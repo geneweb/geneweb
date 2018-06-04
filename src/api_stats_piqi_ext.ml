@@ -1,5 +1,3 @@
-(* nocamlp5 *)
-
 let piqi = Api_stats_piqi.piqi
 
 

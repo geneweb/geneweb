@@ -1,0 +1,5 @@
+(executables
+ ((names (gwpublic1 gwpublic2 gwpublic2priv gwprivate gwiftitles))
+  (libraries (geneweb.lib))
+ )
+)

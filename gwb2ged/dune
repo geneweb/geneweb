@@ -1,0 +1,5 @@
+(executable
+ ((name gwb2ged)
+  (libraries (str geneweb.lib))
+ )
+)

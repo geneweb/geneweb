@@ -1,33 +1,25 @@
 (* $Id: consmoy.ml,v 4.7 2006-10-04 10:51:20 deraugla Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
-open Gwdb;
-open Printf;
+open Gwdb
+open Printf
 
-value consmoy bname base =
+let consmoy bname base =
   let cons = ref 0.0 in
-  do {
-    for i = 0 to nb_of_persons base - 1 do {
-      let p = poi base (Adef.iper_of_int i) in
-      cons.val := cons.val +. Adef.float_of_fix (get_consang p)
-    };
-    printf "average consanguinity: %f\n"
-      (cons.val /. float (nb_of_persons base));
-    flush stdout;
-    ()
-  }
-;
+  for i = 0 to nb_of_persons base - 1 do
+    let p = poi base (Adef.iper_of_int i) in
+    cons := !cons +. Adef.float_of_fix (get_consang p)
+  done;
+  printf "average consanguinity: %f\n" (!cons /. float (nb_of_persons base));
+  flush stdout;
+  ()
 
-value bname = ref "";
-value usage = "usage: " ^ Sys.argv.(0) ^ " <base>";
-value speclist = [];
+let bname = ref ""
+let usage = "usage: " ^ Sys.argv.(0) ^ " <base>"
+let speclist = []
 
-value main () =
-  do {
-    Argl.parse speclist (fun s -> bname.val := s) usage;
-    let base = Gwdb.open_base bname.val in
-    consmoy bname.val base
-  }
-;
+let main () =
+  Argl.parse speclist (fun s -> bname := s) usage;
+  let base = Gwdb.open_base !bname in consmoy !bname base
 
-Printexc.print main ();
+let _ = Printexc.print main ()

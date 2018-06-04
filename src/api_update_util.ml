@@ -1,5 +1,3 @@
-(* nocamlp5 *)
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -43,7 +41,6 @@ let new_gutil_find_free_occ base f s i =
     | [] -> cnt1
   in
   loop 0 list_occ
-;;
 
 let ht_free_occ = Hashtbl.create 33 ;;
 let api_find_free_occ base fn sn =
@@ -67,7 +64,6 @@ let api_find_free_occ base fn sn =
         Hashtbl.add ht_free_occ key free_occ;
         free_occ
       end
-;;
 
 
 (**/**) (* Type de retour de modification. *)
@@ -95,7 +91,6 @@ type update_base_status =
   | UpdateSuccess of CheckItem.base_warning list * CheckItem.base_misc list * (unit -> unit) list
   | UpdateError of string
   | UpdateErrorConflict of Mwrite.Create_conflict.t
-;;
 
 
 (* Exception qui gère les conflits de création de personnes. *)
@@ -161,7 +156,6 @@ let error_conflict_person_link conf base (f, s, o, create, var, force_create) =
              *)
       else false
   | _ -> false
-;;
 
 let check_person_conflict conf base sp =
   (* Vérification de la personne. *)
@@ -185,8 +179,8 @@ let check_person_conflict conf base sp =
                let form = Some `person_form1 in
                let lastname = sp.surname in
                let firstname = sp.first_name in
-               Mwrite.Create_conflict.({
-                 form = form;
+               {
+                 Mwrite.Create_conflict.form = form;
                  witness = false;
                  rparents = false;
                  event = false;
@@ -194,7 +188,7 @@ let check_person_conflict conf base sp =
                  pos_witness = None;
                  lastname = lastname;
                  firstname = firstname;
-               })
+               }
              in
              raise (ModErrApiConflict conflict))
         end;
@@ -209,8 +203,8 @@ let check_person_conflict conf base sp =
                 if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
                   let form = Some `person_form1 in
                   let conflict =
-                    Mwrite.Create_conflict.({
-                      form = form;
+                    {
+                      Mwrite.Create_conflict.form = form;
                       witness = false;
                       rparents = true;
                       event = false;
@@ -218,7 +212,7 @@ let check_person_conflict conf base sp =
                       pos_witness = None;
                       lastname = s;
                       firstname = f;
-                    })
+                    }
                   in
                   raise (ModErrApiConflict conflict)
                 else
@@ -241,8 +235,8 @@ let check_person_conflict conf base sp =
                   if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
                     let form = Some `person_form1 in
                     let conflict =
-                      Mwrite.Create_conflict.({
-                        form = form;
+                      {
+                        Mwrite.Create_conflict.form = form;
                         witness = true;
                         rparents = false;
                         event = true;
@@ -250,7 +244,7 @@ let check_person_conflict conf base sp =
                         pos_witness = Some (Int32.of_int j);
                         lastname = s;
                         firstname = f;
-                      })
+                      }
                     in
                     raise (ModErrApiConflict conflict)
                   else
@@ -262,7 +256,6 @@ let check_person_conflict conf base sp =
       in
       loop sp.pevents 0
     end
-;;
 
 let check_family_conflict conf base sfam scpl sdes =
   (* Vérification des parents. *)
@@ -276,8 +269,8 @@ let check_family_conflict conf base sfam scpl sdes =
             else  Some `person_form2
           in
           let conflict =
-            Mwrite.Create_conflict.({
-              form = form;
+            {
+              Mwrite.Create_conflict.form = form;
               witness = false;
               rparents = false;
               event = false;
@@ -285,7 +278,7 @@ let check_family_conflict conf base sfam scpl sdes =
               pos_witness = None;
               lastname = s;
               firstname = f;
-            })
+            }
           in
           raise (ModErrApiConflict conflict)
         else
@@ -305,8 +298,8 @@ let check_family_conflict conf base sfam scpl sdes =
               if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
                 let form = Some `family_form in
                 let conflict =
-                  Mwrite.Create_conflict.({
-                    form = form;
+                  {
+                    Mwrite.Create_conflict.form = form;
                     witness = true;
                     rparents = false;
                     event = true;
@@ -314,7 +307,7 @@ let check_family_conflict conf base sfam scpl sdes =
                     pos_witness = Some (Int32.of_int j);
                     lastname = s;
                     firstname = f;
-                  })
+                  }
                 in
                 raise (ModErrApiConflict conflict)
               else
@@ -333,8 +326,8 @@ let check_family_conflict conf base sfam scpl sdes =
         if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
           let form = Some `person_form1 in
           let conflict =
-            Mwrite.Create_conflict.({
-              form = form;
+            {
+              Mwrite.Create_conflict.form = form;
               witness = false;
               rparents = false;
               event = false;
@@ -342,14 +335,13 @@ let check_family_conflict conf base sfam scpl sdes =
               pos_witness = None;
               lastname = s;
               firstname = f;
-            })
+            }
           in
           raise (ModErrApiConflict conflict)
         else
           loop l (i + 1)
   in
   loop (Array.to_list sdes.children) 0
-;;
 
 
 (**/**) (* Convertion d'une date. *)
@@ -379,7 +371,7 @@ let piqi_date_of_date date =
         let m = Some (Int32.of_int dmy.month) in
         let y = Some (Int32.of_int dmy.year) in
         let delta = Some (Int32.of_int dmy.delta) in
-        let dmy1 = Mwrite.Dmy.({day = d; month = m; year = y; delta = delta;}) in
+        let dmy1 = {Mwrite.Dmy.day = d; month = m; year = y; delta = delta;} in
         let (prec, dmy2) =
           match dmy.prec with
           | Sure -> (`sure, None)
@@ -393,7 +385,7 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                Mwrite.Dmy.({day = d; month = m; year = y; delta = delta;})
+                {Mwrite.Dmy.day = d; month = m; year = y; delta = delta;}
               in
               (`oryear, Some dmy2)
           | YearInt dmy2 ->
@@ -402,28 +394,27 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                Mwrite.Dmy.({day = d; month = m; year = y; delta = delta;})
+                {Mwrite.Dmy.day = d; month = m; year = y; delta = delta;}
               in
               (`yearint, Some dmy2)
         in
         (prec, dmy1, dmy2)
       in
-      Mwrite.Date.({
-        cal = cal;
+      {
+        Mwrite.Date.cal = cal;
         prec = Some prec;
         dmy = Some dmy;
         dmy2 = dmy2;
         text = None;
-      })
+      }
   | Dtext txt ->
-      Mwrite.Date.({
-        cal = None;
+      {
+        Mwrite.Date.cal = None;
         prec = None;
         dmy = None;
         dmy2 = None;
         text = Some txt;
-      })
-;;
+      }
 
 
 (* ************************************************************************ *)
@@ -576,7 +567,6 @@ let date_of_piqi_date conf date =
           | None -> None
           end
       | None -> None
-;;
 
 
 (**/**) (* Convertion d'une personne pour la lecture. *)
@@ -625,7 +615,6 @@ let child_of_parent conf base p =
       translate_eval
         (transl_a_of_gr_eq_gen_lev conf
            (transl_nth conf "son/daughter/child" is) s)
-;;
 
 let husband_wife conf base p =
   let rec loop i =
@@ -644,7 +633,6 @@ let husband_wife conf base p =
     else ""
   in
   loop 0
-;;
 
 
 (* ************************************************************************** *)
@@ -715,8 +703,8 @@ let pers_to_piqi_simple_person conf base p =
       | None -> ""
       *)
   in
-  Mwrite.Simple_person.({
-    index = index;
+  {
+    Mwrite.Simple_person.index = index;
     sex = sex;
     lastname = surname;
     firstname = first_name;
@@ -726,8 +714,7 @@ let pers_to_piqi_simple_person conf base p =
     death_place = if death_place = "" then None else Some death_place;
     image = if image = "" then None else Some image;
     sosa = sosa;
-  })
-;;
+  }
 
 
 (* ************************************************************************** *)
@@ -775,8 +762,8 @@ let pers_to_piqi_person_search conf base p =
     if hw <> "" then hw
     else child_of_parent conf base p
   in
-  Mwrite.Person_search.({
-    index = index;
+  {
+    Mwrite.Person_search.index = index;
     sex = sex;
     lastname = surname;
     firstname = first_name;
@@ -787,8 +774,7 @@ let pers_to_piqi_person_search conf base p =
     n = Name.lower (p_surname base p);
     p = Name.lower (p_first_name base p);
     oc = Int32.of_int (get_occ p);
-  })
-;;
+  }
 
 
 (* ************************************************************************** *)
@@ -917,8 +903,8 @@ let pers_to_piqi_person_search_info conf base p =
                }))
             (Array.to_list w)
         in
-        Mwrite.Event.({
-          name = name;
+        {
+          Mwrite.Event.name = name;
           date = if date = "" then None else Some date;
           date_conv = if date_conv = "" then None else Some date_conv;
           date_cal = date_cal;
@@ -928,7 +914,7 @@ let pers_to_piqi_person_search_info conf base p =
           src = if src= "" then None else Some src;
           spouse = spouse;
           witnesses = witnesses;
-        }))
+        })
       (Perso.events_list conf base p)
   in
   let notes =
@@ -1018,10 +1004,10 @@ let pers_to_piqi_person_search_info conf base p =
           | GodParent -> `rchild_god_parent
           | FosterParent -> `rchild_foster_parent
         in
-        Mwrite.Relation_person.({
-          r_type = r_type;
+        {
+          Mwrite.Relation_person.r_type = r_type;
           person = p;
-        }) )
+        } )
       list
   in
   let rparents =
@@ -1041,10 +1027,10 @@ let pers_to_piqi_person_search_info conf base p =
               let p = poi base ip in
               let p = pers_to_piqi_simple_person conf base p in
               let p =
-                Mwrite.Relation_person.({
-                  r_type = r_type;
+                {
+                  Mwrite.Relation_person.r_type = r_type;
                   person = p;
-                })
+                }
               in
               p :: rl
           | None -> rl
@@ -1055,10 +1041,10 @@ let pers_to_piqi_person_search_info conf base p =
               let p = poi base ip in
               let p = pers_to_piqi_simple_person conf base p in
               let p =
-                Mwrite.Relation_person.({
-                  r_type = r_type;
+                {
+                  Mwrite.Relation_person.r_type = r_type;
                   person = p;
-                })
+                }
               in
               p :: rl
           | None -> rl
@@ -1130,8 +1116,8 @@ let pers_to_piqi_person_search_info conf base p =
          }) )
       list
   in
-  Mwrite.Person_search_info.({
-    index = index;
+  {
+    Mwrite.Person_search_info.index = index;
     sex = sex;
     lastname = surname;
     firstname = first_name;
@@ -1151,8 +1137,7 @@ let pers_to_piqi_person_search_info conf base p =
     rparents = rparents;
     was_witness = was_witness;
     sosa = sosa;
-  })
-;;
+  }
 
 
 (**/**) (* Convertion d'une personne, d'une famille. *)
@@ -1191,16 +1176,15 @@ let pers_to_piqi_person_link conf base p =
     if dates = "" then None
     else Some ("(" ^ dates ^ ")")
   in
-  Mwrite.Person_link.({
-    create_link = create_link;
+  {
+    Mwrite.Person_link.create_link = create_link;
     index = index;
     sex = sex;
     lastname = surname;
     firstname = first_name;
     occ = occ;
     dates = dates;
-  })
-;;
+  }
 
 
 (* ************************************************************************* *)
@@ -1372,8 +1356,8 @@ let pers_to_piqi_mod_person conf base p =
                 }))
              (Array.to_list evt.epers_witnesses)
          in
-         Mwrite.Pevent.({
-           pevent_type = pevent_type;
+         {
+           Mwrite.Pevent.pevent_type = pevent_type;
            date = date;
            place = if place = "" then None else Some place;
            reason = reason;
@@ -1381,7 +1365,7 @@ let pers_to_piqi_mod_person conf base p =
            src = if src = "" then None else Some src;
            witnesses = witnesses;
            event_perso = event_perso;
-         }))
+         })
       (get_pevents p)
   in
   (* Si la personne n'a aucun évènement et/ou est décédée mais *)
@@ -1390,8 +1374,8 @@ let pers_to_piqi_mod_person conf base p =
     if pevents = [] then
       begin
         let birth =
-          Mwrite.Pevent.({
-            pevent_type = Some `epers_birth;
+          {
+            Mwrite.Pevent.pevent_type = Some `epers_birth;
             date = None;
             place = None;
             reason = None;
@@ -1399,13 +1383,13 @@ let pers_to_piqi_mod_person conf base p =
             src = None;
             witnesses = [];
             event_perso = None;
-          })
+          }
         in
         (* Que pour les personnes qui existent. *)
         if Adef.int_of_iper (get_key_index p) >= 0 && death_type != `not_dead then
           let death =
-            Mwrite.Pevent.({
-              pevent_type = Some `epers_death;
+            {
+              Mwrite.Pevent.pevent_type = Some `epers_death;
               date = None;
               place = None;
               reason = None;
@@ -1413,7 +1397,7 @@ let pers_to_piqi_mod_person conf base p =
               src = None;
               witnesses = [];
               event_perso = None;
-            })
+            }
           in
           [birth; death]
         else [birth]
@@ -1431,8 +1415,8 @@ let pers_to_piqi_mod_person conf base p =
         else
           begin
             let birth =
-              Mwrite.Pevent.({
-                pevent_type = Some `epers_birth;
+              {
+                Mwrite.Pevent.pevent_type = Some `epers_birth;
                 date = None;
                 place = None;
                 reason = None;
@@ -1440,7 +1424,7 @@ let pers_to_piqi_mod_person conf base p =
                 src = None;
                 witnesses = [];
                 event_perso = None;
-              })
+              }
             in
             birth :: pevents
           end
@@ -1449,8 +1433,8 @@ let pers_to_piqi_mod_person conf base p =
       else
         begin
           let death =
-            Mwrite.Pevent.({
-              pevent_type = Some `epers_death;
+            {
+              Mwrite.Pevent.pevent_type = Some `epers_death;
               date = None;
               place = None;
               reason = None;
@@ -1458,7 +1442,7 @@ let pers_to_piqi_mod_person conf base p =
               src = None;
               witnesses = [];
               event_perso = None;
-            })
+            }
           in
           pevents @ [death]
         end;
@@ -1537,8 +1521,8 @@ let pers_to_piqi_mod_person conf base p =
       (fun ifam -> Int32.of_int (Adef.int_of_ifam ifam))
       (Array.to_list (get_family p))
   in
-  Mwrite.Person.({
-    digest = digest;
+  {
+    Mwrite.Person.digest = digest;
     index = index;
     sex = sex;
     lastname = surname;
@@ -1562,8 +1546,7 @@ let pers_to_piqi_mod_person conf base p =
     parents = parents;
     families = families;
     create_link = create_link;
-  })
-;;
+  }
 
 
 (* ************************************************************************ *)
@@ -1626,8 +1609,8 @@ let fam_to_piqi_mod_family conf base ifam fam =
                 }))
              (Array.to_list evt.efam_witnesses)
          in
-         Mwrite.Fevent.({
-           fevent_type = fevent_type;
+         {
+           Mwrite.Fevent.fevent_type = fevent_type;
            date = date;
            place = if place = "" then None else Some place;
            reason = reason;
@@ -1635,7 +1618,7 @@ let fam_to_piqi_mod_family conf base ifam fam =
            src = if src = "" then None else Some src;
            witnesses = witnesses;
            event_perso = event_perso;
-         }))
+         })
       (get_fevents fam)
   in
   let fsources = sou base (get_fsources fam) in
@@ -1658,8 +1641,8 @@ let fam_to_piqi_mod_family conf base ifam fam =
       (fun ip -> Int32.of_int (Adef.int_of_iper ip))
       (Array.to_list (get_witnesses fam))
   in
-  Mwrite.Family.({
-    digest = digest;
+  {
+    Mwrite.Family.digest = digest;
     index = index;
     fevents = fevents;
     fsources = if fsources = "" then None else Some fsources;
@@ -1669,8 +1652,7 @@ let fam_to_piqi_mod_family conf base ifam fam =
     mother = mother;
     children = children;
     old_witnesses = old_witnesses;
-  })
-;;
+  }
 
 
 (* ************************************************************************** *)
@@ -1731,8 +1713,8 @@ let piqi_mod_person_of_person_start conf base start_p =
     | _ -> None
   in
   let birth =
-    Mwrite.Pevent.({
-      pevent_type = Some `epers_birth;
+    {
+      Mwrite.Pevent.pevent_type = Some `epers_birth;
       date = birth_date;
       place = None;
       reason = None;
@@ -1740,11 +1722,10 @@ let piqi_mod_person_of_person_start conf base start_p =
       src = None;
       witnesses = [];
       event_perso = None;
-    })
+    }
   in
   mod_p.Mwrite.Person.pevents <- [birth];
   mod_p
-;;
 
 
 (**/**) (* Famille vide. *)
@@ -1763,8 +1744,8 @@ let piqi_empty_family conf base ifam =
   mother.Mwrite.Person.access <- `access_iftitles;
   let fevents =
     let evt =
-      Mwrite.Fevent.({
-        fevent_type = Some `efam_marriage;
+      {
+        Mwrite.Fevent.fevent_type = Some `efam_marriage;
         date = None;
         place = None;
         reason = None;
@@ -1772,12 +1753,12 @@ let piqi_empty_family conf base ifam =
         src = None;
         witnesses = [];
         event_perso = None;
-      })
+      }
     in
     [evt]
   in
-  Mwrite.Family.({
-    digest = "";
+  {
+    Mwrite.Family.digest = "";
     index = Int32.of_int (Adef.int_of_ifam ifam);
     fevents = fevents;
     fsources = None;
@@ -1787,8 +1768,7 @@ let piqi_empty_family conf base ifam =
     mother = mother;
     children = [];
     old_witnesses = [];
-  })
-;;
+  }
 
 (* List of strings in which some characters were removed. *)
 let removed_string = ref [] ;;
@@ -1847,4 +1827,3 @@ let reconstitute_somebody conf base person =
     else (fn, sn)
   in
   (fn, sn, occ, create, var, force_create)
-;;

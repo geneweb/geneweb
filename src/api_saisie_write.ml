@@ -1,5 +1,3 @@
-(* nocamlp5 *)
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -1155,8 +1153,8 @@ let compute_modification_status conf base ip ifam resp =
     else ()
   in
   let response =
-    Mwrite.Modification_status.({
-      is_base_updated = is_base_updated;
+    {
+      Mwrite.Modification_status.is_base_updated = is_base_updated;
       base_warnings = warnings;
       base_miscs = miscs;
       index_person = index_person;
@@ -1169,7 +1167,7 @@ let compute_modification_status conf base ip ifam resp =
       firstname_str = first_name_str;
       n = sn;
       p = fn;
-    })
+    }
   in
   let data = Mext_write.gen_modification_status response in
   data
@@ -1481,8 +1479,8 @@ let compute_add_family conf base p =
   (* On calcul si le conjoint est décédé et ajoute les évènements nécessaires. *)
   let () =
     let death =
-      Mwrite.Pevent.({
-        pevent_type = Some `epers_death;
+      {
+        Mwrite.Pevent.pevent_type = Some `epers_death;
         date = None;
         place = None;
         reason = None;
@@ -1490,7 +1488,7 @@ let compute_add_family conf base p =
         src = None;
         witnesses = [];
         event_perso = None;
-      })
+      }
     in
     match compute_infer_death conf base p with
     | Compute_dead | Compute_dont_know_if_dead ->
@@ -1536,15 +1534,14 @@ let print_add_family conf base =
   let first_name = sou base (get_first_name p) in
   let family = compute_add_family conf base p in
   let add_family =
-    Mwrite.Add_family.({
-      person_lastname = surname;
+    {
+      Mwrite.Add_family.person_lastname = surname;
       person_firstname = first_name;
       family = family;
-    })
+    }
   in
   let data = Mext_write.gen_add_family add_family in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -1753,7 +1750,6 @@ let compute_add_family_ok conf base ip mod_family =
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
-;;
 
 
 (* ************************************************************************ *)
@@ -1774,7 +1770,6 @@ let print_add_family_ok conf base =
   let ifam = Int32.to_int mod_family.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -1824,8 +1819,8 @@ let print_mod_family_request conf base =
            else `sosa
          in
          let family_spouse =
-           Mwrite.Family_spouse.({
-             index_family = index_family;
+           {
+             Mwrite.Family_spouse.index_family = index_family;
              index_person = index_person;
              sex = sex;
              lastname = surname;
@@ -1833,7 +1828,7 @@ let print_mod_family_request conf base =
              dates = if dates = "" then None else Some dates;
              image = if image = "" then None else Some image;
              sosa = sosa;
-           })
+           }
          in
          family_spouse :: accu)
       (Array.to_list (get_family p)) []
@@ -1858,11 +1853,11 @@ let print_mod_family_request conf base =
           family.Mwrite.Family.mother <- mother;
         in
         let edit_family =
-          Mwrite.Edit_family.({
-            person_lastname = surname;
+          {
+            Mwrite.Edit_family.person_lastname = surname;
             person_firstname = first_name;
             family = family;
-          })
+          }
         in
         Some edit_family
   in
@@ -1874,7 +1869,6 @@ let print_mod_family_request conf base =
   in
   let data = Mext_write.gen_edit_family_request spouses in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -1910,15 +1904,14 @@ let print_mod_family conf base =
     family.Mwrite.Family.mother <- mother;
   in
   let edit_family =
-    Mwrite.Edit_family.({
-      person_lastname = surname;
+    {
+      Mwrite.Edit_family.person_lastname = surname;
       person_firstname = first_name;
       family = family;
-    })
+    }
   in
   let data = Mext_write.gen_edit_family edit_family in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -1993,7 +1986,6 @@ let print_mod_family_ok conf base =
   let ifam = Int32.to_int mod_family.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -2040,8 +2032,8 @@ let print_add_parents conf base =
      et ajoute les évènements nécessaires. *)
   let () =
     let death =
-      Mwrite.Pevent.({
-        pevent_type = Some `epers_death;
+      {
+        Mwrite.Pevent.pevent_type = Some `epers_death;
         date = None;
         place = None;
         reason = None;
@@ -2049,7 +2041,7 @@ let print_add_parents conf base =
         src = None;
         witnesses = [];
         event_perso = None;
-      })
+      }
     in
     match compute_infer_death conf base p with
     | Compute_dead | Compute_dont_know_if_dead ->
@@ -2074,15 +2066,14 @@ let print_add_parents conf base =
       father.Mwrite.Person.lastname <- surname;
   in
   let add_parents =
-    Mwrite.Add_parents.({
-      person_lastname = surname;
+    {
+      Mwrite.Add_parents.person_lastname = surname;
       person_firstname = first_name;
       family = family;
-    })
+    }
   in
   let data = Mext_write.gen_add_parents add_parents in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -2204,7 +2195,6 @@ let print_add_parents_ok conf base =
   in
   let data = compute_modification_status conf base ip (-1) resp in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -2256,8 +2246,8 @@ let print_add_child conf base =
            else `sosa
          in
          let family_spouse =
-           Mwrite.Family_spouse.({
-             index_family = index_family;
+           {
+             Mwrite.Family_spouse.index_family = index_family;
              index_person = index_person;
              sex = sex;
              lastname = surname;
@@ -2265,7 +2255,7 @@ let print_add_child conf base =
              dates = if dates = "" then None else Some dates;
              image = if image = "" then None else Some image;
              sosa = sosa;
-           })
+           }
          in
          family_spouse :: accu)
       (Array.to_list (get_family p)) []
@@ -2291,8 +2281,8 @@ let print_add_child conf base =
   (* On calcul si l'enfant est décédé. *)
   let () =
     let death =
-      Mwrite.Pevent.({
-        pevent_type = Some `epers_death;
+      {
+        Mwrite.Pevent.pevent_type = Some `epers_death;
         date = None;
         place = None;
         reason = None;
@@ -2300,7 +2290,7 @@ let print_add_child conf base =
         src = None;
         witnesses = [];
         event_perso = None;
-      })
+      }
     in
     match compute_infer_death conf base p with
     | Compute_dead | Compute_dont_know_if_dead ->
@@ -2324,7 +2314,6 @@ let print_add_child conf base =
   in
   let data = Mext_write.gen_add_child add_child in
   print_result conf data
-;;
 
 
 (*
@@ -2355,7 +2344,6 @@ let print_add_child_ok conf base =
     let resp = Api_update_family.print_add_child conf base ip ifam mod_c in
     let data = compute_modification_status conf base ip ifam resp in
     print_result conf data
-;;
 *)
 
 
@@ -2382,15 +2370,15 @@ let print_add_child_ok conf base =
   let sn = mod_c.Mwrite.Person.lastname in
   let occ = mod_c.Mwrite.Person.occ in
   let create_child =
-    Mwrite.Person_link.({
-      create_link = mod_c.Mwrite.Person.create_link;
+    {
+      Mwrite.Person_link.create_link = mod_c.Mwrite.Person.create_link;
       index = mod_c.Mwrite.Person.index;
       sex = mod_c.Mwrite.Person.sex;
       lastname = sn;
       firstname = fn;
       occ = occ; (* Directement mis à jour dans update_family *)
       dates = None;
-    })
+    }
   in
   if add_child_ok.Mwrite.Add_child_ok.new_family then
     begin
@@ -2510,7 +2498,6 @@ let print_add_child_ok conf base =
       let data = compute_modification_status conf base ip ifam resp in
       print_result conf data
     end
-;;
 
 
 (* ************************************************************************ *)
@@ -2557,8 +2544,8 @@ let print_add_sibling conf base =
   (* On calcul si l'enfant est décédé. *)
   let () =
     let death =
-      Mwrite.Pevent.({
-        pevent_type = Some `epers_death;
+      {
+        Mwrite.Pevent.pevent_type = Some `epers_death;
         date = None;
         place = None;
         reason = None;
@@ -2566,7 +2553,7 @@ let print_add_sibling conf base =
         src = None;
         witnesses = [];
         event_perso = None;
-      })
+      }
     in
     match father with
     | Some father ->
@@ -2596,7 +2583,6 @@ let print_add_sibling conf base =
   in
   let data = Mext_write.gen_add_sibling add_sibling in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -2622,15 +2608,15 @@ let print_add_sibling_ok conf base =
   let sn = mod_c.Mwrite.Person.lastname in
   let occ = mod_c.Mwrite.Person.occ in
   let create_sibling =
-    Mwrite.Person_link.({
-      create_link = mod_c.Mwrite.Person.create_link;
+    {
+      Mwrite.Person_link.create_link = mod_c.Mwrite.Person.create_link;
       index = mod_c.Mwrite.Person.index;
       sex = mod_c.Mwrite.Person.sex;
       lastname = sn;
       firstname = fn;
       occ = occ; (* Directement mis à jour dans update_family *)
       dates = None;
-    })
+    }
   in
   (* Si il n'y a pas de parent, on veut créer la famille *)
   match get_parents p with
@@ -2771,7 +2757,6 @@ let print_add_sibling_ok conf base =
         let data = compute_modification_status conf base ip (Adef.int_of_ifam ifam) resp in
         print_result conf data
       end
-;;
 
 
 (**/**) (* Fonctions pour la première saisie. *)
@@ -2841,7 +2826,6 @@ let check_input_person conf mod_p =
       raise (Update.ModErrApi err)
   in
   ()
-;;
 
 
 (* ************************************************************************ *)
@@ -2979,7 +2963,6 @@ let compute_add_first_fam conf =
         Api_update_util.UpdateErrorConflict c
   in
   (add_first_fam, resp)
-;;
 
 
 (* ************************************************************************ *)
@@ -3016,8 +2999,8 @@ let print_add_first_fam conf =
     | Api_update_util.UpdateSuccess (wl, ml, hr) -> (true, [], [], None, [])
   in
   let response =
-    Mwrite.Modification_status.({
-      is_base_updated = is_base_updated;
+    {
+      Mwrite.Modification_status.is_base_updated = is_base_updated;
       base_warnings = warnings;
       base_miscs = miscs;
       index_person = index_person;
@@ -3030,11 +3013,10 @@ let print_add_first_fam conf =
       firstname_str = first_name_str;
       n = sn;
       p = fn;
-    })
+    }
   in
   let data = Mext_write.gen_modification_status response in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -3103,15 +3085,15 @@ let print_add_first_fam_ok conf base =
           family.Mwrite.Family.mother.Mwrite.Person.sex <- `female;
           (* On met à jour la famille avec l'enfant. *)
           let child =
-            Mwrite.Person_link.({
-              create_link = `create_default_occ;
+            {
+              Mwrite.Person_link.create_link = `create_default_occ;
               index = mod_p.Mwrite.Person.index;
               sex = mod_p.Mwrite.Person.sex;
               lastname = mod_p.Mwrite.Person.lastname;
               firstname = mod_p.Mwrite.Person.firstname;
               occ = mod_p.Mwrite.Person.occ;
               dates = None;
-            })
+            }
           in
           family.Mwrite.Family.children <- [child];
           family
@@ -3261,15 +3243,15 @@ let print_add_first_fam_ok conf base =
           let children =
             List.map
               (fun c ->
-                Mwrite.Person_link.({
-                  create_link = `create_default_occ;
+                {
+                  Mwrite.Person_link.create_link = `create_default_occ;
                   index = c.Mwrite.Person.index;
                   sex = c.Mwrite.Person.sex;
                   lastname = c.Mwrite.Person.lastname;
                   firstname = c.Mwrite.Person.firstname;
                   occ = c.Mwrite.Person.occ;
                   dates = None;
-                }))
+                })
               mod_children
           in
           family.Mwrite.Family.children <- children;
@@ -3333,4 +3315,3 @@ let print_add_first_fam_ok conf base =
   in
   let data = compute_modification_status conf base !ip !ifam resp in
   print_result conf data
-;;

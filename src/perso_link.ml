@@ -1,15 +1,14 @@
-(* camlp5r *)
 (* $Id: perso_link.ml,v 0.01 2015-02-19 15:29:32 flh Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 
-module MLink = Api_link_tree_piqi;
-module MLinkext = Api_link_tree_piqi_ext;
+module MLink = Api_link_tree_piqi
+module MLinkext = Api_link_tree_piqi_ext
 
 
-open Config;
-open Def;
-open Gwdb;
+open Config
+open Def
+open Gwdb
 
 
 
@@ -25,149 +24,150 @@ open Gwdb;
       - date : date
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-value date_of_piqi_date date =
+let date_of_piqi_date date =
   match date.MLink.Date.text with
-  [ Some txt -> Some (Dtext txt)
+    Some txt -> Some (Dtext txt)
   | _ ->
       (* Si on a une année, on a une date. *)
       match date.MLink.Date.dmy with
-      [ Some dmy ->
-            match dmy.MLink.Dmy.year with
-            [ Some _ ->
-                let cal =
-                  match date.MLink.Date.cal with
-                  [ Some `julian -> Djulian
-                  | Some `french -> Dfrench
-                  | Some `hebrew -> Dhebrew
-                  | _ -> Dgregorian ]
-                in
-                let prec =
-                  match date.MLink.Date.prec with
-                  [ Some `about -> About
-                  | Some `maybe -> Maybe
-                  | Some `before -> Before
-                  | Some `after -> After
-                  | Some `oryear ->
-                      match date.MLink.Date.dmy2 with
-                      [ Some dmy ->
-                            match dmy.MLink.Dmy.year with
-                            [ Some _ ->
-                                let d =
-                                  match dmy.MLink.Dmy.day with
-                                  [ Some day -> Int32.to_int day
-                                  | None -> 0 ]
-                                in
-                                let m =
-                                  match dmy.MLink.Dmy.month with
-                                  [ Some month -> Int32.to_int month
-                                  | None -> 0 ]
-                                in
-                                let y =
-                                  match dmy.MLink.Dmy.year with
-                                  [ Some year -> Int32.to_int year
-                                  | None -> 0 (* erreur ! *) ]
-                                in
-                                (* gestion des erreurs. *)
-                                let (d, m, y) =
-                                  match dmy.MLink.Dmy.year with
-                                  [ Some _ ->
-                                      if m <= 0 then (0, 0, y)
-                                      else (d, m, y)
-                                  | None -> (0, 0, 0) (* should not happen ! *) ]
-                                in
-                                let dmy2 =
-                                  {day2 = d; month2 = m; year2 = y; delta2 = 0}
-                                in
-                                OrYear dmy2
-                            | None -> Sure ]
-                      | None -> Sure (*OrYear {day2 = 0; month2 = 0; year2 = 0; delta2 = 0}*) (* erreur*) ]
-                  | Some `yearint ->
-                      match date.MLink.Date.dmy2 with
-                      [ Some dmy ->
-                            match dmy.MLink.Dmy.year with
-                            [ Some _ ->
-                                let d =
-                                  match dmy.MLink.Dmy.day with
-                                  [ Some day -> Int32.to_int day
-                                  | None -> 0 ]
-                                in
-                                let m =
-                                  match dmy.MLink.Dmy.month with
-                                  [ Some month -> Int32.to_int month
-                                  | None -> 0 ]
-                                in
-                                let y =
-                                  match dmy.MLink.Dmy.year with
-                                  [ Some year -> Int32.to_int year
-                                  | None -> 0 (* erreur ! *) ]
-                                in
-                                (* gestion des erreurs. *)
-                                let (d, m, y) =
-                                  match dmy.MLink.Dmy.year with
-                                  [ Some _ ->
-                                      if m <= 0 then (0, 0, y)
-                                      else (d, m, y)
-                                  | None -> (0, 0, 0) (* should not happen ! *) ]
-                                in
-                                let dmy2 =
-                                  {day2 = d; month2 = m; year2 = y; delta2 = 0}
-                                in
-                                YearInt dmy2
-                            | None -> Sure ]
-                      | None -> Sure (*YearInt {day2 = 0; month2 = 0; year2 = 0; delta2 = 0}*) (* erreur*) ]
-                  | _ -> Sure ]
-                in
-                let dmy =
-                  match date.MLink.Date.dmy with
-                  [ Some dmy ->
-                      let day =
-                        match dmy.MLink.Dmy.day with
-                        [ Some day -> Int32.to_int day
-                        | None -> 0 ]
-                      in
-                      let month =
-                        match dmy.MLink.Dmy.month with
-                        [ Some month -> Int32.to_int month
-                        | None -> 0 ]
-                      in
-                      let year =
-                        match dmy.MLink.Dmy.year with
-                        [ Some year -> Int32.to_int year
-                        | None -> 0 (* erreur ! *) ]
-                      in
-                      let delta =
-                        match dmy.MLink.Dmy.delta with
-                        [ Some delta -> Int32.to_int delta
-                        | None -> 0 ]
-                      in
-                      (* gestion des erreurs. *)
-                      let (day, month, year) =
-                        match dmy.MLink.Dmy.year with
-                        [ Some _ ->
-                            if month <= 0 then (0, 0, year)
-                            else (day, month, year)
-                        | None -> (0, 0, 0) (* should not happen ! *) ]
-                      in
-                      let dmy =
-                        {day = day; month = month; year = year; prec = prec; delta = delta}
-                      in
-                      dmy
-                  | None -> (* erreur*)
-                      {day = 0; month = 0; year = 0; prec = Sure; delta = 0} ]
-                in
-                let dmy =
-                  match cal with
-                  [ Dgregorian -> dmy
-                  | Djulian -> Calendar.gregorian_of_julian dmy
-                  | Dfrench -> Calendar.gregorian_of_french dmy
-                  | Dhebrew -> Calendar.gregorian_of_hebrew dmy ]
-                in
-                Some (Dgreg dmy cal)
-          | None -> None ]
-      | None -> None ] ]
-;
+        Some dmy ->
+          begin match dmy.MLink.Dmy.year with
+            Some _ ->
+              let cal =
+                match date.MLink.Date.cal with
+                  Some `julian -> Djulian
+                | Some `french -> Dfrench
+                | Some `hebrew -> Dhebrew
+                | _ -> Dgregorian
+              in
+              let prec =
+                match date.MLink.Date.prec with
+                  Some `about -> About
+                | Some `maybe -> Maybe
+                | Some `before -> Before
+                | Some `after -> After
+                | Some `oryear ->
+                    begin match date.MLink.Date.dmy2 with
+                      Some dmy ->
+                        begin match dmy.MLink.Dmy.year with
+                          Some _ ->
+                            let d =
+                              match dmy.MLink.Dmy.day with
+                                Some day -> Int32.to_int day
+                              | None -> 0
+                            in
+                            let m =
+                              match dmy.MLink.Dmy.month with
+                                Some month -> Int32.to_int month
+                              | None -> 0
+                            in
+                            let y =
+                              match dmy.MLink.Dmy.year with
+                                Some year -> Int32.to_int year
+                              | None -> 0
+                            in
+                            (* gestion des erreurs. *)
+                            let (d, m, y) =
+                              match dmy.MLink.Dmy.year with
+                                Some _ -> if m <= 0 then 0, 0, y else d, m, y
+                              | None -> 0, 0, 0
+                            in
+                            let dmy2 =
+                              {day2 = d; month2 = m; year2 = y; delta2 = 0}
+                            in
+                            OrYear dmy2
+                        | None -> Sure
+                        end
+                    | None -> Sure
+                    end
+                | Some `yearint ->
+                    begin match date.MLink.Date.dmy2 with
+                      Some dmy ->
+                        begin match dmy.MLink.Dmy.year with
+                          Some _ ->
+                            let d =
+                              match dmy.MLink.Dmy.day with
+                                Some day -> Int32.to_int day
+                              | None -> 0
+                            in
+                            let m =
+                              match dmy.MLink.Dmy.month with
+                                Some month -> Int32.to_int month
+                              | None -> 0
+                            in
+                            let y =
+                              match dmy.MLink.Dmy.year with
+                                Some year -> Int32.to_int year
+                              | None -> 0
+                            in
+                            (* gestion des erreurs. *)
+                            let (d, m, y) =
+                              match dmy.MLink.Dmy.year with
+                                Some _ -> if m <= 0 then 0, 0, y else d, m, y
+                              | None -> 0, 0, 0
+                            in
+                            let dmy2 =
+                              {day2 = d; month2 = m; year2 = y; delta2 = 0}
+                            in
+                            YearInt dmy2
+                        | None -> Sure
+                        end
+                    | None -> Sure
+                    end
+                | _ -> Sure
+              in
+              let dmy =
+                match date.MLink.Date.dmy with
+                  Some dmy ->
+                    let day =
+                      match dmy.MLink.Dmy.day with
+                        Some day -> Int32.to_int day
+                      | None -> 0
+                    in
+                    let month =
+                      match dmy.MLink.Dmy.month with
+                        Some month -> Int32.to_int month
+                      | None -> 0
+                    in
+                    let year =
+                      match dmy.MLink.Dmy.year with
+                        Some year -> Int32.to_int year
+                      | None -> 0
+                    in
+                    let delta =
+                      match dmy.MLink.Dmy.delta with
+                        Some delta -> Int32.to_int delta
+                      | None -> 0
+                    in
+                    (* gestion des erreurs. *)
+                    let (day, month, year) =
+                      match dmy.MLink.Dmy.year with
+                        Some _ ->
+                          if month <= 0 then 0, 0, year else day, month, year
+                      | None -> 0, 0, 0
+                    in
+                    let dmy =
+                      {day = day; month = month; year = year; prec = prec;
+                       delta = delta}
+                    in
+                    dmy
+                | None ->
+                    (* erreur*)
+                    {day = 0; month = 0; year = 0; prec = Sure; delta = 0}
+              in
+              let dmy =
+                match cal with
+                  Dgregorian -> dmy
+                | Djulian -> Calendar.gregorian_of_julian dmy
+                | Dfrench -> Calendar.gregorian_of_french dmy
+                | Dhebrew -> Calendar.gregorian_of_hebrew dmy
+              in
+              Some (Dgreg (dmy, cal))
+          | None -> None
+          end
+      | None -> None
 
-value make_ep_link conf base p_link =
+let make_ep_link conf base p_link =
   let empty_union = {family = [| |]} in
   let empty_ascend = {parents = None; consang = Adef.fix (-1)} in
   let empty_p = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
@@ -176,21 +176,21 @@ value make_ep_link conf base p_link =
   let surname = Gwdb.insert_string base p_link.MLink.Person.lastname in
   let first_name = Gwdb.insert_string base p_link.MLink.Person.firstname in
   let occ = Int32.to_int p_link.MLink.Person.oc in
-  let key_index = Adef.iper_of_int (Int32.to_int p_link.MLink.Person.ip)  in
+  let key_index = Adef.iper_of_int (Int32.to_int p_link.MLink.Person.ip) in
   let image =
     match p_link.MLink.Person.image with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let occupation =
     match p_link.MLink.Person.occupation with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let public_name =
     match p_link.MLink.Person.public_name with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let qualifiers =
     List.map (Gwdb.insert_string base) p_link.MLink.Person.qualifiers
@@ -202,77 +202,77 @@ value make_ep_link conf base p_link =
   let titles = [] in
   let sex =
     match p_link.MLink.Person.sex with
-    [ `male -> Male
+      `male -> Male
     | `female -> Female
-    | `unknown -> Neuter ]
+    | `unknown -> Neuter
   in
   let birth =
     match p_link.MLink.Person.birth_date with
-    [ Some d -> Adef.codate_of_od (date_of_piqi_date d)
-    | None -> Adef.codate_None ]
+      Some d -> Adef.codate_of_od (date_of_piqi_date d)
+    | None -> Adef.codate_None
   in
   let birth_place =
     match p_link.MLink.Person.birth_place with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let baptism =
     match p_link.MLink.Person.baptism_date with
-    [ Some d -> Adef.codate_of_od (date_of_piqi_date d)
-    | None -> Adef.codate_None ]
+      Some d -> Adef.codate_of_od (date_of_piqi_date d)
+    | None -> Adef.codate_None
   in
   let baptism_place =
     match p_link.MLink.Person.baptism_place with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let death =
     match p_link.MLink.Person.death_type with
-    [ `not_dead -> NotDead
+      `not_dead -> NotDead
     | `dead ->
-         match p_link.MLink.Person.death_date with
-         [ Some date ->
-               match date_of_piqi_date date with
-               [ Some date -> Death Unspecified (Adef.cdate_of_date date)
-               | None -> DeadDontKnowWhen ]
-         | None -> DeadDontKnowWhen ]
+        begin match p_link.MLink.Person.death_date with
+          Some date ->
+            begin match date_of_piqi_date date with
+              Some date -> Death (Unspecified, Adef.cdate_of_date date)
+            | None -> DeadDontKnowWhen
+            end
+        | None -> DeadDontKnowWhen
+        end
     | `dead_young -> DeadYoung
     | `dead_dont_know_when -> DeadDontKnowWhen
     | `dont_know_if_dead -> DontKnowIfDead
-    | `of_course_dead -> OfCourseDead ]
+    | `of_course_dead -> OfCourseDead
   in
   let death_place =
     match p_link.MLink.Person.death_place with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let burial =
     match p_link.MLink.Person.baptism_date with
-    [ Some d -> Buried (Adef.codate_of_od (date_of_piqi_date d))
-    | None -> UnknownBurial ]
+      Some d -> Buried (Adef.codate_of_od (date_of_piqi_date d))
+    | None -> UnknownBurial
   in
   let burial_place =
     match p_link.MLink.Person.burial_place with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let gen_p =
-    {(gen_p) with access = IfTitles; first_name = first_name; surname = surname;
-      key_index = key_index; occ = occ; image = image; occupation = occupation;
-      public_name = public_name; qualifiers = qualifiers; titles = titles;
-      aliases = aliases; sex = sex; birth = birth; birth_place = birth_place;
-      baptism = baptism; baptism_place = baptism_place; death = death;
-      death_place = death_place; burial = burial; burial_place = burial_place}
+    {gen_p with access = IfTitles; first_name = first_name; surname = surname;
+     key_index = key_index; occ = occ; image = image; occupation = occupation;
+     public_name = public_name; qualifiers = qualifiers; titles = titles;
+     aliases = aliases; sex = sex; birth = birth; birth_place = birth_place;
+     baptism = baptism; baptism_place = baptism_place; death = death;
+     death_place = death_place; burial = burial; burial_place = burial_place}
   in
   let p = Gwdb.person_of_gen_person base (gen_p, empty_ascend, empty_union) in
-  (p, True)
-;
+  p, true
 
-value make_efam_link conf base ip fam_link =
+let make_efam_link conf base ip fam_link =
   let empty_string = Gwdb.insert_string base "" in
   let children =
-    List.map
-      (fun p -> Adef.iper_of_int (Int32.to_int p.MLink.Person_link.ip))
+    List.map (fun p -> Adef.iper_of_int (Int32.to_int p.MLink.Person_link.ip))
       fam_link.MLink.Family.children
   in
   let des = {children = Array.of_list children} in
@@ -281,43 +281,43 @@ value make_efam_link conf base ip fam_link =
   let cpl = Futil.parent conf.multi_parents [| ifath; imoth |] in
   let marriage =
     match fam_link.MLink.Family.marriage_date with
-    [ Some d -> Adef.codate_of_od (date_of_piqi_date d)
-    | None -> Adef.codate_None ]
+      Some d -> Adef.codate_of_od (date_of_piqi_date d)
+    | None -> Adef.codate_None
   in
   let marriage_place =
     match fam_link.MLink.Family.marriage_place with
-    [ Some s -> Gwdb.insert_string base s
-    | None -> empty_string ]
+      Some s -> Gwdb.insert_string base s
+    | None -> empty_string
   in
   let relation =
     match fam_link.MLink.Family.marriage_type with
-    [ `married -> Married
+      `married -> Married
     | `not_married -> NotMarried
     | `engaged -> Engaged
     | `no_sexes_check_not_married -> NoSexesCheckNotMarried
     | `no_mention -> NoMention
-    | `no_sexes_check_married -> NoSexesCheckMarried ]
+    | `no_sexes_check_married -> NoSexesCheckMarried
   in
   let divorce =
     match fam_link.MLink.Family.divorce_type with
-    [ `not_divorced -> NotDivorced
+      `not_divorced -> NotDivorced
     | `divorced ->
-        match fam_link.MLink.Family.divorce_date with
-        [ Some d -> Divorced (Adef.codate_of_od (date_of_piqi_date d))
-        | None -> Divorced Adef.codate_None]
-    | `separated -> Separated ]
+        begin match fam_link.MLink.Family.divorce_date with
+          Some d -> Divorced (Adef.codate_of_od (date_of_piqi_date d))
+        | None -> Divorced Adef.codate_None
+        end
+    | `separated -> Separated
   in
   let index = Adef.ifam_of_int (Int32.to_int fam_link.MLink.Family.ifam) in
   let gen_f =
-    { marriage = marriage; marriage_place = marriage_place;
-      marriage_note = empty_string; marriage_src = empty_string;
-      witnesses = [| |]; relation = relation; divorce = divorce;
-      fevents = []; comment = empty_string; origin_file = empty_string;
-      fsources = empty_string; fam_index = index }
+    {marriage = marriage; marriage_place = marriage_place;
+     marriage_note = empty_string; marriage_src = empty_string;
+     witnesses = [| |]; relation = relation; divorce = divorce; fevents = [];
+     comment = empty_string; origin_file = empty_string;
+     fsources = empty_string; fam_index = index}
   in
   let fam = Gwdb.family_of_gen_family base (gen_f, cpl, des) in
-  (index, fam, cpl, True)
-;
+  index, fam, cpl, true
 
 
 (**/**)
@@ -338,25 +338,23 @@ value make_efam_link conf base ip fam_link =
     [Retour] : Person.t option
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_person_link_with_base base_prefix ip base_distante =
+let get_person_link_with_base base_prefix ip base_distante =
   let base_prefix = Link.chop_base_prefix base_prefix in
   let base_distante = Link.chop_base_prefix base_distante in
   try Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip)) with
-  [ Not_found ->
+    Not_found ->
       try
         let rec loop l =
           match l with
-          [ [] -> raise Not_found
-          | [(base_prefix, ip) :: l] ->
-              if base_prefix = base_distante then (base_prefix, ip)
-              else loop l ]
+            [] -> raise Not_found
+          | (base_prefix, ip) :: l ->
+              if base_prefix = base_distante then base_prefix, ip else loop l
         in
         let (base_prefix, ip) =
           loop (Hashtbl.find_all Link.ht_corresp (base_prefix, ip))
         in
         Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip))
-      with [ Not_found -> None ] ]
-;
+      with Not_found -> None
 
 
 (* ************************************************************************** *)
@@ -369,17 +367,16 @@ value get_person_link_with_base base_prefix ip base_distante =
     [Retour] : Person.t option
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_person_link base_prefix ip =
+let get_person_link base_prefix ip =
   let base_prefix = Link.chop_base_prefix base_prefix in
   try Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip)) with
-  [ Not_found ->
+    Not_found ->
       try
         let (base_prefix, ip) =
           Hashtbl.find Link.ht_corresp (base_prefix, ip)
         in
         Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip))
-      with [ Not_found -> None ] ]
-;
+      with Not_found -> None
 
 
 (* ************************************************************************** *)
@@ -391,24 +388,22 @@ value get_person_link base_prefix ip =
     [Retour] : Person.t list
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_persons_link base_prefix ip =
+let get_persons_link base_prefix ip =
   let base_prefix = Link.chop_base_prefix base_prefix in
   let find_corr (base_prefix, ip) =
     let l = Hashtbl.find_all Link.ht_corresp (base_prefix, ip) in
     List.fold_left
       (fun accu (base_prefix, ip) ->
-        try
-          let p = Hashtbl.find Link.ht_person_cache (base_prefix, ip) in
-          [p :: accu]
-        with [ Not_found -> accu ])
+         try
+           let p = Hashtbl.find Link.ht_person_cache (base_prefix, ip) in
+           p :: accu
+         with Not_found -> accu)
       [] l
   in
   try
     let p = Hashtbl.find Link.ht_person_cache (base_prefix, ip) in
-    let l = find_corr (base_prefix, ip) in
-    [p :: l]
-  with [ Not_found -> find_corr (base_prefix, ip) ]
-;
+    let l = find_corr (base_prefix, ip) in p :: l
+  with Not_found -> find_corr (base_prefix, ip)
 
 
 (* ************************************************************************** *)
@@ -422,21 +417,21 @@ value get_persons_link base_prefix ip =
     [Retour] : Family.t option
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_parents_link base_prefix ip =
+let get_parents_link base_prefix ip =
   let base_prefix = Link.chop_base_prefix base_prefix in
   try Some (Hashtbl.find Link.ht_parents_cache (base_prefix, ip)) with
-  [ Not_found ->
+    Not_found ->
       try
         let rec loop l =
           match l with
-          [ [] -> None
-          | [(base_prefix, ip) :: l] ->
-              try Some (Hashtbl.find Link.ht_parents_cache (base_prefix, ip))
-              with [ Not_found -> loop l ] ]
+            [] -> None
+          | (base_prefix, ip) :: l ->
+              try
+                Some (Hashtbl.find Link.ht_parents_cache (base_prefix, ip))
+              with Not_found -> loop l
         in
         loop (Hashtbl.find_all Link.ht_corresp (base_prefix, ip))
-      with [ Not_found -> None ] ]
-;
+      with Not_found -> None
 
 
 (* ************************************************************************** *)
@@ -450,14 +445,13 @@ value get_parents_link base_prefix ip =
     [Retour] : Person.t option
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_father_link base_prefix ip =
+let get_father_link base_prefix ip =
   match get_parents_link base_prefix ip with
-  [ Some family ->
+    Some family ->
       let base_prefix = family.MLink.Family.baseprefix in
       let ifath = Adef.iper_of_int (Int32.to_int family.MLink.Family.ifath) in
       get_person_link base_prefix ifath
-  | None -> None ]
-;
+  | None -> None
 
 
 (* ************************************************************************** *)
@@ -471,14 +465,13 @@ value get_father_link base_prefix ip =
     [Retour] : Person.t option
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_mother_link base_prefix ip =
+let get_mother_link base_prefix ip =
   match get_parents_link base_prefix ip with
-  [ Some family ->
+    Some family ->
       let base_prefix = family.MLink.Family.baseprefix in
       let imoth = Adef.iper_of_int (Int32.to_int family.MLink.Family.imoth) in
       get_person_link base_prefix imoth
-  | None -> None ]
-;
+  | None -> None
 
 
 (* ************************************************************************** *)
@@ -491,19 +484,19 @@ value get_mother_link base_prefix ip =
     [Retour] : Family_link.t list
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_family_correspondance base_prefix ip =
+let get_family_correspondance base_prefix ip =
   let base_prefix = Link.chop_base_prefix base_prefix in
   try Hashtbl.find Link.ht_families_cache (base_prefix, ip) with
-  [ Not_found ->
+    Not_found ->
       try
         let l = Hashtbl.find_all Link.ht_corresp (base_prefix, ip) in
         List.fold_left
           (fun accu (base_prefix, ip) ->
-            try Hashtbl.find Link.ht_families_cache (base_prefix, ip) @ accu
-            with [ Not_found -> accu ])
+             try
+               Hashtbl.find Link.ht_families_cache (base_prefix, ip) @ accu
+             with Not_found -> accu)
           [] l
-      with [ Not_found -> [] ] ]
-;
+      with Not_found -> []
 
 
 (* ************************************************************************** *)
@@ -515,22 +508,22 @@ value get_family_correspondance base_prefix ip =
     [Retour] : Family.t list
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_family_link base_prefix ip =
+let get_family_link base_prefix ip =
   let base_prefix = Link.chop_base_prefix base_prefix in
   try
     let l = get_family_correspondance base_prefix ip in
     List.fold_right
       (fun fam accu ->
-        let (base_prefix, ifam) =
-          (fam.MLink.Family_link.baseprefix,
-           Adef.ifam_of_int (Int32.to_int fam.MLink.Family_link.ifam))
-        in
-        let base_prefix = Link.chop_base_prefix base_prefix in
-        try [Hashtbl.find Link.ht_family_cache (base_prefix, ifam) :: accu]
-        with [ Not_found -> accu ])
+         let (base_prefix, ifam) =
+           fam.MLink.Family_link.baseprefix,
+           Adef.ifam_of_int (Int32.to_int fam.MLink.Family_link.ifam)
+         in
+         let base_prefix = Link.chop_base_prefix base_prefix in
+         try
+           Hashtbl.find Link.ht_family_cache (base_prefix, ifam) :: accu
+         with Not_found -> accu)
       l []
-  with [ Not_found -> [] ]
-;
+  with Not_found -> []
 
 
 (* ************************************************************************** *)
@@ -544,34 +537,34 @@ value get_family_link base_prefix ip =
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_families_of_parents base_prefix ip isp =
+let get_families_of_parents base_prefix ip isp =
   let lip = get_persons_link base_prefix ip in
   let lisp = get_persons_link base_prefix isp in
   List.fold_left
     (fun accu p ->
-      let base_prefix = p.MLink.Person.baseprefix in
-      let ip = Adef.iper_of_int (Int32.to_int p.MLink.Person.ip) in
-      let faml = get_family_link base_prefix ip in
-      List.fold_left
-        (fun accu fam ->
-          let ifath =
-            Adef.iper_of_int (Int32.to_int fam.MLink.Family.ifath)
-          in
-          let imoth =
-            Adef.iper_of_int (Int32.to_int fam.MLink.Family.imoth)
-          in
-          List.fold_left
-            (fun accu sp ->
-              let isp =
-                Adef.iper_of_int (Int32.to_int sp.MLink.Person.ip)
-              in
-              if (ip = ifath && isp = imoth) || (isp = ifath && ip = imoth)
-              then [fam :: accu]
-              else accu)
-            accu lisp)
-        accu faml)
+       let base_prefix = p.MLink.Person.baseprefix in
+       let ip = Adef.iper_of_int (Int32.to_int p.MLink.Person.ip) in
+       let faml = get_family_link base_prefix ip in
+       List.fold_left
+         (fun accu fam ->
+            let ifath =
+              Adef.iper_of_int (Int32.to_int fam.MLink.Family.ifath)
+            in
+            let imoth =
+              Adef.iper_of_int (Int32.to_int fam.MLink.Family.imoth)
+            in
+            List.fold_left
+              (fun accu sp ->
+                 let isp =
+                   Adef.iper_of_int (Int32.to_int sp.MLink.Person.ip)
+                 in
+                 if ip = ifath && isp = imoth || isp = ifath && ip = imoth
+                 then
+                   fam :: accu
+                 else accu)
+              accu lisp)
+         accu faml)
     [] lip
-;
 
 
 (* ************************************************************************** *)
@@ -584,22 +577,21 @@ value get_families_of_parents base_prefix ip isp =
     [Retour] : Person.t list
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_children_of_fam base_prefix ifam =
+let get_children_of_fam base_prefix ifam =
   let base_prefix = Link.chop_base_prefix base_prefix in
   try
     let fam = Hashtbl.find Link.ht_family_cache (base_prefix, ifam) in
     List.fold_right
       (fun c accu ->
          let (base_prefix, ip) =
-           (c.MLink.Person_link.baseprefix,
-            Adef.iper_of_int (Int32.to_int c.MLink.Person_link.ip))
+           c.MLink.Person_link.baseprefix,
+           Adef.iper_of_int (Int32.to_int c.MLink.Person_link.ip)
          in
          match get_person_link base_prefix ip with
-         [ Some p -> [p :: accu]
-         | None -> accu ])
+           Some p -> p :: accu
+         | None -> accu)
       fam.MLink.Family.children []
-  with [ Not_found -> [] ]
-;
+  with Not_found -> []
 
 
 (* ************************************************************************** *)
@@ -615,7 +607,7 @@ value get_children_of_fam base_prefix ifam =
     [Retour] : Person.t list
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value get_children_of_parents base_prefix ifam ifath imoth =
+let get_children_of_parents base_prefix ifam ifath imoth =
   let base_prefix = Link.chop_base_prefix base_prefix in
   try
     let fam = Hashtbl.find Link.ht_family_cache (base_prefix, ifam) in
@@ -627,12 +619,11 @@ value get_children_of_parents base_prefix ifam ifath imoth =
            let base_prefix = c.MLink.Person_link.baseprefix in
            let ip = Adef.iper_of_int (Int32.to_int c.MLink.Person_link.ip) in
            match get_person_link base_prefix ip with
-           [ Some p -> [p :: accu]
-           | None -> accu ])
+             Some p -> p :: accu
+           | None -> accu)
         fam.MLink.Family.children []
     else []
-  with [ Not_found -> [] ]
-;
+  with Not_found -> []
 
 
 (**/**)
@@ -652,23 +643,22 @@ value get_children_of_parents base_prefix ifam ifath imoth =
     [Retour] : Vrai si on peut merger, faux sinon.
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value can_merge_family base_prefix ip fam fam_link (_, _, isp) =
+let can_merge_family base_prefix ip fam fam_link (_, _, isp) =
   let from_baseprefix = Link.chop_base_prefix base_prefix in
-  let base_prefix =
-    Link.chop_base_prefix fam_link.MLink.Family.baseprefix
-  in
-  loop fam where rec loop faml =
+  let base_prefix = Link.chop_base_prefix fam_link.MLink.Family.baseprefix in
+  let rec loop faml =
     match faml with
-    [ [] -> False
-    | [fam :: faml] ->
+      [] -> false
+    | fam :: faml ->
         let from_ip = Gutil.spouse ip fam in
         try
           let (to_baseprefix, to_ip) =
             Hashtbl.find Link.ht_corresp (from_baseprefix, from_ip)
           in
-          (to_baseprefix = base_prefix && to_ip = isp) || loop faml
-        with [ Not_found -> loop faml ] ]
-;
+          to_baseprefix = base_prefix && to_ip = isp || loop faml
+        with Not_found -> loop faml
+  in
+  loop fam
 
 
 (* ************************************************************************** *)
@@ -684,23 +674,22 @@ value can_merge_family base_prefix ip fam fam_link (_, _, isp) =
     [Retour] : Vrai si on peut merger, faux sinon.
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value can_merge_child base_prefix children c_link =
+let can_merge_child base_prefix children c_link =
   let from_baseprefix = Link.chop_base_prefix base_prefix in
   let ip = Adef.iper_of_int (Int32.to_int c_link.MLink.Person.ip) in
-  let base_prefix =
-    Link.chop_base_prefix c_link.MLink.Person.baseprefix
-  in
-  loop (Array.to_list children) where rec loop children =
+  let base_prefix = Link.chop_base_prefix c_link.MLink.Person.baseprefix in
+  let rec loop children =
     match children with
-    [ [] -> False
-    | [from_ip :: children] ->
+      [] -> false
+    | from_ip :: children ->
         try
           let (to_baseprefix, to_ip) =
             Hashtbl.find Link.ht_corresp (from_baseprefix, from_ip)
           in
-          (to_baseprefix = base_prefix && to_ip = ip) || loop children
-        with [ Not_found -> loop children ] ]
-;
+          to_baseprefix = base_prefix && to_ip = ip || loop children
+        with Not_found -> loop children
+  in
+  loop (Array.to_list children)
 
 (**/**)
 
@@ -719,14 +708,12 @@ value can_merge_child base_prefix children c_link =
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-value init_cache conf base ip nb_asc from_gen_desc nb_desc =
+let init_cache conf base ip nb_asc from_gen_desc nb_desc =
   (* Option pour activer/desactiver totalement le cache. *)
   let init = Wserver.extract_param "links-tree: " '\n' conf.request in
   if init = "1" then
-    Link.init_cache conf base conf.request conf.bname ip
-      nb_asc from_gen_desc nb_desc
-  else ()
-;
+    Link.init_cache conf base conf.request conf.bname ip nb_asc from_gen_desc
+      nb_desc
 
 (* ***************************************************************************** *)
 (*  [Fonc] max_interlinks_descendancy_level : config -> base -> ip -> int -> int *)
@@ -741,42 +728,34 @@ value init_cache conf base ip nb_asc from_gen_desc nb_desc =
       - int
                                                                                 *)
 (* **************************************************************************** *)
-value max_interlinks_descendancy_level conf base ip max_lev =
+let max_interlinks_descendancy_level conf base ip max_lev =
   let x = ref 0 in
   (* Charge le cache *)
   let () = init_cache conf base ip 10 1 max_lev in
   (* Itère sur chaque personne de l'arbre *)
-  let rec loop level (ip, base_prefix) = do {
+  let rec loop level (ip, base_prefix) =
     (* Met à jour x.val avec la valeur la plus haute du niveau trouvé. *)
-    x.val := max x.val level;
+    x := max !x level;
     (* Sort de la boucle si le nombre de descendants est suffisamment haut. *)
-    if (x.val = max_lev)
-        then ()
+    if !x = max_lev then ()
     else
-      (* Récupère les différentes familles déclarées dans d'autres arbres de la personne. *)
       let families_link = get_family_link base_prefix ip in
-      do {
       (* Itère sur chaque famille. *)
       List.iter
         (fun family_link ->
-          do {
-            (* Itère sur chaque enfant de la famille. *)
-            List.iter
-              (fun child_link ->
+           (* Itère sur chaque enfant de la famille. *)
+           List.iter
+             (fun child_link ->
                 (* Prend le nom de l'arbre de la famille en cours. *)
                 let baseprefix = child_link.MLink.Person_link.baseprefix in
                 (* Prend l'index de l'enfant. *)
-                let ip_child =  Adef.iper_of_int (Int32.to_int child_link.MLink.Person_link.ip) in
-                 do {
-                     (* Recherche à nouveau des descendants sur l'enfant en incrémentant le niveau de descendance. *)
-                     loop (succ level) (ip_child, baseprefix)
-                 }
-              ) family_link.MLink.Family.children
-          }
-        ) families_link
-     }
-  }
+                let ip_child =
+                  Adef.iper_of_int
+                    (Int32.to_int child_link.MLink.Person_link.ip)
+                in
+                (* Recherche à nouveau des descendants sur l'enfant en incrémentant le niveau de descendance. *)
+                loop (succ level) (ip_child, baseprefix))
+             family_link.MLink.Family.children)
+        families_link
   in
-  (* Lance une première fois la recherche de descendants sur la personne de l'arbre d'origine. *)
-  do { loop 0 (ip, conf.command); x.val }
-;
+  loop 0 (ip, conf.command); !x
