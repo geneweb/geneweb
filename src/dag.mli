@@ -17,9 +17,7 @@ type item =
     Item of person * string
 
 (**)
-type ('a, 'b) sum =
-    Left of 'a
-  | Right of 'b
+type ('a, 'b) sum = ('a, 'b) Def.choice
 (**)
 
 val image_txt : config -> base -> person -> string
@@ -32,7 +30,7 @@ val make_tree_hts :
 (**)
 
 val print_slices_menu_or_dag_page :
-  config -> base -> string -> (string, string) html_table -> string -> unit
+  config -> string -> (string, string) html_table -> string -> unit
 
 val make_and_print_dag :
   config -> base -> (person -> item) -> (iper -> string) -> bool -> Pset.t ->

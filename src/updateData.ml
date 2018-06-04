@@ -256,7 +256,7 @@ let get_person_from_data conf base =
   (* On retourne la liste des couples ("data", persons list) *)
   let list = ref [] in
   PersMap.iter
-    (fun hash (istr, pset) -> list := (istr, PersSet.elements pset) :: !list)
+    (fun _ (istr, pset) -> list := (istr, PersSet.elements pset) :: !list)
     !pers_map;
   !list
 
@@ -368,7 +368,7 @@ let translate_title conf =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let print_title conf base ini len =
+let print_title conf ini len =
   let (book_of, title) = translate_title conf in
   Wserver.printf "%s" (capitale book_of);
   if ini = "" then Wserver.printf " (%d %s)" len title
@@ -393,7 +393,7 @@ let print_title conf base ini len =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let print_long conf base list len =
+let print_long conf list len =
   let env_keys =
     let list = ref [] in
     let keys = List.map fst (fst (get_data conf)) in
@@ -441,7 +441,7 @@ let print_long conf base list len =
     List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2)
       list
   in
-  let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
+  let title _ = print_title conf (Mutil.tr '_' ' ' ini) len in
   Hutil.header conf title;
   print_link_to_welcome conf true;
   Wserver.printf "<div class=\"tips\">\n";
@@ -585,7 +585,7 @@ let print_long conf base list len =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let print_short conf base list len =
+let print_short conf list len =
   let data =
     match p_getenv conf.env "data" with
       Some s -> s
@@ -628,7 +628,7 @@ let print_short conf base list len =
     else List.sort Gutil.alphabetic_order ini_list
   in
   let ini_list = build_ini list (String.length ini) in
-  let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
+  let title _ = print_title conf (Mutil.tr '_' ' ' ini) len in
   Hutil.header conf title;
   print_link_to_welcome conf true;
   Wserver.printf "%s :" (capitale (transl conf "select a letter"));
@@ -691,8 +691,8 @@ let print_mod_old conf base =
   in
   let list = if ini <> "" then reduce list else list in
   let len = List.length list in
-  if len > max_results then print_short conf base list len
-  else print_long conf base list len
+  if len > max_results then print_short conf list len
+  else print_long conf list len
 
 
 (* ************************************************************************** *)
@@ -1230,7 +1230,7 @@ let build_list conf base =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let build_list_short conf base list =
+let build_list_short conf list =
   let ini =
     match p_getenv conf.env "s" with
       Some s -> s
@@ -1282,7 +1282,7 @@ let build_list_short conf base list =
     [Retour] : La liste des couples (initiale de "data", "data")
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let build_list_long conf base list =
+let build_list_long conf list =
   let ini =
     match p_getenv conf.env "s" with
       Some s -> s
@@ -1332,7 +1332,7 @@ let bool_val x = VVbool x
 let str_val x = VVstring x
 
 
-let rec eval_var conf base env xx loc sl =
+let rec eval_var conf base env xx _loc sl =
   try eval_simple_var conf base env xx sl with
     Not_found -> eval_compound_var conf base env xx sl
 and eval_simple_var conf base env xx =
@@ -1342,7 +1342,7 @@ and eval_simple_var conf base env xx =
         Not_found -> str_val (eval_simple_str_var conf base env xx s)
       end
   | _ -> raise Not_found
-and eval_simple_bool_var conf base env xx =
+and eval_simple_bool_var _conf _base env _xx =
   function
     "is_modified" ->
       let k =
@@ -1357,7 +1357,7 @@ and eval_simple_bool_var conf base env xx =
       in
       k = env_keys
   | _ -> raise Not_found
-and eval_simple_str_var conf base env xx =
+and eval_simple_str_var conf _base env _xx =
   function
     "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_value" -> eval_string_env "entry_value" env
@@ -1422,15 +1422,15 @@ and eval_int_env s env =
     Vint i -> string_of_int i
   | _ -> raise Not_found
 
-let print_foreach conf base print_ast eval_expr =
-  let rec print_foreach env xx loc s sl el al =
+let print_foreach conf print_ast _eval_expr =
+  let rec print_foreach env xx _loc s sl el al =
     match s :: sl with
-      ["initial"] -> print_foreach_initial env xx el al
+      ["initial"] -> print_foreach_initial env xx al
     | ["entry"] -> print_foreach_entry env xx el al
-    | ["value"] -> print_foreach_value env xx el al
+    | ["value"] -> print_foreach_value env xx al
     | ["env_keys"] -> print_foreach_env_keys env xx el al
     | _ -> raise Not_found
-  and print_foreach_entry env xx el al =
+  and print_foreach_entry env xx _el al =
     let env_keys =
       let keys = List.map fst (fst (get_data conf)) in
       let list =
@@ -1448,7 +1448,7 @@ let print_foreach conf base print_ast eval_expr =
         Vlist_data l -> l
       | _ -> []
     in
-    let list = build_list_long conf base list in
+    let list = build_list_long conf list in
     let env = ("env_keys", Venv_keys env_keys) :: env in
     let rec loop =
       function
@@ -1461,7 +1461,7 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ()
     in
     loop list
-  and print_foreach_value env xx el al =
+  and print_foreach_value env xx al =
     let list =
       match get_env "list_value" env with
         Vlist_value l ->
@@ -1485,13 +1485,13 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ()
     in
     loop list
-  and print_foreach_initial env xx el al =
+  and print_foreach_initial env xx al =
     let list =
       match get_env "list" env with
         Vlist_data l -> l
       | _ -> []
     in
-    let ini_list = build_list_short conf base list in
+    let ini_list = build_list_short conf list in
     let rec loop =
       function
         ini :: l ->
@@ -1500,7 +1500,7 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ()
     in
     loop ini_list
-  and print_foreach_env_keys env xx el al =
+  and print_foreach_env_keys env xx _el al =
     let env_keys =
       match get_env "env_keys" env with
         Venv_keys env_keys -> env_keys
@@ -1530,7 +1530,7 @@ let print_mod conf base =
            Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
            Templ.eval_predefined_apply = (fun _ -> raise Not_found);
            Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-           Templ.print_foreach = print_foreach conf base}
+           Templ.print_foreach = print_foreach conf}
           env ()
     | _ ->
         Hutil.interp conf "upddatamenu"

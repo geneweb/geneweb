@@ -1,4 +1,4 @@
-(* $Id: updateInd.ml,v 5.15 2008-01-08 11:58:46 ddr Exp $ *)
+(* $id: updateInd.ml,v 5.15 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -59,10 +59,10 @@ let obsolete version var new_var r =
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
-let rec eval_var conf base env p loc sl =
-  try eval_special_var conf base p sl with
-    Not_found -> eval_simple_var conf base env p loc sl
-and eval_simple_var conf base env p loc =
+let rec eval_var conf base env p _loc sl =
+  try eval_special_var conf base sl with
+    Not_found -> eval_simple_var conf base env p sl
+and eval_simple_var conf base env p =
   function
     ["alias"] -> eval_string_env "alias" env
   | ["acc_if_titles"] -> bool_val (p.access = IfTitles)
@@ -125,7 +125,7 @@ and eval_simple_var conf base env p loc =
             (try Some (List.nth p.pevents (i - 1)) with Failure _ -> None)
         | _ -> None
       in
-      eval_event_var conf base env e sl
+      eval_event_var e sl
   | ["event_date"; s] ->
       let od =
         match get_env "cnt" env with
@@ -282,7 +282,7 @@ and eval_simple_var conf base env p loc =
             (try Some (List.nth p.rparents (i - 1)) with Failure _ -> None)
         | _ -> None
       in
-      eval_relation_var conf base env r sl
+      eval_relation_var r sl
   | ["sources"] -> str_val (quote_escaped p.psources)
   | ["surname"] -> str_val (quote_escaped p.surname)
   | ["surname_alias"] -> eval_string_env "surname_alias" env
@@ -293,7 +293,7 @@ and eval_simple_var conf base env p loc =
             (try Some (List.nth p.titles (i - 1)) with Failure _ -> None)
         | _ -> None
       in
-      eval_title_var conf base env t sl
+      eval_title_var t sl
   | ["title_date_start"; s] ->
       let od =
         match get_env "cnt" env with
@@ -351,7 +351,7 @@ and eval_simple_var conf base env p loc =
                       "", "", 0, Update.Create (Neuter, None), ""
                     else raise Not_found
                   in
-                  eval_person_var conf base env k sl
+                  eval_person_var k sl
               | _ -> raise Not_found
               end
           | None -> raise Not_found
@@ -544,7 +544,7 @@ and eval_date_field =
       | _ -> None
       end
   | None -> None
-and eval_event_var conf base env e =
+and eval_event_var e =
   function
     ["e_name"] ->
       begin match e with
@@ -620,7 +620,7 @@ and eval_event_var conf base env e =
       | _ -> str_val ""
       end
   | _ -> raise Not_found
-and eval_title_var conf base env t =
+and eval_title_var t =
   function
     ["t_estate"] ->
       begin match t with
@@ -648,7 +648,7 @@ and eval_title_var conf base env t =
       | _ -> str_val ""
       end
   | _ -> raise Not_found
-and eval_relation_var conf base env r =
+and eval_relation_var r =
   function
     "r_father" :: sl ->
       let x =
@@ -656,14 +656,14 @@ and eval_relation_var conf base env r =
           Some {r_fath = Some x} -> x
         | _ -> "", "", 0, Update.Create (Neuter, None), ""
       in
-      eval_person_var conf base env x sl
+      eval_person_var x sl
   | "r_mother" :: sl ->
       let x =
         match r with
           Some {r_moth = Some x} -> x
         | _ -> "", "", 0, Update.Create (Neuter, None), ""
       in
-      eval_person_var conf base env x sl
+      eval_person_var x sl
   | ["rt_adoption"] -> eval_is_relation_type Adoption r
   | ["rt_candidate_parent"] -> eval_is_relation_type CandidateParent r
   | ["rt_empty"] ->
@@ -675,7 +675,7 @@ and eval_relation_var conf base env r =
   | ["rt_godparent"] -> eval_is_relation_type GodParent r
   | ["rt_recognition"] -> eval_is_relation_type Recognition r
   | _ -> raise Not_found
-and eval_person_var conf base env (fn, sn, oc, create, var) =
+and eval_person_var (fn, sn, oc, create, _) =
   function
     ["create"] ->
       begin match create with
@@ -711,14 +711,14 @@ and eval_is_relation_type rt =
     Some {r_fath = None; r_moth = None} -> bool_val false
   | Some {r_type = x} -> bool_val (x = rt)
   | _ -> bool_val false
-and eval_special_var conf base p =
+and eval_special_var conf base =
   function
     ["include_perso_header"] ->
       begin match p_getint conf.env "i" with
         Some i ->
           let has_base_loop =
             try let _ = Util.create_topological_sort conf base in false with
-              Consang.TopologicalSortError p -> true
+              Consang.TopologicalSortError _ -> true
           in
           if has_base_loop then VVstring ""
           else
@@ -740,8 +740,8 @@ and eval_string_env var env =
 
 (* print *)
 
-let print_foreach print_ast eval_expr =
-  let rec print_foreach env p loc s sl _ al =
+let print_foreach print_ast _eval_expr =
+  let rec print_foreach env p _loc s sl _ al =
     match s :: sl with
       ["alias"] -> print_foreach_string env p al p.aliases s
     | ["first_name_alias"] ->
@@ -766,7 +766,7 @@ let print_foreach print_ast eval_expr =
   and print_foreach_relation env p al list =
     let _ =
       List.fold_left
-        (fun cnt nn ->
+        (fun cnt _ ->
            let env = ("cnt", Vint cnt) :: env in
            List.iter (print_ast env p) al; cnt + 1)
         1 list
@@ -775,7 +775,7 @@ let print_foreach print_ast eval_expr =
   and print_foreach_title env p al list =
     let _ =
       List.fold_left
-        (fun cnt nn ->
+        (fun cnt _ ->
            let env = ("cnt", Vint cnt) :: env in
            List.iter (print_ast env p) al; cnt + 1)
         1 list
@@ -784,7 +784,7 @@ let print_foreach print_ast eval_expr =
   and print_foreach_pevent env p al list =
     let rec loop first cnt =
       function
-        nn :: l ->
+        _ :: l ->
           let env =
             ("cnt", Vint cnt) :: ("first", Vbool first) ::
             ("last", Vbool (l = [])) :: env
@@ -802,7 +802,7 @@ let print_foreach print_ast eval_expr =
           Some e ->
             let rec loop first wcnt =
               function
-                nn :: l ->
+                _ :: l ->
                   let env =
                     ("wcnt", Vint wcnt) :: ("first", Vbool first) ::
                     ("last", Vbool (l = [])) :: env

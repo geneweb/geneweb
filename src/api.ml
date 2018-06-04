@@ -1,6 +1,3 @@
-(* nocamlp5 *)
-
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -13,12 +10,6 @@ open Gwdb
 open Util
 open Api_def
 open Api_util
-
-
-
-
-
-
 
 (**/**) (* Services disponibles. *)
 
@@ -56,40 +47,30 @@ let print_info_base conf base =
     | None -> Int64.of_int 0
   in
   let last_modified_person =
-    match
-      try Some (Secure.open_in_bin (History.file_name conf))
-      with Sys_error _ -> None
-    with
-    | Some ic ->
-        (try
-           let (k, pos, wiz) = (1, in_channel_length ic, "") in
-           let vv = (ref (Bytes.create 0), ref 0) in
-           let last_modified_person =
-             (match
-                try Some (History.rev_input_line ic pos vv)
-                with exn -> None
-              with
-              | Some (line, pos) ->
-                  (match History.line_fields line with
-                   | Some (time, user, action, keyo) ->
-                       if wiz = "" || user = wiz then
-                         match keyo with
-                         | Some key ->
-                             (match action with
-                              | "mn" -> sosa_or_first_ind
-                              | _ ->
-                                  (match Gutil.person_ht_find_all base key with
-                                   | [ip] -> Int64.of_int (Adef.int_of_iper ip)
-                                   | _ -> sosa_or_first_ind))
-                         | None -> sosa_or_first_ind
-                       else sosa_or_first_ind
-                   | None -> sosa_or_first_ind)
-              | None -> sosa_or_first_ind)
-           in
-           close_in ic;
-           last_modified_person
-         with e -> sosa_or_first_ind)
-    | None -> sosa_or_first_ind
+    try
+      let ic = Secure.open_in_bin (History.file_name conf) in
+      let (_, pos, wiz) = (1, in_channel_length ic, "") in
+      let vv = (ref (Bytes.create 0), ref 0) in
+      let last_modified_person =
+        let (line, _) = History.rev_input_line ic pos vv in
+        match History.line_fields line with
+        | Some (_, user, action, keyo) ->
+          if wiz = "" || user = wiz then
+            match keyo with
+            | Some key ->
+              (match action with
+               | "mn" -> sosa_or_first_ind
+               | _ ->
+                 (match Gutil.person_ht_find_all base key with
+                  | [ip] -> Int64.of_int (Adef.int_of_iper ip)
+                  | _ -> sosa_or_first_ind))
+            | None -> sosa_or_first_ind
+          else sosa_or_first_ind
+        | None -> sosa_or_first_ind
+      in
+      close_in ic;
+      last_modified_person
+    with Sys_error _ | _ -> sosa_or_first_ind
   in
   let last_modified_person =
     if Gwdb.nb_of_persons base = 0 then None
@@ -139,7 +120,8 @@ let print_loop conf base =
     if !base_loop then
       (* Comme il y a une boucle, Perso.get_single_sosa ne va pas marcher *)
       (* mais la fonction ne sera pas appelée dans pers_to_piqi_person.   *)
-      pers_to_piqi_person conf base !pers !base_loop Perso.get_single_sosa false
+      pers_to_piqi_person conf base !pers !base_loop
+        (Perso.get_single_sosa conf base) false
     else
       let ref_pers =
         M.Reference_person.({
@@ -177,9 +159,9 @@ let print_info_ind conf base =
     match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
     | Some ip ->
         let p = pget conf base ip in
-        if apply_filters_p conf base filters Perso.get_single_sosa p then
+        if apply_filters_p conf filters (Perso.get_single_sosa conf base) p then
           pers_to_piqi_person
-            conf base p base_loop Perso.get_single_sosa false
+            conf base p base_loop (Perso.get_single_sosa conf base) false
         else
           empty_piqi_person conf ref_person base_loop
     | None -> empty_piqi_person conf ref_person base_loop
@@ -433,7 +415,7 @@ let print_last_modified_persons conf base =
     in
     loop list
   in
-  let compute_sosa = Perso.get_single_sosa in
+  let compute_sosa = Perso.get_single_sosa conf base in
   let list =
     match
       try Some (Secure.open_in_bin (History.file_name conf))
@@ -464,7 +446,7 @@ let print_last_modified_persons conf base =
                                   let p = poi base ip in
                                   if not (is_empty_or_quest_name p) &&
                                      apply_filters_p
-                                       conf base filters compute_sosa p &&
+                                       conf filters compute_sosa p &&
                                      not (p_mem ip list)
                                   then loop (p :: list) (res - 1) pos
                                   else loop list res pos
@@ -663,7 +645,7 @@ let print_img conf base =
       let l = ref [] in
       let base_loop = has_base_loop conf base in
       let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf base in
+      let () = load_image_ht conf in
       for i = 0 to nb_of_persons base - 1 do
         let p = poi base (Adef.iper_of_int i) in
         match Api_util.find_image_file conf base p with
@@ -686,7 +668,7 @@ let print_img conf base =
       let l = ref [] in
       let base_loop = has_base_loop conf base in
       let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf base in
+      let () = load_image_ht conf in
       for i = 0 to nb_of_persons base - 1 do
         let p = poi base (Adef.iper_of_int i) in
         match Api_util.find_image_file conf base p with
@@ -715,7 +697,7 @@ let print_img_ext conf base =
       let l = ref [] in
       let base_loop = has_base_loop conf base in
       let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf base in
+      let () = load_image_ht conf in
       for i = 0 to nb_of_persons base - 1 do
         let p = poi base (Adef.iper_of_int i) in
         let http = "http://" in
@@ -741,7 +723,7 @@ let print_img_ext conf base =
       let l = ref [] in
       let base_loop = has_base_loop conf base in
       let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf base in
+      let () = load_image_ht conf in
       for i = 0 to nb_of_persons base - 1 do
         let p = poi base (Adef.iper_of_int i) in
         let http = "http://" in
@@ -775,7 +757,7 @@ let print_img_all conf base =
       let base_loop = has_base_loop conf base in
       let () = Perso.build_sosa_ht conf base in
       (* On commente pour la migration des portraits *)
-      (*let () = load_image_ht conf base in*)
+      (*let () = load_image_ht conf in*)
       for i = 0 to nb_of_persons base - 1 do
         let p = poi base (Adef.iper_of_int i) in
         if not (is_empty_string (get_image p)) then
@@ -805,7 +787,7 @@ let print_img_all conf base =
       let base_loop = has_base_loop conf base in
       let () = Perso.build_sosa_ht conf base in
       (* On commente pour la migration des portraits *)
-      (*let () = load_image_ht conf base in*)
+      (*let () = load_image_ht conf in*)
       for i = 0 to nb_of_persons base - 1 do
         let p = poi base (Adef.iper_of_int i) in
         if not (is_empty_string (get_image p)) then
@@ -879,7 +861,7 @@ let print_updt_image conf base =
 
 (**/**) (* API_REMOVE_IMAGE_EXT *)
 
-let print_remove_image_ext conf base =
+let print_remove_image_ext base =
   for i = 0 to nb_of_persons base - 1 do
     let p = poi base (Adef.iper_of_int i) in
     let http = "http://" in
@@ -900,7 +882,7 @@ let print_remove_image_ext conf base =
 
 (**/**) (* API_REMOVE_IMAGE_EXT_ALL *)
 
-let print_remove_image_ext_all conf base =
+let print_remove_image_ext_all base =
   for i = 0 to nb_of_persons base - 1 do
     let p = poi base (Adef.iper_of_int i) in
     if not (is_empty_string (get_image p)) then
@@ -967,7 +949,7 @@ let build_anniversary_pers_list conf base month f_scan =
   with Not_found -> ());
   let tab =
     Array.map
-      (fun l -> List.sort (fun (p1, a1) (p2, a2) -> compare a1 a2) l )
+      (fun l -> List.sort (fun (_, a1) (_, a2) -> compare a1 a2) l )
       tab
   in
   let list = Array.to_list tab in
@@ -1046,7 +1028,7 @@ let print_base_warnings conf base =
   in
   let base_loop = has_base_loop conf base in
   let () = Perso.build_sosa_ht conf base in
-  let () = load_image_ht conf base in
+  let () = load_image_ht conf in
   List.iter
     (Api_warnings.add_error_to_piqi_warning_list
        conf base base_loop Perso.get_sosa_person true)
@@ -1176,7 +1158,7 @@ let print_all_full_person conf base =
   let () = load_couples_array base in
   let () = load_unions_array base in
   let () = load_descends_array base in
-  let () = load_image_ht conf base in
+  let () = load_image_ht conf in
 (*  let l = ref IperSort.empty in*)
   let index_map = ref StringMap.empty in
   let add_to_map k v =
@@ -1233,7 +1215,7 @@ let print_all_full_person conf base =
     *)
 
     StringMap.iter
-      (fun k v -> List.iter (output_binary_int oc_index_surname) v)
+      (fun _ v -> List.iter (output_binary_int oc_index_surname) v)
       !index_map;
 
 (*
@@ -1332,7 +1314,7 @@ $sourcestxt =
  *)
 
 
-let print_index_g3 conf base =
+let print_index_g3 base =
   let fname = "/tmp/index_g3" in
   match try Some (open_out fname) with Sys_error _ -> None with
   | Some oc ->
@@ -1396,8 +1378,8 @@ let print_index_g3 conf base =
 module NameSort =
   Set.Make
     (struct
-      type t = int * string * string * string * Def.date option;;
-      let compare (i1, sn1, fn1, r1, d1) (i2, sn2, fn2, r2, d2) =
+      type t = int * string * string * string * Def.date option
+      let compare (i1, sn1, fn1, _, d1) (i2, sn2, fn2, _, d2) =
         if sn1 = sn2 then
           if fn1 = fn2 then
             match (d1, d2) with
@@ -1406,8 +1388,8 @@ module NameSort =
                 else
                   if CheckItem.strictly_after d2 d1 then -1
                   else compare i1 i2
-            | (Some d1, None) -> -1
-            | (None, Some d2) -> 1
+            | (Some _, None) -> -1
+            | (None, Some _) -> 1
             | _ -> compare i1 i2
           else compare fn1 fn2
         else compare sn1 sn2;;
@@ -1550,7 +1532,7 @@ let print_export_family conf export_directory =
       output_binary_int oc_dat 0;
       for i = 0 to nb_of_families base - 1 do
         let ifam = Adef.ifam_of_int i in
-        let fam_app = fam_to_piqi_app_family conf base ifam in
+        let fam_app = fam_to_piqi_app_family base ifam in
         let data = Mext_app.gen_family fam_app in
         let data = data `pb in
         (* Longueur de la famille puis données de la famille *)
@@ -1704,7 +1686,7 @@ let export_img conf base =
    Fichier name.i :
     -
 *)
-let build_relative_name conf base p =
+let build_relative_name base p =
   let add_from_list accu list =
     List.fold_left
       (fun accu istr ->
@@ -1786,7 +1768,7 @@ let print_index_search conf export_directory =
           begin
             let fn = Name.lower fn in
             let sn = Name.lower sn in
-            let r = String.concat " " (build_relative_name conf base p) in
+            let r = String.concat " " (build_relative_name base p) in
             let date =
               match (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p)) with
               | (Some d1, _) -> Some d1
@@ -1806,7 +1788,7 @@ let print_index_search conf export_directory =
 
       let oc_name_inx = open_out_bin fname_inx in
       List.iter
-        (fun (i, sn, fn, r, date) ->
+        (fun (i, _, _, _, _) ->
           output_binary_int oc_name_inx i;
           incr nb_tab;
           Array.set !intSetTab i !nb_tab)
@@ -1935,7 +1917,7 @@ let print_export conf base =
   let () = load_unions_array base in
   let () = load_descends_array base in
 
-  let () = load_image_ht conf base in
+  let () = load_image_ht conf in
 
   (*
      On créé X processus pour l'export :
@@ -1990,7 +1972,7 @@ let print_export conf base =
              exit 0
            end
        | -1 -> failwith "fork error"
-       | pid -> ())
+       | _ -> ())
     process;
 
   (* wait for all children *)
@@ -2022,7 +2004,7 @@ module IntIdSet =
 open Database;;
 
 
-let full_synchro conf base synchro timestamp =
+let full_synchro conf synchro timestamp =
   let last_import = ref None in
   let bdir =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
@@ -2030,7 +2012,7 @@ let full_synchro conf base synchro timestamp =
   in
   (* Suppression potentiel du fichier patch. *)
   (match synchro.synch_list with
-  | (last_timestamp, _, _) :: l ->
+  | (last_timestamp, _, _) :: _ ->
       let fname_synchro = Filename.concat bdir "synchro_patches" in
       let fname_cmd = Filename.concat bdir "command.txt" in
       (match
@@ -2130,7 +2112,7 @@ let print_synchro_patch_mobile conf base =
   in
   let last_timestamp =
     match synchro.synch_list with
-    | (timestamp, _, _) :: l -> timestamp
+    | (timestamp, _, _) :: _ -> timestamp
     | _ -> ""
   in
   (* On rend unique les ids. *)
@@ -2157,7 +2139,7 @@ let print_synchro_patch_mobile conf base =
       with Sys_error _ -> None
     with
     | Some oc ->
-        if full_synchro conf base synchro timestamp then
+        if full_synchro conf synchro timestamp then
           (* si 0 il faut re-synchroniser la base. *)
           output_char oc '\000'
         else
@@ -2196,7 +2178,7 @@ let print_synchro_patch_mobile conf base =
             List.iter
               (fun i ->
                 let ifam = Adef.ifam_of_int i in
-                let fam_app = fam_to_piqi_app_family conf base ifam in
+                let fam_app = fam_to_piqi_app_family base ifam in
                 let data = Mext_app.gen_family fam_app in
                 let data = data `pb in
                 (* id, longueur de la famille puis données de la famille *)
@@ -2287,7 +2269,7 @@ let print_synchro_patch_mobile conf base =
                   begin
                     let fn = Name.lower fn in
                     let sn = Name.lower sn in
-                    let r = build_relative_name conf base p in
+                    let r = build_relative_name base p in
                     output_binary_int oc i;
                     let (split_l, nb_words, nb_chars) =
                       List.fold_left
@@ -2591,7 +2573,6 @@ let print_notification_birthday conf base =
     | `descend_grand_parent -> (2, -3, 2)
     | `descend_great_grand_parent -> (3, -4, 3)
   in
-  let base_loop = has_base_loop conf base in
   let ip_proprio =
     match piqi_ref_person_to_person base ref_p with
     | Some p -> get_key_index p
@@ -2600,7 +2581,7 @@ let print_notification_birthday conf base =
   let p = poi base ip_proprio in
   let list =
     Api_graph.close_person_relation
-      conf base ip_proprio nb_asc nb_desc false true base_loop
+      conf base ip_proprio nb_asc nb_desc false
   in
   let list =
     List.fold_left
@@ -2609,7 +2590,7 @@ let print_notification_birthday conf base =
         let isp = Gutil.spouse ip_proprio fam in
         let sp_list =
           Api_graph.close_person_relation
-            conf base isp nb_asc_sp nb_desc false true base_loop
+            conf base isp nb_asc_sp nb_desc false
         in
         List.rev_append accu sp_list)
       list (Array.to_list (get_family p))
@@ -2675,7 +2656,7 @@ let print_notification_birthday conf base =
         let p2 = poi base ip2 in
         (Some (sou base (get_first_name p1)),
          Some (sou base (get_first_name p2)), None)
-    | ip1 :: ip2 :: ip3 :: l ->
+    | ip1 :: ip2 :: ip3 :: _ ->
         let p1 = poi base ip1 in
         let p2 = poi base ip2 in
         let p3 = poi base ip3 in

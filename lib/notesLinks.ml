@@ -174,14 +174,6 @@ let share_strings db =
        page, (list_nt, list_ind))
     db
 
-let update_db_list db who (list_nt, list_ind) =
-  let db = List.remove_assoc who db in
-  let new_db =
-    if list_nt = [] && list_ind = [] then db
-    else (who, (list_nt, list_ind)) :: db
-  in
-  share_strings new_db
-
 let read_db bdir =
   let fname_def = Filename.concat bdir "notes_links" in
   read_db_from_file fname_def

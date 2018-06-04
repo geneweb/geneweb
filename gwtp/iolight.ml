@@ -56,7 +56,7 @@ let input_4_10_array ic pos len =
   seek_in ic (pos + value_header_size + array_header_size len);
   Array.init len (fun _ -> Iovalue.input ic)
 
-let make_record_access ic shift array_pos patches len name =
+let make_record_access ic array_pos patches len name =
   let tab = ref None in
   let rec array () =
     match !tab with
@@ -112,39 +112,32 @@ let input bname =
   let descends_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
-  let shift = 0 in
   let persons =
-    make_record_access ic shift persons_array_pos patches.p_person persons_len
+    make_record_access ic persons_array_pos patches.p_person persons_len
       "persons"
   in
-  let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
-    make_record_access ic shift ascends_array_pos patches.p_ascend persons_len
+    make_record_access ic ascends_array_pos patches.p_ascend persons_len
       "ascends"
   in
-  let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
-    make_record_access ic shift unions_array_pos patches.p_union persons_len
+    make_record_access ic unions_array_pos patches.p_union persons_len
       "unions"
   in
-  let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_record_access ic shift families_array_pos patches.p_family
+    make_record_access ic families_array_pos patches.p_family
       families_len "families"
   in
-  let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
-    make_record_access ic shift couples_array_pos patches.p_couple
+    make_record_access ic couples_array_pos patches.p_couple
       families_len "couples"
   in
-  let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_record_access ic shift descends_array_pos patches.p_descend
+    make_record_access ic descends_array_pos patches.p_descend
       families_len "descends"
   in
-  let shift = shift + families_len * Iovalue.sizeof_long in
   let strings =
-    make_record_access ic shift strings_array_pos patches.p_string strings_len
+    make_record_access ic strings_array_pos patches.p_string strings_len
       "strings"
   in
   let cleanup () = close_in ic in

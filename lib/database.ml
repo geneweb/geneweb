@@ -1,8 +1,6 @@
 (* $Id: database.ml,v 5.19 2007-06-06 15:22:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-module type HACK_FOR_DEPEND = sig open Btree end
-
 open Dbdisk
 open Def
 open Dutil
@@ -112,14 +110,6 @@ the corresponding list of persons holding this surname
        of association lists "index" - "new value".
 *)
 
-(* Search index of a given string in file strings.inx *)
-
-let string_piece s =
-  let s = String.escaped s in
-  if String.length s > 20 then
-    String.sub s 0 10 ^ " ... " ^ String.sub s (String.length s - 10) 10
-  else s
-
 exception Found of int
 
 let hashtbl_right_assoc s ht =
@@ -150,16 +140,6 @@ let index_of_string strings ic start_pos hash_len string_patches s =
           Printf.eprintf "Sorry. I really need string.inx\n";
           flush stderr;
           failwith "database access"
-
-let initial s =
-  let rec loop i =
-    if i = String.length s then 0
-    else
-      match s.[i] with
-        'A'..'Z' | 'À'..'Ý' -> i
-      | _ -> loop (succ i)
-  in
-  loop 0
 
 let rec list_remove_elemq x =
   function
@@ -311,7 +291,7 @@ let new_persons_of_first_name_or_surname base_data strings params =
       | None ->
           let bt = ref (bt ()) in
           Hashtbl.iter
-            (fun i p ->
+            (fun _i p ->
                let istr1 = proj p in
                try let _ = IstrTree.find istr1 !bt in () with
                  Not_found -> bt := IstrTree.add istr1 0 !bt)
@@ -414,14 +394,6 @@ let strings_of_fsname bname strings (_, person_patches) =
       person_patches;
     !l
 (**)
-
-let lock_file bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then
-      Filename.chop_suffix bname ".gwb"
-    else bname
-  in
-  bname ^ ".lck"
 
 (* Restrict file *)
 

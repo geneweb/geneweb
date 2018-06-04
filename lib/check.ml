@@ -105,12 +105,12 @@ let print_base_warning oc base =
         (designation base fath) (designation base moth) a.year
   | BirthAfterDeath p ->
       fprintf oc "%s\n  born after his/her death\n" (designation base p)
-  | ChangedOrderOfChildren (ifam, des, _, _) ->
+  | ChangedOrderOfChildren (ifam, _, _, _) ->
       let cpl = foi base ifam in
       fprintf oc "Changed order of children of %s and %s\n"
         (designation base (poi base (get_father cpl)))
         (designation base (poi base (get_mother cpl)))
-  | ChildrenNotInOrder (ifam, des, elder, x) ->
+  | ChildrenNotInOrder (ifam, _, elder, x) ->
       let cpl = foi base ifam in
       fprintf oc
         "The following children of\n  %s\nand\n  %s\nare not in order:\n"
@@ -129,7 +129,7 @@ let print_base_warning oc base =
   | ChangedOrderOfPersonEvents (p, _, _) ->
       fprintf oc "Changed order of person's events for %s\n"
         (designation base p)
-  | CloseChildren (ifam, des, elder, x) ->
+  | CloseChildren (ifam, _, elder, x) ->
       let cpl = foi base ifam in
       fprintf oc
         "The following children of\n  %s\nand\n  %s\nare born very close:\n"
@@ -282,7 +282,7 @@ let update_stats base current_year s p =
       end
   | _ -> ()
 
-let min_year_of base p =
+let min_year_of p =
   match Adef.od_of_codate (get_birth p) with
     Some (Dgreg (d, _)) -> Some d.year
   | Some (Dtext _) | None -> None
@@ -290,7 +290,7 @@ let min_year_of base p =
 let rec check_ancestors base warning year year_tab ip ini_p =
   if fst year_tab.(Adef.int_of_iper ip) = max_int then
     let p = poi base ip in
-    let new_year_o = min_year_of base p in
+    let new_year_o = min_year_of p in
     let (new_year, new_ini_p, own_year) =
       match new_year_o with
         Some y -> y, p, true
@@ -335,7 +335,7 @@ let check_base_aux base error warning changed_p =
     let ifam = Adef.ifam_of_int i in
     let fam = foi base ifam in
     if is_deleted_family fam then ()
-    else CheckItem.family base error warning ifam fam
+    else CheckItem.family base warning ifam fam
   done;
   ProgrBar.finish ();
   Consang.check_noloop base error

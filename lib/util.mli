@@ -93,7 +93,7 @@ val person_text_no_surn_no_acc_chk : config -> base -> person -> string
 val person_text_without_title : config -> base -> person -> string
 val main_title : config -> base -> person -> title option
 val titled_person_text : config -> base -> person -> title -> string
-val one_title_text : config -> base -> person -> title -> string
+val one_title_text : base -> title -> string
 val person_title_text : config -> base -> person -> string
 val person_title : config -> base -> person -> string
 
@@ -130,7 +130,7 @@ val check_xhtml : string -> string
 val replace_quotes : string -> string
 
 val print_alphab_list :
-  config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
+  ('a -> string) -> ('a -> unit) -> 'a list -> unit
 val of_course_died : config -> person -> bool
 val hexa_string : string -> string
 
@@ -159,7 +159,7 @@ val transl_a_of_b : config -> string -> string -> string
 val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string
 val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : config -> ('a, 'b) format2 -> int -> ('a, 'b) format2
-val fdecline : config -> ('a, 'b) format2 -> string -> ('a, 'b) format2
+val fdecline : ('a, 'b) format2 -> string -> ('a, 'b) format2
 val fcapitale : ('a, 'b) format2 -> ('a, 'b) format2
 val nth_field : string -> int -> string
 

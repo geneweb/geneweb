@@ -100,8 +100,8 @@ let usage speclist errmsg =
 let parse_list spec_list anonfun errmsg list =
   match parse_arg_list spec_list anonfun list with
     [] -> ()
-  | "-help" :: sl -> usage spec_list errmsg; exit 0
-  | s :: sl ->
+  | "-help" :: _ -> usage spec_list errmsg; exit 0
+  | s :: _ ->
       eprintf "%s: unknown or misused option\n" s;
       eprintf "Use option -help for usage\n";
       flush stderr;

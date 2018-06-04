@@ -64,9 +64,9 @@ let has_base_loop conf base =
 (* plusieurs fois en fonction des extensions, on prend le problème *)
 (* à l'envers et on charge tous les fichiers qui existe. Ensuite,  *)
 (* on teste l'existence avec une Hashtbl.                          *)
-let ht_img = Hashtbl.create 5003;;
+let ht_img = Hashtbl.create 5003
 
-let load_image_ht conf base =
+let load_image_ht conf =
   let dir_img = base_path ["images"] conf.bname in
   let images =
     if Sys.file_exists dir_img then Array.to_list (Sys.readdir dir_img)
@@ -104,7 +104,7 @@ let load_image_ht conf base =
         with _ -> ())
     images
 
-let find_image_ht name = try Hashtbl.find ht_img name with Not_found -> "" ;;
+let find_image_ht name = try Hashtbl.find ht_img name with Not_found -> ""
 
 (* Cas inverse, on teste que pour une personne donc pas besoin *)
 (* de charger toute la Hashtbl.                                *)
@@ -118,7 +118,7 @@ let find_image_file conf base p =
 
 
 (* BIENTOT DEPRECATED *)
-let string_of_prec_dmy conf d =
+let string_of_prec_dmy d =
   let s =
     match (d.day, d.month, d.year) with
      | (0, 0, _) -> string_of_int d.year
@@ -136,8 +136,8 @@ let string_of_prec_dmy conf d =
    | OrYear d2 -> s ^ "|" ^ string_of_int d2.year2
    | YearInt d2 -> s ^ ".." ^ string_of_int d2.year2
 
-let string_of_date conf = function
-    Dgreg (d, _) -> string_of_prec_dmy conf d
+let string_of_date = function
+    Dgreg (d, _) -> string_of_prec_dmy d
   | Dtext t -> "(" ^ t ^ ")"
 
 
@@ -199,7 +199,7 @@ let string_of_date_option date =
   | None -> ""
 
 
-let date_of_string s = Gwcomp.date_of_string s 0 ;;
+let date_of_string s = Gwcomp.date_of_string s 0
 
 
 (**/**) (* Convertion d'une date. *)
@@ -369,94 +369,53 @@ let date_included d d1 d2 =
     else false
   in
   let (d, m, y) = (d.day, d.month, d.year) in
+  let { day = d2 ; month = m2 ; year = y2 } = d2 in
   match d1 with
   | {day = 0; month = 0; year = 0} -> false
   | {day = d1; month = 0; year = 0} ->
-      begin
-        match d2 with
-        | {day = 0; month = m2; year = y2} -> false
-        | {day = d2; month = 0; year = 0} -> d > 0 && comp d d1 d2 31
-        | _ -> false
-      end
+    d2 <> 0 && m2 = 0 && y2 = 0 && d > 0 && comp d d1 d2 31
   | {day = 0; month = m1; year = 0} ->
-      begin
-        match d2 with
-        | {day = d2; month = 0; year = y2} -> false
-        | {day = 0; month = m2; year = 0} -> m > 0 && comp m m1 m2 12
-        | _ -> false
-      end
+    m2 <> 0 && d2 = 0 && y2 = 0 && m > 0 && comp m m1 m2 12
   | {day = 0; month = 0; year = y1} ->
-      begin
-        match d2 with
-        | {day = d2; month = m2; year = 0} -> false
-        | {day = 0; month = 0; year = y2} -> comp y y1 y2 0
-        | _ -> false
-      end
+    y2 <> 0 && d2 = 0 && m2 = 0 && comp y y1 y2 0
   (* Impossible pour GeneWeb *)
   | {day = d1; month = m1; year = 0} ->
-      begin
-        match d2 with
-        | {day = 0; month = 0; year = y2} -> false
-        | {day = d2; month = 0; year = y2} -> false
-        | {day = 0; month = m2; year = y2} -> false
-        | {day = d2; month = m2; year = 0} ->
-            d > 0 && m > 0 &&
-              comp (m * 100 + d) (m1 * 100 + d1) (m2 * 100 + d2) (12 * 100 + 31)
-        | _ -> false
-      end
+    d2 <> 0 && m2 <> 0 && y2 = 0
+    && d > 0
+    && m > 0
+    && comp (m * 100 + d) (m1 * 100 + d1) (m2 * 100 + d2) (12 * 100 + 31)
   | {day = 0; month = m1; year = y1} ->
-      begin
-        match d2 with
-        | {day = d2; month = 0; year = 0} -> false
-        | {day = d2; month = m2; year = 0} -> false
-        | {day = d2; month = 0; year = y2} -> false
-        | {day = 0; month = m2; year = y2} ->
-            m > 0 && comp (y * 100 + m) (y1 * 100 + m1) (y2 * 100 + m2) 0
-        | _ -> false
-      end
+    m2 <> 0 && y2 <> 0 && d2 = 0
+    && m > 0 && comp (y * 100 + m) (y1 * 100 + m1) (y2 * 100 + m2) 0
   (* Impossible pour GeneWeb *)
   | {day = d1; month = 0; year = y1} ->
-      begin
-        match d2 with
-        | {day = 0; month = m2; year = 0} -> false
-        | {day = d2; month = m2; year = 0} -> false
-        | {day = 0; month = m2; year = y2} -> false
-        | {day = d2; month = 0; year = y2} ->
-            d > 0 && y1 = y2 && comp d d1 d2 31
-        | _ -> false
-      end
+    d2 <> 0 && y2 <> 0 && m2 = 0
+    && d > 0 && y1 = y2 && comp d d1 d2 31
   | {day = d1; month = m1; year = y1} ->
-      begin
-        match d2 with
-        | {day = d2; month = m2; year = y2} ->
-            y2 <> 0 &&
-              comp
-                (y * 10000 + m * 100 + d)
-                (y1 * 10000 + m1 * 100 + d1)
-                (y2 * 10000 + m2 * 100 + d2)
-                0
-      end
-
+    y2 <> 0 &&
+    comp
+      (y * 10000 + m * 100 + d)
+      (y1 * 10000 + m1 * 100 + d1)
+      (y2 * 10000 + m2 * 100 + d2)
+      0
 
 (**/**) (* Divers filtres possibles. *)
 
 (* ********************************************************************* *)
-(*  [Fonc] reduce_to_sosa : config -> base -> person list -> person list *)
+(*  [Fonc] reduce_to_sosa : person list -> person list                   *)
 (** [Description] : Renvoie la liste des personnes ayant un numéro sosa.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
       - l    : liste de personnes
     [Retour] :
       - person list : Retourne la liste des personnes avec un sosa.
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let reduce_to_sosa conf base compute_sosa l =
+let reduce_to_sosa compute_sosa l =
   let rec loop l accu =
     match l with
     | [] -> accu
     | p :: l ->
-        let sosa = compute_sosa conf base p in
+        let sosa = compute_sosa p in
         if Sosa.gt sosa Sosa.zero then loop l (p :: accu)
         else loop l accu
   in loop l []
@@ -503,19 +462,13 @@ let is_visible conf base p =
 
 
 (* ********************************************************************* *)
-(*  [Fonc] is_sosa : config -> base -> bool -> person -> bool            *)
+(*  [Fonc] is_sosa : (person -> Sosa.t) -> person -> bool            *)
 (** [Description] : Test si la personne est un sosa.
-    [Args] :
-      - conf   : configuration de la base
-      - base   : base de donnée
-      - use_ht : true = get_sosa_person, false = get_single_sosa
-      - p      : person
     [Retour] : bool
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let is_sosa conf base compute_sosa p =
-  let sosa = compute_sosa conf base p in
-  Sosa.gt sosa Sosa.zero
+let is_sosa compute_sosa p =
+  Sosa.gt (compute_sosa p) Sosa.zero
 
 
 (* ********************************************************************* *)
@@ -547,7 +500,7 @@ let is_recent conf p =
     [Retour] : bool
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let check_sex p sex = get_sex p = sex ;;
+let check_sex p sex = get_sex p = sex
 
 
 (* ********************************************************************* *)
@@ -569,18 +522,17 @@ let is_date_included prec d d1 d2 =
 
 
 (* ********************************************************************* *)
-(*  [Fonc] apply_filters_p : config -> base -> filters -> person -> bool *)
+(*  [Fonc] apply_filters_p : config -> filters -> person -> bool *)
 (** [Description] : Test en fonction des filtres défini si la personne
                     répond aux critères (true) ou pas (false).
     [Args] :
       - conf    : configuration de la base
-      - base    : base de donnée
       - filters : filtres demandés
       - p       : person
     [Retour] : bool
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let apply_filters_p conf base filters compute_sosa p =
+let apply_filters_p conf filters compute_sosa p =
   let filter = true in
   let filter =
     if filter then
@@ -590,7 +542,7 @@ let apply_filters_p conf base filters compute_sosa p =
     else filter
   in
   let filter =
-    if filter && filters.only_sosa then is_sosa conf base compute_sosa p
+    if filter && filters.only_sosa then is_sosa compute_sosa p
     else filter
   in
   let filter =
@@ -883,7 +835,7 @@ let empty_piqi_person conf ref_person base_loop =
 (* ************************************************************************** *)
 (*  [Fonc] spouse_to_piqi_spouse :
              config -> base -> person -> family -> bool ->
-               (config -> base -> person -> Sosa.t) -> Perso                   *)
+             (person -> Sosa.t) -> Perso                                      *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Spouse (piqi)
                     dont tous les champs sont complétés.
                     Les tests de droits d'accès sont fait dans cette fonction.
@@ -913,7 +865,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
     (* comme ça, s'il y a une boucle, l'init de init_sosa_t ne plante pas. *)
     if base_loop then "-1"
     else
-      let sosa_p = compute_sosa conf base p in
+      let sosa_p = compute_sosa p in
       Sosa.to_string sosa_p
   in
   let sex =
@@ -954,7 +906,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
   in
   let birth =
     match Adef.od_of_codate gen_p.birth with
-    | Some d when p_auth -> string_of_date conf d
+    | Some d when p_auth -> string_of_date d
     | _ -> ""
   in
   let birth_place =
@@ -963,7 +915,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
   in
   let baptism =
     match Adef.od_of_codate gen_p.baptism with
-    | Some d when p_auth -> string_of_date conf d
+    | Some d when p_auth -> string_of_date d
     | _ -> ""
   in
   let baptism_place =
@@ -976,7 +928,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
       | NotDead -> (`not_dead, "")
       | Death (_, cd) ->
           let d = Adef.date_of_cdate cd in
-          (`dead, string_of_date conf d)
+          (`dead, string_of_date d)
       | DeadYoung -> (`dead_young, "")
       | DeadDontKnowWhen -> (`dead_dont_know_when, "")
       | DontKnowIfDead -> (`dont_know_if_dead, "")
@@ -992,7 +944,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
     match gen_p.burial with
     | Buried cod | Cremated cod ->
         (match Adef.od_of_codate cod with
-        | Some d when p_auth -> string_of_date conf d
+        | Some d when p_auth -> string_of_date d
         | _ -> "")
     | _ -> ""
   in
@@ -1002,7 +954,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
   in
   let marriage_date =
     match Adef.od_of_codate (get_marriage fam) with
-    | Some d when m_auth -> string_of_date conf d
+    | Some d when m_auth -> string_of_date d
     | _ -> ""
   in
   let marriage_place =
@@ -1046,8 +998,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
 
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_person_light :
-             config -> base -> person -> bool ->
-               (config -> base -> person -> Sosa.t) -> Person                  *)
+             config -> base -> person -> bool -> (person -> Sosa.t) -> Person *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person (piqi)
                     (piqi) dont tous les champs sont complétés.
                     Les tests de droits d'accès sont fait dans cette fonction.
@@ -1070,7 +1021,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
     (* comme ça, s'il y a une boucle, l'init de init_sosa_t ne plante pas. *)
     if base_loop then "-1"
     else
-      let sosa_p = compute_sosa conf base p in
+      let sosa_p = compute_sosa p in
       Sosa.to_string sosa_p
   in
   let sex =
@@ -1111,7 +1062,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
   in
   let birth =
     match Adef.od_of_codate gen_p.birth with
-    | Some d when p_auth -> string_of_date conf d
+    | Some d when p_auth -> string_of_date d
     | _ -> ""
   in
   let birth_place =
@@ -1120,7 +1071,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
   in
   let baptism =
     match Adef.od_of_codate gen_p.baptism with
-    | Some d when p_auth -> string_of_date conf d
+    | Some d when p_auth -> string_of_date d
     | _ -> ""
   in
   let baptism_place =
@@ -1133,7 +1084,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
       | NotDead -> (`not_dead, "")
       | Death (_, cd) ->
           let d = Adef.date_of_cdate cd in
-          (`dead, string_of_date conf d)
+          (`dead, string_of_date d)
       | DeadYoung -> (`dead_young, "")
       | DeadDontKnowWhen -> (`dead_dont_know_when, "")
       | DontKnowIfDead -> (`dont_know_if_dead, "")
@@ -1149,7 +1100,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
     match gen_p.burial with
     | Buried cod | Cremated cod ->
         (match Adef.od_of_codate cod with
-        | Some d when p_auth -> string_of_date conf d
+        | Some d when p_auth -> string_of_date d
         | _ -> "")
     | _ -> ""
   in
@@ -1172,11 +1123,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
         spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img)
       sl
   in
-  let ascend =
-    match get_parents p with
-     | Some ifam -> true
-     | None -> false
-  in
+  let ascend = get_parents p <> None in
   let descend =
     List.exists
       (fun c -> Array.length (get_children c) > 0)
@@ -1215,7 +1162,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_person_full :
              config -> base -> person -> bool ->
-               (config -> base -> person -> Sosa.t) -> FullPerson              *)
+               (person -> Sosa.t) -> FullPerson              *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person (piqi)
                     (piqi) dont tous les champs sont complétés.
                     Les tests de droits d'accès sont fait dans cette fonction.
@@ -1238,7 +1185,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
     (* comme ça, s'il y a une boucle, l'init de init_sosa_t ne plante pas. *)
     if base_loop then "-1"
     else
-      let sosa_p = compute_sosa conf base p in
+      let sosa_p = compute_sosa p in
       Sosa.to_string sosa_p
   in
   let sex =
@@ -1287,7 +1234,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   in
   let birth =
     match Adef.od_of_codate gen_p.birth with
-    | Some d when p_auth -> Some (string_of_date conf d)
+    | Some d when p_auth -> Some (string_of_date d)
     | _ -> None
   in
   let birth_place =
@@ -1300,7 +1247,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   in
   let baptism =
     match Adef.od_of_codate gen_p.baptism with
-    | Some d when p_auth -> Some (string_of_date conf d)
+    | Some d when p_auth -> Some (string_of_date d)
     | _ -> None
   in
   let baptism_place =
@@ -1317,7 +1264,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
       | NotDead -> (`not_dead, None)
       | Death (_, cd) ->
           let d = Adef.date_of_cdate cd in
-          (`dead, Some (string_of_date conf d))
+          (`dead, Some (string_of_date d))
       | DeadYoung -> (`dead_young, None)
       | DeadDontKnowWhen -> (`dead_dont_know_when, None)
       | DontKnowIfDead -> (`dont_know_if_dead, None)
@@ -1337,7 +1284,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
     match get_burial p with
     | Buried cod | Cremated cod ->
         (match Adef.od_of_codate cod with
-        | Some d when p_auth -> Some (string_of_date conf d)
+        | Some d when p_auth -> Some (string_of_date d)
         | _ -> None)
     | _ -> None
   in
@@ -1362,12 +1309,12 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
         let fief = t.t_place in
         let date_begin =
           match Adef.od_of_codate t.t_date_start with
-          | Some d -> Some (string_of_date conf d)
+          | Some d -> Some (string_of_date d)
           | None -> None
         in
         let date_end =
           match Adef.od_of_codate t.t_date_end with
-          | Some d -> Some (string_of_date conf d)
+          | Some d -> Some (string_of_date d)
           | None -> None
         in
         let nth = Some (Int32.of_int t.t_nth) in
@@ -1529,7 +1476,7 @@ let fam_to_piqi_family conf base ifam =
   in
   let marriage =
     match Adef.od_of_codate gen_f.marriage with
-    | Some d when m_auth -> Some (string_of_date conf d)
+    | Some d when m_auth -> Some (string_of_date d)
     | _ -> None
   in
   let marriage_place =
@@ -1554,7 +1501,7 @@ let fam_to_piqi_family conf base ifam =
     | NotDivorced -> (`not_divorced, None)
     | Divorced cod ->
         (match Adef.od_of_codate cod with
-         | Some d when m_auth -> (`divorced, Some (string_of_date conf d))
+         | Some d when m_auth -> (`divorced, Some (string_of_date d))
          | _ -> (`divorced, None))
     | Separated -> (`separated, None)
   in
@@ -1597,13 +1544,13 @@ let fam_to_piqi_family conf base ifam =
       -
     [Rem] : Non exportÃ© en clair hors de ce module.                        *)
 (* *********************************************************************** *)
-let fam_to_piqi_family_link conf base (ifath, imoth) ifam fam =
+let fam_to_piqi_family_link base (ifath, imoth) ifam fam =
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let index = Int32.of_int (Adef.int_of_ifam ifam) in
   let fsources = None in
   let marriage =
     match Adef.od_of_codate gen_f.marriage with
-    | Some d -> Some (string_of_date conf d)
+    | Some d -> Some (string_of_date d)
     | _ -> None
   in
   let marriage_place = Some gen_f.marriage_place in
@@ -1622,7 +1569,7 @@ let fam_to_piqi_family_link conf base (ifath, imoth) ifam fam =
     | NotDivorced -> (`not_divorced, None)
     | Divorced cod ->
         (match Adef.od_of_codate cod with
-         | Some d -> (`divorced, Some (string_of_date conf d))
+         | Some d -> (`divorced, Some (string_of_date d))
          | _ -> (`divorced, None))
     | Separated -> (`separated, None)
   in
@@ -1982,7 +1929,7 @@ let pers_to_piqi_app_person conf base p =
       - Family : Retourne une famille dont tous les champs sont complétés.
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let fam_to_piqi_app_family conf base ifam =
+let fam_to_piqi_app_family base ifam =
   let fam = foi base ifam in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let ifath = get_father fam in
@@ -2050,7 +1997,7 @@ let data_person p =
   | PLight p -> Mext.gen_person p
   | PFull p -> Mext.gen_full_person p
 
-let person_map conf base l base_loop compute_sosa load_img =
+let person_map conf base l compute_sosa load_img =
   let base_loop = has_base_loop conf base in
   if p_getenvbin conf.env "full_infos" = Some "1" then
     PFull
@@ -2072,15 +2019,13 @@ let conv_data_list_person conf base filters l =
       if List.length l > 20 then
         let () = Perso.build_sosa_ht conf base in
         Perso.get_sosa_person
-      else Perso.get_single_sosa
+      else (Perso.get_single_sosa conf base)
     in
     let load_img =
-      if List.length l > 20 then
-        let () = load_image_ht conf base in true
+      if List.length l > 20 then let () = load_image_ht conf in true
       else false
     in
-    let base_loop = has_base_loop conf base in
-    let l = person_map conf base l base_loop compute_sosa load_img in
+    let l = person_map conf base l compute_sosa load_img in
     match l with
     | PLight pl ->
         let list = M.List_persons.({list_persons = pl}) in
@@ -2094,20 +2039,18 @@ let data_list_person conf base filters l =
     if List.length l > 20 then
       let () = Perso.build_sosa_ht conf base in
       Perso.get_sosa_person
-    else Perso.get_single_sosa
+    else (Perso.get_single_sosa conf base)
   in
   let load_img =
-    if List.length l > 20 then
-      let () = load_image_ht conf base in true
+    if List.length l > 20 then let () = load_image_ht conf in true
     else false
   in
-  let l = List.filter (apply_filters_p conf base filters compute_sosa) l in
+  let l = List.filter (apply_filters_p conf filters compute_sosa) l in
   if filters.nb_results then
     let len = M.Internal_int32.({value = Int32.of_int (List.length l)}) in
     Mext.gen_internal_int32 len
   else
-    let base_loop = has_base_loop conf base in
-    let l = person_map conf base l base_loop compute_sosa load_img in
+    let l = person_map conf base l compute_sosa load_img in
     match l with
     | PLight pl ->
         let list = M.List_persons.({list_persons = pl}) in
@@ -2121,11 +2064,10 @@ let data_list_person_option conf base filters l =
     if List.length l > 20 then
       let () = Perso.build_sosa_ht conf base in
       Perso.get_sosa_person
-    else Perso.get_single_sosa
+    else (Perso.get_single_sosa conf base)
   in
   let load_img =
-    if List.length l > 20 then
-      let () = load_image_ht conf base in true
+    if List.length l > 20 then let () = load_image_ht conf in true
     else false
   in
   if filters.nb_results then
@@ -2140,7 +2082,7 @@ let data_list_person_option conf base filters l =
             (fun p ->
               match p with
               | PFull p ->
-                  if apply_filters_p conf base filters compute_sosa p then
+                  if apply_filters_p conf filters compute_sosa p then
                     pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
                   else
                     let fn = Name.lower (sou base (get_first_name p)) in
@@ -2162,7 +2104,7 @@ let data_list_person_option conf base filters l =
             (fun p ->
               match p with
               | PFull p ->
-                  if apply_filters_p conf base filters compute_sosa p then
+                  if apply_filters_p conf filters compute_sosa p then
                     pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
                   else
                     let fn = Name.lower (sou base (get_first_name p)) in
@@ -2193,11 +2135,10 @@ let person_node_map conf base l =
     if List.length l > 20 then
       let () = Perso.build_sosa_ht conf base in
       Perso.get_sosa_person
-    else Perso.get_single_sosa
+    else (Perso.get_single_sosa conf base)
   in
   let load_img =
-    if List.length l > 20 then
-      let () = load_image_ht conf base in true
+    if List.length l > 20 then let () = load_image_ht conf in true
     else false
   in
   let base_loop = has_base_loop conf base in
@@ -2229,11 +2170,10 @@ let person_node_map conf base l =
          l)
 
 let person_node_map_lia conf base l =
-  let compute_sosa = (fun _ _ _ -> Sosa.zero) in
+  let compute_sosa = (fun _ -> Sosa.zero) in
   (* TODO ? *)
   let load_img =
-    if List.length l > 20 then
-      let () = load_image_ht conf base in true
+    if List.length l > 20 then let () = load_image_ht conf in true
     else false
   in
   let base_loop = has_base_loop conf base in

@@ -16,4 +16,4 @@ val print : Config.config -> Gwdb.base -> unit
     [Args] :
       - conf : configuration de la requête
       - base : argument non utilisé                                          *)
-val print_html : Config.config -> 'a -> unit
+val print_html : Config.config -> unit

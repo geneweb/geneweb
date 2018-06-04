@@ -3,10 +3,19 @@
 
 let phony_min_size = 8
 
-let check_input_value func fname len = ()
+let check_input_value _func _fname _len = ()
+  (* Printf.eprintf "*** check input_value (%s) %s\n" func fname; flush stderr;
+   * let ic = open_in_bin fname in
+   * let tab = input_value ic in
+   * if not (Obj.is_block (Obj.repr tab)) then failwith "not a block" else ();
+   * Printf.eprintf "tab len %d cnt %d\n" (Array.length tab) len;
+   * flush stderr;
+   * if Array.length tab <> len then failwith "error" else ();
+   * close_in ic;
+   * Printf.eprintf "check ok\n"; flush stderr *)
 
 let output_item_no_compress_return_pos oc_dat item_cnt s =
-  incr item_cnt; let pos = pos_out oc_dat in Iovalue.output oc_dat s; pos
+  incr item_cnt ; let pos = pos_out oc_dat in Iovalue.output oc_dat s; pos
 
 let output_value_array_no_compress bdir e len pad f =
   let oc_acc = open_out_bin (Filename.concat bdir ("access" ^ e)) in
@@ -96,6 +105,7 @@ let output_value_array_compress bdir e _ pad f =
     end
   else assert false
 
+[@@@ocaml.warning "-37"]
 type ('a, 'b) hashtbl_t =
   { mutable size : int;
     mutable data : ('a, 'b) bucketlist array;
@@ -104,6 +114,7 @@ type ('a, 'b) hashtbl_t =
 and ('a, 'b) bucketlist =
     Empty
   | Cons of 'a * 'b * ('a, 'b) bucketlist
+[@@@ocaml.warning "+37"]
 
 let output_hashtbl dir file ht =
   let oc_ht = open_out_bin (Filename.concat dir file) in

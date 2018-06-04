@@ -230,7 +230,7 @@ let adjust_ul_level rev_lines old_lev new_lev =
 let message_txt conf i = transl_nth conf "visualize/show/hide/summary" i
 
 let sections_nums_of_tlsw_lines lines =
-  let (lev, _, cnt, rev_sections_nums) =
+  let (_, _, _, rev_sections_nums) =
     List.fold_left
       (fun (prev_lev, indent_stack, cnt, sections_nums) s ->
          let len = String.length s in
@@ -275,7 +275,7 @@ let remove_links s =
       let (len, i) =
         match NotesLinks.misc_notes_link s i with
           NotesLinks.WLpage (j, _, _, _, text) -> Buff.mstore len text, j
-        | NotesLinks.WLperson (j, k, name, text) ->
+        | NotesLinks.WLperson (j, _, name, text) ->
             let text =
               match text with
                 Some text -> if text = "" then name else text

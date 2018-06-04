@@ -19,7 +19,7 @@ let is_censored_couple base threshold cpl =
   let moth = poi base (get_mother cpl) in
   is_censored_person threshold fath || is_censored_person threshold moth
 
-let censor_person base per_tab fam_tab flag threshold p no_check =
+let censor_person base per_tab flag threshold p no_check =
   let ps = poi base (Adef.iper_of_int p) in
   if no_check || is_censored_person threshold ps then
     per_tab.(p) <- per_tab.(p) lor flag
@@ -31,7 +31,7 @@ let rec censor_family base per_tab fam_tab flag threshold i no_check =
       (fun ifam ->
          let f = Adef.int_of_ifam ifam in
          censor_family base per_tab fam_tab flag threshold f true;
-         censor_person base per_tab fam_tab flag threshold p true)
+         censor_person base per_tab flag threshold p true)
       (get_family uni)
   in
   let censor_descendants f =
@@ -69,13 +69,12 @@ let censor_base base per_tab fam_tab flag threshold =
     censor_family base per_tab fam_tab flag threshold i false
   done;
   for i = 0 to nb_of_persons base - 1 do
-    censor_person base per_tab fam_tab flag threshold i false
+    censor_person base per_tab flag threshold i false
   done
 
 let restrict_base base per_tab fam_tab flag =
   for i = 0 to nb_of_persons base - 1 do
-    let fct p = false in
-    if base_visible_get base fct i then
+    if base_visible_get base (fun _ -> false) i then
       let _ = per_tab.(i) <- per_tab.(i) lor flag in ()
   done;
   for i = 0 to nb_of_families base - 1 do
@@ -234,7 +233,7 @@ let select_descendants base per_tab fam_tab no_spouses_parents flag iper
   in
   loop 0 iper
 
-let select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
+let select_descendants_ancestors base per_tab fam_tab ip =
   let new_mark = let r = ref 0 in fun () -> incr r; !r in
   let tab = Array.make (nb_of_persons base) (new_mark ()) in
   let anc_mark = new_mark () in
@@ -338,8 +337,7 @@ let select_ancestors_descendants base anc desc ancdesc no_spouses_parents
         if censor = -1 then restrict_base base per_tab fam_tab 4
         else if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
       in
-      select_descendants_ancestors base per_tab fam_tab no_spouses_parents
-        iadper;
+      select_descendants_ancestors base per_tab fam_tab iadper;
       (fun i -> let fl = per_tab.(Adef.int_of_iper i) in fl < 4 && fl > 0),
       (fun i -> let fl = fam_tab.(Adef.int_of_ifam i) in fl < 4 && fl > 0)
   | _ ->

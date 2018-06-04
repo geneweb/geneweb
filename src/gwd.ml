@@ -180,13 +180,12 @@ let refuse_auth conf from auth auth_type =
        fprintf oc "  Response: %s\n" auth);
   Util.unauthorized conf auth_type
 
-let index_from c s =
-  let rec loop i =
-    if i = String.length s then i else if s.[i] = c then i else loop (i + 1)
-  in
-  loop
+let index_from s o c =
+  match String.index_from_opt s o c with
+  | Some i -> i
+  | None -> String.length s
 
-let index c s = index_from c s 0
+let index s c = index_from s 0 c
 
 let rec extract_assoc key =
   function
@@ -218,7 +217,7 @@ let alias_lang lang =
         let lang =
           try
             let rec loop line =
-              match Mutil.lindex line '=' with
+              match String.index_opt line '=' with
                 Some i ->
                   if lang = String.sub line 0 i then
                     String.sub line (i + 1) (String.length line - i - 1)
@@ -298,7 +297,7 @@ let print_renamed conf new_n =
       Wserver.printf "</ul>\n";
       Hutil.trailer conf
 
-let log_redirect conf from request req =
+let log_redirect from request req =
   match
     Lock.control (Srcfile.adm_file "gwd.lck") true
       (fun () ->
@@ -318,7 +317,7 @@ let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf.request in
   let link = "http://" ^ new_addr ^ req in
   let env = ["link", link] in
-  log_redirect conf from request req;
+  log_redirect from request req;
   match Util.open_etc_file "redirect" with
     Some ic ->
       let conf = {conf with is_printed_by_template = false} in
@@ -388,7 +387,7 @@ let nonce_private_key =
            string_of_int k
          end
        else k)
-let digest_nonce tm = Lazy.force nonce_private_key
+let digest_nonce _ = Lazy.force nonce_private_key
 
 let trace_auth base_env f =
   if List.mem_assoc "trace_auth" base_env then
@@ -492,10 +491,10 @@ let digest_match_auth_file asch =
     (fun au -> is_that_user_and_password asch au.au_user au.au_passwd)
 
 let match_simple_passwd sauth uauth =
-  match lindex sauth ':' with
+  match String.index_opt sauth ':' with
     Some _ -> sauth = uauth
   | None ->
-      match lindex uauth ':' with
+      match String.index_opt uauth ':' with
         Some i ->
           sauth = String.sub uauth (i + 1) (String.length uauth - i - 1)
       | None -> sauth = uauth
@@ -520,12 +519,12 @@ let get_actlog check_from utm from_addr base_password =
     Some ic ->
       let tmout = float_of_int !login_timeout in
       let rec loop changed r list =
-        match try Some (input_line ic) with End_of_file -> None with
-          Some line ->
-            let i = index ' ' line in
+        match input_line ic with
+        | line ->
+            let i = index line ' ' in
             let tm = float_of_string (String.sub line 0 i) in
-            let islash = index_from '/' line (i + 1) in
-            let ispace = index_from ' ' line (islash + 1) in
+            let islash = index_from line (i + 1) '/' in
+            let ispace = index_from line (islash + 1) ' ' in
             let addr = String.sub line (i + 1) (islash - i - 1) in
             let db_pwd = String.sub line (islash + 1) (ispace - islash - 1) in
             let c = line.[ispace+1] in
@@ -545,7 +544,7 @@ let get_actlog check_from utm from_addr base_password =
               else ((addr, db_pwd), (tm, c, user)) :: list, r, changed
             in
             loop changed r list
-        | None ->
+        | exception End_of_file ->
             close_in ic;
             let list =
               List.sort (fun (_, (t1, _, _)) (_, (t2, _, _)) -> compare t2 t1)
@@ -900,7 +899,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
             | None -> true, false, false, ""
   in
   let user =
-    match lindex uauth ':' with
+    match String.index_opt uauth ':' with
       Some i ->
         let s = String.sub uauth 0 i in
         if s = wizard_passwd || s = friend_passwd then "" else s
@@ -933,7 +932,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
         if wizard then "Wizard " ^ base_file else "Friend " ^ base_file
       in
       let (u, p) =
-        match lindex passwd1 ':' with
+        match String.index_opt passwd1 ':' with
           Some i ->
             let u = String.sub passwd1 0 i in
             let p =
@@ -1004,7 +1003,7 @@ let digest_authorization request base_env passwd utm base_file command =
       let meth =
         match Wserver.extract_param "GET " ' ' request with
           "" -> "POST"
-        | s -> "GET"
+        | _ -> "GET"
       in
       let _ =
         trace_auth base_env (fun oc -> fprintf oc "\nauth = \"%s\"\n" auth)
@@ -1084,7 +1083,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
         basic_authorization from_addr request base_env passwd access_type utm
           base_file command
 
-let make_conf from_addr (addr, request) script_name contents env =
+let make_conf from_addr request script_name env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
   let b_arg_for_basename = !(Wserver.cgi) in
@@ -1093,7 +1092,7 @@ let make_conf from_addr (addr, request) script_name contents env =
       let (x, env) = extract_assoc "b" env in
       if x <> "" || b_arg_for_basename then x, env else script_name, env
     in
-    let ip = index '_' base_passwd in
+    let ip = index base_passwd '_' in
     let base_file =
       let s = String.sub base_passwd 0 ip in
       let s =
@@ -1386,10 +1385,8 @@ let no_access conf =
   Wserver.printf "No access to this database in CGI mode\n";
   Hutil.trailer conf
 
-let conf_and_connection from (addr, request) script_name contents env =
-  let (conf, sleep, passwd_err) =
-    make_conf from (addr, request) script_name contents env
-  in
+let conf_and_connection from request script_name contents env =
+  let (conf, sleep, passwd_err) = make_conf from request script_name env in
   match !redirected_addr with
     Some addr -> print_redirected conf from request addr
   | None ->
@@ -1407,10 +1404,10 @@ let conf_and_connection from (addr, request) script_name contents env =
         end;
       match !(Wserver.cgi), auth_err, passwd_err with
         true, true, _ ->
-          if is_robot from then Robot.robot_error conf from 0 0
+          if is_robot from then Robot.robot_error conf 0 0
           else no_access conf
       | _, true, _ ->
-          if is_robot from then Robot.robot_error conf from 0 0
+          if is_robot from then Robot.robot_error conf 0 0
           else
             let auth_type =
               let x =
@@ -1420,7 +1417,7 @@ let conf_and_connection from (addr, request) script_name contents env =
             in
             refuse_auth conf from auth auth_type
       | _, _, ({ar_ok = false} as ar) ->
-          if is_robot from then Robot.robot_error conf from 0 0
+          if is_robot from then Robot.robot_error conf 0 0
           else
             let tm = Unix.time () in
             begin match
@@ -1670,7 +1667,7 @@ let connection (addr, request) script_name contents =
   let from =
     match addr with
       Unix.ADDR_UNIX x -> x
-    | Unix.ADDR_INET (iaddr, port) ->
+    | Unix.ADDR_INET (iaddr, _) ->
         if !no_host_address then Unix.string_of_inet_addr iaddr
         else
           try (Unix.gethostbyaddr iaddr).Unix.h_name with
@@ -1689,7 +1686,7 @@ let connection (addr, request) script_name contents =
           if image_request script_name env then ()
           else if misc_request script_name then ()
           else
-            conf_and_connection from (addr, request) script_name contents env
+            conf_and_connection from request script_name contents env
         with
           Adef.Request_failure msg -> print_request_failure msg
         | Exit -> ()
@@ -1960,8 +1957,8 @@ let main () =
      Arg.String
        (fun x ->
           (* ^[a-z]:gwx:2322 *)
-          let i = String.index x ':' in
-          let j = String.index_from x (i + 1) ':' in
+          let i = index x ':' in
+          let j = index_from x (i + 1) ':' in
           let base_regexp = String.sub x 0 i in
           let host_name = String.sub x (i + 1) (j - i - 1) in
           let port = String.sub x (j + 1) (String.length x - j - 1) in

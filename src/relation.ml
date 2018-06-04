@@ -109,17 +109,17 @@ let dag_fam_list_of_ind_list indl =
 
 let add_phony_children indl faml =
   List.fold_right
-    (fun fam (indl, faml) ->
+    (fun fam indl ->
        match fam with
-         {df_pare = [_]; df_chil = []} -> indl, fam :: faml
+         {df_pare = [_]; df_chil = []} -> indl
        | {df_pare = pare; df_chil = []} ->
            let rec ind = {di_val = None; di_famc = famc; di_fams = fams}
            and famc = {df_pare = pare; df_chil = [ind]}
            and fams = {df_pare = [ind]; df_chil = []} in
            List.iter (fun ind -> ind.di_fams <- famc) pare;
-           ind :: indl, famc :: fams :: faml
-       | _ -> indl, fam :: faml)
-    faml (indl, [])
+           ind :: indl
+       | _ -> indl)
+    faml indl
 
 let dag_of_ind_dag_list indl =
   let (indl, _) =
@@ -132,8 +132,8 @@ let dag_of_ind_dag_list indl =
        {pare = List.map idag_of_di_ind ind.di_famc.df_pare;
         valu =
           begin match ind.di_val with
-            Some ic -> Dag.Left ic
-          | None -> Dag.Right cnt
+            Some ic -> Def.Left ic
+          | None -> Def.Right cnt
           end;
         chil = List.map idag_of_di_ind ind.di_fams.df_chil})
     indl
@@ -142,15 +142,15 @@ let dag_of_relation_path conf base path =
   let indl = dag_ind_list_of_path path in
   let indl = add_missing_parents_of_siblings conf base indl in
   let faml = dag_fam_list_of_ind_list indl in
-  let (indl, faml) = add_phony_children indl faml in
+  let indl = add_phony_children indl faml in
   let nl = dag_of_ind_dag_list indl in
   let d = {dag = Array.of_list (List.rev nl)} in
   let set =
     List.fold_left
       (fun set n ->
          match n.valu with
-           Dag.Left ip -> Dag.Pset.add ip set
-         | Dag.Right _ -> set)
+           Def.Left ip -> Dag.Pset.add ip set
+         | Def.Right _ -> set)
       Dag.Pset.empty nl
   in
   set, d
@@ -164,7 +164,7 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let (set, d) = dag_of_relation_path conf base path in
   let page_title = capitale (transl conf "relationship") in
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
-  Dag.print_slices_menu_or_dag_page conf base page_title hts next_txt
+  Dag.print_slices_menu_or_dag_page conf page_title hts next_txt
 
 let add_common_parent base ip1 ip2 set =
   let a1 = poi base ip1 in
@@ -180,7 +180,7 @@ let add_common_parent base ip1 ip2 set =
       else set
   | _ -> set
 
-let ind_set_of_relation_path conf base path =
+let ind_set_of_relation_path base path =
   let (set, _) =
     List.fold_left
       (fun (set, prev_ip) (ip, fl) ->
@@ -206,7 +206,7 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
         Some "on" -> true
       | _ -> false
     in
-    let set = ind_set_of_relation_path conf base path in
+    let set = ind_set_of_relation_path base path in
     let page_title = capitale (transl conf "relationship") in
     Dag.make_and_print_dag conf base elem_txt vbar_txt invert set []
       page_title next_txt
@@ -332,11 +332,11 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
   in
   let rec make_path path vertex =
     match List.hd path with
-      iper, Self -> path
-    | iper, _ ->
+    | _, Self -> path
+    | _, _ ->
         match mark_per.(Adef.int_of_iper vertex) with
           NotVisited -> assert false
-        | Visited (s, v, f) -> make_path ((vertex, f) :: path) v
+        | Visited (_, v, f) -> make_path ((vertex, f) :: path) v
   in
   let merge_path p1 p2 =
     let swap_order el =
@@ -345,9 +345,11 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
       | iper, Child -> iper, Parent
       | _ -> el
     in
-    List.map2 (fun (ip1, fl1) (ip2, fl2) -> swap_order (ip1, fl2))
-      (List.rev (List.tl (List.rev p1))) (List.tl p1) @
-    List.rev p2
+    List.rev_append
+      (List.rev_map2 (fun (ip1, _) (_, fl2) -> swap_order (ip1, fl2))
+         (List.rev (List.tl (List.rev p1)))
+         (List.tl p1))
+      (List.rev p2)
   in
   let one_step_further source queue =
     let rec loop1 newvertexlist =
@@ -938,7 +940,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   Wserver.printf "</ul>\n"
 
 let print_solution conf base long n p1 p2 sol =
-  let (pp1, pp2, (x1, x2, list), reltab) = sol in
+  let (pp1, pp2, (x1, x2, list), _) = sol in
   Wserver.printf "<p>\n";
   Wserver.printf "<img src=\"%s/%s\" alt=\"\"%s>\n" (Util.image_prefix conf)
     "picto_fleche_bleu.png" conf.xhs;
@@ -979,7 +981,7 @@ let print_dag_links conf base p1 p2 rl =
   in
   let something =
     M.fold
-      (fun ip (_, _, nn, nt, maxlev) something ->
+      (fun _ (_, _, nn, nt, _) something ->
          something || nt > 1 && nn > 1 && nn < max_br)
       anc_map false
   in
@@ -990,7 +992,7 @@ let print_dag_links conf base p1 p2 rl =
         (Util.image_prefix conf) "picto_fleche_bleu.png" conf.xhs
     else Wserver.printf "<ul>\n";
     M.iter
-      (fun ip (pp1, pp2, nn, nt, maxlev) ->
+      (fun ip (pp1, pp2, nn, nt, _) ->
          let dp1 =
            match pp1 with
              Some p -> p
@@ -1198,7 +1200,7 @@ let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
     pl1 sl
 
 let sp p = Some p
-let no_sp p = None
+let no_sp _ = None
 
 let compute_relationship conf base by_marr p1 p2 =
   let ip1 = get_key_index p1 in
@@ -1315,10 +1317,9 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
         end
   | _ -> ()
 
-let print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list), _) =
+let print_path conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
   let found = ref [] in
-  List.iter
-    (fun (a, n) -> print_one_path conf base found a p1 p2 pp1 pp2 l1 l2) list;
+  List.iter (fun (a, _) -> print_one_path conf base found a p1 p2 pp1 pp2 l1 l2) list;
   Wserver.printf "\n"
 
 let print_main_relationship conf base long p1 p2 rel =
@@ -1400,7 +1401,7 @@ let print_main_relationship conf base long p1 p2 rel =
             Wserver.printf "</p>\n"
           end
         end
-  | Some (rl, total, relationship) ->
+  | Some (rl, _, relationship) ->
       let a1 = p1 in
       let a2 = p2 in
       let all_by_marr =
@@ -1414,7 +1415,7 @@ let print_main_relationship conf base long p1 p2 rel =
         List.fold_left
           (fun i sol ->
              print_solution conf base long i p1 p2 sol;
-             if long then print_path conf base i p1 p2 sol;
+             if long then print_path conf base p1 p2 sol;
              succ i)
           1 rl
       in
@@ -1522,7 +1523,7 @@ let print_multi_relation conf base pl lim assoc_txt =
             "<b>(" ^ t ^ ")</b>"
           with Not_found -> ""))
     in
-    let vbar_txt ip = "" in
+    let vbar_txt _ = "" in
     let next_txt = multi_relation_next_txt conf pl2 lim assoc_txt in
     print_relationship_dag conf base elem_txt vbar_txt path next_txt
 

@@ -18,9 +18,7 @@ and span_id
 and ghost_id
 
 external span_id_of_int : int -> span_id = "%identity"
-external int_of_span_id : span_id -> int = "%identity"
 external ghost_id_of_int : int -> ghost_id = "%identity"
-external int_of_ghost_id : ghost_id -> int = "%identity"
 
 let new_span_id = let i = ref 0 in fun () -> incr i; span_id_of_int !i
 
@@ -311,7 +309,7 @@ let ancestors d =
   loop 0
 
 let get_children d parents =
-  let rec merge_children children el =
+  let merge_children children el =
     List.fold_right
       (fun (x, _) children ->
          match x with
@@ -329,20 +327,20 @@ let get_children d parents =
 let rec get_block t i j =
   if j = Array.length t.table.(i) then None
   else if j = Array.length t.table.(i) - 1 then
-    let x = t.table.(i).(j) in Some ([x.elem, 1], 1, x.span)
+    let x = t.table.(i).(j) in Some ([x.elem, 1], 1)
   else
     let x = t.table.(i).(j) in
     let y = t.table.(i).(j+1) in
     if y.span = x.span then
       match get_block t i (j + 1) with
-        Some ((x1, c1) :: list, mpc, span) ->
+        Some ((x1, c1) :: list, mpc) ->
           let (list, mpc) =
             if x1 = x.elem then (x1, c1 + 1) :: list, max mpc (c1 + 1)
             else (x.elem, 1) :: (x1, c1) :: list, max mpc c1
           in
-          Some (list, mpc, span)
+          Some (list, mpc)
       | _ -> assert false
-    else Some ([x.elem, 1], 1, x.span)
+    else Some ([x.elem, 1], 1)
 
 let group_by_common_children d list =
   let module O = struct type t = idag let compare = compare end in
@@ -409,7 +407,7 @@ let treat_new_row d t =
   let i = Array.length t.table - 1 in
   let rec loop t i j =
     match get_block t i j with
-      Some (parents, max_parent_colspan, span) ->
+      Some (parents, max_parent_colspan) ->
         let children = get_children d parents in
         let children =
           if children = [] then [{elem = Nothing; span = new_span_id ()}]
@@ -488,7 +486,7 @@ let treat_new_row d t =
   in
   loop t i 0
 
-let down_it t i k y =
+let down_it t i k =
   t.table.(Array.length t.table - 1).(k) <- t.table.(i).(k);
   for r = i to Array.length t.table - 2 do
     t.table.(r).(k) <- {elem = Ghost (new_ghost_id ()); span = new_span_id ()}
@@ -518,7 +516,7 @@ let equilibrate t =
                 if k = len then loop1 (i + 1)
                 else
                   match t.table.(i).(k).elem with
-                    Elem y when x = y -> down_it t i k y; loop 0
+                    Elem y when x = y -> down_it t i k; loop 0
                   | _ -> loop2 (k + 1)
               in
               loop2 0
@@ -739,7 +737,7 @@ let find_block_with_parents t i jj1 jj2 jj3 jj4 =
   in
   loop i jj1 jj2 jj3 jj4
 
-let push_to_right d t i j1 j2 =
+let push_to_right t i j1 j2 =
   let line = t.(i) in
   let rec loop j =
     if j = j2 then j - 1
@@ -780,7 +778,7 @@ let push_to_right d t i j1 j2 =
   in
   loop (j1 + 1)
 
-let push_to_left d t i j1 j2 =
+let push_to_left t i j1 j2 =
   let line = t.(i) in
   let rec loop j =
     if j = j1 then j + 1
@@ -821,7 +819,7 @@ let push_to_left d t i j1 j2 =
   in
   loop (j2 - 1)
 
-let fill_gap d t i j1 j2 =
+let fill_gap t i j1 j2 =
   let t1 =
     let t1 = Array.copy t.table in
     for i = 0 to Array.length t.table - 1 do
@@ -832,8 +830,8 @@ let fill_gap d t i j1 j2 =
     done;
     t1
   in
-  let j2 = push_to_left d t1 i j1 j2 in
-  let j1 = push_to_right d t1 i j1 j2 in
+  let j2 = push_to_left t1 i j1 j2 in
+  let j1 = push_to_right t1 i j1 j2 in
   if j1 = j2 - 1 then
     let line = t1.(i-1) in
     let x = line.(j1).span in
@@ -850,7 +848,7 @@ let fill_gap d t i j1 j2 =
     loop y j2; Some ({table = t1}, true)
   else None
 
-let treat_gaps d t =
+let treat_gaps t =
   let i = Array.length t.table - 1 in
   let rec loop t j =
     let line = t.table.(i) in
@@ -863,7 +861,7 @@ let treat_gaps d t =
             let rec loop1 t j1 =
               if j1 < 0 then loop t (j + 1)
               else if y = line.(j1).elem then
-                match fill_gap d t i j1 j with
+                match fill_gap t i j1 j with
                   Some (t, ok) -> if ok then loop t 2 else loop t (j + 1)
                 | None -> loop t (j + 1)
               else loop1 t (j1 - 1)
@@ -917,14 +915,14 @@ let tablify phony no_optim no_group d =
           let _ = group_ghost t in
           let _ = group_children t in
           let _ = group_span_by_common_children d t in
-          let t = if no_optim then t else treat_gaps d t in
+          let t = if no_optim then t else treat_gaps t in
           let _ = group_span_last_row t in t
       in
       loop t
   in
   loop t
 
-let fall d t =
+let fall t =
   for i = 1 to Array.length t.table - 1 do
     let line = t.table.(i) in
     let rec loop j =
@@ -990,7 +988,7 @@ let fall d t =
     loop 0
   done
 
-let fall2_cool_right t i1 i2 i3 j1 j2 =
+let fall2_cool_right t i1 i2 j1 j2 =
   let span = t.table.(i2-1).(j1).span in
   for i = i2 - 1 downto 0 do
     for j = j1 to j2 - 1 do
@@ -1014,7 +1012,7 @@ let fall2_cool_right t i1 i2 i3 j1 j2 =
   in
   loop j1
 
-let fall2_cool_left t i1 i2 i3 j1 j2 =
+let fall2_cool_left t i1 i2 j1 j2 =
   let span = t.table.(i2-1).(j2).span in
   for i = i2 - 1 downto 0 do
     for j = j1 + 1 to j2 do
@@ -1062,7 +1060,7 @@ let do_fall2_right t i1 i2 j1 j2 =
         else
           let new_line =
             Array.init (Array.length t.table.(0))
-              (fun i -> {elem = Nothing; span = new_span_id ()})
+              (fun _ -> {elem = Nothing; span = new_span_id ()})
           in
           let t = {table = Array.append t.table [| new_line |]} in
           loop (cnt - 1) t
@@ -1070,7 +1068,7 @@ let do_fall2_right t i1 i2 j1 j2 =
       loop (new_height - Array.length t.table) t
     else t
   in
-  fall2_cool_right t i1 i2 i3 j1 j2; t
+  fall2_cool_right t i1 i2 j1 j2; t
 
 let do_fall2_left t i1 i2 j1 j2 =
   let i3 =
@@ -1096,7 +1094,7 @@ let do_fall2_left t i1 i2 j1 j2 =
         else
           let new_line =
             Array.init (Array.length t.table.(0))
-              (fun i -> {elem = Nothing; span = new_span_id ()})
+              (fun _ -> {elem = Nothing; span = new_span_id ()})
           in
           let t = {table = Array.append t.table [| new_line |]} in
           loop (cnt - 1) t
@@ -1104,7 +1102,7 @@ let do_fall2_left t i1 i2 j1 j2 =
       loop (new_height - Array.length t.table) t
     else t
   in
-  fall2_cool_left t i1 i2 i3 j1 j2; t
+  fall2_cool_left t i1 i2 j1 j2; t
 
 let do_shorten_too_long t i1 j1 j2 =
   for i = i1 to Array.length t.table - 2 do
@@ -1398,7 +1396,7 @@ let table_of_dag phony no_optim invert no_group d =
   let d = if invert then invert_dag d else d in
   let t = tablify phony no_optim no_group d in
   let t = if invert then invert_table t else t in
-  let _ = fall () t in
+  let _ = fall t in
   let t = fall2_right t in
   let t = fall2_left t in
   let t = shorten_too_long t in

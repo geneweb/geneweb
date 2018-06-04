@@ -716,7 +716,7 @@ let reconstitute_person conf =
   in
   p, ext
 
-let check_event_witnesses conf base witnesses =
+let check_event_witnesses conf witnesses =
   let wl = Array.to_list witnesses in
   let rec loop wl =
     match wl with
@@ -735,7 +735,7 @@ let check_event_witnesses conf base witnesses =
   in
   loop wl
 
-let check_person conf base p =
+let check_person conf p =
   if p.first_name = "" || p.first_name = "?" then
     Some (transl conf "first name missing")
   else if p.surname = "" || p.surname = "?" then
@@ -745,13 +745,13 @@ let check_person conf base p =
       match pevents with
         [] -> None
       | evt :: l ->
-          match check_event_witnesses conf base evt.epers_witnesses with
+          match check_event_witnesses conf evt.epers_witnesses with
             Some err -> Some err
           | _ -> loop l
     in
     loop p.pevents
 
-let error_person conf base p err =
+let error_person conf err =
   if !(Api_conf.mode_api) then
     begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
@@ -767,7 +767,7 @@ let strip_pevents p =
   let strip_array_witness pl =
     let pl =
       List.fold_right
-        (fun ((f, s, o, c, _), k as p) pl -> if f = "" then pl else p :: pl)
+        (fun ((f, _, _, _, _), _ as p) pl -> if f = "" then pl else p :: pl)
         (Array.to_list pl) []
     in
     Array.of_list pl
@@ -922,12 +922,6 @@ let pwitnesses_of pevents =
        List.fold_left (fun ipl (ip, _) -> ip :: ipl) ipl
          (Array.to_list e.epers_witnesses))
     [] pevents
-
-let is_witness_at_marriage base ip p =
-  let u = poi base ip in
-  List.exists
-    (fun ifam -> let fam = foi base ifam in array_mem ip (get_witnesses fam))
-    (Array.to_list (get_family u))
 
 let effective_mod conf base sp =
   let pi = sp.key_index in
@@ -1094,7 +1088,7 @@ let update_relations_of_related base ip old_related =
        done)
     old_related
 
-let effective_del conf base warning p =
+let effective_del base warning p =
   let none = Gwdb.insert_string base "?" in
   let empty = Gwdb.insert_string base "" in
   let ip = get_key_index p in
@@ -1217,9 +1211,8 @@ let relation_sex_is_coherent base warning p =
        | None -> ())
     p.rparents
 
-let all_checks_person conf base p a u =
+let all_checks_person base p a u =
   let wl = ref [] in
-  let error = Update.error conf base in
   let warning w = wl := w :: !wl in
   let _ =
     (let p = person_of_gen_person base (p, a, u) in
@@ -1229,17 +1222,17 @@ let all_checks_person conf base p a u =
   relation_sex_is_coherent base warning p;
   begin match a.parents with
     Some ifam ->
-      CheckItem.reduce_family base error warning ifam (foi base ifam)
+      CheckItem.reduce_family base warning ifam (foi base ifam)
   | _ -> ()
   end;
   Array.iter
     (fun ifam ->
-       CheckItem.reduce_family base error warning ifam (foi base ifam))
+       CheckItem.reduce_family base warning ifam (foi base ifam))
     u.family;
   let wl = CheckItem.list_uniq !wl in
   List.iter
     (function
-       ChangedOrderOfChildren (ifam, des, _, after) ->
+       ChangedOrderOfChildren (ifam, _, _, after) ->
          patch_descend base ifam {children = after}
      | ChangedOrderOfPersonEvents (_, _, after) ->
          patch_person base p.key_index {p with pevents = after}
@@ -1312,12 +1305,12 @@ let print_add o_conf base =
     if ext || redisp then UpdateInd.print_update_ind conf base sp ""
     else
       let sp = strip_person sp in
-      match check_person conf base sp with
-        Some err -> error_person conf base sp err
+      match check_person conf sp with
+        Some err -> error_person conf err
       | None ->
           let (p, a) = effective_add conf base sp in
           let u = {family = get_family (poi base p.key_index)} in
-          let wl = all_checks_person conf base p a u in
+          let wl = all_checks_person base p a u in
           Util.commit_patches conf base;
           let changed = U_Add_person (Util.string_gen_person base p) in
           History.record conf base changed "ap"; print_add_ok conf base wl p
@@ -1335,7 +1328,7 @@ let print_del conf base =
       let op = Util.string_gen_person base (gen_person_of_person p) in
       update_relations_of_related base ip old_related;
       let warning _ = () in
-      let p = effective_del conf base warning p in
+      let p = effective_del base warning p in
       patch_person base ip p;
       if fn <> "?" && sn <> "?" then
         patch_cache_info conf Util.cache_nb_base_persons
@@ -1361,8 +1354,8 @@ let print_mod_aux conf base callback =
       if ext || redisp then UpdateInd.print_update_ind conf base p digest
       else
         let p = strip_person p in
-        match check_person conf base p with
-          Some err -> error_person conf base p err
+        match check_person conf p with
+          Some err -> error_person conf err
         | None -> callback p
     else Update.error_digest conf
   with Update.ModErr -> ()
@@ -1422,7 +1415,7 @@ let print_mod o_conf base =
     let wl =
       let a = poi base p.key_index in
       let a = {parents = get_parents a; consang = get_consang a} in
-      all_checks_person conf base p a u
+      all_checks_person base p a u
     in
     Util.commit_patches conf base;
     let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
@@ -1464,7 +1457,7 @@ let print_change_event_order conf base =
           let a = poi base p.key_index in
           let a = {parents = get_parents a; consang = get_consang a} in
           let u = poi base p.key_index in
-          let u = {family = get_family u} in all_checks_person conf base p a u
+          let u = {family = get_family u} in all_checks_person base p a u
         in
         Util.commit_patches conf base;
         let changed = U_Modify_person (o_p, Util.string_gen_person base p) in

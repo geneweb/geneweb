@@ -74,10 +74,11 @@ let string_of_istr2 db2 f pos =
   if pos = -1 then "" else get_field_data db2 pos f "data"
 
 (* hash tables in disk *)
-
+[@@@ocaml.warning "-37"]
 type ('a, 'b) bucketlist =
     Empty
   | Cons of 'a * 'b * ('a, 'b) bucketlist
+[@@@ocaml.warning "+37"]
 
 let rec hashtbl_find_rec key =
   function
@@ -144,7 +145,7 @@ let sorted_patched_person_strings db2 is_first_name =
   in
   let sl =
     Hashtbl.fold
-      (fun ip p sl ->
+      (fun _ip p sl ->
          let s = if is_first_name then p.first_name else p.surname in s :: sl)
       db2.patches.h_person []
   in

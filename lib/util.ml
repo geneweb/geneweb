@@ -173,7 +173,7 @@ let transl_nth conf w n =
     Not_found -> tnf (nth_field w n)
 
 let plus_decl s =
-  match rindex s '+' with
+  match String.rindex_opt s '+' with
     Some i ->
       if i > 0 && s.[i-1] = ' ' then
         let start = String.sub s 0 (i - 1) in
@@ -185,14 +185,13 @@ let plus_decl s =
 let gen_decline wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
-  if rindex wt '/' <> None then
-    match rindex wt '/' with
-      Some i ->
+  if String.rindex_opt wt '/' <> None then
+    if String.rindex_opt wt '/' <> None then
         (* special case for Spanish *)
         if String.length s > 0 && start_with_hi_i s then
           nth_field wt 1 ^ Mutil.decline 'n' s
         else nth_field wt 0 ^ Mutil.decline 'n' s1
-    | None -> wt ^ Mutil.decline 'n' s1
+    else wt ^ Mutil.decline 'n' s1
   else if len >= 3 && wt.[len-3] = ':' && wt.[len-1] = ':' then
     let start = String.sub wt 0 (len - 3) in
     start ^ Mutil.decline wt.[len-2] s
@@ -300,7 +299,7 @@ let ftransl conf s = valid_format s (transl conf (string_of_format s))
 let ftransl_nth conf s p =
   valid_format s (transl_nth conf (string_of_format s) p)
 
-let fdecline conf w s = valid_format w (gen_decline (string_of_format w) s)
+let fdecline w s = valid_format w (gen_decline (string_of_format w) s)
 
 let translate_eval s = Translate.eval (nominative s)
 
@@ -322,13 +321,13 @@ let begin_centered conf =
   Wserver.printf
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
     conf.border
-let end_centered _ = Wserver.printf "</td></tr></table>\n"
+let end_centered _conf = Wserver.printf "</td></tr></table>\n"
 
 let html_br conf = Wserver.printf "<br%s>\n" conf.xhs
 
-let html_p conf = Wserver.printf "<p>"; Wserver.printf "\n"
+let html_p _conf = Wserver.printf "<p>"; Wserver.printf "\n"
 
-let html_li conf = Wserver.printf "<li>"; Wserver.printf "\n"
+let html_li _conf = Wserver.printf "<li>"; Wserver.printf "\n"
 
 let nl () = Wserver.printf "\013\010"
 
@@ -426,7 +425,7 @@ let quote_escaped s =
     if i < String.length s then
       match s.[i] with
         '"' | '&' | '<' | '>' -> true
-      | x -> need_code (succ i)
+      | _ -> need_code (succ i)
     else false
   in
   let rec compute_len i i1 =
@@ -633,16 +632,6 @@ let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 let string_gen_family base fam =
   Futil.map_family_ps (fun p -> p) (sou base) fam
 
-let parent_has_title conf base p =
-  match get_parents p with
-    Some ifam ->
-      let cpl = foi base ifam in
-      let fath = pget conf base (get_father cpl) in
-      let moth = pget conf base (get_mother cpl) in
-      get_access fath <> Private && nobtit conf base fath <> [] ||
-      get_access moth <> Private && nobtit conf base moth <> []
-  | _ -> false
-
 let is_hidden p = is_empty_string (get_surname p)
 
 let know base p =
@@ -730,7 +719,7 @@ let raw_access =
 (*   - son/ses sobriquets                                               *)
 
 
-let restricted_txt conf = "....."
+let restricted_txt = "....."
 
 
 (* ************************************************************************** *)
@@ -747,7 +736,7 @@ let restricted_txt conf = "....."
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let gen_person_text (p_first_name, p_surname) conf base p =
-  if is_hidden p then restricted_txt conf
+  if is_hidden p then restricted_txt
   else if is_hide_names conf p && not (authorized_age conf base p) then "x x"
   else
     let beg =
@@ -775,7 +764,7 @@ let gen_person_text (p_first_name, p_surname) conf base p =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let gen_person_text_no_html (p_first_name, p_surname) conf base p =
-  if is_hidden p then restricted_txt conf
+  if is_hidden p then restricted_txt
   else if is_hide_names conf p && not (authorized_age conf base p) then "x x"
   else
     let beg =
@@ -802,9 +791,9 @@ let gen_person_text_no_html (p_first_name, p_surname) conf base p =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-let gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
+let gen_person_text_without_surname check_acc (p_first_name, _p_surname) conf
     base p =
-  if is_hidden p then restricted_txt conf
+  if is_hidden p then restricted_txt
   else if
     check_acc && is_hide_names conf p && not (authorized_age conf base p)
   then
@@ -908,18 +897,16 @@ let titled_person_text conf base p t =
 
 
 (* *********************************************************************** *)
-(*  [Fonc] one_title_text : config -> base -> person -> istr gen_title     *)
+(*  [Fonc] one_title_text : base -> istr gen_title     *)
 (** [Description] : Renvoie la chaÓne de caractère du titre ainsi que le
                     domaine.
     [Args] :
-      - conf : configuration de la base
       - base : base de donnée
-      - p    : la personne dont on veut le titre
       - t    : le titre de noblesse que l'on veut afficher
     [Retour] : string
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
-let one_title_text conf base p t =
+let one_title_text base t =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
   let s = if place = "" then s else s ^ " " ^ place in " <em>" ^ s ^ "</em>"
@@ -987,15 +974,15 @@ let update_family_loop conf base p s =
         "<a href=\"" ^ commd conf ^ "m=U;i=" ^ iper ^ "\">" ^ s ^ "</a>"
     else s
 
-let no_reference conf base p s = s
+let no_reference _conf _base _p s = s
 
 let gen_person_title_text reference p_access conf base p =
   if authorized_age conf base p then
     match main_title conf base p with
       Some t ->
         reference conf base p (titled_person_text conf base p t) ^
-          ", " ^ one_title_text conf base p t
-    | None -> reference conf base p (gen_person_text p_access conf base p) ]
+          ", " ^ one_title_text base t
+    | None -> reference conf base p (gen_person_text p_access conf base p)
   else reference conf base p (gen_person_text p_access conf base p)
 
 let referenced_person_title_text = gen_person_title_text reference std_access
@@ -1026,7 +1013,7 @@ let person_text_without_title = gen_person_text_without_title std_access
 let person_title conf base p =
   if authorized_age conf base p then
     match main_title conf base p with
-      Some t -> one_title_text conf base p t
+      Some t -> one_title_text base t
     | None -> ""
   else ""
 
@@ -1434,7 +1421,7 @@ let url_no_index conf base =
   let addr =
     let pref =
       let s = get_request_string conf.request in
-      match rindex s '?' with
+      match String.rindex_opt s '?' with
         Some i -> String.sub s 0 i
       | None -> s
     in
@@ -1480,7 +1467,7 @@ let doctype conf =
       "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\
        \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
 
-let http_string conf s i =
+let http_string s i =
   let http = "http://" in
   let https = "https://" in
   let (http, start_with_http) =
@@ -1716,7 +1703,7 @@ let string_with_macros conf env s =
             let tt = if s.[i] = '>' then Out else In_norm in
             Buffer.add_char buff s.[i]; loop tt (i + 1)
         | Out ->
-            match http_string conf s i with
+            match http_string s i with
               Some (x, j) ->
                 bprintf buff "<a href=\"%s\">" x;
                 expand_ampersand buff x;
@@ -1969,7 +1956,7 @@ let check_xhtml s =
     if i = String.length s then
       begin
         List.iter
-          (fun (pos, txt, t) ->
+          (fun (pos, txt, _t) ->
              let s = Buffer.contents b in
              let s_bef = String.sub s 0 pos in
              let pos_aft = pos + String.length txt + 2 in
@@ -2055,7 +2042,7 @@ let hexa_string s =
   done;
   Bytes.unsafe_to_string s'
 
-let print_alphab_list conf crit print_elem liste =
+let print_alphab_list crit print_elem liste =
   let len = List.length liste in
   if len > menu_threshold then
     begin
@@ -2305,11 +2292,10 @@ let get_approx_date_place d1 p1 d2 p2 =
   match d1, p1, d2, p2 with
     Some d, "", None, y -> Some d, y
   | Some d, "", Some x, y -> if y = "" then Some d, "" else Some x, y
-  | Some d, p, None, x -> Some d, p
-  | Some d, p, Some x, y -> Some d, p
+  | Some d, p, _, _ -> Some d, p
   | None, "", None, p -> None, p
   | None, "", Some x, y -> Some x, y
-  | None, p, None, x -> None, p
+  | None, p, None, _ -> None, p
   | None, p, Some x, y -> if y = "" then Some x, p else Some x, y
 
 let get_approx_birth_date_place conf base p =
@@ -2513,7 +2499,7 @@ let find_sosa_ref conf base =
     Some p -> Some p
   | None -> default_sosa_ref conf base
 
-let write_default_sosa conf base key =
+let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
   let fname = base_path [] (conf.bname ^ ".gwf") in
@@ -2539,7 +2525,7 @@ let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
   in
   let new_key = fn ^ "." ^ string_of_int occ ^ " " ^ sn in
   if ip = fst conf.default_sosa_ref && new_key != sosa_ref_key then
-    write_default_sosa conf base new_key
+    write_default_sosa conf new_key
 
 let create_topological_sort conf base =
   match p_getenv conf.env "opt" with
@@ -2621,7 +2607,7 @@ let sosa_of_branch ipl =
   if ipl = [] then failwith "sosa_of_branch";
   let ipl = List.tl (List.rev ipl) in
   List.fold_left
-    (fun b (ip, sp) ->
+    (fun b (_ip, sp) ->
        let b = Sosa.twice b in
        match sp with
          Male -> b
@@ -2832,7 +2818,6 @@ let has_nephews_or_nieces conf base p =
   with Ok -> true
 
 let h s = Digest.to_hex (Digest.string s)
-let max_login_time = 60.0 (* short, just for testing *)
 
 let is_that_user_and_password auth_scheme user passwd =
   match auth_scheme with
@@ -3261,7 +3246,7 @@ let dispatch_in_columns ncol list order =
          let ord = order elem in
          let kind =
            match rlist with
-             (_, prev_ord, prev_elem) :: _ ->
+             (_, prev_ord, _prev_elem) :: _ ->
                if ord = prev_ord ||
                   ord <> "" && prev_ord <> "" && ord.[0] = prev_ord.[0]
                then
@@ -3313,7 +3298,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
   Wserver.printf "<tr align=\"%s\" valign=\"top\">\n" conf.left;
   begin let _ =
     List.fold_left
-      (fun (list, first) len ->
+      (fun (list, _first) len ->
          let rec loop n list =
            if n = 0 then
              begin Wserver.printf "</ul>\n</td>\n"; list, false end
@@ -3344,7 +3329,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
   end;
   Wserver.printf "</tr>\n";
   Wserver.printf "</table>\n";
-  end_centered conf
+  end_centered ()
 
 let wprint_in_columns conf order wprint_elem list =
   let ncols =
@@ -3474,7 +3459,6 @@ let print_image_sex conf p size =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 let display_options conf =
-  let s = if p_getenv conf.env "image" = Some "on" then ";image=on" else "" in
   let s =
     if p_getenv conf.env "image" = Some "off" then ";image=off"
     else ""

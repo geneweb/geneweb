@@ -47,9 +47,7 @@ let get_dag_elems conf base =
   in
   loop None Pset.empty 1
 
-type ('a, 'b) sum =
-    Left of 'a
-  | Right of 'b
+type ('a, 'b) sum = ('a, 'b) Def.choice
 
 let make_dag conf base set =
   let list = Pset.elements set in
@@ -171,7 +169,7 @@ let image_normal_txt conf base p fname width height =
   if conf.cancel_links then r
   else sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
 
-let image_url_txt conf base url_p url height =
+let image_url_txt conf url_p url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url_p ^
   sprintf "<img src=\"%s\"\n alt=\"%s\" title=\"%s\" style=\"%s\" />" url
@@ -180,7 +178,7 @@ let image_url_txt conf base url_p url height =
      else " max-height:" ^ string_of_int height ^ "px;") ^
   "</a>\n"
 
-let image_url_txt_with_size conf base url_p url width height =
+let image_url_txt_with_size conf url_p url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url_p ^
   sprintf
@@ -211,7 +209,7 @@ let image_txt conf base p =
             let url_p = commd conf ^ acces conf base p in
             "<br" ^ conf.xhs ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt_with_size conf base url_p url wid hei ^
+            image_url_txt_with_size conf url_p url wid hei ^
             "</td></tr></table></center>\n"
         | Some (false, url, None) ->
             let url_p = commd conf ^ acces conf base p in
@@ -220,7 +218,7 @@ let image_txt conf base p =
             (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
             ">\n<center><table border=\"0\" style=\"height: " ^ string_of_int height ^
             "px\"><tr align=\"left\"><td>\n" ^
-              image_url_txt conf base url_p url height ^ "</td></tr></table></center>\n"
+              image_url_txt conf url_p url height ^ "</td></tr></table></center>\n"
         | _ -> ""
       else
         ""
@@ -375,7 +373,7 @@ let strip_empty_tags s =
 let displayed_length s =
   let rec loop len i =
     match displayed_next_char s i with
-      Some (i, j) -> loop (len + 1) j
+      Some (_i, j) -> loop (len + 1) j
     | None -> len
   in
   loop 0 0
@@ -587,7 +585,7 @@ let table_strip_troublemakers hts =
     done
   done
 
-let table_pre_dim conf hts =
+let table_pre_dim hts =
   table_strip_troublemakers hts;
   let ncol =
     let hts0 = hts.(0) in
@@ -661,7 +659,7 @@ let print_next_pos conf pos1 pos2 tcol =
 (* Main print table algorithm with <pre> *)
 
 let print_table_pre conf hts =
-  let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim conf hts in
+  let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim hts in
   let dcol =
     let dcol =
       match p_getint conf.env "width" with
@@ -715,7 +713,7 @@ let print_table_pre conf hts =
       let rec loop pos col j =
         if j = Array.length hts.(i) then Wserver.printf "\n"
         else
-          let (colspan, align, td) = hts.(i).(j) in
+          let (colspan, _, td) = hts.(i).(j) in
           let sz =
             let rec loop sz k =
               if k = 0 then sz else loop (sz + colsz.(col+k-1)) (k - 1)
@@ -724,7 +722,7 @@ let print_table_pre conf hts =
           in
           let outs =
             match td with
-              TDitem s | TDtext s ->
+            | TDitem _ | TDtext _ ->
                 let s =
                   let k =
                     let dk = (max_row - Array.length stra.(j)) / 2 in row - dk
@@ -881,7 +879,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let indi_txt n =
     let (bd, td) =
       match n.valu with
-        Left ip -> bd, td_prop
+        Left _ -> bd, td_prop
       | _ -> 0, ""
     in
     if bd > 0 || td <> "" then
@@ -946,7 +944,7 @@ let print_slices_menu conf hts =
   Wserver.printf "<td align=\"right\">\n";
   Wserver.printf "%s\n" (txt 3);
   begin let wid =
-    let (min_wid, max_wid, _, _, _) = table_pre_dim conf hts in
+    let (min_wid, max_wid, _, _, _) = table_pre_dim hts in
     Wserver.printf "(%d-%d)\n" min_wid max_wid; max min_wid (min max_wid 78)
   in
     Wserver.printf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid
@@ -962,7 +960,7 @@ let print_slices_menu conf hts =
   Wserver.printf "</form>\n";
   Hutil.trailer conf
 
-let print_dag_page conf base page_title hts next_txt =
+let print_dag_page conf page_title hts next_txt =
   let conf =
     let doctype =
       (* changing doctype to transitional because use of
@@ -1011,7 +1009,7 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 
-let rec eval_var conf page_title next_txt env xx loc =
+let rec eval_var conf page_title next_txt env _xx _loc =
   function
     "dag" :: sl ->
       begin match get_env "dag" env with
@@ -1031,7 +1029,7 @@ let rec eval_var conf page_title next_txt env xx loc =
   | ["head_title"] -> VVstring page_title
   | ["link_next"] -> VVstring next_txt
   | _ -> raise Not_found
-and eval_dag_var conf (tmincol, tcol, colminsz, colsz, ncol) =
+and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) =
   function
     ["max_wid"] -> VVstring (string_of_int tcol)
   | ["min_wid"] -> VVstring (string_of_int tmincol)
@@ -1079,11 +1077,11 @@ and eval_dag_cell_var conf (colspan, align, td) =
       end
   | _ -> raise Not_found
 
-let rec print_foreach conf hts print_ast eval_expr env () loc s sl el al =
+let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
   match s :: sl with
-    ["dag_cell"] -> print_foreach_dag_cell conf hts print_ast env al
+    ["dag_cell"] -> print_foreach_dag_cell hts print_ast env al
   | ["dag_cell_pre"] -> print_foreach_dag_cell_pre conf hts print_ast env al
-  | ["dag_line"] -> print_foreach_dag_line conf print_ast env hts al
+  | ["dag_line"] -> print_foreach_dag_line print_ast env hts al
   | ["dag_line_pre"] -> print_foreach_dag_line_pre conf hts print_ast env al
   | _ -> raise Not_found
 and print_foreach_dag_cell_pre conf hts print_ast env al =
@@ -1105,7 +1103,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
   let rec loop pos col j =
     if j = Array.length hts.(i) then ()
     else
-      let (colspan, align, td) = hts.(i).(j) in
+      let (colspan, _, td) = hts.(i).(j) in
       let sz =
         let rec loop sz k =
           if k = 0 then sz else loop (sz + colsz.(col+k-1)) (k - 1)
@@ -1114,7 +1112,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
       in
       let outs =
         match td with
-          TDitem s | TDtext s ->
+          TDitem _ | TDtext _ ->
             let s =
               let k =
                 let dk = (max_row - Array.length stra.(j)) / 2 in row - dk
@@ -1176,7 +1174,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
       loop (pos + sz) (col + colspan) (j + 1)
   in
   loop 0 0 0
-and print_foreach_dag_cell conf hts print_ast env al =
+and print_foreach_dag_cell hts print_ast env al =
   let i =
     match get_env "dag_line" env with
       Vdline i -> i
@@ -1186,7 +1184,7 @@ and print_foreach_dag_cell conf hts print_ast env al =
     let print_ast = print_ast (("dag_cell", Vdcell hts.(i).(j)) :: env) () in
     List.iter print_ast al
   done
-and print_foreach_dag_line conf print_ast env hts al =
+and print_foreach_dag_line print_ast env hts al =
   for i = 0 to Array.length hts - 1 do
     let print_ast = print_ast (("dag_line", Vdline i) :: env) () in
     List.iter print_ast al
@@ -1197,7 +1195,7 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
       Vdline i -> i
     | _ -> raise Not_found
   in
-  let (tmincol, tcol, colminsz, colsz, ncol) =
+  let (_, _, _, colsz, _) =
     match get_env "dag" env with
       Vdag d -> d
     | _ -> raise Not_found
@@ -1239,17 +1237,17 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
     List.iter print_ast al
   done
 
-let old_print_slices_menu_or_dag_page conf base page_title hts next_txt =
+let old_print_slices_menu_or_dag_page conf page_title hts next_txt =
   if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
-  else print_dag_page conf base page_title hts next_txt
+  else print_dag_page conf  page_title hts next_txt
 
-let print_slices_menu_or_dag_page conf base page_title hts next_txt =
+let print_slices_menu_or_dag_page conf page_title hts next_txt =
   if p_getenv conf.env "old" = Some "on" then
-    old_print_slices_menu_or_dag_page conf base page_title hts next_txt
+    old_print_slices_menu_or_dag_page conf page_title hts next_txt
   else
     let env =
       let table_pre_dim () =
-        let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim conf hts in
+        let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim hts in
         let dcol =
           let dcol =
             match p_getint conf.env "width" with
@@ -1280,12 +1278,12 @@ let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
     next_txt =
   let d = make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
-  print_slices_menu_or_dag_page conf base page_title hts next_txt
+  print_slices_menu_or_dag_page conf page_title hts next_txt
 
 let print conf base =
   let set = get_dag_elems conf base in
   let elem_txt p = Item (p, "") in
-  let vbar_txt ip = "" in
+  let vbar_txt _ = "" in
   let invert =
     match Util.p_getenv conf.env "invert" with
       Some "on" -> true

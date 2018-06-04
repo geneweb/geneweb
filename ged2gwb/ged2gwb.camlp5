@@ -462,7 +462,7 @@ let less_greater_escaped s =
     if i < String.length s then
       match s.[i] with
         '<' | '>' -> true
-      | x -> need_code (succ i)
+      | _ -> need_code (succ i)
     else false
   in
   let rec compute_len i i1 =
@@ -554,7 +554,7 @@ let make_date_lexing s = Stream.from (fun _ -> Some (lexing_date s))
 
 let tparse = Token.default_match
 
-let using_token (p_con, p_prm) =
+let using_token (p_con, _) =
   match p_con with
     "" | "INT" | "ID" | "TEXT" | "EOI" -> ()
   | _ ->
@@ -651,6 +651,7 @@ let recover_date cal =
       Dgreg (d, cal)
   | d -> d
 
+(* [@@@ocaml.warning "-27"] *)
 EXTEND
   GLOBAL: date_value date_interval date_value_recover;
   date_value:
@@ -818,23 +819,24 @@ EXTEND
           (try (- int_of_string i) with  Failure _ -> raise Stream.Failure) ] ]
   ;
 END
+(* [@@@ocaml.warning "+27"] *)
 
 (* Perform a regular expression match. *)
 let preg_match pattern subject =
   let re = Str.regexp pattern in
   try ignore (Str.search_forward re subject 0); true with Not_found -> false
 
-let date_of_field pos d =
+let date_of_field d =
   if d = "" then None
   else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Dtext d)
   else
     let s = Stream.of_string (String.uppercase_ascii d) in
     date_str := d;
     try Some (Grammar.Entry.parse date_value s) with
-      Ploc.Exc (loc, Stream.Error _) ->
+      Ploc.Exc (_, Stream.Error _) ->
         let s = Stream.of_string (String.uppercase_ascii d) in
         try Some (Grammar.Entry.parse date_value_recover s) with
-          Ploc.Exc (loc, Stream.Error _) -> Some (Dtext d)
+          Ploc.Exc (_, Stream.Error _) -> Some (Dtext d)
 
 (* Creating base *)
 
@@ -858,7 +860,7 @@ type gen =
     mutable g_frelated : (Adef.iper * Adef.iper) list;
     mutable g_witn : (Adef.ifam * Adef.iper) list }
 
-let assume_tab name tab none =
+let assume_tab tab none =
   if tab.tlen = Array.length tab.arr then
     let new_len = 2 * Array.length tab.arr + 1 in
     let new_arr = Array.make new_len none in
@@ -868,7 +870,7 @@ let add_string gen s =
   try Hashtbl.find gen.g_hstr s with
     Not_found ->
       let i = gen.g_str.tlen in
-      assume_tab "gen.g_str" gen.g_str "";
+      assume_tab gen.g_str "";
       gen.g_str.arr.(i) <- s;
       gen.g_str.tlen <- gen.g_str.tlen + 1;
       Hashtbl.add gen.g_hstr s (Adef.istr_of_int i);
@@ -889,7 +891,7 @@ let per_index gen lab =
   try Hashtbl.find gen.g_hper lab with
     Not_found ->
       let i = gen.g_per.tlen in
-      assume_tab "gen.g_per" gen.g_per (Left3 "");
+      assume_tab gen.g_per (Left3 "");
       gen.g_per.arr.(i) <- Left3 lab;
       gen.g_per.tlen <- gen.g_per.tlen + 1;
       Hashtbl.add gen.g_hper lab (Adef.iper_of_int i);
@@ -901,7 +903,7 @@ let fam_index gen lab =
   try Hashtbl.find gen.g_hfam lab with
     Not_found ->
       let i = gen.g_fam.tlen in
-      assume_tab "gen.g_fam" gen.g_fam (Left3 "");
+      assume_tab gen.g_fam (Left3 "");
       gen.g_fam.arr.(i) <- Left3 lab;
       gen.g_fam.tlen <- gen.g_fam.tlen + 1;
       Hashtbl.add gen.g_hfam lab (Adef.ifam_of_int i);
@@ -911,7 +913,7 @@ let string_empty = Adef.istr_of_int 0
 let string_quest = Adef.istr_of_int 1
 let string_x = Adef.istr_of_int 2
 
-let unknown_per gen i sex =
+let unknown_per i sex =
   let empty = string_empty in
   let what = string_quest in
   let p =
@@ -933,8 +935,8 @@ let unknown_per gen i sex =
 
 let phony_per gen sex =
   let i = gen.g_per.tlen in
-  let (person, ascend, union) = unknown_per gen i sex in
-  assume_tab "gen.g_per" gen.g_per (Left3 "");
+  let (person, ascend, union) = unknown_per i sex in
+  assume_tab gen.g_per (Left3 "");
   gen.g_per.tlen <- gen.g_per.tlen + 1;
   gen.g_per.arr.(i) <- Right3 (person, ascend, union);
   Adef.iper_of_int i
@@ -957,7 +959,7 @@ let unknown_fam gen i =
 let phony_fam gen =
   let i = gen.g_fam.tlen in
   let (fam, cpl, des) = unknown_fam gen i in
-  assume_tab "gen.g_fam" gen.g_fam (Left3 "");
+  assume_tab gen.g_fam (Left3 "");
   gen.g_fam.tlen <- gen.g_fam.tlen + 1;
   gen.g_fam.arr.(i) <- Right3 (fam, cpl, des);
   Adef.ifam_of_int i
@@ -1102,70 +1104,70 @@ let lowercase_utf8_letter = gen_lowercase_uppercase_utf8_letter true
 let uppercase_utf8_letter = gen_lowercase_uppercase_utf8_letter false
 
 let capitalize_word s =
-  let rec copy special i len uncap =
+  let rec copy i len uncap =
     if i = String.length s then Buff.get len
     else
       match s.[i] with
-        'a'..'z' as c ->
-          let c =
-            if uncap then c
-            else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
-          in
-          copy false (i + 1) (Buff.store len c) true
+      'a'..'z' as c ->
+        let c =
+          if uncap then c
+          else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
+        in
+        copy (i + 1) (Buff.store len c) true
       | 'A'..'Z' as c ->
-          let c =
-            if not uncap then c
-            else Char.chr (Char.code c - Char.code 'A' + Char.code 'a')
-          in
-          copy false (i + 1) (Buff.store len c) true
+        let c =
+          if not uncap then c
+          else Char.chr (Char.code c - Char.code 'A' + Char.code 'a')
+        in
+        copy (i + 1) (Buff.store len c) true
       | c ->
-          if Char.code c < 128 then
-            copy false (i + 1) (Buff.store len c) (particle s (i + 1))
+        if Char.code c < 128 then
+          copy (i + 1) (Buff.store len c) (particle s (i + 1))
+        else
+          let nbc = Name.nbc s.[i] in
+          if nbc = 1 || nbc < 0 || i + nbc > String.length s then
+            copy (i + 1) (Buff.store len s.[i]) true
           else
-            let nbc = Name.nbc s.[i] in
-            if nbc = 1 || nbc < 0 || i + nbc > String.length s then
-              copy false (i + 1) (Buff.store len s.[i]) true
-            else
-              let s = String.sub s i nbc in
-              let s =
-                if not uncap then uppercase_utf8_letter s
-                else lowercase_utf8_letter s
-              in
-              let (t, j) = s, i + nbc in copy false j (Buff.mstore len t) true
+            let s = String.sub s i nbc in
+            let s =
+              if not uncap then uppercase_utf8_letter s
+              else lowercase_utf8_letter s
+            in
+            let (t, j) = s, i + nbc in copy j (Buff.mstore len t) true
   in
-  copy false 0 0 (particle s 0)
+  copy 0 0 (particle s 0)
 
 let uppercase_word s =
-  let rec copy special i len uncap =
+  let rec copy i len uncap =
     if i = String.length s then Buff.get len
     else
       match s.[i] with
-        'a'..'z' as c ->
-          let c =
-            if uncap then c
-            else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
-          in
-          copy false (i + 1) (Buff.store len c) uncap
+      'a'..'z' as c ->
+        let c =
+          if uncap then c
+          else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
+        in
+        copy (i + 1) (Buff.store len c) uncap
       | 'A'..'Z' as c ->
-          let c =
-            if not uncap then c
-            else Char.chr (Char.code c - Char.code 'A' + Char.code 'a')
-          in
-          copy false (i + 1) (Buff.store len c) uncap
+        let c =
+          if not uncap then c
+          else Char.chr (Char.code c - Char.code 'A' + Char.code 'a')
+        in
+        copy (i + 1) (Buff.store len c) uncap
       | c ->
-          if Char.code c < 128 then
-            copy false (i + 1) (Buff.store len c) (particle s (i + 1))
+        if Char.code c < 128 then
+          copy (i + 1) (Buff.store len c) (particle s (i + 1))
+        else
+          let nbc = Name.nbc s.[i] in
+          if nbc = 1 || nbc < 0 || i + nbc > String.length s then
+            copy (i + 1) (Buff.store len s.[i]) false
           else
-            let nbc = Name.nbc s.[i] in
-            if nbc = 1 || nbc < 0 || i + nbc > String.length s then
-              copy false (i + 1) (Buff.store len s.[i]) false
-            else
-              let s = String.sub s i nbc in
-              let s = if uncap then s else uppercase_utf8_letter s in
-              let (t, j) = s, i + nbc in
-              copy false j (Buff.mstore len t) false
+            let s = String.sub s i nbc in
+            let s = if uncap then s else uppercase_utf8_letter s in
+            let (t, j) = s, i + nbc in
+            copy j (Buff.mstore len t) false
   in
-  copy false 0 0 (particle s 0)
+  copy 0 0 (particle s 0)
 
 module Buff2 = Buff.Make (struct  end)
 
@@ -1601,7 +1603,7 @@ let find_event_witness gen tag ip r =
   in
   Array.of_list witnesses
 
-let find_fevent_witness gen tag ifath imoth r =
+let find_fevent_witness gen tag ifath r =
   let rec find_witnesses =
     function
       [] -> []
@@ -1705,7 +1707,7 @@ let treat_indi_pevent gen ip r =
               let name = find_pevent_name_from_tag gen tag tag in
               let date =
                 match find_field "DATE" r.rsons with
-                  Some r -> date_of_field r.rpos r.rval
+                  Some r -> date_of_field r.rval
                 | None -> None
               in
               let place =
@@ -1777,7 +1779,7 @@ let treat_indi_pevent gen ip r =
                in
                let date =
                  match find_field "DATE" r.rsons with
-                   Some r -> date_of_field r.rpos r.rval
+                   Some r -> date_of_field r.rval
                  | None -> None
                in
                let place =
@@ -2087,9 +2089,9 @@ let add_indi gen r =
             None -> find_field "CHR" r.rsons
           | x -> x
         in
-        match ro with
-          Some r -> find_all_rela ["godf"; "godm"; "godp"] rasso
-        | None -> []
+        if ro <> None then find_all_rela ["godf"; "godm"; "godp"] rasso
+        else []
+
       else godparents
     in
     let rec loop rl =
@@ -2124,13 +2126,15 @@ let add_indi gen r =
     loop godparents
   in
   let witn = find_all_rela ["witness"] rasso in
-  let _ = List.map (fun (n, rval) -> forward_witn gen ip rval) witn in
+  let () =
+    List.iter (fun (_, rval) -> ignore @@ forward_witn gen ip rval) witn
+  in
   let (birth, birth_place, (birth_note, _), (birth_src, birth_nt)) =
     match find_field "BIRT" r.rsons with
       Some r ->
         let d =
           match find_field "DATE" r.rsons with
-            Some r -> date_of_field r.rpos r.rval
+            Some r -> date_of_field r.rval
           | _ -> None
         in
         let p =
@@ -2156,7 +2160,7 @@ let add_indi gen r =
       Some r ->
         let d =
           match find_field "DATE" r.rsons with
-            Some r -> date_of_field r.rpos r.rval
+            Some r -> date_of_field r.rval
           | _ -> None
         in
         let p =
@@ -2182,7 +2186,7 @@ let add_indi gen r =
           let d =
             match find_field "DATE" r.rsons with
               Some r ->
-                begin match date_of_field r.rpos r.rval with
+                begin match date_of_field r.rval with
                   Some d -> Death (Unspecified, Adef.cdate_of_date d)
                 | None -> DeadDontKnowWhen
                 end
@@ -2212,7 +2216,7 @@ let add_indi gen r =
           else
             let d =
               match find_field "DATE" r.rsons with
-                Some r -> date_of_field r.rpos r.rval
+                Some r -> date_of_field r.rval
               | _ -> None
             in
             let p =
@@ -2238,7 +2242,7 @@ let add_indi gen r =
           else
             let d =
               match find_field "DATE" r.rsons with
-                Some r -> date_of_field r.rpos r.rval
+                Some r -> date_of_field r.rval
               | _ -> None
             in
             let p =
@@ -2383,7 +2387,7 @@ let find_fevent_name_from_tag gen tag tagv =
   | "MARL" -> Efam_MarriageLicense
   | "pacs" -> Efam_PACS
   | "RESI" | "residence" -> Efam_Residence
-  | n -> Efam_Name (add_string gen (strip_spaces tagv))
+  | _ -> Efam_Name (add_string gen (strip_spaces tagv))
 
 let primary_fevents =
   ["ANUL"; "DIV"; "ENGA"; "MARR"; "MARB"; "MARC"; "MARL"; "RESI"; "SEP"]
@@ -2391,7 +2395,7 @@ let primary_fevents =
 (* Types d'évènement présents seulement dans les tags de niveau 2 (2 TYPE). *)
 let secondary_fevent_types = [Efam_NoMarriage; Efam_NoMention]
 
-let treat_fam_fevent gen ifath imoth r =
+let treat_fam_fevent gen ifath r =
   let check_place_unmarried efam_name place r =
     match find_all_fields "PLAC" r.rsons with
       r :: rl ->
@@ -2418,7 +2422,7 @@ let treat_fam_fevent gen ifath imoth r =
               let name = find_fevent_name_from_tag gen tag tag in
               let date =
                 match find_field "DATE" r.rsons with
-                  Some r -> date_of_field r.rpos r.rval
+                  Some r -> date_of_field r.rval
                 | None -> None
               in
               let place =
@@ -2455,7 +2459,7 @@ let treat_fam_fevent gen ifath imoth r =
                     in
                     loop true "" rl
               in
-              let witnesses = find_fevent_witness gen "INDI" ifath imoth r in
+              let witnesses = find_fevent_witness gen "INDI" ifath r in
               (* Vérification du mariage. *)
               let (name, place) =
                 match name with
@@ -2499,7 +2503,7 @@ let treat_fam_fevent gen ifath imoth r =
                in
                let date =
                  match find_field "DATE" r.rsons with
-                   Some r -> date_of_field r.rpos r.rval
+                   Some r -> date_of_field r.rval
                  | None -> None
                in
                let place =
@@ -2536,7 +2540,7 @@ let treat_fam_fevent gen ifath imoth r =
                      in
                      loop true "" rl
                in
-               let witnesses = find_fevent_witness gen "INDI" ifath imoth r in
+               let witnesses = find_fevent_witness gen "INDI" ifath r in
                let evt =
                  {efam_name = name; efam_date = Adef.codate_of_od date;
                   efam_place = add_string gen place;
@@ -2672,7 +2676,7 @@ let add_fam_norm gen r adop_list =
         fath, moth, false
   in
   begin match gen.g_per.arr.(Adef.int_of_iper fath) with
-    Left3 lab -> ()
+    Left3 _ -> ()
   | Right3 (p, a, u) ->
       let u =
         if not (List.mem i (Array.to_list (get_family u))) then
@@ -2683,7 +2687,7 @@ let add_fam_norm gen r adop_list =
       gen.g_per.arr.(Adef.int_of_iper fath) <- Right3 (p, a, u)
   end;
   begin match gen.g_per.arr.(Adef.int_of_iper moth) with
-    Left3 lab -> ()
+    Left3 _ -> ()
   | Right3 (p, a, u) ->
       let u =
         if not (List.mem i (Array.to_list (get_family u))) then
@@ -2754,7 +2758,7 @@ let add_fam_norm gen r adop_list =
         in
         let d =
           match find_field "DATE" r.rsons with
-            Some r -> date_of_field r.rpos r.rval
+            Some r -> date_of_field r.rval
           | _ -> None
         in
         let rec heredis_witnesses =
@@ -2786,7 +2790,7 @@ let add_fam_norm gen r adop_list =
     match find_field "DIV" r.rsons with
       Some r ->
         begin match find_field "DATE" r.rsons with
-          Some d -> Divorced (Adef.codate_of_od (date_of_field d.rpos d.rval))
+          Some d -> Divorced (Adef.codate_of_od (date_of_field d.rval))
         | _ ->
             match find_field "PLAC" r.rsons with
               Some _ -> Divorced Adef.codate_None
@@ -2796,7 +2800,7 @@ let add_fam_norm gen r adop_list =
         end
     | None -> NotDivorced
   in
-  let fevents = treat_fam_fevent gen fath moth r in
+  let fevents = treat_fam_fevent gen fath r in
   let comment =
     match find_all_fields "NOTE" r.rsons with
       [] -> ""
@@ -2891,7 +2895,7 @@ let add_fam gen r =
         Some _ -> add_fam_norm gen r list
       | _ -> ()
 
-let treat_header2 gen r =
+let treat_header2 r =
   begin match !charset_option with
     Some v -> charset := v
   | None ->
@@ -2927,7 +2931,7 @@ let turn_around_genealogos_bug r =
 let make_gen2 gen r =
   let r = turn_around_genealogos_bug r in
   match r.rlab with
-    "HEAD" -> treat_header2 gen r
+    "HEAD" -> treat_header2 r
   | "INDI" -> add_indi gen r
   | _ -> ()
 
@@ -2947,9 +2951,8 @@ let rec sortable_by_date proj =
   function
     [] -> true
   | e :: el ->
-      match proj e with
-        Some d -> sortable_by_date proj el
-      | None -> false
+    if proj e <> None then sortable_by_date proj el
+    else false
 
 let sort_by_date proj list =
   if sortable_by_date proj list then
@@ -2991,7 +2994,7 @@ let pass2 gen fname =
   line_cnt := 0;
   let strm =
     Stream.from
-      (fun i ->
+      (fun _ ->
          try
            let c = input_char ic in if c = '\n' then incr line_cnt; Some c
          with End_of_file -> None)
@@ -3037,7 +3040,7 @@ let pass3 gen fname =
   line_cnt := 0;
   let strm =
     Stream.from
-      (fun i ->
+      (fun _ ->
          try
            let c = input_char ic in if c = '\n' then incr line_cnt; Some c
          with End_of_file -> None)
@@ -3067,7 +3070,7 @@ let pass3 gen fname =
              gen.g_per.arr.(Adef.int_of_iper (get_father cpl)),
              gen.g_per.arr.(Adef.int_of_iper ip)
            with
-             Right3 (pfath, _, _), Right3 (p, a, u) ->
+             Right3 _, Right3 (p, a, u) ->
                if List.mem (get_father cpl) (get_related p) then ()
                else
                  begin let p =
@@ -3105,7 +3108,7 @@ let check_undefined gen =
     match gen.g_per.arr.(i) with
       Right3 (_, _, _) -> ()
     | Left3 lab ->
-        let (p, a, u) = unknown_per gen i Neuter in
+        let (p, a, u) = unknown_per i Neuter in
         fprintf !log_oc "Warning: undefined person %s\n" lab;
         gen.g_per.arr.(i) <- Right3 (p, a, u)
   done;
@@ -3154,7 +3157,7 @@ let add_parents_to_isolated gen =
                 fn (get_occ p) sn;
               let ifam = phony_fam gen in
               match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
-                Right3 (fam, cpl, des) ->
+                Right3 (fam, cpl, _) ->
                   let des =
                     descend_of_gen_descend {children = [| get_key_index p |]}
                   in

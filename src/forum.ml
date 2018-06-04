@@ -269,13 +269,13 @@ let read_message conf ic =
     let (subject, s) = get_var ic "Subject:" s in
     let (wiki, s) = get_var ic "Wiki:" s in
     let (_, s) = get_var ic "Text:" s in
-    let (mess, s) =
+    let mess =
       let rec get_mess len s =
         if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
           let s = String.sub s 2 (String.length s - 2) in
           let len = if len = 0 then len else Buff.store len '\n' in
           get_mess (Buff.mstore len s) (MF.input_line ic)
-        else Buff.get len, s
+        else Buff.get len
       in
       get_mess 0 s
     in
@@ -376,7 +376,7 @@ let is_visible conf mess =
   not mess.m_waiting || is_moderator conf ||
   conf.wizard && mess.m_wizard <> "" && mess.m_wizard = conf.user
 
-let rec eval_var conf base env xx loc =
+let rec eval_var conf base env _xx _loc =
   function
     ["can_post"] -> VVbool (can_post conf)
   | ["is_moderated_forum"] -> VVbool (moderators conf <> [])
@@ -465,7 +465,7 @@ and eval_message_var conf base env =
       end
   | ["prev_pos"] ->
       begin match get_env "mess" env with
-        Vmess (_, _, pos, next_pos, _) ->
+        Vmess (_, _, _, next_pos, _) ->
           let rec loop next_pos =
             match get_message conf next_pos with
               Some (acc, mess, next_pos, next_next_pos) ->
@@ -570,12 +570,12 @@ and eval_message_string_var conf str so =
       VVstring s
   | _ -> raise Not_found
 
-let print_foreach conf base print_ast eval_expr =
+let print_foreach conf _base print_ast eval_expr =
   let eval_int_expr env e =
     let s = eval_expr env () e in
     try int_of_string s with Failure _ -> raise Not_found
   in
-  let rec print_foreach env xx loc s sl el al =
+  let rec print_foreach env _xx _loc s sl el al =
     match s :: sl with
       ["message"] -> print_foreach_message env el al
     | _ -> raise Not_found
@@ -663,7 +663,7 @@ let get conf key =
 let get1 conf key =
   only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf key))
 
-let forum_add conf base moderated mess =
+let forum_add conf _base moderated mess =
   let access =
     if conf.wizard || conf.friend then
       match p_getenv conf.env "priv_acc" with
@@ -760,10 +760,10 @@ let print_add_ok conf base =
 let message_txt conf n =
   transl_nth conf "message/previous message/previous messages/next message" n
 
-let forum_del conf base pos =
+let forum_del conf pos =
   let fname = forum_file conf in MF.patch fname pos "****"
 
-let print_del_ok conf base next_pos =
+let print_del_ok conf next_pos =
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "message deleted"))
   in
@@ -783,7 +783,7 @@ let find_next_pos conf =
   let rec loop pos =
     let back_pos = backward_pos conf pos in
     match get_message conf back_pos with
-      Some (acc, mess, _, _) ->
+      Some (acc, _, _, _) ->
         if back_pos = pos then None
         else if acc then Some back_pos
         else loop back_pos
@@ -799,8 +799,8 @@ let delete_forum_message conf base pos =
          conf.manitou || conf.supervisor
       then
         try
-          forum_del conf base pos;
-          print_del_ok conf base (find_next_pos conf pos)
+          forum_del conf pos;
+          print_del_ok conf (find_next_pos conf pos)
         with Update.ModErr -> ()
       else print_forum_headers conf base
   | None -> print_forum_headers conf base
@@ -812,7 +812,7 @@ let print_del conf base =
 
 (* validate *)
 
-let set_validator conf base pos =
+let set_validator conf pos =
   let fname = forum_file conf in
   match try Some (MF.open_in fname) with Sys_error _ -> None with
     Some ic ->
@@ -835,7 +835,7 @@ let set_validator conf base pos =
 let message_txt conf n =
   transl_nth conf "message/previous message/previous messages/next message" n
 
-let print_valid_ok conf base pos del =
+let print_valid_ok conf pos del =
   let mess =
     if del then transl conf "message deleted" else transl conf "message added"
   in
@@ -855,17 +855,17 @@ let print_valid_ok conf base pos del =
 
 let valid_forum_message conf base pos =
   match get_message conf pos with
-    Some (a, m, _, _) ->
+    Some (a, _,  _, _) ->
       if a && conf.wizard && List.mem conf.user (moderators conf) then
         let del =
           match p_getenv conf.env "d" with
             Some "" | None -> false
           | Some _ -> true
         in
-        if set_validator conf base pos then
+        if set_validator conf pos then
           begin
-            if del then forum_del conf base pos;
-            print_valid_ok conf base pos del
+            if del then forum_del conf pos;
+            print_valid_ok conf pos del
           end
         else print_forum_headers conf base
       else print_forum_headers conf base
@@ -878,7 +878,7 @@ let print_valid conf base =
 
 (* access switch *)
 
-let set_access conf base pos =
+let set_access conf pos =
   let rec get_access ic =
     let pos = MF.rpos_in ic in
     let s = MF.input_line ic in
@@ -907,7 +907,7 @@ let access_switch_forum_message conf base pos =
       if (a && conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
           passwd_in_file conf "wizard" ||
           conf.manitou || conf.supervisor) &&
-         set_access conf base pos
+         set_access conf pos
       then
         print_forum_message conf base (get_message conf pos) None
       else print_forum_headers conf base

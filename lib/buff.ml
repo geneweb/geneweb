@@ -1,6 +1,6 @@
 (* $Id: buff.ml,v 5.1 2006-10-15 15:39:39 ddr Exp $ *)
 
-module Make (B : sig  end) =
+module Make () =
   struct
     let buff = ref (Bytes.create 80)
     let store len x =

@@ -308,14 +308,13 @@ let treat_connection tmout callback addr fd =
     if tmout > 0 then
       begin let spid = Unix.fork () in
         if spid > 0 then
-          let _ =
-            Sys.signal Sys.sigalrm (Sys.Signal_handle (timeout tmout spid))
-          in
-          ();
-          let _ = Unix.alarm tmout in
-          ();
-          let _ = Unix.waitpid [] spid in
-          (); let _ = Sys.signal Sys.sigalrm Sys.Signal_default in (); exit 0
+          begin
+            ignore @@ Sys.signal Sys.sigalrm (Sys.Signal_handle (timeout tmout spid)) ;
+            ignore @@ Unix.alarm tmout ;
+            ignore @@ Unix.waitpid [] spid ;
+            ignore @@ Sys.signal Sys.sigalrm Sys.Signal_default ;
+            exit 0
+          end
       end;
   let (request, script_name, contents) =
     let (request, contents) =
@@ -559,13 +558,11 @@ let f addr_opt port tmout max_clients g =
     if Sys.unix then None
     else try Some (Sys.getenv "WSERVER") with Not_found -> None
   with
-    Some s ->
-      if Sys.unix then ()
-      else
-        let addr = sockaddr_of_string s in
-        let fd = Unix.openfile !sock_in [Unix.O_RDONLY] 0 in
-        let oc = open_out_bin !sock_out in
-        wserver_oc := oc; ignore (treat_connection tmout g addr fd); exit 0
+  | Some s ->
+    let addr = sockaddr_of_string s in
+    let fd = Unix.openfile !sock_in [Unix.O_RDONLY] 0 in
+    let oc = open_out_bin !sock_out in
+    wserver_oc := oc; ignore (treat_connection tmout g addr fd); exit 0
   | None ->
       check_stopping ();
       let addr =

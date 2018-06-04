@@ -110,7 +110,7 @@ let diff_key d =
 (* ********************************************************************** *)
 let diff_person conf base changed =
   match changed with
-    U_Add_person p | U_Delete_person p -> [| |]
+    U_Add_person _ | U_Delete_person _ -> [| |]
   | U_Modify_person (o, n) ->
       Array.append (diff_key (Diff_person (o, n)))
         (diff_visibility conf base o n)
@@ -135,7 +135,7 @@ let diff_person conf base changed =
            Array.append accu
              (diff_key (Diff_string ((ofn, osn, oocc), (fn, sn, occ)))))
         [| |] l
-  | U_Multi (o, n, modified_key) -> diff_key (Diff_person (o, n))
+  | U_Multi (o, n, _) -> diff_key (Diff_person (o, n))
   | U_Notes (_, _) | U_Kill_ancestors _ -> [| |]
 
 
@@ -344,7 +344,7 @@ let line_fields line =
   if String.length line > String.length line_tpl then
     let time = String.sub line 0 19 in
     let (user, i) =
-      match line.[20], Mutil.lindex line ']' with
+      match line.[20], String.index_opt line ']' with
         '[', Some i -> let user = String.sub line 21 (i - 21) in user, i + 2
       | _ -> "", 20
     in
@@ -383,7 +383,7 @@ let possibly_highlight env s =
       if in_text case_sens h s then html_highlight case_sens h s else s
   | _ -> s
 
-let rec eval_var conf base env xx loc =
+let rec eval_var conf base env _ _ =
   function
     ["count"] ->
       begin match get_env "count" env with
@@ -517,10 +517,10 @@ let print_foreach conf base print_ast eval_expr =
     let s = eval_expr env ep e in
     try int_of_string s with Failure _ -> raise Not_found
   in
-  let rec print_foreach env xx loc s sl el al =
+  let rec print_foreach env xx _ s sl el al =
     match s, sl with
       "history_line", [] -> print_foreach_history_line env xx el al
-    | s, _ -> raise Not_found
+    | _, _ -> raise Not_found
   and print_foreach_history_line env xx el al =
     match
       try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
@@ -543,10 +543,10 @@ let print_foreach conf base print_ast eval_expr =
             | [] -> 3, in_channel_length ic, ""
             | _ -> raise Not_found
           in
-          let (pos, n) =
+          let pos =
             let vv = ref (Bytes.create 0), ref 0 in
             let rec loop pos i =
-              if i >= k then pos, i
+              if i >= k then pos
               else
                 match
                   try Some (rev_input_line ic pos vv) with
@@ -555,7 +555,7 @@ let print_foreach conf base print_ast eval_expr =
                   Some (line, pos) ->
                     let i = print_history_line2 env xx line wiz i al in
                     loop pos i
-                | None -> pos, i
+                | None -> pos
             in
             loop pos 0
           in
@@ -654,7 +654,7 @@ let search_text conf base s =
           with
             Some (line, pos2) ->
               begin match line_fields line with
-                Some (time, user, action, keyo) ->
+                Some (time, user, _, keyo) ->
                   let key =
                     match keyo with
                       Some key -> key

@@ -175,121 +175,46 @@ let output_field so ff =
 
 let int_size = 4
 
-let update_person_with_pevents gen p =
-  let found_birth = ref false in
-  let found_baptism = ref false in
-  let found_death = ref false in
-  let found_burial = ref false in
-  let death_std_fields = p.death in
-  let death_reason_std_fields =
-    match death_std_fields with
-      Death (dr, _) -> dr
-    | _ -> Unspecified
-  in
-  let rec loop pevents p =
-    match pevents with
-      [] -> p
-    | evt :: l ->
-        match evt.epers_name with
-          Epers_Birth ->
-            if !found_birth then loop l p
-            else
-              let p =
-                {p with birth = evt.epers_date; birth_place = evt.epers_place;
-                 birth_note = evt.epers_note; birth_src = evt.epers_src}
-              in
-              let () = found_birth := true in loop l p
-        | Epers_Baptism ->
-            if !found_baptism then loop l p
-            else
-              let p =
-                {p with baptism = evt.epers_date;
-                 baptism_place = evt.epers_place;
-                 baptism_note = evt.epers_note; baptism_src = evt.epers_src}
-              in
-              let () = found_baptism := true in loop l p
-        | Epers_Death ->
-            if !found_death then loop l p
-            else
-              let death =
-                match Adef.od_of_codate evt.epers_date with
-                  Some d ->
-                    Death (death_reason_std_fields, Adef.cdate_of_date d)
-                | None ->
-                    match death_std_fields with
-                      OfCourseDead -> OfCourseDead
-                    | DeadYoung -> DeadYoung
-                    | _ -> DeadDontKnowWhen
-              in
-              let p =
-                {p with death = death; death_place = evt.epers_place;
-                 death_note = evt.epers_note; death_src = evt.epers_src}
-              in
-              let () = found_death := true in loop l p
-        | Epers_Burial ->
-            if !found_burial then loop l p
-            else
-              let p =
-                {p with burial = Buried evt.epers_date;
-                 burial_place = evt.epers_place; burial_note = evt.epers_note;
-                 burial_src = evt.epers_src}
-              in
-              let () = found_burial := true in loop l p
-        | Epers_Cremation ->
-            if !found_burial then loop l p
-            else
-              let p =
-                {p with burial = Cremated evt.epers_date;
-                 burial_place = evt.epers_place; burial_note = evt.epers_note;
-                 burial_src = evt.epers_src}
-              in
-              let () = found_burial := true in loop l p
-        | _ -> loop l p
-  in
-  loop p.pevents p
-
-let update_pevents_with_person gen so =
+let update_pevents_with_person so =
   let evt_birth =
-    match Adef.od_of_codate so.birth with
-      Some d ->
-        let evt =
-          {epers_name = Epers_Birth; epers_date = so.birth;
-           epers_place = so.birth_place; epers_reason = "";
-           epers_note = so.birth_note; epers_src = so.birth_src;
-           epers_witnesses = [| |]}
-        in
-        Some evt
-    | None ->
-        if so.birth_place = "" && so.birth_src = "" then None
-        else
-          let evt =
-            {epers_name = Epers_Birth; epers_date = so.birth;
-             epers_place = so.birth_place; epers_reason = "";
-             epers_note = so.birth_note; epers_src = so.birth_src;
-             epers_witnesses = [| |]}
-          in
-          Some evt
+    if Adef.od_of_codate so.birth <> None
+    then
+      let evt =
+        {epers_name = Epers_Birth; epers_date = so.birth;
+         epers_place = so.birth_place; epers_reason = "";
+         epers_note = so.birth_note; epers_src = so.birth_src;
+         epers_witnesses = [| |]}
+      in
+      Some evt
+    else if so.birth_place = "" && so.birth_src = "" then None
+    else
+      let evt =
+        {epers_name = Epers_Birth; epers_date = so.birth;
+         epers_place = so.birth_place; epers_reason = "";
+         epers_note = so.birth_note; epers_src = so.birth_src;
+         epers_witnesses = [| |]}
+      in
+      Some evt
   in
   let evt_bapt =
-    match Adef.od_of_codate so.baptism with
-      Some d ->
-        let evt =
-          {epers_name = Epers_Baptism; epers_date = so.baptism;
-           epers_place = so.baptism_place; epers_reason = "";
-           epers_note = so.baptism_note; epers_src = so.baptism_src;
-           epers_witnesses = [| |]}
-        in
-        Some evt
-    | None ->
-        if so.baptism_place = "" && so.baptism_src = "" then None
-        else
-          let evt =
-            {epers_name = Epers_Baptism; epers_date = so.baptism;
-             epers_place = so.baptism_place; epers_reason = "";
-             epers_note = so.baptism_note; epers_src = so.baptism_src;
-             epers_witnesses = [| |]}
-          in
-          Some evt
+    if Adef.od_of_codate so.baptism <> None
+    then
+      let evt =
+        {epers_name = Epers_Baptism; epers_date = so.baptism;
+         epers_place = so.baptism_place; epers_reason = "";
+         epers_note = so.baptism_note; epers_src = so.baptism_src;
+         epers_witnesses = [| |]}
+      in
+      Some evt
+    else if so.baptism_place = "" && so.baptism_src = "" then None
+    else
+      let evt =
+        {epers_name = Epers_Baptism; epers_date = so.baptism;
+         epers_place = so.baptism_place; epers_reason = "";
+         epers_note = so.baptism_note; epers_src = so.baptism_src;
+         epers_witnesses = [| |]}
+      in
+      Some evt
   in
   let evt_death =
     match so.death with
@@ -303,7 +228,7 @@ let update_pevents_with_person gen so =
              epers_witnesses = [| |]}
           in
           Some evt
-    | Death (death_reason, cd) ->
+    | Death (_, cd) ->
         let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
         let evt =
           {epers_name = Epers_Death; epers_date = date;
@@ -392,7 +317,7 @@ let insert_person1 gen so =
         in
         k, {so with psources = psources}
       in
-      let so = update_pevents_with_person gen so in
+      let so = update_pevents_with_person so in
       key_hashtbl_add gen.g_index_of_key k (Adef.iper_of_int gen.g_pcnt);
       List.iter (output_field so) gen.g_person_fields;
       Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
@@ -419,10 +344,10 @@ let insert_person1 gen so =
 
 let insert_somebody1 gen sex =
   function
-    Undefined key -> ()
+    Undefined _ -> ()
   | Defined so -> let so = {so with sex = sex} in insert_person1 gen so
 
-let insert_family1 gen co fath_sex moth_sex witl fevents fo deo =
+let insert_family1 gen co fath_sex moth_sex witl fevents _fo deo =
   let _ifath = insert_somebody1 gen fath_sex (Adef.father co) in
   let _imoth = insert_somebody1 gen moth_sex (Adef.mother co) in
   Array.iter (fun key -> insert_person1 gen key) deo.children;
@@ -491,7 +416,7 @@ let insert_gwo_1 gen =
   function
     Family (cpl, fs, ms, witl, fevents, fam, des) ->
       insert_family1 gen cpl fs ms witl fevents fam des
-  | Notes (key, str) -> ()
+  | Notes (_, _) -> ()
   | Relations (sb, sex, rl) -> insert_rparents1 gen sb sex rl
   | Pevent (sb, sex, pevents) -> insert_pevents1 gen sb sex pevents
   | Bnotes (nfname, str) -> insert_bnotes1 gen nfname str
@@ -538,7 +463,7 @@ let insert_undefined2 gen key fn sn sex =
     {empty_person with first_name = key.pk_first_name;
      surname = key.pk_surname; occ = key.pk_occ; sex = sex}
   in
-  let so = update_pevents_with_person gen so in
+  let so = update_pevents_with_person so in
   List.iter (output_field so) gen.g_person_fields;
   Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
   Iochan.output_binary_int (fst gen.g_person_parents) (-1);
@@ -591,7 +516,7 @@ let get_person2 gen so sex =
              so.surname)
   else
     let so = if so.sex = Neuter then {so with sex = sex} else so in
-    let so = update_pevents_with_person gen so in
+    let so = update_pevents_with_person so in
     List.iter (output_field so) gen.g_person_fields;
     Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
     Iochan.output_binary_int (fst gen.g_person_parents) (-1);
@@ -913,8 +838,8 @@ let insert_gwo_2 gen =
   | Notes (key, str) -> insert_notes2 gen key str
   | Relations (sb, sex, rl) -> insert_rparents2 gen sb sex rl
   | Pevent (sb, sex, pevents) -> insert_pevents2 gen sb sex pevents
-  | Bnotes (nfname, str) -> ()
-  | Wnotes (wizid, str) -> ()
+  | Bnotes (_, _) -> ()
+  | Wnotes (_, _) -> ()
 
 let open_out_field_unknown_size d valu =
   let oc_dat = open_out_bin (Filename.concat d "data1") in
@@ -922,7 +847,7 @@ let open_out_field_unknown_size d valu =
   {oc_dat = oc_dat; oc_acc = oc_acc; dname = d; start_pos = None; sz32 = 0;
    sz64 = 0; item_cnt = 0; valu = valu}
 
-let close_out_field_known_size pad ff =
+let close_out_field_known_size ff =
   close_out ff.oc_dat;
   close_out ff.oc_acc;
   (* making input_value header of "data" file, and copying "data1" file *)
@@ -990,35 +915,6 @@ let close_out_field pad ff len =
   (* test *)
   Db2out.check_input_value "Db2link.close_out_field"
     (Filename.concat ff.dname "data2") ff.item_cnt
-
-let no_person empty_string ip =
-  {first_name = empty_string; surname = empty_string; occ = 0;
-   image = empty_string; first_names_aliases = []; surnames_aliases = [];
-   public_name = empty_string; qualifiers = []; titles = []; rparents = [];
-   related = []; aliases = []; occupation = empty_string; sex = Neuter;
-   access = Private; birth = Adef.codate_None; birth_place = empty_string;
-   birth_note = empty_string; birth_src = empty_string;
-   baptism = Adef.codate_None; baptism_place = empty_string;
-   baptism_note = empty_string; baptism_src = empty_string;
-   death = DontKnowIfDead; death_place = empty_string;
-   death_note = empty_string; death_src = empty_string;
-   burial = UnknownBurial; burial_place = empty_string;
-   burial_note = empty_string; burial_src = empty_string; pevents = [];
-   notes = empty_string; psources = empty_string; key_index = ip}
-
-let pad_per = no_person "" (Adef.iper_of_int 0)
-
-let no_family empty_string ifam =
-  {fam =
-    {marriage = Adef.codate_None; marriage_place = empty_string;
-     marriage_note = empty_string; marriage_src = empty_string;
-     witnesses = [| |]; relation = Married; divorce = NotDivorced;
-     fevents = []; comment = empty_string; origin_file = empty_string;
-     fsources = empty_string; fam_index = ifam};
-   cpl = Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0);
-   des = {children = [| |]}}
-
-let pad_fam = no_family "" (Adef.ifam_of_int 0)
 
 let compress_type_string len field_d e ic =
   Db2out.output_value_array_compress field_d e len ""
@@ -1212,7 +1108,7 @@ let read_int_array_field (ic_acc, ic_dat) n =
   in
   loop [] pos
 
-let reorder_type_list_int field_d ic_acc ic_dat ff =
+let reorder_type_list_int ic_acc ic_dat ff =
   let item_cnt = ref 0 in
   try
     while true do
@@ -1222,28 +1118,28 @@ let reorder_type_list_int field_d ic_acc ic_dat ff =
   with End_of_file -> ()
 
 let reorder_fields tmp_dir nper =
+  let f1 = "person" in
+  let f2 = "family" in
+  let reorder_type = reorder_type_list_int in
+  let len = nper in
+  let field_d =
+    List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
+  in
+  let ic_acc = open_in_bin (Filename.concat field_d "access") in
+  let ic_dat = open_in_bin (Filename.concat field_d "data") in
+  if !(Mutil.verbose) then (eprintf "reordering %s..." f2; flush stderr);
+  let ff = open_out_field field_d len Obj.repr in
+  reorder_type ic_acc ic_dat ff;
+  close_out_field [| |] ff len;
+  close_in ic_dat;
+  close_in ic_acc;
   List.iter
-    (fun (f1, f2, reorder_type, len) ->
-       let field_d =
-         List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
-       in
-       let ic_acc = open_in_bin (Filename.concat field_d "access") in
-       let ic_dat = open_in_bin (Filename.concat field_d "data") in
-       if !(Mutil.verbose) then
-         begin eprintf "reordering %s..." f2; flush stderr end;
-       let ff = open_out_field field_d len Obj.repr in
-       reorder_type field_d ic_acc ic_dat ff;
-       close_out_field [| |] ff len;
-       close_in ic_dat;
-       close_in ic_acc;
-       List.iter
-         (fun n ->
-            let f = Filename.concat field_d n in
-            Mutil.remove_file f;
-            Sys.rename (Filename.concat field_d (n ^ "2")) f)
-         ["data"; "access"];
-       if !(Mutil.verbose) then begin Printf.eprintf "\n"; flush stderr end)
-    ["person", "family", reorder_type_list_int, nper]
+    (fun n ->
+       let f = Filename.concat field_d n in
+       Mutil.remove_file f;
+       Sys.rename (Filename.concat field_d (n ^ "2")) f)
+    ["data"; "access"];
+  if !(Mutil.verbose) then (Printf.eprintf "\n"; flush stderr)
 
 let output_command_line bdir =
   let oc = open_out (Filename.concat bdir "command.txt") in
@@ -1283,7 +1179,7 @@ let changed_p (ip, p, o_sex, o_rpar) =
        fold_option
          (List.map
             (Futil.map_relation_ps (fun p -> p)
-               (fun s -> Adef.istr_of_int 0)))
+               (fun _ -> Adef.istr_of_int 0)))
          p.rparents o_rpar}
   in
   let i = Adef.int_of_iper ip in
@@ -1406,8 +1302,8 @@ let link next_family_fun bdir =
       eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
       flush stderr
     end;
-  List.iter (close_out_field_known_size pad_per) person_fields;
-  List.iter (close_out_field_known_size pad_fam) family_fields;
+  List.iter close_out_field_known_size person_fields;
+  List.iter close_out_field_known_size family_fields;
   Iochan.close (fst person_notes);
   close_out (snd person_notes);
   Iochan.close (fst person_related);

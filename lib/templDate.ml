@@ -21,13 +21,13 @@ let rec eval_date_var conf jd =
            (Sosa.of_int jd))
   | ["moon_age"] ->
       begin try
-        let (mp, md) = Calendar.moon_phase_of_sdn jd in
+        let (_, md) = Calendar.moon_phase_of_sdn jd in
         VVstring (string_of_int md)
       with Failure _ -> VVstring ""
       end
   | "moon_phase" :: sl ->
       begin try
-        let (mp, md) = Calendar.moon_phase_of_sdn jd in
+        let (mp, _) = Calendar.moon_phase_of_sdn jd in
         eval_moon_phase_var mp sl
       with Failure _ -> VVstring ""
       end

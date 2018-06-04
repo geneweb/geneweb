@@ -179,7 +179,7 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
       Curl.cleanup connection;
       res := Buffer.contents result
     with
-    | Curl.CurlException (reason, code, str) ->
+    | Curl.CurlException _ ->
         Printf.fprintf stderr "Error: %s\n" !errorBuffer
     | Failure s ->
         Printf.fprintf stderr "Caught exception: %s\n" s

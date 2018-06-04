@@ -99,7 +99,7 @@ let output_item_value = Iovalue.output
 let input_item_value = Iovalue.input
 (**)
 
-let no_string gen = ""
+let no_string = ""
 
 let unique_string gen x =
   try Hashtbl.find gen.g_strings x with
@@ -107,7 +107,7 @@ let unique_string gen x =
       if gen.g_scnt = Array.length gen.g_base.c_strings then
         begin let arr = gen.g_base.c_strings in
           let new_size = 2 * Array.length arr + 1 in
-          let new_arr = Array.make new_size (no_string gen) in
+          let new_arr = Array.make new_size no_string in
           Array.blit arr 0 new_arr 0 (Array.length arr);
           gen.g_base.c_strings <- new_arr
         end;
@@ -233,7 +233,7 @@ let find_person_by_name gen first_name surname occ =
     find_person_by_local_name gen first_name surname occ
   else find_person_by_global_name gen first_name surname occ
 
-let add_person_by_name gen first_name surname occ iper =
+let add_person_by_name gen first_name surname iper =
   let s = Name.crush_lower (nominative (first_name ^ " " ^ surname)) in
   let key = Hashtbl.hash s in Hashtbl.add gen.g_names key iper
 
@@ -275,10 +275,10 @@ let insert_undefined gen key =
         make_person gen key.pk_first_name key.pk_surname new_occ
       in
       if key.pk_first_name <> "?" && key.pk_surname <> "?" then
-        add_person_by_name gen key.pk_first_name key.pk_surname new_occ
+        add_person_by_name gen key.pk_first_name key.pk_surname
           (Adef.iper_of_int i)
       else if !(Gwcomp.create_all_keys) then
-        add_person_by_name gen key.pk_first_name key.pk_surname new_occ
+        add_person_by_name gen key.pk_first_name key.pk_surname
           (Adef.iper_of_int i);
       new_iper gen;
       gen.g_base.c_persons.(i) <- x;
@@ -335,10 +335,10 @@ let insert_person gen so =
       let i = gen.g_pcnt in
       let (x, a, u) = make_person gen so.first_name so.surname new_occ in
       if so.first_name <> "?" && so.surname <> "?" then
-        add_person_by_name gen so.first_name so.surname new_occ
+        add_person_by_name gen so.first_name so.surname
           (Adef.iper_of_int i)
       else if !(Gwcomp.create_all_keys) then
-        add_person_by_name gen so.first_name so.surname new_occ
+        add_person_by_name gen so.first_name so.surname
           (Adef.iper_of_int i);
       new_iper gen;
       gen.g_base.c_persons.(i) <- x;
@@ -747,7 +747,7 @@ let pevent_name_unique_string gen =
       evt
   | Epers_Name n -> Epers_Name (unique_string gen n)
 
-let insert_pevents fname gen sb sex pevtl =
+let insert_pevents fname gen sb pevtl =
   let (p, ip) = insert_somebody gen sb in
   if p.m_pevents <> [] then
     begin
@@ -830,7 +830,7 @@ let insert_bnotes fname gen nfname str =
   in
   gen.g_base.c_bnotes <- bnotes
 
-let insert_wiznote fname gen wizid str =
+let insert_wiznote gen wizid str =
   gen.g_wiznotes <- (wizid, str) :: gen.g_wiznotes
 
 let map_option f =
@@ -873,9 +873,9 @@ let insert_syntax fname gen =
       insert_family gen cpl fs ms witl fevents fam des
   | Notes (key, str) -> insert_notes fname gen key str
   | Relations (sb, sex, rl) -> insert_relations fname gen sb sex rl
-  | Pevent (sb, sex, pevents) -> insert_pevents fname gen sb sex pevents
+  | Pevent (sb, _, pevents) -> insert_pevents fname gen sb pevents
   | Bnotes (nfname, str) -> insert_bnotes fname gen nfname str
-  | Wnotes (wizid, str) -> insert_wiznote fname gen wizid str
+  | Wnotes (wizid, str) -> insert_wiznote gen wizid str
 
 let record_access_of tab =
   {load_array = (fun () -> ()); get = (fun i -> tab.(i));
@@ -888,7 +888,7 @@ let no_istr_iper_index =
    cursor = (fun _ -> raise (Match_failure ("src/db1link.ml", 999, 52)));
    next = fun _ -> raise (Match_failure ("src/db1link.ml", 999, 67))}
 
-let update_person_with_pevents gen p =
+let update_person_with_pevents p =
   let found_birth = ref false in
   let found_baptism = ref false in
   let found_death = ref false in
@@ -961,11 +961,11 @@ let update_person_with_pevents gen p =
   in
   loop p.pevents p
 
-let update_pevents_with_person gen p =
+let update_pevents_with_person p =
   let empty_string = Adef.istr_of_int 0 in
   let evt_birth =
     match Adef.od_of_codate p.birth with
-      Some d ->
+      Some _ ->
         let evt =
           {epers_name = Epers_Birth; epers_date = p.birth;
            epers_place = p.birth_place; epers_reason = empty_string;
@@ -989,7 +989,7 @@ let update_pevents_with_person gen p =
   in
   let evt_bapt =
     match Adef.od_of_codate p.baptism with
-      Some d ->
+      Some _ ->
         let evt =
           {epers_name = Epers_Baptism; epers_date = p.baptism;
            epers_place = p.baptism_place; epers_reason = empty_string;
@@ -1026,7 +1026,7 @@ let update_pevents_with_person gen p =
              epers_witnesses = [| |]}
           in
           Some evt
-    | Death (death_reason, cd) ->
+    | Death (_, cd) ->
         let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
         let evt =
           {epers_name = Epers_Death; epers_date = date;
@@ -1127,8 +1127,8 @@ let persons_record_access gen per_index_ic per_ic persons =
     in
     (* Si on a trouvé des évènements, on mets à jour *)
     let p =
-      if p.pevents <> [] then update_person_with_pevents gen p
-      else update_pevents_with_person gen p
+      if p.pevents <> [] then update_person_with_pevents p
+      else update_pevents_with_person p
     in
     p
   in
@@ -1138,7 +1138,7 @@ let persons_record_access gen per_index_ic per_ic persons =
   in
   let len = Array.length persons in
   {load_array = (fun () -> ()); get = get_fun;
-   set = (fun i v -> failwith "bug: setting persons array");
+   set = (fun _ _ -> failwith "bug: setting persons array");
    output_array = (fun oc -> Mutil.output_array_no_sharing oc get_fun len);
    len = len; clear_array = fun () -> ()}
 
@@ -1151,7 +1151,7 @@ let families_record_access fam_index_ic fam_ic len =
     seek_in fam_ic pos; let fam : family = input_item_value fam_ic in fam
   in
   {load_array = (fun () -> ()); get = get_fun;
-   set = (fun i v -> failwith "bug: setting family array");
+   set = (fun _ _ -> failwith "bug: setting family array");
    output_array = (fun oc -> output_array_no_sharing oc get_fun len);
    len = len; clear_array = fun () -> ()}
 
@@ -1383,7 +1383,7 @@ let link next_family_fun bdir =
            fold_option
              (List.map
                 (Futil.map_relation_ps (fun p -> p)
-                   (fun s -> Adef.istr_of_int 0)))
+                   (fun _ -> Adef.istr_of_int 0)))
              p.rparents o_rpar}
       in
       let i = Adef.int_of_iper ip in Hashtbl.replace gen.g_patch_p i p

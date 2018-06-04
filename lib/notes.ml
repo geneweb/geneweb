@@ -156,7 +156,7 @@ let merge_possible_aliases conf db =
   let db = List.sort (fun (pg1, _) (pg2, _) -> compare pg1 pg2) db in
   List.fold_left
     (fun list (pg, (sl, il)) ->
-       let (sl, il1, list) =
+       let (sl, _il1, list) =
          let (list1, list2) =
            match list with
              (pg1, _ as x) :: l -> if pg = pg1 then [x], l else [], list
@@ -185,7 +185,7 @@ let notes_links_db conf base eliminate_unlinked =
   let db = merge_possible_aliases conf db in
   let db2 =
     List.fold_left
-      (fun db2 (pg, (sl, il)) ->
+      (fun db2 (pg, (sl, _il)) ->
          let record_it =
            match pg with
              NotesLinks.PgInd ip ->
@@ -213,7 +213,7 @@ let notes_links_db conf base eliminate_unlinked =
   let misc = Hashtbl.create 1 in
   let set =
     List.fold_left
-      (fun set (pg, (sl, il)) ->
+      (fun set (pg, (sl, _il)) ->
          match pg with
            NotesLinks.PgInd _ | NotesLinks.PgFam _ | NotesLinks.PgNotes |
            NotesLinks.PgWizard _ ->
@@ -307,7 +307,7 @@ let print_linked_list conf base pgl =
            Wserver.printf "</a>\n";
            Wserver.printf "</tt>\n"
        | NotesLinks.PgMisc fnotes ->
-           let (nenv, s) = read_notes base fnotes in
+           let (nenv, _) = read_notes base fnotes in
            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
            Wserver.printf "<tt>";
            if conf.wizard then

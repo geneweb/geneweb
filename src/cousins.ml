@@ -1,8 +1,6 @@
 (* $Id: cousins.ml,v 5.17 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-module type HACK_FOR_DEPEND = sig open Pqueue end
-
 open Config
 open Def
 open Gutil
@@ -33,7 +31,7 @@ let children_of base u =
        let des = foi base ifam in Array.to_list (get_children des) @ list)
     (Array.to_list (get_family u)) []
 
-let children_of_fam base u ifam =
+let children_of_fam base ifam =
   let des = foi base ifam in
   Array.to_list (get_children des)
 
@@ -212,7 +210,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                       List.map
                         (fun ip ->
                            (ip, ia_asex, (get_key_index p, get_sex p) :: rev_br))
-                        (children_of_fam base p ifam)
+                        (children_of_fam base ifam)
                     in
                     let sp = get_spouse base ip ifam in
                     if (Array.length (get_family p)) > 1 && lev >= 2 &&

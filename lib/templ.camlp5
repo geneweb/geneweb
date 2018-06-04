@@ -705,9 +705,9 @@ let rec eval_variable conf =
   | _ -> raise Not_found
 and eval_time_var conf =
   function
-    ["hours"] -> let (hh, mm, ss) = conf.time in sprintf "%02d" hh
-  | ["minutes"] -> let (hh, mm, ss) = conf.time in sprintf "%02d" mm
-  | ["seconds"] -> let (hh, mm, ss) = conf.time in sprintf "%02d" ss
+    ["hours"] -> let (hh, _, _) = conf.time in sprintf "%02d" hh
+  | ["minutes"] -> let (_, mm, _) = conf.time in sprintf "%02d" mm
+  | ["seconds"] -> let (_, _, ss) = conf.time in sprintf "%02d" ss
   | [] -> let (hh, mm, ss) = conf.time in sprintf "%02d:%02d:%02d" hh mm ss
   | _ -> raise Not_found
 and eval_simple_variable conf =
@@ -826,8 +826,8 @@ and eval_simple_variable conf =
   | "suffix" ->
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l =
-        List.fold_left (fun accu (k, v) -> List.remove_assoc k accu) conf.env
-          (conf.henv @ conf.senv)
+        List.fold_left (fun accu (k, _) -> List.remove_assoc k accu) conf.env
+          (List.rev_append conf.henv conf.senv)
       in
       List.fold_left
         (fun c (k, v) ->
@@ -837,13 +837,13 @@ and eval_simple_variable conf =
       let c = Util.commd conf in
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l =
-        List.fold_left (fun accu (k, v) -> List.remove_assoc k accu) conf.env
-          (conf.henv @ conf.senv)
+        List.fold_left (fun accu (k, _) -> List.remove_assoc k accu) conf.env
+          (List.rev_append conf.henv conf.senv)
       in
       List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c l
   | "version" -> Version.txt
   | "/" -> conf.xhs
-  | s -> raise Not_found
+  | _ -> raise Not_found
 
 let rec string_of_expr_val =
   function
@@ -898,10 +898,7 @@ and eval_transl conf upp s c =
     eval_transl_inline conf s
   else eval_transl_lexicon conf upp s c
 and eval_transl_inline conf s =
-  let (s, alt) =
-    Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
-  in
-  s
+    fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 and eval_transl_lexicon conf upp s c =
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
@@ -1068,7 +1065,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       | "%" -> VVstring (string_of_int (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\""))
       end
-  | Aint (loc, s) -> VVstring s
+  | Aint (_, s) -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
 let line_of_loc conf fname (bp, ep) =
@@ -1225,7 +1222,7 @@ let print_apply loc f set_vother print_ast env ep gxl al gvl =
 let templ_eval_expr = eval_string_expr
 let templ_print_apply = print_apply
 
-let rec templ_print_foreach conf print_ast set_vother env ep loc s sl el al =
+let rec templ_print_foreach conf print_ast set_vother env ep _loc s sl _el al =
   match s :: sl with
     ["env_binding"] ->
       print_foreach_env_binding conf print_ast set_vother env ep al
@@ -1273,17 +1270,17 @@ let eval_var conf ifun env ep loc sl =
     match sl with
       ["env"; "key"] ->
         begin match ifun.get_vother (List.assoc "binding" env) with
-          Some (Vbind (k, v)) -> VVstring k
+          Some (Vbind (k, _)) -> VVstring k
         | _ -> raise Not_found
         end
     | ["env"; "val"] ->
         begin match ifun.get_vother (List.assoc "binding" env) with
-          Some (Vbind (k, v)) -> VVstring v
+          Some (Vbind (_, v)) -> VVstring v
         | _ -> raise Not_found
         end
     | ["env"; "val"; "decoded"] ->
         begin match ifun.get_vother (List.assoc "binding" env) with
-          Some (Vbind (k, v)) -> VVstring (Util.decode_varenv v)
+          Some (Vbind (_, v)) -> VVstring (Util.decode_varenv v)
         | _ -> raise Not_found
         end
     | "today" :: sl ->
@@ -1302,7 +1299,7 @@ let print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
     Not_found ->
       templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl el al
 
-let print_wid_hei env fname =
+let print_wid_hei fname =
   match Util.image_size (Util.image_file_name fname) with
     Some (wid, hei) -> Wserver.printf " width=\"%d\" height=\"%d\"" wid hei
   | None -> ()
@@ -1398,17 +1395,17 @@ let rec interp_ast conf ifun env =
             (try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
         | "red_of_hsv", [VVstring h; VVstring s; VVstring v] ->
             begin try
-              let (r, g, b) = rgb_of_str_hsv h s v in string_of_int r
+              let (r, _, _) = rgb_of_str_hsv h s v in string_of_int r
             with Failure _ -> "red_of_hsv bad params"
             end
         | "green_of_hsv", [VVstring h; VVstring s; VVstring v] ->
             begin try
-              let (r, g, b) = rgb_of_str_hsv h s v in string_of_int g
+              let (_, g, _) = rgb_of_str_hsv h s v in string_of_int g
             with Failure _ -> "green_of_hsv bad params"
             end
         | "blue_of_hsv", [VVstring h; VVstring s; VVstring v] ->
             begin try
-              let (r, g, b) = rgb_of_str_hsv h s v in string_of_int b
+              let (_, _, b) = rgb_of_str_hsv h s v in string_of_int b
             with Failure _ -> "blue_of_hsv bad params"
             end
         | _ ->
@@ -1448,7 +1445,7 @@ let rec interp_ast conf ifun env =
     function
       Avar (loc, s, sl) ->
         print_var print_ast_list conf ifun env ep loc (s :: sl)
-    | Awid_hei s -> print_wid_hei env s
+    | Awid_hei s -> print_wid_hei s
     | Aif (e, alt, ale) -> print_if env ep e alt ale
     | Aforeach ((loc, s, sl), el, al) ->
         begin try
@@ -1467,7 +1464,7 @@ let rec interp_ast conf ifun env =
     | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
-    | Aimport (templ, astl) :: al ->
+    | Aimport (_, astl) :: al ->
         print_ast_list env ep astl; print_ast_list !m_env ep al
     | [a] -> print_ast env ep a
     | a :: al -> print_ast env ep a; print_ast_list env ep al
@@ -1551,11 +1548,10 @@ let copy_from_templ conf env ic =
   close_in ic;
   let ifun =
     {eval_var =
-      (fun env accu loc ->
-         function
-           [s] -> VVstring (List.assoc s env)
-         | _ -> raise Not_found);
-     eval_transl = (fun env -> eval_transl conf);
+      (fun env _ _ -> function
+        | [s] -> VVstring (List.assoc s env)
+        | _ -> raise Not_found);
+     eval_transl = (fun _ -> eval_transl conf);
      eval_predefined_apply = (fun _ -> raise Not_found);
      get_vother = (fun _ -> None); set_vother = (fun _ -> "");
      print_foreach = fun _ -> raise Not_found}

@@ -19,18 +19,6 @@ let get_date conf =
   Printf.sprintf "%02d/%02d/%d" conf.today.day conf.today.month
     conf.today.year
 
-(*
-   On cherche le fichier dans cet ordre :
-    - dans la base (bases/bname/cnt/)
-    - dans le répertoire des bases (bases/)
-*)
-let find_cnt_file conf =
-  let bases_cnt = Filename.concat !(Util.cnt_dir) "cnt" in
-  let bname_cnt =
-    List.fold_left Filename.concat !(Util.cnt_dir) [conf.bname; "cnt"]
-  in
-  if Sys.file_exists bname_cnt then bname_cnt else bases_cnt
-
 let adm_file f = List.fold_right Filename.concat [!(Util.cnt_dir); "cnt"] f
 
 let cnt conf ext = adm_file (conf.bname ^ ext)
@@ -163,11 +151,6 @@ let source_file_name conf fname =
     Filename.concat (Util.base_path ["src"] bname)
       (Filename.basename fname ^ ".txt")
 
-let digit =
-  function
-    '0'..'9' as c -> Char.code c - Char.code '0'
-  | _ -> failwith "digit"
-
 let extract_date s =
   try Scanf.sscanf s "%d,%d,%d" (fun d m y -> Some (d, m, y)) with
     Ploc.Exc (_, (Stream.Error _ | Token.Error _)) -> None
@@ -273,7 +256,7 @@ let rec lexicon_translate conf base nomin strm first_c =
         (lexicon_translate conf base false strm (Stream.next strm))
     else
       let r = Util.transl_nth conf s n in
-      match Mutil.lindex r '%' with
+      match String.index_opt r '%' with
         Some i when c = "(" ->
           let sa =
             let rec loop len =
@@ -500,7 +483,7 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 
-let eval_var conf base env () loc =
+let eval_var conf base env () _loc =
   function
     ["base"; "has_notes"] -> VVbool (not (base_notes_are_empty base ""))
   | ["base"; "name"] -> VVstring conf.bname
@@ -563,9 +546,9 @@ let eval_var conf base env () loc =
       VVbool (Sys.file_exists (Wiznotes.dir conf base))
   | _ -> raise Not_found
 
-let print_foreach conf print_ast eval_expr = raise Not_found
+let print_foreach _conf _print_ast _eval_expr = raise Not_found
 
-let eval_predefined_apply conf env f vl = raise Not_found
+let eval_predefined_apply _conf _env _f _vl = raise Not_found
 
 let print_start conf base =
   let env =
@@ -576,7 +559,7 @@ let print_start conf base =
   in
   Hutil.interp conf "welcome"
     {Templ.eval_var = eval_var conf base;
-     Templ.eval_transl = (fun env -> Templ.eval_transl conf);
+     Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
      Templ.eval_predefined_apply = eval_predefined_apply conf;
      Templ.get_vother = get_vother; Templ.set_vother = set_vother;
      Templ.print_foreach = print_foreach conf}
@@ -587,7 +570,7 @@ let print conf base fname =
   if Sys.file_exists (Util.etc_file_name conf fname) then
     Hutil.interp conf fname
       {Templ.eval_var = eval_var conf base;
-       Templ.eval_transl = (fun env -> Templ.eval_transl conf);
+       Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
        Templ.eval_predefined_apply = eval_predefined_apply conf;
        Templ.get_vother = get_vother; Templ.set_vother = set_vother;
        Templ.print_foreach = print_foreach conf}
@@ -596,7 +579,7 @@ let print conf base fname =
 
 (* lexicon (info) *)
 
-let print_lexicon conf base =
+let print_lexicon conf _base =
   let title _ = Wserver.printf "Lexicon" in
   let fname =
     let f = if !(Mutil.utf_8_db) then "lex_utf8.txt" else "lexicon.txt" in

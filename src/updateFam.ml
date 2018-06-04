@@ -73,14 +73,6 @@ let extract_var sini s =
     String.sub s len (String.length s - len)
   else ""
 
-let not_impl func x =
-  let desc =
-    if Obj.is_block (Obj.repr x) then
-      "tag = " ^ string_of_int (Obj.tag (Obj.repr x))
-    else "int_val = " ^ string_of_int (Obj.magic x)
-  in
-  Wserver.printf ">%s<p>\n" ("UpdateFam." ^ func ^ ": not impl " ^ desc)
-
 let obsolete_list = ref []
 
 let obsolete version var new_var r =
@@ -99,10 +91,10 @@ let obsolete version var new_var r =
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
-let rec eval_var conf base env (fam, cpl, des) loc sl =
-  try eval_special_var conf base (fam, cpl, des) sl with
-    Not_found -> eval_simple_var conf base env (fam, cpl, des) loc sl
-and eval_simple_var conf base env (fam, cpl, des) loc =
+let rec eval_var conf base env (fam, cpl, des) _loc sl =
+  try eval_special_var conf base sl with
+    Not_found -> eval_simple_var conf base env (fam, cpl, des) sl
+and eval_simple_var conf base env (fam, cpl, des) =
   function
     ["bvar"; v] ->
       begin try VVstring (List.assoc v conf.base_env) with
@@ -169,7 +161,7 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
             else raise Not_found
         | _ -> raise Not_found
       in
-      eval_parent conf base env k sl
+      eval_parent conf env k sl
   | ["wcnt"] -> eval_int_env "wcnt" env
   | "witness" :: sl ->
       let k =
@@ -191,7 +183,7 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
             (try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None)
         | _ -> None
       in
-      eval_event_var conf base env e sl
+      eval_event_var e sl
   | ["event_date"; s] ->
       let od =
         match get_env "cnt" env with
@@ -223,7 +215,7 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
             let src = sou base e.efam_src in
             let wit =
               List.fold_right
-                (fun (w, wk) accu ->
+                (fun (w, _) accu ->
                    (transl_nth conf "witness/witnesses" 0 ^ ": " ^
                     Util.person_text conf base (poi base w)) ::
                    accu)
@@ -408,7 +400,7 @@ and eval_date_field =
       | _ -> None
       end
   | None -> None
-and eval_event_var conf base env e =
+and eval_event_var e =
   function
     ["e_name"] ->
       begin match e with
@@ -446,19 +438,19 @@ and eval_event_var conf base env e =
       | _ -> str_val ""
       end
   | _ -> raise Not_found
-and eval_parent conf base env k =
+and eval_parent conf env k =
   function
     ["himher"] ->
       let s =
         match get_env "cnt" env with
           Vint 1 -> capitale (transl_nth conf "him/her" 0)
         | Vint 2 -> capitale (transl_nth conf "him/her" 1)
-        | Vint n -> transl conf "him/her"
+        | Vint _ -> transl conf "him/her"
         | _ -> "???"
       in
       str_val s
   | sl -> eval_key k sl
-and eval_key (fn, sn, oc, create, var) =
+and eval_key (fn, sn, oc, create, _) =
   function
     ["create"] -> str_val (if create <> Update.Link then "create" else "link")
   | ["create"; s] -> str_val (eval_create create s)
@@ -590,14 +582,14 @@ and eval_relation_kind =
   | NoSexesCheckNotMarried -> "nsck"
   | NoSexesCheckMarried -> "nsckm"
   | NoMention -> "no_ment"
-and eval_special_var conf base p =
+and eval_special_var conf base =
   function
     ["include_perso_header"] ->
       begin match p_getint conf.env "ip" with
         Some i ->
           let has_base_loop =
             try let _ = Util.create_topological_sort conf base in false with
-              Consang.TopologicalSortError p -> true
+              Consang.TopologicalSortError _ -> true
           in
           if has_base_loop then VVstring ""
           else
@@ -619,24 +611,24 @@ and eval_string_env var env =
 
 (* print *)
 
-let print_foreach print_ast eval_expr =
+let print_foreach print_ast _eval_expr =
   let rec print_foreach env (fam, cpl, des as fcd) _ s sl _ al =
     match s :: sl with
-      ["child"] -> print_foreach_child env fcd al des.children s
-    | ["fevent"] -> print_foreach_fevent env fcd al fam.fevents s
-    | ["fwitness"] -> print_foreach_fwitness env fcd al fam.fevents s
-    | ["witness"] -> print_foreach_witness env fcd al fam.witnesses s
-    | ["parent"] -> print_foreach_parent env fcd al (parent_array cpl) s
+      ["child"] -> print_foreach_child env fcd al des.children
+    | ["fevent"] -> print_foreach_fevent env fcd al fam.fevents
+    | ["fwitness"] -> print_foreach_fwitness env fcd al fam.fevents
+    | ["witness"] -> print_foreach_witness env fcd al fam.witnesses
+    | ["parent"] -> print_foreach_parent env fcd al (parent_array cpl)
     | _ -> raise Not_found
-  and print_foreach_child env fcd al arr lab =
+  and print_foreach_child env fcd al arr =
     for i = 0 to max 1 (Array.length arr) - 1 do
       let env = ("cnt", Vint (i + 1)) :: env in
       List.iter (print_ast env fcd) al
     done
-  and print_foreach_fevent env fcd al list lab =
+  and print_foreach_fevent env fcd al list =
     let rec loop first cnt =
       function
-        nn :: l ->
+        _ :: l ->
           let env =
             ("cnt", Vint cnt) :: ("first", Vbool first) ::
             ("last", Vbool (l = [])) :: env
@@ -645,7 +637,7 @@ let print_foreach print_ast eval_expr =
       | [] -> ()
     in
     loop true 1 list
-  and print_foreach_fwitness env fcd al list lab =
+  and print_foreach_fwitness env fcd al list =
     match get_env "cnt" env with
       Vint i ->
         begin match
@@ -654,7 +646,7 @@ let print_foreach print_ast eval_expr =
           Some e ->
             let rec loop first wcnt =
               function
-                nn :: l ->
+                _ :: l ->
                   let env =
                     ("wcnt", Vint wcnt) :: ("first", Vbool first) ::
                     ("last", Vbool (l = [])) :: env
@@ -666,12 +658,12 @@ let print_foreach print_ast eval_expr =
         | None -> ()
         end
     | _ -> ()
-  and print_foreach_witness env fcd al arr lab =
+  and print_foreach_witness env fcd al arr =
     for i = 0 to max 2 (Array.length arr) - 1 do
       let env = ("cnt", Vint (i + 1)) :: env in
       List.iter (print_ast env fcd) al
     done
-  and print_foreach_parent env fcd al arr lab =
+  and print_foreach_parent env fcd al arr =
     for i = 0 to Array.length arr - 1 do
       let env = ("cnt", Vint (i + 1)) :: env in
       List.iter (print_ast env fcd) al
@@ -865,7 +857,7 @@ let print_inv conf base =
       end
   | _ -> incorrect_request conf
 
-let change_order conf base ip u ifam n =
+let change_order u ifam n =
   let rec loop i =
     function
       [] -> if i = n then [ifam] else []
@@ -905,9 +897,7 @@ let print_change_order conf base =
              Wserver.printf "</li>\n")
           arr
       in
-      let after =
-        change_order conf base (get_key_index p) p (Adef.ifam_of_int ifam) n
-      in
+      let after = change_order p (Adef.ifam_of_int ifam) n in
       let (before, after) = get_family p, Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
       let title _ =

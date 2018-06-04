@@ -228,12 +228,6 @@ let date_of_string s i =
     Some (dt, i) -> if i = String.length s then Some dt else error 5
   | None -> None
 
-let rindex s c =
-  let rec pos i =
-    if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
-  in
-  pos (String.length s - 1)
-
 let line_cnt = ref 0
 let no_fail = ref false
 let no_picture = ref false
@@ -343,7 +337,7 @@ let get_optional_sexe =
   | "f" :: l -> Female, l
   | l -> Neuter, l
 
-let make_int str x =
+let make_int x =
   let rec loop found n i =
     if i = String.length x then if found then n else raise Not_found
     else
@@ -362,9 +356,9 @@ let get_fst_name str l =
         ' ' ->
           let x = cut_space x in
           let (x, occ) =
-            match rindex x '.' with
+            match String.rindex_opt x '.' with
               Some i ->
-                begin try String.sub x 0 i, make_int str x (succ i) with
+                begin try String.sub x 0 i, make_int x (succ i) with
                   Not_found -> x, 0
                 end
             | None -> x, 0
@@ -401,43 +395,43 @@ let rec get_aliases str l =
       let (nl, l) = get_aliases str l' in cut_space x :: nl, l
   | _ -> [], l
 
-let get_name str l =
+let get_name l =
   match l with
-    "#nick" :: _ | "#alias" :: _ -> "", l
+  | "#nick" :: _ | "#alias" :: _ -> "", l
   | x :: l' ->
-      begin match x.[0] with
-        '{' -> "", l
+    begin match x.[0] with
+      |  '{' -> "", l
       | 'a'..'z' | 'A'..'Z' | 'à'..'ı' | 'À'..'İ' | '0'..'9' | '?' | ' ' ->
-          cut_space x, l'
+        cut_space x, l'
       | _ -> "", l
-      end
+    end
   | _ -> "", l
 
-let get_pub_name str l =
+let get_pub_name l =
   match l with
-    x :: l' ->
-      if x.[0] = '(' && x.[String.length x - 1] = ')' then
-        let a = String.sub x 1 (String.length x - 2) in cut_space a, l'
-      else "", l
+  | x :: l' ->
+    if x.[0] = '(' && x.[String.length x - 1] = ')' then
+      let a = String.sub x 1 (String.length x - 2) in cut_space a, l'
+    else "", l
   | _ -> "", l
 
-let get_image str l =
+let get_image l =
   match l with
-    ("#image" | "#photo") :: x :: l' ->
-      if !no_picture then "", l' else cut_space x, l'
+  | ("#image" | "#photo") :: x :: l' ->
+    if !no_picture then "", l' else cut_space x, l'
   | _ -> "", l
 
-let get_occu str l =
+let get_occu l =
   match l with
-    "#occu" :: x :: l' -> cut_space x, l'
+  | "#occu" :: x :: l' -> cut_space x, l'
   | _ -> "", l
 
-let get_sources str l =
+let get_sources l =
   match l with
     "#src" :: x :: l' -> cut_space x, l'
   | _ -> "", l
 
-let rec get_access str l =
+let get_access l =
   match l with
     "#apubl" :: l' -> Public, l'
   | "#apriv" :: l' -> Private, l'
@@ -587,7 +581,7 @@ let get_optional_event_date l =
         end
   | _ -> None, l
 
-let get_event_witness_kind str l =
+let get_event_witness_kind l =
   match l with
     "#godp" :: l' -> Witness_GodParent, l'
   | "#offi" :: l' -> Witness_Officer, l'
@@ -659,19 +653,19 @@ let create_person () =
    burial_note = ""; burial_src = ""; pevents = []; notes = ""; psources = "";
    key_index = Adef.iper_of_int (-1)}
 
-let bogus_def p n o = p = "?" || n = "?"
+let bogus_def p n = p = "?" || n = "?"
 
 let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let (first_names_aliases, l) = get_fst_names_aliases str l in
   let (surnames_aliases, l) = get_surnames_aliases str l in
-  let (public_name, l) = get_pub_name str l in
-  let (image, l) = get_image str l in
+  let (public_name, l) = get_pub_name l in
+  let (image, l) = get_image l in
   let (qualifiers, l) = get_qualifiers str l in
   let (aliases, l) = get_aliases str l in
   let (titles, l) = get_titles str l in
-  let (access, l) = get_access str l in
-  let (occupation, l) = get_occu str l in
-  let (psources, l) = get_sources str l in
+  let (access, l) = get_access l in
+  let (occupation, l) = get_occu l in
+  let (psources, l) = get_sources l in
   let (naissance, l) = get_optional_birthdate l in
   let (birth_place, l) = get_field "#bp" l in
   let (birth_note, l) = get_field "#bn" l in
@@ -731,10 +725,10 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   u, l
 
 let parse_parent str l =
-  let (np, l) = get_name str l in
+  let (np, l) = get_name l in
   let (pp, op, l) = get_fst_name str l in
   let defined =
-    if bogus_def pp np op then true
+    if bogus_def pp np then true
     else
       match l with
         [] -> false
@@ -753,13 +747,13 @@ let parse_child str surname sex csrc cbp l =
   let (prenom, occ, l) = get_fst_name str l in
   let (nom, l) =
     match l with
-      "?" :: _ -> get_name str l
-    | x :: l' ->
+      "?" :: _ -> get_name l
+    | x :: _ ->
         begin match x.[0] with
           '<' | '>' | '!' | '~' | '?' | '-' | '0'..'9' | '{' | '#' ->
             surname, l
         | '(' | '[' -> (if prenom = "" then "" else surname), l
-        | _ -> get_name str l
+        | _ -> get_name l
         end
     | _ -> surname, []
   in
@@ -841,6 +835,41 @@ type 'a read_family =
   | F_none
   | F_fail of string
 
+let loop_note line ic =
+  let rec loop_note acc str =
+    match fields str with
+    | "note" :: tl ->
+      let note =
+        if tl = [] then ""
+        else
+          String.sub
+            str
+            (String.length "note" + 1)
+            (String.length str - String.length "note" - 1)
+      in
+      loop_note (note :: acc) (input_a_line ic)
+    | _ -> String.concat "\n" (List.rev @@ "" :: acc), str
+  in
+  loop_note [] line
+
+let loop_witn line ic =
+  let rec loop_witn acc str =
+    match fields str with
+      ("wit" | "wit:") :: l ->
+      let (sex, l) =
+        match l with
+          "m:" :: l -> Male, l
+        | "f:" :: l -> Female, l
+        | l -> Neuter, l
+      in
+      let (wkind, l) = get_event_witness_kind l in
+      let (wk, _, l) = parse_parent str l in
+      if l <> [] then failwith str;
+      loop_witn ((wk, sex, wkind) :: acc) (input_a_line ic)
+    | _ -> (List.rev acc, str)
+  in
+  loop_witn [] line
+
 let read_family ic fname =
   function
     Some (_, ["encoding:"; "utf-8"]) -> F_enc_utf_8
@@ -875,19 +904,19 @@ let read_family ic fname =
       in
       let (fsrc, line) =
         match line with
-          Some (str, ["src"; x]) -> cut_space x, read_line ic
+          Some (_, ["src"; x]) -> cut_space x, read_line ic
         | Some (str, "src" :: _) -> failwith str
         | _ -> "", line
       in
       let (csrc, line) =
         match line with
-          Some (str, ["csrc"; x]) -> cut_space x, read_line ic
+          Some (_, ["csrc"; x]) -> cut_space x, read_line ic
         | Some (str, "csrc" :: _) -> failwith str
         | _ -> "", line
       in
       let (cbp, line) =
         match line with
-          Some (str, ["cbp"; x]) -> cut_space x, read_line ic
+          Some (_, ["cbp"; x]) -> cut_space x, read_line ic
         | Some (str, "cbp" :: _) -> failwith str
         | _ -> "", line
       in
@@ -901,7 +930,7 @@ let read_family ic fname =
       in
       let (fevents, line) =
         match line with
-          Some (str, "fevt" :: l) ->
+          Some (_, "fevt" :: _) ->
             let (fevents, line) =
               let rec loop fevents =
                 function
@@ -921,44 +950,9 @@ let read_family ic fname =
                     in
                     if l <> [] then failwith str;
                     (* On récupère les témoins *)
-                    let (witn, line) =
-                      let rec loop_witn str =
-                        match fields str with
-                          ("wit" | "wit:") :: l ->
-                            let (sex, l) =
-                              match l with
-                                "m:" :: l -> Male, l
-                              | "f:" :: l -> Female, l
-                              | l -> Neuter, l
-                            in
-                            let (wkind, l) = get_event_witness_kind str l in
-                            let (wk, _, l) = parse_parent str l in
-                            if l <> [] then failwith str;
-                            let (witn, str) = loop_witn (input_a_line ic) in
-                            (wk, sex, wkind) :: witn, str
-                        | line -> [], str
-                      in
-                      loop_witn (input_a_line ic)
-                    in
+                    let (witn, line) = loop_witn (input_a_line ic) ic in
                     (* On récupère les notes *)
-                    let (notes, line) =
-                      let rec loop_note str =
-                        match fields str with
-                          "note" :: l ->
-                            let note =
-                              match l with
-                                [] -> ""
-                              | _ :: l' ->
-                                  String.sub str (String.length "note" + 1)
-                                    (String.length str -
-                                     String.length "note" - 1)
-                            in
-                            let (notes, str) = loop_note (input_a_line ic) in
-                            note ^ "\n" ^ notes, str
-                        | line -> "", str
-                      in
-                      loop_note line
-                    in
+                    let (notes, line) = loop_note line ic in
                     let notes = Mutil.strip_all_trailing_spaces notes in
                     let evt = name, date, place, cause, src, notes, witn in
                     loop (evt :: fevents) line
@@ -977,7 +971,7 @@ let read_family ic fname =
                   let (sex, l) = get_optional_sexe l in
                   let (child, l) = parse_child str surname sex csrc cbp l in
                   if l <> [] then failwith str else loop (child :: children)
-              | Some (str, ["end"]) -> children
+              | Some (_, ["end"]) -> children
               | Some (str, _) -> failwith str
               | _ -> failwith "eof"
             in
@@ -1006,7 +1000,7 @@ let read_family ic fname =
           F_some
             (Family (co, fath_sex, moth_sex, witn, fevents, fo, deo), line)
       end
-  | Some (str, ["notes-db"]) ->
+  | Some (_, ["notes-db"]) ->
       let notes = read_notes_db ic "end notes-db" in
       F_some (Bnotes ("", notes), read_line ic)
   | Some (str, ["page-ext"; _]) ->
@@ -1016,11 +1010,11 @@ let read_family ic fname =
       in
       let notes = read_notes_db ic "end page-ext" in
       F_some (Bnotes (p, notes), read_line ic)
-  | Some (str, ["notes"]) ->
+  | Some (_, ["notes"]) ->
       (* used before version 5.00 *)
       let notes = read_notes ic in F_some (Bnotes ("", notes), read_line ic)
   | Some (str, "notes" :: l) ->
-      let (surname, l) = get_name str l in
+      let (surname, l) = get_name l in
       let (first_name, occ, l) = get_fst_name str l in
       if l <> [] then failwith "str"
       else
@@ -1090,43 +1084,9 @@ let read_family ic fname =
                 in
                 if l <> [] then failwith str;
                 (* On récupère les témoins *)
-                let (witn, line) =
-                  let rec loop_witn str =
-                    match fields str with
-                      ("wit" | "wit:") :: l ->
-                        let (sex, l) =
-                          match l with
-                            "m:" :: l -> Male, l
-                          | "f:" :: l -> Female, l
-                          | l -> Neuter, l
-                        in
-                        let (wkind, l) = get_event_witness_kind str l in
-                        let (wk, _, l) = parse_parent str l in
-                        if l <> [] then failwith str;
-                        let (witn, str) = loop_witn (input_a_line ic) in
-                        (wk, sex, wkind) :: witn, str
-                    | line -> [], str
-                  in
-                  loop_witn (input_a_line ic)
-                in
+                let (witn, line) = loop_witn (input_a_line ic) ic in
                 (* On récupère les notes *)
-                let (notes, line) =
-                  let rec loop_note str =
-                    match fields str with
-                      "note" :: l ->
-                        let note =
-                          match l with
-                            [] -> ""
-                          | _ :: l' ->
-                              String.sub str (String.length "note" + 1)
-                                (String.length str - String.length "note" - 1)
-                        in
-                        let (notes, str) = loop_note (input_a_line ic) in
-                        note ^ "\n" ^ notes, str
-                    | line -> "", str
-                  in
-                  loop_note line
-                in
+                let (notes, line) = loop_note line ic in
                 let notes = Mutil.strip_all_trailing_spaces notes in
                 let evt = name, date, place, cause, src, notes, witn in
                 loop (evt :: pevents) line
@@ -1135,7 +1095,7 @@ let read_family ic fname =
         in
         let pevents = List.rev pevents in
         F_some (Pevent (sb, Neuter, pevents), read_line ic)
-  | Some (str, l) -> failwith str
+  | Some (str, _) -> failwith str
   | None -> F_none
 
 let read_family_1 ic fname line =

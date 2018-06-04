@@ -104,8 +104,6 @@ let header_fluid conf title =
   title false;
   Wserver.printf "</h1>\n"
 
-let red_color = "red"
-
 let rheader conf title =
   header_without_page_title conf title;
   Wserver.printf "<h1 class=\"error\">";

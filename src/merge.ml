@@ -6,7 +6,7 @@ open Gwdb
 open Hutil
 open Util
 
-let print_someone conf base p =
+let print_someone base p =
   Wserver.printf "%s%s %s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
@@ -18,7 +18,7 @@ let print conf base p =
     else
       begin
         Wserver.printf "%s " (transl conf ":");
-        print_someone conf base p
+        print_someone base p
       end
   in
   let list = Gutil.find_same_name base p in
@@ -93,9 +93,9 @@ let print_possible_continue_merging conf base =
       Wserver.printf "%s" (capitale (transl conf "continue merging"));
       Wserver.printf "</a>";
       Wserver.printf "\n";
-      print_someone conf base p1;
+      print_someone base p1;
       Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
-      print_someone conf base p2;
+      print_someone base p2;
       Wserver.printf "\n"
   | _ ->
       match p_getint conf.env "ip" with

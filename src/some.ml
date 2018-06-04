@@ -236,7 +236,7 @@ let first_name_print_list conf base x1 xl liste =
                with
                  Some d1, Some d2 ->
                    if CheckItem.strictly_after d1 d2 then -1 else 1
-               | Some d1, _ -> 1
+               | Some _, _ -> 1
                | _ -> -1
                end
            | n -> -n)
@@ -272,11 +272,11 @@ let first_name_print_list conf base x1 xl liste =
       liste
   in
   let list = List.sort compare list in
-  print_alphab_list conf (fun (ord, txt, _) -> first_char ord)
+  print_alphab_list (fun (ord, _, _) -> first_char ord)
     (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl)) list;
   trailer conf
 
-let select_first_name conf base n list =
+let select_first_name conf n list =
   let title _ =
     Wserver.printf "%s \"%s\" : %s"
       (capitale (transl_nth conf "first name/first names" 0)) n
@@ -339,7 +339,7 @@ let first_name_print conf base x =
   in
   let list =
     List.map
-      (fun (str, istr, iperl) ->
+      (fun (str, _, iperl) ->
          Name.lower str, (StrSet.add str StrSet.empty, iperl))
       list
   in
@@ -360,7 +360,7 @@ let first_name_print conf base x =
           pl []
       in
       first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf base x list
+  | _ -> select_first_name conf x list
 
 let has_children_with_that_name conf base des name =
   let compare_name n1 n2 =
@@ -518,26 +518,22 @@ let print_branch conf base psn name =
 
 let print_one_branch conf base bh psn lev =
   let p = bh.bh_ancestor in
-  match bh.bh_well_named_ancestors with
-    [] ->
-      let x = sou base (get_surname p) in print_branch conf base psn x lev p
-  | pl ->
-      if is_hidden p then Wserver.printf "&lt;&lt;"
-      else
-        begin let href = Util.acces conf base p in
-          wprint_geneweb_link conf href "&lt;&lt;"
-        end;
-      Wserver.printf "\n";
-      List.iter
-        (fun p ->
-           let x = sou base (get_surname p) in
-           Wserver.printf "<dl>\n";
-           Wserver.printf "<dd>\n";
-           print_branch conf base psn x false p;
-           Wserver.printf "</dd>\n";
-           Wserver.printf "</dl>\n")
-        bh.bh_well_named_ancestors
-
+  if bh.bh_well_named_ancestors = []
+  then let x = sou base (get_surname p) in print_branch conf base psn x lev p
+  else begin
+    if is_hidden p then Wserver.printf "&lt;&lt;"
+    else wprint_geneweb_link conf (Util.acces conf base p) "&lt;&lt;" ;
+    Wserver.printf "\n";
+    List.iter
+      (fun p ->
+         let x = sou base (get_surname p) in
+         Wserver.printf "<dl>\n";
+         Wserver.printf "<dd>\n";
+         print_branch conf base psn x false p;
+         Wserver.printf "</dd>\n";
+         Wserver.printf "</dl>\n")
+      bh.bh_well_named_ancestors
+  end
 
 let print_one_surname_by_branch conf base x xl (bhl, str) =
   let ancestors =
@@ -627,14 +623,14 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
   Wserver.printf "</div>\n";
   trailer conf
 
-let print_several_possible_surnames x conf base (bhl, homonymes) =
+let print_several_possible_surnames x conf base (_, homonymes) =
   let fx = x in
   let x =
     match homonymes with
       x :: _ -> x
     | _ -> x
   in
-  let title h =
+  let title _ =
     Wserver.printf "%s \"%s\" : %s"
       (capitale (transl_nth conf "surname/surnames" 0)) fx
       (transl conf "specify")
@@ -720,7 +716,7 @@ let print_family_alphabetic x conf base liste =
       Util.print_tips_relationship conf;
       (* Menu afficher par branche/ordre alphabetique *)
       print_alphabetic_to_branch conf x;
-      print_alphab_list conf (fun (p, _) -> first_char p)
+      print_alphab_list (fun (p, _) -> first_char p)
         (print_elem conf base false) liste;
       trailer conf
 
@@ -805,14 +801,14 @@ let surname_print conf base not_found_fun x =
   in
   let list =
     List.map
-      (fun (str, istr, iperl) ->
+      (fun (str, _, iperl) ->
          Name.lower str, (StrSet.add str StrSet.empty, iperl))
       list
   in
   let list = List.fold_right merge_insert list [] in
-  let (iperl, strl) =
+  let (iperl, _) =
     List.fold_right
-      (fun (str, (istr, iperl1)) (iperl, strl) ->
+      (fun (str, (_, iperl1)) (iperl, strl) ->
          let len = List.length iperl1 in
          let strl =
            try
@@ -852,10 +848,10 @@ let surname_print conf base not_found_fun x =
       in
       match bhl, list with
         [], _ -> not_found_fun conf x
-      | _, [s, (strl, iperl)] ->
+      | _, [s, (strl, _)] ->
           print_one_surname_by_branch conf base x strl (bhl, s)
       | _ ->
-          let strl = List.map (fun (s, (strl, _)) -> s) list in
+          let strl = List.map fst list in
           print_several_possible_surnames x conf base (bhl, strl)
 
 
@@ -875,14 +871,14 @@ let search_surname conf base x =
   in
   let list =
     List.map
-      (fun (str, istr, iperl) ->
+      (fun (str, _, iperl) ->
          Name.lower str, (StrSet.add str StrSet.empty, iperl))
       list
   in
   let list = List.fold_right merge_insert list [] in
-  let (iperl, strl) =
+  let (iperl, _) =
     List.fold_right
-      (fun (str, (istr, iperl1)) (iperl, strl) ->
+      (fun (str, (_, iperl1)) (iperl, strl) ->
          let len = List.length iperl1 in
          let strl =
            try
@@ -905,7 +901,7 @@ let search_surname conf base x =
   in
   match bhl, list with
     [], _ -> []
-  | _, [s, (strl, iperl)] -> iperl
+  | _, [_, (_, iperl)] -> iperl
   | _ -> []
 
 let search_surname_print conf base not_found_fun x =
@@ -920,14 +916,14 @@ let search_surname_print conf base not_found_fun x =
   in
   let list =
     List.map
-      (fun (str, istr, iperl) ->
+      (fun (str, _, iperl) ->
          Name.lower str, (StrSet.add str StrSet.empty, iperl))
       list
   in
   let list = List.fold_right merge_insert list [] in
-  let (iperl, strl) =
+  let (iperl, _) =
     List.fold_right
-      (fun (str, (istr, iperl1)) (iperl, strl) ->
+      (fun (str, (_, iperl1)) (iperl, strl) ->
          let len = List.length iperl1 in
          let strl =
            try
@@ -967,10 +963,10 @@ let search_surname_print conf base not_found_fun x =
       in
       match bhl, list with
         [], _ -> not_found_fun conf x
-      | _, [s, (strl, iperl)] ->
+      | _, [s, (strl, _)] ->
           print_one_surname_by_branch conf base x strl (bhl, s)
       | _ ->
-          let strl = List.map (fun (s, (strl, _)) -> s) list in
+          let strl = List.map (fun (s, _) -> s) list in
           print_several_possible_surnames x conf base (bhl, strl)
 
 let search_first_name conf base x =
@@ -986,7 +982,7 @@ let search_first_name conf base x =
   in
   let list =
     List.map
-      (fun (str, istr, iperl) ->
+      (fun (str, _, iperl) ->
          Name.lower str, (StrSet.add str StrSet.empty, iperl))
       list
   in
@@ -1005,7 +1001,7 @@ let search_first_name_print conf base x =
   in
   let list =
     List.map
-      (fun (str, istr, iperl) ->
+      (fun (str, _, iperl) ->
          Name.lower str, (StrSet.add str StrSet.empty, iperl))
       list
   in
@@ -1026,4 +1022,4 @@ let search_first_name_print conf base x =
           pl []
       in
       first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf base x list
+  | _ -> select_first_name conf x list

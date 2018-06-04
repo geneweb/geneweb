@@ -108,7 +108,7 @@ let gen_print conf base mois f_scan dead_people =
         Wserver.printf "<li>\n";
         Wserver.printf "%d\n" j;
         begin let liste =
-          List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
+          List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2)
             tab.(pred j)
         in
           print_anniversary_day conf base dead_people liste
@@ -289,7 +289,7 @@ let print_marriage conf base month =
     match tab.(i-1) with
       [] -> ()
     | l ->
-        let l = List.sort (fun (fam1, y1) (fam2, y2) -> compare y1 y2) l in
+        let l = List.sort (fun (_, y1) (_, y2) -> compare y1 y2) l in
         Wserver.printf "\n";
         html_li conf;
         Wserver.printf "%d\n<ul>" i;
@@ -311,7 +311,7 @@ let print_marriage conf base month =
   Wserver.printf "</ul>\n";
   trailer conf
 
-let print_anniversaries_of_marriage conf base y list =
+let print_anniversaries_of_marriage conf base list =
   Wserver.printf "<ul>\n";
   List.iter
     (fun (fam, year) ->
@@ -350,7 +350,7 @@ let print_marriage_day conf base day_name fphrase wd dt list =
         (transl conf "the anniversary of marriage");
       Wserver.printf "...\n";
       Wserver.printf "</p>\n";
-      print_anniversaries_of_marriage conf base dt.year list
+      print_anniversaries_of_marriage conf base list
 
 let match_dates conf base p d1 d2 =
   if d1.day = d2.day && d1.month = d2.month then authorized_age conf base p
@@ -396,7 +396,7 @@ let gen_print_menu_birth conf base f_scan mode =
   List.iter
     (fun xx ->
        xx :=
-         List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2) !xx)
+         List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2) !xx)
     [list_tod; list_tom; list_aft];
   print_birth_day conf base (transl conf "today")
     (ftransl conf "%s, it is %s of") conf.today_wd conf.today !list_tod;
@@ -475,7 +475,7 @@ let gen_print_menu_dead conf base f_scan mode =
   List.iter
     (fun xx ->
        xx :=
-         List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2) !xx)
+         List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2) !xx)
     [list_tod; list_tom; list_aft];
   print_anniv conf base (transl conf "today") (ftransl conf "%s, it is %s of")
     conf.today_wd conf.today !list_tod;

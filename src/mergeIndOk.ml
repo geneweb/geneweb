@@ -7,7 +7,6 @@ open Futil
 open Gutil
 open Gwdb
 open Hutil
-open Mutil
 open Util
 
 let rec merge_lists l1 =
@@ -34,7 +33,7 @@ let sorp base ip =
   sou base (get_first_name p), sou base (get_surname p), get_occ p,
   Update.Link, ""
 
-let merge_event_witnesses base wit1 wit2 =
+let merge_event_witnesses wit1 wit2 =
   let list =
     List.fold_right
       (fun wit list -> if List.mem wit list then list else wit :: list)
@@ -42,7 +41,7 @@ let merge_event_witnesses base wit1 wit2 =
   in
   Array.of_list list
 
-let merge_events base l1 l2 p =
+let merge_events l1 l2 p =
   let list_mem e l =
     let found_birth = ref false in
     let found_baptism = ref false in
@@ -58,7 +57,7 @@ let merge_events base l1 l2 p =
                  if !found_birth then mem, e1 :: l1
                  else if e.epers_name = e1.epers_name then
                    let witnesses =
-                     merge_event_witnesses base e1.epers_witnesses
+                     merge_event_witnesses e1.epers_witnesses
                        e.epers_witnesses
                    in
                    let e1 =
@@ -72,8 +71,7 @@ let merge_events base l1 l2 p =
                  if !found_baptism then mem, e1 :: l1
                  else if e.epers_name = e1.epers_name then
                    let witnesses =
-                     merge_event_witnesses base e1.epers_witnesses
-                       e.epers_witnesses
+                     merge_event_witnesses e1.epers_witnesses e.epers_witnesses
                    in
                    let e1 =
                      {e1 with epers_date = p.baptism;
@@ -96,8 +94,7 @@ let merge_events base l1 l2 p =
                          true, Adef.codate_None
                    in
                    let witnesses =
-                     merge_event_witnesses base e1.epers_witnesses
-                       e.epers_witnesses
+                     merge_event_witnesses e1.epers_witnesses e.epers_witnesses
                    in
                    let e1 =
                      {e1 with epers_date = date; epers_place = p.death_place;
@@ -114,8 +111,7 @@ let merge_events base l1 l2 p =
                      UnknownBurial -> let _ = found_burial := true in true, l1
                    | Buried cd ->
                        let witnesses =
-                         merge_event_witnesses base e1.epers_witnesses
-                           e.epers_witnesses
+                         merge_event_witnesses e1.epers_witnesses e.epers_witnesses
                        in
                        let e1 =
                          {e1 with epers_date = cd;
@@ -134,8 +130,7 @@ let merge_events base l1 l2 p =
                      UnknownBurial -> let _ = found_burial := true in true, l1
                    | Cremated cd ->
                        let witnesses =
-                         merge_event_witnesses base e1.epers_witnesses
-                           e.epers_witnesses
+                         merge_event_witnesses e1.epers_witnesses e.epers_witnesses
                        in
                        let e1 =
                          {e1 with epers_date = cd;
@@ -176,7 +171,7 @@ let reconstitute conf base p1 p2 =
   in
   let merge_primary_events conv proj p =
     let l1 = List.map conv (proj p1) in
-    let l2 = List.map conv (proj p2) in merge_events base l1 l2 p
+    let l2 = List.map conv (proj p2) in merge_events l1 l2 p
   in
   let p =
     {first_name =
@@ -273,7 +268,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
     List.fold_right
       (fun ipc (p_related, mod_p) ->
          let pc = poi base ipc in
-         let (pc_rparents, mod_pc, p_related, mod_p) =
+         let (pc_rparents, _, p_related, mod_p) =
            List.fold_right
              (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
                 let (r, mod_pc, p_related, mod_p) =
@@ -303,7 +298,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
          in
          let (pc_pevents, mod_pc, p_related, mod_p) =
            List.fold_right
-             (fun e (pc_pevents, mod_pc, p_related, mod_p) ->
+             (fun e (pc_pevents, mod_pc, p_related, _) ->
                 let (e, mod_pc, p_related, mod_p) =
                   let (witnesses, mod_p, p_related) =
                     List.fold_right
@@ -341,7 +336,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                let ifam = (get_family pc).(i) in
                let fam = gen_family_of_family (foi base ifam) in
                let (p_related, mod_p) =
-                 if array_mem ip2 fam.witnesses then
+                 if Array.mem ip2 fam.witnesses then
                    let (p_related, mod_p) =
                      let rec loop (p_related, mod_p) j =
                        if j = Array.length fam.witnesses then p_related, mod_p
@@ -364,7 +359,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                in
                let (pc_fevents, mod_pc, p_related, mod_p) =
                  List.fold_right
-                   (fun e (pc_fevents, mod_pc, p_related, mod_p) ->
+                   (fun e (pc_fevents, _, p_related, mod_p) ->
                       let (e, mod_pc, p_related, mod_p) =
                         let (p_related, mod_p) =
                           let rec loop (p_related, mod_p) j =
@@ -452,7 +447,7 @@ let effective_mod_merge conf base o_p1 o_p2 sp =
       delete_key base (sou base (get_first_name p2))
         (sou base (get_surname p2)) (get_occ p2);
       let warning _ = () in
-      let p2 = UpdateIndOk.effective_del conf base warning p2 in
+      let p2 = UpdateIndOk.effective_del base warning p2 in
       patch_person base p2.key_index p2;
       let u2 = {family = [| |]} in
       patch_union base p2.key_index u2;
@@ -470,7 +465,7 @@ let effective_mod_merge conf base o_p1 o_p2 sp =
       let wl =
         let a = poi base p.key_index in
         let a = {parents = get_parents a; consang = get_consang a} in
-        UpdateIndOk.all_checks_person conf base p a u
+        UpdateIndOk.all_checks_person base p a u
       in
       Util.commit_patches conf base;
       let changed =

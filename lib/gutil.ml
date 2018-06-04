@@ -5,10 +5,6 @@ open Def
 open Gwdb
 open Mutil
 
-let string_sub s i len =
-  let i = min (String.length s) (max 0 i) in
-  let len = min (String.length s - i) (max 0 len) in String.sub s i len
-
 let designation base p =
   let first_name = p_first_name base p in
   let nom = p_surname base p in
@@ -272,7 +268,7 @@ let sort_person_list base pl =
            else c)
     pl
 
-let find_free_occ base f s i =
+let find_free_occ base f s _i =
   let ipl = persons_of_name base (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in

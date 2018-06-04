@@ -116,6 +116,7 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 	    && echo "(* DO NOT EDIT *)" > $@ \
 	    && echo "(* This file was generated from $< *)" >> $@ \
 	    && camlp5o pr_o.cmo $(CAMLP5_OPT) -impl $< >> $@ \
+	    && sed -i -r 's/[(]\* (\[@.+\]) \*[)]/\1/g' $@ \
 	    && echo " Done!")
 
 %.bc %.exe:

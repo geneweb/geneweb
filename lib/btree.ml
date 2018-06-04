@@ -67,7 +67,7 @@ module Make (Ord : OrderedType) =
     let rec key_after f_compare =
       function
         Empty -> raise Not_found
-      | Node (l, v, d, r, _) ->
+      | Node (l, v, _d, r, _) ->
           let c = f_compare v in
           if c < 0 then try key_after f_compare l with Not_found -> v
           else if c > 0 then key_after f_compare r
@@ -75,19 +75,19 @@ module Make (Ord : OrderedType) =
     let rec next x =
       function
         Empty -> raise Not_found
-      | Node (l, v, d, r, _) ->
+      | Node (l, v, _d, r, _) ->
           let c = Ord.compare x v in
           if c < 0 then try next x l with Not_found -> v else next x r
     let rec merge t1 t2 =
       match t1, t2 with
         Empty, t -> t
       | t, Empty -> t
-      | Node (l1, v1, d1, r1, h1), Node (l2, v2, d2, r2, h2) ->
+      | Node (l1, v1, d1, r1, _h1), Node (l2, v2, d2, r2, _h2) ->
           bal l1 v1 d1 (bal (merge r1 l2) v2 d2 r2)
     let rec remove x =
       function
         Empty -> Empty
-      | Node (l, v, d, r, h) ->
+      | Node (l, v, d, r, _h) ->
           let c = Ord.compare x v in
           if c = 0 then merge l r
           else if c < 0 then bal (remove x l) v d r

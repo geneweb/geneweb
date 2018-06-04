@@ -146,9 +146,9 @@ let sunday = 0
 let monday = 1
 let tuesday = 2
 let wednesday = 3
-let thursday = 4
+(* let thursday = 4 *)
 let friday = 5
-let saturday = 6
+(* let saturday = 6 *)
 
 let noon = 18 * halakim_per_hour
 let am3_11_20 = 9 * halakim_per_hour + 204
@@ -226,12 +226,12 @@ let sdn_of_hebrew d =
   let sdn =
     match d.month with
       1 | 2 ->
-        let (metonicCycle, metonicYear, moladDay, moladHalakim, tishri1) =
+        let (_metonicCycle, _metonicYear, _moladDay, _moladHalakim, tishri1) =
           findStartOfYear d.year
         in
         if d.month = 1 then tishri1 + d.day - 1 else tishri1 + d.day + 29
     | 3 ->
-        let (metonicCycle, metonicYear, moladDay, moladHalakim, tishri1) =
+        let (_metonicCycle, metonicYear, moladDay, moladHalakim, tishri1) =
           findStartOfYear d.year
         in
         let moladHalakim =
@@ -246,7 +246,7 @@ let sdn_of_hebrew d =
         if yearLength = 355 || yearLength = 385 then tishri1 + d.day + 59
         else tishri1 + d.day + 58
     | 4 | 5 | 6 ->
-        let (metonicCycle, metonicYear, moladDay, moladHalakim,
+        let (_metonicCycle, _metonicYear, _moladDay, _moladHalakim,
          tishri1After) =
           findStartOfYear (d.year + 1)
         in
@@ -260,7 +260,7 @@ let sdn_of_hebrew d =
           tishri1After + d.day - lengthOfAdarIAndII - 208
         else tishri1After + d.day - lengthOfAdarIAndII - 178
     | _ ->
-        let (metonicCycle, metonicYear, moladDay, moladHalakim,
+        let (_metonicCycle, _metonicYear, _moladDay, _moladHalakim,
          tishri1After) =
           findStartOfYear (d.year + 1)
         in
@@ -373,7 +373,7 @@ let hebrew_of_sdn prec sdn =
                 if day > 0 then year, month, day
                 else
                   let tishri1After = tishri1 in
-                  let (metonicCycle, metonicYear, day, halakim) =
+                  let (_metonicCycle, metonicYear, day, halakim) =
                     findTishriMolad (init_day - 365)
                   in
                   let tishri1 = fTishri1 metonicYear day halakim in
@@ -393,7 +393,7 @@ let hebrew_of_sdn prec sdn =
               if day > 0 then year, month, day
               else
                 let tishri1After = tishri1 in
-                let (metonicCycle, metonicYear, day, halakim) =
+                let (_metonicCycle, metonicYear, day, halakim) =
                   findTishriMolad (init_day - 365)
                 in
                 let tishri1 = fTishri1 metonicYear day halakim in
@@ -542,13 +542,13 @@ let affmoph i date_JJD leap_year first_moon_age_found month_day moon_age
   let fracj = fracj -. float hh /. 24.0 in
   let mm = fracj *. 1440.0 in
   let mm = int_of_float (floor mm +. 0.1) in
-  let (jour, hh) =
+  let hh =
     if hh = 24 then
       let jfin = tabjm.(month-1) in
       let _ = assert (leap_year = is_leap_year year) in
       let jfin = if month = 2 && leap_year then 29 else jfin in
-      if day < jfin then day + 1, 0 else day, hh
-    else day, hh
+      if day < jfin then 0 else hh
+    else hh
   in
   let rec loop month_day moon_age =
     if month_day < day then

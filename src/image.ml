@@ -59,16 +59,16 @@ let print_image_type fname ctype =
 (* ************************************************************************** *)
 let print_image_file fname =
   List.exists
-    (fun (suff, itype, ctype) ->
+    (fun (suff, ctype) ->
        if Filename.check_suffix fname suff ||
           Filename.check_suffix fname (String.uppercase_ascii suff)
        then
          print_image_type fname ctype
        else false)
-    [".png", "png", "image/png"; ".jpg", "jpeg", "image/jpeg";
-     ".jpeg", "jpeg", "image/jpeg"; ".pjpeg", "jpeg", "image/jpeg";
-     ".gif", "gif", "image/gif"; ".pdf", "pdf", "application/pdf";
-     ".htm", "html", "text/html"; ".html", "html", "text/html"]
+    [(".png", "image/png"); (".jpg", "image/jpeg");
+     (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");
+     (".gif", "image/gif"); (".pdf", "application/pdf");
+     (".htm", "text/html"); (".html", "text/html")]
 
 (* ************************************************************************** *)
 (*  [Fonc] print_personal_image : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
@@ -81,7 +81,7 @@ let print_image_file fname =
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
 let print_personal_image conf base p =
-  match Util.image_and_size conf base p (fun x y -> Some (1, 1)) with
+  match Util.image_and_size conf base p (fun _ _ -> Some (1, 1)) with
     Some (true, f, _) ->
       if print_image_file f then () else Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
@@ -119,7 +119,7 @@ let print conf base =
 (* ************************************************************************** *)
 (*  [Fonc] print_html : config -> 'a -> unit                                  *)
 (* ************************************************************************** *)
-let print_html conf base =
+let print_html conf =
   Util.html conf;
   Wserver.printf "<head>\n";
   Wserver.printf "  <title>%s</title>\n"

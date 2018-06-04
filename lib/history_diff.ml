@@ -180,7 +180,7 @@ let record_diff conf base changed =
             end;
             write_history_file conf person_file fname gr
           else write_history_file conf person_file fname gr
-      | U_Delete_family (p, f) -> ()
+      | U_Delete_family (_p, _f) -> ()
       | U_Add_family (p, f) | U_Modify_family (p, _, f) |
         U_Merge_family (p, _, _, f) | U_Add_parent (p, f) ->
           let p_file = history_file p.first_name p.surname p.occ in
@@ -217,7 +217,7 @@ let record_diff conf base changed =
             (Array.to_list (get_children cpl))
       | U_Change_children_name (_, list) ->
           List.iter
-            (fun ((ofn, osn, oocc, oip), (fn, sn, occ, ip)) ->
+            (fun ((ofn, osn, oocc, _oip), (fn, sn, occ, ip)) ->
                let o_person_file = history_file ofn osn oocc in
                let person_file = history_file fn sn occ in
                if o_person_file <> person_file then
@@ -284,15 +284,14 @@ let load_person_history conf fname =
 
 
 (* ************************************************************************ *)
-(*  [Fonc] print_clean : config -> base -> unit                             *)
+(*  [Fonc] print_clean : config -> unit                                     *)
 (** [Description] :
     [Args] :
       - conf : configuration de la base
-      - base : base de donnée
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-let print_clean conf base =
+let print_clean conf =
   match p_getenv conf.env "f" with
     Some f when f <> "" ->
       let title _ =
@@ -351,16 +350,15 @@ let print_clean conf base =
 *)
 
 (* ************************************************************************ *)
-(*  [Fonc] print_clean_ok : config -> base -> unit                          *)
+(*  [Fonc] print_clean_ok : config -> unit                                  *)
 (** [Description] : Ré-écrit le fichier historique lié à une personne en
       ayant supprimé les entrées non désirées.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnée
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-let print_clean_ok conf base =
+let print_clean_ok conf =
   let rec clean_history i history new_history =
     match history with
       [] -> new_history
@@ -731,7 +729,7 @@ let set_vother x = Vother x
 let str_val x = VVstring x
 let bool_val x = VVbool x
 
-let rec eval_var conf base env (bef, aft, p_auth) loc sl =
+let rec eval_var conf base env (bef, aft, p_auth) _loc sl =
   try eval_simple_var conf base env (bef, aft, p_auth) sl with
     Not_found -> eval_compound_var conf base env (bef, aft, p_auth) sl
 and eval_simple_var conf base env (bef, aft, p_auth) =
@@ -739,7 +737,7 @@ and eval_simple_var conf base env (bef, aft, p_auth) =
     [s] -> str_val (eval_simple_str_var conf base env (bef, aft, p_auth) s)
   | _ -> raise Not_found
 and eval_compound_var conf base env (bef, aft, p_auth) sl =
-  let rec loop =
+  let loop =
     function
       [s] -> eval_simple_str_var conf base env (bef, aft, p_auth) s
     | ["evar"; s] ->
@@ -1039,7 +1037,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       else "", ""
   | "spouse" ->
       begin match get_env "fam" env with
-        Vfam (f_bef, f_aft, m_auth) ->
+        Vfam (_f_bef, _f_aft, m_auth) ->
           if m_auth then
             eval_string_env "spouse_bef" env, eval_string_env "spouse_aft" env
           else "", ""
@@ -1312,15 +1310,15 @@ and eval_int_env s env =
     Vint i -> string_of_int i
   | _ -> raise Not_found
 
-let print_foreach conf base print_ast eval_expr =
-  let rec print_foreach env xx loc s sl el al =
+let print_foreach conf base print_ast _eval_expr =
+  let rec print_foreach env xx _loc s sl _el al =
     match s :: sl with
-      ["family"] -> print_foreach_family env xx el al
-    | ["fevent"] -> print_foreach_fevent env xx el al
-    | ["pevent"] -> print_foreach_pevent env xx el al
-    | ["history_line"] -> print_foreach_history_line env xx el al
+      ["family"] -> print_foreach_family env xx al
+    | ["fevent"] -> print_foreach_fevent env xx al
+    | ["pevent"] -> print_foreach_pevent env xx al
+    | ["history_line"] -> print_foreach_history_line env xx al
     | _ -> raise Not_found
-  and print_foreach_family env xx el al =
+  and print_foreach_family env xx al =
     let (bef, aft, p_auth) = xx in
     let rec loop bef_f bef_c aft_f aft_c =
       match bef_f, aft_f with
@@ -1378,7 +1376,7 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env xx) al; loop l1 c1 l2 c2
     in
     loop bef.gen_f bef.gen_c aft.gen_f aft.gen_c
-  and print_foreach_fevent env xx el al =
+  and print_foreach_fevent env xx al =
     let rec loop m_auth bef_fevents aft_fevents =
       match bef_fevents, aft_fevents with
         [], [] -> ()
@@ -1403,8 +1401,8 @@ let print_foreach conf base print_ast eval_expr =
         | None, None -> ()
         end
     | _ -> ()
-  and print_foreach_pevent env xx el al =
-    let (bef, aft, p_auth) = xx in
+  and print_foreach_pevent env xx al =
+    let (bef, aft, _p_auth) = xx in
     let rec loop bef_pevents aft_pevents =
       match bef_pevents, aft_pevents with
         [], [] -> ()
@@ -1419,7 +1417,7 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env xx) al; loop l1 l2
     in
     loop bef.gen_p.pevents aft.gen_p.pevents
-  and print_foreach_history_line env xx el al =
+  and print_foreach_history_line env xx al =
     match get_env "history_file" env with
       Vstring fname ->
         let history = load_person_history conf fname in
@@ -1438,7 +1436,7 @@ let print_foreach conf base print_ast eval_expr =
   in
   print_foreach
 
-let eval_predefined_apply conf env f vl =
+let eval_predefined_apply conf _env f vl =
   let vl =
     List.map
       (function

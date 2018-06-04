@@ -4,7 +4,7 @@
 open Gwdb
 open Config
 
-val string_of_titles : config -> base -> bool -> string -> person -> string
+val string_of_titles : config -> base -> string -> person -> string
 val string_of_marriage_text : config -> base -> family -> string
 val interp_templ : string -> config -> base -> person -> unit
 val interp_templ_with_menu :
@@ -22,18 +22,18 @@ val links_to_ind :
 
 val build_sosa_tree_ht : config -> base -> person -> unit
 val build_sosa_ht : config -> base -> unit
-val get_sosa_person : config -> base -> person -> Sosa.t
+val get_sosa_person : person -> Sosa.t
 val get_single_sosa : config -> base -> person -> Sosa.t
 val print_sosa : config -> base -> person -> bool -> unit
 
 val string_of_num : string -> Sosa.t -> string
 val get_linked_page : config -> base -> person -> string -> string
-val get_birth_text : config -> base -> person -> bool -> string
-val get_baptism_text : config -> base -> person -> bool -> string
-val get_death_text : config -> base -> person -> bool -> string
-val get_burial_text : config -> base -> person -> bool -> string
-val get_cremation_text : config -> base -> person -> bool -> string
-val get_marriage_date_text : config -> base -> family -> bool -> string
+val get_birth_text : config -> person -> bool -> string
+val get_baptism_text : config -> person -> bool -> string
+val get_death_text : config -> person -> bool -> string
+val get_burial_text : config -> person -> bool -> string
+val get_cremation_text : config -> person -> bool -> string
+val get_marriage_date_text : config -> family -> bool -> string
 
 (**)
 

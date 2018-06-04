@@ -26,7 +26,7 @@ type excl =
     mutable who : who W.t;
     mutable max_conn : int * string }
 
-let robot_error conf from cnt sec =
+let robot_error conf cnt sec =
   Wserver.http HttpStatus.Forbidden;
   Wserver.header "Content-type: text/html; charset=iso-8859-1";
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
@@ -193,7 +193,7 @@ let check oc_opt tm from max_call sec conf suicide =
     Some oc -> output_excl oc xcl; close_out oc
   | None -> ()
   end;
-  if refused then robot_error conf from max_call sec;
+  if refused then robot_error conf max_call sec;
   W.fold
     (fun _ w (c, cw, cf, wl) ->
        if w.nbase = conf.bname && w.nbase <> "" then

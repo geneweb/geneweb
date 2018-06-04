@@ -104,7 +104,7 @@ let display_descendants_level conf base max_level ancestor =
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
   Wserver.printf ".\n";
   html_p conf;
-  print_alphab_list conf
+  print_alphab_list
     (fun (p, _) ->
        if is_hidden p then "?"
        else String.sub (p_surname base p) (initial (p_surname base p)) 1)
@@ -185,18 +185,15 @@ let labelled conf base marks max_lev lev ip =
   Array.length (get_family u) <> 0 &&
   (match get_parents a with
      Some ifam ->
-       let fam = foi base ifam in
-       List.exists
-         (fun ifam ->
-            let el = get_children fam in
-            List.exists
-              (fun ie ->
-                 let e = pget conf base ie in
-                 let u = e in
-                 Array.length (get_family u) <> 0 &&
-                 not (close_to_end conf base marks max_lev lev e))
-              (Array.to_list el))
-         (Array.to_list (get_family (pget conf base (get_father fam))))
+     let fam = foi base ifam in
+     let el = get_children fam in
+     List.exists
+       (fun ie ->
+          let e = pget conf base ie in
+          let u = e in
+          Array.length (get_family u) <> 0 &&
+          not (close_to_end conf base marks max_lev lev e))
+       (Array.to_list el)
    | _ -> false)
 
 let label_of_path paths p =
@@ -600,7 +597,7 @@ let display_spouse_index conf base max_level ancestor =
       - Le nombre de colonnes à afficher (nombre d'options sélectionnées).
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
-let print_desc_table_header conf base =
+let print_desc_table_header conf =
   let nb_col = ref 2 in
   Wserver.printf "<tr class=\"descends_table_header\">\n";
   Wserver.printf "<th>\n";
@@ -1054,7 +1051,7 @@ let display_descendant_with_table conf base max_lev p =
   Wserver.printf "<table class=descends_table>\n";
   (* On affiche l'entête et on en profite pour récupèrer *)
   (* le nombre de colonnes à afficher pour les colspans. *)
-  begin let nb_col = print_desc_table_header conf base in
+  begin let nb_col = print_desc_table_header conf in
     loop 0 nb_col true [p, ""] [p, ""]
   end;
   Wserver.printf "</table>\n";
@@ -1262,7 +1259,7 @@ let make_tree_hts conf base gv p =
     List.fold_right
       (fun po gen ->
          match po with
-           Some (p, auth) ->
+           Some (p, _) ->
              if Array.length (get_family p) = 0 then None :: gen
              else
                List.fold_right
@@ -1318,7 +1315,7 @@ let print_tree conf base v p =
          (person_text_no_html conf base p))
   in
   let hts = make_tree_hts conf base gv p in
-  Dag.print_slices_menu_or_dag_page conf base page_title hts ""
+  Dag.print_slices_menu_or_dag_page conf page_title hts ""
 
 let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in

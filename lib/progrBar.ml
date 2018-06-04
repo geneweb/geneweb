@@ -13,9 +13,7 @@ let start () =
   for i = 1 to size do Printf.eprintf "%c" !empty done; Printf.eprintf "\013"
 
 let run cnt max_cnt =
-  let (pb_cnt, draw_rep) =
-    if max_cnt < pb_cnt then size * draw_len, 1 else pb_cnt, draw_rep
-  in
+  let pb_cnt = if max_cnt < pb_cnt then size * draw_len else pb_cnt in
   let already_disp = cnt * size / max_cnt in
   let to_disp = (cnt + 1) * size / max_cnt in
   for i = already_disp + 1 to to_disp do Printf.eprintf "%c" !full done;

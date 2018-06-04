@@ -31,7 +31,7 @@ let fold_place inverted s =
   in
   let (iend, rest) =
     if String.length s > 0 && s.[String.length s - 1] = ')' then
-      match Mutil.rindex s '(' with
+      match String.rindex_opt s '(' with
         Some i when i < String.length s - 2 ->
           let j =
             let rec loop i =
@@ -235,7 +235,7 @@ let print_all_places_surnames_short conf list =
   Wserver.printf "</p>\n";
   Wserver.printf "<p>\n";
   List.iter
-    (fun (s, len, ip) ->
+    (fun (s, len, _) ->
        Wserver.printf "<a href=\"%sm=PS%s;k=%s\">" (commd conf) opt
          (Util.code_varenv s);
        Wserver.printf "%s" s;
