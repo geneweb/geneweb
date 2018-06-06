@@ -5348,7 +5348,7 @@ oc: familha/familhas
 pl: rodzina:a:-ę/rodziny
 pt: família/famílias
 ro: familie/fmalilii
-ru: семья:a:-ю:g:-и/семьи
+ru: семья:a:--ю:g:--и/семьи
 sk: rodina:a:-u/rodiny
 sl: družina/družine
 sv: familj/familjer
