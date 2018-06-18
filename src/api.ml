@@ -468,31 +468,6 @@ let print_last_modified_persons conf base =
 
 (**/**) (* API_LAST_VISITED_PERSONS *)
 
-let delete_outdated_base_file conf file =
-  let bdir =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  let fname = Filename.concat bdir file in
-  let fname_cmd = Filename.concat bdir "command.txt" in
-  match
-    try (Some (open_in (Util.base_path [] fname_cmd)),
-         Some (open_in (Util.base_path [] fname)))
-    with Sys_error _ -> (None, None)
-  with
-  | (Some ic_cmd, Some ic_fname) ->
-      let fd_cmd = Unix.descr_of_in_channel ic_cmd in
-      let stats_cmd = Unix.fstat fd_cmd in
-      let fd_fname = Unix.descr_of_in_channel ic_fname in
-      let stats_fname = Unix.fstat fd_fname in
-      close_in ic_cmd;
-      close_in ic_fname;
-      if stats_fname.Unix.st_mtime < stats_cmd.Unix.st_mtime then
-        try Sys.remove fname with Sys_error _ -> ()
-      else ()
-  | _ -> ()
-;;
-
 (* ************************************************************************ *)
 (*  [Fonc] print_last_visited_persons : config -> base -> persons list      *)
 (** [Description] : Retourne la liste des dernières personnes visités
@@ -1291,86 +1266,6 @@ let print_all_full_person conf base =
   Util.html conf ;
   Wserver.printf "Gagné !!!";
 ;;
-
-
-(**/**) (* Indexation g3 *)
-
-(*
-$idgeneweb, $lastname, $firstname, $genewebkey, $numerososa, $lieu, $sex, $occu, $birthdate, $mardate, $deathdate,  $idpere, $idmere, $idconjoint, $nbenfants, $privatestatus, $tailledesnotes, $sourcestxt
-Pour sourcestxt cela peut être soit exporter les sources dans le fichier.
-
-Soit mieux de renvoyer un indice:
-$sourcestxt =
-
- if($src =~ m/gedcom|gw\d?.geneanet|base geneanet|roglo|pierfit/i) {
-             return 0;
- } elsif($src =~ m/faire[ _-]part|microfilm|photocopie|archive|registre|notariat|tabelion|BMS|NMD|tat[ _]civil|R\.P\.|^RP[ _]|E\.C\.|^EC[ _]|^AD[A-Z]( |$)|A\.D\.|A\.M\.|Burgerlijke|archief|Bevolkingsregister|table[ _]d|recensement|insinuations|Arch Dep|AD(|_| )\d|(^|_| )A[MD][ _]|(^|_)A_D_|mairie|communale|archev.ch.|(img|image|vue|vue[ _]p)(|_| )\d|\b[NMDBS][ _]\d|\bacte[ _]de|\bacte[ _]N|^actes?[ _]|^acte$|sallevirtuelle/oi || length($src) > 500) {
-          return 3;
- } elsif($src =~ m/arbre de/) {
-           return 0;
- } elsif($src =~ m/\w\w/) {
-           return 1;
- }
- *)
-
-
-let print_index_g3 base =
-  let fname = "/tmp/index_g3" in
-  match try Some (open_out fname) with Sys_error _ -> None with
-  | Some oc ->
-      for i = 0 to nb_of_persons base - 1 do
-        let ip = Adef.iper_of_int i in
-        let p = poi base ip in
-        let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-        let key =
-          Name.lower gen_p.first_name ^ "." ^
-            string_of_int gen_p.occ ^ " " ^ Name.lower gen_p.surname
-        in
-        Printf.fprintf oc "%s," key;
-        Printf.fprintf oc " %s, %s," gen_p.first_name gen_p.surname;
-        Printf.fprintf oc " %s," (if gen_p.sex = Male then "M" else if gen_p.sex = Female then "F" else "?");
-        Printf.fprintf oc " %s," gen_p.occupation;
-        let nb_child =
-          List.fold_left
-            (fun n ifam ->
-              n + Array.length (get_children (foi base ifam)))
-            0 (Array.to_list (get_family p))
-        in
-        Printf.fprintf oc " %d," nb_child;
-        Printf.fprintf oc " %s" "date naissance ou bapteme";
-        Printf.fprintf oc " %s" (if gen_p.birth_place <> "" then gen_p.birth_place else gen_p.baptism_place);
-        Printf.fprintf oc " %s" "date décès ou inhumation";
-        Printf.fprintf oc " %s" (if gen_p.death_place <> "" then gen_p.death_place else gen_p.burial_place);
-        (* en cas de multi mariage ? *)
-        Printf.fprintf oc " %s" "date mariage";
-        Printf.fprintf oc " %s" "lieu de mariage";
-        Printf.fprintf oc " %s;" "spouse";
-        let (father, mother) =
-          match get_parents p with
-          | Some ifam ->
-              let cpl = foi base ifam in
-              let father = poi base (get_father cpl) in
-              let mother = poi base (get_mother cpl) in
-              let key_father =
-                Name.lower (sou base (get_first_name father)) ^ "." ^
-                  string_of_int (get_occ father) ^ " " ^ Name.lower (sou base (get_surname father))
-              in
-              let key_mother =
-                Name.lower (sou base (get_first_name mother)) ^ "." ^
-                  string_of_int (get_occ mother) ^ " " ^ Name.lower (sou base (get_surname mother))
-              in
-              (key_father, key_mother)
-          | None -> ("", "")
-        in
-        Printf.fprintf oc " %s, %s," father mother;
-        Printf.fprintf oc " %d" (String.length (gen_p.notes));
-        Printf.fprintf oc " %s" "indice sources";
-      done;
-      close_out oc;
-  | None -> ()
-;;
-
-
 
 
 (**/**) (* Version app *)

@@ -772,20 +772,16 @@ let send_file env b tok fname =
               <h1 align=center>Gwtp...</h1>\n\
               <pre>\n";
       flush stdout;
-      begin match
-        Lock.control lockf false
-          (fun () ->
-             make_temp env b;
-             printf "\nTemporary database created.\n";
+      Lock.control lockf false
+        ~onerror:(fun () ->
+            printf "Database is already being transferred.<br>\n";
+            printf "Please try again later.\n")
+        (fun () ->
+           make_temp env b;
+           printf "\nTemporary database created.\n";
              flush stdout;
-             copy_temp b;
-             printf "Database \"%s\" updated.\n" b)
-      with
-        Some x -> x
-      | None ->
-          printf "Database is already being transferred.<br>\n";
-          printf "Please try again later.\n"
-      end;
+           copy_temp b;
+           printf "Database \"%s\" updated.\n" b);
       flush stdout;
       printf "</pre>\n";
       printf_link_to_main env b tok;

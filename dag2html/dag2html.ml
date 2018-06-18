@@ -239,25 +239,22 @@ let html_table_struct indi_txt vbar_txt phony d t =
                       if phony t.table.(k).(l).elem then TDnothing else s
                     in
                     if l = j && next_l = next_j then
-                      let les = (1, LeftA, TDnothing) :: les in
-                      let s = ph (TDbar None) in
-                      let les = (colspan, CenterA, s) :: les in
-                      let les = (1, LeftA, TDnothing) :: les in les
+                      (1, LeftA, TDnothing)
+                      :: (colspan, CenterA, ph (TDbar None))
+                      :: (1, LeftA, TDnothing)
+                      :: les
                     else if l = j then
-                      let les = (1, LeftA, TDnothing) :: les in
-                      let s = ph (TDhr RightA) in
-                      let les = (colspan, RightA, s) :: les in
-                      let s = ph (TDhr CenterA) in
-                      let les = (1, LeftA, s) :: les in les
+                      (1, LeftA, ph (TDhr CenterA))
+                      :: (colspan, RightA, ph (TDhr RightA))
+                      :: (1, LeftA, TDnothing)
+                      :: les
                     else if next_l = next_j then
-                      let s = ph (TDhr CenterA) in
-                      let les = (1, LeftA, s) :: les in
-                      let s = ph (TDhr LeftA) in
-                      let les = (colspan, LeftA, s) :: les in
-                      let les = (1, LeftA, TDnothing) :: les in les
+                      (1, LeftA, TDnothing)
+                      :: (colspan, LeftA, ph (TDhr LeftA))
+                      :: (1, LeftA, ph (TDhr CenterA))
+                      :: les
                     else
-                      let s = ph (TDhr CenterA) in
-                      (colspan + 2, LeftA, s) :: les
+                      (colspan + 2, LeftA, ph (TDhr CenterA)) :: les
               in
               loop1 les next_l
           in
@@ -281,14 +278,11 @@ let html_table_struct indi_txt vbar_txt phony d t =
                 alone_bar_txt i :: hbars_txt i i :: hts
               else hts
             in
-            let hts =
-              if exist_several_branches i (i + 1) &&
-                 (i < Array.length t.table - 2 || not (all_empty (i + 1)))
-              then
-                vbars_txt (i + 1) (i + 1) :: hbars_txt i (i + 1) :: hts
-              else hts
-            in
-            hts
+            if exist_several_branches i (i + 1) &&
+               (i < Array.length t.table - 2 || not (all_empty (i + 1)))
+            then
+              vbars_txt (i + 1) (i + 1) :: hbars_txt i (i + 1) :: hts
+            else hts
           else hts
         in
         loop hts (i + 1)
@@ -1397,7 +1391,8 @@ let table_of_dag phony no_optim invert no_group d =
   let t = tablify phony no_optim no_group d in
   let t = if invert then invert_table t else t in
   let _ = fall t in
-  let t = fall2_right t in
-  let t = fall2_left t in
-  let t = shorten_too_long t in
-  let t = top_adjust t in let t = bottom_adjust t in t
+  fall2_right t
+  |> fall2_left
+  |> shorten_too_long
+  |> top_adjust
+  |> bottom_adjust

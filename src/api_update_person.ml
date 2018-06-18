@@ -393,10 +393,7 @@ let reconstitute_person conf base mod_p =
         {(r) with r_fath = fath; r_moth = moth})
       rparents
   in
-  let p = {(p) with rparents = rparents_gw; pevents = pevents_gw } in
-  p
-;;
-
+  {(p) with rparents = rparents_gw; pevents = pevents_gw }
 
 (**/**)
 
@@ -1050,32 +1047,25 @@ let reconstitute_person_nobase conf mod_p =
     | _ -> death
   in
   *)
-  let p =
-    {first_name = first_name; surname = surname; occ = occ; image = image;
-     first_names_aliases = first_names_aliases;
-     surnames_aliases = surnames_aliases; public_name = public_name;
-     qualifiers = qualifiers; aliases = aliases; titles = titles;
-     rparents = rparents; occupation = occupation; related = [];
-     sex = sex; access = access; birth = birth;
-     birth_place = birth_place; birth_note = birth_note; birth_src = birth_src;
-     baptism = baptism; baptism_place = baptism_place;
-     baptism_note = baptism_note; baptism_src = baptism_src; death = death;
-     death_place = death_place; death_note = death_note;
-     death_src = death_src; burial = burial; burial_place = burial_place;
-     burial_note = burial_note; burial_src = burial_src; notes = notes;
-     pevents = pevents;
-     psources = psources; key_index = Adef.iper_of_int key_index}
-  in
-  (* On vérifie s'il y a des conflits de personne. *)
-  (* Normalement, il ne doit plus y avoir de lever *)
-  (* de conflits par les autres modules : update,  *)
-  (* updateIndOk et updateFamOk.                   *)
-  (*
-  let _err = Api_update_util.check_person_conflict conf base p in
-  *)
-  p
-;;
-
+  {first_name = first_name; surname = surname; occ = occ; image = image;
+   first_names_aliases = first_names_aliases;
+   surnames_aliases = surnames_aliases; public_name = public_name;
+   qualifiers = qualifiers; aliases = aliases; titles = titles;
+   rparents = rparents; occupation = occupation; related = [];
+   sex = sex; access = access; birth = birth;
+   birth_place = birth_place; birth_note = birth_note; birth_src = birth_src;
+   baptism = baptism; baptism_place = baptism_place;
+   baptism_note = baptism_note; baptism_src = baptism_src; death = death;
+   death_place = death_place; death_note = death_note;
+   death_src = death_src; burial = burial; burial_place = burial_place;
+   burial_note = burial_note; burial_src = burial_src; notes = notes;
+   pevents = pevents;
+   psources = psources; key_index = Adef.iper_of_int key_index}
+(* On vérifie s'il y a des conflits de personne. *)
+(* Normalement, il ne doit plus y avoir de lever *)
+(* de conflits par les autres modules : update,  *)
+(* updateIndOk et updateFamOk.                   *)
+(* Api_update_util.check_person_conflict conf base p *)
 
 let print_add_nobase conf mod_p =
   try

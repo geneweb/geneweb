@@ -62,15 +62,12 @@ let neighbourgs base ifam =
       Some ifam -> ifam :: ifaml
     | None -> ifaml
   in
-  let ifaml =
-    List.fold_left
-      (fun ifaml ip ->
-         let u = poi base ip in
-         List.fold_left (fun ifaml ifam -> ifam :: ifaml) ifaml
-           (Array.to_list (get_family u)))
-      ifaml (Array.to_list (get_children fam))
-  in
-  ifaml
+  List.fold_left
+    (fun ifaml ip ->
+       let u = poi base ip in
+       List.fold_left (fun ifaml ifam -> ifam :: ifaml) ifaml
+         (Array.to_list (get_family u)))
+    ifaml (Array.to_list (get_children fam))
 
 let utf8_designation base p =
   let first_name = p_first_name base p in
@@ -186,12 +183,9 @@ let speclist =
 let main () =
   Arg.parse speclist (fun s -> bname := s) usage;
   if !ask_for_delete > 0 then
-    match
-      Lock.control (Mutil.lock_file !bname) false
-        (fun () -> move (Gwdb.open_base !bname))
-    with
-      Some () -> ()
-    | None -> Printf.eprintf "Base locked. Try again.\n"; flush stdout
+    Lock.control (Mutil.lock_file !bname) false
+      (fun () -> move (Gwdb.open_base !bname))
+      ~onerror:Lock.print_try_again
   else move (Gwdb.open_base !bname)
 
 let _ = main ()

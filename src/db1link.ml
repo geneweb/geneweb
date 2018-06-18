@@ -1126,11 +1126,8 @@ let persons_record_access gen per_index_ic per_ic persons =
        key_index = Adef.iper_of_int i}
     in
     (* Si on a trouvé des évènements, on mets à jour *)
-    let p =
-      if p.pevents <> [] then update_person_with_pevents p
-      else update_pevents_with_person p
-    in
-    p
+    if p.pevents <> [] then update_person_with_pevents p
+    else update_pevents_with_person p
   in
   let get_fun i =
     try Hashtbl.find gen.g_patch_p i with
@@ -1148,7 +1145,7 @@ let families_record_access fam_index_ic fam_ic len =
   let get_fun i =
     seek_in fam_index_ic (Iovalue.sizeof_long * i);
     let pos = input_binary_int fam_index_ic in
-    seek_in fam_ic pos; let fam : family = input_item_value fam_ic in fam
+    seek_in fam_ic pos; (input_item_value fam_ic : family)
   in
   {load_array = (fun () -> ()); get = get_fun;
    set = (fun _ _ -> failwith "bug: setting family array");

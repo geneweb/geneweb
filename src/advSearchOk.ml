@@ -440,14 +440,11 @@ let searching_fields conf =
         search ^ sep ^ transl_nth conf event_name sex
       else search
     in
-    let search =
-      (* The place and date have to be shown after each event only for the AND request. *)
-      if search_type <> "OR" then
-        get_place_date_request place_prefix_field_name date_prefix_field_name
-          search
-      else search
-    in
-    search
+    (* The place and date have to be shown after each event only for the AND request. *)
+    if search_type <> "OR" then
+      get_place_date_request place_prefix_field_name date_prefix_field_name
+        search
+    else search
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
@@ -530,11 +527,8 @@ let searching_fields conf =
       else search
     else search
   in
-  let search =
-    let sep = if search <> "" then "," else "" in
-    string_field "occu" (search ^ sep)
-  in
-  search
+  let sep = if search <> "" then "," else "" in
+  string_field "occu" (search ^ sep)
 
 let print conf base =
   let title _ =

@@ -53,26 +53,10 @@ let main () =
   let gcc = Gc.get () in
   gcc.Gc.max_overhead <- 100;
   Gc.set gcc;
-  match
-    Lock.control (Mutil.lock_file !bname) false
-      (fun () ->
-         if !everybody then private_everybody !bname
-         else private_some !bname !ind)
-  with
-    Some x -> x
-  | None ->
-      eprintf "Base is locked. Waiting... ";
-      flush stderr;
-      match
-        Lock.control (Mutil.lock_file !bname) true
-          (fun () ->
-             eprintf "Ok\n";
-             flush stderr;
-             if !everybody then private_everybody !bname
-             else private_some !bname !ind)
-      with
-        Some x -> x
-      | None ->
-          printf "\nSorry. Impossible to lock base.\n"; flush stdout; exit 2
+  Lock.control_retry (Mutil.lock_file !bname)
+    ~onerror:Lock.print_error_and_exit
+    (fun () ->
+       if !everybody then private_everybody !bname
+       else private_some !bname !ind)
 
 let _ = main ()

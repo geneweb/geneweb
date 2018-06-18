@@ -1,44 +1,43 @@
 (* $Id: lock.ml,v 5.2 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-type ('a, 'b) choice =
-    Left of 'a
-  | Right of 'b
-
 let no_lock_flag = ref false
 
-let control lname wait f =
-  if !no_lock_flag then Some (f ())
-  else if Sys.unix then
-    match
-      try Some (Unix.openfile lname [Unix.O_RDWR; Unix.O_CREAT] 0o666) with
-        Unix.Unix_error (_, _, _) -> None
-    with
-      Some fd ->
-        (try Unix.chmod lname 0o666 with _ -> ());
-        let r =
-          try
-            if wait then Unix.lockf fd Unix.F_LOCK 0
-            else Unix.lockf fd Unix.F_TLOCK 0;
-            Left fd
-          with e -> Right e
-        in
-        begin match r with
-          Left fd ->
-            let r = try f () with e -> Unix.close fd; raise e in
-            Unix.close fd; Some r
-        | Right (Unix.Unix_error (_, _, _)) -> Unix.close fd; None
-        | Right exc -> Unix.close fd; raise exc
-        end
-    | None -> None
+let print_error_and_exit () =
+  Printf.printf "\nSorry. Impossible to lock base.\n";
+  flush stdout;
+  exit 2
+
+let print_try_again () =
+  Printf.eprintf "Base locked. Try again.\n";
+  flush stdout
+
+let control ~onerror lname wait f =
+  if !no_lock_flag then f ()
   else
-    let r =
-      try Left (Unix.openfile lname [Unix.O_RDWR; Unix.O_CREAT] 0o666) with
-        e -> Right e
-    in
-    match r with
-      Left fd ->
-        let r = try f () with e -> Unix.close fd; raise e in
-        Unix.close fd; Some r
-    | Right (Unix.Unix_error (_, _, _)) -> None
-    | Right exc -> raise exc
+    try
+      let fd = Unix.openfile lname [Unix.O_RDWR; Unix.O_CREAT] 0o666 in
+      (try Unix.chmod lname 0o666 with _ -> ()) ;
+      (try
+         if Sys.unix
+         then if wait
+           then Unix.lockf fd Unix.F_LOCK 0
+           else Unix.lockf fd Unix.F_TLOCK 0 ;
+         let r = f () in Unix.close fd ; r
+       with e -> Unix.close fd ; raise e)
+    with
+    | Unix.Unix_error _ -> onerror ()
+    | e -> raise e
+
+let control_retry ~onerror lname f =
+  control lname false
+    ~onerror:(fun () ->
+        Printf.eprintf "Base is locked. Waiting... ";
+        flush stderr;
+        control lname true ~onerror
+          (fun () ->
+             Printf.eprintf "Ok\n";
+             flush stderr;
+             f ()))
+    f
+

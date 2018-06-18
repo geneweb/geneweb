@@ -314,16 +314,13 @@ let format_stats_dmy l title series =
       (Array.to_list data)
   in
   let labels = List.map Int32.of_int labels in
-  let stats =
-    Mstats.Stat.({
+  Mstats.Stat.({
       title = title;
       labels = labels;
       series = series;
       series_string = [];
       datas = datas;
     })
-  in
-  stats
 
 let filter_gte_1600_and_create_ht l =
   let l = filter_gte_1600 l in
@@ -395,16 +392,13 @@ let format_stats_day l title =
     [`serie_day_1; `serie_day_2; `serie_day_3; `serie_day_4;
      `serie_day_5; `serie_day_6; `serie_day_7;]
   in
-  let stats =
-    Mstats.Stat.({
+  Mstats.Stat.({
       title = title;
       labels = labels;
       series = series;
       series_string = [];
       datas = datas;
     })
-  in
-  stats
 
 let format_stats_month l title =
   let l, ht = filter_gte_1600_and_create_ht l in
@@ -809,18 +803,13 @@ let format_stats_moon l title =
     [`serie_moon_new; `serie_moon_first_quarter; `serie_moon_full;
      `serie_moon_last_quarter ]
   in
-  let stats =
-    Mstats.Stat.({
+  Mstats.Stat.({
       title = title;
       labels = [Int32.zero];
       series = series;
       series_string = [];
       datas = datas;
     })
-  in
-  stats
-
-
 
 let print_ind_stats conf base =
   let params =

@@ -231,10 +231,7 @@ let check bname =
 
 let main () =
   let bname = Sys.argv.(1) in
-  match
-    Lock.control (Mutil.lock_file bname) false (fun () -> check bname)
-  with
-    Some x -> x
-  | None -> eprintf "Cannot lock database. Try again.\n"; flush stderr
+  Lock.control (Mutil.lock_file bname) false (fun () -> check bname)
+    ~onerror:Lock.print_try_again
 
 let _ = main ()

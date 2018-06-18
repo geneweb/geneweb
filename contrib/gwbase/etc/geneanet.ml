@@ -58,28 +58,22 @@ let min_or_max_date f a base p =
       Some (Dgreg (d, _)) -> f d.year a
     | _ -> a
   in
-  let a =
-    List.fold_left
-      (fun a ifam ->
-         let fam = foi base ifam in
-         let a =
-           match Adef.od_of_codate (get_marriage fam) with
+  List.fold_left
+    (fun a ifam ->
+       let fam = foi base ifam in
+       let a =
+         match Adef.od_of_codate (get_marriage fam) with
+           Some (Dgreg (d, _)) -> f d.year a
+         | _ -> a
+       in
+       match get_divorce fam with
+         Divorced cod ->
+         begin match Adef.od_of_codate cod with
              Some (Dgreg (d, _)) -> f d.year a
            | _ -> a
-         in
-         let a =
-           match get_divorce fam with
-             Divorced cod ->
-               begin match Adef.od_of_codate cod with
-                 Some (Dgreg (d, _)) -> f d.year a
-               | _ -> a
-               end
-           | _ -> a
-         in
-         a)
-      a (Array.to_list (get_family p))
-  in
-  a
+         end
+       | _ -> a)
+    a (Array.to_list (get_family p))
 
 let region_of_person base p =
   match main_title base (get_titles p) with

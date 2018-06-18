@@ -71,32 +71,29 @@ let partial_short_dates_text conf birth_date death_date p =
 let short_dates_text conf base p =
   if authorized_age conf base p then
     let (birth_date, death_date, _) = Date.get_birth_death_date p in
-    let s =
-      match (birth_date, death_date) with
-      | (Some (Dgreg (b, _)), Some (Dgreg (d, _))) ->
-          short_prec_year_text conf b ^ "-" ^ short_prec_year_text conf d
-      | (Some (Dgreg (b, _)), None) ->
-          (* La personne peut être décédée mais ne pas avoir de date. *)
-          (match get_death p with
-          | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-              short_prec_year_text conf b ^ "-"
-          | _ -> short_prec_year_text conf b )
-      | (None, Some (Dgreg (d, _))) ->
-          (match get_death p with
-          | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-              Date.death_symbol conf ^ short_prec_year_text conf d
-          | _ -> "" )
-      | (None, None) ->
-          (* La personne peut être décédée mais ne pas avoir de date. *)
-          (match get_death p with
-          | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-              Date.death_symbol conf
-          | _ -> "" )
-      (* On ne peut pas traiter les dates au format texte, mais on *)
-      (* affiche tout de même les dates au format Dgreg.           *)
-      | (_, _) -> partial_short_dates_text conf birth_date death_date p
-    in
-    s
+    match (birth_date, death_date) with
+    | (Some (Dgreg (b, _)), Some (Dgreg (d, _))) ->
+      short_prec_year_text conf b ^ "-" ^ short_prec_year_text conf d
+    | (Some (Dgreg (b, _)), None) ->
+      (* La personne peut être décédée mais ne pas avoir de date. *)
+      (match get_death p with
+       | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
+         short_prec_year_text conf b ^ "-"
+       | _ -> short_prec_year_text conf b )
+    | (None, Some (Dgreg (d, _))) ->
+      (match get_death p with
+       | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
+         Date.death_symbol conf ^ short_prec_year_text conf d
+       | _ -> "" )
+    | (None, None) ->
+      (* La personne peut être décédée mais ne pas avoir de date. *)
+      (match get_death p with
+       | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
+         Date.death_symbol conf
+       | _ -> "" )
+    (* On ne peut pas traiter les dates au format texte, mais on *)
+    (* affiche tout de même les dates au format Dgreg.           *)
+    | (_, _) -> partial_short_dates_text conf birth_date death_date p
   else ""
 
 let code_french_date conf d m y =
@@ -120,11 +117,8 @@ let encode_dmy conf d m y is_long =
       else date ^ " " ^ transl_nth conf date_keyword (m - 1)
     else date
   in
-  let date =
-    if date = "" then string_of_int y
-    else date ^ " " ^ string_of_int y
-  in
-  date
+  if date = "" then string_of_int y
+  else date ^ " " ^ string_of_int y
 
 let string_of_dmy conf d is_long =
   let sy = encode_dmy conf d.day d.month d.year is_long in
@@ -777,8 +771,7 @@ let fam_to_piqi_family_link conf base ifath imoth sp ifam fam fam_link spouse_to
         in
         Api_wiki.syntax_links conf wi s
       in
-      let s = string_with_macros conf [] s in
-      s
+      string_with_macros conf [] s
     else ""
   in
   let children =
@@ -1050,8 +1043,7 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
         in
         Api_wiki.syntax_links conf wi s
       in
-      let s = string_with_macros conf [] s in
-      s
+      string_with_macros conf [] s
     else ""
   in
   let children =
@@ -1204,14 +1196,9 @@ let get_rparents_piqi base conf base_prefix gen_p has_relations pers_to_piqi_cal
               p :: rl
           | None -> rl
         in
-        let rl =
-          match rp.r_moth with
-          | Some ip ->
-              let p = to_relation_person conf base ip in
-              p :: rl
-          | None -> rl
-        in
-        rl)
+        match rp.r_moth with
+        | Some ip -> to_relation_person conf base ip :: rl
+        | None -> rl)
       [] gen_p.rparents
   else []
 
@@ -1473,8 +1460,7 @@ let fill_sources conf base p p_auth gen_p is_main_person =
       in
       Api_wiki.syntax_links conf wi s
     in
-    let s = string_with_macros conf env s in
-    s
+    string_with_macros conf env s
     else ""
 
 let fill_parents conf base p base_prefix =
@@ -2259,49 +2245,48 @@ let is_private_person conf base ip =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let print_from_identifier_person conf base print_result_from_ip identifier_person =
-  try
-  let result =
   match identifier_person.Mread.Identifier_person.index with
+  | exception _ -> print_error conf `not_found
   | Some index ->
-      (* Traite l'index *)
-      let ip = Adef.iper_of_int (Int32.to_int index) in
-      if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-      print_result_from_ip conf base ip
+    (* Traite l'index *)
+    let ip = Adef.iper_of_int (Int32.to_int index) in
+    if identifier_person.Mread.Identifier_person.track_visit = Some true
+    then record_visited conf ip;
+    print_result_from_ip conf base ip
   | None ->
     match (identifier_person.Mread.Identifier_person.oc) with
     | (Some oc) ->
-      let result =
-      (
-      match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n) with
-      | (Some fn, Some sn) ->
-        (* Retourne une personne en fonction de son npoc *)
-          (
+      begin
+        match ( identifier_person.Mread.Identifier_person.p
+              , identifier_person.Mread.Identifier_person.n) with
+        | (Some fn, Some sn) ->
+          (* Retourne une personne en fonction de son npoc *)
+          begin
             match Gwdb.person_of_key base fn sn (Int32.to_int oc) with
             | Some ip ->
               if is_private_person conf base ip
               then
                 print_error conf `not_found
               else
-              (
-                if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-                print_result_from_ip conf base ip
-              )
+                (if identifier_person.Mread.Identifier_person.track_visit
+                    = Some true
+                 then record_visited conf ip;
+                 print_result_from_ip conf base ip)
             | None ->
               print_error conf `not_found
-          )
-      | _ -> print_error conf `bad_request
-      )
-      in result
+          end
+        | _ -> print_error conf `bad_request
+        end
     | None ->
-    (* Fait une recherche par mots-clé *)
-    let (fn, sn) = (
-      match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n) with
-      | (Some fn, Some sn) -> (fn, sn)
-      | (None, Some sn) -> ("", sn)
-      | (Some fn, None) -> (fn, "")
-      | _ -> print_error conf `bad_request; ("", "")
-    ) in
-    let result =
+      (* Fait une recherche par mots-clé *)
+      let (fn, sn) =
+        match ( identifier_person.Mread.Identifier_person.p
+              , identifier_person.Mread.Identifier_person.n) with
+        | (Some fn, Some sn) -> (fn, sn)
+        | (None, Some sn) -> ("", sn)
+        | (Some fn, None) -> (fn, "")
+        | _ -> print_error conf `bad_request; ("", "")
+      in
       let (an, order) =
         if fn = "" then
           (sn, [ Sosa; Key; Surname; ApproxKey; PartialKey ])
@@ -2309,17 +2294,12 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
           (fn, [ FirstName ])
         else
           (fn ^ " " ^ sn, [ Key; ApproxKey; PartialKey ])
-      in (
-      match search_index conf base an order with
+      in match search_index conf base an order with
       | Some ip ->
-        if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+        if identifier_person.Mread.Identifier_person.track_visit = Some true
+        then record_visited conf ip;
         print_result_from_ip conf base ip
       | None -> print_error conf `not_found
-    ) in
-    result
-  in
-  result
-  with _ -> print_error conf `not_found
 
 (* ********************************************************************* *)
 (*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
@@ -3080,34 +3060,31 @@ let build_graph_desc_v2 conf base p max_gen =
                                          let family_link =
                                            Perso_link.get_families_of_parents baseprefix ifath imoth
                                          in
-                                         let children_link =
-                                           List.fold_left
-                                             (fun accu fam_link ->
-                                               List.fold_left
-                                                 (fun accu c_link ->
+                                         List.fold_left
+                                           (fun accu fam_link ->
+                                              List.fold_left
+                                                (fun accu c_link ->
                                                    let baseprefix = c_link.MLink.Person_link.baseprefix in
                                                    let ip_c =
                                                      Adef.iper_of_int (Int32.to_int c_link.MLink.Person_link.ip)
                                                    in
                                                    match Perso_link.get_person_link baseprefix ip_c with
                                                    | Some c_link ->
-                                                       let (c, _) = Perso_link.make_ep_link base c_link in
-                                                       let c_factor =
-                                                         try
-                                                           let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
-                                                           Hashtbl.replace ht (baseprefix, get_key_index c) i;
-                                                           i
-                                                         with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
-                                                       in
-                                                       nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
-                                                       edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
-                                                       edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
-                                                       (baseprefix, c, gen + 1) :: accu
+                                                     let (c, _) = Perso_link.make_ep_link base c_link in
+                                                     let c_factor =
+                                                       try
+                                                         let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
+                                                         Hashtbl.replace ht (baseprefix, get_key_index c) i;
+                                                         i
+                                                       with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
+                                                     in
+                                                     nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
+                                                     edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
+                                                     edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
+                                                     (baseprefix, c, gen + 1) :: accu
                                                    | None -> accu)
-                                                 accu fam_link.MLink.Family.children)
-                                             accu family_link
-                                         in
-                                         children_link
+                                                accu fam_link.MLink.Family.children)
+                                           accu family_link
                                        end
                                      else accu
                                  | None -> accu)
@@ -4077,34 +4054,31 @@ let build_graph_desc_full conf base p max_gen =
                                          in
                                          create_family_link (ifath, imoth) ifam fam families;
                                          *)
-                                         let children_link =
-                                           List.fold_left
-                                             (fun accu fam_link ->
-                                               List.fold_left
-                                                 (fun accu c_link ->
+                                         List.fold_left
+                                           (fun accu fam_link ->
+                                              List.fold_left
+                                                (fun accu c_link ->
                                                    let baseprefix = c_link.MLink.Person_link.baseprefix in
                                                    let ip_c =
                                                      Adef.iper_of_int (Int32.to_int c_link.MLink.Person_link.ip)
                                                    in
                                                    match Perso_link.get_person_link baseprefix ip_c with
                                                    | Some c_link ->
-                                                       let (c, _) = Perso_link.make_ep_link base c_link in
-                                                       let c_factor =
-                                                         try
-                                                           let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
-                                                           Hashtbl.replace ht (baseprefix, get_key_index c) i;
-                                                           i
-                                                         with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
-                                                       in
-                                                       nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
-                                                       edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
-                                                       edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
-                                                       (baseprefix, c, gen + 1) :: accu
+                                                     let (c, _) = Perso_link.make_ep_link base c_link in
+                                                     let c_factor =
+                                                       try
+                                                         let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
+                                                         Hashtbl.replace ht (baseprefix, get_key_index c) i;
+                                                         i
+                                                       with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
+                                                     in
+                                                     nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
+                                                     edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
+                                                     edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
+                                                     (baseprefix, c, gen + 1) :: accu
                                                    | None -> accu)
-                                                 accu fam_link.MLink.Family.children)
-                                             accu family_link
-                                         in
-                                         children_link
+                                                accu fam_link.MLink.Family.children)
+                                           accu family_link
                                        end
                                      else accu
                                  | None -> accu)

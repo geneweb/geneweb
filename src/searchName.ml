@@ -92,33 +92,27 @@ let try_find_with_one_first_name conf base n =
         Some.persons_of_fsname conf base base_strings_of_surname
           (spi_find (persons_of_surname base)) get_surname sn
       in
-      let pl =
-        List.fold_left
-          (fun pl (_, _, ipl) ->
-             List.fold_left
-               (fun pl ip ->
-                  let p = pget conf base ip in
-                  let fn1 =
-                    Name.abbrev (Name.lower (sou base (get_first_name p)))
-                  in
-                  if List.mem fn (cut_words fn1) then p :: pl else pl)
-               pl ipl)
-          [] list
-      in
-      pl
+      List.fold_left
+        (fun pl (_, _, ipl) ->
+           List.fold_left
+             (fun pl ip ->
+                let p = pget conf base ip in
+                let fn1 =
+                  Name.abbrev (Name.lower (sou base (get_first_name p)))
+                in
+                if List.mem fn (cut_words fn1) then p :: pl else pl)
+             pl ipl)
+        [] list
   | None -> []
 
 let compact_list base xl =
   let pl = sort_person_list base xl in
-  let pl =
-    List.fold_right
-      (fun p pl ->
-         match pl with
-           p1 :: _ when get_key_index p = get_key_index p1 -> pl
-         | _ -> p :: pl)
-      pl []
-  in
-  pl
+  List.fold_right
+    (fun p pl ->
+       match pl with
+         p1 :: _ when get_key_index p = get_key_index p1 -> pl
+       | _ -> p :: pl)
+    pl []
 
 let name_with_roman_number str =
   let rec loop found len i =

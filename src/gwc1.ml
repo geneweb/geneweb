@@ -142,24 +142,23 @@ let main () =
         flush stdout;
         exit 2
       end;
-    match
-      Lock.control (Mutil.lock_file !out_file) false
-        (fun () ->
-           let bdir =
-             if Filename.check_suffix !out_file ".gwb" then !out_file
-             else !out_file ^ ".gwb"
-           in
-           let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-           if Db1link.link next_family_fun bdir then ()
-           else
-             begin
-               eprintf "*** database not created\n";
-               flush stderr;
-               exit 2
-             end)
-    with
-      Some x -> x
-    | None -> printf "Base is locked: cannot write it\n"; flush stdout; exit 2
+    Lock.control
+      (Mutil.lock_file !out_file)
+      false
+      ~onerror:Lock.print_error_and_exit
+      (fun () ->
+         let bdir =
+           if Filename.check_suffix !out_file ".gwb" then !out_file
+           else !out_file ^ ".gwb"
+         in
+         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
+         if Db1link.link next_family_fun bdir then ()
+         else
+           begin
+             eprintf "*** database not created\n";
+             flush stderr;
+             exit 2
+           end)
 
 let print_exc =
   function

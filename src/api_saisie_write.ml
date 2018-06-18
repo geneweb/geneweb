@@ -1158,9 +1158,7 @@ let compute_modification_status conf base ip ifam resp =
       p = fn;
     }
   in
-  let data = Mext_write.gen_modification_status response in
-  data
-
+  Mext_write.gen_modification_status response 
 
 (**/**) (* Fonctions d'ajout de la première personne. *)
 

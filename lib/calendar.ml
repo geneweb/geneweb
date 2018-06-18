@@ -185,11 +185,8 @@ let fTishri1 metonicYear moladDay moladHalakim =
       let dow = if dow = 7 then 0 else dow in tishri1, dow
     else tishri1, dow
   in
-  let tishri1 =
-    if dow = wednesday || dow = friday || dow = sunday then tishri1 + 1
-    else tishri1
-  in
-  tishri1
+  if dow = wednesday || dow = friday || dow = sunday then tishri1 + 1
+  else tishri1
 
 let moladOfMetonicCycle metonicCycle =
   let r1 = new_moon_of_creation in
