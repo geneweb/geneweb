@@ -270,10 +270,7 @@ let init_sosa_t conf base sosa_ref =
   let () =
     Hashtbl.add sosa_ht (get_key_index sosa_ref) (Some (Sosa.one, sosa_ref))
   in
-  let t_sosa =
-    {tstab = tstab; mark = mark; last_zil = last_zil; sosa_ht = sosa_ht}
-  in
-  t_sosa
+  {tstab = tstab; mark = mark; last_zil = last_zil; sosa_ht = sosa_ht}
 
 let find_sosa_aux conf base a p t_sosa =
   let cache = ref [] in
@@ -1276,16 +1273,13 @@ let get_date_place conf base auth_for_all_anc p =
       let pl = if pl <> "" then pl else sou base (get_baptism_place p) in
       let pl = if pl <> "" then pl else sou base (get_death_place p) in
       let pl = if pl <> "" then pl else sou base (get_burial_place p) in
-      let pl =
-        if pl <> "" then pl
-        else
-          List.fold_left
-            (fun pl ifam ->
-               if pl <> "" then pl
-               else sou base (get_marriage_place (foi base ifam)))
-            pl (Array.to_list (get_family p))
-      in
-      pl
+      if pl <> "" then pl
+      else
+        List.fold_left
+          (fun pl ifam ->
+             if pl <> "" then pl
+             else sou base (get_marriage_place (foi base ifam)))
+          pl (Array.to_list (get_family p))
     in
     (d1, d2, pl), auth_for_all_anc
   else (None, None, ""), false
@@ -5769,11 +5763,8 @@ let print_foreach conf base print_ast eval_expr =
         let srcl =
           insert (transl_nth conf "death" 0) (sou base (get_death_src p)) srcl
         in
-        let srcl =
-          insert (transl_nth conf "burial" 0) (sou base (get_burial_src p))
-            srcl
-        in
-        srcl
+        insert (transl_nth conf "burial" 0) (sou base (get_burial_src p))
+          srcl
       else []
     in
     (* Affiche les sources et met à jour les variables "first" et "last". *)

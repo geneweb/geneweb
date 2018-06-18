@@ -89,39 +89,26 @@ let set_wizard_and_friend_traces conf =
       let fname = adm_file (conf.bname ^ "_f.txt") in
       update_wf_trace conf fname
 
-let incr_welcome_counter conf =
+let incr_counter f conf =
   let lname = cnt conf ".lck" in
-  match
-    Lock.control lname true
-      (fun () ->
-         let r = count conf in
-         r.welcome_cnt <- r.welcome_cnt + 1;
-         if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
-         else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
-         else r.normal_cnt <- r.normal_cnt + 1;
-         write_counter conf r;
-         set_wizard_and_friend_traces conf;
-         Some (r.welcome_cnt, r.request_cnt, r.start_date))
-  with
-    Some x -> x
-  | None -> None
+  Lock.control lname true
+    ~onerror:(fun () -> None)
+    (fun () ->
+       let r = count conf in
+       f r ;
+       if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
+       else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
+       else r.normal_cnt <- r.normal_cnt + 1;
+       write_counter conf r;
+       set_wizard_and_friend_traces conf;
+       Some (r.welcome_cnt, r.request_cnt, r.start_date))
 
-let incr_request_counter conf =
-  let lname = cnt conf ".lck" in
-  match
-    Lock.control lname true
-      (fun () ->
-         let r = count conf in
-         r.request_cnt <- r.request_cnt + 1;
-         if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
-         else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
-         else r.normal_cnt <- r.normal_cnt + 1;
-         write_counter conf r;
-         set_wizard_and_friend_traces conf;
-         Some (r.welcome_cnt, r.request_cnt, r.start_date))
-  with
-    Some x -> x
-  | None -> None
+
+let incr_welcome_counter =
+  incr_counter (fun r -> r.welcome_cnt <- r.welcome_cnt + 1)
+
+let incr_request_counter =
+  incr_counter (fun r -> r.request_cnt <- r.request_cnt + 1)
 
 let lang_file_name conf fname =
   let fname1 =

@@ -1048,13 +1048,10 @@ module Make (Select : Select) =
             list
         else list
       in
-      let list =
-        List.fold_right
-          (fun p list ->
-             List.fold_right (concat_isolated p) (get_related p) list)
-          (Array.to_list m.m_chil) list
-      in
-      list
+      List.fold_right
+        (fun p list ->
+           List.fold_right (concat_isolated p) (get_related p) list)
+        (Array.to_list m.m_chil) list
     let get_persons_with_relations base m list =
       let fath = m.m_fath in
       let moth = m.m_moth in
@@ -1354,12 +1351,9 @@ module Make (Select : Select) =
                 find_ancestors base surn fath list
               else list
             in
-            let list =
-              if eq_istr (get_surname moth) surn then
-                find_ancestors base surn moth list
-              else list
-            in
-            list
+            if eq_istr (get_surname moth) surn then
+              find_ancestors base surn moth list
+            else list
       | None -> p :: list
     let mark_branch base mark surn p =
       let rec loop top p =
@@ -1433,14 +1427,11 @@ module Make (Select : Select) =
           | _ -> len
         in
         let children = get_children fam in
-        let len =
-          Array.fold_left
-            (fun len ip ->
-               Array.fold_left (test_action loop) len
-                 (get_family (poi base ip)))
-            len children
-        in
-        len
+        Array.fold_left
+          (fun len ip ->
+             Array.fold_left (test_action loop) len
+               (get_family (poi base ip)))
+          len children
       in
       loop len ifam
     let mark_one_connex_component base mark ifam =

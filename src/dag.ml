@@ -831,49 +831,46 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
         let txt =
           string_of_item conf base (elem_txt p) ^ image_txt conf base p
         in
-        let txt =
-          let spouses =
-            if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
-              List.fold_left
-                (fun list id ->
-                   match d.dag.(int_of_idag id).valu with
-                     Left cip ->
-                       begin match get_parents (pget conf base cip) with
-                         Some ifam ->
-                           let cpl = foi base ifam in
-                           if ip = get_father cpl then
-                             if List.mem_assoc (get_mother cpl) list then list
-                             else (get_mother cpl, Some ifam) :: list
-                           else if ip = get_mother cpl then
-                             if List.mem_assoc (get_father cpl) list then list
-                             else (get_father cpl, Some ifam) :: list
-                           else list
-                       | None -> list
-                       end
-                   | Right _ -> list)
-                [] n.chil
-            else if n.chil = [] then
-              try [List.assq ip spl] with Not_found -> []
-            else []
-          in
-          List.fold_left
-            (fun txt (ips, ifamo) ->
-               if Pset.mem ips set then txt
-               else
-                 let ps = pget conf base ips in
-                 let d =
-                   match ifamo with
-                     Some ifam ->
-                       Date.short_marriage_date_text conf base (foi base ifam)
-                         p ps
-                   | None -> ""
-                 in
-                 txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^
-                 string_of_item conf base (elem_txt ps) ^
-                 image_txt conf base ps)
-            txt spouses
+        let spouses =
+          if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
+            List.fold_left
+              (fun list id ->
+                 match d.dag.(int_of_idag id).valu with
+                   Left cip ->
+                   begin match get_parents (pget conf base cip) with
+                       Some ifam ->
+                       let cpl = foi base ifam in
+                       if ip = get_father cpl then
+                         if List.mem_assoc (get_mother cpl) list then list
+                         else (get_mother cpl, Some ifam) :: list
+                       else if ip = get_mother cpl then
+                         if List.mem_assoc (get_father cpl) list then list
+                         else (get_father cpl, Some ifam) :: list
+                       else list
+                     | None -> list
+                   end
+                 | Right _ -> list)
+              [] n.chil
+          else if n.chil = [] then
+            try [List.assq ip spl] with Not_found -> []
+          else []
         in
-        txt
+        List.fold_left
+          (fun txt (ips, ifamo) ->
+             if Pset.mem ips set then txt
+             else
+               let ps = pget conf base ips in
+               let d =
+                 match ifamo with
+                   Some ifam ->
+                   Date.short_marriage_date_text conf base (foi base ifam)
+                     p ps
+                 | None -> ""
+               in
+               txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^
+               string_of_item conf base (elem_txt ps) ^
+               image_txt conf base ps)
+          txt spouses
     | Right _ -> "&nbsp;"
   in
   let indi_txt n =

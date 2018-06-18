@@ -1,8 +1,3 @@
-
-
-(* !!! C'est écrit en camlp5 pour "profiter" de la définition de lock. *)
-
-
 open Config
 open Def
 open Gwdb
@@ -141,42 +136,39 @@ let get_list_from_cache conf base s max_res mode =
     | `place -> Filename.concat bfile "cache_place"
     | `source -> Filename.concat bfile "cache_src"
   in
-  match
-    Lock.control cache_file false
-      (fun () ->
-         let stats = Unix.stat cache_file in
-         let last_mod = conf.ctime -. stats.Unix.st_mtime in
-         if stats.Unix.st_size = 0 || last_mod > 3600. then
-           print_cache base mode cache_file;
-         match
-           try Some (Secure.open_in_bin cache_file) with Sys_error _ -> None
-         with
-           Some ic ->
-             let cache =
-               try Some (Marshal.from_channel ic) with
-                 End_of_file | Failure _ -> None
+  Lock.control cache_file false
+    ~onerror:(fun () -> [])
+    (fun () ->
+       let stats = Unix.stat cache_file in
+       let last_mod = conf.ctime -. stats.Unix.st_mtime in
+       if stats.Unix.st_size = 0 || last_mod > 3600. then
+         print_cache base mode cache_file;
+       match
+         try Some (Secure.open_in_bin cache_file) with Sys_error _ -> None
+       with
+         Some ic ->
+         let cache =
+           try Some (Marshal.from_channel ic) with
+             End_of_file | Failure _ -> None
+         in
+         close_in ic;
+         let ini = Mutil.tr '_' ' ' s in
+         (* optim : on sait que la liste est triée. *)
+         let rec loop list accu nb_res =
+           match list with
+             [] -> accu
+           | name :: l ->
+             let k = Mutil.tr '_' ' ' name in
+             let (accu, nb_res) =
+               if string_start_with (Name.lower ini) (Name.lower k) then
+                 name :: accu, nb_res + 1
+               else accu, nb_res
              in
-             close_in ic;
-             let ini = Mutil.tr '_' ' ' s in
-             (* optim : on sait que la liste est triée. *)
-             let rec loop list accu nb_res =
-               match list with
-                 [] -> accu
-               | name :: l ->
-                   let k = Mutil.tr '_' ' ' name in
-                   let (accu, nb_res) =
-                     if string_start_with (Name.lower ini) (Name.lower k) then
-                       name :: accu, nb_res + 1
-                     else accu, nb_res
-                   in
-                   if nb_res < max_res then loop l accu nb_res
-                   else List.rev accu
-             in
-             begin match cache with
-               Some (Cache_string list) -> loop list [] 0
-             | _ -> []
-             end
-         | None -> [])
-  with
-    Some x -> x
-  | None -> []
+             if nb_res < max_res then loop l accu nb_res
+             else List.rev accu
+         in
+         begin match cache with
+             Some (Cache_string list) -> loop list [] 0
+           | _ -> []
+         end
+       | None -> [])

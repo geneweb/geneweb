@@ -125,9 +125,8 @@ let get_links conf base redis ip include_not_validated =
   | [] -> []
   | l ->
       (* on récupère les liens associées *)
-      let list = List.map (findLinksBySourcenameAndBridge redis conf.bname) l in
-      let list = filter_string list in
-      list
+    List.map (findLinksBySourcenameAndBridge redis conf.bname) l
+    |> filter_string
 
 
 (**/**) (* CURL. *)

@@ -81,17 +81,14 @@ let make_record_access ic array_pos patches len name =
   r
 
 let input_patches bname =
-  let patches =
-    match
-      try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
-    with
-      Some ic -> let p = input_value ic in close_in ic; p
-    | None ->
-        {p_person = ref []; p_ascend = ref []; p_union = ref [];
-         p_family = ref []; p_couple = ref []; p_descend = ref [];
-         p_string = ref []; p_name = ref []}
-  in
-  patches
+  match
+    try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
+  with
+    Some ic -> let p = input_value ic in close_in ic; p
+  | None ->
+    {p_person = ref []; p_ascend = ref []; p_union = ref [];
+     p_family = ref []; p_couple = ref []; p_descend = ref [];
+     p_string = ref []; p_name = ref []}
 
 let input bname =
   let bname =

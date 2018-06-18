@@ -298,20 +298,17 @@ let print_renamed conf new_n =
       Hutil.trailer conf
 
 let log_redirect from request req =
-  match
-    Lock.control (Srcfile.adm_file "gwd.lck") true
-      (fun () ->
-         Log.with_log
-           (fun oc ->
-              let referer = Wserver.extract_param "referer: " '\n' request in
-              let tm = Unix.localtime (Unix.time ()) in
-              fprintf_date oc tm;
-              fprintf oc " %s\n" req;
-              fprintf oc "  From: %s\n" from;
-              fprintf oc "  Referer: %s\n" referer))
-  with
-    Some x -> x
-  | None -> ()
+  Lock.control (Srcfile.adm_file "gwd.lck") true
+    ~onerror:(fun () -> ())
+    (fun () ->
+       Log.with_log
+         (fun oc ->
+            let referer = Wserver.extract_param "referer: " '\n' request in
+            let tm = Unix.localtime (Unix.time ()) in
+            fprintf_date oc tm;
+            fprintf oc " %s\n" req;
+            fprintf oc "  From: %s\n" from;
+            fprintf oc "  Referer: %s\n" referer))
 
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf.request in
@@ -568,16 +565,13 @@ let set_actlog list =
   | None -> ()
 
 let get_token check_from utm from_addr base_password =
-  match
-    Lock.control (Srcfile.adm_file "gwd.lck") true
-      (fun () ->
-         let (list, r, changed) =
-           get_actlog check_from utm from_addr base_password
-         in
-         if changed then set_actlog list; r)
-  with
-    Some x -> x
-  | None -> ATnormal
+  Lock.control (Srcfile.adm_file "gwd.lck") true
+    ~onerror:(fun () -> ATnormal)
+    (fun () ->
+       let (list, r, changed) =
+         get_actlog check_from utm from_addr base_password
+       in
+       if changed then set_actlog list; r)
 
 let mkpasswd () =
   let rec loop len =
@@ -593,33 +587,30 @@ let random_self_init () =
   Random.init seed
 
 let set_token utm from_addr base_file acc user =
-  match
-    Lock.control (Srcfile.adm_file "gwd.lck") true
-      (fun () ->
-         random_self_init ();
-         let (list, _, _) = get_actlog false utm "" "" in
-         let (x, xx) =
-           let base = base_file ^ "_" in
-           let rec loop ntimes =
-             if ntimes = 0 then failwith "set_token"
-             else
-               let x = mkpasswd () in
-               let xx = base ^ x in
-               if List.exists
-                    (fun (tok, _) ->
-                       compatible_tokens false tok (from_addr, xx))
-                    list
-               then
-                 loop (ntimes - 1)
-               else x, xx
-           in
-           loop 50
+  Lock.control (Srcfile.adm_file "gwd.lck") true
+    ~onerror:(fun () -> "")
+    (fun () ->
+       random_self_init ();
+       let (list, _, _) = get_actlog false utm "" "" in
+       let (x, xx) =
+         let base = base_file ^ "_" in
+         let rec loop ntimes =
+           if ntimes = 0 then failwith "set_token"
+           else
+             let x = mkpasswd () in
+             let xx = base ^ x in
+             if List.exists
+                 (fun (tok, _) ->
+                    compatible_tokens false tok (from_addr, xx))
+                 list
+             then
+               loop (ntimes - 1)
+             else x, xx
          in
-         let list = ((from_addr, xx), (utm, acc, user)) :: list in
-         set_actlog list; x)
-  with
-    Some x -> x
-  | None -> ""
+         loop 50
+       in
+       let list = ((from_addr, xx), (utm, acc, user)) :: list in
+       set_actlog list; x)
 
 let index_not_name s =
   let rec loop i =
@@ -1315,38 +1306,31 @@ let log_and_robot_check conf auth from request script_name contents =
          let tm = Unix.time () in
          log oc tm conf from auth request script_name contents)
   else
-    match
-      Lock.control (Srcfile.adm_file "gwd.lck") true
-        (fun () ->
-           Log.with_log_opt
-             (fun oc_opt ->
-                let tm = Unix.time () in
-                begin match !robot_xcl with
-                  Some (cnt, sec) ->
-                    let s = "suicide" in
-                    let suicide = Util.p_getenv conf.env s <> None in
-                    conf.n_connect <-
-                      Some (Robot.check oc_opt tm from cnt sec conf suicide)
-                | _ -> ()
-                end;
-                match oc_opt with
-                  Some oc ->
-                    log oc tm conf from auth request script_name contents
-                | None -> ()))
-    with
-      Some x -> x
-    | None -> ()
-
-let is_robot from =
-  match
+    ignore @@
     Lock.control (Srcfile.adm_file "gwd.lck") true
       (fun () ->
-         let (robxcl, _) = Robot.robot_excl () in
-         try let _ = List.assoc from robxcl.Robot.excl in true with
-           Not_found -> false)
-  with
-    Some x -> x
-  | None -> false
+         Log.with_log_opt
+           (fun oc_opt ->
+              let tm = Unix.time () in
+              begin match !robot_xcl with
+                  Some (cnt, sec) ->
+                  let s = "suicide" in
+                  let suicide = Util.p_getenv conf.env s <> None in
+                  conf.n_connect <-
+                    Some (Robot.check oc_opt tm from cnt sec conf suicide)
+                | _ -> ()
+              end;
+              match oc_opt with
+                Some oc ->
+                log oc tm conf from auth request script_name contents
+              | None -> ()))
+
+let is_robot from =
+  Lock.control (Srcfile.adm_file "gwd.lck") true
+    ~onerror:(fun () -> false)
+    (fun () ->
+       let (robxcl, _) = Robot.robot_excl () in
+       List.mem_assoc from robxcl.Robot.excl)
 
 let auth_err request auth_file =
   if auth_file = "" then false, ""
@@ -1420,16 +1404,12 @@ let conf_and_connection from request script_name contents env =
           if is_robot from then Robot.robot_error conf 0 0
           else
             let tm = Unix.time () in
-            begin match
-              Lock.control (Srcfile.adm_file "gwd.lck") true
-                (fun () ->
-                   Log.with_log
-                     (fun oc ->
-                        log_passwd_failed ar oc tm from request conf.bname))
-            with
-              Some x -> x
-            | None -> ()
-            end;
+            Lock.control (Srcfile.adm_file "gwd.lck") true
+              ~onerror:(fun () -> ())
+              (fun () ->
+                 Log.with_log
+                   (fun oc ->
+                      log_passwd_failed ar oc tm from request conf.bname)) ;
             unauth_server conf ar
       | _ ->
           if mode = Some "API_ADD_FIRST_FAM" then

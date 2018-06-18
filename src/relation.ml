@@ -293,19 +293,16 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
                  (Array.to_list (get_children (foi base fam))) children)
           (Array.to_list (get_family (pget conf base (get_father fam)))) []
       in
-      let result =
-        result @
-        List.fold_right
-          (fun fam children ->
-             if ifam = fam then children
-             else if mark_fam.(Adef.int_of_ifam fam) then children
-             else
-               List.fold_right
-                 (fun child children -> (child, HalfSibling, fam) :: children)
-                 (Array.to_list (get_children (foi base fam))) children)
-          (Array.to_list (get_family (pget conf base (get_mother fam)))) []
-      in
-      result
+      result @
+      List.fold_right
+        (fun fam children ->
+           if ifam = fam then children
+           else if mark_fam.(Adef.int_of_ifam fam) then children
+           else
+             List.fold_right
+               (fun child children -> (child, HalfSibling, fam) :: children)
+               (Array.to_list (get_children (foi base fam))) children)
+        (Array.to_list (get_family (pget conf base (get_mother fam)))) []
   in
   let neighbours iper =
     let result =
@@ -322,13 +319,10 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
              nb)
         (Array.to_list (get_family (pget conf base iper))) []
     in
-    let result =
-      result @
-      (match get_parents (pget conf base iper) with
-         Some ifam -> parse_fam ifam
-       | _ -> [])
-    in
-    result
+    result @
+    (match get_parents (pget conf base iper) with
+       Some ifam -> parse_fam ifam
+     | _ -> [])
   in
   let rec make_path path vertex =
     match List.hd path with

@@ -3236,16 +3236,12 @@ let main () =
     Gc.compact ();
     let arrays = make_subarrays arrays in flush !log_oc; make_gwsyntax arrays
   in
-  begin match Lock.control (Mutil.lock_file !out_file) false
-                (fun () ->
-                   let next_family_fun = next_family_fun_templ gw_syntax !in_file in
-                   if Db2link.link next_family_fun bdir then ()
-                   else
-                     begin eprintf "*** database not created\n"; flush stderr; exit 2 end)
-    with
-    | Some x -> x
-    | None -> printf "Base is locked: cannot write it\n"; flush stdout; exit 2
-  end;
+  Lock.control (Mutil.lock_file !out_file) false
+    (fun () ->
+       let next_family_fun = next_family_fun_templ gw_syntax !in_file in
+       if Db2link.link next_family_fun bdir then ()
+       else (eprintf "*** database not created\n"; flush stderr; exit 2))
+    ~onerror:Lock.print_error_and_exit;
   (*
       finish_base base arrays;
   *)

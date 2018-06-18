@@ -799,15 +799,11 @@ let gen_person_text_without_surname check_acc (p_first_name, _p_surname) conf
   then
     "x x"
   else
-    let s =
-      match sou base (get_public_name p), get_qualifiers p with
-        n, nn :: _ when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
-      | n, [] when n <> "" -> n
-      | _, nn :: _ -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-      | _, [] -> p_first_name base p
-    in
-    s
-
+    match sou base (get_public_name p), get_qualifiers p with
+      n, nn :: _ when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
+    | n, [] when n <> "" -> n
+    | _, nn :: _ -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
+    | _, [] -> p_first_name base p
 
 let person_text = gen_person_text std_access
 let person_text_no_html = gen_person_text_no_html std_access
@@ -1777,7 +1773,7 @@ let place_of_string conf place =
                 [] ->
                   let other = String.concat ", " (x :: list_p) in
                   let other = place.other ^ " " ^ other in
-                  let place = {place with other = other} in place
+                  {place with other = other}
               | t :: list ->
                   let place =
                     match t with
@@ -2536,53 +2532,50 @@ let create_topological_sort conf base =
   | Some "no_tstab" -> Array.make (nb_of_persons base) 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
-      match
-        Lock.control (Mutil.lock_file bfile) false
-          (fun () ->
-             let tstab_file =
-               if conf.use_restrict && not conf.wizard && not conf.friend then
-                 Filename.concat bfile "tstab_visitor"
-               else Filename.concat bfile "tstab"
-             in
-             let r =
-               match
-                 try Some (Secure.open_in_bin tstab_file) with
-                   Sys_error _ -> None
-               with
-                 Some ic ->
-                   let r =
-                     try Some (Marshal.from_channel ic) with
-                       End_of_file | Failure _ -> None
-                   in
-                   close_in ic; r
-               | None -> None
-             in
-             match r with
-               Some tstab -> tstab
-             | None ->
-                 let () = load_ascends_array base in
-                 let () = load_couples_array base in
-                 let tstab = Consang.topological_sort base (pget conf) in
-                 if conf.use_restrict && not conf.wizard && not conf.friend
-                 then
-                   base_visible_write base;
-                 begin match
-                   begin try Some (Secure.open_out_bin tstab_file) with
+      Lock.control (Mutil.lock_file bfile) false
+        ~onerror:(fun () ->
+            let () = load_ascends_array base in
+            let () = load_couples_array base in
+            Consang.topological_sort base (pget conf) )
+        (fun () ->
+           let tstab_file =
+             if conf.use_restrict && not conf.wizard && not conf.friend then
+               Filename.concat bfile "tstab_visitor"
+             else Filename.concat bfile "tstab"
+           in
+           let r =
+             match
+               try Some (Secure.open_in_bin tstab_file) with
+                 Sys_error _ -> None
+             with
+               Some ic ->
+               let r =
+                 try Some (Marshal.from_channel ic) with
+                   End_of_file | Failure _ -> None
+               in
+               close_in ic; r
+             | None -> None
+           in
+           match r with
+             Some tstab -> tstab
+           | None ->
+             let () = load_ascends_array base in
+             let () = load_couples_array base in
+             let tstab = Consang.topological_sort base (pget conf) in
+             if conf.use_restrict && not conf.wizard && not conf.friend
+             then
+               base_visible_write base;
+             begin match
+                 begin try Some (Secure.open_out_bin tstab_file) with
                      Sys_error _ -> None
-                   end
-                 with
-                   Some oc ->
-                     Marshal.to_channel oc tstab [Marshal.No_sharing];
-                     close_out oc
-                 | None -> ()
-                 end;
-                 tstab)
-      with
-        Some x -> x
-      | None ->
-          let () = load_ascends_array base in
-          let () = load_couples_array base in
-          Consang.topological_sort base (pget conf)
+                 end
+               with
+                 Some oc ->
+                 Marshal.to_channel oc tstab [Marshal.No_sharing];
+                 close_out oc
+               | None -> ()
+             end;
+             tstab)
 
 let branch_of_sosa conf base ip n =
   if Sosa.eq n Sosa.zero then invalid_arg "branch_of_sosa";
@@ -3472,13 +3465,9 @@ let display_options conf =
       Some i -> s ^ ";bd=" ^ i
     | None -> s
   in
-  let s =
-    match p_getenv conf.env "color" with
-      Some c -> s ^ ";color=" ^ c
-    | None -> s
-  in
-  s
-
+  match p_getenv conf.env "color" with
+    Some c -> s ^ ";color=" ^ c
+  | None -> s
 
 (* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)
 (* On en profite aussi pour stocker la date de la dernière visite.          *)

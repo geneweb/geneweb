@@ -1282,30 +1282,27 @@ let make_tree_hts conf base gv p =
          | None -> None :: gen)
       gen []
   in
-  let hts =
-    let tdal =
-      let rec loop tdal prev_gen gen v =
-        let tdal =
-          if prev_gen <> [] then
-            children_vertical_bars v gen :: horizontal_bars v prev_gen ::
-            spouses_vertical_bar (v + 1) prev_gen :: tdal
-          else tdal
-        in
-        let tdal =
-          let tdl = List.fold_left (person_txt v) [] gen in
-          Array.of_list (List.rev tdl) :: tdal
-        in
-        let tdal =
-          let tdl = List.fold_left (spouses_txt v) [] gen in
-          Array.of_list (List.rev tdl) :: tdal
-        in
-        if v > 1 then loop tdal gen (next_gen gen) (v - 1) else tdal
+  let tdal =
+    let rec loop tdal prev_gen gen v =
+      let tdal =
+        if prev_gen <> [] then
+          children_vertical_bars v gen :: horizontal_bars v prev_gen ::
+          spouses_vertical_bar (v + 1) prev_gen :: tdal
+        else tdal
       in
-      loop [] [] [Some (p, true)] (gv + 1)
+      let tdal =
+        let tdl = List.fold_left (person_txt v) [] gen in
+        Array.of_list (List.rev tdl) :: tdal
+      in
+      let tdal =
+        let tdl = List.fold_left (spouses_txt v) [] gen in
+        Array.of_list (List.rev tdl) :: tdal
+      in
+      if v > 1 then loop tdal gen (next_gen gen) (v - 1) else tdal
     in
-    Array.of_list (List.rev tdal)
+    loop [] [] [Some (p, true)] (gv + 1)
   in
-  hts
+  Array.of_list (List.rev tdal)
 
 let print_tree conf base v p =
   let gv = min (limit_by_tree conf) v in

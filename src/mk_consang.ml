@@ -469,29 +469,19 @@ let main () =
       exit 2
     end;
   Secure.set_base_dir (Filename.dirname !fname);
-  let f () =
-    let base = Gwdb.open_base !fname in
-    try
-      Sys.catch_break true;
-      let carray = ConsangAll.compute base !tlim !scratch !quiet in
-      simple_output !fname base carray
-    with Consang.TopologicalSortError p ->
-      printf "\nError: loop in database, %s is his/her own ancestor.\n"
-        (designation base p);
-      flush stdout;
-      exit 2
-  in
-  match Lock.control (Mutil.lock_file !fname) false (fun () -> f ()) with
-    Some x -> x
-  | None ->
-      eprintf "Base is locked. Waiting... ";
-      flush stderr;
-      match
-        Lock.control (Mutil.lock_file !fname) true
-          (fun () -> eprintf "Ok\n"; flush stderr; f ())
-      with
-        Some x -> x
-      | None ->
-          printf "\nSorry. Impossible to lock base.\n"; flush stdout; exit 2
+  Lock.control_retry
+    (Mutil.lock_file !fname)
+    ~onerror:Lock.print_error_and_exit
+    (fun () ->
+       let base = Gwdb.open_base !fname in
+       try
+         Sys.catch_break true;
+         let carray = ConsangAll.compute base !tlim !scratch !quiet in
+         simple_output !fname base carray
+       with Consang.TopologicalSortError p ->
+         printf "\nError: loop in database, %s is his/her own ancestor.\n"
+           (designation base p);
+         flush stdout;
+         exit 2)
 
 let _ = Printexc.print main ()

@@ -22,32 +22,12 @@ let main () =
   let gcc = Gc.get () in
   gcc.Gc.max_overhead <- 100;
   Gc.set gcc;
-  match
-    Lock.control (Mutil.lock_file !bname) false
-      (fun () ->
-         if !everybody then Gwaccess.access_everybody Def.Private !bname
-         else if !list_ind = "" then
-           Gwaccess.access_some Def.Private !bname !ind
-         else Gwaccess.access_some_list Def.Private !bname !list_ind)
-  with
-    Some x -> x
-  | None ->
-      Printf.eprintf "Base is locked. Waiting... ";
-      flush stderr;
-      match
-        Lock.control (Mutil.lock_file !bname) true
-          (fun () ->
-             Printf.eprintf "Ok\n";
-             flush stderr;
-             if !everybody then Gwaccess.access_everybody Def.Private !bname
-             else if !list_ind = "" then
-               Gwaccess.access_some Def.Private !bname !ind
-             else Gwaccess.access_some_list Def.Private !bname !list_ind)
-      with
-        Some x -> x
-      | None ->
-          Printf.printf "\nSorry. Impossible to lock base.\n";
-          flush stdout;
-          exit 2
+  Lock.control_retry (Mutil.lock_file !bname)
+    ~onerror:Lock.print_error_and_exit
+    (fun () ->
+       if !everybody then Gwaccess.access_everybody Def.Private !bname
+       else if !list_ind = "" then
+         Gwaccess.access_some Def.Private !bname !ind
+       else Gwaccess.access_some_list Def.Private !bname !list_ind)
 
 let _ = main ()

@@ -53,12 +53,9 @@ let gen_good_dates base p birth_lim death_lim =
   in
   if death_ok then true
   else
-    let birth_ok =
-      match Adef.od_of_codate (get_birth p) with
-        Some (Dgreg (d, _)) -> d.year <= birth_lim
-      | _ -> false
-    in
-    birth_ok
+    match Adef.od_of_codate (get_birth p) with
+      Some (Dgreg (d, _)) -> d.year <= birth_lim
+    | _ -> false
 
 let good_dates base p =
   if gen_good_dates base p 1830 1900 then true

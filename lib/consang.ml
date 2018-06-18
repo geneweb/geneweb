@@ -116,10 +116,7 @@ let topological_sort base poi =
                  let new_list =
                    if tab.(ifath) = 0 then ifath :: new_list else new_list
                  in
-                 let new_list =
-                   if tab.(imoth) = 0 then imoth :: new_list else new_list
-                 in
-                 new_list
+                 if tab.(imoth) = 0 then imoth :: new_list else new_list
              | _ -> new_list)
           [] list
       in

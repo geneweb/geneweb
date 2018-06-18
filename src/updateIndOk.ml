@@ -1383,7 +1383,7 @@ let print_mod o_conf base =
     let fname = Filename.concat bdir "notes_links" in
     let db = NotesLinks.read_db_from_file fname in
     let db = Notes.merge_possible_aliases conf db in
-    let pgl = Perso.links_to_ind conf base db key in pgl
+    Perso.links_to_ind conf base db key
   in
   let callback sp =
     let p = effective_mod conf base sp in

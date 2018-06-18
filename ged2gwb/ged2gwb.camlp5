@@ -3793,15 +3793,12 @@ let main () =
   let arrays = make_subarrays arrays in
   let base = make_base arrays bdir in
   finish_base base arrays;
-  begin match Lock.control (Mutil.lock_file !out_file) false
-                (fun () ->
-                   Outbase.output !out_file base;
-                   output_command_line !out_file;
-                   init_cache_info !out_file base arrays)
-    with
-    | Some x -> x
-    | None -> printf "Base is locked: cannot write it\n"; flush stdout; exit 2
-  end;
+  Lock.control (Mutil.lock_file !out_file) false
+    (fun () ->
+       Outbase.output !out_file base;
+       output_command_line !out_file;
+       init_cache_info !out_file base arrays)
+    ~onerror:Lock.print_error_and_exit ;
   warning_month_number_dates ();
   if !log_oc != stdout then close_out !log_oc
 

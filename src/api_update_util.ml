@@ -938,8 +938,7 @@ let pers_to_piqi_person_search_info conf base p =
       in
       Wiki.syntax_links conf wi s
     in
-    let s = string_with_macros conf env s in
-    s
+    string_with_macros conf env s
   in
   let has_sources = psources <> "" in
   let titles = Perso.nobility_titles_list conf base p in
@@ -1029,21 +1028,18 @@ let pers_to_piqi_person_search_info conf base p =
               p :: rl
           | None -> rl
         in
-        let rl =
-          match rp.r_moth with
-          | Some ip ->
-              let p = poi base ip in
-              let p = pers_to_piqi_simple_person conf base p in
-              let p =
-                {
-                  Mwrite.Relation_person.r_type = r_type;
-                  person = p;
-                }
-              in
-              p :: rl
-          | None -> rl
-        in
-        rl)
+        match rp.r_moth with
+        | Some ip ->
+          let p = poi base ip in
+          let p = pers_to_piqi_simple_person conf base p in
+          let p =
+            {
+              Mwrite.Relation_person.r_type = r_type;
+              person = p;
+            }
+          in
+          p :: rl
+        | None -> rl)
       [] (get_rparents p)
   in
   let was_witness =
@@ -1473,30 +1469,27 @@ let pers_to_piqi_mod_person conf base p =
               r :: accu
           | None -> accu
         in
-        let accu =
-          match rp.r_moth with
-          | Some ip ->
-              let p = poi base ip in
-              let mother = pers_to_piqi_person_link conf base p in
-              let rpt_type =
-                match rp.r_type with
-                | Adoption -> `rpt_adoption_mother
-                | Recognition -> `rpt_recognition_mother
-                | CandidateParent -> `rpt_candidate_parent_mother
-                | GodParent -> `rpt_god_parent_mother
-                | FosterParent -> `rpt_foster_parent_mother
-              in
-              let r =
-                Mwrite.Relation_parent.({
-                  rpt_type = rpt_type;
-                  person = Some mother;
-                  source = if source = "" then None else Some source;
-                })
-              in
-              r :: accu
-          | None -> accu
-        in
-        accu)
+        match rp.r_moth with
+        | Some ip ->
+          let p = poi base ip in
+          let mother = pers_to_piqi_person_link conf base p in
+          let rpt_type =
+            match rp.r_type with
+            | Adoption -> `rpt_adoption_mother
+            | Recognition -> `rpt_recognition_mother
+            | CandidateParent -> `rpt_candidate_parent_mother
+            | GodParent -> `rpt_god_parent_mother
+            | FosterParent -> `rpt_foster_parent_mother
+          in
+          let r =
+            Mwrite.Relation_parent.({
+                rpt_type = rpt_type;
+                person = Some mother;
+                source = if source = "" then None else Some source;
+              })
+          in
+          r :: accu
+        | None -> accu)
       (get_rparents p) []
   in
   let access =
@@ -1507,8 +1500,8 @@ let pers_to_piqi_mod_person conf base p =
   in
   let parents =
     match get_parents p with
-     | Some ifam -> Some (Int32.of_int (Adef.int_of_ifam ifam))
-     | None -> None
+    | Some ifam -> Some (Int32.of_int (Adef.int_of_ifam ifam))
+    | None -> None
   in
   let families =
     List.map
@@ -1541,7 +1534,6 @@ let pers_to_piqi_mod_person conf base p =
     families = families;
     create_link = create_link;
   }
-
 
 (* ************************************************************************ *)
 (*  [Fonc] fam_to_piqi_mod_family :

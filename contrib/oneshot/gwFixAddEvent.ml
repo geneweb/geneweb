@@ -130,13 +130,10 @@ let main () =
   Arg.parse speclist anonfun usage;
   if !bname = "" || !fname = "" then
     begin Arg.usage speclist usage; exit 2 end;
-  match
-    Lock.control (Mutil.lock_file !bname) false
-      (fun () ->
-         let base = Gwdb.open_base !bname in
-         let () = update_database_with_file base !fname in close_base base)
-  with
-    Some x -> x
-  | None -> eprintf "Cannot lock database. Try again.\n"; flush stderr
+  Lock.control (Mutil.lock_file !bname) false
+    ~onerror:Lock.print_try_again
+    (fun () ->
+       let base = Gwdb.open_base !bname in
+       let () = update_database_with_file base !fname in close_base base)
 
 let _ = main ()

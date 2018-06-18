@@ -142,11 +142,8 @@ let date_of_piqi_date date =
                           if month <= 0 then 0, 0, year else day, month, year
                       | None -> 0, 0, 0
                     in
-                    let dmy =
-                      {day = day; month = month; year = year; prec = prec;
-                       delta = delta}
-                    in
-                    dmy
+                    {day = day; month = month; year = year; prec = prec;
+                     delta = delta}
                 | None ->
                     (* erreur*)
                     {day = 0; month = 0; year = 0; prec = Sure; delta = 0}

@@ -558,20 +558,17 @@ let apply_filters_p conf filters compute_sosa p =
       | None -> filter
     else filter
   in
-  let filter =
-    if filter then
-      match filters.date_death with
-      | Some (date_begin, date_end, prec) ->
-          let death =
-            match get_death p with
-            | Death (_, cd) -> Some (Adef.date_of_cdate cd)
-            | _ -> None
-          in
-          is_date_included prec death date_begin date_end
-      | None -> filter
-    else filter
-  in
-  filter
+  if filter then
+    match filters.date_death with
+    | Some (date_begin, date_end, prec) ->
+      let death =
+        match get_death p with
+        | Death (_, cd) -> Some (Adef.date_of_cdate cd)
+        | _ -> None
+      in
+      is_date_included prec death date_begin date_end
+    | None -> filter
+  else filter
 
 
 (**/**) (* Fonctions IO *)
