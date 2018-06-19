@@ -1403,14 +1403,6 @@ let array_forall2 f a1 a2 =
     in
     loop 0
 
-let array_exists f a =
-  let rec loop i =
-    if i = Array.length a then false
-    else if f a.(i) then true
-    else loop (i + 1)
-  in
-  loop 0
-
 let is_a_link =
   function
     _, _, _, Update.Link, _ -> true
@@ -1432,8 +1424,8 @@ let is_created_or_already_there ochil_arr nchil schil =
 (* Improvement : check the name on the parents/children if they linked *)
 
 let need_check_noloop (scpl, sdes, onfs) =
-  if array_exists is_a_link (parent_array scpl) ||
-     array_exists is_a_link sdes.children
+  if Array.exists is_a_link (parent_array scpl) ||
+     Array.exists is_a_link sdes.children
   then
     match onfs with
       Some ((opar, ochil), (npar, nchil)) ->
