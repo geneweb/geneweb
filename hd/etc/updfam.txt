@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updfam.txt,v 7.00 10/11/2016 09:45:03 $ -->
+  <!-- $Id: updfam.txt,v 7.00 exp 21/06/2018 23:27:22 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -33,8 +33,8 @@
         <a class="nav-item nav-link" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
         <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
         <a class="nav-item nav-link" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
-        <a class="nav-item nav-link" href="#comments" title="[*comment]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
         <a class="nav-item nav-link" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
+        <a class="nav-item nav-link" href="#comments" title="[*comment]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
       </nav>
     </nav>
   </div>
@@ -238,31 +238,31 @@ $(document).ready(function(){
   <div class="row">
     <span class="col-sm-2 col-form-label">[*kind]</span>
     <div class="col-sm-3 form-inline">
-    %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
-      <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
-      <input type="text" class="form-control" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-      <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
-      <input type="text" class="form-control" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-      <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
-      <input type="text" class="form-control" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-    %elseif;([ !dates order]0 = "mmddyyyy")
-      <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
-      <input type="text" class="form-control" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-      <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
-      <input type="text" class="form-control" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-      <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
-      <input type="text" class="form-control" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-    %else;
-      <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
-      <input type="text" class="form-control" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-      <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
-      <input type="text" class="form-control" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-      <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
-      <input type="text" class="form-control" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-    %end;
+      %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+      %elseif;([ !dates order]0 = "mmddyyyy")
+        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+      %else;
+        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+      %end;
     </div>
     <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place]</label>%nn;
-    <div class="col-sm-4">
+    <div class="col-sm">
       <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place]" %readonly;>
     </div>
   </div>
@@ -278,38 +278,26 @@ $(document).ready(function(){
 
 %define;parent(xcnt,xx)
   <div class="row">
-     %if;(bvar.multi_parents != "yes")
-       <h5 class="col-form-label col-sm-2">%parent.himher;</h5>
-       <div class="col-sm-2">
-         <select class="form-control" id="paxcnt_p" name="paxcnt_p">
-           <option value="create" %if;(xx.create = "create")selected%end;>[*create]0</option>
-           <option value="link" %if;(xx.create = "link")selected%end;>[*link]0</option>
-         </select>
-        </div>
-     %end;
-  </div>
-  <div class="row">
-    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
-    <div class="col-sm-4">
+    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">%if;(bvar.multi_parents!="yes")%parent.himher;%nn;
+      %else;pxcnt%end;</span></label>
+    <div class="col-sm-8">
       <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0">
     </div>
-    <label for="paxcnt_occ" class="col-auto col-form-label">[*number]</label>
+    <label for="paxcnt_occ" class="col-auto col-form-label sr-only">[*number]</label>
     <div class="col-sm-2">
-       <input class="form-control" type="number" name="paxcnt_occ" min="0" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" placeholder="#" title="[*number]">
+       <input class="form-control" type="number" name="paxcnt_occ" min="0" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" title="[*number] (occurence)">
     </div>
-    %if;(bvar.multi_parents = "yes")
-      <div class="col-sm-2 ml-sm-auto">
-        <select class="form-control" id="paxcnt_p" name="paxcnt_p">
-          <option value="create" %if;(xx.create = "create")selected%end;>[*create]0</option>
-          <option value="link" %if;(xx.create = "link")selected%end;>[*link]0</option>
-        </select>
-      </div>
-    %end;
   </div>
   <div class="row">
     <label for="paxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
-    <div class="col-sm-7">
+    <div class="col-sm-8">
       <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0">
+    </div>
+    <div class="col-sm-2">
+      <select class="form-control" id="paxcnt_p" name="paxcnt_p">
+        <option value="create" %if;(xx.create = "create")selected%end;>[*create]0</option>
+        <option value="link" %if;(xx.create = "link")selected%end;>[*link]0</option>
+      </select>
     </div>
   </div>
   <div id="paxcnt_div">
@@ -317,7 +305,7 @@ $(document).ready(function(){
     %apply;death("paxcnt","xx","true")
     <div class="row">
       <label for="paxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-      <div class="col-sm-7">
+      <div class="col-sm">
         <input class="form-control" name="paxcnt_occupation" id="paxcnt_occupation" maxlength="300" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;">
       </div>
     </div>
@@ -325,12 +313,12 @@ $(document).ready(function(){
 %end;
 
 %define;insert_parent(xcnt)
-  <div class="row mt-2">
+  <div class="row my-2">
     <label for="ins_paxcnt_n" class="col-form-label col-2">[*insert]</label>
     <div class="form-inline col-10 ml-auto">
       <div class="input-group">
         <select class="custom-select form-control" id="ins_paxcnt_n" name="ins_paxcnt_n">
-          %for;i;1;2;<option>%i;</option> %end;
+          %for;i;1;6;<option>%i;</option> %end;
         </select>
         <div class="input-group-append">
           <label class="btn btn-outline-secondary"> [parents]0
@@ -506,11 +494,11 @@ $(document).ready(function(){
 
 %define;card_header(xx,yy)
   <div class="anchor_upd" id="xx"> </div>
-  <h3 class="card-header pt-2 pb-1 text-center"><label for="xx">[*yy]1</label></h3>
+  <h3 class="card-header pt-1 pb-0 text-center"><label for="xx">[*yy]1</label></h3>
 %end;
 
-<h1 %if;(evar.m="ADD_FAM" or evar.m="ADD_FAM_OK")class="mt-4"%end;>%nn;
-  %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
+<h1 %if;(evar.m="ADD_FAM" or evar.m="ADD_FAM_OK" and evar.ip="")class="mt-5"%end;>%nn;
+  %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
     [*add::family/families]0
   %elseif;(evar_m = "ADD_PAR")
     [*add::parents] %foreach;child;%child.first_name;%if;(child.occ!="").%child.occ;%end; %child.surname;%end;
@@ -526,7 +514,7 @@ $(document).ready(function(){
   <div class="row">
     %apply;nav()
   </div>
-  <p>
+  <p class="my-0">
     %hidden;
     <input type="hidden" name="digest" value="%digest;"%/>
     %if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;"%/>%nl;%end;
@@ -557,17 +545,27 @@ $(document).ready(function(){
   <div class="card">
     %apply;card_header("parents","parents")
     <div class="card-body">
-      %foreach;parent;
-        %apply;parent(cnt, "parent")
-        %if;(bvar.multi_parents = "yes")%apply;insert_parent(cnt)%end;
-        %if;(cnt>=1)<hr class="w-100">%end;
-      %end;
-        <div class="text-right">
-        <button type="submit" class="btn btn-outline-success col-2" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+      <div class="row">
+        <div class="col-11">
+          %foreach;parent;
+            %if;(cnt!=1 and bvar.multi_parents="yes")<hr class="w-100">%end;
+            %apply;parent(cnt, "parent")
+            %if;(bvar.multi_parents="yes")%apply;insert_parent(cnt)%end;
+            %if;(bvar.multi_parents!="yes" and cnt=1)
+              <div class="form-check my-2">
+                <label class="form-check-label">
+                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(mrel="nsck" or mrel="nsckm") checked%end;%/>
+                  [*no sexes check]
+                </label>
+              </div>
+            %end;
+          %end;
+        </div>
+        <button type="submit" class="btn btn-outline-success col mt-auto mr-2" title="[*validate/delete]0" aria-label="[*validate/delete]0">
           <span class="font-weight-bold text-uppercase sr-only">[*validate/delete]0</span>
           <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
         </button>
-        </div>
+      </div>
     </div>
   </div>
 
@@ -681,12 +679,6 @@ $(document).ready(function(){
     %apply;date([*date/dates]0, "div", "divorce")
   </div>
   
-    <div class="form-check">
-      <label class="form-check-label">
-        <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(mrel="nsck" or mrel="nsckm") checked%end;%/>
-        [*no sexes check]
-      </label>
-    </div>
       %if;has_fevents;
         %foreach;fevent;
           %apply;one_fevent(cnt, has_fevents)
@@ -744,7 +736,7 @@ $(document).ready(function(){
   </div>
   <div class="row">
     <label for="chxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         <input class="form-control" type="text" name="chxcnt_fn" value="%child.first_name;" id="chxcnt_fn" placeholder="[*first name/first names]0">
     </div>
     <label for="chxcnt_occ" class="col-sm-auto col-form-label">[*number]</label>
@@ -754,7 +746,7 @@ $(document).ready(function(){
   </div>
   <div class="row">
     <label for="chxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
       <input class="form-control" type="text" name="chxcnt_sn" value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;">
     </div>
     <div id="chxcnt_sex_div">
@@ -785,7 +777,7 @@ $(document).ready(function(){
     %apply;death("chxcnt", "child", "true")
     <div class="row">
       <label for="chxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-      <div class="col-sm-7">
+      <div class="col-sm">
          <input class="form-control" type="text" name="chxcnt_occupation" value="%child.create.occupation;" id="chxcnt_occupation" placeholder="[*occupation/occupations]0" %readonly;>
       </div>
     </div>
@@ -811,13 +803,6 @@ $(document).ready(function(){
     </div>
   </div>
 
-  <div class="card">
-    %apply;card_header("comments","comment")
-    <div class="card-body">
-      <textarea class="form-control" name="comment" id="comment" rows="4">%comment;</textarea>
-    </div>
-  </div>
-  
   <div class="card">
     %apply;card_header("sources","source/sources")
     <div class="card-body">
@@ -850,10 +835,17 @@ $(document).ready(function(){
   %if;(bvar.origin_file = "on")
     <input type="text" name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
   %end;
-  <div class="text-center">
-    <button type="submit" class="btn btn-outline-success btn-lg col-4 py-3 mt-2 mb-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
-      <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
-    </button>
+
+  <div class="card">
+    %apply;card_header("comments","comment")
+    <div class="row ml-3">
+      <div class="d-inline col-9 py-1">%include.toolbar;</div>
+      <textarea class="col-9 form-control" id="notes_comments" name="comment" rows="16">%comment;</textarea>%sq;
+      <button type="submit" class="btn btn-outline-success btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+        <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+      </button>
+      <div class="col my-1 mr-2 text-monospace">%include.accent;</div>
+    </div>
   </div>
 </form>
 
