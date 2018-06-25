@@ -41,11 +41,10 @@
       <br>
     %end;
     %if;has_nobility_titles;
-      <em>
-      %foreach;nobility_title;
-        %if;not is_first;,
-        %end;
-        %nobility_title;
+      <em>%nn;
+      %foreach;nobility_title;%nn;
+       %if;not is_first;,%sp;%end;
+        %nobility_title;%nn;
       %end;
       </em><br>
     %end;
