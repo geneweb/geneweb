@@ -2016,6 +2016,13 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let s = sou base (get_comment fam) in
             let s = string_with_macros conf [] s in
             let lines = Wiki.html_of_tlsw conf s in
+            let lines =
+              if List.length lines > 2 then 
+                match lines with
+                [ ["<p>" :: remain] -> List.rev (List.tl (List.rev remain))
+                | _ -> lines ]
+              else lines
+            in
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
