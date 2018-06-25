@@ -25,15 +25,18 @@
        or evar.m="MOD_DATA_OK"))
     <script>
       var htmlTitle = document.title;
-      if ( htmlTitle == "[*person modified]" ||
-           htmlTitle == "[*family modified]" ||
-           htmlTitle == "[*person added]" ||
-           htmlTitle == "[*family added]" ||
-           htmlTitle == "[*family deleted]" ||
-           htmlTitle == "[*image received]" ||
-           htmlTitle == "[*image deleted]" ||
-           htmlTitle == "[*modification successful]" )
-      { document.getElementById("i%evar.i;").focus(); }
+      if (htmlTitle == "[*person modified]" ||
+          htmlTitle == "[*person added]"    ||
+          htmlTitle == "[*image received]"  ||
+          htmlTitle == "[*image deleted]"   ||
+          htmlTitle == "[*modification successful]") {
+          document.getElementById("i%evar.i;").focus();
+      }
+      else if (htmlTitle == "[*family modified]" ||
+               htmlTitle == "[*family added]"    ||
+               htmlTitle == "[*family deleted]") {
+          document.getElementById("i%evar.ip;").focus();
+      }
     </script>
   %end;
 %end;
