@@ -3,314 +3,9 @@
 
 open Config
 open Def
-open Gutil
 open Gwdb
 open Hutil
 open Util
-
-let person_is_std_key conf base p k =
-  let k = Name.strip_lower k in
-  if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p) then
-    true
-  else if
-    List.exists (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
-  then
-    true
-  else false
-
-let select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl -> if person_is_std_key conf base p k then p :: pl else pl) pl
-    []
-
-let very_unknown conf =
-  match p_getenv conf.env "n", p_getenv conf.env "p" with
-    Some nom, Some prenom ->
-      let title _ =
-        Wserver.printf "%s%s \"%s %s\"" (capitale (transl conf "not found"))
-          (Util.transl conf ":") prenom nom
-      in
-      Wserver.http HttpStatus.Not_Found;
-      rheader conf title;
-      print_link_to_welcome conf false;
-      trailer conf
-  | _ -> incorrect_request conf
-
-let unknown conf n =
-  let title _ =
-    Wserver.printf "%s%s \"%s\"" (capitale (transl conf "not found"))
-      (Util.transl conf ":") n
-  in
-  Wserver.http HttpStatus.Not_Found;
-  rheader conf title;
-  print_link_to_welcome conf false;
-  trailer conf
-
-let relation_print conf base p =
-  let p1 =
-    match p_getint conf.senv "ei" with
-      Some i ->
-        conf.senv <- [];
-        if i >= 0 && i < nb_of_persons base then
-          Some (pget conf base (Adef.iper_of_int i))
-        else None
-    | None ->
-        match find_person_in_env conf base "1" with
-          Some p1 -> conf.senv <- []; Some p1
-        | None -> None
-  in
-  Relation.print conf base p p1
-
-let person_selected conf base p =
-  match p_getenv conf.senv "em" with
-    Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf
-  | None -> record_visited conf (get_key_index p); Perso.print conf base p
-
-let person_selected_with_redirect conf base p =
-  match p_getenv conf.senv "em" with
-    Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf
-  | None ->
-      Wserver.http_redirect_temporarily (commd conf ^ Util.acces conf base p)
-
-let compact_list base xl =
-  let pl = sort_person_list base xl in
-  List.fold_right
-    (fun p pl ->
-       match pl with
-         p1 :: _ when get_key_index p = get_key_index p1 -> pl
-       | _ -> p :: pl)
-    pl []
-
-let cut_words str =
-  let rec loop beg i =
-    if i < String.length str then
-      match str.[i] with
-        ' ' ->
-          if beg = i then loop (succ beg) (succ i)
-          else String.sub str beg (i - beg) :: loop (succ i) (succ i)
-      | _ -> loop beg (succ i)
-    else if beg = i then []
-    else [String.sub str beg (i - beg)]
-  in
-  loop 0 0
-
-let try_find_with_one_first_name conf base n =
-  let n1 = Name.abbrev (Name.lower n) in
-  match String.index_opt n1 ' ' with
-    Some i ->
-    let fn = String.sub n1 0 i in
-    let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
-    let (list, _) =
-      Some.persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base)) get_surname sn
-    in
-    List.fold_left
-      (fun pl (_, _, ipl) ->
-         List.fold_left
-           (fun pl ip ->
-              let p = pget conf base ip in
-              let fn1 =
-                Name.abbrev (Name.lower (sou base (get_first_name p)))
-              in
-              if List.mem fn (cut_words fn1) then p :: pl else pl)
-           pl ipl)
-      [] list
-  | None -> []
-
-let name_with_roman_number str =
-  let rec loop found len i =
-    if i = String.length str then if found then Some (Buff.get len) else None
-    else
-      match str.[i] with
-        '0'..'9' as c ->
-          let (n, i) =
-            let rec loop n i =
-              if i = String.length str then n, i
-              else
-                match str.[i] with
-                  '0'..'9' as c ->
-                    loop (10 * n + Char.code c - Char.code '0') (i + 1)
-                | _ -> n, i
-            in
-            loop (Char.code c - Char.code '0') (i + 1)
-          in
-          loop true (Buff.mstore len (Mutil.roman_of_arabian n)) i
-      | c -> loop found (Buff.store len c) (i + 1)
-  in
-  loop false 0 0
-
-let find_all conf base an =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with Failure _ -> None in
-  match sosa_ref, sosa_nb with
-    Some p, Some n ->
-      if n <> Sosa.zero then
-        match Util.branch_of_sosa conf base (get_key_index p) n with
-          Some ((ip, _) :: _) -> [pget conf base ip], true
-        | _ -> [], false
-      else [], false
-  | _ ->
-      match person_of_string_key base an with
-        Some ip ->
-          let pl =
-            let p = pget conf base ip in if is_hidden p then [] else [p]
-          in
-          let pl =
-            if not conf.wizard && not conf.friend then
-              List.fold_right
-                (fun p pl ->
-                   if not (is_hide_names conf p) ||
-                      Util.authorized_age conf base p
-                   then
-                     p :: pl
-                   else pl)
-                pl []
-            else pl
-          in
-          pl, false
-      | None ->
-          let ipl = person_not_a_key_find_all base an in
-          let (an, ipl) =
-            if ipl = [] then
-              match name_with_roman_number an with
-                Some an1 ->
-                  let ipl = person_ht_find_all base an1 in
-                  if ipl = [] then an, [] else an1, ipl
-              | None -> an, ipl
-            else an, ipl
-          in
-          let pl =
-            List.fold_left
-              (fun l ip ->
-                 let p = pget conf base ip in
-                 if is_hidden p then l else p :: l)
-              [] ipl
-          in
-          let spl = select_std_eq conf base pl an in
-          let pl =
-            if spl = [] then
-              if pl = [] then try_find_with_one_first_name conf base an
-              else pl
-            else spl
-          in
-          let pl =
-            if not conf.wizard && not conf.friend then
-              List.fold_right
-                (fun p pl ->
-                   if not (is_hide_names conf p) ||
-                      Util.authorized_age conf base p
-                   then
-                     p :: pl
-                   else pl)
-                pl []
-            else pl
-          in
-          compact_list base pl, false
-
-let specify conf base n pl =
-  let title _ = Wserver.printf "%s : %s" n (transl conf "specify") in
-  let n = Name.crush_lower n in
-  let ptll =
-    List.map
-      (fun p ->
-         let tl = ref [] in
-         let add_tl t =
-           tl :=
-             let rec add_rec =
-               function
-                 t1 :: tl1 ->
-                   if eq_istr t1.t_ident t.t_ident &&
-                      eq_istr t1.t_place t.t_place
-                   then
-                     t1 :: tl1
-                   else t1 :: add_rec tl1
-               | [] -> [t]
-             in
-             add_rec !tl
-         in
-         let compare_and_add t pn =
-           let pn = sou base pn in
-           if Name.crush_lower pn = n then add_tl t
-           else
-             match get_qualifiers p with
-               nn :: _ ->
-                 let nn = sou base nn in
-                 if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t
-             | _ -> ()
-         in
-         List.iter
-           (fun t ->
-              match t.t_name, get_public_name p with
-                Tname s, _ -> compare_and_add t s
-              | _, pn when sou base pn <> "" -> compare_and_add t pn
-              | _ -> ())
-           (nobtit conf base p);
-         p, !tl)
-      pl
-  in
-  header conf title;
-  conf.cancel_links <- false;
-  print_link_to_welcome conf true;
-  (* Si on est dans un calcul de parenté, on affiche *)
-  (* l'aide sur la sélection d'un individu.          *)
-  Util.print_tips_relationship conf;
-  Wserver.printf "<ul>\n";
-  (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
-  List.iter
-    (fun (p, tl) ->
-       Wserver.printf "<li>\n";
-       Perso.print_sosa conf base p true;
-       begin match tl with
-         [] ->
-           Wserver.printf "\n%s" (referenced_person_title_text conf base p)
-       | t :: _ ->
-           Wserver.printf "<a href=\"%s%s\">\n" (commd conf)
-             (acces conf base p);
-           Wserver.printf "%s" (titled_person_text conf base p t);
-           Wserver.printf "</a>\n";
-           List.iter
-             (fun t -> Wserver.printf "%s" (one_title_text base t)) tl
-       end;
-       Wserver.printf "%s" (Date.short_dates_text conf base p);
-       if authorized_age conf base p then
-         begin match get_first_names_aliases p with
-           [] -> ()
-         | fnal ->
-             Wserver.printf "\n<em>(";
-             Mutil.list_iter_first
-               (fun first fna ->
-                  if not first then Wserver.printf ", ";
-                  Wserver.printf "%s" (sou base fna))
-               fnal;
-             Wserver.printf ")</em>"
-         end;
-       begin let spouses =
-         List.fold_right
-           (fun ifam spouses ->
-              let cpl = foi base ifam in
-              let spouse = pget conf base (spouse (get_key_index p) cpl) in
-              if p_surname base spouse <> "?" then spouse :: spouses
-              else spouses)
-           (Array.to_list (get_family p)) []
-       in
-         match spouses with
-           [] -> ()
-         | h :: hl ->
-             let s =
-               List.fold_left
-                 (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
-                 (person_title_text conf base h) hl
-             in
-             Wserver.printf ", <em>&amp; %s</em>\n" s
-       end;
-       Wserver.printf "</li>\n")
-    ptll;
-  Wserver.printf "</ul>\n";
-  trailer conf
 
 (* Make the "special" environement; "em=mode;ei=n" *)
 
@@ -362,425 +57,202 @@ let make_senv conf base =
       let vi = string_of_int (Adef.int_of_iper ip) in set_senv conf vm vi
   | _ -> ()
 
-let updmenu_print = Perso.interp_templ "updmenu"
-
-let family_m conf base =
-  match p_getenv conf.env "m" with
-    Some "A" ->
-      begin match find_person_in_env conf base "" with
-        Some p -> Perso.print_ascend conf base p
-      | _ -> very_unknown conf
-      end
-  | Some "ADD_FAM" when conf.wizard -> UpdateFam.print_add conf base
-  | Some "ADD_FAM_OK" when conf.wizard -> UpdateFamOk.print_add conf base
-  | Some "ADD_IND" when conf.wizard -> UpdateInd.print_add conf base
-  | Some "ADD_IND_OK" when conf.wizard -> UpdateIndOk.print_add conf base
-  | Some "ADD_PAR" when conf.wizard -> UpdateFam.print_add_parents conf base
-  | Some "ANM" -> Birthday.print_anniversaries conf
-  | Some "AN" ->
-      begin match p_getenv conf.env "v" with
-        Some x -> Birthday.print_birth conf base (int_of_string x)
-      | _ -> Birthday.print_menu_birth conf base
-      end
-  | Some "AD" ->
-      begin match p_getenv conf.env "v" with
-        Some x -> Birthday.print_dead conf base (int_of_string x)
-      | _ -> Birthday.print_menu_dead conf base
-      end
-  | Some "AM" ->
-      begin match p_getenv conf.env "v" with
-        Some x -> Birthday.print_marriage conf base (int_of_string x)
-      | _ -> Birthday.print_menu_marriage conf base
-      end
-  | Some "AS_OK" -> AdvSearchOk.print conf base
-  | Some "B" when conf.wizard || conf.friend ->
-      BirthDeath.print_birth conf base
-  | Some "C" ->
-      begin match find_person_in_env conf base "" with
-        Some p -> Cousins.print conf base p
-      | _ -> very_unknown conf
-      end
-  | Some "CAL" -> Date.print_calendar conf
-  | Some "CHG_CHN" when conf.wizard -> ChangeChildren.print conf base
-  | Some "CHG_CHN_OK" when conf.wizard -> ChangeChildren.print_ok conf base
-  | Some "CHG_EVT_IND_ORD" when conf.wizard ->
-      UpdateInd.print_change_event_order conf base
-  | Some "CHG_EVT_IND_ORD_OK" when conf.wizard ->
-      UpdateIndOk.print_change_event_order conf base
-  | Some "CHG_EVT_FAM_ORD" when conf.wizard ->
-      UpdateFam.print_change_event_order conf base
-  | Some "CHG_EVT_FAM_ORD_OK" when conf.wizard ->
-      UpdateFamOk.print_change_event_order conf base
-  | Some "CHG_FAM_ORD" when conf.wizard ->
-      UpdateFam.print_change_order conf base
-  | Some "CHG_FAM_ORD_OK" when conf.wizard ->
-      UpdateFamOk.print_change_order_ok conf base
-  | Some "CONN_WIZ" when conf.wizard -> Wiznotes.connected_wizards conf base
-  | Some "D" ->
-      begin match find_person_in_env conf base "" with
-        Some p -> Descend.print conf base p
-      | _ -> very_unknown conf
-      end
-  | Some "DAG" -> Dag.print conf base
-  | Some "DEL_FAM" when conf.wizard -> UpdateFam.print_del conf base
-  | Some "DEL_FAM_OK" when conf.wizard -> UpdateFamOk.print_del conf base
-  | Some "DEL_IMAGE" when conf.wizard && conf.can_send_image ->
-      SendImage.print_del conf base
-  | Some "DEL_IMAGE_OK" when conf.wizard && conf.can_send_image ->
-      SendImage.print_del_ok conf base
-  | Some "DEL_IND" when conf.wizard -> UpdateInd.print_del conf base
-  | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
-  | Some "F" ->
-      match find_person_in_env conf base "" with
-      [ Some p ->   Perso.interp_templ "family" conf base p
-      | _ -> very_unknown conf ]
-  | Some "FORUM" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print conf base
-      end
-  | Some "FORUM_ADD" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print_add conf base
-      end
-  | Some "FORUM_ADD_OK" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print_add_ok conf base
-      end
-  | Some "FORUM_DEL" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print_del conf base
-      end
-  | Some "FORUM_P_P" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print_access_switch conf base
-      end
-  | Some "FORUM_SEARCH" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print_search conf base
-      end
-  | Some "FORUM_VAL" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print_valid conf base
-      end
-  | Some "FORUM_VIEW" ->
-      begin match p_getenv conf.base_env "disable_forum" with
-        Some "yes" -> incorrect_request conf
-      | _ -> Forum.print conf base
-      end
-  | Some "H" ->
-      begin match p_getenv conf.env "v" with
-        Some f -> Srcfile.print conf base f
-      | None -> Hutil.incorrect_request conf
-      end
-  | Some "HIST" -> History.print conf base
-  | Some "HIST_CLEAN" when conf.wizard -> History_diff.print_clean conf
-  | Some "HIST_CLEAN_OK" when conf.wizard ->
-      History_diff.print_clean_ok conf
-  | Some "HIST_DIFF" -> History_diff.print conf base
-  | Some "HIST_SEARCH" -> History.print_search conf base
-  | Some "IMH" -> Image.print_html conf
-  | Some "INV_FAM" when conf.wizard -> UpdateFam.print_inv conf base
-  | Some "INV_FAM_OK" when conf.wizard -> UpdateFamOk.print_inv conf base
-  | Some "KILL_ANC" when conf.wizard ->
-      MergeInd.print_kill_ancestors conf base
-  | Some "LB" when conf.wizard || conf.friend ->
-      BirthDeath.print_birth conf base
-  | Some "LD" when conf.wizard || conf.friend ->
-      BirthDeath.print_death conf base
-  | Some "LINKED" ->
-      begin match find_person_in_env conf base "" with
-        Some p -> Perso.print_what_links conf base p
-      | _ -> very_unknown conf
-      end
-  | Some "LL" -> BirthDeath.print_longest_lived conf base
-  | Some "LM" when conf.wizard || conf.friend ->
-      BirthDeath.print_marriage conf base
-  | Some "LEX" -> Srcfile.print_lexicon conf base
-  | Some "MISC_NOTES" -> Notes.print_misc_notes conf base
-  | Some "MISC_NOTES_SEARCH" -> Notes.print_misc_notes_search conf base
-  | Some "MOD_DATA" when conf.wizard -> UpdateData.print_mod conf base
-  | Some "MOD_DATA_OK" when conf.wizard -> UpdateData.print_mod_ok conf base
-  | Some "MOD_FAM" when conf.wizard -> UpdateFam.print_mod conf base
-  | Some "MOD_FAM_OK" when conf.wizard -> UpdateFamOk.print_mod conf base
-  | Some "MOD_IND" when conf.wizard -> UpdateInd.print_mod conf base
-  | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
-  | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
-  | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
-  | Some "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
-      Wiznotes.print_mod conf base
-  | Some "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
-      Wiznotes.print_mod_ok conf base
-  | Some "MRG" when conf.wizard ->
-      begin match find_person_in_env conf base "" with
-        Some p -> Merge.print conf base p
-      | _ -> very_unknown conf
-      end
-  | Some "MRG_DUP" when conf.wizard -> MergeDup.main_page conf base
-  | Some "MRG_DUP_IND_Y_N" when conf.wizard -> MergeDup.answ_ind_y_n conf base
-  | Some "MRG_DUP_FAM_Y_N" when conf.wizard -> MergeDup.answ_fam_y_n conf base
-  | Some "MRG_FAM" when conf.wizard -> MergeFam.print conf base
-  | Some "MRG_FAM_OK" when conf.wizard -> MergeFamOk.print_merge conf base
-  | Some "MRG_MOD_FAM_OK" when conf.wizard ->
-      MergeFamOk.print_mod_merge conf base
-  | Some "MRG_IND" when conf.wizard -> MergeInd.print conf base
-  | Some "MRG_IND_OK" when conf.wizard -> MergeIndOk.print_merge conf base
-  | Some "MRG_MOD_IND_OK" when conf.wizard ->
-      MergeIndOk.print_mod_merge conf base
-  | Some "N" ->
-      begin match p_getenv conf.env "v" with
-        Some v -> Some.surname_print conf base Some.surname_not_found v
-      | _ -> Alln.print_surnames conf base
-      end
-  | Some "NG" ->
-      (* Rétro-compatibilité <= 6.06 *)
-      let env =
-        match p_getenv conf.env "n" with
-          Some n ->
-            begin match p_getenv conf.env "t" with
-              Some "P" -> ("fn", n) :: conf.env
-            | Some "N" -> ("sn", n) :: conf.env
-            | _ -> ("v", n) :: conf.env
-            end
-        | None -> conf.env
-      in
-      let conf = {conf with env = env} in
-      (* Nouveau mode de recherche. *)
-      begin match p_getenv conf.env "select" with
-        Some "input" | None ->
-          (* Récupère le contenu non vide de la recherche. *)
-          let real_input label =
-            match p_getenv conf.env label with
-              Some s -> if s = "" then None else Some s
-            | None -> None
-          in
-          (* Recherche par clé, sosa, alias ... *)
-          let search n =
-            let (pl, sosa_acc) = find_all conf base n in
-            match pl with
-              [] ->
-                conf.cancel_links <- false;
-                Some.surname_print conf base unknown n
-            | [p] ->
-                if sosa_acc || Gutil.person_of_string_key base n <> None ||
-                   person_is_std_key conf base p n
-                then
-                  person_selected_with_redirect conf base p
-                else specify conf base n pl
-            | pl -> specify conf base n pl
-          in
-          begin match real_input "v" with
-            Some n -> search n
-          | None ->
-              match real_input "fn", real_input "sn" with
-                Some fn, Some sn -> search (fn ^ " " ^ sn)
-              | Some fn, None ->
-                  conf.cancel_links <- false;
-                  Some.first_name_print conf base fn
-              | None, Some sn ->
-                  conf.cancel_links <- false;
-                  Some.surname_print conf base unknown sn
-              | None, None -> incorrect_request conf
-          end
-      | Some i ->
-          relation_print conf base
-            (pget conf base (Adef.iper_of_int (int_of_string i)))
-      end
-  | Some "NOTES" -> Notes.print conf base
-  | Some "OA" when conf.wizard || conf.friend ->
-      BirthDeath.print_oldest_alive conf base
-  | Some "OE" when conf.wizard || conf.friend ->
-      BirthDeath.print_oldest_engagements conf base
-  | Some "P" ->
-      begin match p_getenv conf.env "v" with
-        Some v -> Some.first_name_print conf base v
-      | None -> Alln.print_first_names conf base
-      end
-  | Some "POP_PYR" when conf.wizard || conf.friend ->
-      BirthDeath.print_population_pyramid conf base
-  | Some "PS" -> Place.print_all_places_surnames conf base
-  | Some "R" ->
-      begin match find_person_in_env conf base "" with
-        Some p -> relation_print conf base p
-      | _ -> very_unknown conf
-      end
-  | Some "REQUEST" when conf.wizard ->
-      let title _ = () in
-      header conf title;
-      Wserver.printf "<pre>\n";
-      List.iter (Wserver.printf "%s\n") conf.request;
-      Wserver.printf "</pre>\n";
-      trailer conf
-  | Some "RL" -> RelationLink.print conf base
-  | Some "RLM" -> Relation.print_multi conf base
-  | Some "S" -> SearchName.print conf base specify unknown
-  | Some "SND_IMAGE" when conf.wizard && conf.can_send_image ->
-      SendImage.print conf base
-  | Some "SND_IMAGE_OK" when conf.wizard && conf.can_send_image ->
-      SendImage.print_send_ok conf base
-  | Some "SRC" ->
-      begin match p_getenv conf.env "v" with
-        Some f -> Srcfile.print_source conf base f
-      | _ -> Hutil.incorrect_request conf
-      end
-  | Some "STAT" -> BirthDeath.print_statistics conf
-  | Some "CHANGE_WIZ_VIS" when conf.wizard ->
-      Wiznotes.change_wizard_visibility conf base
-  | Some "TT" -> Title.print conf base
-  | Some "U" when conf.wizard ->
-      begin match find_person_in_env conf base "" with
-        Some p -> updmenu_print conf base p
-      | _ -> very_unknown conf
-      end
-  | Some "VIEW_WIZNOTES" when conf.wizard && conf.authorized_wizards_notes ->
-      Wiznotes.print_view conf base
-  | Some "WIZNOTES" when conf.authorized_wizards_notes ->
-      Wiznotes.print conf base
-  | Some "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
-      Wiznotes.print_search conf base
-  | Some mode
-    when
-      try
-        String.get mode 0 = 'A' && String.get mode 1 = 'P' &&
-        String.get mode 2 = 'I' && String.get mode 3 = '_'
-      with _ -> false ->
-      (* On passe en mode API, i.e. que les exceptions API sont levées. *)
-      let () = Api_conf.set_mode_api () in
-      begin match Some mode with
-        Some "API_ALL_PERSONS" -> Api.print_all_persons conf base
-      | Some "API_ALL_FAMILIES" -> Api.print_all_families conf base
-      | Some "API_ANNIVERSARY" -> Api.print_birthday conf base
-      | Some "API_BASE_WARNINGS" when conf.wizard || conf.friend ->
-          (* Pour les flex, on autorise en mode friend. *)
-          Api.print_base_warnings conf base
-      | Some "API_CLOSE_PERSONS" ->
-          Api_graph.print_close_person_relations conf base
-      | Some "API_CPL_REL" -> Api_graph.print_cpl_relation conf base
-      | Some "API_GRAPH_ASC" -> Api_graph.print_graph_asc conf base
-      | Some "API_GRAPH_ASC_LIA" -> Api_graph.print_graph_asc_lia conf base
-      | Some "API_GRAPH_DESC" -> Api_graph.print_graph_desc conf base
-      | Some "API_GRAPH_REL" -> Api_graph.print_graph_rel conf base
-      | Some "API_FIRST_AVAILABLE_PERSON" ->
-          Api.print_first_available_person conf base
-      | Some "API_FIND_SOSA" -> Api.print_find_sosa conf base
-      | Some "API_INFO_BASE" -> Api.print_info_base conf base
-      | Some "API_INFO_IND" -> Api.print_info_ind conf base
-      | Some "API_IMAGE" -> Api.print_img conf base
-      | Some "API_IMAGE_EXT" -> Api.print_img_ext conf base
-      | Some "API_IMAGE_ALL" -> Api.print_img_all conf base
-      | Some "API_IMAGE_PERSON" -> Api.print_img_person conf base
-      | Some "API_IMAGE_UPDATE" when conf.wizard ->
-          Api.print_updt_image conf base
-      | Some "API_LAST_MODIFIED_PERSONS" ->
-          Api.print_last_modified_persons conf base
-      | Some "API_LAST_VISITED_PERSONS" ->
-          Api.print_last_visited_persons conf base
-      | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
-      | Some "API_LOOP_BASE" -> Api.print_loop conf base
-      | Some "API_MAX_ANCESTORS" when conf.wizard ->
-          Api.print_max_ancestors conf base
-      | Some "API_NB_ANCESTORS" ->
-          Api_saisie_read.print_nb_ancestors conf base
-      | Some "API_NOTIFICATION_BIRTHDAY" ->
-          Api.print_notification_birthday conf base
-      | Some "API_PRINT_INDEX" -> Api.print_all_full_person conf base
-      | Some "API_PRINT_EXPORT" -> Api.print_export conf base
-      | Some "API_PRINT_EXPORT_SEARCH" -> Api.print_export_search conf base
-      | Some "API_PRINT_SYNCHRO" -> Api.print_synchro_patch_mobile conf base
-      | Some "API_REF_PERSON_FROM_ID" ->
-          Api.print_ref_person_from_ip conf base
-      | Some "API_REMOVE_IMAGE_EXT" when conf.wizard ->
-          Api.print_remove_image_ext base
-      | Some "API_REMOVE_IMAGE_EXT_ALL" when conf.wizard ->
-          Api.print_remove_image_ext_all base
-      | Some "API_SEARCH" -> Api_search.print_search conf base
-      | Some "API_GRAPH_TREE_V2" ->
-          Api_saisie_read.print_graph_tree_v2 conf base
-      | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
-      | Some "API_FICHE_PERSON" ->
-          Api_saisie_read.print_fiche_person conf base
-      | Some "API_AUTO_COMPLETE" when conf.wizard ->
-          Api_saisie_write.print_auto_complete conf base
-      | Some "API_GET_CONFIG" when conf.wizard ->
-          Api_saisie_write.print_config conf base
-      | Some "API_PERSON_SEARCH_LIST" when conf.wizard ->
-          Api_saisie_write.print_person_search_list conf base
-      | Some "API_GET_PERSON_SEARCH_INFO" when conf.wizard ->
-          Api_saisie_write.print_person_search_info conf base
-      | Some "API_ADD_CHILD" when conf.wizard ->
-          Api_saisie_write.print_add_child conf base
-      | Some "API_ADD_CHILD_OK" when conf.wizard ->
-          Api_saisie_write.print_add_child_ok conf base
-      | Some "API_ADD_FAMILY" when conf.wizard ->
-          Api_saisie_write.print_add_family conf base
-      | Some "API_ADD_FAMILY_OK" when conf.wizard ->
-          Api_saisie_write.print_add_family_ok conf base
-      | Some "API_ADD_FIRST_FAM_OK" when conf.wizard ->
-          Api_saisie_write.print_add_first_fam_ok conf base
-      | Some "API_ADD_PARENTS" when conf.wizard ->
-          Api_saisie_write.print_add_parents conf base
-      | Some "API_ADD_PARENTS_OK" when conf.wizard ->
-          Api_saisie_write.print_add_parents_ok conf base
-      | Some "API_ADD_PERSON_OK" when conf.wizard ->
-          Api_saisie_write.print_add_ind_ok conf base
-      | Some "API_ADD_PERSON_START_OK" when conf.wizard ->
-          Api_saisie_write.print_add_ind_start_ok conf base
-      | Some "API_ADD_SIBLING" when conf.wizard ->
-          Api_saisie_write.print_add_sibling conf base
-      | Some "API_ADD_SIBLING_OK" when conf.wizard ->
-          Api_saisie_write.print_add_sibling_ok conf base
-      | Some "API_EDIT_FAMILY_REQUEST" when conf.wizard ->
-          Api_saisie_write.print_mod_family_request conf base
-      | Some "API_EDIT_FAMILY" when conf.wizard ->
-          Api_saisie_write.print_mod_family conf base
-      | Some "API_EDIT_FAMILY_OK" when conf.wizard ->
-          Api_saisie_write.print_mod_family_ok conf base
-      | Some "API_EDIT_PERSON" when conf.wizard ->
-          Api_saisie_write.print_mod_ind conf base
-      | Some "API_EDIT_PERSON_OK" when conf.wizard ->
-          Api_saisie_write.print_mod_ind_ok conf base
-      | Some "API_DEL_FAMILY_OK" when conf.wizard ->
-          Api_saisie_write.print_del_fam_ok conf base
-      | Some "API_DEL_PERSON_OK" when conf.wizard ->
-          Api_saisie_write.print_del_ind_ok conf base
-      | Some "API_LINK_TREE" -> Api_link.print_link_tree conf base
-      | Some "API_STATS" -> Api_stats.print_stats conf base
-      | Some _ -> incorrect_request conf
-      | None -> ()
-      end
-  | Some _ -> incorrect_request conf
-  | None ->
-      match find_person_in_env conf base "" with
-        Some p -> person_selected conf base p
-      | _ -> very_unknown conf
-
-let print_no_index conf base =
-  let title _ =
-    Wserver.printf "%s" (Util.capitale (transl conf "link to use"))
+[@@@ocaml.warning "-45"]
+let family_m (handler : RequestHandler.handler) conf base =
+  let open RequestHandler in
+  let p =
+    match p_getenv conf.env "m" with
+    | None -> handler._no_mode
+    | Some s -> match s with
+      | "A" -> handler.a
+      | "ADD_FAM" -> handler.add_fam
+      | "ADD_FAM_OK" -> handler.add_fam_ok
+      | "ADD_IND" -> handler.add_ind
+      | "ADD_IND_OK" -> handler.add_ind_ok
+      | "ADD_PAR" -> handler.add_par
+      | "ANM" -> handler.anm
+      | "AN" -> handler.an
+      | "AD" -> handler.ad
+      | "AM" -> handler.am
+      | "AS_OK" -> handler.as_ok
+      | "B" -> handler.b
+      | "C" -> handler.c
+      | "CAL" -> handler.cal
+      | "CHG_CHN" -> handler.chg_chn
+      | "CHG_CHN_OK" -> handler.chg_chn_ok
+      | "CHG_EVT_IND_ORD" -> handler.chg_evt_ind_ord
+      | "CHG_EVT_IND_ORD_OK" -> handler.chg_evt_ind_ord_ok
+      | "CHG_EVT_FAM_ORD" -> handler.chg_evt_fam_ord
+      | "CHG_EVT_FAM_ORD_OK" -> handler.chg_evt_fam_ord_ok
+      | "CHG_FAM_ORD" -> handler.chg_fam_ord
+      | "CHG_FAM_ORD_OK" -> handler.chg_fam_ord_ok
+      | "CONN_WIZ" -> handler.conn_wiz
+      | "D" -> handler.d
+      | "DAG" -> handler.dag
+      | "DEL_FAM" -> handler.del_fam
+      | "DEL_FAM_OK" -> handler.del_fam_ok
+      | "DEL_IMAGE" -> handler.del_image
+      | "DEL_IMAGE_OK" -> handler.del_image_ok
+      | "DEL_IND" -> handler.del_ind
+      | "DEL_IND_OK" -> handler.del_ind_ok
+      | "FORUM" -> handler.forum
+      | "FORUM_ADD" -> handler.forum_add
+      | "FORUM_ADD_OK" -> handler.forum_add_ok
+      | "FORUM_DEL" -> handler.forum_del
+      | "FORUM_P_P" -> handler.forum_p_p
+      | "FORUM_SEARCH" -> handler.forum_search
+      | "FORUM_VAL" -> handler.forum_val
+      | "FORUM_VIEW" -> handler.forum_view
+      | "H" -> handler.h
+      | "HIST" -> handler.hist
+      | "HIST_CLEAN" -> handler.hist_clean
+      | "HIST_CLEAN_OK" -> handler.hist_clean_ok
+      | "HIST_DIFF" -> handler.hist_diff
+      | "HIST_SEARCH" -> handler.hist_search
+      | "IMH" -> handler.imh
+      | "INV_FAM" -> handler.inv_fam
+      | "INV_FAM_OK" -> handler.inv_fam_ok
+      | "KILL_ANC" -> handler.kill_anc
+      | "LB" -> handler.lb
+      | "LD" -> handler.ld
+      | "LINKED" -> handler.linked
+      | "LL" -> handler.ll
+      | "LM" -> handler.lm
+      | "LEX" -> handler.lex
+      | "MISC_NOTES" -> handler.misc_notes
+      | "MISC_NOTES_SEARCH" -> handler.misc_notes_search
+      | "MOD_DATA" -> handler.mod_data
+      | "MOD_DATA_OK" -> handler.mod_data_ok
+      | "MOD_FAM" -> handler.mod_fam
+      | "MOD_FAM_OK" -> handler.mod_fam_ok
+      | "MOD_IND" -> handler.mod_ind
+      | "MOD_IND_OK" -> handler.mod_ind_ok
+      | "MOD_NOTES" -> handler.mod_notes
+      | "MOD_NOTES_OK" -> handler.mod_notes_ok
+      | "MOD_WIZNOTES" -> handler.mod_wiznotes
+      | "MOD_WIZNOTES_OK" -> handler.mod_wiznotes_ok
+      | "MRG" -> handler.mrg
+      | "MRG_DUP" -> handler.mrg_dup
+      | "MRG_DUP_IND_Y_N" -> handler.mrg_dup_ind_y_n
+      | "MRG_DUP_FAM_Y_N" -> handler.mrg_dup_fam_y_n
+      | "MRG_FAM" -> handler.mrg_fam
+      | "MRG_FAM_OK" -> handler.mrg_fam_ok
+      | "MRG_MOD_FAM_OK" -> handler.mrg_mod_fam_ok
+      | "MRG_IND" -> handler.mrg_ind
+      | "MRG_IND_OK" -> handler.mrg_ind_ok
+      | "MRG_MOD_IND_OK" -> handler.mrg_mod_ind_ok
+      | "N" -> handler.n
+      | "NG" -> handler.ng
+      | "NOTES" -> handler.notes
+      | "OA" -> handler.oa
+      | "OE" -> handler.oe
+      | "P" -> handler.p
+      | "POP_PYR" -> handler.pop_pyr
+      | "PS" -> handler.ps
+      | "R" -> handler.r
+      | "REQUEST" -> handler.request
+      | "RL" -> handler.rl
+      | "RLM" -> handler.rlm
+      | "S" -> handler.s
+      | "SND_IMAGE" -> handler.snd_image
+      | "SND_IMAGE_OK" -> handler.snd_image_ok
+      | "SRC" -> handler.src
+      | "STAT" -> handler.stat
+      | "CHANGE_WIZ_VIS" -> handler.change_wiz_vis
+      | "TT" -> handler.tt
+      | "U" -> handler.u
+      | "VIEW_WIZNOTES" -> handler.view_wiznotes
+      | "WIZNOTES" -> handler.wiznotes
+      | "WIZNOTES_SEARCH" -> handler.wiznotes_search
+      | mode
+        when
+          try
+            String.get mode 0 = 'A' && String.get mode 1 = 'P' &&
+            String.get mode 2 = 'I' && String.get mode 3 = '_'
+          with _ -> false ->
+        (* On passe en mode API, i.e. que les exceptions API sont levées. *)
+        let () = Api_conf.set_mode_api () in
+        begin match mode with
+          | "API_ALL_PERSONS" -> handler.api_all_persons
+          | "API_ALL_FAMILIES" -> handler.api_all_families
+          | "API_ANNIVERSARY" -> handler.api_anniversary
+          | "API_BASE_WARNINGS" -> handler.api_base_warnings
+          | "API_CLOSE_PERSONS" -> handler.api_close_persons
+          | "API_CPL_REL" -> handler.api_cpl_rel
+          | "API_GRAPH_ASC" -> handler.api_graph_asc
+          | "API_GRAPH_ASC_LIA" -> handler.api_graph_asc_lia
+          | "API_GRAPH_DESC" -> handler.api_graph_desc
+          | "API_GRAPH_REL" -> handler.api_graph_rel
+          | "API_FIRST_AVAILABLE_PERSON" -> handler.api_first_available_person
+          | "API_FIND_SOSA" -> handler.api_find_sosa
+          | "API_INFO_BASE" -> handler.api_info_base
+          | "API_INFO_IND" -> handler.api_info_ind
+          | "API_IMAGE" -> handler.api_image
+          | "API_IMAGE_EXT" -> handler.api_image_ext
+          | "API_IMAGE_ALL" -> handler.api_image_all
+          | "API_IMAGE_PERSON" -> handler.api_image_person
+          | "API_IMAGE_UPDATE" -> handler.api_image_update
+          | "API_LAST_MODIFIED_PERSONS" -> handler.api_last_modified_persons
+          | "API_LAST_VISITED_PERSONS" -> handler.api_last_visited_persons
+          | "API_LIST_PERSONS" -> handler.api_list_persons
+          | "API_LOOP_BASE" -> handler.api_loop_base
+          | "API_MAX_ANCESTORS" -> handler.api_max_ancestors
+          | "API_NB_ANCESTORS" -> handler.api_nb_ancestors
+          | "API_NOTIFICATION_BIRTHDAY" -> handler.api_notification_birthday
+          | "API_PRINT_INDEX" -> handler.api_print_index
+          | "API_PRINT_EXPORT" -> handler.api_print_export
+          | "API_PRINT_EXPORT_SEARCH" -> handler.api_print_export_search
+          | "API_PRINT_SYNCHRO" -> handler.api_print_synchro
+          | "API_REF_PERSON_FROM_ID" -> handler.api_ref_person_from_id
+          | "API_REMOVE_IMAGE_EXT" -> handler.api_remove_image_ext
+          | "API_REMOVE_IMAGE_EXT_ALL" -> handler.api_remove_image_ext_all
+          | "API_SEARCH" -> handler.api_search
+          | "API_GRAPH_TREE_V2" -> handler.api_graph_tree_v2
+          | "API_PERSON_TREE" -> handler.api_person_tree
+          | "API_FICHE_PERSON" -> handler.api_fiche_person
+          | "API_AUTO_COMPLETE" -> handler.api_auto_complete
+          | "API_GET_CONFIG" -> handler.api_get_config
+          | "API_PERSON_SEARCH_LIST" -> handler.api_person_search_list
+          | "API_GET_PERSON_SEARCH_INFO" -> handler.api_get_person_search_info
+          | "API_ADD_CHILD" -> handler.api_add_child
+          | "API_ADD_CHILD_OK" -> handler.api_add_child_ok
+          | "API_ADD_FAMILY" -> handler.api_add_family
+          | "API_ADD_FAMILY_OK" -> handler.api_add_family_ok
+          | "API_ADD_FIRST_FAM_OK" -> handler.api_add_first_fam_ok
+          | "API_ADD_PARENTS" -> handler.api_add_parents
+          | "API_ADD_PARENTS_OK" -> handler.api_add_parents_ok
+          | "API_ADD_PERSON_OK" -> handler.api_add_person_ok
+          | "API_ADD_PERSON_START_OK" -> handler.api_add_person_start_ok
+          | "API_ADD_SIBLING" -> handler.api_add_sibling
+          | "API_ADD_SIBLING_OK" -> handler.api_add_sibling_ok
+          | "API_EDIT_FAMILY_REQUEST" -> handler.api_edit_family_request
+          | "API_EDIT_FAMILY" -> handler.api_edit_family
+          | "API_EDIT_FAMILY_OK" -> handler.api_edit_family_ok
+          | "API_EDIT_PERSON" -> handler.api_edit_person
+          | "API_EDIT_PERSON_OK" -> handler.api_edit_person_ok
+          | "API_DEL_FAMILY_OK" -> handler.api_del_family_ok
+          | "API_DEL_PERSON_OK" -> handler.api_del_person_ok
+          | "API_LINK_TREE" -> handler.api_link_tree
+          | "API_STATS" -> handler.api_stats
+          | _ -> handler.incorrect_request
+        end
+      | _ -> handler.incorrect_request
   in
-  let link = url_no_index conf base in
-  header conf title;
-  Wserver.printf "<ul>\n";
-  html_li conf;
-  Wserver.printf "<a href=\"http://%s\">\n" link;
-  Wserver.printf "%s" link;
-  Wserver.printf "</a>\n";
-  Wserver.printf "</ul>\n";
-  print_link_to_welcome conf false;
-  trailer conf
+  p handler conf base
 
-let family_m_nobase conf =
+let family_m = family_m RequestHandler.defaultHandler
+
+let family_m_nobase handler conf =
+  let open RequestHandler in
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
   let () = Api_conf.set_mode_api () in
   match p_getenv conf.env "m" with
-    Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
+    Some "API_ADD_FIRST_FAM" -> handler.api_add_first_fam handler conf
   | Some _ | None -> ()
+
+let family_m_nobase = family_m_nobase RequestHandler.defaultHandler
+
+[@@@ocaml.warning "+45"]
 
 let special_vars =
   ["alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
@@ -876,6 +348,21 @@ let print_moved conf s =
       Wserver.printf "</a>";
       Wserver.printf "\n</dd></dt></dl>\n";
       Hutil.trailer conf
+
+let print_no_index conf base =
+  let title _ =
+    Wserver.printf "%s" (Util.capitale (transl conf "link to use"))
+  in
+  let link = url_no_index conf base in
+  header conf title;
+  Wserver.printf "<ul>\n";
+  html_li conf;
+  Wserver.printf "<a href=\"http://%s\">\n" link;
+  Wserver.printf "%s" link;
+  Wserver.printf "</a>\n";
+  Wserver.printf "</ul>\n";
+  print_link_to_welcome conf false;
+  trailer conf
 
 let treat_request conf base =
   begin match
