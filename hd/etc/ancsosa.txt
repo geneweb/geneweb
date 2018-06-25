@@ -214,17 +214,17 @@
   %end;
 %end;
 
-%define;link(aa, xx, ind)
-  %if;(evar.cgl = "on")xx%else;<a id="iind" href="%prefix;aa">xx</a>%end;
+%define;link(aaa, xxx, nnn)
+  %if;(evar.cgl="on")xxx%else;<a id="innn" href="%prefix;aaa">xxx</a>%end;
 %end;
 
-%define;link2(xx, ind)
-  %if;(evar.cgl = "on")%xx;%else;<a id="iind" href="%prefix;%xx.access;">%xx;</a>%end;
-  %xx.title;%xx.dates;
+%define;link2(xxx, nnn)
+  %if;(evar.cgl="on")%xxx;%else;<a id="innn" href="%prefix;%xxx.access;">%xxx;</a>%end;
+  %xxx.title;%xxx.dates;
 %end;
 
-%define;my_link(aa, xx, rr, ind)
-  %if;(evar.cgl = "on" or rr)xx%else;<a id="iind" href="%prefix;aa">xx</a>%end;
+%define;my_link(aaa, xxx, rrr, nnn)
+  %if;(evar.cgl="on" or rrr)xxx%else;<a id="innn" href="%prefix;aaa">xxx</a>%end;
 %end;
 
 %define;somebody_extra_info(xx)
@@ -1135,8 +1135,7 @@
       <div class="align-self-center mr-2">
         %apply;image_MF("ancestor")
         %apply;link%with;%ancestor.access;%and;
-          %ancestor;%and;%ancestor.index;
-        %end;
+          %ancestor;%and;%ancestor.index;%end;
         %if;(evar.title="on" and ancestor.title!=""), %ancestor.title;%end;
         %if;(ancestor.same != "" and evar.repeat = "on" and evar.num!="on")
           %apply;implex()
