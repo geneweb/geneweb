@@ -1071,7 +1071,7 @@ value gen_person_title_text reference p_access conf base p =
     match main_title conf base p with
     [ Some t ->
         reference conf base p (titled_person_text conf base p t) ^
-          one_title_text conf base p t
+          ", " ^ one_title_text conf base p t
     | None -> reference conf base p (gen_person_text p_access conf base p) ]
   else reference conf base p (gen_person_text p_access conf base p)
 ;
