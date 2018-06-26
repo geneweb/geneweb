@@ -1,6 +1,17 @@
 (* $Id: request.ml,v 5.61 2008-11-03 15:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+module type MakeIn = sig
+  val handler : RequestHandler.handler
+end
+
+module type MakeOut = sig
+  val treat_request_on_base : Config.config -> unit
+  val treat_request_on_nobase : Config.config -> unit
+end
+
+module Make (H : MakeIn) : MakeOut = struct
+
 open Config
 open Def
 open Gwdb
@@ -58,8 +69,9 @@ let make_senv conf base =
   | _ -> ()
 
 [@@@ocaml.warning "-45"]
-let family_m (handler : RequestHandler.handler) conf base =
+let family_m conf base =
   let open RequestHandler in
+  let handler = H.handler in
   let p =
     match p_getenv conf.env "m" with
     | None -> handler._no_mode
@@ -240,17 +252,14 @@ let family_m (handler : RequestHandler.handler) conf base =
   in
   p handler conf base
 
-let family_m = family_m RequestHandler.defaultHandler
-
-let family_m_nobase handler conf =
+let family_m_nobase conf =
   let open RequestHandler in
+  let handler = H.handler in
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
   let () = Api_conf.set_mode_api () in
   match p_getenv conf.env "m" with
     Some "API_ADD_FIRST_FAM" -> handler.api_add_first_fam handler conf
   | Some _ | None -> ()
-
-let family_m_nobase = family_m_nobase RequestHandler.defaultHandler
 
 [@@@ocaml.warning "+45"]
 
@@ -498,3 +507,6 @@ let treat_request_on_nobase conf =
           Not_found -> "iso-8859-1"
     end;
   try family_m_nobase conf; Wserver.wflush () with exc -> raise exc
+
+
+end
