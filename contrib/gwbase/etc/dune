@@ -2,6 +2,6 @@
 
 (executables
  ((names (public public2 geneanet clavier connex hist selroy chkimg consmoy lune titres gwck nbdesc probot))
-  (libraries (geneweb.lib))
+  (libraries (geneweb.internal))
  )
 )
