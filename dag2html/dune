@@ -4,7 +4,7 @@
  (public_name geneweb.dag2html)
  (modules (dag2html))
  (wrapped false)
- (libraries (geneweb.lib))
+ (libraries (geneweb.internal))
  )
 )
 

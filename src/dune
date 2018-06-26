@@ -8,7 +8,7 @@
               str
               camlp5
               camlp5.gramlib
-              geneweb.lib
+              geneweb.internal
               geneweb.wserver
               geneweb.dag2html))
  )

@@ -3,7 +3,7 @@
   (libraries (unix
               str
               camlp5.gramlib
-              geneweb.lib))
+              geneweb.internal))
  )
 )
 

@@ -8,6 +8,6 @@
           gwFixColon
           gwFindCpl
           gwFixY))
-  (libraries (str geneweb.lib))
+  (libraries (str geneweb.internal))
  )
 )

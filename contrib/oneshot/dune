@@ -1,5 +1,5 @@
 (executables
  ((names (gwRemoveImgGallery gwBaseCompatiblePlus gwFixDateText gwExportAscCSV gwFixAddEvent gwMostAsc))
-  (libraries (geneweb.lib))
+  (libraries (geneweb.internal))
  )
 )

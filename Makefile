@@ -93,13 +93,13 @@ CAMLP5_PA_EXTEND_FILES = \
 	ged2gwb/ged2gwb \
 	ged2gwb/ged2gwb2 \
 	src/pr_transl \
-	lib/templ \
-	lib/update \
+	internal/templ \
+	internal/update \
 	setup/setup
 
 CAMLP5_Q_MLAST_FILES = \
 	src/pr_transl \
-	lib/templ
+	internal/templ
 
 CAMLP5_FILES = $(sort $(CAMLP5_Q_MLAST_FILES) $(CAMLP5_PA_EXTEND_FILES))
 
@@ -122,8 +122,8 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 %.bc %.exe:
 	dune build $@
 
-install-exe: lib/gwlib.ml $(CAMLP5_FILES:=.camlp5) $(CAMLP5_FILES:=.ml) $(INSTALL_EXE:=.exe)
-install-bc: lib/gwlib.ml $(CAMLP5_FILES:=.camlp5) $(CAMLP5_FILES:=.ml) $(INSTALL_EXE:=.bc)
+install-exe: internal/gwlib.ml $(CAMLP5_FILES:=.camlp5) $(CAMLP5_FILES:=.ml) $(INSTALL_EXE:=.exe)
+install-bc: internal/gwlib.ml $(CAMLP5_FILES:=.camlp5) $(CAMLP5_FILES:=.ml) $(INSTALL_EXE:=.bc)
 
 exe: install-exe $(ALL_EXE:=.exe)
 bc: install-bc $(ALL_EXE:=.bc)
@@ -132,11 +132,11 @@ everything-bc: bc $(EVERYTHING_EXE:=.bc)
 everything-exe: exe $(EVERYTHING_EXE:=.exe)
 
 clean:
-	$(RM) $(CAMLP5_FILES:=.ml) lib/gwlib.ml
+	$(RM) $(CAMLP5_FILES:=.ml) internal/gwlib.ml
 	$(RM)r distribution
 	dune clean
 
-lib/gwlib.ml:
+internal/gwlib.ml:
 	echo "let prefix =" > $@
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@

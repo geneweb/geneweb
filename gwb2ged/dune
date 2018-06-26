@@ -1,5 +1,5 @@
 (executable
  ((name gwb2ged)
-  (libraries (str geneweb.lib))
+  (libraries (str geneweb.internal))
  )
 )
