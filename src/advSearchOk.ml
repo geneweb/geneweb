@@ -386,7 +386,7 @@ value searching_fields conf base =
 
 value print conf base =
   let title _ =
-    Wserver.printf "%s" (capitale (transl conf "advanced request"))
+    Wserver.printf "%s" (capitale (transl_nth conf "advanced request" 0))
   in
   let max_answers =
     match p_getint conf.env "max" with
@@ -396,7 +396,7 @@ value print conf base =
   do {
     header conf title;
     tag "p" begin
-      Wserver.printf "%s: %s."
+      Wserver.printf "%s %s"
         (capitale (transl conf "searching all")) (searching_fields conf base);
     end;
     let list = advanced_search conf base max_answers in

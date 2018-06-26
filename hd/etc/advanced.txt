@@ -11,16 +11,19 @@
 </head>
 <body%body_prop;>
 <div class="container">
-<h1 class="display-5 my-2 text-center">[*advanced request]0</h1>
+<div class="d-flex justify-content-between">
 
-%if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
-  </div>
-%end;
+  <h1 class="my-2">[*advanced request]0</h1>
+  %if;not cancel_links;
+    <div class="btn-group mt-4">
+      %if;(referer != "")
+        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+      %end;
+      <a href="%prefix;"><span class="fa fa-home fa-lg mx-1" title="[*home]"></span></a>
+    </div>
+  %end;
+</div>
+
 
 %define;date(xx,zz)
   %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
@@ -63,7 +66,7 @@
         %end;
         %if;("xx"="marriage")
           </div>
-          <div class="form-inline col-8">
+          <div class="form-inline col">
             <span class="form-control-label mr-2">[*married][:]</span>
             <div class="form-check form-check-inline">
               <input type="radio" class="form-check-input" name="married" id="mY" value="Y">
@@ -110,7 +113,7 @@
         <div class="col-3">
           <h4>[*person/persons]0</h4>
         </div>
-        <div class="form-inline col-9">
+        <div class="form-inline col">
           <span class="form-control-label mr-2">[*sex][:]</span>
           <div class="form-check form-check-inline">
             <input type="radio" class="form-check-input" name="sex" id="sexM" value="M">
@@ -155,16 +158,15 @@
     %apply;event("death","death")
     %apply;event("burial","burial")
   </div>
-  <div class="row">
-    <div class="col-4 form-inline">
-      <label for="max" class="col-3 col-form-label mb-2">[*maximum]</label>
-      <div class="col-9">
-        <input type="number" class="form-control" name="max" id="max" min="0" max="5000" value="150" step="50"><span class="ml-2">[person/persons]1</span>
-      </div>
+  <div class="row justify-content-center">
+    <div class="form-inline">
+      <label for="max" class="mr-2">[*maximum]</label>
+      <input type="number" class="form-control" name="max" id="max" min="0" max="5000" value="150" step="50">
+      <span class="ml-2">[person/persons]1</span>
     </div>
-    <div class="col-4 text-center">
-      <button type="submit" class="btn btn-outline-primary btn-lg">[*search/case sensitive]0</button>
-    </div>
+  </div>
+  <div class="row justify-content-center my-3">
+    <button type="submit" class="btn btn-outline-primary btn-lg">[*search/case sensitive]0</button>
   </div>
 </form>
 %base_trailer;

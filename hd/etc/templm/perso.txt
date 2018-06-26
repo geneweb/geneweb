@@ -467,7 +467,7 @@
     %let;x1;
       %prefix;m=H;v=advanced;focus=z1;birth1_yyyy=%birth_date.year;;death2_yyyy=%death_date.year;;z1=%nn;
     %in;
-    <a class="date" href="javascript:;" onclick="adv('%x1;',this)" title="[advanced request]">z2</a>%nn;
+    <a class="date" href="javascript:;" onclick="adv('%x1;',this)" title="[advanced request]0">z2</a>%nn;
   %else;
     z2%nn;
   %end;

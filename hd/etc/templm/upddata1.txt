@@ -59,7 +59,7 @@
                 %end;
                 +"<input type=\"submit\" value=\"ok\"\/>"
                 %if;(bvar.hide_advanced_request != "yes" and evar.data = "occu")
-                  +"<a href=\"javascript:lhr()\"> [*advanced request] <\/a>"
+                  +"<a href=\"javascript:lhr()\"> [*advanced request]0 <\/a>"
                 %end;
                 +"<\/span>";
       x2.insertAdjacentHTML("AfterEnd",x5);
