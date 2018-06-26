@@ -1,6 +1,6 @@
 (* $Id: gwc.ml,v 5.66 2008-01-14 16:47:00 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
-
+open Geneweb
 open Gwcomp
 open Printf
 

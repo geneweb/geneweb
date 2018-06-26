@@ -1,0 +1,18 @@
+(library
+ (
+ (name geneweb)
+ (public_name geneweb)
+ (synopsis "GeneWeb library")
+   (libraries (unix
+              piqirun.ext
+              redis-sync
+              yojson
+              curl
+              str
+              camlp5
+              camlp5.gramlib
+              geneweb.internal
+              geneweb.wserver
+              geneweb.dag2html))
+ )
+)

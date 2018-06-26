@@ -36,7 +36,6 @@ INSTALL_EXE = \
 DISTRIB_EXE = \
 	$(INSTALL_EXE) \
 
-
 ALL_EXE = \
 	$(INSTALL_EXE) \
 	gwtp/gwtp \
@@ -122,8 +121,15 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 %.bc %.exe:
 	dune build $@
 
-install-exe: internal/gwlib.ml $(CAMLP5_FILES:=.camlp5) $(CAMLP5_FILES:=.ml) $(INSTALL_EXE:=.exe)
-install-bc: internal/gwlib.ml $(CAMLP5_FILES:=.camlp5) $(CAMLP5_FILES:=.ml) $(INSTALL_EXE:=.bc)
+GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml)
+
+geneweb.install: $(GENERATED_FILES_DEP)
+	dune build @install
+
+.PHONY: geneweb.install
+
+install-exe: $(GENERATED_FILES_DEP) $(INSTALL_EXE:=.exe)
+install-bc: $(GENERATED_FILES_DEP) $(INSTALL_EXE:=.bc)
 
 exe: install-exe $(ALL_EXE:=.exe)
 bc: install-bc $(ALL_EXE:=.bc)
@@ -132,7 +138,7 @@ everything-bc: bc $(EVERYTHING_EXE:=.bc)
 everything-exe: exe $(EVERYTHING_EXE:=.exe)
 
 clean:
-	$(RM) $(CAMLP5_FILES:=.ml) internal/gwlib.ml
+	$(RM) $(GENERATED_FILES_DEP)
 	$(RM)r distribution
 	dune clean
 
@@ -143,13 +149,19 @@ internal/gwlib.ml:
 
 .PHONY: piqi
 piqi:
-	$(foreach p, $(wildcard src/*.proto), \
+	$(foreach p, $(wildcard lib/*.proto), \
 		piqi of-proto --normalize $(p) ; \
-		piqic-ocaml -C src/ --ext $(p).piqi ; \
+		piqic-ocaml -C lib/ --ext $(p).piqi ; \
 	  )
-	$(RM) src/*.piqi
+	$(RM) lib/*.piqi
 
-.PHONY: install uninstall distrib
+.PHONY: install uninstall distrib install-lib uninstall-lib
+
+install-lib: geneweb.install $(GENERATED_FILES_DEP)
+	dune install geneweb
+
+uninstall-lib: geneweb.install
+	dune uninstall geneweb
 
 install: install-exe
 	PWD=`pwd`

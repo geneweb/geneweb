@@ -1,4 +1,3 @@
-(* nocamlp5 *)
 
 module Gwu = GwuLib.Make(Select)
 

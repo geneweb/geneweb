@@ -1,15 +1,11 @@
 (executables
  ((names (gwc1 gwc2 mk_consang gwd gwu update_nldb check_base i18n_check))
-  (libraries (unix
-              piqirun.ext
-              redis-sync
-              yojson
-              curl
-              str
-              camlp5
-              camlp5.gramlib
+  (libraries (
               geneweb.internal
               geneweb.wserver
-              geneweb.dag2html))
+              geneweb.dag2html
+              geneweb
+              )
+  )
  )
 )

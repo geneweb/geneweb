@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 (* First Parentless Ancestor *)
 
+open Geneweb
 open Gwdb
 open Printf
 
