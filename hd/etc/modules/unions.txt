@@ -1,4 +1,4 @@
-<!-- $Id: perso_module/unions.txt v 7.00 19/03/2018 07:46:01 hg -->
+<!-- $Id: modules/unions.txt v 7.00 19/03/2018 07:46:01 hg -->
 %( op_m=1 simple: name %)
 %( op_m=2 photos: simple with photo %)
 %( op_m=3 evolved: spouse parents and children's spouse %)

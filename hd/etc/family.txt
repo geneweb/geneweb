@@ -26,7 +26,7 @@
   %include.menubar;
   %message_to_wizard;
   <div id="content" tabindex="-1">
-    %apply;show_templ("perso_module/arbre_famille")
+    %apply;show_templ("modules/arbre_famille")
   </div>
   %if;(not cancel_links)
     %include.trl;

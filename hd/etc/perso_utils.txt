@@ -828,12 +828,12 @@
 %end;
 
 %define;get_templ(tplnum)
-  %let;templ;perso_module/%bvar.perso_module_tplnum;%in
+  %let;templ;modules/%bvar.perso_module_tplnum;%in
   %apply;show_templ(templ)
 %end;
 
 %define;get_mod(modnum, optx)
-  %let;modx;perso_module/%bvar.perso_module_modnum;%in;
+  %let;modx;modules/%bvar.perso_module_modnum;%in;
   %let;op_m;optx%in;
   %apply;show_templ(modx)
 %end;

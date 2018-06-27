@@ -1,4 +1,4 @@
-<!-- $Id: perso_module/parents.txt v 7.00 20/11/2016 06:10:01 hg -->
+<!-- $Id: modules/parents.txt v 7.00 20/11/2016 06:10:01 hg -->
 %( op_m=1 simple: name %)
 %( op_m=3 simple with photo in 2 cols %)
 %( op_m=2 evolved: name, occupation %)
