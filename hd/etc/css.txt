@@ -14,8 +14,8 @@ li.female { list-style-type: circle; list-style-image: url('%image_prefix;/femal
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
       integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
   %else;
-    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;bootstrap.min.css">
+    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/bootstrap.min.css">
     <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.css">
   %end;
 %end;
-<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css.css">
+<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/css.css">
