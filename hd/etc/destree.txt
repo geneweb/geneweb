@@ -18,7 +18,7 @@
 <div class="container%if;(evar.wide="on")-fluid%end;">
 %import;perso_utils;
 %import;menubar;
-%apply;show_templ("perso_module/arbre_descendants")
+%apply;show_templ("modules/arbre_descendants")
 %base_trailer;
 %include.copyr;
 </div>

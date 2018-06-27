@@ -1,4 +1,4 @@
-<!-- $Id: perso_module/arbre_vertical v7.00 18/11/2017 20:02:08 Arbre ascendant (vertical) -->
+<!-- $Id: modules/arbre_vertical v7.00 18/11/2017 20:02:08 Arbre ascendant (vertical) -->
 
 %define;a_tree_line()
   %if;(not is_first)
@@ -256,7 +256,7 @@
   </div>
   <table class="tree-vert mx-auto my-3" style="border-width:%border;">
     %if;(evar.t="T" and evar.t1="m")
-      %include;perso_module/arbre_9gen;
+      %include;modules/arbre_9gen;
     %elseif;(evar.t="T")
       %apply;tree(evarv)
     %else;

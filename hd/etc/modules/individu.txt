@@ -1,4 +1,4 @@
-<!-- $Id: perso_module/individu.txt v 7.00 07/05/2018 07:54:32 hg -->
+<!-- $Id: modules/individu.txt v 7.00 07/05/2018 07:54:32 hg -->
 %( options
 0: skip
 1: standard

@@ -1,4 +1,4 @@
-<!-- $Id: perso_module/fratrie.txt v 7.00 28/03/2017 20:05:48 hg -->
+<!-- $Id: modules/fratrie.txt v 7.00 28/03/2017 20:05:48 hg -->
 %( op_m=1 simple: name %)
 %( op_m=2 simple with photo %)
 %( op_m=3 complete: name, marriages %)
@@ -192,7 +192,7 @@
         %end;
       %end;
     %end;
-<!--  perso_module/freresoeur_complet (deux listes de demi frères côte à côte) -->
+<!--  modules/freresoeur_complet (deux listes de demi frères côte à côte) -->
 %elseif;(op_m=3 and has_parents and (half_father != 0 or half_mother != 0))
   <h2>[*half siblings]</h2>
   <table style="border:%border;;width:100%">

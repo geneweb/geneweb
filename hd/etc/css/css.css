@@ -190,7 +190,7 @@ div.p_mod_builder {
   width: 300px;
 }
 
-/* Fixed ancestors image width on perso_module/tree_3gen_photo */
+/* Fixed ancestors image width on modules/arbre_3gen_photo */
 img.image_small_size {
   height: 70px;
 }
@@ -202,7 +202,7 @@ span.image_small_size {
   font-weight: 320
 }
 
-/* Fixed image size (width) on perso_module/parents and unions */
+/* Fixed image size (width) on modules/parents and modules/unions */
 .big_image{
   width: 8.5rem;
 }
