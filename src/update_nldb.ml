@@ -32,7 +32,7 @@ value notes_links s =
             [(key, link) :: list_ind]
           in
           loop list_nt list_ind (pos + 1) j
-      | NotesLinks.WLwizard j _ _ -> loop list_nt list_ind pos j
+      | NotesLinks.WLwizard j _ _ -> loop list_nt list_ind (pos + 1) j
       | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1) ]
 ;
 
