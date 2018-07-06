@@ -1198,9 +1198,26 @@ value gwc2 conf =
 ;
 
 value gwdiff_check conf =
-  print_file conf "bsi.htm"
+  print_file conf "bsi_diff.htm"
+;
+value gwdiff ok_file conf =
+  let rc =
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
+    exec_f (comm ^ parameters_2 conf.env)
+  in
+  do {
+    eprintf "\n";
+    flush stderr;
+    if rc > 1 then print_file conf "bsi_err.htm"
+    else
+      let conf =
+        conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
+      in
+      print_file conf ok_file
+  }
 ;
 
+(*
 value gwdiff conf ok_file =
   let ic = Unix.open_process_in "uname" in
   let uname = input_line ic in
@@ -1230,12 +1247,13 @@ value gwdiff conf ok_file =
     if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
   }
 ;
+*)
 
 value connex_check conf =
   print_file conf "bsi_connex.htm"
 ;
 
-value connex conf ok_file =
+value connex ok_file conf =
   let ic = Unix.open_process_in "uname" in
   let uname = input_line ic in
   let () = close_in ic in
@@ -2048,11 +2066,11 @@ value setup_comm_ok conf =
   | "connex" -> 
        match p_getenv conf.env "opt" with
       [ Some "check" -> connex_check conf
-      | _ -> connex conf "connex_ok.htm" ]
+      | _ -> connex "connex_ok.htm" conf ]
   | "gwdiff" -> 
        match p_getenv conf.env "opt" with
       [ Some "check" -> gwdiff_check conf
-      | _ -> gwdiff conf "gwdiff_ok.htm" ]
+      | _ -> gwdiff "gwdiff_ok.htm" conf ]
   | x ->
       if start_with x "doc/" || start_with x "images/" || start_with x "css/"
       then raw_file conf x
