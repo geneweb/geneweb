@@ -1217,38 +1217,6 @@ value gwdiff ok_file conf =
   }
 ;
 
-(*
-value gwdiff conf ok_file =
-  let ic = Unix.open_process_in "uname" in
-  let uname = input_line ic in
-  let () = close_in ic in
-  let rc =
-    let commnd = "cd " ^ (Sys.getcwd ()) ^ "; tput bel;" ^
-        (stringify (Filename.concat bin_dir.val "gwdiff")) ^ " " ^
-            parameters_2 conf.env in
-    if uname = "Darwin" then
-      let launch = "tell application \"Terminal\" to do script " in
-      Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd ^ " \"' " )
-    else if uname = "Linux" then
-      (* non testé ! *)
-      Sys.command ("xterm -e \" " ^ commnd ^ " \" ")
-    else if Sys.os_type = "Win32" then
-      (* à compléter et tester ! *)
-      let commnd = (stringify (Filename.concat bin_dir.val "gwdiff")) ^ " " ^
-          parameters_2 conf.env in
-      Sys.command (commnd)
-    else do {
-      eprintf "%s (%s) %s (%s)\n" 
-        "Unknown Os_type" Sys.os_type "or wrong uname response" uname;
-      2}
-  in
-  do {
-    flush stderr;
-    if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
-  }
-;
-*)
-
 value connex_check conf =
   print_file conf "bsi_connex.htm"
 ;
