@@ -5,7 +5,6 @@
 open Def;
 open Futil;
 open Gwcomp;
-open Printf;
 
 value default_source = ref "";
 value do_check = ref True;
@@ -169,7 +168,7 @@ value find_first_available_occ gen so fn sn =
     | None -> do {
         gen.g_warning_cnt := gen.g_warning_cnt - 1;
         if gen.g_warning_cnt > 0 then do {
-          eprintf "Warning: %s: %s.%d %s renumbered %d\n"
+          Printf.eprintf "Warning: %s: %s.%d %s renumbered %d\n"
             gen.g_file_info.f_curr_gwo_file so.first_name so.occ
             so.surname occ;
           flush stderr;
@@ -406,8 +405,8 @@ value insert_person1 gen so = do {
         ignore (key_hashtbl_find gen.g_index_of_key k : iper);
       gen.g_error_cnt := gen.g_error_cnt - 1;
       if gen.g_error_cnt > 0 then do {
-        eprintf "File \"%s\"\n" gen.g_file_info.f_curr_gwo_file;
-        eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
+        Printf.eprintf "File \"%s\"\n" gen.g_file_info.f_curr_gwo_file;
+        Printf.eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
           so.surname
       }
       else ();
@@ -524,7 +523,7 @@ value insert_bnotes1 gen notesname str = do {
         ["base_d"; "notes_of.txt"]
     in
     let oc = open_out fname in
-    fprintf oc "%s\n" gen.g_file_info.f_curr_src_file;
+    Printf.fprintf oc "%s\n" gen.g_file_info.f_curr_src_file;
     close_out oc;
   }
   else ();
@@ -578,7 +577,7 @@ value insert_undefined2 gen key fn sn sex = do {
     gen.g_error_cnt := gen.g_error_cnt - 1;
     if gen.g_error_cnt > 0 then do {
       gen.g_error_cnt := -1;
-      eprintf
+      Printf.eprintf
         "Error: option -sep does not work when there are undefined persons\n";
       flush stderr;
     }
@@ -588,7 +587,7 @@ value insert_undefined2 gen key fn sn sex = do {
   else if do_check.val then do {
     gen.g_warning_cnt := gen.g_warning_cnt - 1;
     if gen.g_warning_cnt > 0 then
-      eprintf "Warning: adding undefined %s.%d %s\n"
+      Printf.eprintf "Warning: adding undefined %s.%d %s\n"
         (Name.lower key.pk_first_name) key.pk_occ (Name.lower key.pk_surname)
     else ();
     flush stderr;
@@ -649,7 +648,7 @@ value get_person2 gen so sex =
     try key_hashtbl_find gen.g_index_of_key (fn, sn, occ) with
     [ Not_found ->
         failwith
-          (sprintf "*** bug not found %s.%d %s" so.first_name so.occ
+          (Printf.sprintf "*** bug not found %s.%d %s" so.first_name so.occ
              so.surname) ]
   }
   else do {
@@ -1299,7 +1298,7 @@ value compress_fields nper nfam tmp_dir =
        in
        let ic = open_in_bin (Filename.concat field_d "data") in
        if Mutil.verbose.val then do {
-         eprintf "compressing %s..." f2;
+         Printf.eprintf "compressing %s..." f2;
          flush stderr;
        }
        else ();
@@ -1385,7 +1384,7 @@ value reorder_fields tmp_dir nper =
        let ic_acc = open_in_bin (Filename.concat field_d "access") in
        let ic_dat = open_in_bin (Filename.concat field_d "data") in
        if Mutil.verbose.val then do {
-         eprintf "reordering %s..." f2;
+         Printf.eprintf "reordering %s..." f2;
          flush stderr;
        }
        else ();
@@ -1413,11 +1412,11 @@ value reorder_fields tmp_dir nper =
 
 value output_command_line bdir = do {
   let oc = open_out (Filename.concat bdir "command.txt") in
-  fprintf oc "%s" Sys.argv.(0);
+  Printf.fprintf oc "%s" Sys.argv.(0);
   for i = 1 to Array.length Sys.argv - 1 do {
-    fprintf oc " %s" Sys.argv.(i)
+    Printf.fprintf oc " %s" Sys.argv.(i)
   };
-  fprintf oc "\n";
+  Printf.fprintf oc "\n";
   close_out oc;
 };
 
@@ -1426,12 +1425,12 @@ value output_particles_file tmp_dir particles = do {
     List.fold_left Filename.concat tmp_dir ["base_d"; "particles.txt"]
   in
   let oc = open_out fname in
-  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
   close_out oc;
 };
 
 value set_error base x = do {
-  printf "\nError: ";
+  Printf.printf "\nError: ";
   Check.print_base_error stdout base x;
 };
 
@@ -1439,7 +1438,7 @@ value set_warning base =
   fun
   [ UndefinedSex _ -> ()
   | x -> do {
-      printf "\nWarning: ";
+      Printf.printf "\nWarning: ";
       Check.print_base_warning stdout base x;
     } ]
 ;
@@ -1568,7 +1567,7 @@ value link next_family_fun bdir = do {
      g_person_pevents = person_pevents}
   in
   if Mutil.verbose.val then do {
-    eprintf "pass 1: creating persons...\n";
+    Printf.eprintf "pass 1: creating persons...\n";
     flush stderr
   }
   else ();
@@ -1581,7 +1580,7 @@ value link next_family_fun bdir = do {
   Gc.compact ();
 
   if Mutil.verbose.val then do {
-    eprintf "pass 2: creating families...\n";
+    Printf.eprintf "pass 2: creating families...\n";
     flush stderr
   }
   else ();
@@ -1592,12 +1591,12 @@ value link next_family_fun bdir = do {
     | None -> () ];
 
   if gen.g_warning_cnt < 0 then do {
-    eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
+    Printf.eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
     flush stderr;
   }
   else ();
   if gen.g_error_cnt < 0 then do {
-    eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
+    Printf.eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
     flush stderr;
   }
   else ();

@@ -13,7 +13,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 
 value trace = ref False;
@@ -44,7 +43,7 @@ value read_file fname =
           try int_of_string occ
           with [ Failure _ ->
             do {
-              eprintf "*** Error int_of_string: %s" occ;
+              Printf.eprintf "*** Error int_of_string: %s" occ;
               flush stderr;
               exit 2;
             }]
@@ -52,7 +51,7 @@ value read_file fname =
         (sn, fn, occ)
     | _ ->
         do {
-          eprintf "*** Error key: %s" name;
+          Printf.eprintf "*** Error key: %s" name;
           flush stderr;
           exit 2;
         } ]
@@ -101,7 +100,8 @@ value update_database_with_file base fname =
              do {
                let p = poi base ip in
                if trace.val then do {
-                 eprintf "Modifiy person : %s" (Gutil.designation base p);
+                 Printf.eprintf
+                   "Modifiy person : %s" (Gutil.designation base p);
                  flush stderr
                }
                else ();
@@ -131,7 +131,8 @@ value update_database_with_file base fname =
              }
          | None ->
              do {
-               eprintf "Person not in the database anymore : %s.%d %s" fn occ sn;
+               Printf.eprintf
+                 "Person not in the database anymore : %s.%d %s" fn occ sn;
                flush stderr
              } ]
        })
@@ -161,7 +162,7 @@ value main () = do {
       let () = update_database_with_file base fname.val in
       close_base base
   | Refuse -> do {
-      eprintf "Cannot lock database. Try again.\n";
+      Printf.eprintf "Cannot lock database. Try again.\n";
       flush stderr;
     } ]
 };

@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 
 value designation base ip p =
@@ -94,7 +93,7 @@ value main () = do {
   lock Mutil.lock_file bname.val with
   [ Accept -> check bname.val
   | Refuse -> do {
-      eprintf "Cannot lock database. Try again.\n";
+      Printf.eprintf "Cannot lock database. Try again.\n";
       flush stderr;
     } ]
 };

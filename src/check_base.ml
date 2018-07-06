@@ -1,9 +1,8 @@
 (* $Id: check_base.ml,v 5.5 2007-03-19 10:59:31 ddr Exp $ *)
 
-open Printf;
 
 value print_error base x = do {
-  printf "\nError: ";
+  Printf.printf "\nError: ";
   Check.print_base_error stdout base x;
 };
 
@@ -24,7 +23,7 @@ value print_warning base =
         (Name.lower (Gwdb.p_surname base anc))
 *)
   | x -> do {
-      printf "\nWarning: ";
+      Printf.printf "\nWarning: ";
       Check.print_base_warning stdout base x;
     } ]
 ;
@@ -37,7 +36,7 @@ value check_base bname = do {
   let changed_p (ip, p, o_sex, o_rpar) = do {
     let fn = Gwdb.p_first_name base p in
     let sn = Gwdb.p_surname base p in
-    printf "%s.%d %s not changed" fn (Gwdb.get_occ p) sn;
+    Printf.printf "%s.%d %s not changed" fn (Gwdb.get_occ p) sn;
   }
   in
   let errors = ref [] in

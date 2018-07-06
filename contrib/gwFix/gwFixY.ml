@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 (* Copie de util.ml *)
 value gen_only_printable or_nl s =
@@ -69,7 +68,7 @@ value fix_occu_y base = do {
     in
     if updt.val then do {
       if trace.val then do {
-        eprintf "Modifiy person : %s\n" (Gutil.designation base p);
+        Printf.eprintf "Modifiy person : %s\n" (Gutil.designation base p);
         flush stderr
       }
       else ();
@@ -111,7 +110,7 @@ value fix_occu_y base = do {
       if trace.val then do {
         let fath = poi base (get_father fam) in
         let moth = poi base (get_mother fam) in
-        eprintf "Modifiy family : %s %s\n"
+        Printf.eprintf "Modifiy family : %s %s\n"
           (Gutil.designation base fath) (Gutil.designation base moth);
         flush stderr
       }
@@ -127,8 +126,8 @@ value fix_occu_y base = do {
   };
   if changed.val then do {
     commit_patches base;
-    eprintf "Number of modified persons: %d\n" nb_ind_modified.val;
-    eprintf "Number of modified families: %d\n" nb_fam_modified.val;
+    Printf.eprintf "Number of modified persons: %d\n" nb_ind_modified.val;
+    Printf.eprintf "Number of modified families: %d\n" nb_fam_modified.val;
     flush stderr
   }
   else ()
@@ -151,7 +150,7 @@ value main () = do {
       let base = Gwdb.open_base bname.val in
       fix_occu_y base
   | Refuse -> do {
-      eprintf "Cannot lock database. Try again.\n";
+      Printf.eprintf "Cannot lock database. Try again.\n";
       flush stderr;
     } ]
 };

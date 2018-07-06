@@ -1,7 +1,6 @@
 (* $Id: chkimg.ml,v 4.9 2007-09-04 03:06:50 deraugla Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
-open Printf;
 
 value get_images_names bname =
   let dh = Unix.opendir (Filename.concat "images" bname) in
@@ -27,8 +26,8 @@ value check_key_aux base ifname fname =
       if ip = None then raise Not_found else ()
     }
   with
-  [ Not_found -> do { printf "... nobody: %s\n" ifname; flush stdout }
-  | x -> do { printf "error at %s\n" fname; flush stdout; raise x } ]
+  [ Not_found -> do { Printf.printf "... nobody: %s\n" ifname; flush stdout }
+  | x -> do { Printf.printf "error at %s\n" fname; flush stdout; raise x } ]
 ;
 
 value check_key base fname =
@@ -36,7 +35,7 @@ value check_key base fname =
     check_key_aux base fname (Filename.chop_suffix fname ".jpg")
   else if Filename.check_suffix fname ".gif" then
     check_key_aux base fname (Filename.chop_suffix fname ".gif")
-  else printf "... alone: %s\n" fname
+  else Printf.printf "... alone: %s\n" fname
 ;
 
 value chkimg bname base =

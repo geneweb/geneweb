@@ -6,7 +6,6 @@ open Config;
 open Def;
 open Gutil;
 open Mutil;
-open Printf;
 open Util;
 
 value green_color = "#2f6400";
@@ -50,7 +49,7 @@ value extract_boundary content_type =
 ;
 
 value fprintf_date oc tm =
-  fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
+  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
     (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
     tm.Unix.tm_sec
 ;
@@ -61,7 +60,7 @@ value print_and_cut_if_too_big oc str =
       output_char oc str.[i];
       let i =
         if i > 700 && String.length str - i > 750 then do {
-          fprintf oc " ... "; String.length str - 700
+          Printf.fprintf oc " ... "; String.length str - 700
         }
         else i + 1
       in
@@ -76,25 +75,25 @@ value log oc tm conf from gauth request script_name contents =
   do {
     let tm = Unix.localtime tm in
     fprintf_date oc tm;
-    fprintf oc " (%d)" (Unix.getpid ());
-    fprintf oc " %s?" script_name;
+    Printf.fprintf oc " (%d)" (Unix.getpid ());
+    Printf.fprintf oc " %s?" script_name;
     print_and_cut_if_too_big oc contents;
     output_char oc '\n';
-    fprintf oc "  From: %s\n" from;
-    if gauth <> "" then fprintf oc "  User: %s\n" gauth else ();
+    Printf.fprintf oc "  From: %s\n" from;
+    if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth else ();
     if conf.wizard && not conf.friend then
-      fprintf oc "  User: %s%s(wizard)\n" conf.user
+      Printf.fprintf oc "  User: %s%s(wizard)\n" conf.user
         (if conf.user = "" then "" else " ")
     else if conf.friend && not conf.wizard then
-      fprintf oc "  User: %s%s(friend)\n" conf.user
+      Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
         (if conf.user = "" then "" else " ")
     else ();
-    if user_agent <> "" then fprintf oc "  Agent: %s\n" user_agent
+    if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent
     else ();
     if referer <> "" then do {
-      fprintf oc "  Referer: ";
+      Printf.fprintf oc "  Referer: ";
       print_and_cut_if_too_big oc referer;
-      fprintf oc "\n"
+      Printf.fprintf oc "\n"
     }
     else ();
   }
@@ -111,16 +110,16 @@ value log_passwd_failed ar oc tm from request base_file = do {
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in fprintf_date oc tm;
-  fprintf oc " (%d)" (Unix.getpid ());
-  fprintf oc " %s_%s" base_file ar.ar_passwd;
-  fprintf oc " => failed (%s)" ar.ar_user;
+  Printf.fprintf oc " (%d)" (Unix.getpid ());
+  Printf.fprintf oc " %s_%s" base_file ar.ar_passwd;
+  Printf.fprintf oc " => failed (%s)" ar.ar_user;
   if trace_failed_passwd.val then
-    fprintf oc " (%s)" (String.escaped ar.ar_uauth)
+    Printf.fprintf oc " (%s)" (String.escaped ar.ar_uauth)
   else ();
-  fprintf oc "\n";
-  fprintf oc "  From: %s\n" from;
-  fprintf oc "  Agent: %s\n" user_agent;
-  if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
+  Printf.fprintf oc "\n";
+  Printf.fprintf oc "  From: %s\n" from;
+  Printf.fprintf oc "  Agent: %s\n" user_agent;
+  if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
 };
 
 value copy_file fname =
@@ -162,7 +161,7 @@ value refuse_log from =
     Log.with_file ~{file = "refuse_log"} (fun oc -> do {
       let tm = Unix.localtime (Unix.time ()) in
       fprintf_date oc tm;
-      fprintf oc " excluded: %s\n" from
+      Printf.fprintf oc " excluded: %s\n" from
     });
     http HttpStatus.Forbidden;
     Wserver.header "Content-type: text/html";
@@ -176,12 +175,13 @@ value only_log from =
     Log.with_log (fun oc -> do {
       let tm = Unix.localtime (Unix.time ()) in
       fprintf_date oc tm;
-      fprintf oc " Connection refused from %s " from;
-      fprintf oc "(only ";
+      Printf.fprintf oc " Connection refused from %s " from;
+      Printf.fprintf oc "(only ";
       list_iter_first
-        (fun first s -> fprintf oc "%s%s" (if not first then "," else "") s)
+        (fun first s ->
+          Printf.fprintf oc "%s%s" (if not first then "," else "") s)
         only_addresses.val;
-      fprintf oc ")\n" });
+      Printf.fprintf oc ")\n" });
     http HttpStatus.OK;
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
     Wserver.printf "<head><title>Invalid access</title></head>\n";
@@ -194,10 +194,10 @@ value refuse_auth conf from auth auth_type =
     Log.with_log (fun oc -> do {
       let tm = Unix.localtime (Unix.time ()) in
       fprintf_date oc tm;
-      fprintf oc " Access failed\n";
-      fprintf oc "  From: %s\n" from;
-      fprintf oc "  Basic realm: %s\n" auth_type;
-      fprintf oc "  Response: %s\n" auth });
+      Printf.fprintf oc " Access failed\n";
+      Printf.fprintf oc "  From: %s\n" from;
+      Printf.fprintf oc "  Basic realm: %s\n" auth_type;
+      Printf.fprintf oc "  Response: %s\n" auth });
     Util.unauthorized conf auth_type;
   }
 ;
@@ -339,9 +339,9 @@ value log_redirect conf from request req =
       let referer = Wserver.extract_param "referer: " '\n' request in
       let tm = Unix.localtime (Unix.time ()) in
       fprintf_date oc tm;
-      fprintf oc " %s\n" req;
-      fprintf oc "  From: %s\n" from;
-      fprintf oc "  Referer: %s\n" referer })
+      Printf.fprintf oc " %s\n" req;
+      Printf.fprintf oc "  From: %s\n" from;
+      Printf.fprintf oc "  Referer: %s\n" referer })
   | Refuse -> () ]
 ;
 
@@ -425,11 +425,11 @@ value nonce_private_key =
          Random.self_init ();
          let k = Random.bits () in
          let oc = open_out fname in
-         fprintf oc "\
+         Printf.fprintf oc "\
 # Gwd key for better password protection in communication.\n\
 # Changing it makes all users receive their login window again.\n\
 # Generated by program but can be modified by hand to any value.\n";
-         fprintf oc "\n%d\n" k;
+         Printf.fprintf oc "\n%d\n" k;
          close_out oc;
          string_of_int k
        }
@@ -454,10 +454,11 @@ value unauth_server conf ar =  do {
   Wserver.http HttpStatus.Unauthorized;
   if use_auth_digest_scheme.val then
     let nonce = digest_nonce conf.ctime in
-let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun oc -> fprintf oc "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n" fprintf_date tm (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) conf.request) ar.ar_passwd nonce ar.ar_can_stale) in
+let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun oc -> Printf.fprintf oc "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n" fprintf_date tm (fun oc -> List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) conf.request) ar.ar_passwd nonce ar.ar_can_stale) in
     Wserver.header
       "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\"" typ
-      conf.bname (if nonce = "" then "" else sprintf ",nonce=\"%s\"" nonce)
+      conf.bname
+      (if nonce = "" then "" else Printf.sprintf ",nonce=\"%s\"" nonce)
       (if ar.ar_can_stale then ",stale=true" else "")
   else
     Wserver.header "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
@@ -610,7 +611,7 @@ value set_actlog list =
       do {
         List.iter
           (fun ((from, base_pw), (a, c, d)) ->
-             fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
+             Printf.fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
                (if d = "" then "" else " " ^ d))
           list;
         close_out oc;
@@ -1032,7 +1033,7 @@ value digest_authorization request base_env passwd utm base_file command =
         [ "" -> "POST"
         | s -> "GET" ]
       in
-let _ = trace_auth base_env (fun oc -> fprintf oc "\nauth = \"%s\"\n" auth) in
+let _ = trace_auth base_env (fun oc -> Printf.fprintf oc "\nauth = \"%s\"\n" auth) in
       let digenv = parse_digest auth in
       let get_digenv s = try List.assoc s digenv with [ Not_found -> "" ] in
       let ds =
@@ -1043,7 +1044,7 @@ let _ = trace_auth base_env (fun oc -> fprintf oc "\nauth = \"%s\"\n" auth) in
          ds_response = get_digenv "response"}
       in
       let nonce = digest_nonce utm in
-let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n" fprintf_date (Unix.localtime utm) (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) request) passwd nonce ds.ds_meth ds.ds_uri) in
+let _ = trace_auth base_env (fun oc -> Printf.fprintf oc "\nanswer\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n" fprintf_date (Unix.localtime utm) (fun oc -> List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) request) passwd nonce ds.ds_meth ds.ds_uri) in
       if passwd = "w" then
         test_passwd ds nonce command wizard_passwd wizard_passwd_file "w"
           True
@@ -1051,7 +1052,7 @@ let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- reque
         test_passwd ds nonce command friend_passwd friend_passwd_file "f"
           False
       else
-        failwith (sprintf "not impl (2) %s %s" auth meth)
+        failwith (Printf.sprintf "not impl (2) %s %s" auth meth)
     else
       {ar_ok = False; ar_command = command; ar_passwd = passwd;
        ar_scheme = NoAuth; ar_user = ""; ar_name = ""; ar_wizard = False;
@@ -1749,15 +1750,15 @@ value geneweb_server () =
         [ Some addr -> addr
         | None -> try Unix.gethostname () with _ -> "computer" ]
       in
-      eprintf "GeneWeb %s - " Version.txt;
+      Printf.eprintf "GeneWeb %s - " Version.txt;
       if not daemon.val then do {
-        eprintf "Possible addresses:";
-        eprintf "
+        Printf.eprintf "Possible addresses:";
+        Printf.eprintf "
    http://localhost:%d/base
    http://127.0.0.1:%d/base
    http://%s:%d/base" selected_port.val selected_port.val hostn
           selected_port.val;
-        eprintf "
+        Printf.eprintf "
 where \"base\" is the name of the database
 Type %s to stop the service
 " "control C";
@@ -1883,8 +1884,8 @@ value robot_exclude_arg s =
   with
   [ Ploc.Exc _ (Stream.Error _ | Token.Error _) ->
       do {
-        eprintf "Bad use of option -robot_xcl\n";
-        eprintf "Use option -help for usage.\n";
+        Printf.eprintf "Bad use of option -robot_xcl\n";
+        Printf.eprintf "Use option -help for usage.\n";
         flush Pervasives.stderr;
         exit 2
       } ]
@@ -2124,7 +2125,7 @@ value test_eacces_bind err fun_name =
     if err = Unix.EACCES && fun_name = "bind" then
       try
         do {
-          eprintf "
+          Printf.eprintf "
 Error: invalid access to the port %d: users port number less than 1024
 are reserved to the system. Solution: do it as root or choose another port
 number greater than 1024.
@@ -2142,9 +2143,9 @@ value print_exc exc =
   match exc with
   [ Unix.Unix_error Unix.EADDRINUSE "bind" _ ->
       do {
-        eprintf "\nError: ";
-        eprintf "the port %d" selected_port.val;
-        eprintf " \
+        Printf.eprintf "\nError: ";
+        Printf.eprintf "the port %d" selected_port.val;
+        Printf.eprintf " \
 is already used by another GeneWeb daemon
 or by another program. Solution: kill the other program or launch
 GeneWeb with another port number (option -p)
@@ -2167,7 +2168,7 @@ GeneWeb with another port number (option -p)
       }
   | _ ->
       do {
-        eprintf "%s\n" (Printexc.to_string exc);
+        Printf.eprintf "%s\n" (Printexc.to_string exc);
         flush stderr
       } ]
 ;

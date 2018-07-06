@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 value bname = ref "";
 
@@ -35,25 +34,25 @@ value lune bname =
 	  else ()
       | _ -> () ];
     };
-    printf "Influence de la lune sur les naissances.\n\n";
-    printf "Nombre de personnes = %d\n" nbb.val;
-    printf "\n";
-    printf "Naissances :\n\n";
-    printf "- à la nouvelle lune  : %d (%.3f%%)\n" moon_phase.(1)
+    Printf.printf "Influence de la lune sur les naissances.\n\n";
+    Printf.printf "Nombre de personnes = %d\n" nbb.val;
+    Printf.printf "\n";
+    Printf.printf "Naissances :\n\n";
+    Printf.printf "- à la nouvelle lune  : %d (%.3f%%)\n" moon_phase.(1)
       (100.0 *. float moon_phase.(1) /. float nbb.val);
-    printf "- au premier quartier : %d (%.3f%%)\n" moon_phase.(2)
+    Printf.printf "- au premier quartier : %d (%.3f%%)\n" moon_phase.(2)
       (100.0 *. float moon_phase.(2) /. float nbb.val);
-    printf "- à la pleine lune    : %d (%.3f%%)\n" moon_phase.(3)
+    Printf.printf "- à la pleine lune    : %d (%.3f%%)\n" moon_phase.(3)
       (100.0 *. float moon_phase.(3) /. float nbb.val);
-    printf "- au dernier quartier : %d (%.3f%%)\n" moon_phase.(4)
+    Printf.printf "- au dernier quartier : %d (%.3f%%)\n" moon_phase.(4)
       (100.0 *. float moon_phase.(4) /. float nbb.val);
-    printf "- entre deux phases   : %d (%.3f%%)\n" moon_phase.(0)
+    Printf.printf "- entre deux phases   : %d (%.3f%%)\n" moon_phase.(0)
       (100.0 *. float moon_phase.(0) /. float nbb.val);
-    printf "\n";
-    printf "Naissances en fonction de l'âge de la lune:\n\n";
-    printf "\tâge\tnombre\t%%/total\n";
+    Printf.printf "\n";
+    Printf.printf "Naissances en fonction de l'âge de la lune:\n\n";
+    Printf.printf "\tâge\tnombre\t%%/total\n";
     for i = 0 to Array.length moon_age - 1 do {
-      printf "\t%2d\t%d\t%.3f%%\n" (i + 1) moon_age.(i)
+      Printf.printf "\t%2d\t%d\t%.3f%%\n" (i + 1) moon_age.(i)
         (float moon_age.(i) *. 100.0 /. float nbb.val);
     };
     flush stdout;

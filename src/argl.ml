@@ -1,8 +1,6 @@
 (* $Id: argl.ml,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Printf;
-
 value action_arg s sl =
   fun
   [ Arg.Set r -> if s = "" then do { r.val := True; Some sl } else None
@@ -96,8 +94,8 @@ value parse_arg_list spec_list anon_fun remaining_args =
   try parse_aux spec_list anon_fun remaining_args with
   [ Arg.Bad s ->
       do {
-        eprintf "Error: %s\n" s;
-        eprintf "Use option -help for usage\n";
+        Printf.eprintf "Error: %s\n" s;
+        Printf.eprintf "Use option -help for usage\n";
         flush stderr;
         exit 2
       } ]
@@ -105,8 +103,8 @@ value parse_arg_list spec_list anon_fun remaining_args =
 
 value usage speclist errmsg =
   do {
-    printf "%s\n" errmsg;
-    List.iter (fun (key, _, doc) -> printf "  %s %s\n" key doc)
+    Printf.printf "%s\n" errmsg;
+    List.iter (fun (key, _, doc) -> Printf.printf "  %s %s\n" key doc)
       speclist;
     flush stdout;
   }
@@ -118,8 +116,8 @@ value parse_list spec_list anonfun errmsg list =
   | ["-help" :: sl] -> do { usage spec_list errmsg; exit 0 }
   | [s :: sl] ->
       do {
-        eprintf "%s: unknown or misused option\n" s;
-        eprintf "Use option -help for usage\n";
+        Printf.eprintf "%s: unknown or misused option\n" s;
+        Printf.eprintf "Use option -help for usage\n";
         flush stderr;
         exit 2
       } ]

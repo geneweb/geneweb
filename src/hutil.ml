@@ -3,7 +3,6 @@
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
-open Printf;
 
 value commd_no_params conf =
   conf.command ^ "?" ^
@@ -18,7 +17,7 @@ value link_to_referer conf =
   let referer = Util.get_referer conf in
   let back = Util.capitale (Util.transl conf "back") in
   if referer <> "" then
-    sprintf
+    Printf.sprintf
       "<a href=\"%s\">\
          <span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span>\
        </a>\n"

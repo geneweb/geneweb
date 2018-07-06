@@ -1,7 +1,6 @@
 (* $Id: main.ml,v 5.1 2006-10-15 15:39:38 ddr Exp $ *)
 
 open Dag2html;
-open Printf;
 
 value version = "1.02-exp";
 
@@ -174,44 +173,44 @@ value print_char_table d t =
 
 value print_table border hts =
   do {
-    printf "<center><table border=%d" border;
-    printf " cellspacing=0 cellpadding=0>\n";
+    Printf.printf "<center><table border=%d" border;
+    Printf.printf " cellspacing=0 cellpadding=0>\n";
     for i = 0 to Array.length hts - 1 do {
-      printf "<tr align=left>\n";
+      Printf.printf "<tr align=left>\n";
       for j = 0 to Array.length hts.(i) - 1 do {
         let (colspan, align, td) = hts.(i).(j) in
-        printf "<td";
+        Printf.printf "<td";
         (*
             if colspan > 1 then printf " colspan=%d" colspan else ();
 *)
 if colspan = 1 && (td = TDitem "&nbsp;" || td = TDhr CenterA) then
           ()
-        else printf " colspan=%d" colspan;
+        else Printf.printf " colspan=%d" colspan;
         (**)
         match (align, td) with
-        [ (LeftA, TDhr LeftA) -> printf " align=left"
+        [ (LeftA, TDhr LeftA) -> Printf.printf " align=left"
         | (LeftA, _) -> ()
-        | (CenterA, _) -> printf " align=center"
-        | (RightA, _) -> printf " align=right" ];
-        printf ">";
+        | (CenterA, _) -> Printf.printf " align=center"
+        | (RightA, _) -> Printf.printf " align=right" ];
+        Printf.printf ">";
         match td with
-        [ TDitem s -> printf "%s" s
-        | TDtext s -> printf "%s" s
-        | TDbar _ -> printf "|"
+        [ TDitem s -> Printf.printf "%s" s
+        | TDtext s -> Printf.printf "%s" s
+        | TDbar _ -> Printf.printf "|"
         | TDhr align ->
             do {
-              printf "<hr noshade size=1";
+              Printf.printf "<hr noshade size=1";
               match align with
-              [ LeftA -> printf " width=\"50%%\" align=left"
-              | RightA -> printf " width=\"50%%\" align=right"
+              [ LeftA -> Printf.printf " width=\"50%%\" align=left"
+              | RightA -> Printf.printf " width=\"50%%\" align=right"
               | _ -> () ];
-              printf ">"
+              Printf.printf ">"
             }
-        | TDnothing -> printf "&nbsp;" ];
-        printf "</td>\n"
+        | TDnothing -> Printf.printf "&nbsp;" ];
+        Printf.printf "</td>\n"
       }
     };
-    printf "</table></center>\n"
+    Printf.printf "</table></center>\n"
   }
 ;
 
@@ -223,7 +222,7 @@ value no_optim = ref False;
 value no_group = ref False;
 
 value print_version () =
-  do { eprintf "Dag2html version %s\n" version; flush stderr; exit 0 }
+  do { Printf.eprintf "Dag2html version %s\n" version; flush stderr; exit 0 }
 ;
 
 value speclist =

@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 value trace = ref False;
 
@@ -89,7 +88,7 @@ value update_database_with_burial base = do {
     in
     if changed then do {
       if trace.val then do {
-        eprintf "Modifiy person : %s\n" (Gutil.designation base p);
+        Printf.eprintf "Modifiy person : %s\n" (Gutil.designation base p);
         flush stderr
       }
       else ();
@@ -105,7 +104,7 @@ value update_database_with_burial base = do {
   };
   if base_changed.val then do {
     commit_patches base;
-    eprintf "Number of modified persons: %d\n" nb_modified.val;
+    Printf.eprintf "Number of modified persons: %d\n" nb_modified.val;
     flush stderr
   }
   else ()
@@ -128,7 +127,7 @@ value main () = do {
       let base = Gwdb.open_base bname.val in
       update_database_with_burial base
   | Refuse -> do {
-      eprintf "Cannot lock database. Try again.\n";
+      Printf.eprintf "Cannot lock database. Try again.\n";
       flush stderr;
     } ]
 };

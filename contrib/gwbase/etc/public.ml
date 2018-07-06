@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 value year_of p =
   match
@@ -87,12 +86,12 @@ value mark_ancestors base scanned lim_year is_quest_string =
          not (is_quest_string (get_surname p))
       then do {
 (**)
-  let _ = do { printf "%s\n" (Gutil.designation base p); flush stdout; } in
+  let _ = do { Printf.printf "%s\n" (Gutil.designation base p); flush stdout; } in
 (**)
         match year_of p with
 	[ Some y ->
 	    if y >= lim_year then do {
-              eprintf "ça déconne %s %d\n" (Gutil.designation base p) y;
+              Printf.eprintf "ça déconne %s %d\n" (Gutil.designation base p) y;
               flush stderr;
             }
 	    else ()

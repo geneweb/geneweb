@@ -2,7 +2,6 @@
 (* Copyright (c) 2000 INRIA *)
 
 open Gwdb;
-open Printf;
 
 value consmoy bname base =
   let cons = ref 0.0 in
@@ -11,7 +10,7 @@ value consmoy bname base =
       let p = poi base (Adef.iper_of_int i) in
       cons.val := cons.val +. Adef.float_of_fix (get_consang p)
     };
-    printf "average consanguinity: %f\n"
+    Printf.printf "average consanguinity: %f\n"
       (cons.val /. float (nb_of_persons base));
     flush stdout;
     ()

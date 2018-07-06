@@ -2,7 +2,6 @@
 (* $Id: mk_consang.ml,v 5.56 2012-01-18 21:03:02 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Printf;
 
 value fname = ref "";
 value indexes = ref False;
@@ -58,7 +57,7 @@ value init_cache_info bname base = do {
 
 value rebuild_field_array db2 len pad bdir compress f = do {
   if Mutil.verbose.val then do {
-    eprintf "rebuilding %s..." (Filename.basename bdir);
+    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
   }
   else ();
@@ -67,7 +66,7 @@ value rebuild_field_array db2 len pad bdir compress f = do {
   else
     Db2out.output_value_array_no_compress bdir "" len pad f;
   if Mutil.verbose.val then do {
-    eprintf "\n";
+    Printf.eprintf "\n";
     flush stderr
   }
   else ()
@@ -153,7 +152,7 @@ value rebuild_list_field_array db2 fi (f2, get) = do {
   Mutil.mkdir_p bdir;
 
   if Mutil.verbose.val then do {
-    eprintf "rebuilding %s..." (Filename.basename bdir);
+    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
   }
   else ();
@@ -163,7 +162,7 @@ value rebuild_list_field_array db2 fi (f2, get) = do {
   close_out oc_acc;
   close_out oc_dat;
   if Mutil.verbose.val then do {
-    eprintf "\n";
+    Printf.eprintf "\n";
     flush stderr
   }
   else ()
@@ -205,7 +204,7 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
   Mutil.mkdir_p bdir;
 
   if Mutil.verbose.val then do {
-    eprintf "rebuilding %s..." (Filename.basename bdir);
+    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
   }
   else ();
@@ -215,7 +214,7 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
   close_out oc_acc;
   close_out oc_dat;
   if Mutil.verbose.val then do {
-    eprintf "\n";
+    Printf.eprintf "\n";
     flush stderr
   }
   else ()
@@ -290,7 +289,7 @@ value unique_key_string (ht, scnt) s =
 
 value make_key_index db2 nb_per bdir = do {
   if Mutil.verbose.val then do {
-    eprintf "key index...";
+    Printf.eprintf "key index...";
     flush stderr;
   }
   else ();
@@ -332,7 +331,7 @@ value make_key_index db2 nb_per bdir = do {
   Hashtbl.clear (fst ht_strings);
 
   if Mutil.verbose.val then do {
-    eprintf "\n";
+    Printf.eprintf "\n";
     flush stderr
   }
   else ();
@@ -533,8 +532,8 @@ value designation base p =
 value main () = do {
   Argl.parse speclist anonfun errmsg;
   if fname.val = "" then do {
-    eprintf "Missing file name\n";
-    eprintf "Use option -help for usage\n";
+    Printf.eprintf "Missing file name\n";
+    Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2;
   }
@@ -549,7 +548,7 @@ value main () = do {
     }
     with
     [ Consang.TopologicalSortError p -> do {
-        printf "\nError: loop in database, %s is his/her own ancestor.\n"
+        Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
           (designation base p);
         flush stdout;
         exit 2
@@ -558,12 +557,12 @@ value main () = do {
   lock (Mutil.lock_file fname.val) with
   [ Accept -> f ()
   | Refuse -> do {
-      eprintf "Base is locked. Waiting... ";
+      Printf.eprintf "Base is locked. Waiting... ";
       flush stderr;
       lock_wait (Mutil.lock_file fname.val) with
-      [ Accept -> do { eprintf "Ok\n"; flush stderr; f () }
+      [ Accept -> do { Printf.eprintf "Ok\n"; flush stderr; f () }
       | Refuse -> do {
-          printf "\nSorry. Impossible to lock base.\n";
+          Printf.printf "\nSorry. Impossible to lock base.\n";
           flush stdout;
           exit 2
         } ]

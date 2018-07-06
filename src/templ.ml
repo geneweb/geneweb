@@ -2,7 +2,6 @@
 (* $Id: templ.ml,v 5.36 2007-09-12 09:58:44 ddr Exp $ *)
 
 open Config;
-open Printf;
 open TemplAst;
 
 (* Parsing *)
@@ -712,16 +711,16 @@ and eval_time_var conf =
   fun
   [ ["hours"] ->
       let (hh, mm, ss) = conf.time in
-      sprintf "%02d" hh
+      Printf.sprintf "%02d" hh
   | ["minutes"] ->
       let (hh, mm, ss) = conf.time in
-      sprintf "%02d" mm
+      Printf.sprintf "%02d" mm
   | ["seconds"] ->
       let (hh, mm, ss) = conf.time in
-      sprintf "%02d" ss
+      Printf.sprintf "%02d" ss
   | [] ->
       let (hh, mm, ss) = conf.time in
-      sprintf "%02d:%02d:%02d" hh mm ss
+      Printf.sprintf "%02d:%02d:%02d" hh mm ss
 | _ -> raise Not_found ]
 and eval_simple_variable conf =
   fun
@@ -735,19 +734,19 @@ and eval_simple_variable conf =
       match conf.n_connect with
       [ Some (c, cw, cf, _) ->
           if c > 0 then
-            " - " ^ sprintf "%s %d" (Util.transl conf "connections") c ^
+            " - " ^ Printf.sprintf "%s %d" (Util.transl conf "connections") c ^
             (if cw > 0 then
-               sprintf ", %s %s"
+               Printf.sprintf ", %s %s"
                  (Util.transl_nth conf
                     "wizard/wizards/friend/friends/exterior" 1)
                  (if conf.wizard then
-                    sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
+                    Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
                        (Util.commd conf) cw
                   else
                     string_of_int cw)
              else "") ^
             (if cf > 0 then
-               sprintf ", %s %d"
+               Printf.sprintf ", %s %d"
                  (Util.transl_nth conf
                     "wizard/wizards/friend/friends/exterior" 3)
                  cf
@@ -882,7 +881,7 @@ value eval_string_var conf eval_var sl =
 
 value eval_var_handled conf sl =
   try eval_variable conf sl with
-  [ Not_found -> sprintf " %%%s?" (String.concat "." sl) ]
+  [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
 ;
 
 value apply_format conf nth s1 s2 =
@@ -892,14 +891,14 @@ value apply_format conf nth s1 s2 =
     | None -> Util.ftransl conf s ]
   in
   match Util.check_format "%t" s1 with
-  [ Some s3 -> sprintf (transl_nth_format s3) (fun _ -> s2)
+  [ Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
   | None ->
       match Util.check_format "%s" s1 with
-      [ Some s3 -> sprintf (transl_nth_format s3) s2
+      [ Some s3 -> Printf.sprintf (transl_nth_format s3) s2
       | None ->
           match Util.check_format "%d" s1 with
           [ Some s3 ->
-              sprintf (transl_nth_format s3) (int_of_string s2)
+              Printf.sprintf (transl_nth_format s3) (int_of_string s2)
           | None ->
               match Util.check_format "%s%s" s1 with
               [ Some s3 ->
@@ -908,7 +907,7 @@ value apply_format conf nth s1 s2 =
                     (String.sub s2 0 i,
                      String.sub s2 (i + 1) (String.length s2 - i - 1))
                   in
-                  sprintf (transl_nth_format s3) s21 s22
+                  Printf.sprintf (transl_nth_format s3) s21 s22
               | None -> raise Not_found ] ] ] ]
 ;
 
@@ -1129,22 +1128,22 @@ value print_error conf (bp, ep) exc =
   do {
     incr nb_errors;
     if nb_errors.val <= 10 then do {
-      if template_file.val = "" then eprintf "*** <W> template file"
-      else eprintf "File \"%s.txt\"" template_file.val;
+      if template_file.val = "" then Printf.eprintf "*** <W> template file"
+      else Printf.eprintf "File \"%s.txt\"" template_file.val;
       let line =
         if template_file.val = "" then None
         else line_of_loc conf template_file.val (bp, ep)
       in
-      eprintf ", ";
+      Printf.eprintf ", ";
       match line with
       [ Some (lin, col1, col2) ->
-          eprintf "line %d, characters %d-%d:\n" lin col1 col2
+          Printf.eprintf "line %d, characters %d-%d:\n" lin col1 col2
       | None ->
-          eprintf "characters %d-%d:\n" bp ep ];
+          Printf.eprintf "characters %d-%d:\n" bp ep ];
       match exc with
-      [ Failure s -> eprintf "Failed - %s" s
-      | _ -> eprintf "%s" (Printexc.to_string exc) ];
-      eprintf "\n\n";
+      [ Failure s -> Printf.eprintf "Failed - %s" s
+      | _ -> Printf.eprintf "%s" (Printexc.to_string exc) ];
+      Printf.eprintf "\n\n";
       flush stderr;
     }
     else ();
@@ -1260,7 +1259,7 @@ value print_apply loc f set_vother print_ast env ep gxl al gvl =
         | _ ->
             (env,
              Atext loc
-               (sprintf "%s: bad # of params (%d instead of %d)" f
+               (Printf.sprintf "%s: bad # of params (%d instead of %d)" f
                   (List.length gvl) (List.length gxl))) ]
     in
     print_ast env ep a
@@ -1486,7 +1485,7 @@ value rec interp_ast conf ifun env =
             [ Failure _ -> "blue_of_hsv bad params" ]
         | _ ->
             try ifun.eval_predefined_apply env f vl with
-            [ Not_found -> sprintf "%%apply;%s?" f ] ] ]
+            [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]
   and eval_if env ep e alt ale =
     let eval_var = eval_var conf ifun env ep in
     let eval_ast = eval_ast env ep in

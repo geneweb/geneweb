@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Hutil;
-open Printf;
 open TemplAst;
 open Util;
 
@@ -710,39 +709,41 @@ value forum_add conf base moderated mess =
       (fun oc ->
          let (hh, mm, ss) = conf.time in
          do {
-           fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
+           Printf.fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
              conf.today.year conf.today.month conf.today.day hh mm ss;
-           if moderated then fprintf oc "Moderator: ....................\n"
+           if moderated then
+             Printf.fprintf oc "Moderator: ....................\n"
            else ();
-           fprintf oc "From: %s\n" conf.from;
-           fprintf oc "Ident: %s\n" mess.m_ident;
+           Printf.fprintf oc "From: %s\n" conf.from;
+           Printf.fprintf oc "Ident: %s\n" mess.m_ident;
            if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
            then
-             fprintf oc "Wizard: %s\n" conf.user
+             Printf.fprintf oc "Wizard: %s\n" conf.user
            else ();
            if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
-             fprintf oc "Friend: %s\n" conf.user
+             Printf.fprintf oc "Friend: %s\n" conf.user
            else ();
-           if mess.m_email <> "" then fprintf oc "Email: %s\n" mess.m_email
+           if mess.m_email <> "" then
+             Printf.fprintf oc "Email: %s\n" mess.m_email
            else ();
-           fprintf oc "Access: %s\n" access;
+           Printf.fprintf oc "Access: %s\n" access;
            let subject =
              if mess.m_subject = "" then "-" else mess.m_subject
            in
-           fprintf oc "Subject: %s\n" subject;
-           fprintf oc "Wiki: on\n";
-           fprintf oc "Text:\n";
+           Printf.fprintf oc "Subject: %s\n" subject;
+           Printf.fprintf oc "Wiki: on\n";
+           Printf.fprintf oc "Text:\n";
            let txt = mess.m_text in
            let rec loop i bol =
              if i = String.length txt then ()
              else do {
-               if bol then fprintf oc "  " else ();
+               if bol then Printf.fprintf oc "  " else ();
                if txt.[i] <> '\r' then output_char oc txt.[i] else ();
                loop (i + 1) (txt.[i] = '\n')
              }
            in
            loop 0 True;
-           fprintf oc "\n\n";
+           Printf.fprintf oc "\n\n";
          })
   else ()
 ;
@@ -763,7 +764,7 @@ value print_add_ok conf base =
   let mess =
     let time =
       let (hh, mm, ss) = conf.time in
-      sprintf "%04d-%02d-%02d %02d:%02d:%02d"
+      Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d"
         conf.today.year conf.today.month conf.today.day hh mm ss
     in
     let ident = Gutil.strip_spaces (get conf "Ident") in
@@ -888,7 +889,7 @@ value set_validator conf base pos =
             if String.length conf.user < len - 1 then conf.user
             else String.sub conf.user 0 (len - 1)
           in
-          MF.patch fname pos (sprintf "Moderator: /%s" m);
+          MF.patch fname pos (Printf.sprintf "Moderator: /%s" m);
           True
         }
         else False
@@ -970,7 +971,7 @@ value set_access conf base pos =
             [ "publ" -> "priv"
             | _ -> "publ" ]
           in
-          MF.patch fname pos (sprintf "Access: %s" new_access);
+          MF.patch fname pos (Printf.sprintf "Access: %s" new_access);
           True
         }
         else False

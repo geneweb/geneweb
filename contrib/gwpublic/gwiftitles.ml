@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 
 value private_everybody bname =
@@ -76,17 +75,17 @@ value main () =
         if everybody.val then private_everybody bname.val
         else private_some bname.val ind.val
     | Refuse -> do {
-        eprintf "Base is locked. Waiting... ";
+        Printf.eprintf "Base is locked. Waiting... ";
         flush stderr;
         lock_wait (Mutil.lock_file bname.val) with
         [ Accept -> do {
-            eprintf "Ok\n";
+            Printf.eprintf "Ok\n";
             flush stderr;
             if everybody.val then private_everybody bname.val
             else private_some bname.val ind.val
           }
         | Refuse -> do {
-            printf "\nSorry. Impossible to lock base.\n";
+            Printf.printf "\nSorry. Impossible to lock base.\n";
             flush stdout;
             exit 2
           } ]
