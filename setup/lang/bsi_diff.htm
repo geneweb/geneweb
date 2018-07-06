@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: bsi_diff.htm,v 7.00 2018_04_10 05:35:06 hg Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[
+de: Funktion "%d" ausführen
+en: Application of "%d"
+es: Aplicación de "%d"
+fi: "%d" ohjelma
+fr: Application de "%d"
+it: Applicazione di "%d"
+lv: "%d" lietoðana
+sv: Applicering av "%d"
+]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[
+de: Funktion "%d" ausführen
+en: Application of "%d"
+es: Aplicación de "%d"
+fi: "%d" ohjelma
+fr: Application de "%d"
+it: Applicazione di "%d"
+lv: "%d" lietoðana
+sv: Applicering av "%d"
+]
+</h1>
+</div>
+
+[
+de: Die Funktion "%d" wird nun auf deiner Datenbank "%a" ausgeführt.
+    Warnung: Das kann, abhängig vom Einzelfall, zwischen einigen Sekunden 
+    und mehreren Minuten dauern. Bitte habe Geduld.
+en: The operation "%d" will be applied on your database "%a". Warning: it
+    can take some seconds or some minutes, depending on the case. Be
+    patient.
+es: La operación "%d" va a aplicarse a su base "%a". 
+    Atención: la operación puede durar algunos segundos o 
+    algunos minutos, de acuerdo al caso. Sea paciente.
+fi: Toiminto "%d" hyväksytään tietokantaasi "%a". Varoitus: toiminto kestää
+    hetken. Ole kärsivällinen.
+fr: L’opération "%d" va être appliquée sur votre base
+    "%a". Attention: l’opération peut prendre quelques secondes ou
+    quelques minutes, suivant les cas. Soyez patient.
+it: L'operazione viene applicata alla vostra base. Attenzione:
+    l'operazione può prendere qualche secondo o qualche minuto,
+    secondo i casi. Siate pazienti.
+lv: Darbîba "%d" tiks lietota datu bâzei "%a". Brîdinâjums: tas var aizòemt
+    daðas sekundes, vai minûtes, atkarîbâ no nosacîjumiem. Esiet pacietîgs.
+sv: Operationen "%d" kommer att appliceras på din databas "%a". Varning: det
+    kan ta några sekunder eller några minuter, beroende på fallet. Ha tålamod.
+]
+
+<p />
+[
+en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+]
+
+<p />
+[
+de: Drücke diesen Knopf um zu starten:
+en: Push the button below to start:
+es: Apoyar sobre el botón inferior para comenzar:
+fi: Paina alla olevaa nappia aloittaaksesi:
+fr: Appuyez sur le bouton ci-dessous pour démarrer :
+it: Per iniziare, cliccate sul bottone qui sotto:
+lv: Nospiediet podziòu zemâk, lai sâktu:
+sv: Tryck på knappen nedan för att starta:
+]
+
+<p />
+
+<form method="post" action="%d">
+%h
+<dl><dt><dd><input type="submit" value="Ok" /></dl>
+</form>
+
+<p>
+
+[
+de: Zu deiner Information: Diese Funktion entspricht der Ausführung
+    der folgenden Kommandos:
+en: For information, this operation corresponds to the following commands:
+es: Por información, esta operación corresponde a los 
+    comandos siguientes:
+fi: Tiedoksi, tämä toiminto vastaa seuraavia komentoja:
+fr: Pour information, cette opération correspond à la suite
+    des commandes suivantes:
+it: Per informazione, questa operazione corrisponde ai seguenti comandi:
+lv: Informâcijai: ðî darbîba atbilst sekojoðâm komandâm:
+sv: Denna operation motsvarar de följande kommandona:
+]
+
+<pre>
+     $ %x%/%d %R
+</pre>
