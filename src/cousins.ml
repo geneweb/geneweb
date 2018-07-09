@@ -6,7 +6,6 @@ module type HACK_FOR_DEPEND = sig open Pqueue; end;
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Util;
@@ -469,7 +468,7 @@ value print_anniv conf base p dead_people level =
              if i = Array.length u then set
              else
                let cpl = foi base u.(i) in
-               let c = spouse ip cpl in
+               let c = Gutil.spouse ip cpl in
                loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1)
            in
            loop set 0)

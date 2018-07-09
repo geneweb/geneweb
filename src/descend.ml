@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Dag2html;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -85,10 +84,10 @@ value display_descendants_level conf base max_level ancestor =
   let list =
     List.sort
       (fun p1 p2 ->
-         let c = alphabetic (p_surname base p2) (p_surname base p1) in
+         let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
          if c = 0 then
            let c =
-             alphabetic (p_first_name base p2) (p_first_name base p1)
+             Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
            in
            if c = 0 then compare (get_occ p2) (get_occ p1) else c
          else c)
@@ -153,7 +152,7 @@ value label_descendants conf base marks paths max_lev =
         List.fold_left
           (fun cnt ifam ->
              let fam = foi base ifam in
-             let c = spouse (get_key_index p) fam in
+             let c = Gutil.spouse (get_key_index p) fam in
              let el = get_children fam in
              List.fold_left
                (fun cnt e ->
@@ -184,7 +183,7 @@ value close_to_end conf base marks max_lev lev p =
       List.for_all
         (fun ifam ->
            let fam = foi base ifam in
-           let c = spouse (get_key_index p) fam in
+           let c = Gutil.spouse (get_key_index p) fam in
            let el = get_children fam in
            if get_sex p = Male || not marks.(Adef.int_of_iper c) then
              if dlev = close_lev then Array.length el = 0
@@ -270,7 +269,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
         List.fold_left
           (fun (cnt, first, need_br) ifam ->
              let fam = foi base ifam in
-             let c = spouse (get_key_index p) fam in
+             let c = Gutil.spouse (get_key_index p) fam in
              let el = get_children fam in
              let c = pget conf base c in
              do {
@@ -299,7 +298,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                             list_iter_first
                               (fun first ifam ->
                                  let fam = foi base ifam in
-                                 let c1 = spouse ie fam in
+                                 let c1 = Gutil.spouse ie fam in
                                  let el = get_children fam in
                                  let c1 = pget conf base c1 in
                                  do {
@@ -348,7 +347,7 @@ value print_family conf base marks paths max_lev lev p =
       List.fold_left
         (fun cnt ifam ->
            let fam = foi base ifam in
-           let c = spouse (get_key_index p) fam in
+           let c = Gutil.spouse (get_key_index p) fam in
            let el = get_children fam in
            let c = pget conf base c in
            do {
@@ -376,7 +375,7 @@ value print_family conf base marks paths max_lev lev p =
                           Array.iter
                             (fun ifam ->
                                let fam = foi base ifam in
-                               let c = spouse ie fam in
+                               let c = Gutil.spouse ie fam in
                                let el = get_children fam in
                                let c = pget conf base c in
                                do {
@@ -413,7 +412,7 @@ value print_families conf base marks paths max_lev =
       Array.iter
         (fun ifam ->
            let fam = foi base ifam in
-           let c = spouse (get_key_index p) fam in
+           let c = Gutil.spouse (get_key_index p) fam in
            let el = get_children fam in
            let c = pget conf base c in
            if get_sex p = Male ||
@@ -483,7 +482,7 @@ value print_ref conf base paths p =
   else
     Array.iter
       (fun ifam ->
-         let c = spouse (get_key_index p) (foi base ifam) in
+         let c = Gutil.spouse (get_key_index p) (foi base ifam) in
          if paths.(Adef.int_of_iper c) <> [] then
            let c = pget conf base c in
            Wserver.printf " => %s %s <tt><b>%s</b></tt>" (p_first_name base c)
@@ -548,9 +547,9 @@ value sort_and_display conf base paths precision list =
   let list =
     List.sort
       (fun p1 p2 ->
-         let c = alphabetic (p_surname base p2) (p_surname base p1) in
+         let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
          if c = 0 then
-           alphabetic (p_first_name base p2) (p_first_name base p1)
+           Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
          else c)
       list
   in
@@ -639,7 +638,7 @@ value display_spouse_index conf base max_level ancestor =
            p_first_name base p <> "x" then
           Array.iter
             (fun ifam ->
-               let c = spouse (get_key_index p) (foi base ifam) in
+               let c = Gutil.spouse (get_key_index p) (foi base ifam) in
                if paths.(Adef.int_of_iper c) = [] then
                  let c = pget conf base c in
                  if p_first_name base c <> "?" && p_surname base c <> "?" &&
@@ -1309,7 +1308,7 @@ value make_tree_hts conf base gv p =
                 else 1
               in
               let s =
-                let sp = pget conf base (spouse (get_key_index p) fam) in
+                let sp = pget conf base (Gutil.spouse (get_key_index p) fam) in
                 let txt = person_title_text conf base sp in
                 let txt = reference conf base sp txt in
                 let txt =

@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
 
 value is_censored_person threshold p =
@@ -258,7 +257,7 @@ value select_descendants
                mark.(i) := True;
                select_family ifam fam;
                if not no_spouses_parents then
-                 let sp = spouse iper fam in
+                 let sp = Gutil.spouse iper fam in
                  match get_parents (poi base sp) with
                  [ Some ifam -> select_family ifam (foi base ifam)
                  | None -> () ]

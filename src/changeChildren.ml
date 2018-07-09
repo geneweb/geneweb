@@ -4,7 +4,6 @@
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Util;
@@ -293,7 +292,7 @@ value change_child conf base parent_surname changed ip =
     new_surname <> p_surname base p || new_occ <> get_occ p
   then do {
     let key = new_first_name ^ " " ^ new_surname in
-    let ipl = person_ht_find_all base key in
+    let ipl = Gutil.person_ht_find_all base key in
     check_conflict conf base p key new_occ ipl;
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
     (* On ajoute les enfants dans le type Change_children_name       *)
@@ -309,9 +308,9 @@ value change_child conf base parent_surname changed ip =
     in
     patch_person base ip p;
     patch_key base ip new_first_name new_surname new_occ;
-    person_ht_add base key ip;
+    Gutil.person_ht_add base key ip;
     let np_misc_names = gen_person_misc_names base p (fun p -> p.titles) in
-    List.iter (fun key -> person_ht_add base key p.key_index)
+    List.iter (fun key -> Gutil.person_ht_add base key p.key_index)
       np_misc_names;
   }
   else ()

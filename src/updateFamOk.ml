@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Futil;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -461,7 +460,7 @@ value reconstitute_family conf base =
   let marriage_note =
     only_printable_or_nl (strip_all_trailing_spaces (get conf "marr_note"))
   in
-  let marriage_src = strip_spaces (get conf "marr_src") in
+  let marriage_src = Gutil.strip_spaces (get conf "marr_src") in
   let (witnesses, ext) =
     loop 1 ext where rec loop i ext =
       match
@@ -695,8 +694,8 @@ value check_witnesses conf base fam =
 ;
 
 value check_parents conf base cpl =
-  let (fa_fn, fa_sn, _, _, _) = father cpl in
-  let (mo_fn, mo_sn, _, _, _) = mother cpl in
+  let (fa_fn, fa_sn, _, _, _) = Gutil.father cpl in
+  let (mo_fn, mo_sn, _, _, _) = Gutil.mother cpl in
   match ((fa_fn = "", fa_sn = ""), (mo_fn = "", mo_sn = "")) with
   [ ((True, True), (True, True)) | ((True, True), (False, False)) |
     ((False, False), (True, True)) | ((False, False), (False, False)) -> None
@@ -1251,7 +1250,7 @@ value effective_mod conf base sfam scpl sdes = do {
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-    [ Some s -> strip_spaces s
+    [ Some s -> Gutil.strip_spaces s
     | None -> "" ]
   in
   let ncpl =
@@ -1392,7 +1391,7 @@ value effective_add conf base sfam scpl sdes =
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-    [ Some s -> strip_spaces s
+    [ Some s -> Gutil.strip_spaces s
     | None -> "" ]
   in
   let ncpl =
@@ -1560,14 +1559,14 @@ value is_created_or_already_there ochil_arr nchil schil =
 (* Improvement : check the name on the parents/children if they linked *)
 
 value need_check_noloop (scpl, sdes, onfs) =
-  if array_exists is_a_link (parent_array scpl) ||
+  if array_exists is_a_link (Gutil.parent_array scpl) ||
      array_exists is_a_link sdes.children
   then
     match onfs with
     [ Some ((opar, ochil), (npar, nchil)) ->
         not
           (array_forall2 (is_created_or_already_there opar) npar
-             (parent_array scpl)) ||
+             (Gutil.parent_array scpl)) ||
         not
           (array_forall2 (is_created_or_already_there ochil) nchil
              sdes.children)
@@ -1735,8 +1734,8 @@ value forbidden_disconnected conf sfam scpl sdes =
     [ Not_found -> False ]
   in
   if no_dec then
-    if get_create (father scpl) = Update.Link ||
-       get_create (mother scpl) = Update.Link then
+    if get_create (Gutil.father scpl) = Update.Link ||
+       get_create (Gutil.mother scpl) = Update.Link then
       False
     else
       List.for_all (fun p -> get_create p <> Update.Link)

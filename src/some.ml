@@ -4,7 +4,6 @@
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -235,7 +234,7 @@ value first_name_print_list conf base x1 xl liste = do {
     let l =
       List.sort
         (fun x1 x2 ->
-           match alphabetic (p_surname base x1) (p_surname base x2) with
+           match Gutil.alphabetic (p_surname base x1) (p_surname base x2) with
            [ 0 ->
                match
                  (Adef.od_of_codate (get_birth x1),
@@ -252,7 +251,8 @@ value first_name_print_list conf base x1 xl liste = do {
       (fun l x ->
          let px = p_surname base x in
          match l with
-         [ [(p, l1) :: l] when alphabetic px p = 0 -> [(p, [x :: l1]) :: l]
+         [ [(p, l1) :: l] when Gutil.alphabetic px p = 0 ->
+             [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])
       [] l
   in
@@ -441,7 +441,7 @@ value print_branch conf base psn name =
       List.map
         (fun ifam ->
            let fam = foi base ifam in
-           let c = spouse (get_key_index p) fam in
+           let c = Gutil.spouse (get_key_index p) fam in
            let c = pget conf base c in
            let down = has_children_with_that_name conf base fam name in
            let down =

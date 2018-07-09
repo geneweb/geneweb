@@ -14,7 +14,6 @@ end;
 module Make(Select : Select) = struct
 
 open Def;
-open Gutil;
 open Gwdb;
 
 
@@ -187,7 +186,7 @@ value no_picture = ref False;
 value isolated = ref False;
 
 value gen_correct_string no_num no_colon s =
-  let s = strip_spaces s in
+  let s = Gutil.strip_spaces s in
   let s =
     if Mutil.utf_8_db.val || raw_output.val then s
     else Mutil.utf_8_of_iso_8859_1 s
@@ -1648,8 +1647,9 @@ value mark_one_connex_component base mark ifam =
   else do {
     Printf.eprintf "%s: group of size %d not included\n" origin_file len;
     let cpl = foi base ifam in
-    Printf.eprintf "    %s + %s\n" (designation base (poi base (get_father cpl)))
-      (designation base (poi base (get_mother cpl)));
+    Printf.eprintf "    %s + %s\n"
+      (Gutil.designation base (poi base (get_father cpl)))
+      (Gutil.designation base (poi base (get_mother cpl)));
     flush stderr;
     set_mark Scanned
   }
@@ -1901,7 +1901,7 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
              [ Some (dl, f) -> List.fold_right Filename.concat dl f
              | None -> "bad" ]
            in
-           let s = strip_spaces (base_notes_read base fn) in
+           let s = Gutil.strip_spaces (base_notes_read base fn) in
            if s <> "" then do {
              if not first.val then Printf.fprintf oc "\n" else ();
              first.val := False;
@@ -1928,7 +1928,7 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
                 List.fold_left Filename.concat in_dir
                   [base_wiznotes_dir base; file]
               in
-              let s = strip_spaces (read_file_contents wfile) in
+              let s = Gutil.strip_spaces (read_file_contents wfile) in
               Printf.fprintf oc "\nwizard-note %s\n" wizid;
               rs_printf oc s;
               Printf.fprintf oc "\nend wizard-note\n";

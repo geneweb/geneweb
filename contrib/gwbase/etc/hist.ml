@@ -1,7 +1,6 @@
 (* $Id: hist.ml,v 4.7 2006-10-30 09:37:58 deraugla Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
-open Gutil;
 open Gwdb;
 
 value line_tpl = "0000-00-00 00:00:00 xx .";
@@ -9,7 +8,7 @@ value line_tpl = "0000-00-00 00:00:00 xx .";
 value person_of_line_exists base line =
   let i = try String.index line ']' + 2 with [ Not_found -> 20 ] in
   let key = String.sub line (i + 3) (String.length line - i - 3) in
-  match person_ht_find_all base key with
+  match Gutil.person_ht_find_all base key with
   [ [ip] -> True
   | _ -> False ]
 ;

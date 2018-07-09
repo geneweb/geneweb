@@ -3,7 +3,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -250,7 +249,8 @@ value notes_links_db conf base eliminate_unlinked = do {
     else db2
   in
   List.sort
-    (fun (s1, _) (s2, _) -> alphabetic_order (Name.lower s1) (Name.lower s2))
+    (fun (s1, _) (s2, _) ->
+      Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 };
 

@@ -4,7 +4,6 @@
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open TemplAst;
 open Util;
@@ -591,7 +590,7 @@ value print_foreach conf base print_ast eval_expr =
                     try HI_notes pg (Some (int_of_string s)) with
                     [ Failure _ -> HI_notes key None ]
                 | _ ->
-                    match person_ht_find_all base key with
+                    match Gutil.person_ht_find_all base key with
                     [ [ip] -> HI_ind (pget conf base ip)
                     | _ -> HI_none ] ]
             | None -> HI_none ]

@@ -4,7 +4,6 @@
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -58,7 +57,7 @@ value date_interval conf base t x =
               (fun ifam ->
                  let fam = foi base ifam in
                  let md = get_marriage fam in
-                 let conj = spouse (get_key_index x) fam in
+                 let conj = Gutil.spouse (get_key_index x) fam in
                  do {
                    match Adef.od_of_codate md with
                    [ Some (Dgreg d _) -> set d

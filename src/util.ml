@@ -4,7 +4,6 @@
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Mutil;
 
@@ -548,7 +547,7 @@ value p_getenv env label =
 value p_getint env label =
   match p_getenv env label with
   [ Some s ->
-      try Some (int_of_string (strip_spaces s)) with
+      try Some (int_of_string (Gutil.strip_spaces s)) with
       [ Failure _ -> None ]
   | None -> None ]
 ;
@@ -956,7 +955,7 @@ value titled_person_text conf base p t =
       | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
       | _ ->
           let trunc_surname _ _ =
-            strip_spaces (String.sub surname 0 (slen - elen))
+            Gutil.strip_spaces (String.sub surname 0 (slen - elen))
           in
           let trunc_access = (p_first_name, trunc_surname) in
           gen_person_text trunc_access conf base p ]
@@ -1902,9 +1901,9 @@ value place_of_string conf place =
         loop str []
       in
       let list = explode gwf_place ',' in
-      let list = List.map strip_spaces list in
+      let list = List.map Gutil.strip_spaces list in
       let list_p = explode place ',' in
-      let list_p = List.map strip_spaces list_p in
+      let list_p = List.map Gutil.strip_spaces list_p in
       let place =
         {other = ""; town = ""; township = ""; canton = "";
          district = ""; county = ""; region = ""; country = ""}
@@ -2352,7 +2351,7 @@ value husband_wife conf base p =
   let rec loop i =
     if i < Array.length (get_family p) then
       let fam = foi base (get_family p).(i) in
-      let conjoint = spouse (get_key_index p) fam in
+      let conjoint = Gutil.spouse (get_key_index p) fam in
       let conjoint = pget conf base conjoint in
       if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
       then
@@ -2682,7 +2681,7 @@ value default_sosa_ref conf base =
   [ Some n ->
       if n = "" then None
       else
-        match person_ht_find_all base n with
+        match Gutil.person_ht_find_all base n with
         [ [ip] ->
             let p = pget conf base ip in
             if is_hidden p then None
@@ -2940,7 +2939,7 @@ value gen_only_printable or_nl s =
           [ ' '..'~' | '\160'..'\255' -> s.[i]
           | '\n' -> if or_nl then '\n' else ' '
           | _ -> ' ' ] in
-  strip_spaces s'
+  Gutil.strip_spaces s'
 ;
 
 value only_printable_or_nl = gen_only_printable True;

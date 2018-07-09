@@ -4,7 +4,6 @@
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Util;
@@ -82,7 +81,7 @@ value print_person_parents_and_spouses conf base p = do {
   List.iteri
     (fun i ifam -> do {
       let fam = foi base ifam in
-      let sp = spouse (get_key_index p) fam in
+      let sp = Gutil.spouse (get_key_index p) fam in
       let sp = poi base sp in
       Wserver.printf ", &amp;";
       if nbfam > 1 then Wserver.printf "%d" (i + 1) else ();
@@ -197,8 +196,9 @@ value update_misc_names_of_family base p_sex u =
              (fun ip ->
                 List.iter
                   (fun name ->
-                     if not (List.mem ip (person_ht_find_all base name)) then
-                       person_ht_add base name ip
+                     if not (List.mem ip (Gutil.person_ht_find_all base name))
+                     then
+                       Gutil.person_ht_add base name ip
                      else ())
                   (person_misc_names base (poi base ip) get_titles))
              [get_mother fam :: Array.to_list (get_children fam)])
@@ -371,7 +371,7 @@ value print_warning conf base =
         Array.iteri
           (fun i ifam ->
              let fam = foi base ifam in
-             let sp = spouse (get_key_index p) fam in
+             let sp = Gutil.spouse (get_key_index p) fam in
              let sp = poi base sp in
              tag "li" "%s"
                (if diff_arr.(i) then "style=\"background:pink\"" else "")
@@ -905,7 +905,7 @@ value bad_date conf d = do {
 };
 
 value int_of_field s =
-  try Some (int_of_string (strip_spaces s)) with [ Failure _ -> None ]
+  try Some (int_of_string (Gutil.strip_spaces s)) with [ Failure _ -> None ]
 ;
 
 value reconstitute_date_dmy2 conf var =
@@ -1109,7 +1109,7 @@ value print_create_conflict conf base p var = do {
       Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
    (fun _ -> "</a>.");
  let free_n =
-   find_free_occ base (p_first_name base p) (p_surname base p) 0
+   Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
  in
  tag "form" "method=\"post\" action=\"%s\"" conf.command begin
    List.iter
@@ -1162,7 +1162,7 @@ value print_create_conflict conf base p var = do {
 value add_misc_names_for_new_persons base new_persons =
   List.iter
     (fun p ->
-       List.iter (fun n -> person_ht_add base n p.key_index)
+       List.iter (fun n -> Gutil.person_ht_add base n p.key_index)
          (gen_person_misc_names base p (fun p -> p.titles)))
     new_persons
 ;
@@ -1259,7 +1259,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             let fn = Util.translate_eval f in
             let sn = Util.translate_eval s in
             patch_key base ip fn sn o;
-            person_ht_add base (fn ^ " " ^ sn) ip;
+            Gutil.person_ht_add base (fn ^ " " ^ sn) ip;
             new_persons.val := [p :: new_persons.val]
           }
           else ();

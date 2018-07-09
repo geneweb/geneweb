@@ -4,7 +4,6 @@
 open Config;
 open Dag2html;
 open Def;
-open Gutil;
 open Gwdb;
 open Mutil;
 open TemplAst;
@@ -102,7 +101,7 @@ value make_dag conf base set =
                 fun
                 [ [ifam :: ifaml] ->
                     let cpl = foi base ifam in
-                    let isp = spouse ip cpl in
+                    let isp = Gutil.spouse ip cpl in
                     let jdo =
                       try Some (M.find isp map) with
                       [ Not_found -> None ]
