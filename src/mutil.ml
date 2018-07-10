@@ -17,13 +17,6 @@ value rindex s c =
     if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
 ;
 
-value array_mem x a =
-  loop 0 where rec loop i =
-    if i = Array.length a then False
-    else if x = a.(i) then True
-    else loop (i + 1)
-;
-
 value list_iter_first f al =
   let _ =
     List.fold_left (fun first a -> let () = f first a in False) True al

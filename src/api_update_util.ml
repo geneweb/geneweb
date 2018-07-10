@@ -1127,7 +1127,7 @@ let pers_to_piqi_person_search_info conf base p =
               Array.iter
                 (fun ifam ->
                    let fam = foi base ifam in
-                   if Mutil.array_mem (get_key_index p) (get_witnesses fam)
+                   if Array.mem (get_key_index p) (get_witnesses fam)
                    then
                      list := (ifam, fam) :: !list
                    else ())

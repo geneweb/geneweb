@@ -68,7 +68,7 @@ value check_families_parents base nb_fam = do {
       let a = get_parent_array fam in
       for j = 0 to Array.length a - 1 do {
         let ip = a.(j) in
-        if Mutil.array_mem ifam (get_family (poi base ip)) then ()
+        if Array.mem ifam (get_family (poi base ip)) then ()
         else do {
            ProgrBar.suspend ();
            Printf.printf "*** no family for : %s\n"
@@ -140,7 +140,7 @@ value check_persons_parents base nb_ind fix = do {
         }
         else
           let children = get_children fam in
-          if Mutil.array_mem ip children then ()
+          if Array.mem ip children then ()
           else do {
             Printf.printf "*** not in parent's family: %s\n"
               (designation base ip (poi base ip));
@@ -166,7 +166,7 @@ value check_persons_families base nb_ind fix = do {
     for j = 0 to Array.length ifams - 1 do {
       let ifam = ifams.(j) in
       let cpl = foi base ifam in
-      if Mutil.array_mem ip (get_parent_array cpl) then ()
+      if Array.mem ip (get_parent_array cpl) then ()
       else do {
         ProgrBar.suspend ();
         Printf.printf "*** not father or mother of hir family: %s\n"

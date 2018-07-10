@@ -7,7 +7,6 @@ value utf_8_db : ref bool;
 
 value lindex : string -> char -> option int;
 value rindex : string -> char -> option int;
-value array_mem : 'a -> array 'a -> bool;
 value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
 value list_uniq : list 'a -> list 'a;
 value tr : char -> char -> string -> string;
