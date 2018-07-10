@@ -5,7 +5,6 @@
 open Config;
 open Gwdb;
 open Hutil;
-open Mutil;
 open Util;
 
 value file_path conf base fname =
@@ -222,13 +221,13 @@ value notes_links_db conf base eliminate_unlinked = do {
          match pg with
          [ NotesLinks.PgInd _ | NotesLinks.PgFam _ | NotesLinks.PgNotes |
            NotesLinks.PgWizard _ ->
-             List.fold_left (fun set s -> StrSet.add s set) set sl
+             List.fold_left (fun set s -> Mutil.StrSet.add s set) set sl
          | NotesLinks.PgMisc s ->
              do { Hashtbl.add misc s sl; set } ])
-      StrSet.empty db
+      Mutil.StrSet.empty db
   in
   let mark = Hashtbl.create 1 in
-  loop (StrSet.elements set) where rec loop =
+  loop (Mutil.StrSet.elements set) where rec loop =
     fun
     [ [s :: sl] ->
         if Hashtbl.mem mark s then loop sl
@@ -479,7 +478,7 @@ value begin_text_without_html_tags lim s =
       loop i size len
     else if s.[i] = '=' then loop (i + 1) size len
     else
-      let nbc = if utf_8_db.val then Name.nbc s.[i] else i + 1 in
+      let nbc = if Mutil.utf_8_db.val then Name.nbc s.[i] else i + 1 in
       loop (i + nbc) (size + 1) (Buff.mstore len (String.sub s i nbc))
 ;
 

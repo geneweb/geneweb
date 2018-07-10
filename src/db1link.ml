@@ -4,7 +4,6 @@
 open Gwcomp;
 open Dbdisk;
 open Def;
-open Mutil;
 
 value default_source = ref "";
 value do_check = ref True;
@@ -93,8 +92,8 @@ value aoi base i = base.c_ascends.(Adef.int_of_iper i);
 value uoi base i = base.c_unions.(Adef.int_of_iper i);
 value coi base i = base.c_couples.(Adef.int_of_ifam i);
 value sou base i = base.c_strings.(Adef.int_of_istr i);
-value p_first_name base p = nominative (sou base p.m_first_name);
-value p_surname base p = nominative (sou base p.m_surname);
+value p_first_name base p = Mutil.nominative (sou base p.m_first_name);
+value p_surname base p = Mutil.nominative (sou base p.m_surname);
 value designation base p =
   let prenom = p_first_name base p in
   let nom = p_surname base p in
@@ -209,14 +208,14 @@ value title_unique_string gen t =
 ;
 
 value person_hash first_name surname =
-  let first_name = nominative first_name in
-  let surname = nominative surname in
+  let first_name = Mutil.nominative first_name in
+  let surname = Mutil.nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in Hashtbl.hash s
 ;
 
 value find_person_by_global_name gen first_name surname occ =
-  let first_name = nominative first_name in
-  let surname = nominative surname in
+  let first_name = Mutil.nominative first_name in
+  let surname = Mutil.nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Hashtbl.find_all gen.g_names key in
@@ -237,8 +236,8 @@ value find_person_by_global_name gen first_name surname occ =
 ;
 
 value find_person_by_local_name gen first_name surname occ =
-  let first_name = nominative first_name in
-  let surname = nominative surname in
+  let first_name = Mutil.nominative first_name in
+  let surname = Mutil.nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Hashtbl.find_all gen.g_file_info.f_local_names (key, occ) in
@@ -265,7 +264,7 @@ value find_person_by_name gen first_name surname occ =
 ;
 
 value add_person_by_name gen first_name surname occ iper =
-  let s = Name.crush_lower (nominative (first_name ^ " " ^ surname)) in
+  let s = Name.crush_lower (Mutil.nominative (first_name ^ " " ^ surname)) in
   let key = Hashtbl.hash s in Hashtbl.add gen.g_names key iper
 ;
 
@@ -991,7 +990,7 @@ value insert_syntax fname gen =
 
 value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
-   output_array oc = output_value_no_sharing oc (tab : array _);
+   output_array oc = Mutil.output_value_no_sharing oc (tab : array _);
    len = Array.length tab; clear_array () = ()}
 ;
 
@@ -1279,7 +1278,7 @@ value families_record_access fam_index_ic fam_ic len =
   in
   {load_array () = (); get = get_fun;
    set i v = failwith "bug: setting family array";
-   output_array oc = output_array_no_sharing oc get_fun len;
+   output_array oc = Mutil.output_array_no_sharing oc get_fun len;
    len = len; clear_array () = ()}
 ;
 

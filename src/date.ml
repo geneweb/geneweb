@@ -6,7 +6,6 @@ open Config;
 open Def;
 open Util;
 open Gwdb;
-open Mutil;
 open TemplAst;
 
 
@@ -48,7 +47,7 @@ value death_symbol conf =
     [ Not_found -> None ]
   with
   [ Some x -> x
-  | None -> if utf_8_db.val then "†" else "+" ]
+  | None -> if Mutil.utf_8_db.val then "†" else "+" ]
 ;
 
 value birth_symbol conf =
@@ -57,7 +56,7 @@ value birth_symbol conf =
     [ Not_found -> None ]
   with
   [ Some x -> x
-  | None -> if utf_8_db.val then "°" else "°" ]
+  | None -> if Mutil.utf_8_db.val then "°" else "°" ]
 ;
 
 value before_date d d1 =
@@ -166,7 +165,7 @@ value hebrew_month conf m =
 
 value code_french_year conf y =
   transl_nth conf "year/month/day" 3 ^ " " ^
-    (if y >= 1 && y < 4000 then roman_of_arabian y else string_of_int y)
+    (if y >= 1 && y < 4000 then Mutil.roman_of_arabian y else string_of_int y)
 ;
 
 value code_french_date conf d m y =
@@ -219,7 +218,7 @@ value string_of_on_prec_dmy_aux conf code_year sy sy2 d =
         else if d2.day2 = 0 then transl_decline conf "in (month year)" sy2
         else transl_decline conf "on (day month year)" sy2
       in
-      s ^ " " ^ transl conf "or" ^ " " ^ nominative s2
+      s ^ " " ^ transl conf "or" ^ " " ^ Mutil.nominative s2
   | YearInt d2 ->
       let s =
         if d.day = 0 && d.month = 0 then sy
@@ -232,7 +231,7 @@ value string_of_on_prec_dmy_aux conf code_year sy sy2 d =
         else transl_decline conf "on (day month year)" sy2
       in
       transl conf "between (date)" ^ " " ^ s ^ " " ^
-        transl_nth conf "and" 0 ^ " " ^ nominative s2 ]
+        transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2 ]
 ;
 
 value replace_spaces_by_nbsp s =
@@ -281,7 +280,7 @@ value string_of_on_hebrew_dmy conf d =
 
 value string_of_prec_dmy conf s s2 d =
   match d.prec with
-  [ Sure -> nominative s
+  [ Sure -> Mutil.nominative s
   | About -> transl_decline conf "about (date)" s
   | Before -> transl_decline conf "before (date)" s
   | After -> transl_decline conf "after (date)" s
@@ -289,12 +288,12 @@ value string_of_prec_dmy conf s s2 d =
   | OrYear d2 -> 
       "<span class=\"text-nowrap\">" ^ s ^ "</span>" ^ " " ^
       "<span class=\"text-nowrap\">" ^
-     transl conf "or" ^ " " ^ nominative s2 ^ "</span>"
+     transl conf "or" ^ " " ^ Mutil.nominative s2 ^ "</span>"
   | YearInt d2 ->
       "<span class=\"text-nowrap\">" ^ transl conf "between (date)" ^
         " " ^ s ^ "</span>" ^ " " ^
       "<span class=\"text-nowrap\">" ^ transl_nth conf "and" 0 ^
-        " " ^ nominative s2 ^ "</span>"]
+        " " ^ Mutil.nominative s2 ^ "</span>"]
 ;
 
 value string_of_dmy conf d =
@@ -340,7 +339,7 @@ value translate_dmy conf (fst, snd, trd) cal short =
     match cal with
     [ Dfrench ->
         let y1 = int_of_string y in
-        (if y1 >= 1 && y1 < 4000 then roman_of_arabian y1 else y)
+        (if y1 >= 1 && y1 < 4000 then Mutil.roman_of_arabian y1 else y)
     | _ -> y ]
   in
   match transl conf " !dates order" with

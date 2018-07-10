@@ -2,7 +2,6 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
-open Mutil;
 
 value magic_patch = "GwPt0002";
 
@@ -111,7 +110,7 @@ value hashtbl_find dir file key = do {
   let ic_ht = open_in_bin (Filename.concat dir file) in
   let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
   let alen = input_binary_int ic_hta in
-  let pos = int_size + (Hashtbl.hash key) mod alen * int_size in
+  let pos = Mutil.int_size + (Hashtbl.hash key) mod alen * Mutil.int_size in
   seek_in ic_hta pos;
   let pos = input_binary_int ic_hta in
   close_in ic_hta;
@@ -136,7 +135,7 @@ value hashtbl_find_all dir file key = do {
   [ Some ic_ht -> do {
   let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
   let alen = input_binary_int ic_hta in
-  let pos = int_size + (Hashtbl.hash key) mod alen * int_size in
+  let pos = Mutil.int_size + (Hashtbl.hash key) mod alen * Mutil.int_size in
   seek_in ic_hta pos;
   let pos = input_binary_int ic_hta in
   close_in ic_hta;
@@ -181,7 +180,7 @@ value sorted_patched_person_strings db2 is_first_name =
          [s :: sl])
     db2.patches.h_person []
   in
-  let sl = list_uniq (List.sort compare sl) in
+  let sl = Mutil.list_uniq (List.sort compare sl) in
   let sl =
     List.map
       (fun s ->
@@ -349,8 +348,8 @@ value disk_person2_of_key db2 fn sn oc =
 ;
 
 value person2_of_key db2 fn sn oc =
-  let fn = Name.lower (nominative fn) in
-  let sn = Name.lower (nominative sn) in
+  let fn = Name.lower (Mutil.nominative fn) in
+  let sn = Name.lower (Mutil.nominative sn) in
   try Hashtbl.find db2.patches.h_key (fn, sn, oc) with
   [ Not_found -> disk_person2_of_key db2 fn sn oc ]
 ;
@@ -551,9 +550,9 @@ value commit_patches2 db2 = do {
   let fname = Filename.concat db2.bdir2 "patches" in
   let oc = open_out_bin (fname ^ "1") in
   output_string oc magic_patch;
-  output_value_no_sharing oc db2.patches;
+  Mutil.output_value_no_sharing oc db2.patches;
   close_out oc;
-  remove_file (fname ^ "~");
+  Mutil.remove_file (fname ^ "~");
   try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
   Sys.rename (fname ^ "1") fname
 };

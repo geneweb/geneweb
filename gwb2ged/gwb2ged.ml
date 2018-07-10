@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Mutil;
 
 type charset =
   [ Ansel
@@ -573,7 +572,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
            List.iter
              (fun ifam ->
                 let fam = foi base ifam in
-                if array_mem (get_key_index per) (get_witnesses fam) then
+                if Array.mem (get_key_index per) (get_witnesses fam) then
                   ged_witness fam_sel oc ifam
                 else ())
              (Array.to_list (get_family c))

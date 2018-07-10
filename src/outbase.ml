@@ -6,7 +6,6 @@ module type HACK_FOR_DEPEND = sig open Btree; end;
 open Dbdisk;
 open Dutil;
 open Def;
-open Mutil;
 
 value load_ascends_array base = base.data.ascends.load_array ();
 value load_unions_array base = base.data.unions.load_array ();
@@ -18,7 +17,7 @@ value close_base base = base.func.cleanup ();
 value save_mem = ref False;
 
 value trace s =
-  if verbose.val then do { Printf.eprintf "*** %s\n" s; flush stderr }
+  if Mutil.verbose.val then do { Printf.eprintf "*** %s\n" s; flush stderr }
   else ()
 ;
 
@@ -103,7 +102,7 @@ value make_name_index base =
   let add_name key valu =
     let key = Name.crush (Name.abbrev key) in
     let i = Hashtbl.hash key mod Array.length t in
-    if array_mem valu t.(i) then ()
+    if Array.mem valu t.(i) then ()
     else t.(i) := Array.append [| valu |] t.(i)
   in
   let rec add_names ip =
@@ -132,7 +131,7 @@ value create_name_index oc_inx oc_inx_acc base =
   let ni = make_name_index base in
   let bpos = pos_out oc_inx in
   do {
-    output_value_no_sharing oc_inx (ni : name_index_data);
+    Mutil.output_value_no_sharing oc_inx (ni : name_index_data);
     let epos =
       Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
         bpos
@@ -145,7 +144,7 @@ value create_name_index oc_inx oc_inx_acc base =
 value add_name t key valu =
   let key = Name.crush_lower key in
   let i = Hashtbl.hash key mod Array.length t in
-  if array_mem valu t.(i) then ()
+  if Array.mem valu t.(i) then ()
   else t.(i) := Array.append [| valu |] t.(i)
 ;
 
@@ -160,7 +159,7 @@ value make_strings_of_fsname base =
       if surname <> "?" then do {
         add_name t surname p.surname;
         List.iter (fun sp -> add_name t sp p.surname)
-          (surnames_pieces surname);
+          (Mutil.surnames_pieces surname);
       }
       else ();
     };
@@ -172,7 +171,7 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
   let t = make_strings_of_fsname base in
   let bpos = pos_out oc_inx in
   do {
-    output_value_no_sharing oc_inx (t : strings_of_fsname);
+    Mutil.output_value_no_sharing oc_inx (t : strings_of_fsname);
     let epos =
       Iovalue.output_array_access oc_inx_acc (Array.get t) (Array.length t)
         bpos
@@ -237,7 +236,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
     (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
        i.e. the created database can be still read by these versions but this
        table will not be used in versions >= 4.10 *)
-    output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+    Mutil.output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
     (* new table created from version >= 4.10 *)
     let oc_sn_dat = Secure.open_out_bin tmp_snames_dat in
     let bt2 =
@@ -255,7 +254,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
     in
     close_out oc_sn_dat;
     let oc_sn_inx = Secure.open_out_bin tmp_snames_inx in
-    output_value_no_sharing oc_sn_inx (bt2 : IstrTree.t int);
+    Mutil.output_value_no_sharing oc_sn_inx (bt2 : IstrTree.t int);
     close_out oc_sn_inx;
   }
 ;
@@ -280,7 +279,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
     (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
        i.e. the created database can be still read by these versions but this
        table will not be used in versions >= 4.10 *)
-    output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+    Mutil.output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
     (* new table created from version >= 4.10 *)
     let oc_fn_dat = Secure.open_out_bin tmp_fnames_dat in
     let bt2 =
@@ -298,7 +297,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
     in
     close_out oc_fn_dat;
     let oc_fn_inx = Secure.open_out_bin tmp_fnames_inx in
-    output_value_no_sharing oc_fn_inx (bt2 : IstrTree.t int);
+    Mutil.output_value_no_sharing oc_fn_inx (bt2 : IstrTree.t int);
     close_out oc_fn_inx;
   }
 ;
@@ -343,7 +342,7 @@ value gen_output no_patches bname base =
     try
       do {
         output_string oc
-          (if utf_8_db.val then magic_gwb else magic_gwb_iso_8859_1);
+          (if Mutil.utf_8_db.val then magic_gwb else magic_gwb_iso_8859_1);
         output_binary_int oc base.data.persons.len;
         output_binary_int oc base.data.families.len;
         output_binary_int oc base.data.strings.len;
@@ -355,7 +354,8 @@ value gen_output no_patches bname base =
         output_binary_int oc 0;
         output_binary_int oc 0;
         output_binary_int oc 0;
-        output_value_no_sharing oc (base.data.bnotes.norigin_file : string);
+        Mutil.output_value_no_sharing
+          oc (base.data.bnotes.norigin_file : string);
         let persons_array_pos = pos_out oc in
         if not no_patches then output_array "persons" base.data.persons
         else just_copy bname "persons" oc oc_acc;
@@ -426,7 +426,7 @@ value gen_output no_patches bname base =
               let first_name_pos = pos_out oc2 in
               trace "create first name index";
               output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat;
-              seek_out oc2 int_size;
+              seek_out oc2 Mutil.int_size;
               output_binary_int oc2 surname_pos;
               output_binary_int oc2 first_name_pos;
               let s = base.data.bnotes.nread "" RnAll in
@@ -442,7 +442,7 @@ value gen_output no_patches bname base =
                    let s = base.data.bnotes.nread f RnAll in
                    let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
                    do {
-                     mkdir_p (Filename.dirname fname);
+                     Mutil.mkdir_p (Filename.dirname fname);
                      let oc = open_out fname in
                      output_string oc s;
                      close_out oc;
@@ -463,52 +463,52 @@ value gen_output no_patches bname base =
       do {
         try close_out oc with _ -> ();
         try close_out oc_acc with _ -> ();
-        remove_file tmp_base;
-        remove_file tmp_base_acc;
+        Mutil.remove_file tmp_base;
+        Mutil.remove_file tmp_base_acc;
         if not no_patches then do {
-          remove_file tmp_names_inx;
-          remove_file tmp_names_acc;
-          remove_file tmp_strings_inx;
-          remove_dir tmp_notes_d;
+          Mutil.remove_file tmp_names_inx;
+          Mutil.remove_file tmp_names_acc;
+          Mutil.remove_file tmp_strings_inx;
+          Mutil.remove_dir tmp_notes_d;
         }
         else ();
         raise e
       };
     close_base base;
-    remove_file (Filename.concat bname "base");
+    Mutil.remove_file (Filename.concat bname "base");
     Sys.rename tmp_base (Filename.concat bname "base");
-    remove_file (Filename.concat bname "base.acc");
+    Mutil.remove_file (Filename.concat bname "base.acc");
     Sys.rename tmp_base_acc (Filename.concat bname "base.acc");
     if not no_patches then do {
-      remove_file (Filename.concat bname "names.inx");
+      Mutil.remove_file (Filename.concat bname "names.inx");
       Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
-      remove_file (Filename.concat bname "names.acc");
+      Mutil.remove_file (Filename.concat bname "names.acc");
       Sys.rename tmp_names_acc (Filename.concat bname "names.acc");
-      remove_file (Filename.concat bname "snames.dat");
+      Mutil.remove_file (Filename.concat bname "snames.dat");
       Sys.rename tmp_snames_dat (Filename.concat bname "snames.dat");
-      remove_file (Filename.concat bname "snames.inx");
+      Mutil.remove_file (Filename.concat bname "snames.inx");
       Sys.rename tmp_snames_inx (Filename.concat bname "snames.inx");
-      remove_file (Filename.concat bname "fnames.dat");
+      Mutil.remove_file (Filename.concat bname "fnames.dat");
       Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
-      remove_file (Filename.concat bname "fnames.inx");
+      Mutil.remove_file (Filename.concat bname "fnames.inx");
       Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
-      remove_file (Filename.concat bname "strings.inx");
+      Mutil.remove_file (Filename.concat bname "strings.inx");
       Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
-      remove_file (Filename.concat bname "notes");
+      Mutil.remove_file (Filename.concat bname "notes");
       if Sys.file_exists tmp_notes then
         Sys.rename tmp_notes (Filename.concat bname "notes")
       else ();
       if Sys.file_exists tmp_notes_d then do {
         let notes_d = Filename.concat bname "notes_d" in
-        remove_dir notes_d;
+        Mutil.remove_dir notes_d;
         Sys.rename tmp_notes_d notes_d;
       }
       else ();
-      remove_file (Filename.concat bname "patches");
-      remove_file (Filename.concat bname "patches~");
-      remove_file (Filename.concat bname "tstab");
-      remove_file (Filename.concat bname "tstab_visitor");
-      remove_file (Filename.concat bname "restrict")
+      Mutil.remove_file (Filename.concat bname "patches");
+      Mutil.remove_file (Filename.concat bname "patches~");
+      Mutil.remove_file (Filename.concat bname "tstab");
+      Mutil.remove_file (Filename.concat bname "tstab_visitor");
+      Mutil.remove_file (Filename.concat bname "restrict")
     }
     else ();
   }

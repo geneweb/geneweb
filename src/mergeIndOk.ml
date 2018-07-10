@@ -6,7 +6,6 @@ open Config;
 open Def;
 open Gwdb;
 open Hutil;
-open Mutil;
 open Util;
 
 value rec merge_lists l1 =
@@ -368,7 +367,7 @@ value redirect_relations_of_added_related base p ip2 rel_chil =
                let ifam = (get_family pc).(i) in
                let fam = gen_family_of_family (foi base ifam) in
                let (p_related, mod_p) =
-                 if array_mem ip2 fam.witnesses
+                 if Array.mem ip2 fam.witnesses
                  then do {
                    let (p_related, mod_p) =
                      loop (p_related, mod_p) 0

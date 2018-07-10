@@ -6,7 +6,6 @@ open Config;
 open Def;
 open Gwdb;
 open Hutil;
-open Mutil;
 open Util;
 
 (* Liste des string dont on a supprimé un caractère.       *)
@@ -225,7 +224,8 @@ value rec reconstitute_pevents conf ext cnt =
       in
       let epers_note =
         match get_nth conf "e_note" cnt with
-        [ Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
+        [ Some note ->
+            only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
         | _ -> "" ]
       in
       let epers_src =
@@ -653,24 +653,28 @@ value reconstitute_person conf =
   let birth = Update.reconstitute_date conf "birth" in
   let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
   let birth_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "birth_note"))
+    only_printable_or_nl
+      (Mutil.strip_all_trailing_spaces (get conf "birth_note"))
   in
   let birth_src = only_printable (get conf "birth_src") in
   let bapt = Update.reconstitute_date conf "bapt" in
   let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
   let bapt_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "bapt_note"))
+    only_printable_or_nl
+      (Mutil.strip_all_trailing_spaces (get conf "bapt_note"))
   in
   let bapt_src = only_printable (get conf "bapt_src") in
   let burial_place = no_html_tags (only_printable (get conf "burial_place")) in
   let burial_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "burial_note"))
+    only_printable_or_nl
+      (Mutil.strip_all_trailing_spaces (get conf "burial_note"))
   in
   let burial_src = only_printable (get conf "burial_src") in
   let burial = reconstitute_burial conf burial_place in
   let death_place = no_html_tags (only_printable (get conf "death_place")) in
   let death_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "death_note"))
+    only_printable_or_nl
+      (Mutil.strip_all_trailing_spaces (get conf "death_note"))
   in
   let death_src = only_printable (get conf "death_src") in
   let death =
@@ -690,7 +694,8 @@ value reconstitute_person conf =
   let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
   let notes =
     if first_name = "?" || surname = "?" then ""
-    else only_printable_or_nl (strip_all_trailing_spaces (get conf "notes"))
+    else
+      only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "notes"))
   in
   let psources = only_printable (get conf "src") in
   (* Mise à jour des évènements principaux. *)
@@ -963,7 +968,7 @@ value pwitnesses_of pevents =
 value is_witness_at_marriage base ip p =
   let u = poi base ip in
   List.exists
-    (fun ifam -> let fam = foi base ifam in array_mem ip (get_witnesses fam))
+    (fun ifam -> let fam = foi base ifam in Array.mem ip (get_witnesses fam))
     (Array.to_list (get_family u))
 ;
 
@@ -981,8 +986,8 @@ value effective_mod conf base sp = do {
     rename_image_file conf base op sp;
   };
   let same_fn_sn =
-    Name.lower (nominative sp.first_name) = Name.lower ofn &&
-    Name.lower (nominative sp.surname) = Name.lower osn
+    Name.lower (Mutil.nominative sp.first_name) = Name.lower ofn &&
+    Name.lower (Mutil.nominative sp.surname) = Name.lower osn
   in
   if sp.first_name <> "?" && sp.surname <> "?" &&
      (not same_fn_sn || oocc <> sp.occ)

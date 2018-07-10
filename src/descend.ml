@@ -7,7 +7,6 @@ open Def;
 open Dag2html;
 open Gwdb;
 open Hutil;
-open Mutil;
 open Util;
 
 value limit_by_tree conf =
@@ -114,7 +113,7 @@ value display_descendants_level conf base max_level ancestor =
     print_alphab_list conf
       (fun (p, _) ->
          if is_hidden p then "?" else
-         String.sub (p_surname base p) (initial (p_surname base p)) 1)
+         String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
       (fun (p, c) ->
          do {
            Wserver.printf "\n%s" (referenced_person_title_text conf base p);
@@ -295,7 +294,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                           Wserver.printf "\n";
                           incr total;
                           if succ lev = max_lev then
-                            list_iter_first
+                            Mutil.list_iter_first
                               (fun first ifam ->
                                  let fam = foi base ifam in
                                  let c1 = Gutil.spouse ie fam in

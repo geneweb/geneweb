@@ -6,7 +6,6 @@ open Config;
 open Def;
 open Gwdb;
 open Hutil;
-open Mutil;
 open Util;
 
 type date_search = [ JustSelf | AddSpouse | AddChildren ];
@@ -243,7 +242,7 @@ value select_all_with_place conf base place =
 ;
 
 value select_title conf base title =
-  let set = ref StrSet.empty in
+  let set = ref Mutil.StrSet.empty in
   let clean_name = ref title in
   let all_names = ref [] in
   let absolute = p_getenv conf.env "a" = Some "A" in
@@ -254,9 +253,9 @@ value select_title conf base title =
        not absolute && strip_abbrev_lower tn = title2
     then do {
       let pn = sou base t.t_place in
-      if not (StrSet.mem pn set.val) then do {
+      if not (Mutil.StrSet.mem pn set.val) then do {
         clean_name.val := tn;
-        set.val := StrSet.add pn set.val;
+        set.val := Mutil.StrSet.add pn set.val;
       }
       else ();
       if not (List.mem tn all_names.val) then
@@ -270,7 +269,7 @@ value select_title conf base title =
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter add_place (nobtit conf base x)
     };
-    (StrSet.elements set.val, clean_name.val, all_names.val)
+    (Mutil.StrSet.elements set.val, clean_name.val, all_names.val)
   }
 ;
 
@@ -300,17 +299,17 @@ value select_place conf base place =
 
 value select_all proj conf base =
   let s =
-    loop 0 StrSet.empty where rec loop i s =
+    loop 0 Mutil.StrSet.empty where rec loop i s =
       if i = nb_of_persons base then s
       else
         let x = pget conf base (Adef.iper_of_int i) in
         let s =
-          List.fold_left (fun s t -> StrSet.add (sou base (proj t)) s) s
+          List.fold_left (fun s t -> Mutil.StrSet.add (sou base (proj t)) s) s
             (nobtit conf base x)
         in
         loop (i + 1) s
   in
-  StrSet.elements s
+  Mutil.StrSet.elements s
 ;
 
 value select_all2 proj conf base = do {
@@ -414,7 +413,7 @@ value print_title_place_list conf base t p t_equiv list =
       if p <> "" then Wserver.printf " %s" p else ()
     }
     else
-      list_iter_first
+      Mutil.list_iter_first
         (fun first t -> do {
            if not first then Wserver.printf ",\n" else ();
            Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;a=A\">" (commd conf)
@@ -513,7 +512,7 @@ value print_places_list conf base t t_equiv list = do {
   let title h =
     if h || List.length t_equiv = 1 then Wserver.printf "%s" t
     else
-      list_iter_first
+      Mutil.list_iter_first
         (fun first t -> do {
            Wserver.printf "%s" (if first then "" else ", ");
            give_access_all_titles conf t True;

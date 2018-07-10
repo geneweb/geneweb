@@ -4,7 +4,6 @@
 
 open Config;
 open Def;
-open Mutil;
 open Util;
 
 value green_color = "#2f6400";
@@ -176,7 +175,7 @@ value only_log from =
       fprintf_date oc tm;
       Printf.fprintf oc " Connection refused from %s " from;
       Printf.fprintf oc "(only ";
-      list_iter_first
+      Mutil.list_iter_first
         (fun first s ->
           Printf.fprintf oc "%s%s" (if not first then "," else "") s)
         only_addresses.val;
@@ -535,10 +534,10 @@ value digest_match_auth_file asch =
 ;
 
 value match_simple_passwd sauth uauth =
-  match lindex sauth ':' with
+  match Mutil.lindex sauth ':' with
   [ Some _ -> sauth = uauth
   | None ->
-      match lindex uauth ':' with
+      match Mutil.lindex uauth ':' with
       [ Some i ->
           sauth = String.sub uauth (i + 1) (String.length uauth - i - 1)
       | None -> sauth = uauth ] ]
@@ -757,7 +756,7 @@ value allowed_denied_titles key extra_line env base_env () =
       if fname = "" then []
       else
         let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
-        loop StrSet.empty where rec loop set =
+        loop Mutil.StrSet.empty where rec loop set =
           let (line, eof) =
             try (input_line ic, False) with [ End_of_file -> ("", True) ]
           in
@@ -778,11 +777,11 @@ value allowed_denied_titles key extra_line env base_env () =
                     (if pla = "*" then pla else Name.lower pla)
                 | None -> Name.lower line ]
               in
-              StrSet.add line set
+              Mutil.StrSet.add line set
           in
           if eof then do {
             close_in ic;
-            StrSet.elements set
+            Mutil.StrSet.elements set
           }
           else loop set
     with
@@ -916,7 +915,7 @@ value basic_authorization from_addr request base_env passwd access_type
               | None -> (True, False, False, "") ] ]
   in
   let user =
-    match lindex uauth ':' with
+    match Mutil.lindex uauth ':' with
     [ Some i ->
         let s = String.sub uauth 0 i in
         if s = wizard_passwd || s = friend_passwd then "" else s
@@ -950,7 +949,7 @@ value basic_authorization from_addr request base_env passwd access_type
         if wizard then "Wizard " ^ base_file else "Friend " ^ base_file
       in
         let (u, p) =
-          match lindex passwd1 ':' with
+          match Mutil.lindex passwd1 ':' with
           [ Some i ->
               let u = String.sub passwd1 0 i in
               let p =
@@ -1900,7 +1899,7 @@ value slashify s =
 
 value make_cnt_dir x =
   do {
-    mkdir_p x;
+    Mutil.mkdir_p x;
     if Sys.unix then ()
     else do {
       Wserver.sock_in.val := Filename.concat x "gwd.sin";

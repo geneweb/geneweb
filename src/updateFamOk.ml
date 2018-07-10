@@ -6,7 +6,6 @@ open Config;
 open Def;
 open Gwdb;
 open Hutil;
-open Mutil;
 open Util;
 
 (* Liste des string dont on a supprimé un caractère.       *)
@@ -222,7 +221,8 @@ value rec reconstitute_events conf ext cnt =
       in
       let efam_note =
         match get_nth conf "e_note" cnt with
-        [ Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
+        [ Some note ->
+            only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
         | _ -> "" ]
       in
       let efam_src =
@@ -457,7 +457,8 @@ value reconstitute_family conf base =
   let marriage = Update.reconstitute_date conf "marr" in
   let marriage_place = no_html_tags (only_printable (get conf "marr_place")) in
   let marriage_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "marr_note"))
+    only_printable_or_nl
+      (Mutil.strip_all_trailing_spaces (get conf "marr_note"))
   in
   let marriage_src = Gutil.strip_spaces (get conf "marr_src") in
   let (witnesses, ext) =
@@ -525,7 +526,7 @@ value reconstitute_family conf base =
       | None -> ([], ext) ]
   in
   let comment =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "comment"))
+    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "comment"))
   in
   let fsources = only_printable (get conf "src") in
   let origin_file =
@@ -1305,7 +1306,7 @@ value effective_mod conf base sfam scpl sdes = do {
   patch_descend base fi ndes;
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do {
-    if not (array_mem oarr.(i) narr) then do {
+    if not (Array.mem oarr.(i) narr) then do {
       let ou = poi base oarr.(i) in
       let ou = {family = family_exclude (get_family ou) fi} in
       patch_union base oarr.(i) ou
@@ -1313,7 +1314,7 @@ value effective_mod conf base sfam scpl sdes = do {
     else ()
   };
   for i = 0 to Array.length narr - 1 do {
-    if not (array_mem narr.(i) oarr) then do {
+    if not (Array.mem narr.(i) oarr) then do {
       let nu = poi base narr.(i) in
       let nu = {family = Array.append (get_family nu) [| fi |]} in
       patch_union base narr.(i) nu;
@@ -1340,7 +1341,7 @@ value effective_mod conf base sfam scpl sdes = do {
        let a =
          {parents = None;
           consang =
-            if not (array_mem ip ndes.children) then Adef.fix (-1)
+            if not (Array.mem ip ndes.children) then Adef.fix (-1)
             else a.consang}
        in
        Hashtbl.replace cache ip a)
@@ -1354,7 +1355,7 @@ value effective_mod conf base sfam scpl sdes = do {
            let a =
              {parents = Some fi;
               consang =
-                if not (array_mem ip ochildren) || not same_parents then
+                if not (Array.mem ip ochildren) || not same_parents then
                   Adef.fix (-1)
                 else a.consang}
            in
@@ -1362,13 +1363,13 @@ value effective_mod conf base sfam scpl sdes = do {
     ndes.children;
   Array.iter
     (fun ip ->
-       if not (array_mem ip ndes.children) then
+       if not (Array.mem ip ndes.children) then
          patch_ascend base ip (find_asc ip)
        else ())
     ochildren;
   Array.iter
     (fun ip ->
-       if not (array_mem ip ochildren) || not same_parents then
+       if not (Array.mem ip ochildren) || not same_parents then
          patch_ascend base ip (find_asc ip)
        else ())
     ndes.children;
@@ -1542,7 +1543,7 @@ value is_a_link =
 ;
 
 value is_created_or_already_there ochil_arr nchil schil =
-  not (is_a_link schil) || array_mem nchil ochil_arr
+  not (is_a_link schil) || Array.mem nchil ochil_arr
 ;
 
 (* need_check_noloop: optimization

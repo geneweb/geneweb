@@ -3,7 +3,6 @@
 (* Copyright (c) 1998-2008 INRIA *)
 
 open Def;
-open Mutil;
 
 type person = gen_person iper Adef.istr;
 type ascend = gen_ascend ifam;
@@ -300,7 +299,7 @@ value ascii_of_macintosh s =
 
 value utf8_of_string s =
   match charset.val with
-  [ Ansel -> utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
+  [ Ansel -> Mutil.utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
   | Ansi -> Mutil.utf_8_of_iso_8859_1 s
   | Ascii -> Mutil.utf_8_of_iso_8859_1 s
   | Msdos -> Mutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
@@ -2207,7 +2206,9 @@ value add_indi gen r =
         in
         let s = applycase_surname s in
         let r =
-          let key = Name.strip_lower (nominative f ^ " " ^ nominative s) in
+          let key =
+            Name.strip_lower (Mutil.nominative f ^ " " ^ Mutil.nominative s)
+          in
           try Hashtbl.find gen.g_hnam key with
           [ Not_found ->
               let r = ref (-1) in

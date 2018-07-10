@@ -5,7 +5,6 @@ open Config;
 open Dag2html;
 open Def;
 open Gwdb;
-open Mutil;
 open TemplAst;
 open Util;
 
@@ -316,7 +315,7 @@ value displayed_next_char s i =
           in
           loop1 (i + 1)
       | c ->
-          if utf_8_db.val then Some (i, i + max 1 (Name.nbc c))
+          if Mutil.utf_8_db.val then Some (i, i + max 1 (Name.nbc c))
           else Some (i, i + 1) ]
 ;
 
