@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Gwdb;
-open Hutil;
 open Util;
 
 value person_is_std_key conf base p k =
@@ -35,9 +34,11 @@ value very_unknown conf =
           (Util.transl conf ":") prenom nom
       in
       do {
-        rheader conf title; print_link_to_welcome conf False; trailer conf;
+        Hutil.rheader conf title;
+        Hutil.print_link_to_welcome conf False;
+        Hutil.trailer conf;
       }
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value unknown conf n =
@@ -46,7 +47,9 @@ value unknown conf n =
       (Util.transl conf ":") n
   in
   do {
-    rheader conf title; print_link_to_welcome conf False; trailer conf;
+    Hutil.rheader conf title;
+    Hutil.print_link_to_welcome conf False;
+    Hutil.trailer conf;
   }
 ;
 
@@ -71,7 +74,7 @@ value relation_print conf base p =
 value person_selected conf base p =
   match p_getenv conf.senv "em" with
   [ Some "R" -> relation_print conf base p
-  | Some mode -> incorrect_request conf
+  | Some mode -> Hutil.incorrect_request conf
   | None -> do {
       record_visited conf (get_key_index p);
       Perso.print conf base p } ]
@@ -257,9 +260,9 @@ value specify conf base n pl =
       pl
   in
   do {
-    header conf title;
+    Hutil.header conf title;
     conf.cancel_links := False;
-    print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     (* Si on est dans un calcul de parenté, on affiche *)
     (* l'aide sur la sélection d'un individu.          *)
     Util.print_tips_relationship conf;
@@ -324,7 +327,7 @@ value specify conf base n pl =
          end)
       ptll;
     Wserver.printf "</ul>\n";
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
@@ -370,7 +373,7 @@ value make_senv conf base =
       let ip =
         match person_of_key base vp vn voc with
         [ Some ip -> ip
-        | None -> do { incorrect_request conf; raise Exit } ]
+        | None -> do { Hutil.incorrect_request conf; raise Exit } ]
       in
       let vi = string_of_int (Adef.int_of_iper ip) in set_senv conf vm vi
   | _ -> () ]
@@ -444,35 +447,35 @@ value family_m conf base =
       | _ -> very_unknown conf ]
   | Some "FORUM" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print conf base ]
   | Some "FORUM_ADD" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print_add conf base ]
   | Some "FORUM_ADD_OK" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print_add_ok conf base ]
   | Some "FORUM_DEL" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print_del conf base ]
   | Some "FORUM_P_P" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print_access_switch conf base ]
   | Some "FORUM_SEARCH" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print_search conf base ]
   | Some "FORUM_VAL" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print_valid conf base ]
   | Some "FORUM_VIEW" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> incorrect_request conf
+      [ Some "yes" -> Hutil.incorrect_request conf
       | _ -> Forum.print conf base ]
   | Some "H" ->
       match p_getenv conf.env "v" with
@@ -591,7 +594,7 @@ value family_m conf base =
                     conf.cancel_links := False;
                     Some.surname_print conf base unknown sn
                   }
-              | (None, None) -> incorrect_request conf ] ]
+              | (None, None) -> Hutil.incorrect_request conf ] ]
       | Some i ->
           relation_print conf base
             (pget conf base (Adef.iper_of_int (int_of_string i))) ]
@@ -614,11 +617,11 @@ value family_m conf base =
   | Some "REQUEST" when conf.wizard ->
       let title _ = () in
       do {
-        header conf title;
+        Hutil.header conf title;
         Wserver.printf "<pre>\n";
         List.iter (Wserver.printf "%s\n") conf.request;
         Wserver.printf "</pre>\n";
-        trailer conf;
+        Hutil.trailer conf;
       }
   | Some "RL" -> RelationLink.print conf base
   | Some "RLM" -> Relation.print_multi conf base
@@ -731,9 +734,9 @@ IFDEF API THEN
   | Some mode -> ()
   | None -> () ]
 ELSE
-    incorrect_request conf
+    Hutil.incorrect_request conf
 END
-  | Some mode -> incorrect_request conf
+  | Some mode -> Hutil.incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with
       [ Some p -> person_selected conf base p
@@ -744,13 +747,13 @@ value print_no_index conf base =
   let title _ = Wserver.printf "%s" (Util.capitale (transl conf "link to use")) in
   let link = url_no_index conf base in
   do {
-    header conf title;
+    Hutil.header conf title;
     tag "ul" begin
       html_li conf;
       tag "a" "href=\"http://%s\"" link begin Wserver.printf "%s" link; end;
     end;
-    print_link_to_welcome conf False;
-    trailer conf;
+    Hutil.print_link_to_welcome conf False;
+    Hutil.trailer conf;
   }
 ;
 
@@ -763,7 +766,7 @@ IFDEF API THEN
   | Some mode -> ()
   | None -> () ]
 ELSE
-  incorrect_request conf
+  Hutil.incorrect_request conf
 END
 ;
 
@@ -911,7 +914,7 @@ value treat_request conf base = do {
             Srcfile.print_source conf base f
           else
             Image.print conf base
-      | None -> incorrect_request conf ]
+      | None -> Hutil.incorrect_request conf ]
   | _ ->
       do {
         set_owner conf;

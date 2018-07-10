@@ -4,7 +4,6 @@
 
 open Config;
 open Gwdb;
-open Hutil;
 open Util;
 
 (* tools *)
@@ -419,5 +418,5 @@ value print conf base specify unknown =
         [ Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname ]
       in
       search conf base sn order specify unknown
-  | (None, None) -> incorrect_request conf ]
+  | (None, None) -> Hutil.incorrect_request conf ]
 ;

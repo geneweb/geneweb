@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Gwdb;
-open Hutil;
 open Util;
 
 type date_search = [ JustSelf | AddSpouse | AddChildren ];
@@ -429,7 +428,7 @@ value print_title_place_list conf base t p t_equiv list =
          t_equiv
   in
   do {
-    header conf title;
+    Hutil.header conf title;
     tag "ul" begin
       let _ =
         List.fold_left
@@ -470,14 +469,14 @@ value print_title_place_list conf base t p t_equiv list =
           Wserver.printf ";lim=6\">%s</a>\n" (capitale (transl conf "tree"));
         end
     | _ -> () ];
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
 value print_all_with_place_list conf base p list =
   let title _ = Wserver.printf "... %s\n" p in
   do {
-    header conf title;
+    Hutil.header conf title;
     Wserver.printf "<ul>\n";
     let _ =
       List.fold_left
@@ -492,7 +491,7 @@ value print_all_with_place_list conf base p list =
         [] list
     in
     Wserver.printf "</ul>\n";
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
@@ -530,9 +529,9 @@ value print_places_list conf base t t_equiv list = do {
       else Wserver.printf "%s%s" (surname_end base p) (surname_begin base p);
     end
   in
-  header conf title;
+  Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
-  trailer conf;
+  Hutil.trailer conf;
 };
 
 value print_places conf base t =
@@ -548,7 +547,7 @@ value print_titles conf base p =
   let list = string_list_uniq (List.sort compare_titles l) in
   let title _ = Wserver.printf "... %s" p in
   do {
-    header conf title;
+    Hutil.header conf title;
     tag "ul" begin
       List.iter (fun t -> stagn "li" begin give_access_title conf t p; end)
         list;
@@ -558,7 +557,7 @@ value print_titles conf base p =
         Wserver.printf "%s" (capitale (transl conf "the whole list"));
       end
     else ();
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
@@ -576,9 +575,9 @@ value print_all_titles conf base = do {
     Wserver.printf " (%d)" cnt;
   }
   in
-  header conf title;
+  Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
-  trailer conf;
+  Hutil.trailer conf;
 };
 
 value print_all_places conf base = do {
@@ -589,13 +588,13 @@ value print_all_places conf base = do {
     let l = select_all_places conf base in
     string_list_uniq (List.sort compare_places l)
   in
-  header conf title;
+  Hutil.header conf title;
   tag "ul" begin
     List.iter (fun t -> do {
       stagn "li" begin give_access_all_places conf t; end;
     }) list;
   end;
-  trailer conf;
+  Hutil.trailer conf;
 };
 
 value print conf base = do {

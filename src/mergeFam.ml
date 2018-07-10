@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Gwdb;
-open Hutil;
 open Util;
 
 value compatible_fevents fevt1 fevt2 =
@@ -138,9 +137,9 @@ value merge_fam1 conf base fam1 fam2 =
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
   do {
-    header conf title;
+    Hutil.header conf title;
     print_differences conf base [] fam1 fam2;
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
@@ -156,7 +155,7 @@ value merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
     else
       MergeFamOk.print_merge conf base
   else
-    incorrect_request conf
+    Hutil.incorrect_request conf
 ;
 
 value print conf base =
@@ -168,5 +167,5 @@ value print conf base =
       let fam2 = foi base ifam2 in
       merge_fam conf base (ifam1, fam1) (ifam2, fam2)
   | _ ->
-      incorrect_request conf ]
+      Hutil.incorrect_request conf ]
 ;

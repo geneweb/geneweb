@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Gwdb;
-open Hutil;
 open TemplAst;
 open Util;
 
@@ -659,7 +658,7 @@ value print_update_fam conf base fcd digest =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         env fcd
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_del1 conf base ifam =
@@ -693,7 +692,7 @@ value print_del1 conf base ifam =
       end;
     end;
     Wserver.printf "\n";
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -737,7 +736,7 @@ value print_inv1 conf base p ifam1 ifam2 =
       end;
     end;
     Wserver.printf "\n";
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -793,7 +792,7 @@ value print_add_parents conf base =
                get_occ p, Update.Link, "") |]}
       in
       print_update_fam conf base (fam, cpl, des) ""
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_mod conf base =
@@ -802,13 +801,13 @@ value print_mod conf base =
       let sfam = string_family_of conf base (Adef.ifam_of_int i) in
       let digest = Update.digest_family sfam in
       print_update_fam conf base sfam digest
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i -> print_del1 conf base (Adef.ifam_of_int i)
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value rec find_families ifam =
@@ -829,8 +828,8 @@ value print_inv conf base =
       [ Some (ifam1, ifam2) ->
           let p = poi base (Adef.iper_of_int ip) in
           print_inv1 conf base p ifam1 ifam2
-      | _ -> incorrect_request conf ]
-  | _ -> incorrect_request conf ]
+      | _ -> Hutil.incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value change_order conf base ip u ifam n =
@@ -917,9 +916,9 @@ value print_change_order conf base =
         end;
       end;
       Wserver.printf "\n";
-      trailer conf
+      Hutil.trailer conf
     }
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_change_event_order conf base =
@@ -933,5 +932,5 @@ value print_change_event_order conf base =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         [] sfam
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;

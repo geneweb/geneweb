@@ -4,7 +4,6 @@
 
 open Config;
 open Gwdb;
-open Hutil;
 open Util;
 
 value file_path conf base fname =
@@ -64,7 +63,7 @@ value print_search_form conf from_note =
 ;
 
 value print_whole_notes conf base fnotes title s ho = do {
-  header_no_page_title conf
+  Hutil.header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
@@ -74,7 +73,7 @@ value print_whole_notes conf base fnotes title s ho = do {
       end
     else ()
   in
-  gen_print_link_to_welcome what_links_page conf True;
+  Hutil.gen_print_link_to_welcome what_links_page conf True;
   Wserver.printf "<div class=\"d-flex justify-content-between\">\n";
   if title <> "" then
     let title =
@@ -109,14 +108,14 @@ value print_whole_notes conf base fnotes title s ho = do {
   match ho with
   [ Some _ -> print_search_form conf (Some fnotes)
   | None -> () ];
-  trailer conf;
+  Hutil.trailer conf;
 };
 
 value print_notes_part conf base fnotes title s cnt0 =
   do {
-    header_no_page_title conf
+    Hutil.header_no_page_title conf
       (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
-    print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     match Util.open_etc_file "summary" with
     [ Some ic -> Templ.copy_from_templ conf [] ic
     | None -> () ];
@@ -136,7 +135,7 @@ value print_notes_part conf base fnotes title s cnt0 =
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
@@ -437,7 +436,7 @@ value commit_notes conf base fnotes s =  do {
   in
   Mutil.mkdir_p (Filename.dirname fpath);
   try Gwdb.commit_notes base fname s with
-  [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
+  [ Sys_error _ -> do { Hutil.incorrect_request conf; raise Update.ModErr } ];
   History.record conf base (Def.U_Notes (p_getint conf.env "v") fnotes) "mn";
   update_notes_links_db conf pg s;
 };
@@ -523,7 +522,7 @@ value print_misc_notes conf base =
       db []
   in
   do {
-    header_link_welcome conf title;
+    Hutil.header_link_welcome conf title;
     if db <> [] then
       tag "ul" begin
         if d <> "" then
@@ -579,7 +578,7 @@ value print_misc_notes conf base =
       end
     else ();
     if d = "" then print_search_form conf None else ();
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 

@@ -4,7 +4,6 @@
 
 open Config;
 open Gwdb;
-open Hutil;
 open Util;
 
 value print_link conf base p = do {
@@ -147,7 +146,7 @@ value main_page conf base =
       | Perso.NoDup ->
           print_no_candidate conf base (ip, p) ]
  | None ->
-      incorrect_request conf ]
+      Hutil.incorrect_request conf ]
 ;
 
 value answ_ind_y_n conf base =

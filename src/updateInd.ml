@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Gwdb;
-open Hutil;
 open TemplAst;
 open Util;
 
@@ -758,7 +757,7 @@ value print_update_ind conf base p digest =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         env p
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_del1 conf base p =
@@ -780,7 +779,7 @@ value print_del1 conf base p =
         end;
       end;
     end;
-    trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
@@ -807,7 +806,7 @@ value print_mod conf base =
       let sp = string_person_of base p in
       let digest = Update.digest_person sp in
       print_update_ind conf base sp digest
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_del conf base =
@@ -815,7 +814,7 @@ value print_del conf base =
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
       print_del1 conf base p
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_change_event_order conf base =
@@ -829,5 +828,5 @@ value print_change_event_order conf base =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         [] p
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;

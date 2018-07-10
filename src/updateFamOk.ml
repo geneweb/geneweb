@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Gwdb;
-open Hutil;
 open Util;
 
 (* Liste des string dont on a supprimé un caractère.       *)
@@ -646,10 +645,10 @@ value error_family conf base err = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 };
 
@@ -758,7 +757,7 @@ value print_err_parents conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "\n";
   Wserver.printf (fcapitale (ftransl conf "%t already has parents"))
     (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p));
@@ -772,7 +771,7 @@ value print_err_parents conf base p = do {
          0);
   end;
   Update.print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 };
 
@@ -787,11 +786,11 @@ value print_err_father_sex conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "\n%s" (referenced_person_text conf base p);
   Wserver.printf "\n%s\n" (transl conf "should be male");
   Update.print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 };
 
@@ -806,11 +805,11 @@ value print_err_mother_sex conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "\n%s" (referenced_person_text conf base p);
   Wserver.printf "\n%s\n" (transl conf "should be female");
   Update.print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 };
 
@@ -822,9 +821,9 @@ value print_err conf base = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Update.print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 };
 
@@ -838,10 +837,10 @@ value print_error_disconnected conf = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf True;
   Wserver.printf "%s" (capitale (transl conf "msg error disconnected"));
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 };
 
@@ -1468,7 +1467,7 @@ value effective_inv conf base ip u ifam =
     [ [ifam1; ifam2 :: ifaml] ->
         if ifam2 = ifam then [ifam2; ifam1 :: ifaml]
         else [ifam1 :: loop [ifam2 :: ifaml]]
-    | _ -> do { incorrect_request conf; raise Update.ModErr } ]
+    | _ -> do { Hutil.incorrect_request conf; raise Update.ModErr } ]
   in
   let u = {family = Array.of_list (loop (Array.to_list (get_family u)))} in
   patch_union base ip u
@@ -1642,8 +1641,8 @@ value print_mod_ok conf base (wl, ml) cpl des =
     Wserver.printf "%s" (capitale (transl conf "family modified"))
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
@@ -1659,7 +1658,7 @@ value print_mod_ok conf base (wl, ml) cpl des =
       }
     else ();
     print_family conf base (wl, ml) cpl des;
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -1668,18 +1667,18 @@ value print_change_event_order_ok conf base (wl, ml) cpl des =
     Wserver.printf "%s" (capitale (transl conf "family modified"))
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf True;
     print_family conf base (wl, ml) cpl des;
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
 value print_add_ok conf base (wl, ml) cpl des =
   let title _ = Wserver.printf "%s" (capitale (transl conf "family added")) in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
@@ -1688,7 +1687,7 @@ value print_add_ok conf base (wl, ml) cpl des =
       }
     else ();
     print_family conf base (wl, ml) cpl des;
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -1697,8 +1696,8 @@ value print_del_ok conf base wl =
     Wserver.printf "%s" (capitale (transl conf "family deleted"))
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf True;
     match p_getint conf.env "ip" with
     [ Some i ->
         let p = poi base (Adef.iper_of_int i) in
@@ -1709,7 +1708,7 @@ value print_del_ok conf base wl =
         end
     | _ -> () ];
     Update.print_warnings conf base wl;
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -1718,11 +1717,11 @@ value print_inv_ok conf base p =
     Wserver.printf "%s" (capitale (transl conf "inversion done"))
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf True;
     Wserver.printf "\n%s" (referenced_person_text conf base p);
     Wserver.printf "\n";
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -1847,7 +1846,7 @@ value print_del conf base =
         else ();
         print_del_ok conf base []
       }
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_mod_aux conf base callback =
@@ -1957,7 +1956,7 @@ value print_inv conf base =
         }
       with
       [ Update.ModErr -> () ]
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_change_order_ok conf base =
@@ -1982,7 +1981,7 @@ value print_change_order_ok conf base =
         }
       with
       [ Update.ModErr -> () ]
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 value print_change_event_order conf base =
@@ -2054,5 +2053,5 @@ value print_change_event_order conf base =
       }
     with
     [ Update.ModErr -> () ]
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;

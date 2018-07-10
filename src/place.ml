@@ -4,7 +4,6 @@
 
 open Config;
 open Gwdb;
-open Hutil;
 open Util;
 
 
@@ -262,7 +261,7 @@ value print_all_places_surnames_short conf list =
   in
   do {
     Hutil.header conf title;
-    print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     tag "p" begin
       stag "a" "href=\"%sm=PS%s;k=\"" (commd conf) opt begin
         Wserver.printf "%s" (transl conf "long display");
@@ -310,7 +309,7 @@ value print_all_places_surnames_long conf base list =
   in
   do {
     Hutil.header conf title;
-    print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     if list = [] then () else print_html_places_surnames conf base list;
     Hutil.trailer conf
   }
