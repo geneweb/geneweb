@@ -1026,8 +1026,6 @@ value print_solution conf base long n p1 p2 sol =
   }
 ;
 
-open RelationLink;
-
 value max_br = 33;
 
 value print_dag_links conf base p1 p2 rl =
@@ -1385,9 +1383,10 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
             | Some x -> " class=\"" ^ x ^ "\"" ] ]
       in
       let info =
-        {ip = ip; sp = get_sex a; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
-         c1 = 1; c2 = 1; pb1 = None; pb2 = None; nb1 = None; nb2 = None;
-         sp1 = sp1; sp2 = sp2; bd = bd; td_prop = td_prop}
+        RelationLink.(
+          {ip = ip; sp = get_sex a; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
+           c1 = 1; c2 = 1; pb1 = None; pb2 = None; nb1 = None; nb2 = None;
+           sp1 = sp1; sp2 = sp2; bd = bd; td_prop = td_prop})
       in
       if List.mem (b1, b2) found.val then ()
       else do {
