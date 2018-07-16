@@ -48,7 +48,6 @@ git clone https://github.com/geneweb/geneweb
 make opt
 make distrib
 ```
-
 ### Building the API
 
 The API uses the Google Protocol Buffer to exchange informations
@@ -68,6 +67,20 @@ It has the following dependancies:
 - uuidm
 - yojson
 - redis
+
+### Docker 
+
+You can use Docker to build and run geneweb on any computer. 
+```
+git clone https://github.com/geneweb/geneweb
+cd geneweb 
+docker build -t geneweb .
+docker run --rm -it -p 2316:2316 -p 2317:2317 -v `pwd`:/home/opam/geneweb/ -v YOUR_BASE_DIR:/home/opam/bases/ geneweb /home/opam/geneweb/docker/build.sh --run --api --clean
+```
+the following options are available for the build script : 
+- run: runs geneweb and gwsetup right after build
+- clean: runs `make clean` before build phase
+- api: builds the api
 
 ## Contributor guidelines
 
