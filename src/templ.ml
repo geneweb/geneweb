@@ -1083,7 +1083,7 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
       match op with
       [ "and" -> VVbool (if bool e1 then bool e2 else False)
       | "or" -> VVbool (if bool e1 then True else bool e2)
-      | "is_substr" -> VVbool (is_substr (string e2) (string e1))
+      | "is_substr" -> VVbool (is_substr (string e1) (string e2))
       | "=" -> VVbool (eval_expr ceva e1 = eval_expr ceva e2)
       | "<" -> VVbool (int e1 < int e2)
       | ">" -> VVbool (int e1 > int e2)
