@@ -11,7 +11,7 @@ open Util
 module Make
     (Wserver : module type of Wserver)
     (Request : Request.MakeOut)
-  : (sig val run : unit -> unit end)
+  : (sig val run : ?speclist:(string * Arg.spec * string) list -> unit -> unit end)
 = struct
 
 let green_color = "#2f6400"
@@ -1815,7 +1815,7 @@ let make_cnt_dir x =
     end;
   Util.cnt_dir := x
 
-let main () =
+let main ~speclist () =
   if Sys.unix then ()
   else begin Wserver.sock_in := "gwd.sin"; Wserver.sock_out := "gwd.sou" end;
   let usage =
@@ -1900,17 +1900,22 @@ let main () =
     ("-nolock", Arg.Set Lock.no_lock_flag,
      "\n       Do not lock files before writing.") ::
     (if Sys.unix then
-       ["-max_clients", Arg.Int (fun x -> max_clients := Some x),
-        "<num>\n       \
-         Max number of clients treated at the same time (default: no limit) \
-         (not cgi).";
-        "-conn_tmout", Arg.Int (fun x -> conn_timeout := x),
-        "<sec>\n       Connection timeout (default " ^
-        string_of_int !conn_timeout ^ "s; 0 means no limit)";
-        "-daemon", Arg.Set daemon, "\n       Unix daemon mode."]
+       ( " -max_clients"
+       , Arg.Int (fun x -> max_clients := Some x)
+       , "<num>\n       \
+          Max number of clients treated at the same time (default: no limit) \
+          (not cgi).")
+       :: ( "-conn_tmout"
+          , Arg.Int (fun x -> conn_timeout := x)
+          , "<sec>\n       Connection timeout (default "
+            ^ string_of_int !conn_timeout ^ "s; 0 means no limit)" )
+       :: ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.")
+       :: speclist
      else
-       ["-noproc", Arg.Set Wserver.noproc,
-        "\n       Do not launch a process at each request."])
+       ( "-noproc"
+       , Arg.Set Wserver.noproc
+       ,"\n       Do not launch a process at each request." )
+       :: speclist)
   in
   let speclist =
     ("-api_url", Arg.String (fun x -> Link.api_url := x),
@@ -2066,6 +2071,6 @@ let print_exc exc =
   | _ -> eprintf "%s\n" (Printexc.to_string exc); flush stderr
 
 
-let run () = try main () with exc -> print_exc exc
+let run ?(speclist = []) () = try main ~speclist () with exc -> print_exc exc
 
 end
