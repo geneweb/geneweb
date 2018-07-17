@@ -1,17 +1,17 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html>
+<html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: err_reco.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <!-- $Id: err_reco.htm,v 7.00 2018-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[error]</title>
+%fsetup.css;
 </head>
 
-<body background="images/gwback.jpg">
+<body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;"><font color=red>[error]</font></h1>
@@ -20,79 +20,79 @@
 
 [
 de: Das vorangegangene Kommando hat beim Beenden einen Fehler geliefert.
-    Deine Datenbank "%o" wurde m&ouml;glicherweise nicht angelegt.
+    Deine Datenbank "%o" wurde mÃ¶glicherweise nicht angelegt.
     Du kannst dir seine <a
     href="gwsetup?lang=%l;v=traces.htm">Trace-Ausgaben</a> ansehen, 
-    vielleicht kannst du die Erkl&auml;rung f&uuml;r das Problem erkennen.
+    vielleicht kannst du die ErklÃ¤rung fÃ¼r das Problem erkennen.
 en: The previous command exited with an error code. Your database "%o" may
     have not been created. Look at the <a
     href="gwsetup?lang=%l;v=traces.htm">traces</a>, maybe you can find
     an explanation.
-es: El comando anterior ha terminado con un c&oacute;digo de error.
+es: El comando anterior ha terminado con un cÃ³digo de error.
     Es posible que su base de datos "%o" no haya sido creada.
     Consulte Ud. las <a href="gwsetup?lang=%l;v=traces.htm">trazas</a>,
-    es posible que all&iacute; encuentre Ud. una explicaci&oacute;n.
-fi: Edellinen komento keskeytyi virheeseen. Tietokantaa "%o" ei välttämättä
-    luotu. Katso <a href="gwsetup?lang=%l;v=traces.htm">täältä</a>,
-    jos löytäisit selityksen.
-fr: La commande pr&eacute;c&eacute;dente s'est termin&eacute;e avec un
-    code d'erreur. Il se peut que votre base de donn&eacute;es "%o" n'ait
-    pas &eacute;t&eacute; cr&eacute;&eacute;e. Regardez dans les <a
-    href="gwsetup?lang=%l;v=traces.htm">traces</a>, peut-&ecirc;tre y
+    es posible que allÃ­ encuentre Ud. una explicaciÃ³n.
+fi: Edellinen komento keskeytyi virheeseen. Tietokantaa "%o" ei vÃ¤lttÃ¤mÃ¤ttÃ¤
+    luotu. Katso <a href="gwsetup?lang=%l;v=traces.htm">tÃ¤Ã¤ltÃ¤</a>,
+    jos lÃ¶ytÃ¤isit selityksen.
+fr: La commande prÃ©cÃ©dente sâ€™est terminÃ©e avec un
+    code dâ€™erreur. Il se peut que votre base de donnÃ©es "%o" nâ€™ait
+    pas Ã©tÃ© crÃ©Ã©e. Regardez dans les <a
+    href="gwsetup?lang=%l;v=traces.htm">traces</a>, peut-Ãªtre y
     trouverez-vous une explication.
 it: Il comando precedente ha generato un codice di errore.
-    Forse la base di dati "%o" non &egrave; stata creata. Consultate le <a
+    Forse la base di dati "%o" non Ã¨ stata creata. Consultate le <a
     href="gwsetup?lang=%l;v=traces.htm">tracce</a>, forse vi troverete
     una spiegazione.
-lv: Ipriekğâjâ komanda beidza savu darbu ar kïûdas paziòojumu. Jûsu datu
-    bâze iespçjams nav izveidota. Skatiet komandas darbîbas <a
-    href="gwsetup?lang=%l;v=traces.htm">pçdas</a>, iespçjams, ka varçsiet
+lv: IpriekÃ°Ã¢jÃ¢ komanda beidza savu darbu ar kÃ¯Ã»das paziÃ²ojumu. JÃ»su datu
+    bÃ¢ze iespÃ§jams nav izveidota. Skatiet komandas darbÃ®bas <a
+    href="gwsetup?lang=%l;v=traces.htm">pÃ§das</a>, iespÃ§jams, ka varÃ§siet
     rast izskaidrojumu.
-sv: Föregående kommando avslutades med en felkod. Din databas "%o" kanske
-    inte har skapats. Titta på <a
+sv: FÃ¶regÃ¥ende kommando avslutades med en felkod. Din databas "%o" kanske
+    inte har skapats. Titta pÃ¥ <a
     href="gwsetup?lang=%l;v=traces.htm">utskriften</a>, kanske kan du finna
-    en förklaring.
+    en fÃ¶rklaring.
 ]
 
 <p />
 
 [
-de: M&ouml;glicherweise kommst du von einer zu alten
+de: MÃ¶glicherweise kommst du von einer zu alten
     <font color=#2f6400><b>GeneWeb</b></font>-Version. In diesem Fall
     solltest du es <a href="gwsetup?lang=%l;v=recover.htm">nochmal
     versuchen</a>, wobei du die Option "GEDCOM-Datei verwenden"
-    ausw&auml;hlen solltest (du kannst auch mit dem "zur&uuml;ck"-Knopf
-    deines Browsers auf die Seite zur&uuml;ckgehen um das zu machen).
+    auswÃ¤hlen solltest (du kannst auch mit dem "zurÃ¼ck"-Knopf
+    deines Browsers auf die Seite zurÃ¼ckgehen um das zu machen).
 en: You may have come from a too old version of
     <font color=#2f6400><b>GeneWeb</b></font>. In this
     case, <a href="gwsetup?lang=%l;v=recover.htm">try again</a> to do the
     transfer using the option to "pass by a GEDCOM file" (you can also
     go back to the previous screen to do it).
-es: Es posible que Ud. haya comenzado con una versi&oacute;n muy antig&uumla de
+es: Es posible que Ud. haya comenzado con una versiÃ³n muy antig&uumla de
     <font color=#2f6400><b>GeneWeb</b></font>. En ese caso, <a
     href="gwsetup?lang=%l;v=recover.htm">trate de nuevo</a> de efectuar la
-    transferencia utilizando la opci&oacute;n "pasar por un fichero GEDCOM".
+    transferencia utilizando la opciÃ³n "pasar por un fichero GEDCOM".
 fi: Olet saattanut tulla vanhemmasta <font color=#2f6400><b>GeneWeb</b></font>
-    versiosta. Tässä tapauksessa
+    versiosta. TÃ¤ssÃ¤ tapauksessa
     <a href="gwsetup?lang=%l;v=recover.htm">kokeile</a> uudestaan siirtoa
-    käyttäen asetusta "GEDCOM tiedostona" (voit palata edelliselle sivulle).
-fr: Il se peut que vous soyez parti d'une trop ancienne version de
+    kÃ¤yttÃ¤en asetusta "GEDCOM tiedostona" (voit palata edelliselle sivulle).
+fr: Il se peut que vous soyez parti dâ€™une trop ancienne version de
     <b><font color=#2f6400>GeneWeb</font></b>. Dans ce cas, <a
-    href="gwsetup?lang=%l;v=recover.htm">r&eacute;essayez</a> de faire le
-    transfert en mettant l'option de "passer par un fichier GEDCOM".
+    href="gwsetup?lang=%l;v=recover.htm">rÃ©essayez</a> de faire le
+    transfert en mettant lâ€™option de Â«â€¯passer par un fichier GEDCOMâ€¯Â».
 it: Forse siete partiti da una troppo vecchia versione di
     <b><font color=#2f6400>GeneWeb</font></b>. In questo caso <a
     href="gwsetup?lang=%l;v=recover.htm"> riprovate </a> a fare il
     trasferimento aggiungendo l'opzione "passare per un file GEDCOM".
-lv: Iespçjams Jûsu dati nâk no pârâk vecas
-    <font color=#2f6400><b>GeneWeb</b></font> versijas. Tâdâ gadîjumâ
-    <a href="gwsetup?lang=%l;v=recover.htm">mçìiniet vçlreiz</a> veikt
-    pârveidoğanu, lietojot iespçju "izmantojot GEDCOM datni" (to Jûs arî
-    variet izdarît aizejot atpakï uz ieprieksçjo lapu).
-sv: Du kanske har gått från en alltför gammal version av
+lv: IespÃ§jams JÃ»su dati nÃ¢k no pÃ¢rÃ¢k vecas
+    <font color=#2f6400><b>GeneWeb</b></font> versijas. TÃ¢dÃ¢ gadÃ®jumÃ¢
+    <a href="gwsetup?lang=%l;v=recover.htm">mÃ§Ã¬iniet vÃ§lreiz</a> veikt
+    pÃ¢rveidoÃ°anu, lietojot iespÃ§ju "izmantojot GEDCOM datni" (to JÃ»s arÃ®
+    variet izdarÃ®t aizejot atpakÃ¯ uz ieprieksÃ§jo lapu).
+sv: Du kanske har gÃ¥tt frÃ¥n en alltfÃ¶r gammal version av
     <font color=#2f6400><b>GeneWeb</b></font>.
-    I det fallet, <a href="gwsetup?lang=%l;v=recover.htm">försök igen</a>
-    för att göra överföringen med optionen "genom en GEDCOM-fil".
+    I det fallet, <a href="gwsetup?lang=%l;v=recover.htm">fÃ¶rsÃ¶k igen</a>
+    fÃ¶r att gÃ¶ra Ã¶verfÃ¶ringen med optionen "genom en GEDCOM-fil".
 ]
 
 <p />
@@ -108,38 +108,38 @@ en: If you were already doing that, and it does not work better, ask the
 es: Si es justamente eso que Ud. viene de efectuar y que eso no resuelve el
     problema; pida consejo al creador del programa
     <font color=#2f6400><b>GeneWeb</b></font>. Enviele las trazas del comando.
-fi: Jos teit sen jo eikä se toimi paremmin, kysy neuvoa 
-    <font color=#2f6400><b>GeneWeb</b></font> tekijältä. Lähetä hänelle lista
-    tehdyistä komennon jäljistä.
-fr: Si c'est pr&eacute;cis&eacute;ment ce que vous venez de faire et que
-    &ccedil;a ne marche donc pas, demandez conseil au cr&eacute;ateur du
+fi: Jos teit sen jo eikÃ¤ se toimi paremmin, kysy neuvoa 
+    <font color=#2f6400><b>GeneWeb</b></font> tekijÃ¤ltÃ¤. LÃ¤hetÃ¤ hÃ¤nelle lista
+    tehdyistÃ¤ komennon jÃ¤ljistÃ¤.
+fr: Si câ€™est prÃ©cisÃ©ment ce que vous venez de faire et que
+    Ã§a ne marche donc pas, demandez conseil au crÃ©ateur du
     programme <b><font color=#2f6400>GeneWeb</font></b> en lui envoyant les
     traces de la commande.
-it: Se &egrave; esattamente ci&ograve; che avete appena fatto, e non ha
+it: Se Ã¨ esattamente ciÃ² che avete appena fatto, e non ha
     funzionato, domandate consiglio al creatore del programma
     <b><font color=#2f6400>GeneWeb</font></b> inviandogli la traccia del
     comando.
-lv: Ja Jûs to jau esiet izmçìinâjis un tas nelîdzçja, jautâjiet
-    <font color=#2f6400><b>GeneWeb</b></font> programmas autoram. Nosûtiet
-    viòam arî programas darbîbas pçdas.
-sv: Om du redan har gjort det och det inte fungerade bättre, fråga
-    <font color=#2f6400><b>GeneWeb</b></font>s upphovsman. Sänd honom
-    utskrifterna från kommandona.
+lv: Ja JÃ»s to jau esiet izmÃ§Ã¬inÃ¢jis un tas nelÃ®dzÃ§ja, jautÃ¢jiet
+    <font color=#2f6400><b>GeneWeb</b></font> programmas autoram. NosÃ»tiet
+    viÃ²am arÃ® programas darbÃ®bas pÃ§das.
+sv: Om du redan har gjort det och det inte fungerade bÃ¤ttre, frÃ¥ga
+    <font color=#2f6400><b>GeneWeb</b></font>s upphovsman. SÃ¤nd honom
+    utskrifterna frÃ¥n kommandona.
 ]
 
 <p />
 
 [
-de: Zur&uuml;ck zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmen&uuml;</a>.
+de: ZurÃ¼ck zum <a href="gwsetup?lang=%l;v=welcome.htm">HauptmenÃ¼</a>.
 en: You can return to the <a href="gwsetup?lang=%l;v=welcome.htm">main menu</a>.
-es: Ud. puede regresar al <a href="gwsetup?lang=%l;v=welcome.htm">men&uacute;
+es: Ud. puede regresar al <a href="gwsetup?lang=%l;v=welcome.htm">menÃº
     principal</a>.
-fi: Voit palata <a href="gwsetup?lang=%l;v=welcome.htm">päävalikkoon</a>.
+fi: Voit palata <a href="gwsetup?lang=%l;v=welcome.htm">pÃ¤Ã¤valikkoon</a>.
 fr: Vous pouvez revenir au <a href="gwsetup?lang=%l;v=welcome.htm">menu
     principal</a>.
 it: Potete tornare al <a href="gwsetup?lang=%l;v=welcome.htm">menu
     principale</a>.
-lv: Jûs variet atgriezties <a href="gwsetup?lang=%l;v=welcome.htm">galvenajâ
-    izvçlnç</a>.
-sv: Du kan återvända till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
+lv: JÃ»s variet atgriezties <a href="gwsetup?lang=%l;v=welcome.htm">galvenajÃ¢
+    izvÃ§lnÃ§</a>.
+sv: Du kan Ã¥tervÃ¤nda till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
 ]

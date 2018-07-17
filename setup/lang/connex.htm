@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: connex.htm,v 7.00 2018-04-09 05:35:06 hg Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[
+en: Connex
+fr: Connex
+]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[
+en: Listing connected components
+fr: Liste des composantes connexes
+]
+</h1>
+</div>
+<ul>
+<li>
+<form method="get" action="connex">
+<input type=hidden name=opt value=check>
+<input type="hidden" name="lang" value="%l">
+<input type="hidden" name="server" value="%m">
+<input type="hidden" name="gwd_p" value="%P">
+
+[
+en: Select your database by clicking on the associated button:
+fr: Sélectionnez votre base de données en cliquant sur le bouton associé :
+]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td><input type="radio" name="anon" value="%a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://%m:%P/%a">%a</a></td>
+</tr>|
+<tr align="left"><td>- [
+en: there is no database at present
+fr: il n'y a aucune base de données actuellement
+]</tr></td>}
+</table></dl>
+<p>
+<li>
+[
+de: Wähle die gewünschten Optionen:
+en: Select the options you want:
+es: Seleccione las opciones que Ud. desee:
+fr: Sélectionnez les options que vous désirez :
+it: Selezionate le opzioni desiderate:
+lv: Izvçlieties atbilstoðos parametrus:
+sv: Välj de optioner du vill ha:
+]
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="a" id="a" value="on">
+<label for="a" style="font-family: monospace">-a&nbsp;&nbsp;</label>[
+en: All connex components.
+fr: Toutes les composantes connexes.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="s" id="s" value="on">
+<label for="s" style="font-family: monospace">-s&nbsp;&nbsp;</label>[
+en: Produce connected components statistics.
+fr: Afficher les statistiques sur les composantes connexes.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="d_1" style="font-family: monospace">-d&nbsp;&nbsp;
+<input type="input" name="d" size="2" maxlength="2" style="padding-left:4px">
+</label>&nbsp;&nbsp;[
+en: Details for this length.
+fr: Fournir détails pour cette taille.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="i" style="font-family: monospace">-i&nbsp;&nbsp;
+<input type="input" name="i" size="20" maxlength="50" style="padding-left:4px"></label>&nbsp;&nbsp;[
+en: Ignore this file.
+fr: Ignorer ce fichier.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="bf" id="bf" value="on">
+<label for="bf" style="font-family: monospace">-bf&nbsp;&nbsp;</label>[
+en: By origin file.
+fr: D'après le fichier origine.
+]</td>
+</tr>
+</table></dl>
+<p>
+[
+en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
+fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
+]
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="del_1" style="font-family: monospace">-del
+<input type="input" name="del" size="5" maxlength="2" style="padding-left:4px"></label>&nbsp;&nbsp;[
+en: Ask for deleting branches whose size <= that value.
+fr: Demander à détruire les composantes de taille <= à cette valeur.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="cnt_1" style="font-family: monospace">-cnt
+<input type="input" name="cnt" size="5" maxlength="2" style="padding-left:4px"></label>&nbsp;&nbsp;[
+en: Specifiy the number of branches to be deleted.
+fr: Définit le nombre de branches à supprimer.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="exact" id="exact" value="on">
+<label for="exact" style="font-family: monospace">-exact&nbsp;&nbsp;</label>[
+en: Restrict deleting branches whose size = -del.
+fr: Limite la suppression aux branches de taille = -del.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<input type="radio" name="o" id="o" value="choice">
+<label for="o1" style="font-family: monospace">-o &nbsp;
+<input type="input" name="o1" size="20" maxlength="50" style="padding-left:4px"></label>&nbsp;&nbsp;[
+en: Output results to this file.
+fr: Rediriger les résultats vers ce fichier.
+]</td>
+</tr>
+<p>
+<tr align="left">
+<td><input type="radio" name="o" id="o" value="/notes_d/connex.txt">
+<label for="o" style="font-family: monospace">&nbsp;&nbsp;</label>[
+en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
+fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
+]</td>
+</tr>
+<p>
+<tr align="left">
+<td><input type="radio" name="o" id="o" value="" checked/>
+<label for="o" style="font-family: monospace">&nbsp;&nbsp;</label>[
+en: No redirection of results.
+fr: Pas de redirection des résultats.
+]</td>
+</tr>
+</table></dl>
+<p>
+<li>
+[
+de: Dann drücke "Ok".
+en: Then click on "Ok".
+es: Finalmente cliquear en "Ok".
+fr: Puis cliquez sur "Ok".
+it: Poi cliccate su "Ok".
+lv: Tad nospiediet "Ok".
+sv: Klicka sedan på "OK".
+]
+</li>
+
+<input type="submit" value="Ok">
+</dl>
+</form>
+</ul>

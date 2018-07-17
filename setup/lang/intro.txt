@@ -6,11 +6,11 @@ es: Bienvenido a GeneWeb %q
 fr: Bienvenue dans GeneWeb %q
 it: Benvenuti su GeneWeb %q
 lv: Sveicinaati GeneWeb %q Ghenealoghijas datu baazee
-sv: Välkommen till GeneWeb %q
+sv: VÃ¤lkommen till GeneWeb %q
 ]
 
 [
-de: Nimm deinen Webbrowser und öffne eine der folgenden Adressen:
+de: Nimm deinen Webbrowser und Ã¶ffne eine der folgenden Adressen:
 en: Go to your Web browser and open one of the following addresses:
 fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
 it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
@@ -20,45 +20,45 @@ it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
 
 [
 de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses 
-    Fenster nicht schließen!
+    Fenster nicht schlieÃŸen!
 en: Warning: for this program to work, you must not close this window!
 fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette
     fenetre!
 it: Attenzione! Per poter navigare nella base, non dovete mai chiudere questa
     finestra!
 lv: Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
-sv: Varning: för att det här programmet ska fungera, får du inte stänga
-    detta fönster!
+sv: Varning: fÃ¶r att det hÃ¤r programmet ska fungera, fÃ¥r du inte stÃ¤nga
+    detta fÃ¶nster!
 ]
 
 [
-de: Falls das nicht funktioniert, mußt du eventuell in deinem Webbrowser
-    einige Optionen ändern, wie zum Beispiel "Offline arbeiten" oder
-    "Für lokale Adressen keinen Proxy benutzen" oder "Für die Adresse
+de: Falls das nicht funktioniert, muÃŸt du eventuell in deinem Webbrowser
+    einige Optionen Ã¤ndern, wie zum Beispiel "Offline arbeiten" oder
+    "FÃ¼r lokale Adressen keinen Proxy benutzen" oder "FÃ¼r die Adresse
     'localhost' nicht mit dem Internet verbinden".
 en: If none of theses addresses work, you may have to configure, in your
     browser, options like "work off-line" or "do not use the proxy for
     local addresses" or "do not connect to Internet for the address
     'localhost'".
 es: Si esto no funciona, es posible que Ud. haya configurado en su
-    explorador algunas opciones de tipo "trabajar fuera de conección"
+    explorador algunas opciones de tipo "trabajar fuera de conecciÃ³n"
     o "no utilizar un proxy con las direcciones locales" o "no conectarse
-    al internet con la dirección 'localhost'".
-fr: Si aucune de ces adresses ne fonctionne, il se peut que vous ayez à
+    al internet con la direcciÃ³n 'localhost'".
+fr: Si aucune de ces adresses ne fonctionne, il se peut que vous ayez Ã 
     configurer dans votre navigateur des options du genre "travailler hors
     connexion" ou "ne pas utiliser de proxy pour les adresses locales" ou
     "ne pas se connecter sur internet pour l'adresse 'localhost'".
-it: Se nessuno dei due indirizzi funziona, forse è a causa del fatto
+it: Se nessuno dei due indirizzi funziona, forse Ã¨ a causa del fatto
     che avete configurato nel vostro navigatore un'opzione del genere
     "lavorare off-line" oppure "non utilizzare il proxy per gli indirizzi
     locali" o "non collegarsi ad internet per l'indirizzo "localhost".
 lv: Ja pie iepriekshmineetajiem nosaciijumiem Juus nevariet pieklhuut pie
     GeneWeb, Jums iespeejams jaaiestaada savaa Interneta caurluukprogramaa
-    sekojoýi noraadiijumi: "work off-line" vai "do not use the proxy for local
+    sekojoÃ½i noraadiijumi: "work off-line" vai "do not use the proxy for local
     addresses" vai "do not connect to Internet for the address
     'localhost'". 
-sv: Om det inte fungerar, kanske du måste ställa in din webbläsare
-    med optioner som "arbeta off-line" eller "använd inte en proxyserver
-    för lokala adresser" eller "anslut inte till Internet för adressen
+sv: Om det inte fungerar, kanske du mÃ¥ste stÃ¤lla in din webblÃ¤sare
+    med optioner som "arbeta off-line" eller "anvÃ¤nd inte en proxyserver
+    fÃ¶r lokala adresser" eller "anslut inte till Internet fÃ¶r adressen
     'localhost'".
 ]

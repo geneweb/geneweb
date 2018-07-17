@@ -5,10 +5,17 @@ open Def;
 open Gwdb;
 
 value all = ref False;
+value statistics = ref False;
 value detail = ref 0;
 value ignore = ref [];
+value output = ref "";
 value ignore_files = ref True;
 value ask_for_delete = ref 0;
+value cnt_for_delete = ref 0;
+value exact = ref False;
+value gwd_port = ref 2317;
+value bname = ref "";
+value server = ref "127.0.0.1";
 
 value rec merge_families ifaml1f ifaml2f =
   match (ifaml1f, ifaml2f) with
@@ -84,16 +91,42 @@ value utf8_designation base p =
   else s
 ;
 
-value print_family base ifam = do {
+value wiki_designation base basename p =
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
+  let s = "[[" ^ first_name ^ "/" ^ surname ^ "/" ^ string_of_int (get_occ p) ^ "/" ^
+    first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname ^ "]]" in
+  if first_name = "?" || surname = "?" then
+    let indx = string_of_int (Adef.int_of_iper (get_key_index p)) in
+    s ^ " <a href=\"http://" ^ server.val ^ ":" ^ (string_of_int gwd_port.val) ^ "/" ^
+          basename ^ "?i=" ^ indx ^ "\">(i=" ^ indx ^ ")</a><br>"
+  else s ^ "<br>"
+;
+
+value print_family base basename ifam = do {
   let fam = foi base ifam in
   let p = poi base (get_father fam) in
-  if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
-  then
-    Printf.printf "i=%d" (Adef.int_of_iper (get_key_index p))
-  else Printf.printf "  - %s" (utf8_designation base p);
-  Printf.printf "\n";
-  Printf.printf "  - %s\n"
-    (utf8_designation base (poi base (get_mother fam)));
+  do {
+    if output.val <> "" then do {
+      if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
+      then
+        Printf.eprintf "i=%d" (Adef.int_of_iper (get_key_index p))
+      else Printf.eprintf "  - %s" (utf8_designation base p);
+      Printf.eprintf "\n";
+      Printf.eprintf "  - %s\n"
+        (utf8_designation base (poi base (get_mother fam)));
+      flush stderr;
+    } else ();
+    if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
+    then
+      let indx = (Adef.int_of_iper (get_key_index p)) in
+      Printf.printf "  - <a href=\"http://%s:%d/%s?i=%d\">i=%d</a><br>"
+        server.val gwd_port.val basename indx indx
+    else Printf.printf "  - %s" (wiki_designation base basename p);
+    Printf.printf "\n";
+    Printf.printf "  - %s\n"
+      (wiki_designation base basename (poi base (get_mother fam)));
+  }
 };
 
 value kill_family base fam ip =
@@ -113,15 +146,22 @@ value effective_del base (ifam, fam) = do {
   Gwdb.delete_family base ifam;
 };
 
-value move base = do {
+value move base basename = do {
   load_ascends_array base;
   load_unions_array base;
   load_couples_array base;
   load_descends_array base;
+  Printf.printf "<h3>Connected components of base %s</h3><br>\n" basename;
+  let ic = Unix.open_process_in "date" in
+  let date = input_line ic in
+  let () = close_in ic in
+  Printf.printf "Computed on %s<br><br>\n" date;
+  flush stderr;
   let nb_fam = nb_of_families base in
   let mark = Array.make nb_fam False in
   let min = ref max_int in
   let max = ref 0 in
+  let hts = Hashtbl.create 100 in
   for i = 0 to nb_fam - 1 do {
     let ifam = Adef.ifam_of_int i in
     let fam = foi base ifam in
@@ -154,16 +194,39 @@ value move base = do {
       if nb > 0 && (all.val || nb <= min.val) then do {
         if nb <= min.val then min.val := nb else ();
         if nb >= max.val then max.val := nb else ();
-        Printf.printf "Connex component \"%s\" length %d\n"
-          (sou base origin_file) nb;
-        if detail.val == nb then List.iter (print_family base) ifaml
-        else print_family base ifam;
-        flush stdout;
-        if ask_for_delete.val > 0 && nb <= ask_for_delete.val then do {
-          Printf.eprintf "Delete that branch (y/N) ? ";
+        if output.val <> "" then do {
+          Printf.eprintf "Connex component \"%s\" length %d\n"
+            (sou base origin_file) nb;
           flush stderr;
-          let r = input_line stdin in
+        } else ();
+        Printf.printf "Connex component \"%s\" length %d<br>\n"
+          (sou base origin_file) nb;
+        if detail.val == nb then List.iter (print_family base basename) ifaml
+        else print_family base basename ifam;
+        if statistics.val then
+          try
+            let n = Hashtbl.find hts nb in
+            Hashtbl.replace hts nb (n+1)
+          with
+            [ Not_found -> Hashtbl.add hts nb 1 ]
+        else ();
+        flush stdout;
+        let check_ask =
+          if exact.val then nb = ask_for_delete.val else nb <= ask_for_delete.val
+        in
+        if ask_for_delete.val > 0 && check_ask then do {
+          (* if -o file, repeat branch definition to stderr! *)
+          Printf.eprintf "Delete up to %d branches of size %s %d ?\n"
+            cnt_for_delete.val (if exact.val then "=" else "<=") ask_for_delete.val;
+          flush stderr;
+          let r = if cnt_for_delete.val > 0 then "y" 
+            else do {
+              Printf.eprintf "Delete that branch (y/N) ?";
+              flush stderr;
+              input_line stdin }
+          in
           if r = "y" then do {
+            decr cnt_for_delete;
             List.iter
               (fun ifam -> do {
                  let fam = foi base ifam in
@@ -185,19 +248,46 @@ value move base = do {
       else ();
   };
   if ask_for_delete.val > 0 then Gwdb.commit_patches base else ();
+
+  if statistics.val then do {
+    Printf.printf "<br>\nStatistics:<br>\n";
+    let ls = 
+      Hashtbl.fold (fun nb n ls -> [(nb, n) :: ls] ) hts []
+    in
+    let ls = List.sort compare ls in
+    let ls = List.rev ls in
+    List.iter 
+      (fun item -> 
+        match item with 
+            [(nb, n) -> Printf.printf "%d(%d) " nb n ]
+      ) ls;
+    Printf.printf "\n"
+  }
+  else ();
 };
 
-value bname = ref "";
 value usage = "usage: " ^ Sys.argv.(0) ^ " <base>";
 value speclist =
-  [("-a", Arg.Set all, ": all connex components");
+  [("-gwd_p", Arg.Int (fun x -> gwd_port.val := x),
+    "<number>: Specify the port number of gwd (default = " ^
+      string_of_int gwd_port.val ^ "); > 1024 for normal users.");
+   ("-server", Arg.String (fun x -> server.val := x ),
+    "<string>: Name of the server (default is 127.0.0.1).");
+   ("-a", Arg.Set all, ": all connex components");
+   ("-s", Arg.Set statistics, ": produce statistics");
    ("-d", Arg.Int (fun x -> detail.val := x),
     "<int> : detail for this length");
    ("-i", Arg.String (fun x -> ignore.val := [x :: ignore.val]),
     "<file> : ignore this file");
    ("-bf", Arg.Clear ignore_files, ": by origin files");
    ("-del", Arg.Int (fun i -> ask_for_delete.val := i),
-    "<int> : ask for deleting branches whose size <= that value")]
+    "<int> : ask for deleting branches whose size <= that value");
+   ("-cnt", Arg.Int (fun i -> cnt_for_delete.val := i),
+    "<int> : delete cnt branches whose size <= -del value");
+   ("-exact", Arg.Set exact, ": delete only branches whose size strictly = -del value");
+   ("-o", Arg.String (fun x -> output.val := x),
+    "<file> : output to this file")
+]
 ;
 
 value main () =
@@ -206,14 +296,14 @@ value main () =
     if ask_for_delete.val > 0 then
       match
         Lock.control (Mutil.lock_file bname.val) False
-          (fun () ->  move (Gwdb.open_base bname.val))
+          (fun () ->  move (Gwdb.open_base bname.val) bname.val)
       with
       [ Some () -> ()
       | None -> do {
           Printf.eprintf "Base locked. Try again.\n";
           flush stdout
         } ]
-    else move (Gwdb.open_base bname.val)
+    else move (Gwdb.open_base bname.val) bname.val
   }
 ;
 

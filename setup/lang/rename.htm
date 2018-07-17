@@ -1,12 +1,11 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html>
+<html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: rename.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <!-- $Id: rename.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[
 de: Datenbank umbenennen
@@ -14,12 +13,13 @@ en: Renaming
 es: Cambio de nombre
 fr: Renommage
 it: Cambio di nome
-lv: Pârsaukğana
-sv: Döpa om
+lv: PÃ¢rsaukÃ°ana
+sv: DÃ¶pa om
 ]</title>
+%fsetup.css;
 </head>
 
-<body background="images/gwback.jpg">
+<body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
@@ -29,54 +29,54 @@ en: Renaming
 es: Cambio de nombre
 fr: Renommage
 it: Cambio di nome
-lv: Pârsaukğana
-sv: Döpa om
+lv: PÃ¢rsaukÃ°ana
+sv: DÃ¶pa om
 ]
 </h1>
 </div>
 
 <form method=POST action="rename">
 <input type=hidden name=lang value=%l>
-
+<ul><li>
 [
-de: &Auml;ndere die Namen wie gew&uuml;nscht:
+de: Ã„ndere die Namen wie gewÃ¼nscht:
 en: Change the names you want:
 es: Chambie el o los nombres que Ud. desee:
-fr: Changez le ou les noms que vous d&eacute;sirez:
+fr: Changez le ou les noms que vous dÃ©sirezâ€¯:
 it: Cambiate il o i nomi che volete:
-lv: Izvçlieties nosaukumus, kurus Jûs vçlaties mainît:
-sv: Ändra de namn du vill:
+lv: IzvÃ§lieties nosaukumus, kurus JÃ»s vÃ§laties mainÃ®t:
+sv: Ã„ndra de namn du vill:
 ]
 
 <p>
 
-<dl><dt><dd><table style="border:1px solid" cellspacing=0 cellpadding=1>
+<table class="setup">
 %b{
 <tr align=left>
-<td><a href="http://%m:2317/%a">%a</a></td>
+<td><a href="http://%m:%P/%a">%a</a></td>
 <td><input name="%a" value="%a" size=20></td>
 </tr>|
 <tr align=left><td>- [
 de: keine Datenbank vorhanden
 en: there is no database at present
 es: ninguna base de datos existe actualmente
-fr: il n'y a aucune base de donn&eacute;es actuellement
+fr: il nâ€™y a aucune base de donnÃ©es actuellement
 it: attualmente non esiste nessuna base di dati
-lv: nav nevienas datu bâzes
-sv: det finns ingen databas för tillfället
+lv: nav nevienas datu bÃ¢zes
+sv: det finns ingen databas fÃ¶r tillfÃ¤llet
 ]</tr></td>}
-</table></dl>
+</table>
 
 <p>
-
+<li>
 [
-de: Dann dr&uuml;cke diesen Knopf:
+de: Dann drÃ¼cke diesen Knopf:
 en: Then push this button:
-es: Apoye luego en este bot&oacute;n
-fr: Puis appuyez sur ce bouton:
+es: Apoye luego en este botÃ³n
+fr: Puis appuyez sur ce boutonâ€¯:
 it: Poi cliccate su questo bottone:
-lv: Beigâs nospiediet sekojoğo podziòu:
-sv: Tryck sedan på denna knapp:
+lv: BeigÃ¢s nospiediet sekojoÃ°o podziÃ²u:
+sv: Tryck sedan pÃ¥ denna knapp:
 ]
 
 <p>
@@ -88,8 +88,8 @@ en: Rename
 es: Cambio de nombre
 fr: Renommer
 it: Cambio di nome
-lv: Pârsaukt
-sv: Döp om
+lv: PÃ¢rsaukt
+sv: DÃ¶p om
 ]">
-
+</ul>
 </form>

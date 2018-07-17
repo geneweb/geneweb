@@ -1,35 +1,35 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html>
+<html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: gwu_ok.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <!-- $Id: gwu_ok.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[
-de: Operation durchgef&uuml;hrt
+de: Operation durchgeführt
 en: Operation completed
-es: Operaci&oacute;n terminada
-fr: Op&eacute;ration termin&eacute;e
+es: Operación terminada
+fr: Opération terminée
 it: Operazione terminata
-lv: Dar�ts
+lv: Darîts
 sv: Operationen klar
 ]</title>
+%fsetup.css;
 </head>
 
-<body background="images/gwback.jpg">
+<body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
-de: Operation durchgef&uuml;hrt
+de: Operation durchgeführt
 en: Operation completed
-es: Operaci&oacute;n terminada
-fr: Op&eacute;ration termin&eacute;e
+es: Operación terminada
+fr: Opération terminée
 it: Operazione terminata
-lv: Dar�ts
+lv: Darîts
 sv: Operationen klar
 ]
 </h1>
@@ -42,27 +42,40 @@ de: Die Extraktion der <font color=#2f6400><b>GeneWeb</b></font>-Quelldatei
     ist beendet.
 en: The extraction of the <font color=#2f6400><b>GeneWeb</b></font> source
     file is terminated.
-es: Bi&eacute;n. La extracci&oacute;n de su fichero fuente
+es: Bién. La extracción de su fichero fuente
     <font color=#2f6400><b>GeneWeb</b></font> ha terminado.
-fr: L'extraction du fichier <b><font color=#2f6400>GeneWeb</font></b> est
-    termin&eacute;e.
-it: L'estrazione del file <b><font color=#2f6400>GeneWeb</font></b> &egrave;
+fr: L’extraction du fichier <b><font color=#2f6400>GeneWeb</font></b> est
+    terminée.
+it: L'estrazione del file <b><font color=#2f6400>GeneWeb</font></b> è
     terminata.
 lv: <font color=#2f6400><b>GeneWeb</b></font> datnes izveide ir pabeigta.
-sv: Exporteringen av <font color=#2f6400><b>GeneWeb</b></font> k�llfilen
-    �r avslutad.
+sv: Exporteringen av <font color=#2f6400><b>GeneWeb</b></font> källfilen
+    är avslutad.
 ]
 
 <p>
+%Iodir;.;{
+[
+en: Files were reconstructed in the original sources directory.<br>
+    Data created without origin file has been directed to the file
+    %o or to comm.log.
+    It is up to you to manage this new source file, or to merge this data into existing files.
+fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br>
+    Les nouvelles données sans fichier d'origine ont été redirigées vers le
+    fichier %o ou vers comm.log.
+    Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces 
+    données aux fichiers existants.
+]
 
+|
 [
 de: Es wurde eine Daten namens "%o" erzeugt.
 en: This has built a file named "%o".
-es: Esta operaci&oacute;n ha creado un fichero de nombre "%o".
+es: Esta operación ha creado un fichero de nombre "%o".
 fr: Cela a construit un fichier de nom "%o".
 it: Questa operazione ha creato un file chiamato "%o".
-lv: Rezult�t� izveidota datne: "%o".
-sv: Den har skapat en fil ben�mnd "%o".
+lv: Rezultâtâ izveidota datne: "%o".
+sv: Den har skapat en fil benämnd "%o".
 ]
 
 <p>
@@ -71,22 +84,37 @@ sv: Den har skapat en fil ben�mnd "%o".
 de: Diese Datei steht im Verzeichnis "%w".
 en: This file is in the directory "%w".
 es: Este fichero se encuentra en la carpeta "%w".
-fr: Ce fichier se trouve dans le r&eacute;pertoire "%w".
+fr: Ce fichier se trouve dans le répertoire "%w".
 it: Questo file si trova nella directory "%w".
 ]
-
+}
 <p>
 
+Comm.log:
+<pre>
+%g{- [
+de: empty file
+en: empty file
+es: fichero vacio
+fi: tyhjä tiedosto
+fr: fichier vide
+it: file vuoto
+lv: datne ir tukða
+sv: tom fil
+lv: datne ir tukða
+] -}
+</pre>
+<p>
 [
-de: Zur&uuml;ck zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmen&uuml;</a>.
+de: Zurück zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmenü</a>.
 en: You can return to the <a href="gwsetup?lang=%l;v=welcome.htm">main menu</a>.
 es: Si Ud. lo desea, regrese al
-    <a href="gwsetup?lang=%l;v=welcome.htm">men&uacute; principal</a>.
+    <a href="gwsetup?lang=%l;v=welcome.htm">menú principal</a>.
 fr: Vous pouvez revenir au <a href="gwsetup?lang=%l;v=welcome.htm">menu
     principal</a>.
 it: Potete tornare al <a href="gwsetup?lang=%l;v=welcome.htm">menu
     principale</a>.
-lv: J�s variet atgriezties <a href="gwsetup?lang=%l;v=welcome.htm">galvenaj�
-    izv�ln�</a>.
-sv: Du kan �terv�nda till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
+lv: Jûs variet atgriezties <a href="gwsetup?lang=%l;v=welcome.htm">galvenajâ
+    izvçlnç</a>.
+sv: Du kan återvända till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
 ]

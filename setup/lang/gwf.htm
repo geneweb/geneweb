@@ -1,33 +1,33 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html>
+<html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: gwf.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <!-- $Id: gwf.htm,v 7.00 2018-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[
 de: Parameter
 en: Parameters
-es: Par&aacute;metros
-fr: Param&egrave;tres
+es: Parámetros
+fr: Paramètres
 it: Parametri
 lv: Parametri
 sv: parametrar
 ]</title>
+%fsetup.css;
 </head>
 
-<body background="images/gwback.jpg">
+<body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
 de: Parameter
 en: Parameters
-es: Par&aacute;metros
-fr: Param&egrave;tres
+es: Parámetros
+fr: Paramètres
 it: Parametri
 lv: Parametri
 sv: Parametrar
@@ -39,48 +39,48 @@ sv: Parametrar
 
 <form method=GET action="gwf">
 <input type=hidden name=lang value=%l>
-
+<ul><li>
 [
-de: Bitte w&auml;hle deine Datenbank mit dem zugeh&ouml;rigen Schalter:
+de: Bitte wähle deine Datenbank mit dem zugehörigen Schalter:
 en: Select your database by clicking on the corresponding button:
-es: Seleccione Ud. su base de datos cliqueando en el bot&oacute;n asociado:
-fr: S&eacute;lectionnez votre base de donn&eacute;es en cliquant sur le
-    bouton associ&eacute;:
+es: Seleccione Ud. su base de datos cliqueando en el botón asociado:
+fr: Sélectionnez votre base de données en cliquant sur le
+    bouton associé:
 it: Selezionate la vostra base di dati cliccando sul
     bottone associato:
-lv: Ieklik��inot atbilsto�j� podzi��, izv�lieties savu datu b�zi:
-sv: V�lj din databas genom att klicka p� motsvarande knapp:
+lv: Ieklikðíinot atbilstoðjâ podziòâ, izvçlieties savu datu bâzi:
+sv: Välj din databas genom att klicka på motsvarande knapp:
 ]
 
 <p>
 
-<dl><dt><dd><table style="border:1px solid" cellspacing=0 cellpadding=1>
+<table class="setup">
 %b{
 <tr align=left>
-<td><input type=radio name=anon value="%a">&nbsp;&nbsp;&nbsp;</td>
-<td><a href="http://%m:2317/%a">%a</a></td>
+<td><input type=radio name=anon value="%a">   </td>
+<td><a href="http://%m:%P/%a">%a</a></td>
 </tr>|
 <tr align=left><td>- [
 de: keine Datenbank vorhanden
 en: there is no database at present
 es: actualmente no existe ninguna base de datos
-fr: il n'y a aucune base de donn&eacute;es actuellement
+fr: il n’y a aucune base de données actuellement
 it: attualmente non esiste nessuna base di dati
 lv: patreiz nav nevienas datu bazes
-sv: det finns ingen databas f�r tillf�llet
+sv: det finns ingen databas för tillfället
 ]</tr></td>}
-</table></dl>
+</table>
 
 <p>
-
+<li>
 [
-de: Dann dr&uuml;cke diesen Knopf:
+de: Dann drücke diesen Knopf:
 en: Then push this button:
-es: Apoye a continuaci&oacute;n en este bot&oacute;n:
-fr: Puis appuyez sur ce bouton:
+es: Apoye a continuación en este botón:
+fr: Puis appuyez sur ce bouton :
 it: Poi cliccate su questo bottone:
-lv: Tad nospiediet �o podzi�u:
-sv: Tryck sedan p� denna knapp:
+lv: Tad nospiediet ðo podziòu:
+sv: Tryck sedan på denna knapp:
 ]
 
 <p>
@@ -91,8 +91,8 @@ en: Configure
 es: Configurar
 fr: Configurer
 it: Configurare
-lv: Dar�ts
+lv: Darîts
 sv: Konfigurera
 ]">
-
+</ul>
 </form>
