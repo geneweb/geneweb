@@ -3,6 +3,7 @@
 (* First Parentless Ancestor *)
 
 open Gwdb;
+open Printf;
 
 value make_table base =
   let _ = load_ascends_array base in
@@ -49,13 +50,12 @@ value first_parentless_ancestor base =
   let tab = make_table base in
   do {
     Array.sort (fun (_, s1) (_, s2) -> compare s2 s1) tab;
-    Printf.printf "First parentless ancestor\n\n";
+    printf "First parentless ancestor\n\n";
     Array.iter
       (fun (i, s) ->
          let p = poi base (Adef.iper_of_int i) in
          do {
-           Printf.printf
-             "Sosa %d  \t%s.%d %s\n" s (p_first_name base p) (get_occ p)
+           printf "Sosa %d  \t%s.%d %s\n" s (p_first_name base p) (get_occ p)
              (p_surname base p);
            flush stdout;
          })

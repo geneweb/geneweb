@@ -13,6 +13,7 @@
 
 open Def;
 open Gwdb;
+open Printf;
 
 
 value trace = ref False;
@@ -43,7 +44,7 @@ value read_file fname = do {
           try int_of_string occ
           with [ Failure _ ->
             do {
-              Printf.eprintf "*** Error int_of_string: %s\n" occ;
+              eprintf "*** Error int_of_string: %s\n" occ;
               flush stderr;
               exit 2;
             }]
@@ -51,7 +52,7 @@ value read_file fname = do {
         (sn, fn, occ)
     | _ ->
         do {
-          Printf.eprintf "*** Error key: %s\n" name;
+          eprintf "*** Error key: %s\n" name;
           flush stderr;
           exit 2;
         }]
@@ -119,8 +120,7 @@ value update_database_with_domicile base fname = do {
              do {
                let p = poi base ip in
                if trace.val then do {
-                 Printf.eprintf
-                   "Modifiy person : %s\n" (Gutil.designation base p);
+                 eprintf "Modifiy person : %s\n" (Gutil.designation base p);
                  flush stderr
                }
                else ();
@@ -144,15 +144,14 @@ value update_database_with_domicile base fname = do {
              }
          | None ->
              do {
-               Printf.eprintf
-                 "Person not in the database anymore : %s.%d %s\n" fn occ sn;
+               eprintf "Person not in the database anymore : %s.%d %s\n" fn occ sn;
                flush stderr
              } ]
        })
     list;
   if changed.val then do {
     commit_patches base;
-    Printf.eprintf "Number of modified persons: %d\n" nb_modified.val;
+    eprintf "Number of modified persons: %d\n" nb_modified.val;
     flush stderr
   }
   else ()
@@ -170,8 +169,7 @@ value update_database_with_alias base fname = do {
              do {
                let p = poi base ip in
                if trace.val then do {
-                 Printf.eprintf
-                   "Modifiy person : %s\n" (Gutil.designation base p);
+                 eprintf "Modifiy person : %s\n" (Gutil.designation base p);
                  flush stderr
                }
                else ();
@@ -186,15 +184,14 @@ value update_database_with_alias base fname = do {
              }
          | None ->
              do {
-               Printf.eprintf
-                 "Person not in the database anymore : %s.%d %s\n" fn occ sn;
+               eprintf "Person not in the database anymore : %s.%d %s\n" fn occ sn;
                flush stderr
              } ]
        })
     list;
   if changed.val then do {
     commit_patches base;
-    Printf.eprintf "Number of modified persons: %d\n" nb_modified.val;
+    eprintf "Number of modified persons: %d\n" nb_modified.val;
     flush stderr
   }
   else ()
@@ -222,7 +219,7 @@ value main () = do {
       let base = Gwdb.open_base bname.val in
       update_database_with_domicile base fname.val
   | Refuse -> do {
-      Printf.eprintf "Cannot lock database. Try again.\n";
+      eprintf "Cannot lock database. Try again.\n";
       flush stderr;
     } ]
 };

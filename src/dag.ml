@@ -7,6 +7,7 @@ open Def;
 open Gutil;
 open Gwdb;
 open Mutil;
+open Printf;
 open TemplAst;
 open Util;
 
@@ -161,7 +162,7 @@ value image_normal_txt conf base p fname width height =
   let b = acces conf base p in
   let k = default_image_name base p in
   let r =
-    Printf.sprintf "\
+    sprintf "\
 <img src=\"%sm=IM&d=%d&%s&k=/%s\"%s%s alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
@@ -172,25 +173,22 @@ value image_normal_txt conf base p fname width height =
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;")
   in
   if conf.cancel_links then r
-  else
-    Printf.sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
+  else sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
 ;
 
 value image_url_txt conf base url_p url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
-  Printf.sprintf "<a href=\"%s\">" url_p ^
-  Printf.sprintf
-      "<img src=\"%s\"\nheight=%d alt=\"%s\" title=\"%s\" style=\"%s\" />"
+  sprintf "<a href=\"%s\">" url_p ^
+    sprintf "<img src=\"%s\"\nheight=%d alt=\"%s\" title=\"%s\" style=\"%s\" />"
       url height image_txt image_txt
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^
-      "</a>\n"
+    "</a>\n"
 ;
 
 value image_url_txt_with_size conf base url_p url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
-  Printf.sprintf "<a href=\"%s\">" url_p ^
-  Printf.sprintf
-      "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
+  sprintf "<a href=\"%s\">" url_p ^
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
       url width height image_txt image_txt
       (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^
@@ -742,7 +740,7 @@ value print_table_pre conf hts =
                     match s with
                     [ None | Some "" -> "|"
                     | Some s ->
-                        Printf.sprintf
+                        sprintf
                           "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
                           s ]
                   in
@@ -888,7 +886,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
       | _ -> (0, "") ]
     in
     if bd > 0 || td <> "" then
-      Printf.sprintf "\
+      sprintf "\
 <table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s</td></tr></table>"
         bd td (indi_txt n)
     else indi_txt n
@@ -1136,7 +1134,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
               | Some s ->
                   if conf.cancel_links then "|"
                   else
-                    Printf.sprintf
+                    sprintf
                       "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s ]
             in
             let len = displayed_length s in

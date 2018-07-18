@@ -7,6 +7,7 @@ open Def;
 open Gutil;
 open Gwdb;
 open Mutil;
+open Printf;
 
 value is_hide_names conf p =
   if conf.hide_names || get_access p = Private then True
@@ -111,23 +112,23 @@ value rec capitale_utf_8 s =
       match Char.code c with
       [ 0xC3 when Char.code s.[1] <> 0xBF ->
           let c1 = (Char.chr (Char.code s.[1] - 0xA0 + 0x80)) in
-          Printf.sprintf "%c%c%s" c c1
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xC3 when Char.code s.[1] = 0xBF -> (* ÿ *)
           let c = (Char.chr 0xC5) in
           let c1 = (Char.chr 0xB8) in
-          Printf.sprintf "%c%c%s" c c1
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xC4 | 0xC5 | 0xC6 | 0xC7 -> 
           let c1 = (Char.chr (Char.code s.[1] - 1)) in
-          Printf.sprintf "%c%c%s" c c1
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 -> (* cyrillic lowercase *)
           let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
-          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+          sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD1 when Char.code s.[1] < 0x90 -> (* cyrillic lowercase again *)
           let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
-          Printf.sprintf "%c%c%s" (Char.chr 0xD0) c1
+          sprintf "%c%c%s" (Char.chr 0xD0) c1
             (String.sub s 2 (String.length s - 2))
       | _ -> s ]
 ;
@@ -377,7 +378,7 @@ value month_txt =
 
 value string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
-  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
+  sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
     (week_day_txt lt.Unix.tm_wday) lt.Unix.tm_mday (month_txt lt.Unix.tm_mon)
     (1900 + lt.Unix.tm_year) lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 ;
@@ -1839,9 +1840,9 @@ value string_with_macros conf env s =
             match http_string conf s i with
             [ Some (x, j) ->
                 do {
-                  Printf.bprintf buff "<a href=\"%s\">" x;
+                  bprintf buff "<a href=\"%s\">" x;
                   expand_ampersand buff x;
-                  Printf.bprintf buff "</a>";
+                  bprintf buff "</a>";
                   loop Out j
                 }
             | None ->
@@ -1849,7 +1850,7 @@ value string_with_macros conf env s =
                 [ Some j ->
                     let x = String.sub s i (j - i) in
                     do {
-                      Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
+                      bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                       loop Out j
                     }
                 | None ->
@@ -2031,7 +2032,7 @@ value check_ampersand s i =
     [ 'a'..'z' ->
         loop_id i where rec loop_id j =
           if j = String.length s then do {
-            let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
+            let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
             Some (a, j)
           }
           else
@@ -2039,12 +2040,12 @@ value check_ampersand s i =
             [ 'a'..'z' -> loop_id (j + 1)
             | ';' -> None
             | _ ->
-                let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
+                let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
                 Some (a, j) ]
     | _ -> Some ("&amp;", i) ]
 ;
 
-value bad col s = Printf.sprintf "<span style=\"color:%s\">%s</span>" col s;
+value bad col s = sprintf "<span style=\"color:%s\">%s</span>" col s;
 
 value check_ampersands s =
   let b = Buffer.create (String.length s) in
@@ -2115,7 +2116,7 @@ value check_xhtml s =
            let s_aft = String.sub s pos_aft (String.length s - pos_aft) in
            Buffer.clear b;
            Buffer.add_string b s_bef;
-           Buffer.add_string b (bad "red" (Printf.sprintf "&lt;%s&gt;" txt));
+           Buffer.add_string b (bad "red" (sprintf "&lt;%s&gt;" txt));
            Buffer.add_string b s_aft
          })
         tag_stack;
@@ -2126,34 +2127,34 @@ value check_xhtml s =
       [ Some (Btag t a, i) ->
           if t = "br" && a = "" then do {
             (* frequent error *)
-            Buffer.add_string b (Printf.sprintf "<%s/>" t);
+            Buffer.add_string b (sprintf "<%s/>" t);
             loop tag_stack i
           }
           else do {
             match check_ampersands a with
             [ Some a -> do {
-                Buffer.add_string b (Printf.sprintf "&lt;%s%s&gt;" t a);
+                Buffer.add_string b (sprintf "&lt;%s%s&gt;" t a);
                 loop tag_stack i;
               }
             | None -> do {
                 let pos = Buffer.length b in
-                let txt = Printf.sprintf "%s%s" t a in
-                Buffer.add_string b (Printf.sprintf "<%s>" txt);
+                let txt = sprintf "%s%s" t a in
+                Buffer.add_string b (sprintf "<%s>" txt);
                 loop [(pos, txt, t) :: tag_stack] i
               } ]
           }
       | Some (Etag t, i) ->
           match tag_stack with
           [ [(_, _, bt) :: rest] when t = bt -> do {
-              Buffer.add_string b (Printf.sprintf "</%s>" t);
+              Buffer.add_string b (sprintf "</%s>" t);
               loop rest i
             }
           | _ -> do {
-              Buffer.add_string b (bad "red" (Printf.sprintf "&lt;/%s&gt;" t));
+              Buffer.add_string b (bad "red" (sprintf "&lt;/%s&gt;" t));
               loop tag_stack i
             } ]
       | Some (Atag t, i) -> do {
-          Buffer.add_string b (Printf.sprintf "<%s/>" t);
+          Buffer.add_string b (sprintf "<%s/>" t);
           loop tag_stack i
         }
       | None ->
@@ -3032,8 +3033,8 @@ value is_that_user_and_password auth_scheme user passwd =
       if user <> ds.ds_username then False
       else
         let that_response_would_be =
-          let a1 = Printf.sprintf "%s:%s:%s" user ds.ds_realm passwd in
-          let a2 = Printf.sprintf "%s:%s" ds.ds_meth ds.ds_uri in
+          let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
+          let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
           if ds.ds_qop = "auth" || ds.ds_qop = "auth-int" then
             h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ ds.ds_nc ^ ":" ^
                ds.ds_cnonce ^ ":" ^ ds.ds_qop ^ ":" ^ h a2)
@@ -3218,7 +3219,7 @@ value adm_file f =
 
 value std_date conf =
   let (hour, min, sec) = conf.time in
-  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
+  sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
     conf.today.month conf.today.day hour min sec
 ;
 
@@ -3237,7 +3238,7 @@ value read_wf_trace fname =
 value write_wf_trace fname wt =
   let oc = Secure.open_out fname in
   do {
-    List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
+    List.iter (fun (dt, u) -> fprintf oc "%s %s\n" dt u) wt;
     close_out oc;
   }
 ;

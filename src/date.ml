@@ -7,6 +7,7 @@ open Def;
 open Util;
 open Gwdb;
 open Mutil;
+open Printf;
 open TemplAst;
 
 
@@ -421,7 +422,7 @@ value string_of_ondate_aux conf =
   [ Dgreg d Dgregorian ->
       let s = string_of_on_dmy conf d in
       if d.day > 0 && not conf.cancel_links then
-        Printf.sprintf
+        sprintf
           "<a href=\"%sm=CAL;yg=%d;mg=%d;dg=%d;tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
       else s
@@ -433,7 +434,7 @@ value string_of_ondate_aux conf =
       let year_prec =
         if d1.month > 0 && d1.month < 3 ||
            d1.month = 3 && d1.day > 0 && d1.day < 25 then
-          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+          sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
         else ""
       in
       let s =
@@ -441,7 +442,7 @@ value string_of_ondate_aux conf =
           transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
       in
       if d1.day > 0 && not conf.cancel_links then
-        Printf.sprintf
+        sprintf
           "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
       else s
@@ -450,7 +451,7 @@ value string_of_ondate_aux conf =
       let s = string_of_on_french_dmy conf d1 in
       let s =
         if d1.day > 0 && not conf.cancel_links then
-          Printf.sprintf
+          sprintf
             "<a href=\"%sm=CAL;yf=%d;mf=%d;df=%d;tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
         else s
@@ -482,7 +483,7 @@ value string_of_date_aux conf sep =
   [ Dgreg d Dgregorian ->
       let s = string_of_dmy conf d in
       if d.day > 0 && not conf.cancel_links then
-        Printf.sprintf
+        sprintf
           "<a href=\"%sm=CAL;yg=%d;mg=%d;dg=%d;tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
       else s
@@ -494,7 +495,7 @@ value string_of_date_aux conf sep =
       let year_prec =
         if d1.month > 0 && d1.month < 3 ||
            d1.month = 3 && d1.day > 0 && d1.day < 25 then
-          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+          sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
         else ""
       in
       let s =
@@ -502,7 +503,7 @@ value string_of_date_aux conf sep =
           transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
       in
       if d1.day > 0 && not conf.cancel_links then
-        Printf.sprintf
+        sprintf
           "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
       else s
@@ -511,7 +512,7 @@ value string_of_date_aux conf sep =
       let s = string_of_on_french_dmy conf d1 in
       let s =
         if d1.day > 0 && not conf.cancel_links then
-          Printf.sprintf
+          sprintf
             "<a href=\"%sm=CAL;yf=%d;mf=%d;df=%d;tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
         else s

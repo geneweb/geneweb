@@ -3,6 +3,7 @@
 
 open Def;
 open Gwdb;
+open Printf;
 
 Mutil.verbose.val := False;
 
@@ -180,7 +181,7 @@ value popule bname size ngen gyear =
       if n > ngen then ()
       else do {
         let jd = Calendar.sdn_of_gregorian d in
-        Printf.eprintf "%d." n;
+        eprintf "%d." n;
         flush stderr;
         for i = 0 to size - 1 do {
 if List.mem i celib then ()
@@ -251,7 +252,7 @@ else do {
         loop (mkcelib size) {(d) with year = d.year + gyear} (n + 1);
       }
     ;
-    Printf.eprintf "\n";
+    eprintf "\n";
     commit_patches base.val;
     Gwdb.apply_base1 base.val
       (fun base ->
