@@ -4,13 +4,13 @@
 (* checking database ; independent from its implementation on disk *)
 
 open Gwdb;
+open CheckItem;
 
-value print_base_error : out_channel -> base -> CheckItem.base_error -> unit;
-value print_base_warning :
-  out_channel -> base -> CheckItem.base_warning -> unit;
+value print_base_error : out_channel -> base -> base_error -> unit;
+value print_base_warning : out_channel -> base -> base_warning -> unit;
 
 value check_base :
-  base -> (CheckItem.base_error -> unit) -> (CheckItem.base_warning -> unit) ->
+  base -> (base_error -> unit) -> (base_warning -> unit) ->
     (int -> bool) ->
     ((Def.iper * person * option Def.sex * option (list relation)) -> unit) ->
     bool -> unit;
