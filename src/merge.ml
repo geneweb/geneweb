@@ -4,6 +4,7 @@
 
 open Config;
 open Gwdb;
+open Hutil;
 open Util;
 
 value print_someone conf base p =
@@ -76,7 +77,7 @@ type=\"radio\" class=\"form-control\" name=\"select\" value=\"input\" checked";
         Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
       end;
     end;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 

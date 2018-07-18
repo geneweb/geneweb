@@ -7,6 +7,7 @@ module type HACK_FOR_DEPEND = sig open Pqueue; end;
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 value default_max_cnt = 2000;
@@ -378,7 +379,7 @@ value print_cousins conf base p lev1 lev2 =
       else ();
     end;
     Wserver.printf "</div>\n";
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 

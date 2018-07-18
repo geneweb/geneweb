@@ -7,6 +7,7 @@ module type HACK_FOR_DEPEND = sig open Pqueue; end;
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 (* Algorithm *)
@@ -640,11 +641,11 @@ value print_relation_ok conf base info =
     }
   in
   do {
-    Hutil.header_no_page_title conf title;
-    Hutil.print_link_to_welcome conf True;
+    header_no_page_title conf title;
+    print_link_to_welcome conf True;
     xtag "p" "style=\"clear:both\"";
     print_relation_path conf base info;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -722,7 +723,7 @@ value print_relation_no_dag conf base po ip1 ip2 =
          sp2 = sp2; bd = bd; td_prop = td_prop}
       in
       print_relation_ok conf base info
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_relation_dag conf base a ip1 ip2 l1 l2 =
@@ -805,5 +806,5 @@ value print conf base = do {
     (find_person_in_env conf base "1", find_person_in_env conf base "2")
   with
   [ (Some p1, Some p2) -> print_relation conf base p1 p2
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 };

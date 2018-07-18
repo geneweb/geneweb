@@ -5,6 +5,7 @@
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open TemplAst;
 open Util;
 
@@ -481,7 +482,7 @@ value print_long conf base list len =
   do {
     let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    print_link_to_welcome conf True;
     tag "div" "class=\"tips\"" begin
       tag "table" begin
         tag "tr" begin
@@ -641,7 +642,7 @@ value print_short conf base list len =
   do {
     let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    print_link_to_welcome conf True;
     Wserver.printf "%s :" (capitale (transl conf "select a letter"));
     tag "p" "class=\"list_ini\"" begin
       List.iter
@@ -1059,7 +1060,7 @@ value print_mod_ok conf base = do {
       Wserver.printf "%s" (capitale (transl conf "modification successful"))
     in
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    print_link_to_welcome conf True;
     tag "p" begin
       (* En attendant mieux ... *)
       Wserver.printf "%s%s %d "
@@ -1111,7 +1112,7 @@ value print_mod_ok conf base = do {
       Wserver.printf "%s" (capitale (transl conf "no modification"))
     in
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    print_link_to_welcome conf True;
     tag "p" begin
       stag "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" (commd conf) data ini begin
         Wserver.printf "%s" (capitale (transl conf "new modification"));
