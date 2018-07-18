@@ -5,6 +5,7 @@
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 open Dag2html;
 
@@ -276,8 +277,8 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let title _ =
       Wserver.printf "%s" (capitale (transl conf "relationship"))
     in
-    Hutil.header_no_page_title conf title;
-    Hutil.trailer conf
+    header_no_page_title conf title;
+    trailer conf
   }
   else
     let next_txt = next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml] in
@@ -448,9 +449,9 @@ value print_shortest_path conf base p1 p2 =
     let title _ =
       Wserver.printf "%s" (capitale (transl conf "relationship"))
     in
-    Hutil.header conf title;
+    header conf title;
     Wserver.printf "%s\n" (capitale (transl conf "it is the same person!"));
-    Hutil.trailer conf
+    trailer conf
   }
   else
     (* optimization to be used 1/ if database not too big or 2/ running
@@ -493,7 +494,7 @@ value print_shortest_path conf base p1 p2 =
         let s1 = gen_person_title_text reference raw_access conf base p1 in
         let s2 = gen_person_title_text reference raw_access conf base p2 in
         do {
-          Hutil.header_no_page_title conf title;
+          header_no_page_title conf title;
           if excl_faml = [] then do {
             Wserver.printf "<h1>";
             title False;
@@ -523,7 +524,7 @@ value print_shortest_path conf base p1 p2 =
             Wserver.printf "<li>%s</li>\n" s2;
             Wserver.printf "</ul>\n"
           };
-          Hutil.trailer conf
+          trailer conf
         } ]
 ;
 
@@ -1446,8 +1447,8 @@ value print_main_relationship conf base long p1 p2 rel =
         {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
       else conf
     in
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     match p_getenv conf.env "spouse" with
     [ Some "on" -> conf.senv := conf.senv @ [("spouse", "on")]
     | _ -> () ];
@@ -1523,7 +1524,7 @@ value print_main_relationship conf base long p1 p2 rel =
           else ();
           print_propose_upto conf base p1 p2 rl
         } ];
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1556,7 +1557,7 @@ value multi_relation_next_txt conf pl2 lim assoc_txt =
 value print_no_relationship conf base pl =
   let title _ = Wserver.printf "%s" (capitale (transl conf "tree")) in
   do {
-    Hutil.header conf title;
+    header conf title;
     tag "ul" begin
       List.iter
         (fun p ->
@@ -1564,7 +1565,7 @@ value print_no_relationship conf base pl =
              (referenced_person_title_text conf base p))
         pl;
     end;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1621,13 +1622,13 @@ value print_multi_relation conf base pl lim assoc_txt =
 value print_base_loop conf base p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
+    rheader conf title;
     Wserver.printf
       (fcapitale
          (ftransl conf "loop in database: %s is his/her own ancestor"))
       (Util.update_family_loop conf base p (Gutil.designation base p));
     Wserver.printf ".\n";
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 

@@ -7,6 +7,7 @@ module type HACK_FOR_DEPEND = sig open Pqueue; end;
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 value get_k conf =
@@ -132,8 +133,8 @@ value print_birth conf base =
     Wserver.printf (fcapitale (ftransl conf "the latest %d births")) len
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     Wserver.printf "<ul>\n";
     let _ =
       List.fold_left
@@ -174,7 +175,7 @@ value print_birth conf base =
         ("", False) list
     in
     Wserver.printf "</ul>\n</li>\n</ul>\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -191,8 +192,8 @@ value print_death conf base =
       (fun _ -> string_of_int len)
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     if list <> [] then do {
       Wserver.printf "<ul>\n";
       let (_, ages_sum, ages_nb) =
@@ -315,7 +316,7 @@ value print_death conf base =
       end;
     }
     else ();
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -340,8 +341,8 @@ value print_oldest_alive conf base =
       (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     tag "ul" begin
       List.iter
         (fun (p, d, cal) ->
@@ -360,7 +361,7 @@ value print_oldest_alive conf base =
            end)
         list;
     end;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -382,8 +383,8 @@ value print_longest_lived conf base =
       len
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     Wserver.printf "<ul>\n";
     List.iter
       (fun (p, d, cal) ->
@@ -396,14 +397,14 @@ value print_longest_lived conf base =
          end)
       list;
     Wserver.printf "</ul>\n\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
 value print_marr_or_eng conf base title list len =
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     Wserver.printf "<ul>\n";
     let _ =
       List.fold_left
@@ -458,7 +459,7 @@ value print_marr_or_eng conf base title list len =
         ("", False) list
     in
     Wserver.printf "</ul>\n</li>\n</ul>\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -508,8 +509,8 @@ value old_print_statistics conf base =
     [ Not_found | Failure _ -> 20 ]
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     tag "ul" begin
       if conf.wizard || conf.friend then do {
         stagn "li" begin
@@ -548,7 +549,7 @@ value old_print_statistics conf base =
         Wserver.printf "</a>";
       end;
     end;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -641,7 +642,7 @@ value print_population_pyramid conf base = do {
     end
   in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
+  print_link_to_welcome conf True;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
     let max_wom = Array.fold_left max 0 wom in

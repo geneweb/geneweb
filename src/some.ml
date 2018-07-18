@@ -5,14 +5,13 @@
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 value not_found conf txt x =
   let title _ = Wserver.printf "%s: \"%s\"" (capitale txt) x in
   do {
-    Hutil.rheader conf title;
-    Hutil.print_link_to_welcome conf False;
-    Hutil.trailer conf;
+    rheader conf title; print_link_to_welcome conf False; trailer conf;
   }
 ;
 
@@ -265,8 +264,8 @@ value first_name_print_list conf base x1 xl liste = do {
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
         (Mutil.StrSet.elements xl)
   in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
+  header conf title;
+  print_link_to_welcome conf True;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -281,7 +280,7 @@ value first_name_print_list conf base x1 xl liste = do {
   let list = List.sort compare list in
   print_alphab_list conf (fun (ord, txt, _) -> first_char ord)
     (fun (_, txt, ipl) -> print_elem conf base True (txt, ipl)) list;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value select_first_name conf base n list =
@@ -291,7 +290,7 @@ value select_first_name conf base n list =
       (transl conf "specify")
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     Wserver.printf "<ul>";
     List.iter
       (fun (sstr, (strl, _)) ->
@@ -308,7 +307,7 @@ value select_first_name conf base n list =
          })
       list;
     Wserver.printf "</ul>\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -593,8 +592,8 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
         (Mutil.StrSet.elements xl)
   in
   let br = p_getint conf.env "br" in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
+  header conf title;
+  print_link_to_welcome conf True;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -637,7 +636,7 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
       in
       ();
   end;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_several_possible_surnames x conf base (bhl, homonymes) = do {
@@ -652,8 +651,8 @@ value print_several_possible_surnames x conf base (bhl, homonymes) = do {
       (capitale (transl_nth conf "surname/surnames" 0)) fx
       (transl conf "specify")
   in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
+  header conf title;
+  print_link_to_welcome conf True;
   let list =
     List.map
       (fun sn ->
@@ -680,7 +679,7 @@ value print_several_possible_surnames x conf base (bhl, homonymes) = do {
       (transl conf "for the first names by alphabetic order");
     Wserver.printf ".</em>\n";
   end;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_family_alphabetic x conf base liste =
@@ -731,8 +730,8 @@ value print_family_alphabetic x conf base liste =
           homonymes
       in
       do {
-        Hutil.header conf title;
-        Hutil.print_link_to_welcome conf True;
+        header conf title;
+        print_link_to_welcome conf True;
         (* Si on est dans un calcul de parenté, on affiche *)
         (* l'aide sur la sélection d'un individu.          *)
         Util.print_tips_relationship conf;
@@ -740,7 +739,7 @@ value print_family_alphabetic x conf base liste =
         print_alphabetic_to_branch conf x;
         print_alphab_list conf (fun (p, _) -> first_char p)
           (print_elem conf base False) liste;
-        Hutil.trailer conf;
+        trailer conf;
       } ]
 ;
 

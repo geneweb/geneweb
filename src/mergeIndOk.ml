@@ -5,6 +5,7 @@
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 value rec merge_lists l1 =
@@ -277,18 +278,18 @@ value print_merge conf base =
       let sp = UpdateInd.string_person_of base p1 in
       let digest = Update.digest_person sp in
       UpdateInd.print_update_ind conf base p digest
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_merge_ok conf base wl p = do {
   let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
+  header conf title;
+  print_link_to_welcome conf True;
   Wserver.printf "\n%s\n"
     (referenced_person_text conf base (poi base p.key_index));
   Update.print_warnings conf base wl;
   Merge.print_possible_continue_merging conf base;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value redirect_relations_of_added_related base p ip2 rel_chil =
@@ -515,7 +516,7 @@ value effective_mod_merge conf base o_p1 o_p2 sp =
       Update.delete_topological_sort conf base;
       print_mod_merge_ok conf base wl p;
     }
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_merge o_conf base =

@@ -3,6 +3,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
+open Hutil;
 open Util;
 
 (* TLSW: Text Language Stolen to Wikipedia

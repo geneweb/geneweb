@@ -5,6 +5,7 @@
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 exception ModErrApi of string;
@@ -176,12 +177,12 @@ value print_err_unknown conf base (f, s, o) = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
     (capitale (transl conf "unknown person"))
     (transl conf ":") f o s;
   print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise ModErr
 };
 
@@ -770,18 +771,18 @@ value error conf base x = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   print_error conf base x;
   Wserver.printf "\n";
   print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise ModErr
 };
 
 value error_locked conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
+    rheader conf title;
     tag "p" begin
       Wserver.printf
         (fcapitale
@@ -836,7 +837,7 @@ value error_locked conf =
         end;
       end;
     end;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -853,8 +854,8 @@ the base has changed; do \"back\", \"reload\", and refill the form"))
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf True;
+  rheader conf title;
+  print_link_to_welcome conf True;
   tag "p" begin
     Wserver.printf
       (fcapitale
@@ -862,7 +863,7 @@ the base has changed; do \"back\", \"reload\", and refill the form"))
 the base has changed; do \"back\", \"reload\", and refill the form"));
     Wserver.printf ".\n";
   end;
-  Hutil.trailer conf;
+  trailer conf;
   raise ModErr
 };
 
@@ -892,14 +893,14 @@ value bad_date conf d = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Wserver.printf "%s%s\n" (capitale (transl conf "incorrect date"))
     (transl conf ":");
   match d with
   [ {day = 0; month = 0; year = a} -> Wserver.printf "%d" a
   | {day = 0; month = m; year = a} -> Wserver.printf "%d/%d" m a
   | {day = j; month = m; year = a} -> Wserver.printf "%d/%d/%d" j m a ];
-  Hutil.trailer conf;
+  trailer conf;
   raise ModErr
 };
 
@@ -1099,7 +1100,7 @@ value print_create_conflict conf base p var = do {
   ELSE () END;
   let text = text_of_var conf var in
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
- Hutil.rheader conf title;
+ rheader conf title;
  Wserver.printf
    (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
    ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
@@ -1154,7 +1155,7 @@ value print_create_conflict conf base p var = do {
      (capitale (transl conf "back"));
  end;
  print_same_name conf base p;
- Hutil.trailer conf;
+ trailer conf;
  raise ModErr
 };
 

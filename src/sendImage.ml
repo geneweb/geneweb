@@ -4,6 +4,7 @@
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 type image_type = [ JPEG | GIF | PNG ];
@@ -16,13 +17,13 @@ value extension_of_type = fun
   | PNG -> ".png" ]
 ;
 
-value incorrect conf = do { Hutil.incorrect_request conf; raise Update.ModErr };
+value incorrect conf = do { incorrect_request conf; raise Update.ModErr };
 
 value incorrect_content_type conf base p s =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
-    Hutil.print_link_to_welcome conf True;
+    rheader conf title;
+    print_link_to_welcome conf True;
     tag "p" begin
       Wserver.printf "<em style=\"font-size:smaller\">";
       Wserver.printf "Error: incorrect image content type: %s" s;
@@ -33,7 +34,7 @@ value incorrect_content_type conf base p s =
         Wserver.printf "%s" (referenced_person_title_text conf base p);
       end;
     end;
-    Hutil.trailer conf;
+    trailer conf;
     raise Update.ModErr
   }
 ;
@@ -41,8 +42,8 @@ value incorrect_content_type conf base p s =
 value error_too_big_image conf base p len max_len =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
-    Hutil.print_link_to_welcome conf True;
+    rheader conf title;
+    print_link_to_welcome conf True;
     Wserver.printf "<p><em style=\"font-size:smaller\">";
     Wserver.printf "Error: this image is too big: %d bytes<br%s>\n" len
       conf.xhs;
@@ -54,7 +55,7 @@ value error_too_big_image conf base p len max_len =
         Wserver.printf "%s" (referenced_person_title_text conf base p);
       end;
     end;
-    Hutil.trailer conf;
+    trailer conf;
     raise Update.ModErr
   }
 ;
@@ -131,7 +132,7 @@ type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\"
       end;
     end;
     print_link_delete_image conf base p;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -142,9 +143,9 @@ value print conf base =
       let fn = p_first_name base p in
       let sn = p_surname base p in
       if sou base (get_image p) <> "" || fn = "?" || sn = "?" then
-        Hutil.incorrect_request conf
+        incorrect_request conf
       else print_send_image conf base p
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 (* Delete image form *)
@@ -169,7 +170,7 @@ value print_delete_image conf base p =
     }
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     Wserver.printf "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
@@ -185,7 +186,7 @@ value print_delete_image conf base p =
       end;
     end;
     Wserver.printf "\n";
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -193,12 +194,12 @@ value print_del conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
       let p = poi base (Adef.iper_of_int ip) in
-      if sou base (get_image p) <> "" then Hutil.incorrect_request conf
+      if sou base (get_image p) <> "" then incorrect_request conf
       else
         match auto_image_file conf base p with
         [ Some _ -> print_delete_image conf base p
-        | _ -> Hutil.incorrect_request conf ]
-  | _ -> Hutil.incorrect_request conf ]
+        | _ -> incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 (* Send image form validated *)
@@ -208,13 +209,13 @@ value print_sent conf base p =
     Wserver.printf "%s" (capitale (transl conf "image received"))
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     tag "ul" begin
       stag "li" begin
         Wserver.printf "%s" (referenced_person_text conf base p);
       end;
     end;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -362,13 +363,13 @@ value print_deleted conf base p =
     Wserver.printf "%s" (capitale (transl conf "image deleted"))
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     tag "ul" begin
       html_li conf;
       Wserver.printf "\n%s" (referenced_person_text conf base p);
       Wserver.printf "\n";
     end;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
