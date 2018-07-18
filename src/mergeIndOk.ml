@@ -4,6 +4,7 @@
 
 open Config;
 open Def;
+open Futil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -216,9 +217,8 @@ value reconstitute conf base p1 p2 =
      aliases = list (sou base) get_aliases;
      first_names_aliases = list (sou base) get_first_names_aliases;
      surnames_aliases = list (sou base) get_surnames_aliases;
-     titles = list (Futil.map_title_strings (sou base)) get_titles;
-     rparents =
-       list (Futil.map_relation_ps (sorp base) (sou base)) get_rparents;
+     titles = list (map_title_strings (sou base)) get_titles;
+     rparents = list (map_relation_ps (sorp base) (sou base)) get_rparents;
      related = [];
      occupation =
        field "occupation" (fun p -> sou base (get_occupation p)) ( \= "");
@@ -254,7 +254,7 @@ value reconstitute conf base p1 p2 =
        merge_strings base (get_burial_note p1) "<br>\n" (get_burial_note p2);
      burial_src =
        merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
-       pevents = list (Futil.map_pers_event (sorp base) (sou base)) get_pevents;
+       pevents = list (map_pers_event (sorp base) (sou base)) get_pevents;
      notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
      psources = merge_strings base (get_psources p1) ", " (get_psources p2);
      key_index = get_key_index p1}
@@ -262,10 +262,7 @@ value reconstitute conf base p1 p2 =
   (* On fait la fusion des évènements à partir *)
   (* de la fusion des évènements principaux.   *)
   let pevents =
-    merge_primary_events
-      (Futil.map_pers_event (sorp base) (sou base))
-      get_pevents
-      p
+    merge_primary_events (map_pers_event (sorp base) (sou base)) get_pevents p
   in
   {(p) with pevents = pevents}
 ;
