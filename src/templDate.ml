@@ -4,6 +4,8 @@
 
 open Config;
 open Def;
+open Mutil;
+open Printf;
 open TemplAst;
 open Util;
 
@@ -42,7 +44,7 @@ and eval_moon_phase_var mp =
       let s =
         match mp with
         [ None -> ""
-        | Some (_, hh, _) -> Printf.sprintf "%02d" hh ]
+        | Some (_, hh, _) -> sprintf "%02d" hh ]
       in
       VVstring s
   | ["index"] ->
@@ -59,7 +61,7 @@ and eval_moon_phase_var mp =
       let s =
         match mp with
         [ None -> ""
-        | Some (_, _, mm) -> Printf.sprintf "%02d" mm ]
+        | Some (_, _, mm) -> sprintf "%02d" mm ]
       in
       VVstring s
   | _ -> raise Not_found ]
@@ -68,11 +70,11 @@ and eval_dmy_var dmy =
   [ ["day"] -> VVstring (string_of_int dmy.day)
   | ["month"] -> VVstring (string_of_int dmy.month)
   | ["year" :: sl] -> eval_integer dmy.year sl
-  | [] -> VVstring (Printf.sprintf "%d-%02d-%02d" dmy.year dmy.month dmy.day)
+  | [] -> VVstring (sprintf "%d-%02d-%02d" dmy.year dmy.month dmy.day)
   | _ -> raise Not_found ]
 and eval_integer i =
   fun
-  [ ["roman"] -> VVstring (Mutil.roman_of_arabian i)
+  [ ["roman"] -> VVstring (roman_of_arabian i)
   | [] -> VVstring (string_of_int i)
   | _ -> raise Not_found ]
 ;

@@ -1,6 +1,5 @@
 (* nocamlp5 *)
 
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -566,7 +565,6 @@ let build_graph_asc conf base p max_gen base_loop =
   let () = load_couples_array base in
   let () = Perso.build_sosa_ht conf base in
 *)
-  let ht = Hashtbl.create 42 in
   let create_edge p_from p_to =
     M.Edge.({
       from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));
@@ -584,29 +582,22 @@ let build_graph_asc conf base p max_gen base_loop =
         (* la référence, suivi du père suivi, puis de la mère ...  *)
         (!nodes, List.rev !edges, List.rev !families)
     | (p, gen) :: l ->
-        try
-          let _ = Hashtbl.find ht (get_key_index p) in
-          loop l nodes edges families
-        with Not_found ->
-          begin
-            if gen >= max_gen then
-              loop l nodes edges families
-            else
-              begin
-                Hashtbl.add ht (get_key_index p) true;
-                match get_parents p with
-                | Some ifam ->
-                    let cpl = foi base ifam in
-                    let fath = poi base (get_father cpl) in
-                    let moth = poi base (get_mother cpl) in
-                    nodes := moth :: fath :: !nodes;
-                    edges := (create_edge p fath) :: !edges;
-                    edges := (create_edge p moth) :: !edges;
-                    create_family ifam families;
-                    loop ((fath, gen + 1) :: (moth, gen + 1) :: l) nodes edges families
-                | None -> loop l nodes edges families
-              end
-          end
+      if gen >= max_gen then
+        loop l nodes edges families
+      else
+        begin
+          match get_parents p with
+          | Some ifam ->
+              let cpl = foi base ifam in
+              let fath = poi base (get_father cpl) in
+              let moth = poi base (get_mother cpl) in
+              nodes := moth :: fath :: !nodes;
+              edges := (create_edge p fath) :: !edges;
+              edges := (create_edge p moth) :: !edges;
+              create_family ifam families;
+              loop ((fath, gen + 1) :: (moth, gen + 1) :: l) nodes edges families
+          | None -> loop l nodes edges families
+        end
   in
   let nodes = ref [] in
   let edges = ref [] in

@@ -3,6 +3,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
+open Hutil;
+open Printf;
 open Util;
 
 (* TLSW: Text Language Stolen to Wikipedia
@@ -128,7 +130,7 @@ value syntax_links conf wi s =
           else if s.[j] = '}' then (Buff2.get len, j + 1)
           else loop (Buff2.store len s.[j]) (j + 1)
       in
-      let s = Printf.sprintf "<span class=\"highlight\">%s</span>" b in
+      let s = sprintf "<span class=\"highlight\">%s</span>" b in
       loop quot_lev pos j (Buff.mstore len s)
 (*
 interesting idea, but perhaps dangerous (risk of hidden messages and
@@ -176,7 +178,7 @@ use of database forum by ill-intentioned people to communicate)...
           let t =
             if wi.wi_cancel_links then text
             else
-              Printf.sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
+              sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
                 (commd conf) wi.wi_mode fname anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
@@ -184,18 +186,17 @@ use of database forum by ill-intentioned people to communicate)...
           let t =
             if wi.wi_cancel_links then name
             else if wi.wi_person_exists (fn, sn, oc) then
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
+              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
                 pos (commd conf) (code_varenv fn) (code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
             else if wi.wi_always_show_link then
               let s = " style=\"color:red\"" in
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
+              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
                 pos (commd conf) (code_varenv fn) (code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) s name
             else
-              Printf.sprintf
-                "<a href=\"%s\" style=\"color:red\">%s</a>"
-                (commd conf) (if conf.hide_names then "x x" else name)
+              sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
+                (if conf.hide_names then "x x" else name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard j wiz name ->
@@ -203,9 +204,8 @@ use of database forum by ill-intentioned people to communicate)...
             let s = if name <> "" then name else wiz in
             if wi.wi_cancel_links then s
             else
-              Printf.sprintf
-                "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>"
-                (commd conf) wiz s
+              sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>" (commd conf) wiz
+                s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLnone ->
@@ -316,7 +316,7 @@ value summary_of_tlsw_lines conf short lines =
           in
           let summary =
             let s =
-              Printf.sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
+              sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
               (if short then "" else section_num ^ " - ")
                 (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
             in
@@ -370,10 +370,10 @@ value string_of_modify_link conf cnt empty =
   [ Some (can_edit, mode, sfn) ->
       if conf.wizard then
         let mode_pref = if can_edit then "MOD" else "VIEW" in
-        Printf.sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
+        sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
           (if empty then "<p>"
            else
-             Printf.sprintf "<div class=\"small float-%s\">"
+             sprintf "<div class=\"small float-%s\">"
                conf.right)
           (commd conf) mode_pref mode cnt (if sfn = "" then "" else ";f=" ^ sfn)
           (if can_edit then transl_decline conf "modify" ""
@@ -527,12 +527,12 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
                if slev <= 3 then " class=\"subtitle\""
                else ""
              in
-             Printf.sprintf "<h%d%s>%s%s</h%d>" slev style section_num
+             sprintf "<h%d%s>%s%s</h%d>" slev style section_num
                (String.sub s slev (len-2*slev)) slev
             in
             let list =
               if wlo <> None then
-                let s = Printf.sprintf "<p><a id=\"a_%d\"></a></p>" cnt in
+                let s = sprintf "<p><a id=\"a_%d\"></a></p>" cnt in
                 [s:: list]
               else list
             in
@@ -658,7 +658,7 @@ value print_sub_part_text conf wi edit_opt cnt0 lines =
     List.map
       (fun
        [ "__TOC__" | "__SHORT_TOC__" ->
-           Printf.sprintf "<p>...%s...</p>" (message_txt conf 3)
+           sprintf "<p>...%s...</p>" (message_txt conf 3)
        | "__NOTOC__" -> ""
        | s -> s ])
       lines
@@ -700,7 +700,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
   in
   let is_empty = sub_part = "" in
   let sfn = if fname = "" then "" else ";f=" ^ code_varenv fname in
-  Hutil.header conf title;
+  header conf title;
   if can_edit then
     tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\"" conf.right
       conf.left
@@ -714,7 +714,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
       Wserver.printf ")\n";
     end
   else ();
-  Hutil.print_link_to_welcome conf True;
+  print_link_to_welcome conf True;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
   else ();
@@ -778,7 +778,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
       end_centered conf;
     end;
   end;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value insert_sub_part s v sub_part =

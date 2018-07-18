@@ -2,6 +2,8 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
+open Mutil;
+open Printf;
 
 value magic_patch = "GwPt0002";
 
@@ -65,7 +67,7 @@ value get_field_acc db2 i (f1, f2) =
     r
   }
   with e -> do {
-    Printf.eprintf "Error get_field_acc \"%s/%s/access\" i = %d\n" f1 f2 i;
+    eprintf "Error get_field_acc \"%s/%s/access\" i = %d\n" f1 f2 i;
     flush stderr;
     raise e;
   }
@@ -110,7 +112,7 @@ value hashtbl_find dir file key = do {
   let ic_ht = open_in_bin (Filename.concat dir file) in
   let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
   let alen = input_binary_int ic_hta in
-  let pos = Mutil.int_size + (Hashtbl.hash key) mod alen * Mutil.int_size in
+  let pos = int_size + (Hashtbl.hash key) mod alen * int_size in
   seek_in ic_hta pos;
   let pos = input_binary_int ic_hta in
   close_in ic_hta;
@@ -135,7 +137,7 @@ value hashtbl_find_all dir file key = do {
   [ Some ic_ht -> do {
   let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
   let alen = input_binary_int ic_hta in
-  let pos = Mutil.int_size + (Hashtbl.hash key) mod alen * Mutil.int_size in
+  let pos = int_size + (Hashtbl.hash key) mod alen * int_size in
   seek_in ic_hta pos;
   let pos = input_binary_int ic_hta in
   close_in ic_hta;
@@ -180,7 +182,7 @@ value sorted_patched_person_strings db2 is_first_name =
          [s :: sl])
     db2.patches.h_person []
   in
-  let sl = Mutil.list_uniq (List.sort compare sl) in
+  let sl = list_uniq (List.sort compare sl) in
   let sl =
     List.map
       (fun s ->
@@ -348,8 +350,8 @@ value disk_person2_of_key db2 fn sn oc =
 ;
 
 value person2_of_key db2 fn sn oc =
-  let fn = Name.lower (Mutil.nominative fn) in
-  let sn = Name.lower (Mutil.nominative sn) in
+  let fn = Name.lower (nominative fn) in
+  let sn = Name.lower (nominative sn) in
   try Hashtbl.find db2.patches.h_key (fn, sn, oc) with
   [ Not_found -> disk_person2_of_key db2 fn sn oc ]
 ;
@@ -399,15 +401,14 @@ value load_array2 bdir nb_ini nb def f1 f2 get =
       tab
     }
     with e -> do {
-      Printf.eprintf
-        "Error load_array2 %s/%s nb_ini %d nb %d\n" f1 f2 nb_ini nb;
+      eprintf "Error load_array2 %s/%s nb_ini %d nb %d\n" f1 f2 nb_ini nb;
       flush stderr;
       raise e;
     }
 ;
 
 value load_couples_array2 db2 = do {
-  Printf.eprintf "*** loading couples array\n";
+  eprintf "*** loading couples array\n";
   flush stderr;
   let nb = db2.patches.nb_fam in
   match db2.father_array with
@@ -468,7 +469,7 @@ value consang_array2 db2 nb = do {
         close_in ic;
         if Array.length tab < db2.patches.nb_per_ini then
           failwith
-            (Printf.sprintf "consang_array2 array length = %d < %d"
+            (sprintf "consang_array2 array length = %d < %d"
                (Array.length tab) db2.patches.nb_per_ini)
         else ();
         if nb > Array.length tab then
@@ -492,7 +493,7 @@ value family_array2 db2 = do {
   close_in ic;
   if Array.length tab < db2.patches.nb_per_ini then
     failwith
-      (Printf.sprintf "family_array2 array length = %d < %d"
+      (sprintf "family_array2 array length = %d < %d"
          (Array.length tab) db2.patches.nb_per_ini)
   else ();
   tab
@@ -507,7 +508,7 @@ value children_array2 db2 = do {
   close_in ic;
   if Array.length tab < db2.patches.nb_fam_ini then
     failwith
-      (Printf.sprintf "children_array2 array length = %d < %d"
+      (sprintf "children_array2 array length = %d < %d"
          (Array.length tab) db2.patches.nb_fam_ini)
   else ();
   tab
@@ -542,7 +543,7 @@ value read_notes db2 fnotes rn_mode =
 
 value check_magic ic magic id = do {
   let b = really_input_string ic (String.length magic) in
-  if b <> magic then failwith (Printf.sprintf "bad %s magic number" id)
+  if b <> magic then failwith (sprintf "bad %s magic number" id)
   else ();
 };
 
@@ -550,9 +551,9 @@ value commit_patches2 db2 = do {
   let fname = Filename.concat db2.bdir2 "patches" in
   let oc = open_out_bin (fname ^ "1") in
   output_string oc magic_patch;
-  Mutil.output_value_no_sharing oc db2.patches;
+  output_value_no_sharing oc db2.patches;
   close_out oc;
-  Mutil.remove_file (fname ^ "~");
+  remove_file (fname ^ "~");
   try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
   Sys.rename (fname ^ "1") fname
 };

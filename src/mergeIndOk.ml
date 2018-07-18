@@ -4,7 +4,11 @@
 
 open Config;
 open Def;
+open Futil;
+open Gutil;
 open Gwdb;
+open Hutil;
+open Mutil;
 open Util;
 
 value rec merge_lists l1 =
@@ -214,9 +218,8 @@ value reconstitute conf base p1 p2 =
      aliases = list (sou base) get_aliases;
      first_names_aliases = list (sou base) get_first_names_aliases;
      surnames_aliases = list (sou base) get_surnames_aliases;
-     titles = list (Futil.map_title_strings (sou base)) get_titles;
-     rparents =
-       list (Futil.map_relation_ps (sorp base) (sou base)) get_rparents;
+     titles = list (map_title_strings (sou base)) get_titles;
+     rparents = list (map_relation_ps (sorp base) (sou base)) get_rparents;
      related = [];
      occupation =
        field "occupation" (fun p -> sou base (get_occupation p)) ( \= "");
@@ -252,7 +255,7 @@ value reconstitute conf base p1 p2 =
        merge_strings base (get_burial_note p1) "<br>\n" (get_burial_note p2);
      burial_src =
        merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
-       pevents = list (Futil.map_pers_event (sorp base) (sou base)) get_pevents;
+       pevents = list (map_pers_event (sorp base) (sou base)) get_pevents;
      notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
      psources = merge_strings base (get_psources p1) ", " (get_psources p2);
      key_index = get_key_index p1}
@@ -260,10 +263,7 @@ value reconstitute conf base p1 p2 =
   (* On fait la fusion des évènements à partir *)
   (* de la fusion des évènements principaux.   *)
   let pevents =
-    merge_primary_events
-      (Futil.map_pers_event (sorp base) (sou base))
-      get_pevents
-      p
+    merge_primary_events (map_pers_event (sorp base) (sou base)) get_pevents p
   in
   {(p) with pevents = pevents}
 ;
@@ -277,18 +277,18 @@ value print_merge conf base =
       let sp = UpdateInd.string_person_of base p1 in
       let digest = Update.digest_person sp in
       UpdateInd.print_update_ind conf base p digest
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_merge_ok conf base wl p = do {
   let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
+  header conf title;
+  print_link_to_welcome conf True;
   Wserver.printf "\n%s\n"
     (referenced_person_text conf base (poi base p.key_index));
   Update.print_warnings conf base wl;
   Merge.print_possible_continue_merging conf base;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value redirect_relations_of_added_related base p ip2 rel_chil =
@@ -366,7 +366,7 @@ value redirect_relations_of_added_related base p ip2 rel_chil =
                let ifam = (get_family pc).(i) in
                let fam = gen_family_of_family (foi base ifam) in
                let (p_related, mod_p) =
-                 if Array.mem ip2 fam.witnesses
+                 if array_mem ip2 fam.witnesses
                  then do {
                    let (p_related, mod_p) =
                      loop (p_related, mod_p) 0
@@ -464,10 +464,10 @@ value redirect_added_families base p ip2 p2_family =
                  else ())
                evt.efam_witnesses)
           (get_fevents fam);
-        Gutil.couple False p.key_index (get_mother fam)
+        couple False p.key_index (get_mother fam)
       }
       else if ip2 = get_mother fam then
-        Gutil.couple False (get_father fam) p.key_index
+        couple False (get_father fam) p.key_index
       else assert False
     in
     patch_couple base ifam cpl;
@@ -515,7 +515,7 @@ value effective_mod_merge conf base o_p1 o_p2 sp =
       Update.delete_topological_sort conf base;
       print_mod_merge_ok conf base wl p;
     }
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_merge o_conf base =

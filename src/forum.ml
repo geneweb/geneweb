@@ -4,6 +4,8 @@
 
 open Config;
 open Def;
+open Hutil;
+open Printf;
 open TemplAst;
 open Util;
 
@@ -708,41 +710,39 @@ value forum_add conf base moderated mess =
       (fun oc ->
          let (hh, mm, ss) = conf.time in
          do {
-           Printf.fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
+           fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
              conf.today.year conf.today.month conf.today.day hh mm ss;
-           if moderated then
-             Printf.fprintf oc "Moderator: ....................\n"
+           if moderated then fprintf oc "Moderator: ....................\n"
            else ();
-           Printf.fprintf oc "From: %s\n" conf.from;
-           Printf.fprintf oc "Ident: %s\n" mess.m_ident;
+           fprintf oc "From: %s\n" conf.from;
+           fprintf oc "Ident: %s\n" mess.m_ident;
            if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
            then
-             Printf.fprintf oc "Wizard: %s\n" conf.user
+             fprintf oc "Wizard: %s\n" conf.user
            else ();
            if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
-             Printf.fprintf oc "Friend: %s\n" conf.user
+             fprintf oc "Friend: %s\n" conf.user
            else ();
-           if mess.m_email <> "" then
-             Printf.fprintf oc "Email: %s\n" mess.m_email
+           if mess.m_email <> "" then fprintf oc "Email: %s\n" mess.m_email
            else ();
-           Printf.fprintf oc "Access: %s\n" access;
+           fprintf oc "Access: %s\n" access;
            let subject =
              if mess.m_subject = "" then "-" else mess.m_subject
            in
-           Printf.fprintf oc "Subject: %s\n" subject;
-           Printf.fprintf oc "Wiki: on\n";
-           Printf.fprintf oc "Text:\n";
+           fprintf oc "Subject: %s\n" subject;
+           fprintf oc "Wiki: on\n";
+           fprintf oc "Text:\n";
            let txt = mess.m_text in
            let rec loop i bol =
              if i = String.length txt then ()
              else do {
-               if bol then Printf.fprintf oc "  " else ();
+               if bol then fprintf oc "  " else ();
                if txt.[i] <> '\r' then output_char oc txt.[i] else ();
                loop (i + 1) (txt.[i] = '\n')
              }
            in
            loop 0 True;
-           Printf.fprintf oc "\n\n";
+           fprintf oc "\n\n";
          })
   else ()
 ;
@@ -763,7 +763,7 @@ value print_add_ok conf base =
   let mess =
     let time =
       let (hh, mm, ss) = conf.time in
-      Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d"
+      sprintf "%04d-%02d-%02d %02d:%02d:%02d"
         conf.today.year conf.today.month conf.today.day hh mm ss
     in
     let ident = Gutil.strip_spaces (get conf "Ident") in
@@ -775,7 +775,7 @@ value print_add_ok conf base =
      m_email = email; m_access = ""; m_subject = subject; m_wiki = "";
      m_text = text}
   in
-  if not (can_post conf) then Hutil.incorrect_request conf
+  if not (can_post conf) then incorrect_request conf
   else if
     match p_getenv conf.env "visu" with
     [ Some _ -> True
@@ -790,8 +790,8 @@ value print_add_ok conf base =
       do {
         let mods = moderators conf in
         forum_add conf base (mods <> []) mess;
-        Hutil.header conf title;
-        Hutil.print_link_to_welcome conf True;
+        header conf title;
+        print_link_to_welcome conf True;
         if mods <> [] then do {
           Wserver.printf "<p>%s. %s.</p>"
             (capitale (transl conf "this forum is moderated"))
@@ -800,7 +800,7 @@ value print_add_ok conf base =
         else ();
         Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
           (capitale (transl conf "database forum"));
-        Hutil.trailer conf;
+        trailer conf;
       }
     with
     [ Update.ModErr -> () ]
@@ -822,8 +822,8 @@ value print_del_ok conf base next_pos =
     Wserver.printf "%s" (capitale (transl conf "message deleted"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     match next_pos with
     [ Some pos ->
         Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
@@ -831,7 +831,7 @@ value print_del_ok conf base next_pos =
     | None ->
         Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
           (capitale (transl conf "database forum")) ];
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -888,7 +888,7 @@ value set_validator conf base pos =
             if String.length conf.user < len - 1 then conf.user
             else String.sub conf.user 0 (len - 1)
           in
-          MF.patch fname pos (Printf.sprintf "Moderator: /%s" m);
+          MF.patch fname pos (sprintf "Moderator: /%s" m);
           True
         }
         else False
@@ -909,8 +909,8 @@ value print_valid_ok conf base pos del =
   let title _ = Wserver.printf "%s" (capitale mess) in
   let next_pos = find_next_pos conf pos in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     match next_pos with
     [ Some pos ->
         Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
@@ -918,7 +918,7 @@ value print_valid_ok conf base pos del =
     | None ->
         Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
          (capitale (transl conf "database forum")) ];
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -970,7 +970,7 @@ value set_access conf base pos =
             [ "publ" -> "priv"
             | _ -> "publ" ]
           in
-          MF.patch fname pos (Printf.sprintf "Access: %s" new_access);
+          MF.patch fname pos (sprintf "Access: %s" new_access);
           True
         }
         else False

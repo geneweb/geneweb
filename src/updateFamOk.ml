@@ -4,7 +4,11 @@
 
 open Config;
 open Def;
+open Futil;
+open Gutil;
 open Gwdb;
+open Hutil;
+open Mutil;
 open Util;
 
 (* Liste des string dont on a supprimé un caractère.       *)
@@ -220,8 +224,7 @@ value rec reconstitute_events conf ext cnt =
       in
       let efam_note =
         match get_nth conf "e_note" cnt with
-        [ Some note ->
-            only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
+        [ Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
         | _ -> "" ]
       in
       let efam_src =
@@ -456,10 +459,9 @@ value reconstitute_family conf base =
   let marriage = Update.reconstitute_date conf "marr" in
   let marriage_place = no_html_tags (only_printable (get conf "marr_place")) in
   let marriage_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "marr_note"))
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "marr_note"))
   in
-  let marriage_src = Gutil.strip_spaces (get conf "marr_src") in
+  let marriage_src = strip_spaces (get conf "marr_src") in
   let (witnesses, ext) =
     loop 1 ext where rec loop i ext =
       match
@@ -525,7 +527,7 @@ value reconstitute_family conf base =
       | None -> ([], ext) ]
   in
   let comment =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "comment"))
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "comment"))
   in
   let fsources = only_printable (get conf "src") in
   let origin_file =
@@ -600,7 +602,7 @@ value reconstitute_family conf base =
      divorce = divorce; fevents = events;
      comment = comment; origin_file = origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int fam_index}
-  and cpl = Futil.parent conf.multi_parents (Array.of_list parents)
+  and cpl = parent conf.multi_parents (Array.of_list parents)
   and des = {children = Array.of_list children} in
   (fam, cpl, des, ext)
 ;
@@ -645,10 +647,10 @@ value error_family conf base err = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -693,8 +695,8 @@ value check_witnesses conf base fam =
 ;
 
 value check_parents conf base cpl =
-  let (fa_fn, fa_sn, _, _, _) = Gutil.father cpl in
-  let (mo_fn, mo_sn, _, _, _) = Gutil.mother cpl in
+  let (fa_fn, fa_sn, _, _, _) = father cpl in
+  let (mo_fn, mo_sn, _, _, _) = mother cpl in
   match ((fa_fn = "", fa_sn = ""), (mo_fn = "", mo_sn = "")) with
   [ ((True, True), (True, True)) | ((True, True), (False, False)) |
     ((False, False), (True, True)) | ((False, False), (False, False)) -> None
@@ -757,7 +759,7 @@ value print_err_parents conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Wserver.printf "\n";
   Wserver.printf (fcapitale (ftransl conf "%t already has parents"))
     (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p));
@@ -771,7 +773,7 @@ value print_err_parents conf base p = do {
          0);
   end;
   Update.print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -786,11 +788,11 @@ value print_err_father_sex conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Wserver.printf "\n%s" (referenced_person_text conf base p);
   Wserver.printf "\n%s\n" (transl conf "should be male");
   Update.print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -805,11 +807,11 @@ value print_err_mother_sex conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Wserver.printf "\n%s" (referenced_person_text conf base p);
   Wserver.printf "\n%s\n" (transl conf "should be female");
   Update.print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -821,9 +823,9 @@ value print_err conf base = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Update.print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -837,10 +839,10 @@ value print_error_disconnected conf = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Hutil.print_link_to_welcome conf True;
   Wserver.printf "%s" (capitale (transl conf "msg error disconnected"));
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -1249,19 +1251,19 @@ value effective_mod conf base sfam scpl sdes = do {
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-    [ Some s -> Gutil.strip_spaces s
+    [ Some s -> strip_spaces s
     | None -> "" ]
   in
   let ncpl =
-    Futil.map_couple_p conf.multi_parents
+    map_couple_p conf.multi_parents
       (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
-    Futil.map_family_ps (Update.insert_person conf base psrc created_p)
+    map_family_ps (Update.insert_person conf base psrc created_p)
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let nfath = poi base (Adef.father ncpl) in
   let nmoth = poi base (Adef.mother ncpl) in
@@ -1305,7 +1307,7 @@ value effective_mod conf base sfam scpl sdes = do {
   patch_descend base fi ndes;
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do {
-    if not (Array.mem oarr.(i) narr) then do {
+    if not (array_mem oarr.(i) narr) then do {
       let ou = poi base oarr.(i) in
       let ou = {family = family_exclude (get_family ou) fi} in
       patch_union base oarr.(i) ou
@@ -1313,7 +1315,7 @@ value effective_mod conf base sfam scpl sdes = do {
     else ()
   };
   for i = 0 to Array.length narr - 1 do {
-    if not (Array.mem narr.(i) oarr) then do {
+    if not (array_mem narr.(i) oarr) then do {
       let nu = poi base narr.(i) in
       let nu = {family = Array.append (get_family nu) [| fi |]} in
       patch_union base narr.(i) nu;
@@ -1340,7 +1342,7 @@ value effective_mod conf base sfam scpl sdes = do {
        let a =
          {parents = None;
           consang =
-            if not (Array.mem ip ndes.children) then Adef.fix (-1)
+            if not (array_mem ip ndes.children) then Adef.fix (-1)
             else a.consang}
        in
        Hashtbl.replace cache ip a)
@@ -1354,7 +1356,7 @@ value effective_mod conf base sfam scpl sdes = do {
            let a =
              {parents = Some fi;
               consang =
-                if not (Array.mem ip ochildren) || not same_parents then
+                if not (array_mem ip ochildren) || not same_parents then
                   Adef.fix (-1)
                 else a.consang}
            in
@@ -1362,13 +1364,13 @@ value effective_mod conf base sfam scpl sdes = do {
     ndes.children;
   Array.iter
     (fun ip ->
-       if not (Array.mem ip ndes.children) then
+       if not (array_mem ip ndes.children) then
          patch_ascend base ip (find_asc ip)
        else ())
     ochildren;
   Array.iter
     (fun ip ->
-       if not (Array.mem ip ochildren) || not same_parents then
+       if not (array_mem ip ochildren) || not same_parents then
          patch_ascend base ip (find_asc ip)
        else ())
     ndes.children;
@@ -1390,19 +1392,19 @@ value effective_add conf base sfam scpl sdes =
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-    [ Some s -> Gutil.strip_spaces s
+    [ Some s -> strip_spaces s
     | None -> "" ]
   in
   let ncpl =
-    Futil.map_couple_p conf.multi_parents
+    map_couple_p conf.multi_parents
       (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
-    Futil.map_family_ps (Update.insert_person conf base psrc created_p)
+    map_family_ps (Update.insert_person conf base psrc created_p)
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base (Adef.father ncpl) in
@@ -1467,7 +1469,7 @@ value effective_inv conf base ip u ifam =
     [ [ifam1; ifam2 :: ifaml] ->
         if ifam2 = ifam then [ifam2; ifam1 :: ifaml]
         else [ifam1 :: loop [ifam2 :: ifaml]]
-    | _ -> do { Hutil.incorrect_request conf; raise Update.ModErr } ]
+    | _ -> do { incorrect_request conf; raise Update.ModErr } ]
   in
   let u = {family = Array.of_list (loop (Array.to_list (get_family u)))} in
   patch_union base ip u
@@ -1542,7 +1544,7 @@ value is_a_link =
 ;
 
 value is_created_or_already_there ochil_arr nchil schil =
-  not (is_a_link schil) || Array.mem nchil ochil_arr
+  not (is_a_link schil) || array_mem nchil ochil_arr
 ;
 
 (* need_check_noloop: optimization
@@ -1558,14 +1560,14 @@ value is_created_or_already_there ochil_arr nchil schil =
 (* Improvement : check the name on the parents/children if they linked *)
 
 value need_check_noloop (scpl, sdes, onfs) =
-  if array_exists is_a_link (Gutil.parent_array scpl) ||
+  if array_exists is_a_link (parent_array scpl) ||
      array_exists is_a_link sdes.children
   then
     match onfs with
     [ Some ((opar, ochil), (npar, nchil)) ->
         not
           (array_forall2 (is_created_or_already_there opar) npar
-             (Gutil.parent_array scpl)) ||
+             (parent_array scpl)) ||
         not
           (array_forall2 (is_created_or_already_there ochil) nchil
              sdes.children)
@@ -1641,8 +1643,8 @@ value print_mod_ok conf base (wl, ml) cpl des =
     Wserver.printf "%s" (capitale (transl conf "family modified"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
@@ -1658,7 +1660,7 @@ value print_mod_ok conf base (wl, ml) cpl des =
       }
     else ();
     print_family conf base (wl, ml) cpl des;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1667,18 +1669,18 @@ value print_change_event_order_ok conf base (wl, ml) cpl des =
     Wserver.printf "%s" (capitale (transl conf "family modified"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     print_family conf base (wl, ml) cpl des;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
 value print_add_ok conf base (wl, ml) cpl des =
   let title _ = Wserver.printf "%s" (capitale (transl conf "family added")) in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
@@ -1687,7 +1689,7 @@ value print_add_ok conf base (wl, ml) cpl des =
       }
     else ();
     print_family conf base (wl, ml) cpl des;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1696,8 +1698,8 @@ value print_del_ok conf base wl =
     Wserver.printf "%s" (capitale (transl conf "family deleted"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     match p_getint conf.env "ip" with
     [ Some i ->
         let p = poi base (Adef.iper_of_int i) in
@@ -1708,7 +1710,7 @@ value print_del_ok conf base wl =
         end
     | _ -> () ];
     Update.print_warnings conf base wl;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1717,11 +1719,11 @@ value print_inv_ok conf base p =
     Wserver.printf "%s" (capitale (transl conf "inversion done"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     Wserver.printf "\n%s" (referenced_person_text conf base p);
     Wserver.printf "\n";
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1733,8 +1735,8 @@ value forbidden_disconnected conf sfam scpl sdes =
     [ Not_found -> False ]
   in
   if no_dec then
-    if get_create (Gutil.father scpl) = Update.Link ||
-       get_create (Gutil.mother scpl) = Update.Link then
+    if get_create (father scpl) = Update.Link ||
+       get_create (mother scpl) = Update.Link then
       False
     else
       List.for_all (fun p -> get_create p <> Update.Link)
@@ -1846,7 +1848,7 @@ value print_del conf base =
         else ();
         print_del_ok conf base []
       }
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_aux conf base callback =
@@ -1956,7 +1958,7 @@ value print_inv conf base =
         }
       with
       [ Update.ModErr -> () ]
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_change_order_ok conf base =
@@ -1981,7 +1983,7 @@ value print_change_order_ok conf base =
         }
       with
       [ Update.ModErr -> () ]
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_change_event_order conf base =
@@ -2017,7 +2019,7 @@ value print_change_event_order conf base =
         let fam = update_family_with_fevents conf base fam in
         patch_family base fam.fam_index fam;
         let a = foi base fam.fam_index in
-        let cpl = Futil.parent conf.multi_parents (get_parent_array a) in
+        let cpl = parent conf.multi_parents (get_parent_array a) in
         let des = {children = get_children a} in
         let wl =
           do {
@@ -2053,5 +2055,5 @@ value print_change_event_order conf base =
       }
     with
     [ Update.ModErr -> () ]
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;

@@ -3,6 +3,7 @@
 
 open Def;
 open Gwdb;
+open Printf;
 
 (* Printing check errors *)
 
@@ -93,151 +94,148 @@ value string_of_efam_name base efam_name =
 value print_base_error oc base =
   fun
   [ AlreadyDefined p ->
-      Printf.fprintf oc "%s\nis defined several times\n" (designation base p)
+      fprintf oc "%s\nis defined several times\n" (designation base p)
   | OwnAncestor p ->
-      Printf.fprintf oc "%s\nis his/her own ancestor\n" (designation base p)
+      fprintf oc "%s\nis his/her own ancestor\n" (designation base p)
   | BadSexOfMarriedPerson p ->
-      Printf.fprintf
-        oc "%s\n  bad sex for a married person\n" (designation base p) ]
+      fprintf oc "%s\n  bad sex for a married person\n" (designation base p) ]
 ;
 
 value print_base_warning oc base =
   fun
   [ BigAgeBetweenSpouses fath moth a ->
-      Printf.fprintf
-        oc "The difference of age between %s and %s is quite important: %d\n"
+      fprintf oc "The difference of age between %s and %s is quite important: %d\n"
         (designation base fath) (designation base moth) a.year
   | BirthAfterDeath p ->
-      Printf.fprintf oc "%s\n  born after his/her death\n" (designation base p)
+      fprintf oc "%s\n  born after his/her death\n" (designation base p)
   | ChangedOrderOfChildren ifam des _ _ ->
       let cpl = foi base ifam in
-      Printf.fprintf oc "Changed order of children of %s and %s\n"
+      fprintf oc "Changed order of children of %s and %s\n"
         (designation base (poi base (get_father cpl)))
         (designation base (poi base (get_mother cpl)))
   | ChildrenNotInOrder ifam des elder x -> do {
       let cpl = foi base ifam in
-      Printf.fprintf oc
+      fprintf oc
         "The following children of\n  %s\nand\n  %s\nare not in order:\n"
         (designation base (poi base (get_father cpl)))
         (designation base (poi base (get_mother cpl)));
-      Printf.fprintf oc "- %s\n" (designation base elder);
-      Printf.fprintf oc "- %s\n" (designation base x)
+      fprintf oc "- %s\n" (designation base elder);
+      fprintf oc "- %s\n" (designation base x)
     }
   | ChangedOrderOfMarriages p _ _ ->
-      Printf.fprintf
-        oc "Changed order of marriages of %s\n" (designation base p)
+      fprintf oc "Changed order of marriages of %s\n" (designation base p)
   | ChangedOrderOfFamilyEvents ifam _ _ -> do {
       let cpl = foi base ifam in
-      Printf.fprintf oc "Changed order of family's events for %s\n"
+      fprintf oc "Changed order of family's events for %s\n"
         (designation base (poi base (get_father cpl)));
-      Printf.fprintf oc "Changed order of family's events for %s\n"
+      fprintf oc "Changed order of family's events for %s\n"
         (designation base (poi base (get_mother cpl)));
     }
   | ChangedOrderOfPersonEvents p _ _ ->
-      Printf.fprintf oc "Changed order of person's events for %s\n"
+      fprintf oc "Changed order of person's events for %s\n"
         (designation base p)
   | CloseChildren ifam des elder x -> do {
       let cpl = foi base ifam in
-      Printf.fprintf oc
+      fprintf oc
         "The following children of\n  %s\nand\n  %s\nare born very close:\n"
         (designation base (poi base (get_father cpl)))
         (designation base (poi base (get_mother cpl)));
-      Printf.fprintf oc "- %s\n" (designation base elder);
-      Printf.fprintf oc "- %s\n" (designation base x)
+      fprintf oc "- %s\n" (designation base elder);
+      fprintf oc "- %s\n" (designation base x)
     }
   | DeadOld p a ->
-      Printf.fprintf oc "%s died at the advanced age of %d years old\n"
+      fprintf oc "%s died at the advanced age of %d years old\n"
         (designation base p) a.year
   | DeadTooEarlyToBeFather father child -> do {
-      Printf.fprintf oc "%s\n" (designation base child);
-      Printf.fprintf oc
+      fprintf oc "%s\n" (designation base child);
+      fprintf oc
         "  is born more than 2 years after the death of his/her father\n";
-      Printf.fprintf oc "%s\n" (designation base father)
+      fprintf oc "%s\n" (designation base father)
     }
   | FEventOrder p e1 e2 ->
-      Printf.fprintf oc "%s's %s before his/her %s\n"
+      fprintf oc "%s's %s before his/her %s\n"
         (designation base p)
         (string_of_efam_name base e1.efam_name)
         (string_of_efam_name base e2.efam_name)
   | FWitnessEventAfterDeath p e -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "witnessed the %s after his/her death\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s after his/her death\n"
         (string_of_efam_name base e.efam_name)
     }
   | FWitnessEventBeforeBirth p e -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "witnessed the %s before his/her birth\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s before his/her birth\n"
         (string_of_efam_name base e.efam_name)
     }
   | IncoherentSex p fixed not_fixed -> do {
-      Printf.fprintf oc "%s\n  sex not coherent with relations"
+      fprintf oc "%s\n  sex not coherent with relations"
         (designation base p);
       if fixed > 0 then
         if not_fixed > 0 then
-          Printf.fprintf oc " (fixed in %d of the %d cases)" fixed
+          fprintf oc " (fixed in %d of the %d cases)" fixed
             (fixed + not_fixed)
         else
-          Printf.fprintf oc " (fixed)"
+          fprintf oc " (fixed)"
       else ();
-      Printf.fprintf oc "\n";
+      fprintf oc "\n";
     }
   | IncoherentAncestorDate anc p -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "  has a younger ancestor:\n";
-      Printf.fprintf oc "%s\n" (designation base anc);
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "  has a younger ancestor:\n";
+      fprintf oc "%s\n" (designation base anc);
     }
   | MarriageDateAfterDeath p -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "marriage after his/her death\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "marriage after his/her death\n"
     }
   | MarriageDateBeforeBirth p -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "marriage before his/her birth\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "marriage before his/her birth\n"
     }
   | MotherDeadAfterChildBirth mother child ->
-      Printf.fprintf oc "%s\n  is born after the death of his/her mother\n%s\n"
+      fprintf oc "%s\n  is born after the death of his/her mother\n%s\n"
         (designation base child) (designation base mother)
   | ParentBornAfterChild parent child ->
-      Printf.fprintf oc "%s born after his/her child %s\n"
+      fprintf oc "%s born after his/her child %s\n"
         (designation base parent) (designation base child)
   | ParentTooOld p a ->
-      Printf.fprintf oc "%s was parent at age of %d\n" (designation base p)
+      fprintf oc "%s was parent at age of %d\n" (designation base p)
         a.year
   | ParentTooYoung p a ->
-      Printf.fprintf oc "%s was parent at age of %d\n" (designation base p)
+      fprintf oc "%s was parent at age of %d\n" (designation base p)
         a.year
   | PEventOrder p e1 e2 ->
-      Printf.fprintf oc "%s's %s before his/her %s\n"
+      fprintf oc "%s's %s before his/her %s\n"
         (designation base p)
         (string_of_epers_name base e1.epers_name)
         (string_of_epers_name base e2.epers_name)
   | PWitnessEventAfterDeath p e -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "witnessed the %s after his/her death\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s after his/her death\n"
         (string_of_epers_name base e.epers_name)
     }
   | PWitnessEventBeforeBirth p e -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "witnessed the %s before his/her birth\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s before his/her birth\n"
         (string_of_epers_name base e.epers_name)
     }
   | TitleDatesError p t -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "has incorrect title dates as:\n";
-      Printf.fprintf oc "  %s %s\n" (sou base t.t_ident) (sou base t.t_place)
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "has incorrect title dates as:\n";
+      fprintf oc "  %s %s\n" (sou base t.t_ident) (sou base t.t_place)
     }
   | UndefinedSex _ ->
       ()
   | WitnessDateAfterDeath p -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "was witness after his/her death\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "was witness after his/her death\n"
     }
   | WitnessDateBeforeBirth p -> do {
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "was witness before his/her birth\n"
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "was witness before his/her birth\n"
     }
   | YoungForMarriage p a ->
-      Printf.fprintf oc "%s married at age %d\n" (designation base p) a.year ]
+      fprintf oc "%s married at age %d\n" (designation base p) a.year ]
 ;
 
 type stats =
@@ -356,7 +354,7 @@ value rec check_ancestors base warning year year_tab ip ini_p =
 ;
 
 value check_base_aux base error warning changed_p = do {
-  Printf.eprintf "check persons\n";
+  eprintf "check persons\n";
   let nb_ind = nb_of_persons base in
   let year_tab = Array.make nb_ind (max_int, False) in
   ProgrBar.start ();
@@ -371,7 +369,7 @@ value check_base_aux base error warning changed_p = do {
     | None -> () ]
   };
   ProgrBar.finish ();
-  Printf.eprintf "check families\n";
+  eprintf "check families\n";
   let nb_fam = nb_of_families base in
   ProgrBar.start ();
   for i = 0 to nb_fam - 1 do {
@@ -398,31 +396,31 @@ value check_base base error warning def changed_p pr_stats = do {
   for i = 0 to nb_of_persons base - 1 do {
     let p = poi base (Adef.iper_of_int i) in
     if not (def i) then
-      Printf.printf "Undefined: %s\n" (designation base p)
+      printf "Undefined: %s\n" (designation base p)
     else ();
     if pr_stats then update_stats base current_year s p else ();
     flush stdout;
   };
   if pr_stats then do {
-    Printf.printf "\n";
-    Printf.printf "%d men\n" s.men;
-    Printf.printf "%d women\n" s.women;
-    Printf.printf "%d unknown sex\n" s.neutre;
-    Printf.printf "%d unnamed\n" s.noname;
-    Printf.printf "Oldest: %s, %d\n" (designation base (snd s.oldest_dead))
+    printf "\n";
+    printf "%d men\n" s.men;
+    printf "%d women\n" s.women;
+    printf "%d unknown sex\n" s.neutre;
+    printf "%d unnamed\n" s.noname;
+    printf "Oldest: %s, %d\n" (designation base (snd s.oldest_dead))
       (fst s.oldest_dead);
-    Printf.printf "Oldest still alive: %s, %d\n"
+    printf "Oldest still alive: %s, %d\n"
       (designation base (snd s.oldest_still_alive))
       (fst s.oldest_still_alive);
-    Printf.printf "Youngest father: %s, %d\n"
+    printf "Youngest father: %s, %d\n"
       (designation base (snd s.youngest_father)) (fst s.youngest_father);
-    Printf.printf "Youngest mother: %s, %d\n"
+    printf "Youngest mother: %s, %d\n"
       (designation base (snd s.youngest_mother)) (fst s.youngest_mother);
-    Printf.printf "Oldest father: %s, %d\n"
+    printf "Oldest father: %s, %d\n"
       (designation base (snd s.oldest_father)) (fst s.oldest_father);
-    Printf.printf "Oldest mother: %s, %d\n"
+    printf "Oldest mother: %s, %d\n"
       (designation base (snd s.oldest_mother)) (fst s.oldest_mother);
-    Printf.printf "\n";
+    printf "\n";
     flush stdout;
   }
   else ();

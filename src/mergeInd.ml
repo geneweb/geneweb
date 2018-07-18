@@ -4,7 +4,9 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value print_differences conf base branches p1 p2 =
@@ -265,7 +267,7 @@ value propose_merge_ind conf base branches p1 p2 =
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     if branches <> [] then do {
       Wserver.printf "%s%s\n" (capitale (transl conf "you must first merge"))
         (transl conf ":");
@@ -312,7 +314,7 @@ value propose_merge_ind conf base branches p1 p2 =
       end;
     }
     else ();
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -354,9 +356,9 @@ value effective_merge_ind conf base warning p1 p2 =
         let cpl = foi base ifam in
         let cpl =
           if get_key_index p2 = get_father cpl then
-            Gutil.couple False (get_key_index p1) (get_mother cpl)
+            couple False (get_key_index p1) (get_mother cpl)
           else if get_key_index p2 = get_mother cpl then
-            Gutil.couple False (get_father cpl) (get_key_index p1)
+            couple False (get_father cpl) (get_key_index p1)
           else assert False
         in
         patch_couple base ifam cpl;
@@ -457,14 +459,14 @@ value is_ancestor base ip1 ip2 =
 value error_loop conf base p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
-    Hutil.print_link_to_welcome conf True;
+    rheader conf title;
+    print_link_to_welcome conf True;
     Wserver.printf "<strong>%s%s %s</strong>" (p_first_name base p)
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
       (p_surname base p);
     Wserver.printf "\n%s\n" (transl conf "would be his/her own ancestor");
     Wserver.printf "\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -495,7 +497,7 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     Wserver.printf "%s%s\n"
       (capitale (transl conf "you must first merge the 2 families"))
       (transl conf ":");
@@ -512,7 +514,7 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
     end;
     html_p conf;
     MergeFam.print_differences conf base branches fam1 fam2;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -569,29 +571,29 @@ value merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
 value not_found_or_incorrect conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
+    rheader conf title;
     Wserver.printf "%s %s %s %s %s\n" (capitale (transl conf "not found"))
       (transl conf "or") (transl conf "several answers") (transl conf "or")
       (transl conf "incorrect request");
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
 value same_person conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
+    rheader conf title;
     Wserver.printf "%s\n" (capitale (transl conf "it is the same person!"));
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
 value different_sexes conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
+    rheader conf title;
     Wserver.printf "%s.\n" (capitale (transl conf "incompatible sexes"));
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -638,8 +640,8 @@ value rec try_merge conf base warning branches ip1 ip2 changes_done =
 
 value print_merged conf base wl p = do {
   let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
+  header conf title;
+  print_link_to_welcome conf True;
   tag "ul" begin
     tag "li" begin
       Wserver.printf "%s\n" (referenced_person_text conf base p);
@@ -668,7 +670,7 @@ value print_merged conf base wl p = do {
       end
   | _ -> () ];
   Update.print_warnings conf base wl;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print conf base =
@@ -782,6 +784,6 @@ value print_kill_ancestors conf base =
             History.record conf base changed "ka";
             print_killed conf base p nb_ind.val nb_fam.val;
           }
-      | None -> Hutil.incorrect_request conf ]
-  | _ -> Hutil.incorrect_request conf ]
+      | None -> incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;

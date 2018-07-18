@@ -3,6 +3,7 @@
 
 open Dbdisk;
 open Def;
+open Mutil;
 
 type name_index_data = array (array iper);
 type strings_of_fsname = array (array dsk_istr);
@@ -17,8 +18,8 @@ value uoi base i = base.data.unions.get (Adef.int_of_iper i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
 value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
-value p_first_name base p = Mutil.nominative (sou base p.first_name);
-value p_surname base p = Mutil.nominative (sou base p.surname);
+value p_first_name base p = nominative (sou base p.first_name);
+value p_surname base p = nominative (sou base p.surname);
 
 value husbands base p =
   let u = uoi base p.key_index in
@@ -102,16 +103,15 @@ value compare_names_1 s1 s2 =
   in
   if s1 = s2 then 0
   else
-    let i1 = Mutil.initial s1 in
-    let i2 = Mutil.initial s2 in
+    let i1 = initial s1 in
+    let i2 = initial s2 in
     match compare_aux (String.length s1) (String.length s2) i1 i2 with
     [ 0 -> compare_aux i1 i2 0 0
     | x -> x ]
 ;
 
 value compare_names base_data s1 s2 =
-  if Mutil.utf_8_db.val then
-    Mutil.compare_after_particle base_data.particles s1 s2
+  if utf_8_db.val then compare_after_particle base_data.particles s1 s2
   else compare_names_1 s1 s2
 ;
 

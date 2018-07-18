@@ -3,6 +3,7 @@
 
 open Def;
 open Gwdb;
+open Printf;
 
 value designation base ip p =
   let first_name = p_first_name base p in
@@ -104,9 +105,7 @@ value nb_desc bname date = do {
   let nb_ind = nb_of_persons base in
   let nb_fam = nb_of_families base in
   let nb_liv = apply base date nb_ind (fun _ _ _ -> ()) in
-  Printf.printf
-    "nombre de personnes vivantes en %s : %d\n"
-    (string_of_date date)
+  printf "nombre de personnes vivantes en %s : %d\n" (string_of_date date)
     nb_liv;
   flush stdout;
   let mark = Array.make nb_fam 0 in
@@ -129,14 +128,13 @@ value nb_desc bname date = do {
   let (nb_gen, nb_tot) =
     List.fold_left
       (fun (nb_gen, nb_tot) nb_at_gen -> do {
-         Printf.printf
-           "nombre moyen de descendants à la génération %2d :" nb_gen;
-         Printf.printf " %7.2f\n" (float nb_at_gen /. float nb_liv);
+         printf "nombre moyen de descendants à la génération %2d :" nb_gen;
+         printf " %7.2f\n" (float nb_at_gen /. float nb_liv);
          (nb_gen + 1, nb_tot + nb_at_gen)
        })
       (1, 0) nb_desc.val
   in
-  Printf.printf "nombre de descendants moyen = %.2f\n"
+  printf "nombre de descendants moyen = %.2f\n"
     (float nb_tot /. float nb_liv);
   flush stdout;
 };

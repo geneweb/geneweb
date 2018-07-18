@@ -4,7 +4,10 @@
 open Config;
 open Dag2html;
 open Def;
+open Gutil;
 open Gwdb;
+open Mutil;
+open Printf;
 open TemplAst;
 open Util;
 
@@ -100,7 +103,7 @@ value make_dag conf base set =
                 fun
                 [ [ifam :: ifaml] ->
                     let cpl = foi base ifam in
-                    let isp = Gutil.spouse ip cpl in
+                    let isp = spouse ip cpl in
                     let jdo =
                       try Some (M.find isp map) with
                       [ Not_found -> None ]
@@ -159,7 +162,7 @@ value image_normal_txt conf base p fname width height =
   let b = acces conf base p in
   let k = default_image_name base p in
   let r =
-    Printf.sprintf "\
+    sprintf "\
 <img src=\"%sm=IM&d=%d&%s&k=/%s\"%s%s alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
@@ -170,25 +173,22 @@ value image_normal_txt conf base p fname width height =
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;")
   in
   if conf.cancel_links then r
-  else
-    Printf.sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
+  else sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
 ;
 
 value image_url_txt conf base url_p url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
-  Printf.sprintf "<a href=\"%s\">" url_p ^
-  Printf.sprintf
-      "<img src=\"%s\"\nheight=%d alt=\"%s\" title=\"%s\" style=\"%s\" />"
-      url height image_txt image_txt
+  sprintf "<a href=\"%s\">" url_p ^
+    sprintf "<img src=\"%s\"\n alt=\"%s\" title=\"%s\" style=\"%s\" />"
+      url image_txt image_txt
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^
-      "</a>\n"
+    "</a>\n"
 ;
 
 value image_url_txt_with_size conf base url_p url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
-  Printf.sprintf "<a href=\"%s\">" url_p ^
-  Printf.sprintf
-      "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
+  sprintf "<a href=\"%s\">" url_p ^
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
       url width height image_txt image_txt
       (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^
@@ -199,28 +199,34 @@ value image_txt conf base p =
   match p_getenv conf.env "image" with
   [ Some "off" -> ""
   | _ ->
-      match image_and_size conf base p (limited_image_size 100 75) with
-      [ Some (True, f, Some (wid, hei)) ->
-          "<br" ^ conf.xhs ^
-           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f wid hei ^ "</td></tr></table></center>\n"
-      | Some (True, f, None) ->
-          "<br" ^ conf.xhs ^
-          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f 0 75 ^ "</td></tr></table></center>\n"
-      | Some (False, url, Some (wid, hei)) ->
-          let url_p = (commd conf) ^ (acces conf base p) in
-          "<br" ^ conf.xhs ^
-          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt_with_size conf base url_p url wid hei ^
-            "</td></tr></table></center>\n"
-      | Some (False, url, None) ->
-          let url_p = (commd conf) ^ (acces conf base p) in
-          "<br" ^ conf.xhs ^
-          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt conf base url_p url 75 ^ "</td></tr></table></center>\n"
-      | _ -> "" ]
-    ]
+      if (has_image conf base p) then
+        match image_and_size conf base p (limited_image_size 100 75) with
+        [ Some (True, f, Some (wid, hei)) ->
+            "<br" ^ conf.xhs ^
+             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
+              image_normal_txt conf base p f wid hei ^ "</td></tr></table></center>\n"
+        | Some (True, f, None) ->
+            "<br" ^ conf.xhs ^
+            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
+              image_normal_txt conf base p f 0 75 ^ "</td></tr></table></center>\n"
+        | Some (False, url, Some (wid, hei)) ->
+            let url_p = (commd conf) ^ (acces conf base p) in
+            "<br" ^ conf.xhs ^
+            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
+              image_url_txt_with_size conf base url_p url wid hei ^
+              "</td></tr></table></center>\n"
+        | Some (False, url, None) ->
+            let url_p = (commd conf) ^ (acces conf base p) in
+            let height = 75 in
+            "<br" ^ conf.xhs ^
+            (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
+            ">\n<center><table border=\"0\" style=\"height: " ^ string_of_int height ^
+            "px\"><tr align=\"left\"><td>\n" ^
+              image_url_txt conf base url_p url height ^ "</td></tr></table></center>\n"
+        | _ -> "" ]
+      else
+        ""
+  ]
 ;
 
 (* *)
@@ -315,7 +321,7 @@ value displayed_next_char s i =
           in
           loop1 (i + 1)
       | c ->
-          if Mutil.utf_8_db.val then Some (i, i + max 1 (Name.nbc c))
+          if utf_8_db.val then Some (i, i + max 1 (Name.nbc c))
           else Some (i, i + 1) ]
 ;
 
@@ -740,7 +746,7 @@ value print_table_pre conf hts =
                     match s with
                     [ None | Some "" -> "|"
                     | Some s ->
-                        Printf.sprintf
+                        sprintf
                           "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
                           s ]
                   in
@@ -886,7 +892,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
       | _ -> (0, "") ]
     in
     if bd > 0 || td <> "" then
-      Printf.sprintf "\
+      sprintf "\
 <table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s</td></tr></table>"
         bd td (indi_txt n)
     else indi_txt n
@@ -1134,7 +1140,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
               | Some s ->
                   if conf.cancel_links then "|"
                   else
-                    Printf.sprintf
+                    sprintf
                       "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s ]
             in
             let len = displayed_length s in

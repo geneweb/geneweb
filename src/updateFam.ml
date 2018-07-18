@@ -4,7 +4,9 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Hutil;
 open TemplAst;
 open Util;
 
@@ -141,7 +143,7 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
         | _ -> None ]
       in
       eval_date_var d s
-  | ["father" :: sl] -> eval_key (Gutil.father cpl) sl
+  | ["father" :: sl] -> eval_key (father cpl) sl
   | ["fsources"] -> str_val (quote_escaped fam.fsources)
   | ["is_first"] ->
       match get_env "first" env with
@@ -162,7 +164,7 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
         let k =
           match get_env "cnt" env with
           [ Vint i ->
-              let arr = Gutil.parent_array cpl in
+              let arr = parent_array cpl in
               let i = i - 1 in
               if i >= 0 && i < Array.length arr  then arr.(i)
               else if i >= 0 && i < 1 && Array.length arr = 0 then
@@ -588,7 +590,7 @@ value print_foreach print_ast eval_expr =
     | ["fevent"] -> print_foreach_fevent env fcd al fam.fevents s
     | ["fwitness"] -> print_foreach_fwitness env fcd al fam.fevents s
     | ["witness"] -> print_foreach_witness env fcd al fam.witnesses s
-    | ["parent"] -> print_foreach_parent env fcd al (Gutil.parent_array cpl) s
+    | ["parent"] -> print_foreach_parent env fcd al (parent_array cpl) s
     | _ -> raise Not_found ]
   and print_foreach_child env fcd al arr lab =
     for i = 0 to max 1 (Array.length arr) - 1 do {
@@ -658,7 +660,7 @@ value print_update_fam conf base fcd digest =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         env fcd
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_del1 conf base ifam =
@@ -692,7 +694,7 @@ value print_del1 conf base ifam =
       end;
     end;
     Wserver.printf "\n";
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -736,7 +738,7 @@ value print_inv1 conf base p ifam1 ifam2 =
       end;
     end;
     Wserver.printf "\n";
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -768,7 +770,7 @@ value print_add conf base =
      marriage_src = ""; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
      fsources = default_source conf; fam_index = bogus_family_index}
-  and cpl = Gutil.couple conf.multi_parents fath moth
+  and cpl = couple conf.multi_parents fath moth
   and des = {children = [| |]} in
   print_update_fam conf base (fam, cpl, des) digest
 ;
@@ -783,7 +785,7 @@ value print_add_parents conf base =
          divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
          fsources = default_source conf; fam_index = bogus_family_index}
       and cpl =
-        Gutil.couple conf.multi_parents
+        couple conf.multi_parents
           ("", sou base (get_surname p), 0, Update.Create Neuter None, "")
           ("", "", 0, Update.Create Neuter None, "")
       and des =
@@ -792,7 +794,7 @@ value print_add_parents conf base =
                get_occ p, Update.Link, "") |]}
       in
       print_update_fam conf base (fam, cpl, des) ""
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod conf base =
@@ -801,13 +803,13 @@ value print_mod conf base =
       let sfam = string_family_of conf base (Adef.ifam_of_int i) in
       let digest = Update.digest_family sfam in
       print_update_fam conf base sfam digest
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i -> print_del1 conf base (Adef.ifam_of_int i)
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value rec find_families ifam =
@@ -828,8 +830,8 @@ value print_inv conf base =
       [ Some (ifam1, ifam2) ->
           let p = poi base (Adef.iper_of_int ip) in
           print_inv1 conf base p ifam1 ifam2
-      | _ -> Hutil.incorrect_request conf ]
-  | _ -> Hutil.incorrect_request conf ]
+      | _ -> incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value change_order conf base ip u ifam n =
@@ -857,7 +859,7 @@ value print_change_order conf base =
         Array.iteri
           (fun i ifam ->
              let fam = foi base ifam in
-             let sp = Gutil.spouse (get_key_index p) fam in
+             let sp = spouse (get_key_index p) fam in
              let sp = poi base sp in
              tag "li" "%s"
                (if diff_arr.(i) then "style=\"background:pink\"" else "")
@@ -916,9 +918,9 @@ value print_change_order conf base =
         end;
       end;
       Wserver.printf "\n";
-      Hutil.trailer conf
+      trailer conf
     }
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_change_event_order conf base =
@@ -932,5 +934,5 @@ value print_change_event_order conf base =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         [] sfam
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;

@@ -1,5 +1,6 @@
 (* $Id: gui.ml,v 1.00 2011-12-25 15:36:35 flh Exp $ *)
 
+open Printf;
 
 type conf =
   { bases_dir : mutable string;
@@ -90,7 +91,7 @@ value channel_redirector channel callback = do {
         if List.mem `IN cond then do {
           (* On Windows, you must use Io.read *)
           let len =
-            GMain.Io.read chan ~{ buf = Bytes.to_string buf; pos = 0; len }
+            GMain.Io.read chan ~{ buf = Bytes.to_string buf ; pos = 0; len }
           in
           len >= 1 && (callback (Bytes.sub  buf 0 len))
         }
@@ -210,7 +211,7 @@ value write_base_env conf bname env =
   match try Some (open_out fname) with [ Sys_error _ -> None] with
   [ Some oc ->
       do {
-        List.iter (fun (k, v) -> Printf.fprintf oc "%s=%s\n" k v) env;
+        List.iter (fun (k, v) -> fprintf oc "%s=%s\n" k v) env;
         close_out oc
       }
   | None -> () ]
@@ -221,7 +222,7 @@ value write_config_file conf = do {
   match try Some (open_out fname) with [ Sys_error _ -> None] with
   [ Some oc ->
       do {
-        List.iter (fun (k, v) -> Printf.fprintf oc "%s=%s\n" k v) conf.gui_arg;
+        List.iter (fun (k, v) -> fprintf oc "%s=%s\n" k v) conf.gui_arg;
         close_out oc;
       }
   | None -> () ]
@@ -283,7 +284,7 @@ value close_server conf =
   match conf.server_running with
   [ Some server_pid -> do {
       clean_waiting_pids conf;
-      Printf.eprintf "Closing..."; flush stderr;
+      eprintf "Closing..."; flush stderr;
       (* Making a (empty) file STOP_SERVER to make the server stop. *)
       let stop_server =
         List.fold_left Filename.concat conf.bases_dir ["cnt"; "STOP_SERVER"]
@@ -299,7 +300,7 @@ value close_server conf =
       [ Unix.Unix_error _ _ _ -> () ];
       ignore (Unix.waitpid [] server_pid);
       conf.server_running := None;
-      Printf.eprintf "\n"; flush stderr;
+      eprintf "\n"; flush stderr;
     }
   | None -> () ]
 ;
@@ -1114,15 +1115,15 @@ and launch_server conf = do {
   try Sys.remove stop_server with [ Sys_error _ -> () ];
   let prog = Filename.concat bin_dir "gwd" in
   let args =
-    ["-hd"; bin_dir; "-bd"; conf.bases_dir; "-p"; Printf.sprintf "%d" conf.port]
+    ["-hd"; bin_dir; "-bd"; conf.bases_dir; "-p"; sprintf "%d" conf.port]
   in
   let server_pid = exec prog args gwd_log gwd_log in
   let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
   if pid = 0 then ()
   else do {
-    Printf.eprintf "Cannot launch the server:";
-    Printf.eprintf " perhaps another server is running.\n";
-    Printf.eprintf "You must close it, if you want to try again.\n";
+    eprintf "Cannot launch the server:";
+    eprintf " perhaps another server is running.\n";
+    eprintf "You must close it, if you want to try again.\n";
     flush stderr;
     exit 2;
   };
@@ -1273,8 +1274,7 @@ value launch_config () =
 (**/**) (* main *)
 
 value speclist = [("-trace", Arg.Set trace, " Trace server")];
-value anon_fun s =
-  raise (Arg.Bad (Printf.sprintf "Don't know what to do with %s" s));
+value anon_fun s = raise (Arg.Bad (sprintf "Don't know what to do with %s" s));
 value usage_msg = "Usage: gui [option]";
 
 value main () = do {
@@ -1282,7 +1282,7 @@ value main () = do {
   launch_config ();
   let () = GMain.main () in
   Sys.catch_break True;
-  Printf.eprintf "Bye\n"; flush stderr;
+  eprintf "Bye\n"; flush stderr;
 };
 
 Printexc.print main ();

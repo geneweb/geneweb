@@ -59,8 +59,8 @@ value print_someone : config -> base -> person -> unit;
 
 value update_conf : config -> config;
 
-
 IFDEF API THEN
+(* Ajout pour l'API *)
 (* Erreurs possibles :
      - "UnknownPerson"
      - "AlreadyDefined"

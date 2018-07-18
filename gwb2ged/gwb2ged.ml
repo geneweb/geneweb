@@ -3,6 +3,8 @@
 
 open Def;
 open Gwdb;
+open Mutil;
+open Printf;
 
 type charset =
   [ Ansel
@@ -103,28 +105,28 @@ value rec display_note_aux oc tagn s len i =
     }
     else decr j
   in
-  if j.val = String.length s then Printf.fprintf oc "\n"
+  if j.val = String.length s then fprintf oc "\n"
   else
     (* \n, <br>, <br \> : cut text for CONTinuate with new gedcom line *)
     let br = find_br s i in
     if i <= String.length s - String.length br &&
        String.lowercase_ascii (String.sub s i (String.length br)) = br
     then do {
-      Printf.fprintf oc "\n%d CONT " (succ tagn);
+      fprintf oc "\n%d CONT " (succ tagn);
       let i = i + String.length br in
       let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
       display_note_aux
         oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     else if s.[i] = '\n' then do {
-      Printf.fprintf oc "\n%d CONT " (succ tagn);
+      fprintf oc "\n%d CONT " (succ tagn);
       let i = if i < String.length s then i + 1 else i in
       display_note_aux
         oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     (* cut text at max length for CONCat with next gedcom line *)
     else if len = max_len then do {
-      Printf.fprintf oc "\n%d CONC " (succ tagn);
+      fprintf oc "\n%d CONC " (succ tagn);
       display_note_aux
         oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
     }
@@ -137,47 +139,47 @@ value rec display_note_aux oc tagn s len i =
 
 value display_note oc tagn s =
   do {
-    let tag = Printf.sprintf "%d NOTE " tagn in
-    Printf.fprintf oc "%s" tag;
+    let tag = sprintf "%d NOTE " tagn in
+    fprintf oc "%s" tag;
     display_note_aux oc tagn (encode s) (String.length tag) 0;
   }
 ;
 
 value ged_header base oc ifile ofile =
   do {
-    Printf.fprintf oc "0 HEAD\n";
-    Printf.fprintf oc "1 SOUR GeneWeb\n";
-    Printf.fprintf oc "2 VERS %s\n" Version.txt;
-    Printf.fprintf oc "2 NAME %s\n" (Filename.basename Sys.argv.(0));
-    Printf.fprintf oc "2 CORP INRIA\n";
-    Printf.fprintf oc "3 ADDR http://www.geneweb.org\n";
-    Printf.fprintf oc "2 DATA %s\n"
+    fprintf oc "0 HEAD\n";
+    fprintf oc "1 SOUR GeneWeb\n";
+    fprintf oc "2 VERS %s\n" Version.txt;
+    fprintf oc "2 NAME %s\n" (Filename.basename Sys.argv.(0));
+    fprintf oc "2 CORP INRIA\n";
+    fprintf oc "3 ADDR http://www.geneweb.org\n";
+    fprintf oc "2 DATA %s\n"
       (let fname = Filename.basename ifile in
        if Filename.check_suffix fname ".gwb" then fname else fname ^ ".gwb");
     try
       let tm = Unix.localtime (Unix.time ()) in
       let mon = ged_month Dgregorian (tm.Unix.tm_mon + 1) in
       do {
-        Printf.fprintf oc "1 DATE %02d %s %d\n" tm.Unix.tm_mday mon
+        fprintf oc "1 DATE %02d %s %d\n" tm.Unix.tm_mday mon
           (1900 + tm.Unix.tm_year);
-        Printf.fprintf oc "2 TIME %02d:%02d:%02d\n" tm.Unix.tm_hour
+        fprintf oc "2 TIME %02d:%02d:%02d\n" tm.Unix.tm_hour
           tm.Unix.tm_min tm.Unix.tm_sec;
       }
     with _ ->
       ();
     if ofile <> "" then
-      Printf.fprintf oc "1 FILE %s\n" (Filename.basename ofile)
+      fprintf oc "1 FILE %s\n" (Filename.basename ofile)
     else ();
-    Printf.fprintf oc "1 GEDC\n";
+    fprintf oc "1 GEDC\n";
     match charset.val with
-    [ Ansel | Ansi | Ascii -> Printf.fprintf oc "2 VERS 5.5\n"
-    | Utf8 -> Printf.fprintf oc "2 VERS 5.5.1\n" ];
-    Printf.fprintf oc "2 FORM LINEAGE-LINKED\n";
+    [ Ansel | Ansi | Ascii -> fprintf oc "2 VERS 5.5\n"
+    | Utf8 -> fprintf oc "2 VERS 5.5.1\n" ];
+    fprintf oc "2 FORM LINEAGE-LINKED\n";
     match charset.val with
-    [ Ansel -> Printf.fprintf oc "1 CHAR ANSEL\n"
-    | Ansi -> Printf.fprintf oc "1 CHAR ANSI\n"
-    | Ascii -> Printf.fprintf oc "1 CHAR ASCII\n"
-    | Utf8 -> Printf.fprintf oc "1 CHAR UTF-8\n" ];
+    [ Ansel -> fprintf oc "1 CHAR ANSEL\n"
+    | Ansi -> fprintf oc "1 CHAR ANSI\n"
+    | Ascii -> fprintf oc "1 CHAR ASCII\n"
+    | Utf8 -> fprintf oc "1 CHAR UTF-8\n" ];
     if no_notes.val then ()
     else
       let s = base_notes_read base "" in
@@ -216,74 +218,72 @@ value string_of_list =
 
 value ged_name base oc per =
   do {
-    Printf.fprintf oc "1 NAME %s /%s/\n"
+    fprintf oc "1 NAME %s /%s/\n"
       (encode (Mutil.nominative (ged_1st_name base per)))
       (encode (Mutil.nominative (sou base (get_surname per))));
     let n = sou base (get_public_name per) in
-    if n <> "" then Printf.fprintf oc "2 GIVN %s\n" (encode n) else ();
+    if n <> "" then fprintf oc "2 GIVN %s\n" (encode n) else ();
     match get_qualifiers per with
-    [ [nn :: _] -> Printf.fprintf oc "2 NICK %s\n" (encode (sou base nn))
+    [ [nn :: _] -> fprintf oc "2 NICK %s\n" (encode (sou base nn))
     | [] -> () ];
     match get_surnames_aliases per with
     [ [] -> ()
     | list ->
         let list = List.map (fun n -> encode (sou base n)) list in
-        Printf.fprintf oc "2 SURN %s\n" (string_of_list list) ];
-    List.iter (fun s -> Printf.fprintf oc "1 NAME %s\n" (encode (sou base s)))
+        fprintf oc "2 SURN %s\n" (string_of_list list) ];
+    List.iter (fun s -> fprintf oc "1 NAME %s\n" (encode (sou base s)))
       (get_aliases per);
   }
 ;
 
 value ged_sex base oc per =
   match get_sex per with
-  [ Male -> Printf.fprintf oc "1 SEX M\n"
-  | Female -> Printf.fprintf oc "1 SEX F\n"
+  [ Male -> fprintf oc "1 SEX M\n"
+  | Female -> fprintf oc "1 SEX F\n"
   | Neuter -> () ]
 ;
 
 value ged_calendar oc =
   fun
   [ Dgregorian -> ()
-  | Djulian -> Printf.fprintf oc "@#DJULIAN@ "
-  | Dfrench -> Printf.fprintf oc "@#DFRENCH R@ "
-  | Dhebrew -> Printf.fprintf oc "@#DHEBREW@ " ]
+  | Djulian -> fprintf oc "@#DJULIAN@ "
+  | Dfrench -> fprintf oc "@#DFRENCH R@ "
+  | Dhebrew -> fprintf oc "@#DHEBREW@ " ]
 ;
 
 value ged_date_dmy oc dt cal =
   do {
     match dt.prec with
     [ Sure -> ()
-    | About -> Printf.fprintf oc "ABT "
-    | Maybe -> Printf.fprintf oc "EST "
-    | Before -> Printf.fprintf oc "BEF "
-    | After -> Printf.fprintf oc "AFT "
-    | OrYear i -> Printf.fprintf oc "BET "
-    | YearInt i -> Printf.fprintf oc "BET " ];
+    | About -> fprintf oc "ABT "
+    | Maybe -> fprintf oc "EST "
+    | Before -> fprintf oc "BEF "
+    | After -> fprintf oc "AFT "
+    | OrYear i -> fprintf oc "BET "
+    | YearInt i -> fprintf oc "BET " ];
     ged_calendar oc cal;
-    if dt.day <> 0 then Printf.fprintf oc "%02d " dt.day else ();
-    if dt.month <> 0 then Printf.fprintf oc "%s " (ged_month cal dt.month)
+    if dt.day <> 0 then fprintf oc "%02d " dt.day else ();
+    if dt.month <> 0 then fprintf oc "%s " (ged_month cal dt.month)
     else ();
-    Printf.fprintf oc "%d" dt.year;
+    fprintf oc "%d" dt.year;
     match dt.prec with
     [ OrYear dmy2 ->
         do {
-          Printf.fprintf oc " AND ";
+          fprintf oc " AND ";
           ged_calendar oc cal;
-          if dmy2.day2 <> 0 then Printf.fprintf oc "%02d " dmy2.day2 else ();
-          if dmy2.month2 <> 0 then
-            Printf.fprintf oc "%s " (ged_month cal dmy2.month2)
+          if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
+          if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
           else ();
-          Printf.fprintf oc "%d" dmy2.year2;
+          fprintf oc "%d" dmy2.year2;
         }
     | YearInt dmy2 ->
         do {
-          Printf.fprintf oc " AND ";
+          fprintf oc " AND ";
           ged_calendar oc cal;
-          if dmy2.day2 <> 0 then Printf.fprintf oc "%02d " dmy2.day2 else ();
-          if dmy2.month2 <> 0 then
-            Printf.fprintf oc "%s " (ged_month cal dmy2.month2)
+          if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
+          if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
           else ();
-          Printf.fprintf oc "%d" dmy2.year2;
+          fprintf oc "%d" dmy2.year2;
         }
     | _ -> () ];
   }
@@ -298,27 +298,27 @@ value ged_date oc =
       ged_date_dmy oc (Calendar.french_of_gregorian d) Dfrench
   | Dgreg d Dhebrew ->
       ged_date_dmy oc (Calendar.hebrew_of_gregorian d) Dhebrew
-  | Dtext t -> Printf.fprintf oc "(%s)" t ]
+  | Dtext t -> fprintf oc "(%s)" t ]
 ;
 
 value ged_ev_detail oc n typ d pl note src =
   do {
     match (typ, d, pl, note, src) with
-    [ ("", None, "", "", "") -> Printf.fprintf oc " Y"
+    [ ("", None, "", "", "") -> fprintf oc " Y"
     | _ -> () ];
-    Printf.fprintf oc "\n";
-    if typ = "" then () else Printf.fprintf oc "%d TYPE %s\n" n typ;
+    fprintf oc "\n";
+    if typ = "" then () else fprintf oc "%d TYPE %s\n" n typ;
     match d with
     [ Some d ->
         do {
-          Printf.fprintf oc "%d DATE " n;
+          fprintf oc "%d DATE " n;
           ged_date oc d;
-          Printf.fprintf oc "\n";
+          fprintf oc "\n";
         }
     | None -> () ];
-    if pl <> "" then Printf.fprintf oc "%d PLAC %s\n" n (encode pl) else ();
+    if pl <> "" then fprintf oc "%d PLAC %s\n" n (encode pl) else ();
     if note <> "" then display_note oc n note else ();
-    if src <> "" then Printf.fprintf oc "%d SOUR %s\n" n (encode src) else ();
+    if src <> "" then fprintf oc "%d SOUR %s\n" n (encode src) else ();
   }
 ;
 
@@ -396,11 +396,11 @@ value ged_pevent base oc per per_sel evt =
     let typ =
       if is_primary_pevents evt.epers_name then do {
         let tag = ged_tag_pevent base evt in
-        Printf.fprintf oc "1 %s" tag;
+        fprintf oc "1 %s" tag;
         ""
       }
       else do {
-        Printf.fprintf oc "1 EVEN";
+        fprintf oc "1 EVEN";
         ged_tag_pevent base evt
       }
     in
@@ -412,12 +412,12 @@ value ged_pevent base oc per per_sel evt =
     Array.iter
       (fun (ip, wk) ->
          if per_sel ip then do {
-           Printf.fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
-           Printf.fprintf oc "3 TYPE INDI\n";
+           fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+           fprintf oc "3 TYPE INDI\n";
            match wk with
-           [ Witness -> Printf.fprintf oc "3 RELA witness\n"
-           | Witness_GodParent -> Printf.fprintf oc "3 RELA GODP\n"
-           | Witness_Officer   -> Printf.fprintf oc "3 RELA officer\n" ]
+           [ Witness -> fprintf oc "3 RELA witness\n"
+           | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
+           | Witness_Officer   -> fprintf oc "3 RELA officer\n" ]
          }
          else ())
       evt.epers_witnesses
@@ -436,30 +436,30 @@ value ged_adoption base (per_sel, fam_sel) oc per r =
     | _ -> True ]
   in
   if sel then do {
-    Printf.fprintf oc "1 ADOP Y\n";
+    fprintf oc "1 ADOP Y\n";
     adop_fam_list.val :=
       [(r.r_fath, r.r_moth, get_key_index per) :: adop_fam_list.val];
     incr adop_fam_cnt;
-    Printf.fprintf oc "2 FAMC @F%d@\n" (nb_of_families base + adop_fam_cnt.val);
-    Printf.fprintf oc "3 ADOP ";
+    fprintf oc "2 FAMC @F%d@\n" (nb_of_families base + adop_fam_cnt.val);
+    fprintf oc "3 ADOP ";
     match (r.r_fath, r.r_moth) with
-    [ (Some _, None) -> Printf.fprintf oc "HUSB"
-    | (None, Some _) -> Printf.fprintf oc "WIFE"
-    | (Some _, Some _) -> Printf.fprintf oc "BOTH"
+    [ (Some _, None) -> fprintf oc "HUSB"
+    | (None, Some _) -> fprintf oc "WIFE"
+    | (Some _, Some _) -> fprintf oc "BOTH"
     | _ -> () ];
-    Printf.fprintf oc "\n";
+    fprintf oc "\n";
   }
   else ()
 ;
 
 value ged_fam_adop base oc i (fath, moth, child) =
   do {
-    Printf.fprintf oc "0 @F%d@ FAM\n" i;
+    fprintf oc "0 @F%d@ FAM\n" i;
     match fath with
-    [ Some i -> Printf.fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper i + 1)
+    [ Some i -> fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper i + 1)
     | _ -> () ];
     match moth with
-    [ Some i -> Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper i + 1)
+    [ Some i -> fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper i + 1)
     | _ -> () ];
   }
 ;
@@ -470,42 +470,41 @@ value ged_ind_ev_str base sel oc per per_sel =
 
 value ged_title base oc per tit =
   do {
-    Printf.fprintf oc "1 TITL ";
-    Printf.fprintf oc "%s" (encode (sou base tit.t_ident));
+    fprintf oc "1 TITL ";
+    fprintf oc "%s" (encode (sou base tit.t_ident));
     match sou base tit.t_place with
     [ "" -> ()
-    | pl -> Printf.fprintf oc ", %s" (encode pl) ];
-    if tit.t_nth <> 0 then Printf.fprintf oc ", %d" tit.t_nth else ();
-    Printf.fprintf oc "\n";
+    | pl -> fprintf oc ", %s" (encode pl) ];
+    if tit.t_nth <> 0 then fprintf oc ", %d" tit.t_nth else ();
+    fprintf oc "\n";
     match
       (Adef.od_of_codate tit.t_date_start, Adef.od_of_codate tit.t_date_end)
     with
     [ (None, None) -> ()
     | (Some sd, None) ->
         do {
-          Printf.fprintf oc "2 DATE FROM ";
+          fprintf oc "2 DATE FROM ";
           ged_date oc sd;
-          Printf.fprintf oc "\n";
+          fprintf oc "\n";
         }
     | (None, Some sd) ->
         do {
-          Printf.fprintf oc "2 DATE TO ";
+          fprintf oc "2 DATE TO ";
           ged_date oc sd;
-          Printf.fprintf oc "\n";
+          fprintf oc "\n";
         }
     | (Some sd1, Some sd2) ->
         do {
-          Printf.fprintf oc "2 DATE FROM ";
+          fprintf oc "2 DATE FROM ";
           ged_date oc sd1;
-          Printf.fprintf oc " TO ";
+          fprintf oc " TO ";
           ged_date oc sd2;
-          Printf.fprintf oc "\n";
+          fprintf oc "\n";
         } ];
     match tit.t_name with
     [ Tmain ->
-        Printf.fprintf oc
-          "2 NOTE %s\n" (encode (sou base (get_public_name per)))
-    | Tname n -> Printf.fprintf oc "2 NOTE %s\n" (encode (sou base n))
+        fprintf oc "2 NOTE %s\n" (encode (sou base (get_public_name per)))
+    | Tname n -> fprintf oc "2 NOTE %s\n" (encode (sou base n))
     | Tnone -> () ];
   }
 ;
@@ -514,7 +513,7 @@ value ged_ind_attr_str base oc per =
   do {
     match sou base (get_occupation per) with
     [ "" -> ()
-    | occu -> Printf.fprintf oc "1 OCCU %s\n" (encode occu) ];
+    | occu -> fprintf oc "1 OCCU %s\n" (encode occu) ];
     List.iter (ged_title base oc per) (get_titles per);
   }
 ;
@@ -523,14 +522,14 @@ value ged_famc base (per_sel, fam_sel) oc asc =
   match get_parents asc with
   [ Some ifam ->
       if fam_sel ifam then
-        Printf.fprintf oc "1 FAMC @F%d@\n" (Adef.int_of_ifam ifam + 1)
+        fprintf oc "1 FAMC @F%d@\n" (Adef.int_of_ifam ifam + 1)
       else ()
   | None -> () ]
 ;
 
 value ged_fams base (per_sel, fam_sel) oc ifam =
   if fam_sel ifam then
-    Printf.fprintf oc "1 FAMS @F%d@\n" (Adef.int_of_ifam ifam + 1)
+    fprintf oc "1 FAMS @F%d@\n" (Adef.int_of_ifam ifam + 1)
   else ()
 ;
 
@@ -538,9 +537,9 @@ value ged_godparent per_sel oc godp =
   fun
   [ Some ip ->
       if per_sel ip then do {
-        Printf.fprintf oc "1 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
-        Printf.fprintf oc "2 TYPE INDI\n";
-        Printf.fprintf oc "2 RELA %s\n" godp;
+        fprintf oc "1 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+        fprintf oc "2 TYPE INDI\n";
+        fprintf oc "2 RELA %s\n" godp;
       }
       else ()
   | None -> () ]
@@ -548,9 +547,9 @@ value ged_godparent per_sel oc godp =
 
 value ged_witness fam_sel oc ifam =
   if fam_sel ifam then do {
-    Printf.fprintf oc "1 ASSO @F%d@\n" (Adef.int_of_ifam ifam + 1);
-    Printf.fprintf oc "2 TYPE FAM\n";
-    Printf.fprintf oc "2 RELA witness\n";
+    fprintf oc "1 ASSO @F%d@\n" (Adef.int_of_ifam ifam + 1);
+    fprintf oc "2 TYPE FAM\n";
+    fprintf oc "2 RELA witness\n";
   }
   else ()
 ;
@@ -572,7 +571,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
            List.iter
              (fun ifam ->
                 let fam = foi base ifam in
-                if Array.mem (get_key_index per) (get_witnesses fam) then
+                if array_mem (get_key_index per) (get_witnesses fam) then
                   ged_witness fam_sel oc ifam
                 else ())
              (Array.to_list (get_family c))
@@ -584,7 +583,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
 value ged_psource base oc per =
   match sou base (get_psources per) with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" (encode s) ]
+  | s -> fprintf oc "1 SOUR %s\n" (encode s) ]
 ;
 
 value img_base_path = ref "";
@@ -604,15 +603,12 @@ value ged_multimedia_link base oc per =
       if not no_picture.val && picture_path.val then
         match has_image_file base per with
         [ Some s ->
-            do {
-              Printf.fprintf oc "1 OBJE\n";
-              Printf.fprintf oc "2 FILE %s\n" s;
-            }
+            do {fprintf oc "1 OBJE\n"; fprintf oc "2 FILE %s\n" s;}
         | None -> () ]
       else ()
   | s ->
       if not no_picture.val then
-        do {Printf.fprintf oc "1 OBJE\n"; Printf.fprintf oc "2 FILE %s\n" s;}
+        do {fprintf oc "1 OBJE\n"; fprintf oc "2 FILE %s\n" s;}
       else () ]
 ;
 
@@ -631,7 +627,7 @@ value ged_marriage base oc fam =
   (*[ (None, "", Married | Engaged) -> ()*)
   [ (d, pl, _) ->
       do {
-        Printf.fprintf oc "1 %s"
+        fprintf oc "1 %s"
           (if get_relation fam = Engaged then "ENGA" else "MARR");
         let typ =
           if get_relation fam = NoSexesCheckNotMarried
@@ -642,7 +638,7 @@ value ged_marriage base oc fam =
         let src = sou base (get_marriage_src fam) in
         ged_ev_detail oc 2 typ d pl note src;
         if get_relation fam = NotMarried then
-          Printf.fprintf oc "2 PLAC unmarried\n"
+          fprintf oc "2 PLAC unmarried\n"
         else ();
       } ]
 ;
@@ -653,7 +649,7 @@ value ged_divorce base oc fam =
   | Separated -> ()
   | Divorced cd ->
       let d = Adef.od_of_codate cd in
-      do { Printf.fprintf oc "1 DIV"; ged_ev_detail oc 2 "" d "" "" ""; } ]
+      do { fprintf oc "1 DIV"; ged_ev_detail oc 2 "" d "" "" ""; } ]
 ;
 
 value ged_tag_fevent base evt =
@@ -686,11 +682,11 @@ value ged_fevent base oc ifam fam_sel evt =
     let typ =
       if is_primary_fevents evt.efam_name then do {
         let tag = ged_tag_fevent base evt in
-        Printf.fprintf oc "1 %s" tag;
+        fprintf oc "1 %s" tag;
         ""
       }
       else do {
-        Printf.fprintf oc "1 EVEN";
+        fprintf oc "1 EVEN";
         ged_tag_fevent base evt
       }
     in
@@ -702,12 +698,12 @@ value ged_fevent base oc ifam fam_sel evt =
     Array.iter
       (fun (ip, wk) ->
          if fam_sel ifam then do {
-           Printf.fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
-           Printf.fprintf oc "3 TYPE INDI\n";
+           fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+           fprintf oc "3 TYPE INDI\n";
            match wk with
-           [ Witness -> Printf.fprintf oc "3 RELA witness\n"
-           | Witness_GodParent -> Printf.fprintf oc "3 RELA GODP\n"
-           | Witness_Officer   -> Printf.fprintf oc "3 RELA officer\n" ]
+           [ Witness -> fprintf oc "3 RELA witness\n"
+           | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
+           | Witness_Officer   -> fprintf oc "3 RELA officer\n" ]
          }
          else ())
       evt.efam_witnesses
@@ -716,14 +712,14 @@ value ged_fevent base oc ifam fam_sel evt =
 
 value ged_child base (per_sel, fam_sel) oc chil =
   if per_sel chil then
-    Printf.fprintf oc "1 CHIL @I%d@\n" (Adef.int_of_iper chil + 1)
+    fprintf oc "1 CHIL @I%d@\n" (Adef.int_of_iper chil + 1)
   else ()
 ;
 
 value ged_fsource base oc fam =
   match sou base (get_fsources fam) with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" (encode s) ]
+  | s -> fprintf oc "1 SOUR %s\n" (encode s) ]
 ;
 
 value ged_comment base oc fam =
@@ -748,7 +744,7 @@ value has_personal_infos base per =
 value ged_ind_record base ((per_sel, fam_sel) as sel) oc i =
   let per = poi base (Adef.iper_of_int i) in
   if has_personal_infos base per then do {
-    Printf.fprintf oc "0 @I%d@ INDI\n" (i + 1);
+    fprintf oc "0 @I%d@ INDI\n" (i + 1);
     ged_name base oc per;
     ged_sex base oc per;
     ged_ind_ev_str base sel oc per per_sel;
@@ -768,17 +764,17 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
   let fam = foi base ifam in
   if is_deleted_family fam then ()
   else do {
-    Printf.fprintf oc "0 @F%d@ FAM\n" (i + 1);
+    fprintf oc "0 @F%d@ FAM\n" (i + 1);
     List.iter (ged_fevent base oc ifam fam_sel) (get_fevents fam);
     if has_personal_infos base (poi base (get_father fam)) &&
        per_sel (get_father fam)
     then
-      Printf.fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (get_father fam) + 1)
+      fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (get_father fam) + 1)
     else ();
     if has_personal_infos base (poi base (get_mother fam)) &&
        per_sel (get_mother fam)
     then
-      Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother fam) + 1)
+      fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother fam) + 1)
     else ();
     Array.iter (ged_child base sel oc) (get_children fam);
     ged_fsource base oc fam;
@@ -790,7 +786,7 @@ value find_person base p1 po p2 =
   match person_of_key base p1 p2 po with
   [ Some ip -> ip
   | None -> do {
-      Printf.printf "Not found: %s%s %s\n" p1
+      printf "Not found: %s%s %s\n" p1
         (if po = 0 then "" else " " ^ string_of_int po) p2;
       flush stdout;
       exit 2
@@ -853,7 +849,7 @@ value gwb2ged base ifile ofile anc desc mem =
         (fun adop i -> do { ged_fam_adop base oc i adop; i + 1 })
         adop_fam_list.val (nb_of_families base + 1)
     in
-    Printf.fprintf oc "0 TRLR\n";
+    fprintf oc "0 TRLR\n";
     flush oc;
     if ofile = "" then () else close_out oc;
   }
@@ -964,8 +960,8 @@ value main () =
     let anc =
       if anc_1st.val <> "" then
         if anc_2nd.val = "" then do {
-          Printf.printf "Misused option -a\n";
-          Printf.printf "Use option -help for usage\n";
+          printf "Misused option -a\n";
+          printf "Use option -help for usage\n";
           flush stdout;
           exit 2
         }
@@ -975,8 +971,8 @@ value main () =
     let desc =
       if desc_1st.val <> "" then
         if desc_2nd.val = "" then do {
-          Printf.printf "Misused option -d\n";
-          Printf.printf "Use option -help for usage\n";
+          printf "Misused option -d\n";
+          printf "Use option -help for usage\n";
           flush stdout;
           exit 2
         }
@@ -985,8 +981,8 @@ value main () =
     in
     if ofile.val = "-" then ofile.val := "" else ();
     if ifile.val = "" then do {
-      Printf.printf "Missing base name\n";
-      Printf.printf "Use option -help for usage\n";
+      printf "Missing base name\n";
+      printf "Use option -help for usage\n";
       flush stdout;
       exit 2
     }
@@ -997,7 +993,7 @@ value main () =
     [ Some base -> gwb2ged base ifile.val ofile.val anc desc mem.val
     | None ->
         do {
-          Printf.printf "Can't open base %s\n" ifile.val; flush stdout; exit 2
+          printf "Can't open base %s\n" ifile.val; flush stdout; exit 2
         } ];
   }
 ;

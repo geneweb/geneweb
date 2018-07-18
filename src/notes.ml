@@ -3,7 +3,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
+open Gutil;
 open Gwdb;
+open Hutil;
+open Mutil;
 open Util;
 
 value file_path conf base fname =
@@ -63,7 +66,7 @@ value print_search_form conf from_note =
 ;
 
 value print_whole_notes conf base fnotes title s ho = do {
-  Hutil.header_no_page_title conf
+  header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
@@ -73,7 +76,7 @@ value print_whole_notes conf base fnotes title s ho = do {
       end
     else ()
   in
-  Hutil.gen_print_link_to_welcome what_links_page conf True;
+  gen_print_link_to_welcome what_links_page conf True;
   Wserver.printf "<div class=\"d-flex justify-content-between\">\n";
   if title <> "" then
     let title =
@@ -108,14 +111,14 @@ value print_whole_notes conf base fnotes title s ho = do {
   match ho with
   [ Some _ -> print_search_form conf (Some fnotes)
   | None -> () ];
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_notes_part conf base fnotes title s cnt0 =
   do {
-    Hutil.header_no_page_title conf
+    header_no_page_title conf
       (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
-    Hutil.print_link_to_welcome conf True;
+    print_link_to_welcome conf True;
     match Util.open_etc_file "summary" with
     [ Some ic -> Templ.copy_from_templ conf [] ic
     | None -> () ];
@@ -135,7 +138,7 @@ value print_notes_part conf base fnotes title s cnt0 =
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -220,13 +223,13 @@ value notes_links_db conf base eliminate_unlinked = do {
          match pg with
          [ NotesLinks.PgInd _ | NotesLinks.PgFam _ | NotesLinks.PgNotes |
            NotesLinks.PgWizard _ ->
-             List.fold_left (fun set s -> Mutil.StrSet.add s set) set sl
+             List.fold_left (fun set s -> StrSet.add s set) set sl
          | NotesLinks.PgMisc s ->
              do { Hashtbl.add misc s sl; set } ])
-      Mutil.StrSet.empty db
+      StrSet.empty db
   in
   let mark = Hashtbl.create 1 in
-  loop (Mutil.StrSet.elements set) where rec loop =
+  loop (StrSet.elements set) where rec loop =
     fun
     [ [s :: sl] ->
         if Hashtbl.mem mark s then loop sl
@@ -247,8 +250,7 @@ value notes_links_db conf base eliminate_unlinked = do {
     else db2
   in
   List.sort
-    (fun (s1, _) (s2, _) ->
-      Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
+    (fun (s1, _) (s2, _) -> alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 };
 
@@ -436,7 +438,7 @@ value commit_notes conf base fnotes s =  do {
   in
   Mutil.mkdir_p (Filename.dirname fpath);
   try Gwdb.commit_notes base fname s with
-  [ Sys_error _ -> do { Hutil.incorrect_request conf; raise Update.ModErr } ];
+  [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
   History.record conf base (Def.U_Notes (p_getint conf.env "v") fnotes) "mn";
   update_notes_links_db conf pg s;
 };
@@ -477,7 +479,7 @@ value begin_text_without_html_tags lim s =
       loop i size len
     else if s.[i] = '=' then loop (i + 1) size len
     else
-      let nbc = if Mutil.utf_8_db.val then Name.nbc s.[i] else i + 1 in
+      let nbc = if utf_8_db.val then Name.nbc s.[i] else i + 1 in
       loop (i + nbc) (size + 1) (Buff.mstore len (String.sub s i nbc))
 ;
 
@@ -522,7 +524,7 @@ value print_misc_notes conf base =
       db []
   in
   do {
-    Hutil.header_link_welcome conf title;
+    header_link_welcome conf title;
     if db <> [] then
       tag "ul" begin
         if d <> "" then
@@ -578,7 +580,7 @@ value print_misc_notes conf base =
       end
     else ();
     if d = "" then print_search_form conf None else ();
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 

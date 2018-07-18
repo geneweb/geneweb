@@ -4,7 +4,11 @@
 
 open Config;
 open Def;
+open Futil;
+open Gutil;
 open Gwdb;
+open Hutil;
+open Mutil;
 open Util;
 
 (* Liste des string dont on a supprimé un caractère.       *)
@@ -223,8 +227,7 @@ value rec reconstitute_pevents conf ext cnt =
       in
       let epers_note =
         match get_nth conf "e_note" cnt with
-        [ Some note ->
-            only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
+        [ Some note -> Util.sanitize_html (only_printable_or_nl (strip_all_trailing_spaces note))
         | _ -> "" ]
       in
       let epers_src =
@@ -599,8 +602,7 @@ value reconstitute_person conf =
   let ext = False in
   let key_index =
     match p_getenv conf.env "i" with
-    [ Some s ->
-        try int_of_string (Gutil.strip_spaces s) with [ Failure _ -> -1 ]
+    [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
     | _ -> -1 ]
   in
   let first_name = no_html_tags (only_printable (get conf "first_name")) in
@@ -619,8 +621,7 @@ value reconstitute_person conf =
     else (first_name, surname)
   in
   let occ =
-    try int_of_string (Gutil.strip_spaces (get conf "occ"))
-    with [ Failure _ -> 0 ]
+    try int_of_string (strip_spaces (get conf "occ")) with [ Failure _ -> 0 ]
   in
   let image = only_printable (get conf "image") in
   let (first_names_aliases, ext) =
@@ -652,28 +653,24 @@ value reconstitute_person conf =
   let birth = Update.reconstitute_date conf "birth" in
   let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
   let birth_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "birth_note"))
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "birth_note"))
   in
   let birth_src = only_printable (get conf "birth_src") in
   let bapt = Update.reconstitute_date conf "bapt" in
   let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
   let bapt_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "bapt_note"))
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "bapt_note"))
   in
   let bapt_src = only_printable (get conf "bapt_src") in
   let burial_place = no_html_tags (only_printable (get conf "burial_place")) in
   let burial_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "burial_note"))
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "burial_note"))
   in
   let burial_src = only_printable (get conf "burial_src") in
   let burial = reconstitute_burial conf burial_place in
   let death_place = no_html_tags (only_printable (get conf "death_place")) in
   let death_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "death_note"))
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "death_note"))
   in
   let death_src = only_printable (get conf "death_src") in
   let death =
@@ -694,7 +691,7 @@ value reconstitute_person conf =
   let notes =
     if first_name = "?" || surname = "?" then ""
     else
-      only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "notes"))
+      Util.sanitize_html (only_printable_or_nl (strip_all_trailing_spaces (get conf "notes")))
   in
   let psources = only_printable (get conf "src") in
   (* Mise à jour des évènements principaux. *)
@@ -780,10 +777,10 @@ value error_person conf base p err = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -844,7 +841,7 @@ value print_conflict conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
@@ -878,7 +875,7 @@ value print_conflict conf base p = do {
       (capitale (transl conf "back"));
   end;
   Update.print_same_name conf base p;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -893,7 +890,7 @@ value print_cannot_change_sex conf base p = do {
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
+  rheader conf title;
   Update.print_error conf base (BadSexOfMarriedPerson p);
   tag "ul" begin
     html_li conf;
@@ -901,7 +898,7 @@ value print_cannot_change_sex conf base p = do {
     Wserver.printf "\n";
   end;
   Update.print_return conf;
-  Hutil.trailer conf;
+  trailer conf;
   raise Update.ModErr
 };
 
@@ -967,7 +964,7 @@ value pwitnesses_of pevents =
 value is_witness_at_marriage base ip p =
   let u = poi base ip in
   List.exists
-    (fun ifam -> let fam = foi base ifam in Array.mem ip (get_witnesses fam))
+    (fun ifam -> let fam = foi base ifam in array_mem ip (get_witnesses fam))
     (Array.to_list (get_family u))
 ;
 
@@ -980,13 +977,13 @@ value effective_mod conf base sp = do {
   let oocc = get_occ op in
   if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
   else do {
-    let ipl = Gutil.person_ht_find_all base key in
+    let ipl = person_ht_find_all base key in
     check_conflict conf base sp ipl;
     rename_image_file conf base op sp;
   };
   let same_fn_sn =
-    Name.lower (Mutil.nominative sp.first_name) = Name.lower ofn &&
-    Name.lower (Mutil.nominative sp.surname) = Name.lower osn
+    Name.lower (nominative sp.first_name) = Name.lower ofn &&
+    Name.lower (nominative sp.surname) = Name.lower osn
   in
   if sp.first_name <> "?" && sp.surname <> "?" &&
      (not same_fn_sn || oocc <> sp.occ)
@@ -1007,7 +1004,7 @@ value effective_mod conf base sp = do {
   check_sex_married conf base sp op;
   let created_p = ref [] in
   let np =
-    Futil.map_person_ps (Update.insert_person conf base sp.psources created_p)
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
       (Gwdb.insert_string base) sp
   in
   let op_misc_names = person_misc_names base op get_titles in
@@ -1015,8 +1012,7 @@ value effective_mod conf base sp = do {
   let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
   List.iter
     (fun key ->
-      if List.mem key op_misc_names then ()
-      else Gutil.person_ht_add base key pi)
+       if List.mem key op_misc_names then () else person_ht_add base key pi)
     np_misc_names;
   let ol_rparents = rparents_of (get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
@@ -1034,17 +1030,17 @@ value effective_add conf base sp = do {
   let fn = Util.translate_eval sp.first_name in
   let sn = Util.translate_eval sp.surname in
   let key = fn ^ " " ^ sn in
-  let ipl = Gutil.person_ht_find_all base key in
+  let ipl = person_ht_find_all base key in
   check_conflict conf base sp ipl;
   patch_key base pi fn sn sp.occ;
-  Gutil.person_ht_add base key pi;
+  person_ht_add base key pi;
   patch_cache_info conf Util.cache_nb_base_persons
     (fun v ->
       let v = int_of_string v + 1 in
       string_of_int v);
   let created_p = ref [] in
   let np =
-    Futil.map_person_ps (Update.insert_person conf base sp.psources created_p)
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
       (Gwdb.insert_string base) {(sp) with key_index = pi}
   in
   patch_person base pi np;
@@ -1053,7 +1049,7 @@ value effective_add conf base sp = do {
   let nu = {family = [| |]} in
   patch_union base pi nu;
   let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
-  List.iter (fun key -> Gutil.person_ht_add base key pi) np_misc_names;
+  List.iter (fun key -> person_ht_add base key pi) np_misc_names;
   (np, na)
 };
 
@@ -1198,8 +1194,8 @@ value print_mod_ok conf base wl pgl p ofn osn oocc=
     Wserver.printf "%s" (capitale (transl conf "person modified"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
@@ -1256,7 +1252,7 @@ value print_mod_ok conf base wl pgl p ofn osn oocc=
       Wserver.printf "<span>%s%s</span>"
         (capitale (transl conf "linked pages")) (transl conf ":");
       Notes.print_linked_list conf base pgl;    } else ();
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -1315,8 +1311,8 @@ value all_checks_person conf base p a u = do {
 value print_add_ok conf base wl p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "person added")) in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
@@ -1332,7 +1328,7 @@ value print_add_ok conf base wl p =
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.printf "\n";
     Update.print_warnings conf base wl;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -1348,10 +1344,10 @@ value print_del_ok conf base wl =
     Wserver.printf "%s" (capitale (transl conf "person deleted"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf False;
+    header conf title;
+    print_link_to_welcome conf False;
     Update.print_warnings conf base wl;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -1360,13 +1356,13 @@ value print_change_event_order_ok conf base wl p =
     Wserver.printf "%s" (capitale (transl conf "person modified"))
   in
   do {
-    Hutil.header conf title;
-    Hutil.print_link_to_welcome conf True;
+    header conf title;
+    print_link_to_welcome conf True;
     Update.print_warnings conf base wl;
     Wserver.printf "\n%s"
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.printf "\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -1430,7 +1426,7 @@ value print_del conf base =
       History.record conf base changed "dp";
       print_del_ok conf base [];
     }
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_aux conf base callback =
@@ -1505,8 +1501,8 @@ value print_mod o_conf base =
     in
     Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
     if not (eq_istr (get_surname op) p.surname) ||
-       not (Futil.eq_lists eq_istr (get_surnames_aliases op) p.surnames_aliases) ||
-       not (Futil.eq_lists (Futil.eq_titles eq_istr) (get_titles op) p.titles)
+       not (eq_lists eq_istr (get_surnames_aliases op) p.surnames_aliases) ||
+       not (eq_lists (eq_titles eq_istr) (get_titles op) p.titles)
     then
       Update.update_misc_names_of_family base p.sex u
     else ();
@@ -1573,5 +1569,5 @@ value print_change_event_order conf base =
       }
     with
     [ Update.ModErr -> () ]
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;

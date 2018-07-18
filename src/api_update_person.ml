@@ -11,13 +11,7 @@ open Def
 open Util
 open Api_def
 open Api_util
-
-
-
-(* Liste des string dont on a supprimé un caractère.       *)
-(* Utilisé pour le message d'erreur lors de la validation. *)
-let removed_string = ref [] ;;
-
+open Api_update_util
 
 let reconstitute_person conf base mod_p =
   let key_index = Int32.to_int mod_p.Mwrite.Person.index in
@@ -151,86 +145,10 @@ let reconstitute_person conf base mod_p =
               | `rpt_god_parent_father | `rpt_god_parent_mother -> GodParent
               | `rpt_foster_parent_father | `rpt_foster_parent_mother -> FosterParent
             in
-            let create_link = person.Mwrite.Person_link.create_link in
             let (r_fath, r_moth) =
-              match create_link with
-              | `create_default_occ ->
-                  let sex =
-                    match person.Mwrite.Person_link.sex with
-                    | `male -> Male
-                    | `female -> Female
-                    | `unknown -> Neuter
-                  in
-                  let fn = person.Mwrite.Person_link.firstname in
-                  let sn = person.Mwrite.Person_link.lastname in
-                  let occ =
-                    match person.Mwrite.Person_link.occ with
-                    | Some occ -> Int32.to_int occ
-                    | None -> 0
-                  in
-                  (Some (fn, sn, occ, Update.Create (sex, None), "", false), None)
-              | `create ->
-                  let sex =
-                    match person.Mwrite.Person_link.sex with
-                    | `male -> Male
-                    | `female -> Female
-                    | `unknown -> Neuter
-                  in
-                  let fn = person.Mwrite.Person_link.firstname in
-                  let sn = person.Mwrite.Person_link.lastname in
-                  let occ = Api_update_util.api_find_free_occ base fn sn in
-                  (*
-                  let occ = Api_update_util.find_free_occ base fn sn in
-                  *)
-                  (* On met à jour parce que si on veut le rechercher, *)
-                  (* il faut qu'on connaisse son occ.                  *)
-                  let () =
-                    if occ = 0 then person.Mwrite.Person_link.occ <- None
-                    else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
-                  in
-                  (Some (fn, sn, occ, Update.Create (sex, None), "", true), None)
-              | `link ->
-                  (match person.Mwrite.Person_link.sex with
-                   | `male ->
-                       let ip = Int32.to_int person.Mwrite.Person_link.index in
-                       let p = poi base (Adef.iper_of_int ip) in
-                       let fn = sou base (get_first_name p) in
-                       let sn = sou base (get_surname p) in
-                       let occ =
-                         if fn = "?" || sn = "?" then
-                           Adef.int_of_iper (get_key_index p)
-                         else get_occ p
-                       in
-                       (*
-                       let fn = person.Mwrite.Person_link.firstname in
-                       let sn = person.Mwrite.Person_link.lastname in
-                       let occ =
-                         get_occ
-                           (poi base
-                              (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
-                       in
-                       *)
-                       (Some (fn, sn, occ, Update.Link, "", false), None)
-                   | _ ->
-                       let ip = Int32.to_int person.Mwrite.Person_link.index in
-                       let p = poi base (Adef.iper_of_int ip) in
-                       let fn = sou base (get_first_name p) in
-                       let sn = sou base (get_surname p) in
-                       let occ =
-                         if fn = "?" || sn = "?" then
-                           Adef.int_of_iper (get_key_index p)
-                         else get_occ p
-                       in
-                       (*
-                       let fn = person.Mwrite.Person_link.firstname in
-                       let sn = person.Mwrite.Person_link.lastname in
-                       let occ =
-                         get_occ
-                           (poi base
-                              (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
-                       in
-                       *)
-                       (None, Some (fn, sn, occ, Update.Link, "", false)))
+              match person.Mwrite.Person_link.sex with
+                | `female -> (None, Some (reconstitute_somebody conf base person))
+                | _ -> (Some (reconstitute_somebody conf base person), None)
             in
             let r_sources =
               match r.Mwrite.Relation_parent.source with
@@ -288,7 +206,7 @@ let reconstitute_person conf base mod_p =
   in
   let notes =
     match mod_p.Mwrite.Person.notes with
-    | Some s -> only_printable_or_nl (Mutil.strip_all_trailing_spaces s)
+    | Some s -> Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces s))
     | None -> ""
   in
   let pevents =
@@ -369,7 +287,7 @@ let reconstitute_person conf base mod_p =
         let note =
           match evt.Mwrite.Pevent.note with
           | Some note ->
-              only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
+              Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces note))
           | None -> ""
         in
         let src =
@@ -386,68 +304,9 @@ let reconstitute_person conf base mod_p =
                     match witness.Mwrite.Witness.witness_type with
                     | `witness -> Witness
                     | `witness_godparent -> Witness_GodParent
-                    | `witness_officer   -> Witness_Officer
+                    | `witness_officer -> Witness_Officer
                   in
-                  let create_link = person.Mwrite.Person_link.create_link in
-                  let wit =
-                    (match create_link with
-                     | `create_default_occ ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | `unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ =
-                           match person.Mwrite.Person_link.occ with
-                           | Some occ -> Int32.to_int occ
-                           | None -> 0
-                         in
-                         ((fn, sn, occ, Update.Create (sex, None), "", false), wk)
-                     | `create ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | ` unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ = Api_update_util.api_find_free_occ base fn sn in
-                         (*
-                         let occ = Api_update_util.find_free_occ base fn sn in
-                         *)
-                         (* On met à jour parce que si on veut le rechercher, *)
-                         (* il faut qu'on connaisse son occ.                  *)
-                         let () =
-                           if occ = 0 then person.Mwrite.Person_link.occ <- None
-                           else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
-                         in
-                         ((fn, sn, occ, Update.Create (sex, None), "", true), wk)
-                     | `link ->
-                         let ip = Int32.to_int person.Mwrite.Person_link.index in
-                         let p = poi base (Adef.iper_of_int ip) in
-                         let fn = sou base (get_first_name p) in
-                         let sn = sou base (get_surname p) in
-                         let occ =
-                           if fn = "?" || sn = "?" then
-                             Adef.int_of_iper (get_key_index p)
-                           else get_occ p
-                         in
-                         (*
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ =
-                           get_occ
-                             (poi base
-                                (Adef.iper_of_int
-                                   (Int32.to_int person.Mwrite.Person_link.index)))
-                         in
-                         *)
-                         ((fn, sn, occ, Update.Link, "", false), wk))
-                  in
+                  let wit = (reconstitute_somebody conf base person, wk) in
                   wit :: accu
               | None -> accu)
             evt.Mwrite.Pevent.witnesses []
@@ -575,7 +434,7 @@ let print_add conf base mod_p =
         History.record conf base changed "ap";
         *)
         let hr = [(fun () -> History.record conf base changed "ap")] in
-        Api_update_util.UpdateSuccess (wl, hr)
+        Api_update_util.UpdateSuccess (wl, [], hr)
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
@@ -602,7 +461,7 @@ let print_del conf base ip =
   History.record conf base changed "dp";
   *)
   let hr = [(fun () -> History.record conf base changed "dp")] in
-  Api_update_util.UpdateSuccess ([], hr)
+  Api_update_util.UpdateSuccess ([], [], hr)
 ;;
 
 
@@ -693,7 +552,7 @@ let print_mod conf base mod_p =
              Update.delete_topological_sort_v conf base
            else ())]
       in
-      Api_update_util.UpdateSuccess (wl, hr)
+      Api_update_util.UpdateSuccess (wl, [], hr)
     end
   in
   print_mod_aux conf base ip mod_p callback
@@ -1095,7 +954,6 @@ let reconstitute_person_nobase conf mod_p =
                     match witness.Mwrite.Witness.witness_type with
                     | `witness -> Witness
                     | `witness_godparent -> Witness_GodParent
-                    | `witness_officer   -> Witness_Officer
                   in
                   let create_link = person.Mwrite.Person_link.create_link in
                   let wit =
@@ -1240,7 +1098,7 @@ let print_add_nobase conf mod_p =
     (* on le fait plus haut, pour savoir si c'est un oubli ou si l'on   *)
     (* ne connait pas la personne.                                      *)
     (* On n'appelle pas CheckItem car ils ne sont pas révélateurs *)
-    Api_update_util.UpdateSuccess ([], [])
+    Api_update_util.UpdateSuccess ([], [], [])
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c

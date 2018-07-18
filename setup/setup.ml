@@ -1,6 +1,7 @@
 (* camlp5r *)
 (* $Id: setup.ml,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
 
+open Printf;
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -701,9 +702,9 @@ value error conf str =
 value exec_f comm =
   let s = comm ^ " > " ^ "comm.log" in
   do {
-    Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
+    eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
     flush stderr;
-    Printf.eprintf "$ %s\n" s;
+    eprintf "$ %s\n" s;
     flush stderr;
     Sys.command s
   }
@@ -789,7 +790,7 @@ value print_default_gwf_file conf =
   if Sys.file_exists fname then ()
   else do {
     let oc = open_out fname in
-    List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
+    List.iter (fun s -> fprintf oc "%s\n" s) gwf;
     close_out oc
   }
 ;
@@ -943,7 +944,7 @@ value gwc conf =
   do {
     let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
     try Sys.remove gwo with [ Sys_error _ -> () ];
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then print_file conf "bso_err.htm"
     else do {
@@ -962,7 +963,7 @@ value gwc2 conf =
   do {
     let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
     try Sys.remove gwo with [ Sys_error _ -> () ];
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then print_file conf "bso_err.htm"
     else do {
@@ -1005,7 +1006,7 @@ value gwb2ged_or_gwu_1 ok_file conf =
     exec_f (comm ^ parameters conf.env)
   in
   do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then print_file conf "bsi_err.htm"
     else
@@ -1166,14 +1167,14 @@ value recover_2 conf =
   let rc =
     try
       do {
-        Printf.eprintf "$ cd \"%s\"\n" init_dir;
+        eprintf "$ cd \"%s\"\n" init_dir;
         flush stderr;
         Sys.chdir init_dir;
         let c =
           Filename.concat "." old_to_src ^ " " ^ in_file ^ o_opt ^
             stringify (Filename.concat dir tmp)
         in
-        Printf.eprintf "$ %s\n" c;
+        eprintf "$ %s\n" c;
         flush stderr;
         Sys.command c
       }
@@ -1182,18 +1183,18 @@ value recover_2 conf =
   in
   let rc =
     if rc = 0 then do {
-      Printf.eprintf "$ cd \"%s\"\n" dir;
+      eprintf "$ cd \"%s\"\n" dir;
       flush stderr;
       Sys.chdir dir;
       let c =
         Filename.concat bin_dir.val src_to_new ^ " " ^ tmp ^ " -f -o " ^
           out_file ^ " > " ^ "comm.log"
       in
-      Printf.eprintf "$ %s\n" c;
+      eprintf "$ %s\n" c;
       flush stderr;
       let rc = Sys.command c in
       let rc = if Sys.unix then rc else infer_rc conf rc in
-      Printf.eprintf "\n";
+      eprintf "\n";
       flush stderr;
       rc
     }
@@ -1257,36 +1258,36 @@ value cleanup_1 conf =
   in
   let in_base_dir = in_base ^ ".gwb" in
   do {
-    Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
+    eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
     flush stderr;
     let c =
       Filename.concat bin_dir.val "gwu" ^ " " ^ in_base ^ " -o tmp.gw"
     in
-    Printf.eprintf "$ %s\n" c;
+    eprintf "$ %s\n" c;
     flush stderr;
     let _ = Sys.command c in
-    Printf.eprintf "$ mkdir old\n";
+    eprintf "$ mkdir old\n";
     try Unix.mkdir "old" 0o755 with [ Unix.Unix_error _ _ _ -> () ];
-    if Sys.unix then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
+    if Sys.unix then eprintf "$ rm -rf old/%s\n" in_base_dir
     else do {
-      Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
-      Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
+      eprintf "$ del old\\%s\\*.*\n" in_base_dir;
+      eprintf "$ rmdir old\\%s\n" in_base_dir
     };
     flush stderr;
     rm_base (Filename.concat "old" in_base_dir);
-    if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
-    else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
+    if Sys.unix then eprintf "$ mv %s old/.\n" in_base_dir
+    else eprintf "$ move %s old\\.\n" in_base_dir;
     flush stderr;
     Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
     let c =
       Filename.concat bin_dir.val "gwc" ^ " tmp.gw -nofail -o " ^ in_base ^
         " > comm.log 2>&1"
     in
-    Printf.eprintf "$ %s\n" c;
+    eprintf "$ %s\n" c;
     flush stderr;
     let rc = Sys.command c in
     let rc = if Sys.unix then rc else infer_rc conf rc in
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then
       let conf = {(conf) with comm = "gwc"} in
@@ -1376,7 +1377,7 @@ value merge_1 conf =
   let bases = selected conf.env in
   let dir = Sys.getcwd () in
   do {
-    Printf.eprintf "$ cd \"%s\"\n" dir;
+    eprintf "$ cd \"%s\"\n" dir;
     flush stderr;
     Sys.chdir dir;
     let rc =
@@ -1389,7 +1390,7 @@ value merge_1 conf =
                 ".gw"
             in
             do {
-              Printf.eprintf "$ %s\n" c;
+              eprintf "$ %s\n" c;
               flush stderr;
               let r = Sys.command c in
               if r = 0 then loop bases else r
@@ -1406,7 +1407,7 @@ value merge_1 conf =
               "" bases ^
             " -f -o " ^ out_file ^ " > comm.log 2>&1"
         in
-        Printf.eprintf "$ %s\n" c;
+        eprintf "$ %s\n" c;
         flush stderr;
         Sys.command c
       }
@@ -1517,19 +1518,19 @@ value gwf_1 conf =
       [ Some "" | None -> s_getenv conf.env "body_prop"
       | Some x -> x ]
     in
-    Printf.fprintf oc "# File generated by \"setup\"\n\n";
+    fprintf oc "# File generated by \"setup\"\n\n";
     List.iter
       (fun k ->
          match k with
          [ "body_prop" ->
              if body_prop = "" then ()
-             else Printf.fprintf oc "body_prop=%s\n" body_prop
-         | _ -> Printf.fprintf oc "%s=%s\n" k (s_getenv conf.env k) ])
+             else fprintf oc "body_prop=%s\n" body_prop
+         | _ -> fprintf oc "%s=%s\n" k (s_getenv conf.env k) ])
       vars;
     List.iter
       (fun (k, v) ->
          if List.mem k vars then ()
-         else Printf.fprintf oc "%s=%s\n" k v)
+         else fprintf oc "%s=%s\n" k v)
       benv;
 
     close_out oc;
@@ -1567,16 +1568,16 @@ value gwd_1 conf =
   let oc = open_out (Filename.concat setup_dir.val "gwd.arg") in
   let print_param k =
     match p_getenv conf.env k with
-    [ Some v when v <> "" -> Printf.fprintf oc "-%s\n%s\n" k v
+    [ Some v when v <> "" -> fprintf oc "-%s\n%s\n" k v
     | _ -> () ]
   in
   do {
     match p_getenv conf.env "setup_link" with
-    [ Some v -> Printf.fprintf oc "-setup_link\n"
+    [ Some v -> fprintf oc "-setup_link\n"
     | _ -> () ];
     print_param "only";
     match p_getenv conf.env "default_lang" with
-    [ Some v when v <> "" -> Printf.fprintf oc "-lang\n%s\n" v
+    [ Some v when v <> "" -> fprintf oc "-lang\n%s\n" v
     | _ -> () ];
     print_param "log";
     close_out oc;
@@ -1591,7 +1592,7 @@ value ged2gwb conf =
   in
   let rc = if Sys.unix then rc else infer_rc conf rc in
   do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then print_file conf "bso_err.htm"
     else do {
@@ -1608,7 +1609,7 @@ value ged2gwb2 conf =
   in
   let rc = if Sys.unix then rc else infer_rc conf rc in
   do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then print_file conf "bso_err.htm"
     else do {
@@ -1624,7 +1625,7 @@ value consang conf ok_file =
     exec_f (comm ^ parameters conf.env)
   in
   do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
   }
@@ -1636,7 +1637,7 @@ value update_nldb conf ok_file =
     exec_f (comm ^ parameters conf.env)
   in
   do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
     if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
   }
@@ -1888,7 +1889,7 @@ value setup (addr, req) comm env_str =
   let s = only_addr () in
   if s <> saddr then do {
     let conf = {(conf) with env = [("anon", saddr); ("o", s)]} in
-    Printf.eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n"
+    eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n"
       saddr s;
     flush stderr;
     print_file conf "err_acc.htm"
@@ -1928,8 +1929,8 @@ value copy_text lang fname =
       }
   | _ ->
       do {
-        Printf.printf "\nCannot access file \"%s\".\n" fname;
-        Printf.printf "Type \"Enter\" to exit\n? ";
+        printf "\nCannot access file \"%s\".\n" fname;
+        printf "Type \"Enter\" to exit\n? ";
         flush stdout;
         let _ = input_line stdin in ();
         exit 2
@@ -1946,12 +1947,12 @@ value set_gwd_default_language_if_absent lang =
         List.iter
           (fun (k, v) ->
              do {
-               Printf.fprintf oc "-%s\n" k;
+               fprintf oc "-%s\n" k;
                if k = "lang" then lang_found.val := True else ();
-               if v <> "" then Printf.fprintf oc "%s\n" v else ();
+               if v <> "" then fprintf oc "%s\n" v else ();
              })
           env;
-        if not lang_found.val then Printf.fprintf oc "-lang\n%s\n" lang
+        if not lang_found.val then fprintf oc "-lang\n%s\n" lang
         else ();
         close_out oc
       }
@@ -2016,7 +2017,7 @@ value intro () =
             if String.length lang_param.val < 2 then default_setup_lang
             else lang_param.val
           in
-          Printf.printf "To start, open location http://localhost:%d/\n"
+          printf "To start, open location http://localhost:%d/\n"
             port.val;
           flush stdout;
           if Unix.fork () = 0 then do {
@@ -2048,7 +2049,7 @@ value intro () =
     else do {
       Unix.putenv "GWLANG" setup_lang; Unix.putenv "GWGD" setup_dir.val
     };
-    Printf.printf "\n";
+    printf "\n";
     flush stdout
   }
 ;

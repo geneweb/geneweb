@@ -4,7 +4,10 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Hutil;
+open Mutil;
 open Util;
 
 type date_search = [ JustSelf | AddSpouse | AddChildren ];
@@ -55,7 +58,7 @@ value date_interval conf base t x =
               (fun ifam ->
                  let fam = foi base ifam in
                  let md = get_marriage fam in
-                 let conj = Gutil.spouse (get_key_index x) fam in
+                 let conj = spouse (get_key_index x) fam in
                  do {
                    match Adef.od_of_codate md with
                    [ Some (Dgreg d _) -> set d
@@ -241,7 +244,7 @@ value select_all_with_place conf base place =
 ;
 
 value select_title conf base title =
-  let set = ref Mutil.StrSet.empty in
+  let set = ref StrSet.empty in
   let clean_name = ref title in
   let all_names = ref [] in
   let absolute = p_getenv conf.env "a" = Some "A" in
@@ -252,9 +255,9 @@ value select_title conf base title =
        not absolute && strip_abbrev_lower tn = title2
     then do {
       let pn = sou base t.t_place in
-      if not (Mutil.StrSet.mem pn set.val) then do {
+      if not (StrSet.mem pn set.val) then do {
         clean_name.val := tn;
-        set.val := Mutil.StrSet.add pn set.val;
+        set.val := StrSet.add pn set.val;
       }
       else ();
       if not (List.mem tn all_names.val) then
@@ -268,7 +271,7 @@ value select_title conf base title =
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter add_place (nobtit conf base x)
     };
-    (Mutil.StrSet.elements set.val, clean_name.val, all_names.val)
+    (StrSet.elements set.val, clean_name.val, all_names.val)
   }
 ;
 
@@ -298,17 +301,17 @@ value select_place conf base place =
 
 value select_all proj conf base =
   let s =
-    loop 0 Mutil.StrSet.empty where rec loop i s =
+    loop 0 StrSet.empty where rec loop i s =
       if i = nb_of_persons base then s
       else
         let x = pget conf base (Adef.iper_of_int i) in
         let s =
-          List.fold_left (fun s t -> Mutil.StrSet.add (sou base (proj t)) s) s
+          List.fold_left (fun s t -> StrSet.add (sou base (proj t)) s) s
             (nobtit conf base x)
         in
         loop (i + 1) s
   in
-  Mutil.StrSet.elements s
+  StrSet.elements s
 ;
 
 value select_all2 proj conf base = do {
@@ -412,7 +415,7 @@ value print_title_place_list conf base t p t_equiv list =
       if p <> "" then Wserver.printf " %s" p else ()
     }
     else
-      Mutil.list_iter_first
+      list_iter_first
         (fun first t -> do {
            if not first then Wserver.printf ",\n" else ();
            Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;a=A\">" (commd conf)
@@ -428,7 +431,7 @@ value print_title_place_list conf base t p t_equiv list =
          t_equiv
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     tag "ul" begin
       let _ =
         List.fold_left
@@ -469,14 +472,14 @@ value print_title_place_list conf base t p t_equiv list =
           Wserver.printf ";lim=6\">%s</a>\n" (capitale (transl conf "tree"));
         end
     | _ -> () ];
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
 value print_all_with_place_list conf base p list =
   let title _ = Wserver.printf "... %s\n" p in
   do {
-    Hutil.header conf title;
+    header conf title;
     Wserver.printf "<ul>\n";
     let _ =
       List.fold_left
@@ -491,7 +494,7 @@ value print_all_with_place_list conf base p list =
         [] list
     in
     Wserver.printf "</ul>\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -511,7 +514,7 @@ value print_places_list conf base t t_equiv list = do {
   let title h =
     if h || List.length t_equiv = 1 then Wserver.printf "%s" t
     else
-      Mutil.list_iter_first
+      list_iter_first
         (fun first t -> do {
            Wserver.printf "%s" (if first then "" else ", ");
            give_access_all_titles conf t True;
@@ -529,9 +532,9 @@ value print_places_list conf base t t_equiv list = do {
       else Wserver.printf "%s%s" (surname_end base p) (surname_begin base p);
     end
   in
-  Hutil.header conf title;
+  header conf title;
   wprint_in_columns conf order wprint_elem list;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_places conf base t =
@@ -547,7 +550,7 @@ value print_titles conf base p =
   let list = string_list_uniq (List.sort compare_titles l) in
   let title _ = Wserver.printf "... %s" p in
   do {
-    Hutil.header conf title;
+    header conf title;
     tag "ul" begin
       List.iter (fun t -> stagn "li" begin give_access_title conf t p; end)
         list;
@@ -557,7 +560,7 @@ value print_titles conf base p =
         Wserver.printf "%s" (capitale (transl conf "the whole list"));
       end
     else ();
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -575,9 +578,9 @@ value print_all_titles conf base = do {
     Wserver.printf " (%d)" cnt;
   }
   in
-  Hutil.header conf title;
+  header conf title;
   wprint_in_columns conf order wprint_elem list;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_all_places conf base = do {
@@ -588,13 +591,13 @@ value print_all_places conf base = do {
     let l = select_all_places conf base in
     string_list_uniq (List.sort compare_places l)
   in
-  Hutil.header conf title;
+  header conf title;
   tag "ul" begin
     List.iter (fun t -> do {
       stagn "li" begin give_access_all_places conf t; end;
     }) list;
   end;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print conf base = do {

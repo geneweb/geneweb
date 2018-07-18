@@ -4,7 +4,9 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value print_child_person conf base p =
@@ -132,7 +134,7 @@ value print_change conf base p =
       end;
     end;
     Wserver.printf "\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -141,7 +143,7 @@ value print conf base =
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
       print_change conf base p
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_children_list conf base u =
@@ -175,18 +177,18 @@ value print_change_done conf base p =
     Wserver.printf "%s" (capitale s)
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     Wserver.printf "\n%s" (reference conf base p (person_text conf base p));
     Wserver.printf "%s\n" (Date.short_dates_text conf base p);
     print_children_list conf base p;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
 value print_conflict conf base ip_var p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
+    rheader conf title;
     Update.print_error conf base (AlreadyDefined p);
     let free_n =
       Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
@@ -223,7 +225,7 @@ value print_conflict conf base ip_var p =
       end;
     end;
     Update.print_same_name conf base p;
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -246,9 +248,9 @@ value check_conflict conf base p key new_occ ipl =
 value error_person conf base p err =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
-    Hutil.rheader conf title;
+    rheader conf title;
     Wserver.printf "%s\n" (capitale err);
-    Hutil.trailer conf;
+    trailer conf;
     raise Update.ModErr
   }
 ;
@@ -291,7 +293,7 @@ value change_child conf base parent_surname changed ip =
     new_surname <> p_surname base p || new_occ <> get_occ p
   then do {
     let key = new_first_name ^ " " ^ new_surname in
-    let ipl = Gutil.person_ht_find_all base key in
+    let ipl = person_ht_find_all base key in
     check_conflict conf base p key new_occ ipl;
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
     (* On ajoute les enfants dans le type Change_children_name       *)
@@ -307,9 +309,9 @@ value change_child conf base parent_surname changed ip =
     in
     patch_person base ip p;
     patch_key base ip new_first_name new_surname new_occ;
-    Gutil.person_ht_add base key ip;
+    person_ht_add base key ip;
     let np_misc_names = gen_person_misc_names base p (fun p -> p.titles) in
-    List.iter (fun key -> Gutil.person_ht_add base key p.key_index)
+    List.iter (fun key -> person_ht_add base key p.key_index)
       np_misc_names;
   }
   else ()
@@ -318,7 +320,7 @@ value change_child conf base parent_surname changed ip =
 value print_update_child conf base p digest =
   match p_getenv conf.env "m" with
   [ Some "CHG_CHN_OK" -> print conf base
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_change_ok conf base p =
@@ -354,5 +356,5 @@ value print_ok o_conf base =
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
       print_change_ok conf base p
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;

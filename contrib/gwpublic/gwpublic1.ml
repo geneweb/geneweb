@@ -3,6 +3,7 @@
 
 open Def;
 open Gwdb;
+open Printf;
 
 value year_of p =
   match
@@ -91,8 +92,7 @@ value mark_ancestors base scanned lim_year titled is_quest_string =
         match year_of p with
         [ Some y ->
            if y >= lim_year then do {
-             Printf.eprintf
-               "Problem of date ! %s %d\n" (Gutil.designation base p) y;
+             eprintf "Problem of date ! %s %d\n" (Gutil.designation base p) y;
              flush stderr;
            }
            else ()
@@ -135,9 +135,8 @@ value public_all bname lim_year titled = do {
   Consang.check_noloop base
         (fun
          [ OwnAncestor p -> do {
-             Printf.printf "I cannot deal this database.\n";
-             Printf.printf
-               "%s is his own ancestors\n" (Gutil.designation base p);
+             printf "I cannot deal this database.\n";
+             printf "%s is his own ancestors\n" (Gutil.designation base p);
              flush stdout;
              exit 2
            }
@@ -226,18 +225,18 @@ value main () =
         else if ind.val = "" then public_all bname.val lim_year.val titled.val
         else public_some bname.val lim_year.val titled.val ind.val
     | Refuse -> do {
-        Printf.eprintf "Base is locked. Waiting... ";
+        eprintf "Base is locked. Waiting... ";
         flush stderr;
         lock_wait (Mutil.lock_file bname.val) with
         [ Accept -> do {
-            Printf.eprintf "Ok\n";
+            eprintf "Ok\n";
             flush stderr;
             if everybody.val then public_everybody bname.val
             else if ind.val = "" then public_all bname.val lim_year.val titled.val
             else public_some bname.val lim_year.val titled.val ind.val
           }
         | Refuse -> do {
-            Printf.printf "\nSorry. Impossible to lock base.\n";
+            printf "\nSorry. Impossible to lock base.\n";
             flush stdout;
             exit 2
           } ]

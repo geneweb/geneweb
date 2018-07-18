@@ -4,7 +4,10 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Mutil;
+open Printf;
 
 value is_hide_names conf p =
   if conf.hide_names || get_access p = Private then True
@@ -109,23 +112,23 @@ value rec capitale_utf_8 s =
       match Char.code c with
       [ 0xC3 when Char.code s.[1] <> 0xBF ->
           let c1 = (Char.chr (Char.code s.[1] - 0xA0 + 0x80)) in
-          Printf.sprintf "%c%c%s" c c1
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xC3 when Char.code s.[1] = 0xBF -> (* Ã¿ *)
           let c = (Char.chr 0xC5) in
           let c1 = (Char.chr 0xB8) in
-          Printf.sprintf "%c%c%s" c c1
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xC4 | 0xC5 | 0xC6 | 0xC7 -> 
           let c1 = (Char.chr (Char.code s.[1] - 1)) in
-          Printf.sprintf "%c%c%s" c c1
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 -> (* cyrillic lowercase *)
           let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
-          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+          sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD1 when Char.code s.[1] < 0x90 -> (* cyrillic lowercase again *)
           let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
-          Printf.sprintf "%c%c%s" (Char.chr 0xD0) c1
+          sprintf "%c%c%s" (Char.chr 0xD0) c1
             (String.sub s 2 (String.length s - 2))
       | _ -> s ]
 ;
@@ -187,7 +190,7 @@ value transl_nth conf w n =
 ;
 
 value plus_decl s =
-  match Mutil.rindex s '+' with
+  match rindex s '+' with
   [ Some i ->
       if i > 0 && s.[i - 1] = ' ' then
         let start = String.sub s 0 (i - 1) in
@@ -200,8 +203,8 @@ value plus_decl s =
 value gen_decline wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
-  if Mutil.rindex wt '/' <> None then
-    match Mutil.rindex wt '/' with
+  if rindex wt '/' <> None then
+    match rindex wt '/' with
     [ Some i ->
         (* special case for Spanish *)
         if String.length s > 0 && start_with_hi_i s then
@@ -242,7 +245,7 @@ value gen_decline2 wt s1 s2 =
         | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' ->
             let c = wt.[i + 1] in
             match string_of wt.[i + 4] with
-            [ Some s -> (Mutil.decline c s, i + 4)
+            [ Some s -> (decline c s, i + 4)
             | None -> (":", i) ]
         | '[' ->
             try
@@ -307,11 +310,11 @@ value cftransl conf fmt =
     | [a :: al] as gal ->
         if i + 4 < String.length fmt && fmt.[i] = ':' &&
            fmt.[i + 2] = ':' && fmt.[i + 3] = '%' && fmt.[i + 4] = 's' then
-          Mutil.decline fmt.[i + 1] a ^ loop (i + 5) al
+          decline fmt.[i + 1] a ^ loop (i + 5) al
         else if
           i + 1 < String.length fmt && fmt.[i] = '%' &&
           fmt.[i + 1] = 's' then
-          Mutil.nominative a ^ loop (i + 2) al
+          nominative a ^ loop (i + 2) al
         else if i < String.length fmt then
           String.make 1 fmt.[i] ^ loop (i + 1) gal
         else "" ]
@@ -329,7 +332,7 @@ value fdecline conf w s =
   valid_format w (gen_decline (string_of_format w) s)
 ;
 
-value translate_eval s = Translate.eval (Mutil.nominative s);
+value translate_eval s = Translate.eval (nominative s);
 
 (* *)
 
@@ -357,6 +360,8 @@ value html_p conf = do { Wserver.printf "<p>"; Wserver.printf "\n"; };
 
 value html_li conf = do { Wserver.printf "<li>"; Wserver.printf "\n"; };
 
+value nl () = Wserver.printf "\013\010";
+
 value week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
   fun i ->
@@ -373,9 +378,21 @@ value month_txt =
     txt.(i)
 ;
 
+(* Returns true if sub is a substring of str or false otherwise. *)
+value string_exists str sub =
+  let re = Str.regexp_string sub in
+  try
+    do {
+      ignore (Str.search_forward re str 0);
+      True
+    }
+  with
+    Not_found -> False
+;
+
 value string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
-  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
+  sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
     (week_day_txt lt.Unix.tm_wday) lt.Unix.tm_mday (month_txt lt.Unix.tm_mon)
     (1900 + lt.Unix.tm_year) lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 ;
@@ -383,7 +400,6 @@ value string_of_ctime conf =
 value html conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
   do {
-    Wserver.http HttpStatus.OK;
     if not Wserver.cgi.val then
       Wserver.header "Server: GeneWeb/%s" Version.txt
     else ();
@@ -408,7 +424,6 @@ value unauthorized conf auth_type =
     Wserver.printf "</body>\n";
   }
 ;
-
 
 value commd conf =
   let c = conf.command ^ "?" in
@@ -530,6 +545,20 @@ value clean_html_tags s l =
     s l
 ;
 
+(* ********************************************************************* *)
+(*  [Fonc] value sanitize_html : string -> string                        *)
+(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
+                    les éléments dangereux.
+    [Args] :
+      - html_str : Chaîne de caractères à assainir.
+    [Retour] : La chaîne de caractères assainie.                         *)
+(* ********************************************************************* *)
+value sanitize_html html_str =
+  (* Enlève les évènements DOM. *)
+  let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
+  Str.global_replace regexp_dom_events "" html_str
+;
+
 value hidden_env conf =
   List.iter
     (fun (k, v) ->
@@ -546,7 +575,7 @@ value p_getenv env label =
 value p_getint env label =
   match p_getenv env label with
   [ Some s ->
-      try Some (int_of_string (Gutil.strip_spaces s)) with
+      try Some (int_of_string (strip_spaces s)) with
       [ Failure _ -> None ]
   | None -> None ]
 ;
@@ -954,7 +983,7 @@ value titled_person_text conf base p t =
       | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
       | _ ->
           let trunc_surname _ _ =
-            Gutil.strip_spaces (String.sub surname 0 (slen - elen))
+            strip_spaces (String.sub surname 0 (slen - elen))
           in
           let trunc_access = (p_first_name, trunc_surname) in
           gen_person_text trunc_access conf base p ]
@@ -1111,7 +1140,7 @@ value person_title conf base p =
 ;
 
 value old_surname_begin n =
-  let i = Mutil.initial n in
+  let i = initial n in
   if i = 0 then ""
   else
     let i =
@@ -1122,7 +1151,7 @@ value old_surname_begin n =
 ;
 
 value old_surname_end n =
-  let i = Mutil.initial n in
+  let i = initial n in
   if i = 0 then n else String.sub n i (String.length n - i)
 ;
 
@@ -1544,7 +1573,7 @@ value url_no_index conf base =
   let addr =
     let pref =
       let s = get_request_string conf.request in
-      match Mutil.rindex s '?' with
+      match rindex s '?' with
       [ Some i -> String.sub s 0 i
       | None -> s ]
     in
@@ -1837,9 +1866,9 @@ value string_with_macros conf env s =
             match http_string conf s i with
             [ Some (x, j) ->
                 do {
-                  Printf.bprintf buff "<a href=\"%s\">" x;
+                  bprintf buff "<a href=\"%s\">" x;
                   expand_ampersand buff x;
-                  Printf.bprintf buff "</a>";
+                  bprintf buff "</a>";
                   loop Out j
                 }
             | None ->
@@ -1847,7 +1876,7 @@ value string_with_macros conf env s =
                 [ Some j ->
                     let x = String.sub s i (j - i) in
                     do {
-                      Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
+                      bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                       loop Out j
                     }
                 | None ->
@@ -1900,9 +1929,9 @@ value place_of_string conf place =
         loop str []
       in
       let list = explode gwf_place ',' in
-      let list = List.map Gutil.strip_spaces list in
+      let list = List.map strip_spaces list in
       let list_p = explode place ',' in
-      let list_p = List.map Gutil.strip_spaces list_p in
+      let list_p = List.map strip_spaces list_p in
       let place =
         {other = ""; town = ""; township = ""; canton = "";
          district = ""; county = ""; region = ""; country = ""}
@@ -2029,7 +2058,7 @@ value check_ampersand s i =
     [ 'a'..'z' ->
         loop_id i where rec loop_id j =
           if j = String.length s then do {
-            let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
+            let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
             Some (a, j)
           }
           else
@@ -2037,12 +2066,12 @@ value check_ampersand s i =
             [ 'a'..'z' -> loop_id (j + 1)
             | ';' -> None
             | _ ->
-                let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
+                let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
                 Some (a, j) ]
     | _ -> Some ("&amp;", i) ]
 ;
 
-value bad col s = Printf.sprintf "<span style=\"color:%s\">%s</span>" col s;
+value bad col s = sprintf "<span style=\"color:%s\">%s</span>" col s;
 
 value check_ampersands s =
   let b = Buffer.create (String.length s) in
@@ -2113,7 +2142,7 @@ value check_xhtml s =
            let s_aft = String.sub s pos_aft (String.length s - pos_aft) in
            Buffer.clear b;
            Buffer.add_string b s_bef;
-           Buffer.add_string b (bad "red" (Printf.sprintf "&lt;%s&gt;" txt));
+           Buffer.add_string b (bad "red" (sprintf "&lt;%s&gt;" txt));
            Buffer.add_string b s_aft
          })
         tag_stack;
@@ -2124,34 +2153,34 @@ value check_xhtml s =
       [ Some (Btag t a, i) ->
           if t = "br" && a = "" then do {
             (* frequent error *)
-            Buffer.add_string b (Printf.sprintf "<%s/>" t);
+            Buffer.add_string b (sprintf "<%s/>" t);
             loop tag_stack i
           }
           else do {
             match check_ampersands a with
             [ Some a -> do {
-                Buffer.add_string b (Printf.sprintf "&lt;%s%s&gt;" t a);
+                Buffer.add_string b (sprintf "&lt;%s%s&gt;" t a);
                 loop tag_stack i;
               }
             | None -> do {
                 let pos = Buffer.length b in
-                let txt = Printf.sprintf "%s%s" t a in
-                Buffer.add_string b (Printf.sprintf "<%s>" txt);
+                let txt = sprintf "%s%s" t a in
+                Buffer.add_string b (sprintf "<%s>" txt);
                 loop [(pos, txt, t) :: tag_stack] i
               } ]
           }
       | Some (Etag t, i) ->
           match tag_stack with
           [ [(_, _, bt) :: rest] when t = bt -> do {
-              Buffer.add_string b (Printf.sprintf "</%s>" t);
+              Buffer.add_string b (sprintf "</%s>" t);
               loop rest i
             }
           | _ -> do {
-              Buffer.add_string b (bad "red" (Printf.sprintf "&lt;/%s&gt;" t));
+              Buffer.add_string b (bad "red" (sprintf "&lt;/%s&gt;" t));
               loop tag_stack i
             } ]
       | Some (Atag t, i) -> do {
-          Buffer.add_string b (Printf.sprintf "<%s/>" t);
+          Buffer.add_string b (sprintf "<%s/>" t);
           loop tag_stack i
         }
       | None ->
@@ -2350,7 +2379,7 @@ value husband_wife conf base p =
   let rec loop i =
     if i < Array.length (get_family p) then
       let fam = foi base (get_family p).(i) in
-      let conjoint = Gutil.spouse (get_key_index p) fam in
+      let conjoint = spouse (get_key_index p) fam in
       let conjoint = pget conf base conjoint in
       if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
       then
@@ -2680,7 +2709,7 @@ value default_sosa_ref conf base =
   [ Some n ->
       if n = "" then None
       else
-        match Gutil.person_ht_find_all base n with
+        match person_ht_find_all base n with
         [ [ip] ->
             let p = pget conf base ip in
             if is_hidden p then None
@@ -2867,6 +2896,20 @@ value auto_image_file conf base p =
   else None
 ;
 
+(* ********************************************************************** *)
+(*  [Fonc] image_and_size : config -> base -> person -> image_size        *)
+(** [Description] : Renvoie la source de l'image ainsi que sa taille.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnÃ©es
+      - p    : personne
+      [Retour] :
+        - is_filename : indique si la source de l'image est un nom de
+                        fichier ou une URL.
+        - source
+        - image_size
+    [Rem] : ExportÃ© en clair hors de ce module.                            *)
+(* *********************************************************************** *)
 value image_and_size conf base p image_size =
   if not conf.no_image && authorized_age conf base p then
     match sou base (get_image p) with
@@ -2911,7 +2954,6 @@ value image_and_size conf base p image_size =
   else None
 ;
 
-
 (* ********************************************************************** *)
 (*  [Fonc] has_image : config -> base -> person -> bool                   *)
 (** [Description] : Renvoie Vrai si la personne a une photo et qu'on a les
@@ -2925,8 +2967,12 @@ value image_and_size conf base p image_size =
 (* ********************************************************************** *)
 value has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
-    not (is_empty_string (get_image p)) || auto_image_file conf base p <> None
-  else False
+    (not (is_empty_string (get_image p)) &&
+    (* Gestion des médias privés (contenant "private" dans leur URL) dans le cas du mode visiteur. *)
+     (conf.wizard || conf.friend || not (string_exists (sou base (get_image p)) "/private/"))
+    ) || auto_image_file conf base p <> None
+  else
+    False
 ;
 
 value gen_only_printable or_nl s =
@@ -2938,7 +2984,7 @@ value gen_only_printable or_nl s =
           [ ' '..'~' | '\160'..'\255' -> s.[i]
           | '\n' -> if or_nl then '\n' else ' '
           | _ -> ' ' ] in
-  Gutil.strip_spaces s'
+  strip_spaces s'
 ;
 
 value only_printable_or_nl = gen_only_printable True;
@@ -3030,8 +3076,8 @@ value is_that_user_and_password auth_scheme user passwd =
       if user <> ds.ds_username then False
       else
         let that_response_would_be =
-          let a1 = Printf.sprintf "%s:%s:%s" user ds.ds_realm passwd in
-          let a2 = Printf.sprintf "%s:%s" ds.ds_meth ds.ds_uri in
+          let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
+          let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
           if ds.ds_qop = "auth" || ds.ds_qop = "auth-int" then
             h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ ds.ds_nc ^ ":" ^
                ds.ds_cnonce ^ ":" ^ ds.ds_qop ^ ":" ^ h a2)
@@ -3216,7 +3262,7 @@ value adm_file f =
 
 value std_date conf =
   let (hour, min, sec) = conf.time in
-  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
+  sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
     conf.today.month conf.today.day hour min sec
 ;
 
@@ -3235,7 +3281,7 @@ value read_wf_trace fname =
 value write_wf_trace fname wt =
   let oc = Secure.open_out fname in
   do {
-    List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
+    List.iter (fun (dt, u) -> fprintf oc "%s %s\n" dt u) wt;
     close_out oc;
   }
 ;
@@ -3883,12 +3929,12 @@ value init_cache_info conf base = do {
 
 (* ************************************************************************ *)
 (*  [Fonc] real_nb_of_persons conf : config -> int                          *)
-(** [Description] : Renvoie le nombre de personnes rÃ©elles (sans ? ?) d'une
-                    base, Ã  partir du fichier de cache.
+(** [Description] : Renvoie le nombre de personnes réelles (sans ? ?) d'une
+                    base, à partir du fichier de cache.
     [Args] :
       - conf : configuration de la base
     [Retour] : nombre de personne sans ? ?
-    [Rem] : ExportÃ© en clair hors de ce module.                             *)
+    [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value real_nb_of_persons conf base =
   let real_nb_person () =

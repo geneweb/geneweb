@@ -2,6 +2,7 @@
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
+open Printf;
 
 value has_infos p =
   match p.death with [ Death _ _ -> True | _ -> False ]
@@ -16,18 +17,18 @@ value modif base =
       let fn = Gwdb.p_first_name base p in
       let sn = Gwdb.p_surname base p in
       if match fn with [ "ne" -> True | _ -> False ] then do {
-        Printf.eprintf ".";
+        eprintf ".";
         flush stderr;
         let fn' = match p.sex with [ Male -> "Nn" | Female -> "Ne" | _ -> "N" ] in
         let sn' = sn in
         try
           let p' = person_ht_find_unique base fn' sn' p.occ in
           do {
-            Printf.eprintf "\nconflit %s avec %s..." (designation base p)
+            eprintf "\nconflit %s avec %s..." (designation base p)
               (designation base (poi base p'));
             flush stderr;
             let occ' = Gutil.find_free_occ base fn' sn' 0 in
-            Printf.eprintf " rempl occ par %d\n" occ';
+            eprintf " rempl occ par %d\n" occ';
             flush stderr;
             p.occ := occ';
             raise Not_found; (* comme ça, ça fait le reste... *)
@@ -46,7 +47,7 @@ value modif base =
     };
     if changes.val then do {
       base.func.commit_patches ();
-      Printf.eprintf "
+      eprintf "
 Attention: il n'est pas sûr que les index aient été complètement mis à jour.
 Pour faire bien, il faudrait vérifier si le programme le fait correctement.
 Dans le doute, il est probablement préférable de faire gwu et gwc (nettoyage)
@@ -57,7 +58,7 @@ s'il était vide au départ.";
       flush stderr;
     }
     else ();
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr;
   }
 ;

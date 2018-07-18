@@ -9,7 +9,9 @@ END;
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Mutil;
 open TemplAst;
 open Util;
 
@@ -187,7 +189,7 @@ value print_base_loop conf base p =
     Wserver.printf
       (fcapitale
          (ftransl conf "loop in database: %s is his/her own ancestor"))
-      (Util.update_family_loop conf base p (Gutil.designation base p));
+      (Util.update_family_loop conf base p (designation base p));
     Wserver.printf ".\n";
     Hutil.trailer conf;
     exit 2
@@ -425,11 +427,10 @@ value rec get_p_of_sosa conf base s p =
 (* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
 value sosa_ht = Hashtbl.create 5003;
 
-
 (* ************************************************************************ *)
-(*  [Fonc] build_sosa_ht : config -> base -> unit                           *)
-(** [Description] : Construit à partir du sosa de référence de la base, la
-      liste de tous ces ancêtres directs et la stocke dans une hashtbl. La
+(*  [Fonc] build_sosa_tree_ht : config -> base -> person -> unit            *)
+(** [Description] : Construit à partir d'une personne la base, la
+      liste de tous ses ancêtres directs et la stocke dans une hashtbl. La
       clé de la table est l'iper de la personne et on lui associe son numéro
       de sosa. Les sosa multiples ne sont représentés qu'une seule fois par
       leur plus petit numéro sosa.
@@ -440,57 +441,71 @@ value sosa_ht = Hashtbl.create 5003;
       - unit
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-value build_sosa_ht conf base =
+value build_sosa_tree_ht conf base person =
   let () = load_ascends_array base in
   let () = load_couples_array base in
-  match Util.find_sosa_ref conf base with
-  [ Some sosa_ref ->
-      let nb_persons = nb_of_persons base in
-      let mark = Array.make nb_persons False in
-      (* Tableau qui va socker au fur et à mesure les ancêtres du sosa_ref. *)
-      (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
-      (* commence à l'indice 1 !                                            *)
-      let sosa_accu =
-        Array.make (nb_persons + 1) (Sosa.zero, Adef.iper_of_int 0)
-      in
-      let () = Array.set sosa_accu 1 (Sosa.one, get_key_index sosa_ref) in
-      let rec loop i len =
-        if i > nb_persons then ()
-        else
-          let (sosa_num, ip) = Array.get sosa_accu i in
-          (* Si la personne courante n'a pas de numéro de sosa, alors il n'y *)
-          (* a plus d'ancêtres car ils ont été ajoutés par ordre croissant.  *)
-          if Sosa.eq sosa_num Sosa.zero then ()
-          else do {
-            Hashtbl.add sosa_ht ip sosa_num;
-            let asc = pget conf base ip in
-            (* Ajoute les nouveaux ascendants au tableau des ancêtres. *)
-            match get_parents asc with
-            [ Some ifam ->
-                let cpl = foi base ifam in
-                let z = Sosa.twice sosa_num in
-                let len =
-                  if not mark.(Adef.int_of_iper (get_father cpl)) then do {
-                    Array.set sosa_accu (len + 1) (z, get_father cpl) ;
-                    mark.(Adef.int_of_iper (get_father cpl)) := True ;
-                    len + 1 }
-                  else len
-                in
-                let len =
-                  if not mark.(Adef.int_of_iper (get_mother cpl)) then do {
-                    Array.set sosa_accu (len + 1) (Sosa.inc z 1, get_mother cpl);
-                    mark.(Adef.int_of_iper (get_mother cpl)) := True ;
-                    len + 1 }
+  let nb_persons = nb_of_persons base in
+    let mark = Array.make nb_persons False in
+    (* Tableau qui va socker au fur et à mesure les ancêtres du person. *)
+    (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
+    (* commence à l'indice 1 !                                            *)
+    let sosa_accu =
+      Array.make (nb_persons + 1) (Sosa.zero, Adef.iper_of_int 0)
+    in
+    let () = Array.set sosa_accu 1 (Sosa.one, get_key_index person) in
+    let rec loop i len =
+      if i > nb_persons then ()
+      else
+        let (sosa_num, ip) = Array.get sosa_accu i in
+        (* Si la personne courante n'a pas de numéro de sosa, alors il n'y *)
+        (* a plus d'ancêtres car ils ont été ajoutés par ordre croissant.  *)
+        if Sosa.eq sosa_num Sosa.zero then ()
+        else do {
+          Hashtbl.add sosa_ht ip sosa_num;
+          let asc = pget conf base ip in
+          (* Ajoute les nouveaux ascendants au tableau des ancêtres. *)
+          match get_parents asc with
+          [ Some ifam ->
+              let cpl = foi base ifam in
+              let z = Sosa.twice sosa_num in
+              let len =
+                if not mark.(Adef.int_of_iper (get_father cpl)) then do {
+                  Array.set sosa_accu (len + 1) (z, get_father cpl) ;
+                  mark.(Adef.int_of_iper (get_father cpl)) := True ;
+                  len + 1 }
                 else len
-                in
-                loop (i + 1) len
-            | None -> loop (i + 1) len ]
-          }
-      in
-      loop 1 1
-   | None -> () ]
+              in
+              let len =
+                if not mark.(Adef.int_of_iper (get_mother cpl)) then do {
+                  Array.set sosa_accu (len + 1) (Sosa.inc z 1, get_mother cpl);
+                  mark.(Adef.int_of_iper (get_mother cpl)) := True ;
+                  len + 1 }
+              else len
+              in
+              loop (i + 1) len
+          | None -> loop (i + 1) len ]
+        }
+    in
+    loop 1 1
 ;
 
+(* ************************************************************************ *)
+(*  [Fonc] build_sosa_ht : config -> base -> unit                           *)
+(** [Description] : Fait appel à la construction de la
+      liste de tous les ancêtres directs de la souche de l'arbre
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value build_sosa_ht conf base =
+  match Util.find_sosa_ref conf base with
+  [ Some sosa_ref ->
+    build_sosa_tree_ht conf base sosa_ref
+   | None -> () ]
+;
 
 (* ******************************************************************** *)
 (*  [Fonc] next_sosa : config -> base -> Sosa.t -> Sosa.t               *)
@@ -553,6 +568,24 @@ value get_sosa_person conf base p =
   [ Not_found -> Sosa.zero ]
 ;
 
+(* ********************************************************************** *)
+(*  [Fonc] has_history : config -> string -> bool                         *)
+(** [Description] : Indique si l'individu a été modifiée.
+    [Args] :
+      - conf   : configuration de la base
+      - base   : arbre
+      - p      : person
+      - p_auth : indique si l'utilisateur est authentifié
+    [Retour] : Vrai si la personne a été modifiée, Faux sinon.
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
+value has_history conf base p p_auth =
+  let fn = sou base (get_first_name p) in
+  let sn = sou base (get_surname p) in
+  let occ = get_occ p in
+  let person_file = History_diff.history_file fn sn occ in
+  p_auth && (Sys.file_exists (History_diff.history_path conf person_file))
+;
 
 (* ******************************************************************** *)
 (*  [Fonc] get_single_sosa : config -> base -> person -> Sosa.t          *)
@@ -637,13 +670,212 @@ value print_sosa conf base p link =
   else ()
 ;
 
+(* ************************************************************************ *)
+(*  [Fonc] get_death_text : config -> base -> person -> bool -> string      *)
+(** [Description] : Retourne une description de la mort de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_death_text conf base p p_auth =
+  let died =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      match get_death p with
+      [ Death dr _ ->
+          match dr with
+          [ Unspecified -> transl_nth conf "died" is
+          | Murdered -> transl_nth conf "murdered" is
+          | Killed -> transl_nth conf "killed (in action)" is
+          | Executed -> transl_nth conf "executed (legally killed)" is
+          | Disappeared -> transl_nth conf "disappeared" is ]
+      | DeadYoung -> transl_nth conf "died young" is
+      | DeadDontKnowWhen -> transl_nth conf "died" is
+      | _ -> "" ]
+    else ""
+  in
+  let on_death_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match (p_auth, get_death p) with
+          [ (True, Death _ d) ->
+              let d = Adef.date_of_cdate d in
+              match p_getenv conf.base_env "long_date" with
+              [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+              | _ -> Date.string_of_ondate tmp_conf d ]
+          | _ -> "" ]
+  in
+  died ^ " " ^ on_death_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_baptism_text : config -> base -> person -> bool -> string    *)
+(** [Description] : Retourne le texte sur le baptême de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_baptism_text conf base p p_auth =
+  let baptized =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "baptized" is
+    else ""
+  in
+  let on_baptism_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match (p_auth, Adef.od_of_codate (get_baptism p)) with
+      [ (True, Some d) ->
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+          | _ -> Date.string_of_ondate tmp_conf d ]
+      | _ -> "" ]
+  in
+  baptized ^ " " ^ on_baptism_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_birth_text : config -> base -> person -> bool -> string    *)
+(** [Description] : Retourne le texte sur la naissance de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_birth_text conf base p p_auth =
+  let born =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "born" is
+    else ""
+  in
+  let on_birth_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match (p_auth, Adef.od_of_codate (get_birth p)) with
+      [ (True, Some d) ->
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+          | _ -> Date.string_of_ondate tmp_conf d ]
+      | _ -> "" ]
+  in
+  born ^ " " ^ on_birth_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_marriage_text : config -> base -> fam -> bool -> string      *)
+(** [Description] : Retourne le texte sur la date de l'union.
+    [Args] :
+      - conf   : configuration de la base
+      - base   : base de donnée
+      - family : la famille concernée
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_marriage_date_text conf base fam p_auth =
+  let tmp_conf = {(conf) with cancel_links = True} in
+  match (p_auth, Adef.od_of_codate (get_marriage fam)) with
+    [ (True, Some d) ->
+        match p_getenv conf.base_env "long_date" with
+        [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+        | _ -> Date.string_of_ondate tmp_conf d ]
+    | _ -> "" ]
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_burial_text : config -> base -> person -> bool -> string     *)
+(** [Description] : Retourne le texte sur l'incinération de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_burial_text conf base p p_auth =
+  let buried =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "buried" is
+    else ""
+  in
+  let on_burial_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match get_burial p with
+      [ Buried cod ->
+        match (p_auth, Adef.od_of_codate cod) with
+        [ (True, Some d) ->
+            match p_getenv conf.base_env "long_date" with
+            [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+            | _ -> Date.string_of_ondate tmp_conf d ]
+        | _ -> "" ]
+      | _ -> "" ]
+  in
+  buried ^ " " ^ on_burial_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_burial_text : config -> base -> person -> bool -> string     *)
+(** [Description] : Retourne le texte sur l'incinération de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_cremation_text conf base p p_auth =
+  let cremated =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "cremated" is
+    else ""
+  in
+  let on_cremation_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match get_burial p with
+      [ Cremated cod ->
+          match (p_auth, Adef.od_of_codate cod) with
+          [ (True, Some d) ->
+              match p_getenv conf.base_env "long_date" with
+              [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+              | _ -> Date.string_of_ondate tmp_conf d ]
+          | _ -> "" ]
+      | _ -> "" ]
+  in
+  cremated ^ " " ^ on_cremation_date
+;
 
 value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
   let mark = Array.make (nb_of_persons base) False in
+  (* Charge le cache des LIA. *)
+  (* On limite à 10 le nombre de générations ascendantes à charger pour les LIA. *)
+  let () = Perso_link.init_cache conf base ip 10 0 0 in
   let rec loop level ip =
+    (* Ne traite pas l'index s'il a déjà été traité. *)
+    (* Pose surement probleme pour des implexes. *)
     if mark.(Adef.int_of_iper ip) then ()
     else do {
+      (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
       mark.(Adef.int_of_iper ip) := True;
       x.val := max x.val level;
       if x.val = max_lev then ()
@@ -1547,7 +1779,7 @@ value links_to_ind conf base db key =
          else pgl)
       [] db
   in
-  Mutil.list_uniq (List.sort compare list)
+  list_uniq (List.sort compare list)
 ;
 
 (* Interpretation of template file *)
@@ -1726,6 +1958,30 @@ value get_sosa conf base env r p =
       r.val := [(get_key_index p, s) :: r.val];
       s
     } ]
+;
+
+(* ************************************************************************** *)
+(*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
+(** [Description] : Permet de récupérer un lien de la chronique familiale.
+    [Args] :
+      - conf : configuration
+      - base : base de donnée
+      - p    : person
+      - s    : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH")
+    [Retour] : string : "<a href="xxx">description du lien</a>"
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
+value get_linked_page conf base p s =
+    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let fname = Filename.concat bdir "notes_links" in
+    let db = NotesLinks.read_db_from_file fname in
+    let db = Notes.merge_possible_aliases conf db in
+    let key =
+        let fn = Name.lower (sou base (get_first_name p)) in
+        let sn = Name.lower (sou base (get_surname p)) in
+        (fn, sn, get_occ p)
+    in
+    List.fold_left (linked_page_text conf base p s key) "" db
 ;
 
 value events_list conf base p =
@@ -3334,7 +3590,7 @@ and eval_str_event_field
 and eval_event_field_var
       conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc =
   fun
-  [ ["date" :: sl] when sl <> [] ->
+  [ ["date" :: sl] ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
@@ -3675,12 +3931,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_first_names_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
       else get_first_names_aliases p <> []
-  | "has_history" ->
-      let fn = sou base (get_first_name p) in
-      let sn = sou base (get_surname p) in
-      let occ = get_occ p in
-      let person_file = History_diff.history_file fn sn occ in
-      p_auth && (Sys.file_exists (History_diff.history_path conf person_file))
+  | "has_history" -> has_history conf base p p_auth
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
@@ -3766,6 +4017,10 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "is_dead" ->
       match get_death p with
       [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
+      | _ -> False ]
+  | "is_certainly_dead" ->
+      match get_death p with
+      [ OfCourseDead -> p_auth
       | _ -> False ]
   | "is_descendant" ->
       match get_env "desc_mark" env with
@@ -4651,7 +4906,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_alias env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      Mutil.list_iter_first
+      list_iter_first
         (fun first a ->
            let env = [("alias", Vstring (sou base a)) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -4789,7 +5044,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Baptism then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("baptism_witness", Vind p) :: env] in
@@ -4803,7 +5058,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Birth then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("birth_witness", Vind p) :: env] in
@@ -4817,7 +5072,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Burial then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("burial_witness", Vind p) :: env] in
@@ -4831,7 +5086,7 @@ value print_foreach conf base print_ast eval_expr =
       [ Vcelll celll -> celll
       | _ -> raise Not_found ]
     in
-    Mutil.list_iter_first
+    list_iter_first
       (fun first cell ->
          let env = [("cell", Vcell cell); ("first", Vbool first) :: env] in
          List.iter (print_ast env ep) al)
@@ -4944,7 +5199,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Cremation then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("cremation_witness", Vind p) :: env] in
@@ -4958,7 +5213,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Death then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("death_witness", Vind p) :: env] in
@@ -4982,7 +5237,7 @@ value print_foreach conf base print_ast eval_expr =
         }
   and print_foreach_event env al ((p, p_auth) as ep) =
     let events = events_list conf base p in
-    Mutil.list_iter_first
+    list_iter_first
       (fun first evt ->
          let env = [("event", Vevent p evt) :: env] in
          let env = [("first", Vbool first) :: env] in
@@ -4993,7 +5248,7 @@ value print_foreach conf base print_ast eval_expr =
       match get_env "event" env with
       [ Vevent _ (_, _, _, _, _, witnesses, _) ->
           let witnesses = Array.to_list witnesses in
-          Mutil.list_iter_first
+          list_iter_first
             (fun first (ip, wk) ->
                let p = pget conf base ip in
                let wk = Util.string_of_witness_kind conf p wk in
@@ -5015,7 +5270,7 @@ value print_foreach conf base print_ast eval_expr =
         (True, witness_kind)
       else loop (i + 1)
     in
-    let related = Mutil.list_uniq (List.sort compare (get_related p)) in
+    let related = list_uniq (List.sort compare (get_related p)) in
     let events_witnesses = do {
       let list = ref [] in
       make_list related where rec make_list =
@@ -5118,7 +5373,7 @@ value print_foreach conf base print_ast eval_expr =
               let fam = foi base ifam in
               let ifath = get_father fam in
               let imoth = get_mother fam in
-              let ispouse = Gutil.spouse (get_key_index p) fam in
+              let ispouse = spouse (get_key_index p) fam in
               let cpl = (ifath, imoth, ispouse) in
               let m_auth =
                  authorized_age conf base (pget conf base ifath) &&
@@ -5195,9 +5450,10 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_first_name_alias env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      List.iter
-        (fun s ->
+      list_iter_first
+        (fun first s ->
            let env = [("first_name_alias", Vstring (sou base s)) :: env] in
+           let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
   and print_foreach_level max_lev env al ((p, _) as ep) =
@@ -5217,7 +5473,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_nobility_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
-      Mutil.list_iter_first
+      list_iter_first
         (fun first x ->
            let env = [("nobility_title", Vtitle p x) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -5238,7 +5494,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_qualifier env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      Mutil.list_iter_first
+      list_iter_first
         (fun first nn ->
            let env = [("qualifier", Vstring (sou base nn)) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -5246,7 +5502,7 @@ value print_foreach conf base print_ast eval_expr =
         (get_qualifiers p)
   and print_foreach_relation env al ((p, p_auth) as ep) =
     if p_auth then
-      Mutil.list_iter_first
+      list_iter_first
         (fun first r ->
            let env = [("rel", Vrel r None) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -5256,7 +5512,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
       let list =
-        let list = Mutil.list_uniq (List.sort compare (get_related p)) in
+        let list = list_uniq (List.sort compare (get_related p)) in
         List.fold_left
           (fun list ic ->
              let c = pget conf base ic in
@@ -5423,15 +5679,16 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_surname_alias env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      List.iter
-        (fun s ->
+      list_iter_first
+        (fun first s ->
            let env = [("surname_alias", Vstring (sou base s)) :: env] in
+           let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_surnames_aliases p)
   and print_foreach_witness env al ep =
     fun
     [ Vfam _ fam _ True ->
-        Mutil.list_iter_first
+        list_iter_first
           (fun first ip ->
              let p = pget conf base ip in
              let env = [("witness", Vind p) :: env] in
@@ -5442,7 +5699,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_witness_relation env al ((p, _) as ep) =
     let list = do {
       let list = ref [] in
-      let related = Mutil.list_uniq (List.sort compare (get_related p)) in
+      let related = list_uniq (List.sort compare (get_related p)) in
       make_list related where rec make_list =
         fun
         [ [ic :: icl] -> do {
@@ -5451,7 +5708,7 @@ value print_foreach conf base print_ast eval_expr =
               Array.iter
                 (fun ifam ->
                    let fam = foi base ifam in
-                   if Array.mem (get_key_index p) (get_witnesses fam)
+                   if array_mem (get_key_index p) (get_witnesses fam)
                    then
                      list.val := [(ifam, fam) :: list.val]
                    else ())
@@ -5592,7 +5849,8 @@ value gen_interp_templ menu title templ_fname conf base p = do {
       | _ -> Vint 0 ]
     in
     let mcl () = Vint (max_cousin_level conf base p) in
-    let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
+    (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
+    let mdl () = Vint (max (max_descendant_level conf base desc_level_table_l) (Perso_link.max_interlinks_descendancy_level conf base (get_key_index p) 10)) in
     (* Static max descendant level *)
     let smdl () =
       Vint (max_descendant_level conf base desc_level_table_m)

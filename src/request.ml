@@ -4,7 +4,9 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value person_is_std_key conf base p k =
@@ -34,11 +36,10 @@ value very_unknown conf =
           (Util.transl conf ":") prenom nom
       in
       do {
-        Hutil.rheader conf title;
-        Hutil.print_link_to_welcome conf False;
-        Hutil.trailer conf;
+        Wserver.http HttpStatus.Not_Found;
+        rheader conf title; print_link_to_welcome conf False; trailer conf;
       }
-  | _ -> Hutil.incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value unknown conf n =
@@ -47,9 +48,8 @@ value unknown conf n =
       (Util.transl conf ":") n
   in
   do {
-    Hutil.rheader conf title;
-    Hutil.print_link_to_welcome conf False;
-    Hutil.trailer conf;
+    Wserver.http  HttpStatus.Not_Found;
+    rheader conf title; print_link_to_welcome conf False; trailer conf;
   }
 ;
 
@@ -74,14 +74,23 @@ value relation_print conf base p =
 value person_selected conf base p =
   match p_getenv conf.senv "em" with
   [ Some "R" -> relation_print conf base p
-  | Some mode -> Hutil.incorrect_request conf
+  | Some mode -> incorrect_request conf
   | None -> do {
       record_visited conf (get_key_index p);
       Perso.print conf base p } ]
 ;
 
+value person_selected_with_redirect conf base p =
+  match p_getenv conf.senv "em" with
+  [ Some "R" -> relation_print conf base p
+  | Some mode -> incorrect_request conf
+  | None -> do {
+      Wserver.http_redirect_temporarily (commd conf ^ Util.acces conf base p)
+  } ]
+;
+
 value compact_list conf base xl =
-  let pl = Gutil.sort_person_list base xl in
+  let pl = sort_person_list base xl in
   let pl =
     List.fold_right
       (fun p pl ->
@@ -162,7 +171,7 @@ value find_all conf base an =
         | _ -> ([], False) ]
       else ([], False)
   | _ ->
-      match Gutil.person_of_string_key base an with
+      match person_of_string_key base an with
       [ Some ip ->
           let pl =
             let p = pget conf base ip in
@@ -180,12 +189,12 @@ value find_all conf base an =
           in
           (pl, False)
       | None ->
-          let ipl = Gutil.person_not_a_key_find_all base an in
+          let ipl = person_not_a_key_find_all base an in
           let (an, ipl) =
             if ipl = [] then
               match name_with_roman_number an with
               [ Some an1 ->
-                  let ipl = Gutil.person_ht_find_all base an1 in
+                  let ipl = person_ht_find_all base an1 in
                   if ipl = [] then (an, []) else (an1, ipl)
               | None -> (an, ipl) ]
             else (an, ipl)
@@ -260,9 +269,9 @@ value specify conf base n pl =
       pl
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     conf.cancel_links := False;
-    Hutil.print_link_to_welcome conf True;
+    print_link_to_welcome conf True;
     (* Si on est dans un calcul de parenté, on affiche *)
     (* l'aide sur la sélection d'un individu.          *)
     Util.print_tips_relationship conf;
@@ -309,7 +318,7 @@ value specify conf base n pl =
                (fun ifam spouses ->
                   let cpl = foi base ifam in
                   let spouse =
-                    pget conf base (Gutil.spouse (get_key_index p) cpl)
+                    pget conf base (spouse (get_key_index p) cpl)
                   in
                   if p_surname base spouse <> "?" then [spouse :: spouses]
                   else spouses)
@@ -327,7 +336,7 @@ value specify conf base n pl =
          end)
       ptll;
     Wserver.printf "</ul>\n";
-    Hutil.trailer conf;
+    trailer conf;
   }
 ;
 
@@ -373,7 +382,7 @@ value make_senv conf base =
       let ip =
         match person_of_key base vp vn voc with
         [ Some ip -> ip
-        | None -> do { Hutil.incorrect_request conf; raise Exit } ]
+        | None -> do { incorrect_request conf; raise Exit } ]
       in
       let vi = string_of_int (Adef.int_of_iper ip) in set_senv conf vm vi
   | _ -> () ]
@@ -447,35 +456,35 @@ value family_m conf base =
       | _ -> very_unknown conf ]
   | Some "FORUM" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print conf base ]
   | Some "FORUM_ADD" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_add conf base ]
   | Some "FORUM_ADD_OK" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_add_ok conf base ]
   | Some "FORUM_DEL" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_del conf base ]
   | Some "FORUM_P_P" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_access_switch conf base ]
   | Some "FORUM_SEARCH" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_search conf base ]
   | Some "FORUM_VAL" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_valid conf base ]
   | Some "FORUM_VIEW" ->
       match p_getenv conf.base_env "disable_forum" with
-      [ Some "yes" -> Hutil.incorrect_request conf
+      [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print conf base ]
   | Some "H" ->
       match p_getenv conf.env "v" with
@@ -547,7 +556,7 @@ value family_m conf base =
             match p_getenv conf.env "t" with
             [ Some "P" -> [("fn", n) :: conf.env]
             | Some "N" -> [("sn", n) :: conf.env]
-            | _ -> [("n", n) :: conf.env] ]
+            | _ -> [("v", n) :: conf.env] ]
         | None -> conf.env ]
       in
       let conf = {(conf) with env = env} in
@@ -575,11 +584,11 @@ value family_m conf base =
                    Gutil.person_of_string_key base n <> None ||
                    person_is_std_key conf base p n
                 then
-                  person_selected conf base p
+                  person_selected_with_redirect conf base p
                 else specify conf base n pl
             | pl -> specify conf base n pl ]
           in
-          match real_input "n" with
+          match real_input "v" with
           [ Some n -> search n
           | None ->
               match (real_input "fn", real_input "sn") with
@@ -594,7 +603,7 @@ value family_m conf base =
                     conf.cancel_links := False;
                     Some.surname_print conf base unknown sn
                   }
-              | (None, None) -> Hutil.incorrect_request conf ] ]
+              | (None, None) -> incorrect_request conf ] ]
       | Some i ->
           relation_print conf base
             (pget conf base (Adef.iper_of_int (int_of_string i))) ]
@@ -617,11 +626,11 @@ value family_m conf base =
   | Some "REQUEST" when conf.wizard ->
       let title _ = () in
       do {
-        Hutil.header conf title;
+        header conf title;
         Wserver.printf "<pre>\n";
         List.iter (Wserver.printf "%s\n") conf.request;
         Wserver.printf "</pre>\n";
-        Hutil.trailer conf;
+        trailer conf;
       }
   | Some "RL" -> RelationLink.print conf base
   | Some "RLM" -> Relation.print_multi conf base
@@ -685,6 +694,7 @@ IFDEF API THEN
   | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
   | Some "API_LOOP_BASE" -> Api.print_loop conf base
   | Some "API_MAX_ANCESTORS" when conf.wizard -> Api.print_max_ancestors conf base
+  | Some "API_NB_ANCESTORS" -> Api_saisie_read.print_nb_ancestors conf base
   | Some "API_NOTIFICATION_BIRTHDAY" -> Api.print_notification_birthday conf base
   | Some "API_PRINT_INDEX" -> Api.print_all_full_person conf base
   | Some "API_PRINT_EXPORT" -> Api.print_export conf base
@@ -698,11 +708,9 @@ IFDEF API THEN
   | Some "API_UPDATE_PERSON" -> Api_update_person.print_mod conf base
   | Some "API_UPDATE_FAMILY" -> Api_update_family.print_mod conf base
 *)
-  | Some "API_GRAPH_TREE" -> Api_saisie_read.print_graph_tree conf base
   | Some "API_GRAPH_TREE_V2" -> Api_saisie_read.print_graph_tree_v2 conf base
-  | Some "API_GRAPH_TREE_FULL" -> Api_saisie_read.print_graph_tree_full conf base
   | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
-
+  | Some "API_FICHE_PERSON" -> Api_saisie_read.print_fiche_person conf base
   | Some "API_AUTO_COMPLETE" when conf.wizard -> Api_saisie_write.print_auto_complete conf base
   | Some "API_GET_CONFIG" when conf.wizard -> Api_saisie_write.print_config conf base
   | Some "API_PERSON_SEARCH_LIST" when conf.wizard -> Api_saisie_write.print_person_search_list conf base
@@ -734,9 +742,9 @@ IFDEF API THEN
   | Some mode -> ()
   | None -> () ]
 ELSE
-    Hutil.incorrect_request conf
+    incorrect_request conf
 END
-  | Some mode -> Hutil.incorrect_request conf
+  | Some mode -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with
       [ Some p -> person_selected conf base p
@@ -747,13 +755,13 @@ value print_no_index conf base =
   let title _ = Wserver.printf "%s" (Util.capitale (transl conf "link to use")) in
   let link = url_no_index conf base in
   do {
-    Hutil.header conf title;
+    header conf title;
     tag "ul" begin
       html_li conf;
       tag "a" "href=\"http://%s\"" link begin Wserver.printf "%s" link; end;
     end;
-    Hutil.print_link_to_welcome conf False;
-    Hutil.trailer conf;
+    print_link_to_welcome conf False;
+    trailer conf;
   }
 ;
 
@@ -766,7 +774,7 @@ IFDEF API THEN
   | Some mode -> ()
   | None -> () ]
 ELSE
-  Hutil.incorrect_request conf
+  incorrect_request conf
 END
 ;
 
@@ -914,7 +922,7 @@ value treat_request conf base = do {
             Srcfile.print_source conf base f
           else
             Image.print conf base
-      | None -> Hutil.incorrect_request conf ]
+      | None -> incorrect_request conf ]
   | _ ->
       do {
         set_owner conf;

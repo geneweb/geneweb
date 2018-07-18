@@ -1,6 +1,7 @@
 (* camlp5r ../../src/pa_lock.cmo *)
 (* $Id: public2.ml,v 4.1 2008/03/31 11:34:34 deraugla Exp $ *)
 
+open Printf;
 
 open Def;
 open Gwdb;
@@ -67,12 +68,11 @@ value change_somebody_access base lim_year trace p year_of_p spouse =
         let gp = {(gen_person_of_person p) with access = acc} in
         patch_person base gp.key_index gp;
         if trace then do {
-          Printf.printf "%s -> " (Gutil.designation base p);
-          if acc = Private then Printf.printf "private"
-          else Printf.printf "public";
-          Printf.printf " (anc %d gen %s year %d)" nb_gen
+          printf "%s -> " (Gutil.designation base p);
+          if acc = Private then printf "private" else printf "public";
+          printf " (anc %d gen %s year %d)" nb_gen
             (Gutil.designation base a) year;
-          Printf.printf "\n";
+          printf "\n";
           flush stdout;
         }
         else ();
@@ -82,7 +82,7 @@ value change_somebody_access base lim_year trace p year_of_p spouse =
   else None
 ;
 
-value public_all bname lim_year trace = do {
+value public_all bname lim_year trace patched = do {
   let base = Gwdb.open_base bname in
   let () = load_ascends_array base in
   let () = load_couples_array base in
@@ -91,9 +91,8 @@ value public_all bname lim_year trace = do {
   Consang.check_noloop base
         (fun
          [ OwnAncestor p -> do {
-             Printf.printf "I cannot deal this database.\n";
-             Printf.printf
-               "%s is his own ancestors\n" (Gutil.designation base p);
+             printf "I cannot deal this database.\n";
+             printf "%s is his own ancestors\n" (Gutil.designation base p);
              flush stdout;
              exit 2
            }
@@ -103,7 +102,7 @@ value public_all bname lim_year trace = do {
     ProgrBar.run i n;
     let ip = Adef.iper_of_int i in
     let p = poi base ip in
-    if year_of p = None && get_access p = IfTitles then do {
+    if year_of p = None && get_access p = IfTitles && (patched && is_patched_person base ip || patched = False) then do {
       match change_somebody_access base lim_year trace p (year_of p) False with
       [ Some _ -> changes.val := True
       | None ->
@@ -128,12 +127,12 @@ value public_all bname lim_year trace = do {
                   patch_person base gp.key_index gp;
                   changes.val := True;
                   if trace then do {
-                    Printf.printf "%s -> " (Gutil.designation base p);
-                    if acc = Private then Printf.printf "private"
-                    else Printf.printf "public";
-                    Printf.printf " (inherited from spouse %s)"
+                    printf "%s -> " (Gutil.designation base p);
+                    if acc = Private then printf "private"
+                    else printf "public";
+                    printf " (inherited from spouse %s)"
                       (Gutil.designation base sp);
-                    Printf.printf "\n";
+                    printf "\n";
                     flush stdout;
                   }
                   else ();
@@ -148,12 +147,14 @@ value public_all bname lim_year trace = do {
 
 value lim_year = ref 1900;
 value trace = ref False;
+value patched = ref False;
 value bname = ref "";
 
 value speclist =
   [("-y", Arg.Int (fun i -> lim_year.val := i),
     "limit year (default = " ^ string_of_int lim_year.val ^ ")");
-   ("-t", Arg.Set trace, "trace changed persons")]
+   ("-t", Arg.Set trace, "trace changed persons");
+   ("-p", Arg.Set patched, "compute patched persons only")]
 ;
 value anonfun i = bname.val := i;
 value usage = "Usage: public [-y #] [-t] base";
@@ -163,18 +164,18 @@ value main () = do {
   if bname.val = "" then do { Arg.usage speclist usage; exit 2; } else ();
   lock (Mutil.lock_file bname.val) with
   [ Accept ->
-      public_all bname.val lim_year.val trace.val
+      public_all bname.val lim_year.val trace.val patched.val
   | Refuse -> do {
-      Printf.eprintf "Base is locked. Waiting... ";
+      eprintf "Base is locked. Waiting... ";
       flush stderr;
       lock_wait (Mutil.lock_file bname.val) with
       [ Accept -> do {
-          Printf.eprintf "Ok\n";
+          eprintf "Ok\n";
           flush stderr;
-          public_all bname.val lim_year.val trace.val;
+          public_all bname.val lim_year.val trace.val patched.val;
         }
       | Refuse -> do {
-          Printf.printf "\nSorry. Impossible to lock base.\n";
+          printf "\nSorry. Impossible to lock base.\n";
           flush stdout;
           exit 2
         } ]

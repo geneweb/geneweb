@@ -27,5 +27,6 @@ class FilterSex extends Filter {
 	public function getSex(){
 		return $this->sex;
 	}
+
 }
 ?>

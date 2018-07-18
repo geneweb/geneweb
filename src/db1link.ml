@@ -2,8 +2,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp;
+open Printf;
 open Dbdisk;
 open Def;
+open Mutil;
 
 value default_source = ref "";
 value do_check = ref True;
@@ -71,7 +73,7 @@ value check_error gen = gen.g_errored := True;
 
 value set_error base gen x =
   do {
-    Printf.printf "\nError: ";
+    printf "\nError: ";
     Check.print_base_error stdout base x;
     check_error gen;
   }
@@ -82,7 +84,7 @@ value set_warning base =
   [ UndefinedSex _ -> ()
   | x ->
       do {
-        Printf.printf "\nWarning: ";
+        printf "\nWarning: ";
         Check.print_base_warning stdout base x;
       } ]
 ;
@@ -92,8 +94,8 @@ value aoi base i = base.c_ascends.(Adef.int_of_iper i);
 value uoi base i = base.c_unions.(Adef.int_of_iper i);
 value coi base i = base.c_couples.(Adef.int_of_ifam i);
 value sou base i = base.c_strings.(Adef.int_of_istr i);
-value p_first_name base p = Mutil.nominative (sou base p.m_first_name);
-value p_surname base p = Mutil.nominative (sou base p.m_surname);
+value p_first_name base p = nominative (sou base p.m_first_name);
+value p_surname base p = nominative (sou base p.m_surname);
 value designation base p =
   let prenom = p_first_name base p in
   let nom = p_surname base p in
@@ -208,14 +210,14 @@ value title_unique_string gen t =
 ;
 
 value person_hash first_name surname =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
+  let first_name = nominative first_name in
+  let surname = nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in Hashtbl.hash s
 ;
 
 value find_person_by_global_name gen first_name surname occ =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
+  let first_name = nominative first_name in
+  let surname = nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Hashtbl.find_all gen.g_names key in
@@ -236,8 +238,8 @@ value find_person_by_global_name gen first_name surname occ =
 ;
 
 value find_person_by_local_name gen first_name surname occ =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
+  let first_name = nominative first_name in
+  let surname = nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Hashtbl.find_all gen.g_file_info.f_local_names (key, occ) in
@@ -264,7 +266,7 @@ value find_person_by_name gen first_name surname occ =
 ;
 
 value add_person_by_name gen first_name surname occ iper =
-  let s = Name.crush_lower (Mutil.nominative (first_name ^ " " ^ surname)) in
+  let s = Name.crush_lower (nominative (first_name ^ " " ^ surname)) in
   let key = Hashtbl.hash s in Hashtbl.add gen.g_names key iper
 ;
 
@@ -336,13 +338,13 @@ value insert_undefined gen key =
       if sou gen.g_base x.m_first_name <> key.pk_first_name ||
          sou gen.g_base x.m_surname <> key.pk_surname then
          do {
-        Printf.printf "\nPerson defined with two spellings:\n";
-        Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
+        printf "\nPerson defined with two spellings:\n";
+        printf "  \"%s%s %s\"\n" key.pk_first_name
           (match x.m_occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
           key.pk_surname;
-        Printf.printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
+        printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
           (match occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
@@ -400,14 +402,14 @@ value insert_person gen so =
   in
   do {
     if gen.g_def.(Adef.int_of_iper ip) then do {
-      Printf.printf "\nPerson already defined: \"%s%s %s\"\n" so.first_name
+      printf "\nPerson already defined: \"%s%s %s\"\n" so.first_name
         (match x.m_occ with
          [ 0 -> ""
          | n -> "." ^ string_of_int n ])
         so.surname;
       if p_first_name gen.g_base x <> so.first_name ||
          p_surname gen.g_base x <> so.surname then
-        Printf.printf "as name: \"%s%s %s\"\n" (p_first_name gen.g_base x)
+        printf "as name: \"%s%s %s\"\n" (p_first_name gen.g_base x)
           (match occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
@@ -421,13 +423,13 @@ value insert_person gen so =
       if sou gen.g_base x.m_first_name <> so.first_name ||
          sou gen.g_base x.m_surname <> so.surname then
          do {
-        Printf.printf "\nPerson defined with two spellings:\n";
-        Printf.printf "  \"%s%s %s\"\n" so.first_name
+        printf "\nPerson defined with two spellings:\n";
+        printf "  \"%s%s %s\"\n" so.first_name
           (match x.m_occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
           so.surname;
-        Printf.printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
+        printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
           (match occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
@@ -497,7 +499,7 @@ value check_parents_not_already_defined gen ix fath moth =
       let p = Adef.father cpl in
       let m = Adef.mother cpl in
       do {
-        Printf.printf "
+        printf "
 I cannot add \"%s\", child of
     - \"%s\"
     - \"%s\",
@@ -522,7 +524,7 @@ value notice_sex gen p s =
   if p.m_sex = Neuter then p.m_sex := s
   else if p.m_sex = s || s = Neuter then ()
   else do {
-    Printf.printf "\nInconsistency about the sex of\n  %s %s\n"
+    printf "\nInconsistency about the sex of\n  %s %s\n"
       (p_first_name gen.g_base p) (p_surname gen.g_base p);
     check_error gen
   }
@@ -846,8 +848,8 @@ value pevent_name_unique_string gen =
 value insert_pevents fname gen sb sex pevtl =
   let (p, ip) = insert_somebody gen sb in
   if p.m_pevents <> [] then do {
-    Printf.printf "\nFile \"%s\"\n" fname;
-    Printf.printf "Individual events already defined for \"%s%s %s\"\n"
+    printf "\nFile \"%s\"\n" fname;
+    printf "Individual events already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
       (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
@@ -898,8 +900,8 @@ value insert_notes fname gen key str =
   [ Some ip ->
       let p = poi gen.g_base ip in
       if sou gen.g_base p.m_notes <> "" then do {
-        Printf.printf "\nFile \"%s\"\n" fname;
-        Printf.printf "Notes already defined for \"%s%s %s\"\n"
+        printf "\nFile \"%s\"\n" fname;
+        printf "Notes already defined for \"%s%s %s\"\n"
           key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
         check_error gen
@@ -907,8 +909,8 @@ value insert_notes fname gen key str =
       else p.m_notes := unique_string gen str
   | None ->
       do {
-        Printf.printf "File \"%s\"\n" fname;
-        Printf.printf "*** warning: undefined person: \"%s%s %s\"\n"
+        printf "File \"%s\"\n" fname;
+        printf "*** warning: undefined person: \"%s%s %s\"\n"
           key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
         flush stdout;
@@ -963,8 +965,8 @@ value insert_relation gen ip r =
 value insert_relations fname gen sb sex rl =
   let (p, ip) = insert_somebody gen sb in
   if p.m_rparents <> [] then do {
-    Printf.printf "\nFile \"%s\"\n" fname;
-    Printf.printf "Relations already defined for \"%s%s %s\"\n"
+    printf "\nFile \"%s\"\n" fname;
+    printf "Relations already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
       (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
@@ -990,7 +992,7 @@ value insert_syntax fname gen =
 
 value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
-   output_array oc = Mutil.output_value_no_sharing oc (tab : array _);
+   output_array oc = output_value_no_sharing oc (tab : array _);
    len = Array.length tab; clear_array () = ()}
 ;
 
@@ -1278,7 +1280,7 @@ value families_record_access fam_index_ic fam_ic len =
   in
   {load_array () = (); get = get_fun;
    set i v = failwith "bug: setting family array";
-   output_array oc = Mutil.output_array_no_sharing oc get_fun len;
+   output_array oc = output_array_no_sharing oc get_fun len;
    len = len; clear_array () = ()}
 ;
 
@@ -1405,17 +1407,17 @@ value output_wizard_notes bdir wiznotes = do {
 
 value output_particles_file bdir particles = do {
   let oc = open_out (Filename.concat bdir "particles.txt") in
-  List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
   close_out oc;
 };
 
 value output_command_line bdir = do {
   let oc = open_out (Filename.concat bdir "command.txt") in
-  Printf.fprintf oc "%s" Sys.argv.(0);
+  fprintf oc "%s" Sys.argv.(0);
   for i = 1 to Array.length Sys.argv - 1 do {
-    Printf.fprintf oc " %s" Sys.argv.(i)
+    fprintf oc " %s" Sys.argv.(i)
   };
-  Printf.fprintf oc "\n";
+  fprintf oc "\n";
   close_out oc;
 };
 

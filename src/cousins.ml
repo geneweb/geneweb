@@ -6,7 +6,9 @@ module type HACK_FOR_DEPEND = sig open Pqueue; end;
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value default_max_cnt = 2000;
@@ -378,7 +380,7 @@ value print_cousins conf base p lev1 lev2 =
       else ();
     end;
     Wserver.printf "</div>\n";
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -467,7 +469,7 @@ value print_anniv conf base p dead_people level =
              if i = Array.length u then set
              else
                let cpl = foi base u.(i) in
-               let c = Gutil.spouse ip cpl in
+               let c = spouse ip cpl in
                loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1)
            in
            loop set 0)

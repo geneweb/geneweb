@@ -4,6 +4,8 @@
 
 open Config;
 open Gwdb;
+open Hutil;
+open Mutil;
 open Util;
 
 value default_max_cnt = 2000;
@@ -144,7 +146,7 @@ value tr c1 s2 s =
 value print_alphabetic_big conf base is_surnames ini list len too_big = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
-  Hutil.header conf title;
+  header conf title;
   tag "p" "class=\"search_name\"" begin
     List.iter
       (fun (ini_k, _) ->
@@ -181,13 +183,13 @@ value print_alphabetic_big conf base is_surnames ini list len too_big = do {
     end;
   }
   else ();
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_alphabetic_all conf base is_surnames ini list len = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
-  Hutil.header conf title;
+  header conf title;
   tag "p" "class=\"search_name\"" begin
     List.iter
       (fun (ini_k, _) ->
@@ -222,13 +224,13 @@ value print_alphabetic_all conf base is_surnames ini list len = do {
          end)
       list;
   end;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_alphabetic_small conf base is_surnames ini list len = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
-  Hutil.header conf title;
+  header conf title;
   if list = [] then ()
   else
     tag "ul" begin
@@ -244,14 +246,14 @@ value print_alphabetic_small conf base is_surnames ini list len = do {
            end)
         list;
     end;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_frequency_any conf base is_surnames list len = do {
   let title _ = print_title conf base is_surnames "" len in
   let mode = if is_surnames then "N" else "P" in
   let n = ref 0 in
-  Hutil.header conf title;
+  header conf title;
   tag "ul" begin
     List.iter
       (fun (cnt, l) ->
@@ -275,7 +277,7 @@ value print_frequency_any conf base is_surnames list len = do {
            end)
       list;
   end;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 (* selection *)
@@ -293,7 +295,7 @@ value select_names conf base is_surnames ini need_whole_list =
     with
     [ Some istr ->
         loop istr 0 [] where rec loop istr len list =
-          let s = Mutil.nominative (sou base istr) in
+          let s = nominative (sou base istr) in
           let k = name_key_compatible base s in
           if string_start_with ini k then
             let (list, len) =
@@ -411,7 +413,7 @@ value print_alphabetic conf base is_surnames =
   else if len >= 50 || ini = "" then
     let list = combine_by_ini ini list in
     if all then
-      if len > default_max_cnt then Hutil.incorrect_request conf
+      if len > default_max_cnt then incorrect_request conf
       else print_alphabetic_all conf base is_surnames ini list len
     else print_alphabetic_big conf base is_surnames ini list len False
   else print_alphabetic_small conf base is_surnames ini list len
@@ -423,7 +425,7 @@ value print_alphabetic_short conf base is_surnames ini list len = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   let need_ref = len >= 250 in
-  Hutil.header conf title;
+  header conf title;
   if need_ref then
     tag "p" begin
       List.iter
@@ -439,7 +441,7 @@ value print_alphabetic_short conf base is_surnames ini list len = do {
     (fun (ini_k, l) ->
        let ini = capitalize_if_not_utf8 ini_k in
        tag "p" begin
-         Mutil.list_iter_first
+         list_iter_first
            (fun first (s, cnt) -> do {
               let href =
                 if not conf.cancel_links then
@@ -463,7 +465,7 @@ value print_alphabetic_short conf base is_surnames ini list len = do {
          Wserver.printf "\n";
        end)
     list;
-  Hutil.trailer conf;
+  trailer conf;
 };
 
 value print_short conf base is_surnames =
@@ -474,7 +476,7 @@ value print_short conf base is_surnames =
   in
   let _ = if String.length ini < 2 then load_strings_array base else () in
   let (list, sorted, len) = select_names conf base is_surnames ini True in
-  if len > default_max_cnt then Hutil.incorrect_request conf
+  if len > default_max_cnt then incorrect_request conf
   else
     let list =
       if sorted then list

@@ -5,7 +5,10 @@
 open Config;
 open Def;
 open Dag2html;
+open Gutil;
 open Gwdb;
+open Hutil;
+open Mutil;
 open Util;
 
 value limit_by_tree conf =
@@ -82,10 +85,10 @@ value display_descendants_level conf base max_level ancestor =
   let list =
     List.sort
       (fun p1 p2 ->
-         let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
+         let c = alphabetic (p_surname base p2) (p_surname base p1) in
          if c = 0 then
            let c =
-             Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
+             alphabetic (p_first_name base p2) (p_first_name base p1)
            in
            if c = 0 then compare (get_occ p2) (get_occ p1) else c
          else c)
@@ -101,7 +104,7 @@ value display_descendants_level conf base max_level ancestor =
       [] list
   in
   do {
-    Hutil.header conf (descendants_title conf base ancestor);
+    header conf (descendants_title conf base ancestor);
     Wserver.printf "%s" (capitale (text_level conf max_level));
     if len.val > 1 then
       Wserver.printf " (%d %s)" len.val
@@ -112,7 +115,7 @@ value display_descendants_level conf base max_level ancestor =
     print_alphab_list conf
       (fun (p, _) ->
          if is_hidden p then "?" else
-         String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
+         String.sub (p_surname base p) (initial (p_surname base p)) 1)
       (fun (p, c) ->
          do {
            Wserver.printf "\n%s" (referenced_person_title_text conf base p);
@@ -123,7 +126,7 @@ value display_descendants_level conf base max_level ancestor =
            Wserver.printf "\n"
          })
       list;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -150,7 +153,7 @@ value label_descendants conf base marks paths max_lev =
         List.fold_left
           (fun cnt ifam ->
              let fam = foi base ifam in
-             let c = Gutil.spouse (get_key_index p) fam in
+             let c = spouse (get_key_index p) fam in
              let el = get_children fam in
              List.fold_left
                (fun cnt e ->
@@ -181,7 +184,7 @@ value close_to_end conf base marks max_lev lev p =
       List.for_all
         (fun ifam ->
            let fam = foi base ifam in
-           let c = Gutil.spouse (get_key_index p) fam in
+           let c = spouse (get_key_index p) fam in
            let el = get_children fam in
            if get_sex p = Male || not marks.(Adef.int_of_iper c) then
              if dlev = close_lev then Array.length el = 0
@@ -267,7 +270,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
         List.fold_left
           (fun (cnt, first, need_br) ifam ->
              let fam = foi base ifam in
-             let c = Gutil.spouse (get_key_index p) fam in
+             let c = spouse (get_key_index p) fam in
              let el = get_children fam in
              let c = pget conf base c in
              do {
@@ -293,10 +296,10 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                           Wserver.printf "\n";
                           incr total;
                           if succ lev = max_lev then
-                            Mutil.list_iter_first
+                            list_iter_first
                               (fun first ifam ->
                                  let fam = foi base ifam in
-                                 let c1 = Gutil.spouse ie fam in
+                                 let c1 = spouse ie fam in
                                  let el = get_children fam in
                                  let c1 = pget conf base c1 in
                                  do {
@@ -345,7 +348,7 @@ value print_family conf base marks paths max_lev lev p =
       List.fold_left
         (fun cnt ifam ->
            let fam = foi base ifam in
-           let c = Gutil.spouse (get_key_index p) fam in
+           let c = spouse (get_key_index p) fam in
            let el = get_children fam in
            let c = pget conf base c in
            do {
@@ -373,7 +376,7 @@ value print_family conf base marks paths max_lev lev p =
                           Array.iter
                             (fun ifam ->
                                let fam = foi base ifam in
-                               let c = Gutil.spouse ie fam in
+                               let c = spouse ie fam in
                                let el = get_children fam in
                                let c = pget conf base c in
                                do {
@@ -410,7 +413,7 @@ value print_families conf base marks paths max_lev =
       Array.iter
         (fun ifam ->
            let fam = foi base ifam in
-           let c = Gutil.spouse (get_key_index p) fam in
+           let c = spouse (get_key_index p) fam in
            let el = get_children fam in
            let c = pget conf base c in
            if get_sex p = Male ||
@@ -445,7 +448,7 @@ value display_descendants_with_numbers conf base max_level ancestor =
   let marks = Array.make (nb_of_persons base) False in
   let paths = Array.make (nb_of_persons base) [] in
   do {
-    Hutil.header conf title;
+    header conf title;
     total.val := 0;
     Wserver.printf "%s" (Date.short_dates_text conf base ancestor);
     let p = ancestor in
@@ -470,7 +473,7 @@ value display_descendants_with_numbers conf base max_level ancestor =
       Wserver.printf ".\n"
     }
     else ();
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -480,7 +483,7 @@ value print_ref conf base paths p =
   else
     Array.iter
       (fun ifam ->
-         let c = Gutil.spouse (get_key_index p) (foi base ifam) in
+         let c = spouse (get_key_index p) (foi base ifam) in
          if paths.(Adef.int_of_iper c) <> [] then
            let c = pget conf base c in
            Wserver.printf " => %s %s <tt><b>%s</b></tt>" (p_first_name base c)
@@ -545,9 +548,9 @@ value sort_and_display conf base paths precision list =
   let list =
     List.sort
       (fun p1 p2 ->
-         let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
+         let c = alphabetic (p_surname base p2) (p_surname base p1) in
          if c = 0 then
-           Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
+           alphabetic (p_first_name base p2) (p_first_name base p1)
          else c)
       list
   in
@@ -594,7 +597,7 @@ value display_descendant_index conf base max_level ancestor =
     else Wserver.printf "%s" txt
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     let marks = Array.make (nb_of_persons base) False in
     let paths = Array.make (nb_of_persons base) [] in
     mark_descendants conf base marks max_level (get_key_index ancestor);
@@ -611,7 +614,7 @@ value display_descendant_index conf base max_level ancestor =
       else ()
     };
     sort_and_display conf base paths True list.val;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -622,7 +625,7 @@ value display_spouse_index conf base max_level ancestor =
       (capitale (transl conf "index of the spouses (non descendants)"))
   in
   do {
-    Hutil.header conf title;
+    header conf title;
     let marks = Array.make (nb_of_persons base) False in
     let paths = Array.make (nb_of_persons base) [] in
     mark_descendants conf base marks max_level (get_key_index ancestor);
@@ -636,7 +639,7 @@ value display_spouse_index conf base max_level ancestor =
            p_first_name base p <> "x" then
           Array.iter
             (fun ifam ->
-               let c = Gutil.spouse (get_key_index p) (foi base ifam) in
+               let c = spouse (get_key_index p) (foi base ifam) in
                if paths.(Adef.int_of_iper c) = [] then
                  let c = pget conf base c in
                  if p_first_name base c <> "?" && p_surname base c <> "?" &&
@@ -652,7 +655,7 @@ value display_spouse_index conf base max_level ancestor =
       else ()
     };
     sort_and_display conf base paths False list.val;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1118,7 +1121,7 @@ value display_descendant_with_table conf base max_lev p =
         nb_pers.val
         (transl_nth conf "person/persons" 1);
     end;
-    Hutil.trailer conf
+    trailer conf
   }
 ;
 
@@ -1306,7 +1309,7 @@ value make_tree_hts conf base gv p =
                 else 1
               in
               let s =
-                let sp = pget conf base (Gutil.spouse (get_key_index p) fam) in
+                let sp = pget conf base (spouse (get_key_index p) fam) in
                 let txt = person_title_text conf base sp in
                 let txt = reference conf base sp txt in
                 let txt =
@@ -1403,7 +1406,7 @@ value print_aboville conf base max_level p =
   let num_aboville = p_getenv conf.env "num" = Some "on" in
   do {
     Hutil.header conf (descendants_title conf base p);
-    Hutil.print_link_to_welcome conf True;
+    print_link_to_welcome conf True;
     Wserver.printf "%s.<br><p>" (capitale (text_to conf max_level));
     let rec loop_ind lev lab p =
       do {

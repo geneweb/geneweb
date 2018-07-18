@@ -8,6 +8,7 @@ open Gwdb;
 value dmy_of_dmy2 : dmy2 -> dmy;
 value code_dmy : config -> dmy -> string;
 value string_of_ondate : config -> date -> string;
+value string_of_ondate_aux : config -> date -> string;
 value string_of_date : config -> date -> string;
 value string_of_date_sep : config -> string -> date -> string;
 value string_slash_of_date : config -> date -> string;
@@ -36,6 +37,8 @@ value compare_date : date -> date -> int;
 (* Ajout pour l'API *)
 value death_symbol : config -> string;
 value string_of_dmy : config -> dmy -> string;
+value string_of_on_french_dmy : config -> dmy -> string;
+value string_of_on_hebrew_dmy : config -> dmy -> string;
 value string_of_prec_dmy : config -> string -> string -> dmy -> string;
 value gregorian_precision : config -> dmy -> string;
 value french_month : config -> int -> string;

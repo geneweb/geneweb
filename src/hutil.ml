@@ -3,6 +3,7 @@
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
+open Printf;
 
 value commd_no_params conf =
   conf.command ^ "?" ^
@@ -17,7 +18,7 @@ value link_to_referer conf =
   let referer = Util.get_referer conf in
   let back = Util.capitale (Util.transl conf "back") in
   if referer <> "" then
-    Printf.sprintf
+    sprintf
       "<a href=\"%s\">\
          <span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span>\
        </a>\n"
@@ -141,6 +142,7 @@ value incorrect_request conf = do {
   let title _ =
     Wserver.printf "%s" (Util.capitale (Util.transl conf "incorrect request"))
   in
+  Wserver.http HttpStatus.Bad_Request;
   header conf title;
   Wserver.printf "<p>\n";
   print_link_to_welcome conf False;
