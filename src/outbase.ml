@@ -4,6 +4,7 @@
 module type HACK_FOR_DEPEND = sig open Btree; end;
 
 open Dbdisk;
+open Dutil;
 open Def;
 
 value load_ascends_array base = base.data.ascends.load_array ();
@@ -34,7 +35,7 @@ value just_copy bname what oc oc_acc =
     flush stderr;
     let ic =
       let ic = Secure.open_in_bin (Filename.concat bname "base") in
-      do { Dutil.check_magic ic; ic }
+      do { check_magic ic; ic }
     in
     let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
     let persons_len = input_binary_int ic in
@@ -97,7 +98,7 @@ value just_copy bname what oc oc_acc =
 ;
 
 value make_name_index base =
-  let t = Array.make Dutil.table_size [| |] in
+  let t = Array.make table_size [| |] in
   let add_name key valu =
     let key = Name.crush (Name.abbrev key) in
     let i = Hashtbl.hash key mod Array.length t in
@@ -112,8 +113,8 @@ value make_name_index base =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
-      let first_name = Dutil.p_first_name base p in
-      let surname = Dutil.p_surname base p in
+      let first_name = p_first_name base p in
+      let surname = p_surname base p in
       if first_name <> "?" && surname <> "?" then
         let names =
           [Name.lower (first_name ^ " " ^ surname) ::
@@ -130,7 +131,7 @@ value create_name_index oc_inx oc_inx_acc base =
   let ni = make_name_index base in
   let bpos = pos_out oc_inx in
   do {
-    Mutil.output_value_no_sharing oc_inx (ni : Dutil.name_index_data);
+    Mutil.output_value_no_sharing oc_inx (ni : name_index_data);
     let epos =
       Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
         bpos
@@ -148,12 +149,12 @@ value add_name t key valu =
 ;
 
 value make_strings_of_fsname base =
-  let t = Array.make Dutil.table_size [| |] in
+  let t = Array.make table_size [| |] in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let p = Dutil.poi base (Adef.iper_of_int i) in
-      let first_name = Dutil.p_first_name base p in
-      let surname = Dutil.p_surname base p in
+      let p = poi base (Adef.iper_of_int i) in
+      let first_name = p_first_name base p in
+      let surname = p_surname base p in
       if first_name <> "?" then add_name t first_name p.first_name else ();
       if surname <> "?" then do {
         add_name t surname p.surname;
@@ -170,7 +171,7 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
   let t = make_strings_of_fsname base in
   let bpos = pos_out oc_inx in
   do {
-    Mutil.output_value_no_sharing oc_inx (t : Dutil.strings_of_fsname);
+    Mutil.output_value_no_sharing oc_inx (t : strings_of_fsname);
     let epos =
       Iovalue.output_array_access oc_inx_acc (Array.get t) (Array.length t)
         bpos
@@ -220,13 +221,13 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
     Btree.Make
       (struct
          type t = dsk_istr;
-         value compare = Dutil.compare_istr_fun base.data;
+         value compare = compare_istr_fun base.data;
        end)
   in
   let bt = ref IstrTree.empty in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let p = Dutil.poi base (Adef.iper_of_int i) in
+      let p = poi base (Adef.iper_of_int i) in
       let a =
         try IstrTree.find p.surname bt.val with [ Not_found -> [] ]
       in
@@ -263,13 +264,13 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
     Btree.Make
       (struct
          type t = dsk_istr;
-         value compare = Dutil.compare_istr_fun base.data;
+         value compare = compare_istr_fun base.data;
        end)
   in
   let bt = ref IstrTree.empty in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let p = Dutil.poi base (Adef.iper_of_int i) in
+      let p = poi base (Adef.iper_of_int i) in
       let a =
         try IstrTree.find p.first_name bt.val with [ Not_found -> [] ]
       in
@@ -341,8 +342,7 @@ value gen_output no_patches bname base =
     try
       do {
         output_string oc
-          (if Mutil.utf_8_db.val then Dutil.magic_gwb
-           else Dutil.magic_gwb_iso_8859_1);
+          (if Mutil.utf_8_db.val then magic_gwb else magic_gwb_iso_8859_1);
         output_binary_int oc base.data.persons.len;
         output_binary_int oc base.data.families.len;
         output_binary_int oc base.data.strings.len;
