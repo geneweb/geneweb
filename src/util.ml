@@ -5,6 +5,7 @@
 open Config;
 open Def;
 open Gwdb;
+open Mutil;
 
 value is_hide_names conf p =
   if conf.hide_names || get_access p = Private then True
@@ -187,7 +188,7 @@ value transl_nth conf w n =
 ;
 
 value plus_decl s =
-  match Mutil.rindex s '+' with
+  match rindex s '+' with
   [ Some i ->
       if i > 0 && s.[i - 1] = ' ' then
         let start = String.sub s 0 (i - 1) in
@@ -200,8 +201,8 @@ value plus_decl s =
 value gen_decline wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
-  if Mutil.rindex wt '/' <> None then
-    match Mutil.rindex wt '/' with
+  if rindex wt '/' <> None then
+    match rindex wt '/' with
     [ Some i ->
         (* special case for Spanish *)
         if String.length s > 0 && start_with_hi_i s then
@@ -242,7 +243,7 @@ value gen_decline2 wt s1 s2 =
         | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' ->
             let c = wt.[i + 1] in
             match string_of wt.[i + 4] with
-            [ Some s -> (Mutil.decline c s, i + 4)
+            [ Some s -> (decline c s, i + 4)
             | None -> (":", i) ]
         | '[' ->
             try
@@ -307,11 +308,11 @@ value cftransl conf fmt =
     | [a :: al] as gal ->
         if i + 4 < String.length fmt && fmt.[i] = ':' &&
            fmt.[i + 2] = ':' && fmt.[i + 3] = '%' && fmt.[i + 4] = 's' then
-          Mutil.decline fmt.[i + 1] a ^ loop (i + 5) al
+          decline fmt.[i + 1] a ^ loop (i + 5) al
         else if
           i + 1 < String.length fmt && fmt.[i] = '%' &&
           fmt.[i + 1] = 's' then
-          Mutil.nominative a ^ loop (i + 2) al
+          nominative a ^ loop (i + 2) al
         else if i < String.length fmt then
           String.make 1 fmt.[i] ^ loop (i + 1) gal
         else "" ]
@@ -329,7 +330,7 @@ value fdecline conf w s =
   valid_format w (gen_decline (string_of_format w) s)
 ;
 
-value translate_eval s = Translate.eval (Mutil.nominative s);
+value translate_eval s = Translate.eval (nominative s);
 
 (* *)
 
@@ -1111,7 +1112,7 @@ value person_title conf base p =
 ;
 
 value old_surname_begin n =
-  let i = Mutil.initial n in
+  let i = initial n in
   if i = 0 then ""
   else
     let i =
@@ -1122,7 +1123,7 @@ value old_surname_begin n =
 ;
 
 value old_surname_end n =
-  let i = Mutil.initial n in
+  let i = initial n in
   if i = 0 then n else String.sub n i (String.length n - i)
 ;
 
@@ -1544,7 +1545,7 @@ value url_no_index conf base =
   let addr =
     let pref =
       let s = get_request_string conf.request in
-      match Mutil.rindex s '?' with
+      match rindex s '?' with
       [ Some i -> String.sub s 0 i
       | None -> s ]
     in

@@ -5,6 +5,7 @@
 open Config;
 open Gwdb;
 open Hutil;
+open Mutil;
 open Util;
 
 value default_max_cnt = 2000;
@@ -294,7 +295,7 @@ value select_names conf base is_surnames ini need_whole_list =
     with
     [ Some istr ->
         loop istr 0 [] where rec loop istr len list =
-          let s = Mutil.nominative (sou base istr) in
+          let s = nominative (sou base istr) in
           let k = name_key_compatible base s in
           if string_start_with ini k then
             let (list, len) =
@@ -440,7 +441,7 @@ value print_alphabetic_short conf base is_surnames ini list len = do {
     (fun (ini_k, l) ->
        let ini = capitalize_if_not_utf8 ini_k in
        tag "p" begin
-         Mutil.list_iter_first
+         list_iter_first
            (fun first (s, cnt) -> do {
               let href =
                 if not conf.cancel_links then

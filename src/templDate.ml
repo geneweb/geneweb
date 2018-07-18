@@ -4,6 +4,7 @@
 
 open Config;
 open Def;
+open Mutil;
 open TemplAst;
 open Util;
 
@@ -72,7 +73,7 @@ and eval_dmy_var dmy =
   | _ -> raise Not_found ]
 and eval_integer i =
   fun
-  [ ["roman"] -> VVstring (Mutil.roman_of_arabian i)
+  [ ["roman"] -> VVstring (roman_of_arabian i)
   | [] -> VVstring (string_of_int i)
   | _ -> raise Not_found ]
 ;
