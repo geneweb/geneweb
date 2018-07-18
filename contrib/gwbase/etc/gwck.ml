@@ -3,6 +3,7 @@
 
 open Def;
 open Gwdb;
+open Printf;
 
 value designation base ip p =
   let first_name = p_first_name base p in
@@ -15,7 +16,7 @@ value designation base ip p =
 ;
 
 value check_keys base nb_ind fix = do {
-  Printf.printf "Check keys\n";
+  printf "Check keys\n";
   flush stdout;
   ProgrBar.start ();
   for i = 0 to nb_ind - 1 do {
@@ -30,11 +31,11 @@ value check_keys base nb_ind fix = do {
       [ Some ip2 ->
           if ip2 <> ip then do {
             ProgrBar.suspend ();
-            Printf.printf "*** key %s.%d %s is \"%s\"\n" fn occ sn
+            printf "*** key %s.%d %s is \"%s\"\n" fn occ sn
               (designation base ip (poi base ip2));
             flush stdout;
             Gwdb.patch_key base ip fn sn occ;
-            Printf.printf "*** fixed\n";
+            printf "*** fixed\n";
             flush stdout;
             fix.val := True;
             ProgrBar.restart i nb_ind;
@@ -42,10 +43,10 @@ value check_keys base nb_ind fix = do {
           else ()
       | None -> do {
           ProgrBar.suspend ();
-          Printf.printf "*** key %s.%d %s = no anwser\n" fn occ sn;
+          printf "*** key %s.%d %s = no anwser\n" fn occ sn;
           flush stdout;
           Gwdb.patch_key base ip fn sn occ;
-          Printf.printf "*** fixed\n";
+          printf "*** fixed\n";
           flush stdout;
           fix.val := True;
           ProgrBar.restart i nb_ind;
@@ -56,7 +57,7 @@ value check_keys base nb_ind fix = do {
 };
 
 value check_families_parents base nb_fam = do {
-  Printf.printf "Check families' parents\n";
+  printf "Check families' parents\n";
   flush stdout;
   ProgrBar.start ();
   for i = 0 to nb_fam - 1 do {
@@ -71,7 +72,7 @@ value check_families_parents base nb_fam = do {
         if Array.mem ifam (get_family (poi base ip)) then ()
         else do {
            ProgrBar.suspend ();
-           Printf.printf "*** no family for : %s\n"
+           printf "*** no family for : %s\n"
              (designation base ip (poi base ip));
            flush stdout;
            ProgrBar.restart i nb_fam;
@@ -82,7 +83,7 @@ value check_families_parents base nb_fam = do {
 };
 
 value check_families_children base nb_fam fix = do {
-  Printf.printf "Check families' children\n";
+  printf "Check families' children\n";
   flush stdout;
   ProgrBar.start ();
   for i = 0 to nb_fam - 1 do {
@@ -98,14 +99,14 @@ value check_families_children base nb_fam fix = do {
         match get_parents a with
         [ Some ifam1 ->
             if ifam1 != ifam then do {
-              Printf.printf "*** bad parents : %s\n"
+              printf "*** bad parents : %s\n"
                 (designation base ip (poi base ip));
               flush stdout;
             }
             else ()
         | None -> do {
             ProgrBar.suspend ();
-            Printf.printf "*** no parents : %s in family\n    %s & %s\n"
+            printf "*** no parents : %s in family\n    %s & %s\n"
               (designation base ip (poi base ip))
               (let ip = get_father fam in designation base ip (poi base ip))
               (let ip = get_mother fam in designation base ip (poi base ip));
@@ -121,7 +122,7 @@ value check_families_children base nb_fam fix = do {
 };
 
 value check_persons_parents base nb_ind fix = do {
-  Printf.printf "Check persons' parents\n";
+  printf "Check persons' parents\n";
   flush stdout;
   ProgrBar.start ();
   for i = 0 to nb_ind - 1 do {
@@ -132,7 +133,7 @@ value check_persons_parents base nb_ind fix = do {
     [ Some ifam ->
         let fam = foi base ifam in
         if is_deleted_family fam then do {
-          Printf.printf "*** parent family deleted: %s\n"
+          printf "*** parent family deleted: %s\n"
             (designation base ip (poi base ip));
           flush stdout;
           patch_ascend base ip {parents = None; consang = Adef.fix (-1)};
@@ -142,7 +143,7 @@ value check_persons_parents base nb_ind fix = do {
           let children = get_children fam in
           if Array.mem ip children then ()
           else do {
-            Printf.printf "*** not in parent's family: %s\n"
+            printf "*** not in parent's family: %s\n"
               (designation base ip (poi base ip));
             flush stdout;
             let children = Array.append children [| ip |] in
@@ -155,7 +156,7 @@ value check_persons_parents base nb_ind fix = do {
 };
 
 value check_persons_families base nb_ind fix = do {
-  Printf.printf "Check persons' families\n";
+  printf "Check persons' families\n";
   flush stdout;
   ProgrBar.start ();
   for i = 0 to nb_ind - 1 do {
@@ -169,7 +170,7 @@ value check_persons_families base nb_ind fix = do {
       if Array.mem ip (get_parent_array cpl) then ()
       else do {
         ProgrBar.suspend ();
-        Printf.printf "*** not father or mother of hir family: %s\n"
+        printf "*** not father or mother of hir family: %s\n"
           (designation base ip (poi base ip));
         flush stdout;
         let ifams =
@@ -177,7 +178,7 @@ value check_persons_families base nb_ind fix = do {
             (Array.sub ifams (j + 1) (Array.length ifams - j - 1))
         in
         patch_union base ip {family = ifams};
-        Printf.printf "*** fixed\n";
+        printf "*** fixed\n";
         flush stdout;
         fix.val := True;
         ProgrBar.restart i nb_ind;
@@ -188,7 +189,7 @@ value check_persons_families base nb_ind fix = do {
 };
 
 value check_witnesses base nb_fam fix = do {
-  Printf.printf "Check witnesses\n";
+  printf "Check witnesses\n";
   flush stdout;
   ProgrBar.start ();
   for i = 0 to nb_fam - 1 do {
@@ -203,15 +204,15 @@ value check_witnesses base nb_fam fix = do {
       if not (List.memq ifath (get_related p)) then do {
         ProgrBar.suspend ();
         let imoth = get_mother fam in
-        Printf.printf "*** in marriage: %s & %s\n"
+        printf "*** in marriage: %s & %s\n"
           (designation base ifath (poi base ifath))
           (designation base ifath (poi base imoth));
-        Printf.printf "*** witness has no pointer to marriage: %s\n"
+        printf "*** witness has no pointer to marriage: %s\n"
           (designation base ip p);
         flush stdout;
         patch_person base ip
           {(gen_person_of_person p) with related = [ifath :: get_related p]};
-        Printf.printf "*** fixed\n";
+        printf "*** fixed\n";
         fix.val := True;
         flush stdout;
         ProgrBar.restart i nb_fam;
@@ -235,7 +236,7 @@ value check bname = do {
   check_witnesses base nb_fam fix;
   if fix.val then Gwdb.commit_patches base
   else do {
-    Printf.printf "No change\n";
+    printf "No change\n";
     flush stdout;
   }
 };
@@ -245,7 +246,7 @@ value main () =
   lock Mutil.lock_file bname with
   [ Accept -> check bname
   | Refuse -> do {
-      Printf.eprintf "Cannot lock database. Try again.\n";
+      eprintf "Cannot lock database. Try again.\n";
       flush stderr;
     } ]
 ;

@@ -1,6 +1,7 @@
 (* camlp5r *)
 (* $Id: recover.ml,v 5.3 2007-09-12 09:58:44 ddr Exp $ *)
 
+open Printf;
 
 value recover db =
   let base = Iolight.input db in
@@ -21,6 +22,6 @@ value main () =
 
 try main () with exc ->
   do {
-    Printf.eprintf "Exception raised: %s\n" (Printexc.to_string exc);
+    eprintf "Exception raised: %s\n" (Printexc.to_string exc);
     flush stderr;
   };

@@ -5,6 +5,7 @@
 open Dbdisk;
 open Def;
 open Mutil;
+open Printf;
 
 type person = dsk_person;
 type ascend = dsk_ascend;
@@ -184,7 +185,7 @@ value line_cnt = ref 1;
 value in_file = ref "";
 
 value print_location pos =
-  Printf.fprintf log_oc.val "File \"%s\", line %d:\n" in_file.val pos
+  fprintf log_oc.val "File \"%s\", line %d:\n" in_file.val pos
 ;
 
 value rec skip_eol =
@@ -417,14 +418,14 @@ value print_bad_date pos d =
   else do {
     bad_dates_warned.val := True;
     print_location pos;
-    Printf.fprintf log_oc.val "Can't decode date %s\n" d;
+    fprintf log_oc.val "Can't decode date %s\n" d;
     flush log_oc.val
   }
 ;
 
 value check_month m =
   if m < 1 || m > 12 then do {
-    Printf.fprintf log_oc.val "Bad (numbered) month in date: %d\n" m;
+    fprintf log_oc.val "Bad (numbered) month in date: %d\n" m;
     flush log_oc.val
   }
   else ()
@@ -434,7 +435,7 @@ value warning_month_number_dates () =
   match month_number_dates.val with
   [ MonthNumberHappened s ->
       do {
-        Printf.fprintf log_oc.val "
+        fprintf log_oc.val "
   Warning: the file holds dates with numbered months (like: 12/05/1912).
 
   GEDCOM standard *requires* that months in dates be identifiers. The
@@ -1362,7 +1363,7 @@ value extract_notes gen rl =
                 | None ->
                     do {
                       print_location r.rpos;
-                      Printf.fprintf log_oc.val "Note %s not found\n" addr;
+                      fprintf log_oc.val "Note %s not found\n" addr;
                       flush log_oc.val;
                       lines
                     } ]
@@ -1450,7 +1451,7 @@ value note gen r =
         | None ->
             do {
               print_location r.rpos;
-              Printf.fprintf log_oc.val "Note %s not found\n" r.rval;
+              fprintf log_oc.val "Note %s not found\n" r.rval;
               flush log_oc.val;
               ("", [])
             } ]
@@ -1465,7 +1466,7 @@ value treat_source gen r =
     | None ->
         do {
           print_location r.rpos;
-          Printf.fprintf log_oc.val "Source %s not found\n" r.rval;
+          fprintf log_oc.val "Source %s not found\n" r.rval;
           flush log_oc.val;
           ("", [])
         } ]
@@ -1633,7 +1634,7 @@ value indi_lab =
         if List.mem c glop.val then ()
         else do {
           glop.val := [c :: glop.val];
-          Printf.eprintf "untreated tag %s -> in notes\n" c;
+          eprintf "untreated tag %s -> in notes\n" c;
           flush stderr
         };
         False
@@ -3135,10 +3136,10 @@ value make_gen3 gen r =
   | "FAM" -> add_fam gen r
   | "NOTE" -> ()
   | "SOUR" -> ()
-  | "TRLR" -> do { Printf.eprintf "*** Trailer ok\n"; flush stderr }
+  | "TRLR" -> do { eprintf "*** Trailer ok\n"; flush stderr }
   | s ->
       do {
-        Printf.fprintf log_oc.val "Not implemented typ = %s\n" s;
+        fprintf log_oc.val "Not implemented typ = %s\n" s;
         flush log_oc.val
       } ]
 ;
@@ -3266,7 +3267,7 @@ value pass3 gen fname =
           | [: `_ :] ->
               do {
                 print_location line_cnt.val;
-                Printf.fprintf log_oc.val "Strange input.\n";
+                fprintf log_oc.val "Strange input.\n";
                 flush log_oc.val;
                 let _ : string = get_to_eoln 0 strm in
                 loop ()
@@ -3325,7 +3326,7 @@ value check_undefined gen =
       | Left3 lab ->
           let (p, a, u) = unknown_per gen i Neuter in
           do {
-            Printf.fprintf log_oc.val "Warning: undefined person %s\n" lab;
+            fprintf log_oc.val "Warning: undefined person %s\n" lab;
             gen.g_per.arr.(i) := Right3 p a u
           } ]
     };
@@ -3335,7 +3336,7 @@ value check_undefined gen =
       | Left3 lab ->
           let (f, c, d) = unknown_fam gen i in
           do {
-            Printf.fprintf log_oc.val "Warning: undefined family %s\n" lab;
+            fprintf log_oc.val "Warning: undefined family %s\n" lab;
             gen.g_fam.arr.(i) := Right3 f c d
           } ]
     }
@@ -3373,7 +3374,7 @@ value add_parents_to_isolated gen =
           let sn = gen.g_str.arr.(Adef.int_of_istr (get_surname p)) in
           if fn = "?" && sn = "?" then ()
           else do {
-            Printf.fprintf log_oc.val
+            fprintf log_oc.val
               "Adding parents to isolated person: %s.%d %s\n" fn (get_occ p)
               sn;
             let ifam = phony_fam gen in
@@ -3413,13 +3414,13 @@ value make_arrays in_file =
     assert (add_string gen "" = string_empty);
     assert (add_string gen "?" = string_quest);
     assert (add_string gen "x" = string_x);
-    Printf.eprintf "*** pass 1 (note)\n";
+    eprintf "*** pass 1 (note)\n";
     flush stderr;
     pass1 gen fname;
-    Printf.eprintf "*** pass 2 (indi)\n";
+    eprintf "*** pass 2 (indi)\n";
     flush stderr;
     pass2 gen fname;
-    Printf.eprintf "*** pass 3 (fam)\n";
+    eprintf "*** pass 3 (fam)\n";
     flush stderr;
     pass3 gen fname;
     close_in gen.g_ic;
@@ -3519,15 +3520,15 @@ value check_parents_children base ascends unions couples descends =
             if array_memq (Adef.iper_of_int i) (get_children des) then ()
             else do {
               let p = poi base (Adef.iper_of_int i) in
-              Printf.fprintf log_oc.val
+              fprintf log_oc.val
                 "%s is not the child of his/her parents\n"
                 (designation base p);
-              Printf.fprintf log_oc.val "- %s\n"
+              fprintf log_oc.val "- %s\n"
                 (designation base (poi base (get_father cpl)));
-              Printf.fprintf log_oc.val "- %s\n"
+              fprintf log_oc.val "- %s\n"
                 (designation base (poi base (get_mother cpl)));
-              Printf.fprintf log_oc.val "=> no more parents for him/her\n";
-              Printf.fprintf log_oc.val "\n";
+              fprintf log_oc.val "=> no more parents for him/her\n";
+              fprintf log_oc.val "\n";
               flush log_oc.val;
               ascends.(i) := ascend_with_parents a None
             }
@@ -3539,12 +3540,12 @@ value check_parents_children base ascends unions couples descends =
         if Adef.iper_of_int i <> get_father cpl &&
            Adef.iper_of_int i <> get_mother cpl
         then do {
-          Printf.fprintf log_oc.val
+          fprintf log_oc.val
             "%s is spouse in this family but neither husband nor wife:\n"
             (designation base (poi base (Adef.iper_of_int i)));
-          Printf.fprintf log_oc.val "- %s\n"
+          fprintf log_oc.val "- %s\n"
             (designation base (poi base (get_father cpl)));
-          Printf.fprintf log_oc.val "- %s\n"
+          fprintf log_oc.val "- %s\n"
             (designation base (poi base (get_mother cpl)));
           let fath = poi base (get_father cpl) in
           let moth = poi base (get_mother cpl) in
@@ -3553,7 +3554,7 @@ value check_parents_children base ascends unions couples descends =
           let mfn = sou base (get_first_name moth) in
           let msn = sou base (get_surname moth) in
           if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
-            Printf.fprintf log_oc.val
+            fprintf log_oc.val
               "However, the husband is unknown, I set him as husband\n";
             unions.(Adef.int_of_iper (get_father cpl)) :=
               union_of_gen_union {family = [| |]};
@@ -3564,7 +3565,7 @@ value check_parents_children base ascends unions couples descends =
             couples.(Adef.int_of_ifam (get_family u).(j)) := cpl;
           }
           else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then do {
-            Printf.fprintf log_oc.val
+            fprintf log_oc.val
               "However, the wife is unknown, I set her as wife\n";
             unions.(Adef.int_of_iper (get_mother cpl)) :=
               union_of_gen_union {family = [| |]};
@@ -3575,10 +3576,10 @@ value check_parents_children base ascends unions couples descends =
             couples.(Adef.int_of_ifam (get_family u).(j)) := cpl;
           }
           else do {
-            Printf.fprintf log_oc.val "=> deleted this family for him/her\n";
+            fprintf log_oc.val "=> deleted this family for him/her\n";
             fam_to_delete.val := [j :: fam_to_delete.val];
           };
-          Printf.fprintf log_oc.val "\n";
+          fprintf log_oc.val "\n";
           flush log_oc.val
         }
         else ()
@@ -3606,29 +3607,29 @@ value check_parents_children base ascends unions couples descends =
         match get_parents a with
         [ Some ifam ->
             if Adef.int_of_ifam ifam <> i then do {
-              Printf.fprintf log_oc.val "Other parents for %s\n"
+              fprintf log_oc.val "Other parents for %s\n"
                 (designation base p);
-              Printf.fprintf log_oc.val "- %s\n"
+              fprintf log_oc.val "- %s\n"
                 (designation base (poi base (get_father cpl)));
-              Printf.fprintf log_oc.val "- %s\n"
+              fprintf log_oc.val "- %s\n"
                 (designation base (poi base (get_mother cpl)));
-              Printf.fprintf log_oc.val "=> deleted in this family\n";
-              Printf.fprintf log_oc.val "\n";
+              fprintf log_oc.val "=> deleted in this family\n";
+              fprintf log_oc.val "\n";
               flush log_oc.val;
               to_delete.val := [get_key_index p :: to_delete.val]
             }
             else ()
         | None ->
             do {
-              Printf.fprintf log_oc.val
+              fprintf log_oc.val
                 "%s has no parents but is the child of\n"
                 (designation base p);
-              Printf.fprintf log_oc.val "- %s\n"
+              fprintf log_oc.val "- %s\n"
                 (designation base (poi base (get_father cpl)));
-              Printf.fprintf log_oc.val "- %s\n"
+              fprintf log_oc.val "- %s\n"
                 (designation base (poi base (get_mother cpl)));
-              Printf.fprintf log_oc.val "=> added parents\n";
-              Printf.fprintf log_oc.val "\n";
+              fprintf log_oc.val "=> added parents\n";
+              fprintf log_oc.val "\n";
               flush log_oc.val;
               let a = ascend_with_parents a (Some (get_fam_index fam)) in
               ascends.(Adef.int_of_iper (get_children des).(j)) := a
@@ -3665,11 +3666,11 @@ value check_parents_sex base persons families =
     || get_relation fam = NoSexesCheckMarried then ()
     else if get_sex fath = Female || get_sex moth = Male then do {
       if get_sex fath = Female then
-        Printf.fprintf log_oc.val "Warning - husband with female sex: %s\n"
+        fprintf log_oc.val "Warning - husband with female sex: %s\n"
           (designation base fath)
       else ();
       if get_sex moth = Male then
-        Printf.fprintf log_oc.val "Warning - wife with male sex: %s\n"
+        fprintf log_oc.val "Warning - wife with male sex: %s\n"
           (designation base moth)
       else ();
       flush log_oc.val;
@@ -3816,14 +3817,14 @@ value finish_base base (persons, families, _, _) = do {
        (fun x ->
           do {
             Check.print_base_error log_oc.val base x;
-            Printf.fprintf log_oc.val "\n"
+            fprintf log_oc.val "\n"
           })
        (fun
         [ UndefinedSex _ -> ()
         | x ->
             do {
               Check.print_base_warning log_oc.val base x;
-              Printf.fprintf log_oc.val "\n"
+              fprintf log_oc.val "\n"
             } ])
        (fun _ -> True) (fun _ -> ()) False
   else ();
@@ -3836,11 +3837,11 @@ value output_command_line bname =
   in
   let oc = open_out (Filename.concat bdir "command.txt") in
   do {
-    Printf.fprintf oc "%s" Sys.argv.(0);
+    fprintf oc "%s" Sys.argv.(0);
     for i = 1 to Array.length Sys.argv - 1 do {
-      Printf.fprintf oc " %s" Sys.argv.(i)
+      fprintf oc " %s" Sys.argv.(i)
     };
-    Printf.fprintf oc "\n";
+    fprintf oc "\n";
     close_out oc
   }
 ;
@@ -3876,7 +3877,7 @@ value set_undefined_death_interval s =
     match Stream.of_string s with parser
     [ [: a = number 0; `'-'; b = number 0 :] ->
         do {
-          Printf.eprintf "ay %s dy %s\n" a b;
+          eprintf "ay %s dy %s\n" a b;
           flush stderr;
           let a = if a = "" then alive_years.val else int_of_string a in
           let b =
@@ -3884,7 +3885,7 @@ value set_undefined_death_interval s =
           in
           alive_years.val := a;
           dead_years.val := b;
-          Printf.eprintf "ay %d dy %d\n" a b;
+          eprintf "ay %d dy %d\n" a b;
           flush stderr
         } ]
   with
@@ -4009,7 +4010,7 @@ value main () =
       else out_file.val ^ ".gwb"
     in
     if not force.val && Sys.file_exists bdir then do {
-      Printf.printf "\
+      printf "\
 The database \"%s\" already exists. Use option -f to overwrite it.
 "
         out_file.val;
@@ -4031,7 +4032,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
         }
     | Refuse ->
         do {
-          Printf.printf "Base is locked: cannot write it\n";
+          printf "Base is locked: cannot write it\n";
           flush stdout;
           exit 2
         } ];
@@ -4047,7 +4048,7 @@ try main () with e ->
     |  _ -> e ]
   in
   do {
-    Printf.fprintf log_oc.val "Uncaught exception: %s\n"
+    fprintf log_oc.val "Uncaught exception: %s\n"
       (Printexc.to_string e);
     if log_oc.val != stdout then close_out log_oc.val else ();
     exit 2

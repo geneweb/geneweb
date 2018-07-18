@@ -2,6 +2,7 @@
 (* $Id: gw_fix_base.ml,v 0.01 2014-02-21 16:26:45 flh Exp $ *)
 
 open Gwdb;
+open Printf;
 
 
 value designation base ip p =
@@ -15,7 +16,7 @@ value designation base ip p =
 ;
 
 value check_name base nb_ind fix = do {
-  Printf.printf "Check colon\n";
+  printf "Check colon\n";
   flush stdout;
   for i = 0 to nb_ind - 1 do {
     let ip = Adef.iper_of_int i in
@@ -23,9 +24,7 @@ value check_name base nb_ind fix = do {
     let fn = sou base (get_first_name p) in
     let sn = sou base (get_surname p) in
     if String.contains fn ':' || String.contains sn ':' then do {
-      Printf.printf
-        "*** bad name : %s %s (%d) => %s\n"
-        fn sn i (designation base ip (poi base ip));
+      printf "*** bad name : %s %s (%d) => %s\n" fn sn i (designation base ip (poi base ip));
       flush stdout;
     }
     else ();
@@ -40,7 +39,7 @@ value check bname = do {
   check_name base nb_ind fix;
   if fix.val then Gwdb.commit_patches base
   else do {
-    Printf.printf "No change\n";
+    printf "No change\n";
     flush stdout;
   }
 };
@@ -60,7 +59,7 @@ value main () = do {
   lock Mutil.lock_file bname.val with
   [ Accept -> check bname.val
   | Refuse -> do {
-      Printf.eprintf "Cannot lock database. Try again.\n";
+      eprintf "Cannot lock database. Try again.\n";
       flush stderr;
     } ]
 };

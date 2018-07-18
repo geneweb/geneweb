@@ -6,6 +6,7 @@ open Db2disk;
 open Def;
 open Futil;
 open Mutil;
+open Printf;
 
 type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
   { find : 'istr -> list iper;
@@ -1370,7 +1371,7 @@ value base2 db2 =
        base_strings_of_first_name_or_surname "surname" (fun p -> p.surname) s;
      load_ascends_array () =
        do {
-         Printf.eprintf "*** loading ascends array\n";
+         eprintf "*** loading ascends array\n";
          flush stderr;
          let nb = db2.patches.nb_per in
          let nb_ini = db2.patches.nb_per_ini in
@@ -1386,7 +1387,7 @@ value base2 db2 =
        [ Some _ -> ()
        | None ->
            do {
-             Printf.eprintf "*** loading unions array\n";
+             eprintf "*** loading unions array\n";
              flush stderr;
              db2.family_array := Some (family_array2 db2)
            } ];
@@ -1396,7 +1397,7 @@ value base2 db2 =
        [ Some _ -> ()
        | None ->
            do {
-             Printf.eprintf "*** loading descends array\n";
+             eprintf "*** loading descends array\n";
              flush stderr;
              db2.children_array := Some (children_array2 db2)
            } ];

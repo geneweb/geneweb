@@ -3,6 +3,7 @@
 
 open Def;
 open Gwdb;
+open Printf;
 
 module Buff = Buff.Make (struct end);
 
@@ -24,7 +25,7 @@ value titres bname =
       let p = poi base (Adef.iper_of_int i) in
       List.iter
         (fun t ->
-	   Printf.printf "%s/%s\n" (lower_utf_8 (sou base t.t_ident))
+	   printf "%s/%s\n" (lower_utf_8 (sou base t.t_ident))
 	     (lower_utf_8 (sou base t.t_place)))
         (get_titles p)
     };

@@ -3,6 +3,7 @@
 
 open Def;
 open Mutil;
+open Printf;
 
 value magic_patch = "GwPt0002";
 
@@ -66,7 +67,7 @@ value get_field_acc db2 i (f1, f2) =
     r
   }
   with e -> do {
-    Printf.eprintf "Error get_field_acc \"%s/%s/access\" i = %d\n" f1 f2 i;
+    eprintf "Error get_field_acc \"%s/%s/access\" i = %d\n" f1 f2 i;
     flush stderr;
     raise e;
   }
@@ -400,15 +401,14 @@ value load_array2 bdir nb_ini nb def f1 f2 get =
       tab
     }
     with e -> do {
-      Printf.eprintf
-        "Error load_array2 %s/%s nb_ini %d nb %d\n" f1 f2 nb_ini nb;
+      eprintf "Error load_array2 %s/%s nb_ini %d nb %d\n" f1 f2 nb_ini nb;
       flush stderr;
       raise e;
     }
 ;
 
 value load_couples_array2 db2 = do {
-  Printf.eprintf "*** loading couples array\n";
+  eprintf "*** loading couples array\n";
   flush stderr;
   let nb = db2.patches.nb_fam in
   match db2.father_array with
@@ -469,7 +469,7 @@ value consang_array2 db2 nb = do {
         close_in ic;
         if Array.length tab < db2.patches.nb_per_ini then
           failwith
-            (Printf.sprintf "consang_array2 array length = %d < %d"
+            (sprintf "consang_array2 array length = %d < %d"
                (Array.length tab) db2.patches.nb_per_ini)
         else ();
         if nb > Array.length tab then
@@ -493,7 +493,7 @@ value family_array2 db2 = do {
   close_in ic;
   if Array.length tab < db2.patches.nb_per_ini then
     failwith
-      (Printf.sprintf "family_array2 array length = %d < %d"
+      (sprintf "family_array2 array length = %d < %d"
          (Array.length tab) db2.patches.nb_per_ini)
   else ();
   tab
@@ -508,7 +508,7 @@ value children_array2 db2 = do {
   close_in ic;
   if Array.length tab < db2.patches.nb_fam_ini then
     failwith
-      (Printf.sprintf "children_array2 array length = %d < %d"
+      (sprintf "children_array2 array length = %d < %d"
          (Array.length tab) db2.patches.nb_fam_ini)
   else ();
   tab
@@ -543,7 +543,7 @@ value read_notes db2 fnotes rn_mode =
 
 value check_magic ic magic id = do {
   let b = really_input_string ic (String.length magic) in
-  if b <> magic then failwith (Printf.sprintf "bad %s magic number" id)
+  if b <> magic then failwith (sprintf "bad %s magic number" id)
   else ();
 };
 

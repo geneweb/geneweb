@@ -3,6 +3,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp;
+open Printf;
 
 value check_magic fname ic =
   do {
@@ -139,7 +140,7 @@ value main () =
       (fun (x, separate, shift) ->
          if Filename.check_suffix x ".gw" then do {
            try Gwcomp.comp_families x with e -> do {
-             Printf.printf "File \"%s\", line %d:\n" x line_cnt.val;
+             printf "File \"%s\", line %d:\n" x line_cnt.val;
              raise e
            };
            gwo.val := [(x ^ "o", separate, shift) :: gwo.val];
@@ -154,7 +155,7 @@ value main () =
         else out_file.val ^ ".gwb"
       in
       if not force.val && Sys.file_exists bdir then do {
-        Printf.printf "\
+        printf "\
 The database \"%s\" already exists. Use option -f to overwrite it.
 " out_file.val;
         flush stdout;
@@ -170,12 +171,12 @@ The database \"%s\" already exists. Use option -f to overwrite it.
           let next_family_fun = next_family_fun_templ (List.rev gwo.val) in
           if Db1link.link next_family_fun bdir then ()
           else do {
-            Printf.eprintf "*** database not created\n";
+            eprintf "*** database not created\n";
             flush stderr;
             exit 2;
           }
       | Refuse -> do {
-          Printf.printf "Base is locked: cannot write it\n";
+          printf "Base is locked: cannot write it\n";
           flush stdout;
           exit 2
         } ];
@@ -187,7 +188,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
 value print_exc =
   fun
   [ Failure txt ->
-      do { Printf.printf "Failed: %s\n" txt; flush stdout; exit 2 }
+      do { printf "Failed: %s\n" txt; flush stdout; exit 2 }
   | exc -> Printexc.print raise exc ]
 ;
 
