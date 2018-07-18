@@ -1346,10 +1346,7 @@ let print_index_g3 conf base =
         in
         Printf.fprintf oc "%s," key;
         Printf.fprintf oc " %s, %s," gen_p.first_name gen_p.surname;
-        Printf.fprintf oc " %s,"
-          (if gen_p.sex = Male then "M"
-           else if gen_p.sex = Female then "F"
-           else "?");
+        Printf.fprintf oc " %s," (if gen_p.sex = Male then "M" else if gen_p.sex = Female then "F" else "?");
         Printf.fprintf oc " %s," gen_p.occupation;
         let nb_child =
           List.fold_left
@@ -1359,13 +1356,9 @@ let print_index_g3 conf base =
         in
         Printf.fprintf oc " %d," nb_child;
         Printf.fprintf oc " %s" "date naissance ou bapteme";
-        Printf.fprintf oc " %s"
-          (if gen_p.birth_place <> "" then gen_p.birth_place
-           else gen_p.baptism_place);
+        Printf.fprintf oc " %s" (if gen_p.birth_place <> "" then gen_p.birth_place else gen_p.baptism_place);
         Printf.fprintf oc " %s" "date décès ou inhumation";
-        Printf.fprintf oc " %s"
-          (if gen_p.death_place <> "" then gen_p.death_place
-           else gen_p.burial_place);
+        Printf.fprintf oc " %s" (if gen_p.death_place <> "" then gen_p.death_place else gen_p.burial_place);
         (* en cas de multi mariage ? *)
         Printf.fprintf oc " %s" "date mariage";
         Printf.fprintf oc " %s" "lieu de mariage";

@@ -1,5 +1,3 @@
-(* nocamlp5 *)
-
 let piqi = Api_saisie_write_piqi.piqi
 
 

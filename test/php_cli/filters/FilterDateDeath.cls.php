@@ -18,5 +18,6 @@ class FilterDateDeath extends FilterDate {
 
 	public function __construct(){
 	}
+
 }
 ?>

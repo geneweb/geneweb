@@ -1,26 +1,17 @@
-(* camlp5r *)
 (* $Id: recover.ml,v 5.3 2007-09-12 09:58:44 ddr Exp $ *)
 
+open Printf
 
-value recover db =
-  let base = Iolight.input db in
-  Outbase.output "a" base
-;
+let recover db = let base = Iolight.input db in Outbase.output "a" base
 
-value database = ref "";
-value usage_msg = "Usage: recover base.gwb";
-value speclist = [];
-value anonfun db = database.val := db;
+let database = ref ""
+let usage_msg = "Usage: recover base.gwb"
+let speclist = []
+let anonfun db = database := db
 
-value main () =
-  do {
-    Arg.parse speclist anonfun usage_msg;
-    recover database.val;
-  }
-;
+let main () = Arg.parse speclist anonfun usage_msg; recover !database
 
-try main () with exc ->
-  do {
-    Printf.eprintf "Exception raised: %s\n" (Printexc.to_string exc);
-    flush stderr;
-  };
+let _ =
+  try main () with
+    exc ->
+      eprintf "Exception raised: %s\n" (Printexc.to_string exc); flush stderr

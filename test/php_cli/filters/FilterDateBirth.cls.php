@@ -18,5 +18,6 @@ class FilterDateBirth extends FilterDate {
 
 	public function __construct(){
 	}
+
 }
 ?>

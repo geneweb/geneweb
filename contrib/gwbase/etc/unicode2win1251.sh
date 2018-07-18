@@ -1,6 +1,6 @@
 #!/bin/sh
 #cd (*
-exec ocaml camlp5r.cma $0
+exec ocaml camlp5.cma $0
 *) ".";
 (* $Id: unicode2win1251.sh,v 4.1 2002-09-26 09:43:11 ddr Exp $ *)
 

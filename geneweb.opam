@@ -1,0 +1,32 @@
+opam-version: "1.2"
+maintainer: "YOUR EMAIL ADDRESS"
+# authors: ["YOUR NAME"]
+homepage: "https://github.com/geneweb/geneweb"
+bug-reports: "https://github.com/geneweb/geneweb/issues"
+dev-repo: "https://github.com/geneweb/geneweb.git"
+
+build: [
+  [ configure --api ]
+  [ make "opt"]
+]
+
+install: [ make "install" ]
+
+remove: [ make "uninstall" ]
+
+available: [ ocaml-version >= "4.02.1" & ocaml-version <= "4.05" ]
+
+depends: [
+  "camlp5"
+  "curl"
+  "dune" {build}
+  "lablgtk2"
+  "piqirun"
+  "piqirun.ext"
+  "re"
+  "redis"
+  "redis-sync"
+  "str"
+  "unix"
+  "yojson"
+]
