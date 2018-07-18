@@ -4,6 +4,7 @@
 
 open Config;
 open Def;
+open Futil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -1003,7 +1004,7 @@ value effective_mod conf base sp = do {
   check_sex_married conf base sp op;
   let created_p = ref [] in
   let np =
-    Futil.map_person_ps (Update.insert_person conf base sp.psources created_p)
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
       (Gwdb.insert_string base) sp
   in
   let op_misc_names = person_misc_names base op get_titles in
@@ -1040,7 +1041,7 @@ value effective_add conf base sp = do {
       string_of_int v);
   let created_p = ref [] in
   let np =
-    Futil.map_person_ps (Update.insert_person conf base sp.psources created_p)
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
       (Gwdb.insert_string base) {(sp) with key_index = pi}
   in
   patch_person base pi np;
@@ -1501,8 +1502,8 @@ value print_mod o_conf base =
     in
     Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
     if not (eq_istr (get_surname op) p.surname) ||
-       not (Futil.eq_lists eq_istr (get_surnames_aliases op) p.surnames_aliases) ||
-       not (Futil.eq_lists (Futil.eq_titles eq_istr) (get_titles op) p.titles)
+       not (eq_lists eq_istr (get_surnames_aliases op) p.surnames_aliases) ||
+       not (eq_lists (eq_titles eq_istr) (get_titles op) p.titles)
     then
       Update.update_misc_names_of_family base p.sex u
     else ();
