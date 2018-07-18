@@ -1,8 +1,7 @@
-(* camlp5r *)
 (* $Id: image.ml,v 5.8 2009-03-11 09:22:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config;
+open Config
 
 (* ************************************************************************** *)
 (*  [Fonc] content : string -> int -> string -> unit                          *)
@@ -16,18 +15,15 @@ open Config;
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value content ct len fname =
-  do {
-    Wserver.http HttpStatus.OK;
-    Wserver.header "Content-type: %s" ct;
-    Wserver.header "Content-length: %d" len;
-    Wserver.header "Content-disposition: inline; filename=%s"
-      (Filename.basename fname);
-    (* TODO: Utiliser un cache public pour les images non personelles. *)
-    Wserver.header "Cache-control: private, max-age=%d" (60 * 60 * 24 * 30);
-    Wserver.wflush ();
-  }
-;
+let content ct len fname =
+  Wserver.http HttpStatus.OK;
+  Wserver.header "Content-type: %s" ct;
+  Wserver.header "Content-length: %d" len;
+  Wserver.header "Content-disposition: inline; filename=%s"
+    (Filename.basename fname);
+  (* TODO: Utiliser un cache public pour les images non personelles. *)
+  Wserver.header "Cache-control: private, max-age=%d" (60 * 60 * 24 * 30);
+  Wserver.wflush ()
 
 (* ************************************************************************** *)
 (*  [Fonc] print_image_type : string -> string -> bool                        *)
@@ -41,48 +37,38 @@ value content ct len fname =
                HTTP.
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value print_image_type fname ctype =
-  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
+let print_image_type fname ctype =
+  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
+    Some ic ->
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
-      do {
-        content ctype len fname;
-        let rec loop len =
-          if len = 0 then ()
-          else do {
-            let olen = min (Bytes.length buf) len in
-            really_input ic buf 0 olen;
-            Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
-            loop (len - olen)
-          }
-        in
-        loop len;
-        close_in ic;
-        True
-      }
-  | None -> False ]
-;
+      content ctype len fname;
+      let rec loop len =
+        if len = 0 then ()
+        else
+          let olen = min (Bytes.length buf) len in
+          really_input ic buf 0 olen;
+          Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+          loop (len - olen)
+      in
+      loop len; close_in ic; true
+  | None -> false
 
 (* ************************************************************************** *)
 (*  [Fonc] print_image_file : string -> bool                                  *)
 (* ************************************************************************** *)
-value print_image_file fname =
+let print_image_file fname =
   List.exists
-    (fun (suff, itype, ctype) ->
+    (fun (suff, ctype) ->
        if Filename.check_suffix fname suff ||
-          Filename.check_suffix fname (String.uppercase_ascii suff) then
+          Filename.check_suffix fname (String.uppercase_ascii suff)
+       then
          print_image_type fname ctype
-       else False)
-    [(".png", "png", "image/png");
-     (".jpg", "jpeg", "image/jpeg");
-     (".jpeg", "jpeg", "image/jpeg");
-     (".pjpeg", "jpeg", "image/jpeg");
-     (".gif", "gif", "image/gif");
-     (".pdf", "pdf", "application/pdf");
-     (".htm", "html", "text/html");
-     (".html", "html", "text/html")]
-;
+       else false)
+    [(".png", "image/png"); (".jpg", "image/jpeg");
+     (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");
+     (".gif", "image/gif"); (".pdf", "application/pdf");
+     (".htm", "text/html"); (".html", "text/html")]
 
 (* ************************************************************************** *)
 (*  [Fonc] print_personal_image : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
@@ -94,12 +80,11 @@ value print_image_file fname =
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value print_personal_image conf base p =
-  match Util.image_and_size conf base p (fun x y -> Some (1, 1)) with
-  [ Some (True, f, _) ->
+let print_personal_image conf base p =
+  match Util.image_and_size conf base p (fun _ _ -> Some (1, 1)) with
+    Some (true, f, _) ->
       if print_image_file f then () else Hutil.incorrect_request conf
-  | _ -> Hutil.incorrect_request conf ]
-;
+  | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
 (*  [Fonc] print_source_image : Config.config -> string -> unit               *)
@@ -111,7 +96,7 @@ value print_personal_image conf base p =
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value print_source_image conf f =
+let print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
@@ -119,36 +104,31 @@ value print_source_image conf f =
     let fname = Util.source_image_file_name conf.bname fname in
     if print_image_file fname then () else Hutil.incorrect_request conf
   else Hutil.incorrect_request conf
-;
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
-value print conf base =
+let print conf base =
   match Util.p_getenv conf.env "s" with
-  [ Some f -> print_source_image conf f
+    Some f -> print_source_image conf f
   | None ->
       match Util.find_person_in_env conf base "" with
-      [ Some p -> print_personal_image conf base p
-      | _ -> Hutil.incorrect_request conf ] ]
-;
+        Some p -> print_personal_image conf base p
+      | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
 (*  [Fonc] print_html : config -> 'a -> unit                                  *)
 (* ************************************************************************** *)
-value print_html conf base =
-  do {
-    Util.html conf;
-    Wserver.printf "<head>\n";
-    Wserver.printf "  <title>%s</title>\n"
-      (Util.transl_nth conf "image/images" 0);
-    Wserver.printf "</head>\n<body>\n";
-    Wserver.printf "<img src=\"%s" (Util.commd conf);
-    Mutil.list_iter_first
-      (fun first (k, v) ->
-         let v = if k = "m" then "IM" else v in
-         Wserver.printf "%s%s=%s" (if first then "" else "&") k v)
-      conf.env;
-    Wserver.printf "\"%s>\n</body>\n</html>" conf.xhs;
-  }
-;
+let print_html conf =
+  Util.html conf;
+  Wserver.printf "<head>\n";
+  Wserver.printf "  <title>%s</title>\n"
+    (Util.transl_nth conf "image/images" 0);
+  Wserver.printf "</head>\n<body>\n";
+  Wserver.printf "<img src=\"%s" (Util.commd conf);
+  Mutil.list_iter_first
+    (fun first (k, v) ->
+       let v = if k = "m" then "IM" else v in
+       Wserver.printf "%s%s=%s" (if first then "" else "&") k v)
+    conf.env;
+  Wserver.printf "\"%s>\n</body>\n</html>" conf.xhs

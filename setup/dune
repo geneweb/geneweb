@@ -1,0 +1,6 @@
+(executable
+ (
+ (name setup)
+ (libraries (geneweb.lib geneweb.wserver))
+ )
+)

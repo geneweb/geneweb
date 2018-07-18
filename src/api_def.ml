@@ -1,15 +1,8 @@
-(* nocamlp5 *)
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
-
 open Def
 
 type ('a, 'b) pb_person =
   | PLight of 'a
   | PFull of 'b
-;;
-
-type 'a pb_family =
-  | FFull of 'a
 ;;
 
 type filters =

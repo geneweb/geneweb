@@ -1,0 +1,6 @@
+(executable
+ ((name lex_utils)
+  (libraries (str))
+ )
+)
+

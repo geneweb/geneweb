@@ -9,7 +9,7 @@
    The implementation uses binomial queues from Chris Okasak.
    "add", "take" and "union" are in o(log n) in the worst case. *)
 
-module type OrderedType = sig type t = 'a; value leq : t -> t -> bool; end;
+module type OrderedType = sig type t val leq : t -> t -> bool end
           (* The input signature of the functor [Pqueue.Make].
              [t] is the type of the inserted elements.
              [leq] is a total ordering function over the elements.
@@ -18,16 +18,13 @@ module type OrderedType = sig type t = 'a; value leq : t -> t -> bool; end;
 
 module type S =
   sig
-    type elt = 'a;
-    type t = 'a;
-    value empty : t;
-    value is_empty : t -> bool;
-    value add : elt -> t -> t;
-    value take : t -> (elt * t);
-    value union : t -> t -> t;
+    type elt
+    type t
+    val empty : t
+    val is_empty : t -> bool
+    val add : elt -> t -> t
+    val take : t -> elt * t
+    val union : t -> t -> t
   end
-;
 
-module Make (Ord : OrderedType) :
-  S with type elt = Ord.t
-;
+module Make (Ord : OrderedType) : S with type elt = Ord.t

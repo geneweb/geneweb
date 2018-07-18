@@ -2,17 +2,16 @@
 (* Copyright (c) 2007-2008 INRIA *)
 
 type file_info =
-  { f_curr_src_file : mutable string;
-    f_curr_gwo_file : mutable string;
-    f_separate : mutable bool;
-    f_shift : mutable int;
-    f_local_names : mutable Hashtbl.t (int * int) Def.iper }
-;
+  { mutable f_curr_src_file : string;
+    mutable f_curr_gwo_file : string;
+    mutable f_separate : bool;
+    mutable f_shift : int;
+    mutable f_local_names : (int * int, Def.iper) Hashtbl.t }
 
-value particules_file : ref string;
-value do_check : ref bool;
-value do_consang : ref bool;
-value default_source : ref string;
-value pr_stats : ref bool;
+val particules_file : string ref
+val do_check : bool ref
+val do_consang : bool ref
+val default_source : string ref
+val pr_stats : bool ref
 
-value link : (file_info -> unit -> option Gwcomp.gw_syntax) -> string -> bool;
+val link : (file_info -> unit -> Gwcomp.gw_syntax option) -> string -> bool

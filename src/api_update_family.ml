@@ -9,10 +9,7 @@ open Config
 open Gwdb
 open Def
 open Util
-open Api_def
-open Api_util
-
-
+open Api_update_util
 
 let reconstitute_family conf base mod_f =
   (* Valeurs par défaut qui seront écrasées par reconstitute_from_fevents. *)
@@ -98,66 +95,7 @@ let reconstitute_family conf base mod_f =
                     | `witness_godparent -> Witness_GodParent
                     | `witness_officer   -> Witness_Officer
                   in
-                  let create_link = person.Mwrite.Person_link.create_link in
-                  let wit =
-                    (match create_link with
-                     | `create_default_occ ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | ` unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ =
-                           match person.Mwrite.Person_link.occ with
-                           | Some occ -> Int32.to_int occ
-                           | None -> 0
-                         in
-                         ((fn, sn, occ, Update.Create (sex, None), "", false), wk)
-                     | `create ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | ` unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ = Api_update_util.api_find_free_occ base fn sn in
-                         (*
-                         let occ = Api_update_util.find_free_occ base fn sn in
-                         (* On met à jour parce que si on veut le rechercher, *)
-                         (* il faut qu'on connaisse son occ.                  *)
-                         let () =
-                           if occ = 0 then person.Mwrite.Person_link.occ <- None
-                           else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
-                         in
-                         *)
-                         ((fn, sn, occ, Update.Create (sex, None), "", true), wk)
-                     | `link ->
-                         let ip = Int32.to_int person.Mwrite.Person_link.index in
-                         let p = poi base (Adef.iper_of_int ip) in
-                         let fn = sou base (get_first_name p) in
-                         let sn = sou base (get_surname p) in
-                         let occ =
-                           if fn = "?" || sn = "?" then
-                             Adef.int_of_iper (get_key_index p)
-                           else get_occ p
-                         in
-                         (*
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ =
-                           get_occ
-                             (poi base
-                                (Adef.iper_of_int
-                                   (Int32.to_int person.Mwrite.Person_link.index)))
-                         in
-                         *)
-                         ((fn, sn, occ, Update.Link, "", false), wk))
-                  in
+                  let wit = (reconstitute_somebody base person, wk) in
                   wit :: accu
               | None -> accu)
             evt.Mwrite.Fevent.witnesses []
@@ -390,7 +328,7 @@ let reconstitute_family conf base mod_f =
   (* Normalement, il ne doit plus y avoir de lever *)
   (* de conflits par les autres modules : update,  *)
   (* updateIndOk et updateFamOk.                   *)
-  let _err = Api_update_util.check_family_conflict conf base fam cpl des in
+  let _err = Api_update_util.check_family_conflict base fam cpl des in
   (* Maintenant qu'on a fini les conflit, on remet l'objet person *)
   (* tel que pour GeneWeb, c'est à dire qu'on supprime l'option   *)
   (* force_create.                                                *)
@@ -433,7 +371,7 @@ let reconstitute_family conf base mod_f =
 (**/**)
 
 
-let print_add conf base ip mod_f mod_fath mod_moth =
+let print_add conf base mod_f mod_fath mod_moth =
   (try
     let (sfam, scpl, sdes) = reconstitute_family conf base mod_f in
     (*
@@ -448,7 +386,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
       Api_update_util.UpdateError "BaseChanged"
     else
     *)
-      (match UpdateFamOk.check_family conf base sfam scpl with
+      (match UpdateFamOk.check_family conf sfam scpl with
       | (Some err, _) | (_, Some err) ->
           (* Correspond au cas ou fn/sn = ""/"?" *)
           (* => ne devrait pas se produire       *)
@@ -490,8 +428,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
             in
             (* TODO ?? idem enfant/witness ? *)
             (* optim ? regarder que ceux dont index = 0 *)
-            (* TODO *)
-            let _ =
+            let (wl, ml) =
               UpdateFamOk.all_checks_family
                 conf base ifam fam cpl des (scpl, sdes, None)
             in
@@ -534,7 +471,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
               [(fun () -> History.record conf base changed act);
                (fun () -> Update.delete_topological_sort conf base)]
             in
-            Api_update_util.UpdateSuccess ([], hr)
+            Api_update_util.UpdateSuccess (wl, ml, hr)
           end)
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
@@ -547,7 +484,7 @@ let print_del conf base ip ifam =
   begin
     if not (is_deleted_family fam) then
       begin
-        UpdateFamOk.effective_del conf base (ifam, fam);
+        UpdateFamOk.effective_del base ifam fam;
         (* Déplacé dans Api_saisie_write.compute_modification_status *)
         (*Util.commit_patches conf base;*)
         let changed =
@@ -571,15 +508,15 @@ let print_del conf base ip ifam =
           [(fun () -> History.record conf base changed "df");
            (fun () -> Update.delete_topological_sort conf base)]
         in
-        Api_update_util.UpdateSuccess ([], hr)
+        Api_update_util.UpdateSuccess ([], [], hr)
       end
     else
-      Api_update_util.UpdateSuccess ([], [])
+      Api_update_util.UpdateSuccess ([], [], [])
   end
 ;;
 
 
-let print_mod_aux conf base ip mod_f callback =
+let print_mod_aux conf base mod_f callback =
   try
     let (sfam, scpl, sdes) = reconstitute_family conf base mod_f in
     (*
@@ -589,7 +526,7 @@ let print_mod_aux conf base ip mod_f callback =
     in
     if digest = mod_f.Mwrite.Family.digest then
     *)
-      match UpdateFamOk.check_family conf base sfam scpl with
+      match UpdateFamOk.check_family conf sfam scpl with
       | (Some err, _) | (_, Some err) ->
           (* Correspond au cas ou fn/sn = "" ou "?" *)
           (* => ne devrait pas se produire *)
@@ -615,7 +552,7 @@ let print_mod conf base ip mod_f =
   in
   let callback sfam scpl sdes =
     begin
-      let ofs = UpdateFamOk.family_structure conf base sfam.fam_index in
+      let ofs = UpdateFamOk.family_structure base sfam.fam_index in
       let (ifam, fam, cpl, des) =
         UpdateFamOk.effective_mod conf base sfam scpl sdes
       in
@@ -658,10 +595,10 @@ let print_mod conf base ip mod_f =
         [(fun () -> History.record conf base changed "mf");
          (fun () -> Update.delete_topological_sort conf base)]
       in
-      Api_update_util.UpdateSuccess (wl, hr)
+      Api_update_util.UpdateSuccess (wl, ml, hr)
     end
   in
-  print_mod_aux conf base ip mod_f callback
+  print_mod_aux conf base mod_f callback
 ;;
 
 

@@ -1,17 +1,10 @@
-(* nocamlp5 *)
-
-
 module Mstats = Api_stats_piqi
 module Mext_stats = Api_stats_piqi_ext
-
 
 open Config
 open Def
 open Gwdb
-open Util
-open Api_def
 open Api_util
-
 
 (**/**) (* API_STATS *)
 
@@ -26,7 +19,6 @@ let list_uniq l =
       [] l
   in
   List.rev l
-;;
 
 let nsplit s c =
   if s = "" then []
@@ -45,7 +37,6 @@ let nsplit s c =
     in
     let len = String.length s in
     loop [] (len - 1) len
-;;
 
 let get_wday conf d =
   let jd =
@@ -66,9 +57,8 @@ let get_wday conf d =
     if x < 0 then 6 + (x + 1) mod 7 else x mod 7
   in
   if jd <> -1 then wday else -1
-;;
 
-let get_month conf d =
+let get_month d =
   match d with
   | Dgreg (d, _)  ->
       begin
@@ -77,14 +67,12 @@ let get_month conf d =
         | _ -> -1
       end
   | _ -> -1
-;;
 
 
 type record_stats =
   { s_year : int;
     s_sex : Def.sex;
     s_value : int; }
-;;
 
 let format_res ht =
   let res = ref [] in
@@ -102,7 +90,6 @@ let format_res ht =
       res := (s_year, ((nb_male, v_male), (nb_female, v_female))) :: !res)
     ht;
   List.sort (fun (k1, _) (k2, _) -> compare k1 k2) !res
-;;
 
 let format_res2 ht =
   let res = ref [] in
@@ -123,7 +110,6 @@ let format_res2 ht =
       if v = 0 then compare w1 w2
       else v)
     !res
-;;
 
 let format_res3 ht =
   let res = ref [] in
@@ -139,17 +125,15 @@ let format_res3 ht =
       res := (s_year, (nb_male, nb_female)) :: !res)
     ht;
   List.sort (fun (k1, _) (k2, _) -> compare k1 k2) !res
-;;
+
+let filter_gte_1600 : 'a . (int * 'a) list -> (int * 'a) list =
+  fun l -> List.filter (fun (k, _) -> k >= 1600) l
 
 let format_stats_all l title series =
-  let l =
-    List.filter
-      (fun (k, ((nb_m, am), (nb_f, af))) -> k >= 1600)
-      l
-  in
+  let l = filter_gte_1600 l in
   let (labels, datas_all) =
     List.fold_right
-      (fun (k, ((nb_m, am), (nb_f, af))) (labels, datas_all) ->
+      (fun (k, (_, (nb_f, af))) (labels, datas_all) ->
         let data =
           Mstats.Data.({
             nb = Int32.of_int nb_f;
@@ -168,14 +152,9 @@ let format_stats_all l title series =
     series_string = [];
     datas = datas;
   })
-;;
 
 let format_stats_m_f l title series =
-  let l =
-    List.filter
-      (fun (k, ((nb_m, am), (nb_f, af))) -> k >= 1600)
-      l
-  in
+  let l = filter_gte_1600 l in
   let (labels, (datas_male, datas_female)) =
     List.fold_right
       (fun (k, ((nb_m, am), (nb_f, af))) (labels, (datas_male, datas_female)) ->
@@ -205,21 +184,15 @@ let format_stats_m_f l title series =
     series_string = [];
     datas = datas;
   })
-;;
 
 let format_stats_m_f2 l1 l2 title series1 series2 =
-  let l1 =
-    List.filter
-      (fun (k, ((nb_m, am), (nb_f, af))) -> k >= 1600)
-      l1
+  let l1 = filter_gte_1600 l1 in
+  let l2 = filter_gte_1600 l2 in
+  let labels =
+    List.sort_uniq compare @@
+    List.rev_map fst @@
+    List.rev_append l1 l2
   in
-  let l2 =
-    List.filter
-      (fun (k, ((nb_m, am), (nb_f, af))) -> k >= 1600)
-      l2
-  in
-  let labels = List.map (fun (k, _) -> k) l1 @ List.map (fun (k, _) -> k) l2 in
-  let labels = List.sort compare (list_uniq labels) in
   let ht_labels = Hashtbl.create (List.length labels) in
   let () =
     let rec loop i l =
@@ -232,7 +205,7 @@ let format_stats_m_f2 l1 l2 title series1 series2 =
   let data = Array.make (List.length series1 + List.length series2) ([| |]) in
   let data =
     Array.map
-      (fun a ->
+      (fun _ ->
         Array.make (List.length labels)
           (Mstats.Data.({
             nb = Int32.zero;
@@ -297,14 +270,9 @@ let format_stats_m_f2 l1 l2 title series1 series2 =
     series_string = [];
     datas = datas;
   })
-;;
 
 let format_stats_dmy l title series =
-  let l =
-    List.filter
-      (fun (k, (md, nb_m, nb_f)) -> k >= 1600)
-      l
-  in
+  let l = filter_gte_1600 l in
   let ht = Hashtbl.create (List.length l) in
   let () =
     List.iter
@@ -315,7 +283,7 @@ let format_stats_dmy l title series =
   let data = Array.make (List.length series) ([| |]) in
   let data =
     Array.map
-      (fun a ->
+      (fun _ ->
         Array.make (List.length labels)
           (Mstats.Data.({
             nb = Int32.zero;
@@ -346,30 +314,22 @@ let format_stats_dmy l title series =
       (Array.to_list data)
   in
   let labels = List.map Int32.of_int labels in
-  let stats =
-    Mstats.Stat.({
+  Mstats.Stat.({
       title = title;
       labels = labels;
       series = series;
       series_string = [];
       datas = datas;
     })
-  in
-  stats
-;;
+
+let filter_gte_1600_and_create_ht l =
+  let l = filter_gte_1600 l in
+  let ht = Hashtbl.create (List.length l) in
+  let () = List.iter (fun (k, v) -> Hashtbl.add ht k v) l in
+  (l, ht)
 
 let format_stats_day l title =
-  let l =
-    List.filter
-      (fun (k, (md, nb_m, nb_f)) -> k >= 1600)
-      l
-  in
-  let ht = Hashtbl.create (List.length l) in
-  let () =
-    List.iter
-      (fun (k, (md, nb_m, nb_f)) -> Hashtbl.add ht k (md, nb_m, nb_f))
-      l
-  in
+  let l, ht = filter_gte_1600_and_create_ht l in
   let labels = list_uniq (List.map (fun (k, _) -> k) l) in
   let (data_mon, data_tue, data_wed, data_thu, data_fri, data_sat, data_sun) =
     List.fold_right
@@ -432,30 +392,16 @@ let format_stats_day l title =
     [`serie_day_1; `serie_day_2; `serie_day_3; `serie_day_4;
      `serie_day_5; `serie_day_6; `serie_day_7;]
   in
-  let stats =
-    Mstats.Stat.({
+  Mstats.Stat.({
       title = title;
       labels = labels;
       series = series;
       series_string = [];
       datas = datas;
     })
-  in
-  stats
-;;
 
 let format_stats_month l title =
-  let l =
-    List.filter
-      (fun (k, (md, nb_m, nb_f)) -> k >= 1600)
-      l
-  in
-  let ht = Hashtbl.create (List.length l) in
-  let () =
-    List.iter
-      (fun (k, (md, nb_m, nb_f)) -> Hashtbl.add ht k (md, nb_m, nb_f))
-      l
-  in
+  let l, ht = filter_gte_1600_and_create_ht l in
   let labels = list_uniq (List.map (fun (k, _) -> k) l) in
   let (data_jan, data_feb, data_mar, data_apr,
        data_may, data_jun, data_jul, data_aug,
@@ -551,13 +497,10 @@ let format_stats_month l title =
     series_string = [];
     datas = datas;
   })
-;;
 
 let format_top_stats ht title =
   let res = ref [] in
-  Hashtbl.iter
-    (fun k (s, n) -> res := (s, n) :: !res)
-    ht;
+  Hashtbl.iter (fun _ (s, n) -> res := (s, n) :: !res) ht;
   let l =
     List.sort (fun (_, n1) (_, n2) -> if n1 > n2 then -1 else 1) !res
   in
@@ -590,20 +533,9 @@ let format_top_stats ht title =
     series_string = series_string;
     datas = datas;
   })
-;;
 
 let format_stats_astro l title =
-  let l =
-    List.filter
-      (fun (k, (md, nb_m, nb_f)) -> k >= 1600)
-      l
-  in
-  let ht = Hashtbl.create (List.length l) in
-  let () =
-    List.iter
-      (fun (k, (md, nb_m, nb_f)) -> Hashtbl.add ht k (md, nb_m, nb_f))
-      l
-  in
+  let l, ht = filter_gte_1600_and_create_ht l in
   let labels = list_uniq (List.map (fun (k, _) -> k) l) in
   let (data_aries, data_taurus, data_gemini, data_cancer,
        data_leo, data_virgo, data_libra, data_scorpio,
@@ -797,20 +729,9 @@ let format_stats_astro l title =
     series_string = [];
     datas = datas;
   })
-;;
 
 let format_stats_moon l title =
-  let l =
-    List.filter
-      (fun (k, (md, nb_m, nb_f)) -> k >= 1600)
-      l
-  in
-  let ht = Hashtbl.create (List.length l) in
-  let () =
-    List.iter
-      (fun (k, (md, nb_m, nb_f)) -> Hashtbl.add ht k (md, nb_m, nb_f))
-      l
-  in
+  let l, ht = filter_gte_1600_and_create_ht l in
   let labels = list_uniq (List.map (fun (k, _) -> k) l) in
   let (data_new, data_first, data_full, data_last) =
     List.fold_right
@@ -882,23 +803,18 @@ let format_stats_moon l title =
     [`serie_moon_new; `serie_moon_first_quarter; `serie_moon_full;
      `serie_moon_last_quarter ]
   in
-  let stats =
-    Mstats.Stat.({
+  Mstats.Stat.({
       title = title;
       labels = [Int32.zero];
       series = series;
       series_string = [];
       datas = datas;
     })
-  in
-  stats
-;;
-
-
 
 let print_ind_stats conf base =
-  let params = get_params conf Mext_stats.parse_stats_params in
-
+  let params =
+    get_params conf (fun a b -> Mext_stats.parse_stats_params a b)
+  in
   let nb_pers = nb_of_persons base in
 
   (* nombre d'ascendants *)
@@ -1150,7 +1066,7 @@ let print_ind_stats conf base =
           l)
       l;
     let res = ref [] in
-    Hashtbl.iter (fun k (s, n) -> res := (s, n) :: !res) ht;
+    Hashtbl.iter (fun _ (s, n) -> res := (s, n) :: !res) ht;
     let l =
       List.sort
         (fun (_, n1) (_, n2) -> if n1 > n2 then -1 else 1)
@@ -1229,7 +1145,7 @@ let print_ind_stats conf base =
           l)
       l;
     let res = ref [] in
-    Hashtbl.iter (fun k (s, n) -> res := (s, n) :: !res) ht;
+    Hashtbl.iter (fun _ (s, n) -> res := (s, n) :: !res) ht;
     let l =
       List.sort
         (fun (_, n1) (_, n2) -> if n1 > n2 then -1 else 1)
@@ -1310,7 +1226,6 @@ let print_ind_stats conf base =
 
   let data = Mext_stats.gen_stats stats in
   print_result conf data
-;;
 
 
 let print_all_stats conf base =
@@ -1401,7 +1316,7 @@ let print_all_stats conf base =
             (* mois de naissance *)
             begin
               if p_auth && dmy1.month > 0 then
-                let md = get_month conf d1 in
+                let md = get_month d1 in
                 if md <> -1 then
                   let md = md - 1 in
                   let r =
@@ -1422,7 +1337,7 @@ let print_all_stats conf base =
             (* mois de décès *)
             begin
               if p_auth && dmy2.month > 0 then
-                let md = get_month conf d2 in
+                let md = get_month d2 in
                 if md <> -1 then
                   let md = md - 1 in
                   let r =
@@ -1860,7 +1775,7 @@ let print_all_stats conf base =
               (* mois de mariage *)
               begin
                 if m_auth && dmy.month > 0 then
-                  let md = get_month conf d in
+                  let md = get_month d in
                   if md <> -1 then
                     let md = md - 1 in
                     let r1 =
@@ -1962,8 +1877,7 @@ let print_all_stats conf base =
                 (* On prend le parti que les enfants sont triés ! *)
                 let rec loop l =
                   match l with
-                  | [] -> ()
-                  | [ic] -> ()
+                  | [] | [_] -> ()
                   | ic1 :: ic2 :: l ->
                       let c1 = poi base ic1 in
                       let c2 = poi base ic2 in
@@ -2202,7 +2116,7 @@ let print_all_stats conf base =
   (* Nom le plus long *)
   let _longuest_name =
     let () = load_strings_array base in
-    let (list, _, len) = Alln.select_names conf base true "" true in
+    let (list, _, _) = Alln.select_names conf base true "" true in
     let list =
       List.sort
         (fun (k1, _, _) (k2, _, _) ->
@@ -2218,7 +2132,7 @@ let print_all_stats conf base =
   (* Nom les plus fréquents *)
   let () =
     let () = load_strings_array base in
-    let (list, _, len) = Alln.select_names conf base true "" true in
+    let (list, _, _) = Alln.select_names conf base true "" true in
     let list =
       List.sort
         (fun (k1, _, _) (k2, _, _) ->
@@ -2253,7 +2167,7 @@ let print_all_stats conf base =
   (* Prénom les plus fréquents *)
   let () =
     let () = load_strings_array base in
-    let (list, _, len) = Alln.select_names conf base false "" true in
+    let (list, _, _) = Alln.select_names conf base false "" true in
     let list =
       List.sort
         (fun (k1, _, _) (k2, _, _) ->
@@ -2664,12 +2578,10 @@ let print_all_stats conf base =
 
   let data = Mext_stats.gen_stats stats in
   print_result conf data
-;;
 
 
 let print_stats conf base =
   let params = get_params conf Mext_stats.parse_stats_params in
-  match params.Mstats.Stats_params.i with
-  | Some i -> print_ind_stats conf base
-  | None -> print_all_stats conf base
-;;
+  if params.Mstats.Stats_params.i <> None
+  then print_ind_stats conf base
+  else print_all_stats conf base

@@ -1,6 +1,5 @@
 (* nocamlp5 *)
 
-
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
 module RC = Redis_sync.Client
@@ -8,7 +7,6 @@ module RC = Redis_sync.Client
 open Config
 open Def
 open Gwdb
-
 
 (* base redis contenant tous les liens. *)
 let redis_host_all = ref "127.0.0.1" ;;
@@ -27,15 +25,13 @@ let api_servers = ref [] ;;
 let create_redis_connection () =
   let connection_spec = {RC.host = !redis_host; RC.port = !redis_port} in
   RC.IO.run (RC.connect connection_spec)
-;;
 
-let redis_p_key conf base ip =
+let redis_p_key base ip =
   let p = poi base ip in
   let sn = Name.lower (sou base (get_surname p)) in
   let fn = Name.lower (sou base (get_first_name p)) in
   let occ = get_occ p in
   sn ^ "|" ^ fn ^ "|" ^ if occ > 0 then string_of_int occ else ""
-;;
 
 let filter_bulk l =
   List.fold_right
@@ -49,7 +45,6 @@ let filter_bulk l =
           end
       | _ -> accu)
     l []
-;;
 
 let filter_string l =
   List.fold_right
@@ -58,54 +53,80 @@ let filter_string l =
       | Some s -> s :: accu
       | None -> accu)
     l []
-;;
 
 (* Trouve une key en fonction de l'utilisateur et d'une référence GW *)
 let findKeyBySourcenameAndRef redis bname geneweb_key =
   RC.IO.run (RC.zscore redis ("lia.keys." ^ bname) geneweb_key)
-;;
 
 let findBridgesBySourcenameAndIdGlinks redis bname fb =
   let l = RC.zrangebyscore redis ("lia.bridges." ^ bname) fb fb in
   filter_bulk (RC.IO.run l)
-;;
 
 let findLinksBySourcenameAndBridge redis bname s =
   RC.IO.run (RC.hget redis ("lia.links." ^ bname) s)
-;;
 
 let findKeyBySourcenameAndIdGlinks redis bname fb =
   let l = RC.zrangebyscore redis ("lia.keys." ^ bname) fb fb in
   filter_bulk (RC.IO.run l)
-;;
+
+(* connection -> string -> string -> string option *)
+(* Cherche les données d'un bridge en fonction du sourcename et de l'ID du bridge. *)
+let findBridgeDataBySourcenameAndBridgeId redis bname bridge_id =
+  RC.IO.run (RC.hget redis ("lia.bridges_data." ^ bname) bridge_id)
 
 let json_list_of_string s =
   Yojson.Basic.Util.filter_string
     (Yojson.Basic.Util.to_list
        (Yojson.Basic.from_string s))
-;;
 
-let get_bridges conf base redis ip =
+(* conf -> base -> connection -> ip -> bool *)
+(* Permet de récupérer les ponts d'une personne (en utilisant son index). *)
+(* include_not_validated : booléen indiquant l'inclusion ou non des ponts non validés. *)
+let get_bridges conf base redis ip include_not_validated =
   (* on récupère la clé *)
   match
-    findKeyBySourcenameAndRef redis conf.bname (redis_p_key conf base ip)
+    findKeyBySourcenameAndRef redis conf.bname (redis_p_key base ip)
   with
   | Some f ->
-      (* on récupère tous les ids de ponts *)
-      findBridgesBySourcenameAndIdGlinks
-        redis conf.bname (RC.FloatBound.Inclusive f)
+      (* Récupère tous les IDs de ponts. *)
+      let bridge_ids =
+        findBridgesBySourcenameAndIdGlinks redis conf.bname (RC.FloatBound.Inclusive f)
+      in
+      (* Filtre sur les ponts validés. *)
+      List.fold_left
+        (fun accu bridge_id ->
+          (* Récupère les données du pont. *)
+          match findBridgeDataBySourcenameAndBridgeId redis conf.bname bridge_id
+          with
+           | Some bridge_data ->
+              (* Les ponts ne sont pas filtrés si les ponts non validés sont inclus. *)
+              if include_not_validated then
+                bridge_id::accu
+              else
+                (* Parsing du JSON. *)
+                let is_validated_bridge = List.hd (Yojson.Basic.Util.filter_string
+                  (Yojson.Basic.Util.filter_member "validated" [Yojson.Basic.from_string bridge_data])) in
+                (* Ajoute l'ID du pont à la liste seulement s'il est validé. *)
+                if ((int_of_string is_validated_bridge) == 1) then
+                  bridge_id::accu
+                else
+                  accu
+           | None -> accu)
+        [] bridge_ids
   | None -> []
-;;
 
-let get_links conf base redis ip =
-  match get_bridges conf base redis ip with
+(* conf -> base -> connection -> ip -> bool *)
+(* Permet de récupérer les liens d'une personne (en utilisant son index). *)
+(* include_not_validated : booléen indiquant l'inclusion ou non des liens non validés. *)
+let get_links conf base redis ip include_not_validated =
+  (* L'inclusion ou non des liens non validés se fait lors de la récupération des ponts. *)
+  (* On pourrait aussi le faire au niveau des liens puisqu'ils contiennent également l'information validated. *)
+  match get_bridges conf base redis ip include_not_validated with
   | [] -> []
   | l ->
       (* on récupère les liens associées *)
-      let list = List.map (findLinksBySourcenameAndBridge redis conf.bname) l in
-      let list = filter_string list in
-      list
-;;
+    List.map (findLinksBySourcenameAndBridge redis conf.bname) l
+    |> filter_string
 
 
 (**/**) (* CURL. *)
@@ -114,23 +135,20 @@ let get_links conf base redis ip =
 let writer accum data =
   Buffer.add_string accum data;
   String.length data
-;;
 
 let showContent content =
   Printf.printf "%s" (Buffer.contents content);
   flush stdout
-;;
 
 let showInfo connection =
   Printf.printf "Time: %f\nURL: %s\n"
     (Curl.get_totaltime connection)
     (Curl.get_effectiveurl connection)
-;;
 
 let getContent connection url =
   Curl.set_url connection url;
+  Curl.set_timeoutms connection 1000;
   Curl.perform connection
-;;
 
 
 (**/**) (* Convertion d'une date, personne, famille. *)
@@ -159,7 +177,7 @@ let piqi_date_of_date date =
         let m = Some (Int32.of_int dmy.month) in
         let y = Some (Int32.of_int dmy.year) in
         let delta = Some (Int32.of_int dmy.delta) in
-        let dmy1 = MLink.Dmy.({day = d; month = m; year = y; delta = delta;}) in
+        let dmy1 = {MLink.Dmy.day = d; month = m; year = y; delta = delta;} in
         let (prec, dmy2) =
           match dmy.prec with
           | Sure -> (`sure, None)
@@ -173,7 +191,7 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                MLink.Dmy.({day = d; month = m; year = y; delta = delta;})
+                {MLink.Dmy.day = d; month = m; year = y; delta = delta;}
               in
               (`oryear, Some dmy2)
           | YearInt dmy2 ->
@@ -182,28 +200,27 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                MLink.Dmy.({day = d; month = m; year = y; delta = delta;})
+                {MLink.Dmy.day = d; month = m; year = y; delta = delta;}
               in
               (`yearint, Some dmy2)
         in
         (prec, dmy1, dmy2)
       in
-      MLink.Date.({
-        cal = cal;
+      {
+        MLink.Date.cal = cal;
         prec = Some prec;
         dmy = Some dmy;
         dmy2 = dmy2;
         text = None;
-      })
+      }
   | Dtext txt ->
-      MLink.Date.({
-        cal = None;
+      {
+        MLink.Date.cal = None;
         prec = None;
         dmy = None;
         dmy2 = None;
         text = Some txt;
-      })
-;;
+      }
 
 let p_to_piqi_full_person conf base ip ip_spouse =
   let baseprefix = conf.command in
@@ -310,8 +327,8 @@ let p_to_piqi_full_person conf base ip ip_spouse =
         else accu)
       (Array.to_list (get_family p)) []
   in
-  MLink.Person.({
-    baseprefix = baseprefix;
+  {
+    MLink.Person.baseprefix = baseprefix;
     ip = index;
     n = sn;
     p = fn;
@@ -335,8 +352,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
     burial_date = burial;
     burial_place = burial_place;
     families = families;
-  })
-;;
+  }
 
 let fam_to_piqi_full_family conf base ip ifam add_children =
   let baseprefix = conf.command in
@@ -400,8 +416,8 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
       in
       [pl]
   in
-  MLink.Family.({
-    baseprefix = baseprefix;
+  {
+    MLink.Family.baseprefix = baseprefix;
     ifam = index;
     ifath = ifath;
     imoth = imoth;
@@ -411,14 +427,13 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
     divorce_type = divorce_type;
     divorce_date = divorce_date;
     children = children;
-  })
-;;
+  }
 
 
 (**/**)
 
 
-let get_families_asc conf base ip nb_asc from_gen_desc =
+let get_families_asc base ip nb_asc =
   let rec loop_asc parents families =
     match parents with
     | [] -> families
@@ -435,9 +450,8 @@ let get_families_asc conf base ip nb_asc from_gen_desc =
       | None -> loop_asc parents families
   in
   loop_asc [(ip, 0)] []
-;;
 
-let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
+let get_families_desc base ip ip_spouse from_gen_desc nb_desc =
   if from_gen_desc <= 0 then []
   else
     let rec loop_asc pl accu =
@@ -455,6 +469,8 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
                   ((ip, gen) :: accu)
             | None -> loop_asc pl accu
     in
+    (* Récupère les ascendants jusqu'au nombre de générations from_gen_desc. *)
+    (* Utile pour le template affichant les parents des conjoints. *)
     let ipl = loop_asc [(ip, 0)] [] in
     let ipl =
       match ipl with
@@ -463,7 +479,7 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
     in
     let rec loop_desc pl accu =
       match pl with
-      | [] -> accu
+      | [] -> accu (* Retourne accu lorsqu'il n'y a plus rien à parcourir. *)
       | (ip, gen) :: pl ->
           let fam = Array.to_list (get_family (poi base ip)) in
           let fam =
@@ -477,6 +493,7 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
             else fam
           in
           let accu =
+            (* Si la génération est inférieure à celle demandée, les données ne sont pas retournées. *)
             if gen <= -nb_desc then accu
             else
               List.fold_left
@@ -488,14 +505,14 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
               (fun pl ifam ->
                 let fam = foi base ifam in
                 List.fold_left
-                  (fun pl ic -> (ic, gen - 1) :: pl)
+                  (* Ne récupère pas les descendants si la génération suivante est inférieure à celle demandée. *)
+                  (fun pl ic -> if gen - 1 <= -nb_desc then pl else (ic, gen - 1) :: pl)
                   pl (Array.to_list (get_children fam)))
               pl fam
           in
           loop_desc pl accu
     in
     loop_desc ipl []
-;;
 
 
 
@@ -547,11 +564,11 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
         else headers
       in
       let headers =
-        let redis_moderate =
-          Wserver.extract_param "redis-moderate: " '\r' request
+        let include_not_validated =
+          Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' request
         in
-        if redis_moderate <> "" then
-          ("Redis-Moderate: " ^ redis_moderate) :: headers
+        if include_not_validated <> "" then
+          ("Inter-Tree-Links-Include-Not-Validated: " ^ include_not_validated) :: headers
         else headers
       in
       Curl.set_httpheader connection headers;
@@ -559,6 +576,7 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
       Curl.set_writefunction connection (writer result);
       Curl.set_followlocation connection true;
       Curl.set_url connection url;
+      Curl.set_timeoutms connection 1000;
       Curl.perform connection;
       (*
         showContent result;
@@ -567,7 +585,7 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
       Curl.cleanup connection;
       res := Buffer.contents result
     with
-    | Curl.CurlException (reason, code, str) ->
+    | Curl.CurlException _ ->
         Printf.fprintf stderr "Error: %s\n" !errorBuffer
     | Failure s ->
         Printf.fprintf stderr "Caught exception: %s\n" s
@@ -582,7 +600,6 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
      | _ -> exit (-2)
   in
   MLinkext.parse_link_tree !res output_encoding
-;;
 
 
 let print_link_tree conf base =
@@ -595,20 +612,11 @@ let print_link_tree conf base =
   let from_gen_desc = Int32.to_int params.MLink.Link_tree_params.from_gen_desc in
   let nb_desc = Int32.to_int params.MLink.Link_tree_params.nb_desc in
 
-  (* Choix de la base redis en fonction du header envoyé. *)
-  let redis_moderate =
-    Wserver.extract_param "redis-moderate: " '\r' conf.request
+  (* Gestion de l'inclusion des not validated. *)
+  let include_not_validated =
+    let h_include_not_validated = Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' conf.request in
+    if h_include_not_validated = "1" then true else false
   in
-  if redis_moderate <> "" then
-    begin
-      redis_host := !redis_host_moderate;
-      redis_port := !redis_port_moderate;
-    end
-  else
-    begin
-      redis_host := !redis_host_all;
-      redis_port := !redis_port_all;
-    end;
 
   let redis = create_redis_connection () in
 
@@ -659,7 +667,7 @@ let print_link_tree conf base =
 
   (* La liste de toutes les personnes à renvoyer. *)
   let pl =
-    get_families_desc conf base ip_local ip_local_spouse from_gen_desc nb_desc
+    get_families_desc base ip_local ip_local_spouse from_gen_desc nb_desc
   in
   (* On dédoublonne la liste. *)
   let pl =
@@ -677,7 +685,7 @@ let print_link_tree conf base =
        ip_local <> Adef.iper_of_int (-1) &&
        ip_distant <> Adef.iper_of_int (-1)
     then
-      let families = get_families_asc conf base ip_local nb_asc from_gen_desc in
+      let families = get_families_asc base ip_local nb_asc in
       List.map
         (fun (ip, ifam, gen) ->
           let add_children = gen < from_gen_desc in
@@ -755,7 +763,7 @@ let print_link_tree conf base =
   let all_persons =
     let ht = Hashtbl.create 101 in
     List.fold_left
-      (fun accu (_, ifam, gen) ->
+      (fun accu (_, ifam, _) ->
          let fam = foi base ifam in
          let ifath = get_father fam in
          let imoth = get_mother fam in
@@ -791,18 +799,19 @@ let print_link_tree conf base =
     List.fold_left
       (fun accu p ->
         let ip = Adef.iper_of_int (Int32.to_int p.MLink.Person.ip) in
-        let bl = get_bridges conf base redis ip in
+        let bl = get_bridges conf base redis ip include_not_validated in
         List.fold_left
           (fun accu s ->
              match Link.nsplit s ':' with
              | [_; bname_link; id_link] ->
                  begin
                    match
-                     findKeyBySourcenameAndIdGlinks redis bname_link
+                     findKeyBySourcenameAndIdGlinks
+                       redis bname_link
                        (RC.FloatBound.Inclusive (float_of_string id_link))
                    with
                    | [s] ->
-                       let from_ref = redis_p_key conf base ip in
+                       let from_ref = redis_p_key base ip in
                        let corresp =
                          MLink.Connection.({
                            from_baseprefix = conf.bname;
@@ -828,12 +837,12 @@ let print_link_tree conf base =
     in
     let ht_request = Hashtbl.create 101 in
     List.fold_left
-      (fun (accu_fam, accu_pers, accu_conn) (ip, ifam, gen) ->
+      (fun (accu_fam, accu_pers, accu_conn) (ip, _, gen) ->
         if Hashtbl.mem ht_request ip then (accu_fam, accu_pers, accu_conn)
         else
           begin
             Hashtbl.add ht_request ip ();
-            let links = get_links conf base redis ip in
+            let links = get_links conf base redis ip include_not_validated in
             List.fold_left
               (fun (accu_fam, accu_pers, accu_conn) s ->
                 List.fold_left
@@ -856,7 +865,7 @@ let print_link_tree conf base =
                                   bname_link ip s s2 0 1 (nb_desc + gen)
                               in
                               let corr =
-                                let from_ref = redis_p_key conf base ip in
+                                let from_ref = redis_p_key base ip in
                                 MLink.Connection.({
                                   from_baseprefix = conf.bname;
                                   from_ref = from_ref;
@@ -899,7 +908,7 @@ let print_link_tree conf base =
       let persons = loop [(ip_local, 0)] [] in
       List.fold_left
         (fun (accu_fam, accu_pers, accu_conn) (ip, gen) ->
-           let links = get_links conf base redis ip in
+           let links = get_links conf base redis ip include_not_validated in
            List.fold_left
              (fun (accu_fam, accu_pers, accu_conn) s ->
                 List.fold_left
@@ -919,7 +928,7 @@ let print_link_tree conf base =
                                    (if conf.bname <> basename then gen + nb_desc else gen)
                                in
                                let corr =
-                                 let from_ref = redis_p_key conf base ip in
+                                 let from_ref = redis_p_key base ip in
                                  MLink.Connection.({
                                    from_baseprefix = conf.bname;
                                    from_ref = from_ref;
@@ -955,4 +964,3 @@ let print_link_tree conf base =
   in
   let data = MLinkext.gen_link_tree data in
   Api_util.print_result conf data
-;;

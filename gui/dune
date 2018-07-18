@@ -1,0 +1,6 @@
+(executables
+ ((names (gui))
+  (libraries (geneweb.lib threads lablgtk2 unix))
+  (flags (-w -a+31))
+ )
+)
