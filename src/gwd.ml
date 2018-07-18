@@ -4,6 +4,7 @@
 
 open Config;
 open Def;
+open Gutil;
 open Mutil;
 open Util;
 
@@ -734,7 +735,7 @@ value http_preferred_language request =
         else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
         else loop list (i + 1) (Buff.store len s.[i])
     in
-    let list = List.map Gutil.strip_spaces list in
+    let list = List.map strip_spaces list in
     let rec loop =
       fun
       [ [lang :: list] ->
@@ -1857,7 +1858,7 @@ value arg_parse_in_file fname speclist anonfun errmsg =
       in
       let list =
         match list with
-        [ [x] -> Gutil.arg_list_of_string x
+        [ [x] -> arg_list_of_string x
         | _ -> list ]
       in
       Argl.parse_list speclist anonfun errmsg list

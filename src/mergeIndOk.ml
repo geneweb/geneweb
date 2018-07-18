@@ -5,6 +5,7 @@
 open Config;
 open Def;
 open Futil;
+open Gutil;
 open Gwdb;
 open Hutil;
 open Mutil;
@@ -463,10 +464,10 @@ value redirect_added_families base p ip2 p2_family =
                  else ())
                evt.efam_witnesses)
           (get_fevents fam);
-        Gutil.couple False p.key_index (get_mother fam)
+        couple False p.key_index (get_mother fam)
       }
       else if ip2 = get_mother fam then
-        Gutil.couple False (get_father fam) p.key_index
+        couple False (get_father fam) p.key_index
       else assert False
     in
     patch_couple base ifam cpl;

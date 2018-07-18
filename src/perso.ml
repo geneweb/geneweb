@@ -9,6 +9,7 @@ END;
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
 open Mutil;
 open TemplAst;
@@ -188,7 +189,7 @@ value print_base_loop conf base p =
     Wserver.printf
       (fcapitale
          (ftransl conf "loop in database: %s is his/her own ancestor"))
-      (Util.update_family_loop conf base p (Gutil.designation base p));
+      (Util.update_family_loop conf base p (designation base p));
     Wserver.printf ".\n";
     Hutil.trailer conf;
     exit 2
@@ -5119,7 +5120,7 @@ value print_foreach conf base print_ast eval_expr =
               let fam = foi base ifam in
               let ifath = get_father fam in
               let imoth = get_mother fam in
-              let ispouse = Gutil.spouse (get_key_index p) fam in
+              let ispouse = spouse (get_key_index p) fam in
               let cpl = (ifath, imoth, ispouse) in
               let m_auth =
                  authorized_age conf base (pget conf base ifath) &&
