@@ -4,6 +4,7 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
 open Hutil;
 open Util;
@@ -78,7 +79,7 @@ value person_selected conf base p =
 ;
 
 value compact_list conf base xl =
-  let pl = Gutil.sort_person_list base xl in
+  let pl = sort_person_list base xl in
   let pl =
     List.fold_right
       (fun p pl ->
@@ -159,7 +160,7 @@ value find_all conf base an =
         | _ -> ([], False) ]
       else ([], False)
   | _ ->
-      match Gutil.person_of_string_key base an with
+      match person_of_string_key base an with
       [ Some ip ->
           let pl =
             let p = pget conf base ip in
@@ -177,12 +178,12 @@ value find_all conf base an =
           in
           (pl, False)
       | None ->
-          let ipl = Gutil.person_not_a_key_find_all base an in
+          let ipl = person_not_a_key_find_all base an in
           let (an, ipl) =
             if ipl = [] then
               match name_with_roman_number an with
               [ Some an1 ->
-                  let ipl = Gutil.person_ht_find_all base an1 in
+                  let ipl = person_ht_find_all base an1 in
                   if ipl = [] then (an, []) else (an1, ipl)
               | None -> (an, ipl) ]
             else (an, ipl)
@@ -306,7 +307,7 @@ value specify conf base n pl =
                (fun ifam spouses ->
                   let cpl = foi base ifam in
                   let spouse =
-                    pget conf base (Gutil.spouse (get_key_index p) cpl)
+                    pget conf base (spouse (get_key_index p) cpl)
                   in
                   if p_surname base spouse <> "?" then [spouse :: spouses]
                   else spouses)

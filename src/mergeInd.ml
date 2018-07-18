@@ -4,6 +4,7 @@
 
 open Config;
 open Def;
+open Gutil;
 open Gwdb;
 open Hutil;
 open Util;
@@ -355,9 +356,9 @@ value effective_merge_ind conf base warning p1 p2 =
         let cpl = foi base ifam in
         let cpl =
           if get_key_index p2 = get_father cpl then
-            Gutil.couple False (get_key_index p1) (get_mother cpl)
+            couple False (get_key_index p1) (get_mother cpl)
           else if get_key_index p2 = get_mother cpl then
-            Gutil.couple False (get_father cpl) (get_key_index p1)
+            couple False (get_father cpl) (get_key_index p1)
           else assert False
         in
         patch_couple base ifam cpl;
