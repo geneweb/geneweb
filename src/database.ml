@@ -6,6 +6,7 @@ module type HACK_FOR_DEPEND = sig open Btree; end;
 open Dbdisk;
 open Def;
 open Dutil;
+open Mutil;
 
 type person = dsk_person;
 type ascend = dsk_ascend;
@@ -140,13 +141,13 @@ value index_of_string strings ic start_pos hash_len string_patches s =
       [ (Some ic, Some hash_len) ->
           let ia = Hashtbl.hash s mod hash_len in
           do {
-            seek_in ic (start_pos + ia * Mutil.int_size);
+            seek_in ic (start_pos + ia * int_size);
             let i1 = input_binary_int ic in
             let rec loop i =
               if i = -1 then raise Not_found
               else if strings.get i = s then Adef.istr_of_int i
               else do {
-                seek_in ic (start_pos + (hash_len + i) * Mutil.int_size);
+                seek_in ic (start_pos + (hash_len + i) * int_size);
                 loop (input_binary_int ic)
               }
             in
@@ -408,7 +409,7 @@ value persons_of_name bname patches =
             [ Some a -> a
             | None ->
                 do {
-                  seek_in ic_inx Mutil.int_size;
+                  seek_in ic_inx int_size;
                   let a : name_index_data = input_value ic_inx in
                   t.val := Some a;
                   a
@@ -468,14 +469,14 @@ value strings_of_fsname bname strings (_, person_patches) =
            do {
              if not (List.mem p.first_name l.val) then
                let s1 = strings.get (Adef.int_of_istr p.first_name) in
-               let s1 = Mutil.nominative s1 in
+               let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
                  l.val := [p.first_name :: l.val]
                else ()
              else ();
              if not (List.mem p.surname l.val) then
                let s1 = strings.get (Adef.int_of_istr p.surname) in
-               let s1 = Mutil.nominative s1 in
+               let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
                  l.val := [p.surname :: l.val]
                else ()
@@ -509,7 +510,7 @@ value make_visible_record_access bname persons =
       [ Some ic ->
           do {
             if Sys.unix then
-              if Mutil.verbose.val then do {
+              if verbose.val then do {
                 Printf.eprintf "*** read restrict file\n";
                 flush stderr;
               }
@@ -529,7 +530,7 @@ value make_visible_record_access bname persons =
         try do {
           let oc = Secure.open_out fname in
           if Sys.unix then
-            if Mutil.verbose.val then do {
+            if verbose.val then do {
               Printf.eprintf "*** write restrict file\n";
               flush stderr;
             }
@@ -672,7 +673,7 @@ value array_ext phony fa =
     if rlen = alen then fa
     else if rlen < alen then do {
       if Sys.unix then
-        if Mutil.verbose.val then do {
+        if verbose.val then do {
           Printf.eprintf
             "*** extending records from size %d to size %d\n"
             rlen alen;
@@ -737,7 +738,7 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
     [ Some x -> x
     | None -> do {
         if Sys.unix then
-          if Mutil.verbose.val then do {
+          if verbose.val then do {
             Printf.eprintf "*** read %s%s\n" name
               (if cleared.val then " (again)" else "");
             flush stderr;
@@ -754,7 +755,7 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
   and r =
     {load_array () = let _ = array () in (); get = gen_get;
      set i v = (array ()).(i) := v; len = max len plenr.val;
-     output_array oc = Mutil.output_value_no_sharing oc (array () : array _);
+     output_array oc = output_value_no_sharing oc (array () : array _);
      clear_array () = do { cleared.val := True; tab.val := None }}
   in
   r
@@ -834,8 +835,8 @@ value input_synchro bname =
 value person_of_key persons strings persons_of_name first_name surname occ =
   if first_name = "?" || surname = "?" then None
   else
-    let first_name = Mutil.nominative first_name in
-    let surname = Mutil.nominative surname in
+    let first_name = nominative first_name in
+    let surname = nominative surname in
     let ipl = persons_of_name (first_name ^ " " ^ surname) in
     let first_name = Name.lower first_name in
     let surname = Name.lower surname in
@@ -893,7 +894,7 @@ value opendb bname =
         flush stderr;
         None } ]
   in
-  let ic2_string_start_pos = 3 * Mutil.int_size in
+  let ic2_string_start_pos = 3 * int_size in
   let ic2_string_hash_len =
     match ic2 with
     [ Some ic2 -> Some (input_binary_int ic2)
@@ -984,9 +985,9 @@ value opendb bname =
       let v = (timestamp, synchro_person.val, synchro_family.val) in
       {synch_list = [v :: synchro.synch_list]}
     in
-    Mutil.output_value_no_sharing oc9 (synchro : synchro_patch);
+    output_value_no_sharing oc9 (synchro : synchro_patch);
     close_out oc9;
-    Mutil.remove_file (fname ^ "~");
+    remove_file (fname ^ "~");
     try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
     try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
   }
@@ -1000,9 +1001,9 @@ value opendb bname =
           raise (Adef.Request_failure "the database is not writable") ]
     in
     output_string oc9 magic_patch;
-    Mutil.output_value_no_sharing oc9 (patches : patches_ht);
+    output_value_no_sharing oc9 (patches : patches_ht);
     close_out oc9;
-    Mutil.remove_file (fname ^ "~");
+    remove_file (fname ^ "~");
     try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
     try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
     commit_synchro ();

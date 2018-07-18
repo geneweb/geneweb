@@ -4,6 +4,7 @@
 
 open Dbdisk;
 open Def;
+open Mutil;
 
 type person = dsk_person;
 type ascend = dsk_ascend;
@@ -105,8 +106,8 @@ value doi base i = base.data.descends.get (Adef.int_of_ifam i);
 
 value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
-value p_first_name base p = Mutil.nominative (sou base p.first_name);
-value p_surname base p = Mutil.nominative (sou base p.surname);
+value p_first_name base p = nominative (sou base p.first_name);
+value p_surname base p = nominative (sou base p.surname);
 value designation base p =
   let prenom = p_first_name base p in
   let nom = p_surname base p in
@@ -373,7 +374,7 @@ value ascii_of_macintosh s =
 
 value utf8_of_string s =
   match charset.val with
-  [ Ansel -> Mutil.utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
+  [ Ansel -> utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
   | Ansi -> Mutil.utf_8_of_iso_8859_1 s
   | Ascii -> Mutil.utf_8_of_iso_8859_1 s
   | Msdos -> Mutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
@@ -2156,9 +2157,7 @@ value add_indi gen r =
         in
         let s = applycase_surname s in
         let r =
-          let key =
-            Name.strip_lower (Mutil.nominative f ^ " " ^ Mutil.nominative s)
-          in
+          let key = Name.strip_lower (nominative f ^ " " ^ nominative s) in
           try Hashtbl.find gen.g_hnam key with
           [ Not_found ->
               let r = ref (-1) in
@@ -3463,7 +3462,7 @@ value make_subarrays (g_per, g_fam, g_str, g_bnot) =
 
 value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
-   output_array oc = Mutil.output_value_no_sharing oc (tab : array _);
+   output_array oc = output_value_no_sharing oc (tab : array _);
    len = Array.length tab; clear_array () = ()}
 ;
 

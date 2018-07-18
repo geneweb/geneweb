@@ -6,6 +6,7 @@ open Config;
 open Def;
 open Gwdb;
 open Hutil;
+open Mutil;
 open Util;
 
 value not_found conf txt x =
@@ -144,9 +145,9 @@ value persons_of_fsname conf base base_strings_of_fsname find proj x =
     let x = Name.crush_lower x in
     List.fold_right
       (fun istr l ->
-         let str = Mutil.nominative (sou base istr) in
+         let str = nominative (sou base istr) in
          if Name.crush_lower str = x ||
-            List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
+            List.mem x (List.map Name.crush_lower (surnames_pieces str))
          then
            let iperl = find istr in
            (* maybe they are not the good ones because of changes in the
@@ -189,7 +190,7 @@ value persons_of_fsname conf base base_strings_of_fsname find proj x =
 ;
 
 value print_elem conf base is_surname (p, xl) =
-  Mutil.list_iter_first
+  list_iter_first
     (fun first x ->
        do {
          let iper = get_key_index x in
@@ -217,7 +218,7 @@ value first_char s =
       let len = Name.nbc s.[0] in
       if len < String.length s then String.sub s 0 len
       else s
-    else String.sub s (Mutil.initial s) 1
+    else String.sub s (initial s) 1
 ;
 
 value name_unaccent s =
@@ -262,7 +263,7 @@ value first_name_print_list conf base x1 xl liste = do {
         (fun first x ->
            Wserver.printf "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
-        (Mutil.StrSet.elements xl)
+        (StrSet.elements xl)
   in
   header conf title;
   print_link_to_welcome conf True;
@@ -299,10 +300,10 @@ value select_first_name conf base n list =
            html_li conf;
            Wserver.printf "<a href=\"%sm=P;v=%s\">" (commd conf)
              (code_varenv sstr);
-           Mutil.list_iter_first
+           list_iter_first
              (fun first str ->
                 Wserver.printf "%s%s" (if first then "" else ", ") str)
-             (Mutil.StrSet.elements strl);
+             (StrSet.elements strl);
            Wserver.printf "</a>\n";
          })
       list;
@@ -316,7 +317,7 @@ value rec merge_insert ((sstr, (strl, iperl)) as x) =
   [ [((sstr1, (strl1, iperl1)) as y) :: l] ->
       if sstr < sstr1 then [x; y :: l]
       else if sstr > sstr1 then [y :: merge_insert x l]
-      else [(sstr, (Mutil.StrSet.union strl strl1, iperl @ iperl1)) :: l]
+      else [(sstr, (StrSet.union strl strl1, iperl @ iperl1)) :: l]
   | [] -> [x] ]
 ;
 
@@ -352,7 +353,7 @@ value first_name_print conf base x =
   let list =
     List.map
       (fun (str, istr, iperl) ->
-         (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -361,7 +362,7 @@ value first_name_print conf base x =
   match list with
   [ [] -> first_name_not_found conf x
   | [(_, (strl, iperl))] ->
-      let iperl = Mutil.list_uniq (List.sort compare iperl) in
+      let iperl = list_uniq (List.sort compare iperl) in
       let pl = List.map (pget conf base) iperl in
       let pl =
         List.fold_right
@@ -426,7 +427,7 @@ value unselected_bullets conf =
 ;
 
 value alphabetic1 n1 n2 =
-  if Mutil.utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2
+  if utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2
   else Gutil.alphabetic n1 n2
 ;
 
@@ -589,7 +590,7 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
         (fun first x ->
            Wserver.printf "%s<a href=\"%sm=N;v=%s;t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
-        (Mutil.StrSet.elements xl)
+        (StrSet.elements xl)
   in
   let br = p_getint conf.env "br" in
   header conf title;
@@ -692,10 +693,10 @@ value print_family_alphabetic x conf base liste =
         [] liste
     in
     let set =
-      List.fold_left (fun set istr -> Mutil.StrSet.add (sou base istr) set)
-        Mutil.StrSet.empty list
+      List.fold_left (fun set istr -> StrSet.add (sou base istr) set)
+        StrSet.empty list
     in
-    List.sort compare (Mutil.StrSet.elements set)
+    List.sort compare (StrSet.elements set)
   in
   let liste =
     let l =
@@ -724,7 +725,7 @@ value print_family_alphabetic x conf base liste =
           if h || List.length homonymes = 1 then x
           else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv x ^ ";t=A") x
         in
-        Mutil.list_iter_first
+        list_iter_first
           (fun first x ->
              Wserver.printf "%s%s" (if first then "" else ", ") (access x))
           homonymes
@@ -829,7 +830,7 @@ value surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, istr, iperl) ->
-         (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -900,7 +901,7 @@ value search_surname conf base x =
   let list =
     List.map
       (fun (str, istr, iperl) ->
-         (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -946,7 +947,7 @@ value search_surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, istr, iperl) ->
-         (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -1012,7 +1013,7 @@ value search_first_name conf base x =
   let list =
     List.map
       (fun (str, istr, iperl) ->
-         (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
       list
   in
   List.fold_right merge_insert list []
@@ -1030,7 +1031,7 @@ value search_first_name_print conf base x =
   let list =
     List.map
       (fun (str, istr, iperl) ->
-         (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -1039,7 +1040,7 @@ value search_first_name_print conf base x =
   match list with
   [ [] -> first_name_not_found conf x
   | [(_, (strl, iperl))] ->
-      let iperl = Mutil.list_uniq (List.sort compare iperl) in
+      let iperl = list_uniq (List.sort compare iperl) in
       let pl = List.map (pget conf base) iperl in
       let pl =
         List.fold_right

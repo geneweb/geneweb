@@ -10,6 +10,7 @@ END;
 open Config;
 open Def;
 open Gwdb;
+open Mutil;
 open TemplAst;
 open Util;
 
@@ -1547,7 +1548,7 @@ value links_to_ind conf base db key =
          else pgl)
       [] db
   in
-  Mutil.list_uniq (List.sort compare list)
+  list_uniq (List.sort compare list)
 ;
 
 (* Interpretation of template file *)
@@ -4651,7 +4652,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_alias env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      Mutil.list_iter_first
+      list_iter_first
         (fun first a ->
            let env = [("alias", Vstring (sou base a)) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -4789,7 +4790,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Baptism then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("baptism_witness", Vind p) :: env] in
@@ -4803,7 +4804,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Birth then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("birth_witness", Vind p) :: env] in
@@ -4817,7 +4818,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Burial then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("burial_witness", Vind p) :: env] in
@@ -4831,7 +4832,7 @@ value print_foreach conf base print_ast eval_expr =
       [ Vcelll celll -> celll
       | _ -> raise Not_found ]
     in
-    Mutil.list_iter_first
+    list_iter_first
       (fun first cell ->
          let env = [("cell", Vcell cell); ("first", Vbool first) :: env] in
          List.iter (print_ast env ep) al)
@@ -4944,7 +4945,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Cremation then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("cremation_witness", Vind p) :: env] in
@@ -4958,7 +4959,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [] -> ()
       | [(name, _, _, _, _, wl, _) :: events] ->
           if name = Pevent Epers_Death then
-            Mutil.list_iter_first
+            list_iter_first
               (fun first (ip, _) ->
                 let p = pget conf base ip in
                 let env = [("death_witness", Vind p) :: env] in
@@ -4982,7 +4983,7 @@ value print_foreach conf base print_ast eval_expr =
         }
   and print_foreach_event env al ((p, p_auth) as ep) =
     let events = events_list conf base p in
-    Mutil.list_iter_first
+    list_iter_first
       (fun first evt ->
          let env = [("event", Vevent p evt) :: env] in
          let env = [("first", Vbool first) :: env] in
@@ -4993,7 +4994,7 @@ value print_foreach conf base print_ast eval_expr =
       match get_env "event" env with
       [ Vevent _ (_, _, _, _, _, witnesses, _) ->
           let witnesses = Array.to_list witnesses in
-          Mutil.list_iter_first
+          list_iter_first
             (fun first (ip, wk) ->
                let p = pget conf base ip in
                let wk = Util.string_of_witness_kind conf p wk in
@@ -5015,7 +5016,7 @@ value print_foreach conf base print_ast eval_expr =
         (True, witness_kind)
       else loop (i + 1)
     in
-    let related = Mutil.list_uniq (List.sort compare (get_related p)) in
+    let related = list_uniq (List.sort compare (get_related p)) in
     let events_witnesses = do {
       let list = ref [] in
       make_list related where rec make_list =
@@ -5217,7 +5218,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_nobility_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
-      Mutil.list_iter_first
+      list_iter_first
         (fun first x ->
            let env = [("nobility_title", Vtitle p x) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -5238,7 +5239,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_qualifier env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      Mutil.list_iter_first
+      list_iter_first
         (fun first nn ->
            let env = [("qualifier", Vstring (sou base nn)) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -5246,7 +5247,7 @@ value print_foreach conf base print_ast eval_expr =
         (get_qualifiers p)
   and print_foreach_relation env al ((p, p_auth) as ep) =
     if p_auth then
-      Mutil.list_iter_first
+      list_iter_first
         (fun first r ->
            let env = [("rel", Vrel r None) :: env] in
            let env = [("first", Vbool first) :: env] in
@@ -5256,7 +5257,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
       let list =
-        let list = Mutil.list_uniq (List.sort compare (get_related p)) in
+        let list = list_uniq (List.sort compare (get_related p)) in
         List.fold_left
           (fun list ic ->
              let c = pget conf base ic in
@@ -5431,7 +5432,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_witness env al ep =
     fun
     [ Vfam _ fam _ True ->
-        Mutil.list_iter_first
+        list_iter_first
           (fun first ip ->
              let p = pget conf base ip in
              let env = [("witness", Vind p) :: env] in
@@ -5442,7 +5443,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_witness_relation env al ((p, _) as ep) =
     let list = do {
       let list = ref [] in
-      let related = Mutil.list_uniq (List.sort compare (get_related p)) in
+      let related = list_uniq (List.sort compare (get_related p)) in
       make_list related where rec make_list =
         fun
         [ [ic :: icl] -> do {
@@ -5451,7 +5452,7 @@ value print_foreach conf base print_ast eval_expr =
               Array.iter
                 (fun ifam ->
                    let fam = foi base ifam in
-                   if Array.mem (get_key_index p) (get_witnesses fam)
+                   if array_mem (get_key_index p) (get_witnesses fam)
                    then
                      list.val := [(ifam, fam) :: list.val]
                    else ())

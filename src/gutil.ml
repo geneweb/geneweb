@@ -3,6 +3,7 @@
 
 open Def;
 open Gwdb;
+open Mutil;
 
 value string_sub s i len =
   let i = min (String.length s) (max 0 i) in
@@ -12,7 +13,7 @@ value string_sub s i len =
 value designation base p =
   let first_name = p_first_name base p in
   let nom = p_surname base p in
-  Mutil.iso_8859_1_of_utf_8
+  iso_8859_1_of_utf_8
     (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
 ;
 
@@ -214,7 +215,7 @@ value alphabetic_iso_8859_1 n1 n2 =
       else if alphabetic_value c1 > alphabetic_value c2 then 1
       else loop (succ i1) (succ i2)
   in
-  if n1 = n2 then 0 else loop (Mutil.initial n1) (Mutil.initial n2)
+  if n1 = n2 then 0 else loop (initial n1) (initial n2)
 ;
 
 value alphabetic n1 n2 =
@@ -226,8 +227,7 @@ value alphabetic n1 n2 =
 ;
 
 value alphabetic_order n1 n2 =
-  if Mutil.utf_8_db.val then alphabetic_utf_8 n1 n2
-  else alphabetic_iso_8859_1 n1 n2
+  if utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
 ;
 
 value arg_list_of_string line =
