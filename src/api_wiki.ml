@@ -480,7 +480,7 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
                loop2 [s] sl
               else loop1 [s :: parag] sl
           | [] -> Some (parag, [], True) ]
-        and loop2 parag = 
+        and loop2 parag =
           fun
           [ ["" :: sl] -> Some (parag, sl, False)
           | [s :: sl] ->
@@ -707,7 +707,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
   in
   let is_empty = sub_part = "" in
   let sfn = if fname = "" then "" else ";f=" ^ code_varenv fname in
-  header conf title;
+  Hutil.header conf title;
   if can_edit then
     tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\"" conf.right
       conf.left
@@ -721,7 +721,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
       Wserver.printf ")\n";
     end
   else ();
-  print_link_to_welcome conf (if can_edit then False else True);
+  Hutil.print_link_to_welcome conf (if can_edit then False else True);
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
   else ();
@@ -774,7 +774,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
             end;
             if can_edit then do {
               xtag "br";
-              tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+              tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin
                 Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
               end;
             }
@@ -785,7 +785,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
       end_centered conf;
     end;
   end;
-  trailer conf;
+  Hutil.trailer conf;
 };
 
 value insert_sub_part s v sub_part =

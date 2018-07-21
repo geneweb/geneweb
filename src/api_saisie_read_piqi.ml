@@ -74,6 +74,7 @@ module rec Api_saisie_read_piqi:
       [
         | `witness
         | `witness_godparent
+        | `witness_officer
       ]
     type title_type =
       [
@@ -1085,11 +1086,13 @@ and parse_witness_type x =
   match Piqirun.int32_of_signed_varint x with
     | 0l -> `witness
     | 1l -> `witness_godparent
+    | 2l -> `witness_officer
     | x -> Piqirun.error_enum_const x
 and packed_parse_witness_type x =
   match Piqirun.int32_of_packed_signed_varint x with
     | 0l -> `witness
     | 1l -> `witness_godparent
+    | 2l -> `witness_officer
     | x -> Piqirun.error_enum_const x
 
 and parse_title_type x =
@@ -1526,11 +1529,13 @@ and gen__witness_type code x =
   Piqirun.int32_to_signed_varint code (match x with
     | `witness -> 0l
     | `witness_godparent -> 1l
+    | `witness_officer -> 2l
   )
 and packed_gen__witness_type x =
   Piqirun.int32_to_packed_signed_varint (match x with
     | `witness -> 0l
     | `witness_godparent -> 1l
+    | `witness_officer -> 2l
   )
 
 and gen__title_type code x =
