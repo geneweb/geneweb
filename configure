@@ -41,6 +41,7 @@ PIQI=
 YOJSON=
 LABLGTK2D=+lablgtk2
 LREDIS=
+LREDIS_SYNC=
 RE=
 PACKAGES=
 
@@ -395,6 +396,27 @@ check_redis() {
   fi
 }
 
+check_redis_sync() {
+  if $API; then
+    if ocamlfind query redis-sync >/dev/null 2>&1; then
+      local REDIS_SYNC_MIN_VER="0.3.3"
+      local REDIS_SYNC_VER=`opam show -f version redis-sync`
+      if testversion "$REDIS_SYNC_VER" ">=" "$REDIS_SYNC_MIN_VER"; then
+        print_check_ok \
+          "Checking Ocaml redis-sync version $REDIS_SYNC_VER >= $REDIS_SYNC_MIN_VER"
+        LREDIS_SYNC=`ocamlfind query redis-sync`
+      else
+        print_check_warn \
+          "Checking ocaml redis-sync version $REDIS_SYNC_VER" \
+          "$REDIS_SYNC_MIN_VER or compatible needed."
+      fi
+    else
+      print_check_err "Checking OCaml redis-sync" \
+          "You need the OCaml dependency redis-sync!"
+    fi
+  fi
+}
+
 check_re() {
   if $API; then
     if ocamlfind query re >/dev/null 2>&1; then
@@ -422,6 +444,7 @@ check_environment() {
   check_piqi
   check_yojson
   check_redis
+  check_redis_sync
   check_re
 }
 
@@ -462,6 +485,7 @@ print_compiler() {
      echo "OCURL=${CURL}"
      echo "RE=${RE}"
      echo "LREDIS=${LREDIS}"
+     echo "LREDIS_SYNC=${LREDIS_SYNC}"
      echo "WITH_API=y"
      echo "PACKAGES=${PACKAGES}"
    fi
