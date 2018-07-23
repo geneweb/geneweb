@@ -65,43 +65,6 @@ let lowercase_start_with s s_ini =
   String.length s >= len &&
   String.lowercase_ascii (String.sub s 0 len) = s_ini
 
-let quote_escaped s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-        '"' | '&' | '<' | '>' -> true
-      | _ -> need_code (succ i)
-    else false
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '"' -> i1 + 6
-        | '&' -> i1 + 5
-        | '<' | '>' -> i1 + 4
-        | _ -> succ i1
-      in
-      compute_len (succ i) i1
-    else i1
-  in
-  let rec copy_code_in s1 i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '"' -> String.blit "&#034;" 0 s1 i1 6; i1 + 6
-        | '&' -> String.blit "&amp;" 0 s1 i1 5; i1 + 5
-        | '<' -> String.blit "&lt;" 0 s1 i1 4; i1 + 4
-        | '>' -> String.blit "&gt;" 0 s1 i1 4; i1 + 4
-        | c -> Bytes.set s1 i1 c; succ i1
-      in
-      copy_code_in s1 (succ i) i1
-    else Bytes.unsafe_to_string s1
-  in
-  if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
-  else s
-
 let log_open () =
   let fname = Filename.concat !gwtp_log "gwtp.log" in
   open_out_gen [Open_wronly; Open_creat; Open_append] 0o644 fname
@@ -203,13 +166,13 @@ let copy_template genv (varenv, filenv) env if_env fname =
           | 'v' ->
               let v = get_variable ic in
               begin try
-                print_string (quote_escaped (List.assoc v varenv))
+                print_string (Util.quote_escaped (List.assoc v varenv))
               with Not_found -> ()
               end
           | 'f' ->
               let v = get_variable ic in
               begin try
-                print_string (quote_escaped (List.assoc v filenv))
+                print_string (Util.quote_escaped (List.assoc v filenv))
               with Not_found -> ()
               end
           | 'l' -> print_string lang
