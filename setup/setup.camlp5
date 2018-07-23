@@ -17,43 +17,6 @@ let slashify s =
   in
   String.init (String.length s) conv_char
 
-let quote_escaped s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-        '"' | '&' | '<' | '>' -> true
-      | _ -> need_code (succ i)
-    else false
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '"' -> i1 + 6
-        | '&' -> i1 + 5
-        | '<' | '>' -> i1 + 4
-        | _ -> succ i1
-      in
-      compute_len (succ i) i1
-    else i1
-  in
-  let rec copy_code_in s1 i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '"' -> String.blit "&#034;" 0 s1 i1 6; i1 + 6
-        | '&' -> String.blit "&amp;" 0 s1 i1 5; i1 + 5
-        | '<' -> String.blit "&lt;" 0 s1 i1 4; i1 + 4
-        | '>' -> String.blit "&gt;" 0 s1 i1 4; i1 + 4
-        | c -> Bytes.set s1 i1 c; succ i1
-      in
-      copy_code_in s1 (succ i) i1
-    else Bytes.unsafe_to_string s1
-  in
-  if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
-  else s
-
 let rec list_remove_assoc x =
   function
     (x1, y1) :: l -> if x = x1 then l else (x1, y1) :: list_remove_assoc x l
@@ -1338,12 +1301,12 @@ let gwf conf =
   else
     let benv = read_base_env in_base in
     let trailer =
-      quote_escaped
+      Util.quote_escaped
         (file_contents (Filename.concat "lang" (in_base ^ ".trl")))
     in
     let conf =
       {conf with env =
-        List.map (fun (k, v) -> k, quote_escaped v) benv @
+        List.map (fun (k, v) -> k, Util.quote_escaped v) benv @
         ("trailer", trailer) :: conf.env}
     in
     print_file conf "gwf_1.htm"
