@@ -919,6 +919,13 @@ type base =
     load_couples_array : unit -> unit;
     load_descends_array : unit -> unit;
     load_strings_array : unit -> unit;
+    load_persons_array : unit -> unit;
+    clear_ascends_array : unit -> unit;
+    clear_unions_array : unit -> unit;
+    clear_couples_array : unit -> unit;
+    clear_descends_array : unit -> unit;
+    clear_strings_array : unit -> unit;
+    clear_persons_array : unit -> unit;
     persons_array :
       unit ->
         (int -> (iper, istr) gen_person) *
@@ -1085,6 +1092,13 @@ let base1 base =
      load_couples_array = base.data.couples.load_array;
      load_descends_array = base.data.descends.load_array;
      load_strings_array = base.data.strings.load_array;
+     load_persons_array = base.data.persons.load_array;
+     clear_ascends_array = base.data.ascends.clear_array;
+     clear_unions_array = base.data.unions.clear_array;
+     clear_couples_array = base.data.couples.clear_array;
+     clear_descends_array = base.data.descends.clear_array;
+     clear_strings_array = base.data.strings.clear_array;
+     clear_persons_array = base.data.persons.clear_array;
      persons_array =
        (fun () ->
           let get i =
@@ -1299,6 +1313,18 @@ let base2 db2 =
               flush stderr;
               db2.children_array <- Some (children_array2 db2));
      load_strings_array = (fun () -> ());
+     load_persons_array = (fun () -> ());
+     clear_ascends_array =
+       (fun () -> db2.parents_array <- None);
+     clear_unions_array =
+       (fun () -> db2.family_array <- None);
+     clear_couples_array = (fun () ->
+         db2.father_array <- None ;
+         db2.mother_array <- None );
+     clear_descends_array =
+       (fun () -> db2.children_array <- None);
+     clear_strings_array = (fun () -> ());
+     clear_persons_array = (fun () -> ());
      persons_array = (fun () -> failwith "not impl persons_array");
      ascends_array =
        (fun () ->
@@ -1392,6 +1418,13 @@ let load_unions_array (b : base) = b.load_unions_array ()
 let load_couples_array (b : base) = b.load_couples_array ()
 let load_descends_array (b : base) = b.load_descends_array ()
 let load_strings_array (b : base) = b.load_strings_array ()
+let load_persons_array (b : base) = b.load_persons_array ()
+let clear_ascends_array (b : base) = b.clear_ascends_array ()
+let clear_unions_array (b : base) = b.clear_unions_array ()
+let clear_couples_array (b : base) = b.clear_couples_array ()
+let clear_descends_array (b : base) = b.clear_descends_array ()
+let clear_strings_array (b : base) = b.clear_strings_array ()
+let clear_persons_array (b : base) = b.clear_persons_array ()
 let persons_array (b : base) = b.persons_array ()
 let ascends_array (b : base) = b.ascends_array ()
 let base_notes_read (b : base) = b.base_notes_read
