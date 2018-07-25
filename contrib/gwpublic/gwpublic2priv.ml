@@ -1,7 +1,5 @@
 (* $Id: public2.ml,v 4.1 2008/03/31 11:34:34 deraugla Exp $ *)
 
-open Printf
-
 open Def
 open Gwdb
 
@@ -71,28 +69,29 @@ let change_somebody_access base lim_year trace p year_of_p spouse =
         patch_person base gp.key_index gp;
         if trace then
           begin
-            printf "%s -> " (Gutil.designation base p);
-            if acc = Private then printf "private" else printf "public";
-            printf " (anc %d gen %s year %d)" nb_gen
+            Printf.printf "%s -> " (Gutil.designation base p);
+            if acc = Private then Printf.printf "private" else Printf.printf "public";
+            Printf.printf " (anc %d gen %s year %d)" nb_gen
               (Gutil.designation base a) year;
-            printf "\n";
+            Printf.printf "\n";
             flush stdout
           end;
         Some acc
     | None -> None
   else None
 
-let public_all bname lim_year trace patched =
+let public_all ~fast bname lim_year trace patched =
   let base = Gwdb.open_base bname in
   let () = load_ascends_array base in
   let () = load_couples_array base in
   let n = nb_of_persons base in
   let changes = ref false in
+  if fast then load_persons_array base ;
   Consang.check_noloop base
     (function
        OwnAncestor p ->
-         printf "I cannot deal this database.\n";
-         printf "%s is his own ancestors\n" (Gutil.designation base p);
+         Printf.printf "I cannot deal this database.\n";
+         Printf.printf "%s is his own ancestors\n" (Gutil.designation base p);
          flush stdout;
          exit 2
      | _ -> assert false);
@@ -132,18 +131,19 @@ let public_all bname lim_year trace patched =
                   changes := true;
                   if trace then
                     begin
-                      printf "%s -> " (Gutil.designation base p);
-                      if acc = Private then printf "private"
-                      else printf "public";
-                      printf " (inherited from spouse %s)"
+                      Printf.printf "%s -> " (Gutil.designation base p);
+                      if acc = Private then Printf.printf "private"
+                      else Printf.printf "public";
+                      Printf.printf " (inherited from spouse %s)"
                         (Gutil.designation base sp);
-                      printf "\n";
+                      Printf.printf "\n";
                       flush stdout
                     end
               | None -> loop (i + 1)
           in
           loop 0
   done;
+  if fast then clear_persons_array base ;
   if !changes then commit_patches base;
   ProgrBar.finish ()
 
@@ -151,20 +151,27 @@ let lim_year = ref 1900
 let trace = ref false
 let patched = ref false
 let bname = ref ""
+let fast = ref false
 
 let speclist =
-  ["-y", Arg.Int (fun i -> lim_year := i),
-   "limit year (default = " ^ string_of_int !lim_year ^ ")";
-   "-t", Arg.Set trace, "trace changed persons";
-   "-p", Arg.Set patched, "compute patched persons only"]
+  [ ("-fast", Arg.Set fast, " fast mode. Needs more memory.")
+  ; ("-y", Arg.Int (fun i -> lim_year := i),
+     "limit year (default = " ^ string_of_int !lim_year ^ ")")
+  ; ("-t", Arg.Set trace, "trace changed persons")
+  ; ("-p", Arg.Set patched, "compute patched persons only")
+  ]
+
 let anonfun i = bname := i
-let usage = "Usage: public [-y #] [-t] base"
+
+let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
   if !bname = "" then begin Arg.usage speclist usage; exit 2 end;
-  Lock.control_retry (Mutil.lock_file !bname)
-    ~onerror:Lock.print_error_and_exit
-    (fun () -> public_all !bname !lim_year !trace !patched)
+  Lock.control_retry
+    (Mutil.lock_file !bname)
+    ~onerror:Lock.print_error_and_exit @@
+  fun () ->
+  public_all ~fast:!fast !bname !lim_year !trace !patched
 
 let _ = main ()

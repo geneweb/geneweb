@@ -18,9 +18,11 @@ let designation base ip p =
 let suspend_with msg = ProgrBar.suspend (); msg () ; flush stdout
 let restart_with i n = printf "*** fixed\n"; flush stdout; ProgrBar.restart i n
 
-let check_keys verbose base nb_ind fix =
+(* TODO: -fast option to load array and unload at the end *)
+let check_keys ~verbose ~fast base nb_ind fix =
   printf "Check keys\n";
   flush stdout;
+  if fast then begin load_strings_array base ; load_persons_array base end ;
   ProgrBar.start ();
   for i = 0 to nb_ind - 1 do
     ProgrBar.run i nb_ind;
@@ -56,6 +58,7 @@ let check_keys verbose base nb_ind fix =
         patch ?msg base ip fn sn occ
       | _ -> ()
   done;
+  if fast then begin clear_strings_array base ; clear_persons_array base end ;
   ProgrBar.finish ()
 
 let check_families_parents base nb_fam =
@@ -288,6 +291,7 @@ let check_fevents_witnesses verbose base nb_fam fix =
 
 let check
     ~verbose
+    ~fast
     ~keys
     ~f_parents
     ~f_children
@@ -298,11 +302,12 @@ let check
     ~fevents_witnesses
     bname =
   let verbose = !verbose in
+  let fast = !fast in
   let base = Gwdb.open_base bname in
   let fix = ref 0 in
   let nb_fam = nb_of_families base in
   let nb_ind = nb_of_persons base in
-  if !keys then check_keys verbose base nb_ind fix;
+  if !keys then check_keys ~verbose ~fast base nb_ind fix;
   if !f_parents then check_families_parents base nb_fam;
   if !f_children then check_families_children verbose base nb_fam fix;
   if !p_parents then check_persons_parents verbose base nb_ind fix;
@@ -324,6 +329,7 @@ let check
 
 let bname = ref ""
 let verbose = ref true
+let fast = ref false
 let keys = ref false
 let f_parents = ref false
 let f_children = ref false
@@ -335,6 +341,7 @@ let fevents_witnesses = ref false
 
 let speclist =
   [ ("-q", Arg.Clear verbose, " quiet mode")
+  ; ("-fast", Arg.Set fast, " fast mode. Needs more memory.")
   ; ("-keys", Arg.Set keys, " missing doc")
   ; ("-families-parents", Arg.Set f_parents, " missing doc")
   ; ("-families-children", Arg.Set f_children, " missing doc")
@@ -346,7 +353,7 @@ let speclist =
   ]
 
 let anonfun i = bname := i
-let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION]  base"
+let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
@@ -374,6 +381,7 @@ let main () =
     fevents_witnesses := true
   end ;
   check
+    ~fast
     ~verbose
     ~keys
     ~f_parents
