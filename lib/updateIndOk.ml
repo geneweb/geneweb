@@ -1268,13 +1268,12 @@ value print_add_ok conf base wl p =
 ;
 *)
 
-let print_del_ok conf base wl =
+let print_del_ok conf =
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "person deleted"))
   in
   header conf title;
   print_link_to_welcome conf false;
-  Update.print_warnings conf base wl;
   trailer conf
 
 let print_change_event_order_ok conf base wl p =
@@ -1337,7 +1336,8 @@ let print_del conf base =
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
       Util.commit_patches conf base;
       let changed = U_Delete_person op in
-      History.record conf base changed "dp"; print_del_ok conf base []
+      History.record conf base changed "dp";
+      print_del_ok conf
   | _ -> incorrect_request conf
 
 let print_mod_aux conf base callback =
