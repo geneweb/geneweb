@@ -433,7 +433,9 @@ let effective_merge_ind conf base warning p1 p2 =
   in
   Notes.update_notes_links_db conf (NotesLinks.PgInd p1.key_index) s
 
-let is_ancestor base ip1 ip2 =
+let is_ancestor base p1 p2 =
+  let ip1 = get_key_index p1 in
+  let ip2 = get_key_index p2 in
   let visited = Array.make (nb_of_persons base) false in
   let rec loop ip =
     if visited.(Adef.int_of_iper ip) then false
@@ -450,6 +452,10 @@ let is_ancestor base ip1 ip2 =
   in
   loop ip2
 
+exception Error_loop of person
+exception Same_person
+exception Different_sexes
+
 let error_loop conf base p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
@@ -461,14 +467,19 @@ let error_loop conf base p =
   Wserver.printf "\n";
   trailer conf
 
-let merge_ind conf base warning branches ip1 ip2 changes_done =
-  let p1 = poi base ip1 in
-  let p2 = poi base ip2 in
-  if is_ancestor base ip1 ip2 then
-    begin error_loop conf base p2; false, false end
-  else if is_ancestor base ip2 ip1 then
-    begin error_loop conf base p1; false, false end
-  else if compatible_ind base p1 p2 then
+let check_ind base p1 p2 =
+  if get_key_index p1 = get_key_index p2 then raise Same_person
+  else if get_sex p1 <> get_sex p2 && get_sex p1 <> Neuter
+          && get_sex p2 <> Neuter
+  then raise Different_sexes
+  else if is_ancestor base p1 p2 then raise (Error_loop p2)
+  (* begin error_loop conf base p2; false, false end *)
+  else if is_ancestor base p2 p1 then raise (Error_loop p1)
+  (* begin error_loop conf base p1; false, false end *)
+  else compatible_ind base p1 p2
+
+let merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind =
+  if check_ind base p1 p2 then
     begin effective_merge_ind conf base warning p1 p2; true, true end
   else
     begin propose_merge_ind conf base branches p1 p2; false, changes_done end
@@ -529,11 +540,9 @@ let effective_merge_fam base ifam1 fam1 ifam2 fam2 =
   patch_family base ifam1 fam1;
   patch_descend base ifam1 des1
 
-let merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
+let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done =
   let p1 = poi base ip1 in
   let p2 = poi base ip2 in
-  let fam1 = foi base ifam1 in
-  let fam2 = foi base ifam2 in
   if compatible_fam fam1 fam2 then
     begin
       effective_merge_fam base ifam1 fam1 ifam2 fam2 ;
@@ -565,44 +574,42 @@ let different_sexes conf =
   Wserver.printf "%s.\n" (capitale (transl conf "incompatible sexes"));
   trailer conf
 
-let rec try_merge conf base warning branches ip1 ip2 changes_done =
-  let a1 = poi base ip1 in
-  let a2 = poi base ip2 in
+let rec try_merge conf base warning branches ip1 ip2 changes_done propose_merge_ind =
+  let p1 = poi base ip1 in
+  let p2 = poi base ip2 in
   let ok_so_far = true in
   let (ok_so_far, changes_done) =
-    match get_parents a1, get_parents a2 with
+    match get_parents p1, get_parents p2 with
       Some ifam1, Some ifam2 when ifam1 <> ifam2 ->
         let branches = (ip1, ip2) :: branches in
-        let cpl1 = foi base ifam1 in
-        let cpl2 = foi base ifam2 in
+        let fam1 = foi base ifam1 in
+        let fam2 = foi base ifam2 in
+        let f1 = get_father fam1 in
+        let f2 = get_father fam2 in
+        let m1 = get_mother fam1 in
+        let m2 = get_mother fam2 in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            if get_father cpl1 = get_father cpl2 then true, changes_done
-            else
-              let warning _ = () in
-              try_merge conf base warning branches (get_father cpl1)
-                (get_father cpl2) changes_done
+            if f1 = f2 then true, changes_done
+            else try_merge conf base ignore branches f1 f2 changes_done propose_merge_ind
           else false, changes_done
         in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            if get_mother cpl1 = get_mother cpl2 then true, changes_done
-            else
-              let warning _ = () in
-              try_merge conf base warning branches (get_mother cpl1)
-                (get_mother cpl2) changes_done
+            if m1 = m2 then true, changes_done
+            else try_merge conf base ignore branches m1 m2 changes_done propose_merge_ind
           else false, changes_done
         in
         let (ok_so_far, changes_done) =
-          if ok_so_far then
-            merge_fam conf base branches ifam1 ifam2 (get_father cpl1)
-              (get_mother cpl1) changes_done
+          if ok_so_far
+          then merge_fam conf base branches ifam1 ifam2 fam1 fam2 f1 m1 changes_done
           else false, changes_done
         in
         ok_so_far, changes_done
     | _ -> ok_so_far, changes_done
   in
-  if ok_so_far then merge_ind conf base warning branches ip1 ip2 changes_done
+  if ok_so_far
+  then merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind
   else false, changes_done
 
 let print_merged conf base wl p =
@@ -640,6 +647,24 @@ let print_merged conf base wl p =
   Update.print_warnings conf base wl;
   trailer conf
 
+let merge conf base p1 p2 propose_merge_ind =
+  let rev_wl = ref [] in
+  let warning w = rev_wl := w :: !rev_wl in
+  let (ok, changes_done) =
+    try_merge conf base warning [] (get_key_index p1) (get_key_index p2)
+      false propose_merge_ind
+  in
+  if changes_done then Util.commit_patches conf base;
+  if ok then begin
+    let changed =
+      let p1 = Util.string_gen_person base (gen_person_of_person p1) in
+      let p2 = Util.string_gen_person base (gen_person_of_person p2) in
+      U_Merge_person (p2, p1, p1)
+    in
+    History.record conf base changed "fp" end ;
+  Update.delete_topological_sort conf base ;
+  (ok, List.rev !rev_wl)
+
 let print conf base =
   let p1 =
     match p_getint conf.env "i" with
@@ -662,34 +687,15 @@ let print conf base =
         | _ -> None
   in
   match p1, p2 with
-    Some p1, Some p2 ->
-      if get_key_index p1 = get_key_index p2 then same_person conf
-      else if
-        get_sex p1 <> get_sex p2 && get_sex p1 <> Neuter &&
-        get_sex p2 <> Neuter
-      then
-        different_sexes conf
-      else if is_ancestor base (get_key_index p1) (get_key_index p2) then
-        error_loop conf base p2
-      else if is_ancestor base (get_key_index p2) (get_key_index p1) then
-        error_loop conf base p1
-      else
-        let rev_wl = ref [] in
-        let warning w = rev_wl := w :: !rev_wl in
-        let (ok, changes_done) =
-          try_merge conf base warning [] (get_key_index p1) (get_key_index p2)
-            false
-        in
-        if changes_done then Util.commit_patches conf base;
-        if ok then
-          let changed =
-            let p1 = Util.string_gen_person base (gen_person_of_person p1) in
-            let p2 = Util.string_gen_person base (gen_person_of_person p2) in
-            U_Merge_person (p2, p1, p1)
-          in
-          History.record conf base changed "fp";
-          Update.delete_topological_sort conf base;
-          print_merged conf base (List.rev !rev_wl) p1
+  | Some p1, Some p2 ->
+    begin
+      try
+        let (_, warnings) = merge conf base p1 p2 propose_merge_ind in
+        print_merged conf base warnings p1
+      with Error_loop p -> error_loop conf base p
+         | Different_sexes -> different_sexes conf
+         | Same_person -> same_person conf
+    end
   | _ -> not_found_or_incorrect conf
 
 (* Undocumented feature... Kill someone's ancestors *)
