@@ -524,6 +524,12 @@ let print_warning conf base =
       Wserver.printf "%s\n%s\n" (print_someone_strong conf base p)
         (transl conf "is a very old parent");
       Wserver.printf "(%s)" (Date.string_of_age conf a)
+  | PossibleDuplicateFam (f1, _) ->
+    let f = foi base f1 in
+    Wserver.printf
+      (fcapitale (ftransl conf "%s and %s have several unions"))
+      (print_someone_strong conf base @@ poi base @@ get_father f)
+      (print_someone_strong conf base @@ poi base @@ get_mother f)
   | PEventOrder (p, e1, e2) ->
       Wserver.printf (fcapitale (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> print_someone_strong conf base p)
