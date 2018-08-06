@@ -271,6 +271,7 @@ type ('person, 'descend, 'title, 'pevent, 'fevent) warning =
   | ParentTooOld of 'person * dmy
   | ParentTooYoung of 'person * dmy
   | PEventOrder of 'person * 'pevent * 'pevent
+  | PossibleDuplicateFam of ifam * ifam
   | PWitnessEventAfterDeath of 'person * 'pevent
   | PWitnessEventBeforeBirth of 'person * 'pevent
   | TitleDatesError of 'person * 'title

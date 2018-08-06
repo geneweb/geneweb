@@ -1,7 +1,3 @@
-(* nocamlp5 *)
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
-
-
 module Mwrite = Api_saisie_write_piqi
 module Mext_write = Api_saisie_write_piqi_ext
 

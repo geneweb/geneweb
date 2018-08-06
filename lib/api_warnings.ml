@@ -10,7 +10,7 @@ let set_list l v = l := v :: !l
 (* Listes des erreurs *)
 let already_defined = ref []
 let own_ancestor = ref []
-let bad_sex_of_married_person = ref [];;
+let bad_sex_of_married_person = ref []
 
 (* Listes des warnings *)
 let big_age_between_spouses = ref []
@@ -35,6 +35,7 @@ let mother_dead_before_child_birth = ref []
 let parent_born_after_child = ref []
 let parent_too_old = ref []
 let parent_too_young = ref []
+let possible_duplicate_fam = ref []
 let pevent_order = ref []
 let pevent_witness_after_death = ref []
 let pevent_witness_before_birth = ref []
@@ -80,7 +81,6 @@ let add_error_to_piqi_warning_list conf base base_loop compute_sosa load_img err
       in
       let w = M.Warning_bad_sex_of_married_person.({person = p}) in
       set_list bad_sex_of_married_person w
-;;
 
 
 (* ********************************************************************* *)
@@ -362,6 +362,16 @@ let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img w
         })
       in
       set_list parent_too_young w
+  | PossibleDuplicateFam (f1, f2) ->
+    let f1 = fam_to_piqi_family conf base f1 in
+    let f2 = fam_to_piqi_family conf base f2 in
+      let w =
+        M.Warning_possible_duplicate_fam.({
+          family1 = f1;
+          family2 = f2;
+        })
+      in
+      set_list possible_duplicate_fam w
   | PEventOrder (p, e1, e2) ->
       let p = pers_to_piqi_person_full conf base p base_loop compute_sosa load_img in
       let e1 = Util.string_of_pevent_name conf base e1.epers_name in
@@ -434,7 +444,6 @@ let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img w
         })
       in
       set_list young_for_marriage w
-;;
 
 let create_piqi_warnings () =
   (* Ajouter une limite. Pour pierfit, on peut
@@ -454,6 +463,7 @@ let create_piqi_warnings () =
     warning_mother_dead_before_child_birth = !mother_dead_before_child_birth;
     warning_parent_born_after_child = !parent_born_after_child;
     warning_parent_too_young = !parent_too_young;
+    warning_possible_duplicate_fam = !possible_duplicate_fam;
     warning_title_dates_error = !title_dates_error;
     warning_undefined_sex = !undefined_sex;
     warning_young_for_marriage = !young_for_marriage;
@@ -466,4 +476,3 @@ let create_piqi_warnings () =
     warning_witness_date_after_death = !witness_date_after_death;
     warning_witness_date_before_birth = !witness_date_before_birth;
   })
-;;

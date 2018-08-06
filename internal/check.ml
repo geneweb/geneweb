@@ -185,6 +185,9 @@ let print_base_warning oc base =
       fprintf oc "%s was parent at age of %d\n" (designation base p) a.year
   | ParentTooYoung (p, a) ->
       fprintf oc "%s was parent at age of %d\n" (designation base p) a.year
+  | PossibleDuplicateFam (f1, f2) ->
+    fprintf oc "possible duplicate families: %d and %d\n"
+      (Adef.int_of_ifam f1) (Adef.int_of_ifam f2)
   | PEventOrder (p, e1, e2) ->
       fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_epers_name base e1.epers_name)

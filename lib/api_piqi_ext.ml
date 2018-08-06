@@ -57,6 +57,7 @@ let _warning_marriage_date_before_birth_piqi_type = Piqirun_ext.find_piqi_type "
 let _warning_mother_dead_before_child_birth_piqi_type = Piqirun_ext.find_piqi_type "api/warning-mother-dead-before-child-birth"
 let _warning_parent_born_after_child_piqi_type = Piqirun_ext.find_piqi_type "api/warning-parent-born-after-child"
 let _warning_parent_too_young_piqi_type = Piqirun_ext.find_piqi_type "api/warning-parent-too-young"
+let _warning_possible_duplicate_fam_piqi_type = Piqirun_ext.find_piqi_type "api/warning-possible-duplicate-fam"
 let _warning_title_dates_error_piqi_type = Piqirun_ext.find_piqi_type "api/warning-title-dates-error"
 let _warning_undefined_sex_piqi_type = Piqirun_ext.find_piqi_type "api/warning-undefined-sex"
 let _warning_young_for_marriage_piqi_type = Piqirun_ext.find_piqi_type "api/warning-young-for-marriage"
@@ -364,6 +365,11 @@ let parse_warning_parent_too_young ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _warning_parent_too_young_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
   Api_piqi.parse_warning_parent_too_young buf
+
+let parse_warning_possible_duplicate_fam ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _warning_possible_duplicate_fam_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_piqi.parse_warning_possible_duplicate_fam buf
 
 let parse_warning_title_dates_error ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _warning_title_dates_error_piqi_type format `pb x ?opts in
@@ -836,6 +842,11 @@ let gen_warning_parent_too_young ?opts x (format :Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _warning_parent_too_young_piqi_type `pb format x_pb ?opts
 
+let gen_warning_possible_duplicate_fam ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_piqi.gen_warning_possible_duplicate_fam x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _warning_possible_duplicate_fam_piqi_type `pb format x_pb ?opts
+
 let gen_warning_title_dates_error ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_piqi.gen_warning_title_dates_error x in
   let x_pb = Piqirun.to_string buf in
@@ -1306,6 +1317,11 @@ let print_warning_parent_too_young ?opts x =
   Pervasives.print_endline (gen_warning_parent_too_young x `piq ?opts)
 let prerr_warning_parent_too_young ?opts x =
   Pervasives.prerr_endline (gen_warning_parent_too_young x `piq ?opts)
+
+let print_warning_possible_duplicate_fam ?opts x =
+  Pervasives.print_endline (gen_warning_possible_duplicate_fam x `piq ?opts)
+let prerr_warning_possible_duplicate_fam ?opts x =
+  Pervasives.prerr_endline (gen_warning_possible_duplicate_fam x `piq ?opts)
 
 let print_warning_title_dates_error ?opts x =
   Pervasives.print_endline (gen_warning_title_dates_error x `piq ?opts)

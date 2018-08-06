@@ -457,6 +457,11 @@ message WarningParentTooYoung {
   required string date = 2;
 }
 
+message WarningPossibleDuplicateFam {
+  required FullFamily family1 = 1;
+  required FullFamily family2 = 2;
+}
+
 message WarningTitleDatesError {
   required FullPerson person = 1;
 }
@@ -562,6 +567,7 @@ message BaseWarnings {
   repeated WarningMotherDeadBeforeChildBirth warning_mother_dead_before_child_birth = 12;
   repeated WarningParentBornAfterChild warning_parent_born_after_child = 13;
   repeated WarningParentTooYoung warning_parent_too_young = 14;
+  repeated WarningPossibleDuplicateFam warning_possible_duplicate_fam = 26; // ???
   repeated WarningTitleDatesError warning_title_dates_error = 15;
   repeated WarningUndefinedSex warning_undefined_sex = 16;
   repeated WarningYoungForMarriage warning_young_for_marriage = 17;
