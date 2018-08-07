@@ -6,12 +6,13 @@ open Printf
 let fname = ref ""
 let indexes = ref false
 let scratch = ref false
-let quiet = ref false
+let verbosity = ref 2
 let tlim = ref (-1)
 
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
 let speclist =
-  ["-q", Arg.Set quiet, ": quiet mode";
+  [("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
+   ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
    "-i", Arg.Set indexes, ": build the indexes again";
    "-t", Arg.Int (fun i -> tlim := i), " <int>: time limit in seconds";
    "-scratch", Arg.Set scratch, ": from scratch";
@@ -476,7 +477,7 @@ let main () =
        let base = Gwdb.open_base !fname in
        try
          Sys.catch_break true;
-         let carray = ConsangAll.compute base !tlim !scratch !quiet in
+         let carray = ConsangAll.compute ~verbosity:!verbosity base !tlim !scratch in
          simple_output !fname base carray
        with Consang.TopologicalSortError p ->
          printf "\nError: loop in database, %s is his/her own ancestor.\n"
