@@ -1392,7 +1392,7 @@ let link next_family_fun bdir =
   if not gen.g_errored then
     begin
       if !do_consang then
-        (let _ = (ConsangAll.compute base (-1) true false : _ option) in ());
+        (let _ = (ConsangAll.compute base (-1) true : _ option) in ());
       Gc.compact ();
       Outbase.output bdir dsk_base;
       output_wizard_notes bdir gen.g_wiznotes;

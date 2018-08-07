@@ -3,4 +3,4 @@
 
 open Gwdb
 
-val compute : base -> int -> bool -> bool -> Adef.fix array option
+val compute : ?verbosity:int -> base -> int -> bool -> Adef.fix array option

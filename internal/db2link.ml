@@ -1358,7 +1358,7 @@ let link next_family_fun bdir =
             Check.check_base base (set_error base) (set_warning base)
               (fun _ -> true) changed_p !pr_stats;
           if !do_consang then
-            let _ = (ConsangAll.compute base (-1) true false : _ option) in ()
+            let _ = (ConsangAll.compute base (-1) true : _ option) in ()
         end;
       true
     end
