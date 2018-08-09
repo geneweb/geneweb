@@ -24,7 +24,7 @@ let count_error computed found =
   exit 2
 
 let just_copy bname what oc oc_acc =
-  Printf.eprintf "*** copying %s\n" what;
+  if !verbose then Printf.eprintf "*** copying %s\n" what;
   flush stderr;
   let ic =
     let ic = Secure.open_in_bin (Filename.concat bname "base") in
@@ -274,7 +274,7 @@ let gen_output no_patches bname base =
   let oc_acc = Secure.open_out_bin tmp_base_acc in
   let output_array arrname arr =
     let bpos = pos_out oc in
-    Printf.eprintf "*** saving %s array\n" arrname;
+    if !verbose then Printf.eprintf "*** saving %s array\n" arrname;
     flush stderr;
     arr.output_array oc;
     let epos = Iovalue.output_array_access oc_acc arr.get arr.len bpos in
