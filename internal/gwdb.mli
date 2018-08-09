@@ -151,6 +151,7 @@ val load_couples_array : base -> unit
 val load_descends_array : base -> unit
 val load_strings_array : base -> unit
 val load_persons_array : base -> unit
+val load_families_array : base -> unit
 
 val clear_ascends_array : base -> unit
 val clear_unions_array : base -> unit
@@ -158,6 +159,7 @@ val clear_couples_array : base -> unit
 val clear_descends_array : base -> unit
 val clear_strings_array : base -> unit
 val clear_persons_array : base -> unit
+val clear_families_array : base -> unit
 
 val persons_array :
   base ->
