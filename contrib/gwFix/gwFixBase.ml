@@ -235,8 +235,7 @@ let check_pevents_witnesses ~verbosity1 ~verbosity2 base nb_ind fix =
     let p = poi base ip in
     List.iter
       (fun evt ->
-         let witn = List.map fst (Array.to_list evt.epers_witnesses) in
-         let witn = Array.of_list witn in
+         let witn = Array.map fst evt.epers_witnesses in
          for j = 0 to Array.length witn - 1 do
            let ip2 = witn.(j) in
            let p2 = poi base ip2 in
@@ -271,8 +270,7 @@ let check_fevents_witnesses ~verbosity1 ~verbosity2 base nb_fam fix =
     let ifath = get_father fam in
     List.iter
       (fun evt ->
-         let witn = List.map fst (Array.to_list evt.efam_witnesses) in
-         let witn = Array.of_list witn in
+         let witn = Array.map fst evt.efam_witnesses in
          for j = 0 to Array.length witn - 1 do
            let ip = witn.(j) in
            let p = poi base ip in
