@@ -2022,7 +2022,6 @@ let print_add_parents conf base =
   let data = Mext_write.gen_add_parents add_parents in
   print_result conf data
 
-(* FIXME: what is ip? *)
 let do_mod_fam_add_child conf base ifam ip mod_c =
     (*
        On modifie une famille, il faut effectuer les actions suivantes :
@@ -2214,18 +2213,18 @@ let print_add_parents_ok conf base =
       let len = Array.length families in
       try
         (* Should test compatibility of events and set a warning flag if PossibleDuplicateFam *)
-        let fam, ifam =
+        let ifam =
           let rec loop i =
             if i = len then raise Not_found
             else
               let fam = foi base families.(i) in
               if (get_father fam = ifath && get_mother fam = imoth)
-              then fam, families.(i)
+              then families.(i)
               else loop (i + 1)
           in
           loop 0
         in
-        Some (fam, ifam)
+        Some ifam
       with Not_found -> None
     else None
   in
@@ -2233,7 +2232,7 @@ let print_add_parents_ok conf base =
      we update an existing union (if exists) instead of creating a new one
      (aka add a child instead of add parents) *)
   match existing_fam with
-  | Some (fam, ifam)
+  | Some ifam
     when begin match mod_family.Mwrite.Family.fevents with
       (* FIXME: really test events compatibilty instead of only handling default case *)
         [ { Mwrite.Fevent.fevent_type = Some `efam_marriage
@@ -2252,7 +2251,7 @@ let print_add_parents_ok conf base =
       | _ -> false
     end ->
     let add_child_ok =
-      { Mwrite.Add_child_ok.index_person = Int32.of_int @@ Adef.int_of_iper (get_father fam) (* ??? *)
+      { Mwrite.Add_child_ok.index_person = add_parents_ok.Mwrite.Add_parents_ok.index_person
       ; index_family = Int32.of_int @@ Adef.int_of_ifam ifam
       ; new_family = false
       ; child = Api_update_util.pers_to_piqi_mod_person conf base @@ Gwdb.poi base @@ Adef.iper_of_int ip
@@ -2356,7 +2355,7 @@ let print_add_parents_ok conf base =
                 raise (Api_update_util.ModErrApiConflict c)
           in
           let all_wl = match existing_fam with
-            | Some (_, ifam) ->
+            | Some ifam ->
               let ifam' = Adef.ifam_of_int @@ Int32.to_int mod_family.Mwrite.Family.index in
               Def.PossibleDuplicateFam (ifam, ifam') :: all_wl
             | _ -> all_wl
