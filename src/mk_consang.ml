@@ -8,11 +8,13 @@ let indexes = ref false
 let scratch = ref false
 let verbosity = ref 2
 let tlim = ref (-1)
+let fast = ref false
 
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
 let speclist =
   [("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
    ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
+   ("-fast", Arg.Set fast, " faster, but use more memory");
    "-i", Arg.Set indexes, ": build the indexes again";
    "-t", Arg.Int (fun i -> tlim := i), " <int>: time limit in seconds";
    "-scratch", Arg.Set scratch, ": from scratch";
@@ -36,7 +38,7 @@ let init_cache_info bname base =
   for i = 0 to nb_ind - 1 do
     let ip = Adef.iper_of_int i in
     let p = Gwdb.poi base ip in
-    if is_empty_name p then () else incr nb_real_persons
+    if not @@ is_empty_name p then incr nb_real_persons
   done;
   (* Il faudrait que cache_nb_base_persons ne soit pas dans util.ml *)
   let ht = Hashtbl.create 1 in
@@ -469,12 +471,22 @@ let main () =
       flush stderr;
       exit 2
     end;
+  if !verbosity = 0 then Mutil.verbose := false ;
   Secure.set_base_dir (Filename.dirname !fname);
   Lock.control_retry
     (Mutil.lock_file !fname)
     ~onerror:Lock.print_error_and_exit
     (fun () ->
        let base = Gwdb.open_base !fname in
+       if !fast then begin
+         Gwdb.load_persons_array base;
+         Gwdb.load_families_array base;
+         Gwdb.load_ascends_array base;
+         Gwdb.load_unions_array base;
+         Gwdb.load_couples_array base;
+         Gwdb.load_descends_array base;
+         Gwdb.load_strings_array base
+       end ;
        try
          Sys.catch_break true;
          let carray = ConsangAll.compute ~verbosity:!verbosity base !tlim !scratch in

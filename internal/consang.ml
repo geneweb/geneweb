@@ -82,7 +82,6 @@ exception TopologicalSortError of person
 
 let topological_sort base poi =
   let tab = Array.make (nb_of_persons base) 0 in
-  let todo = ref [] in
   let cnt = ref 0 in
   for i = 0 to nb_of_persons base - 1 do
     let a = poi base (Adef.iper_of_int i) in
@@ -94,9 +93,14 @@ let topological_sort base poi =
         tab.(ifath) <- tab.(ifath) + 1; tab.(imoth) <- tab.(imoth) + 1
     | _ -> ()
   done;
-  for i = 0 to nb_of_persons base - 1 do
-    if tab.(i) = 0 then todo := i :: !todo
-  done;
+  let todo =
+    let stop = nb_of_persons base - 1 in
+    let rec loop i acc =
+      if i >= stop then acc else
+      loop (i + 1) (if tab.(i) = 0 then i :: acc else acc)
+    in
+    loop 0 []
+  in
   let rec loop tval list =
     if list = [] then ()
     else
@@ -122,7 +126,7 @@ let topological_sort base poi =
       in
       loop (tval + 1) new_list
   in
-  loop 0 !todo;
+  loop 0 todo;
   if !cnt <> nb_of_persons base then
     check_noloop base
       (function
