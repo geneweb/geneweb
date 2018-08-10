@@ -50,7 +50,6 @@ let start_with_hi_i s =
     | 'h' -> String.length s > 1 && s.[1] = 'i'
     | _ -> false
   else false
-
 let match_begin s t =
   let rec loop i j =
     if i >= String.length s || j >= String.length t then true
@@ -104,35 +103,35 @@ let rec capitale_utf_8 s =
     else
       match Char.code c with
         0xC3 when Char.code s.[1] <> 0xBF ->
-          let c1 = Char.uppercase_ascii (Char.chr (Char.code s.[1] + 0x40)) in
-          sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
-            (String.sub s 2 (String.length s - 2))
-      | 0xC3 when Char.code s.[1] = 0xBF -> (* ÿ *)
-          let c = (Char.chr 0xC5) in
-          let c1 = (Char.chr 0xB8) in
-          sprintf "%c%c%s" c c1
-            (String.sub s 2 (String.length s - 2))
+          let c1 = Char.chr (Char.code s.[1] - 0xA0 + 0x80) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xC3 when Char.code s.[1] = 0xBF ->
+          (* ÿ *)
+          let c = Char.chr 0xC5 in
+          let c1 = Char.chr 0xB8 in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xC4 | 0xC5 | 0xC6 | 0xC7 ->
-          let c1 = (Char.chr (Char.code s.[1] - 1)) in
-          sprintf "%c%c%s" c c1
-            (String.sub s 2 (String.length s - 2))
+          let c1 = Char.chr (Char.code s.[1] - 1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 ->
           (* cyrillic lowercase *)
           let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
-          sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD1 when Char.code s.[1] < 0x90 ->
           (* cyrillic lowercase again *)
           let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
-          sprintf "%c%c%s" (Char.chr 0xD0) c1
+          Printf.sprintf "%c%c%s" (Char.chr 0xD0) c1
             (String.sub s 2 (String.length s - 2))
       | _ -> s
 
 let index_of_next_char s i =
-  if !(Mutil.utf_8_db) then min (String.length s) (i + max 1 (Name.nbc s.[i]))
+  if !Mutil.utf_8_db then
+    min (String.length s) (i + max 1 (Name.nbc s.[i]))
   else i + 1
 
 let capitale s =
-  if !(Mutil.utf_8_db) then capitale_utf_8 s else capitale_iso_8859_1 s
+  if !Mutil.utf_8_db then capitale_utf_8 s
+  else capitale_iso_8859_1 s
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
