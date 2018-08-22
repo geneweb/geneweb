@@ -33,8 +33,13 @@ print_check_ok() {
 
 check_os() {
   OS_TYPE=`uname -s`
-  if [[ $OS_TYPE == "Darwin" ]] || [[ $OS_TYPE == "Linux" ]] ; then
-    print_check_ok "Checking OS type" "UNIX"
+  if [[ $OS_TYPE == "Linux" ]] ; then
+    print_check_ok "Checking OS type" "Linux"
+    EXE=
+    RM="/bin/rm -f"
+    STRIP=strip
+  elif [[ $OS_TYPE == "Darwin" ]] ; then
+    print_check_ok "Checking OS type" "Darwin"
     EXE=
     RM="/bin/rm -f"
     STRIP=strip

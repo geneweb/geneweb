@@ -1,9 +1,7 @@
 (library
- (
  (name internal)
  (public_name geneweb.internal)
- (libraries (str geneweb.wserver camlp5.gramlib))
+ (libraries str geneweb.wserver camlp5.gramlib)
  (wrapped false)
- (modules_without_implementation (config dbdisk def templAst))
- )
+ (modules_without_implementation config dbdisk def templAst)
 )

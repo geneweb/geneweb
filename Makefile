@@ -10,16 +10,11 @@ include Makefile.config
 
 # Variables for packagers.
 PREFIX=/usr
-LANGDIR=$(PREFIX)/share/geneweb
-MANDIR=$(PREFIX)/man/man1
-DESTDIR=distribution
-MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwc2.1 gwu.1 gwd.1 consang.1 gwsetup.1
+DISTRIB_DIR=distribution
 
-.DEFAULT_GOAL = exe
+BUILD_DIR=_build/default
 
-BUILD_DIR=_build/default/
-
-# Executables
+###### [BEGIN] Executables list
 
 INSTALL_EXE = \
 	src/gwc1 \
@@ -33,8 +28,7 @@ INSTALL_EXE = \
 	gwb2ged/gwb2ged \
 	setup/setup
 
-DISTRIB_EXE = \
-	$(INSTALL_EXE) \
+DISTRIB_EXE = $(INSTALL_EXE) gwtp/gwtp
 
 ALL_EXE = \
 	$(INSTALL_EXE) \
@@ -88,6 +82,10 @@ EVERYTHING_EXE = \
 	src/check_base \
 	src/i18n_check
 
+###### [END] Executables list
+
+###### [BEGIN] Generated .ml files section
+
 CAMLP5_PA_EXTEND_FILES = \
 	ged2gwb/ged2gwb \
 	ged2gwb/ged2gwb2 \
@@ -115,142 +113,116 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 	    && echo "(* DO NOT EDIT *)" > $@ \
 	    && echo "(* This file was generated from $< *)" >> $@ \
 	    && camlp5o pr_o.cmo $(CAMLP5_OPT) -impl $< >> $@ \
-	    && sed -i -r 's/[(]\* (\[@.+\]) \*[)]/\1/g' $@ \
+	    && sed -i.bak -E 's/[(]\* (\[@.+\]) \*[)]/\1/g' $@ \
 	    && echo " Done!")
-
-%.bc %.exe:
-	dune build $@
-
-GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml)
-
-geneweb.install: $(GENERATED_FILES_DEP)
-	dune build @install
-
-.PHONY: geneweb.install
-
-install-exe: $(GENERATED_FILES_DEP) $(INSTALL_EXE:=.exe)
-install-bc: $(GENERATED_FILES_DEP) $(INSTALL_EXE:=.bc)
-
-exe: install-exe $(ALL_EXE:=.exe)
-bc: install-bc $(ALL_EXE:=.bc)
-
-everything-bc: bc $(EVERYTHING_EXE:=.bc)
-everything-exe: exe $(EVERYTHING_EXE:=.exe)
-
-clean:
-	$(RM) $(GENERATED_FILES_DEP)
-	$(RM)r distribution
-	dune clean
 
 internal/gwlib.ml:
 	echo "let prefix =" > $@
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
-.PHONY: piqi
+GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml)
+
+###### [End] Generated .ml files section
+
+geneweb.install: $(GENERATED_FILES_DEP)
+	dune build @install
+.PHONY: geneweb.install
+
+install-exe:
+	dune build $(INSTALL_EXE:=.exe)
+distrib-exe:
+	dune build $(DISTRIB_EXE:=.exe)
+exe:
+	dune build $(ALL_EXE:=.exe)
+everything-exe:
+	dune build $(EVERYTHING_EXE:=.exe)
+.DEFAULT_GOAL = exe
+
+install-exe distrib-exe exe everything-exe: $(GENERATED_FILES_DEP)
+
 piqi:
 	$(foreach p, $(wildcard lib/*.proto), \
 		piqi of-proto --normalize $(p) ; \
 		piqic-ocaml -C lib/ --ext $(p).piqi ; \
 	  )
 	$(RM) lib/*.piqi
+.PHONY: piqi
 
-.PHONY: install uninstall distrib install-lib uninstall-lib
+###### [BEGIN] Installation / Distribution section
 
-install-lib: geneweb.install $(GENERATED_FILES_DEP)
+install: geneweb.install
 	dune install geneweb
 
-uninstall-lib: geneweb.install
+uninstall: geneweb.install
 	dune uninstall geneweb
 
-install: install-exe
-	PWD=`pwd`
-	if test "$(OS_TYPE)" = "Darwin"; then \
-	    etc/macOS/install.command $(PWD) $(DESTDIR) etc/macOS; \
-	elif test "$(OS_TYPE)" = "Win"; then \
-		echo "No install for Window"; \
-	else \
-	mkdir -p $(PREFIX)/bin; \
-	cp $(BUILD_DIR)/src/gwc1.exe $(PREFIX)/bin/gwc$(EXE); \
-	cp $(BUILD_DIR)/src/gwc1.exe $(PREFIX)/bin/gwc1$(EXE); \
-	cp $(BUILD_DIR)/src/gwc2.exe $(PREFIX)/bin/gwc2$(EXE); \
-	cp $(BUILD_DIR)/src/mk_consang.exe $(PREFIX)/bin/mk_consang$(EXE); \
-	cp $(BUILD_DIR)/src/mk_consang.exe $(PREFIX)/bin/consang$(EXE); \
-	cp $(BUILD_DIR)/src/gwd.exe $(PREFIX)/bin/gwd$(EXE); \
-	cp $(BUILD_DIR)/src/gwu.exe $(PREFIX)/bin/gwu$(EXE); \
-	cp $(BUILD_DIR)/ged2gwb/ged2gwb.exe $(PREFIX)/bin/ged2gwb$(EXE); \
-	cp $(BUILD_DIR)/ged2gwb/ged2gwb2.exe $(PREFIX)/bin/ged2gwb2$(EXE); \
-	cp $(BUILD_DIR)/gwb2ged/gwb2ged.exe $(PREFIX)/bin/gwb2ged$(EXE); \
-	cp $(BUILD_DIR)/setup/setup.exe $(PREFIX)/bin/gwsetup$(EXE); \
-	cp $(BUILD_DIR)/src/update_nldb.exe $(PREFIX)/bin/update_nldb$(EXE); \
-	mkdir -p $(LANGDIR); \
-	cp -R hd/* $(LANGDIR)/.; \
-	mkdir -p $(MANDIR); \
-	cd man; cp $(MANPAGES) $(MANDIR)/.; \
-	fi
-
-uninstall:
-	$(RM) $(addprefix $(PREFIX)/bin/,$(INSTALL_EXE))
-	$(RM) -r $(PREFIX)/share/geneweb
-	cd $(MANDIR); $(RM) $(MANPAGES)
-
-distribution: distrib
-distrib: install-exe gwtp/gwtp.exe
-	$(RM) -r $(DESTDIR)
-	mkdir $(DESTDIR)
-	mkdir -p $(DESTDIR)/bases
-	cp CHANGES $(DESTDIR)/CHANGES.txt
-	cp LICENSE $(DESTDIR)/LICENSE.txt
-	cp etc/README.txt $(DESTDIR)/.
-	cp etc/LISEZMOI.txt $(DESTDIR)/.
-	cp etc/START.htm $(DESTDIR)/.
+distrib: distrib-exe
+	$(RM) -r $(DISTRIB_DIR)
+	mkdir $(DISTRIB_DIR)
+	mkdir -p $(DISTRIB_DIR)/bases
+	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
+	cp LICENSE $(DISTRIB_DIR)/LICENSE.txt
+	cp etc/README.txt $(DISTRIB_DIR)/.
+	cp etc/LISEZMOI.txt $(DISTRIB_DIR)/.
+	cp etc/START.htm $(DISTRIB_DIR)/.
 	if test $(OS_TYPE) = "Win"; then \
-	  cp etc/Windows/gwd.bat $(DESTDIR); \
-	  cp etc/Windows/gwsetup.bat $(DESTDIR); \
-	  cp -f etc/Windows/README.txt $(DESTDIR)/README.txt; \
-	  cp -f etc/Windows/LISEZMOI.txt $(DESTDIR)/LISEZMOI.txt; \
+	  cp etc/Windows/gwd.bat $(DISTRIB_DIR); \
+	  cp etc/Windows/gwsetup.bat $(DISTRIB_DIR); \
+	  cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt; \
+	  cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt; \
 	elif test $(OS_TYPE) = "Darwin"; then \
-	  cp etc/gwd $(DESTDIR)/gwd.command; \
-	  cp etc/gwsetup $(DESTDIR)/gwsetup.command; \
-	  cp etc/macOS/geneweb.command $(DESTDIR); \
+	  cp etc/gwd $(DISTRIB_DIR)/gwd.command; \
+	  cp etc/gwsetup $(DISTRIB_DIR)/gwsetup.command; \
+	  cp etc/macOS/geneweb.command $(DISTRIB_DIR); \
 	else \
-	  cp etc/gwd $(DESTDIR); \
-	  cp etc/gwsetup $(DESTDIR); \
+	  cp etc/gwd $(DISTRIB_DIR); \
+	  cp etc/gwsetup $(DISTRIB_DIR); \
 	fi
-	mkdir $(DESTDIR)/gw
-	cp etc/a.gwf $(DESTDIR)/gw/.
-	echo "127.0.0.1" > $(DESTDIR)/gw/only.txt
-	echo "-setup_link" > $(DESTDIR)/gw/gwd.arg
-	cp $(BUILD_DIR)/src/gwc1.exe $(DESTDIR)/gw/gwc$(EXE)
-	cp $(BUILD_DIR)/src/gwc1.exe $(DESTDIR)/gw/gwc1$(EXE)
-	cp $(BUILD_DIR)/src/gwc2.exe $(DESTDIR)/gw/gwc2$(EXE)
-	cp $(BUILD_DIR)/src/mk_consang.exe $(DESTDIR)/gw/mk_consang$(EXE)
-	cp $(BUILD_DIR)/src/mk_consang.exe $(DESTDIR)/gw/consang$(EXE)
-	cp $(BUILD_DIR)/src/gwd.exe $(DESTDIR)/gw/gwd$(EXE)
-	cp $(BUILD_DIR)/src/gwu.exe $(DESTDIR)/gw/gwu$(EXE)
-	cp $(BUILD_DIR)/src/update_nldb.exe $(DESTDIR)/gw/update_nldb$(EXE)
-	cp $(BUILD_DIR)/ged2gwb/ged2gwb.exe $(DESTDIR)/gw/ged2gwb$(EXE)
-	cp $(BUILD_DIR)/ged2gwb/ged2gwb2.exe $(DESTDIR)/gw/ged2gwb2$(EXE)
-	cp $(BUILD_DIR)/gwb2ged/gwb2ged.exe $(DESTDIR)/gw/gwb2ged$(EXE)
-	cp $(BUILD_DIR)/setup/setup.exe $(DESTDIR)/gw/gwsetup$(EXE)
-	mkdir $(DESTDIR)/gw/gwtp_tmp
-	mkdir $(DESTDIR)/gw/gwtp_tmp/lang
-	cp gwtp/README $(DESTDIR)/gw/gwtp_tmp/.
-	cp $(BUILD_DIR)/gwtp/gwtp.exe $(DESTDIR)/gw/gwtp_tmp/gwtp$(EXE)
-	cp gwtp/lang/*.txt $(DESTDIR)/gw/gwtp_tmp/lang/.
-	mkdir $(DESTDIR)/gw/setup
-	cp setup/intro.txt $(DESTDIR)/gw/setup/.
-	mkdir $(DESTDIR)/gw/setup/lang
+	mkdir $(DISTRIB_DIR)/gw
+	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
+	echo "127.0.0.1" > $(DISTRIB_DIR)/gw/only.txt
+	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
+	cp $(BUILD_DIR)/src/gwc1.exe $(DISTRIB_DIR)/gw/gwc$(EXE); \
+	cp $(BUILD_DIR)/src/gwc1.exe $(DISTRIB_DIR)/gw/gwc1$(EXE); \
+	cp $(BUILD_DIR)/src/gwc2.exe $(DISTRIB_DIR)/gw/gwc2$(EXE); \
+	cp $(BUILD_DIR)/src/mk_consang.exe $(DISTRIB_DIR)/gw/mk_consang$(EXE); \
+	cp $(BUILD_DIR)/src/mk_consang.exe $(DISTRIB_DIR)/gw/consang$(EXE); \
+	cp $(BUILD_DIR)/src/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXE); \
+	cp $(BUILD_DIR)/src/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXE); \
+	cp $(BUILD_DIR)/ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXE); \
+	cp $(BUILD_DIR)/ged2gwb/ged2gwb2.exe $(DISTRIB_DIR)/gw/ged2gwb2$(EXE); \
+	cp $(BUILD_DIR)/gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXE); \
+	cp $(BUILD_DIR)/setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXE); \
+	cp $(BUILD_DIR)/src/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXE); \
+	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp
+	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp/lang
+	cp gwtp/README $(DISTRIB_DIR)/gw/gwtp_tmp/.
+	cp $(BUILD_DIR)/gwtp/gwtp.exe $(DISTRIB_DIR)/gw/gwtp_tmp/gwtp$(EXE)
+	cp gwtp/lang/*.txt $(DISTRIB_DIR)/gw/gwtp_tmp/lang/.
+	mkdir $(DISTRIB_DIR)/gw/setup
+	cp setup/intro.txt $(DISTRIB_DIR)/gw/setup/.
+	mkdir $(DISTRIB_DIR)/gw/setup/lang
 	if test $(OS_TYPE) = "Win"; then \
-	  cp setup/lang/intro.txt.dos $(DESTDIR)/gw/setup/lang/intro.txt; \
+	  cp setup/lang/intro.txt.dos $(DISTRIB_DIR)/gw/setup/lang/intro.txt; \
 	else \
-	  cp setup/lang/intro.txt $(DESTDIR)/gw/setup/lang/intro.txt; \
+	  cp setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/intro.txt; \
 	fi
-	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
-	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
-	cp -R hd/* $(DESTDIR)/gw/.
-	rm -f $(DESTDIR)/exe-version.txt
-	echo "Commit: `git log  -1 | grep commit | cut -c8-15`, `date`"      > $(DESTDIR)/commit.txt
-	echo "`ocaml  -version`"      >> $(DESTDIR)/commit.txt
-	echo "`camlp5 -v 2>&1`"       >> $(DESTDIR)/commit.txt
-	echo "-----"                  >> $(DESTDIR)/commit.txt
+	cp setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/.
+	cp setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/.
+	cp -R hd/* $(DISTRIB_DIR)/gw/.
+	$(RM) $(DISTRIB_DIR)/exe-version.txt
+	echo "Commit: `git log  -1 | grep commit | cut -c8-15`, `date`"      > $(DISTRIB_DIR)/commit.txt
+	echo "`ocaml  -version`"      >> $(DISTRIB_DIR)/commit.txt
+	echo "`camlp5 -v 2>&1`"       >> $(DISTRIB_DIR)/commit.txt
+	echo "-----"                  >> $(DISTRIB_DIR)/commit.txt
+
+.PHONY: install uninstall distrib
+
+###### [END] Installation / Distribution section
+
+clean:
+	$(RM) $(GENERATED_FILES_DEP)
+	$(RM)r distribution
+	dune clean
+.PHONY: clean

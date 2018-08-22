@@ -1,28 +1,37 @@
-opam-version: "1.2"
-maintainer: "YOUR EMAIL ADDRESS"
-# authors: ["YOUR NAME"]
-homepage: "https://github.com/geneweb/geneweb"
+opam-version: "2.0"
+
+maintainer: [ "Julien Sagot <julien.sagot@geneanet.org>" ]
+
+authors: [ "Daniel de Rauglaudre" ]
+
+homepage: "http://geneweb.org"
+
+dev-repo: "git://github.com/geneweb/geneweb"
+
 bug-reports: "https://github.com/geneweb/geneweb/issues"
-dev-repo: "https://github.com/geneweb/geneweb.git"
 
 build: [
-  [ configure --api ]
-  [ make "install" "install-lib" ]
+  [ "./configure" ]
+  [ make "install-exe" ]
 ]
 
-available: [ ocaml-version >= "4.02.1" & ocaml-version <= "4.05" ]
+install: [ [ make "install" ] ]
+
+remove: [ [ make "uninstall" ] ]
+
+pin-depends: [
+  [ "piqilib.dev" "git://github.com/alavrik/piqi" ]
+  [ "piqi.dev" "git://github.com/alavrik/piqi-ocaml" ]
+]
 
 depends: [
-  "camlp5"
-  "curl"
-  "dune" {build}
-  "lablgtk2"
-  "piqirun"
-  "piqirun.ext"
-  "re"
+  "camlp5" { build }
+  "dune" { build }
+  "ocaml" { >= "4.05" }
+  "ocurl" { = "0.8.1" }
+  "piqi" { = "dev" }
+  "piqilib" { = "dev" }
   "redis"
   "redis-sync"
-  "str"
-  "unix"
   "yojson"
 ]

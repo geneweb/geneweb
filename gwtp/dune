@@ -1,5 +1,4 @@
 (executables
- ((names (gwtp recover))
-  (libraries (geneweb.internal))
- )
+  (names gwtp recover)
+  (libraries geneweb.internal)
 )
