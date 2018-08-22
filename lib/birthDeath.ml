@@ -557,6 +557,39 @@ let print_statistics conf =
        Templ.print_foreach = fun _ -> raise Not_found}
       [] ()
 
+let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
+  let men = Array.make (nb_intervals + 1) 0 in
+  let wom = Array.make (nb_intervals + 1) 0 in
+  (* TODO? Load person array *)
+  for i = 0 to nb_of_persons base - 1 do
+    let p = pget conf base (Adef.iper_of_int i) in
+    let sex = get_sex p in
+    let dea = get_death p in
+    if sex <> Neuter then
+      match Adef.od_of_codate (get_birth p) with
+        Some (Dgreg (dmy, _)) ->
+        if not (Date.before_date dmy at_date) then
+          let a = CheckItem.time_elapsed dmy at_date in
+          let j = min nb_intervals (a.year / interval) in
+          let ok =
+            if dea = NotDead || dea = DontKnowIfDead && a.year < limit then
+              true
+            else
+              match dea with
+                Death (_, cd) ->
+                begin match Adef.date_of_cdate cd with
+                    Dgreg (d, _) -> Date.before_date d at_date
+                  | _ -> false
+                end
+              | _ -> false
+          in
+          if ok then
+            if sex = Male then men.(j) <- men.(j) + 1
+            else wom.(j) <- wom.(j) + 1
+      | Some (Dtext _) | None -> ()
+  done;
+  (men, wom)
+
 let print_population_pyramid conf base =
   let interval =
     match p_getint conf.env "int" with
@@ -573,37 +606,9 @@ let print_population_pyramid conf base =
       Some i -> {year = i; month = 31; day = 12; prec = Sure; delta = 0}
     | None -> conf.today
   in
-  let at_year = at_date.year in
   let nb_intervals = 150 / interval in
-  let men = Array.make (nb_intervals + 1) 0 in
-  let wom = Array.make (nb_intervals + 1) 0 in
-  for i = 0 to nb_of_persons base - 1 do
-    let p = pget conf base (Adef.iper_of_int i) in
-    let sex = get_sex p in
-    let dea = get_death p in
-    if sex <> Neuter then
-      match Adef.od_of_codate (get_birth p) with
-        Some (Dgreg (dmy, _)) ->
-          if not (Date.before_date dmy at_date) then
-            let a = CheckItem.time_elapsed dmy at_date in
-            let j = min nb_intervals (a.year / interval) in
-            let ok =
-              if dea = NotDead || dea = DontKnowIfDead && a.year < limit then
-                true
-              else
-                match dea with
-                  Death (_, cd) ->
-                    begin match Adef.date_of_cdate cd with
-                      Dgreg (d, _) -> Date.before_date d at_date
-                    | _ -> false
-                    end
-                | _ -> false
-            in
-            if ok then
-              if sex = Male then men.(j) <- men.(j) + 1
-              else wom.(j) <- wom.(j) + 1
-      | Some (Dtext _) | None -> ()
-  done;
+  let men, wom = make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base in
+  let at_year = at_date.year in
   let string_of_nb n =
     Sosa.to_string_sep (transl conf "(thousand separator)") (Sosa.of_int n)
   in

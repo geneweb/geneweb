@@ -1,17 +1,13 @@
 (library
- (
  (name dag2html)
  (public_name geneweb.dag2html)
- (modules (dag2html))
+ (modules dag2html)
  (wrapped false)
- (libraries (geneweb.internal))
- )
+ (libraries geneweb.internal)
 )
 
 (executable
- ((name main)
-  (public_name dag2html)
-  (modules (main))
-  (libraries (geneweb.dag2html))
- )
+  (name main)
+  (modules main)
+  (libraries geneweb.dag2html)
 )
