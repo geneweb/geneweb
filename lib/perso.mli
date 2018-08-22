@@ -4,6 +4,18 @@
 open Gwdb
 open Config
 
+type generation_person =
+    GP_person of Sosa.t * Adef.iper * Adef.ifam option
+  | GP_same of Sosa.t * Sosa.t * Adef.iper
+  | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
+  | GP_missing of Sosa.t * Adef.iper
+
+type sosa_t =
+  { tstab : int array;
+    mark : bool array;
+    mutable last_zil : (Def.iper * Sosa.t) list;
+    sosa_ht : (Def.iper, (Sosa.t * Gwdb.person) option) Hashtbl.t }
+
 val string_of_titles : config -> base -> string -> person -> string
 val string_of_marriage_text : config -> base -> family -> string
 val interp_templ : string -> config -> base -> person -> unit
@@ -34,6 +46,39 @@ val get_death_text : config -> person -> bool -> string
 val get_burial_text : config -> person -> bool -> string
 val get_cremation_text : config -> person -> bool -> string
 val get_marriage_date_text : config -> family -> bool -> string
+
+val linked_page_text
+  : Config.config
+  -> Gwdb.base
+  -> Gwdb.person
+  -> string
+  -> 'a
+  -> string
+  -> NotesLinks.page * ('b * ('a * NotesLinks.ind_link) list)
+  -> string
+
+module IperSet : sig include Set.S with type elt = Adef.iper end
+
+val max_ancestor_level : config -> base -> Adef.iper -> int -> int
+
+val string_of_died : config -> person -> bool -> string
+
+val string_of_parent_age : config -> base -> person * bool -> (family -> Adef.iper) -> string
+
+val string_of_image_url : config -> base -> person * bool -> bool -> string
+
+val round_2_dec : float -> float
+
+val has_children : base -> person -> bool
+
+val string_of_image_size : config -> base -> person * bool -> string
+val string_of_image_medium_size : config -> base -> person * bool -> string
+val string_of_image_small_size : config -> base -> person * bool -> string
+
+val get_link : generation_person list -> IperSet.elt -> generation_person option
+
+val find_sosa
+  : config -> base -> person -> person option Lazy.t -> sosa_t -> (Sosa.t * Gwdb.person) option
 
 (**)
 
