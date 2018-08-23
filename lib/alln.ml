@@ -299,11 +299,8 @@ let select_names conf base is_surnames ini need_whole_list =
   in
   let (list, len) =
     let start_k = Mutil.tr '_' ' ' ini in
-    match
-      try Some (spi_first iii (capitalize_if_not_utf8 start_k)) with
-        Not_found -> None
-    with
-      Some istr ->
+    try
+      let istr = spi_first iii (capitalize_if_not_utf8 start_k) in
         let rec loop istr len list =
           let s = nominative (sou base istr) in
           let k = name_key_compatible base s in
@@ -342,16 +339,14 @@ let select_names conf base is_surnames ini need_whole_list =
                   | [] -> [k, s, cnt], len
               else list, len
             in
-            match
-              try Some (spi_next iii istr need_whole_list) with
-                Not_found -> None
-            with
-              Some (istr, dlen) -> loop istr (len + dlen) list
-            | None -> list, len
+            try
+              let (istr, dlen) = spi_next iii istr need_whole_list in
+              loop istr (len + dlen) list
+            with Not_found -> list, len
           else list, len
         in
         loop istr 0 []
-    | None -> [], 0
+    with Not_found -> [], 0
   in
   let (list, len) =
     let lim =

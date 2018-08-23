@@ -404,33 +404,34 @@ let make_visible_record_access bname persons =
   let fname = Filename.concat bname "restrict" in
   let read_or_create_visible () =
     let visible =
-      match try Some (Secure.open_in fname) with Sys_error _ -> None with
-        Some ic ->
-          if Sys.unix then
-            if !verbose then
-              begin
-                Printf.eprintf "*** read restrict file\n";
-                flush stderr
-              end;
-          let visible = input_value ic in close_in ic; visible
-      | None -> Array.make persons.len VsNone
+      try
+        let ic = Secure.open_in fname in
+        if Sys.unix && !verbose then
+          begin
+            Printf.eprintf "*** read restrict file\n";
+            flush stderr
+          end ;
+        let visible = input_value ic in
+        close_in ic ;
+        visible
+      with Sys_error _ -> Array.make persons.len VsNone
     in
-    visible_ref := Some visible; visible
+    visible_ref := Some visible ;
+    visible
   in
   let v_write () =
     match !visible_ref with
       Some visible ->
         begin try
           let oc = Secure.open_out fname in
-          if Sys.unix then
-            if !verbose then
-              begin
-                Printf.eprintf "*** write restrict file\n";
-                flush stderr
-              end;
+          if Sys.unix && !verbose then
+            begin
+              Printf.eprintf "*** write restrict file\n";
+              flush stderr
+            end;
           output_value oc visible;
           close_out oc
-        with Sys_error _ -> ()
+          with Sys_error _ -> ()
         end
     | None -> ()
   in
@@ -620,11 +621,8 @@ let check_patch_magic ic =
   really_input_string ic (String.length magic_patch) = magic_patch
 
 let input_patches bname =
-  match
-    try Some (Secure.open_in_bin (Filename.concat bname "patches")) with
-      _ -> None
-  with
-    Some ic ->
+  try
+    let ic = Secure.open_in_bin (Filename.concat bname "patches") in
       let r =
         if check_patch_magic ic then (input_value ic : patches_ht)
         else
@@ -656,7 +654,7 @@ let input_patches bname =
           end
       in
       close_in ic; r
-  | None ->
+  with _ ->
       {h_person = ref 0, Hashtbl.create 1; h_ascend = ref 0, Hashtbl.create 1;
        h_union = ref 0, Hashtbl.create 1; h_family = ref 0, Hashtbl.create 1;
        h_couple = ref 0, Hashtbl.create 1;
@@ -664,13 +662,12 @@ let input_patches bname =
        h_string = ref 0, Hashtbl.create 1; h_name = Hashtbl.create 1}
 
 let input_synchro bname =
-  match
-    try
-      Some (Secure.open_in_bin (Filename.concat bname "synchro_patches"))
-    with _ -> None
-  with
-    Some ic -> let r : synchro_patch = input_value ic in close_in ic; r
-  | None -> {synch_list = []}
+  try
+    let ic = Secure.open_in_bin (Filename.concat bname "synchro_patches") in
+    let r : synchro_patch = input_value ic in
+    close_in ic ;
+    r
+  with _ -> {synch_list = []}
 
 let person_of_key persons strings persons_of_name first_name surname occ =
   if first_name = "?" || surname = "?" then None
@@ -918,25 +915,23 @@ let opendb bname =
       if fnotes = "" then "notes"
       else Filename.concat "notes_d" (fnotes ^ ".txt")
     in
-    match
-      try Some (Secure.open_in (Filename.concat bname fname)) with
-        Sys_error _ -> None
-    with
-      Some ic ->
-        let str =
-          match rn_mode with
-            RnDeg -> if in_channel_length ic = 0 then "" else " "
-          | Rn1Ln -> (try input_line ic with End_of_file -> "")
-          | RnAll ->
-              let rec loop len =
-                match try Some (input_char ic) with End_of_file -> None with
-                  Some c -> loop (Buff.store len c)
-                | _ -> Buff.get len
-              in
-              loop 0
-        in
-        close_in ic; str
-    | None -> ""
+    try
+      let ic = Secure.open_in (Filename.concat bname fname) in
+      let str =
+        match rn_mode with
+          RnDeg -> if in_channel_length ic = 0 then "" else " "
+        | Rn1Ln -> (try input_line ic with End_of_file -> "")
+        | RnAll ->
+          let rec loop len =
+            match input_char ic with
+            | exception End_of_file -> Buff.get len
+            | c -> loop (Buff.store len c)
+          in
+          loop 0
+      in
+      close_in ic ;
+      str
+    with Sys_error _ -> ""
   in
   let commit_notes fnotes s =
     let fname =
@@ -960,16 +955,16 @@ let opendb bname =
     let top = Filename.concat bname "notes_d" in
     let rec loop list subdir =
       let dir = Filename.concat top subdir in
-      match try Some (Sys.readdir dir) with Sys_error _ -> None with
-        Some files ->
-          List.fold_left
-            (fun files file ->
-               let f = Filename.concat subdir file in
-               if Filename.check_suffix f ".txt" then
-                 Filename.chop_suffix f ".txt" :: files
-               else loop files f)
-            list (Array.to_list files)
-      | None -> list
+      try
+        let files = Sys.readdir dir in
+        Array.fold_left
+          (fun files file ->
+             let f = Filename.concat subdir file in
+             if Filename.check_suffix f ".txt" then
+               Filename.chop_suffix f ".txt" :: files
+             else loop files f)
+          list files
+      with Sys_error _ -> list
     in
     loop [] Filename.current_dir_name
   in

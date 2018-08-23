@@ -218,23 +218,24 @@ let alias_lang lang =
     let fname =
       Util.search_in_lang_path (Filename.concat "lang" "alias_lg.txt")
     in
-    match try Some (Secure.open_in fname) with Sys_error _ -> None with
-      Some ic ->
-        let lang =
-          try
-            let rec loop line =
-              match String.index_opt line '=' with
-                Some i ->
-                  if lang = String.sub line 0 i then
-                    String.sub line (i + 1) (String.length line - i - 1)
-                  else loop (input_line ic)
-              | None -> loop (input_line ic)
-            in
-            loop (input_line ic)
-          with End_of_file -> lang
+    try
+      let ic = Secure.open_in fname in
+      let lang =
+        let rec loop () =
+          match input_line ic with
+          | line -> begin match String.index_opt line '=' with
+              | Some i ->
+                if lang = String.sub line 0 i
+                then String.sub line (i + 1) (String.length line - i - 1)
+                else loop ()
+              | None -> loop ()
+            end
+          | exception End_of_file -> lang
         in
-        close_in ic; lang
-    | None -> lang
+        loop ()
+      in
+      close_in ic ; lang
+    with Sys_error _ -> lang
 
 let rec cut_at_equal i s =
   if i = String.length s then s, ""
@@ -257,21 +258,21 @@ let strip_trailing_spaces s =
 
 let read_base_env bname =
   let fname = Util.base_path [] (bname ^ ".gwf") in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-    Some ic ->
-      let env =
-        let rec loop env =
-          match try Some (input_line ic) with End_of_file -> None with
-            Some s ->
-              let s = strip_trailing_spaces s in
-              if s = "" || s.[0] = '#' then loop env
-              else loop (cut_at_equal 0 s :: env)
-          | None -> env
-        in
-        loop []
+  try
+    let ic = Secure.open_in fname in
+    let env =
+      let rec loop env =
+        match input_line ic with
+        | s ->
+          let s = strip_trailing_spaces s in
+          if s = "" || s.[0] = '#' then loop env
+          else loop (cut_at_equal 0 s :: env)
+        | exception End_of_file -> env
       in
-      close_in ic; env
-  | None -> []
+      loop []
+    in
+    close_in ic; env
+  with Sys_error _ -> []
 
 let print_renamed conf new_n =
   let link =
@@ -363,18 +364,20 @@ let nonce_private_key =
        let cnt_dir = Filename.concat !(Util.cnt_dir) "cnt" in
        let fname = Filename.concat cnt_dir "gwd_private.txt" in
        let k =
-         match try Some (open_in fname) with Sys_error _ -> None with
-           Some ic ->
-             let s =
-               try
-                 let rec loop s =
-                   if s = "" || s.[0] = '#' then loop (input_line ic) else s
-                 in
-                 loop (input_line ic)
-               with End_of_file -> ""
+         try
+           let ic = open_in fname in
+           let s =
+             let rec loop () =
+               match input_line ic with
+               | s when s = "" || s.[0] = '#' -> loop ()
+               | s -> s
+               | exception End_of_file -> ""
              in
-             close_in ic; s
-         | None -> ""
+             loop ()
+           in
+           close_in ic;
+           s
+         with Sys_error _ -> ""
        in
        if k = "" then
          begin
@@ -518,8 +521,8 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
 
 let get_actlog check_from utm from_addr base_password =
   let fname = Srcfile.adm_file "actlog" in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-    Some ic ->
+  try
+    let ic = Secure.open_in fname in
       let tmout = float_of_int !login_timeout in
       let rec loop changed r list =
         match input_line ic with
@@ -556,19 +559,19 @@ let get_actlog check_from utm from_addr base_password =
             list, r, changed
       in
       loop false ATnormal []
-  | None -> [], ATnormal, false
+  with Sys_error _ -> [], ATnormal, false
 
 let set_actlog list =
   let fname = Srcfile.adm_file "actlog" in
-  match try Some (Secure.open_out fname) with Sys_error _ -> None with
-    Some oc ->
-      List.iter
-        (fun ((from, base_pw), (a, c, d)) ->
-           fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
-             (if d = "" then "" else " " ^ d))
-        list;
-      close_out oc
-  | None -> ()
+  try
+    let oc = Secure.open_out fname in
+    List.iter
+      (fun ((from, base_pw), (a, c, d)) ->
+         fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
+           (if d = "" then "" else " " ^ d))
+      list;
+    close_out oc
+  with Sys_error _ -> ()
 
 let get_token check_from utm from_addr base_password =
   Lock.control (Srcfile.adm_file "gwd.lck") true
@@ -711,10 +714,8 @@ let allowed_denied_titles key extra_line env base_env () =
             if line = "" || line.[0] = ' ' || line.[0] = '#' then set
             else
               let line =
-                match
-                  try Some (String.index line '/') with Not_found -> None
-                with
-                  Some i ->
+                match String.index_opt line '/' with
+                | Some i ->
                     let len = String.length line in
                     let tit = String.sub line 0 i in
                     let pla = String.sub line (i + 1) (len - i - 1) in
@@ -1425,10 +1426,7 @@ let conf_and_connection from request script_name contents env =
             end
           else if conf.bname = "" then general_welcome conf
           else
-            match
-              try Some (List.assoc "renamed" conf.base_env) with
-                Not_found -> None
-            with
+            match List.assoc_opt "renamed" conf.base_env with
               Some n when n <> "" -> print_renamed conf n
             | _ ->
                 Request.treat_request_on_base conf;
@@ -1460,17 +1458,16 @@ let match_strings regexp s =
 
 let excluded from =
   let efname = chop_extension Sys.argv.(0) ^ ".xcl" in
-  match try Some (open_in efname) with Sys_error _ -> None with
-    Some ic ->
-      let rec loop () =
-        match try Some (input_line ic) with End_of_file -> None with
-          Some line ->
-            if match_strings line from then begin close_in ic; true end
-            else loop ()
-        | None -> close_in ic; false
-      in
-      loop ()
-  | None -> false
+  try
+    let ic = open_in efname in
+    let rec loop () =
+      match input_line ic with
+      | line when match_strings line from -> close_in ic ; true
+      | _ -> loop ()
+      | exception End_of_file -> close_in ic ; false
+    in
+    loop ()
+  with Sys_error _ -> false
 
 let image_request script_name env =
   match Util.p_getenv env "m", Util.p_getenv env "v" with
@@ -1534,10 +1531,9 @@ let print_misc_file misc_fname =
   match misc_fname with
     Css fname | Js fname | Otf fname | Svg fname | Woff fname | Eot fname |
     Ttf fname | Woff2 fname ->
-      begin match
-        (try Some (Secure.open_in_bin fname) with Sys_error _ -> None)
-      with
-        Some ic ->
+      begin
+        try
+          let ic = Secure.open_in_bin fname in
           let buf = Bytes.create 1024 in
           let len = in_channel_length ic in
           content_misc len misc_fname;
@@ -1550,7 +1546,7 @@ let print_misc_file misc_fname =
               loop (len - olen)
           in
           loop len; close_in ic; true
-      | None -> false
+        with Sys_error _ -> false
       end
   | Other _ -> false
 
@@ -1766,27 +1762,23 @@ let read_input len =
     Buffer.contents buff
 
 let arg_parse_in_file fname speclist anonfun errmsg =
-  match try Some (open_in fname) with Sys_error _ -> None with
-    Some ic ->
-      let list =
-        let list = ref [] in
-        begin try
-          while true do
-            let line = input_line ic in
-            if line <> "" then list := line :: !list
-          done
-        with End_of_file -> ()
-        end;
-        close_in ic;
-        List.rev !list
-      in
-      let list =
-        match list with
-          [x] -> arg_list_of_string x
-        | _ -> list
-      in
-      Argl.parse_list speclist anonfun errmsg list
-  | _ -> ()
+  try
+    let ic = open_in fname in
+    let list =
+      let rec loop acc = match input_line ic with
+        | line -> loop (if line <> "" then line :: acc else acc)
+        | exception End_of_file ->
+          close_in ic ;
+          List.rev acc
+      in loop []
+    in
+    let list =
+      match list with
+        [x] -> arg_list_of_string x
+      | _ -> list
+    in
+    Argl.parse_list speclist anonfun errmsg list
+  with Sys_error _ -> ()
 
 let robot_exclude_arg s =
   try

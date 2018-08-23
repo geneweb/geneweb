@@ -40,11 +40,8 @@ let get_wday conf d =
   if jd <> -1 then " (" ^ transl_nth conf "(week day)" wday ^ ")" else ""
 
 let death_symbol conf =
-  match
-    try Some (List.assoc "death_symbol" conf.base_env) with Not_found -> None
-  with
-    Some x -> x
-  | None -> if !utf_8_db then "†" else "+"
+  try List.assoc "death_symbol" conf.base_env
+  with Not_found -> if !utf_8_db then "†" else "+"
 
 let before_date d d1 =
   if d1.year < d.year then true

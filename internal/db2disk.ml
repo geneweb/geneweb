@@ -106,20 +106,18 @@ let hashtbl_find_all dir file key =
         if compare k key = 0 then d :: find_in_bucket rest
         else find_in_bucket rest
   in
-  match
-    try Some (open_in_bin (Filename.concat dir file)) with Sys_error _ -> None
-  with
-    Some ic_ht ->
-      let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
-      let alen = input_binary_int ic_hta in
-      let pos = int_size + Hashtbl.hash key mod alen * int_size in
-      seek_in ic_hta pos;
-      let pos = input_binary_int ic_hta in
-      close_in ic_hta;
-      seek_in ic_ht pos;
-      let bl : (_, _) bucketlist = Iovalue.input ic_ht in
-      close_in ic_ht; find_in_bucket bl
-  | None -> []
+  try
+    let ic_ht = open_in_bin (Filename.concat dir file) in
+    let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
+    let alen = input_binary_int ic_hta in
+    let pos = int_size + Hashtbl.hash key mod alen * int_size in
+    seek_in ic_hta pos;
+    let pos = input_binary_int ic_hta in
+    close_in ic_hta;
+    seek_in ic_ht pos;
+    let bl : (_, _) bucketlist = Iovalue.input ic_ht in
+    close_in ic_ht; find_in_bucket bl
+  with Sys_error _ -> []
 
 let key_hashtbl_find dir file k = hashtbl_find dir file (Db2.key2_of_key k)
 
