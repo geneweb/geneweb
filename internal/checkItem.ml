@@ -492,10 +492,9 @@ let check_normal_marriage_date_for_someone base warning witn fam ip =
 (* ************************************************************************* *)
 let check_normal_marriage_date_for_witness base warning (ifam, fam) =
   let wl = foi base ifam in
-  List.iter
-    (fun ip ->
-       check_normal_marriage_date_for_someone base warning true fam ip)
-    (Array.to_list (get_witnesses wl))
+  Array.iter
+    (fun ip -> check_normal_marriage_date_for_someone base warning true fam ip)
+    (get_witnesses wl)
 
 
 (* ************************************************************************* *)
@@ -826,26 +825,24 @@ let check_children base warning (ifam, fam) =
   let cpl = fam in
   let des = fam in
   let after = sort_children2 base warning ifam des in
-  let _ =
-    List.fold_left
-      (fun np child ->
-         let child = poi base child in
-         check_pevents base warning child;
-         born_after_his_elder_sibling warning child np ifam des;
-         close_siblings warning child np ifam des;
-         child_born_after_his_parent base warning child
-           (get_father cpl);
-         child_born_after_his_parent base warning child
-           (get_mother cpl);
-         child_born_before_mother_death base warning child (get_mother cpl);
-         possible_father base warning child (get_father cpl);
-         child_has_sex warning child;
-         match Adef.od_of_codate (get_birth child) with
-           Some d -> Some (child, d)
-         | _ -> np)
-      None (Array.to_list after)
-  in
-  ()
+  ignore @@
+  Array.fold_left
+    (fun np child ->
+       let child = poi base child in
+       check_pevents base warning child;
+       born_after_his_elder_sibling warning child np ifam des;
+       close_siblings warning child np ifam des;
+       child_born_after_his_parent base warning child
+         (get_father cpl);
+       child_born_after_his_parent base warning child
+         (get_mother cpl);
+       child_born_before_mother_death base warning child (get_mother cpl);
+       possible_father base warning child (get_father cpl);
+       child_has_sex warning child;
+       match Adef.od_of_codate (get_birth child) with
+         Some d -> Some (child, d)
+       | _ -> np)
+    None after
 
 let has_family_sources fam =
   not

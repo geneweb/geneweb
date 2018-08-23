@@ -40,3 +40,11 @@ val input_lexicon :
   string -> (string, string) Hashtbl.t -> (unit -> in_channel) -> unit
 
 module StrSet : Set.S with type elt = string
+
+(** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
+    but it does not allocate an intermediate list.
+
+    The list is constructed backward,
+    so if [fn] have side effects it may not behave as excepted.
+ *)
+val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list

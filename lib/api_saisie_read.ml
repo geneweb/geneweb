@@ -482,8 +482,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
                       nb_fam))
                    (false, 0) (Array.to_list (get_family p))))
       | Spouse ->
-          let has_parents = get_parents p <> None in
-          has_parents || Array.length (get_family p) > 1
+          (get_parents p <> None) || Array.length (get_family p) > 1
     in
     {
       Mread.Person_tree.index = index;
@@ -655,15 +654,14 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       else ""
     in
     let has_parent = get_parents p <> None in
-    let has_spouse = Array.length (get_family p) >= 1
-    in
+    let has_spouse = Array.length (get_family p) >= 1 in
     let has_child =
-    (List.fold_left
+    (Array.fold_left
         (fun has_children ifam ->
           let fam = foi base ifam in
           let children = get_children fam in
           (has_children || Array.length children >= 1))
-        false (Array.to_list (get_family p)))
+        false (get_family p))
     in
     let gen_p = Util.string_gen_person base (gen_person_of_person p)
     in
@@ -746,11 +744,9 @@ let fam_to_piqi_family_link conf base ifath imoth sp ifam fam fam_link spouse_to
     | Separated -> (`separated, "", "", "", "", None, "")
   in
   let witnesses =
-    List.map
-      (fun ip ->
-        let p = poi base ip in
-        witness_to_piqi_callback conf base p base_prefix)
-      (Array.to_list gen_f.witnesses)
+    Mutil.array_to_list_map
+      (fun ip -> witness_to_piqi_callback conf base (poi base ip) base_prefix)
+      gen_f.witnesses
   in
   let notes =
     if m_auth && not conf.no_note then
@@ -846,14 +842,10 @@ let fill_events conf base p base_prefix p_auth pers_to_piqi_callback witness_con
           string_with_macros conf env s
         in
         let spouse =
-          match isp with
-          | Some ip ->
-              let sp = poi base ip in
-              Some (pers_to_piqi_callback conf base sp base_prefix)
-          | None -> None
+          Opt.map (fun ip -> pers_to_piqi_callback conf base (poi base ip) base_prefix) isp
         in
         let witnesses =
-          List.map
+          Mutil.array_to_list_map
             (fun (ip, wk) ->
                let witness_type =
                  match wk with
@@ -862,12 +854,10 @@ let fill_events conf base p base_prefix p_auth pers_to_piqi_callback witness_con
                  | Witness_Officer -> `witness_officer
                in
                let witness = poi base ip in
-               let witness =
-                 pers_to_piqi_callback conf base witness base_prefix
-               in
+               let witness = pers_to_piqi_callback conf base witness base_prefix in
                witness_constructor witness_type witness
                )
-            (Array.to_list w)
+            w
         in
           event_constructor name type_ date date_long date_raw date_conv date_conv_long date_cal place note src spouse witnesses
         )
@@ -1018,11 +1008,9 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
     | Separated -> (`separated, "", "", "", "", None, "")
   in
   let witnesses =
-    List.map
-      (fun ip ->
-        let p = poi base ip in
-        witnesses_to_piqi_callback conf base p base_prefix)
-      (Array.to_list gen_f.witnesses)
+    Mutil.array_to_list_map
+      (fun ip -> witnesses_to_piqi_callback conf base (poi base ip) base_prefix)
+      gen_f.witnesses
   in
   let notes =
     if m_auth && not conf.no_note then
@@ -1047,11 +1035,9 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
     else ""
   in
   let children =
-    List.map
-      (fun ip ->
-        let p = poi base ip in
-        child_to_piqi_callback conf base p base_prefix)
-      (Array.to_list (get_children fam))
+    Mutil.array_to_list_map
+      (fun ip -> child_to_piqi_callback conf base (poi base ip) base_prefix)
+      (get_children fam)
   in
   (* lien inter arbre *)
   let children_link =
@@ -1103,12 +1089,11 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
 (* ********************************************************************* *)
 let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_to_piqi_callback child_to_piqi_callback family_constructor =
   let families =
-      List.map
-      (
-       fun ifam ->
+    Mutil.array_to_list_map
+      (fun ifam ->
          get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witnesses_to_piqi_callback child_to_piqi_callback family_constructor
       )
-      (Array.to_list (get_family p))
+      (get_family p)
   in
   (* lien inter arbre *)
   let families_link =
@@ -1138,7 +1123,7 @@ let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_
            else (ifath, imoth, if ip = ifath then imoth else ifath)
          in
          let can_merge =
-           let fam = List.map (foi base) (Array.to_list (get_family p)) in
+           let fam = Mutil.array_to_list_map (foi base) (get_family p) in
            Perso_link.can_merge_family conf.command (get_key_index p) fam fam_link cpl
          in
          if can_merge then accu
@@ -2505,12 +2490,12 @@ let build_graph_desc conf base p max_gen =
                 Hashtbl.add ht (get_key_index p) true;
                 let ifam = get_family p in
                 let l =
-                  List.fold_left
+                  Array.fold_left
                     (fun accu ifam  ->
                       let fam = foi base ifam in
                       let sp = poi base (Gutil.spouse (get_key_index p) fam) in
                       let children =
-                        List.map (poi base) (Array.to_list (get_children fam))
+                        Mutil.array_to_list_map (poi base) (get_children fam)
                       in
                       nodes := (create_node sp ifam gen Spouse conf.command) :: !nodes;
                       edges := (create_edge p sp) :: !edges;
@@ -2574,7 +2559,7 @@ let build_graph_desc conf base p max_gen =
                           child_local @ child_distant
                         end
                       else accu)
-                    l (Array.to_list ifam)
+                    l ifam
                 in
                 let l_link =
                   let ip = get_key_index p in
@@ -2601,7 +2586,7 @@ let build_graph_desc conf base p max_gen =
                          else (ifath, imoth, if ip = ifath then imoth else ifath)
                        in
                        let can_merge =
-                         let fam = List.map (foi base) (Array.to_list (get_family p)) in
+                         let fam = Mutil.array_to_list_map (foi base) (get_family p) in
                          Perso_link.can_merge_family conf.command (get_key_index p) fam fam_link cpl
                        in
                        if can_merge then accu
@@ -2870,7 +2855,7 @@ let build_graph_desc_v2 conf base p max_gen =
             in
             let ifam = get_family p in
             let l =
-              List.fold_left
+              Array.fold_left
                 (fun accu ifam  ->
                   let fam = foi base ifam in
                   let sp = poi base (Gutil.spouse (get_key_index p) fam) in
@@ -2882,7 +2867,7 @@ let build_graph_desc_v2 conf base p max_gen =
                     with Not_found -> Hashtbl.add ht (get_key_index sp) 1; 1
                   in
                   let children =
-                    List.map (poi base) (Array.to_list (get_children fam))
+                    Mutil.array_to_list_map (poi base) (get_children fam)
                   in
                   nodes := create_node sp ifam gen Spouse conf.command sp_factor :: !nodes;
                   edges := create_edge factor conf.command p sp_factor conf.command sp :: !edges;
@@ -2995,7 +2980,7 @@ let build_graph_desc_v2 conf base p max_gen =
                       child_local
                     end
                   else accu)
-                l (Array.to_list ifam)
+                l ifam
             in
 
             (* lien inter arbre *)
@@ -3035,7 +3020,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                  else (ifath, imoth, if ip = ifath then imoth else ifath)
                                in
                                let can_merge =
-                                 let fam = List.map (foi base) (Array.to_list (get_family p)) in
+                                 let fam = Mutil.array_to_list_map (foi base) (get_family p) in
                                  Perso_link.can_merge_family conf.command (get_key_index p) fam fam_link cpl
                                in
                                if can_merge then accu
@@ -3160,7 +3145,7 @@ let print_result_graph_tree_v2 conf base ip =
     match get_parents p with
     | Some ifam ->
         let fam = foi base ifam in
-        List.fold_right
+        Array.fold_right
           (fun ic accu ->
             if ic = ip then accu
             else
@@ -3178,7 +3163,7 @@ let print_result_graph_tree_v2 conf base ip =
                 })
               in
               node :: accu)
-          (Array.to_list (get_children fam)) []
+          (get_children fam) []
     | None -> []
   in
   let (nodes_siblings_before, nodes_siblings_after) =
