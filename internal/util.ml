@@ -506,14 +506,11 @@ let hidden_env conf =
     (conf.henv @ conf.senv)
 
 let p_getenv env label =
-  try Some (decode_varenv (List.assoc (decode_varenv label) env)) with
-    Not_found -> None
+  Opt.map decode_varenv (List.assoc_opt (decode_varenv label) env)
 
 let p_getint env label =
-  match p_getenv env label with
-    Some s ->
-      (try Some (int_of_string (strip_spaces s)) with Failure _ -> None)
-  | None -> None
+  try Opt.map (fun s -> int_of_string (strip_spaces s)) (p_getenv env label)
+  with Failure _ -> None
 
 let nobtit conf base p =
   Gwdb.nobtit base conf.allowed_titles conf.denied_titles p
@@ -1342,24 +1339,24 @@ let get_request_string request =
 let url_no_index conf base =
   let scratch s = code_varenv (Name.lower (sou base s)) in
   let get_a_person v =
-    match try Some (int_of_string v) with Failure _ -> None with
-      Some i ->
-        if i >= 0 && i < nb_of_persons base then
-          let p = pget conf base (Adef.iper_of_int i) in
-          if is_hide_names conf p && not (authorized_age conf base p) ||
-             is_hidden p
-          then
-            None
-          else
-            let f = scratch (get_first_name p) in
-            let s = scratch (get_surname p) in
-            let oc = string_of_int (get_occ p) in Some (f, s, oc)
-        else None
-    | None -> None
+    try
+      let i = int_of_string v in
+      if i >= 0 && i < nb_of_persons base then
+        let p = pget conf base (Adef.iper_of_int i) in
+        if is_hide_names conf p && not (authorized_age conf base p) ||
+           is_hidden p
+        then
+          None
+        else
+          let f = scratch (get_first_name p) in
+          let s = scratch (get_surname p) in
+          let oc = string_of_int (get_occ p) in Some (f, s, oc)
+      else None
+    with Failure _ -> None
   in
   let get_a_family v =
-    match try Some (int_of_string v) with Failure _ -> None with
-      Some i ->
+    try
+      let i = int_of_string v in
         if i >= 0 && i < nb_of_families base then
           let fam = foi base (Adef.ifam_of_int i) in
           if is_deleted_family fam then None
@@ -1381,7 +1378,7 @@ let url_no_index conf base =
               in
               Some (f, s, oc, n)
         else None
-    | None -> None
+    with Failure _ -> None 
   in
   let env =
     let rec loop =
@@ -1435,13 +1432,11 @@ let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then
     let print_file fname =
       let fname = base_path ["etc"; conf.bname] (fname ^ ".txt") in
-      match try Some (Secure.open_in fname) with Sys_error _ -> None with
-        Some ic ->
-          begin try
-            while true do Wserver.printf "%c" (input_char ic) done
-          with End_of_file -> close_in ic
-          end
-      | None -> ()
+      try
+        let ic = Secure.open_in fname in
+        try while true do Wserver.printf "%c" (input_char ic) done
+        with End_of_file -> close_in ic
+      with Sys_error _ -> ()
     in
     print_file "mess_wizard";
     if conf.user <> "" then print_file ("mess_wizard_" ^ conf.user)
@@ -1574,15 +1569,17 @@ let allowed_tags_file = ref ""
 
 let good_tag_list_fun () =
   if !allowed_tags_file <> "" then
-    match try Some (open_in !allowed_tags_file) with Sys_error _ -> None with
-      Some ic ->
-        let rec loop tags =
-          match try Some (input_line ic) with End_of_file -> None with
-            Some tg -> loop (String.lowercase_ascii tg :: tags)
-          | None -> close_in ic; tags
-        in
-        loop []
-    | None -> default_good_tag_list
+    try
+      let ic = open_in !allowed_tags_file in
+      let rec loop tags =
+        match input_line ic with
+        | tg -> loop (String.lowercase_ascii tg :: tags)
+        | exception End_of_file ->
+          close_in ic;
+          tags
+      in
+      loop []
+    with Sys_error _ -> default_good_tag_list
   else default_good_tag_list
 
 let good_tags_list = Lazy.from_fun good_tag_list_fun
@@ -2408,20 +2405,20 @@ let jpeg_image_size ic =
   else None
 
 let image_size fname =
-  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-    Some ic ->
-      let r =
-        try
-          let sz = jpeg_image_size ic in
-          let sz =
-            if sz = None then begin seek_in ic 0; png_image_size ic end
-            else sz
-          in
-          if sz = None then begin seek_in ic 0; gif_image_size ic end else sz
-        with End_of_file -> None
-      in
-      close_in ic; r
-  | None -> None
+  try
+    let ic = Secure.open_in_bin fname in
+    let r =
+      try
+        let sz = jpeg_image_size ic in
+        let sz =
+          if sz = None then begin seek_in ic 0; png_image_size ic end
+          else sz
+        in
+        if sz = None then begin seek_in ic 0; gif_image_size ic end else sz
+      with End_of_file -> None
+    in
+    close_in ic; r
+  with Sys_error _ -> None
 
 let limited_image_size max_wid max_hei fname size =
   match if fname = "" then size else image_size fname with
@@ -2543,17 +2540,14 @@ let create_topological_sort conf base =
              else Filename.concat bfile "tstab"
            in
            let r =
-             match
-               try Some (Secure.open_in_bin tstab_file) with
-                 Sys_error _ -> None
-             with
-               Some ic ->
+             try
+               let ic = Secure.open_in_bin tstab_file in
                let r =
-                 try Some (Marshal.from_channel ic) with
-                   End_of_file | Failure _ -> None
+                 try Some (Marshal.from_channel ic)
+                 with End_of_file | Failure _ -> None
                in
                close_in ic; r
-             | None -> None
+             with Sys_error _ -> None
            in
            match r with
              Some tstab -> tstab
@@ -2564,15 +2558,12 @@ let create_topological_sort conf base =
              if conf.use_restrict && not conf.wizard && not conf.friend
              then
                base_visible_write base;
-             begin match
-                 begin try Some (Secure.open_out_bin tstab_file) with
-                     Sys_error _ -> None
-                 end
-               with
-                 Some oc ->
+             begin
+               try
+                 let oc = Secure.open_out_bin tstab_file in
                  Marshal.to_channel oc tstab [Marshal.No_sharing];
                  close_out oc
-               | None -> ()
+               with Sys_error _ -> ()
              end;
              tstab)
 
@@ -2917,9 +2908,10 @@ let cache_info conf =
 (* ************************************************************************ *)
 let read_cache_info conf =
   let fname = cache_info conf in
-  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-    Some ic -> let ht : cache_info_t = input_value ic in close_in ic; ht
-  | None -> ht_cache_info
+  try
+    let ic = Secure.open_in_bin fname in
+    let ht : cache_info_t = input_value ic in close_in ic; ht
+  with Sys_error _ -> ht_cache_info
 
 
 (* ************************************************************************ *)
@@ -2943,9 +2935,11 @@ let write_cache_info conf =
       ht_cache
   in
   let fname = cache_info conf in
-  match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
-    Some oc -> output_value oc ht_cache_info; close_out oc
-  | None -> ()
+  try
+    let oc = Secure.open_out_bin fname in
+    output_value oc ht_cache_info;
+    close_out oc
+  with Sys_error _ -> ()
 
 
 (* ************************************************************************ *)
@@ -2985,14 +2979,14 @@ let std_date conf =
     conf.today.day hour min sec
 
 let read_wf_trace fname =
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-    Some ic ->
-      let r = ref [] in
-      begin try while true do r := input_line ic :: !r done with
-        End_of_file -> close_in ic
-      end;
-      List.rev !r
-  | None -> []
+  try
+    let ic = Secure.open_in fname in
+    let rec loop acc =
+      match input_line ic with
+      | line -> loop (line :: acc)
+      | exception End_of_file -> close_in ic ; List.rev acc
+    in loop []
+  with Sys_error _ -> []
 
 let write_wf_trace fname wt =
   let oc = Secure.open_out fname in
@@ -3055,38 +3049,32 @@ type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
 let read_gen_auth_file fname =
   let fname = base_path [] fname in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-    Some ic ->
-      let rec loop data =
-        match try Some (input_line ic) with End_of_file -> None with
-          Some line ->
-            let len = String.length line in
-            let data =
-              match
-                try Some (String.index line ':') with Not_found -> None
-              with
-                Some i ->
-                  let user = String.sub line 0 i in
-                  let j =
-                    try String.index_from line (i + 1) ':' with
-                      Not_found -> len
-                  in
-                  let passwd = String.sub line (i + 1) (j - i - 1) in
-                  let rest =
-                    if j = len then ""
-                    else String.sub line (j + 1) (len - j - 1)
-                  in
-                  let au =
-                    {au_user = user; au_passwd = passwd; au_info = rest}
-                  in
-                  au :: data
-              | None -> data
+  try
+    let ic = Secure.open_in fname in
+    let rec loop data =
+      match input_line ic with
+      | line ->
+        let len = String.length line in
+        let data =
+          match String.index_opt line ':' with
+          | Some i ->
+            let user = String.sub line 0 i in
+            let j = try String.index_from line (i + 1) ':' with Not_found -> len in
+            let passwd = String.sub line (i + 1) (j - i - 1) in
+            let rest =
+              if j = len then ""
+              else String.sub line (j + 1) (len - j - 1)
             in
-            loop data
-        | None -> close_in ic; List.rev data
-      in
-      loop []
-  | None -> []
+            let au = {au_user = user; au_passwd = passwd; au_info = rest} in
+            au :: data
+          | None -> data
+        in
+        loop data
+      | exception End_of_file ->
+        close_in ic ; List.rev data
+    in
+    loop []
+  with Sys_error _ -> []
 
 let start_equiv_with case_sens s m i =
   let rec test i j =
@@ -3499,9 +3487,12 @@ let cache_visited conf =
 (* ************************************************************************ *)
 let read_visited conf =
   let fname = cache_visited conf in
-  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-    Some ic -> let ht : cache_visited_t = input_value ic in close_in ic; ht
-  | None -> Hashtbl.create 1
+  try
+    let ic = Secure.open_in_bin fname in
+    let ht : cache_visited_t = input_value ic in
+    close_in ic;
+    ht
+  with Sys_error _ -> Hashtbl.create 1
 
 
 (* ************************************************************************ *)
@@ -3515,9 +3506,11 @@ let read_visited conf =
 (* ************************************************************************ *)
 let write_visited conf ht =
   let fname = cache_visited conf in
-  match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
-    Some oc -> output_value oc ht; close_out oc
-  | None -> ()
+  try
+    let oc = Secure.open_out_bin fname in
+    output_value oc ht;
+    close_out oc
+  with Sys_error _ -> ()
 
 
 (* ************************************************************************ *)

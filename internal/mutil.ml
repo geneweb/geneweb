@@ -147,20 +147,20 @@ let name_key s =
   Name.lower s
 
 let input_particles fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
-    Some ic ->
-      let rec loop list len =
-        match try Some (input_char ic) with End_of_file -> None with
-          Some '_' -> loop list (Buff.store len ' ')
-        | Some '\n' -> loop (if len = 0 then list else Buff.get len :: list) 0
-        | Some '\r' -> loop list len
-        | Some c -> loop list (Buff.store len c)
-        | None ->
-            close_in ic;
-            List.rev (if len = 0 then list else Buff.get len :: list)
-      in
-      loop [] 0
-  | None -> []
+  try
+    let ic = open_in fname in
+    let rec loop list len =
+      match input_char ic with
+      | '_' -> loop list (Buff.store len ' ')
+      | '\n' -> loop (if len = 0 then list else Buff.get len :: list) 0
+      | '\r' -> loop list len
+      | c -> loop list (Buff.store len c)
+      | exception End_of_file ->
+        close_in ic;
+        List.rev (if len = 0 then list else Buff.get len :: list)
+    in
+    loop [] 0
+  with Sys_error _ -> []
 
 let saints = ["saint"; "sainte"]
 

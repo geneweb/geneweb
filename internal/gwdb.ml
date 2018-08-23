@@ -19,7 +19,7 @@ let milazy_force f a (get, set) p =
     Some v -> v
   | None -> let v = f a in set p (Some v); v
 
-let ht_find ht i = try Some (Hashtbl.find ht i) with Not_found -> None
+let ht_find ht i = Hashtbl.find_opt ht i
 
 let no_person empty_string ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
@@ -1355,9 +1355,12 @@ let base2 db2 =
      base_notes_origin_file =
        (fun () ->
           let fname = Filename.concat db2.bdir2 "notes_of.txt" in
-          match try Some (Secure.open_in fname) with Sys_error _ -> None with
-            Some ic -> let r = input_line ic in close_in ic; r
-          | None -> "");
+          try
+            let ic = Secure.open_in fname in
+            let r = input_line ic in
+            close_in ic;
+            r
+          with Sys_error _ -> "");
      base_notes_dir = (fun () -> Filename.concat "base_d" "notes_d");
      base_wiznotes_dir = (fun () -> Filename.concat "base_d" "wiznotes_d");
      nobtit = (fun conf p -> C_base.nobtit self conf p);

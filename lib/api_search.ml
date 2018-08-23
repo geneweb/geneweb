@@ -76,6 +76,7 @@ let name_key_compatible base s =
   if !Mutil.utf_8_db then new_name_key base s else Mutil.name_key s
 
 
+(* FIXME: DUPLICATE OF ALLN.SELECT ??? *)
 (* ************************************************************************** *)
 (*  [Fonc] get_list_of_select_start_with :
     config -> base -> bool -> string -> bool -> name -> letter                *)
@@ -103,13 +104,9 @@ let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
         (* Sinon, on parcourt un tableau de prénoms *)
         persons_of_first_name base
     in
-    match
+    try
       (* Itère sur chaque entrée du tableau qui commence par la lettre letter *)
-      try Some (spi_first name letter) with
-        (* Retourne None si rien trouvé, qui deviendra une sortie [] lors du with *)
-        Not_found -> None
-    with
-     | Some istr ->
+      let istr = spi_first name letter in
         let rec loop istr list =
           let s = Mutil.nominative (sou base istr) in
           let k = name_key_compatible base s in
@@ -167,24 +164,16 @@ let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
                 (* Sort totalement de l'itération puisque les personnes ne sont plus définies *)
                 else list
               in
-              match
-                (* Passe à la personne suivante *)
-                try Some (spi_next name istr need_whole_list) with
-                  Not_found -> None
-              with
-               | Some (istr, _) -> loop istr list
-               | None -> list
+              match spi_next name istr need_whole_list with
+              | (istr, _) -> loop istr list
+              | exception Not_found -> list
             else
-              match
-                (* Passe à la personne suivante *)
-                try Some (spi_next name istr need_whole_list) with
-                  Not_found -> None
-              with
-               | Some (istr, _) -> loop istr list
-               | None -> list
+              match spi_next name istr need_whole_list with
+              | (istr, _) -> loop istr list
+              | exception Not_found -> list
         (* Première itération, on initialise au passage list comme tableau vide *)
         in loop istr []
-    | None -> []
+    with Not_found -> []
 
 (* ************************************************************************** *)
 (*  [Fonc] select_start_with :
@@ -565,11 +554,8 @@ let select_start_with_auto_complete base mode max_res ini =
       in
       let start_k = Mutil.tr '_' ' ' ini in
       let letter = String.uppercase_ascii (String.sub start_k 0 1) in
-      match
-        try Some (spi_first name letter) with
-          Not_found -> None
-      with
-      | Some istr ->
+      match spi_first name letter with
+      | istr ->
           let rec loop istr =
             let s = sou base istr in
             let k = name_key_compatible base s in
@@ -577,26 +563,18 @@ let select_start_with_auto_complete base mode max_res ini =
               begin
                 string_set := StrSetAutoComplete.add s !string_set;
                 incr nb_res;
-                match
-                  try Some (spi_next name istr need_whole_list) with
-                   Not_found -> None
-                with
-                 | Some (istr, _) ->
-                     if !nb_res < max_res && (String.sub k 0 1) = letter then loop istr
-                     else ()
-                 | None -> ()
+                match spi_next name istr need_whole_list with
+                | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+                | _ -> ()
+                | exception Not_found -> ()
               end
             else
-              match
-                try Some (spi_next name istr need_whole_list) with
-                  Not_found -> None
-              with
-              | Some (istr, _) ->
-                  if !nb_res < max_res && (String.sub k 0 1) = letter then loop istr
-                  else ()
-              | None -> ()
+              match spi_next name istr need_whole_list with
+              | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+              | _ -> ()
+              | exception Not_found -> ()
           in loop istr
-      | None -> ();
+      | exception Not_found -> ();
       (* minuscule *)
       if !nb_res < max_res then
         let ini =
@@ -608,11 +586,8 @@ let select_start_with_auto_complete base mode max_res ini =
         in
         let start_k = Mutil.tr '_' ' ' ini in
         let letter = String.lowercase_ascii (String.sub start_k 0 1) in
-        match
-          try Some (spi_first name letter) with
-            Not_found -> None
-        with
-        | Some istr ->
+        match spi_first name letter with
+        | istr ->
             let rec loop istr =
               let s = sou base istr in
               let k = name_key_compatible base s in
@@ -620,38 +595,27 @@ let select_start_with_auto_complete base mode max_res ini =
                 begin
                   string_set := StrSetAutoComplete.add s !string_set;
                   incr nb_res;
-                  match
-                    try Some (spi_next name istr need_whole_list) with
-                      Not_found -> None
-                  with
-                  | Some (istr, _) ->
-                      if !nb_res < max_res && (String.sub k 0 1) = letter then loop istr
-                      else ()
-                  | None -> ()
+                  match spi_next name istr need_whole_list with
+                  | exception Not_found -> ()
+                  | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+                  | _ -> ()
                 end
               else
-                match
-                  try Some (spi_next name istr need_whole_list) with
-                    Not_found -> None
-                with
-                | Some (istr, _) ->
-                    if !nb_res < max_res && (String.sub k 0 1) = letter then loop istr
-                    else ()
-                | None -> ()
+                match spi_next name istr need_whole_list with
+                | exception Not_found -> ()
+                | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+                | _ -> ()
             in loop istr
-        | None -> ()
-      else ()
+        | exception Not_found -> ()
     end
   else
     begin
       (* On commence à ? comme ça on fait MAJ et MIN. *)
       let start_k = Mutil.tr '_' ' ' "?" in
       let letter = String.uppercase_ascii (String.sub start_k 0 1) in
-      match
-        try Some (spi_first name letter) with
-          Not_found -> None
-      with
-      | Some istr ->
+      match spi_first name letter with
+      | exception Not_found -> ()
+      | istr ->
           let rec loop istr list =
             let s = sou base istr in
             let k = name_key_compatible base s in
@@ -659,26 +623,17 @@ let select_start_with_auto_complete base mode max_res ini =
               begin
                 string_set := StrSetAutoComplete.add (sou base istr) !string_set;
                 incr nb_res;
-                match
-                  try Some (spi_next name istr need_whole_list) with
-                    Not_found -> None
-                with
-                | Some (istr, _) ->
-                    if !nb_res < max_res then loop istr list
-                    else ()
-                | None -> ()
+                match spi_next name istr need_whole_list with
+                | exception Not_found -> ()
+                | (istr, _) when !nb_res < max_res -> loop istr list
+                | _ -> ()
               end
             else
-              match
-                try Some (spi_next name istr need_whole_list) with
-                  Not_found -> None
-              with
-              | Some (istr, _) ->
-                  if !nb_res < max_res then loop istr list
-                  else ()
-              | None -> ()
+              match spi_next name istr need_whole_list with
+              | exception Not_found -> ()
+              | (istr, _) when !nb_res < max_res -> loop istr list
+              | _ -> ()
           in loop istr []
-      | None -> ()
     end;
   List.sort Gutil.alphabetic_order (StrSetAutoComplete.elements !string_set)
 
@@ -715,28 +670,23 @@ let select_all_auto_complete _ base get_field max_res ini =
 
 let load_dico_lieu conf pl_mode =
   let fname =
-  match pl_mode with
-  | `town -> "dico_place_town_" ^ conf.lang ^ ".list"
-  | `area_code -> "dico_place_area_code_" ^ conf.lang ^ ".list"
-  | `county -> "dico_place_county_" ^ conf.lang ^ ".list"
-  | `region -> "dico_place_region_" ^ conf.lang ^ ".list"
-  | `country -> "dico_place_country_" ^ conf.lang ^ ".list"
-  | _ -> ""
+    match pl_mode with
+    | `town -> "dico_place_town_" ^ conf.lang ^ ".list"
+    | `area_code -> "dico_place_area_code_" ^ conf.lang ^ ".list"
+    | `county -> "dico_place_county_" ^ conf.lang ^ ".list"
+    | `region -> "dico_place_region_" ^ conf.lang ^ ".list"
+    | `country -> "dico_place_country_" ^ conf.lang ^ ".list"
+    | _ -> ""
   in
   if fname = "" then []
   else
     let fname = Filename.concat "lang" fname in
-    match
-      try Some (Secure.open_in (Util.search_in_lang_path fname))
-      with Sys_error _ -> None
-    with
-    | Some ic ->
-        begin
-          let list : (string list) = input_value ic in
-          close_in ic;
-          list
-        end
-    | None -> []
+    try
+      let ic = Secure.open_in (Util.search_in_lang_path fname) in
+      let list : (string list) = input_value ic in
+      close_in ic;
+      list
+    with Sys_error _ -> []
 
 
 let get_field mode =
