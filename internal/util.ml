@@ -939,22 +939,13 @@ let update_family_loop conf base p s =
   if conf.cancel_links || is_hidden p then s
   else
     let iper = get_key_index p in
-    let list = Array.to_list (get_family p) in
-    let list = List.map (fun ifam -> ifam, foi base ifam) list in
-    let list =
-      List.map (fun (ifam, fam) -> ifam, Array.to_list (get_children fam))
-        list
+    let list = get_family p in
+    let list = Array.map (fun ifam -> ifam, get_children (foi base ifam)) list in
+    let res =
+      Array.fold_left
+        (fun acc (ifam, children) -> if Array.mem iper children then ifam :: acc else acc)
+        [] list
     in
-    (* [Fonc] : 'a list -> (ifam, iper list) list -> ifam list *)
-    let rec loop accu l =
-      match l with
-        [] -> accu
-      | (ifam, children) :: l ->
-          if List.exists (fun c -> iper = c) children then
-            loop (ifam :: accu) l
-          else loop accu l
-    in
-    let res = loop [] list in
     if conf.wizard then
       if List.length res = 1 then
         let iper = string_of_int (Adef.int_of_iper iper) in
