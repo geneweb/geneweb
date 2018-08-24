@@ -141,93 +141,7 @@ let index_of_string strings ic start_pos hash_len string_patches s =
           flush stderr;
           failwith "database access"
 
-let rec list_remove_elemq x =
-  function
-    y :: l -> if x = y then l else y :: list_remove_elemq x l
-  | [] -> []
-
-(* compatibility with databases created with versions <= 4.09 *)
-(* should be removed after some time (when all databases will have
-   been rebuilt with version >= 4.10 *)
-let old_persons_of_first_name_or_surname base_data strings params =
-  let (ic2, start_pos, proj, person_patches, _, _, _) = params in
-  let module IstrTree =
-    Btree.Make
-      (struct type t = dsk_istr let compare = compare_istr_fun base_data end)
-  in
-  let bt =
-    let btr = ref None in
-    let completed = ref false in
-    let update_bt gistro bt =
-      let bt = ref bt in
-      Hashtbl.iter
-        (fun i p ->
-           let istr = proj p in
-           if gistro <> None && gistro <> Some istr then ()
-           else
-             let ipera = try IstrTree.find istr !bt with Not_found -> [] in
-             if List.mem (Adef.iper_of_int i) ipera then ()
-             else bt := IstrTree.add istr (Adef.iper_of_int i :: ipera) !bt)
-        person_patches;
-      if gistro = None then completed := true;
-      !bt
-    in
-    fun gistro ->
-      match !btr with
-        Some bt ->
-          if !completed then bt
-          else let bt = update_bt gistro bt in btr := Some bt; bt
-      | None ->
-          match ic2, start_pos with
-            Some ic2, Some start_pos ->
-              seek_in ic2 start_pos;
-              (*
-              let ab1 = Gc.allocated_bytes () in
-              *)
-              let bt : iper list IstrTree.t = input_value ic2 in
-              (*
-              let ab2 = Gc.allocated_bytes () in
-              *)
-              let bt = update_bt gistro bt in
-              btr := Some bt;
-              (*
-              Printf.eprintf "*** old database created by version <= 4.09\n"; flush stderr;
-              Printf.eprintf "*** using index allocating here %.0f bytes\n"
-                (ab2 -. ab1);
-              flush stderr;
-              *)
-              bt
-          | _ ->
-              Printf.eprintf "Sorry, I really need strings.inx.\n";
-              flush stderr;
-              failwith "database access"
-  in
-  let compare = compare_istr_fun base_data in
-  let check_patches istr ipl =
-    let ipl = ref ipl in
-    Hashtbl.iter
-      (fun i p ->
-         if List.mem (Adef.iper_of_int i) !ipl then
-           if compare istr p.first_name = 0 || compare istr p.surname = 0 then
-             ()
-           else ipl := list_remove_elemq (Adef.iper_of_int i) !ipl)
-      person_patches;
-    !ipl
-  in
-  let find istr =
-    try check_patches istr (IstrTree.find istr (bt (Some istr))) with
-      Not_found -> []
-  in
-  let cursor str =
-    IstrTree.key_after
-      (fun key ->
-         compare_names base_data str (strings.get (Adef.int_of_istr key)))
-      (bt None)
-  in
-  let next key = IstrTree.next key (bt None) in
-  {find = find; cursor = cursor; next = next}
-
-let new_persons_of_first_name_or_surname base_data strings params =
+let persons_of_first_name_or_surname base_data strings params =
   let (_, _, proj, person_patches, names_inx, names_dat, bname) = params in
   let module IstrTree =
     Btree.Make
@@ -306,12 +220,6 @@ let new_persons_of_first_name_or_surname base_data strings params =
   in
   let next key = IstrTree.next key (bt_patched ()) in
   {find = find; cursor = cursor; next = next}
-
-let persons_of_first_name_or_surname base_data strings params =
-  let (_, _, _, _, names_inx, _, bname) = params in
-  if Sys.file_exists (Filename.concat bname names_inx) then
-    new_persons_of_first_name_or_surname base_data strings params
-  else old_persons_of_first_name_or_surname base_data strings params
 
 (* Search index for a given name in file names.inx *)
 
