@@ -184,9 +184,10 @@ let surnames_pieces surname =
 
 let tr c1 c2 s =
   match String.rindex_opt s c1 with
-    Some _ ->
-      let convert_char i = if s.[i] = c1 then c2 else s.[i] in
-      String.init (String.length s) convert_char
+  | Some _ ->
+    String.init
+      (String.length s)
+      (fun i -> if String.unsafe_get s i = c1 then c2 else s.[i])
   | None -> s
 
 let utf_8_of_iso_8859_1 str =
