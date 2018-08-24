@@ -12,12 +12,18 @@ let default_max_cnt = 2000
 (* tools *)
 
 let string_start_with ini s =
+  let l1 = String.length ini in
+  let l2 = String.length s in
   let rec loop i1 i2 =
-    if i1 = String.length ini then true
-    else if i2 = String.length s then
-      if ini.[i1] = '_' then loop (i1 + 1) i2 else false
-    else if s.[i2] = ini.[i1] || s.[i2] = ' ' && ini.[i1] = '_' then
-      loop (i1 + 1) (i2 + 1)
+    if i1 = l1 then true
+    else if i2 = l2
+    then
+      if String.unsafe_get ini i1 = '_'
+      then loop (i1 + 1) i2 else false
+    else if String.unsafe_get s i2 = String.unsafe_get ini i1
+         || String.unsafe_get s i2 = ' '
+            && String.unsafe_get ini i1 = '_'
+    then loop (i1 + 1) (i2 + 1)
     else false
   in
   loop 0 0
@@ -297,6 +303,10 @@ let select_names conf base is_surnames ini need_whole_list =
     if is_surnames then persons_of_surname base
     else persons_of_first_name base
   in
+  let get_name =
+    if is_surnames then get_surname
+    else get_first_name
+  in
   let (list, len) =
     let start_k = Mutil.tr '_' ' ' ini in
     try
@@ -313,10 +323,7 @@ let select_names conf base is_surnames ini need_whole_list =
                     (fun l ip ->
                        if is_patched_person base ip then
                          let p = poi base ip in
-                         let isn =
-                           if is_surnames then get_surname p
-                           else get_first_name p
-                         in
+                         let isn = get_name p in
                          if eq_istr isn istr then ip :: l else l
                        else ip :: l)
                     [] my_list
@@ -339,10 +346,9 @@ let select_names conf base is_surnames ini need_whole_list =
                   | [] -> [k, s, cnt], len
               else list, len
             in
-            try
-              let (istr, dlen) = spi_next iii istr need_whole_list in
-              loop istr (len + dlen) list
-            with Not_found -> list, len
+            match spi_next iii istr need_whole_list with
+            | (istr, dlen) -> loop istr (len + dlen) list
+            | exception Not_found -> list, len
           else list, len
         in
         loop istr 0 []
@@ -359,7 +365,7 @@ let select_names conf base is_surnames ini need_whole_list =
          if cnt >= lim then (k, s, cnt) :: list, len else list, len - 1)
       ([], len) list
   in
-  list, (if !(Mutil.utf_8_db) then false else true), len
+  list, not !Mutil.utf_8_db, len
 
 let compare2 s1 s2 =
   if !(Mutil.utf_8_db) then Gutil.alphabetic_utf_8 s1 s2 else compare s1 s2

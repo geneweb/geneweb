@@ -277,9 +277,8 @@ let new_persons_of_first_name_or_surname base_data strings params =
     Hashtbl.iter
       (fun i p ->
          let istr1 = proj p in
-         if istr1 <> istr then ()
-         else if List.mem (Adef.iper_of_int i) !ipera then ()
-         else ipera := Adef.iper_of_int i :: !ipera)
+         if istr1 = istr && not (List.mem (Adef.iper_of_int i) !ipera)
+         then ipera := Adef.iper_of_int i :: !ipera)
       person_patches;
     !ipera
   in
