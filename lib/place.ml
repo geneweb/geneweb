@@ -80,13 +80,7 @@ let get_all conf base =
         let pl_bp = get_baptism_place p in
         let pl_de = get_death_place p in
         let pl_bu = get_burial_place p in
-        if (not add_birth || is_empty_string pl_bi) &&
-           (not add_baptism || is_empty_string pl_bp) &&
-           (not add_death || is_empty_string pl_de) &&
-           (not add_burial || is_empty_string pl_bu)
-        then
-          ()
-        else if authorized_age conf base p then
+         if authorized_age conf base p then
           begin
             if add_birth && not (is_empty_string pl_bi) then ht_add pl_bi p;
             if add_baptism && not (is_empty_string pl_bp) then ht_add pl_bp p;
