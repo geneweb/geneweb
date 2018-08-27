@@ -6,167 +6,158 @@ open Gwdb
 open Hutil
 open Util
 
-
-let fold_place inverted s =
+let normalize =
   (* petit hack en attendant une vraie gestion des lieux transforme
      "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)" *)
-  let s =
-    Str.global_replace (Str.regexp "^\\[\\([^]]+\\)\\] *- *\\(.*\\)") "\\1, \\2" s
-  in
+  let r = Str.regexp "^\\[\\([^]]+\\)\\] *- *\\(.*\\)" in
+  fun s -> Str.global_replace r "\\1, \\2" s
+
+(* [String.length s > 0] is always true because we already tested [is_empty_string].
+   If it is not true, then the base should be cleaned. *)
+let fold_place_long inverted s =
+  let len = String.length s in
+  (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
   let rec loop iend list i ibeg =
-    if i = iend then
-      if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
+    if i = iend
+    then if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
     else
       let (list, ibeg) =
-        match s.[i] with
-          ',' ->
-            let list =
-              if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
-            in
-            list, i + 1
-        | ' ' -> if i = ibeg then list, i + 1 else list, ibeg
+        match String.unsafe_get s i with
+        | ',' ->
+          let list =
+            if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
+          in
+          list, i + 1
+        | ' ' when i = ibeg -> (list, i + 1)
         | _ -> list, ibeg
       in
       loop iend list (i + 1) ibeg
   in
   let (iend, rest) =
-    if String.length s > 0 && s.[String.length s - 1] = ')' then
-      match String.rindex_opt s '(' with
-        Some i when i < String.length s - 2 ->
-          let j =
-            let rec loop i =
-              if i >= 0 && s.[i] = ' ' then loop (i - 1) else i + 1
-            in
-            loop (i - 1)
+    if String.unsafe_get s (len - 1) = ')'
+    then match String.rindex_opt s '(' with
+      | Some i when i < len - 2 ->
+        let j =
+          let rec loop i =
+            if i >= 0 && String.unsafe_get s i = ' ' then loop (i - 1) else i + 1
           in
-          j, [String.sub s (i + 1) (String.length s - i - 2)]
-      | _ -> String.length s, []
-    else String.length s, []
+          loop (i - 1)
+        in
+        j, [ String.sub s (i + 1) (len - i - 2) ]
+      | _ -> len, []
+    else len, []
   in
-  let list = rest @ loop iend [] 0 0 in
+  let list = List.rev_append rest @@ loop iend [] 0 0 in
   if inverted then List.rev list else list
 
-let get_all conf base =
-  let add_birth = p_getenv conf.env "bi" = Some "on" in
-  let add_baptism = p_getenv conf.env "bp" = Some "on" in
-  let add_death = p_getenv conf.env "de" = Some "on" in
-  let add_burial = p_getenv conf.env "bu" = Some "on" in
+let fold_place_short s =
+  let len = String.length s in
+  let default () =
+    let i =
+      match String.rindex_opt s ',' with
+      | Some i ->
+        let rec l i = if i < len && String.unsafe_get s i = ' ' then l (i + 1) else i in l (i + 1)
+      | None -> 0
+    in
+    let i = if i = len then 0 else i in
+    String.sub s i (len - i)
+  in
+  if String.unsafe_get s (len - 1) = ')'
+  then match String.rindex_opt s '(' with
+    | Some i when i < len - 2 ->
+      String.sub s (i + 1) (len - i - 2)
+    | _ -> default ()
+  else default ()
+
+let get_all =
+  fun conf base ~add_birth ~add_baptism ~add_death ~add_burial
+    (dummy_key : 'a)
+    (dummy_value : 'c)
+    (fold_place : string -> 'a)
+    (filter : 'a -> bool)
+    (mk_value : 'b option -> person -> 'b)
+    (foo : 'b -> 'c) :
+    ('a * 'c) array ->
   let add_marriage = p_getenv conf.env "ma" = Some "on" in
-  let inverted =
-    try List.assoc "places_inverted" conf.base_env = "yes" with
-      Not_found -> false
-  in
-  let ini =
-    match p_getenv conf.env "k" with
-      Some s -> s
-    | None -> ""
-  in
-  let ht = Hashtbl.create 5003 in
+  let ht_size = 2048 in (* FIXME: find the good heuristic *)
+  let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
   let ht_add istr p =
-    let (cnt, _) =
-      try Hashtbl.find ht (istr, get_surname p) with
-        Not_found ->
-          let cnt = ref 0, get_key_index p in
-          Hashtbl.add ht (istr, get_surname p) cnt; cnt
-    in
-    incr cnt
+    let key : 'a = sou base istr |> normalize |> fold_place in
+    if filter key then
+      match Hashtbl.find_opt ht key with
+      | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
+      | None -> Hashtbl.add ht key (mk_value None p)
   in
-  if add_birth || add_death || add_baptism || add_burial then
-    begin let rec loop i =
-      if i = nb_of_persons base then ()
-      else
+  if add_birth || add_death || add_baptism || add_burial then begin
+    let len = nb_of_persons base in
+    let aux b fn p =
+      if b then let x = fn p in if not (is_empty_string x) then ht_add x p
+    in
+    let rec loop i =
+      if i < len then begin
         let p = pget conf base (Adef.iper_of_int i) in
-        let pl_bi = get_birth_place p in
-        let pl_bp = get_baptism_place p in
-        let pl_de = get_death_place p in
-        let pl_bu = get_burial_place p in
-         if authorized_age conf base p then
-          begin
-            if add_birth && not (is_empty_string pl_bi) then ht_add pl_bi p;
-            if add_baptism && not (is_empty_string pl_bp) then ht_add pl_bp p;
-            if add_death && not (is_empty_string pl_de) then ht_add pl_de p;
-            if add_burial && not (is_empty_string pl_bu) then ht_add pl_bu p
-          end;
+        if authorized_age conf base p then begin
+          aux add_birth get_birth_place p ;
+          aux add_baptism get_baptism_place p ;
+          aux add_death get_death_place p ;
+          aux add_burial get_burial_place p ;
+        end ;
         loop (i + 1)
+      end
     in
-      loop 0
-    end;
-  if add_marriage then
-    begin let rec loop i =
-      if i = nb_of_families base then ()
-      else
+    loop 0 ;
+  end ;
+  if add_marriage then begin
+    let rec loop i =
+      let len = nb_of_families base in
+      if i < len then begin
         let fam = foi base (Adef.ifam_of_int i) in
-        if is_deleted_family fam then ()
-        else
-          begin let pl_ma = get_marriage_place fam in
-            if not (is_empty_string pl_ma) then
-              let fath = pget conf base (get_father fam) in
-              let moth = pget conf base (get_mother fam) in
-              if authorized_age conf base fath &&
-                 authorized_age conf base moth
-              then
-                begin ht_add pl_ma fath; ht_add pl_ma moth end
-          end;
-        loop (i + 1)
+        if not @@ is_deleted_family fam then begin
+          let pl_ma = get_marriage_place fam in
+          if not (is_empty_string pl_ma) then
+            let fath = pget conf base (get_father fam) in
+            let moth = pget conf base (get_mother fam) in
+            if authorized_age conf base fath
+            && authorized_age conf base moth
+            then begin
+              ht_add pl_ma fath ;
+              ht_add pl_ma moth
+            end
+        end ;
+        loop (i + 1) ;
+      end
     in
-      loop 0
-    end;
-  let list = ref [] in
-  let len = ref 0 in
+    loop 0 ;
+  end ;
+  let len = Hashtbl.length ht in
+  let array = Array.make len (dummy_key, dummy_value) in
+  let i = ref 0 in
   Hashtbl.iter
-    (fun (istr_pl, _) (cnt, ip) ->
-       let s = Util.string_with_macros conf [] (sou base istr_pl) in
-       let s = fold_place inverted s in
-       if s <> [] && (ini = "" || List.hd s = ini) then
-         begin list := (s, !cnt, ip) :: !list; incr len end)
-    ht;
-  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) !list in
-  list, !len
+    (fun k v ->
+       Array.unsafe_set array !i (k, foo v) ;
+       incr i)
+    ht ;
+  array
 
-let max_len = ref 2000
-
-let print_html_places_surnames conf base list =
+let print_html_places_surnames conf base (array : (string list * (string * Adef.iper list) list) array) =
+  let list = Array.to_list array in
   let link_to_ind =
     match p_getenv conf.base_env "place_surname_link_to_ind" with
       Some "yes" -> true
     | _ -> false
   in
-  let print_sn len p sn sep =
-    Wserver.printf "%s<a href=\"%s" sep (commd conf);
-    if link_to_ind then Wserver.printf "%s" (acces conf base p)
+  let print_sn (sn, ips) =
+    let len = List.length ips in
+    Wserver.printf "<a href=\"%s" (commd conf);
+    if link_to_ind && len = 1
+    then Wserver.printf "%s" (acces conf base @@ pget conf base @@ List.hd ips)
     else Wserver.printf "m=N;v=%s" (code_varenv sn);
     Wserver.printf "\">%s</a> (%d)" sn len
   in
-  let print_sn_list snl =
-    let snl =
-      List.map
-        (fun (len, ip) ->
-           let p = pget conf base ip in
-           let sn = p_surname base p in len, p, sn)
-        snl
-    in
-    let snl =
-      List.sort
-        (fun (_, _, sn1) (_, _, sn2) -> Gutil.alphabetic_order sn1 sn2) snl
-    in
-    let snl =
-      List.fold_right
-        (fun (len, p, sn) ->
-           function
-             (len1, p1, sn1) :: snl ->
-               if sn = sn1 then (len + len1, p, sn) :: snl
-               else (len, p, sn) :: (len1, p1, sn1) :: snl
-           | [] -> [len, p, sn])
-        snl []
-    in
-    let (len, p, sn, snl) =
-      match snl with
-        (len, p, sn) :: snl -> len, p, sn, snl
-      | _ -> assert false
-    in
+  let print_sn_list (snl : (string * Adef.iper list) list) =
+    let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
     Wserver.printf "<li>\n";
-    print_sn len p sn "";
-    List.iter (fun (len, p, sn) -> print_sn len p sn ",\n") snl;
+    Mutil.list_iter_first (fun first -> if not first then Wserver.printf ",\n" ; print_sn) snl ;
     Wserver.printf "\n";
     Wserver.printf "</li>\n"
   in
@@ -186,28 +177,28 @@ let print_html_places_surnames conf base list =
                 end
           | _ -> assert false
         in
-        loop1 prev pl; print_sn_list snl; loop pl list
+        loop1 prev pl;
+        print_sn_list snl;
+        loop pl list
     | [] -> List.iter (fun _ -> Wserver.printf "</ul></li>\n") prev
   in
-  Wserver.printf "<ul>\n"; loop [] list; Wserver.printf "</ul>\n"
+  Wserver.printf "<ul>\n";
+  loop [] list;
+  Wserver.printf "</ul>\n"
 
-let print_all_places_surnames_short conf list =
+let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death ~add_burial =
+  let array =
+    get_all
+      conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      "" 0
+      fold_place_short
+      (fun _ -> true)
+      (fun prev _ -> match prev with Some n -> n + 1 | None -> 1)
+      (fun x -> x)
+  in
   let title _ = Wserver.printf "%s" (capitale (transl conf "place")) in
-  let list =
-    List.map (fun (s, len, ip) -> let s = List.hd s in s, len, ip) list
-  in
-  let list =
-    List.sort (fun (s1, _, _) (s2, _, _) -> Gutil.alphabetic_order s1 s2) list
-  in
-  let list =
-    List.fold_left
-      (fun list (p, len, ip) ->
-         match list with
-           (p1, len1, ip1) :: list1 when p1 = p ->
-             (p1, len1 + len, ip1) :: list1
-         | _ -> (p, len, ip) :: list)
-      [] (List.rev list)
-  in
+  Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s2 s1) array ;
+  let list = Array.to_list array in
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_baptism = p_getenv conf.env "bp" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
@@ -229,25 +220,37 @@ let print_all_places_surnames_short conf list =
   Wserver.printf "</p>\n";
   Wserver.printf "<p>\n";
   List.iter
-    (fun (s, len, _) ->
+    (fun (s, x) ->
        Wserver.printf "<a href=\"%sm=PS%s;k=%s\">" (commd conf) opt
          (Util.code_varenv s);
        Wserver.printf "%s" s;
        Wserver.printf "</a>";
-       Wserver.printf " (%d),\n" len)
+       Wserver.printf " (%d),\n" x)
     list;
   Wserver.printf "</p>\n";
   Hutil.trailer conf
 
-let print_all_places_surnames_long conf base list =
-  let list =
-    List.fold_left
-      (fun list (pl, len, ip) ->
-         match list with
-           (pl1, lpl1) :: list1 when pl = pl1 ->
-             (pl1, (len, ip) :: lpl1) :: list1
-         | _ -> (pl, [len, ip]) :: list)
-      [] list
+let print_all_places_surnames_long conf base filter ~add_birth ~add_baptism ~add_death ~add_burial =
+  let inverted =
+    try List.assoc "places_inverted" conf.base_env = "yes"
+    with Not_found -> false
+  in
+  let array =
+    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      [] [] (fold_place_long inverted) filter
+      (fun prev p ->
+         let value = (get_surname p, get_key_index p) in
+         match prev with Some list -> value :: list | None -> [ value ])
+      (fun v ->
+         let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
+         let rec loop acc list = match list, acc with
+           | [], _ -> acc
+           | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc when (sou base sn) = sn' ->
+             loop ((sn', iper:: iper_list) :: tl_acc) tl_list
+           | (sn, iper) :: tl_list, _ ->
+             loop ((sou base sn, [iper]) :: acc) tl_list
+         in
+         loop [] v)
   in
   let rec sort_place_utf8 pl1 pl2 =
     match pl1, pl2 with
@@ -257,21 +260,28 @@ let print_all_places_surnames_long conf base list =
         if Gutil.alphabetic_order s1 s2 = 0 then sort_place_utf8 pl11 pl22
         else Gutil.alphabetic_order s1 s2
   in
-  let list =
-    List.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) list
-  in
+  Array.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) array ;
   let title _ =
     Wserver.printf "%s / %s" (capitale (transl conf "place"))
       (capitale (transl_nth conf "surname/surnames" 0))
   in
   Hutil.header conf title;
   print_link_to_welcome conf true;
-  if list = [] then () else print_html_places_surnames conf base list;
+  if array <> [||] then print_html_places_surnames conf base array;
   Hutil.trailer conf
 
 let print_all_places_surnames conf base =
-  let ini = p_getenv conf.env "k" in
-  let (list, len) = get_all conf base in
-  if ini = None && len > !max_len then
-    print_all_places_surnames_short conf list
-  else print_all_places_surnames_long conf base list
+  let add_birth = p_getenv conf.env "bi" = Some "on" in
+  let add_baptism = p_getenv conf.env "bp" = Some "on" in
+  let add_death = p_getenv conf.env "de" = Some "on" in
+  let add_burial = p_getenv conf.env "bu" = Some "on" in
+  match p_getenv conf.env "k" with
+  | Some ini ->
+    print_all_places_surnames_long conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      (if ini = "" then fun _ -> true else fun x -> List.hd x = ini)
+  | None ->
+    if nb_of_persons base > 1000000 && add_birth && add_baptism && add_death && add_burial
+    then print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death ~add_burial
+    else print_all_places_surnames_long conf base ~add_birth ~add_baptism ~add_death ~add_burial (fun _ -> true)
+
+
