@@ -1,4 +1,3 @@
-(* $Id: db1link.ml,v 5.3 2010-09-23 16:56:51 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp
@@ -68,12 +67,13 @@ type gen =
 let check_error gen = gen.g_errored <- true
 
 let set_error base gen x =
-  printf "\nError: "; Check.print_base_error stdout base x; check_error gen
+  printf "\nError: " ;
+  Check.print_base_error stdout base x ;
+  check_error gen
 
-let set_warning base =
-  function
-    UndefinedSex _ -> ()
-  | x -> printf "\nWarning: "; Check.print_base_warning stdout base x
+let set_warning base x =
+  printf "\nWarning: " ;
+  Check.print_base_warning stdout base x
 
 let poi base i = base.c_persons.(Adef.int_of_iper i)
 let aoi base i = base.c_ascends.(Adef.int_of_iper i)
@@ -461,13 +461,9 @@ let check_parents_not_already_defined gen ix fath moth =
 
 let notice_sex gen p s =
   if p.m_sex = Neuter then p.m_sex <- s
-  else if p.m_sex = s || s = Neuter then ()
-  else
-    begin
-      printf "\nInconsistency about the sex of\n  %s %s\n"
-        (p_first_name gen.g_base p) (p_surname gen.g_base p);
-      check_error gen
-    end
+  else if p.m_sex <> s && s <> Neuter then
+    printf "\nInconsistency about the sex of\n  %s %s\n"
+      (p_first_name gen.g_base p) (p_surname gen.g_base p)
 
 let fevent_name_unique_string gen =
   function
@@ -635,8 +631,13 @@ let update_fevents_with_family gen fam =
   {fam with fevents = fevents}
 
 let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
-  let (fath, ifath) = insert_somebody gen (Adef.father co) in
-  let (moth, imoth) = insert_somebody gen (Adef.mother co) in
+  let fath, ifath, moth, imoth =
+    match insert_somebody gen (Adef.father co), insert_somebody gen (Adef.mother co) with
+    (* Look for inverted WIFE/HUSB *)
+    | ((fath, ifath), (moth, imoth)) when fath.m_sex = Female && moth.m_sex = Male ->
+      (moth, imoth, fath, ifath)
+    | ((fath, ifath), (moth, imoth))  -> (fath, ifath, moth, imoth)
+  in
   let witl =
     List.map
       (fun (wit, sex) ->
