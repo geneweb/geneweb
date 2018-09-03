@@ -84,7 +84,7 @@ EVERYTHING_EXE = \
 
 ###### [END] Executables list
 
-###### [BEGIN] Generated .ml files section
+###### [BEGIN] Generated files section
 
 CAMLP5_PA_EXTEND_FILES = \
 	ged2gwb/ged2gwb \
@@ -123,12 +123,18 @@ internal/gwlib.ml:
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
-###### [End] Generated .ml files section
+internal/compilation.ml:
+	echo "let compilation_time = \"$$(date "+%d %B %Y")\"" > $@
+	echo "let commit = \"$$(git show -s --pretty=format:%h)\"" >> $@
+	echo "let commit_date = \"$$(git show -s --pretty=format:%cd --date=format:'%d %B %Y')\"" >> $@
+.PHONY:internal/compilation.ml
 
 %/dune: %/dune.in
 	sed -E "s/%%%API%%%/$(API)/g" $< > $@
 
-GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune internal/dune
+###### [End] Generated files section
+
+GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune internal/dune internal/compilation.ml
 
 geneweb.install: $(GENERATED_FILES_DEP)
 	dune build @install
