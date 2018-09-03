@@ -242,13 +242,6 @@ val print_pre_right : int -> string -> unit
 
 val short_f_month : int -> string
 
-val get_compilation_time : unit -> string
-val set_compilation_time : string -> unit
-val get_commit : unit -> string
-val set_commit : string -> unit
-val get_commit_date : unit -> string
-val set_commit_date : string -> unit
-
 (* Reading password file *)
 
 type auth_user = { au_user : string; au_passwd : string; au_info : string }

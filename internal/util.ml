@@ -1998,18 +1998,6 @@ let check_xhtml s =
   in
   loop [] 0
 
-(* There is a hook to avoid a dependency on compilation.ml which is
-   recompiled every time *)
-let compilation_time_hook = ref ""
-let set_compilation_time s = compilation_time_hook := s
-let get_compilation_time () = !compilation_time_hook
-let commit_hook = ref ""
-let set_commit s = commit_hook := s
-let get_commit () = !commit_hook
-let commit_date_hook = ref ""
-let set_commit_date s = commit_date_hook := s
-let get_commit_date () = !commit_date_hook
-
 let menu_threshold = 20
 
 let is_number t =
