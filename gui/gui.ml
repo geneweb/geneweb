@@ -75,9 +75,7 @@ let channel_redirector channel callback =
      ~callback:(fun cond ->
         try
           if List.mem `IN cond then
-            let len =
-              GMain.Io.read chan ~buf:(Bytes.to_string buf) ~pos:0 ~len
-            in
+            let len = GMain.Io.read chan ~buf ~pos:0 ~len in
             len >= 1 && callback (Bytes.sub buf 0 len)
           else false
         with _ -> false)
