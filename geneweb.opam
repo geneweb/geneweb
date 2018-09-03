@@ -11,7 +11,7 @@ dev-repo: "git://github.com/geneweb/geneweb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 
 build: [
-  [ "./configure" ]
+  [ "./configure" "--api" ]
   [ make "install-exe" ]
 ]
 
@@ -26,6 +26,7 @@ pin-depends: [
 
 depends: [
   "camlp5" { build }
+  "cppo" { build }
   "dune" { build }
   "ocaml" { >= "4.05" }
   "ocurl" { = "0.8.1" }

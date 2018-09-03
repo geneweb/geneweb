@@ -1,3 +1,5 @@
+#ifdef API
+
 module Mread = Api_saisie_read_piqi
 module Mext_read = Api_saisie_read_piqi_ext
 module MLink = Api_link_tree_piqi
@@ -4181,3 +4183,5 @@ let print_graph_tree_v2 conf base =
   let params = get_params conf Mext_read.parse_graph_tree_params in
   let identifier_person = params.Mread.Graph_tree_params.identifier_person in
   print_from_identifier_person conf base print_result_graph_tree_v2 identifier_person
+
+#endif

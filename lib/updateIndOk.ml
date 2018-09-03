@@ -752,10 +752,12 @@ let check_person conf p =
     loop p.pevents
 
 let error_person conf err =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "%s\n" (capitale err);
@@ -800,6 +802,7 @@ let strip_person p =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 
 let print_conflict conf base p =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf
@@ -813,6 +816,7 @@ let print_conflict conf base p =
     in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
@@ -852,6 +856,7 @@ let print_conflict conf base p =
   raise Update.ModErr
 
 let print_cannot_change_sex conf base p =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf "%s."
@@ -859,6 +864,7 @@ let print_cannot_change_sex conf base p =
     in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Update.print_error conf base (BadSexOfMarriedPerson p);

@@ -384,6 +384,8 @@ and handler =
   ; view_wiznotes : handler_base
   ; wiznotes : handler_base
   ; wiznotes_search : handler_base
+  ; _no_mode : handler_base
+#ifdef API
   ; api_all_persons : handler_base
   ; api_all_families : handler_base
   ; api_anniversary : handler_base
@@ -445,15 +447,17 @@ and handler =
   ; api_del_person_ok : handler_base
   ; api_link_tree : handler_base
   ; api_stats : handler_base
-  ; _no_mode : handler_base
   ; api_add_first_fam : handler_nobase
+#endif
   }
 
 (*** Handlers ***)
 
 let dummyHandler =
   let dummy_base = fun _ _ _ -> assert false in
+#ifdef API
   let dummy_nobase = fun _ _ -> assert false in
+#endif
   { unknown = begin fun _ _ -> assert false end
   ; very_unknown = dummy_base
   ; incorrect_request = dummy_base
@@ -558,6 +562,8 @@ let dummyHandler =
   ; view_wiznotes = dummy_base
   ; wiznotes = dummy_base
   ; wiznotes_search = dummy_base
+  ; _no_mode = dummy_base
+#ifdef API
   ; api_all_persons = dummy_base
   ; api_all_families = dummy_base
   ; api_anniversary = dummy_base
@@ -619,8 +625,8 @@ let dummyHandler =
   ; api_del_person_ok = dummy_base
   ; api_link_tree = dummy_base
   ; api_stats = dummy_base
-  ; _no_mode = dummy_base
   ; api_add_first_fam = dummy_nobase
+#endif
   }
 
 let person_selected self conf base p =
@@ -1212,6 +1218,8 @@ let defaultHandler : handler =
       else self.incorrect_request self conf base
     end
 
+#ifdef API
+
   ; api_all_persons = begin fun _self conf base ->
       Api.print_all_persons conf base
     end
@@ -1481,5 +1489,7 @@ let defaultHandler : handler =
   ; api_add_first_fam = begin fun _self conf ->
       Api_saisie_write.print_add_first_fam conf
     end
+
+#endif
 
   }

@@ -1,6 +1,4 @@
-(* nocamlp5 *)
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
-
+#ifdef API
 
 module Mwrite = Api_saisie_write_piqi
 module Mext_write = Api_saisie_write_piqi_ext
@@ -1089,4 +1087,5 @@ let print_add_nobase conf mod_p =
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
-;;
+
+#endif

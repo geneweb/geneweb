@@ -176,6 +176,7 @@ let family_m conf base =
       | "VIEW_WIZNOTES" -> handler.view_wiznotes
       | "WIZNOTES" -> handler.wiznotes
       | "WIZNOTES_SEARCH" -> handler.wiznotes_search
+#ifdef API
       | mode
         when
           try
@@ -248,11 +249,13 @@ let family_m conf base =
           | "API_STATS" -> handler.api_stats
           | _ -> handler.incorrect_request
         end
+#endif
       | _ -> handler.incorrect_request
   in
   p handler conf base
 
 let family_m_nobase conf =
+#ifdef API
   let open RequestHandler in
   let handler = H.handler in
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
@@ -260,6 +263,9 @@ let family_m_nobase conf =
   match p_getenv conf.env "m" with
     Some "API_ADD_FIRST_FAM" -> handler.api_add_first_fam handler conf
   | Some _ | None -> ()
+#else
+  Hutil.incorrect_request conf
+#endif
 
 [@@@ocaml.warning "+45"]
 

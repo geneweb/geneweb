@@ -632,10 +632,12 @@ let strip_array_persons pl =
   Array.of_list pl
 
 let error_family conf err =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "%s\n" (capitale err);
@@ -739,6 +741,7 @@ let strip_family fam des =
   let des = {children = strip_array_persons des.children} in fam, des
 
 let print_err_parents conf base p =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
@@ -746,6 +749,7 @@ let print_err_parents conf base p =
     in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "\n";
@@ -764,6 +768,7 @@ let print_err_parents conf base p =
   raise Update.ModErr
 
 let print_err_father_sex conf base p =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
@@ -771,6 +776,7 @@ let print_err_father_sex conf base p =
     in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "\n%s" (referenced_person_text conf base p);
@@ -780,6 +786,7 @@ let print_err_father_sex conf base p =
   raise Update.ModErr
 
 let print_err_mother_sex conf base p =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
@@ -787,6 +794,7 @@ let print_err_mother_sex conf base p =
     in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "\n%s" (referenced_person_text conf base p);
@@ -796,10 +804,12 @@ let print_err_mother_sex conf base p =
   raise Update.ModErr
 
 let print_err conf =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Update.print_return conf;
@@ -807,12 +817,14 @@ let print_err conf =
   raise Update.ModErr
 
 let print_error_disconnected conf =
+#ifdef API
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf "%s" (capitale (transl conf "msg error disconnected"))
     in
       raise (Update.ModErrApi err)
     end;
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1165,11 +1177,13 @@ let effective_mod conf base sfam scpl sdes =
   let nfath = poi base (Adef.father ncpl) in
   let nmoth = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
+#ifdef API
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
     if !(Api_conf.mode_api) then {nfam with relation = sfam.relation}
     else nfam
   in
+#endif
   let sfam = {sfam with relation = nfam.relation} in
   if sfam.relation <> NoSexesCheckNotMarried &&
      sfam.relation <> NoSexesCheckMarried
@@ -1296,11 +1310,13 @@ let effective_add conf base sfam scpl sdes =
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
+#ifdef API
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
     if !(Api_conf.mode_api) then {nfam with relation = sfam.relation}
     else nfam
   in
+#endif
   let sfam = {sfam with relation = nfam.relation} in
   if sfam.relation <> NoSexesCheckNotMarried &&
      sfam.relation <> NoSexesCheckMarried
