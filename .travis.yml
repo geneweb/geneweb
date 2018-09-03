@@ -24,3 +24,6 @@ notifications:
       - julien.sagot@geneanet.org
     on_success: always
     on_failure: always
+
+after_failure:
+  - cat ~/.opam/log/*.out
