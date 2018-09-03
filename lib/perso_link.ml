@@ -1,5 +1,4 @@
-(* $Id: perso_link.ml,v 0.01 2015-02-19 15:29:32 flh Exp $ *)
-(* Copyright (c) 1998-2007 INRIA *)
+#ifdef API
 
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
@@ -752,3 +751,5 @@ let max_interlinks_descendancy_level conf base ip max_lev =
         families_link
   in
   loop 0 (ip, conf.command); !x
+
+#endif

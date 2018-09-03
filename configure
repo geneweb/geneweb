@@ -12,6 +12,18 @@ RM=
 EXE=
 OS_TYPE=
 
+API=
+
+while [[ $# -ne 0 ]]; do
+  case $1 in
+    --api)
+      API="-D API" ;;
+    *)
+      echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
+  esac
+  [[ $# -gt 0 ]] && shift
+done
+
 # Functions that print the checked information
 
 # Length of line for print_check_*
@@ -70,9 +82,14 @@ print_tools() {
   echo "EXE=${EXE}"
 }
 
+print_vars() {
+  echo "API=${API}"
+}
+
 print_makefile() {
   (print_common_header
    print_tools
+   print_vars
   ) > $MAKEFILE
 }
 

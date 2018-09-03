@@ -1,3 +1,5 @@
+#ifdef API
+
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -3332,3 +3334,5 @@ let print_add_first_fam_ok conf base =
   in
   let data = compute_modification_status conf base !ip !ifam resp in
   print_result conf data
+
+#endif

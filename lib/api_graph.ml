@@ -1,4 +1,4 @@
-(* nocamlp5 *)
+#ifdef API
 
 module M = Api_piqi
 module Mext = Api_piqi_ext
@@ -1079,4 +1079,5 @@ let print_cpl_relation conf base =
   in
   let data = data_list_person conf base filters list in
   print_result conf data
-;;
+
+#endif

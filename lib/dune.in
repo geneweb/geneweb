@@ -2,6 +2,7 @@
  (name geneweb)
  (public_name geneweb)
  (synopsis "GeneWeb library")
+ (preprocess (action (run %{bin:cppo} %%%API%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
             piqirun.ext
             redis-sync

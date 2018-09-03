@@ -17,8 +17,6 @@ module Make
 let green_color = "#2f6400"
 let selected_addr = ref None
 let selected_port = ref 2317
-let selected_api_host = ref "127.0.0.1"
-let selected_api_port = ref 2322
 let redirected_addr = ref None
 let wizard_passwd = ref ""
 let friend_passwd = ref ""
@@ -39,6 +37,11 @@ let trace_failed_passwd = ref false
 let use_auth_digest_scheme = ref false
 let no_host_address = ref false
 let lexicon_list = ref []
+
+#ifdef API
+let selected_api_host = ref "127.0.0.1"
+let selected_api_port = ref 2322
+#endif
 
 let is_multipart_form =
   let s = "multipart/form-data" in
@@ -1185,8 +1188,12 @@ let make_conf from_addr request script_name env =
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
   let conf =
-    {from = from_addr; api_host = !selected_api_host;
-     api_port = !selected_api_port; manitou = manitou;
+    {from = from_addr;
+#ifdef API
+     api_host = !selected_api_host;
+     api_port = !selected_api_port;
+#endif
+     manitou = manitou;
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
@@ -1419,12 +1426,15 @@ let conf_and_connection from request script_name contents env =
                       log_passwd_failed ar oc tm from request conf.bname)) ;
             unauth_server conf ar
       | _ ->
+#ifdef API
           if mode = Some "API_ADD_FIRST_FAM" then
             begin
               Request.treat_request_on_nobase conf;
               if conf.manitou && sleep > 0 then Unix.sleep sleep
             end
-          else if conf.bname = "" then general_welcome conf
+          else
+#endif
+          if conf.bname = "" then general_welcome conf
           else
             match List.assoc_opt "renamed" conf.base_env with
               Some n when n <> "" -> print_renamed conf n
@@ -1816,8 +1826,6 @@ let main ~speclist () =
   in
   let force_cgi = ref false in
   let speclist =
-    ("-api_url", Arg.String (fun x -> Link.api_url := x),
-     "Url api for links tree") ::
     ("-hd", Arg.String Util.add_lang_path,
      "<dir>\n       Directory where the directory lang is installed.") ::
     ("-bd", Arg.String Util.set_base_dir,
@@ -1837,12 +1845,6 @@ let main ~speclist () =
     ("-p", Arg.Int (fun x -> selected_port := x),
      "<number>\n       Select a port number (default = " ^
      string_of_int !selected_port ^ "); > 1024 for normal users.") ::
-    ("-api_h", Arg.String (fun x -> selected_api_host := x),
-     "<host>\n       Host for Geneweb API (default = " ^ !selected_api_host ^
-     ")") ::
-    ("-api_p", Arg.Int (fun x -> selected_api_port := x),
-     "<number>\n       Port number for Geneweb API (default = " ^
-     string_of_int !selected_api_port ^ "); > 1024 for normal users.") ::
     ("-setup_link", Arg.Set setup_link,
      "\n       Display a link to local gwsetup in bottom of pages.") ::
     ("-allowed_tags", Arg.String (fun x -> Util.allowed_tags_file := x),
@@ -1909,9 +1911,16 @@ let main ~speclist () =
        ,"\n       Do not launch a process at each request." )
        :: speclist)
   in
+#ifdef API
   let speclist =
     ("-api_url", Arg.String (fun x -> Link.api_url := x),
      "Url api for links tree") ::
+    ("-api_h", Arg.String (fun x -> selected_api_host := x),
+     "<host>\n       Host for Geneweb API (default = " ^ !selected_api_host ^
+     ")") ::
+    ("-api_p", Arg.Int (fun x -> selected_api_port := x),
+     "<number>\n       Port number for Geneweb API (default = " ^
+     string_of_int !selected_api_port ^ "); > 1024 for normal users.") ::
     ("-sig", Arg.String (fun _ -> ()), "ignore option.") ::
     ("-redis",
      Arg.String
@@ -1960,6 +1969,7 @@ let main ~speclist () =
      "api_url for links tree") ::
     speclist
   in
+#endif
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   if Sys.unix then
     default_lang :=

@@ -1,3 +1,5 @@
+#ifdef API
+
 module Mwrite = Api_saisie_write_piqi
 module Mext_write = Api_saisie_write_piqi_ext
 
@@ -796,3 +798,5 @@ let print_add_child_and_family conf base ip ifam mod_c =
   print_add_child conf base ip !new_ifam mod_c
 ;;
 *)
+
+#endif

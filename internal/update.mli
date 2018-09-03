@@ -56,6 +56,8 @@ val print_someone : config -> base -> person -> unit
 
 val update_conf : config -> config
 
+#ifdef API
+
 (* Ajout pour l'API *)
 (* Erreurs possibles :
      - "UnknownPerson"
@@ -74,3 +76,6 @@ val update_conf : config -> config
 exception ModErrApi of string
 val bad_date : config -> dmy -> 'a
 val check_greg_day : config -> dmy -> unit
+
+#endif
+

@@ -1,4 +1,4 @@
-(* nocamlp5 *)
+#ifdef API
 
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
@@ -299,4 +299,5 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
         (fun v -> Hashtbl.add ht_corresp k v)
         l)
     ht_corresp_tmp;
-;;
+
+#endif

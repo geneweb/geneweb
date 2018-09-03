@@ -1,4 +1,4 @@
-(* nocamlp5 *)
+#ifdef API
 
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
@@ -964,3 +964,5 @@ let print_link_tree conf base =
   in
   let data = MLinkext.gen_link_tree data in
   Api_util.print_result conf data
+
+#endif

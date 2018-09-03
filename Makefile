@@ -114,6 +114,8 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 	    && echo "(* This file was generated from $< *)" >> $@ \
 	    && camlp5o pr_o.cmo $(CAMLP5_OPT) -impl $< >> $@ \
 	    && sed -i.bak -E 's/[(]\* (\[@.+\]) \*[)]/\1/g' $@ \
+	    && sed -i.bak -E 's/[(]\* (#[^\*]+) \*[)]/\1/g' $@ \
+	    && rm $@.bak \
 	    && echo " Done!")
 
 internal/gwlib.ml:
@@ -121,9 +123,12 @@ internal/gwlib.ml:
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
-GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml)
-
 ###### [End] Generated .ml files section
+
+%/dune: %/dune.in
+	sed -E "s/%%%API%%%/$(API)/g" $< > $@
+
+GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune internal/dune
 
 geneweb.install: $(GENERATED_FILES_DEP)
 	dune build @install

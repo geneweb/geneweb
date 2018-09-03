@@ -9,7 +9,9 @@ open Gwdb
 open Hutil
 open Util
 
+(* #ifdef API *)
 exception ModErrApi of string
+(* #endif *)
 
 exception ModErr
 type create_info =
@@ -169,6 +171,7 @@ let print_return conf =
   Wserver.printf "</p>\n"
 
 let print_err_unknown conf _base (f, s, o) =
+(* #ifdef API *)
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
@@ -176,6 +179,7 @@ let print_err_unknown conf _base (f, s, o) =
     in
       raise (ModErrApi err)
     end;
+(* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
@@ -697,6 +701,7 @@ let print_warnings_and_miscs conf base (wl, ml) =
     end
 
 let error conf base x =
+(* #ifdef API *)
   if !(Api_conf.mode_api) then
     begin let err =
       match x with
@@ -719,6 +724,7 @@ let error conf base x =
     in
       raise (ModErrApi err)
     end;
+(* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   print_error conf base x;
@@ -788,6 +794,7 @@ let error_locked conf =
   trailer conf
 
 let error_digest conf =
+(* #ifdef API *)
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf
@@ -797,6 +804,7 @@ the base has changed; do \"back\", \"reload\", and refill the form"))
     in
       raise (ModErrApi err)
     end;
+(* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   print_link_to_welcome conf true;
@@ -821,6 +829,7 @@ let get var key env =
 let get_number var key env = p_getint env (var ^ "_" ^ key)
 
 let bad_date conf d =
+(* #ifdef API *)
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf "%s%s\n" (capitale (transl conf "incorrect date"))
@@ -832,6 +841,7 @@ let bad_date conf d =
     in
       raise (ModErrApi err)
     end;
+(* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "%s%s\n" (capitale (transl conf "incorrect date"))
@@ -1020,6 +1030,7 @@ let text_of_var conf =
       | [< >] -> var
 
 let print_create_conflict conf base p var =
+(* #ifdef API *)
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf
@@ -1033,6 +1044,7 @@ let print_create_conflict conf base p var =
     in
       raise (ModErrApi err)
     end;
+(* #endif *)
   let text = text_of_var conf var in
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
