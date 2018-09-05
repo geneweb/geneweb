@@ -2,30 +2,39 @@ sudo: required
 
 language: c
 
-install:
-  - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
-
 os:
   - linux
   - osx
 
 env:
-  - OCAML_VERSION=4.05
-  - OCAML_VERSION=4.06
-  - OCAML_VERSION=4.07
+  - OCAML_VERSION=4.05 OPAM_VERSION=2.0.0
+  - OCAML_VERSION=4.06 OPAM_VERSION=2.0.0
+  - OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
 
 matrix:
+  fast_finish: true
   allow_failures:
     - os: osx
-      env: OCAML_VERSION=4.07
+      env: OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+
+# Needed until `opam depext geneweb` is fixed
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install protobuf ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq protobuf-compiler ; fi
+
+install:
+  - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
 
 script:
   - bash -ex .travis-ocaml.sh ;
+    set -ex ;
     export OPAMYES=1 ;
     eval $(opam config env) ;
     opam pin add geneweb . --no-action ;
     opam install geneweb --deps-only ;
-    ./configure make && install uninstall clean ;
+    ./configure && make install uninstall clean ;
     ./configure --api && make install uninstall clean ;
     opam depext lablgtk && opam install lablgtk && make everything-exe ;
 
