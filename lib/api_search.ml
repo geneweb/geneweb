@@ -1,3 +1,5 @@
+#ifdef API
+
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -1280,3 +1282,5 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
   in
   List.sort Gutil.alphabetic_order (StrSetAutoComplete.elements !string_set)
 *)
+
+#endif

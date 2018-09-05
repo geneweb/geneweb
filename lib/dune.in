@@ -4,10 +4,7 @@
  (synopsis "GeneWeb library")
  (preprocess (action (run %{bin:cppo} %%%API%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
-            piqirun.ext
-            redis-sync
-            yojson
-            curl
+            %%%API_DEP%%%
             str
             camlp5
             camlp5.gramlib

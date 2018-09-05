@@ -1,3 +1,5 @@
+#ifdef API
+
 module Mstats = Api_stats_piqi
 module Mext_stats = Api_stats_piqi_ext
 
@@ -2585,3 +2587,5 @@ let print_stats conf base =
   if params.Mstats.Stats_params.i <> None
   then print_ind_stats conf base
   else print_all_stats conf base
+
+#endif

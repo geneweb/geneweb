@@ -1,3 +1,5 @@
+#ifdef API
+
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -476,3 +478,5 @@ let create_piqi_warnings () =
     warning_witness_date_after_death = !witness_date_after_death;
     warning_witness_date_before_birth = !witness_date_before_birth;
   })
+
+#endif
