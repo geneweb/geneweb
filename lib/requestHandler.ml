@@ -751,7 +751,7 @@ let defaultHandler : handler =
     end
 
   ; cal = begin fun _self conf _base ->
-      Date.print_calendar conf
+      Hutil.print_calendar conf
     end
 
   ; chg_chn = begin fun self conf base ->

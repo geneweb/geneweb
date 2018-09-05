@@ -24,3 +24,5 @@ val interp :
 
 val interp_no_header :
   config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit
+
+val print_calendar : config -> unit
