@@ -134,13 +134,25 @@ internal/compilation.ml:
 .PHONY:internal/compilation.ml
 
 %/dune: %/dune.in
-	sed -E "s/%%%API%%%/$(API)/g" $< > $@
+	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
 
 ###### [End] Generated files section
 
 GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune internal/dune internal/compilation.ml
 
-geneweb.install: $(GENERATED_FILES_DEP)
+ifdef API
+piqi:
+	$(foreach p, $(wildcard lib/*.proto), \
+		piqi of-proto --normalize $(p) ; \
+		piqic-ocaml -C lib/ --ext $(p).piqi ; \
+	  )
+	$(RM) lib/*.piqi
+else
+piqi:
+endif
+.PHONY: piqi
+
+geneweb.install:
 	dune build @install
 .PHONY: geneweb.install
 
@@ -154,15 +166,7 @@ everything-exe:
 	dune build $(EVERYTHING_EXE:=.exe)
 .DEFAULT_GOAL = exe
 
-install-exe distrib-exe exe everything-exe: $(GENERATED_FILES_DEP)
-
-piqi:
-	$(foreach p, $(wildcard lib/*.proto), \
-		piqi of-proto --normalize $(p) ; \
-		piqic-ocaml -C lib/ --ext $(p).piqi ; \
-	  )
-	$(RM) lib/*.piqi
-.PHONY: piqi
+geneweb.install install-exe distrib-exe exe everything-exe: $(GENERATED_FILES_DEP) piqi
 
 ###### [BEGIN] Installation / Distribution section
 
@@ -237,7 +241,7 @@ distrib: distrib-exe
 ###### [END] Installation / Distribution section
 
 clean:
-	$(RM) $(GENERATED_FILES_DEP)
-	$(RM)r distribution
+	$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
+	$(RM) -r distribution
 	dune clean
 .PHONY: clean

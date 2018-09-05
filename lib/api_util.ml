@@ -1,3 +1,4 @@
+#ifdef API
 
 module M = Api_piqi
 module Mext = Api_piqi_ext
@@ -2240,3 +2241,5 @@ let explode str sep =
     with Not_found -> (s :: accu)
   in
   loop str []
+
+#endif
