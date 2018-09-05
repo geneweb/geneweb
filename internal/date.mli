@@ -22,7 +22,6 @@ val short_dates_text : config -> base -> person -> string
 val short_marriage_date_text :
   config -> base -> family -> person -> person -> string
 val print_dates : config -> base -> person -> unit
-val print_calendar : config -> unit
 val get_birth_death_date : person -> date option * date option * bool
 
 val before_date : dmy -> dmy -> bool
