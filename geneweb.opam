@@ -36,3 +36,8 @@ depends: [
   "redis-sync"
   "yojson"
 ]
+
+depexts: [
+  [ [ "ubuntu" "linux" ] [ "protobuf-compiler" ] ]
+  [ [ "homebrew" "osx" ] [ "protobuf" ] ]
+]
