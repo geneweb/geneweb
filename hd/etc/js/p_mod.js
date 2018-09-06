@@ -90,9 +90,10 @@ var p_mod_table = '\
   </tbody>\
 </table>';
 
+var p_mod_build = '<div id="p_mod_builder">';
+
 function upd_p_mod_build () {
   var p_mod = $('#p_mod').val();
-  var p_mod_build = '<div id="p_mod_builder">';
   for(i=0;i<=p_mod.length-2;i=i+2){
     var mod = "";
     for(j=1;j<=12;j++){if (p_mod[i] == modules[j][0]){mod = modules[j];}};
@@ -115,7 +116,7 @@ $('#p_mod_rm').on('click', function ()
 { $('#p_mod').val($('#p_mod').val().slice(0, -2));
   $('#rm:last-child').remove();
 });
-
+                  
 $('#p_mod_bvar').on('click', function ()
 { $('#p_mod').val($('#p_mod_bvar').val());
   upd_p_mod_build ();
