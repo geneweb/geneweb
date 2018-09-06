@@ -6,7 +6,7 @@ html{color:#000;background-color:#EEE;}
 ::-webkit-input-placeholder {color:#aaa;}
 ::-moz-placeholder {color:#aaa;}
 :-ms-input-placeholder {color:#aaa;}
-/* added for anctree_hi */
+/* added for arbre_hi */
 .big_anchor {display: block;width: 100%;height: 100%;position: absolute;top: 0;left: 0;z-index: 0;}
 .big_anchor_1 {display: block;width: 100%;height: 60%;position: absolute;top: 0;left: 0;z-index: 0;}
 .big_anchor_1m {display: block;width: 100%;height: 40%;position: absolute;top: 60%;left: 0;z-index: 0;}

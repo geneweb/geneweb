@@ -24,9 +24,9 @@ Options
 %elseif;(op_m=7)
   %apply;show_templ("modules/arbre_9gen")
 %elseif;(op_m=8)
-  %import;modules/arbre_hi_tools
-  %import;templm/anctree_hi_indexes
-  %apply;show_templ("templm/anctree_hi")
+  %import;modules/arbre_hi_tools;
+  %import;modules/arbre_hi_indexes;
+  %apply;show_templ("modules/arbre_hi")
 %elseif;(op_m=9)
   %apply;show_templ("modules/arbre_descendants")
 %else;

@@ -16,7 +16,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
-%include.css;
+%import;css;
 %base_header;
 </head>
 <body%body_prop;>
@@ -33,9 +33,9 @@
   %import;modules/arbre_9gen;
 %elseif;(evar.t="T" and evar.t1="CT") %(CT for compatibility with templm %)
   %import;modules/arbre_hi_tools;
-  %import;templm/tools;
-  %import;templm/anctree_hi_indexes
-  %import;templm/anctree_hi;
+  %import;tools;
+  %import;modules/arbre_hi_indexes
+  %import;modules/arbre_hi;
 %elseif;(evar.t="A" or evar.t="C" or evar.t="T")
   %import;modules/arbre_vertical;
 %else;
@@ -45,8 +45,8 @@
 
 <div>
 %base_trailer;
-%include.copyr;
+%import;copyr;
 </div>
-%include.js;
+%import;js;
 </body>
 </html>
