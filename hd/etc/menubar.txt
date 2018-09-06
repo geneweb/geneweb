@@ -35,15 +35,15 @@
         <ul class="nav nav-tabs">
           %( personnal modules selection menu %)
           <li class="nav-item dropdown">
-            <a id="load_once_p_mod" class="nav-link dropdown-toggle dropdown-toggle-split" 
-              data-toggle="dropdown" aria-haspopup="true" title="[*module]1">
+            <a id="load_once_p_mod" class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+              href="#" role="button" aria-haspopup="true" aria-expanded="false" title="[*module]1"%( data-offset="10,20"%)>
               <span class="sr-only">[*module]1</span>%nn;
             </a>
             <div class="dropdown-menu">
-              <div class="d-inline-flex">
-                <form class="form-control" name="upd_url" method="get" action="%action;">
+              <div class="d-inline-flex justify-content-around mx-1">
+               <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
                   <div class="invisible" id="img_prfx">%image_prefix;/modules</div>
-                  <div class="d-flex justify-content-start">
+                  <div class="d-flex justify-content-start mx-2">
                     %apply;input_hidden("evar.b","b")
                     %apply;input_hidden("evar.lang","lang")
                     <div class="input-group">
@@ -91,7 +91,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                   </div>
                   <div id="p_mod_table"></div>
                 </form>
-                <div class="form-control d-none d-md-block">
+                <div class="form-group d-none d-md-block mx-1">
                   <img src="%image_prefix;/modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
                   <div id="p_mod_builder">
                     %if;(evar.p_mod="zz")
@@ -113,6 +113,11 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               </li>
             %end;
             %if(sosa_next.index!="")
+              %(%if;(sosa_prev.index="")
+                <li class="nav-item">
+                  <a class="nav-link"><i class="far fa-dot-circle fa-fw %sexcolor; disabled" aria-hidden="true" title="Sosa 1"><span class="sr-only">·</span></i></a>%nn;
+                </li>
+              %end;%)
               <li class="nav-item">
                 <a class="nav-link" href="%prefix_base_password;%if;(bvar.access_by_key="yes")%sosa_next.access;%else;i=%sosa_next.index;%end;;%nn;
                   %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i")%env.key=%env.val;;%end;%end;"
@@ -192,8 +197,8 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                   %end;
                 %end;
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item simple-copy" title="[*copy link]" data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</a>
-                <a class="dropdown-item full-copy" title="[*copy link]" data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</a>
+                <a class="dropdown-item btn simple-copy" role="button" title="[*copy link]" data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</a>
+                <a class="dropdown-item btn full-copy" role="button" title="[*copy link]" data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</a>
               </div>
             </li>
           %else;

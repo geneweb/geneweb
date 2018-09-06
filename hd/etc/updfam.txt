@@ -281,7 +281,7 @@ $(document).ready(function(){
     <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">%if;(bvar.multi_parents!="yes")%parent.himher;%nn;
       %else;pxcnt%end;</span></label>
     <div class="col-sm-8">
-      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0">
+      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0" %if;(evar.m="ADD_FAM" and xx.first_name="")autofocus%end;>
     </div>
     <label for="paxcnt_occ" class="col-auto col-form-label sr-only">[*number]</label>
     <div class="col-sm-2">
@@ -497,7 +497,7 @@ $(document).ready(function(){
   <h3 class="card-header pt-1 pb-0 text-center"><label for="xx">[*yy]1</label></h3>
 %end;
 
-<h1 %if;(evar.m="ADD_FAM" or evar.m="ADD_FAM_OK" and evar.ip="")class="mt-5"%end;>%nn;
+<h1 %if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="")class="mt-5"%end;>%nn;
   %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
     [*add::family/families]0
   %elseif;(evar_m = "ADD_PAR")

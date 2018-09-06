@@ -167,9 +167,9 @@
       %if;(family_cnt > 1)
         %self;%nn;
       %elseif;(not cancel_links)
-        <a id="i_%index;" href="%prefix;&i=%index;">%self;</a>%self.title; %dates;%nn;
+        <a id="i_%index;" href="%prefix;&i=%index;">%self;</a> %dates;%if;(self.title!=""), %self.title;%end;%nn;
       %else;
-        %self; %self.title; %dates;%nn;
+        %self; %dates;%if;(self has_title), %self.title;%end;%nn;
       %end;
       %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small>%end;%sp;
       %if;(not cancel_links)

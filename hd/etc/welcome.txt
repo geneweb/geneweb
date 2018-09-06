@@ -152,37 +152,17 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
               <input type="hidden" name="m" value="S">
               <div class="col">
                 <div class="input-group">
-                  <div class="input-group-append">
-                    <div class="btn-group-vertical">
-                      <div class="input-group">
-                        <div class="input-group-prepend">
-                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=7><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-                        </div>
-                      </div>
-                      <div class="input-group">
-                        <div class="input-group-prepend">
-                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=8><i class="fa fa-sort-amount-down fa-fw"></i></a>
-                        </div>
-                      </div>
-                    </div>
+                  <div class="input-group-prepend">
+                    <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=7><i class="fa fa-sort-alpha-down fa-fw"></i></a>
+                    <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=8><i class="fa fa-sort-amount-down fa-fw"></i></a>
                   </div>
                   <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
                   <input type="search" id="surname" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" autofocus tabindex=1>
                 </div>
                 <div class="input-group">
-                  <div class="input-group-append">
-                    <div class="btn-group-vertical">
-                      <div class="input-group">
-                        <div class="input-group-prepend">
-                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=9><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-                        </div>
-                      </div>
-                      <div class="input-group">
-                        <div class="input-group-prepend">
-                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=10><i class="fa fa-sort-amount-down fa-fw"></i></a>
-                        </div>
-                      </div>
-                    </div>
+                  <div class="input-group-prepend">
+                    <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=9><i class="fa fa-sort-alpha-down fa-fw"></i></a>
+                    <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=10><i class="fa fa-sort-amount-down fa-fw"></i></a>
                   </div>
                   <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
                   <input type="search" id="firstname" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]2" tabindex=2>
@@ -238,34 +218,31 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         <form id="form-place" method="get" action="%prefix;">
           %hidden;
           <input type="hidden" name="m" value="PS"%/>
-          <div class="text-center h5 mb-0">[*places] / [surname/surnames]0</div>
+          <div class="h5 mb-0">[*places] / [surname/surnames]0</div>
           <div class="input-group">
-            <div class="btn-group input-group-prepend">
-              <label class="btn btn-outline-secondary my-1" title="[*birth place]"><input type="checkbox" name="bi" value="on"> [*birth]</label>
-              <label class="btn btn-outline-secondary my-1" title="[*baptism place]"><input type="checkbox" name="bp" value="on"> [*baptism]</label>
-              <label class="btn btn-outline-secondary my-1" title="[*marriage place]"><input type="checkbox" name="ma" value="on"> [*marriage/marriages]0</label>
-              <label class="btn btn-outline-secondary my-1" title="[*death place]"><input type="checkbox" name="de" value="on"> [*death]</label>
-              <label class="btn btn-outline-secondary my-1" title="[*burial place]"><input type="checkbox" name="bu" value="on"> [*burial]</label>
-            </div>
-            <div class="input-group-append">
+              <label class="btn " title="[*birth place]"><input type="checkbox" name="bi" value="on"> [*birth]</label>
+              <label class="btn " title="[*baptism place]"><input type="checkbox" name="bp" value="on"> [*baptism]</label>
+              <label class="btn " title="[*marriage place]"><input type="checkbox" name="ma" value="on"> [*marriage/marriages]0</label>
+              <label class="btn " title="[*death place]"><input type="checkbox" name="de" value="on"> [*death]</label>
+              <label class="btn " title="[*burial place]"><input type="checkbox" name="bu" value="on"> [*burial]</label>
+
+
               <button type="submit" class="btn btn-outline-secondary my-1 text-muted" title="[*search/case sensitive]0 [places] / [surname/surnames]0"><i class="fa fa-search"></i></button>
-            </div>
+
           </div>
         </form>
       </div>
     %end;
     %if;(wizard)
-      <div class="d-flex justify-content-center">
-        <div class="mt-md-1 mt-xl-3">
-          <div class="text-success h5 mb-0 text-center">[*books]</div>
-          <div class="btn-group">
-            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=fn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([first name/first names]1)">[*first name/first names]1</a>
-            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=sn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([surname/surnames]1)">[*surname/surnames]1</a>
-            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=occu" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([occupation/occupations]1)">[*occupation/occupations]1</a>
-            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=src" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([source/sources]1)">[*source/sources]1</a>
-            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=place" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([places])">[*places]</a>
+      <div class="d-flex-inline justify-content-center">
+        <span class="text-success font-weight-bold">[*books][:]</div>     
+          <div class="btn-group" role="group" >
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=fn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([first name/first names]1)">[*first name/first names]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=sn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([surname/surnames]1)">[*surname/surnames]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=occu" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([occupation/occupations]1)">[*occupation/occupations]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=src" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([source/sources]1)">[*source/sources]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=place" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([places])">[*places]</a>
           </div>
-        </div>
       </div>
     %end;
   <div class="row">

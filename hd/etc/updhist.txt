@@ -60,7 +60,7 @@
         <td>
           %if;(first_name != "")
             <!--%first_name;/%occ;/%surname;-->
-            <a href="%prefix;%person.access;">%person;</a>%person.title;
+            <a href="%prefix;%person.access;">%person;</a>, %person.title;
             %person.dates;
             %if;(bvar.show_invisible = "on" and wizard and person.is_invisible)
               <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)"%/>%nn;
