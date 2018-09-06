@@ -1,4 +1,4 @@
-  <!-- $Id: anctree_hi.txt -->
+  <!-- $Id: arbre_hi.txt -->
 %let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
 %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
 %let;evart1;%if;(evar.t1!="")%evar.t1;%else;CT%end;%in;
@@ -43,8 +43,8 @@
   -->
 </script>
 
-<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;css/jquery.min.js"></script>
-<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
+<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;js/jquery.min.js"></script>
+<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;js/jquery.line.js"></script>
 
 %define;implexc(x0,y0,x1,y1)
   <span style="top:%top;px;left:%left;px;font-family:monospace;">x
@@ -110,7 +110,7 @@
   %apply;nth%with;/1/2/4/8/16/32/64/128/256/512%and;xx%end;
 %end;
 
-%import;anctree_hi_indexes
+%import;modules/arbre_hi_indexes;
 
 
 %define;prefix_all()

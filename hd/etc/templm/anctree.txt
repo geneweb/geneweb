@@ -222,7 +222,7 @@
 %end;
 
 %define;show_templ(z1)
-  %include.anctree_z1;
+  %import;anctree_z1;
 %end;
 <div class="container" style="all:unset">
 %if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = ""))
@@ -232,7 +232,7 @@
 %elseif;(evar.t = "C" or evar.t1 = "C")
   <div style="text-align: center">%apply;female_line("self",l_v0)</div>
 %elseif;(evar.t1= "CT")
-  %include.anctree_hi;
+  %import;modules/arbre_hi;
 %elseif;(evar.t1 = "HT")
   %include.anclist_hrztl;
 %elseif;(evar.t1 != "")
@@ -244,8 +244,8 @@
   %import;tools;
   %apply;tools_anctree()
   <div style="clear:both;"></div>
-  %include.trl;
-  %include.copyr;
+  %import;trl;
+  %import;copyr;
 %end;
 </body>
 </html>
