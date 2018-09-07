@@ -6,7 +6,6 @@ open Def
 open Dag2html
 open Gutil
 open Gwdb
-open Hutil
 open Mutil
 open Util
 
@@ -97,7 +96,7 @@ let display_descendants_level conf base max_level ancestor =
          | _ -> incr len; (p, 1) :: pl)
       [] list
   in
-  header conf (descendants_title conf base ancestor);
+  Hutil.header conf (descendants_title conf base ancestor);
   Wserver.printf "%s" (capitale (text_level conf max_level));
   if !len > 1 then
     Wserver.printf " (%d %s)" !len
@@ -114,7 +113,7 @@ let display_descendants_level conf base max_level ancestor =
        if not (is_hidden p) && c > 1 then Wserver.printf " <em>(%d)</em>" c;
        Wserver.printf "\n")
     list;
-  trailer conf
+  Hutil.trailer conf
 
 (* With number *)
 
@@ -397,7 +396,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   in
   let marks = Array.make (nb_of_persons base) false in
   let paths = Array.make (nb_of_persons base) [] in
-  header conf title;
+  Hutil.header conf title;
   total := 0;
   Wserver.printf "%s" (Date.short_dates_text conf base ancestor);
   let p = ancestor in
@@ -421,7 +420,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
         Wserver.printf " (%s)" (transl conf "spouses not included");
       Wserver.printf ".\n"
     end;
-  trailer conf
+  Hutil.trailer conf
 
 let print_ref conf base paths p =
   if paths.(Adef.int_of_iper (get_key_index p)) <> [] then
@@ -531,7 +530,7 @@ let display_descendant_index conf base max_level ancestor =
         txt
     else Wserver.printf "%s" txt
   in
-  header conf title;
+  Hutil.header conf title;
   let marks = Array.make (nb_of_persons base) false in
   let paths = Array.make (nb_of_persons base) [] in
   mark_descendants conf base marks max_level (get_key_index ancestor);
@@ -547,7 +546,7 @@ let display_descendant_index conf base max_level ancestor =
         list := get_key_index p :: !list
   done;
   sort_and_display conf base paths true !list;
-  trailer conf
+  Hutil.trailer conf
 
 let display_spouse_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -555,7 +554,7 @@ let display_spouse_index conf base max_level ancestor =
     Wserver.printf "%s"
       (capitale (transl conf "index of the spouses (non descendants)"))
   in
-  header conf title;
+  Hutil.header conf title;
   let marks = Array.make (nb_of_persons base) false in
   let paths = Array.make (nb_of_persons base) [] in
   mark_descendants conf base marks max_level (get_key_index ancestor);
@@ -583,7 +582,7 @@ let display_spouse_index conf base max_level ancestor =
           (get_family u)
   done;
   sort_and_display conf base paths false !list;
-  trailer conf
+  Hutil.trailer conf
 
 
 (* *********************************************************************** *)
@@ -1061,7 +1060,7 @@ let display_descendant_with_table conf base max_lev p =
     !nb_pers
     (transl_nth conf "person/persons" 1);
   Wserver.printf "</p>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let make_tree_hts conf base gv p =
   let bd =
@@ -1318,7 +1317,7 @@ let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
   let num_aboville = p_getenv conf.env "num" = Some "on" in
   Hutil.header conf (descendants_title conf base p);
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "%s.<br><p>" (capitale (text_to conf max_level));
   let rec loop_ind lev lab p =
     if num_aboville then Wserver.printf "<tt>%s</tt>\n" lab

@@ -6,7 +6,6 @@ open Def
 open Futil
 open Gutil
 open Gwdb
-open Hutil
 open Mutil
 open Util
 
@@ -759,10 +758,10 @@ let error_person conf err =
     end;
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 
 let strip_pevents p =
@@ -818,7 +817,7 @@ let print_conflict conf base p =
     end;
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
@@ -852,7 +851,7 @@ let print_conflict conf base p =
     (capitale (transl conf "back")) conf.xhs;
   Wserver.printf "</form>\n";
   Update.print_same_name conf base p;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 
 let print_cannot_change_sex conf base p =
@@ -866,7 +865,7 @@ let print_cannot_change_sex conf base p =
     end;
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Update.print_error conf base (BadSexOfMarriedPerson p);
   Wserver.printf "<ul>\n";
   html_li conf;
@@ -874,7 +873,7 @@ let print_cannot_change_sex conf base p =
   Wserver.printf "\n";
   Wserver.printf "</ul>\n";
   Update.print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 
 let check_conflict conf base sp ipl =
@@ -1134,8 +1133,8 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "person modified"))
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
@@ -1192,7 +1191,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
         (capitale (transl conf "linked pages")) (transl conf ":");
       Notes.print_linked_list conf base pgl
     end;
-  trailer conf
+  Hutil.trailer conf
 
 (*
 value print_mod_ok conf base wl p =
@@ -1248,8 +1247,8 @@ let all_checks_person base p a u =
 
 let print_add_ok conf base wl p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "person added")) in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
@@ -1265,7 +1264,7 @@ let print_add_ok conf base wl p =
     (referenced_person_text conf base (poi base p.key_index));
   Wserver.printf "\n";
   Update.print_warnings conf base wl;
-  trailer conf
+  Hutil.trailer conf
 
 (*
 value print_add_ok conf base wl p =
@@ -1278,21 +1277,21 @@ let print_del_ok conf =
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "person deleted"))
   in
-  header conf title;
-  print_link_to_welcome conf false;
-  trailer conf
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf false;
+  Hutil.trailer conf
 
 let print_change_event_order_ok conf base wl p =
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "person modified"))
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Update.print_warnings conf base wl;
   Wserver.printf "\n%s"
     (referenced_person_text conf base (poi base p.key_index));
   Wserver.printf "\n";
-  trailer conf
+  Hutil.trailer conf
 
 
 let print_add o_conf base =
@@ -1344,7 +1343,7 @@ let print_del conf base =
       let changed = U_Delete_person op in
       History.record conf base changed "dp";
       print_del_ok conf
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_mod_aux conf base callback =
   try
@@ -1471,4 +1470,4 @@ let print_change_event_order conf base =
         print_change_event_order_ok conf base wl p
       with Update.ModErr -> ()
       end
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf

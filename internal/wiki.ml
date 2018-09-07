@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Hutil
 open Printf
 open Util
 
@@ -665,7 +664,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   in
   let is_empty = sub_part = "" in
   let sfn = if fname = "" then "" else ";f=" ^ code_varenv fname in
-  header conf title;
+  Hutil.header conf title;
   if can_edit then
     begin
       Wserver.printf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">\n"
@@ -680,7 +679,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
       Wserver.printf ")\n";
       Wserver.printf "</div>\n"
     end;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty;
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
@@ -750,7 +749,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   end_centered conf;
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let insert_sub_part s v sub_part =
   let (lines, _) = lines_list_of_string s in

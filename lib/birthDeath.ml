@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open Hutil
 open Util
 
 let get_k conf =
@@ -125,8 +124,8 @@ let print_birth conf base =
   let title _ =
     Wserver.printf (fcapitale (ftransl conf "the latest %d births")) len
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
   let _ =
     List.fold_left
@@ -165,7 +164,7 @@ let print_birth conf base =
          month_txt, future)
       ("", false) list
   in
-  Wserver.printf "</ul>\n</li>\n</ul>\n"; trailer conf
+  Wserver.printf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
 
 let death_date p =
   match get_death p with
@@ -178,8 +177,8 @@ let print_death conf base =
     Wserver.printf (fcapitale (ftransl conf "the latest %t deaths"))
       (fun _ -> string_of_int len)
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   if list <> [] then
     begin
       Wserver.printf "<ul>\n";
@@ -303,7 +302,7 @@ let print_death conf base =
       Wserver.printf "</p>\n";
       Wserver.printf "</form>\n"
     end;
-  trailer conf
+  Hutil.trailer conf
 
 let print_oldest_alive conf base =
   let limit =
@@ -326,8 +325,8 @@ let print_oldest_alive conf base =
     Wserver.printf
       (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
   List.iter
     (fun (p, d, cal) ->
@@ -344,7 +343,7 @@ let print_oldest_alive conf base =
        Wserver.printf "</li>\n")
     list;
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_longest_lived conf base =
   let get_longest p =
@@ -364,8 +363,8 @@ let print_longest_lived conf base =
     Wserver.printf (fcapitale (ftransl conf "the %d who lived the longest"))
       len
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
   List.iter
     (fun (p, d, _) ->
@@ -378,11 +377,11 @@ let print_longest_lived conf base =
        Wserver.printf "</li>\n")
     list;
   Wserver.printf "</ul>\n\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_marr_or_eng conf base title list =
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
   let _ =
     List.fold_left
@@ -435,7 +434,7 @@ let print_marr_or_eng conf base title list =
          month_txt, future)
       ("", false) list
   in
-  Wserver.printf "</ul>\n</li>\n</ul>\n"; trailer conf
+  Wserver.printf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
 
 let print_marriage conf base =
   let (list, len) =
@@ -481,8 +480,8 @@ let old_print_statistics conf =
     try int_of_string (List.assoc "latest_event" conf.base_env) with
       Not_found | Failure _ -> 20
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
   if conf.wizard || conf.friend then
     begin
@@ -532,7 +531,7 @@ let old_print_statistics conf =
   Wserver.printf "</a>";
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 (* *)
 
@@ -626,7 +625,7 @@ let print_population_pyramid conf base =
     Wserver.printf "</td>\n"
   in
   Hutil.header conf title;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
     let max_wom = Array.fold_left max 0 wom in max 1 (max max_men max_wom)

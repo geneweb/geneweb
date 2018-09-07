@@ -15,7 +15,6 @@ module Make (H : MakeIn) : MakeOut = struct
 open Config
 open Def
 open Gwdb
-open Hutil
 open Util
 
 (* Make the "special" environement; "em=mode;ei=n" *)
@@ -63,7 +62,7 @@ let make_senv conf base =
       let ip =
         match person_of_key base vp vn voc with
           Some ip -> ip
-        | None -> incorrect_request conf; raise Exit
+        | None -> Hutil.incorrect_request conf; raise Exit
       in
       let vi = string_of_int (Adef.int_of_iper ip) in set_senv conf vm vi
   | _ -> ()
@@ -370,15 +369,15 @@ let print_no_index conf base =
     Wserver.printf "%s" (Util.capitale (transl conf "link to use"))
   in
   let link = url_no_index conf base in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "<ul>\n";
   html_li conf;
   Wserver.printf "<a href=\"http://%s\">\n" link;
   Wserver.printf "%s" link;
   Wserver.printf "</a>\n";
   Wserver.printf "</ul>\n";
-  print_link_to_welcome conf false;
-  trailer conf
+  Hutil.print_link_to_welcome conf false;
+  Hutil.trailer conf
 
 let treat_request conf base =
   begin match
@@ -395,7 +394,7 @@ let treat_request conf base =
             let f = Filename.chop_suffix f ".txt" in
             Srcfile.print_source conf base f
           else Image.print conf base
-      | None -> incorrect_request conf
+      | None -> Hutil.incorrect_request conf
       end
   | _ ->
       set_owner conf;

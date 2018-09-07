@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Hutil
 open Util
 
 let dir conf base =
@@ -277,7 +276,7 @@ let print_main conf base auth_file =
   let wddir = dir conf base in
   Hutil.header_no_page_title conf title;
   (* mouais... *)
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<h1>";
   title false;
   Wserver.printf "</h1>\n";
@@ -320,7 +319,7 @@ let print_main conf base auth_file =
     end;
   if by_alphab_order then
     begin print_old_wizards conf old_list; print_search_form conf "" end;
-  trailer conf
+  Hutil.trailer conf
 
 let wizard_page_title wizname _ = Wserver.printf "%s" wizname
 
@@ -334,8 +333,8 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     Some (can_edit, "WIZNOTES", code_varenv wz)
   in
   let title = wizard_page_title wizname in
-  header_no_page_title conf title;
-  print_link_to_welcome conf true;
+  Hutil.header_no_page_title conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<h1>";
   title false;
   Wserver.printf "</h1>\n";
@@ -382,7 +381,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     Some "WIZNOTES_SEARCH" -> print_search_form conf wz
   | Some _ | None -> ()
   end;
-  trailer conf
+  Hutil.trailer conf
 
 let print_part_wiznote conf base wz s cnt0 =
   let title = wz in
@@ -412,7 +411,7 @@ let wizard_auth_file_name conf =
 
 let print conf base =
   let auth_file = wizard_auth_file_name conf in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
     let f =
       (* backward compatibility *)
@@ -442,7 +441,7 @@ let print_mod conf base =
     | Some auth_file, _ -> auth_file
     | _, Some auth_file -> auth_file
   in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
     match p_getenv conf.env "f" with
       Some wz ->
@@ -453,8 +452,8 @@ let print_mod conf base =
           let wfile = wzfile (dir conf base) wz in
           let (s, _) = read_wizard_notes wfile in
           Wiki.print_mod_view_page conf true "WIZNOTES" wz title [] s
-        else incorrect_request conf
-    | None -> incorrect_request conf
+        else Hutil.incorrect_request conf
+    | None -> Hutil.incorrect_request conf
 
 let print_view conf base =
   let auth_file =
@@ -466,7 +465,7 @@ let print_view conf base =
     | Some auth_file, _ -> auth_file
     | _, Some auth_file -> auth_file
   in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
     match p_getenv conf.env "f" with
       Some wz ->
@@ -475,7 +474,7 @@ let print_view conf base =
         let wfile = wzfile (dir conf base) wz in
         let (s, _) = read_wizard_notes wfile in
         Wiki.print_mod_view_page conf false "WIZNOTES" wz title [] s
-    | None -> incorrect_request conf
+    | None -> Hutil.incorrect_request conf
 
 let commit_wiznotes conf base wz s =
   let wddir = dir conf base in
@@ -494,7 +493,7 @@ let print_mod_ok conf base =
     | Some auth_file, _ -> auth_file
     | _, Some auth_file -> auth_file
   in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
     let fname =
       function
@@ -575,8 +574,8 @@ let do_connected_wizards conf base (_, _, _, wl) =
     Wserver.printf "%s"
       (capitale (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   let wddir = dir conf base in
   let denying = wizard_denying wddir in
   let wl =
@@ -627,12 +626,12 @@ let do_connected_wizards conf base (_, _, _, wl) =
       end
   end;
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let connected_wizards conf base =
   match conf.n_connect with
     Some x -> do_connected_wizards conf base x
-  | None -> incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 let do_change_wizard_visibility conf base x set_vis =
   let wddir = dir conf base in
@@ -659,7 +658,7 @@ let do_change_wizard_visibility conf base x set_vis =
 let change_wizard_visibility conf base =
   match conf.n_connect, p_getint conf.env "v" with
     Some x, Some vis -> do_change_wizard_visibility conf base x (vis <> 0)
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 (* searching *)
 

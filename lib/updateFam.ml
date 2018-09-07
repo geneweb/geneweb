@@ -5,7 +5,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open TemplAst
 open Util
 
@@ -684,7 +683,7 @@ let print_update_fam conf base fcd digest =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         env fcd
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_del1 conf base ifam =
   let title _ =
@@ -723,7 +722,7 @@ let print_del1 conf base ifam =
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";
   Wserver.printf "\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
   let title _ =
@@ -766,7 +765,7 @@ let print_inv1 conf base p ifam1 ifam2 =
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";
   Wserver.printf "\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_add conf base =
   let (fath, moth, digest) =
@@ -821,7 +820,7 @@ let print_add_parents conf base =
              Update.Link, "" |]}
       in
       print_update_fam conf base (fam, cpl, des) ""
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_mod conf base =
   match p_getint conf.env "i" with
@@ -829,12 +828,12 @@ let print_mod conf base =
       let sfam = string_family_of conf base (Adef.ifam_of_int i) in
       let digest = Update.digest_family sfam in
       print_update_fam conf base sfam digest
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_del conf base =
   match p_getint conf.env "i" with
     Some i -> print_del1 conf base (Adef.ifam_of_int i)
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let rec find_families ifam =
   function
@@ -853,9 +852,9 @@ let print_inv conf base =
         Some (ifam1, ifam2) ->
           let p = poi base (Adef.iper_of_int ip) in
           print_inv1 conf base p ifam1 ifam2
-      | _ -> incorrect_request conf
+      | _ -> Hutil.incorrect_request conf
       end
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let change_order u ifam n =
   let rec loop i =
@@ -945,8 +944,8 @@ let print_change_order conf base =
       Wserver.printf "</p>\n";
       Wserver.printf "</form>\n";
       Wserver.printf "\n";
-      trailer conf
-  | _ -> incorrect_request conf
+      Hutil.trailer conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
   match p_getint conf.env "i" with
@@ -959,4 +958,4 @@ let print_change_event_order conf base =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         [] sfam
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf

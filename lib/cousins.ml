@@ -5,7 +5,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open Util
 
 let default_max_cnt = 2000
@@ -355,7 +354,7 @@ let print_cousins conf base p lev1 lev2 =
   else Wserver.printf ".\n" ;
   Wserver.printf "</p>\n";
   Wserver.printf "</div>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let sosa_of_persons conf base =
   let rec loop n =

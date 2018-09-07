@@ -5,7 +5,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open Util
 open Dag2html
 
@@ -244,7 +243,7 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let title _ =
       Wserver.printf "%s" (capitale (transl conf "relationship"))
     in
-    header_no_page_title conf title; trailer conf
+    Hutil.header_no_page_title conf title; Hutil.trailer conf
   else
     let next_txt = next_relation_link_txt conf ip1 ip2 (ifam :: excl_faml) in
     let elem_txt p = Dag.Item (p, "") in
@@ -398,9 +397,9 @@ let print_shortest_path conf base p1 p2 =
     let title _ =
       Wserver.printf "%s" (capitale (transl conf "relationship"))
     in
-    header conf title;
+    Hutil.header conf title;
     Wserver.printf "%s\n" (capitale (transl conf "it is the same person!"));
-    trailer conf
+    Hutil.trailer conf
   else
     let excl_faml =
       let rec loop list i =
@@ -434,7 +433,7 @@ let print_shortest_path conf base p1 p2 =
     | None ->
         let s1 = gen_person_title_text reference raw_access conf base p1 in
         let s2 = gen_person_title_text reference raw_access conf base p2 in
-        header_no_page_title conf title;
+        Hutil.header_no_page_title conf title;
         if excl_faml = [] then
           begin
             Wserver.printf "<h1>";
@@ -473,7 +472,7 @@ let print_shortest_path conf base p1 p2 =
             Wserver.printf "<li>%s</li>\n" s2;
             Wserver.printf "</ul>\n"
           end;
-        trailer conf
+        Hutil.trailer conf
 
 let nb_fields s =
   let rec loop cnt i =
@@ -1342,8 +1341,8 @@ let print_main_relationship conf base long p1 p2 rel =
       {conf with base_env = ("doctype", doctype) :: conf.base_env}
     else conf
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   begin match p_getenv conf.env "spouse" with
     Some "on" -> conf.senv <- conf.senv @ ["spouse", "on"]
   | _ -> ()
@@ -1430,7 +1429,7 @@ let print_main_relationship conf base long p1 p2 rel =
         end;
       print_propose_upto conf base p1 p2 rl
   end;
-  trailer conf
+  Hutil.trailer conf
 
 let multi_relation_next_txt conf pl2 lim assoc_txt =
   match pl2 with
@@ -1457,14 +1456,14 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
 
 let print_no_relationship conf base pl =
   let title _ = Wserver.printf "%s" (capitale (transl conf "tree")) in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "<ul>\n";
   List.iter
     (fun p ->
        Wserver.printf "<li>%s\n" (referenced_person_title_text conf base p))
     pl;
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_multi_relation conf base pl lim assoc_txt =
   let (pl1, pl2) =
@@ -1521,12 +1520,12 @@ let print_multi_relation conf base pl lim assoc_txt =
 
 let print_base_loop conf base p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
     (Util.update_family_loop conf base p (designation base p));
   Wserver.printf ".\n";
-  trailer conf
+  Hutil.trailer conf
 
 let relmenu_print = Perso.interp_templ "relmenu"
 

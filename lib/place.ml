@@ -3,7 +3,6 @@
 
 open Config
 open Gwdb
-open Hutil
 open Util
 
 let normalize =
@@ -212,7 +211,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
     (if add_marriage then ";ma=on" else "")
   in
   Hutil.header conf title;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>\n";
   Wserver.printf "<a href=\"%sm=PS%s;k=\">" (commd conf) opt;
   Wserver.printf "%s" (transl conf "long display");
@@ -266,7 +265,7 @@ let print_all_places_surnames_long conf base filter ~add_birth ~add_baptism ~add
       (capitale (transl_nth conf "surname/surnames" 0))
   in
   Hutil.header conf title;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   if array <> [||] then print_html_places_surnames conf base array;
   Hutil.trailer conf
 

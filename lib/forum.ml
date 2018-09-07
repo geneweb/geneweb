@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Hutil
 open Printf
 open TemplAst
 open Util
@@ -729,7 +728,7 @@ let print_add_ok conf base =
      m_email = email; m_access = ""; m_subject = subject; m_wiki = "";
      m_text = text}
   in
-  if not (can_post conf) then incorrect_request conf
+  if not (can_post conf) then Hutil.incorrect_request conf
   else if
     match p_getenv conf.env "visu" with
       Some _ -> true
@@ -744,15 +743,15 @@ let print_add_ok conf base =
     try
       let mods = moderators conf in
       forum_add conf base (mods <> []) mess;
-      header conf title;
-      print_link_to_welcome conf true;
+      Hutil.header conf title;
+      Hutil.print_link_to_welcome conf true;
       if mods <> [] then
         Wserver.printf "<p>%s. %s.</p>"
           (capitale (transl conf "this forum is moderated"))
           (capitale (transl conf "your message is waiting for validation"));
       Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
         (capitale (transl conf "database forum"));
-      trailer conf
+      Hutil.trailer conf
     with Update.ModErr -> ()
 
 (* Deleting a message *)
@@ -767,8 +766,8 @@ let print_del_ok conf next_pos =
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "message deleted"))
   in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   begin match next_pos with
     Some pos ->
       Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
@@ -777,7 +776,7 @@ let print_del_ok conf next_pos =
       Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
         (capitale (transl conf "database forum"))
   end;
-  trailer conf
+  Hutil.trailer conf
 
 let find_next_pos conf =
   let rec loop pos =
@@ -841,8 +840,8 @@ let print_valid_ok conf pos del =
   in
   let title _ = Wserver.printf "%s" (capitale mess) in
   let next_pos = find_next_pos conf pos in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   begin match next_pos with
     Some pos ->
       Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
@@ -851,7 +850,7 @@ let print_valid_ok conf pos del =
       Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
         (capitale (transl conf "database forum"))
   end;
-  trailer conf
+  Hutil.trailer conf
 
 let valid_forum_message conf base pos =
   match get_message conf pos with

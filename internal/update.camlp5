@@ -6,7 +6,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open Util
 
 (* #ifdef API *)
@@ -181,11 +180,11 @@ let print_err_unknown conf _base (f, s, o) =
     end;
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
     (capitale (transl conf "unknown person")) (transl conf ":") f o s;
   print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise ModErr
 
 let update_misc_names_of_family base p_sex u =
@@ -726,16 +725,16 @@ let error conf base x =
     end;
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   print_error conf base x;
   Wserver.printf "\n";
   print_return conf;
-  trailer conf;
+  Hutil.trailer conf;
   raise ModErr
 
 let error_locked conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "<p>\n";
   Wserver.printf
     (fcapitale
@@ -791,7 +790,7 @@ let error_locked conf =
   Wserver.printf "</td>\n";
   Wserver.printf "</tr>\n";
   Wserver.printf "</table>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let error_digest conf =
 (* #ifdef API *)
@@ -806,8 +805,8 @@ the base has changed; do \"back\", \"reload\", and refill the form"))
     end;
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
-  print_link_to_welcome conf true;
+  Hutil.rheader conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>\n";
   Wserver.printf
     (fcapitale
@@ -815,7 +814,7 @@ the base has changed; do \"back\", \"reload\", and refill the form"))
 the base has changed; do \"back\", \"reload\", and refill the form"));
   Wserver.printf ".\n";
   Wserver.printf "</p>\n";
-  trailer conf;
+  Hutil.trailer conf;
   raise ModErr
 
 let digest_person p = Iovalue.digest p
@@ -843,7 +842,7 @@ let bad_date conf d =
     end;
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s%s\n" (capitale (transl conf "incorrect date"))
     (transl conf ":");
   begin match d with
@@ -851,7 +850,7 @@ let bad_date conf d =
   | {day = 0; month = m; year = a} -> Wserver.printf "%d/%d" m a
   | {day = j; month = m; year = a} -> Wserver.printf "%d/%d/%d" j m a
   end;
-  trailer conf;
+  Hutil.trailer conf;
   raise ModErr
 
 let int_of_field s =
@@ -1047,7 +1046,7 @@ let print_create_conflict conf base p var =
 (* #endif *)
   let text = text_of_var conf var in
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf
     (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
     ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
@@ -1105,7 +1104,7 @@ let print_create_conflict conf base p var =
     (capitale (transl conf "back")) conf.xhs;
   Wserver.printf "</form>\n";
   print_same_name conf base p;
-  trailer conf;
+  Hutil.trailer conf;
   raise ModErr
 
 let add_misc_names_for_new_persons base new_persons =

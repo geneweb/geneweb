@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open Hutil
 open Util
 
 type date_event =
@@ -93,8 +92,8 @@ let gen_print conf base mois f_scan dead_people =
     done
   with Not_found -> ()
   end;
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   if List.for_all (fun l -> List.length l = 0) (Array.to_list tab) then
     begin
       Wserver.printf "<p>\n";
@@ -117,7 +116,7 @@ let gen_print conf base mois f_scan dead_people =
       end
   done;
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_anniversary_list conf base dead_people dt liste =
   let a_ref = dt.year in
@@ -266,8 +265,8 @@ let print_marriage conf base month =
          (transl_nth conf "(month)" (month - 1)))
   in
   let tab = Array.make 31 [] in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   for i = 0 to nb_of_families base - 1 do
     let fam = foi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
@@ -309,7 +308,7 @@ let print_marriage conf base month =
         Wserver.printf "</ul>\n"
   done;
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_anniversaries_of_marriage conf base list =
   Wserver.printf "<ul>\n";
@@ -374,9 +373,9 @@ let gen_print_menu_birth conf base f_scan mode =
       Wserver.printf "<h2>\n";
       title false;
       Wserver.printf "</h2>\n"
-  | None -> header conf title
+  | None -> Hutil.header conf title
   end;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   begin try
     while true do
       let (p, txt_of) = f_scan () in
@@ -409,7 +408,7 @@ let gen_print_menu_birth conf base f_scan mode =
   Wserver.printf "\n";
   propose_months conf mode;
   Wserver.printf "\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_menu_birth conf base =
   let i = ref (-1) in
@@ -488,7 +487,7 @@ let gen_print_menu_dead conf base f_scan mode =
   Wserver.printf "\n";
   propose_months conf mode;
   Wserver.printf "\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_menu_dead conf base =
   let i = ref (-1) in
@@ -525,8 +524,8 @@ let print_menu_marriage conf base =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   for i = 0 to nb_of_families base - 1 do
     let fam = foi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
@@ -566,7 +565,7 @@ let print_menu_marriage conf base =
     Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"AM\"%s>\n"
       conf.xhs
   in
-  propose_months conf mode; Wserver.printf "\n"; trailer conf
+  propose_months conf mode; Wserver.printf "\n"; Hutil.trailer conf
 
 (* template *)
 type 'a env =

@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open Hutil
 open TemplAst
 open Util
 
@@ -443,7 +442,7 @@ let print_long conf list len =
   in
   let title _ = print_title conf (Mutil.tr '_' ' ' ini) len in
   Hutil.header conf title;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<div class=\"tips\">\n";
   Wserver.printf "<table>\n";
   Wserver.printf "<tr>\n";
@@ -630,7 +629,7 @@ let print_short conf list len =
   let ini_list = build_ini list (String.length ini) in
   let title _ = print_title conf (Mutil.tr '_' ' ' ini) len in
   Hutil.header conf title;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "%s :" (capitale (transl conf "select a letter"));
   Wserver.printf "<p class=\"list_ini\">\n";
   List.iter
@@ -1060,7 +1059,7 @@ let print_mod_ok conf base =
         Wserver.printf "%s" (capitale (transl conf "modification successful"))
       in
       Hutil.header conf title;
-      print_link_to_welcome conf true;
+      Hutil.print_link_to_welcome conf true;
       Wserver.printf "<p>\n";
       (* En attendant mieux ... *)
       Wserver.printf "%s%s %d "
@@ -1131,7 +1130,7 @@ let print_mod_ok conf base =
       Wserver.printf "%s" (capitale (transl conf "no modification"))
     in
     Hutil.header conf title;
-    print_link_to_welcome conf true;
+    Hutil.print_link_to_welcome conf true;
     Wserver.printf "<p>\n";
     Wserver.printf "<a href=\"%sm=MOD_DATA;data=%s;s=%s\">" (commd conf) data
       ini;

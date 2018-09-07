@@ -5,7 +5,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open Util
 
 let print_differences conf base branches p1 p2 =
@@ -265,7 +264,7 @@ let propose_merge_ind conf base branches p1 p2 =
     let s = transl_nth conf "person/persons" 1 in
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
-  header conf title;
+  Hutil.header conf title;
   if branches <> [] then
     begin
       Wserver.printf "%s%s\n" (capitale (transl conf "you must first merge"))
@@ -320,7 +319,7 @@ let propose_merge_ind conf base branches p1 p2 =
         Wserver.printf "</table>\n"
       end
     end;
-  trailer conf
+  Hutil.trailer conf
 
 let reparent_ind base warning ip1 ip2 =
   let a1 = poi base ip1 in
@@ -458,14 +457,14 @@ exception Different_sexes
 
 let error_loop conf base p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
-  print_link_to_welcome conf true;
+  Hutil.rheader conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<strong>%s%s %s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p);
   Wserver.printf "\n%s\n" (transl conf "would be his/her own ancestor");
   Wserver.printf "\n";
-  trailer conf
+  Hutil.trailer conf
 
 let check_ind base p1 p2 =
   if get_key_index p1 = get_key_index p2 then raise Same_person
@@ -489,7 +488,7 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
     let s = transl_nth conf "family/families" 1 in
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "%s%s\n"
     (capitale (transl conf "you must first merge the 2 families"))
     (transl conf ":");
@@ -506,7 +505,7 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   Wserver.printf "</ul>\n";
   html_p conf;
   MergeFam.print_differences conf base branches fam1 fam2;
-  trailer conf
+  Hutil.trailer conf
 
 let effective_merge_fam base ifam1 fam1 ifam2 fam2 =
   let des1 = fam1 in
@@ -556,23 +555,23 @@ let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done =
 
 let not_found_or_incorrect conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s %s %s %s %s\n" (capitale (transl conf "not found"))
     (transl conf "or") (transl conf "several answers") (transl conf "or")
     (transl conf "incorrect request");
-  trailer conf
+  Hutil.trailer conf
 
 let same_person conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale (transl conf "it is the same person!"));
-  trailer conf
+  Hutil.trailer conf
 
 let different_sexes conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s.\n" (capitale (transl conf "incompatible sexes"));
-  trailer conf
+  Hutil.trailer conf
 
 let rec try_merge conf base warning branches ip1 ip2 changes_done propose_merge_ind =
   let p1 = poi base ip1 in
@@ -614,8 +613,8 @@ let rec try_merge conf base warning branches ip1 ip2 changes_done propose_merge_
 
 let print_merged conf base wl p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>\n";
   Wserver.printf "%s\n" (referenced_person_text conf base p);
@@ -645,7 +644,7 @@ let print_merged conf base wl p =
   | _ -> ()
   end;
   Update.print_warnings conf base wl;
-  trailer conf
+  Hutil.trailer conf
 
 let merge conf base p1 p2 propose_merge_ind =
   let rev_wl = ref [] in
@@ -739,6 +738,6 @@ let print_kill_ancestors conf base =
           in
           History.record conf base changed "ka";
           print_killed conf base p !nb_ind !nb_fam
-      | None -> incorrect_request conf
+      | None -> Hutil.incorrect_request conf
       end
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
