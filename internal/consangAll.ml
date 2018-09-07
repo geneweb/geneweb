@@ -3,12 +3,6 @@
 
 open Gwdb
 
-let designation base p =
-  let first_name = p_first_name base p in
-  let nom = p_surname base p in
-  Mutil.iso_8859_1_of_utf_8
-    (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
-
 let rec clear_descend_consang base cset mark ifam =
   let des = foi base ifam in
   Array.iter
@@ -108,7 +102,7 @@ let compute ?(verbosity = 2) base tlim from_scratch =
                        begin
                          Printf.eprintf "\nMax consanguinity %g for %s... "
                            consang
-                           (designation base (poi base (Adef.iper_of_int i)));
+                           (Gutil.designation base (poi base (Adef.iper_of_int i)));
                          flush stderr;
                          most := Some i
                        end)

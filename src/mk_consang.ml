@@ -455,12 +455,6 @@ let simple_output bname base carray =
       (* On recalcul le nombre reel de personnes. *)
       init_cache_info bname base
 
-let designation base p =
-  let first_name = Gwdb.p_first_name base p in
-  let nom = Gwdb.p_surname base p in
-  Mutil.iso_8859_1_of_utf_8
-    (first_name ^ "." ^ string_of_int (Gwdb.get_occ p) ^ " " ^ nom)
-
 let main () =
   Argl.parse speclist anonfun errmsg;
   if !fname = "" then
@@ -492,7 +486,7 @@ let main () =
          simple_output !fname base carray
        with Consang.TopologicalSortError p ->
          Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
-           (designation base p);
+           (Gutil.designation base p);
          flush stdout;
          exit 2)
 
