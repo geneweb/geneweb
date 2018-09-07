@@ -1092,7 +1092,8 @@
             %if;(ancestor.occ!="" and ancestor.occ!=0) (%ancestor.occ;)%end;"%sp;
                 href="%prefix_base_password;%ancestor.access;;%nn;
                   %foreach;env_binding;
-                    %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;
+                    %if;(not (env.key="p" or env.key="n" or env.key="oc" or
+                      env.key="i" or env.key=""))%env.key;=%env.val;;%nn;
                     %end;
                   %end;">%nn;
          %else;
