@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Futil
 open Gutil
 open Gwdb
 open Util
@@ -595,7 +594,7 @@ let reconstitute_family conf base =
      divorce = divorce; fevents = events; comment = comment;
      origin_file = origin_file; fsources = fsources;
      fam_index = Adef.ifam_of_int fam_index}
-  and cpl = parent conf.multi_parents (Array.of_list parents)
+  and cpl = Futil.parent conf.multi_parents (Array.of_list parents)
   and des = {children = Array.of_list children} in
   fam, cpl, des, ext
 
@@ -1162,15 +1161,15 @@ let effective_mod conf base sfam scpl sdes =
     | None -> ""
   in
   let ncpl =
-    map_couple_p conf.multi_parents
+    Futil.map_couple_p conf.multi_parents
       (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
-    map_family_ps (Update.insert_person conf base psrc created_p)
+    Futil.map_family_ps (Update.insert_person conf base psrc created_p)
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let nfath = poi base (Adef.father ncpl) in
   let nmoth = poi base (Adef.mother ncpl) in
@@ -1294,15 +1293,15 @@ let effective_add conf base sfam scpl sdes =
     | None -> ""
   in
   let ncpl =
-    map_couple_p conf.multi_parents
+    Futil.map_couple_p conf.multi_parents
       (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
-    map_family_ps (Update.insert_person conf base psrc created_p)
+    Futil.map_family_ps (Update.insert_person conf base psrc created_p)
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base (Adef.father ncpl) in
@@ -1849,7 +1848,7 @@ let print_change_event_order conf base =
         let fam = update_family_with_fevents conf base fam in
         patch_family base fam.fam_index fam;
         let a = foi base fam.fam_index in
-        let cpl = parent conf.multi_parents (get_parent_array a) in
+        let cpl = Futil.parent conf.multi_parents (get_parent_array a) in
         let des = {children = get_children a} in
         let wl =
           let wl = ref [] in
