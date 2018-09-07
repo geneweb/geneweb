@@ -12,7 +12,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 
 let trace = ref false
@@ -37,10 +36,10 @@ let read_file fname =
         let occ =
           try int_of_string occ with
             Failure _ ->
-              eprintf "*** Error int_of_string: %s" occ; flush stderr; exit 2
+              Printf.eprintf "*** Error int_of_string: %s" occ; flush stderr; exit 2
         in
         sn, fn, occ
-    | _ -> eprintf "*** Error key: %s" name; flush stderr; exit 2
+    | _ -> Printf.eprintf "*** Error key: %s" name; flush stderr; exit 2
   in
   let list = ref [] in
   let () =
@@ -85,7 +84,7 @@ let update_database_with_file base fname =
            let p = poi base ip in
            if !trace then
              begin
-               eprintf "Modifiy person : %s" (Gutil.designation base p);
+               Printf.eprintf "Modifiy person : %s" (Gutil.designation base p);
                flush stderr
              end;
            let evt =
@@ -109,7 +108,7 @@ let update_database_with_file base fname =
            in
            patch_person base gp.key_index gp
        | None ->
-           eprintf "Person not in the database anymore : %s.%d %s" fn occ sn;
+           Printf.eprintf "Person not in the database anymore : %s.%d %s" fn occ sn;
            flush stderr)
     list
 

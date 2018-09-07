@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 let year_of p =
   match
@@ -86,7 +85,7 @@ let mark_ancestors base scanned lim_year titled is_quest_string =
               Some y ->
                 if y >= lim_year then
                   begin
-                    eprintf "Problem of date ! %s %d\n"
+                    Printf.eprintf "Problem of date ! %s %d\n"
                       (Gutil.designation base p) y;
                     flush stderr
                   end
@@ -121,8 +120,8 @@ let public_all bname lim_year titled =
   Consang.check_noloop base
     (function
        OwnAncestor p ->
-         printf "I cannot deal this database.\n";
-         printf "%s is his own ancestors\n" (Gutil.designation base p);
+         Printf.printf "I cannot deal this database.\n";
+         Printf.printf "%s is his own ancestors\n" (Gutil.designation base p);
          flush stdout;
          exit 2
      | _ -> assert false);

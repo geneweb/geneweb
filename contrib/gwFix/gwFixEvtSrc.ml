@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 let trace = ref false
 
@@ -89,7 +88,7 @@ let update_database_with_burial base =
       begin
         if !trace then
           begin
-            eprintf "Modifiy person : %s\n" (Gutil.designation base p);
+            Printf.eprintf "Modifiy person : %s\n" (Gutil.designation base p);
             flush stderr
           end;
         let pevents = get_pevents p @ pevents in
@@ -102,7 +101,7 @@ let update_database_with_burial base =
   if !base_changed then
     begin
       commit_patches base;
-      eprintf "Number of modified persons: %d\n" !nb_modified;
+      Printf.eprintf "Number of modified persons: %d\n" !nb_modified;
       flush stderr
     end
 
@@ -120,7 +119,7 @@ let main () =
   if !bname = "" then begin Arg.usage speclist usage; exit 2 end;
     Lock.control (Mutil.lock_file !bname) false
       ~onerror:(fun () ->
-          eprintf "Cannot lock database. Try again.\n";
+          Printf.eprintf "Cannot lock database. Try again.\n";
           flush stderr)
       (fun () ->
          let base = Gwdb.open_base !bname in update_database_with_burial base)

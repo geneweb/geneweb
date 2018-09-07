@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 let trace = ref false
 
@@ -22,7 +21,7 @@ let update_database_with_burial base =
           begin
             if !trace then
               begin
-                eprintf "Modifiy person : %s\n" (Gutil.designation base p);
+                Printf.eprintf "Modifiy person : %s\n" (Gutil.designation base p);
                 flush stderr
               end;
             let evt =
@@ -42,7 +41,7 @@ let update_database_with_burial base =
   if !changed then
     begin
       commit_patches base;
-      eprintf "Number of modified persons: %d\n" !nb_modified;
+      Printf.eprintf "Number of modified persons: %d\n" !nb_modified;
       flush stderr
     end
 

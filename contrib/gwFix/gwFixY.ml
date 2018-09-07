@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 (* Copie de util.ml *)
 let gen_only_printable or_nl s =
@@ -60,7 +59,7 @@ let fix_occu_y base =
       begin
         if !trace then
           begin
-            eprintf "Modifiy person : %s\n" (Gutil.designation base p);
+            Printf.eprintf "Modifiy person : %s\n" (Gutil.designation base p);
             flush stderr
           end;
         let gp =
@@ -97,7 +96,7 @@ let fix_occu_y base =
         if !trace then
           begin let fath = poi base (get_father fam) in
             let moth = poi base (get_mother fam) in
-            eprintf "Modifiy family : %s %s\n" (Gutil.designation base fath)
+            Printf.eprintf "Modifiy family : %s %s\n" (Gutil.designation base fath)
               (Gutil.designation base moth);
             flush stderr
           end;
@@ -110,8 +109,8 @@ let fix_occu_y base =
   if !changed then
     begin
       commit_patches base;
-      eprintf "Number of modified persons: %d\n" !nb_ind_modified;
-      eprintf "Number of modified families: %d\n" !nb_fam_modified;
+      Printf.eprintf "Number of modified persons: %d\n" !nb_ind_modified;
+      Printf.eprintf "Number of modified families: %d\n" !nb_fam_modified;
       flush stderr
     end
 
@@ -130,7 +129,7 @@ let main () =
   Lock.control (Mutil.lock_file !bname) false
     (fun () -> let base = Gwdb.open_base !bname in fix_occu_y base)
     ~onerror:(fun () ->
-        eprintf "Cannot lock database. Try again.\n";
+        Printf.eprintf "Cannot lock database. Try again.\n";
         flush stderr)
 
 let _ = main ()

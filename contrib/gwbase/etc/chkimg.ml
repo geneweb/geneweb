@@ -1,7 +1,6 @@
 (* $Id: chkimg.ml,v 4.9 2007-09-04 03:06:50 deraugla Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
-open Printf
 
 let get_images_names bname =
   let dh = Unix.opendir (Filename.concat "images" bname) in
@@ -23,15 +22,15 @@ let check_key_aux base ifname fname =
     let ip = Gwdb.person_of_key base fn sn oc in
     if ip = None then raise Not_found
   with
-    Not_found -> printf "... nobody: %s\n" ifname; flush stdout
-  | x -> printf "error at %s\n" fname; flush stdout; raise x
+    Not_found -> Printf.printf "... nobody: %s\n" ifname; flush stdout
+  | x -> Printf.printf "error at %s\n" fname; flush stdout; raise x
 
 let check_key base fname =
   if Filename.check_suffix fname ".jpg" then
     check_key_aux base fname (Filename.chop_suffix fname ".jpg")
   else if Filename.check_suffix fname ".gif" then
     check_key_aux base fname (Filename.chop_suffix fname ".gif")
-  else printf "... alone: %s\n" fname
+  else Printf.printf "... alone: %s\n" fname
 
 let chkimg bname base =
   let list = get_images_names bname in

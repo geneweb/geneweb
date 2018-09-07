@@ -3,7 +3,6 @@
 
 open Gutil
 open Gwdb
-open Printf
 
 let line_tpl = "0000-00-00 00:00:00 xx ."
 
@@ -20,7 +19,7 @@ let histselect bname base =
   try
     while true do
       let line = input_line ic in
-      if person_of_line_exists base line then printf "%s\n" line; flush stdout
+      if person_of_line_exists base line then Printf.printf "%s\n" line; flush stdout
     done
   with End_of_file -> close_in ic
 

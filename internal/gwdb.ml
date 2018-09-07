@@ -4,7 +4,6 @@
 open Dbdisk
 open Db2disk
 open Def
-open Printf
 
 type 'istr gen_string_person_index =
   'istr Dbdisk.string_person_index =
@@ -1286,7 +1285,7 @@ let base2 db2 =
             s);
      load_ascends_array =
        (fun () ->
-          eprintf "*** loading ascends array\n";
+          Printf.eprintf "*** loading ascends array\n";
           flush stderr;
           let nb = db2.patches.nb_per in
           let nb_ini = db2.patches.nb_per_ini in
@@ -1302,7 +1301,7 @@ let base2 db2 =
           match db2.family_array with
             Some _ -> ()
           | None ->
-              eprintf "*** loading unions array\n";
+              Printf.eprintf "*** loading unions array\n";
               flush stderr;
               db2.family_array <- Some (family_array2 db2));
      load_couples_array = (fun () -> load_couples_array2 db2);
@@ -1311,7 +1310,7 @@ let base2 db2 =
           match db2.children_array with
             Some _ -> ()
           | None ->
-              eprintf "*** loading descends array\n";
+              Printf.eprintf "*** loading descends array\n";
               flush stderr;
               db2.children_array <- Some (children_array2 db2));
      load_strings_array = (fun () -> ());

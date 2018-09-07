@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 
 let designation base ip p =
@@ -47,7 +46,7 @@ let check bname =
           (Array.to_list (get_parent_array fam))
       in
       if neg_cpl then do {
-        eprintf "%s\n" bname;
+        Printf.eprintf "%s\n" bname;
         flush stderr;
       }
       else ()
@@ -71,7 +70,7 @@ let main () =
   if !bname = "" then begin Arg.usage speclist usage; exit 2 end;
   Lock.control (Mutil.lock_file !bname) false (fun () -> check !bname)
     ~onerror:(fun () ->
-        eprintf "Cannot lock database. Try again.\n";
+        Printf.eprintf "Cannot lock database. Try again.\n";
         flush stderr)
 
 let _ = main ()

@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk
-open Printf
 
 let gwtp_tmp = ref (Filename.concat ".." "gwtp_tmp")
 let gwtp_dst = ref (Filename.concat ".." "gwtp_dst")
@@ -145,7 +144,7 @@ let copy_template genv (varenv, filenv) env if_env fname =
       'N' -> not (if_expr (input_char ic))
     | c ->
         try List.assoc c if_env with
-          Not_found -> printf "!!!!!%c!!!!!" c; true
+          Not_found -> Printf.printf "!!!!!%c!!!!!" c; true
   in
   begin try
     while true do
@@ -273,10 +272,10 @@ value html_escaped s =
 *)
 
 let gwtp_error txt =
-  printf "content-type: text/html";
+  Printf.printf "content-type: text/html";
   crlf ();
   crlf ();
-  printf "<head><title>Error</title></head>\n\
+  Printf.printf "<head><title>Error</title></head>\n\
           <body>\n\
           <h1><font color=red>Error</font></h1>\n\
           %s\n\
@@ -386,7 +385,7 @@ let set_base_conf b varenv =
       begin try
         while true do
           let line = input_line ic in
-          let line_out = extract line varenv in fprintf oc "%s\n" line_out
+          let line_out = extract line varenv in Printf.fprintf oc "%s\n" line_out
         done
       with End_of_file -> close_in ic
       end
@@ -394,7 +393,7 @@ let set_base_conf b varenv =
   end;
   List.iter
     (fun (k, v, is_set) ->
-       if not !is_set && v <> "" then fprintf oc "%s=%s\n" k v)
+       if not !is_set && v <> "" then Printf.fprintf oc "%s=%s\n" k v)
     varenv;
   close_out oc;
   (try Sys.remove fname_saved with Sys_error _ -> ());
@@ -438,7 +437,7 @@ let read_tokens fname =
 
 let write_tokens fname tokens =
   let oc = open_out fname in
-  List.iter (fun (tm, from_b, tok) -> fprintf oc "%.0f %s %s\n" tm from_b tok)
+  List.iter (fun (tm, from_b, tok) -> Printf.fprintf oc "%.0f %s %s\n" tm from_b tok)
     tokens;
   close_out oc
 
@@ -513,7 +512,7 @@ let insert_file env bdir name =
   let fname = filename_basename fname in
   if fname = "" then ()
   else if fname <> name then
-    printf "You selected <b>%s</b> instead of <b>%s</b> -&gt; ignored.\n"
+    Printf.printf "You selected <b>%s</b> instead of <b>%s</b> -&gt; ignored.\n"
       fname name
   else
     begin let contents = List.assoc name env in
@@ -528,7 +527,7 @@ let insert_file env bdir name =
         let oc = open_out (Filename.concat bdir name) in
         output_substring oc contents (j + 1) len;
         flush oc;
-        printf "File \"%s\" transferred.\n" name;
+        Printf.printf "File \"%s\" transferred.\n" name;
         close_out oc
     end;
   flush stdout
@@ -543,9 +542,9 @@ let make_temp env b =
   insert_file env bdir "particles.txt";
   flush stdout;
   let base = Iolight.input bdir in
-  printf "\n";
-  printf "persons: %d\n" base.data.persons.len;
-  printf "families: %d\n\n" base.data.families.len;
+  Printf.printf "\n";
+  Printf.printf "persons: %d\n" base.data.persons.len;
+  Printf.printf "families: %d\n\n" base.data.families.len;
   flush stdout;
   Secure.set_base_dir (Filename.dirname bdir);
   Outbase.output bdir base;
@@ -577,8 +576,8 @@ let printf_link_to_main env b tok =
       Some x -> x
     | _ -> "en"
   in
-  printf "<p><hr /><div align=right>\n";
-  printf "<a href=\"%s?m=MAIN;b=%s;t=%s;lang=%s\">%s</a></div>\n"
+  Printf.printf "<p><hr /><div align=right>\n";
+  Printf.printf "<a href=\"%s?m=MAIN;b=%s;t=%s;lang=%s\">%s</a></div>\n"
     (cgi_script_name ()) b tok lang (transl lang "main page")
 
 (* Upload from GEDCOM *)
@@ -618,29 +617,29 @@ let send_gedcom_file env b tok fname =
   if Filename.check_suffix fname ".ged" || Filename.check_suffix fname ".GED"
   then
     begin
-      printf "content-type: text/html";
+      Printf.printf "content-type: text/html";
       crlf ();
       crlf ();
-      printf "<head><title>Gwtp...</title></head>\n\
+      Printf.printf "<head><title>Gwtp...</title></head>\n\
               <body>\n\
               <h1 align=center>Gwtp...</h1>\n\
               <pre>\n";
       flush stdout;
       make_gedcom_file env b;
-      printf "\nGedcom file transferred.\n";
+      Printf.printf "\nGedcom file transferred.\n";
       flush stdout;
       ged2gwb b;
-      printf "New database created.\n";
+      Printf.printf "New database created.\n";
       flush stdout;
       copy_temp b;
-      printf "Database \"%s\" updated.\n" b;
-      printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
+      Printf.printf "Database \"%s\" updated.\n" b;
+      Printf.printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
         (cgi_script_name ()) b tok;
       flush stdout;
       move_gedcom_to_old b;
-      printf "</pre>\n";
+      Printf.printf "</pre>\n";
       printf_link_to_main env b tok;
-      printf "</body>\n";
+      Printf.printf "</body>\n";
       flush stdout
     end
   else gwtp_error "This is not a gedcom file (not ending with .GED)"
@@ -658,36 +657,36 @@ let gwtp_upload_gedcom env b tok =
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
     begin
-      printf "content-type: text/html";
+      Printf.printf "content-type: text/html";
       crlf ();
       crlf ();
       copy_template env ([], []) ['b', Val b; 't', Val tok] [] "send_gedcom"
     end
 
 let gwtp_print_log env b tok =
-  printf "content-type: text/html";
+  Printf.printf "content-type: text/html";
   crlf ();
   crlf ();
-  printf "<head><title>Gwtp - %s</title></head>\n\
+  Printf.printf "<head><title>Gwtp - %s</title></head>\n\
           <body>\n\
           <h1 align=center>Gwtp - %s</h1>\n"
     b b;
   let fname = Filename.concat !gwtp_tmp (b ^ ".log") in
   let ic = open_in fname in
-  printf "<pre>\n";
+  Printf.printf "<pre>\n";
   begin try while true do output_char stdout (input_char ic) done with
     End_of_file -> ()
   end;
-  printf "</pre>\n";
+  Printf.printf "</pre>\n";
   close_in ic;
   printf_link_to_main env b tok;
-  printf "</body>\n"
+  Printf.printf "</body>\n"
 
 let gwtp_print_accesses of_wizards env b tok =
-  printf "content-type: text/html";
+  Printf.printf "content-type: text/html";
   crlf ();
   crlf ();
-  printf "<head><title>Gwtp - %s</title></head>\n\
+  Printf.printf "<head><title>Gwtp - %s</title></head>\n\
           <body>\n\
           <h1 align=center>Gwtp - %s</h1>\n"
     b b;
@@ -705,8 +704,8 @@ let gwtp_print_accesses of_wizards env b tok =
       List.fold_right Filename.concat [!gwtp_dst; "cnt"]
         (b ^ (if of_wizards then "_w.txt" else "_f.txt"))
   in
-  printf "<pre>\n";
-  if fname = "" then printf "[no password file]\n"
+  Printf.printf "<pre>\n";
+  if fname = "" then Printf.printf "[no password file]\n"
   else
     begin try
       let ic = open_in fname in
@@ -714,11 +713,11 @@ let gwtp_print_accesses of_wizards env b tok =
         End_of_file -> ()
       end;
       close_in ic
-    with Sys_error _ -> printf "[nothing]\n"
+    with Sys_error _ -> Printf.printf "[nothing]\n"
     end;
-  printf "</pre>\n";
+  Printf.printf "</pre>\n";
   printf_link_to_main env b tok;
-  printf "</body>\n"
+  Printf.printf "</body>\n"
 
 (* Actions *)
 
@@ -727,43 +726,43 @@ let send_file env b tok fname =
   let lockf = Filename.concat !gwtp_tmp (b ^ ".lck") in
   if fname = "base" then
     begin
-      printf "content-type: text/html";
+      Printf.printf "content-type: text/html";
       crlf ();
       crlf ();
-      printf "<head><title>Gwtp...</title></head>\n\
+      Printf.printf "<head><title>Gwtp...</title></head>\n\
               <body>\n\
               <h1 align=center>Gwtp...</h1>\n\
               <pre>\n";
       flush stdout;
       Lock.control lockf false
         ~onerror:(fun () ->
-            printf "Database is already being transferred.<br>\n";
-            printf "Please try again later.\n")
+            Printf.printf "Database is already being transferred.<br>\n";
+            Printf.printf "Please try again later.\n")
         (fun () ->
            make_temp env b;
-           printf "\nTemporary database created.\n";
+           Printf.printf "\nTemporary database created.\n";
              flush stdout;
            copy_temp b;
-           printf "Database \"%s\" updated.\n" b);
+           Printf.printf "Database \"%s\" updated.\n" b);
       flush stdout;
-      printf "</pre>\n";
+      Printf.printf "</pre>\n";
       printf_link_to_main env b tok;
-      printf "</body>\n"
+      Printf.printf "</body>\n"
     end
   else
     begin
-      printf "content-type: text/html";
+      Printf.printf "content-type: text/html";
       crlf ();
       crlf ();
-      printf "<head><title>Error</title></head>\n\
+      Printf.printf "<head><title>Error</title></head>\n\
               <body>\n\
               <h1><font color=red>Error</font></h1>\n";
       if fname = "" then
-        printf "You must select at least the <b>base</b> file\n"
+        Printf.printf "You must select at least the <b>base</b> file\n"
       else
-        printf "You selected the file <b>%s</b> instead of <b>base</b>\n"
+        Printf.printf "You selected the file <b>%s</b> instead of <b>base</b>\n"
           fname;
-      printf "</body>\n";
+      Printf.printf "</body>\n";
       printf_link_to_main env b tok
     end
 
@@ -779,9 +778,9 @@ let gwtp_receive env b _ =
     Some fname ->
       let fname = filename_basename fname in
       let bdir = Filename.concat !gwtp_dst (b ^ ".gwb") in
-      printf "content-type: bin/geneweb";
+      Printf.printf "content-type: bin/geneweb";
       crlf ();
-      printf "content-disposition: attachment; filename=%s" fname;
+      Printf.printf "content-disposition: attachment; filename=%s" fname;
       crlf ();
       crlf ();
       let ic = open_in (Filename.concat bdir fname) in
@@ -848,25 +847,25 @@ let gwtp_setconf env b tok =
          | None -> filenv)
       files []
   in
-  printf "content-type: text/html";
+  Printf.printf "content-type: text/html";
   crlf ();
   crlf ();
-  printf "<head><title>Gwtp - configuration %s</title></head>\n\
+  Printf.printf "<head><title>Gwtp - configuration %s</title></head>\n\
           <body>\n\
           <h1 align=center>Gwtp - configuration %s</h1>\n"
     b b;
   set_base_conf b varenv;
   set_base_files b filenv;
-  printf "Configuration changed\n";
+  Printf.printf "Configuration changed\n";
   printf_link_to_main env b tok;
-  printf "</body>\n"
+  Printf.printf "</body>\n"
 
 let gwtp_upload env b tok =
   let bcnf = Filename.concat !gwtp_dst (b ^ ".gwf") in
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
     begin
-      printf "content-type: text/html";
+      Printf.printf "content-type: text/html";
       crlf ();
       crlf ();
       copy_template env ([], []) ['b', Val b; 't', Val tok] [] "send"
@@ -878,13 +877,13 @@ let gwtp_download env b tok =
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
     begin
-      printf "content-type: text/html";
+      Printf.printf "content-type: text/html";
       crlf ();
       crlf ();
       if Sys.file_exists bdir then
         let print_directory () =
           let dh = Unix.opendir bdir in
-          printf "<ul>\n";
+          Printf.printf "<ul>\n";
           begin try
             while true do
               let f = Unix.readdir dh in
@@ -893,46 +892,46 @@ let gwtp_download env b tok =
                  f.[String.length f - 1] <> '~'
               then
                 begin
-                  printf "<li><tt>";
-                  printf "<a href=\"%s?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
+                  Printf.printf "<li><tt>";
+                  Printf.printf "<a href=\"%s?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
                     (cgi_script_name ()) b tok f f;
                   let sz = string_of_int st.Unix.st_size in
-                  printf "%t%s bytes"
+                  Printf.printf "%t%s bytes"
                     (fun oc ->
                        for i = 1 to 25 - String.length sz - String.length f do
-                         fprintf oc "&nbsp;"
+                         Printf.fprintf oc "&nbsp;"
                        done)
                     sz;
-                  printf "</tt>\n"
+                  Printf.printf "</tt>\n"
                 end
             done
           with End_of_file -> Unix.closedir dh
           end;
-          printf "</ul>\n"
+          Printf.printf "</ul>\n"
         in
         copy_template env ([], [])
           ['b', Val b; 't', Val tok; 'd', Fun print_directory] [] "recv"
       else
         begin
-          printf "<head><title>Gwtp - download %s</title></head>\n\
+          Printf.printf "<head><title>Gwtp - download %s</title></head>\n\
                   <body>\n\
                   <h1 align=center>Gwtp - download %s</h1>\n\
                   <p>Your database does not exist or is empty.\n"
             b b;
           printf_link_to_main env b tok;
-          printf "</body>\n"
+          Printf.printf "</body>\n"
         end
     end
 
 let gwtp_config env b tok =
   let (varenv, filenv) = get_base_conf b in
-  printf "content-type: text/html";
+  Printf.printf "content-type: text/html";
   crlf ();
   crlf ();
   copy_template env (varenv, filenv) ['b', Val b; 't', Val tok] [] "conf"
 
 let gwtp_main env b tok =
-  printf "content-type: text/html";
+  Printf.printf "content-type: text/html";
   crlf ();
   crlf ();
   copy_template env ([], []) ['b', Val b; 't', Val tok; 'w', Val !gw_site]
@@ -942,10 +941,10 @@ let gwtp_main env b tok =
     "main"
 
 let gwtp_login () =
-  printf "content-type: text/html";
+  Printf.printf "content-type: text/html";
   crlf ();
   crlf ();
-  printf "<head><title>Gwtp</title></head>\n\
+  Printf.printf "<head><title>Gwtp</title></head>\n\
           <body>\n\
           <h1>Gwtp</h1>\n\
           <form method=POST action=%s>\n\
@@ -992,13 +991,13 @@ let log oc_log str =
     try Sys.getenv "REMOTE_HOST" with
       Not_found -> try Sys.getenv "REMOTE_ADDR" with Not_found -> ""
   in
-  fprintf oc_log "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
+  Printf.fprintf oc_log "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
     (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
     tm.Unix.tm_sec;
-  fprintf oc_log " %s?%s\n" (cgi_script_name ()) str;
-  if from <> "" then fprintf oc_log "  From: %s\n" from;
-  if user_agent <> "" then fprintf oc_log "  Agent: %s\n" user_agent;
-  if referer <> "" then fprintf oc_log "  Referer: %s\n" referer
+  Printf.fprintf oc_log " %s?%s\n" (cgi_script_name ()) str;
+  if from <> "" then Printf.fprintf oc_log "  From: %s\n" from;
+  if user_agent <> "" then Printf.fprintf oc_log "  Agent: %s\n" user_agent;
+  if referer <> "" then Printf.fprintf oc_log "  Referer: %s\n" referer
 
 let gwtp () =
   let content_type = cgi_content_type () in
@@ -1058,4 +1057,4 @@ let main () =
 let _ =
   try main () with
     exc ->
-      eprintf "Exception raised: %s\n" (Printexc.to_string exc); flush stderr
+      Printf.eprintf "Exception raised: %s\n" (Printexc.to_string exc); flush stderr

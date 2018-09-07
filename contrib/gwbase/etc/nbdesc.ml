@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 let designation base ip p =
   let first_name = p_first_name base p in
@@ -85,7 +84,7 @@ let number_of_desc base mark ip p =
           [] -> List.rev nb_list
         | _ ->
             (*
-            let _ = do { if List.length nb_list > glop.val then do { glop.val := List.length nb_list; printf "\n%s gen %d" (designation base ip p) glop.val; flush stdout; } else () } in
+            let _ = do { if List.length nb_list > glop.val then do { glop.val := List.length nb_list; Printf.printf "\n%s gen %d" (designation base ip p) glop.val; flush stdout; } else () } in
             *)
             loop (nb :: nb_list) 0 [] new_gen
   in
@@ -98,7 +97,7 @@ let nb_desc bname date =
   let nb_ind = nb_of_persons base in
   let nb_fam = nb_of_families base in
   let nb_liv = apply base date nb_ind (fun _ _ _ -> ()) in
-  printf "nombre de personnes vivantes en %s : %d\n" (string_of_date date)
+  Printf.printf "nombre de personnes vivantes en %s : %d\n" (string_of_date date)
     nb_liv;
   flush stdout;
   let mark = Array.make nb_fam 0 in
@@ -122,12 +121,12 @@ let nb_desc bname date =
   let (nb_gen, nb_tot) =
     List.fold_left
       (fun (nb_gen, nb_tot) nb_at_gen ->
-         printf "nombre moyen de descendants à la génération %2d :" nb_gen;
-         printf " %7.2f\n" (float nb_at_gen /. float nb_liv);
+         Printf.printf "nombre moyen de descendants à la génération %2d :" nb_gen;
+         Printf.printf " %7.2f\n" (float nb_at_gen /. float nb_liv);
          nb_gen + 1, nb_tot + nb_at_gen)
       (1, 0) !nb_desc
   in
-  printf "nombre de descendants moyen = %.2f\n"
+  Printf.printf "nombre de descendants moyen = %.2f\n"
     (float nb_tot /. float nb_liv);
   flush stdout
 

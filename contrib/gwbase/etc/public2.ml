@@ -1,6 +1,5 @@
 (* $Id: public2.ml,v 4.1 2008-03-31 11:34:34 deraugla Exp $ *)
 
-open Printf
 
 open Def
 open Gwdb
@@ -58,11 +57,11 @@ let change_somebody_access base lim_year trace p year_of_p =
         patch_person base gp.key_index gp;
         if trace then
           begin
-            printf "%s -> " (Gutil.designation base p);
-            if acc = Private then printf "private" else printf "public";
-            printf " (anc %d gen %s year %d)" nb_gen
+            Printf.printf "%s -> " (Gutil.designation base p);
+            if acc = Private then Printf.printf "private" else Printf.printf "public";
+            Printf.printf " (anc %d gen %s year %d)" nb_gen
               (Gutil.designation base a) year;
-            printf "\n";
+            Printf.printf "\n";
             flush stdout;
             Some acc
           end
@@ -107,12 +106,12 @@ let public_all bname lim_year trace =
                   changes := true;
                   if trace then
                     begin
-                      printf "%s -> " (Gutil.designation base p);
-                      if acc = Private then printf "private"
-                      else printf "public";
-                      printf " (inherited from spouse %s)"
+                      Printf.printf "%s -> " (Gutil.designation base p);
+                      if acc = Private then Printf.printf "private"
+                      else Printf.printf "public";
+                      Printf.printf " (inherited from spouse %s)"
                         (Gutil.designation base sp);
-                      printf "\n";
+                      Printf.printf "\n";
                       flush stdout
                     end
               | None -> loop (i + 1)

@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 
 let image_start_with_gallery img =
@@ -15,7 +14,7 @@ let remove_image_everybody bname trace =
     let p = poi base (Adef.iper_of_int i) in
     if image_start_with_gallery (sou base (get_image p)) then
       begin
-        if trace then printf "%s\n" (Gutil.designation base p);
+        if trace then Printf.printf "%s\n" (Gutil.designation base p);
         let empty = Gwdb.insert_string base "" in
         let p = {(gen_person_of_person p) with image = empty} in
         patch_person base p.key_index p
@@ -30,7 +29,7 @@ let remove_image_some bname key trace =
       let p = poi base ip in
       if image_start_with_gallery (sou base (get_image p)) then
         begin
-          if trace then printf "%s\n" (Gutil.designation base p);
+          if trace then Printf.printf "%s\n" (Gutil.designation base p);
           let empty = Gwdb.insert_string base "" in
           let p = {(gen_person_of_person p) with image = empty} in
           patch_person base p.key_index p

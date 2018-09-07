@@ -1,6 +1,5 @@
 (* $Id: gui.ml,v 1.00 2011-12-25 15:36:35 flh Exp $ *)
 
-open Printf
 
 type conf =
   { mutable bases_dir : string;
@@ -177,14 +176,14 @@ let write_base_env conf bname env =
   let fname = Filename.concat conf.bases_dir (bname ^ ".gwf") in
   match try Some (open_out fname) with Sys_error _ -> None with
     Some oc ->
-      List.iter (fun (k, v) -> fprintf oc "%s=%s\n" k v) env; close_out oc
+      List.iter (fun (k, v) -> Printf.fprintf oc "%s=%s\n" k v) env; close_out oc
   | None -> ()
 
 let write_config_file conf =
   let fname = Filename.concat bin_dir "config.txt" in
   match try Some (open_out fname) with Sys_error _ -> None with
     Some oc ->
-      List.iter (fun (k, v) -> fprintf oc "%s=%s\n" k v) conf.gui_arg;
+      List.iter (fun (k, v) -> Printf.fprintf oc "%s=%s\n" k v) conf.gui_arg;
       close_out oc
   | None -> ()
 
@@ -238,7 +237,7 @@ let close_server conf =
   match conf.server_running with
     Some server_pid ->
       clean_waiting_pids conf;
-      eprintf "Closing...";
+      Printf.eprintf "Closing...";
       flush stderr;
       (* Making a (empty) file STOP_SERVER to make the server stop. *)
       let stop_server =
@@ -255,7 +254,7 @@ let close_server conf =
       (try Unix.close s with Unix.Unix_error (_, _, _) -> ());
       ignore (Unix.waitpid [] server_pid);
       conf.server_running <- None;
-      eprintf "\n";
+      Printf.eprintf "\n";
       flush stderr
   | None -> ()
 
@@ -1030,16 +1029,16 @@ and launch_server conf =
   (try Sys.remove stop_server with Sys_error _ -> ());
   let prog = Filename.concat bin_dir "gwd" in
   let args =
-    ["-hd"; bin_dir; "-bd"; conf.bases_dir; "-p"; sprintf "%d" conf.port]
+    ["-hd"; bin_dir; "-bd"; conf.bases_dir; "-p"; Printf.sprintf "%d" conf.port]
   in
   let server_pid = exec prog args gwd_log gwd_log in
   let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
   if pid = 0 then ()
   else
     begin
-      eprintf "Cannot launch the server:";
-      eprintf " perhaps another server is running.\n";
-      eprintf "You must close it, if you want to try again.\n";
+      Printf.eprintf "Cannot launch the server:";
+      Printf.eprintf " perhaps another server is running.\n";
+      Printf.eprintf "You must close it, if you want to try again.\n";
       flush stderr;
       exit 2
     end;
@@ -1203,13 +1202,13 @@ let launch_config () =
 (**/**) (* main *)
 
 let speclist = ["-trace", Arg.Set trace, " Trace server"]
-let anon_fun s = raise (Arg.Bad (sprintf "Don't know what to do with %s" s))
+let anon_fun s = raise (Arg.Bad (Printf.sprintf "Don't know what to do with %s" s))
 let usage_msg = "Usage: gui [option]"
 
 let main () =
   Arg.parse (Arg.align speclist) anon_fun usage_msg;
   launch_config ();
   let () = GMain.main () in
-  Sys.catch_break true; eprintf "Bye\n"; flush stderr
+  Sys.catch_break true; Printf.eprintf "Bye\n"; flush stderr
 
 let _ = Printexc.print main ()

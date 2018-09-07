@@ -1,6 +1,5 @@
 (* $Id: recover.ml,v 5.3 2007-09-12 09:58:44 ddr Exp $ *)
 
-open Printf
 
 let recover db = let base = Iolight.input db in Outbase.output "a" base
 
@@ -14,4 +13,4 @@ let main () = Arg.parse speclist anonfun usage_msg; recover !database
 let _ =
   try main () with
     exc ->
-      eprintf "Exception raised: %s\n" (Printexc.to_string exc); flush stderr
+      Printf.eprintf "Exception raised: %s\n" (Printexc.to_string exc); flush stderr

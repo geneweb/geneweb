@@ -1,7 +1,6 @@
 (* $Id: main.ml,v 5.1 2006-10-15 15:39:38 ddr Exp $ *)
 
 open Dag2html
-open Printf
 
 let version = "1.02-exp"
 
@@ -165,40 +164,40 @@ let print_char_table d t =
   done
 
 let print_table border hts =
-  printf "<center><table border=%d" border;
-  printf " cellspacing=0 cellpadding=0>\n";
+  Printf.printf "<center><table border=%d" border;
+  Printf.printf " cellspacing=0 cellpadding=0>\n";
   for i = 0 to Array.length hts - 1 do
-    printf "<tr align=left>\n";
+    Printf.printf "<tr align=left>\n";
     for j = 0 to Array.length hts.(i) - 1 do
       let (colspan, align, td) = hts.(i).(j) in
-      printf "<td";
+      Printf.printf "<td";
       if colspan = 1 && (td = TDitem "&nbsp;" || td = TDhr CenterA) then ()
-      else printf " colspan=%d" colspan;
+      else Printf.printf " colspan=%d" colspan;
       begin match align, td with
-        LeftA, TDhr LeftA -> printf " align=left"
+        LeftA, TDhr LeftA -> Printf.printf " align=left"
       | LeftA, _ -> ()
-      | CenterA, _ -> printf " align=center"
-      | RightA, _ -> printf " align=right"
+      | CenterA, _ -> Printf.printf " align=center"
+      | RightA, _ -> Printf.printf " align=right"
       end;
-      printf ">";
+      Printf.printf ">";
       begin match td with
-        TDitem s -> printf "%s" s
-      | TDtext s -> printf "%s" s
-      | TDbar _ -> printf "|"
+        TDitem s -> Printf.printf "%s" s
+      | TDtext s -> Printf.printf "%s" s
+      | TDbar _ -> Printf.printf "|"
       | TDhr align ->
-          printf "<hr noshade size=1";
+          Printf.printf "<hr noshade size=1";
           begin match align with
-            LeftA -> printf " width=\"50%%\" align=left"
-          | RightA -> printf " width=\"50%%\" align=right"
+            LeftA -> Printf.printf " width=\"50%%\" align=left"
+          | RightA -> Printf.printf " width=\"50%%\" align=right"
           | _ -> ()
           end;
-          printf ">"
-      | TDnothing -> printf "&nbsp;"
+          Printf.printf ">"
+      | TDnothing -> Printf.printf "&nbsp;"
       end;
-      printf "</td>\n"
+      Printf.printf "</td>\n"
     done
   done;
-  printf "</table></center>\n"
+  Printf.printf "</table></center>\n"
 
 let fname = ref ""
 let invert = ref false
@@ -208,7 +207,7 @@ let no_optim = ref false
 let no_group = ref false
 
 let print_version () =
-  eprintf "Dag2html version %s\n" version; flush stderr; exit 0
+  Printf.eprintf "Dag2html version %s\n" version; flush stderr; exit 0
 
 let speclist =
   ["-b", Arg.Int (fun x -> border := x), "<int>: table border";

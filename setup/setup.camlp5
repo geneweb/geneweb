@@ -1,6 +1,5 @@
 (* $Id: setup.ml,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
 
-open Printf
 
 let port = ref 2316
 let default_lang = ref "en"
@@ -612,9 +611,9 @@ let error conf str =
 
 let exec_f comm =
   let s = comm ^ " > " ^ "comm.log" in
-  eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
+  Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
-  eprintf "$ %s\n" s;
+  Printf.eprintf "$ %s\n" s;
   flush stderr;
   Sys.command s
 
@@ -676,7 +675,7 @@ let print_default_gwf_file conf =
   if Sys.file_exists fname then ()
   else
     let oc = open_out fname in
-    List.iter (fun s -> fprintf oc "%s\n" s) gwf; close_out oc
+    List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf; close_out oc
 
 let simple conf =
   let ged =
@@ -816,7 +815,7 @@ let gwc conf =
   let rc = if Sys.unix then rc else infer_rc conf rc in
   let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
   (try Sys.remove gwo with Sys_error _ -> ());
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bso_err.htm"
   else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
@@ -829,7 +828,7 @@ let gwc2 conf =
   let rc = if Sys.unix then rc else infer_rc conf rc in
   let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
   (try Sys.remove gwo with Sys_error _ -> ());
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bso_err.htm"
   else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
@@ -867,7 +866,7 @@ let gwb2ged_or_gwu_1 ok_file conf =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f (comm ^ parameters conf.env)
   in
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bsi_err.htm"
   else
@@ -1020,31 +1019,31 @@ let recover_2 conf =
   let dir = Sys.getcwd () in
   let rc =
     try
-      eprintf "$ cd \"%s\"\n" init_dir;
+      Printf.eprintf "$ cd \"%s\"\n" init_dir;
       flush stderr;
       Sys.chdir init_dir;
       let c =
         Filename.concat "." old_to_src ^ " " ^ in_file ^ o_opt ^
         stringify (Filename.concat dir tmp)
       in
-      eprintf "$ %s\n" c; flush stderr; Sys.command c
+      Printf.eprintf "$ %s\n" c; flush stderr; Sys.command c
     with e -> Sys.chdir dir; raise e
   in
   let rc =
     if rc = 0 then
       begin
-        eprintf "$ cd \"%s\"\n" dir;
+        Printf.eprintf "$ cd \"%s\"\n" dir;
         flush stderr;
         Sys.chdir dir;
         let c =
           Filename.concat !bin_dir src_to_new ^ " " ^ tmp ^ " -f -o " ^
           out_file ^ " > " ^ "comm.log"
         in
-        eprintf "$ %s\n" c;
+        Printf.eprintf "$ %s\n" c;
         flush stderr;
         let rc = Sys.command c in
         let rc = if Sys.unix then rc else infer_rc conf rc in
-        eprintf "\n"; flush stderr; rc
+        Printf.eprintf "\n"; flush stderr; rc
       end
     else rc
   in
@@ -1096,35 +1095,35 @@ let cleanup_1 conf =
     | None -> ""
   in
   let in_base_dir = in_base ^ ".gwb" in
-  eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
+  Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
   let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
-  eprintf "$ %s\n" c;
+  Printf.eprintf "$ %s\n" c;
   flush stderr;
   let _ = Sys.command c in
-  eprintf "$ mkdir old\n";
+  Printf.eprintf "$ mkdir old\n";
   (try Unix.mkdir "old" 0o755 with Unix.Unix_error (_, _, _) -> ());
-  if Sys.unix then eprintf "$ rm -rf old/%s\n" in_base_dir
+  if Sys.unix then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
   else
     begin
-      eprintf "$ del old\\%s\\*.*\n" in_base_dir;
-      eprintf "$ rmdir old\\%s\n" in_base_dir
+      Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
+      Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
     end;
   flush stderr;
   rm_base (Filename.concat "old" in_base_dir);
-  if Sys.unix then eprintf "$ mv %s old/.\n" in_base_dir
-  else eprintf "$ move %s old\\.\n" in_base_dir;
+  if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
+  else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
   flush stderr;
   Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
   let c =
     Filename.concat !bin_dir "gwc" ^ " tmp.gw -nofail -o " ^ in_base ^
     " > comm.log 2>&1"
   in
-  eprintf "$ %s\n" c;
+  Printf.eprintf "$ %s\n" c;
   flush stderr;
   let rc = Sys.command c in
   let rc = if Sys.unix then rc else infer_rc conf rc in
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then
     let conf = {conf with comm = "gwc"} in print_file conf "bsi_err.htm"
@@ -1195,7 +1194,7 @@ let merge_1 conf =
   in
   let bases = selected conf.env in
   let dir = Sys.getcwd () in
-  eprintf "$ cd \"%s\"\n" dir;
+  Printf.eprintf "$ cd \"%s\"\n" dir;
   flush stderr;
   Sys.chdir dir;
   let rc =
@@ -1206,7 +1205,7 @@ let merge_1 conf =
           let c =
             Filename.concat !bin_dir "gwu" ^ " " ^ b ^ " -o " ^ b ^ ".gw"
           in
-          eprintf "$ %s\n" c;
+          Printf.eprintf "$ %s\n" c;
           flush stderr;
           let r = Sys.command c in if r = 0 then loop bases else r
     in
@@ -1223,7 +1222,7 @@ let merge_1 conf =
           "" bases ^
         " -f -o " ^ out_file ^ " > comm.log 2>&1"
       in
-      eprintf "$ %s\n" c; flush stderr; Sys.command c
+      Printf.eprintf "$ %s\n" c; flush stderr; Sys.command c
   in
   if rc > 1 then print_file conf "bso_err.htm"
   else print_file conf "bso_ok.htm"
@@ -1325,17 +1324,17 @@ let gwf_1 conf =
       Some "" | None -> s_getenv conf.env "body_prop"
     | Some x -> x
   in
-  fprintf oc "# File generated by \"setup\"\n\n";
+  Printf.fprintf oc "# File generated by \"setup\"\n\n";
   List.iter
     (fun k ->
        match k with
          "body_prop" ->
            if body_prop = "" then ()
-           else fprintf oc "body_prop=%s\n" body_prop
-       | _ -> fprintf oc "%s=%s\n" k (s_getenv conf.env k))
+           else Printf.fprintf oc "body_prop=%s\n" body_prop
+       | _ -> Printf.fprintf oc "%s=%s\n" k (s_getenv conf.env k))
     vars;
   List.iter
-    (fun (k, v) -> if List.mem k vars then () else fprintf oc "%s=%s\n" k v)
+    (fun (k, v) -> if List.mem k vars then () else Printf.fprintf oc "%s=%s\n" k v)
     benv;
   close_out oc;
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
@@ -1364,14 +1363,14 @@ let gwd_1 conf =
   let oc = open_out (Filename.concat !setup_dir "gwd.arg") in
   let print_param k =
     match p_getenv conf.env k with
-      Some v when v <> "" -> fprintf oc "-%s\n%s\n" k v
+      Some v when v <> "" -> Printf.fprintf oc "-%s\n%s\n" k v
     | _ -> ()
   in
   if  p_getenv conf.env "setup_link" <> None
-  then fprintf oc "-setup_link\n" ;
+  then Printf.fprintf oc "-setup_link\n" ;
   print_param "only";
   begin match p_getenv conf.env "default_lang" with
-    Some v when v <> "" -> fprintf oc "-lang\n%s\n" v
+    Some v when v <> "" -> Printf.fprintf oc "-lang\n%s\n" v
   | _ -> ()
   end;
   print_param "log";
@@ -1384,7 +1383,7 @@ let ged2gwb conf =
     exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
   let rc = if Sys.unix then rc else infer_rc conf rc in
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bso_err.htm"
   else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
@@ -1395,7 +1394,7 @@ let ged2gwb2 conf =
     exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
   let rc = if Sys.unix then rc else infer_rc conf rc in
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bso_err.htm"
   else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
@@ -1405,7 +1404,7 @@ let consang conf ok_file =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f (comm ^ parameters conf.env)
   in
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
 
@@ -1414,7 +1413,7 @@ let update_nldb conf ok_file =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f (comm ^ parameters conf.env)
   in
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
 
@@ -1647,7 +1646,7 @@ let setup (addr, req) comm env_str =
   let s = only_addr () in
   if s <> saddr then
     let conf = {conf with env = ["anon", saddr; "o", s]} in
-    eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n" saddr s;
+    Printf.eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n" saddr s;
     flush stderr;
     print_file conf "err_acc.htm"
   else if conf.comm = "" then print_file conf "welcome.htm"
@@ -1679,8 +1678,8 @@ let copy_text lang fname =
       flush stdout;
       close_in ic
   | _ ->
-      printf "\nCannot access file \"%s\".\n" fname;
-      printf "Type \"Enter\" to exit\n? ";
+      Printf.printf "\nCannot access file \"%s\".\n" fname;
+      Printf.printf "Type \"Enter\" to exit\n? ";
       flush stdout;
       let _ = input_line stdin in (); exit 2
 
@@ -1692,11 +1691,11 @@ let set_gwd_default_language_if_absent lang =
       let lang_found = ref false in
       List.iter
         (fun (k, v) ->
-           fprintf oc "-%s\n" k;
+           Printf.fprintf oc "-%s\n" k;
            if k = "lang" then lang_found := true;
-           if v <> "" then fprintf oc "%s\n" v)
+           if v <> "" then Printf.fprintf oc "%s\n" v)
         env;
-      if not !lang_found then fprintf oc "-lang\n%s\n" lang;
+      if not !lang_found then Printf.fprintf oc "-lang\n%s\n" lang;
       close_out oc
   | None -> ()
 
@@ -1750,7 +1749,7 @@ let intro () =
           if String.length !lang_param < 2 then default_setup_lang
           else !lang_param
         in
-        printf "To start, open location http://localhost:%d/\n" !port;
+        Printf.printf "To start, open location http://localhost:%d/\n" !port;
         flush stdout;
         if Unix.fork () = 0 then
           begin
@@ -1779,7 +1778,7 @@ let intro () =
   if Sys.unix then ()
   else
     begin Unix.putenv "GWLANG" setup_lang; Unix.putenv "GWGD" !setup_dir end;
-  printf "\n";
+  Printf.printf "\n";
   flush stdout
 
 let main () =

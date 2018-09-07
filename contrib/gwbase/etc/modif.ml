@@ -2,7 +2,6 @@
 (* Copyright (c) 1999 INRIA *)
 
 open Def
-open Printf
 
 let has_infos p =
   match p.death with
@@ -21,7 +20,7 @@ let modif base =
        | _ -> false
     then
       begin
-        eprintf ".";
+        Printf.eprintf ".";
         flush stderr;
         let fn' =
           match p.sex with
@@ -32,11 +31,11 @@ let modif base =
         let sn' = sn in
         try
           let p' = person_ht_find_unique base fn' sn' p.occ in
-          eprintf "\nconflit %s avec %s..." (designation base p)
+          Printf.eprintf "\nconflit %s avec %s..." (designation base p)
             (designation base (poi base p'));
           flush stderr;
           let occ' = Gutil.find_free_occ base fn' sn' 0 in
-          eprintf " rempl occ par %d\n" occ';
+          Printf.eprintf " rempl occ par %d\n" occ';
           flush stderr;
           p.occ <- occ';
           raise Not_found
@@ -51,7 +50,7 @@ let modif base =
   if !changes then
     begin
       base.func.commit_patches ();
-      eprintf "
+      Printf.eprintf "
 Attention: il n'est pas sûr que les index aient été complètement mis à jour.
 Pour faire bien, il faudrait vérifier si le programme le fait correctement.
 Dans le doute, il est probablement préférable de faire gwu et gwc (nettoyage)
@@ -61,7 +60,7 @@ On peut encore annuler les modifs en supprimant le fichier patches,
 s'il était vide au départ.";
       flush stderr
     end;
-  eprintf "\n";
+  Printf.eprintf "\n";
   flush stderr
 
 let bname = ref ""

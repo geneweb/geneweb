@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Printf
 open Util
 
 (* TLSW: Text Language Stolen to Wikipedia
@@ -131,7 +130,7 @@ let syntax_links conf wi s =
         in
         loop 0 (i + 1)
       in
-      let s = sprintf "<span class=\"highlight\">%s</span>" b in
+      let s = Printf.sprintf "<span class=\"highlight\">%s</span>" b in
       loop quot_lev pos j (Buff.mstore len s)
     else if
       i <= slen - 5 && s.[i] = '\'' && s.[i+1] = '\'' && s.[i+2] = '\'' &&
@@ -168,7 +167,7 @@ let syntax_links conf wi s =
           let t =
             if wi.wi_cancel_links then text
             else
-              sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>" (commd conf)
+              Printf.sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>" (commd conf)
                 wi.wi_mode fname anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
@@ -176,16 +175,16 @@ let syntax_links conf wi s =
           let t =
             if wi.wi_cancel_links then name
             else if wi.wi_person_exists (fn, sn, oc) then
-              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>" pos
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>" pos
                 (commd conf) (code_varenv fn) (code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
             else if wi.wi_always_show_link then
               let s = " style=\"color:red\"" in
-              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>" pos
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>" pos
                 (commd conf) (code_varenv fn) (code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) s name
             else
-              sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
+              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
                 (if conf.hide_names then "x x" else name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
@@ -194,7 +193,7 @@ let syntax_links conf wi s =
             let s = if name <> "" then name else wiz in
             if wi.wi_cancel_links then s
             else
-              sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>" (commd conf) wiz
+              Printf.sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>" (commd conf) wiz
                 s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
@@ -304,7 +303,7 @@ let summary_of_tlsw_lines conf short lines =
            in
            let summary =
              let s =
-               sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
+               Printf.sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
                  (if short then "" else section_num ^ " - ")
                  (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
              in
@@ -343,10 +342,10 @@ let string_of_modify_link conf cnt empty =
     Some (can_edit, mode, sfn) ->
       if conf.wizard then
         let mode_pref = if can_edit then "MOD" else "VIEW" in
-        sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
+        Printf.sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
           (if empty then "<p>"
            else
-             sprintf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">"
+             Printf.sprintf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">"
                conf.right conf.left)
           (commd conf) mode_pref mode cnt
           (if sfn = "" then "" else ";f=" ^ sfn)
@@ -497,12 +496,12 @@ let rec hotl conf wlo cnt edit_opt sections_nums list =
             in
             let s =
               let style = if slev <= 3 then " class=\"subtitle\"" else "" in
-              sprintf "<h%d%s>%s%s</h%d>" slev style section_num
+              Printf.sprintf "<h%d%s>%s%s</h%d>" slev style section_num
                 (String.sub s slev (len - 2 * slev)) slev
             in
             let list =
               if wlo <> None then
-                let s = sprintf "<p><a id=\"a_%d\"></a></p>" cnt in s :: list
+                let s = Printf.sprintf "<p><a id=\"a_%d\"></a></p>" cnt in s :: list
               else list
             in
             let list =
@@ -629,7 +628,7 @@ let print_sub_part_text conf wi edit_opt cnt0 lines =
     List.map
       (function
          "__TOC__" | "__SHORT_TOC__" ->
-           sprintf "<p>...%s...</p>" (message_txt conf 3)
+           Printf.sprintf "<p>...%s...</p>" (message_txt conf 3)
        | "__NOTOC__" -> ""
        | s -> s)
       lines

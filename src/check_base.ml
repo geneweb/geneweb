@@ -1,14 +1,13 @@
 (* $Id: check_base.ml,v 5.5 2007-03-19 10:59:31 ddr Exp $ *)
 
-open Printf
 
 let print_error base x =
-  printf "\nError: "; Check.print_base_error stdout base x
+  Printf.printf "\nError: "; Check.print_base_error stdout base x
 
 let print_warning base =
   function
     Def.UndefinedSex _ -> ()
-  | x -> printf "\nWarning: "; Check.print_base_warning stdout base x
+  | x -> Printf.printf "\nWarning: "; Check.print_base_warning stdout base x
 
 let set_list l v = l := v :: !l
 
@@ -18,7 +17,7 @@ let check_base bname =
   let changed_p (_, p, _, _) =
     let fn = Gwdb.p_first_name base p in
     let sn = Gwdb.p_surname base p in
-    printf "%s.%d %s not changed" fn (Gwdb.get_occ p) sn
+    Printf.printf "%s.%d %s not changed" fn (Gwdb.get_occ p) sn
   in
   let errors = ref [] in
   let warnings = ref [] in
