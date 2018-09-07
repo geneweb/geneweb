@@ -1209,18 +1209,6 @@ let get_rparents_piqi base conf base_prefix gen_p has_relations pers_to_piqi_cal
 let get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers_to_piqi_callback event_witness_constructor =
   if has_relations then
     begin
-      let array_mem_witn x a =
-        let rec loop i =
-          if i = Array.length a then (false, "")
-          else if x = fst a.(i) then
-            let witness_kind =
-              Util.string_of_witness_kind conf (poi base x) (snd a.(i))
-            in
-            (true, witness_kind)
-          else loop (i + 1)
-        in
-        loop 0
-      in
       let related = Mutil.list_uniq (List.sort compare gen_p.related) in
       let events_witnesses =
         let list = ref [] in
@@ -1230,7 +1218,7 @@ let get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers
               let c = pget conf base ic in
               List.iter
                 (fun ((name, _, _, _, _, wl, _) as evt) ->
-                  let (mem, wk) = array_mem_witn (get_key_index p) wl in
+                  let (mem, wk) = Util.array_mem_witn conf base (get_key_index p) wl in
                   if mem then
                     (* Attention aux doublons pour les evenements famille. *)
                     match name with

@@ -5458,18 +5458,6 @@ let print_foreach conf base print_ast eval_expr =
             witnesses
       | _ -> ()
   and print_foreach_event_witness_relation env al (p, p_auth as ep) =
-    let array_mem_witn x a =
-      let rec loop i =
-        if i = Array.length a then false, ""
-        else if x = fst a.(i) then
-          let witness_kind =
-            Util.string_of_witness_kind conf (poi base x) (snd a.(i))
-          in
-          true, witness_kind
-        else loop (i + 1)
-      in
-      loop 0
-    in
     let related = Mutil.list_uniq (List.sort compare (get_related p)) in
     let events_witnesses =
       let list = ref [] in
@@ -5479,7 +5467,7 @@ let print_foreach conf base print_ast eval_expr =
             let c = pget conf base ic in
             List.iter
               (fun (name, _, _, _, _, wl, _ as evt) ->
-                 let (mem, wk) = array_mem_witn (get_key_index p) wl in
+                 let (mem, wk) = Util.array_mem_witn conf base (get_key_index p) wl in
                  if mem then
                    match name with
                      Fevent _ ->
