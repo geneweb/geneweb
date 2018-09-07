@@ -3,7 +3,6 @@
 
 open Config
 open Gwdb
-open Hutil
 open Util
 
 let print_someone base p =
@@ -80,7 +79,7 @@ type=\"radio\" class=\"form-control\" name=\"select\" value=\"input\" checked%s>
   Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print_possible_continue_merging conf base =
   match p_getint conf.env "ini1", p_getint conf.env "ini2" with

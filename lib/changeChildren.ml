@@ -5,7 +5,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open Util
 
 let print_child_person conf base p =
@@ -129,13 +128,13 @@ let print_change conf base p =
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
   Wserver.printf "\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print conf base =
   match p_getint conf.env "ip" with
     Some i ->
       let p = poi base (Adef.iper_of_int i) in print_change conf base p
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
   Wserver.printf "<h4>";
@@ -162,15 +161,15 @@ let print_change_done conf base p =
     let s = transl conf "children's names changed" in
     Wserver.printf "%s" (capitale s)
   in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "\n%s" (reference conf base p (person_text conf base p));
   Wserver.printf "%s\n" (Date.short_dates_text conf base p);
   print_children_list conf base p;
-  trailer conf
+  Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
@@ -212,7 +211,7 @@ let print_conflict conf base ip_var p =
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
   Update.print_same_name conf base p;
-  trailer conf
+  Hutil.trailer conf
 
 let check_conflict conf base p key new_occ ipl =
   let name = Name.lower key in
@@ -232,9 +231,9 @@ let check_conflict conf base p key new_occ ipl =
 
 let error_person conf err =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
+  Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale err);
-  trailer conf;
+  Hutil.trailer conf;
   raise Update.ModErr
 
 let rename_image_file conf base p (nfn, nsn, noc) =
@@ -297,7 +296,7 @@ let change_child conf base parent_surname changed ip =
 let print_update_child conf base =
   match p_getenv conf.env "m" with
     Some "CHG_CHN_OK" -> print conf base
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_change_ok conf base p =
   try
@@ -328,4 +327,4 @@ let print_ok o_conf base =
   match p_getint conf.env "ip" with
     Some i ->
       let p = poi base (Adef.iper_of_int i) in print_change_ok conf base p
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf

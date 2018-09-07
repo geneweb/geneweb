@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open Hutil
 open Util
 
 let rec merge_lists l1 =
@@ -206,15 +205,15 @@ let print_merge conf base =
           (gen_couple_of_couple (foi base sfam.fam_index))
       in
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl cpl des =
   let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
-  header conf title;
-  print_link_to_welcome conf true;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   UpdateFamOk.print_family conf base wl cpl des;
   Merge.print_possible_continue_merging conf base;
-  trailer conf
+  Hutil.trailer conf
 
 let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
   match p_getint conf.env "i2" with
@@ -262,7 +261,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
       in
       History.record conf base changed "ff";
       print_mod_merge_ok conf base wl cpl des
-  | None -> incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 let print_mod_merge o_conf base =
   let get_gen_family i =

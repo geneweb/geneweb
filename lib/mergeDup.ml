@@ -3,7 +3,6 @@
 
 open Config
 open Gwdb
-open Hutil
 open Util
 
 let print_link conf base p =
@@ -151,7 +150,7 @@ let main_page conf base =
           print_cand_fam conf base (ip, p) excl ifam1 ifam2
       | Perso.NoDup -> print_no_candidate conf base p
       end
-  | None -> incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 let answ_ind_y_n conf base =
   let yes = p_getenv conf.env "answer_y" <> None in

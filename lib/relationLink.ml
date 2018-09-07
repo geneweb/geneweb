@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open Hutil
 open Util
 
 (* Algorithm *)
@@ -605,11 +604,11 @@ let print_relation_ok conf base info =
       None, None -> ()
     | _ -> Wserver.printf " %d" info.c2
   in
-  header_no_page_title conf title;
-  print_link_to_welcome conf true;
+  Hutil.header_no_page_title conf title;
+  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p style=\"clear:both\"%s>\n" conf.xhs;
   print_relation_path conf base info;
-  trailer conf
+  Hutil.trailer conf
 
 let print_relation_no_dag conf base po ip1 ip2 =
   let params =
@@ -689,7 +688,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
          sp2 = sp2; bd = bd; td_prop = td_prop}
       in
       print_relation_ok conf base info
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
   let ia = get_key_index a in
@@ -767,4 +766,4 @@ let print conf base =
     find_person_in_env conf base "1", find_person_in_env conf base "2"
   with
     Some p1, Some p2 -> print_relation conf base p1 p2
-  | _ -> incorrect_request conf
+  | _ -> Hutil.incorrect_request conf

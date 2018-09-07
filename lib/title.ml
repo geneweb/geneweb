@@ -5,7 +5,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open Mutil
 open Util
 
@@ -365,7 +364,7 @@ let print_title_place_list conf base t p t_equiv list =
              end)
         t_equiv
   in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "<ul>\n";
   begin let _ =
     List.fold_left
@@ -403,11 +402,11 @@ let print_title_place_list conf base t p t_equiv list =
       Wserver.printf "</p>\n"
   | _ -> ()
   end;
-  trailer conf
+  Hutil.trailer conf
 
 let print_all_with_place_list conf base p list =
   let title _ = Wserver.printf "... %s\n" p in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "<ul>\n";
   let _ =
     List.fold_left
@@ -419,7 +418,7 @@ let print_all_with_place_list conf base p list =
          fst x :: list)
       [] list
   in
-  Wserver.printf "</ul>\n"; trailer conf
+  Wserver.printf "</ul>\n"; Hutil.trailer conf
 
 let print_title_place conf base t p =
   let (l, t, p, t_equiv) = select_title_place conf base t p in
@@ -451,9 +450,9 @@ let print_places_list conf base t t_equiv list =
     else Wserver.printf "%s%s" (surname_end base p) (surname_begin base p);
     Wserver.printf "</a>"
   in
-  header conf title;
+  Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
-  trailer conf
+  Hutil.trailer conf
 
 let print_places conf base t =
   let (l, t, t_equiv) = select_title conf base t in
@@ -466,7 +465,7 @@ let print_titles conf base p =
   let (l, p) = select_place conf base p in
   let list = string_list_uniq (List.sort compare_titles l) in
   let title _ = Wserver.printf "... %s" p in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "<ul>\n";
   List.iter
     (fun t ->
@@ -482,7 +481,7 @@ let print_titles conf base p =
       Wserver.printf "%s" (capitale (transl conf "the whole list"));
       Wserver.printf "</a>\n"
     end;
-  trailer conf
+  Hutil.trailer conf
 
 let print_all_titles conf base =
   let title _ =
@@ -496,9 +495,9 @@ let print_all_titles conf base =
   let wprint_elem (t, cnt) =
     give_access_all_titles conf t false; Wserver.printf " (%d)" cnt
   in
-  header conf title;
+  Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
-  trailer conf
+  Hutil.trailer conf
 
 let print_all_places conf base =
   let title _ =
@@ -508,7 +507,7 @@ let print_all_places conf base =
     let l = select_all_places conf base in
     string_list_uniq (List.sort compare_places l)
   in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "<ul>\n";
   List.iter
     (fun t ->
@@ -517,7 +516,7 @@ let print_all_places conf base =
        Wserver.printf "</li>\n")
     list;
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 let print conf base =
   match

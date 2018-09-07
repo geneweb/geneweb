@@ -2,7 +2,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Hutil
 open Util
 
 (*** Utils ***)
@@ -214,9 +213,9 @@ let specify conf base n pl =
          p, !tl)
       pl
   in
-  header conf title;
+  Hutil.header conf title;
   conf.cancel_links <- false;
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -273,7 +272,7 @@ let specify conf base n pl =
        Wserver.printf "</li>\n")
     ptll;
   Wserver.printf "</ul>\n";
-  trailer conf
+  Hutil.trailer conf
 
 type handler_base = (handler -> config -> base -> unit)
 
@@ -656,7 +655,7 @@ let defaultHandler : handler =
       end
 
   ; incorrect_request = begin fun _self conf _base ->
-      incorrect_request conf
+      Hutil.incorrect_request conf
     end
 
   ; unknown = begin fun conf n ->
@@ -664,9 +663,9 @@ let defaultHandler : handler =
         Wserver.printf "%s: \"%s\"" (capitale (transl conf "not found")) n
       in
       Wserver.http HttpStatus.Not_Found;
-      rheader conf title;
-      print_link_to_welcome conf false;
-      trailer conf
+      Hutil.rheader conf title;
+      Hutil.print_link_to_welcome conf false;
+      Hutil.trailer conf
     end
 
   ; very_unknown = begin fun self conf base ->
@@ -677,9 +676,9 @@ let defaultHandler : handler =
             fname sname
         in
         Wserver.http HttpStatus.Not_Found;
-        rheader conf title;
-        print_link_to_welcome conf false;
-        trailer conf
+        Hutil.rheader conf title;
+        Hutil.print_link_to_welcome conf false;
+        Hutil.trailer conf
       | _ -> self.incorrect_request self conf base
     end
 
@@ -1101,7 +1100,7 @@ let defaultHandler : handler =
               | None, Some sn ->
                 conf.cancel_links <- false ;
                 Some.surname_print conf base self.unknown sn
-              | None, None -> incorrect_request conf
+              | None, None -> self.incorrect_request self conf base
           end
         | Some i ->
           relation_print conf base
@@ -1146,11 +1145,11 @@ let defaultHandler : handler =
 
   ; request = begin fun self conf base ->
       if conf.wizard then begin
-        header conf (fun _ -> ()) ;
+        Hutil.header conf (fun _ -> ()) ;
         Wserver.printf "<pre>\n" ;
         List.iter (Wserver.printf "%s\n") conf.Config.request ;
         Wserver.printf "</pre>\n" ;
-        trailer conf
+        Hutil.trailer conf
       end
       else self.incorrect_request self conf base
     end

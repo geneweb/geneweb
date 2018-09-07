@@ -4,7 +4,6 @@
 open Config
 open Gutil
 open Gwdb
-open Hutil
 open Mutil
 open Util
 
@@ -64,7 +63,7 @@ let print_search_form conf from_note =
   Wserver.printf "</table>\n"
 
 let print_whole_notes conf base fnotes title s ho =
-  header_no_page_title conf
+  Hutil.header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
@@ -75,7 +74,7 @@ let print_whole_notes conf base fnotes title s ho =
         Wserver.printf "</a>\n"
       end
   in
-  gen_print_link_to_welcome what_links_page conf true;
+  Hutil.gen_print_link_to_welcome what_links_page conf true;
   Wserver.printf "<div class=\"d-flex justify-content-between\">\n";
   if title <> "" then
     begin let title =
@@ -112,12 +111,12 @@ let print_whole_notes conf base fnotes title s ho =
     Some _ -> print_search_form conf (Some fnotes)
   | None -> ()
   end;
-  trailer conf
+  Hutil.trailer conf
 
 let print_notes_part conf base fnotes title s cnt0 =
-  header_no_page_title conf
+  Hutil.header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
-  print_link_to_welcome conf true;
+  Hutil.print_link_to_welcome conf true;
   begin match Util.open_etc_file "summary" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
@@ -137,7 +136,7 @@ let print_notes_part conf base fnotes title s cnt0 =
      Wiki.wi_person_exists = person_exists conf base;
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
-  Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines; trailer conf
+  Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines; Hutil.trailer conf
 
 let merge_possible_aliases conf db =
   let aliases = Wiki.notes_aliases conf in
@@ -441,7 +440,7 @@ let commit_notes conf base fnotes s =
   in
   Mutil.mkdir_p (Filename.dirname fpath);
   begin try Gwdb.commit_notes base fname s with
-    Sys_error _ -> incorrect_request conf; raise Update.ModErr
+    Sys_error _ -> Hutil.incorrect_request conf; raise Update.ModErr
   end;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db conf pg s
@@ -527,7 +526,7 @@ let print_misc_notes conf base =
          else list)
       db []
   in
-  header_link_welcome conf title;
+  Hutil.header_link_welcome conf title;
   if db <> [] then
     begin
       Wserver.printf "<ul>\n";
@@ -584,7 +583,7 @@ let print_misc_notes conf base =
       Wserver.printf "</ul>\n"
     end;
   if d = "" then print_search_form conf None;
-  trailer conf
+  Hutil.trailer conf
 
 (* searching *)
 

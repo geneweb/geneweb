@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open Hutil
 open Util
 
 let get_number var key env = p_getint env (var ^ "_" ^ key)
@@ -539,10 +538,10 @@ let print conf base =
       Some n -> n
     | None -> 100
   in
-  header conf title;
+  Hutil.header conf title;
   Wserver.printf "<p>\n";
   Wserver.printf "%s %s." (capitale (transl conf "searching all"))
     (searching_fields conf);
   Wserver.printf "</p>\n";
   let list = advanced_search conf base max_answers in
-  print_result conf base max_answers list; trailer conf
+  print_result conf base max_answers list; Hutil.trailer conf
