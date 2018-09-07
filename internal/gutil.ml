@@ -3,12 +3,11 @@
 
 open Def
 open Gwdb
-open Mutil
 
 let designation base p =
   let first_name = p_first_name base p in
   let nom = p_surname base p in
-  iso_8859_1_of_utf_8
+  Mutil.iso_8859_1_of_utf_8
     (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
 
 let father = Adef.father
@@ -205,16 +204,16 @@ let alphabetic_iso_8859_1 n1 n2 =
       else if alphabetic_value c1 > alphabetic_value c2 then 1
       else loop (succ i1) (succ i2)
   in
-  if n1 = n2 then 0 else loop (initial n1) (initial n2)
+  if n1 = n2 then 0 else loop (Mutil.initial n1) (Mutil.initial n2)
 
 let alphabetic n1 n2 =
   (*
-    if utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
+    if Mutil.utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
   *)
   alphabetic_iso_8859_1 n1 n2
 
 let alphabetic_order n1 n2 =
-  if !utf_8_db then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
+  if !Mutil.utf_8_db then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
 
 let arg_list_of_string line =
   let rec loop list i len quote =

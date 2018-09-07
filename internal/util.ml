@@ -5,7 +5,6 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Mutil
 open Printf
 
 let is_hide_names conf p =
@@ -223,7 +222,7 @@ let gen_decline2 wt s1 s2 =
         | ':' when i + 4 < len && wt.[i+2] = ':' && wt.[i+3] = '%' ->
             let c = wt.[i+1] in
             begin match string_of wt.[i+4] with
-              Some s -> decline c s, i + 4
+              Some s -> Mutil.decline c s, i + 4
             | None -> ":", i
             end
         | '[' ->
@@ -282,11 +281,11 @@ let cftransl conf fmt =
         if i + 4 < String.length fmt && fmt.[i] = ':' && fmt.[i+2] = ':' &&
            fmt.[i+3] = '%' && fmt.[i+4] = 's'
         then
-          decline fmt.[i+1] a ^ loop (i + 5) al
+          Mutil.decline fmt.[i+1] a ^ loop (i + 5) al
         else if
           i + 1 < String.length fmt && fmt.[i] = '%' && fmt.[i+1] = 's'
         then
-          nominative a ^ loop (i + 2) al
+          Mutil.nominative a ^ loop (i + 2) al
         else if i < String.length fmt then
           String.make 1 fmt.[i] ^ loop (i + 1) gal
         else ""
@@ -300,7 +299,7 @@ let ftransl_nth conf s p =
 
 let fdecline w s = valid_format w (gen_decline (string_of_format w) s)
 
-let translate_eval s = Translate.eval (nominative s)
+let translate_eval s = Translate.eval (Mutil.nominative s)
 
 (* *)
 
@@ -1001,7 +1000,7 @@ let person_title conf base p =
   else ""
 
 let old_surname_begin n =
-  let i = initial n in
+  let i = Mutil.initial n in
   if i = 0 then ""
   else
     let i =
@@ -1013,7 +1012,7 @@ let old_surname_begin n =
     " (" ^ String.sub n 0 i ^ ")"
 
 let old_surname_end n =
-  let i = initial n in
+  let i = Mutil.initial n in
   if i = 0 then n else String.sub n i (String.length n - i)
 
 let start_with s i p =

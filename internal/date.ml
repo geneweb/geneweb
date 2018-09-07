@@ -5,7 +5,6 @@ open Config
 open Def
 open Util
 open Gwdb
-open Mutil
 open Printf
 
 
@@ -40,7 +39,7 @@ let get_wday conf d =
 
 let death_symbol conf =
   try List.assoc "death_symbol" conf.base_env
-  with Not_found -> if !utf_8_db then "†" else "+"
+  with Not_found -> if !Mutil.utf_8_db then "†" else "+"
 
 let before_date d d1 =
   if d1.year < d.year then true
@@ -136,7 +135,7 @@ let hebrew_month conf m =
 
 let code_french_year conf y =
   transl_nth conf "year/month/day" 3 ^ " " ^
-  (if y >= 1 && y < 4000 then roman_of_arabian y else string_of_int y)
+  (if y >= 1 && y < 4000 then Mutil.roman_of_arabian y else string_of_int y)
 
 let code_french_date conf d m y =
   let s =
@@ -187,7 +186,7 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
         else if d2.day2 = 0 then transl_decline conf "in (month year)" sy2
         else transl_decline conf "on (day month year)" sy2
       in
-      s ^ " " ^ transl conf "or" ^ " " ^ nominative s2
+      s ^ " " ^ transl conf "or" ^ " " ^ Mutil.nominative s2
   | YearInt d2 ->
       let s =
         if d.day = 0 && d.month = 0 then sy
@@ -200,7 +199,7 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
         else transl_decline conf "on (day month year)" sy2
       in
       transl conf "between (date)" ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^
-      " " ^ nominative s2
+      " " ^ Mutil.nominative s2
 
 let replace_spaces_by_nbsp s =
   let rec loop i len =
@@ -245,7 +244,7 @@ let string_of_on_hebrew_dmy conf d =
 
 let string_of_prec_dmy conf s s2 d =
   match d.prec with
-    Sure -> nominative s
+    Sure -> Mutil.nominative s
   | About -> transl_decline conf "about (date)" s
   | Before -> transl_decline conf "before (date)" s
   | After -> transl_decline conf "after (date)" s
@@ -253,11 +252,11 @@ let string_of_prec_dmy conf s s2 d =
   | OrYear _ ->
       "<span class=\"text-nowrap\">" ^ s ^ "</span>" ^ " " ^
       "<span class=\"text-nowrap\">" ^ transl conf "or" ^ " " ^
-      nominative s2 ^ "</span>"
+      Mutil.nominative s2 ^ "</span>"
   | YearInt _ ->
       "<span class=\"text-nowrap\">" ^ transl conf "between (date)" ^ " " ^
       s ^ "</span>" ^ " " ^ "<span class=\"text-nowrap\">" ^
-      transl_nth conf "and" 0 ^ " " ^ nominative s2 ^ "</span>"
+      transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2 ^ "</span>"
 
 let string_of_dmy conf d =
   let sy = code_dmy conf d in
@@ -301,7 +300,7 @@ let translate_dmy conf (fst, snd, trd) cal short =
     match cal with
       Dfrench ->
         let y1 = int_of_string y in
-        if y1 >= 1 && y1 < 4000 then roman_of_arabian y1 else y
+        if y1 >= 1 && y1 < 4000 then Mutil.roman_of_arabian y1 else y
     | _ -> y
   in
   match transl conf " !dates order" with

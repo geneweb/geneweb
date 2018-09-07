@@ -4,9 +4,10 @@
 open Config
 open Def
 open Gutil
-open Mutil
 open Printf
 open Util
+
+module StrSet = Mutil.StrSet
 
 module Make
     (Wserver : module type of Wserver)
@@ -169,7 +170,7 @@ let only_log from =
        fprintf_date oc tm;
        fprintf oc " Connection refused from %s " from;
        fprintf oc "(only ";
-       list_iter_first
+       Mutil.list_iter_first
          (fun first s -> fprintf oc "%s%s" (if not first then "," else "") s)
          !only_addresses;
        fprintf oc ")\n");
@@ -1808,7 +1809,7 @@ let slashify s =
   String.init (String.length s) conv_char
 
 let make_cnt_dir x =
-  mkdir_p x;
+  Mutil.mkdir_p x;
   if Sys.unix then ()
   else
     begin

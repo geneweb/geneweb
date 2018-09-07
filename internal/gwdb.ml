@@ -5,7 +5,6 @@ open Dbdisk
 open Db2disk
 open Def
 open Futil
-open Mutil
 open Printf
 
 type 'istr gen_string_person_index =
@@ -1005,8 +1004,8 @@ module C_base :
                      false
                    else true)
                 list
-    let p_first_name self p = nominative (self.sou (get_first_name p))
-    let p_surname self p = nominative (self.sou (get_surname p))
+    let p_first_name self p = Mutil.nominative (self.sou (get_first_name p))
+    let p_surname self p = Mutil.nominative (self.sou (get_surname p))
   end
 
 (* Database - implementation 1 *)
@@ -1163,7 +1162,7 @@ let base2 db2 =
            if Name.crush_lower (proj p) = s then proj p :: sl else sl)
         db2.patches.h_person []
     in
-    let sl = list_uniq (List.sort compare sl) in
+    let sl = Mutil.list_uniq (List.sort compare sl) in
     List.fold_left (fun istrl s -> Istr2New (db2, s) :: istrl) istrl sl
   in
   let rec self =
@@ -1248,13 +1247,13 @@ let base2 db2 =
           with Not_found -> Hashtbl.add ht s [ip]);
      patch_key =
        (fun ip fn sn occ ->
-          let fn = Name.lower (nominative fn) in
-          let sn = Name.lower (nominative sn) in
+          let fn = Name.lower (Mutil.nominative fn) in
+          let sn = Name.lower (Mutil.nominative sn) in
           Hashtbl.replace db2.patches.h_key (fn, sn, occ) (Some ip));
      delete_key =
        (fun fn sn occ ->
-          let fn = Name.lower (nominative fn) in
-          let sn = Name.lower (nominative sn) in
+          let fn = Name.lower (Mutil.nominative fn) in
+          let sn = Name.lower (Mutil.nominative sn) in
           match disk_person2_of_key db2 fn sn occ with
             Some _ -> Hashtbl.replace db2.patches.h_key (fn, sn, occ) None
           | None -> Hashtbl.remove db2.patches.h_key (fn, sn, occ));

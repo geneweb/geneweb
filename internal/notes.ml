@@ -4,8 +4,9 @@
 open Config
 open Gutil
 open Gwdb
-open Mutil
 open Util
+
+module StrSet = Mutil.StrSet
 
 let file_path conf base fname =
   Util.base_path []
@@ -482,7 +483,7 @@ let begin_text_without_html_tags lim s =
       loop i size len
     else if s.[i] = '=' then loop (i + 1) size len
     else
-      let nbc = if !utf_8_db then Name.nbc s.[i] else i + 1 in
+      let nbc = if !Mutil.utf_8_db then Name.nbc s.[i] else i + 1 in
       loop (i + nbc) (size + 1) (Buff.mstore len (String.sub s i nbc))
   in
   loop 0 0 0
