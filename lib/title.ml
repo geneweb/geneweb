@@ -140,17 +140,6 @@ let my_alphabetic n1 n2 =
   *)
   compare (Name.lower n1) (Name.lower n2)
 
-let string_list_uniq l =
-  let l =
-    List.fold_left
-      (fun l e ->
-         match l with
-           [] -> [e]
-         | x :: _ -> if my_alphabetic e x = 0 then l else e :: l)
-      [] l
-  in
-  List.rev l
-
 let string_cnt_list_uniq l =
   let l =
     List.fold_left
@@ -163,15 +152,8 @@ let string_cnt_list_uniq l =
   in
   List.rev l
 
-let compare_places p1 p2 = compare (Name.lower p1) (Name.lower p2)
-
-let compare_titles t1 t2 = my_alphabetic t1 t2
 let compare_titles2 (t1, _) (t2, _) = my_alphabetic t1 t2
 
-(*
-value strip_abbrev_lower s = Name.strip (Name.abbrev (Name.lower s));
-*)
-let strip_abbrev_lower s = Name.lower s
 (**)
 
 let select_title_place conf base title place =
@@ -179,13 +161,13 @@ let select_title_place conf base title place =
   let clean_title = ref title in
   let clean_place = ref place in
   let all_names = ref [] in
-  let title1 = strip_abbrev_lower title in
-  let place1 = strip_abbrev_lower place in
+  let title1 = Name.lower title in
+  let place1 = Name.lower place in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let select x t =
     if absolute && sou base t.t_ident = title && sou base t.t_place = place ||
-       not absolute && strip_abbrev_lower (sou base t.t_ident) = title1 &&
-       strip_abbrev_lower (sou base t.t_place) = place1
+       not absolute && Name.lower (sou base t.t_ident) = title1 &&
+       Name.lower (sou base t.t_place) = place1
     then
       let tn = sou base t.t_ident in
       clean_title := tn;
@@ -202,9 +184,9 @@ let select_title_place conf base title place =
 let select_all_with_place conf base place =
   let list = ref [] in
   let clean_place = ref place in
-  let place = strip_abbrev_lower place in
+  let place = Name.lower place in
   let select x t =
-    if strip_abbrev_lower (sou base t.t_place) = place then
+    if Name.lower (sou base t.t_place) = place then
       begin clean_place := sou base t.t_place; list := (x, t) :: !list end
   in
   for i = 0 to nb_of_persons base - 1 do
@@ -218,11 +200,11 @@ let select_title conf base title =
   let clean_name = ref title in
   let all_names = ref [] in
   let absolute = p_getenv conf.env "a" = Some "A" in
-  let title2 = strip_abbrev_lower title in
+  let title2 = Name.lower title in
   let add_place t =
     let tn = sou base t.t_ident in
     if absolute && tn = title ||
-       not absolute && strip_abbrev_lower tn = title2
+       not absolute && Name.lower tn = title2
     then
       let pn = sou base t.t_place in
       if not (StrSet.mem pn !set) then
@@ -238,10 +220,10 @@ let select_title conf base title =
 let select_place conf base place =
   let list = ref [] in
   let clean_name = ref place in
-  let place2 = strip_abbrev_lower place in
+  let place2 = Name.lower place in
   let add_title t =
     let pn = sou base t.t_place in
-    if strip_abbrev_lower pn = place2 then
+    if Name.lower pn = place2 then
       let tn = sou base t.t_ident in
       if not (List.mem tn !list) then
         begin clean_name := pn; list := tn :: !list end
@@ -456,14 +438,14 @@ let print_places_list conf base t t_equiv list =
 
 let print_places conf base t =
   let (l, t, t_equiv) = select_title conf base t in
-  let list = string_list_uniq (List.sort compare_places l) in
+  let list = List.sort_uniq my_alphabetic l in
   match list with
     [p] -> print_title_place conf base t p
   | _ -> print_places_list conf base t t_equiv list
 
 let print_titles conf base p =
   let (l, p) = select_place conf base p in
-  let list = string_list_uniq (List.sort compare_titles l) in
+  let list = List.sort_uniq my_alphabetic l in
   let title _ = Wserver.printf "... %s" p in
   Hutil.header conf title;
   Wserver.printf "<ul>\n";
@@ -505,7 +487,7 @@ let print_all_places conf base =
   in
   let list =
     let l = select_all_places conf base in
-    string_list_uniq (List.sort compare_places l)
+    List.sort_uniq my_alphabetic l
   in
   Hutil.header conf title;
   Wserver.printf "<ul>\n";
