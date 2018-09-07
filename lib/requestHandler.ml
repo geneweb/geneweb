@@ -1,6 +1,5 @@
 open Config
 open Def
-open Gutil
 open Gwdb
 open Util
 
@@ -45,7 +44,7 @@ let name_with_roman_number str =
   loop false 0 0
 
 let compact_list base xl =
-  let pl = sort_person_list base xl in
+  let pl = Gutil.sort_person_list base xl in
   List.fold_right
     (fun p pl ->
        match pl with
@@ -100,7 +99,7 @@ let find_all conf base an =
       | _ -> [], false
     else [], false
   | _ ->
-    match person_of_string_key base an with
+    match Gutil.person_of_string_key base an with
       Some ip ->
       let pl =
         let p = pget conf base ip in if is_hidden p then [] else [p]
@@ -119,12 +118,12 @@ let find_all conf base an =
       in
       pl, false
     | None ->
-      let ipl = person_not_a_key_find_all base an in
+      let ipl = Gutil.person_not_a_key_find_all base an in
       let (an, ipl) =
         if ipl = [] then
           match name_with_roman_number an with
             Some an1 ->
-            let ipl = person_ht_find_all base an1 in
+            let ipl = Gutil.person_ht_find_all base an1 in
             if ipl = [] then an, [] else an1, ipl
           | None -> an, ipl
         else an, ipl
@@ -254,7 +253,7 @@ let specify conf base n pl =
                List.fold_right
                  (fun ifam spouses ->
                     let cpl = foi base ifam in
-                    let spouse = pget conf base (spouse (get_key_index p) cpl) in
+                    let spouse = pget conf base (Gutil.spouse (get_key_index p) cpl) in
                     if p_surname base spouse <> "?" then spouse :: spouses
                     else spouses)
                  (Array.to_list (get_family p)) []

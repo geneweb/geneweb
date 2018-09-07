@@ -135,7 +135,7 @@ val persons_of_surname : base -> string_person_index
 val spi_first : string_person_index -> string -> istr
   (* first [first/sur]name starting with that string *)
 val spi_next : string_person_index -> istr -> bool -> istr * int
-  (* next [first/sur]name by alphabetical order *)
+  (* next [first/sur]name by Gutil.alphabetical order *)
 val spi_find : string_person_index -> istr -> iper list
   (* all persons having that [first/sur]name *)
 

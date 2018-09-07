@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gutil
 open Gwdb
 open Util
 
@@ -105,7 +104,7 @@ let try_find_with_one_first_name conf base n =
   | None -> []
 
 let compact_list base xl =
-  let pl = sort_person_list base xl in
+  let pl = Gutil.sort_person_list base xl in
   List.fold_right
     (fun p pl ->
        match pl with
@@ -151,12 +150,12 @@ let search_by_sosa conf base an =
 
 (*
 value gen_search_approx_key std_key conf base an =
-  let ipl = person_not_a_key_find_all base an in
+  let ipl = Gutil.person_not_a_key_find_all base an in
   let (an, ipl) =
     if ipl = [] then
       match name_with_roman_number an with
       [ Some an1 ->
-          let ipl = person_ht_find_all base an1 in
+          let ipl = Gutil.person_ht_find_all base an1 in
           if ipl = [] then (an, []) else (an1, ipl)
       | None -> (an, ipl) ]
     else (an, ipl)
@@ -194,12 +193,12 @@ value gen_search_approx_key std_key conf base an =
 *)
 
 let search_partial_key conf base an =
-  let ipl = person_not_a_key_find_all base an in
+  let ipl = Gutil.person_not_a_key_find_all base an in
   let (an, ipl) =
     if ipl = [] then
       match name_with_roman_number an with
         Some an1 ->
-          let ipl = person_ht_find_all base an1 in
+          let ipl = Gutil.person_ht_find_all base an1 in
           if ipl = [] then an, [] else an1, ipl
       | None -> an, ipl
     else an, ipl
@@ -227,12 +226,12 @@ let search_partial_key conf base an =
   compact_list base pl
 
 let search_approx_key conf base an =
-  let ipl = person_not_a_key_find_all base an in
+  let ipl = Gutil.person_not_a_key_find_all base an in
   let (an, ipl) =
     if ipl = [] then
       match name_with_roman_number an with
         Some an1 ->
-          let ipl = person_ht_find_all base an1 in
+          let ipl = Gutil.person_ht_find_all base an1 in
           if ipl = [] then an, [] else an1, ipl
       | None -> an, ipl
     else an, ipl
@@ -264,7 +263,7 @@ let search_approx_key conf base an =
 
 (* recherche par clé, i.e. prenom.occ nom *)
 let search_by_key conf base an =
-  match person_of_string_key base an with
+  match Gutil.person_of_string_key base an with
     Some ip ->
       let pl = let p = pget conf base ip in if is_hidden p then [] else [p] in
       if not conf.wizard && not conf.friend then

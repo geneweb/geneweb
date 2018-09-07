@@ -259,7 +259,7 @@ val html_highlight : bool -> string -> string -> string
 
 val xml_pretty_print : string -> string
 
-(* Print list in columns with alphabetic order *)
+(* Print list in columns with Gutil.alphabetic order *)
 
 val wprint_in_columns :
   config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit

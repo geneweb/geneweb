@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Gutil
 open Gwdb
 open Util
 
@@ -578,7 +577,7 @@ let reconstitute_person conf =
   let ext = false in
   let key_index =
     match p_getenv conf.env "i" with
-      Some s -> (try int_of_string (strip_spaces s) with Failure _ -> -1)
+      Some s -> (try int_of_string (Gutil.strip_spaces s) with Failure _ -> -1)
     | _ -> -1
   in
   let first_name = no_html_tags (only_printable (get conf "first_name")) in
@@ -599,7 +598,7 @@ let reconstitute_person conf =
     else first_name, surname
   in
   let occ =
-    try int_of_string (strip_spaces (get conf "occ")) with Failure _ -> 0
+    try int_of_string (Gutil.strip_spaces (get conf "occ")) with Failure _ -> 0
   in
   let image = only_printable (get conf "image") in
   let (first_names_aliases, ext) =
@@ -935,7 +934,7 @@ let effective_mod conf base sp =
   let oocc = get_occ op in
   if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
   else
-    begin let ipl = person_ht_find_all base key in
+    begin let ipl = Gutil.person_ht_find_all base key in
       check_conflict conf base sp ipl; rename_image_file conf base op sp
     end;
   let same_fn_sn =
@@ -966,7 +965,7 @@ let effective_mod conf base sp =
   let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
   List.iter
     (fun key ->
-       if List.mem key op_misc_names then () else person_ht_add base key pi)
+       if List.mem key op_misc_names then () else Gutil.person_ht_add base key pi)
     np_misc_names;
   let ol_rparents = rparents_of (get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
@@ -981,10 +980,10 @@ let effective_add conf base sp =
   let fn = Util.translate_eval sp.first_name in
   let sn = Util.translate_eval sp.surname in
   let key = fn ^ " " ^ sn in
-  let ipl = person_ht_find_all base key in
+  let ipl = Gutil.person_ht_find_all base key in
   check_conflict conf base sp ipl;
   patch_key base pi fn sn sp.occ;
-  person_ht_add base key pi;
+  Gutil.person_ht_add base key pi;
   patch_cache_info conf Util.cache_nb_base_persons
     (fun v -> let v = int_of_string v + 1 in string_of_int v);
   let created_p = ref [] in
@@ -998,7 +997,7 @@ let effective_add conf base sp =
   let nu = {family = [| |]} in
   patch_union base pi nu;
   let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
-  List.iter (fun key -> person_ht_add base key pi) np_misc_names; np, na
+  List.iter (fun key -> Gutil.person_ht_add base key pi) np_misc_names; np, na
 
 let array_except v a =
   let rec loop i =

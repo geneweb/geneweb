@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Gutil
 open Printf
 open Util
 
@@ -685,7 +684,7 @@ let http_preferred_language request =
       in
       loop [] 0 0
     in
-    let list = List.map strip_spaces list in
+    let list = List.map Gutil.strip_spaces list in
     let rec loop =
       function
         lang :: list ->
@@ -1785,7 +1784,7 @@ let arg_parse_in_file fname speclist anonfun errmsg =
     in
     let list =
       match list with
-        [x] -> arg_list_of_string x
+        [x] -> Gutil.arg_list_of_string x
       | _ -> list
     in
     Argl.parse_list speclist anonfun errmsg list

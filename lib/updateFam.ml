@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Gutil
 open Gwdb
 open TemplAst
 open Util
@@ -129,7 +128,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
         | _ -> None
       in
       eval_date_var d s
-  | "father" :: sl -> eval_key (father cpl) sl
+  | "father" :: sl -> eval_key (Gutil.father cpl) sl
   | ["fsources"] -> str_val (quote_escaped fam.fsources)
   | ["is_first"] ->
       begin match get_env "first" env with
@@ -152,7 +151,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
       let k =
         match get_env "cnt" env with
           Vint i ->
-            let arr = parent_array cpl in
+            let arr = Gutil.parent_array cpl in
             let i = i - 1 in
             if i >= 0 && i < Array.length arr then arr.(i)
             else if i >= 0 && i < 1 && Array.length arr = 0 then
@@ -617,7 +616,7 @@ let print_foreach print_ast _eval_expr =
     | ["fevent"] -> print_foreach_fevent env fcd al fam.fevents
     | ["fwitness"] -> print_foreach_fwitness env fcd al fam.fevents
     | ["witness"] -> print_foreach_witness env fcd al fam.witnesses
-    | ["parent"] -> print_foreach_parent env fcd al (parent_array cpl)
+    | ["parent"] -> print_foreach_parent env fcd al (Gutil.parent_array cpl)
     | _ -> raise Not_found
   and print_foreach_child env fcd al arr =
     for i = 0 to max 1 (Array.length arr) - 1 do
@@ -797,7 +796,7 @@ let print_add conf base =
      marriage_src = ""; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
      fsources = default_source conf; fam_index = bogus_family_index}
-  and cpl = couple conf.multi_parents fath moth
+  and cpl = Gutil.couple conf.multi_parents fath moth
   and des = {children = [| |]} in
   print_update_fam conf base (fam, cpl, des) digest
 
@@ -811,7 +810,7 @@ let print_add_parents conf base =
          divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
          fsources = default_source conf; fam_index = bogus_family_index}
       and cpl =
-        couple conf.multi_parents
+        Gutil.couple conf.multi_parents
           ("", sou base (get_surname p), 0, Update.Create (Neuter, None), "")
           ("", "", 0, Update.Create (Neuter, None), "")
       and des =
@@ -878,7 +877,7 @@ let print_change_order conf base =
         Array.iteri
           (fun i ifam ->
              let fam = foi base ifam in
-             let sp = spouse (get_key_index p) fam in
+             let sp = Gutil.spouse (get_key_index p) fam in
              let sp = poi base sp in
              Wserver.printf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");

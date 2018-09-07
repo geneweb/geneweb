@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gutil
 open Gwdb
 open Util
 
@@ -246,7 +245,7 @@ let notes_links_db conf base eliminate_unlinked =
     else db2
   in
   List.sort
-    (fun (s1, _) (s2, _) -> alphabetic_order (Name.lower s1) (Name.lower s2))
+    (fun (s1, _) (s2, _) -> Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 
 let print_linked_list conf base pgl =
