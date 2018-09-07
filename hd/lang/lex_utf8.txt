@@ -10303,7 +10303,7 @@ sl: kraj
 sv: plats
 
     places
-de: orte
+de: Orte
 en: places
 es: lugares
 fi: paikoista
