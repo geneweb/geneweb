@@ -3,7 +3,6 @@
 
 open Dbdisk
 open Def
-open Dutil
 open Mutil
 
 type person = dsk_person
@@ -145,7 +144,10 @@ let persons_of_first_name_or_surname base_data strings params =
   let (_, _, proj, person_patches, names_inx, names_dat, bname) = params in
   let module IstrTree =
     Btree.Make
-      (struct type t = dsk_istr let compare = compare_istr_fun base_data end)
+      (struct
+        type t = dsk_istr
+        let compare = Dutil.compare_istr_fun base_data
+      end)
   in
   let fname_dat = Filename.concat bname names_dat in
   let bt =
@@ -215,7 +217,7 @@ let persons_of_first_name_or_surname base_data strings params =
   let cursor str =
     IstrTree.key_after
       (fun key ->
-         compare_names base_data str (strings.get (Adef.int_of_istr key)))
+         Dutil.compare_names base_data str (strings.get (Adef.int_of_istr key)))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -231,7 +233,7 @@ let persons_of_name bname patches =
     let ai =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
-        let i = i mod table_size in
+        let i = i mod Dutil.table_size in
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
@@ -246,7 +248,9 @@ let persons_of_name bname patches =
               Some a -> a
             | None ->
                 seek_in ic_inx int_size;
-                let a : name_index_data = input_value ic_inx in t := Some a; a
+                let a : Dutil.name_index_data = input_value ic_inx in
+                t := Some a;
+                a
           in
           a.(i)
       in
@@ -263,11 +267,11 @@ let strings_of_fsname bname strings (_, person_patches) =
     let r =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
-        let i = i mod table_size in
+        let i = i mod Dutil.table_size in
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
-          seek_in ic_inx_acc (Iovalue.sizeof_long * (table_size + i));
+          seek_in ic_inx_acc (Iovalue.sizeof_long * (Dutil.table_size + i));
           let pos = input_binary_int ic_inx_acc in
           close_in ic_inx_acc;
           seek_in ic_inx pos;
@@ -279,8 +283,9 @@ let strings_of_fsname bname strings (_, person_patches) =
             | None ->
                 let pos = input_binary_int ic_inx in
                 seek_in ic_inx pos;
-                let a : strings_of_fsname = input_value ic_inx in
-                t := Some a; a
+                let a : Dutil.strings_of_fsname = input_value ic_inx in
+                t := Some a;
+                a
           in
           a.(i)
       in
@@ -610,7 +615,8 @@ let opendb bname =
   in
   let ic =
     let ic = Secure.open_in_bin (Filename.concat bname "base") in
-    check_magic ic; ic
+    Dutil.check_magic ic;
+    ic
   in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
