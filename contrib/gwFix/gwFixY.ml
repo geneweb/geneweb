@@ -15,7 +15,7 @@ let gen_only_printable or_nl s =
          | '\n' -> if or_nl then '\n' else ' '
          | _ -> ' ')
   done;
-  Gutil.strip_spaces (Bytes.unsafe_to_string s')
+  String.trim (Bytes.unsafe_to_string s')
 
 let only_printable = gen_only_printable false
 

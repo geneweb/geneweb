@@ -683,7 +683,7 @@ let http_preferred_language request =
       in
       loop [] 0 0
     in
-    let list = List.map Gutil.strip_spaces list in
+    let list = List.map String.trim list in
     let rec loop =
       function
         lang :: list ->

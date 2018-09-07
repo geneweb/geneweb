@@ -577,7 +577,7 @@ let reconstitute_person conf =
   let ext = false in
   let key_index =
     match p_getenv conf.env "i" with
-      Some s -> (try int_of_string (Gutil.strip_spaces s) with Failure _ -> -1)
+      Some s -> (try int_of_string (String.trim s) with Failure _ -> -1)
     | _ -> -1
   in
   let first_name = no_html_tags (only_printable (get conf "first_name")) in
@@ -598,7 +598,7 @@ let reconstitute_person conf =
     else first_name, surname
   in
   let occ =
-    try int_of_string (Gutil.strip_spaces (get conf "occ")) with Failure _ -> 0
+    try int_of_string (String.trim (get conf "occ")) with Failure _ -> 0
   in
   let image = only_printable (get conf "image") in
   let (first_names_aliases, ext) =

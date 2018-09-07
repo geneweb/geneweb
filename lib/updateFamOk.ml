@@ -445,7 +445,7 @@ let reconstitute_family conf base =
   let marriage_note =
     only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "marr_note"))
   in
-  let marriage_src = Gutil.strip_spaces (get conf "marr_src") in
+  let marriage_src = String.trim (get conf "marr_src") in
   let (witnesses, ext) =
     let rec loop i ext =
       match
@@ -1156,7 +1156,7 @@ let effective_mod conf base sfam scpl sdes =
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-      Some s -> Gutil.strip_spaces s
+      Some s -> String.trim s
     | None -> ""
   in
   let ncpl =
@@ -1288,7 +1288,7 @@ let effective_add conf base sfam scpl sdes =
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-      Some s -> Gutil.strip_spaces s
+      Some s -> String.trim s
     | None -> ""
   in
   let ncpl =
