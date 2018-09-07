@@ -4,7 +4,6 @@
 open Dbdisk
 open Db2disk
 open Def
-open Futil
 open Printf
 
 type 'istr gen_string_person_index =
@@ -256,7 +255,7 @@ let person1_fun =
    get_related = (fun p -> p.Def.related);
    get_rparents =
      (fun p ->
-        List.map (map_relation_ps (fun x -> x) (fun i -> Istr i))
+        List.map (Futil.map_relation_ps (fun x -> x) (fun i -> Istr i))
           p.Def.rparents);
    get_sex = (fun p -> p.Def.sex);
    get_surname = (fun p -> Istr p.Def.surname);
@@ -264,14 +263,14 @@ let person1_fun =
      (fun p -> List.map (fun i -> Istr i) p.Def.surnames_aliases);
    get_titles =
      (fun p ->
-        List.map (fun t -> map_title_strings (fun i -> Istr i) t)
+        List.map (fun t -> Futil.map_title_strings (fun i -> Istr i) t)
           p.Def.titles);
    get_pevents =
      (fun p ->
-        List.map (fun t -> map_pers_event (fun x -> x) (fun i -> Istr i) t)
+        List.map (fun t -> Futil.map_pers_event (fun x -> x) (fun i -> Istr i) t)
           p.Def.pevents);
    gen_person_of_person =
-     (fun p -> map_person_ps (fun p -> p) (fun s -> Istr s) p);
+     (fun p -> Futil.map_person_ps (fun p -> p) (fun s -> Istr s) p);
    dsk_person_of_person = (fun p -> p);
    get_consang = (fun a -> a.Def.consang);
    get_parents = (fun a -> a.Def.parents); get_family = fun u -> u.Def.family}
@@ -360,7 +359,7 @@ let person2_fun =
           else
             let rl = get_field_data db2 pos ("person", "rparents") "data" in
             List.map
-              (map_relation_ps (fun x -> x)
+              (Futil.map_relation_ps (fun x -> x)
                  (fun _ -> Istr2 (db2, ("", ""), -1)))
               rl);
      get_sex = (fun (db2, i) -> get_field db2 i ("person", "sex"));
@@ -375,14 +374,14 @@ let person2_fun =
        (fun (db2, i) ->
           let list = get_list_field db2 i ("person", "titles") in
           List.map
-            (map_title_strings
+            (Futil.map_title_strings
                (fun pos -> Istr2 (db2, ("person", "titles"), pos)))
             list);
      get_pevents =
        (fun (db2, i) ->
           let list = get_list_field db2 i ("person", "pevents") in
           List.map
-            (map_pers_event (fun x -> x)
+            (Futil.map_pers_event (fun x -> x)
                (fun pos -> Istr2 (db2, ("person", "pevents"), pos)))
             list);
      gen_person_of_person =
@@ -475,7 +474,7 @@ let person2gen_fun =
    get_related = (fun (_db2, _i, p) -> p.Def.related);
    get_rparents =
      (fun (db2, _i, p) ->
-        List.map (map_relation_ps (fun x -> x) (fun s -> Istr2New (db2, s)))
+        List.map (Futil.map_relation_ps (fun x -> x) (fun s -> Istr2New (db2, s)))
           p.Def.rparents);
    get_sex = (fun (_db2, _i, p) -> p.Def.sex);
    get_surname = (fun (db2, _i, p) -> Istr2New (db2, p.Def.surname));
@@ -484,17 +483,17 @@ let person2gen_fun =
         List.map (fun s -> Istr2New (db2, s)) p.Def.surnames_aliases);
    get_titles =
      (fun (db2, _i, p) ->
-        List.map (fun t -> map_title_strings (fun s -> Istr2New (db2, s)) t)
+        List.map (fun t -> Futil.map_title_strings (fun s -> Istr2New (db2, s)) t)
           p.Def.titles);
    get_pevents =
      (fun (db2, _i, p) ->
         List.map
           (fun t ->
-             map_pers_event (fun x -> x) (fun s -> Istr2New (db2, s)) t)
+             Futil.map_pers_event (fun x -> x) (fun s -> Istr2New (db2, s)) t)
           p.Def.pevents);
    gen_person_of_person =
      (fun (db2, _i, p) ->
-        map_person_ps (fun p -> p) (fun s -> Istr2New (db2, s)) p);
+        Futil.map_person_ps (fun p -> p) (fun s -> Istr2New (db2, s)) p);
    dsk_person_of_person =
      (fun (_db2, _i, _p) -> failwith "not impl dsk_person_of_person (gen)");
    get_consang = (fun (_db2, _i, a) -> a.Def.consang);
@@ -660,7 +659,7 @@ let family1_fun =
    get_fsources = (fun f -> Istr f.Def.fsources);
    get_fevents =
      (fun f ->
-        List.map (fun t -> map_fam_event (fun x -> x) (fun i -> Istr i) t)
+        List.map (fun t -> Futil.map_fam_event (fun x -> x) (fun i -> Istr i) t)
           f.Def.fevents);
    get_marriage = (fun f -> f.Def.marriage);
    get_marriage_place = (fun f -> Istr f.Def.marriage_place);
@@ -670,7 +669,7 @@ let family1_fun =
    get_relation = (fun f -> f.Def.relation);
    get_witnesses = (fun f -> f.Def.witnesses);
    gen_family_of_family =
-     (fun f -> map_family_ps (fun p -> p) (fun s -> Istr s) f);
+     (fun f -> Futil.map_family_ps (fun p -> p) (fun s -> Istr s) f);
    is_deleted_family = (fun f -> f.Def.fam_index = Adef.ifam_of_int (-1));
    get_father = (fun c -> Adef.father c);
    get_mother = (fun c -> Adef.mother c);
@@ -690,7 +689,7 @@ let family2_fun =
        (fun (db2, i) ->
           let list = get_list_field db2 i ("family", "fevents") in
           List.map
-            (map_fam_event (fun x -> x)
+            (Futil.map_fam_event (fun x -> x)
                (fun pos -> Istr2 (db2, ("family", "fevents"), pos)))
             list);
      get_marriage = (fun (db2, i) -> get_field db2 i ("family", "marriage"));
@@ -755,7 +754,7 @@ let family2gen_fun =
    get_fevents =
      (fun (db2, f) ->
         List.map
-          (fun t -> map_fam_event (fun x -> x) (fun s -> Istr2New (db2, s)) t)
+          (fun t -> Futil.map_fam_event (fun x -> x) (fun s -> Istr2New (db2, s)) t)
           f.Def.fevents);
    get_marriage = (fun (_db2, f) -> f.Def.marriage);
    get_marriage_place =
@@ -767,7 +766,7 @@ let family2gen_fun =
    get_witnesses = (fun (_db2, f) -> f.Def.witnesses);
    gen_family_of_family =
      (fun (db2, f) ->
-        map_family_ps (fun p -> p) (fun s -> Istr2New (db2, s)) f);
+        Futil.map_family_ps (fun p -> p) (fun s -> Istr2New (db2, s)) f);
    is_deleted_family =
      (fun (_db2, f) -> f.Def.fam_index = Adef.ifam_of_int (-1));
    get_father = (fun (_db2, c) -> Adef.father c);
@@ -1026,13 +1025,13 @@ let base1 base =
        (fun (p, a, u) ->
           Person
             (base, 0,
-             {per1 = Some (map_person_ps (fun p -> p) un_istr p);
+             {per1 = Some (Futil.map_person_ps (fun p -> p) un_istr p);
               asc1 = Some a; uni1 = Some u}));
      family_of_gen_family =
        (fun (f, c, d) ->
           Family
             (base, 0,
-             {fam1 = Some (map_family_ps (fun p -> p) un_istr f);
+             {fam1 = Some (Futil.map_family_ps (fun p -> p) un_istr f);
               cpl1 = Some c; des1 = Some d}));
      poi =
        (fun i ->
@@ -1053,13 +1052,13 @@ let base1 base =
      nb_of_families = (fun () -> base.data.families.len);
      patch_person =
        (fun ip p ->
-          let p = map_person_ps (fun p -> p) un_istr p in
+          let p = Futil.map_person_ps (fun p -> p) un_istr p in
           base.func.Dbdisk.patch_person ip p);
      patch_ascend = (fun ip a -> base.func.Dbdisk.patch_ascend ip a);
      patch_union = (fun ip u -> base.func.Dbdisk.patch_union ip u);
      patch_family =
        (fun ifam f ->
-          let f = map_family_ps (fun p -> p) un_istr f in
+          let f = Futil.map_family_ps (fun p -> p) un_istr f in
           base.func.Dbdisk.patch_family ifam f);
      patch_descend = (fun ifam d -> base.func.Dbdisk.patch_descend ifam d);
      patch_couple = (fun ifam c -> base.func.Dbdisk.patch_couple ifam c);
@@ -1106,10 +1105,10 @@ let base1 base =
        (fun () ->
           let get i =
             let p = base.data.persons.get i in
-            map_person_ps (fun p -> p) (fun i -> Istr i) p
+            Futil.map_person_ps (fun p -> p) (fun i -> Istr i) p
           in
           let set i p =
-            let p = map_person_ps (fun p -> p) un_istr p in
+            let p = Futil.map_person_ps (fun p -> p) un_istr p in
             base.data.persons.set i p
           in
           get, set);
@@ -1179,13 +1178,13 @@ let base2 db2 =
        (fun (p, a, u) ->
           Person2
             (db2, Adef.int_of_iper p.key_index,
-             {per2 = Some (Some (map_person_ps (fun p -> p) un_istr2 p));
+             {per2 = Some (Some (Futil.map_person_ps (fun p -> p) un_istr2 p));
               asc2 = Some (Some a); uni2 = Some (Some u)}));
      family_of_gen_family =
        (fun (f, c, d) ->
           Family2
             (db2, Adef.int_of_ifam f.fam_index,
-             {fam2 = Some (Some (map_family_ps (fun p -> p) un_istr2 f));
+             {fam2 = Some (Some (Futil.map_family_ps (fun p -> p) un_istr2 f));
               cpl2 = Some (Some c); des2 = Some (Some d)}));
      poi =
        (fun i ->
@@ -1207,7 +1206,7 @@ let base2 db2 =
      nb_of_families = (fun () -> db2.patches.nb_fam);
      patch_person =
        (fun ip p ->
-          let p = map_person_ps (fun p -> p) un_istr2 p in
+          let p = Futil.map_person_ps (fun p -> p) un_istr2 p in
           Hashtbl.replace db2.patches.h_person ip p;
           db2.patches.nb_per <-
             max (Adef.int_of_iper ip + 1) db2.patches.nb_per);
@@ -1223,7 +1222,7 @@ let base2 db2 =
             max (Adef.int_of_iper ip + 1) db2.patches.nb_per);
      patch_family =
        (fun ifam f ->
-          let f = map_family_ps (fun p -> p) un_istr2 f in
+          let f = Futil.map_family_ps (fun p -> p) un_istr2 f in
           Hashtbl.replace db2.patches.h_family ifam f;
           db2.patches.nb_fam <-
             max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam);

@@ -2,7 +2,6 @@
 (* Copyright (c) 2006-2008 INRIA *)
 
 open Def
-open Futil
 open Gwcomp
 open Printf
 
@@ -975,7 +974,7 @@ let compress_type_list_title len field_d e ic =
           output_binary_int oc_acc (pos_out oc_ext);
           let tl =
             List.map
-              (map_title_strings
+              (Futil.map_title_strings
                  (Db2out.output_item_compress_return_pos oc_dat ht items_cnt))
               tl
           in
@@ -1003,7 +1002,7 @@ let compress_type_list_pevents len field_d e ic =
           output_binary_int oc_acc (pos_out oc_ext);
           let pl =
             List.map
-              (map_pers_event (fun id -> id)
+              (Futil.map_pers_event (fun id -> id)
                  (Db2out.output_item_compress_return_pos oc_dat ht items_cnt))
               pl
           in
@@ -1031,7 +1030,7 @@ let compress_type_list_fevents len field_d e ic =
           output_binary_int oc_acc (pos_out oc_ext);
           let fl =
             List.map
-              (map_fam_event (fun id -> id)
+              (Futil.map_fam_event (fun id -> id)
                  (Db2out.output_item_compress_return_pos oc_dat ht items_cnt))
               fl
           in
