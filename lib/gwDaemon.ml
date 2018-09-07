@@ -1703,13 +1703,13 @@ let geneweb_server () =
       eprintf "GeneWeb %s - " Version.txt;
       if not !daemon then
         begin
-          eprintf "Possible addresses:";
-          eprintf "http://localhost:%d/base\n\
+          eprintf "Possible addresses:\n\
+                   http://localhost:%d/base\n\
                    http://127.0.0.1:%d/base\n\
                    http://%s:%d/base\n"
             !selected_port !selected_port hostn !selected_port;
           eprintf "where \"base\" is the name of the database\n\
-                   Type %s to stop the service"
+                   Type %s to stop the service\n"
             "control C"
         end;
       flush stderr;

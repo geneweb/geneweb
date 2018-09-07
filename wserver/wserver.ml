@@ -579,10 +579,10 @@ let f addr_opt port tmout max_clients g =
       Unix.listen s 4;
       if Sys.unix then (let _ = Unix.nice 1 in ());
       let tm = Unix.localtime (Unix.time ()) in
-      eprintf "Ready %4d-%02d-%02d %02d:%02d port" (1900 + tm.Unix.tm_year)
-        (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min;
-      eprintf " %d" port;
-      eprintf "...\n";
+      eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
+        (1900 + tm.Unix.tm_year)
+        (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+        port ;
       flush stderr;
       while true do
         begin try accept_connection tmout max_clients g s with
