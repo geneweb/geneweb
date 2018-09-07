@@ -149,7 +149,7 @@ module Make (Select : Select) =
     let no_picture = ref false
     let isolated = ref false
     let gen_correct_string no_num no_colon s =
-      let s = Gutil.strip_spaces s in
+      let s = String.trim s in
       let s =
         if !(Mutil.utf_8_db) || !raw_output then s
         else Mutil.utf_8_of_iso_8859_1 s
@@ -1705,7 +1705,7 @@ module Make (Select : Select) =
                  Some (dl, f) -> List.fold_right Filename.concat dl f
                | None -> "bad"
              in
-             let s = Gutil.strip_spaces (base_notes_read base fn) in
+             let s = String.trim (base_notes_read base fn) in
              if s <> "" then
                begin
                  if not !first then Printf.fprintf oc "\n";
@@ -1731,7 +1731,7 @@ module Make (Select : Select) =
                 List.fold_left Filename.concat in_dir
                   [base_wiznotes_dir base; file]
               in
-              let s = Gutil.strip_spaces (read_file_contents wfile) in
+              let s = String.trim (read_file_contents wfile) in
               Printf.fprintf oc "\nwizard-note %s\n" wizid;
               rs_printf oc s;
               Printf.fprintf oc "\nend wizard-note\n"

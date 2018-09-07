@@ -718,10 +718,10 @@ let print_add_ok conf base =
       Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year conf.today.month
         conf.today.day hh mm ss
     in
-    let ident = Gutil.strip_spaces (get conf "Ident") in
-    let email = Gutil.strip_spaces (get conf "Email") in
-    let subject = Gutil.strip_spaces (get conf "Subject") in
-    let text = Gutil.gen_strip_spaces false (get1 conf "Text") in
+    let ident = String.trim (get conf "Ident") in
+    let email = String.trim (get conf "Email") in
+    let subject = String.trim (get conf "Subject") in
+    let text = Gutil.trim_trailing_spaces (get1 conf "Text") in
     {m_time = time; m_date = Dtext ""; m_hour = ""; m_waiting = false;
      m_from = ""; m_ident = ident; m_wizard = ""; m_friend = "";
      m_email = email; m_access = ""; m_subject = subject; m_wiki = "";

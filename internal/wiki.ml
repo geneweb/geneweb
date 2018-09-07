@@ -305,7 +305,7 @@ let summary_of_tlsw_lines conf short lines =
              let s =
                Printf.sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
                  (if short then "" else section_num ^ " - ")
-                 (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
+                 (String.trim (String.sub s slev (len - 2 * slev)))
              in
              if short then if summary = [] then [s] else s :: ";" :: summary
              else

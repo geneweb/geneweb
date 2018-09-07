@@ -506,7 +506,7 @@ let p_getenv env label =
   Opt.map decode_varenv (List.assoc_opt (decode_varenv label) env)
 
 let p_getint env label =
-  try Opt.map (fun s -> int_of_string (Gutil.strip_spaces s)) (p_getenv env label)
+  try Opt.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
   with Failure _ -> None
 
 let nobtit conf base p =
@@ -869,7 +869,7 @@ let titled_person_text conf base p t =
       | Tname n, nn :: _ -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
       | _ ->
           let trunc_surname _ _ =
-            Gutil.strip_spaces (String.sub surname 0 (slen - elen))
+            String.trim (String.sub surname 0 (slen - elen))
           in
           let trunc_access = p_first_name, trunc_surname in
           gen_person_text trunc_access conf base p
@@ -1741,9 +1741,9 @@ let place_of_string conf place =
         loop str []
       in
       let list = explode gwf_place ',' in
-      let list = List.map Gutil.strip_spaces list in
+      let list = List.map String.trim list in
       let list_p = explode place ',' in
-      let list_p = List.map Gutil.strip_spaces list_p in
+      let list_p = List.map String.trim list_p in
       let place =
         {other = ""; town = ""; township = ""; canton = ""; district = "";
          county = ""; region = ""; country = ""}
@@ -2706,7 +2706,7 @@ let gen_only_printable or_nl s =
     in
     String.init (String.length s) conv_char
   in
-  Gutil.strip_spaces s'
+  String.trim s'
 
 let only_printable_or_nl = gen_only_printable true
 let only_printable = gen_only_printable false

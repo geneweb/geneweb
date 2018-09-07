@@ -127,34 +127,21 @@ let find_same_name base p =
   in
   List.sort (fun p1 p2 -> compare (get_occ p1) (get_occ p2)) pl
 
-let gen_strip_spaces strip_heading str =
-  let start =
-    if strip_heading then
-      let rec loop i =
-        if i = String.length str then i
-        else
-          match str.[i] with
-            ' ' | '\r' | '\n' | '\t' -> loop (i + 1)
-          | _ -> i
-      in
-      loop 0
-    else 0
-  in
-  let stop =
+let trim_trailing_spaces s =
+  let len = String.length s in
+  let len' =
     let rec loop i =
-      if i = -1 then i + 1
+      if i = -1 then 0
       else
-        match str.[i] with
-          ' ' | '\r' | '\n' | '\t' -> loop (i - 1)
+        match String.unsafe_get s i with
+        | ' ' | '\r' | '\n' | '\t' -> loop (i - 1)
         | _ -> i + 1
     in
-    loop (String.length str - 1)
+    loop (len - 1)
   in
-  if start = 0 && stop = String.length str then str
-  else if start > stop then ""
-  else String.sub str start (stop - start)
-
-let strip_spaces = gen_strip_spaces true
+  if len' = 0 then ""
+  else if len' = len then s
+  else String.sub s 0 len'
 
 let alphabetic_utf_8 n1 n2 =
   let rec loop i1 i2 =

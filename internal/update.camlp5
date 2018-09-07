@@ -853,7 +853,7 @@ let bad_date conf d =
   raise ModErr
 
 let int_of_field s =
-  try Some (int_of_string (Gutil.strip_spaces s)) with Failure _ -> None
+  try Some (int_of_string (String.trim s)) with Failure _ -> None
 
 let reconstitute_date_dmy2 conf var =
   let m =
