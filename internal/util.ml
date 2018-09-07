@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Gutil
 open Gwdb
 open Printf
 
@@ -508,7 +507,7 @@ let p_getenv env label =
   Opt.map decode_varenv (List.assoc_opt (decode_varenv label) env)
 
 let p_getint env label =
-  try Opt.map (fun s -> int_of_string (strip_spaces s)) (p_getenv env label)
+  try Opt.map (fun s -> int_of_string (Gutil.strip_spaces s)) (p_getenv env label)
   with Failure _ -> None
 
 let nobtit conf base p =
@@ -871,7 +870,7 @@ let titled_person_text conf base p t =
       | Tname n, nn :: _ -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
       | _ ->
           let trunc_surname _ _ =
-            strip_spaces (String.sub surname 0 (slen - elen))
+            Gutil.strip_spaces (String.sub surname 0 (slen - elen))
           in
           let trunc_access = p_first_name, trunc_surname in
           gen_person_text trunc_access conf base p
@@ -1743,9 +1742,9 @@ let place_of_string conf place =
         loop str []
       in
       let list = explode gwf_place ',' in
-      let list = List.map strip_spaces list in
+      let list = List.map Gutil.strip_spaces list in
       let list_p = explode place ',' in
-      let list_p = List.map strip_spaces list_p in
+      let list_p = List.map Gutil.strip_spaces list_p in
       let place =
         {other = ""; town = ""; township = ""; canton = ""; district = "";
          county = ""; region = ""; country = ""}
@@ -2150,7 +2149,7 @@ let husband_wife conf base p =
   let rec loop i =
     if i < Array.length (get_family p) then
       let fam = foi base (get_family p).(i) in
-      let conjoint = spouse (get_key_index p) fam in
+      let conjoint = Gutil.spouse (get_key_index p) fam in
       let conjoint = pget conf base conjoint in
       if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
       then
@@ -2457,7 +2456,7 @@ let default_sosa_ref conf base =
     Some n ->
       if n = "" then None
       else
-        begin match person_ht_find_all base n with
+        begin match Gutil.person_ht_find_all base n with
           [ip] ->
             let p = pget conf base ip in if is_hidden p then None else Some p
         | _ -> None
@@ -2708,7 +2707,7 @@ let gen_only_printable or_nl s =
     in
     String.init (String.length s) conv_char
   in
-  strip_spaces s'
+  Gutil.strip_spaces s'
 
 let only_printable_or_nl = gen_only_printable true
 let only_printable = gen_only_printable false
@@ -3189,7 +3188,7 @@ let xml_pretty_print s =
   in
   loop 0
 
-(* Print list in columns with alphabetic order *)
+(* Print list in columns with Gutil.alphabetic order *)
 
 type elem_kind = HeadElem | ContElem | Elem
 let kind_size =

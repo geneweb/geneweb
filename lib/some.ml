@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Gutil
 open Gwdb
 open Util
 
@@ -228,7 +227,7 @@ let first_name_print_list conf base x1 xl liste =
     let l =
       List.sort
         (fun x1 x2 ->
-           match alphabetic (p_surname base x1) (p_surname base x2) with
+           match Gutil.alphabetic (p_surname base x1) (p_surname base x2) with
              0 ->
                begin match
                  Adef.od_of_codate (get_birth x1),
@@ -246,7 +245,7 @@ let first_name_print_list conf base x1 xl liste =
       (fun l x ->
          let px = p_surname base x in
          match l with
-           (p, l1) :: l when alphabetic px p = 0 -> (p, x :: l1) :: l
+           (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
          | _ -> (px, [x]) :: l)
       [] l
   in
@@ -416,7 +415,7 @@ let print_branch conf base psn name =
       List.map
         (fun ifam ->
            let fam = foi base ifam in
-           let c = spouse (get_key_index p) fam in
+           let c = Gutil.spouse (get_key_index p) fam in
            let c = pget conf base c in
            let down = has_children_with_that_name conf base fam name in
            let down =
@@ -657,7 +656,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
     (if List.length homonymes = 1 then code_varenv x ^ ";t=A"
      else code_varenv fx)
     (transl conf "here");
-  Wserver.printf "%s" (transl conf "for the first names by alphabetic order");
+  Wserver.printf "%s" (transl conf "for the first names by Gutil.alphabetic order");
   Wserver.printf ".</em>\n";
   Wserver.printf "</p>\n";
   Hutil.trailer conf

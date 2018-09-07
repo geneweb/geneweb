@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Gutil
 open Gwdb
 open Util
 
@@ -423,10 +422,10 @@ let redirect_added_families base p ip2 p2_family =
                       patch_person base ip w)
                  evt.efam_witnesses)
             (get_fevents fam);
-          couple false p.key_index (get_mother fam)
+          Gutil.couple false p.key_index (get_mother fam)
         end
       else if ip2 = get_mother fam then
-        couple false (get_father fam) p.key_index
+        Gutil.couple false (get_father fam) p.key_index
       else assert false
     in
     patch_couple base ifam cpl

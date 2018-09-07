@@ -12,7 +12,6 @@ module type Select =
 module Make (Select : Select) =
   struct
     open Def
-    open Gutil
     open Gwdb
     open Printf
     let old_gw = ref false
@@ -151,7 +150,7 @@ module Make (Select : Select) =
     let no_picture = ref false
     let isolated = ref false
     let gen_correct_string no_num no_colon s =
-      let s = strip_spaces s in
+      let s = Gutil.strip_spaces s in
       let s =
         if !(Mutil.utf_8_db) || !raw_output then s
         else Mutil.utf_8_of_iso_8859_1 s
@@ -1464,8 +1463,8 @@ module Make (Select : Select) =
           eprintf "%s: group of size %d not included\n" origin_file len;
           let cpl = foi base ifam in
           eprintf "    %s + %s\n"
-            (designation base (poi base (get_father cpl)))
-            (designation base (poi base (get_mother cpl)));
+            (Gutil.designation base (poi base (get_father cpl)))
+            (Gutil.designation base (poi base (get_mother cpl)));
           flush stderr;
           set_mark Scanned
         end
@@ -1707,7 +1706,7 @@ module Make (Select : Select) =
                  Some (dl, f) -> List.fold_right Filename.concat dl f
                | None -> "bad"
              in
-             let s = strip_spaces (base_notes_read base fn) in
+             let s = Gutil.strip_spaces (base_notes_read base fn) in
              if s <> "" then
                begin
                  if not !first then fprintf oc "\n";
@@ -1733,7 +1732,7 @@ module Make (Select : Select) =
                 List.fold_left Filename.concat in_dir
                   [base_wiznotes_dir base; file]
               in
-              let s = strip_spaces (read_file_contents wfile) in
+              let s = Gutil.strip_spaces (read_file_contents wfile) in
               fprintf oc "\nwizard-note %s\n" wizid;
               rs_printf oc s;
               fprintf oc "\nend wizard-note\n"

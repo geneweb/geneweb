@@ -3,7 +3,6 @@
 
 open Config
 open Def
-open Gutil
 open Gwdb
 open Util
 open Dag2html
@@ -1150,7 +1149,7 @@ let known_spouses_list conf base p excl_p =
   let u = p in
   List.fold_left
     (fun spl ifam ->
-       let sp = pget conf base (spouse (get_key_index p) (foi base ifam)) in
+       let sp = pget conf base (Gutil.spouse (get_key_index p) (foi base ifam)) in
        if sou base (get_first_name sp) <> "?" &&
           sou base (get_surname sp) <> "?" &&
           get_key_index sp <> get_key_index excl_p
@@ -1523,7 +1522,7 @@ let print_base_loop conf base p =
   Hutil.rheader conf title;
   Wserver.printf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
-    (Util.update_family_loop conf base p (designation base p));
+    (Util.update_family_loop conf base p (Gutil.designation base p));
   Wserver.printf ".\n";
   Hutil.trailer conf
 
