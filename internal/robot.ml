@@ -53,11 +53,6 @@ let purge_who tm xcl sec =
   in
   List.iter (fun k -> xcl.who <- W.remove k xcl.who) to_remove
 
-let fprintf_date oc tm =
-  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
-    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-    tm.Unix.tm_sec
-
 let input_excl ic =
   let b = really_input_string ic (String.length magic_robot) in
   if b <> magic_robot then raise Not_found else (input_value ic : excl)
@@ -94,7 +89,7 @@ let check oc_opt tm from max_call sec conf suicide =
         incr att;
         begin match !att mod max_call, oc_opt with
           0, Some oc ->
-            fprintf_date oc (Unix.localtime tm);
+            Util.fprintf_date oc (Unix.localtime tm);
             Printf.fprintf oc "\n";
             Printf.fprintf oc "  From: %s\n" from;
             Printf.fprintf oc "  %d refused attempts;" !att;

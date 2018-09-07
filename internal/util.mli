@@ -302,3 +302,6 @@ val array_mem_witn
  -> Def.iper
  -> (Def.iper * Def.witness_kind) array
  -> bool * string
+
+(* Print a date using "%4d-%02d-%02d %02d:%02d:%02d" format *)
+val fprintf_date : out_channel -> Unix.tm -> unit
