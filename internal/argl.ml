@@ -1,7 +1,6 @@
 (* $Id: argl.ml,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Printf
 
 let action_arg s sl =
   function
@@ -87,14 +86,14 @@ let parse_arg_list spec_list anon_fun remaining_args =
   in
   try parse_aux spec_list anon_fun remaining_args with
     Arg.Bad s ->
-      eprintf "Error: %s\n" s;
-      eprintf "Use option -help for usage\n";
+      Printf.eprintf "Error: %s\n" s;
+      Printf.eprintf "Use option -help for usage\n";
       flush stderr;
       exit 2
 
 let usage speclist errmsg =
-  printf "%s\n" errmsg;
-  List.iter (fun (key, _, doc) -> printf "  %s %s\n" key doc) speclist;
+  Printf.printf "%s\n" errmsg;
+  List.iter (fun (key, _, doc) -> Printf.printf "  %s %s\n" key doc) speclist;
   flush stdout
 
 let parse_list spec_list anonfun errmsg list =
@@ -102,8 +101,8 @@ let parse_list spec_list anonfun errmsg list =
     [] -> ()
   | "-help" :: _ -> usage spec_list errmsg; exit 0
   | s :: _ ->
-      eprintf "%s: unknown or misused option\n" s;
-      eprintf "Use option -help for usage\n";
+      Printf.eprintf "%s: unknown or misused option\n" s;
+      Printf.eprintf "Use option -help for usage\n";
       flush stderr;
       exit 2
 

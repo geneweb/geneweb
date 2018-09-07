@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open Printf
 
 let is_hide_names conf p =
   if conf.hide_names || get_access p = Private then true else false
@@ -345,7 +344,7 @@ let string_exists str sub =
 
 let string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
-  sprintf "%s, %d %s %d %02d:%02d:%02d GMT" (week_day_txt lt.Unix.tm_wday)
+  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT" (week_day_txt lt.Unix.tm_wday)
     lt.Unix.tm_mday (month_txt lt.Unix.tm_mon) (1900 + lt.Unix.tm_year)
     lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 
@@ -1287,7 +1286,7 @@ let find_misc_file name =
 
 (* Code mort. Géré par le css
 value default_background conf =
-  sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
+  Printf.sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
 ;
 
 value default_body_prop conf =
@@ -1296,7 +1295,7 @@ value default_body_prop conf =
     [ Some v -> "font-size:" ^ v ^ ";"
     | None -> "" ]
   in
-  let style = sprintf "%s%s" style (default_background conf) in
+  let style = Printf.sprintf "%s%s" style (default_background conf) in
   " style=\"" ^ style ^ "\""
 ;
    Code mort. Géré par le css *)
@@ -1686,15 +1685,15 @@ let string_with_macros conf env s =
         | Out ->
             match http_string s i with
               Some (x, j) ->
-                bprintf buff "<a href=\"%s\">" x;
+                Printf.bprintf buff "<a href=\"%s\">" x;
                 expand_ampersand buff x;
-                bprintf buff "</a>";
+                Printf.bprintf buff "</a>";
                 loop Out j
             | None ->
                 match email_addr s i with
                   Some j ->
                     let x = String.sub s i (j - i) in
-                    bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
+                    Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                     loop Out j
                 | None ->
                     let tt =
@@ -1871,19 +1870,19 @@ let check_ampersand s i =
       'a'..'z' ->
         let rec loop_id j =
           if j = String.length s then
-            let a = sprintf "&amp;%s" (String.sub s i (j - i)) in Some (a, j)
+            let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in Some (a, j)
           else
             match s.[j] with
               'a'..'z' -> loop_id (j + 1)
             | ';' -> None
             | _ ->
-                let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
+                let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
                 Some (a, j)
         in
         loop_id i
     | _ -> Some ("&amp;", i)
 
-let bad col s = sprintf "<span style=\"color:%s\">%s</span>" col s
+let bad col s = Printf.sprintf "<span style=\"color:%s\">%s</span>" col s
 
 let check_ampersands s =
   let b = Buffer.create (String.length s) in
@@ -1944,7 +1943,7 @@ let check_xhtml s =
              let s_aft = String.sub s pos_aft (String.length s - pos_aft) in
              Buffer.clear b;
              Buffer.add_string b s_bef;
-             Buffer.add_string b (bad "red" (sprintf "&lt;%s&gt;" txt));
+             Buffer.add_string b (bad "red" (Printf.sprintf "&lt;%s&gt;" txt));
              Buffer.add_string b s_aft)
           tag_stack;
         Buffer.contents b
@@ -1955,30 +1954,30 @@ let check_xhtml s =
           if t = "br" && a = "" then
             begin
               (* frequent error *)
-              Buffer.add_string b (sprintf "<%s/>" t);
+              Buffer.add_string b (Printf.sprintf "<%s/>" t);
               loop tag_stack i
             end
           else
             begin match check_ampersands a with
               Some a ->
-                Buffer.add_string b (sprintf "&lt;%s%s&gt;" t a);
+                Buffer.add_string b (Printf.sprintf "&lt;%s%s&gt;" t a);
                 loop tag_stack i
             | None ->
                 let pos = Buffer.length b in
-                let txt = sprintf "%s%s" t a in
-                Buffer.add_string b (sprintf "<%s>" txt);
+                let txt = Printf.sprintf "%s%s" t a in
+                Buffer.add_string b (Printf.sprintf "<%s>" txt);
                 loop ((pos, txt, t) :: tag_stack) i
             end
       | Some (Etag t, i) ->
           begin match tag_stack with
             (_, _, bt) :: rest when t = bt ->
-              Buffer.add_string b (sprintf "</%s>" t); loop rest i
+              Buffer.add_string b (Printf.sprintf "</%s>" t); loop rest i
           | _ ->
-              Buffer.add_string b (bad "red" (sprintf "&lt;/%s&gt;" t));
+              Buffer.add_string b (bad "red" (Printf.sprintf "&lt;/%s&gt;" t));
               loop tag_stack i
           end
       | Some (Atag t, i) ->
-          Buffer.add_string b (sprintf "<%s/>" t); loop tag_stack i
+          Buffer.add_string b (Printf.sprintf "<%s/>" t); loop tag_stack i
       | None ->
           if s.[i] = '&' then
             match check_ampersand s (i + 1) with
@@ -2788,8 +2787,8 @@ let is_that_user_and_password auth_scheme user passwd =
       if user <> ds.ds_username then false
       else
         let that_response_would_be =
-          let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
-          let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
+          let a1 = Printf.sprintf "%s:%s:%s" user ds.ds_realm passwd in
+          let a2 = Printf.sprintf "%s:%s" ds.ds_meth ds.ds_uri in
           if ds.ds_qop = "auth" || ds.ds_qop = "auth-int" then
             h
               (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ ds.ds_nc ^ ":" ^
@@ -2952,7 +2951,7 @@ let adm_file f = List.fold_right Filename.concat [!cnt_dir; "cnt"] f
 
 let std_date conf =
   let (hour, min, sec) = conf.time in
-  sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year conf.today.month
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year conf.today.month
     conf.today.day hour min sec
 
 let read_wf_trace fname =
@@ -2967,7 +2966,7 @@ let read_wf_trace fname =
 
 let write_wf_trace fname wt =
   let oc = Secure.open_out fname in
-  List.iter (fun (dt, u) -> fprintf oc "%s %s\n" dt u) wt; close_out oc
+  List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt; close_out oc
 
 let update_wf_trace conf fname =
   let dt = std_date conf in

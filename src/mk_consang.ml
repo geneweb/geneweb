@@ -1,7 +1,6 @@
 (* $Id: mk_consang.ml,v 5.56 2012-01-18 21:03:02 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Printf
 
 let fname = ref ""
 let indexes = ref false
@@ -56,12 +55,12 @@ let init_cache_info bname base =
 let rebuild_field_array len pad bdir compress f =
   if !(Mutil.verbose) then
     begin
-      eprintf "rebuilding %s..." (Filename.basename bdir);
+      Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
       flush stderr
     end;
   if compress then Db2out.output_value_array_compress bdir "" len pad f
   else Db2out.output_value_array_no_compress bdir "" len pad f;
-  if !(Mutil.verbose) then begin eprintf "\n"; flush stderr end
+  if !(Mutil.verbose) then begin Printf.eprintf "\n"; flush stderr end
 
 type ('index, 'item) field_info =
   { fi_nb : int;
@@ -133,7 +132,7 @@ let rebuild_list_field_array db2 fi (f2, get) =
   Mutil.mkdir_p bdir;
   if !(Mutil.verbose) then
     begin
-      eprintf "rebuilding %s..." (Filename.basename bdir);
+      Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
       flush stderr
     end;
   let oc_dat = open_out_bin (Filename.concat bdir "data") in
@@ -141,7 +140,7 @@ let rebuild_list_field_array db2 fi (f2, get) =
   f oc_acc oc_dat;
   close_out oc_acc;
   close_out oc_dat;
-  if !(Mutil.verbose) then begin eprintf "\n"; flush stderr end
+  if !(Mutil.verbose) then begin Printf.eprintf "\n"; flush stderr end
 
 let rebuild_list2_field_array db2 fi (f2, get) =
   let f1 = fi.fi_dir in
@@ -182,7 +181,7 @@ let rebuild_list2_field_array db2 fi (f2, get) =
   Mutil.mkdir_p bdir;
   if !(Mutil.verbose) then
     begin
-      eprintf "rebuilding %s..." (Filename.basename bdir);
+      Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
       flush stderr
     end;
   let oc_dat = open_out_bin (Filename.concat bdir "data") in
@@ -190,7 +189,7 @@ let rebuild_list2_field_array db2 fi (f2, get) =
   f oc_acc oc_dat;
   close_out oc_acc;
   close_out oc_dat;
-  if !(Mutil.verbose) then begin eprintf "\n"; flush stderr end
+  if !(Mutil.verbose) then begin Printf.eprintf "\n"; flush stderr end
 
 let rebuild_string_field db2 fi (f2, get) =
   let f1 = fi.fi_dir in
@@ -251,7 +250,7 @@ let unique_key_string (ht, scnt) s =
       Hashtbl.add ht s istr; incr scnt; istr
 
 let make_key_index db2 nb_per bdir =
-  if !(Mutil.verbose) then begin eprintf "key index..."; flush stderr end;
+  if !(Mutil.verbose) then begin Printf.eprintf "key index..."; flush stderr end;
   let person_of_key_d = Filename.concat bdir "person_of_key" in
   (try Mutil.mkdir_p person_of_key_d with _ -> ());
   let ht_index_of_key = Hashtbl.create 1 in
@@ -284,7 +283,7 @@ let make_key_index db2 nb_per bdir =
   Db2out.output_hashtbl person_of_key_d "istr_of_string.ht"
     (fst ht_strings : (string, Adef.istr) Hashtbl.t);
   Hashtbl.clear (fst ht_strings);
-  if !(Mutil.verbose) then begin eprintf "\n"; flush stderr end
+  if !(Mutil.verbose) then begin Printf.eprintf "\n"; flush stderr end
 
 let rebuild_fields2 db2 =
   let fi_per =
@@ -466,8 +465,8 @@ let main () =
   Argl.parse speclist anonfun errmsg;
   if !fname = "" then
     begin
-      eprintf "Missing file name\n";
-      eprintf "Use option -help for usage\n";
+      Printf.eprintf "Missing file name\n";
+      Printf.eprintf "Use option -help for usage\n";
       flush stderr;
       exit 2
     end;
@@ -492,7 +491,7 @@ let main () =
          let carray = ConsangAll.compute ~verbosity:!verbosity base !tlim !scratch in
          simple_output !fname base carray
        with Consang.TopologicalSortError p ->
-         printf "\nError: loop in database, %s is his/her own ancestor.\n"
+         Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
            (designation base p);
          flush stdout;
          exit 2)

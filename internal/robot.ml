@@ -3,7 +3,6 @@
 
 open Config
 open Util
-open Printf
 
 let magic_robot = "GWRB0007"
 
@@ -55,7 +54,7 @@ let purge_who tm xcl sec =
   List.iter (fun k -> xcl.who <- W.remove k xcl.who) to_remove
 
 let fprintf_date oc tm =
-  fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
+  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
     (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
     tm.Unix.tm_sec
 
@@ -96,10 +95,10 @@ let check oc_opt tm from max_call sec conf suicide =
         begin match !att mod max_call, oc_opt with
           0, Some oc ->
             fprintf_date oc (Unix.localtime tm);
-            fprintf oc "\n";
-            fprintf oc "  From: %s\n" from;
-            fprintf oc "  %d refused attempts;" !att;
-            fprintf oc " to restore access, delete file \"%s\"\n" fname
+            Printf.fprintf oc "\n";
+            Printf.fprintf oc "  From: %s\n" from;
+            Printf.fprintf oc "  %d refused attempts;" !att;
+            Printf.fprintf oc " to restore access, delete file \"%s\"\n" fname
         | _ -> ()
         end;
         true
@@ -131,11 +130,11 @@ let check oc_opt tm from max_call sec conf suicide =
             begin
               begin match oc_opt with
                 Some oc ->
-                  fprintf oc "--- %s is a robot" from;
+                  Printf.fprintf oc "--- %s is a robot" from;
                   if suicide then
-                    fprintf oc " (called the \"suicide\" request)\n"
+                    Printf.fprintf oc " (called the \"suicide\" request)\n"
                   else
-                    fprintf oc " (%d > %d connections in %g <= %d seconds)\n"
+                    Printf.fprintf oc " (%d > %d connections in %g <= %d seconds)\n"
                       cnt max_call (tm -. tm0) sec
               | None -> ()
               end;
@@ -150,11 +149,11 @@ let check oc_opt tm from max_call sec conf suicide =
           [_; _], Some oc ->
             List.iter
               (fun (s, att) ->
-                 fprintf oc "--- excluded:";
-                 fprintf oc " %s (%d refused attempts)\n" s !att;
+                 Printf.fprintf oc "--- excluded:";
+                 Printf.fprintf oc " %s (%d refused attempts)\n" s !att;
                  ())
               xcl.excl;
-            fprintf oc "--- to restore access, delete file \"%s\"\n" fname
+            Printf.fprintf oc "--- to restore access, delete file \"%s\"\n" fname
         | _ -> ()
         end;
         let (list, nconn) =
@@ -179,9 +178,9 @@ let check oc_opt tm from max_call sec conf suicide =
           Some oc ->
             List.iter
               (fun (k, tm0, nb) ->
-                 fprintf oc "--- %3d req - %3.0f sec - %s\n" nb (tm -. tm0) k)
+                 Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb (tm -. tm0) k)
               list;
-            fprintf oc "--- max %d req by %s / conn %d\n" (fst xcl.max_conn)
+            Printf.fprintf oc "--- max %d req by %s / conn %d\n" (fst xcl.max_conn)
               (snd xcl.max_conn) nconn
         | None -> ()
         end;

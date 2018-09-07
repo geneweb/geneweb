@@ -2,7 +2,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 
 let private_everybody bname =

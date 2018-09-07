@@ -3,7 +3,6 @@
 
 open Def
 open Gwcomp
-open Printf
 
 let default_source = ref ""
 let do_check = ref true
@@ -150,7 +149,7 @@ let find_first_available_occ gen so fn sn =
         gen.g_warning_cnt <- gen.g_warning_cnt - 1;
         if gen.g_warning_cnt > 0 then
           begin
-            eprintf "Warning: %s: %s.%d %s renumbered %d\n"
+            Printf.eprintf "Warning: %s: %s.%d %s renumbered %d\n"
               gen.g_file_info.f_curr_gwo_file so.first_name so.occ so.surname
               occ;
             flush stderr
@@ -297,8 +296,8 @@ let insert_person1 gen so =
       gen.g_error_cnt <- gen.g_error_cnt - 1;
       if gen.g_error_cnt > 0 then
         begin
-          eprintf "File \"%s\"\n" gen.g_file_info.f_curr_gwo_file;
-          eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
+          Printf.eprintf "File \"%s\"\n" gen.g_file_info.f_curr_gwo_file;
+          Printf.eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
             so.surname
         end;
       flush stderr;
@@ -398,7 +397,7 @@ let insert_bnotes1 gen notesname str =
       List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "notes_of.txt"]
     in
     let oc = open_out fname in
-    fprintf oc "%s\n" gen.g_file_info.f_curr_src_file; close_out oc
+    Printf.fprintf oc "%s\n" gen.g_file_info.f_curr_src_file; close_out oc
 
 let write_file_contents fname text =
   let oc = open_out fname in output_string oc text; close_out oc
@@ -443,7 +442,7 @@ let insert_undefined2 gen key fn sn sex =
       if gen.g_error_cnt > 0 then
         begin
           gen.g_error_cnt <- -1;
-          eprintf
+          Printf.eprintf
             "Error: option -sep does not work when there are undefined persons\n";
           flush stderr
         end;
@@ -453,7 +452,7 @@ let insert_undefined2 gen key fn sn sex =
     begin
       gen.g_warning_cnt <- gen.g_warning_cnt - 1;
       if gen.g_warning_cnt > 0 then
-        eprintf "Warning: adding undefined %s.%d %s\n"
+        Printf.eprintf "Warning: adding undefined %s.%d %s\n"
           (Name.lower key.pk_first_name) key.pk_occ
           (Name.lower key.pk_surname);
       flush stderr
@@ -511,7 +510,7 @@ let get_person2 gen so sex =
     try key_hashtbl_find gen.g_index_of_key (fn, sn, occ) with
       Not_found ->
         failwith
-          (sprintf "*** bug not found %s.%d %s" so.first_name so.occ
+          (Printf.sprintf "*** bug not found %s.%d %s" so.first_name so.occ
              so.surname)
   else
     let so = if so.sex = Neuter then {so with sex = sex} else so in
@@ -1051,7 +1050,7 @@ let compress_fields nper nfam tmp_dir =
        in
        let ic = open_in_bin (Filename.concat field_d "data") in
        if !(Mutil.verbose) then
-         begin eprintf "compressing %s..." f2; flush stderr end;
+         begin Printf.eprintf "compressing %s..." f2; flush stderr end;
        compress_type len field_d "2" ic;
        close_in ic;
        List.iter
@@ -1126,7 +1125,7 @@ let reorder_fields tmp_dir nper =
   in
   let ic_acc = open_in_bin (Filename.concat field_d "access") in
   let ic_dat = open_in_bin (Filename.concat field_d "data") in
-  if !(Mutil.verbose) then (eprintf "reordering %s..." f2; flush stderr);
+  if !(Mutil.verbose) then (Printf.eprintf "reordering %s..." f2; flush stderr);
   let ff = open_out_field field_d len Obj.repr in
   reorder_type ic_acc ic_dat ff;
   close_out_field [| |] ff len;
@@ -1142,11 +1141,11 @@ let reorder_fields tmp_dir nper =
 
 let output_command_line bdir =
   let oc = open_out (Filename.concat bdir "command.txt") in
-  fprintf oc "%s" Sys.argv.(0);
+  Printf.fprintf oc "%s" Sys.argv.(0);
   for i = 1 to Array.length Sys.argv - 1 do
-    fprintf oc " %s" Sys.argv.(i)
+    Printf.fprintf oc " %s" Sys.argv.(i)
   done;
-  fprintf oc "\n";
+  Printf.fprintf oc "\n";
   close_out oc
 
 let output_particles_file tmp_dir particles =
@@ -1154,16 +1153,16 @@ let output_particles_file tmp_dir particles =
     List.fold_left Filename.concat tmp_dir ["base_d"; "particles.txt"]
   in
   let oc = open_out fname in
-  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
   close_out oc
 
 let set_error base x =
-  printf "\nError: "; Check.print_base_error stdout base x
+  Printf.printf "\nError: "; Check.print_base_error stdout base x
 
 let set_warning base =
   function
     UndefinedSex _ -> ()
-  | x -> printf "\nWarning: "; Check.print_base_warning stdout base x
+  | x -> Printf.printf "\nWarning: "; Check.print_base_warning stdout base x
 
 let fold_option fsome vnone =
   function
@@ -1271,7 +1270,7 @@ let link next_family_fun bdir =
      g_person_pevents = person_pevents}
   in
   if !(Mutil.verbose) then
-    begin eprintf "pass 1: creating persons...\n"; flush stderr end;
+    begin Printf.eprintf "pass 1: creating persons...\n"; flush stderr end;
   let next_family = next_family_fun fi in
   begin let rec loop () =
     match next_family () with
@@ -1282,7 +1281,7 @@ let link next_family_fun bdir =
   end;
   Gc.compact ();
   if !(Mutil.verbose) then
-    begin eprintf "pass 2: creating families...\n"; flush stderr end;
+    begin Printf.eprintf "pass 2: creating families...\n"; flush stderr end;
   let next_family = next_family_fun fi in
   begin let rec loop () =
     match next_family () with
@@ -1293,12 +1292,12 @@ let link next_family_fun bdir =
   end;
   if gen.g_warning_cnt < 0 then
     begin
-      eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
+      Printf.eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
       flush stderr
     end;
   if gen.g_error_cnt < 0 then
     begin
-      eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
+      Printf.eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
       flush stderr
     end;
   List.iter close_out_field_known_size person_fields;

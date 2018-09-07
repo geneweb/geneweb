@@ -2,7 +2,6 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Gwcomp
-open Printf
 
 (* ******************************************************************** *)
 (*  [Fonc] check_magic : string -> in_channel -> unit                   *)
@@ -151,7 +150,7 @@ let main () =
        if Filename.check_suffix x ".gw" then
          begin
            begin try Gwcomp.comp_families x with
-             e -> printf "File \"%s\", line %d:\n" x !line_cnt; raise e
+             e -> Printf.printf "File \"%s\", line %d:\n" x !line_cnt; raise e
            end;
            gwo := (x ^ "o", separate, shift) :: !gwo
          end
@@ -166,7 +165,7 @@ let main () =
     in
     if not !force && Sys.file_exists bdir then
       begin
-        printf "The database \"%s\" already exists. \
+        Printf.printf "The database \"%s\" already exists. \
                 Use option -f to overwrite it."
           !out_file;
         flush stdout;
@@ -183,14 +182,14 @@ let main () =
            if Db2link.link next_family_fun bdir then ()
            else
              begin
-               eprintf "*** database not created\n";
+               Printf.eprintf "*** database not created\n";
                flush stderr;
                exit 2
              end)
 
 let print_exc =
   function
-    Failure txt -> printf "Failed: %s\n" txt; flush stdout; exit 2
+    Failure txt -> Printf.printf "Failed: %s\n" txt; flush stdout; exit 2
   | exc -> Printexc.print raise exc
 
 let _ = try main () with exc -> print_exc exc

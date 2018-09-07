@@ -12,7 +12,6 @@
 
 open Def
 open Gwdb
-open Printf
 
 
 let trace = ref false
@@ -37,12 +36,12 @@ let read_file fname =
         let occ =
           try int_of_string occ with
             Failure _ ->
-              eprintf "*** Error int_of_string: %s\n" occ;
+              Printf.eprintf "*** Error int_of_string: %s\n" occ;
               flush stderr;
               exit 2
         in
         sn, fn, occ
-    | _ -> eprintf "*** Error key: %s\n" name; flush stderr; exit 2
+    | _ -> Printf.eprintf "*** Error key: %s\n" name; flush stderr; exit 2
   in
   let list = ref [] in
   begin match (try Some (open_in fname) with Sys_error _ -> None) with
@@ -96,7 +95,7 @@ let update_database_with_domicile base fname =
            let p = poi base ip in
            if !trace then
              begin
-               eprintf "Modifiy person : %s\n" (Gutil.designation base p);
+               Printf.eprintf "Modifiy person : %s\n" (Gutil.designation base p);
                flush stderr
              end;
            let evt =
@@ -117,14 +116,14 @@ let update_database_with_domicile base fname =
            changed := true;
            incr nb_modified
        | None ->
-           eprintf "Person not in the database anymore : %s.%d %s\n" fn occ
+           Printf.eprintf "Person not in the database anymore : %s.%d %s\n" fn occ
              sn;
            flush stderr)
     list;
   if !changed then
     begin
       commit_patches base;
-      eprintf "Number of modified persons: %d\n" !nb_modified;
+      Printf.eprintf "Number of modified persons: %d\n" !nb_modified;
       flush stderr
     end
 
@@ -139,7 +138,7 @@ let update_database_with_alias base fname =
            let p = poi base ip in
            if !trace then
              begin
-               eprintf "Modifiy person : %s\n" (Gutil.designation base p);
+               Printf.eprintf "Modifiy person : %s\n" (Gutil.designation base p);
                flush stderr
              end;
            let note = Gwdb.insert_string base note in
@@ -152,14 +151,14 @@ let update_database_with_alias base fname =
            changed := true;
            incr nb_modified
        | None ->
-           eprintf "Person not in the database anymore : %s.%d %s\n" fn occ
+           Printf.eprintf "Person not in the database anymore : %s.%d %s\n" fn occ
              sn;
            flush stderr)
     list;
   if !changed then
     begin
       commit_patches base;
-      eprintf "Number of modified persons: %d\n" !nb_modified;
+      Printf.eprintf "Number of modified persons: %d\n" !nb_modified;
       flush stderr
     end
 
@@ -182,7 +181,7 @@ let main () =
     begin Arg.usage speclist usage; exit 2 end;
   Lock.control (Mutil.lock_file !bname) false
     ~onerror:(fun () ->
-        eprintf "Cannot lock database. Try again.\n";
+        Printf.eprintf "Cannot lock database. Try again.\n";
         flush stderr)
     (fun () ->
        let base = Gwdb.open_base !bname in

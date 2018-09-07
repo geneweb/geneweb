@@ -4,21 +4,20 @@ exec ocaml $0
 *) ".";;
 (* $Id: lex_sort.sh,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
-open Printf
 
 let linenum = ref 0
 let input_line_cnt ic = incr linenum; input_line ic
 
 let rec skip_to_same_line ic line_ref =
   let line = input_line_cnt ic in
-  if line = line_ref then printf "%s\n" line
+  if line = line_ref then Printf.printf "%s\n" line
   else skip_to_same_line ic line_ref
 
 let rec get_all_versions ic =
   let line = try input_line_cnt ic with End_of_file -> "" in
   if line = "" then []
   else if String.length line < 3 then begin
-    eprintf "small line %d: \"%s\"\n" !linenum (String.escaped line);
+    Printf.eprintf "small line %d: \"%s\"\n" !linenum (String.escaped line);
     flush stderr;
     []
   end
@@ -47,11 +46,11 @@ let print_languages (lang, str) =
     in
     List.sort compare (loop 0 0)
   in
-  printf "%s: " lang;
+  Printf.printf "%s: " lang;
   let _ = List.fold_left
-    (fun sep s -> printf "%s%s" sep s; "/") "" list
+    (fun sep s -> Printf.printf "%s%s" sep s; "/") "" list
   in ();
-  printf "\n"
+  Printf.printf "\n"
 
 let lex_sort () =
   let ic_lex = open_in "../hd/lang/lex_utf8.txt" in
@@ -65,9 +64,9 @@ let lex_sort () =
     if line = " !languages" then
       List.iter print_languages list
     else
-      List.iter (fun (lang, str) -> printf "%s:%s\n" lang str) list;
+      List.iter (fun (lang, str) -> Printf.printf "%s:%s\n" lang str) list;
     match try Some (input_line ic_i18n) with End_of_file -> None with
-      Some line -> printf "\n"; loop line
+      Some line -> Printf.printf "\n"; loop line
     | None -> ()
   in
   loop (input_line ic_i18n)

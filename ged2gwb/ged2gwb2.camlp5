@@ -3,7 +3,6 @@
 
 open Def
 open Mutil
-open Printf
 
 type person = (iper, Adef.istr) gen_person
 type ascend = ifam gen_ascend
@@ -96,7 +95,7 @@ let line_cnt = ref 1
 let in_file = ref ""
 
 let print_location pos =
-  fprintf !log_oc "File \"%s\", line %d:\n" !in_file pos
+  Printf.fprintf !log_oc "File \"%s\", line %d:\n" !in_file pos
 
 let rec skip_eol =
   parser
@@ -321,21 +320,21 @@ let print_bad_date pos d =
     begin
       bad_dates_warned := true;
       print_location pos;
-      fprintf !log_oc "Can't decode date %s\n" d;
+      Printf.fprintf !log_oc "Can't decode date %s\n" d;
       flush !log_oc
     end
 
 let check_month m =
   if m < 1 || m > 12 then
     begin
-      fprintf !log_oc "Bad (numbered) month in date: %d\n" m;
+      Printf.fprintf !log_oc "Bad (numbered) month in date: %d\n" m;
       flush !log_oc
     end
 
 let warning_month_number_dates () =
   match !month_number_dates with
     MonthNumberHappened s ->
-      fprintf !log_oc
+      Printf.fprintf !log_oc
         "  Warning: the file holds dates with numbered months \
          (like: 12/05/1912).\n\n  \
          GEDCOM standard *requires* that months in dates be identifiers. The \
@@ -1167,7 +1166,7 @@ let extract_notes gen rl =
                   ("NOTE", r.rcont) :: (l @ lines)
               | None ->
                   print_location r.rpos;
-                  fprintf !log_oc "Note %s not found\n" addr;
+                  Printf.fprintf !log_oc "Note %s not found\n" addr;
                   flush !log_oc;
                   lines
             else (r.rlab, r.rval) :: lines)
@@ -1245,7 +1244,7 @@ let note gen r =
           Some v -> strip_spaces v.rcont, v.rsons
         | None ->
             print_location r.rpos;
-            fprintf !log_oc "Note %s not found\n" r.rval;
+            Printf.fprintf !log_oc "Note %s not found\n" r.rval;
             flush !log_oc;
             "", []
       else strip_spaces r.rval, r.rsons
@@ -1257,7 +1256,7 @@ let treat_source gen r =
       Some v -> strip_spaces v.rcont, v.rsons
     | None ->
         print_location r.rpos;
-        fprintf !log_oc "Source %s not found\n" r.rval;
+        Printf.fprintf !log_oc "Source %s not found\n" r.rval;
         flush !log_oc;
         "", []
   else strip_spaces r.rval, r.rsons
@@ -1442,7 +1441,7 @@ let indi_lab =
       else
         begin
           glop := c :: !glop;
-          eprintf "untreated tag %s -> in notes\n" c;
+          Printf.eprintf "untreated tag %s -> in notes\n" c;
           flush stderr
         end;
       false
@@ -2735,8 +2734,8 @@ let make_gen3 gen r =
   | "FAM" -> add_fam gen r
   | "NOTE" -> ()
   | "SOUR" -> ()
-  | "TRLR" -> eprintf "*** Trailer ok\n"; flush stderr
-  | s -> fprintf !log_oc "Not implemented typ = %s\n" s; flush !log_oc
+  | "TRLR" -> Printf.eprintf "*** Trailer ok\n"; flush stderr
+  | s -> Printf.fprintf !log_oc "Not implemented typ = %s\n" s; flush !log_oc
 
 let find_lev0 =
   parser bp
@@ -2829,7 +2828,7 @@ let pass3 gen fname =
             loop ()
         | [< '_ >] ->
               print_location (!line_cnt);
-              fprintf (!log_oc) "Strange input.\n";
+              Printf.fprintf (!log_oc) "Strange input.\n";
               flush (!log_oc);
               let _ : string = get_to_eoln 0 strm in
               loop ()
@@ -2883,7 +2882,7 @@ let check_undefined gen =
       Right3 (_, _, _) -> ()
     | Left3 lab ->
         let (p, a, u) = unknown_per i Neuter in
-        fprintf !log_oc "Warning: undefined person %s\n" lab;
+        Printf.fprintf !log_oc "Warning: undefined person %s\n" lab;
         gen.g_per.arr.(i) <- Right3 (p, a, u)
   done;
   for i = 0 to gen.g_fam.tlen - 1 do
@@ -2891,7 +2890,7 @@ let check_undefined gen =
       Right3 (_, _, _) -> ()
     | Left3 lab ->
         let (f, c, d) = unknown_fam gen i in
-        fprintf !log_oc "Warning: undefined family %s\n" lab;
+        Printf.fprintf !log_oc "Warning: undefined family %s\n" lab;
         gen.g_fam.arr.(i) <- Right3 (f, c, d)
   done
 
@@ -2907,7 +2906,7 @@ let add_parents_to_isolated gen =
           if fn = "?" && sn = "?" then ()
           else
             begin
-              fprintf !log_oc "Adding parents to isolated person: %s.%d %s\n"
+              Printf.fprintf !log_oc "Adding parents to isolated person: %s.%d %s\n"
                 fn (get_occ p) sn;
               let ifam = phony_fam gen in
               match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
@@ -2942,13 +2941,13 @@ let make_arrays in_file =
   assert (add_string gen "" = string_empty);
   assert (add_string gen "?" = string_quest);
   assert (add_string gen "x" = string_x);
-  eprintf "*** pass 1 (note)\n";
+  Printf.eprintf "*** pass 1 (note)\n";
   flush stderr;
   pass1 gen fname;
-  eprintf "*** pass 2 (indi)\n";
+  Printf.eprintf "*** pass 2 (indi)\n";
   flush stderr;
   pass2 gen fname;
-  eprintf "*** pass 3 (fam)\n";
+  Printf.eprintf "*** pass 3 (fam)\n";
   flush stderr;
   pass3 gen fname;
   close_in gen.g_ic;
@@ -3102,13 +3101,13 @@ let set_undefined_death_interval s =
   try
     match Stream.of_string s with parser
     | [< a = number 0; ''-'; b = number 0 >] ->
-      eprintf "ay %s dy %s\n" a b;
+      Printf.eprintf "ay %s dy %s\n" a b;
       flush stderr;
       let a = if a = "" then ! alive_years else int_of_string a in
       let b = max a (if b = "" then ! dead_years else int_of_string b) in
       alive_years := a;
       dead_years := b;
-      eprintf "ay %d dy %d\n" a b;
+      Printf.eprintf "ay %d dy %d\n" a b;
       flush stderr
   with
   | Stream.Error _ -> raise (Arg.Bad "bad parameter for -udi")
@@ -3225,7 +3224,7 @@ let main () =
   in
   if not !force && Sys.file_exists bdir then
     begin
-      printf "The database \"%s\" already exists. \
+      Printf.printf "The database \"%s\" already exists. \
               Use option -f to overwrite it."
         !out_file;
       flush stdout;
@@ -3240,7 +3239,7 @@ let main () =
     (fun () ->
        let next_family_fun = next_family_fun_templ gw_syntax !in_file in
        if Db2link.link next_family_fun bdir then ()
-       else (eprintf "*** database not created\n"; flush stderr; exit 2))
+       else (Printf.eprintf "*** database not created\n"; flush stderr; exit 2))
     ~onerror:Lock.print_error_and_exit;
   (*
       finish_base base arrays;
@@ -3256,6 +3255,6 @@ let _ =
           Ploc.Exc (_, e) -> e
         | _ -> e
       in
-      fprintf !log_oc "Uncaught exception: %s\n" (Printexc.to_string e);
+      Printf.fprintf !log_oc "Uncaught exception: %s\n" (Printexc.to_string e);
       if !log_oc != stdout then close_out !log_oc;
       exit 2
