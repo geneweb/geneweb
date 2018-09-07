@@ -945,8 +945,6 @@ let print_solution conf base long n p1 p2 sol =
   else print_solution_not_ancestor conf base long p1 p2 sol;
   Wserver.printf "\n"
 
-open RelationLink
-
 let max_br = 33
 
 let print_dag_links conf base p1 p2 rl =
@@ -1285,7 +1283,7 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
             | Some x -> " class=\"" ^ x ^ "\""
       in
       let info =
-        {ip = ip; sp = get_sex a; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
+        {RelationLink.ip = ip; sp = get_sex a; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
          c1 = 1; c2 = 1; pb1 = None; pb2 = None; nb1 = None; nb2 = None;
          sp1 = sp1; sp2 = sp2; bd = bd; td_prop = td_prop}
       in
