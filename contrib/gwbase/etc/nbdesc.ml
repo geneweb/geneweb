@@ -3,15 +3,6 @@
 open Def
 open Gwdb
 
-let designation base ip p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  if first_name = "?" || surname = "?" then
-    "i=" ^ string_of_int (Adef.int_of_iper ip)
-  else
-    Mutil.iso_8859_1_of_utf_8
-      (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname)
-
 let before_date d d1 =
   if d1.year < d.year then true
   else if d1.year > d.year then false
@@ -83,9 +74,6 @@ let number_of_desc base mark ip p =
         match new_gen with
           [] -> List.rev nb_list
         | _ ->
-            (*
-            let _ = do { if List.length nb_list > glop.val then do { glop.val := List.length nb_list; Printf.printf "\n%s gen %d" (designation base ip p) glop.val; flush stdout; } else () } in
-            *)
             loop (nb :: nb_list) 0 [] new_gen
   in
   loop [] 0 [] (Array.to_list (get_family p))

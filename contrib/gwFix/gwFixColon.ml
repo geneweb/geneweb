@@ -2,16 +2,6 @@
 
 open Gwdb
 
-
-let designation base ip p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  if first_name = "?" || surname = "?" then
-    "i=" ^ string_of_int (Adef.int_of_iper ip)
-  else
-    Mutil.iso_8859_1_of_utf_8
-      (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname)
-
 let check_name base nb_ind fix =
   Printf.printf "Check colon\n";
   flush stdout;
@@ -23,7 +13,7 @@ let check_name base nb_ind fix =
     if String.contains fn ':' || String.contains sn ':' then
       begin
         Printf.printf "*** bad name : %s %s (%d) => %s\n" fn sn i
-          (designation base ip (poi base ip));
+          (Gutil.designation base (poi base ip));
         flush stdout
       end
   done

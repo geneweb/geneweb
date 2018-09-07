@@ -3,15 +3,6 @@
 open Def
 open Gwdb
 
-let designation base ip p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  if first_name = "?" || surname = "?" then
-    "i=" ^ string_of_int (Adef.int_of_iper ip)
-  else
-    Mutil.iso_8859_1_of_utf_8
-      (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname)
-
 let check_keys base nb_ind fix =
   Printf.printf "Check keys\n";
   flush stdout;
@@ -30,7 +21,7 @@ let check_keys base nb_ind fix =
             begin
               ProgrBar.suspend ();
               Printf.printf "*** key %s.%d %s is \"%s\"\n" fn occ sn
-                (designation base ip (poi base ip2));
+                (Gutil.designation base (poi base ip2));
               flush stdout;
               Gwdb.patch_key base ip fn sn occ;
               Printf.printf "*** fixed\n";
@@ -68,7 +59,7 @@ let check_families_parents base nb_fam =
           begin
             ProgrBar.suspend ();
             Printf.printf "*** no family for : %s\n"
-              (designation base ip (poi base ip));
+              (Gutil.designation base (poi base ip));
             flush stdout;
             ProgrBar.restart i nb_fam
           end
@@ -95,15 +86,15 @@ let check_families_children base nb_fam fix =
             if ifam1 != ifam then
               begin
                 Printf.printf "*** bad parents : %s\n"
-                  (designation base ip (poi base ip));
+                  (Gutil.designation base (poi base ip));
                 flush stdout
               end
         | None ->
             ProgrBar.suspend ();
             Printf.printf "*** no parents : %s in family\n    %s & %s\n"
-              (designation base ip (poi base ip))
-              (let ip = get_father fam in designation base ip (poi base ip))
-              (let ip = get_mother fam in designation base ip (poi base ip));
+              (Gutil.designation base (poi base ip))
+              (let ip = get_father fam in Gutil.designation base (poi base ip))
+              (let ip = get_mother fam in Gutil.designation base (poi base ip));
             flush stdout;
             patch_ascend base ip
               {parents = Some ifam; consang = get_consang a};
@@ -127,7 +118,7 @@ let check_persons_parents base nb_ind fix =
         if is_deleted_family fam then
           begin
             Printf.printf "*** parent family deleted: %s\n"
-              (designation base ip (poi base ip));
+              (Gutil.designation base (poi base ip));
             flush stdout;
             patch_ascend base ip {parents = None; consang = Adef.fix (-1)};
             fix := true
@@ -138,7 +129,7 @@ let check_persons_parents base nb_ind fix =
           else
             begin
               Printf.printf "*** not in parent's family: %s\n"
-                (designation base ip (poi base ip));
+                (Gutil.designation base (poi base ip));
               flush stdout;
               let children = Array.append children [| ip |] in
               patch_descend base ifam {children = children}; fix := true
@@ -164,7 +155,7 @@ let check_persons_families base nb_ind fix =
         begin
           ProgrBar.suspend ();
           Printf.printf "*** not father or mother of hir family: %s\n"
-            (designation base ip (poi base ip));
+            (Gutil.designation base (poi base ip));
           flush stdout;
           let ifams =
             Array.append (Array.sub ifams 0 j)
@@ -198,10 +189,10 @@ let check_witnesses base nb_fam fix =
           ProgrBar.suspend ();
           let imoth = get_mother fam in
           Printf.printf "*** in marriage: %s & %s\n"
-            (designation base ifath (poi base ifath))
-            (designation base ifath (poi base imoth));
+            (Gutil.designation base (poi base ifath))
+            (Gutil.designation base (poi base imoth));
           Printf.printf "*** witness has no pointer to marriage: %s\n"
-            (designation base ip p);
+            (Gutil.designation base p);
           flush stdout;
           patch_person base ip
             {(gen_person_of_person p) with related = ifath :: get_related p};

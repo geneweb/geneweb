@@ -7,14 +7,9 @@ open Gwdb
 (* Printing check errors *)
 
 let designation base p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  let s =
-    Mutil.iso_8859_1_of_utf_8
-      (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname)
-  in
-  if first_name = "?" || surname = "?" then
-    s ^ " (i=" ^ string_of_int (Adef.int_of_iper (get_key_index p)) ^ ")"
+  let s = Gutil.designation base p in
+  if String.get s 0 = '?' || String.get s (String.length s - 1) = '?'
+  then s ^ " (i=" ^ string_of_int (Adef.int_of_iper (get_key_index p)) ^ ")"
   else s
 
 let string_of_epers_name base epers_name =
