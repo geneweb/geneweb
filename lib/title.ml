@@ -5,10 +5,11 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Mutil
 open Util
 
 type date_search = JustSelf | AddSpouse | AddChildren
+
+module StrSet = Mutil.StrSet
 
 let infinity = 10000
 
@@ -350,7 +351,7 @@ let print_title_place_list conf base t p t_equiv list =
     if h || absolute then
       begin Wserver.printf "%s" t; if p <> "" then Wserver.printf " %s" p end
     else
-      list_iter_first
+      Mutil.list_iter_first
         (fun first t ->
            if not first then Wserver.printf ",\n";
            Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;a=A\">" (commd conf)
@@ -434,7 +435,7 @@ let print_places_list conf base t t_equiv list =
   let title h =
     if h || List.length t_equiv = 1 then Wserver.printf "%s" t
     else
-      list_iter_first
+      Mutil.list_iter_first
         (fun first t ->
            Wserver.printf "%s" (if first then "" else ", ");
            give_access_all_titles conf t true)

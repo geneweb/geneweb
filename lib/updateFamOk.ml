@@ -6,7 +6,6 @@ open Def
 open Futil
 open Gutil
 open Gwdb
-open Mutil
 open Util
 
 (* Liste des string dont on a supprimé un caractère.       *)
@@ -222,7 +221,7 @@ let rec reconstitute_events conf ext cnt =
       in
       let efam_note =
         match get_nth conf "e_note" cnt with
-          Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
+          Some note -> only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
         | _ -> ""
       in
       let efam_src =
@@ -446,7 +445,7 @@ let reconstitute_family conf base =
     no_html_tags (only_printable (get conf "marr_place"))
   in
   let marriage_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "marr_note"))
+    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "marr_note"))
   in
   let marriage_src = strip_spaces (get conf "marr_src") in
   let (witnesses, ext) =
@@ -520,7 +519,7 @@ let reconstitute_family conf base =
     loop 1 ext
   in
   let comment =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "comment"))
+    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "comment"))
   in
   let fsources = only_printable (get conf "src") in
   let origin_file =

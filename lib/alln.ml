@@ -3,7 +3,6 @@
 
 open Config
 open Gwdb
-open Mutil
 open Util
 
 let default_max_cnt = 2000
@@ -311,7 +310,7 @@ let select_names conf base is_surnames ini need_whole_list =
     try
       let istr = spi_first iii (capitalize_if_not_utf8 start_k) in
         let rec loop istr len list =
-          let s = nominative (sou base istr) in
+          let s = Mutil.nominative (sou base istr) in
           let k = name_key_compatible base s in
           if string_start_with ini k then
             let (list, len) =
@@ -448,7 +447,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
     (fun (ini_k, l) ->
        let ini = capitalize_if_not_utf8 ini_k in
        Wserver.printf "<p>\n";
-       list_iter_first
+       Mutil.list_iter_first
          (fun first (s, cnt) ->
             let href =
               if not conf.cancel_links then

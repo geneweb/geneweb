@@ -5,8 +5,9 @@ open Config
 open Def
 open Gutil
 open Gwdb
-open Mutil
 open Util
+
+module StrSet = Mutil.StrSet
 
 let not_found conf txt x =
   let title _ = Wserver.printf "%s: \"%s\"" (capitale txt) x in
@@ -146,9 +147,9 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
     let x = Name.crush_lower x in
     List.fold_right
       (fun istr l ->
-         let str = nominative (sou base istr) in
+         let str = Mutil.nominative (sou base istr) in
          if Name.crush_lower str = x ||
-            List.mem x (List.map Name.crush_lower (surnames_pieces str))
+            List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
          then
            let iperl = find istr in
            (* maybe they are not the good ones because of changes in the
@@ -189,7 +190,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   l, name_inj
 
 let print_elem conf base is_surname (p, xl) =
-  list_iter_first
+  Mutil.list_iter_first
     (fun first x ->
        let iper = get_key_index x in
        if not first then Wserver.printf "</li>\n<li>\n  ";
@@ -212,7 +213,7 @@ let first_char s =
   else if !(Mutil.utf_8_db) then
     let len = Name.nbc s.[0] in
     if len < String.length s then String.sub s 0 len else s
-  else String.sub s (initial s) 1
+  else String.sub s (Mutil.initial s) 1
 
 let name_unaccent s =
   let rec copy i len =
@@ -289,7 +290,7 @@ let select_first_name conf n list =
        html_li conf;
        Wserver.printf "<a href=\"%sm=P;v=%s\">" (commd conf)
          (code_varenv sstr);
-       list_iter_first
+       Mutil.list_iter_first
          (fun first str ->
             Wserver.printf "%s%s" (if first then "" else ", ") str)
          (StrSet.elements strl);
@@ -348,7 +349,7 @@ let first_name_print conf base x =
   match list with
     [] -> first_name_not_found conf x
   | [_, (strl, iperl)] ->
-      let iperl = list_uniq (List.sort compare iperl) in
+      let iperl = Mutil.list_uniq (List.sort compare iperl) in
       let pl = List.map (pget conf base) iperl in
       let pl =
         List.fold_right
@@ -403,7 +404,7 @@ let unselected_bullets conf =
     [] conf.env
 
 let alphabetic1 n1 n2 =
-  if !utf_8_db then Gutil.alphabetic_utf_8 n1 n2 else Gutil.alphabetic n1 n2
+  if !Mutil.utf_8_db then Gutil.alphabetic_utf_8 n1 n2 else Gutil.alphabetic n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
@@ -703,7 +704,7 @@ let print_family_alphabetic x conf base liste =
           if h || List.length homonymes = 1 then x
           else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv x ^ ";t=A") x
         in
-        list_iter_first
+        Mutil.list_iter_first
           (fun first x ->
              Wserver.printf "%s%s" (if first then "" else ", ") (access x))
           homonymes
@@ -1010,7 +1011,7 @@ let search_first_name_print conf base x =
   match list with
     [] -> first_name_not_found conf x
   | [_, (strl, iperl)] ->
-      let iperl = list_uniq (List.sort compare iperl) in
+      let iperl = Mutil.list_uniq (List.sort compare iperl) in
       let pl = List.map (pget conf base) iperl in
       let pl =
         List.fold_right
