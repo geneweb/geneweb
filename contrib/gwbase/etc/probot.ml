@@ -1,36 +1,35 @@
 (* $Id: probot.ml,v 1.7 2006-10-05 13:37:58 deraugla Exp $ *)
 
 open Printf
-open Robot
 
 let main () =
-  let xcl = input_excl (open_in_bin "cnt/robot") in
+  let xcl = Robot.input_excl (open_in_bin "cnt/robot") in
   let tm_now = Unix.time () in
   if xcl.excl <> [] then printf "excl\n";
-  List.iter (fun (s, ri) -> printf "  \"%s\" %d\n" s !ri) xcl.excl;
+  List.iter (fun (s, ri) -> printf "  \"%s\" %d\n" s !ri) xcl.Robot.excl;
   printf "who\n";
   let sorted_who =
     List.sort
       (fun (k1, w1) (k2, w2) ->
-         compare (List.hd w1.acc_times) (List.hd w2.acc_times))
-      (W.fold (fun k x l -> (k, x) :: l) xcl.who [])
+         compare (List.hd w1.Robot.acc_times) (List.hd w2.Robot.acc_times))
+      (Robot.W.fold (fun k x l -> (k, x) :: l) xcl.who [])
   in
   List.iter
     (fun (k, w) ->
-       let tml = w.acc_times in
-       let _tm0 = w.oldest_time in
-       let cnt = w.nb_connect in
-       let bn = w.nbase in
-       let nfw = w.utype in
+       let tml = w.Robot.acc_times in
+       let _tm0 = w.Robot.oldest_time in
+       let cnt = w.Robot.nb_connect in
+       let bn = w.Robot.nbase in
+       let nfw = w.Robot.utype in
        printf "  %s (%d)" k cnt;
        begin match nfw with
-         Wizard n ->
+       | Robot.Wizard n ->
            printf " (\027[31mwiz %s%s\027[30m)" bn
              (if n = "" then "" else " " ^ n)
-       | Friend n ->
+       | Robot.Friend n ->
            printf " (\027[34mfri %s%s\027[30m)" bn
              (if n = "" then "" else " " ^ n)
-       | Normal -> ()
+       | Robot.Normal -> ()
        end;
        printf "\n";
        printf "    ";
@@ -46,7 +45,7 @@ let main () =
        printf "\n")
     sorted_who;
   printf "max_conn\n";
-  printf "  %d \"%s\"\n" (fst xcl.max_conn) (snd xcl.max_conn);
+  printf "  %d \"%s\"\n" (fst xcl.Robot.max_conn) (snd xcl.Robot.max_conn);
   flush stdout
 
 let _ = main ()
