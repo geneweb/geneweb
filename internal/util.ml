@@ -3580,3 +3580,12 @@ let real_nb_of_persons conf base =
     Not_found ->
       try init_cache_info conf base; real_nb_person () with
         _ -> Gwdb.nb_of_persons base
+
+let array_mem_witn conf base x a =
+  let rec loop i =
+    if i = Array.length a then (false, "")
+    else if x = fst a.(i)
+    then (true, string_of_witness_kind conf (poi base x) (snd a.(i)))
+    else loop (i + 1)
+  in
+  loop 0

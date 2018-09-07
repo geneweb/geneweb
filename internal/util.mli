@@ -293,3 +293,12 @@ val read_cache_info : config -> cache_info_t
 val patch_cache_info : config -> string -> (string -> string) -> unit
 
 val real_nb_of_persons : config -> base -> int
+
+(* [array_mem_witn conf base ip array] checks if [ip] is in [array]
+   and returns corresponding [string_of_witness_kind] if so.  *)
+val array_mem_witn
+ : Config.config
+ -> Gwdb.base
+ -> Def.iper
+ -> (Def.iper * Def.witness_kind) array
+ -> bool * string
