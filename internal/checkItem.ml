@@ -8,20 +8,6 @@ type base_error = person error
 type base_warning = (person, family, title, pers_event, fam_event) warning
 type base_misc = (person, family, title) misc
 
-
-let list_uniq wl =
-  (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
-  (* levé par plusieurs fonctions différents selon le context.       *)
-  let ht = Hashtbl.create 20 in
-  List.fold_left
-    (fun accu w ->
-       if Hashtbl.mem ht (Hashtbl.hash w) then accu
-       else begin Hashtbl.add ht (Hashtbl.hash w) true; w :: accu end)
-    [] wl
-
-let stable_list_uniq wl = List.rev (list_uniq wl)
-
-
 (* Constants used for computing the warnings. *)
 let max_age_btw_cpl = 50
 let max_days_btw_sibl = 10

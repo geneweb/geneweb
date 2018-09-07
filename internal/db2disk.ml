@@ -145,7 +145,7 @@ let sorted_patched_person_strings db2 is_first_name =
          let s = if is_first_name then p.first_name else p.surname in s :: sl)
       db2.patches.h_person []
   in
-  let sl = Mutil.list_uniq (List.sort compare sl) in
+  let sl = List.sort_uniq compare sl in
   let sl =
     List.map
       (fun s ->

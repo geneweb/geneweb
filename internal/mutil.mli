@@ -6,7 +6,6 @@ val verbose : bool ref
 val utf_8_db : bool ref
 
 val list_iter_first : (bool -> 'a -> unit) -> 'a list -> unit
-val list_uniq : 'a list -> 'a list
 val tr : char -> char -> string -> string
 val strip_all_trailing_spaces : string -> string
 

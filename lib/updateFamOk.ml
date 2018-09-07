@@ -1462,7 +1462,7 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
   let fam = family_of_gen_family base (gen_fam, cpl, des) in
   CheckItem.family base warning ifam fam;
   CheckItem.check_other_fields base misc ifam fam;
-  let (wl, ml) = CheckItem.list_uniq !wl, CheckItem.list_uniq !ml in
+  let (wl, ml) = List.sort_uniq compare !wl, List.sort_uniq compare !ml in
   List.iter
     (function
        ChangedOrderOfMarriages (p, _, after) ->

@@ -1231,7 +1231,7 @@ let all_checks_person base p a u =
     (fun ifam ->
        CheckItem.reduce_family base warning ifam (foi base ifam))
     u.family;
-  let wl = CheckItem.list_uniq !wl in
+  let wl = List.sort_uniq compare !wl in
   List.iter
     (function
        ChangedOrderOfChildren (ifam, _, _, after) ->

@@ -891,7 +891,7 @@ let fill_events_if_is_main_person conf base p base_prefix p_auth is_main_person 
 let get_related_piqi conf base p base_prefix gen_p has_relations pers_to_piqi_callback relation_person_constructor =
   if has_relations then
     let list =
-      let list = Mutil.list_uniq (List.sort compare (gen_p.related)) in
+      let list = List.sort_uniq compare gen_p.related in
       List.fold_left
         (fun list ic ->
            let c = pget conf base ic in
@@ -1209,7 +1209,7 @@ let get_rparents_piqi base conf base_prefix gen_p has_relations pers_to_piqi_cal
 let get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers_to_piqi_callback event_witness_constructor =
   if has_relations then
     begin
-      let related = Mutil.list_uniq (List.sort compare gen_p.related) in
+      let related = List.sort_uniq compare gen_p.related in
       let events_witnesses =
         let list = ref [] in
         let rec make_list =
