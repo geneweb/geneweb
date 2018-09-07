@@ -3589,3 +3589,8 @@ let array_mem_witn conf base x a =
     else loop (i + 1)
   in
   loop 0
+
+let fprintf_date oc tm =
+  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
+    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+    tm.Unix.tm_sec

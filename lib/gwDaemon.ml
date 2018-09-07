@@ -56,11 +56,6 @@ let is_multipart_form =
 let extract_boundary content_type =
   let e = Util.create_env content_type in List.assoc "boundary" e
 
-let fprintf_date oc tm =
-  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
-    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-    tm.Unix.tm_sec
-
 let print_and_cut_if_too_big oc str =
   let rec loop i =
     if i < String.length str then
@@ -80,7 +75,7 @@ let log oc tm conf from gauth request script_name contents =
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
-  fprintf_date oc tm;
+  Util.fprintf_date oc tm;
   Printf.fprintf oc " (%d)" (Unix.getpid ());
   Printf.fprintf oc " %s?" script_name;
   print_and_cut_if_too_big oc contents;
@@ -117,7 +112,7 @@ let log_passwd_failed ar oc tm from request base_file =
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
-  fprintf_date oc tm;
+  Util.fprintf_date oc tm;
   Printf.fprintf oc " (%d)" (Unix.getpid ());
   Printf.fprintf oc " %s_%s" base_file ar.ar_passwd;
   Printf.fprintf oc " => failed (%s)" ar.ar_user;
@@ -155,7 +150,7 @@ let refuse_log from =
   Log.with_file ~file:"refuse_log"
     (fun oc ->
        let tm = Unix.localtime (Unix.time ()) in
-       fprintf_date oc tm; Printf.fprintf oc " excluded: %s\n" from);
+       Util.fprintf_date oc tm; Printf.fprintf oc " excluded: %s\n" from);
   http HttpStatus.Forbidden;
   Wserver.header "Content-type: text/html";
   Wserver.printf "Your access has been disconnected by administrator.\n";
@@ -165,7 +160,7 @@ let only_log from =
   Log.with_log
     (fun oc ->
        let tm = Unix.localtime (Unix.time ()) in
-       fprintf_date oc tm;
+       Util.fprintf_date oc tm;
        Printf.fprintf oc " Connection refused from %s " from;
        Printf.fprintf oc "(only ";
        Mutil.list_iter_first
@@ -181,7 +176,7 @@ let refuse_auth conf from auth auth_type =
   Log.with_log
     (fun oc ->
        let tm = Unix.localtime (Unix.time ()) in
-       fprintf_date oc tm;
+       Util.fprintf_date oc tm;
        Printf.fprintf oc " Access failed\n";
        Printf.fprintf oc "  From: %s\n" from;
        Printf.fprintf oc "  Basic realm: %s\n" auth_type;
@@ -314,7 +309,7 @@ let log_redirect from request req =
          (fun oc ->
             let referer = Wserver.extract_param "referer: " '\n' request in
             let tm = Unix.localtime (Unix.time ()) in
-            fprintf_date oc tm;
+            Util.fprintf_date oc tm;
             Printf.fprintf oc " %s\n" req;
             Printf.fprintf oc "  From: %s\n" from;
             Printf.fprintf oc "  Referer: %s\n" referer))
@@ -416,7 +411,7 @@ let unauth_server conf ar =
         (fun oc ->
            Printf.fprintf oc
              "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n"
-             fprintf_date tm
+             Util.fprintf_date tm
              (fun oc ->
                 List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) conf.request)
              ar.ar_passwd nonce ar.ar_can_stale)
@@ -1023,7 +1018,7 @@ let digest_authorization request base_env passwd utm base_file command =
           (fun oc ->
              Printf.fprintf oc
                "\nanswer\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n"
-               fprintf_date (Unix.localtime utm)
+               Util.fprintf_date (Unix.localtime utm)
                (fun oc ->
                   List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) request)
                passwd nonce ds.ds_meth ds.ds_uri)
