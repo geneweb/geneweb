@@ -950,7 +950,7 @@ let pers_to_piqi_person_search_info conf base p =
   in
   let related =
     let list =
-      let list = Mutil.list_uniq (List.sort compare (get_related p)) in
+      let list = List.sort_uniq compare (get_related p) in
       List.fold_left
         (fun list ic ->
            let c = pget conf base ic in
@@ -1047,7 +1047,7 @@ let pers_to_piqi_person_search_info conf base p =
   let was_witness =
     let list =
       let list = ref [] in
-      let related = Mutil.list_uniq (List.sort compare (get_related p)) in
+      let related = List.sort_uniq compare (get_related p) in
       let rec make_list =
         function
         | ic :: icl ->

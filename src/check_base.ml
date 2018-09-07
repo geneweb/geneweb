@@ -24,7 +24,7 @@ let check_base bname =
   Check.check_base base (set_list errors) (set_list warnings) (fun _ -> true)
     changed_p false;
   List.iter (print_error base) (List.rev !errors);
-  List.iter (print_warning base) (CheckItem.list_uniq !warnings);
+  List.iter (print_warning base) (List.sort_uniq compare !warnings);
   flush stdout
 
 let main () = check_base Sys.argv.(1)

@@ -32,7 +32,7 @@ let find_dated_ancestor base p =
       (* Dans le cas où le nombre d'implexes est très élevé, le calcul *)
       (* peut être très long car on le refait plusieurs fois pour les  *)
       (* mêmes personnes. On rend donc la liste unique.                *)
-      let anc_list = Mutil.list_uniq anc_list in
+      let anc_list = List.sort_uniq compare anc_list in
       let anc_list =
         List.filter (fun ip -> not mark.(Adef.int_of_iper ip)) anc_list
       in

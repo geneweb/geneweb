@@ -42,6 +42,3 @@ val sort_children :
 
 val check_other_fields :
   base -> (base_misc -> unit) -> Def.ifam -> family -> unit
-
-val list_uniq : 'a list -> 'a list
-val stable_list_uniq : 'a list -> 'a list

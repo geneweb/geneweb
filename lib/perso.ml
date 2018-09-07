@@ -1707,7 +1707,7 @@ let links_to_ind conf base db key =
          else pgl)
       [] db
   in
-  Mutil.list_uniq (List.sort compare list)
+  List.sort_uniq compare list
 
 (* Interpretation of template file *)
 
@@ -5458,7 +5458,7 @@ let print_foreach conf base print_ast eval_expr =
             witnesses
       | _ -> ()
   and print_foreach_event_witness_relation env al (p, p_auth as ep) =
-    let related = Mutil.list_uniq (List.sort compare (get_related p)) in
+    let related = List.sort_uniq compare (get_related p) in
     let events_witnesses =
       let list = ref [] in
       begin let rec make_list =
@@ -5710,7 +5710,7 @@ let print_foreach conf base print_ast eval_expr =
   and print_foreach_related env al (p, p_auth as ep) =
     if p_auth then
       let list =
-        let list = Mutil.list_uniq (List.sort compare (get_related p)) in
+        let list = List.sort_uniq compare (get_related p) in
         List.fold_left
           (fun list ic ->
              let c = pget conf base ic in
@@ -5894,7 +5894,7 @@ let print_foreach conf base print_ast eval_expr =
   and print_foreach_witness_relation env al (p, _ as ep) =
     let list =
       let list = ref [] in
-      let related = Mutil.list_uniq (List.sort compare (get_related p)) in
+      let related = List.sort_uniq compare (get_related p) in
       begin let rec make_list =
         function
           ic :: icl ->

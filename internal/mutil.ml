@@ -5,22 +5,9 @@ let int_size = 4
 let verbose = ref true
 let utf_8_db = Name.utf_8_db
 
-let list_iter_first f al =
-  let _ =
-    List.fold_left (fun first a -> let () = f first a in false) true al
-  in
-  ()
-
-let list_uniq =
-  function
-    [_] | [] as l -> l
-  | x :: l ->
-      let rec loop rl x =
-        function
-          y :: l -> if y = x then loop rl x l else loop (x :: rl) y l
-        | [] -> List.rev (x :: rl)
-      in
-      loop [] x l
+let list_iter_first f = function
+  | [] -> ()
+  | hd :: tl -> f true hd ; List.iter (f false) tl
 
 (* [decline] has been deprecated since version 5.00
    compatibility code: *)
