@@ -1314,8 +1314,8 @@ let log_and_robot_check conf auth from request script_name contents =
          let tm = Unix.time () in
          log oc tm conf from auth request script_name contents)
   else
-    ignore @@
     Lock.control (Srcfile.adm_file "gwd.lck") true
+      ~onerror:ignore
       (fun () ->
          Log.with_log_opt
            (fun oc_opt ->
