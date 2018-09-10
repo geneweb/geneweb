@@ -277,7 +277,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %if;(evar.birth="on" and famx=1)
     <td class="align-middle text-right table_big_cell"%rowspan;>
       %if;(wizard and not cancel_links)
-        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;#birth_"%sp;
+        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;#birth"%sp;
           title="%if;(xxx.has_approx_birth_date)[*update::birth]%else;[*add::birth]%end;&#010;
            %xxx.first_name; %xxx.surname; %if;(xxx.occ!="0")(%xxx.occ;)%end;&#010;%if;(xxx.has_birth_date and xxx.birth_date.prec="" or xxx.birth_date.prec="?")° %xxx.birth_date;%end;">%nn;
         %if;(xxx.has_approx_birth_date)%xxx.slash_approx_birth_date;%else;°%end;%nn;
@@ -527,7 +527,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %if;(evar.death="on" and famx=1)
     <td class="align-middle text-right table_big_cell"%rowspan;>
       %if;(wizard and not cancel_links)
-        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;#death_"%sp;
+        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;#death"%sp;
            title="%if;(xxx.has_approx_death_date)[*update::death]%else;[*add::death]%end;&#010;
            %xxx.first_name; %xxx.surname; %if;(xxx.occ!="0")(%xxx.occ;)%end;&#010;%if;(xxx.has_death_date and xxx.death_date.prec="" or xxx.death_date.prec="?")† %xxx.death_date;%end;">%nn;
         %if;xxx.has_approx_death_date;%xxx.slash_approx_death_date;%elseif;xxx.is_dead;†%end;%nn;
