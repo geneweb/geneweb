@@ -647,7 +647,7 @@
     </div>
     %( Fratrie·s conjoint·s %)
     %foreach;family;
-      %if;(family_cnt=fam_cnt)
+      %if;(family_cnt=fam_cnt and spouse.has_parents)
         %let;selfspouse;%self.spouse;%in;
         %let;spfath;%self.spouse.father;%in;
         %let;spfathfn;%if;(self.spouse.father.public_name!="")%self.spouse.father.public_name;%else;%self.spouse.father.first_name;%end;%in;
