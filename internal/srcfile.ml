@@ -139,8 +139,8 @@ let source_file_name conf fname =
       (Filename.basename fname ^ ".txt")
 
 let extract_date s =
-  try Scanf.sscanf s "%d,%d,%d" (fun d m y -> Some (d, m, y)) with
-    Ploc.Exc (_, (Stream.Error _ | Token.Error _)) -> None
+  try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y))
+  with _ -> None
 
 let string_of_start_date conf =
   let r = count conf in
