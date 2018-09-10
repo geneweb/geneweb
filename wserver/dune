@@ -1,0 +1,6 @@
+(library
+ (name wserver)
+ (public_name geneweb.wserver)
+ (wrapped false)
+ (libraries unix)
+)

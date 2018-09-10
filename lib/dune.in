@@ -1,0 +1,14 @@
+(library
+ (name geneweb)
+ (public_name geneweb)
+ (synopsis "GeneWeb library")
+ (preprocess (action (run %{bin:cppo} %%%API%%% -V OCAML:%{ocaml_version} %{input-file})))
+ (libraries unix
+            %%%API_DEP%%%
+            str
+            camlp5
+            camlp5.gramlib
+            geneweb.internal
+            geneweb.wserver
+            geneweb.dag2html)
+)

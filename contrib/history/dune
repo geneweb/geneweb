@@ -1,0 +1,4 @@
+(executables
+  (names convert_hist fix_hist is_gw_plus)
+  (libraries geneweb.internal)
+)

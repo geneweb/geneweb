@@ -7189,6 +7189,10 @@ sk: je veľmi mladý rodič
 sl: je zelo mlad oče/je zelo mlada mamica
 sv: är en väldigt ung förälder
 
+    %s and %s have several unions
+en: %s and %s have several unions
+fr: il y a plusieurs unions entre %s et %s
+
     is born after his/her child
 af: is gebore voor sy/haar kind
 bg: роден след свое дете/родена след свое дете
