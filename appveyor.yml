@@ -21,5 +21,6 @@ install:
   - '%CYG_BASH% "opam install camlp5 cppo dune"'
 
 build_script:
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make install uninstall clean"'
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && opam depext lablgtk && ./configure && opam install lablgtk && make everything-exe"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make clean install uninstall clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make clean distrib clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && opam depext lablgtk && opam install lablgtk && ./configure && make clean everything-exe clean"'

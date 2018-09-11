@@ -212,8 +212,8 @@ distrib: distrib-exe
 	cp $(BUILD_DIR)/ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXE); \
 	cp $(BUILD_DIR)/ged2gwb/ged2gwb2.exe $(DISTRIB_DIR)/gw/ged2gwb2$(EXE); \
 	cp $(BUILD_DIR)/gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXE); \
-	cp $(BUILD_DIR)/contrib/gwbase/etc/connex.out $(DISTRIB_DIR)/gw/connex$(EXE); \
-	cp $(BUILD_DIR)/contrib/gwdiff/gwdiff.out $(DISTRIB_DIR)/gw/gwdiff$(EXE); \
+	cp $(BUILD_DIR)/contrib/gwbase/etc/connex.exe $(DISTRIB_DIR)/gw/connex$(EXE); \
+	cp $(BUILD_DIR)/contrib/gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXE); \
 	cp $(BUILD_DIR)/setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXE); \
 	cp $(BUILD_DIR)/src/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXE); \
 	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp
@@ -228,7 +228,7 @@ distrib: distrib-exe
 	cp setup/setup.css $(DISTRIB_DIR)/gw/setup/
 	cp setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
 	cp setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp setup/lang/intro.txt $(DESTDIR)/gw/setup/lang/
+	cp setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	$(RM) $(DISTRIB_DIR)/exe-version.txt
 	echo "Commit: `git log  -1 | grep commit | cut -c8-15`, `date`"      > $(DISTRIB_DIR)/commit.txt
