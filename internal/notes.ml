@@ -263,10 +263,13 @@ let print_linked_list conf base pgl =
                Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
-           begin let p = pget conf base ip in
+           begin
+             let p = pget conf base ip in
+             Wserver.printf "<span class=\"mx-2\">";
              Wserver.printf "%s%s"
                (Util.referenced_person_title_text conf base p)
-               (Date.short_dates_text conf base p)
+               (Date.short_dates_text conf base p);
+             Wserver.printf "</span>"
            end;
            Wserver.printf "</tt>\n"
        | NotesLinks.PgFam ifam ->
