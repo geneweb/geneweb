@@ -204,7 +204,7 @@ let get_var ic lab s =
     String.sub s start (String.length s - start), MF.input_line ic
   else "", s
 
-let size_of_char s i = if !(Mutil.utf_8_db) then max 1 (Name.nbc s.[i]) else 1
+let size_of_char s i = max 1 (Name.nbc s.[i])
 
 let string_length s i =
   let rec loop i =

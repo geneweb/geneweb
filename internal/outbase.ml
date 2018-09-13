@@ -286,8 +286,7 @@ let gen_output no_patches bname base =
     if epos <> pos_out oc then count_error epos (pos_out oc)
   in
   begin try
-    output_string oc
-      (if !Mutil.utf_8_db then Dutil.magic_gwb else Dutil.magic_gwb_iso_8859_1);
+    output_string oc Dutil.magic_gwb;
     output_binary_int oc base.data.persons.len;
     output_binary_int oc base.data.families.len;
     output_binary_int oc base.data.strings.len;

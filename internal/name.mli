@@ -44,6 +44,4 @@ val next_chars_if_equiv : string -> int -> string -> int -> (int * int) option
 val unaccent_utf_8 : bool -> string -> int -> string * int
 val nbc : char -> int
 
-val utf_8_db : bool ref
-
 val forbidden_char : char list

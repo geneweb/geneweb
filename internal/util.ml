@@ -70,17 +70,6 @@ let amp_capitalize capitale s =
         String.sub s 2 (String.length s - 2)
     | _ -> s
 
-let rec capitale_iso_8859_1 s =
-  if String.length s = 0 then ""
-  else
-    match s.[0] with
-      'a'..'z' | '\224'..'\246' | '\248'..'\253' ->
-        String.make 1
-          (Char.chr (Char.code s.[0] - Char.code 'a' + Char.code 'A')) ^
-        String.sub s 1 (String.length s - 1)
-    | '&' -> amp_capitalize capitale_iso_8859_1 s
-    | _ -> s
-
 let rec capitale_utf_8 s =
   if String.length s = 0 then ""
   else
@@ -122,13 +111,9 @@ let rec capitale_utf_8 s =
       | _ -> s
 
 let index_of_next_char s i =
-  if !Mutil.utf_8_db then
-    min (String.length s) (i + max 1 (Name.nbc s.[i]))
-  else i + 1
+  min (String.length s) (i + max 1 (Name.nbc s.[i]))
 
-let capitale s =
-  if !Mutil.utf_8_db then capitale_utf_8 s
-  else capitale_iso_8859_1 s
+let capitale s = capitale_utf_8 s
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
@@ -2697,7 +2682,7 @@ let has_image conf base p =
 let gen_only_printable or_nl s =
   let s' =
     let conv_char i =
-      if !(Mutil.utf_8_db) && Char.code s.[i] > 127 then s.[i]
+      if Char.code s.[i] > 127 then s.[i]
       else
         match s.[i] with
           ' '..'~' | '\160'..'\255' -> s.[i]

@@ -38,7 +38,7 @@ let get_wday conf d =
 
 let death_symbol conf =
   try List.assoc "death_symbol" conf.base_env
-  with Not_found -> if !Mutil.utf_8_db then "†" else "+"
+  with Not_found -> "†"
 
 let before_date d d1 =
   if d1.year < d.year then true

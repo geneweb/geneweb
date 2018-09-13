@@ -568,10 +568,7 @@ let print conf base fname =
 
 let print_lexicon conf _base =
   let title _ = Wserver.printf "Lexicon" in
-  let fname =
-    let f = if !(Mutil.utf_8_db) then "lex_utf8.txt" else "lexicon.txt" in
-    search_in_lang_path (Filename.concat "lang" f)
-  in
+  let fname = search_in_lang_path (Filename.concat "lang" "lex_utf8.txt") in
   Hutil.header conf title;
   begin match (try Some (Secure.open_in fname) with Sys_error _ -> None) with
     Some ic ->

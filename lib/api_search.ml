@@ -50,9 +50,6 @@ let kmp p s =
       if !j >= m then true else false
     end
 
-let capitalize_if_not_utf8 s =
-  if !Mutil.utf_8_db then s else String.capitalize_ascii s
-
 let new_name_key base s =
   let start_with2 s i p =
     i + String.length p <= String.length s &&
@@ -74,8 +71,7 @@ let new_name_key base s =
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 
 
-let name_key_compatible base s =
-  if !Mutil.utf_8_db then new_name_key base s else Mutil.name_key s
+let name_key_compatible base s = new_name_key base s
 
 
 (* FIXME: DUPLICATE OF ALLN.SELECT ??? *)

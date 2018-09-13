@@ -52,58 +52,15 @@ let dsk_person_misc_names base p nobtit =
 
 let check_magic ic =
   let b = really_input_string ic (String.length magic_gwb) in
-  Mutil.utf_8_db := true;
   if b <> magic_gwb then
-    if b = magic_gwb_iso_8859_1 then Mutil.utf_8_db := false
-    else if String.sub magic_gwb 0 4 = String.sub b 0 4 then
-      failwith "this is a GeneWeb base, but not compatible"
+    if b = magic_gwb_iso_8859_1
+    then failwith "this is a iso_8859_1 GeneWeb base, but you need utf-8"
+    else if String.sub magic_gwb 0 4 = String.sub b 0 4
+    then failwith "this is a GeneWeb base, but not compatible"
     else failwith "this is not a GeneWeb base, or it is a very old version"
 
-let unaccent =
-  function
-    'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
-  | 'ç' -> 'c'
-  | 'è' | 'é' | 'ê' | 'ë' -> 'e'
-  | 'ì' | 'í' | 'î' | 'ï' -> 'i'
-  | 'ð' -> 'd'
-  | 'ñ' -> 'n'
-  | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' -> 'o'
-  | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
-  | 'ý' | 'ÿ' -> 'y'
-  | 'þ' -> 'p'
-  | c -> c
-
-let compare_names_1 s1 s2 =
-  let compare_aux e1 e2 =
-    let rec loop i1 i2 =
-      if i1 = e1 && i2 = e2 then 0
-      else if i1 = e1 then -1
-      else if i2 = e2 then 1
-      else
-        let c1 = unaccent (Char.lowercase_ascii s1.[i1]) in
-        let c2 = unaccent (Char.lowercase_ascii s2.[i2]) in
-        match c1, c2 with
-          'a'..'z', 'a'..'z' ->
-            if c1 < c2 then -1
-            else if c1 > c2 then 1
-            else loop (i1 + 1) (i2 + 1)
-        | 'a'..'z', _ -> 1
-        | _, 'a'..'z' -> -1
-        | _ -> loop (i1 + 1) (i2 + 1)
-    in
-    loop
-  in
-  if s1 = s2 then 0
-  else
-    let i1 = Mutil.initial s1 in
-    let i2 = Mutil.initial s2 in
-    match compare_aux (String.length s1) (String.length s2) i1 i2 with
-      0 -> compare_aux i1 i2 0 0
-    | x -> x
-
 let compare_names base_data s1 s2 =
-  if !Mutil.utf_8_db then Mutil.compare_after_particle base_data.particles s1 s2
-  else compare_names_1 s1 s2
+  Mutil.compare_after_particle base_data.particles s1 s2
 
 let compare_istr_fun base_data is1 is2 =
   if is1 = is2 then 0

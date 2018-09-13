@@ -433,17 +433,6 @@ let treat_request conf base =
 let treat_request_on_possibly_locked_base conf bfile =
   match try Left (Gwdb.open_base bfile) with e -> Right e with
     Left base ->
-      if !(Mutil.utf_8_db) then ()
-      else
-        begin
-          Hashtbl.clear conf.lexicon;
-          let fname = Filename.concat "lang" "lexicon.txt" in
-          Mutil.input_lexicon conf.lang conf.lexicon
-            (fun () -> Secure.open_in (Util.search_in_lang_path fname));
-          conf.charset <-
-            try Hashtbl.find conf.lexicon " !charset" with
-              Not_found -> "iso-8859-1"
-        end;
       (try treat_request conf base with exc -> close_base base; raise exc);
       close_base base
   | Right e ->
@@ -501,17 +490,6 @@ let treat_request_on_base conf =
   else treat_request_on_possibly_locked_base conf bfile
 
 let treat_request_on_nobase conf =
-  if !(Mutil.utf_8_db) then ()
-  else
-    begin
-      Hashtbl.clear conf.lexicon;
-      let fname = Filename.concat "lang" "lexicon.txt" in
-      Mutil.input_lexicon conf.lang conf.lexicon
-        (fun () -> Secure.open_in (Util.search_in_lang_path fname));
-      conf.charset <-
-        try Hashtbl.find conf.lexicon " !charset" with
-          Not_found -> "iso-8859-1"
-    end;
   try family_m_nobase conf; Wserver.wflush () with exc -> raise exc
 
 

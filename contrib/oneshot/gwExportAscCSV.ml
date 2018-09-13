@@ -10,7 +10,6 @@ let is_printable =
   | _ -> true
 
 let escape_quote s =
-  let s = if !(Mutil.utf_8_db) then s else Mutil.utf_8_of_iso_8859_1 s in
   let rec loop i len =
     if i = String.length s then Buff.get len
     else
