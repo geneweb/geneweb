@@ -188,12 +188,14 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                   <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;"><span class="fa fa-archive fa-fw mr-2"></span>[*revision history]</a>
                   <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;><span class="fa fa-history fa-fw mr-2"></span>[*last diff]</a>
                 %end;
-                %foreach;father.child;
-                  %if;is_sibling_before;
-                    <a href="%prefix;%child.access;" id="previous_sibling" class="d-none"></a>
-                  %end;
-                  %if;is_sibling_after;
-                    <a href="%prefix;%child.access;" id="next_sibling" class="d-none"></a>
+                %if;has_parents;
+                  %foreach;father.child;
+                    %if;is_sibling_before;
+                      <a href="%prefix;%child.access;" id="previous_sibling" class="d-none"></a>
+                    %end;
+                    %if;is_sibling_after;
+                      <a href="%prefix;%child.access;" id="next_sibling" class="d-none"></a>
+                    %end;
                   %end;
                 %end;
                 <div class="dropdown-divider"></div>
