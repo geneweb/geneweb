@@ -1,33 +1,38 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: gwb2ged.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-    <title>
+  <!-- $Id: gwb2ged.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>
 [
 de: GEDCOM-Datei extrahieren
 en: Extract a GEDCOM file
-es: Extracci&oacute;n de un fichero GEDCOM
+es: Extracción de un fichero GEDCOM
 fi: Vie GEDCOM tiedosto
-fr: Extraction d'un fichier GEDCOM
+fr: Extraction d’un fichier GEDCOM
 it: Estrazione di un file GEDCOM
 lv: Izveidot GEDCOM datni
 sv: Exportera en GEDCOM-fil
 ]</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+%fsetup.css;
 </head>
-<body background="images/gwback.jpg">
+<body %Vbody_prop;>
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
 de: GEDCOM-Datei extrahieren
 en: Extract a GEDCOM file
-es: Extracci&oacute;n de un fichero GEDCOM
+es: Extracción de un fichero GEDCOM
 fi: Vie GEDCOM tiedosto
-fr: Extraction d'un fichier GEDCOM
+fr: Extraction d’un fichier GEDCOM
 it: Estrazione di un file GEDCOM
 lv: Izveidot GEDCOM datni
 sv: Exportera en GEDCOM-fil
@@ -36,126 +41,125 @@ sv: Exportera en GEDCOM-fil
 </div>
 
 <form method="get" action="gwb2ged">
-<input type="hidden" name="opt" value="check" />
-<input type="hidden" name="lang" value="%l" />
-
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
+<ul><li>
 [
-de: W&auml;hle deine Datenbank:
+de: Wähle deine Datenbank:
 en: Select your database:
 es: Seleccione Ud. su base de datos :
 fi: Valitse tietokanta:
-fr: S&eacute;lectionnez votre base de donn&eacute;es&nbsp;:
+fr: Sélectionnez votre base de données :
 it: Selezionate la vostra base di dati:
-lv: Izv�lieties datu b�zi:
-sv: V�lj din databas:
+lv: Izvçlieties datu bâzi:
+sv: Välj din databas:
 ]
 
-<p />
+<p>
 
-<dl><dt><dd><table style="border:1px solid" cellspacing="0" cellpadding="1">
+<table class="setup">
 
 %b{<tr align="left">
-<td><input type="radio" name="anon" id="anon%a" value="%a" />&nbsp;&nbsp;&nbsp;
+<td><input type="radio" name="anon" id="anon%a" value="%a">   
 <label for="anon%a">%a</label></td></tr>|
 <tr align="left"><td>- [
 de: Keine Datenbank vorhanden
 en: here is no database at present
 es: actualmente ninguna base de datos existente
 fi: ei tietokantaa saatavilla
-fr: il n&rsquo;y a aucune base de donn�es actuellement
+fr: il n’y a aucune base de données actuellement
 it: attualmente non esiste nessuna base di dati
-lv: nav nevienas datu b�zes
-sv: det finns ingen databas f�r tillf�llet
+lv: nav nevienas datu bâzes
+sv: det finns ingen databas för tillfället
 ]</tr></td>}
 
-</table></dl>
+</table>
 
-<p />
-
+<p>
+<li>
 [
-de: Gib den Namen ein, den du deiner GEDCOM-Datei geben m&ouml;chtest.
+de: Gib den Namen ein, den du deiner GEDCOM-Datei geben möchtest.
     Falls du nichts eingibst, verwenden wir den Namen deiner Datenbank,
     gefolgt von der Endung 
 en: Enter the name you want to give to your GEDCOM file. If you write
     nothing, it will be the name of the database ended by the suffix
 es: Entre Ud el nombre que desea dar a su fichero GEDCOM.
-    Si Ud no mete nada, el nombre utilizado ser&aacute; el nombre de la
+    Si Ud no mete nada, el nombre utilizado será el nombre de la
     base seguida del sufijo
 fi: Kirjoita nimi jonka haluat antaa GEDCOM tiedostolle. Jos et kirjoita
-    mit��n, tiedoston nimi on tyhj� ja p��ttyy sanaan
-fr: Entrez le nom que vous voulez donner &agrave; votre fichier GEDCOM.
+    mitään, tiedoston nimi on tyhjä ja päättyy sanaan
+fr: Entrez le nom que vous voulez donner à votre fichier GEDCOM.
     Si vous ne mettez rien, ce sera le nom de la base suivi du suffixe
 it: Digitate il nome che volete attribuire al vostro file GEDCOM.
-    Se non mettete niente, il nome utilizzato sar&agrave; quello della base
+    Se non mettete niente, il nome utilizzato sarà quello della base
     seguito dal suffisso
-lv: Ierakstiet J�su izv�l�to GEDCOM datnes nosaukumu. Ja J�s to
-    neierakst�siet datne tiks nosaukta t�d� pa�� v�rd�, k� datu b�ze ar
-    papla�in�jumu
+lv: Ierakstiet Jûsu izvçlçto GEDCOM datnes nosaukumu. Ja Jûs to
+    neierakstîsiet datne tiks nosaukta tâdâ paðâ vârdâ, kâ datu bâze ar
+    paplaðinâjumu
 sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver
-    n�gonting, kommer det att bli samma namn som databasen avslutat med
+    någonting, kommer det att bli samma namn som databasen avslutat med
 ] "<tt>.ged</tt>".
 
-<p />
-
-<dl><dt><dd>-o<br>
-<input name="o" size="30" /></dl>
-
-<p />
-
+<p>
+<table class="setup">
+<tr align=left><td>
+-o&nbsp;&nbsp;
+<input name="o" size="30">
+</td></tr>
+</table>
+<p>
+<li>
 [
-de: W&auml;hle die gew&uuml;nschten Optionen:
+de: Wähle die gewünschten Optionen:
 en: Select the options you want:
 es: Seleccione Ud. las opciones deseadas:
 fi: Valitse asetukset jotka haluat:
-fr: S&eacute;lectionnez les options que vous d&eacute;sirez:
+fr: Sélectionnez les options que vous désirez :
 if: Selezionate le opzioni desiderate:
-lv: Iv�l�ties nepiecie�amos izveides parametrus:
-sv: V�lj de optioner du vill ha:
+lv: Ivçlçties nepiecieðamos izveides parametrus:
+sv: Välj de optioner du vill ha:
 ]
 
-<p />
-
-<dl><dt><dd><table style="border:1px solid">
-
+<p>
+<table class="setup">
 <tr><td>-charset</td></tr>
-
 <tr align="left"><td>
-<input type="radio" name="charset" value="ASCII" id="ASCII"/>&nbsp;&nbsp;&nbsp;
+<input type="radio" name="charset" value="ASCII" id="ASCII"/>   
 <label for="ASCII">[
 de: Kodiere die Zeichen in ASCII.
 en: Encode the characters in ASCII.
-es: Codificar los car&aacute;cteres en ASCII.
+es: Codificar los carácteres en ASCII.
 fi: Koodaa merkit ASCII muodossa.
-fr: Coder les caract&egrave;res en ASCII.
+fr: Coder les caractères en ASCII.
 it: Codificare i caratteri in ASCII.
-lv: Burti ASCII kod�jum�.
+lv: Burti ASCII kodçjumâ.
 sv: Koda tecknen i ASCII.
 ]</label></td>
 </tr>
 
 <tr align="left"><td>
-<input type="radio" name="charset" value="UTF-8" id="UTF-8" checked="checked" />&nbsp;&nbsp;&nbsp;
+<input type="radio" name="charset" value="UTF-8" id="UTF-8" checked="checked">   
 <label for="UTF-8">[
 de: Kodiere die Zeichen in UTF-8.
 en: Encode the characters in UTF-8.
-es: Codificar los car&aacute;cteres en UTF-8.
+es: Codificar los carácteres en UTF-8.
 fi: Koodaa merkit UTF-8 muodossa.
-fr: Coder les caract&egrave;res en UTF-8.
+fr: Coder les caractères en UTF-8.
 it: Codificare i caratteri in UTF-8.
-lv: Burti UTF-8 kod�jum�.
+lv: Burti UTF-8 kodçjumâ.
 sv: Koda tecknen i UTF-8.
 ]</label></td>
 </tr>
 
 <tr align="left"><td>
-<input type="radio" name="charset" value="ANSEL" id="ANSEL"/>&nbsp;&nbsp;&nbsp;
+<input type="radio" name="charset" value="ANSEL" id="ANSEL"/>   
 <label for="ANSEL">[
 de: Kodiere die Zeichen in ANSEL.
 en: Encode the characters in ANSEL.
-es: Codificar los car&aacute;cteres en ANSEL.
-fr: Coder les caract&egrave;res en ANSEL.
+es: Codificar los carácteres en ANSEL.
+fr: Coder les caractères en ANSEL.
 it: Codificare i caratteri in ANSEL.
-lv: Burti ANSEL kod�jum�.
+lv: Burti ANSEL kodçjumâ.
 sv: Koda tecknen i ANSEL.
 ]</label></td>
 </tr>
@@ -168,96 +172,94 @@ en: Encode the characters in ANSI (ISO 8859-1).
 es: Codificar los car&aacute;cteres en ANSI (ISO 8859-1).
 fr: Coder les caract&egrave;res en ANSI (ISO 8859-1).
 it: Codificare i caratteri in ANSI (ISO 8859-1).
-lv: Burti ANSI kod�jum� (ISO 8859-1).
+lv: Burti ANSI kodçjumâ (ISO 8859-1).
 sv: Koda tecknen i ANSI (ISO 8859-1).
 ]</label></td>
 </tr>
-
 </table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
+<p>
+<table class="setup">
 <tr align=left>
-<td><input type=checkbox name=mem value=on id=mem>&nbsp;&nbsp;&nbsp;
+<td><input type=checkbox name=mem value=on id=mem>   
 <label for=mem>-mem</label>[
-de: : w&auml;hrend der Operation sparsam mit dem Speicher umgehen
+de: : während der Operation sparsam mit dem Speicher umgehen
     (ist aber langsamer).
 en: : Save the memory space during the operation (but it will be slower).
-es: : economizar el espacio-memoria durante la operaci&oacute;n
+es: : economizar el espacio-memoria durante la operación
     (pero esta sera mas lenta).
-fr:  : &eacute;conomiser l'espace m&eacute;moire pendant l'op&eacute;ration
+fr:  : économiser l’espace mémoire pendant l’opération
     (mais ce sera plus lent).
 it: : economizzare lo spazio-memoria durante l'operazione
-    (che per&ograve; sar&agrave; pi&ugrave; lenta)
-lv: : darb�bas laik� taup�t operat�vo atmi�u (darb�ba notiks l�n�k).
-sv: : spara minne under operationen (men det kommer att g� saktare).
+    (che però sarà più lenta)
+lv: : darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).
+sv: : spara minne under operationen (men det kommer att gå saktare).
 ]</td>
 </tr>
-</table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
+</table>
+<p>
+<table class="setup">
 <tr align=left>
-<td><input type=checkbox name=nn id=nn value=on>&nbsp;&nbsp;&nbsp;
+<td><input type=checkbox name=nn id=nn value=on>   
 <label for=nn>-nn</label>[
 en: : Do not extract notes.
-fr:  : ne pas extraire les notes.
+fr:  : ne pas extraire les notes.
 ]</td>
 </tr>
-</table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
+</table>
+<p>
+<table class="setup">
 <tr align=left>
-<td><input type=checkbox name=nopicture id=nopicture value=on>&nbsp;&nbsp;&nbsp;
+<td><input type=checkbox name=nopicture id=nopicture value=on>   
 <label for=nopicture>-nopicture</label>[
 en: : Dont extract individual pictures (portraits).
-fr:  : ne pas extraire les images individuelles (portraits).
+fr:  : ne pas extraire les images individuelles (portraits).
 ]</td>
 </tr>
-</table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
+</table>
+<p>
+<table class="setup">
 <tr align=left>
-<td><input type=checkbox name=picture-path id=picture-path value=on>&nbsp;&nbsp;&nbsp;
+<td><input type=checkbox name=picture-path id=picture-path value=on>   
 <label for=picture-path>-picture-path</label>[
 en: : Extract individual pictures path (portraits).
-fr:  : extraire le chemin des images individuelles (portraits).
+fr:  : extraire le chemin des images individuelles (portraits).
 ]</td>
 </tr>
-</table></dl>
-
-<dl><dt><dd>[
+</table>
+<p>
+[
 en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
-fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (&eacute;ventuellement "0").
-]</dl>
-
-
-<dl><dt><dd><table style="border:1px solid">
-<tr align=left><td>&nbsp;</td>
+fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
+]
+<p>
+<table class="setup">
+<tr align=left><td> </td>
 <td colspan=3>
 -a[
-de: : nur die Vorfahren ausw&auml;hlen von&hellip;
-en: : Extract only the ancestors of&hellip;
-es: : extraer solamente los antepasados de&hellip;
-fr:  : n'extraire que les anc&ecirc;tres de&hellip;
-it: : estrarre solamente gli antenati di&hellip;
-lv: : izmantot tikai&hellip;
-sv: : exportera endast anorna till&hellip;
+de: : nur die Vorfahren auswählen von…
+en: : Extract only the ancestors of…
+es: : extraer solamente los antepasados de…
+fr:  : n’extraire que les ancêtres de…
+it: : estrarre solamente gli antenati di…
+lv: : izmantot tikai…
+sv: : exportera endast anorna till…
 ]</td></tr>
 
 <tr align=left><td>[
 de: Vorname
 en: First name
 es: Nombre
-fr: Pr&eacute;nom
+fr: Prénom
 it: Nome
-lv: V�rds
-sv: F�rnamn
+lv: Vârds
+sv: Förnamn
 ]</td>
 <td><input name="a1" size=30 maxlength=200></td>
 
 <td>N[
 de: r
 en: um
-es: &uacute;m
+es: úm
 fr: um
 it: umero
 lv: r
@@ -272,7 +274,7 @@ en: Surname
 es: Apellido
 fr: Nom
 it: Cognome
-lv: Uzv�rds
+lv: Uzvârds
 sv: Efternamn
 ]</td>
 <td colspan=3><input name="a3" size=40 maxlength=200></td>
@@ -284,19 +286,19 @@ en:
 es: 
 fr: 
 it: 
-lv: <tr align=left><td>&nbsp;</td><td colspan=3>&hellip;vec�kus</td></tr>
+lv: <tr align=left><td> </td><td colspan=3>…vecâkus</td></tr>
 sv: 
-]</table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
-<tr align=left><td>&nbsp;</td><td colspan=3>
+]</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
 -d[
-de: : nur die Nachkommen ausw&auml;hlen von&hellip;
-en: : Extract only the descendants of&hellip;
-es: : extraer solamente los descendientes de&hellip;
-fr:  : n'extraire que les descendants de&hellip;
-it: : estrarre solamente i discendenti di&hellip;
-lv: : izmantot tikai&hellip;
+de: : nur die Nachkommen auswählen von…
+en: : Extract only the descendants of…
+es: : extraer solamente los descendientes de…
+fr:  : n’extraire que les descendants de…
+it: : estrarre solamente i discendenti di…
+lv: : izmantot tikai…
 ]</td>
 </tr>
 
@@ -304,16 +306,16 @@ lv: : izmantot tikai&hellip;
 de: Vorname
 en: First name
 es: Nombre
-fr: Pr&eacute;nom
+fr: Prénom
 it: Nome
-lv: V�rds
+lv: Vârds
 ]</td>
 <td><input name="d1" size=30 maxlength=200></td>
 
 <td>[
 de: Nr
 en: Num
-es: N&uacute;m
+es: Núm
 fr: Num
 it: Numero
 lv: Nr
@@ -326,44 +328,44 @@ en: Surname
 es: Apellido
 fr: Nom
 it: Cognome
-lv: Uzv�rds
+lv: Uzvârds
 ]
 </td>
 <td colspan=3><input name="d3" size=40 maxlength=200></td>
 
 </tr>
-</table></dl>
-
-<dl><dt><dd>[
-de: Falls du oben beide Optionen gew&auml;hlt hast, wird die Schnittmenge
+</table>
+<p>
+[
+de: Falls du oben beide Optionen gewählt hast, wird die Schnittmenge
     extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
     einen und Nachkommen des anderen sind.
 en: If you use both above options, the intersection is assumed:<br>
     persons <em>at the same time</em> ancestors of the one and descendants
     of the other.
-es: Si Ud. utiliza las dos opciones indicadas m&aacute;s arriba, la
-    intercepci&oacute;n de estas ser&aacute; la que contar&aacute;:
+es: Si Ud. utiliza las dos opciones indicadas más arriba, la
+    intercepción de estas será la que contará:
     personas <em>al mismo tiempo</em>
     antepasados del uno y descendientes del otro.
-fr: Si vous utilisez les deux options ci-dessus, c'est
-    l'intersection qui comptera :<br>personnes <em>&agrave; la fois</em>
-    anc&ecirc;tres de l'un et descendants de l'autre.
-it: Se utilizzate insieme le due opzioni precedenti, &egrave;
-    l'intersezione che sar&agrave; presa in considerazione; ossia le
-    persone al  <em>tempo stesso</em> antenati dell'uno e discendenti dell'altro.
-lv: Ja J�s lietosiet abus iepriek��jos parametrus, tiek izmantota
-    p�rkl��an�s: t.i. personas, kas <em>vienlaic�gi </em> ir vienam
-    sen�i un otram p�cte�i.
-sv: Om du v�ljer de b�da valen ovan, kommer
-    �verlappning att antas: personer <em>som samtidigt</em> �r
-    anor av den ena och �ttlingar av den andra.
-]</dl>
-
-<dl><dt><dd><table style="border:1px solid">
-<tr align=left><td>&nbsp;</td><td colspan=3>
+fr: Si vous utilisez les deux options ci-dessus, c’est
+    l’intersection qui comptera :<br>personnes <em>à la fois</em>
+    ancêtres de l’un et descendants de l’autre.
+it: Se utilizzate insieme le due opzioni precedenti, è
+    l'intersezione che sarà presa in considerazione; ossia le
+    persone al <em>tempo stesso</em> antenati dell'uno e discendenti dell'altro.
+lv: Ja Jûs lietosiet abus iepriekðçjos parametrus, tiek izmantota
+    pârklâðanâs: t.i. personas, kas <em>vienlaicîgi </em> ir vienam
+    senèi un otram pçcteèi.
+sv: Om du väljer de båda valen ovan, kommer
+    överlappning att antas: personer <em>som samtidigt</em> är
+    anor av den ena och ättlingar av den andra.
+]
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
 -aws[
-en: : Extract ancestors with siblings of&hellip;
-fr:  : extraire les anc&ecirc;tres avec fratries de&hellip;
+en: : Extract ancestors with siblings of…
+fr:  : extraire les ancêtres avec fratries de…
 ]</td>
 </tr>
 
@@ -371,16 +373,16 @@ fr:  : extraire les anc&ecirc;tres avec fratries de&hellip;
 de: Vorname
 en: First name
 es: Nombre
-fr: Pr&eacute;nom
+fr: Prénom
 it: Nome
-lv: V�rds
+lv: Vârds
 ]</td>
 <td><input name="aws1" size=30 maxlength=200></td>
 
 <td>[
 de: Nr
 en: Num
-es: N&uacute;m
+es: Núm
 fr: Num
 it: Numero
 lv: Nr
@@ -393,19 +395,18 @@ en: Surname
 es: Apellido
 fr: Nom
 it: Cognome
-lv: Uzv�rds
+lv: Uzvârds
 ]
 </td>
 <td colspan=3><input name="aws3" size=40 maxlength=200></td>
-
 </tr>
-</table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
-<tr align=left><td>&nbsp;</td><td colspan=3>
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
 -s[
 en: : extract surname (usable several times).
-fr:  : extraire un nom de famille (utilisable plusieurs fois).
+fr:  : extraire un nom de famille (utilisable plusieurs fois).
 ]</td>
 </tr>
 
@@ -415,54 +416,53 @@ en: Surname
 es: Apellido
 fr: Nom
 it: Cognome
-lv: Uzv�rds
+lv: Uzvârds
 ]
 </td>
 <td colspan=3><input name="s" size=40 maxlength=200></td>
-
 </tr>
-</table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
-<tr align=left><td>&nbsp;</td><td colspan=3>
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
 -c[
 en: : When a person is born less than <num> years ago, it is not exported unless it is Public.<br> 
     All the spouses and descendants are also censored.
-fr:  : quand une personne est n&eacute;e il y a moins de &hellip; ann&eacute;es, elle n'est pas export&eacute;e sauf<br>
-    si elle est "publique". La censure s'applique aux &eacute;poux et descendants. 
+fr:  : quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br>
+    si elle est "publique". La censure s’applique aux époux et descendants. 
 ]</td>
 </tr>
 
 <tr align=left><td>[
 en: Years
-fr: Ann&eacute;es
+fr: Années
 ]
 </td>
 <td colspan=3><input name="c" size=10 maxlength=200></td>
 
 </tr>
-</table></dl>
-
-<dl><dt><dd><table style="border:1px solid">
+</table>
+<p>
+<table class="setup">
 <tr align=left>
-<td><input type=checkbox name=nsp id=nsp value=on>&nbsp;&nbsp;&nbsp;
+<td><input type=checkbox name=nsp id=nsp value=on>   
 <label for=nsp>-nsp</label>[
 en: : Do not extract spouses' parents (for options -s and -d).
-fr:  : ne pas extraire les parents des &eacute;poux (pour les options -s et -d).
+fr:  : ne pas extraire les parents des époux (pour les options -s et -d).
 ]</td>
 </tr>
-</table></dl>
+</table>
 
 <p>
-
+<li>
 [
-de: Dann dr&uuml;cke diesen Knopf:
+de: Dann drücke diesen Knopf:
 en: Then push this button:
-es: Finalmente apoye en el bot&oacute;n:
-fr: Puis appuyez sur ce bouton :
+es: Finalmente apoye en el botón:
+fr: Puis appuyez sur ce bouton :
 it: Poi cliccate su questo bottone:
-lv: Tad nospiediet �o podzi�u:
-sv: Tryck sedan p� denna knapp:
+lv: Tad nospiediet ðo podziòu:
+sv: Tryck sedan på denna knapp:
 ]
 
 <p>
@@ -476,5 +476,5 @@ it: Estrarre
 lv: Extract
 sv: Exportera
 ]">
-
+</ul>
 </form>

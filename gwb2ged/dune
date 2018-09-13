@@ -1,0 +1,9 @@
+(executable
+  (name gwb2ged)
+  (libraries str geneweb.internal)
+)
+
+(install
+ (section bin)
+ (files gwb2ged.exe)
+)

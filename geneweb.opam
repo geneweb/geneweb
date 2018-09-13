@@ -1,0 +1,43 @@
+opam-version: "2.0"
+
+maintainer: [ "Julien Sagot <julien.sagot@geneanet.org>" ]
+
+authors: [ "Daniel de Rauglaudre" ]
+
+homepage: "http://geneweb.org"
+
+dev-repo: "git://github.com/geneweb/geneweb"
+
+bug-reports: "https://github.com/geneweb/geneweb/issues"
+
+build: [
+  [ "./configure" "--api" ]
+  [ make "install-exe" ]
+]
+
+install: [ [ make "install" ] ]
+
+remove: [ [ make "uninstall" ] ]
+
+pin-depends: [
+  [ "piqilib.dev" "git://github.com/alavrik/piqi" ]
+  [ "piqi.dev" "git://github.com/alavrik/piqi-ocaml" ]
+]
+
+depends: [
+  "camlp5" { build }
+  "cppo" { build }
+  "dune" { build>= "1.1.1" }
+  "ocaml" { >= "4.05" }
+  "ocurl" { = "0.8.1" }
+  "piqi" { = "dev" }
+  "piqilib" { = "dev" }
+  "redis"
+  "redis-sync"
+  "yojson"
+]
+
+depexts: [
+  [ [ "ubuntu" "linux" ] [ "protobuf-compiler" ] ]
+  [ [ "homebrew" "osx" ] [ "protobuf" ] ]
+]

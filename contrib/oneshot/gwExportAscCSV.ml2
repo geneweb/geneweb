@@ -3,7 +3,6 @@
 
 open Def;
 open Gwdb;
-open Printf;
 
 
 value starting_char no_num s =

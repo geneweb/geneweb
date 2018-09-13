@@ -1,0 +1,9 @@
+(executable
+ (name setup)
+ (libraries geneweb.internal geneweb.wserver)
+)
+
+(install
+ (section bin)
+ (files setup.exe)
+)

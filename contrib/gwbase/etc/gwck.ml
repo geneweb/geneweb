@@ -1,24 +1,13 @@
-(* camlp5r ../../../src/pa_lock.cmo *)
 (* $Id: gwck.ml,v 4.13 2009-03-11 10:58:51 deraugla Exp $ *)
 
-open Def;
-open Gwdb;
+open Def
+open Gwdb
 
-value designation base ip p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  if first_name = "?" || surname = "?" then
-    "i=" ^ string_of_int (Adef.int_of_iper ip)
-  else
-    Mutil.iso_8859_1_of_utf_8
-      (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname)
-;
-
-value check_keys base nb_ind fix = do {
+let check_keys base nb_ind fix =
   Printf.printf "Check keys\n";
   flush stdout;
   ProgrBar.start ();
-  for i = 0 to nb_ind - 1 do {
+  for i = 0 to nb_ind - 1 do
     ProgrBar.run i nb_ind;
     let ip = Adef.iper_of_int i in
     let p = poi base ip in
@@ -27,204 +16,198 @@ value check_keys base nb_ind fix = do {
     let occ = get_occ p in
     if fn <> "?" && sn <> "?" then
       match Gwdb.person_of_key base fn sn occ with
-      [ Some ip2 ->
-          if ip2 <> ip then do {
-            ProgrBar.suspend ();
-            Printf.printf "*** key %s.%d %s is \"%s\"\n" fn occ sn
-              (designation base ip (poi base ip2));
-            flush stdout;
-            Gwdb.patch_key base ip fn sn occ;
-            Printf.printf "*** fixed\n";
-            flush stdout;
-            fix.val := True;
-            ProgrBar.restart i nb_ind;
-          }
-          else ()
-      | None -> do {
+        Some ip2 ->
+          if ip2 <> ip then
+            begin
+              ProgrBar.suspend ();
+              Printf.printf "*** key %s.%d %s is \"%s\"\n" fn occ sn
+                (Gutil.designation base (poi base ip2));
+              flush stdout;
+              Gwdb.patch_key base ip fn sn occ;
+              Printf.printf "*** fixed\n";
+              flush stdout;
+              fix := true;
+              ProgrBar.restart i nb_ind
+            end
+      | None ->
           ProgrBar.suspend ();
           Printf.printf "*** key %s.%d %s = no anwser\n" fn occ sn;
           flush stdout;
           Gwdb.patch_key base ip fn sn occ;
           Printf.printf "*** fixed\n";
           flush stdout;
-          fix.val := True;
-          ProgrBar.restart i nb_ind;
-        } ]
-    else ();
-  };
-  ProgrBar.finish ();
-};
+          fix := true;
+          ProgrBar.restart i nb_ind
+  done;
+  ProgrBar.finish ()
 
-value check_families_parents base nb_fam = do {
+let check_families_parents base nb_fam =
   Printf.printf "Check families' parents\n";
   flush stdout;
   ProgrBar.start ();
-  for i = 0 to nb_fam - 1 do {
+  for i = 0 to nb_fam - 1 do
     ProgrBar.run i nb_fam;
     let ifam = Adef.ifam_of_int i in
     let fam = foi base ifam in
     if is_deleted_family fam then ()
     else
       let a = get_parent_array fam in
-      for j = 0 to Array.length a - 1 do {
+      for j = 0 to Array.length a - 1 do
         let ip = a.(j) in
         if Array.mem ifam (get_family (poi base ip)) then ()
-        else do {
-           ProgrBar.suspend ();
-           Printf.printf "*** no family for : %s\n"
-             (designation base ip (poi base ip));
-           flush stdout;
-           ProgrBar.restart i nb_fam;
-        };
-      }
-  };
-  ProgrBar.finish ();
-};
+        else
+          begin
+            ProgrBar.suspend ();
+            Printf.printf "*** no family for : %s\n"
+              (Gutil.designation base (poi base ip));
+            flush stdout;
+            ProgrBar.restart i nb_fam
+          end
+      done
+  done;
+  ProgrBar.finish ()
 
-value check_families_children base nb_fam fix = do {
+let check_families_children base nb_fam fix =
   Printf.printf "Check families' children\n";
   flush stdout;
   ProgrBar.start ();
-  for i = 0 to nb_fam - 1 do {
+  for i = 0 to nb_fam - 1 do
     ProgrBar.run i nb_fam;
     let ifam = Adef.ifam_of_int i in
     let fam = foi base ifam in
     if is_deleted_family fam then ()
     else
       let children = get_children fam in
-      for j = 0 to Array.length children - 1 do {
+      for j = 0 to Array.length children - 1 do
         let ip = children.(j) in
         let a = poi base ip in
         match get_parents a with
-        [ Some ifam1 ->
-            if ifam1 != ifam then do {
-              Printf.printf "*** bad parents : %s\n"
-                (designation base ip (poi base ip));
-              flush stdout;
-            }
-            else ()
-        | None -> do {
+          Some ifam1 ->
+            if ifam1 != ifam then
+              begin
+                Printf.printf "*** bad parents : %s\n"
+                  (Gutil.designation base (poi base ip));
+                flush stdout
+              end
+        | None ->
             ProgrBar.suspend ();
             Printf.printf "*** no parents : %s in family\n    %s & %s\n"
-              (designation base ip (poi base ip))
-              (let ip = get_father fam in designation base ip (poi base ip))
-              (let ip = get_mother fam in designation base ip (poi base ip));
+              (Gutil.designation base (poi base ip))
+              (let ip = get_father fam in Gutil.designation base (poi base ip))
+              (let ip = get_mother fam in Gutil.designation base (poi base ip));
             flush stdout;
             patch_ascend base ip
               {parents = Some ifam; consang = get_consang a};
-            fix.val := True;
-            ProgrBar.restart i nb_fam;
-          } ];
-      };
-  };
-  ProgrBar.finish ();
-};
+            fix := true;
+            ProgrBar.restart i nb_fam
+      done
+  done;
+  ProgrBar.finish ()
 
-value check_persons_parents base nb_ind fix = do {
+let check_persons_parents base nb_ind fix =
   Printf.printf "Check persons' parents\n";
   flush stdout;
   ProgrBar.start ();
-  for i = 0 to nb_ind - 1 do {
+  for i = 0 to nb_ind - 1 do
     ProgrBar.run i nb_ind;
     let ip = Adef.iper_of_int i in
     let a = poi base ip in
     match get_parents a with
-    [ Some ifam ->
+      Some ifam ->
         let fam = foi base ifam in
-        if is_deleted_family fam then do {
-          Printf.printf "*** parent family deleted: %s\n"
-            (designation base ip (poi base ip));
-          flush stdout;
-          patch_ascend base ip {parents = None; consang = Adef.fix (-1)};
-          fix.val := True;
-        }
+        if is_deleted_family fam then
+          begin
+            Printf.printf "*** parent family deleted: %s\n"
+              (Gutil.designation base (poi base ip));
+            flush stdout;
+            patch_ascend base ip {parents = None; consang = Adef.fix (-1)};
+            fix := true
+          end
         else
           let children = get_children fam in
           if Array.mem ip children then ()
-          else do {
-            Printf.printf "*** not in parent's family: %s\n"
-              (designation base ip (poi base ip));
-            flush stdout;
-            let children = Array.append children [| ip |] in
-            patch_descend base ifam {children = children};
-            fix.val := True;
-          }
-    | None -> () ];
-  };
-  ProgrBar.finish ();
-};
+          else
+            begin
+              Printf.printf "*** not in parent's family: %s\n"
+                (Gutil.designation base (poi base ip));
+              flush stdout;
+              let children = Array.append children [| ip |] in
+              patch_descend base ifam {children = children}; fix := true
+            end
+    | None -> ()
+  done;
+  ProgrBar.finish ()
 
-value check_persons_families base nb_ind fix = do {
+let check_persons_families base nb_ind fix =
   Printf.printf "Check persons' families\n";
   flush stdout;
   ProgrBar.start ();
-  for i = 0 to nb_ind - 1 do {
+  for i = 0 to nb_ind - 1 do
     ProgrBar.run i nb_ind;
     let ip = Adef.iper_of_int i in
     let u = poi base ip in
     let ifams = get_family u in
-    for j = 0 to Array.length ifams - 1 do {
+    for j = 0 to Array.length ifams - 1 do
       let ifam = ifams.(j) in
       let cpl = foi base ifam in
       if Array.mem ip (get_parent_array cpl) then ()
-      else do {
-        ProgrBar.suspend ();
-        Printf.printf "*** not father or mother of hir family: %s\n"
-          (designation base ip (poi base ip));
-        flush stdout;
-        let ifams =
-          Array.append (Array.sub ifams 0 j)
-            (Array.sub ifams (j + 1) (Array.length ifams - j - 1))
-        in
-        patch_union base ip {family = ifams};
-        Printf.printf "*** fixed\n";
-        flush stdout;
-        fix.val := True;
-        ProgrBar.restart i nb_ind;
-      }
-    };
-  };
-  ProgrBar.finish ();
-};
+      else
+        begin
+          ProgrBar.suspend ();
+          Printf.printf "*** not father or mother of hir family: %s\n"
+            (Gutil.designation base (poi base ip));
+          flush stdout;
+          let ifams =
+            Array.append (Array.sub ifams 0 j)
+              (Array.sub ifams (j + 1) (Array.length ifams - j - 1))
+          in
+          patch_union base ip {family = ifams};
+          Printf.printf "*** fixed\n";
+          flush stdout;
+          fix := true;
+          ProgrBar.restart i nb_ind
+        end
+    done
+  done;
+  ProgrBar.finish ()
 
-value check_witnesses base nb_fam fix = do {
+let check_witnesses base nb_fam fix =
   Printf.printf "Check witnesses\n";
   flush stdout;
   ProgrBar.start ();
-  for i = 0 to nb_fam - 1 do {
+  for i = 0 to nb_fam - 1 do
     ProgrBar.run i nb_fam;
     let ifam = Adef.ifam_of_int i in
     let fam = foi base ifam in
     let witn = get_witnesses fam in
     let ifath = get_father fam in
-    for j = 0 to Array.length witn - 1 do {
+    for j = 0 to Array.length witn - 1 do
       let ip = witn.(j) in
       let p = poi base ip in
-      if not (List.memq ifath (get_related p)) then do {
-        ProgrBar.suspend ();
-        let imoth = get_mother fam in
-        Printf.printf "*** in marriage: %s & %s\n"
-          (designation base ifath (poi base ifath))
-          (designation base ifath (poi base imoth));
-        Printf.printf "*** witness has no pointer to marriage: %s\n"
-          (designation base ip p);
-        flush stdout;
-        patch_person base ip
-          {(gen_person_of_person p) with related = [ifath :: get_related p]};
-        Printf.printf "*** fixed\n";
-        fix.val := True;
-        flush stdout;
-        ProgrBar.restart i nb_fam;
-      }
-      else ();
-    };
-  };
-  ProgrBar.finish ();
-};
+      if not (List.memq ifath (get_related p)) then
+        begin
+          ProgrBar.suspend ();
+          let imoth = get_mother fam in
+          Printf.printf "*** in marriage: %s & %s\n"
+            (Gutil.designation base (poi base ifath))
+            (Gutil.designation base (poi base imoth));
+          Printf.printf "*** witness has no pointer to marriage: %s\n"
+            (Gutil.designation base p);
+          flush stdout;
+          patch_person base ip
+            {(gen_person_of_person p) with related = ifath :: get_related p};
+          Printf.printf "*** fixed\n";
+          fix := true;
+          flush stdout;
+          ProgrBar.restart i nb_fam
+        end
+    done
+  done;
+  ProgrBar.finish ()
 
-value check bname = do {
+let check bname =
   let base = Gwdb.open_base bname in
-  let fix = ref False in
+  let fix = ref false in
   let nb_fam = nb_of_families base in
   let nb_ind = nb_of_persons base in
   check_keys base nb_ind fix;
@@ -233,21 +216,12 @@ value check bname = do {
   check_persons_parents base nb_ind fix;
   check_persons_families base nb_ind fix;
   check_witnesses base nb_fam fix;
-  if fix.val then Gwdb.commit_patches base
-  else do {
-    Printf.printf "No change\n";
-    flush stdout;
-  }
-};
+  if !fix then Gwdb.commit_patches base
+  else begin Printf.printf "No change\n"; flush stdout end
 
-value main () =
+let main () =
   let bname = Sys.argv.(1) in
-  lock Mutil.lock_file bname with
-  [ Accept -> check bname
-  | Refuse -> do {
-      Printf.eprintf "Cannot lock database. Try again.\n";
-      flush stderr;
-    } ]
-;
+  Lock.control (Mutil.lock_file bname) false (fun () -> check bname)
+    ~onerror:Lock.print_try_again
 
-main ();
+let _ = main ()

@@ -14,12 +14,12 @@ done
 head -1 $FILE >/dev/null || exit 1
 
 set - `head -1 $FILE`
-if test "$2" = "camlp5r" -o "$2" = "camlp5o" -o "$2" = "camlp5"; then
+if test "$2" = "camlp5" -o "$2" = "camlp5" -o "$2" = "camlp5"; then
         COMM="$2"
         shift; shift
         ARGS2=`echo $* | sed -e "s/[()*]//g"`
 else
-	COMM=camlp5r
+	COMM=camlp5
 	ARGS2=
 fi
 

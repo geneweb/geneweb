@@ -12,9 +12,11 @@
 
 namespace geneweb\api\filters;
 
-abstract class Filter {
+abstract class Filter
+{
 
-	public function __construct(){
-	}
+    public function __construct()
+    {
+    }
 }
 ?>

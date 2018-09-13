@@ -17,13 +17,10 @@ cd "$DIR"
 DIR="$PWD"
 export LANG
 
-# echo -n "]2;GeneWeb"
-# echo -n "]1;GeneWeb"
-
-pids=""
-trap 'kill $pids' 1 2
-killall gwd
-killall gwsetup
+gwd_pid=`ps -ef|grep '/gwd'|grep -v grep|awk '{print $2}'`
+kill $gwd_pid
+gws_pid=`ps -ef|grep '/gwsetup'|grep -v grep|awk '{print $2}'`
+kill $gws_pid
 
 if [ -f gwsetup.log ]; then
   mv gwsetup.log gwseup.log.old
@@ -43,9 +40,9 @@ else
 fi
 
 "$DIR/gw/gwsetup" -gd "$DIR/gw" -lang $LANG > gwsetup.log 2>&1 &
-pid=$!
 sleep 1
-if test "`ps $pid | wc -l`" -ne 2; then
+gws_pid=`ps -ef|grep '/gwsetup'|grep -v grep|awk '{print $2}'`
+if test "$gws_pid" = ""; then
   if test "$LANG" = "fr"; then echo Echec gwsetup; else echo Failed gwsetup; fi
   cat
   exit 1
@@ -58,14 +55,13 @@ else
   echo "Starting gwd..."
 fi
 "$DIR/gw/gwd" -hd "$DIR/gw" > gwd.log 2>&1 &
-pid=$!
 sleep 1
-if test "`ps $pid | wc -l`" -ne 2; then
+gwd_pid=`ps -ef|grep '/gwd'|grep -v grep|awk '{print $2}'`
+if test "$gwd_pid" = ""; then
   if test "$LANG" = "fr"; then echo Echec gwd; else echo Failed gwd; fi
   cat
   exit 1
 fi
-pids="$pids $pid"
 
 echo
 if test "$LANG" = "fr"; then

@@ -16,5 +16,6 @@ class FilterOnlySosa extends Filter {
 
 	public function __construct(){
 	}
+
 }
 ?>

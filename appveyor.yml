@@ -1,3 +1,5 @@
+# Not building with API because piqi does not compile on windows
+
 platform:
   - x86
 
@@ -12,10 +14,13 @@ install:
   - '%CYG_BASH% "opam64/install.sh"'
   - '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git --comp 4.05.0+mingw64c --switch 4.05.0+mingw64c"'
   - '%CYG_BASH% "eval `opam config env`"'
-  - '%CYG_BASH% "opam install -y ocamlfind camlp5 depext depext-cygwinports"'
+  - '%CYG_BASH% "opam install -y depext depext-cygwinports"'
   - 'set PATH=%PATH%;/usr/x86_64-w64-mingw32/sys-root/mingw/bin'
   - 'set OPAMYES=1'
-  - '%CYG_BASH% "opam depext -i lablgtk"'
+  - '%CYG_BASH% "opam install depext depext-cygwinports"'
+  - '%CYG_BASH% "opam install camlp5 cppo dune"'
 
 build_script:
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make everything && make distrib"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make clean install uninstall clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make clean distrib clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && opam depext lablgtk && opam install lablgtk && ./configure && make clean everything-exe clean"'
