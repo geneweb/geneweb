@@ -3,7 +3,6 @@
 
 let int_size = 4
 let verbose = ref true
-let utf_8_db = Name.utf_8_db
 
 let list_iter_first f = function
   | [] -> ()

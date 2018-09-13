@@ -485,7 +485,7 @@ let begin_text_without_html_tags lim s =
       loop i size len
     else if s.[i] = '=' then loop (i + 1) size len
     else
-      let nbc = if !Mutil.utf_8_db then Name.nbc s.[i] else i + 1 in
+      let nbc = Name.nbc s.[i] in
       loop (i + nbc) (size + 1) (Buff.mstore len (String.sub s i nbc))
   in
   loop 0 0 0

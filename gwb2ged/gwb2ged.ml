@@ -38,10 +38,9 @@ let ged_month cal m =
 let encode s =
   match !charset with
     Ansel ->
-      let s = if !(Mutil.utf_8_db) then Mutil.iso_8859_1_of_utf_8 s else s in
-      Ansel.of_iso_8859_1 s
-  | Ascii | Ansi -> if !(Mutil.utf_8_db) then Mutil.iso_8859_1_of_utf_8 s else s
-  | Utf8 -> if !(Mutil.utf_8_db) then s else Mutil.utf_8_of_iso_8859_1 s
+      Ansel.of_iso_8859_1 @@ Mutil.iso_8859_1_of_utf_8 s
+  | Ascii | Ansi -> Mutil.iso_8859_1_of_utf_8 s
+  | Utf8 -> s
 
 let max_len = 78
 

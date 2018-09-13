@@ -1,8 +1,6 @@
 (* $Id: name.ml,v 5.12 2007-03-20 10:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-let utf_8_db = ref true
-
 (* La liste des caractères interdits *)
 let forbidden_char = [':'; '@'; '#'; '='; '$']
 
@@ -421,27 +419,20 @@ let unaccent_utf_8 lower s i =
 
 let next_chars_if_equiv s i t j =
   if i >= String.length s || j >= String.length t then None
-  else if !utf_8_db then
+  else
     let (s1, i1) = unaccent_utf_8 true s i in
     let (t1, j1) = unaccent_utf_8 true t j in
     if s1 = t1 then Some (i1, j1) else None
-  else if s.[i] = t.[j] then Some (i + 1, j + 1)
-  else if
-    unaccent_iso_8859_1 (Char.lowercase_ascii s.[i]) =
-      unaccent_iso_8859_1 (Char.lowercase_ascii t.[j])
-  then
-    Some (i + 1, j + 1)
-  else None
 
 let lower s =
   let rec copy special i len =
     if i = String.length s then Buff.get len
-    else if not !utf_8_db || Char.code s.[i] < 0x80 then
+    else if Char.code s.[i] < 0x80 then
       match s.[i] with
-        'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c ->
-          let len = if special then Buff.store len ' ' else len in
-          let c = unaccent_iso_8859_1 (Char.lowercase_ascii c) in
-          copy false (i + 1) (Buff.store len c)
+      | 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c ->
+        let len = if special then Buff.store len ' ' else len in
+        let c = unaccent_iso_8859_1 (Char.lowercase_ascii c) in
+        copy false (i + 1) (Buff.store len c)
       | _ -> copy (len <> 0) (i + 1) len
     else
       let len = if special then Buff.store len ' ' else len in
@@ -550,7 +541,7 @@ let crush s =
               in
               copy (i + 1) len first_vowel
           | 's' | 'z'
-            when !utf_8_db && (i = String.length s - 1 || s.[i+1] = ' ') ->
+            when (i = String.length s - 1 || s.[i+1] = ' ') ->
               let len =
                 let rec loop i len =
                   if i > 0 && len > 0 && s.[i] = Bytes.get !(Buff.buff) len &&

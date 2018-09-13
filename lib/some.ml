@@ -209,10 +209,9 @@ let print_elem conf base is_surname (p, xl) =
 let first_char s =
   (* Si la personne n'a pas de prénom/nom, on renvoie '?' *)
   if s = "" then "?"
-  else if !(Mutil.utf_8_db) then
+  else
     let len = Name.nbc s.[0] in
     if len < String.length s then String.sub s 0 len else s
-  else String.sub s (Mutil.initial s) 1
 
 let name_unaccent s =
   let rec copy i len =
@@ -327,7 +326,7 @@ let persons_of_absolute_first_name conf base x =
 
 let first_name_print conf base x =
   let (list, _) =
-    if !(Mutil.utf_8_db) && p_getenv conf.env "t" = Some "A" then
+    if p_getenv conf.env "t" = Some "A" then
       persons_of_absolute_first_name conf base x,
       (fun _ -> raise (Match_failure ("src/some.ml", 347, 51)))
     else if x = "" then
@@ -402,8 +401,7 @@ let unselected_bullets conf =
        try if k = "u" then int_of_string v :: sl else sl with Failure _ -> sl)
     [] conf.env
 
-let alphabetic1 n1 n2 =
-  if !Mutil.utf_8_db then Gutil.alphabetic_utf_8 n1 n2 else Gutil.alphabetic n1 n2
+let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
@@ -790,7 +788,7 @@ module PerSet = Set.Make (struct type t = iper let compare = compare end)
 
 let surname_print conf base not_found_fun x =
   let (list, name_inj) =
-    if !(Mutil.utf_8_db) && p_getenv conf.env "t" = Some "A" then
+    if p_getenv conf.env "t" = Some "A" then
       persons_of_absolute_surname conf base x, (fun x -> x)
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 825, 29)))
@@ -860,7 +858,7 @@ let surname_print conf base not_found_fun x =
 
 let search_surname conf base x =
   let (list, name_inj) =
-    if !(Mutil.utf_8_db) && p_getenv conf.env "t" = Some "A" then
+    if p_getenv conf.env "t" = Some "A" then
       persons_of_absolute_surname conf base x, (fun x -> x)
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
@@ -905,7 +903,7 @@ let search_surname conf base x =
 
 let search_surname_print conf base not_found_fun x =
   let (list, name_inj) =
-    if !(Mutil.utf_8_db) && p_getenv conf.env "t" = Some "A" then
+    if p_getenv conf.env "t" = Some "A" then
       persons_of_absolute_surname conf base x, (fun x -> x)
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 942, 29)))
@@ -970,7 +968,7 @@ let search_surname_print conf base not_found_fun x =
 
 let search_first_name conf base x =
   let (list, _) =
-    if !(Mutil.utf_8_db) && p_getenv conf.env "t" = Some "A" then
+    if p_getenv conf.env "t" = Some "A" then
       persons_of_absolute_first_name conf base x,
       (fun _ -> raise (Match_failure ("src/some.ml", 1007, 51)))
     else if x = "" then
@@ -989,7 +987,7 @@ let search_first_name conf base x =
 
 let search_first_name_print conf base x =
   let (list, _) =
-    if !(Mutil.utf_8_db) && p_getenv conf.env "t" = Some "A" then
+    if p_getenv conf.env "t" = Some "A" then
       persons_of_absolute_first_name conf base x,
       (fun _ -> raise (Match_failure ("src/some.ml", 1025, 51)))
     else if x = "" then

@@ -79,17 +79,8 @@ let combine_by_count list =
 
 let alphab_string base is_surname s =
   if is_surname then
-    if !(Mutil.utf_8_db) then surname_end base s ^ surname_begin base s
-    else old_surname_end s ^ old_surname_begin s
+    surname_end base s ^ surname_begin base s
   else s
-
-let lower_if_not_utf8 s = if !(Mutil.utf_8_db) then s else Name.lower s
-
-let capitalize_if_not_utf8 s =
-  if !(Mutil.utf_8_db) then s else String.capitalize_ascii s
-
-let lowercase_if_not_utf8 s =
-  if !(Mutil.utf_8_db) then s else String.lowercase_ascii s
 
 let new_name_key base s =
   let part = Util.get_particle base s in
@@ -98,8 +89,7 @@ let new_name_key base s =
     let i = String.length part in
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 
-let name_key_compatible base s =
-  if !(Mutil.utf_8_db) then new_name_key base s else Mutil.name_key s
+let name_key_compatible base s = new_name_key base s
 
 (* print *)
 
@@ -114,24 +104,21 @@ let print_title conf base is_surnames ini len =
     Wserver.printf "%s"
       (capitale (transl_nth conf "first name/first names" 0));
   if ini <> "" then
-    Wserver.printf " %s %s" (transl conf "starting with")
-      (capitalize_if_not_utf8 ini)
+    Wserver.printf " %s %s" (transl conf "starting with") ini
   else
     Wserver.printf " (%d %s)" (Util.real_nb_of_persons conf base)
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
 
 let displayify s =
-  if !(Mutil.utf_8_db) then
-    let rec loop i len =
-      if i = String.length s then Buff.get len
-      else
-        let nbc = Name.nbc s.[i] in
-        if nbc < 0 || i + nbc > String.length s then
-          Buff.get (Buff.mstore len "...")
-        else loop (i + nbc) (Buff.gstore len s i nbc)
-    in
-    loop 0 0
-  else String.capitalize_ascii s
+  let rec loop i len =
+    if i = String.length s then Buff.get len
+    else
+      let nbc = Name.nbc s.[i] in
+      if nbc < 0 || i + nbc > String.length s then
+        Buff.get (Buff.mstore len "...")
+      else loop (i + nbc) (Buff.gstore len s i nbc)
+  in
+  loop 0 0
 
 let tr c1 s2 s =
   let rec loop i len =
@@ -206,7 +193,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
   Wserver.printf "<p class=\"search_name\">\n";
   List.iter
     (fun (ini_k, _) ->
-       let ini = capitalize_if_not_utf8 ini_k in
+       let ini = ini_k in
        Wserver.printf "<a href=\"#a%s\">" ini;
        Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
        Wserver.printf "</a>\n")
@@ -215,7 +202,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
   Wserver.printf "<ul>\n";
   List.iter
     (fun (ini_k, l) ->
-       let ini = capitalize_if_not_utf8 ini_k in
+       let ini = ini_k in
        Wserver.printf "<li>\n";
        Wserver.printf "<a id=\"a%s\">" ini_k;
        Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
@@ -225,7 +212,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
          (fun (s, cnt) ->
             Wserver.printf "<li>";
             begin let href =
-              "m=" ^ mode ^ ";v=" ^ code_varenv (lower_if_not_utf8 s) ^ ";t=A"
+              "m=" ^ mode ^ ";v=" ^ code_varenv s ^ ";t=A"
             in
               wprint_geneweb_link conf href
                 (alphab_string base is_surnames s)
@@ -251,7 +238,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
         (fun (_, s, cnt) ->
            Wserver.printf "<li>";
            Wserver.printf "<a href=\"%sm=%s;v=%s;t=A\">" (commd conf) mode
-             (code_varenv (lower_if_not_utf8 s));
+             (code_varenv s);
            Wserver.printf "%s" (alphab_string base is_surnames s);
            Wserver.printf "</a>";
            Wserver.printf " (%d)" cnt;
@@ -308,7 +295,7 @@ let select_names conf base is_surnames ini need_whole_list =
   let (list, len) =
     let start_k = Mutil.tr '_' ' ' ini in
     try
-      let istr = spi_first iii (capitalize_if_not_utf8 start_k) in
+      let istr = spi_first iii start_k in
         let rec loop istr len list =
           let s = Mutil.nominative (sou base istr) in
           let k = name_key_compatible base s in
@@ -363,10 +350,10 @@ let select_names conf base is_surnames ini need_whole_list =
          if cnt >= lim then (k, s, cnt) :: list, len else list, len - 1)
       ([], len) list
   in
-  list, not !Mutil.utf_8_db, len
+  list, false, len
 
 let compare2 s1 s2 =
-  if !(Mutil.utf_8_db) then Gutil.alphabetic_utf_8 s1 s2 else compare s1 s2
+  Gutil.alphabetic_utf_8 s1 s2
 
 let print_frequency conf base is_surnames =
   let () = load_strings_array base in
@@ -385,7 +372,7 @@ let print_frequency conf base is_surnames =
 let print_alphabetic conf base is_surnames =
   let ini =
     match p_getenv conf.env "k" with
-      Some k -> lowercase_if_not_utf8 k
+      Some k -> k
     | _ -> ""
   in
   let fast =
@@ -436,7 +423,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
       Wserver.printf "<p>\n";
       List.iter
         (fun (ini_k, _) ->
-           let ini = capitalize_if_not_utf8 ini_k in
+           let ini = ini_k in
            Wserver.printf "<a href=\"#a%s\">" ini;
            Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
            Wserver.printf "</a>\n")
@@ -445,14 +432,14 @@ let print_alphabetic_short conf base is_surnames ini list len =
     end;
   List.iter
     (fun (ini_k, l) ->
-       let ini = capitalize_if_not_utf8 ini_k in
+       let ini = ini_k in
        Wserver.printf "<p>\n";
        Mutil.list_iter_first
          (fun first (s, cnt) ->
             let href =
               if not conf.cancel_links then
                 " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
-                code_varenv (lower_if_not_utf8 s) ^ ";t=A\""
+                code_varenv s ^ ";t=A\""
               else ""
             in
             let name =
@@ -473,7 +460,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
 let print_short conf base is_surnames =
   let ini =
     match p_getenv conf.env "k" with
-      Some k -> lowercase_if_not_utf8 k
+      Some k -> k
     | _ -> ""
   in
   let _ = if String.length ini < 2 then load_strings_array base in

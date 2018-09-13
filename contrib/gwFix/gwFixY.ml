@@ -8,7 +8,7 @@ let gen_only_printable or_nl s =
   let s' = Bytes.create (String.length s) in
   for i = 0 to String.length s - 1 do
     Bytes.set s' i
-      (if !(Mutil.utf_8_db) && Char.code s.[i] > 127 then s.[i]
+      (if Char.code s.[i] > 127 then s.[i]
        else
          match s.[i] with
            ' '..'~' | '\160'..'\255' -> s.[i]

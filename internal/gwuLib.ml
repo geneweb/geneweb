@@ -150,10 +150,6 @@ module Make (Select : Select) =
     let isolated = ref false
     let gen_correct_string no_num no_colon s =
       let s = String.trim s in
-      let s =
-        if !(Mutil.utf_8_db) || !raw_output then s
-        else Mutil.utf_8_of_iso_8859_1 s
-      in
       let rec loop i len =
         if i = String.length s then Buff.get len
         else if len = 0 && not (starting_char no_num s) then
