@@ -4,7 +4,7 @@ open Def
 open Gwdb
 
 let suspend_with msg = ProgrBar.suspend (); msg () ; flush stdout
-let restart_with i n = Printf.printf "*** fixed\n"; flush stdout; ProgrBar.restart i n
+let restart_with_fixed i n = Printf.printf "*** fixed\n"; flush stdout; ProgrBar.restart i n
 
 let check_keys ~verbosity1 ~verbosity2 base nb_ind fix =
   if verbosity1 then (Printf.printf "Check keys\n"; flush stdout);
@@ -21,7 +21,7 @@ let check_keys ~verbosity1 ~verbosity2 base nb_ind fix =
         Opt.iter suspend_with msg ;
         Gwdb.patch_key base ip fn sn occ;
         incr fix ;
-        Opt.iter (fun _ -> restart_with i nb_ind) msg
+        Opt.iter (fun _ -> restart_with_fixed i nb_ind) msg
       in
       match Gwdb.person_of_key base fn sn occ with
       | Some ip2 when ip2 <> ip ->
@@ -64,7 +64,8 @@ let check_families_parents ~verbosity1 base nb_fam =
                   Printf.printf
                     "*** no family for : %s\n"
                     (Gutil.designation base (poi base ip)) ) ;
-              restart_with i nb_fam
+              flush stdout ;
+              ProgrBar.restart i nb_fam
             end
         done
     done;
@@ -171,7 +172,7 @@ let check_persons_families ~verbosity1 ~verbosity2 base nb_ind fix =
           in
           patch_union base ip {family = ifams};
           incr fix;
-          if verbosity2 then restart_with i nb_ind ;
+          if verbosity2 then restart_with_fixed i nb_ind ;
         end
     done
   done;
@@ -205,7 +206,7 @@ let check_witnesses ~verbosity1 ~verbosity2 base nb_fam fix =
           patch_person base ip
             {(gen_person_of_person p) with related = ifath :: get_related p};
           incr fix;
-          if verbosity2 then restart_with i nb_fam
+          if verbosity2 then restart_with_fixed i nb_fam
         end
     done
   done;
@@ -238,7 +239,7 @@ let check_pevents_witnesses ~verbosity1 ~verbosity2 base nb_ind fix =
                  {(gen_person_of_person p2)
                   with related = ip :: get_related p2};
                incr fix;
-               if verbosity2 then restart_with i nb_ind
+               if verbosity2 then restart_with_fixed i nb_ind
              end
          done)
       (get_pevents p)
@@ -276,7 +277,7 @@ let check_fevents_witnesses ~verbosity1 ~verbosity2 base nb_fam fix =
                  {(gen_person_of_person p)
                   with related = ifath :: get_related p};
                incr fix;
-               if verbosity2 then restart_with i nb_fam
+               if verbosity2 then restart_with_fixed i nb_fam
              end
          done)
       (get_fevents fam)
