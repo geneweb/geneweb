@@ -631,7 +631,7 @@ value insert_file env bdir name =
         let oc = open_out (Filename.concat bdir name) in
         output_substring oc contents (j + 1) len;
         flush oc;
-        printf "File \"%s\" transfered.\n" name;
+        printf "File \"%s\" transferred.\n" name;
         close_out oc;
       }
       else ();
@@ -755,7 +755,7 @@ value send_gedcom_file str env b tok f fname =
 ";
     flush stdout;
     make_gedcom_file env b;
-    printf "\nGedcom file transfered.\n";
+    printf "\nGedcom file transferred.\n";
     flush stdout;
     ged2gwb b;
     printf "New database created.\n";
@@ -893,7 +893,7 @@ value send_file str env b tok f fname =
         }
     | Refuse ->
         do {
-          printf "Database is already being transfered.<br>\n";
+          printf "Database is already being transferred.<br>\n";
           printf "Please try again later.\n";
         } ];
     flush stdout;
@@ -935,7 +935,7 @@ value gwtp_receive str env b tok =
       do {
         printf "content-type: bin/geneweb";
         crlf ();
-        printf "content-disposition: attachement; filename=%s" fname;
+        printf "content-disposition: attachment; filename=%s" fname;
         crlf ();
         crlf ();
         let ic = open_in (Filename.concat bdir fname) in
@@ -1227,7 +1227,7 @@ value speclist =
     "<etc>: directory for passwd, default.gwf and lang files; default: " ^
     gwtp_tmp.val);
    ("-site", Arg.String (fun x -> gw_site.val := x),
-    "<url>: site (if any) where databases are accomodated");
+    "<url>: site (if any) where databases are accommodated");
    ("-noup", Arg.Set no_upload, "no upload");
    ("-tmout", Arg.Float (fun x -> token_tmout.val := x),
     "<sec>: tokens time out; default = " ^

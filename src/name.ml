@@ -78,7 +78,7 @@ value unaccent_utf_8 lower s i =
               try
                 let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
                 String.make 1 c
-              with Invalid_argument "Char.chr" -> "" ]
+              with Invalid_argument _ -> "" ]
       | 0xC4 ->
           match Char.code s.[i+1] with
           [ 0x80 | 0x82 | 0x84 -> f "A"

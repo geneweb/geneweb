@@ -272,7 +272,7 @@ value speclist =
    ("-n", Arg.Int (fun i -> ngen.val := i),
     "nb of generations (" ^ string_of_int ngen.val ^ ")");
    ("-g", Arg.Int (fun i -> gyear.val := i),
-    "age at mariage (" ^ string_of_int gyear.val ^ ")")]
+    "age at marriage (" ^ string_of_int gyear.val ^ ")")]
 ;
 value anonfun i = bname.val := i;
 value usage = "Usage: popule base [args]";

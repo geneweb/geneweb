@@ -333,6 +333,12 @@ function changeCalendar(e,v,m,c) {
     <tr>
       %apply;death("paxcnt","xx","true")
     </tr>
+    <tr>
+      <td><label for="paxcnt_occupation">[*occupation/occupations]0</label></td>
+      <td colspan="4">
+        <input name="paxcnt_occupation" size="40" maxlength="200" value="%xx.create.occupation" id="paxcnt_occupation"%/>
+      </td>
+    </tr>
   </table>
 %end;
 
@@ -583,6 +589,12 @@ function changeCalendar(e,v,m,c) {
         </label>
       </td>
       %apply;death("chxcnt", "child", "false")
+    </tr>
+    <tr>
+      <td><label for="chxcnt_occupation">[*occupation/occupations]0</label></td>
+      <td colspan="4">
+        <input name="chxcnt_occupation" size="40" maxlength="200" value="%child.create.occupation;" id="chxcnt_occupation"%/>
+      </td>
     </tr>
   </table>
 %end;
