@@ -305,3 +305,7 @@ val array_mem_witn
 
 (* Print a date using "%4d-%02d-%02d %02d:%02d:%02d" format *)
 val fprintf_date : out_channel -> Unix.tm -> unit
+
+(* [name_key base name] is [name],
+   with particles put at the end of the string instead of the beginning *)
+val name_key : Gwdb.base -> string -> string

@@ -50,30 +50,6 @@ let kmp p s =
       if !j >= m then true else false
     end
 
-let new_name_key base s =
-  let start_with2 s i p =
-    i + String.length p <= String.length s &&
-    String.sub s i (String.length p) = p
-  in
-  let parts =
-    List.filter
-      (fun p -> start_with2 (Name.lower s) 0 (Name.lower p ^ " "))
-      (Gwdb.base_particles base)
-  in
-  let part =
-    (function
-      | [] -> ""
-      | x :: _ -> x) parts
-  in
-  let i = String.length part in
-  if part = "" || i > String.length s then s
-  else
-    String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
-
-
-let name_key_compatible base s = new_name_key base s
-
-
 (* FIXME: DUPLICATE OF ALLN.SELECT ??? *)
 (* ************************************************************************** *)
 (*  [Fonc] get_list_of_select_start_with :
@@ -107,7 +83,7 @@ let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
       let istr = spi_first name letter in
         let rec loop istr list =
           let s = Mutil.nominative (sou base istr) in
-          let k = name_key_compatible base s in
+          let k = Util.name_key base s in
             (* Vérifie que le début du nom de famille de la personne correspond à celui demandé *)
             if "" = ini_n || string_start_with (Name.lower ini_n) (Name.lower k) then
               let list =
@@ -189,7 +165,7 @@ let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
                                                                               *)
 (* ************************************************************************** *)
 let select_start_with conf base ini_n ini_p need_whole_list =
-  let ini_n = name_key_compatible base ini_n in
+  let ini_n = Util.name_key base ini_n in
   let start =
     if ini_n <> ""
     then
@@ -212,7 +188,7 @@ let select_both_all base ini_n ini_p maiden_name =
   let find_sn p x = kmp x (sou base (get_surname p)) in
   let find_fn p x = kmp x (sou base (get_first_name p)) in
   let find_str s x = kmp x s in
-  let ini_n = name_key_compatible base ini_n in
+  let ini_n = Util.name_key base ini_n in
   let ini_n = code_varenv ini_n in
   let ini_n =
     let rec loop s acc =
@@ -302,7 +278,7 @@ let select_all base is_surnames ini =
     else kmp x (sou base (get_first_name p))
   in
   let ini =
-    if is_surnames then name_key_compatible base ini
+    if is_surnames then Util.name_key base ini
     else ini
   in
   let ini = code_varenv ini in
@@ -545,7 +521,7 @@ let select_start_with_auto_complete base mode max_res ini =
       (* majuscule *)
       let ini =
         match mode with
-        | `lastname -> name_key_compatible base ini
+        | `lastname -> Util.name_key base ini
         | `firstname -> ini
         | `place -> failwith "cannot use select_start_with_auto_complete"
         | `source -> failwith "cannot use select_start_with_auto_complete"
@@ -556,7 +532,7 @@ let select_start_with_auto_complete base mode max_res ini =
       | istr ->
           let rec loop istr =
             let s = sou base istr in
-            let k = name_key_compatible base s in
+            let k = Util.name_key base s in
             if string_start_with (Name.lower ini) (Name.lower k) then
               begin
                 string_set := StrSetAutoComplete.add s !string_set;
@@ -577,7 +553,7 @@ let select_start_with_auto_complete base mode max_res ini =
       if !nb_res < max_res then
         let ini =
           match mode with
-          | `lastname -> name_key_compatible base ini
+          | `lastname -> Util.name_key base ini
           | `firstname -> ini
           | `place -> failwith "cannot use select_start_with_auto_complete"
           | `source -> failwith "cannot use select_start_with_auto_complete"
@@ -588,7 +564,7 @@ let select_start_with_auto_complete base mode max_res ini =
         | istr ->
             let rec loop istr =
               let s = sou base istr in
-              let k = name_key_compatible base s in
+              let k = Util.name_key base s in
               if string_start_with (Name.lower ini) (Name.lower k) then
                 begin
                   string_set := StrSetAutoComplete.add s !string_set;
@@ -616,7 +592,7 @@ let select_start_with_auto_complete base mode max_res ini =
       | istr ->
           let rec loop istr list =
             let s = sou base istr in
-            let k = name_key_compatible base s in
+            let k = Util.name_key base s in
             if string_incl_start_with (Name.lower ini) (Name.lower k) then
               begin
                 string_set := StrSetAutoComplete.add (sou base istr) !string_set;
@@ -929,7 +905,7 @@ let select_both_link_person conf base ini_n ini_p =
   let find_sn p x = kmp x (sou base (get_surname p)) in
   let find_fn p x = kmp x (sou base (get_first_name p)) in
   let find_str s x = kmp x s in
-  let ini_n = name_key_compatible base ini_n in
+  let ini_n = Util.name_key base ini_n in
   let ini_n = code_varenv ini_n in
   let ini_n =
     let rec loop s acc =
@@ -1018,7 +994,7 @@ let select_both_link_person conf base ini_n ini_p =
 let select_both_link_person base ini_n ini_p max_res =
   let find_sn p x = kmp x (sou base (get_surname p)) in
   let find_fn p x = kmp x (sou base (get_first_name p)) in
-  let ini_n = name_key_compatible base ini_n in
+  let ini_n = Util.name_key base ini_n in
   let ini_n = code_varenv ini_n in
   let ini_n =
     let rec loop s acc =
@@ -1124,7 +1100,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
   let need_whole_list = true in
 (*
   let ini =
-    if is_surnames then name_key_compatible base ini
+    if is_surnames then Util.name_key base ini
     else ini
   in
 *)
@@ -1153,7 +1129,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
                   if StrSetAutoComplete.cardinal !string_set < max_res then
                     begin
                       let s = sou base istr in
-                      let k = name_key_compatible base s in
+                      let k = Util.name_key base s in
         (*              if (String.sub k 0 1) = letter then*)
                         if string_incl_start_with (Name.lower ini) (Name.lower k) then
                           begin
@@ -1222,7 +1198,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
                   if StrSetAutoComplete.cardinal !string_set < max_res then
                     begin
                       let s = sou base istr in
-                      let k = name_key_compatible base s in
+                      let k = Util.name_key base s in
         (*              if (String.sub k 0 1) = letter then*)
                         if string_incl_start_with (Name.lower ini) (Name.lower k) then
                           let () =

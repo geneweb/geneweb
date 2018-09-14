@@ -1009,10 +1009,18 @@ let start_with2 s i p =
 let get_particle base s =
   let rec loop =
     function
-      part :: parts -> if start_with2 s 0 part then part else loop parts
+    | hd :: _ when start_with2 (Name.lower s) 0 (Name.lower hd ^ " ") -> hd
+    | _ :: tl -> loop tl
     | [] -> ""
   in
-  loop (base_particles base)
+  loop (Gwdb.base_particles base)
+
+let name_key base s =
+  let part = get_particle base s in
+  if part = "" then s
+  else
+    let i = String.length part in
+    String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 
 let surname_begin base s =
   let part = get_particle base s in
