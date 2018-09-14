@@ -24,9 +24,9 @@
 %message_to_wizard;
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
+%import;perso_utils;
 %include.menubar;
 <div id="content" tabindex="-1">
-%import;perso_utils;
 %define;init_nb_asc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
   %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
