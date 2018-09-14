@@ -91,9 +91,9 @@
         title="%if;(evar.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
                %else;[*visualize/show/hide/summary]1%sp;
                  %if;(evar.m="D")
-                   %apply;togend("v")
+                   %apply;togend(evar.v)
                  %elseif;(evar.m="A")
-                   %apply;togen("v")
+                   %apply;togen(evar.v)
                  %end;
                %end;">%nn;
             <i class="fa fa-level-up-alt%if;(evar.m="D") fa-flip-vertical%end; fa-fw%if;(evar.only!="on") text-danger%end;" aria-hidden="true"></i>%nn;
