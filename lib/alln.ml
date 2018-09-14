@@ -82,15 +82,6 @@ let alphab_string base is_surname s =
     surname_end base s ^ surname_begin base s
   else s
 
-let new_name_key base s =
-  let part = Util.get_particle base s in
-  if part = "" then s
-  else
-    let i = String.length part in
-    String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
-
-let name_key_compatible base s = new_name_key base s
-
 (* print *)
 
 let print_title conf base is_surnames ini len =
@@ -298,7 +289,7 @@ let select_names conf base is_surnames ini need_whole_list =
       let istr = spi_first iii start_k in
         let rec loop istr len list =
           let s = Mutil.nominative (sou base istr) in
-          let k = name_key_compatible base s in
+          let k = Util.name_key base s in
           if string_start_with ini k then
             let (list, len) =
               if s <> "?" then
