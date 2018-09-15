@@ -90,9 +90,9 @@ value channel_redirector channel callback = do {
     do { fun cond ->
       try
         if List.mem `IN cond then do {
-	        (* On Windows, you must use Io.read *)
-	        let len = GMain.Io.read chan ~buf ~pos:0 ~len in
-	        len >= 1 && (callback (String.sub buf 0 len))
+          (* On Windows, you must use Io.read *)
+          let len = GMain.Io.read chan ~buf ~pos:0 ~len in
+          len >= 1 && (callback (Bytes.sub buf 0 len))
         }
         else False
       with [ _ -> False ]
@@ -130,7 +130,8 @@ value exec_wait conf prog args =
     let redirect channel =
       let buffer = GText.buffer () in
       let _text = GText.view ~buffer ~editable:False ~packing:vvbox#add () in
-      channel_redirector channel (fun c -> do {buffer#insert c; True})
+      channel_redirector channel
+        (fun c -> do {buffer#insert (Bytes.to_string c); True})
     in
     ignore (redirect Unix.stderr);
     let pid = exec prog args Unix.stdout Unix.stderr in
