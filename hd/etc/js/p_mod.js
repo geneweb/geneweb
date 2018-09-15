@@ -90,51 +90,53 @@ var p_mod_table = '\
   </tbody>\
 </table>';
 
-var p_mod_build = '<div id="p_mod_builder">';
+var p_mod_init = '<div id="p_mod_builder">\n</div>\n';
 
-function upd_p_mod_build () {
+$('#p_mod_builder').replaceWith(p_mod_init);
+var p_mod = $('#p_mod').val();
+var p_mod_build = '<div id="p_mod_builder">';
+for(i=0;i<=p_mod.length-2;i=i+2){
+  var mod = "";
+  for(j=1;j<=12;j++){if (p_mod[i] == modules[j][0]){mod = modules[j];}};
+  var opt = p_mod[i+1];
+  if(p_mod[0]=="z"){$('#p_mod_builder').append('<div id="p_mod_builder"><img id="rm" src="'+img_prfx+'/zz_1.jpg">\n');}
+  else if(opt>=1&&opt<=9){$('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/'+mod+'_'+opt+'.jpg">\n');}
+  else{i-=1};
+};
+$('#p_mod_builder').append('</div>');
+$('#p_mod_table').replaceWith(p_mod_table);
+
+$('[data-toggle="popover"]').popover();
+
+$('#p_mod').on('keyup', function ()
+{ $('#p_mod_builder').replaceWith(p_mod_init);
   var p_mod = $('#p_mod').val();
   for(i=0;i<=p_mod.length-2;i=i+2){
     var mod = "";
     for(j=1;j<=12;j++){if (p_mod[i] == modules[j][0]){mod = modules[j];}};
     var opt = p_mod[i+1];
-    if(p_mod[0]=="z"){p_mod_build='<div id="p_mod_builder"><img id="rm" src="'+img_prfx+'/zz_1.jpg">\n';}
-    else if(opt>=1&&opt<=9){p_mod_build+='<img id="rm" src="'+img_prfx+'/'+mod+'_'+opt+'.jpg">\n';}
+    if(p_mod[0]=="z"){$('#p_mod_builder').append('<div id="p_mod_builder"><img id="rm" src="'+img_prfx+'/zz_1.jpg">\n');}
+    else if(opt>=1&&opt<=9){$('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/'+mod+'_'+opt+'.jpg">\n');}
     else{i-=1};
   };
-  p_mod_build += '</div>';
-  $('#p_mod_builder').replaceWith(p_mod_build);
-};
+});
 
-$('#p_mod_table').replaceWith(p_mod_table);
-
-upd_p_mod_build ();
-
-$('[data-toggle="popover"]').popover();
+$('#p_mod_bvar').on('click', function ()
+{ $('#p_mod').val($('#p_mod_bvar').val())
+});
 
 $('#p_mod_rm').on('click', function ()
 { $('#p_mod').val($('#p_mod').val().slice(0, -2));
   $('#rm:last-child').remove();
 });
-                  
-$('#p_mod_bvar').on('click', function ()
-{ $('#p_mod').val($('#p_mod_bvar').val());
-  upd_p_mod_build ();
-  $('#p_mod_builder').replaceWith(p_mod_build);
-});
 
-$('#p_mod').on('keyup', function ()
-{ upd_p_mod_build ();
-  $('#p_mod_builder').replaceWith(p_mod_build);
+$('#p_mod_clear').on('click', function ()
+{ $('#p_mod').val('');
+  $('#p_mod_builder').replaceWith(p_mod_init);
 });
 
 $('#zz').on('click', function ()
 { $('#p_mod').val('zz');
-});
-
-$('#p_mod_clear').on('click', function ()
-{ $('#p_mod').val('');
-  upd_p_mod_build ();
 });
 
 $('#i1').on('click', function ()

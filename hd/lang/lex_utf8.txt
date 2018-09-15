@@ -1,3 +1,11 @@
+    reset to
+en: reset to
+fr: restaurer
+
+    select p_mod
+en: select personalized modules (default zz)
+fr: selectionner les modules personnalisés (défaut zz)
+
     last sosa level not navigable
 en: last sosa level not navigable. Use ancestors list.
 fr: le dernier niveau des sosa n'est pas navigable. Utilisez la liste des ancêtres.

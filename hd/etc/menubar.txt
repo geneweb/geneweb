@@ -47,7 +47,11 @@
                     %apply;input_hidden("evar.b","b")
                     %apply;input_hidden("evar.lang","lang")
                     <div class="input-group">
-                      <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (%base.name;.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
+                      <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
+                        value="%p_mod;"
+                        placeholder="%if;(evar.pmod="" and bvar.pmod!="")%bvar.p_mod;
+                        (%base.name;.gwf)%else;[*select p_mod]%end;"
+                        maxlength="30">
                       <div class="input-group-append">
                         <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
                         <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-times fa-lg mx-1"></i></button>
@@ -66,7 +70,7 @@
                     %apply;input_hidden("evar.simple","simple")
                     <button type="button" class="btn btn-outline-danger ml-2" id="p_mod_rm" title="[*remove last module]" value="%bvar.p_mod;"><i class="fa fa-backward"></i></button>
                     %if;(bvar.p_mod!="")
-                      <button type="button" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*visualize/show/hide/summary]1/[modify] p_mod=%bvar.p_mod (%base.name;.gwf)" value="%bvar.p_mod;"><i class="fa fa-plus"></i></button>
+                      <button type="submit" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*reset to] p_mod=%bvar.p_mod (%base.name;.gwf)" value="%bvar.p_mod;"><i class="fa fa-plus"></i></button>
                     %end;
                     <button type="submit" class="btn btn-outline-secondary ml-2 mr-1"
                             value="X" id="zz" title="default"
@@ -76,8 +80,8 @@
                   <div class="d-flex justify-content-between">
                     <div class="mx-2 mt-2">
                     [
-en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear (maximum 15 modules).
-fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules (maximum 15 modules).
+en: Select each module by clicking on the corresponding button (max 15).
+fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     ]
                     </div>
                     <a role="button" class="btn btn-outline-%if;(evar.wide="on")danger%else;primary%end; my-3"%sp;
@@ -93,11 +97,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                 </form>
                 <div class="form-group d-none d-md-block mx-1">
                   <img src="%image_prefix;/modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
-                  <div id="p_mod_builder">
-                    %if;(evar.p_mod="zz")
-                      <img src="%image_prefix;/modules/zz_1.jpg" alt="zz_1">
-                    %end;
-                  </div>
+                  <div id="p_mod_builder"></div>
                 </div>
               </div>
             </div>
