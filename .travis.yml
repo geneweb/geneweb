@@ -7,8 +7,8 @@ os:
   - osx
 
 env:
+  - OCAML_VERSION=4.02 OPAM_VERSION=2.0.0
   - OCAML_VERSION=4.05 OPAM_VERSION=2.0.0
-  - OCAML_VERSION=4.06 OPAM_VERSION=2.0.0
   - OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
 
 matrix:
@@ -32,17 +32,14 @@ script:
     set -ex ;
     export OPAMYES=1 ;
     eval $(opam config env) ;
-    opam pin add geneweb . --no-action ;
-    opam install geneweb --deps-only ;
-    ./configure && make clean install uninstall clean ;
-    make clean distrib clean ;
-    ./configure --api && make clean install uninstall clean ;
-    opam depext lablgtk && opam install lablgtk && make clean everything-exe clean ;
+    opam install camlp5 ocamlfind ;
+    ./configure ;
+    make && make distrib && make clean ;
 
 notifications:
   email:
     recipients:
-      - julien.sagot@geneanet.org
+      - guillaume_brochu@yahoo.ca
     on_success: always
     on_failure: always
 
