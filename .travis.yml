@@ -1,0 +1,40 @@
+sudo: required
+
+language: c
+
+os:
+  - linux
+  - osx
+
+env:
+  - OCAML_VERSION=4.02 OPAM_VERSION=2.0.0
+  - OCAML_VERSION=4.05 OPAM_VERSION=2.0.0
+  - OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - os: osx
+      env: OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+
+# Needed until `opam depext geneweb` is fixed
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install protobuf ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq protobuf-compiler ; fi
+
+install:
+  - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
+
+script:
+  - bash -ex .travis-ocaml.sh ;
+    set -ex ;
+    export OPAMYES=1 ;
+    eval $(opam config env) ;
+    opam install camlp5 ocamlfind ;
+    ./configure ;
+    make && make distrib && make clean ;
+
+after_failure:
+  - cat ~/.opam/log/*.out
