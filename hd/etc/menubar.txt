@@ -48,8 +48,8 @@
                     %apply;input_hidden("evar.lang","lang")
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
-                        value="%p_mod;"
-                        placeholder="%if;(evar.pmod="" and bvar.pmod!="")%bvar.p_mod;
+                        value="%if;(p_mod!="zz")%p_mod;%end;"
+                        placeholder="%if;(evar.p_mod="" and bvar.p_mod!="")%bvar.p_mod;
                         (%base.name;.gwf)%else;[*select p_mod]%end;"
                         maxlength="30">
                       <div class="input-group-append">
@@ -72,10 +72,9 @@
                     %if;(bvar.p_mod!="")
                       <button type="submit" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*reset to] p_mod=%bvar.p_mod (%base.name;.gwf)" value="%bvar.p_mod;"><i class="fa fa-plus"></i></button>
                     %end;
-                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1"
-                            value="X" id="zz" title="default"
-                            data-toggle="popover" data-trigger="hover" data-placement="bottom"
-                            data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/modules/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
+                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
+                            title="Default template" data-toggle="popover" data-trigger="hover"
+                            data-html="true" data-content="<img class='w-100' src='%image_prefix;/modules/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
                   </div>
                   <div class="d-flex justify-content-between">
                     <div class="mx-2 mt-2">
