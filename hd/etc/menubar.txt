@@ -22,6 +22,7 @@
     <input type="hidden" name="nnn" value="%xxx;">
   %end;
 %end;
+%let;p_mod;%if;(bvar.p_mod!="" and evar.p_mod="")%bvar.p_mod;%elseif;(evar.p_mod!="")%evar.p_mod;%end;%in;
 %if;(not cancel_links)
   <div class="d-flex justify-content-between">
     <nav class="navbar navbar-light navbar-expand-md%nn;
@@ -48,8 +49,8 @@
                     %apply;input_hidden("evar.lang","lang")
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
-                        value="%if;(p_mod!="zz")%p_mod;%end;"
-                        placeholder="%if;(evar.p_mod="" and bvar.p_mod!="")%bvar.p_mod;
+                        value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
+                        placeholder="%if;(evar.p_mod="")%bvar.p_mod;
                         (%base.name;.gwf)%else;[*select p_mod]%end;"
                         maxlength="30">
                       <div class="input-group-append">
