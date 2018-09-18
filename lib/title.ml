@@ -326,6 +326,32 @@ let give_access_all_places conf t =
   Wserver.printf "... %s" t;
   Wserver.printf "</a>\n"
 
+let propose_tree_for_list list conf =
+  let (list, _) =
+    List.fold_left
+      (fun (list, n) (p, _) ->
+         let list = if List.mem_assq p list then list else (p, n) :: list in
+         list, n + 1)
+      ([], 1) list
+  in
+  begin match List.rev list with
+    _ :: _ :: _ as list ->
+      Wserver.printf "<p>\n";
+      Wserver.printf "<a href=\"%sm=RLM" (commd conf);
+      begin let _ =
+        List.fold_left
+          (fun i (p, n) ->
+             Wserver.printf ";i%d=%d;t%d=%d" i
+               (Adef.int_of_iper (get_key_index p)) i n;
+             i + 1)
+          1 list
+      in
+        Wserver.printf ";lim=6\">%s</a>\n" (capitale (transl conf "tree"))
+      end;
+      Wserver.printf "</p>\n"
+  | _ -> ()
+  end
+
 let print_title_place_list conf base t p t_equiv list =
   let absolute = p_getenv conf.env "a" = Some "A" in
   let title h =
@@ -360,30 +386,7 @@ let print_title_place_list conf base t p t_equiv list =
     ()
   end;
   Wserver.printf "</ul>\n";
-  let (list, _) =
-    List.fold_left
-      (fun (list, n) (p, _) ->
-         let list = if List.mem_assq p list then list else (p, n) :: list in
-         list, n + 1)
-      ([], 1) list
-  in
-  begin match List.rev list with
-    _ :: _ :: _ as list ->
-      Wserver.printf "<p>\n";
-      Wserver.printf "<a href=\"%sm=RLM" (commd conf);
-      begin let _ =
-        List.fold_left
-          (fun i (p, n) ->
-             Wserver.printf ";i%d=%d;t%d=%d" i
-               (Adef.int_of_iper (get_key_index p)) i n;
-             i + 1)
-          1 list
-      in
-        Wserver.printf ";lim=6\">%s</a>\n" (capitale (transl conf "tree"))
-      end;
-      Wserver.printf "</p>\n"
-  | _ -> ()
-  end;
+  propose_tree_for_list list conf;
   Hutil.trailer conf
 
 let print_all_with_place_list conf base p list =
@@ -400,7 +403,9 @@ let print_all_with_place_list conf base p list =
          fst x :: list)
       [] list
   in
-  Wserver.printf "</ul>\n"; Hutil.trailer conf
+  Wserver.printf "</ul>\n";
+  propose_tree_for_list list conf;
+  Hutil.trailer conf
 
 let print_title_place conf base t p =
   let (l, t, p, t_equiv) = select_title_place conf base t p in
