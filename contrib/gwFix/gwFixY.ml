@@ -3,23 +3,6 @@
 open Def
 open Gwdb
 
-(* Copie de util.ml *)
-let gen_only_printable or_nl s =
-  let s' = Bytes.create (String.length s) in
-  for i = 0 to String.length s - 1 do
-    Bytes.set s' i
-      (if Char.code s.[i] > 127 then s.[i]
-       else
-         match s.[i] with
-           ' '..'~' | '\160'..'\255' -> s.[i]
-         | '\n' -> if or_nl then '\n' else ' '
-         | _ -> ' ')
-  done;
-  String.trim (Bytes.unsafe_to_string s')
-
-let only_printable = gen_only_printable false
-
-
 (**/**)
 
 let trace = ref false
@@ -36,7 +19,7 @@ let fix_occu_y base =
     let occu = sou base (get_occupation p) in
     let () = if Str.string_match regexp_one occu 0 then updt := true in
     let new_occu = Str.global_replace regexp_one "" occu in
-    let new_occu = only_printable new_occu in
+    let new_occu = Util.only_printable new_occu in
     let new_occu = Gwdb.insert_string base new_occu in
     let new_pevents =
       List.map
@@ -50,7 +33,7 @@ let fix_occu_y base =
            in
            let new_note = Str.global_replace regexp_two "" note in
            let new_note = Str.global_replace regexp_one "" new_note in
-           let new_note = only_printable new_note in
+           let new_note = Util.only_printable new_note in
            let new_note = Gwdb.insert_string base new_note in
            {evt with epers_note = new_note})
         (get_pevents p)
@@ -86,7 +69,7 @@ let fix_occu_y base =
            in
            let new_note = Str.global_replace regexp_two "" note in
            let new_note = Str.global_replace regexp_one "" new_note in
-           let new_note = only_printable new_note in
+           let new_note = Util.only_printable new_note in
            let new_note = Gwdb.insert_string base new_note in
            {evt with efam_note = new_note})
         (get_fevents fam)
