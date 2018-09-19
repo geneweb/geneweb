@@ -24,7 +24,7 @@ fr: choisir une généalogie
 
     input database
 en: Please, enter the name of the database you want to use:
-fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
 
     available genealogies
 en: list of available genealogies (use gwsetup)
@@ -134,11 +134,11 @@ fr: graphe de relations multiples
 
     edit tree
 en: edit the graph
-fr: editer le graphe
+fr: éditer le graphe
 
     dag on/dag off
-en: dag on/dag off
-fr: dag actif/dag inactif
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
 
      !dates order
 af: yyyymmdd

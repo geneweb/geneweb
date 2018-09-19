@@ -142,7 +142,7 @@
       %if;(evar.mode="DAG")
         %apply;one_svar(1)
       %else;
-        %if;(eavr.i0!="")
+        %if;(evar.i0!="")
           %apply;one_pvar(0)
         %else;
           %apply;one_pvar(1)
