@@ -13,16 +13,25 @@
     $('#load_once_p_mod').one('click', function() {
       $.getScript('%if;(cgi)%bvar.static_path;%end;js/p_mod.js');
     });
-
     $('#load_once_copylink').one('click', function() {
       $.getScript('%if;(cgi)%bvar.static_path;%end;js/copylink.js');
     });
   </script>
-  %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
+  %if;wizard;
+    %if;(evar.m="MOD_DATA_OK" and evar.data!="")
+      <script>
+        var htmlTitle = document.title;
+        if (htmlTitle == "[*modification successful]" ||
+            htmlTitle == "[*no modification]") {
+          document.getElementById("reference").focus();
+        }
+      </script>
+    %end;
+    %if;(evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
        or evar.m="ADD_FAM_OK" or evar.m="DEL_FAM_OK"
        or evar.m="SND_IMAGE_OK" or evar.m="DEL_IMAGE_OK"
        or evar.m="CHG_EVT_IND_ORD_OK" or evar.m="CHG_EVT_FAM_ORD_OK"
-       or evar.m="MOD_DATA_OK"))
+       or (evar.m="MOD_DATA_OK" and evar.data=""))
     <script>
       var htmlTitle = document.title;
       if (htmlTitle == "[*person modified]" ||
@@ -38,6 +47,7 @@
           document.getElementById("i%evar.ip;").focus();
       }
     </script>
+    %end;
   %end;
 %end;
 %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"

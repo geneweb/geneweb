@@ -1132,7 +1132,7 @@ let print_mod_ok conf base =
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Wserver.printf "<p>\n";
-    Wserver.printf "<a href=\"%sm=MOD_DATA;data=%s;s=%s\">" (commd conf) data
+    Wserver.printf "<a href=\"%sm=MOD_DATA;data=%s;s=%s\" id=\"reference\">" (commd conf) data
       ini;
     Wserver.printf "%s" (capitale (transl conf "new modification"));
     Wserver.printf "</a>";
