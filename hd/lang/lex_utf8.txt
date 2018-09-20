@@ -380,10 +380,10 @@ eo: %1 de %2
 es: %1 de %2
 et: :g:%2 %1
 fi: :g:%2 %1
-fr: %1 d[e']%2
+fr: %1 d[e |’]%2
 he: %1 של %2
 is: %1 %2
-it: %1 d[i']%2
+it: %1 d[i |']%2
 lv: %1 -> %2
 nl: %1 van %2
 no: %1 til %2/%1 av %2
@@ -828,7 +828,7 @@ af: 1 %m %y/%d %m %y/%m %y/%y
 ar: 1 %m %y/%d %m %y/%m %y/%y
 bg: 1 %m %y/%d %m %y/%m %y/%y
 br: 1añ %m %y/%d %m %y/%m %y/%y
-ca: 1 d[e']%m de %y/%d d[e']%m de %y/%m de %y/%y
+ca: 1 d[e |']%m de %y/%d d[e |']%m de %y/%m de %y/%y
 co: 1<sup>u</sup> d[i']%m %y/%d d[i']%m %y/d[i']%m %y/in u %y
 cs: 1. %m %y/%d. %m %y/%m %y/%y
 da: 1. %m %y/%d. %m %y/%m %y/%y
@@ -845,7 +845,7 @@ it: 1º %m %y/%d %m %y/%m %y/%y
 lv: 1. %m %y/%y.gada %d.%m/%y %m/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
 no: 1. %m %y/%d. %m %y/%m %y/%y
-oc: 1<sup>èr</sup> d[e']%m de %y/%d d[e']%m de %y/%m de %y/%y
+oc: 1<sup>èr</sup> d[e |']%m de %y/%d d[e |']%m de %y/%m de %y/%y
 pl: 1 %m %y/%d %m %y/%m %y/%y
 pt: 1 de %m de %y/%d de %m de %y/%m %y/%y
 ro: 1 %m %y/%d. %m %y/%m %y/%y

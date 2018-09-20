@@ -394,12 +394,17 @@
       %and;%apply;dprec("event_witness_relation.event.date")%nn;
       %and;%count2;
       %and;%if;(event_witness_relation.event.date!="")%event_witness_relation.event.date;%else;([missing date]0)%end;%nn;
-      %and;%apply;a_of_b%with;%apply;a_of_b%with;%event_witness_relation_kind;%and;
-        %sp;%event_witness_relation.event.name;%end;%and;
-          %apply;short_display_person("event_witness_relation.person")%sp;
-          %if;(event_witness_relation.event.spouse != "")
-            %sp;[and]%sp;%apply;short_display_person("event_witness_relation.event.spouse")%nn;
-          %end;%end;%nn;
+      %and;%nn;
+        %apply;a_of_b%with;
+          %apply;a_of_b%with;
+            %event_witness_relation_kind;
+            %and;%event_witness_relation.event.name;
+          %end;
+          %and;%apply;short_display_person("event_witness_relation.person")%sp;
+            %if;(event_witness_relation.event.spouse != "")
+              %sp;[and]%sp;%apply;short_display_person("event_witness_relation.event.spouse")%nn;
+            %end;
+        %end;%nn;
       %and;%nn;
       %and;%nn;
       %and;%nn;

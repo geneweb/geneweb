@@ -156,6 +156,7 @@ val transl : config -> string -> string
 val transl_nth : config -> string -> int -> string
 val transl_decline : config -> string -> string -> string
 val transl_a_of_b : config -> string -> string -> string
+val transl_a_of_b2 : config -> string -> string -> string -> string
 val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string
 val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : config -> ('a, 'b) format2 -> int -> ('a, 'b) format2
