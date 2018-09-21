@@ -21,7 +21,7 @@ let has_children base u =
     (Array.to_list (get_family u))
 
 let string_of_marriage_text conf base fam =
-  let marriage = Adef.od_of_codate (get_marriage fam) in
+  let marriage = Adef.od_of_cdate (get_marriage fam) in
   let marriage_place = sou base (get_marriage_place fam) in
   let s =
     match marriage with
@@ -120,8 +120,8 @@ let nobility_titles_list conf base p =
   let titles =
     List.fold_right
       (fun t l ->
-         let t_date_start = Adef.od_of_codate t.t_date_start in
-         let t_date_end = Adef.od_of_codate t.t_date_end in
+         let t_date_start = Adef.od_of_cdate t.t_date_start in
+         let t_date_end = Adef.od_of_cdate t.t_date_end in
          match l with
            (nth, name, title, place, dates) :: rl
            when
@@ -666,7 +666,7 @@ let get_baptism_text conf p p_auth =
   in
   let on_baptism_date =
     let tmp_conf = {conf with cancel_links = true} in
-    match p_auth, Adef.od_of_codate (get_baptism p) with
+    match p_auth, Adef.od_of_cdate (get_baptism p) with
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
@@ -696,7 +696,7 @@ let get_birth_text conf p p_auth =
   in
   let on_birth_date =
     let tmp_conf = {conf with cancel_links = true} in
-    match p_auth, Adef.od_of_codate (get_birth p) with
+    match p_auth, Adef.od_of_cdate (get_birth p) with
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
@@ -720,7 +720,7 @@ let get_birth_text conf p p_auth =
 (* ************************************************************************ *)
 let get_marriage_date_text conf fam p_auth =
   let tmp_conf = {conf with cancel_links = true} in
-  match p_auth, Adef.od_of_codate (get_marriage fam) with
+  match p_auth, Adef.od_of_cdate (get_marriage fam) with
     true, Some d ->
       begin match p_getenv conf.base_env "long_date" with
         Some "yes" ->
@@ -750,7 +750,7 @@ let get_burial_text conf p p_auth =
     let tmp_conf = {conf with cancel_links = true} in
     match get_burial p with
       Buried cod ->
-        begin match p_auth, Adef.od_of_codate cod with
+        begin match p_auth, Adef.od_of_cdate cod with
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
@@ -784,7 +784,7 @@ let get_cremation_text conf p p_auth =
     let tmp_conf = {conf with cancel_links = true} in
     match get_burial p with
       Cremated cod ->
-        begin match p_auth, Adef.od_of_codate cod with
+        begin match p_auth, Adef.od_of_cdate cod with
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
@@ -1250,8 +1250,8 @@ let tree_generation_list conf base gv p =
 let get_date_place conf base auth_for_all_anc p =
   if auth_for_all_anc || authorized_age conf base p then
     let d1 =
-      match Adef.od_of_codate (get_birth p) with
-        None -> Adef.od_of_codate (get_baptism p)
+      match Adef.od_of_cdate (get_birth p) with
+        None -> Adef.od_of_cdate (get_baptism p)
       | x -> x
     in
     let d1 =
@@ -1260,7 +1260,7 @@ let get_date_place conf base auth_for_all_anc p =
         List.fold_left
           (fun d ifam ->
              if d <> None then d
-             else Adef.od_of_codate (get_marriage (foi base ifam)))
+             else Adef.od_of_cdate (get_marriage (foi base ifam)))
           d1 (Array.to_list (get_family p))
     in
     let d2 =
@@ -1268,8 +1268,8 @@ let get_date_place conf base auth_for_all_anc p =
         Death (_, cd) -> Some (Adef.date_of_cdate cd)
       | _ ->
           match get_burial p with
-            Buried cod -> Adef.od_of_codate cod
-          | Cremated cod -> Adef.od_of_codate cod
+            Buried cod -> Adef.od_of_cdate cod
+          | Cremated cod -> Adef.od_of_cdate cod
           | _ -> None
     in
     let auth_for_all_anc =
@@ -1561,9 +1561,9 @@ let build_list_eclair conf base v p =
       begin
         mark.(Adef.int_of_iper (get_key_index p)) <- true;
         add_surname p surn (get_birth_place p)
-          (Adef.od_of_codate (get_birth p));
+          (Adef.od_of_cdate (get_birth p));
         add_surname p surn (get_baptism_place p)
-          (Adef.od_of_codate (get_baptism p));
+          (Adef.od_of_cdate (get_baptism p));
         let death =
           match get_death p with
             Death (_, cd) -> Some (Adef.date_of_cdate cd)
@@ -1572,7 +1572,7 @@ let build_list_eclair conf base v p =
         add_surname p surn (get_death_place p) death;
         let burial =
           match get_burial p with
-            Buried cod | Cremated cod -> Adef.od_of_codate cod
+            Buried cod | Cremated cod -> Adef.od_of_cdate cod
           | _ -> None
         in
         add_surname p surn (get_burial_place p) burial;
@@ -1580,7 +1580,7 @@ let build_list_eclair conf base v p =
           (fun ifam ->
              let fam = foi base ifam in
              add_surname p surn (get_marriage_place fam)
-               (Adef.od_of_codate (get_marriage fam)))
+               (Adef.od_of_cdate (get_marriage fam)))
           (Array.to_list (get_family p))
       end
   in
@@ -1785,7 +1785,7 @@ and title_item =
   int * istr gen_title_name * istr * istr list *
     (date option * date option) list
 and event_item =
-  event_name * codate * istr * istr * istr * (iper * witness_kind) array *
+  event_name * cdate * istr * istr * istr * (iper * witness_kind) array *
     iper option
 and event_name =
     Pevent of istr gen_pers_event_name
@@ -2197,7 +2197,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
         Vfam (_, fam, _, m_auth) when mode_local env ->
           begin match get_divorce fam with
             Divorced d ->
-              let d = Adef.od_of_codate d in
+              let d = Adef.od_of_cdate d in
               begin match d with
                 Some d when m_auth ->
                   begin match p_getenv conf.base_env "long_date" with
@@ -2215,7 +2215,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             Vfam (_, fam, _, m_auth) ->
               begin match get_divorce fam with
                 Divorced d ->
-                  let d = Adef.od_of_codate d in
+                  let d = Adef.od_of_cdate d in
                   begin match d with
                     Some d when m_auth ->
                       begin match p_getenv conf.base_env "long_date" with
@@ -2235,7 +2235,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
         Vfam (_, fam, _, m_auth) ->
           begin match get_divorce fam with
             Divorced d ->
-              let d = Adef.od_of_codate d in
+              let d = Adef.od_of_cdate d in
               begin match d with
                 Some d when m_auth -> Date.string_slash_of_date conf d
               | _ -> ""
@@ -2408,7 +2408,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "on_marriage_date" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) when mode_local env ->
-          begin match m_auth, Adef.od_of_codate (get_marriage fam) with
+          begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
             true, Some s ->
               begin match p_getenv conf.base_env "long_date" with
                 Some "yes" ->
@@ -2420,7 +2420,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
       | _ ->
           match get_env "fam_link" env with
             Vfam (_, fam, _, m_auth) ->
-              begin match m_auth, Adef.od_of_codate (get_marriage fam) with
+              begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
                 true, Some s ->
                   begin match p_getenv conf.base_env "long_date" with
                     Some "yes" ->
@@ -2434,7 +2434,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "slash_marriage_date" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          begin match m_auth, Adef.od_of_codate (get_marriage fam) with
+          begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
             true, Some s -> Date.string_slash_of_date conf s
           | _ -> ""
           end
@@ -3193,19 +3193,19 @@ and eval_num conf n =
 and eval_person_field_var conf base env (p, p_auth as ep) loc =
   function
     "baptism_date" :: sl ->
-      begin match Adef.od_of_codate (get_baptism p) with
+      begin match Adef.od_of_cdate (get_baptism p) with
         Some d when p_auth -> eval_date_field_var conf d sl
       | _ -> VVstring ""
       end
   | "birth_date" :: sl ->
-      begin match Adef.od_of_codate (get_birth p) with
+      begin match Adef.od_of_cdate (get_birth p) with
         Some d when p_auth -> eval_date_field_var conf d sl
       | _ -> VVstring ""
       end
   | "burial_date" :: sl ->
       begin match get_burial p with
         Buried cod when p_auth ->
-          begin match Adef.od_of_codate cod with
+          begin match Adef.od_of_cdate cod with
             Some d -> eval_date_field_var conf d sl
           | None -> VVstring ""
           end
@@ -3214,7 +3214,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
   | "cremated_date" :: sl ->
       begin match get_burial p with
         Cremated cod when p_auth ->
-          begin match Adef.od_of_codate cod with
+          begin match Adef.od_of_cdate cod with
             Some d -> eval_date_field_var conf d sl
           | None -> VVstring ""
           end
@@ -3330,7 +3330,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
   | "marriage_date" :: sl ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, true) ->
-          begin match Adef.od_of_codate (get_marriage fam) with
+          begin match Adef.od_of_cdate (get_marriage fam) with
             Some d -> eval_date_field_var conf d sl
           | None -> VVstring ""
           end
@@ -3545,7 +3545,7 @@ and eval_nobility_title_field_var (id, pl) =
 and eval_bool_event_field base (p, p_auth)
     (_, date, place, note, src, w, isp) =
   function
-    "has_date" -> p_auth && date <> Adef.codate_None
+    "has_date" -> p_auth && date <> Adef.cdate_None
   | "has_place" -> p_auth && sou base place <> ""
   | "has_note" -> p_auth && sou base note <> ""
   | "has_src" -> p_auth && sou base src <> ""
@@ -3553,11 +3553,11 @@ and eval_bool_event_field base (p, p_auth)
   | "has_spouse" -> p_auth && isp <> None
   | "computable_age" ->
       if p_auth then
-        match Adef.od_of_codate (get_birth p) with
+        match Adef.od_of_cdate (get_birth p) with
           Some (Dgreg (d, _)) ->
             not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | _ ->
-            match Adef.od_of_codate (get_baptism p) with
+            match Adef.od_of_cdate (get_baptism p) with
               Some (Dgreg (d, _)) ->
                 not (d.day = 0 && d.month = 0 && d.prec <> Sure)
             | _ -> false
@@ -3569,11 +3569,11 @@ and eval_str_event_field conf base (p, p_auth)
     "age" ->
       if p_auth then
         let (birth_date, approx) =
-          match Adef.od_of_codate (get_birth p) with
-            None -> Adef.od_of_codate (get_baptism p), true
+          match Adef.od_of_cdate (get_birth p) with
+            None -> Adef.od_of_cdate (get_baptism p), true
           | x -> x, false
         in
-        match birth_date, Adef.od_of_codate date with
+        match birth_date, Adef.od_of_cdate date with
           Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
           Some (Dgreg (({prec = Sure | About | Maybe} as d2), _))
           when d1 <> d2 ->
@@ -3592,12 +3592,12 @@ and eval_str_event_field conf base (p, p_auth)
       | _ -> ""
       end
   | "date" ->
-      begin match p_auth, Adef.od_of_codate date with
+      begin match p_auth, Adef.od_of_cdate date with
         true, Some d -> Date.string_of_date conf d
       | _ -> ""
       end
   | "on_date" ->
-      begin match p_auth, Adef.od_of_codate date with
+      begin match p_auth, Adef.od_of_cdate date with
         true, Some d ->
           begin match p_getenv conf.base_env "long_date" with
             Some "yes" -> Date.string_of_ondate conf d ^ Date.get_wday conf d
@@ -3643,7 +3643,7 @@ and eval_event_field_var conf base env (p, p_auth)
     (name, date, place, note, src, w, isp) loc =
   function
     "date" :: sl ->
-      begin match p_auth, Adef.od_of_codate date with
+      begin match p_auth, Adef.od_of_cdate date with
         true, Some d -> eval_date_field_var conf d sl
       | _ -> VVstring ""
       end
@@ -3681,7 +3681,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       Util.accessible_by_key conf base p (p_first_name base p)
         (p_surname base p)
   | "birthday" ->
-      begin match p_auth, Adef.od_of_codate (get_birth p) with
+      begin match p_auth, Adef.od_of_cdate (get_birth p) with
         true, Some (Dgreg (d, _)) ->
           if d.prec = Sure && get_death p = NotDead then
             d.day = conf.today.day && d.month = conf.today.month &&
@@ -3696,7 +3696,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
         Vfam (_, fam, _, m_auth) ->
           begin match get_relation fam, get_divorce fam with
             (Married | NoSexesCheckMarried), NotDivorced ->
-              begin match m_auth, Adef.od_of_codate (get_marriage fam) with
+              begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
                 true, Some (Dgreg (d, _)) ->
                   let father = pget conf base (get_father fam) in
                   let mother = pget conf base (get_mother fam) in
@@ -3718,7 +3718,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       end
   | "computable_age" ->
       if p_auth then
-        match Adef.od_of_codate (get_birth p), get_death p with
+        match Adef.od_of_cdate (get_birth p), get_death p with
           Some (Dgreg (d, _)), NotDead ->
             not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | _ -> false
@@ -3740,8 +3740,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
         Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              Adef.od_of_codate (get_birth p),
-              Adef.od_of_codate (get_marriage fam)
+              Adef.od_of_cdate (get_birth p),
+              Adef.od_of_cdate (get_marriage fam)
             with
               Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
               Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)) ->
@@ -3763,7 +3763,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_aliases" ->
       if not p_auth && is_hide_names conf p then false
       else get_aliases p <> []
-  | "has_baptism_date" -> p_auth && get_baptism p <> Adef.codate_None
+  | "has_baptism_date" -> p_auth && get_baptism p <> Adef.cdate_None
   | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
   | "has_baptism_source" -> p_auth && sou base (get_baptism_src p) <> ""
   | "has_baptism_note" ->
@@ -3777,7 +3777,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             else loop events
       in
       p_auth && loop (events_list conf base p)
-  | "has_birth_date" -> p_auth && get_birth p <> Adef.codate_None
+  | "has_birth_date" -> p_auth && get_birth p <> Adef.cdate_None
   | "has_birth_place" -> p_auth && sou base (get_birth_place p) <> ""
   | "has_birth_source" -> p_auth && sou base (get_birth_src p) <> ""
   | "has_birth_note" ->
@@ -3794,7 +3794,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_burial_date" ->
       if p_auth then
         match get_burial p with
-          Buried cod -> Adef.od_of_codate cod <> None
+          Buried cod -> Adef.od_of_cdate cod <> None
         | _ -> false
       else false
   | "has_burial_place" -> p_auth && sou base (get_burial_place p) <> ""
@@ -3908,7 +3908,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_cremation_date" ->
       if p_auth then
         match get_burial p with
-          Cremated cod -> Adef.od_of_codate cod <> None
+          Cremated cod -> Adef.od_of_cdate cod <> None
         | _ -> false
       else false
   | "has_cremation_place" -> p_auth && sou base (get_burial_place p) <> ""
@@ -4133,7 +4133,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   function
     "access" -> acces conf base p
   | "age" ->
-      begin match p_auth, Adef.od_of_codate (get_birth p), get_death p with
+      begin match p_auth, Adef.od_of_cdate (get_birth p), get_death p with
         true, Some (Dgreg (d, _)), NotDead ->
           let a = CheckItem.time_elapsed d conf.today in
           Date.string_of_age conf a
@@ -4346,8 +4346,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              Adef.od_of_codate (get_birth p),
-              Adef.od_of_codate (get_marriage fam)
+              Adef.od_of_cdate (get_birth p),
+              Adef.od_of_cdate (get_marriage fam)
             with
               Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
               Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)) ->
@@ -4469,7 +4469,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         string_with_macros conf [] s
       else ""
   | "on_baptism_date" ->
-      begin match p_auth, Adef.od_of_codate (get_baptism p) with
+      begin match p_auth, Adef.od_of_cdate (get_baptism p) with
         true, Some d ->
           begin match p_getenv conf.base_env "long_date" with
             Some "yes" -> Date.string_of_ondate conf d ^ Date.get_wday conf d
@@ -4478,12 +4478,12 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | _ -> ""
       end
   | "slash_baptism_date" ->
-      begin match p_auth, Adef.od_of_codate (get_baptism p) with
+      begin match p_auth, Adef.od_of_cdate (get_baptism p) with
         true, Some d -> Date.string_slash_of_date conf d
       | _ -> ""
       end
   | "on_birth_date" ->
-      begin match p_auth, Adef.od_of_codate (get_birth p) with
+      begin match p_auth, Adef.od_of_cdate (get_birth p) with
         true, Some d ->
           begin match p_getenv conf.base_env "long_date" with
             Some "yes" -> Date.string_of_ondate conf d ^ Date.get_wday conf d
@@ -4492,7 +4492,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | _ -> ""
       end
   | "slash_birth_date" ->
-      begin match p_auth, Adef.od_of_codate (get_birth p) with
+      begin match p_auth, Adef.od_of_cdate (get_birth p) with
         true, Some d -> Date.string_slash_of_date conf d
       | _ -> ""
       end
@@ -4506,7 +4506,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "on_burial_date" ->
       begin match get_burial p with
         Buried cod ->
-          begin match p_auth, Adef.od_of_codate cod with
+          begin match p_auth, Adef.od_of_cdate cod with
             true, Some d ->
               begin match p_getenv conf.base_env "long_date" with
                 Some "yes" ->
@@ -4536,7 +4536,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "slash_burial_date" ->
       begin match get_burial p with
         Buried cod ->
-          begin match p_auth, Adef.od_of_codate cod with
+          begin match p_auth, Adef.od_of_cdate cod with
             true, Some d -> Date.string_slash_of_date conf d
           | _ -> ""
           end
@@ -4545,7 +4545,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "on_cremation_date" ->
       begin match get_burial p with
         Cremated cod ->
-          begin match p_auth, Adef.od_of_codate cod with
+          begin match p_auth, Adef.od_of_cdate cod with
             true, Some d ->
               begin match p_getenv conf.base_env "long_date" with
                 Some "yes" ->
@@ -4559,7 +4559,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "slash_cremation_date" ->
       begin match get_burial p with
         Cremated cod ->
-          begin match p_auth, Adef.od_of_codate cod with
+          begin match p_auth, Adef.od_of_cdate cod with
             true, Some d -> Date.string_slash_of_date conf d
           | _ -> ""
           end
@@ -4699,7 +4699,7 @@ and eval_family_field_var conf base env
           eval_person_field_var conf base env ep loc sl
       end
   | "marriage_date" :: sl ->
-      begin match Adef.od_of_codate (get_marriage fam) with
+      begin match Adef.od_of_cdate (get_marriage fam) with
         Some d when m_auth -> eval_date_field_var conf d sl
       | _ -> VVstring ""
       end
@@ -4777,7 +4777,7 @@ and string_of_parent_age conf base (p, p_auth) parent =
       let pp = pget conf base (parent cpl) in
       if p_auth && authorized_age conf base pp then
         match
-          Adef.od_of_codate (get_birth pp), Adef.od_of_codate (get_birth p)
+          Adef.od_of_cdate (get_birth pp), Adef.od_of_cdate (get_birth p)
         with
           Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
             Date.string_of_age conf (CheckItem.time_elapsed d1 d2)
@@ -5735,13 +5735,13 @@ let print_foreach conf base print_ast eval_expr =
         List.sort
           (fun (c1, _) (c2, _) ->
              let d1 =
-               match Adef.od_of_codate (get_baptism c1) with
-                 None -> Adef.od_of_codate (get_birth c1)
+               match Adef.od_of_cdate (get_baptism c1) with
+                 None -> Adef.od_of_cdate (get_birth c1)
                | x -> x
              in
              let d2 =
-               match Adef.od_of_codate (get_baptism c2) with
-                 None -> Adef.od_of_codate (get_birth c2)
+               match Adef.od_of_cdate (get_baptism c2) with
+                 None -> Adef.od_of_cdate (get_birth c2)
                | x -> x
              in
              match d1, d2 with
@@ -5917,8 +5917,8 @@ let print_foreach conf base print_ast eval_expr =
       List.sort
         (fun (_, fam1) (_, fam2) ->
            match
-             Adef.od_of_codate (get_marriage fam1),
-             Adef.od_of_codate (get_marriage fam2)
+             Adef.od_of_cdate (get_marriage fam1),
+             Adef.od_of_cdate (get_marriage fam2)
            with
              Some d1, Some d2 ->
                if CheckItem.strictly_before d1 d2 then -1

@@ -12,7 +12,7 @@ open Api_update_util
 let reconstitute_family conf base mod_f =
   (* Valeurs par défaut qui seront écrasées par reconstitute_from_fevents. *)
   let relation = NoMention in
-  let marriage = Adef.codate_None in
+  let marriage = Adef.cdate_None in
   let marriage_place = "" in
   let marriage_note = "" in
   let marriage_src = "" in
@@ -98,7 +98,7 @@ let reconstitute_family conf base mod_f =
               | None -> accu)
             evt.Mwrite.Fevent.witnesses []
         in
-        { efam_name = name; efam_date = Adef.codate_of_od date;
+        { efam_name = name; efam_date = Adef.cdate_of_od date;
           efam_place = place; efam_reason = reason; efam_note = note;
           efam_src = src; efam_witnesses = Array.of_list witnesses })
       mod_f.Mwrite.Family.fevents
@@ -643,7 +643,7 @@ let empty_mod_fam conf base ip =
   let origin_file = "" in
   let fam_index = Adef.ifam_of_int 0 in
   let fam =
-    {marriage = Adef.codate_of_od marriage; marriage_place = marriage_place;
+    {marriage = Adef.cdate_of_od marriage; marriage_place = marriage_place;
      marriage_note = marriage_note; marriage_src = marriage_src;
      fevents = fevents; witnesses = Array.of_list witnesses;
      relation = relation; divorce = divorce; comment = comment;

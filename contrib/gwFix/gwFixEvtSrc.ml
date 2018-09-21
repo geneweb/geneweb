@@ -12,14 +12,14 @@ let update_database_with_burial base =
   for i = 0 to nb_of_persons base - 1 do
     let p = poi base (Adef.iper_of_int i) in
     let evt_birth =
-      match Adef.od_of_codate (get_birth p) with
+      match Adef.od_of_cdate (get_birth p) with
         Some d -> None
       | None ->
           if sou base (get_birth_place p) <> "" then None
           else if sou base (get_birth_src p) = "" then None
           else
             let evt =
-              {epers_name = Epers_Birth; epers_date = Adef.codate_None;
+              {epers_name = Epers_Birth; epers_date = Adef.cdate_None;
                epers_place = empty_string; epers_reason = empty_string;
                epers_note = empty_string; epers_src = get_birth_src p;
                epers_witnesses = [| |]}
@@ -27,14 +27,14 @@ let update_database_with_burial base =
             Some evt
     in
     let evt_bapt =
-      match Adef.od_of_codate (get_baptism p) with
+      match Adef.od_of_cdate (get_baptism p) with
         Some d -> None
       | None ->
           if sou base (get_baptism_place p) <> "" then None
           else if sou base (get_baptism_src p) = "" then None
           else
             let evt =
-              {epers_name = Epers_Baptism; epers_date = Adef.codate_None;
+              {epers_name = Epers_Baptism; epers_date = Adef.cdate_None;
                epers_place = empty_string; epers_reason = empty_string;
                epers_note = empty_string; epers_src = get_baptism_src p;
                epers_witnesses = [| |]}
@@ -50,7 +50,7 @@ let update_database_with_burial base =
             None
           else
             let evt =
-              {epers_name = Epers_Death; epers_date = Adef.codate_None;
+              {epers_name = Epers_Death; epers_date = Adef.cdate_None;
                epers_place = get_death_place p; epers_reason = empty_string;
                epers_note = empty_string; epers_src = get_death_src p;
                epers_witnesses = [| |]}
@@ -67,7 +67,7 @@ let update_database_with_burial base =
             None
           else
             let evt =
-              {epers_name = Epers_Burial; epers_date = Adef.codate_None;
+              {epers_name = Epers_Burial; epers_date = Adef.cdate_None;
                epers_place = get_burial_place p; epers_reason = empty_string;
                epers_note = empty_string; epers_src = get_burial_src p;
                epers_witnesses = [| |]}

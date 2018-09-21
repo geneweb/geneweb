@@ -175,7 +175,7 @@ let int_size = 4
 
 let update_pevents_with_person so =
   let evt_birth =
-    if Adef.od_of_codate so.birth <> None
+    if Adef.od_of_cdate so.birth <> None
     then
       let evt =
         {epers_name = Epers_Birth; epers_date = so.birth;
@@ -195,7 +195,7 @@ let update_pevents_with_person so =
       Some evt
   in
   let evt_bapt =
-    if Adef.od_of_codate so.baptism <> None
+    if Adef.od_of_cdate so.baptism <> None
     then
       let evt =
         {epers_name = Epers_Baptism; epers_date = so.baptism;
@@ -220,14 +220,14 @@ let update_pevents_with_person so =
         if so.death_place = "" && so.death_src = "" then None
         else
           let evt =
-            {epers_name = Epers_Death; epers_date = Adef.codate_None;
+            {epers_name = Epers_Death; epers_date = Adef.cdate_None;
              epers_place = so.death_place; epers_reason = "";
              epers_note = so.death_note; epers_src = so.death_src;
              epers_witnesses = [| |]}
           in
           Some evt
     | Death (_, cd) ->
-        let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
+        let date = Adef.cdate_of_od (Some (Adef.date_of_cdate cd)) in
         let evt =
           {epers_name = Epers_Death; epers_date = date;
            epers_place = so.death_place; epers_reason = "";
@@ -237,7 +237,7 @@ let update_pevents_with_person so =
         Some evt
     | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         let evt =
-          {epers_name = Epers_Death; epers_date = Adef.codate_None;
+          {epers_name = Epers_Death; epers_date = Adef.cdate_None;
            epers_place = so.death_place; epers_reason = "";
            epers_note = so.death_note; epers_src = so.death_src;
            epers_witnesses = [| |]}
@@ -250,7 +250,7 @@ let update_pevents_with_person so =
         if so.burial_place = "" && so.burial_src = "" then None
         else
           let evt =
-            {epers_name = Epers_Burial; epers_date = Adef.codate_None;
+            {epers_name = Epers_Burial; epers_date = Adef.cdate_None;
              epers_place = so.burial_place; epers_reason = "";
              epers_note = so.burial_note; epers_src = so.burial_src;
              epers_witnesses = [| |]}
@@ -424,9 +424,9 @@ let empty_person =
   {first_name = ""; surname = ""; occ = 0; image = "";
    first_names_aliases = []; surnames_aliases = []; public_name = "";
    qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
-   occupation = ""; sex = Neuter; access = IfTitles; birth = Adef.codate_None;
+   occupation = ""; sex = Neuter; access = IfTitles; birth = Adef.cdate_None;
    birth_place = ""; birth_note = ""; birth_src = "";
-   baptism = Adef.codate_None; baptism_place = ""; baptism_note = "";
+   baptism = Adef.cdate_None; baptism_place = ""; baptism_note = "";
    baptism_src = ""; death = DontKnowIfDead; death_place = "";
    death_note = ""; death_src = ""; burial = UnknownBurial; burial_place = "";
    burial_note = ""; burial_src = ""; pevents = []; notes = ""; psources = "";
@@ -597,10 +597,10 @@ let update_family_with_fevents fam =
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
-                match Adef.od_of_codate evt.efam_date with
+                match Adef.od_of_cdate evt.efam_date with
                   Some (Dgreg (dmy, cal)) ->
                     let dmy = {dmy with prec = About} in
-                    Adef.codate_of_od (Some (Dgreg (dmy, cal)))
+                    Adef.cdate_of_od (Some (Dgreg (dmy, cal)))
                 | _ -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
@@ -687,7 +687,7 @@ let update_fevents_with_family fam =
         Some evt
     | Separated ->
         let evt =
-          {efam_name = Efam_Separated; efam_date = Adef.codate_None;
+          {efam_name = Efam_Separated; efam_date = Adef.cdate_None;
            efam_place = ""; efam_reason = ""; efam_note = ""; efam_src = "";
            efam_witnesses = [| |]}
         in

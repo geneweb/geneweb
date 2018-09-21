@@ -428,8 +428,8 @@ let person_of_iper_list conf base ipl =
   String.concat ", " list
 
 
-let string_of_codate conf cod =
-  match Adef.od_of_codate cod with
+let string_of_cdate conf cod =
+  match Adef.od_of_cdate cod with
     Some d -> Date.string_slash_of_date conf d
   | None -> ""
 
@@ -440,7 +440,7 @@ let string_of_death conf death =
 
 let string_of_burial conf burial =
   match burial with
-    Buried cod | Cremated cod -> string_of_codate conf cod
+    Buried cod | Cremated cod -> string_of_cdate conf cod
   | _ -> ""
 
 let string_of_title conf titles =
@@ -453,8 +453,8 @@ let string_of_title conf titles =
     let name = t.t_ident ^ " " ^ t.t_place in
     let name = if name = " " then "" else name in
     let dates =
-      string_of_codate conf t.t_date_start ^ "-" ^
-      string_of_codate conf t.t_date_end
+      string_of_cdate conf t.t_date_start ^ "-" ^
+      string_of_cdate conf t.t_date_end
     in
     let dates = if dates = "-" then "" else "(" ^ dates ^ ")" in
     let nth = if t.t_nth = 0 then "" else string_of_int t.t_nth in
@@ -545,7 +545,7 @@ let string_of_marriage conf marriage =
 let string_of_divorce conf divorce =
   match divorce with
     NotDivorced -> ""
-  | Divorced cod -> transl conf "divorced" ^ " " ^ string_of_codate conf cod
+  | Divorced cod -> transl conf "divorced" ^ " " ^ string_of_cdate conf cod
   | Separated -> transl conf "separated"
 
 let string_of_event_witness conf base witnesses =
@@ -862,8 +862,8 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       else "", ""
   | "birth" ->
       if p_auth then
-        let b = string_of_codate conf bef.gen_p.birth in
-        let a = string_of_codate conf aft.gen_p.birth in diff_string b a
+        let b = string_of_cdate conf bef.gen_p.birth in
+        let a = string_of_cdate conf aft.gen_p.birth in diff_string b a
       else "", ""
   | "birth_place" ->
       if p_auth then
@@ -882,8 +882,8 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       else "", ""
   | "baptism" ->
       if p_auth then
-        let b = string_of_codate conf bef.gen_p.baptism in
-        let a = string_of_codate conf aft.gen_p.baptism in diff_string b a
+        let b = string_of_cdate conf bef.gen_p.baptism in
+        let a = string_of_cdate conf aft.gen_p.baptism in diff_string b a
       else "", ""
   | "baptism_place" ->
       if p_auth then
@@ -961,10 +961,10 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if p_auth then
             match bef, aft with
               Some b, Some a ->
-                let b = string_of_codate conf b.epers_date in
-                let a = string_of_codate conf a.epers_date in diff_string b a
-            | None, Some a -> "", string_of_codate conf a.epers_date
-            | Some b, None -> string_of_codate conf b.epers_date, ""
+                let b = string_of_cdate conf b.epers_date in
+                let a = string_of_cdate conf a.epers_date in diff_string b a
+            | None, Some a -> "", string_of_cdate conf a.epers_date
+            | Some b, None -> string_of_cdate conf b.epers_date, ""
             | None, None -> "", ""
           else "", ""
       | _ -> raise Not_found
@@ -1052,10 +1052,10 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if m_auth then
             match bef, aft with
               Some b, Some a ->
-                let b = string_of_codate conf b.marriage in
-                let a = string_of_codate conf a.marriage in diff_string b a
-            | None, Some a -> "", string_of_codate conf a.marriage
-            | Some b, None -> string_of_codate conf b.marriage, ""
+                let b = string_of_cdate conf b.marriage in
+                let a = string_of_cdate conf a.marriage in diff_string b a
+            | None, Some a -> "", string_of_cdate conf a.marriage
+            | Some b, None -> string_of_cdate conf b.marriage, ""
             | None, None -> "", ""
           else "", ""
       | _ -> raise Not_found
@@ -1158,10 +1158,10 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if m_auth then
             match bef, aft with
               Some b, Some a ->
-                let b = string_of_codate conf b.efam_date in
-                let a = string_of_codate conf a.efam_date in diff_string b a
-            | None, Some a -> "", string_of_codate conf a.efam_date
-            | Some b, None -> string_of_codate conf b.efam_date, ""
+                let b = string_of_cdate conf b.efam_date in
+                let a = string_of_cdate conf a.efam_date in diff_string b a
+            | None, Some a -> "", string_of_cdate conf a.efam_date
+            | Some b, None -> string_of_cdate conf b.efam_date, ""
             | None, None -> "", ""
           else "", ""
       | _ -> raise Not_found

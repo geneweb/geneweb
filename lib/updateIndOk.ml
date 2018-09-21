@@ -52,7 +52,7 @@ let reconstitute_insert_title conf ext cnt tl =
         if n > 0 then
           let t1 =
             {t_name = Tnone; t_ident = ""; t_place = "";
-             t_date_start = Adef.codate_None; t_date_end = Adef.codate_None;
+             t_date_start = Adef.cdate_None; t_date_end = Adef.cdate_None;
              t_nth = 0}
           in
           loop (t1 :: tl) (n - 1)
@@ -89,8 +89,8 @@ let rec reconstitute_titles conf ext cnt =
       let t =
         {t_name = t_name; t_ident = no_html_tags (only_printable t_ident);
          t_place = no_html_tags (only_printable t_place);
-         t_date_start = Adef.codate_of_od t_date_start;
-         t_date_end = Adef.codate_of_od t_date_end; t_nth = t_nth}
+         t_date_start = Adef.cdate_of_od t_date_start;
+         t_date_end = Adef.cdate_of_od t_date_end; t_nth = t_nth}
       in
       let (tl, ext) = reconstitute_titles conf ext (cnt + 1) in
       let (tl, ext) = reconstitute_insert_title conf ext cnt tl in
@@ -142,7 +142,7 @@ let reconstitute_insert_pevent conf ext cnt el =
       let rec loop el n =
         if n > 0 then
           let e1 =
-            {epers_name = Epers_Name ""; epers_date = Adef.codate_None;
+            {epers_name = Epers_Name ""; epers_date = Adef.cdate_None;
              epers_place = ""; epers_reason = ""; epers_note = "";
              epers_src = ""; epers_witnesses = [| |]}
           in
@@ -313,7 +313,7 @@ let rec reconstitute_pevents conf ext cnt =
         | _ -> witnesses, ext
       in
       let e =
-        {epers_name = epers_name; epers_date = Adef.codate_of_od epers_date;
+        {epers_name = epers_name; epers_date = Adef.cdate_of_od epers_date;
          epers_place = epers_place; epers_reason = "";
          epers_note = epers_note; epers_src = epers_src;
          epers_witnesses = Array.of_list witnesses}
@@ -418,7 +418,7 @@ let reconstitute_death conf birth baptism death_place burial burial_place =
          dr <> Unspecified
       then
         DeadDontKnowWhen
-      else Update.infer_death conf birth baptism
+      else Update.infer_death_bb conf birth baptism
   | "DeadYoung" when d = None -> DeadYoung
   | "DontKnowIfDead" when d = None -> DontKnowIfDead
   | "NotDead" -> NotDead
@@ -434,10 +434,10 @@ let reconstitute_burial conf burial_place =
     Some "UnknownBurial" | None ->
       begin match d, burial_place with
         None, "" -> UnknownBurial
-      | _ -> Buried (Adef.codate_of_od d)
+      | _ -> Buried (Adef.cdate_of_od d)
       end
-  | Some "Buried" -> Buried (Adef.codate_of_od d)
-  | Some "Cremated" -> Cremated (Adef.codate_of_od d)
+  | Some "Buried" -> Buried (Adef.cdate_of_od d)
+  | Some "Cremated" -> Cremated (Adef.cdate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x)
 
 let reconstitute_from_pevents pevents ext bi bp de bu =
@@ -481,7 +481,7 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
             if !found_death then loop l bi bp de bu
             else
               let death =
-                match Adef.od_of_codate evt.epers_date with
+                match Adef.od_of_cdate evt.epers_date with
                   Some d ->
                     Death (death_reason_std_fields, Adef.cdate_of_date d)
                 | None ->
@@ -558,8 +558,8 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
     else pevents
   in
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
-  let bi = if not !found_birth then Adef.codate_None, "", "", "" else bi in
-  let bp = if not !found_baptism then Adef.codate_None, "", "", "" else bp in
+  let bi = if not !found_birth then Adef.cdate_None, "", "", "" else bi in
+  let bp = if not !found_baptism then Adef.cdate_None, "", "", "" else bp in
   let de =
     if not !found_death then
       if !found_burial then DeadDontKnowWhen, "", "", ""
@@ -677,8 +677,8 @@ let reconstitute_person conf =
   (* Mise à jour des évènements principaux. *)
   let (bi, bp, de, bu, pevents) =
     reconstitute_from_pevents pevents ext
-      (Adef.codate_of_od birth, birth_place, birth_note, birth_src)
-      (Adef.codate_of_od bapt, bapt_place, bapt_note, bapt_src)
+      (Adef.cdate_of_od birth, birth_place, birth_note, birth_src)
+      (Adef.cdate_of_od bapt, bapt_place, bapt_note, bapt_src)
       (death, death_place, death_note, death_src)
       (burial, burial_place, burial_note, burial_src)
   in
@@ -691,8 +691,9 @@ let reconstitute_person conf =
   let death =
     match death with
       DontKnowIfDead ->
-        Update.infer_death conf (Adef.od_of_codate birth)
-          (Adef.od_of_codate bapt)
+      (* FIXME: do not use _bb version *)
+        Update.infer_death_bb conf (Adef.od_of_cdate birth)
+          (Adef.od_of_cdate bapt)
     | _ -> death
   in
   let p =
@@ -776,7 +777,7 @@ let strip_pevents p =
          match e.epers_name with
            Epers_Name s -> s <> "", strip_array_witness e.epers_witnesses
          | Epers_Birth | Epers_Baptism ->
-             Adef.od_of_codate e.epers_date <> None || e.epers_place <> "" ||
+             Adef.od_of_cdate e.epers_date <> None || e.epers_place <> "" ||
              e.epers_reason <> "" || e.epers_note <> "" || e.epers_src <> "",
              strip_array_witness e.epers_witnesses
          | _ -> true, strip_array_witness e.epers_witnesses
@@ -925,6 +926,7 @@ let pwitnesses_of pevents =
          (Array.to_list e.epers_witnesses))
     [] pevents
 
+(* sp.death *)
 let effective_mod conf base sp =
   let pi = sp.key_index in
   let op = poi base pi in
@@ -1118,8 +1120,8 @@ let effective_del base warning p =
    public_name = empty; qualifiers = []; aliases = []; sex = get_sex p;
    first_names_aliases = []; surnames_aliases = []; titles = [];
    rparents = []; related = []; occupation = empty; access = IfTitles;
-   birth = Adef.codate_None; birth_place = empty; birth_note = empty;
-   birth_src = empty; baptism = Adef.codate_None; baptism_place = empty;
+   birth = Adef.cdate_None; birth_place = empty; birth_note = empty;
+   birth_src = empty; baptism = Adef.cdate_None; baptism_place = empty;
    baptism_note = empty; baptism_src = empty; death = DontKnowIfDead;
    death_place = empty; death_note = empty; death_src = empty;
    burial = UnknownBurial; burial_place = empty; burial_note = empty;

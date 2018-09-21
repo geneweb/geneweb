@@ -11,7 +11,7 @@ type somebody =
 type gw_syntax =
     Family of
       somebody gen_couple * sex * sex * (somebody * sex) list *
-        (string gen_fam_event_name * codate * string * string * string *
+        (string gen_fam_event_name * cdate * string * string * string *
            string * (somebody * sex * witness_kind) list)
           list *
         ((iper, string) gen_person, string) gen_family *
@@ -20,7 +20,7 @@ type gw_syntax =
   | Relations of somebody * sex * (somebody, string) gen_relation list
   | Pevent of
       somebody * sex *
-        (string gen_pers_event_name * codate * string * string * string *
+        (string gen_pers_event_name * cdate * string * string * string *
            string * (somebody * sex * witness_kind) list)
           list
   | Bnotes of string * string

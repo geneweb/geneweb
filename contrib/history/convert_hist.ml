@@ -21,10 +21,10 @@ type ('person, 'string) old_gen_person =
     old_occupation : 'string;
     old_sex : sex;
     old_access : access;
-    old_birth : codate;
+    old_birth : cdate;
     old_birth_place : 'string;
     old_birth_src : 'string;
-    old_baptism : codate;
+    old_baptism : cdate;
     old_baptism_place : 'string;
     old_baptism_src : 'string;
     old_death : death;
@@ -38,7 +38,7 @@ type ('person, 'string) old_gen_person =
     old_key_index : iper }
 
 type ('person, 'string) old_gen_family =
-  { old_marriage : codate;
+  { old_marriage : cdate;
     old_marriage_place : 'string;
     old_marriage_src : 'string;
     old_witnesses : 'person array;

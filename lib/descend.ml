@@ -399,7 +399,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Wserver.printf "%s" (Date.short_dates_text conf base ancestor);
   let p = ancestor in
   if authorized_age conf base p then
-    begin match Adef.od_of_codate (get_birth p), get_death p with
+    begin match Adef.od_of_cdate (get_birth p), get_death p with
       Some _, _ | _, Death (_, _) -> html_br conf
     | _ -> ()
     end;
@@ -787,7 +787,7 @@ let print_person_table conf base p lab =
             if authorized_age conf base p && authorized_age conf base spouse
             then
               let fam = foi base (get_family u).(0) in
-              match Adef.od_of_codate (get_marriage fam) with
+              match Adef.od_of_cdate (get_marriage fam) with
                 Some d -> Date.string_slash_of_date conf d
               | _ -> "&nbsp;"
             else "&nbsp;"
@@ -923,7 +923,7 @@ let print_person_table conf base p lab =
               if authorized_age conf base p && authorized_age conf base spouse
               then
                 let fam = foi base (get_family u).(i) in
-                match Adef.od_of_codate (get_marriage fam) with
+                match Adef.od_of_cdate (get_marriage fam) with
                   Some d -> Date.string_slash_of_date conf d
                 | _ -> "&nbsp;"
               else "&nbsp;"
@@ -1331,7 +1331,7 @@ let print_aboville conf base max_level p =
           if authorized_age conf base p && authorized_age conf base spouse
           then
             let fam = foi base (get_family u).(i) in
-            match Adef.od_of_codate (get_marriage fam) with
+            match Adef.od_of_cdate (get_marriage fam) with
               Some (Dgreg (d, _)) ->
                 let date = Date.prec_year_text conf d in
                 "<font size=\"-2\"><em>" ^ date ^ "</em></font>"

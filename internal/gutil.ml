@@ -224,8 +224,8 @@ let sort_person_list base pl =
   List.sort
     (fun p1 p2 ->
        match
-         Adef.od_of_codate (get_birth p1), get_death p1,
-         Adef.od_of_codate (get_birth p2), get_death p2
+         Adef.od_of_cdate (get_birth p1), get_death p1,
+         Adef.od_of_cdate (get_birth p2), get_death p2
        with
          Some d1, _, Some d2, _ ->
            if CheckItem.strictly_before d1 d2 then -1 else 1

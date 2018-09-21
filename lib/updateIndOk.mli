@@ -43,12 +43,12 @@ val reconstitute_death :
     string -> Def.death
 val reconstitute_from_pevents :
   ('a, string) Def.gen_pers_event list -> bool ->
-    Def.codate * string * string * string ->
-    Def.codate * string * string * string ->
+    Def.cdate * string * string * string ->
+    Def.cdate * string * string * string ->
     Def.death * string * string * string ->
     Def.burial * string * string * string ->
-    (Def.codate * string * string * string) *
-      (Def.codate * string * string * string) *
+    (Def.cdate * string * string * string) *
+      (Def.cdate * string * string * string) *
       (Def.death * string * string * string) *
       (Def.burial * string * string * string) *
       ('a, string) Def.gen_pers_event list

@@ -25,7 +25,7 @@ let update_database_with_burial base =
                 flush stderr
               end;
             let evt =
-              {epers_name = Epers_Burial; epers_date = Adef.codate_None;
+              {epers_name = Epers_Burial; epers_date = Adef.cdate_None;
                epers_place = get_burial_place p; epers_reason = empty_string;
                epers_note = empty_string; epers_src = get_burial_src p;
                epers_witnesses = [| |]}

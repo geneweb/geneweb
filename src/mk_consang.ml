@@ -335,7 +335,7 @@ let rebuild_fields2 db2 =
     ("sex", (fun p -> p.Def.sex));
   rebuild_any_field_array db2 fi_per Def.IfTitles true
     ("access", (fun p -> p.Def.access));
-  List.iter (rebuild_any_field_array db2 fi_per Adef.codate_None true)
+  List.iter (rebuild_any_field_array db2 fi_per Adef.cdate_None true)
     ["birth", (fun p -> p.Def.birth); "baptism", (fun p -> p.Def.baptism)];
   rebuild_any_field_array db2 fi_per Def.NotDead true
     ("death", (fun p -> p.Def.death));
@@ -363,7 +363,7 @@ let rebuild_fields2 db2 =
      fi_ht = db2.Db2disk.patches.Db2disk.h_descend;
      fi_index_of_int = Adef.ifam_of_int; fi_dir = "family"}
   in
-  rebuild_any_field_array db2 fi_fam Adef.codate_None true
+  rebuild_any_field_array db2 fi_fam Adef.cdate_None true
     ("marriage", (fun f -> f.Def.marriage));
   List.iter (rebuild_string_field db2 fi_fam)
     ["marriage_place", (fun f -> f.Def.marriage_place);

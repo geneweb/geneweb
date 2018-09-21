@@ -189,9 +189,9 @@ let compatible_dates date1 date2 =
     | Dgreg (_, _), Dtext _ -> false
     | Dtext _, _ -> true
 
-let compatible_codates codate1 codate2 =
-  let od1 = Adef.od_of_codate codate1 in
-  let od2 = Adef.od_of_codate codate2 in
+let compatible_cdates cdate1 cdate2 =
+  let od1 = Adef.od_of_cdate cdate1 in
+  let od2 = Adef.od_of_cdate cdate2 in
   match od1, od2 with
     Some date1, Some date2 -> compatible_dates date1 date2
   | Some _, None -> false
@@ -199,12 +199,12 @@ let compatible_codates codate1 codate2 =
 
 let compatible_birth base1 base2 p1 p2 =
   let get_birth person =
-    if person.birth = Adef.codate_None then person.baptism else person.birth
+    if person.birth = Adef.cdate_None then person.baptism else person.birth
   in
   let birth1 = get_birth p1 in
   let birth2 = get_birth p2 in
   let res1 =
-    if compatible_codates birth1 birth2 then [] else [MsgBirthDate]
+    if compatible_cdates birth1 birth2 then [] else [MsgBirthDate]
   in
   let res2 =
     if compatible_str_field p1.birth_place p2.birth_place then []
@@ -299,7 +299,7 @@ let rec find_compatible_unions base1 base2 iper1 iper2 ifam1 ifam2_list =
 
 let compatible_divorces d1 d2 =
   match d1, d2 with
-    Divorced codate1, Divorced codate2 -> compatible_codates codate1 codate2
+    Divorced cdate1, Divorced cdate2 -> compatible_cdates cdate1 cdate2
   | Divorced _, _ -> false
   | _ -> true
 
@@ -307,7 +307,7 @@ let compatible_marriages base1 base2 ifam1 ifam2 =
   let f1 = gen_family_of_family (foi base1 ifam1) in
   let f2 = gen_family_of_family (foi base2 ifam2) in
   let res1 =
-    if compatible_codates f1.marriage f2.marriage then []
+    if compatible_cdates f1.marriage f2.marriage then []
     else [MsgMarriageDate]
   in
   let res2 =

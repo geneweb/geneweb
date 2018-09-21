@@ -12,7 +12,7 @@ let lune bname =
   let nbb = ref 0 in
   for i = 0 to nb_of_persons base - 1 do
     let p = poi base (Adef.iper_of_int i) in
-    match Adef.od_of_codate (get_birth p) with
+    match Adef.od_of_cdate (get_birth p) with
       Some (Dgreg (dt, _)) ->
         if dt.prec = Sure && dt.delta = 0 && dt.day > 0 then
           begin

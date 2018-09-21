@@ -504,7 +504,7 @@ let strictly_after_private_years conf a =
 
 let is_old_person conf p =
   match
-    Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism, p.death,
+    Adef.od_of_cdate p.birth, Adef.od_of_cdate p.baptism, p.death,
     CheckItem.date_of_death p.death
   with
     _, _, NotDead, _ when conf.private_years > 0 -> false
@@ -556,41 +556,43 @@ let fast_auth_age conf p =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 let authorized_age conf base p =
-  if conf.wizard || conf.friend || get_access p = Public then true
-  else if
-    conf.public_if_titles && get_access p = IfTitles &&
-    nobtit conf base p <> []
-  then
-    true
-  else
-    match
-      Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-      get_death p, CheckItem.date_of_death (get_death p)
-    with
-      _, _, NotDead, _ when conf.private_years > 0 -> false
-    | Some (Dgreg (d, _)), _, _, _ ->
-        let a = CheckItem.time_elapsed d conf.today in
-        strictly_after_private_years conf a
-    | _, Some (Dgreg (d, _)), _, _ ->
-        let a = CheckItem.time_elapsed d conf.today in
-        strictly_after_private_years conf a
-    | _, _, _, Some (Dgreg (d, _)) ->
-        let a = CheckItem.time_elapsed d conf.today in
-        strictly_after_private_years conf a
-    | None, None, DontKnowIfDead, None ->
-        get_access p <> Private && conf.public_if_no_date
-    | _ ->
-        let rec loop i =
-          if i >= Array.length (get_family p) then false
-          else
-            let fam = foi base (get_family p).(i) in
-            match Adef.od_of_codate (get_marriage fam) with
-              Some (Dgreg (d, _)) ->
-                let a = CheckItem.time_elapsed d conf.today in
-                strictly_after_private_years conf a
-            | _ -> loop (i + 1)
-        in
-        loop 0
+  conf.wizard
+  || conf.friend
+  || get_access p = Public
+  || (conf.public_if_titles
+      && get_access p = IfTitles
+      && nobtit conf base p <> [])
+  || begin
+    let death = get_death p in
+    if death = NotDead then conf.private_years = 0
+    else
+      let check_date none = function
+        | Some (Dgreg (d, _)) ->
+          strictly_after_private_years conf (CheckItem.time_elapsed d conf.today)
+        | _ -> none ()
+      in
+      check_date
+        (fun () ->
+           check_date
+             (fun () ->
+                check_date
+                  (fun () ->
+                     (death = DontKnowIfDead && get_access p <> Private && conf.public_if_no_date)
+                     || begin
+                       let families = get_family p in
+                       let len = Array.length families in
+                       let rec loop i =
+                         i < len
+                         && check_date
+                           (fun () -> loop (i + 1))
+                           (Adef.od_of_cdate (get_marriage @@ foi base (Array.get families i)))
+                       in
+                       loop 0
+                     end)
+                  (CheckItem.date_of_death (get_death p)) )
+             (Adef.od_of_cdate (get_baptism p)) )
+        (Adef.od_of_cdate (get_birth p))
+  end
 
 let is_restricted (conf : config) base ip =
   let fct p =
@@ -2239,14 +2241,14 @@ let specify_homonymous conf base p specify_public_name =
 
 (* ************************************************************************** *)
 (*  [Fonc] get_approx_date_place :
-             codate -> string -> codate -> string -> (codate, string)         *)
+             cdate -> string -> cdate -> string -> (cdate, string)         *)
 (** [Description] : Renvoi la date et le lieu le mieux correspondant.
     [Args] :
       - d1   : date (naissance/décès)
       - p1   : lieu (naissance/décès)
       - d2   : date (baptème/inhumation)
       - p2   : lieu (baptème/inhumation)
-    [Retour] : (codate, string)
+    [Retour] : (cdate, string)
     [Rem] : None exporté en clair hors de ce module.                          *)
 (* ************************************************************************** *)
 let get_approx_date_place d1 p1 d2 p2 =
@@ -2260,9 +2262,9 @@ let get_approx_date_place d1 p1 d2 p2 =
   | None, p, Some x, y -> if y = "" then Some x, p else Some x, y
 
 let get_approx_birth_date_place conf base p =
-  let birth = Adef.od_of_codate (get_birth p) in
+  let birth = Adef.od_of_cdate (get_birth p) in
   let birth_place = string_of_place conf (sou base (get_birth_place p)) in
-  let baptism = Adef.od_of_codate (get_baptism p) in
+  let baptism = Adef.od_of_cdate (get_baptism p) in
   let baptism_place = string_of_place conf (sou base (get_baptism_place p)) in
   get_approx_date_place birth birth_place baptism baptism_place
 
@@ -2271,8 +2273,8 @@ let get_approx_death_date_place conf base p =
   let death_place = string_of_place conf (sou base (get_death_place p)) in
   let buri =
     match get_burial p with
-      Buried cd -> Adef.od_of_codate cd
-    | Cremated cd -> Adef.od_of_codate cd
+      Buried cd -> Adef.od_of_cdate cd
+    | Cremated cd -> Adef.od_of_cdate cd
     | _ -> None
   in
   let buri_place = string_of_place conf (sou base (get_burial_place p)) in
@@ -2835,7 +2837,7 @@ let print_pre_right sz txt =
   Wserver.printf " %s\n" txt
 
 let of_course_died conf p =
-  match Adef.od_of_codate (get_birth p) with
+  match Adef.od_of_cdate (get_birth p) with
     Some (Dgreg (d, _)) -> conf.today.year - d.year > 120
   | _ -> false
 

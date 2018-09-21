@@ -213,8 +213,8 @@ module Make (Select : Select) =
       sou base (get_baptism_place p) <> "" ||
       sou base (get_death_place p) <> "" || sou base (get_psources p) <> ""
     let has_infos base p =
-      has_infos_not_dates base p || get_birth p <> Adef.codate_None ||
-      get_baptism p <> Adef.codate_None || get_death p <> NotDead
+      has_infos_not_dates base p || get_birth p <> Adef.cdate_None ||
+      get_baptism p <> Adef.cdate_None || get_death p <> NotDead
     let print_if_not_equal_to x oc base lab is =
       if sou base is = x then ()
       else Printf.fprintf oc " %s %s" lab (correct_string base is)
@@ -237,20 +237,20 @@ module Make (Select : Select) =
       match b with
         Buried cod ->
           Printf.fprintf oc " #buri";
-          begin match Adef.od_of_codate cod with
+          begin match Adef.od_of_cdate cod with
             Some d -> Printf.fprintf oc " "; print_date oc d; ()
           | _ -> ()
           end
       | Cremated cod ->
           Printf.fprintf oc " #crem";
-          begin match Adef.od_of_codate cod with
+          begin match Adef.od_of_cdate cod with
             Some d -> Printf.fprintf oc " "; print_date oc d; ()
           | _ -> ()
           end
       | UnknownBurial -> ()
     let print_title oc base t =
-      let t_date_start = Adef.od_of_codate t.t_date_start in
-      let t_date_end = Adef.od_of_codate t.t_date_end in
+      let t_date_start = Adef.od_of_cdate t.t_date_start in
+      let t_date_end = Adef.od_of_cdate t.t_date_end in
       Printf.fprintf oc " [";
       begin match t.t_name with
         Tmain -> Printf.fprintf oc "*"
@@ -296,10 +296,10 @@ module Make (Select : Select) =
       end;
       print_if_no_empty oc base "#occu" (get_occupation p);
       print_if_not_equal_to csrc oc base "#src" (get_psources p);
-      begin match Adef.od_of_codate (get_birth p) with
+      begin match Adef.od_of_cdate (get_birth p) with
         Some d -> Printf.fprintf oc " "; print_date oc d
       | _ ->
-          if get_baptism p <> Adef.codate_None then ()
+          if get_baptism p <> Adef.cdate_None then ()
           else
             match get_death p with
               Death (_, _) | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
@@ -313,7 +313,7 @@ module Make (Select : Select) =
       end;
       print_if_not_equal_to cbp oc base "#bp" (get_birth_place p);
       print_if_no_empty oc base "#bs" (get_birth_src p);
-      begin match Adef.od_of_codate (get_baptism p) with
+      begin match Adef.od_of_cdate (get_baptism p) with
         Some d -> Printf.fprintf oc " !"; print_date oc d
       | _ -> ()
       end;
@@ -334,7 +334,7 @@ module Make (Select : Select) =
       | DeadDontKnowWhen -> Printf.fprintf oc " 0"
       | DontKnowIfDead ->
           begin match
-            Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p)
+            Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p)
           with
             Some _, _ | _, Some _ -> Printf.fprintf oc " ?"
           | _ -> ()
@@ -574,7 +574,7 @@ module Make (Select : Select) =
       | Epers_Name s -> Printf.fprintf oc "#%s" (correct_string base s)
       end;
       Printf.fprintf oc " ";
-      let epers_date = Adef.od_of_codate e.epers_date in
+      let epers_date = Adef.od_of_cdate e.epers_date in
       print_date_option oc epers_date;
       print_if_no_empty oc base "#p" e.epers_place;
       (* TODO *)
@@ -675,7 +675,7 @@ module Make (Select : Select) =
       | Efam_Name n -> Printf.fprintf oc "#%s" (correct_string base n)
       end;
       Printf.fprintf oc " ";
-      let efam_date = Adef.od_of_codate e.efam_date in
+      let efam_date = Adef.od_of_cdate e.efam_date in
       print_date_option oc efam_date;
       print_if_no_empty oc base "#p" e.efam_place;
       (*print_if_no_empty oc base "#c" e.efam_cause;*)
@@ -743,14 +743,14 @@ module Make (Select : Select) =
       print_child oc base string_quest "" "" p;
       Printf.fprintf oc "end\n"
     let has_infos_isolated base p =
-      has_infos_not_dates base p || get_birth p <> Adef.codate_None ||
-      get_baptism p <> Adef.codate_None
+      has_infos_not_dates base p || get_birth p <> Adef.cdate_None ||
+      get_baptism p <> Adef.cdate_None
     let print_family oc base gen m =
       let fam = m.m_fam in
       Printf.fprintf oc "fam ";
       print_parent oc base gen m.m_fath;
       Printf.fprintf oc " +";
-      print_date_option oc (Adef.od_of_codate (get_marriage fam));
+      print_date_option oc (Adef.od_of_cdate (get_marriage fam));
       begin match get_relation fam with
         NotMarried -> Printf.fprintf oc " #nm"
       | Married -> ()
@@ -779,7 +779,7 @@ module Make (Select : Select) =
         NotDivorced -> ()
       | Separated -> Printf.fprintf oc " #sep"
       | Divorced d ->
-          let d = Adef.od_of_codate d in
+          let d = Adef.od_of_cdate d in
           Printf.fprintf oc " -"; print_date_option oc d
       end;
       Printf.fprintf oc " ";
@@ -1612,8 +1612,8 @@ module Make (Select : Select) =
             | None ->
                 if bogus_person base p &&
                    not
-                     (get_birth p <> Adef.codate_None ||
-                      get_baptism p <> Adef.codate_None ||
+                     (get_birth p <> Adef.cdate_None ||
+                      get_baptism p <> Adef.cdate_None ||
                       get_first_names_aliases p <> [] ||
                       get_surnames_aliases p <> [] ||
                       sou base (get_public_name p) <> "" ||

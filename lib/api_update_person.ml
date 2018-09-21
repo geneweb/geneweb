@@ -36,33 +36,9 @@ let reconstitute_person conf base mod_p =
         Api_update_util.api_find_free_occ base fn sn
     | _ ->
         (* Cas par défaut, i.e. modifier personne sans changer le occ. *)
-        match mod_p.Mwrite.Person.occ with
-        | Some occ -> Int32.to_int occ
-        | None -> 0
+        Opt.map_default 0 Int32.to_int mod_p.Mwrite.Person.occ
   in
-  (*
-  let occ =
-    match
-      Gutil.person_of_string_key
-        base (first_name ^ "." ^ string_of_int occ ^ " " ^ surname)
-    with
-    | Some ip ->
-        if Adef.int_of_iper ip = key_index then occ
-        else
-          let occ = Api_update_util.find_free_occ base first_name surname in
-          let () =
-            if occ = 0 then mod_p.Mwrite.Person.occ <- None
-            else mod_p.Mwrite.Person.occ <- Some (Int32.of_int occ)
-          in
-          occ
-    | None -> occ
-  in
-  *)
-  let image =
-    match mod_p.Mwrite.Person.image with
-    | Some s -> only_printable s
-    | None -> ""
-  in
+  let image = Opt.map_default "" only_printable mod_p.Mwrite.Person.image in
   let first_names_aliases =
     List.map
       (fun s -> no_html_tags (only_printable s))
@@ -122,8 +98,8 @@ let reconstitute_person conf base mod_p =
           | None -> 0
         in
         { t_name = t_name; t_ident = t_ident; t_place = t_place;
-          t_date_start = Adef.codate_of_od t_date_start;
-          t_date_end = Adef.codate_of_od t_date_end;
+          t_date_start = Adef.cdate_of_od t_date_start;
+          t_date_end = Adef.cdate_of_od t_date_end;
           t_nth = t_nth } )
       mod_p.Mwrite.Person.titles
   in
@@ -164,11 +140,7 @@ let reconstitute_person conf base mod_p =
     | `access_public -> Public
     | `access_private -> Private
   in
-  let occupation =
-    match mod_p.Mwrite.Person.occupation with
-    | Some s -> only_printable s
-    | None -> ""
-  in
+  let occupation = Opt.map_default "" only_printable mod_p.Mwrite.Person.occupation in
   let sex =
     match mod_p.Mwrite.Person.sex with
     | `male -> Male
@@ -194,15 +166,11 @@ let reconstitute_person conf base mod_p =
     | `dont_know_if_dead -> DontKnowIfDead
     | `of_course_dead -> OfCourseDead
   in
-  let psources =
-    match mod_p.Mwrite.Person.psources with
-    | Some s -> only_printable s
-    | None -> ""
-  in
+  let psources = Opt.map_default "" only_printable mod_p.Mwrite.Person.psources in
   let notes =
-    match mod_p.Mwrite.Person.notes with
-    | Some s -> Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces s))
-    | None -> ""
+    Opt.map_default ""
+      (fun s -> Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces s)))
+      mod_p.Mwrite.Person.notes
   in
   let pevents =
     List.fold_right
@@ -269,27 +237,14 @@ let reconstitute_person conf base mod_p =
           | Some date -> Api_update_util.date_of_piqi_date conf date
           | None -> None
         in
-        let place =
-          match evt.Mwrite.Pevent.place with
-          | Some place -> no_html_tags (only_printable place)
-          | None -> ""
-        in
-        let reason =
-          match evt.Mwrite.Pevent.reason with
-          | Some reason -> no_html_tags (only_printable reason)
-          | None -> ""
-        in
+        let place = Opt.map_default "" (fun p -> no_html_tags (only_printable p)) evt.Mwrite.Pevent.place in
+        let reason = Opt.map_default "" (fun r -> no_html_tags (only_printable r)) evt.Mwrite.Pevent.reason in
         let note =
-          match evt.Mwrite.Pevent.note with
-          | Some note ->
-              Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces note))
-          | None -> ""
+          Opt.map_default
+            "" (fun n -> Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces n)))
+            evt.Mwrite.Pevent.src
         in
-        let src =
-          match evt.Mwrite.Pevent.src with
-          | Some src -> only_printable src
-          | None -> ""
-        in
+        let src = Opt.map_default "" only_printable evt.Mwrite.Pevent.src in
         let witnesses =
           List.fold_right
             (fun witness accu ->
@@ -313,7 +268,7 @@ let reconstitute_person conf base mod_p =
         then pevents
         else
           let evt =
-            { epers_name = name; epers_date = Adef.codate_of_od date;
+            { epers_name = name; epers_date = Adef.cdate_of_od date;
               epers_place = place; epers_reason = reason; epers_note = note;
               epers_src = src; epers_witnesses = Array.of_list witnesses }
           in
@@ -323,8 +278,8 @@ let reconstitute_person conf base mod_p =
   (* Mise à jour des évènements principaux. *)
   let (bi, bp, de, bu, pevents) =
     UpdateIndOk.reconstitute_from_pevents pevents false
-      (Adef.codate_None, "", "", "")
-      (Adef.codate_None, "", "", "")
+      (Adef.cdate_None, "", "", "")
+      (Adef.cdate_None, "", "", "")
       (death, "", "", "")
       (UnknownBurial, "", "", "")
   in
@@ -334,13 +289,13 @@ let reconstitute_person conf base mod_p =
   let (burial, burial_place, burial_note, burial_src) = bu in
   (* Maintenant qu'on a propagé les évènements, on a *)
   (* peut-être besoin de refaire un infer_death.     *)
-  (*
+  (* FIXME: do no use the _bb version *)
   let death =
     match death with
-    | DontKnowIfDead -> Update.infer_death conf birth baptism
+    | DontKnowIfDead ->
+      Update.infer_death_bb conf (Adef.od_of_cdate birth) (Adef.od_of_cdate baptism)
     | _ -> death
   in
-  *)
   let p =
     {first_name = first_name; surname = surname; occ = occ; image = image;
      first_names_aliases = first_names_aliases;
@@ -430,8 +385,6 @@ let print_add conf base mod_p =
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
-;;
-
 
 let print_del conf base ip =
   let p = poi base ip in
@@ -690,8 +643,8 @@ let reconstitute_person_nobase conf mod_p =
           | None -> 0
         in
         { t_name = t_name; t_ident = t_ident; t_place = t_place;
-          t_date_start = Adef.codate_of_od t_date_start;
-          t_date_end = Adef.codate_of_od t_date_end;
+          t_date_start = Adef.cdate_of_od t_date_start;
+          t_date_end = Adef.cdate_of_od t_date_end;
           t_nth = t_nth } )
       mod_p.Mwrite.Person.titles
   in
@@ -1017,7 +970,7 @@ let reconstitute_person_nobase conf mod_p =
         then pevents
         else
           let evt =
-            { epers_name = name; epers_date = Adef.codate_of_od date;
+            { epers_name = name; epers_date = Adef.cdate_of_od date;
               epers_place = place; epers_reason = reason; epers_note = note;
               epers_src = src; epers_witnesses = Array.of_list witnesses }
           in
@@ -1027,8 +980,8 @@ let reconstitute_person_nobase conf mod_p =
   (* Mise à jour des évènements principaux. *)
   let (bi, bp, de, bu, pevents) =
     UpdateIndOk.reconstitute_from_pevents pevents false
-      (Adef.codate_None, "", "", "")
-      (Adef.codate_None, "", "", "")
+      (Adef.cdate_None, "", "", "")
+      (Adef.cdate_None, "", "", "")
       (death, "", "", "")
       (UnknownBurial, "", "", "")
   in

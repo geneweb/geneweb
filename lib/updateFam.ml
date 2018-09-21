@@ -124,7 +124,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
   | ["divorce"; s] ->
       let d =
         match fam.divorce with
-          Divorced d -> Adef.od_of_codate d
+          Divorced d -> Adef.od_of_cdate d
         | _ -> None
       in
       eval_date_var d s
@@ -140,7 +140,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
         Vbool x -> bool_val x
       | _ -> raise Not_found
       end
-  | ["marriage"; s] -> eval_date_var (Adef.od_of_codate fam.marriage) s
+  | ["marriage"; s] -> eval_date_var (Adef.od_of_cdate fam.marriage) s
   | ["marriage_place"] -> str_val (quote_escaped fam.marriage_place)
   | ["marriage_note"] -> str_val (quote_escaped fam.marriage_note)
   | ["marriage_src"] -> str_val (quote_escaped fam.marriage_src)
@@ -188,7 +188,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
           Vint i ->
             begin try
               let e = List.nth fam.fevents (i - 1) in
-              Adef.od_of_codate e.efam_date
+              Adef.od_of_cdate e.efam_date
             with Failure _ -> None
             end
         | _ -> None
@@ -204,7 +204,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
               capitale (Util.string_of_fevent_name conf base e.efam_name)
             in
             let date =
-              match Adef.od_of_codate e.efam_date with
+              match Adef.od_of_cdate e.efam_date with
                 Some d -> Date.string_of_date conf d
               | None -> ""
             in
@@ -792,7 +792,7 @@ let print_add conf base =
         ("", "", 0, Update.Create (Female, None), ""), ""
   in
   let fam =
-    {marriage = Adef.codate_None; marriage_place = ""; marriage_note = "";
+    {marriage = Adef.cdate_None; marriage_place = ""; marriage_note = "";
      marriage_src = ""; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
      fsources = default_source conf; fam_index = bogus_family_index}
@@ -805,7 +805,7 @@ let print_add_parents conf base =
     Some i ->
       let p = poi base (Adef.iper_of_int i) in
       let fam =
-        {marriage = Adef.codate_None; marriage_place = ""; marriage_note = "";
+        {marriage = Adef.cdate_None; marriage_place = ""; marriage_note = "";
          marriage_src = ""; witnesses = [| |]; relation = Married;
          divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
          fsources = default_source conf; fam_index = bogus_family_index}

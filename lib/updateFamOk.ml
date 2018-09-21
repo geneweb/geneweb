@@ -178,7 +178,7 @@ let reconstitute_insert_event conf ext cnt el =
       let rec loop el n =
         if n > 0 then
           let e1 =
-            {efam_name = Efam_Name ""; efam_date = Adef.codate_None;
+            {efam_name = Efam_Name ""; efam_date = Adef.cdate_None;
              efam_place = ""; efam_reason = ""; efam_note = ""; efam_src = "";
              efam_witnesses = [| |]}
           in
@@ -308,7 +308,7 @@ let rec reconstitute_events conf ext cnt =
         | _ -> witnesses, ext
       in
       let e =
-        {efam_name = efam_name; efam_date = Adef.codate_of_od efam_date;
+        {efam_name = efam_name; efam_date = Adef.cdate_of_od efam_date;
          efam_place = efam_place; efam_reason = ""; efam_note = efam_note;
          efam_src = efam_src; efam_witnesses = Array.of_list witnesses}
       in
@@ -363,10 +363,10 @@ let reconstitute_from_fevents conf fevents marr div =
             if !found_marriage then loop l marr div
             else
               let date =
-                match Adef.od_of_codate evt.efam_date with
+                match Adef.od_of_cdate evt.efam_date with
                   Some (Dgreg (dmy, cal)) ->
                     let dmy = {dmy with prec = About} in
-                    Adef.codate_of_od (Some (Dgreg (dmy, cal)))
+                    Adef.cdate_of_od (Some (Dgreg (dmy, cal)))
                 | _ -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
@@ -406,7 +406,7 @@ let reconstitute_from_fevents conf fevents marr div =
   let (marr, div) = loop (List.rev fevents) marr div in
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
   let marr =
-    if not !found_marriage then NoMention, Adef.codate_None, "", "", ""
+    if not !found_marriage then NoMention, Adef.cdate_None, "", "", ""
     else marr
   in
   (* Parents de même sexe. *)
@@ -475,7 +475,7 @@ let reconstitute_family conf base =
     match p_getenv conf.env "div" with
       Some "not_divorced" -> NotDivorced
     | Some "separated" -> Separated
-    | _ -> Divorced (Adef.codate_of_od (Update.reconstitute_date conf "div"))
+    | _ -> Divorced (Adef.cdate_of_od (Update.reconstitute_date conf "div"))
   in
   let (events, ext) = reconstitute_events conf ext 1 in
   let (events, ext) = reconstitute_insert_event conf ext 0 events in
@@ -537,14 +537,14 @@ let reconstitute_family conf base =
   let events =
     if events = [] then
       let evt =
-        {efam_name = Efam_NoMention; efam_date = Adef.codate_None;
+        {efam_name = Efam_NoMention; efam_date = Adef.cdate_None;
          efam_place = ""; efam_reason = ""; efam_note = ""; efam_src = "";
          efam_witnesses = [| |]}
       in
       [evt]
     else events
   in
-  let marriage = Adef.codate_of_od marriage in
+  let marriage = Adef.cdate_of_od marriage in
   (* Attention, surtout pas les witnesses, parce que si on en créé un, *)
   (* on le créé aussi dans witness et on ne pourra jamais valider.     *)
   let (marr, div) =
@@ -901,7 +901,7 @@ let patch_person_with_pevents base ip =
   let p = poi base ip in
   let p = gen_person_of_person p in
   let empty_string = Gwdb.insert_string base "" in
-  let evt ~name ?(date = Adef.codate_None) ~place ~src ~note () =
+  let evt ~name ?(date = Adef.cdate_None) ~place ~src ~note () =
     {epers_name = name; epers_date = date;
      epers_place = place; epers_reason = empty_string;
      epers_note = note; epers_src = src;
@@ -915,7 +915,7 @@ let patch_person_with_pevents base ip =
       let src = p.birth_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Adef.od_of_codate p.birth <> None
+    if Adef.od_of_cdate p.birth <> None
     then evt ~date:p.birth ()
     else if sou base p.birth_place = "" then None
     else evt ()
@@ -928,7 +928,7 @@ let patch_person_with_pevents base ip =
       let src = p.baptism_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Adef.od_of_codate p.baptism <> None
+    if Adef.od_of_cdate p.baptism <> None
     then evt ~date:p.baptism ()
     else if sou base p.baptism_place = "" then None
     else evt ()
@@ -943,7 +943,7 @@ let patch_person_with_pevents base ip =
     in
     match p.death with
     | Death (_, cd) ->
-        let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
+        let date = Adef.cdate_of_od (Some (Adef.date_of_cdate cd)) in
         evt ~date ()
     | _ ->
         if sou base p.death_place = "" then None
@@ -1058,10 +1058,10 @@ let reconstitute_from_fevents2 conf base fevents marr div =
             if !found_marriage then loop l marr div wit
             else
               let date =
-                match Adef.od_of_codate evt.efam_date with
+                match Adef.od_of_cdate evt.efam_date with
                   Some (Dgreg (dmy, cal)) ->
                     let dmy = {dmy with prec = About} in
-                    Adef.codate_of_od (Some (Dgreg (dmy, cal)))
+                    Adef.cdate_of_od (Some (Dgreg (dmy, cal)))
                 | _ -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
@@ -1105,7 +1105,7 @@ let reconstitute_from_fevents2 conf base fevents marr div =
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
   let (marr, wit) =
     if not !found_marriage then
-      (NoMention, Adef.codate_None, empty_string, empty_string, empty_string),
+      (NoMention, Adef.cdate_None, empty_string, empty_string, empty_string),
       [| |]
     else marr, wit
   in

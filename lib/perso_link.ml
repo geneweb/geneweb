@@ -200,8 +200,8 @@ let make_ep_link base p_link =
   in
   let birth =
     match p_link.MLink.Person.birth_date with
-      Some d -> Adef.codate_of_od (date_of_piqi_date d)
-    | None -> Adef.codate_None
+      Some d -> Adef.cdate_of_od (date_of_piqi_date d)
+    | None -> Adef.cdate_None
   in
   let birth_place =
     match p_link.MLink.Person.birth_place with
@@ -210,8 +210,8 @@ let make_ep_link base p_link =
   in
   let baptism =
     match p_link.MLink.Person.baptism_date with
-      Some d -> Adef.codate_of_od (date_of_piqi_date d)
-    | None -> Adef.codate_None
+      Some d -> Adef.cdate_of_od (date_of_piqi_date d)
+    | None -> Adef.cdate_None
   in
   let baptism_place =
     match p_link.MLink.Person.baptism_place with
@@ -242,7 +242,7 @@ let make_ep_link base p_link =
   in
   let burial =
     match p_link.MLink.Person.baptism_date with
-      Some d -> Buried (Adef.codate_of_od (date_of_piqi_date d))
+      Some d -> Buried (Adef.cdate_of_od (date_of_piqi_date d))
     | None -> UnknownBurial
   in
   let burial_place =
@@ -273,8 +273,8 @@ let make_efam_link conf base fam_link =
   let cpl = Futil.parent conf.multi_parents [| ifath; imoth |] in
   let marriage =
     match fam_link.MLink.Family.marriage_date with
-      Some d -> Adef.codate_of_od (date_of_piqi_date d)
-    | None -> Adef.codate_None
+      Some d -> Adef.cdate_of_od (date_of_piqi_date d)
+    | None -> Adef.cdate_None
   in
   let marriage_place =
     match fam_link.MLink.Family.marriage_place with
@@ -295,8 +295,8 @@ let make_efam_link conf base fam_link =
       `not_divorced -> NotDivorced
     | `divorced ->
         begin match fam_link.MLink.Family.divorce_date with
-          Some d -> Divorced (Adef.codate_of_od (date_of_piqi_date d))
-        | None -> Divorced Adef.codate_None
+          Some d -> Divorced (Adef.cdate_of_od (date_of_piqi_date d))
+        | None -> Divorced Adef.cdate_None
         end
     | `separated -> Separated
   in

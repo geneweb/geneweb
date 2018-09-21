@@ -27,11 +27,11 @@ val empty_person : base -> iper -> person
 
 val get_access : person -> Def.access
 val get_aliases : person -> istr list
-val get_baptism : person -> codate
+val get_baptism : person -> cdate
 val get_baptism_place : person -> istr
 val get_baptism_note : person -> istr
 val get_baptism_src : person -> istr
-val get_birth : person -> codate
+val get_birth : person -> cdate
 val get_birth_place : person -> istr
 val get_birth_note : person -> istr
 val get_birth_src : person -> istr
@@ -72,7 +72,7 @@ val get_comment : family -> istr
 val get_divorce : family -> Def.divorce
 val get_fevents : family -> fam_event list
 val get_fsources : family -> istr
-val get_marriage : family -> codate
+val get_marriage : family -> cdate
 val get_marriage_place : family -> istr
 val get_marriage_note : family -> istr
 val get_marriage_src : family -> istr

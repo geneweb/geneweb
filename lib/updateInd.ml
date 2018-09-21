@@ -70,11 +70,11 @@ and eval_simple_var conf base env p =
   | ["bapt_place"] -> str_val (quote_escaped p.baptism_place)
   | ["bapt_note"] -> str_val (quote_escaped p.baptism_note)
   | ["bapt_src"] -> str_val (quote_escaped p.baptism_src)
-  | ["birth"; s] -> eval_date_var (Adef.od_of_codate p.birth) s
+  | ["birth"; s] -> eval_date_var (Adef.od_of_cdate p.birth) s
   | ["birth_place"] -> str_val (quote_escaped p.birth_place)
   | ["birth_note"] -> str_val (quote_escaped p.birth_note)
   | ["birth_src"] -> str_val (quote_escaped p.birth_src)
-  | ["bapt"; s] -> eval_date_var (Adef.od_of_codate p.baptism) s
+  | ["bapt"; s] -> eval_date_var (Adef.od_of_cdate p.baptism) s
   | ["bt_buried"] ->
       bool_val
         (match p.burial with
@@ -89,8 +89,8 @@ and eval_simple_var conf base env p =
   | ["burial"; s] ->
       let od =
         match p.burial with
-          Buried cod -> Adef.od_of_codate cod
-        | Cremated cod -> Adef.od_of_codate cod
+          Buried cod -> Adef.od_of_cdate cod
+        | Cremated cod -> Adef.od_of_cdate cod
         | _ -> None
       in
       eval_date_var od s
@@ -131,7 +131,7 @@ and eval_simple_var conf base env p =
           Vint i ->
             begin try
               let e = List.nth p.pevents (i - 1) in
-              Adef.od_of_codate e.epers_date
+              Adef.od_of_cdate e.epers_date
             with Failure _ -> None
             end
         | _ -> None
@@ -147,7 +147,7 @@ and eval_simple_var conf base env p =
               capitale (Util.string_of_pevent_name conf base e.epers_name)
             in
             let date =
-              match Adef.od_of_codate e.epers_date with
+              match Adef.od_of_cdate e.epers_date with
                 Some d -> Date.string_of_date conf d
               | None -> ""
             in
@@ -171,7 +171,7 @@ and eval_simple_var conf base env p =
   | ["first_name"] -> str_val (quote_escaped p.first_name)
   | ["first_name_alias"] -> eval_string_env "first_name_alias" env
   | ["has_aliases"] -> bool_val (p.aliases <> [])
-  | ["has_birth_date"] -> bool_val (Adef.od_of_codate p.birth <> None)
+  | ["has_birth_date"] -> bool_val (Adef.od_of_cdate p.birth <> None)
   | ["has_pevent_birth"] ->
       let rec loop pevents =
         match pevents with
@@ -299,7 +299,7 @@ and eval_simple_var conf base env p =
           Vint i ->
             begin try
               let t = List.nth p.titles (i - 1) in
-              Adef.od_of_codate t.t_date_start
+              Adef.od_of_cdate t.t_date_start
             with Failure _ -> None
             end
         | _ -> None
@@ -311,7 +311,7 @@ and eval_simple_var conf base env p =
           Vint i ->
             begin try
               let t = List.nth p.titles (i - 1) in
-              Adef.od_of_codate t.t_date_end
+              Adef.od_of_cdate t.t_date_end
             with Failure _ -> None
             end
         | _ -> None
@@ -863,8 +863,8 @@ let print_add conf base =
      first_names_aliases = []; surnames_aliases = []; public_name = "";
      qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
      occupation = ""; sex = Neuter; access = IfTitles;
-     birth = Adef.codate_None; birth_place = ""; birth_note = "";
-     birth_src = ""; baptism = Adef.codate_None; baptism_place = "";
+     birth = Adef.cdate_None; birth_place = ""; birth_note = "";
+     birth_src = ""; baptism = Adef.cdate_None; baptism_place = "";
      baptism_note = ""; baptism_src = ""; death = DontKnowIfDead;
      death_place = ""; death_note = ""; death_src = "";
      burial = UnknownBurial; burial_place = ""; burial_note = "";

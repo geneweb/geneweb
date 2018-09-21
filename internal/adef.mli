@@ -6,7 +6,6 @@ type ifam
 type istr
 type fix
 type cdate
-type codate
 type 'person gen_couple
 
 type date =
@@ -35,9 +34,9 @@ val no_consang : fix
 val date_of_cdate : cdate -> date
 val cdate_of_date : date -> cdate
 
-val codate_None : codate
-val od_of_codate : codate -> date option
-val codate_of_od : date option -> codate
+val cdate_None : cdate
+val od_of_cdate : cdate -> date option
+val cdate_of_od : date option -> cdate
 
 external int_of_iper : iper -> int = "%identity"
 external iper_of_int : int -> iper = "%identity"

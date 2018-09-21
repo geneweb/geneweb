@@ -25,19 +25,91 @@ type create =
   | Link
 type key = string * string * int * create * string
 
-let infer_death conf birth bapt =
-  match birth, bapt with
-    Some (Dgreg (d, _)), _ ->
-      let a = (CheckItem.time_elapsed d conf.today).year in
-      if a > 120 then OfCourseDead
-      else if a <= 80 then NotDead
-      else DontKnowIfDead
-  | _, Some (Dgreg (d, _)) ->
-      let a = (CheckItem.time_elapsed d conf.today).year in
-      if a > 120 then OfCourseDead
-      else if a <= 80 then NotDead
-      else DontKnowIfDead
+let infer_death_from_age a =
+  if a > 120 then OfCourseDead
+  (* TO BE REMOVED else if a <= 80 then NotDead *)
+  else DontKnowIfDead
+
+let infer_death_from_date conf d =
+  infer_death_from_age (CheckItem.time_elapsed d conf.today).year
+
+let infer_death_from_odate conf = function
+  | Some (Dgreg (d, _)) -> infer_death_from_date conf d
   | _ -> DontKnowIfDead
+
+let infer_death_bb conf birth bapt =
+  match infer_death_from_odate conf birth with
+  | DontKnowIfDead -> infer_death_from_odate conf bapt
+  | death -> death
+
+let infer_death_from_parents conf base fam =
+  let fath = poi base @@ get_father fam in
+  let moth = poi base @@ get_mother fam in
+  let aux = function
+    | (Death (_, d),_) | (_, Death (_, d)) ->
+      infer_death_from_odate conf (Adef.od_of_cdate d)
+    | _ ->
+      match
+        ( Adef.od_of_cdate @@ get_birth moth
+        , Adef.od_of_cdate @@ get_birth fath )
+      with
+      | (Some (Dgreg (d, _)), _) | (_, Some (Dgreg (d, _))) ->
+        infer_death_from_age @@ (CheckItem.time_elapsed d conf.today).year - 120
+      | _ -> DontKnowIfDead
+  in
+  match get_death fath, get_death moth with
+  | (Death (_, d1) as a), (Death (_, d2) as b) ->
+    begin match Adef.od_of_cdate d1, Adef.od_of_cdate d2 with
+      | Some (Dgreg (d1, _) as d1'), Some (Dgreg (d2, _)as d2') ->
+        if Date.compare_date d1' d2' > 0
+        then infer_death_from_date conf d2
+        else infer_death_from_date conf d1
+      | Some (Dgreg (d, _)), _ | _, Some (Dgreg (d, _)) -> infer_death_from_date conf d
+      | _ -> aux (a, b)
+    end
+  | a, b -> aux (a, b)
+
+let rec infer_death conf base p =
+  let death =
+    infer_death_bb conf
+      (Adef.od_of_cdate (get_birth p))
+      (Adef.od_of_cdate (get_baptism p))
+  in
+  if death <> DontKnowIfDead then death
+  else
+    let death =
+      let families = get_family p in
+      let len = Array.length families in
+      let rec loop_families i =
+        if i = len then DontKnowIfDead
+        else
+          let fam = foi base families.(i) in
+          match Adef.od_of_cdate (get_marriage fam) with
+          | Some (Dgreg (d, _)) when (CheckItem.time_elapsed d conf.today).year > 120 ->
+            OfCourseDead
+          | _ ->
+            let death =
+              let children = get_children fam in
+              let len = Array.length families in
+              let rec loop_children j =
+                if j = len then DontKnowIfDead
+                else
+                  let death = infer_death conf base (poi base children.(j)) in
+                  if death = OfCourseDead then OfCourseDead
+                  else loop_children (j + 1)
+              in
+              loop_children 0
+            in
+            if death = OfCourseDead then OfCourseDead
+            else loop_families (i + 1)
+      in
+      loop_families 0
+    in
+    if death <> DontKnowIfDead then death
+    else
+      match get_parents p with
+      | None -> DontKnowIfDead
+      | Some ifam -> infer_death_from_parents conf base (foi base ifam)
 
 let restrict_to_small_list el =
   let rec begin_list n rl el =
@@ -560,10 +632,10 @@ let print_warning conf base =
         (fun _ ->
            Printf.sprintf "<strong>%s %s</strong> <em>%s-%s</em>"
              (sou base t.t_ident) (sou base t.t_place)
-             (match Adef.od_of_codate t.t_date_start with
+             (match Adef.od_of_cdate t.t_date_start with
                 Some d -> Date.string_of_date conf d
               | _ -> "")
-             (match Adef.od_of_codate t.t_date_end with
+             (match Adef.od_of_cdate t.t_date_end with
                 Some d -> Date.string_of_date conf d
               | _ -> ""))
   | UndefinedSex p ->
@@ -1153,7 +1225,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
               {ci_death = DeadDontKnowWhen | NotDead as dead;
                ci_death_date = None; ci_death_place = dpl} ->
               dead, dpl
-          | _ -> infer_death conf birth baptism, ""
+          | _ -> infer_death_bb conf birth baptism, ""
         in
         let occupation =
           match info with
@@ -1172,10 +1244,10 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
            public_name = empty_string; qualifiers = []; aliases = [];
            titles = []; rparents = []; related = [];
            occupation = Gwdb.insert_string base occupation; sex = sex;
-           access = access; birth = Adef.codate_of_od birth;
+           access = access; birth = Adef.cdate_of_od birth;
            birth_place = Gwdb.insert_string base birth_place;
            birth_note = empty_string; birth_src = empty_string;
-           baptism = Adef.codate_of_od baptism;
+           baptism = Adef.cdate_of_od baptism;
            baptism_place = Gwdb.insert_string base baptism_place;
            baptism_note = empty_string; baptism_src = empty_string;
            death = death; death_place = Gwdb.insert_string base death_place;

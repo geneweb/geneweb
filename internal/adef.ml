@@ -45,8 +45,6 @@ type cdate =
   | Cdate of date
   | Cnone
 
-type codate = cdate
-
 let compress d =
   let simple =
     match d.prec with
@@ -106,17 +104,17 @@ let date_of_cdate =
   | Ctext t -> Dtext t
   | Cnone -> failwith "date_of_cdate"
 
-let codate_of_od =
+let cdate_of_od =
   function
     Some d -> cdate_of_date d
   | None -> Cnone
 
-let od_of_codate od =
+let od_of_cdate od =
   match od with
     Cnone -> None
   | _ -> Some (date_of_cdate od)
 
-let codate_None = codate_of_od None
+let cdate_None = cdate_of_od None
 
 exception Request_failure of string
 
