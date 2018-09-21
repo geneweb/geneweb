@@ -4238,7 +4238,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       if p_auth then
         string_of_decimal_num conf
           (round_2_dec (Adef.float_of_fix (get_consang p) *. 100.0)) ^
-        "%"
+        " %"
       else ""
   | "cremation_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
