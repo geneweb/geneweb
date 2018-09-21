@@ -10,6 +10,7 @@ let charset = ref Utf8
 let no_notes = ref false
 let no_picture = ref false
 let picture_path = ref false
+let with_indexes = ref false
 
 let month_txt =
   [| "JAN"; "FEB"; "MAR"; "APR"; "MAY"; "JUN"; "JUL"; "AUG"; "SEP"; "OCT";
@@ -199,6 +200,9 @@ let string_of_list =
     | [] -> r
   in
   loop ""
+
+let ged_index oc per =
+  Printf.fprintf oc "1 _GWID %d\n" (Adef.int_of_iper (get_key_index per))
 
 let ged_name base oc per =
   Printf.fprintf oc "1 NAME %s /%s/\n"
@@ -643,6 +647,7 @@ let ged_ind_record base (per_sel, fam_sel as sel) oc i =
     begin
       Printf.fprintf oc "0 @I%d@ INDI\n" (i + 1);
       ged_name base oc per;
+      if !with_indexes then ged_index oc per;
       ged_sex oc per;
       ged_ind_ev_str base oc per per_sel;
       ged_ind_attr_str base oc per;
@@ -790,6 +795,7 @@ let speclist =
    "-nn", Arg.Set no_notes, ": no (database) notes";
    "-nopicture", Arg.Set no_picture, ": Don't extract individual picture.";
    "-picture-path", Arg.Set picture_path, ": Extract pictures path.";
+   "-indexes", Arg.Set with_indexes, ": Export indexes in gedcom.";
    "-c", Arg.Int (fun i -> censor := i),
    "<num> :\n     \
     When a person is born less than <num> years ago, it is not exported \
