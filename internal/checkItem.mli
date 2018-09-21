@@ -21,10 +21,10 @@ type 'string event_name =
     Psort of 'string Def.gen_pers_event_name
   | Fsort of 'string Def.gen_fam_event_name
 val sort_events :
-  ('a -> 'string event_name) * ('a -> Adef.codate) -> 'a list -> 'a list
+  ('a -> 'string event_name) * ('a -> Adef.cdate) -> 'a list -> 'a list
 
 val merge_events :
-  ('a -> 'string event_name) * ('a -> Adef.codate) -> 'a list -> 'a list ->
+  ('a -> 'string event_name) * ('a -> Adef.cdate) -> 'a list -> 'a list ->
     'a list
 
 val person :

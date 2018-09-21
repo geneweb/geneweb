@@ -121,6 +121,6 @@ type event_name =
 
 val events_list :
   config -> base -> person ->
-    (event_name * Def.codate * istr * istr * istr *
+    (event_name * Def.cdate * istr * istr * istr *
        (Def.iper * Def.witness_kind) array * Def.iper option)
       list

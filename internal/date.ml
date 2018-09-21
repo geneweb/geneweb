@@ -672,8 +672,8 @@ let prec_year_text conf d =
 (* ********************************************************************** *)
 let get_birth_death_date p =
   let (birth_date, approx) =
-    match Adef.od_of_codate (get_birth p) with
-      None -> Adef.od_of_codate (get_baptism p), true
+    match Adef.od_of_cdate (get_birth p) with
+      None -> Adef.od_of_cdate (get_baptism p), true
     | x -> x, false
   in
   let (death_date, approx) =
@@ -681,8 +681,8 @@ let get_birth_death_date p =
       Some d -> Some d, approx
     | _ ->
         match get_burial p with
-          Buried cd -> Adef.od_of_codate cd, true
-        | Cremated cd -> Adef.od_of_codate cd, true
+          Buried cd -> Adef.od_of_cdate cd, true
+        | Cremated cd -> Adef.od_of_cdate cd, true
         | _ -> None, approx
   in
   birth_date, death_date, approx
@@ -749,7 +749,7 @@ let short_dates_text conf base p =
 (* ********************************************************************** *)
 let short_marriage_date_text conf base fam p1 p2 =
   if authorized_age conf base p1 && authorized_age conf base p2 then
-    match Adef.od_of_codate (get_marriage fam) with
+    match Adef.od_of_cdate (get_marriage fam) with
       Some (Dgreg (d, _)) ->
         "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
     | _ -> ""
@@ -761,7 +761,7 @@ let print_dates conf base p =
   let cap s = ", " ^ s in
   let is = index_of_sex (get_sex p) in
   let birth_place = sou base (get_birth_place p) in
-  begin match Adef.od_of_codate (get_birth p) with
+  begin match Adef.od_of_cdate (get_birth p) with
     Some d ->
       Wserver.printf "%s " (cap (transl_nth conf "born" is));
       Wserver.printf "%s" (string_of_ondate conf d);
@@ -772,7 +772,7 @@ let print_dates conf base p =
   end;
   if birth_place <> "" then
     Wserver.printf "%s" (string_of_place conf birth_place);
-  let baptism = Adef.od_of_codate (get_baptism p) in
+  let baptism = Adef.od_of_cdate (get_baptism p) in
   let baptism_place = sou base (get_baptism_place p) in
   begin match baptism with
     Some d ->
@@ -819,7 +819,7 @@ let print_dates conf base p =
     Wserver.printf "%s" (string_of_place conf death_place);
   let burial_date_place cod =
     let place = sou base (get_burial_place p) in
-    begin match Adef.od_of_codate cod with
+    begin match Adef.od_of_cdate cod with
       Some d ->
         Wserver.printf " %s" (string_of_ondate conf d);
         if place <> "" then Wserver.printf ",\n"

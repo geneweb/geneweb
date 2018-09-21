@@ -913,7 +913,7 @@ let build_anniversary_pers_list conf base month f_scan =
   (try
     while true do
       let p = f_scan () in
-      match (Adef.od_of_codate (get_birth p), get_death p) with
+      match (Adef.od_of_cdate (get_birth p), get_death p) with
       | (Some (Dgreg (d, _)), (NotDead | DontKnowIfDead)) ->
           if d.prec = Sure && d.day <> 0 && d.month <> 0 &&
              d.month = month && d.delta = 0
@@ -1667,7 +1667,7 @@ let print_index_search conf export_directory =
             let sn = Name.lower sn in
             let r = String.concat " " (build_relative_name base p) in
             let date =
-              match (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p)) with
+              match (Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p)) with
               | (Some d1, _) -> Some d1
               | (_, Some d1) -> Some d1
               | _ -> None
@@ -2512,7 +2512,7 @@ let print_notification_birthday conf base =
         List.fold_left
           (fun accu (ip, _, _) ->
             let p = poi base ip in
-            match Adef.od_of_codate (get_birth p) with
+            match Adef.od_of_cdate (get_birth p) with
             | Some (Dgreg (d, _)) ->
                 if d.prec = Sure && get_death p = NotDead &&
                    d.day = day && d.month = month
@@ -2526,7 +2526,7 @@ let print_notification_birthday conf base =
         List.fold_left
           (fun accu (ip, _, _) ->
             let p = poi base ip in
-            match Adef.od_of_codate (get_birth p) with
+            match Adef.od_of_cdate (get_birth p) with
             | Some (Dgreg (d, _)) ->
                 if d.prec = Sure && get_death p = NotDead && d.month = month
                 then (ip :: accu)

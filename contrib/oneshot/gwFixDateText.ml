@@ -12,7 +12,7 @@ let fix_date_text bname trace =
     let p = poi base (Adef.iper_of_int i) in
     let birth = get_birth p in
     let birth =
-      match Adef.od_of_codate birth with
+      match Adef.od_of_cdate birth with
         Some d ->
           begin match d with
             Dgreg (_, _) -> birth
@@ -22,13 +22,13 @@ let fix_date_text bname trace =
                 let sub_date = String.sub t 0 10 in
                 let end_date = String.sub t 10 (String.length t - 10) in
                 let sub_date = space_to_unders sub_date in
-                Adef.codate_of_od (Some (Dtext (sub_date ^ end_date)))
+                Adef.cdate_of_od (Some (Dtext (sub_date ^ end_date)))
           end
       | None -> birth
     in
     let baptism = get_baptism p in
     let baptism =
-      match Adef.od_of_codate baptism with
+      match Adef.od_of_cdate baptism with
         Some d ->
           begin match d with
             Dgreg (_, _) -> baptism
@@ -38,7 +38,7 @@ let fix_date_text bname trace =
                 let sub_date = String.sub t 0 10 in
                 let end_date = String.sub t 10 (String.length t - 10) in
                 let sub_date = space_to_unders sub_date in
-                Adef.codate_of_od (Some (Dtext (sub_date ^ end_date)))
+                Adef.cdate_of_od (Some (Dtext (sub_date ^ end_date)))
           end
       | None -> baptism
     in
@@ -63,7 +63,7 @@ let fix_date_text bname trace =
     let burial =
       match burial with
         Buried d ->
-          begin match Adef.od_of_codate d with
+          begin match Adef.od_of_cdate d with
             Some d ->
               begin match d with
                 Dgreg (_, _) -> burial
@@ -74,12 +74,12 @@ let fix_date_text bname trace =
                     let end_date = String.sub t 10 (String.length t - 10) in
                     let sub_date = space_to_unders sub_date in
                     Buried
-                      (Adef.codate_of_od (Some (Dtext (sub_date ^ end_date))))
+                      (Adef.cdate_of_od (Some (Dtext (sub_date ^ end_date))))
               end
           | None -> burial
           end
       | Cremated d ->
-          begin match Adef.od_of_codate d with
+          begin match Adef.od_of_cdate d with
             Some d ->
               begin match d with
                 Dgreg (_, _) -> burial
@@ -90,7 +90,7 @@ let fix_date_text bname trace =
                     let end_date = String.sub t 10 (String.length t - 10) in
                     let sub_date = space_to_unders sub_date in
                     Cremated
-                      (Adef.codate_of_od (Some (Dtext (sub_date ^ end_date))))
+                      (Adef.cdate_of_od (Some (Dtext (sub_date ^ end_date))))
               end
           | None -> burial
           end
@@ -102,7 +102,7 @@ let fix_date_text bname trace =
         (fun evt ->
            let date = evt.epers_date in
            let date =
-             match Adef.od_of_codate date with
+             match Adef.od_of_cdate date with
                Some d ->
                  begin match d with
                    Dgreg (_, _) -> date
@@ -114,7 +114,7 @@ let fix_date_text bname trace =
                          String.sub t 10 (String.length t - 10)
                        in
                        let sub_date = space_to_unders sub_date in
-                       Adef.codate_of_od (Some (Dtext (sub_date ^ end_date)))
+                       Adef.cdate_of_od (Some (Dtext (sub_date ^ end_date)))
                  end
              | None -> date
            in
@@ -131,7 +131,7 @@ let fix_date_text bname trace =
     let fam = foi base (Adef.ifam_of_int i) in
     let marriage = get_marriage fam in
     let marriage =
-      match Adef.od_of_codate marriage with
+      match Adef.od_of_cdate marriage with
         Some d ->
           begin match d with
             Dgreg (_, _) -> marriage
@@ -141,7 +141,7 @@ let fix_date_text bname trace =
                 let sub_date = String.sub t 0 10 in
                 let end_date = String.sub t 10 (String.length t - 10) in
                 let sub_date = space_to_unders sub_date in
-                Adef.codate_of_od (Some (Dtext (sub_date ^ end_date)))
+                Adef.cdate_of_od (Some (Dtext (sub_date ^ end_date)))
           end
       | None -> marriage
     in
@@ -151,7 +151,7 @@ let fix_date_text bname trace =
         (fun evt ->
            let date = evt.efam_date in
            let date =
-             match Adef.od_of_codate date with
+             match Adef.od_of_cdate date with
                Some d ->
                  begin match d with
                    Dgreg (_, _) -> date
@@ -163,7 +163,7 @@ let fix_date_text bname trace =
                          String.sub t 10 (String.length t - 10)
                        in
                        let sub_date = space_to_unders sub_date in
-                       Adef.codate_of_od (Some (Dtext (sub_date ^ end_date)))
+                       Adef.cdate_of_od (Some (Dtext (sub_date ^ end_date)))
                  end
              | None -> date
            in

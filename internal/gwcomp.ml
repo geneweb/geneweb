@@ -18,7 +18,7 @@ type somebody =
 type gw_syntax =
     Family of
       somebody gen_couple * sex * sex * (somebody * sex) list *
-        (string gen_fam_event_name * codate * string * string * string *
+        (string gen_fam_event_name * cdate * string * string * string *
            string * (somebody * sex * witness_kind) list)
           list *
         ((iper, string) gen_person, string) gen_family *
@@ -27,7 +27,7 @@ type gw_syntax =
   | Relations of somebody * sex * (somebody, string) gen_relation list
   | Pevent of
       somebody * sex *
-        (string gen_pers_event_name * codate * string * string * string *
+        (string gen_pers_event_name * cdate * string * string * string *
            string * (somebody * sex * witness_kind) list)
           list
   | Bnotes of string * string
@@ -314,8 +314,8 @@ let get_burial l =
               '~' | '?' | '>' | '<' | '-' | '0'..'9' -> date_of_string x i, l'
             | _ -> None, l
           in
-          Buried (Adef.codate_of_od od), l
-      | [] -> Buried Adef.codate_None, l
+          Buried (Adef.cdate_of_od od), l
+      | [] -> Buried Adef.cdate_None, l
       end
   | "#crem" :: l ->
       begin match l with
@@ -326,8 +326,8 @@ let get_burial l =
               '~' | '?' | '>' | '<' | '-' | '0'..'9' -> date_of_string x i, l'
             | _ -> None, l
           in
-          Cremated (Adef.codate_of_od od), l
-      | [] -> Cremated Adef.codate_None, l
+          Cremated (Adef.cdate_of_od od), l
+      | [] -> Cremated Adef.cdate_None, l
       end
   | _ -> UnknownBurial, l
 
@@ -478,8 +478,8 @@ let scan_title t =
   if i <> String.length t then failwith t
   else
     {t_name = name; t_ident = title; t_place = place;
-     t_date_start = Adef.codate_of_od date_start;
-     t_date_end = Adef.codate_of_od date_end; t_nth = nth}
+     t_date_start = Adef.cdate_of_od date_start;
+     t_date_end = Adef.cdate_of_od date_end; t_nth = nth}
 
 let rec get_titles str l =
   match l with
@@ -594,8 +594,8 @@ let get_mar_date str =
         match x.[0] with
           '+' ->
             (if String.length x > 1 then
-               Adef.codate_of_od (date_of_string x 1)
-             else Adef.codate_None),
+               Adef.cdate_of_od (date_of_string x 1)
+             else Adef.cdate_None),
             l
         | _ -> failwith str
       in
@@ -629,8 +629,8 @@ let get_mar_date str =
         match l with
           x :: l when x.[0] = '-' ->
             if String.length x > 1 then
-              Divorced (Adef.codate_of_od (date_of_string x 1)), l
-            else Divorced Adef.codate_None, l
+              Divorced (Adef.cdate_of_od (date_of_string x 1)), l
+            else Divorced Adef.cdate_None, l
         | "#sep" :: l -> Separated, l
         | _ -> NotDivorced, l
       in
@@ -645,9 +645,9 @@ let create_person () =
   {first_name = ""; surname = ""; occ = 0; image = ""; public_name = "";
    qualifiers = []; aliases = []; first_names_aliases = [];
    surnames_aliases = []; titles = []; rparents = []; related = [];
-   occupation = ""; sex = Neuter; access = IfTitles; birth = Adef.codate_None;
+   occupation = ""; sex = Neuter; access = IfTitles; birth = Adef.cdate_None;
    birth_place = ""; birth_note = ""; birth_src = "";
-   baptism = Adef.codate_None; baptism_place = ""; baptism_note = "";
+   baptism = Adef.cdate_None; baptism_place = ""; baptism_note = "";
    baptism_src = ""; death = DontKnowIfDead; death_place = "";
    death_note = ""; death_src = ""; burial = UnknownBurial; burial_place = "";
    burial_note = ""; burial_src = ""; pevents = []; notes = ""; psources = "";
@@ -692,13 +692,13 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   in
   let naissance =
     match naissance with
-      None -> Adef.codate_None
-    | Some x -> Adef.codate_of_od x
+      None -> Adef.cdate_None
+    | Some x -> Adef.cdate_of_od x
   in
   let baptism =
     match baptism with
-      None -> Adef.codate_None
-    | Some x -> Adef.codate_of_od x
+      None -> Adef.cdate_None
+    | Some x -> Adef.cdate_of_od x
   in
   let (burial, l) = get_burial l in
   let (burial_place, l) = get_field "#rp" l in
@@ -945,8 +945,8 @@ let read_family ic fname =
                     let (src, l) = get_field "#s" l in
                     let date =
                       match date with
-                        None -> Adef.codate_None
-                      | Some x -> Adef.codate_of_od x
+                        None -> Adef.cdate_None
+                      | Some x -> Adef.cdate_of_od x
                     in
                     if l <> [] then failwith str;
                     (* On récupère les témoins *)
@@ -1079,8 +1079,8 @@ let read_family ic fname =
                 let (src, l) = get_field "#s" l in
                 let date =
                   match date with
-                    None -> Adef.codate_None
-                  | Some x -> Adef.codate_of_od x
+                    None -> Adef.cdate_None
+                  | Some x -> Adef.cdate_of_od x
                 in
                 if l <> [] then failwith str;
                 (* On récupère les témoins *)

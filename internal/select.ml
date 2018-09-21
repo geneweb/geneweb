@@ -5,7 +5,7 @@ open Def
 open Gwdb
 
 let is_censored_person threshold p =
-  match Adef.od_of_codate (get_birth p) with
+  match Adef.od_of_cdate (get_birth p) with
     Some date ->
       begin match date with
         Dgreg (dmy, _) -> dmy.year >= threshold && get_access p != Public

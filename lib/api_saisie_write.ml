@@ -25,7 +25,7 @@ open Api_util
       - base : base de donnée
     [Retour] :
       - result : la liste de la recherche.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_auto_complete conf base =
   let params = get_params conf Mext_write.parse_auto_complete in
@@ -56,7 +56,7 @@ let print_auto_complete conf base =
       - base : base de donnée
     [Retour] :
       - result : la liste de la recherche.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_person_search_list conf base =
   let params = get_params conf Mext_write.parse_person_search_list_params in
@@ -80,8 +80,8 @@ let print_person_search_list conf base =
           let cmp_fn = Gutil.alphabetic_order fn1 fn2 in
           if cmp_fn = 0 then
             (match
-              (Adef.od_of_codate (get_birth p1),
-               Adef.od_of_codate (get_birth p2))
+              (Adef.od_of_cdate (get_birth p1),
+               Adef.od_of_cdate (get_birth p2))
              with
              | (Some d1, Some d2) ->
                  if CheckItem.strictly_before d1 d2 then -1
@@ -116,7 +116,7 @@ let print_person_search_list conf base =
       - conf : configuration de la base
       - base : base de donnée
     [Retour] : PersonSearchInfo
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_person_search_info conf base =
   let params = get_params conf Mext_write.parse_index_person in
@@ -210,7 +210,7 @@ let piqi_event_of_pevent evt_name =
       - base : base de donnée
     [Retour] :
       - Config
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_config conf base =
   let transl_cal =
@@ -613,7 +613,7 @@ let all_children_surname_are_the_same base fam =
       - person : la personne à partir de laquelle on calcul le nom
     [Retour] :
       - string : le potentiel nom hérité.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let rec infer_surname conf base p ifam =
   let surname = sou base (get_surname p) in
@@ -735,66 +735,28 @@ let rec infer_surname conf base p ifam =
             end
           else ""
 
-type compute_death =
-  | Compute_dead
-  | Compute_not_dead
-  | Compute_dont_know_if_dead
+(* FIXME: factorize *)
+let piqi_death_type_of_death = function
+  | NotDead -> `not_dead
+  | DontKnowIfDead -> `dont_know_if_dead
+  | OfCourseDead -> `of_course_dead
+  | _ -> assert false
 
-(* ************************************************************************ *)
-(*  [Fonc] compute_infer_death : config -> base -> person -> compute_death  *)
-(** [Description] : Renvoie le status de la personne, i.e. si elle est
-                    morte, vivante ou ne sait pas.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - person : la personne à partir de laquelle on calcul le décès
-    [Retour] :
-      - compute_death
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
-let compute_infer_death conf base p =
-  let is_dead p =
-    match get_death p with
-    | Death (_, _) | DeadYoung | DeadDontKnowWhen -> true
-    | OfCourseDead -> true
-    | _ -> false
-  in
-  match
-    (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p))
-  with
-  | (Some (Dgreg (dmy, _)), _) | (_, Some (Dgreg (dmy, _))) ->
-      if (CheckItem.time_elapsed dmy conf.today).year > 120 then Compute_dead
-      else Compute_not_dead
-  | _ ->
-      let rec loop all_children_dead ifaml =
-        match ifaml with
-        | [] ->
-            if all_children_dead then Compute_dead
-            else Compute_dont_know_if_dead
-        | ifam :: l ->
-            let fam = foi base ifam in
-            let rec loop_c all_dead children =
-              match children with
-              | [] -> if all_dead then Compute_dead else loop false l
-              | ip :: ll ->
-                  let child = poi base ip in
-                  match
-                    (Adef.od_of_codate (get_birth child),
-                     Adef.od_of_codate (get_baptism child))
-                  with
-                  | (Some (Dgreg (dmy, _)), _) | (_, Some (Dgreg (dmy, _))) ->
-                      if (CheckItem.time_elapsed dmy conf.today).year > 120
-                      then Compute_dead
-                      else loop_c (all_dead && is_dead child) ll
-                  | _ -> loop_c (all_dead && is_dead child) ll
-            in
-            loop_c all_children_dead (Array.to_list (get_children fam))
-      in
-      loop false (Array.to_list (get_family p))
+let infer_death conf base p =
+  piqi_death_type_of_death (Update.infer_death conf base p)
 
+let empty_death_pevent () =
+  { Mwrite.Pevent.pevent_type = Some `epers_death;
+    date = None;
+    place = None;
+    reason = None;
+    note = None;
+    src = None;
+    witnesses = [];
+    event_perso = None;
+  }
 
 (**/**) (* Fonctions qui renvoie le ModificationStatus. *)
-
 
 let compute_warnings conf base resp =
   let print_someone p =
@@ -1027,10 +989,10 @@ let compute_warnings conf base resp =
                   (fun _ ->
                      Printf.sprintf "%s %s %s-%s"
                        (sou base t.t_ident) (sou base t.t_place)
-                       (match Adef.od_of_codate t.t_date_start with
+                       (match Adef.od_of_cdate t.t_date_start with
                         | Some d -> Date.string_of_date conf d
                         | _ -> "" )
-                       (match Adef.od_of_codate t.t_date_end with
+                       (match Adef.od_of_cdate t.t_date_end with
                         | Some d -> Date.string_of_date conf d
                         | _ -> "" ))
                 in
@@ -1143,7 +1105,7 @@ let compute_modification_status conf base ip ifam resp =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_ind_start_ok conf base =
   let start_p = get_params conf Mext.parse_person_start in
@@ -1188,7 +1150,7 @@ let print_add_ind_start_ok conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_mod_ind conf base =
   let params = get_params conf Mext_write.parse_index_person in
@@ -1207,7 +1169,7 @@ let print_mod_ind conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_mod_ind_ok conf base =
   let mod_p = get_params conf Mext_write.parse_person in
@@ -1225,7 +1187,7 @@ let print_mod_ind_ok conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_ind_ok conf base =
   let mod_p = get_params conf Mext_write.parse_person in
@@ -1281,7 +1243,7 @@ let compute_redirect_person conf base ip =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_del_ind_ok conf base =
   let params = get_params conf Mext_write.parse_index_person in
@@ -1345,7 +1307,7 @@ let print_del_ind_ok conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_del_fam_ok conf base =
   let params = get_params conf Mext_write.parse_index_person_and_family in
@@ -1361,6 +1323,17 @@ let print_del_fam_ok conf base =
   in
   print_result conf data
 
+let set_parents_fields conf base p linked created =
+  linked.Mwrite.Person.create_link <- `link;
+  created.Mwrite.Person.index <- Int32.of_int 0;
+  created.Mwrite.Person.access <- `access_iftitles;
+  created.Mwrite.Person.create_link <- `create_default_occ;
+  created.Mwrite.Person.digest <- "";
+  match infer_death conf base p with
+  | `of_course_dead ->
+    created.Mwrite.Person.death_type <- `of_course_dead ;
+    created.Mwrite.Person.pevents <- created.Mwrite.Person.pevents @ [ empty_death_pevent () ]
+  | x -> created.Mwrite.Person.death_type <- x
 
 (* ************************************************************************ *)
 (*  [Fonc] compute_add_family : config -> base -> person -> Family (piqi)   *)
@@ -1372,96 +1345,37 @@ let print_del_fam_ok conf base =
       - p    : la personne à qui on ajoute la famille
     [Retour] :
       - Family : la famille piqi
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let compute_add_family conf base p =
+  let adding_to_father = get_sex p = Male in
   let family =
     Api_update_util.piqi_empty_family conf base (Adef.ifam_of_int (-1))
   in
   let p_father =
-    if get_sex p = Male then p
-    else Gwdb.empty_person base (Adef.iper_of_int (-1))
+    if adding_to_father then p else Gwdb.empty_person base (Adef.iper_of_int (-1))
   in
   let p_mother =
-    if get_sex p = Female then p
-    else Gwdb.empty_person base (Adef.iper_of_int (-1))
+    if adding_to_father then Gwdb.empty_person base (Adef.iper_of_int (-1))
+    else p
   in
   let father = Api_update_util.pers_to_piqi_mod_person conf base p_father in
   let mother = Api_update_util.pers_to_piqi_mod_person conf base p_mother in
-  (* Mise à jour des parents dans la famille. *)
-  let () =
-    family.Mwrite.Family.father <- father;
-    family.Mwrite.Family.mother <- mother;
-  in
   (* Les index négatifs ne marchent pas ! *)
   (* Par défaut, les access sont en Private, on passe en Iftitles. *)
   family.Mwrite.Family.index <- Int32.of_int 0;
-  if get_sex p = Male then
-    begin
-      mother.Mwrite.Person.index <- Int32.of_int 0;
-      mother.Mwrite.Person.access <- `access_iftitles;
-    end
-  else
-    begin
-      father.Mwrite.Person.index <- Int32.of_int 0;
-      father.Mwrite.Person.access <- `access_iftitles;
-    end;
-  (* On met les parents en mode Create. *)
-  let () =
-    if get_sex p = Male then
-      begin
-        father.Mwrite.Person.create_link <- `link;
-        mother.Mwrite.Person.create_link <- `create_default_occ;
-        (* On supprime le digest car on créé la mère *)
-        mother.Mwrite.Person.digest <- "";
-      end
-    else
-      begin
-        father.Mwrite.Person.create_link <- `create_default_occ;
-        (* On supprime le digest car on créé la père *)
-        father.Mwrite.Person.digest <- "";
-        mother.Mwrite.Person.create_link <- `link;
-      end
-  in
-  (* On met à jour les sexes. *)
-  if get_sex p = Male then mother.Mwrite.Person.sex <- `female
-  else father.Mwrite.Person.sex <- `male;
-  (* On calcul si le conjoint est décédé et ajoute les évènements nécessaires. *)
-  let () =
-    let death =
-      {
-        Mwrite.Pevent.pevent_type = Some `epers_death;
-        date = None;
-        place = None;
-        reason = None;
-        note = None;
-        src = None;
-        witnesses = [];
-        event_perso = None;
-      }
-    in
-    match compute_infer_death conf base p with
-    | Compute_dead | Compute_dont_know_if_dead ->
-        if get_sex p = Male then
-          begin
-            mother.Mwrite.Person.death_type <- `dont_know_if_dead;
-            mother.Mwrite.Person.pevents <-
-              mother.Mwrite.Person.pevents @ [death];
-          end
-        else
-          begin
-            father.Mwrite.Person.death_type <- `dont_know_if_dead;
-            father.Mwrite.Person.pevents <-
-              father.Mwrite.Person.pevents @ [death];
-          end
-    | Compute_not_dead ->
-        if get_sex p = Male then
-          mother.Mwrite.Person.death_type <- `not_dead
-        else
-          father.Mwrite.Person.death_type <- `not_dead
-  in
+  if adding_to_father
+  then begin
+    mother.Mwrite.Person.sex <- `female ;
+    set_parents_fields conf base p father mother
+  end
+  else begin
+    father.Mwrite.Person.sex <- `male;
+    set_parents_fields conf base p mother father
+  end ;
+  family.Mwrite.Family.father <- father;
+  family.Mwrite.Family.mother <- mother;
   family
-
 
 (* ************************************************************************ *)
 (*  [Fonc] print_add_family : config -> base -> AddFamily                   *)
@@ -1472,7 +1386,7 @@ let compute_add_family conf base p =
       - base : base de donnée
     [Retour] :
       - AddFamily : les informations du template.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_family conf base =
   let params = get_params conf Mext_write.parse_index_person in
@@ -1503,34 +1417,15 @@ let print_add_family conf base =
       - mod_family : la famille que l'on veut ajouter
     [Retour] :
       - UpdateStatus
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let compute_add_family_ok conf base mod_family =
   let mod_father = mod_family.Mwrite.Family.father in
   let mod_mother = mod_family.Mwrite.Family.mother in
-  (* Il faut mettre à jour les clés. *)
-  let fath_fn = mod_father.Mwrite.Person.firstname in
-  let fath_sn = mod_father.Mwrite.Person.lastname in
-  (*let fath_occ = mod_father.Mwrite.Person.occ in*)
-  mod_father.Mwrite.Person.firstname <- fath_fn;
-  mod_father.Mwrite.Person.lastname <- fath_sn;
-  (*
-  if fath_occ = 0 then
-    mod_father.Mwrite.Person.occ <- None
-  else
-    mod_father.Mwrite.Person.occ <- Some (Int32.of_int fath_occ);
-  *)
   let moth_fn = mod_mother.Mwrite.Person.firstname in
   let moth_sn = mod_mother.Mwrite.Person.lastname in
-  (*let moth_occ = mod_mother.Mwrite.Person.occ in*)
   mod_mother.Mwrite.Person.firstname <- moth_fn;
   mod_mother.Mwrite.Person.lastname <- moth_sn;
-  (*
-  if moth_occ = 0 then
-    mod_mother.Mwrite.Person.occ <- None
-  else
-    mod_mother.Mwrite.Person.occ <- Some (Int32.of_int moth_occ);
-  *)
   (*
      On ajoute une famille, il faut effectuer les actions suivantes :
        - modification de la personne sur laquelle on clic (pour les clés) => MOD_IND
@@ -1543,47 +1438,40 @@ let compute_add_family_ok conf base mod_family =
              mod_mother.Mwrite.Person.create_link)
       with
       | (`link, (`create | `create_default_occ)) ->
-          (*
-          let occ = Api_update_util.find_free_occ base moth_fn moth_sn in
-          if occ = 0 then
-            mod_mother.Mwrite.Person.occ <- None
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_person.print_mod conf base mod_father with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_family.print_add
+                  conf base mod_family mod_father mod_mother
+          with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
+        (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
+        (* apporter de modifications.                             *)
+        let (all_wl, all_ml, all_hr) =
+          if mod_mother.Mwrite.Person.lastname = "" ||
+             mod_mother.Mwrite.Person.firstname = ""
+          then
+            (all_wl, all_ml, all_hr)
           else
-            mod_mother.Mwrite.Person.occ <- Some (Int32.of_int occ);
-          *)
-          let (all_wl, all_ml, all_hr) =
-            match Api_update_person.print_mod conf base mod_father with
-            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
-            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c ->
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          let (all_wl, all_ml, all_hr) =
-            match Api_update_family.print_add
-                    conf base mod_family mod_father mod_mother
-            with
+            match Api_update_person.print_mod conf base mod_mother with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
             | Api_update_util.UpdateErrorConflict c ->
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
-          (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
-          (* apporter de modifications.                             *)
-          let (all_wl, all_ml, all_hr) =
-            if mod_mother.Mwrite.Person.lastname = "" ||
-               mod_mother.Mwrite.Person.firstname = ""
-            then
-              (all_wl, all_ml, all_hr)
-            else
-              match Api_update_person.print_mod conf base mod_mother with
-              | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-              | Api_update_util.UpdateErrorConflict c ->
-                  (* On dit que c'est le formulaire de la femme. *)
-                  c.Mwrite.Create_conflict.form <- Some `person_form2;
-                  raise (Api_update_util.ModErrApiConflict c)
-          in
-          Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
+              (* On dit que c'est le formulaire de la femme. *)
+              c.Mwrite.Create_conflict.form <- Some `person_form2;
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
       | ((`create | `create_default_occ), `link) ->
           (*
           let occ = Api_update_util.find_free_occ base fath_fn fath_sn in
@@ -1592,110 +1480,110 @@ let compute_add_family_ok conf base mod_family =
           else
             mod_father.Mwrite.Person.occ <- Some (Int32.of_int occ);
           *)
-          let (all_wl, all_ml, all_hr) =
-            match Api_update_person.print_mod conf base mod_mother with
-            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
-            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c ->
-                (* On dit que c'est le formulaire de la femme. *)
-                c.Mwrite.Create_conflict.form <- Some `person_form2;
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          let (all_wl, all_ml, all_hr) =
-            match
-              Api_update_family.print_add
-                conf base mod_family mod_father mod_mother
-            with
-            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c ->
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
-          (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
-          (* apporter de modifications.                             *)
-          let (all_wl, all_ml, all_hr) =
-            if mod_father.Mwrite.Person.lastname = ""
-            || mod_father.Mwrite.Person.firstname = ""
-            then
-              (all_wl, all_ml, all_hr)
-            else
-              match Api_update_person.print_mod conf base mod_father with
-              | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-              | Api_update_util.UpdateErrorConflict c ->
-                  raise (Api_update_util.ModErrApiConflict c)
-          in
-          Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
-      | (`link, `link) ->
-          let (all_wl, all_ml, all_hr) =
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_person.print_mod conf base mod_mother with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            (* On dit que c'est le formulaire de la femme. *)
+            c.Mwrite.Create_conflict.form <- Some `person_form2;
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_ml, all_hr) =
+          match
+            Api_update_family.print_add
+              conf base mod_family mod_father mod_mother
+          with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
+        (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
+        (* apporter de modifications.                             *)
+        let (all_wl, all_ml, all_hr) =
+          if mod_father.Mwrite.Person.lastname = ""
+          || mod_father.Mwrite.Person.firstname = ""
+          then
+            (all_wl, all_ml, all_hr)
+          else
             match Api_update_person.print_mod conf base mod_father with
-            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
+            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
             | Api_update_util.UpdateErrorConflict c ->
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          let (all_wl, all_ml, all_hr) =
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
+      | (`link, `link) ->
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_person.print_mod conf base mod_father with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_person.print_mod conf base mod_mother with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            (* On dit que c'est le formulaire de la femme. *)
+            c.Mwrite.Create_conflict.form <- Some `person_form2;
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_family.print_add
+                  conf base mod_family mod_father mod_mother
+          with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
+      | ((`create | `create_default_occ), (`create | `create_default_occ)) ->
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_family.print_add
+                  conf base mod_family mod_father mod_mother
+          with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+            raise (Api_update_util.ModErrApiConflict c)
+        in
+        (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
+        (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
+        (* apporter de modifications.                             *)
+        let (all_wl, all_ml, all_hr) =
+          if mod_father.Mwrite.Person.lastname = "" ||
+             mod_father.Mwrite.Person.firstname = ""
+          then
+            (all_wl, all_ml, all_hr)
+          else
+            match Api_update_person.print_mod conf base mod_father with
+            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
+            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+            | Api_update_util.UpdateErrorConflict c ->
+              (* On dit que c'est le formulaire de la femme. *)
+              c.Mwrite.Create_conflict.form <- Some `person_form2;
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_ml, all_hr) =
+          if mod_mother.Mwrite.Person.lastname = "" ||
+             mod_mother.Mwrite.Person.firstname = ""
+          then
+            (all_wl, all_ml, all_hr)
+          else
             match Api_update_person.print_mod conf base mod_mother with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
             | Api_update_util.UpdateErrorConflict c ->
-                (* On dit que c'est le formulaire de la femme. *)
-                c.Mwrite.Create_conflict.form <- Some `person_form2;
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          let (all_wl, all_ml, all_hr) =
-            match Api_update_family.print_add
-                    conf base mod_family mod_father mod_mother
-            with
-            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c ->
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
-      | ((`create | `create_default_occ), (`create | `create_default_occ)) ->
-          let (all_wl, all_ml, all_hr) =
-            match Api_update_family.print_add
-                    conf base mod_family mod_father mod_mother
-            with
-            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
-            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c ->
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
-          (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
-          (* apporter de modifications.                             *)
-          let (all_wl, all_ml, all_hr) =
-            if mod_father.Mwrite.Person.lastname = "" ||
-               mod_father.Mwrite.Person.firstname = ""
-            then
-              (all_wl, all_ml, all_hr)
-            else
-              match Api_update_person.print_mod conf base mod_father with
-              | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-              | Api_update_util.UpdateErrorConflict c ->
-                  (* On dit que c'est le formulaire de la femme. *)
-                  c.Mwrite.Create_conflict.form <- Some `person_form2;
-                  raise (Api_update_util.ModErrApiConflict c)
-          in
-          let (all_wl, all_ml, all_hr) =
-            if mod_mother.Mwrite.Person.lastname = "" ||
-               mod_mother.Mwrite.Person.firstname = ""
-            then
-              (all_wl, all_ml, all_hr)
-            else
-              match Api_update_person.print_mod conf base mod_mother with
-              | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-              | Api_update_util.UpdateErrorConflict c ->
-                  (* On dit que c'est le formulaire de la femme. *)
-                  c.Mwrite.Create_conflict.form <- Some `person_form2;
-                  raise (Api_update_util.ModErrApiConflict c)
-          in
-          Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
+              (* On dit que c'est le formulaire de la femme. *)
+              c.Mwrite.Create_conflict.form <- Some `person_form2;
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
     end
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
@@ -1710,7 +1598,7 @@ let compute_add_family_ok conf base mod_family =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_family_ok conf base =
   let add_family_ok = get_params conf Mext_write.parse_add_family_ok in
@@ -1730,15 +1618,15 @@ let print_add_family_ok conf base =
       - base : base de donnée
     [Retour] :
       - EditFamily : les informations du template.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+*)
 (* ************************************************************************ *)
 let print_mod_family_request conf base =
   let params = get_params conf Mext_write.parse_add_child_request in
   let ip = Int32.to_int params.Mwrite.Add_child_request.index in
   let ip = Adef.iper_of_int ip in
   let p = poi base ip in
-  let family_spouse =
-    List.fold_right
+  let spouses =
+    Array.fold_right
       (fun ifam accu ->
          let cpl = foi base ifam in
          let isp = Gutil.spouse ip cpl in
@@ -1751,10 +1639,11 @@ let print_mod_family_request conf base =
            | Female -> `female
            | Neuter -> `unknown
          in
-         let surname = sou base (get_surname sp) in
-         let first_name = sou base (get_first_name sp) in
-         let dates = Api_saisie_read.short_dates_text conf base sp in
+         let lastname = sou base (get_surname sp) in
+         let firstname = sou base (get_first_name sp) in
+         let dates = Opt.of_string @@ Api_saisie_read.short_dates_text conf base sp in
          let image =
+           Opt.of_string @@
            let img = sou base (get_image sp) in
            if img <> "" then img
            else if Api_util.find_image_file conf base sp <> None
@@ -1769,55 +1658,42 @@ let print_mod_family_request conf base =
          in
          let family_spouse =
            {
-             Mwrite.Family_spouse.index_family = index_family;
-             index_person = index_person;
-             sex = sex;
-             lastname = surname;
-             firstname = first_name;
-             dates = if dates = "" then None else Some dates;
-             image = if image = "" then None else Some image;
-             sosa = sosa;
+             Mwrite.Family_spouse.index_family;
+             index_person;
+             sex;
+             lastname;
+             firstname;
+             dates ;
+             image ;
+             sosa ;
            }
          in
          family_spouse :: accu)
-      (Array.to_list (get_family p)) []
+      (get_family p) []
   in
   let first_family =
-    match (Array.to_list (get_family p)) with
-    | [] -> None
-    | ifam :: _ ->
-        let fam = foi base ifam in
-        let surname = sou base (get_surname p) in
-        let first_name = sou base (get_first_name p) in
-        let family = Api_update_util.fam_to_piqi_mod_family conf base ifam fam in
-        let (p_father, p_mother) =
-          if get_sex p = Male then (p, poi base (Gutil.spouse ip fam))
-          else (poi base (Gutil.spouse ip fam), p)
-        in
-        let father = Api_update_util.pers_to_piqi_mod_person conf base p_father in
-        let mother = Api_update_util.pers_to_piqi_mod_person conf base p_mother in
-        (* Mise à jour des parents dans la famille. *)
-        let () =
-          family.Mwrite.Family.father <- father;
-          family.Mwrite.Family.mother <- mother;
-        in
-        let edit_family =
-          {
-            Mwrite.Edit_family.person_lastname = surname;
-            person_firstname = first_name;
-            family = family;
-          }
-        in
-        Some edit_family
+    match get_family p with
+    | [||] -> None
+    | families ->
+      let ifam = Array.get families 0 in
+      let fam = foi base ifam in
+      let person_lastname = sou base (get_surname p) in
+      let person_firstname = sou base (get_first_name p) in
+      let family = Api_update_util.fam_to_piqi_mod_family conf base ifam fam in
+      let (p_father, p_mother) =
+        if get_sex p = Male then (p, poi base (Gutil.spouse ip fam))
+        else (poi base (Gutil.spouse ip fam), p)
+      in
+      let father = Api_update_util.pers_to_piqi_mod_person conf base p_father in
+      let mother = Api_update_util.pers_to_piqi_mod_person conf base p_mother in
+      (* Mise à jour des parents dans la famille. *)
+      family.Mwrite.Family.father <- father ;
+      family.Mwrite.Family.mother <- mother ;
+      Some { Mwrite.Edit_family.person_lastname ; person_firstname ; family }
   in
-  let spouses =
-    Mwrite.Edit_family_request.({
-      spouses = family_spouse;
-      first_family = first_family;
-    })
-  in
-  let data = Mext_write.gen_edit_family_request spouses in
-  print_result conf data
+  print_result conf
+    (Mext_write.gen_edit_family_request
+       { Mwrite.Edit_family_request.spouses ; first_family })
 
 
 (* ************************************************************************ *)
@@ -1828,7 +1704,7 @@ let print_mod_family_request conf base =
       - base : base de donnée
     [Retour] :
       - EditFamily : les informations du template.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_mod_family conf base =
   let params = get_params conf Mext_write.parse_index_person_and_family in
@@ -1871,7 +1747,7 @@ let print_mod_family conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_mod_family_ok conf base =
   let edit_family_ok = get_params conf Mext_write.parse_edit_family_ok in
@@ -1947,7 +1823,7 @@ let print_mod_family_ok conf base =
       - base : base de donnée
     [Retour] :
       - AddChild : les informations du template.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_parents conf base =
   let params = get_params conf Mext_write.parse_index_person in
@@ -1980,31 +1856,15 @@ let print_add_parents conf base =
   (* On calcul si les parents sont décédés
      et ajoute les évènements nécessaires. *)
   let () =
-    let death =
-      {
-        Mwrite.Pevent.pevent_type = Some `epers_death;
-        date = None;
-        place = None;
-        reason = None;
-        note = None;
-        src = None;
-        witnesses = [];
-        event_perso = None;
-      }
-    in
-    match compute_infer_death conf base p with
-    | Compute_dead | Compute_dont_know_if_dead ->
-        begin
-          father.Mwrite.Person.death_type <- `dont_know_if_dead;
-          mother.Mwrite.Person.death_type <- `dont_know_if_dead;
-          father.Mwrite.Person.pevents <- father.Mwrite.Person.pevents @ [death];
-          mother.Mwrite.Person.pevents <- mother.Mwrite.Person.pevents @ [death];
-        end
-    | Compute_not_dead ->
-        begin
-          father.Mwrite.Person.death_type <- `not_dead;
-          mother.Mwrite.Person.death_type <- `not_dead;
-        end
+    match infer_death conf base p with
+    | `of_course_dead as x ->
+      father.Mwrite.Person.death_type <- x ;
+      mother.Mwrite.Person.death_type <- x ;
+      father.Mwrite.Person.pevents <- father.Mwrite.Person.pevents @ [ empty_death_pevent () ];
+      mother.Mwrite.Person.pevents <- mother.Mwrite.Person.pevents @ [ empty_death_pevent () ]
+    | x ->
+      father.Mwrite.Person.death_type <- x ;
+      mother.Mwrite.Person.death_type <- x
   in
   (* On calcul le nom du père. *)
   let () =
@@ -2045,8 +1905,7 @@ let do_mod_fam_add_child conf base ifam ip mod_c =
     Api_update_util.fam_to_piqi_mod_family conf base (Adef.ifam_of_int ifam) fam
   in
   (* On ajoute le nouvel enfant. *)
-  mod_f.Mwrite.Family.children <-
-    mod_f.Mwrite.Family.children @ [ child ];
+  mod_f.Mwrite.Family.children <- mod_f.Mwrite.Family.children @ [ child ] ;
   let resp =
     try
       begin
@@ -2063,11 +1922,7 @@ let do_mod_fam_add_child conf base ifam ip mod_c =
         else
           (* On met à jour l'enfant et l'index ! *)
           let (all_wl, all_ml, all_hr) =
-            let occ =
-              match child.Mwrite.Person_link.occ with
-              | None -> 0
-              | Some occ -> Int32.to_int occ
-            in
+            let occ = Opt.map_default 0 Int32.to_int child.Mwrite.Person_link.occ in
             match person_of_key base mod_c.Mwrite.Person.firstname mod_c.Mwrite.Person.lastname occ with
             | Some ip_child ->
               mod_c.Mwrite.Person.index <- Int32.of_int (Adef.int_of_iper ip_child);
@@ -2076,6 +1931,10 @@ let do_mod_fam_add_child conf base ifam ip mod_c =
               let child = poi base ip_child in
               let digest = Update.digest_person (UpdateInd.string_person_of base child) in
               mod_c.Mwrite.Person.digest <- digest;
+              if mod_c.Mwrite.Person.death_type = `dont_know_if_dead
+              then
+                mod_c.Mwrite.Person.death_type <-
+                  piqi_death_type_of_death (Update.infer_death_from_parents conf base fam) ;
               (match Api_update_person.print_mod conf base mod_c with
                | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
                | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -2102,8 +1961,9 @@ let do_mod_fam_add_child conf base ifam ip mod_c =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
+(* FIXME: if and else could be factorized? *)
 let print_add_child_ok_aux conf base add_child_ok =
   let ip = Int32.to_int add_child_ok.Mwrite.Add_child_ok.index_person in
   let ifam = Int32.to_int add_child_ok.Mwrite.Add_child_ok.index_family in
@@ -2148,18 +2008,12 @@ let print_add_child_ok_aux conf base add_child_ok =
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
             | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
           in
-          if (fn = "?" || fn = "") &&
-             (sn = "?" || sn = "")
-          then
-            Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
-          else
+          match fn, sn with
+          | ("?" | ""), ("" | "?") -> Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
+          | _ ->
             (* On met à jour l'enfant et l'index ! *)
             let (all_wl, all_ml, all_hr) =
-              let occ =
-                match create_child.Mwrite.Person_link.occ with
-                | None -> 0
-                | Some occ -> Int32.to_int occ
-              in
+              let occ = Opt.map_default 0 Int32.to_int create_child.Mwrite.Person_link.occ in
               match person_of_key base fn sn occ with
               | Some ip_child ->
                 mod_c.Mwrite.Person.index <- Int32.of_int (Adef.int_of_iper ip_child);
@@ -2168,6 +2022,13 @@ let print_add_child_ok_aux conf base add_child_ok =
                 let child = poi base ip_child in
                 let digest = Update.digest_person (UpdateInd.string_person_of base child) in
                 mod_c.Mwrite.Person.digest <- digest;
+                if mod_c.Mwrite.Person.death_type = `dont_know_if_dead
+                then
+                  Opt.iter
+                    (fun i ->
+                       mod_c.Mwrite.Person.death_type <-
+                         piqi_death_type_of_death (Update.infer_death_from_parents conf base @@ foi base i) )
+                    (get_parents child) ;
                 (match Api_update_person.print_mod conf base mod_c with
                  | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
                  | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -2197,7 +2058,7 @@ let print_add_child_ok conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_parents_ok conf base =
   let add_parents_ok = get_params conf Mext_write.parse_add_parents_ok in
@@ -2261,51 +2122,6 @@ let print_add_parents_ok conf base =
     in
     print_add_child_ok_aux conf base add_child_ok
   | _ ->
-    (* Il faut mettre à jour les clés. *)
-    let fath_fn = mod_father.Mwrite.Person.firstname in
-    let fath_sn = mod_father.Mwrite.Person.lastname in
-    let fath_occ =
-      match mod_father.Mwrite.Person.create_link with
-      | `link -> mod_father.Mwrite.Person.occ
-      | `create | `create_default_occ ->
-        mod_father.Mwrite.Person.occ
-        (*
-        let occ = Api_update_util.find_free_occ base fath_fn fath_sn in
-        if occ = 0 then None
-        else Some (Int32.of_int occ)
-        *)
-    in
-    mod_father.Mwrite.Person.firstname <- fath_fn;
-    mod_father.Mwrite.Person.lastname <- fath_sn;
-    mod_father.Mwrite.Person.occ <- fath_occ;
-  (*
-  if fath_occ = 0 then
-    mod_father.Mwrite.Person.occ <- None
-  else
-    mod_father.Mwrite.Person.occ <- Some (Int32.of_int fath_occ);
-  *)
-    let moth_fn = mod_mother.Mwrite.Person.firstname in
-    let moth_sn = mod_mother.Mwrite.Person.lastname in
-    let moth_occ =
-      match mod_mother.Mwrite.Person.create_link with
-      | `link -> mod_mother.Mwrite.Person.occ
-      | `create | `create_default_occ ->
-        mod_mother.Mwrite.Person.occ
-        (*
-        let occ = Api_update_util.find_free_occ base moth_fn moth_sn in
-        if occ = 0 then None
-        else Some (Int32.of_int occ)
-        *)
-    in
-    mod_mother.Mwrite.Person.firstname <- moth_fn;
-    mod_mother.Mwrite.Person.lastname <- moth_sn;
-    mod_mother.Mwrite.Person.occ <- moth_occ;
-  (*
-  if moth_occ = 0 then
-    mod_mother.Mwrite.Person.occ <- None
-  else
-    mod_mother.Mwrite.Person.occ <- Some (Int32.of_int moth_occ);
-  *)
   (*
      On ajoute les parents, il faut effectuer les actions suivantes :
        - ajout de la famille => ADD_FAM
@@ -2326,28 +2142,26 @@ let print_add_parents_ok conf base =
           in
           (* Mise à jour des index et digest => fait dans Api_update_family.print_add *)
           let (all_wl, all_ml, all_hr) =
-            if (fath_fn = "?" || fath_fn = "") &&
-               (fath_sn = "?" || fath_sn = "")
-            then
+            match mod_father.Mwrite.Person.firstname, mod_father.Mwrite.Person.lastname with
+            | ("?"|""), ("?"|"") ->
               (* TODO
                  raise (Update.ModErrApi "PersonKey")
               *)
               (all_wl, all_ml, all_hr)
-            else
+            | _ ->
               match Api_update_person.print_mod conf base mod_father with
               | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
               | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
               | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
           in
           let (all_wl, all_ml, all_hr) =
-            if (moth_fn = "?" || moth_fn = "") &&
-               (moth_sn = "?" || moth_sn = "")
-            then
+            match mod_mother.Mwrite.Person.firstname, mod_mother.Mwrite.Person.lastname with
+            | ("?"|""), ("?"|"") ->
               (* TODO
                  raise (Update.ModErrApi "PersonKey")
               *)
               (all_wl, all_ml, all_hr)
-            else
+            | _ ->
               match Api_update_person.print_mod conf base mod_mother with
               | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
               | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -2380,7 +2194,7 @@ let print_add_parents_ok conf base =
       - base : base de donnée
     [Retour] :
       - AddChild : les informations du template.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_child conf base =
   let params = get_params conf Mext_write.parse_add_child_request in
@@ -2453,26 +2267,11 @@ let print_add_child conf base =
   in
   (* On calcul si l'enfant est décédé. *)
   let () =
-    let death =
-      {
-        Mwrite.Pevent.pevent_type = Some `epers_death;
-        date = None;
-        place = None;
-        reason = None;
-        note = None;
-        src = None;
-        witnesses = [];
-        event_perso = None;
-      }
-    in
-    match compute_infer_death conf base p with
-    | Compute_dead | Compute_dont_know_if_dead ->
-        begin
-          child.Mwrite.Person.death_type <- `dont_know_if_dead;
-          child.Mwrite.Person.pevents <- child.Mwrite.Person.pevents @ [death];
-        end
-    | Compute_not_dead ->
-        child.Mwrite.Person.death_type <- `not_dead
+    match infer_death conf base p with
+    | `of_course_dead ->
+      child.Mwrite.Person.death_type <- `dont_know_if_dead;
+      child.Mwrite.Person.pevents <- child.Mwrite.Person.pevents @ [ empty_death_pevent () ];
+    | x -> child.Mwrite.Person.death_type <- x
   in
   (* On prend le nom du père *)
   let child_surname = infer_surname conf base p ifam in
@@ -2501,7 +2300,7 @@ let print_add_child conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_child_ok conf base =
   let add_child_ok = get_params conf Mext_write.parse_add_child_ok in
@@ -2529,7 +2328,7 @@ let print_add_child_ok conf base =
       - base : base de donnée
     [Retour] :
       - AddSibling : les informations du template.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_sibling conf base =
   let params = get_params conf Mext_write.parse_add_sibling_request in
@@ -2537,11 +2336,7 @@ let print_add_sibling conf base =
   let ip = Adef.iper_of_int ip in
   let p = poi base ip in
   let father =
-    match get_parents p with
-    | Some ifam ->
-        let fam = foi base ifam in
-        Some (poi base (get_father fam))
-    | None -> None
+    Opt.map (fun ifam -> poi base @@ get_father @@ foi base ifam) (get_parents p)
   in
   let surname = sou base (get_surname p) in
   let first_name = sou base (get_first_name p) in
@@ -2556,36 +2351,18 @@ let print_add_sibling conf base =
   (* On met le frère/soeur en mode Create. *)
   sibling.Mwrite.Person.create_link <- `create_default_occ;
   (* On met à jour le sex *)
-  let () =
-    match params.Mwrite.Add_sibling_request.sex with
-    | Some sex -> sibling.Mwrite.Person.sex <- sex
-    | None -> ()
-  in
+  Opt.iter (fun s -> sibling.Mwrite.Person.sex <- s) params.Mwrite.Add_sibling_request.sex ;
   (* On calcul si l'enfant est décédé. *)
   let () =
-    let death =
-      {
-        Mwrite.Pevent.pevent_type = Some `epers_death;
-        date = None;
-        place = None;
-        reason = None;
-        note = None;
-        src = None;
-        witnesses = [];
-        event_perso = None;
-      }
-    in
     match father with
     | Some father ->
-        (match compute_infer_death conf base father with
-        | Compute_dead | Compute_dont_know_if_dead ->
-            begin
-              sibling.Mwrite.Person.death_type <- `dont_know_if_dead;
-              sibling.Mwrite.Person.pevents <- sibling.Mwrite.Person.pevents @ [death];
-            end
-        | Compute_not_dead -> ())
-    | None ->
-        sibling.Mwrite.Person.death_type <- `not_dead
+      begin match infer_death conf base father with
+        | `of_course_dead ->
+          sibling.Mwrite.Person.death_type <- `of_course_dead ;
+          sibling.Mwrite.Person.pevents <- sibling.Mwrite.Person.pevents @ [ empty_death_pevent () ] ;
+        | x -> sibling.Mwrite.Person.death_type <- x
+      end
+    | None -> sibling.Mwrite.Person.death_type <- `not_dead
   in
   (* On prend le nom du père *)
   let sibling_surname =
@@ -2616,7 +2393,7 @@ let print_add_sibling conf base =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_sibling_ok conf base =
   let add_sibling_ok = get_params conf Mext_write.parse_add_sibling_ok in
@@ -2789,7 +2566,7 @@ let print_add_sibling_ok conf base =
       - conf  : configuration de la base
       - mod_p : person piqi
     [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let check_input_person conf mod_p =
   let designation () =
@@ -2861,7 +2638,7 @@ let check_input_person conf mod_p =
          L'objet AddFirstFam modifié afain de ne pas avoir de conflit de
          occ et le status de la réponse si l'utilisateur a fait une mauvaise
          saisie.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let compute_add_first_fam conf =
   let add_first_fam = get_params conf Mext_write.parse_add_first_fam in
@@ -2992,7 +2769,7 @@ let compute_add_first_fam conf =
       - conf : configuration de la base
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_first_fam conf =
   let (add_first_fam, resp) = compute_add_first_fam conf in
@@ -3050,7 +2827,7 @@ let print_add_first_fam conf =
       - base : base de donnée
     [Retour] :
       - status : les informations si la modification s'est bien passée.
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+                                                                           *)
 (* ************************************************************************ *)
 let print_add_first_fam_ok conf base =
   let (add_first_fam, _) = compute_add_first_fam conf in

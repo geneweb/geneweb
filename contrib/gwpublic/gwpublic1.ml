@@ -4,26 +4,26 @@ open Def
 open Gwdb
 
 let year_of p =
-  match
-    Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-    get_death p, CheckItem.date_of_death (get_death p)
-  with
-    _, _, NotDead, _ -> None
-  | Some (Dgreg (d, _)), _, _, _ -> Some d.year
-  | _, Some (Dgreg (d, _)), _, _ -> Some d.year
-  | _, _, _, Some (Dgreg (d, _)) -> Some d.year
-  | _ -> None
+  match get_death p with
+  | NotDead -> None
+  | death -> match Adef.od_of_cdate (get_birth p) with
+    | Some (Dgreg (d, _)) -> Some d.year
+    | None -> match Adef.od_of_cdate (get_baptism p) with
+      | Some (Dgreg (d, _)) -> Some d.year
+      | None -> match CheckItem.date_of_death death with
+        | Some (Dgreg (d, _)) -> Some d.year
+        | None -> None
 
 let most_recent_year_of p =
-  match
-    Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-    get_death p, CheckItem.date_of_death (get_death p)
-  with
-    _, _, NotDead, _ -> None
-  | _, _, _, Some (Dgreg (d, _)) -> Some d.year
-  | _, Some (Dgreg (d, _)), _, _ -> Some d.year
-  | Some (Dgreg (d, _)), _, _, _ -> Some d.year
-  | _ -> None
+  match get_death p with
+  | NotDead -> None
+  | death -> match CheckItem.date_of_death death with
+    | Some (Dgreg (d, _)) -> Some d.year
+    | None -> match Adef.od_of_cdate (get_baptism p) with
+      | Some (Dgreg (d, _)) -> Some d.year
+      | None -> match Adef.od_of_cdate (get_birth p) with
+        | Some (Dgreg (d, _)) -> Some d.year
+        | None -> None
 
 let is_old lim_year p =
   match year_of p with

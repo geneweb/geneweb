@@ -9,7 +9,6 @@ type iper = Adef.iper
 type ifam = Adef.ifam
 
 type cdate = Adef.cdate
-type codate = Adef.codate
 
 type date =
   Adef.date =
@@ -40,7 +39,7 @@ type relation_kind =
 
 type divorce =
     NotDivorced
-  | Divorced of codate
+  | Divorced of cdate
   | Separated
 
 type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
@@ -54,8 +53,8 @@ type death =
 
 type burial =
     UnknownBurial
-  | Buried of codate
-  | Cremated of codate
+  | Buried of cdate
+  | Cremated of cdate
 
 type access = IfTitles | Public | Private
 
@@ -67,8 +66,8 @@ type 'string gen_title =
   { t_name : 'string gen_title_name;
     t_ident : 'string;
     t_place : 'string;
-    t_date_start : codate;
-    t_date_end : codate;
+    t_date_start : cdate;
+    t_date_end : cdate;
     t_nth : int }
 
 type witness_kind = Witness | Witness_GodParent | Witness_Officer
@@ -127,7 +126,7 @@ type 'string gen_pers_event_name =
   | Epers_Name of 'string
 type ('person, 'string) gen_pers_event =
   { epers_name : 'string gen_pers_event_name;
-    epers_date : codate;
+    epers_date : cdate;
     epers_place : 'string;
     epers_reason : 'string;
     epers_note : 'string;
@@ -150,7 +149,7 @@ type 'string gen_fam_event_name =
   | Efam_Name of 'string
 type ('person, 'string) gen_fam_event =
   { efam_name : 'string gen_fam_event_name;
-    efam_date : codate;
+    efam_date : cdate;
     efam_place : 'string;
     efam_reason : 'string;
     efam_note : 'string;
@@ -197,11 +196,11 @@ type ('person, 'string) gen_person =
     occupation : 'string;
     sex : sex;
     access : access;
-    birth : codate;
+    birth : cdate;
     birth_place : 'string;
     birth_note : 'string;
     birth_src : 'string;
-    baptism : codate;
+    baptism : cdate;
     baptism_place : 'string;
     baptism_note : 'string;
     baptism_src : 'string;
@@ -226,7 +225,7 @@ type 'family gen_union = { family : 'family array }
 (* family *)
 
 type ('person, 'string) gen_family =
-  { marriage : codate;
+  { marriage : cdate;
     marriage_place : 'string;
     marriage_note : 'string;
     marriage_src : 'string;

@@ -168,11 +168,11 @@ let advanced_search conf base max_answers =
   in
   let match_baptism_date p empty_default_value =
     match_date p bapt_date_field_name
-      (fun () -> Adef.od_of_codate (get_baptism p)) empty_default_value
+      (fun () -> Adef.od_of_cdate (get_baptism p)) empty_default_value
   in
   let match_birth_date p empty_default_value =
     match_date p birth_date_field_name
-      (fun () -> Adef.od_of_codate (get_birth p)) empty_default_value
+      (fun () -> Adef.od_of_cdate (get_birth p)) empty_default_value
   in
   let match_death_date p empty_default_value =
     match_date p death_date_field_name
@@ -186,8 +186,8 @@ let advanced_search conf base max_answers =
     match_date p burial_date_field_name
       (fun () ->
          match get_burial p with
-           Buried cod -> Adef.od_of_codate cod
-         | Cremated cod -> Adef.od_of_codate cod
+           Buried cod -> Adef.od_of_cdate cod
+         | Cremated cod -> Adef.od_of_cdate cod
          | _ -> None)
       empty_default_value
   in
@@ -250,10 +250,10 @@ let advanced_search conf base max_answers =
            if authorized_age conf base father &&
               authorized_age conf base mother
            then
-             if y = "" then df (Adef.od_of_codate (get_marriage fam))
+             if y = "" then df (Adef.od_of_cdate (get_marriage fam))
              else
                name_incl y (sou base (get_marriage_place fam)) &&
-               df (Adef.od_of_codate (get_marriage fam))
+               df (Adef.od_of_cdate (get_marriage fam))
            else false)
         (Array.to_list (get_family p))
     in

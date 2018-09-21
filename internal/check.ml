@@ -221,7 +221,7 @@ type stats =
     mutable oldest_still_alive : int * person }
 
 let birth_year p =
-  match Adef.od_of_codate (get_birth p) with
+  match Adef.od_of_cdate (get_birth p) with
     Some d ->
       begin match d with
         Dgreg ({year = y; prec = Sure}, _) -> Some y
@@ -280,7 +280,7 @@ let update_stats base current_year s p =
   | _ -> ()
 
 let min_year_of p =
-  match Adef.od_of_codate (get_birth p) with
+  match Adef.od_of_cdate (get_birth p) with
     Some (Dgreg (d, _)) -> Some d.year
   | Some (Dtext _) | None -> None
 

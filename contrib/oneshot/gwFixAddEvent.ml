@@ -88,7 +88,7 @@ let update_database_with_file base fname =
                flush stderr
              end;
            let evt =
-             {epers_name = Epers_Residence; epers_date = Adef.codate_None;
+             {epers_name = Epers_Residence; epers_date = Adef.cdate_None;
               epers_place = Gwdb.insert_string base note;
               epers_reason = empty; epers_note = empty; epers_src = empty;
               epers_witnesses = [| |]}

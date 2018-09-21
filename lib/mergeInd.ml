@@ -119,14 +119,14 @@ let print_differences conf base branches p1 p2 =
   *)
   string_field (transl conf "birth") "birth"
     (fun p ->
-       match Adef.od_of_codate (get_birth p) with
+       match Adef.od_of_cdate (get_birth p) with
          None -> ""
        | Some d -> Date.string_of_ondate conf d);
   string_field (transl conf "birth" ^ " / " ^ transl conf "place")
     "birth_place" (fun p -> sou base (get_birth_place p));
   string_field (transl conf "baptism") "baptism"
     (fun p ->
-       match Adef.od_of_codate (get_baptism p) with
+       match Adef.od_of_cdate (get_baptism p) with
          None -> ""
        | Some d -> Date.string_of_ondate conf d);
   string_field (transl conf "baptism" ^ " / " ^ transl conf "place")
@@ -158,12 +158,12 @@ let print_differences conf base branches p1 p2 =
          UnknownBurial -> ""
        | Buried cod ->
            transl_nth conf "buried" is ^
-           (match Adef.od_of_codate cod with
+           (match Adef.od_of_cdate cod with
               None -> ""
             | Some d -> " " ^ Date.string_of_ondate conf d)
        | Cremated cod ->
            transl_nth conf "cremated" is ^
-           (match Adef.od_of_codate cod with
+           (match Adef.od_of_cdate cod with
               None -> ""
             | Some d -> " " ^ Date.string_of_ondate conf d));
   string_field (transl conf "burial" ^ " / " ^ transl conf "place")
@@ -175,10 +175,10 @@ let print_differences conf base branches p1 p2 =
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n"
 
-let compatible_codates cd1 cd2 =
-  cd1 = cd2 || cd2 = Adef.codate_None || cd1 = Adef.codate_None
-
-let compatible_cdates cd1 cd2 = cd1 = cd2
+let compatible_cdates cd1 cd2 =
+  cd1 = cd2
+  || cd2 = Adef.cdate_None
+  || cd1 = Adef.cdate_None
 
 let compatible_death_reasons dr1 dr2 = dr1 = dr2 || dr2 = Unspecified
 
@@ -200,8 +200,8 @@ let compatible_burials b1 b2 =
     match b1, b2 with
       _, UnknownBurial -> true
     | UnknownBurial, _ -> true
-    | Buried cd1, Buried cd2 -> compatible_codates cd1 cd2
-    | Cremated cd1, Cremated cd2 -> compatible_codates cd1 cd2
+    | Buried cd1, Buried cd2 -> compatible_cdates cd1 cd2
+    | Cremated cd1, Cremated cd2 -> compatible_cdates cd1 cd2
     | _ -> false
 
 let compatible_strings s1 s2 =
@@ -239,9 +239,9 @@ let compatible_ind base p1 p2 =
   compatible_pevents (get_pevents p1) (get_pevents p2) &&
   get_rparents p2 = [] && get_related p2 = [] &&
   compatible_strings (get_occupation p1) (get_occupation p2) &&
-  compatible_codates (get_birth p1) (get_birth p2) &&
+  compatible_cdates (get_birth p1) (get_birth p2) &&
   compatible_strings (get_birth_place p1) (get_birth_place p2) &&
-  compatible_codates (get_baptism p1) (get_baptism p2) &&
+  compatible_cdates (get_baptism p1) (get_baptism p2) &&
   compatible_strings (get_baptism_place p1) (get_baptism_place p2) &&
   compatible_deaths (get_death p1) (get_death p2) &&
   compatible_strings (get_death_place p1) (get_death_place p2) &&
@@ -250,7 +250,7 @@ let compatible_ind base p1 p2 =
   compatible_notes base (get_notes p1) (get_notes p2)
 
 let compatible_fam fam1 fam2 =
-  compatible_codates (get_marriage fam1) (get_marriage fam2) &&
+  compatible_cdates (get_marriage fam1) (get_marriage fam2) &&
   compatible_strings (get_marriage_place fam1) (get_marriage_place fam2) &&
   Array.length (get_witnesses fam2) = 0 &&
   compatible_fevents (get_fevents fam1) (get_fevents fam2) &&
@@ -369,7 +369,7 @@ let effective_merge_ind conf base warning p1 p2 =
     {(gen_person_of_person p1) with sex =
       if get_sex p2 <> Neuter then get_sex p2 else get_sex p1;
      birth =
-       if get_birth p1 = Adef.codate_None then get_birth p2 else get_birth p1;
+       if get_birth p1 = Adef.cdate_None then get_birth p2 else get_birth p1;
      birth_place =
        if is_empty_string (get_birth_place p1) then get_birth_place p2
        else get_birth_place p1;
@@ -377,7 +377,7 @@ let effective_merge_ind conf base warning p1 p2 =
        if is_empty_string (get_birth_src p1) then get_birth_src p2
        else get_birth_src p1;
      baptism =
-       if get_baptism p1 = Adef.codate_None then get_baptism p2
+       if get_baptism p1 = Adef.cdate_None then get_baptism p2
        else get_baptism p1;
      baptism_place =
        if is_empty_string (get_baptism_place p1) then get_baptism_place p2
@@ -511,7 +511,7 @@ let effective_merge_fam base ifam1 fam1 ifam2 fam2 =
   let des2 = fam2 in
   let fam1 =
     {(gen_family_of_family fam1) with marriage =
-      if get_marriage fam1 = Adef.codate_None then get_marriage fam2
+      if get_marriage fam1 = Adef.cdate_None then get_marriage fam2
       else get_marriage fam1;
      marriage_place =
        if is_empty_string (get_marriage_place fam1) then

@@ -119,7 +119,7 @@ let select_family conf base get_date find_oldest =
 
 let print_birth conf base =
   let (list, len) =
-    select conf base (fun p -> Adef.od_of_codate (get_birth p)) false
+    select conf base (fun p -> Adef.od_of_cdate (get_birth p)) false
   in
   let title _ =
     Wserver.printf (fcapitale (ftransl conf "the latest %d births")) len
@@ -198,7 +198,7 @@ let print_death conf base =
                end;
              let (age, ages_sum, ages_nb) =
                let sure d = d.prec = Sure in
-               match Adef.od_of_codate (get_birth p) with
+               match Adef.od_of_cdate (get_birth p) with
                  Some (Dgreg (d1, _)) ->
                    if sure d1 && sure d && d1 <> d then
                      let a = CheckItem.time_elapsed d1 d in
@@ -312,9 +312,9 @@ let print_oldest_alive conf base =
   in
   let get_oldest_alive p =
     match get_death p with
-      NotDead -> Adef.od_of_codate (get_birth p)
+      NotDead -> Adef.od_of_cdate (get_birth p)
     | DontKnowIfDead when limit > 0 ->
-        begin match Adef.od_of_codate (get_birth p) with
+        begin match Adef.od_of_cdate (get_birth p) with
           Some (Dgreg (d, _)) as x when conf.today.year - d.year <= limit -> x
         | _ -> None
         end
@@ -348,7 +348,7 @@ let print_oldest_alive conf base =
 let print_longest_lived conf base =
   let get_longest p =
     if Util.authorized_age conf base p then
-      match Adef.od_of_codate (get_birth p), get_death p with
+      match Adef.od_of_cdate (get_birth p), get_death p with
         Some (Dgreg (bd, _)), Death (_, cd) ->
           begin match Adef.date_of_cdate cd with
             Dgreg (dd, _) ->
@@ -442,7 +442,7 @@ let print_marriage conf base =
       (fun _ fam ->
           let rel = get_relation fam in
           if rel = Married || rel = NoSexesCheckMarried then
-            Adef.od_of_codate (get_marriage fam)
+            Adef.od_of_cdate (get_marriage fam)
           else None)
       false
   in
@@ -460,7 +460,7 @@ let print_oldest_engagements conf base =
            let wife = pget conf base (get_mother fam) in
            match get_death husb, get_death wife with
              (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-               Adef.od_of_codate (get_marriage fam)
+               Adef.od_of_cdate (get_marriage fam)
            | _ -> None
          else None)
       true
@@ -565,7 +565,7 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
     let sex = get_sex p in
     let dea = get_death p in
     if sex <> Neuter then
-      match Adef.od_of_codate (get_birth p) with
+      match Adef.od_of_cdate (get_birth p) with
         Some (Dgreg (dmy, _)) ->
         if not (Date.before_date dmy at_date) then
           let a = CheckItem.time_elapsed dmy at_date in

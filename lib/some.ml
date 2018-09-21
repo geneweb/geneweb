@@ -230,8 +230,8 @@ let first_name_print_list conf base x1 xl liste =
            match Gutil.alphabetic (p_surname base x1) (p_surname base x2) with
              0 ->
                begin match
-                 Adef.od_of_codate (get_birth x1),
-                 Adef.od_of_codate (get_birth x2)
+                 Adef.od_of_cdate (get_birth x1),
+                 Adef.od_of_cdate (get_birth x2)
                with
                  Some d1, Some d2 ->
                    if CheckItem.strictly_after d1 d2 then -1 else 1
@@ -540,7 +540,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
       Some "d" ->
         let born_before p1 p2 =
           match
-            Adef.od_of_codate (get_birth p1), Adef.od_of_codate (get_birth p2)
+            Adef.od_of_cdate (get_birth p1), Adef.od_of_cdate (get_birth p2)
           with
             Some d1, Some d2 ->
               if CheckItem.strictly_after d2 d1 then -1 else 1

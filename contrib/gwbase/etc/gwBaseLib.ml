@@ -12,8 +12,8 @@ let add_indi base (fn, sn, nb) sex =
      qualifiers = []; aliases = []; first_names_aliases = [];
      surnames_aliases = []; titles = []; rparents = []; related = [];
      occupation = empty_string; sex = sex; access = IfTitles;
-     birth = Adef.codate_None; birth_place = empty_string;
-     birth_src = empty_string; baptism = Adef.codate_None;
+     birth = Adef.cdate_None; birth_place = empty_string;
+     birth_src = empty_string; baptism = Adef.cdate_None;
      baptism_place = empty_string; baptism_src = empty_string;
      death = NotDead; death_place = empty_string; death_src = empty_string;
      burial = UnknownBurial; burial_place = empty_string;
@@ -28,7 +28,7 @@ let add_fam base fath moth children =
   let ifam = Adef.ifam_of_int (nb_of_families base) in
   let empty_string = insert_string base "" in
   let fam =
-    {marriage = Adef.codate_None; marriage_place = empty_string;
+    {marriage = Adef.cdate_None; marriage_place = empty_string;
      marriage_src = empty_string; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; comment = empty_string;
      origin_file = empty_string; fsources = empty_string; fam_index = ifam}

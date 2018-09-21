@@ -361,7 +361,7 @@ let ged_pevent base oc per_sel evt =
       let tag = ged_tag_pevent base evt in Printf.fprintf oc "1 %s" tag; ""
     else begin Printf.fprintf oc "1 EVEN"; ged_tag_pevent base evt end
   in
-  let date = Adef.od_of_codate evt.epers_date in
+  let date = Adef.od_of_cdate evt.epers_date in
   let place = sou base evt.epers_place in
   let note = sou base evt.epers_note in
   let src = sou base evt.epers_src in
@@ -430,7 +430,7 @@ let ged_title base oc per tit =
   if tit.t_nth <> 0 then Printf.fprintf oc ", %d" tit.t_nth;
   Printf.fprintf oc "\n";
   begin match
-    Adef.od_of_codate tit.t_date_start, Adef.od_of_codate tit.t_date_end
+    Adef.od_of_cdate tit.t_date_start, Adef.od_of_cdate tit.t_date_end
   with
     None, None -> ()
   | Some sd, None ->
@@ -540,7 +540,7 @@ let ged_note base oc per =
 
 let ged_marriage base oc fam =
   match
-    Adef.od_of_codate (get_marriage fam), sou base (get_marriage_place fam),
+    Adef.od_of_cdate (get_marriage fam), sou base (get_marriage_place fam),
     get_relation fam
   with d, pl, _ ->
     Printf.fprintf oc "1 %s" (if get_relation fam = Engaged then "ENGA" else "MARR");
@@ -561,7 +561,7 @@ let ged_divorce oc fam =
     NotDivorced -> ()
   | Separated -> ()
   | Divorced cd ->
-      let d = Adef.od_of_codate cd in
+      let d = Adef.od_of_cdate cd in
       Printf.fprintf oc "1 DIV"; ged_ev_detail oc 2 "" d "" "" ""
 
 let ged_tag_fevent base evt =
@@ -594,7 +594,7 @@ let ged_fevent base oc ifam fam_sel evt =
       let tag = ged_tag_fevent base evt in Printf.fprintf oc "1 %s" tag; ""
     else begin Printf.fprintf oc "1 EVEN"; ged_tag_fevent base evt end
   in
-  let date = Adef.od_of_codate evt.efam_date in
+  let date = Adef.od_of_cdate evt.efam_date in
   let place = sou base evt.efam_place in
   let note = sou base evt.efam_note in
   let src = sou base evt.efam_src in
@@ -629,7 +629,7 @@ let has_personal_infos base per =
   if get_parents per <> None then true
   else if sou base (get_first_name per) <> "?" then true
   else if sou base (get_surname per) <> "?" then true
-  else if get_birth per <> Adef.codate_None then true
+  else if get_birth per <> Adef.cdate_None then true
   else if sou base (get_birth_place per) <> "" then true
   else if get_death per <> NotDead && get_death per <> DontKnowIfDead then
     true

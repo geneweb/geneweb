@@ -1476,13 +1476,13 @@ let print_all_stats conf base =
                       in
                       if not m_auth then ()
                       else
-                        match Adef.od_of_codate (get_marriage fam) with
+                        match Adef.od_of_cdate (get_marriage fam) with
                         | Some (Dgreg (({prec = Sure}) as dmy, _)) ->
                             begin
                               match get_divorce fam with
                               | Divorced co ->
                                   begin
-                                    match Adef.od_of_codate co with
+                                    match Adef.od_of_cdate co with
                                     | Some (Dgreg (({prec = Sure}) as dmy2, _)) ->
                                         if dmy2.year < dmy.year then ()
                                         else
@@ -1585,7 +1585,7 @@ let print_all_stats conf base =
                                     | ifam2 :: l2 ->
                                         begin
                                           let fam2 = foi base ifam2 in
-                                          match Adef.od_of_codate (get_marriage fam2) with
+                                          match Adef.od_of_cdate (get_marriage fam2) with
                                           | Some (Dgreg (({prec = Sure}) as dmy2, _)) ->
                                               if dmy.year > dmy2.year then ()
                                               else
@@ -1696,7 +1696,7 @@ let print_all_stats conf base =
         in
         let childrenl = Array.to_list (get_children fam) in
 
-        match Adef.od_of_codate (get_marriage fam) with
+        match Adef.od_of_cdate (get_marriage fam) with
         | Some (Dgreg (({prec = Sure}) as dmy, _) as d) ->
             begin
               let p = poi base (get_father fam) in

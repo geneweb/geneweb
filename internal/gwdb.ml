@@ -23,9 +23,9 @@ let no_person empty_string ip =
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
    public_name = empty_string; qualifiers = []; titles = []; rparents = [];
    related = []; aliases = []; occupation = empty_string; sex = Neuter;
-   access = Private; birth = Adef.codate_None; birth_place = empty_string;
+   access = Private; birth = Adef.cdate_None; birth_place = empty_string;
    birth_note = empty_string; birth_src = empty_string;
-   baptism = Adef.codate_None; baptism_place = empty_string;
+   baptism = Adef.cdate_None; baptism_place = empty_string;
    baptism_note = empty_string; baptism_src = empty_string;
    death = DontKnowIfDead; death_place = empty_string;
    death_note = empty_string; death_src = empty_string;
@@ -181,11 +181,11 @@ and person2_dat =
 type ('p, 'a, 'u) person_fun =
   { get_access : 'p -> access;
     get_aliases : 'p -> istr list;
-    get_baptism : 'p -> codate;
+    get_baptism : 'p -> cdate;
     get_baptism_place : 'p -> istr;
     get_baptism_note : 'p -> istr;
     get_baptism_src : 'p -> istr;
-    get_birth : 'p -> codate;
+    get_birth : 'p -> cdate;
     get_birth_place : 'p -> istr;
     get_birth_note : 'p -> istr;
     get_birth_src : 'p -> istr;
@@ -634,7 +634,7 @@ type ('f, 'c, 'd) family_fun =
     get_divorce : 'f -> Def.divorce;
     get_fsources : 'f -> istr;
     get_fevents : 'f -> fam_event list;
-    get_marriage : 'f -> codate;
+    get_marriage : 'f -> cdate;
     get_marriage_place : 'f -> istr;
     get_marriage_note : 'f -> istr;
     get_marriage_src : 'f -> istr;
@@ -959,7 +959,7 @@ module C_base :
       let cpl = Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)) in
       let fam =
         let empty = self.insert_string "" in
-        {marriage = Adef.codate_None; marriage_place = empty;
+        {marriage = Adef.cdate_None; marriage_place = empty;
          marriage_note = empty; marriage_src = empty; relation = Married;
          divorce = NotDivorced; fevents = []; witnesses = [| |];
          comment = empty; origin_file = empty; fsources = empty;

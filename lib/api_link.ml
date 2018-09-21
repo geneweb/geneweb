@@ -263,7 +263,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
     | Neuter -> `unknown
   in
   let birth =
-    match Adef.od_of_codate gen_p.birth with
+    match Adef.od_of_cdate gen_p.birth with
     | Some d when p_auth -> Some (piqi_date_of_date d)
     | _ -> None
   in
@@ -272,7 +272,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
     else None
   in
   let baptism =
-    match Adef.od_of_codate gen_p.baptism with
+    match Adef.od_of_cdate gen_p.baptism with
     | Some d when p_auth -> Some (piqi_date_of_date d)
     | _ -> None
   in
@@ -301,7 +301,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
   let burial =
     match gen_p.burial with
     | Buried cod | Cremated cod ->
-        (match Adef.od_of_codate cod with
+        (match Adef.od_of_cdate cod with
         | Some d when p_auth -> Some (piqi_date_of_date d)
         | _ -> None)
     | _ -> None
@@ -368,7 +368,7 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
   let imoth = Int32.of_int (Adef.int_of_iper imoth) in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let marriage =
-    match (m_auth, Adef.od_of_codate gen_f.marriage) with
+    match (m_auth, Adef.od_of_cdate gen_f.marriage) with
     | (true, Some d) -> Some (piqi_date_of_date d)
     | _ -> None
   in
@@ -389,7 +389,7 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
     match gen_f.divorce with
     | NotDivorced -> (`not_divorced, None)
     | Divorced cod ->
-        (match Adef.od_of_codate cod with
+        (match Adef.od_of_cdate cod with
          | Some d when m_auth ->
              let divorce_date = Some (piqi_date_of_date d) in
              (`divorced, divorce_date)

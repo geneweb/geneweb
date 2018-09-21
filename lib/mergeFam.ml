@@ -24,7 +24,7 @@ let need_differences_selection conf base fam1 fam2 =
        | NoMention -> "no mention") ||
   need_selection
     (fun fam ->
-       match Adef.od_of_codate (get_marriage fam) with
+       match Adef.od_of_cdate (get_marriage fam) with
          None -> ""
        | Some d -> Date.string_of_ondate conf d) ||
   need_selection (fun fam -> sou base (get_marriage_place fam)) ||
@@ -34,7 +34,7 @@ let need_differences_selection conf base fam1 fam2 =
          NotDivorced -> "not divorced"
        | Separated -> "separated"
        | Divorced cod ->
-           match Adef.od_of_codate cod with
+           match Adef.od_of_cdate cod with
              Some d -> Date.string_of_ondate conf d
            | None -> "divorced")
 
@@ -99,7 +99,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   string_field (Util.translate_eval (transl_nth conf "marriage/marriages" 0))
     "marriage"
     (fun fam ->
-       match Adef.od_of_codate (get_marriage fam) with
+       match Adef.od_of_cdate (get_marriage fam) with
          None -> ""
        | Some d -> Date.string_of_ondate conf d);
   string_field
@@ -113,7 +113,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
        | Separated -> transl conf "separated"
        | Divorced cod ->
            let ds =
-             match Adef.od_of_codate cod with
+             match Adef.od_of_cdate cod with
                Some d -> " " ^ Date.string_of_ondate conf d
              | None -> ""
            in

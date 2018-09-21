@@ -5,7 +5,7 @@ open Gwdb
 
 let year_of p =
   match
-    Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
+    Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p),
     get_death p, CheckItem.date_of_death (get_death p)
   with
     _, _, NotDead, _ -> None
@@ -16,7 +16,7 @@ let year_of p =
 
 let most_recent_year_of p =
   match
-    Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
+    Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p),
     get_death p, CheckItem.date_of_death (get_death p)
   with
     _, _, NotDead, _ -> None

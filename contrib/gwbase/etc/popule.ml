@@ -143,7 +143,7 @@ let popule bname size ngen gyear =
     let x = persons_get (Adef.int_of_iper ip) in
     let d = Calendar.gregorian_of_sdn Sure (jd + Random.int 365) in
     let x =
-      {x with birth = Adef.codate_of_od (Some (Dgreg (d, Dgregorian)))}
+      {x with birth = Adef.cdate_of_od (Some (Dgreg (d, Dgregorian)))}
     in
     persons_set (Adef.int_of_iper ip) x;
     let surn = nameize i in
@@ -152,7 +152,7 @@ let popule bname size ngen gyear =
     let x = persons_get (Adef.int_of_iper ip) in
     let d = Calendar.gregorian_of_sdn Sure (jd + Random.int 365) in
     let x =
-      {x with birth = Adef.codate_of_od (Some (Dgreg (d, Dgregorian)))}
+      {x with birth = Adef.cdate_of_od (Some (Dgreg (d, Dgregorian)))}
     in
     persons_set (Adef.int_of_iper ip) x
   done;
@@ -186,7 +186,7 @@ let popule bname size ngen gyear =
               in
               let x =
                 {x with birth =
-                  Adef.codate_of_od (Some (Dgreg (d, Dgregorian)))}
+                  Adef.cdate_of_od (Some (Dgreg (d, Dgregorian)))}
               in
               persons_set (Adef.int_of_iper ip) x; [ip]
           in
@@ -202,7 +202,7 @@ let popule bname size ngen gyear =
               in
               let x =
                 {x with birth =
-                  Adef.codate_of_od (Some (Dgreg (d, Dgregorian)))}
+                  Adef.cdate_of_od (Some (Dgreg (d, Dgregorian)))}
               in
               persons_set (Adef.int_of_iper ip) x;
               if h_before_f then list @ [ip] else ip :: list

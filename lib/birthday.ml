@@ -50,7 +50,7 @@ let gen_print conf base mois f_scan dead_people =
     while true do
       let (p, txt_of) = f_scan () in
       if not dead_people then
-        match Adef.od_of_codate (get_birth p), get_death p with
+        match Adef.od_of_cdate (get_birth p), get_death p with
           Some (Dgreg (d, _)), (NotDead | DontKnowIfDead) ->
             if d.prec = Sure && d.day <> 0 && d.month <> 0 &&
                d.month = mois && d.delta = 0
@@ -63,7 +63,7 @@ let gen_print conf base mois f_scan dead_people =
         match get_death p with
           NotDead | DontKnowIfDead -> ()
         | _ ->
-            begin match Adef.od_of_codate (get_birth p) with
+            begin match Adef.od_of_cdate (get_birth p) with
               Some (Dgreg (dt, _)) ->
                 if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 &&
                    dt.month = mois && dt.delta = 0
@@ -271,7 +271,7 @@ let print_marriage conf base month =
     let fam = foi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
     else
-      match Adef.od_of_codate (get_marriage fam) with
+      match Adef.od_of_cdate (get_marriage fam) with
         Some (Dgreg ({day = d; month = m; year = y; prec = Sure}, _))
         when d <> 0 && m <> 0 ->
           let father = pget conf base (get_father fam) in
@@ -379,7 +379,7 @@ let gen_print_menu_birth conf base f_scan mode =
   begin try
     while true do
       let (p, txt_of) = f_scan () in
-      match Adef.od_of_codate (get_birth p), get_death p with
+      match Adef.od_of_cdate (get_birth p), get_death p with
         Some (Dgreg (d, _)), (NotDead | DontKnowIfDead) ->
           if d.prec = Sure && d.day <> 0 && d.month <> 0 then
             if match_dates conf base p d conf.today then
@@ -443,7 +443,7 @@ let gen_print_menu_dead conf base f_scan mode =
       match get_death p with
         NotDead | DontKnowIfDead -> ()
       | _ ->
-          begin match Adef.od_of_codate (get_birth p) with
+          begin match Adef.od_of_cdate (get_birth p) with
             Some (Dgreg (d, _)) ->
               if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                 if match_dates conf base p d conf.today then
@@ -530,7 +530,7 @@ let print_menu_marriage conf base =
     let fam = foi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
     else
-      match Adef.od_of_codate (get_marriage fam), get_divorce fam with
+      match Adef.od_of_cdate (get_marriage fam), get_divorce fam with
         Some (Dgreg (d, _)), NotDivorced
         when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
           let update_list cpl =

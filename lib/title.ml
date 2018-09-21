@@ -24,11 +24,11 @@ let date_interval conf base t x =
       if CheckItem.strictly_after_dmy d !d2 then d2 := d;
       found := true
     in
-    begin match Adef.od_of_codate (get_birth x) with
+    begin match Adef.od_of_cdate (get_birth x) with
       Some (Dgreg (d, _)) -> set d
     | _ -> ()
     end;
-    begin match Adef.od_of_codate (get_baptism x) with
+    begin match Adef.od_of_cdate (get_baptism x) with
       Some (Dgreg (d, _)) -> set d
     | _ -> ()
     end;
@@ -38,11 +38,11 @@ let date_interval conf base t x =
     end;
     List.iter
       (fun t ->
-         begin match Adef.od_of_codate t.t_date_start with
+         begin match Adef.od_of_cdate t.t_date_start with
            Some (Dgreg (d, _)) -> set d
          | _ -> ()
          end;
-         match Adef.od_of_codate t.t_date_end with
+         match Adef.od_of_cdate t.t_date_end with
            Some (Dgreg (d, _)) -> set d
          | _ -> ())
       (Util.nobtit conf base x);
@@ -55,7 +55,7 @@ let date_interval conf base t x =
              let fam = foi base ifam in
              let md = get_marriage fam in
              let conj = Gutil.spouse (get_key_index x) fam in
-             begin match Adef.od_of_codate md with
+             begin match Adef.od_of_cdate md with
                Some (Dgreg (d, _)) -> set d
              | _ -> ()
              end;
@@ -71,16 +71,16 @@ let date_interval conf base t x =
 
 let compare_title_dates conf base (x1, t1) (x2, t2) =
   match
-    (get_birth x1, Adef.od_of_codate t1.t_date_start,
-     Adef.od_of_codate t1.t_date_end, get_death x1),
-    (get_birth x2, Adef.od_of_codate t2.t_date_start,
-     Adef.od_of_codate t2.t_date_end, get_death x2)
+    (get_birth x1, Adef.od_of_cdate t1.t_date_start,
+     Adef.od_of_cdate t1.t_date_end, get_death x1),
+    (get_birth x2, Adef.od_of_cdate t2.t_date_start,
+     Adef.od_of_cdate t2.t_date_end, get_death x2)
   with
     (_, Some (Dgreg (d1, _)), _, _), (_, Some (Dgreg (d2, _)), _, _) ->
       if CheckItem.strictly_before_dmy d1 d2 then -1
       else if d1.year = d2.year then
         match
-          Adef.od_of_codate t1.t_date_end, Adef.od_of_codate t2.t_date_end
+          Adef.od_of_cdate t1.t_date_end, Adef.od_of_cdate t2.t_date_end
         with
           Some d1, Some d2 ->
             if not (CheckItem.strictly_after d1 d2) then -1 else 1
@@ -270,8 +270,8 @@ let select_all_titles = select_all2 (fun t -> t.t_ident)
 let select_all_places = select_all (fun t -> t.t_place)
 
 let give_access_someone conf base (x, t) list =
-  let t_date_start = Adef.od_of_codate t.t_date_start in
-  let t_date_end = Adef.od_of_codate t.t_date_end in
+  let t_date_start = Adef.od_of_cdate t.t_date_start in
+  let t_date_end = Adef.od_of_cdate t.t_date_end in
   let has_dates =
     match t_date_start, t_date_end with
       Some (Dgreg (_, _)), _ | _, Some (Dgreg (_, _)) -> true

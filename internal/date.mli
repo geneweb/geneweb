@@ -32,7 +32,6 @@ val get_wday : config -> date -> string
 
 val compare_date : date -> date -> int
 
-
 (* Ajout pour l'API *)
 val death_symbol : config -> string
 val string_of_dmy : config -> dmy -> string

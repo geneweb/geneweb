@@ -21,7 +21,7 @@ let apply base date nb_ind f =
   for i = 0 to nb_ind - 1 do
     let ip = Adef.iper_of_int i in
     let p = poi base ip in
-    match Adef.od_of_codate (get_birth p) with
+    match Adef.od_of_cdate (get_birth p) with
       Some (Dgreg (b_dmy, _)) ->
         let alive_at_that_date =
           if before_date date b_dmy then
