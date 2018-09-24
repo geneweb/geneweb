@@ -250,13 +250,46 @@ let print_merge conf base =
       UpdateInd.print_update_ind conf base p digest
   | _ -> Hutil.incorrect_request conf
 
-let print_mod_merge_ok conf base wl p =
+let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 =
   let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "\n%s\n"
     (referenced_person_text conf base (poi base p.key_index));
   Update.print_warnings conf base wl;
+  let pi = p.key_index in
+  let np = poi base pi in
+  let nfn = p_first_name base np in
+  let nsn = p_surname base np in
+  let nocc = get_occ np in
+  if ( pgl1 <> [] || pgl2 <> [] ) && 
+    ((ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) || 
+     (ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc)) then
+    begin
+      Wserver.printf
+        "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
+      Wserver.printf (ftransl conf "name changed. update linked pages");
+      Wserver.printf "</div>\n";
+      let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
+      Wserver.printf "<span class=\"unselectable float-left\">%s%s</span>\n\
+                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
+        (capitale (transl conf "new name")) (transl conf ":") nfn nsn snocc;
+      let soocc1 = if oocc1 <> 0 then Printf.sprintf "/%d" oocc1 else "" in
+      Wserver.printf "<span class=\"unselectable float-left\">%s 1%s</span>\n\
+                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
+        (capitale (transl conf "old name")) (transl conf ":") ofn1 osn1 soocc1;
+      Wserver.printf "<span>%s%s</span>"
+        (capitale (transl conf "linked pages")) (transl conf ":");
+      Notes.print_linked_list conf base pgl1;
+      let soocc2 = if oocc2 <> 0 then Printf.sprintf "/%d" oocc2 else "" in
+      Wserver.printf "<span class=\"unselectable float-left\">%s 2%s</span>\n\
+                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
+        (capitale (transl conf "old name")) (transl conf ":") ofn2 osn2 soocc2;
+      Wserver.printf "<span>%s%s</span>"
+        (capitale (transl conf "linked pages")) (transl conf ":");
+      Notes.print_linked_list conf base pgl2
+    end;
+  
   Merge.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
@@ -431,9 +464,33 @@ let redirect_added_families base p ip2 p2_family =
     patch_couple base ifam cpl
   done
 
-let effective_mod_merge conf base o_p1 o_p2 sp =
-  match p_getint conf.env "i2" with
+let effective_mod_merge o_conf base o_p1 o_p2 sp =
+  match p_getint o_conf.env "i2" with
     Some i2 ->
+      let ofn1 = o_p1.first_name in
+      let osn1 = o_p1.surname in
+      let oocc1 = o_p1.occ in
+      let key1 = Name.lower ofn1, Name.lower osn1, oocc1 in
+      let conf = Update.update_conf o_conf in
+      let pgl1 =
+        let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+        let fname = Filename.concat bdir "notes_links" in
+        let db = NotesLinks.read_db_from_file fname in
+        let db = Notes.merge_possible_aliases conf db in
+        Perso.links_to_ind conf base db key1
+      in
+      let ofn2 = o_p2.first_name in
+      let osn2 = o_p2.surname in
+      let oocc2 = o_p2.occ in
+      let key2 = Name.lower ofn2, Name.lower osn2, oocc2 in
+      let conf = Update.update_conf o_conf in
+      let pgl2 =
+        let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+        let fname = Filename.concat bdir "notes_links" in
+        let db = NotesLinks.read_db_from_file fname in
+        let db = Notes.merge_possible_aliases conf db in
+        Perso.links_to_ind conf base db key2
+      in
       let ip2 = Adef.iper_of_int i2 in
       let p2 = poi base ip2 in
       let rel_chil = get_related p2 in
@@ -470,8 +527,8 @@ let effective_mod_merge conf base o_p1 o_p2 sp =
       in
       History.record conf base changed "fp";
       Update.delete_topological_sort conf base;
-      print_mod_merge_ok conf base wl p
-  | _ -> Hutil.incorrect_request conf
+      print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
+  | _ -> Hutil.incorrect_request o_conf
 
 let print_mod_merge o_conf base =
   let get_gen_person i =
