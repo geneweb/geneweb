@@ -95,17 +95,21 @@ let print_person_parents_and_spouses conf base p =
     (Array.to_list ifam);
   Wserver.printf "\n"
 
-
 let print_same_name conf base p =
+  Wserver.printf "<p>\n";
+  Wserver.printf "%s%s\n"
+    (capitale (transl conf "persons having the same name"))
+    (transl conf ":");
+  Wserver.printf "<ul>\n";
   match Gutil.find_same_name base p with
-    [_] -> ()
+    [_] -> 
+      begin 
+        Wserver.printf "<li>";
+        print_person_parents_and_spouses conf base p;
+        Wserver.printf "</li>";
+      end
   | pl ->
       let pl = restrict_to_small_list pl in
-      Wserver.printf "<p>\n";
-      Wserver.printf "%s%s\n"
-        (capitale (transl conf "persons having the same name"))
-        (transl conf ":");
-      Wserver.printf "<ul>\n";
       List.iter
         (fun p ->
            Wserver.printf "<li>";
@@ -115,9 +119,8 @@ let print_same_name conf base p =
            end;
            Wserver.printf "</li>")
         pl;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</p>\n"
-
+  Wserver.printf "</ul>\n";
+  Wserver.printf "</p>\n"
 
 (* ************************************************************************* *)
 (*  [Fonc] is_label_note : string -> bool                                    *)
@@ -1032,13 +1035,9 @@ let print_create_conflict conf base p var =
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf
-        (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+        (fcapitale (ftransl conf "name %s already used"))
         ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
          p_surname base p ^ "\" (" ^ text_of_var conf var ^ ")")
-        (fun _ ->
-           Printf.sprintf "%s %s" (sou base (get_first_name p))
-             (sou base (get_surname p)))
-        (fun _ -> ".")
     in
       raise (ModErrApi err)
     end;
@@ -1047,12 +1046,9 @@ let print_create_conflict conf base p var =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf
-    (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+    (fcapitale (ftransl conf "name %s already used"))
     ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-     p_surname base p ^ "\" (" ^ text ^ ")")
-    (fun _ ->
-       Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-    (fun _ -> "</a>.");
+     p_surname base p ^ "\" (" ^ text ^ ")");
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
