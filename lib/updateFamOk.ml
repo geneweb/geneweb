@@ -634,7 +634,7 @@ let error_family conf err =
       raise (Update.ModErrApi err)
     end;
 #endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "aaerror")) in
   Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
@@ -806,7 +806,7 @@ let print_err conf =
       raise (Update.ModErrApi err)
     end;
 #endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "bberror")) in
   Hutil.rheader conf title;
   Update.print_return conf;
   Hutil.trailer conf;

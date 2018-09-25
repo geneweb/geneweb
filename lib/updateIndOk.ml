@@ -883,7 +883,9 @@ let check_conflict conf base sp ipl =
             name &&
           get_occ p1 = sp.occ
        then
-         print_conflict conf base p1)
+        (* TO DO probably better to use Update.print_create_conflict
+         but one additionnal parameter ?? *)
+         print_conflict conf base p1 )
     ipl
 
 let check_sex_married conf base sp op =

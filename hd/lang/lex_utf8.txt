@@ -8755,6 +8755,36 @@ sk: meno
 sl: ime
 sv: namn
 
+    name %s already used
+af: %s is reeds gebruik
+bg: името %s вече е използваноt
+br: anv %s implijet endeo gant
+ca: nom %s ja utilitzat
+cs: jméno %s už má tato
+da: navn %s er allerede anvendt
+de: Name %s wird schon
+en: name %s already used
+eo: nomo %s jam uzita
+es: nombre %s ya utilizado
+et: nimi %s on juba kasutuses
+fi: nimi %s on jo käytössä
+fr: nom %s déjà utilisé
+he:  השם %s בשימוש כבר ע"י
+is: nafnið %s er þegar
+it: nome %s già utilizzato
+lv: vārds - %s jau
+nl: de naam %s is al gebruikt
+no: navn %s brukes allerede
+oc: nom %s ja utilizat per
+pl: imię %s jest już używane
+pt: apelido %s já utilizado
+pt-br: nome %s já utilizado
+ro: numele %s est in uz
+ru: имя %s уже использовано
+sk: meno %s už má táto
+sl: ime %s že uporablja
+sv: namn %s används redan
+
     name %s already used by %tthis person%t
 af: %s is reeds gebruik deur %t
 bg: името %s вече е използвано %tза друг човек%t
