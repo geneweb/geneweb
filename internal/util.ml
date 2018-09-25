@@ -484,14 +484,14 @@ let clean_html_tags s l =
 
 (* ********************************************************************* *)
 (*  [Fonc] value sanitize_html : string -> string                        *)
-(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
-                    les éléments dangereux.
+(*  [Description] : Assainit une chaÃ®ne de caractÃ¨res HTML en enlevant
+                    les Ã©lÃ©ments dangereux.
     [Args] :
-      - html_str : Chaîne de caractères à assainir.
-    [Retour] : La chaîne de caractères assainie.                         *)
+      - html_str : ChaÃ®ne de caractÃ¨res Ã  assainir.
+    [Retour] : La chaÃ®ne de caractÃ¨res assainie.                         *)
 (* ********************************************************************* *)
 let sanitize_html html_str =
-  (* Enlève les évènements DOM. *)
+  (* EnlÃ¨ve les Ã©vÃ¨nements DOM. *)
   let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
   Str.global_replace regexp_dom_events "" html_str
 
@@ -2068,7 +2068,6 @@ let print_alphab_list crit print_elem liste =
   if len > menu_threshold then Wserver.printf "</ul>\n</li>\n";
   Wserver.printf "</ul>\n"
 
-
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
   match get_relation fam with
@@ -2078,6 +2077,15 @@ let relation_txt conf sex fam =
   | Engaged -> ftransl_nth conf "engaged%t to" is
   | NoMention -> let s = "%t " ^ transl conf "with" in valid_format "%t" s
 
+let relation_date conf fam =
+  match Adef.od_of_codate (get_marriage fam) with
+    Some d -> 
+      begin match d with
+        Dgreg (dmy, _) -> " (" ^ ( transl conf "in (year)" ) ^ " " ^
+          ( string_of_int dmy.year ) ^ ")"
+      | _ -> ""
+      end
+  | _ -> ""
 
 (* ************************************************************************** *)
 (*  [Fonc] child_of_parent : config -> base -> person -> unit                 *)
@@ -2155,7 +2163,10 @@ let husband_wife conf base p =
         let relation =
           Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
         in
-        translate_eval (relation ^ " " ^ person_text conf base conjoint)
+        let rel_date =
+          Printf.sprintf "%s" (relation_date conf fam)
+        in
+        translate_eval (relation ^ " " ^ ( person_text conf base conjoint ) ^ rel_date)
       else loop (i + 1)
     else ""
   in
@@ -3564,12 +3575,12 @@ let init_cache_info conf base =
 
 (* ************************************************************************ *)
 (*  [Fonc] real_nb_of_persons conf : config -> int                          *)
-(** [Description] : Renvoie le nombre de personnes réelles (sans ? ?) d'une
-                    base, à partir du fichier de cache.
+(** [Description] : Renvoie le nombre de personnes rÃ©elles (sans ? ?) d'une
+                    base, Ã  partir du fichier de cache.
     [Args] :
       - conf : configuration de la base
     [Retour] : nombre de personne sans ? ?
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    [Rem] : ExportÃ© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let real_nb_of_persons conf base =
   let real_nb_person () =
