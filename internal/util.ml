@@ -2081,8 +2081,8 @@ let relation_date conf fam =
   match Adef.od_of_codate (get_marriage fam) with
     Some d -> 
       begin match d with
-        Dgreg (dmy, _) -> " (" ^ ( transl conf "in (year)" ) ^ " " ^
-          ( string_of_int dmy.year ) ^ ")"
+        Dgreg (dmy, _) -> " " ^ ( transl conf "in (year)" ) ^ " " ^
+          ( string_of_int dmy.year )
       | _ -> ""
       end
   | _ -> ""
@@ -2163,10 +2163,8 @@ let husband_wife conf base p =
         let relation =
           Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
         in
-        let rel_date =
-          Printf.sprintf "%s" (relation_date conf fam)
-        in
-        translate_eval (relation ^ " " ^ ( person_text conf base conjoint ) ^ rel_date)
+        translate_eval (relation ^ " " ^ ( person_text conf base conjoint ) ^
+          ( relation_date conf fam ))
       else loop (i + 1)
     else ""
   in
