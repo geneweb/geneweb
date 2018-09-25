@@ -101,24 +101,17 @@ let print_same_name conf base p =
     (capitale (transl conf "persons having the same name"))
     (transl conf ":");
   Wserver.printf "<ul>\n";
-  match Gutil.find_same_name base p with
-    [_] -> 
-      begin 
-        Wserver.printf "<li>";
-        print_person_parents_and_spouses conf base p;
-        Wserver.printf "</li>";
-      end
-  | pl ->
-      let pl = restrict_to_small_list pl in
-      List.iter
-        (fun p ->
-           Wserver.printf "<li>";
-           begin match p with
-             Some p -> print_person_parents_and_spouses conf base p
-           | None -> Wserver.printf "...\n"
-           end;
-           Wserver.printf "</li>")
-        pl;
+  let pl = Gutil.find_same_name base p in
+  let pl = restrict_to_small_list pl in
+  List.iter
+    (fun p ->
+       Wserver.printf "<li>";
+       begin match p with
+         Some p -> print_person_parents_and_spouses conf base p
+       | None -> Wserver.printf "...\n"
+       end;
+       Wserver.printf "</li>")
+    pl;
   Wserver.printf "</ul>\n";
   Wserver.printf "</p>\n"
 
