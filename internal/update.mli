@@ -25,7 +25,7 @@ val infer_death_from_age : int -> death
 val infer_death_from_parents : config -> base -> family -> death
 
 val print_same_name : config -> base -> person -> unit
-val print_person_parents_and_spouses : config -> base -> person -> unit
+val print_person_parents_and_spouse : config -> base -> person -> unit
 
 val insert_person :
   config -> base -> string -> (iper, istr) gen_person list ref -> key ->

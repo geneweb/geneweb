@@ -66,7 +66,7 @@ name=\"select\" id=\"%d\" value=\"%d\">\n" (Adef.int_of_iper (get_key_index p))
 (Adef.int_of_iper (get_key_index p));
          Wserver.printf "  <label class=\"custom-control-label\" \
 for=\"%d\">" (Adef.int_of_iper (get_key_index p));
-         Update.print_person_parents_and_spouses conf base p;
+         Update.print_person_parents_and_spouse conf base p;
          Wserver.printf "  </label>\n</div>\n";)
     list;
   Wserver.printf "<button type=\"submit\" \
