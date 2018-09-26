@@ -13,26 +13,14 @@ let print_differences conf base branches p1 p2 =
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
       begin
         Wserver.printf "<h4>%s</h4>\n" (capitale title);
-        begin
-          Wserver.printf "<ul>\n";
-          begin
-            Wserver.printf "<li>\n";
-            Wserver.printf
-              "<input class=\"form-control\" type=\"radio\" name=\"%s\" value=\"1\"%s%s>\n"
-              name chk1 conf.xhs;
-            Wserver.printf "%s\n" x1;
-            Wserver.printf "</li>\n"
-          end;
-          begin
-            Wserver.printf "<li>\n";
-            Wserver.printf
-              "<input class=\"form-control\" type=\"radio\" name=\"%s\" value=\"2\"%s%s>\n"
-              name chk2 conf.xhs;
-            Wserver.printf "%s\n" x2;
-            Wserver.printf "</li>\n"
-          end;
-          Wserver.printf "</ul>\n"
-        end
+        Wserver.printf "<div class=\"custom-control custom-radio ml-3\">\n";
+        Wserver.printf "  <input class=\"custom-control-input\" type=\"radio\" id=\"%s1\" name=\"%s\" value=\"1\"%s>\n" name name chk1;
+        Wserver.printf "  <label class=\"custom-control-label\" for=\"%s1\">%s</label>\n" name x1;
+        Wserver.printf "</div>\n";
+        Wserver.printf "<div class=\"custom-control custom-radio ml-3 mb-2\">\n";
+        Wserver.printf "  <input class=\"custom-control-input\" type=\"radio\" id=\"%s2\" name=\"%s\" value=\"2\"%s>\n" name name chk2;
+        Wserver.printf "  <label class=\"custom-control-label\" for=\"%s2\">%s</label>\n" name x2;
+        Wserver.printf "</div>\n";
       end
   in
   let string_field = gen_string_field " checked" "" in
@@ -170,7 +158,7 @@ let print_differences conf base branches p1 p2 =
     "burial_place" (fun p -> sou base (get_burial_place p));
   html_p conf;
   Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
+    "<button type=\"submit\" class=\"btn btn-primary btn-lg\">\n";
   Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n"

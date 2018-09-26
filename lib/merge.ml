@@ -1,4 +1,4 @@
-(* $Id: merge.ml,v 5.13 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: merge.ml, v7-exp 2018-09-26 07:34:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -16,8 +16,10 @@ let print conf base p =
     if h then ()
     else
       begin
-        Wserver.printf "%s " (transl conf ":");
-        print_someone base p
+        Wserver.printf " ";
+        print_someone base p;
+        Wserver.printf " %s%s" (transl_decline conf "with" "")
+          (transl conf ":");
       end
   in
   let list = Gutil.find_same_name base p in
@@ -28,54 +30,47 @@ let print conf base p =
       list []
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "<h2>\n";
+  Wserver.printf "<h2>";
   title false;
   Wserver.printf "</h2>\n";
-  Wserver.printf "\n";
-  Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Wserver.printf "<p>\n";
+  Wserver.printf "<form method=\"get\" action=\"%s\" \
+class=\"mx-3 mb-3\">\n" conf.command;
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND\"%s>\n"
-    conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper (get_key_index p)) conf.xhs;
-  Wserver.printf "%s " (capitale (transl_decline conf "with" ""));
-  if list <> [] then
-    begin
-      Wserver.printf "%s" (transl conf ":");
-      Wserver.printf "<br%s>\n" conf.xhs;
-      Wserver.printf "<input \
-type=\"radio\" class=\"form-control\" name=\"select\" value=\"input\" checked%s>\n"
-        conf.xhs
-    end;
-  Wserver.printf "(%s.%s %s)%s\n" (transl_nth conf "first name/first names" 0)
+  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND\">\n";
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
+    (Adef.int_of_iper (get_key_index p));
+  Wserver.printf "<span class=\"form-row align-items-center\">\n";
+  Wserver.printf "<span class=\"col-auto\">\n";
+  Wserver.printf "<span class=\"custom-control custom-radio\">\n";
+  Wserver.printf "  <input type=\"radio\" class=\"custom-control-input\" \
+name=\"select\" id=\"input\" value=\"input\" checked>\n";
+  Wserver.printf "  <label class=\"custom-control-label\" \
+for=\"input\">%s</label>\n" (transl conf "any individual in the base");
+  Wserver.printf "</span>\n</span>\n";
+  Wserver.printf "<span class=\"col-auto\">\n";
+  Wserver.printf "<input type=\"text\" class=\"form-control\" \
+name=\"n\" placeholder=\"%s.%s %s\" title=\"%s.%s %s\" \
+size=\"50\" id=\"inlineinput\" autofocus>\n</span>\n"
+    (transl_nth conf "first name/first names" 0)
     (transl conf "number") (transl_nth conf "surname/surnames" 0)
-    (transl conf ":");
-  Wserver.printf
-    "<input class=\"form-control\" name=\"n\" size=\"30\" maxlength=\"200\"%s>\n"
-    conf.xhs;
-  Wserver.printf "<br%s>\n" conf.xhs;
-  Wserver.printf "</p>\n";
+    (transl_nth conf "first name/first names" 0)
+    (transl conf "number") (transl_nth conf "surname/surnames" 0);
+  Wserver.printf "</span>\n";
   if list <> [] then
-    Wserver.printf
-      "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-  List.iter
-    (fun p ->
-       Wserver.printf "<tr align=\"%s\">\n" conf.left;
-       Wserver.printf "<td valign=\"top\">\n";
-       Wserver.printf
-         "<input type=\"radio\" name=\"select\" value=\"%d\"%s>\n"
-         (Adef.int_of_iper (get_key_index p)) conf.xhs;
-       Wserver.printf "</td>\n";
-       Wserver.printf "<td>\n";
-       Update.print_person_parents_and_spouses conf base p;
-       Wserver.printf "<br%s>\n" conf.xhs;
-       Wserver.printf "</td>\n";
-       Wserver.printf "</tr>\n")
+    List.iter
+      (fun p ->
+         Wserver.printf "<div class=\"custom-control custom-radio\">\n";
+         Wserver.printf
+           "  <input type=\"radio\" class=\"custom-control-input\" \
+name=\"select\" id=\"%d\" value=\"%d\">\n" (Adef.int_of_iper (get_key_index p))
+(Adef.int_of_iper (get_key_index p));
+         Wserver.printf "  <label class=\"custom-control-label\" \
+for=\"%d\">" (Adef.int_of_iper (get_key_index p));
+         Update.print_person_parents_and_spouses conf base p;
+         Wserver.printf "  </label>\n</div>\n";)
     list;
-  if list <> [] then Wserver.printf "</table>\n";
-  Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
+  Wserver.printf "<button type=\"submit\" \
+ class=\"btn btn-primary btn-lg mt-2\">";
   Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
