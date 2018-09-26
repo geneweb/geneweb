@@ -2043,6 +2043,15 @@ let relation_txt conf sex fam =
   | Engaged -> ftransl_nth conf "engaged%t to" is
   | NoMention -> let s = "%t " ^ transl conf "with" in valid_format "%t" s
 
+let relation_date conf fam =
+  match Adef.od_of_cdate (get_marriage fam) with
+    Some d ->
+      begin match d with
+        Dgreg (dmy, _) -> " " ^ ( transl conf "in (year)" ) ^ " " ^
+          ( string_of_int dmy.year )
+     | _ -> ""
+      end
+  | _ -> ""
 
 (* ************************************************************************** *)
 (*  [Fonc] child_of_parent : config -> base -> person -> unit                 *)
@@ -2120,12 +2129,12 @@ let husband_wife conf base p =
         let relation =
           Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
         in
-        translate_eval (relation ^ " " ^ person_text conf base conjoint)
+        translate_eval (relation ^ " " ^ (person_text conf base conjoint) ^
+          (relation_date conf fam))
       else loop (i + 1)
     else ""
   in
   loop 0
-
 
 (* ************************************************************************** *)
 (*  [Fonc] first_child : config -> base -> person -> unit                     *)
