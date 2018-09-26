@@ -149,9 +149,9 @@ let print_person_parents_and_spouse conf base p =
   Wserver.printf "</a>";
   Wserver.printf "%s" (Date.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
-  if cop != "" then Wserver.printf ", %s" cop;
-  let hbw = Util.husband_wife conf base p in
-  if hbw != "" then Wserver.printf ", %s" hbw;
+  if (String.length cop) > 0 then Wserver.printf ", %s" cop;
+  let hbw = Util.husband_wife conf base p false in
+  if (String.length hbw) > 0 then Wserver.printf ", %s" (String.sub hbw 0 (String.length hbw -1));
   Wserver.printf "\n"
 
 let print_same_name conf base p =

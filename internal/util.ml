@@ -2137,7 +2137,7 @@ let child_of_parent conf base p =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] husband_wife : config -> base -> person -> unit                    *)
+(*  [Fonc] husband_wife : config -> base -> person -> bool -> string                    *)
 (** [Description] : Traduction selon l'existence du premier conjoint
                     différent de ?? :
                       * époux/épouse de Jean/Jeanne
@@ -2145,26 +2145,42 @@ let child_of_parent conf base p =
       - conf : configuration
       - base : base de donnée
       - p    : person
+      - all  : if true, list all spouses
     [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                           *)
+    [Rem]    : Exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let husband_wife conf base p =
-  let rec loop i =
+let husband_wife conf base p all =
+  let relation =
+    let rec loop i =
+      if i < Array.length (get_family p) then
+        let fam = foi base (get_family p).(i) in
+        let conjoint = Gutil.spouse (get_key_index p) fam in
+        let conjoint = pget conf base conjoint in
+        if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
+        then
+          translate_eval (Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> ""))
+        else loop (i + 1)
+      else ""
+    in
+    loop 0
+  in
+  let rec loop i res =
     if i < Array.length (get_family p) then
       let fam = foi base (get_family p).(i) in
       let conjoint = Gutil.spouse (get_key_index p) fam in
       let conjoint = pget conf base conjoint in
       if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
       then
-        let relation =
-          Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
-        in
-        translate_eval (relation ^ " " ^ (person_text conf base conjoint) ^
-          (relation_date conf fam))
-      else loop (i + 1)
-    else ""
+        if all then
+          loop (i + 1) (res ^ translate_eval (" " ^
+            (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ",")
+        else
+          res ^ translate_eval (" " ^
+            (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ","
+      else loop (i + 1) res
+    else res
   in
-  loop 0
+  loop 0 relation
 
 (* ************************************************************************** *)
 (*  [Fonc] first_child : config -> base -> person -> unit                     *)
@@ -2239,7 +2255,7 @@ let specify_homonymous conf base p specify_public_name =
       (* la personne, donc on affiche les informations sur les parents,   *)
       (* le mariage et/ou le premier enfant.                              *)
       let cop = child_of_parent conf base p in
-      let hw = husband_wife conf base p in
+      let hw = husband_wife conf base p false in
       let fc = first_child conf base p in
       let s =
         (if cop = "" then "" else ", " ^ cop) ^

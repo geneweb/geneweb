@@ -182,7 +182,7 @@ val relation_txt :
 val string_of_decimal_num : config -> float -> string
 
 val person_exists : config -> base -> string * string * int -> bool
-val husband_wife : config -> base -> person -> string
+val husband_wife : config -> base -> person -> bool -> string
 
 val find_person_in_env : config -> base -> string -> person option
 (* Recherche le sosa uniquement dans le fichier gwf *)
