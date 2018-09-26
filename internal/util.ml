@@ -1747,7 +1747,7 @@ let place_of_string conf place =
 (* ********************************************************************** *)
 (*  [Fonc] string_of_place : config -> string -> string                   *)
 (** [Description] : Astuce temporaire pour supprimer les crochets dans
-                    un lieu-dit. A l'avenir, il faudra revoir comment sont
+                    un lieu-dit. À l'avenir, il faudra revoir comment sont
                     implémentés les lieux.
     [Args] :
       - conf  : configuration de la base
@@ -2178,13 +2178,13 @@ let first_child conf base p =
 (** [Description] : Permet d'afficher des informations supplémentaires sur la
       personne en cas d'homonymes (par exemple sur la recherche par ordre
       alphabétique).
-      L'affichage se fait de faÁon similaire à gen_person_text, i.e. en
+      L'affichage se fait de façon similaire à gen_person_text, i.e. en
       fonction du nom publique et sobriquet si on valorise le paramètre
       specify_public_name à True :
         * Louis VI le gros (nom publique sobriquet)
         * Louis le gros    (prénom sobriquet)
         * Louis VI         (nom publique)
-        * Louis Capétiens, fils de Philippe et Berthe, marié avec AdèlaÔde,
+        * Louis Capétiens, fils de Philippe et Berthe, marié avec Adèlaïde,
             père de Philippe
     [Args] :
       - conf : configuration
