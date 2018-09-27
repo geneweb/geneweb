@@ -1,5 +1,5 @@
-(* $Id: changeChildren.ml,v 5.22 2007-09-12 09:58:44 ddr Exp $ *)
-(* Copyright (c) 1998-2007 INRIA *)
+(* $Id: changeChildren.ml, v7.00-exp 2018-09-27 12:04:44 ddr Exp $ *)
+(* Copyright (c) 1998-2018 INRIA *)
 
 open Config
 open Def
@@ -23,36 +23,39 @@ let print_child_person conf base p =
       Some i -> i
     | None -> get_occ p
   in
-  Wserver.printf "<table border=\"1\">\n";
+  Wserver.printf "<table class=\"m1-2\">\n";
+  Wserver.printf "<tbody>\n";
   Wserver.printf "<tr align=\"%s\">\n" conf.left;
-  Wserver.printf "<td>\n";
-  Wserver.printf "%s" (capitale (transl_nth conf "first name/first names" 0));
+  Wserver.printf "<td>";
+  Wserver.printf "<label for=\"%s_fn\" class=\"mx-2 mb-0\">%s</label>"
+    var (capitale (transl_nth conf "first name/first names" 0));
   Wserver.printf "</td>\n";
   Wserver.printf "<td colspan=\"3\">\n";
-  Wserver.printf
-    "<input name=\"%s_first_name\" class=\"form-control\" size=\"23\" maxlength=\"200\" value=\"%s\"%s>\n"
-    var (quote_escaped first_name) conf.xhs;
+  Wserver.printf "<input name=\"%s_first_name\" class=\"form-control\" \
+size=\"23\" maxlength=\"200\" id=\"%s_fn\" value=\"%s\">\n" var var 
+(quote_escaped first_name);
   Wserver.printf "</td>\n";
-  Wserver.printf "<td align=\"%s\">\n" conf.right;
-  (let s = capitale (transl conf "number") in Wserver.printf "%s" s);
+  Wserver.printf "<td align=\"%s\">" conf.right;
+  Wserver.printf "<label for=\"%s_occ\" class=\"mx-2 mb-0\">%s</label>"
+    var (capitale (transl conf "number"));
   Wserver.printf "</td>\n";
   Wserver.printf "<td>\n";
-  Wserver.printf
-    "<input class=\"form-control\" name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s%s>\n"
-    var (if occ = 0 then "" else " value=\"" ^ string_of_int occ ^ "\"")
-    conf.xhs;
+  Wserver.printf "<input class=\"form-control\" id=\"%s_occ\" name=\"%s_occ\" \
+size=\"5\" maxlength=\"8\"%s>\n" var var
+(if occ = 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
   Wserver.printf "</td>\n";
   Wserver.printf "</tr>\n";
   Wserver.printf "<tr align=\"%s\">\n" conf.left;
-  Wserver.printf "<td>\n";
-  Wserver.printf "%s" (capitale (transl_nth conf "surname/surnames" 0));
+  Wserver.printf "<td>";
+  Wserver.printf "<label for=\"%s_sn\" class=\"mx-2 mb-0\">%s</label>"
+    var (capitale (transl_nth conf "surname/surnames" 0));
   Wserver.printf "</td>\n";
   Wserver.printf "<td colspan=\"5\">\n";
-  Wserver.printf
-    "<input name=\"%s_surname\" class=\"form-control\" size=\"40\" maxlength=\"200\" value=\"%s\"%s>\n"
-    var surname conf.xhs;
+  Wserver.printf "<input name=\"%s_surname\" class=\"form-control\" \
+size=\"40\" maxlength=\"200\" id=\"%s_sn\" value=\"%s\">\n" var var surname;
   Wserver.printf "</td>\n";
   Wserver.printf "</tr>\n";
+  Wserver.printf "</tbody>\n";
   Wserver.printf "</table>\n"
 
 let select_children_of base u =
@@ -79,16 +82,14 @@ let check_digest conf digest =
   | None -> ()
 
 let print_children conf base ipl =
-  Wserver.printf "<h4>";
-  Wserver.printf "%s" (capitale (transl_nth conf "child/children" 1));
-  Wserver.printf "</h4>\n";
   Wserver.printf "<ul>\n";
   List.iter
     (fun ip ->
        let p = poi base ip in
-       Wserver.printf "<li>\n";
-       Wserver.printf "%s" (reference conf base p (person_text conf base p));
-       Wserver.printf "%s\n" (Date.short_dates_text conf base p);
+       Wserver.printf "<li class=\"mt-3\">\n";
+       Wserver.printf "<span class=\"ml-2\">%s"
+         (reference conf base p (person_text conf base p));
+       Wserver.printf "%s</span>\n" (Date.short_dates_text conf base p);
        print_child_person conf base p;
        Wserver.printf "</li>\n")
     ipl;
@@ -102,27 +103,23 @@ let print_change conf base p =
   let children = select_children_of base p in
   let digest = digest_children base children in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "<h2>\n";
-  title false;
+  Wserver.printf "<h2>";
+    title false;
+  Wserver.printf "%s" (Util.transl_a_of_b conf ""
+    (reference conf base p (person_text conf base p)));
+  Wserver.printf " %s" (Date.short_dates_text conf base p);
   Wserver.printf "</h2>\n";
-  Wserver.printf "<p>\n";
-  Wserver.printf "%s" (reference conf base p (person_text conf base p));
-  Wserver.printf "%s\n" (Date.short_dates_text conf base p);
-  Wserver.printf "</p>\n";
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Wserver.printf "<p>\n";
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper (get_key_index p)) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n"
-    digest conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\"%s>\n"
-    conf.xhs;
-  Wserver.printf "</p>\n";
+  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%d\">\n"
+    (Adef.int_of_iper (get_key_index p));
+  Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
+    digest;
+  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
   print_children conf base children;
   Wserver.printf "\n";
   Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
+    "<button type=\"submit\" class=\"btn btn-primary btn-lg ml-5 mb-2\">";
   Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
@@ -191,23 +188,18 @@ let print_conflict conf base ip_var p =
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
-       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
-         (quote_escaped (decode_varenv v)) conf.xhs)
+       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
+         (quote_escaped (decode_varenv v)))
     (conf.henv @ conf.env);
   begin let var = "c" ^ string_of_int (Adef.int_of_iper ip_var) in
-    Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\"%s>\n"
-      var conf.xhs
+    Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var
   end;
-  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
-    free_n conf.xhs;
-  Wserver.printf
-    "<button type=\"submit\" name=\"create\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (capitale (transl conf "create"));
-  Wserver.printf "</button>\n";
-  Wserver.printf
-    "<button type=\"submit\" name=\"return\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (capitale (transl conf "back"));
-  Wserver.printf "</button>\n";
+  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
+    free_n;
+  Wserver.printf  "<button type=\"submit\" name=\"create\" \
+class=\"btn btn-primary btn-lg\">%s</button>\n" (capitale (transl conf "create"));
+  Wserver.printf "<button type=\"submit\" name=\"return\" \
+class=\"btn btn-primary btn-lg\">%s</button>\n" (capitale (transl conf "back"));
   Wserver.printf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf
