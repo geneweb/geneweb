@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.52 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.52 2018-09-27 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
@@ -163,19 +163,19 @@ let alphabetic_utf_8 n1 n2 =
 let alphabetic_value =
   let tab = Array.make 256 0 in
   for i = 0 to 255 do tab.(i) <- 10 * i done;
-  tab.(Char.code 'à') <- tab.(Char.code 'a') + 1;
-  tab.(Char.code 'á') <- tab.(Char.code 'a') + 2;
-  tab.(Char.code 'â') <- tab.(Char.code 'a') + 3;
-  tab.(Char.code 'è') <- tab.(Char.code 'e') + 1;
-  tab.(Char.code 'é') <- tab.(Char.code 'e') + 2;
-  tab.(Char.code 'ê') <- tab.(Char.code 'e') + 3;
-  tab.(Char.code 'ë') <- tab.(Char.code 'e') + 4;
-  tab.(Char.code 'ô') <- tab.(Char.code 'o') + 1;
-  tab.(Char.code 'Á') <- tab.(Char.code 'A') + 2;
-  tab.(Char.code 'Æ') <- tab.(Char.code 'A') + 5;
-  tab.(Char.code 'È') <- tab.(Char.code 'E') + 1;
-  tab.(Char.code 'É') <- tab.(Char.code 'E') + 2;
-  tab.(Char.code 'Ö') <- tab.(Char.code 'O') + 4;
+  tab.(Char.code '\xE0')(*'Ã '*) <- tab.(Char.code 'a') + 1;
+  tab.(Char.code '\xE1')(*'Ã¡'*) <- tab.(Char.code 'a') + 2;
+  tab.(Char.code '\xE2')(*'Ã¢'*) <- tab.(Char.code 'a') + 3;
+  tab.(Char.code '\xE8')(*'Ã¨'*) <- tab.(Char.code 'e') + 1;
+  tab.(Char.code '\xE9')(*'Ã©'*) <- tab.(Char.code 'e') + 2;
+  tab.(Char.code '\xEA')(*'Ãª'*) <- tab.(Char.code 'e') + 3;
+  tab.(Char.code '\xEB')(*'Ã«'*) <- tab.(Char.code 'e') + 4;
+  tab.(Char.code '\xF4')(*'Ã´'*) <- tab.(Char.code 'o') + 1;
+  tab.(Char.code '\xC1')(*'Ã'*) <- tab.(Char.code 'A') + 2;
+  tab.(Char.code '\xC6')(*'Ã†'*) <- tab.(Char.code 'A') + 5;
+  tab.(Char.code '\xC8')(*'Ãˆ'*) <- tab.(Char.code 'E') + 1;
+  tab.(Char.code '\xC9')(*'Ã‰'*) <- tab.(Char.code 'E') + 2;
+  tab.(Char.code '\xD6')(*'Ã–'*) <- tab.(Char.code 'O') + 4;
   tab.(Char.code '?') <- 3000;
   fun x -> tab.(Char.code x)
 

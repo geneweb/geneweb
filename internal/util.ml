@@ -469,14 +469,14 @@ let clean_html_tags s l =
 
 (* ********************************************************************* *)
 (*  [Fonc] value sanitize_html : string -> string                        *)
-(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
-                    les éléments dangereux.
+(*  [Description] : Assainit une chaÃ®ne de caractÃ¨res HTML en enlevant
+                    les Ã©lÃ©ments dangereux.
     [Args] :
-      - html_str : Chaîne de caractères à assainir.
-    [Retour] : La chaîne de caractères assainie.                         *)
+      - html_str : ChaÃ®ne de caractÃ¨res Ã  assainir.
+    [Retour] : La chaÃ®ne de caractÃ¨res assainie.                         *)
 (* ********************************************************************* *)
 let sanitize_html html_str =
-  (* Enlève les évènements DOM. *)
+  (* EnlÃ¨ve les Ã©vÃ¨nements DOM. *)
   let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
   Str.global_replace regexp_dom_events "" html_str
 
@@ -824,7 +824,7 @@ let main_title conf base p =
 
 (* *********************************************************************** *)
 (*  [Fonc] titled_person_text : config -> base -> person -> istr gen_title *)
-(** [Description] : Renvoie la chaÃ“ne de caractÃ¨re de la personne en
+(** [Description] : Renvoie la chaÃ®ne de caractÃ¨re de la personne en
                     fonction de son titre.
     [Args] :
       - conf : configuration de la base
@@ -840,7 +840,7 @@ let titled_person_text conf base p t =
     let surname = p_surname base p in
     let elen = String.length estate in
     let slen = String.length surname in
-    (* Si le nom de l'individu est le mÃme que son domaine, on renvoie : *)
+    (* Si le nom de l'individu est le mÃªme que son domaine, on renvoie : *)
     (*   - le nom du titre                                               *)
     (*   - le nom du titre et le premier sobriquet                       *)
     (*   - le nom de la personne (donnÃ© par son nom de domaine) en       *)
@@ -874,7 +874,7 @@ let titled_person_text conf base p t =
 
 (* *********************************************************************** *)
 (*  [Fonc] one_title_text : base -> istr gen_title     *)
-(** [Description] : Renvoie la chaÃ“ne de caractÃ¨re du titre ainsi que le
+(** [Description] : Renvoie la chaÃ®ne de caractÃ¨re du titre ainsi que le
                     domaine.
     [Args] :
       - base : base de donnÃ©e
@@ -3559,12 +3559,12 @@ let init_cache_info conf base =
 
 (* ************************************************************************ *)
 (*  [Fonc] real_nb_of_persons conf : config -> int                          *)
-(** [Description] : Renvoie le nombre de personnes réelles (sans ? ?) d'une
-                    base, à partir du fichier de cache.
+(** [Description] : Renvoie le nombre de personnes rÃ©elles (sans ? ?) d'une
+                    base, Ã  partir du fichier de cache.
     [Args] :
       - conf : configuration de la base
     [Retour] : nombre de personne sans ? ?
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    [Rem] : ExportÃ© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let real_nb_of_persons conf base =
   let real_nb_person () =
