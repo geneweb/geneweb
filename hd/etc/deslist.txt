@@ -524,9 +524,10 @@
   </p>
 %end;
 
+%let;evarv;%if;(evar.v!="")%evar.v;%else;0%end;%in;
 %apply;by_list%with;
-  %if;(bvar.max_desc_level = "")%apply;min(evar.v, max_desc_level, 12)
-  %else;%apply;min(evar.v, max_desc_level, bvar.max_desc_level)%end;
+  %if;(bvar.max_desc_level = "")%apply;min(evarv, max_desc_level, 12)
+  %else;%apply;min(evarv, max_desc_level, bvar.max_desc_level)%end;
 %end;
 
 %include;trl
