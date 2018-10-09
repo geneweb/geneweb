@@ -8,6 +8,7 @@ af: Genealogie/Familiekunde
 bg: Genealogy
 br: Genealogiezh
 ca: Genealogia
+co: Genealugia
 cs: Genealogie
 da: Genealogi
 de: Genealogie
@@ -57,7 +58,7 @@ sv: Genealogi
   <table border="0" width="100%%">
     <tr align="%L">
       <td rowspan="2" style="width: 20%%">
-        <a href="https://github.com/geneweb/geneweb"><img width="96" height="108"
+        <a href="http://opensource.geneanet.org/projects/geneweb/"><img width="96" height="108"
          src="%o/gwlogo.png" style="border: 0" alt="GeneWeb"%/></a>
       </td>
       %I&wNf<td align="%R"
@@ -81,6 +82,7 @@ ar: قاعدة المعلومات العائلية (جينيالوجيا)
 bg: Родословна база от данни
 br: Bon roadoù genealogiezh
 ca: Base de dades geneal&ograve;gica
+co: Basa di dati genealogica
 cs: Genealogická databáze
 da: Genealogisk database
 de: Genealogische Datenbank
@@ -128,6 +130,8 @@ br: Niver an dud a zo er bon roadoù <span class="highlight">"%t"</span>
     bremañ a zo : %n.
 ca: La base de dades <span class="highlight">"%t"</span> cont&eacute;
     actualment %n persones.
+co: A basa di dati <span class="highlight">"%t"</span> %P
+    cuntene %n persone av&agrave;.
 cs: Databáze <span class="highlight">"%t"</span> obsahuje %n osob.
 da: Databasen <span class="highlight">"%t"</span> indeholder for
     &oslash;jeblikket %n personer.
@@ -189,6 +193,9 @@ br: mont e-barzh evel
 ca: acc&eacute;s
     <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (clau)
+co: accessu <a %P
+    href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> %P
+    (parolla d'entrata).
 cs: <a href="%sw=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>
     přístup<br%/> (heslo)
 da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
@@ -241,6 +248,7 @@ af: <a href="%sw=f"><em>Vriend</em></a> toegang<br%/> (password)
 bg: Достъп като <a href="%sw=f"><em>приятел</em></a><br%/> (парола)
 br: mont e-barzh evel <a href="%sw=f"><em>mignon</em></a><br%/> (ger-tremen)
 ca: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br%/> (clau)
+co: accessu <a href="%sw=f"><em>amicu</em></a><br%/> (parolla d'entrata)
 cs: <a href="%sw=f">{<em>"Friend"</em></a> přístup<br%/> (heslo)
 da: <a href="%sw=f"><em>Betroet adgang</em></a><br%/> (adgangskode)
 de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br%/> (Passwort)
@@ -277,6 +285,7 @@ bg: Парола за достъп като <em>приятел</em> или
     <em>администратор</em>:
 br: Ger-tremen evit mont e-barzh evel <em>mignon</em> pe <em>strobineller</em>:
 ca: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
+co: Parolla d'entrata, per accessu <em>amicu</em> o <em>sdrecu</em>:
 cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> přístup:</em>:
 da: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
@@ -315,6 +324,7 @@ ar: بإمكانك البحث في هذه القاعدة:
 bg: Можете да използвате тази база от данни за търсене:
 br: Evit merdeiñ er bon roadoù-mañ e c'hellit klask:
 ca: Per navegar en aquesta base, podeu fer la vostra recerca:
+co: Per navig&agrave; in sta basa di dati, si pò f&agrave; una ricerca :
 cs: Databázi lze prohledávat:
 da: For at navigere i denne database kan du søge:
 de: Zum Benutzen dieser Datenbank kannst du hier suchen:
@@ -354,6 +364,7 @@ ar: عن فرد
 bg: по име на човек
 br: dre anv-den
 ca: per persona
+co: da persona
 cs: Podle osob
 da: personnavn
 de: nach einer Person
@@ -421,6 +432,7 @@ af: by title
 bg: по титла
 br: dre ditl
 ca: per títol
+co: da titulu
 cs: podle titulu
 da: titel (nob.)
 de: nach einem Titel
@@ -475,6 +487,7 @@ af: <span class="highlight">in die lys </span>van alle
 bg: <span class="highlight">в списъка</span> на всички
 br: <span class="highlight">dre roll</span> an holl
 ca: <span class="highlight">pel llistat</span> de tots els
+co: <span class="highlight">da a lista</span> di tutti i
 cs: <span class="highlight">ze seznamu</span> všech
 da: <span class="highlight">i liste</span> over alle
 de: <span class="highlight">in der Liste</span> aller
@@ -506,6 +519,7 @@ af: vanne
 bg: фамилни имена
 br: anvioù-familh
 ca: cognoms
+co: casate
 cs: příjmení
 da: efternavne
 de: Nachnamen
@@ -537,6 +551,7 @@ af: voorname
 bg: собствени имена
 br: raganvioù
 ca: noms
+co: nomi
 cs: křestní jména
 da: fornavne
 de: Vornamen
@@ -568,6 +583,7 @@ af: volgens
 bg: ,&nbsp; подредени по
 br: dre
 ca: per
+co: da
 cs: seřazená podle
 da: sorteret efter
 de:
@@ -599,6 +615,7 @@ af: alfabeties volgorde
 bg: азбучен ред
 br: urzh al lizherenneg
 ca: ordre alfab&egrave;tic
+co: ordine alfabeticu
 cs: abecedy
 da: alfabetisk orden
 de: alphabetisch sortiert
@@ -629,6 +646,7 @@ af: frekwensie
 bg: честота на срещане
 br: stankted
 ca: freq&uuml&egrave;ncia
+co: frequenza
 cs: četnosti
 da: hyppighed
 de: nach H&auml;ufigkeit
@@ -672,6 +690,7 @@ af: by
 bg: по
 br: dre
 ca: per
+co: da
 cs: podle
 da: ved
 de: mit
@@ -718,6 +737,9 @@ br: <span class="highlight"> dre ar</span>
 ca: <span class="highlight">per la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>consulta
        avançada</b></font></a>.
+co: <span class="highlight">da a</span>
+       <a href="%sm=H;v=advanced"><font color="%i"><b>richiesta
+        avanzata</b></font></a>.
 cs: <span class="highlight">lze také zadat</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>rozšířený
        dotaz</b></font></a>.
@@ -798,6 +820,7 @@ af: Jy kan
 bg: Можете още
 br: Gellout a rit
 ca: Podeu
+co: Pudete
 cs: Zde můžete
 da: Du kan:
 de: Du kannst
@@ -833,6 +856,7 @@ af: 'n familie byvoeg
 bg: да добавите семейство
 br: ouzhpennañ ur familh
 ca: afegir una fam&iacute;lia
+co: aghjunghje una famiglia
 cs: přidat novou rodinu
 da: tilføje en familie
 de: eine Familie hinzuf&uuml;gen
@@ -868,6 +892,7 @@ af: die notas wysig
 bg: да промените бележките
 br: kemm an notennoù
 ca: modificar les notes
+co: aghjunghje note
 cs: upravit poznámky
 da: ændre noterne
 de: die Notizen &auml;ndern
@@ -908,6 +933,7 @@ af: Jy kan ook kyk na
 bg: Можете също да се насочите към
 br: Gellout a rit ivez gweladenniñ
 ca: Tamb&eacute; podeu consultar
+co: Pudete cunsult&agrave;
 cs: Lze také zobrazit
 da: Du kan også fremkalde:
 de: Du kannst zugreifen auf
@@ -979,6 +1005,7 @@ bg: От %d насам е имало %q посещения, от които %c �
 br: gweladennoù a zo bet : %q, er bajenn-mañ : %c, abaoe an deiz-mañ : %d.
 ca: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
     del %d.
+co: Ci h&egrave; statu %q accessi, chì %c &agrave; sta pagina, dapoi u %d.
 cs: %q přístupů, z toho %c na tuto stránku, od %d.
 da: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 de: Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
@@ -1033,6 +1060,10 @@ ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
     altre lloc</a>.
+co: S'&egrave; u vostru navigatore &ugrave;n rinfresca micca e pagine
+    mudificate (vi furzendu &agrave; f&agrave; "attualiz&agrave;
+    a pagina"), pruvate a navigazione &agrave; partesi di
+    <a href="%sescache=0">sta lea</a>.
 cs: Pokud Váš prohlížeč neprovádí automaticky obnovu upravených stránek
     (musíte používat tlačítko "obnovit"), zkuste prohlížení přes <a
     href="%sescache=0">tento odkaz</a>.
@@ -1043,7 +1074,7 @@ de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
     (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken),
     bitte <a href="%sescache=0">hier</a> klicken.
 en: If your browser does not automatically update the modified pages (forcing
-    you to do "reload current document"), try navigating from <a
+    you to do "reload current document"), pruvate navigating from <a
     href="%sescache=0">this link</a>.
 eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
     (se vi devas fari "reŝarĝi kurantan dokumenton"), provu ekde <a
@@ -1114,6 +1145,7 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 bg: лексикон
 br: geriaoueg
 ca: L&egrave;xic
+co: lessicu
 cs: lexikon
 da: leksikon
 de: Lexikon
