@@ -58,7 +58,7 @@ sv: Genealogi
   <table border="0" width="100%%">
     <tr align="%L">
       <td rowspan="2" style="width: 20%%">
-        <a href="http://opensource.geneanet.org/projects/geneweb/"><img width="96" height="108"
+        <a href="https://github.com/geneweb/geneweb"><img width="96" height="108"
          src="%o/gwlogo.png" style="border: 0" alt="GeneWeb"%/></a>
       </td>
       %I&wNf<td align="%R"
@@ -324,7 +324,7 @@ ar: بإمكانك البحث في هذه القاعدة:
 bg: Можете да използвате тази база от данни за търсене:
 br: Evit merdeiñ er bon roadoù-mañ e c'hellit klask:
 ca: Per navegar en aquesta base, podeu fer la vostra recerca:
-co: Per navig&agrave; in sta basa di dati, si pò f&agrave; una ricerca :
+co: Per navig&agrave; in sta basa di dati, si p&ograve; f&agrave; una ricerca :
 cs: Databázi lze prohledávat:
 da: For at navigere i denne database kan du søge:
 de: Zum Benutzen dieser Datenbank kannst du hier suchen:
@@ -1005,7 +1005,7 @@ bg: От %d насам е имало %q посещения, от които %c �
 br: gweladennoù a zo bet : %q, er bajenn-mañ : %c, abaoe an deiz-mañ : %d.
 ca: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
     del %d.
-co: Ci h&egrave; statu %q accessi, chì %c &agrave; sta pagina, dapoi u %d.
+co: Ci h&egrave; statu %q accessi, ch&igrave; %c &agrave; sta pagina, dapoi u %d.
 cs: %q přístupů, z toho %c na tuto stránku, od %d.
 da: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 de: Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
@@ -1074,7 +1074,7 @@ de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
     (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken),
     bitte <a href="%sescache=0">hier</a> klicken.
 en: If your browser does not automatically update the modified pages (forcing
-    you to do "reload current document"), pruvate navigating from <a
+    you to do "reload current document"), try navigating from <a
     href="%sescache=0">this link</a>.
 eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
     (se vi devas fari "reŝarĝi kurantan dokumenton"), provu ekde <a
