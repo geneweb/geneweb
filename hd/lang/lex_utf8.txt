@@ -1582,7 +1582,6 @@ fr: un neveu/une nièce/neveux/nièces/neveux et nièces
 he:   אחיין/ אחיינית///אחיינים
 is: bróður(systur)sonur/bróður(systur)dóttir///bræðra og systrabörn
 it: un nipote/una nipote/nipoti/nipoti/nipoti
-cs: synovec/neteř/synovci/neteře/synovci a neteře
 lv: brāļa/māsas dēls/meita
 nl: een neef/een nicht (oom- of tantezegger)///neven en nichten (oom-, tantezegger)
 no: nevø/niese/nevøer/nieser/nevøer og nieser
@@ -3424,7 +3423,7 @@ sv: Begravningsplats
 ru: место погребения
 
     burial src
-co: fonte d'inumazione
+co: fonte di sepultura
 de: Ouellenangabe-Bestattung
 en: Source of burial
 es: fuente inhumación
@@ -6097,8 +6096,8 @@ sv: för förnamnen i bokstavsordning
 
     for the list ordered by the date of the last modification
 bg: за списъка по дати на последно изменение
-cs: pre vypis podla datumu poslednej zmeny
 co: per a lista classificata da data d'ultima mudificazione
+cs: pre vypis podla datumu poslednej zmeny
 da: for en liste sorteret efter datoen for seneste ændring
 de: für eine, nach dem Datum der letzten Änderung geordnete Liste
 en: for the list ordered by the date of the last modification
@@ -6683,7 +6682,7 @@ sl: on/ona
 sv: honom/henne
 
     his/her
-co: u/a so
+co: u so/a so
 en: his/her
 fr: son/sa
 
@@ -7070,11 +7069,11 @@ sv:
 zh:  于
 
     include missing spouses
-co: include i cumpagni chì mancanu
 af: ontbrekende ouers ingesluit
 bg: включително липсващите съпрузи и съпруги
 br: enklozañ ar priedoù a vank
 ca: incloure els cònjuges que falten
+co: include i cumpagni chì mancanu
 cs: včetně chybějících manželů/manželek
 da: medtag ukendte ægtefæller
 de: Fehlende Ehegatten einbeziehen
@@ -8355,11 +8354,6 @@ oc: maridatge amb
 pt: casamento com
 sv: vigslar
 ru: брак с
-
-    marriage with %s
-co: unione cù %s
-en: Marriage with %s
-fr: union avec %s
 
     marriage/marriages
 af: huwelik/huwelike
@@ -10040,7 +10034,7 @@ sl: število živih oseb
 sv: antal levande personer:
 
     n° d'Aboville
-co: N° d’Aboville
+co: N° d'Aboville
 de: Nr. Aboville
 en: d'Aboville number
 es: N° de Aboville
@@ -10055,7 +10049,7 @@ sv: nummer
 ru: номер в системе d'Aboville
 
     d'Aboville
-co: d’Aboville
+co: d'Aboville
 de: Aboville
 en: d'Aboville
 es: Aboville
@@ -11326,11 +11320,6 @@ sk: príbuzenské vzťahy cez svadby
 sl: sorodstvo preko poroke
 sv: släktskap genom äktenskap
 
-    relationship by marriage with %s
-co: lea d'apparentamentu cù %s
-en: relatives by marriage with %s
-fr: liens de parenté par alliance avec %s
-
     relationship computing
 af: bereken verwantskappe
 bg: определяне на родство
@@ -11584,7 +11573,7 @@ sv: Besegling med föräldrar (LDS)
 co: lea eterna cù a sposa LDS
 de: HTL Ehepartner-Versiegelung
 en: Sealing Spouse (LDS)
-es: sellamiento con cónyuge LDS
+es:  sellamiento con cónyuge LDS
 fi: Sinetöity puoliso (LDS)
 fr: scellement au conjoint LDS
 it: Legame eterno con la sposa LDS (mormonismo)
@@ -12514,8 +12503,8 @@ sl: statistike
 sv: statistik
 
     statistics and anniversaries
-co: statistiche è anniversarii
 bg: статистика и годишнини
+co: statistiche è anniversarii
 de: Statistik und Geburtstage
 en: statistics and anniversaries
 es: Estadísticas y aniversarios
@@ -14511,7 +14500,7 @@ ru: проверить/удалить
 sk: potvrdiť/zmazať
 sv: giltligt/tas bort
 
-    
+    venteBien
 co: vendita d'un bè
 de: Verkauf von Besitztum
 en: Sale of Property
