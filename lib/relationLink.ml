@@ -305,31 +305,31 @@ let rec print_both_branches_pre conf base info sz pl1 pl2 =
 
 let include_marr conf base n =
   match find_person_in_env conf base n with
-    Some p -> ";" ^ acces_n conf base n p
+    Some p -> "&" ^ acces_n conf base n p
   | None -> ""
 
 let sign_text conf base sign info b1 b2 c1 c2 =
-  "<a href=\"" ^ commd conf ^ "m=RL" ^ ";" ^
-  acces_n conf base "1" (pget conf base info.ip1) ^ ";" ^
+  "<a href=\"" ^ commd conf ^ "m=RL" ^ "&" ^
+  acces_n conf base "1" (pget conf base info.ip1) ^ "&" ^
   acces_n conf base "2" (pget conf base info.ip2) ^ ";b1=" ^
   Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b1)) ^ ";b2=" ^
   Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b2)) ^ ";c1=" ^
   string_of_int c1 ^ ";c2=" ^ string_of_int c2 ^
   (match p_getenv conf.env "spouse" with
-     Some "on" -> ";spouse=on"
+     Some "on" -> "&spouse=on"
    | _ -> "") ^
   (match p_getenv conf.env "image" with
-     Some "off" -> ";image=off"
+     Some "off" -> "&image=off"
    | _ -> "") ^
   (match p_getenv conf.env "bd" with
      None | Some ("0" | "") -> ""
-   | Some x -> ";bd=" ^ x) ^
+   | Some x -> "&bd=" ^ x) ^
   (match p_getenv conf.env "td" with
      None | Some "" -> ""
-   | Some x -> ";td=" ^ x) ^
+   | Some x -> "&td=" ^ x) ^
   (match p_getenv conf.env "color" with
      None | Some "" -> ""
-   | Some x -> ";color=" ^ code_varenv x) ^
+   | Some x -> "&color=" ^ code_varenv x) ^
   include_marr conf base "3" ^ include_marr conf base "4" ^ "\">" ^ sign ^
   "</a>"
 

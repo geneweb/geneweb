@@ -68,7 +68,7 @@ let print_whole_notes conf base fnotes title s ho =
   let what_links_page () =
     if fnotes <> "" then
       begin
-        Wserver.printf "<a href=\"%sm=NOTES;f=%s;ref=on\" class=\"mx-2\">"
+        Wserver.printf "<a href=\"%sm=NOTES&f=%s&ref=on\" class=\"mx-2\">"
           (commd conf) fnotes;
         Wserver.printf "(%s)" (transl conf "linked pages");
         Wserver.printf "</a>\n"
@@ -258,7 +258,7 @@ let print_linked_list conf base pgl =
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
-               Wserver.printf "<a class=\"mx-2\" href=\"%s;i=%d;\">"
+               Wserver.printf "<a class=\"mx-2\" href=\"%s&i=%d&\">"
                  (commd conf) (Adef.int_of_iper ip);
                Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
@@ -280,7 +280,7 @@ let print_linked_list conf base pgl =
            if conf.wizard then
              begin
                Wserver.printf
-                 "<a class=\"mx-2\" href=\"%sm=MOD_FAM;i=%d;ip=%d;\">"
+                 "<a class=\"mx-2\" href=\"%sm=MOD_FAM&i=%d&ip=%d&\">"
                  (commd conf) (Adef.int_of_ifam ifam)
                  (Adef.int_of_iper (Gwdb.get_key_index fath));
                Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
@@ -298,7 +298,7 @@ let print_linked_list conf base pgl =
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
-               Wserver.printf "<a class=\"mx-2\" href=\"%sm=MOD_NOTES;\">"
+               Wserver.printf "<a class=\"mx-2\" href=\"%sm=MOD_NOTES&\">"
                  (commd conf);
                Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
@@ -315,12 +315,12 @@ let print_linked_list conf base pgl =
            if conf.wizard then
              begin
                Wserver.printf
-                 "<a class=\"mx-2\" href=\"%sm=MOD_NOTES;f=%s;\">"
+                 "<a class=\"mx-2\" href=\"%sm=MOD_NOTES&f=%s&\">"
                  (commd conf) fnotes;
                Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
-           Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES;f=%s;\">"
+           Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES&f=%s&\">"
              (commd conf) fnotes;
            Wserver.printf "%s" fnotes;
            Wserver.printf "</a>";
@@ -331,12 +331,12 @@ let print_linked_list conf base pgl =
            if conf.wizard then
              begin
                Wserver.printf
-                 "<a class=\"mx-2\" href=\"%sm=MOD_WIZNOTES;f=%s;\">"
+                 "<a class=\"mx-2\" href=\"%sm=MOD_WIZNOTES&f=%s&\">"
                  (commd conf) (code_varenv wizname);
                Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
-           Wserver.printf "<a class=\"mx-2\" href=\"%sm=WIZNOTES;v=%s\">"
+           Wserver.printf "<a class=\"mx-2\" href=\"%sm=WIZNOTES&v=%s\">"
              (commd conf) (code_varenv wizname);
            Wserver.printf "%s" wizname;
            Wserver.printf "</a>";
@@ -359,7 +359,7 @@ let print_what_links conf base fnotes =
         Wserver.printf "<tt>";
         Wserver.printf "[";
         begin
-          Wserver.printf "<a href=\"%sm=NOTES;f=%s\">" (commd conf) fnotes;
+          Wserver.printf "<a href=\"%sm=NOTES&f=%s\">" (commd conf) fnotes;
           Wserver.printf "%s" fnotes;
           Wserver.printf "</a>"
         end;
@@ -540,7 +540,7 @@ let print_misc_notes conf base =
             Wserver.printf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf)
               (try
                  let i = String.rindex d NotesLinks.char_dir_sep in
-                 let d = String.sub d 0 i in ";d=" ^ d
+                 let d = String.sub d 0 i in "&d=" ^ d
                with Not_found -> "");
             Wserver.printf "<tt>&lt;--</tt>";
             Wserver.printf "</a>"
@@ -564,7 +564,7 @@ let print_misc_notes conf base =
                in
                Wserver.printf "<li class=\"file\">\n";
                Wserver.printf "<tt>[";
-               Wserver.printf "<a href=\"%sm=NOTES;f=%s\"%s>" (commd conf) f
+               Wserver.printf "<a href=\"%sm=NOTES&f=%s\"%s>" (commd conf) f
                  c;
                Wserver.printf "%s" r;
                Wserver.printf "</a>";
@@ -574,7 +574,7 @@ let print_misc_notes conf base =
            | None ->
                Wserver.printf "<li class=\"folder\">\n";
                Wserver.printf "<tt>";
-               Wserver.printf "<a href=\"%sm=MISC_NOTES;d=%s\">" (commd conf)
+               Wserver.printf "<a href=\"%sm=MISC_NOTES&d=%s\">" (commd conf)
                  (if d = "" then r
                   else d ^ String.make 1 NotesLinks.char_dir_sep ^ r);
                Wserver.printf "%s " r;

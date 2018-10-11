@@ -386,8 +386,8 @@ let display_descendants_with_numbers conf base max_level ancestor =
     else
       wprint_geneweb_link conf
         ("m=D;i=" ^
-         string_of_int (Adef.int_of_iper (get_key_index ancestor)) ^ ";v=" ^
-         string_of_int max_level ^ ";t=G")
+         string_of_int (Adef.int_of_iper (get_key_index ancestor)) ^ "&v=" ^
+         string_of_int max_level ^ "&t=G")
         (capitale
            (transl_a_of_gr_eq_gen_lev conf (transl conf "descendants")
               (person_text conf base ancestor)))
@@ -523,8 +523,8 @@ let display_descendant_index conf base max_level ancestor =
     if not h then
       wprint_geneweb_link conf
         ("m=D;i=" ^
-         string_of_int (Adef.int_of_iper (get_key_index ancestor)) ^ ";v=" ^
-         string_of_int max_level ^ ";t=C")
+         string_of_int (Adef.int_of_iper (get_key_index ancestor)) ^ "&v=" ^
+         string_of_int max_level ^ "&t=C")
         txt
     else Wserver.printf "%s" txt
   in

@@ -61,7 +61,7 @@ let print_link_delete_image conf base p =
     begin
       Wserver.printf "<p>\n";
       begin
-        Wserver.printf "<a href=\"%sm=DEL_IMAGE;i=%d\">" (commd conf)
+        Wserver.printf "<a href=\"%sm=DEL_IMAGE&i=%d\">" (commd conf)
           (Adef.int_of_iper (get_key_index p));
         Wserver.printf "%s %s" (capitale (transl conf "delete"))
           (transl_nth conf "image/images" 0);

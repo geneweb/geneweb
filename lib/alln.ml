@@ -126,7 +126,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
   Wserver.printf "<p class=\"search_name\">\n";
   List.iter
     (fun (ini_k, _) ->
-       Wserver.printf "<a href=\"%sm=%s;tri=A;k=%s\">" (commd conf) mode
+       Wserver.printf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
          (Util.code_varenv ini_k);
        Wserver.printf "%s" (tr '_' "&nbsp;" (displayify ini_k));
        Wserver.printf "</a>\n")
@@ -144,7 +144,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
         begin
           Wserver.printf "<li>";
           begin
-            Wserver.printf "<a href=\"%sm=%s;tri=A;o=A;k=%s\">" (commd conf)
+            Wserver.printf "<a href=\"%sm=%s&tri=A&o=A&k=%s\">" (commd conf)
               mode ini;
             Wserver.printf "%s" (transl conf "long display");
             Wserver.printf "</a>"
@@ -154,7 +154,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
         begin
           Wserver.printf "<li>";
           begin
-            Wserver.printf "<a href=\"%sm=%s;tri=S;o=A;k=%s\">" (commd conf)
+            Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s\">" (commd conf)
               mode ini;
             Wserver.printf "%s" (transl conf "short display");
             Wserver.printf "</a>"
@@ -164,7 +164,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
         begin
           Wserver.printf "<li>";
           begin
-            Wserver.printf "<a href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\">"
+            Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s&cgl=on\">"
               (commd conf) mode ini;
             Wserver.printf "%s + %s" (transl conf "short display")
               (transl conf "cancel GeneWeb links");
@@ -203,7 +203,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
          (fun (s, cnt) ->
             Wserver.printf "<li>";
             begin let href =
-              "m=" ^ mode ^ ";v=" ^ code_varenv s ^ ";t=A"
+              "m=" ^ mode ^ "&v=" ^ code_varenv s ^ "&t=A"
             in
               wprint_geneweb_link conf href
                 (alphab_string base is_surnames s)
@@ -228,7 +228,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
       List.iter
         (fun (_, s, cnt) ->
            Wserver.printf "<li>";
-           Wserver.printf "<a href=\"%sm=%s;v=%s;t=A\">" (commd conf) mode
+           Wserver.printf "<a href=\"%sm=%s&v=%s&t=A\">" (commd conf) mode
              (code_varenv s);
            Wserver.printf "%s" (alphab_string base is_surnames s);
            Wserver.printf "</a>";
@@ -257,7 +257,7 @@ let print_frequency_any conf base is_surnames list len =
              List.iter
                (fun s ->
                   Wserver.printf "<li>";
-                  Wserver.printf "<a href=\"%sm=%s;v=%s\">" (commd conf) mode
+                  Wserver.printf "<a href=\"%sm=%s&v=%s\">" (commd conf) mode
                     (code_varenv (Name.lower s));
                   Wserver.printf "%s" (alphab_string base is_surnames s);
                   Wserver.printf "</a>";
@@ -429,8 +429,8 @@ let print_alphabetic_short conf base is_surnames ini list len =
          (fun first (s, cnt) ->
             let href =
               if not conf.cancel_links then
-                " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
-                code_varenv s ^ ";t=A\""
+                " href=\"" ^ commd conf ^ "m=" ^ mode ^ "&v=" ^
+                code_varenv s ^ "&t=A\""
               else ""
             in
             let name =

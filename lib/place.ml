@@ -204,23 +204,23 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
   let add_burial = p_getenv conf.env "bu" = Some "on" in
   let add_marriage = p_getenv conf.env "ma" = Some "on" in
   let opt =
-    (if add_birth then ";bi=on" else "") ^
-    (if add_baptism then ";bp=on" else "") ^
-    (if add_death then ";de=on" else "") ^
-    (if add_burial then ";bu=on" else "") ^
-    (if add_marriage then ";ma=on" else "")
+    (if add_birth then "&bi=on" else "") ^
+    (if add_baptism then "&bp=on" else "") ^
+    (if add_death then "&de=on" else "") ^
+    (if add_burial then "&bu=on" else "") ^
+    (if add_marriage then "&ma=on" else "")
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>\n";
-  Wserver.printf "<a href=\"%sm=PS%s;k=\">" (commd conf) opt;
+  Wserver.printf "<a href=\"%sm=PS%s&k=\">" (commd conf) opt;
   Wserver.printf "%s" (transl conf "long display");
   Wserver.printf "</a>";
   Wserver.printf "</p>\n";
   Wserver.printf "<p>\n";
   List.iter
     (fun (s, x) ->
-       Wserver.printf "<a href=\"%sm=PS%s;k=%s\">" (commd conf) opt
+       Wserver.printf "<a href=\"%sm=PS%s&k=%s\">" (commd conf) opt
          (Util.code_varenv s);
        Wserver.printf "%s" s;
        Wserver.printf "</a>";

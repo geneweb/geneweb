@@ -359,7 +359,7 @@ let commd conf =
   let c = conf.command ^ "?" in
   List.fold_left (fun c (k, v) ->
     if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
-      c else c ^ k ^ "=" ^ v ^ ";") c (conf.henv @ conf.senv)
+      c else c ^ k ^ "=" ^ v ^ "&") c (conf.henv @ conf.senv)
 
 let commd_2 conf =
   let c = conf.command ^ "?" in
@@ -369,7 +369,7 @@ let commd_2 conf =
 
 
 let prefix_base conf =
-  if conf.b_arg_for_basename then conf.command ^ "?b=" ^ conf.bname ^ ";"
+  if conf.b_arg_for_basename then conf.command ^ "?b=" ^ conf.bname ^ "&"
   else conf.command ^ "?"
 
 let prefix_base_2 conf =
@@ -381,9 +381,9 @@ let prefix_base_2 conf =
 let prefix_base_password conf =
   if conf.b_arg_for_basename then
     if conf.cgi_passwd = "" then
-      conf.command ^ "?b=" ^ conf.bname ^ ";"
+      conf.command ^ "?b=" ^ conf.bname ^ "&"
     else
-      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ ";"
+      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ "&"
   else
     conf.command ^ "?"
 
@@ -934,11 +934,11 @@ let update_family_loop conf base p s =
       if List.length res = 1 then
         let iper = string_of_int (Adef.int_of_iper iper) in
         let ifam = string_of_int (Adef.int_of_ifam (List.hd res)) in
-        "<a href=\"" ^ commd conf ^ "m=MOD_FAM;i=" ^ ifam ^ ";ip=" ^ iper ^
+        "<a href=\"" ^ commd conf ^ "m=MOD_FAM&i=" ^ ifam ^ "&ip=" ^ iper ^
         "\">" ^ s ^ "</a>"
       else
         let iper = string_of_int (Adef.int_of_iper iper) in
-        "<a href=\"" ^ commd conf ^ "m=U;i=" ^ iper ^ "\">" ^ s ^ "</a>"
+        "<a href=\"" ^ commd conf ^ "m=U&i=" ^ iper ^ "\">" ^ s ^ "</a>"
     else s
 
 let no_reference _conf _base _p s = s
@@ -1287,7 +1287,7 @@ value default_background conf =
 value default_body_prop conf =
   let style =
     match p_getenv conf.env "size" with
-    [ Some v -> "font-size:" ^ v ^ ";"
+    [ Some v -> "font-size:" ^ v ^ "&"
     | None -> "" ]
   in
   let style = Printf.sprintf "%s%s" style (default_background conf) in
@@ -1405,10 +1405,10 @@ let url_no_index conf base =
   let suff =
     List.fold_right
       (fun (x, v) s ->
-         let sep = if s = "" then "" else ";" in x ^ "=" ^ v ^ sep ^ s)
+         let sep = if s = "" then "" else "&" in x ^ "=" ^ v ^ sep ^ s)
       (("lang", conf.lang) :: env) ""
   in
-  if conf.b_arg_for_basename then addr ^ "?b=" ^ conf.bname ^ ";" ^ suff
+  if conf.b_arg_for_basename then addr ^ "?b=" ^ conf.bname ^ "&" ^ suff
   else addr ^ "?" ^ suff
 
 let message_to_wizard conf =
@@ -3411,20 +3411,20 @@ let print_image_sex conf p size =
 (* ********************************************************************** *)
 let display_options conf =
   let s =
-    if p_getenv conf.env "image" = Some "off" then ";image=off"
+    if p_getenv conf.env "image" = Some "off" then "&image=off"
     else ""
   in
   let s =
-    if p_getenv conf.env "marriage" = Some "on" then s ^ ";marriage=on"
+    if p_getenv conf.env "marriage" = Some "on" then s ^ "&marriage=on"
     else s
   in
   let s =
     match p_getenv conf.env "bd" with
-      Some i -> s ^ ";bd=" ^ i
+      Some i -> s ^ "&bd=" ^ i
     | None -> s
   in
   match p_getenv conf.env "color" with
-    Some c -> s ^ ";color=" ^ c
+    Some c -> s ^ "&color=" ^ c
   | None -> s
 
 (* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)

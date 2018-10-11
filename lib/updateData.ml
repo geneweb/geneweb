@@ -488,10 +488,10 @@ let print_long conf list len =
                 let k =
                   List.fold_left
                     (fun accu (k, i) ->
-                       accu ^ k ^ "=" ^ string_of_int i ^ ";")
+                       accu ^ k ^ "=" ^ string_of_int i ^ "&")
                     "" k
                 in
-                Wserver.printf "<a href=\"%sm=MOD_DATA;data=%s;%s;s=%s#mod\">"
+                Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&%s&s=%s#mod\">"
                   (commd conf) data k (code_varenv ini);
                 Wserver.printf "%s" (quote_escaped s);
                 Wserver.printf "</a>"
@@ -634,7 +634,7 @@ let print_short conf list len =
   Wserver.printf "<p class=\"list_ini\">\n";
   List.iter
     (fun s ->
-       Wserver.printf "<a href=\"%sm=MOD_DATA;data=%s;s=%s\">" (commd conf)
+       Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\">" (commd conf)
          data (code_varenv s);
        Wserver.printf "%s" (no_html_tags s);
        Wserver.printf "</a>\n")
@@ -1068,7 +1068,7 @@ let print_mod_ok conf base =
         (min nb_pers max_updates);
       if p_getenv conf.base_env "history" = Some "yes" then
         begin
-          Wserver.printf "<a href=\"%sm=HIST;k=20\">" (commd conf);
+          Wserver.printf "<a href=\"%sm=HIST&k=20\">" (commd conf);
           Wserver.printf "%s."
             (transl_nth conf "modification/modifications"
                (if nb_pers > 1 then 1 else 0));
@@ -1118,7 +1118,7 @@ let print_mod_ok conf base =
           Wserver.printf "</form>\n"
         end;
       Wserver.printf "<p>\n";
-      Wserver.printf "<a href=\"%sm=MOD_DATA;data=%s;s=%s\" id=\"reference\">"
+      Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\" id=\"reference\">"
         (commd conf) data ini;
       Wserver.printf "%s" (capitale (transl conf "new modification"));
       Wserver.printf "</a>";
@@ -1132,7 +1132,7 @@ let print_mod_ok conf base =
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Wserver.printf "<p>\n";
-    Wserver.printf "<a href=\"%sm=MOD_DATA;data=%s;s=%s\" id=\"reference\">" (commd conf) data
+    Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\" id=\"reference\">" (commd conf) data
       ini;
     Wserver.printf "%s" (capitale (transl conf "new modification"));
     Wserver.printf "</a>";
@@ -1368,7 +1368,7 @@ and eval_simple_str_var conf _base env _xx =
         | _ -> []
       in
       List.fold_left
-        (fun accu (k, i) -> accu ^ k ^ "=" ^ string_of_int i ^ ";") "" k
+        (fun accu (k, i) -> accu ^ k ^ "=" ^ string_of_int i ^ "&") "" k
   | "key_name" -> eval_string_env "key_name" env
   | "key_value" -> eval_int_env "key_value" env
   | "nb_results" ->

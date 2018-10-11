@@ -88,7 +88,7 @@ let print_possible_continue_merging conf base =
       let p2 = poi base (Adef.iper_of_int ini2) in
       Wserver.printf "\n";
       html_p conf;
-      Wserver.printf "<a href=%sm=MRG_IND;i=%d;i2=%d>" (commd conf) ini1 ini2;
+      Wserver.printf "<a href=%sm=MRG_IND&i=%d&i2=%d>" (commd conf) ini1 ini2;
       Wserver.printf "%s" (capitale (transl conf "continue merging"));
       Wserver.printf "</a>";
       Wserver.printf "\n";
@@ -102,18 +102,18 @@ let print_possible_continue_merging conf base =
           let s1 =
             match p_getenv conf.env "iexcl" with
               Some "" | None -> ""
-            | Some s -> ";iexcl=" ^ s
+            | Some s -> "&iexcl=" ^ s
           in
           let s2 =
             match p_getenv conf.env "fexcl" with
               Some "" | None -> ""
-            | Some s -> ";fexcl=" ^ s
+            | Some s -> "&fexcl=" ^ s
           in
           if s1 <> "" || s2 <> "" then
             begin
               Wserver.printf "<p>\n";
               begin
-                Wserver.printf "<a href=%sm=MRG_DUP;ip=%d%s%s>" (commd conf)
+                Wserver.printf "<a href=%sm=MRG_DUP&ip=%d%s%s>" (commd conf)
                   ip s1 s2;
                 Wserver.printf "%s"
                   (capitale (transl conf "continue merging"));

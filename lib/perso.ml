@@ -34,7 +34,7 @@ let string_of_marriage_text conf base fam =
 
 let string_of_title conf base and_txt p (nth, name, title, places, dates) =
   let href =
-    "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
+    "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ "&p=" ^
     code_varenv (sou base (List.hd places))
   in
   let (tit, est) = sou base title, sou base (List.hd places) in
@@ -50,7 +50,7 @@ let string_of_title conf base and_txt p (nth, name, title, places, dates) =
     match places with
       place :: places ->
         let href =
-          "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
+          "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ "&p=" ^
           code_varenv (sou base place)
         in
         let est = sou base place in
@@ -1677,7 +1677,7 @@ let linked_page_text conf base p s key str (pg, (_, il)) =
                    if conf.cancel_links then Printf.sprintf "%s" b
                    else
                      Printf.sprintf
-                       "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
+                       "%s<a href=\"%sm=NOTES&f=%s#p_%d\">%s</a>%s" a
                        (commd conf) pg text.NotesLinks.lnPos b c
                  in
                  if str = "" then str1 else str ^ ", " ^ str1

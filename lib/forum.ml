@@ -769,7 +769,7 @@ let print_del_ok conf next_pos =
   Hutil.print_link_to_welcome conf true;
   begin match next_pos with
     Some pos ->
-      Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
+      Wserver.printf "<a href=\"%sm=FORUM&p=%s\">%s</a>\n" (commd conf)
         (MF.string_of_pos pos) (capitale (message_txt conf 3))
   | None ->
       Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
@@ -843,7 +843,7 @@ let print_valid_ok conf pos del =
   Hutil.print_link_to_welcome conf true;
   begin match next_pos with
     Some pos ->
-      Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
+      Wserver.printf "<a href=\"%sm=FORUM&p=%s\">%s</a>\n" (commd conf)
         (MF.string_of_pos pos) (capitale (message_txt conf 3))
   | None ->
       Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)

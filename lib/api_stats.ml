@@ -2234,9 +2234,9 @@ let print_all_stats conf base =
   List.iter
     (fun (k, ((nb_m, am), (nb_f, af))) ->
       print_endline
-        (string_of_int k ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ string_of_int nb_m ^ "&" ^
            (if nb_m <> 0 then string_of_int (am / nb_m) else "0") ^
-           ";" ^ string_of_int nb_f ^ ";" ^
+           "&" ^ string_of_int nb_f ^ "&" ^
            (if nb_f <> 0 then string_of_int (af / nb_f) else "0")))
     longuest;
   *)
@@ -2246,7 +2246,7 @@ let print_all_stats conf base =
   List.iter
     (fun (k, (wd, nb_m, nb_f))  ->
       print_endline
-        (string_of_int k ^ ";" ^ ad.(wd) ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ ad.(wd) ^ "&" ^ string_of_int nb_m ^ "&" ^
            string_of_int nb_f))
     day_birth;
   *)
@@ -2259,7 +2259,7 @@ let print_all_stats conf base =
   List.iter
     (fun (k, (md, nb_m, nb_f))  ->
       print_endline
-        (string_of_int k ^ ";" ^ ad.(md - 1) ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ ad.(md - 1) ^ "&" ^ string_of_int nb_m ^ "&" ^
            string_of_int nb_f))
     month_birth;
   *)
@@ -2272,7 +2272,7 @@ let print_all_stats conf base =
   List.iter
     (fun (k, (md, nb_m, nb_f))  ->
       print_endline
-        (string_of_int k ^ ";" ^ ad.(md - 1) ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ ad.(md - 1) ^ "&" ^ string_of_int nb_m ^ "&" ^
            string_of_int nb_f))
     month_death;
   *)
@@ -2282,7 +2282,7 @@ let print_all_stats conf base =
   List.iter
     (fun (k, (wd, nb_m, nb_f))  ->
       print_endline
-        (string_of_int k ^ ";" ^ ad.(wd) ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ ad.(wd) ^ "&" ^ string_of_int nb_m ^ "&" ^
            string_of_int nb_f))
     day_marr;
   let ad =
@@ -2294,7 +2294,7 @@ let print_all_stats conf base =
   List.iter
     (fun (k, (md, nb_m, nb_f))  ->
       print_endline
-        (string_of_int k ^ ";" ^ ad.(md - 1) ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ ad.(md - 1) ^ "&" ^ string_of_int nb_m ^ "&" ^
            string_of_int nb_f))
     month_marr;
   *)
@@ -2315,7 +2315,7 @@ let print_all_stats conf base =
   List.iter
     (fun (k, (moon, nb_m, nb_f))  ->
       print_endline
-        (string_of_int k ^ ";" ^ moon_arr.(moon) ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ moon_arr.(moon) ^ "&" ^ string_of_int nb_m ^ "&" ^
            string_of_int nb_f))
     moon;
   *)
@@ -2324,9 +2324,9 @@ let print_all_stats conf base =
   List.iter
     (fun (k, ((nb_m, am), (nb_f, af))) ->
       print_endline
-        (string_of_int k ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ string_of_int nb_m ^ "&" ^
            (if nb_m <> 0 then string_of_int (am / nb_m) else "0") ^
-           ";" ^ string_of_int nb_f ^ ";" ^
+           "&" ^ string_of_int nb_f ^ "&" ^
            (if nb_f <> 0 then string_of_int (af / nb_f) else "0")))
     age_marr;
   *)
@@ -2335,9 +2335,9 @@ let print_all_stats conf base =
   List.iter
     (fun (k, ((nb_m, am), (nb_f, af))) ->
       print_endline
-        (string_of_int k ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ string_of_int nb_m ^ "&" ^
            (if nb_m <> 0 then string_of_int (am / nb_m) else "0") ^
-           ";" ^ string_of_int nb_f ^ ";" ^
+           "&" ^ string_of_int nb_f ^ "&" ^
            (if nb_f <> 0 then string_of_int (af / nb_f) else "0")))
     diff_age_marr;
   *)
@@ -2423,7 +2423,7 @@ let print_all_stats conf base =
   List.iter
     (fun (k, (wd, nb_m, nb_f))  ->
       print_endline
-        (string_of_int k ^ ";" ^ zodiac.(wd) ^ ";" ^ string_of_int nb_m ^ ";" ^
+        (string_of_int k ^ "&" ^ zodiac.(wd) ^ "&" ^ string_of_int nb_m ^ "&" ^
            string_of_int nb_f))
     astro;
   *)

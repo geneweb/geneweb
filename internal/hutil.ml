@@ -7,7 +7,7 @@ let commd_no_params conf =
   conf.command ^ "?" ^
   List.fold_left
     (fun c (k, v) ->
-       c ^ (if c = "" then "" else ";") ^ k ^
+       c ^ (if c = "" then "" else "&") ^ k ^
        (if v = "" then "" else "=" ^ v))
     "" conf.henv
 
