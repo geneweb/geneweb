@@ -443,17 +443,17 @@ let print_anniv conf base p dead_people level =
       set S.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
-    "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p ^ ";b1=" ^
-    string_of_int up_sosa ^ ";" ^
+    "<a href=\"" ^ commd conf ^ "m=RL&" ^ acces_n conf base "1" p ^ "&b1=" ^
+    string_of_int up_sosa ^ "&" ^
     acces_n conf base "2"
       (match spouse with
          Some ip -> pget conf base ip
        | _ -> c) ^
     ";b2=" ^ string_of_int (sosa_of_persons conf base down_br) ^
     (match spouse with
-       Some _ -> ";" ^ acces_n conf base "4" c
+       Some _ -> "&" ^ acces_n conf base "4" c
      | _ -> "") ^
-    ";spouse=on\">" ^ person_title_text conf base c ^ "</a>"
+    "&spouse=on\">" ^ person_title_text conf base c ^ "</a>"
   in
   let f_scan =
     let list = ref (S.fold (fun ip b list -> (ip, b) :: list) set []) in

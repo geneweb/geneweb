@@ -487,14 +487,14 @@ let old_print_statistics conf =
     begin
       begin
         Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=LB;k=%d\">" (commd conf) n;
+        Wserver.printf "<a href=\"%sm=LB&k=%d\">" (commd conf) n;
         Wserver.printf (ftransl conf "the latest %d births") n;
         Wserver.printf "</a>";
         Wserver.printf "</li>\n"
       end;
       begin
         Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=LD;k=%d\">" (commd conf) n;
+        Wserver.printf "<a href=\"%sm=LD&k=%d\">" (commd conf) n;
         Wserver.printf (ftransl conf "the latest %t deaths")
           (fun _ -> string_of_int n);
         Wserver.printf "</a>";
@@ -502,14 +502,14 @@ let old_print_statistics conf =
       end;
       begin
         Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=LM;k=%d\">" (commd conf) n;
+        Wserver.printf "<a href=\"%sm=LM&k=%d\">" (commd conf) n;
         Wserver.printf (ftransl conf "the latest %d marriages") n;
         Wserver.printf "</a>";
         Wserver.printf "</li>\n"
       end;
       begin
         Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=OE;k=%d\">" (commd conf) n;
+        Wserver.printf "<a href=\"%sm=OE&k=%d\">" (commd conf) n;
         Wserver.printf
           (ftransl conf
              "the %d oldest couples perhaps still alive and engaged")
@@ -519,14 +519,14 @@ let old_print_statistics conf =
       end;
       begin
         Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
+        Wserver.printf "<a href=\"%sm=OA&k=%d&lim=0\">" (commd conf) n;
         Wserver.printf (ftransl conf "the %d oldest perhaps still alive") n;
         Wserver.printf "</a>";
         Wserver.printf "</li>\n"
       end
     end;
   Wserver.printf "<li>";
-  Wserver.printf "<a href=\"%sm=LL;k=%d\">" (commd conf) n;
+  Wserver.printf "<a href=\"%sm=LL&k=%d\">" (commd conf) n;
   Wserver.printf (ftransl conf "the %d who lived the longest") n;
   Wserver.printf "</a>";
   Wserver.printf "</li>\n";
