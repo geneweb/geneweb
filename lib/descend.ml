@@ -385,7 +385,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
     if h then descendants_title conf base ancestor h
     else
       wprint_geneweb_link conf
-        ("m=D;i=" ^
+        ("m=D&i=" ^
          string_of_int (Adef.int_of_iper (get_key_index ancestor)) ^ "&v=" ^
          string_of_int max_level ^ "&t=G")
         (capitale
@@ -522,7 +522,7 @@ let display_descendant_index conf base max_level ancestor =
     let txt = capitale (transl conf "index of the descendants") in
     if not h then
       wprint_geneweb_link conf
-        ("m=D;i=" ^
+        ("m=D&i=" ^
          string_of_int (Adef.int_of_iper (get_key_index ancestor)) ^ "&v=" ^
          string_of_int max_level ^ "&t=C")
         txt
@@ -1095,7 +1095,7 @@ let make_tree_hts conf base gv p =
           let options = Util.display_options conf in
           let ncol = nb_column 0 (v - 1) p in
           let vbar_txt =
-            Printf.sprintf "%sm=D;t=T;v=%d;%s;%s" (commd conf) gv options
+            Printf.sprintf "%sm=D&t=T&v=%d&%s&%s" (commd conf) gv options
               (acces conf base p)
           in
           2 * ncol - 1, CenterA, TDbar (Some vbar_txt)
