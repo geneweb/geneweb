@@ -223,13 +223,13 @@ let next_relation_link_txt conf ip1 ip2 excl_faml =
   let (sl, _) =
     List.fold_left
       (fun (sl, i) ifam ->
-         ";ef" :: string_of_int i :: "=" ::
+         "&ef" :: string_of_int i :: "=" ::
          string_of_int (Adef.int_of_ifam ifam) :: sl,
          i - 1)
       ([], List.length excl_faml - 1) excl_faml
   in
   let sl =
-    commd conf :: "em=R;ei=" :: string_of_int (Adef.int_of_iper ip1) ::
+    commd conf :: "em=R&ei=" :: string_of_int (Adef.int_of_iper ip1) ::
     "&i=" :: string_of_int (Adef.int_of_iper ip2) ::
     (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "") ::
     (if conf.cancel_links then "&cgl=on" else "") :: bd :: color :: "&et=S" ::
@@ -1019,12 +1019,12 @@ let print_dag_links conf base p1 p2 rl =
                     (l1, l2) list)
                ([], []) rl
            in
-           Wserver.printf ";l1=";
+           Wserver.printf "&l1=";
            begin let _ =
              List.fold_right (fun x sep -> Wserver.printf "%s%d" sep x; ",")
                l1 ""
            in
-             Wserver.printf ";l2=";
+             Wserver.printf "&l2=";
              let _ =
                List.fold_right (fun x sep -> Wserver.printf "%s%d" sep x; ",")
                  l2 ""
@@ -1441,11 +1441,11 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
              let sl =
                try
                  let t = Hashtbl.find assoc_txt (get_key_index p) in
-                 ";t" :: string_of_int n :: "=" :: t :: sl
+                 "&t" :: string_of_int n :: "=" :: t :: sl
                with Not_found -> sl
              in
              let sl =
-               ";i" :: string_of_int n :: "=" ::
+               "&i" :: string_of_int n :: "=" ::
                string_of_int (Adef.int_of_iper (get_key_index p)) :: sl
              in
              sl, n - 1)

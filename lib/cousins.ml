@@ -449,7 +449,7 @@ let print_anniv conf base p dead_people level =
       (match spouse with
          Some ip -> pget conf base ip
        | _ -> c) ^
-    ";b2=" ^ string_of_int (sosa_of_persons conf base down_br) ^
+    "&b2=" ^ string_of_int (sosa_of_persons conf base down_br) ^
     (match spouse with
        Some _ -> "&" ^ acces_n conf base "4" c
      | _ -> "") ^

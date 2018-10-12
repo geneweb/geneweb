@@ -643,7 +643,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   in
   let list = List.sort compare list in
   let access txt sn =
-    geneweb_link conf ("m=N;v=" ^ code_varenv sn ^ "&t=N") txt
+    geneweb_link conf ("m=N&v=" ^ code_varenv sn ^ "&t=N") txt
   in
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
     (fun (_, txt, sn) -> Wserver.printf "%s" (access txt sn)) list;
@@ -699,7 +699,7 @@ let print_family_alphabetic x conf base liste =
       let title h =
         let access x =
           if h || List.length homonymes = 1 then x
-          else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv x ^ "&t=A") x
+          else geneweb_link conf ("m=N&o=i&v=" ^ code_varenv x ^ "&t=A") x
         in
         Mutil.list_iter_first
           (fun first x ->

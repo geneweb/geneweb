@@ -577,7 +577,7 @@ let printf_link_to_main env b tok =
     | _ -> "en"
   in
   Printf.printf "<p><hr /><div align=right>\n";
-  Printf.printf "<a href=\"%s?m=MAIN;b=%s;t=%s;lang=%s\">%s</a></div>\n"
+  Printf.printf "<a href=\"%s?m=MAIN&b=%s&t=%s&lang=%s\">%s</a></div>\n"
     (cgi_script_name ()) b tok lang (transl lang "main page")
 
 (* Upload from GEDCOM *)
@@ -633,7 +633,7 @@ let send_gedcom_file env b tok fname =
       flush stdout;
       copy_temp b;
       Printf.printf "Database \"%s\" updated.\n" b;
-      Printf.printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
+      Printf.printf "<a href=\"%s?m=LOG&b=%s&t=%s\">Command output</a>\n"
         (cgi_script_name ()) b tok;
       flush stdout;
       move_gedcom_to_old b;
@@ -893,7 +893,7 @@ let gwtp_download env b tok =
               then
                 begin
                   Printf.printf "<li><tt>";
-                  Printf.printf "<a href=\"%s?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
+                  Printf.printf "<a href=\"%s?m=RECV&b=%s&t=%s&f=/%s\">%s</a>"
                     (cgi_script_name ()) b tok f f;
                   let sz = string_of_int st.Unix.st_size in
                   Printf.printf "%t%s bytes"

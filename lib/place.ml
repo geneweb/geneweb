@@ -150,7 +150,7 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
     Wserver.printf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
     then Wserver.printf "%s" (acces conf base @@ pget conf base @@ List.hd ips)
-    else Wserver.printf "m=N;v=%s" (code_varenv sn);
+    else Wserver.printf "m=N&v=%s" (code_varenv sn);
     Wserver.printf "\">%s</a> (%d)" sn len
   in
   let print_sn_list (snl : (string * Adef.iper list) list) =

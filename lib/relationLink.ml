@@ -311,10 +311,10 @@ let include_marr conf base n =
 let sign_text conf base sign info b1 b2 c1 c2 =
   "<a href=\"" ^ commd conf ^ "m=RL" ^ "&" ^
   acces_n conf base "1" (pget conf base info.ip1) ^ "&" ^
-  acces_n conf base "2" (pget conf base info.ip2) ^ ";b1=" ^
-  Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b1)) ^ ";b2=" ^
-  Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b2)) ^ ";c1=" ^
-  string_of_int c1 ^ ";c2=" ^ string_of_int c2 ^
+  acces_n conf base "2" (pget conf base info.ip2) ^ "&b1=" ^
+  Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b1)) ^ "&b2=" ^
+  Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b2)) ^ "&c1=" ^
+  string_of_int c1 ^ "&c2=" ^ string_of_int c2 ^
   (match p_getenv conf.env "spouse" with
      Some "on" -> "&spouse=on"
    | _ -> "") ^

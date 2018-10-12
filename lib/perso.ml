@@ -34,7 +34,7 @@ let string_of_marriage_text conf base fam =
 
 let string_of_title conf base and_txt p (nth, name, title, places, dates) =
   let href =
-    "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ "&p=" ^
+    "m=TT&sm=S&t=" ^ code_varenv (sou base title) ^ "&p=" ^
     code_varenv (sou base (List.hd places))
   in
   let (tit, est) = sou base title, sou base (List.hd places) in
@@ -50,7 +50,7 @@ let string_of_title conf base and_txt p (nth, name, title, places, dates) =
     match places with
       place :: places ->
         let href =
-          "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ "&p=" ^
+          "m=TT&sm=S&t=" ^ code_varenv (sou base title) ^ "&p=" ^
           code_varenv (sou base place)
         in
         let est = sou base place in
@@ -581,7 +581,7 @@ let print_sosa conf base p link =
             let i1 = string_of_int (Adef.int_of_iper (get_key_index p)) in
             let i2 = string_of_int (Adef.int_of_iper (get_key_index ref)) in
             let b2 = Sosa.to_string sosa_num in
-            "m=RL;i1=" ^ i1 ^ ";i2=" ^ i2 ^ ";b1=1;b2=" ^ b2
+            "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
           in
             Wserver.printf "<a href=\"%s%s\" style=\"text-decoration:none\">"
               (commd conf) sosa_link
@@ -2766,7 +2766,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         else eval_person_field_var conf base env ep loc sl
       else raise Not_found
   | "svar" :: i :: sl ->
-      (* http://localhost:2317/HenriT_w?m=DAG;p1=henri;n1=duchmol;s1=243;s2=245
+      (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
          access to sosa si=n of a person pi ni
          find_base_p will scan down starting from i such that multiple sosa of
          the same person can be listed
@@ -3151,7 +3151,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
              List.fold_right
                (fun sosa (str, n) ->
                   let str =
-                    str ^ ";s" ^ string_of_int n ^ "=" ^ Sosa.to_string sosa
+                    str ^ "&s" ^ string_of_int n ^ "=" ^ Sosa.to_string sosa
                   in
                   str, n + 1)
                sosa_list ("", 1)
@@ -4279,10 +4279,10 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else ""
   | "died" -> string_of_died conf p p_auth
   | "fam_access" ->
-      (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)
+      (* deprecated since 5.00: rather use "i=%family.index;&ip=%index;" *)
       begin match get_env "fam" env with
         Vfam (ifam, _, _, _) ->
-          Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam ifam)
+          Printf.sprintf "i=%d&ip=%d" (Adef.int_of_ifam ifam)
             (Adef.int_of_iper (get_key_index p))
       | _ -> raise Not_found
       end
@@ -4631,7 +4631,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         Vsosa x ->
           begin match get_sosa conf base env x p with
             Some (n, q) ->
-              Printf.sprintf "m=RL;i1=%d;i2=%d;b1=1;b2=%s"
+              Printf.sprintf "m=RL&i1=%d&i2=%d&b1=1&b2=%s"
                 (Adef.int_of_iper (get_key_index p))
                 (Adef.int_of_iper (get_key_index q)) (Sosa.to_string n)
           | None -> ""
@@ -6163,7 +6163,7 @@ let print_ancestors_dag conf base v p =
   let options = Util.display_options conf in
   let vbar_txt ip =
     let p = pget conf base ip in
-    Printf.sprintf "%sm=A;t=T;v=%d;%s;dag=on;%s" (commd conf) v options
+    Printf.sprintf "%sm=A&t=T&v=%d&%s&dag=on&%s" (commd conf) v options
       (acces conf base p)
   in
   let page_title = Util.capitale (Util.transl conf "tree") in
