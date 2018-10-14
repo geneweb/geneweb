@@ -205,17 +205,27 @@ module Make (Select : Select) =
       in
       loop [] 0 0
     let has_infos_not_dates base p =
+      let has_picture_to_export =
+        sou base (get_image p) <> "" && not !no_picture
+      in
       get_first_names_aliases p <> [] ||
       get_surnames_aliases p <> [] ||
       sou base (get_public_name p) <> "" ||
+      has_picture_to_export ||
       get_qualifiers p <> [] ||
       get_aliases p <> [] ||
       get_titles p <> [] ||
+      get_access p <> IfTitles ||
       sou base (get_occupation p) <> "" ||
       sou base (get_psources p) <> "" ||
       sou base (get_birth_place p) <> "" ||
+      sou base (get_birth_src p) <> "" ||
       sou base (get_baptism_place p) <> "" ||
-      sou base (get_death_place p) <> ""
+      sou base (get_baptism_src p) <> "" ||
+      sou base (get_death_place p) <> "" ||
+      sou base (get_death_src p) <> "" ||
+      sou base (get_burial_place p) <> "" ||
+      sou base (get_burial_src p) <> ""
     let has_infos base p =
       has_infos_not_dates base p ||
       get_birth p <> Adef.cdate_None ||
