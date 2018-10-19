@@ -79,12 +79,12 @@ wrappers:
 	  echo -ne 'start /MIN ..\\gw\\gwsetup -lang fr -gd ..\\gw\r\n' >> $(DESTDIR)/gwsetup.bat; \
 	else \
 	  (echo '#!/bin/sh'; \
-	   echo 'cd `dirname $$0`'; \
+	   echo 'cd `dirname "$$0"`'; \
 	   echo 'mkdir -p bases'; \
 	   echo 'cd bases'; \
 	   echo 'exec ../gw/gwd -hd ../gw "$$@"') > $(DESTDIR)/gwd; \
 	  (echo '#!/bin/sh'; \
-	   echo 'cd `dirname $$0`'; \
+	   echo 'cd `dirname "$$0"`'; \
 	   echo 'mkdir -p bases'; \
 	   echo 'cd bases'; \
 	   echo 'exec ../gw/gwsetup -gd ../gw "$$@"') > $(DESTDIR)/gwsetup; \
