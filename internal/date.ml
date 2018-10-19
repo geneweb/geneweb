@@ -373,7 +373,7 @@ let string_of_ondate_aux conf =
       let s = string_of_on_dmy conf d in
       if d.day > 0 && not conf.cancel_links then
         Printf.sprintf
-          "<a href=\"%sm=CAL;yg=%d;mg=%d;dg=%d;tg=1\" class=\"date\">%s</a>"
+          "<a href=\"%sm=CAL&yg=%d&mg=%d&dg=%d&tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
       else s
   | Dgreg (d, Djulian) ->
@@ -394,7 +394,7 @@ let string_of_ondate_aux conf =
       in
       if d1.day > 0 && not conf.cancel_links then
         Printf.sprintf
-          "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
+          "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
       else s
   | Dgreg (d, Dfrench) ->
@@ -403,7 +403,7 @@ let string_of_ondate_aux conf =
       let s =
         if d1.day > 0 && not conf.cancel_links then
           Printf.sprintf
-            "<a href=\"%sm=CAL;yf=%d;mf=%d;df=%d;tf=1\" class=\"date\">%s</a>"
+            "<a href=\"%sm=CAL&yf=%d&mf=%d&df=%d&tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
         else s
       in
@@ -434,7 +434,7 @@ let string_of_date_aux conf sep =
       let s = string_of_dmy conf d in
       if d.day > 0 && not conf.cancel_links then
         Printf.sprintf
-          "<a href=\"%sm=CAL;yg=%d;mg=%d;dg=%d;tg=1\" class=\"date\">%s</a>"
+          "<a href=\"%sm=CAL&yg=%d&mg=%d&dg=%d&tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
       else s
   | Dgreg (d, Djulian) ->
@@ -455,7 +455,7 @@ let string_of_date_aux conf sep =
       in
       if d1.day > 0 && not conf.cancel_links then
         Printf.sprintf
-          "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
+          "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
       else s
   | Dgreg (d, Dfrench) ->
@@ -464,7 +464,7 @@ let string_of_date_aux conf sep =
       let s =
         if d1.day > 0 && not conf.cancel_links then
           Printf.sprintf
-            "<a href=\"%sm=CAL;yf=%d;mf=%d;df=%d;tf=1\" class=\"date\">%s</a>"
+            "<a href=\"%sm=CAL&yf=%d&mf=%d&df=%d&tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
         else s
       in

@@ -17,7 +17,7 @@ open Def
 open Gwdb
 open Util
 
-(* Make the "special" environement; "em=mode;ei=n" *)
+(* Make the "special" environement; "em=mode&ei=n" *)
 
 let set_senv conf vm vi =
   conf.senv <- ["em", vm; "ei", vi];

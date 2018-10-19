@@ -310,19 +310,19 @@ let give_access_someone conf base (x, t) list =
   if List.mem x list then Wserver.printf "</em>" else Wserver.printf "</a>"
 
 let give_access_title conf t p =
-  Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
+  Wserver.printf "<a href=\"%sm=TT&sm=S&t=%s&p=%s\">" (commd conf)
     (code_varenv t) (code_varenv p);
   Wserver.printf "%s" (capitale t);
   Wserver.printf "</a>\n"
 
 let give_access_all_titles conf t absolute =
-  Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s%s\">" (commd conf)
-    (code_varenv t) (if absolute then ";a=A" else "");
+  Wserver.printf "<a href=\"%sm=TT&sm=S&t=%s%s\">" (commd conf)
+    (code_varenv t) (if absolute then "&a=A" else "");
   Wserver.printf "%s" (if absolute then t else capitale t);
   Wserver.printf "</a>"
 
 let give_access_all_places conf t =
-  Wserver.printf "<a href=\"%sm=TT;sm=S;p=%s\">" (commd conf) (code_varenv t);
+  Wserver.printf "<a href=\"%sm=TT&sm=S&p=%s\">" (commd conf) (code_varenv t);
   Wserver.printf "... %s" t;
   Wserver.printf "</a>\n"
 
@@ -341,12 +341,12 @@ let propose_tree_for_list list conf =
       begin let _ =
         List.fold_left
           (fun i (p, n) ->
-             Wserver.printf ";i%d=%d;t%d=%d" i
+             Wserver.printf "&i%d=%d&t%d=%d" i
                (Adef.int_of_iper (get_key_index p)) i n;
              i + 1)
           1 list
       in
-        Wserver.printf ";lim=6\">%s</a>\n" (capitale (transl conf "tree"))
+        Wserver.printf "&lim=6\">%s</a>\n" (capitale (transl conf "tree"))
       end;
       Wserver.printf "</p>\n"
   | _ -> ()
@@ -361,12 +361,12 @@ let print_title_place_list conf base t p t_equiv list =
       Mutil.list_iter_first
         (fun first t ->
            if not first then Wserver.printf ",\n";
-           Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;a=A\">" (commd conf)
+           Wserver.printf "<a href=\"%sm=TT&sm=S&t=%s&a=A\">" (commd conf)
              (code_varenv t);
            Wserver.printf "%s</a>" t;
            if p <> "" then
              begin
-               Wserver.printf "\n<a href=\"%sm=TT;sm=S;p=%s;a=A\">"
+               Wserver.printf "\n<a href=\"%sm=TT&sm=S&p=%s&a=A\">"
                  (commd conf) (code_varenv p);
                Wserver.printf "%s</a>" p
              end)
@@ -431,8 +431,8 @@ let print_places_list conf base t t_equiv list =
   let list = List.sort (fun s1 s2 -> compare (order s1) (order s2)) list in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
-    Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;p=%s%s\">" (commd conf)
-      (code_varenv t) (code_varenv p) (if absolute then ";a=A" else "");
+    Wserver.printf "<a href=\"%sm=TT&sm=S&t=%s&p=%s%s\">" (commd conf)
+      (code_varenv t) (code_varenv p) (if absolute then "&a=A" else "");
     if p = "" then Wserver.printf "..."
     else Wserver.printf "%s%s" (surname_end base p) (surname_begin base p);
     Wserver.printf "</a>"
@@ -463,7 +463,7 @@ let print_titles conf base p =
   Wserver.printf "</ul>\n";
   if List.length list > 1 then
     begin
-      Wserver.printf "<a href=\"%sm=TT;sm=A;p=%s\">" (commd conf)
+      Wserver.printf "<a href=\"%sm=TT&sm=A&p=%s\">" (commd conf)
         (code_varenv p);
       Wserver.printf "%s" (capitale (transl conf "the whole list"));
       Wserver.printf "</a>\n"

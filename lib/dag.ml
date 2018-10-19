@@ -636,7 +636,7 @@ let print_next_pos conf pos1 pos2 tcol =
       begin
         Wserver.printf "<a href=\"%s" (commd conf);
         List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) env;
-        Wserver.printf "pos1=%d;pos2=%d" (pos1 + overlap - dpos)
+        Wserver.printf "pos1=%d&pos2=%d" (pos1 + overlap - dpos)
           (pos1 + overlap);
         Wserver.printf "\">&lt;&lt;</a>\n"
       end;
@@ -645,7 +645,7 @@ let print_next_pos conf pos1 pos2 tcol =
       begin
         Wserver.printf "<a href=\"%s" (commd conf);
         List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) env;
-        Wserver.printf "pos1=%d;pos2=%d" (pos2 - overlap)
+        Wserver.printf "pos1=%d&pos2=%d" (pos2 - overlap)
           (pos2 - overlap + dpos);
         Wserver.printf "\">&gt;&gt;</a>\n"
       end;
@@ -789,7 +789,7 @@ let print_html_table conf hts =
       Wserver.printf "<div style=\"text-align:%s\"><a href=\"%s" conf.right
         (commd conf);
       List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) conf.env;
-      Wserver.printf "notab=on;slices=on";
+      Wserver.printf "notab=on&slices=on";
       Wserver.printf "\"><tt>//</tt></a></div>\n";
       Wserver.printf "</p>\n"
     end;

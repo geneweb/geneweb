@@ -32,9 +32,9 @@ let sorp base ip =
 
 let merge_event_witnesses wit1 wit2 =
   let list =
-    List.fold_right
+    Array.fold_right
       (fun wit list -> if List.mem wit list then list else wit :: list)
-      (Array.to_list wit1) (Array.to_list wit2)
+      wit1 (Array.to_list wit2)
   in
   Array.of_list list
 

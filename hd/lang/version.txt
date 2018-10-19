@@ -17,6 +17,7 @@ ar: بإمكانك إختيار لغة أخرى من بين اللغات الت�
 bg: Можете да изберете друг език за съобщения измежду следните:
 br: Dibab a c'hellit ur yezh all etre ar re-mañ:
 ca: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
+co: Ghjè pussibule di selezziunà una altra lingua da quì :
 cs: Zvolte jazyk pro prohlížení databáze:
 da: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
     f&oslash;lgende:
@@ -69,6 +70,13 @@ sv: Du kan välja ett annat språk bland de följande:
            onmouseout="ica.src='%o/l-ca.jpg'"><img
            src="%o/l-ca.jpg" width="36" height="22" alt=""
            id="ica" style="border: 0"%/><span>%uca;</span></a>
+        </li>
+        <li>
+          <a title="%uco;" href="%glang=co"
+           onmouseover="if (WorkOnBrowser()) ico.src='%o/t-co.png'"
+           onmouseout="ico.src='%o/l-co.jpg'"><img
+           src="%o/l-co.jpg" width="36" height="22" alt=""
+           id="ico" style="border: 0"%/><span>%uco;</span></a>
         </li>
         <li>
           <a title="%ucs;" href="%glang=cs"
@@ -242,6 +250,7 @@ sv: Du kan välja ett annat språk bland de följande:
     </div>
   </div>%Ij
   <p><strong><font color=red>[
+co: I diritti di i streghi sò attimpati avà per mantenimentu.
 en: Wizard rights are now suspended for maintenance.
 fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 oc: Los drreches dels fachilhièrs son suspenduts per ara per mantenença.

@@ -624,15 +624,15 @@ let print_merged conf base wl p =
       let s1 =
         match p_getenv conf.env "iexcl" with
           Some "" | None -> ""
-        | Some s -> ";iexcl=" ^ s
+        | Some s -> "&iexcl=" ^ s
       in
       let s2 =
         match p_getenv conf.env "fexcl" with
           Some "" | None -> ""
-        | Some s -> ";fexcl=" ^ s
+        | Some s -> "&fexcl=" ^ s
       in
       Wserver.printf "<p>\n";
-      Wserver.printf "<a href=%sm=MRG_DUP;ip=%d%s%s>" (commd conf) ip s1 s2;
+      Wserver.printf "<a href=%sm=MRG_DUP&ip=%d%s%s>" (commd conf) ip s1 s2;
       Wserver.printf "%s" (capitale (transl conf "continue merging"));
       Wserver.printf "</a>";
       Wserver.printf "\n(%s)\n"

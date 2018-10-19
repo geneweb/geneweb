@@ -85,10 +85,10 @@ let print_wizards_by_alphabetic_order conf list =
       conf.wizard && conf.user = wz || wfile <> "" || conf.manitou
     in
     if with_link then
-      Wserver.printf "<a href=\"%sm=WIZNOTES;f=%s%t\">" (commd conf)
+      Wserver.printf "<a href=\"%sm=WIZNOTES&f=%s%t\">" (commd conf)
         (Util.code_varenv wz)
         (fun _ ->
-           Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
+           Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
              (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
              tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec);
     if islash > 0 then
@@ -160,10 +160,10 @@ let print_wizards_by_date conf list =
          Wserver.printf "%s%t" (if prev = None || new_item then "" else ",\n")
            (fun _ ->
               if conf.wizard && conf.user = wz || wfile <> "" then
-                Printf.sprintf "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
+                Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s%t\">%s</a>"
                   (commd conf) (Util.code_varenv wz)
                   (fun _ ->
-                     Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                     Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
                        tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
                        tm.Unix.tm_sec)
@@ -189,7 +189,7 @@ let print_old_wizards conf list =
             Mutil.list_iter_first
               (fun first wz ->
                  if not first then Wserver.printf ",\n";
-                 Wserver.printf "<a href=\"%sm=WIZNOTES;f=%s\">" (commd conf)
+                 Wserver.printf "<a href=\"%sm=WIZNOTES&f=%s\">" (commd conf)
                    (Util.code_varenv wz);
                  for i = 0 to String.length wz - 1 do
                    if wz.[i] = ' ' then Wserver.printf "&nbsp;"
@@ -298,7 +298,7 @@ let print_main conf base auth_file =
         Wserver.printf "%d %s<br%s>\n" (List.length wizdata) wiztxt conf.xhs;
         Wserver.printf "<em style=\"font-size:80%%\">\n";
         Wserver.printf "%s " (capitale (transl conf "click"));
-        Wserver.printf "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (commd conf)
+        Wserver.printf "<a href=\"%sm=WIZNOTES&o=H\">%s</a>\n" (commd conf)
           (transl conf "here");
         Wserver.printf "%s"
           (transl conf
@@ -537,10 +537,10 @@ let print_connected_wizard conf first wddir wz tm_user =
   let tm = Unix.localtime stm in
   if wfile <> "" then
     begin
-      Wserver.printf "<a href=\"%sm=WIZNOTES;f=%s%t\">" (commd conf)
+      Wserver.printf "<a href=\"%sm=WIZNOTES&f=%s%t\">" (commd conf)
         (Util.code_varenv wz)
         (fun _ ->
-           Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
+           Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
              (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
              tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec);
       Wserver.printf "%s" wz;
@@ -549,7 +549,7 @@ let print_connected_wizard conf first wddir wz tm_user =
   else Wserver.printf "%s" wz;
   Wserver.printf " ";
   Wserver.printf
-    "<a href=\"%sm=HIST;k=20;wiz=%s\" style=\"text-decoration:none\">"
+    "<a href=\"%sm=HIST&k=20&wiz=%s\" style=\"text-decoration:none\">"
     (commd conf) (Util.code_varenv wz);
   Wserver.printf "(*)";
   Wserver.printf "</a>";
@@ -606,7 +606,7 @@ let do_connected_wizards conf base (_, _, _, wl) =
                      (transl_nth conf "you are visible/you are not visible"
                         (if is_visible then 0 else 1));
                    Wserver.printf " %s %s%s%s %s" (transl conf "click")
-                     (Printf.sprintf "<a href=\"%sm=CHANGE_WIZ_VIS;v=%d\">"
+                     (Printf.sprintf "<a href=\"%sm=CHANGE_WIZ_VIS&v=%d\">"
                         (commd conf) (if is_visible then 0 else 1))
                      (transl conf "here") "</a>" (transl conf "to change");
                    Wserver.printf "."

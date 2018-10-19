@@ -714,23 +714,24 @@ let reconstitute_person conf =
   p, ext
 
 let check_event_witnesses conf witnesses =
-  let wl = Array.to_list witnesses in
-  let rec loop wl =
-    match wl with
-      [] -> None
-    | ((fn, sn, _, _, _), _) :: l ->
-        if fn = "" && sn = "" then loop l
-        else if fn = "" || fn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "first name missing")
-        else if sn = "" || sn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "surname missing")
-        else loop l
+  let len = Array.length witnesses in
+  let rec loop i =
+    if i = len then None
+    else begin
+      let ((fn, sn, _, _, _), _) = Array.get witnesses i in
+      if fn = "" && sn = "" then loop (i + 1)
+      else if fn = "" || fn = "?" then
+        Some
+          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
+           transl conf "first name missing")
+      else if sn = "" || sn = "?" then
+        Some
+          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
+           transl conf "surname missing")
+      else loop (i + 1)
+    end
   in
-  loop wl
+  loop 0
 
 let check_person conf p =
   if p.first_name = "" || p.first_name = "?" then

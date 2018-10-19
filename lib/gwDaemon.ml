@@ -425,7 +425,7 @@ let unauth_server conf ar =
   let url =
     conf.bname ^ "?" ^
     List.fold_left
-      (fun s (k, v) -> if s = "" then k ^ "=" ^ v else s ^ ";" ^ k ^ "=" ^ v)
+      (fun s (k, v) -> if s = "" then k ^ "=" ^ v else s ^ "&" ^ k ^ "=" ^ v)
       "" (conf.henv @ conf.senv @ conf.env)
   in
   let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
@@ -441,7 +441,7 @@ let unauth_server conf ar =
   Wserver.printf "</h1>\n";
   Wserver.printf "<dl>\n";
   begin let (alt_bind, alt_access) =
-    if ar.ar_passwd = "w" then ";w=f", txt 2 else ";w=w", txt 0
+    if ar.ar_passwd = "w" then "&w=f", txt 2 else "&w=w", txt 0
   in
     Wserver.printf "<dd>\n";
     Wserver.printf "<ul>\n";
@@ -1637,7 +1637,7 @@ let extract_multipart boundary str =
   let (str, _) =
     List.fold_left
       (fun (str, sep) (v, x) ->
-         if v = "file" then str, sep else str ^ sep ^ v ^ "=" ^ x, ";")
+         if v = "file" then str, sep else str ^ sep ^ v ^ "=" ^ x, "&")
       ("", "") env
   in
   str, env

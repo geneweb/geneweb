@@ -218,7 +218,7 @@ let extract_multipart boundary str =
     List.fold_left
       (fun (str, env, sep) (v, x, b) ->
          let (str, sep) =
-           if b then str ^ sep ^ v ^ "=" ^ x, ";" else str, sep
+           if b then str ^ sep ^ v ^ "=" ^ x, "&" else str, sep
          in
          str, (v, x) :: env, sep)
       ("", [], "") env

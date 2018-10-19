@@ -213,26 +213,26 @@ let next_relation_link_txt conf ip1 ip2 excl_faml =
   let bd =
     match p_getenv conf.env "bd" with
       None | Some ("0" | "") -> ""
-    | Some x -> ";bd=" ^ x
+    | Some x -> "&bd=" ^ x
   in
   let color =
     match p_getenv conf.env "color" with
       None -> ""
-    | Some x -> ";color=" ^ code_varenv x
+    | Some x -> "&color=" ^ code_varenv x
   in
   let (sl, _) =
     List.fold_left
       (fun (sl, i) ifam ->
-         ";ef" :: string_of_int i :: "=" ::
+         "&ef" :: string_of_int i :: "=" ::
          string_of_int (Adef.int_of_ifam ifam) :: sl,
          i - 1)
       ([], List.length excl_faml - 1) excl_faml
   in
   let sl =
-    commd conf :: "em=R;ei=" :: string_of_int (Adef.int_of_iper ip1) ::
-    ";i=" :: string_of_int (Adef.int_of_iper ip2) ::
-    (if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "") ::
-    (if conf.cancel_links then ";cgl=on" else "") :: bd :: color :: ";et=S" ::
+    commd conf :: "em=R&ei=" :: string_of_int (Adef.int_of_iper ip1) ::
+    "&i=" :: string_of_int (Adef.int_of_iper ip2) ::
+    (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "") ::
+    (if conf.cancel_links then "&cgl=on" else "") :: bd :: color :: "&et=S" ::
     sl
   in
   String.concat "" sl
@@ -449,7 +449,7 @@ let print_shortest_path conf base p1 p2 =
               begin
                 Wserver.printf "<span>";
                 begin
-                  Wserver.printf "<a href=\"%s;m=R;%s\">" (commd conf)
+                  Wserver.printf "<a href=\"%s&m=R&%s\">" (commd conf)
                     (acces conf base p1);
                   Wserver.printf "%s"
                     (capitale
@@ -806,7 +806,7 @@ let string_of_big_int conf i =
 let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   let image_opt =
     match p_getenv conf.env "image" with
-      Some "off" -> ";image=off"
+      Some "off" -> "&image=off"
     | _ -> ""
   in
   Wserver.printf "<ul>\n";
@@ -832,12 +832,12 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            in
            Wserver.printf "<img src=\"%s/%s\" alt=\"\"%s>\n"
              (Util.image_prefix conf) "picto_rel_small.png" conf.xhs;
-           Wserver.printf "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
+           Wserver.printf "<a href=\"%sm=RL&%s&l1=%d&%s&l2=%d&%s%s%s%s%s\">"
              (commd conf) (acces conf base a) x1 (acces_n conf base "1" dp1)
              x2 (acces_n conf base "2" dp2)
-             (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
-             (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
-             (if propose_dag then ";dag=on" else "") image_opt;
+             (if pp1 = None then "" else "&" ^ acces_n conf base "3" p1)
+             (if pp2 = None then "" else "&" ^ acces_n conf base "4" p2)
+             (if propose_dag then "&dag=on" else "") image_opt;
            Wserver.printf "%s" (capitale (transl conf "see"));
            if n > 1 && not propose_dag then
              Wserver.printf "%s" (transl conf " the first branch");
@@ -851,7 +851,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   let image_opt =
     match p_getenv conf.env "image" with
-      Some "off" -> ";image=off"
+      Some "off" -> "&image=off"
     | _ -> ""
   in
   Wserver.printf "<ul class=li_relationship>\n";
@@ -881,12 +881,12 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
            in
            Wserver.printf "<img src=\"%s/%s\" alt=\"\"%s>\n"
              (Util.image_prefix conf) "picto_rel_small.png" conf.xhs;
-           Wserver.printf "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
+           Wserver.printf "<a href=\"%sm=RL&%s&l1=%d&%s&l2=%d&%s%s%s%s%s\">"
              (commd conf) (acces conf base a) x1 (acces_n conf base "1" dp1)
              x2 (acces_n conf base "2" dp2)
-             (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
-             (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
-             (if propose_dag then ";dag=on" else "") image_opt;
+             (if pp1 = None then "" else "&" ^ acces_n conf base "3" p1)
+             (if pp2 = None then "" else "&" ^ acces_n conf base "4" p2)
+             (if propose_dag then "&dag=on" else "") image_opt;
            Wserver.printf "%s" (capitale (transl conf "see"));
            Wserver.printf "</a>"
          end;
@@ -1019,12 +1019,12 @@ let print_dag_links conf base p1 p2 rl =
                     (l1, l2) list)
                ([], []) rl
            in
-           Wserver.printf ";l1=";
+           Wserver.printf "&l1=";
            begin let _ =
              List.fold_right (fun x sep -> Wserver.printf "%s%d" sep x; ",")
                l1 ""
            in
-             Wserver.printf ";l2=";
+             Wserver.printf "&l2=";
              let _ =
                List.fold_right (fun x sep -> Wserver.printf "%s%d" sep x; ",")
                  l2 ""
@@ -1033,15 +1033,15 @@ let print_dag_links conf base p1 p2 rl =
            end;
            let image_opt =
              match p_getenv conf.env "image" with
-               Some "off" -> ";image=off"
+               Some "off" -> "&image=off"
              | _ -> ""
            in
            let border =
              match p_getenv conf.env "bd" with
-               Some "on" -> ";bd=on"
+               Some "on" -> "&bd=on"
              | _ -> ""
            in
-           Wserver.printf ";dag=on%s%s\">" image_opt border;
+           Wserver.printf "&dag=on%s%s\">" image_opt border;
            if is_anc then Wserver.printf "%s" (transl conf "tree")
            else
              Wserver.printf "%d %s" nn
@@ -1080,7 +1080,7 @@ let print_propose_upto conf base p1 p2 rl =
       Wserver.printf "\n&nbsp;";
       Wserver.printf "<img src=\"%s/%s\" alt=\"\"%s>\n"
         (Util.image_prefix conf) "picto_rel_asc.png" conf.xhs;
-      Wserver.printf "<a href=\"%sm=A;t=D;%s;%s;l=%d\">" (commd conf)
+      Wserver.printf "<a href=\"%sm=A&t=D&%s&%s&l=%d\">" (commd conf)
         (acces conf base p) (acces_n conf base "1" a) maxlen;
       Wserver.printf "%s" (capitale (transl conf "see"));
       Wserver.printf "</a>";
@@ -1376,7 +1376,7 @@ let print_main_relationship conf base long p1 p2 rel =
             begin
               Wserver.printf "<span>";
               begin
-                Wserver.printf "<a href=\"%s;m=R;%s\">" (commd conf)
+                Wserver.printf "<a href=\"%s&m=R&%s\">" (commd conf)
                   (acces conf base p1);
                 Wserver.printf "%s"
                   (capitale
@@ -1434,18 +1434,18 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
   match pl2 with
     [] -> ""
   | _ ->
-      let sl = if lim > 0 then [";lim="; string_of_int lim] else [] in
+      let sl = if lim > 0 then ["&lim="; string_of_int lim] else [] in
       let (sl, _) =
         List.fold_left
           (fun (sl, n) p ->
              let sl =
                try
                  let t = Hashtbl.find assoc_txt (get_key_index p) in
-                 ";t" :: string_of_int n :: "=" :: t :: sl
+                 "&t" :: string_of_int n :: "=" :: t :: sl
                with Not_found -> sl
              in
              let sl =
-               ";i" :: string_of_int n :: "=" ::
+               "&i" :: string_of_int n :: "=" ::
                string_of_int (Adef.int_of_iper (get_key_index p)) :: sl
              in
              sl, n - 1)

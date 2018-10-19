@@ -58,16 +58,16 @@ let print_branch_to_alphabetic conf x nb_branch =
   Wserver.printf "<td>";
   if p_getenv conf.env "t" = Some "A" then
     begin
-      Wserver.printf "<a href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\">"
-        (commd conf) (code_varenv x ^ ";t=A");
+      Wserver.printf "<a href=\"%sm=N&o=i&v=%s\" rel=\"nofollow\">"
+        (commd conf) (code_varenv x ^ "&t=A");
       Wserver.printf "%s"
         (transl_nth conf "display by/branch/alphabetic order" 2);
       Wserver.printf "</a>"
     end
   else
     begin
-      Wserver.printf "<a href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\">"
-        (commd conf) (code_varenv x ^ ";t=N");
+      Wserver.printf "<a href=\"%sm=N&o=i&v=%s\" rel=\"nofollow\">"
+        (commd conf) (code_varenv x ^ "&t=N");
       Wserver.printf "%s"
         (transl_nth conf "display by/branch/alphabetic order" 2);
       Wserver.printf "</a>"
@@ -108,15 +108,15 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "<td>";
   if p_getenv conf.env "t" = Some "A" then
     begin
-      Wserver.printf "<a href=\"%sm=N;v=%s\" rel=\"nofollow\">" (commd conf)
-        (code_varenv x ^ ";t=A");
+      Wserver.printf "<a href=\"%sm=N&v=%s\" rel=\"nofollow\">" (commd conf)
+        (code_varenv x ^ "&t=A");
       Wserver.printf "%s"
         (transl_nth conf "display by/branch/alphabetic order" 1);
       Wserver.printf "</a>"
     end
   else
     begin
-      Wserver.printf "<a href=\"%sm=NG;sn=%s\" rel=\"nofollow\">" (commd conf)
+      Wserver.printf "<a href=\"%sm=NG&sn=%s\" rel=\"nofollow\">" (commd conf)
         (code_varenv x);
       Wserver.printf "%s"
         (transl_nth conf "display by/branch/alphabetic order" 1);
@@ -253,7 +253,7 @@ let first_name_print_list conf base x1 xl liste =
     else
       Mutil.list_iter_first
         (fun first x ->
-           Wserver.printf "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
+           Wserver.printf "%s<a href=\"%sm=P&v=%s&t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
         (StrSet.elements xl)
   in
@@ -286,7 +286,7 @@ let select_first_name conf n list =
     (fun (sstr, (strl, _)) ->
        Wserver.printf "\n";
        html_li conf;
-       Wserver.printf "<a href=\"%sm=P;v=%s\">" (commd conf)
+       Wserver.printf "<a href=\"%sm=P&v=%s\">" (commd conf)
          (code_varenv sstr);
        Mutil.list_iter_first
          (fun first str ->
@@ -382,13 +382,13 @@ let print_selection_bullet conf =
           (fun req (k, v) ->
              if not sel && k = "u" && v = txt then req
              else
-               let s = k ^ "=" ^ v in if req = "" then s else req ^ ";" ^ s)
+               let s = k ^ "=" ^ v in if req = "" then s else req ^ "&" ^ s)
           "" conf.env
       in
       if conf.cancel_links then ()
       else
         Wserver.printf "<a id=\"i%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt
-          (commd conf) req (if sel then ";u=" ^ txt else "")
+          (commd conf) req (if sel then "&u=" ^ txt else "")
           (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
       Wserver.printf "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
       if conf.cancel_links then () else Wserver.printf "</a>";
@@ -566,7 +566,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     else
       Mutil.list_iter_first
         (fun first x ->
-           Wserver.printf "%s<a href=\"%sm=N;v=%s;t=A\">%s</a>"
+           Wserver.printf "%s<a href=\"%sm=N&v=%s&t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
         (StrSet.elements xl)
   in
@@ -590,7 +590,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
              else
                begin
                  Wserver.printf
-                   "<a href=\"%sm=N;v=%s;br=%d\" rel=\"nofollow\">"
+                   "<a href=\"%sm=N&v=%s&br=%d\" rel=\"nofollow\">"
                    (commd conf) (Util.code_varenv str) n;
                  Wserver.printf "%d." n;
                  Wserver.printf "</a>"
@@ -643,15 +643,15 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   in
   let list = List.sort compare list in
   let access txt sn =
-    geneweb_link conf ("m=N;v=" ^ code_varenv sn ^ ";t=N") txt
+    geneweb_link conf ("m=N&v=" ^ code_varenv sn ^ "&t=N") txt
   in
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
     (fun (_, txt, sn) -> Wserver.printf "%s" (access txt sn)) list;
   Wserver.printf "<p>\n";
   Wserver.printf "<em style=\"font-size:80%%\">\n";
   Wserver.printf "%s " (capitale (transl conf "click"));
-  Wserver.printf "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-    (if List.length homonymes = 1 then code_varenv x ^ ";t=A"
+  Wserver.printf "<a href=\"%sm=N&o=i&v=%s\">%s</a>\n" (commd conf)
+    (if List.length homonymes = 1 then code_varenv x ^ "&t=A"
      else code_varenv fx)
     (transl conf "here");
   Wserver.printf "%s" (transl conf "for the first names by Gutil.alphabetic order");
@@ -699,7 +699,7 @@ let print_family_alphabetic x conf base liste =
       let title h =
         let access x =
           if h || List.length homonymes = 1 then x
-          else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv x ^ ";t=A") x
+          else geneweb_link conf ("m=N&o=i&v=" ^ code_varenv x ^ "&t=A") x
         in
         Mutil.list_iter_first
           (fun first x ->
