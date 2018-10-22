@@ -2118,7 +2118,7 @@ let print_all_stats conf base =
   (* Nom le plus long *)
   let _longuest_name =
     let () = load_strings_array base in
-    let (list, _, _) = Alln.select_names conf base true "" true in
+    let (list, _) = Alln.select_names conf base true "" true in
     let list =
       List.sort
         (fun (k1, _, _) (k2, _, _) ->
@@ -2134,7 +2134,7 @@ let print_all_stats conf base =
   (* Nom les plus fréquents *)
   let () =
     let () = load_strings_array base in
-    let (list, _, _) = Alln.select_names conf base true "" true in
+    let (list, _) = Alln.select_names conf base true "" true in
     let list =
       List.sort
         (fun (k1, _, _) (k2, _, _) ->
@@ -2169,7 +2169,7 @@ let print_all_stats conf base =
   (* Prénom les plus fréquents *)
   let () =
     let () = load_strings_array base in
-    let (list, _, _) = Alln.select_names conf base false "" true in
+    let (list, _) = Alln.select_names conf base false "" true in
     let list =
       List.sort
         (fun (k1, _, _) (k2, _, _) ->

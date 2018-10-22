@@ -341,14 +341,14 @@ let select_names conf base is_surnames ini need_whole_list =
          if cnt >= lim then (k, s, cnt) :: list, len else list, len - 1)
       ([], len) list
   in
-  list, false, len
+  list, len
 
 let compare2 s1 s2 =
   Gutil.alphabetic_utf_8 s1 s2
 
 let print_frequency conf base is_surnames =
   let () = load_strings_array base in
-  let (list, _, len) = select_names conf base is_surnames "" true in
+  let (list, len) = select_names conf base is_surnames "" true in
   let list =
     List.sort
       (fun (k1, _, cnt1) (k2, _, cnt2) ->
@@ -384,11 +384,8 @@ let print_alphabetic conf base is_surnames =
       in
       loop [] 0 'Z'
     else
-      let (list, sorted, len) = select_names conf base is_surnames ini all in
-      let list =
-        if sorted then list
-        else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
-      in
+      let (list, len) = select_names conf base is_surnames ini all in
+      let list = List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list in
       list, len
   in
   if fast then
@@ -455,13 +452,10 @@ let print_short conf base is_surnames =
     | _ -> ""
   in
   let _ = if String.length ini < 2 then load_strings_array base in
-  let (list, sorted, len) = select_names conf base is_surnames ini true in
+  let (list, len) = select_names conf base is_surnames ini true in
   if len > default_max_cnt then Hutil.incorrect_request conf
   else
-    let list =
-      if sorted then list
-      else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
-    in
+    let list = List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list in
     let list = combine_by_ini ini list in
     print_alphabetic_short conf base is_surnames ini list len
 
