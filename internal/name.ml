@@ -1,24 +1,35 @@
-(* $Id: name.ml,v 5.12 2007-03-20 10:34:14 ddr Exp $ *)
+(* $Id: name.ml,v 5.12 2018-09-27 10:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* La liste des caractËres interdits *)
+(* La liste des caract√®res interdits *)
 let forbidden_char = [':'; '@'; '#'; '='; '$']
 
 (* Name.lower *)
 
 let unaccent_iso_8859_1 =
   function
-  | '‡' | '·' | '‚' | '„' | '‰' | 'Â' | 'Ê' -> 'a'
-  | 'Á' -> 'c'
-  | 'Ë' | 'È' | 'Í' | 'Î' -> 'e'
-  | 'Ï' | 'Ì' | 'Ó' | 'Ô' -> 'i'
-  | '' -> 'd'
-  | 'Ò' -> 'n'
-  | 'Ú' | 'Û' | 'Ù' | 'ı' | 'ˆ' | '¯' -> 'o'
-  | '˘' | '˙' | '˚' | '¸' -> 'u'
-  | '˝' | 'ˇ' -> 'y'
-  | '˛' -> 'p'
-  | 'ﬂ' -> 's'
+  (*| '√†' | '√°' | '√¢' | '√£' | '√§' | '√•' | '√¶' -> 'a'*)
+  | '\xE0' | '\xE1' | '\xE2' | '\xE3' | '\xE4' | '\xE5' | '\xE6' -> 'a'
+  (*| '√ß' -> 'c'*)
+  | '\xE7' -> 'c'
+  (*| '√®' | '√©' | '√™' | '√´' -> 'e'*)
+  | '\xE8' | '\xE9' | '\xEA' | '\xEB' -> 'e'
+  (*| '√¨' | '√≠' | '√Æ' | '√Ø' -> 'i'*)
+  | '\xEC' | '\xED' | '\xEE' | '\xEF' -> 'i'
+  (*| '√∞' -> 'd'*)
+  | '\xF0' -> 'd'
+  (*| '√±' -> 'n'*)
+  | '\xF1' -> 'n'
+  (*| '√≤' | '√≥' | '√¥' | '√µ' | '√∂' | '√∏' -> 'o'*)
+  | '\xF2' | '\xF3' | '\xF4' | '\xF5' | '\xF6' | '\xF8' -> 'o'
+  (*| '√π' | '√∫' | '√ª' | '√º' -> 'u'*)
+  | '\xF9' | '\xFA' | '\xFB' | '\xFC' -> 'u'
+  (*| '√Ω' | '√ø' -> 'y'*)
+  | '\xFD' | '\xFF' -> 'y'
+  (*| '√æ' -> 'p'*)
+  | '\xFE' -> 'p'
+  (*| '√ü' -> 's'*)
+  | '\xDF' -> 's'
   | c -> c
 
 let nbc c =
@@ -67,9 +78,9 @@ let unaccent_utf_8 lower s i =
           | 0xBD | 0xBF -> "y"
           | 0xBE -> "th"
           | _ ->
-              (* Si le caractËre est en dehors de la table ASCII,
-                 alors on ignore le caratËre. Cela peut se produire
-                 si l'entrÈe est mauvaise, ex: J√©r√√∂me /FOO/ *)
+              (* Si le caract√®re est en dehors de la table ASCII,
+                 alors on ignore le carat√®re. Cela peut se produire
+                 si l'entr√©e est mauvaise, ex: J√É¬©r√É√É¬∂me /FOO/ *)
               try
                 let c =
                   Char.lowercase_ascii (Char.chr (Char.code s.[i+1] + 0x40))
@@ -429,10 +440,12 @@ let lower s =
     if i = String.length s then Buff.get len
     else if Char.code s.[i] < 0x80 then
       match s.[i] with
-      | 'a'..'z' | 'A'..'Z' | '‡'..'ˇ' | '¿'..'›' | '0'..'9' | '.' as c ->
-        let len = if special then Buff.store len ' ' else len in
-        let c = unaccent_iso_8859_1 (Char.lowercase_ascii c) in
-        copy false (i + 1) (Buff.store len c)
+      (*'a'..'z' | 'A'..'Z' | '√†'..'√ø' | '√Ä'..'√ù' | *)
+        'a'..'z' | 'A'..'Z' | '\xE0'..'\xFD' | '\xC0'..'\xDD' |
+        '0'..'9' | '.' as c ->
+          let len = if special then Buff.store len ' ' else len in
+          let c = unaccent_iso_8859_1 (Char.lowercase_ascii c) in
+          copy false (i + 1) (Buff.store len c)
       | _ -> copy (len <> 0) (i + 1) len
     else
       let len = if special then Buff.store len ' ' else len in
@@ -492,14 +505,14 @@ let strip s = strip_c s ' '
 
 (* ******************************************************************** *)
 (*  [Fonc] purge : string -> string                                     *)
-(** [Description] : Supprime tous les caractËres interdits (dÈfini par
-                    forbidden_char) prÈsents dans la chaine passÈe en
+(** [Description] : Supprime tous les caract√®res interdits (d√©fini par
+                    forbidden_char) pr√©sents dans la chaine pass√©e en
                     argument.
     [Args] :
       - s : string que l'on veut purger
     [Retour] :
-      - string : retourne la chaÓne dÈlestÈe des caractËres interdits
-    [Rem] : ExportÈ en clair hors de ce module.                         *)
+      - string : retourne la cha√Æne d√©lest√©e des caract√®res interdits
+    [Rem] : Export√© en clair hors de ce module.                         *)
 (* ******************************************************************** *)
 let purge s = List.fold_left (fun s c -> strip_c s c) s forbidden_char
 

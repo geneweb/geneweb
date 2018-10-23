@@ -1,12 +1,12 @@
-(* $Id: gwcomp.ml,v 5.12 2008-11-04 13:03:13 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.12 2018-09-27 13:03:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
 
 let magic_gwo = "GnWo000o"
 
-(* Option qui force a créé les clés des individus. De fait, *)
-(* si la clé est incomplète, on l'enregistre tout de même.  *)
+(* Option qui force a crÃ©Ã© les clÃ©s des individus. De fait, *)
+(* si la clÃ© est incomplÃ¨te, on l'enregistre tout de mÃªme.  *)
 let create_all_keys = ref false
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
@@ -352,8 +352,9 @@ let get_fst_name str l =
   match l with
     x :: l' ->
       begin match x.[0] with
-        'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '[' | '0'..'9' | '?' |
-        ' ' ->
+      (*'a'..'z' | 'A'..'Z' | 'Ã '..'Ã¿' | 'Ã€'..'Ã' *)
+        'a'..'z' | 'A'..'Z' | '\xE0'..'\xFF' | '\xC0'..'\xDD' |
+        '[' | '0'..'9' | '?' | ' ' ->
           let x = cut_space x in
           let (x, occ) =
             match String.rindex_opt x '.' with
@@ -401,7 +402,9 @@ let get_name l =
   | x :: l' ->
     begin match x.[0] with
       |  '{' -> "", l
-      | 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '?' | ' ' ->
+      (*'a'..'z' | 'A'..'Z' | 'Ã '..'Ã¿' | 'Ã€'..'Ã' *)
+      | 'a'..'z' | 'A'..'Z' | '\xE0'..'\xFF' | '\xC0'..'\xDD' |
+        '0'..'9' | '?' | ' ' ->
         cut_space x, l'
       | _ -> "", l
     end
@@ -937,7 +940,7 @@ let read_family ic fname =
                   "end fevt" -> fevents, read_line ic
                 | x ->
                     let (str, l) = x, fields x in
-                    (* On récupère le nom, date, lieu, source, cause *)
+                    (* On rÃ©cupÃ¨re le nom, date, lieu, source, cause *)
                     let (name, l) = get_fevent_name str l in
                     let (date, l) = get_optional_event_date l in
                     let (place, l) = get_field "#p" l in
@@ -949,9 +952,9 @@ let read_family ic fname =
                       | Some x -> Adef.cdate_of_od x
                     in
                     if l <> [] then failwith str;
-                    (* On récupère les témoins *)
+                    (* On rÃ©cupÃ¨re les tÃ©moins *)
                     let (witn, line) = loop_witn (input_a_line ic) ic in
-                    (* On récupère les notes *)
+                    (* On rÃ©cupÃ¨re les notes *)
                     let (notes, line) = loop_note line ic in
                     let notes = Mutil.strip_all_trailing_spaces notes in
                     let evt = name, date, place, cause, src, notes, witn in
@@ -1071,7 +1074,7 @@ let read_family ic fname =
               "end pevt" -> pevents
             | x ->
                 let (str, l) = x, fields x in
-                (* On récupère le nom, date, lieu, source, cause *)
+                (* On rÃ©cupÃ¨re le nom, date, lieu, source, cause *)
                 let (name, l) = get_pevent_name str l in
                 let (date, l) = get_optional_event_date l in
                 let (place, l) = get_field "#p" l in
@@ -1083,9 +1086,9 @@ let read_family ic fname =
                   | Some x -> Adef.cdate_of_od x
                 in
                 if l <> [] then failwith str;
-                (* On récupère les témoins *)
+                (* On rÃ©cupÃ¨re les tÃ©moins *)
                 let (witn, line) = loop_witn (input_a_line ic) ic in
-                (* On récupère les notes *)
+                (* On rÃ©cupÃ¨re les notes *)
                 let (notes, line) = loop_note line ic in
                 let notes = Mutil.strip_all_trailing_spaces notes in
                 let evt = name, date, place, cause, src, notes, witn in
