@@ -1432,7 +1432,7 @@ let is_created_or_already_there ochil_arr nchil schil =
    3/ or the new family have the same parents than the old one *and*
       all linked (not created) new children were already children.
 *)
-(* Replaced && by || to do more checks. *)
+(* Replaced && by || TODO more checks. *)
 (* Improvement : check the name on the parents/children if they linked *)
 
 let need_check_noloop (scpl, sdes, onfs) =
