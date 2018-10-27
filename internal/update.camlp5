@@ -26,7 +26,7 @@ type create =
 type key = string * string * int * create * string
 
 let infer_death_from_age a =
-  if a > 120 then OfCourseDead
+  if a > 120 then OfCourseDead (*TODO private_years??? *)
   (* TODO: TO BE REMOVED else if a <= 80 then NotDead *)
   else DontKnowIfDead
 
@@ -85,6 +85,7 @@ let rec infer_death conf base p =
         else
           let fam = foi base families.(i) in
           match Adef.od_of_cdate (get_marriage fam) with
+          (* TODO this 120 should be related to private_years_marriage *)
           | Some (Dgreg (d, _)) when (CheckItem.time_elapsed d conf.today).year > 120 ->
             OfCourseDead
           | _ ->
@@ -111,8 +112,9 @@ let rec infer_death conf base p =
       | None -> DontKnowIfDead
       | Some ifam -> infer_death_from_parents conf base (foi base ifam)
 
-let restrict_to_small_list el =
+(*let restrict_to_small_list el =
   let rec begin_list n rl el =
+     TODO suppress this limit
     if n > 25 then
       let rec end_list n sl el =
         if n > 25 then List.rev_append rl (None :: sl)
@@ -127,7 +129,7 @@ let restrict_to_small_list el =
         e :: el -> begin_list (n + 1) (Some e :: rl) el
       | [] -> List.rev rl
   in
-  begin_list 0 [] el
+  begin_list 0 [] el*)
 
 (* ************************************************************************** *)
 (*  [Fonc] print_person_parents_and_spouses :
@@ -158,7 +160,6 @@ let print_same_name conf base p =
   match Gutil.find_same_name base p with
     [_] -> ()
   | pl ->
-      let pl = restrict_to_small_list pl in
       Wserver.printf "<p>\n";
       Wserver.printf "%s%s\n"
         (capitale (transl conf "persons having the same name"))
@@ -167,10 +168,7 @@ let print_same_name conf base p =
       List.iter
         (fun p ->
            Wserver.printf "<li>";
-           begin match p with
-             Some p -> print_person_parents_and_spouse conf base p
-           | None -> Wserver.printf "...\n"
-           end;
+           print_person_parents_and_spouse conf base p;
            Wserver.printf "</li>")
         pl;
       Wserver.printf "</ul>\n";
