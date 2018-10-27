@@ -2134,23 +2134,29 @@ let husband_wife conf base p all =
     in
     loop 0
   in
-  let rec loop i res =
-    if i < Array.length (get_family p) then
-      let fam = foi base (get_family p).(i) in
-      let conjoint = Gutil.spouse (get_key_index p) fam in
-      let conjoint = pget conf base conjoint in
-      if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
-      then
-        if all then
-          loop (i + 1) (res ^ translate_eval (" " ^
-            (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ",")
-        else
-          res ^ translate_eval (" " ^
-            (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ","
-      else loop (i + 1) res
-    else res
+  let res =
+    let rec loop i res =
+      if i < Array.length (get_family p) then
+        let fam = foi base (get_family p).(i) in
+        let conjoint = Gutil.spouse (get_key_index p) fam in
+        let conjoint = pget conf base conjoint in
+        if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
+        then
+          if all then
+            loop (i + 1) (res ^ translate_eval (" " ^
+              (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ",")
+          else
+            res ^ translate_eval (" " ^
+              (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ","
+        else loop (i + 1) res
+      else res
+    in
+    loop 0 relation
   in
-  loop 0 relation
+  let res = if String.length res > 1
+    then (String.sub res 0 (String.length res -1)) else res
+  in
+  res
 
 (* ************************************************************************** *)
 (*  [Fonc] first_child : config -> base -> person -> unit                     *)
@@ -2225,11 +2231,11 @@ let specify_homonymous conf base p specify_public_name =
       (* la personne, donc on affiche les informations sur les parents,   *)
       (* le mariage et/ou le premier enfant.                              *)
       let cop = child_of_parent conf base p in
-      let hw = husband_wife conf base p false in
+      let hw = husband_wife conf base p true in
       let fc = first_child conf base p in
       let s =
         (if cop = "" then "" else ", " ^ cop) ^
-        (if hw = "" then if fc = "" then "" else ", " ^ fc else ", " ^ hw)
+        (if hw = "" then if fc = "" then "" else ", " ^ fc else ", " ^ hw) ^ "."
       in
       Wserver.printf "%s" s
 

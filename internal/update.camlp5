@@ -27,7 +27,7 @@ type key = string * string * int * create * string
 
 let infer_death_from_age a =
   if a > 120 then OfCourseDead
-  (* TO BE REMOVED else if a <= 80 then NotDead *)
+  (* TODO: TO BE REMOVED else if a <= 80 then NotDead *)
   else DontKnowIfDead
 
 let infer_death_from_date conf d =
@@ -150,9 +150,9 @@ let print_person_parents_and_spouse conf base p =
   Wserver.printf "%s" (Date.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
   if (String.length cop) > 0 then Wserver.printf ", %s" cop;
-  let hbw = Util.husband_wife conf base p false in
-  if (String.length hbw) > 0 then Wserver.printf ", %s" (String.sub hbw 0 (String.length hbw -1));
-  Wserver.printf "\n"
+  let hbw = Util.husband_wife conf base p true in
+  if (String.length hbw) > 0 then Wserver.printf ", %s" hbw;
+  Wserver.printf ".\n"
 
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
