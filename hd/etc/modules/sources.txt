@@ -33,6 +33,7 @@
           event.name!=[marriage event] and
           event.name!=[death] and
           event.name!=[burial] and
+          event.name!=[cremation] and
           event.name!="special" and
           event.name!="special1" and
           event.name!="special2")
