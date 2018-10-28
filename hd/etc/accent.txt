@@ -30,138 +30,262 @@ function write_ch(v) {
 %end;
 
 %( todo: a simple and a full version %)
-%apply;char("–")%apply;char("—")
-%apply;char("«")
-<a onclick="return write_ch(' ')" href="#" title="&amp;nbsp;">⍽</a>
-%apply;char("»")
-%apply;char("‘")%apply;char("’")
-%apply;char("„")%apply;char("“")%apply;char("”")
+<a onclick="return write_ch('–')" href="#">–</a>
+<a onclick="return write_ch('—')" href="#">—</a>
+<a onclick="return write_ch('«')" href="#">«</a>
+<a onclick="return write_ch(' ')" href="#" title="&amp;nbsp;">⍽</a>
+<a onclick="return write_ch('»')" href="#">»</a>
+<a onclick="return write_ch('‘')" href="#">‘</a>
+<a onclick="return write_ch('’')" href="#">’</a>
+<a onclick="return write_ch('„')" href="#">„</a>
+<a onclick="return write_ch('“')" href="#">“</a>
+<a onclick="return write_ch('”')" href="#">”</a>
 <a onclick="return write_ch(' ')" href="#">&amp;nnbsp;</a>
 <br>
-%apply;char("Á")%apply;char("á")
-%apply;char("À")%apply;char("à")
-%apply;char("Â")%apply;char("â")
-%apply;char("ǎ")%apply;char("ǎ")
-%apply;char("Ä")%apply;char("ä")
-%apply;char("Ȧ")%apply;char("ȧ")
-%apply;char("Ã")%apply;char("ã")
-%apply;char("Ā")%apply;char("ā")
-%apply;char("Ă")%apply;char("ă")
-%apply;char("Å")%apply;char("å")
-%apply;char("Ą")%apply;char("ą")
-%apply;char("Ⱥ")%apply;char("ⱥ")
-%apply;char("Æ")%apply;char("æ")
+<a onclick="return write_ch('Á')" href="#">Á</a>
+<a onclick="return write_ch('á')" href="#">á</a>
+<a onclick="return write_ch('À')" href="#">À</a>
+<a onclick="return write_ch('à')" href="#">à</a>
+<a onclick="return write_ch('Â')" href="#">Â</a>
+<a onclick="return write_ch('â')" href="#">â</a>
+<a onclick="return write_ch('ǎ')" href="#">ǎ</a>
+<a onclick="return write_ch('ǎ')" href="#">ǎ</a>
+<a onclick="return write_ch('Ä')" href="#">Ä</a>
+<a onclick="return write_ch('ä')" href="#">ä</a>
+<a onclick="return write_ch('Ȧ')" href="#">Ȧ</a>
+<a onclick="return write_ch('ȧ')" href="#">ȧ</a>
+<a onclick="return write_ch('Ã')" href="#">Ã</a>
+<a onclick="return write_ch('ã')" href="#">ã</a>
+<a onclick="return write_ch('Ā')" href="#">Ā</a>
+<a onclick="return write_ch('ā')" href="#">ā</a>
+<a onclick="return write_ch('Ă')" href="#">Ă</a>
+<a onclick="return write_ch('ă')" href="#">ă</a>
+<a onclick="return write_ch('Å')" href="#">Å</a>
+<a onclick="return write_ch('å')" href="#">å</a>
+<a onclick="return write_ch('Ą')" href="#">Ą</a>
+<a onclick="return write_ch('ą')" href="#">ą</a>
+<a onclick="return write_ch('Ⱥ')" href="#">Ⱥ</a>
+<a onclick="return write_ch('ⱥ')" href="#">ⱥ</a>
+<a onclick="return write_ch('Æ')" href="#">Æ</a>
+<a onclick="return write_ch('æ')" href="#">æ</a>
 <br>
-%apply;char("É")%apply;char("é")
-%apply;char("È")%apply;char("è")
-%apply;char("Ê")%apply;char("ê")
-%apply;char("Ě")%apply;char("ě")
-%apply;char("Ë")%apply;char("ë")
-%apply;char("Ė")%apply;char("ė")
-%apply;char("Ẽ")%apply;char("ẽ")
-%apply;char("Ē")%apply;char("ē")
-%apply;char("Ĕ")%apply;char("ĕ")
-%apply;char("Ę")%apply;char("ę")
-%apply;char("Ɇ")%apply;char("ɇ")
-%apply;char("Ʃ")%apply;char("ʃ")
+<a onclick="return write_ch('É')" href="#">É</a>
+<a onclick="return write_ch('é')" href="#">é</a>
+<a onclick="return write_ch('È')" href="#">È</a>
+<a onclick="return write_ch('è')" href="#">è</a>
+<a onclick="return write_ch('Ê')" href="#">Ê</a>
+<a onclick="return write_ch('ê')" href="#">ê</a>
+<a onclick="return write_ch('Ě')" href="#">Ě</a>
+<a onclick="return write_ch('ě')" href="#">ě</a>
+<a onclick="return write_ch('Ë')" href="#">Ë</a>
+<a onclick="return write_ch('ë')" href="#">ë</a>
+<a onclick="return write_ch('Ė')" href="#">Ė</a>
+<a onclick="return write_ch('ė')" href="#">ė</a>
+<a onclick="return write_ch('Ẽ')" href="#">Ẽ</a>
+<a onclick="return write_ch('ẽ')" href="#">ẽ</a>
+<a onclick="return write_ch('Ē')" href="#">Ē</a>
+<a onclick="return write_ch('ē')" href="#">ē</a>
+<a onclick="return write_ch('Ĕ')" href="#">Ĕ</a>
+<a onclick="return write_ch('ĕ')" href="#">ĕ</a>
+<a onclick="return write_ch('Ę')" href="#">Ę</a>
+<a onclick="return write_ch('ę')" href="#">ę</a>
+<a onclick="return write_ch('Ɇ')" href="#">Ɇ</a>
+<a onclick="return write_ch('ɇ')" href="#">ɇ</a>
+<a onclick="return write_ch('Ʃ')" href="#">Ʃ</a>
+<a onclick="return write_ch('ʃ')" href="#">ʃ</a>
 <br>
-%apply;char("Í")%apply;char("í")
-%apply;char("Ì")%apply;char("ì")
-%apply;char("Î")%apply;char("î")
-%apply;char("Ǐ")%apply;char("ǐ")
-%apply;char("Ï")%apply;char("ï")
-%apply;char("İ")%apply;char("ı")
-%apply;char("Ĩ")%apply;char("ĩ")
-%apply;char("Ī")%apply;char("ī")
-%apply;char("Ĭ")%apply;char("ĭ")
-%apply;char("Į")%apply;char("į")
-%apply;char("Ɨ")%apply;char("ɨ")
-%apply;char("Ĳ")%apply;char("ĳ")
+<a onclick="return write_ch('Í')" href="#">Í</a>
+<a onclick="return write_ch('í')" href="#">í</a>
+<a onclick="return write_ch('Ì')" href="#">Ì</a>
+<a onclick="return write_ch('ì')" href="#">ì</a>
+<a onclick="return write_ch('Î')" href="#">Î</a>
+<a onclick="return write_ch('î')" href="#">î</a>
+<a onclick="return write_ch('Ǐ')" href="#">Ǐ</a>
+<a onclick="return write_ch('ǐ')" href="#">ǐ</a>
+<a onclick="return write_ch('Ï')" href="#">Ï</a>
+<a onclick="return write_ch('ï')" href="#">ï</a>
+<a onclick="return write_ch('İ')" href="#">İ</a>
+<a onclick="return write_ch('ı')" href="#">ı</a>
+<a onclick="return write_ch('Ĩ')" href="#">Ĩ</a>
+<a onclick="return write_ch('ĩ')" href="#">ĩ</a>
+<a onclick="return write_ch('Ī')" href="#">Ī</a>
+<a onclick="return write_ch('ī')" href="#">ī</a>
+<a onclick="return write_ch('Ĭ')" href="#">Ĭ</a>
+<a onclick="return write_ch('ĭ')" href="#">ĭ</a>
+<a onclick="return write_ch('Į')" href="#">Į</a>
+<a onclick="return write_ch('į')" href="#">į</a>
+<a onclick="return write_ch('Ɨ')" href="#">Ɨ</a>
+<a onclick="return write_ch('ɨ')" href="#">ɨ</a>
+<a onclick="return write_ch('Ĳ')" href="#">Ĳ</a>
+<a onclick="return write_ch('ĳ')" href="#">ĳ</a>
 <br>
-%apply;char("Ó")%apply;char("ó")
-%apply;char("Ò")%apply;char("ò")
-%apply;char("Ô")%apply;char("ô")
-%apply;char("Ǒ")%apply;char("ǒ")
-%apply;char("Ö")%apply;char("ö")
-%apply;char("Ȯ")%apply;char("ȯ")
-%apply;char("Õ")%apply;char("õ")
-%apply;char("Ō")%apply;char("ō")
-%apply;char("Ŏ")%apply;char("ŏ")
-%apply;char("Ǫ")%apply;char("ǫ")
-%apply;char("Ő")%apply;char("ő")
-%apply;char("Ø")%apply;char("ø")
-%apply;char("θ")%apply;char("Θ")
-%apply;char("Œ")%apply;char("œ")
+<a onclick="return write_ch('Ó')" href="#">Ó</a>
+<a onclick="return write_ch('ó')" href="#">ó</a>
+<a onclick="return write_ch('Ò')" href="#">Ò</a>
+<a onclick="return write_ch('ò')" href="#">ò</a>
+<a onclick="return write_ch('Ô')" href="#">Ô</a>
+<a onclick="return write_ch('ô')" href="#">ô</a>
+<a onclick="return write_ch('Ǒ')" href="#">Ǒ</a>
+<a onclick="return write_ch('ǒ')" href="#">ǒ</a>
+<a onclick="return write_ch('Ö')" href="#">Ö</a>
+<a onclick="return write_ch('ö')" href="#">ö</a>
+<a onclick="return write_ch('Ȯ')" href="#">Ȯ</a>
+<a onclick="return write_ch('ȯ')" href="#">ȯ</a>
+<a onclick="return write_ch('Õ')" href="#">Õ</a>
+<a onclick="return write_ch('õ')" href="#">õ</a>
+<a onclick="return write_ch('Ō')" href="#">Ō</a>
+<a onclick="return write_ch('ō')" href="#">ō</a>
+<a onclick="return write_ch('Ŏ')" href="#">Ŏ</a>
+<a onclick="return write_ch('ŏ')" href="#">ŏ</a>
+<a onclick="return write_ch('Ǫ')" href="#">Ǫ</a>
+<a onclick="return write_ch('ǫ')" href="#">ǫ</a>
+<a onclick="return write_ch('Ő')" href="#">Ő</a>
+<a onclick="return write_ch('ő')" href="#">ő</a>
+<a onclick="return write_ch('Ø')" href="#">Ø</a>
+<a onclick="return write_ch('ø')" href="#">ø</a>
+<a onclick="return write_ch('θ')" href="#">θ</a>
+<a onclick="return write_ch('Θ')" href="#">Θ</a>
+<a onclick="return write_ch('Œ')" href="#">Œ</a>
+<a onclick="return write_ch('œ')" href="#">œ</a>
 <br>
-%apply;char("Ú")%apply;char("ú")
-%apply;char("Ù")%apply;char("ù")
-%apply;char("Û")%apply;char("û")
-%apply;char("Ǔ")%apply;char("ǔ")
-%apply;char("Ü")%apply;char("ü")
-%apply;char("Ũ")%apply;char("ũ")
-%apply;char("Ū")%apply;char("ū")
-%apply;char("Ŭ")%apply;char("ŭ")
-%apply;char("Ů")%apply;char("ů")
-%apply;char("Ų")%apply;char("ų")
-%apply;char("Ű")%apply;char("ű")
-%apply;char("Ʉ")%apply;char("ʉ")
+<a onclick="return write_ch('Ú')" href="#">Ú</a>
+<a onclick="return write_ch('ú')" href="#">ú</a>
+<a onclick="return write_ch('Ù')" href="#">Ù</a>
+<a onclick="return write_ch('ù')" href="#">ù</a>
+<a onclick="return write_ch('Û')" href="#">Û</a>
+<a onclick="return write_ch('û')" href="#">û</a>
+<a onclick="return write_ch('Ǔ')" href="#">Ǔ</a>
+<a onclick="return write_ch('ǔ')" href="#">ǔ</a>
+<a onclick="return write_ch('Ü')" href="#">Ü</a>
+<a onclick="return write_ch('ü')" href="#">ü</a>
+<a onclick="return write_ch('Ũ')" href="#">Ũ</a>
+<a onclick="return write_ch('ũ')" href="#">ũ</a>
+<a onclick="return write_ch('Ū')" href="#">Ū</a>
+<a onclick="return write_ch('ū')" href="#">ū</a>
+<a onclick="return write_ch('Ŭ')" href="#">Ŭ</a>
+<a onclick="return write_ch('ŭ')" href="#">ŭ</a>
+<a onclick="return write_ch('Ů')" href="#">Ů</a>
+<a onclick="return write_ch('ů')" href="#">ů</a>
+<a onclick="return write_ch('Ų')" href="#">Ų</a>
+<a onclick="return write_ch('ų')" href="#">ų</a>
+<a onclick="return write_ch('Ű')" href="#">Ű</a>
+<a onclick="return write_ch('ű')" href="#">ű</a>
+<a onclick="return write_ch('Ʉ')" href="#">Ʉ</a>
+<a onclick="return write_ch('ʉ')" href="#">ʉ</a>
 <br>
-%apply;char("Ý")%apply;char("ý")
-%apply;char("Ỳ")%apply;char("ỳ")
-%apply;char("Ŷ")%apply;char("ŷ")
-%apply;char("Ÿ")%apply;char("ÿ")
-%apply;char("Ẏ")%apply;char("ẏ")
-%apply;char("Ỹ")%apply;char("ỹ")
-%apply;char("Ȳ")%apply;char("ȳ")
-%apply;char("Ƴ")%apply;char("ƴ")
-%apply;char("Ɏ")%apply;char("ɏ")
-%apply;char("ẙ")
+<a onclick="return write_ch('Ý')" href="#">Ý</a>
+<a onclick="return write_ch('ý')" href="#">ý</a>
+<a onclick="return write_ch('Ỳ')" href="#">Ỳ</a>
+<a onclick="return write_ch('ỳ')" href="#">ỳ</a>
+<a onclick="return write_ch('Ŷ')" href="#">Ŷ</a>
+<a onclick="return write_ch('ŷ')" href="#">ŷ</a>
+<a onclick="return write_ch('Ÿ')" href="#">Ÿ</a>
+<a onclick="return write_ch('ÿ')" href="#">ÿ</a>
+<a onclick="return write_ch('Ẏ')" href="#">Ẏ</a>
+<a onclick="return write_ch('ẏ')" href="#">ẏ</a>
+<a onclick="return write_ch('Ỹ')" href="#">Ỹ</a>
+<a onclick="return write_ch('ỹ')" href="#">ỹ</a>
+<a onclick="return write_ch('Ȳ')" href="#">Ȳ</a>
+<a onclick="return write_ch('ȳ')" href="#">ȳ</a>
+<a onclick="return write_ch('Ƴ')" href="#">Ƴ</a>
+<a onclick="return write_ch('ƴ')" href="#">ƴ</a>
+<a onclick="return write_ch('Ɏ')" href="#">Ɏ</a>
+<a onclick="return write_ch('ɏ')" href="#">ɏ</a>
+<a onclick="return write_ch('ẙ')" href="#">ẙ</a>
 <br>
-%apply;char("Ć")%apply;char("ć")
-%apply;char("Ç")%apply;char("ç")
-%apply;char("Č")%apply;char("č")
-%apply;char("Ď")%apply;char("ď")
-%apply;char("Ð")%apply;char("ð")%apply;char("đ")
-%apply;char("Ǆ")%apply;char("ǅ")%apply;char("ǆ")
-%apply;char("Ģ")%apply;char("ģ")
-%apply;char("Ħ")%apply;char("ħ")
-%apply;char("Ķ")%apply;char("ķ")
-%apply;char("Ĺ")%apply;char("ĺ")
-%apply;char("Ľ")%apply;char("ľ")
-%apply;char("Ļ")%apply;char("ļ")
-%apply;char("Ł")%apply;char("ł")
-%apply;char("Ǉ")%apply;char("ǈ")%apply;char("ǉ")
-%apply;char("Ǌ")%apply;char("ǋ")%apply;char("ǌ")
-%apply;char("Ń")%apply;char("ń")
-%apply;char("Ñ")%apply;char("ñ")
-%apply;char("Ņ")%apply;char("ņ")
-%apply;char("Ŕ")%apply;char("ŕ")
-%apply;char("Ř")%apply;char("ř")
-%apply;char("Ŗ")%apply;char("ŗ")
-%apply;char("Ś")%apply;char("ś")
-%apply;char("Š")%apply;char("š")
-%apply;char("Ş")%apply;char("ş")
-%apply;char("ẞ")%apply;char("ß")
-%apply;char("Þ")%apply;char("þ")
-%apply;char("ſ")
-%apply;char("Ť")%apply;char("ť")
-%apply;char("Ţ")%apply;char("ț")
-%apply;char("Ź")%apply;char("ź")
-%apply;char("Ž")%apply;char("ž")
-%apply;char("Ż")%apply;char("ż")
-%apply;char("Ʒ")%apply;char("ʒ")
+<a onclick="return write_ch('Ć')" href="#">Ć</a>
+<a onclick="return write_ch('ć')" href="#">ć</a>
+<a onclick="return write_ch('Ç')" href="#">Ç</a>
+<a onclick="return write_ch('ç')" href="#">ç</a>
+<a onclick="return write_ch('Č')" href="#">Č</a>
+<a onclick="return write_ch('č')" href="#">č</a>
+<a onclick="return write_ch('Ď')" href="#">Ď</a>
+<a onclick="return write_ch('ď')" href="#">ď</a>
+<a onclick="return write_ch('Ð')" href="#">Ð</a>
+<a onclick="return write_ch('ð')" href="#">ð</a>
+<a onclick="return write_ch('đ')" href="#">đ</a>
+<a onclick="return write_ch('Ǆ')" href="#">Ǆ</a>
+<a onclick="return write_ch('ǅ')" href="#">ǅ</a>
+<a onclick="return write_ch('ǆ')" href="#">ǆ</a>
+<a onclick="return write_ch('Ģ')" href="#">Ģ</a>
+<a onclick="return write_ch('ģ')" href="#">ģ</a>
+<a onclick="return write_ch('Ħ')" href="#">Ħ</a>
+<a onclick="return write_ch('ħ')" href="#">ħ</a>
+<a onclick="return write_ch('Ķ')" href="#">Ķ</a>
+<a onclick="return write_ch('ķ')" href="#">ķ</a>
+<a onclick="return write_ch('Ĺ')" href="#">Ĺ</a>
+<a onclick="return write_ch('ĺ')" href="#">ĺ</a>
+<a onclick="return write_ch('Ľ')" href="#">Ľ</a>
+<a onclick="return write_ch('ľ')" href="#">ľ</a>
+<a onclick="return write_ch('Ļ')" href="#">Ļ</a>
+<a onclick="return write_ch('ļ')" href="#">ļ</a>
+<a onclick="return write_ch('Ł')" href="#">Ł</a>
+<a onclick="return write_ch('ł')" href="#">ł</a>
+<a onclick="return write_ch('Ǉ')" href="#">Ǉ</a>
+<a onclick="return write_ch('ǈ')" href="#">ǈ</a>
+<a onclick="return write_ch('ǉ')" href="#">ǉ</a>
+<a onclick="return write_ch('Ǌ')" href="#">Ǌ</a>
+<a onclick="return write_ch('ǋ')" href="#">ǋ</a>
+<a onclick="return write_ch('ǌ')" href="#">ǌ</a>
+<a onclick="return write_ch('Ń')" href="#">Ń</a>
+<a onclick="return write_ch('ń')" href="#">ń</a>
+<a onclick="return write_ch('Ñ')" href="#">Ñ</a>
+<a onclick="return write_ch('ñ')" href="#">ñ</a>
+<a onclick="return write_ch('Ņ')" href="#">Ņ</a>
+<a onclick="return write_ch('ņ')" href="#">ņ</a>
+<a onclick="return write_ch('Ŕ')" href="#">Ŕ</a>
+<a onclick="return write_ch('ŕ')" href="#">ŕ</a>
+<a onclick="return write_ch('Ř')" href="#">Ř</a>
+<a onclick="return write_ch('ř')" href="#">ř</a>
+<a onclick="return write_ch('Ŗ')" href="#">Ŗ</a>
+<a onclick="return write_ch('ŗ')" href="#">ŗ</a>
+<a onclick="return write_ch('Ś')" href="#">Ś</a>
+<a onclick="return write_ch('ś')" href="#">ś</a>
+<a onclick="return write_ch('Š')" href="#">Š</a>
+<a onclick="return write_ch('š')" href="#">š</a>
+<a onclick="return write_ch('Ş')" href="#">Ş</a>
+<a onclick="return write_ch('ş')" href="#">ş</a>
+<a onclick="return write_ch('ẞ')" href="#">ẞ</a>
+<a onclick="return write_ch('ß')" href="#">ß</a>
+<a onclick="return write_ch('Þ')" href="#">Þ</a>
+<a onclick="return write_ch('þ')" href="#">þ</a>
+<a onclick="return write_ch('ſ')" href="#">ſ</a>
+<a onclick="return write_ch('Ť')" href="#">Ť</a>
+<a onclick="return write_ch('ť')" href="#">ť</a>
+<a onclick="return write_ch('Ţ')" href="#">Ţ</a>
+<a onclick="return write_ch('ț')" href="#">ț</a>
+<a onclick="return write_ch('Ź')" href="#">Ź</a>
+<a onclick="return write_ch('ź')" href="#">ź</a>
+<a onclick="return write_ch('Ž')" href="#">Ž</a>
+<a onclick="return write_ch('ž')" href="#">ž</a>
+<a onclick="return write_ch('Ż')" href="#">Ż</a>
+<a onclick="return write_ch('ż')" href="#">ż</a>
+<a onclick="return write_ch('Ʒ')" href="#">Ʒ</a>
+<a onclick="return write_ch('ʒ')" href="#">ʒ</a>
 <br>
-%apply;char("¹")%apply;char("²")%apply;char("³")
-%apply;char("½")%apply;char("¼")%apply;char("¾")
-%apply;char("º")%apply;char("ª")
-%apply;char("°")%apply;char("†")%apply;char("‡")
+<a onclick="return write_ch('¹')" href="#">¹</a>
+<a onclick="return write_ch('²')" href="#">²</a>
+<a onclick="return write_ch('³')" href="#">³</a>
+<a onclick="return write_ch('½')" href="#">½</a>
+<a onclick="return write_ch('¼')" href="#">¼</a>
+<a onclick="return write_ch('¾')" href="#">¾</a>
+<a onclick="return write_ch('º')" href="#">º</a>
+<a onclick="return write_ch('ª')" href="#">ª</a>
+<a onclick="return write_ch('°')" href="#">°</a>
+<a onclick="return write_ch('†')" href="#">†</a>
+<a onclick="return write_ch('‡')" href="#">‡</a>
 <br>
-%apply;char("¡")%apply;char("¿")
-%apply;char("•")%apply;char("·")
-%apply;char("×")%apply;char("÷")
-%apply;char("€")%apply;char("£")
-%apply;char("©")%apply;char("®")
-%apply;char("‰")
-%apply;char("µ")
-%apply;char("¶")
-%apply;char("№")
+<a onclick="return write_ch('¡')" href="#">¡</a>
+<a onclick="return write_ch('¿')" href="#">¿</a>
+<a onclick="return write_ch('•')" href="#">•</a>
+<a onclick="return write_ch('·')" href="#">·</a>
+<a onclick="return write_ch('×')" href="#">×</a>
+<a onclick="return write_ch('÷')" href="#">÷</a>
+<a onclick="return write_ch('€')" href="#">€</a>
+<a onclick="return write_ch('£')" href="#">£</a>
+<a onclick="return write_ch('©')" href="#">©</a>
+<a onclick="return write_ch('®')" href="#">®</a>
+<a onclick="return write_ch('‰')" href="#">‰</a>
+<a onclick="return write_ch('µ')" href="#">µ</a>
+<a onclick="return write_ch('¶')" href="#">¶</a>
+<a onclick="return write_ch('№')" href="#">№</a>
