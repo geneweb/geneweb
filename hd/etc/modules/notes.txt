@@ -101,8 +101,11 @@
       <h3>[*death]</h3>
       <blockquote>%death_note;</blockquote>
     %end;
-    %if;has_burial_note;
+    %if;(has_burial_note and is_buried)
       <h3>[*burial]</h3>
+      <blockquote>%burial_note;</blockquote>
+    %elseif;(has_burial_note and is_cremated)
+      <h3>[*cremation]</h3>
       <blockquote>%burial_note;</blockquote>
     %end;
     %foreach;event;
@@ -111,7 +114,8 @@
              event.name!=[baptism] and
              event.name!=[marriage event] and
              event.name!=[death] and
-             event.name!=[burial])
+             event.name!=[burial] and
+             event.name!=[cremation])
           <h3>%apply;capitalize(event.name)</h3>
           <blockquote>%event.note;</blockquote>
         %end;
