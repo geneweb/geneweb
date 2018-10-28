@@ -885,6 +885,8 @@ let check_conflict conf base sp ipl =
             name &&
           get_occ p1 = sp.occ
        then
+       (* TODO probably better to use Update.print_create_conflict
+          but one additionnal parameter (var) I dont understand ?? *)
          print_conflict conf base p1)
     ipl
 
