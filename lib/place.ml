@@ -156,7 +156,7 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
   let print_sn_list (snl : (string * Adef.iper list) list) =
     let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
     Wserver.printf "<li>\n";
-    Mutil.list_iter_first (fun first -> if not first then Wserver.printf ",\n" ; print_sn) snl ;
+    Mutil.list_iter_first (fun first x -> if not first then Wserver.printf ",\n" ; print_sn x) snl ;
     Wserver.printf "\n";
     Wserver.printf "</li>\n"
   in
