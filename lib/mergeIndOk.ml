@@ -262,9 +262,8 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 
   let nfn = p_first_name base np in
   let nsn = p_surname base np in
   let nocc = get_occ np in
-  if ( pgl1 <> [] || pgl2 <> [] ) && 
-    ((ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) || 
-     (ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc)) then
+  if ((ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) && pgl1 <> [] ||
+      (ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc) && pgl2 <> []) then
     begin
       Wserver.printf
         "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
@@ -289,7 +288,7 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 
         (capitale (transl conf "linked pages")) (transl conf ":");
       Notes.print_linked_list conf base pgl2
     end;
-  
+
   Merge.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
@@ -467,30 +466,16 @@ let redirect_added_families base p ip2 p2_family =
 let effective_mod_merge o_conf base o_p1 o_p2 sp =
   match p_getint o_conf.env "i2" with
     Some i2 ->
-      let ofn1 = o_p1.first_name in
-      let osn1 = o_p1.surname in
-      let oocc1 = o_p1.occ in
+      let conf = Update.update_conf o_conf in
+      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+      let fname = Filename.concat bdir "notes_links" in
+      let db = NotesLinks.read_db_from_file fname in
+      let (ofn1, osn1, oocc1) = (o_p1.first_name, o_p1.surname, o_p1.occ) in
       let key1 = Name.lower ofn1, Name.lower osn1, oocc1 in
-      let conf = Update.update_conf o_conf in
-      let pgl1 =
-        let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-        let fname = Filename.concat bdir "notes_links" in
-        let db = NotesLinks.read_db_from_file fname in
-        let db = Notes.merge_possible_aliases conf db in
-        Perso.links_to_ind conf base db key1
-      in
-      let ofn2 = o_p2.first_name in
-      let osn2 = o_p2.surname in
-      let oocc2 = o_p2.occ in
+      let pgl1 = Perso.links_to_ind conf base db key1 in
+      let (ofn2, osn2, oocc2) = (o_p2.first_name, o_p2.surname, o_p2.occ) in
       let key2 = Name.lower ofn2, Name.lower osn2, oocc2 in
-      let conf = Update.update_conf o_conf in
-      let pgl2 =
-        let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-        let fname = Filename.concat bdir "notes_links" in
-        let db = NotesLinks.read_db_from_file fname in
-        let db = Notes.merge_possible_aliases conf db in
-        Perso.links_to_ind conf base db key2
-      in
+      let pgl2 = Perso.links_to_ind conf base db key2 in
       let ip2 = Adef.iper_of_int i2 in
       let p2 = poi base ip2 in
       let rel_chil = get_related p2 in
