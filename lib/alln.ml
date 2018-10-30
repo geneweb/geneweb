@@ -9,23 +9,6 @@ let default_max_cnt = 2000
 
 (* tools *)
 
-let string_start_with ini s =
-  let l1 = String.length ini in
-  let l2 = String.length s in
-  let rec loop i1 i2 =
-    if i1 = l1 then true
-    else if i2 = l2
-    then
-      if String.unsafe_get ini i1 = '_'
-      then loop (i1 + 1) i2 else false
-    else if String.unsafe_get s i2 = String.unsafe_get ini i1
-         || String.unsafe_get s i2 = ' '
-            && String.unsafe_get ini i1 = '_'
-    then loop (i1 + 1) (i2 + 1)
-    else false
-  in
-  loop 0 0
-
 let combine_by_ini ini list =
   let list =
     let rec loop new_list =
@@ -290,7 +273,7 @@ let select_names conf base is_surnames ini need_whole_list =
         let rec loop istr len list =
           let s = Mutil.nominative (sou base istr) in
           let k = Util.name_key base s in
-          if string_start_with ini k then
+          if Mutil.start_with ~wildcard:true ini 0 k then
             let (list, len) =
               if s <> "?" then
                 let my_list = spi_find iii istr in

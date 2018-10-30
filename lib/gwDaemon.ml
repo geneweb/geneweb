@@ -733,10 +733,6 @@ let allowed_titles env =
 
 let denied_titles = allowed_denied_titles "denied_titles_file" ""
 
-let start_with s i p =
-  i + String.length p <= String.length s &&
-  String.sub s i (String.length p) = p
-
 let parse_digest s =
   let rec parse_main (strm__ : _ Stream.t) =
     match try Some (ident strm__) with Stream.Failure -> None with
@@ -855,7 +851,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     if auth = "" then ""
     else
       let s = "Basic " in
-      if start_with auth 0 s then
+      if Mutil.start_with s 0 auth then
         let i = String.length s in
         Base64.decode (String.sub auth i (String.length auth - i))
       else ""
@@ -994,7 +990,7 @@ let digest_authorization request base_env passwd utm base_file command =
      ar_friend = friend_passwd = ""; ar_uauth = ""; ar_can_stale = false}
   else if passwd = "w" || passwd = "f" then
     let auth = Wserver.extract_param "authorization: " '\r' request in
-    if start_with auth 0 "Digest " then
+    if Mutil.start_with "Digest " 0 auth then
       let meth =
         match Wserver.extract_param "GET " ' ' request with
           "" -> "POST"
@@ -1485,7 +1481,7 @@ let image_request script_name env =
       let _ = Image.print_image_file fname in true
   | _ ->
       let s = script_name in
-      if Util.start_with s 0 "images/" then
+      if Mutil.start_with "images/" 0 s then
         let i = String.length "images/" in
         let fname = String.sub s i (String.length s - i) in
         (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)

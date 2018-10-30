@@ -30,8 +30,6 @@ val iso_8859_1_of_utf_8 : string -> string
 val roman_of_arabian : int -> string
 val arabian_of_roman : string -> int
 
-val start_with : string -> string -> bool
-
 val compare_after_particle : string list -> string -> string -> int
 
 val input_lexicon :
@@ -46,3 +44,24 @@ module StrSet : Set.S with type elt = string
     so if [fn] have side effects it may not behave as excepted.
  *)
 val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
+
+(** [start_with ?wildcard prefix off str]
+    Test if [str] starts with [prefix] (at offset [off]).
+    If [wildcard] is set to [true], occurences of ['_'] in [prefix]
+    will match both ['_'] and [' '] in [str] and trailing ['_'] of [prefix]
+    is treated as an optional ['_'] [' '].
+
+    Raise [Invalid_argument] if [off] is not a valid index in [str].
+*)
+val start_with : ?wildcard:bool -> string -> int -> string -> bool
+
+(** [contains ?wildcard str sub] Test [sub] is contained in [str].
+    See {!val:start_with} for details about [wildcard]
+    (with [sub] in the role of [prefix]).
+*)
+val contains : ?wildcard:bool -> string -> string -> bool
+
+(** [get_particle particles name]
+    Return [p] where [p] is in [particles] and is prefix of [name].
+    If no such [p] exists, empty string [""] is returned. *)
+val get_particle : string list -> string -> string

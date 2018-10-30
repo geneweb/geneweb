@@ -136,7 +136,6 @@ val hexa_string : string -> string
 
 val surname_begin : base -> string -> string
 val surname_end : base -> string -> string
-val get_particle : base -> string -> string
 val old_surname_begin : string -> string
 val old_surname_end : string -> string
 
@@ -228,8 +227,6 @@ val has_nephews_or_nieces : config -> base -> person -> bool
 
 val browser_doesnt_have_tables : config -> bool
 
-val start_with : string -> int -> string -> bool
-
 val doctype : config -> string
 
 val begin_centered : config -> unit
@@ -296,8 +293,8 @@ val patch_cache_info : config -> string -> (string -> string) -> unit
 
 val real_nb_of_persons : config -> base -> int
 
-(* [array_mem_witn conf base ip array] checks if [ip] is in [array]
-   and returns corresponding [string_of_witness_kind] if so.  *)
+(** [array_mem_witn conf base ip array] checks if [ip] is in [array]
+    and returns corresponding [string_of_witness_kind] if so.  *)
 val array_mem_witn
  : Config.config
  -> Gwdb.base
@@ -305,22 +302,22 @@ val array_mem_witn
  -> (Def.iper * Def.witness_kind) array
  -> bool * string
 
-(* Print a date using "%4d-%02d-%02d %02d:%02d:%02d" format. *)
+(** Print a date using "%4d-%02d-%02d %02d:%02d:%02d" format. *)
 val fprintf_date : out_channel -> Unix.tm -> unit
 
-(* [name_key base name] is [name],
-   with particles put at the end of the string instead of the beginning. *)
+(** [name_key base name] is [name],
+    with particles put at the end of the string instead of the beginning. *)
 val name_key : Gwdb.base -> string -> string
 
-(* [nb_char_occ c s] return the number of times [c] appears in [s]. *)
+(** [nb_char_occ c s] return the number of times [c] appears in [s]. *)
 val nb_char_occ : char -> string -> int
 
-(* [filter_map fn list] is a combination of map and filter.
-   Not tail-recursive. *)
+(** [filter_map fn list] is a combination of map and filter.
+    Not tail-recursive. *)
 val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 
-(* [rev_iter fn list] is like [List.iter fn (List.rev list)].
-   Not tail-recursive. *)
+(** [rev_iter fn list] is like [List.iter fn (List.rev list)].
+    Not tail-recursive. *)
 val rev_iter : ('a -> unit) -> 'a list -> unit
 
 val print_version_commit : unit -> unit

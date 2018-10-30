@@ -3,15 +3,10 @@
 
 (**/**) (* Utils. *)
 
-let start_with s p =
-  String.length p <= String.length s &&
-    String.sub s 0 (String.length p) = p
-;;
-
 let skip_to_next_message ic =
   let rec loop () =
     let line = input_line ic in
-    if start_with line "    " then line else loop ()
+    if Mutil.start_with "    " 0 line then line else loop ()
   in loop ()
 ;;
 
@@ -168,7 +163,7 @@ let cut_all_msg s =
       in
       let not_msg =
         List.exists
-          (fun x -> start_with w x)
+          (fun x -> Mutil.start_with x 0 w)
           ["type="; "value="; "name="; "id="]
       in
       if not_msg then ()

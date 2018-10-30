@@ -280,27 +280,49 @@ let arabian_of_roman s =
 
 module StrSet = Set.Make (struct type t = string let compare = compare end)
 
-let start_with ini s =
-  let rec loop i j =
-    if i = String.length ini then true
-    else if j = String.length s then false
-    else if String.unsafe_get ini i = String.unsafe_get s j then
-      loop (i + 1) (j + 1)
+let start_with ?(wildcard = false) ini i s =
+  let inilen = String.length ini in
+  let strlen = String.length s in
+  if i < 0 || i > strlen then raise (Invalid_argument "start_with") ;
+  let rec loop i1 i2 =
+    if i1 = inilen then true
+    else if i2 = strlen
+    then
+      if wildcard && String.unsafe_get ini i1 = '_'
+      then loop (i1 + 1) i2 else false
+    else if String.unsafe_get s i2 = String.unsafe_get ini i1
+         || (wildcard && String.unsafe_get s i2 = ' ' && String.unsafe_get ini i1 = '_')
+    then loop (i1 + 1) (i2 + 1)
     else false
   in
-  loop 0 0
+  loop 0 i
 
-let get_particle s =
-  let rec loop =
-    function
-      part :: parts -> if start_with part s then part else loop parts
+let contains ?(wildcard = false) str sub =
+  let strlen = String.length str in
+  let sublen = String.length sub in
+  if not wildcard
+  then
+    let rec loop i =
+      if i + sublen < strlen
+      then start_with ~wildcard sub i str || loop (i + 1)
+      else false
+    in loop 0
+  else
+    let rec loop i =
+      i < strlen && (start_with ~wildcard sub i str || loop (i + 1))
+    in loop 0
+
+let get_particle list s =
+  let rec loop = function
+    | hd :: _ when start_with hd 0 s -> hd
+    | _ :: tl -> loop tl
     | [] -> ""
   in
-  loop
+  loop list
 
 let compare_after_particle particles s1 s2 =
-  let p1 = get_particle s1 particles in
-  let p2 = get_particle s2 particles in
+  let p1 = get_particle particles s1 in
+  let p2 = get_particle particles s2 in
   let rec loop i1 i2 =
     if i1 = String.length s1 && i2 = String.length s2 then compare p1 p2
     else if i1 = String.length s1 then -1

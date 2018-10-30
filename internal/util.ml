@@ -1005,39 +1005,22 @@ let old_surname_end n =
   let i = Mutil.initial n in
   if i = 0 then n else String.sub n i (String.length n - i)
 
-let start_with s i p =
-  i + String.length p <= String.length s &&
-  String.lowercase_ascii (String.sub s i (String.length p)) = p
-
-let start_with2 s i p =
-  i + String.length p <= String.length s &&
-  String.sub s i (String.length p) = p
-
-let get_particle base s =
-  let rec loop =
-    function
-    | hd :: _ when start_with2 (Name.lower s) 0 (Name.lower hd ^ " ") -> hd
-    | _ :: tl -> loop tl
-    | [] -> ""
-  in
-  loop (Gwdb.base_particles base)
-
 let name_key base s =
-  let part = get_particle base s in
+  let part = Mutil.get_particle (Gwdb.base_particles base) s in
   if part = "" then s
   else
     let i = String.length part in
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 
 let surname_begin base s =
-  let part = get_particle base s in
+  let part = Mutil.get_particle (Gwdb.base_particles base) s in
   let len = String.length part in
   if len = 0 then ""
   else if part.[len-1] = ' ' then " (" ^ String.sub part 0 (len - 1) ^ ")"
   else " (" ^ part ^ ")"
 
 let surname_end base s =
-  let part_len = String.length (get_particle base s) in
+  let part_len = String.length (Mutil.get_particle (Gwdb.base_particles base) s) in
   String.sub s part_len (String.length s - part_len)
 
 let rec skip_spaces s i =
@@ -1435,6 +1418,10 @@ let doctype conf =
        \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
 
 let http_string s i =
+  let start_with s i p =
+    i + String.length p <= String.length s &&
+    String.lowercase_ascii (String.sub s i (String.length p)) = p
+  in
   let http = "http://" in
   let https = "https://" in
   let (http, start_with_http) =
@@ -1619,6 +1606,10 @@ let expand_env =
     | _ -> s
 
 let string_with_macros conf env s =
+  let start_with s i p =
+    i + String.length p <= String.length s &&
+    String.lowercase_ascii (String.sub s i (String.length p)) = p
+  in
   let buff = Buffer.create 1000 in
   let rec loop tt i =
     if i < String.length s then
