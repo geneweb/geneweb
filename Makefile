@@ -240,6 +240,10 @@ distrib: distrib-exe
 
 ###### [END] Installation / Distribution section
 
+doc:
+	dune build @doc
+.PHONY: doc
+
 clean:
 	$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
 	$(RM) -r distribution
