@@ -32,15 +32,6 @@ type loc_token =
 
 exception Exc_located of loc * exn
 
-let is_substr substr str =
-  let str_len = String.length str in
-  let rec loop i =
-    if i = str_len then false
-    else if Mutil.start_with substr (String.sub str i (str_len - i)) then true
-    else loop (i + 1)
-  in
-  loop 0
-
 let raise_with_loc loc exc =
   match exc with
     Exc_located (_, _) -> raise exc
@@ -1049,7 +1040,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       begin match op with
         "and" -> VVbool (if bool e1 then bool e2 else false)
       | "or" -> VVbool (if bool e1 then true else bool e2)
-      | "is_substr" -> VVbool (is_substr (string e2) (string e1))
+      | "is_substr" -> VVbool (Mutil.contains (string e1) (string e2))
       | "=" -> VVbool (eval_expr ceva e1 = eval_expr ceva e2)
       | "<" -> VVbool (int e1 < int e2)
       | ">" -> VVbool (int e1 > int e2)

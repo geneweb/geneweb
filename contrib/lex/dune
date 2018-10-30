@@ -1,5 +1,5 @@
 (executable
  (name lex_utils)
- (libraries str)
+ (libraries str geneweb.internal)
 )
 

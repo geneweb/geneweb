@@ -6,7 +6,7 @@ open Gwdb
 
 let image_start_with_gallery img =
   let gallery = "http://www.geneanet.org/gallery/" in
-  Mutil.start_with gallery img
+  Mutil.start_with gallery 0 img
 
 let remove_image_everybody bname trace =
   let base = Gwdb.open_base bname in

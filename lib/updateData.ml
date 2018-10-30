@@ -645,55 +645,6 @@ let print_short conf list len =
 
 let max_results = 1000
 
-
-(* ********************************************************************* *)
-(*  [Fonc] print_mod : config -> base -> unit                            *)
-(** [Description] : Récupère la liste de toutes les "données" de la base
-                    et en fonction du nombre de résultats, fait un
-                    affichage court ou un afficahge long.
-    [Args] :
-      - conf : configuration
-      - base : base
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let print_mod_old conf base =
-  (* Paramètre pour savoir par quoi commence la chaine. *)
-  let ini =
-    match p_getenv conf.env "s" with
-      Some s -> s
-    | None -> ""
-  in
-  (* Astuce pour gérer les espaces. *)
-  let ini = Mutil.tr '_' ' ' ini in
-  let list = get_all_data conf base in
-  (* On fait un rev_map (tail-rec) parce que si le nombre de *)
-  (* données est trop important, on casser la pile d'appels. *)
-  let list = List.rev_map (fun (istr, s, k) -> sou base istr, s, k) list in
-  (* On tri la liste avant de la combiner *)
-  (* sinon on n'élimine pas les doublons. *)
-  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
-  (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
-  (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
-  (* les sources dans un seul index pour de meilleures performances.   *)
-  let list = combine list in
-  (* Fonction qui à une liste de données retourne la *)
-  (* liste de toutes les données commençant par ini. *)
-  let reduce l =
-    List.fold_left
-      (fun acc (data, k) ->
-         let data_tmp = Mutil.tr '_' ' ' data in
-         if Mutil.start_with ini data_tmp || data_tmp ^ " " = ini then
-           (data, k) :: acc
-         else acc)
-      [] l
-  in
-  let list = if ini <> "" then reduce list else list in
-  let len = List.length list in
-  if len > max_results then print_short conf list len
-  else print_long conf list len
-
-
 (* ************************************************************************** *)
 (*  [Fonc] reduce_cpl_list : int -> ('a, 'b list) list -> ('a, 'b list) list  *)
 (** [Description] : Retourne la sous liste telle que la somme des longueurs
@@ -1178,8 +1129,6 @@ let build_list conf base =
       Some s -> s
     | None -> ""
   in
-  (* Astuce pour gérer les espaces. *)
-  let ini = Mutil.tr '_' ' ' ini in
   let list = get_all_data conf base in
   (* ! rev_map  = tail-rec ! *)
   let list = List.rev_map (fun (istr, s, k) -> sou base istr, s, k) list in
@@ -1207,13 +1156,10 @@ let build_list conf base =
   (* Fonction qui à une liste de données retourne la *)
   (* liste de toutes les données commençant par ini. *)
   let reduce l =
-    List.fold_left
-      (fun acc (data, k) ->
-         let data_tmp = remove_suburb (Mutil.tr '_' ' ' data) in
-         if Mutil.start_with ini data_tmp || data_tmp ^ " " = ini then
-           (data, k) :: acc
-         else acc)
-      [] l
+    List.filter
+      (fun (data, _) ->
+         Mutil.start_with ~wildcard:true ini 0 @@ remove_suburb data)
+      l
   in
   if ini <> "" then reduce list else list
 
@@ -1517,25 +1463,22 @@ let print_foreach conf print_ast _eval_expr =
   print_foreach
 
 let print_mod conf base =
-  (* Pas forcément nécessaire mais bon ... On pourra faire le ménage après. *)
-  if p_getenv conf.env "old" = Some "on" then print_mod_old conf base
-  else
-    match p_getenv conf.env "data" with
-      Some ("place" | "src" | "occu" | "fn" | "sn") ->
-        let list = build_list conf base in
-        let env = ["list", Vlist_data list] in
-        Hutil.interp conf "upddata"
-          {Templ.eval_var = eval_var conf base;
-           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-           Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-           Templ.print_foreach = print_foreach conf}
-          env ()
-    | _ ->
-        Hutil.interp conf "upddatamenu"
-          {Templ.eval_var = (fun _ -> raise Not_found);
-           Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-           Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-           Templ.print_foreach = fun _ -> raise Not_found}
-          [] ()
+  match p_getenv conf.env "data" with
+  | Some ("place" | "src" | "occu" | "fn" | "sn") ->
+    let list = build_list conf base in
+    let env = ["list", Vlist_data list] in
+    Hutil.interp conf "upddata"
+      {Templ.eval_var = eval_var conf base;
+       Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
+       Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+       Templ.print_foreach = print_foreach conf}
+      env ()
+  | _ ->
+    Hutil.interp conf "upddatamenu"
+      {Templ.eval_var = (fun _ -> raise Not_found);
+       Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
+       Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+       Templ.print_foreach = fun _ -> raise Not_found}
+      [] ()

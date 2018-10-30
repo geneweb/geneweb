@@ -1645,10 +1645,6 @@ let separate_slashed_filename s =
   in
   loop 0
 
-let start_with s x =
-  let slen = String.length s in
-  let xlen = String.length x in slen >= xlen && String.sub s 0 xlen = x
-
 let end_with s x =
   let slen = String.length s in
   let xlen = String.length x in
@@ -1768,7 +1764,9 @@ let setup_comm_ok conf =
       end
 
   | x ->
-      if start_with x "doc/" || start_with x "images/" || start_with x "css/"
+      if Mutil.start_with "doc/" 0 x
+      || Mutil.start_with "images/" 0 x
+      || Mutil.start_with "css/" 0 x
       then
         raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"")
