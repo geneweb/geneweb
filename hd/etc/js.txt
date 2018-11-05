@@ -1,14 +1,15 @@
-<!-- $Id: js.txt, v7.00 10/04/2018 08:57:17 $ -->
+<!-- $Id: js.txt, v7.00 05/06/2019 04:17:29 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"
-      integrity="sha384-pjaaA8dDz/5BgdFUPX6M/9SUZv4d12SUPF0axWc+VRZkx5xU3daN+lYb49+Ax+Tl" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+      integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o" crossorigin="anonymous"></script>
   %else;
-    <script src=%if;(cgi)%bvar.static_path;%end;js/jquery.min.js></script>
-    <script src=%if;(cgi)%bvar.static_path;%end;js/bootstrap.bundle.min.js></script>
+    <script src=%if;(cgi)%bvar.static_path;%end;js/jquery.min.js?version=3.4.1></script>
+    <script src=%if;(cgi)%bvar.static_path;%end;js/bootstrap.bundle.min.js?version=4.1.3></script>
   %end;
+  %if;(evar.m!="MOD_DATA")
   <script>
     $('#load_once_p_mod').one('click', function() {
       $.getScript('%if;(cgi)%bvar.static_path;%end;js/p_mod.js');
@@ -17,6 +18,7 @@
       $.getScript('%if;(cgi)%bvar.static_path;%end;js/copylink.js');
     });
   </script>
+  %end;
   %if;wizard;
     %if;(evar.m="MOD_DATA_OK" and evar.data!="")
       <script>
@@ -33,37 +35,38 @@
        or evar.m="CHG_EVT_IND_ORD_OK" or evar.m="CHG_EVT_FAM_ORD_OK"
        or evar.m="CHG_CHN_OK"
        or (evar.m="MOD_DATA_OK" and evar.data=""))
-    <script>
-      var htmlTitle = document.title;
-      if (htmlTitle == "[*person modified]" ||
-          htmlTitle == "[*person added]"    ||
-          htmlTitle == "[*image received]"  ||
-          htmlTitle == "[*image deleted]"   ||
-          htmlTitle == "[*modification successful]") {
-          document.getElementById("i%evar.i;").focus();
-      }
-      else if (htmlTitle == "[*family modified]" ||
-               htmlTitle == "[*family added]"    ||
-               htmlTitle == "[*family deleted]"  ||
-               htmlTitle == "[*children's names changed]") {
-          document.getElementById("i%evar.ip;").focus();
-      }
-    </script>
+      <script>
+        var htmlTitle = document.title;
+        if (htmlTitle == "[*person modified]" ||
+            htmlTitle == "[*person added]"    ||
+            htmlTitle == "[*image received]"  ||
+            htmlTitle == "[*image deleted]"   ||
+            htmlTitle == "[*modification successful]") {
+            document.getElementById("i%evar.i;").focus();
+        }
+        else if (htmlTitle == "[*family modified]" ||
+                 htmlTitle == "[*family added]"    ||
+                 htmlTitle == "[*family deleted]"  ||
+                 htmlTitle == "[*children's names changed]") {
+            document.getElementById("i%evar.ip;").focus();
+        }
+      </script>
+    %end;
+    %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
+    or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
+    or evar.m="ADD_FAM" or evar.m="ADD_PAR" or evar.m="ADD_FAM_OK")
+      <script>$('body').scrollspy({ target: '#banner' })</script>
     %end;
   %end;
 %end;
 %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
-  or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
-  or evar.m="ADD_FAM" or evar.m="ADD_PAR" or evar.m="ADD_FAM_OK"
-  or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
+    or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
+    or evar.m="ADD_FAM" or evar.m="ADD_PAR" or evar.m="ADD_FAM_OK" or evar.m="MOD_NOTES" or (evar.m="MOD_DATA" and evar.data="source"))
   %if;(bvar.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
-      integrity="sha256-dW8u4dvEKDThJpWRwLgGugbARnA3O2wqBcVerlg9LMc=" crossorigin="anonymous"></script>
+      integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
   %else;
-     <script src=%if;(cgi)%bvar.static_path;%end;js/autosize.min.js></script>
+     <script src=%if;(cgi)%bvar.static_path;%end;js/autosize.min.js?version=4.0.2></script>
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
-  %if;(evar.templ="")
-    <script>$('body').scrollspy({ target: '#banner' })</script>
-  %end;
 %end;

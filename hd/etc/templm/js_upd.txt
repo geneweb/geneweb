@@ -4,7 +4,7 @@
   <script src="%if;(cgi)%bvar.static_path;%end;templm/js_upd_jq_no.js"></script>
 %else;
   <script src="%if;(cgi)%bvar.static_path;%end;templm/js_upd_jq.js"></script>
-  <script src="%if;(cgi)%bvar.static_path;%end;css/jquery.min.js"></script>
+  <script src="%if;(cgi)%bvar.static_path;%end;js/jquery.min.js"></script>
 %end;
 %if;(bvar.uppercase = "yes")
   <script>
