@@ -294,7 +294,8 @@ val patch_cache_info : config -> string -> (string -> string) -> unit
 val real_nb_of_persons : config -> base -> int
 
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
-    and returns corresponding [string_of_witness_kind] if so.  *)
+    and returns corresponding [string_of_witness_kind] if so.
+*)
 val array_mem_witn
  : Config.config
  -> Gwdb.base
@@ -306,18 +307,44 @@ val array_mem_witn
 val fprintf_date : out_channel -> Unix.tm -> unit
 
 (** [name_key base name] is [name],
-    with particles put at the end of the string instead of the beginning. *)
+    with particles put at the end of the string instead of the beginning.
+*)
 val name_key : Gwdb.base -> string -> string
 
 (** [nb_char_occ c s] return the number of times [c] appears in [s]. *)
 val nb_char_occ : char -> string -> int
 
 (** [filter_map fn list] is a combination of map and filter.
-    Not tail-recursive. *)
+    Not tail-recursive.
+*)
 val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 
 (** [rev_iter fn list] is like [List.iter fn (List.rev list)].
-    Not tail-recursive. *)
+    Not tail-recursive.
+*)
 val rev_iter : ('a -> unit) -> 'a list -> unit
 
+(** [print_version_commit]
+    Print geneweb version and commit number on stdout and exit.
+*)
 val print_version_commit : unit -> unit
+
+(** [group_by ~key ~value list]
+    Group the elements returning the same key together.
+    Ordering of elements is unspecified.
+ *)
+val groupby : key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list
+
+(** [str_replace ?unsafe c ~by str]
+    Return a new string which is the same as [str] with all occurences of [c]
+    replaced by [by].
+    If [str] does not contain [c]. [str] is returned intouched.
+
+    If [unsafe] is set to true, [str] is modified instead of a copy of [str].
+ *)
+val str_replace : ?unsafe:bool -> char -> by:char -> string -> string
+
+(** [str_sub ?pad s start len]
+    Return a fresh UTF8-friendly substring of [len] characters, padded if needed.
+*)
+val str_sub : ?pad:char -> string -> int -> int -> string

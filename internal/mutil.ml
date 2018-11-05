@@ -173,7 +173,7 @@ let tr c1 c2 s =
   | Some _ ->
     String.init
       (String.length s)
-      (fun i -> if String.unsafe_get s i = c1 then c2 else s.[i])
+      (fun i -> let c = String.unsafe_get s i in if c = c1 then c2 else c)
   | None -> s
 
 let utf_8_of_iso_8859_1 str =

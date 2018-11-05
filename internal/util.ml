@@ -3596,4 +3596,43 @@ let rec rev_iter fn = function
 
 let print_version_commit () =
   Printf.eprintf "GeneWeb %s, commit %s\n" Version.txt Compilation.commit;
-  exit 0;
+  exit 0
+
+let groupby ~key ~value list =
+  let h = Hashtbl.create (List.length list) in
+  List.iter
+    (fun x ->
+       let k = key x in
+       let v = value x in
+       if Hashtbl.mem h k then Hashtbl.replace h k (v :: Hashtbl.find h k)
+       else Hashtbl.add h k [v])
+    list ;
+  Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
+
+(* FIXME: merge this en Mutil.tr *)
+let str_replace ?(unsafe = false) c ~by str =
+  match String.rindex_opt str c with
+  | None -> str
+  | Some _ ->
+    let bytes = Bytes.(if unsafe then unsafe_of_string else of_string) str in
+    for i = 0 to Bytes.length bytes - 1 do
+      if Bytes.unsafe_get bytes i = c then Bytes.unsafe_set bytes i by
+    done ;
+    Bytes.(if unsafe then unsafe_to_string else to_string) bytes
+
+let str_sub ?pad str start len =
+  let strlen = String.length str in
+  let n, i =
+    let rec loop n i =
+      if n = len || strlen = i then (n, i)
+      else loop (n + 1) (index_of_next_char str i)
+    in
+    loop 0 start
+  in
+  if n = len then String.sub str start (i - start)
+  else match pad with
+    | None -> raise (Invalid_argument "str_sub")
+    | Some pad ->
+      let bytes = Bytes.make (i - start + len - n) pad in
+      Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str) ;
+      Bytes.unsafe_to_string bytes
