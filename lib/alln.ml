@@ -8,57 +8,24 @@ open Util
 let default_max_cnt = 2000
 
 (* tools *)
+let ini len k =
+  let ini_k = Util.str_sub ~pad:'_' k 0 len in
+  (* ini_k is "a fresh string": we can use unsafe. *)
+  Util.str_replace ~unsafe:true ' ' ~by:'_' ini_k
 
-let combine_by_ini ini list =
-  let list =
-    let rec loop new_list =
-      function
-        [] -> new_list
-      | (k, s, cnt) :: list ->
-          let ini_k =
-            if String.length k > String.length ini then
-              String.sub k 0 (index_of_next_char k (String.length ini))
-            else k ^ String.make (String.length ini + 1 - String.length k) '_'
-          in
-          let ini_k = Bytes.unsafe_of_string ini_k in
-          for i = 0 to Bytes.length ini_k - 1 do
-            if Bytes.get ini_k i = ' ' then Bytes.set ini_k i '_'
-          done;
-          let ini_k = Bytes.unsafe_to_string ini_k in
-          let new_list =
-            if ini_k = "_" then new_list
-            else
-              match new_list with
-                [] -> [ini_k, [s, cnt]]
-              | (ini_k1, l) :: ll ->
-                  if ini_k1 = ini_k then (ini_k1, (s, cnt) :: l) :: ll
-                  else (ini_k, [s, cnt]) :: (ini_k1, l) :: ll
-          in
-          loop new_list list
-    in
-    loop [] list
-  in
-  List.fold_left (fun new_l (ini_k, l) -> (ini_k, List.rev l) :: new_l) []
-    list
+let groupby_ini len list =
+  list
+  |> Util.groupby
+    ~key:(fun (k, _, _) -> ini len k)
+    ~value:(fun (_, s, c) -> (s, c))
+  |> List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b)
 
-let combine_by_count list =
-  let list =
-    let rec loop new_list =
-      function
-        [] -> new_list
-      | (_, s, cnt) :: list ->
-          let new_list =
-            match new_list with
-              [] -> [cnt, [s]]
-            | (cnt1, l) :: ll ->
-                if cnt1 = cnt then (cnt1, s :: l) :: ll
-                else (cnt, [s]) :: (cnt1, l) :: ll
-          in
-          loop new_list list
-    in
-    loop [] list
-  in
-  List.fold_left (fun new_l (cnt, l) -> (cnt, List.rev l) :: new_l) [] list
+let groupby_count list =
+  list
+  |> Util.groupby
+    ~key:(fun (_, _, c) -> c)
+    ~value:(fun (_, s, _) -> s)
+  |> List.sort (fun (a, _) (b, _) -> compare b a)
 
 let alphab_string base is_surname s =
   if is_surname then
@@ -83,16 +50,16 @@ let print_title conf base is_surnames ini len =
     Wserver.printf " (%d %s)" (Util.real_nb_of_persons conf base)
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
 
-let displayify s =
-  let rec loop i len =
-    if i = String.length s then Buff.get len
-    else
-      let nbc = Name.nbc s.[i] in
-      if nbc < 0 || i + nbc > String.length s then
-        Buff.get (Buff.mstore len "...")
-      else loop (i + nbc) (Buff.gstore len s i nbc)
-  in
-  loop 0 0
+let displayify s = s
+  (* let rec loop i len =
+   *   if i = String.length s then Buff.get len
+   *   else
+   *     let nbc = Name.nbc s.[i] in
+   *     if nbc < 0 || i + nbc > String.length s then
+   *       Buff.get (Buff.mstore len "...")
+   *     else loop (i + nbc) (Buff.gstore len s i nbc)
+   * in
+   * loop 0 0 *)
 
 let tr c1 s2 s =
   let rec loop i len =
@@ -326,21 +293,10 @@ let select_names conf base is_surnames ini need_whole_list =
   in
   list, len
 
-let compare2 s1 s2 =
-  Gutil.alphabetic_utf_8 s1 s2
-
 let print_frequency conf base is_surnames =
   let () = load_strings_array base in
   let (list, len) = select_names conf base is_surnames "" true in
-  let list =
-    List.sort
-      (fun (k1, _, cnt1) (k2, _, cnt2) ->
-         if cnt1 > cnt2 then -1
-         else if cnt1 < cnt2 then 1
-         else compare2 k1 k2)
-      list
-  in
-  let list = combine_by_count list in
+  let list = groupby_count list in
   print_frequency_any conf base is_surnames list len
 
 let print_alphabetic conf base is_surnames =
@@ -367,15 +323,13 @@ let print_alphabetic conf base is_surnames =
       in
       loop [] 0 'Z'
     else
-      let (list, len) = select_names conf base is_surnames ini all in
-      let list = List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list in
-      list, len
+      select_names conf base is_surnames ini all 
   in
   if fast then
     let list = List.map (fun (s, _, _) -> s, 1) list in
     print_alphabetic_big conf base is_surnames ini list 1 true
   else if len >= 50 || ini = "" then
-    let list = combine_by_ini ini list in
+    let list = groupby_ini (String.length ini + 1) list in
     if all then
       if len > default_max_cnt then Hutil.incorrect_request conf
       else print_alphabetic_all conf base is_surnames ini list len
@@ -438,8 +392,7 @@ let print_short conf base is_surnames =
   let (list, len) = select_names conf base is_surnames ini true in
   if len > default_max_cnt then Hutil.incorrect_request conf
   else
-    let list = List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list in
-    let list = combine_by_ini ini list in
+    let list = groupby_ini (String.length ini + 1) list in
     print_alphabetic_short conf base is_surnames ini list len
 
 (* main *)
