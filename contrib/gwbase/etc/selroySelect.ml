@@ -39,7 +39,7 @@ let parents_has_titles base p =
       has_titles base (poi base (get_mother cpl))
   | None -> false
 
-let gen_good_dates base p birth_lim death_lim =
+let gen_good_dates p birth_lim death_lim =
   let death_ok =
     match get_death p with
       Death (_, cd) ->
@@ -56,13 +56,13 @@ let gen_good_dates base p birth_lim death_lim =
     | _ -> false
 
 let good_dates base p =
-  if gen_good_dates base p 1830 1900 then true
+  if gen_good_dates p 1830 1900 then true
   else
     match get_parents p with
       Some ifam ->
         let cpl = foi base ifam in
-        gen_good_dates base (poi base (get_father cpl)) 1780 1800 ||
-        gen_good_dates base (poi base (get_mother cpl)) 1780 1800
+        gen_good_dates (poi base (get_father cpl)) 1780 1800 ||
+        gen_good_dates (poi base (get_mother cpl)) 1780 1800
     | None -> false
 
 let rec select_closure base per_tab fam_tab flag ip =
@@ -90,7 +90,7 @@ let rec select_closure base per_tab fam_tab flag ip =
     done;
     ()
 
-let functions base anc desc surnames no_spouses_parents _ _ _ _ =
+let functions base _ _ _ _ _ _ _ _ =
   let per_tab = Array.make (nb_of_persons base) 0 in
   let fam_tab = Array.make (nb_of_families base) 0 in
   for i = 0 to nb_of_persons base - 1 do

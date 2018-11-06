@@ -12,7 +12,7 @@ let update_database_with_burial base =
     let p = poi base (Adef.iper_of_int i) in
     let evt_birth =
       match Adef.od_of_cdate (get_birth p) with
-        Some d -> None
+        Some _ -> None
       | None ->
           if sou base (get_birth_place p) <> "" then None
           else if sou base (get_birth_src p) = "" then None
@@ -27,7 +27,7 @@ let update_database_with_burial base =
     in
     let evt_bapt =
       match Adef.od_of_cdate (get_baptism p) with
-        Some d -> None
+        Some _ -> None
       | None ->
           if sou base (get_baptism_place p) <> "" then None
           else if sou base (get_baptism_src p) = "" then None
