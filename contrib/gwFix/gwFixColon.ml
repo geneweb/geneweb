@@ -1,7 +1,9 @@
 open Geneweb
 open Gwdb
 
-let check_name base nb_ind fix =
+let check bname =
+  let base = Gwdb.open_base bname in
+  let nb_ind = nb_of_persons base in
   Printf.printf "Check colon\n";
   flush stdout;
   for i = 0 to nb_ind - 1 do
@@ -16,16 +18,6 @@ let check_name base nb_ind fix =
         flush stdout
       end
   done
-
-
-let check bname =
-  let base = Gwdb.open_base bname in
-  let fix = ref false in
-  let nb_ind = nb_of_persons base in
-  check_name base nb_ind fix;
-  if !fix then Gwdb.commit_patches base
-  else begin Printf.printf "No change\n"; flush stdout end
-
 
 (**/**)
 

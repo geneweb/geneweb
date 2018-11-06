@@ -48,7 +48,7 @@ let person_link bname base iper target =
       (Adef.int_of_iper iper) target (person_string base iper)
   else person_string base iper
 
-let print_message base1 base2 msg =
+let print_message base1 msg =
   Printf.printf " ";
   begin match msg with
     MsgBadChild iper1 ->
@@ -89,12 +89,12 @@ let print_f_messages base1 base2 ifam1 ifam2 res =
     (person_link !in_file1 base1 (get_mother f1) "base1") !cr
     (person_link !in_file2 base2 (get_father f2) "base2")
     (person_link !in_file2 base2 (get_father f2) "base2") !cr;
-  List.iter (print_message base1 base2) res
+  List.iter (print_message base1) res
 
 let print_p_messages base1 base2 iper1 iper2 res =
   Printf.printf "%s / %s%s" (person_link !in_file1 base1 iper1 "base1")
     (person_link !in_file2 base2 iper2 "base2") !cr;
-  List.iter (print_message base1 base2) res
+  List.iter (print_message base1) res
 
 let compatible_names src_name dest_name_list =
   let src_name = Name.lower src_name in
@@ -138,15 +138,15 @@ let dmy_to_sdn_range_l dmy =
       let (sdn1, sdn2) = sdn_of_dmy dmy in
       let delta = (sdn2 - sdn1 + 1) * 5 in
       [Some (sdn1 - delta), Some (sdn2 + delta)]
-  | Before -> let (sdn1, sdn2) = sdn_of_dmy dmy in [None, Some sdn2]
-  | After -> let (sdn1, sdn2) = sdn_of_dmy dmy in [Some sdn1, None]
+  | Before -> let (_sdn1, sdn2) = sdn_of_dmy dmy in [None, Some sdn2]
+  | After -> let (sdn1, _sdn2) = sdn_of_dmy dmy in [Some sdn1, None]
   | OrYear dmy2 ->
       let (sdn11, sdn12) = sdn_of_dmy dmy in
       let (sdn21, sdn22) = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
       [Some sdn11, Some sdn12; Some sdn21, Some sdn22]
   | YearInt dmy2 ->
-      let (sdn11, sdn12) = sdn_of_dmy dmy in
-      let (sdn21, sdn22) = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
+      let (sdn11, _sdn12) = sdn_of_dmy dmy in
+      let (_sdn21, sdn22) = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
       [Some sdn11, Some sdn22]
 
 let compatible_sdn (sdn11, sdn12) (sdn21, sdn22) =
@@ -197,7 +197,7 @@ let compatible_cdates cdate1 cdate2 =
   | Some _, None -> false
   | None, _ -> true
 
-let compatible_birth base1 base2 p1 p2 =
+let compatible_birth p1 p2 =
   let get_birth person =
     if person.birth = Adef.cdate_None then person.baptism else person.birth
   in
@@ -212,7 +212,7 @@ let compatible_birth base1 base2 p1 p2 =
   in
   res1 @ res2
 
-let compatible_death base1 base2 p1 p2 =
+let compatible_death p1 p2 =
   let bool1 =
     p1.death = p2.death ||
     (match p1.death, p2.death with
@@ -232,10 +232,10 @@ let compatible_death base1 base2 p1 p2 =
   in
   res1 @ res2
 
-let compatible_sexes base1 base2 p1 p2 =
+let compatible_sexes p1 p2 =
   if p1.sex = p2.sex then [] else [MsgSex]
 
-let compatible_occupations base1 base2 p1 p2 =
+let compatible_occupations p1 p2 =
   if compatible_str_field p1.occupation p2.occupation then []
   else [MsgOccupation]
 
@@ -252,9 +252,9 @@ let compatible_persons_ligth base1 base2 p1 p2 =
 
 let compatible_persons base1 base2 p1 p2 =
   compatible_persons_ligth base1 base2 p1 p2 @
-  compatible_sexes base1 base2 p1 p2 @ compatible_birth base1 base2 p1 p2 @
-  compatible_death base1 base2 p1 p2 @
-  compatible_occupations base1 base2 p1 p2
+  compatible_sexes p1 p2 @ compatible_birth p1 p2 @
+  compatible_death p1 p2 @
+  compatible_occupations p1 p2
 
 let rec find_compatible_persons_ligth base1 base2 iper1 iper2_list =
   match iper2_list with
@@ -348,7 +348,7 @@ let rec ddiff base1 base2 iper1 iper2 d_tab =
     let spouse f iper =
       if iper = get_father f then get_mother f else get_father f
     in
-    let rec udiff base1 base2 iper1 iper2 r ifam1 ifam2 =
+    let udiff base1 base2 iper1 iper2 ifam1 ifam2 =
       let fd b1 b2 ip2_list ip1 =
         match find_compatible_persons_ligth b1 b2 ip1 ip2_list with
           [ip2] -> ddiff base1 base2 ip1 ip2 d_tab
@@ -373,7 +373,7 @@ let rec ddiff base1 base2 iper1 iper2 d_tab =
           compatible_marriages b1 b2 ifam1 ifam2;
           compatible_parents b1 b2 (spouse (foi base1 ifam1) iper1)
             (spouse (foi base2 ifam2) iper2);
-          udiff b1 b2 iper1 iper2 true ifam1 ifam2
+          udiff b1 b2 iper1 iper2 ifam1 ifam2
       | [] ->
           print_p_messages base1 base2 iper1 iper2
             [MsgSpouseMissing (spouse (foi base1 ifam1) iper1)]

@@ -44,7 +44,7 @@ let glop = ref 0
 (**)
 
 let mark_cnt = ref 0
-let number_of_desc base mark ip p =
+let number_of_desc base mark p =
   incr mark_cnt;
   let curr_mark = !mark_cnt in
   let rec loop nb_list nb new_gen =
@@ -92,9 +92,9 @@ let nb_desc bname date =
   ProgrBar.start ();
   ignore
     (apply base date nb_ind
-       (fun cnt ip p ->
+       (fun cnt _ip p ->
           ProgrBar.run cnt nb_liv;
-          let nb_list = number_of_desc base mark ip p in
+          let nb_list = number_of_desc base mark p in
           nb_desc :=
             let rec loop l1 l2 =
               match l1, l2 with
@@ -105,7 +105,7 @@ let nb_desc bname date =
             loop !nb_desc nb_list) :
      int);
   ProgrBar.finish ();
-  let (nb_gen, nb_tot) =
+  let (_nb_gen, nb_tot) =
     List.fold_left
       (fun (nb_gen, nb_tot) nb_at_gen ->
          Printf.printf "nombre moyen de descendants à la génération %2d :" nb_gen;
