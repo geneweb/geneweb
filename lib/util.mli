@@ -348,3 +348,13 @@ val str_replace : ?unsafe:bool -> char -> by:char -> string -> string
     Return a fresh UTF8-friendly substring of [len] characters, padded if needed.
 *)
 val str_sub : ?pad:char -> string -> int -> int -> string
+
+(** [ls_rs dirs]
+    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
+*)
+val ls_r : string list -> string list
+
+(** [rm_rf dir]
+    Remove directory [dir] and everything inside [dir].
+*)
+val rm_rf : string -> unit

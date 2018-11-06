@@ -3636,3 +3636,21 @@ let str_sub ?pad str start len =
       let bytes = Bytes.make (i - start + len - n) pad in
       Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str) ;
       Bytes.unsafe_to_string bytes
+
+let ls_r dirs =
+  let rec loop result = function
+    | f :: fs when Sys.is_directory f ->
+      Sys.readdir f
+      |> Array.to_list
+      |> List.rev_map (Filename.concat f)
+      |> List.rev_append fs
+      |> loop (f :: result)
+    | f :: fs -> loop (f :: result) fs
+    | [] -> result
+  in
+  loop [] dirs
+
+let rm_rf dir =
+  let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
+  List.iter Unix.unlink files ;
+  List.iter Unix.rmdir directories

@@ -18,11 +18,11 @@ let oldest_year_of p =
   | NotDead -> None
   | death -> match Adef.od_of_cdate (get_birth p) with
     | Some (Dgreg (d, _)) -> Some d.year
-    | None -> match Adef.od_of_cdate (get_baptism p) with
+    | _ -> match Adef.od_of_cdate (get_baptism p) with
       | Some (Dgreg (d, _)) -> Some d.year
-      | None -> match CheckItem.date_of_death death with
+      | _ -> match CheckItem.date_of_death death with
         | Some (Dgreg (d, _)) -> Some d.year
-        | None -> None
+        | _ -> None
 
 (**
    If [NotDead], return [None].
@@ -34,11 +34,11 @@ let most_recent_year_of p =
   | NotDead -> None
   | death -> match CheckItem.date_of_death death with
     | Some (Dgreg (d, _)) -> Some d.year
-    | None -> match Adef.od_of_cdate (get_baptism p) with
+    | _ -> match Adef.od_of_cdate (get_baptism p) with
       | Some (Dgreg (d, _)) -> Some d.year
-      | None -> match Adef.od_of_cdate (get_birth p) with
+      | _ -> match Adef.od_of_cdate (get_birth p) with
         | Some (Dgreg (d, _)) -> Some d.year
-        | None -> None
+        | _ -> None
 
 let nb_gen_by_century = 3
 
@@ -172,10 +172,11 @@ let public_some bname treshold key =
     match Gutil.person_of_string_dot_key base key with
     | Some ip ->
       let p = poi base ip in
-      if get_access p <> Private then
+      if get_access p <> Private then begin
         let p = {(gen_person_of_person p) with access = Private} in
-        patch_person base p.key_index p ;
-        commit_patches base
+        patch_person base p.key_index p
+      end ;
+      commit_patches base
     | None ->
       Printf.eprintf "Bad key %s\n" key; flush stderr; exit 2
 
@@ -195,7 +196,7 @@ let speclist =
 let anonfun i = bname := i
 let usage = "Usage: public1 [-everybody] [-mem] [-y #] [-ind key] base"
 
-let main () =
+let () =
   Arg.parse speclist anonfun usage;
   if !bname = "" then begin Arg.usage speclist usage ; exit 2 end ;
   Secure.set_base_dir (Filename.dirname !bname);

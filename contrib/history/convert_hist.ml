@@ -150,51 +150,30 @@ let convert_file file tmp_file =
   | None -> ()
 
 let convert history_dir =
-  (* Récupère tous les fichiers et dossier d'un dossier et   *)
-  (* renvoie la liste des dossiers et la liste des fichiers. *)
-  let read_files_folders fname =
-    let list =
-      List.map (fun file -> Filename.concat fname file)
-        (Array.to_list (Sys.readdir fname))
-    in
-    List.partition Sys.is_directory list
+  let files =
+    Util.ls_r [ history_dir ]
+    |> List.filter (fun x -> not @@ Sys.is_directory x)
   in
-  (* Parcours récursif de tous les dossiers *)
-  let rec loop l folders files =
-    match l with
-      [] -> folders, files
-    | x :: l ->
-        let (fd, fi) = read_files_folders x in
-        let l = List.rev_append l fd in
-        let folders = List.rev_append fd folders in
-        let files = List.rev_append fi files in loop l folders files
-  in
-  (* Toute l'arborescence du dossier history_d *)
-  let (folders, files) = loop [history_dir] [] [] in
   let len = List.length files in
   ProgrBar.start ();
-  begin let rec loop i files =
-    match files with
-      [] -> ()
+  let rec loop i = function
+    | [] -> ()
     | file :: l ->
-        let tmp_file = file ^ ".new" in
-        convert_file file tmp_file;
-        (try Sys.rename file (file ^ "~") with Sys_error _ -> ());
-        (try Sys.rename tmp_file file with Sys_error _ -> ());
-        ProgrBar.run i len;
-        loop (i + 1) l
+      let tmp_file = file ^ ".new" in
+      convert_file file tmp_file;
+      Sys.rename file (file ^ "~");
+      Sys.rename tmp_file file;
+      ProgrBar.run i len;
+      loop (i + 1) l
   in
-    loop 0 files
-  end;
+  loop 0 files ;
   ProgrBar.finish ()
-
-
 
 (**/**) (* main *)
 
 let history_dir = ref ""
 
-let speclist = [] 
+let speclist = []
 let anonfun n = history_dir := n
 let usage = "Usage: convert_hist history_dir (the history_d folder)"
 

@@ -2,7 +2,7 @@ open Geneweb
 open Def
 open Gwdb
 
-let fix_date_text bname trace =
+let fix_date_text bname =
   let base = Gwdb.open_base bname in
   let space_to_unders = Mutil.tr ' ' '_' in
   for i = 0 to nb_of_persons base - 1 do
@@ -175,16 +175,15 @@ let fix_date_text bname trace =
   commit_patches base
 
 let bname = ref ""
-let trace = ref false
 
-let speclist = ["-t", Arg.Set trace, "trace changed persons"]
+let speclist = []
 let anonfun i = bname := i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " base"
 
 let main () =
   Arg.parse speclist anonfun usage;
   if !bname = "" then begin Arg.usage speclist usage; exit 2 end;
-  fix_date_text !bname !trace
+  fix_date_text !bname
 
 let _ = main ()
 

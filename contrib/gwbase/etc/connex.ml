@@ -14,7 +14,6 @@ let ask_for_delete = ref 0
 let cnt_for_delete = ref 0
 let exact = ref false
 let gwd_port = ref 2317
-let bname = ref ""
 let server = ref "127.0.0.1"
 
 let rec merge_families ifaml1f ifaml2f =
@@ -116,15 +115,15 @@ let print_family base basename ifam =
   Printf.printf "  - %s\n"
     (wiki_designation base basename (poi base (get_mother fam)))
 
-let kill_family base fam ip =
+let kill_family base ip =
   let u = {family = Array.of_list []} in patch_union base ip u
 
 let kill_parents base ip =
   let a = {parents = None; consang = Adef.fix (-1)} in patch_ascend base ip a
 
 let effective_del base (ifam, fam) =
-  kill_family base fam (get_father fam);
-  kill_family base fam (get_mother fam);
+  kill_family base (get_father fam);
+  kill_family base (get_mother fam);
   Array.iter (kill_parents base) (get_children fam);
   Gwdb.delete_family base ifam
 
