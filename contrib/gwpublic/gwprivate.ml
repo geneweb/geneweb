@@ -1,5 +1,4 @@
 open Geneweb
-open Gwaccess
 
 let list_ind = ref ""
 let ind = ref ""

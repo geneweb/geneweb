@@ -121,32 +121,6 @@ let mkdir_p x =
   in
   loop x
 
-let rmdir conf dir =
-  (* Récupère tous les fichiers et dossier d'un dossier         *)
-  (* et renvoie la liste des dossiers et la liste des fichiers. *)
-  let read_files_folders fname =
-    let list =
-      List.map (fun file -> Filename.concat fname file)
-        (Array.to_list (Sys.readdir fname))
-    in
-    List.partition Sys.is_directory list
-  in
-  (* Parcours récursif de tous les dossiers *)
-  let rec loop l folders files =
-    match l with
-      [] -> folders, files
-    | x :: l ->
-        let (fd, fi) = read_files_folders x in
-        let l = List.rev_append l fd in
-        let folders = List.rev_append fd folders in
-        let files = List.rev_append fi files in loop l folders files
-  in
-  (* Toute l'arborescence de dir *)
-  let (folders, files) = loop [dir] [] [] in
-  List.iter (fun f -> try Unix.unlink f with _ -> ()) files;
-  List.iter (fun f -> try Unix.rmdir f with _ -> ()) folders;
-  try Unix.rmdir dir with Unix.Unix_error (_, _, _) -> ()
-
 let rec cut_at_equal s =
   try
     let i = String.index s '=' in
@@ -361,7 +335,7 @@ let delete_base conf bname =
     (btn_ok#connect#clicked
        (fun () ->
           let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-          rmdir conf base; wnd#destroy ()));
+          Util.rm_rf base; wnd#destroy ()));
   wnd#show ()
 
 

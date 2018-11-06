@@ -3,7 +3,7 @@
 open Geneweb
 open Gwdb
 
-let consmoy bname base =
+let consmoy base =
   let cons = ref 0.0 in
   for i = 0 to nb_of_persons base - 1 do
     let p = poi base (Adef.iper_of_int i) in
@@ -19,6 +19,6 @@ let speclist = []
 
 let main () =
   Argl.parse speclist (fun s -> bname := s) usage;
-  let base = Gwdb.open_base !bname in consmoy !bname base
+  let base = Gwdb.open_base !bname in consmoy base
 
 let _ = Printexc.print main ()
