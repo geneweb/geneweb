@@ -58,13 +58,10 @@ size=\"40\" maxlength=\"200\" id=\"%s_sn\" value=\"%s\">\n" var var surname;
   Wserver.printf "</tbody>\n";
   Wserver.printf "</table>\n"
 
-let select_children_of base u =
-  List.fold_right
-    (fun ifam ipl ->
-       let des = foi base ifam in
-       List.fold_right (fun ip ipl -> ip :: ipl)
-         (Array.to_list (get_children des)) ipl)
-    (Array.to_list (get_family u)) []
+let select_children_of base p =
+  Array.fold_right
+    (fun ifam -> Array.fold_right List.cons (get_children @@ foi base ifam) )
+    (get_family p) []
 
 let digest_children base ipl =
   let l =
