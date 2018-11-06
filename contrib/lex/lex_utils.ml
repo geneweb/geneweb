@@ -26,41 +26,14 @@ let get_all_versions ic =
 
 (**/**) (* Missing or unused translation. *)
 
-let get_files dir =
-  (* Récupère tous les fichiers et dossier d'un dossier         *)
-  (* et renvoie la liste des dossiers et la liste des fichiers. *)
-  let read_files_folders fname =
-    let list =
-      List.map
-        (fun file -> Filename.concat fname file)
-        (Array.to_list (Sys.readdir fname))
-    in
-    List.partition Sys.is_directory list
-  in
-  (* Parcours récursif de tous les dossiers *)
-  let rec loop l folders files =
-    match l with
-    | [] -> (folders, files)
-    | x :: l ->
-        let (fd, fi) = read_files_folders x in
-        let l = List.rev_append l fd in
-        let folders = List.rev_append fd folders in
-        let files = List.rev_append fi files in
-        loop l folders files
-  in
-  (* Toute l'arborescence de dir *)
-  let (folders, files) = loop [dir] [] [] in
-  (folders, files)
-;;
-
 let get_ml_files repo =
-  let (folders, files) = get_files repo in
-  List.filter (fun x -> Filename.check_suffix x ".ml") files
+  Util.ls_r [repo]
+  |> List.filter (fun x -> Filename.check_suffix x ".ml")
 ;;
 
 let get_tpl_files repo =
-  let (folders, files) = get_files repo in
-  List.filter (fun x -> Filename.check_suffix x ".txt") files
+  Util.ls_r [repo]
+  |> List.filter (fun x -> Filename.check_suffix x ".txt")
 ;;
 
 (* Récupère tous les identifiants de message de lexicon. *)
