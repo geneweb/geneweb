@@ -9,9 +9,7 @@ let line_tpl = "0000-00-00 00:00:00 xx ."
 let person_of_line_exists base line =
   let i = try String.index line ']' + 2 with Not_found -> 20 in
   let key = String.sub line (i + 3) (String.length line - i - 3) in
-  match person_ht_find_all base key with
-    [ip] -> true
-  | _ -> false
+  match person_ht_find_all base key with [_] -> true | _ -> false
 
 let histselect bname base =
   let () = load_strings_array base in

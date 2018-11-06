@@ -125,7 +125,7 @@ let country_of_person base p =
       | "de Roumanie" -> "ROM"
       | "de Suède" -> "SWE"
       | "" -> ""
-      | x ->
+      | _ ->
           (* do Printf.eprintf "%s\n" x; flush stderr; return *)
           ""
       end
