@@ -157,7 +157,7 @@ and eval_simple_var conf base env p =
             let wit =
               List.fold_right
                 (fun (w, wk) accu ->
-                   (Util.string_of_witness_kind conf p wk ^ ": " ^
+                   (Util.string_of_witness_kind conf (get_sex p) wk ^ ": " ^
                     Util.person_text conf base (poi base w)) ::
                    accu)
                 (Array.to_list e.epers_witnesses) []
