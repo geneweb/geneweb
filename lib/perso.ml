@@ -5440,7 +5440,7 @@ let print_foreach conf base print_ast eval_expr =
           Mutil.list_iter_first
             (fun first (ip, wk) ->
                let p = pget conf base ip in
-               let wk = Util.string_of_witness_kind conf p wk in
+               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
                let env = ("event_witness", Vind p) :: env in
                let env = ("event_witness_kind", Vstring wk) :: env in
                let env = ("first", Vbool first) :: env in
