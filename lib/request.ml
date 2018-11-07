@@ -250,7 +250,7 @@ let family_m conf base =
           | _ -> handler.incorrect_request
         end
 #endif
-      | _ -> handler.incorrect_request
+      | unknown -> handler.fallback unknown
   in
   p handler conf base
 

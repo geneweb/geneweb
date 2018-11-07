@@ -447,6 +447,7 @@ and handler =
   ; api_stats : handler_base
   ; api_add_first_fam : handler_nobase
 #endif
+  ; fallback : string -> handler_base
   }
 
 (*** Handlers ***)
@@ -625,6 +626,7 @@ let dummyHandler =
   ; api_stats = dummy_base
   ; api_add_first_fam = dummy_nobase
 #endif
+  ; fallback = dummy_base
   }
 
 let person_selected self conf base p =
@@ -1489,5 +1491,9 @@ let defaultHandler : handler =
     end
 
 #endif
+
+  ; fallback = begin fun _mode self conf base ->
+      self.incorrect_request self conf base
+    end
 
   }
