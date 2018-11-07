@@ -174,7 +174,11 @@ val string_of_pevent_name :
   config -> base -> istr gen_pers_event_name -> string
 val string_of_fevent_name :
   config -> base -> istr gen_fam_event_name -> string
-val string_of_witness_kind : config -> person -> witness_kind -> string
+
+(** [string_of_witness_kind conf sex wk]
+    Return the string corresponding to wk according to [sex] and [conf].
+*)
+val string_of_witness_kind : config -> sex -> witness_kind -> string
 
 val relation_txt :
   config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format

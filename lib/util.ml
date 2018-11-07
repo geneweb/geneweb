@@ -1122,12 +1122,12 @@ let string_of_fevent_name conf base efam_name =
   | Efam_Residence -> transl conf "residence"
   | Efam_Name n -> sou base n
 
-let string_of_witness_kind conf p witness_kind =
+let string_of_witness_kind conf sex witness_kind =
   match witness_kind with
     Witness -> transl_nth conf "witness/witness/witnesses" 0
   | Witness_Officer -> transl_nth conf "officer/officer/officers" 0
   | Witness_GodParent ->
-      let n = index_of_sex (get_sex p) in
+      let n = index_of_sex sex in
       transl_nth conf "godfather/godmother/godparents" n
 
 let base_path pref bname =
@@ -3568,7 +3568,7 @@ let array_mem_witn conf base x a =
   let rec loop i =
     if i = Array.length a then (false, "")
     else if x = fst a.(i)
-    then (true, string_of_witness_kind conf (poi base x) (snd a.(i)))
+    then (true, string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
     else loop (i + 1)
   in
   loop 0
