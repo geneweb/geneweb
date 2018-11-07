@@ -447,15 +447,14 @@ and handler =
   ; api_stats : handler_base
   ; api_add_first_fam : handler_nobase
 #endif
+  ; fallback : string -> handler_base
   }
 
 (*** Handlers ***)
 
 let dummyHandler =
   let dummy_base = fun _ _ _ -> assert false in
-#ifdef API
   let dummy_nobase = fun _ _ -> assert false in
-#endif
   { unknown = begin fun _ _ -> assert false end
   ; very_unknown = dummy_base
   ; incorrect_request = dummy_base
@@ -625,6 +624,7 @@ let dummyHandler =
   ; api_stats = dummy_base
   ; api_add_first_fam = dummy_nobase
 #endif
+  ; fallback = fun _ -> dummy_nobase
   }
 
 let person_selected self conf base p =
@@ -1489,5 +1489,9 @@ let defaultHandler : handler =
     end
 
 #endif
+
+  ; fallback = begin fun _mode self conf base ->
+      self.incorrect_request self conf base
+    end
 
   }
