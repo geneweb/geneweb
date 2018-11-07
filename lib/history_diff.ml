@@ -553,7 +553,7 @@ let string_of_event_witness conf base witnesses =
     List.fold_right
       (fun (ip, wk) accu ->
          let witn = person_of_iper conf base ip in
-         let kind = Util.string_of_witness_kind conf (poi base ip) wk in
+         let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
          if witn = "" then (kind ^ ": " ^ witn) :: accu else accu)
       (Array.to_list witnesses) []
   in
