@@ -1014,7 +1014,8 @@ let particle s i =
 
 let look_like_a_number s =
   let rec loop i =
-    if i = String.length s then true
+    if i < 0 then assert false
+    else if i >= String.length s then true
     else
       match s.[i] with
         '0'..'9' -> loop (i + 1)
@@ -1028,12 +1029,12 @@ let is_a_name_char =
   | c -> Char.code c > 127
 
 let rec next_word_pos s i =
-  if i = String.length s then i
+  if i >= String.length s then i
   else if is_a_name_char s.[i] then i
   else next_word_pos s (i + 1)
 
 let rec next_sep_pos s i =
-  if i = String.length s then String.length s
+  if i >= String.length s then String.length s
   else if is_a_name_char s.[i] then next_sep_pos s (i + 1)
   else i
 
@@ -1042,16 +1043,18 @@ let public_name_word =
 
 let rec is_a_public_name s i =
   let i = next_word_pos s i in
-  if i = String.length s then false
-  else
+  i < String.length s
+  && begin
     let j = next_sep_pos s i in
-    if j > i then
+    j > i
+    && begin
       let w = String.sub s i (j - i) in
-      if look_like_a_number w then true
-      else if is_roman_int w && s.[j] <> '.' then true
-      else if List.mem w public_name_word then true
-      else is_a_public_name s j
-    else false
+      (look_like_a_number w)
+      || (is_roman_int w && j < String.length s && s.[j] <> '.')
+      || (List.mem w public_name_word)
+      || (is_a_public_name s j)
+    end
+  end
 
 let gen_lowercase_uppercase_utf8_letter lower s =
   (* liste des code hexa correspondant à l'encodage du caractère e. *)
@@ -1974,7 +1977,7 @@ let add_indi gen r =
               if pn = "" && !extract_public_names then
                 if is_a_public_name f j then fn, f, fal
                 else if !extract_first_names then fn, "", f :: fal
-                else f, "", fal
+                else  f, "", fal
               else fn, pn, f :: fal
           else f, pn, fal
         in
@@ -1997,7 +2000,7 @@ let add_indi gen r =
         incr r; f, s, !r, pn, fal
     | None -> "?", "?", Adef.int_of_iper ip, givn, []
   in
-  (* S'il y a des caractères interdits, on les supprime *)
+(* S'il y a des caractères interdits, on les supprime *)
   let (first_name, surname) =
     Name.strip_c first_name ':', Name.strip_c surname ':'
   in
@@ -2090,7 +2093,6 @@ let add_indi gen r =
         in
         if ro <> None then find_all_rela ["godf"; "godm"; "godp"] rasso
         else []
-
       else godparents
     in
     let rec loop rl =
@@ -3020,17 +3022,17 @@ let pass2 gen fname =
            else
              let p = person_with_related p (ip :: get_related p) in
              gen.g_per.arr.(Adef.int_of_iper ipp) <- Right3 (p, a, u)
-       | _ -> ())
+       | _ -> () )
     gen.g_godp;
   List.iter
     (fun (ipp, ip) ->
        match gen.g_per.arr.(Adef.int_of_iper ipp) with
          Right3 (p, a, u) ->
-           if List.mem ip (get_related p) then ()
-           else
-             let p = person_with_related p (ip :: get_related p) in
-             gen.g_per.arr.(Adef.int_of_iper ipp) <- Right3 (p, a, u)
-       | _ -> ())
+         if List.mem ip (get_related p) then ()
+         else
+           let p = person_with_related p (ip :: get_related p) in
+           gen.g_per.arr.(Adef.int_of_iper ipp) <- Right3 (p, a, u)
+       | _ -> () )
     gen.g_prelated;
   close_in ic
 
