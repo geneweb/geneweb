@@ -56,6 +56,7 @@ ALL_EXE = \
 	contrib/history/is_gw_plus \
 	contrib/lex/lex_utils \
 	contrib/misc/lower_string \
+	contrib/oneshot/jsonExport \
 	contrib/oneshot/gwRemoveImgGallery \
 	contrib/oneshot/gwBaseCompatiblePlus \
 	contrib/oneshot/gwFixDateText \
