@@ -749,7 +749,6 @@ let anc_2nd = ref ""
 let desc_1st = ref ""
 let desc_occ = ref 0
 let desc_2nd = ref ""
-
 type arg_state =
   ASnone | ASwaitAncOcc | ASwaitAncSurn | ASwaitDescOcc | ASwaitDescSurn
 let arg_state = ref ASnone
@@ -795,6 +794,7 @@ let speclist =
    "-nopicture", Arg.Set no_picture, ": Don't extract individual picture.";
    "-picture-path", Arg.Set picture_path, ": Extract pictures path.";
    "-indexes", Arg.Set with_indexes, ": Export indexes in gedcom.";
+   "-version", Arg.Unit Util.print_version_commit, ": print version and commit numbers.";
    "-c", Arg.Int (fun i -> censor := i),
    "<num> :\n     \
     When a person is born less than <num> years ago, it is not exported \

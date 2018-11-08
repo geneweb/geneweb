@@ -3602,3 +3602,7 @@ let rec filter_map fn = function
 let rec rev_iter fn = function
   | [] -> ()
   | hd :: tl -> let () = rev_iter fn tl in fn hd
+
+let print_version_commit () =
+  Printf.eprintf "GeneWeb %s, commit %s\n" Version.txt Compilation.commit;
+  exit 0;

@@ -322,3 +322,5 @@ val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 (* [rev_iter fn list] is like [List.iter fn (List.rev list)].
    Not tail-recursive. *)
 val rev_iter : ('a -> unit) -> 'a list -> unit
+
+val print_version_commit : unit -> unit
