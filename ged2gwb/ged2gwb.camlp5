@@ -3675,6 +3675,8 @@ let speclist =
   ["-o", Arg.String (fun s -> out_file := s),
    "<file>\n       Output database (default: \"a\").";
    "-f", Arg.Set force, "\n       Remove database if already existing";
+   "-version", Arg.Unit Util.print_version_commit,
+   "\n       Print version and commit numbers";
    "-log", Arg.String (fun s -> log_oc := open_out s),
    "<file>\n       Redirect log trace to this file.";
    "-lf", Arg.Set lowercase_first_names,
@@ -3746,7 +3748,7 @@ let speclist =
    ^ string_of_int !alive_years ^ " and y is " ^ string_of_int !dead_years;
    "-uin", Arg.Set untreated_in_notes,
    " - Untreated in notes -\n       Put untreated GEDCOM tags in notes";
-   "-ds", Arg.String (fun s -> default_source := s), 
+   "-ds", Arg.String (fun s -> default_source := s),
    " - Default source -\n       \
     Set the source field for persons and families without source data";
    "-dates_dm", Arg.Unit (fun () -> month_number_dates := DayMonthDates),
