@@ -13,7 +13,7 @@ EXE=
 OS_TYPE=
 
 API=
-API_DEP=
+API_DEP="yojson"
 
 while [[ $# -ne 0 ]]; do
   case $1 in
