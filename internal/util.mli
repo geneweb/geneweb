@@ -5,7 +5,7 @@ open Config
 open Def
 open Gwdb
 
-val add_lang_path : string -> unit
+val add_gw_path : string -> unit
 val set_base_dir : string -> unit
 val cnt_dir : string ref
 val image_prefix : config -> string
@@ -13,7 +13,7 @@ val base_path : string list -> string -> string
 
 val find_misc_file : string -> string
 
-val search_in_lang_path : string -> string
+val search_in_gw_path : string -> string
 
 val etc_file_name : config -> string -> string
 

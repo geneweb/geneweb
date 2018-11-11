@@ -116,14 +116,14 @@ let lang_file_name conf fname =
   in
   if Sys.file_exists fname1 then fname1
   else
-    search_in_lang_path
+    search_in_gw_path
       (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
 
 let any_lang_file_name fname =
   let fname1 = Util.base_path ["lang"] (Filename.basename fname ^ ".txt") in
   if Sys.file_exists fname1 then fname1
   else
-    search_in_lang_path
+    search_in_gw_path
       (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
 
 let source_file_name conf fname =
@@ -568,7 +568,7 @@ let print conf base fname =
 
 let print_lexicon conf _base =
   let title _ = Wserver.printf "Lexicon" in
-  let fname = search_in_lang_path (Filename.concat "lang" "lex_utf8.txt") in
+  let fname = search_in_gw_path (Filename.concat "lang" "lex_utf8.txt") in
   Hutil.header conf title;
   begin match (try Some (Secure.open_in fname) with Sys_error _ -> None) with
     Some ic ->

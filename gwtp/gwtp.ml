@@ -307,7 +307,7 @@ let mk_passwd size =
 (* Base configuration *)
 
 let get_base_conf b =
-  let fname = Filename.concat !gwtp_dst (b ^ ".gwf") in
+  let fname = Filename.concat !gwtp_dst (Filename.concat (b ^ ".gwb") "params.gwf") in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
       let (variables, files) = variables () in
@@ -361,8 +361,8 @@ let get_base_conf b =
   | None -> ["friend_passwd", mk_passwd 9; "wizard_passwd", mk_passwd 9], []
 
 let set_base_conf b varenv =
-  let fname = Filename.concat !gwtp_dst (b ^ ".gwf") in
-  let fname_out = Filename.concat !gwtp_dst (b ^ "1.gwf") in
+  let fname = Filename.concat !gwtp_dst (Filename.concat (b ^ ".gwb") "params.gwf") in
+  let fname_out = Filename.concat !gwtp_dst (Filename.concat (b ^ ".gwb") "params1.gwf") in
   let fname_saved = fname ^ "~" in
   let varenv = List.map (fun (k, v) -> k, v, ref false) varenv in
   let rec extract line =
@@ -653,7 +653,7 @@ let gwtp_send_gedcom env b t =
   | _ -> gwtp_invalid_request ()
 
 let gwtp_upload_gedcom env b tok =
-  let bcnf = Filename.concat !gwtp_dst (b ^ ".gwf") in
+  let bcnf = Filename.concat !gwtp_dst (Filename.concat (b ^ ".gwb") "params.gwf") in
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
     begin
@@ -861,7 +861,7 @@ let gwtp_setconf env b tok =
   Printf.printf "</body>\n"
 
 let gwtp_upload env b tok =
-  let bcnf = Filename.concat !gwtp_dst (b ^ ".gwf") in
+  let bcnf = Filename.concat !gwtp_dst (Filename.concat (b ^ ".gwb") "params.gwf") in
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
     begin
@@ -872,8 +872,8 @@ let gwtp_upload env b tok =
     end
 
 let gwtp_download env b tok =
-  let bcnf = Filename.concat !gwtp_dst (b ^ ".gwf") in
   let bdir = Filename.concat !gwtp_dst (b ^ ".gwb") in
+  let bcnf = Filename.concat bdir "params.gwf" in
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
     begin
@@ -935,7 +935,8 @@ let gwtp_main env b tok =
   crlf ();
   crlf ();
   copy_template env ([], []) ['b', Val b; 't', Val tok; 'w', Val !gw_site]
-    ['c', Sys.file_exists (Filename.concat !gwtp_dst (b ^ ".gwf"));
+    ['c', Sys.file_exists (Filename.concat !gwtp_dst
+          (Filename.concat (b ^ ".gwb") "params.gwf"));
      'g', Sys.file_exists (Filename.concat !gwtp_etc "ged2gwb");
      'w', !gw_site <> ""]
     "main"

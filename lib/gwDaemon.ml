@@ -201,19 +201,23 @@ let input_lexicon lang =
   let ht = Hashtbl.create 501 in
   let fname = Filename.concat "lang" "lex_utf8.txt" in
   Mutil.input_lexicon lang ht
-    (fun () -> Secure.open_in (Util.search_in_lang_path fname));
+    (fun () -> Secure.open_in (Util.search_in_gw_path fname));
   ht
 
-let add_lexicon fname lang ht =
-  let fname = Filename.concat "lang" fname in
+let add_lexicon bname fname lang ht =
+  let fname1 = Filename.concat (Util.search_in_gw_path "lang") fname in
+  let fname2 = Filename.concat (Util.base_path [] (bname ^".gwb"))
+     (Filename.concat "lang" fname)
+  in
   Mutil.input_lexicon lang ht
-    (fun () -> Secure.open_in (Util.search_in_lang_path fname))
+    (fun () -> if Sys.file_exists fname1 then Secure.open_in fname1
+      else Secure.open_in fname2)
 
 let alias_lang lang =
   if String.length lang < 2 then lang
   else
     let fname =
-      Util.search_in_lang_path (Filename.concat "lang" "alias_lg.txt")
+      Util.search_in_gw_path (Filename.concat "lang" "alias_lg.txt")
     in
     try
       let ic = Secure.open_in fname in
@@ -254,7 +258,9 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env bname =
-  let fname = Util.base_path [] (bname ^ ".gwf") in
+  let t1 = Util.base_path [] "" in
+  let fname = Util.base_path [] (Filename.concat (bname ^ ".gwb") "params.gwf") in
+  let _ = Printf.eprintf "read_base_env: %s, %s, %s\n" t1 bname fname in
   try
     let ic = Secure.open_in fname in
     let env =
@@ -1149,7 +1155,7 @@ let make_conf from_addr request script_name env =
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
   List.iter
     (fun fname ->
-       add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
+       add_lexicon base_file fname (if lang = "" then default_lang else lang) lexicon)
     !lexicon_list;
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
@@ -1820,8 +1826,8 @@ let main ~speclist () =
   in
   let force_cgi = ref false in
   let speclist =
-    ("-hd", Arg.String Util.add_lang_path,
-     "<dir>\n       Directory where the directory lang is installed.") ::
+    ("-gw", Arg.String Util.add_gw_path,
+     "<dir>\n       Directory gw where the directory etc or lang are installed.") ::
     ("-bd", Arg.String Util.set_base_dir,
      "<dir>\n       Directory where the databases are installed.") ::
     ("-wd", Arg.String make_cnt_dir,
@@ -1984,7 +1990,7 @@ let main ~speclist () =
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
-        Util.search_in_lang_path (Filename.concat !images_dir "gwback.jpg")
+        Util.search_in_gw_path (Filename.concat !images_dir "gwback.jpg")
       in
       let d = Filename.dirname f in
       if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
