@@ -1242,6 +1242,14 @@ let etc_file_name conf fname =
     "" -> default_templ config_templ std_fname
   | s -> s
 
+(*  Search for files in this order:
+    - in the bases folder (bases/etc/fname.txt)
+    - in the distribution folder (gw/etc/fname.txt)
+    The files searched for are:
+      summary, robot, copyr, toolbar, accent, renamed, redirect, index, moved
+    We are missing the conf argument to make it fully similar to open_templ
+    Note that we are forbidding subfolders (subfolder/filename.txt)
+*)
 let open_etc_file fname =
   let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
   let fname2 =
@@ -1251,12 +1259,29 @@ let open_etc_file fname =
   try Some (Secure.open_in fname1) with
     Sys_error _ -> try Some (Secure.open_in fname2) with Sys_error _ -> None
 
+(*  Similar to open_etc_files
+    The files searched for are:
+      fonts, js, css ...
+*)
+let find_misc_file fname =
+  let base_tpl_dir = Filename.concat (base_path ["etc"] "") fname in
+  let etc_tpl_dir = Filename.concat (search_in_gw_path "etc") fname in
+  if Sys.file_exists base_tpl_dir then base_tpl_dir
+  else if Sys.file_exists etc_tpl_dir then etc_tpl_dir
+  else ""
+
 let open_hed_trl conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
     Sys_error _ -> None
 
 let open_templ conf fname =
-  try Some (Secure.open_in (etc_file_name conf fname)) with
+  let full_fn = etc_file_name conf fname in
+  (* to trace full name of template files. Whish one could print it to Wserver!
+  let _ = Printf.eprintf "<!-- %s -->\n" full_fn in
+  let _ = flush stderr in
+  *)
+  try Some (Secure.open_in full_fn)
+  with
     Sys_error _ ->
       if true then
         let std_fname =
@@ -1266,35 +1291,6 @@ let open_templ conf fname =
       else None
 
 let image_prefix conf = conf.image_prefix
-
-
-(*
-   On cherche le fichier dans cet ordre :
-    - dans la base (bases/etc/name.txt)
-    - dans le répertoire des programmes (gw/etc/name.txt)
-*)
-let find_misc_file name =
-  let base_tpl_dir = Filename.concat (base_path ["etc"] "") name in
-  let etc_tpl_dir = Filename.concat (search_in_gw_path "etc") name in
-  if Sys.file_exists base_tpl_dir then base_tpl_dir
-  else if Sys.file_exists etc_tpl_dir then etc_tpl_dir
-  else ""
-
-(* Code mort. Géré par le css
-value default_background conf =
-  Printf.sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
-;
-
-value default_body_prop conf =
-  let style =
-    match p_getenv conf.env "size" with
-    [ Some v -> "font-size:" ^ v ^ "&"
-    | None -> "" ]
-  in
-  let style = Printf.sprintf "%s%s" style (default_background conf) in
-  " style=\"" ^ style ^ "\""
-;
-   Code mort. Géré par le css *)
 
 let body_prop conf =
   try
@@ -2306,24 +2302,44 @@ let string_of_decimal_num conf f =
   in
   loop 0
 
-let personal_image_file_name bname str =
-  Filename.concat (base_path ["portraits"] (bname ^ ".gwb")) str
+let personal_image_file_name bname str = (* portraits *)
+  let fname1 = List.fold_right Filename.concat [base_path [] (bname ^ ".gwb");
+    "portraits"] str in (* new org *)
+  let fname2 =   Filename.concat (base_path ["images"] bname) str in (* old *)
+  if Sys.file_exists fname1 then fname1
+  else if Sys.file_exists fname2 then fname2
+  else ""
 
-let source_image_file_name bname str =
+
+let source_image_file_name bname str = (* documents *)
   let fname1 =
-    List.fold_right Filename.concat [base_path ["docs"] (bname ^ ".gwb"); "images"] str
+    List.fold_right Filename.concat [base_path [] (bname ^ ".gwb");
+    "portraits"] str (* new org *)
   in
   let fname2 =
-    List.fold_right Filename.concat [Secure.base_dir (); "docs"; "images"] str
+    List.fold_right Filename.concat [base_path ["src"] bname; "images"] str (* old *)
   in
-  if Sys.file_exists fname1 then fname1 else fname2
-
-let image_file_name str =
-  let fname1 =
-    List.fold_right Filename.concat [Secure.base_dir (); "portraits"] str
+  let fname3 =
+    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str (* old *)
   in
   if Sys.file_exists fname1 then fname1
-  else search_in_gw_path (Filename.concat "images" str)
+  else if Sys.file_exists fname2 then fname2
+  else if Sys.file_exists fname3 then fname3
+  else ""
+
+let image_file_name str = (* portraits and icons *)
+  let fname1 =
+    List.fold_right Filename.concat [Secure.base_dir (); "portraits"] str (* new org *)
+  in
+  let fname2 =
+    List.fold_right Filename.concat [Secure.base_dir (); "images"] str (* old *)
+  in
+  let fname3 = search_in_gw_path (Filename.concat "images" str) in (* old *)
+  if Sys.file_exists fname1 then fname1
+  else if Sys.file_exists fname2 then fname2
+  else if Sys.file_exists fname3 then fname3
+  else ""
+
 
 let png_image_size ic =
   let magic = really_input_string ic 4 in
@@ -2672,7 +2688,7 @@ let image_and_size conf base p image_size =
             Some p when p <> "" -> Some (false, p ^ s, size)
           | _ ->
               let fname = personal_image_file_name conf.bname s in
-              if Sys.file_exists fname then
+              if fname <> "" then
                 Some (true, fname, image_size fname None)
               else None
         else None

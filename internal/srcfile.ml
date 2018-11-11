@@ -21,7 +21,8 @@ let get_date conf =
 
 let adm_file f = List.fold_right Filename.concat [!(Util.cnt_dir); "cnt"] f
 
-let cnt conf ext = adm_file (conf.bname ^ ext)
+let cnt conf ext = List.fold_right Filename.concat [!(Util.cnt_dir);
+  (conf.bname ^ ".gwb"); "cnt"] ("counts" ^ ext)
 
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0

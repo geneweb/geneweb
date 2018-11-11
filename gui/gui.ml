@@ -1035,7 +1035,7 @@ and launch_server conf =
   (try Sys.remove stop_server with Sys_error _ -> ());
   let prog = Filename.concat bin_dir "gwd" in
   let args =
-    ["-hd"; share_dir; "-bd"; conf.bases_dir; "-lang"; !lang; "-p";
+    ["-gw"; share_dir; "-bd"; conf.bases_dir; "-lang"; !lang; "-p";
      Printf.sprintf "%d" conf.port]
   in
   let server_pid = exec prog args gwd_log gwd_log in

@@ -205,13 +205,15 @@ let input_lexicon lang =
   ht
 
 let add_lexicon bname fname lang ht =
-  let fname1 = Filename.concat (Util.search_in_gw_path "lang") fname in
-  let fname2 = Filename.concat (Util.base_path [] (bname ^".gwb"))
-     (Filename.concat "lang" fname)
+  let fname1 = Filename.concat (Util.search_in_gw_path "lang") fname in (* distrib *)
+  let fname2 = Filename.concat (Util.base_path ["lang"] fname) fname in (* site *)
+  let fname3 = Filename.concat (Util.base_path [] (bname ^ ".gwb"))
+     (Filename.concat "lang" fname) (* base *)
   in
   Mutil.input_lexicon lang ht
     (fun () -> if Sys.file_exists fname1 then Secure.open_in fname1
-      else Secure.open_in fname2)
+      else if Sys.file_exists fname2 then Secure.open_in fname2
+      else Secure.open_in fname3)
 
 let alias_lang lang =
   if String.length lang < 2 then lang
@@ -258,9 +260,7 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env bname =
-  let t1 = Util.base_path [] "" in
   let fname = Util.base_path [] (Filename.concat (bname ^ ".gwb") "params.gwf") in
-  let _ = Printf.eprintf "read_base_env: %s, %s, %s\n" t1 bname fname in
   try
     let ic = Secure.open_in fname in
     let env =
