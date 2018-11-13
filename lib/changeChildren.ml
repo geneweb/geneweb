@@ -228,7 +228,7 @@ let error_person conf err =
   raise Update.ModErr
 
 let rename_image_file conf base p (nfn, nsn, noc) =
-  match auto_image_file conf base p with
+  match auto_image_file conf base p "" with
     Some old_f ->
       let s = default_image_name_of_key nfn nsn noc in
       let f = List.fold_right

@@ -208,17 +208,24 @@ val has_image : config -> base -> person -> bool
 val image_file_name : string -> string
 val source_image_file_name : config -> string -> string
 
+val has_keydir : config -> base -> person -> bool
+val keydir : config -> base -> person -> string option
+val get_keydir : config -> base -> person -> string list
+val get_keydir_old : config -> base -> person -> string list
+val out_keydir_img_notes : config -> base -> person -> string -> string -> unit
+val get_keydir_img_notes : config -> base -> person -> string -> string
+
 val image_size : string -> (int * int) option
 val limited_image_size :
   int -> int -> string -> (int * int) option -> (int * int) option
 val image_and_size :
-  config -> base -> person ->
+  config -> base -> person -> string ->
     (string -> (int * int) option -> (int * int) option) ->
     (bool * string * (int * int) option) option
 
 val default_image_name_of_key : string -> string -> int -> string
 val default_image_name : base -> person -> string
-val auto_image_file : config -> base -> person -> string option
+val auto_image_file : config -> base -> person -> string -> string option
 
 val only_printable : string -> string
 val only_printable_or_nl : string -> string

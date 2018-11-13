@@ -308,7 +308,6 @@ and handler =
   ; dag : handler_base
   ; del_fam : handler_base
   ; del_fam_ok : handler_base
-  ; del_image : handler_base
   ; del_image_ok : handler_base
   ; del_ind : handler_base
   ; del_ind_ok : handler_base
@@ -321,12 +320,14 @@ and handler =
   ; forum_search : handler_base
   ; forum_val : handler_base
   ; forum_view : handler_base
+  ; reset_image_ok : handler_base
   ; h : handler_base
   ; hist : handler_base
   ; hist_clean : handler_base
   ; hist_clean_ok : handler_base
   ; hist_diff : handler_base
   ; hist_search : handler_base
+  ; image : handler_base
   ; imh : handler_base
   ; inv_fam : handler_base
   ; inv_fam_ok : handler_base
@@ -372,9 +373,8 @@ and handler =
   ; rl : handler_base
   ; rlm : handler_base
   ; s : handler_base
-  ; snd_image : handler_base
-  ; snd_image_ok : handler_base
   ; src : handler_base
+  ; snd_image_ok : handler_base
   ; stat : handler_base
   ; change_wiz_vis : handler_base
   ; tt : handler_base
@@ -486,7 +486,6 @@ let dummyHandler =
   ; dag = dummy_base
   ; del_fam = dummy_base
   ; del_fam_ok = dummy_base
-  ; del_image = dummy_base
   ; del_image_ok = dummy_base
   ; del_ind = dummy_base
   ; del_ind_ok = dummy_base
@@ -499,12 +498,14 @@ let dummyHandler =
   ; forum_search = dummy_base
   ; forum_val = dummy_base
   ; forum_view = dummy_base
+  ; reset_image_ok = dummy_base
   ; h = dummy_base
   ; hist = dummy_base
   ; hist_clean = dummy_base
   ; hist_clean_ok = dummy_base
   ; hist_diff = dummy_base
   ; hist_search = dummy_base
+  ; image = dummy_base
   ; imh = dummy_base
   ; inv_fam = dummy_base
   ; inv_fam_ok = dummy_base
@@ -550,7 +551,6 @@ let dummyHandler =
   ; rl = dummy_base
   ; rlm = dummy_base
   ; s = dummy_base
-  ; snd_image = dummy_base
   ; snd_image_ok = dummy_base
   ; src = dummy_base
   ; stat = dummy_base
@@ -817,13 +817,8 @@ let defaultHandler : handler =
       else self.incorrect_request self conf base
     end
 
-  ; del_image = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print_del conf base
-      else self.incorrect_request self conf base
-    end
-
   ; del_image_ok = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print_del_ok conf base
+      if conf.wizard && conf.can_send_image then SendImage.print conf base
       else self.incorrect_request self conf base
     end
 
@@ -859,6 +854,11 @@ let defaultHandler : handler =
 
   ; forum_view = if_enabled_forum Forum.print
 
+  ; reset_image_ok = begin fun self conf base ->
+      if conf.wizard && conf.can_send_image then SendImage.print conf base
+      else self.incorrect_request self conf base
+    end
+
   ; h = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some f -> Srcfile.print conf base f
@@ -885,6 +885,17 @@ let defaultHandler : handler =
 
   ; hist_search = begin fun _self conf base ->
       History.print_search conf base
+    end
+
+  ; image = begin fun self conf base ->
+      if conf.wizard && conf.can_send_image then SendImage.print conf base
+      else self.incorrect_request self conf base
+    end
+
+  ; snd_image_ok = begin fun self conf base ->
+      if conf.wizard && conf.can_send_image then SendImage.print conf base
+      else
+        self.incorrect_request self conf base
     end
 
   ; imh = begin fun _self conf _base ->
@@ -1163,16 +1174,6 @@ let defaultHandler : handler =
 
   ; s = begin fun self conf base ->
       SearchName.print conf base specify self.unknown
-    end
-
-  ; snd_image = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print conf base
-      else self.incorrect_request self conf base
-    end
-
-  ; snd_image_ok = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print_send_ok conf base
-      else self.incorrect_request self conf base
     end
 
   ; src = begin fun _self conf base ->

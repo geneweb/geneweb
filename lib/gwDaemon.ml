@@ -1533,8 +1533,6 @@ let print_misc_file misc_fname =
   match misc_fname with
     Css fname | Js fname | Otf fname | Svg fname | Woff fname | Eot fname |
     Ttf fname | Woff2 fname ->
-      let _ = Printf.eprintf "Print_misc_file: %s\n" fname in
-      let _ = flush stderr in
       begin
         try
           let ic = Secure.open_in_bin fname in
@@ -1556,8 +1554,6 @@ let print_misc_file misc_fname =
 
 let misc_request fname =
   let fname = Util.gw_etc_file fname in
-  let _ = Printf.eprintf "Misc_request: %s\n" fname in
-  let _ = flush stderr in
   if fname <> "" then
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
@@ -1582,6 +1578,26 @@ let strip_quotes s =
   in
   String.sub s i0 (i1 - i0)
 
+let rec skip_spaces s i =
+  if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
+
+let create_env_1 s =
+  let rec get_assoc beg i =
+    if i = String.length s then
+      if i = beg then [] else [String.sub s beg (i - beg)]
+    else if s.[i] = ';' then
+      let next_i = skip_spaces s (succ i) in
+      String.sub s beg (i - beg) :: get_assoc next_i next_i
+    else get_assoc beg (succ i)
+  in
+  let rec separate i s =
+    if i = String.length s then s, ""
+    else if s.[i] = '=' then
+      String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
+    else separate (succ i) s
+  in
+  List.map (separate 0) (get_assoc 0 0)
+
 let extract_multipart boundary str =
   let rec skip_nl i =
     if i < String.length str && str.[i] = '\r' then skip_nl (i + 1)
@@ -1604,7 +1620,7 @@ let extract_multipart boundary str =
       if s = boundary then
         let (s, i) = next_line i in
         let s = String.lowercase_ascii s in
-        let env = Util.create_env s in
+        let env = create_env_1 s in
         match Util.p_getenv env "name", Util.p_getenv env "filename" with
           Some var, Some filename ->
             let var = strip_quotes var in
@@ -1626,11 +1642,35 @@ let extract_multipart boundary str =
             in
             let v = String.sub str i (i1 - i) in
             (var ^ "_name", filename) :: (var, v) :: loop i1
+(*  )
         | Some var, None ->
             let var = strip_quotes var in
             let (s, i) = next_line i in
             if s = "" then let (s, i) = next_line i in (var, s) :: loop i
             else loop i
+(  *)
+        | Some var, None -> (* %0D%0A for \n*)
+            let var = strip_quotes var in
+            let i = skip_nl i in
+            let i1 =
+              let rec loop i =
+                if i < String.length str then
+                  if i > String.length boundary &&
+                     String.sub str (i - String.length boundary)
+                       (String.length boundary) =
+                       boundary
+                  then
+                    i - String.length boundary
+                  else loop (i + 1)
+                else i
+              in
+              loop i
+            in
+            let v = String.sub str i (i1 - i) in
+            let v = String.sub v 2 (String.length v -4) in (* remove \n at head *)
+            let v = Wserver.encode v in
+            (var, v) :: loop i1
+(* *)
         | _ -> loop i
       else if s = boundary ^ "--" then []
       else loop i
@@ -1670,8 +1710,6 @@ let connection (addr, request) script_name contents =
       if not accept then only_log from
       else
         try
-          let _ = Printf.eprintf "Accept: %s\n" script_name in
-          let _ = flush stderr in
           let (contents, env) = build_env request contents in
           if image_request script_name env then ()
           else if misc_request script_name then ()

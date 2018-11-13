@@ -102,7 +102,6 @@ let family_m conf base =
       | "DAG" -> handler.dag
       | "DEL_FAM" -> handler.del_fam
       | "DEL_FAM_OK" -> handler.del_fam_ok
-      | "DEL_IMAGE" -> handler.del_image
       | "DEL_IMAGE_OK" -> handler.del_image_ok
       | "DEL_IND" -> handler.del_ind
       | "DEL_IND_OK" -> handler.del_ind_ok
@@ -121,6 +120,7 @@ let family_m conf base =
       | "HIST_CLEAN_OK" -> handler.hist_clean_ok
       | "HIST_DIFF" -> handler.hist_diff
       | "HIST_SEARCH" -> handler.hist_search
+      | "IMAGE" -> handler.image
       | "IMH" -> handler.imh
       | "INV_FAM" -> handler.inv_fam
       | "INV_FAM_OK" -> handler.inv_fam_ok
@@ -164,9 +164,9 @@ let family_m conf base =
       | "R" -> handler.r
       | "REQUEST" -> handler.request
       | "RL" -> handler.rl
+      | "RESET_IMAGE_OK" -> handler.reset_image_ok
       | "RLM" -> handler.rlm
       | "S" -> handler.s
-      | "SND_IMAGE" -> handler.snd_image
       | "SND_IMAGE_OK" -> handler.snd_image_ok
       | "SRC" -> handler.src
       | "STAT" -> handler.stat
@@ -387,6 +387,7 @@ let treat_request conf base =
     Some s, _, _ -> print_moved conf s
   | _, Some "no_index", _ -> print_no_index conf base
   | _, _, Some "IM" -> Image.print conf base
+  | _, _, Some "IMS" -> Image.print_saved conf base
   | _, _, Some "DOC" ->
       begin match p_getenv conf.env "s" with
         Some f ->
@@ -468,7 +469,7 @@ let this_request_updates_database conf =
         "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" |
         "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" |
         "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "MOD_DATA_OK" |
-        "SND_IMAGE_OK" ->
+        "IMAGE_OK" ->
           true
       | "API_BASE_WARNINGS" | "API_IMAGE_UPDATE" | "API_REMOVE_IMAGE_EXT" |
         "API_REMOVE_IMAGE_EXT_ALL" | "API_DEL_PERSON_OK" |

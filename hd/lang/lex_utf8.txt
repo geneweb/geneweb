@@ -1,3 +1,76 @@
+    select input
+de: wählen
+en: choose file
+fr: sélect. fichier
+
+    portrait
+en: portrait
+fr: portrait
+
+    saved images
+en: saved image/saved images
+fr: image sauvegardée/images sauvegardées
+
+    comment
+en: comment
+fr: comment
+
+    with comment
+en: with a comment
+fr: avec un commentaire 
+
+    send image with comment
+en: send selected image with this comment
+fr: envoyer l’image selectionnée avec ce commentaire
+
+    uploaded
+en: uploaded
+fr: envoyé/envoyée
+
+    save
+en: save
+fr: sauvegarder
+
+    saved
+en: saved
+fr: sauvegardé/sauvegardée
+
+    deleted
+en: deleted
+fr: supprimé/supprimée
+
+    restore
+en: restore
+fr: restaurer
+
+    restored
+en: restored
+fr: restauré/restaurée
+
+    save portrait
+en: actual portait will be saved to <samp>documents > portraits > saved</samp>.
+fr: le portrait actuel sera sauvegardé dans <samp>documents > portraits > saved</samp>.
+
+    previous portrait
+en: the previous save of the portait in this subfolder will be deleted.
+fr: la précédente sauvegarde du portrait dans ce sous-répertoire sera supprimée.
+
+    save image
+en: an image with a similar name will moved existing image to <samp>documents
+fr: une image au nom identique déplacera l’image existante dans <samp>documents
+
+    previous image
+en: if an image with the same name already exists in this subfolder, it will be deleted.
+fr: si une image du même nom existe déjà dans ce sous-répertoire, elle sera supprimée.
+
+    image comment
+en: add a comment for the image.
+fr: ajouter un commentaire à l’image.
+
+    update image comment
+en: update image comment
+fr: mettre à jour le commentaire de l’image
+
     reset to
 co: risturà
 en: reset to
@@ -977,33 +1050,33 @@ sv: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november
 zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
 
     (thousand separator)
-af:  
+af:
 ar: .
-bg:  
+bg:
 br: .
 ca: .
-co:  
-cs:  
+co:
+cs:
 da: .
 de: .
 en: ,
 eo: .
 es: .
-et:  
+et:
 fi: .
-fr:  
+fr:
 he: ,
 is: .
 it: .
 lv: '
 nl: .
 no: .
-oc:  
+oc:
 pl: .
 pt: .
 ro: .
 ru: '
-sk:  
+sk:
 sl: .
 sv: .
 zh: .
@@ -1843,7 +1916,7 @@ co: aghjunghje una fiura
 cs: přidat :a: obrázek
 da: tilføj billede
 de: hinzufügen Bild
-en: add picture
+en: add portrait
 eo: aldoni :a: bildo:a:+n
 es: agregar imagen
 et: lisa pilt
@@ -2453,7 +2526,7 @@ da: og
 de: und
 en: and
 eo: kaj
-es: y/e 
+es: y/e
 et: ja
 fi: ja
 fr: et
@@ -3090,7 +3163,7 @@ sl: začetek
 sv: börjar
 
     benediction
-co: benedizzione	
+co: benedizzione
 de: Segnung
 en: Blessing
 es: bendición
@@ -5077,7 +5150,7 @@ oc: afichar la data de maridatge
 ru: показать дату брака
 
     display notes/sources inline
-co: include e note/fonte à u cuntenutu 
+co: include e note/fonte à u cuntenutu
 de: einschließen der Notizen/Quellen und Inhalt
 en: Add notes & sources
 es: incluir las notas/fuentes en el contenido
@@ -6897,7 +6970,7 @@ co: fiura squassata
 cs: obrázek smazán
 da: billede slettet
 de: Bild gelöscht
-en: picture has been deleted
+en: picture deleted
 eo: bildo detruita
 es: imagen suprimida
 et: pilt kustutatud
@@ -6927,12 +7000,12 @@ co: fiura ricevuta
 cs: obrázek přijat
 da: billede indsat
 de: Bild erhalten
-en: picture has been uploaded
+en: picture uploaded
 eo: bildo ricevita
 es: imagen recibida
 et: pilt vastu võetud
 fi: kuva vastaanotettu
-fr: image reçue
+fr: image envoyée
 he:  התמונה התקבלה
 is: mynd móttekin
 it: immagine ricevuta
@@ -7053,7 +7126,7 @@ et:
 fi:
 fr: en
 he:  ב-
-is:  
+is:
 it: nel
 lv: gads:
 nl: in
@@ -8993,7 +9066,7 @@ co: mudificà a fiura
 cs: změnit :a: obrázek
 da: ændre billede
 de: ändern +before Bild
-en: update Picture
+en: update portrait
 eo: modifi :a: bildo:a:+n
 es: modificar imagen
 et: muuda :g: pilt
@@ -10243,7 +10316,7 @@ et: :i:
 fi: :e:
 fr: le
 he:   ב-
-is:  
+is:
 it: il
 lv: datums:
 nl: op
@@ -12236,7 +12309,7 @@ sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
     sons/daughters/children
-co: figlioli/figliole/zitelli	
+co: figlioli/figliole/zitelli
 en: sons/daughters/children
 fr: fils/filles/enfants
 
@@ -15335,7 +15408,7 @@ en: permute the events of family %s
 fr: permuter les événements de la famille %s
 
     full width/columns
-co: affissu larghezza sana/affissu nant'à duie culonne 
+co: affissu larghezza sana/affissu nant'à duie culonne
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 

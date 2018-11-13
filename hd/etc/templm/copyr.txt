@@ -1,4 +1,4 @@
-%if;(evar.m!="SND_IMAGE")
+%if;(evar.m!="IMAGE")
   %include;menu_search
 %else;
   %if;not cancel_links;
@@ -15,7 +15,7 @@
         </td></tr>
       </table>
     %end;
-    %if;(evar.digest = "" and evar.m!="SND_IMAGE")
+    %if;(evar.digest = "" and evar.m!="IMAGE")
       %nl;
       <div id="trl" style="clear:both;">
         <ul>

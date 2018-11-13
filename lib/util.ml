@@ -9,7 +9,7 @@ let is_hide_names conf p =
   if conf.hide_names || get_access p = Private then true else false
 
 let sharelib =
-  List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
+  String.concat Filename.dir_sep [Gwlib.prefix; "share"; "geneweb"]
 
 let add_lang_path = Secure.add_lang_path
 let set_base_dir = Secure.set_base_dir
@@ -322,7 +322,8 @@ let string_exists str sub =
 
 let string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
-  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT" (week_day_txt lt.Unix.tm_wday)
+  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
+    (week_day_txt lt.Unix.tm_wday)
     lt.Unix.tm_mday (month_txt lt.Unix.tm_mon) (1900 + lt.Unix.tm_year)
     lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 
@@ -561,7 +562,8 @@ let authorized_age conf base p =
     else
       let check_date none = function
         | Some (Dgreg (d, _)) ->
-          strictly_after_private_years conf (CheckItem.time_elapsed d conf.today)
+          strictly_after_private_years conf
+            (CheckItem.time_elapsed d conf.today)
         | _ -> none ()
       in
       check_date
@@ -570,7 +572,8 @@ let authorized_age conf base p =
              (fun () ->
                 check_date
                   (fun () ->
-                     (death = DontKnowIfDead && get_access p <> Private && conf.public_if_no_date)
+                     (death = DontKnowIfDead && get_access p <> Private &&
+                      conf.public_if_no_date)
                      || begin
                        let families = get_family p in
                        let len = Array.length families in
@@ -578,7 +581,8 @@ let authorized_age conf base p =
                          i < len
                          && check_date
                            (fun () -> loop (i + 1))
-                           (Adef.od_of_cdate (get_marriage @@ foi base (Array.get families i)))
+                           (Adef.od_of_cdate
+                            (get_marriage @@ foi base (Array.get families i)))
                        in
                        loop 0
                      end)
@@ -917,10 +921,13 @@ let update_family_loop conf base p s =
   else
     let iper = get_key_index p in
     let list = get_family p in
-    let list = Array.map (fun ifam -> ifam, get_children (foi base ifam)) list in
+    let list =
+      Array.map (fun ifam -> ifam, get_children (foi base ifam)) list
+    in
     let res =
       Array.fold_left
-        (fun acc (ifam, children) -> if Array.mem iper children then ifam :: acc else acc)
+        (fun acc (ifam, children) ->
+          if Array.mem iper children then ifam :: acc else acc)
         [] list
     in
     if conf.wizard then
@@ -1008,7 +1015,9 @@ let surname_begin base s =
   else " (" ^ part ^ ")"
 
 let surname_end base s =
-  let part_len = String.length (Mutil.get_particle (Gwdb.base_particles base) s) in
+  let part_len =
+    String.length (Mutil.get_particle (Gwdb.base_particles base) s)
+  in
   String.sub s part_len (String.length s - part_len)
 
 let rec skip_spaces s i =
@@ -1018,9 +1027,11 @@ let create_env s =
   let rec get_assoc beg i =
     if i = String.length s then
       if i = beg then [] else [String.sub s beg (i - beg)]
-    else if s.[i] = ';' || s.[i] = '&' then
+    else if (s.[i] = ';' || s.[i] = '&') then
       let next_i = skip_spaces s (succ i) in
-      String.sub s beg (i - beg) :: get_assoc next_i next_i
+      if (i-beg) > 0 then
+        String.sub s beg (i - beg) :: get_assoc next_i next_i
+      else get_assoc next_i next_i
     else get_assoc beg (succ i)
   in
   let rec separate i s =
@@ -1170,9 +1181,6 @@ let gw_etc_file fname =
   let etc_file = Filename.concat (search_in_lang_path "etc") fname in
   (* cette ligne est probablement inutile search_in_lg_path fait le travail *)
   let share_file = Filename.concat sharelib fname in
-  let _ = Printf.eprintf "Gw_etc_file: %s\n" etc_file in
-  let _ = Printf.eprintf "Gw_share_file: %s\n" share_file in
-  let _ = flush stderr in
   if Sys.file_exists etc_file then etc_file
   else if Sys.file_exists share_file then share_file
   else ""
@@ -1239,28 +1247,28 @@ let base_etc_file conf fname =
         loop2 tpl
     | t :: l ->
         let bname_etc_tpl_file =
-          List.fold_right Filename.concat
-            [base_path conf.bname; "etc"; conf.bname; t] fname ^ ".txt"
+          String.concat Filename.dir_sep
+            [base_path conf.bname; "etc"; conf.bname; t; fname ^ ".txt"]
         in
         let bname_etc_file =
-          List.fold_right Filename.concat
-            [base_path conf.bname; "etc"; conf.bname] fname ^ ".txt"
+          String.concat Filename.dir_sep
+            [base_path conf.bname; "etc"; conf.bname; fname ^ ".txt"]
         in
         let bases_etc_tpl_file =
-          List.fold_right Filename.concat
-            [Secure.base_dir (); "etc"; t] fname ^ ".txt"
+          String.concat Filename.dir_sep
+            [Secure.base_dir (); "etc"; t; fname ^ ".txt"]
         in
         let bases_etc_file =
-          List.fold_right Filename.concat
-            [Secure.base_dir (); "etc"] fname ^ ".txt"
+          String.concat Filename.dir_sep
+            [Secure.base_dir (); "etc"; fname ^ ".txt"]
         in
         let etc_tpl_file =
-          List.fold_right Filename.concat
-            [search_in_lang_path "etc"; t] fname ^ ".txt"
+          String.concat Filename.dir_sep
+            [search_in_lang_path "etc"; t; fname ^ ".txt"]
         in
         let etc_file =
-          List.fold_right Filename.concat
-            [search_in_lang_path "etc"] fname ^ ".txt"
+          String.concat Filename.dir_sep
+            [search_in_lang_path "etc"; fname ^ ".txt"]
         in
         if Sys.file_exists bname_etc_tpl_file then bname_etc_tpl_file
         else if Sys.file_exists bname_etc_file then bname_etc_file
@@ -1295,10 +1303,13 @@ let open_etc_file fname =
 
 (* TODO allow sub folders? *)
 let open_etc_file conf fname =
-  let fname1 = List.fold_right Filename.concat
-    [base_path conf.bname; "etc"] (Filename.basename fname ^ ".txt") in
-  let fname2 = List.fold_right Filename.concat
-    [search_in_lang_path "etc"] (Filename.basename fname ^ ".txt")
+  let fname1 =
+    String.concat Filename.dir_sep
+      [base_path conf.bname; "etc"; (Filename.basename fname ^ ".txt")]
+  in
+  let fname2 =
+    String.concat Filename.dir_sep
+      [search_in_lang_path "etc"; (Filename.basename fname ^ ".txt")]
   in
   try Some (Secure.open_in fname1) with
     Sys_error _ -> try Some (Secure.open_in fname2) with Sys_error _ -> None
@@ -1426,7 +1437,10 @@ let url_no_index conf base =
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then
     let print_file fname =
-      let fname = List.fold_right Filename.concat [base_path conf.bname; "etc"] (fname ^ ".txt") in
+      let fname =
+        String.concat Filename.dir_sep
+          [base_path conf.bname; "etc"; (fname ^ ".txt")]
+      in
       try
         let ic = Secure.open_in fname in
         try while true do Wserver.printf "%c" (input_char ic) done
@@ -1861,7 +1875,8 @@ let check_ampersand s i =
       'a'..'z' ->
         let rec loop_id j =
           if j = String.length s then
-            let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in Some (a, j)
+            let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
+            Some (a, j)
           else
             match s.[j] with
               'a'..'z' -> loop_id (j + 1)
@@ -1892,7 +1907,8 @@ let check_ampersands s =
   loop false 0
 
 let replace_quotes s =
-  let b = Buffer.create (String.length s + 100) in (* hack: +100 to account for quote -> &#34; *)
+  let b = Buffer.create (String.length s + 100) in
+    (* hack: +100 to account for quote -> &#34; *)
   let rec loop i =
     if i = String.length s then
       Buffer.contents b
@@ -2133,7 +2149,7 @@ let child_of_parent conf base p =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] husband_wife : config -> base -> person -> bool -> string                    *)
+(*  [Fonc] husband_wife : config -> base -> person -> bool -> string          *)
 (** [Description] : Traduction selon l'existence du premier conjoint
                     différent de ?? :
                       * époux/épouse de Jean/Jeanne
@@ -2154,7 +2170,8 @@ let husband_wife conf base p all =
         let conjoint = pget conf base conjoint in
         if know base conjoint
         then
-          translate_eval (Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> ""))
+          translate_eval
+            (Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> ""))
         else loop (i + 1)
       else ""
     in
@@ -2326,23 +2343,29 @@ let string_of_decimal_num conf f =
   loop 0
 
 let personal_image_file_name conf str =
-  let fname1 = List.fold_right
-    Filename.concat [base_path conf.bname; "documents"; "portraits"] str
+  let fname1 =
+    String.concat
+      Filename.dir_sep [base_path conf.bname; "documents"; "portraits"; str]
   in
   fname1
 
+(* other images *)
 let source_image_file_name conf str =
   let fname1 =
-    List.fold_right Filename.concat [base_path conf.bname; "src"; "images"] str
+    String.concat
+      Filename.dir_sep [base_path conf.bname; "documents"; str]
   in
   let fname2 =
-    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str
+    String.concat
+      Filename.dir_sep [Secure.base_dir (); "images"; str]
   in
   if Sys.file_exists fname1 then fname1 else fname2
 
+(* icons images *)
 let image_file_name str =
   let fname1 =
-    List.fold_right Filename.concat [Secure.base_dir (); "images"] str
+    String.concat
+      Filename.dir_sep [Secure.base_dir (); "images"; str]
   in
   let fname2 =
     search_in_lang_path (Filename.concat "images" str)
@@ -2497,8 +2520,8 @@ let find_sosa_ref conf base =
 let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
-  let fname = List.fold_right
-    Filename.concat [base_path conf.bname; "etc"] conf.bname ^ ".conf"
+  let fname = String.concat
+      Filename.dir_sep [base_path conf.bname; "etc"; conf.bname ^ ".conf"]
   in
   let tmp_fname = fname ^ "2" in
   let oc =
@@ -2638,22 +2661,99 @@ let default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
-let auto_image_file conf base p =
+let auto_image_file conf base p saved =
   let s = default_image_name base p in
-  let f = List.fold_right
-    Filename.concat [base_path conf.bname; "documents"; "portraits"] s in
-  if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
-  else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  let f = (* TODO if // in pathname is not accepted, then duplicate this line *)
+    String.concat
+      Filename.dir_sep [base_path conf.bname; "documents"; "portraits"; saved; s]
+  in
+  if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
   else None
 
+let keydir conf base p =
+  let s = default_image_name base p in
+  let f =
+    String.concat
+      Filename.dir_sep [base_path conf.bname; "documents"; "images"; s]
+  in
+  try if Sys.is_directory f then Some f
+  else None
+  with Sys_error _ -> None
+
+let keydir_old conf base p =
+  let s = default_image_name base p in
+  let f =
+    String.concat
+      Filename.dir_sep [base_path conf.bname; "documents"; "images"; s; "saved"]
+  in
+  try if Sys.is_directory f then Some f
+  else None
+  with Sys_error _ -> None
+
+let get_keydir_img_notes conf base p fname =
+  let k = default_image_name base p in
+  let fname =
+    String.concat Filename.dir_sep
+      [base_path conf.bname; "documents"; "images"; k; (fname ^ ".txt")]
+  in
+  let s = if Sys.file_exists fname then
+    let ic = Secure.open_in fname in
+    let s = really_input_string ic (in_channel_length ic) in
+    close_in ic; s
+    else ""
+  in s
+
+let out_keydir_img_notes conf base p fname s =
+  let k = default_image_name base p in
+  let fname =
+    String.concat Filename.dir_sep
+      [base_path conf.bname; "documents"; "images"; k; (fname ^ ".txt")]
+  in
+  try
+    let oc = Secure.open_out fname in
+    output_string oc s;
+    close_out oc;
+  with Sys_error _ -> ()
+
+let get_keydir_old conf base p =
+  match keydir_old conf base p with
+    Some f ->
+      List.fold_right (fun f1 l ->
+        if f1.[0] <> '.' && Filename.extension f1 <> ".txt" &&
+          ( Filename.extension f1 = ".jpg" ||
+            Filename.extension f1 = ".gif" ||
+            Filename.extension f1 = ".png" )
+        then
+          (* vérifier ici le type des images autorisées  *)
+          ( f1 :: l ) else l)
+          (Array.to_list (Sys.readdir f)) []
+  | None -> []
+
+let get_keydir conf base p =
+  match keydir conf base p with
+    Some f ->
+      List.fold_right (fun f1 l ->
+        if f1.[0] <> '.' && Filename.extension f1 <> ".txt" &&
+          ( Filename.extension f1 = ".jpg" ||
+            Filename.extension f1 = ".gif" ||
+            Filename.extension f1 = ".png" )
+        then
+          (* vérifier ici le type des images autorisées  *)
+          ( f1 :: l ) else l)
+          (Array.to_list (Sys.readdir f)) []
+  | None -> []
+
 (* ********************************************************************** *)
-(*  [Fonc] image_and_size : config -> base -> person -> image_size        *)
+(*  [Fonc] image_and_size : config -> base -> person ->                   *)
+(*                          string -> image_size                          *)
 (** [Description] : Renvoie la source de l'image ainsi que sa taille.
     [Args] :
       - conf : configuration de la base
       - base : base de données
       - p    : personne
+      - saved: "" or "saved" où peut être une sauvegarde du portrait
       [Retour] :
         - is_filename : indique si la source de l'image est un nom de
                         fichier ou une URL.
@@ -2661,11 +2761,11 @@ let auto_image_file conf base p =
         - image_size
     [Rem] : Exporté en clair hors de ce module.                            *)
 (* *********************************************************************** *)
-let image_and_size conf base p image_size =
+let image_and_size conf base p saved image_size =
   if not conf.no_image && authorized_age conf base p then
     match sou base (get_image p) with
       "" ->
-        begin match auto_image_file conf base p with
+        begin match auto_image_file conf base p saved with
           Some f -> Some (true, f, image_size f None)
         | None -> None
         end
@@ -2721,8 +2821,14 @@ let has_image conf base p =
     not (is_empty_string (get_image p)) &&
     (conf.wizard || conf.friend ||
      not (string_exists (sou base (get_image p)) "/private/")) ||
-    auto_image_file conf base p <> None
+    auto_image_file conf base p "" <> None
   else false
+
+let has_keydir conf base p =
+  if not conf.no_image && authorized_age conf base p then
+    keydir conf base p <> None
+  else false
+
 
 let gen_only_printable or_nl s =
   let s' =
@@ -2973,12 +3079,12 @@ let escache_value base =
   let t = Gwdb.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in string_of_int v
 
-let adm_file f = List.fold_right Filename.concat [!cnt_dir; "cnt"] f
+let adm_file f = String.concat Filename.dir_sep  [!cnt_dir; "cnt"; f]
 
 let std_date conf =
   let (hour, min, sec) = conf.time in
-  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year conf.today.month
-    conf.today.day hour min sec
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d"
+    conf.today.year conf.today.month conf.today.day hour min sec
 
 let read_wf_trace fname =
   try
@@ -3670,5 +3776,5 @@ let str_sub ?pad str start len =
     | None -> raise (Invalid_argument "str_sub")
     | Some pad ->
       let bytes = Bytes.make (i - start + len - n) pad in
-      Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str) ;
+      Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str);
       Bytes.unsafe_to_string bytes

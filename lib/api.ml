@@ -799,7 +799,7 @@ let print_img_person conf base =
   let img_addr =
     match sou base (get_image p) with
     | "" ->
-        (match Util.auto_image_file conf base p with
+        (match Util.auto_image_file conf base p "" with
         | Some file -> file
         | None -> "")
     | s -> s
@@ -1553,7 +1553,7 @@ let export_img conf base =
   for i = 0 to (nb_of_persons base - 1) / 2 do
     let ip = Adef.iper_of_int i in
     let p = poi base ip in
-    let img = Util.auto_image_file conf base p in
+    let img = Util.auto_image_file conf base p "" in
     if not (is_empty_string (get_image p)) || img <> None then
       match img with
       | Some file ->
