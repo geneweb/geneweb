@@ -1,5 +1,6 @@
 (* $Id: main.ml,v 5.1 2006-10-15 15:39:38 ddr Exp $ *)
 
+open Geneweb
 open Dag2html
 
 let version = "1.02-exp"
