@@ -1,5 +1,4 @@
-(* $Id: titres.ml,v 1.4 2006-10-30 09:37:58 deraugla Exp $ *)
-
+open Geneweb
 open Def
 open Gwdb
 

@@ -1,5 +1,4 @@
-(* $Id: setup.ml,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
-
+open Geneweb
 
 let port = ref 2316
 let gwd_port = ref 2317

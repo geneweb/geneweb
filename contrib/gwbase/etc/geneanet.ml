@@ -1,5 +1,4 @@
-(* $Id: geneanet.ml,v 4.16 2007-01-19 09:03:02 deraugla Exp $ *)
-
+open Geneweb
 open Def
 open Gwdb
 

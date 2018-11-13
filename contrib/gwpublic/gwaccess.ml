@@ -1,5 +1,4 @@
-(* camlp4r *)
-
+open Geneweb
 open Gwdb
 
 let input_person file =

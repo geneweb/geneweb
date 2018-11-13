@@ -1,6 +1,6 @@
 (executable
   (name gwb2ged)
-  (libraries str geneweb.internal)
+  (libraries str geneweb)
 )
 
 (install

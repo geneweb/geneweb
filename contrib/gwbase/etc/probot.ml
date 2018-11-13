@@ -1,5 +1,4 @@
-(* $Id: probot.ml,v 1.7 2006-10-05 13:37:58 deraugla Exp $ *)
-
+open Geneweb
 
 let main () =
   let xcl = Robot.input_excl (open_in_bin "cnt/robot") in

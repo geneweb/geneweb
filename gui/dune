@@ -1,5 +1,5 @@
 (executables
   (names gui)
-  (libraries geneweb.internal threads lablgtk2 unix)
+  (libraries geneweb threads lablgtk2 unix)
   (flags (-w -a+31))
 )

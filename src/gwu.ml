@@ -1,3 +1,4 @@
+open Geneweb
 
 module Gwu = GwuLib.Make(Select)
 

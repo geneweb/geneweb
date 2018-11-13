@@ -1,7 +1,5 @@
-(* $Id: select.ml,v 4.17 2007-01-19 09:03:03 deraugla Exp $ *)
 (* Copyright (c) 2000-2006 INRIA *)
-(* *)
-
+open Geneweb
 open Def
 open Gwdb
 

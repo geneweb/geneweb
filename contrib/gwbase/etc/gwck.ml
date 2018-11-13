@@ -1,5 +1,4 @@
-(* $Id: gwck.ml,v 4.13 2009-03-11 10:58:51 deraugla Exp $ *)
-
+open Geneweb
 open Def
 open Gwdb
 

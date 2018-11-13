@@ -1,7 +1,5 @@
-(* camlp4r *)
-
+open Geneweb
 open Gwdb
-
 
 let bname = ref ""
 

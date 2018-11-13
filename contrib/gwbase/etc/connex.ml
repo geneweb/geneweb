@@ -1,6 +1,6 @@
-(* $Id: connex.ml,v 4.20 2013-10-06 17:35:18 deraugla Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
+open Geneweb
 open Def
 open Gwdb
 

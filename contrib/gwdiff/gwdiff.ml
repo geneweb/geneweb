@@ -1,6 +1,6 @@
-(* $Id: gwdiff.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
+open Geneweb
 open Def
 open Gwdb
 

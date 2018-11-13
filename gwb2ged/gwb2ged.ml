@@ -1,6 +1,6 @@
-(* $Id: gwb2ged.ml,v 5.29 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+open Geneweb
 open Def
 open Gwdb
 

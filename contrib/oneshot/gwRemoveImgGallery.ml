@@ -1,8 +1,6 @@
-(* camlp4r *)
-
+open Geneweb
 open Def
 open Gwdb
-
 
 let image_start_with_gallery img =
   let gallery = "http://www.geneanet.org/gallery/" in

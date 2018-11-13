@@ -1,5 +1,4 @@
-(* nocamlp5 *)
-
+open Geneweb
 
 (**/**) (* Utils. *)
 
