@@ -5,12 +5,13 @@ open Geneweb
 let get_images_names bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then
-      (Filename.chop_suffix bname ".gwb", bname)
+      Filename.chop_suffix bname ".gwb"
     else
       bname
   in
-  let imgdir = List.fold_right
-    [Filename.current_dir; bname ^ ".gwb"; "documents"] "portraits"
+  let imgdir = String.concat
+    Filename.dir_sep
+      [Filename.current_dir_name; bname ^ ".gwb"; "documents"; "portraits"]
   in
   let dh = Unix.opendir imgdir in
   let list = ref [] in

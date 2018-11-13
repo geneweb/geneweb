@@ -190,7 +190,7 @@ let image_txt conf base p =
   match p_getenv conf.env "image" with
   | Some "on" ->
       if has_image conf base p then
-        match image_and_size conf base p (limited_image_size 100 75) with
+        match image_and_size conf base p "" (limited_image_size 100 75) with
           Some (true, f, Some (wid, hei)) ->
             "<br" ^ conf.xhs ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^

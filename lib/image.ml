@@ -54,6 +54,7 @@ let print_image_type fname ctype =
       loop len; close_in ic; true
   | None -> false
 
+(*same as print_image_type but tests for file existence before *)
 let print_image_type_2 conf fname ctype =
   if Sys.file_exists fname then
     match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
@@ -74,10 +75,22 @@ let print_image_type_2 conf fname ctype =
   else
     begin
     let title _ = Wserver.printf "Error" in
+    let fname1 =
+      String.concat
+        Filename.dir_sep [Util.base_path conf.bname; "documents"; fname]
+    in
+    let fname2 =
+      String.concat
+        Filename.dir_sep [Secure.base_dir (); "images"; fname]
+    in
     Hutil.header conf title;
+    Wserver.printf "Cannot access files:\n";
     Wserver.printf "<ul>\n";
     Wserver.printf "<li>\n";
-    Wserver.printf "Cannot access file \"%s\"\n" fname;
+    Wserver.printf "%s\n" fname1;
+    Wserver.printf "</li>\n";
+    Wserver.printf "<li>\n";
+    Wserver.printf "%s\n" fname2;
     Wserver.printf "</li>\n";
     Wserver.printf "</ul>\n";
     Hutil.gen_trailer true conf;
@@ -115,17 +128,19 @@ let print_image_file_2 conf fname =
      (".htm", "text/html"); (".html", "text/html")]
 
 (* ************************************************************************** *)
-(*  [Fonc] print_personal_image : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(*  [Fonc] print_personal_image : Config.config -> Gwdb.base ->               *)
+(*                   Gwdb.person -> string -> unit                            *)
 (** [Description] : Affiche l'image d'une personne en réponse HTTP.
     [Args] :
       - conf : configuration de la requête
       - base : base de donnée sélectionnée
       - p : personne dans la base dont il faut afficher l'image
+      - saved : "" ou "saved" dossier où peut être sauvegardé l'image
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-let print_personal_image conf base p =
-  match Util.image_and_size conf base p (fun _ _ -> Some (1, 1)) with
+let print_personal_image conf base p saved =
+  match Util.image_and_size conf base p saved (fun _ _ -> Some (1, 1)) with
     Some (true, f, _) ->
       if print_image_file_2 conf f then () else Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
@@ -153,12 +168,28 @@ let print_source_image conf f =
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
 let print conf base =
-  match Util.p_getenv conf.env "s" with
-    Some f -> print_source_image conf f
-  | None ->
-      match Util.find_person_in_env conf base "" with
-        Some p -> print_personal_image conf base p
-      | _ -> Hutil.incorrect_request conf
+  match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
+  | (Some f, Some p) ->
+      let keydir = Util.default_image_name base p in
+      print_source_image conf
+        (String.concat Filename.dir_sep [ "images"; keydir; f])
+  | (Some f, _) ->
+      print_source_image conf f
+  | (_, Some p) ->
+      print_personal_image conf base p ""
+  | (_, _) -> Hutil.incorrect_request conf
+
+let print_saved conf base =
+  match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
+  | (Some f, Some p) ->
+      let keydir = Util.default_image_name base p in
+      print_source_image conf
+        (String.concat Filename.dir_sep [ "images"; keydir; "saved"; f])
+  | (Some f, _) ->
+      print_source_image conf f
+  | (_, Some p) ->
+      print_personal_image conf base p "saved"
+  | (_, _) -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
 (*  [Fonc] print_html : config -> 'a -> unit                                  *)

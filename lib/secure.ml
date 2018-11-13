@@ -39,8 +39,6 @@ let suffix d df =
   loop (d, df)
 
 let check_open fname =
-  let _ = Printf.eprintf "Check_open: %s\n" fname in
-  let _ = flush stderr in
   try
     if String.contains fname '\000' then raise Exit;
     let df = decompose fname in
@@ -67,11 +65,7 @@ let check_open fname =
 
 (*let check_open fname = Printf.eprintf "Open file: %s\n" fname*)
 
-let open_in fname =
-    (*Printf.eprintf "Open_in before %s\n" fname;*)
-    check_open fname;
-    (*Printf.eprintf "Open_in after %s\n" fname;*)
-    Pervasives.open_in fname
+let open_in fname = check_open fname; Pervasives.open_in fname
 let open_in_bin fname = check_open fname; Pervasives.open_in_bin fname
 let open_out fname = check_open fname; Pervasives.open_out fname
 let open_out_bin fname = check_open fname; Pervasives.open_out_bin fname

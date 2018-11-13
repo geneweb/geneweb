@@ -110,8 +110,12 @@
   %elseif;(uu = "mp")[modify::person/persons]0%nn;
   %elseif;(uu = "dp")[delete::person/persons]0%nn;
   %elseif;(uu = "fp")[merge::person/persons]1%nn;
-  %elseif;(uu = "si")[send::image/images]0%nn;
-  %elseif;(uu = "di")[delete::image/images]0%nn;
+  %elseif;(uu = "si")[send::portrait]0%nn;
+  %elseif;(uu = "so")[send::other image]0%nn;
+  %elseif;(uu = "sb")[send::other image] [and::comment]0%nn;
+  %elseif;(uu = "sc")[send::comment]0%nn;
+  %elseif;(uu = "di")[delete::portrait]0%nn;
+  %elseif;(uu = "do")[delete::other image]0%nn;
   %elseif;(uu = "af")[add::family/families]0%nn;
   %elseif;(uu = "mf")[modify::family/families]0%nn;
   %elseif;(uu = "df")[delete::family/families]0%nn;

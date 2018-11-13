@@ -753,7 +753,7 @@
   <h5 class="card-title"><b>[*other action][:] </b>
     <a href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]">[*invert::event/events]1</a> |
     %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-      <a href="%prefix;m=SND_IMAGE;i=%index;">[*modify::]/[delete::]/[add picture]</a>
+      <a href="%prefix;m=IMAGE;i=%index;">[*modify::]/[delete::]/[add picture]0</a>
     %end; | <a href="%prefix;m=MRG;i=%index;">[*merge::]</a> | <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a></h5>
   <div class="form-group mt-4">
     <div class="row">
