@@ -1,9 +1,6 @@
-(* camlp4r *)
-
+open Geneweb
 open Def
 open Gwdb
-
-
 
 let fix_date_text bname trace =
   let base = Gwdb.open_base bname in

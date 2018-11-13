@@ -1,5 +1,4 @@
-(* $Id: recover.ml,v 5.3 2007-09-12 09:58:44 ddr Exp $ *)
-
+open Geneweb
 
 let recover db = let base = Iolight.input db in Outbase.output "a" base
 

@@ -1,5 +1,4 @@
-(* $Id: gui.ml,v 1.00 2011-12-25 15:36:35 flh Exp $ *)
-
+open Geneweb
 
 type conf =
   { mutable bases_dir : string;

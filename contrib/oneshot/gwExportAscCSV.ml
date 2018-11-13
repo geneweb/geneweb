@@ -1,8 +1,5 @@
-(* camlp4r *)
-(* $Id: gwExportAscCSV.ml.ml,v 0.01 2014-04-16 10:05:38 flh Exp $ *)
-
+open Geneweb
 open Gwdb
-
 
 let is_printable =
   function

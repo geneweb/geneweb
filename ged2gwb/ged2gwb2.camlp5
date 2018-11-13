@@ -1,6 +1,6 @@
-(* $Id: ged2gwb2.ml,v 5.7 2008-01-14 03:51:54 ddr Exp $ *)
 (* Copyright (c) 1998-2008 INRIA *)
 
+open Geneweb
 open Def
 open Mutil
 

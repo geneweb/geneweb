@@ -1,5 +1,3 @@
-(* $Id: gw_fix_base.ml,v 0.01 2014-02-21 16:26:45 flh Exp $ *)
-
 (* Permet de corriger une base par exemple en ajoutant le *)
 (* domicile en tant qu'évènement sur les personnes.       *)
 (*
@@ -9,10 +7,9 @@
      ligne_vide
 *)
 
-
+open Geneweb
 open Def
 open Gwdb
-
 
 let trace = ref false
 

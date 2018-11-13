@@ -1,6 +1,6 @@
-(* $Id: mk_consang.ml,v 5.56 2012-01-18 21:03:02 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+open Geneweb
 
 let fname = ref ""
 let indexes = ref false

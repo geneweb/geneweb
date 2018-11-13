@@ -1,4 +1,4 @@
 (executable
   (name lower_string)
-  (libraries geneweb.internal)
+  (libraries geneweb)
 )

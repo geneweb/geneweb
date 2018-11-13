@@ -8,5 +8,5 @@
         gwFixColon
         gwFindCpl
         gwFixY)
-  (libraries str geneweb.internal)
+  (libraries str geneweb)
 )

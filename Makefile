@@ -90,13 +90,13 @@ CAMLP5_PA_EXTEND_FILES = \
 	ged2gwb/ged2gwb \
 	ged2gwb/ged2gwb2 \
 	src/pr_transl \
-	internal/templ \
-	internal/update \
+	lib/templ \
+	lib/update \
 	setup/setup
 
 CAMLP5_Q_MLAST_FILES = \
 	src/pr_transl \
-	internal/templ
+	lib/templ
 
 CAMLP5_FILES = $(sort $(CAMLP5_Q_MLAST_FILES) $(CAMLP5_PA_EXTEND_FILES))
 
@@ -118,12 +118,12 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 	    && rm $@.bak \
 	    && echo " Done!")
 
-internal/gwlib.ml:
+lib/gwlib.ml:
 	echo "let prefix =" > $@
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
-internal/compilation.ml:
+lib/compilation.ml:
 	echo "let scan_dmy s =" > $@
 	echo "let open Adef in" >> $@
 	echo "Scanf.sscanf s \"%d %d %d\" @@ fun day month year ->" >> $@
@@ -131,14 +131,14 @@ internal/compilation.ml:
 	echo "let compilation_time = scan_dmy \"$$(date "+%d %m %Y")\"" >> $@
 	echo "let commit = \"$$(git show -s --pretty=format:%h)\"" >> $@
 	echo "let commit_date = scan_dmy \"$$(git show -s --pretty=format:%cd --date=format:'%d %m %Y')\"" >> $@
-.PHONY:internal/compilation.ml
+.PHONY:lib/compilation.ml
 
 %/dune: %/dune.in
 	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
 
 ###### [End] Generated files section
 
-GENERATED_FILES_DEP = internal/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune internal/dune internal/compilation.ml
+GENERATED_FILES_DEP = lib/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune lib/compilation.ml
 
 ifdef API
 piqi:

@@ -1,5 +1,4 @@
-(* $Id: gw_fix_burial.ml,v 0.01 2014-02-21 16:26:45 flh Exp $ *)
-
+open Geneweb
 open Def
 open Gwdb
 

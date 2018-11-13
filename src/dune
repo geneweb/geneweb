@@ -1,8 +1,7 @@
 (executables
   (names gwc1 gwc2 mk_consang gwd gwu update_nldb check_base i18n_check)
-  (libraries geneweb.internal
+  (libraries geneweb
              geneweb.wserver
-             geneweb
   )
 )
 

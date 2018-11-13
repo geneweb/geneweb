@@ -8,6 +8,6 @@
             str
             camlp5
             camlp5.gramlib
-            geneweb.internal
             geneweb.wserver)
+ (modules_without_implementation config dbdisk def templAst)
 )

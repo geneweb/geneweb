@@ -1,6 +1,6 @@
 (executable
  (name setup)
- (libraries geneweb.internal geneweb.wserver)
+ (libraries geneweb geneweb.wserver)
 )
 
 (install

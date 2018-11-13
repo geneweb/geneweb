@@ -1,6 +1,6 @@
 (executables
   (names ged2gwb ged2gwb2)
-  (libraries unix str camlp5.gramlib geneweb.internal)
+  (libraries unix str camlp5.gramlib geneweb)
 )
 
 (install

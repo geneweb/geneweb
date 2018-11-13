@@ -1,4 +1,4 @@
-(* nocamlp5 *)
+open Geneweb
 
 module SelroyGwu = GwuLib.Make(SelroySelect)
 

@@ -1,5 +1,4 @@
-(* $Id: gw_fix_base.ml,v 0.01 2014-02-21 16:26:45 flh Exp $ *)
-
+open Geneweb
 open Gwdb
 
 let check_name base nb_ind fix =
