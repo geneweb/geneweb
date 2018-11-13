@@ -77,7 +77,7 @@ EVERYTHING_EXE = \
 	contrib/gwbase/etc/probot \
 	contrib/oneshot/gwFixAddEvent \
 	contrib/oneshot/gwMostAsc \
-	dag2html/main \
+	contrib/dag2html/main \
 	gwtp/recover \
 	src/check_base \
 	src/i18n_check
