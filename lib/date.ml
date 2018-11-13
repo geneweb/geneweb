@@ -212,15 +212,6 @@ let string_of_on_prec_dmy conf sy sy2 d =
   let r = string_of_on_prec_dmy_aux conf sy sy2 d in
   replace_spaces_by_nbsp r
 
-let string_of_on_dmy conf d =
-  let sy = code_dmy conf d in
-  let sy2 =
-    match d.prec with
-      OrYear d2 | YearInt d2 -> code_dmy conf (dmy_of_dmy2 d2)
-    | _ -> ""
-  in
-  string_of_on_prec_dmy conf sy sy2 d
-
 let string_of_on_french_dmy conf d =
   let sy = code_french_date conf d.day d.month d.year in
   let sy2 =
@@ -257,15 +248,20 @@ let string_of_prec_dmy conf s s2 d =
       s ^ "</span>" ^ " " ^ "<span class=\"text-nowrap\">" ^
       transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2 ^ "</span>"
 
-let string_of_dmy conf d =
+let string_of_dmy_aux fn conf d =
   let sy = code_dmy conf d in
   let sy2 =
     match d.prec with
-      OrYear d2 | YearInt d2 -> code_dmy conf (dmy_of_dmy2 d2)
+    | OrYear d2 | YearInt d2 -> code_dmy conf (dmy_of_dmy2 d2)
     | _ -> ""
   in
-  string_of_prec_dmy conf sy sy2 d
+  fn conf sy sy2 d
 
+let string_of_on_dmy conf d =
+  string_of_dmy_aux string_of_on_prec_dmy conf d
+
+let string_of_dmy conf d =
+  string_of_dmy_aux string_of_prec_dmy conf d
 
 (* ************************************************************************ *)
 (*  [Fonc] translate_dmy : config -> (string * string * string) ->
