@@ -240,7 +240,7 @@ distrib: distrib-exe
 
 ###### [END] Installation / Distribution section
 
-doc:
+doc: | piqi $(GENERATED_FILES_DEP)
 	dune build @doc
 .PHONY: doc
 
