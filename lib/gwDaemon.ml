@@ -1620,11 +1620,27 @@ let extract_multipart boundary str =
             in
             let v = String.sub str i (i1 - i) in
             (var ^ "_name", filename) :: (var, v) :: loop i1
-        | Some var, None ->
+        | Some var, None -> (* %0D%0A for \n*)
             let var = strip_quotes var in
-            let (s, i) = next_line i in
-            if s = "" then let (s, i) = next_line i in (var, s) :: loop i
-            else loop i
+            let i = skip_nl i in
+            let i1 =
+              let rec loop i =
+                if i < String.length str then
+                  if i > String.length boundary &&
+                     String.sub str (i - String.length boundary)
+                       (String.length boundary) =
+                       boundary
+                  then
+                    i - String.length boundary
+                  else loop (i + 1)
+                else i
+              in
+              loop i
+            in
+            let v = String.sub str i (i1 - i) in
+            let v = String.sub v 2 (String.length v -4) in (* remove \n at head *)
+            let v = Wserver.encode v in
+            (var, v) :: loop i1
         | _ -> loop i
       else if s = boundary ^ "--" then []
       else loop i
