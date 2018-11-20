@@ -1,0 +1,6 @@
+; TOFIX_EXE := cleopatre popule modif
+
+(executables
+ (names public public2 geneanet clavier hist selroy chkimg consmoy lune titres gwck nbdesc probot)
+  (libraries geneweb)
+)

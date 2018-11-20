@@ -1,9 +1,0 @@
-(executable
- (name setup)
- (libraries geneweb geneweb.wserver)
-)
-
-(install
- (section bin)
- (files setup.exe)
-)
