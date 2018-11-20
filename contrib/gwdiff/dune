@@ -1,4 +1,0 @@
-(executable
- (name gwdiff)
- (libraries str geneweb)
-)
