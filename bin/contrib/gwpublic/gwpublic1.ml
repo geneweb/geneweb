@@ -64,7 +64,7 @@ let mark_descendants base scanned old treshold =
       let ndgen = match most_recent_year_of p with
         | Some y ->
           (* We have a date: we do not want to scan this person again with a higher ndgen *)
-          scanned.(i) <- Stdlib.max_int ;
+          scanned.(i) <- max_int ;
           compute_ndgen treshold y
         | None ->
           scanned.(i) <- ndgen ;
