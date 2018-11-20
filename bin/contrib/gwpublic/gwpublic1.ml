@@ -47,10 +47,8 @@ let changes = ref false
 (** Compute the number of (descending) generation to be considered as old
     starting from [p] included. i.e. [0] means that [p] is not considered old.
 *)
-let compute_ndgen default treshold p =
-  match most_recent_year_of p with
-  | Some y -> (treshold - y) * nb_gen_by_century / 100
-  | None -> default
+let compute_ndgen treshold y =
+  (treshold - y) * nb_gen_by_century / 100
 
 (** Recursively mark descendants and spouses as old,
     as long as a date allow you to do so, or until
@@ -62,8 +60,12 @@ let mark_descendants base scanned old treshold =
     let p_key_index = get_key_index p in
     let i = Adef.int_of_iper p_key_index in
     if not scanned.(i) then
-      let () = scanned.(i) <- true in
-      let ndgen = compute_ndgen ndgen treshold p in
+      let ndgen = match most_recent_year_of p with
+        | Some y ->
+          scanned.(i) <- true ;
+          compute_ndgen treshold y
+        | None -> ndgen
+      in
       if ndgen > 0 then
         begin
           let ndgen' = ndgen - 1 in
@@ -74,8 +76,15 @@ let mark_descendants base scanned old treshold =
                let sp = Gutil.spouse p_key_index fam in
                let i = Adef.int_of_iper sp in
                if not scanned.(i) then begin
-                 if compute_ndgen ndgen treshold (poi base sp) <> 0 then old.(i) <- true ;
-                 Array.iter (fun c -> loop (poi base c) ndgen') (get_children fam)
+                 let ndgen'' =
+                   Opt.map_default ndgen
+                     (compute_ndgen treshold)
+                     (most_recent_year_of (poi base sp))
+                 in
+                 if ndgen'' <> 0 then old.(i) <- true ;
+                 Array.iter
+                   (fun c -> loop (poi base c) (min ndgen' ndgen''))
+                   (get_children fam)
                end)
             (get_family p)
         end
