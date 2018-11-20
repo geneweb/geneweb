@@ -1,0 +1,4 @@
+(executables
+  (names i18n_check)
+  (libraries geneweb geneweb.wserver)
+)

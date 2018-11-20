@@ -1,9 +1,0 @@
-(executables
-  (names ged2gwb ged2gwb2)
-  (libraries unix str camlp5.gramlib geneweb)
-)
-
-(install
- (section bin)
- (files ged2gwb.exe ged2gwb2.exe)
-)
