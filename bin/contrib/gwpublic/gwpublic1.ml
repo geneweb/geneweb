@@ -54,17 +54,21 @@ let compute_ndgen treshold y =
     as long as a date allow you to do so, or until
     the number of generations that should be considered old according
     to latest known date is reached.
-  *)
+*)
 let mark_descendants base scanned old treshold =
   let rec loop p ndgen =
     let p_key_index = get_key_index p in
     let i = Adef.int_of_iper p_key_index in
-    if not scanned.(i) then
+    if scanned.(i) < ndgen then begin
+      (* If we did not already scanned with ndgen >= current ndgen *)
       let ndgen = match most_recent_year_of p with
         | Some y ->
-          scanned.(i) <- true ;
+          (* We have a date: we do not want to scan this person again with a higher ndgen *)
+          scanned.(i) <- Stdlib.max_int ;
           compute_ndgen treshold y
-        | None -> ndgen
+        | None ->
+          scanned.(i) <- ndgen ;
+          ndgen
       in
       if ndgen > 0 then
         begin
@@ -75,7 +79,7 @@ let mark_descendants base scanned old treshold =
                let fam = foi base ifam in
                let sp = Gutil.spouse p_key_index fam in
                let i = Adef.int_of_iper sp in
-               if not scanned.(i) then begin
+               if scanned.(i) < ndgen then begin
                  let ndgen'' =
                    Opt.map_default ndgen
                      (compute_ndgen treshold)
@@ -88,6 +92,7 @@ let mark_descendants base scanned old treshold =
                end)
             (get_family p)
         end
+    end
   in
   loop
 
@@ -140,16 +145,16 @@ let public_all ~mem bname treshold =
   end ;
   let nb = nb_of_persons base in
   let old = Array.make nb false in
-  let scanned = Array.make nb false in
+  let scanned = Array.make nb (-1) in
   ProgrBar.start () ;
   for i = 0 to nb - 1 do
     ProgrBar.run i nb ;
-    if not scanned.(i) then
+    if scanned.(i) < 0 then
       let p = poi base (Adef.iper_of_int i) in
       mark_descendants base scanned old treshold p 0
   done;
   ProgrBar.finish () ;
-  Array.fill scanned 0 nb false ;
+  let scanned = Array.make nb false in
   ProgrBar.start () ;
   for i = 0 to nb_of_persons base - 1 do
     ProgrBar.run i nb ;
