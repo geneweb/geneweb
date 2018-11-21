@@ -18,16 +18,14 @@ BUILD_DIR=_build/default
 
 INSTALL_EXE = \
 	bin/distrib/connex \
-	bin/distrib/ged2gwb \
-	bin/distrib/ged2gwb2 \
 	bin/distrib/gwb2ged \
-	bin/distrib/gwc1 \
-	bin/distrib/gwc2 \
+	bin/distrib/ged2gwb \
+	bin/distrib/gwc \
 	bin/distrib/gwd \
 	bin/distrib/gwdiff \
 	bin/distrib/gwtp \
 	bin/distrib/gwu \
-	bin/distrib/mk_consang \
+	bin/distrib/consang \
 	bin/distrib/setup \
 	bin/distrib/update_nldb
 
@@ -43,8 +41,6 @@ ALL_EXE = \
 	bin/contrib/gwFix/gwFixFromFileAlias \
 	bin/contrib/gwFix/gwFixFromFileDomicile \
 	bin/contrib/gwFix/gwFixY \
-	bin/contrib/gwbase/etc/public \
-	bin/contrib/gwbase/etc/public2 \
 	bin/contrib/gwpublic/gwiftitles \
 	bin/contrib/gwpublic/gwprivate \
 	bin/contrib/gwpublic/gwpublic \
@@ -85,7 +81,7 @@ EVERYTHING_EXE = \
 ###### [BEGIN] Generated files section
 
 CAMLP5_PA_EXTEND_FILES = \
-	bin/distrib/ged2gwb/ged2gwb \
+	bin/distrib/ged2gwb/ged2gwb1 \
 	bin/distrib/ged2gwb/ged2gwb2 \
 	lib/templ \
 	lib/update \
@@ -119,8 +115,16 @@ lib/gwlib.ml:
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
+CPPO_D=$(API_D) $(GWDB_D)
+
 %/dune: %/dune.in
-	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
+	cat $< \
+	| cppo -n $(CPPO_D) \
+	| sed \
+	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
+	-e "s/%%%API_PKG%%%/$(API_PKG)/g" \
+	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
+	> $@
 
 hd/etc/version.txt:
 	echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
@@ -130,9 +134,25 @@ hd/etc/version.txt:
 
 ###### [End] Generated files section
 
-GENERATED_FILES_DEP = hd/etc/version.txt lib/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune
+GENERATED_FILES_DEP = \
+	hd/etc/version.txt \
+	lib/gwlib.ml \
+	$(CAMLP5_FILES:=.ml) \
+	lib/dune \
+	bin/contrib/check_base/dune \
+	bin/contrib/dag2html/dune \
+	bin/contrib/gui/dune \
+	bin/contrib/gwFix/dune \
+	bin/contrib/gwbase/etc/dune \
+	bin/contrib/gwpublic/dune \
+	bin/contrib/history/dune \
+	bin/contrib/i18n_check/dune \
+	bin/contrib/lex/dune \
+	bin/contrib/misc/dune \
+	bin/contrib/oneshot/dune \
+	bin/distrib/dune
 
-ifdef API
+ifdef API_D
 piqi:
 	$(foreach p, $(wildcard lib/*.proto), \
 		piqi of-proto --normalize $(p) ; \
@@ -196,15 +216,12 @@ distrib: install-exe
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "127.0.0.1" > $(DISTRIB_DIR)/gw/only.txt
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
-	cp $(BUILD_DISTRIB_DIR)gwc1.exe $(DISTRIB_DIR)/gw/gwc$(EXE);
-	cp $(BUILD_DISTRIB_DIR)gwc1.exe $(DISTRIB_DIR)/gw/gwc1$(EXE);
-	cp $(BUILD_DISTRIB_DIR)gwc2.exe $(DISTRIB_DIR)/gw/gwc2$(EXE);
+	cp $(BUILD_DISTRIB_DIR)gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXE);
 	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/consang$(EXE);
 	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/mk_consang$(EXE);
 	cp $(BUILD_DISTRIB_DIR)gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXE);
 	cp $(BUILD_DISTRIB_DIR)gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXE);
 	cp $(BUILD_DISTRIB_DIR)ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXE);
-	cp $(BUILD_DISTRIB_DIR)ged2gwb2.exe $(DISTRIB_DIR)/gw/ged2gwb2$(EXE);
 	cp $(BUILD_DISTRIB_DIR)gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXE);
 	cp $(BUILD_DISTRIB_DIR)connex.exe $(DISTRIB_DIR)/gw/connex$(EXE);
 	cp $(BUILD_DISTRIB_DIR)gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXE);

@@ -1,6 +1,7 @@
 (* $Id: db2link.ml,v 5.18 2012-01-27 08:53:53 ddr Exp $ *)
 (* Copyright (c) 2006-2008 INRIA *)
 
+open Geneweb
 open Def
 open Gwcomp
 
@@ -1175,7 +1176,7 @@ let fold_option fsome vnone =
   | None -> vnone
 
 let changed_p (ip, p, o_sex, o_rpar) =
-  let p = Gwdb.dsk_person_of_person p in
+  let p = Gwdb2.dsk_person_of_person (Gwdb2.OfGwdb.person p) in
   let _p =
     {p with sex = fold_option (fun s -> s) p.sex o_sex;
      rparents =

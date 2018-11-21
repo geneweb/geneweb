@@ -377,10 +377,27 @@ let rebuild_fields2 db2 =
          (Filename.concat db2.Db2disk.bdir2 f))
     ["family"; "person"; "person_of_key"; "person_of_name"]
 
+#ifdef GWDB1
 let simple_output bname base carray =
   match carray with
-    Some tab ->
-      Gwdb.apply_base2 base
+  | Some _tab -> assert false
+  | None ->
+    Gwdb1.apply_base1 base
+      (fun base ->
+         let bname = base.Dbdisk.data.Dbdisk.bdir in
+         let no_patches =
+           not (Sys.file_exists (Filename.concat bname "patches"))
+         in
+         Outbase.gen_output (no_patches && not !indexes) bname base);
+    (* On recalcul le nombre reel de personnes. *)
+    Util.init_cache_info bname (Gwdb1.ToGwdb.base base)
+#endif
+
+#ifdef GWDB2
+let simple_output bname base carray =
+  match carray with
+  | Some tab ->
+      Gwdb2_internal.apply_base2 base
         (fun db2 ->
            let bdir = db2.Db2disk.bdir2 in
            let dir =
@@ -416,16 +433,8 @@ let simple_output bname base carray =
                list;
              Db2disk.commit_patches2 db2;
              rebuild_fields2 db2)
-  | None ->
-      Gwdb.apply_base1 base
-        (fun base ->
-           let bname = base.Dbdisk.data.Dbdisk.bdir in
-           let no_patches =
-             not (Sys.file_exists (Filename.concat bname "patches"))
-           in
-           Outbase.gen_output (no_patches && not !indexes) bname base);
-      (* On recalcul le nombre reel de personnes. *)
-      Util.init_cache_info bname base
+  | None -> assert false
+#endif
 
 let main () =
   Argl.parse speclist anonfun errmsg;
@@ -455,7 +464,14 @@ let main () =
        try
          Sys.catch_break true;
          let carray = ConsangAll.compute ~verbosity:!verbosity base !tlim !scratch in
-         simple_output !fname base carray
+         simple_output !fname
+           #ifdef GWDB1
+           (Gwdb1.OfGwdb.base base)
+           #endif
+           #ifdef GWDB2
+           (Gwdb2.OfGwdb.base base)
+           #endif
+           carray
        with Consang.TopologicalSortError p ->
          Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
            (Gutil.designation base p);
