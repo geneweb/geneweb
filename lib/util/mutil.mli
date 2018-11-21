@@ -65,3 +65,8 @@ val contains : ?wildcard:bool -> string -> string -> bool
     Return [p] where [p] is in [particles] and is prefix of [name].
     If no such [p] exists, empty string [""] is returned. *)
 val get_particle : string list -> string -> string
+
+(** [rm fname]
+    Remove [fname]. If [fname] does not exists, do nothing.
+*)
+val rm : string -> unit

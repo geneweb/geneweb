@@ -1,0 +1,7 @@
+(library
+ (name gwdb)
+ (public_name geneweb.gwdb)
+ (wrapped false)
+ (libraries geneweb.def geneweb.wserver geneweb.util geneweb.io)
+ (modules_without_implementation dbdisk)
+)
