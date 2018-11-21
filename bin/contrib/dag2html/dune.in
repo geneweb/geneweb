@@ -1,5 +1,5 @@
 (executable
   (name main)
   (modules main)
-  (libraries geneweb)
+  (libraries %%%GWDB_PKG%%% geneweb)
 )

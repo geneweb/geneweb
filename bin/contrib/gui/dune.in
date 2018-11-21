@@ -1,0 +1,5 @@
+(executables
+  (names gui)
+  (libraries %%%GWDB_PKG%%% geneweb threads lablgtk2 unix)
+  (flags (-w -a+31))
+)

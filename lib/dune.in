@@ -2,13 +2,16 @@
  (name geneweb)
  (public_name geneweb)
  (synopsis "GeneWeb library")
- (preprocess (action (run %{bin:cppo} %%%API%%% -V OCAML:%{ocaml_version} %{input-file})))
+ (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
-            %%%API_DEP%%%
+            %%%API_PKG%%%
             str
             camlp5
             camlp5.gramlib
+            geneweb.gwdb
+            geneweb.def
+            geneweb.util
             geneweb.wserver
             markup)
- (modules_without_implementation config dbdisk def templAst)
+ (modules_without_implementation config templAst)
 )
