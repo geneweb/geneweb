@@ -335,7 +335,7 @@ let delete_base conf bname =
     (btn_ok#connect#clicked
        (fun () ->
           let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-          Util.rm_rf base; wnd#destroy ()));
+          Mutil.rm_rf base; wnd#destroy ()));
   wnd#show ()
 
 

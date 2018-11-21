@@ -1338,7 +1338,7 @@ let cleanup_1 conf =
       Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
     end;
   flush stderr;
-  Util.rm_rf (Filename.concat "old" in_base_dir);
+  Mutil.rm_rf (Filename.concat "old" in_base_dir);
   if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
   else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
   flush stderr;
@@ -1398,7 +1398,7 @@ let rename conf =
 let delete conf = print_file conf "delete_1.htm"
 
 let delete_1 conf =
-  List.iter (fun (k, v) -> if v = "del" then Util.rm_rf (k ^ ".gwb")) conf.env;
+  List.iter (fun (k, v) -> if v = "del" then Mutil.rm_rf (k ^ ".gwb")) conf.env;
   print_file conf "del_ok.htm"
 
 let merge conf =
