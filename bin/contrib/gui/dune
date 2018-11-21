@@ -1,5 +1,0 @@
-(executables
-  (names gui)
-  (libraries geneweb threads lablgtk2 unix)
-  (flags (-w -a+31))
-)
