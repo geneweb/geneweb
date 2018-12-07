@@ -292,6 +292,11 @@ and eval_simple_var conf base env p =
         Vstring s -> str_val s
       | _ -> raise Not_found
       end
+  | ["keydir_notes"] ->
+      begin match get_env "keydir_img" env with
+        Vstring s -> str_val ((Filename.remove_extension s) ^ ".txt")
+      | _ -> raise Not_found
+      end
   | ["keydir_img_key"] ->
       begin match get_env "keydir_img" env with
         Vstring s -> str_val (Mutil.tr '+' ' ' (code_varenv s))
@@ -318,33 +323,51 @@ and eval_simple_var conf base env p =
         Vstring f ->
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
-          str_val (get_keydir_img_notes conf base (poi base p.key_index) fname)
+          str_val (Util.replace_quotes
+            (get_keydir_img_notes conf base (poi base p.key_index) fname))
       | _ -> raise Not_found
       end
   | ["keydir_img_src"] ->
       begin match get_env "keydir_img_src" env with
-      | Vstring str ->
-          let src =
+        Vstring f ->
+          let ext = Filename.extension f in
+          let fname = Filename.chop_suffix f ext in
+          let str =
+            get_keydir_img_notes conf base (poi base p.key_index) fname
+          in
+          let str =
             try
               let i = String.index str '\n' in
               let len = String.length str in
-              if i < len then String.sub str i (len - i - 1)
+              if i < len then String.sub str (i + 1) (len - i - 2)
               else ""
             with Not_found -> ""
           in
-          str_val src
+          let src =
+            try
+              let i = String.index str '\n' in
+              String.sub str 0 i
+            with Not_found -> ""
+          in
+          str_val (Util.replace_quotes (strip_br src))
       | _ -> raise Not_found
       end
   | ["keydir_img_title"] ->
       begin match get_env "keydir_img_title" env with
-      | Vstring str ->
+        Vstring f ->
+          let ext = Filename.extension f in
+          let fname = Filename.chop_suffix f ext in
+          let str =
+            get_keydir_img_notes conf base (poi base p.key_index) fname
+          in
           let title =
             try
               let i = String.index str '\n' in
               String.sub str 0 i
             with Not_found -> ""
           in
-          str_val title
+          let title = if title = "" && str <> "" then str else title in
+          str_val (Util.replace_quotes (strip_br title))
       | _ -> raise Not_found
       end
   | ["nb_pevents"] -> str_val (string_of_int (List.length p.pevents))
@@ -373,7 +396,7 @@ and eval_simple_var conf base env p =
         | _ -> None
       in
       eval_relation_var r sl
-  | ["sep"] -> str_val (Filename.dir_sep)
+  | ["X"] -> str_val (Filename.dir_sep)
   | ["sources"] -> str_val (quote_escaped p.psources)
   | ["surname"] -> str_val (quote_escaped p.surname)
   | ["surname_alias"] -> eval_string_env "surname_alias" env
@@ -1173,12 +1196,12 @@ let print_confirm conf base save_m report =
              else (k, v) :: accu)
           [] conf.env
       in
-      let _ = report in
       let new_env =
         if save_m = "IMAGE" then new_env
         else ("em", save_m) :: new_env
       in
       let new_env = ("digest", digest) :: new_env in
+      let new_env = ("report", report) :: new_env in
       let conf = { (conf) with env = new_env } in
       Hutil.interp conf "images"
         {Templ.eval_var = eval_var conf base;
@@ -1274,8 +1297,7 @@ let effective_send_ok conf base p file file_name mode =
         incorrect conf
     end;
   if content <> "" then write_file full_name content;
-  if notes <> "" then
-    write_file ((Filename.remove_extension full_name) ^ ".txt") (notes ^ "\n");
+  write_file ((Filename.remove_extension full_name) ^ ".txt") notes;
   let changed =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -1284,7 +1306,7 @@ let effective_send_ok conf base p file file_name mode =
       if file_name <> "" && notes <> "" then "sb"
       else if file_name <> "" then "so"
       else if notes <> "" then "sc" else "sn");
-  "ok"
+  file_name
 
 (* removes portrait or other image and saves it into old folder *)
 (* if delete=on permanently deletes the file in old folder *)
@@ -1334,7 +1356,7 @@ let effective_delete_ok conf base p =
   in
   History.record conf base changed
     (if mode = "portraits" then "di" else "do");
-  "ok"
+  file_name
 
 (* reset portrait or image from old folder to portrait or others *)
 
@@ -1412,7 +1434,10 @@ let effective_reset_ok conf base p =
       else
         rename_files file_in_old new_file true
     end;
-  "ok"
+  let file_name =
+    try List.assoc "file_name" conf.env with Not_found -> ""
+  in
+  file_name
 
 let print conf base =
   (* if em="" this is the first pass, do it *)
@@ -1425,7 +1450,7 @@ let print conf base =
       | Some ip ->
           let p = poi base (Adef.iper_of_int ip) in
           let digest = (default_image_name base p) in
-          let report =
+          let (conf, report) =
             begin match m with
             | "SND_IMAGE_OK" ->
                 let mode =
@@ -1439,26 +1464,35 @@ let print conf base =
                     (try List.assoc "file_name_2" conf.env with Not_found -> "")
                   else file_name
                 in
+                let file_name_2 = Filename.remove_extension file_name in
+                let new_env =
+                  List.fold_left
+                    (fun accu (k, v) ->
+                       if k = "file_name_2" then (k, file_name_2) :: accu
+                       else (k, v) :: accu)
+                    [] conf.env
+                in
+                let conf = { (conf) with env = new_env } in
                 let file_name = Wserver.decode file_name in
                 let file =
                   if mode <> "comment" then raw_get conf "file"
                   else "file_name"
                 in
                 if digest = raw_get conf "digest" then
-                  effective_send_ok conf base p file file_name mode
-                else "digest error"
+                  conf, effective_send_ok conf base p file file_name mode
+                else conf, "digest error";
             | "DEL_IMAGE_OK" ->
                 if digest = raw_get conf "digest" then
-                  effective_delete_ok conf base p
-                else "digest error"
+                  conf, effective_delete_ok conf base p
+                else conf, "digest error"
             | "RESET_IMAGE_OK" ->
                 let digest = (default_image_name base p) in
                 if digest = raw_get conf "digest" then
-                  effective_reset_ok conf base p
-                else "digest error"
+                  conf, effective_reset_ok conf base p
+                else conf, "digest error"
             | "IMAGE" ->
-                "image"
-            | _ -> "incorrect request"
+                conf, "image"
+            | _ -> conf, "incorrect request"
             end;
           in
           begin match report with

@@ -48,16 +48,16 @@ en: restored
 fr: restauré/restaurée
 
     save portrait
-en: actual portait will be saved to <samp>documents > portraits > saved</samp>.
-fr: le portrait actuel sera sauvegardé dans <samp>documents > portraits > saved</samp>.
+en: the existing portait will be saved to <samp>documents
+fr: le portrait existant sera sauvegardé dans <samp>documents
 
     previous portrait
-en: the previous save of the portait in this subfolder will be deleted.
-fr: la précédente sauvegarde du portrait dans ce sous-répertoire sera supprimée.
+en: the existing save of the portait in this subfolder will be deleted.
+fr: la sauvegarde existante du portrait dans ce sous-répertoire sera supprimée.
 
     save image
 en: an image with a similar name will moved existing image to <samp>documents
-fr: une image au nom identique déplacera l’image existante dans <samp>documents
+fr: si une image du même nom existe déjà, elle sera sauvegardée dans <samp>documents
 
     previous image
 en: if an image with the same name already exists in this subfolder, it will be deleted.
