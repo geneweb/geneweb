@@ -425,7 +425,7 @@ let gen_output no_patches bname base =
       if Sys.file_exists tmp_notes then
         Sys.rename tmp_notes (Filename.concat bname "notes");
       if Sys.file_exists tmp_notes_d then
-        begin let notes_d = Filename.concat bname "notes_d" in
+        begin let notes_d = Filename.concat bname "notes" in
           Mutil.remove_dir notes_d; Sys.rename tmp_notes_d notes_d
         end;
       Mutil.remove_file (Filename.concat bname "patches");

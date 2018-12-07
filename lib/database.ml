@@ -825,10 +825,8 @@ let opendb bname =
     with Not_found -> Hashtbl.add patches.h_name i [ip]
   in
   let read_notes fnotes rn_mode =
-    let fname =
-      if fnotes = "" then "notes"
-      else Filename.concat "notes_d" (fnotes ^ ".txt")
-    in
+    let fname = if fnotes = "" then "notes" else fnotes in
+    let fname = Filename.concat "notes" (fname ^ ".txt") in
     try
       let ic = Secure.open_in (Filename.concat bname fname) in
       let str =
@@ -848,14 +846,13 @@ let opendb bname =
     with Sys_error _ -> ""
   in
   let commit_notes fnotes s =
+    let fname = if fnotes = "" then "notes" else fnotes in
     let fname =
-      if fnotes = "" then "notes"
-      else
         begin
-          begin try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with
+          begin try Unix.mkdir (Filename.concat bname "notes") 0o755 with
             _ -> ()
           end;
-          Filename.concat "notes_d" (fnotes ^ ".txt")
+          Filename.concat "notes" (fname ^ ".txt")
         end
     in
     let fname = Filename.concat bname fname in
@@ -866,7 +863,7 @@ let opendb bname =
       let oc = Secure.open_out fname in output_string oc s; close_out oc; ()
   in
   let ext_files () =
-    let top = Filename.concat bname "notes_d" in
+    let top = Filename.concat bname "notes" in
     let rec loop list subdir =
       let dir = Filename.concat top subdir in
       try
