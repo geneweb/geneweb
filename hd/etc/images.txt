@@ -19,7 +19,6 @@
   file_name must be defined
   mode="comment" then only the comment file is updated
   keydir is “on” if we are dealing with “others” images %)
-%(%foreach;env_binding;%if;(env.key!="file")%env.key;=%env.val;<br>%end;%end;%)
 %define;alert_header()
   %if;(evar.mode="others")
     %if;(evar.em="SND_IMAGE_OK")[*image received]%if;(evar.notes!="") [with comment]%end;
@@ -28,22 +27,24 @@
     %elseif;(evar.em="RESET_IMAGE_OK")[*image/images]0 [restored]1%nn;
     %end;
   %else;
-    %if;(evar.em="SND_IMAGE_OK")%if;(evar.mode="comment")[*comment updated]%else;[*portrait] [uploaded]0%end;%nn;
+    %if;(evar.em="SND_IMAGE_OK")%if;(evar.mode="comment")[*comment] [update]%else;[*portrait] [uploaded]0%end;%nn;
     %elseif;(evar.em="DEL_IMAGE_OK")[*portrait] [deleted]0%if;(evar.delete!="on") [and] [saved]0%end;%nn;
-    %elseif;(evar.em="RESET_IMAGE_OK")[*portrait] [restored]%nn;
+    %elseif;(evar.em="RESET_IMAGE_OK")[*portrait] [restored]0%nn;
     %end;%nn;
   %end;
 %end;
 %define;alert_content()
-  %if;(evar.mode="others")
-    <samp>images/%keydir;%if;(evar.delete="on")/saved%end;/%evar.file_name;</samp>%nn;
+  %if;(evar.mode="others" or evar.mode="comment")
+    <samp>%if;(evar.em="RESET_IMAGE_OK")images%X;%keydir;%X;saved%X;%evar.file_name; <strong>></strong> %end;images%X;%keydir;%if;(evar.delete="on")%X;saved%end;%X;%nn;
+    %if;(evar.notes!="")%evar.file_name_2;%else;%evar.file_name;%end;</samp>
   %else;
     %if;(evar.em="SND_IMAGE_OK" or evar.em="RESET_IMAGE_OK")
-      <samp>%evar.file_name;</samp> %if;(evar.em="RESET IMAGE_OK")%portrait; <%end;> <samp>portraits/%portrait;%nn;
+      <samp>%evar.file_name;</samp> %if;(evar.em="RESET_IMAGE_OK")portraits%X;saved%X;%portrait_saved;
+      <strong> <</strong>%end;<strong>> </strong><samp>portraits%X;%portrait;%nn;
       %(%if;(evar.em="DEL IMAGE_OK" or evar.em="RESET_IMAGE_OK")%portrait;%else;%evar.file_name;%end;</samp>%)
     %elseif;(evar.em="DEL_IMAGE_OK")
-      <samp>%if;(evar.delete!="on")portrait/%portrait_saved;</samp>%sep;<samp>portrait/saved/%portrait_saved;
-            %else;portrait/old/%keydir;.img %portrait_saved; on n'a plus %%portrait_saved; si supprimé !%end;</samp>
+      <samp>%if;(evar.delete!="on")portrait%X;%portrait_saved;</samp> <strong>></strong> <samp>portraits%X;saved%X;%portrait_saved;
+            %else;portraits%X;saved%X;%keydir;(.gif/jpg/png)%end;</samp>
     %end;
   %end;
 %end;
@@ -54,8 +55,8 @@
   %else;warning
   %end;
 %end;
-%( *** Notification toast *** %)
-%if;(evar.em!="")
+%( *** Notification toast, waiting BS4.2 *** %)
+%(%if;(evar.em!="")
 <div class="bg-light">
   <div class="toast" role="alert" aria-live="assertive" aria-atomic="true"%( data-animation="true"data-autohide="false"%) data-delay="3500"%sp;
     style="position: absolute; top: 0; right: 60px;">
@@ -71,7 +72,7 @@
     </div>
   </div>
 </div>
-%end;
+%end;%)
 %if;(wizard)
   <div class="row">
     %( *** Col 1 *** %)
@@ -95,7 +96,7 @@
           type="submit" disabled>[*send]</button>
       </form>
       <div class="small mt-2">%nn;
-        %if;(has_image)[*save portrait]
+        %if;(has_image)[*save portrait]%X;portraits%X;saved%X;</samp>.
           %if;(has_old_image)<br>[*previous portrait]%end;
         %end;
       </div>
@@ -121,7 +122,7 @@
           type="submit" disabled>[*send]
         </button>
         %(TODO: print only if old img already exists%)
-        <div class="small col-12 mt-1">[*save image]%sep;%keydir;%sep;saved ></samp>.<br>[*previous image]</div>
+        <div class="small col-12 mt-1">[*save image]%X;%keydir;%X;saved%X;</samp>.<br>[*previous image]</div>
         <div class="d-flex col">
           <h1 class="display-4">
             %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*comment]</h1>
@@ -141,14 +142,15 @@
       %if;(has_image or has_old_image)
         <h1 class="display-4">[*portrait]0</h1>
         <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
-        <strong><samp class="text-truncate" title="%base.name;.gwb%sep;documents%sep;portraits%sep;">portraits%sep;</samp></strong>
+        <strong><samp class="text-truncate" title="%base.name;.gwb%X;documents%X;portraits%X;">portraits%X;</samp></strong>
         %if;has_image;
           <div class="d-flex w-100 mt-1">
             <a role="button" href="%prefix_base_password;&m=IM&i=%index;" target="_blank" rel="noopener"%sp;
-              title="[*see] [portrait] %portrait;">
+            data-toggle="tooltip" data-html="true" data-placement="left"
+            title='<strong>[*see] [portrait]</strong><br><span class="small">%portrait;</span><img class="rounded my-1" src="%prefix_base_password;&m=IM&i=%index;" width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>
-            <samp class="ml-4" title="%base.name;.gwb%sep;documents%sep;portraits%sep;%portrait;">%portrait;</samp>
+            <samp class="ml-4" title="%base.name;.gwb%X;documents%X;portraits%X;%portrait;">%portrait;</samp>
             <a role="button" href="%prefix_base_password;&m=DEL_IMAGE_OK&i=%index;&digest=%digest;"
               class="ml-auto col-1" title="[*delete] [and] [save] [portrait]"><i class="far fa-trash-alt text-warning"></i>%nn;
             </a>
@@ -156,15 +158,16 @@
         %end;
         %if;has_old_image;
           <div class="d-flex w-100%if;(has_image) mt-1%end;">
-            <a role="button" href="%prefix_base_password;&m=IMS&i=%index;"
-                 target="_blank" rel="noopener" title="[*see] [portrait] %portrait_saved; ([saved images]0)">%nn;
+            <a role="button" href="%prefix_base_password;&m=IMS&i=%index;" target="_blank" rel="noopener"
+              data-toggle="tooltip" data-html="true" data-placement="left"
+              title='<strong>[*see] [portrait] [saved]0</strong><br><span class="small">%portrait;</span><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;" width="185px">'>%nn;
                <i class="far fa-file-image fa-fw text-primary"></i></a>%nn;
             <a role="button" href="%prefix_base_password;&m=RESET_IMAGE_OK&i=%index;&digest=%digest;"
-                title="[*restore] [portrait] %portrait_saved; ([saved images]0)">
+                title="[*restore] [portrait] saved%X;%portrait_saved; ([saved images]0)">
               <i class="fas fa-retweet fa-rotate-90 fa-fw text-success"></i></a>
-            <samp class="ml-1" title="%base.name;.gwb%sep;documents%sep;portraits%sep;saved%sep;%portrait_saved;"><strong>saved ></strong> %portrait_saved;</samp>
+            <samp class="ml-1" title="%base.name;.gwb%X;documents%X;portraits%X;saved%X;%portrait_saved;"><strong>saved ></strong> %portrait_saved;</samp>
             <a role="button" class="ml-auto col-1" href="%prefix_base_password;&m=DEL_IMAGE_OK&i=%index;&digest=%digest;&delete=on"
-              title="[*delete] [portrait] ([saved images]0)"><i class="far fa-trash-alt text-danger"></i></a>
+              title="[*delete] [portrait] saved%X;%portrait_saved; ([saved images]0)"><i class="far fa-trash-alt text-danger"></i></a>
           </div>
         %end;
       %end;
@@ -173,30 +176,37 @@
         %if;(keydir_img_nbr>0)
           <div class="d-flex align-items-center w-100">
             <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
-            <strong><samp class="text-truncate" title="%base.name;.gwb%sep;documents%sep;images%sep;%keydir;">images%sep;%keydir;%sep;</samp></strong>
+            <strong><samp class="text-truncate" title="%base.name;.gwb%X;documents%X;images%X;%keydir;">images%X;%keydir;%X;</samp></strong>
             <div class="ml-auto">(%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
           </div>
           %foreach;img_in_keydir;
             <div class="d-flex w-100 mt-1">
               <a role="button" href="%prefix_base_password;&m=IM&i=%index;&s=%keydir_img_key;"
-                target="_blank" rel="noopener" title="[*see] %keydir_img;">%nn;
-                <i class="far fa-file-image fa-fw text-primary"></i>%nn;
+                target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
+                title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong>
+                       <br><span class="small">%keydir_img;</span>
+                       <img class="rounded my-1" src="%prefix_base_password;&m=IM&i=%index;&s=%keydir_img_key;" width="185px">'>%nn;
+                <i class="far fa-file-image fa-fw text-primary"></i>
               </a>
-              <a id="notes_%cnt;" href="#"
-                class="text-%if;(keydir_img_notes="")danger%else;primary%end;"
-                onclick='get_notes(%cnt;, "%keydir_img;"); return false;' %nn;
-                data-toggle="tooltip" data-html="true"
-                %(data-trigger="focus"%) data-placement="left"
-                data-content="%keydir_img_notes;"
-                title="<em>[*modify] [comment]</em>%keydir_img_notes;
-                %(%if;(keydir_img_title!="")%keydir_img_title;%end;%nn;
-                %if;(keydir_img_src!="") <small>(%keydir_img_src;)</small>%end;%)
-                "><i class="far fa-file-alt fa-fw"></i>
+              <a id="notes_%cnt;" class="text-%if;(keydir_img_notes="")danger%else;primary%end;"
+                onclick='get_notes(%cnt;, "%keydir_img;"); return false;' data-comment="%keydir_img_notes;"
+                data-toggle="tooltip" data-html="true" data-placement="left"
+                title='<strong><i class="far fa-file fa-fw mr-1"></i>
+                       %if;(keydir_img_notes="")[*add]%else;[*modify]%end; [comment]</strong>
+                       <br><span class="small">%keydir_notes;</span>
+                       <br><span class="d-inline-block text-truncate small" style="text-align: left; max-width: 185px">%nn;
+                             %keydir_img_title;%if;(keydir_img_src!="")<br>%keydir_img_src;%end;</span>'>%nn;
+                <i class="far fa-file-alt fa-fw"></i>%nn;
               </a>
-              <samp class="text-truncate ml-1" title="%base.name;.gwd%sep;documents%sep;images%sep;%keydir;%sep;%keydir_img;">%keydir_img;</samp>
+              %(<samp  title="%base.name;.gwd%X;documents%X;images%X;%keydir;%X;%keydir_img;"> TODO: remettre une grande tooltip au clic sur le nom de l'image !%)
+              <a data-toggle="tooltip" data-html="true"
+                  title='<span class="small">%keydir_img;</span>
+                       <img class="rounded my-1" src="%prefix_base_password;&m=IM&i=%index;&s=%keydir_img_key;" width="185px">'><samp class="text-truncate small ml-1">%keydir_img;</samp></a>
               <div class="ml-auto col-1">
                 <a role="button" href="%prefix_base_password;&m=DEL_IMAGE_OK&i=%index;&file_name=%keydir_img_key;&mode=others&digest=%digest;"
-                  title="[*delete] [and] [save] %keydir_img;">%nn;
+                  data-toggle="tooltip" data-html="true" data-placement="left"
+                  title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete]%( [and] [save]%)</strong><br><span class="small">%keydir_img;</span>
+                        <img class="rounded my-1" src="%prefix_base_password;&m=IM&i=%index;&s=%keydir_img_key;" width="185px">'>%nn;
                   <i class="far fa-trash-alt text-warning"></i></a>%nn;
               </div>
             </div>
@@ -207,18 +217,19 @@
         <h1 class="display-4">[*saved images]1</h1>
         <div class="d-flex align-items-center w-100">
           <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
-          <strong><samp class="text-truncate" title="%base.name;.gwb%sep;documents%sep;images%sep;%keydir;%sep;saved%sep;">images%sep;%keydir;%sep;saved%sep;</samp></strong>
+          <strong><samp class="text-truncate" title="%base.name;.gwb%X;documents%X;images%X;%keydir;%X;saved%X;">images%X;%keydir;%X;saved%X;</samp></strong>
           <div class="ml-auto">(%keydir_old_img_nbr; %if;(keydir_old_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
         </div>
         %foreach;img_in_keydir_old;
           <div class="d-flex w-100 mt-1">
-            <a role="button" href="%prefix_base_password;&m=IMS&i=%index;&s=%keydir_img_old_key;"
-               target="_blank" rel="noopener" title="[*see] [saved images]0 %keydir_img_old;">%nn;
-              <i class="far fa-file-image fa-fw text-primary"></i></a>%nn;
+            <a role="button" href="%prefix_base_password;&m=IMS&i=%index;&s=%keydir_img_old_key;" target="_blank" rel="noopener"
+               data-toggle="tooltip" data-html="true" data-placement="left"
+               title='<strong>[*see] [saved images]0</strong><br><span class="small">%keydir_img_old;</span><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;&s=%keydir_img_old_key;" width="185px">'>%nn;
+               <i class="far fa-file-image fa-fw text-primary"></i></a>%nn;
             <a role="button" href="%prefix_base_password;&m=RESET_IMAGE_OK&i=%index;&mode=others&file_name=%keydir_img_old_key;&digest=%digest;"
                title="[*restore] [saved images]0 %keydir_img_old;">%nn;
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i></a>%nn;
-            <samp class="text-truncate ml-1" title="%base.name;.gwd%sep;documents%sep;images%sep;%keydir;%sep;saved%sep;%keydir_img_old;">%keydir_img_old;</samp>
+            <samp class="text-truncate ml-1" title="%base.name;.gwd%X;documents%X;images%X;%keydir;%X;saved%X;%keydir_img_old;">%keydir_img_old;</samp>
             <div class="ml-auto col-1">
               <a role="button" href="%prefix_base_password;&m=DEL_IMAGE_OK&i=%index%nn;
                 &digest=%digest;&file_name=%keydir_img_old_key;&mode=others%nn;
@@ -231,7 +242,7 @@
     </div>
   </div>
   %if;(evar.em!="")
-    <div role="alert" class="alert alert-dismissible fade show alert-%apply;alert_color() mt-2">
+    <div role="alert" class="alert alert-dismissible fade show alert-%apply;alert_color()">
       <strong>%apply;alert_header()[:]</strong> %apply;alert_content()
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -266,14 +277,11 @@ $('#notes_comments').bind('input propertychange', function() {
 $('.fa-file-alt').click(function() {
   $('.custom-others').attr('disabled', true);
   $('textarea').attr('disabled', false);
-  $('textarea').focus();
-
+  $('textarea').focus();4
 });
 %( Initialize Bootstrap toast, tooltip and popover component, dismiss on next click function,
   TODO: choose one and delete the other %)
-$(function () {
-  $('.toast').toast()
-})
+
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
@@ -282,13 +290,16 @@ $(function () {
 })
 $('.popover-dismiss').popover({
   trigger: 'focus'
-})%)
+})
 $( document).ready(function () {
  $('.toast').toast('show');
 })
+$(function () {
+  $('.toast').toast()
+})%)
 function get_notes (cnt, name) {
 var item = document.getElementById("notes_"+cnt);
-document.getElementById("notes_comments").value=item.dataset.content;
+document.getElementById("notes_comments").value=item.dataset.comment;
 document.getElementById("which_img_show").textContent="[*update image comment] "+name;
 document.getElementById("file_name_2").value=name;
 document.getElementById("mode_2").value="comment";
