@@ -55,7 +55,7 @@ let print_image_type fname ctype =
   | None -> false
 
 (*same as print_image_type but tests for file existence before *)
-let print_image_type_2 conf fname ctype =
+let print_image_type_2 conf fname bfname ctype =
   if Sys.file_exists fname then
     match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
       Some ic ->
@@ -77,11 +77,11 @@ let print_image_type_2 conf fname ctype =
     let title _ = Wserver.printf "Error" in
     let fname1 =
       String.concat
-        Filename.dir_sep [Util.base_path conf.bname; "documents"; fname]
+        Filename.dir_sep [Util.base_path conf.bname; "documents"; bfname]
     in
     let fname2 =
       String.concat
-        Filename.dir_sep [Secure.base_dir (); "images"; fname]
+        Filename.dir_sep [Secure.base_dir (); "images"; bfname]
     in
     Hutil.header conf title;
     Wserver.printf "Cannot access files:\n";
@@ -114,13 +114,13 @@ let print_image_file fname =
      (".gif", "image/gif"); (".pdf", "application/pdf");
      (".htm", "text/html"); (".html", "text/html")]
 
-let print_image_file_2 conf fname =
+let print_image_file_2 conf fname bfname =
   List.exists
     (fun (suff, ctype) ->
        if Filename.check_suffix fname suff ||
           Filename.check_suffix fname (String.uppercase_ascii suff)
        then
-         print_image_type_2 conf fname ctype
+         print_image_type_2 conf fname bfname ctype
        else false)
     [(".png", "image/png"); (".jpg", "image/jpeg");
      (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");
@@ -142,7 +142,7 @@ let print_image_file_2 conf fname =
 let print_personal_image conf base p saved =
   match Util.image_and_size conf base p saved (fun _ _ -> Some (1, 1)) with
     Some (true, f, _) ->
-      if print_image_file_2 conf f then () else Hutil.incorrect_request conf
+      if print_image_file_2 conf f f then () else Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
@@ -156,13 +156,12 @@ let print_personal_image conf base p saved =
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
 let print_source_image conf f =
-  let fname =
+  let bfname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  (*if fname = Filename.basename fname then TODO clean if ok*)
-    let fname = Util.source_image_file_name conf fname in
-    if print_image_file_2 conf fname then () else Hutil.incorrect_request conf
-  (*else Hutil.incorrect_request conf*)
+    let fname = Util.source_image_file_name conf bfname in
+    if print_image_file_2 conf fname bfname then ()
+    else Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)

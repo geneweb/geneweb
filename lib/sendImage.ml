@@ -62,6 +62,11 @@ let strip_br str =
   if len > 4 && (String.sub str (len - 4) 4) = "<br>" then
     (String.sub str 0 (len - 4)) else str
 
+let include_hed_trl conf name =
+  match Util.open_etc_file_name conf name with
+    Some ic -> Templ.copy_from_templ conf [] ic
+  | None -> ()
+
 let rec eval_var conf base env p _loc sl =
   try eval_special_var conf base sl with
     Not_found -> eval_simple_var conf base env p sl
@@ -814,6 +819,8 @@ and eval_special_var conf base =
             VVstring ""
       | None -> VVstring ""
       end
+  | ["base_header"] -> include_hed_trl conf "hed"; VVstring ""
+  | ["base_trailer"] -> include_hed_trl conf "trl"; VVstring ""
   | _ -> raise Not_found
 and eval_int_env var env =
   match get_env var env with
@@ -1153,8 +1160,6 @@ let move_file_to_old conf fname bfname mode keydir =
   if Sys.file_exists saved_file then 1 else 0
 
 let print_confirm conf base save_m report =
-  let _ = Printf.eprintf "print_confirm\n" in
-  let _ = flush stderr in
   match p_getint conf.env "i" with
   | Some ip ->
       let p = poi base (Adef.iper_of_int ip) in
