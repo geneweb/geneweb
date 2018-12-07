@@ -1158,15 +1158,6 @@ let base_path bname =
       else bfile_suff
   #endif
 
-let search_in_lang_path fname =
-   let rec loop =
-    function
-      [] -> fname
-    | d :: dl ->
-        let f = Filename.concat d fname in
-        if Sys.file_exists f then f else loop dl
-    in
-    loop (Secure.lang_path ())
 (* *******************************************************************  *)
 (*   Search file (template, image...) in gw default directory.          *)
 (*                                                                      *)
@@ -1177,9 +1168,18 @@ let search_in_lang_path fname =
       (je crois dans cet ordre)
       Renvoie le chemin completé du fichier recherché                  *)
 (* ******************************************************************* *)
+let search_in_lang_path fname =
+   let rec loop =
+    function
+      [] -> fname
+    | d :: dl ->
+        let f = Filename.concat d fname in
+        if Sys.file_exists f then f else loop dl
+    in
+    loop (Secure.lang_path ())
+
 let gw_etc_file fname =
   let etc_file = Filename.concat (search_in_lang_path "etc") fname in
-  (* cette ligne est probablement inutile search_in_lg_path fait le travail *)
   let share_file = Filename.concat sharelib fname in
   if Sys.file_exists etc_file then etc_file
   else if Sys.file_exists share_file then share_file
@@ -1248,11 +1248,11 @@ let base_etc_file conf fname =
     | t :: l ->
         let bname_etc_tpl_file =
           String.concat Filename.dir_sep
-            [base_path conf.bname; "etc"; conf.bname; t; fname ^ ".txt"]
+            [base_path conf.bname; "etc"; t; fname ^ ".txt"]
         in
         let bname_etc_file =
           String.concat Filename.dir_sep
-            [base_path conf.bname; "etc"; conf.bname; fname ^ ".txt"]
+            [base_path conf.bname; "etc"; fname ^ ".txt"]
         in
         let bases_etc_tpl_file =
           String.concat Filename.dir_sep
