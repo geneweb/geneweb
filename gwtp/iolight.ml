@@ -139,9 +139,8 @@ let input bname =
   in
   let cleanup () = close_in ic in
   let read_notes fnotes rn_mode =
-    let fname =
-      if fnotes = "" then "notes"
-      else Filename.concat "notes_d" (fnotes ^ ".txt")
+    let fname = if fnotes = "" then "notes" else fnotes in
+    let fname = Filename.concat "notes" (fname ^ ".txt")
     in
     match
       try Some (Secure.open_in (Filename.concat bname fname)) with
@@ -164,14 +163,13 @@ let input bname =
     | None -> ""
   in
   let commit_notes fnotes s =
+    let fname = if fnotes = "" then "notes" else fnotes in
     let fname =
-      if fnotes = "" then "notes"
-      else
         begin
-          begin try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with
+          begin try Unix.mkdir (Filename.concat bname "notes") 0o755 with
             _ -> ()
           end;
-          Filename.concat "notes_d" (fnotes ^ ".txt")
+          Filename.concat "notes" (fname ^ ".txt")
         end
     in
     let fname = Filename.concat bname fname in

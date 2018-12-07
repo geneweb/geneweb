@@ -62,6 +62,8 @@ let print_search_form conf from_note =
   Wserver.printf "</table>\n"
 
 let print_whole_notes conf base fnotes title s ho =
+  let _ = Printf.eprintf "Print_whole_notes: %s\n %s\n %s\n" fnotes title s in
+  let _ = flush stderr in
   Hutil.header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
@@ -378,9 +380,12 @@ let print_what_links conf base fnotes =
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-      Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      Some f ->
+        if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
+  let _ = Printf.eprintf "Notes: %s\n" fnotes in
+  let _ = flush stderr in
   match p_getenv conf.env "ref" with
     Some "on" -> print_what_links conf base fnotes
   | _ ->

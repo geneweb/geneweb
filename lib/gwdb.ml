@@ -1126,7 +1126,7 @@ let base1 base =
      base_notes_are_empty =
        (fun fnotes -> base.data.bnotes.nread fnotes RnDeg = "");
      base_notes_origin_file = (fun () -> base.data.bnotes.norigin_file);
-     base_notes_dir = (fun () -> "notes_d");
+     base_notes_dir = (fun () -> "notes");
      base_wiznotes_dir = (fun () -> "wiznotes");
      nobtit = (fun conf p -> C_base.nobtit self conf p);
      p_first_name = (fun p -> C_base.p_first_name self p);
@@ -1358,8 +1358,8 @@ let base2 db2 =
             close_in ic;
             r
           with Sys_error _ -> "");
-     base_notes_dir = (fun () -> Filename.concat "base_d" "notes_d");
-     base_wiznotes_dir = (fun () -> Filename.concat "base_d" "wiznotes_d");
+     base_notes_dir = (fun () -> Filename.concat "base_d" "notes");
+     base_wiznotes_dir = (fun () -> Filename.concat "base_d" "wiznotes");
      nobtit = (fun conf p -> C_base.nobtit self conf p);
      p_first_name = (fun p -> C_base.p_first_name self p);
      p_surname = (fun p -> C_base.p_surname self p);

@@ -375,15 +375,14 @@ let insert_pevents1 gen sb sex pevents =
     pevents
 
 let insert_bnotes1 gen notesname str =
+  let nfname = if notesname = "" then "notes" else notesname in
   let nfname =
-    if notesname = "" then "notes"
-    else
       let f =
-        match NotesLinks.check_file_name notesname with
+        match NotesLinks.check_file_name nfname with
           Some (dl, f) -> List.fold_right Filename.concat dl f
         | None -> "bad"
       in
-      Filename.concat "notes_d" f
+      Filename.concat "notes" f
   in
   let fname =
     List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; nfname ^ ".txt"]
@@ -404,7 +403,7 @@ let write_file_contents fname text =
 
 let insert_wiznotes1 gen wizid str =
   let wizdir =
-    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "wiznotes_d"]
+    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "wiznotes"]
   in
   Mutil.mkdir_p wizdir;
   let fname = Filename.concat wizdir wizid ^ ".txt" in
