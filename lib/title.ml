@@ -175,10 +175,10 @@ let select_title_place conf base title place =
       list := (x, t) :: !list;
       if not (List.mem tn !all_names) then all_names := tn :: !all_names
   in
-  for i = 0 to nb_of_persons base - 1 do
-    let x = pget conf base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter (fun i ->
+    let x = pget conf base i in
     List.iter (select x) (nobtit conf base x)
-  done;
+    ) (Gwdb.ipers base) ;
   !list, !clean_title, !clean_place, !all_names
 
 let select_all_with_place conf base place =
@@ -189,10 +189,10 @@ let select_all_with_place conf base place =
     if Name.lower (sou base t.t_place) = place then
       begin clean_place := sou base t.t_place; list := (x, t) :: !list end
   in
-  for i = 0 to nb_of_persons base - 1 do
-    let x = pget conf base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter (fun i ->
+    let x = pget conf base i in
     List.iter (select x) (nobtit conf base x)
-  done;
+    ) (Gwdb.ipers base) ;
   !list, !clean_place
 
 let select_title conf base title =
@@ -211,10 +211,10 @@ let select_title conf base title =
         begin clean_name := tn; set := StrSet.add pn !set end;
       if not (List.mem tn !all_names) then all_names := tn :: !all_names
   in
-  for i = 0 to nb_of_persons base - 1 do
-    let x = pget conf base (Adef.iper_of_int i) in
-    List.iter add_place (nobtit conf base x)
-  done;
+  Gwdb.Collection.iter (fun i ->
+      let x = pget conf base i in
+      List.iter add_place (nobtit conf base x)
+    ) (Gwdb.ipers base) ;
   StrSet.elements !set, !clean_name, !all_names
 
 let select_place conf base place =
@@ -228,32 +228,25 @@ let select_place conf base place =
       if not (List.mem tn !list) then
         begin clean_name := pn; list := tn :: !list end
   in
-  for i = 0 to nb_of_persons base - 1 do
-    let x = pget conf base (Adef.iper_of_int i) in
-    List.iter add_title (nobtit conf base x)
-  done;
+  Gwdb.Collection.iter (fun i ->
+      let x = pget conf base i in
+      List.iter add_title (nobtit conf base x)
+    ) (Gwdb.ipers base) ;
   !list, !clean_name
 
 let select_all proj conf base =
-  let s =
-    let rec loop i s =
-      if i = nb_of_persons base then s
-      else
-        let x = pget conf base (Adef.iper_of_int i) in
-        let s =
-          List.fold_left (fun s t -> StrSet.add (sou base (proj t)) s) s
-            (nobtit conf base x)
-        in
-        loop (i + 1) s
-    in
-    loop 0 StrSet.empty
-  in
-  StrSet.elements s
+  Gwdb.Collection.fold (fun acc i ->
+      let x = pget conf base i in
+      List.fold_left
+        (fun s t -> StrSet.add (sou base (proj t)) s) acc
+        (nobtit conf base x)
+    ) StrSet.empty (Gwdb.ipers base)
+  |> StrSet.elements
 
 let select_all2 proj conf base =
   let ht = Hashtbl.create 1 in
-  for i = 0 to nb_of_persons base - 1 do
-    let x = pget conf base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter (fun i ->
+    let x = pget conf base i in
     List.iter
       (fun t ->
          let s = sou base (proj t) in
@@ -263,7 +256,7 @@ let select_all2 proj conf base =
          in
          incr cnt)
       (nobtit conf base x)
-  done;
+    ) (Gwdb.ipers base) ;
   Hashtbl.fold (fun s cnt list -> (s, !cnt) :: list) ht []
 
 let select_all_titles = select_all2 (fun t -> t.t_ident)
