@@ -285,7 +285,7 @@ let min_year_of p =
   | Some (Dtext _) | None -> None
 
 let rec check_ancestors base warning year year_tab ip ini_p =
-  if fst year_tab.(Adef.int_of_iper ip) = max_int then
+  if fst @@ Gwdb.Marker.get year_tab ip = max_int then
     let p = poi base ip in
     let new_year_o = min_year_of p in
     let (new_year, new_ini_p, own_year) =
@@ -293,47 +293,49 @@ let rec check_ancestors base warning year year_tab ip ini_p =
         Some y -> y, p, true
       | None -> year - 1, ini_p, false
     in
-    year_tab.(Adef.int_of_iper ip) <- new_year, own_year;
+    Gwdb.Marker.set year_tab ip (new_year, own_year) ;
     if new_year >= year then warning (IncoherentAncestorDate (p, ini_p));
     match get_parents p with
-      Some ifam ->
-        let fam = foi base ifam in
-        List.iter
-          (fun get ->
-             let ip = get fam in
-             let year = year_tab.(Adef.int_of_iper ip) in
-             if fst year = max_int then
-               check_ancestors base warning new_year year_tab ip new_ini_p
-             else if snd year && fst year >= new_year then
-               warning (IncoherentAncestorDate (poi base ip, new_ini_p)))
-          [get_father; get_mother]
+    | Some ifam ->
+      let fam = foi base ifam in
+      let f = fun get ->
+        let ip = get fam in
+        let year = Gwdb.Marker.get year_tab ip in
+        if fst year = max_int
+        then check_ancestors base warning new_year year_tab ip new_ini_p
+        else if snd year && fst year >= new_year then
+          warning (IncoherentAncestorDate (poi base ip, new_ini_p))
+      in
+      f get_father ;
+      f get_mother
     | None -> ()
 
 let check_base_aux base error warning changed_p =
   Printf.eprintf "check persons\n";
-  let nb_ind = nb_of_persons base in
-  let year_tab = Array.make nb_ind (max_int, false) in
+  let persons = Gwdb.ipers base in
+  let len = Gwdb.Collection.length persons in
+  let year_tab = Gwdb.iper_marker persons (max_int, false) in
   ProgrBar.start ();
-  for i = 0 to nb_ind - 1 do
-    ProgrBar.run i nb_ind;
-    let p = poi base (Adef.iper_of_int i) in
-    if fst year_tab.(i) = max_int then
-      check_ancestors base warning max_int year_tab (Adef.iper_of_int i) p;
+  Gwdb.Collection.iteri (fun i ip ->
+    ProgrBar.run i len ;
+    let p = poi base ip in
+    if fst @@ Gwdb.Marker.get year_tab ip = max_int
+    then check_ancestors base warning max_int year_tab ip p ;
     match CheckItem.person base warning p with
-      Some ippl -> List.iter changed_p ippl
+    | Some ippl -> List.iter changed_p ippl
     | None -> ()
-  done;
+    ) persons ;
   ProgrBar.finish ();
   Printf.eprintf "check families\n";
-  let nb_fam = nb_of_families base in
+  let families = Gwdb.ifams base in
+  let len = Gwdb.Collection.length families in
   ProgrBar.start ();
-  for i = 0 to nb_fam - 1 do
-    ProgrBar.run i nb_fam;
-    let ifam = Adef.ifam_of_int i in
+  Gwdb.Collection.iteri (fun i ifam ->
+    ProgrBar.run i len ;
     let fam = foi base ifam in
-    if is_deleted_family fam then ()
-    else CheckItem.family base warning ifam fam
-  done;
+    if not @@ is_deleted_family fam
+    then CheckItem.family base warning ifam fam
+    ) families ;
   ProgrBar.finish ();
   Consang.check_noloop base error
 
@@ -347,12 +349,12 @@ let check_base base error warning def changed_p pr_stats =
   in
   let current_year = (Unix.localtime (Unix.time ())).Unix.tm_year + 1900 in
   check_base_aux base error warning changed_p;
-  for i = 0 to nb_of_persons base - 1 do
-    let p = poi base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter (fun i ->
+    let p = poi base i in
     if not (def i) then Printf.printf "Undefined: %s\n" (designation base p);
     if pr_stats then update_stats base current_year s p;
     flush stdout
-  done;
+    ) (Gwdb.ipers base) ;
   if pr_stats then
     begin
       Printf.printf "\n";

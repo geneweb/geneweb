@@ -204,7 +204,7 @@ val update_gwf_sosa : config -> base -> iper * (string * string * int) -> unit
 val get_server_string : string list -> string
 val get_request_string : string list -> string
 
-val create_topological_sort : config -> base -> int array
+val create_topological_sort : config -> base -> (Def.iper, int) Gwdb.Marker.t
 
 val branch_of_sosa :
   config -> base -> iper -> Sosa.t -> (iper * sex) list option
