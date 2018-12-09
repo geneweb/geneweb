@@ -1173,7 +1173,10 @@ let search_in_lang_path fname =
     loop (Secure.lang_path ())
 
 let gw_etc_file fname =
-  let etc_file = Filename.concat (search_in_lang_path "etc") fname in
+  let etc_file =
+    search_in_lang_path
+      (String.concat Filename.dir_sep ["etc"; fname])
+  in
   let share_file = Filename.concat sharelib fname in
   if Sys.file_exists etc_file then etc_file
   else if Sys.file_exists share_file then share_file
@@ -1203,6 +1206,10 @@ let open_gw_etc_file fname =
 (* ************************************************************************ *)
 let base_etc_file conf fname =
   (* gwf default template *)
+  let fname =
+    if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
+    else fname
+  in
   let config_templ =
     try
       let s = List.assoc "template" conf.base_env in
@@ -1257,12 +1264,12 @@ let base_etc_file conf fname =
             [Secure.base_dir (); "etc"; fname ^ ".txt"]
         in
         let etc_tpl_file =
-          String.concat Filename.dir_sep
-            [search_in_lang_path "etc"; t; fname ^ ".txt"]
+          search_in_lang_path
+            (String.concat Filename.dir_sep ["etc"; t; fname ^ ".txt"])
         in
         let etc_file =
-          String.concat Filename.dir_sep
-            [search_in_lang_path "etc"; fname ^ ".txt"]
+          search_in_lang_path
+            (String.concat Filename.dir_sep ["etc"; fname ^ ".txt"])
         in
         if Sys.file_exists bname_etc_tpl_file then bname_etc_tpl_file
         else if Sys.file_exists bname_etc_file then bname_etc_file
@@ -1278,16 +1285,6 @@ let open_base_etc_file conf fname =
   try Some (Secure.open_in (base_etc_file conf fname)) with
     Sys_error _ -> None
 
-let search_in_lang_path fname =
-   let rec loop =
-    function
-      [] -> fname
-    | d :: dl ->
-        let f = Filename.concat d fname in
-        if Sys.file_exists f then f else loop dl
-    in
-    loop (Secure.lang_path ())
-
 (* TODO laquelle des deux implémentation retenir?? *)
 (*
 let open_etc_file fname =
@@ -1302,11 +1299,14 @@ let open_etc_file conf fname =
       [base_path conf.bname; "etc"; (Filename.basename fname ^ ".txt")]
   in
   let fname2 =
-    String.concat Filename.dir_sep
-      [search_in_lang_path "etc"; (Filename.basename fname ^ ".txt")]
+    search_in_lang_path
+      (String.concat Filename.dir_sep
+        ["etc"; (Filename.basename fname ^ ".txt")])
   in
   try Some (Secure.open_in fname1) with
-    Sys_error _ -> try Some (Secure.open_in fname2) with Sys_error _ -> None
+    Sys_error _ ->
+      try Some (Secure.open_in fname2) with
+        Sys_error _ -> None
 
 let open_etc_file_name conf fname =
   try Some (Secure.open_in (base_etc_file conf fname)) with

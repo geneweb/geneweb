@@ -1145,6 +1145,8 @@ let make_conf from_addr request script_name env =
     with Not_found -> !default_lang
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
+  (* search in mybase/lang as well TODO to be verified where this should be *)
+  let _ = Util.add_lang_path (Util.base_path base_file) in
   List.iter
     (fun fname ->
        add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
