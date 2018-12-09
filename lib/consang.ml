@@ -1,4 +1,3 @@
-(* $Id: consang.ml,v 5.13 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -32,38 +31,40 @@ type relationship =
     mutable anc_stat2 : anc_stat }
 
 type relationship_info =
-  { tstab : int array;
-    reltab : relationship array;
-    mutable queue : int list array }
+  { tstab : (Def.iper, int) Gwdb.Marker.t
+  ; reltab : (Def.iper, relationship) Gwdb.Marker.t
+  ; mutable queue : Def.iper list array
+  }
 
 let half x = x *. 0.5
 
 type visit = NotVisited | BeingVisited | Visited
 
 let rec noloop_aux base error tab i =
-  match tab.(i) with
+  match Gwdb.Marker.get tab i with
   | NotVisited ->
-    begin match get_parents (poi base (Adef.iper_of_int i)) with
-        Some ifam ->
+    begin match get_parents (poi base i) with
+      | Some ifam ->
         let fam = foi base ifam in
         let fath = get_father fam in
         let moth = get_mother fam in
-        tab.(i) <- BeingVisited;
-        noloop_aux base error tab (Adef.int_of_iper fath);
-        noloop_aux base error tab (Adef.int_of_iper moth)
+        Gwdb.Marker.set tab i BeingVisited ;
+        noloop_aux base error tab fath ;
+        noloop_aux base error tab moth
       | None -> ()
-    end;
-    tab.(i) <- Visited
-  | BeingVisited -> error (OwnAncestor (poi base (Adef.iper_of_int i)))
+    end ;
+    Gwdb.Marker.set tab i Visited
+  | BeingVisited -> error (OwnAncestor (poi base i))
   | Visited -> ()
 
 let check_noloop base error =
-  let tab = Array.make (nb_of_persons base) NotVisited in
-  for i = 0 to nb_of_persons base - 1 do noloop_aux base error tab i done
+  let persons = Gwdb.ipers base in
+  let tab = Gwdb.iper_marker persons NotVisited in
+  Gwdb.Collection.iter (noloop_aux base error tab) persons
 
-let check_noloop_for_person_list base error ipl =
-  let tab = Array.make (nb_of_persons base) NotVisited in
-  List.iter (fun i -> noloop_aux base error tab @@ Adef.int_of_iper i) ipl
+let check_noloop_for_person_list base error list =
+  let tab = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
+  List.iter (noloop_aux base error tab) list
 
 exception TopologicalSortError of person
 
@@ -77,25 +78,25 @@ exception TopologicalSortError of person
 *)
 
 let topological_sort base poi =
-  let tab = Array.make (nb_of_persons base) 0 in
+  let persons = Gwdb.ipers base in
+  let tab = Gwdb.iper_marker persons 0 in
   let cnt = ref 0 in
-  for i = 0 to nb_of_persons base - 1 do
-    let a = poi base (Adef.iper_of_int i) in
-    match get_parents a with
-      Some ifam ->
+  Gwdb.Collection.iter (fun i ->
+      let a = poi base i in
+      match get_parents a with
+        Some ifam ->
         let cpl = foi base ifam in
-        let ifath = Adef.int_of_iper (get_father cpl) in
-        let imoth = Adef.int_of_iper (get_mother cpl) in
-        tab.(ifath) <- tab.(ifath) + 1; tab.(imoth) <- tab.(imoth) + 1
-    | _ -> ()
-  done;
+        let ifath = get_father cpl in
+        let imoth = get_mother cpl in
+        Gwdb.Marker.set tab ifath (Gwdb.Marker.get tab ifath + 1) ;
+        Gwdb.Marker.set tab imoth (Gwdb.Marker.get tab imoth + 1) ;
+      | _ -> ()
+    )
+    persons ;
   let todo =
-    let stop = nb_of_persons base in
-    let rec loop i acc =
-      if i >= stop then acc else
-      loop (i + 1) (if tab.(i) = 0 then i :: acc else acc)
-    in
-    loop 0 []
+    Gwdb.Collection.fold (fun acc i ->
+        if Gwdb.Marker.get tab i = 0 then i :: acc else acc
+      ) [] persons
   in
   let rec loop tval list =
     if list = [] then ()
@@ -103,20 +104,20 @@ let topological_sort base poi =
       let new_list =
         List.fold_left
           (fun new_list i ->
-             let a = poi base (Adef.iper_of_int i) in
-             tab.(i) <- tval;
+             let a = poi base i in
+             Gwdb.Marker.set tab i tval ;
              incr cnt;
              match get_parents a with
                Some ifam ->
                  let cpl = foi base ifam in
-                 let ifath = Adef.int_of_iper (get_father cpl) in
-                 let imoth = Adef.int_of_iper (get_mother cpl) in
-                 tab.(ifath) <- tab.(ifath) - 1;
-                 tab.(imoth) <- tab.(imoth) - 1;
+                 let ifath = get_father cpl in
+                 let imoth = get_mother cpl in
+                 Gwdb.Marker.set tab ifath (Gwdb.Marker.get tab ifath - 1) ;
+                 Gwdb.Marker.set tab imoth (Gwdb.Marker.get tab imoth - 1) ;
                  let new_list =
-                   if tab.(ifath) = 0 then ifath :: new_list else new_list
+                   if Gwdb.Marker.get tab ifath = 0 then ifath :: new_list else new_list
                  in
-                 if tab.(imoth) = 0 then imoth :: new_list else new_list
+                 if Gwdb.Marker.get tab imoth = 0 then imoth :: new_list else new_list
              | _ -> new_list)
           [] list
       in
@@ -136,7 +137,7 @@ let phony_rel =
    anc_stat2 = MaybeAnc}
 
 let make_relationship_info base tstab =
-  let tab = Array.make (nb_of_persons base) phony_rel in
+  let tab = Gwdb.iper_marker (Gwdb.ipers base) phony_rel in
   {tstab = tstab; reltab = tab; queue = [| |]}
 
 let rec insert_branch_len_rec (len, n, ip as x) =
@@ -160,17 +161,17 @@ let mark = ref 0
 let new_mark () = incr mark; !mark
 
 let relationship_and_links base ri b ip1 ip2 =
-  let i1 = Adef.int_of_iper ip1 in
-  let i2 = Adef.int_of_iper ip2 in
+  let i1 = ip1 in
+  let i2 = ip2 in
   if i1 = i2 then 1.0, []
   else
     let reltab = ri.reltab in
     let tstab = ri.tstab in
     let yes_inserted = new_mark () in
     let reset u =
-      let tu = reltab.(u) in
+      let tu = Gwdb.Marker.get reltab u in
       if tu == phony_rel then
-        reltab.(u) <-
+        Gwdb.Marker.set reltab u
           {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
            lens2 = []; inserted = yes_inserted; elim_ancestors = false;
            anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
@@ -187,10 +188,10 @@ let relationship_and_links base ri b ip1 ip2 =
           tu.anc_stat2 <- MaybeAnc
         end
     in
-    let qi = ref (min tstab.(i1) tstab.(i2)) in
+    let qi = ref (min (Gwdb.Marker.get tstab i1) (Gwdb.Marker.get tstab i2)) in
     let qmax = ref (-1) in
     let insert u =
-      let v = tstab.(u) in
+      let v = Gwdb.Marker.get tstab u in
       reset u;
       if v >= Array.length ri.queue then
         begin let len = Array.length ri.queue in
@@ -217,8 +218,8 @@ let relationship_and_links base ri b ip1 ip2 =
     let nb_anc2 = ref 1 in
     let tops = ref [] in
     let treat_parent ip_from u y =
-      if reltab.(y).inserted <> yes_inserted then insert y;
-      let ty = reltab.(y) in
+      if (Gwdb.Marker.get reltab y).inserted <> yes_inserted then insert y;
+      let ty = Gwdb.Marker.get reltab y in
       let p1 = half u.weight1 in
       let p2 = half u.weight2 in
       if u.anc_stat1 = IsAnc && ty.anc_stat1 <> IsAnc then
@@ -238,8 +239,8 @@ let relationship_and_links base ri b ip1 ip2 =
         end
     in
     let treat_ancestor u =
-      let tu = reltab.(u) in
-      let a = poi base (Adef.iper_of_int u) in
+      let tu = Gwdb.Marker.get reltab u in
+      let a = poi base u in
       let contribution =
         tu.weight1 *. tu.weight2 -. tu.relationship *. (1.0 +. consang_of a)
       in
@@ -251,20 +252,18 @@ let relationship_and_links base ri b ip1 ip2 =
       match get_parents a with
         Some ifam ->
           let cpl = foi base ifam in
-          treat_parent (Adef.iper_of_int u) tu
-            (Adef.int_of_iper (get_father cpl));
-          treat_parent (Adef.iper_of_int u) tu
-            (Adef.int_of_iper (get_mother cpl))
+          treat_parent u tu (get_father cpl);
+          treat_parent u tu (get_mother cpl)
       | _ -> ()
     in
     insert i1;
     insert i2;
-    reltab.(i1).weight1 <- 1.0;
-    reltab.(i2).weight2 <- 1.0;
-    reltab.(i1).lens1 <- [0, 1, []];
-    reltab.(i2).lens2 <- [0, 1, []];
-    reltab.(i1).anc_stat1 <- IsAnc;
-    reltab.(i2).anc_stat2 <- IsAnc;
+    (Gwdb.Marker.get reltab i1).weight1 <- 1.0;
+    (Gwdb.Marker.get reltab i2).weight2 <- 1.0;
+    (Gwdb.Marker.get reltab i1).lens1 <- [0, 1, []];
+    (Gwdb.Marker.get reltab i2).lens2 <- [0, 1, []];
+    (Gwdb.Marker.get reltab i1).anc_stat1 <- IsAnc;
+    (Gwdb.Marker.get reltab i2).anc_stat2 <- IsAnc;
     while !qi <= !qmax && !nb_anc1 > 0 && !nb_anc2 > 0 do
       List.iter treat_ancestor ri.queue.(!qi);
       incr qi

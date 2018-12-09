@@ -161,8 +161,8 @@ let print_base_loop conf base p =
 
 (* Type pour ne pas créer à chaque fois un tableau tstab et mark *)
 type sosa_t =
-  { tstab : int array;
-    mark : bool array;
+  { tstab : (iper, int) Gwdb.Marker.t;
+    mark : (iper, bool) Gwdb.Marker.t;
     mutable last_zil : (Def.iper * Sosa.t) list;
     sosa_ht : (Def.iper, (Sosa.t * Gwdb.person) option) Hashtbl.t }
 
@@ -173,7 +173,8 @@ let init_sosa_t conf base sosa_ref =
         let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
         Hutil.rheader conf title; print_base_loop conf base p
   in
-  let mark = Array.make (nb_of_persons base) false in
+  let persons = Gwdb.ipers base in
+  let mark = Gwdb.iper_marker persons false in
   let last_zil = [get_key_index sosa_ref, Sosa.one] in
   let sosa_ht = Hashtbl.create 5003 in
   let () =
@@ -195,12 +196,12 @@ let find_sosa_aux conf base a p t_sosa =
     | (ip, z) :: zil ->
         let _ = cache := (ip, z) :: !cache in
         if ip = get_key_index a then Right z
-        else if t_sosa.mark.(Adef.int_of_iper ip) then gene_find zil
+        else if Gwdb.Marker.get t_sosa.mark ip then gene_find zil
         else
           begin
-            t_sosa.mark.(Adef.int_of_iper ip) <- true;
-            if t_sosa.tstab.(Adef.int_of_iper (get_key_index a)) <=
-                 t_sosa.tstab.(Adef.int_of_iper ip)
+            Gwdb.Marker.set t_sosa.mark ip true;
+            if Gwdb.Marker.get t_sosa.tstab (get_key_index a)
+               <= Gwdb.Marker.get t_sosa.tstab ip
             then
               let _ = has_ignore := true in gene_find zil
             else
@@ -228,7 +229,7 @@ let find_sosa_aux conf base a p t_sosa =
       Left [] ->
         let _ =
           List.iter
-            (fun (ip, _) -> Array.set t_sosa.mark (Adef.int_of_iper ip) false)
+            (fun (ip, _) -> Gwdb.Marker.set t_sosa.mark ip false)
             !cache
         in
         None
@@ -246,7 +247,7 @@ let find_sosa_aux conf base a p t_sosa =
     | Right z ->
         let _ =
           List.iter
-            (fun (ip, _) -> Array.set t_sosa.mark (Adef.int_of_iper ip) false)
+            (fun (ip, _) -> Gwdb.Marker.set t_sosa.mark ip false)
             !cache
         in
         Some (z, p)
@@ -286,7 +287,8 @@ let build_sosa_tree_ht conf base person =
   let () = load_ascends_array base in
   let () = load_couples_array base in
   let nb_persons = nb_of_persons base in
-  let mark = Array.make nb_persons false in
+  let ipers = Gwdb.ipers base in
+  let mark = Gwdb.iper_marker ipers false in
   (* Tableau qui va socker au fur et à mesure les ancêtres du person. *)
   (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
   (* commence à l'indice 1 !                                            *)
@@ -311,20 +313,19 @@ let build_sosa_tree_ht conf base person =
               let cpl = foi base ifam in
               let z = Sosa.twice sosa_num in
               let len =
-                if not mark.(Adef.int_of_iper (get_father cpl)) then
+                if not @@ Gwdb.Marker.get mark (get_father cpl) then
                   begin
                     Array.set sosa_accu (len + 1) (z, get_father cpl);
-                    mark.(Adef.int_of_iper (get_father cpl)) <- true;
+                    Gwdb.Marker.set mark (get_father cpl) true;
                     len + 1
                   end
                 else len
               in
               let len =
-                if not mark.(Adef.int_of_iper (get_mother cpl)) then
+                if not @@ Gwdb.Marker.get mark (get_mother cpl) then
                   begin
-                    Array.set sosa_accu (len + 1)
-                      (Sosa.inc z 1, get_mother cpl);
-                    mark.(Adef.int_of_iper (get_mother cpl)) <- true;
+                    Array.set sosa_accu (len + 1) (Sosa.inc z 1, get_mother cpl);
+                    Gwdb.Marker.set mark (get_mother cpl) true ;
                     len + 1
                   end
                 else len
@@ -693,7 +694,7 @@ let get_cremation_text conf p p_auth =
 
 let max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
-  let mark = Array.make (nb_of_persons base) false in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
 #ifdef API
   (* Charge le cache des LIA. *)
   (* On limite à 10 le nombre de générations ascendantes à charger pour les LIA. *)
@@ -702,16 +703,13 @@ let max_ancestor_level conf base ip max_lev =
   let rec loop level ip =
     (* Ne traite pas l'index s'il a déjà été traité. *)
     (* Pose surement probleme pour des implexes. *)
-    if mark.(Adef.int_of_iper ip) then ()
-    else
-      begin
+    if not @@ Gwdb.Marker.get mark ip then begin
         (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
-        mark.(Adef.int_of_iper ip) <- true;
+        Gwdb.Marker.set mark ip true ;
         x := max !x level;
-        if !x = max_lev then ()
-        else
+        if !x <> max_lev then
           match get_parents (pget conf base ip) with
-            Some ifam ->
+          | Some ifam ->
               let cpl = foi base ifam in
               loop (succ level) (get_father cpl);
               loop (succ level) (get_mother cpl)
@@ -770,8 +768,8 @@ let make_desc_level_table conf base max_level p =
   in
   (* the table 'levt' may be not necessary, since I added 'flevt'; kept
      because '%max_desc_level;' is still used... *)
-  let levt = Array.make (nb_of_persons base) infinite in
-  let flevt = Array.make (nb_of_families base) infinite in
+  let levt = Gwdb.iper_marker (Gwdb.ipers base) infinite in
+  let flevt = Gwdb.ifam_marker (Gwdb.ifams base) infinite in
   let get = pget conf base in
   let ini_ip = get_key_index p in
   let rec fill lev =
@@ -781,23 +779,23 @@ let make_desc_level_table conf base max_level p =
         let new_ipl =
           List.fold_left
             (fun ipl ip ->
-               if levt.(Adef.int_of_iper ip) <= lev then ipl
+               if Gwdb.Marker.get levt ip <= lev then ipl
                else if lev <= max_level then
                  begin
-                   levt.(Adef.int_of_iper ip) <- lev;
+                   Gwdb.Marker.set levt ip lev ;
                    let down =
                      if ip = ini_ip then true
                      else
                        match line with
-                         Male -> get_sex (pget conf base ip) <> Female
+                       | Male -> get_sex (pget conf base ip) <> Female
                        | Female -> get_sex (pget conf base ip) <> Male
                        | Neuter -> true
                    in
                    if down then
                      Array.fold_left
                        (fun ipl ifam ->
-                          if flevt.(Adef.int_of_ifam ifam) <= lev then ()
-                          else flevt.(Adef.int_of_ifam ifam) <- lev;
+                          if not (Gwdb.Marker.get flevt ifam <= lev)
+                          then Gwdb.Marker.set flevt ifam lev ;
                           let ipa = get_children (foi base ifam) in
                           Array.fold_left (fun ipl ip -> ip :: ipl) ipl ipa)
                        ipl (get_family (get ip))
@@ -808,18 +806,18 @@ let make_desc_level_table conf base max_level p =
         in
         fill (succ lev) new_ipl
   in
-  fill 0 [ini_ip]; levt, flevt
+  fill 0 [ini_ip];
+  levt, flevt
 
-let desc_level_max desc_level_table_l =
+let desc_level_max base desc_level_table_l =
   let (levt, _) = Lazy.force desc_level_table_l in
-  let x = ref 0 in
-  for i = 0 to Array.length levt - 1 do
-    let lev = levt.(i) in if lev != infinite && !x < lev then x := lev
-  done;
-  !x
+  Gwdb.Collection.fold (fun acc i ->
+      let lev = Gwdb.Marker.get levt i in
+      if lev != infinite && acc < lev then lev else acc
+    ) 0 (Gwdb.ipers base)
 
-let max_descendant_level desc_level_table_l =
-  desc_level_max desc_level_table_l
+let max_descendant_level base desc_level_table_l =
+  desc_level_max base desc_level_table_l
 
 (* ancestors by list *)
 
@@ -1654,7 +1652,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vdesclevtab of (int array * int array) Lazy.t
+  | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of bool array ref
   | Vslist of SortedList.t ref
   | Vslistlm of string list list
@@ -1668,7 +1666,7 @@ type 'a env =
   | Vstring of string
   | Vsosa_ref of person option Lazy.t
   | Vsosa of (iper * (Sosa.t * person) option) list ref
-  | Vt_sosa of sosa_t
+  | Vt_sosa of sosa_t option
   | Vtitle of person * title_item
   | Vevent of person * event_item
   | Vlazyp of string option ref
@@ -1757,8 +1755,8 @@ let get_sosa conf base env r p =
         match get_env "sosa_ref" env with
           Vsosa_ref v ->
             begin match get_env "t_sosa" env with
-              Vt_sosa t_sosa -> find_sosa conf base p v t_sosa
-            | _ -> None
+              | Vt_sosa (Some t_sosa) -> find_sosa conf base p v t_sosa
+              | _ -> None
             end
         | _ -> None
       in
@@ -2353,9 +2351,9 @@ and eval_simple_str_var conf base env (_, p_auth) =
       begin match get_env "desc_level_table" env with
         Vdesclevtab levt ->
           let (_, flevt) = Lazy.force levt in
-          for i = 0 to Array.length flevt - 1 do
-            flevt.(i) <- flevt_save.(i)
-          done;
+          Gwdb.Collection.iter (fun i ->
+              Gwdb.Marker.set flevt i (Gwdb.Marker.get flevt_save i)
+            ) (Gwdb.ifams base) ;
           ""
       | _ -> raise Not_found
       end
@@ -2566,13 +2564,16 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | _ -> raise Not_found
       end
   | "number_of_descendants" :: sl ->
+      (* FIXME: what is the difference with number_of_descendants_at_level??? *)
       begin match get_env "level" env with
         Vint i ->
           begin match get_env "desc_level_table" env with
             Vdesclevtab t ->
-              let cnt =
-                Array.fold_left (fun cnt v -> if v <= i then cnt + 1 else cnt)
-                  0 (fst (Lazy.force t))
+            let m = fst (Lazy.force t) in
+            let cnt =
+              Gwdb.Collection.fold (fun cnt ip ->
+                  if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
+                ) 0 (Gwdb.ipers base)
               in
               VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found
@@ -2584,11 +2585,13 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         Vint i ->
           begin match get_env "desc_level_table" env with
             Vdesclevtab t ->
-              let cnt =
-                Array.fold_left (fun cnt v -> if v = i then cnt + 1 else cnt)
-                  0 (fst (Lazy.force t))
+            let m = fst (Lazy.force t) in
+            let cnt =
+              Gwdb.Collection.fold (fun cnt ip ->
+                  if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
+                ) 0 (Gwdb.ipers base)
               in
-              VVstring (eval_num conf (Sosa.of_int cnt) sl)
+              VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found
           end
       | _ -> raise Not_found
@@ -4565,7 +4568,7 @@ and eval_str_family_field env (ifam, _, _, _) =
       begin match get_env "desc_level_table" env with
         Vdesclevtab levt ->
           let (_, flevt) = Lazy.force levt in
-          string_of_int flevt.(Adef.int_of_ifam ifam)
+          string_of_int (Gwdb.Marker.get flevt ifam)
       | _ -> raise Not_found
       end
   | "index" -> string_of_int (Adef.int_of_ifam ifam)
@@ -4573,7 +4576,7 @@ and eval_str_family_field env (ifam, _, _, _) =
       begin match get_env "desc_level_table" env with
         Vdesclevtab levt ->
           let (_, flevt) = Lazy.force levt in
-          flevt.(Adef.int_of_ifam ifam) <- infinite; ""
+          Gwdb.Marker.set flevt ifam infinite; ""
       | _ -> raise Not_found
       end
   | _ -> raise Not_found
@@ -5861,10 +5864,8 @@ let gen_interp_templ menu title templ_fname conf base p =
     let sosa_ref_l = let sosa_ref () = sosa_ref in Lazy.from_fun sosa_ref in
     let t_sosa =
       match sosa_ref with
-        Some p -> init_sosa_t conf base p
-      | _ ->
-          {tstab = [| |]; mark = [| |]; last_zil = [];
-           sosa_ht = Hashtbl.create 1}
+      | Some p -> Some (init_sosa_t conf base p)
+      | _ -> None
     in
     let desc_level_table_l =
       let dlt () = make_desc_level_table conf base emal p in Lazy.from_fun dlt
@@ -5899,12 +5900,12 @@ let gen_interp_templ menu title templ_fname conf base p =
            (Perso_link.max_interlinks_descendancy_level conf base
               (get_key_index p) 10))
 #else
-      Vint (max_descendant_level desc_level_table_l)
+      Vint (max_descendant_level base desc_level_table_l)
 #endif
     in
     (* Static max descendant level *)
     let smdl () =
-      Vint (max_descendant_level desc_level_table_m)
+      Vint (max_descendant_level base desc_level_table_m)
     in
     let nldb () =
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in

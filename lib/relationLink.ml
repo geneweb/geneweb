@@ -35,7 +35,8 @@ let threshold = ref 10
 let phony_dist_tab = (fun _ -> 0), (fun _ -> infinity)
 
 let tsort_leq tstab x y =
-  if tstab.(x) = tstab.(y) then x >= y else tstab.(x) < tstab.(y)
+  if Gwdb.Marker.get tstab x = Gwdb.Marker.get tstab y then x >= y
+  else Gwdb.Marker.get tstab x < Gwdb.Marker.get tstab y
 
 let make_dist_tab conf base ia maxlev =
   if maxlev <= !threshold then phony_dist_tab
@@ -43,45 +44,45 @@ let make_dist_tab conf base ia maxlev =
     let tstab = Util.create_topological_sort conf base in
     let module Pq =
       Pqueue.Make
-        (struct type t = int let leq x y = not (tsort_leq tstab x y) end)
+        (struct type t = iper let leq x y = not (tsort_leq tstab x y) end)
     in
     let default = {dmin = infinity; dmax = 0; mark = false} in
-    let dist = Array.make (nb_of_persons base) default in
+    let dist = Gwdb.iper_marker (Gwdb.ipers base) default in
     let q = ref Pq.empty in
     let add_children ip =
       let u = pget conf base ip in
       for i = 0 to Array.length (get_family u) - 1 do
         let des = foi base (get_family u).(i) in
         for j = 0 to Array.length (get_children des) - 1 do
-          let k = Adef.int_of_iper (get_children des).(j) in
-          let d = dist.(k) in
+          let k = (get_children des).(j) in
+          let d = Gwdb.Marker.get dist k in
           if not d.mark then
             begin
-              dist.(k) <- {dmin = infinity; dmax = 0; mark = true};
+              Gwdb.Marker.set dist k @@ {dmin = infinity; dmax = 0; mark = true};
               q := Pq.add k !q
             end
         done
       done
     in
-    dist.(Adef.int_of_iper ia) <- {dmin = 0; dmax = 0; mark = true};
+    Gwdb.Marker.set dist ia @@ {dmin = 0; dmax = 0; mark = true};
     add_children ia;
     while not (Pq.is_empty !q) do
       begin let (k, nq) = Pq.take !q in
         q := nq;
-        match get_parents (pget conf base (Adef.iper_of_int k)) with
+        match get_parents (pget conf base k) with
           Some ifam ->
             let cpl = foi base ifam in
-            let dfath = dist.(Adef.int_of_iper (get_father cpl)) in
-            let dmoth = dist.(Adef.int_of_iper (get_mother cpl)) in
-            dist.(k).dmin <- min dfath.dmin dmoth.dmin + 1;
-            dist.(k).dmax <- max dfath.dmax dmoth.dmax + 1;
-            if dist.(k).dmin > maxlev then ()
-            else add_children (Adef.iper_of_int k)
+            let dfath = Gwdb.Marker.get dist (get_father cpl) in
+            let dmoth = Gwdb.Marker.get dist (get_mother cpl) in
+            (Gwdb.Marker.get dist k).dmin <- min dfath.dmin dmoth.dmin + 1;
+            (Gwdb.Marker.get dist k).dmax <- max dfath.dmax dmoth.dmax + 1;
+            if (Gwdb.Marker.get dist k).dmin > maxlev then ()
+            else add_children k
         | None -> ()
       end
     done;
-    (fun ip -> dist.(Adef.int_of_iper ip).dmin),
-    (fun ip -> dist.(Adef.int_of_iper ip).dmax)
+    (fun ip -> (Gwdb.Marker.get dist ip).dmin),
+    (fun ip -> (Gwdb.Marker.get dist ip).dmax)
 
 let find_first_branch conf base (dmin, dmax) ia =
   let rec find br len ip sp =
