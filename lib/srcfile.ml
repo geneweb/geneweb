@@ -118,26 +118,34 @@ let lang_file_name conf fname =
   if Sys.file_exists fname1 then fname1
   else
     search_in_lang_path
-      (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
+      (String.concat Filename.dir_sep
+        [conf.lang; Filename.basename fname ^ ".txt"])
 
 let any_lang_file_name conf fname =
-  let fname1 = List.fold_right Filename.concat
-    [Util.base_path conf.bname; "lang"] (Filename.basename fname ^ ".txt") in
+  let fname1 =
+    String.concat Filename.dir_sep
+      [Util.base_path conf.bname; "lang"; Filename.basename fname ^ ".txt"]
+  in
   if Sys.file_exists fname1 then fname1
   else
     search_in_lang_path
-      (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
+      (String.concat Filename.dir_sep
+        ["lang"; Filename.basename fname ^ ".txt"])
 
 let source_file_name conf fname =
   let lang = conf.lang in
   let fname1 =
-    List.fold_right Filename.concat [Util.base_path conf.bname; "src"; lang]
-      (fname ^ ".txt")
+    String.concat Filename.dir_sep
+      [Util.base_path conf.bname; "documents"; "src"; lang; fname ^ ".txt"]
+  in
+  let fname2 =
+    String.concat Filename.dir_sep
+      [Util.base_path conf.bname; "documents"; "src"; fname ^ ".txt"]
   in
   if Sys.file_exists fname1 then fname1
-  else
-    List.fold_right Filename.concat
-      [Util.base_path conf.bname; "src"] (fname ^ ".txt")
+  else if Sys.file_exists fname2 then fname2
+    else String.concat Filename.dir_sep
+      [Util.base_path conf.bname; "documents"; fname ^ ".txt"]
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y))
