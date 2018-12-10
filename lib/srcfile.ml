@@ -399,6 +399,22 @@ let rec copy_from_stream conf base strm mode =
                   Not_found -> ""
               in
               copy_from_string conf base txt mode
+          | 'X' ->
+              let var = (get_variable strm) in
+              let key = try List.assoc "k" conf.env with Not_found -> "" in
+              let (fn, oc, sn) =
+                match Gutil.rsplit_key key with
+                | Some (fn, oc, sn) -> (fn, oc, sn)
+                | None -> ("", 0, "")
+              in
+              let txt =
+                if var = "p" then fn
+                else if var = "o" then string_of_int oc
+                else if var = "n" then sn
+                else try List.assoc var conf.env with
+                  Not_found -> ""
+              in
+              copy_from_string conf base txt mode
           | c -> Wserver.printf "%s" (macro conf base c)
           end
       | c -> if !echo then Wserver.printf "%c" c
