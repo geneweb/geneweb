@@ -21,7 +21,9 @@ let get_date conf =
 
 let adm_file f = List.fold_right Filename.concat [!(Util.cnt_dir); "cnt"] f
 
-let cnt conf ext = adm_file (conf.bname ^ "_cnt" ^ ext)
+(*let cnt conf ext = adm_file (conf.bname ^ "_cnt" ^ ext)*)
+let cnt conf ext = String.concat Filename.dir_sep
+  [Util.base_path conf.bname; "cnt"; conf.bname ^ "_cnt" ^ ext]
 
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
@@ -74,8 +76,11 @@ let set_wizard_and_friend_traces conf =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     (if wpf <> "" then
-       let fname = adm_file (conf.bname ^ "_w.txt") in
-       update_wf_trace conf fname)
+      let fname =
+        String.concat Filename.dir_sep
+          [Util.base_path conf.bname; "cnt"; conf.bname ^ "_w.txt"]
+      in
+      update_wf_trace conf fname)
   else if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
     let fpf =
       try List.assoc "friend_passwd_file" conf.base_env with Not_found -> ""
@@ -86,7 +91,10 @@ let set_wizard_and_friend_traces conf =
     if fpf <> "" &&
        is_that_user_and_password conf.auth_scheme conf.user fp = false
     then
-      let fname = adm_file (conf.bname ^ "_f.txt") in
+      let fname =
+        String.concat Filename.dir_sep
+          [Util.base_path conf.bname; "cnt"; conf.bname ^ "_f.txt"]
+      in
       update_wf_trace conf fname
 
 let incr_counter f conf =
@@ -112,8 +120,8 @@ let incr_request_counter =
 
 let lang_file_name conf fname =
   let fname1 =
-    List.fold_right Filename.concat
-      [Util.base_path conf.bname; "lang"] (Filename.basename fname ^ ".txt")
+    String.concat Filename.dir_sep
+      [Util.base_path conf.bname; "lang"; (Filename.basename fname ^ ".txt")]
   in
   if Sys.file_exists fname1 then fname1
   else
