@@ -3079,8 +3079,6 @@ let escache_value base =
   let t = Gwdb.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in string_of_int v
 
-let adm_file f = String.concat Filename.dir_sep  [!cnt_dir; "cnt"; f]
-
 let std_date conf =
   let (hour, min, sec) = conf.time in
   Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d"
@@ -3131,7 +3129,10 @@ let commit_patches conf base =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = adm_file (conf.bname ^ "_u.txt") in
+      let fname =
+        String.concat Filename.dir_sep
+          [base_path conf.bname; "cnt"; conf.bname ^ "_u.txt"]
+      in
       update_wf_trace conf fname
 
 let short_f_month m =
