@@ -3610,6 +3610,9 @@ and eval_str_event_field conf base (p, p_auth)
   | "note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base note in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
@@ -4483,7 +4486,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       end
   | "notes" | "pnotes" ->
       if p_auth && not conf.no_note then
+
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_notes p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
