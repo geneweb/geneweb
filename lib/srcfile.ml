@@ -23,7 +23,7 @@ let adm_file f = List.fold_right Filename.concat [!(Util.cnt_dir); "cnt"] f
 
 (*let cnt conf ext = adm_file (conf.bname ^ "_cnt" ^ ext)*)
 let cnt conf ext = String.concat Filename.dir_sep
-  [Util.base_path conf.bname; "cnt"; conf.bname ^ "_cnt" ^ ext]
+  [Util.base_path conf.bname; "cnt"; "counts" ^ ext]
 
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
@@ -78,7 +78,7 @@ let set_wizard_and_friend_traces conf =
     (if wpf <> "" then
       let fname =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "cnt"; conf.bname ^ "_w.txt"]
+          [Util.base_path conf.bname; "cnt"; "access_w.txt"]
       in
       update_wf_trace conf fname)
   else if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
@@ -93,7 +93,7 @@ let set_wizard_and_friend_traces conf =
     then
       let fname =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "cnt"; conf.bname ^ "_f.txt"]
+          [Util.base_path conf.bname; "cnt"; "access_f.txt"]
       in
       update_wf_trace conf fname
 

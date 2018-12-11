@@ -1654,12 +1654,25 @@ let expand_env =
         loop 0
     | _ -> s
 
+
+let pp_env env mess =
+  let _ = Printf.eprintf "\n%s\n" mess in
+  let _ =  List.iter
+    (fun (k, v) ->
+       Printf.eprintf "Env_var: %c, %s\n" k (v ()))
+    env
+  in
+  let _ = Printf.eprintf "-----------\n" in
+  flush stderr
+
+
 let string_with_macros conf env s =
   let start_with s i p =
     i + String.length p <= String.length s &&
     String.lowercase_ascii (String.sub s i (String.length p)) = p
   in
   let buff = Buffer.create 1000 in
+  let _ = pp_env env "String_with_macro" in
   let rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' then
@@ -2521,8 +2534,9 @@ let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
   let fname = String.concat
-      Filename.dir_sep [base_path conf.bname; "etc"; conf.bname ^ ".conf"]
+      Filename.dir_sep [base_path conf.bname; "etc"; "config.txt"]
   in
+
   let tmp_fname = fname ^ "2" in
   let oc =
     try Pervasives.open_out tmp_fname with
@@ -3131,7 +3145,7 @@ let commit_patches conf base =
     if wpf <> "" then
       let fname =
         String.concat Filename.dir_sep
-          [base_path conf.bname; "cnt"; conf.bname ^ "_u.txt"]
+          [base_path conf.bname; "cnt"; "update_log.txt"]
       in
       update_wf_trace conf fname
 
