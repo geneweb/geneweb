@@ -128,8 +128,8 @@ let rec cut_at_equal s =
   with Not_found -> s, ""
 
 let read_base_env conf bname =
-  let fname = List.fold_right
-    Filename.concat [conf.bases_dir; (bname ^ ".gwb"); "etc"] (bname ^ ".conf")
+  let fname = String.concat
+    Filename.dir_sep [conf.bases_dir; (bname ^ ".gwb"); "etc"; "config.txt"]
   in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
@@ -147,8 +147,8 @@ let read_base_env conf bname =
   | None -> []
 
 let write_base_env conf bname env =
-  let fname = List.fold_right
-    Filename.concat [conf.bases_dir; (bname ^ ".gwb"); "etc"] (bname ^ ".conf")
+  let fname = String.concat
+    Filename.dir_sep [conf.bases_dir; (bname ^ ".gwb"); "etc"; "config.txt"]
   in
   match try Some (open_out fname) with Sys_error _ -> None with
     Some oc ->
@@ -436,8 +436,8 @@ let print_default_gwf_file conf bname =
      "template", "*"; "long_date", "no"; "counter", "no";
      "full_siblings", "yes"; "hide_advanced_request", "no"]
   in
-  let fname = List.fold_right
-    Filename.concat [conf.bases_dir; (bname ^ ".gwb"); "etc"] (bname ^ ".conf")
+  let fname = String.concat
+    Filename.dir_sep [conf.bases_dir; (bname ^ ".gwb"); "etc"; "config.txt"]
   in
   if Sys.file_exists fname then () else write_base_env conf bname gwf
 
@@ -453,8 +453,8 @@ let create_base conf bname src_file =
             ged2gwb2 conf bname src_file
           else error_popup (transl "Unknown file")
         end;
-      let gwf_file = List.fold_right
-        Filename.concat [conf.bases_dir; (bname ^ ".gwb"); "etc"] (bname ^ ".conf")
+      let gwf_file = String.concat
+        Filename.dir_sep [conf.bases_dir; (bname ^ ".gwb"); "etc"; "config.txt"]
       in
       if Sys.file_exists gwf_file then ()
       else print_default_gwf_file conf bname

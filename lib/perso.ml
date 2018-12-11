@@ -4097,6 +4097,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "birth_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_birth_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
@@ -4116,6 +4119,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "baptism_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_baptism_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
@@ -4134,6 +4140,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "burial_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_burial_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
@@ -4187,6 +4196,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "death_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_death_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
@@ -4404,7 +4416,6 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       end
   | "notes" | "pnotes" ->
       if p_auth && not conf.no_note then
-
         let env = ['i', (fun () -> Util.default_image_name base p)] in
         let env = ('k', (fun () ->
           string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
@@ -4491,6 +4502,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "psources" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_psources p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in

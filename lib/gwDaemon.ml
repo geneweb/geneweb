@@ -254,8 +254,8 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env bname =
-  let fname = List.fold_right
-    Filename.concat [base_path bname; "etc"] bname ^ ".conf"
+  let fname = String.concat
+    Filename.dir_sep [base_path bname; "etc"; "config.txt"]
   in
   try
     let ic = Secure.open_in fname in
