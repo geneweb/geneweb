@@ -3482,6 +3482,10 @@ and eval_str_event_field conf base (p, p_auth)
   | "src" ->
       if p_auth then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
+        let src = string_with_macros conf env src in
         let src =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
@@ -4306,6 +4310,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "occupation" ->
       if p_auth then
         let s = sou base (get_occupation p) in
+        let s = string_with_macros conf [] s in
         let s =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
@@ -4490,6 +4495,10 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_env "src" env with
         Vstring s ->
           let env = ['i', (fun () -> Util.default_image_name base p)] in
+          let env = ('k', (fun () ->
+            string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+          in
+          let s = string_with_macros conf env s in
           let s =
             let wi =
               {Wiki.wi_mode = "NOTES";
