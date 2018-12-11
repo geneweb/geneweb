@@ -802,7 +802,7 @@ let string_of_big_int conf i =
 let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   let image_opt =
     match p_getenv conf.env "image" with
-      Some "off" -> "&image=off"
+      Some "on" -> "&image=on"
     | _ -> ""
   in
   Wserver.printf "<ul>\n";
@@ -847,7 +847,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   let image_opt =
     match p_getenv conf.env "image" with
-      Some "off" -> "&image=off"
+      Some "on" -> "&image=on"
     | _ -> ""
   in
   Wserver.printf "<ul class=li_relationship>\n";
@@ -1029,7 +1029,7 @@ let print_dag_links conf base p1 p2 rl =
            end;
            let image_opt =
              match p_getenv conf.env "image" with
-               Some "off" -> "&image=off"
+               Some "on" -> "&image=on"
              | _ -> ""
            in
            let border =
