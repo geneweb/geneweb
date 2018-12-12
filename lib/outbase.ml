@@ -265,7 +265,7 @@ let gen_output no_patches bname base =
   let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
   let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
-  let tmp_notes = Filename.concat bname "1notes" in
+  (*let tmp_notes = Filename.concat bname "1notes" in REORG *)
   let tmp_notes_d = Filename.concat bname "1notes_d" in
   if not no_patches then
     begin
@@ -365,12 +365,12 @@ let gen_output no_patches bname base =
           seek_out oc2 Mutil.int_size;
           output_binary_int oc2 surname_pos;
           output_binary_int oc2 first_name_pos;
-          let s = base.data.bnotes.nread "" RnAll in
+          (*  REORG let s = base.data.bnotes.nread "" RnAll in
           if s = "" then ()
           else
             begin let oc_not = Secure.open_out tmp_notes in
               output_string oc_not s; close_out oc_not
-            end;
+            end;*)
           close_out oc2;
           List.iter
             (fun f ->
@@ -421,9 +421,9 @@ let gen_output no_patches bname base =
       Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
       Mutil.remove_file (Filename.concat bname "strings.inx");
       Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
-      Mutil.remove_file (Filename.concat bname "notes");
+      (* REORG Mutil.remove_file (Filename.concat bname "notes");
       if Sys.file_exists tmp_notes then
-        Sys.rename tmp_notes (Filename.concat bname "notes");
+        Sys.rename tmp_notes (Filename.concat bname "notes");*)
       if Sys.file_exists tmp_notes_d then
         begin let notes_d = Filename.concat bname "notes" in
           Mutil.remove_dir notes_d; Sys.rename tmp_notes_d notes_d

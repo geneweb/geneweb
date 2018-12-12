@@ -253,10 +253,16 @@ let strip_trailing_spaces s =
   in
   String.sub s 0 len
 
+(* REORG config *)
 let read_base_env bname =
   let fname = String.concat
     Filename.dir_sep [base_path bname; "etc"; "config.txt"]
   in
+  let d1 =
+    String.concat
+      Filename.dir_sep [base_path bname; "etc"; "cnt"]
+  in
+  (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());
   try
     let ic = Secure.open_in fname in
     let env =
@@ -1145,8 +1151,8 @@ let make_conf from_addr request script_name env =
     with Not_found -> !default_lang
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  (* search in mybase/lang as well TODO to be verified where this should be *)
-  let _ = Util.add_lang_path (Util.base_path base_file) in
+  (* REORG search in mybase/lang as well TODO to be verified where this should be *)
+  let _ = Util.add_lang_path (Filename.concat (Util.base_path base_file) "etc") in
   List.iter
     (fun fname ->
        add_lexicon fname (if lang = "" then default_lang else lang) lexicon)

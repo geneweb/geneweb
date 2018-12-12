@@ -919,6 +919,7 @@ let rename_image_file conf base op sp =
     | Some old_d -> old_d
     | None -> ""
   in
+  (* REORG images, portraits *)
   if old_f <> "" || old_fs <> "" || old_d <> "" then
       let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
       let f = String.concat
