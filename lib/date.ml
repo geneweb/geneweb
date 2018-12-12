@@ -414,7 +414,7 @@ let string_of_ondate_aux conf =
         Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
       | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
       end
-  | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")"
+  | Dtext t -> "(" ^ Util.safe_html @@ string_with_macros conf [] t ^ ")"
 
 let string_of_ondate conf d =
   Util.translate_eval (string_of_ondate_aux conf d)
@@ -475,7 +475,7 @@ let string_of_date_aux conf sep =
         Sure -> s ^ sep ^ " (" ^ gregorian_precision conf d ^ ")"
       | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
       end
-  | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")"
+  | Dtext t -> "(" ^ Util.safe_html @@ string_with_macros conf [] t ^ ")"
 
 (* ********************************************************************** *)
 (*  [Fonc] string_of_date_sep : config -> Def.date -> string -> string    *)
