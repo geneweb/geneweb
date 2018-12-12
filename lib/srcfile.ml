@@ -21,9 +21,10 @@ let get_date conf =
 
 let adm_file f = List.fold_right Filename.concat [!(Util.cnt_dir); "cnt"] f
 
+(* REORG counts *)
 (*let cnt conf ext = adm_file (conf.bname ^ "_cnt" ^ ext)*)
 let cnt conf ext = String.concat Filename.dir_sep
-  [Util.base_path conf.bname; "cnt"; "counts" ^ ext]
+  [Util.base_path conf.bname; "etc"; "cnt"; "counts" ^ ext]
 
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
@@ -70,6 +71,7 @@ let write_counter conf r =
     close_out oc
   with _ -> ()
 
+(* REORG count, access *)
 let set_wizard_and_friend_traces conf =
   if conf.wizard && conf.user <> "" then
     let wpf =
@@ -78,7 +80,7 @@ let set_wizard_and_friend_traces conf =
     (if wpf <> "" then
       let fname =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "cnt"; "access_w.txt"]
+          [Util.base_path conf.bname; "etc"; "cnt"; "wizard.log"]
       in
       update_wf_trace conf fname)
   else if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
@@ -93,7 +95,7 @@ let set_wizard_and_friend_traces conf =
     then
       let fname =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "cnt"; "access_f.txt"]
+          [Util.base_path conf.bname; "etc"; "cnt"; "friends.log"]
       in
       update_wf_trace conf fname
 
@@ -118,10 +120,11 @@ let incr_welcome_counter =
 let incr_request_counter =
   incr_counter (fun r -> r.request_cnt <- r.request_cnt + 1)
 
+(* REORG lang_file_name *)
 let lang_file_name conf fname =
   let fname1 =
     String.concat Filename.dir_sep
-      [Util.base_path conf.bname; "lang"; (Filename.basename fname ^ ".txt")]
+      [Util.base_path conf.bname; "etc"; "lang"; (Filename.basename fname ^ ".txt")]
   in
   if Sys.file_exists fname1 then fname1
   else
@@ -132,7 +135,7 @@ let lang_file_name conf fname =
 let any_lang_file_name conf fname =
   let fname1 =
     String.concat Filename.dir_sep
-      [Util.base_path conf.bname; "lang"; Filename.basename fname ^ ".txt"]
+      [Util.base_path conf.bname; "etc"; "lang"; Filename.basename fname ^ ".txt"]
   in
   if Sys.file_exists fname1 then fname1
   else
@@ -140,20 +143,19 @@ let any_lang_file_name conf fname =
       (String.concat Filename.dir_sep
         ["lang"; Filename.basename fname ^ ".txt"])
 
+(* REORG src/lg *)
 let source_file_name conf fname =
   let lang = conf.lang in
   let fname1 =
     String.concat Filename.dir_sep
-      [Util.base_path conf.bname; "documents"; "src"; lang; fname ^ ".txt"]
+      [Util.base_path conf.bname; "documents"; fname ^ "_" ^ lang ^ ".txt"]
   in
-  let fname2 =
+  let fname =
     String.concat Filename.dir_sep
-      [Util.base_path conf.bname; "documents"; "src"; fname ^ ".txt"]
+      [Util.base_path conf.bname; "documents"; fname ^ ".txt"]
   in
   if Sys.file_exists fname1 then fname1
-  else if Sys.file_exists fname2 then fname2
-    else String.concat Filename.dir_sep
-      [Util.base_path conf.bname; "documents"; fname ^ ".txt"]
+  else fname
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y))

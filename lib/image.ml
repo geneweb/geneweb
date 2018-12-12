@@ -54,6 +54,7 @@ let print_image_type fname ctype =
       loop len; close_in ic; true
   | None -> false
 
+(* REORG images *)
 (*same as print_image_type but tests for file existence before *)
 let print_image_type_2 conf fname bfname ctype =
   if Sys.file_exists fname then
@@ -166,6 +167,7 @@ let print_source_image conf f =
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
+(* REORG images *)
 let print conf base =
   match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
   | (Some f, Some p) ->

@@ -1219,7 +1219,7 @@ let print_image conf base = print_confirm conf base ""
 (*                                                                          *)
 (* ************************************************************************ *)
 
-
+(* REORG images, portraits *)
 (* depending on mode, write file/file_name into portraits or others area *)
 
 let effective_send_ok conf base p file file_name mode =

@@ -374,6 +374,7 @@ let insert_pevents1 gen sb sex pevents =
        List.iter (fun (so, sex, _) -> insert_somebody1 gen sex so) wl)
     pevents
 
+(* REORG notes *)
 let insert_bnotes1 gen notesname str =
   let nfname = if notesname = "" then "notes" else notesname in
   let nfname =
@@ -392,7 +393,7 @@ let insert_bnotes1 gen notesname str =
   output_string oc str;
   close_out oc;
   if notesname = "" then
-    let fname =
+    let fname = (* REORG TODO notes_of.txt ?*)
       List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "notes_of.txt"]
     in
     let oc = open_out fname in

@@ -17,6 +17,7 @@ let set_base_dir = Secure.set_base_dir
 let _ = add_lang_path sharelib
 let _ = add_lang_path Filename.current_dir_name
 
+(* REORG cnt_dir *)
 let cnt_dir = ref Filename.current_dir_name
 
 (* Internationalization *)
@@ -1131,6 +1132,7 @@ let string_of_witness_kind conf p witness_kind =
 
 let image_prefix conf = conf.image_prefix
 
+(* REORG base_path *)
 let base_path bname =
   let (bname, bname_suff) =
     if Filename.check_suffix bname ".gwb" then
@@ -1178,6 +1180,7 @@ let search_in_lang_path fname =
     in
     loop (Secure.lang_path ())
 
+(* REORG search in etc *)
 let gw_etc_file fname =
   let etc_file =
     search_in_lang_path
@@ -1210,6 +1213,7 @@ let open_gw_etc_file fname =
       - default: gw_etc_file
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
+(* REORG search in etc *)
 let base_etc_file conf fname =
   (* gwf default template *)
   let fname =
@@ -1297,7 +1301,7 @@ let open_etc_file fname =
   try Some (Secure.open_in (etc_file fname)) with
     Sys_error _ -> None
 *)
-
+(* REORG open etc file *)
 (* TODO allow sub folders? *)
 let open_etc_file conf fname =
   let fname1 =
@@ -2354,7 +2358,7 @@ let string_of_decimal_num conf f =
       end
   in
   loop 0
-
+(* REORG  portraits, images  *)
 let personal_image_file_name conf str =
   let fname1 =
     String.concat
@@ -2530,6 +2534,7 @@ let find_sosa_ref conf base =
     Some p -> Some p
   | None -> default_sosa_ref conf base
 
+(* REORG config *)
 let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
@@ -2674,7 +2679,7 @@ let default_image_name_of_key fnam surn occ =
 let default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
-
+(* REORG portraits *)
 let auto_image_file conf base p saved =
   let s = default_image_name base p in
   let f = (* TODO if // in pathname is not accepted, then duplicate this line *)
@@ -3131,6 +3136,7 @@ let update_wf_trace conf fname =
   in
   write_wf_trace fname (List.sort (fun x y -> compare y x) wt)
 
+(* REORG update.log *)
 let commit_patches conf base =
   Gwdb.commit_patches base;
   write_cache_info conf;
@@ -3145,7 +3151,7 @@ let commit_patches conf base =
     if wpf <> "" then
       let fname =
         String.concat Filename.dir_sep
-          [base_path conf.bname; "cnt"; "update_log.txt"]
+          [base_path conf.bname; "etc"; "cnt"; "update.log"]
       in
       update_wf_trace conf fname
 

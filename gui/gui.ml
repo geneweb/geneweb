@@ -30,6 +30,7 @@ let lang = ref default_lang
 let lexicon_mtime = ref 0.0
 let lexicon_file = Filename.concat bin_dir "gui_lex.txt"
 
+(* REORG TODO conflit avec notre config.txt? *)
 let config_gui_file = Filename.concat bin_dir "config.txt"
 
 (**/**) (* Gestion du dictionnaire des langues pour GUI. *)
@@ -153,6 +154,7 @@ let rec cut_at_equal s =
     String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
   with Not_found -> s, ""
 
+(* REORG config *)
 let read_base_env conf bname =
   let fname = String.concat
     Filename.dir_sep [conf.bases_dir; (bname ^ ".gwb"); "etc"; "config.txt"]
@@ -172,6 +174,7 @@ let read_base_env conf bname =
       close_in ic; env
   | None -> []
 
+(* REORG config *)
 let write_base_env conf bname env =
   let fname = String.concat
     Filename.dir_sep [conf.bases_dir; (bname ^ ".gwb"); "etc"; "config.txt"]

@@ -611,7 +611,7 @@ let opendb bname =
   in
   let patches = input_patches bname in
   let synchro = input_synchro bname in
-  let particles =
+  let particles = (* REORG TODO particles *)
     Mutil.input_particles (Filename.concat bname "particles.txt")
   in
   let ic =
@@ -823,7 +823,7 @@ let opendb bname =
       if List.mem ip ipl then ()
       else Hashtbl.replace patches.h_name i (ip :: ipl)
     with Not_found -> Hashtbl.add patches.h_name i [ip]
-  in
+  in (* REORG notes *)
   let read_notes fnotes rn_mode =
     let fname = if fnotes = "" then "notes" else fnotes in
     let fname = Filename.concat "notes" (fname ^ ".txt") in
@@ -844,7 +844,7 @@ let opendb bname =
       close_in ic ;
       str
     with Sys_error _ -> ""
-  in
+  in (* REORG notes *)
   let commit_notes fnotes s =
     let fname = if fnotes = "" then "notes" else fnotes in
     let fname =

@@ -45,7 +45,7 @@ sv: Parametrar "%a"
 <ul><li>
 [
 de: Hier sind die Parameter der Datenbank <a
-    href="http://%m:%P/%a">%a</a>. 
+    href="http://%m:%P/%a">%a</a>.
     Nimm die geünschten Änderungen vor:
 en: Here are the parameters of the base <a
     href="http://%m:%P/%a">%a</a>. Change what you estimate
@@ -76,7 +76,7 @@ sv: Här är parametrarna för databasen <a
 <td>[
 de: Erlaubt die Änderung der Hintergrundfarbe oder das Hinzufügen
     eines Hintergrundmusters, sowie das Ändern der Farbe von Text und
-    Links. Seine Syntax entspricht der, die im HTML im 
+    Links. Seine Syntax entspricht der, die im HTML im
     "&lt;body&gt;"-Tag vor dem ">" erlaubt ist. Details findest du
     in deiner HTML-Dokumentation. Beispiel:
 en: Allows to change the background color, put a background pattern,
@@ -111,7 +111,7 @@ sv: Gör det möjligt att ändra bakgrunds färgen, att sätta in ett bakgrunds
 <p>
 
 [
-de: Ein paar interessante Variablen… 
+de: Ein paar interessante Variablen…
 en: Some interesting variables…
 es: Algunas variable interesantes…
 fr: Quelques variables intéressantes…
@@ -575,8 +575,8 @@ it: Livello massimo di visualizzazione degli antenati per albero.
 <p>
 
 [
-de: Wenn Vorfahren in Baumstruktur angezeigt werden, soll die Anzahl der 
-    angezeigten Generationen limitiert werden. Per Default ist die Anzahl 
+de: Wenn Vorfahren in Baumstruktur angezeigt werden, soll die Anzahl der
+    angezeigten Generationen limitiert werden. Per Default ist die Anzahl
     sieben Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When ancestors are displayed by tree, limit the number of displayed
     generations. By default, it is 7 generations, but you can
@@ -613,8 +613,8 @@ it: Massimo livello della visualizzazione dei discendenti per albero.
 <p>
 
 [
-de: Wenn Nachkommen in Baumstruktur angezeigt werden, soll die Anzahl der 
-    angezeigten Generationen limitiert werden. Per Default ist die Anzahl 
+de: Wenn Nachkommen in Baumstruktur angezeigt werden, soll die Anzahl der
+    angezeigten Generationen limitiert werden. Per Default ist die Anzahl
     vier Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When descendants are displayed by tree, limit the number of displayed
     generations. By default, it is 4 generations, but you can
@@ -1101,7 +1101,7 @@ sv: Om "Yes", har "wizards" behörighet att sända bilder.
 de: Dies kann auch bei lokalem Zugiff sinnvoll sein, um Bilder für
     jemanden
     zu installieren, da die Funktion das Bild automatisch mit dem richtigen
-    Namen an die richtige Stelle kopiert. 
+    Namen an die richtige Stelle kopiert.
 en: Can be useful in local, in order to be able to put an image for somebody,
     because the procedure installs automatically the image at the right place
     with the appropriate file name.
@@ -1225,6 +1225,10 @@ sv: Om den är tom, har databasen inte blivit omdöpt.
 
 <table style="border:1px solid" width="100%%">
 <tr align=left>
+<td><strong>- trl.txt -</strong></td>
+</tr>
+
+<tr align=left>
 <td>
 [
 de: Wenn Du möchtest, daß ein bestimmter Text am Ende jeder
@@ -1243,17 +1247,40 @@ lv: Ðeit Jûs variet ierakstît tekstu, kurð tikts parâdîts katras lappuses
 sv: Om du vill att en text ska synas längst ner på varje sida, skriv den här.
     Du kan använda HTML taggar.
 ]
-
 </td>
 </tr>
+
 <tr align=left>
 <td>
+[
+en: Current value of the system trl.txt file.
+fr: Contenu actuel du fichier système trl.txt
+]
+</td>
+</tr>
 
+<tr align=left>
+<td>
+<textarea name=trailer_sys rows=3 cols=60 wrap=virtual>%Ftrailer_sys;</textarea>
+</td>
+</tr>
+
+<tr align=left>
+<td>
+[
+en: Current value of the user trl.txt file.
+fr: Contenu actuel du fichier utilisateur trl.txt
+]
+</td>
+</tr>
+
+<tr align=left>
+<td>
 <textarea name=trailer rows=3 cols=60 wrap=virtual>%Ftrailer;</textarea>
 </td>
 </tr>
-</table>
 
+</table>
 </table></dl>
 
 <p>
