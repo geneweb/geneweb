@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%l">
 <head>
-  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: bso_ok.htm,v 7.00 2018-01-01 05:35:06 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2019 INRIA - GeneWeb -->
+  <!-- $Id: bso_ok.htm,v 7.00 13/12/2018 17:06:06 ddr Exp $ -->
   <meta charset="utf-8">
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
@@ -37,23 +37,40 @@ sv: Databasen skapad
 </h1>
 </div>
 
-<p /><p />
+<p>
 
 [
 de: Die Operation ist beendet. Deine Datenbank namens "%o" wurde angelegt.
-en: Done. The operation is terminated. Your database named "%o" is created.
+en: The operation is terminated: Your database named “%o” is created.
 es: Muy bien. La operación a terminado. Su base de datos de nombre
     "%o" ha sido creada.
 fi: Valmis. Toiminto on lopetettu. Tietokanta nimeltä "%0" on luotu.
-fr: L’opération est terminée : votre généalogie "%o" est créée.
-it: L'operazione è terminata. La vostra base di dati "%o" è
+fr: L’opération est terminée : votre généalogie « %o » est créée.
+it: L'operazione è terminata: la vostra base di dati "%o" è
     stata creata.
 lv: Darîts. Datu bâzes izveidoðana ir pabeigta. Jûsu datu bâze "%o" ir
     izveidota.
 sv: Operationen är avklarad. Din databas benämnd "%o" är skapad.
 ]
+	
+[
+en: See the <a href="gwsetup?lang=%l;v=bso_comm.htm">alert messages</a>
+    of the file <samp>comm.log</samp>.
+fr: Voir les <a href="gwsetup?lang=%l;v=bso_comm.htm">messages d’alerte</a>
+    du fichier <samp>comm.log</samp>.
+]
 
-<p />
+</p>
+<p>
+	
+[
+en: Use gwsetup to <a href="gwf?lang=%l;&anon=%o">partially configure the
+	  database parameters</a> (<samp>%o.gwb%/etc%/config.txt</samp>)
+fr: Utiliser gwsetup pour <a href="gwf?lang=%l;&anon=%o">configure les
+	  paramètres de la base de donnée</a> (<samp>%o.gwb%/etc%/config.txt</samp>)
+]
+</p>
+<p>
 
 [
 de: Um mit der Datenbank zu arbeiten und Änderungen daran vornehmen zu
@@ -78,7 +95,8 @@ sv: För att konsultera din databas och möjligen modifiera den, måste <a
     href="gwsetup?lang=%l;v=gwd_info.htm">gwd servicen</a> startas.
 ]
 
-<p />
+</p>
+<p>
 
 [
 de: Sofern dies der Fall ist, probiere die unten angegebene Adresse aus. Die
@@ -106,17 +124,15 @@ sv: Om den är det, försök med adressen nedan. Den visade sidan kallas
     Favoriter/Bokmärken.
 ]
 
-<p />
+</p>
+<p>
+	<ul>
+		<li><a href="http://%m:%P/%o">http://%m:%P/%o</a></li>
+  </ul>
+</p>
 
-<ul>
-
-<li><a
-href="http://%m:%P/%o">http://%m:%P/%o</a>
-
-</ul>
-
-<p />
-
+<p>
+	
 [
 de: Zurück zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmenü</a>.
 en: You can also return to the <a href="gwsetup?lang=%l;v=welcome.htm">main
@@ -134,11 +150,4 @@ sv: Du kan också återvända till <a
     href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
 ]
 
-<br /><p />
-
-[
-en: Click <a href="gwsetup?lang=%l;v=bso_comm.htm">here</a> for the alert messages in the file "comm.log":
-fr: Cliquer <a href="gwsetup?lang=%l;v=bso_comm.htm">ici</a> pour les messages d’alerte dans le fichier "comm.log".
-]
-
-<p />
+</p>
