@@ -53,8 +53,8 @@ sv: Välj din databas:
 <table class="setup" style="cellspacing=0 cellpadding=1">
 
 %b{<tr align=left>
-<td><input type=radio name=anon value="%a">   </td>
-<td>%a</td></tr>|
+<td><input type=radio id=anon%a name=anon value="%a">   </td>
+<td><label for=anon%a>%a</label></td></tr>|
 <tr align=left><td>- [
 de: keine Datenbank vorhanden
 en: there is no database at present
@@ -143,8 +143,8 @@ sv: Välj de optioner du vill ha:
 
 <table class="setup">
 <tr align=left>
-<td><input type=checkbox name=mem value=on>   </td>
-<td>[
+<td><input type=checkbox id=mem name=mem value=on>   </td>
+<td><label for=mem>[
 de: Während der Operation sparsam mit dem Speicher umgehen
     (ist aber langsamer).
 en: Save memory space during operation (but it will be slower).
@@ -156,7 +156,7 @@ it: Economizzare lo spazio-memoria durante l'operazione
     (che però sarà più lenta).
 lv: Taupît operatîvo atmiòu (process notiks lçnâk).
 sv: Spara minne under operationen (men det kommer att gå saktare).
-]</td>
+]</label></td>
 </tr>
 </table>
 <p>
