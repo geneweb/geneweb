@@ -69,7 +69,7 @@ let ht_img = Hashtbl.create 5003
 
 let load_image_ht conf =
   let dir_img = (* REORG portraits *)
-    string.concat
+    String.concat
       Filename.dir_sep  [base_path conf.bname; "documents"; "portraits"]
   in
   let images =
@@ -115,7 +115,7 @@ let find_image_ht name = try Hashtbl.find ht_img name with Not_found -> ""
 let find_image_file conf base p =
   let s = default_image_name base p in
   let f = (* REORG portraits *)
-    string.concat
+    String.concat
       Filename.dir_sep [base_path conf.bname; "documents"; "portraits"; s]
   in
   if Sys.file_exists (f ^ ".gif") then Some (s ^ ".gif")
