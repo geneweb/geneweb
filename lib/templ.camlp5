@@ -742,6 +742,7 @@ and eval_simple_variable conf =
         {conf with base_env = ("doctype", doctype) :: conf.base_env}
       in
       Util.doctype conf ^ "\n"
+  | "exe" -> conf.exe_dir
   | "highlight" -> conf.highlight
   | "image_prefix" -> Util.image_prefix conf
   | "lang" -> conf.lang
