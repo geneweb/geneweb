@@ -36,6 +36,7 @@ let trace_failed_passwd = ref false
 let use_auth_digest_scheme = ref false
 let no_host_address = ref false
 let lexicon_list = ref []
+let exe_dir = ref ""
 
 #ifdef API
 let selected_api_host = ref "127.0.0.1"
@@ -1189,6 +1190,7 @@ let make_conf from_addr request script_name env =
   let wizard_just_friend = if manitou then false else wizard_just_friend in
   let conf =
     {from = from_addr;
+     exe_dir = !exe_dir;
 #ifdef API
      api_host = !selected_api_host;
      api_port = !selected_api_port;
@@ -1864,6 +1866,11 @@ let make_cnt_dir x =
 let main ~speclist () =
   if Sys.unix then ()
   else begin Wserver.sock_in := "gwd.sin"; Wserver.sock_out := "gwd.sou" end;
+  exe_dir := Sys.argv.(0);
+  exe_dir :=
+    if Filename.is_relative !exe_dir
+    then Filename.concat (Sys.getcwd ()) !exe_dir
+    else !exe_dir;
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"
@@ -1889,7 +1896,7 @@ let main ~speclist () =
     ("-p", Arg.Int (fun x -> selected_port := x),
      "<number>\n       Select a port number (default = " ^
      string_of_int !selected_port ^ "); > 1024 for normal users.") ::
-    ("-setup_link", Arg.Set setup_link,
+    ("-setup_link", Arg.Set setup_link, (* TODO obtain gwsetup port number *)
      "\n       Display a link to local gwsetup in bottom of pages.") ::
     ("-allowed_tags", Arg.String (fun x -> Util.allowed_tags_file := x),
      "<file>\n       \

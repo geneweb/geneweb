@@ -26,6 +26,7 @@ and digest_auth_scheme =
 
 type config =
   { from : string;
+    exe_dir : string;
 #ifdef API
     api_host : string;
     api_port : int;

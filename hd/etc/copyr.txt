@@ -10,8 +10,11 @@
     %if;(lang!=l1)
       <a class="dropdown-item" id="lang_%l1;"%sp;
         href="%prefix_no_lang;%if;(l1!=bvar.default_lang)lang=%l1;;%end;%nn;
-              %foreach;env_binding;%if;(env.key!="lang" and env.key!="p_mod" and
-              env.key!="pz" and env.key!="nz" and env.key!="ocz" and env.key!="file")%env.key=%env.val;;%end;%end;">%nn;
+              %foreach;env_binding;%nn;
+                %if;(env.key!="lang" and env.key!="p_mod" and
+                env.key!="pz" and env.key!="nz" and
+                env.key!="ocz" and env.key!="file")%nn;
+                %env.key=%env.val;;%end;%end;">%nn;
        <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1;%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
     %end;
@@ -25,14 +28,17 @@
     <div class="d-none d-flex justify-content-sm-between">
       <div class="d-flex d-sm-inline-flex p-2">
         <a class="btn btn-outline-secondary" role="button"%sp;
-           href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%if;(evar.digest="" and evar.file="")%suffix;%end;"%sp;
-           title="%if(evar.templ!="templm")templm%else;defaut template%end;">%nn;
-           <span class="fa fa-id-card" aria-hidden="true"></span>%nn;
-           <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;defaut template%end;</span>%nn;
+          href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%nn;
+            %if;(evar.digest="" and evar.file="")%suffix;%end;" %nn;
+            title="%if(evar.templ!="templm")templm%else;defaut template%end;">%nn;
+          <span class="fa fa-id-card" aria-hidden="true"></span>%nn;
+          <span class="sr-only">switch to
+          %if(evar.templ!="templm")templm%else;defaut template%end;</span>%nn;
         </a>
         %if;(evar.templ="")
         <div class="ml-sm-1 btn-group dropup">
-          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu1"%sp;
+          <button class="btn btn-outline-secondary dropdown-toggle" %nn;
+            type="button" id="dropdownMenu1"%sp;
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"%sp;
             title="%if;(evar.lang!="")%apply;capitalize%with;%apply;language_name(evar.lang)%end;%end;">%nn;
             <span class="sr-only">lang</span>%nn;
@@ -82,14 +88,24 @@
       </div>
       <div class="d-flex flex-xs-column flex-md-row ml-md-auto p-sm-2 align-items-center">
         <div class="btn-sm-group">
-        <a href="https://github.com/geneweb/geneweb" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb sources on GitHub">%nn;
+        <a href="https://github.com/geneweb/geneweb" %nn;
+          class="ml-1 mt-sm-2 mt-md-0" %nn;
+          target="_blank" title="GeneWeb sources on GitHub">%nn;
         <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
         <span class="align-self-center mx-1">
           <a href="https://github.com/geneweb/geneweb/commit/%commit;"%sp;
-            title="GeneWeb %version %if;(is_printed_by_template)%apply;compil%with;%compilation_time;%and;%commit;%end;%end;%if;(compilation_time!=commit_date) (%commit_date;)%end;">v.&nbsp;%version;</a>%nn;
-          &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017%if;(connections!="") %connections;%end;%nn;
+            title="GeneWeb %version %nn;
+              %if;(is_printed_by_template)%apply;compil%with;%compilation_time;%nn;
+              %and;%commit;%end;%end;%nn;
+              %if;(compilation_time!=commit_date) (%commit_date;)%end; %nn;
+              (%exe;)">v.&nbsp;%version;</a> %nn;
+          &copy; <a href="https://www.inria.fr/">INRIA</a> %nn;
+            1998-2017%if;(connections!="") %connections;%end;%nn;
         </span>
-        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang!="en")/%lang;%end;" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb documentation MediaWiki">%nn;
+        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%nn;
+          %if;(lang!="en")/%lang;%end;" %nn;
+          class="ml-1 mt-sm-2 mt-md-0" %nn;
+          target="_blank" title="GeneWeb documentation MediaWiki">%nn;
         <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb wiki"/></a>
         </div>
       </div>
