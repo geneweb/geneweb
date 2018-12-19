@@ -9,7 +9,7 @@ open Gwdb
 let designation base p =
   let s = Gutil.designation base p in
   if String.get s 0 = '?' || String.get s (String.length s - 1) = '?'
-  then s ^ " (i=" ^ string_of_int (Adef.int_of_iper (get_key_index p)) ^ ")"
+  then s ^ " (i=" ^ string_of_iper (get_key_index p) ^ ")"
   else s
 
 let string_of_epers_name base epers_name =
@@ -180,8 +180,8 @@ let print_base_warning oc base =
   | ParentTooYoung (p, a) ->
       Printf.fprintf oc "%s was parent at age of %d\n" (designation base p) a.year
   | PossibleDuplicateFam (f1, f2) ->
-    Printf.fprintf oc "possible duplicate families: %d and %d\n"
-      (Adef.int_of_ifam f1) (Adef.int_of_ifam f2)
+    Printf.fprintf oc "possible duplicate families: %s and %s\n"
+      (string_of_ifam f1) (string_of_ifam f2)
   | PEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_epers_name base e1.epers_name)
@@ -341,8 +341,8 @@ let check_base_aux base error warning changed_p =
 
 let check_base base error warning def changed_p pr_stats =
   let s =
-    let y = 1000, poi base (Adef.iper_of_int 0) in
-    let o = 0, poi base (Adef.iper_of_int 0) in
+    let y = 1000, poi base Gwdb.dummy_iper in
+    let o = 0, poi base Gwdb.dummy_iper in
     {men = 0; women = 0; neutre = 0; noname = 0; oldest_father = o;
      oldest_mother = o; youngest_father = y; youngest_mother = y;
      oldest_dead = o; oldest_still_alive = o}

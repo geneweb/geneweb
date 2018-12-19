@@ -2,6 +2,7 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def
+open Type
 
 let magic_patch = "GwPt0002"
 
@@ -10,10 +11,10 @@ type patches =
     mutable nb_fam : int;
     nb_per_ini : int;
     nb_fam_ini : int;
-    h_person : (iper, (iper, string) gen_person) Hashtbl.t;
+    h_person : (iper, (iper, iper, string) gen_person) Hashtbl.t;
     h_ascend : (iper, ifam gen_ascend) Hashtbl.t;
     h_union : (iper, ifam gen_union) Hashtbl.t;
-    h_family : (ifam, (iper, string) gen_family) Hashtbl.t;
+    h_family : (ifam, (iper, ifam, string) gen_family) Hashtbl.t;
     h_couple : (ifam, iper gen_couple) Hashtbl.t;
     h_descend : (ifam, iper gen_descend) Hashtbl.t;
     h_key : (string * string * int, iper option) Hashtbl.t;
@@ -351,11 +352,11 @@ let load_couples_array2 db2 =
     Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb (Adef.iper_of_int 0)
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb (Type.iper_of_int 0)
           "family" "father"
           (fun ic_dat pos -> seek_in ic_dat pos; Iovalue.input ic_dat)
       in
-      Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) <- Adef.father c)
+      Hashtbl.iter (fun i c -> tab.(Type.int_of_ifam i) <- Adef.father c)
         db2.patches.h_couple;
       db2.father_array <- Some tab
   end;
@@ -363,11 +364,11 @@ let load_couples_array2 db2 =
     Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb (Adef.iper_of_int 0)
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb (Type.iper_of_int 0)
           "family" "mother"
           (fun ic_dat pos -> seek_in ic_dat pos; Iovalue.input ic_dat)
       in
-      Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) <- Adef.mother c)
+      Hashtbl.iter (fun i c -> tab.(Type.int_of_ifam i) <- Adef.mother c)
         db2.patches.h_couple;
       db2.mother_array <- Some tab
 
@@ -381,7 +382,7 @@ let parents_array2 db2 nb_ini nb =
            else
              begin seek_in ic_dat pos; Some (Iovalue.input ic_dat : ifam) end)
   in
-  Hashtbl.iter (fun i a -> arr.(Adef.int_of_iper i) <- a.parents)
+  Hashtbl.iter (fun i a -> arr.(Type.int_of_iper i) <- a.parents)
     db2.patches.h_ascend;
   arr
 
@@ -404,7 +405,7 @@ let consang_array2 db2 nb =
         else tab
     | None -> Array.make nb Adef.no_consang
   in
-  Hashtbl.iter (fun i a -> arr.(Adef.int_of_iper i) <- a.consang)
+  Hashtbl.iter (fun i a -> arr.(Type.int_of_iper i) <- a.consang)
     db2.patches.h_ascend;
   arr
 

@@ -5,7 +5,7 @@ open Def
 open Gwdb
 
 type base_error = person error
-type base_warning = (person, family, title, pers_event, fam_event) warning
+type base_warning = (iper, person, ifam, family, title, pers_event, fam_event) warning
 type base_misc = (person, family, title) misc
 
 (* Constants used for computing the warnings. *)
@@ -173,16 +173,18 @@ let compare_event_name name1 name2 =
   match name1, name2 with
     Psort Epers_Birth, _ -> -1
   | _, Psort Epers_Birth -> 1
-  | Psort Epers_Baptism, e
-    when
-      e = Psort Epers_Death || e = Psort Epers_Funeral ||
-      e = Psort Epers_Burial || e = Psort Epers_Cremation ->
-      -1
-  | e, Psort Epers_Baptism
-    when
-      e = Psort Epers_Death || e = Psort Epers_Funeral ||
-      e = Psort Epers_Burial || e = Psort Epers_Cremation ->
-      1
+  | Psort Epers_Baptism
+  , ( Psort Epers_Death
+    | Psort Epers_Funeral
+    | Psort Epers_Burial
+    | Psort Epers_Cremation ) ->
+    -1
+  | ( Psort Epers_Death
+    | Psort Epers_Funeral
+    | Psort Epers_Burial
+    | Psort Epers_Cremation )
+  , Psort Epers_Baptism ->
+    1
   | Psort Epers_Burial, _ | Psort Epers_Cremation, _ -> 1
   | _, Psort Epers_Burial | _, Psort Epers_Cremation -> -1
   | Psort Epers_Funeral, _ -> 1
@@ -792,7 +794,8 @@ let check_witness_pevents base warning p =
     (get_pevents p)
 
 let check_pevents base warning p =
-  check_order_pevents warning p; check_witness_pevents base warning p
+  check_order_pevents warning p ;
+  check_witness_pevents base warning p
 
 (* ************************************************************************* *)
 (*  [Fonc] check_children :

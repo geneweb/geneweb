@@ -5,9 +5,6 @@ type ('a, 'b) choice =
     Left of 'a
   | Right of 'b
 
-type iper = Adef.iper
-type ifam = Adef.ifam
-
 type cdate = Adef.cdate
 
 type date =
@@ -187,7 +184,7 @@ type place =
 
 (* person *)
 
-type ('person, 'string) gen_person =
+type ('iper, 'person, 'string) gen_person =
   { first_name : 'string;
     surname : 'string;
     occ : int;
@@ -199,7 +196,7 @@ type ('person, 'string) gen_person =
     surnames_aliases : 'string list;
     titles : 'string gen_title list;
     rparents : ('person, 'string) gen_relation list;
-    related : iper list;
+    related : 'person list;
     occupation : 'string;
     sex : sex;
     access : access;
@@ -222,7 +219,7 @@ type ('person, 'string) gen_person =
     pevents : ('person, 'string) gen_pers_event list;
     notes : 'string;
     psources : 'string;
-    key_index : iper }
+    key_index : 'iper }
 
 
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
@@ -231,7 +228,7 @@ type 'family gen_union = { family : 'family array }
 
 (* family *)
 
-type ('person, 'string) gen_family =
+type ('person, 'ifam, 'string) gen_family =
   { marriage : cdate;
     marriage_place : 'string;
     marriage_note : 'string;
@@ -243,7 +240,7 @@ type ('person, 'string) gen_family =
     comment : 'string;
     origin_file : 'string;
     fsources : 'string;
-    fam_index : ifam }
+    fam_index : 'ifam }
 
 type 'person gen_couple = 'person Adef.gen_couple
 
@@ -254,16 +251,16 @@ type 'person error =
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person
 
-type ('person, 'descend, 'title, 'pevent, 'fevent) warning =
+type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
     BigAgeBetweenSpouses of 'person * 'person * dmy
   | BirthAfterDeath of 'person
   | IncoherentSex of 'person * int * int
-  | ChangedOrderOfChildren of ifam * 'descend * iper array * iper array
-  | ChangedOrderOfMarriages of 'person * ifam array * ifam array
-  | ChangedOrderOfFamilyEvents of ifam * 'fevent list * 'fevent list
+  | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array
+  | ChangedOrderOfMarriages of 'person * 'family array * 'family array
+  | ChangedOrderOfFamilyEvents of 'family * 'fevent list * 'fevent list
   | ChangedOrderOfPersonEvents of 'person * 'pevent list * 'pevent list
-  | ChildrenNotInOrder of ifam * 'descend * 'person * 'person
-  | CloseChildren of ifam * 'descend * 'person * 'person
+  | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
+  | CloseChildren of 'family * 'descend * 'person * 'person
   | DeadOld of 'person * dmy
   | DeadTooEarlyToBeFather of 'person * 'person
   | FEventOrder of 'person * 'fevent * 'fevent
@@ -277,7 +274,7 @@ type ('person, 'descend, 'title, 'pevent, 'fevent) warning =
   | ParentTooOld of 'person * dmy
   | ParentTooYoung of 'person * dmy
   | PEventOrder of 'person * 'pevent * 'pevent
-  | PossibleDuplicateFam of ifam * ifam
+  | PossibleDuplicateFam of 'family * 'family
   | PWitnessEventAfterDeath of 'person * 'pevent
   | PWitnessEventBeforeBirth of 'person * 'pevent
   | TitleDatesError of 'person * 'title
@@ -293,33 +290,33 @@ type rn_mode = RnAll | Rn1Ln | RnDeg
 
 (* Historique des modifications *)
 
-type ('person, 'string) base_changed =
-    U_Add_person of ('person, 'string) gen_person
+type ('iper, 'person, 'family, 'string) base_changed =
+    U_Add_person of ('iper, 'person, 'string) gen_person
   | U_Modify_person of
-      ('person, 'string) gen_person * ('person, 'string) gen_person
-  | U_Delete_person of ('person, 'string) gen_person
+      ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person
+  | U_Delete_person of ('iper, 'person, 'string) gen_person
   | U_Merge_person of
-      ('person, 'string) gen_person * ('person, 'string) gen_person *
-        ('person, 'string) gen_person
-  | U_Send_image of ('person, 'string) gen_person
-  | U_Delete_image of ('person, 'string) gen_person
+      ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person *
+        ('iper, 'person, 'string) gen_person
+  | U_Send_image of ('iper, 'person, 'string) gen_person
+  | U_Delete_image of ('iper, 'person, 'string) gen_person
   | U_Add_family of
-      ('person, 'string) gen_person * ('person, 'string) gen_family
+      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family
   | U_Modify_family of
-      ('person, 'string) gen_person * ('person, 'string) gen_family *
-        ('person, 'string) gen_family
+      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family *
+        ('person, 'family, 'string) gen_family
   | U_Delete_family of
-      ('person, 'string) gen_person * ('person, 'string) gen_family
-  | U_Invert_family of ('person, 'string) gen_person * ifam
+      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family
+  | U_Invert_family of ('iper, 'person, 'string) gen_person * 'family
   | U_Merge_family of
-      ('person, 'string) gen_person * ('person, 'string) gen_family *
-        ('person, 'string) gen_family * ('person, 'string) gen_family
+      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family *
+        ('person, 'family, 'string) gen_family * ('person, 'family, 'string) gen_family
   | U_Change_children_name of
-      ('person, 'string) gen_person *
-        ((string * string * int * iper) * (string * string * int * iper)) list
+      ('iper, 'person, 'string) gen_person *
+        ((string * string * int * 'person) * (string * string * int * 'person)) list
   | U_Add_parent of
-      ('person, 'string) gen_person * ('person, 'string) gen_family
-  | U_Kill_ancestors of ('person, 'string) gen_person
+      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family
+  | U_Kill_ancestors of ('iper, 'person, 'string) gen_person
   | U_Multi of
-      ('person, 'string) gen_person * ('person, 'string) gen_person * bool
+      ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person * bool
   | U_Notes of int option * string

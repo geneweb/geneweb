@@ -17,8 +17,6 @@ type create_info =
       ci_occupation : string;
       ci_public : bool }
 
-let bogus_family_index = Adef.ifam_of_int (-1)
-
 let default_source conf =
   match p_getenv conf.env "dsrc" with
     Some s -> s
@@ -29,16 +27,15 @@ let person_key base ip =
   let first_name = sou base (get_first_name p) in
   let surname = sou base (get_surname p) in
   let occ =
-    if first_name = "?" || surname = "?" then Adef.int_of_iper ip
-    else get_occ p
+    (* if first_name = "?" || surname = "?" then Adef.int_of_iper ip
+     * else *) get_occ p
   in
   first_name, surname, occ, Update.Link, ""
 
 let string_family_of conf base ifam =
   let fam = foi base ifam in
   let sfam =
-    Futil.map_family_ps (person_key base) (sou base)
-      (gen_family_of_family fam)
+    Futil.map_family_ps (person_key base) (fun f -> f) (sou base) (gen_family_of_family fam)
   in
   let scpl =
     Futil.map_couple_p conf.multi_parents (person_key base)
@@ -588,7 +585,7 @@ and eval_relation_kind =
 and eval_special_var conf base =
   function
     ["include_perso_header"] -> (* TODO merge with mainstream includes ?? *)
-      begin match p_getint conf.env "ip" with
+      begin match p_getenv conf.env "ip" with
         Some i ->
           let has_base_loop =
             try let _ = Util.create_topological_sort conf base in false with
@@ -596,7 +593,7 @@ and eval_special_var conf base =
           in
           if has_base_loop then VVstring ""
           else
-            let p = poi base (Adef.iper_of_int i) in
+            let p = poi base (iper_of_string i) in
             Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf
               base p;
             VVstring ""
@@ -695,9 +692,9 @@ let print_del1 conf base ifam =
     Wserver.printf "%s" (capitale (transl_decline conf "delete" s))
   in
   let p =
-    match p_getint conf.env "ip" with
-      Some ip -> poi base (Adef.iper_of_int ip)
-    | None -> Gwdb.empty_person base (Adef.iper_of_int (-1))
+    match p_getenv conf.env "ip" with
+      Some ip -> poi base (iper_of_string ip)
+    | None -> Gwdb.empty_person base dummy_iper
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Wserver.printf "<h2>\n";
@@ -707,8 +704,8 @@ let print_del1 conf base ifam =
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Wserver.printf "<p>\n";
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-    (Adef.int_of_ifam ifam) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+    (string_of_ifam ifam) conf.xhs;
   begin match p_getenv conf.env "ip" with
     Some ip ->
       Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n" ip
@@ -754,10 +751,10 @@ let print_inv1 conf base p ifam1 ifam2 =
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Wserver.printf "<p>\n";
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper (get_key_index p)) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%d\"%s>\n"
-    (Adef.int_of_ifam ifam2) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+    (string_of_iper (get_key_index p)) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
+    (string_of_ifam ifam2) conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"%s>\n"
     conf.xhs;
   Wserver.printf "</p>\n";
@@ -773,9 +770,9 @@ let print_inv1 conf base p ifam1 ifam2 =
 
 let print_add conf base =
   let (fath, moth, digest) =
-    match p_getint conf.env "ip" with
+    match p_getenv conf.env "ip" with
       Some i ->
-        let p = poi base (Adef.iper_of_int i) in
+        let p = poi base (iper_of_string i) in
         let fath =
           if get_sex p = Male ||
              get_sex p = Neuter && p_getenv conf.env "sex" = Some "M"
@@ -800,20 +797,20 @@ let print_add conf base =
     {marriage = Adef.cdate_None; marriage_place = ""; marriage_note = "";
      marriage_src = ""; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
-     fsources = default_source conf; fam_index = bogus_family_index}
+     fsources = default_source conf; fam_index = dummy_ifam}
   and cpl = Gutil.couple conf.multi_parents fath moth
   and des = {children = [| |]} in
   print_update_fam conf base (fam, cpl, des) digest
 
 let print_add_parents conf base =
-  match p_getint conf.env "ip" with
+  match p_getenv conf.env "ip" with
     Some i ->
-      let p = poi base (Adef.iper_of_int i) in
+      let p = poi base (iper_of_string i) in
       let fam =
         {marriage = Adef.cdate_None; marriage_place = ""; marriage_note = "";
          marriage_src = ""; witnesses = [| |]; relation = Married;
          divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
-         fsources = default_source conf; fam_index = bogus_family_index}
+         fsources = default_source conf; fam_index = dummy_ifam}
       and cpl =
         Gutil.couple conf.multi_parents
           ("", sou base (get_surname p), 0, Update.Create (Neuter, None), "")
@@ -827,16 +824,16 @@ let print_add_parents conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some i ->
-      let sfam = string_family_of conf base (Adef.ifam_of_int i) in
+      let sfam = string_family_of conf base (ifam_of_string i) in
       let digest = Update.digest_family sfam in
       print_update_fam conf base sfam digest
   | _ -> Hutil.incorrect_request conf
 
 let print_del conf base =
-  match p_getint conf.env "i" with
-    Some i -> print_del1 conf base (Adef.ifam_of_int i)
+  match p_getenv conf.env "i" with
+    Some i -> print_del1 conf base (ifam_of_string i)
   | _ -> Hutil.incorrect_request conf
 
 let rec find_families ifam =
@@ -847,14 +844,14 @@ let rec find_families ifam =
   | _ -> None
 
 let print_inv conf base =
-  match p_getint conf.env "i", p_getint conf.env "f" with
+  match p_getenv conf.env "i", p_getenv conf.env "f" with
     Some ip, Some ifam ->
-      let u = poi base (Adef.iper_of_int ip) in
+      let u = poi base (iper_of_string ip) in
       begin match
-        find_families (Adef.ifam_of_int ifam) (Array.to_list (get_family u))
+        find_families (ifam_of_string ifam) (Array.to_list (get_family u))
       with
         Some (ifam1, ifam2) ->
-          let p = poi base (Adef.iper_of_int ip) in
+          let p = poi base (iper_of_string ip) in
           print_inv1 conf base p ifam1 ifam2
       | _ -> Hutil.incorrect_request conf
       end
@@ -874,10 +871,12 @@ let change_order u ifam n =
 
 let print_change_order conf base =
   match
-    p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n"
+    p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n"
   with
     Some ip, Some ifam, Some n ->
-      let p = poi base (Adef.iper_of_int ip) in
+      let ip = iper_of_string ip in
+      let ifam = ifam_of_string ifam in
+      let p = poi base ip in
       let print_list arr diff_arr =
         Array.iteri
           (fun i ifam ->
@@ -900,7 +899,7 @@ let print_change_order conf base =
              Wserver.printf "</li>\n")
           arr
       in
-      let after = change_order p (Adef.ifam_of_int ifam) n in
+      let after = change_order p ifam n in
       let (before, after) = get_family p, Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
       let title _ =
@@ -930,10 +929,11 @@ let print_change_order conf base =
       Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
       Wserver.printf "<p>\n";
       Util.hidden_env conf;
-      Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n" ip
+      Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+        (string_of_iper ip)
         conf.xhs;
-      Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%d\"%s>\n"
-        ifam conf.xhs;
+      Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
+        (string_of_ifam ifam) conf.xhs;
       Wserver.printf "<input type=\"hidden\" name=\"n\" value=\"%d\"%s>\n" n
         conf.xhs;
       Wserver.printf
@@ -952,9 +952,10 @@ let print_change_order conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some i ->
-      let sfam = string_family_of conf base (Adef.ifam_of_int i) in
+      let i = ifam_of_string i in
+      let sfam = string_family_of conf base i in
       Hutil.interp conf "updfamevt"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);

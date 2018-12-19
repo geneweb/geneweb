@@ -224,13 +224,13 @@ let next_relation_link_txt conf ip1 ip2 excl_faml =
     List.fold_left
       (fun (sl, i) ifam ->
          "&ef" :: string_of_int i :: "=" ::
-         string_of_int (Adef.int_of_ifam ifam) :: sl,
+         string_of_ifam ifam :: sl,
          i - 1)
       ([], List.length excl_faml - 1) excl_faml
   in
   let sl =
-    commd conf :: "em=R&ei=" :: string_of_int (Adef.int_of_iper ip1) ::
-    "&i=" :: string_of_int (Adef.int_of_iper ip2) ::
+    commd conf :: "em=R&ei=" :: string_of_iper ip1 ::
+    "&i=" :: string_of_iper ip2 ::
     (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "") ::
     (if conf.cancel_links then "&cgl=on" else "") :: bd :: color :: "&et=S" ::
     sl
@@ -400,8 +400,8 @@ let print_shortest_path conf base p1 p2 =
   else
     let excl_faml =
       let rec loop list i =
-        match p_getint conf.env ("ef" ^ string_of_int i) with
-          Some k -> loop (Adef.ifam_of_int k :: list) (i + 1)
+        match p_getenv conf.env ("ef" ^ string_of_int i) with
+          Some k -> loop (ifam_of_string k :: list) (i + 1)
         | None ->
             match find_person_in_env conf base ("ef" ^ string_of_int i) with
               Some p ->
@@ -1442,7 +1442,7 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
              in
              let sl =
                "&i" :: string_of_int n :: "=" ::
-               string_of_int (Adef.int_of_iper (get_key_index p)) :: sl
+               string_of_iper (get_key_index p) :: sl
              in
              sl, n - 1)
           (sl, List.length pl2) (List.rev pl2)

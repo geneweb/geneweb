@@ -9,7 +9,7 @@ val person_key : base -> iper -> Update.key
 
 val print_update_fam :
   config -> base ->
-    (Update.key, string) gen_family * Update.key gen_couple *
+    (Update.key, ifam, string) gen_family * Update.key gen_couple *
       Update.key gen_descend ->
     string -> unit
 
@@ -25,5 +25,5 @@ val print_change_event_order : config -> base -> unit
 
 val string_family_of :
   config -> base -> ifam ->
-    (Update.key, string) gen_family * Update.key gen_couple *
+    (Update.key, ifam,  string) gen_family * Update.key gen_couple *
       Update.key gen_descend

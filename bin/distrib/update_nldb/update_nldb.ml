@@ -119,8 +119,8 @@ let compute base bdir =
   flush stderr;
   ProgrBar.full := '*';
   ProgrBar.start ();
-  for i = 0 to nb_ind - 1 do
-    let p = poi base (Adef.iper_of_int i) in
+  Gwdb.Collection.iteri (fun i ip ->
+    let p = poi base ip in
     let s =
       let sl =
         [get_notes p; get_occupation p; get_birth_note p; get_birth_src p;
@@ -140,18 +140,18 @@ let compute base bdir =
     let list = notes_links s in
     if list = ([], []) then ()
     else
-      begin let pg = NotesLinks.PgInd (Adef.iper_of_int i) in
+      begin let pg = NotesLinks.PgInd ip in
         db := NotesLinks.add_in_db !db pg list
       end;
     ProgrBar.run i nb_ind
-  done;
+    ) (Gwdb.ipers base) ;
   ProgrBar.finish ();
   Printf.eprintf "--- families notes\n";
   flush stderr;
   ProgrBar.full := '*';
   ProgrBar.start ();
-  for i = 0 to nb_fam - 1 do
-    let fam = foi base (Adef.ifam_of_int i) in
+  Gwdb.Collection.iteri (fun i ifam ->
+    let fam = foi base ifam in
     if not (is_deleted_family fam) then
       begin let s =
         let sl =
@@ -171,11 +171,11 @@ let compute base bdir =
         let list = notes_links s in
         if list = ([], []) then ()
         else
-          let pg = NotesLinks.PgFam (Adef.ifam_of_int i) in
+          let pg = NotesLinks.PgFam ifam in
           db := NotesLinks.add_in_db !db pg list
       end;
     ProgrBar.run i nb_fam
-  done;
+    ) (Gwdb.ifams base) ;
   ProgrBar.finish ();
   NotesLinks.write_db bdir !db
 

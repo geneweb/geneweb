@@ -1,12 +1,10 @@
 (* $Id: notesLinks.ml,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-
 let magic_notes_links = "GWNL0010"
 type page =
-    PgInd of iper
-  | PgFam of ifam
+    PgInd of Gwdb.iper
+  | PgFam of Gwdb.ifam
   | PgNotes
   | PgMisc of string
   | PgWizard of string

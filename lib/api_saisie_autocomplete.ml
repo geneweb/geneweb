@@ -1,3 +1,5 @@
+#ifdef API
+
 open Config
 open Def
 open Gwdb
@@ -172,3 +174,5 @@ let get_list_from_cache conf base s max_res mode =
            | _ -> []
          end
        | None -> [])
+
+#endif

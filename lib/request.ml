@@ -64,7 +64,7 @@ let make_senv conf base =
           Some ip -> ip
         | None -> Hutil.incorrect_request conf; raise Exit
       in
-      let vi = string_of_int (Adef.int_of_iper ip) in set_senv conf vm vi
+      let vi = string_of_iper ip in set_senv conf vm vi
   | _ -> ()
 
 [@@@ocaml.warning "-45"]
@@ -286,7 +286,7 @@ let extract_henv conf base =
           ["pz", code_varenv (Name.lower first_name);
            "nz", code_varenv (Name.lower surname);
            "ocz", string_of_int (get_occ p)]
-        else ["iz", string_of_int (Adef.int_of_iper (get_key_index p))]
+        else ["iz", string_of_iper (get_key_index p)]
       in
       conf.henv <- conf.henv @ x
   | None -> ()

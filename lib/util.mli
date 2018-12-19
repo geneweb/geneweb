@@ -48,7 +48,7 @@ val nobtit : config -> base -> person -> title list
 
 val strictly_after_private_years : config -> dmy -> bool
 val authorized_age : config -> base -> person -> bool
-val is_old_person : config -> (iper, istr) gen_person -> bool
+val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 val fast_auth_age : config -> person -> bool
 
 val start_with_vowel : string -> bool
@@ -66,9 +66,9 @@ val is_hidden : person -> bool
 
 val pget : config -> base -> iper -> person
 val string_gen_person :
-  base -> (iper, istr) gen_person -> (iper, string) gen_person
+  base -> (iper, iper, istr) gen_person -> (iper, iper, string) gen_person
 val string_gen_family :
-  base -> (iper, istr) gen_family -> (iper, string) gen_family
+  base -> (iper, ifam, istr) gen_family -> (iper, ifam, string) gen_family
 
 type p_access = (base -> person -> string) * (base -> person -> string)
 val std_access : p_access
@@ -213,7 +213,7 @@ val update_gwf_sosa : config -> base -> iper * (string * string * int) -> unit
 val get_server_string : string list -> string
 val get_request_string : string list -> string
 
-val create_topological_sort : config -> base -> (Def.iper, int) Gwdb.Marker.t
+val create_topological_sort : config -> base -> (iper, int) Gwdb.Marker.t
 
 (** [p_of_sosa conf base sosa p0]
     Get the sosa [sosa] of [p0] if it exists
@@ -336,8 +336,8 @@ val real_nb_of_persons : config -> base -> int
 val array_mem_witn
  : Config.config
  -> Gwdb.base
- -> Def.iper
- -> (Def.iper * Def.witness_kind) array
+ -> iper
+ -> (iper * Def.witness_kind) array
  -> bool * string
 
 (** Print a date using "%4d-%02d-%02d %02d:%02d:%02d" format. *)

@@ -2,7 +2,6 @@
 
 open Config
 open Dag2html
-open Def
 open Gwdb
 
 module Pset :

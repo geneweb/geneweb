@@ -158,12 +158,12 @@ let find_all conf base an =
 
 let relation_print conf base p =
   let p1 =
-    match p_getint conf.senv "ei" with
+    match p_getenv conf.senv "ei" with
     | Some i ->
       conf.senv <- [];
-      if i >= 0 && i < nb_of_persons base then
-        Some (pget conf base (Adef.iper_of_int i))
-      else None
+      (* if i >= 0 && i < nb_of_persons base then *)
+        Some (pget conf base (iper_of_string i))
+      (* else None *)
     | None ->
       match find_person_in_env conf base "1" with
         Some p1 -> conf.senv <- []; Some p1
@@ -1105,7 +1105,7 @@ let defaultHandler : handler =
           end
         | Some i ->
           relation_print conf base
-            (pget conf base (Adef.iper_of_int (int_of_string i)))
+            (pget conf base (iper_of_string i))
       end
     end
 

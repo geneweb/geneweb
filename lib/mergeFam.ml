@@ -70,10 +70,10 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
-    (Adef.int_of_ifam ifam1);
-  Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%d\">\n"
-    (Adef.int_of_ifam ifam2);
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_ifam ifam1);
+  Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
+    (string_of_ifam ifam2);
   begin match p_getenv conf.env "ip" with
     Some ip ->
       Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
@@ -82,10 +82,10 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   begin let rec loop =
     function
       [ip1, ip2] ->
-        Wserver.printf "<input type=\"hidden\" name=\"ini1\" value=\"%d\">\n"
-          (Adef.int_of_iper ip1);
-        Wserver.printf "<input type=\"hidden\" name=\"ini2\" value=\"%d\">\n"
-          (Adef.int_of_iper ip2)
+        Wserver.printf "<input type=\"hidden\" name=\"ini1\" value=\"%s\">\n"
+          (string_of_iper ip1);
+        Wserver.printf "<input type=\"hidden\" name=\"ini2\" value=\"%s\">\n"
+          (string_of_iper ip2)
     | _ :: branches -> loop branches
     | _ -> ()
   in
@@ -157,10 +157,10 @@ let merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
   else Hutil.incorrect_request conf
 
 let print conf base =
-  match p_getint conf.env "i", p_getint conf.env "i2" with
+  match p_getenv conf.env "i", p_getenv conf.env "i2" with
     Some f1, Some f2 ->
-      let ifam1 = Adef.ifam_of_int f1 in
-      let ifam2 = Adef.ifam_of_int f2 in
+      let ifam1 = ifam_of_string f1 in
+      let ifam2 = ifam_of_string f2 in
       let fam1 = foi base ifam1 in
       let fam2 = foi base ifam2 in
       merge_fam conf base (ifam1, fam1) (ifam2, fam2)

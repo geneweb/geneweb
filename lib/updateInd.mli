@@ -5,10 +5,10 @@ open Config
 open Def
 open Gwdb
 
-val string_person_of : base -> person -> (Update.key, string) gen_person
+val string_person_of : base -> person -> (iper, Update.key, string) gen_person
 
 val print_update_ind :
-  config -> base -> (Update.key, string) gen_person -> string -> unit
+  config -> base -> (iper, Update.key, string) gen_person -> string -> unit
 
 val print_add : config -> base -> unit
 val print_del : config -> base -> unit
