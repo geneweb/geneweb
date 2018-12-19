@@ -2,11 +2,12 @@
 (* Copyright (c) 2007-2008 INRIA *)
 
 open Def
+open Gwdb
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 type somebody =
     Undefined of key
-  | Defined of (iper, string) gen_person
+  | Defined of (iper, iper, string) gen_person
 
 type gw_syntax =
     Family of
@@ -14,8 +15,8 @@ type gw_syntax =
         (string gen_fam_event_name * cdate * string * string * string *
            string * (somebody * sex * witness_kind) list)
           list *
-        ((iper, string) gen_person, string) gen_family *
-        (iper, string) gen_person gen_descend
+        ((iper, iper, string) gen_person, ifam, string) gen_family *
+        (iper, iper, string) gen_person gen_descend
   | Notes of key * string
   | Relations of somebody * sex * (somebody, string) gen_relation list
   | Pevent of

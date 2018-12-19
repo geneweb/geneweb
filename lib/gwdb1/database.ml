@@ -3,6 +3,7 @@
 
 open Dbdisk
 open Def
+open Type
 
 type person = dsk_person
 type ascend = dsk_ascend
@@ -117,7 +118,7 @@ let hashtbl_right_assoc s ht =
   with Found x -> x
 
 let index_of_string strings ic start_pos hash_len string_patches s =
-  try Adef.istr_of_int (hashtbl_right_assoc s string_patches) with
+  try Type.istr_of_int (hashtbl_right_assoc s string_patches) with
     Not_found ->
       match ic, hash_len with
         Some ic, Some hash_len ->
@@ -126,7 +127,7 @@ let index_of_string strings ic start_pos hash_len string_patches s =
           let i1 = input_binary_int ic in
           let rec loop i =
             if i = -1 then raise Not_found
-            else if strings.get i = s then Adef.istr_of_int i
+            else if strings.get i = s then Type.istr_of_int i
             else
               begin
                 seek_in ic (start_pos + (hash_len + i) * Mutil.int_size);
@@ -144,7 +145,7 @@ let persons_of_first_name_or_surname base_data strings params =
   let module IstrTree =
     Btree.Make
       (struct
-        type t = dsk_istr
+        type t = istr
         let compare = Dutil.compare_istr_fun base_data
       end)
   in
@@ -182,7 +183,7 @@ let persons_of_first_name_or_surname base_data strings params =
         let rec read_loop ipera len =
           if len = 0 then ipera
           else
-            let iper = Adef.iper_of_int (input_binary_int ic_dat) in
+            let iper = Type.iper_of_int (input_binary_int ic_dat) in
             read_loop (iper :: ipera) (len - 1)
         in
         let ipera = read_loop [] len in close_in ic_dat; ipera
@@ -192,8 +193,8 @@ let persons_of_first_name_or_surname base_data strings params =
     Hashtbl.iter
       (fun i p ->
          let istr1 = proj p in
-         if istr1 = istr && not (List.mem (Adef.iper_of_int i) !ipera)
-         then ipera := Adef.iper_of_int i :: !ipera)
+         if istr1 = istr && not (List.mem (Type.iper_of_int i) !ipera)
+         then ipera := Type.iper_of_int i :: !ipera)
       person_patches;
     !ipera
   in
@@ -216,7 +217,7 @@ let persons_of_first_name_or_surname base_data strings params =
   let cursor str =
     IstrTree.key_after
       (fun key ->
-         Dutil.compare_names base_data str (strings.get (Adef.int_of_istr key)))
+         Dutil.compare_names base_data str (strings.get (Type.int_of_istr key)))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -274,7 +275,7 @@ let strings_of_fsname bname strings (_, person_patches) =
           let pos = input_binary_int ic_inx_acc in
           close_in ic_inx_acc;
           seek_in ic_inx pos;
-          (Iovalue.input ic_inx : dsk_istr array)
+          (Iovalue.input ic_inx : istr array)
         else
           let a =
             match !t with
@@ -294,12 +295,12 @@ let strings_of_fsname bname strings (_, person_patches) =
     Hashtbl.iter
       (fun _ p ->
          if not (List.mem p.first_name !l) then
-           begin let s1 = strings.get (Adef.int_of_istr p.first_name) in
+           begin let s1 = strings.get (Type.int_of_istr p.first_name) in
              let s1 = Mutil.nominative s1 in
              if s = Name.crush_lower s1 then l := p.first_name :: !l
            end;
          if not (List.mem p.surname !l) then
-           let s1 = strings.get (Adef.int_of_istr p.surname) in
+           let s1 = strings.get (Type.int_of_istr p.surname) in
            let s1 = Mutil.nominative s1 in
            if s = Name.crush_lower s1 then l := p.surname :: !l)
       person_patches;
@@ -430,13 +431,13 @@ let phony_person =
    baptism_place = 0; baptism_note = 0; baptism_src = 0;
    death = DontKnowIfDead; death_place = 0; death_note = 0; death_src = 0;
    burial = UnknownBurial; burial_place = 0; burial_note = 0; burial_src = 0;
-   pevents = []; notes = 0; psources = 0; key_index = Adef.iper_of_int 0}
+   pevents = []; notes = 0; psources = 0; key_index = Type.iper_of_int 0}
 
 let phony_family =
   {marriage = Adef.cdate_None; marriage_place = 0; marriage_note = 0;
    marriage_src = 0; witnesses = [| |]; relation = Married;
    divorce = NotDivorced; fevents = []; comment = 0; origin_file = 0;
-   fsources = 0; fam_index = Adef.ifam_of_int 0}
+   fsources = 0; fam_index = Type.ifam_of_int 0}
 
 let ext phony v =
   let rlen = Array.length (Obj.magic v) in
@@ -583,8 +584,8 @@ let input_synchro bname =
   with _ -> {synch_list = []}
 
 let person_of_key persons strings persons_of_name first_name surname occ =
-  if first_name = "?" || surname = "?" then None
-  else
+  (* if first_name = "?" || surname = "?" then None
+   * else *)
     let first_name = Mutil.nominative first_name in
     let surname = Mutil.nominative surname in
     let ipl = persons_of_name (first_name ^ " " ^ surname) in
@@ -593,11 +594,11 @@ let person_of_key persons strings persons_of_name first_name surname occ =
     let rec find =
       function
         ip :: ipl ->
-          let p = persons.get (Adef.int_of_iper ip) in
+          let p = persons.get (Type.int_of_iper ip) in
           if occ = p.occ &&
              first_name =
-               Name.lower (strings.get (Adef.int_of_istr p.first_name)) &&
-             surname = Name.lower (strings.get (Adef.int_of_istr p.surname))
+               Name.lower (strings.get (Type.int_of_istr p.first_name)) &&
+             surname = Name.lower (strings.get (Type.int_of_istr p.surname))
           then
             Some ip
           else find ipl
@@ -753,50 +754,50 @@ let opendb bname =
   in
   let patched_ascends () =
     let r = ref [] in
-    Hashtbl.iter (fun i _ -> r := Adef.iper_of_int i :: !r)
+    Hashtbl.iter (fun i _ -> r := Type.iper_of_int i :: !r)
       (snd patches.h_ascend);
     !r
   in
   let is_patched_person ip =
-    Hashtbl.mem (snd patches.h_person) (Adef.int_of_iper ip)
+    Hashtbl.mem (snd patches.h_person) (Type.int_of_iper ip)
   in
   let patch_person i p =
-    let i = Adef.int_of_iper i in
+    let i = Type.int_of_iper i in
     persons.len <- max persons.len (i + 1);
     fst patches.h_person := persons.len;
     Hashtbl.replace (snd patches.h_person) i p;
     synchro_person := i :: !synchro_person
   in
   let patch_ascend i a =
-    let i = Adef.int_of_iper i in
+    let i = Type.int_of_iper i in
     ascends.len <- max ascends.len (i + 1);
     fst patches.h_ascend := ascends.len;
     Hashtbl.replace (snd patches.h_ascend) i a;
     synchro_person := i :: !synchro_person
   in
   let patch_union i a =
-    let i = Adef.int_of_iper i in
+    let i = Type.int_of_iper i in
     unions.len <- max unions.len (i + 1);
     fst patches.h_union := ascends.len;
     Hashtbl.replace (snd patches.h_union) i a;
     synchro_person := i :: !synchro_person
   in
   let patch_family i f =
-    let i = Adef.int_of_ifam i in
+    let i = Type.int_of_ifam i in
     families.len <- max families.len (i + 1);
     fst patches.h_family := families.len;
     Hashtbl.replace (snd patches.h_family) i f;
     synchro_family := i :: !synchro_family
   in
   let patch_couple i c =
-    let i = Adef.int_of_ifam i in
+    let i = Type.int_of_ifam i in
     couples.len <- max couples.len (i + 1);
     fst patches.h_couple := couples.len;
     Hashtbl.replace (snd patches.h_couple) i c;
     synchro_family := i :: !synchro_family
   in
   let patch_descend i c =
-    let i = Adef.int_of_ifam i in
+    let i = Type.int_of_ifam i in
     descends.len <- max descends.len (i + 1);
     fst patches.h_descend := descends.len;
     Hashtbl.replace (snd patches.h_descend) i c;
@@ -813,7 +814,7 @@ let opendb bname =
         strings.len <- max strings.len (i + 1);
         fst patches.h_string := strings.len;
         Hashtbl.replace (snd patches.h_string) i s;
-        Adef.istr_of_int i
+        Type.istr_of_int i
   in
   let patch_name s ip =
     let s = Name.crush_lower s in

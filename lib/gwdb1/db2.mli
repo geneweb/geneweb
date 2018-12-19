@@ -4,4 +4,4 @@
 val first_item_pos : int -> int
 
 type key2
-val key2_of_key : Adef.istr * Adef.istr * int -> key2
+val key2_of_key : Type.istr * Type.istr * int -> key2

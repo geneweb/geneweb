@@ -61,8 +61,8 @@ let print_link_delete_image conf base p =
     begin
       Wserver.printf "<p>\n";
       begin
-        Wserver.printf "<a href=\"%sm=DEL_IMAGE&i=%d\">" (commd conf)
-          (Adef.int_of_iper (get_key_index p));
+        Wserver.printf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
+          (string_of_iper (get_key_index p));
         Wserver.printf "%s %s" (capitale (transl conf "delete"))
           (transl_nth conf "image/images" 0);
         Wserver.printf "</a>"
@@ -102,8 +102,8 @@ let print_send_image conf base p =
   Util.hidden_env conf;
   Wserver.printf
     "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"%s>\n" conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper (get_key_index p)) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+    (string_of_iper (get_key_index p)) conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n"
     digest conf.xhs;
   Wserver.printf "%s%s\n" (capitale (transl conf "file")) (Util.transl conf ":");
@@ -127,9 +127,9 @@ type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\"
   Hutil.trailer conf
 
 let print conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some ip ->
-      let p = poi base (Adef.iper_of_int ip) in
+      let p = poi base (iper_of_string ip) in
       let fn = p_first_name base p in
       let sn = p_surname base p in
       if sou base (get_image p) <> "" || fn = "?" || sn = "?" then
@@ -149,8 +149,8 @@ let print_delete_image conf base p =
       let fn = p_first_name base p in
       let sn = p_surname base p in
       let occ =
-        if fn = "?" || sn = "?" then Adef.int_of_iper (get_key_index p)
-        else get_occ p
+        (* if fn = "?" || sn = "?" then Adef.int_of_iper (get_key_index p)
+         * else  *)get_occ p
       in
       Wserver.printf ": "; Wserver.printf "%s.%d %s" fn occ sn
   in
@@ -161,8 +161,8 @@ let print_delete_image conf base p =
   Util.hidden_env conf;
   Wserver.printf
     "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
-    (Adef.int_of_iper (get_key_index p));
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n\n"
+    (string_of_iper (get_key_index p));
   Wserver.printf "\n";
   html_p conf;
   Wserver.printf
@@ -174,9 +174,9 @@ let print_delete_image conf base p =
   Hutil.trailer conf
 
 let print_del conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some ip ->
-      let p = poi base (Adef.iper_of_int ip) in
+      let p = poi base (iper_of_string ip) in
       if sou base (get_image p) <> "" then Hutil.incorrect_request conf
       else
         begin match auto_image_file conf base p with
@@ -320,9 +320,9 @@ let print_send_ok conf base =
   try
     let ip =
       let s = raw_get conf "i" in
-      try int_of_string s with Failure _ -> incorrect conf
+      try iper_of_string s with Failure _ -> incorrect conf
     in
-    let p = poi base (Adef.iper_of_int ip) in
+    let p = poi base ip in
     let digest = Update.digest_person (UpdateInd.string_person_of base p) in
     if digest = raw_get conf "digest" then
       let file = raw_get conf "file" in effective_send_ok conf base p file
@@ -354,9 +354,9 @@ let effective_delete_ok conf base p =
 
 let print_del_ok conf base =
   try
-    match p_getint conf.env "i" with
+    match p_getenv conf.env "i" with
       Some ip ->
-        let p = poi base (Adef.iper_of_int ip) in
+        let p = poi base (iper_of_string ip) in
         effective_delete_ok conf base p
     | None -> incorrect conf
   with Update.ModErr -> ()

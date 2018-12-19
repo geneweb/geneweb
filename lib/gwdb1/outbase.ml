@@ -3,6 +3,7 @@
 
 open Dbdisk
 open Def
+open Type
 
 let load_ascends_array base = base.data.ascends.load_array ()
 let load_unions_array base = base.data.unions.load_array ()
@@ -131,7 +132,7 @@ let add_name t key valu =
 let make_strings_of_fsname base =
   let t = Array.make Dutil.table_size [| |] in
   for i = 0 to base.data.persons.len - 1 do
-    let p = Dutil.poi base (Adef.iper_of_int i) in
+    let p = Dutil.poi base (Type.iper_of_int i) in
     let first_name = Dutil.p_first_name base p in
     let surname = Dutil.p_surname base p in
     if first_name <> "?" then add_name t first_name p.first_name;
@@ -185,13 +186,13 @@ let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
   let module IstrTree =
     Btree.Make
       (struct
-        type t = dsk_istr
+        type t = istr
         let compare = Dutil.compare_istr_fun base.data
       end)
   in
   let bt = ref IstrTree.empty in
   for i = 0 to base.data.persons.len - 1 do
-    let p = Dutil.poi base (Adef.iper_of_int i) in
+    let p = Dutil.poi base (Type.iper_of_int i) in
     let a = try IstrTree.find p.surname !bt with Not_found -> [] in
     bt := IstrTree.add p.surname (p.key_index :: a) !bt
   done;
@@ -207,7 +208,7 @@ let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
          let i = pos_out oc_sn_dat in
          output_binary_int oc_sn_dat (List.length ipl);
          List.iter
-           (fun ip -> output_binary_int oc_sn_dat (Adef.int_of_iper ip)) ipl;
+           (fun ip -> output_binary_int oc_sn_dat (Type.int_of_iper ip)) ipl;
          i)
       !bt
   in
@@ -220,13 +221,13 @@ let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
   let module IstrTree =
     Btree.Make
       (struct
-        type t = dsk_istr
+        type t = istr
         let compare = Dutil.compare_istr_fun base.data
       end)
   in
   let bt = ref IstrTree.empty in
   for i = 0 to base.data.persons.len - 1 do
-    let p = Dutil.poi base (Adef.iper_of_int i) in
+    let p = Dutil.poi base (Type.iper_of_int i) in
     let a = try IstrTree.find p.first_name !bt with Not_found -> [] in
     bt := IstrTree.add p.first_name (p.key_index :: a) !bt
   done;
@@ -242,7 +243,7 @@ let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
          let i = pos_out oc_fn_dat in
          output_binary_int oc_fn_dat (List.length ipl);
          List.iter
-           (fun ip -> output_binary_int oc_fn_dat (Adef.int_of_iper ip)) ipl;
+           (fun ip -> output_binary_int oc_fn_dat (Type.int_of_iper ip)) ipl;
          i)
       !bt
   in

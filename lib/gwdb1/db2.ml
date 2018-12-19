@@ -5,8 +5,8 @@ let first_item_pos len =
   20 + (if Sys.word_size = 64 && len >= 1 lsl (32 - 10) then 9 else 5)
 
 type key2 =
-    Key of Adef.istr * Adef.istr * int
-  | Key0 of Adef.istr * Adef.istr
+    Key of Type.istr * Type.istr * int
+  | Key0 of Type.istr * Type.istr
 
 let key2_of_key (fn, sn, oc) =
   if oc = 0 then Key0 (fn, sn) else Key (fn, sn, oc)

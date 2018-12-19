@@ -456,8 +456,8 @@ let print_anniv conf base p dead_people level =
   let mode () =
     Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"C\"%s>\n"
       conf.xhs;
-    Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-      (Adef.int_of_iper (get_key_index p)) conf.xhs;
+    Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+      (string_of_iper (get_key_index p)) conf.xhs;
     Wserver.printf "<input type=\"hidden\" name=\"t\" value=\"%s\"%s>\n"
       (if dead_people then "AD" else "AN") conf.xhs
   in

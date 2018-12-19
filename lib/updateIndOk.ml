@@ -576,8 +576,8 @@ let reconstitute_person conf =
   let ext = false in
   let key_index =
     match p_getenv conf.env "i" with
-      Some s -> (try int_of_string (String.trim s) with Failure _ -> -1)
-    | _ -> -1
+    | Some s -> (try iper_of_string (String.trim s) with Failure _ -> dummy_iper)
+    | _ -> dummy_iper
   in
   let first_name = no_html_tags (only_printable (get conf "first_name")) in
   let surname = no_html_tags (only_printable (get conf "surname")) in
@@ -706,7 +706,7 @@ let reconstitute_person conf =
      death_note = death_note; death_src = death_src; burial = burial;
      burial_place = burial_place; burial_note = burial_note;
      burial_src = burial_src; pevents = pevents; notes = notes;
-     psources = psources; key_index = Adef.iper_of_int key_index}
+     psources = psources; key_index = key_index}
   in
   p, ext
 
@@ -978,7 +978,7 @@ let effective_mod conf base sp =
   let pi = np.key_index in Update.update_related_pointers base pi ol nl; np
 
 let effective_add conf base sp =
-  let pi = Adef.iper_of_int (nb_of_persons base) in
+  let pi = Gwdb.insert_person base (Gwdb.empty_person base Gwdb.dummy_iper) in
   let fn = Util.translate_eval sp.first_name in
   let sn = Util.translate_eval sp.surname in
   let key = fn ^ " " ^ sn in
@@ -1320,9 +1320,9 @@ let print_add o_conf base =
   with Update.ModErr -> ()
 
 let print_del conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some i ->
-      let ip = Adef.iper_of_int i in
+      let ip = iper_of_string i in
       let p = poi base ip in
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
@@ -1369,13 +1369,13 @@ let print_mod o_conf base =
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
   let o_p =
-    match p_getint o_conf.env "i" with
+    match p_getenv o_conf.env "i" with
       Some ip ->
         Util.string_gen_person base
-          (gen_person_of_person (poi base (Adef.iper_of_int ip)))
+          (gen_person_of_person (poi base (iper_of_string ip)))
     | None ->
         Util.string_gen_person base
-          (gen_person_of_person (poi base (Adef.iper_of_int (-1))))
+          (gen_person_of_person (poi base dummy_iper))
   in
   let ofn = o_p.first_name in
   let osn = o_p.surname in
@@ -1433,10 +1433,10 @@ let print_mod o_conf base =
   print_mod_aux conf base callback
 
 let print_change_event_order conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some ip ->
       begin try
-        let p = poi base (Adef.iper_of_int ip) in
+        let p = poi base (iper_of_string ip) in
         let o_p = Util.string_gen_person base (gen_person_of_person p) in
         let ht = Hashtbl.create 50 in
         let _ =

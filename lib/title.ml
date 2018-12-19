@@ -334,8 +334,8 @@ let propose_tree_for_list list conf =
       begin let _ =
         List.fold_left
           (fun i (p, n) ->
-             Wserver.printf "&i%d=%d&t%d=%d" i
-               (Adef.int_of_iper (get_key_index p)) i n;
+             Wserver.printf "&i%d=%s&t%d=%d" i
+               (Gwdb.string_of_iper (get_key_index p)) i n;
              i + 1)
           1 list
       in

@@ -88,29 +88,22 @@ let get_all =
       | None -> Hashtbl.add ht key (mk_value None p)
   in
   if add_birth || add_death || add_baptism || add_burial then begin
-    let len = nb_of_persons base in
     let aux b fn p =
       if b then let x = fn p in if not (is_empty_string x) then ht_add x p
     in
-    let rec loop i =
-      if i < len then begin
-        let p = pget conf base (Adef.iper_of_int i) in
+    Gwdb.Collection.iter (fun i ->
+        let p = pget conf base i in
         if authorized_age conf base p then begin
           aux add_birth get_birth_place p ;
           aux add_baptism get_baptism_place p ;
           aux add_death get_death_place p ;
           aux add_burial get_burial_place p ;
-        end ;
-        loop (i + 1)
-      end
-    in
-    loop 0 ;
+        end)
+    (Gwdb.ipers base) ;
   end ;
   if add_marriage then begin
-    let rec loop i =
-      let len = nb_of_families base in
-      if i < len then begin
-        let fam = foi base (Adef.ifam_of_int i) in
+    Gwdb.Collection.iter (fun i ->
+        let fam = foi base i in
         if not @@ is_deleted_family fam then begin
           let pl_ma = get_marriage_place fam in
           if not (is_empty_string pl_ma) then
@@ -122,11 +115,8 @@ let get_all =
               ht_add pl_ma fath ;
               ht_add pl_ma moth
             end
-        end ;
-        loop (i + 1) ;
-      end
-    in
-    loop 0 ;
+        end)
+      (Gwdb.ifams base) ;
   end ;
   let len = Hashtbl.length ht in
   let array = Array.make len (dummy_key, dummy_value) in
@@ -138,7 +128,7 @@ let get_all =
     ht ;
   array
 
-let print_html_places_surnames conf base (array : (string list * (string * Adef.iper list) list) array) =
+let print_html_places_surnames conf base (array : (string list * (string * iper list) list) array) =
   let list = Array.to_list array in
   let link_to_ind =
     match p_getenv conf.base_env "place_surname_link_to_ind" with
@@ -153,7 +143,7 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
     else Wserver.printf "m=N&v=%s" (code_varenv sn);
     Wserver.printf "\">%s</a> (%d)" sn len
   in
-  let print_sn_list (snl : (string * Adef.iper list) list) =
+  let print_sn_list (snl : (string * iper list) list) =
     let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
     Wserver.printf "<li>\n";
     Mutil.list_iter_first (fun first x -> if not first then Wserver.printf ",\n" ; print_sn x) snl ;

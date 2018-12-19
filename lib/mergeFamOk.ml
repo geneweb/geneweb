@@ -190,11 +190,11 @@ let reconstitute conf base ifam1 fam1 fam2 =
   fam, des
 
 let print_merge conf base =
-  match p_getint conf.env "i", p_getint conf.env "i2" with
+  match p_getenv conf.env "i", p_getenv conf.env "i2" with
     Some f1, Some f2 ->
-      let ifam1 = Adef.ifam_of_int f1 in
+      let ifam1 = ifam_of_string f1 in
       let fam1 = foi base ifam1 in
-      let fam2 = foi base (Adef.ifam_of_int f2) in
+      let fam2 = foi base (ifam_of_string f2) in
       let (sfam, sdes) = reconstitute conf base ifam1 fam1 fam2 in
       let digest =
         let ini_sfam = UpdateFam.string_family_of conf base ifam1 in
@@ -216,9 +216,9 @@ let print_mod_merge_ok conf base wl cpl des =
   Hutil.trailer conf
 
 let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
-  match p_getint conf.env "i2" with
+  match p_getenv conf.env "i2" with
     Some i2 ->
-      let ifam2 = Adef.ifam_of_int i2 in
+      let ifam2 = ifam_of_string i2 in
       let fam2 = foi base ifam2 in
       UpdateFamOk.effective_del base ifam2 fam2;
       let (ifam, fam, cpl, des) =
@@ -247,9 +247,9 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
       let changed =
         let gen_p =
           let p =
-            match p_getint conf.env "ip" with
+            match p_getenv conf.env "ip" with
               Some i ->
-                let ip = Adef.iper_of_int i in
+                let ip = iper_of_string i in
                 if Adef.mother cpl = ip then poi base (Adef.mother cpl)
                 else poi base (Adef.father cpl)
             | None -> poi base (Adef.father cpl)
@@ -265,12 +265,12 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
 
 let print_mod_merge o_conf base =
   let get_gen_family i =
-    match p_getint o_conf.env i with
+    match p_getenv o_conf.env i with
       Some i ->
-        let fam = foi base (Adef.ifam_of_int i) in
+        let fam = foi base (ifam_of_string i) in
         Util.string_gen_family base (gen_family_of_family fam)
     | None ->
-        let fam = foi base (Adef.ifam_of_int (-1)) in
+        let fam = foi base dummy_ifam in
         Util.string_gen_family base (gen_family_of_family fam)
   in
   let o_f1 = get_gen_family "i" in
