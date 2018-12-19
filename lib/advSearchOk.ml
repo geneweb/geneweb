@@ -348,10 +348,10 @@ let advanced_search conf base max_answers =
     in
     loop slist
   else
-    for i = 0 to nb_of_persons base - 1 do
-      if !len > max_answers then ()
-      else match_person (pget conf base (Adef.iper_of_int i)) search_type
-    done;
+    Gwdb.Collection.iter (fun i ->
+        if !len > max_answers then ()
+        else match_person (pget conf base i) search_type
+      ) (Gwdb.ipers base) ;
   List.rev !list, !len
 
 let print_result conf base max_answers (list, len) =

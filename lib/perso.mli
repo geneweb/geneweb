@@ -5,10 +5,10 @@ open Gwdb
 open Config
 
 type generation_person =
-    GP_person of Sosa.t * Adef.iper * Adef.ifam option
-  | GP_same of Sosa.t * Sosa.t * Adef.iper
+    GP_person of Sosa.t * iper * ifam option
+  | GP_same of Sosa.t * Sosa.t * iper
   | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
-  | GP_missing of Sosa.t * Adef.iper
+  | GP_missing of Sosa.t * iper
 
 val string_of_marriage_text : config -> base -> family -> string
 val interp_templ : string -> config -> base -> person -> unit
@@ -49,13 +49,13 @@ val linked_page_text
   -> NotesLinks.page * ('b * ('a * NotesLinks.ind_link) list)
   -> string
 
-module IperSet : sig include Set.S with type elt = Adef.iper end
+module IperSet : sig include Set.S with type elt = iper end
 
-val max_ancestor_level : config -> base -> Adef.iper -> int -> int
+val max_ancestor_level : config -> base -> iper -> int -> int
 
 val string_of_died : config -> person -> bool -> string
 
-val string_of_parent_age : config -> base -> person * bool -> (family -> Adef.iper) -> string
+val string_of_parent_age : config -> base -> person * bool -> (family -> iper) -> string
 
 val string_of_image_url : config -> base -> person * bool -> bool -> string
 
@@ -78,19 +78,19 @@ val make_desc_level_table
   -> base
   -> int
   -> person
-  -> (IperSet.elt, int) Gwdb.Marker.t * (Def.ifam, int) Gwdb.Marker.t
+  -> (IperSet.elt, int) Gwdb.Marker.t * (ifam, int) Gwdb.Marker.t
 
 val default_max_cousin_lev : int
 
 type dup =
-    DupFam of Adef.ifam * Adef.ifam
-  | DupInd of Adef.iper * Adef.iper
+    DupFam of ifam * ifam
+  | DupInd of iper * iper
   | NoDup
 
-type excl_dup = (Adef.iper * Adef.iper) list * (Adef.ifam * Adef.ifam) list
+type excl_dup = (iper * iper) list * (ifam * ifam) list
 
 val excluded_possible_duplications : config -> excl_dup
-val first_possible_duplication : base -> Adef.iper -> excl_dup -> dup
+val first_possible_duplication : base -> iper -> excl_dup -> dup
 
 
 (* Ajout pour l'API *)
@@ -116,5 +116,5 @@ type event_name =
 val events_list :
   config -> base -> person ->
     (event_name * Def.cdate * istr * istr * istr *
-       (Def.iper * Def.witness_kind) array * Def.iper option)
+       (iper * Def.witness_kind) array * iper option)
       list

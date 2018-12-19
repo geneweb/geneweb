@@ -31,9 +31,9 @@ type relationship =
     mutable anc_stat2 : anc_stat }
 
 type relationship_info =
-  { tstab : (Def.iper, int) Gwdb.Marker.t
-  ; reltab : (Def.iper, relationship) Gwdb.Marker.t
-  ; mutable queue : Def.iper list array
+  { tstab : (Gwdb.iper, int) Gwdb.Marker.t
+  ; reltab : (Gwdb.iper, relationship) Gwdb.Marker.t
+  ; mutable queue : Gwdb.iper list array
   }
 
 let half x = x *. 0.5
@@ -136,18 +136,19 @@ let topological_sort base poi =
   tab
 
 let check_noloop_for_person_list base error ipl =
-  let tab = Array.make (nb_of_persons base) NotVisited in
+  let persons = Gwdb.ipers base in
+  let tab = Gwdb.iper_marker persons NotVisited in
   let rec noloop ip =
-    let i = Adef.int_of_iper ip in
-    match tab.(i) with
+    match Gwdb.Marker.get tab ip with
       NotVisited ->
         begin match get_parents (poi base ip) with
           Some ifam ->
             let cpl = foi base ifam in
-            tab.(i) <- BeingVisited; Array.iter noloop (get_parent_array cpl)
+            Gwdb.Marker.set tab ip BeingVisited ;
+            Array.iter noloop (get_parent_array cpl)
         | None -> ()
         end;
-        tab.(i) <- Visited
+        Gwdb.Marker.set tab ip Visited
     | BeingVisited -> error (OwnAncestor (poi base ip))
     | Visited -> ()
   in

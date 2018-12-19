@@ -68,7 +68,7 @@ let diff_visibility conf base op np =
 
 
 type kind_diff =
-    Diff_person of (iper, string) gen_person * (iper, string) gen_person
+    Diff_person of (iper, iper, string) gen_person * (iper, iper, string) gen_person
   | Diff_string of (string * string * int) * (string * string * int)
 
 (* ********************************************************************** *)
@@ -164,7 +164,7 @@ let notify_change conf base changed action =
             U_Kill_ancestors p | U_Change_children_name (p, _) |
             U_Multi (_, p, _) ->
               let key = slash_name_of_key p.first_name p.surname p.occ in
-              [| key; string_of_int (Adef.int_of_iper p.key_index) |]
+              [| key; string_of_iper p.key_index |]
           | U_Notes (Some num, file) -> [| file; string_of_int num |]
           | U_Notes (None, file) -> [| file |]
         in
@@ -294,7 +294,7 @@ let record conf base changed action =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let notify conf base action =
-  let empty_person = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
+  let empty_person = Gwdb.empty_person base Gwdb.dummy_iper in
   let empty_person =
     Util.string_gen_person base (gen_person_of_person empty_person)
   in

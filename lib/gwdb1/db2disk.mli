@@ -2,16 +2,17 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def
+open Type
 
 type patches =
   { mutable nb_per : int;
     mutable nb_fam : int;
     nb_per_ini : int;
     nb_fam_ini : int;
-    h_person : (iper, (iper, string) gen_person) Hashtbl.t;
+    h_person : (iper, (iper, iper, string) gen_person) Hashtbl.t;
     h_ascend : (iper, ifam gen_ascend) Hashtbl.t;
     h_union : (iper, ifam gen_union) Hashtbl.t;
-    h_family : (ifam, (iper, string) gen_family) Hashtbl.t;
+    h_family : (ifam, (iper, ifam, string) gen_family) Hashtbl.t;
     h_couple : (ifam, iper gen_couple) Hashtbl.t;
     h_descend : (ifam, iper gen_descend) Hashtbl.t;
     h_key : (string * string * int, iper option) Hashtbl.t;

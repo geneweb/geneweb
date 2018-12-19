@@ -240,10 +240,10 @@ let reconstitute conf base p1 p2 =
   {p with pevents = pevents}
 
 let print_merge conf base =
-  match p_getint conf.env "i1", p_getint conf.env "i2" with
+  match p_getenv conf.env "i1", p_getenv conf.env "i2" with
     Some i1, Some i2 ->
-      let p1 = poi base (Adef.iper_of_int i1) in
-      let p2 = poi base (Adef.iper_of_int i2) in
+      let p1 = poi base (iper_of_string i1) in
+      let p2 = poi base (iper_of_string i2) in
       let p = reconstitute conf base p1 p2 in
       let sp = UpdateInd.string_person_of base p1 in
       let digest = Update.digest_person sp in
@@ -464,7 +464,7 @@ let redirect_added_families base p ip2 p2_family =
   done
 
 let effective_mod_merge o_conf base o_p1 o_p2 sp =
-  match p_getint o_conf.env "i2" with
+  match p_getenv o_conf.env "i2" with
     Some i2 ->
       let conf = Update.update_conf o_conf in
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
@@ -476,7 +476,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp =
       let (ofn2, osn2, oocc2) = (o_p2.first_name, o_p2.surname, o_p2.occ) in
       let key2 = Name.lower ofn2, Name.lower osn2, oocc2 in
       let pgl2 = Perso.links_to_ind conf base db key2 in
-      let ip2 = Adef.iper_of_int i2 in
+      let ip2 = iper_of_string i2 in
       let p2 = poi base ip2 in
       let rel_chil = get_related p2 in
       let p_family = get_family (poi base sp.key_index) in
@@ -517,13 +517,13 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp =
 
 let print_mod_merge o_conf base =
   let get_gen_person i =
-    match p_getint o_conf.env i with
+    match p_getenv o_conf.env i with
       Some i ->
         Util.string_gen_person base
-          (gen_person_of_person (poi base (Adef.iper_of_int i)))
+          (gen_person_of_person (poi base (iper_of_string i)))
     | None ->
         Util.string_gen_person base
-          (gen_person_of_person (poi base (Adef.iper_of_int (-1))))
+          (gen_person_of_person (poi base dummy_iper))
   in
   let o_p1 = get_gen_person "i" in
   let o_p2 = get_gen_person "i2" in

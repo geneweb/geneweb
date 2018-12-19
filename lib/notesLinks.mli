@@ -2,8 +2,8 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 type page =
-    PgInd of Def.iper
-  | PgFam of Def.ifam
+    PgInd of Gwdb.iper
+  | PgFam of Gwdb.ifam
   | PgNotes
   | PgMisc of string
   | PgWizard of string

@@ -67,7 +67,7 @@ let select_family conf base get_date find_oldest =
   let module QF =
     Pqueue.Make
       (struct
-         type t = Adef.ifam * Gwdb.family * Def.dmy * Def.calendar
+         type t = Gwdb.ifam * Gwdb.family * Def.dmy * Def.calendar
          let leq (_, _, x, _) (_, _, y, _) =
            if find_oldest then Date.before_date x y else Date.before_date y x
        end)

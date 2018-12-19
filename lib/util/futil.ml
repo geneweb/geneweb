@@ -84,37 +84,63 @@ let map_relation_ps fp fs r =
      end;
    r_sources = fs r.r_sources}
 
-let map_person_ps fp fs p =
-  {first_name = fs p.first_name; surname = fs p.surname; occ = p.occ;
-   image = fs p.image;
-   first_names_aliases = List.map fs p.first_names_aliases;
-   surnames_aliases = List.map fs p.surnames_aliases;
-   public_name = fs p.public_name; qualifiers = List.map fs p.qualifiers;
-   titles = List.map (map_title_strings fs) p.titles;
-   rparents = List.map (map_relation_ps fp fs) p.rparents;
-   related = p.related; aliases = List.map fs p.aliases;
-   occupation = fs p.occupation; sex = p.sex; access = p.access;
-   birth = p.birth; birth_place = fs p.birth_place;
-   birth_note = fs p.birth_note; birth_src = fs p.birth_src;
-   baptism = p.baptism; baptism_place = fs p.baptism_place;
-   baptism_note = fs p.baptism_note; baptism_src = fs p.baptism_src;
-   death = p.death; death_place = fs p.death_place;
-   death_note = fs p.death_note; death_src = fs p.death_src;
-   burial = p.burial; burial_place = fs p.burial_place;
-   burial_note = fs p.burial_note; burial_src = fs p.burial_src;
-   pevents = List.map (map_pers_event fp fs) p.pevents; notes = fs p.notes;
-   psources = fs p.psources; key_index = p.key_index}
+let map_person_ps
+ =
+ (* FIXME!!!! *)
+ Obj.magic @@
+ fun fp fs p ->
+  { first_name = fs p.first_name
+  ; surname = fs p.surname
+  ; occ = p.occ
+  ; image = fs p.image
+  ; first_names_aliases = List.map fs p.first_names_aliases
+  ; surnames_aliases = List.map fs p.surnames_aliases
+  ; public_name = fs p.public_name
+  ; qualifiers = List.map fs p.qualifiers
+  ; titles = List.map (map_title_strings fs) p.titles
+  ; rparents = List.map (map_relation_ps fp fs) p.rparents
+  ; related = p.related
+  ; aliases = List.map fs p.aliases
+  ;  occupation = fs p.occupation
+  ; sex = p.sex
+  ; access = p.access
+  ; birth = p.birth
+  ; birth_place = fs p.birth_place
+  ; birth_note = fs p.birth_note
+  ; birth_src = fs p.birth_src
+  ; baptism = p.baptism
+  ; baptism_place = fs p.baptism_place
+  ; baptism_note = fs p.baptism_note
+  ; baptism_src = fs p.baptism_src
+  ; death = p.death
+  ; death_place = fs p.death_place
+  ; death_note = fs p.death_note
+  ; death_src = fs p.death_src
+  ; burial = p.burial
+  ; burial_place = fs p.burial_place
+  ; burial_note = fs p.burial_note
+  ; burial_src = fs p.burial_src
+  ; pevents = List.map (map_pers_event fp fs) p.pevents
+  ; notes = fs p.notes
+  ; psources = fs p.psources
+  ; key_index = p.key_index
+  }
 
 let map_union_f ff u = {family = Array.map ff u.family}
 
-let map_family_ps fp fs fam =
-  {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
-   marriage_note = fs fam.marriage_note; marriage_src = fs fam.marriage_src;
-   witnesses = Array.map fp fam.witnesses; relation = fam.relation;
-   divorce = fam.divorce;
-   fevents = List.map (map_fam_event fp fs) fam.fevents;
-   comment = fs fam.comment; origin_file = fs fam.origin_file;
-   fsources = fs fam.fsources; fam_index = fam.fam_index}
+let map_family_ps fp ff fs fam =
+  { marriage = fam.marriage
+  ; marriage_place = fs fam.marriage_place
+  ; marriage_note = fs fam.marriage_note
+  ; marriage_src = fs fam.marriage_src
+  ; witnesses = Array.map fp fam.witnesses
+  ; relation = fam.relation
+  ; divorce = fam.divorce
+  ; fevents = List.map (map_fam_event fp fs) fam.fevents
+  ; comment = fs fam.comment
+  ; origin_file = fs fam.origin_file
+  ; fsources = fs fam.fsources
+  ; fam_index = ff fam.fam_index }
 
 let parent multi parent =
   if not multi then Adef.parent parent else Adef.multi_parent parent

@@ -7,7 +7,7 @@ open Gwdb
 open Util
 
 let print_child_person conf base p =
-  let var = "c" ^ string_of_int (Adef.int_of_iper (get_key_index p)) in
+  let var = "c" ^ string_of_iper (get_key_index p) in
   let first_name =
     match p_getenv conf.env (var ^ "_first_name") with
       Some v -> v
@@ -110,8 +110,8 @@ let print_change conf base p =
   Wserver.printf "</h2>\n";
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%d\">\n"
-    (Adef.int_of_iper (get_key_index p));
+  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
+    (string_of_iper (get_key_index p));
   Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
     digest;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
@@ -126,9 +126,9 @@ let print_change conf base p =
   Hutil.trailer conf
 
 let print conf base =
-  match p_getint conf.env "ip" with
+  match p_getenv conf.env "ip" with
     Some i ->
-      let p = poi base (Adef.iper_of_int i) in print_change conf base p
+      let p = poi base (iper_of_string i) in print_change conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
@@ -190,7 +190,7 @@ let print_conflict conf base ip_var p =
        Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
          (Util.escape_html (decode_varenv v)))
     (conf.henv @ conf.env);
-  begin let var = "c" ^ string_of_int (Adef.int_of_iper ip_var) in
+  begin let var = "c" ^ string_of_iper ip_var in
     Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var
   end;
   Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
@@ -241,7 +241,7 @@ exception FirstNameMissing of iper
 
 let change_child conf base parent_surname changed ip =
   let p = poi base ip in
-  let var = "c" ^ string_of_int (Adef.int_of_iper (get_key_index p)) in
+  let var = "c" ^ string_of_iper (get_key_index p) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
       Some x -> only_printable x
@@ -325,7 +325,7 @@ let print_change_ok conf base p =
 
 let print_ok o_conf base =
   let conf = Update.update_conf o_conf in
-  match p_getint conf.env "ip" with
+  match p_getenv conf.env "ip" with
     Some i ->
-      let p = poi base (Adef.iper_of_int i) in print_change_ok conf base p
+      let p = poi base (iper_of_string i) in print_change_ok conf base p
   | _ -> Hutil.incorrect_request conf

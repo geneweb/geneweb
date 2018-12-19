@@ -80,7 +80,7 @@ let utf8_designation base p =
   let surname = p_surname base p in
   let s = first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname in
   if first_name = "?" || surname = "?" then
-    s ^ " (i=" ^ string_of_int (Adef.int_of_iper (get_key_index p)) ^ ")"
+    s ^ " (i=" ^ string_of_iper (get_key_index p) ^ ")"
   else s
 
 let wiki_designation base basename p =
@@ -89,7 +89,7 @@ let wiki_designation base basename p =
   let s = "[[" ^ first_name ^ "/" ^ surname ^ "/" ^ string_of_int (get_occ p) ^ "/" ^
           first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname ^ "]]" in
   if first_name = "?" || surname = "?" then
-    let indx = string_of_int (Adef.int_of_iper (get_key_index p)) in
+    let indx = string_of_iper (get_key_index p) in
     s ^ " <a href=\"http://" ^ !server ^ ":" ^ (string_of_int !gwd_port) ^ "/" ^
     basename ^ "?i=" ^ indx ^ "\">(i=" ^ indx ^ ")</a><br>"
   else s ^ "<br>"
@@ -99,7 +99,7 @@ let print_family base basename ifam =
   let p = poi base (get_father fam) in
   if !output <> "" then begin
     if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
-    then Printf.eprintf "i=%d" (Adef.int_of_iper (get_key_index p))
+    then Printf.eprintf "i=%s" (string_of_iper (get_key_index p))
     else Printf.eprintf "  - %s" (utf8_designation base p);
     Printf.eprintf "\n" ;
     Printf.eprintf "  - %s\n" (utf8_designation base (poi base (get_mother fam))) ;
@@ -107,8 +107,8 @@ let print_family base basename ifam =
   end ;
   if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
   then
-    let indx = (Adef.int_of_iper (get_key_index p)) in
-    Printf.printf "  - <a href=\"http://%s:%d/%s?i=%d\">i=%d</a><br>"
+    let indx = string_of_iper (get_key_index p) in
+    Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>"
       !server !gwd_port basename indx indx
   else Printf.printf "  - %s" (wiki_designation base basename p);
   Printf.printf "\n";
@@ -138,13 +138,11 @@ let move base basename =
   let () = close_in ic in
   Printf.printf "Computed on %s<br><br>\n" date;
   flush stderr;
-  let nb_fam = nb_of_families base in
-  let mark = Array.make nb_fam false in
+  let mark = Gwdb.ifam_marker (Gwdb.ifams base) false in
   let min = ref max_int in
   let max = ref 0 in
   let hts = Hashtbl.create 100 in
-  for i = 0 to nb_fam - 1 do
-    let ifam = Adef.ifam_of_int i in
+  Gwdb.Collection.iter (fun ifam ->
     let fam = foi base ifam in
     let origin_file = get_origin_file fam in
     if List.mem (sou base origin_file) !ignore then ()
@@ -154,12 +152,13 @@ let move base basename =
           function
             [] -> nb, rfaml
           | ifam :: ifaml ->
-            let j = Adef.int_of_ifam ifam in
-            if not (is_deleted_family (foi base ifam)) && not mark.(j) &&
-               (!ignore_files || eq_istr (get_origin_file fam) origin_file)
+            let j = ifam in
+            if not (is_deleted_family (foi base ifam))
+            && not (Gwdb.Marker.get mark j)
+            && (!ignore_files || eq_istr (get_origin_file fam) origin_file)
             then
               begin
-                mark.(j) <- true;
+                (Gwdb.Marker.set mark j true);
                 let nl = neighbourgs base ifam in
                 let rfaml =
                   if nb > !detail then
@@ -223,8 +222,8 @@ let move base basename =
                 end
               else begin Printf.printf "Nothing done.\n"; flush stdout end
             end
-        end
-  done;
+        end)
+    (Gwdb.ifams base) ;
   if !ask_for_delete > 0 then Gwdb.commit_patches base ;
   if !statistics then begin
     Printf.printf "<br>\nStatistics:<br>\n";

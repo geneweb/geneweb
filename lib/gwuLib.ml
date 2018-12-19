@@ -4,9 +4,9 @@
 module type Select =
   sig
     val functions :
-      Gwdb.base -> Adef.iper option -> Def.iper option -> string list ->
-        Adef.iper option -> bool -> int -> bool -> int ->
-        (Adef.iper -> bool) * (Adef.ifam -> bool)
+      Gwdb.base -> Gwdb.iper option -> Gwdb.iper option -> string list ->
+        Gwdb.iper option -> bool -> int -> bool -> int ->
+        (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
   end
 
 module Make (Select : Select) =
