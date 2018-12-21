@@ -3632,6 +3632,7 @@ and eval_str_event_field conf base (p, p_auth)
         let env = ('k', (fun () ->
           string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
         in
+        let src = string_with_macros conf env (sou base src) in
         let src =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
@@ -3639,10 +3640,9 @@ and eval_str_event_field conf base (p, p_auth)
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
-          Wiki.syntax_links conf wi (sou base src)
+          Wiki.syntax_links conf wi src
         in
-        let src = Util.replace_quotes src in
-        string_with_macros conf env src
+        Util.replace_quotes src
       else ""
   | _ -> raise Not_found
 and eval_event_field_var conf base env (p, p_auth)
@@ -4524,6 +4524,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "occupation" ->
       if p_auth then
         let s = sou base (get_occupation p) in
+        let s = string_with_macros conf [] s in
         let s =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
@@ -4533,8 +4534,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           in
           Wiki.syntax_links conf wi s
         in
-        let s = Util.replace_quotes s in
-        string_with_macros conf [] s
+        Util.replace_quotes s
       else ""
   | "on_baptism_date" ->
       begin match p_auth, Adef.od_of_cdate (get_baptism p) with
@@ -4716,6 +4716,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           let env = ('k', (fun () ->
             string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
           in
+          let s = string_with_macros conf env s in
           let s =
             let wi =
               {Wiki.wi_mode = "NOTES";
@@ -4726,8 +4727,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
             in
             Wiki.syntax_links conf wi s
           in
-          let s = Util.replace_quotes s in
-          string_with_macros conf env s
+          Util.replace_quotes s
       | _ -> raise Not_found
       end
   | "surname" ->
