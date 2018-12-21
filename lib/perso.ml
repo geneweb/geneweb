@@ -3551,7 +3551,7 @@ and eval_str_event_field conf base (p, p_auth)
         let env = ('k', (fun () ->
           string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
         in
-        let src = string_with_macros conf env src in
+        let src = string_with_macros conf env (sou base src) in
         let src =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
@@ -3559,7 +3559,7 @@ and eval_str_event_field conf base (p, p_auth)
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
-          Wiki.syntax_links conf wi (sou base src)
+          Wiki.syntax_links conf wi src
         in
         if conf.pure_xhtml then Util.check_xhtml src else src
       else ""
