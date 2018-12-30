@@ -337,6 +337,7 @@ and handler =
   ; ll : handler_base
   ; lm : handler_base
   ; lex : handler_base
+  ; list : handler_base
   ; misc_notes : handler_base
   ; misc_notes_search : handler_base
   ; mod_data : handler_base
@@ -515,6 +516,7 @@ let dummyHandler =
   ; ll = dummy_base
   ; lm = dummy_base
   ; lex = dummy_base
+  ; list = dummy_base
   ; misc_notes = dummy_base
   ; misc_notes_search = dummy_base
   ; mod_data = dummy_base
@@ -933,6 +935,10 @@ let defaultHandler : handler =
 
   ; lex = begin fun _self conf base ->
       Srcfile.print_lexicon conf base
+    end
+
+  ; list = begin fun _self conf base ->
+      Place.print_list conf base
     end
 
   ; misc_notes = begin fun _self conf base ->

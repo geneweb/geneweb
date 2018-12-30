@@ -138,6 +138,10 @@ let get_all =
     ht ;
   array
 
+let cons_uniq xs x = if List.mem x xs then xs else x :: xs
+
+let remove_from_left xs = List.rev (List.fold_left cons_uniq [] xs)
+
 let print_html_places_surnames conf base (array : (string list * (string * Adef.iper list) list) array) =
   let list = Array.to_list array in
   let link_to_ind =
@@ -146,12 +150,26 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
     | _ -> false
   in
   let print_sn (sn, ips) =
+    (*let ips = remove_from_left ips in*)
     let len = List.length ips in
-    Wserver.printf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
-    then Wserver.printf "%s" (acces conf base @@ pget conf base @@ List.hd ips)
-    else Wserver.printf "m=N&v=%s" (code_varenv sn);
-    Wserver.printf "\">%s</a> (%d)" sn len
+    then
+      Wserver.printf "<a href=\"%s%s\">%s</a> (%d)\n" (commd conf)
+      (acces conf base @@ pget conf base @@ List.hd ips) sn len
+    else
+      begin
+        Wserver.printf "<a href=\"%sm=N&v=%s\">%s</a>" (commd conf)
+          (code_varenv sn) sn;
+        if link_to_ind then
+          begin
+            Wserver.printf " (<a href=\"%sm=LIST" (commd conf);
+            List.iteri (fun i ip ->
+              Wserver.printf "&%s=%d" ("i" ^ (string_of_int i)) (Adef.int_of_iper ip))
+            ips;
+            Wserver.printf "\">%d</a>)\n" len
+          end
+        else Wserver.printf " (%d)\n" len
+      end
   in
   let print_sn_list (snl : (string * Adef.iper list) list) =
     let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
@@ -185,19 +203,7 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
   loop [] list;
   Wserver.printf "</ul>\n"
 
-let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death ~add_burial =
-  let array =
-    get_all
-      conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      "" 0
-      fold_place_short
-      (fun _ -> true)
-      (fun prev _ -> match prev with Some n -> n + 1 | None -> 1)
-      (fun x -> x)
-  in
-  let title _ = Wserver.printf "%s" (capitale (transl conf "place")) in
-  Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s2 s1) array ;
-  let list = Array.to_list array in
+let print_html_places_surnames_short conf _base (array : (string list * (string * Adef.iper list) list) array) =
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_baptism = p_getenv conf.env "bp" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
@@ -210,47 +216,59 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
     (if add_burial then "&bu=on" else "") ^
     (if add_marriage then "&ma=on" else "")
   in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>\n";
   Wserver.printf "<a href=\"%sm=PS%s&k=\">" (commd conf) opt;
   Wserver.printf "%s" (transl conf "long display");
   Wserver.printf "</a>";
   Wserver.printf "</p>\n";
   Wserver.printf "<p>\n";
-  List.iter
-    (fun (s, x) ->
-       Wserver.printf "<a href=\"%sm=PS%s&k=%s\">" (commd conf) opt
-         (Util.code_varenv s);
-       Wserver.printf "%s" s;
-       Wserver.printf "</a>";
-       Wserver.printf " (%d),\n" x)
-    list;
-  Wserver.printf "</p>\n";
+  let list = Array.to_list array in
+  let print_sn_list (snl : (string * Adef.iper list) list) =
+    (List.fold_left (fun cnt (_sn, ips) -> cnt + (List.length ips)) 0 snl)
+  in
+  let rec loop cnt prev =
+    function
+       (pl, snl) :: list ->
+        if (List.hd pl) <> (if prev <> [] then List.hd prev else "")
+        then
+          begin
+            Wserver.printf "%s"
+              (if cnt <> 0 then (Printf.sprintf " (%d), " cnt) else "");
+            Wserver.printf "<a href=\"%sm=PS%s&k=%s\">" (commd conf) opt
+              (Util.code_varenv (List.hd pl));
+            Wserver.printf "%s" (List.hd pl);
+            Wserver.printf "</a>";
+          end
+        else ();
+        loop
+          (if (List.hd pl) <> (if prev <> [] then List.hd prev else "")
+          then (print_sn_list snl) else cnt + (print_sn_list snl))
+          pl list;
+    | [] -> Wserver.printf "%s"
+              (if cnt <> 0 then (Printf.sprintf " (%d)" cnt) else "")
+  in
+  loop 0 [] list
+
+let print_all_places_surnames_short conf base array =
+  let rec sort_place_utf8 pl1 pl2 =
+    match pl1, pl2 with
+      _, [] -> 1
+    | [], _ -> -1
+    | s1 :: pl11, s2 :: pl22 ->
+        if Gutil.alphabetic_order s1 s2 = 0 then sort_place_utf8 pl11 pl22
+        else Gutil.alphabetic_order s1 s2
+  in
+  Array.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) array ;
+  let title _ =
+    Wserver.printf "%s / %s" (capitale (transl conf "place"))
+      (capitale (transl_nth conf "surname/surnames" 0))
+  in
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
+  if array <> [||] then print_html_places_surnames_short conf base array;
   Hutil.trailer conf
 
-let print_all_places_surnames_long conf base filter ~add_birth ~add_baptism ~add_death ~add_burial =
-  let inverted =
-    try List.assoc "places_inverted" conf.base_env = "yes"
-    with Not_found -> false
-  in
-  let array =
-    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      [] [] (fold_place_long inverted) filter
-      (fun prev p ->
-         let value = (get_surname p, get_key_index p) in
-         match prev with Some list -> value :: list | None -> [ value ])
-      (fun v ->
-         let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
-         let rec loop acc list = match list, acc with
-           | [], _ -> acc
-           | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc when (sou base sn) = sn' ->
-             loop ((sn', iper:: iper_list) :: tl_acc) tl_list
-           | (sn, iper) :: tl_list, _ ->
-             loop ((sou base sn, [iper]) :: acc) tl_list
-         in
-         loop [] v)
-  in
+let print_all_places_surnames_long conf base array =
   let rec sort_place_utf8 pl1 pl2 =
     match pl1, pl2 with
       _, [] -> 1
@@ -269,18 +287,81 @@ let print_all_places_surnames_long conf base filter ~add_birth ~add_baptism ~add
   if array <> [||] then print_html_places_surnames conf base array;
   Hutil.trailer conf
 
+let print_all_places_surnames_some conf base array ini =
+  if ini = "" then
+    print_all_places_surnames_long conf base array
+  else
+    let list = Array.to_list array in
+    let rec loop acc =
+      function
+        (pl, snl) :: list ->
+          loop (if (List.hd pl) = ini then (pl, snl) :: acc else acc) list;
+      | [] -> acc
+    in
+    let array = Array.of_list (loop [] list) in
+    print_all_places_surnames_long conf base array
+
+let print_list conf base =
+  let title _ =
+    Wserver.printf "%s / %s" (capitale (transl conf "place"))
+      (capitale (transl_nth conf "person/persons" 1))
+  in
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
+  Wserver.printf "<p>\n";
+  Wserver.printf "</p>\n";
+  let rec loop i =
+    match p_getenv conf.env ("i" ^ (string_of_int i)) with
+    | Some ip ->
+        let p = poi base (Adef.iper_of_int (int_of_string ip)) in
+        Wserver.printf "<a href=\"%s%s\">%s %s %s</a><br>\n"
+          (commd conf)
+          (acces conf base @@ pget conf base
+            (Adef.iper_of_int (int_of_string ip)))
+          (p_first_name base p) (p_surname base p)
+          (if (get_occ p) > 0 then (Printf.sprintf "(%d)" (get_occ p)) else "");
+        loop (i + 1)
+    | None -> ()
+  in loop 0;
+  Hutil.trailer conf
+
 let print_all_places_surnames conf base =
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_baptism = p_getenv conf.env "bp" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
+  let inverted =
+    try List.assoc "places_inverted" conf.base_env = "yes"
+    with Not_found -> false
+  in
+  let array =
+    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      [] [] (fold_place_long inverted) (fun _ -> true)
+      (fun prev p ->
+         let value = (get_surname p, get_key_index p) in
+         match prev with Some list -> value :: list | None -> [ value ])
+      (fun v ->
+         let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
+         let rec loop acc list = match list, acc with
+           | [], _ -> acc
+           | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc when (sou base sn) = sn' ->
+             loop ((sn', iper:: iper_list) :: tl_acc) tl_list
+           | (sn, iper) :: tl_list, _ ->
+             loop ((sou base sn, [iper]) :: acc) tl_list
+         in
+         loop [] v)
+  in
+  let len = Array.length array in
+  let len_max =
+    int_of_string
+      (try List.assoc "nb_places_short" conf.base_env with Not_found -> "200")
+  in
   match p_getenv conf.env "k" with
   | Some ini ->
-    print_all_places_surnames_long conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      (if ini = "" then fun _ -> true else fun x -> List.hd x = ini)
+    print_all_places_surnames_some conf base array ini
   | None ->
-    if nb_of_persons base > 1000000 && add_birth && add_baptism && add_death && add_burial
-    then print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death ~add_burial
-    else print_all_places_surnames_long conf base ~add_birth ~add_baptism ~add_death ~add_burial (fun _ -> true)
+    if len > len_max
+    then print_all_places_surnames_short conf base array
+    else print_all_places_surnames_long conf base array
 
 
