@@ -28,6 +28,7 @@ remove: [
 pin-depends: [
   [ "piqilib.dev" "git://github.com/alavrik/piqi" ]
   [ "piqi.dev" "git://github.com/alavrik/piqi-ocaml" ]
+  [ "markup.dev" "git://github.com/geneanet/markup.ml" ]
 ]
 
 depends: [
