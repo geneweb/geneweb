@@ -34,6 +34,7 @@ depends: [
   "camlp5" { build }
   "cppo" { build }
   "dune" { build>= "1.1.1" }
+  "markup"
   "ocaml" { >= "4.05" }
   "ocurl" { = "0.8.1" }
   "piqi" { = "dev" }
