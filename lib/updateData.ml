@@ -109,8 +109,6 @@ let get_all_data conf base =
   if test_family then
     Gwdb.Collection.iter (fun i ->
         let fam = foi base i in
-        if is_deleted_family fam then ()
-        else
           List.iter
             (fun (label, fun_data) ->
                match fun_data with
@@ -201,8 +199,6 @@ let get_person_from_data conf base =
   if test_family then
     Gwdb.Collection.iter (fun i ->
         let fam = foi base i in
-        if is_deleted_family fam then ()
-        else
           List.iter
             (fun (label, fun_data) ->
                match fun_data with

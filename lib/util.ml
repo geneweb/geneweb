@@ -1418,27 +1418,23 @@ let url_no_index conf base =
   let get_a_family v =
     try
       let i = ifam_of_string v in
-        (* if i >= 0 && i < nb_of_families base then *)
-          let fam = foi base i in
-          if is_deleted_family fam then None
-          else
-            let p = pget conf base (get_father fam) in
-            let f = scratch (get_first_name p) in
-            let s = scratch (get_surname p) in
-            if f = "" || s = "" then None
-            else
-              let oc = string_of_int (get_occ p) in
-              let u = pget conf base (get_father fam) in
-              let n =
-                let rec loop k =
-                  if (get_family u).(k) = i then
-                    string_of_int k
-                  else loop (k + 1)
-                in
-                loop 0
-              in
-              Some (f, s, oc, n)
-        (* else None *)
+      let fam = foi base i in
+      let p = pget conf base (get_father fam) in
+      let f = scratch (get_first_name p) in
+      let s = scratch (get_surname p) in
+      if f = "" || s = "" then None
+      else
+        let oc = string_of_int (get_occ p) in
+        let u = pget conf base (get_father fam) in
+        let n =
+          let rec loop k =
+            if (get_family u).(k) = i then
+              string_of_int k
+            else loop (k + 1)
+          in
+          loop 0
+        in
+        Some (f, s, oc, n)
     with Failure _ -> None
   in
   let env =

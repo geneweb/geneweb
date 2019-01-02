@@ -268,7 +268,6 @@ let print_marriage conf base month =
   Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter (fun ifam ->
     let fam = foi base ifam in
-    if not (is_deleted_family fam) then
       match Adef.od_of_cdate (get_marriage fam) with
       | Some (Dgreg ({day = d; month = m; year = y; prec = Sure}, _))
         when d <> 0 && m <> 0 ->
@@ -523,7 +522,6 @@ let print_menu_marriage conf base =
   Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter (fun ifam ->
     let fam = foi base ifam in
-    if not @@ is_deleted_family fam then
       match Adef.od_of_cdate (get_marriage fam), get_divorce fam with
       | Some (Dgreg (d, _)), NotDivorced
         when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
