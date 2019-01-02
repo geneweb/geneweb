@@ -177,7 +177,7 @@ let print_html_places_surnames_long conf base place1 place2
     (commd conf) opt place1 (transl conf "short display") place1 place1
   in
   let _ =
-    if place2 <> "" then Wserver.printf "</p>&nbsp;&nbsp;&nbsp;%s<p>" place2
+    if place2 <> "" then Wserver.printf "<p>&nbsp;&nbsp;&nbsp;%s</p>" place2
   in
   let print_sn (sn, ips) =
     let ips = remove_from_left ips in
@@ -243,7 +243,8 @@ let print_html_places_surnames_short conf place1 place2
   (commd conf) opt (transl conf "long display");
   let list = Array.to_list array in
   let print_sn_list (snl : (string * Adef.iper list) list) =
-    (List.fold_left (fun cnt (_sn, ips) -> cnt + (List.length ips)) 0 snl)
+    (List.fold_left (fun cnt (_sn, ips) -> cnt +
+      (List.length (remove_from_left ips))) 0 snl)
   in
   let _ = if place1 <> ""
     then Wserver.printf
@@ -251,7 +252,7 @@ let print_html_places_surnames_short conf place1 place2
       (commd conf) opt place1 (transl conf "long display") place1 place1;
   in
   let _ = if place2 <> "" then
-    Wserver.printf "</p>&nbsp;&nbsp;&nbsp;%s<p>" place2
+    Wserver.printf "<p>&nbsp;&nbsp;&nbsp;%s</p>" place2
   in
   let rec loop cnt prev =
     function
@@ -336,7 +337,7 @@ let print_places_surnames_some conf base array =
   let len = Array.length array in
   let len_max =
     int_of_string
-      (try List.assoc "nb_places_short" conf.base_env with Not_found -> "200")
+      (try List.assoc "nb_places_short" conf.base_env with Not_found -> "30")
   in
   match p_getenv conf.env "long" with
   | Some "on" -> print_places_surnames conf base place1 place2 array false
