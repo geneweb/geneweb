@@ -19,6 +19,7 @@ install:
   - 'set OPAMYES=1'
   - '%CYG_BASH% "opam install depext depext-cygwinports"'
   - '%CYG_BASH% "opam install camlp5 cppo dune"'
+  - '%CYG_BASH% "opam pin add markup git://github.com/geneanet/markup.ml"'
 
 build_script:
   - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make clean install uninstall clean"'
