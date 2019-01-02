@@ -38,7 +38,8 @@ let fold_place_long inverted s =
       | Some i when i < len - 2 ->
         let j =
           let rec loop i =
-            if i >= 0 && String.unsafe_get s i = ' ' then loop (i - 1) else i + 1
+            if i >= 0 && String.unsafe_get s i = ' '
+            then loop (i - 1) else i + 1
           in
           loop (i - 1)
         in
@@ -55,7 +56,9 @@ let fold_place_short s =
     let i =
       match String.rindex_opt s ',' with
       | Some i ->
-        let rec l i = if i < len && String.unsafe_get s i = ' ' then l (i + 1) else i in l (i + 1)
+        let rec l i =
+          if i < len && String.unsafe_get s i = ' '
+          then l (i + 1) else i in l (i + 1)
       | None -> 0
     in
     let i = if i = len then 0 else i in
@@ -142,19 +145,46 @@ let cons_uniq xs x = if List.mem x xs then xs else x :: xs
 
 let remove_from_left xs = List.rev (List.fold_left cons_uniq [] xs)
 
-let print_html_places_surnames conf base (array : (string list * (string * Adef.iper list) list) array) =
+let get_opt conf =
+  let add_birth = p_getenv conf.env "bi" = Some "on" in
+  let add_baptism = p_getenv conf.env "bp" = Some "on" in
+  let add_death = p_getenv conf.env "de" = Some "on" in
+  let add_burial = p_getenv conf.env "bu" = Some "on" in
+  let add_marriage = p_getenv conf.env "ma" = Some "on" in
+  (if add_birth then "&bi=on" else "") ^
+  (if add_baptism then "&bp=on" else "") ^
+  (if add_death then "&de=on" else "") ^
+  (if add_burial then "&bu=on" else "") ^
+  (if add_marriage then "&ma=on" else "")
+
+let print_html_places_surnames_long conf base place1 place2
+  (array : (string list * (string * Adef.iper list) list) array) =
   let list = Array.to_list array in
   let link_to_ind =
     match p_getenv conf.base_env "place_surname_link_to_ind" with
       Some "yes" -> true
     | _ -> false
   in
+  let opt = get_opt conf in
+  if place1 = "" && place2 = ""
+  then Wserver.printf "<p>\n<a href=\"%sm=PS%s\">%s</a></p>\n"
+      (commd conf) opt (transl conf "short display")
+  else Wserver.printf "<p>\n<a href=\"%sm=PS%s&long=on\">%s</a></p>\n"
+      (commd conf) opt (transl conf "long display");
+  let _ = if place1 <> "" then
+    Wserver.printf
+      "<p><a href=\"%sm=PS%s&k1=%s\" title=\"%s for %s\">%s</a>\n</p>\n"
+    (commd conf) opt place1 (transl conf "short display") place1 place1
+  in
+  let _ =
+    if place2 <> "" then Wserver.printf "</p>&nbsp;&nbsp;&nbsp;%s<p>" place2
+  in
   let print_sn (sn, ips) =
-    (*let ips = remove_from_left ips in*)
+    let ips = remove_from_left ips in
     let len = List.length ips in
     if link_to_ind && len = 1
     then
-      Wserver.printf "<a href=\"%s%s\">%s</a> (%d)\n" (commd conf)
+      Wserver.printf "<a href=\"%s%s\">%s</a> (%d)" (commd conf)
       (acces conf base @@ pget conf base @@ List.hd ips) sn len
     else
       begin
@@ -164,17 +194,20 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
           begin
             Wserver.printf " (<a href=\"%sm=LIST" (commd conf);
             List.iteri (fun i ip ->
-              Wserver.printf "&%s=%d" ("i" ^ (string_of_int i)) (Adef.int_of_iper ip))
+              Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))
             ips;
-            Wserver.printf "\">%d</a>)\n" len
+            Wserver.printf "\">%d</a>)" len
           end
-        else Wserver.printf " (%d)\n" len
+        else Wserver.printf " (%d)" len
       end
   in
   let print_sn_list (snl : (string * Adef.iper list) list) =
-    let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
+    let snl = List.sort
+      (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl
+    in
     Wserver.printf "<li>\n";
-    Mutil.list_iter_first (fun first x -> if not first then Wserver.printf ",\n" ; print_sn x) snl ;
+    Mutil.list_iter_first
+      (fun first x -> if not first then Wserver.printf ",\n" ; print_sn x) snl ;
     Wserver.printf "\n";
     Wserver.printf "</li>\n"
   in
@@ -203,60 +236,60 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
   loop [] list;
   Wserver.printf "</ul>\n"
 
-let print_html_places_surnames_short conf _base (array : (string list * (string * Adef.iper list) list) array) =
-  let add_birth = p_getenv conf.env "bi" = Some "on" in
-  let add_baptism = p_getenv conf.env "bp" = Some "on" in
-  let add_death = p_getenv conf.env "de" = Some "on" in
-  let add_burial = p_getenv conf.env "bu" = Some "on" in
-  let add_marriage = p_getenv conf.env "ma" = Some "on" in
-  let opt =
-    (if add_birth then "&bi=on" else "") ^
-    (if add_baptism then "&bp=on" else "") ^
-    (if add_death then "&de=on" else "") ^
-    (if add_burial then "&bu=on" else "") ^
-    (if add_marriage then "&ma=on" else "")
-  in
-  Wserver.printf "<p>\n";
-  Wserver.printf "<a href=\"%sm=PS%s&k=\">" (commd conf) opt;
-  Wserver.printf "%s" (transl conf "long display");
-  Wserver.printf "</a>";
-  Wserver.printf "</p>\n";
-  Wserver.printf "<p>\n";
+let print_html_places_surnames_short conf place1 place2
+  (array : (string list * (string * Adef.iper list) list) array) =
+  let opt = get_opt conf in
+  Wserver.printf "<p>\n<a href=\"%sm=PS%s&long=on\">%s</a></p>\n"
+  (commd conf) opt (transl conf "long display");
   let list = Array.to_list array in
   let print_sn_list (snl : (string * Adef.iper list) list) =
     (List.fold_left (fun cnt (_sn, ips) -> cnt + (List.length ips)) 0 snl)
   in
+  let _ = if place1 <> ""
+    then Wserver.printf
+      "<a href=\"%sm=PS%s&long=on&k1=%s\" title=\"%s for %s\">%s</a>\n</p>"
+      (commd conf) opt place1 (transl conf "long display") place1 place1;
+  in
+  let _ = if place2 <> "" then
+    Wserver.printf "</p>&nbsp;&nbsp;&nbsp;%s<p>" place2
+  in
   let rec loop cnt prev =
     function
        (pl, snl) :: list ->
-        if (List.hd pl) <> (if prev <> [] then List.hd prev else "")
+        if (if pl <> [] then List.hd pl else "") <>
+           (if prev <> [] then List.hd prev else "")
         then
           begin
             Wserver.printf "%s"
               (if cnt <> 0 then (Printf.sprintf " (%d), " cnt) else "");
-            Wserver.printf "<a href=\"%sm=PS%s&k=%s\">" (commd conf) opt
-              (Util.code_varenv (List.hd pl));
-            Wserver.printf "%s" (List.hd pl);
-            Wserver.printf "</a>";
+            Wserver.printf "\n<a href=\"%sm=PS%s%s%s%s\">%s</a>" (commd conf) opt
+              (Printf.sprintf "&k1=%s"
+                (if place1 = "" then (Util.code_varenv (List.hd pl)) else place1))
+              (Printf.sprintf "&k2=%s"
+                (if place1 = "" then "" else (Util.code_varenv (List.hd pl))))
+              (if place1 <> "" && place2 <> "" then "&long=on" else "")
+              (List.hd pl);
           end
         else ();
         loop
-          (if (List.hd pl) <> (if prev <> [] then List.hd prev else "")
+          (if (if pl <> [] then List.hd pl else "") <>
+              (if prev <> [] then List.hd prev else "")
           then (print_sn_list snl) else cnt + (print_sn_list snl))
           pl list;
-    | [] -> Wserver.printf "%s"
+    | [] -> Wserver.printf "%s\n</p>\n"
               (if cnt <> 0 then (Printf.sprintf " (%d)" cnt) else "")
   in
   loop 0 [] list
 
-let print_all_places_surnames_short conf base array =
+let print_places_surnames conf base place1 place2 array short =
   let rec sort_place_utf8 pl1 pl2 =
     match pl1, pl2 with
       _, [] -> 1
     | [], _ -> -1
     | s1 :: pl11, s2 :: pl22 ->
-        if Gutil.alphabetic_order s1 s2 = 0 then sort_place_utf8 pl11 pl22
-        else Gutil.alphabetic_order s1 s2
+        match Gutil.alphabetic_order s1 s2 with
+        | 0 -> sort_place_utf8 pl11 pl22
+        | x -> x
   in
   Array.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) array ;
   let title _ =
@@ -265,41 +298,52 @@ let print_all_places_surnames_short conf base array =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  if array <> [||] then print_html_places_surnames_short conf base array;
+  if array <> [||] then
+    if short
+    then print_html_places_surnames_short conf place1 place2 array
+    else print_html_places_surnames_long conf base place1 place2 array;
   Hutil.trailer conf
 
-let print_all_places_surnames_long conf base array =
-  let rec sort_place_utf8 pl1 pl2 =
-    match pl1, pl2 with
-      _, [] -> 1
-    | [], _ -> -1
-    | s1 :: pl11, s2 :: pl22 ->
-        if Gutil.alphabetic_order s1 s2 = 0 then sort_place_utf8 pl11 pl22
-        else Gutil.alphabetic_order s1 s2
-  in
-  Array.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) array ;
-  let title _ =
-    Wserver.printf "%s / %s" (capitale (transl conf "place"))
-      (capitale (transl_nth conf "surname/surnames" 0))
-  in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
-  if array <> [||] then print_html_places_surnames conf base array;
-  Hutil.trailer conf
-
-let print_all_places_surnames_some conf base array ini =
-  if ini = "" then
-    print_all_places_surnames_long conf base array
-  else
-    let list = Array.to_list array in
+let filter_array array place =
+  let list = Array.to_list array in
+  if place <> "" then
     let rec loop acc =
       function
         (pl, snl) :: list ->
-          loop (if (List.hd pl) = ini then (pl, snl) :: acc else acc) list;
+          loop (if (if List.length pl > 0 then List.hd pl else "") = place
+            then ((List.tl pl), snl) :: acc else acc)
+          list;
       | [] -> acc
     in
-    let array = Array.of_list (loop [] list) in
-    print_all_places_surnames_long conf base array
+    (Array.of_list (loop [] list))
+  else array
+
+let print_places_surnames_some conf base array =
+  let (array, place1) =
+    match p_getenv conf.env "k1" with
+    | Some place ->
+        if place <> "" then (filter_array array place, place)
+        else (array, "")
+    | None -> (array, "")
+  in
+  let (array, place2) =
+    match p_getenv conf.env "k2" with
+    | Some place ->
+        if place <> "" then (filter_array array place, place)
+        else (array, "")
+    | None -> (array, "")
+  in
+  let len = Array.length array in
+  let len_max =
+    int_of_string
+      (try List.assoc "nb_places_short" conf.base_env with Not_found -> "200")
+  in
+  match p_getenv conf.env "long" with
+  | Some "on" -> print_places_surnames conf base place1 place2 array false
+  | _ ->
+      if len > len_max
+      then print_places_surnames conf base place1 place2 array true
+      else print_places_surnames conf base place1 place2 array false
 
 let print_list conf base =
   let title _ =
@@ -344,24 +388,14 @@ let print_all_places_surnames conf base =
          let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
          let rec loop acc list = match list, acc with
            | [], _ -> acc
-           | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc when (sou base sn) = sn' ->
+           | (sn, iper) :: tl_list,
+              (sn', iper_list) :: tl_acc when (sou base sn) = sn' ->
              loop ((sn', iper:: iper_list) :: tl_acc) tl_list
            | (sn, iper) :: tl_list, _ ->
              loop ((sou base sn, [iper]) :: acc) tl_list
          in
          loop [] v)
   in
-  let len = Array.length array in
-  let len_max =
-    int_of_string
-      (try List.assoc "nb_places_short" conf.base_env with Not_found -> "200")
-  in
-  match p_getenv conf.env "k" with
-  | Some ini ->
-    print_all_places_surnames_some conf base array ini
-  | None ->
-    if len > len_max
-    then print_all_places_surnames_short conf base array
-    else print_all_places_surnames_long conf base array
+  print_places_surnames_some conf base array
 
 
