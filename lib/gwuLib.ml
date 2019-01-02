@@ -1663,8 +1663,7 @@ module Make (Select : Select) =
       Gwdb.Collection.iteri (fun i ifam ->
         if !(Mutil.verbose) then ProgrBar.run i nb_fam;
         let fam = foi base ifam in
-        if is_deleted_family fam then ()
-        else if Gwdb.Marker.get gen.fam_done ifam then ()
+        if Gwdb.Marker.get gen.fam_done ifam then ()
         else if gen.fam_sel ifam then
           let ifaml = connected_families base gen.fam_sel ifam fam in
           let (oc, first) =

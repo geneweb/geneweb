@@ -104,7 +104,6 @@ let get_all =
   if add_marriage then begin
     Gwdb.Collection.iter (fun i ->
         let fam = foi base i in
-        if not @@ is_deleted_family fam then begin
           let pl_ma = get_marriage_place fam in
           if not (is_empty_string pl_ma) then
             let fath = pget conf base (get_father fam) in
@@ -114,7 +113,6 @@ let get_all =
             then begin
               ht_add pl_ma fath ;
               ht_add pl_ma moth
-            end
         end)
       (Gwdb.ifams base) ;
   end ;
