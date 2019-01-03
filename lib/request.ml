@@ -131,6 +131,7 @@ let family_m conf base =
       | "LL" -> handler.ll
       | "LM" -> handler.lm
       | "LEX" -> handler.lex
+      | "LIST" -> handler.list
       | "MISC_NOTES" -> handler.misc_notes
       | "MISC_NOTES_SEARCH" -> handler.misc_notes_search
       | "MOD_DATA" -> handler.mod_data

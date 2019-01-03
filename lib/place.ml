@@ -138,6 +138,10 @@ let get_all =
     ht ;
   array
 
+let cons_uniq xs x = if List.mem x xs then xs else x :: xs
+
+let remove_from_left xs = List.rev (List.fold_left cons_uniq [] xs)
+
 let print_html_places_surnames conf base (array : (string list * (string * Adef.iper list) list) array) =
   let list = Array.to_list array in
   let link_to_ind =
@@ -146,12 +150,26 @@ let print_html_places_surnames conf base (array : (string list * (string * Adef.
     | _ -> false
   in
   let print_sn (sn, ips) =
+    let ips = remove_from_left ips in
     let len = List.length ips in
-    Wserver.printf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
-    then Wserver.printf "%s" (acces conf base @@ pget conf base @@ List.hd ips)
-    else Wserver.printf "m=N&v=%s" (code_varenv sn);
-    Wserver.printf "\">%s</a> (%d)" sn len
+    then
+      Wserver.printf "<a href=\"%s%s\">%s</a> (%d)" (commd conf)
+      (acces conf base @@ pget conf base @@ List.hd ips) sn len
+    else
+      begin
+        Wserver.printf "<a href=\"%sm=N&v=%s\">%s</a>" (commd conf)
+          (code_varenv sn) sn;
+        if link_to_ind then
+          begin
+            Wserver.printf " (<a href=\"%sm=LIST" (commd conf);
+            List.iteri (fun i ip ->
+              Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))
+            ips;
+            Wserver.printf "\">%d</a>)" len
+          end
+        else Wserver.printf " (%d)" len
+      end
   in
   let print_sn_list (snl : (string * Adef.iper list) list) =
     let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
@@ -267,6 +285,30 @@ let print_all_places_surnames_long conf base filter ~add_birth ~add_baptism ~add
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   if array <> [||] then print_html_places_surnames conf base array;
+  Hutil.trailer conf
+
+let print_list conf base =
+  let title _ =
+    Wserver.printf "%s / %s" (capitale (transl conf "place"))
+      (capitale (transl_nth conf "person/persons" 1))
+  in
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
+  Wserver.printf "<p>\n";
+  Wserver.printf "</p>\n";
+  let rec loop i =
+    match p_getenv conf.env ("i" ^ (string_of_int i)) with
+    | Some ip ->
+        let p = poi base (Adef.iper_of_int (int_of_string ip)) in
+        Wserver.printf "<a href=\"%s%s\">%s %s %s</a><br>\n"
+          (commd conf)
+          (acces conf base @@ pget conf base
+            (Adef.iper_of_int (int_of_string ip)))
+          (p_first_name base p) (p_surname base p)
+          (if (get_occ p) > 0 then (Printf.sprintf "(%d)" (get_occ p)) else "");
+        loop (i + 1)
+    | None -> ()
+  in loop 0;
   Hutil.trailer conf
 
 let print_all_places_surnames conf base =
