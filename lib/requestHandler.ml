@@ -334,10 +334,10 @@ and handler =
   ; lb : handler_base
   ; ld : handler_base
   ; linked : handler_base
+  ; l : handler_base
   ; ll : handler_base
   ; lm : handler_base
   ; lex : handler_base
-  ; list : handler_base
   ; misc_notes : handler_base
   ; misc_notes_search : handler_base
   ; mod_data : handler_base
@@ -513,10 +513,10 @@ let dummyHandler =
   ; lb = dummy_base
   ; ld = dummy_base
   ; linked = dummy_base
+  ; l = dummy_base
   ; ll = dummy_base
   ; lm = dummy_base
   ; lex = dummy_base
-  ; list = dummy_base
   ; misc_notes = dummy_base
   ; misc_notes_search = dummy_base
   ; mod_data = dummy_base
@@ -924,6 +924,10 @@ let defaultHandler : handler =
       | _ -> self.very_unknown self conf base
     end
 
+  ; l = begin fun _self conf base ->
+      Perso.interp_templ "list" conf base (poi base (Adef.iper_of_int 0))
+    end
+
   ; ll = begin fun _self conf base ->
       BirthDeath.print_longest_lived conf base
     end
@@ -935,10 +939,6 @@ let defaultHandler : handler =
 
   ; lex = begin fun _self conf base ->
       Srcfile.print_lexicon conf base
-    end
-
-  ; list = begin fun _self conf base ->
-      Place.print_list conf base
     end
 
   ; misc_notes = begin fun _self conf base ->

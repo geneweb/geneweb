@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<head>
+  <!-- $Id: list.txt,v 7 2019/1/05 13:15:19 hg Exp $ -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
+  <title>%nn;
+    %first_name; %surname; %if;(occ!="0")(%occ;)%end;[:] [list] [of] [person/persons]0
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+%include;css
+%include;hed
+</head>
+<body%body_prop;>
+%message_to_wizard;
+<div class="container%if;(evar.wide="on")-fluid%end;">
+%include;perso_utils
+
+%define;get_ip(n)
+  %evar.in;
+%end;
+
+%define;get_value(index, param)
+  %qvar.index.param;
+%end;
+%let;nb;%evar.nb;%in;
+
+<h1>[list] [of] [person/persons]1</h1>
+
+%for;i;0;nb;
+  %let;index;%apply;get_ip(i)%in;
+  %let;access;%apply;get_value(index, "access")%in;
+  <a href="%prefix;%access;">
+  %apply;get_value(index, "first_name")%sp;
+  %apply;get_value(index, "surname")%nn;
+  %let;occ;%apply;get_value(index, "occ")%in;%nn;
+  %if;(occ!="0")%sp;(%occ;)%end;</a>,
+  %if;(evar.dates="on")
+    <a href="%prefix;m=MOD_IND&i=%index;"
+    %apply;get_value(index, "dates")</a>,%sp;
+  %end;
+  %if;(evar.parents="on")
+    %let;fa;%apply;get_value(index, "father")%in;
+    %let;mo;%apply;get_value(index, "mother")%in;
+    %if;(fa!="" or mo!="")
+      %let;fa;%if;(fa="")?%else;%fa;%end;%in;
+      %let;mo;%if;(mo="")?%else;%mo;%end;%in;
+      [child/children]0 [of] %fa; [and] %mo;
+    %end;
+  %end;
+  <br>
+%end;
+
+%include;trl
+%include;copyr
+</div>
+%include;js
+</body>
+</html>
