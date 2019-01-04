@@ -300,30 +300,6 @@ let print_all_places_surnames_long conf base filter
   if array <> [||] then print_html_places_surnames conf base array;
   Hutil.trailer conf
 
-let print_list conf base =
-  let title _ =
-    Wserver.printf "%s / %s" (capitale (transl conf "place"))
-      (capitale (transl_nth conf "person/persons" 1))
-  in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<p>\n";
-  Wserver.printf "</p>\n";
-  let rec loop i =
-    match p_getenv conf.env ("i" ^ (string_of_int i)) with
-    | Some ip ->
-        let p = poi base (Adef.iper_of_int (int_of_string ip)) in
-        Wserver.printf "<a href=\"%s%s\">%s %s %s</a><br>\n"
-          (commd conf)
-          (acces conf base @@ pget conf base
-            (Adef.iper_of_int (int_of_string ip)))
-          (p_first_name base p) (p_surname base p)
-          (if (get_occ p) > 0 then (Printf.sprintf "(%d)" (get_occ p)) else "");
-        loop (i + 1)
-    | None -> ()
-  in loop 0;
-  Hutil.trailer conf
-
 let print_all_places_surnames conf base =
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_baptism = p_getenv conf.env "bp" = Some "on" in

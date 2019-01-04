@@ -925,7 +925,8 @@ let defaultHandler : handler =
     end
 
   ; l = begin fun _self conf base ->
-      Perso.interp_templ "list" conf base (poi base (Adef.iper_of_int 0))
+      Perso.interp_templ "list" conf base
+        (Gwdb.empty_person base (Adef.iper_of_int (-1)))
     end
 
   ; ll = begin fun _self conf base ->
