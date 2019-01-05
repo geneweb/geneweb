@@ -103,8 +103,10 @@ let print_source_image conf f =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
   let fname = Util.source_image_file_name conf fname in
-  if print_image_file fname then ()
-  else Hutil.incorrect_request conf
+  if Sys.file_exists fname then
+    if print_image_file fname then ()
+    else Hutil.incorrect_request conf
+  else Hutil.error_message conf (Printf.sprintf "Cannot access file %s\n" fname)
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
