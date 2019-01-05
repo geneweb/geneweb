@@ -1153,7 +1153,7 @@ let make_conf from_addr request script_name env =
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
   (* REORG search in mybase/lang as well TODO to be verified where this should be *)
-  let _ = Util.add_lang_path (Filename.concat (Util.base_path base_file) "etc") in
+  let _ = Util.add_lang_path (Util.base_path base_file) in
   List.iter
     (fun fname ->
        add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
@@ -1309,8 +1309,7 @@ let make_conf from_addr request script_name env =
      time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
      image_prefix =
        if !images_url <> "" then !images_url
-       else if !(Wserver.cgi) then ar.ar_command ^ "?m=IM&v="
-       else "images";
+       else ar.ar_command ^ "?m=IM&s=";
      b_arg_for_basename = b_arg_for_basename}
   in
   conf, sleep, ar
