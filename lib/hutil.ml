@@ -135,15 +135,18 @@ let incorrect_request conf =
   Wserver.printf "</p>\n";
   trailer conf
 
-let error_cannot_access conf fname =
+let error_message conf mess =
   let title _ = Wserver.printf "Error" in
   header conf title;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>\n";
-  Wserver.printf "Cannot access file \"%s.txt\".\n" fname;
+  Wserver.printf "%s\n" mess;
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
   trailer conf
+
+let error_cannot_access conf fname =
+  error_message conf (Printf.sprintf "Cannot access file \"%s.txt\".\n" fname)
 
 let gen_interp header conf fname ifun env ep =
   let v = !(Templ.template_file) in
