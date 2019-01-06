@@ -150,12 +150,17 @@ let source_file_name conf fname =
     String.concat Filename.dir_sep
       [Util.base_path conf.bname; "documents"; fname ^ "_" ^ lang ^ ".txt"]
   in
-  let fname =
+  let fname2 =
     String.concat Filename.dir_sep
       [Util.base_path conf.bname; "documents"; fname ^ ".txt"]
   in
+  let fname3 =
+    String.concat Filename.dir_sep
+      [Util.base_path conf.bname; "documents"; "src"; fname ^ ".txt"]
+  in
   if Sys.file_exists fname1 then fname1
-  else fname
+  else if Sys.file_exists fname2 then fname2
+  else fname3
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y))
