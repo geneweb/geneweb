@@ -2353,7 +2353,7 @@ let personal_image_file_name conf str =
   in
   fname1
 
-(* other images *)
+(* other images and icons *)
 let source_image_file_name conf str =
   let fname1 =
     String.concat
@@ -2363,7 +2363,11 @@ let source_image_file_name conf str =
     String.concat
       Filename.dir_sep [Secure.base_dir (); "images"; str]
   in
-  if Sys.file_exists fname1 then fname1 else fname2
+  let fname3 =
+        search_in_lang_path (Filename.concat "images" str)
+  in
+  if Sys.file_exists fname1 then fname1 else
+  if Sys.file_exists fname2 then fname2 else fname3
 
 (* icons images *)
 let image_file_name str =
