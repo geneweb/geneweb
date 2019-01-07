@@ -116,7 +116,7 @@ val base_etc_file : config -> string -> string
 
 val search_in_lang_path : string -> string
 val gw_etc_file : string -> string
-val open_etc_file : config -> string -> in_channel option
+(* val open_etc_file : config -> string -> in_channel option *)
 (* summary, robot, toolbar, accent, renamed, redirect, index, moved *)
 val open_etc_file_name : config -> string -> in_channel option
 
