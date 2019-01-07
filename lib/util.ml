@@ -12,10 +12,16 @@ let sharelib =
   String.concat Filename.dir_sep [Gwlib.prefix; "share"; "geneweb"]
 
 let add_lang_path = Secure.add_lang_path
+
 let set_base_dir = Secure.set_base_dir
 
 let _ = add_lang_path sharelib
 let _ = add_lang_path Filename.current_dir_name
+(* gwDaemon y rajoute
+let _ = Util.add_lang_path (Util.base_path base_file)
+let _ = Util.add_lang_path (Util.base_path "")
+*)
+
 
 (* REORG cnt_dir *)
 let cnt_dir = ref Filename.current_dir_name
@@ -1158,7 +1164,9 @@ let base_path bname =
 (*   Search file (template, image...) in gw default directory.          *)
 (*                                                                      *)
 (*   search_in_lang_path cherche dans une succession de dossiers :
-      -hd
+      bases/mybase.gwb/
+      bases
+      -hd (where binaries are sitting, typically gw)
       .
       sharelib (GWPREFIX/share/geneweb ou /usr/share/geneweb)
       (je crois dans cet ordre)
@@ -1180,9 +1188,10 @@ let gw_etc_file fname =
     search_in_lang_path
       (String.concat Filename.dir_sep ["etc"; fname])
   in
-  let share_file = Filename.concat sharelib fname in
+  (* TODO search_in_lang_path cherche déjà dans sharelib
+  let share_file = Filename.concat sharelib fname in *)
   if Sys.file_exists etc_file then etc_file
-  else if Sys.file_exists share_file then share_file
+  (* else if Sys.file_exists share_file then share_file *)
   else ""
 
 let open_gw_etc_file fname =
@@ -1297,6 +1306,7 @@ let open_etc_file fname =
 *)
 (* REORG open etc file *)
 (* TODO allow sub folders? *)
+(*
 let open_etc_file conf fname =
   let fname1 =
     String.concat Filename.dir_sep
@@ -1311,6 +1321,7 @@ let open_etc_file conf fname =
     Sys_error _ ->
       try Some (Secure.open_in fname2) with
         Sys_error _ -> None
+*)
 
 let open_etc_file_name conf fname =
   try Some (Secure.open_in (base_etc_file conf fname)) with
@@ -2317,6 +2328,7 @@ let personal_image_file_name conf str =
   fname1
 
 (* other images and icons *)
+(* 1 & 2 base specific, 3 site specific, 4 distribution *)
 let source_image_file_name conf str =
   let fname1 =
     String.concat
@@ -2324,7 +2336,7 @@ let source_image_file_name conf str =
   in
   let fname2 =
     String.concat
-      Filename.dir_sep [Secure.base_dir (); "images"; str]
+      Filename.dir_sep [base_path conf.bname; "documents"; "images"; str]
   in
   let fname3 =
         search_in_lang_path (Filename.concat "images" str)

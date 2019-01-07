@@ -1152,8 +1152,13 @@ let make_conf from_addr request script_name env =
     with Not_found -> !default_lang
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  (* REORG search in mybase/lang as well TODO to be verified where this should be *)
+  (* REORG search in bases/mybase.gwb/ and bases/ *)
+  let _ = Util.add_lang_path (Util.base_path "") in
   let _ = Util.add_lang_path (Util.base_path base_file) in
+  let _ = Printf.eprintf "After gwDaemon\n" in
+  let _ = List.iter (fun d -> Printf.eprintf "Lang_path: %s\n" d)
+    (Secure.lang_path ()) in
+  let _ = Printf.eprintf "end\n" in
   List.iter
     (fun fname ->
        add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
