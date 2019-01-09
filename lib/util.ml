@@ -362,22 +362,9 @@ let commd conf =
     if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
       c else c ^ k ^ "=" ^ v ^ "&") c (conf.henv @ conf.senv)
 
-let commd_2 conf =
-  let c = conf.command ^ "?" in
-  List.fold_left (fun c (k, v) ->
-    if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
-      c else c ^ "&" ^ k ^ "=" ^ v ) c (conf.henv @ conf.senv)
-
-
 let prefix_base conf =
   if conf.b_arg_for_basename then conf.command ^ "?b=" ^ conf.bname ^ "&"
   else conf.command ^ "?"
-
-let prefix_base_2 conf =
-  if conf.b_arg_for_basename then
-    conf.command ^ "?b=" ^ conf.bname
-  else
-    conf.command ^ "?"
 
 let prefix_base_password conf =
   if conf.b_arg_for_basename then
@@ -387,17 +374,6 @@ let prefix_base_password conf =
       conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ "&"
   else
     conf.command ^ "?"
-
-
-let prefix_base_password_2 conf =
-  if conf.b_arg_for_basename then
-    if conf.cgi_passwd = "" then
-      conf.command ^ "?b=" ^ conf.bname
-    else
-      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd
-  else
-    conf.command ^ "?"
-
 
 let code_varenv = Wserver.encode
 let decode_varenv = Wserver.decode

@@ -30,11 +30,8 @@ val unauthorized : config -> string -> unit
 val string_of_ctime : config -> string
 
 val commd : config -> string
-val commd_2 : config -> string
 val prefix_base : config -> string
 val prefix_base_password : config -> string
-val prefix_base_2 : config -> string
-val prefix_base_password_2 : config -> string
 val code_varenv : string -> string
 val decode_varenv : string -> string
 val hidden_env : config -> unit
