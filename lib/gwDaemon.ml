@@ -1155,10 +1155,6 @@ let make_conf from_addr request script_name env =
   (* REORG search in bases/mybase.gwb/ and bases/ *)
   let _ = Util.add_lang_path (Util.base_path "") in
   let _ = Util.add_lang_path (Util.base_path base_file) in
-  let _ = Printf.eprintf "After gwDaemon\n" in
-  let _ = List.iter (fun d -> Printf.eprintf "Lang_path: %s\n" d)
-    (Secure.lang_path ()) in
-  let _ = Printf.eprintf "end\n" in
   List.iter
     (fun fname ->
        add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
@@ -1314,7 +1310,9 @@ let make_conf from_addr request script_name env =
      time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
      image_prefix =
        if !images_url <> "" then !images_url
-       else ar.ar_command ^ "?m=IM&s=";
+       else if !(Wserver.cgi)
+         then ar.ar_command ^ "?b=" ^ base_file ^ "_" ^ ar.ar_passwd ^ "&m=IM&s="
+         else ar.ar_command ^ "?m=IM&s=";
      b_arg_for_basename = b_arg_for_basename}
   in
   conf, sleep, ar
