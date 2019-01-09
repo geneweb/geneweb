@@ -1,6 +1,6 @@
 <!-- $Id: cousins_tools.txt, v7.00 03/04/2018 14:04:31 $ -->
 %define;url(vvv,ttt)
-  %prefix_base_password_2;
+  %prefix_base_password;
   %foreach;env_binding;
     %if;(env.key="vvv")ttt
     %elseif;(env.val!="")&%env.key;=%env.val;
@@ -10,7 +10,7 @@
 %end;
 
 %define;url2(vvv,ttt,www,uuu)
-  %prefix_base_password_2;
+  %prefix_base_password;
   %foreach;env_binding;
     %if;(env.key="vvv")ttt%nn;
     %elseif;(env.key="www")uuu%nn;
