@@ -1283,7 +1283,7 @@ let open_etc_file fname =
 *)
 (* REORG open etc file *)
 (* TODO allow sub folders? *)
-(*
+
 let open_etc_file conf fname =
   let fname1 =
     String.concat Filename.dir_sep
@@ -1298,7 +1298,7 @@ let open_etc_file conf fname =
     Sys_error _ ->
       try Some (Secure.open_in fname2) with
         Sys_error _ -> None
-*)
+
 
 let open_etc_file_name conf fname =
   let file = base_etc_file conf fname in
