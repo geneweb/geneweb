@@ -1227,54 +1227,49 @@ let base_etc_file conf fname =
         | x :: _ -> x
   in
   let tpl = url_templ :: config_templ in
-  let rec loop tpl =
-    match tpl with
-      [] ->
-        let rec loop2 tpl =
-          match tpl with
-            [] -> ""
-          | t :: l ->
-            let etc_file = gw_etc_file fname in
-            let etc_tpl_file = gw_etc_file (Filename.concat t fname) in
-            if Sys.file_exists etc_file then etc_file
-            else if Sys.file_exists etc_tpl_file then etc_tpl_file
-            else loop2 l
-        in
-        loop2 tpl
-    | t :: l ->
-        let bname_etc_tpl_file =
-          String.concat Filename.dir_sep
-            [base_path conf.bname; "etc"; t; fname ^ ".txt"]
-        in
-        let bname_etc_file =
-          String.concat Filename.dir_sep
-            [base_path conf.bname; "etc"; fname ^ ".txt"]
-        in
-        let bases_etc_tpl_file =
-          String.concat Filename.dir_sep
-            [Secure.base_dir (); "etc"; t; fname ^ ".txt"]
-        in
-        let bases_etc_file =
-          String.concat Filename.dir_sep
-            [Secure.base_dir (); "etc"; fname ^ ".txt"]
-        in
-        let etc_tpl_file =
-          search_in_lang_path
-            (String.concat Filename.dir_sep ["etc"; t; fname ^ ".txt"])
-        in
-        let etc_file =
-          search_in_lang_path
-            (String.concat Filename.dir_sep ["etc"; fname ^ ".txt"])
-        in
-        if Sys.file_exists bname_etc_tpl_file then bname_etc_tpl_file
-        else if Sys.file_exists bname_etc_file then bname_etc_file
-        else if Sys.file_exists bases_etc_tpl_file then bases_etc_tpl_file
-        else if Sys.file_exists bases_etc_file then bases_etc_file
-        else if Sys.file_exists etc_tpl_file then etc_tpl_file
-        else if Sys.file_exists etc_file then etc_file
-        else loop l
+  let tpl = List.fold_left
+    (fun accu tpl -> if not (List.mem tpl accu) then tpl :: accu else accu)
+    [] tpl
   in
-  loop tpl
+  let tpl = List.rev tpl in
+  let file =
+    let rec loop tpl =
+      match tpl with
+        [] -> ""
+      | t :: l ->
+          let bname_etc_tpl_file =
+            String.concat Filename.dir_sep
+              [base_path conf.bname; "etc"; t; fname ^ ".txt"]
+          in
+          let bname_etc_file =
+            String.concat Filename.dir_sep
+              [base_path conf.bname; "etc"; fname ^ ".txt"]
+          in
+          let bases_etc_tpl_file =
+            String.concat Filename.dir_sep
+              [Secure.base_dir (); "etc"; t; fname ^ ".txt"]
+          in
+          let bases_etc_file =
+            String.concat Filename.dir_sep
+              [Secure.base_dir (); "etc"; fname ^ ".txt"]
+          in
+          let etc_tpl_file =
+            search_in_lang_path
+              (String.concat Filename.dir_sep ["etc"; t; fname ^ ".txt"])
+          in
+          if Sys.file_exists bname_etc_tpl_file then bname_etc_tpl_file
+          else if Sys.file_exists bname_etc_file then bname_etc_file
+          else if Sys.file_exists bases_etc_tpl_file then bases_etc_tpl_file
+          else if Sys.file_exists bases_etc_file then bases_etc_file
+          else if Sys.file_exists etc_tpl_file then etc_tpl_file
+          else loop l
+    in
+    loop tpl
+  in
+  if file <> "" then file
+  else
+    search_in_lang_path
+      (String.concat Filename.dir_sep ["etc"; fname ^ ".txt"])
 
 let open_base_etc_file conf fname =
   try Some (Secure.open_in (base_etc_file conf fname)) with
@@ -1306,8 +1301,12 @@ let open_etc_file conf fname =
 *)
 
 let open_etc_file_name conf fname =
-  try Some (Secure.open_in (base_etc_file conf fname)) with
-    Sys_error _ -> None
+  let file = base_etc_file conf fname in
+  try Some (Secure.open_in file) with
+    Sys_error m ->
+        let _ = Printf.eprintf "Error: %s, %s\n" file m in
+        let _ = flush stderr in
+        None
 
 let body_prop conf =
   try
