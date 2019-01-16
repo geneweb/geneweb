@@ -297,19 +297,19 @@ let start_with ?(wildcard = false) ini i s =
   in
   loop 0 i
 
-let contains ?(wildcard = false) str sub =
+let contains ?(wildcard = false) sub str =
   let strlen = String.length str in
   let sublen = String.length sub in
   if not wildcard
   then
     let rec loop i =
-      if i + sublen < strlen
+      if i + sublen <= strlen
       then start_with ~wildcard sub i str || loop (i + 1)
       else false
     in loop 0
   else
     let rec loop i =
-      i < strlen && (start_with ~wildcard sub i str || loop (i + 1))
+      i <= strlen && (start_with ~wildcard sub i str || loop (i + 1))
     in loop 0
 
 let get_particle list s =
