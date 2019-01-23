@@ -13,23 +13,11 @@ let mul x n = x * n
 let div x n = x / n
 let modl x n = x mod n
 
-let of_int i =
-  if i < 0 then invalid_arg "Sosa.of_int"
-  else if i = 0 then zero
-  else if i = 1 then one
-  else i
-
+let of_int i = if i < 0 then invalid_arg "Sosa.of_int" else i
 let inc sosa increment = sosa + increment
-
-let even sosa =
-  sosa mod 2 = 0
-
-let twice sosa =
-  sosa * 2
-
-let to_int = function
-  | 0 -> 0
-  | i -> i
+let even sosa = sosa mod 2 = 0
+let twice sosa = sosa * 2
+let to_int x = x
 
 let rec exp_gen x1 x2 n =
   if n = 0 || x1 = zero then one
@@ -83,13 +71,11 @@ let to_string_sep_base sep base x =
 
 let to_string_sep sep = to_string_sep_base sep 10
 
-let to_string = to_string_sep_base "" 10
+let to_string = string_of_int
 
-let of_string s = int_of_string s
+let of_string = int_of_string
 
-let gen x =
-  let s =  to_string_sep_base "" 2 x in
-  String.length s (* coherent with %sosa.lvl *)
+let gen x = int_of_float (log (float_of_int x) /. log 2.)
 
 let branch x =
   let s = to_string_sep_base "" 2 x in
