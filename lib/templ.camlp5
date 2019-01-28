@@ -677,6 +677,12 @@ let setup_link conf =
 let rec eval_variable conf =
   function
     ["bvar"; v] -> (try List.assoc v conf.base_env with Not_found -> "")
+  | ["evar"; "p"; v] ->
+      begin match Util.p_getenv (conf.env @ conf.henv) v with
+        Some vv -> Util.quote_escaped
+          (if String.length vv > 1 then String.sub vv 0 (String.length vv - 1) else "")
+      | None -> ""
+      end
   | ["evar"; v; "ns"] ->
       begin try
         let vv = List.assoc v (conf.env @ conf.henv) in

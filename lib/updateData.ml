@@ -370,10 +370,10 @@ let translate_title conf =
 let print_title conf ini len =
   let (book_of, title) = translate_title conf in
   Wserver.printf "%s" (capitale book_of);
-  if ini = "" then Wserver.printf " (%d %s)" len title
+  if ini = "" then Wserver.printf "%d %s" len title
   else
     begin
-      Wserver.printf " - ";
+      Wserver.printf "<br>";
       Wserver.printf (fcapitale (ftransl conf "%d %s starting with %s")) len
         title ini
     end
@@ -1053,13 +1053,13 @@ let print_mod_ok conf base =
               "<input type=\"hidden\" name=\"s\" value=\"%s\"%s>\n" ini
               conf.xhs;
             Wserver.printf
-              "<input type=\"hidden\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"data\"%s>\n"
-              (Util.escape_html (only_printable new_input)) conf.xhs;
+              "<input type=\"hidden\" name=\"nx_input\" value=\"%s\" id=\"data\"%s>\n"
+              (quote_escaped (only_printable new_input)) conf.xhs;
             Wserver.printf "%s"
               (capitale (transl conf "continue correcting"));
             begin
               Wserver.printf
-                "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
+                "<button type=\"submit\" class=\"btn btn-primary btn-lg\">\n";
               Wserver.printf "%s"
                 (capitale (transl_nth conf "validate/delete" 0));
               Wserver.printf "</button>\n"
@@ -1069,8 +1069,8 @@ let print_mod_ok conf base =
           Wserver.printf "</form>\n"
         end;
       Wserver.printf "<p>\n";
-      Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\" id=\"reference\">"
-        (commd conf) data ini;
+      Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s#%s\" id=\"reference\">"
+        (commd conf) data ini (no_html_tags (quote_escaped (only_printable new_input))) ;
       Wserver.printf "%s" (capitale (transl conf "new modification"));
       Wserver.printf "</a>";
       Wserver.printf "</p>\n";
@@ -1083,8 +1083,8 @@ let print_mod_ok conf base =
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Wserver.printf "<p>\n";
-    Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\" id=\"reference\">" (commd conf) data
-      ini;
+    Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s#%s\" id=\"reference\">"
+      (commd conf) data ini (no_html_tags (quote_escaped (only_printable new_input)));
     Wserver.printf "%s" (capitale (transl conf "new modification"));
     Wserver.printf "</a>";
     Wserver.printf "</p>\n";
@@ -1264,6 +1264,7 @@ type 'a env =
   | Venv_keys of (string * int) list
   | Vint of int
   | Vstring of string
+  | Vbool of bool
   | Vother of 'a
   | Vnone
 
@@ -1276,6 +1277,17 @@ let set_vother x = Vother x
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
+let string_to_list str =
+  let rec loop acc =
+    function
+      s ->
+        if String.length s > 0 then
+          let nbc = Name.nbc s.[0] in
+          let c = String.sub s 0 nbc in
+          let s1 = String.sub s nbc (String.length s - nbc) in
+          loop (c :: acc) s1
+        else acc
+  in loop [] str
 
 let rec eval_var conf base env xx _loc sl =
   try eval_simple_var conf base env xx sl with
@@ -1301,12 +1313,20 @@ and eval_simple_bool_var _conf _base env _xx =
         | _ -> []
       in
       k = env_keys
+  | "is_first" ->
+      begin match get_env "first" env with
+        Vbool x -> x
+      | _ -> raise Not_found
+      end
   | _ -> raise Not_found
 and eval_simple_str_var conf _base env _xx =
   function
     "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "ini" -> eval_string_env "ini" env
+  | "substr" -> eval_string_env "substr" env
+  | "cnt" -> eval_int_env "cnt" env
+  | "tail" -> eval_string_env "tail" env
   | "keys" ->
       let k =
         match get_env "keys" env with
@@ -1335,9 +1355,9 @@ and eval_simple_str_var conf _base env _xx =
       in
       let (book_of, title) = translate_title conf in
       let result =
-        if ini = "" then Printf.sprintf " (%d %s)" len title
+        if ini = "" then Printf.sprintf "<br>%d %s" len title
         else
-          " - " ^
+          "<br>" ^
           Printf.sprintf (ftransl conf "%d %s starting with %s") len title ini
       in
       capitale book_of ^ result
@@ -1346,11 +1366,19 @@ and eval_compound_var conf base env xx sl =
   let rec loop =
     function
       [s] -> eval_simple_str_var conf base env xx s
+    | ["evar"; "p"; s] ->
+        begin match p_getenv conf.env s with
+          Some s -> if String.length s > 1 then String.sub s 0 (String.length s - 1) else ""
+        | None -> ""
+        end
     | ["evar"; s] ->
         begin match p_getenv conf.env s with
           Some s -> s
         | None -> ""
         end
+    | ["subs"; n; s] ->
+        let n = int_of_string n in
+        if String.length s > n then String.sub s 0 (String.length s - n) else ""
     | "encode" :: sl -> code_varenv (loop sl)
     | "escape" :: sl -> Util.escape_html (loop sl)
     | "html_encode" :: sl -> no_html_tags (loop sl)
@@ -1366,15 +1394,50 @@ and eval_int_env s env =
   match get_env s env with
     Vint i -> string_of_int i
   | _ -> raise Not_found
-
 let print_foreach conf print_ast _eval_expr =
   let rec print_foreach env xx _loc s sl el al =
     match s :: sl with
       ["initial"] -> print_foreach_initial env xx al
     | ["entry"] -> print_foreach_entry env xx el al
+    | ["substr"; e] -> print_foreach_substr env xx el al e
     | ["value"] -> print_foreach_value env xx al
     | ["env_keys"] -> print_foreach_env_keys env xx el al
     | _ -> raise Not_found
+  and print_foreach_substr env xx _el al evar =
+    let evar =
+      match p_getenv conf.env evar with
+        Some s -> s
+      | None -> ""
+    in
+    let list_of_char = string_to_list evar in
+    let list_of_sub =
+      let rec loop acc =
+        function
+        | c :: l ->
+            let s1 = List.fold_left (fun acc cc -> cc ^ acc) c l in
+            loop (s1 :: acc) l
+        | [] -> acc
+      in loop [] list_of_char
+    in
+    let rec loop first cnt =
+      function
+      | s :: l ->
+          if List.length l > 0 then
+          begin
+            let tail = List.hd (string_to_list s) in
+            let env =
+              ("substr", Vstring s) ::
+              ("tail", Vstring tail) ::
+              ("first", Vbool first) ::
+              ("cnt", Vint cnt) :: env
+            in
+            List.iter (print_ast env xx) al ;
+            loop false (cnt + 1) l
+          end
+          else () (* dont do last element *)
+      | [] -> ()
+    in
+    loop true 0 list_of_sub
   and print_foreach_entry env xx _el al =
     let env_keys =
       let keys = List.map fst (fst (get_data conf)) in
@@ -1395,17 +1458,18 @@ let print_foreach conf print_ast _eval_expr =
     in
     let list = build_list_long conf list in
     let env = ("env_keys", Venv_keys env_keys) :: env in
-    let rec loop =
+    let rec loop cnt =
       function
         (ini_k, list_v) :: l ->
           let env =
+            ("cnt", Vint cnt) ::
             ("entry_ini", Vstring ini_k) ::
             ("list_value", Vlist_value list_v) :: env
           in
-          List.iter (print_ast env xx) al; loop l
+          List.iter (print_ast env xx) al; loop (cnt + 1) l
       | [] -> ()
     in
-    loop list
+    loop 0 list
   and print_foreach_value env xx al =
     let list =
       match get_env "list_value" env with
@@ -1419,17 +1483,19 @@ let print_foreach conf print_ast _eval_expr =
             l
       | _ -> []
     in
-    let rec loop =
+    let rec loop cnt =
       function
         (s, k) :: l ->
           let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
           let env =
-            ("entry_value", Vstring s) :: ("keys", Venv_keys k) :: env
+            ("cnt", Vint cnt) ::
+            ("entry_value", Vstring s) ::
+            ("keys", Venv_keys k) :: env
           in
-          List.iter (print_ast env xx) al; loop l
+          List.iter (print_ast env xx) al; loop (cnt + 1) l
       | [] -> ()
     in
-    loop list
+    loop 0 list
   and print_foreach_initial env xx al =
     let list =
       match get_env "list" env with
@@ -1437,14 +1503,17 @@ let print_foreach conf print_ast _eval_expr =
       | _ -> []
     in
     let ini_list = build_list_short conf list in
-    let rec loop =
+    let rec loop cnt =
       function
         ini :: l ->
-          let env = ("ini", Vstring ini) :: env in
-          List.iter (print_ast env xx) al; loop l
+          let env =
+            ("cnt", Vint cnt) ::
+            ("ini", Vstring ini) :: env
+          in
+          List.iter (print_ast env xx) al; loop (cnt + 1) l
       | [] -> ()
     in
-    loop ini_list
+    loop 0 ini_list
   and print_foreach_env_keys env xx _el al =
     let env_keys =
       match get_env "env_keys" env with
