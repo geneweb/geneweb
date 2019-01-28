@@ -423,10 +423,10 @@ sv: %1 till %2
     %d %s starting with %s
 co: %d %s principiendu da "%s"
 de: %d %s beginnend mit "%s"
-en: %d %s starting with "%s"
+en: %d %s starting with “%s”
 es: %d %s comenzando con "%s"
 fi: %d %s ensimmäisenä "%s"
-fr: %d %s commençant par "%s"
+fr: %d %s commençant par %s
 it: %d %s partendo da "%s"
 nl: %d %s beginnend met "%s"
 no: %d %s som starter med "%s"

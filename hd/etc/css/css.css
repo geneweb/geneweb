@@ -256,11 +256,6 @@ table#dag {
   color: black;
 }
 
-/* Fixed width button in books indexes using monospace font */
-a.book-char{
-  font-family: monospace, monospace;
-}
-
 /* Fix noword-wrap on long a href */
 a {
   word-wrap: break-word
