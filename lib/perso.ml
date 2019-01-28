@@ -4245,6 +4245,10 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           mark_descendants 0 p; r := tab; ""
       | _ -> raise Not_found
       end
+  | "marriage_places" ->
+    List.fold_left
+      (fun acc ifam -> acc ^ (sou base (get_marriage_place (foi base ifam))) ^ "|")
+    "|" (Array.to_list (get_family p))
   | "marriage_age" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
