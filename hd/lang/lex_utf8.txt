@@ -1,3 +1,27 @@
+    search results
+en: detailed results of search by place for
+fr: résultats détaillés de la recherche par lieu pour
+
+    matching
+en: matching
+fr: correspondance
+
+    case sensitive
+en: case sensitive
+fr: capitales et accents
+
+    substring
+en: substring
+fr: partiel
+
+    total/partial display
+en: total/partial display
+fr: affichage total/partiel
+
+    long/short display
+en: long/short display
+fr: affichage long/court
+
     reset to
 co: risturà
 en: reset to
@@ -2200,6 +2224,10 @@ sk: žijúci
 sl: živi
 sv: lever
 
+    all the places
+en: all the places
+fr: tous les lieux
+
     all the estates
 af: alle plase
 bg: всички местоуказания
@@ -2453,7 +2481,7 @@ da: og
 de: und
 en: and
 eo: kaj
-es: y/e 
+es: y/e
 et: ja
 fi: ja
 fr: et
@@ -3090,7 +3118,7 @@ sl: začetek
 sv: börjar
 
     benediction
-co: benedizzione	
+co: benedizzione
 de: Segnung
 en: Blessing
 es: bendición
@@ -5077,7 +5105,7 @@ oc: afichar la data de maridatge
 ru: показать дату брака
 
     display notes/sources inline
-co: include e note/fonte à u cuntenutu 
+co: include e note/fonte à u cuntenutu
 de: einschließen der Notizen/Quellen und Inhalt
 en: Add notes & sources
 es: incluir las notas/fuentes en el contenido
@@ -12236,9 +12264,13 @@ sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
     sons/daughters/children
-co: figlioli/figliole/zitelli	
+co: figlioli/figliole/zitelli
 en: sons/daughters/children
 fr: fils/filles/enfants
+
+    sorted by
+en: sorted by
+fr: triés par
 
     sort by/branch/alphabetic order
 co: urganizà da :/ghjemba/ordine alfabeticu
@@ -12539,7 +12571,7 @@ de: liste der Dateien
 en: list of individuals
 es: lista de fichas
 fi: kaikki perhetietokortit
-fr: liste des fiches
+fr: liste d’individus
 it: lista delle schede
 nl: lijst van de fichen
 no: sammendrag
@@ -15335,7 +15367,7 @@ en: permute the events of family %s
 fr: permuter les événements de la famille %s
 
     full width/columns
-co: affissu larghezza sana/affissu nant'à duie culonne 
+co: affissu larghezza sana/affissu nant'à duie culonne
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 

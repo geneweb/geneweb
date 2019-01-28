@@ -1,0 +1,103 @@
+<!-- $Id: buttons_places.txt v7.00 28/01/2019 05:47:07 $ -->
+<!-- Copyright (c) 1998-2019 INRIA -->
+%( Boutons de configurations et d'options %)
+<form class="form-group mx-1" name="evt_url" method="get" action="%action;">
+  <input type="hidden" name="m" value="PS">
+  <div class="form-inline">
+    <label class="sr-only" for="k2">[*place] (k2)</label>
+    <input type="search" class="form-control col-4" name="k2" id="k2" value="%evar.k2;"
+      placeholder="%if;(evar.k2!="")%evar.k2;%else;[*place] (k2)%end;">
+    <label class="sr-only" for="k1">[*place] (k1)</label>
+    <input type="search" class="form-control col-4 ml-2" name="k1" id="k1" value="%evar.k1;"
+      placeholder="%if;(evar.k1!="")%evar.k1;%else;[*place] (k1)%end;">
+  </div>
+  <div class="form-inline mt-1">
+    <div class="form-group w-100">
+      <span>[*event/events]1[:]</span>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="bi" id="bi" value="on"
+          %if;(evar.bi!="" and evar.bi="on") checked%end;>
+        <label class="custom-control-label" title="[*birth place]" for="bi">[*birth]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="bp" id="bp" value="on"
+          %if;(evar.bp!="" and evar.bp="on") checked%end;>
+        <label class="custom-control-label" title="[*baptism place]" for="bp">[*baptism]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="ma" id="ma" value="on"
+          %if;(evar.ma!="" and evar.ma="on") checked%end;>
+        <label class="custom-control-label" title="[*marriage place]" for="ma">[*marriage/marriages]0</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="de" id="de" value="on"
+          %if;(evar.de!="" and evar.de="on") checked%end;>
+        <label class="custom-control-label" title="[*death place]" for="de">[*death]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="bu" id="bu" value="on"
+          %if;(evar.bu!="" and evar.bu="on") checked%end;>
+        <label class="custom-control-label" title="[*burial place]" for="bu">[*burial]</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <span>[*matching][:]</span>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input ml-4" name="exact" id="exact" value="on"
+          %if;(evar.exact!="" and evar.exact="on") checked%end;>
+        <label class="custom-control-label" title="[*case sensitive]" for="exact">[*case sensitive]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input ml-4" name="substr" id="substr" value="on"
+          %if;(evar.substr!="" and evar.substr="on") checked%end;>
+        <label class="custom-control-label" title="[*substring]" for="substr">[*substring]</label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm ml-2"
+        title="[*search/case sensitive]0 [surname/surnames]1 / [places] [and] [event/events]1">
+        <i class="fa fa-search mr-2"></i>Search</button>
+    </div>
+  </div>
+</form>
+<div class="d-flex">
+  <div>
+    %if;(evar.k1!="" or evar.k2!="")
+      <a role="button" href="%prefix_base_password;
+        %foreach;env_binding;%if;(env_val!="" and env_key!="k1" and env_key!="k2")%nn;
+          &%env_key=%env_val;%end;%nn;
+        %end;"
+        title="[*all the places]"><i class="fa fa-sort-up mr-2"></i>
+      </a>
+    %end;
+    %if;(evar.bi!="" or evar.bp!="" or evar.ma!="" or evar.de!="" or evar.bu!="")
+      <a href="%prefix_base_password;%nn;
+        %foreach;env_binding;%if;(env_val!="" and env_key!="long")%nn;
+          &%env_key=%env_val;%end;%nn;
+        %end;%nn;
+        %if;(evar.long!="on")&long=on%end;%nn;"
+        title="[long/short display]">%nn;
+        %if;(evar.k1="" and evar.k2="")[*all the places]%nn;
+        %elseif;(evar.k1!="")%evar.k1;%nn;
+        %end;
+      </a>
+    %end;
+    %if;(evar.k2!="")
+      %sp;>%sp;<a href="%prefix_base_password;%nn;
+        %foreach;env_binding;%if;(env_val!="" and env_key!="long")%nn;
+         &%env_key=%env_val;%end;%nn;
+        %end;%nn;
+        %if;(evar.long!="on")&long=on%end;%nn;"
+        title="[*long/short display]">%nn;
+      %evar.k2;</a>
+    %end;
+  </div>
+  <a role="button" class="ml-auto"
+    href="%prefix_base_password;%nn;
+      %foreach;env_binding;%if;(env_val!="" and env_key!="f_sort")%nn;
+       &%env_key=%env_val;%end;%nn;
+      %end;%nn;
+      %if;(evar.f_sort!="on")&f_sort=on%end;%nn;"
+      title="[*sort by/branch/alphabetic order]0%sp;
+        %if;(evar.f_sort!="on")[frequency]%nn;%else;[sort by/branch/alphabetic order]2%nn;%end;">
+      <i class="fas fa-sort-%if;(evar.f_sort!="on")amount-down%else;alpha-down%end; fa-lg"></i>%nn;
+     </a>%nn;
+</div>
