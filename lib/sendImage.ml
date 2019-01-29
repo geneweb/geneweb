@@ -1,6 +1,5 @@
-(* $Id: sendImage.ml,v 5.7 2018/11/17 09:58:44 hg Exp $ *)
-
 open Config
+open Path
 open Def
 open Gwdb
 open TemplAst
@@ -63,7 +62,7 @@ let strip_br str =
     (String.sub str 0 (len - 4)) else str
 
 let include_hed_trl conf name =
-  match Util.open_etc_file_name conf name with
+  match Util.open_template conf name with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
 
@@ -185,7 +184,7 @@ and eval_simple_var conf base env p =
   | ["has_birth_date"] -> bool_val (Adef.od_of_cdate p.birth <> None)
   | ["has_image"] -> bool_val (Util.has_image conf base (poi base p.key_index))
   | ["has_old_image"] ->
-      begin match Util.auto_image_file conf base (poi base p.key_index) "saved" with
+      begin match Util.auto_image_file ~bak:true conf base (poi base p.key_index) with
         Some _s -> bool_val true
       | _ -> bool_val false
       end
@@ -264,12 +263,12 @@ and eval_simple_var conf base env p =
   | ["has_titles"] -> bool_val (p.titles <> [])
   | ["image"] -> str_val (quote_escaped p.image)
   | ["portrait"] -> (* see auto_image_file_name in perso.ml *)
-      begin match auto_image_file conf base (poi base p.key_index) "" with
+      begin match auto_image_file conf base (poi base p.key_index) with
         Some s -> str_val (Filename.basename s)
       | _ -> str_val ""
       end
   | ["portrait_saved"] ->
-      begin match auto_image_file conf base (poi base p.key_index) "saved" with
+      begin match auto_image_file ~bak:false conf base (poi base p.key_index) with
         Some s -> str_val (Filename.basename s)
       | _ -> str_val ""
       end
@@ -1056,21 +1055,21 @@ let clean_old_portrait conf bfname =
   let file_name = Filename.remove_extension
     (String.concat
       Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "portraits"; "saved"; bfname])
+        [conf.path.dir_root; "documents"; "portraits"; "saved"; bfname])
   in
-  Util.rm (file_name ^ ".jpg") ;
-  Util.rm (file_name ^ ".png") ;
-  Util.rm (file_name ^ ".gif")
+  Mutil.rm (file_name ^ ".jpg") ;
+  Mutil.rm (file_name ^ ".png") ;
+  Mutil.rm (file_name ^ ".gif")
 
 let delete_old_file conf folder bfname =
   let file_name =
     String.concat
       Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; folder; "saved"; bfname]
+        [conf.path.dir_root; "documents"; folder; "saved"; bfname]
   in
   let file_name_t = (Filename.remove_extension file_name) ^ ".txt" in
-  Util.rm file_name ;
-  Util.rm file_name_t ;
+  Mutil.rm file_name ;
+  Mutil.rm file_name_t ;
   1
 
 let normal_image_type s =
@@ -1133,7 +1132,7 @@ let get_extension conf keydir =
   let f =
     String.concat
       Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "portraits"; keydir]
+        [conf.path.dir_root; "documents"; "portraits"; keydir]
   in
   if Sys.file_exists (f ^ ".jpg") then ".jpg"
   else if Sys.file_exists (f ^ ".png") then ".png"
@@ -1144,7 +1143,7 @@ let get_extension_old conf keydir =
   let f =
     String.concat
       Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "portraits"; "saved"; keydir]
+        [conf.path.dir_root; "documents"; "portraits"; "saved"; keydir]
   in
   if Sys.file_exists (f ^ ".jpg") then ".jpg"
   else if Sys.file_exists (f ^ ".png") then ".png"
@@ -1157,17 +1156,17 @@ let move_file_to_old conf fname bfname mode keydir =
   let old_dir_p =
     String.concat
       Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "portraits"; "saved"]
+        [conf.path.dir_root; "documents"; "portraits"; "saved"]
   in
   let old_dir_i0 =
     String.concat
       Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "images"; keydir;]
+        [conf.path.dir_root; "documents"; "images"; keydir;]
   in
   let old_dir_i =
     String.concat
       Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "images"; keydir; "saved"]
+        [conf.path.dir_root; "documents"; "images"; keydir; "saved"]
   in
   (try Unix.mkdir old_dir_p 0o777 with Unix.Unix_error (_, _, _) -> ());
   (try Unix.mkdir old_dir_i0 0o777 with Unix.Unix_error (_, _, _) -> ());
@@ -1260,14 +1259,14 @@ let effective_send_ok conf base p file file_name mode =
   let full_dir =
     if mode = "portraits" then
       String.concat Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "portraits";]
+        [conf.path.dir_root; "documents"; "portraits";]
     else
       String.concat Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "images"; keydir]
+        [conf.path.dir_root; "documents"; "images"; keydir]
   in
   let _ =
     if not (Sys.file_exists full_dir) then
-      let d = Filename.concat (Util.base_path conf.bname) "documents" in
+      let d = Filename.concat conf.path.dir_root "documents" in
       let d1 = Filename.concat d "portraits" in
       let d2 = Filename.concat d "images" in
       let d3 = Filename.concat d2 keydir in
@@ -1282,7 +1281,7 @@ let effective_send_ok conf base p file file_name mode =
      else file_name)
   in
   if mode = "portraits" then
-    begin match Util.auto_image_file conf base p "" with
+    begin match Util.auto_image_file conf base p with
     | Some f ->
         clean_old_portrait conf (Filename.basename f);
         if (move_file_to_old conf f (Filename.basename f) mode keydir) = 0 then
@@ -1334,7 +1333,7 @@ let effective_delete_ok conf base p =
   let saved = if delete then "saved" else "" in
   let full_name =
     String.concat Filename.dir_sep
-      [Util.base_path conf.bname; "documents"; folder; saved; bfname]
+      [conf.path.dir_root; "documents"; folder; saved; bfname]
   in
   let res =
     if (Sys.file_exists full_name) && delete then
@@ -1342,7 +1341,7 @@ let effective_delete_ok conf base p =
     else if (Sys.file_exists full_name) then
     (* TODO verify we dont destroy a saved image having the same name as portrait! *)
       begin
-        begin match Util.auto_image_file conf base p "saved" with
+        begin match Util.auto_image_file ~bak:true conf base p with
         | Some _ -> clean_old_portrait conf bfname
         | None -> ()
         end;
@@ -1363,7 +1362,7 @@ let effective_delete_ok conf base p =
 let swap_files conf file1 file2 txt =
   let tmp_file =
     String.concat Filename.dir_sep
-      [Util.base_path conf.bname; "documents"; "tempfile.tmp"]
+      [conf.path.dir_root; "documents"; "tempfile.tmp"]
   in
   let ext_1 = Filename.extension file1 in
   let ext_2 = Filename.extension file2 in
@@ -1375,7 +1374,7 @@ let swap_files conf file1 file2 txt =
   if txt then
     let tmp_file_t =
       String.concat Filename.dir_sep
-        [Util.base_path conf.bname; "documents"; "tempfile.tmp"]
+        [conf.path.dir_root; "documents"; "tempfile.tmp"]
     in
     let file1_t = (Filename.remove_extension file1) ^ ".txt" in
     let file2_t = (Filename.remove_extension file2) ^ ".txt" in
@@ -1401,12 +1400,12 @@ let effective_reset_ok conf base p =
       let ext = if ext = "." then ext_o else ext in
       let file_in_old =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "documents"; "portraits"; "saved";
+          [conf.path.dir_root; "documents"; "portraits"; "saved";
             (file_name ^ ext_o)]
       in
       let file_in_portraits =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "documents"; "portraits";
+          [conf.path.dir_root; "documents"; "portraits";
             (file_name ^ ext)]
       in
       if Sys.file_exists file_in_portraits then
@@ -1422,12 +1421,12 @@ let effective_reset_ok conf base p =
       let file_name = Wserver.decode file_name in
       let file_in_old =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "documents"; "images";
+          [conf.path.dir_root; "documents"; "images";
             keydir; "saved"; file_name]
       in
       let new_file =
         String.concat Filename.dir_sep
-          [Util.base_path conf.bname; "documents"; "images"; keydir; file_name]
+          [conf.path.dir_root; "documents"; "images"; keydir; file_name]
       in
       if Sys.file_exists new_file then
         swap_files conf file_in_old new_file true

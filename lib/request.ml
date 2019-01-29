@@ -13,6 +13,7 @@ end
 module Make (H : MakeIn) : MakeOut = struct
 
 open Config
+open Path
 open Def
 open Gwdb
 open Util
@@ -331,7 +332,7 @@ let extract_henv conf base =
 
 let set_owner conf =
   if Sys.unix then
-    let s = Unix.stat (Util.base_path conf.bname) in
+    let s = Unix.stat conf.path.dir_root in
     try Unix.setgid s.Unix.st_gid; Unix.setuid s.Unix.st_uid with
       Unix.Unix_error (_, _, _) -> ()
 
@@ -348,7 +349,7 @@ let log_count r =
   | None -> ()
 
 let print_moved conf s =
-  match Util.open_etc_file_name conf "moved" with
+  match Util.open_template conf "moved" with
     Some ic ->
       let env = ["bname", conf.bname] in
       let conf = {conf with is_printed_by_template = false} in
@@ -380,54 +381,45 @@ let print_no_index conf base =
   Hutil.trailer conf
 
 let treat_request conf base =
-  begin match
-    p_getenv conf.base_env "moved", p_getenv conf.env "opt",
-    p_getenv conf.env "m"
-  with
-    Some s, _, _ -> print_moved conf s
-  | _, Some "no_index", _ -> print_no_index conf base
-  | _, _, Some "IM" -> Image.print conf base
-  | _, _, Some "IMS" -> Image.print_saved conf base
-  | _, _, Some "DOC" ->
-      begin match p_getenv conf.env "s" with
-        Some f ->
-          if Filename.check_suffix f ".txt" then
-            let f = Filename.chop_suffix f ".txt" in
-            Srcfile.print_source conf base f
-          else Image.print conf base
-      | None -> Hutil.incorrect_request conf
-      end
-  | _ ->
-      set_owner conf;
-      extract_henv conf base;
-      make_senv conf base;
-      let conf =
-        match Util.default_sosa_ref conf base with
-          Some p -> {conf with default_sosa_ref = get_key_index p, Some p}
-        | None -> conf
-      in
-      if only_special_env conf.env then
-        begin
-          begin match p_getenv conf.base_env "counter" with
-            Some "no" -> ()
-          | _ -> let r = Srcfile.incr_welcome_counter conf in log_count r
-          end;
-          Srcfile.print_start conf base
-        end
-      else
-        begin
-          begin match p_getenv conf.base_env "counter" with
-            Some "no" -> ()
-          | _ -> let r = Srcfile.incr_request_counter conf in log_count r
-          end;
-          match p_getenv conf.env "ptempl" with
-            Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
+  begin match p_getenv conf.base_env "moved" with
+    | Some s -> print_moved conf s
+    | None -> match p_getenv conf.env "opt" with
+      | Some "no_index" -> print_no_index conf base
+      | _ -> match p_getenv conf.env "m" with
+        | Some "IM" -> Image.print conf base
+        | Some "IMS" -> Image.print_saved conf base
+        | Some "DOC" ->
+          begin match p_getenv conf.env "s" with
+            | Some f ->
+              if Filename.check_suffix f ".txt"
+              then Srcfile.print_source conf base (Filename.chop_suffix f ".txt")
+              else Image.print conf base
+            | None -> Hutil.incorrect_request conf
+          end
+        | _ ->
+          set_owner conf;
+          extract_henv conf base;
+          make_senv conf base;
+          let conf =
+            Opt.map_default conf
+              (fun p -> {conf with default_sosa_ref = get_key_index p, Some p})
+              (Util.default_sosa_ref conf base)
+          in
+          if only_special_env conf.env then begin
+            if p_getenv conf.base_env "counter" <> Some "no"
+            then log_count (Srcfile.incr_welcome_counter conf) ;
+            Srcfile.print_start conf base
+          end else begin
+            if p_getenv conf.base_env "counter" <> Some "no"
+            then log_count (Srcfile.incr_request_counter conf) ;
+            match p_getenv conf.env "ptempl" with
+            | Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
               begin match find_person_in_env conf base "" with
-                Some p -> Perso.interp_templ tname conf base p
-              | None -> family_m conf base
+                | Some p -> Perso.interp_templ tname conf base p
+                | None -> family_m conf base
               end
-          | _ -> family_m conf base
-        end
+            | _ -> family_m conf base
+          end
   end;
   Wserver.wflush ()
 
@@ -458,32 +450,52 @@ let treat_request_on_possibly_locked_base conf bfile =
       Hutil.trailer conf
 
 let this_request_updates_database conf =
-  match p_getenv conf.env "m" with
-    Some ("FORUM_ADD_OK" | "FORUM_DEL" | "FORUM_VAL") -> true
-  | Some "API_PRINT_SYNCHRO" -> true
-  | Some x when conf.wizard ->
-      begin match x with
-        "ADD_FAM_OK" | "ADD_IND_OK" | "CHANGE_WIZ_VIS" | "CHG_CHN_OK" |
-        "CHG_EVT_IND_ORD_OK" | "CHG_EVT_FAM_ORD_OK" | "CHG_FAM_ORD_OK" |
-        "DEL_FAM_OK" | "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" |
-        "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" |
-        "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" |
-        "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "MOD_DATA_OK" |
-        "IMAGE_OK" ->
-          true
-      | "API_BASE_WARNINGS" | "API_IMAGE_UPDATE" | "API_REMOVE_IMAGE_EXT" |
-        "API_REMOVE_IMAGE_EXT_ALL" | "API_DEL_PERSON_OK" |
-        "API_EDIT_PERSON_OK" | "API_ADD_CHILD_OK" | "API_ADD_PERSON_OK" |
-        "API_ADD_PARENTS_OK" | "API_ADD_FAMILY_OK" | "API_ADD_FIRST_FAM_OK" |
-        "API_EDIT_FAMILY_OK" | "API_DEL_FAMILY_OK" | "API_ADD_SIBLING_OK" |
-        "API_ADD_PERSON_START_OK" | "API_PRINT_SYNCHRO" ->
-          true
-      | _ -> false
-      end
-  | _ -> false
+  p_getenv conf.env "m" |> Opt.map_default false begin function
+    | "API_PRINT_SYNCHRO" | "FORUM_ADD_OK" | "FORUM_DEL" | "FORUM_VAL" -> true
+    | "ADD_FAM_OK"
+    | "ADD_IND_OK"
+    | "API_ADD_CHILD_OK"
+    | "API_ADD_FAMILY_OK"
+    | "API_ADD_FIRST_FAM_OK"
+    | "API_ADD_PARENTS_OK"
+    | "API_ADD_PERSON_OK"
+    | "API_ADD_PERSON_START_OK"
+    | "API_ADD_SIBLING_OK"
+    | "API_BASE_WARNINGS"
+    | "API_DEL_FAMILY_OK"
+    | "API_DEL_PERSON_OK"
+    | "API_EDIT_FAMILY_OK"
+    | "API_EDIT_PERSON_OK"
+    | "API_IMAGE_UPDATE"
+    | "API_REMOVE_IMAGE_EXT"
+    | "API_REMOVE_IMAGE_EXT_ALL"
+    | "CHANGE_WIZ_VIS"
+    | "CHG_CHN_OK"
+    | "CHG_EVT_FAM_ORD_OK"
+    | "CHG_EVT_IND_ORD_OK"
+    | "CHG_FAM_ORD_OK"
+    | "DEL_FAM_OK"
+    | "DEL_IMAGE_OK"
+    | "DEL_IND_OK"
+    | "IMAGE_OK"
+    | "INV_FAM_OK"
+    | "KILL_ANC"
+    | "MOD_DATA_OK"
+    | "MOD_FAM_OK"
+    | "MOD_IND_OK"
+    | "MOD_NOTES_OK"
+    | "MOD_WIZNOTES_OK"
+    | "MRG_DUP_FAM_Y_N"
+    | "MRG_DUP_IND_Y_N"
+    | "MRG_IND"
+    | "MRG_MOD_FAM_OK"
+    | "MRG_MOD_IND_OK"
+      when conf.wizard -> true
+    | _ -> false
+  end
 
 let treat_request_on_base conf =
-  let bfile = Util.base_path conf.bname in
+  let bfile = conf.path.dir_root in
   if this_request_updates_database conf then
     Lock.control (Mutil.lock_file bfile) false
       ~onerror:(fun () -> Update.error_locked conf)

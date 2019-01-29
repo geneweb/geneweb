@@ -795,7 +795,7 @@ let defaultHandler : handler =
     end
 
   ; conn_wiz = begin fun self conf base ->
-      if conf.wizard then Wiznotes.connected_wizards conf base
+      if conf.wizard then Wiznotes.connected_wizards conf
       else self.incorrect_request self conf base
     end
 
@@ -997,7 +997,7 @@ let defaultHandler : handler =
     end
 
   ; mod_wiznotes = begin fun self conf base ->
-      if conf.authorized_wizards_notes then Wiznotes.print_mod conf base
+      if conf.authorized_wizards_notes then Wiznotes.print_mod conf
       else self.incorrect_request self conf base
     end
 
@@ -1189,7 +1189,7 @@ let defaultHandler : handler =
     end
 
   ; change_wiz_vis = begin fun self conf base ->
-      if conf.wizard then Wiznotes.change_wizard_visibility conf base
+      if conf.wizard then Wiznotes.change_wizard_visibility conf
       else self.incorrect_request self conf base
     end
 
@@ -1205,7 +1205,7 @@ let defaultHandler : handler =
     end
 
   ; view_wiznotes = begin fun self conf base ->
-      if conf.wizard && conf.authorized_wizards_notes then Wiznotes.print_view conf base
+      if conf.wizard && conf.authorized_wizards_notes then Wiznotes.print_view conf
       else self.incorrect_request self conf base
     end
 

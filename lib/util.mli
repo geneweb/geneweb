@@ -7,9 +7,7 @@ open Gwdb
 
 val add_lang_path : string -> unit
 val set_base_dir : string -> unit
-val cnt_dir : string ref
 val image_prefix : config -> string
-val base_path : string -> string
 
 val escache_value : base -> string
 val commit_patches : config -> base -> unit
@@ -105,17 +103,13 @@ val create_env : string -> (string * string) list
 val capitale : string -> string
 val index_of_next_char : string -> int -> int
 
-(** Search file (template, image...) in gw. *)
-val open_gw_etc_file : string -> in_channel option
+(** TODO *)
+val template_file_path : config -> string -> string
 
-val open_base_etc_file : config -> string -> in_channel option
-val base_etc_file : config -> string -> string
+(** TODO *)
+val open_template : config -> string -> in_channel option
 
 val search_in_lang_path : string -> string
-val gw_etc_file : string -> string
-val open_etc_file : config -> string -> in_channel option
-(* summary, robot, toolbar, accent, renamed, redirect, index, moved *)
-val open_etc_file_name : config -> string -> in_channel option
 
 val string_with_macros :
   config -> (char * (unit -> string)) list -> string -> string
@@ -211,7 +205,6 @@ val sosa_of_branch : (iper * sex) list -> Sosa.t
 
 val has_image : config -> base -> person -> bool
 val image_file_name : string -> string
-val source_image_file_name : config -> string -> string
 
 val has_keydir : config -> base -> person -> bool
 val keydir : config -> base -> person -> string option
@@ -220,17 +213,35 @@ val get_keydir_old : config -> base -> person -> string list
 val out_keydir_img_notes : config -> base -> person -> string -> string -> unit
 val get_keydir_img_notes : config -> base -> person -> string -> string
 
-val image_size : string -> (int * int) option
 val limited_image_size :
   int -> int -> string -> (int * int) option -> (int * int) option
-val image_and_size :
-  config -> base -> person -> string ->
-    (string -> (int * int) option -> (int * int) option) ->
-    (bool * string * (int * int) option) option
+val image_size : string -> (int * int) option
 
+(** [default_image_name_of_key fn sn oc]
+    Default portrait filename (without extension).
+
+    e.g. [default_image_name_of_key "Jean Claude" "DUPOND" 3]
+    = ["jean_claude.3.dupond"]
+ *)
 val default_image_name_of_key : string -> string -> int -> string
+
+(** [default_image_name base p]
+    See {!val:default_image_name_of_key}
+*)
 val default_image_name : base -> person -> string
-val auto_image_file : config -> base -> person -> string -> string option
+
+(** [auto_image_file ?bak conf base p]
+    Return the path to portrait image of [p].
+    If [backup] is set to [true],
+    return the path to the backuped version of this file.
+*)
+val auto_image_file : ?bak:bool -> config -> base -> person -> string option
+
+(** [image_and_size ?bak conf base p image_size] *)
+val image_and_size
+  : ?bak:bool -> config -> base -> person ->
+  (string -> (int * int) option -> (int * int) option) ->
+  ([> `File of string | `Url of string ] * (int * int) option) option
 
 val only_printable : string -> string
 val only_printable_or_nl : string -> string
@@ -329,16 +340,6 @@ val name_key : Gwdb.base -> string -> string
 (** [nb_char_occ c s] return the number of times [c] appears in [s]. *)
 val nb_char_occ : char -> string -> int
 
-(** [filter_map fn list] is a combination of map and filter.
-    Not tail-recursive.
-*)
-val filter_map : ('a -> 'b option) -> 'a list -> 'b list
-
-(** [rev_iter fn list] is like [List.iter fn (List.rev list)].
-    Not tail-recursive.
-*)
-val rev_iter : ('a -> unit) -> 'a list -> unit
-
 (** [print_version_commit]
     Print geneweb version and commit number on stdout and exit.
 *)
@@ -370,18 +371,3 @@ val str_nth_pos : string -> int -> int
     not the [start-th] UTF8-character.
 *)
 val str_sub : ?pad:char -> string -> int -> int -> string
-
-(** [ls_rs dirs]
-    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
-*)
-val ls_r : string list -> string list
-
-(** [rm_rf dir]
-    Remove directory [dir] and everything inside [dir].
-*)
-val rm_rf : string -> unit
-
-(** [rm fname]
-    Remove [fname]. If [fname] does not exists, do nothing.
-*)
-val rm : string -> unit

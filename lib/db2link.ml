@@ -1056,7 +1056,7 @@ let compress_fields nper nfam tmp_dir =
        List.iter
          (fun n ->
             let f = Filename.concat field_d n in
-            Mutil.remove_file f;
+            Mutil.rm f;
             Sys.rename (Filename.concat field_d (n ^ "2")) f)
          ["data"; "access"];
        if !(Mutil.verbose) then begin Printf.eprintf "\n"; flush stderr end)
@@ -1134,7 +1134,7 @@ let reorder_fields tmp_dir nper =
   List.iter
     (fun n ->
        let f = Filename.concat field_d n in
-       Mutil.remove_file f;
+       Mutil.rm f;
        Sys.rename (Filename.concat field_d (n ^ "2")) f)
     ["data"; "access"];
   if !(Mutil.verbose) then (Printf.eprintf "\n"; flush stderr)
@@ -1199,7 +1199,7 @@ let mkdir_and_open_out_field_unknown_size tmp_dir (name, valu) =
 (* ******************************************************************** *)
 let link next_family_fun bdir =
   let tmp_dir = Filename.concat "gw_tmp" bdir in
-  Mutil.remove_dir tmp_dir;
+  Mutil.rm_rf tmp_dir;
   (try Mutil.mkdir_p tmp_dir with _ -> ());
   let person_d =
     List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
@@ -1343,10 +1343,10 @@ let link next_family_fun bdir =
       Mutil.mkdir_p bdir;
       let dir = Filename.concat bdir "base_d" in
       let old_dir = Filename.concat bdir "base_d~" in
-      Mutil.remove_dir old_dir;
+      Mutil.rm_rf old_dir;
       (try Sys.rename dir old_dir with Sys_error _ -> ());
       Sys.rename (Filename.concat tmp_dir "base_d") dir;
-      Mutil.remove_dir old_dir;
+      Mutil.rm_rf old_dir;
       (try Unix.rmdir tmp_dir with Unix.Unix_error (_, _, _) -> ());
       (try Unix.rmdir "gw_tmp" with Unix.Unix_error (_, _, _) -> ());
       output_command_line bdir;

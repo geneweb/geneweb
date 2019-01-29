@@ -6,6 +6,7 @@ module MLink = Api_link_tree_piqi
 #endif
 
 open Config
+open Path
 open Def
 open Gwdb
 open TemplAst
@@ -15,10 +16,9 @@ let max_im_wid = 240
 let round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0
 
 let has_children base u =
-  List.exists
-    (fun ifam ->
-       let des = foi base ifam in Array.length (get_children des) > 0)
-    (Array.to_list (get_family u))
+  Array.exists
+    (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)
+    (get_family u)
 
 let string_of_marriage_text conf base fam =
   let marriage = Adef.od_of_cdate (get_marriage fam) in
@@ -1758,11 +1758,11 @@ let str_val x = VVstring x
 
 let gen_string_of_img_sz max_wid max_hei conf base (p, p_auth) =
   if p_auth then
-    let v = image_and_size conf base p "" (limited_image_size max_wid max_hei) in
+    let v = image_and_size conf base p (limited_image_size max_wid max_hei) in
     match v with
-      Some (_, _, Some (width, height)) ->
+      Some (_, Some (width, height)) ->
         Format.sprintf " width=\"%d\" height=\"%d\"" width height
-    | Some (_, _, None) -> Format.sprintf " height=\"%d\"" max_hei
+    | Some (_, None) -> Format.sprintf " height=\"%d\"" max_hei
     | None -> ""
   else ""
 let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
@@ -1795,9 +1795,7 @@ let get_sosa conf base env r p =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_linked_page conf base p s =
-  let bdir = Util.base_path conf.bname in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
+  let db = NotesLinks.read_db_from_file conf.path.file_notes_links in
   let db = Notes.merge_possible_aliases conf db in
   let key =
     let fn = Name.lower (sou base (get_first_name p)) in
@@ -2080,7 +2078,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -2245,7 +2243,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -2264,7 +2262,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -3538,7 +3536,7 @@ and eval_str_event_field conf base (p, p_auth)
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -3555,7 +3553,7 @@ and eval_str_event_field conf base (p, p_auth)
         let src =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_file_path = Notes.file_path conf;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
@@ -4086,7 +4084,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | _ -> ""
       end
   | "auto_image_file_name" ->
-      begin match auto_image_file conf base p "" with
+      begin match auto_image_file conf base p with
         Some s when p_auth -> s
       | _ -> ""
       end
@@ -4105,7 +4103,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4127,7 +4125,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4148,7 +4146,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4204,7 +4202,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4425,7 +4423,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4442,7 +4440,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let s =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_file_path = Notes.file_path conf;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
@@ -4510,7 +4508,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4634,7 +4632,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -4743,10 +4741,10 @@ and string_of_died conf p p_auth =
 and string_of_image_url conf base (p, p_auth) html =
   if p_auth then
     let v =
-      image_and_size conf base p "" (limited_image_size max_im_wid max_im_wid)
+      image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
     in
     match v with
-      Some (true, fname, _) ->
+      Some (`File fname, _) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
         let k = default_image_name base p in
@@ -4754,7 +4752,7 @@ and string_of_image_url conf base (p, p_auth) html =
           (if html then "H" else "")
           (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b
           k
-    | Some (false, link, _) -> link
+    | Some (`Url link, _) -> link
     | None -> ""
   else ""
 and string_of_parent_age conf base (p, p_auth) parent =
@@ -6067,9 +6065,7 @@ let gen_interp_templ menu title templ_fname conf base p =
       Vint (max_descendant_level desc_level_table_m)
     in
     let nldb () =
-      let bdir = Util.base_path conf.bname in
-      let fname = Filename.concat bdir "notes_links" in
-      let db = NotesLinks.read_db_from_file fname in
+      let db = NotesLinks.read_db_from_file conf.path.file_notes_links in
       let db = Notes.merge_possible_aliases conf db in Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
@@ -6099,10 +6095,12 @@ let gen_interp_templ menu title templ_fname conf base p =
   in
   if menu then
     let size =
-      match Util.open_etc_file_name conf templ_fname with
-        Some ic ->
-          let fd = Unix.descr_of_in_channel ic in
-          let stats = Unix.fstat fd in close_in ic; stats.Unix.st_size
+      match Util.open_template conf templ_fname with
+      | Some ic ->
+        let fd = Unix.descr_of_in_channel ic in
+        let stats = Unix.fstat fd in
+        close_in ic;
+        stats.Unix.st_size
       | None -> 0
     in
     if size = 0 then Hutil.header conf title
@@ -6203,9 +6201,7 @@ let print_what_links conf base p =
       let fn = Name.lower (sou base (get_first_name p)) in
       let sn = Name.lower (sou base (get_surname p)) in fn, sn, get_occ p
     in
-    let bdir = Util.base_path conf.bname in
-    let fname = Filename.concat bdir "notes_links" in
-    let db = NotesLinks.read_db_from_file fname in
+    let db = NotesLinks.read_db_from_file conf.path.file_notes_links in
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h =

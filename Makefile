@@ -1,4 +1,4 @@
-Makefile.config: configure
+SMakefile.config: configure
 	@if [ -e "$@" ]; then \
 	  echo "configure file has changed. Please rerun ./configure"; exit 1; \
 	else \
@@ -114,11 +114,6 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 	    && rm $@.bak \
 	    && echo " Done!")
 
-lib/gwlib.ml:
-	echo "let prefix =" > $@
-	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
-	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
-
 lib/compilation.ml:
 	echo "let scan_dmy s =" > $@
 	echo "let open Adef in" >> $@
@@ -130,11 +125,13 @@ lib/compilation.ml:
 .PHONY:lib/compilation.ml
 
 %/dune: %/dune.in
-	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
+	sed \
+	-e "s/%%%API%%%/$(API)/g" \
+	-e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
 
 ###### [End] Generated files section
 
-GENERATED_FILES_DEP = lib/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune lib/compilation.ml
+GENERATED_FILES_DEP = $(CAMLP5_FILES:=.ml) lib/dune lib/compilation.ml
 
 ifdef API
 piqi:

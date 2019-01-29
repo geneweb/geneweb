@@ -187,7 +187,7 @@ let write_db bdir db =
   output_string oc magic_notes_links;
   output_value oc (db : notes_links_db);
   close_out oc;
-  Mutil.remove_file fname_back;
+  Mutil.rm fname_back;
   (try Sys.rename fname_def fname_back with Sys_error _ -> ());
   try Sys.rename fname_tmp fname_def with Sys_error _ -> ()
 

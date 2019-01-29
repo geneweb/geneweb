@@ -63,8 +63,6 @@ let check_open fname =
       end;
     raise (Sys_error "invalid access")
 
-(*let check_open fname = Printf.eprintf "Open file: %s\n" fname*)
-
 let open_in fname = check_open fname; Pervasives.open_in fname
 let open_in_bin fname = check_open fname; Pervasives.open_in_bin fname
 let open_out fname = check_open fname; Pervasives.open_out fname

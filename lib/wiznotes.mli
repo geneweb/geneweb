@@ -4,13 +4,11 @@
 open Config
 open Gwdb
 
-val dir : config -> base -> string
-
 val print : config -> base -> unit
-val print_mod : config -> base -> unit
+val print_mod : config -> unit
 val print_mod_ok : config -> base -> unit
-val print_view : config -> base -> unit
+val print_view : config -> unit
 val print_search : config -> base -> unit
 
-val connected_wizards : config -> base -> unit
-val change_wizard_visibility : config -> base -> unit
+val connected_wizards : config -> unit
+val change_wizard_visibility : config -> unit

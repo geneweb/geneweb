@@ -2,14 +2,14 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Gwdb
 open Util
 
 module StrSet = Mutil.StrSet
 
-let file_path conf base fname =
-  List.fold_right Filename.concat
-    [Util.base_path conf.bname; base_notes_dir base] fname ^ ".txt"
+let file_path conf fname =
+  Filename.concat conf.path.dir_notes (fname ^ ".txt")
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -62,8 +62,6 @@ let print_search_form conf from_note =
   Wserver.printf "</table>\n"
 
 let print_whole_notes conf base fnotes title s ho =
-  let _ = Printf.eprintf "Print_whole_notes: %s\n %s\n %s\n" fnotes title s in
-  let _ = flush stderr in
   Hutil.header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
@@ -86,11 +84,11 @@ let print_whole_notes conf base fnotes title s ho =
       Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
     end;
   Wserver.printf "</div>\n";
-  begin match Util.open_etc_file_name conf "summary" with
+  begin match Util.open_template conf "summary" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
-  let file_path = file_path conf base in
+  let file_path = file_path conf in
   let s = string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
   let s =
@@ -118,7 +116,7 @@ let print_notes_part conf base fnotes title s cnt0 =
   Hutil.header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   Hutil.print_link_to_welcome conf true;
-  begin match Util.open_etc_file_name conf "summary" with
+  begin match Util.open_template conf "summary" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
@@ -133,7 +131,7 @@ let print_notes_part conf base fnotes title s cnt0 =
   let mode = "NOTES" in
   let wi =
     {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
-     Wiki.wi_file_path = file_path conf base;
+     Wiki.wi_file_path = file_path conf;
      Wiki.wi_person_exists = person_exists conf base;
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
@@ -179,9 +177,7 @@ let merge_possible_aliases conf db =
     [] db
 
 let notes_links_db conf base eliminate_unlinked =
-  let bdir = Util.base_path conf.bname in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
+  let db = NotesLinks.read_db_from_file conf.path.file_notes_links in
   let db = merge_possible_aliases conf db in
   let db2 =
     List.fold_left
@@ -380,12 +376,9 @@ let print_what_links conf base fnotes =
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-      Some f ->
-        if NotesLinks.check_file_name f <> None then f else ""
+      Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  let _ = Printf.eprintf "Notes: %s\n" fnotes in
-  let _ = flush stderr in
   match p_getenv conf.env "ref" with
     Some "on" -> print_what_links conf base fnotes
   | _ ->
@@ -433,7 +426,7 @@ let update_notes_links_db conf fnotes s =
     in
     loop [] [] 1 0
   in
-  let bdir = Util.base_path conf.bname in
+  let bdir = conf.path.dir_root in
   NotesLinks.update_db bdir fnotes (list_nt, list_ind)
 
 let commit_notes conf base fnotes s =
@@ -441,10 +434,7 @@ let commit_notes conf base fnotes s =
     if fnotes = "" then NotesLinks.PgNotes else NotesLinks.PgMisc fnotes
   in
   let fname = path_of_fnotes fnotes in
-  let fpath =
-    List.fold_right Filename.concat
-      [Util.base_path conf.bname; base_notes_dir base] fname
-  in
+  let fpath = Filename.concat conf.path.dir_notes fname in
   Mutil.mkdir_p (Filename.dirname fpath);
   begin try Gwdb.commit_notes base fname s with
     Sys_error _ -> Hutil.incorrect_request conf; raise Update.ModErr
@@ -463,7 +453,7 @@ let print_mod_ok conf base =
   let read_string = read_notes base in
   let commit = commit_notes conf base in
   let string_filter = string_with_macros conf [] in
-  let file_path = file_path conf base in
+  let file_path = file_path conf in
   let wi =
     {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
      Wiki.wi_file_path = file_path;
@@ -563,7 +553,7 @@ let print_misc_notes conf base =
                  else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
                in
                let c =
-                 let f = file_path conf base (path_of_fnotes f) in
+                 let f = file_path conf (path_of_fnotes f) in
                  if Sys.file_exists f then "" else " style=\"color:red\""
                in
                Wserver.printf "<li class=\"file\">\n";

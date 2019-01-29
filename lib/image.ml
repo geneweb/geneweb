@@ -82,10 +82,10 @@ let print_image_file fname =
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-let print_personal_image conf base p saved =
-  match Util.image_and_size conf base p saved (fun _ _ -> Some (1, 1)) with
-    Some (true, f, _) ->
-      if print_image_file f then () else Hutil.incorrect_request conf
+let print_personal_image ?bak conf base p =
+  match Util.image_and_size ?bak conf base p (fun _ _ -> Some (1, 1)) with
+    Some (`File f, _) ->
+      if not (print_image_file f) then Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
@@ -102,38 +102,40 @@ let print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  let fname = Util.source_image_file_name conf fname in
+  let fname =
+    let fname1 = Filename.concat conf.path.Path.dir_images fname in
+    if Sys.file_exists fname1 then fname1
+    else let fname2 = Filename.concat conf.path.Path.dir_documents fname in
+      if Sys.file_exists fname2 then fname2
+      else Util.search_in_lang_path (Filename.concat "images" fname)
+  in
   if Sys.file_exists fname then
-    if print_image_file fname then ()
-    else Hutil.incorrect_request conf
+    (if not (print_image_file fname) then Hutil.incorrect_request conf)
   else Hutil.error_message conf (Printf.sprintf "Cannot access file %s\n" fname)
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
-(* REORG images *)
 let print conf base =
   match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
   | (Some f, Some p) ->
       let keydir = Util.default_image_name base p in
-      print_source_image conf
-        (String.concat Filename.dir_sep [ "images"; keydir; f])
+      print_source_image conf (Filename.concat keydir f)
   | (Some f, _) ->
       print_source_image conf f
   | (_, Some p) ->
-      print_personal_image conf base p ""
+      print_personal_image conf base p
   | (_, _) -> Hutil.incorrect_request conf
 
 let print_saved conf base =
   match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
   | (Some f, Some p) ->
       let keydir = Util.default_image_name base p in
-      print_source_image conf
-        (String.concat Filename.dir_sep [ "images"; keydir; "saved"; f])
+      print_source_image conf (Filename.concat (Filename.concat keydir "saved") f)
   | (Some f, _) ->
       print_source_image conf f
   | (_, Some p) ->
-      print_personal_image conf base p "saved"
+      print_personal_image ~bak:true conf base p
   | (_, _) -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)

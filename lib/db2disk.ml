@@ -472,7 +472,7 @@ let commit_patches2 db2 =
   output_string oc magic_patch;
   Mutil.output_value_no_sharing oc db2.patches;
   close_out oc;
-  Mutil.remove_file (fname ^ "~");
+  Mutil.rm (fname ^ "~");
   (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
   Sys.rename (fname ^ "1") fname
 

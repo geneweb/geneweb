@@ -2,32 +2,19 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Def
 open Gwdb
 
-let rm fname =
-  if Sys.file_exists fname then Sys.remove fname
-
 let is_hide_names conf p =
   if conf.hide_names || get_access p = Private then true else false
-
-let sharelib =
-  String.concat Filename.dir_sep [Gwlib.prefix; "share"; "geneweb"]
 
 let add_lang_path = Secure.add_lang_path
 
 let set_base_dir = Secure.set_base_dir
 
-let _ = add_lang_path sharelib
+let _ = add_lang_path Path.sharelib
 let _ = add_lang_path Filename.current_dir_name
-(* gwDaemon y rajoute
-let _ = Util.add_lang_path (Util.base_path base_file)
-let _ = Util.add_lang_path (Util.base_path "")
-*)
-
-
-(* REORG cnt_dir *)
-let cnt_dir = ref Filename.current_dir_name
 
 (* Internationalization *)
 
@@ -1111,199 +1098,24 @@ let string_of_witness_kind conf sex witness_kind =
 
 let image_prefix conf = conf.image_prefix
 
-(* REORG base_path *)
-let base_path bname =
-  let (bname, bname_suff) =
-    if Filename.check_suffix bname ".gwb" then
-      (Filename.chop_suffix bname ".gwb", bname)
-    else
-      (bname, bname ^ ".gwb")
-  in
-  #ifdef WINDOWS
-    if bname_suff = ".gwb" then "" else bname_suff
-  #else
-    let bname_suff = if bname_suff = ".gwb" then "" else bname_suff in
-    let bfile_suff =
-      List.fold_left Filename.concat (Secure.base_dir ()) [bname_suff]
-    in
-    if Sys.file_exists bfile_suff then bfile_suff
-    else if String.length bname >= 6 then
-      let dir =
-        List.fold_left
-          Filename.concat
-          (Secure.base_dir ())
-          [String.make 1 bname.[0]; String.make 1 bname.[1]]
-      in
-      let bfile_suff = Filename.concat dir bname_suff in
-      bfile_suff
-      else bfile_suff
-  #endif
-
-(* *******************************************************************  *)
-(*   Search file (template, image...) in gw default directory.          *)
-(*                                                                      *)
-(*   search_in_lang_path cherche dans une succession de dossiers :
-      bases/mybase.gwb/
-      bases
-      -hd (where binaries are sitting, typically gw)
-      .
-      sharelib (GWPREFIX/share/geneweb ou /usr/share/geneweb)
-      (je crois dans cet ordre)
-      Renvoie le chemin completé du fichier recherché                  *)
-(* ******************************************************************* *)
 let search_in_lang_path fname =
-   let rec loop =
+  let rec loop =
     function
-      [] -> fname
+    | [] -> fname
     | d :: dl ->
-        let f = Filename.concat d fname in
-        if Sys.file_exists f then f else loop dl
-    in
-    loop (Secure.lang_path ())
-
-(* REORG search in etc *)
-let gw_etc_file fname =
-  let etc_file =
-    search_in_lang_path
-      (String.concat Filename.dir_sep ["etc"; fname])
+      let f = Filename.concat d fname in
+      if Sys.file_exists f then f else loop dl
   in
-  (* TODO search_in_lang_path cherche déjà dans sharelib
-  let share_file = Filename.concat sharelib fname in *)
-  if Sys.file_exists etc_file then etc_file
-  (* else if Sys.file_exists share_file then share_file *)
-  else ""
+  loop @@ Secure.lang_path ()
 
-let open_gw_etc_file fname =
-  try Some (Secure.open_in (gw_etc_file fname)) with
-    Sys_error _ -> None
+let template_file_path conf fname =
+  Array.fold_left Filename.concat conf.path.dir_root [| "etc" ; fname |]
 
-(* ************************************************************************ *)
-(*  [Fonc] base_etc_file : config -> string -> string                       *)
-(** [Description] : Renvoie le chemin vers le fichier de template passé
-                    en paramètre.
-    [Args] :
-      - conf  : configuration de la base
-      - fname : le fichier de template
-    [Retour] :
-      - string : le chemin vers le fichier de template
-    On recherche successivement dans :
-      - bases/bname.gwb/etc/templ/file   (base)
-      - bases/bname.gwb/etc/file
-      - bases/etc/templ/file         (site)
-      - bases/etc/file
-      - gw/etc/templ/file            (distribution)
-      - default: gw_etc_file
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-(* REORG search in etc *)
-let base_etc_file conf fname =
-  (* gwf default template *)
-  let fname =
-    if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
-    else fname
-  in
-  let config_templ =
-    try
-      let s = List.assoc "template" conf.base_env in
-      let rec loop list i len =
-        if i = String.length s then List.rev (Buff.get len :: list)
-        else if s.[i] = ',' then loop (Buff.get len :: list) (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
-      in
-      loop [] 0 0
-    with
-      Not_found -> [conf.bname; "*"]
-  in
-  let url_templ =
-    match p_getenv conf.env "templ" with
-      Some x when List.mem "*" config_templ -> x
-    | Some x when List.mem x config_templ -> x
-    | Some _ | None ->
-        match config_templ with
-          [] | ["*"] -> ""
-        | x :: _ -> x
-  in
-  let tpl = url_templ :: config_templ in
-  let tpl = List.fold_left
-    (fun accu tpl -> if not (List.mem tpl accu) then tpl :: accu else accu)
-    [] tpl
-  in
-  let tpl = List.rev tpl in
-  let file =
-    let rec loop tpl =
-      match tpl with
-        [] -> ""
-      | t :: l ->
-          let bname_etc_tpl_file =
-            String.concat Filename.dir_sep
-              [base_path conf.bname; "etc"; t; fname ^ ".txt"]
-          in
-          let bname_etc_file =
-            String.concat Filename.dir_sep
-              [base_path conf.bname; "etc"; fname ^ ".txt"]
-          in
-          let bases_etc_tpl_file =
-            String.concat Filename.dir_sep
-              [Secure.base_dir (); "etc"; t; fname ^ ".txt"]
-          in
-          let bases_etc_file =
-            String.concat Filename.dir_sep
-              [Secure.base_dir (); "etc"; fname ^ ".txt"]
-          in
-          let etc_tpl_file =
-            search_in_lang_path
-              (String.concat Filename.dir_sep ["etc"; t; fname ^ ".txt"])
-          in
-          if Sys.file_exists bname_etc_tpl_file then bname_etc_tpl_file
-          else if Sys.file_exists bname_etc_file then bname_etc_file
-          else if Sys.file_exists bases_etc_tpl_file then bases_etc_tpl_file
-          else if Sys.file_exists bases_etc_file then bases_etc_file
-          else if Sys.file_exists etc_tpl_file then etc_tpl_file
-          else loop l
-    in
-    loop tpl
-  in
-  if file <> "" then file
-  else
-    search_in_lang_path
-      (String.concat Filename.dir_sep ["etc"; fname ^ ".txt"])
-
-let open_base_etc_file conf fname =
-  try Some (Secure.open_in (base_etc_file conf fname)) with
-    Sys_error _ -> None
-
-(* TODO laquelle des deux implémentation retenir?? *)
-(*
-let open_etc_file fname =
-  try Some (Secure.open_in (etc_file fname)) with
-    Sys_error _ -> None
-*)
-(* REORG open etc file *)
-(* TODO allow sub folders? *)
-
-let open_etc_file conf fname =
-  let fname1 =
-    String.concat Filename.dir_sep
-      [base_path conf.bname; "etc"; (Filename.basename fname ^ ".txt")]
-  in
-  let fname2 =
-    search_in_lang_path
-      (String.concat Filename.dir_sep
-        ["etc"; (Filename.basename fname ^ ".txt")])
-  in
-  try Some (Secure.open_in fname1) with
-    Sys_error _ ->
-      try Some (Secure.open_in fname2) with
-        Sys_error _ -> None
-
-
-let open_etc_file_name conf fname =
-  let file = base_etc_file conf fname in
-  try Some (Secure.open_in file) with
-    Sys_error m ->
-        let _ = Printf.eprintf "Error: %s, %s\n" file m in
-        let _ = flush stderr in
-        None
+let open_template conf fname =
+  try Some (Secure.open_in @@ template_file_path conf fname)
+  with Sys_error _ ->
+  try Some (Secure.open_in @@ search_in_lang_path (Filename.concat "etc" fname) )
+  with Sys_error _ -> None
 
 let body_prop conf =
   try
@@ -1426,7 +1238,7 @@ let message_to_wizard conf =
     let print_file fname =
       let fname =
         String.concat Filename.dir_sep
-          [base_path conf.bname; "etc"; (fname ^ ".txt")]
+          [conf.path.dir_root; "etc"; (fname ^ ".txt")]
       in
       try
         let ic = Secure.open_in fname in
@@ -2301,26 +2113,9 @@ let string_of_decimal_num conf f =
 let personal_image_file_name conf str =
   let fname1 =
     String.concat
-      Filename.dir_sep [base_path conf.bname; "documents"; "portraits"; str]
+      Filename.dir_sep [conf.path.dir_root; "documents"; "portraits"; str]
   in
   fname1
-
-(* other images and icons *)
-(* 1 & 2 base specific, 3 site specific, 4 distribution *)
-let source_image_file_name conf str =
-  let fname1 =
-    String.concat
-      Filename.dir_sep [base_path conf.bname; "documents"; str]
-  in
-  let fname2 =
-    String.concat
-      Filename.dir_sep [base_path conf.bname; "documents"; "images"; str]
-  in
-  let fname3 =
-        search_in_lang_path (Filename.concat "images" str)
-  in
-  if Sys.file_exists fname1 then fname1 else
-  if Sys.file_exists fname2 then fname2 else fname3
 
 (* icons images *)
 let image_file_name str =
@@ -2483,7 +2278,7 @@ let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
   let fname = String.concat
-      Filename.dir_sep [base_path conf.bname; "etc"; "config.txt"]
+      Filename.dir_sep [conf.path.dir_root; "etc"; "config.txt"]
   in
 
   let tmp_fname = fname ^ "2" in
@@ -2494,7 +2289,7 @@ let write_default_sosa conf key =
   List.iter (fun (k, v) -> Pervasives.output_string oc (k ^ "=" ^ v ^ "\n"))
     gwf;
   close_out oc;
-  rm (fname ^ "~") ;
+  Mutil.rm (fname ^ "~") ;
   Sys.rename fname (fname ^ "~") ;
   try Sys.rename tmp_fname fname with Sys_error _ -> ()
 
@@ -2518,7 +2313,7 @@ let create_topological_sort conf base =
       Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Array.make (nb_of_persons base) 0
   | _ ->
-      let bfile = base_path conf.bname in
+      let bfile = conf.path.dir_root in
       Lock.control (Mutil.lock_file bfile) false
         ~onerror:(fun () ->
             let () = load_ascends_array base in
@@ -2591,44 +2386,20 @@ let sosa_of_branch ipl =
 
 let space_to_unders = Mutil.tr ' ' '_'
 
-
-(* ************************************************************************** *)
-(*  [Fonc] default_image_name_of_key : string -> string -> int -> string      *)
-(** [Description] : Renvoie à partir de la clé d'une personne, le nom par
-                    défaut de son image (portrait).
-                    Par exemple, Jean Claude DUPOND 3 => jean_claude.3.dupond
-    [Args] :
-      - fnam : first name
-      - snam : surname
-      - occ  : occ
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                               *)
-(* ************************************************************************** *)
 let default_image_name_of_key fnam surn occ =
   let f = space_to_unders (Name.lower fnam) in
   let s = space_to_unders (Name.lower surn) in
   f ^ "." ^ string_of_int occ ^ "." ^ s
 
-
-(* *********************************************************************** *)
-(*  [Fonc] default_image_name : base -> person -> string                   *)
-(** [Description] : Renvoie à partir d'une personne, le nom par défaut de
-                    son image (portrait) => voir default_image_name_of_key.
-    [Args] :
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                            *)
-(* *********************************************************************** *)
 let default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
-(* REORG portraits *)
-let auto_image_file conf base p saved =
+
+let auto_image_file ?bak:(b=false) conf base p =
   let s = default_image_name base p in
-  let f = (* TODO if // in pathname is not accepted, then duplicate this line *)
-    String.concat
-      Filename.dir_sep [base_path conf.bname; "documents"; "portraits"; saved; s]
+  let f =
+    Filename.concat
+      (if b then conf.path.dir_portraits_bak else conf.path.dir_portraits) s
   in
   if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
@@ -2637,29 +2408,20 @@ let auto_image_file conf base p saved =
 
 let keydir conf base p =
   let s = default_image_name base p in
-  let f =
-    String.concat
-      Filename.dir_sep [base_path conf.bname; "documents"; "images"; s]
-  in
-  try if Sys.is_directory f then Some f
-  else None
+  let f = Filename.concat conf.path.dir_images s in
+  try if Sys.is_directory f then Some f else None
   with Sys_error _ -> None
 
 let keydir_old conf base p =
   let s = default_image_name base p in
-  let f =
-    String.concat
-      Filename.dir_sep [base_path conf.bname; "documents"; "images"; s; "saved"]
-  in
-  try if Sys.is_directory f then Some f
-  else None
+  let f = List.fold_left Filename.concat conf.path.dir_images [ s ; "saved" ] in
+  try if Sys.is_directory f then Some f else None
   with Sys_error _ -> None
 
 let get_keydir_img_notes conf base p fname =
   let k = default_image_name base p in
   let fname =
-    String.concat Filename.dir_sep
-      [base_path conf.bname; "documents"; "images"; k; (fname ^ ".txt")]
+    List.fold_left Filename.concat conf.path.dir_images [ k ; fname ^ ".txt" ]
   in
   let s = if Sys.file_exists fname then
     let ic = Secure.open_in fname in
@@ -2671,8 +2433,7 @@ let get_keydir_img_notes conf base p fname =
 let out_keydir_img_notes conf base p fname s =
   let k = default_image_name base p in
   let fname =
-    String.concat Filename.dir_sep
-      [base_path conf.bname; "documents"; "images"; k; (fname ^ ".txt")]
+    List.fold_left Filename.concat conf.path.dir_images [ k ; fname ^ ".txt" ]
   in
   try
     let oc = Secure.open_out fname in
@@ -2683,7 +2444,7 @@ let out_keydir_img_notes conf base p fname s =
 let get_keydir_old conf base p =
   match keydir_old conf base p with
     Some f ->
-      List.fold_right (fun f1 l ->
+      Array.fold_right (fun f1 l ->
         if f1.[0] <> '.' && Filename.extension f1 <> ".txt" &&
           ( Filename.extension f1 = ".jpg" ||
             Filename.extension f1 = ".gif" ||
@@ -2691,13 +2452,13 @@ let get_keydir_old conf base p =
         then
           (* vérifier ici le type des images autorisées  *)
           ( f1 :: l ) else l)
-          (Array.to_list (Sys.readdir f)) []
+          (Sys.readdir f) []
   | None -> []
 
 let get_keydir conf base p =
   match keydir conf base p with
     Some f ->
-      List.fold_right (fun f1 l ->
+      Array.fold_right (fun f1 l ->
         if f1.[0] <> '.' && Filename.extension f1 <> ".txt" &&
           ( Filename.extension f1 = ".jpg" ||
             Filename.extension f1 = ".gif" ||
@@ -2705,31 +2466,15 @@ let get_keydir conf base p =
         then
           (* vérifier ici le type des images autorisées  *)
           ( f1 :: l ) else l)
-          (Array.to_list (Sys.readdir f)) []
+          (Sys.readdir f) []
   | None -> []
 
-(* ********************************************************************** *)
-(*  [Fonc] image_and_size : config -> base -> person ->                   *)
-(*                          string -> image_size                          *)
-(** [Description] : Renvoie la source de l'image ainsi que sa taille.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de données
-      - p    : personne
-      - saved: "" or "saved" où peut être une sauvegarde du portrait
-      [Retour] :
-        - is_filename : indique si la source de l'image est un nom de
-                        fichier ou une URL.
-        - source
-        - image_size
-    [Rem] : Exporté en clair hors de ce module.                            *)
-(* *********************************************************************** *)
-let image_and_size conf base p saved image_size =
+let image_and_size ?bak conf base p image_size =
   if not conf.no_image && authorized_age conf base p then
     match sou base (get_image p) with
       "" ->
-        begin match auto_image_file conf base p saved with
-          Some f -> Some (true, f, image_size f None)
+        begin match auto_image_file ?bak conf base p with
+          Some f -> Some (`File f, image_size f None)
         | None -> None
         end
     | s ->
@@ -2753,17 +2498,17 @@ let image_and_size conf base p saved image_size =
            String.length s > String.length https &&
            String.sub s 0 (String.length https) = https
         then
-          Some (false, s, size)
+          Some (`Url s, size)
         else if Filename.is_implicit s then
           match
             try Some (List.assoc "images_path" conf.base_env) with
               Not_found -> None
           with
-            Some p when p <> "" -> Some (false, p ^ s, size)
+            Some p when p <> "" -> Some (`Url (p ^ s), size)
           | _ ->
               let fname = personal_image_file_name conf s in
               if Sys.file_exists fname then
-                Some (true, fname, image_size fname None)
+                Some (`File fname, image_size fname None)
               else None
         else None
   else None
@@ -2784,7 +2529,7 @@ let has_image conf base p =
     not (is_empty_string (get_image p)) &&
     (conf.wizard || conf.friend ||
      not (string_exists (sou base (get_image p)) "/private/")) ||
-    auto_image_file conf base p "" <> None
+    auto_image_file conf base p <> None
   else false
 
 let has_keydir conf base p =
@@ -2966,7 +2711,7 @@ let (ht_cache_info : cache_info_t) = Hashtbl.create 1
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let cache_info conf =
-  Filename.concat (base_path conf.bname) "cache_info"
+  Filename.concat conf.path.dir_root "cache_info"
 
 
 (* ************************************************************************ *)
@@ -3093,11 +2838,7 @@ let commit_patches conf base =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname =
-        String.concat Filename.dir_sep
-          [base_path conf.bname; "etc"; "cnt"; "update.log"]
-      in
-      update_wf_trace conf fname
+      update_wf_trace conf conf.path.file_update_log
 
 let short_f_month m =
   match m with
@@ -3120,9 +2861,9 @@ let short_f_month m =
 
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
-(* TODO provide bname *)
 let read_gen_auth_file fname =
-  let fname = Filename.concat (base_path "") fname in
+  let conf_path = Path.path_from_bname "" in (* FIXME *)
+  let fname = Filename.concat conf_path.dir_password fname in
   try
     let ic = Secure.open_in fname in
     let rec loop data =
@@ -3544,7 +3285,7 @@ type cache_visited_t = (string, (iper * string) list) Hashtbl.t
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let cache_visited conf =
-  Filename.concat (base_path conf.bname) "cache_visited"
+  Filename.concat conf.path.dir_root "cache_visited"
 
 
 (* ************************************************************************ *)
@@ -3690,17 +3431,6 @@ let nb_char_occ c s =
   String.iter (fun x -> if x = c then incr cnt) s ;
   !cnt
 
-let rec filter_map fn = function
-  | [] -> []
-  | hd :: tl ->
-    match fn hd with
-    | Some x -> x :: filter_map fn tl
-    | None -> filter_map fn tl
-
-let rec rev_iter fn = function
-  | [] -> ()
-  | hd :: tl -> let () = rev_iter fn tl in fn hd
-
 let print_version_commit () =
   Printf.eprintf "GeneWeb %s, commit %s\n" Version.txt Compilation.commit;
   exit 0
@@ -3752,21 +3482,3 @@ let str_sub ?pad str start len =
       let bytes = Bytes.make (i - start + len - n) pad in
       Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str);
       Bytes.unsafe_to_string bytes
-
-let ls_r dirs =
-  let rec loop result = function
-    | f :: fs when Sys.is_directory f ->
-      Sys.readdir f
-      |> Array.to_list
-      |> List.rev_map (Filename.concat f)
-      |> List.rev_append fs
-      |> loop (f :: result)
-    | f :: fs -> loop (f :: result) fs
-    | [] -> result
-  in
-  loop [] dirs
-
-let rm_rf dir =
-  let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
-  List.iter Unix.unlink files ;
-  List.iter Unix.rmdir directories

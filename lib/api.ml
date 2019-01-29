@@ -7,6 +7,7 @@ module Mapp = Api_app_piqi
 module Mext_app = Api_app_piqi_ext
 
 open Config
+open Path
 open Def
 open Gwdb
 open Util
@@ -50,7 +51,7 @@ let print_info_base conf base =
   in
   let last_modified_person =
     try
-      let ic = Secure.open_in_bin (History.file_name conf) in
+      let ic = Secure.open_in_bin conf.path.Path.file_history in
       let (_, pos, wiz) = (1, in_channel_length ic, "") in
       let vv = (ref (Bytes.create 0), ref 0) in
       let last_modified_person =
@@ -436,7 +437,7 @@ let print_last_modified_persons conf base =
   in
   let list =
     match
-      try Some (Secure.open_in_bin (History.file_name conf))
+      try Some (Secure.open_in_bin conf.path.Path.file_history)
       with Sys_error _ -> None
     with
     | Some ic ->
@@ -818,19 +819,14 @@ let print_img_person conf base =
   let ip = Int32.to_int id.M.Index.index in
   let p = poi base (Adef.iper_of_int ip) in
   let img_addr =
-    match sou base (get_image p) with
-    | "" ->
-        (match Util.auto_image_file conf base p "" with
-        | Some file -> file
-        | None -> "")
-    | s -> s
+    Opt.string_default
+      (fun () -> Opt.to_string @@ Util.auto_image_file conf base p)
+      (sou base (get_image p))
   in
   let img_from_ip = M.Image_address.({img = img_addr}) in
   let data = Mext.gen_image_address img_from_ip in
   print_result conf data
 ;;
-
-
 
 (**/**) (* API_UPDT_IMAGE *)
 
@@ -1341,7 +1337,7 @@ module IntSet =
      - timestamp de la création de la base
 *)
 let print_export_info conf export_directory =
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1381,7 +1377,7 @@ let print_export_info conf export_directory =
      - liste des taille Person, Person (proto app)
 *)
 let print_export_person conf export_directory =
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1430,7 +1426,7 @@ let print_export_person conf export_directory =
      - liste des taille Family, Family (proto app)
 *)
 let print_export_family conf export_directory =
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1478,7 +1474,7 @@ let print_export_family conf export_directory =
      - liste des notes individuelles
 *)
 let print_person_note conf export_directory =
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1527,7 +1523,7 @@ let print_person_note conf export_directory =
      - liste des notes familiales
 *)
 let print_family_note conf export_directory =
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1574,7 +1570,7 @@ let export_img conf base =
   for i = 0 to (nb_of_persons base - 1) / 2 do
     let ip = Adef.iper_of_int i in
     let p = poi base ip in
-    let img = Util.auto_image_file conf base p "" in
+    let img = Util.auto_image_file conf base p in
     if not (is_empty_string (get_image p)) || img <> None then
       match img with
       | Some file ->
@@ -1642,7 +1638,7 @@ let build_relative_name base p =
 
 
 let print_index_search conf export_directory =
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1696,9 +1692,9 @@ let print_index_search conf export_directory =
             list_inx := NameSort.add (i, sn, fn, r, date) !list_inx;
             (* Faut il faire si y'a plusieurs espaces ? *)
             (* FIXME: Does order matter or not? If not, use List.iter instead *)
-            Util.rev_iter (fun sn -> add_to_map sn i) (String.split_on_char ' ' sn);
-            Util.rev_iter (fun fn -> add_to_map fn i) (String.split_on_char ' ' fn);
-            Util.rev_iter (fun n -> add_to_map n i) (String.split_on_char ' ' r);
+            Mutil.rev_iter (fun sn -> add_to_map sn i) (String.split_on_char ' ' sn);
+            Mutil.rev_iter (fun fn -> add_to_map fn i) (String.split_on_char ' ' fn);
+            Mutil.rev_iter (fun n -> add_to_map n i) (String.split_on_char ' ' r);
           end
       done;
 
@@ -1790,7 +1786,7 @@ let print_index_search conf export_directory =
     -
 *)
 let print_ascends_index conf export_directory =
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1925,33 +1921,26 @@ open Database;;
 
 let full_synchro conf synchro timestamp =
   let last_import = ref None in
-  let bdir =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
   (* Suppression potentiel du fichier patch. *)
   (match synchro.synch_list with
   | (last_timestamp, _, _) :: _ ->
-      let fname_synchro = Filename.concat bdir "synchro_patches" in
-      let fname_cmd = Filename.concat bdir "command.txt" in
-      (match
-         try Some (open_in (Filename.concat (Util.base_path conf.bname) fname_cmd))
-         with Sys_error _ -> None
-       with
-       | Some ic ->
-           let fd = Unix.descr_of_in_channel ic in
-           let stats = Unix.fstat fd in
-           close_in ic;
-           last_import := Some stats.Unix.st_mtime;
-           if float_of_string last_timestamp < stats.Unix.st_mtime then
-             try Sys.remove fname_synchro with Sys_error _ -> ()
-           else ()
-       | None -> ());
+    if Sys.file_exists conf.path.file_cmd
+    then begin
+      let ic = open_in conf.path.file_cmd in
+      let fd = Unix.descr_of_in_channel ic in
+      let stats = Unix.fstat fd in
+      close_in ic;
+      last_import := Some stats.Unix.st_mtime;
+      if float_of_string last_timestamp < stats.Unix.st_mtime
+      then
+        if Sys.file_exists conf.path.file_synchro_patches
+        then Sys.remove conf.path.file_synchro_patches
+    end
   | _ -> ());
   (* On clean le fichier synchro des trop vieilles modifs. *)
   (match !last_import with
   | Some last_mod ->
-      let bname = Util.base_path conf.bname in
+      let bname = conf.path.dir_root in
       let new_synchro = Database.input_synchro bname in
       let list =
         List.fold_right
@@ -1964,22 +1953,20 @@ let full_synchro conf synchro timestamp =
       (* Si on a rien modifier, ça ne sert à rien de faire la mise à *)
       (* jour du fichier synchro, parce qu'on modifie la date de     *)
       (* dernière modification pour rien.                            *)
-      if synchro = new_synchro then ()
-      else
-        begin
-          let tmp_fname = Filename.concat bname "1synchro_patches" in
-          let fname = Filename.concat bname "synchro_patches" in
-          let oc9 =
-            try Secure.open_out_bin tmp_fname
-            with Sys_error _ ->
-              raise (Adef.Request_failure "the database is not writable")
-          in
-          Mutil.output_value_no_sharing oc9 (synchro : Database.synchro_patch);
-          close_out oc9;
-          Mutil.remove_file (fname ^ "~");
-          (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
-          (try Sys.rename tmp_fname fname with Sys_error _ -> ());
-        end
+      if synchro <> new_synchro then begin
+        let fname = conf.path.file_synchro_patches in
+        let tmp_fname = fname ^ ".tmp" in
+        let oc9 =
+          try Secure.open_out_bin tmp_fname
+          with Sys_error _ ->
+            raise (Adef.Request_failure "the database is not writable")
+        in
+        Mutil.output_value_no_sharing oc9 (synchro : Database.synchro_patch);
+        close_out oc9;
+        Mutil.rm (fname ^ "~") ;
+        Sys.rename fname (fname ^ "~") ;
+        Sys.rename tmp_fname fname ;
+      end
   | _ -> ());
   (* Si timestamp plus petit que import, alors synchro totale. *)
   match !last_import with
@@ -2012,7 +1999,7 @@ let print_synchro_patch_mobile conf base =
   in
 
   (* Récupération du fichier synchro. *)
-  let bname = Util.base_path conf.bname in
+  let bname = conf.path.dir_root in
   let synchro = Database.input_synchro bname in
   (* Toutes les dernières modifications. *)
   let timestamp = float_of_string timestamp in

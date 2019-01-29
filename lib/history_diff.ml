@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Def
 open Gwdb
 open TemplAst
@@ -25,15 +26,12 @@ let history_file fn sn occ =
 
 (* history directory path *)
 let history_d conf =
-  let path =
-    match p_getenv conf.base_env "history_path" with
-    | Some path when path <> "" -> path
-    | _ -> "history"
-  in
-  if Filename.is_relative path then
-    Filename.concat (Util.base_path conf.bname) path
-  else
-    path
+  match p_getenv conf.base_env "history_path" with
+  | Some path when path <> "" ->
+    if Filename.is_relative path
+    then Filename.concat conf.path.dir_root path
+    else path
+  | _ -> conf.path.Path.dir_history
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
 let history_path conf fname =
@@ -376,7 +374,7 @@ let print_clean_ok conf =
       let history = load_person_history conf f in
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
-      if new_history = [] then Util.rm fname
+      if new_history = [] then Mutil.rm fname
       else
         begin let ext_flags =
           [Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock]

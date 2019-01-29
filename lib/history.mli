@@ -5,8 +5,6 @@ open Config
 open Def
 open Gwdb
 
-val file_name : config -> string
-
 val record : config -> base -> (iper, string) base_changed -> string -> unit
 val notify : config -> base -> string -> unit
 

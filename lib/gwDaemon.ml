@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Def
 open Util
 
@@ -123,16 +124,16 @@ let log_passwd_failed ar oc tm from request base_file =
   Printf.fprintf oc "  Agent: %s\n" user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
-let copy_file fname =
-  match Util.open_gw_etc_file fname with
-    Some ic ->
-      begin try
-        while true do let c = input_char ic in Wserver.printf "%c" c done
-      with _ -> ()
-      end;
-      close_in ic;
-      true
-  | None -> false
+let serve_static_template fname =
+  let fname = Filename.concat !Path.etc fname in
+  if Sys.file_exists fname
+  then begin
+    let ic = open_in fname in
+    Wserver.printf "%s" (really_input_string ic @@ in_channel_length ic) ;
+    close_in ic;
+    true
+  end
+  else false
 
 let http status =
   Wserver.http status;
@@ -142,7 +143,7 @@ let robots_txt () =
   Log.with_log (fun oc -> Printf.fprintf oc "Robot request\n");
   Wserver.http HttpStatus.OK;
   Wserver.header "Content-type: text/plain";
-  if copy_file "robots" then ()
+  if serve_static_template "robots.txt" then ()
   else
     begin Wserver.printf "User-Agent: *\n"; Wserver.printf "Disallow: /\n" end
 
@@ -154,7 +155,7 @@ let refuse_log from =
   http HttpStatus.Forbidden;
   Wserver.header "Content-type: text/html";
   Wserver.printf "Your access has been disconnected by administrator.\n";
-  let _ = (copy_file "refuse" : bool) in ()
+  let _ = (serve_static_template "refuse.txt" : bool) in ()
 
 let only_log from =
   Log.with_log
@@ -199,13 +200,13 @@ let rec extract_assoc key =
 
 let input_lexicon lang =
   let ht = Hashtbl.create 501 in
-  let fname = Filename.concat "lang" "lex_utf8.txt" in
+  let fname = Filename.concat !Path.lang "lex_utf8.txt" in
   Mutil.input_lexicon lang ht
     (fun () -> Secure.open_in (Util.search_in_lang_path fname));
   ht
 
 let add_lexicon fname lang ht =
-  let fname = Filename.concat "lang" fname in
+  let fname = Filename.concat !Path.lang fname in
   Mutil.input_lexicon lang ht
     (fun () -> Secure.open_in (Util.search_in_lang_path fname))
 
@@ -253,17 +254,13 @@ let strip_trailing_spaces s =
   in
   String.sub s 0 len
 
-(* REORG config *)
 let read_base_env bname =
-  let fname = String.concat
-    Filename.dir_sep [base_path bname; "etc"; "config.txt"]
-  in
-  let d1 =
-    String.concat
-      Filename.dir_sep [base_path bname; "etc"; "cnt"]
-  in
-  (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());
-  try
+  let conf_path = Path.path_from_bname bname in
+  let fname = conf_path.file_conf in
+  if not (Sys.file_exists conf_path.dir_cnt) then
+    Mutil.mkdir_p conf_path.dir_cnt ;
+  if Sys.file_exists conf_path.file_conf
+  then begin
     let ic = Secure.open_in fname in
     let env =
       let rec loop env =
@@ -276,8 +273,10 @@ let read_base_env bname =
       in
       loop []
     in
-    close_in ic; env
-  with Sys_error _ -> []
+    close_in ic ;
+    env
+  end
+  else []
 
 let print_renamed conf new_n =
   let link =
@@ -296,7 +295,7 @@ let print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf.request ^ new_req
   in
   let env = ["old", conf.bname; "new", new_n; "link", link] in
-  match Util.open_etc_file_name conf "renamed" with
+  match Util.open_template conf "renamed" with
     Some ic -> Util.html conf; Templ.copy_from_templ conf env ic
   | None ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
@@ -310,9 +309,8 @@ let print_renamed conf new_n =
       Hutil.trailer conf
 
 let log_redirect from request req =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
-    ~onerror:(fun () -> ())
-    (fun () ->
+  Lock.control (Lazy.force Path.gwd_lock_file) true
+    ~onerror:(fun () -> ()) (fun () ->
        Log.with_log
          (fun oc ->
             let referer = Wserver.extract_param "referer: " '\n' request in
@@ -327,7 +325,7 @@ let print_redirected conf from request new_addr =
   let link = "http://" ^ new_addr ^ req in
   let env = ["link", link] in
   log_redirect from request req;
-  match Util.open_etc_file_name conf "redirect" with
+  match Util.open_template conf "redirect" with
     Some ic ->
       let conf = {conf with is_printed_by_template = false} in
       Util.html conf; Templ.copy_from_templ conf env ic
@@ -359,15 +357,14 @@ let propose_base conf =
   Hutil.trailer conf
 
 let general_welcome conf =
-  match Util.open_etc_file_name conf "index" with
+  match Util.open_template conf "index" with
     Some ic -> Util.html conf; Templ.copy_from_templ conf [] ic
   | None -> propose_base conf
 
 let nonce_private_key =
   Lazy.from_fun
     (fun () ->
-       let cnt_dir = Filename.concat !(Util.cnt_dir) "cnt" in
-       let fname = Filename.concat cnt_dir "gwd_private.txt" in
+       let fname = Filename.concat !Path.cnt "gwd_private.txt" in
        let k =
          try
            let ic = open_in fname in
@@ -525,7 +522,7 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
   (not check_from || addr1 = addr2) && base1_pw1 = base2_pw2
 
 let get_actlog check_from utm from_addr base_password =
-  let fname = Srcfile.adm_file "actlog" in
+  let fname = Filename.concat !Path.cnt "actlog" in
   try
     let ic = Secure.open_in fname in
       let tmout = float_of_int !login_timeout in
@@ -567,7 +564,7 @@ let get_actlog check_from utm from_addr base_password =
   with Sys_error _ -> [], ATnormal, false
 
 let set_actlog list =
-  let fname = Srcfile.adm_file "actlog" in
+  let fname = Filename.concat !Path.cnt "actlog" in
   try
     let oc = Secure.open_out fname in
     List.iter
@@ -579,7 +576,7 @@ let set_actlog list =
   with Sys_error _ -> ()
 
 let get_token check_from utm from_addr base_password =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
+  Lock.control (Lazy.force Path.gwd_lock_file) true
     ~onerror:(fun () -> ATnormal)
     (fun () ->
        let (list, r, changed) =
@@ -601,7 +598,7 @@ let random_self_init () =
   Random.init seed
 
 let set_token utm from_addr base_file acc user =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
+  Lock.control (Lazy.force Path.gwd_lock_file) true
     ~onerror:(fun () -> "")
     (fun () ->
        random_self_init ();
@@ -1151,9 +1148,6 @@ let make_conf from_addr request script_name env =
     with Not_found -> !default_lang
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  (* REORG search in bases/mybase.gwb/ and bases/ *)
-  let _ = Util.add_lang_path (Util.base_path "") in
-  let _ = Util.add_lang_path (Util.base_path base_file) in
   List.iter
     (fun fname ->
        add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
@@ -1190,6 +1184,7 @@ let make_conf from_addr request script_name env =
   let wizard_just_friend = if manitou then false else wizard_just_friend in
   let conf =
     {from = from_addr;
+     path = Path.path_from_bname base_file;
 #ifdef API
      api_host = !selected_api_host;
      api_port = !selected_api_port;
@@ -1289,12 +1284,12 @@ let make_conf from_addr request script_name env =
      charset = "UTF-8"; is_rtl = is_rtl;
      left = if is_rtl then "right" else "left";
      right = if is_rtl then "left" else "right";
-     auth_file =
-       begin try
-         let x = List.assoc "auth_file" base_env in
-         if x = "" then !auth_file else Filename.concat (Util.base_path base_file) x
-       with Not_found -> !auth_file
-       end;
+     (* auth_file =
+      *   begin try
+      *     let x = List.assoc "auth_file" base_env in
+      *     if x = "" then !auth_file else Filename.concat (Util.base_path base_file) x
+      *   with Not_found -> !auth_file
+      *   end; *)
      border =
        begin match Util.p_getint env "border" with
          Some i -> i
@@ -1317,67 +1312,59 @@ let make_conf from_addr request script_name env =
 
 let log_and_robot_check conf auth from request script_name contents =
   if !robot_xcl = None then
-    Log.with_log
-      (fun oc ->
-         let tm = Unix.time () in
-         log oc tm conf from auth request script_name contents)
+    Log.with_log @@ fun oc ->
+    log oc (Unix.time ()) conf from auth request script_name contents
   else
-    Lock.control (Srcfile.adm_file "gwd.lck") true
-      ~onerror:ignore
-      (fun () ->
-         Log.with_log_opt
-           (fun oc_opt ->
-              let tm = Unix.time () in
-              begin match !robot_xcl with
-                  Some (cnt, sec) ->
-                  let s = "suicide" in
-                  let suicide = Util.p_getenv conf.env s <> None in
-                  conf.n_connect <-
-                    Some (Robot.check oc_opt tm from cnt sec conf suicide)
-                | _ -> ()
-              end;
-              match oc_opt with
-                Some oc ->
-                log oc tm conf from auth request script_name contents
-              | None -> ()))
+    Lock.control (Lazy.force Path.gwd_lock_file) true ~onerror:ignore (fun () ->
+        Log.with_log_opt @@ fun oc_opt ->
+        let tm = Unix.time () in
+        begin match !robot_xcl with
+          | Some (cnt, sec) ->
+            let suicide = Util.p_getenv conf.env "suicide" <> None in
+            conf.n_connect <-
+              Some (Robot.check oc_opt tm from cnt sec conf suicide)
+          | _ -> ()
+        end;
+        Opt.iter
+          (fun oc -> log oc tm conf from auth request script_name contents)
+          oc_opt)
 
 let is_robot from =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
-    ~onerror:(fun () -> false)
+  Lock.control (Lazy.force Path.gwd_lock_file) true ~onerror:(fun () -> false)
     (fun () ->
        let (robxcl, _) = Robot.robot_excl () in
        List.mem_assoc from robxcl.Robot.excl)
 
-let auth_err request auth_file =
-  if auth_file = "" then false, ""
-  else
-    let auth = Wserver.extract_param "authorization: " '\r' request in
-    if auth <> "" then
-      match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
-        Some ic ->
-          let auth =
-            let i = String.length "Basic " in
-            Base64.decode (String.sub auth i (String.length auth - i))
-          in
-          begin try
-            let rec loop () =
-              if auth = input_line ic then
-                begin
-                  close_in ic;
-                  let s =
-                    try
-                      let i = String.rindex auth ':' in String.sub auth 0 i
-                    with Not_found -> "..."
-                  in
-                  false, s
-                end
-              else loop ()
-            in
-            loop ()
-          with End_of_file -> close_in ic; true, auth
-          end
-      | _ -> true, "(auth file '" ^ auth_file ^ "' not found)"
-    else true, "(authorization not provided)"
+(* let auth_err request auth_file =
+ *   if auth_file = "" then false, ""
+ *   else
+ *     let auth = Wserver.extract_param "authorization: " '\r' request in
+ *     if auth <> "" then
+ *       match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
+ *         Some ic ->
+ *           let auth =
+ *             let i = String.length "Basic " in
+ *             Base64.decode (String.sub auth i (String.length auth - i))
+ *           in
+ *           begin try
+ *             let rec loop () =
+ *               if auth = input_line ic then
+ *                 begin
+ *                   close_in ic;
+ *                   let s =
+ *                     try
+ *                       let i = String.rindex auth ':' in String.sub auth 0 i
+ *                     with Not_found -> "..."
+ *                   in
+ *                   false, s
+ *                 end
+ *               else loop ()
+ *             in
+ *             loop ()
+ *           with End_of_file -> close_in ic; true, auth
+ *           end
+ *       | _ -> true, "(auth file '" ^ auth_file ^ "' not found)"
+ *     else true, "(authorization not provided)" *)
 
 let no_access conf =
   let title _ = Wserver.printf "Error" in
@@ -1390,10 +1377,10 @@ let conf_and_connection from request script_name contents env =
   match !redirected_addr with
     Some addr -> print_redirected conf from request addr
   | None ->
-      let (auth_err, auth) =
-        if conf.auth_file = "" then false, ""
-        else if !(Wserver.cgi) then true, ""
-        else auth_err request conf.auth_file
+      let (auth_err, auth) = false, ""
+        (* if conf.auth_file = "" then false, ""
+         * else if !(Wserver.cgi) then true, ""
+         * else auth_err request conf.auth_file *)
       in
       let mode = Util.p_getenv conf.env "m" in
       if mode <> Some "IM" then
@@ -1420,7 +1407,7 @@ let conf_and_connection from request script_name contents env =
           if is_robot from then Robot.robot_error conf 0 0
           else
             let tm = Unix.time () in
-            Lock.control (Srcfile.adm_file "gwd.lck") true
+            Lock.control (Lazy.force Path.gwd_lock_file) true
               ~onerror:(fun () -> ())
               (fun () ->
                  Log.with_log
@@ -1563,7 +1550,7 @@ let print_misc_file misc_fname =
   | Other _ -> false
 
 let misc_request fname =
-  let fname = Util.gw_etc_file fname in
+  let fname = Filename.concat !Path.etc fname in
   if fname <> "" then
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
@@ -1767,8 +1754,7 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-      try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o777 with
-        Unix.Unix_error (_, _, _) -> ()
+      Mutil.mkdir_p !Path.cnt
     end;
   Wserver.f !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection
@@ -1790,9 +1776,7 @@ let manage_cgi_timeout tmout =
 let geneweb_cgi addr script_name contents =
   Log.fallback_to_stderr := false;
   if Sys.unix then manage_cgi_timeout !conn_timeout;
-  begin try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o755 with
-    Unix.Unix_error (_, _, _) -> ()
-  end;
+  Mutil.mkdir_p !Path.cnt ;
   let add k x request =
     try
       let v = Sys.getenv x in
@@ -1853,15 +1837,10 @@ let slashify s =
   in
   String.init (String.length s) conv_char
 
-let make_cnt_dir x =
-  Mutil.mkdir_p x;
-  if Sys.unix then ()
-  else
-    begin
-      Wserver.sock_in := Filename.concat x "gwd.sin";
-      Wserver.sock_out := Filename.concat x "gwd.sou"
-    end;
-  Util.cnt_dir := x
+let init_windows_sockets x =
+  assert (not Sys.unix) ;
+  Wserver.sock_in := Filename.concat x "gwd.sin";
+  Wserver.sock_out := Filename.concat x "gwd.sou"
 
 let main ~speclist () =
   if Sys.unix then ()
@@ -1873,12 +1852,12 @@ let main ~speclist () =
   let force_cgi = ref false in
   let speclist =
     ("-hd", Arg.String Util.add_lang_path,
-     "<dir>\n       Directory where the directory lang is installed.") ::
+     "<dir>\n       Directory where the static files are installed (templates, icons, lexicon).") ::
     ("-bd", Arg.String Util.set_base_dir,
      "<dir>\n       Directory where the databases are installed.") ::
-    ("-wd", Arg.String make_cnt_dir,
+    ("-wd", Arg.String init_windows_sockets,
      "<dir>\n       \
-      Directory for socket communication (Windows) and access count.") ::
+      Directory for socket communication (Windows only).") ::
     ("-cgi", Arg.Set force_cgi, "\n       Force CGI mode.") ::
     ("-images_url", Arg.String (fun x -> images_url := x),
      "<url>\n       URL for GeneWeb images (default: gwd send them)") ::
@@ -2030,10 +2009,8 @@ let main ~speclist () =
     in
       images_url := "file://" ^ slashify abs_dir
     end;
-  if !(Util.cnt_dir) = Filename.current_dir_name then
-    Util.cnt_dir := Secure.base_dir ();
-  Wserver.stop_server :=
-    List.fold_left Filename.concat !(Util.cnt_dir) ["cnt"; "STOP_SERVER"];
+  if !Path.cnt = Filename.current_dir_name then Path.cnt := Filename.concat (Secure.base_dir ()) "cnt" ;
+  Wserver.stop_server := List.fold_left Filename.concat !Path.cnt ["STOP_SERVER"];
   let (query, cgi) =
     try Sys.getenv "QUERY_STRING", true with Not_found -> "", !force_cgi
   in

@@ -10,6 +10,10 @@ let map_default default fn = function Some x -> fn x | None -> default
 
 let default x = function Some x -> x | _ -> x
 
+let string_default def = function "" -> def () | x -> x
+
+let string_map_default default fn = function "" -> default () | x -> fn x
+
 let of_string = function "" -> None | s -> Some s
 
 let to_string = function None -> "" | Some s -> s
