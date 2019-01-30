@@ -689,6 +689,13 @@ let rec eval_variable conf =
         Util.escape_html (Wserver.gen_decode false vv)
       with Not_found -> ""
       end
+  | ["evar"; n; v] ->
+      begin match Util.p_getenv (conf.env @ conf.henv) v with
+        Some vv ->
+          let n = int_of_string n in
+          if String.length vv > n then String.sub vv 0 n else vv
+      | None -> ""
+      end
   | ["evar"; v] ->
       begin match Util.p_getenv (conf.env @ conf.henv) v with
         Some vv -> Util.escape_html vv
