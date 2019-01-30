@@ -1326,6 +1326,7 @@ and eval_simple_str_var conf _base env _xx =
   | "ini" -> eval_string_env "ini" env
   | "substr" -> eval_string_env "substr" env
   | "cnt" -> eval_int_env "cnt" env
+  | "max" -> eval_int_env "max" env
   | "tail" -> eval_string_env "tail" env
   | "keys" ->
       let k =
@@ -1369,6 +1370,11 @@ and eval_compound_var conf base env xx sl =
     | ["evar"; "p"; s] ->
         begin match p_getenv conf.env s with
           Some s -> if String.length s > 1 then String.sub s 0 (String.length s - 1) else ""
+        | None -> ""
+        end
+    | ["evar"; "length"; s] ->
+        begin match p_getenv conf.env s with
+          Some s -> string_of_int (String.length s)
         | None -> ""
         end
     | ["evar"; s] ->
@@ -1419,6 +1425,7 @@ let print_foreach conf print_ast _eval_expr =
         | [] -> acc
       in loop [] list_of_char
     in
+    let max = List.length list_of_sub in
     let rec loop first cnt =
       function
       | s :: l ->
@@ -1429,6 +1436,7 @@ let print_foreach conf print_ast _eval_expr =
               ("substr", Vstring s) ::
               ("tail", Vstring tail) ::
               ("first", Vbool first) ::
+              ("max", Vint max) ::
               ("cnt", Vint cnt) :: env
             in
             List.iter (print_ast env xx) al ;

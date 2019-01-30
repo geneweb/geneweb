@@ -212,6 +212,7 @@ and eval_simple_str_var _conf _base env _xx =
   function
   | "substr" -> eval_string_env "substr" env
   | "cnt" -> eval_int_env "cnt" env
+  | "max" -> eval_int_env "max" env
   | "tail" -> eval_string_env "tail" env
   | "keys" ->
       let k =
@@ -572,7 +573,7 @@ let print_places_surnames conf base array long searchl=
         Wserver.printf "<a href=\"%sm=PS%s%s%s%s%s%s\">%s %s “%s”</a>\n"
           (commd conf)
           (if k1 <> "" then "&k1=" ^ k1 else "")
-          (if k2 <> "" then "&k2=" ^ k2 else "") opt 
+          (if k2 <> "" then "&k2=" ^ k2 else "") opt
           (if substr then "&substr=on" else "")
           (if exact then "&exact=on" else "") search
           (capitale (transl_nth conf "visualize/show/hide/summary" 1))

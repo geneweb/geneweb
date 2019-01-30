@@ -39,16 +39,43 @@
       </div>
     </div>
   </div>%)
+  %let;maxs;%evar.length.s;%in;
+  %let;nbs;%if;(evar.nbs<=maxs)%evar.nbs;%else;%maxs;%end;%in;
   <div class="col-auto">
+    <a role="button" class="btn pl-3"%sp;
+      title="[*delete] 1 [substr]"%sp;
+      href="%prefix_base_password;%nn;
+          %foreach;env_binding;
+            %if;(env.key="nbs" and evar.nbs>1)&nbs=%expr(evar.nbs-1)%nn;
+            %elseif;(env.key!="")&%env.key=%env.val;%nn;
+            %end;
+          %end;">%nn;
+      <i class="fa fa-minus fa-lg %if;(evar.nbs<2) disabled text-muted%end;" aria-hidden="true"></i>
+      <span class="sr-only">-</span>
+    </a>
+    <span class="sr-only">/</span>
+    <a role="button" class="btn pl-2"%sp;
+      title="[*add] 1 [substr]0"%sp;
+      href="%prefix_base_password;%nn;
+            %foreach;env_binding;
+              %if;(env.key="nbs" and evar.nbs<maxs)&nbs=%expr(evar.nbs+1)%nn;
+              %elseif;(env.key!="")&%env.key=%env.val;%nn;
+              %end;
+            %end;">%nn;
+      <i class="fa fa-plus fa-lg %if;(evar.nbs>maxs-1) disabled text-muted%end;" aria-hidden="true"></i>%nn;
+      <span class="sr-only">+</span>%nn;
+    </a>
     <div class="col-auto btn-group" role="toolbar" aria-label="sub-selection">
-      %if;(evar.s!="")<a class="mr-2" href="%prefix;m=MOD_DATA&data=%evar.data;" title="Index"><i class="fa fa-book fa-lg"></i></a>%end;
+      %if;(evar.s!="")<a class="mr-2" href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;" title="Index"><i class="fa fa-book fa-lg"></i></a>%end;
       <div class="btn-group d-flex align-content-around flex-wrap">
         <span class="text-monospace">
           %if;(evar.s!="")>%sp;
-            %foreach;substr.s;<a href="%prefix;m=MOD_DATA&data=%evar.data;&s=%substr;">%substr;</a> > %end;<b>%evar.s;</b>%nn;
+            %foreach;substr.s;
+              %if;(cnt>=max-nbs)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr;">%substr;</a> > %end;%nn;
+            %end;<b>%evar.s;</b>%nn;
           %end;
           %foreach;entry;
-            %sp;<a href="#%entry_ini;">·</a>%sp;<a href="%prefix;m=MOD_DATA&data=%evar.data;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>
+            %sp;<a href="#%entry_ini;">·</a>%sp;<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>
           %end;
         </span>
       </div>
@@ -58,7 +85,7 @@
     %foreach;entry;
       <li class="list-group-item list-group-item-primary py-0 mt-2 justify-content-between">
         <a class="btn btn-link p-0 ml-1" href="#top" title="Return to top" tabindex="-1"><i class="fa fa-arrow-up fa-fw mx-1"></i></a>%nn;
-        <a class="font-weight-bold text-monospace" id="%entry_ini;" href="%prefix;&m=MOD_DATA&data=%evar.data;&s=%html_encode.entry_ini;">%html_encode.entry_ini;</a>
+        <a class="font-weight-bold text-monospace" id="%entry_ini;" href="%prefix;&m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%html_encode.entry_ini;">%html_encode.entry_ini;</a>
       </li>
       <li class="list-unstyled mt-1">
         <ul class="list-group">
@@ -73,7 +100,7 @@
               %end;
               <a role="button" id="%escape.entry_value;" class="btn btn-link text-wrap p-0 ml-2%nn;
                 %if;is_modified; disabled" tabindex="-1" aria-disabled="true%end;"
-                href="%prefix;m=MOD_DATA&data=%evar.data;&%keys;s=%encode.evar.s;">%escape.entry_value;%nn;
+                href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&%keys;s=%encode.evar.s;">%escape.entry_value;%nn;
                 %if;is_modified; <b>([modify])</b>%end;</a>
               %if;is_modified;
                 <form class="form-inline col-12" method="post" action="%action;">
