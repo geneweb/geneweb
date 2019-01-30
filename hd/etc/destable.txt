@@ -55,8 +55,8 @@
   %if;(wizard and not cancel_links)</a>%end;
 %end;
 
-%define;link(aa, xxx)
-  %if;(evar.cgl="on")xxx%else;<a id="i_%xxx.index;" href="%prefix;aa">xxx</a>%end;
+%define;link(aa, xxx, yyy)
+  %if;(evar.cgl="on")xxx%else;<a id="i_yyy" href="%prefix;aa">xxx</a>%end;
 %end;
 
 %define;table_header()
@@ -227,7 +227,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           <div class="align-self-center mr-2">
             %apply;image_MF("xxx")
             %apply;link%with;%xxx.access;%and;
-              %xxx;
+              %xxx;%and;%xxx.index;
             %end;
             %if;(evar.title="on" and xxx.title!=""), %xxx.title;%end;
           </div>
@@ -266,7 +266,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           <div class="align-self-center px-1">
             %apply;image_MF("xxx")
             %apply;link%with;%xxx.access;%and;
-              %xxx;
+              %xxx;%and;%xxx.index;
             %end;
             %if;(evar.title="on" and xxx.title!=""), %xxx.title;%end;
           </div>
@@ -360,7 +360,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %if;(zzz.nb_families>1)<span class="mr-1">%apply;letter(family_cnt)</span>%end;
             %apply;image_MF("spouse")
             %apply;link%with;%spouse.access;%and;
-              %spouse;
+              %spouse;%and;%spouse.index;
             %end;
           </td>
         %end;
@@ -610,7 +610,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %if;(evar.t="A")
     <br>%prfx; %apply;image_MF("xxx")
         %apply;link%with;%xxx.access;%and;
-          %xxx.first_name; %xxx.surname;%nn;
+          %xxx.first_name; %xxx.surname;%nn;%and;%xxx.index;
         %end;%nn;
         %xxx.title;%nn;
     %if;(has_families)
@@ -624,7 +624,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %end;
         %apply;image_MF("xxx.spouse")
         %apply;link%with;%xxx.spouse.access;%and;
-          %xxx.spouse.first_name; %xxx.spouse.surname;
+          %xxx.spouse.first_name; %xxx.spouse.surname;&and;%xxx.spouse.index;
         %end;
         %xxx.spouse.title;
       %end;
@@ -714,7 +714,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %if;("prefx"!="")<br>prefx.%end;
   %sp;%apply;image_MF("xxx")
   %apply;link%with;%xxx.access;%and;
-      %xxx.first_name; %xxx.surname;%nn;
+      %xxx.first_name; %xxx.surname;%nn;%and;%xxx.index;
       %end;
   %if;(xxx.title!=""), %xxx.title;%end;
   %if;(has_families)
@@ -735,7 +735,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <span>
         %sp;%apply;image_MF("xxx.spouse")
         %apply;link%with;%xxx.spouse.access;
-        %and;%xxx.spouse.first_name; %xxx.spouse.surname;
+        %and;%xxx.spouse.first_name; %xxx.spouse.surname;%and;%xxx.spouse.index;
         %end;
         %if;(xxx.spouse.title!=""), %xxx.spouse.title;%end;
       </span>
