@@ -272,7 +272,7 @@ a {
 /* Welcome language dropdown scrollable */
 .scrollable-lang {
   height: auto;
-  max-height: 400px;
+  max-height: 430px;
   overflow-x: hidden;
 }
 
