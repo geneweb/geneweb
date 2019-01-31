@@ -42,6 +42,16 @@
   %let;maxs;%if;(evar.s!="")%evar.length.s;%else;0%end;%in;
   %let;nbs;%if;(evar.nbs<=maxs)%evar.nbs;%else;%maxs;%end;%in;
   <div class="col-auto">
+  <a role="button" class="ml-auto"
+    href="%prefix_base_password;%nn;
+      %foreach;env_binding;%if;(env.val!="" and env.key!="rev")%nn;
+       &%env.key=%env.val;%end;%nn;
+      %end;%nn;
+      %if;(evar.rev!="" and evar.rev!="on")&rev=on%elseif;(evar.rev="")&rev=on%end;%nn;"
+      title="[*invert elements]">
+      <i class="fas fa-arrows-alt-h fa-lg"></i>%nn;
+     </a>%nn;
+
     %if;(evar.s!="")
     <a role="button" class="btn pl-3"%sp;
       title="[*delete] 1 [substr]"%sp;
@@ -76,11 +86,11 @@
           %if;(maxs-nbs>3 and nbs>0) ... >%end;
           %if;(evar.s!="")
             %foreach;substr.s;
-              %if;(cnt > 1 and cnt+1 >= maxs-nbs )<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr;"> %substr;</a> > %end;%nn;
+              %if;(cnt > 1 and cnt+1 >= maxs-nbs )<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%substr;"> %substr;</a> > %end;%nn;
             %end;<b> %evar.s;</b>%nn;
           %end;
           %foreach;entry;
-            %sp;<a href="#%entry_ini;">·</a>%sp;<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>
+            %sp;<a href="#%entry_ini;">·</a>%sp;<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>
           %end;
         </span>
       </div>
@@ -105,7 +115,7 @@
               %end;
               <a role="button" id="%escape.entry_value;" class="btn btn-link text-wrap p-0 ml-2%nn;
                 %if;is_modified; disabled" tabindex="-1" aria-disabled="true%end;"
-                href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&%keys;s=%encode.evar.s;">%escape.entry_value;%nn;
+                href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&%keys;s=%encode.evar.s;">%escape.entry_value;%nn;
                 %if;is_modified; <b>([modify])</b>%end;</a>
               %if;is_modified;
                 <form class="form-inline col-12" method="post" action="%action;">
@@ -116,6 +126,10 @@
                   <input type="hidden" name="m" value="MOD_DATA_OK">
                   <input type="hidden" name="data" value="%evar.data;">
                   <input type="hidden" name="s" value="%evar.s;">
+                  <input type="hidden" name="k" value="kkk">
+                  %if;(evar.rev!="" and evar.rev="on")
+                    <input type="hidden" name="rev" value="on">
+                  %end;
                   %if;(evar.data = "fn")
                     <div class="form-check form-check-inline ml-sm-2 ml-md-5">
                       <label class="form-check-label">
@@ -131,15 +145,16 @@
                     </div>
                   %end;
                   <div class="input-group col-12 px-0 mx-2">
+                    %let;entry_v;%if;(evar.rev!="" and evar.rev="on")%escape.printable.entry_value_rev;%else;%escape.printable.entry_value;%end;%in;
                     %if;(bvar.notextarea="yes" or evar.data="fn" or evar.data="sn" or evar.data="place")
                       <input type="text" class="form-control col-11" id="nx_input" name="nx_input"%nn
                         maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;"
-                        value="%escape.printable.entry_value;" placeholder="%escape.printable.entry_value;"
+                        value="%entry_v;" placeholder="%entry_v;"
                         %if;(evar.data!="fn" or evar.data!="sn") autofocus%end; aria-label="Recipient's username" aria-describedby="button-addon2">
                     %else;
                       <textarea class="form-control col-11" id="nx_input" name="nx_input" rows="1"
                         maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;"
-                        placeholder="%escape.printable.entry_value;"%if;(evar.data!="fn" or evar.data!="sn") autofocus%end;>%escape.printable.entry_value;</textarea>
+                        placeholder="%entry_v;"%if;(evar.data!="fn" or evar.data!="sn") autofocus%end;>%entry_v;</textarea>
                     %end;
                     <div class="input-group-append">
                       <button type="submit" class="btn btn-primary" title="[*modify]">OK</button>

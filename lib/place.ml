@@ -51,6 +51,12 @@ let fold_place_long inverted s =
   let list = List.rev_append rest @@ loop iend [] 0 0 in
   if inverted then List.rev list else list
 
+let unfold_place_long inverted s =
+  let pl = fold_place_long inverted s in
+  let s = List.fold_left
+    (fun acc p -> acc ^ (if acc = "" then "" else ", ") ^ p) "" pl
+  in s
+
 let fold_place_short s =
   let len = String.length s in
   let default () =

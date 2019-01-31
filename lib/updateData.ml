@@ -1129,9 +1129,21 @@ let build_list conf base =
       Some s -> s
     | None -> ""
   in
+  let rev =
+    match p_getenv conf.env "rev" with
+      Some "on" -> true
+    | _ -> false
+  in
   let list = get_all_data conf base in
   (* ! rev_map  = tail-rec ! *)
   let list = List.rev_map (fun (istr, s, k) -> sou base istr, s, k) list in
+  let list = if rev then
+    List.rev_map (fun (str, s, k) ->
+      let pl = Place.fold_place_long false str in
+      let new_str = List.fold_left (fun acc p -> acc ^ (if acc = "" then "" else ", ") ^ p) "" pl in
+      new_str, s, k) list
+    else list
+  in
   (* On tri la liste avant de la combiner *)
   (* sinon on n'élimine pas les doublons. *)
   let list =
@@ -1323,6 +1335,7 @@ and eval_simple_str_var conf _base env _xx =
   function
     "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_value" -> eval_string_env "entry_value" env
+  | "entry_value_rev" -> eval_string_env "entry_value_rev" env
   | "ini" -> eval_string_env "ini" env
   | "substr" -> eval_string_env "substr" env
   | "cnt" -> eval_int_env "cnt" env
@@ -1498,6 +1511,7 @@ let print_foreach conf print_ast _eval_expr =
           let env =
             ("cnt", Vint cnt) ::
             ("entry_value", Vstring s) ::
+            ("entry_value_rev", Vstring (Place.unfold_place_long false s)) ::
             ("keys", Venv_keys k) :: env
           in
           List.iter (print_ast env xx) al; loop (cnt + 1) l
