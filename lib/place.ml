@@ -338,15 +338,10 @@ let get_new_list conf list =
   in
   (new_list, cntt)
 
-let get_k3 pl k1 k2 =
+let get_k3 plo =
   Util.code_varenv (List.fold_left
-  (fun acc p -> p ^ (if acc <> "" then ", " else "") ^ acc) ""
-    (List.rev (
-      if k1 <> "" && k2 <> ""
-        then if List.length pl > 2 then (List.tl (List.tl pl)) else []
-        else if k1 <> ""
-          then if List.length pl > 1 then (List.tl pl) else []
-          else pl)))
+  (fun acc p -> p ^ (if acc <> "" then ", " else "") ^ acc)
+  "" (List.rev plo))
 
 let print_section conf opt ps1 =
   Wserver.printf "</ul><h5><a href=\"%sm=PS%s%s%s\">%s</a></h5><ul>\n"
@@ -364,11 +359,18 @@ let print_html_places_surnames_long conf _base
     | Some "yes" -> true
     | _ -> false
   in
+  let long =
+    match p_getenv conf.base_env "long" with
+    | Some "on" -> true
+    | _ -> false
+  in
   (*let (_new_list, cntt) = get_new_list conf list in
   let conf = {conf with env = ("k1_cnt", (string_of_int cntt)) :: conf.env} in *)
-  let print_sn ((sn, ips), pl) =
+  let print_sn ((sn, ips), _pl, plo) =
     let len = List.length ips in
-    let k3 = get_k3 pl k1 k2 in
+    let ps1 = if List.length plo > 0 then List.hd plo else "" in
+    let ps2 = if List.length plo > 1 then List.hd (List.tl plo) else "" in
+    let k3 = get_k3 plo in
     Wserver.printf "<a href=\"%sm=N&v=%s\">%s</a>" (commd conf)
         (code_varenv sn) sn ;
     if link_to_ind then
@@ -380,19 +382,13 @@ let print_html_places_surnames_long conf _base
         ips ;
         let opt = get_opt conf in
         Wserver.printf "%s%s%s%s\">%d</a>)"
-          (if k1 <> "" then "&k1=" ^ (Util.code_varenv k1)
-           else "&k1=" ^ (if pl <> [] then List.hd pl else ""))
-          (if k2 <> "" then "&k2=" ^ (Util.code_varenv k2)
-           else if k1 = ""
-            then
-              if List.length pl > 1 then "&k2=" ^ (List.hd (List.tl pl))
-              else ""
-            else "&k2=" ^ (if pl <> [] then List.hd pl else ""))
+          (if ps1 <> "" then "&k1=" ^ Util.code_varenv (ps1) else "")
+          (if ps2 <> "" then "&k2=" ^ Util.code_varenv (ps2) else "")
           (if k3 <> "" then "&k3=" ^ k3 else "") opt len
       end
     else Wserver.printf " (%d)" len
   in
-  let print_sn_list ((snl : (string * Adef.iper list) list), pl) =
+  let print_sn_list ((snl : (string * Adef.iper list) list), pl, plo) =
     let snl = List.sort
       (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl
     in
@@ -410,7 +406,7 @@ let print_html_places_surnames_long conf _base
     Wserver.printf "<li>\n" ;
     Mutil.list_iter_first
       (fun first x -> if not first then Wserver.printf ",\n" ;
-        print_sn (x, pl)) snl ;
+        print_sn (x, pl, plo)) snl ;
     Wserver.printf "\n" ;
     Wserver.printf "</li>\n"
   in
@@ -434,14 +430,13 @@ let print_html_places_surnames_long conf _base
                 let href =
                   Printf.sprintf "%sm=PS%s%s%s%s"
                   (commd conf) opt
-                  (if k1 <> "" then "&k1=" ^ Util.code_varenv (ps1) else
-                    if k2 <> "" then "&k1=" ^ Util.code_varenv (ps1) else "")
-                  (if (k2 <> ""  || (i + lvl) >= 0) && ps2 <> ""
+                  (if i >= 0 && ps1 <> "" then "&k1=" ^ Util.code_varenv (ps1) else "")
+                  (if (k1 = "" && i + lvl -1 >= 1) || (  k1 <> "" && i >= 0 ) && ps2 <> ""
                     then "&k2=" ^ Util.code_varenv (ps2) else "")
-                  (if k1 <> "" && k2 <> "" then "&long=on" else "")
+                  (if k1 <> "" && k2 <> "" || long then "&long=on" else "")
                 in
                 Wserver.printf "<li><a href=\"%s\" title=\"%s\">%s</a><ul>\n"
-                href title x )
+                href title x)
               l2
           | x1 :: l1, x2 :: l2 ->
               if x1 = x2 then loop1 l1 l2 (lvl + 1)
@@ -461,7 +456,7 @@ let print_html_places_surnames_long conf _base
             (fun acc (sn, ipl) -> (sn, List.sort_uniq compare ipl) :: acc)
             [] snl
         in
-        print_sn_list (snl, pl) ;
+        print_sn_list (snl, pl, plo) ;
         loop pl list
     | [] -> List.iter (fun _ -> Wserver.printf "</ul></li>\n") prev
   in
@@ -490,6 +485,7 @@ let print_html_places_surnames_short conf _base
     (fun first (_pl, plo, _cnt, _, ipl) ->
       let ps1 = if List.length plo > 0 then List.hd plo else "" in
       let ps2 = if List.length plo > 1 then List.hd (List.tl plo) else ps1 in
+      let k3 = get_k3 plo in
       let ipl = List.flatten ipl |> List.sort_uniq compare in
       Wserver.printf
         "%s<a href=\"%sm=PS%s%s%s%s\" title=\"%s\">%s</a>"
@@ -500,10 +496,11 @@ let print_html_places_surnames_short conf _base
           then "&k2=" ^ Util.code_varenv ps2 else "")
         (if not long then "&long=on" else "") title
         (if k1 = "" then ps1 else ps2) ;
-      Wserver.printf " (<a href=\"%sm=L%s%s%s&nb=%d" (commd conf)
+      Wserver.printf " (<a href=\"%sm=L%s%s%s%s&nb=%d" (commd conf)
         ("&k1=" ^ (Util.code_varenv ps1))
         (if k1 = "" then ""
          else "&k2=" ^ (Util.code_varenv ps2))
+         (if k3 <> "" then "&k3=" ^ k3 else "")
         opt (List.length ipl) ;
       List.iteri (fun i ip ->
         Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))

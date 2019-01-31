@@ -70,9 +70,9 @@
     %end;
     %if;(evar.bi!="" or evar.bp!="" or evar.ma!="" or evar.de!="" or evar.bu!="")
       <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env_val!="" and env_key!="long")%nn;
+        %foreach;env_binding;%if;(env_val!="" and env_key!="long" and env_key!="k1" and env_key!="k2")%nn;
           &%env_key=%env_val;%end;%nn;
-        %end;%nn;
+        %end;&k1=%evar.k1;%nn;
         %if;(evar.long!="on")&long=on%end;%nn;"
         title="[long/short display]">%nn;
         %if;(evar.k1="" and evar.k2="")[*all the places]%nn;
@@ -82,9 +82,9 @@
     %end;
     %if;(evar.k2!="")
       %sp;>%sp;<a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env_val!="" and env_key!="long")%nn;
+        %foreach;env_binding;%if;(env_val!="" and env_key!="long" and env_key!="k1" and env_key!="k2")%nn;
          &%env_key=%env_val;%end;%nn;
-        %end;%nn;
+        %end;&k1=%evar.k1;&k2=%evar.k2;%nn;
         %if;(evar.long!="on")&long=on%end;%nn;"
         title="[*long/short display]">%nn;
       %evar.k2;</a>
@@ -101,3 +101,4 @@
       <i class="fas fa-sort-%if;(evar.f_sort!="on")amount-down%else;alpha-down%end; fa-lg"></i>%nn;
      </a>%nn;
 </div>
+<!-- fin buttons -->

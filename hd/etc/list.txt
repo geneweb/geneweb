@@ -76,21 +76,20 @@
 <div>
 %if;(evar.surn!="")[*surname/surnames]0[:] %evar.surn;.<br>%end;
 [*place][:]%sp;
-  %if;(k1!="")<a href="%prefix;m=PS&k1=%k1;%opt;">%k1;</a>%end;
-    %if;(wizard and evar.k2="")
-      <a href="%prefix;m=MOD_DATA&data=place&s=%k1;#%k1;" title="%apply;book_of([places]) [modify] #%k1;…">%nn;
-        <i class="fa fa-magic fa-xs ml-2"></i>%nn;
-      </a>%nn;
-    %end;
-  %if;(k2!="")%if;(k1!="") > %end;%nn;
-    <a href="%prefix;m=PS%if;(k1!="")&k1=%k1;%end;&k2=%k2;%opt;"
-      title="%k2; — [*searching all] [surname/surnames]1">%k2;%if;(k3!="")<span class="small"> > %k3;</span>%end;</a>%nn;
-        %if;(wizard and evar.k2="");
-      <a href="%prefix;m=MOD_DATA&data=place&s=%k2;#%k2;" title="%apply;book_of([places]) [modify] #%k2;…">
-        <i class="fa fa-magic fa-xs ml-2"></i>
-      </a>
-    %end;
-  %end;
+%if;(k1!="")<a href="%prefix;m=PS&k1=%k1;%opt;">%k1;</a>
+  <a href="%prefix;m=MOD_DATA&data=place&s=%k1;#%k1;" title="%apply;book_of([places]) [modify] #%k1;…">
+    <i class="fa fa-magic fa-xs ml-2"></i>
+  </a>
+%end;
+%if;(k2!="")%sp;>%sp;<a href="%prefix;m=PS%if;(k1!="")&k1=%k1;%end;&k2=%k2;%opt;">%k2;</a>
+  <a href="%prefix;m=MOD_DATA&data=place&s=%k2;#%k2;" title="%apply;book_of([places]) [modify] #%k2;…">
+    <i class="fa fa-magic fa-xs ml-2"></i>
+  </a>
+%end;
+%sp;>%sp;%evar.k3;
+<a href="%prefix;m=MOD_DATA&data=place&s=%k3;#%k3;" title="%apply;book_of([places]) [modify] #%k3;…">
+  <i class="fa fa-magic fa-xs ml-2"></i>
+</a>
 <br>[*event/events]1%if;(evar.date_sort="on")
   %sp;[sorted by]%sp;
   %if;(evar.date_sort="on")[date/dates]1%nn;
