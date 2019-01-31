@@ -341,7 +341,7 @@ let get_new_list conf list =
 let get_k3 plo =
   Util.code_varenv (List.fold_left
   (fun acc p -> p ^ (if acc <> "" then ", " else "") ^ acc)
-  "" (List.rev plo))
+  "" plo)
 
 let print_section conf opt ps1 =
   Wserver.printf "</ul><h5><a href=\"%sm=PS%s%s%s\">%s</a></h5><ul>\n"
