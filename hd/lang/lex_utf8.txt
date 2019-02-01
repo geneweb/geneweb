@@ -8393,7 +8393,7 @@ co: matrimoniu/matrimonii
 cs: manželství
 da: giftermål/giftermål
 de: Heirat/Heiraten
-en: spouse/spouses
+en: marriage/marriages
 eo: edziĝo:a:+n/edziĝoj
 es: casamiento/casamientos
 et: abielu/abielud

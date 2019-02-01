@@ -38,7 +38,7 @@
       <a href="%prefix_base_password;%nn;
           %foreach;env_binding;%if;(env.key!="dates" and env.key!="")%env.key;=%env.val;&%end;%end;%nn;
           %if;(evar.dates!="on")dates=on;"%else;" class="text-muted"%end;
-        title="%if;(evar.dates="on")[*dates on/dates off]1%else;[*dates on/dates off]0%end;">
+        title="%if;(evar.dates="on")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date/dates]1">
         <i class="fa fa-calendar-alt"></i>
       </a>
     </div>
@@ -46,19 +46,21 @@
       <a href="%prefix_base_password;%nn;
         %foreach;env_binding;%if;(env.key!="parents")%env.key;=%env.val;&%end;%end;%nn;
         %if;(evar.parents!="on")parents=on;%end;"
-        title="%if;(evar.parents="on")[*parents on/parents off]1%else;[*parents on/parents off]0%end;">
+        title="%if;(evar.parents="on")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [parents]">
         <i class="fa fa-user %if;(evar.parents="on")text-muted%else;male%end;"></i>%nn;
         <i class="fa fa-user %if;(evar.parents="on")text-muted%else;female%end;"></i>%nn;
       </a>
     </div>
-    <div class="btn-group ml-2" role="group">
-      <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="date_sort")%env.key;=%env.val;&%end;%end;%nn;
-        %if;(evar.date_sort!="on")date_sort=on;%end;"
-        title="[sort by/branch/alphabetic order]0 %if;(evar.date_sort="on")[date/dates]2%else;[sort by/branch/alphabetic order]2%end;">
+    %if;(nb!=1)
+      <div class="btn-group ml-2" role="group">
+        <a href="%prefix_base_password;%nn;
+          %foreach;env_binding;%if;(env.key!="date_sort")%env.key;=%env.val;&%end;%end;%nn;
+          %if;(evar.date_sort!="on")date_sort=on;%end;"
+          title="[*sort by/branch/alphabetic order]0 %if;(evar.date_sort="on")[date/dates]2%else;[sort by/branch/alphabetic order]2%end;">
           <i class="fa fa-sort-%if;(evar.date_sort="on")numeric%else;amount%end;-down fa-fw"></i>%nn;
-      </a>
-    </div>
+        </a>
+      </div>
+    %end;
   </div>
 </div>
 %let;opt;%nn;
@@ -73,39 +75,52 @@
 %let;k2;%if;(evar.k2!="")%evar.k2;%end;%in;
 %let;k3;%if;(evar.k3!="")%evar.k3;%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
+
 <div>
-%if;(evar.surn!="")[*surname/surnames]0[:] %evar.surn;.<br>%end;
-[*place][:]%sp;
+%if;(evar.surn!="")[*surname/surnames]0[:] <span class="text-primary">%evar.surn;</span>.%end;
+<br>[*place][:]%sp;
+%( TODO: list is only for one place, so only magic wand for k3, magic k1/k2 left for tests atm %)
 %if;(k1!="")<a href="%prefix;m=PS&k1=%k1;%opt;">%k1;</a>
-  <a href="%prefix;m=MOD_DATA&data=place&s=%k1;#%k1;" title="%apply;book_of([places]) [modify] #%k1;…">
-    <i class="fa fa-magic fa-xs ml-2"></i>
-  </a>
+  %if;(wizard and k2="")
+    <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k1;#%k3;" title="%apply;book_of([places]) [modify] #%k1;…">
+      <i class="fa fa-magic fa-xs ml-1"></i>
+    </a>%nn;
+  %end;
 %end;
 %if;(k2!="")%sp;>%sp;<a href="%prefix;m=PS%if;(k1!="")&k1=%k1;%end;&k2=%k2;%opt;">%k2;</a>
-  <a href="%prefix;m=MOD_DATA&data=place&s=%k2;#%k2;" title="%apply;book_of([places]) [modify] #%k2;…">
-    <i class="fa fa-magic fa-xs ml-2"></i>
-  </a>
+  %if;wizard;
+    <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k2;#%k3;" title="%apply;book_of([places]) [modify] #%k2;…">
+      <i class="fa fa-magic fa-xs ml-1"></i>
+    </a>%nn;
+  %end;
 %end;
-%sp;>%sp;%evar.k3;
-<a href="%prefix;m=MOD_DATA&data=place&s=%k3;#%k3;" title="%apply;book_of([places]) [modify] #%k3;…">
-  <i class="fa fa-magic fa-xs ml-2"></i>
-</a>
+%sp;|%sp;%k3;
+%if;wizard;
+  <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k3;#%k3;" title="%apply;book_of([places]) [modify] #%k3;…">
+    <i class="fa fa-magic fa-xs ml-1"></i>
+  </a>
+%end;.
 <br>[*event/events]1%if;(evar.date_sort="on")
   %sp;[sorted by]%sp;
   %if;(evar.date_sort="on")[date/dates]1%nn;
   %else;[sort by/branch/alphabetic order]2 ([first name/first names]1)%nn;
   %end;
 %end;[:]%sp;
-%if;(evar.bi="on")[birth]%end;%nn;
-%if;(evar.bp="on")%if;(evar.bi="on"), %end;[baptism]%end;%nn;
-%if;(evar.ma="on")%if;(evar.bi="on" or evar.pb="on"), %end;[marriage event]%end;%nn;
-%if;(evar.de="on")%if;(evar.bi="on" or evar.pb="on" or evar.ma="on"), %end;[death]%end;%nn;
-%if;(evar.bu="on")%if;(evar.bi="on" or evar.pb="on" or evar.ma="on" or evar.de="on"), %end;[burial]%end;.</div>
+%define;evt(vv,tt,ii)
+  %if;("vv"!="bi"), %end;<span class="text-%if;(evar.vv="on")primary%else;secondary%end;">tt ii</span>%nn;
+%end;
+%apply;evt("bi",[birth],"N")
+%apply;evt("bp",[baptism],"B")
+%apply;evt("ma",[marriage event],"M")
+%apply;evt("de",[death],"D")
+%apply;evt("bu",[burial],"S").
+</div>
 
 %define;nbmds(xx,yy,tt)
-  %(TODO: vérifier si “xx is_substr evar.k1” est utile, is_substr ne marche pas si l'égalité est stricte %)
-  %if;((evar.k2="" and (xx is_substr evar.k1 or xx=evar.k1)) or
-       (evar.k2!="" and (xx is_substr evar.k2 or xx= evar.k2)))yy%else;%if;("tt"=1)&nbsp;%end;%end;
+  %if;((k2="" and (xx is_substr k1 or xx=k1))
+    or (k2!="" and (xx is_substr k2 or xx=k2)))yy%nn;
+  %else;%if;("tt"=1)&nbsp;%end;
+  %end;
 %end;
 
 %define;tags(xx,tt)
@@ -123,17 +138,20 @@
 %end;
 
 %( RLM commence a i1 et non i0 on décale i(0) en i(nb), à défaut on pourrait aussi tout décaller à i+1 %)
-<a role="button" class="ml-5" href="%prefix&m=RLM&%nn;
-  %foreach;env_binding;%nn;
-    %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb" and env.key!="k1" and env.key!="k2"
-     and env.key!="bi" and env.key!="bd" and env.key!="ma" and env.key!="de" and env.key!="bu"
-     and env.key!="surn" and env.key!="date_sort" and env.key!="i0")%env.key;=%env.val;&%nn;
-    %elseif(env.key="i0")i%nb;=%env.val;&%end;%nn;
-    %end;%nn;
-    %for;i;0;nb;%if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%end;
-                %else;&t%expr(nb)=%apply;tags%with;%apply;get_ip(0)%and;%end;%end;%end;">%nn;
+%if;(nb!=1)
+  <a role="button" class="ml-5" href="%prefix&m=RLM&%nn;
+    %foreach;env_binding;%nn;
+      %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
+       and env.key!="k1" and env.key!="k2" and env.key!="k3"
+       and env.key!="bi" and env.key!="bd" and env.key!="ma" and env.key!="de" and env.key!="bu"
+       and env.key!="surn" and env.key!="date_sort" and env.key!="i0")%env.key;=%env.val;&%nn;
+      %elseif(env.key="i0")i%nb;=%env.val;&%end;%nn;
+      %end;%nn;
+      %for;i;0;nb;%if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%end;
+                  %else;&t%expr(nb)=%apply;tags%with;%apply;get_ip(0)%and;%end;%end;%end;">%nn;
     <i class="fa fa-bezier-curve mr-2 mt-3"></i>[*multi relations graph] (%nb;)%nn;
-</a>
+  </a>
+%end;
 
 %empty_sorted_list
 %for;i;0;nb;
@@ -160,12 +178,14 @@
     <div class="ml-3">
       %let;index;%item.2;%in;
       %let;access;%apply;get_value(index, "access")%in;
+      %let;sex;%apply;get_value(index, "sex")%in;
       <span class="text-monospace mr-2">%apply;tags(index,"1")</span>%nn;
       <a href="%prefix;%access;">%nn;
       %apply;get_value(index, "first_name")%sp;
       %apply;get_value(index, "surname")%nn;
+      %( Occurence number is hidden of those lists for the moment
       %let;occ;%apply;get_value(index, "occ")%in;%nn;
-      %if;(occ!="0")%sp;%[%occ;%]%end;</a>%nn;
+      %if;(occ!="0")%sp;%[%occ;%]%end;</a>%nn; %)
       %if;(evar.dates="on")
         <a href="%prefix;m=MOD_IND&i=%index;">%apply;get_value(index, "dates")</a>%nn;
       %end;
@@ -175,7 +195,12 @@
         %if;(fa!="" or mo!=""), %sp;
           %let;fa;%if;(fa="")?%else;%fa;%end;%in;
           %let;mo;%if;(mo="")?%else;%mo;%end;%in;
-          [child/children]0 [of] %fa; [and] %mo;
+          %apply;a_of_b%with;
+            %if;(sex=0)[son/daughter/child]0
+            %elseif;(sex=1)[son/daughter/child]1
+            %else;[son/daughter/child]2%end;
+          %and;%fa; [and] %mo;
+          %end;
         %end;
       %end;
     </div>
@@ -186,5 +211,10 @@
 %include;copyr
 </div>
 %include;js
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 </body>
 </html>

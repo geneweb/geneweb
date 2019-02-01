@@ -90,7 +90,7 @@
             %end;<b> %evar.s;</b>%nn;
           %end;
           %foreach;entry;
-            %sp;<a href="#%entry_ini;">·</a>%sp;<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>
+            %sp;<a href="#_%entry_ini;">·</a>%sp;<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>
           %end;
         </span>
       </div>
@@ -100,7 +100,7 @@
     %foreach;entry;
       <li class="list-group-item list-group-item-primary py-0 mt-2 justify-content-between">
         <a class="btn btn-link p-0 ml-1" href="#top" title="Return to top" tabindex="-1"><i class="fa fa-arrow-up fa-fw mx-1"></i></a>%nn;
-        <a class="font-weight-bold text-monospace" id="%entry_ini;" href="%prefix;&m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%html_encode.entry_ini;">%html_encode.entry_ini;</a>
+        <a class="font-weight-bold text-monospace" id="_%entry_ini;" href="%prefix;&m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%html_encode.entry_ini;">%html_encode.entry_ini;</a>
       </li>
       <li class="list-unstyled mt-1">
         <ul class="list-group">
