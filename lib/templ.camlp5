@@ -693,7 +693,19 @@ let rec eval_variable conf =
       begin match Util.p_getenv (conf.env @ conf.henv) v with
         Some vv ->
           let n = int_of_string n in
-          if String.length vv > n then String.sub vv 0 n else vv
+          (* Attention aux caractères utf-8 !! *)
+          let sub =
+            let len = String.length vv in
+            let rec loop i n str =
+              if n = 0 || i >= len then str
+              else
+                let nbc = Name.nbc vv.[i] in
+                let car = String.sub vv i nbc in
+                loop (i+nbc) (n-1) (str ^ car)
+            in
+            loop 0 n ""
+          in
+          sub
       | None -> ""
       end
   | ["evar"; v] ->

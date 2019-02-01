@@ -73,8 +73,11 @@
   %if;(evar.f_sort="on")&f_sort=on%end;%in;
 %let;k1;%if;(evar.k1!="")%evar.k1;%end;%in;
 %let;k2;%if;(evar.k2!="")%evar.k2;%end;%in;
-%let;k3;%if;(evar.k4!="")%evar.k4;%else;%if;(evar.k3!="")%evar.k3;%end;%end;%in;
+%let;k3;%if;(evar.k3!="")%evar.k3;%end;%in;
+%let;k4;%if;(evar.k4!="")%evar.k4;%else;%if;(evar.k3!="")%evar.k3;%end;%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
+
+Test substr_start: %substr_start.1.k4;, %substr_start.2.k4;, %substr_start.3.k4;
 
 <div>
 %if;(evar.surn!="")[*surname/surnames]0[:] <span class="text-primary">%evar.surn;</span>.%end;
@@ -96,7 +99,7 @@
 %end;
 %sp;|%sp;%k3;
 %if;wizard;
-  <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k3;#%k3;" title="%apply;book_of([places]) [modify] #%k3;…">
+  <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k4;#%k3;" title="%apply;book_of([places]) [modify] #%k3;…">
     <i class="fa fa-magic fa-xs ml-1"></i>
   </a>
 %end;.
