@@ -73,7 +73,7 @@
   %if;(evar.f_sort="on")&f_sort=on%end;%in;
 %let;k1;%if;(evar.k1!="")%evar.k1;%end;%in;
 %let;k2;%if;(evar.k2!="")%evar.k2;%end;%in;
-%let;k3;%if;(evar.k3!="")%evar.k3;%end;%in;
+%let;k3;%if;(evar.k4!="")%evar.k4;%else;%if;(evar.k3!="")%evar.k3;%end;%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
 
 <div>

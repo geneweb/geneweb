@@ -8,9 +8,11 @@ open TemplAst
 
 let normalize =
   (* petit hack en attendant une vraie gestion des lieux transforme
-     "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)" *)
+     "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)"
+     On remet les [, ] pour se souvenir!
+  *)
   let r = Str.regexp "^\\[\\([^]]+\\)\\] *- *\\(.*\\)" in
-  fun s -> Str.global_replace r "\\1, \\2" s
+  fun s -> Str.global_replace r "[\\1], \\2" s
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
@@ -339,9 +341,16 @@ let get_new_list conf list =
   (new_list, cntt)
 
 let get_k3 plo =
-  Util.code_varenv (List.fold_left
-  (fun acc p -> p ^ (if acc <> "" then ", " else "") ^ acc)
-  "" plo)
+  (* si on avait [xxx] - aaa, bbb, alors le s= se fera sur aaa *)
+  let k4 = if List.length plo > 1 && (List.hd (List.rev plo)).[0] = '['
+    then List.hd (List.tl plo) else ""
+  in
+  let k3 =
+    Util.code_varenv (List.fold_left
+    (fun acc p -> p ^ (if acc <> "" then ", " else "") ^ acc)
+    "" plo)
+  in
+  (k3, k4)
 
 let print_section conf opt ps1 =
   Wserver.printf "</ul><h5><a href=\"%sm=PS%s%s%s\">%s</a></h5><ul>\n"
@@ -370,7 +379,7 @@ let print_html_places_surnames_long conf _base
     let len = List.length ips in
     let ps1 = if List.length plo > 0 then List.hd plo else "" in
     let ps2 = if List.length plo > 1 then List.hd (List.tl plo) else "" in
-    let k3 = get_k3 plo in
+    let (k3, k4) = get_k3 plo in
     Wserver.printf "<a href=\"%sm=N&v=%s\">%s</a>" (commd conf)
         (code_varenv sn) sn ;
     if link_to_ind then
@@ -381,10 +390,11 @@ let print_html_places_surnames_long conf _base
           Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))
         ips ;
         let opt = get_opt conf in
-        Wserver.printf "%s%s%s%s\">%d</a>)"
+        Wserver.printf "%s%s%s%s%s\">%d</a>)"
           (if ps1 <> "" then "&k1=" ^ Util.code_varenv (ps1) else "")
           (if ps2 <> "" then "&k2=" ^ Util.code_varenv (ps2) else "")
-          (if k3 <> "" then "&k3=" ^ k3 else "") opt len
+          (if k3 <> "" then "&k3=" ^ k3 else "")
+          (if k4 <> "" then "&k4=" ^ k4 else "") opt len
       end
     else Wserver.printf " (%d)" len
   in
@@ -485,7 +495,7 @@ let print_html_places_surnames_short conf _base
     (fun first (_pl, plo, _cnt, _, ipl) ->
       let ps1 = if List.length plo > 0 then List.hd plo else "" in
       let ps2 = if List.length plo > 1 then List.hd (List.tl plo) else ps1 in
-      let k3 = get_k3 plo in
+      let (k3, k4) = get_k3 plo in
       let ipl = List.flatten ipl |> List.sort_uniq compare in
       Wserver.printf
         "%s<a href=\"%sm=PS%s%s%s%s\" title=\"%s\">%s</a>"
@@ -496,11 +506,12 @@ let print_html_places_surnames_short conf _base
           then "&k2=" ^ Util.code_varenv ps2 else "")
         (if not long then "&long=on" else "") title
         (if k1 = "" then ps1 else ps2) ;
-      Wserver.printf " (<a href=\"%sm=L%s%s%s%s&nb=%d" (commd conf)
+      Wserver.printf " (<a href=\"%sm=L%s%s%s%s%s&nb=%d" (commd conf)
         ("&k1=" ^ (Util.code_varenv ps1))
         (if k1 = "" then ""
          else "&k2=" ^ (Util.code_varenv ps2))
          (if k3 <> "" then "&k3=" ^ k3 else "")
+         (if k4 <> "" then "&k4=" ^ k4 else "")
         opt (List.length ipl) ;
       List.iteri (fun i ip ->
         Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))
