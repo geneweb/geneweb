@@ -81,8 +81,8 @@
       %if;(evar.s!="")<a class="mr-2" href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;" title="Index"><i class="fa fa-book fa-lg"></i></a>%end;
       <div class="btn-group d-flex align-content-around flex-wrap">
         <span class="text-monospace">
-          %if;(evar.1.s!="" and maxs > 1)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%evar.1.s;">%evar.1.s;</a> >%end;
-          %if;(evar.2.s!="" and maxs > 2) <a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%evar.2.s;">%evar.2.s;</a> >%end;
+          %if;(substr_start.1.s!="" and maxs > 1)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.1.s;">%substr_start.1.s;</a> >%end;
+          %if;(substr_start.2.s!="" and maxs > 2) <a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.2.s;">%substr_start.2.s;</a> >%end;
           %if;(maxs-nbs>3 and nbs>0) ... >%end;
           %if;(evar.s!="")
             %foreach;substr.s;

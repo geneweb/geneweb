@@ -11,7 +11,7 @@ let normalize =
      "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)"
      On remet les [, ] pour se souvenir!
   *)
-  let r = Str.regexp "^\\[\\([^]]+\\)\\] *- *\\(.*\\)" in
+  let r = Str.regexp "^\\[\\([^]]+\\)\\] *[-–—] *\\(.*\\)" in
   fun s -> Str.global_replace r "[\\1], \\2" s
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
@@ -342,8 +342,8 @@ let get_new_list conf list =
 
 let get_k3 plo =
   (* si on avait [xxx] - aaa, bbb, alors le s= se fera sur aaa *)
-  let k4 = if List.length plo > 1 && (List.hd (List.rev plo)).[0] = '['
-    then List.hd (List.tl plo) else ""
+  let k4 = Util.code_varenv (if List.length plo > 1 && (List.hd (List.rev plo)).[0] = '['
+    then List.hd (List.tl plo) else "")
   in
   let k3 =
     Util.code_varenv (List.fold_left

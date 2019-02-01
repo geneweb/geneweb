@@ -1105,7 +1105,7 @@ let print_mod_ok conf base =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let remove_suburb s =
-  let re = Str.regexp "^\\[.+\\] - " in
+  let re = Str.regexp "^\\[.+\\] [-–—] " in
   let matched = Str.string_match re s 0 in
   if matched then
     let sub_start = Str.match_end () in
