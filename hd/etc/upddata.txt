@@ -40,7 +40,8 @@
     </div>
   </div>%)
   %let;length_s;%if;(evar.s!="")%evar.length.s;%else;0%end;%in;
-  %let;nbs;%if;(evar.nbs<=length_s)%evar.nbs;%else;%length_s;%end;%in;
+  %let;nbs;%if;(evar.nbs!="" and evar.nbs<=length_s)%evar.nbs;%else;%length_s;%end;%in;
+  %let;enbs;&nbs=%nbs;%in;
   <div class="d-flex">
     <div class="ml-auto">
     <a role="button" class="btn"
@@ -80,18 +81,27 @@
     </div>
   </div>
   %( Idée facile mais moins esthétique pour les cas longs, fixé à 7, sans utiliser nbs atm, une bvar plutôt qu'evar ? %)
+  %reset_count;
+  %foreach;entry;
+    %foreach;value;
+      %incr_count;
+    %end;
+  %end;
+  %let;value_list_len;%count;%in;
   <div class="col-auto">
     <div class="btn-group" role="toolbar" aria-label="sub-selection">
       %if;(evar.s!="")
-        <a class="mr-2" href="%prefix;m=MOD_DATA&data=%evar.data;" title="Index"><i class="fa fa-book fa-lg"></i></a>
+        <a class="mr-2" href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;" title="Index"><i class="fa fa-book fa-lg"></i></a>
         <span class="text-monospace">
           %foreach;substr.s;
-            <a href="%prefix;m=MOD_DATA&data=%evar.data;&s=%substr;" title="%substr;">%if;(length_s>7)%tail;%else;%substr;%end;</a>%nn;
+            <a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr;" title="%substr;">%if;(length_s>7)%tail;%else;%substr;%end;</a>%nn;
             %if;(length_s>7) %else; > %end;%nn;
           %end;%if;(length_s>7)>%end; <b> %evar.s;</b>%nn;
-          %foreach;entry;
-            %sp;%if;(max!=1)<a href="#_%entry_ini;">·</a>%else;·%end;
-            %sp;%if;(max!=1)<a href="%prefix;m=MOD_DATA&data=%evar.data&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
+          %if;(value_list_len>1)
+            %foreach;entry;
+              %sp;%if;(max>0)<a href="#_%entry_ini;">·</a>%else;·%end;
+              %sp;%if;(max>0)<a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
+            %end;
           %end;
         </span>
       %end;
@@ -99,21 +109,23 @@
   </div>
   <div class="col-auto">
     <div class="btn-group" role="toolbar" aria-label="sub-selection">
-      %if;(evar.s!="")<a class="mr-2" href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;" title="Index"><i class="fa fa-book fa-lg"></i></a>%end;
+      %if;(evar.s!="")<a class="mr-2" href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;" title="Index"><i class="fa fa-book fa-lg"></i></a>%end;
       <div class="btn-group d-flex align-content-around flex-wrap">
         <span class="text-monospace">
-          %if;(substr_start.1.s!="" and length_s > 1)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.1.s;">%substr_start.1.s;</a> >%end;
-          %if;(substr_start.2.s!="" and length_s > 2) <a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.2.s;">%substr_start.2.s;</a> >%end;
-          %if;(substr_start.3.s!="" and length_s > 3) <a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.3.s;">%substr_start.3.s;</a> >%end;
+          %if;(substr_start.1.s!="" and length_s > 1)<a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr_start.1.s;">%substr_start.1.s;</a> >%end;
+          %if;(substr_start.2.s!="" and length_s > 2) <a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr_start.2.s;">%substr_start.2.s;</a> >%end;
+          %if;(substr_start.3.s!="" and length_s > 3) <a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr_start.3.s;">%substr_start.3.s;</a> >%end;
           %if;(length_s-nbs>4 and nbs>0) … >%end;
           %if;(evar.s!="")
             %foreach;substr.s;
-              %if;(cnt > 1 and cnt+1 >= length_s-nbs )<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%substr;"> %substr;</a> > %end;%nn;
+              %if;(cnt > 2 and cnt+1 >= length_s-nbs )<a href="%prefix;m=MOD_DATA%nbs;&data=%evar.data;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%substr;"> %substr;</a> > %end;%nn;
             %end;<b> %evar.s;</b>%nn;
           %end;
-          %foreach;entry;
-            %sp;%if;(max!=1)<a href="#_%entry_ini;">·</a>%else;·%end;
-            %sp;%if;(max!=1)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
+          %if;(value_list_len>1)
+            %foreach;entry;
+              %sp;%if;(max>0)<a href="#_%entry_ini;">·</a>%else;·%end;
+              %sp;%if;(max>0)<a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
+            %end;
           %end;
         </span>
       </div>
@@ -123,7 +135,7 @@
     %foreach;entry;
       <li class="list-group-item list-group-item-primary py-0 mt-2 justify-content-between">
         <a class="btn btn-link p-0 ml-1" href="#top" title="Return to top" tabindex="-1"><i class="fa fa-arrow-up fa-fw mx-1"></i></a>%nn;
-        <a class="font-weight-bold text-monospace" id="_%entry_ini;" href="%prefix;&m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%html_encode.entry_ini;">%html_encode.entry_ini;</a>
+        <a class="font-weight-bold text-monospace" id="_%entry_ini;" href="%prefix;&m=MOD_DATA%enbs;&data=%evar.data;&s=%html_encode.entry_ini;">%html_encode.entry_ini;</a>
       </li>
       <li class="list-unstyled mt-1">
         <ul class="list-group">
@@ -138,7 +150,7 @@
               %end;
               <a role="button" id="%escape.entry_value;" class="btn btn-link text-wrap p-0 ml-2%nn;
                 %if;is_modified; disabled" tabindex="-1" aria-disabled="true%end;"
-                href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&%keys;s=%encode.evar.s;">%escape.entry_value;%nn;
+                href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&%keys;s=%encode.evar.s;">%escape.entry_value;%nn;
                 %if;is_modified; <b>([modify])</b>%end;</a>
               %if;is_modified;
                 <form class="form-inline col-12" method="post" action="%action;">

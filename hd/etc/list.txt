@@ -78,8 +78,6 @@
 %let;nbs;%if;(evar.nbs!="")&nbs=%evar.nbs;%else;nbs=3%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
 
-Test substr_start: %substr_start.1.k4;, %substr_start.2.k4;, %substr_start.3.k4;
-
 <div>
 %if;(evar.surn!="")[*surname/surnames]0[:] <span class="text-primary">%evar.surn;</span>.%end;
 <br>[*place][:]%sp;

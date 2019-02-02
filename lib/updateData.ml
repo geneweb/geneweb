@@ -416,6 +416,11 @@ let print_long conf list len =
       Some s -> s
     | None -> ""
   in
+  let nbs =
+    match p_getenv conf.env "nbs" with
+      Some s -> "&nbs=" ^ s
+    | None -> ""
+  in
   (* Construit à partir de la liste de (src * hash) la liste dont      *)
   (* le premier composant est les premières lettres de la sources.     *)
   (* Attention, il ne faut pas faire String.length ini + 1 parce qu'en *)
@@ -491,9 +496,9 @@ let print_long conf list len =
                        accu ^ k ^ "=" ^ string_of_int i ^ "&")
                     "" k
                 in
-                Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&%s&s=%s#mod\">"
-                  (commd conf) data k (code_varenv ini);
-                Wserver.printf "%s" (Util.escape_html s);
+                Wserver.printf "<a href=\"%sm=MOD_DATA%s&data=%s&%s&s=%s#mod\">"
+                  (commd conf) nbs data k (code_varenv ini);
+                Wserver.printf "%s" (quote_escaped s);
                 Wserver.printf "</a>"
               else
                 begin
@@ -587,12 +592,17 @@ let print_long conf list len =
 let print_short conf list len =
   let data =
     match p_getenv conf.env "data" with
-      Some s -> s
+      Some s -> "&nbs=" ^ s
     | None -> ""
   in
   let ini =
     match p_getenv conf.env "s" with
       Some s -> s
+    | None -> ""
+  in
+  let nbs =
+    match p_getenv conf.env "nbs" with
+      Some s -> "&nbs=" ^ s
     | None -> ""
   in
   (* Construit la liste des string commençant par ini. *)
@@ -634,8 +644,8 @@ let print_short conf list len =
   Wserver.printf "<p class=\"list_ini\">\n";
   List.iter
     (fun s ->
-       Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\">" (commd conf)
-         data (code_varenv s);
+       Wserver.printf "<a href=\"%sm=MOD_DATA%s&data=%s&s=%s\">"
+         (commd conf) nbs data (code_varenv s);
        Wserver.printf "%s" (no_html_tags s);
        Wserver.printf "</a>\n")
     ini_list;
@@ -971,6 +981,11 @@ let print_mod_ok conf base =
       Some s -> s
     | None -> ""
   in
+  let nbs =
+    match p_getenv conf.env "nbs" with
+      Some s -> "&nbs=" ^ s
+    | None -> ""
+  in
   let env_keys =
     let list = ref [] in
     let keys = List.map fst (fst (get_data conf)) in
@@ -1069,8 +1084,9 @@ let print_mod_ok conf base =
           Wserver.printf "</form>\n"
         end;
       Wserver.printf "<p>\n";
-      Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s#%s\" id=\"reference\">"
-        (commd conf) data ini (no_html_tags (quote_escaped (only_printable new_input))) ;
+      Wserver.printf "<a href=\"%sm=MOD_DATA%s&data=%s&s=%s#%s\" id=\"reference\">"
+        (commd conf) nbs data ini
+        (no_html_tags (quote_escaped (only_printable new_input))) ;
       Wserver.printf "%s" (capitale (transl conf "new modification"));
       Wserver.printf "</a>";
       Wserver.printf "</p>\n";
@@ -1083,8 +1099,9 @@ let print_mod_ok conf base =
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Wserver.printf "<p>\n";
-    Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s#%s\" id=\"reference\">"
-      (commd conf) data ini (no_html_tags (quote_escaped (only_printable new_input)));
+    Wserver.printf "<a href=\"%sm=MOD_DATA%s&data=%s&s=%s#%s\" id=\"reference\">"
+      (commd conf) nbs data ini
+      (no_html_tags (quote_escaped (only_printable new_input)));
     Wserver.printf "%s" (capitale (transl conf "new modification"));
     Wserver.printf "</a>";
     Wserver.printf "</p>\n";
@@ -1275,6 +1292,7 @@ type 'a env =
   | Vlist_value of (string * (string * int) list) list
   | Venv_keys of (string * int) list
   | Vint of int
+  | Vcnt of int ref
   | Vstring of string
   | Vbool of bool
   | Vother of 'a
@@ -1339,6 +1357,21 @@ and eval_simple_str_var conf _base env _xx =
   | "ini" -> eval_string_env "ini" env
   | "substr" -> eval_string_env "substr" env
   | "cnt" -> eval_int_env "cnt" env
+  | "count" ->
+      begin match get_env "count" env with
+        Vcnt c -> string_of_int !c
+      | _ -> ""
+      end
+  | "incr_count" ->
+      begin match get_env "count" env with
+        Vcnt c -> incr c; ""
+      | _ -> ""
+      end
+  | "reset_count" ->
+      begin match get_env "count" env with
+        Vcnt c -> c := 0; ""
+      | _ -> ""
+      end
   | "max" -> eval_int_env "max" env
   | "tail" -> eval_string_env "tail" env
   | "keys" ->
@@ -1356,6 +1389,20 @@ and eval_simple_str_var conf _base env _xx =
         Vlist_data l -> string_of_int (List.length l)
       | _ -> "0"
       end
+  | "value_list_len" ->
+      let list =
+      match get_env "list_value" env with
+        Vlist_value l ->
+          List.sort
+            (fun (s1, _) (s2, _) ->
+               let rss1 = remove_suburb s1 in
+               let rss2 = remove_suburb s2 in
+               if rss1 = rss2 then Gutil.alphabetic_order s1 s2
+               else Gutil.alphabetic_order rss1 rss2)
+            l
+      | _ -> []
+    in
+    string_of_int (List.length list)
   | "title" ->
       let len =
         match get_env "list" env with
@@ -1563,7 +1610,9 @@ let print_mod conf base =
   match p_getenv conf.env "data" with
   | Some ("place" | "src" | "occu" | "fn" | "sn") ->
     let list = build_list conf base in
-    let env = ["list", Vlist_data list] in
+    let env = ("list", Vlist_data list) ::
+              ("count", Vcnt (ref 0)) :: []
+    in
     Hutil.interp conf "upddata"
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
