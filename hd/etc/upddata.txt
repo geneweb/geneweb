@@ -39,58 +39,81 @@
       </div>
     </div>
   </div>%)
-  %let;maxs;%if;(evar.s!="")%evar.length.s;%else;0%end;%in;
-  %let;nbs;%if;(evar.nbs<=maxs)%evar.nbs;%else;%maxs;%end;%in;
-  <div class="col-auto">
-  <a role="button" class="ml-auto"
-    href="%prefix_base_password;%nn;
-      %foreach;env_binding;%if;(env.val!="" and env.key!="rev")%nn;
-       &%env.key=%env.val;%end;%nn;
-      %end;%nn;
-      %if;(evar.rev!="" and evar.rev!="on")&rev=on%elseif;(evar.rev="")&rev=on%end;%nn;"
-      title="[*invert elements]">
+  %let;length_s;%if;(evar.s!="")%evar.length.s;%else;0%end;%in;
+  %let;nbs;%if;(evar.nbs<=length_s)%evar.nbs;%else;%length_s;%end;%in;
+  <div class="d-flex">
+    <div class="ml-auto">
+    <a role="button" class="btn"
+      href="%prefix_base_password;%nn;
+        %foreach;env_binding;%if;(env.val!="" and env.key!="rev")%nn;
+         &%env.key=%env.val;%end;%nn;
+        %end;%nn;
+        %if;(evar.rev!="" and evar.rev!="on")&rev=on%elseif;(evar.rev="")&rev=on%end;%nn;"
+        title="[*invert elements]">
       <i class="fas fa-arrows-alt-h fa-lg"></i>%nn;
-     </a>%nn;
-
+    </a>%nn;
     %if;(evar.s!="")
-    <a role="button" class="btn pl-3"%sp;
-      title="[*delete] 1 [substr]"%sp;
-      href="%prefix_base_password;%nn;
-          %foreach;env_binding;
-            %if;(env.key="nbs" and evar.nbs>=1)&nbs=%expr(evar.nbs-1)%nn;
-            %elseif;(env.key!="")&%env.key=%env.val;%nn;
-            %end;
-          %end;">%nn;
-      <i class="fa fa-minus fa-lg %if;(evar.nbs<1) disabled text-muted%end;" aria-hidden="true"></i>
-      <span class="sr-only">-</span>
-    </a>
-    <span class="sr-only">/</span>
-    <a role="button" class="btn pl-2"%sp;
-      title="[*add] 1 [substr]0"%sp;
-      href="%prefix_base_password;%nn;
+      <a role="button" class="btn pl-2"%sp;
+        title="[*delete] 1 [substr]"%sp;
+        href="%prefix_base_password;%nn;
             %foreach;env_binding;
-              %if;(env.key="nbs" and evar.nbs+3<maxs)&nbs=%expr(evar.nbs+1)%nn;
+              %if;(env.key="nbs" and evar.nbs>=1)&nbs=%expr(evar.nbs-1)%nn;
               %elseif;(env.key!="")&%env.key=%env.val;%nn;
               %end;
             %end;">%nn;
-      <i class="fa fa-plus fa-lg %if;(evar.nbs+3>=maxs) disabled text-muted%end;" aria-hidden="true"></i>%nn;
-      <span class="sr-only">+</span>%nn;
-    </a>
+        <i class="fa fa-minus fa-lg %if;(evar.nbs<1) disabled text-muted%end;" aria-hidden="true"></i>
+        <span class="sr-only">-</span>
+      </a>
+      <span class="sr-only">/</span>
+      <a role="button" class="btn pl-2"%sp;
+        title="[*add] 1 [substr]0"%sp;
+        href="%prefix_base_password;%nn;
+              %foreach;env_binding;
+                %if;(env.key="nbs" and evar.nbs+3<length_s)&nbs=%expr(evar.nbs+1)%nn;
+                %elseif;(env.key!="")&%env.key=%env.val;%nn;
+                %end;
+              %end;">%nn;
+        <i class="fa fa-plus fa-lg %if;(evar.nbs+3>=length_s) disabled text-muted%end;" aria-hidden="true"></i>%nn;
+        <span class="sr-only">+</span>%nn;
+      </a>
     %end;
-    <div class="col-auto btn-group" role="toolbar" aria-label="sub-selection">
+    </div>
+  </div>
+  %( Idée facile mais moins esthétique pour les cas longs, fixé à 7, sans utiliser nbs atm, une bvar plutôt qu'evar ? %)
+  <div class="col-auto">
+    <div class="btn-group" role="toolbar" aria-label="sub-selection">
+      %if;(evar.s!="")
+        <a class="mr-2" href="%prefix;m=MOD_DATA&data=%evar.data;" title="Index"><i class="fa fa-book fa-lg"></i></a>
+        <span class="text-monospace">
+          %foreach;substr.s;
+            <a href="%prefix;m=MOD_DATA&data=%evar.data;&s=%substr;" title="%substr;">%if;(length_s>7)%tail;%else;%substr;%end;</a>%nn;
+            %if;(length_s>7) %else; > %end;%nn;
+          %end;%if;(length_s>7)>%end; <b> %evar.s;</b>%nn;
+          %foreach;entry;
+            %sp;%if;(max!=1)<a href="#_%entry_ini;">·</a>%else;·%end;
+            %sp;%if;(max!=1)<a href="%prefix;m=MOD_DATA&data=%evar.data&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
+          %end;
+        </span>
+      %end;
+    </div>
+  </div>
+  <div class="col-auto">
+    <div class="btn-group" role="toolbar" aria-label="sub-selection">
       %if;(evar.s!="")<a class="mr-2" href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;" title="Index"><i class="fa fa-book fa-lg"></i></a>%end;
       <div class="btn-group d-flex align-content-around flex-wrap">
         <span class="text-monospace">
-          %if;(substr_start.1.s!="" and maxs > 1)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.1.s;">%substr_start.1.s;</a> >%end;
-          %if;(substr_start.2.s!="" and maxs > 2) <a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.2.s;">%substr_start.2.s;</a> >%end;
-          %if;(maxs-nbs>3 and nbs>0) ... >%end;
+          %if;(substr_start.1.s!="" and length_s > 1)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.1.s;">%substr_start.1.s;</a> >%end;
+          %if;(substr_start.2.s!="" and length_s > 2) <a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.2.s;">%substr_start.2.s;</a> >%end;
+          %if;(substr_start.3.s!="" and length_s > 3) <a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;&s=%substr_start.3.s;">%substr_start.3.s;</a> >%end;
+          %if;(length_s-nbs>4 and nbs>0) … >%end;
           %if;(evar.s!="")
             %foreach;substr.s;
-              %if;(cnt > 1 and cnt+1 >= maxs-nbs )<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%substr;"> %substr;</a> > %end;%nn;
+              %if;(cnt > 1 and cnt+1 >= length_s-nbs )<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%substr;"> %substr;</a> > %end;%nn;
             %end;<b> %evar.s;</b>%nn;
           %end;
           %foreach;entry;
-            %sp;<a href="#_%entry_ini;">·</a>%sp;<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>
+            %sp;%if;(max!=1)<a href="#_%entry_ini;">·</a>%else;·%end;
+            %sp;%if;(max!=1)<a href="%prefix;m=MOD_DATA&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
           %end;
         </span>
       </div>
