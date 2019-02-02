@@ -1478,12 +1478,14 @@ let print_foreach conf print_ast _eval_expr =
       | _ -> []
     in
     let list = build_list_long conf list in
+    let max = List.length list in
     let env = ("env_keys", Venv_keys env_keys) :: env in
     let rec loop cnt =
       function
         (ini_k, list_v) :: l ->
           let env =
             ("cnt", Vint cnt) ::
+            ("max", Vint max) ::
             ("entry_ini", Vstring ini_k) ::
             ("list_value", Vlist_value list_v) :: env
           in
@@ -1504,12 +1506,14 @@ let print_foreach conf print_ast _eval_expr =
             l
       | _ -> []
     in
+    let max = List.length list in
     let rec loop cnt =
       function
         (s, k) :: l ->
           let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
           let env =
             ("cnt", Vint cnt) ::
+            ("max", Vint max) ::
             ("entry_value", Vstring s) ::
             ("entry_value_rev", Vstring (Place.unfold_place_long false s)) ::
             ("keys", Venv_keys k) :: env
@@ -1525,11 +1529,13 @@ let print_foreach conf print_ast _eval_expr =
       | _ -> []
     in
     let ini_list = build_list_short conf list in
+    let max = List.length ini_list in
     let rec loop cnt =
       function
         ini :: l ->
           let env =
             ("cnt", Vint cnt) ::
+            ("max", Vint max) ::
             ("ini", Vstring ini) :: env
           in
           List.iter (print_ast env xx) al; loop (cnt + 1) l
