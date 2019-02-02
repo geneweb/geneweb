@@ -249,11 +249,11 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
       <div class="d-flex justify-content-center mt-xl-5 mt-md-3">
         <div class="btn-group" role="group">
           <span class="btn disabled text-success font-weight-bold">[*books][:]</span>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=fn;nbs=4" title="[*modify] %apply;book_of([first name/first names]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*first name/first names]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=sn;nbs=4" title="[*modify] %apply;book_of([surname/surnames]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*surname/surnames]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=occu;nbs=4" title="[*modify] %apply;book_of([occupation/occupations]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*occupation/occupations]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=src;nbs=4" title="[*modify] %apply;book_of([source/sources]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*source/sources]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=place;nbs=4" title="[*modify] %apply;book_of([places]) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*places]</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=fn;nbs=3" title="[*modify] %apply;book_of([first name/first names]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*first name/first names]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=sn;nbs=3" title="[*modify] %apply;book_of([surname/surnames]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*surname/surnames]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=occu;nbs=3" title="[*modify] %apply;book_of([occupation/occupations]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*occupation/occupations]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=src;nbs=3" title="[*modify] %apply;book_of([source/sources]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*source/sources]1</a>
+            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=place;nbs=3" title="[*modify] %apply;book_of([places]) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*places]</a>
           </div>
       </div>
     %end;

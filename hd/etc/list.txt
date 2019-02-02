@@ -75,6 +75,7 @@
 %let;k2;%if;(evar.k2!="")%evar.k2;%end;%in;
 %let;k3;%if;(evar.k3!="")%evar.k3;%end;%in;
 %let;k4;%if;(evar.k4!="")%evar.k4;%else;%if;(evar.k3!="")%evar.k3;%end;%end;%in;
+%let;nbs;%if;(evar.nbs!="")&nbs=%evar.nbs;%else;nbs=3%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
 
 Test substr_start: %substr_start.1.k4;, %substr_start.2.k4;, %substr_start.3.k4;
@@ -85,21 +86,21 @@ Test substr_start: %substr_start.1.k4;, %substr_start.2.k4;, %substr_start.3.k4;
 %( TODO: list is only for one place, so only magic wand for k3, magic k1/k2 left for tests atm %)
 %if;(k1!="")<a href="%prefix;m=PS&k1=%k1;%opt;">%k1;</a>
   %if;(wizard and k2="")
-    <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k1;#%k3;" title="%apply;book_of([places]) [modify] #%k1;…">
+    <a href="%prefix;m=MOD_DATA%nbs;&data=place&s=%substr_start.3.k1;#%k3;" title="%apply;book_of([places]) [modify] #%k1;…">
       <i class="fa fa-magic fa-xs ml-1"></i>
     </a>%nn;
   %end;
 %end;
 %if;(k2!="")%sp;>%sp;<a href="%prefix;m=PS%if;(k1!="")&k1=%k1;%end;&k2=%k2;%opt;">%k2;</a>
   %if;wizard;
-    <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k2;#%k3;" title="%apply;book_of([places]) [modify] #%k2;…">
+    <a href="%prefix;m=MOD_DATA%nbs;&data=place&s=%substr_start.3.k2;#%k3;" title="%apply;book_of([places]) [modify] #%k2;…">
       <i class="fa fa-magic fa-xs ml-1"></i>
     </a>%nn;
   %end;
 %end;
 %sp;|%sp;%k3;
 %if;wizard;
-  <a href="%prefix;m=MOD_DATA&data=place&s=%substr_start.3.k4;#%k3;" title="%apply;book_of([places]) [modify] #%k3;…">
+  <a href="%prefix;m=MOD_DATA%nbs;&data=place&s=%substr_start.3.k4;#%k3;" title="%apply;book_of([places]) [modify] #%k3;…">
     <i class="fa fa-magic fa-xs ml-1"></i>
   </a>
 %end;.

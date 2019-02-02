@@ -384,7 +384,7 @@ let print_html_places_surnames_long conf _base
         (code_varenv sn) sn ;
     if link_to_ind then
       begin
-        Wserver.printf " (<a href=\"%sm=L&surn=%s&nb=%d"
+        Wserver.printf " (<a href=\"%sm=L&surn=%s&nb=%d&nbs=3"
           (commd conf) sn (List.length ips) ;
         List.iteri (fun i ip ->
           Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))
@@ -506,7 +506,7 @@ let print_html_places_surnames_short conf _base
           then "&k2=" ^ Util.code_varenv ps2 else "")
         (if not long then "&long=on" else "") title
         (if k1 = "" then ps1 else ps2) ;
-      Wserver.printf " (<a href=\"%sm=L%s%s%s%s%s&nb=%d" (commd conf)
+      Wserver.printf " (<a href=\"%sm=L%s%s%s%s%s&nb=%d&nbs=3" (commd conf)
         ("&k1=" ^ (Util.code_varenv ps1))
         (if k1 = "" then ""
          else "&k2=" ^ (Util.code_varenv ps2))
