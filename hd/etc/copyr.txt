@@ -81,13 +81,15 @@
       </div>
       <div class="d-flex flex-xs-column flex-md-row ml-md-auto p-sm-2 align-items-center">
         <div class="btn-sm-group">
-        <a href="https://github.com/geneweb/geneweb" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb sources on GitHub">%nn;
+        <a href="https://github.com/geneweb/geneweb" class="ml-1 mt-sm-2 mt-md-0" %nn;
+        target="_blank" title="GeneWeb sources on GitHub">%nn;
         <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
         <span class="align-self-center mx-1">
           v%version;%nn;
           &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017%if;(connections!="") %connections;%end;%nn;
         </span>
-        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang!="en")/%lang;%end;" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb documentation MediaWiki">%nn;
+        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang!="en")/%lang;%end;" %nn;
+        class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb documentation MediaWiki">%nn;
         <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb wiki"/></a>
         </div>
       </div>

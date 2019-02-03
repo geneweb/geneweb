@@ -121,17 +121,13 @@ lib/gwlib.ml:
 
 lib/compilation.ml:
 	echo "let scan_dmy s =" > $@
+	echo "let s = if s <> \"\" then s else \"01 01 2019\" in" >> $@
 	echo "let open Adef in" >> $@
 	echo "Scanf.sscanf s \"%d %d %d\" @@ fun day month year ->" >> $@
 	echo "Dgreg({day;month;year;prec=Sure;delta=0},Dgregorian)" >> $@
 	echo "let compilation_time = scan_dmy \"$$(date "+%d %m %Y")\"" >> $@; \
-	if [ -f ./.git/config ]; then \
-	  echo "let commit_date = scan_dmy \"$$(git show -s --pretty=format:%cd --date=format:'%d %m %Y')\"" >> $@; \
-	  echo "let commit = \"$$(git show -s --pretty=format:%h)\"" >> $@; \
-	else \
-	  echo "let commit_date = scan_dmy \"unknown\"" >> $@; \
-	  echo "let commit = \"unknown\"" >> $@;\
-	fi
+	echo "let commit_date = scan_dmy \"$$(git show -s --pretty=format:%cd --date=format:'%d %m %Y')\"" >> $@; \
+	echo "let commit = \"$$(git show -s --pretty=format:%h)\"" >> $@; \
 
 .PHONY:lib/compilation.ml
 
