@@ -228,7 +228,8 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%nn;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" %nn;
+        class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>
     %end;
   %end;
   <span class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
@@ -294,7 +295,8 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+    %else;<a href="%prefix;%xx.access;" %nn;
+      class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%end;
   %end;
 %end;
 
