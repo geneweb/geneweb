@@ -14702,6 +14702,22 @@ no: Testamente
 pt: testamento
 sv: Testament
 
+    relations of
+en: relations of
+fr: relations de
+
+    witness to events of
+en: witness to events of
+fr: témoin aux évènements de
+
+    participant/participant
+en: participant/participant
+fr: participant/participante
+
+    events to which %s was
+en: events to which %s was
+fr: évènements auxquels %s était
+
     with
 af: met
 bg: с
@@ -15421,3 +15437,4 @@ fr: retirer le dernier module ajouté
 co: cupià a lea in u preme'papei
 en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
+
