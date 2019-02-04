@@ -34,7 +34,7 @@
 %end;
 
 %define;li_SD(xx)
-  <li style="list-style-type: %nn;
+  <li style="vertical-align: middle;list-style-type: %nn;
     %if;xx.has_parents;disc%else;circle%end;">%nn;
 %end;
 
@@ -54,11 +54,11 @@
     <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%nn;
   %end;
   %if;xx.is_male;
-    <i class="fa fa-mars fa-fw male"></i>%nn;
+    <i class="fa fa-mars male mx-1"></i>%nn;
   %elseif;xx.is_female;
-    <i class="fa fa-venus fa-fw female"></i>%nn;
+    <i class="fa fa-venus female mx-1"></i>%nn;
   %else;
-    <i class="fa fa-neuter fa-fw neuter"></i>%nn;
+    <i class="fa fa-neuter neuter mx-1"></i>%nn;
   %end;%nn;
   %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
 %end;
@@ -111,8 +111,8 @@
   %end;
 %end;
 
-%define;image_sosa(xxx,yyy,zzz)
-  <i class="far fa-dot-circle fa-xs %if;(zzz.is_male)male%elseif;(zzz.is_female)female%else;neuter%end; mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></i>%nn;
+%define;image_sosa(xxx,yyy)
+  <span class="far fa-dot-circle text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
 %end;
 
 %define;nav_with_sosa_ref(xxx)
@@ -217,27 +217,27 @@
   %if;(xx.has_sosa and bvar.display_sosa="yes")
     %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
     %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
-    %sosa_ref.surname_key_strip;%and;%xx.sosa;%and;xx%end;
-    %if;not cancel_links;</a>%end;
+    %sosa_ref.surname_key_strip;
+    %and;%xx.sosa;%end;
+    %if;not cancel_links;</a>%end;%nn;
   %end;
 %end;
 
 %define;short_display_person(xx)
-  <span class="text-nowrap">
-    %if;not (xx.has_sosa and bvar.display_sosa="yes");%apply;image_MF("xx")%end;
-    %apply;display_sosa("xx")
-    %if;(xx.index=central_index)<b>%xx;</b>%else;
-      %if;(cancel_links or xx.is_restricted)%xx;
-      %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%nn;
-      %end;
+  %apply;image_MF("xx")
+  %apply;display_sosa("xx")
+  %if;(xx.index=central_index)<b>%xx;</b>%else;
+    %if;(cancel_links or xx.is_restricted)%xx;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%nn;
     %end;
-  </span>
+  %end;
   <span class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
 %end;
 
 %define;short_display_person_tree(xx)
-  %if;(cancel_links or xx.is_restricted)<span class="text-nowrap">%if;(xx.has_sosa)%apply;display_sosa("xx")%end;%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
-  %else;%if;(xx.has_sosa)<span class="text-nowrap">%apply;display_sosa("xx")%end;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(evar.image="off")image=off;%end;%if;(evar.marriage="on")marriage=on;%end;"><span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%if;(xx.has_sosa)</span>%end;%nn;
+  %if;(xx.has_sosa)%apply;display_sosa("xx")%end;
+  %if;(cancel_links or xx.is_restricted)<span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
+  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(evar.image="off")image=off;%end;%if;(evar.marriage="on")marriage=on;%end;"><span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;
   <br>%nn;
   %if;(wizard and not cancel_links)
@@ -253,8 +253,8 @@
 %end;
 
 %define;short_display_person_noname(xx,yy,zz,uu,ii)
-  %if;("ii"="MF" and not xx.has_sosa)%apply;image_MF("xx")
-  %else;%apply;display_sosa("xx")%end;
+  %if;("ii"="MF")%apply;image_MF("xx")%end;
+  %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
     %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="uu%if;("uu"!=""). %end;%xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
@@ -283,6 +283,14 @@
 
 %define;very_short_display_person(xx)
   %apply;image_MF("xx")
+  %apply;display_sosa("xx")
+  %if;(xx.index=central_index)<b>%xx;</b>%else;
+    %if;(cancel_links or xx.is_restricted)%xx;
+    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  %end;
+%end;
+
+%define;very_short_display_person_no_sex(xx)
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
@@ -506,7 +514,7 @@
   %if;(wizard and not cancel_links)
     <a href="%prefix;;m=MOD_FAM;i=%family.index;;ip=%index;">%nn;
       <i class="fa fa-wrench%sp;
-        %if;(m_f.is_male)male%elseif;(m_f.is_female)female%else;neuter%end;"%sp;
+        %if;(m_f=0)male%elseif;(m_f=1)female%else;neuter%end;"%sp;
         title="[*modify::family/families]0 [with]%sp;
         %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end;%sp;
         %spouse.surname;"></i>%nn;
