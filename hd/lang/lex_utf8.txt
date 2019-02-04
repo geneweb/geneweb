@@ -14707,16 +14707,16 @@ en: relations of
 fr: relations de
 
     witness to events of
-en: witness to events of
-fr: témoin aux évènements de
+en: witnesses to events of
+fr: témoins aux évènements de
 
     participant/participant
 en: participant/participant
 fr: participant/participante
 
-    events to which %s was
-en: events to which %s was
-fr: évènements auxquels %s était
+    events to which %s was witness
+en: events to which %s was witness
+fr: évènements auxquels %s était témoin
 
     with
 af: met
