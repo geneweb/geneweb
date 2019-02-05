@@ -19,21 +19,25 @@ let normalize =
 let fold_place_long inverted s =
   let len = String.length s in
   (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
-  let rec loop iend list i ibeg =
+  let rec loop iend list i ibeg bracket=
     if i = iend
     then if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
     else
-      let (list, ibeg) =
+      let (list, ibeg, bracket) =
         match String.unsafe_get s i with
+        | '[' -> list, ibeg, true
+        | ']' -> list, ibeg, false
         | ',' ->
-          let list =
-            if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
-          in
-          list, i + 1
-        | ' ' when i = ibeg -> (list, i + 1)
-        | _ -> list, ibeg
+          if bracket then list, ibeg, true
+          else
+            let list =
+              if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
+            in
+            list, i + 1, false
+        | ' ' when i = ibeg -> (list, i + 1, bracket)
+        | _ -> list, ibeg, bracket
       in
-      loop iend list (i + 1) ibeg
+      loop iend list (i + 1) ibeg bracket
   in
   let (iend, rest) =
     if String.unsafe_get s (len - 1) = ')'
@@ -46,11 +50,11 @@ let fold_place_long inverted s =
           in
           loop (i - 1)
         in
-        j, [ String.sub s (i + 1) (len - i - 2) ]
+        j, [ String.sub s (i) (len - i) ]
       | _ -> len, []
     else len, []
   in
-  let list = List.rev_append rest @@ loop iend [] 0 0 in
+  let list = List.rev_append rest @@ loop iend [] 0 0 false in
   if inverted then List.rev list else list
 
 let unfold_place_long inverted s =
@@ -358,7 +362,11 @@ let get_k3 plo =
   in
   let k3 =
     Util.code_varenv (List.fold_left
-    (fun acc p -> p ^ (if acc <> "" then ", " else "") ^ acc)
+    (fun acc p -> p ^
+      (if acc <> "" && acc.[0] = '(' then " "
+        else if p.[0] = '['  then " - "
+        else if acc <> "" then ", " 
+        else "") ^ acc)
     "" plo)
   in
   (k3, k4)
