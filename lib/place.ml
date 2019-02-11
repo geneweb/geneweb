@@ -297,9 +297,9 @@ let sort_list _conf list =
           let k1 = if List.length pl > 0 then List.hd pl else "" in
           let k2 = if List.length pl > 1 then List.hd (List.tl pl) else "" in
           (* let _ = Printf.eprintf "Place: %s, %s, %s, %s, (%d) (%d) (%d)\n" k1 prev1 k2 prev2 cnt1 cnt2 (List.length snl) in *)
-          if k1 = prev1 then
+          if k1 = prev1 && k2 = prev2 then
             loop (cnt1 + (List.length snl))
-            (if k2 = prev2 then cnt2 + (List.length snl) else List.length snl)
+            (cnt2 + (List.length snl))
             ((pl, snl) :: acc1) acc2 prev1 k2 l
           else
             loop (List.length snl) (List.length snl) [(pl, snl)]
