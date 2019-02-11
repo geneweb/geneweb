@@ -291,25 +291,33 @@ let get_ip_list (snl : (string * Adef.iper list) list) =
 
 let sort_list _conf list =
   let list_n =
-    let rec loop cnt acc1 acc2 prev =
+    let rec loop cnt1 cnt2 acc1 acc2 prev1 prev2 =
       function
       | (pl, snl) :: l ->
           let k1 = if List.length pl > 0 then List.hd pl else "" in
-          if k1 = prev then
-            loop (cnt + (List.length snl)) ((pl, snl) :: acc1) acc2 prev l
+          let k2 = if List.length pl > 1 then List.hd (List.tl pl) else "" in
+          (* let _ = Printf.eprintf "Place: %s, %s, %s, %s, (%d) (%d) (%d)\n" k1 prev1 k2 prev2 cnt1 cnt2 (List.length snl) in *)
+          if k1 = prev1 then
+            loop (cnt1 + (List.length snl))
+            (if k2 = prev2 then cnt2 + (List.length snl) else List.length snl)
+            ((pl, snl) :: acc1) acc2 prev1 k2 l
           else
-            loop (List.length snl) [(pl, snl)]
+            loop (List.length snl) (List.length snl) [(pl, snl)]
               (List.fold_left 
                 (fun acc (pl, snl) ->
-                  (cnt, (List.length snl), pl, snl) :: acc) acc2 acc1)
-              k1 l
+                  (cnt1, cnt2, pl, snl) :: acc) acc2 acc1)
+              k1 k2 l
       | [] -> (List.fold_left 
                 (fun acc (pl, snl) ->
-                  (cnt, (List.length snl), pl, snl) :: acc) acc2 acc1)
-    in loop 0 [] [] "" list
+                  (cnt1, (List.length snl), pl, snl) :: acc) acc2 acc1)
+    in loop 0 0 [] [] "" "" list
   in
   let list_n = List.sort (fun (c1, c3, _, _) (c2, c4, _, _) -> 
     if c1 = c2 then c3 - c4 else c1 - c2) list_n in
+(*  List.iter (fun (c1, c2, pl, snl) ->
+    Printf.eprintf "Ligne: %d, %d" c1 c2;
+    List.iter (fun p -> Printf.eprintf ", %s" p) pl;
+    Printf.eprintf "(%d)\n" (List.length snl)) list_n; *)
   List.fold_left (fun acc (_, _, pl, snl) -> (pl, snl) :: acc) [] list_n
 
 let get_new_list conf list =
