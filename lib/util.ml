@@ -1924,10 +1924,10 @@ let hexa_string s =
   Bytes.unsafe_to_string s'
 
 let print_alphab_list crit print_elem liste =
+  Wserver.printf "<p>\n";
   let len = List.length liste in
   if len > menu_threshold then
     begin
-      Wserver.printf "<p>\n";
       begin let _ =
         List.fold_left
           (fun last e ->
@@ -1944,9 +1944,8 @@ let print_alphab_list crit print_elem liste =
       in
         ()
       end;
-      Wserver.printf "</p>\n"
     end;
-  Wserver.printf "<ul>\n";
+  Wserver.printf "</p>\n<ul>\n";
   begin let _ =
     List.fold_left
       (fun last e ->
