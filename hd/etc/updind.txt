@@ -521,9 +521,9 @@
             %if;(not has_birth_date and dont_know_if_dead)
               <option value="Auto" selected> -</option>
             %end;
-            <option value="NotDead" %if;not_dead; selected%end;>[*alive]</option>
+            <option value="NotDead" %if;not_dead; selected%end;>[*alive]2</option>
             <option value="DontKnowIfDead" %if;(dont_know_if_dead and has_birth_date)%sp;selected%end;>[*don't know]0%nl;</option>
-            <option value="Death" %if;(death.year != "" or death.text != "" or dead_dont_know_when) selected%end;>[*died]2...</option>
+            <option value="Death" %if;(death.year != "" or death.text != "" or dead_dont_know_when) selected%end;>[*died]2</option>
             <option value="DeadYoung" %if;died_young; selected%end;>[*died young]2</option>
             <option value="OfCourseDead" %if;of_course_dead; selected%end;>[*of course dead]</option>
           </select>
