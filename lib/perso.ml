@@ -4149,6 +4149,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
       else ""
   | "dates" -> if p_auth then Date.short_dates_text conf base p else ""
+  | "dates_sort" -> if p_auth then Date.short_dates_text_no_prec conf base p else ""
   | "death_age" ->
       if p_auth then
         match Date.get_birth_death_date p with

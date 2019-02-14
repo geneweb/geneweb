@@ -19,6 +19,7 @@ val day_text : dmy -> string
 val month_text : dmy -> string
 val year_text : dmy -> string
 val short_dates_text : config -> base -> person -> string
+val short_dates_text_no_prec : config -> base -> person -> string
 val short_marriage_date_text :
   config -> base -> family -> person -> person -> string
 val print_dates : config -> base -> person -> unit

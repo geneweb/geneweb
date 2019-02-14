@@ -729,6 +729,26 @@ let short_dates_text conf base p =
     else s
   else ""
 
+(* same as above, but without precision for correct sorting *)
+let short_dates_text_no_prec conf base p =
+  if authorized_age conf base p then
+    let (birth_date, death_date, _) = get_birth_death_date p in
+    let s =
+      match birth_date, death_date with
+        Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
+          year_text b ^ "-" ^ year_text  d
+      | Some (Dgreg (b, _)), _ ->
+          begin match get_death p with
+            Death (_, _) | DeadDontKnowWhen | DeadYoung ->
+              year_text  b ^ "-"
+          | _ -> year_text  b
+          end
+      | _, Some (Dgreg (d, _)) -> "-" ^ year_text d
+      | _, _ -> ""
+    in
+    s
+  else ""
+
 
 (* ********************************************************************** *)
 (*  [Fonc] short_marriage_date_text :
