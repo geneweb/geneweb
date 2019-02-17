@@ -1492,7 +1492,6 @@ let image_request script_name env =
         let _ = Image.print_image_file fname in true
       else false
 
-
 (* Une version un peu à cheval entre avant et maintenant afin de   *)
 (* pouvoir inclure une css, un fichier javascript (etc) facilement *)
 (* et que le cache du navigateur puisse prendre le relais.         *)
@@ -1505,6 +1504,7 @@ type misc_fname =
   | Eot of string
   | Ttf of string
   | Woff2 of string
+  | Cache of string
   | Other of string
 
 let content_misc len misc_fname =
@@ -1519,6 +1519,7 @@ let content_misc len misc_fname =
     | Eot fname -> fname, "application/font-eot"
     | Ttf fname -> fname, "application/font-ttf"
     | Woff2 fname -> fname, "application/font-woff2"
+    | Cache fname -> fname, "text/plain"
     | Other fname -> fname, "text/plain"
   in
   Wserver.header "Content-type: %s" t;
@@ -1530,7 +1531,7 @@ let content_misc len misc_fname =
 let print_misc_file misc_fname =
   match misc_fname with
     Css fname | Js fname | Otf fname | Svg fname | Woff fname | Eot fname |
-    Ttf fname | Woff2 fname ->
+    Ttf fname | Woff2 fname | Cache fname ->
       begin
         try
           let ic = Secure.open_in_bin fname in
@@ -1562,6 +1563,7 @@ let misc_request fname =
       else if Filename.check_suffix fname ".eot" then Eot fname
       else if Filename.check_suffix fname ".ttf" then Ttf fname
       else if Filename.check_suffix fname ".woff2" then Woff2 fname
+      else if Filename.check_suffix fname ".cache" then Cache fname
       else Other fname
     in
     print_misc_file misc_fname

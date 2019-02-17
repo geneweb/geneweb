@@ -187,5 +187,7 @@
     %apply;g_oku("place","no","")
     %apply;g_oku("occu","no","")
     %apply;g_oku("src","no","")
+    %apply;g_oku("qualifier","no","")
+    %apply;g_oku("alias","no","")
   -->
 </script>

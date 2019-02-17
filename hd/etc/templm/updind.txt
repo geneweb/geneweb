@@ -171,19 +171,19 @@
     %if;has_qualifiers;
       %foreach;qualifier;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[qualifier]0 %cnt1;<input id="qualifier%cnt;" name="qualifier%cnt;" size="30" value="%qualifier;"%/></label><a href="javascript:addItem('qualifier',%cnt1;,'[qualifier]0')"> + </a>
+        <label>[qualifier]0 %cnt1;<input id="qualifier%cnt;" name="qualifier%cnt;" size="30" value="%qualifier;" list="dlqualifier"%/></label><a href="javascript:addItem('qualifier',%cnt1;,'[qualifier]0')"> + </a>
       %end;
     %elseif;(bvar.propose_qualifier != "no")
-      <label>[qualifier]0 1<input id="qualifier0" name="qualifier0" size="30" value=""%/></label><a href="javascript:addItem('qualifier',1,'[qualifier]0')"> + </a>
+      <label>[qualifier]0 1<input id="qualifier0" name="qualifier0" size="30" value="" list="dlqualifier"%/></label><a href="javascript:addItem('qualifier',1,'[qualifier]0')"> + </a>
     %end;
     <span id="new_qualifier"></span>
     %if;has_aliases;
       %foreach;alias;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[alias]0 %cnt1;<input id="alias%cnt;" name="alias%cnt;" size="30" value="%alias;"%/></label><a href="javascript:addItem('alias',%cnt1;,'[alias]0')"> + </a>
+        <label>[alias]0 %cnt1;<input id="alias%cnt;" name="alias%cnt;" size="30" value="%alias;" list="dlalias"%/></label><a href="javascript:addItem('alias',%cnt1;,'[alias]0')"> + </a>
       %end;
     %elseif;(bvar.propose_alias != "no")
-      <label>[alias]0 1<input id="alias0" name="alias0" size="30" value=""%/></label><a href="javascript:addItem('alias',1,'[alias]0')"> + </a>
+      <label>[alias]0 1<input id="alias0" name="alias0" size="30" value="" list="dlalias"%/></label><a href="javascript:addItem('alias',1,'[alias]0')"> + </a>
     %end;
     <span id="new_alias"></span>
     %if;has_first_names_aliases;
