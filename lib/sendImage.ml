@@ -1058,9 +1058,9 @@ let clean_old_portrait conf bfname =
       Filename.dir_sep
         [Util.base_path conf.bname; "documents"; "portraits"; "saved"; bfname])
   in
-  (try Sys.remove (file_name ^ ".jpg") with Sys_error _ -> ());
-  (try Sys.remove (file_name ^ ".png") with Sys_error _ -> ());
-  (try Sys.remove (file_name ^ ".gif") with Sys_error _ -> ())
+  Util.rm (file_name ^ ".jpg") ;
+  Util.rm (file_name ^ ".png") ;
+  Util.rm (file_name ^ ".gif")
 
 let delete_old_file conf folder bfname =
   let file_name =
@@ -1069,8 +1069,8 @@ let delete_old_file conf folder bfname =
         [Util.base_path conf.bname; "documents"; folder; "saved"; bfname]
   in
   let file_name_t = (Filename.remove_extension file_name) ^ ".txt" in
-  (try Sys.remove file_name with Sys_error _ -> ());
-  (try Sys.remove file_name_t with Sys_error _ -> ());
+  Util.rm file_name ;
+  Util.rm file_name_t ;
   1
 
 let normal_image_type s =
