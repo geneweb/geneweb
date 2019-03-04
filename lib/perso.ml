@@ -1896,70 +1896,38 @@ and eval_simple_var conf base env ep =
       end
   | _ -> raise Not_found
 and eval_simple_bool_var conf base env =
+  let fam_check_aux fn =
+    match get_env "fam" env with
+    | Vfam (_, fam, _, _) when mode_local env -> fn fam
+    | _ ->
+      match get_env "fam_link" env with
+      | Vfam (_, fam, _, _) -> fn fam
+      | _ -> raise Not_found
+  in
+  let check_relation test =
+    fam_check_aux (fun fam -> test @@ get_relation fam)
+  in
   function
-    "are_divorced" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, _) when mode_local env ->
-          begin match get_divorce fam with
-            Divorced _ -> true
-          | _ -> false
-          end
-      | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, _) ->
-              begin match get_divorce fam with
-                Divorced _ -> true
-              | _ -> false
-              end
-          | _ -> raise Not_found
-      end
+  | "are_divorced" ->
+    fam_check_aux (fun fam -> match get_divorce fam with Divorced _ -> true | _ -> false)
   | "are_engaged" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, _) when mode_local env -> get_relation fam = Engaged
-      | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, _) -> get_relation fam = Engaged
-          | _ -> raise Not_found
-      end
+    check_relation ((=) Engaged)
   | "are_married" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, _) when mode_local env ->
-          get_relation fam = Married || get_relation fam = NoSexesCheckMarried
-      | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, _) ->
-              get_relation fam = Married ||
-              get_relation fam = NoSexesCheckMarried
-          | _ -> raise Not_found
-      end
+    check_relation (function Married | NoSexesCheckMarried -> true | _ -> false)
   | "are_not_married" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, _) when mode_local env ->
-          get_relation fam = NotMarried ||
-          get_relation fam = NoSexesCheckNotMarried
-      | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, _) ->
-              get_relation fam = NotMarried ||
-              get_relation fam = NoSexesCheckNotMarried
-          | _ -> raise Not_found
-      end
+    check_relation (function NotMarried | NoSexesCheckNotMarried -> true | _ -> false)
+  | "are_pacs" ->
+    check_relation ((=) Pacs)
+  | "are_marriage_banns" ->
+    check_relation ((=) MarriageBann)
+  | "are_marriage_contract" ->
+    check_relation ((=) MarriageContract)
+  | "are_marriage_license" ->
+    check_relation ((=) MarriageLicense)
+  | "are_residence" ->
+    check_relation ((=) Residence)
   | "are_separated" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, _) when mode_local env ->
-          begin match get_divorce fam with
-            Separated -> true
-          | _ -> false
-          end
-      | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, _) ->
-              begin match get_divorce fam with
-                Separated -> true
-              | _ -> false
-              end
-          | _ -> raise Not_found
-      end
+    fam_check_aux (fun fam -> get_divorce fam = Separated)
   | "browsing_with_sosa_ref" ->
       begin match get_env "sosa_ref" env with
         Vsosa_ref v -> Lazy.force v <> None
@@ -2011,6 +1979,8 @@ and eval_simple_bool_var conf base env =
             Vfam (_, _, _, _) -> false
           | _ -> raise Not_found
       end
+
+
   | "is_first" ->
       begin match get_env "first" env with
         Vbool x -> x

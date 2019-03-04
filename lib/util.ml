@@ -1206,9 +1206,8 @@ let string_of_pevent_name conf base epers_name =
   | Epers_Will -> transl conf "will"
   | Epers_Name n -> sou base n
 
-let string_of_fevent_name conf base efam_name =
-  match efam_name with
-    Efam_Marriage -> transl conf "marriage event"
+let string_of_fevent_name conf base = function
+  | Efam_Marriage -> transl conf "marriage event"
   | Efam_NoMarriage -> transl conf "no marriage event"
   | Efam_NoMention -> transl conf "no mention"
   | Efam_Engage -> transl conf "engage event"
@@ -1221,6 +1220,10 @@ let string_of_fevent_name conf base efam_name =
   | Efam_PACS -> transl conf "PACS"
   | Efam_Residence -> transl conf "residence"
   | Efam_Name n -> sou base n
+
+let string_of_fevent conf base = function
+  | Efam_NoMention -> transl conf "no mention"
+  | x -> string_of_fevent_name conf base x
 
 let string_of_witness_kind conf sex witness_kind =
   match witness_kind with
@@ -2095,11 +2098,21 @@ let print_alphab_list crit print_elem liste =
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
   match get_relation fam with
-    NotMarried | NoSexesCheckNotMarried ->
-      ftransl_nth conf "relationship%t to" is
-  | Married | NoSexesCheckMarried -> ftransl_nth conf "married%t to" is
-  | Engaged -> ftransl_nth conf "engaged%t to" is
-  | NoMention -> let s = "%t " ^ transl conf "with" in valid_format "%t" s
+  | NotMarried
+  | NoSexesCheckNotMarried ->
+    ftransl_nth conf "relationship%t to" is
+  | Married
+  | NoSexesCheckMarried ->
+    ftransl_nth conf "married%t to" is
+  | Engaged ->
+    ftransl_nth conf "engaged%t to" is
+  | NoMention
+  | MarriageBann
+  | MarriageContract
+  | MarriageLicense
+  | Pacs
+  | Residence ->
+    let s = "%t " ^ transl conf "with" in valid_format "%t" s
 
 let relation_date conf fam =
   match Adef.od_of_cdate (get_marriage fam) with

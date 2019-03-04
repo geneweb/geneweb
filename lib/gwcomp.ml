@@ -603,27 +603,37 @@ let get_mar_date str =
         | _ -> failwith str
       in
       let (relation, l) =
+        let decode_sex v c =
+          let decode_sex i =
+            match c.[i] with
+            | 'm' -> Male
+            | 'f' -> Female
+            | _ -> Neuter
+          in
+          (v, decode_sex 0, decode_sex 1)
+        in
         match l with
-          "#nm" :: l -> (NotMarried, Male, Female), l
-        | "#eng" :: l -> (Engaged, Male, Female), l
-        | "#nsck" :: c :: l when String.length c = 2 ->
-            let decode_sex i =
-              match c.[i] with
-                'm' -> Male
-              | 'f' -> Female
-              | _ -> Neuter
-            in
-            (NoSexesCheckNotMarried, decode_sex 0, decode_sex 1), l
-        | "#nsckm" :: c :: l when String.length c = 2 ->
-            let decode_sex i =
-              match c.[i] with
-                'm' -> Male
-              | 'f' -> Female
-              | _ -> Neuter
-            in
-            (NoSexesCheckMarried, decode_sex 0, decode_sex 1), l
+        | "#nm" :: l ->
+          (NotMarried, Male, Female), l
+        | "#eng" :: l ->
+          (Engaged, Male, Female), l
         | "#noment" :: l -> (NoMention, Male, Female), l
-        | _ -> (Married, Male, Female), l
+        | "#nsck" :: c :: l when String.length c = 2 ->
+          decode_sex NoSexesCheckNotMarried c, l
+        | "#nsckm" :: c :: l when String.length c = 2 ->
+          decode_sex NoSexesCheckMarried c, l
+        | "#banns" :: c :: l when String.length c = 2 ->
+          decode_sex MarriageBann c, l
+        | "#contract" :: c :: l when String.length c = 2 ->
+          decode_sex MarriageContract c, l
+        | "#license" :: c :: l when String.length c = 2 ->
+          decode_sex MarriageLicense c, l
+        | "#pacs" :: c :: l when String.length c = 2 ->
+          decode_sex Pacs c, l
+        | "#residence" :: c :: l when String.length c = 2 ->
+          decode_sex Residence c, l
+        | _ ->
+          (Married, Male, Female), l
       in
       let (place, l) = get_field "#mp" l in
       let (note, l) = get_field "#mn" l in

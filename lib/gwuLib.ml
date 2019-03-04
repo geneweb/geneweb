@@ -816,27 +816,27 @@ module Make (Select : Select) =
       print_parent oc base gen m.m_fath;
       Printf.fprintf oc " +";
       print_date_option oc (Adef.od_of_cdate (get_marriage fam));
+      let print_sexes s =
+        let c x =
+          match get_sex x with
+          | Male -> 'm'
+          | Female -> 'f'
+          | Neuter -> '?'
+        in
+        Printf.fprintf oc " %s %c%c" s (c m.m_fath) (c m.m_moth)
+      in
       begin match get_relation fam with
-        NotMarried -> Printf.fprintf oc " #nm"
       | Married -> ()
+      | NotMarried -> Printf.fprintf oc " #nm"
       | Engaged -> Printf.fprintf oc " #eng"
-      | NoSexesCheckNotMarried ->
-          let c x =
-            match get_sex x with
-              Male -> 'm'
-            | Female -> 'f'
-            | Neuter -> '?'
-          in
-          Printf.fprintf oc " #nsck %c%c" (c m.m_fath) (c m.m_moth)
-      | NoSexesCheckMarried ->
-          let c x =
-            match get_sex x with
-              Male -> 'm'
-            | Female -> 'f'
-            | Neuter -> '?'
-          in
-          Printf.fprintf oc " #nsckm %c%c" (c m.m_fath) (c m.m_moth)
-      | NoMention -> Printf.fprintf oc " #noment"
+      | NoSexesCheckNotMarried -> print_sexes "#nsck" ;
+      | NoSexesCheckMarried -> print_sexes "#nsckm" ;
+      | NoMention -> print_sexes "#noment"
+      | MarriageBann -> print_sexes "#banns"
+      | MarriageContract -> print_sexes "#contract"
+      | MarriageLicense -> print_sexes "#license"
+      | Pacs -> print_sexes "#pacs"
+      | Residence -> print_sexes "#residence"
       end;
       print_if_no_empty oc base "#mp" (get_marriage_place fam);
       print_if_no_empty oc base "#ms" (get_marriage_src fam);

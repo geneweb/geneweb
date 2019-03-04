@@ -537,10 +537,16 @@ let string_of_rparents conf base rparents =
 
 let string_of_marriage conf marriage =
   match marriage with
-    NotMarried | NoSexesCheckNotMarried -> transl conf "with"
+  | NotMarried | NoSexesCheckNotMarried -> transl conf "with"
   | Married | NoSexesCheckMarried -> transl conf "married"
   | Engaged -> transl conf "engaged"
-  | NoMention -> transl conf "with"
+  | NoMention
+  | MarriageBann
+  | MarriageContract
+  | MarriageLicense
+  | Pacs
+  | Residence
+    -> transl conf "with"
 
 let string_of_divorce conf divorce =
   match divorce with

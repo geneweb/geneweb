@@ -428,6 +428,11 @@ let print_marr_or_eng conf base title list =
                   transl_nth conf "relation/relations" 0
               | Married | NoSexesCheckMarried -> transl conf "married"
               | Engaged -> transl conf "engaged"
+              | MarriageBann
+              | MarriageContract
+              | MarriageLicense
+              | Pacs
+              | Residence
               | NoMention -> "")
              (Date.string_of_ondate conf (Dgreg (d, cal)));
          Wserver.printf "</li>\n";

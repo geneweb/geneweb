@@ -16,12 +16,17 @@ let need_differences_selection conf base fam1 fam2 =
   need_selection
     (fun fam ->
        match get_relation fam with
-         Married -> "married"
+       | Married -> "married"
        | NotMarried -> "not married"
        | Engaged -> "engaged"
        | NoSexesCheckNotMarried -> "no sexes check"
        | NoSexesCheckMarried -> "no sexes check married"
-       | NoMention -> "no mention") ||
+       | NoMention -> "no mention"
+       | MarriageBann -> "marriage banns"
+       | MarriageContract -> "marriage contract"
+       | MarriageLicense -> "marriage license"
+       | Pacs -> "pacs"
+       | Residence -> "residence") ||
   need_selection
     (fun fam ->
        match Adef.od_of_cdate (get_marriage fam) with
@@ -95,7 +100,12 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
        | Engaged -> transl conf "engaged"
        | NoSexesCheckNotMarried -> transl conf "no sexes check"
        | NoSexesCheckMarried -> transl conf "married"
-       | NoMention -> transl conf "no mention");
+       | NoMention -> transl conf "no mention"
+       | MarriageBann -> "marriage banns"
+       | MarriageContract -> "marriage contract"
+       | MarriageLicense -> "marriage license"
+       | Pacs -> "pacs"
+       | Residence -> "residence");
   string_field (Util.translate_eval (transl_nth conf "marriage/marriages" 0))
     "marriage"
     (fun fam ->
