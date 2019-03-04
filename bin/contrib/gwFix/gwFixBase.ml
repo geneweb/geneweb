@@ -286,6 +286,48 @@ let check_fevents_witnesses ~verbosity1 ~verbosity2 base nb_fam fix =
   done;
   if verbosity1 then ProgrBar.finish ()
 
+let fix_marriage_divorce ~verbosity1 ~verbosity2 base nb_fam fix =
+  if verbosity1 then begin
+    Printf.printf "Fix families' marriage and divorce\n";
+    flush stdout;
+    ProgrBar.start () ;
+  end ;
+  for i = 0 to nb_fam - 1 do
+    if verbosity1 then ProgrBar.run i nb_fam;
+    let ifam = Adef.ifam_of_int i in
+    let fam = foi base ifam in
+    if not @@ is_deleted_family fam then begin
+      let fevents = get_fevents fam in
+      let relation0 = get_relation fam in
+      let marriage0 = get_marriage fam in
+      let marriage_place0 = get_marriage_place fam in
+      let marriage_note0 = get_marriage_note fam in
+      let marriage_src0 = get_marriage_src fam in
+      let divorce0 = get_divorce fam in
+      let marr_data0 = (relation0, marriage0, marriage_place0, marriage_note0, marriage_src0) in
+      let (relation, marriage, marriage_place, marriage_note, marriage_src) as marr_data, divorce, _ =
+        UpdateFamOk.reconstitute_from_fevents false (insert_string base "")
+          fevents marr_data0 divorce0
+      in
+      if marr_data0 <> marr_data || divorce0 <> divorce then begin
+        if verbosity2 then begin suspend_with (fun () ->
+            Printf.printf "*** Updating: %s & %s\n"
+              (Gutil.designation base (poi base @@ get_father fam))
+              (Gutil.designation base (poi base @@ get_mother fam)) ) ;
+          flush stdout ;
+          ProgrBar.restart i nb_fam
+        end ;
+        let fam' =
+          { (gen_family_of_family fam)
+            with relation ; marriage ; marriage_place ; marriage_note ; marriage_src ; divorce }
+        in
+        patch_family base ifam fam' ;
+        incr fix
+      end ;
+    end ;
+  done ;
+  if verbosity1 then ProgrBar.finish ()
+
 let check
     ~verbosity
     ~fast
@@ -297,6 +339,7 @@ let check
     ~witnesses
     ~pevents_witnesses
     ~fevents_witnesses
+    ~marriage_divorce
     bname =
   let verbosity1 = !verbosity >= 1 in
   let verbosity2 = !verbosity >= 2 in
@@ -315,6 +358,7 @@ let check
   if !witnesses then check_witnesses ~verbosity1 ~verbosity2 base nb_fam fix;
   if !pevents_witnesses then check_pevents_witnesses ~verbosity1 ~verbosity2 base nb_ind fix;
   if !fevents_witnesses then check_fevents_witnesses ~verbosity1 ~verbosity2 base nb_fam fix;
+  if !marriage_divorce then fix_marriage_divorce ~verbosity1 ~verbosity2 base nb_fam fix;
   if fast then begin clear_strings_array base ; clear_persons_array base end ;
   if !fix <> 0 then begin
     Gwdb.commit_patches base ;
@@ -331,7 +375,7 @@ let check
   begin match Gwdb.ascends_array base with
   | (_, _, _, None) ->
     Gwdb.apply_base1 base
-      (fun base -> Outbase.gen_output false base.Dbdisk.data.Dbdisk.bdir base) 
+      (fun base -> Outbase.gen_output false base.Dbdisk.data.Dbdisk.bdir base)
   | _ -> ()
   end ;
   (* On recalcul le nombre reel de personnes. *)
@@ -351,6 +395,7 @@ let p_families = ref false
 let witnesses = ref false
 let pevents_witnesses = ref false
 let fevents_witnesses = ref false
+let marriage_divorce = ref false
 
 let speclist =
   [ ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode")
@@ -364,6 +409,7 @@ let speclist =
   ; ("-witnesses", Arg.Set witnesses, " missing doc")
   ; ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc")
   ; ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc")
+  ; ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc")
   ]
 
 let anonfun i = bname := i
@@ -383,6 +429,7 @@ let main () =
   || !witnesses
   || !pevents_witnesses
   || !fevents_witnesses
+  || !marriage_divorce
   then ()
   else begin
     keys := true ;
@@ -392,7 +439,8 @@ let main () =
     p_families := true ;
     witnesses := true ;
     pevents_witnesses := true ;
-    fevents_witnesses := true
+    fevents_witnesses := true ;
+    marriage_divorce := true
   end ;
   check
     ~fast
@@ -405,6 +453,7 @@ let main () =
     ~witnesses
     ~pevents_witnesses
     ~fevents_witnesses
+    ~marriage_divorce
     !bname
 
 let _ = main ()

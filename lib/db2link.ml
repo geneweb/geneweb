@@ -665,6 +665,11 @@ let update_fevents_with_family fam =
       | NoSexesCheckNotMarried -> Efam_NoMarriage
       | NoMention -> Efam_NoMention
       | NoSexesCheckMarried -> Efam_Marriage
+      | MarriageBann -> Efam_MarriageBann
+      | MarriageContract -> Efam_MarriageContract
+      | MarriageLicense -> Efam_MarriageLicense
+      | Pacs -> Efam_PACS
+      | Residence -> Efam_Residence
     in
     let witnesses = Array.map (fun ip -> ip, Witness) fam.witnesses in
     let evt =

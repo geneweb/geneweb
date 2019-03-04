@@ -29,16 +29,23 @@ and precision =
     | OrYear of dmy2
     | YearInt of dmy2
 
-type relation_kind =
-    Married
+type f_relation_kind =
+  | Married
   | NotMarried
   | Engaged
   | NoSexesCheckNotMarried
   | NoMention
   | NoSexesCheckMarried
+  | MarriageBann
+  | MarriageContract
+  | MarriageLicense
+  | Pacs
+  | Residence
+
+type relation_kind = f_relation_kind
 
 type divorce =
-    NotDivorced
+  | NotDivorced
   | Divorced of cdate
   | Separated
 

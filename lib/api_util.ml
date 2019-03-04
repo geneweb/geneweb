@@ -1493,6 +1493,11 @@ let fam_to_piqi_family conf base ifam =
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date) =
     match gen_f.divorce with
@@ -1561,6 +1566,11 @@ let fam_to_piqi_family_link base (ifath, imoth) ifam fam =
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date) =
     match gen_f.divorce with
@@ -1948,6 +1958,11 @@ let fam_to_piqi_app_family base ifam =
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date) =
     match gen_f.divorce with
