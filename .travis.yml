@@ -45,3 +45,4 @@ script:
     ./configure --sosa-num && make clean test bench distrib clean ;
     ./configure --sosa-zarith && make clean test bench distrib clean ;
     ./configure --api && make clean test bench distrib clean ;
+    ./configure --cgi && make clean test bench distrib clean ;

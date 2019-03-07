@@ -2,5 +2,6 @@
  (name wserver_gw)
  (public_name geneweb.wserver)
  (libraries unix)
+ (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (implements geneweb.wserver.mli)
 )

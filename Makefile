@@ -62,7 +62,7 @@ lib/gwlib.ml:
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
-CPPO_D=$(API_D) $(GWDB_D)
+CPPO_D=$(API_D) $(GWDB_D) $(CGI_D)
 
 %/dune: %/dune.in
 	cat $< \
@@ -90,6 +90,7 @@ GENERATED_FILES_DEP = \
 	benchmark/dune \
 	bin/distrib/dune \
 	lib/dune \
+	lib/wserver/dune \
 	test/dune \
 
 ifdef API_D

@@ -18,6 +18,7 @@ GWDB_D=
 GWDB_PKG=
 SOSA_PKG=
 DUNE_DIRS_EXCLUDE=
+CGI_D=
 
 while [[ $# -ne 0 ]]; do
   case $1 in
@@ -33,6 +34,8 @@ while [[ $# -ne 0 ]]; do
     --sosa-zarith)
       DUNE_DIRS_EXCLUDE="$DUNE_DIRS_EXCLUDE sosa.array sosa.num"
       SOSA_PKG="geneweb.sosa-zarith" ;;
+    --cgi)
+      CGI_D="-D CGI" ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
@@ -116,6 +119,7 @@ print_vars() {
   echo "GWDB_PKG=${GWDB_PKG}"
   echo "SOSA_PKG=${SOSA_PKG}"
   echo "DUNE_DIRS_EXCLUDE=${DUNE_DIRS_EXCLUDE}"
+  echo "CGI_D=${CGI_D}"
 }
 
 print_makefile() {

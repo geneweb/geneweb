@@ -14,7 +14,6 @@ let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
 let noproc = ref false
-let cgi = ref false
 
 let wserver_sock = ref Unix.stdout
 let wsocket () = !wserver_sock
@@ -34,16 +33,19 @@ let printing_state = ref Nothing
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
-  if status <> OK || not !cgi then
-    let answer = match status with
-      | OK -> "200 OK"
-      | Moved_Temporarily -> "302 Moved Temporarily"
-      | Bad_Request -> "400 Bad Request"
-      | Unauthorized -> "401 Unauthorized"
-      | Forbidden -> "403 Forbidden"
-      | Not_Found -> "404 Not Found"
-    in
-    if !cgi then printnl "Status: %s" answer else printnl "HTTP/1.0 %s" answer
+  let answer = match status with
+    | OK -> "200 OK"
+    | Moved_Temporarily -> "302 Moved Temporarily"
+    | Bad_Request -> "400 Bad Request"
+    | Unauthorized -> "401 Unauthorized"
+    | Forbidden -> "403 Forbidden"
+    | Not_Found -> "404 Not Found"
+  in
+#ifdef CGI
+  if status <> OK then printnl "Status: %s" answer
+#else
+  printnl "HTTP/1.0 %s" answer
+#endif
 
 let header fmt =
   if !printing_state <> Status then
