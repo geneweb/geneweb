@@ -2101,18 +2101,21 @@ let relation_txt conf sex fam =
   | NotMarried
   | NoSexesCheckNotMarried ->
     ftransl_nth conf "relationship%t to" is
+  | MarriageContract
+  | MarriageLicense
   | Married
   | NoSexesCheckMarried ->
     ftransl_nth conf "married%t to" is
   | Engaged ->
     ftransl_nth conf "engaged%t to" is
-  | NoMention
-  | MarriageBann
-  | MarriageContract
-  | MarriageLicense
-  | Pacs
+  | MarriageBann ->
+    ftransl_nth conf "marriage banns%t to" is
+  | Pacs ->
+    ftransl_nth conf "pacsed%t to" is
   | Residence ->
-    let s = "%t " ^ transl conf "with" in valid_format "%t" s
+    ftransl_nth conf "residence%t to" is
+  | NoMention ->
+    ftransl conf "with%t"
 
 let relation_date conf fam =
   match Adef.od_of_cdate (get_marriage fam) with

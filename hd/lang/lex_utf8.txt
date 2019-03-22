@@ -11453,7 +11453,7 @@ eo: rilato%t kun
 es: parentesco%t con
 et: kooselu%t
 fi: suhde%t ja
-fr: relation%t avec
+fr: %t avec
 he:  קירבה
 is: sambúð%t með
 it: legame%t con
@@ -11469,6 +11469,42 @@ ru: приходится%t
 sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
+
+    pacsed%t to
+de: Eheähnliches Verhältnis%t mit
+en: Civil solidarity pact%t with
+es: Pacto civil de solidaridad%t con
+fi: Pacs-sopimuksella%t (kanssa)
+fr: PACS%t avec
+it: Unione civile%t con
+nl: Samenlevingscontract%t met
+no: Samboeravtale%t med
+pt: Pacto civil de solidariedade%t com
+sv: Sambo%t med
+
+    marriage banns%t to
+de: aufgebot zur Heirat%t mit
+en: marriage banns%t with
+es: proclamas de matrimonio%t con
+fi: kuuluutus aviolittoon%t (kanssa)
+fr: bans de mariage%t avec
+it: bandi di matrimonio%t con
+nl: huwelijksafkondiging%t met
+no: lysning%t med
+pt: editais de casamento%t com
+sv: lysning%t med
+
+    residence%t to
+de: gemeinsamer Wohnsitz%t mit
+en: residence%t with
+es: residencia%t con
+fi: asuu samassa taloudessa%t (kanssa)
+fr: résidence%t avec
+it: residenza%t con
+nl: woonplaats%t met
+no: bopel%t med
+pt: residência%t com
+sv: sammanboende%t med
 
     residence
 co: residenza
@@ -14695,6 +14731,18 @@ ru: с
 sk: s :i:
 sl: z
 sv: med
+
+    with%t
+de: mit%t
+en: with%t
+es: cont%t
+fi: sekä%t
+fr: avec%t
+it: con%t
+nl: met%t
+no: med%t
+pt: com%t
+sv: med%t
 
     witness at marriage of %s and %s
 af: getuie by die troue van %s met %s
