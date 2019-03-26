@@ -7,7 +7,7 @@ let one = 1
 let eq x y = x = y
 let gt x y = x > y
 let half x = x / 2
-let add x y = x - y
+let add x y = x + y
 let sub x y = x - y
 let mul x n = x * n
 let div x n = x / n
