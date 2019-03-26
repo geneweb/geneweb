@@ -272,17 +272,14 @@ let find_sosa conf base a sosa_ref_l t_sosa =
 let rec get_p_of_sosa conf base s p =
   if Sosa.eq s Sosa.one then (Some p)
   else
-    let ns = Sosa.sosa_gen_up s in
-    let c = Sosa.branch s in
     match get_parents p with
-      | Some ifam ->
-          let cpl = foi base ifam in
-          let pm = pget conf base (get_mother cpl) in
-          let pf = pget conf base (get_father cpl) in
-          if c = '0' then get_p_of_sosa conf base ns pf
-          else get_p_of_sosa conf base ns pm
-      | None -> None
-
+    | Some ifam ->
+      let ns = Sosa.sosa_gen_up s in
+      let c = Sosa.branch s in
+      let cpl = foi base ifam in
+      if c = '0' then get_p_of_sosa conf base ns @@ pget conf base (get_father cpl)
+      else get_p_of_sosa conf base ns @@ pget conf base (get_mother cpl)
+    | None -> None
 
 (* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
 let sosa_ht = Hashtbl.create 5003
