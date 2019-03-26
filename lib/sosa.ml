@@ -75,7 +75,7 @@ let to_string = string_of_int
 
 let of_string = int_of_string
 
-let gen x = int_of_float (log (float_of_int x) /. log 2.)
+let gen x = int_of_float (log (float_of_int x) /. log 2.) + 1
 
 let branch x =
   let s = to_string_sep_base "" 2 x in
