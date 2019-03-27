@@ -33,10 +33,10 @@ let get_dag_elems conf base =
       Some p, Some s ->
         let set =
           match
-            Util.branch_of_sosa conf base (get_key_index p) (Sosa.of_string s)
+            Util.branch_of_sosa conf base (Sosa.of_string s) p
           with
             Some ipsl ->
-              List.fold_left (fun set (ip, _) -> Pset.add ip set) set ipsl
+              List.fold_left (fun set p -> Pset.add (get_key_index p) set) set ipsl
           | None -> set
         in
         loop po set (i + 1)

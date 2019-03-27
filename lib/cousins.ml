@@ -87,9 +87,9 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
     if is_hidden p then s
     else
       "<a href=\"" ^ commd conf ^ "m=RL&" ^ acces_n conf base "1" p1 ^
-      "&b1=" ^ Sosa.to_string (Util.sosa_of_branch (ia_asex :: b1)) ^ "&" ^
+      "&b1=" ^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1)) ^ "&" ^
       acces_n conf base "2" p2 ^ "&b2=" ^
-      Sosa.to_string (Util.sosa_of_branch (ia_asex :: b2)) ^ "&spouse=" ^
+      Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2)) ^ "&spouse=" ^
       (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^
       "&image=" ^
       (if p_getenv conf.env "image" = Some "off" then "off" else "") ^ "&bd=" ^
@@ -102,9 +102,9 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
     if is_hidden p then s
     else
       "<a href=\"" ^ commd conf ^ "m=RL&" ^ acces_n conf base "1" p1 ^
-      "&b1=" ^ Sosa.to_string (Util.sosa_of_branch (ia_asex :: b1)) ^ "&" ^
+      "&b1=" ^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1)) ^ "&" ^
       acces_n conf base "2" p2 ^ "&b2=" ^
-      Sosa.to_string (Util.sosa_of_branch (ia_asex :: b2)) ^ "&" ^
+      Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2)) ^ "&" ^
       acces_n conf base "4" p3 ^ "&spouse=" ^
       (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^
       "&image=" ^
@@ -266,7 +266,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     let rec loop sosa some =
       if !cnt < max_cnt && Sosa.gt last_sosa sosa then
         let some =
-          match Util.branch_of_sosa conf base (get_key_index p) sosa with
+          match Util.old_branch_of_sosa conf base (get_key_index p) sosa with
             Some ((ia, _) :: _ as br) ->
               print_cousins_side_of conf base max_cnt (pget conf base ia) p br
                 lev1 lev2 ||

@@ -312,8 +312,8 @@ let sign_text conf base sign info b1 b2 c1 c2 =
   "<a href=\"" ^ commd conf ^ "m=RL" ^ "&" ^
   acces_n conf base "1" (pget conf base info.ip1) ^ "&" ^
   acces_n conf base "2" (pget conf base info.ip2) ^ "&b1=" ^
-  Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b1)) ^ "&b2=" ^
-  Sosa.to_string (sosa_of_branch ((info.ip, info.sp) :: b2)) ^ "&c1=" ^
+  Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b1)) ^ "&b2=" ^
+  Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b2)) ^ "&c1=" ^
   string_of_int c1 ^ "&c2=" ^ string_of_int c2 ^
   (match p_getenv conf.env "spouse" with
      Some "on" -> "&spouse=on"
@@ -628,7 +628,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
             let n1 = Sosa.of_string b1str in
             let n2 = Sosa.of_string b2str in
             begin match
-              branch_of_sosa conf base ip1 n1, branch_of_sosa conf base ip2 n2
+              old_branch_of_sosa conf base ip1 n1, old_branch_of_sosa conf base ip2 n2
             with
               Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
                 if ia1 = ia2 then
