@@ -36,5 +36,12 @@ let suite =
         test 4 14 ;
         test 4 15 ;
       end
+
+    ; "branch" >:: begin fun _ ->
+        assert_equal
+          ~printer:(fun list -> "[" ^ String.concat ";" (List.map string_of_int list) ^ "]")
+          [0;0;1;1;0]
+          (Sosa.branches @@ Sosa.of_int 38)
+      end
     ]
   ]
