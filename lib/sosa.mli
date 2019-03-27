@@ -17,7 +17,14 @@ val exp : t -> int -> t
 val div : t -> int -> t
 val modl : t -> int -> int
 val gen : t -> int
-val branch : t -> char
+
+(** [branches sosa]
+    Return the path to follow in order to reach [sosa]
+    It is encoded as a list of int representing the acendant to choose at each generation.
+    [0] if you have to follow the father branch, [1] if it is the mother branch.
+*)
+val branches : t -> int list
+
 val sosa_gen_up : t -> t
 val print : (string -> unit) -> string -> t -> unit
 val of_int : int -> t

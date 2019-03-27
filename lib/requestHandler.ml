@@ -94,8 +94,8 @@ let find_all conf base an =
   match sosa_ref, sosa_nb with
     Some p, Some n ->
     if n <> Sosa.zero then
-      match Util.branch_of_sosa conf base (get_key_index p) n with
-        Some ((ip, _) :: _) -> [pget conf base ip], true
+      match Util.branch_of_sosa conf base n p with
+        Some (p :: _) -> [p], true
       | _ -> [], false
     else [], false
   | _ ->

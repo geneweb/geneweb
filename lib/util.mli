@@ -206,9 +206,28 @@ val get_request_string : string list -> string
 
 val create_topological_sort : config -> base -> int array
 
-val branch_of_sosa :
-  config -> base -> iper -> Sosa.t -> (iper * sex) list option
-val sosa_of_branch : (iper * sex) list -> Sosa.t
+(** [p_of_sosa conf base sosa p0]
+    Get the sosa [sosa] of [p0] if it exists
+*)
+val p_of_sosa : config -> base -> Sosa.t -> person -> person option
+
+(** [branch_of_sosa conf base sosa p0]
+    Get all the lineage to go from [p0]'s sosa [sosa] to [p0]
+*)
+val branch_of_sosa : config -> base -> Sosa.t -> person -> person list option
+
+(** [sosa_of_branch branch]
+    Given a path of person to follow [branch], return the sosa number
+    of the last person of this list. No check is done to ensure that
+    given persons are actually parents.
+*)
+val sosa_of_branch : person list -> Sosa.t
+
+(** @deprecated Use [branch_of_sosa] instead *)
+val old_branch_of_sosa : config -> base -> iper -> Sosa.t -> (iper * sex) list option
+
+(** @deprecated Use [sosa_of_branch] instead *)
+val old_sosa_of_branch : config -> base -> (iper * sex) list -> Sosa.t
 
 val has_image : config -> base -> person -> bool
 val image_file_name : string -> string

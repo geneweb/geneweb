@@ -77,9 +77,11 @@ let of_string = int_of_string
 
 let gen x = int_of_float (log (float_of_int x) /. log 2.) + 1
 
-let branch x =
-  let s = to_string_sep_base "" 2 x in
-  if (String.length s) > 1 then s.[1] else '0'
+let branches x =
+  let rec aux acc d =
+    if d = 0 then acc else aux (d land 1 :: acc) (d lsr 1)
+  in
+  List.tl (aux [] x)
 
 let sosa_gen_up x =
   if eq x one then zero
