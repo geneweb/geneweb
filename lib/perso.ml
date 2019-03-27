@@ -269,18 +269,6 @@ let find_sosa conf base a sosa_ref_l t_sosa =
         else None
   | None -> None
 
-let rec get_p_of_sosa conf base s p =
-  if Sosa.eq s Sosa.one then (Some p)
-  else
-    match get_parents p with
-    | Some ifam ->
-      let ns = Sosa.sosa_gen_up s in
-      let c = Sosa.branch s in
-      let cpl = foi base ifam in
-      if c = '0' then get_p_of_sosa conf base ns @@ pget conf base (get_father cpl)
-      else get_p_of_sosa conf base ns @@ pget conf base (get_mother cpl)
-    | None -> None
-
 (* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
 let sosa_ht = Hashtbl.create 5003
 
@@ -2662,9 +2650,8 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | Some s ->
             let s0 = Sosa.of_int s in
             let ip0 = get_key_index p0 in
-            begin match Util.branch_of_sosa conf base ip0 s0 with
-            | Some ((ip, _) :: _) ->
-                let p = poi base ip in
+            begin match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
+            | Some (p :: _) ->
                 let p_auth = authorized_age conf base p in
                 eval_person_field_var conf base env (p, p_auth) loc sl
             | _ -> raise Not_found
@@ -2681,9 +2668,8 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           | Some p ->
               let ip = get_key_index p in
               let s0 = Sosa.of_string s in
-              begin match Util.branch_of_sosa conf base ip s0 with
-              | Some ((ip, _) :: _) ->
-                  let p = poi base ip in
+              begin match Util.branch_of_sosa conf base s0 (pget conf base ip) with
+              | Some (p :: _) ->
                   let p_auth = authorized_age conf base p in
                   eval_person_field_var conf base env (p, p_auth) loc sl
               | _ -> raise Not_found
@@ -2696,7 +2682,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       (* %sosa_anc_p.sosa.first_name;
          direct access to a person whose sosa relative to current person
       *)
-      begin match get_p_of_sosa conf base (Sosa.of_string s) a with
+      begin match Util.p_of_sosa conf base (Sosa.of_string s) a with
       | Some np ->
         let np_auth = authorized_age conf base np in
         eval_person_field_var conf base env (np, np_auth) loc sl

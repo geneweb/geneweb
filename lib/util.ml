@@ -2614,36 +2614,59 @@ let create_topological_sort conf base =
              end;
              tstab)
 
-let branch_of_sosa conf base ip n =
-  if Sosa.eq n Sosa.zero then invalid_arg "branch_of_sosa";
-  let rec expand bl n =
-    if Sosa.eq n Sosa.one then bl
-    else expand (Sosa.even n :: bl) (Sosa.half n)
+let p_of_sosa conf base sosa p0 =
+  let path = Sosa.branches sosa in
+  let rec aux acc = function
+    | [] -> Some acc
+    | hd :: tl ->
+      match get_parents acc with
+      | Some ifam ->
+        let cpl = foi base ifam in
+        if hd = 0
+        then aux (pget conf base (get_father cpl)) tl
+        else aux (pget conf base (get_mother cpl)) tl
+      | None -> None
   in
-  let rec loop ipl ip sp =
-    function
-      [] -> Some ((ip, sp) :: ipl)
-    | goto_fath :: nl ->
-        match get_parents (pget conf base ip) with
-          Some ifam ->
-            let cpl = foi base ifam in
-            if goto_fath then loop ((ip, sp) :: ipl) (get_father cpl) Male nl
-            else loop ((ip, sp) :: ipl) (get_mother cpl) Female nl
-        | _ -> None
+  aux p0 path
+
+let branch_of_sosa conf base sosa p =
+  if Sosa.eq sosa Sosa.zero then invalid_arg "branch_of_sosa";
+  let rec expand bl sosa =
+    if Sosa.eq sosa Sosa.one then bl
+    else expand (Sosa.even sosa :: bl) (Sosa.half sosa)
   in
-  loop [] ip (get_sex (pget conf base ip)) (expand [] n)
+  let rec loop pl p = function
+    | [] -> Some (p :: pl)
+    | male :: tl ->
+      match get_parents p with
+      | Some ifam ->
+        let cpl = foi base ifam in
+        if male then loop (p :: pl) (pget conf base @@ get_father cpl) tl
+        else loop (p :: pl) (pget conf base @@ get_mother cpl) tl
+      | _ -> None
+  in
+  loop [] p (expand [] sosa)
 
 let sosa_of_branch ipl =
   if ipl = [] then failwith "sosa_of_branch";
   let ipl = List.tl (List.rev ipl) in
   List.fold_left
-    (fun b (_ip, sp) ->
+    (fun b p ->
        let b = Sosa.twice b in
-       match sp with
-         Male -> b
+       match get_sex p with
+       | Male -> b
        | Female -> Sosa.inc b 1
        | Neuter -> assert false)
     Sosa.one ipl
+
+(* FIXME: remove this and use sosa_of_branch only *)
+let old_sosa_of_branch conf base (ipl : (iper * sex) list) =
+  sosa_of_branch (List.map (fun (ip, _) -> pget conf base ip) ipl)
+
+(* FIXME: remove this and use branch_of_sosa only *)
+let old_branch_of_sosa conf base ip sosa =
+  branch_of_sosa conf base sosa (pget conf base ip)
+  |> Opt.map @@ List.map (fun p -> get_key_index p, get_sex p)
 
 let space_to_unders = Mutil.tr ' ' '_'
 
