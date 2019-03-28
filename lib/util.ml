@@ -3767,6 +3767,27 @@ let rm_rf dir =
   List.iter Unix.unlink files ;
   List.iter Unix.rmdir directories
 
+let string_of_int_sep sep x =
+  let digits, len =
+    let rec loop (d, l) x =
+      if x = 0 then (d, l) else loop (Char.chr (Char.code '0' + x mod 10) :: d, l + 1) (x / 10)
+    in
+    loop ([], 0) x
+  in
+  let digits, len = if digits = [] then ['0'], 1 else digits, len in
+  let slen = String.length sep in
+  let s = Bytes.create (len + (len - 1) / 3 * slen) in
+  let _ =
+    List.fold_left
+      (fun (i, j) c ->
+         Bytes.set s j c ;
+         if i < len - 1 && (len - 1 - i) mod 3 = 0 then
+           begin String.blit sep 0 s (j + 1) slen; i + 1, j + 1 + slen end
+         else i + 1, j + 1)
+      (0, 0) digits
+  in
+  Bytes.unsafe_to_string s
+
 let init_cache_info bname base =
   match Gwdb.ascends_array base with
   | (_, _, _, None) ->
