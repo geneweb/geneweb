@@ -2969,25 +2969,19 @@ and eval_ancestor_field_var conf base env gp loc =
       | _ -> VVstring ""
       end
   | ["interval"] ->
+    let to_string x =
+      Util.string_of_int_sep
+        (transl conf "(thousand separator)")
+        (int_of_string @@ Sosa.to_string x)
+    in
       begin match gp with
         GP_interv (Some (n1, n2, Some (n3, n4))) ->
           let n2 = Sosa.sub n2 Sosa.one in
           let n4 = Sosa.sub n4 Sosa.one in
-          let sep = transl conf "(thousand separator)" in
-          let r =
-            Sosa.to_string_sep sep n1 ^ "-" ^ Sosa.to_string_sep sep n2 ^
-            " = " ^ Sosa.to_string_sep sep n3 ^ "-" ^
-            Sosa.to_string_sep sep n4
-          in
-          VVstring r
+          VVstring (to_string n1 ^ "-" ^ to_string n2 ^ " = " ^ to_string n3 ^ "-" ^ to_string n4)
       | GP_interv (Some (n1, n2, None)) ->
           let n2 = Sosa.sub n2 Sosa.one in
-          let sep = transl conf "(thousand separator)" in
-          let r =
-            Sosa.to_string_sep sep n1 ^ "-" ^ Sosa.to_string_sep sep n2 ^
-            " = ..."
-          in
-          VVstring r
+          VVstring (to_string n1 ^ "-" ^ to_string n2 ^ " = ...")
       | GP_interv None -> VVstring "..."
       | _ -> VVstring ""
       end
@@ -3077,11 +3071,13 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           eval_person_field_var conf base env ep loc sl
 and eval_num conf n =
   function
-    ["hexa"] -> "0x" ^ Sosa.to_string_sep_base "" 16 n
-  | ["octal"] -> "0o" ^ Sosa.to_string_sep_base "" 8 n
-  | ["lvl"] -> string_of_int (String.length (Sosa.to_string_sep_base "" 2 n))
+    ["hexa"] -> Printf.sprintf "0x%X" @@ int_of_string (Sosa.to_string n)
+  | ["octal"] -> Printf.sprintf "0x%o" @@ int_of_string (Sosa.to_string n)
+  | ["lvl"] -> string_of_int @@ Sosa.gen n
   | ["v"] -> Sosa.to_string n
-  | [] -> Sosa.to_string_sep (transl conf "(thousand separator)") n
+  | [] -> Util.string_of_int_sep
+            (transl conf "(thousand separator)")
+            (int_of_string @@ Sosa.to_string n)
   | _ -> raise Not_found
 and eval_person_field_var conf base env (p, p_auth as ep) loc =
   function

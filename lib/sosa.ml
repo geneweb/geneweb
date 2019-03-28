@@ -44,33 +44,6 @@ let print f sep x =
     in
     ()
 
-let code_of_digit d =
-  if d < 10 then Char.code '0' + d else Char.code 'A' + (d - 10)
-
-let to_string_sep_base sep base x =
-  let digits =
-    let rec loop d x =
-      if eq x zero then d else loop (modl x base :: d) (div x base)
-    in
-    loop [] x
-  in
-  let digits = if digits = [] then [0] else digits in
-  let len = List.length digits in
-  let slen = String.length sep in
-  let s = Bytes.create (len + (len - 1) / 3 * slen) in
-  let _ =
-    List.fold_left
-      (fun (i, j) d ->
-         Bytes.set s j (Char.chr (code_of_digit d));
-         if i < len - 1 && (len - 1 - i) mod 3 = 0 then
-           begin String.blit sep 0 s (j + 1) slen; i + 1, j + 1 + slen end
-         else i + 1, j + 1)
-      (0, 0) digits
-  in
-  Bytes.unsafe_to_string s
-
-let to_string_sep sep = to_string_sep_base sep 10
-
 let to_string = string_of_int
 
 let of_string = int_of_string
@@ -82,14 +55,3 @@ let branches x =
     if d = 0 then acc else aux (d land 1 :: acc) (d lsr 1)
   in
   List.tl (aux [] x)
-
-let sosa_gen_up x =
-  if eq x one then zero
-  else
-    let s = to_string_sep_base "" 2 x in
-    let s = if String.length s > 2 then
-        "0b" ^ (String.sub s 0 1) ^ (String.sub s 2 (String.length s -2))
-      else "0b1"
-    in
-    let is = int_of_string s in
-    of_int is

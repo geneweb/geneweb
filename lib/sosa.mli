@@ -25,10 +25,7 @@ val gen : t -> int
 *)
 val branches : t -> int list
 
-val sosa_gen_up : t -> t
 val print : (string -> unit) -> string -> t -> unit
 val of_int : int -> t
 val of_string : string -> t
 val to_string : t -> string
-val to_string_sep : string -> t -> string
-val to_string_sep_base : string -> int -> t -> string
