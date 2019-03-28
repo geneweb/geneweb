@@ -91,6 +91,18 @@ let util_safe_html _ =
     {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
     (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|})
 
+let util_string_of_int_sep _ =
+  let test sep exp int =
+    assert_equal ~printer:(fun s -> s) exp (Util.string_of_int_sep sep int)
+  in
+  test "," "1" 1 ;
+  test "," "10" 10 ;
+  test "," "100" 100 ;
+  test "," "1,000" 1000 ;
+  test "," "10,000" 10000 ;
+  test "," "100,000" 100000 ;
+  test "," "1,000,000" 1000000
+
 let suite =
   [ "Mutil" >:::
     [ "mutil_contains" >:: mutil_contains
@@ -101,5 +113,6 @@ let suite =
   ; "Util" >:::
     [ "util_str_sub" >:: util_str_sub
     ; "util_safe_html" >:: util_safe_html
+    ; "util_string_of_int_sep" >:: util_string_of_int_sep
     ]
   ]
