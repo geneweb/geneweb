@@ -418,5 +418,9 @@ val escape_html : string -> string
  *)
 val safe_html : string -> string
 
+(** [string_of_int_sep "," 1000000] is ["1,000,000"]
+*)
+val string_of_int_sep : string -> int -> string
+
 (**/**)
 val init_cache_info : string -> Gwdb.base -> unit
