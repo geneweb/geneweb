@@ -193,7 +193,7 @@ let piqi_date_of_date date =
 
 let p_to_piqi_full_person conf base ip ip_spouse =
   let baseprefix = conf.command in
-  let index = Int32.of_int (Adef.int_of_iper ip) in
+  let index = Gwdb.string_of_iper ip in
   let p = poi base ip in
   let p_auth = Util.authorized_age conf base p in
   let p_hidden = Util.is_hide_names conf p in
@@ -283,9 +283,9 @@ let p_to_piqi_full_person conf base ip ip_spouse =
     List.fold_right
       (fun ifam accu ->
         let isp = Gutil.spouse ip (foi base ifam) in
-        if isp = ip_spouse || ip_spouse = Adef.iper_of_int (-1) then
+        if isp = ip_spouse || ip_spouse = Gwdb.dummy_iper then
           let baseprefix = conf.command in
-          let index = Int32.of_int (Adef.int_of_ifam ifam) in
+          let index = Gwdb.string_of_ifam ifam in
           let fl =
             MLink.Family_link.({
               baseprefix = baseprefix;
@@ -325,7 +325,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
 
 let fam_to_piqi_full_family conf base ip ifam add_children =
   let baseprefix = conf.command in
-  let index = Int32.of_int (Adef.int_of_ifam ifam) in
+  let index = Gwdb.string_of_ifam ifam in
   let fam = foi base ifam in
   let ifath = get_father fam in
   let imoth = get_mother fam in
@@ -333,8 +333,8 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
     Util.authorized_age conf base (poi base ifath) &&
     Util.authorized_age conf base (poi base imoth)
   in
-  let ifath = Int32.of_int (Adef.int_of_iper ifath) in
-  let imoth = Int32.of_int (Adef.int_of_iper imoth) in
+  let ifath = Gwdb.string_of_iper ifath in
+  let imoth = Gwdb.string_of_iper imoth in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let marriage =
     match (m_auth, Adef.od_of_cdate gen_f.marriage) with
@@ -374,7 +374,7 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
     if add_children then
       List.map
         (fun ip ->
-          let ip = Int32.of_int (Adef.int_of_iper ip) in
+          let ip = Gwdb.string_of_iper ip in
           MLink.Person_link.({
             baseprefix = baseprefix;
             ip = ip;
@@ -382,7 +382,7 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
         (Array.to_list (get_children fam))
     else
       let pl =
-        let ip = Int32.of_int (Adef.int_of_iper ip) in
+        let ip = Gwdb.string_of_iper ip in
         MLink.Person_link.({
           baseprefix = baseprefix;
           ip = ip;
@@ -465,7 +465,7 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
         then
           let fam = Array.to_list (get_family p) in
           let fam =
-            if gen = 0 && ip_spouse <> Adef.iper_of_int (-1) then
+            if gen = 0 && ip_spouse <> Gwdb.dummy_iper then
               List.filter
                 (fun ifam ->
                   let fam = foi base ifam in
@@ -511,7 +511,7 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
     in
     loop !api_servers
   in
-  let index = Some (Int32.of_int (Adef.int_of_iper ip)) in
+  let index = Some (Gwdb.string_of_iper ip) in
   let data =
     MLink.Link_tree_params.({
       basename = basename;
@@ -604,18 +604,18 @@ let print_link_tree conf base =
         begin
           match Link.ip_of_ref_person base s with
           | Some ip -> ip
-          | None -> Adef.iper_of_int (-1)
+          | None -> Gwdb.dummy_iper
         end
     | None ->
         match ip with
-        | Some ip -> Adef.iper_of_int (Int32.to_int ip)
-        | None -> Adef.iper_of_int (-1)
+        | Some ip -> Gwdb.iper_of_string ip
+        | None -> Gwdb.dummy_iper
   in
 
   let ip_distant =
     match ip with
-    | Some ip -> Adef.iper_of_int (Int32.to_int ip)
-    | None -> Adef.iper_of_int (-1)
+    | Some ip -> Gwdb.iper_of_string ip
+    | None -> Gwdb.dummy_iper
   in
 
   let ip_local_spouse =
@@ -624,9 +624,9 @@ let print_link_tree conf base =
         begin
           match Link.ip_of_ref_person base s with
           | Some ip -> ip
-          | None -> Adef.iper_of_int (-1)
+          | None -> Gwdb.dummy_iper
         end
-    | _ -> Adef.iper_of_int (-1)
+    | _ -> Gwdb.dummy_iper
   in
 
   (* On rend unique tous les résultats. *)
@@ -660,8 +660,8 @@ let print_link_tree conf base =
   (* Familles ascendantes locales. *)
   let local_asc_fam =
     if conf.bname <> basename &&
-       ip_local <> Adef.iper_of_int (-1) &&
-       ip_distant <> Adef.iper_of_int (-1)
+       ip_local <> Gwdb.dummy_iper &&
+       ip_distant <> Gwdb.dummy_iper
     then
       let families = get_families_asc conf base ip_local nb_asc in
       List.map
@@ -675,8 +675,8 @@ let print_link_tree conf base =
   (* Familles descendantes locales. *)
   let local_desc_fam =
     if conf.bname <> basename &&
-       ip_local <> Adef.iper_of_int (-1) &&
-       ip_distant <> Adef.iper_of_int (-1)
+       ip_local <> Gwdb.dummy_iper &&
+       ip_distant <> Gwdb.dummy_iper
     then
       List.map
         (fun (ip, ifam, _) -> fam_to_piqi_full_family conf base ip ifam true)
@@ -692,8 +692,8 @@ let print_link_tree conf base =
     let ht = Hashtbl.create 101 in
     List.fold_left
       (fun accu fam ->
-         let ifath = Adef.iper_of_int (Int32.to_int fam.MLink.Family.ifath) in
-         let imoth = Adef.iper_of_int (Int32.to_int fam.MLink.Family.imoth) in
+         let ifath = Gwdb.iper_of_string fam.MLink.Family.ifath in
+         let imoth = Gwdb.iper_of_string fam.MLink.Family.imoth in
          let accu =
            if Hashtbl.mem ht ifath then accu
            else
@@ -701,7 +701,7 @@ let print_link_tree conf base =
                Hashtbl.add ht ifath ();
                let ip_spouse =
                  if ip_local = ifath then ip_local_spouse
-                 else Adef.iper_of_int (-1)
+                 else Gwdb.dummy_iper
                in
                p_to_piqi_full_person conf base ifath ip_spouse :: accu
              end
@@ -713,21 +713,21 @@ let print_link_tree conf base =
                Hashtbl.add ht imoth ();
                let ip_spouse =
                  if ip_local = imoth then ip_local_spouse
-                 else Adef.iper_of_int (-1)
+                 else Gwdb.dummy_iper
                in
                p_to_piqi_full_person conf base imoth ip_spouse :: accu
              end
          in
          List.fold_left
            (fun accu c ->
-              let ic = Adef.iper_of_int (Int32.to_int c.MLink.Person_link.ip) in
+              let ic = Gwdb.iper_of_string c.MLink.Person_link.ip in
               if Hashtbl.mem ht ic then accu
               else
                 begin
                   Hashtbl.add ht ic ();
                   let ip_spouse =
                     if ip_local = ic then ip_local_spouse
-                    else Adef.iper_of_int (-1)
+                    else Gwdb.dummy_iper
                   in
                   p_to_piqi_full_person conf base ic ip_spouse :: accu
                 end)
@@ -750,7 +750,7 @@ let print_link_tree conf base =
            else
              begin
                Hashtbl.add ht ifath ();
-               p_to_piqi_full_person conf base ifath (Adef.iper_of_int (-1)) :: accu
+               p_to_piqi_full_person conf base ifath (Gwdb.dummy_iper) :: accu
              end
          in
          let accu =
@@ -758,7 +758,7 @@ let print_link_tree conf base =
            else
              begin
                Hashtbl.add ht imoth ();
-               p_to_piqi_full_person conf base imoth (Adef.iper_of_int (-1)) :: accu
+               p_to_piqi_full_person conf base imoth (Gwdb.dummy_iper) :: accu
              end
          in
          List.fold_left
@@ -767,7 +767,7 @@ let print_link_tree conf base =
               else
                 begin
                   Hashtbl.add ht ic ();
-                  p_to_piqi_full_person conf base ic (Adef.iper_of_int (-1)) :: accu
+                  p_to_piqi_full_person conf base ic (Gwdb.dummy_iper) :: accu
                 end)
            accu (Array.to_list (get_children fam)))
       [] pl
@@ -776,7 +776,7 @@ let print_link_tree conf base =
   let local_connections =
     List.fold_left
       (fun accu p ->
-        let ip = Adef.iper_of_int (Int32.to_int p.MLink.Person.ip) in
+        let ip = Gwdb.iper_of_string p.MLink.Person.ip in
         let bl = get_bridges conf base redis ip include_not_validated in
         List.fold_left
           (fun accu s ->
@@ -810,7 +810,7 @@ let print_link_tree conf base =
   let distant_desc_fam =
     let pl =
       match pl with
-      | [] -> [(ip_local, Adef.ifam_of_int (-1), 0)]
+      | [] -> [(ip_local, Gwdb.dummy_ifam, 0)]
       | _ -> pl
     in
     let ht_request = Hashtbl.create 101 in
@@ -868,7 +868,7 @@ let print_link_tree conf base =
 
   (* Ascendance distante. *)
   let distant_asc_fam =
-    if nb_asc > 0 && ip_local <> Adef.iper_of_int (-1) then
+    if nb_asc > 0 && ip_local <> Gwdb.dummy_iper then
       let rec loop parents persons =
         match parents with
         | [] -> persons
