@@ -73,8 +73,8 @@ enum RelationParentType {
 }
 
 message RelationParent {
-  optional int32 father = 1;
-  optional int32 mother = 2;
+  optional string father = 1;
+  optional string mother = 2;
   optional string source = 3;
   required RelationParentType rpt_type = 4;
 }
@@ -174,7 +174,7 @@ enum WitnessType {
 
 message WitnessEvent {
   required WitnessType witness_type = 1;
-  required int32 witness = 2;
+  required string witness = 2;
 }
 
 message Event {
@@ -186,11 +186,11 @@ message Event {
   optional string note = 6;
   optional string src = 7;
   repeated WitnessEvent witnesses = 8;
-  optional int32 index_spouse = 9;
+  optional string index_spouse = 9;
 }
 
 message Person {
-  required int32 index = 1;
+  required string index = 1;
   required Sex sex = 2;
   required string lastname = 3;
   required string firstname = 4;
@@ -217,27 +217,27 @@ message Person {
   optional string occupation = 25;
   optional string psources = 26;
   repeated Title titles = 27;
-  repeated int32 related = 28;
+  repeated string related = 28;
   repeated RelationParent rparents = 29;
   optional Access access = 30 [default = ACCESS_IFTITLES];
-  optional int32 parents = 31;
-  repeated int32 families = 32;
+  optional string parents = 31;
+  repeated string families = 32;
   repeated Event events = 33;
 }
 
 message Family {
-  required int32 index = 1;
+  required string index = 1;
   optional Date marriage_date = 2;
   optional string marriage_place = 3;
   optional string marriage_src = 4;
   required MarriageType marriage_type = 5;
   required DivorceType divorce_type = 6;
   optional Date divorce_date = 7;
-  repeated int32 witnesses = 8;
+  repeated string witnesses = 8;
   optional string fsources = 9;
-  required int32 father = 10;
-  required int32 mother = 11;
-  repeated int32 children = 12;
+  required string father = 10;
+  required string mother = 11;
+  repeated string children = 12;
 }
 
 message BaseWarnings {
@@ -277,5 +277,5 @@ message BaseWarnings {
 message ModificationStatus {
   required bool status = 1;
   required BaseWarnings base_warnings = 2;
-  optional int32 index = 3;
+  optional string index = 3;
 }

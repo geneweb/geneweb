@@ -22,84 +22,36 @@ open Api_def
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let print_cache base mode cache_file =
-  let string_cache get_field =
-    let cache = ref StringSetAutoComplete.empty in
-    for i = 0 to nb_of_persons base - 1 do
-      let p = poi base (Adef.iper_of_int i) in
-      let field = sou base (get_field p) in
-      if field = "" then ()
-      else cache := StringSetAutoComplete.add (sou base (get_field p)) !cache
-    done;
-    let list = StringSetAutoComplete.elements !cache in
-    let list = List.sort Gutil.alphabetic_order list in Cache_string list
-  in
-  let cache =
-    match mode with
-      `lastname -> string_cache get_surname
-    | `firstname -> string_cache get_first_name
+  let cache = ref StringSetAutoComplete.empty in
+  let add x = if x <> "" then cache := StringSetAutoComplete.add x !cache in
+  begin match mode with
+    | `lastname ->
+      Gwdb.Collection.iter (fun p -> add @@ sou base (get_surname p) ) (Gwdb.persons base)
+    | `firstname ->
+      Gwdb.Collection.iter (fun p -> add @@ sou base (get_first_name p) ) (Gwdb.persons base)
     | `place ->
-        let cache = ref StringSetAutoComplete.empty in
-        (*
-        let rec loop place =
-          let (_, place) =
-            try Api_util.split place ',' with
-            [ Not_found -> ("", "") ]
-          in
-          if place = "" then ()
-          else do {
-            cache.val := StringSetAutoComplete.add place cache.val;
-            loop place
-          }
-        in
-        *)
-        for i = 0 to nb_of_persons base - 1 do
-          let p = poi base (Adef.iper_of_int i) in
-          List.iter
-            (fun evt ->
-               let place = sou base evt.epers_place in
-               if place = "" then ()
-               else cache := StringSetAutoComplete.add place !cache)
-            (get_pevents p)
-        done;
-        for i = 0 to nb_of_families base - 1 do
-          let fam = foi base (Adef.ifam_of_int i) in
-          List.iter
-            (fun evt ->
-               let place = sou base evt.efam_place in
-               if place = "" then ()
-               else cache := StringSetAutoComplete.add place !cache)
-            (get_fevents fam)
-        done;
-        let list = StringSetAutoComplete.elements !cache in
-        let list = List.sort Gutil.alphabetic_order list in Cache_string list
+      Gwdb.Collection.iter
+        (fun p -> List.iter (fun e -> add @@ sou base e.epers_place) (get_pevents p) )
+        (Gwdb.persons base) ;
+      Gwdb.Collection.iter
+        (fun f -> List.iter (fun e -> add @@ sou base e.efam_place) (get_fevents f) )
+        (Gwdb.families base)
     | `source ->
-        let cache = ref StringSetAutoComplete.empty in
-        for i = 0 to nb_of_persons base - 1 do
-          let p = poi base (Adef.iper_of_int i) in
-          let psrc = sou base (get_psources p) in
-          if psrc = "" then ()
-          else cache := StringSetAutoComplete.add psrc !cache;
-          List.iter
-            (fun evt ->
-               let src = sou base evt.epers_src in
-               if src = "" then ()
-               else cache := StringSetAutoComplete.add src !cache)
-            (get_pevents p)
-        done;
-        for i = 0 to nb_of_families base - 1 do
-          let fam = foi base (Adef.ifam_of_int i) in
-          let fsrc = sou base (get_fsources fam) in
-          if fsrc = "" then ()
-          else cache := StringSetAutoComplete.add fsrc !cache;
-          List.iter
-            (fun evt ->
-               let src = sou base evt.efam_src in
-               if src = "" then ()
-               else cache := StringSetAutoComplete.add src !cache)
-            (get_fevents fam)
-        done;
-        let list = StringSetAutoComplete.elements !cache in
-        let list = List.sort Gutil.alphabetic_order list in Cache_string list
+      Gwdb.Collection.iter
+        (fun p ->
+           add @@ sou base (get_psources p) ;
+           List.iter (fun e -> add @@ sou base e.epers_src) (get_pevents p) )
+        (Gwdb.persons base) ;
+      Gwdb.Collection.iter
+        (fun f ->
+           add @@ sou base (get_fsources f) ;
+           List.iter (fun e -> add @@ sou base e.efam_src) (get_fevents f) )
+        (Gwdb.families base)
+  end ;
+  let cache =
+    let list = StringSetAutoComplete.elements !cache in
+    let list = List.sort Gutil.alphabetic_order list in
+    Cache_string list
   in
   match
     try Some (Secure.open_out_bin cache_file) with Sys_error _ -> None

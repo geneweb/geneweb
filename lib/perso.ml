@@ -742,10 +742,8 @@ let max_ancestor_level conf base ip max_lev =
                   match Perso_link.get_parents_link base_prefix ip with
                     Some family ->
                       let (ifath, imoth, base_prefix) =
-                        Adef.iper_of_int
-                          (Int32.to_int family.MLink.Family.ifath),
-                        Adef.iper_of_int
-                          (Int32.to_int family.MLink.Family.imoth),
+                        Gwdb.iper_of_string family.MLink.Family.ifath,
+                        Gwdb.iper_of_string family.MLink.Family.imoth,
                         family.MLink.Family.baseprefix
                       in
                       if Perso_link.get_person_link base_prefix ifath <> None
@@ -1069,12 +1067,9 @@ let tree_generation_list conf base gv p =
                  with
                    Some family ->
                      let (ifath, imoth, ifam) =
-                       Adef.iper_of_int
-                         (Int32.to_int family.MLink.Family.ifath),
-                       Adef.iper_of_int
-                         (Int32.to_int family.MLink.Family.imoth),
-                       Adef.ifam_of_int
-                         (Int32.to_int family.MLink.Family.ifam)
+                       Gwdb.iper_of_string family.MLink.Family.ifath,
+                       Gwdb.iper_of_string family.MLink.Family.imoth,
+                       Gwdb.ifam_of_string family.MLink.Family.ifam
                      in
                      begin match
                        Perso_link.get_person_link
@@ -2839,20 +2834,13 @@ and eval_cell_field_var conf base env cell loc =
                 match l with
                   [] -> failwith "lia"
                 | fam_link :: l ->
-                    let fam_link_ifam =
-                      Adef.ifam_of_int
-                        (Int32.to_int fam_link.MLink.Family.ifam)
-                    in
+                    let fam_link_ifam = Gwdb.ifam_of_string fam_link.MLink.Family.ifam in
                     if fam_link_ifam = ifam then
                       let (_, fam, _, _) =
                         Perso_link.make_efam_link conf base fam_link
                       in
-                      let (ifath, imoth) =
-                        Adef.iper_of_int
-                          (Int32.to_int fam_link.MLink.Family.ifath),
-                        Adef.iper_of_int
-                          (Int32.to_int fam_link.MLink.Family.imoth)
-                      in
+                      let ifath = Gwdb.iper_of_string fam_link.MLink.Family.ifath in
+                      let imoth = Gwdb.iper_of_string fam_link.MLink.Family.imoth in
                       let cpl =
                         let ip = get_key_index p in
                         if ip <> ifath && ip <> imoth then
@@ -2861,10 +2849,7 @@ and eval_cell_field_var conf base env cell loc =
                               ip base_prefix
                           with
                             Some p ->
-                              let ip =
-                                Adef.iper_of_int
-                                  (Int32.to_int p.MLink.Person.ip)
-                              in
+                              let ip = Gwdb.iper_of_string p.MLink.Person.ip in
                               ifath, imoth,
                               (if ip = ifath then imoth else ifath)
                           | None ->
@@ -3727,11 +3712,9 @@ and eval_bool_person_field conf base env (p, p_auth) =
                 [] -> false
               | fam_link :: faml ->
                   let (ifath, imoth, _) =
-                    Adef.iper_of_int
-                      (Int32.to_int fam_link.MLink.Family.ifath),
-                    Adef.iper_of_int
-                      (Int32.to_int fam_link.MLink.Family.imoth),
-                    Adef.ifam_of_int (Int32.to_int fam_link.MLink.Family.ifam)
+                    Gwdb.iper_of_string fam_link.MLink.Family.ifath,
+                    Gwdb.iper_of_string fam_link.MLink.Family.imoth,
+                    Gwdb.ifam_of_string fam_link.MLink.Family.ifam
                   in
                   let cpl =
                     let ip = get_key_index p in
@@ -3741,9 +3724,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
                           fam_link.MLink.Family.baseprefix
                       with
                         Some p ->
-                          let ip =
-                            Adef.iper_of_int (Int32.to_int p.MLink.Person.ip)
-                          in
+                          let ip = Gwdb.iper_of_string p.MLink.Person.ip in
                           ifath, imoth, (if ip = ifath then imoth else ifath)
                       | None ->
                           ifath, imoth, (if ip = ifath then imoth else ifath)
@@ -3755,12 +3736,9 @@ and eval_bool_person_field conf base env (p, p_auth) =
                   in
                   if can_merge then
                     let (ifam, ifath, imoth) =
-                      Adef.ifam_of_int
-                        (Int32.to_int fam_link.MLink.Family.ifam),
-                      Adef.iper_of_int
-                        (Int32.to_int fam_link.MLink.Family.ifath),
-                      Adef.iper_of_int
-                        (Int32.to_int fam_link.MLink.Family.imoth)
+                      Gwdb.ifam_of_string fam_link.MLink.Family.ifam,
+                      Gwdb.iper_of_string fam_link.MLink.Family.ifath,
+                      Gwdb.iper_of_string fam_link.MLink.Family.imoth
                     in
                     List.length
                       (Perso_link.get_children_of_parents
@@ -4812,9 +4790,9 @@ let print_foreach conf base print_ast eval_expr =
               with
                 Some family ->
                   let (ifath, imoth, ifam) =
-                    Adef.iper_of_int (Int32.to_int family.MLink.Family.ifath),
-                    Adef.iper_of_int (Int32.to_int family.MLink.Family.imoth),
-                    Adef.ifam_of_int (Int32.to_int family.MLink.Family.ifam)
+                    Gwdb.iper_of_string family.MLink.Family.ifath,
+                    Gwdb.iper_of_string family.MLink.Family.imoth,
+                    Gwdb.ifam_of_string family.MLink.Family.ifam
                   in
                   begin match
                     Perso_link.get_person_link family.MLink.Family.baseprefix
@@ -4867,9 +4845,9 @@ let print_foreach conf base print_ast eval_expr =
               with
                 Some family ->
                   let (ifath, imoth, ifam) =
-                    Adef.iper_of_int (Int32.to_int family.MLink.Family.ifath),
-                    Adef.iper_of_int (Int32.to_int family.MLink.Family.imoth),
-                    Adef.ifam_of_int (Int32.to_int family.MLink.Family.ifam)
+                    Gwdb.iper_of_string family.MLink.Family.ifath,
+                    Gwdb.iper_of_string family.MLink.Family.imoth,
+                    Gwdb.ifam_of_string family.MLink.Family.ifam
                   in
                   begin match
                     Perso_link.get_person_link family.MLink.Family.baseprefix
@@ -5246,10 +5224,7 @@ let print_foreach conf base print_ast eval_expr =
                  List.iter
                    (fun c_link ->
                       let baseprefix = c_link.MLink.Person_link.baseprefix in
-                      let ip_c =
-                        Adef.iper_of_int
-                          (Int32.to_int c_link.MLink.Person_link.ip)
-                      in
+                      let ip_c = Gwdb.iper_of_string c_link.MLink.Person_link.ip in
                       match Perso_link.get_person_link baseprefix ip_c with
                         Some c_link ->
                           let can_merge =
@@ -5409,9 +5384,9 @@ let print_foreach conf base print_ast eval_expr =
                 Perso_link.make_efam_link conf base fam_link
               in
               let (ifath, imoth, ifam) =
-                Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.ifath),
-                Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.imoth),
-                Adef.ifam_of_int (Int32.to_int fam_link.MLink.Family.ifam)
+                Gwdb.iper_of_string fam_link.MLink.Family.ifath,
+                Gwdb.iper_of_string fam_link.MLink.Family.imoth,
+                Gwdb.ifam_of_string fam_link.MLink.Family.ifam
               in
               let cpl =
                 let ip = get_key_index p in
@@ -5421,9 +5396,7 @@ let print_foreach conf base print_ast eval_expr =
                       baseprefix
                   with
                     Some p ->
-                      let ip =
-                        Adef.iper_of_int (Int32.to_int p.MLink.Person.ip)
-                      in
+                      let ip = Gwdb.iper_of_string p.MLink.Person.ip in
                       ifath, imoth, (if ip = ifath then imoth else ifath)
                   | None ->
                       ifath, imoth, (if ip = ifath then imoth else ifath)
@@ -5489,9 +5462,9 @@ let print_foreach conf base print_ast eval_expr =
                 Perso_link.make_efam_link conf base fam_link
               in
               let (ifath, imoth, ifam) =
-                Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.ifath),
-                Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.imoth),
-                Adef.ifam_of_int (Int32.to_int fam_link.MLink.Family.ifam)
+                Gwdb.iper_of_string fam_link.MLink.Family.ifath,
+                Gwdb.iper_of_string fam_link.MLink.Family.imoth,
+                Gwdb.ifam_of_string fam_link.MLink.Family.ifam
               in
               let cpl =
                 let ip = get_key_index p in
@@ -5501,9 +5474,7 @@ let print_foreach conf base print_ast eval_expr =
                       fam_link.MLink.Family.baseprefix
                   with
                     Some p ->
-                      let ip =
-                        Adef.iper_of_int (Int32.to_int p.MLink.Person.ip)
-                      in
+                      let ip = Gwdb.iper_of_string p.MLink.Person.ip in
                       ifath, imoth, (if ip = ifath then imoth else ifath)
                   | None ->
                       ifath, imoth, (if ip = ifath then imoth else ifath)
@@ -5936,7 +5907,7 @@ let gen_interp_templ menu title templ_fname conf base p =
     let mdl () =
 #ifdef API
       Vint
-        (max (max_descendant_level desc_level_table_l)
+        (max (max_descendant_level base desc_level_table_l)
            (Perso_link.max_interlinks_descendancy_level conf base
               (get_key_index p) 10))
 #else

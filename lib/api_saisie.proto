@@ -153,7 +153,7 @@ enum Access {
 }
 
 message ModPerson {
-  required int32 index = 1;
+  required string index = 1;
   required Sex sex = 2;
   required string lastname = 3;
   required string firstname = 4;
@@ -186,13 +186,13 @@ message ModPerson {
   optional string notes = 31;
   optional string psources = 32;
   repeated Title titles = 33;
-  repeated int32 related = 34;
+  repeated string related = 34;
   repeated RelationParent rparents = 35;
   optional Access access = 36 [default = ACCESS_IFTITLES];
 }
 
 message ModFamily {
-  required int32 index = 1;
+  required string index = 1;
   optional Date marriage_date = 2;
   optional string marriage_place = 3;
   optional string marriage_note = 4;
@@ -247,5 +247,5 @@ message BaseWarnings {
 message ModificationStatus {
   required bool status = 1;
   required BaseWarnings base_warnings = 2;
-  optional int32 index = 3;
+  optional string index = 3;
 }
