@@ -9,6 +9,7 @@ include Makefile.config
 -include Makefile.local
 
 .PHONY: clean distrib doc geneweb.install install piqi test uninstall
+.DEFAULT_GOAL = exe
 
 # Variables for packagers.
 PREFIX=/usr
@@ -17,17 +18,17 @@ DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
 
 EXE = \
-	bin/distrib/connex \
-	bin/distrib/consang \
-	bin/distrib/ged2gwb \
-	bin/distrib/gwb2ged \
-	bin/distrib/gwc \
-	bin/distrib/gwd \
-	bin/distrib/gwdiff \
-	bin/distrib/gwtp \
-	bin/distrib/gwu \
-	bin/distrib/setup \
-	bin/distrib/update_nldb \
+	bin/distrib/connex.exe \
+	bin/distrib/consang.exe \
+	bin/distrib/ged2gwb.exe \
+	bin/distrib/gwb2ged.exe \
+	bin/distrib/gwc.exe \
+	bin/distrib/gwd.exe \
+	bin/distrib/gwdiff.exe \
+	bin/distrib/gwtp.exe \
+	bin/distrib/gwu.exe \
+	bin/distrib/setup.exe \
+	bin/distrib/update_nldb.exe \
 
 ###### [BEGIN] Generated files section
 
@@ -110,7 +111,7 @@ geneweb.install:
 	dune build $@
 
 exe:
-	dune build $(ALL_EXE:=.exe)
+	dune build $(EXE)
 
 geneweb.install exe: $(GENERATED_FILES_DEP) piqi
 
@@ -150,21 +151,21 @@ distrib: exe
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "127.0.0.1" > $(DISTRIB_DIR)/gw/only.txt
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
-	cp $(BUILD_DISTRIB_DIR)gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXE);
-	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/consang$(EXE);
-	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/mk_consang$(EXE);
-	cp $(BUILD_DISTRIB_DIR)gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXE);
-	cp $(BUILD_DISTRIB_DIR)gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXE);
-	cp $(BUILD_DISTRIB_DIR)ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXE);
-	cp $(BUILD_DISTRIB_DIR)gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXE);
-	cp $(BUILD_DISTRIB_DIR)connex.exe $(DISTRIB_DIR)/gw/connex$(EXE);
-	cp $(BUILD_DISTRIB_DIR)gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXE);
-	cp $(BUILD_DISTRIB_DIR)setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXE);
-	cp $(BUILD_DISTRIB_DIR)update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXE);
+	cp $(BUILD_DISTRIB_DIR)gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
+	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
+	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/mk_consang$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
+	cp $(BUILD_DISTRIB_DIR)ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT);
+	cp $(BUILD_DISTRIB_DIR)connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);
+	cp $(BUILD_DISTRIB_DIR)setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
+	cp $(BUILD_DISTRIB_DIR)update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
 	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp
 	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp/lang
 	cp bin/distrib/gwtp/README $(DISTRIB_DIR)/gw/gwtp_tmp/.
-	cp $(BUILD_DISTRIB_DIR)/gwtp.exe $(DISTRIB_DIR)/gw/gwtp_tmp/gwtp$(EXE)
+	cp $(BUILD_DISTRIB_DIR)/gwtp.exe $(DISTRIB_DIR)/gw/gwtp_tmp/gwtp$(EXT)
 	cp bin/distrib/gwtp/lang/*.txt $(DISTRIB_DIR)/gw/gwtp_tmp/lang/.
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/distrib/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
