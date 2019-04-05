@@ -4,6 +4,7 @@ open Geneweb
 open Dbdisk
 open Def
 open Mutil
+open Gwdb1_internal
 
 type person = dsk_person
 type ascend = dsk_ascend
@@ -94,15 +95,15 @@ let get_children d = d.Def.children
 let descend_of_gen_descend d = d
 let gen_descend_of_descend d = d
 
-let poi base i = base.data.persons.get (Adef.int_of_iper i)
-let aoi base i = base.data.ascends.get (Adef.int_of_iper i)
-let uoi base i = base.data.unions.get (Adef.int_of_iper i)
+let poi base i = base.data.persons.get i
+let aoi base i = base.data.ascends.get i
+let uoi base i = base.data.unions.get i
 
-let foi base i = base.data.families.get (Adef.int_of_ifam i)
-let coi base i = base.data.couples.get (Adef.int_of_ifam i)
-let doi base i = base.data.descends.get (Adef.int_of_ifam i)
+let foi base i = base.data.families.get i
+let coi base i = base.data.couples.get i
+let doi base i = base.data.descends.get i
 
-let sou base i = base.data.strings.get (Adef.int_of_istr i)
+let sou base i = base.data.strings.get i
 
 let p_first_name base p = nominative (sou base p.first_name)
 let p_surname base p = nominative (sou base p.surname)
@@ -849,15 +850,15 @@ type gen =
     g_ic : in_channel;
     g_not : (string, int) Hashtbl.t;
     g_src : (string, int) Hashtbl.t;
-    g_hper : (string, Adef.iper) Hashtbl.t;
-    g_hfam : (string, Adef.ifam) Hashtbl.t;
-    g_hstr : (string, dsk_istr) Hashtbl.t;
+    g_hper : (string, Gwdb1_internal.iper) Hashtbl.t;
+    g_hfam : (string, Gwdb1_internal.ifam) Hashtbl.t;
+    g_hstr : (string, Gwdb1_internal.istr) Hashtbl.t;
     g_hnam : (string, int ref) Hashtbl.t;
-    g_adop : (string, Adef.iper * string) Hashtbl.t;
-    mutable g_godp : (Adef.iper * Adef.iper) list;
-    mutable g_prelated : (Adef.iper * Adef.iper) list;
-    mutable g_frelated : (Adef.iper * Adef.iper) list;
-    mutable g_witn : (Adef.ifam * Adef.iper) list }
+    g_adop : (string, Gwdb1_internal.iper * string) Hashtbl.t;
+    mutable g_godp : (Gwdb1_internal.iper * Gwdb1_internal.iper) list;
+    mutable g_prelated : (Gwdb1_internal.iper * Gwdb1_internal.iper) list;
+    mutable g_frelated : (Gwdb1_internal.iper * Gwdb1_internal.iper) list;
+    mutable g_witn : (Gwdb1_internal.ifam * Gwdb1_internal.iper) list }
 
 let assume_tab tab none =
   if tab.tlen = Array.length tab.arr then
@@ -872,8 +873,8 @@ let add_string gen s =
       assume_tab gen.g_str "";
       gen.g_str.arr.(i) <- s;
       gen.g_str.tlen <- gen.g_str.tlen + 1;
-      Hashtbl.add gen.g_hstr s (Adef.istr_of_int i);
-      Adef.istr_of_int i
+      Hashtbl.add gen.g_hstr s (i);
+      i
 
 let extract_addr addr =
   if String.length addr > 0 && addr.[0] = '@' then
@@ -893,9 +894,9 @@ let per_index gen lab =
       assume_tab gen.g_per (Left3 "");
       gen.g_per.arr.(i) <- Left3 lab;
       gen.g_per.tlen <- gen.g_per.tlen + 1;
-      Hashtbl.add gen.g_hper lab (Adef.iper_of_int i);
+      Hashtbl.add gen.g_hper lab i;
       output_pindex i lab;
-      Adef.iper_of_int i
+      i
 
 let fam_index gen lab =
   let lab = extract_addr lab in
@@ -905,12 +906,12 @@ let fam_index gen lab =
       assume_tab gen.g_fam (Left3 "");
       gen.g_fam.arr.(i) <- Left3 lab;
       gen.g_fam.tlen <- gen.g_fam.tlen + 1;
-      Hashtbl.add gen.g_hfam lab (Adef.ifam_of_int i);
-      Adef.ifam_of_int i
+      Hashtbl.add gen.g_hfam lab (i);
+      i
 
-let string_empty = Adef.istr_of_int 0
-let string_quest = Adef.istr_of_int 1
-let string_x = Adef.istr_of_int 2
+let string_empty = 0
+let string_quest = 1
+let string_x = 2
 
 let unknown_per i sex =
   let empty = string_empty in
@@ -927,7 +928,7 @@ let unknown_per i sex =
        death_place = empty; death_note = empty; death_src = empty;
        burial = UnknownBurial; burial_place = empty; burial_note = empty;
        burial_src = empty; pevents = []; notes = empty; psources = empty;
-       key_index = Adef.iper_of_int i}
+       key_index = i}
   and a = ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}
   and u = union_of_gen_union {family = [| |]} in
   p, a, u
@@ -938,7 +939,7 @@ let phony_per gen sex =
   assume_tab gen.g_per (Left3 "");
   gen.g_per.tlen <- gen.g_per.tlen + 1;
   gen.g_per.arr.(i) <- Right3 (person, ascend, union);
-  Adef.iper_of_int i
+  i
 
 let unknown_fam gen i =
   let empty = string_empty in
@@ -950,7 +951,7 @@ let unknown_fam gen i =
        marriage_note = empty; marriage_src = empty; witnesses = [| |];
        relation = !relation_status; divorce = NotDivorced; fevents = [];
        comment = empty; origin_file = empty; fsources = empty;
-       fam_index = Adef.ifam_of_int i}
+       fam_index = i}
   and c = couple_of_gen_couple (couple false father mother)
   and d = descend_of_gen_descend {children = [| |]} in
   f, c, d
@@ -961,7 +962,7 @@ let phony_fam gen =
   assume_tab gen.g_fam (Left3 "");
   gen.g_fam.tlen <- gen.g_fam.tlen + 1;
   gen.g_fam.arr.(i) <- Right3 (fam, cpl, des);
-  Adef.ifam_of_int i
+  i
 
 let this_year =
   let tm = Unix.localtime (Unix.time ()) in tm.Unix.tm_year + 1900
@@ -1464,18 +1465,18 @@ let forward_adop gen ip lab which_parent =
 
 let adop_parent gen ip r =
   let i = per_index gen r.rval in
-  match gen.g_per.arr.(Adef.int_of_iper i) with
+  match gen.g_per.arr.(i) with
     Left3 _ -> None
   | Right3 (p, a, u) ->
       if List.mem ip (get_related p) then ()
       else
         begin let p = person_with_related p (ip :: get_related p) in
-          gen.g_per.arr.(Adef.int_of_iper i) <- Right3 (p, a, u)
+          gen.g_per.arr.(i) <- Right3 (p, a, u)
         end;
       Some (get_key_index p)
 
 let set_adop_fam gen ip which_parent fath moth =
-  match gen.g_per.arr.(Adef.int_of_iper ip) with
+  match gen.g_per.arr.(ip) with
     Left3 _ -> ()
   | Right3 (per, asc, uni) ->
       let r_fath =
@@ -1493,7 +1494,7 @@ let set_adop_fam gen ip which_parent fath moth =
          r_sources = string_empty}
       in
       let per = person_with_rparents per (r :: get_rparents per) in
-      gen.g_per.arr.(Adef.int_of_iper ip) <- Right3 (per, asc, uni)
+      gen.g_per.arr.(ip) <- Right3 (per, asc, uni)
 
 let forward_godp gen ip rval =
   let ipp = per_index gen rval in gen.g_godp <- (ipp, ip) :: gen.g_godp; ipp
@@ -1998,7 +1999,7 @@ let add_indi gen r =
             Not_found -> let r = ref (-1) in Hashtbl.add gen.g_hnam key r; r
         in
         incr r; f, s, !r, pn, fal
-    | None -> "?", "?", Adef.int_of_iper ip, givn, []
+    | None -> "?", "?", ip, givn, []
   in
 (* S'il y a des caractères interdits, on les supprime *)
   let (first_name, surname) =
@@ -2363,7 +2364,7 @@ let add_indi gen r =
     ascend_of_gen_ascend {parents = parents; consang = Adef.fix (-1)}
   in
   let union = union_of_gen_union {family = Array.of_list family} in
-  gen.g_per.arr.(Adef.int_of_iper ip) <- Right3 (person, ascend, union);
+  gen.g_per.arr.(ip) <- Right3 (person, ascend, union);
   begin match find_field "ADOP" r.rsons with
     Some r ->
       begin match find_field "FAMC" r.rsons with
@@ -2676,7 +2677,7 @@ let add_fam_norm gen r adop_list =
         in
         fath, moth, false
   in
-  begin match gen.g_per.arr.(Adef.int_of_iper fath) with
+  begin match gen.g_per.arr.(fath) with
     Left3 _ -> ()
   | Right3 (p, a, u) ->
       let u =
@@ -2685,9 +2686,9 @@ let add_fam_norm gen r adop_list =
         else u
       in
       let p = if get_sex p = Neuter then person_with_sex p Male else p in
-      gen.g_per.arr.(Adef.int_of_iper fath) <- Right3 (p, a, u)
+      gen.g_per.arr.(fath) <- Right3 (p, a, u)
   end;
-  begin match gen.g_per.arr.(Adef.int_of_iper moth) with
+  begin match gen.g_per.arr.(moth) with
     Left3 _ -> ()
   | Right3 (p, a, u) ->
       let u =
@@ -2696,7 +2697,7 @@ let add_fam_norm gen r adop_list =
         else u
       in
       let p = if get_sex p = Neuter then person_with_sex p Female else p in
-      gen.g_per.arr.(Adef.int_of_iper moth) <- Right3 (p, a, u)
+      gen.g_per.arr.(moth) <- Right3 (p, a, u)
   end;
   let children =
     let rl = find_all_fields "CHIL" r.rsons in
@@ -2704,13 +2705,13 @@ let add_fam_norm gen r adop_list =
       (fun r ipl ->
          let ip = per_index gen r.rval in
          if List.mem_assoc ip adop_list then
-           match gen.g_per.arr.(Adef.int_of_iper ip) with
+           match gen.g_per.arr.(ip) with
              Right3 (p, a, u) ->
                begin match get_parents a with
                  Some ifam ->
                    if ifam = i then
                      let a = ascend_with_parents a None in
-                     gen.g_per.arr.(Adef.int_of_iper ip) <- Right3 (p, a, u);
+                     gen.g_per.arr.(ip) <- Right3 (p, a, u);
                      ipl
                    else ip :: ipl
                | None -> ip :: ipl
@@ -2832,10 +2833,10 @@ let add_fam_norm gen r adop_list =
     else ""
   in
   let add_in_person_notes iper =
-    match gen.g_per.arr.(Adef.int_of_iper iper) with
+    match gen.g_per.arr.(iper) with
       Left3 _ -> ()
     | Right3 (p, a, u) ->
-        let notes = gen.g_str.arr.(Adef.int_of_istr (get_notes p)) in
+        let notes = gen.g_str.arr.(get_notes p) in
         let notes =
           if notes = "" then ext_sources ^ ext_notes
           else if ext_sources = "" then notes ^ "\n" ^ ext_notes
@@ -2846,7 +2847,7 @@ let add_fam_norm gen r adop_list =
           person_of_gen_person
             {(gen_person_of_person p) with notes = new_notes}
         in
-        gen.g_per.arr.(Adef.int_of_iper iper) <- Right3 (p, a, u)
+        gen.g_per.arr.(iper) <- Right3 (p, a, u)
   in
   let _ =
     if ext_notes = "" then ()
@@ -2880,7 +2881,7 @@ let add_fam_norm gen r adop_list =
        fam_index = i}
   and cpl = couple_of_gen_couple (couple false fath moth)
   and des = descend_of_gen_descend {children = Array.of_list children} in
-  gen.g_fam.arr.(Adef.int_of_ifam i) <- Right3 (fam, cpl, des)
+  gen.g_fam.arr.(i) <- Right3 (fam, cpl, des)
 
 let add_fam gen r =
   let list = Hashtbl.find_all gen.g_adop r.rval in
@@ -3016,22 +3017,22 @@ let pass2 gen fname =
   loop ();
   List.iter
     (fun (ipp, ip) ->
-       match gen.g_per.arr.(Adef.int_of_iper ipp) with
+       match gen.g_per.arr.(ipp) with
          Right3 (p, a, u) ->
            if List.mem ip (get_related p) then ()
            else
              let p = person_with_related p (ip :: get_related p) in
-             gen.g_per.arr.(Adef.int_of_iper ipp) <- Right3 (p, a, u)
+             gen.g_per.arr.(ipp) <- Right3 (p, a, u)
        | _ -> () )
     gen.g_godp;
   List.iter
     (fun (ipp, ip) ->
-       match gen.g_per.arr.(Adef.int_of_iper ipp) with
+       match gen.g_per.arr.(ipp) with
          Right3 (p, a, u) ->
          if List.mem ip (get_related p) then ()
          else
            let p = person_with_related p (ip :: get_related p) in
-           gen.g_per.arr.(Adef.int_of_iper ipp) <- Right3 (p, a, u)
+           gen.g_per.arr.(ipp) <- Right3 (p, a, u)
        | _ -> () )
     gen.g_prelated;
   close_in ic
@@ -3065,11 +3066,11 @@ let pass3 gen fname =
   loop ();
   List.iter
     (fun (ifam, ip) ->
-       match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
+       match gen.g_fam.arr.(ifam) with
          Right3 (fam, cpl, des) ->
            begin match
-             gen.g_per.arr.(Adef.int_of_iper (get_father cpl)),
-             gen.g_per.arr.(Adef.int_of_iper ip)
+             gen.g_per.arr.(get_father cpl),
+             gen.g_per.arr.(ip)
            with
              Right3 _, Right3 (p, a, u) ->
                if List.mem (get_father cpl) (get_related p) then ()
@@ -3077,7 +3078,7 @@ let pass3 gen fname =
                  begin let p =
                    person_with_related p (get_father cpl :: get_related p)
                  in
-                   gen.g_per.arr.(Adef.int_of_iper ip) <- Right3 (p, a, u)
+                   gen.g_per.arr.(ip) <- Right3 (p, a, u)
                  end;
                if List.mem ip (Array.to_list (get_witnesses fam)) then ()
                else
@@ -3086,7 +3087,7 @@ let pass3 gen fname =
                      {(gen_family_of_family fam) with witnesses =
                        Array.append (get_witnesses fam) [| ip |]}
                  in
-                 gen.g_fam.arr.(Adef.int_of_ifam ifam) <-
+                 gen.g_fam.arr.(ifam) <-
                    Right3 (fam, cpl, des)
            | _ -> ()
            end
@@ -3094,12 +3095,12 @@ let pass3 gen fname =
     gen.g_witn;
   List.iter
     (fun (ipp, ip) ->
-       match gen.g_per.arr.(Adef.int_of_iper ipp) with
+       match gen.g_per.arr.(ipp) with
          Right3 (p, a, u) ->
            if List.mem ip (get_related p) then ()
            else
              let p = person_with_related p (ip :: get_related p) in
-             gen.g_per.arr.(Adef.int_of_iper ipp) <- Right3 (p, a, u)
+             gen.g_per.arr.(ipp) <- Right3 (p, a, u)
        | _ -> ())
     gen.g_frelated;
   close_in ic
@@ -3149,20 +3150,20 @@ let add_parents_to_isolated gen =
            get_rparents p = [] && get_related p = [] &&
            not (Hashtbl.mem ht_missing_children (get_key_index p))
         then
-          let fn = gen.g_str.arr.(Adef.int_of_istr (get_first_name p)) in
-          let sn = gen.g_str.arr.(Adef.int_of_istr (get_surname p)) in
+          let fn = gen.g_str.arr.(get_first_name p) in
+          let sn = gen.g_str.arr.(get_surname p) in
           if fn = "?" && sn = "?" then ()
           else
             begin
               Printf.fprintf !log_oc "Adding parents to isolated person: %s.%d %s\n"
                 fn (get_occ p) sn;
               let ifam = phony_fam gen in
-              match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
+              match gen.g_fam.arr.(ifam) with
                 Right3 (fam, cpl, _) ->
                   let des =
                     descend_of_gen_descend {children = [| get_key_index p |]}
                   in
-                  gen.g_fam.arr.(Adef.int_of_ifam ifam) <-
+                  gen.g_fam.arr.(ifam) <-
                     Right3 (fam, cpl, des);
                   let a = ascend_with_parents a (Some ifam) in
                   gen.g_per.arr.(i) <- Right3 (p, a, u)
@@ -3325,14 +3326,14 @@ let check_parents_children base ascends unions couples descends =
     begin match get_parents a with
       Some ifam ->
         let fam = foi base ifam in
-        if get_fam_index fam = Adef.ifam_of_int (-1) then
+        if get_fam_index fam = (-1) then
           ascends.(i) <- ascend_with_parents a None
         else
           let cpl = coi base ifam in
           let des = doi base ifam in
-          if array_memq (Adef.iper_of_int i) (get_children des) then ()
+          if array_memq i (get_children des) then ()
           else
-            let p = poi base (Adef.iper_of_int i) in
+            let p = poi base i in
             Printf.fprintf !log_oc "%s is not the child of his/her parents\n"
               (designation base p);
             Printf.fprintf !log_oc "- %s\n"
@@ -3348,14 +3349,14 @@ let check_parents_children base ascends unions couples descends =
     fam_to_delete := [];
     let u = unions.(i) in
     for j = 0 to Array.length (get_family u) - 1 do
-      let cpl = couples.(Adef.int_of_ifam (get_family u).(j)) in
-      if Adef.iper_of_int i <> get_father cpl &&
-         Adef.iper_of_int i <> get_mother cpl
+      let cpl = couples.((get_family u).(j)) in
+      if i <> get_father cpl &&
+         i <> get_mother cpl
       then
         begin
           Printf.fprintf !log_oc
             "%s is spouse in this family but neither husband nor wife:\n"
-            (designation base (poi base (Adef.iper_of_int i)));
+            (designation base (poi base (i)));
           Printf.fprintf !log_oc "- %s\n"
             (designation base (poi base (get_father cpl)));
           Printf.fprintf !log_oc "- %s\n"
@@ -3370,25 +3371,25 @@ let check_parents_children base ascends unions couples descends =
             begin
               Printf.fprintf !log_oc
                 "However, the husband is unknown, I set him as husband\n";
-              unions.(Adef.int_of_iper (get_father cpl)) <-
+              unions.(get_father cpl) <-
                 union_of_gen_union {family = [| |]};
               let cpl =
                 couple_of_gen_couple
-                  (couple false (Adef.iper_of_int i) (get_mother cpl))
+                  (couple false (i) (get_mother cpl))
               in
-              couples.(Adef.int_of_ifam (get_family u).(j)) <- cpl
+              couples.((get_family u).(j)) <- cpl
             end
           else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then
             begin
               Printf.fprintf !log_oc
                 "However, the wife is unknown, I set her as wife\n";
-              unions.(Adef.int_of_iper (get_mother cpl)) <-
+              unions.(get_mother cpl) <-
                 union_of_gen_union {family = [| |]};
               let cpl =
                 couple_of_gen_couple
-                  (couple false (get_father cpl) (Adef.iper_of_int i))
+                  (couple false (get_father cpl) (i))
               in
-              couples.(Adef.int_of_ifam (get_family u).(j)) <- cpl
+              couples.((get_family u).(j)) <- cpl
             end
           else
             begin
@@ -3412,15 +3413,15 @@ let check_parents_children base ascends unions couples descends =
   done;
   for i = 0 to base.data.families.len - 1 do
     to_delete := [];
-    let fam = foi base (Adef.ifam_of_int i) in
-    let cpl = coi base (Adef.ifam_of_int i) in
+    let fam = foi base (i) in
+    let cpl = coi base (i) in
     let des = descends.(i) in
     for j = 0 to Array.length (get_children des) - 1 do
-      let a = ascends.(Adef.int_of_iper (get_children des).(j)) in
+      let a = ascends.((get_children des).(j)) in
       let p = poi base (get_children des).(j) in
       match get_parents a with
         Some ifam ->
-          if Adef.int_of_ifam ifam <> i then
+          if ifam <> i then
             begin
               Printf.fprintf !log_oc "Other parents for %s\n" (designation base p);
               Printf.fprintf !log_oc "- %s\n"
@@ -3443,7 +3444,7 @@ let check_parents_children base ascends unions couples descends =
           Printf.fprintf !log_oc "\n";
           flush !log_oc;
           let a = ascend_with_parents a (Some (get_fam_index fam)) in
-          ascends.(Adef.int_of_iper (get_children des).(j)) <- a
+          ascends.((get_children des).(j)) <- a
     done;
     if !to_delete <> [] then
       let l =
@@ -3462,7 +3463,7 @@ let string_of_sex =
 
 let check_parents_sex base persons families =
   for i = 0 to base.data.couples.len - 1 do
-    let cpl = coi base (Adef.ifam_of_int i) in
+    let cpl = coi base (i) in
     let fam = families.(i) in
     let ifath = get_father cpl in
     let imoth = get_mother cpl in
@@ -3490,8 +3491,8 @@ let check_parents_sex base persons families =
       end
     else
       begin
-        persons.(Adef.int_of_iper ifath) <- person_with_sex fath Male;
-        persons.(Adef.int_of_iper imoth) <- person_with_sex moth Female
+        persons.(ifath) <- person_with_sex fath Male;
+        persons.(imoth) <- person_with_sex moth Female
       end
   done
 
@@ -3530,7 +3531,7 @@ let rec negative_date_ancestors base persons families i =
   persons.(i) <- p;
   let u = uoi base (get_key_index p) in
   for i = 0 to Array.length (get_family u) - 1 do
-    let j = Adef.int_of_ifam (get_family u).(i) in
+    let j = (get_family u).(i) in
     let fam = families.(j) in
     match Adef.od_of_cdate (get_marriage fam) with
       Some d ->
@@ -3547,9 +3548,9 @@ let rec negative_date_ancestors base persons families i =
     Some ifam ->
       let cpl = coi base ifam in
       negative_date_ancestors base persons families
-        (Adef.int_of_iper (get_father cpl));
+        (get_father cpl);
       negative_date_ancestors base persons families
-        (Adef.int_of_iper (get_mother cpl))
+        (get_mother cpl)
   | _ -> ()
 
 let negative_dates base persons families =
@@ -3570,7 +3571,7 @@ let finish_base base (persons, families, _, _) =
     let children =
       sort_by_date
         (fun ip ->
-           Adef.od_of_cdate (get_birth persons.(Adef.int_of_iper ip)))
+           Adef.od_of_cdate (get_birth persons.(ip)))
         (Array.to_list (get_children des))
     in
     descends.(i) <- descend_of_gen_descend {children = Array.of_list children}
@@ -3580,7 +3581,7 @@ let finish_base base (persons, families, _, _) =
     let family =
       sort_by_date
         (fun ifam ->
-           Adef.od_of_cdate (get_marriage families.(Adef.int_of_ifam ifam)))
+           Adef.od_of_cdate (get_marriage families.(ifam)))
         (Array.to_list (get_family u))
     in
     unions.(i) <- union_of_gen_union {family = Array.of_list family}
@@ -3605,7 +3606,6 @@ let finish_base base (persons, families, _, _) =
   check_parents_sex base persons families;
   check_parents_children base ascends unions couples descends;
   if !try_negative_dates then negative_dates base persons families;
-  let base = base in
   if !do_check then
     let base = Gwdb1.ToGwdb.base base in
     Check.check_base base

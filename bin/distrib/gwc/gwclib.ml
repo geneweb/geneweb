@@ -75,7 +75,6 @@ let speclist =
   [ ("-c", Arg.Set just_comp, "Only compiling")
   ; ("-sep", Arg.Set separate, " Separate all persons in next file")
   ; ("-sh", Arg.Int (fun x -> shift := x), "<int> Shift all persons numbers in next files")
-  ; ("-version", Arg.Unit Util.print_version_commit, " print version and commit numbers")
   ]
 
 let anonfun x =

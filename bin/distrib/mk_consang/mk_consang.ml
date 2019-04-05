@@ -214,6 +214,24 @@ let rebuild_list_with_string_field_array g h db2 fi (f2, get) =
        done);
   close_out oc_ext
 
+#ifdef GWDB1
+let simple_output bname base carray =
+  match carray with
+  | Some _tab -> assert false
+  | None ->
+    Gwdb1.apply_base1 base
+      (fun base ->
+         let bname = base.Dbdisk.data.Dbdisk.bdir in
+         let no_patches =
+           not (Sys.file_exists (Filename.concat bname "patches"))
+         in
+         Outbase.gen_output (no_patches && not !indexes) bname base);
+    (* On recalcul le nombre reel de personnes. *)
+    Util.init_cache_info bname (Gwdb1.ToGwdb.base base)
+#endif
+
+#ifdef GWDB2
+
 let unique_key_string (ht, scnt) s =
   let s = Name.lower (Mutil.nominative s) in
   try Hashtbl.find ht s with
@@ -377,23 +395,6 @@ let rebuild_fields2 db2 =
          (Filename.concat db2.Db2disk.bdir2 f))
     ["family"; "person"; "person_of_key"; "person_of_name"]
 
-#ifdef GWDB1
-let simple_output bname base carray =
-  match carray with
-  | Some _tab -> assert false
-  | None ->
-    Gwdb1.apply_base1 base
-      (fun base ->
-         let bname = base.Dbdisk.data.Dbdisk.bdir in
-         let no_patches =
-           not (Sys.file_exists (Filename.concat bname "patches"))
-         in
-         Outbase.gen_output (no_patches && not !indexes) bname base);
-    (* On recalcul le nombre reel de personnes. *)
-    Util.init_cache_info bname (Gwdb1.ToGwdb.base base)
-#endif
-
-#ifdef GWDB2
 let simple_output bname base carray =
   match carray with
   | Some tab ->
