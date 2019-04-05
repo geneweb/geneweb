@@ -6,6 +6,30 @@ open Gwdb
 
 type charset = Ansel | Ansi | Ascii | Utf8
 
+let nb_persons = ref 0
+
+let int_of_iper =
+  let ht = lazy (Hashtbl.create !nb_persons) in
+  fun i ->
+    let ht = Lazy.force ht in
+    try Hashtbl.find ht i
+    with Not_found ->
+      let x = Hashtbl.length ht in
+      Hashtbl.add ht i x ;
+      x
+
+let nb_families = ref 0
+
+let int_of_ifam =
+  let ht = lazy (Hashtbl.create !nb_families) in
+  fun i ->
+    let ht = Lazy.force ht in
+    try Hashtbl.find ht i
+    with Not_found ->
+      let x = Hashtbl.length ht in
+      Hashtbl.add ht i x ;
+      x
+
 let charset = ref Utf8
 let no_notes = ref false
 let no_picture = ref false
@@ -201,7 +225,7 @@ let string_of_list =
   loop ""
 
 let ged_index oc per =
-  Printf.fprintf oc "1 _GWID %d\n" (Adef.int_of_iper (get_key_index per))
+  Printf.fprintf oc "1 _GWID %d\n" (int_of_iper (get_key_index per))
 
 let ged_name base oc per =
   Printf.fprintf oc "1 NAME %s /%s/\n"
@@ -373,7 +397,7 @@ let ged_pevent base oc per_sel evt =
     (fun (ip, wk) ->
        if per_sel ip then
          begin
-           Printf.fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+           Printf.fprintf oc "2 ASSO @I%d@\n" (int_of_iper ip + 1);
            Printf.fprintf oc "3 TYPE INDI\n";
            match wk with
              Witness -> Printf.fprintf oc "3 RELA witness\n"
@@ -413,11 +437,11 @@ let ged_adoption base per_sel oc per r =
 let ged_fam_adop oc i (fath, moth, _) =
   Printf.fprintf oc "0 @F%d@ FAM\n" i;
   begin match fath with
-    Some i -> Printf.fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper i + 1)
+    Some i -> Printf.fprintf oc "1 HUSB @I%d@\n" (int_of_iper i + 1)
   | _ -> ()
   end;
   match moth with
-    Some i -> Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper i + 1)
+    Some i -> Printf.fprintf oc "1 WIFE @I%d@\n" (int_of_iper i + 1)
   | _ -> ()
 
 let ged_ind_ev_str base oc per per_sel =
@@ -463,18 +487,18 @@ let ged_famc fam_sel oc asc =
   match get_parents asc with
     Some ifam ->
       if fam_sel ifam then
-        Printf.fprintf oc "1 FAMC @F%d@\n" (Adef.int_of_ifam ifam + 1)
+        Printf.fprintf oc "1 FAMC @F%d@\n" (int_of_ifam ifam + 1)
   | None -> ()
 
 let ged_fams fam_sel oc ifam =
-  if fam_sel ifam then Printf.fprintf oc "1 FAMS @F%d@\n" (Adef.int_of_ifam ifam + 1)
+  if fam_sel ifam then Printf.fprintf oc "1 FAMS @F%d@\n" (int_of_ifam ifam + 1)
 
 let ged_godparent per_sel oc godp =
   function
     Some ip ->
       if per_sel ip then
         begin
-          Printf.fprintf oc "1 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+          Printf.fprintf oc "1 ASSO @I%d@\n" (int_of_iper ip + 1);
           Printf.fprintf oc "2 TYPE INDI\n";
           Printf.fprintf oc "2 RELA %s\n" godp
         end
@@ -483,7 +507,7 @@ let ged_godparent per_sel oc godp =
 let ged_witness fam_sel oc ifam =
   if fam_sel ifam then
     begin
-      Printf.fprintf oc "1 ASSO @F%d@\n" (Adef.int_of_ifam ifam + 1);
+      Printf.fprintf oc "1 ASSO @F%d@\n" (int_of_ifam ifam + 1);
       Printf.fprintf oc "2 TYPE FAM\n";
       Printf.fprintf oc "2 RELA witness\n"
     end
@@ -606,7 +630,7 @@ let ged_fevent base oc ifam fam_sel evt =
     (fun (ip, wk) ->
        if fam_sel ifam then
          begin
-           Printf.fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+           Printf.fprintf oc "2 ASSO @I%d@\n" (int_of_iper ip + 1);
            Printf.fprintf oc "3 TYPE INDI\n";
            match wk with
              Witness -> Printf.fprintf oc "3 RELA witness\n"
@@ -616,7 +640,7 @@ let ged_fevent base oc ifam fam_sel evt =
     evt.efam_witnesses
 
 let ged_child per_sel oc chil =
-  if per_sel chil then Printf.fprintf oc "1 CHIL @I%d@\n" (Adef.int_of_iper chil + 1)
+  if per_sel chil then Printf.fprintf oc "1 CHIL @I%d@\n" (int_of_iper chil + 1)
 
 let ged_fsource base oc fam =
   match sou base (get_fsources fam) with
@@ -641,10 +665,10 @@ let has_personal_infos base per =
   else false
 
 let ged_ind_record base (per_sel, fam_sel as sel) oc i =
-  let per = poi base (Adef.iper_of_int i) in
+  let per = poi base i in
   if has_personal_infos base per then
     begin
-      Printf.fprintf oc "0 @I%d@ INDI\n" (i + 1);
+      Printf.fprintf oc "0 @I%d@ INDI\n" (int_of_iper i + 1);
       ged_name base oc per;
       if !with_indexes then ged_index oc per;
       ged_sex oc per;
@@ -658,35 +682,32 @@ let ged_ind_record base (per_sel, fam_sel as sel) oc i =
       ged_note base oc per
     end
 
-let ged_fam_record base (per_sel, fam_sel) oc i =
-  let ifam = Adef.ifam_of_int i in
+let ged_fam_record base (per_sel, fam_sel) oc ifam =
   let fam = foi base ifam in
-  if is_deleted_family fam then ()
-  else
-    begin
-      Printf.fprintf oc "0 @F%d@ FAM\n" (i + 1);
-      List.iter (ged_fevent base oc ifam fam_sel) (get_fevents fam);
-      if has_personal_infos base (poi base (get_father fam)) &&
-         per_sel (get_father fam)
-      then
-        Printf.fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (get_father fam) + 1);
-      if has_personal_infos base (poi base (get_mother fam)) &&
-         per_sel (get_mother fam)
-      then
-        Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother fam) + 1);
-      Array.iter (ged_child per_sel oc) (get_children fam);
-      ged_fsource base oc fam;
-      ged_comment base oc fam
-    end
+  begin
+    Printf.fprintf oc "0 @F%d@ FAM\n" (int_of_ifam ifam + 1);
+    List.iter (ged_fevent base oc ifam fam_sel) (get_fevents fam);
+    if has_personal_infos base (poi base (get_father fam)) &&
+       per_sel (get_father fam)
+    then
+      Printf.fprintf oc "1 HUSB @I%d@\n" (int_of_iper (get_father fam) + 1);
+    if has_personal_infos base (poi base (get_mother fam)) &&
+       per_sel (get_mother fam)
+    then
+      Printf.fprintf oc "1 WIFE @I%d@\n" (int_of_iper (get_mother fam) + 1);
+    Array.iter (ged_child per_sel oc) (get_children fam);
+    ged_fsource base oc fam;
+    ged_comment base oc fam
+  end
 
 let find_person base p1 po p2 =
   match person_of_key base p1 p2 po with
-    Some ip -> ip
+  | Some ip -> ip
   | None ->
-      Printf.printf "Not found: %s%s %s\n" p1
-        (if po = 0 then "" else " " ^ string_of_int po) p2;
-      flush stdout;
-      exit 2
+    Printf.printf "Not found: %s%s %s\n" p1
+      (if po = 0 then "" else " " ^ string_of_int po) p2;
+    flush stdout;
+    exit 2
 
 let surnames = ref []
 let no_spouses_parents = ref false
@@ -728,12 +749,12 @@ let gwb2ged base ifile ofile anc desc mem =
   in
   ged_header base oc ifile ofile;
   flush oc;
-  for i = 0 to nb_of_persons base - 1 do
-    if per_sel (Adef.iper_of_int i) then ged_ind_record base sel oc i
-  done;
-  for i = 0 to nb_of_families base - 1 do
-    if fam_sel (Adef.ifam_of_int i) then ged_fam_record base sel oc i
-  done;
+  Gwdb.Collection.iter begin fun i ->
+    if per_sel i then ged_ind_record base sel oc i
+  end (Gwdb.ipers base) ;
+  Gwdb.Collection.iter begin fun i ->
+    if fam_sel i then ged_fam_record base sel oc i
+  end (Gwdb.ifams base) ;
   let _ =
     List.fold_right (fun adop i -> ged_fam_adop oc i adop; i + 1)
       !adop_fam_list (nb_of_families base + 1)
@@ -851,7 +872,10 @@ let main () =
       exit 2
     end;
   match try Some (Gwdb.open_base !ifile) with Sys_error _ -> None with
-    Some base -> gwb2ged base !ifile !ofile anc desc !mem
+  | Some base ->
+    nb_persons := Gwdb.nb_of_persons base ;
+    nb_families := Gwdb.nb_of_families base ;
+    gwb2ged base !ifile !ofile anc desc !mem
   | None -> Printf.printf "Can't open base %s\n" !ifile; flush stdout; exit 2
 
 let _ = Printexc.catch main ()

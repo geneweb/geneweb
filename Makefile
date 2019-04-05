@@ -18,17 +18,17 @@ DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
 
 EXE = \
-	bin/distrib/connex.exe \
-	bin/distrib/consang.exe \
 	bin/distrib/ged2gwb.exe \
 	bin/distrib/gwb2ged.exe \
 	bin/distrib/gwc.exe \
 	bin/distrib/gwd.exe \
-	bin/distrib/gwdiff.exe \
-	bin/distrib/gwtp.exe \
 	bin/distrib/gwu.exe \
 	bin/distrib/setup.exe \
 	bin/distrib/update_nldb.exe \
+	bin/distrib/consang.exe \
+	bin/distrib/gwtp.exe \
+	bin/distrib/connex.exe \
+	bin/distrib/gwdiff.exe \
 
 ###### [BEGIN] Generated files section
 

@@ -153,8 +153,7 @@ let move base basename =
             [] -> nb, rfaml
           | ifam :: ifaml ->
             let j = ifam in
-            if not (is_deleted_family (foi base ifam))
-            && not (Gwdb.Marker.get mark j)
+            if not (Gwdb.Marker.get mark j)
             && (!ignore_files || eq_istr (get_origin_file fam) origin_file)
             then
               begin
@@ -214,8 +213,7 @@ let move base basename =
                   List.iter
                     (fun ifam ->
                        let fam = foi base ifam in
-                       if not (is_deleted_family fam) then
-                         effective_del base (ifam, fam))
+                       effective_del base (ifam, fam))
                     ifaml;
                   Printf.eprintf "%d families deleted\n" (List.length ifaml);
                   flush stderr
