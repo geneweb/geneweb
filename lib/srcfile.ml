@@ -153,10 +153,6 @@ let string_of_start_date conf =
       Util.translate_eval (Date.string_of_date conf d)
   | _ -> r.start_date
 
-let string_of_num sep num =
-  let len = ref 0 in
-  Sosa.print (fun x -> len := Buff.mstore !len x) sep num; Buff.get !len
-
 let macro conf base =
   function
     'a' ->
@@ -172,8 +168,7 @@ let macro conf base =
       s ^ body_prop conf
   | 'c' ->
       let r = count conf in
-      string_of_num (transl conf "(thousand separator)")
-        (Sosa.of_int r.welcome_cnt)
+      Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") r.welcome_cnt
   | 'd' -> string_of_start_date conf
   | 'D' -> (count conf).start_date
   | 'e' -> conf.charset
@@ -190,14 +185,16 @@ let macro conf base =
       with Not_found -> "20"
       end
   | 'n' ->
-      string_of_num (transl conf "(thousand separator)")
-        (Sosa.of_int (nb_of_persons base))
+      Mutil.string_of_int_sep
+        (Util.transl conf "(thousand separator)")
+        (nb_of_persons base)
   | 'N' -> (try List.assoc "base_notes_title" conf.base_env with Not_found -> "")
   | 'o' -> image_prefix conf
   | 'q' ->
       let r = count conf in
-      string_of_num (transl conf "(thousand separator)")
-        (Sosa.of_int (r.welcome_cnt + r.request_cnt))
+      Mutil.string_of_int_sep
+        (Util.transl conf "(thousand separator)")
+        (r.welcome_cnt + r.request_cnt)
   | 'R' -> conf.right
   | 's' -> commd conf
   | 't' -> conf.bname
@@ -469,12 +466,14 @@ let eval_var conf base env () _loc =
   | ["base"; "name"] -> VVstring conf.bname
   | ["base"; "nb_persons"] ->
       VVstring
-        (string_of_num (Util.transl conf "(thousand separator)")
-           (Sosa.of_int (nb_of_persons base)))
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           (nb_of_persons base))
   | ["base"; "real_nb_persons"] ->
       VVstring
-        (string_of_num (Util.transl conf "(thousand separator)")
-           (Sosa.of_int (Util.real_nb_of_persons conf base)))
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           (Util.real_nb_of_persons conf base))
   | ["browsing_with_sosa_ref"] ->
       begin match get_env "sosa_ref" env with
         Vsosa_ref v -> VVbool (Lazy.force v <> None)
@@ -485,15 +484,17 @@ let eval_var conf base env () _loc =
   | ["nb_accesses"] ->
       let r = count conf in
       let s =
-        string_of_num (transl conf "(thousand separator)")
-          (Sosa.of_int (r.welcome_cnt + r.request_cnt))
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           (r.welcome_cnt + r.request_cnt))
       in
       VVstring s
   | ["nb_accesses_to_welcome"] ->
       let r = count conf in
       let s =
-        string_of_num (transl conf "(thousand separator)")
-          (Sosa.of_int r.welcome_cnt)
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           r.welcome_cnt)
       in
       VVstring s
   | ["random"; "init"] -> Random.self_init (); VVstring ""

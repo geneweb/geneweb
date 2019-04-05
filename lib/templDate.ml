@@ -15,7 +15,7 @@ let rec eval_date_var conf jd =
   | ["julian_day"] -> VVstring (string_of_int jd)
   | ["julian_day"; "sep1000"] ->
       VVstring
-        (Util.string_of_int_sep (transl conf "(thousand separator)") jd)
+        (Mutil.string_of_int_sep (transl conf "(thousand separator)") jd)
   | ["moon_age"] ->
       begin try
         let (_, md) = Calendar.moon_phase_of_sdn jd in

@@ -146,10 +146,6 @@ let nobility_titles_list conf base p =
        | _ -> (t_nth, t_name, t_ident, [t_place], t_dates) :: l)
     titles []
 
-let string_of_num sep num =
-  let len = ref 0 in
-  Sosa.print (fun x -> len := Buff.mstore !len x) sep num; Buff.get !len
-
 let print_base_loop conf base p =
   Wserver.printf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
@@ -495,7 +491,7 @@ let print_sosa conf base p link =
             Printf.sprintf (fcapitale (ftransl conf "direct ancestor of %s"))
               direct_ancestor ^
             Printf.sprintf ", Sosa: %s"
-              (string_of_num (transl conf "(thousand separator)") sosa_num)
+              (Sosa.to_string_sep (transl conf "(thousand separator)") sosa_num)
         in
         Wserver.printf "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
           (image_prefix conf) title;
@@ -2408,12 +2404,14 @@ and eval_compound_var conf base env (a, _ as ep) loc =
   | ["base"; "name"] -> VVstring conf.bname
   | ["base"; "nb_persons"] ->
       VVstring
-        (string_of_num (Util.transl conf "(thousand separator)")
-           (Sosa.of_int (nb_of_persons base)))
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           (nb_of_persons base))
   | ["base"; "real_nb_persons"] ->
       VVstring
-        (string_of_num (Util.transl conf "(thousand separator)")
-           (Sosa.of_int (Util.real_nb_of_persons conf base)))
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           (Util.real_nb_of_persons conf base))
   | "birth_witness" :: sl ->
       begin match get_env "birth_witness" env with
         Vind p ->
@@ -2940,7 +2938,7 @@ and eval_ancestor_field_var conf base env gp loc =
       end
   | ["interval"] ->
     let to_string x =
-      Util.string_of_int_sep
+      Mutil.string_of_int_sep
         (transl conf "(thousand separator)")
         (int_of_string @@ Sosa.to_string x)
     in
@@ -3045,7 +3043,7 @@ and eval_num conf n =
   | ["octal"] -> Printf.sprintf "0x%o" @@ int_of_string (Sosa.to_string n)
   | ["lvl"] -> string_of_int @@ Sosa.gen n
   | ["v"] -> Sosa.to_string n
-  | [] -> Util.string_of_int_sep
+  | [] -> Mutil.string_of_int_sep
             (transl conf "(thousand separator)")
             (int_of_string @@ Sosa.to_string n)
   | _ -> raise Not_found
