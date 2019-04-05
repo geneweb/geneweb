@@ -28,7 +28,7 @@ type patches =
     p_couple : (int * couple) list ref;
     p_descend : (int * descend) list ref;
     p_string : (int * string) list ref;
-    p_name : (int * iper list) list ref }
+    p_name : (int * Gwdb.iper list) list ref }
 
 let rec patch_len len =
   function
