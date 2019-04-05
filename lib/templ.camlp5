@@ -674,6 +674,17 @@ let setup_link conf =
     "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
   with Not_found -> ""
 
+let get_commit_param which =
+  begin match Util.open_etc_file "commit_nbrs" with
+  | Some ic ->
+      let params = [| input_line ic; input_line ic; input_line ic |] in
+      let str = params.(which) in
+      let i = String.index str '=' in
+      let l = String.length str in
+      String.sub str (i + 2) (l - i - 2)
+  | None -> "Unknown"
+  end
+
 let rec eval_variable conf =
   function
     ["bvar"; v] -> (try List.assoc v conf.base_env with Not_found -> "")
@@ -705,6 +716,9 @@ and eval_simple_variable conf =
     "action" -> conf.command
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
+  | "compilation_time" -> get_commit_param 0
+  | "commit" -> get_commit_param 1
+  | "commit_date" -> get_commit_param 2
   | "connections" ->
       begin match conf.n_connect with
         Some (c, cw, cf, _) ->

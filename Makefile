@@ -114,6 +114,14 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 	    && rm $@.bak \
 	    && echo " Done!")
 
+#
+#hd/etc/commit_nbrs.txt:
+#	echo "compilation_time = `date '+%d %m %Y'`" > hd/etc/commit_nbrs.txt
+#	echo "commit = `git show -s --pretty=format:%h`" >> hd/etc/commit_nbrs.txt
+#	echo "commit_date = `git show -s --pretty=format:%cd --date=format:'%d %m %Y'`" >> hd/etc/commit_nbrs.txt
+#
+#
+
 lib/gwlib.ml:
 	echo "let prefix =" > $@
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@

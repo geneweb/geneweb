@@ -402,6 +402,9 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     </div>
   %end;
 %include;trl
+<small>GeneWeb [*version][:] %version; compiled on %compilation_time;%sp;
+  from commit %commit; (%commit_date;)
+</small>
 %include;copyr
 
 </div>
