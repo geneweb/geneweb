@@ -335,9 +335,8 @@ let set_owner conf =
     try Unix.setgid s.Unix.st_gid; Unix.setuid s.Unix.st_uid with
       Unix.Unix_error (_, _, _) -> ()
 
-let thousand oc x = Sosa.print (output_string oc) "," (Sosa.of_int x)
-
 let log_count r =
+  let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
   match r with
     Some (welcome_cnt, request_cnt, start_date) ->
       Log.with_log
