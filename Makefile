@@ -8,75 +8,26 @@ Makefile.config: configure
 include Makefile.config
 -include Makefile.local
 
+.PHONY: clean distrib doc geneweb.install install piqi test uninstall
+
 # Variables for packagers.
 PREFIX=/usr
 DISTRIB_DIR=distribution
 
 BUILD_DIR=_build/default
 
-###### [BEGIN] Executables list
-
-INSTALL_EXE = \
+EXE = \
 	bin/distrib/connex \
-	bin/distrib/gwb2ged \
+	bin/distrib/consang \
 	bin/distrib/ged2gwb \
+	bin/distrib/gwb2ged \
 	bin/distrib/gwc \
 	bin/distrib/gwd \
 	bin/distrib/gwdiff \
 	bin/distrib/gwtp \
 	bin/distrib/gwu \
-	bin/distrib/consang \
 	bin/distrib/setup \
-	bin/distrib/update_nldb
-
-ALL_EXE = \
-	$(INSTALL_EXE) \
-	bin/contrib/gui/gui \
-	bin/contrib/gwFix/gwFindCpl \
-	bin/contrib/gwFix/gwFixBase \
-	bin/contrib/gwFix/gwFixBurial \
-	bin/contrib/gwFix/gwFixColon \
-	bin/contrib/gwFix/gwFixEvtSrc \
-	bin/contrib/gwFix/gwFixFromFile \
-	bin/contrib/gwFix/gwFixFromFileAlias \
-	bin/contrib/gwFix/gwFixFromFileDomicile \
-	bin/contrib/gwFix/gwFixY \
-	bin/contrib/gwpublic/gwiftitles \
-	bin/contrib/gwpublic/gwprivate \
-	bin/contrib/gwpublic/gwpublic \
-	bin/contrib/gwpublic/gwpublic1 \
-	bin/contrib/gwpublic/gwpublic2 \
-	bin/contrib/gwpublic/gwpublic2priv \
-	bin/contrib/history/convert_hist \
-	bin/contrib/history/fix_hist \
-	bin/contrib/history/is_gw_plus \
-	bin/contrib/lex/lex_utils \
-	bin/contrib/misc/lower_string \
-	bin/contrib/oneshot/gwBaseCompatiblePlus \
-	bin/contrib/oneshot/gwExportAscCSV \
-	bin/contrib/oneshot/gwFixDateText \
-	bin/contrib/oneshot/gwRemoveImgGallery
-
-EVERYTHING_EXE = \
-	$(ALL_EXE) \
-	bin/contrib/check_base/check_base \
-	bin/contrib/dag2html/main \
-	bin/contrib/gwbase/etc/chkimg \
-	bin/contrib/gwbase/etc/clavier \
-	bin/contrib/gwbase/etc/consmoy \
-	bin/contrib/gwbase/etc/geneanet \
-	bin/contrib/gwbase/etc/gwck \
-	bin/contrib/gwbase/etc/hist \
-	bin/contrib/gwbase/etc/lune \
-	bin/contrib/gwbase/etc/nbdesc \
-	bin/contrib/gwbase/etc/probot \
-	bin/contrib/gwbase/etc/selroy \
-	bin/contrib/gwbase/etc/titres \
-	bin/contrib/i18n_check/i18n_check \
-	bin/contrib/oneshot/gwFixAddEvent \
-	bin/contrib/oneshot/gwMostAsc
-
-###### [END] Executables list
+	bin/distrib/update_nldb \
 
 ###### [BEGIN] Generated files section
 
@@ -140,17 +91,6 @@ GENERATED_FILES_DEP = \
 	lib/gwlib.ml \
 	$(CAMLP5_FILES:=.ml) \
 	lib/dune \
-	bin/contrib/check_base/dune \
-	bin/contrib/dag2html/dune \
-	bin/contrib/gui/dune \
-	bin/contrib/gwFix/dune \
-	bin/contrib/gwbase/etc/dune \
-	bin/contrib/gwpublic/dune \
-	bin/contrib/history/dune \
-	bin/contrib/i18n_check/dune \
-	bin/contrib/lex/dune \
-	bin/contrib/misc/dune \
-	bin/contrib/oneshot/dune \
 	bin/distrib/dune
 
 ifdef API_D
@@ -163,23 +103,17 @@ piqi:
 else
 piqi:
 endif
-.PHONY: piqi
 
 geneweb.install:
 	dune build @install
-.PHONY: geneweb.install
 
 %.exe: | piqi $(GENERATED_FILES_DEP)
 	dune build $@
-install-exe:
-	dune build $(INSTALL_EXE:=.exe)
+
 exe:
 	dune build $(ALL_EXE:=.exe)
-everything-exe:
-	dune build $(EVERYTHING_EXE:=.exe)
-.DEFAULT_GOAL = exe
 
-geneweb.install install-exe exe everything-exe: $(GENERATED_FILES_DEP) piqi
+geneweb.install exe: $(GENERATED_FILES_DEP) piqi
 
 ###### [BEGIN] Installation / Distribution section
 
@@ -191,7 +125,7 @@ uninstall: geneweb.install
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/distrib/
 
-distrib: install-exe
+distrib: exe
 	$(RM) -r $(DISTRIB_DIR)
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
@@ -248,17 +182,13 @@ distrib: install-exe
 	echo "`camlp5 -v 2>&1`"       >> $(DISTRIB_DIR)/commit.txt
 	echo "-----"                  >> $(DISTRIB_DIR)/commit.txt
 
-.PHONY: install uninstall distrib
-
 ###### [END] Installation / Distribution section
 
 doc: | piqi $(GENERATED_FILES_DEP)
 	dune build @doc
-.PHONY: doc
 
-test: install-exe
+test: exe
 	dune build @runtest
-.PHONY: test
 
 bench: geneweb.install
 	dune build @runbench
@@ -268,4 +198,3 @@ clean:
 	$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
 	$(RM) -r $(DISTRIB_DIR)
 	dune clean
-.PHONY: clean

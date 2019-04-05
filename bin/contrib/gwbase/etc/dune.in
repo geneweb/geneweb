@@ -1,6 +1,0 @@
-; TOFIX_EXE := cleopatre popule modif
-
-(executables
- (names geneanet clavier hist selroy chkimg consmoy lune titres gwck nbdesc probot)
-  (libraries %%%GWDB_PKG%%% geneweb)
-)
