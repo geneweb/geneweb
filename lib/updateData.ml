@@ -498,7 +498,7 @@ let print_long conf list len =
                 in
                 Wserver.printf "<a href=\"%sm=MOD_DATA%s&data=%s&%s&s=%s#mod\">"
                   (commd conf) nbs data k (code_varenv ini);
-                Wserver.printf "%s" (quote_escaped s);
+                Wserver.printf "%s" (escape_html s);
                 Wserver.printf "</a>"
               else
                 begin
@@ -1069,7 +1069,7 @@ let print_mod_ok conf base =
               conf.xhs;
             Wserver.printf
               "<input type=\"hidden\" name=\"nx_input\" value=\"%s\" id=\"data\"%s>\n"
-              (quote_escaped (only_printable new_input)) conf.xhs;
+              (escape_html (only_printable new_input)) conf.xhs;
             Wserver.printf "%s"
               (capitale (transl conf "continue correcting"));
             begin
@@ -1086,7 +1086,7 @@ let print_mod_ok conf base =
       Wserver.printf "<p>\n";
       Wserver.printf "<a href=\"%sm=MOD_DATA%s&data=%s&s=%s#%s\" id=\"reference\">"
         (commd conf) nbs data ini
-        (no_html_tags (quote_escaped (only_printable new_input))) ;
+        (no_html_tags (escape_html (only_printable new_input))) ;
       Wserver.printf "%s" (capitale (transl conf "new modification"));
       Wserver.printf "</a>";
       Wserver.printf "</p>\n";
@@ -1101,7 +1101,7 @@ let print_mod_ok conf base =
     Wserver.printf "<p>\n";
     Wserver.printf "<a href=\"%sm=MOD_DATA%s&data=%s&s=%s#%s\" id=\"reference\">"
       (commd conf) nbs data ini
-      (no_html_tags (quote_escaped (only_printable new_input)));
+      (no_html_tags (escape_html (only_printable new_input)));
     Wserver.printf "%s" (capitale (transl conf "new modification"));
     Wserver.printf "</a>";
     Wserver.printf "</p>\n";

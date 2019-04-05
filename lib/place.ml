@@ -258,7 +258,7 @@ and eval_compound_var conf base env xx sl =
         let n = int_of_string n in
         if String.length s > n then String.sub s 0 (String.length s - n) else ""
     | "encode" :: sl -> code_varenv (loop sl)
-    | "escape" :: sl -> quote_escaped (loop sl)
+    | "escape" :: sl -> escape_html (loop sl)
     | "html_encode" :: sl -> no_html_tags (loop sl)
     | "printable" :: sl -> only_printable (loop sl)
     | _ -> raise Not_found
