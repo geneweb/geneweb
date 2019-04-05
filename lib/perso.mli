@@ -37,7 +37,6 @@ val get_sosa_person : person -> Sosa.t
 val get_single_sosa : config -> base -> person -> Sosa.t
 val print_sosa : config -> base -> person -> bool -> unit
 
-val string_of_num : string -> Sosa.t -> string
 val get_linked_page : config -> base -> person -> string -> string
 val get_birth_text : config -> person -> bool -> string
 val get_baptism_text : config -> person -> bool -> string
