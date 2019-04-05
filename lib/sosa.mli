@@ -25,7 +25,9 @@ val gen : t -> int
 *)
 val branches : t -> int list
 
-val print : (string -> unit) -> string -> t -> unit
 val of_int : int -> t
 val of_string : string -> t
 val to_string : t -> string
+
+(** See {!val:Mutil.string_of_int_sep} *)
+val to_string_sep : string -> t -> string

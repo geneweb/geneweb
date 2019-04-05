@@ -393,3 +393,24 @@ let array_to_list_map fn a =
     else loop (fn (Array.unsafe_get a i) :: acc) (i - 1)
   in
   loop [] (Array.length a - 1)
+
+let string_of_int_sep sep x =
+  let digits, len =
+    let rec loop (d, l) x =
+      if x = 0 then (d, l) else loop (Char.chr (Char.code '0' + x mod 10) :: d, l + 1) (x / 10)
+    in
+    loop ([], 0) x
+  in
+  let digits, len = if digits = [] then ['0'], 1 else digits, len in
+  let slen = String.length sep in
+  let s = Bytes.create (len + (len - 1) / 3 * slen) in
+  let _ =
+    List.fold_left
+      (fun (i, j) c ->
+         Bytes.set s j c ;
+         if i < len - 1 && (len - 1 - i) mod 3 = 0 then
+           begin String.blit sep 0 s (j + 1) slen; i + 1, j + 1 + slen end
+         else i + 1, j + 1)
+      (0, 0) digits
+  in
+  Bytes.unsafe_to_string s
