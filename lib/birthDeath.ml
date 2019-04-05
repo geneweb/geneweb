@@ -609,7 +609,7 @@ let print_population_pyramid conf base =
   let men, wom = make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base in
   let at_year = at_date.year in
   let string_of_nb n =
-    Util.string_of_int_sep (transl conf "(thousand separator)") n
+    Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   in
   let title _ =
     Wserver.printf "%s (%d)" (capitale (transl conf "population pyramid"))

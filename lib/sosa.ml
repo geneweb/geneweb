@@ -27,24 +27,9 @@ let rec exp_gen x1 x2 n =
 let exp x n =
   exp_gen x x n
 
-let print f sep x =
-  if eq x zero then f "0"
-  else
-    let digits =
-      let rec loop d x =
-        if eq x zero then d else loop (modl x 10 :: d) (div x 10)
-      in
-      loop [] x
-    in
-    let _ =
-      List.fold_left
-        (fun n d ->
-           f (string_of_int d); if n > 0 && n mod 3 = 0 then f sep; n - 1)
-        (List.length digits - 1) digits
-    in
-    ()
-
 let to_string = string_of_int
+
+let to_string_sep = Mutil.string_of_int_sep
 
 let of_string = int_of_string
 
