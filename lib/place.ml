@@ -8,8 +8,11 @@ open TemplAst
 
 let normalize =
   (* petit hack en attendant une vraie gestion des lieux transforme
-     "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)"
-     On remet les [, ] pour se souvenir!
+     "[foo-bar] - boobar (baz)" en "[foo-bar], boobar (baz)"
+     On remet les [ ] pour retrouver le lien vers le dictionnaire!
+     La convention [aaa] - bbb permet de trier les lieux par rapport à bbb
+     Cette fonction normalize n'est utilisée que dans le module place
+     la séquence [-–—] distingue les trois tirets possibles
   *)
   let r = Str.regexp "^\\[\\([^]]+\\)\\] *[-–—] *\\(.*\\)" in
   fun s -> Str.global_replace r "[\\1], \\2" s
@@ -50,7 +53,7 @@ let fold_place_long inverted s =
           in
           loop (i - 1)
         in
-        j, [ String.sub s (i) (len - i) ]
+        j, [ String.sub s (i) (len - i) ] (* +1 and -2 to strip () *)
       | _ -> len, []
     else len, []
   in
@@ -296,7 +299,6 @@ let sort_list _conf list =
       | (pl, snl) :: l ->
           let k1 = if List.length pl > 0 then List.hd pl else "" in
           let k2 = if List.length pl > 1 then List.hd (List.tl pl) else "" in
-          (* let _ = Printf.eprintf "Place: %s, %s, %s, %s, (%d) (%d) (%d)\n" k1 prev1 k2 prev2 cnt1 cnt2 (List.length snl) in *)
           if k1 = prev1 && k2 = prev2 then
             loop (cnt1 + (List.length snl))
             (cnt2 + (List.length snl))
@@ -314,10 +316,6 @@ let sort_list _conf list =
   in
   let list_n = List.sort (fun (c1, c3, _, _) (c2, c4, _, _) -> 
     if c1 = c2 then c3 - c4 else c1 - c2) list_n in
-(*  List.iter (fun (c1, c2, pl, snl) ->
-    Printf.eprintf "Ligne: %d, %d" c1 c2;
-    List.iter (fun p -> Printf.eprintf ", %s" p) pl;
-    Printf.eprintf "(%d)\n" (List.length snl)) list_n; *)
   List.fold_left (fun acc (_, _, pl, snl) -> (pl, snl) :: acc) [] list_n
 
 let get_new_list conf list =
@@ -383,6 +381,12 @@ let print_section conf opt ps1 f_sort =
   if not f_sort then
   Wserver.printf "</ul><h5><a href=\"%sm=PS%s%s%s\">%s</a></h5><ul>\n"
     (commd conf) opt "&long=on" ("&k1=" ^(Util.code_varenv ps1)) ps1
+  
+let clean_ps ps =
+  let len = String.length ps in
+  if ps.[0] = '(' && ps.[len - 1] = ')' then
+    String.sub ps 1 (len - 2)
+  else ps
 
 let print_html_places_surnames_long conf _base
   (array : (string list * (string * Adef.iper list) list) array) =
@@ -408,6 +412,7 @@ let print_html_places_surnames_long conf _base
   let print_sn ((sn, ips), _pl, plo) =
     let len = List.length ips in
     let ps1 = if List.length plo > 0 then List.hd plo else "" in
+    let ps1 = clean_ps ps1 in
     let ps2 = if List.length plo > 1 then List.hd (List.tl plo) else "" in
     let (k3, k4) = get_k3 plo in
     Wserver.printf "<a href=\"%sm=N&v=%s\">%s</a>" (commd conf)
@@ -453,6 +458,18 @@ let print_html_places_surnames_long conf _base
   (* TODO sort list according to number of persons at k1 level *)
   (* as done in short *)
   let list = if f_sort then sort_list conf list else list in
+  (* sort list removing the possible () around first item in place list *)
+    let list =
+    List.sort
+      (fun (plo1, _) (plo2, _) -> 
+        let ps11 = clean_ps
+          (if List.length plo1 > 0 then List.hd plo1 else "")
+        in
+        let ps12 = clean_ps
+          (if List.length plo2 > 0 then List.hd plo2 else "")
+        in
+        compare ps11 ps12) list
+  in
   let rec loop prev =
     function
     | (plo, snl) :: list ->
@@ -461,6 +478,7 @@ let print_html_places_surnames_long conf _base
           else if List.length plo > 0 then List.tl plo else []
         in
         let ps1 = if List.length plo > 0 then List.hd plo else "" in
+        let ps1 = clean_ps ps1 in
         let ps2 = if List.length plo > 1 then List.hd (List.tl plo) else "" in
         let rec loop1 prev pl lvl =
           match prev, pl with
@@ -469,6 +487,7 @@ let print_html_places_surnames_long conf _base
             then print_section conf opt ps1 f_sort;
             List.iteri
               (fun i x ->
+                let x = clean_ps x in
                 let href =
                   Printf.sprintf "%sm=PS%s%s%s%s"
                   (commd conf) opt
@@ -512,7 +531,6 @@ let print_html_places_surnames_short conf _base
   let long = p_getenv conf.env "long" = Some "on" in
   let opt = get_opt conf in
   let pl_sn_list = Array.to_list array in
-  (*print_list pl_sn_list ;*)
   let (new_list, _cntt) = get_new_list conf pl_sn_list in
   let new_list =
     if p_getenv conf.env "f_sort" = Some "on" then
@@ -520,12 +538,24 @@ let print_html_places_surnames_short conf _base
       (fun (_, _, cnt1, _, _) (_, _, cnt2, _, _) -> (cnt1 - cnt2)) new_list)
     else new_list
   in
+  (* sort new_list removing the possible () around first item in place list *)
+  let new_list =
+    List.sort
+      (fun (_, plo1, _, _, _) (_, plo2, _, _, _) -> 
+        let ps11 = clean_ps
+          (if List.length plo1 > 0 then List.hd plo1 else "")
+        in
+        let ps12 = clean_ps
+          (if List.length plo2 > 0 then List.hd plo2 else "")
+        in
+        compare ps11 ps12) new_list
+  in
   let title = transl conf "long/short display" in
   (* in new_list, ps is a string, pl was a list of strings *)
-  (* let conf = {conf with env = ("k1_cnt", (string_of_int cntt)) :: conf.env} in *)
   Mutil.list_iter_first
     (fun first (_pl, plo, _cnt, _, ipl) ->
       let ps1 = if List.length plo > 0 then List.hd plo else "" in
+      let ps1 = clean_ps ps1 in
       let ps2 = if List.length plo > 1 then List.hd (List.tl plo) else ps1 in
       let (k3, k4) = get_k3 plo in
       let ipl = List.flatten ipl |> List.sort_uniq compare in
@@ -651,8 +681,6 @@ let filter_array array place i exact substr =
            place exact substr
           then (pl, snl) :: acc else acc
         else
-          (* let _ = Printf.eprintf "Test: %s %s\n"
-            place (if List.length pl > 1 then (List.hd (List.tl pl)) else "") in *)
           if match_place
             (if List.length pl > 1 then (List.hd (List.tl pl)) else "")
             place exact substr
@@ -675,20 +703,13 @@ let print_places_surnames_some conf base array =
   let k2 = match p_getenv conf.env "k2" with | Some s -> s | _ -> "" in
   let exact = p_getenv conf.env "exact" = Some "on" in
   let substr = p_getenv conf.env "substr" = Some "on" in
-  (*
-  let _ = Printf.eprintf "Exact : %s\n" (if exact then "true" else "false") in
-  let _ = Printf.eprintf "Substr : %s\n" (if substr then "true" else "false") in
-  let _ = flush stderr in
-  *)
   let searchl = search_array array k1 exact in
   let array =
     if k1 <> "" then filter_array array k1 0 exact substr else array
   in
-  (*let _ = Printf.eprintf "Array after k1 : %d\n" (Array.length array) in*)
   let array =
     if k2 <> "" then filter_array array k2 1 exact substr else array
   in
-  (*let _ = Printf.eprintf "Array after k2 : %d\n" (Array.length array) in*)
   let long = p_getenv conf.env "long" = Some "on" in
   let k1 = p_getenv conf.env "k1" <> Some "" in
   let k2 =
