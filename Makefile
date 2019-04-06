@@ -122,9 +122,16 @@ lib/gwlib.ml:
 %/dune: %/dune.in
 	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
 
+hd/etc/version.txt:
+	echo "GeneWeb [*version][:] %version; compiled on " > $@
+	echo "$$(date '+%Y-%m-%d')" >> $@
+	echo " from commit " >> $@
+	echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')" >> $@
+.PHONY:hd/etc/version.txt
+
 ###### [End] Generated files section
 
-GENERATED_FILES_DEP = lib/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune
+GENERATED_FILES_DEP = hd/etc/version.txt lib/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune
 
 ifdef API
 piqi:
