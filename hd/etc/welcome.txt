@@ -402,6 +402,11 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     </div>
   %end;
 %include;trl
+<div class="text-center">
+  <small>
+    %include;version
+  </small>
+</div>
 %include;copyr
 
 </div>
