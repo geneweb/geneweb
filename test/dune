@@ -1,6 +1,17 @@
+(library
+ (name dummy_gwdb)
+ (wrapped false)
+ (flags       (:standard -no-keep-locs))
+ (libraries geneweb.def)
+ (modules gwdb)
+)
+
+(rule (copy# %{lib:geneweb.gwdb:gwdb.mli} gwdb.mli))
+
 (executable
   (name test)
-  (libraries geneweb oUnit)
+  (libraries dummy_gwdb geneweb oUnit)
+  (modules test test_place test_sosa test_utils)
 )
 
 (alias (name runtest) (action (run ./test.exe) ) )
