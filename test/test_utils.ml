@@ -84,6 +84,10 @@ let util_str_sub _ =
 let util_safe_html _ =
   assert_equal
     ~printer:(fun x -> x)
+    {|<a href="localhost:2318/foo_w?lang=fr&#38;acte=123">foo</a>|}
+    (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&acte=123">foo</a>|}) ;
+  assert_equal
+    ~printer:(fun x -> x)
     {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
     (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|})
 
