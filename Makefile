@@ -123,10 +123,9 @@ lib/gwlib.ml:
 	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
 
 hd/etc/version.txt:
-	echo "GeneWeb [*version][:] %version; compiled on " > $@
-	echo "$$(date '+%Y-%m-%d')" >> $@
-	echo " from commit " >> $@
-	echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')" >> $@
+	echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
+	echo "$$(date '+%Y-%m-%d'):" >> $@
+	echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')]" >> $@
 .PHONY:hd/etc/version.txt
 
 ###### [End] Generated files section
