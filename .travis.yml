@@ -34,8 +34,8 @@ script:
     eval $(opam config env) ;
     opam pin add geneweb . --no-action ;
     opam install geneweb --deps-only ;
-    ./configure && make clean test install uninstall distrib clean ;
-    ./configure --api && make clean test install uninstall distrib clean ;
+    ./configure && make clean test bench install uninstall distrib clean ;
+    ./configure --api && make clean test bench install uninstall distrib clean ;
 
 notifications:
   email:

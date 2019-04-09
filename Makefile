@@ -242,6 +242,10 @@ test: install-exe
 	dune build @runtest
 .PHONY: test
 
+bench: geneweb.install
+	dune build @runbench
+.PHONY: bench
+
 clean:
 	$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
 	$(RM) -r $(DISTRIB_DIR)
