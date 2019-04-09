@@ -224,7 +224,7 @@ module Make (Select : Select) =
       in
       loop [] 0 0
 
-    let has_infos_not_in_events base p =
+    let has_infos_not_dates base p =
       let has_picture_to_export =
         sou base (get_image p) <> "" && not !no_picture
       in
@@ -237,10 +237,7 @@ module Make (Select : Select) =
       get_titles p <> [] ||
       get_access p <> IfTitles ||
       sou base (get_occupation p) <> "" ||
-      sou base (get_psources p) <> ""
-
-    let has_infos_not_dates base p =
-      has_infos_not_in_events base p ||
+      sou base (get_psources p) <> "" ||
       sou base (get_birth_place p) <> "" ||
       sou base (get_birth_src p) <> "" ||
       sou base (get_baptism_place p) <> "" ||
@@ -329,10 +326,6 @@ module Make (Select : Select) =
       Printf.fprintf oc "]"
 
     let zero_birth_is_required base is_child p =
-      let has_infos_to_print =
-        if !old_gw then has_infos_not_dates base p
-        else has_infos_not_in_events base p
-      in
       if get_baptism p <> Adef.cdate_None then false
       else
         begin match get_death p with
@@ -340,7 +333,7 @@ module Make (Select : Select) =
             true
         | DontKnowIfDead
           when
-            not is_child && not has_infos_to_print &&
+            not is_child && not (has_infos_not_dates base p) &&
             p_first_name base p <> "?" && p_surname base p <> "?" ->
             true
         | _ -> false
@@ -366,29 +359,18 @@ module Make (Select : Select) =
       print_if_no_empty oc base "#occu" (get_occupation p);
       print_if_not_equal_to csrc oc base "#src" (get_psources p);
       begin match Adef.od_of_cdate (get_birth p) with
-        Some d ->
-          Printf.fprintf oc " ";
-          if !old_gw then print_date oc d
-          else Printf.fprintf oc "0(b)"
+        Some d -> Printf.fprintf oc " "; print_date oc d
       | _ when zero_birth_is_required base is_child p -> Printf.fprintf oc " 0"
       | _ -> ()
       end;
-      if !old_gw then
-        begin
-          print_if_not_equal_to cbp oc base "#bp" (get_birth_place p);
-          print_if_no_empty oc base "#bs" (get_birth_src p)
-        end;
+      print_if_not_equal_to cbp oc base "#bp" (get_birth_place p);
+      print_if_no_empty oc base "#bs" (get_birth_src p);
       begin match Adef.od_of_cdate (get_baptism p) with
-        Some d ->
-          if !old_gw then begin Printf.fprintf oc " !"; print_date oc d end
-          else if get_birth p = Adef.cdate_None then Printf.fprintf oc " !0(p)"
+        Some d -> Printf.fprintf oc " !"; print_date oc d
       | _ -> ()
       end;
-      if !old_gw then
-        begin
-          print_if_no_empty oc base "#pp" (get_baptism_place p);
-          print_if_no_empty oc base "#ps" (get_baptism_src p)
-        end;
+      print_if_no_empty oc base "#pp" (get_baptism_place p);
+      print_if_no_empty oc base "#ps" (get_baptism_src p);
       begin match get_death p with
         Death (dr, d) ->
           Printf.fprintf oc " ";
@@ -399,8 +381,7 @@ module Make (Select : Select) =
           | Disappeared -> Printf.fprintf oc "s"
           | _ -> ()
           end;
-          if !old_gw then print_date oc (Adef.date_of_cdate d)
-          else Printf.fprintf oc "0(d)"
+          print_date oc (Adef.date_of_cdate d)
       | DeadYoung -> Printf.fprintf oc " mj"
       | DeadDontKnowWhen -> Printf.fprintf oc " 0"
       | DontKnowIfDead ->
@@ -413,14 +394,11 @@ module Make (Select : Select) =
       | OfCourseDead -> Printf.fprintf oc " od"
       | NotDead -> ()
       end;
-      if !old_gw then
-        begin
-          print_if_no_empty oc base "#dp" (get_death_place p);
-          print_if_no_empty oc base "#ds" (get_death_src p);
-          print_burial oc (get_burial p);
-          print_if_no_empty oc base "#rp" (get_burial_place p);
-          print_if_no_empty oc base "#rs" (get_burial_src p)
-        end
+      print_if_no_empty oc base "#dp" (get_death_place p);
+      print_if_no_empty oc base "#ds" (get_death_src p);
+      print_burial oc (get_burial p);
+      print_if_no_empty oc base "#rp" (get_burial_place p);
+      print_if_no_empty oc base "#rs" (get_burial_src p)
 
     type gen =
       { mark : bool array;
@@ -837,8 +815,7 @@ module Make (Select : Select) =
       Printf.fprintf oc "fam ";
       print_parent oc base gen m.m_fath;
       Printf.fprintf oc " +";
-      if !old_gw then
-        print_date_option oc (Adef.od_of_cdate (get_marriage fam));
+      print_date_option oc (Adef.od_of_cdate (get_marriage fam));
       begin match get_relation fam with
         NotMarried -> Printf.fprintf oc " #nm"
       | Married -> ()
@@ -861,35 +838,32 @@ module Make (Select : Select) =
           Printf.fprintf oc " #nsckm %c%c" (c m.m_fath) (c m.m_moth)
       | NoMention -> Printf.fprintf oc " #noment"
       end;
-      if !old_gw then
-        begin
-          print_if_no_empty oc base "#mp" (get_marriage_place fam);
-          print_if_no_empty oc base "#ms" (get_marriage_src fam);
-          match get_divorce fam with
-            NotDivorced -> ()
-          | Separated -> Printf.fprintf oc " #sep"
-          | Divorced d ->
-              let d = Adef.od_of_cdate d in
-              Printf.fprintf oc " -"; print_date_option oc d
-        end;
+      print_if_no_empty oc base "#mp" (get_marriage_place fam);
+      print_if_no_empty oc base "#ms" (get_marriage_src fam);
+      begin match get_divorce fam with
+        NotDivorced -> ()
+      | Separated -> Printf.fprintf oc " #sep"
+      | Divorced d ->
+          let d = Adef.od_of_cdate d in
+          Printf.fprintf oc " -"; print_date_option oc d
+      end;
       Printf.fprintf oc " ";
       print_parent oc base gen m.m_moth;
       Printf.fprintf oc "\n";
-      if !old_gw then
-        Array.iter
-          (fun ip ->
-             if gen.per_sel ip then
-               let p = poi base ip in
-               Printf.fprintf oc "wit";
-               begin match get_sex p with
-                 Male -> Printf.fprintf oc " m"
-               | Female -> Printf.fprintf oc " f"
-               | _ -> ()
-               end;
-               Printf.fprintf oc ": ";
-               print_witness oc base gen p;
-               Printf.fprintf oc "\n")
-          (get_witnesses fam);
+      Array.iter
+        (fun ip ->
+           if gen.per_sel ip then
+             let p = poi base ip in
+             Printf.fprintf oc "wit";
+             begin match get_sex p with
+               Male -> Printf.fprintf oc " m"
+             | Female -> Printf.fprintf oc " f"
+             | _ -> ()
+             end;
+             Printf.fprintf oc ": ";
+             print_witness oc base gen p;
+             Printf.fprintf oc "\n")
+        (get_witnesses fam);
       let fsources = sou base (get_fsources fam) in
       if fsources <> ""
       then Printf.fprintf oc "src %s\n" (correct_string base (get_fsources fam));
@@ -900,9 +874,7 @@ module Make (Select : Select) =
       in
       let cbp =
         match common_children_birth_place base m.m_chil with
-          Some s ->
-            if !old_gw then Printf.fprintf oc "cbp %s\n" (s_correct_string s);
-            s
+          Some s -> Printf.fprintf oc "cbp %s\n" (s_correct_string s); s
         | _ -> ""
       in
       print_comment_for_family oc base gen fam;
