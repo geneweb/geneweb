@@ -30,13 +30,14 @@ pin-depends: [
 ]
 
 depends: [
+  "benchmark" { with-test }
   "camlp5" { build }
   "cppo" { build }
-  "dune" { build>= "1.1.1" }
+  "dune" { build >= "1.1.1" }
   "markup"
   "ocaml" { >= "4.05" }
   "ocurl" { = "0.8.1" }
-  "ounit"
+  "ounit" { with-test }
   "piqi"
   "piqilib"
   "redis"
