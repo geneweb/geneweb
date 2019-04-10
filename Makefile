@@ -152,8 +152,7 @@ distrib: exe
 	echo "127.0.0.1" > $(DISTRIB_DIR)/gw/only.txt
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
 	cp $(BUILD_DISTRIB_DIR)gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
-	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
-	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/mk_consang$(EXT);
+	cp $(BUILD_DISTRIB_DIR)consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
 	cp $(BUILD_DISTRIB_DIR)ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT);
