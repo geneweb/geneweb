@@ -221,7 +221,6 @@ let print_ref_person_from_ip conf base =
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
 
-
 (**/**) (* API_FIRST_AVAILABLE_PERSON *)
 
 (* ************************************************************************ *)
@@ -264,7 +263,6 @@ let print_first_available_person conf base =
   end () (Gwdb.persons base) ;
   let data = Mext.gen_reference_person !res in
   print_result conf data
-
 
 (**/**) (* API_SOSA *)
 
@@ -322,7 +320,6 @@ let print_find_sosa conf base =
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
-
 
 (**/**) (* API_LAST_MODIFIED_PERSONS *)
 
@@ -468,7 +465,6 @@ let print_last_modified_persons conf base =
   let data = conv_data_list_person conf base filters list in
   print_result conf data
 
-
 (**/**) (* API_LAST_VISITED_PERSONS *)
 
 (* ************************************************************************ *)
@@ -502,7 +498,6 @@ let print_last_visited_persons conf base =
   in
   let data = data_list_person conf base filters list in
   print_result conf data
-
 
 (**/**) (* API_MAX_ANCESTORS *)
 
@@ -734,8 +729,6 @@ let print_img_person conf base =
   let data = Mext.gen_image_address img_from_ip in
   print_result conf data
 
-
-
 (**/**) (* API_UPDT_IMAGE *)
 
 let print_updt_image conf base =
@@ -872,9 +865,7 @@ let print_birthday conf base =
   let data = data_list_person conf base filters list in
   print_result conf data
 
-
 (**/**) (* API_CHECK_BASE *)
-
 
 (* ********************************************************************* *)
 (*  [Fonc] print_base_warnings : config -> base -> unit                  *)
@@ -945,7 +936,6 @@ let print_base_warnings conf base =
   in
   print_result conf data
 
-
 (**/**) (* Récupération de toute une base. *)
 
 let print_all_persons conf base =
@@ -973,7 +963,6 @@ let print_all_persons conf base =
   let list = Gwdb.poi_batch base (List.rev @@ fst list) in
   let data = data_list_person conf base filters list in
   print_result conf data
-
 
 let print_all_families conf base =
   let params = get_params conf Mext.parse_all_families_params in
@@ -1012,18 +1001,18 @@ let print_all_families conf base =
 module StringMap =
   Map.Make
     (struct
-      type t = string      let compare = Gutil.alphabetic_order      end)
+      type t = string
+      let compare = Gutil.alphabetic_order
+    end)
 
 module IperSort =
   Set.Make
     (struct
-      type t = string * string       let compare (sn1, fn1) (sn2, fn2) =
-        let cmp = compare sn1 sn2 in
-        if cmp = 0 then compare fn1 fn2
-        else cmp(*
-        let cmp = Gutil.alphabetic_order sn1 sn2 in
-        if cmp = 0 then Gutil.alphabetic_order fn1 fn2
-        else cmp*)
+      type t = string * string
+      let compare (sn1, fn1) (sn2, fn2) =
+        match compare sn1 sn2 with
+        | 0 -> compare fn1 fn2
+        | res -> res
      end)
 
 (**/**) (* Version app *)
@@ -1081,9 +1070,6 @@ let print_export_info conf export_directory =
       let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
       output_binary_int oc (String.length timestamp);
       output_string oc timestamp;
-      (* Utilisation de Extlib pour le binaire. *)
-      (* let timestamp = Int32.of_float (Unix.time ()) in *)
-      (* IO.write_i32 oc timestamp; *)
       close_out oc;
   | None -> ()
 
@@ -1313,21 +1299,6 @@ let build_relative_name base p =
         else Name.lower (sou base istr) :: accu)
       accu list
   in
-  (* Nom de jeune fille *)
-  (* Plus tard, en v2
-  let list =
-    if get_sex p = Female then
-      List.fold_left
-        (fun accu ifam ->
-          let fam = foi base ifam in
-          let isp = Gutil.spouse (get_key_index p) fam in
-          let sp = poi base isp in
-          let sn = Name.lower (sou base (get_surname sp)) in
-          if sn = "" then accu else sn :: accu)
-        [] (Array.to_list (get_family p))
-    else []
-  in
-  *)
   let list = [] in
   let list =
     let pn = Name.lower (sou base (get_public_name p)) in
@@ -1338,7 +1309,6 @@ let build_relative_name base p =
   let list = add_from_list list (get_first_names_aliases p) in
   let list = add_from_list list (get_surnames_aliases p) in
   List.rev list
-
 
 let iperSetTab = ref (Hashtbl.create 0)
 
@@ -1361,15 +1331,6 @@ let print_index_search conf export_directory =
 
   let list_inx = ref NameSort.empty in
   let list_map = ref NameSortMap.empty in
-
-  (* avec Hashtbl *)
-  (*
-  let ht = Hashtbl.create 5003 in
-
-  let add_to_map k v =
-    Hashtbl.add ht k v
-  in
-  *)
 
   (* avec Set *)
   let add_to_map k v =
@@ -1452,38 +1413,6 @@ let print_index_search conf export_directory =
 
           offset_i := !offset_i + 4 + (4 * (List.length vv)))
         !list_map;
-
-      (* avec Hashtbl *)
-      (*
-      let last_key = ref "" in
-      let vv = ref IntSet.empty in
-      let len = Hashtbl.length ht in
-      let i = ref 0 in
-      Hashtbl.iter
-        (fun k v ->
-          incr i;
-          (* On tri la liste pour avoir afficher les résultats triés *)
-          if k = !last_key then vv := IntSet.add v !vv else ();
-
-          if k <> !last_key || len = !i then
-            begin
-              output_binary_int oc_name_wi !offset_w;
-              output_binary_int oc_name_w (String.length !last_key);
-              output_string oc_name_w !last_key;
-              output_binary_int oc_name_w !offset_i;
-
-              offset_w := !offset_w + 4 + (String.length !last_key) + 4;
-
-              output_binary_int oc_name_i (IntSet.cardinal !vv);
-              IntSet.iter (output_binary_int oc_name_i) !vv;
-
-              offset_i := !offset_i + 4 + (4 * (IntSet.cardinal !vv));
-
-              vv := IntSet.empty;
-
-            end)
-        ht;
-      *)
 
       close_out oc_name_wi;
       close_out oc_name_w;
@@ -1651,189 +1580,7 @@ let print_export_search conf base =
 
   Util.html conf
 
-
-(*
-let print_export conf base =
-  let () = load_ascends_array base in
-  let () = load_strings_array base in
-  let () = load_couples_array base in
-  let () = load_unions_array base in
-  let () = load_descends_array base in
-
-  let finfo = "/tmp/pb_base_info.dat" in
-  let fpers_data = "/tmp/pb_base_person.dat" in
-  let fpers_inx = "/tmp/pb_base_person.inx" in
-  let ffam_data = "/tmp/pb_base_family.dat" in
-  let ffam_inx = "/tmp/pb_base_family.inx" in
-
-  let pid = Unix.fork () in
-
-  if pid = 0 then
-    begin
-      print_index_search conf base;
-      exit 0
-    end
-  else
-  begin
-    (try
-      let curr = ref 0 in
-
-      (*
-         Fichier base_info :
-           - nombre de personnes
-           - nombre de familles
-           - sosa de référence (1-num s'il existe, 0-0 sinon)
-           - timestamp de la création de la base
-      *)
-      let oc_info = open_out_bin finfo in
-      output_binary_int oc_info (nb_of_persons base);
-      output_binary_int oc_info (nb_of_families base);
-      let sosa_ref =
-        match Util.find_sosa_ref conf base with
-        | Some p ->
-            (output_char oc_info '\001'; (get_key_index p))
-        | None -> (output_char oc_info '\000'; 0)
-      in
-      output_binary_int oc_info sosa_ref;
-      let timestamp = int_of_float (Unix.time ()) in
-      output_binary_int oc_info timestamp;
-      close_out oc_info;
-
-      (*
-         Fichier person index :
-           - l'adresse dans le fichier data de cette personne
-         Fichier person data :
-           - offset delete : à la création, c'est la fin du fichier
-           - liste des Person (proto app)
-      *)
-      let oc_pers_data = open_out_bin fpers_data in
-      let oc_pers_inx = open_out_bin fpers_inx in
-      curr := 0;
-      (* offset delete *)
-      output_binary_int oc_pers_data 0;
-      for i = 0 to nb_of_persons base - 1 do
-        let ip = Adef.iper_of_int i in
-        let p = poi base ip in
-        let pers_app = pers_to_piqi_app_person conf base p in
-        let data = Mext_app.gen_person pers_app in
-        let data = data `pb in
-        output_binary_int oc_pers_data (String.length data);
-        output_string oc_pers_data data;
-        (* Adresse de la personne *)
-        output_binary_int oc_pers_inx !curr;
-        (* Attention a ne pas oublier offset delete => +4 *)
-        curr := !curr + 4 + String.length data;
-      done;
-      (* mise à jour de offset delete maintenant qu'on a fini *)
-      seek_out oc_pers_data 0;
-      output_binary_int oc_pers_data !curr;
-      close_out oc_pers_data;
-      close_out oc_pers_inx;
-
-      (*
-         Fichier family index :
-           - l'adresse dans le fichier data de cette famille
-         Fichier family data :
-           - offset delete : à la création, c'est la fin du fichier
-           - liste des Family
-      *)
-      let oc_fam_data = open_out_bin ffam_data in
-      let oc_fam_inx = open_out_bin ffam_inx in
-      curr := 0;
-      (* offset delete *)
-      output_binary_int oc_fam_data 0;
-      for i = 0 to nb_of_families base - 1 do
-        let ifam = Adef.ifam_of_int i in
-        let fam_app = fam_to_piqi_app_family conf base ifam in
-        let data = Mext_app.gen_family fam_app in
-        let data = data `pb in
-        output_binary_int oc_fam_data (String.length data);
-        output_string oc_fam_data data;
-        (* Adresse de la famille *)
-        output_binary_int oc_fam_inx !curr;
-        (* Attention a ne pas oublier offset delete => +4 *)
-        curr := !curr + 4 + String.length data;
-      done;
-      (* mise à jour de offset delete maintenant qu'on a fini *)
-      seek_out oc_fam_data 0;
-      output_binary_int oc_fam_data !curr;
-      close_out oc_fam_data;
-      close_out oc_fam_inx;
-
-    with Sys_error _ -> ());
-    ignore (Unix.waitpid [] pid);
-  end;
-
-  (*export_img conf base;*)
-
-(*
-  let fpers_data = "/tmp/pb_base_person_note.dat" in
-  let fpers_inx = "/tmp/pb_base_person_note.inx" in
-  let ffam_data = "/tmp/pb_base_family_note.dat" in
-  let ffam_inx = "/tmp/pb_base_family_note.inx" in
-
-  (try
-     let curr = ref 0 in
-
-     (*
-        Fichier pers_note index :
-          - l'adresse dans le fichier data de cette note
-        Fichier pers_note data :
-          - liste des notes
-     *)
-     let oc_pers_data = open_out_bin fpers_data in
-     let oc_pers_inx = open_out_bin fpers_inx in
-     for i = 0 to nb_persons base - 1 do
-       let ip = Adef.iper_of_int i in
-       let p = poi base ip in
-       let data = sou base (get_notes p) in
-       if data <> "" then
-         begin
-           output_binary_int oc_pers_data (String.length data);
-           output_string oc_pers_data notes;
-           ouput_binary_int oc_pers_inx !curr;
-           curr := !curr + String.length data;
-         end
-     done;
-     close_out oc_pers_data;
-     close_out oc_pers_inx;
-
-     (*
-        Fichier fam_note index :
-          - l'adresse dans le fichier data de cette note
-        Fichier fam_note data :
-          - liste des notes
-     *)
-     let oc_fam_data = open_out_bin ffam_data in
-     let oc_fam_inx = open_out_bin ffam_inx in
-     curr := 0;
-     for i = 0 to nb_persons base - 1 do
-       let ifam = Adef.ifam_of_int i in
-       let fam = foi base ifam in
-       let data = sou base (get_comment fam) in
-       if data <> "" then
-         begin
-           output_binary_int oc_fam_data (String.length data);
-           output_string oc_fam_data notes;
-           ouput_binary_int oc_fam_inx !curr;
-           curr := !curr + String.length data;
-         end
-     done;
-     close_out oc_fam_data;
-     close_out oc_fam_inx;
-   with Sys_error _ -> ());
-*)
-
-
-  Util.html conf ;
-*)
-
-
-
 (**/**) (* API_NOTIFICATION_BIRTHDAY *)
-
-
-(* !!! Repris de api_graph !!! *)
 
 module Iper3 =
   struct
