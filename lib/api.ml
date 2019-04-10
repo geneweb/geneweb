@@ -1026,8 +1026,6 @@ module IperSort =
         else cmp*)
      end)
 
-let print_all_full_person _conf _base = () (* FIXME!!! *)
-
 (**/**) (* Version app *)
 
 module NameSort =
