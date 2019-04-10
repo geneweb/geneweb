@@ -281,7 +281,6 @@ let change_child conf base parent_surname changed ip =
       ; occ = new_occ}
     in
     patch_person base ip p;
-    patch_key base ip new_first_name new_surname new_occ;
     Gutil.person_ht_add base key ip;
     let np_misc_names = gen_person_misc_names base p (fun p -> p.titles) in
     List.iter (fun key -> Gutil.person_ht_add base key p.key_index) np_misc_names ;

@@ -886,12 +886,6 @@ let update_person_list conf base new_input list nb_pers max_updates =
                 let key =
                   sou base np.first_name ^ " " ^ sou base np.surname
                 in
-                let ofn = p_first_name base op in
-                let osn = p_surname base op in
-                let oocc = get_occ op in
-                delete_key base ofn osn oocc;
-                patch_key base pi (sou base np.first_name)
-                  (sou base np.surname) np.occ;
                 patch_name base key pi;
                 Update.update_misc_names_of_family base (get_sex p)
                   {family = get_family p};
