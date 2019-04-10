@@ -483,8 +483,6 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp =
       let p2_family = get_family p2 in
       let warning _ = () in
       MergeInd.reparent_ind base warning sp.key_index ip2;
-      delete_key base (sou base (get_first_name p2))
-        (sou base (get_surname p2)) (get_occ p2);
       let warning _ = () in
       let p2 = UpdateIndOk.effective_del base warning p2 in
       patch_person base p2.key_index p2;
