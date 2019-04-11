@@ -43,6 +43,7 @@ depends: [
   "redis"
   "redis-sync"
   "yojson"
+  "zarith" { >= "1.7" }
 ]
 
 depexts: [
