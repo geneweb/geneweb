@@ -15,7 +15,7 @@ val inc : t -> int -> t
 val mul : t -> int -> t
 val exp : t -> int -> t
 val div : t -> int -> t
-val modl : t -> int -> int
+val modl : t -> int -> t
 val gen : t -> int
 
 (** [branches sosa]
