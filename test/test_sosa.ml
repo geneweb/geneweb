@@ -15,6 +15,19 @@ let suite =
         assert_equal "1" (Sosa.to_string Sosa.one) ;
       end
 
+    ; "pretty print" >:: begin fun _ ->
+        let test a b =
+          assert_equal ~printer:(fun x -> x) a (Sosa.to_string_sep "," (Sosa.of_int b))
+        in
+        test "1" 1;
+        test "10" 10;
+        test "100" 100;
+        test "1,000" 1000;
+        test "10,000" 10000;
+        test "100,000" 100000;
+        test "1,000,000" 1000000;
+      end
+
     ; "gen" >:: begin fun _ ->
         let test exp x =
           assert_equal ~printer:string_of_int exp @@
