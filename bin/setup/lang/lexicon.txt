@@ -96,6 +96,137 @@ it: I possessori di password "Wizard" possono in più effettuare delle modifiche
 lv: "Burvji" var veikt arî izmaiòas datu bâzç.
 sv: "Wizards" kan göra modifieringar i databasen.
 
+    build names/places cache files
+aa: welcome.htm
+en: Name and places cache files for auto completion.
+fr: Les fichiers cache de noms et places pour l'auto-completion.
+
+    cache files
+aa: cache_file.htm
+en: Cache files
+fr: Cache files
+
+    cache files title
+aa: cache_file.htm
+en: Produce cache files.
+fr: Construire les fichiers cache.
+
+    select base
+aa: cache_file.htm
+en: Select your database by clicking on the associated button:
+fr: Sélectionnez votre base de données en cliquant sur le bouton associé :
+
+    no base provided
+aa: cache_file.htm
+en: there is no database at present
+fr: il n’y a aucune base de données actuellement
+
+    select options
+aa: cache_file.htm
+de: Wähle die gewünschten Optionen:
+en: Select the options you want:
+es: Seleccione las opciones que Ud. desee:
+fr: Sélectionnez les options que vous désirez :
+it: Selezionate le opzioni desiderate:
+lv: Izvçlieties atbilstoðos parametrus:
+sv: Välj de optioner du vill ha:
+
+    first_names
+aa: cache_file.htm
+en: First names
+fr: Prénoms
+
+    surnames
+aa: cache_file.htm
+en: Surnames.
+fr: Patronymes.
+
+    aliases
+aa: cache_file.htm
+en: Aliases.
+fr: Aliases.
+
+    qualifiers
+aa: cache_file.htm
+en: Qualifiers.
+fr: Qualifiers.
+
+    places
+aa: cache_file.htm
+en: Places.
+fr: Lieux.
+
+    all
+aa: cache_file.htm
+en: Build all cache files.
+fr: Construire tous les fichiers cache.
+
+    fn alias
+aa: cache_file.htm
+en: Add first name aliases to the first names list.
+fr: Ajouter les prénoms alias à la liste des prénoms.
+
+    progress
+aa: cache_file.htm
+en: Show progress bar.
+fr: Afficher la barre de progrès.
+
+    ok
+aa: cache_file.htm
+de: Dann drücke "Ok".
+en: Then click on "Ok".
+es: Finalmente cliquear en "Ok".
+fr: Puis cliquez sur "Ok".
+it: Poi cliccate su "Ok".
+lv: Tad nospiediet "Ok".
+sv: Klicka sedan på "OK".
+
+    click on ok
+de: Drücke diesen Knopf um zu starten:
+en: Push the button below to start:
+es: Apoyar sobre el botón inferior para comenzar:
+fi: Paina alla olevaa nappia aloittaaksesi:
+fr: Appuyez sur le bouton ci-dessous pour démarrer :
+it: Per iniziare, cliccate sul bottone qui sotto:
+lv: Nospiediet podziòu zemâk, lai sâktu:
+sv: Tryck på knappen nedan för att starta:
+
+    cache files compute
+aa: cache_file_ok.htm
+en: Cache files computed.
+fr: Fichiers cache construits.
+
+    return
+aa: cache_file_ok.htm
+de: Zurück zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmenü</a>.
+en: You can return to the <a href="gwsetup?lang=%l;v=welcome.htm">main menu</a>.
+es: Si no Ud. puede regresar al <a href="gwsetup?lang=%l;v=welcome.htm">menú principal</a>.
+fi: Tai voit palata <a href="gwsetup?lang=%l;v=welcome.htm">päävalikkoon</a>.
+fr: Vous pouvez revenir au <a href="gwsetup?lang=%l;v=welcome.htm">menu principal</a>.
+it: Potete tornare al <a href="gwsetup?lang=%l;v=welcome.htm">menu principale</a>.
+lv: Vai Jûs varat atgriezties uz <a href="gwsetup?lang=%l;v=welcome.htm">galveno izvçlni</a>.
+sv: Eller du kan återvända till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
+
+    applied operation
+de: Die Funktion "%d" wird nun auf deiner Datenbank "%a" ausgeführt. Warnung: Das kann, abhängig vom Einzelfall, zwischen einigen Sekunden und mehreren Minuten dauern. Bitte habe Geduld.
+en: The operation "%d" will be applied on your database "%a". Warning: it can take some seconds or some minutes, depending on the case. Be patient.
+es: La operación "%d" va a aplicarse a su base "%a". Atención: la operación puede durar algunos segundos o algunos minutos, de acuerdo al caso. Sea paciente.
+fi: Toiminto "%d" hyväksytään tietokantaasi "%a". Varoitus: toiminto kestää hetken. Ole kärsivällinen.
+fr: L’opération « %d » va être appliquée sur votre base %a. Attention : l’opération peut prendre quelques secondes ou quelques minutes, suivant les cas. Soyez patient.
+it: L'operazione viene applicata alla vostra base. Attenzione: l'operazione può prendere qualche secondo o qualche minuto, secondo i casi. Siate pazienti.
+lv: Darbîba "%d" tiks lietota datu bâzei "%a". Brîdinâjums: tas var aizòemt daðas sekundes, vai minûtes, atkarîbâ no nosacîjumiem. Esiet pacietîgs.
+sv: Operationen "%d" kommer att appliceras på din databas "%a". Varning: det kan ta några sekunder eller några minuter, beroende på fallet. Ha tålamod.
+
+    commands
+de: Zu deiner Information: Diese Funktion entspricht der Ausführung der folgenden Kommandos:
+en: For information, this operation corresponds to the following commands:
+es: Por información, esta operación corresponde a los comandos siguientes:
+fi: Tiedoksi, tämä toiminto vastaa seuraavia komentoja:
+fr: Pour information, cette opération correspond à la suite des commandes suivantes:
+it: Per informazione, questa operazione corrisponde ai seguenti comandi:
+lv: Informâcijai: ðî darbîba atbilst sekojoðâm komandâm:
+sv: Denna operation motsvarar de följande kommandona:
+
     (do not enter the quotes "" in the input zone).
 aa: ged2gwb.htm
 co: (ùn micca inchjude e virgulette "" in u campu di scrittura).
@@ -1894,7 +2025,7 @@ de: Blutsverwandtschaft bereitstellen
 en: initialisation of consanguinities
 es: Inicialización de las consanguinidades
 fi: Perheenjäsenten yhdistäminen
-fr: calcul de la consanguinité
+fr: Calcul de la consanguinité
 it: Inizializzazione delle consanguineità
 lv: Asinsradniecîbas sakârtoðana
 sv: Beräkning av blodsband
@@ -3149,27 +3280,27 @@ sv: Parametrarna har sparats i textfilen "%a.gwf" i katalogen "%w".
 
     the parameters of a database
 aa: welcome.htm
-co: i parametri d'una basa di dati
-de: die Parameter einer Datenbank
-en: the parameters of a database
-es: los parámetros de una base de datos
-fi: tietokannan parametrit
-fr: les paramètres d’une base de données
-it: i parametri di une base di dati
-lv: datu bâzes parametrus
-sv: parametrarna för en databas
+co: I parametri d'una basa di dati
+de: Die Parameter einer Datenbank
+en: The parameters of a database
+es: Los parámetros de una base de datos
+fi: Tietokannan parametrit
+fr: Les paramètres d’une base de données
+it: I parametri di une base di dati
+lv: Datu bâzes parametrus
+sv: Parametrarna för en databas
 
     the parameters of the gwd service
 aa: welcome.htm
-co: i parametri di u serviziu gwd
-de: die Parameter des gwd-Dienstes
-en: the parameters of the gwd service
-es: los parámetros de un servicio gwd
-fi: gwd palvelun parametrit
-fr: les paramètres du service gwd
-it: i parametri del service gwd
-lv: gwd servisa parametrus
-sv: parametrarna för gwd servicen
+co: I parametri di u serviziu gwd
+de: Die Parameter des gwd-Dienstes
+en: The parameters of the gwd service
+es: Los parámetros de un servicio gwd
+fi: Gwd palvelun parametrit
+fr: Les paramètres du service gwd
+it: I parametri del service gwd
+lv: Gwd servisa parametrus
+sv: Parametrarna för gwd servicen
 
     The previous command exited with an error code. Your database "%o" may have not been created.
 aa: err_reco.htm

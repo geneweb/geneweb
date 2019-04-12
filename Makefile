@@ -77,6 +77,7 @@ GENERATED_FILES_DEP = \
 	lib/util/dune \
 	benchmark/dune \
 	bin/connex/dune \
+	bin/cache_files/dune \
 	bin/consang/dune \
 	bin/fixbase/dune \
 	bin/ged2gwb/dune \
@@ -153,6 +154,7 @@ distrib:
 	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT);
 	cp $(BUILD_DISTRIB_DIR)ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT);
+	cp $(BUILD_DISTRIB_DIR)cache_files/cache_files.exe $(DISTRIB_DIR)/gw/cache_files$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);
