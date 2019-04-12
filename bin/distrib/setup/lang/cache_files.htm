@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: cache_files.htm,v 7.00 2018-04-09 05:35:06 hg Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[
+en: Cache files
+fr: Cache files
+]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[
+en: Produce cache files (Lastnames, firstnames, places)
+fr: Condtruire les ficheirs cache (noms, prénoms, places)
+]
+</h1>
+</div>
+<ul>
+<li>
+<form method="get" action="cache_files">
+<input type=hidden name=opt value=check>
+<input type="hidden" name="lang" value="%l">
+
+[
+en: Select your database by clicking on the associated button:
+fr: Sélectionnez votre base de données en cliquant sur le bouton associé :
+]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td><input type="radio" name="anon" value="%a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://%m:%P/%a">%a</a></td>
+</tr>|
+<tr align="left"><td>- [
+en: there is no database at present
+fr: il n'y a aucune base de données actuellement
+]</tr></td>}
+</table></dl>
+<p>
+<li>
+[
+de: Wähle die gewünschten Optionen:
+en: Select the options you want:
+es: Seleccione las opciones que Ud. desee:
+fr: Sélectionnez les options que vous désirez :
+it: Selezionate le opzioni desiderate:
+lv: Izvçlieties atbilstoðos parametrus:
+sv: Välj de optioner du vill ha:
+]
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="fn" id="sn" value="on">
+<label for="fn" style="font-family: monospace">-fn&nbsp;&nbsp;</label>[
+en: First names.
+fr: Prénoms.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="sn" id="sn" value="on">
+<label for="sn" style="font-family: monospace">-sn&nbsp;&nbsp;</label>[
+en: Surnames.
+fr: Patronymes.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="al" id="al" value="on">
+<label for="al" style="font-family: monospace">-al&nbsp;&nbsp;</label>[
+en: Aliases.
+fr: Aliases.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="qu" id="qu" value="on">
+<label for="qu" style="font-family: monospace">-qu&nbsp;&nbsp;</label>[
+en: Qualifiers.
+fr: Qualifiers.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="pl" id="pl" value="on">
+<label for="pl" style="font-family: monospace">-pl&nbsp;&nbsp;</label>[
+en: Places.
+fr: Lieux.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="all" id="all" value="on" checked>
+<label for="all" style="font-family: monospace">-all&nbsp;&nbsp;</label>[
+en: Build all cache files.
+fr: Construire tous les fichiers cache.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="fna" id="fna" value="on">
+<label for="fna" style="font-family: monospace">-fna&nbsp;&nbsp;</label>[
+en: Add first name aliases to the first names list.
+fr: Ajouter els prénoms alias à la liste des prénoms.
+]</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="prog" id="prog" value="on">
+<label for="prog" style="font-family: monospace">-prog&nbsp;&nbsp;</label>[
+en: Show progress bar.
+fr: Afficher la barre de progrès.
+]</td>
+</tr>
+</table></dl>
+
+
+<p>
+<li>
+[
+de: Dann drücke "Ok".
+en: Then click on "Ok".
+es: Finalmente cliquear en "Ok".
+fr: Puis cliquez sur "Ok".
+it: Poi cliccate su "Ok".
+lv: Tad nospiediet "Ok".
+sv: Klicka sedan på "OK".
+]
+</li>
+
+<input type="submit" value="Ok">
+</dl>
+</form>
+</ul>

@@ -1,8 +1,8 @@
 (include_subdirs unqualified)
 
 (executables
-  (public_names connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
-  (modules connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
+  (public_names cache_files connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
+  (modules cache_files connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
   (libraries geneweb geneweb.wserver)
 )
 

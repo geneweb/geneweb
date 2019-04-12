@@ -17,6 +17,7 @@ BUILD_DIR=_build/default
 ###### [BEGIN] Executables list
 
 INSTALL_EXE = \
+	bin/distrib/cache_files \
 	bin/distrib/connex \
 	bin/distrib/ged2gwb \
 	bin/distrib/ged2gwb2 \
@@ -207,6 +208,7 @@ distrib: install-exe
 	cp $(BUILD_DISTRIB_DIR)ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXE);
 	cp $(BUILD_DISTRIB_DIR)ged2gwb2.exe $(DISTRIB_DIR)/gw/ged2gwb2$(EXE);
 	cp $(BUILD_DISTRIB_DIR)gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXE);
+	cp $(BUILD_DISTRIB_DIR)cache_files.exe $(DISTRIB_DIR)/gw/cache_files$(EXE);
 	cp $(BUILD_DISTRIB_DIR)connex.exe $(DISTRIB_DIR)/gw/connex$(EXE);
 	cp $(BUILD_DISTRIB_DIR)gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXE);
 	cp $(BUILD_DISTRIB_DIR)setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXE);
