@@ -7,7 +7,7 @@ let suite =
           let test exp inp =
             assert_equal ~printer:(fun x -> x) exp (Place.normalize inp)
           in
-          test "foo-bar, boobar (baz)" "[foo-bar] - boobar (baz)"
+          test "[foo-bar], boobar (baz)" "[foo-bar] - boobar (baz)"
         end
     ]
   ]
