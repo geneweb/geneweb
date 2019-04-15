@@ -19,19 +19,20 @@ cache:
   directories:
     - /home/travis/.opam/
 
-# Needed until `opam depext geneweb` is fixed
+cache:
+  directories:
+    - /home/travis/.opam/
+
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install protobuf ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq protobuf-compiler ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install protobuf ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq && sudo apt-get install -qq protobuf-compiler ; fi
 
 install:
-  - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
+  - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh ;
+    bash -ex .travis-ocaml.sh ;
 
 script:
-  - bash -ex .travis-ocaml.sh ;
-    set -ex ;
+  - set -ex ;
     export OPAMYES=1 ;
     eval $(opam config env) ;
     if [[ "$OCAML_VERSION" == "4.08" ]] ; then
@@ -40,16 +41,12 @@ script:
       opam pin add piqi https://github.com/geneanet/piqi-ocaml.git --no-action ;
     fi ;
     opam pin add geneweb . --no-action ;
-    opam install geneweb --deps-only ;
-    ./configure && make clean test bench install uninstall distrib clean ;
-    ./configure --api && make clean test bench install uninstall distrib clean ;
-
-notifications:
-  email:
-    recipients:
-      - julien.sagot@geneanet.org
-    on_success: change
-    on_failure: always
-
-after_failure:
-  - cat ~/.opam/log/*.out
+    opam update ;
+    opam install geneweb --with-test --deps-only ;
+    ./configure && make clean test bench distrib clean ;
+    opam install ocurl piqi piqilib redis redis-sync yojson ;
+    ./configure --api && make clean test bench distrib clean ;
+    opam install num ;
+    ./configure --sosa-num && make clean test bench distrib clean ;
+    opam install zarith ;
+    ./configure --sosa-zarith && make clean test bench distrib clean ;
