@@ -123,6 +123,19 @@ let rec capitale_utf_8 s =
           let c1 = Char.code s.[1] in
           let c1 = Char.chr (if c1 land 1 = 0 then c1 - 1 else c1) in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xCE when Char.code s.[1] >= 0xB1 && Char.code s.[1] <= 0xBF ->
+          (* greek *)
+          let c1 = Char.chr (Char.code s.[1] - 0xB1 + 0x91) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xCE when Char.code s.[1] = 0xAC ->
+          let c1 = Char.chr 0x86 in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xCE when Char.code s.[1] = 0xAD ->
+          let c1 = Char.chr 0x88 in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xCE when Char.code s.[1] = 0xAF ->
+          let c1 = Char.chr 0x8A in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 ->
           (* cyrillic lowercase *)
           let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
