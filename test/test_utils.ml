@@ -44,10 +44,16 @@ let util_capitale _ =
   ; test "Ńoemie" "Ńoemie"
   ; test "Ĕtienne" "ĕtienne"
   ; test "Ÿvette" "ÿvette"
-(*  ; test "Eλληνικά" "ελληνικά" *)
+  (* greek *)
+  (*; test "Eλληνικά" "ελληνικά"*)
   ; test "Eλληνικά" "Eλληνικά"
   ; test "Έλληνικά" "έλληνικά"
   ; test "Έλληνικά" "Έλληνικά"
+  ; test "Π λληνικ" "π λληνικ"
+  ; test "Π λληνικ" "Π λληνικ"
+  ; test "Ω λληνικ" "ω λληνικ"
+  ; test "Ω λληνικ" "Ω λληνικ"
+  (* cyrillic *)
   ; test "Генри" "генри"
   ; test "Генри" "Генри"
   ; test "Б енри" "б енри"
