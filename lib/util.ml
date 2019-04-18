@@ -145,6 +145,13 @@ let rec capitale_utf_8 s =
           let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
           Printf.sprintf "%c%c%s" (Char.chr 0xD0) c1
             (String.sub s 2 (String.length s - 2))
+      | 0xD1 when Char.code s.[1] >= 0xA0 ->
+          let c1 = Char.code s.[1] in
+          let c1 = Char.chr (if c1 land 1 = 1 then c1 - 1 else c1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xD2 when Char.code s.[1] = 0x81 ->
+          let c1 = Char.chr (Char.code s.[1] - 1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | _ -> s
 
 let index_of_next_char s i =
