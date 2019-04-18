@@ -110,8 +110,18 @@ let rec capitale_utf_8 s =
           let c = Char.chr 0xC5 in
           let c1 = Char.chr 0xB8 in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
-      | 0xC4 | 0xC5 | 0xC6 | 0xC7 ->
-          let c1 = Char.chr (Char.code s.[1] - 1) in
+      | 0xC4 when Char.code s.[1] <= 0xB7 ->
+          let c1 = Char.code s.[1] in
+          let c1 = Char.chr (if c1 land 1 = 1 then c1 - 1 else c1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+          (* character 0xB8 has no uppercase *)
+      | 0xC4 when Char.code s.[1] >= 0xB9 ->
+          let c1 = Char.code s.[1] in
+          let c1 = Char.chr (if c1 land 1 = 0 then c1 - 1 else c1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xC5 | 0xC6 | 0xC7 ->
+          let c1 = Char.code s.[1] in
+          let c1 = Char.chr (if c1 land 1 = 0 then c1 - 1 else c1) in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 ->
           (* cyrillic lowercase *)
