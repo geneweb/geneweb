@@ -203,7 +203,15 @@ let unaccent_utf_8 lower s i =
       | 0xCE ->
           (* Greek *)
           begin match Char.code s.[i+1] with
-            0x91 -> f "A"
+            0x86 -> f "A"
+          | 0x88 -> f "E"
+          | 0x89 -> f "H"
+          | 0x8A -> f "I"
+          | 0x8C -> f "O"
+          | 0x8E -> f "Y"
+          | 0x8F -> f "O"
+          | 0x90 -> f "I"
+          | 0x91 -> f "A"
           | 0x92 -> f "B"
           | 0x93 -> f "G"
           | 0x94 -> f "D"
@@ -227,6 +235,13 @@ let unaccent_utf_8 lower s i =
           | 0xA7 -> f "KH"
           | 0xA8 -> f "PS"
           | 0xA9 -> f "O"
+          | 0xAA -> f "I"
+          | 0xAB -> f "Y"
+          | 0xAC -> "a"
+          | 0xAD -> "e"
+          | 0xAE -> "n"
+          | 0xAF -> "i"
+          | 0xB0 -> "a"
           | 0xB1 -> "a"
           | 0xB2 -> "b"
           | 0xB3 -> "g"
@@ -254,7 +269,9 @@ let unaccent_utf_8 lower s i =
           | 0x86 -> "ph"
           | 0x87 -> "kh"
           | 0x88 -> "ps"
-          | 0x89 -> "o"
+          | 0x89  | 0x8C | 0x8E -> "o"
+          | 0x8A -> "i"
+          | 0x8B | 0x8D -> "u"
           | _ -> String.sub s i nbc
           end
       | 0xD0 ->
