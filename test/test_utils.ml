@@ -1,6 +1,64 @@
 open Geneweb
 open OUnit2
 
+let name_unaccent _ =
+  let test a b =
+    assert_equal ~printer:(fun x -> x) a (Some.name_unaccent b)
+  in
+  test "etienne" "étienne"
+  ; test "Etienne" "Étienne"
+  ; test "yvette" "ÿvette"
+  ; test "Yvette" "Ÿvette"
+  ; test "Etienne" "Ĕtienne"
+  (* unaccent performs cyrillic to latin translation! *)
+  ; test "Genri" "Генри"
+
+(* Name.lower performs lower and unaccent *)
+let name_lower _ =
+  let test a b =
+    assert_equal ~printer:(fun x -> x) a (Name.lower b)
+  in
+  test "abcdef" "ABCdEF"
+  ; test "abcdef" "ÂBÇdĘF"
+  ; test "etienne" "Ĕtienne"
+  ; test "andre" "André"
+  ; test "andrea" "Andréá"
+  ; test "ellenika" "ελληνικά"
+  ; test "ellnhiya" "ΈΛΛΝΉΊΎΆ"
+  ; test "yvette" "Ÿvette"
+  (* cyrillic to latin and lower *)
+  ; test "genri" "Генри"
+  ; test "genri" "ГЕНРИ"
+
+
+let util_capitale _ =
+  let test a b =
+    assert_equal ~printer:(fun x -> x) a (Util.capitale b)
+  in
+  test "Abc" "abc"
+  ; test "Abc" "Abc"
+  ; test "Étienne" "étienne"
+  ; test "Étienne" "Étienne"
+  ; test "Étienne" "Étienne"
+  ; test "Ńoemie" "ńoemie"
+  ; test "Ńoemie" "Ńoemie"
+  ; test "Ĕtienne" "ĕtienne"
+  ; test "Ÿvette" "ÿvette"
+(*  ; test "Eλληνικά" "ελληνικά" *)
+  ; test "Eλληνικά" "Eλληνικά"
+  ; test "Έλληνικά" "έλληνικά"
+  ; test "Έλληνικά" "Έλληνικά"
+  ; test "Генри" "генри"
+  ; test "Генри" "Генри"
+  ; test "Б енри" "б енри"
+  ; test "Б енри" "Б енри"
+  ; test "Я енри" "я енри"
+  ; test "Я енри" "Я енри"
+  ; test "Ѡ енри" "ѡ енри"
+  ; test "Ѡ енри" "Ѡ енри"
+  ; test "Ҁ енри" "ҁ енри"
+  ; test "Ҁ енри" "Ҁ енри"
+
 let mutil_contains _ =
   let str = "foo bar" in
   let test t b1 b2 =
@@ -8,6 +66,7 @@ let mutil_contains _ =
   ; assert_equal b2 (Mutil.contains ~wildcard:true str t)
   in
   test "foo" true true
+; test "foo bar" true true
 ; test "baz" false false
 ; test "foo_b" false true
 ; test "foo b" true true
@@ -101,5 +160,8 @@ let suite =
   ; "Util" >:::
     [ "util_str_sub" >:: util_str_sub
     ; "util_safe_html" >:: util_safe_html
+    ; "util_capitale" >:: util_capitale
+    ; "name_unaccent" >:: name_unaccent
+    ; "name_lower" >:: name_lower
     ]
   ]
