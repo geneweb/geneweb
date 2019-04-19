@@ -84,7 +84,7 @@ let util_capitale _ =
   ; test "Ҁ енри" "Ҁ енри"
 
 let mutil_contains _ =
-  let str = "foo bar" in
+  let str = "foo bar Ĕtienne Έλληνικά Генри bar" in
   let test t b1 b2 =
     assert_equal b1 (Mutil.contains ~wildcard:false str t)
   ; assert_equal b2 (Mutil.contains ~wildcard:true str t)
@@ -98,6 +98,9 @@ let mutil_contains _ =
 ; test "bar__" false true
 ; test "r" true true
 ; test "" true true
+; test "Ĕtienne" true true
+; test "Έλληνικά" true true
+; test "Генри" true true
 
 let mutil_start_with _ =
   assert_raises (Invalid_argument "start_with")
@@ -110,6 +113,14 @@ let mutil_start_with _ =
     (not @@ Mutil.start_with "bar" 0 "foo")
 ; assert_bool "Mutil.start_with \"\" 0 \"foo\""
     (Mutil.start_with "" 0 "foo")
+; assert_bool "Mutil.start_with \"Ĕtien\" 0 \"Ĕtienne\""
+    (Mutil.start_with "Ĕtien" 0 "Ĕtienne")
+; assert_bool "Mutil.start_with \"Ĕtien\" 1 \"aĔtienne\""
+    (Mutil.start_with "Ĕtien" 1 "aĔtienne")
+; assert_bool "Mutil.start_with \"Ĕtien\" 1 \"ĔĔtienne\""
+    (Mutil.start_with "Ĕtien" 1 "ĔĔtienne")
+; assert_bool "Mutil.start_with \"Ĕtien\" 2 \"ĔĔtienne\""
+    (Mutil.start_with "tien" 2 "ĔĔtienne")
 
 let mutil_arabian_romian _ =
   let test a r =
@@ -189,3 +200,4 @@ let suite =
     ; "name_lower" >:: name_lower
     ]
   ]
+
