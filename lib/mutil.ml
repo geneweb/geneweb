@@ -280,37 +280,53 @@ let arabian_of_roman s =
 
 module StrSet = Set.Make (struct type t = string let compare = compare end)
 
+let nb_car_utf_8 str =
+  let strlen = String.length str in
+  let rec loop j n =
+    if n >= strlen then j
+    else loop (j+1) (n + Name.nbc str.[n])
+  in
+  loop 0 0
+
 let start_with ?(wildcard = false) ini i s =
   let inilen = String.length ini in
   let strlen = String.length s in
-  if i < 0 || i > strlen then raise (Invalid_argument "start_with") ;
+  let nbs = nb_car_utf_8 s in
+  if i < 0 || i > nbs then raise (Invalid_argument "start_with") ;
+  let i =
+    let rec loop j n =
+      if j = i then n
+      else loop (j+1) (n + Name.nbc s.[n])
+    in
+    loop 0 0
+  in
   let rec loop i1 i2 =
     if i1 = inilen then true
     else if i2 = strlen
-    then
-      if wildcard && String.unsafe_get ini i1 = '_'
-      then loop (i1 + 1) i2 else false
-    else if String.unsafe_get s i2 = String.unsafe_get ini i1
-         || (wildcard && String.unsafe_get s i2 = ' ' && String.unsafe_get ini i1 = '_')
-    then loop (i1 + 1) (i2 + 1)
-    else false
+      then
+        if wildcard && String.unsafe_get ini i1 = '_'
+        then loop (i1 + 1) i2 else false
+      else 
+        if String.unsafe_get s i2 = String.unsafe_get ini i1 ||
+          (wildcard && String.unsafe_get s i2 = ' ' && String.unsafe_get ini i1 = '_')
+        then loop (i1 + 1) (i2 + 1) else false
   in
   loop 0 i
 
 let contains ?(wildcard = false) str sub =
-  let strlen = String.length str in
-  let sublen = String.length sub in
+  let nbstr = nb_car_utf_8 str in
+  let nbsub = nb_car_utf_8 sub in
   if not wildcard
-  then
-    let rec loop i =
-      if i + sublen <= strlen
-      then start_with ~wildcard sub i str || loop (i + 1)
-      else false
-    in loop 0
-  else
-    let rec loop i =
-      i <= strlen && (start_with ~wildcard sub i str || loop (i + 1))
-    in loop 0
+    then
+      let rec loop i =
+        if i + nbsub <= nbstr
+        then start_with ~wildcard sub i str || loop (i + 1)
+        else false
+      in loop 0
+    else
+      let rec loop i =
+        i <= nbstr && (start_with ~wildcard sub i str || loop (i + 1))
+      in loop 0
 
 let get_particle list s =
   let rec loop = function
