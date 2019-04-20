@@ -30,7 +30,19 @@ let name_lower _ =
   ; test "genri" "Генри"
   ; test "genri" "ГЕНРИ"
 
-
+(*
+    %1 of %2
+de: %1 von :d:%2
+fr: %1 d[e |’]%2
+*)
+(*
+let util_decline _ =
+  let test s wt s1 s2 s2_raw =
+    assert_equal ~printer:(fun x -> x) s (Util.gen_decline wt s1 s2 s2_raw)
+  in
+  test "abc xxx def yyy ghi" "abc %1 def %2 ghi" "xxx" "<xyz>yyy" "yyy"
+  test "abc xxx def yyy ghi" "abc %1 def %2 ghi" "xxx" "<xyz>yyy" "yyy"
+*)
 let util_capitale _ =
   let test a b =
     assert_equal ~printer:(fun x -> x) a (Util.capitale b)
@@ -83,6 +95,20 @@ let util_capitale _ =
   ; test "Ҁ енри" "ҁ енри"
   ; test "Ҁ енри" "Ҁ енри"
 
+(*
+    %1 of %2
+de: %1 von :d:%2
+fr: %1 d[e |’]%2
+*)
+(*
+let mutil_nominative _ =
+  let test s1 s2 =
+    assert_equal ~printer:(fun x -> x) s1 (Mutil.nominative s2)
+  in
+  test "abcdef" "abc:d:def"
+  test "abcdef" "abc d[def|ghi]i"
+*)
+
 let mutil_contains _ =
   let str = "foo bar Ĕtienne Έλληνικά Генри bar" in
   let test t b1 b2 =
@@ -107,6 +133,7 @@ let mutil_contains _ =
    Transforming chars into bytes at the beginning of start_with breaks
    the behaviour of contains! TODO fix this!!
 *)
+
 let mutil_start_with _ =
   assert_raises (Invalid_argument "start_with")
     (fun () -> Mutil.start_with "foo" (-1) "foo")
@@ -199,6 +226,7 @@ let util_safe_html _ =
 let suite =
   [ "Mutil" >:::
     [ "mutil_contains" >:: mutil_contains
+    (*; "mutil_nominative" >:: mutil_nominative *)
     ; "mutil_start_with" >:: mutil_start_with
     ; "mutil_arabian_romian" >:: mutil_arabian_romian
     ; "mutil_compare_after_particle" >:: mutil_compare_after_particle
@@ -207,6 +235,7 @@ let suite =
     [ "util_str_sub" >:: util_str_sub
     (*; "util_safe_html" >:: util_safe_html *)
     ; "util_capitale" >:: util_capitale
+    (*; "util_decline" >:: util_decline *)
     ; "name_unaccent" >:: name_unaccent
     ; "name_lower" >:: name_lower
     ]

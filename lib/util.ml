@@ -296,6 +296,8 @@ let gen_decline wt s1 s2 s2_raw =
   in
   loop 0
 
+let _decline = gen_decline
+
 let transl_a_of_b conf x y1 y2 =
   gen_decline (transl_nth conf "%1 of %2" 0) x y1 y2
 let transl_a_of_gr_eq_gen_lev conf x y1 y2 =
