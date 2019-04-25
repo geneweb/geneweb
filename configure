@@ -21,10 +21,12 @@ while [[ $# -ne 0 ]]; do
     --api)
       API_PKG="piqirun.ext redis-sync yojson curl";
       API_D="-D API" ;;
-    --sosa-zarith)
-      SOSA_PKG="geneweb.sosa-zarith" ;;
+    --sosa-num)
+      SOSA_PKG="geneweb.sosa-num" ;;
     --sosa-vanilla)
       SOSA_PKG="geneweb.sosa-vanilla" ;;
+    --sosa-zarith)
+      SOSA_PKG="geneweb.sosa-zarith" ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
