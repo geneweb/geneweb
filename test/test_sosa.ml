@@ -2,14 +2,21 @@ open OUnit2
 
 let suite =
   [ "Sosa" >:::
-    [ "int conversion" >:: begin fun _ ->
-          assert_equal Sosa.zero (Sosa.of_int 0) ;
-          assert_equal Sosa.one (Sosa.of_int 1) ;
+    [ "eq" >:: begin fun _ ->
+          assert_equal true (Sosa.eq Sosa.zero Sosa.zero) ;
+          assert_equal false (Sosa.eq Sosa.zero Sosa.one) ;
+          assert_equal true (Sosa.eq Sosa.one Sosa.one) ;
+          assert_equal false (Sosa.eq Sosa.one Sosa.zero) ;
+        end
+
+    ; "int conversion" >:: begin fun _ ->
+          assert_equal ~cmp:Sosa.eq Sosa.zero (Sosa.of_int 0) ;
+          assert_equal ~cmp:Sosa.eq Sosa.one (Sosa.of_int 1) ;
         end
 
     ; "string conversion" >:: begin fun _ ->
-        assert_equal Sosa.zero (Sosa.of_string "0") ;
-        assert_equal Sosa.one (Sosa.of_string "1") ;
+        assert_equal ~cmp:Sosa.eq Sosa.zero (Sosa.of_string "0") ;
+        assert_equal ~cmp:Sosa.eq Sosa.one (Sosa.of_string "1") ;
         assert_equal "0" (Sosa.to_string Sosa.zero) ;
         assert_equal "1" (Sosa.to_string Sosa.one) ;
       end
