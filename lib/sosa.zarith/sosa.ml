@@ -27,8 +27,10 @@ let to_string_sep =
   fun sep x ->
   let digits, len =
     let rec loop (d, l) x =
-      if x = Z.zero then (d, l)
-      else loop (Char.chr (Char.code '0' + Z.to_int (Z.rem x ten)) :: d, l + 1) (Z.div x ten)
+      if Z.equal Z.zero x then (d, l)
+      else
+        let q, r = Z.div_rem x ten in
+        loop (Char.chr (Char.code '0' + Z.to_int r) :: d, l + 1) q
     in
     loop ([], 0) x
   in
@@ -54,6 +56,6 @@ let gen x = Z.log2 x + 1
 
 let branches x =
   let rec aux acc d =
-    if d = Z.zero then acc else aux (Z.to_int (Z.logand d one) :: acc) (Z.shift_right d 1)
+    if Z.equal Z.zero d then acc else aux (Z.to_int (Z.logand d one) :: acc) (Z.shift_right d 1)
   in
   List.tl (aux [] x)
