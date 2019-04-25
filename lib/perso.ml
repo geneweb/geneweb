@@ -5880,7 +5880,7 @@ let gen_interp_templ menu title templ_fname conf base p =
      ("list", Vslist (ref SortedList.empty));
      ("listb", Vslist (ref SortedList.empty));
      ("listc", Vslist (ref SortedList.empty));
-     ("desc_mark", Vdmark (Obj.magic @@ ref 0)); (* FIXME !!!!! *)
+     ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vsosa (ref []));
      ("sosa_ref", Vsosa_ref sosa_ref_l);
