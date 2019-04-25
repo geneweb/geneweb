@@ -4,8 +4,8 @@
  (synopsis "GeneWeb library")
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
-            zarith
             %%%API_PKG%%%
+            %%%SOSA_PKG%%%
             str
             camlp5
             camlp5.gramlib
