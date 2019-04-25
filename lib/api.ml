@@ -44,6 +44,7 @@ let print_info_base conf base =
      | None -> (None, None)
   in
   let last_modified_person =
+    let default () = Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p in
     try
       let ic = Secure.open_in_bin (History.file_name conf) in
       let (_, pos, wiz) = (1, in_channel_length ic, "") in
@@ -56,18 +57,18 @@ let print_info_base conf base =
             match keyo with
             | Some key ->
               (match action with
-               | "mn" -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+               | "mn" -> default ()
                | _ ->
                  (match Gutil.person_ht_find_all base key with
                   | [ip] -> Some (Gwdb.string_of_iper ip)
-                  | _ -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p))
-            | None -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
-          else Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
-        | None -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+                  | _ -> default ()))
+            | None -> default ()
+          else default ()
+        | None -> default ()
       in
       close_in ic;
       last_modified_person
-    with Sys_error _ | _ -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+    with Sys_error _ | _ -> default ()
   in
   let info_base =
     M.Infos_base.({
@@ -512,10 +513,7 @@ let print_last_visited_persons conf base =
 (* ************************************************************************ *)
 let print_max_ancestors conf base =
   let module IperSet =
-        Set.Make
-          (struct
-            type t = iper            let compare i1 i2 =
-              Pervasives.compare (i1) (i2)           end)
+    Set.Make (struct type t = iper let compare = compare end)
   in
 
   let ipers = Gwdb.ipers base in
