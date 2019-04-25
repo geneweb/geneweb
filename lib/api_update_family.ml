@@ -27,10 +27,7 @@ let reconstitute_family conf base mod_f =
         let p = poi base (Gwdb.iper_of_string ip) in
         let fn = sou base (get_first_name p) in
         let sn = sou base (get_surname p) in
-        let occ =
-          if fn = "?" || sn = "?" then -1 (* FIXME!!! *)
-          else get_occ p
-        in
+        let occ = get_occ p in
         (fn, sn, occ, Update.Link, "", false))
       mod_f.Mwrite.Family.old_witnesses
   in
@@ -143,9 +140,6 @@ let reconstitute_family conf base mod_f =
           let fn = father.Mwrite.Person.firstname in
           let sn = father.Mwrite.Person.lastname in
           let occ = Api_update_util.api_find_free_occ base fn sn in
-          (*
-          let occ = Api_update_util.find_free_occ base fn sn in
-          *)
           (* On met à jour parce que si on veut le rechercher, *)
           (* il faut qu'on connaisse son occ.                  *)
           let () =
@@ -158,19 +152,7 @@ let reconstitute_family conf base mod_f =
           let p = poi base ip in
           let fn = sou base (get_first_name p) in
           let sn = sou base (get_surname p) in
-          let occ =
-            if fn = "?" || sn = "?" then -1 (* FIXME!!! *)
-            else get_occ p
-          in
-          (*
-          let fn = father.Mwrite.Person.firstname in
-          let sn = father.Mwrite.Person.lastname in
-          let occ =
-            match father.Mwrite.Person.occ with
-            | Some occ -> Int32.to_int occ
-            | None -> 0
-          in
-          *)
+          let occ = get_occ p in
           (fn, sn, occ, Update.Link, "", false)
     in
     let mother = mod_f.Mwrite.Family.mother in
@@ -195,9 +177,6 @@ let reconstitute_family conf base mod_f =
           let fn = mother.Mwrite.Person.firstname in
           let sn = mother.Mwrite.Person.lastname in
           let occ = Api_update_util.api_find_free_occ base fn sn in
-          (*
-          let occ = Api_update_util.find_free_occ base fn sn in
-          *)
           (* On met à jour parce que si on veut le rechercher, *)
           (* il faut qu'on connaisse son occ.                  *)
           let () =
@@ -214,15 +193,6 @@ let reconstitute_family conf base mod_f =
             if fn = "?" || sn = "?" then -1
             else get_occ p
           in
-          (*
-          let fn = mother.Mwrite.Person.firstname in
-          let sn = mother.Mwrite.Person.lastname in
-          let occ =
-            match mother.Mwrite.Person.occ with
-            | Some occ -> Int32.to_int occ
-            | None -> 0
-          in
-          *)
           (fn, sn, occ, Update.Link, "", false)
     in
     [father; mother]
@@ -256,9 +226,6 @@ let reconstitute_family conf base mod_f =
              let fn = child.Mwrite.Person_link.firstname in
              let sn = child.Mwrite.Person_link.lastname in
              let occ = Api_update_util.api_find_free_occ base fn sn in
-             (*
-             let occ = Api_update_util.find_free_occ base fn sn in
-             *)
              (* On met à jour parce que si on veut le rechercher, *)
              (* il faut qu'on connaisse son occ.                  *)
              let () =
@@ -271,17 +238,7 @@ let reconstitute_family conf base mod_f =
              let p = poi base ip in
              let fn = sou base (get_first_name p) in
              let sn = sou base (get_surname p) in
-             let occ =
-               if fn = "?" || sn = "?" then -1 (* FIXME!!! *)
-               else get_occ p
-             in
-             (*
-             let fn = child.Mwrite.Person_link.firstname in
-             let sn = child.Mwrite.Person_link.lastname in
-             let ip_child = Int32.to_int child.Mwrite.Person_link.index in
-             let child = poi base (Adef.iper_of_int ip_child) in
-             let occ = get_occ child in
-             *)
+             let occ = get_occ p in
              (fn, sn, occ, Update.Link, "", false))
       mod_f.Mwrite.Family.children
   in
@@ -366,18 +323,6 @@ let reconstitute_family conf base mod_f =
 let print_add conf base mod_f mod_fath mod_moth =
   (try
     let (sfam, scpl, sdes) = reconstitute_family conf base mod_f in
-    (*
-    let digest =
-      (* TODO gérer le cas de l'ajout de la première famille => ip = -1 *)
-      string_of_int
-        (Array.length (get_family (poi base ip)))
-    in
-    if digest <> "" && mod_f.Mwrite.Family.digest <> "" &&
-       digest <> mod_f.Mwrite.Family.digest
-    then
-      Api_update_util.UpdateError "BaseChanged"
-    else
-    *)
       (match UpdateFamOk.check_family conf sfam scpl with
       | (Some err, _) | (_, Some err) ->
           (* Correspond au cas ou fn/sn = ""/"?" *)
@@ -454,12 +399,6 @@ let print_add conf base mod_f mod_fath mod_moth =
                   in
                   (U_Add_parent (gen_p, fam), "aa")
             in
-            (* Déplacé dans Api_saisie_write.compute_modification_status *)
-            (*
-            Util.commit_patches conf base;
-            History.record conf base changed act;
-            Update.delete_topological_sort conf base;
-            *)
             let hr =
               [(fun () -> History.record conf base changed act);
                (fun () -> Update.delete_topological_sort conf base)]
@@ -475,8 +414,6 @@ let print_del conf base ip ifam =
   let fam = foi base ifam in
       begin
         UpdateFamOk.effective_del base ifam fam;
-        (* Déplacé dans Api_saisie_write.compute_modification_status *)
-        (*Util.commit_patches conf base;*)
         let changed =
           let gen_p =
             let p =
@@ -490,10 +427,6 @@ let print_del conf base ip ifam =
           in
           U_Delete_family (gen_p, gen_fam)
         in
-        (*
-        History.record conf base changed "df";
-        Update.delete_topological_sort conf base
-        *)
         let hr =
           [(fun () -> History.record conf base changed "df");
            (fun () -> Update.delete_topological_sort conf base)]
@@ -505,13 +438,6 @@ let print_del conf base ip ifam =
 let print_mod_aux conf base mod_f callback =
   try
     let (sfam, scpl, sdes) = reconstitute_family conf base mod_f in
-    (*
-    let digest =
-      let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
-      Update.digest_family ini_sfam
-    in
-    if digest = mod_f.Mwrite.Family.digest then
-    *)
       match UpdateFamOk.check_family conf sfam scpl with
       | (Some err, _) | (_, Some err) ->
           (* Correspond au cas ou fn/sn = "" ou "?" *)
@@ -520,10 +446,6 @@ let print_mod_aux conf base mod_f callback =
       | (None, None) ->
           let (sfam, sdes) = UpdateFamOk.strip_family sfam sdes in
           callback sfam scpl sdes
-    (*
-    else
-      Api_update_util.UpdateError "BaseChanged"
-    *)
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
@@ -562,8 +484,6 @@ let print_mod conf base ip mod_f =
         UpdateFamOk.all_checks_family
           conf base ifam fam cpl des (scpl, sdes, onfs)
       in
-      (* Déplacé dans Api_saisie_write.compute_modification_status *)
-      (*Util.commit_patches conf base;*)
       let changed =
         let p =
           Util.string_gen_person
@@ -572,10 +492,6 @@ let print_mod conf base ip mod_f =
         let n_f = Util.string_gen_family base fam in
         U_Modify_family (p, o_f, n_f)
       in
-      (*
-      History.record conf base changed "mf";
-      Update.delete_topological_sort conf base;
-      *)
       let hr =
         [(fun () -> History.record conf base changed "mf");
          (fun () -> Update.delete_topological_sort conf base)]
