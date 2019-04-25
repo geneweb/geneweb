@@ -410,8 +410,6 @@ and handler =
   ; api_max_ancestors : handler_base
   ; api_nb_ancestors : handler_base
   ; api_notification_birthday : handler_base
-  ; api_print_export : handler_base
-  ; api_print_export_search : handler_base
   ; api_print_synchro : handler_base
   ; api_ref_person_from_id : handler_base
   ; api_remove_image_ext : handler_base
@@ -588,8 +586,6 @@ let dummyHandler =
   ; api_max_ancestors = dummy_base
   ; api_nb_ancestors = dummy_base
   ; api_notification_birthday = dummy_base
-  ; api_print_export = dummy_base
-  ; api_print_export_search = dummy_base
   ; api_print_synchro = dummy_base
   ; api_ref_person_from_id = dummy_base
   ; api_remove_image_ext = dummy_base
@@ -1321,14 +1317,6 @@ let defaultHandler : handler =
 
   ; api_notification_birthday = begin fun _self conf base ->
       Api.print_notification_birthday conf base
-    end
-
-  ; api_print_export = begin fun _self conf base ->
-      Api.print_export conf base
-    end
-
-  ; api_print_export_search = begin fun _self conf base ->
-      Api.print_export_search conf base
     end
 
   ; api_print_synchro = begin fun _self _conf _base -> ()
