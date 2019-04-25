@@ -5,13 +5,13 @@
 (executables
   (public_names connex gwb2ged gwd gwdiff gwu setup update_nldb)
   (modules connex gwb2ged gwdiff gwd gwu setup update_nldb)
-  (libraries str %%%GWDB_PKG%%% geneweb geneweb.wserver)
+  (libraries str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb geneweb.wserver)
 )
 
 (executables
   (names gwtp)
   (modules gwtp httpEnv iolight)
-  (libraries %%%GWDB_PKG%%% geneweb)
+  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
 )
 
 (rule (copy mk_consang/mk_consang.ml consang.ml))
@@ -19,10 +19,10 @@
   (public_name consang)
   (modules consang)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries %%%GWDB_PKG%%% geneweb)
+  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
 )
 
-(library (name gwclib) (wrapped false) (libraries %%%GWDB_PKG%%% geneweb) (modules gwclib))
+(library (name gwclib) (wrapped false) (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb) (modules gwclib))
 
 #ifdef GWDB1
 (library (name db1link) (wrapped false) (libraries geneweb.gwdb1 geneweb) (modules db1link))

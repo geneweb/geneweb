@@ -75,6 +75,7 @@ CPPO_D=$(API_D) $(GWDB_D)
 	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
 	-e "s/%%%API_PKG%%%/$(API_PKG)/g" \
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
+	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
 	> $@
 
 hd/etc/version.txt:
@@ -91,7 +92,8 @@ GENERATED_FILES_DEP = \
 	lib/gwlib.ml \
 	$(CAMLP5_FILES:=.ml) \
 	lib/dune \
-	bin/distrib/dune
+	bin/distrib/dune \
+	test/dune \
 
 ifdef API_D
 piqi:

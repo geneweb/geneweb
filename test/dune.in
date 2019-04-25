@@ -10,7 +10,7 @@
 
 (executable
   (name test)
-  (libraries dummy_gwdb geneweb oUnit)
+  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb oUnit)
   (modules test test_place test_sosa test_utils)
 )
 
