@@ -2,10 +2,10 @@
  (name geneweb)
  (public_name geneweb)
  (synopsis "GeneWeb library")
- (preprocess (action (run %{bin:cppo} %%%API%%% -V OCAML:%{ocaml_version} %{input-file})))
+ (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
-            zarith
-            %%%API_DEP%%%
+            %%%API_PKG%%%
+            %%%SOSA_PKG%%%
             str
             stdlib-shims
             camlp5

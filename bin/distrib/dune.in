@@ -3,23 +3,23 @@
 (executables
   (public_names connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
   (modules connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
-  (libraries geneweb geneweb.wserver)
+  (libraries %%%SOSA_PKG%%% geneweb geneweb.wserver)
 )
 
 (executables
   (public_names ged2gwb ged2gwb2)
   (modules ged2gwb ged2gwb2 utf8List)
-  (libraries unix str camlp5.gramlib geneweb)
+  (libraries unix str camlp5.gramlib %%%SOSA_PKG%%% geneweb)
 )
 
 (executables
   (public_names gwb2ged gwdiff)
   (modules gwb2ged gwdiff)
-  (libraries str geneweb)
+  (libraries str %%%SOSA_PKG%%% geneweb)
 )
 
 (executables
   (names gwtp)
   (modules gwtp httpEnv iolight)
-  (libraries geneweb)
+  (libraries %%%SOSA_PKG%%% geneweb)
 )
