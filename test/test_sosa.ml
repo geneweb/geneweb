@@ -1,4 +1,3 @@
-open Geneweb
 open OUnit2
 
 let suite =

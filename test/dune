@@ -1,6 +1,0 @@
-(executable
-  (name test)
-  (libraries geneweb oUnit)
-)
-
-(alias (name runtest) (action (run ./test.exe) ) )
