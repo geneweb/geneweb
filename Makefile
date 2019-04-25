@@ -91,8 +91,9 @@ GENERATED_FILES_DEP = \
 	hd/etc/version.txt \
 	lib/gwlib.ml \
 	$(CAMLP5_FILES:=.ml) \
-	lib/dune \
+	benchmark/dune \
 	bin/distrib/dune \
+	lib/dune \
 	test/dune \
 
 ifdef API_D
