@@ -1,7 +1,15 @@
 let bench name n fn arg =
   ignore @@ Benchmark.latency1 ~name n fn arg
 
+let list =
+  [1;2;10;100;1000;10000;100000;1000000;10000000;100000000;1000000000]
+
+let sosa_list =
+  List.map Sosa.of_int list
+
 let () =
-  bench "Sosa.gen" 1000000L
-    (List.map Sosa.gen)
-    (List.map Sosa.of_int [1;2;3;4;5;6;7;8;9;10;11;12;13;14;15])
+  bench "Sosa.gen" 1000000L (List.map Sosa.gen) sosa_list
+; bench "Sosa.to_string_sep" 1000000L (List.map @@ Sosa.to_string_sep ",") sosa_list
+; bench "Sosa.to_string" 1000000L (List.map Sosa.to_string) sosa_list
+; bench "Sosa.of_string" 1000000L (List.map Sosa.of_string) (List.map string_of_int list)
+; bench "Sosa.branches" 1000000L (List.map Sosa.branches) sosa_list
