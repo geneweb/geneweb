@@ -23,6 +23,8 @@ while [[ $# -ne 0 ]]; do
       API_D="-D API" ;;
     --sosa-zarith)
       SOSA_PKG="geneweb.sosa-zarith" ;;
+    --sosa-vanilla)
+      SOSA_PKG="geneweb.sosa-vanilla" ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
@@ -30,8 +32,8 @@ while [[ $# -ne 0 ]]; do
 done
 
 if [[ $SOSA_PKG == "" ]] ; then
-  echo -e "\\x1b[33m[WARNING]\\x1b[0m SOSA is not set, using geneweb.sosa-zarith" ;
-  SOSA_PKG="geneweb.sosa-zarith" ;
+  echo -e "\\x1b[33m[WARNING]\\x1b[0m SOSA is not set, using geneweb.sosa-vanilla" ;
+  SOSA_PKG="geneweb.sosa-vanilla" ;
 fi ;
 
 # Functions that print the checked information
