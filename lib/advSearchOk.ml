@@ -293,41 +293,38 @@ let advanced_search conf base max_answers =
                else false)
             (Array.to_list (get_family p))
   in
-  let list = ref [] in
-  let len = ref 0 in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status p =
     match_sex p true && match_first_name p true && match_surname p true &&
     match_married p true && match_occupation p true
   in
-  let match_person p search_type =
-    if search_type <> "OR" then
-      (if match_civil_status p && match_baptism_date p true &&
-          match_baptism_place p true && match_birth_date p true &&
-          match_birth_place p true && match_burial_date p true &&
-          match_burial_place p true && match_death_date p true &&
-          match_death_place p true &&
-          match_marriage p marriage_date_field_name marriage_place_field_name
-            true
-       then
-         begin list := p :: !list; incr len end)
+  let match_person ((list, len) as acc) p search_type =
+    if search_type <> "OR"
+    && (match_civil_status p && match_baptism_date p true
+        && match_baptism_place p true && match_birth_date p true
+        && match_birth_place p true && match_burial_date p true
+        && match_burial_place p true && match_death_date p true
+        && match_death_place p true
+        && match_marriage p marriage_date_field_name marriage_place_field_name true)
+    then (p :: list, len +1)
     else if
-      match_civil_status p &&
-      (gets "place" = "" && gets "date2_yyyy" = "" &&
-       gets "date1_yyyy" = "" ||
-       (match_baptism_date p false || match_baptism_place p false) &&
-       match_baptism_date p true && match_baptism_place p true ||
-       (match_birth_date p false || match_birth_place p false) &&
-       match_birth_date p true && match_birth_place p true ||
-       (match_burial_date p false || match_burial_place p false) &&
-       match_burial_date p true && match_burial_place p true ||
-       (match_death_date p false || match_death_place p false) &&
-       match_death_date p true && match_death_place p true ||
-       match_marriage p marriage_date_field_name marriage_place_field_name
-         false)
-    then
-      begin list := p :: !list; incr len end
+      match_civil_status p
+      && (gets "place" = "" && gets "date2_yyyy" = ""
+          && gets "date1_yyyy" = ""
+          || (match_baptism_date p false || match_baptism_place p false)
+          && match_baptism_date p true && match_baptism_place p true
+          || (match_birth_date p false || match_birth_place p false)
+          && match_birth_date p true && match_birth_place p true
+          || (match_burial_date p false || match_burial_place p false)
+          && match_burial_date p true && match_burial_place p true
+          || (match_death_date p false || match_death_place p false)
+          && match_death_date p true && match_death_place p true
+          || match_marriage p marriage_date_field_name marriage_place_field_name false
+         )
+    then (p :: list, len + 1)
+    else acc
   in
+  let list, len =
   if gets "first_name" <> "" || gets "surname" <> "" then
     let (slist, _) =
       if gets "first_name" <> "" then
@@ -339,20 +336,21 @@ let advanced_search conf base max_answers =
           (spi_find (persons_of_surname base)) get_surname (gets "surname")
     in
     let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-    let rec loop =
-      function
-        [] -> ()
+    let rec loop ((_, len) as acc) = function
+      | [] -> acc
+      | _ when len > max_answers -> acc
       | ip :: l ->
-          if !len > max_answers then ()
-          else begin match_person (pget conf base ip) search_type; loop l end
+        loop (match_person acc (pget conf base ip) search_type) l
     in
-    loop slist
+    loop ([], 0) slist
   else
-    Gwdb.Collection.iter (fun i ->
-        if !len > max_answers then ()
-        else match_person (pget conf base i) search_type
-      ) (Gwdb.ipers base) ;
-  List.rev !list, !len
+    Gwdb.Collection.fold_until
+      (fun (_, len) -> len <= max_answers)
+      (fun acc i -> match_person acc (pget conf base i) search_type)
+      ([], 0)
+      (Gwdb.ipers base)
+  in
+  List.rev list, len
 
 let print_result conf base max_answers (list, len) =
   let list =

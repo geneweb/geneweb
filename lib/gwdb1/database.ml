@@ -584,8 +584,6 @@ let input_synchro bname =
   with _ -> {synch_list = []}
 
 let person_of_key persons strings persons_of_name first_name surname occ =
-  (* if first_name = "?" || surname = "?" then None
-   * else *)
     let first_name = Mutil.nominative first_name in
     let surname = Mutil.nominative surname in
     let ipl = persons_of_name (first_name ^ " " ^ surname) in
