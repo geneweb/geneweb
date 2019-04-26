@@ -254,11 +254,11 @@ doc: | piqi $(GENERATED_FILES_DEP)
 	dune build @doc
 .PHONY: doc
 
-test: install-exe
+test: | piqi $(GENERATED_FILES_DEP)
 	dune build @runtest
 .PHONY: test
 
-bench: geneweb.install
+bench: | piqi $(GENERATED_FILES_DEP)
 	dune build @runbench
 .PHONY: bench
 
