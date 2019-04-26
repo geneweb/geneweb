@@ -189,10 +189,10 @@ distrib: exe
 doc: | piqi $(GENERATED_FILES_DEP)
 	dune build @doc
 
-test: exe
+test: | piqi $(GENERATED_FILES_DEP)
 	dune build @runtest
 
-bench: geneweb.install
+bench: | piqi $(GENERATED_FILES_DEP)
 	dune build @runbench
 .PHONY: bench
 
