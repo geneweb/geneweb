@@ -1,6 +1,6 @@
 (library
- (name gwdb)
- (public_name geneweb.gwdb)
+ (name gwdb_mli)
+ (public_name geneweb.gwdb.mli)
  (wrapped false)
  (libraries geneweb.def)
  (modules_without_implementation gwdb)
