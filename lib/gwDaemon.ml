@@ -8,7 +8,6 @@ open Util
 module StrSet = Mutil.StrSet
 
 module Make
-    (Wserver : module type of Wserver)
     (Request : Request.MakeOut)
   : (sig val run : ?speclist:(string * Arg.spec * string) list -> unit -> unit end)
 = struct
@@ -140,7 +139,7 @@ let http status =
 
 let robots_txt () =
   Log.with_log (fun oc -> Printf.fprintf oc "Robot request\n");
-  Wserver.http HttpStatus.OK;
+  Wserver.http Wserver.OK;
   Wserver.header "Content-type: text/plain";
   if copy_file "robots" then ()
   else
@@ -151,7 +150,7 @@ let refuse_log from =
     (fun oc ->
        let tm = Unix.localtime (Unix.time ()) in
        Util.fprintf_date oc tm; Printf.fprintf oc " excluded: %s\n" from);
-  http HttpStatus.Forbidden;
+  http Wserver.Forbidden;
   Wserver.header "Content-type: text/html";
   Wserver.printf "Your access has been disconnected by administrator.\n";
   let _ = (copy_file "refuse" : bool) in ()
@@ -167,7 +166,7 @@ let only_log from =
          (fun first s -> Printf.fprintf oc "%s%s" (if not first then "," else "") s)
          !only_addresses;
        Printf.fprintf oc ")\n");
-  http HttpStatus.OK;
+  http Wserver.OK;
   Wserver.header "Content-type: text/html; charset=iso-8859-1";
   Wserver.printf "<head><title>Invalid access</title></head>\n";
   Wserver.printf "<body><h1>Invalid access</h1></body>\n"
@@ -402,7 +401,7 @@ let trace_auth base_env f =
 
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Wserver.http HttpStatus.Unauthorized;
+  Wserver.http Wserver.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
     let _ =
@@ -629,7 +628,7 @@ let index_not_name s =
   loop 0
 
 let print_request_failure msg =
-  http HttpStatus.OK;
+  http Wserver.OK;
   Wserver.header "Content-type: text/html";
   Wserver.printf "<head><title>Request failure</title></head>\n";
   Wserver.printf
@@ -653,7 +652,7 @@ let refresh_url request b_arg_for_basename bname =
     in
     serv ^ req
   in
-  http HttpStatus.OK;
+  http Wserver.OK;
   Wserver.header "Content-type: text/html";
   Wserver.printf "<head>\n\
                   <meta http-equiv=\"REFRESH\"\n\
@@ -1508,7 +1507,7 @@ type misc_fname =
   | Other of string
 
 let content_misc len misc_fname =
-  Wserver.http HttpStatus.OK;
+  Wserver.http Wserver.OK;
   let (fname, t) =
     match misc_fname with
       Css fname -> fname, "text/css"

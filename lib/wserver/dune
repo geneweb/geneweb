@@ -3,4 +3,7 @@
  (public_name geneweb.wserver)
  (wrapped false)
  (libraries unix)
+ (flags (:standard -no-keep-locs))
 )
+
+(rule (copy# %{lib:geneweb.wserver.mli:wserver.mli} wserver.mli))

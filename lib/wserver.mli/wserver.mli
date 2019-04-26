@@ -1,5 +1,12 @@
-(* $Id: wserver.mli,v 5.5 2007-05-24 15:03:22 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
+
+type httpStatus =
+  | OK (* 200 *)
+  | Moved_Temporarily (* 302 *)
+  | Bad_Request (* 400 *)
+  | Unauthorized (* 401 *)
+  | Forbidden (* 403 *)
+  | Not_Found (* 404 *)
 
 (* module [Wserver]: elementary web service *)
 
@@ -32,7 +39,7 @@ val wrap_string : (string -> string) ref
     (* To specify a function which may transform the string printed by
        [sprint] below. *)
 
-val http : HttpStatus.t -> unit
+val http : httpStatus -> unit
     (* [Wserver.http answer] sends the http header where [answer]
        represents the answer status. If empty string, "200 OK" is assumed. *)
 
@@ -85,7 +92,7 @@ val cgi : bool ref
    - Source program "foo.ml":
         Wserver.f None 2371 60 None
            (fun _ s _ ->
-              Wserver.http HttpStatus.OK;
+              Wserver.http Wserver.OK;
               Wserver.printf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml

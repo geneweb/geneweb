@@ -16,7 +16,7 @@ open Config
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
 let content ct len fname =
-  Wserver.http HttpStatus.OK;
+  Wserver.http Wserver.OK;
   Wserver.header "Content-type: %s" ct;
   Wserver.header "Content-length: %d" len;
   Wserver.header "Content-disposition: inline; filename=%s"
