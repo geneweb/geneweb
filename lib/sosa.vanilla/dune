@@ -5,4 +5,4 @@
  (flags       (:standard -no-keep-locs))
 )
 
-(rule (copy# %{lib:geneweb.sosa:sosa.mli} sosa.mli))
+(rule (copy# %{lib:geneweb.sosa.mli:sosa.mli} sosa.mli))
