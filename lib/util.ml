@@ -361,7 +361,7 @@ let html ?content_type conf =
   Wserver.header "Content-type: %s; charset=%s" content_type charset
 
 let unauthorized conf auth_type =
-  Wserver.http HttpStatus.Unauthorized;
+  Wserver.http Wserver.Unauthorized;
   if not !(Wserver.cgi) then
     Wserver.header "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
   Wserver.header "Content-type: text/html; charset=%s" conf.charset;

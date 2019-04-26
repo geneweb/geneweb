@@ -2,9 +2,9 @@
  (name gwdb1)
  (public_name geneweb.gwdb1)
  (wrapped false)
- (libraries geneweb.def geneweb.wserver geneweb.util geneweb.io)
+ (libraries geneweb.def geneweb.wserver.mli geneweb.util geneweb.io)
  (modules_without_implementation dbdisk)
- (flags       (:standard -no-keep-locs))
+ (flags (:standard -no-keep-locs))
 )
 
 (rule (copy# %{lib:geneweb.gwdb.mli:gwdb.mli} gwdb.mli))

@@ -1,5 +1,13 @@
-(* $Id: wserver.ml,v 5.15 2007-09-12 09:42:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
+
+type httpStatus =
+  | OK (* 200 *)
+  | Moved_Temporarily (* 302 *)
+  | Bad_Request (* 400 *)
+  | Unauthorized (* 401 *)
+  | Forbidden (* 403 *)
+  | Not_Found (* 404 *)
+
 let eprintf = Printf.eprintf
 
 let sock_in = ref "wserver.sin"
@@ -26,13 +34,20 @@ let printing_state = ref Nothing
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
-  if status <> HttpStatus.OK || not !cgi then
-    let answer = HttpStatus.to_string status in
+  if status <> OK || not !cgi then
+    let answer = match status with
+      | OK -> "200 OK"
+      | Moved_Temporarily -> "302 Moved Temporarily"
+      | Bad_Request -> "400 Bad Request"
+      | Unauthorized -> "401 Unauthorized"
+      | Forbidden -> "403 Forbidden"
+      | Not_Found -> "404 Not Found"
+    in
     if !cgi then printnl "Status: %s" answer else printnl "HTTP/1.0 %s" answer
 
 let header fmt =
   if !printing_state <> Status then
-    if !printing_state = Nothing then http HttpStatus.OK
+    if !printing_state = Nothing then http OK
     else failwith "Cannot write HTTP headers: page contents already started";
   printnl fmt
 
@@ -41,7 +56,7 @@ let wrap_string = ref (fun s -> s)
 let printf fmt =
   if !printing_state <> Contents then
     begin
-      if !printing_state = Nothing then http HttpStatus.OK;
+      if !printing_state = Nothing then http OK;
       printnl "";
       printing_state := Contents
     end;
@@ -155,7 +170,7 @@ let encode s =
   else s
 
 let http_redirect_temporarily url =
-  http HttpStatus.Moved_Temporarily; printnl "Location: %s" url
+  http Moved_Temporarily; printnl "Location: %s" url
 
 let print_exc exc =
   let () =
@@ -268,7 +283,7 @@ let timeout tmout spid _ =
   if pid = 0 then
     if Unix.fork () = 0 then
       begin
-        http HttpStatus.OK;
+        http OK;
         printnl "Content-type: text/html; charset=iso-8859-1";
         printnl "";
         printf "<head><title>Time out</title></head>\n";
