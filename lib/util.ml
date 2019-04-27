@@ -228,12 +228,20 @@ let rec capitale_utf_8 s =
           let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
           Printf.sprintf "%c%c%s" (Char.chr 0xD0) c1
             (String.sub s 2 (String.length s - 2))
-      | 0xD1 when Char.code s.[1] >= 0xA0 ->
+      | 0xD1 when Char.code s.[1] >= 0x90 && Char.code s.[1] <= 0x9F ->
+          let c = Char.chr 0xD0 in
+          let c1 = Char.chr (Char.code s.[1] - 0x90 + 0x80) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xD1 when Char.code s.[1] >= 0xA0 && Char.code s.[1] <= 0xBF ->
           let c1 = Char.code s.[1] in
           let c1 = Char.chr (if c1 land 1 = 1 then c1 - 1 else c1) in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD2 when Char.code s.[1] = 0x81 ->
           let c1 = Char.chr (Char.code s.[1] - 1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xD2 when Char.code s.[1] >= 0x8A ->
+          let c1 = Char.code s.[1] in
+          let c1 = Char.chr (if c1 land 1 = 1 then c1 - 1 else c1) in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xE1 ->
           begin
@@ -243,7 +251,7 @@ let rec capitale_utf_8 s =
               let c2 = Char.code s.[2] in
               let c2 = Char.chr (if c2 land 1 = 1 then c2 - 1 else c2) in
               Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
-          | 0xBA when Char.code s.[2] < 0x95 ->
+          | 0xBA when Char.code s.[2] <= 0x95 ->
               let c1 = s.[1] in
               let c2 = Char.code s.[2] in
               let c2 = Char.chr (if c2 land 1 = 1 then c2 - 1 else c2) in
@@ -252,6 +260,36 @@ let rec capitale_utf_8 s =
               let c1 = s.[1] in
               let c2 = Char.code s.[2] in
               let c2 = Char.chr (if c2 land 1 = 1 then c2 - 1 else c2) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBC when Char.code s.[2] >= 0x80 && Char.code s.[2] <= 0x87  ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (c2 - 0x80 + 0x88) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBC when Char.code s.[2] >= 0x90 && Char.code s.[2] <= 0x95 ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (c2 - 0x90 + 0x98) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBC when Char.code s.[2] >= 0xA0 && Char.code s.[2] <= 0xA7 ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (c2 - 0xA0 + 0xA8) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBC when Char.code s.[2] >= 0xB0 && Char.code s.[2] <= 0xB7 ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (c2 - 0xB0 + 0xB8) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBD when Char.code s.[2] >= 0x80 && Char.code s.[2] <= 0x85 ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (c2 - 0x80 + 0x88) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBD when Char.code s.[2] >= 0xA0 && Char.code s.[2] <= 0xA7 ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (c2 - 0xA0 + 0xA8) in
               Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
           | _ -> s
           end
