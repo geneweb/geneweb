@@ -43,6 +43,47 @@ let util_decline _ =
   test "abc xxx def yyy ghi" "abc %1 def %2 ghi" "xxx" "<xyz>yyy" "yyy"
   test "abc xxx def yyy ghi" "abc %1 def %2 ghi" "xxx" "<xyz>yyy" "yyy"
 *)
+
+let util_capitale_full _ =
+  let test_two_bytes c =
+    let rec loop1 i =
+      Printf.printf "\nLine: %X\n standard: " i ;
+      let rec loop2 j =
+        let s = Bytes.make 2 (Char.chr i) in
+        Bytes.set s 1 (Char.chr j) ;
+        let s = Bytes.to_string s in
+        Printf.printf "%s " s ;
+        if j < 0xBF then loop2 (j + 1)
+      in loop2 0x80 ;
+      Printf.printf "\nuppercase: ";
+      let rec loop2 j =
+        let s = Bytes.make 2 (Char.chr i) in
+        Bytes.set s 1 (Char.chr j) ;
+        let s = Bytes.to_string s in
+        let s1 = Util.capitale s in
+        Printf.printf "%s " s1 ;
+        if j < 0xBF then loop2 (j + 1)
+      in loop2 0x80 ;
+      if i <= 0xBB then loop1 (i + 1)
+    in 
+    loop1 c ;
+  "done"
+  in
+  let test_2 c =
+    assert_equal "done" (test_two_bytes c)
+  in
+  test_2 0xC3
+  ; test_2 0xC4
+  ; test_2 0xC5
+  ; test_2 0xC6
+  ; test_2 0xC7
+  ; test_2 0xC8
+  ; test_2 0xCE
+  ; test_2 0xCF
+  ; test_2 0xD0
+  ; test_2 0xD1
+  ; test_2 0xD2
+  
 let util_capitale _ =
   let test a b =
     assert_equal ~printer:(fun x -> x) a (Util.capitale b)
@@ -55,7 +96,9 @@ let util_capitale _ =
   ; test "Ńoemie" "ńoemie"
   ; test "Ńoemie" "Ńoemie"
   ; test "Ĕtienne" "ĕtienne"
+  ; test "Ĕtienne" "Ĕtienne"
   ; test "Ÿvette" "ÿvette"
+  ; test "Ÿvette" "Ÿvette"
   (* greek *)
   ; test "Δ λληνικά" "δ λληνικά"
   ; test "Δ λληνικά" "Δ λληνικά"
@@ -94,7 +137,13 @@ let util_capitale _ =
   ; test "Ѡ енри" "Ѡ енри"
   ; test "Ҁ енри" "ҁ енри"
   ; test "Ҁ енри" "Ҁ енри"
-
+  (* Latin extended, Vietnameese *)
+  ; test "Nguyễn" "nguyễn"
+  ; test "Nguyễn" "Nguyễn"
+  ; test "Đình" "đình"
+  ; test "Đình" "Đình"
+  ; test "Ḕtienne" "ḕtienne"
+  ; test "Ḕtienne" "Ḕtienne"
 (*
     %1 of %2
 de: %1 von :d:%2
@@ -235,6 +284,7 @@ let suite =
     [ "util_str_sub" >:: util_str_sub
     (*; "util_safe_html" >:: util_safe_html *)
     ; "util_capitale" >:: util_capitale
+    ; "util_capitale_full" >:: util_capitale_full
     (*; "util_decline" >:: util_decline *)
     ; "name_unaccent" >:: name_unaccent
     ; "name_lower" >:: name_lower

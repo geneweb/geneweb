@@ -83,6 +83,34 @@ let uppercase c =
   then Char.unsafe_chr(Char.code c - 32)
   else c
 
+let _c5_table =
+(*        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F *)
+(* 80 *)[|0; 0; 0;-1; 0;-1; 0; 0;-1; 0; 0; 0;-1; 0; 0; 0; 
+(* 90 *)  0; 0;-1; 0; 0; 0; 0; 0; 0;-1; 0; 0; 0; 0; 0; 0; 
+(* A0 *)  0;-1; 0;-1; 0;-1; 0; 0;-1; 0; 0; 0; 0;-1; 0; 0;
+(* B0 *) -1; 0; 0; 0;-1; 0;-1; 0; 0;-1; 0; 0; 0;-1; 0; 0|]
+
+let c6_table =
+(*        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F *)
+(* 80 *)[|0; 0; 0;-1; 0;-1; 0; 0;-1; 0; 0; 0;-1; 0; 0; 0; 
+(* 90 *)  0; 0;-1; 0; 0; 0; 0; 0; 0;-1; 0; 0; 0; 0; 0; 0; 
+(* A0 *)  0;-1; 0;-1; 0;-1; 0; 0;-1; 0; 0; 0; 0;-1; 0; 0;
+(* B0 *) -1; 0; 0; 0;-1; 0;-1; 0; 0;-1; 0; 0; 0;-1; 0; 0|]
+
+let c7_table =
+(*        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F *)
+(* 80 *)[|0; 0; 0; 0; 0;-1; 0; 0;-1; 0; 0;-1; 0; 0;-1; 0;
+(* 90 *) -1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0; 0;-1;
+(* A0 *)  0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1;
+(* B0 *)  0; 0;-1; 0; 0;-1; 0; 0; 0;-1; 0;-1; 0;-1; 0;-1|]
+
+let c8_table =
+(*        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F *)
+(* 80 *)[|0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1;
+(* 90 *)  0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1;
+(* A0 *)  0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1; 0;-1;
+(* B0 *)  0;-1; 0;-1; 0; 0; 0; 0; 0; 0; 0; 0;-1; 0; 0; 0;|]
+
 let rec capitale_utf_8 s =
   if String.length s = 0 then ""
   else
@@ -119,9 +147,42 @@ let rec capitale_utf_8 s =
           let c1 = Char.code s.[1] in
           let c1 = Char.chr (if c1 land 1 = 0 then c1 - 1 else c1) in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
-      | 0xC5 | 0xC6 | 0xC7 ->
+      | 0xC5 when Char.code s.[1] = 0x80 ->
+          let c = Char.chr 0xC4 in
+          let c1 = Char.chr (0xBF) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xC5 when Char.code s.[1] > 0x80 &&Char.code s.[1] < 0x89 ->
           let c1 = Char.code s.[1] in
           let c1 = Char.chr (if c1 land 1 = 0 then c1 - 1 else c1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+          (* x89 is ŉ *)
+      | 0xC5 when Char.code s.[1] > 0x89 &&Char.code s.[1] < 0xB8 ->
+          let c1 = Char.code s.[1] in
+          let c1 = Char.chr (if c1 land 1 = 1 then c1 - 1 else c1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+          (* xB8 is Ÿ *)
+      | 0xC5 when Char.code s.[1] > 0xB8 && Char.code s.[1] < 0xBF ->
+          let c1 = Char.code s.[1] in
+          let c1 = Char.chr (if c1 land 1 = 0 then c1 - 1 else c1) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      (* xBF is ſ *)
+      | 0xC6 ->
+          let c1 = Char.code s.[1] in
+          let i = c1 - 0x80 in
+          let d = Array.get c6_table i  in
+          let c1 = Char.chr (c1 + d) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xC7 ->
+          let c1 = Char.code s.[1] in
+          let i = c1 - 0x80 in
+          let d = Array.get c7_table i  in
+          let c1 = Char.chr (c1 + d) in
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xC8 ->
+          let c1 = Char.code s.[1] in
+          let i = c1 - 0x80 in
+          let d = Array.get c8_table i  in
+          let c1 = Char.chr (c1 + d) in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xCE when Char.code s.[1] >= 0xB1 && Char.code s.[1] <= 0xBF ->
           (* greek *)
@@ -174,6 +235,26 @@ let rec capitale_utf_8 s =
       | 0xD2 when Char.code s.[1] = 0x81 ->
           let c1 = Char.chr (Char.code s.[1] - 1) in
           Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xE1 ->
+          begin
+          match Char.code s.[1] with
+          | 0xB8 | 0xB9 | 0xBB ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (if c2 land 1 = 1 then c2 - 1 else c2) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBA when Char.code s.[2] < 0x95 ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (if c2 land 1 = 1 then c2 - 1 else c2) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | 0xBA when Char.code s.[2] >= 0xA0 ->
+              let c1 = s.[1] in
+              let c2 = Char.code s.[2] in
+              let c2 = Char.chr (if c2 land 1 = 1 then c2 - 1 else c2) in
+              Printf.sprintf "%c%c%c%s" c c1 c2 (String.sub s 3 (String.length s - 3))
+          | _ -> s
+          end
       | _ -> s
 
 let index_of_next_char s i =
