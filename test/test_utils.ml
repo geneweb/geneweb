@@ -18,6 +18,12 @@ let name_lower _ =
   let test a b =
     assert_equal ~printer:(fun x -> x) a (Name.lower b)
   in
+  let test_a a b =
+    assert_equal ~printer:(fun x -> x) a (Name.lower ~apostr:true b)
+  in
+  let test_v a b =
+    assert_equal ~printer:(fun x -> x) a (Name.lower ~viet:true b)
+  in
   test "abcdef" "ABCdEF"
   ; test "abcdef" "ÂBÇdĘF"
   ; test "etienne" "Ĕtienne"
@@ -26,11 +32,14 @@ let name_lower _ =
   ; test "ellenika" "ελληνικά"
   ; test "ellnhiya" "ΈΛΛΝΉΊΎΆ"
   ; test "yvette" "Ÿvette"
+  ; test "l’homme" "L’homme"
+  ; test_a "l homme" "L’homme"
   (* cyrillic to latin and lower *)
   ; test "genri" "Генри"
   ; test "genri" "ГЕНРИ"
   (* Latin supplemental, vietnameese *)
-  ; test "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
+  ; test "mien dịnh nguyễn phuc" "Miên Định Nguyễn Phúc"
+  ; test_v "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
 
 (*
     %1 of %2

@@ -42,7 +42,7 @@ let nbc c =
   else if Char.code c < 0b11111110 then 6
   else -1
 
-let unaccent_utf_8 lower s i =
+let unaccent_utf_8 ?(viet=false) ?(apostr=false) lower  s i =
   let f s = if lower then String.lowercase_ascii s else s in
   let nbc = nbc s.[i] in
   if nbc = 1 || nbc < 0 || i + nbc > String.length s then
@@ -441,7 +441,7 @@ let unaccent_utf_8 lower s i =
           | 0x86 -> "f"
           | _ -> String.sub s i nbc
           end
-      | 0xE1 ->
+      | 0xE1 when viet = true ->
           (* Latin extended additionnal - Vietnameese *)
           begin match Char.code s.[i+1] with
             0xB8 ->
@@ -713,11 +713,11 @@ let unaccent_utf_8 lower s i =
           | _ -> String.sub s i nbc
           end (* E1 *)
       (* Code pour supprimer l'apostrophe typographique *)
-      | 0xE2 ->
+      | 0xE2 when apostr = true ->
           begin match Char.code s.[i+1] with
           | 0x80 ->
             begin match Char.code s.[i+2] with
-            | 0x99 -> " "
+            | 0x99 -> " " (* FIXME " " or "" ??? *)
             | _ -> String.sub s i nbc
             end
           | _ -> String.sub s i nbc
@@ -733,7 +733,7 @@ let next_chars_if_equiv s i t j =
     let (t1, j1) = unaccent_utf_8 true t j in
     if s1 = t1 then Some (i1, j1) else None
 
-let lower s =
+let lower ?(viet=false) ?(apostr=false) s =
   let rec copy special i len =
     if i = String.length s then Buff.get len
     else if Char.code s.[i] < 0x80 then
@@ -747,7 +747,9 @@ let lower s =
       | _ -> copy (len <> 0) (i + 1) len
     else
       let len = if special then Buff.store len ' ' else len in
-      let (t, j) = unaccent_utf_8 true s i in copy false j (Buff.mstore len t)
+      let (t, j) = 
+        unaccent_utf_8 ~viet:viet ~apostr:apostr true s i 
+      in copy false j (Buff.mstore len t)
   in
   copy false 0 0
 

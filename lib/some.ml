@@ -182,7 +182,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
              if x = Name.strip_lower str then (str, istr, iperl) :: l else l)
           l [],
         Name.strip_lower
-      else l1, name_inj
+      else l1, name_inj ~viet:false ~apostr:false
     in
     if l1 = [] then l, Name.crush_lower else l1, name_inj
   in
