@@ -29,6 +29,8 @@ let name_lower _ =
   (* cyrillic to latin and lower *)
   ; test "genri" "Генри"
   ; test "genri" "ГЕНРИ"
+  (* Latin supplemental, vietnameese *)
+  ; test "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
 
 (*
     %1 of %2
