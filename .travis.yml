@@ -15,7 +15,7 @@ matrix:
   fast_finish: true
   allow_failures:
     - os: osx
-      env: OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+      env: OCAML_VERSION=4.07 OPAM_VERSION=2.0.3
 
 cache:
   directories:
