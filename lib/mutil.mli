@@ -60,6 +60,7 @@ val start_with : ?wildcard:bool -> string -> int -> string -> bool
     (with [sub] in the role of [prefix]).
 *)
 val contains : ?wildcard:bool -> string -> string -> bool
+val replace_utf_8 : string -> string -> string -> string
 
 (** [get_particle particles name]
     Return [p] where [p] is in [particles] and is prefix of [name].

@@ -312,6 +312,25 @@ let contains ?(wildcard = false) str sub =
       i <= strlen && (start_with ~wildcard sub i str || loop (i + 1))
     in loop 0
 
+let replace_utf_8 str sub rep =
+  if not (contains str sub) then str
+  else
+    begin
+      let strlen = String.length str in
+      let sublen = String.length sub in
+      let i =
+        let rec loop i =
+        if i + sublen <= strlen
+        then 
+          if start_with sub i str then i
+          else loop (i + 1)
+        else -1
+        in loop 0
+      in
+      (String.sub str 0 i) ^ rep ^ 
+        (String.sub str (i + sublen) (strlen - i - sublen))
+    end
+
 let get_particle list s =
   let rec loop = function
     | hd :: _ when start_with hd 0 s -> hd

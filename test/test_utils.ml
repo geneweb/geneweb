@@ -1,6 +1,7 @@
 open Geneweb
 open OUnit2
 
+
 let mutil_contains _ =
   let str = "foo bar" in
   let test t b1 b2 =
@@ -91,15 +92,44 @@ let util_safe_html _ =
     {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
     (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|})
 
+let normalize _ =
+    let test exp inp =
+      assert_equal ~printer:(fun x -> x) exp (Place.normalize inp)
+    in
+    test "[foo-bar], boobar (baz)" "[foo-bar] - boobar (baz)"
+  ; test "[foo-bar], boobar (baz)" "[foo-bar] – boobar (baz)" (* EN dash *)
+  ; test "[foo-bar], boobar (baz)" "[foo-bar] — boobar (baz)" (* EM dash *)
+
+let remove_suburb _ =
+    let test exp inp =
+      assert_equal ~printer:(fun x -> x) exp (UpdateData.remove_suburb inp)
+    in
+    test "boobar (baz)" "[foo-bar] - boobar (baz)"
+  ; test "boobar (baz)" "[foo-bar] – boobar (baz)" (* EN dash *)
+  ; test "boobar (baz)" "[foo-bar] — boobar (baz)" (* EM dash *)
+
+let mutil_replace_utf_8 _ =
+    let test a b c d =
+      assert_equal ~printer:(fun x -> x) a (Mutil.replace_utf_8 b c d)
+    in
+    test "Abcdef ghlmnl" "Abcdef ghijkl" "ijk" "lmn"
+    ; test "Abcdef svedcina" "Abcdef švédčina" "švédčina" "svedcina"
+    ; test "Abcdef xxsvedcinayy" "Abcdef xxšvédčinayy" "švédčina" "svedcina"
+
 let suite =
   [ "Mutil" >:::
     [ "mutil_contains" >:: mutil_contains
     ; "mutil_start_with" >:: mutil_start_with
     ; "mutil_arabian_romian" >:: mutil_arabian_romian
     ; "mutil_compare_after_particle" >:: mutil_compare_after_particle
+    ; "mutil_replace_utf_8" >:: mutil_replace_utf_8
     ]
   ; "Util" >:::
     [ "util_str_sub" >:: util_str_sub
     ; "util_safe_html" >:: util_safe_html
+    ]
+  ; "Place" >:::
+    [ "normalize" >:: normalize
+    ; "remove_suburb" >:: remove_suburb
     ]
   ]

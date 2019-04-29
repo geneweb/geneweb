@@ -14,8 +14,11 @@ let normalize =
      Cette fonction normalize n'est utilisée que dans le module place
      la séquence [-–—] distingue les trois tirets possibles
   *)
-  let r = Str.regexp "^\\[\\([^]]+\\)\\] *[-–—] *\\(.*\\)" in
-  fun s -> Str.global_replace r "[\\1], \\2" s
+  let r = Str.regexp "^\\[\\([^]]+\\)\\] *[-] *\\(.*\\)" in
+  fun s -> 
+    let s = Mutil.replace_utf_8 s "–" "-" in
+    let s = Mutil.replace_utf_8 s "—" "-" in  
+    Str.global_replace r "[\\1], \\2" s
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
