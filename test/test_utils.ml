@@ -56,62 +56,65 @@ let util_decline _ =
 *)
 
 let util_capitale_full _ =
-  let array_to_string c =
-    Array.fold_left
-      (fun acc chr -> acc ^ (String.make 1 (Char.chr (chr)))) "" c 
-  in
-  let test_n_bytes c =
-  let n = Array.length c in
-    Printf.printf "\n\nLine: %X;" (Array.get c 0) ;
-    if n > 1 then
-      let c1 = Array.get c 1 in
-      let s1 = Printf.sprintf " %X" c1 in
-      Printf.printf "%s;" (if c1 = 0 then " xx [80-BF]" else s1) else ();
-    if n > 2 then 
-      let c1 = Array.get c 2 in
-      let s1 = Printf.sprintf " %X" c1 in
-      Printf.printf "%s;" (if c1 = 0 then " xx [80-BF]" else s1) else ();
-    Printf.printf "\n           " ;
-    Printf.printf "80                  8A          " ;
-    Printf.printf "90                  9A          " ;
-    Printf.printf "A0                  AA          " ;
-    Printf.printf "B0                  BA          " ;
-    Printf.printf "\n standard: " ;
-    let rec loop1 i =
-      Array.set c (n-1) i ;
-      let s1 = array_to_string c in
-      Printf.printf "%s " s1 ;
-      if i < 0xBF then loop1 (i + 1)
-    in loop1 0x80 ;
-    Printf.printf "\nuppercase: ";
-    let rec loop1 i =
-      Array.set c (n-1) i ;
-      let s2 = array_to_string c in
-      let s2 = Util.capitale s2 in
-      Printf.printf "%s " s2 ;
-      if i < 0xBF then loop1 (i + 1)
-    in loop1 0x80 ;
-  "done"
-  in
-  let test c =
-    assert_equal "done" (test_n_bytes c)
-  in
-  test [|0xC3; 0|]
-  ; test [|0xC4; 0|]
-  ; test [|0xC5; 0|]
-  ; test [|0xC6; 0|]
-  ; test [|0xC7; 0|]
-  ; test [|0xC8; 0|]
-  ; test [|0xCE; 0|]
-  ; test [|0xCF; 0|]
-  ; test [|0xD0; 0|]
-  ; test [|0xD1; 0|]
-  ; test [|0xD2; 0|]
-  ; test [|0xE1; 0xB8; 0|]
-  ; test [|0xE1; 0xB9; 0|]
-  ; test [|0xE1; 0xBA; 0|]
-  ; test [|0xE1; 0xBB; 0|]
-  ; test [|0xE1; 0xBC; 0|]
+  match Sys.getenv_opt "TEST_UPPER" with
+  | Some "test" ->
+    let array_to_string c =
+      Array.fold_left
+        (fun acc chr -> acc ^ (String.make 1 (Char.chr (chr)))) "" c 
+    in
+    let test_n_bytes c =
+    let n = Array.length c in
+      Printf.printf "\n\nLine: %X;" (Array.get c 0) ;
+      if n > 1 then
+        let c1 = Array.get c 1 in
+        let s1 = Printf.sprintf " %X" c1 in
+        Printf.printf "%s;" (if c1 = 0 then " xx [80-BF]" else s1) else ();
+      if n > 2 then 
+        let c1 = Array.get c 2 in
+        let s1 = Printf.sprintf " %X" c1 in
+        Printf.printf "%s;" (if c1 = 0 then " xx [80-BF]" else s1) else ();
+      Printf.printf "\n           " ;
+      Printf.printf "80                  8A          " ;
+      Printf.printf "90                  9A          " ;
+      Printf.printf "A0                  AA          " ;
+      Printf.printf "B0                  BA          " ;
+      Printf.printf "\n standard: " ;
+      let rec loop1 i =
+        Array.set c (n-1) i ;
+        let s1 = array_to_string c in
+        Printf.printf "%s " s1 ;
+        if i < 0xBF then loop1 (i + 1)
+      in loop1 0x80 ;
+      Printf.printf "\nuppercase: ";
+      let rec loop1 i =
+        Array.set c (n-1) i ;
+        let s2 = array_to_string c in
+        let s2 = Util.capitale s2 in
+        Printf.printf "%s " s2 ;
+        if i < 0xBF then loop1 (i + 1)
+      in loop1 0x80 ;
+    "done"
+    in
+    let test c =
+      assert_equal "done" (test_n_bytes c)
+    in
+    test [|0xC3; 0|]
+    ; test [|0xC4; 0|]
+    ; test [|0xC5; 0|]
+    ; test [|0xC6; 0|]
+    ; test [|0xC7; 0|]
+    ; test [|0xC8; 0|]
+    ; test [|0xCE; 0|]
+    ; test [|0xCF; 0|]
+    ; test [|0xD0; 0|]
+    ; test [|0xD1; 0|]
+    ; test [|0xD2; 0|]
+    ; test [|0xE1; 0xB8; 0|]
+    ; test [|0xE1; 0xB9; 0|]
+    ; test [|0xE1; 0xBA; 0|]
+    ; test [|0xE1; 0xBB; 0|]
+    ; test [|0xE1; 0xBC; 0|]
+  | _ -> ()
   
 let util_capitale _ =
   let test a b =
