@@ -1122,8 +1122,7 @@ let print_mod_ok conf base =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let remove_suburb s =
-  let s = Mutil.replace_utf_8 s "–" "-" in
-  let s = Mutil.replace_utf_8 s "—" "-" in  
+  let s = Place.replace_em_en_dash s in
   let re = Str.regexp "^\\[.+\\] [-] " in
   let matched = Str.string_match re s 0 in
   if matched then

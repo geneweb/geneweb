@@ -6,6 +6,23 @@ open Gwdb
 open Util
 open TemplAst
 
+let replace_em_en_dash str =
+  let rec loop str i =
+    if i <= String.length str
+    then
+    begin
+      match String.index_opt str (Char.chr 0xE2) with
+      | Some i ->
+        if (Char.code str.[i+1]) = 0x80 &&
+          ((Char.code str.[i+2]) = 0x93 || (Char.code str.[i+2]) = 0x94) then
+        loop ((String.sub str 0 i) ^ "-" ^ 
+          (String.sub str (i+3) (String.length str -i -3))) (i+3)
+        else loop str (i+3)
+      | None -> str
+    end
+    else str
+  in loop str 0
+
 let normalize =
   (* petit hack en attendant une vraie gestion des lieux transforme
      "[foo-bar] - boobar (baz)" en "[foo-bar], boobar (baz)"
@@ -16,8 +33,7 @@ let normalize =
   *)
   let r = Str.regexp "^\\[\\([^]]+\\)\\] *[-] *\\(.*\\)" in
   fun s -> 
-    let s = Mutil.replace_utf_8 s "–" "-" in
-    let s = Mutil.replace_utf_8 s "—" "-" in  
+    let s = replace_em_en_dash s in
     Str.global_replace r "[\\1], \\2" s
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
