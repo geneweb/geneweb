@@ -41,20 +41,6 @@ let name_lower _ =
   ; test "mien dịnh nguyễn phuc" "Miên Định Nguyễn Phúc"
   ; test_v "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
 
-(*
-    %1 of %2
-de: %1 von :d:%2
-fr: %1 d[e |’]%2
-*)
-(*
-let util_decline _ =
-  let test s wt s1 s2 s2_raw =
-    assert_equal ~printer:(fun x -> x) s (Util.gen_decline wt s1 s2 s2_raw)
-  in
-  test "abc xxx def yyy ghi" "abc %1 def %2 ghi" "xxx" "<xyz>yyy" "yyy"
-  test "abc xxx def yyy ghi" "abc %1 def %2 ghi" "xxx" "<xyz>yyy" "yyy"
-*)
-
 let capitalize str =
   let strlen = String.length str in
   let rec loop s i =
@@ -69,92 +55,75 @@ let util_capitale_full _ =
   let test_s a b =
     assert_equal ~printer:(fun x -> x) a (capitalize b)
   in
-  (*
-  let array_to_string c =
-    Array.fold_left
-      (fun acc chr -> acc ^ (String.make 1 (Char.chr (chr)))) "" c 
-  in
-  let test_n_bytes c =
-  let n = Array.length c in
-    Printf.printf "\n\nLine: %X;" (Array.get c 0) ;
-    if n > 1 then
-      let c1 = Array.get c 1 in
-      let s1 = Printf.sprintf " %X" c1 in
-      Printf.printf "%s;" (if c1 = 0 then " xx [80-BF]" else s1) else ();
-    if n > 2 then 
-      let c1 = Array.get c 2 in
-      let s1 = Printf.sprintf " %X" c1 in
-      Printf.printf "%s;" (if c1 = 0 then " xx [80-BF]" else s1) else ();
-    Printf.printf "\n           " ;
-    Printf.printf "80                  8A          " ;
-    Printf.printf "90                  9A          " ;
-    Printf.printf "A0                  AA          " ;
-    Printf.printf "B0                  BA          " ;
-    Printf.printf "\n standard: " ;
-    let rec loop1 i =
-      Array.set c (n-1) i ;
-      let s1 = array_to_string c in
-      Printf.printf "%s " s1 ;
-      if i < 0xBF then loop1 (i + 1)
-    in loop1 0x80 ;
-    Printf.printf "\nuppercase: ";
-    let rec loop1 i =
-      Array.set c (n-1) i ;
-      let s2 = array_to_string c in
-      let s2 = Util.capitale s2 in
-      Printf.printf "%s " s2 ;
-      if i < 0xBF then loop1 (i + 1)
-    in loop1 0x80 ;
-    "done"
-  in
-  let test c =
-    assert_equal "done" (test_n_bytes c)
-  in 
-  test [|0xC3; 0|]
-  ; test [|0xC4; 0|]
-  ; test [|0xC5; 0|]
-  ; test [|0xC6; 0|]
-  ; test [|0xC7; 0|]
-  ; test [|0xC8; 0|]
-  ; test [|0xCE; 0|]
-  ; test [|0xCF; 0|]
-  ; test [|0xD0; 0|]
-  ; test [|0xD1; 0|]
-  ; test [|0xD2; 0|]
-  ; test [|0xE1; 0xB8; 0|]
-  ; test [|0xE1; 0xB9; 0|]
-  ; test [|0xE1; 0xBA; 0|]
-  ; test [|0xE1; 0xBB; 0|]
-  ; test [|0xE1; 0xBC; 0|]
-  *)
   test_s "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
          "abcdefghijklmnopqrstuvwxyz"
-  ; test_s "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ" 
+  ; test_s "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+           "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  ; test_s "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ"
            "àáâãäåæçèéêëìíîïñòóôõöùúûüýÿ"
-  ; test_s "ĀĂĄĆĈĊČĎĐĒĔĖĘĚĜĞĠĢĤĦĨĪĬĮİĲĴĶĹĻĽ" 
+  ; test_s "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ"
+           "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ"
+
+  ; test_s "ĀĂĄĆĈĊČĎĐĒĔĖĘĚĜĞĠĢĤĦĨĪĬĮİĲĴĶĹĻĽ"
            "āăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĳĵķĺļľ"
-  ; test_s "ĿŁŃŅŇŊŌŎŐŒŔŖŘŚŜŞŠŢŤŦŨŪŬŮŰŲŴŶŸŹŻŽ" 
+  ; test_s "ĀĂĄĆĈĊČĎĐĒĔĖĘĚĜĞĠĢĤĦĨĪĬĮİĲĴĶĹĻĽ"
+           "ĀĂĄĆĈĊČĎĐĒĔĖĘĚĜĞĠĢĤĦĨĪĬĮİĲĴĶĹĻĽ"
+
+  ; test_s "ĿŁŃŅŇŊŌŎŐŒŔŖŘŚŜŞŠŢŤŦŨŪŬŮŰŲŴŶŸŹŻŽ"
            "ŀłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷÿźżž"
-  ; test_s "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡςΣΤΥΦΧΨΩ ΆΈήΊΰΪΫΌΎΏ" 
-           "αβγδεζηθικλμνξοπρςστυφχψω άέήίΰϊϋόύώ"
-  ; test_s "ƂƄƇƋƑƘƠƢƤƧƪƯƵƼ ЀЁЂЃЄЅІЇЈЉЊЋЌЍЎЏ"
-           "ƃƅƈƌƒƙơƣƥƨƪưƶƽ ѐёђѓєѕіїјљњћќѝўџ"
-  ; test_s "ЀЁЂЃЄЅІЇЈЉЊЋЌЍЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-           "ѐёђѓєѕіїјљњћќѝўџабвгдежзийклмнопрстуфхцчшщъыьэюя"
-  ; test_s "ἈἉἊἋἌἍἎἏἘἙἚἛἜἝἨἩἪἫἬἭἮἯἸἹἺἻἼἽἾἿ"
-           "ἀἁἂἃἄἅἆἇἐἑἒἓἔἕἠἡἢἣἤἥἦἧἰἱἲἳἴἵἶἷ"
-  ; test_s "ẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ"
-           "ạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ"
-  ; test_s "ǍǏǑǓǕǗǙǛǞǠǢǤǦǨǪǬǮǱǴǸǺǼǾ"
-           "ǎǐǒǔǖǘǚǜǟǡǣǥǧǩǫǭǯǲǵǹǻǽǿ"
-  ; test_s "ȀȂȄȆȈȊȌȎȐȒȔȖȘȚȜȞȤȦȨȪȬȮȰȲȻ"
-           "ȁȃȅȇȉȋȍȏȑȓȕȗșțȝȟȥȧȩȫȭȯȱȳȼ"
-  ; test_s "ḀḂḄḆḈḊḌḎḐḒḔḖḘḚḜḞḠḢḤḦḨḪḬḮḰḲḴḶḸḺḼḾ"
-           "ḁḃḅḇḉḋḍḏḑḓḕḗḙḛḝḟḡḣḥḧḩḫḭḯḱḳḵḷḹḻḽḿ"
-  ; test_s "ṀṂṄṆṈṊṌṎṐṒṔṖṘṚṜṞṠṢṤṦṨṪṬṮṰṲṴṶṸṺṼṾẀẂẄẆẈẊẌẎẐẒẔ"
-           "ṁṃṅṇṉṋṍṏṑṓṕṗṙṛṝṟṡṣṥṧṩṫṭṯṱṳṵṷṹṻṽṿẁẃẅẇẉẋẍẏẑẓẕ"
+  ; test_s "ĿŁŃŅŇŊŌŎŐŒŔŖŘŚŜŞŠŢŤŦŨŪŬŮŰŲŴŶŸŹŻŽ"
+           "ĿŁŃŅŇŊŌŎŐŒŔŖŘŚŜŞŠŢŤŦŨŪŬŮŰŲŴŶŸŹŻŽ"
+
+  ; test_s "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡςΣΤΥΦΧΨΩΆΈήΊΰΪΫΌΎΏ"
+           "αβγδεζηθικλμνξοπρςστυφχψωάέήίΰϊϋόύώ"
+  ; test_s "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡςΣΤΥΦΧΨΩΆΈήΊΰΪΫΌΎΏ"
+           "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡςΣΤΥΦΧΨΩΆΈήΊΰΪΫΌΎΏ"
+
+  ; test_s "ƂƄƇƋƑƘƠƢƤƧƪƯƵƼЀЁЂЃЄЅІЇЈЉЊЋЌЍЎЏ"
+           "ƃƅƈƌƒƙơƣƥƨƪưƶƽѐёђѓєѕіїјљњћќѝўџ"
+  ; test_s "ƂƄƇƋƑƘƠƢƤƧƪƯƵƼЀЁЂЃЄЅІЇЈЉЊЋЌЍЎЏ"
+           "ƂƄƇƋƑƘƠƢƤƧƪƯƵƼЀЁЂЃЄЅІЇЈЉЊЋЌЍЎЏ"
+
+  ; test_s "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+           "абвгдежзийклмнопрстуфхцчшщъыьэюя"
+  ; test_s "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+           "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+
   ; test_s "ҀҊҌҎҐҒҔҖҘҚҜҞҠҢҤҦҨҪҬҮҰҲҴҶҸҺҼҾ"
            "ҁҋҍҏґғҕҗҙқҝҟҡңҥҧҩҫҭүұҳҵҷҹһҽҿ"
+  ; test_s "ҀҊҌҎҐҒҔҖҘҚҜҞҠҢҤҦҨҪҬҮҰҲҴҶҸҺҼҾ"
+           "ҀҊҌҎҐҒҔҖҘҚҜҞҠҢҤҦҨҪҬҮҰҲҴҶҸҺҼҾ"
+
+  ; test_s "ἈἉἊἋἌἍἎἏἘἙἚἛἜἝἨἩἪἫἬἭἮἯἸἹἺἻἼἽἾἿ"
+           "ἀἁἂἃἄἅἆἇἐἑἒἓἔἕἠἡἢἣἤἥἦἧἰἱἲἳἴἵἶἷ"
+  ; test_s "ἈἉἊἋἌἍἎἏἘἙἚἛἜἝἨἩἪἫἬἭἮἯἸἹἺἻἼἽἾἿ"
+           "ἈἉἊἋἌἍἎἏἘἙἚἛἜἝἨἩἪἫἬἭἮἯἸἹἺἻἼἽἾἿ"
+
+  ; test_s "ẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ"
+           "ạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ"
+  ; test_s "ẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ"
+           "ẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ"
+
+  ; test_s "ǍǏǑǓǕǗǙǛǞǠǢǤǦǨǪǬǮǱǴǸǺǼǾ"
+           "ǎǐǒǔǖǘǚǜǟǡǣǥǧǩǫǭǯǲǵǹǻǽǿ"
+  ; test_s "ǍǏǑǓǕǗǙǛǞǠǢǤǦǨǪǬǮǱǴǸǺǼǾ"
+           "ǍǏǑǓǕǗǙǛǞǠǢǤǦǨǪǬǮǱǴǸǺǼǾ"
+
+  ; test_s "ȀȂȄȆȈȊȌȎȐȒȔȖȘȚȜȞȤȦȨȪȬȮȰȲȻ"
+           "ȁȃȅȇȉȋȍȏȑȓȕȗșțȝȟȥȧȩȫȭȯȱȳȼ"
+  ; test_s "ȀȂȄȆȈȊȌȎȐȒȔȖȘȚȜȞȤȦȨȪȬȮȰȲȻ"
+           "ȀȂȄȆȈȊȌȎȐȒȔȖȘȚȜȞȤȦȨȪȬȮȰȲȻ"
+
+  ; test_s "ḀḂḄḆḈḊḌḎḐḒḔḖḘḚḜḞḠḢḤḦḨḪḬḮḰḲḴḶḸḺḼḾ" (* E1 B8 80 *)
+           "ḁḃḅḇḉḋḍḏḑḓḕḗḙḛḝḟḡḣḥḧḩḫḭḯḱḳḵḷḹḻḽḿ"
+  ; test_s "ḀḂḄḆḈḊḌḎḐḒḔḖḘḚḜḞḠḢḤḦḨḪḬḮḰḲḴḶḸḺḼḾ"
+           "ḀḂḄḆḈḊḌḎḐḒḔḖḘḚḜḞḠḢḤḦḨḪḬḮḰḲḴḶḸḺḼḾ"
+
+  ; test_s "ṀṂṄṆṈṊṌṎṐṒṔṖṘṚṜṞṠṢṤṦṨṪṬṮṰṲṴṶṸṺṼṾẀẂẄẆẈẊẌẎẐẒẔ"
+           "ṁṃṅṇṉṋṍṏṑṓṕṗṙṛṝṟṡṣṥṧṩṫṭṯṱṳṵṷṹṻṽṿẁẃẅẇẉẋẍẏẑẓẕ"
+  ; test_s "ṀṂṄṆṈṊṌṎṐṒṔṖṘṚṜṞṠṢṤṦṨṪṬṮṰṲṴṶṸṺṼṾẀẂẄẆẈẊẌẎẐẒẔ"
+           "ṀṂṄṆṈṊṌṎṐṒṔṖṘṚṜṞṠṢṤṦṨṪṬṮṰṲṴṶṸṺṼṾẀẂẄẆẈẊẌẎẐẒẔ"
 
 let util_capitale _ =
   let test a b =
@@ -216,19 +185,6 @@ let util_capitale _ =
   ; test "Đình" "Đình"
   ; test "Ḕtienne" "ḕtienne"
   ; test "Ḕtienne" "Ḕtienne"
-(*
-    %1 of %2
-de: %1 von :d:%2
-fr: %1 d[e |’]%2
-*)
-(*
-let mutil_nominative _ =
-  let test s1 s2 =
-    assert_equal ~printer:(fun x -> x) s1 (Mutil.nominative s2)
-  in
-  test "abcdef" "abc:d:def"
-  test "abcdef" "abc d[def|ghi]i"
-*)
 
 let mutil_contains _ =
   let str = "foo bar Ĕtienne Έλληνικά Генри bar" in
@@ -249,12 +205,7 @@ let mutil_contains _ =
 ; test "Έλληνικά" true true
 ; test "Генри" true true
 
-(* in this test, second argument is the byte number, not the char number 
-   at which to start the test.
-   Transforming chars into bytes at the beginning of start_with breaks
-   the behaviour of contains! TODO fix this!!
-*)
-
+(* in this test, second argument the char number at which to start the test.*)
 let mutil_start_with _ =
   assert_raises (Invalid_argument "start_with")
     (fun () -> Mutil.start_with "foo" (-1) "foo")
@@ -347,17 +298,15 @@ let util_safe_html _ =
 let suite =
   [ "Mutil" >:::
     [ "mutil_contains" >:: mutil_contains
-    (*; "mutil_nominative" >:: mutil_nominative *)
     ; "mutil_start_with" >:: mutil_start_with
     ; "mutil_arabian_romian" >:: mutil_arabian_romian
     ; "mutil_compare_after_particle" >:: mutil_compare_after_particle
     ]
   ; "Util" >:::
     [ "util_str_sub" >:: util_str_sub
-    (*; "util_safe_html" >:: util_safe_html *)
+    ; "util_safe_html" >:: util_safe_html
     ; "util_capitale" >:: util_capitale
     ; "util_capitale_full" >:: util_capitale_full
-    (*; "util_decline" >:: util_decline *)
     ; "name_unaccent" >:: name_unaccent
     ; "name_lower" >:: name_lower
     ]
