@@ -105,6 +105,7 @@ let remove_suburb _ =
       assert_equal ~printer:(fun x -> x) exp (UpdateData.remove_suburb inp)
     in
     test "boobar (baz)" "[foo-bar] - boobar (baz)"
+  ; test "boobar (baz)" "[foo-bar]-boobar (baz)"
   ; test "boobar (baz)" "[foo-bar] – boobar (baz)" (* EN dash *)
   ; test "boobar (baz)" "[foo-bar] — boobar (baz)" (* EM dash *)
 

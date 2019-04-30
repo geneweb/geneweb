@@ -6,23 +6,6 @@ open Gwdb
 open Util
 open TemplAst
 
-let replace_em_en_dash str =
-  let rec loop str i =
-    if i <= String.length str
-    then
-    begin
-      match String.index_opt str (Char.chr 0xE2) with
-      | Some i ->
-        if (Char.code str.[i+1]) = 0x80 &&
-          ((Char.code str.[i+2]) = 0x93 || (Char.code str.[i+2]) = 0x94) then
-        loop ((String.sub str 0 i) ^ "-" ^ 
-          (String.sub str (i+3) (String.length str -i -3))) (i+3)
-        else loop str (i+3)
-      | None -> str
-    end
-    else str
-  in loop str 0
-
 let normalize =
   (* petit hack en attendant une vraie gestion des lieux transforme
      "[foo-bar] - boobar (baz)" en "[foo-bar], boobar (baz)"
@@ -31,10 +14,8 @@ let normalize =
      Cette fonction normalize n'est utilisée que dans le module place
      la séquence [-–—] distingue les trois tirets possibles
   *)
-  let r = Str.regexp "^\\[\\([^]]+\\)\\] *[-] *\\(.*\\)" in
-  fun s -> 
-    let s = replace_em_en_dash s in
-    Str.global_replace r "[\\1], \\2" s
+  let r = Str.regexp "^\\[\\([^]]+\\)\\] *\\(-\\|–\\|—\\) *\\(.*\\)" in
+  fun s -> Str.global_replace r "[\\1], \\3" s
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
