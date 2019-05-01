@@ -177,6 +177,13 @@ value print_exc exc =
     }
   | x -> do {
       prerr_string "Wserver: uncaught exception: ";
+(* Print details *)
+      prerr_string (Printexc.to_string x);
+      prerr_string " :\n";
+      if Printexc.backtrace_status () then Printexc.print_backtrace stderr
+      else prerr_string "Backtrace are not recorded : add b flag to OCAMLRUNPARAM variable";
+      prerr_char '\n';
+(* The following code doesn't show anything for me (linked to Ocaml version ?) *)
       prerr_string (Obj.magic (Obj.field (Obj.field (Obj.repr x) 0) 0));
       if Obj.size (Obj.repr x) > 1 then do {
         prerr_char '(';
@@ -195,6 +202,7 @@ value print_exc exc =
         prerr_char ')';
       }
       else ();
+(* *)
       prerr_char '\n'
     } ]
 ;
