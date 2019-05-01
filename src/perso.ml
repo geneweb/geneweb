@@ -1709,6 +1709,23 @@ and eval_simple_str_var conf base env (_, p_auth) =
             if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
       | _ -> raise Not_found ]
+  | "comment_old" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          if m_auth && not conf.no_note then
+            let s = sou base (get_comment fam) in
+            let s = string_with_macros conf [] s in
+            let wi =
+              {Wiki.wi_mode = "NOTES";
+               Wiki.wi_cancel_links = conf.cancel_links;
+               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_person_exists = person_exists conf base;
+               Wiki.wi_always_show_link = conf.wizard || conf.friend}
+            in
+            let s = Wiki.syntax_links conf wi s in
+            if conf.pure_xhtml then Util.check_xhtml s else s
+          else ""
+      | _ -> raise Not_found ]
   | "count" ->
       match get_env "count" env with
       [ Vcnt c -> string_of_int c.val
