@@ -1322,13 +1322,10 @@ value open_hed_trl conf fname =
 value open_templ conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
   [ Sys_error _ ->
-      if (*dir = conf.bname*)True(**) then
-        (* template par défaut *)
-        let std_fname =
-          search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
-        in
-        try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
-      else None ]
+      let std_fname =
+        search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
+      in
+      try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ] ]
 ;
 
 value macro_etc env imcom c =
