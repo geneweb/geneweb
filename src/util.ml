@@ -1867,10 +1867,13 @@ value string_with_macros conf env s =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value string_of_place conf place =
-  List.fold_left
-    (fun s c -> Name.strip_c s c)
-    (string_with_macros conf [] place)
-    [ '[' ; ']' ]
+  match p_getenv conf.base_env "keep_brackets_in_places" with
+  [ Some "yes" -> place
+  | _ ->
+      List.fold_left
+        (fun s c -> Name.strip_c s c)
+        (string_with_macros conf [] place)
+        [ '[' ; ']' ] ]
 ;
 
 

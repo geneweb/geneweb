@@ -10,11 +10,6 @@ open Util;
 
 
 value fold_place inverted s =
-  (* petit hack en attendant une vraie gestion des lieux transforme
-     "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)" *)
-  let s =
-   Str.global_replace (Str.regexp "^\[\([^]]+\)\] *- *\(.*\)") "\1, \2" s
-  in
   let rec loop iend list i ibeg =
     if i = iend then
       if i > ibeg then [String.sub s ibeg (i - ibeg) :: list] else list
@@ -49,6 +44,14 @@ value fold_place inverted s =
 ;
 
 value get_all conf base =
+  let adjust_place s =
+    match p_getenv conf.base_env "keep_brackets_in_places" with
+    [ Some "yes" -> s
+    | _ ->
+        (* petit hack en attendant une vraie gestion des lieux transforme
+           "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)" *)
+        Str.global_replace (Str.regexp "^\[\([^]]+\)\] *- *\(.*\)") "\1, \2" s]
+  in
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_baptism = p_getenv conf.env "bp" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
@@ -132,7 +135,7 @@ value get_all conf base =
     Hashtbl.iter
       (fun (istr_pl, _) (cnt, ip) ->
          let s = Util.string_with_macros conf [] (sou base istr_pl) in
-         let s = fold_place inverted s in
+         let s = fold_place inverted (adjust_place s) in
          if s <> [] && (ini = "" || List.hd s = ini) then do {
            list.val := [(s, cnt.val, ip) :: list.val]; incr len
          }
