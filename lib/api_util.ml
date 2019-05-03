@@ -1950,7 +1950,7 @@ let fam_to_piqi_app_family base ifam =
   in
   let marriage_place = gen_f.marriage_place in
   let marriage_src = gen_f.marriage_src in
-  let marriage_type =
+  let marriage_type : Api_app_piqi.marriage_type =
     match gen_f.relation with
     | Married -> `married
     | NotMarried -> `not_married
@@ -1958,11 +1958,11 @@ let fam_to_piqi_app_family base ifam =
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
-    | MarriageBann -> `marriage_bann
-    | MarriageContract -> `marriage_contract
-    | MarriageLicense -> `marriage_license
-    | Pacs -> `pacs
-    | Residence -> `residence
+    | MarriageBann -> `married
+    | MarriageContract -> `married
+    | MarriageLicense -> `married
+    | Pacs -> `not_married
+    | Residence -> `not_married
   in
   let (divorce_type, divorce_date) =
     match gen_f.divorce with
