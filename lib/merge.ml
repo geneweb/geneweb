@@ -26,7 +26,7 @@ let print conf base p =
   let list =
     List.fold_right
       (fun p1 pl ->
-         if get_key_index p1 = get_key_index p then pl else p1 :: pl)
+         if get_iper p1 = get_iper p then pl else p1 :: pl)
       list []
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
@@ -38,7 +38,7 @@ class=\"mx-3 mb-3\">\n" conf.command;
   Util.hidden_env conf;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND\">\n";
   Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_iper (get_key_index p));
+    (string_of_iper (get_iper p));
   Wserver.printf "<span class=\"form-row align-items-center\">\n";
   Wserver.printf "<span class=\"col-auto\">\n";
   Wserver.printf "<span class=\"custom-control custom-radio\">\n";
@@ -62,10 +62,10 @@ size=\"50\" id=\"inlineinput\" autofocus>\n</span>\n"
          Wserver.printf "<div class=\"custom-control custom-radio\">\n";
          Wserver.printf
            "  <input type=\"radio\" class=\"custom-control-input\" \
-name=\"select\" id=\"%s\" value=\"%s\">\n" (string_of_iper (get_key_index p))
-(string_of_iper (get_key_index p));
+name=\"select\" id=\"%s\" value=\"%s\">\n" (string_of_iper (get_iper p))
+(string_of_iper (get_iper p));
          Wserver.printf "  <label class=\"custom-control-label\" \
-for=\"%s\">" (string_of_iper (get_key_index p));
+for=\"%s\">" (string_of_iper (get_iper p));
          Update.print_person_parents_and_spouse conf base p;
          Wserver.printf "  </label>\n</div>\n";)
     list;

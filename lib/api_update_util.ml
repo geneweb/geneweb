@@ -576,7 +576,7 @@ let child_of_parent conf base p =
     else
       gen_person_text_no_html (p_first_name, (fun _ _ -> "")) conf base fath
   in
-  let a = pget conf base (get_key_index p) in
+  let a = pget conf base (get_iper p) in
   let ifam =
     match get_parents a with
     | Some ifam ->
@@ -613,7 +613,7 @@ let husband_wife conf base p =
   let rec loop i =
     if i < Array.length (get_family p) then
       let fam = foi base (get_family p).(i) in
-      let conjoint = Gutil.spouse (get_key_index p) fam in
+      let conjoint = Gutil.spouse (get_iper p) fam in
       let conjoint = pget conf base conjoint in
       if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
       then
@@ -642,7 +642,7 @@ let husband_wife conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_simple_person conf base p =
-  let index = Gwdb.string_of_iper (get_key_index p) in
+  let index = Gwdb.string_of_iper (get_iper p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -723,7 +723,7 @@ let pers_to_piqi_simple_person conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_person_search conf base p =
-  let index = Gwdb.string_of_iper (get_key_index p) in
+  let index = Gwdb.string_of_iper (get_iper p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -784,7 +784,7 @@ let pers_to_piqi_person_search conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_person_search_info conf base p =
-  let index = Gwdb.string_of_iper (get_key_index p) in
+  let index = Gwdb.string_of_iper (get_iper p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -955,11 +955,11 @@ let pers_to_piqi_person_search_info conf base p =
              function
              | r :: rl ->
                  (match r.r_fath with
-                 | Some ip when ip = get_key_index p ->
+                 | Some ip when ip = get_iper p ->
                      loop ((c, r) :: list) rl
                  | _ ->
                      (match r.r_moth with
-                     | Some ip when ip = get_key_index p ->
+                     | Some ip when ip = get_iper p ->
                          loop ((c, r) :: list) rl
                      | _ -> loop list rl))
              | [] -> list
@@ -1053,7 +1053,7 @@ let pers_to_piqi_person_search_info conf base p =
               Array.iter
                 (fun ifam ->
                    let fam = foi base ifam in
-                   if Array.mem (get_key_index p) (get_witnesses fam)
+                   if Array.mem (get_iper p) (get_witnesses fam)
                    then
                      list := (ifam, fam) :: !list
                    else ())
@@ -1146,7 +1146,7 @@ let pers_to_piqi_person_search_info conf base p =
 (* ************************************************************************** *)
 let pers_to_piqi_person_link conf base p =
   let create_link = `link in
-  let index = Gwdb.string_of_iper (get_key_index p) in
+  let index = Gwdb.string_of_iper (get_iper p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -1187,7 +1187,7 @@ let pers_to_piqi_person_link conf base p =
 let pers_to_piqi_mod_person conf base p =
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   let create_link = `link in
-  let index = Gwdb.string_of_iper (get_key_index p) in
+  let index = Gwdb.string_of_iper (get_iper p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -1369,7 +1369,7 @@ let pers_to_piqi_mod_person conf base p =
           }
         in
         (* Que pour les personnes qui existent. *)
-        if get_key_index p <> dummy_iper && death_type != `not_dead then
+        if get_iper p <> dummy_iper && death_type != `not_dead then
           let death =
             {
               Mwrite.Pevent.pevent_type = Some `epers_death;

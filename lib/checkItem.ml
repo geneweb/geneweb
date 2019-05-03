@@ -321,7 +321,7 @@ let check_person_age base warning p =
     | _ -> ()
 
 let try_to_fix_relation_sex base warning p_ref =
-  let p_index = Some (get_key_index p_ref) in
+  let p_index = Some (get_iper p_ref) in
   let fixed = ref 0 in
   let not_fixed = ref 0 in
   let changed_related =
@@ -386,7 +386,7 @@ let try_to_fix_relation_sex base warning p_ref =
   if !fixed > 0 then Some changed_related else None
 
 let related_sex_is_coherent base warning p_ref =
-  let p_index = Some (get_key_index p_ref) in
+  let p_index = Some (get_iper p_ref) in
   let merge_sex g1 g2 =
     match g1, g2 with
       Some Male, Some Male -> Some Male
@@ -413,7 +413,7 @@ let related_sex_is_coherent base warning p_ref =
   match new_sex with
     Some g ->
       if get_sex p_ref != g then
-        Some [get_key_index p_ref, p_ref, Some g, None]
+        Some [get_iper p_ref, p_ref, Some g, None]
       else None
   | None -> try_to_fix_relation_sex base warning p_ref
 

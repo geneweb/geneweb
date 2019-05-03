@@ -144,7 +144,7 @@ let compute base bdir =
       match notes_links (Buffer.contents buffer) with
       | ([], []) -> ()
       | list ->
-        db := NotesLinks.add_in_db !db (NotesLinks.PgInd (get_key_index p)) list
+        db := NotesLinks.add_in_db !db (NotesLinks.PgInd (get_iper p)) list
     ) (Gwdb.persons base) ;
   ProgrBar.finish () ;
   Printf.eprintf "--- families notes\n"; flush stderr;

@@ -108,7 +108,7 @@ let compact_list base xl =
   List.fold_right
     (fun p pl ->
        match pl with
-         p1 :: _ when get_key_index p = get_key_index p1 -> pl
+         p1 :: _ when get_iper p = get_iper p1 -> pl
        | _ -> p :: pl)
     pl []
 
@@ -142,7 +142,7 @@ let search_by_sosa conf base an =
   match sosa_ref, sosa_nb with
     Some p, Some n ->
       if n <> Sosa.zero then
-        match Util.branch_of_sosa conf base n (pget conf base @@ get_key_index p) with
+        match Util.branch_of_sosa conf base n (pget conf base @@ get_iper p) with
           Some (p :: _) -> [p]
         | _ -> []
       else []
@@ -296,7 +296,7 @@ let search conf base an search_order specify unknown =
         let pl = search_by_sosa conf base an in
         begin match pl with
           [p] ->
-            record_visited conf (get_key_index p); Perso.print conf base p
+            record_visited conf (get_iper p); Perso.print conf base p
         | _ -> loop l
         end
     | Key :: l ->
@@ -304,7 +304,7 @@ let search conf base an search_order specify unknown =
         begin match pl with
           [] -> loop l
         | [p] ->
-            record_visited conf (get_key_index p); Perso.print conf base p
+            record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
         end
     | Surname :: l ->
@@ -328,7 +328,7 @@ let search conf base an search_order specify unknown =
         begin match pl with
           [] -> loop l
         | [p] ->
-            record_visited conf (get_key_index p); Perso.print conf base p
+            record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
         end
     | PartialKey :: l ->
@@ -336,7 +336,7 @@ let search conf base an search_order specify unknown =
         begin match pl with
           [] -> loop l
         | [p] ->
-            record_visited conf (get_key_index p); Perso.print conf base p
+            record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
         end
     | DefaultSurname :: _ ->

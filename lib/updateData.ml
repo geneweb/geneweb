@@ -22,7 +22,7 @@ module PersSet =
   Set.Make
     (struct
        type t = person
-       let compare p1 p2 = compare (get_key_index p1) (get_key_index p2)
+       let compare p1 p2 = compare (get_iper p1) (get_iper p2)
      end)
 
 module StringSet = Set.Make (struct type t = string let compare = compare end)

@@ -44,7 +44,7 @@ let print_info_base conf base =
      | None -> (None, None)
   in
   let last_modified_person =
-    let default () = Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p in
+    let default () = Opt.map (fun p -> Gwdb.string_of_iper (get_iper p)) sosa_p in
     try
       let ic = Secure.open_in_bin (History.file_name conf) in
       let (_, pos, wiz) = (1, in_channel_length ic, "") in
@@ -404,7 +404,7 @@ let print_last_modified_persons conf base =
       match list with
       | [] -> false
       | p :: list ->
-          if ip = get_key_index p then true
+          if ip = get_iper p then true
           else loop list
     in
     loop list
@@ -558,10 +558,10 @@ let print_max_ancestors conf base =
   in
 
   Gwdb.Collection.iter begin fun p ->
-    if has_children p || Gwdb.Marker.get mark (get_key_index p) then ()
+    if has_children p || Gwdb.Marker.get mark (get_iper p) then ()
     else
       begin
-        let i = get_key_index p in
+        let i = get_iper p in
         let anc = nb_ancestors i in
         Gwdb.Marker.set ancestors i anc;
         Gwdb.Marker.set mark i true
@@ -916,7 +916,7 @@ let print_base_warnings conf base =
       | ChangedOrderOfChildren (ifam, _, _, after) ->
           patch_descend base ifam {children = after}
       | ChangedOrderOfMarriages (p, _, after) ->
-          patch_union base (get_key_index p) {family = after}
+          patch_union base (get_iper p) {family = after}
       | _ -> ()))
     warnings;
   (* Attention, les FLEX peuvent aussi faire un calcul de warning, *)
@@ -1037,7 +1037,7 @@ let print_notification_birthday conf base =
   in
   let ip_proprio =
     match piqi_ref_person_to_person base ref_p with
-    | Some p -> get_key_index p
+    | Some p -> get_iper p
     | None -> Gwdb.dummy_iper
   in
   let p = poi base ip_proprio in

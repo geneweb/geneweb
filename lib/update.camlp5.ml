@@ -392,7 +392,7 @@ let print_warning conf base =
         Array.iteri
           (fun i ifam ->
              let fam = foi base ifam in
-             let sp = Gutil.spouse (get_key_index p) fam in
+             let sp = Gutil.spouse (get_iper p) fam in
              let sp = poi base sp in
              Wserver.printf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");

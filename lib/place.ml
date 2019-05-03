@@ -226,7 +226,7 @@ let print_all_places_surnames_long conf base filter ~add_birth ~add_baptism ~add
     get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
       [] [] (fold_place_long inverted) filter
       (fun prev p ->
-         let value = (get_surname p, get_key_index p) in
+         let value = (get_surname p, get_iper p) in
          match prev with Some list -> value :: list | None -> [ value ])
       (fun v ->
          let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
