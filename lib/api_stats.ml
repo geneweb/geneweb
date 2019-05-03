@@ -1682,7 +1682,7 @@ let print_all_stats conf base =
     (Gwdb.persons base) ;
 
   Gwdb.Collection.iter begin fun fam ->
-    let ifam = get_fam_index fam in
+    let ifam = get_ifam fam in
         let m_auth =
           let father = poi base (get_father fam) in
           let mother = poi base (get_mother fam) in
