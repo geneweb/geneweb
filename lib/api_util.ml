@@ -1769,18 +1769,18 @@ let pers_to_piqi_app_person conf base p =
         }))
       gen_p.titles
   in
-  let related = List.map Gwdb.string_of_iper gen_p.related in
+  let related = List.map (fun x -> Int32.of_string @@ Gwdb.string_of_iper x) gen_p.related in
   let rparents =
     List.map
       (fun rp ->
         let father =
           match rp.r_fath with
-          | Some ip -> Some (Gwdb.string_of_iper ip)
+          | Some ip -> Some (Int32.of_string @@ Gwdb.string_of_iper ip)
           | None -> None
         in
         let mother =
           match rp.r_moth with
-          | Some ip -> Some (Gwdb.string_of_iper ip)
+          | Some ip -> Some (Int32.of_string @@ Gwdb.string_of_iper ip)
           | None -> None
         in
         let source = rp.r_sources in
@@ -1808,11 +1808,13 @@ let pers_to_piqi_app_person conf base p =
   in
   let parents =
     match get_parents p with
-     | Some ifam -> Some ((Gwdb.string_of_ifam ifam))
+     | Some ifam -> Some (Int32.of_string @@ Gwdb.string_of_ifam ifam)
      | None -> None
   in
   let families =
-    List.map Gwdb.string_of_ifam (Array.to_list (get_family p))
+    List.map
+      (fun i -> Int32.of_string @@ Gwdb.string_of_ifam i)
+      (Array.to_list (get_family p))
   in
   let events =
     List.map
@@ -1845,7 +1847,7 @@ let pers_to_piqi_app_person conf base p =
                  | Witness_GodParent -> `witness_godparent
                  | Witness_Officer -> `witness_officer
                in
-               let index = Gwdb.string_of_iper ip in
+               let index = Int32.of_string @@ Gwdb.string_of_iper ip in
                Mapp.Witness_event.({
                  witness_type = witness_type;
                  witness = index;
@@ -1854,7 +1856,7 @@ let pers_to_piqi_app_person conf base p =
         in
         let index_spouse =
           match isp with
-          | Some ip -> Some (Gwdb.string_of_iper ip)
+          | Some ip -> Some (Int32.of_string @@ Gwdb.string_of_iper ip)
           | None -> None
         in
         {
@@ -1871,7 +1873,7 @@ let pers_to_piqi_app_person conf base p =
       (Perso.events_list conf base p)
   in
   {
-    Mapp.Person.index = index;
+    Mapp.Person.index = Int32.of_string @@ index;
     sex = sex;
     lastname = surname;
     firstname = first_name;
@@ -1956,7 +1958,7 @@ let fam_to_piqi_app_family base ifam =
   in
   let witnesses =
     List.map
-      Gwdb.string_of_iper
+      (fun i -> Int32.of_string @@ Gwdb.string_of_iper i)
       (Array.to_list gen_f.witnesses)
   in
   let fsources = gen_f.fsources in
@@ -1964,11 +1966,11 @@ let fam_to_piqi_app_family base ifam =
   let mother = Gwdb.string_of_iper imoth in
   let children =
     List.map
-      Gwdb.string_of_iper
+      (fun i -> Int32.of_string @@ Gwdb.string_of_iper i)
       (Array.to_list (get_children fam))
   in
   {
-    Mapp.Family.index = index;
+    Mapp.Family.index = Int32.of_string @@ index;
     marriage_date = marriage;
     marriage_place = if marriage_place = "" then None else Some marriage_place;
     marriage_src = if marriage_src = "" then None else Some marriage_src;
@@ -1977,8 +1979,8 @@ let fam_to_piqi_app_family base ifam =
     divorce_date = divorce_date;
     witnesses = witnesses;
     fsources = if fsources = "" then None else Some fsources;
-    father = father;
-    mother = mother;
+    father = Int32.of_string @@ father;
+    mother = Int32.of_string @@ mother;
     children = children;
   }
 
