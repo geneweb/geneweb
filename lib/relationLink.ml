@@ -202,7 +202,7 @@ let spouse_text conf base end_sp ip ipl =
   | [], _ ->
       begin match end_sp with
         Some p ->
-          someone_text conf base (get_key_index p), "", Some (get_key_index p)
+          someone_text conf base (get_iper p), "", Some (get_iper p)
       | _ -> "", "", None
       end
   | _ -> "", "", None
@@ -618,7 +618,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
   let params =
     match po, p_getint conf.env "l1", p_getint conf.env "l2" with
       Some p, Some l1, Some l2 ->
-        let ip = get_key_index p in
+        let ip = get_iper p in
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
         let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
@@ -695,7 +695,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
   | _ -> Hutil.incorrect_request conf
 
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
-  let ia = get_key_index a in
+  let ia = get_iper a in
   let add_branches dist set n ip l =
     let b = find_first_branch conf base dist ia l ip Neuter in
     let rec loop set n b =
@@ -728,7 +728,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
       List.fold_right
         (fun (ip, s) spl ->
            match find_person_in_env conf base s with
-             Some sp -> (ip, (get_key_index sp, None)) :: spl
+             Some sp -> (ip, (get_iper sp, None)) :: spl
            | None -> spl)
         [ip1, "3"; ip2, "4"] []
     in
@@ -760,10 +760,10 @@ let print_relation conf base p1 p2 =
   let po = find_person_in_env conf base "" in
   match p_getenv conf.env "dag", po, l1, l2 with
     Some "on", Some p, Some l1, Some l2 ->
-      print_relation_dag conf base p (get_key_index p1) (get_key_index p2)
+      print_relation_dag conf base p (get_iper p1) (get_iper p2)
         (int_list l1) (int_list l2)
   | _ ->
-      print_relation_no_dag conf base po (get_key_index p1) (get_key_index p2)
+      print_relation_no_dag conf base po (get_iper p1) (get_iper p2)
 
 let print conf base =
   match

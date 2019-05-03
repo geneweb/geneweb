@@ -225,7 +225,7 @@ let string_of_list =
   loop ""
 
 let ged_index oc per =
-  Printf.fprintf oc "1 _GWID %d\n" (int_of_iper (get_key_index per))
+  Printf.fprintf oc "1 _GWID %d\n" (int_of_iper (get_iper per))
 
 let ged_name base oc per =
   Printf.fprintf oc "1 NAME %s /%s/\n"
@@ -421,7 +421,7 @@ let ged_adoption base per_sel oc per r =
     begin
       Printf.fprintf oc "1 ADOP Y\n";
       adop_fam_list :=
-        (r.r_fath, r.r_moth, get_key_index per) :: !adop_fam_list;
+        (r.r_fath, r.r_moth, get_iper per) :: !adop_fam_list;
       incr adop_fam_cnt;
       Printf.fprintf oc "2 FAMC @F%d@\n" (nb_of_families base + !adop_fam_cnt);
       Printf.fprintf oc "3 ADOP ";
@@ -528,7 +528,7 @@ let ged_asso base (per_sel, fam_sel) oc per =
          List.iter
            (fun ifam ->
               let fam = foi base ifam in
-              if Array.mem (get_key_index per) (get_witnesses fam) then
+              if Array.mem (get_iper per) (get_witnesses fam) then
                 ged_witness fam_sel oc ifam)
            (Array.to_list (get_family c)))
     (get_related per)

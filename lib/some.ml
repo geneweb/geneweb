@@ -191,7 +191,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
 let print_elem conf base is_surname (p, xl) =
   Mutil.list_iter_first
     (fun first x ->
-       let iper = get_key_index x in
+       let iper = get_iper x in
        if not first then Wserver.printf "</li>\n<li>\n  ";
        Perso.print_sosa conf base x true;
        Wserver.printf "<a href=\"%s%s\" id=\"i%s\">" (commd conf)
@@ -408,12 +408,12 @@ type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 let print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
   let rec loop is_first_level p =
-    let u = pget conf base (get_key_index p) in
+    let u = pget conf base (get_iper p) in
     let family_list =
       List.map
         (fun ifam ->
            let fam = foi base ifam in
-           let c = Gutil.spouse (get_key_index p) fam in
+           let c = Gutil.spouse (get_iper p) fam in
            let c = pget conf base c in
            let down = has_children_with_that_name conf base fam name in
            let down =

@@ -49,12 +49,12 @@ let date_interval conf base t x =
     match t with
       JustSelf -> ()
     | _ ->
-        let u = pget conf base (get_key_index x) in
+        let u = pget conf base (get_iper x) in
         Array.iter
           (fun ifam ->
              let fam = foi base ifam in
              let md = get_marriage fam in
-             let conj = Gutil.spouse (get_key_index x) fam in
+             let conj = Gutil.spouse (get_iper x) fam in
              begin match Adef.od_of_cdate md with
                Some (Dgreg (d, _)) -> set d
              | _ -> ()
@@ -335,7 +335,7 @@ let propose_tree_for_list list conf =
         List.fold_left
           (fun i (p, n) ->
              Wserver.printf "&i%d=%s&t%d=%d" i
-               (Gwdb.string_of_iper (get_key_index p)) i n;
+               (Gwdb.string_of_iper (get_iper p)) i n;
              i + 1)
           1 list
       in

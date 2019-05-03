@@ -80,7 +80,7 @@ let utf8_designation base p =
   let surname = p_surname base p in
   let s = first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname in
   if first_name = "?" || surname = "?" then
-    s ^ " (i=" ^ string_of_iper (get_key_index p) ^ ")"
+    s ^ " (i=" ^ string_of_iper (get_iper p) ^ ")"
   else s
 
 let wiki_designation base basename p =
@@ -89,7 +89,7 @@ let wiki_designation base basename p =
   let s = "[[" ^ first_name ^ "/" ^ surname ^ "/" ^ string_of_int (get_occ p) ^ "/" ^
           first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname ^ "]]" in
   if first_name = "?" || surname = "?" then
-    let indx = string_of_iper (get_key_index p) in
+    let indx = string_of_iper (get_iper p) in
     s ^ " <a href=\"http://" ^ !server ^ ":" ^ (string_of_int !gwd_port) ^ "/" ^
     basename ^ "?i=" ^ indx ^ "\">(i=" ^ indx ^ ")</a><br>"
   else s ^ "<br>"
@@ -99,7 +99,7 @@ let print_family base basename ifam =
   let p = poi base (get_father fam) in
   if !output <> "" then begin
     if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
-    then Printf.eprintf "i=%s" (string_of_iper (get_key_index p))
+    then Printf.eprintf "i=%s" (string_of_iper (get_iper p))
     else Printf.eprintf "  - %s" (utf8_designation base p);
     Printf.eprintf "\n" ;
     Printf.eprintf "  - %s\n" (utf8_designation base (poi base (get_mother fam))) ;
@@ -107,7 +107,7 @@ let print_family base basename ifam =
   end ;
   if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
   then
-    let indx = string_of_iper (get_key_index p) in
+    let indx = string_of_iper (get_iper p) in
     Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>"
       !server !gwd_port basename indx indx
   else Printf.printf "  - %s" (wiki_designation base basename p);

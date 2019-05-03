@@ -62,7 +62,7 @@ let print_link_delete_image conf base p =
       Wserver.printf "<p>\n";
       begin
         Wserver.printf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
-          (string_of_iper (get_key_index p));
+          (string_of_iper (get_iper p));
         Wserver.printf "%s %s" (capitale (transl conf "delete"))
           (transl_nth conf "image/images" 0);
         Wserver.printf "</a>"
@@ -103,7 +103,7 @@ let print_send_image conf base p =
   Wserver.printf
     "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"%s>\n" conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper (get_key_index p)) conf.xhs;
+    (string_of_iper (get_iper p)) conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n"
     digest conf.xhs;
   Wserver.printf "%s%s\n" (capitale (transl conf "file")) (Util.transl conf ":");
@@ -149,7 +149,7 @@ let print_delete_image conf base p =
       let fn = p_first_name base p in
       let sn = p_surname base p in
       let occ =
-        (* if fn = "?" || sn = "?" then Adef.int_of_iper (get_key_index p)
+        (* if fn = "?" || sn = "?" then Adef.int_of_iper (get_iper p)
          * else  *)get_occ p
       in
       Wserver.printf ": "; Wserver.printf "%s.%d %s" fn occ sn
@@ -162,7 +162,7 @@ let print_delete_image conf base p =
   Wserver.printf
     "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
   Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n\n"
-    (string_of_iper (get_key_index p));
+    (string_of_iper (get_iper p));
   Wserver.printf "\n";
   html_p conf;
   Wserver.printf

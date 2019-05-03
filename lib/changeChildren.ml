@@ -7,7 +7,7 @@ open Gwdb
 open Util
 
 let print_child_person conf base p =
-  let var = "c" ^ string_of_iper (get_key_index p) in
+  let var = "c" ^ string_of_iper (get_iper p) in
   let first_name =
     match p_getenv conf.env (var ^ "_first_name") with
       Some v -> v
@@ -111,7 +111,7 @@ let print_change conf base p =
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
-    (string_of_iper (get_key_index p));
+    (string_of_iper (get_iper p));
   Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
     digest;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
@@ -208,13 +208,13 @@ let check_conflict conf base p key new_occ ipl =
   List.iter
     (fun ip ->
        let p1 = poi base ip in
-       if get_key_index p1 <> get_key_index p &&
+       if get_iper p1 <> get_iper p &&
           Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) =
             name &&
           get_occ p1 = new_occ
        then
          begin
-           print_conflict conf base (get_key_index p) p1;
+           print_conflict conf base (get_iper p) p1;
            raise Update.ModErr
          end)
     ipl
@@ -241,7 +241,7 @@ exception FirstNameMissing of iper
 
 let change_child conf base parent_surname changed ip =
   let p = poi base ip in
-  let var = "c" ^ string_of_iper (get_key_index p) in
+  let var = "c" ^ string_of_iper (get_iper p) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
       Some x -> only_printable x

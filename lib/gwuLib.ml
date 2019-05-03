@@ -92,7 +92,7 @@ module Make (Select : Select) =
         ht_dup_occ
 
     let get_new_occ p =
-      try Hashtbl.find ht_dup_occ (get_key_index p) with
+      try Hashtbl.find ht_dup_occ (get_iper p) with
         Not_found -> get_occ p
 
     type mfam =
@@ -489,10 +489,10 @@ module Make (Select : Select) =
         | None -> false
       in
       let first_parent_definition =
-        if Gwdb.Marker.get gen.mark (get_key_index p) then false
+        if Gwdb.Marker.get gen.mark (get_iper p) then false
         else
           begin
-            Gwdb.Marker.set gen.mark (get_key_index p) true;
+            Gwdb.Marker.set gen.mark (get_iper p) true;
             true
           end
       in
@@ -563,10 +563,10 @@ module Make (Select : Select) =
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
       if Array.length (get_family p) = 0 && get_parents p = None
-         && not (Gwdb.Marker.get gen.mark (get_key_index p))
+         && not (Gwdb.Marker.get gen.mark (get_iper p))
       then
         begin
-          Gwdb.Marker.set gen.mark (get_key_index p) true;
+          Gwdb.Marker.set gen.mark (get_iper p) true;
           if has_infos base p then print_infos oc base false "" "" p
           else Printf.fprintf oc " 0";
           begin match sou base (get_notes p) with
@@ -704,9 +704,9 @@ module Make (Select : Select) =
         [] -> false
       | a :: l -> f x a || list_memf f x l
 
-    let eq_key p1 p2 = get_key_index p1 = get_key_index p2
+    let eq_key p1 p2 = get_iper p1 = get_iper p2
 
-    let eq_key_fst (p1, _) (p2, _) = get_key_index p1 = get_key_index p2
+    let eq_key_fst (p1, _) (p2, _) = get_iper p1 = get_iper p2
 
     let print_pevents oc base gen ml =
       let pl =
@@ -718,7 +718,7 @@ module Make (Select : Select) =
       in
       List.iter
         (fun p ->
-           if gen.per_sel (get_key_index p) then
+           if gen.per_sel (get_iper p) then
              print_pevents_for_person oc base gen p)
         pl
 
@@ -893,7 +893,7 @@ module Make (Select : Select) =
           Printf.fprintf oc "beg\n";
           Array.iter
             (fun p ->
-               if gen.per_sel (get_key_index p) then
+               if gen.per_sel (get_iper p) then
                  print_child oc base fam_surname csrc cbp p)
             m.m_chil;
           Printf.fprintf oc "end\n"
@@ -1076,7 +1076,7 @@ module Make (Select : Select) =
       in
       List.iter
         (fun p ->
-           if gen.per_sel (get_key_index p) then
+           if gen.per_sel (get_iper p) then
              print_notes_for_person oc base gen p)
         pl
 
@@ -1096,10 +1096,10 @@ module Make (Select : Select) =
         if List.mem_assq p list then list
         else if is_isolated p then
           match get_rparents p with
-            {r_fath = Some x} :: _ when x = get_key_index p_relation ->
+            {r_fath = Some x} :: _ when x = get_iper p_relation ->
               list @ [p, true]
           | {r_fath = None; r_moth = Some x} :: _
-            when x = get_key_index p_relation ->
+            when x = get_iper p_relation ->
               list @ [p, true]
           | _ -> list
         else list
@@ -1140,7 +1140,7 @@ module Make (Select : Select) =
              let p = poi base ip in
              match get_rparents p, get_parents p with
                [], _ | _, Some _ -> list
-             | {r_fath = Some x} :: _, _ when x <> get_key_index m.m_fath ->
+             | {r_fath = Some x} :: _, _ when x <> get_iper m.m_fath ->
                  list
              | _ -> (p, false) :: list)
           (Array.to_list (get_witnesses m.m_fam)) list
@@ -1158,10 +1158,10 @@ module Make (Select : Select) =
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
       if Array.length (get_family p) = 0 && get_parents p = None &&
-         not (Gwdb.Marker.get mark (get_key_index p))
+         not (Gwdb.Marker.get mark (get_iper p))
       then
         begin
-          Gwdb.Marker.set mark (get_key_index p) true ;
+          Gwdb.Marker.set mark (get_iper p) true ;
           if has_infos base p then print_infos oc base false "" "" p
           else Printf.fprintf oc " 0";
           defined_p := p :: !defined_p
@@ -1278,17 +1278,17 @@ module Make (Select : Select) =
           (get_rparents p)
       in
       if surn <> "?" && fnam <> "?" && exist_relation &&
-         not (Gwdb.Marker.get gen.mark_rel (get_key_index p))
+         not (Gwdb.Marker.get gen.mark_rel (get_iper p))
       then
         begin
-          Gwdb.Marker.set gen.mark_rel (get_key_index p) true;
+          Gwdb.Marker.set gen.mark_rel (get_iper p) true;
           Printf.fprintf oc "\n";
           Printf.fprintf oc "rel %s %s%s" surn fnam
             (if get_new_occ p = 0 then ""
              else "." ^ string_of_int (get_new_occ p));
           if is_definition then
             begin
-              Gwdb.Marker.set gen.mark (get_key_index p) true;
+              Gwdb.Marker.set gen.mark (get_iper p) true;
               def_p := p :: !def_p;
               if has_infos base p then print_infos oc base false "" "" p
               else Printf.fprintf oc " 0";
@@ -1317,7 +1317,7 @@ module Make (Select : Select) =
           [] -> ()
         | (p, if_def) :: pl ->
             let def_p = ref [] in
-            if get_rparents p <> [] && gen.per_sel (get_key_index p) then
+            if get_rparents p <> [] && gen.per_sel (get_iper p) then
               begin
                 print_relations_for_person oc base gen def_p if_def p;
                 List.iter (print_notes_for_person oc base gen) !def_p;
@@ -1340,7 +1340,7 @@ module Make (Select : Select) =
           [] -> ()
         | (p, if_def) :: pl ->
             let def_p = ref [] in
-            if get_rparents p <> [] && gen.per_sel (get_key_index p) then
+            if get_rparents p <> [] && gen.per_sel (get_iper p) then
               begin
                 print_relations_for_person oc base gen def_p if_def p;
                 List.iter (print_notes_for_person oc base gen) !def_p
