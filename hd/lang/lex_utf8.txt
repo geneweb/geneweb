@@ -6570,7 +6570,7 @@ is: börn
 it: da cui
 lv: bērni:
 nl: en hun kinderen
-no: barn
+no: med
 oc: enfants
 pl: dzieci
 pt: tiveram
