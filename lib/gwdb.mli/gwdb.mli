@@ -97,7 +97,7 @@ val get_witnesses : family -> iper array
 val get_father : family -> iper
 val get_mother : family -> iper
 val get_parent_array : family -> iper array
-val get_fam_index : family -> ifam
+val get_ifam : family -> ifam
 
 val get_children : family -> iper array
 
