@@ -6,65 +6,38 @@ open Gwdb
 open Util
 open TemplAst
 
+let normalize =
+  (* petit hack en attendant une vraie gestion des lieux transforme
+     "[foo-bar] - boobar (baz)" en "[foo-bar], boobar (baz)"
+     On remet les [ ] pour retrouver le lien vers le dictionnaire!
+     La convention [aaa] - bbb permet de trier les lieux par rapport à bbb
+     Cette fonction normalize n'est utilisée que dans le module place
+     la séquence [-–—] distingue les trois tirets possibles
+  *)
+  let r = Str.regexp "^\\[\\([^]]+\\)\\] *\\(-\\|–\\|—\\) *\\(.*\\)" in
+  fun s -> Str.global_replace r "[\\1], \\3" s
+
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
-(* Scans a string of the form [aaa, bbb] - ccc, ddd (eee) and splits it
-   into a list ["[aaa, bbb]"; "ccc"; "ddd"; "(eee)"] *)
-
-
-let strip_spaces str =
-  let start =
-    let rec loop i =
-      if i = String.length str then i
-      else
-        match str.[i] with
-          ' ' -> loop (i + 1)
-        | _ -> i
-    in
-    loop 0
-  in
-  let stop =
-    let rec loop i =
-      if i = -1 then i + 1
-      else
-        match str.[i] with
-          ' ' -> loop (i - 1)
-        | _ -> i + 1
-    in
-    loop (String.length str - 1)
-  in
-  if start = 0 && stop = String.length str then str
-  else if start > stop then ""
-  else String.sub str start (stop - start)
-
 let fold_place_long inverted s =
   let len = String.length s in
   (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
   let rec loop iend list i ibeg bracket=
-    let skip n =
-      if bracket then list, ibeg, true
-      else
-        let list =
-          if i > ibeg then
-            let subs = String.sub s (ibeg) (i - ibeg) in
-            let subs = strip_spaces subs in
-            subs :: list else list
-        in
-        list, i + n, false
-    in
     if i = iend
     then if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
     else
       let (list, ibeg, bracket) =
-        match Char.code (String.unsafe_get s i) with
-        | 0x5B -> list, ibeg, true (* [ *)
-        | 0x5D -> list, ibeg, false (* ] *)
-        | 0x2C | 0x2D -> skip 1 (* , and - *)
-        | 0xE2 (* cadratin — *)
-          when Char.code s.[i+1] = 0x80 && Char.code s.[i+2] = 0x93 -> skip 3
-        | 0xE2 (* demi cadratin – *)
-          when Char.code s.[i+1] = 0x80 && Char.code s.[i+2] = 0x94 -> skip 3
-        | 0x20 when i = ibeg -> (list, i + 1, bracket)
+        match String.unsafe_get s i with
+        | '[' -> list, ibeg, true
+        | ']' -> list, ibeg, false
+        | ',' ->
+          if bracket then list, ibeg, true
+          else
+            let list =
+              if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
+            in
+            list, i + 1, false
+        | ' ' when i = ibeg -> (list, i + 1, bracket)
         | _ -> list, ibeg, bracket
       in
       loop iend list (i + 1) ibeg bracket
@@ -90,7 +63,7 @@ let fold_place_long inverted s =
 let unfold_place_long inverted s =
   let pl = fold_place_long inverted s in
   let s = List.fold_left
-    (fun acc p -> acc ^ (if acc = "" then "" else ", ") ^ p) "" (List.rev pl)
+    (fun acc p -> acc ^ (if acc = "" then "" else ", ") ^ p) "" pl
   in s
 
 let fold_place_short s =
@@ -127,7 +100,7 @@ let get_all =
   let ht_size = 2048 in (* FIXME: find the good heuristic *)
   let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
   let ht_add istr p =
-    let key : 'a = sou base istr |> fold_place in
+    let key : 'a = sou base istr |> normalize |> fold_place in
     if filter key then
       match Hashtbl.find_opt ht key with
       | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
