@@ -61,7 +61,7 @@ let fold_place_long inverted s =
   if inverted then List.rev list else list
 
 let unfold_place_long inverted s =
-  let pl = fold_place_long inverted s in
+  let pl = List.rev (fold_place_long inverted s) in
   let s = List.fold_left
     (fun acc p -> acc ^ (if acc = "" then "" else ", ") ^ p) "" pl
   in s

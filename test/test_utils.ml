@@ -92,13 +92,21 @@ let util_safe_html _ =
     {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
     (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|})
 
-let normalize _ =
-    let test exp inp =
-      assert_equal ~printer:(fun x -> x) exp (Place.normalize inp)
+let fold_place _ =
+    let test_d exp inp =
+      let inp = Place.normalize inp in
+      assert_equal ~printer:(fun x -> x) exp (Place.unfold_place_long false inp)
     in
-    test "[foo-bar], boobar (baz)" "[foo-bar] - boobar (baz)"
-  ; test "[foo-bar], boobar (baz)" "[foo-bar] – boobar (baz)" (* EN dash *)
-  ; test "[foo-bar], boobar (baz)" "[foo-bar] — boobar (baz)" (* EM dash *)
+    let test_r exp inp =
+      let inp = Place.normalize inp in
+      assert_equal ~printer:(fun x -> x) exp (Place.unfold_place_long true inp)
+    in
+    test_d "[foo-bar], boobar1, (baz)" "[foo-bar] - boobar1 (baz)"
+  ; test_d "[foo-bar], boobar2, (baz)" "[foo-bar] – boobar2 (baz)" (* EN dash *)
+  ; test_d "[foo-bar], boobar3, (baz)" "[foo-bar] — boobar3 (baz)" (* EM dash *)
+  ; test_r "(baz), boobar1, [foo-bar]" "[foo-bar] - boobar1 (baz)"
+  ; test_r "(baz), boobar2, [foo-bar]" "[foo-bar] – boobar2 (baz)" (* EN dash *)
+  ; test_r "(baz), boobar3, [foo-bar]" "[foo-bar] — boobar3 (baz)" (* EM dash *)
 
 let remove_suburb _ =
     let test exp inp =
@@ -130,7 +138,7 @@ let suite =
     ; "util_safe_html" >:: util_safe_html
     ]
   ; "Place" >:::
-    [ "normalize" >:: normalize
+    [ "fold_place" >:: fold_place
     ; "remove_suburb" >:: remove_suburb
     ]
   ]
