@@ -48,24 +48,13 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
     if x1 <> "" && x2 <> "" && x1 <> x2 then
-      begin
-        Wserver.printf "<h4>%s</h4>\n" (capitale title);
-        begin
-          Wserver.printf "<ul>\n";
-          html_li conf;
-          Wserver.printf
-            "<input type=\"radio\" class=\"form-control\" name=\"%s\" \
-           value=\"1\" checked>\n"
-            name;
-          Wserver.printf "%s\n" x1;
-          html_li conf;
-          Wserver.printf "<input type=\"radio\" class=\"form-control\" \
-           name=\"%s\" value=\"2\">\n"
-            name;
-          Wserver.printf "%s\n" x2;
-          Wserver.printf "</ul>\n"
-        end
-      end
+      Wserver.printf
+        "<h4>%s</h4>\
+         <ul>\
+         <li><input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"1\" checked>%s</li>\
+         <li><input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"2\">%s</li>\
+         </ul>"
+        (capitale title) name x1 name x2;
   in
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
@@ -91,7 +80,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   in
     loop branches
   end;
-  html_p conf;
+  Wserver.printf "<p>" ;
   string_field (transl_nth conf "relation/relations" 0) "relation"
     (fun fam ->
        match get_relation fam with
@@ -128,12 +117,9 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
              | None -> ""
            in
            transl conf "divorced" ^ ds);
-  html_p conf;
   Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</form>\n"
+    "</p><p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></form>"
+    (capitale (transl_nth conf "validate/delete" 0))
 
 let merge_fam1 conf base fam1 fam2 =
   let title _ =

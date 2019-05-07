@@ -35,10 +35,6 @@ val header : ('a, unit, string, unit) format4 -> 'a
 val wflush : unit -> unit
     (* To flush page contents print. *)
 
-val wrap_string : (string -> string) ref
-    (* To specify a function which may transform the string printed by
-       [sprint] below. *)
-
 val http : httpStatus -> unit
     (* [Wserver.http answer] sends the http header where [answer]
        represents the answer status. If empty string, "200 OK" is assumed. *)

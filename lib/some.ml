@@ -285,7 +285,7 @@ let select_first_name conf n list =
   List.iter
     (fun (sstr, (strl, _)) ->
        Wserver.printf "\n";
-       html_li conf;
+       Wserver.printf "<li>" ;
        Wserver.printf "<a href=\"%sm=P&v=%s\">" (commd conf)
          (code_varenv sstr);
        Mutil.list_iter_first

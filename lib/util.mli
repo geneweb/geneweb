@@ -26,11 +26,7 @@ val get_referer : config -> string
 val no_html_tags : string -> string
 val clean_html_tags : string -> string list -> string
 
-val nl : unit -> unit
 val html : ?content_type:string -> config -> unit
-val html_br : config -> unit
-val html_p : config -> unit
-val html_li : config -> unit
 val unauthorized : config -> string -> unit
 val string_of_ctime : config -> string
 
@@ -290,10 +286,6 @@ val is_that_user_and_password : auth_scheme_kind -> string -> string -> bool
 
 val in_text : bool -> string -> string -> bool
 val html_highlight : bool -> string -> string -> string
-
-(* Pretty print XHTML wrapper for Wserver.wrap_string *)
-
-val xml_pretty_print : string -> string
 
 (* Print list in columns with Gutil.alphabetic order *)
 

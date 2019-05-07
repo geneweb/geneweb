@@ -310,6 +310,13 @@ let someone_ref_text conf base p =
   (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p)) ^ " " ^
   p_surname base p ^ "</a>"
 
+let print_list_aux conf base title list printer =
+  if list <> [] then begin
+    Wserver.printf "%s\n<ul>" (capitale (transl conf title)) ;
+    printer conf base list ;
+    Wserver.printf "</ul>";
+  end
+
 let print_warning conf base =
   function
     BigAgeBetweenSpouses (fath, moth, a) ->
@@ -639,38 +646,16 @@ let print_warning conf base =
         (fun _ -> Date.string_of_age conf a)
 
 let print_warnings conf base wl =
-  if wl = [] then ()
-  else
-    begin
-      Wserver.printf "%s\n" (capitale (transl conf "warnings"));
-      begin
-        Wserver.printf "<ul>\n";
-        (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
-        (* levé par plusieurs fonctions différents selon le context.       *)
-        begin let wl =
-          let ht = Hashtbl.create 1 in
-          let rec loop wl accu =
-            match wl with
-              [] -> accu
-            | x :: wl ->
-                if Hashtbl.mem ht (Hashtbl.hash x) then loop wl accu
-                else
-                  begin
-                    Hashtbl.add ht (Hashtbl.hash x) true;
-                    loop wl (x :: accu)
-                  end
-          in
-          loop wl []
-        in
-          List.iter
-            (fun w ->
-               html_li conf; print_warning conf base w; Wserver.printf "\n")
-            wl
-        end;
-        Wserver.printf "</ul>\n"
-      end
-    end
-
+  print_list_aux conf base "warnings" wl @@ fun conf base wl ->
+  (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
+  (* levé par plusieurs fonctions différents selon le context.       *)
+  let wl = List.sort_uniq compare wl in
+  List.iter
+    (fun w ->
+       Wserver.printf "<li>" ;
+       print_warning conf base w ;
+       Wserver.printf "</li>" )
+    wl
 
 (* ************************************************************************* *)
 (*  [Fonc] print_misc : config -> base -> Def.misc -> unit                   *)
@@ -690,7 +675,6 @@ let print_misc conf _base =
       Wserver.printf "%s\n" (capitale (transl conf "missing sources"));
       Wserver.printf "</em>"
 
-
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs : config -> base -> Def.misc list -> unit             *)
 (** [Description] : Affiche la liste des 'informations diverses'.
@@ -703,20 +687,9 @@ let print_misc conf _base =
     [Rem] : Exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
 let print_miscs conf base ml =
-  if ml = [] then ()
-  else
-    begin
-      Wserver.printf "%s\n"
-        (capitale (transl conf "miscellaneous informations"));
-      begin
-        Wserver.printf "<ul>\n";
-        List.iter
-          (fun m -> html_li conf; print_misc conf base m; Wserver.printf "\n")
-          ml;
-        Wserver.printf "</ul>\n"
-      end
-    end
-
+  print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
+  List.iter
+    (fun m -> Wserver.printf "<li>" ; print_misc conf base m ; Wserver.printf "</li>")
 
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs :
@@ -732,23 +705,24 @@ let print_miscs conf base ml =
       - unit
     [Rem] : Exporté en clair hors de ce module.                              *)
 (* ************************************************************************* *)
-let print_warnings_and_miscs conf base (wl, ml) =
-  if wl = [] && ml = [] then ()
-  else
-    begin
-      Wserver.printf "%s\n" (capitale (transl conf "warnings"));
-      begin
-        Wserver.printf "<ul>\n";
-        List.iter
-          (fun w ->
-             html_li conf; print_warning conf base w; Wserver.printf "\n")
-          wl;
-        List.iter
-          (fun m -> html_li conf; print_misc conf base m; Wserver.printf "\n")
-          ml;
-        Wserver.printf "</ul>\n"
-      end
-    end
+let print_warnings_and_miscs conf base wl ml =
+  if wl <> [] || ml <> [] then begin
+    Wserver.printf "%s\n" (capitale (transl conf "warnings"));
+    Wserver.printf "<ul>\n";
+    List.iter
+      (fun w ->
+         Wserver.printf "<li>" ;
+         print_warning conf base w ;
+         Wserver.printf "</li>")
+      wl ;
+    List.iter
+      (fun m ->
+         Wserver.printf "<li>" ;
+         print_misc conf base m ;
+         Wserver.printf "</li>")
+      ml;
+    Wserver.printf "</ul>\n"
+  end
 
 let error conf base x =
   let err = string_of_error conf base x in
