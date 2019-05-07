@@ -748,17 +748,23 @@ let check_person conf p =
 
 let error_person conf err =
 #ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
-      raise (Update.ModErrApi err)
-    end;
+  if !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
   Hutil.trailer conf;
-  raise Update.ModErr
+#ifdef API
+  end ;
+#endif
+  let err =
+    Printf.sprintf "%s%s%s"
+      (capitale (transl conf "error"))
+      (capitale (transl conf ":"))
+      err
+  in
+  raise @@ Update.ModErr err
 
 let strip_pevents p =
   let strip_array_witness pl =
@@ -798,19 +804,7 @@ let strip_person p =
 
 let print_conflict conf base p =
 #ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf
-        (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-        ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-         p_surname base p ^ "\"")
-        (fun _ ->
-           Printf.sprintf "%s %s" (sou base (get_first_name p))
-             (sou base (get_surname p)))
-        (fun _ -> ".")
-    in
-      raise (Update.ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
@@ -848,17 +842,24 @@ let print_conflict conf base p =
   Wserver.printf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
-  raise Update.ModErr
+#ifdef API
+  end ;
+#endif
+  let err =
+    Printf.sprintf
+      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+       p_surname base p ^ "\"")
+      (fun _ ->
+         Printf.sprintf "%s %s" (sou base (get_first_name p))
+           (sou base (get_surname p)))
+      (fun _ -> ".")
+   in
+   raise @@ Update.ModErr err
 
 let print_cannot_change_sex conf base p =
 #ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf "%s."
-        (capitale (transl conf "cannot change sex of a married person"))
-    in
-      raise (Update.ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
@@ -870,7 +871,13 @@ let print_cannot_change_sex conf base p =
   Wserver.printf "</ul>\n";
   Update.print_return conf;
   Hutil.trailer conf;
-  raise Update.ModErr
+#ifdef API
+  end;
+#endif
+  let err =
+    Printf.sprintf "%s." (capitale (transl conf "cannot change sex of a married person"))
+  in
+  raise @@ Update.ModErr err
 
 let check_conflict conf base sp ipl =
   let name = Name.lower (sp.first_name ^ " " ^ sp.surname) in
@@ -1294,26 +1301,24 @@ let print_add o_conf base =
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
-  try
-    let (sp, ext) = reconstitute_person conf in
-    let redisp =
-      match p_getenv conf.env "return" with
-        Some _ -> true
-      | _ -> false
-    in
-    if ext || redisp then UpdateInd.print_update_ind conf base sp ""
-    else
-      let sp = strip_person sp in
-      match check_person conf sp with
-        Some err -> error_person conf err
-      | None ->
-          let (p, a) = effective_add conf base sp in
-          let u = {family = get_family (poi base p.key_index)} in
-          let wl = all_checks_person base p a u in
-          Util.commit_patches conf base;
-          let changed = U_Add_person (Util.string_gen_person base p) in
-          History.record conf base changed "ap"; print_add_ok conf base wl p
-  with Update.ModErr -> ()
+  let (sp, ext) = reconstitute_person conf in
+  let redisp =
+    match p_getenv conf.env "return" with
+      Some _ -> true
+    | _ -> false
+  in
+  if ext || redisp then UpdateInd.print_update_ind conf base sp ""
+  else
+    let sp = strip_person sp in
+    match check_person conf sp with
+      Some err -> error_person conf err
+    | None ->
+      let (p, a) = effective_add conf base sp in
+      let u = {family = get_family (poi base p.key_index)} in
+      let wl = all_checks_person base p a u in
+      Util.commit_patches conf base;
+      let changed = U_Add_person (Util.string_gen_person base p) in
+      History.record conf base changed "ap"; print_add_ok conf base wl p
 
 let print_del conf base =
   match p_getenv conf.env "i" with
@@ -1339,24 +1344,22 @@ let print_del conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_aux conf base callback =
-  try
-    let (p, ext) = reconstitute_person conf in
-    let redisp =
-      match p_getenv conf.env "return" with
-        Some _ -> true
-      | _ -> false
-    in
-    let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
-    let digest = Update.digest_person ini_ps in
-    if digest = raw_get conf "digest" then
-      if ext || redisp then UpdateInd.print_update_ind conf base p digest
-      else
-        let p = strip_person p in
-        match check_person conf p with
-          Some err -> error_person conf err
-        | None -> callback p
-    else Update.error_digest conf
-  with Update.ModErr -> ()
+  let (p, ext) = reconstitute_person conf in
+  let redisp =
+    match p_getenv conf.env "return" with
+      Some _ -> true
+    | _ -> false
+  in
+  let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
+  let digest = Update.digest_person ini_ps in
+  if digest = raw_get conf "digest" then
+    if ext || redisp then UpdateInd.print_update_ind conf base p digest
+    else
+      let p = strip_person p in
+      match check_person conf p with
+        Some err -> error_person conf err
+      | None -> callback p
+  else Update.error_digest conf
 
 let print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
@@ -1428,39 +1431,36 @@ let print_mod o_conf base =
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
-    Some ip ->
-      begin try
-        let p = poi base (iper_of_string ip) in
-        let o_p = Util.string_gen_person base (gen_person_of_person p) in
-        let ht = Hashtbl.create 50 in
-        let _ =
-          List.fold_left (fun id evt -> Hashtbl.add ht id evt; succ id) 1
-            (get_pevents p)
-        in
-        let sorted_pevents =
-          List.sort (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
-            (reconstitute_sorted_pevents conf 1)
-        in
-        let pevents =
-          List.fold_right
-            (fun (id, _) accu ->
-               try Hashtbl.find ht id :: accu with
-                 Not_found -> failwith "Sorting event")
-            sorted_pevents []
-        in
-        let p = gen_person_of_person p in
-        let p = {p with pevents = pevents} in
-        patch_person base p.key_index p;
-        let wl =
-          let a = poi base p.key_index in
-          let a = {parents = get_parents a; consang = get_consang a} in
-          let u = poi base p.key_index in
-          let u = {family = get_family u} in all_checks_person base p a u
-        in
-        Util.commit_patches conf base;
-        let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
-        History.record conf base changed "mp";
-        print_change_event_order_ok conf base wl p
-      with Update.ModErr -> ()
-      end
+  | Some ip ->
+    let p = poi base (iper_of_string ip) in
+    let o_p = Util.string_gen_person base (gen_person_of_person p) in
+    let ht = Hashtbl.create 50 in
+    let _ =
+      List.fold_left (fun id evt -> Hashtbl.add ht id evt; succ id) 1
+        (get_pevents p)
+    in
+    let sorted_pevents =
+      List.sort (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
+        (reconstitute_sorted_pevents conf 1)
+    in
+    let pevents =
+      List.fold_right
+        (fun (id, _) accu ->
+           try Hashtbl.find ht id :: accu with
+             Not_found -> failwith "Sorting event")
+        sorted_pevents []
+    in
+    let p = gen_person_of_person p in
+    let p = {p with pevents = pevents} in
+    patch_person base p.key_index p;
+    let wl =
+      let a = poi base p.key_index in
+      let a = {parents = get_parents a; consang = get_consang a} in
+      let u = poi base p.key_index in
+      let u = {family = get_family u} in all_checks_person base p a u
+    in
+    Util.commit_patches conf base;
+    let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
+    History.record conf base changed "mp";
+    print_change_event_order_ok conf base wl p
   | _ -> Hutil.incorrect_request conf

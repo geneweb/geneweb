@@ -5,11 +5,8 @@ open Def
 open Gwdb
 open Util
 
-(* #ifdef API *)
-exception ModErrApi of string
-(* #endif *)
+exception ModErr of string
 
-exception ModErr
 type create_info =
   { ci_birth_date : date option;
     ci_birth_place : string;
@@ -223,13 +220,7 @@ let print_return conf =
 
 let print_err_unknown conf _base (f, s, o) =
 (* #ifdef API *)
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
-        (capitale (transl conf "unknown person")) (transl conf ":") f o s
-    in
-      raise (ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
@@ -237,7 +228,14 @@ let print_err_unknown conf _base (f, s, o) =
     (capitale (transl conf "unknown person")) (transl conf ":") f o s;
   print_return conf;
   Hutil.trailer conf;
-  raise ModErr
+(* #ifdef API *)
+    end;
+(* #endif *)
+  let err =
+    Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
+      (capitale (transl conf "unknown person")) (transl conf ":") f o s
+  in
+  raise @@ ModErr err
 
 let update_misc_names_of_family base p_sex u =
   match p_sex with
@@ -287,23 +285,24 @@ let print_first_name_strong _conf base p =
   Wserver.printf "<strong>%s%s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
-let print_error conf base =
-  function
-    AlreadyDefined p ->
-      Wserver.printf
-        (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-        ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-         p_surname base p ^ "\"")
-        (fun _ ->
-           Printf.sprintf "<a href=\"%s%s\">" (commd conf)
-             (acces conf base p))
-        (fun _ -> "</a>.")
+let string_of_error conf base = function
+  | AlreadyDefined p ->
+    Printf.sprintf
+      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+       p_surname base p ^ "\"")
+      (fun _ ->
+         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+      (fun _ -> "</a>.")
   | OwnAncestor p ->
-      Wserver.printf "%s\n%s" (print_someone_strong conf base p)
-        (transl conf "would be his/her own ancestor")
+    Printf.sprintf "%s\n%s" (print_someone_strong conf base p)
+      (transl conf "would be his/her own ancestor")
   | BadSexOfMarriedPerson _ ->
-      Wserver.printf "%s."
-        (capitale (transl conf "cannot change sex of a married person"))
+    Printf.sprintf "%s."
+      (capitale (transl conf "cannot change sex of a married person"))
+
+let print_error conf base e =
+  Wserver.printf "%s" @@ string_of_error conf base e
 
 let someone_ref_text conf base p =
   "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
@@ -752,37 +751,20 @@ let print_warnings_and_miscs conf base (wl, ml) =
     end
 
 let error conf base x =
+  let err = string_of_error conf base x in
 (* #ifdef API *)
-  if !(Api_conf.mode_api) then
-    begin let err =
-      match x with
-        AlreadyDefined p ->
-          Printf.sprintf
-            (fcapitale
-               (ftransl conf "name %s already used by %tthis person%t"))
-            ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^
-             " " ^ p_surname base p ^ "\"")
-            (fun _ ->
-               Printf.sprintf "%s %s" (sou base (get_first_name p))
-                 (sou base (get_surname p)))
-            (fun _ -> ".")
-      | OwnAncestor p ->
-          Printf.sprintf "%s\n%s" (print_someone_strong conf base p)
-            (transl conf "would be his/her own ancestor")
-      | BadSexOfMarriedPerson _ ->
-          Printf.sprintf "%s."
-            (capitale (transl conf "cannot change sex of a married person"))
-    in
-      raise (ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
-  print_error conf base x;
+  Wserver.printf "%s" err;
   Wserver.printf "\n";
   print_return conf;
   Hutil.trailer conf;
-  raise ModErr
+(* #ifdef API *)
+  end ;
+(* #endif *)
+  raise @@ ModErr err
 
 let error_locked conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
@@ -845,29 +827,22 @@ let error_locked conf =
   Hutil.trailer conf
 
 let error_digest conf =
+  let err =
+    Printf.sprintf @@
+    fcapitale (ftransl conf "the base has changed; do \"back\", \"reload\", and refill the form")
+  in
 (* #ifdef API *)
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf
-        (fcapitale
-           (ftransl conf "\
-the base has changed; do \"back\", \"reload\", and refill the form"))
-    in
-      raise (ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<p>\n";
-  Wserver.printf
-    (fcapitale
-       (ftransl conf "\
-the base has changed; do \"back\", \"reload\", and refill the form"));
-  Wserver.printf ".\n";
-  Wserver.printf "</p>\n";
+  Wserver.printf "<p>%s.\n</p>\n" err ;
   Hutil.trailer conf;
-  raise ModErr
+(* #ifdef API *)
+  end;
+(* #endif *)
+  raise @@ ModErr err
 
 let digest_person p = Iovalue.digest p
 let digest_family (fam, cpl, des) = Iovalue.digest (fam, cpl, des)
@@ -880,30 +855,28 @@ let get var key env =
 let get_number var key env = p_getint env (var ^ "_" ^ key)
 
 let bad_date conf d =
+  let err =
+    Printf.sprintf
+      "%s%s%a\n"
+      (capitale (transl conf "incorrect date"))
+      (transl conf ":")
+      (fun _ -> function
+         | {day = 0; month = 0; year = a} -> Printf.sprintf "%d" a
+         | {day = 0; month = m; year = a} -> Printf.sprintf "%d/%d" m a
+         | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a)
+      d
+  in
 (* #ifdef API *)
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf "%s%s\n" (capitale (transl conf "incorrect date"))
-        (transl conf ":") ^
-      (match d with
-         {day = 0; month = 0; year = a} -> Printf.sprintf "%d" a
-       | {day = 0; month = m; year = a} -> Printf.sprintf "%d/%d" m a
-       | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a)
-    in
-      raise (ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 (* #endif *)
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
-  Wserver.printf "%s%s\n" (capitale (transl conf "incorrect date"))
-    (transl conf ":");
-  begin match d with
-    {day = 0; month = 0; year = a} -> Wserver.printf "%d" a
-  | {day = 0; month = m; year = a} -> Wserver.printf "%d/%d" m a
-  | {day = j; month = m; year = a} -> Wserver.printf "%d/%d/%d" j m a
-  end;
-  Hutil.trailer conf;
-  raise ModErr
+  Hutil.rheader conf title ;
+  Wserver.printf "%s" err ;
+  Hutil.trailer conf ;
+(* #ifdef API *)
+    end;
+(* #endif *)
+  raise @@ ModErr err
 
 let int_of_field s =
   try Some (int_of_string (String.trim s)) with Failure _ -> None
@@ -946,7 +919,7 @@ let reconstitute_date_dmy2 conf var =
           end
       | None -> {day2 = 0; month2 = 0; year2 = y; delta2 = 0}
       end
-  | None -> raise ModErr
+  | None -> raise @@ ModErr __LOC__
 
 let reconstitute_date_dmy conf var =
   let (prec, y) =
@@ -1081,31 +1054,21 @@ let text_of_var conf =
       | [< >] -> var
 
 let print_create_conflict conf base p var =
+  let err =
+    Printf.sprintf
+      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+       p_surname base p ^ "\" (" ^ text_of_var conf var ^ ")")
+      (fun _ ->
+         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+      (fun _ -> "</a>.");
+  in
 (* #ifdef API *)
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf
-        (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-        ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-         p_surname base p ^ "\" (" ^ text_of_var conf var ^ ")")
-        (fun _ ->
-           Printf.sprintf "%s %s" (sou base (get_first_name p))
-             (sou base (get_surname p)))
-        (fun _ -> ".")
-    in
-      raise (ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 (* #endif *)
-  let text = text_of_var conf var in
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf
-    (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-    ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-     p_surname base p ^ "\" (" ^ text ^ ")")
-    (fun _ ->
-       Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-    (fun _ -> "</a>.");
+  Wserver.printf "%s" err ;
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
@@ -1157,7 +1120,10 @@ let print_create_conflict conf base p var =
   Wserver.printf "</form>\n";
   print_same_name conf base p;
   Hutil.trailer conf;
-  raise ModErr
+(* #ifdef API *)
+  end ;
+(* #endif *)
+  raise @@ ModErr err
 
 let add_misc_names_for_new_persons base new_persons =
   List.iter

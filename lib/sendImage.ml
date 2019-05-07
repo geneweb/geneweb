@@ -15,7 +15,7 @@ let extension_of_type =
   | GIF -> ".gif"
   | PNG -> ".png"
 
-let incorrect conf = Hutil.incorrect_request conf; raise Update.ModErr
+let incorrect conf = Hutil.incorrect_request conf; raise @@ Update.ModErr __LOC__
 
 let incorrect_content_type conf base p s =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
@@ -32,7 +32,7 @@ let incorrect_content_type conf base p s =
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
   Hutil.trailer conf;
-  raise Update.ModErr
+  raise @@ Update.ModErr __LOC__
 
 let error_too_big_image conf base p len max_len =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
@@ -50,7 +50,7 @@ let error_too_big_image conf base p len max_len =
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
   Hutil.trailer conf;
-  raise Update.ModErr
+  raise @@ Update.ModErr __LOC__
 
 let raw_get conf key =
   try List.assoc key conf.env with Not_found -> incorrect conf
@@ -317,17 +317,15 @@ let effective_send_ok conf base p file =
   History.record conf base changed "si"; print_sent conf base p
 
 let print_send_ok conf base =
-  try
-    let ip =
-      let s = raw_get conf "i" in
-      try iper_of_string s with Failure _ -> incorrect conf
-    in
-    let p = poi base ip in
-    let digest = Update.digest_person (UpdateInd.string_person_of base p) in
-    if digest = raw_get conf "digest" then
-      let file = raw_get conf "file" in effective_send_ok conf base p file
-    else Update.error_digest conf
-  with Update.ModErr -> ()
+  let ip =
+    let s = raw_get conf "i" in
+    try iper_of_string s with Failure _ -> incorrect conf
+  in
+  let p = poi base ip in
+  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
+  if digest = raw_get conf "digest" then
+    let file = raw_get conf "file" in effective_send_ok conf base p file
+  else Update.error_digest conf
 
 (* Delete image form validated *)
 
@@ -353,10 +351,8 @@ let effective_delete_ok conf base p =
   History.record conf base changed "di"; print_deleted conf base p
 
 let print_del_ok conf base =
-  try
-    match p_getenv conf.env "i" with
-      Some ip ->
-        let p = poi base (iper_of_string ip) in
-        effective_delete_ok conf base p
-    | None -> incorrect conf
-  with Update.ModErr -> ()
+  match p_getenv conf.env "i" with
+    Some ip ->
+    let p = poi base (iper_of_string ip) in
+    effective_delete_ok conf base p
+  | None -> incorrect conf
