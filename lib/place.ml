@@ -663,12 +663,22 @@ let print_places_surnames conf base array long searchl=
     end ;
   Hutil.trailer conf
 
+let str_replace str c1 c2 =
+  let bstr = Bytes.of_string str in
+  let rec loop bstr i =
+    if bstr.[i] = c1 then Bytes.set bstr i c2;
+    if i < (Bytes.length bstr - 1) then loop bstr (i+1)
+  in loop bstr 0;
+  Bytes.to_string bstr
+
 let match_place str1 str2 exact substr =
   match (str1, str2) with
   | ("", "") -> true
   | (s1, s2) ->
       let s1 = if exact then s1 else Name.lower (Some.name_unaccent s1) in
+      let s1 = if exact then s1 else str_replace s1 '-' ' ' in
       let s2 = if exact then s2 else Name.lower (Some.name_unaccent s2) in
+      let s2 = if exact then s2 else str_replace s2 '-' ' ' in
       if not substr then s1 = s2
       else if s2 = "" then false else Mutil.contains s1 s2
 
@@ -690,9 +700,12 @@ let filter_array array place i exact substr =
 let search_array array k exact =
   if k <> "" then
     let k = if exact then k else Name.lower (Some.name_unaccent k) in
+    let k = if exact then k else str_replace k '-' ' ' in
     let is_in_list k l =
-      List.exists (fun p -> Mutil.contains
-        (if exact then p else (Name.lower (Some.name_unaccent p))) k) l
+      List.exists (fun p ->
+        let p = if exact then p else (Name.lower (Some.name_unaccent p)) in
+        let p = if exact then p else str_replace p '-' ' ' in
+        Mutil.contains p k ) l
     in
     Array.fold_left
       (fun acc (pl, _) -> if is_in_list k pl then pl :: acc else acc) [] array

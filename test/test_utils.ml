@@ -117,6 +117,51 @@ let remove_suburb _ =
   ; test "boobar (baz)" "[foo-bar] – boobar (baz)" (* EN dash *)
   ; test "boobar (baz)" "[foo-bar] — boobar (baz)" (* EM dash *)
 
+let str_replace _ =
+    let test exp inp =
+      assert_equal ~printer:(fun x -> x) exp (Place.str_replace inp '-' ' ')
+    in
+  test "abc def" "abc-def"
+  ; test "abc def ghi" "abc-def-ghi"
+
+let match_place _ =
+    let test_a a b y =
+      if y then
+        assert_bool "a true true t" (Place.match_place a b true true )
+      else  
+        assert_bool "a true true f" (not @@ (Place.match_place a b true true ))
+    in
+    let test_b a b y =
+      if y then
+        assert_bool "b true false t" (Place.match_place a b true false )
+      else  
+        assert_bool "b true false f" (not @@ (Place.match_place a b true false ))
+    in
+    let test_c a b y =
+      if y then
+        assert_bool "c false true t" (Place.match_place a b false true )
+      else  
+        assert_bool "c false true f" (not @@ (Place.match_place a b false true ))
+    in
+    let test_d a b y =
+      if y then
+        assert_bool "d false false t" (Place.match_place a b false false )
+      else  
+        assert_bool "d false false f" (not @@ (Place.match_place a b false false ))
+    in
+    test_a "abcdef" "abcdef" true
+    ; test_a "abcdefghi" "abcdef" true (* exact, substring *)
+    ; test_a "abcdefghi" "Abcdef" false
+    ; test_b "abcdef" "abcdef" true (* exact, not substring *)
+    ; test_b "abcdefghi" "abcdef" false
+    ; test_c "abcdefghi" "abcdef" true (* not exact, substring *)
+    ; test_c "abcdefghi" "Abcdef" true
+    ; test_c "abcdef-ghi" "abcdef" true
+    ; test_d "abcdef" "Abcdef" true (* not exact, not substring *)
+    ; test_d "abcdefghi" "Abcdef" false
+
+
+
 let mutil_replace_utf_8 _ =
     let test a b c d =
       assert_equal ~printer:(fun x -> x) a (Mutil.replace_utf_8 b c d)
@@ -140,5 +185,7 @@ let suite =
   ; "Place" >:::
     [ "fold_place" >:: fold_place
     ; "remove_suburb" >:: remove_suburb
+    ; "str_replace" >:: str_replace
+    ; "match_place" >:: match_place
     ]
   ]
