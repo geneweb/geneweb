@@ -406,7 +406,7 @@ let print_add conf base mod_f mod_fath mod_moth =
             Api_update_util.UpdateSuccess (wl, ml, hr)
           end)
   with
-  | Update.ModErrApi s -> Api_update_util.UpdateError s
+  | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c)
 
 
@@ -447,7 +447,7 @@ let print_mod_aux conf base mod_f callback =
           let (sfam, sdes) = UpdateFamOk.strip_family sfam sdes in
           callback sfam scpl sdes
   with
-  | Update.ModErrApi s -> Api_update_util.UpdateError s
+  | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
 
