@@ -7,7 +7,7 @@ Makefile.local
 
 # Generated from dune.in files
 benchmark/dune
-bin/distrib/dune
+bin/dune
 lib/dune
 test/dune
 
@@ -18,9 +18,9 @@ _build/
 geneweb.install
 
 # Generated from .camlp5 sources
-bin/distrib/setup/setup.ml
-bin/distrib/ged2gwb/ged2gwb1.ml
-bin/distrib/ged2gwb/ged2gwb2.ml
+bin/setup/setup.ml
+bin/ged2gwb/ged2gwb1.ml
+bin/ged2gwb/ged2gwb2.ml
 lib/api_saisie_piqi.ml
 lib/api_saisie_piqi_ext.ml
 lib/gwlib.ml
