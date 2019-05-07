@@ -83,17 +83,15 @@ let print_possible_continue_merging conf base =
       let ini2 = iper_of_string ini2 in
       let p1 = poi base ini1 in
       let p2 = poi base ini2 in
-      Wserver.printf "\n";
-      html_p conf;
-      Wserver.printf "<a href=%sm=MRG_IND&i=%s&i2=%s>" (commd conf)
-        (string_of_iper ini1) (string_of_iper ini2);
-      Wserver.printf "%s" (capitale (transl conf "continue merging"));
-      Wserver.printf "</a>";
-      Wserver.printf "\n";
+      Wserver.printf {|<p><a href="%sm=MRG_IND&i=%s&i2=%s">%s</a>\n|}
+        (commd conf)
+        (string_of_iper ini1)
+        (string_of_iper ini2)
+        (capitale (transl conf "continue merging"));
       print_someone base p1;
       Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
       print_someone base p2;
-      Wserver.printf "\n"
+      Wserver.printf "</p>\n"
   | _ ->
       match p_getenv conf.env "ip" with
         Some ip ->
@@ -110,20 +108,13 @@ let print_possible_continue_merging conf base =
           in
           if s1 <> "" || s2 <> "" then
             begin
-              Wserver.printf "<p>\n";
-              Wserver.printf "<a href=%sm=MRG_DUP&ip=%s%s%s>" (commd conf)
-                (string_of_iper ip) s1 s2;
-              Wserver.printf "%s"
-                (capitale (transl conf "continue merging"));
-              Wserver.printf "</a>" ;
-              begin
-                let p = poi base ip in
-                let s = person_text conf base p in
-                Wserver.printf "\n(%s)\n"
-                  (transl_a_of_b conf
-                     (transl conf "possible duplications")
-                     (reference conf base p s) s)
-              end;
-              Wserver.printf "</p>\n"
+              let p = poi base ip in
+              let s = person_text conf base p in
+              Wserver.printf {|<p><a href="%sm=MRG_DUP&ip=%s%s%s">%s</a> (%s)</p>|}
+                (commd conf) (string_of_iper ip) s1 s2
+                (capitale (transl conf "continue merging"))
+                (transl_a_of_b conf
+                   (transl conf "possible duplications")
+                   (reference conf base p s) s)
             end
       | None -> ()

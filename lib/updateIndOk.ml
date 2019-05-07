@@ -1,4 +1,3 @@
-(* $Id: updateIndOk.ml,v 5.75 2008-01-21 13:28:12 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -864,11 +863,7 @@ let print_cannot_change_sex conf base p =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Update.print_error conf base (BadSexOfMarriedPerson p);
-  Wserver.printf "<ul>\n";
-  html_li conf;
-  Wserver.printf "\n%s" (referenced_person_text conf base p);
-  Wserver.printf "\n";
-  Wserver.printf "</ul>\n";
+  Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
   Update.print_return conf;
   Hutil.trailer conf;
 #ifdef API

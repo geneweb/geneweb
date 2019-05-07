@@ -287,11 +287,11 @@ let print_marriage conf base month =
     | l ->
         let l = List.sort (fun (_, y1) (_, y2) -> compare y1 y2) l in
         Wserver.printf "\n";
-        html_li conf;
+        Wserver.printf "<li>" ;
         Wserver.printf "%d\n<ul>" i;
         List.iter
           (fun (fam, year) ->
-             html_li conf;
+             Wserver.printf "<li>" ;
              Wserver.printf "%s"
                (referenced_person_title_text conf base
                   (pget conf base (get_father fam)));

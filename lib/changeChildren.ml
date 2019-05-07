@@ -143,7 +143,7 @@ let print_children_list conf base u =
        Array.iter
          (fun ip ->
             let p = poi base ip in
-            html_li conf;
+            Wserver.printf "<li>" ;
             Wserver.printf "\n%s"
               (reference conf base p (person_text conf base p));
             Wserver.printf "%s\n" (Date.short_dates_text conf base p))

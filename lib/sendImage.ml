@@ -155,22 +155,15 @@ let print_delete_image conf base p =
       Wserver.printf ": "; Wserver.printf "%s.%d %s" fn occ sn
   in
   Hutil.header conf title;
-  Wserver.printf "\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  html_p conf;
+  Wserver.printf "<form method=\"post\" action=\"%s\">" conf.command;
   Util.hidden_env conf;
   Wserver.printf
-    "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n\n"
-    (string_of_iper (get_iper p));
-  Wserver.printf "\n";
-  html_p conf;
-  Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</form>\n";
-  Wserver.printf "\n";
+    "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\
+     <input type=\"hidden\" name=\"i\" value=\"%s\">\
+     <p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>\
+     </form>"
+    (string_of_iper (get_iper p))
+    (capitale (transl_nth conf "validate/delete" 0));
   Hutil.trailer conf
 
 let print_del conf base =
@@ -334,11 +327,7 @@ let print_deleted conf base p =
     Wserver.printf "%s" (capitale (transl conf "image deleted"))
   in
   Hutil.header conf title;
-  Wserver.printf "<ul>\n";
-  html_li conf;
-  Wserver.printf "\n%s" (referenced_person_text conf base p);
-  Wserver.printf "\n";
-  Wserver.printf "</ul>\n";
+  Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =
