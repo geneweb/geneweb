@@ -62,16 +62,16 @@
   <div>
     %if;(evar.k1!="" or evar.k2!="")
       <a role="button" href="%prefix_base_password;
-        %foreach;env_binding;%if;(env_val!="" and env_key!="k1" and env_key!="k2")%nn;
-          &%env_key=%env_val;%end;%nn;
+        %foreach;env_binding;%if;(env.val!="" and env.key!="k1" and env.key!="k2")%nn;
+          &%env.key=%env.val;%end;%nn;
         %end;"
         title="[*all the places]"><i class="fa fa-sort-up mr-2"></i>
       </a>
     %end;
     %if;(evar.bi!="" or evar.bp!="" or evar.ma!="" or evar.de!="" or evar.bu!="")
       <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env_val!="" and env_key!="long" and env_key!="k1" and env_key!="k2")%nn;
-          &%env_key=%env_val;%end;%nn;
+        %foreach;env_binding;%if;(env.val!="" and env.key!="long" and env.key!="k1" and env.key!="k2")%nn;
+          &%env.key=%env.val;%end;%nn;
         %end;&k1=%evar.k1;%nn;
         %if;(evar.long!="on")&long=on%end;%nn;"
         title="[long/short display]">%nn;
@@ -82,8 +82,8 @@
     %end;
     %if;(evar.k2!="")
       %sp;>%sp;<a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env_val!="" and env_key!="long" and env_key!="k1" and env_key!="k2")%nn;
-         &%env_key=%env_val;%end;%nn;
+        %foreach;env_binding;%if;(env.val!="" and env.key!="long" and env.key!="k1" and env.key!="k2")%nn;
+         &%env.key=%env.val;%end;%nn;
         %end;&k1=%evar.k1;&k2=%evar.k2;%nn;
         %if;(evar.long!="on")&long=on%end;%nn;"
         title="[*long/short display]">%nn;
@@ -92,8 +92,8 @@
   </div>
   <a role="button" class="ml-auto"
     href="%prefix_base_password;%nn;
-      %foreach;env_binding;%if;(env_val!="" and env_key!="f_sort")%nn;
-       &%env_key=%env_val;%end;%nn;
+      %foreach;env_binding;%if;(env.val!="" and env.key!="f_sort")%nn;
+       &%env.key=%env.val;%end;%nn;
       %end;%nn;
       %if;(evar.f_sort!="on")&f_sort=on%end;%nn;"
       title="[*sort by/branch/alphabetic order]0%sp;

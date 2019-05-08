@@ -172,7 +172,6 @@ let get_opt conf =
   (if f_sort then "&f_sort=on" else "") ^
   "&dates=on"
 
-
 type 'a env =
     Vlist_data of (string * (string * int) list) list
   | Vlist_ini of string list
@@ -204,90 +203,6 @@ let string_to_list str =
           loop (c :: acc) s1
         else acc
   in loop [] str
-
-let rec eval_var conf base env xx _loc sl =
-  try eval_simple_var conf base env xx sl with
-    Not_found -> eval_compound_var conf base env xx sl
-and eval_simple_var conf base env xx =
-  function
-    [s] ->
-      begin try bool_val (eval_simple_bool_var conf base env xx s) with
-        Not_found -> str_val (eval_simple_str_var conf base env xx s)
-      end
-  | _ -> raise Not_found
-and eval_simple_bool_var _conf _base env _xx =
-  function
-  | "is_first" ->
-      begin match get_env "first" env with
-        Vbool x -> x
-      | _ -> raise Not_found
-      end
-  | _ -> raise Not_found
-and eval_simple_str_var _conf _base env _xx =
-  function
-  | "substr" -> eval_string_env "substr" env
-  | "cnt" -> eval_int_env "cnt" env
-  | "max" -> eval_int_env "max" env
-  | "tail" -> eval_string_env "tail" env
-  | "keys" ->
-      let k =
-        match get_env "keys" env with
-          Venv_keys k -> k
-        | _ -> []
-      in
-      List.fold_left
-        (fun accu (k, i) -> accu ^ k ^ "=" ^ string_of_int i ^ "&") "" k
-  | "env_key" -> eval_string_env "env_key" env
-  | "env_val" -> eval_string_env "env_val" env
-  | _ -> raise Not_found
-and eval_compound_var conf base env xx sl =
-  let rec loop =
-    function
-      [s] -> eval_simple_str_var conf base env xx s
-    | ["evar"; "p"; s] ->
-        begin match p_getenv conf.env s with
-          Some s -> if String.length s > 1 then String.sub s 0 (String.length s - 1) else ""
-        | None -> ""
-        end
-    | ["evar"; s] ->
-        begin match p_getenv conf.env s with
-          Some s -> s
-        | None -> ""
-        end
-    | ["subs"; n; s] ->
-        let n = int_of_string n in
-        if String.length s > n then String.sub s 0 (String.length s - n) else ""
-    | "encode" :: sl -> code_varenv (loop sl)
-    | "escape" :: sl -> escape_html (loop sl)
-    | "html_encode" :: sl -> no_html_tags (loop sl)
-    | "printable" :: sl -> only_printable (loop sl)
-    | _ -> raise Not_found
-  in
-  str_val (loop sl)
-and eval_string_env s env =
-  match get_env s env with
-    Vstring s -> s
-  | _ -> raise Not_found
-and eval_int_env s env =
-  match get_env s env with
-    Vint i -> string_of_int i
-  | _ -> raise Not_found
-let print_foreach conf print_ast _eval_expr =
-  let rec print_foreach env xx _loc s sl el al =
-    match s :: sl with
-    | ["env_binding"] -> print_foreach_env_binding env xx el al
-    | _ -> raise Not_found
-  and print_foreach_env_binding env xx _el al =
-    let rec loop =
-      function
-        (k, v) :: l ->
-          let env = ("env_key", Vstring k) :: ("env_val", Vstring v) :: env in
-          List.iter (print_ast env xx) al; loop l
-      | [] -> ()
-    in
-    loop conf.env
-  in
-  print_foreach
 
 let get_ip_list (snl : (string * Adef.iper list) list) =
   List.map snd snl |> List.flatten |> List.sort_uniq compare
@@ -621,11 +536,11 @@ let print_places_surnames conf base array long searchl=
   Hutil.header conf title ;
   Hutil.print_link_to_welcome conf true ;
   Hutil.interp_no_header conf "buttons_places"
-    {Templ.eval_var = eval_var conf base;
+    {Templ.eval_var = (fun _ -> raise Not_found);
      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
      Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-     Templ.print_foreach = print_foreach conf}
+     Templ.print_foreach = (fun _ -> raise Not_found)}
     [] () ;
   if array <> [||] then
     if long || k2_no
