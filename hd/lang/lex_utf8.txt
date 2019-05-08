@@ -1,3 +1,7 @@
+    rlm_nbr too large
+en: the number of participants is too large. If necessary, adjust max_rlm_nbr in your parameter file.
+fr: le nombre de personnes concernées est trop grand. Si nécessaire, ajustez max_rlm_nbr dans votre fichier paramètres.
+
     search results
 en: detailed results of search by place for
 fr: résultats détaillés de la recherche par lieu pour

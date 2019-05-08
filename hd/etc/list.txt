@@ -140,19 +140,24 @@
 %end;
 
 %( RLM commence a i1 et non i0 on décale i(0) en i(nb), à défaut on pourrait aussi tout décaller à i+1 %)
-%if;(nb!=1)
-  <a role="button" class="ml-5" href="%prefix&m=RLM&%nn;
-    %foreach;env_binding;%nn;
-      %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
-       and env.key!="k1" and env.key!="k2" and env.key!="k3"
-       and env.key!="bi" and env.key!="bd" and env.key!="ma" and env.key!="de" and env.key!="bu"
-       and env.key!="surn" and env.key!="date_sort" and env.key!="i0")%env.key;=%env.val;&%nn;
-      %elseif(env.key="i0")i%nb;=%env.val;&%end;%nn;
-      %end;%nn;
-      %for;i;0;nb;%if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%end;
-                  %else;&t%expr(nb)=%apply;tags%with;%apply;get_ip(0)%and;%end;%end;%end;">%nn;
-    <i class="fa fa-bezier-curve mr-2 mt-3"></i>[*multi relations graph] (%nb;)%nn;
-  </a>
+%if;(nb<bvar.max_rlm_nbr)
+  %if;(nb!=1)
+    <a role="button" class="ml-5" href="%prefix&m=RLM&%nn;
+      %foreach;env_binding;%nn;
+        %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
+         and env.key!="k1" and env.key!="k2" and env.key!="k3"
+         and env.key!="bi" and env.key!="bd" and env.key!="ma" and env.key!="de" and env.key!="bu"
+         and env.key!="surn" and env.key!="date_sort" and env.key!="i0")%env.key;=%env.val;&%nn;
+        %elseif(env.key="i0")i%nb;=%env.val;&%end;%nn;
+        %end;%nn;
+        %for;i;0;nb;%if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%end;
+                    %else;&t%expr(nb)=%apply;tags%with;%apply;get_ip(0)%and;%end;%end;%end;">%nn;
+      <i class="fa fa-bezier-curve mr-2 mt-3"></i>[*multi relations graph] (%nb;)%nn;
+    </a>
+  %end;
+%else;
+  <i class="fa fa-bezier-curve mr-2 mt-3"></i>[*multi relations graph] (%nb;)<br>
+  [*rlm_nbr too large]
 %end;
 
 %empty_sorted_list
