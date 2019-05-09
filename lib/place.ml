@@ -581,8 +581,11 @@ let print_places_surnames conf base array long searchl=
 let str_replace str c1 c2 =
   let bstr = Bytes.of_string str in
   let rec loop bstr i =
-    if bstr.[i] = c1 then Bytes.set bstr i c2;
-    if i < (Bytes.length bstr - 1) then loop bstr (i+1)
+    if i < (Bytes.length bstr - 1) then
+      begin
+      if Bytes.get bstr i = c1 then Bytes.set bstr i c2;
+      loop bstr (i+1)
+      end
   in loop bstr 0;
   Bytes.to_string bstr
 
