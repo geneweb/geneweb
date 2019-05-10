@@ -613,8 +613,6 @@ message ModificationStatus {
   optional int32 index = 3;
 }
 
-
-
 enum NotifBirthdayParams {
   CLOSE_PERSON = 0;
   DESCEND_GRAND_PARENT = 1;
@@ -635,7 +633,6 @@ message NotificationBirthday {
   optional string firstname2 = 4;
   optional string firstname3 = 5;
 }
-
 
 // ***************************************************************************
 // Premiere saisie

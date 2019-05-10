@@ -13,457 +13,40 @@ open Util
 open Api_def
 open Api_util
 
-
-
-(**/**) (* TRY WITH COMPUTE RELATION *)
-(*
-module Iper2 =
-  struct
-    type t = (Adef.iper * int)
-    let compare (i1, _) (i2, _) =
-      Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
-  end
-
-module IperSet2 = Set.Make(Iper2) ;;
-
-
-let close_persons conf base ip nb_gen_asc nb_gen_desc spouse_ascend =
-  let _ = load_descends_array base in
-  let _ = load_unions_array base in
-  (* On construit la liste des plus vieux ancêtre pour obtenir *)
-  (* toute la descendances correspondant aux proches.          *)
-  let ascends = ref [] in
-  let next_gen_ascend curr_gen =
-    let rec loop curr_gen next_gen =
-      match curr_gen with
-      | [] -> next_gen
-      | (ip, gen) :: l ->
-          let asc = pget conf base ip in
-          match get_parents asc with
-          | Some ifam ->
-              let cpl = foi base ifam in
-              let father = (get_father cpl, (gen + 1)) in
-              let mother = (get_mother cpl, (gen + 1)) in
-              loop l (father :: mother :: next_gen)
-          | None ->
-              let _ = ascends := (ip, gen) :: !ascends in
-              loop l next_gen
-    in
-    loop curr_gen []
+let close_person_relation conf base ips gen_desc =
+  (* First, build the list of oldest ancestors of each branch *)
+  let asc = Hashtbl.create 32 in
+  (* Make sure that ref personne is first element of the list (because of implex) *)
+  let rec loop_asc max_gen gen ip =
+    if not @@ Hashtbl.mem asc ip then begin
+      let p = pget conf base ip in
+      match get_parents p with
+      | Some ifam when gen < max_gen ->
+        let cpl = foi base ifam in
+        loop_asc max_gen (gen + 1) (get_father cpl) ;
+        loop_asc max_gen (gen + 1) (get_mother cpl)
+      | _ -> Hashtbl.add asc ip (gen, p)
+    end
   in
-  let build_ascend l nb_gen =
-    let rec loop l gen =
-      if gen = nb_gen then List.append !ascends l
-      else loop (next_gen_ascend l) (gen + 1)
-    in loop l 0
+  List.iter (fun (ip, max_gen) -> loop_asc max_gen 0 ip) ips ;
+  let desc = Hashtbl.create 64 in
+  let skip = Hashtbl.create 64 in
+  let rec loop_desc gen ip =
+    if not @@ Hashtbl.mem skip ip then begin
+      let p = pget conf base ip in
+      Hashtbl.add skip ip true ;
+      Hashtbl.replace desc ip p ;
+      Array.iter
+        (fun ifam ->
+           let sp = Gutil.spouse ip (foi base ifam) in
+           Hashtbl.replace desc sp (pget conf base sp) )
+        (get_family p) ;
+      if gen > gen_desc then
+        List.iter (loop_desc (gen - 1)) @@ ChangeChildren.select_children_of base p
+    end
   in
-  (* Liste de la personne et conjoints dont on veut les proches *)
-  let gen_0 =
-    if spouse_ascend then
-      let p = poi base ip in
-      let spl =
-        List.map
-          (fun ifam ->
-            let fam = foi base ifam in
-            (spouse ip fam, 0) )
-          (Array.to_list (get_family p))
-      in
-      build_ascend ((ip, 0) :: spl) nb_gen_asc
-    else
-      let p = poi base ip in
-      let spl =
-        List.map
-          (fun ifam ->
-            let fam = foi base ifam in
-            (spouse ip fam, 0) )
-          (Array.to_list (get_family p))
-      in
-      let spl = build_ascend spl 1 in
-      let asc = build_ascend [(ip, 0)] nb_gen_asc in
-      List.append asc spl
-  in
-  (* On construit la liste de tous les descendants, *)
-  (* cela correspond à la liste des proches.        *)
-  let close_persons = ref IperSet.empty in
-  let mark_fam = Array.make (nb_of_families base) false in
-  let next_gen_descend curr_gen =
-    let rec loop curr_gen next_gen =
-      match curr_gen with
-      | [] -> IperSet2.elements !next_gen
-      | (ip, gen) :: l ->
-          close_persons := IperSet.add ip !close_persons;
-          (* Si la génération suivante est trop 'basse', on ne l'ajoute pas *)
-          if gen <= nb_gen_desc then loop l next_gen
-          else
-            begin
-              let p = poi base ip in
-              Array.iter
-                (fun ifam ->
-                  if mark_fam.(Adef.int_of_ifam ifam) then ()
-                  else
-                    begin
-                      Array.set mark_fam (Adef.int_of_ifam ifam) true;
-                      let fam = foi base ifam in
-                      next_gen := IperSet2.add (spouse ip fam, gen) !next_gen;
-                      Array.iter
-                        (fun ip -> next_gen := IperSet2.add (ip, gen-1) !next_gen)
-                        (get_children fam);
-                    end)
-                (get_family p);
-              loop l next_gen
-            end
-    in
-    loop curr_gen (ref IperSet2.empty)
-  in
-  let rec build_descend curr_gen =
-    if curr_gen = [] then IperSet.elements !close_persons
-    else build_descend (next_gen_descend curr_gen)
-  in
-  build_descend gen_0
-;;
-
-let print_close_person_relations2 conf base =
-  let cpp = get_params conf Mext.parse_close_persons_params in
-  let base_loop = has_base_loop conf base in
-  let ref_person = cpp.M.Close_persons_params.person in
-  let sn = ref_person.M.Reference_person.n in
-  let fn = ref_person.M.Reference_person.p in
-  let occ = ref_person.M.Reference_person.oc in
-  let asc =
-    match cpp.M.Close_persons_params.nb_gen_asc with
-    | Some n -> max 1 (Int32.to_int n)
-    | None -> 2
-  in
-  let desc =
-    match cpp.M.Close_persons_params.nb_gen_asc with
-    | Some n -> (- (max 1 (Int32.to_int n)))
-    | None -> (-3)
-  in
-  let spouse = cpp.M.Close_persons_params.spouse_ascend in
-  let only_recent = cpp.M.Close_persons_params.only_recent in
-  let list =
-    match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
-    | Some ip ->
-        close_person_relation conf base ip asc desc spouse
-    | None -> []
-  in
-  let list =
-    if only_recent then
-      reduce_to_recent conf (List.map (fun ip -> poi base ip) list)
-    else List.map (fun ip -> poi base ip) list
-  in
-  let list = M.List_person_relation.({person_relations = list}) in
-  let data = Mext.gen_list_person_relation list in
-  print_result conf data
-;;
-
-*)
-
-
-
-
-
-(**/**)
-
-module Iper3 =
-  struct
-    type t = (Adef.iper * int * M.relation_type)
-    let compare (i1, _, _) (i2, _, _) =
-      Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
-  end
-
-module IperSet3 = Set.Make(Iper3) ;;
-
-let compute_related r_type level =
-  match r_type with
-  | Adoption ->
-      (match level with
-      | 1 -> `adoptive_parent
-      | (-1) -> `adoptive_child
-      | _ -> `no_relation)
-  | Recognition ->
-      (match level with
-      | 1 -> `recognized_parent
-      | (-1) -> `recognized_child
-      | _ -> `no_relation)
-  | CandidateParent ->
-      (match level with
-      | 1 -> `candidate_parent
-      | (-1) -> `candidate_child
-      | _ -> `no_relation)
-  | GodParent ->
-      (match level with
-      | 1 -> `god_parent
-      | (-1) -> `god_child
-      | _ -> `no_relation)
-  | FosterParent ->
-      (match level with
-      | 1 -> `foster_parent
-      | (-1) -> `foster_child
-      | _ -> `no_relation)
-;;
-
-let compute_rel_sp r_type =
-  match r_type with
-  | `self -> `spouse
-  | `spouse -> `step_brother
-  | `sibling -> `step_brother
-  | `step_brother -> `step_brother
-  | `parent -> `step_parent
-  | `uncle -> `uncle_spouse
-  | `cousin -> `cousin_spouse
-  | `child -> `step_child
-  | `grand_child -> `grand_child_spouse
-  | `nephew -> `nephew_spouse
-  | `nephew_spouse -> `nephew_spouse_spouse
-  | `grand_nephew -> `grand_nephew_spouse
-  | `grand_nephew_spouse -> `grand_nephew_spouse_spouse
-  | `great_grand_nephew -> `great_grand_nephew_spouse
-  | `great_grand_nephew_spouse -> `great_grand_nephew_spouse_spouse
-  | `great_grand_child -> `great_grand_child_spouse
-  | `child_cousin -> `child_cousin_spouse
-  | `grand_child_cousin -> `grand_child_cousin_spouse
-  | `great_grand_child_cousin -> `great_grand_child_cousin_spouse
-  | _ -> `no_relation
-;;
-
-let compute_rel r_type level =
-  match r_type with
-  | `self ->
-      (match level with
-      | 0 -> `sibling
-      | 1 -> `parent
-      | (-1) -> `child
-      | _ -> `no_relation)
-  | `spouse ->
-      (match level with
-      | 0 -> `step_brother
-      | 1 -> `step_parent
-      | (-1) -> `great_grand_child_cousin
-      | _ -> `no_relation)
-  | `parent ->
-      (match level with
-      | 0 -> `uncle
-      | 1 -> `grand_parent
-      | _ -> `no_relation)
-  | `uncle ->
-      (match level with
-      | (-1) -> `cousin
-      | _ -> `no_relation)
-  | `sibling ->
-      (match level with
-      | 0 -> `sibling
-      | 1 -> `grand_parent
-      | (-1) -> `nephew
-      | _ -> `no_relation)
-  | `child ->
-      (match level with
-      | (-1) -> `grand_child
-      | _ -> `no_relation)
-  | `grand_child ->
-      (match level with
-      | (-1) -> `great_grand_child
-      | _ -> `no_relation)
-  | `step_brother ->
-      (match level with
-      | (-1) -> `nephew_spouse
-      | _ -> `no_relation)
-  | `nephew_spouse ->
-      (match level with
-      | (-1) -> `grand_nephew_spouse
-      | _ -> `no_relation)
-  | `grand_nephew_spouse ->
-      (match level with
-      | (-1) -> `great_grand_nephew_spouse
-      | _ -> `no_relation)
-  | `cousin ->
-      (match level with
-      | (-1) -> `child_cousin
-      | _ -> `no_relation)
-  | `child_cousin ->
-      (match level with
-      | (-1) -> `grand_child_cousin
-      | _ -> `no_relation)
-  | `grand_child_cousin ->
-      (match level with
-      | (-1) -> `great_grand_child_cousin
-      | _ -> `no_relation)
-  | `nephew ->
-      (match level with
-      | (-1) -> `grand_nephew
-      | _ -> `no_relation)
-  | `grand_nephew ->
-      (match level with
-      | (-1) -> `great_grand_nephew
-      | _ -> `no_relation)
-  | _ -> `no_relation
-;;
-
-
-let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend =
-(*
-  let () = load_descends_array base in
-  let () = load_unions_array base in
-  let () = load_couples_array base in
-*)
-  (* On construit la liste des plus vieux ancêtre pour obtenir *)
-  (* toute la descendances correspondant aux proches.          *)
-  let ref_close_person = poi base ip in
-  let ascends = ref [] in
-  let next_gen_ascend curr_gen =
-    let rec loop curr_gen next_gen =
-      match curr_gen with
-      | [] -> next_gen
-      | (ip, gen, r_type) :: l ->
-          let asc = pget conf base ip in
-          match get_parents asc with
-          | Some ifam ->
-              let cpl = foi base ifam in
-              let father = (get_father cpl, (gen + 1), compute_rel r_type 1) in
-              let mother = (get_mother cpl, (gen + 1), compute_rel r_type 1) in
-              let child =
-                List.map
-                  (fun ip_c ->
-                    if ip_c = ip then (ip, gen, r_type)
-                    else (ip_c, gen, compute_rel r_type 0))
-                  (Array.to_list (get_children cpl))
-              in
-              ascends := List.append !ascends child;
-              loop l (father :: mother :: next_gen)
-          | None ->
-              ascends := (ip, gen, r_type) :: !ascends;
-              loop l next_gen
-    in
-    loop curr_gen []
-  in
-  let build_ascend l nb_gen =
-    let rec loop l gen =
-      ascends := List.append !ascends l;
-      if gen = nb_gen then !ascends
-      else loop (next_gen_ascend l) (gen + 1)
-    in loop l 0
-  in
-  (* Liste de la personne et conjoints dont on veut les proches *)
-  let _ =
-    (* on veut les ascendants de la personne et ses conjoints *)
-    if spouse_ascend then
-      let p = ref_close_person in
-      let spl =
-        List.map
-          (fun ifam ->
-            let fam = foi base ifam in
-            (Gutil.spouse ip fam, 0, `spouse) )
-          (Array.to_list (get_family p))
-      in
-      build_ascend ((ip, 0, `self) :: spl) nb_gen_asc
-    (* on ne veut que les parents du conjoint *)
-    else
-      let p = ref_close_person in
-      let spl =
-        List.map
-          (fun ifam ->
-            let fam = foi base ifam in
-            (Gutil.spouse ip fam, 0, `spouse) )
-          (Array.to_list (get_family p))
-      in
-      let spl = build_ascend spl 1 in
-      let asc = build_ascend [(ip, 0, `self)] nb_gen_asc in
-      List.append asc spl
-  in
-  (* On construit la liste de tous les descendants, *)
-  (* cela correspond à la liste des proches.        *)
-  let close_persons = ref IperSet3.empty in
-  let mark_fam = Array.make (nb_of_families base) false in
-  let next_gen_descend curr_gen =
-    let rec loop curr_gen next_gen =
-      match curr_gen with
-      | [] -> IperSet3.elements !next_gen
-      | (ip, gen, r_type) :: l ->
-          close_persons := IperSet3.add (ip, gen, r_type) !close_persons;
-          (* Si la génération suivante est trop 'basse', on ne l'ajoute pas *)
-          if gen <= nb_gen_desc then loop l next_gen
-          else
-            begin
-              let p = poi base ip in
-              Array.iter
-                (fun ifam ->
-                  if mark_fam.(Adef.int_of_ifam ifam) then ()
-                  else
-                    begin
-                      Array.set mark_fam (Adef.int_of_ifam ifam) true;
-                      let fam = foi base ifam in
-                      next_gen :=
-                        IperSet3.add
-                          (Gutil.spouse ip fam, gen, compute_rel_sp r_type)
-                          !next_gen;
-                      (* On marque la famille du conjoint sinon, en cas de multi
-                         marriage, on a la descendance de chaque conjoint *)
-                      Array.iter
-                        (fun ifam -> Array.set mark_fam (Adef.int_of_ifam ifam) true)
-                        (get_family (poi base (Gutil.spouse ip fam)));
-                      Array.iter
-                        (fun ip ->
-                          next_gen :=
-                            IperSet3.add
-                              (ip, gen-1, compute_rel r_type (-1))
-                              !next_gen)
-                        (get_children fam);
-                    end)
-                (get_family p);
-              loop l next_gen
-            end
-    in
-    loop curr_gen (ref IperSet3.empty)
-  in
-  let rec build_descend curr_gen =
-    if curr_gen = [] then !close_persons
-    else build_descend (next_gen_descend curr_gen)
-  in
-  let _ = build_descend (List.rev !ascends) in
-  let _ =
-    List.iter
-      (fun r ->
-        (match r.r_fath with
-        | Some ip ->
-            close_persons := IperSet3.add (ip, 0, compute_related r.r_type 1) !close_persons
-        | None -> ());
-        (match r.r_moth with
-        | Some ip ->
-            close_persons := IperSet3.add (ip, 0, compute_related r.r_type 1) !close_persons
-        | None -> ()))
-      (get_rparents ref_close_person)
-  in
-  let _ =
-    List.iter
-      (fun ip ->
-        let p = poi base ip in
-        List.iter
-          (fun r ->
-            (match r.r_fath with
-            | Some _ ->
-                close_persons := IperSet3.add (ip, 0, compute_related r.r_type (-1)) !close_persons
-            | None -> ());
-            (match r.r_moth with
-            | Some _ ->
-                close_persons := IperSet3.add (ip, 0, compute_related r.r_type (-1)) !close_persons
-            | None -> ()))
-          (get_rparents p))
-      (get_related ref_close_person)
-  in
-  let _ =
-    let ifam = get_family ref_close_person in
-    List.iter
-      (fun ifam ->
-        let fam = foi base ifam in
-        List.iter
-          (fun ip ->
-            close_persons := IperSet3.add (ip, 0, `witness) !close_persons)
-          (Array.to_list (get_witnesses fam)))
-      (Array.to_list (ifam))
-  in
-  IperSet3.elements !close_persons
-;;
-
+  Hashtbl.iter (fun ip (gen, _p) -> loop_desc gen ip) asc ;
+  Hashtbl.fold (fun _k v acc -> v :: acc) desc []
 
 let print_close_person_relations conf base =
   let cpp = get_params conf Mext.parse_close_persons_params in
@@ -483,10 +66,20 @@ let print_close_person_relations conf base =
     | Some n -> (- (max 1 (Int32.to_int n)))
     | None -> (-3)
   in
-  let spouse = cpp.M.Close_persons_params.spouse_ascend in
   let list =
     match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
-    | Some ip -> close_person_relation conf base ip asc desc spouse
+    | Some ip ->
+      let ips =
+        let sp_lvl =
+          if cpp.M.Close_persons_params.spouse_ascend
+          then asc else 1
+        in
+        (ip, asc)
+        :: Array.fold_left
+          (fun acc f -> (Gutil.spouse ip (foi base f), sp_lvl) :: acc)
+          [] (get_family @@ pget conf base ip)
+      in
+      close_person_relation conf base ips desc
     | None -> []
   in
   let () = Perso.build_sosa_ht conf base in
@@ -495,18 +88,11 @@ let print_close_person_relations conf base =
     begin
       let list =
         List.fold_left
-          (fun accu (ip, _, r_type) ->
-            let p = poi base ip in
+          (fun accu p ->
             if apply_filters_p conf filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
-              let p =
-                {
-                  M.Full_person_relation.person = p;
-                  relation = r_type;
-                }
-              in
               p :: accu
-            else accu )
+            else accu)
           [] list
       in
       let data =
@@ -515,8 +101,8 @@ let print_close_person_relations conf base =
           Mext.gen_internal_int32 len
         else
           begin
-            let list = M.List_full_person_relation.({person_relations = list}) in
-            Mext.gen_list_full_person_relation list
+            let list = M.List_full_persons.({persons = list}) in
+            Mext.gen_list_full_persons list
           end
       in
       print_result conf data
@@ -525,16 +111,9 @@ let print_close_person_relations conf base =
     begin
       let list =
         List.fold_left
-          (fun accu (ip, _, r_type) ->
-            let p = poi base ip in
+          (fun accu p ->
             if apply_filters_p conf filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
-              let p =
-                {
-                  M.Person_relation.person = p;
-                  relation = r_type;
-                }
-              in
               p :: accu
             else accu )
           [] list
@@ -545,8 +124,8 @@ let print_close_person_relations conf base =
           Mext.gen_internal_int32 len
         else
           begin
-            let list = M.List_person_relation.({person_relations = list}) in
-            Mext.gen_list_person_relation list
+            let list = M.List_persons.({list_persons = list}) in
+            Mext.gen_list_persons list
           end
       in
       print_result conf data
