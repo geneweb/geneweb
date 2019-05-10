@@ -2161,6 +2161,16 @@ and eval_simple_str_var conf base env (_, p_auth) =
         Vcnt c -> incr c; ""
       | _ -> ""
       end
+  | "keydir_img" ->
+      begin match get_env "keydir_img" env with
+        Vstring s -> s
+      | _ -> raise Not_found
+      end
+  | "keydir_img_key" ->
+      begin match get_env "keydir_img" env with
+        Vstring s -> (Mutil.tr '+' ' ' (code_varenv s))
+      | _ -> raise Not_found
+      end
   | "lazy_force" ->
       begin match get_env "lazy_print" env with
         Vlazyp r ->
@@ -3831,6 +3841,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
   | "has_image" -> Util.has_image conf base p
+  | "has_keydir" -> Util.has_keydir conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -4097,6 +4108,52 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_env "p_link" env with
         Vbool _ -> ""
       | _ -> string_of_iper (get_iper p)
+      end
+  | "keydir" -> default_image_name base p
+  | "keydir_img_nbr" ->
+    string_of_int (List.length (get_keydir conf base p))
+  | "keydir_img_notes" ->
+      begin match get_env "keydir_img_notes" env with
+        Vstring f ->
+          let ext = Filename.extension f in
+          let fname = Filename.chop_suffix f ext in
+          get_keydir_img_notes conf base p fname
+      | _ -> raise Not_found
+      end
+  | "keydir_img_src" ->
+      begin match get_env "keydir_img_src" env with
+        Vstring f ->
+          begin
+            let ext = Filename.extension f in
+            let fname = Filename.chop_suffix f ext in
+            let n = get_keydir_img_notes conf base p fname in
+            match (String.index_opt n '\n') with
+              Some i ->
+                let s1 = if (String.length n) > i then (String.sub n (i + 1)
+                  (String.length n - i - 1)) else ""
+                in
+                begin
+                  match (String.index_opt s1 '\n') with
+                    Some j -> String.sub s1 0 j
+                  | None -> ""
+                end
+            | None -> ""
+          end
+      | _ -> raise Not_found
+      end
+  | "keydir_img_title" ->
+      begin match get_env "keydir_img_title" env with
+        Vstring f ->
+          begin
+            let ext = Filename.extension f in
+            let fname = Filename.chop_suffix f ext in
+            let n = get_keydir_img_notes conf base p fname in
+            match (String.index_opt n '\n') with
+              Some i ->
+                String.sub n 0 i
+            | None -> ""
+          end
+      | _ -> raise Not_found
       end
   | "mark_descendants" ->
       begin match get_env "desc_mark" env with
@@ -4815,6 +4872,7 @@ let print_foreach conf base print_ast eval_expr =
         print_foreach_event_witness_relation env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
+    | "img_in_keydir" -> print_foreach_img_in_keydir env al ep
     | "nobility_title" -> print_foreach_nobility_title env al ep
     | "parent" -> print_foreach_parent env al ep
     | "qualifier" -> print_foreach_qualifier env al ep
@@ -5431,6 +5489,25 @@ let print_foreach conf base print_ast eval_expr =
         List.iter (print_ast env ep) al; loop (succ i)
     in
     loop 1
+  and print_foreach_img_in_keydir env al (p, p_auth as ep) =
+    if not p_auth && is_hide_names conf p then ()
+    else
+      let list = get_keydir conf base p in
+      let rec loop first cnt =
+        function
+          a :: l ->
+          let env =
+            ("keydir_img", Vstring a) ::
+            ("keydir_img_notes", Vstring a) ::
+            ("keydir_img_title", Vstring a) ::
+            ("keydir_img_src", Vstring a) ::
+            ("first", Vbool first) :: ("last", Vbool (l = [])) ::
+            ("cnt", Vint cnt) :: env
+          in
+            List.iter (print_ast env ep) al; loop false (cnt + 1) l
+        | [] -> ()
+      in
+      loop true 1 list
   and print_foreach_nobility_title env al (p, p_auth as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in

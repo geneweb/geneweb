@@ -368,30 +368,22 @@ let default_safe_html_allowed_tags =
   ; ("http://www.w3.org/1999/xhtml", "section")
   ]
 
-let safe_html_allowed_tags =
-  lazy begin
-    if !allowed_tags_file = "" then default_safe_html_allowed_tags
-    else begin
-      let ic = open_in !allowed_tags_file in
-      let rec loop tags =
-        match input_line ic with
-        | tag ->
-          let ns, tag =
-            match String.split_on_char ' ' tag with
-            | [ ns ; tag ] -> (ns, tag)
-            | [ tag ] -> "http://www.w3.org/1999/xhtml", tag
-            | _ -> assert false
-          in
-          loop ((ns, String.lowercase_ascii tag) :: tags)
-        | exception End_of_file ->
-          close_in ic ;
-          tags
-      in
-      loop []
-    end
-  end
+(* ********************************************************************* *)
+(*  [Fonc] value sanitize_html : string -> string                        *)
+(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
+                    les éléments dangereux.
+    [Args] :
+      - html_str : Chaîne de caractères à assainir.
+    [Retour] : La chaîne de caractères assainie.                         *)
+(* ********************************************************************* *)
+let sanitize_html html_str =
+  (* Enlève les évènements DOM. *)
+  let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
+  Str.global_replace regexp_dom_events "" html_str
 
-let escape_aux count blit str =
+(** [escape_html str] replaces '&', '"', '<' and '>'
+    with their corresponding character entities (using entity number) *)
+let escape_html str =
   let strlen = String.length str in
   let rec loop acc i =
     if i < strlen
@@ -2543,7 +2535,6 @@ let old_branch_of_sosa conf base ip sosa =
 
 let space_to_unders = Mutil.tr ' ' '_'
 
-
 (* ************************************************************************** *)
 (*  [Fonc] default_image_name_of_key : string -> string -> int -> string      *)
 (** [Description] : Renvoie à partir de la clé d'une personne, le nom par
@@ -2576,13 +2567,94 @@ let default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
-let auto_image_file conf base p =
+(*let auto_image_file conf base p =
   let s = default_image_name base p in
   let f = Filename.concat (base_path ["images"] conf.bname) s in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
   else None
+*)
+let auto_image_file ?bak:(b=false) conf base p =
+  let s = default_image_name base p in
+  let dir =
+      if b then Filename.concat (base_path ["images"] conf.bname) "saved"
+      else (base_path ["images"] conf.bname)
+  in
+  let f = Filename.concat dir s in
+  if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
+  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
+  else None
+
+let keydir conf base p =
+  let k = default_image_name base p in
+  let f = String.concat Filename.dir_sep
+    [(base_path ["src"] conf.bname); "images"; k]
+  in
+  try if Sys.is_directory f then Some f else None
+  with Sys_error _ -> None
+
+let keydir_old conf base p =
+  let k = default_image_name base p in
+  let f = String.concat Filename.dir_sep
+    [(base_path ["src"] conf.bname); "images"; k ; "saved" ]
+  in
+  try if Sys.is_directory f then Some f else None
+  with Sys_error _ -> None
+
+let get_keydir_img_notes conf base p fname =
+  let k = default_image_name base p in
+  let fname =
+    String.concat Filename.dir_sep
+      [(base_path ["src"] conf.bname); "images"; k ; fname ^ ".txt" ]
+  in
+  let s = if Sys.file_exists fname then
+    let ic = Secure.open_in fname in
+    let s = really_input_string ic (in_channel_length ic) in
+    close_in ic; s
+    else ""
+  in s
+
+let out_keydir_img_notes conf base p fname s =
+  let k = default_image_name base p in
+  let fname =
+    String.concat Filename.dir_sep
+      [(base_path ["src"] conf.bname); "images";  k ; fname ^ ".txt" ]
+  in
+  try
+    let oc = Secure.open_out fname in
+    output_string oc s;
+    close_out oc;
+  with Sys_error _ -> ()
+
+let get_keydir_old conf base p =
+  match keydir_old conf base p with
+    Some f ->
+      Array.fold_right (fun f1 l ->
+        if f1.[0] <> '.' && Filename.extension f1 <> ".txt" &&
+          ( Filename.extension f1 = ".jpg" ||
+            Filename.extension f1 = ".gif" ||
+            Filename.extension f1 = ".png" )
+        then
+          (* vérifier ici le type des images autorisées  *)
+          ( f1 :: l ) else l)
+          (Sys.readdir f) []
+  | None -> []
+
+let get_keydir conf base p =
+  match keydir conf base p with
+    Some f ->
+      Array.fold_right (fun f1 l ->
+        if f1.[0] <> '.' && Filename.extension f1 <> ".txt" &&
+          ( Filename.extension f1 = ".jpg" ||
+            Filename.extension f1 = ".gif" ||
+            Filename.extension f1 = ".png" )
+        then
+          (* vérifier ici le type des images autorisées  *)
+          ( f1 :: l ) else l)
+          (Sys.readdir f) []
+  | None -> []
 
 (* ********************************************************************** *)
 (*  [Fonc] image_and_size : config -> base -> person -> image_size        *)
@@ -2598,11 +2670,11 @@ let auto_image_file conf base p =
         - image_size
     [Rem] : Exporté en clair hors de ce module.                            *)
 (* *********************************************************************** *)
-let image_and_size conf base p image_size =
+let image_and_size ?bak conf base p image_size =
   if not conf.no_image && authorized_age conf base p then
     match sou base (get_image p) with
       "" ->
-        begin match auto_image_file conf base p with
+        begin match auto_image_file ?bak conf base p with
           Some f -> Some (true, f, image_size f None)
         | None -> None
         end
@@ -2659,6 +2731,11 @@ let has_image conf base p =
     (conf.wizard || conf.friend ||
      not (Mutil.contains (sou base (get_image p)) "/private/")) ||
     auto_image_file conf base p <> None
+  else false
+
+let has_keydir conf base p =
+  if not conf.no_image && authorized_age conf base p then
+    keydir conf base p <> None
   else false
 
 let gen_only_printable or_nl s =

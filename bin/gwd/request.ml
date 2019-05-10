@@ -23,7 +23,7 @@ open Util
 let set_senv conf vm vi =
   conf.senv <- ["em", vm; "ei", vi];
   begin match p_getenv conf.env "image" with
-    Some "off" -> conf.senv <- conf.senv @ ["image", "off"]
+    Some "on" -> conf.senv <- conf.senv @ ["image", "on"]
   | _ -> ()
   end;
   begin match p_getenv conf.env "long" with
@@ -107,6 +107,7 @@ let family_m conf base =
       | "DEL_FAM_OK" -> handler.del_fam_ok
       | "DEL_IMAGE" -> handler.del_image
       | "DEL_IMAGE_OK" -> handler.del_image_ok
+      | "DEL_IMAGE_C_OK" -> handler.del_image_c_ok
       | "DEL_IND" -> handler.del_ind
       | "DEL_IND_OK" -> handler.del_ind_ok
       | "F" -> handler.f
@@ -124,6 +125,7 @@ let family_m conf base =
       | "HIST_CLEAN_OK" -> handler.hist_clean_ok
       | "HIST_DIFF" -> handler.hist_diff
       | "HIST_SEARCH" -> handler.hist_search
+      | "IMAGE_C" -> handler.image_c
       | "IMH" -> handler.imh
       | "INV_FAM" -> handler.inv_fam
       | "INV_FAM_OK" -> handler.inv_fam_ok
@@ -166,10 +168,12 @@ let family_m conf base =
       | "R" -> handler.r
       | "REQUEST" -> handler.request
       | "RL" -> handler.rl
+      | "RESET_IMAGE_C_OK" -> handler.reset_image_c_ok
       | "RLM" -> handler.rlm
       | "S" -> handler.s
       | "SND_IMAGE" -> handler.snd_image
       | "SND_IMAGE_OK" -> handler.snd_image_ok
+      | "SND_IMAGE_C_OK" -> handler.snd_image_c_ok
       | "SRC" -> handler.src
       | "STAT" -> handler.stat
       | "CHANGE_WIZ_VIS" -> handler.change_wiz_vis
@@ -357,8 +361,12 @@ let log_count r =
   | None -> ()
 
 let print_moved conf s =
-  Util.include_template conf ["bname", conf.bname] "moved"
-    (fun () ->
+  match Util.open_templ conf "moved" with
+    Some ic ->
+      let env = ["bname", conf.bname] in
+      let conf = {conf with is_printed_by_template = false} in
+      Util.html conf; Templ.copy_from_templ conf env ic
+  | None ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname s in
       Hutil.header_no_page_title conf title;
       Wserver.printf "The database %s has moved to:\n<dl><dt><dd>\n"
@@ -427,11 +435,11 @@ let treat_request conf base =
           match p_getenv conf.env "ptempl" with
             Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
               begin match find_person_in_env conf base "" with
-                Some p -> Perso.interp_templ tname conf base p
-              | None -> family_m conf base
+                | Some p -> Perso.interp_templ tname conf base p
+                | None -> family_m conf base
               end
-          | _ -> family_m conf base
-        end
+            | _ -> family_m conf base
+          end
   end;
   Wserver.wflush ()
 
@@ -496,6 +504,5 @@ let treat_request_on_base conf =
 
 let treat_request_on_nobase conf =
   try family_m_nobase conf; Wserver.wflush () with exc -> raise exc
-
 
 end

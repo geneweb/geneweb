@@ -80,10 +80,10 @@ let print_image_file fname =
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-let print_personal_image conf base p =
-  match Util.image_and_size conf base p (fun _ _ -> Some (1, 1)) with
+let print_personal_image ?bak conf base p =
+  match Util.image_and_size ?bak conf base p (fun _ _ -> Some (1, 1)) with
     Some (true, f, _) ->
-      if print_image_file f then () else Hutil.incorrect_request conf
+      if not (print_image_file f) then Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
@@ -100,21 +100,37 @@ let print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  if fname = Filename.basename fname then
+  (*if fname = Filename.basename fname then*)
     let fname = Util.source_image_file_name conf.bname fname in
     if print_image_file fname then () else Hutil.incorrect_request conf
-  else Hutil.incorrect_request conf
+  (*else Hutil.incorrect_request conf*)
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
-let print conf base =
+let print ?(bak=false) conf base =
+  match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
+  | (Some f, Some p) ->
+      let k = Util.default_image_name base p in
+      let f =
+          if bak then String.concat Filename.dir_sep [k; "saved"; f]
+          else String.concat Filename.dir_sep [k; f]
+      in
+      print_source_image conf f
+  | (Some f, _) ->
+      print_source_image conf f
+  | (_, Some p) ->
+      print_personal_image ~bak:bak conf base p
+  | (_, _) -> Hutil.incorrect_request conf
+
+(*let print conf base =
   match Util.p_getenv conf.env "s" with
     Some f -> print_source_image conf f
   | None ->
       match Util.find_person_in_env conf base "" with
         Some p -> print_personal_image conf base p
       | _ -> Hutil.incorrect_request conf
+*)
 
 (* ************************************************************************** *)
 (*  [Fonc] print_html : config -> 'a -> unit                                  *)

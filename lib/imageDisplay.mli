@@ -10,7 +10,7 @@ val print_image_file : string -> bool
     [Args] :
       - config : configuration de la requête
       - base : base de donnée sélectionnée                                  *)
-val print : Config.config -> Gwdb.base -> unit
+val print : ?bak:bool -> Config.config -> Gwdb.base -> unit
 
 (** [Description] : Affiche une image seule dans une page HTML.
     [Args] :

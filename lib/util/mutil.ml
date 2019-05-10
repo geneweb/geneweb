@@ -538,194 +538,37 @@ let normalize_utf_8 s =
   add `End ;
   Buffer.contents b
 
-(* Copied from OCaml's List.sort_uniq and adapted to our needs
-   (commit e5ebec7 from Nov 7, 2019) *)
-let list_map_sort_uniq (fn : 'a -> 'b) l =
-  let open List in
-  let rec rev_merge l1 l2 accu =
-    match l1, l2 with
-    | [], l2 -> rev_append l2 accu
-    | l1, [] -> rev_append l1 accu
-    | h1::t1, h2::t2 ->
-      let c = compare h1 h2 in
-      if c = 0 then rev_merge t1 t2 (h1::accu)
-      else if c < 0
-      then rev_merge t1 l2 (h1::accu)
-      else rev_merge l1 t2 (h2::accu)
+let ls_r dirs =
+  let rec loop result = function
+    | f :: fs when Sys.is_directory f ->
+      Sys.readdir f
+      |> Array.to_list
+      |> List.rev_map (Filename.concat f)
+      |> List.rev_append fs
+      |> loop (f :: result)
+    | f :: fs -> loop (f :: result) fs
+    | [] -> result
   in
-  let rec rev_merge_rev l1 l2 accu =
-    match l1, l2 with
-    | [], l2 -> rev_append l2 accu
-    | l1, [] -> rev_append l1 accu
-    | h1::t1, h2::t2 ->
-      let c = compare h1 h2 in
-      if c = 0 then rev_merge_rev t1 t2 (h1::accu)
-      else if c > 0
-      then rev_merge_rev t1 l2 (h1::accu)
-      else rev_merge_rev l1 t2 (h2::accu)
-  in
-  let rec sort n l =
-    match n, l with
-    | 2, x1 :: x2 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let s =
-        let c = compare x1 x2 in
-        if c = 0 then [x1] else if c < 0 then [x1; x2] else [x2; x1]
-      in
-      (s, tl)
-    | 3, x1 :: x2 :: x3 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let x3 = fn x3 in
-      let s =
-        let c = compare x1 x2 in
-        if c = 0 then
-          let c = compare x2 x3 in
-          if c = 0 then [x2] else if c < 0 then [x2; x3] else [x3; x2]
-        else if c < 0 then
-          let c = compare x2 x3 in
-          if c = 0 then [x1; x2]
-          else if c < 0 then [x1; x2; x3]
-          else
-            let c = compare x1 x3 in
-            if c = 0 then [x1; x2]
-            else if c < 0 then [x1; x3; x2]
-            else [x3; x1; x2]
-        else
-          let c = compare x1 x3 in
-          if c = 0 then [x2; x1]
-          else if c < 0 then [x2; x1; x3]
-          else
-            let c = compare x2 x3 in
-            if c = 0 then [x2; x1]
-            else if c < 0 then [x2; x3; x1]
-            else [x3; x2; x1]
-      in
-      (s, tl)
-    | n, l ->
-      let n1 = n asr 1 in
-      let n2 = n - n1 in
-      let s1, l2 = rev_sort n1 l in
-      let s2, tl = rev_sort n2 l2 in
-      (rev_merge_rev s1 s2 [], tl)
-  and rev_sort n l =
-    match n, l with
-    | 2, x1 :: x2 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let s =
-        let c = compare x1 x2 in
-        if c = 0 then [x1] else if c > 0 then [x1; x2] else [x2; x1]
-      in
-      (s, tl)
-    | 3, x1 :: x2 :: x3 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let x3 = fn x3 in
-      let s =
-        let c = compare x1 x2 in
-        if c = 0 then
-          let c = compare x2 x3 in
-          if c = 0 then [x2] else if c > 0 then [x2; x3] else [x3; x2]
-        else if c > 0 then
-          let c = compare x2 x3 in
-          if c = 0 then [x1; x2]
-          else if c > 0 then [x1; x2; x3]
-          else
-            let c = compare x1 x3 in
-            if c = 0 then [x1; x2]
-            else if c > 0 then [x1; x3; x2]
-            else [x3; x1; x2]
-        else
-          let c = compare x1 x3 in
-          if c = 0 then [x2; x1]
-          else if c > 0 then [x2; x1; x3]
-          else
-            let c = compare x2 x3 in
-            if c = 0 then [x2; x1]
-            else if c > 0 then [x2; x3; x1]
-            else [x3; x2; x1]
-      in
-      (s, tl)
-    | n, l ->
-      let n1 = n asr 1 in
-      let n2 = n - n1 in
-      let s1, l2 = sort n1 l in
-      let s2, tl = sort n2 l2 in
-      (rev_merge s1 s2 [], tl)
-  in
-  let len = length l in
-  if len < 2 then List.map fn l else fst (sort len l)
+  loop [] dirs
 
-let list_rev_map_append f l1 l2 =
-  let rec aux acc = function
-    | [] -> acc
-    | hd :: tl -> aux (f hd :: acc) tl
-  in
-  aux l2 l1
-
-(* POSIX lockf(3), and fcntl(2), releases its locks when the process
-   that holds the locks closes ANY file descriptor that was open on that file.
-
-   i.e. Do not close channels before releasing the lock.
-*)
-#ifndef WINDOWS 
-let read_or_create ?(wait = true) ?magic fname read write =
-#else
-let read_or_create ?wait:(_ = true) ?magic fname read write =
-#endif
-  assert (Secure.check fname) ;
-  let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
-  let ic = Unix.in_channel_of_descr fd in
-#ifndef WINDOWS
-  let writelock lock =
-    assert (Unix.lseek fd 1 Unix.SEEK_SET = 1) ;
-    Unix.lockf fd lock 1 ;
-    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
-  in
-  let readlock lock =
-    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0) ;
-    Unix.lockf fd lock 1 ;
-    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
-  in
-#endif
-  let rec rd k =
-    seek_in ic 0 ;
-    if match magic with None -> true | Some m -> check_magic m ic
-    then
-      try
-        let res = read ic in
-        close_in ic ;
-        res
-      with _ -> k ()
-    else k ()
-  and wr () =
-#ifndef WINDOWS
-    (* remove all present locks *)
-    Unix.lockf fd Unix.F_ULOCK 0 ;
-    (* prevent readers from acquiring cache file *)
-    writelock Unix.F_LOCK ;
-    (* wait for current readers to finish reading
-       and prevent other writer from acquiring cache file.*)
-    readlock Unix.F_LOCK ;
-#endif
-    (* check if another writer has already updated the cache file
-       and update it if not *)
-    rd begin fun () ->
-      let oc = open_out_bin fname in
-      begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
-      let res = write oc in
-      begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
-      flush oc ;
-      close_out oc ;
-      close_in ic ;
-      res
+let rm fname =
+  try if Sys.file_exists fname then Sys.remove fname
+  with Failure _ -> 
+    begin
+      Printf.eprintf "Rm failed: %s\n" fname; flush stderr
     end
-  in
-#ifndef WINDOWS
-  writelock (if wait then Unix.F_LOCK else Unix.F_TRLOCK) ;
-  readlock Unix.F_RLOCK ;
-  writelock Unix.F_ULOCK ;
-#endif
-  rd wr
+
+let rn fname s =
+  try if Sys.file_exists fname then Sys.rename fname s
+  with Failure _ -> 
+    begin
+      Printf.eprintf "Rn failed: %s to %s\n" fname s; flush stderr
+    end
+
+let rm_rf dir =
+  if Sys.file_exists dir then
+    begin
+      let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
+      List.iter Unix.unlink files ;
+      List.iter Unix.rmdir directories
+    end

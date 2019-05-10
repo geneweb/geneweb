@@ -85,6 +85,16 @@ val contains : ?wildcard:bool -> string -> string -> bool
     If no such [p] exists, empty string [""] is returned. *)
 val get_particle : string list -> string -> string
 
+(** [ls_rs dirs]
+    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
+*)
+val ls_r : string list -> string list
+
+(** [rm_rf dir]
+    Remove directory [dir] and everything inside [dir].
+*)
+val rm_rf : string -> unit
+
 (** [rm fname]
     Remove [fname]. If [fname] does not exists, do nothing.
 *)
