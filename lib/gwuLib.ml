@@ -903,7 +903,6 @@ module Make (Select : Select) =
           (p_surname base m.m_fath) (p_first_name base m.m_moth)
           (get_new_occ m.m_moth) (p_surname base m.m_moth)
       in
-      ignore (add_linked_files gen f fsources [] : _ list);
       let s =
         let sl =
           [get_comment fam; get_fsources fam; get_marriage_note fam;
@@ -923,37 +922,20 @@ module Make (Select : Select) =
       in
       ignore (add_linked_files gen f s [] : _ list)
 
-    let get_persons_with_notes base m list =
-      let fath = m.m_fath in
-      let moth = m.m_moth in
+    let get_persons_with_notes m list =
       let list =
-        match sou base (get_notes fath), get_parents fath with
-          "", _ ->
-            begin match get_parents fath with
-              Some _ -> list
-            | None ->
-                if put_events_in_notes base fath then fath :: list else list
-            end
-        | _, Some _ -> list
-        | _ -> fath :: list
+        let fath = m.m_fath in
+        match get_parents fath with
+          Some _ -> list
+        | None -> fath :: list
       in
       let list =
-        match sou base (get_notes moth), get_parents moth with
-          "", _ ->
-            begin match get_parents moth with
-              Some _ -> list
-            | None ->
-                if put_events_in_notes base moth then moth :: list else list
-            end
-        | _, Some _ -> list
-        | _ -> moth :: list
+        let moth = m.m_moth in
+        match get_parents moth with
+          Some _ -> list
+        | None -> moth :: list
       in
-      List.fold_right
-        (fun p list ->
-           match sou base (get_notes p) with
-             "" -> if put_events_in_notes base p then p :: list else list
-           | _ -> p :: list)
-        (Array.to_list m.m_chil) list
+      Array.fold_right List.cons m.m_chil list
 
     let notes_aliases bdir =
       let fname = Filename.concat bdir "notes.alias" in
@@ -1042,7 +1024,6 @@ module Make (Select : Select) =
         Printf.sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
           (p_surname base p)
       in
-      ignore (add_linked_files gen f notes [] : _ list);
       let s =
         let sl =
           [get_notes p; get_occupation p; get_birth_note p; get_birth_src p;
@@ -1066,7 +1047,7 @@ module Make (Select : Select) =
 
     let print_notes oc base gen ml =
       let pl =
-        List.fold_right (get_persons_with_notes base) ml gen.notes_pl_p
+        List.fold_right get_persons_with_notes ml gen.notes_pl_p
       in
       let pl =
         List.fold_right
