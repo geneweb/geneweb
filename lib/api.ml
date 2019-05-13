@@ -92,18 +92,10 @@ let print_info_base conf base =
 ;;
 
 
-(* ******************************************************************** *)
-(*  [Fonc] print_loop : config -> base -> Person                        *)
-(** [Description] : Si il y a une boucle dans la base, retourne la
-                    personne qui est son propre ancêtre, une personne
-                    vide sinon.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - Person : La personne qui est son propre ancêtre.
-    [Rem] : Non exporté en clair hors de ce module.                     *)
-(* ******************************************************************** *)
+
+(** [print_loop conf base]
+    If there is a loop in the base print a person being its own ancestor.
+    Otherwise, print a dummy (empty) person instead. **)
 let print_loop conf base =
   let (base_loop, pers) =
     (ref false, ref (poi base (Adef.iper_of_int (-1))))
@@ -113,10 +105,12 @@ let print_loop conf base =
   (* la boucle (on ne check pas la base en entier). Avec cette méthode, on  *)
   (* n'a pas de ce problème.                                                *)
   let () =
+    load_ascends_array base ;
+    load_couples_array base ;
     Consang.check_noloop base
-      (function
-        | OwnAncestor p -> base_loop := true; pers := p
-        | _ -> () )
+      (function OwnAncestor p -> base_loop := true ; pers := p | _ -> () ) ;
+    clear_ascends_array base ;
+    clear_couples_array base
   in
   let p =
     if !base_loop then
@@ -136,8 +130,6 @@ let print_loop conf base =
   in
   let data = data_person p in
   print_result conf data
-;;
-
 
 (* ******************************************************************** *)
 (*  [Fonc] print_info_ind : config -> base -> unit                      *)
