@@ -305,15 +305,23 @@ let clean_ps ps =
 
 let print_html_places_surnames_long conf _base
   (array : (string list * (string * Adef.iper list) list) array) =
-  let opt = get_opt conf in
-  let k1 = match p_getenv conf.env "k1" with | Some s -> s | _ -> "" in
-  let k2 = match p_getenv conf.env "k2" with | Some s -> s | _ -> "" in
-  let list = Array.to_list array in
+  let max_rlm_nbr =
+    match p_getenv conf.env "max_rlm_nbr" with
+    | Some n -> int_of_string n
+    | None -> 
+        match p_getenv conf.base_env "max_rlm_nbr" with
+        | Some n -> int_of_string n
+        | None -> 80
+  in
   let link_to_ind =
     match p_getenv conf.base_env "place_surname_link_to_ind" with
     | Some "yes" -> true
     | _ -> false
   in
+  let opt = get_opt conf in
+  let k1 = match p_getenv conf.env "k1" with | Some s -> s | _ -> "" in
+  let k2 = match p_getenv conf.env "k2" with | Some s -> s | _ -> "" in
+  let list = Array.to_list array in
   let long =
     match p_getenv conf.env "long" with
     | Some "on" -> true
@@ -332,7 +340,7 @@ let print_html_places_surnames_long conf _base
     let (k3, k4) = get_k3 plo in
     Wserver.printf "<a href=\"%sm=N&v=%s\">%s</a>" (commd conf)
         (code_varenv sn) sn ;
-    if link_to_ind then
+    if link_to_ind && len < max_rlm_nbr then
       begin
         Wserver.printf " (<a href=\"%sm=L&surn=%s&nb=%d&nbs=3"
           (commd conf) sn (List.length ips) ;
@@ -442,6 +450,19 @@ let print_html_places_surnames_long conf _base
 
 let print_html_places_surnames_short conf _base
   (array : (string list * (string * Adef.iper list) list) array) =
+  let max_rlm_nbr =
+    match p_getenv conf.env "max_rlm_nbr" with
+    | Some n -> int_of_string n
+    | None -> 
+        match p_getenv conf.base_env "max_rlm_nbr" with
+        | Some n -> int_of_string n
+        | None -> 80
+  in
+  let link_to_ind =
+    match p_getenv conf.base_env "place_surname_link_to_ind" with
+    | Some "yes" -> true
+    | _ -> false
+  in
   let k1 = match p_getenv conf.env "k1" with | Some s -> s | _ -> "" in
   let long = p_getenv conf.env "long" = Some "on" in
   let opt = get_opt conf in
@@ -483,18 +504,24 @@ let print_html_places_surnames_short conf _base
           then "&k2=" ^ Util.code_varenv ps2 else "")
         (if not long then "&long=on" else "") title
         (if k1 = "" then ps1 else ps2) ;
-      Wserver.printf " (<a href=\"%sm=L%s%s%s%s%s&nb=%d&nbs=3" (commd conf)
-        ("&k1=" ^ (Util.code_varenv ps1))
-        (if k1 = "" then ""
-         else "&k2=" ^ (Util.code_varenv ps2))
-         (if k3 <> "" then "&k3=" ^ k3 else "")
-         (if k4 <> "" then "&k4=" ^ k4 else "")
-        opt (List.length ipl) ;
-      List.iteri (fun i ip ->
-        Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))
-      ipl ;
-      Wserver.printf "\" title=\"%s\">%d</a>)"
-        (capitale (transl conf "summary book ascendants")) (List.length ipl))
+      if link_to_ind && List.length ipl < max_rlm_nbr then
+        begin
+        Wserver.printf " (<a href=\"%sm=L%s%s%s%s%s&nb=%d&nbs=3" (commd conf)
+          ("&k1=" ^ (Util.code_varenv ps1))
+          (if k1 = "" then ""
+           else "&k2=" ^ (Util.code_varenv ps2))
+           (if k3 <> "" then "&k3=" ^ k3 else "")
+           (if k4 <> "" then "&k4=" ^ k4 else "")
+          opt (List.length ipl) ;
+        List.iteri (fun i ip ->
+          Wserver.printf "&i%d=%d" i (Adef.int_of_iper ip))
+        ipl ;
+        Wserver.printf "\" title=\"%s\">%d</a>)"
+          (capitale (transl conf "summary book ascendants")) (List.length ipl)
+        end
+      else
+        Wserver.printf " (%d)" (List.length ipl);
+      )
     new_list
 
 let print_searchl conf searchl =

@@ -52,7 +52,18 @@
           %if;(evar.substr!="" and evar.substr="on") checked%end;>
         <label class="custom-control-label" title="[*substring]" for="substr">[*substring]</label>
       </div>
-      <button type="submit" class="btn btn-primary btn-sm ml-2"
+      <div class="custom-control ml-2">
+        <input type="test" size="3" class="form-control-input" 
+          name="max_rlm_nbr" id="max_rlm_nbr"
+          value="%if;(evar.max_rlm_nbr!="")%evar.max_rlm_nbr;
+            %elseif;(bvar.max_rlm_nbr!="")%bvar.max_rlm_nbr;%else;80%end;"
+          placeholder="%if;(evar.max_rlm_nbr!="")%evar.max_rlm_nbr;
+            %elseif;(bvar.max_rlm_nbr!="")%bvar.max_rlm_nbr;%else;80%end;">
+      </div>
+      <div>
+        <label class="form-control-label" title="[*max_rlm]" for="max_rlm_nbr"> Max</label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm ml-4"
         title="[*search/case sensitive]0 [surname/surnames]1 / [places] [and] [event/events]1">
         <i class="fa fa-search mr-2"></i>Search</button>
     </div>
