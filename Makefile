@@ -101,7 +101,7 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 
 %.ml: CAMLP5_OPT=
 
-%.ml: %.camlp5
+%.ml: %.camlp5.ml
 	@([ -z "$(CAMLP5_OPT)" ] \
 	|| false \
 	&& echo "ERROR generating $@: CAMLP5_OPT variable must be defined") \
