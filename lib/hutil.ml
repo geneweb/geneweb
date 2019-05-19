@@ -133,9 +133,9 @@ let incorrect_request conf =
   Wserver.printf "</p>\n";
   trailer conf
 
-let error_cannot_access conf fname =
+let error_cannot_access hedr conf fname =
   let title _ = Wserver.printf "Error" in
-  header conf title;
+  if hedr then header conf title;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>\n";
   Wserver.printf "Cannot access file \"%s.txt\".\n" fname;
@@ -143,14 +143,14 @@ let error_cannot_access conf fname =
   Wserver.printf "</ul>\n";
   trailer conf
 
-let gen_interp header conf fname ifun env ep =
+let gen_interp hedr conf fname ifun env ep =
   let v = !(Templ.template_file) in
   Templ.template_file := fname;
   begin try
     match Templ.input_templ conf fname with
       Some astl ->
-        if header then Util.html conf; Templ.interp_ast conf ifun env ep astl
-    | None -> error_cannot_access conf fname
+        if hedr then Util.html conf; Templ.interp_ast conf ifun env ep astl
+    | None -> error_cannot_access hedr conf fname
   with e -> Templ.template_file := v; raise e
   end;
   Templ.template_file := v

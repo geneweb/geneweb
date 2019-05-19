@@ -20,6 +20,7 @@ val trim_trailing_spaces : string -> string
 val alphabetic_utf_8 : string -> string -> int
 val alphabetic : string -> string -> int
 val alphabetic_order : string -> string -> int
+val alphabetic_order_list : string list -> string list-> int
 
 val arg_list_of_string : string -> string list
 

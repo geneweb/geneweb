@@ -128,6 +128,7 @@ let family_m conf base =
       | "LB" -> handler.lb
       | "LD" -> handler.ld
       | "LINKED" -> handler.linked
+      | "L" -> handler.l
       | "LL" -> handler.ll
       | "LM" -> handler.lm
       | "LEX" -> handler.lex

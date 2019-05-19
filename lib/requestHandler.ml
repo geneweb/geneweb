@@ -334,6 +334,7 @@ and handler =
   ; lb : handler_base
   ; ld : handler_base
   ; linked : handler_base
+  ; l : handler_base
   ; ll : handler_base
   ; lm : handler_base
   ; lex : handler_base
@@ -513,6 +514,7 @@ let dummyHandler =
   ; lb = dummy_base
   ; ld = dummy_base
   ; linked = dummy_base
+  ; l = dummy_base
   ; ll = dummy_base
   ; lm = dummy_base
   ; lex = dummy_base
@@ -922,6 +924,11 @@ let defaultHandler : handler =
       match find_person_in_env conf base "" with
       | Some p -> Perso.print_what_links conf base p
       | _ -> self.very_unknown self conf base
+    end
+
+  ; l = begin fun _self conf base ->
+      Perso.interp_templ "list" conf base
+        (Gwdb.empty_person base (Adef.iper_of_int (-1)))
     end
 
   ; ll = begin fun _self conf base ->
