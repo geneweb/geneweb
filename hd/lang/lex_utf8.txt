@@ -1,4 +1,251 @@
-    !dates order
+
+
+    rlm_nbr too large
+en: the number of participants is too large. If necessary, adjust max_rlm_nbr in your parameter file.
+fr: le nombre de personnes concernées est trop grand. Si nécessaire, ajustez max_rlm_nbr dans votre fichier paramètres.
+
+    search results
+en: detailed results of search by place for
+fr: résultats détaillés de la recherche par lieu pour
+
+    matching
+en: matching
+fr: correspondance
+
+    case sensitive title
+en: dont ignore case and accents
+fr: tenir compte des majuscules et accents
+
+    case sensitive
+en: case sensitive
+fr: capitales et accents
+
+    word match title
+en: match full location name
+fr: comparer avec le nom complet d'un lieu
+
+    word match
+en: word match
+fr: mot complet
+
+    any place title
+en: search in the list of sub-places
+fr: rechercher dans la liste des sous-lieux
+
+    any place
+en: sub-places
+fr: sous-lieux
+
+    max nbr title
+en: max number for relation list
+fr: nombre maximum pour les listes de relations
+
+    max nbr
+en: max rel nbr
+fr: max rel nbr
+
+    substring
+en: substring
+fr: partiel
+
+    substring
+en: substring
+fr: partiel
+
+    total/partial display
+en: total/partial display
+fr: affichage total/partiel
+
+    long/short display
+en: long/short display
+fr: affichage long/court
+
+    all the places
+en: all the places
+fr: tous les lieux
+
+    reset to
+co: risturà
+en: reset to
+fr: restaurer
+
+    select p_mod
+co: selezziunà i mudulli persunalizati
+en: select personalized modules
+fr: selectionner les modules personnalisés
+
+    last sosa level not navigable
+co: l'ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l'antenati.
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
+
+    with root, spouses and unknowns
+co: cù l'antenatu radica, i cumpagni è i scunnisciuti
+en: with root ancestor, spouses and unknowns
+fr: avec l’ancêtre racine, les conjoints et les inconnus
+
+    hide portraits
+co: piattà i ritratti
+en: hide portraits
+fr: ne pas afficher les portraits
+
+    choose a genealogy
+co: sceglie una genealugia
+en: choose a genealogy
+fr: choisir une généalogie
+
+    input database
+co: Ci vole à scrive quì u nome di a basa di dati à impiegà :
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
+
+    available genealogies
+co: lista di e genealugie dispunibule (impiegà gwsetup)
+en: list of available genealogies (use gwsetup)
+fr: listes des généalogies disponibles (utilise gwsetup)
+
+    collapse implex
+co: ripiegà l'implessi
+en: collapse implex
+fr: réduire les implexes
+
+    display implex
+co: affissà l'implessi
+en: display implex
+fr: afficher les implexes
+
+    show implex
+co: identificà l'implessi
+en: show implex
+fr: identifier les implexes
+
+    ignore implex
+co: ignurà l'implessi
+en: ignore implex
+fr: ignorer les implexes
+
+    both
+co: i dui
+en: both
+fr: les deux
+
+    books
+co: dizziunarii
+en: books
+fr: dictionnaires
+oc: diccionaris
+
+    reduce/increase
+co: reduce/aumentà
+en: reduce/increase
+fr: réduire/augmenter
+
+    activate/suppress
+co: attivà/squassà
+en: activate/suppress
+fr: activer/supprimer
+
+    do not
+co: ùn micca
+en: do not
+fr: ne pas
+
+    size
+co: scala
+en: scale
+fr: echelle
+
+    couples
+co: coppii
+en: couples
+fr: couples
+
+    missing %s
+co: %s manchendu
+en: missing %s
+fr: %s manquant
+
+    one additional generation
+co: una generazione di più
+en: one additional generation
+fr: une génération en plus
+
+    compiled on %s from commit %s
+co: cumpilatu u %s à partesi di u commit %s
+en: compiled on %s from commit %s
+fr: compilé le %s à partir du commit %s
+
+    link to children
+co: lea ver di i zitelli
+en: link to children
+fr: lien vers les enfants
+no: lenke til barn
+
+    link back to parents
+co: lea di ritornu ver di i genitori
+en: link back to parents
+fr: lien retour vers les parents
+no: lenke til foreldre
+
+    presentation
+co: Prisentazione
+de: Präsentation
+en: Presentation
+fr: Présentation
+he: הצגה
+it: Presentazione
+pl: Prezentacja
+ru: представление
+no: prensentasjon
+
+    of
+co: di
+en: of
+fr: de
+
+    officer/officer/officers
+co: uffiziante/uffiziante/uffizianti
+en: officer/officer/officers
+fr: officiant/officiante/officiants
+
+    name changed. update linked pages
+co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l'anziana chjave inghjò.
+fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
+en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
+
+    old name
+co: vechju nome
+en: old name
+fr: ancien nom
+no: gammelt navn
+
+    new name
+co: novu nome
+en: new name
+fr: nouveau nom
+no: nytt navn
+
+    scale
+co: anni per generazione
+en: years by generation
+fr: années par génération
+
+    multi relations graph
+co: graficu di rilazioni multiple
+en: multi relations graph
+fr: graphe de relations multiples
+
+    edit tree
+co: mudufucà u graficu
+en: edit the graph
+fr: éditer le graphe
+
+    dag on/dag off
+co: affissà un graficu orientatu aciclicu (dag)/piattà u graficu orientatu aciclicu (dag)
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
+
+     !dates order
 af: yyyymmdd
 ar: ddmmyyyy
 bg: ddmmyyyy

@@ -201,6 +201,15 @@ let alphabetic n1 n2 =
 let alphabetic_order n1 n2 =
   alphabetic_utf_8 n1 n2
 
+let rec alphabetic_order_list l1 l2 =
+  if l1 = [] || l2 = [] then
+    if l1 <> [] && l2 = [] then 1 else if l1 = [] && l2 <> [] then -1 else 0
+  else
+    let sort = (alphabetic_utf_8 (List.hd l1) (List.hd l2)) in
+    if sort = 0 then
+      alphabetic_order_list (List.tl l1) (List.tl l2)
+    else sort
+
 let arg_list_of_string line =
   let rec loop list i len quote =
     if i = String.length line then
