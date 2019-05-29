@@ -5,7 +5,7 @@ open Gwdb
 open NotesLinks
 
 val file_path : config -> base -> string -> string
-val read_notes : base -> string -> (string * string) list * string
+val read_notes : bool -> base -> string -> (string * string) list * string
 
 val print : config -> base -> unit
 val print_mod : config -> base -> unit
@@ -17,3 +17,5 @@ val print_misc_notes_search : config -> base -> unit
 val print_linked_list : config -> base -> page list -> unit
 
 val merge_possible_aliases : config -> notes_links_db -> notes_links_db
+
+val skip_notes_first_line : string -> string * string

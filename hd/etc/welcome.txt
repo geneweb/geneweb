@@ -130,7 +130,8 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 <a class="btn btn-outline-primary" href="%prefix;m=MOD_NOTES">[*add base notes]</a>
               %end;
               %if;base.has_notes;
-                <a class="btn btn-outline-primary" href="%prefix;m=NOTES"><i class="far fa-file-alt fa-fw" aria-hidden="true"></i> [*base notes]</a>%base.title;
+                <a class="btn btn-outline-primary" href="%prefix;m=NOTES">
+                	%if(base.title!="")%base.title;%else;<i class="far fa-file-alt fa-fw" aria-hidden="true"></i>[*base notes]</a>
               %end;
               %if;has_misc_notes;
                 <a class="btn btn-outline-primary" href="%prefix;m=MISC_NOTES">[*base index notes]</a>

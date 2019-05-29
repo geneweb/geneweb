@@ -577,6 +577,7 @@ let html_with_summary_of_tlsw conf wi edit_opt s =
     let s2 = string_of_modify_link conf 0 (s = "") edit_opt in s2 ^ s
   else s
 
+(* FIXME should not skip over <!-- xxx -> as first line!! *)
 let rev_extract_sub_part s v =
   let (lines, _) = lines_list_of_string s in
   let rec loop lines lev cnt =

@@ -1552,7 +1552,7 @@ let linked_page_text conf base p s key str (pg, (_, il)) =
       List.fold_right
         (fun text str ->
            try
-             let (nenv, _) = Notes.read_notes base pg in
+             let (nenv, _) = Notes.read_notes false base pg in
              let v =
                let v = List.assoc s nenv in
                if v = "" then raise Not_found
@@ -3175,7 +3175,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
                  match pg with
                    NotesLinks.PgMisc pg ->
                      if List.mem_assoc key il then
-                       let (nenv, _) = Notes.read_notes base pg in
+                       let (nenv, _) = Notes.read_notes false base pg in
                        List.mem_assoc s nenv
                      else false
                  | _ -> false)

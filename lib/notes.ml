@@ -17,9 +17,36 @@ let path_of_fnotes fnotes =
     Some (dl, f) -> List.fold_right Filename.concat dl f
   | None -> ""
 
-let read_notes base fnotes =
+let skip_notes_first_line s =
+  let len = String.length s in
+  let (t, s) =
+    if len > 9 && String.sub s 0 5 = "<!-- "
+    then
+      let (i, yes) =
+        let rec loop i =
+      	  if i >= len then (0, false)
+      	  else if s.[i] = '>' && s.[i-1] = '-' && s.[i-2] = '-' then (i, true)
+      	  else loop (i + 1)
+        in loop 5
+      in
+      if yes then
+      (String.sub s 5 (i - 7),
+      (if i < len - 1 then
+       	String.trim (String.sub s (i + 1) (String.length s - i - 2))
+       else ""))
+      else ("", s)
+    else ("", s)
+  in
+  (t, s)
+
+let read_notes keep_fl base fnotes =
   let fnotes = path_of_fnotes fnotes in
-  let s = base_notes_read base fnotes in Wiki.split_title_and_text s
+  let s = base_notes_read base fnotes in
+  let (_, s) =
+  	if keep_fl then ("", s)
+  	else skip_notes_first_line s
+  in
+  Wiki.split_title_and_text s
 
 let print_search_form conf from_note =
   Wserver.printf "<table>\n";
@@ -312,7 +339,7 @@ let print_linked_list conf base pgl =
            Wserver.printf "</a>\n";
            Wserver.printf "</tt>\n"
        | NotesLinks.PgMisc fnotes ->
-           let (nenv, _) = read_notes base fnotes in
+           let (nenv, _) = read_notes false base fnotes in
            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
            let title = Util.safe_html title in
            Wserver.printf "<tt>";
@@ -389,7 +416,7 @@ let print conf base =
   match p_getenv conf.env "ref" with
     Some "on" -> print_what_links conf base fnotes
   | _ ->
-      let (nenv, s) = read_notes base fnotes in
+      let (nenv, s) = read_notes false base fnotes in
       let title = try List.assoc "TITLE" nenv with Not_found -> "" in
       let title = Util.safe_html title in
       match p_getint conf.env "v" with
@@ -406,7 +433,12 @@ let print_mod conf base =
     Wserver.printf "%s - %s%s" (capitale (transl conf "base notes"))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let (env, s) = read_notes base fnotes in
+  let mode = 
+      match p_getenv conf.env "m" with
+      | Some "MOD_NOTES" -> true && conf.wizard
+      | _ -> false
+  in
+  let (env, s) = read_notes mode base fnotes in
   Wiki.print_mod_view_page conf true "NOTES" fnotes title env s
 
 let update_notes_links_db conf fnotes s =
@@ -461,7 +493,7 @@ let print_mod_ok conf base =
   in
   let edit_mode _ = if conf.wizard then Some "NOTES" else None in
   let mode = "NOTES" in
-  let read_string = read_notes base in
+  let read_string = read_notes true base in
   let commit = commit_notes conf base in
   let string_filter = string_with_macros conf [] in
   let file_path = file_path conf base in
@@ -557,7 +589,7 @@ let print_misc_notes conf base =
            match f with
              Some f ->
                let txt =
-                 let (n, s) = read_notes base f in
+                 let (n, s) = read_notes false base f in
                  let t = try List.assoc "TITLE" n with Not_found -> "" in
                  if t <> "" then t
                  else if s = "" then ""
@@ -615,7 +647,7 @@ let search_text conf base s =
     let rec loop =
       function
         fnotes :: list ->
-          let (nenv, nt) = read_notes base fnotes in
+          let (nenv, nt) = read_notes false base fnotes in
           let tit = try List.assoc "TITLE" nenv with Not_found -> "" in
           if in_text case_sens s tit || in_text case_sens s nt then
             Some (fnotes, tit, nt)
