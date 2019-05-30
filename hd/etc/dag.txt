@@ -232,9 +232,9 @@
           </a>
         </div>
         <div class="btn-group ml-2">
-          <a href="%prefix_base_password;m=U;et=S;i=2;%nn;
-            %foreach;env_binding;%if;(env.key!="m" and env.val!="")%env.key;=%env.val;;%end;%end;%nn;
-            mode=%evar.m;;upddag=on;">
+          <a href="%prefix_base_password;m=TP&v=updrlm&%nn;
+            %foreach;env_binding;%if(env.key!="m" and env.val!="")%env.key;=%env.val;&%end;%end;%nn;
+            mode=%evar.m;">
             <span class="far fa-edit fa-lg mb-1" title="[*edit tree]"></span>
           </a>
         </div>

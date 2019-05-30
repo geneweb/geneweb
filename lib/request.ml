@@ -171,6 +171,7 @@ let family_m conf base =
       | "SRC" -> handler.src
       | "STAT" -> handler.stat
       | "CHANGE_WIZ_VIS" -> handler.change_wiz_vis
+      | "TP" -> handler.tp
       | "TT" -> handler.tt
       | "U" -> handler.u
       | "VIEW_WIZNOTES" -> handler.view_wiznotes

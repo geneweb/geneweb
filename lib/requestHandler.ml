@@ -377,6 +377,7 @@ and handler =
   ; src : handler_base
   ; stat : handler_base
   ; change_wiz_vis : handler_base
+  ; tp : handler_base
   ; tt : handler_base
   ; u : handler_base
   ; view_wiznotes : handler_base
@@ -556,6 +557,7 @@ let dummyHandler =
   ; src = dummy_base
   ; stat = dummy_base
   ; change_wiz_vis = dummy_base
+  ; tp = dummy_base
   ; tt = dummy_base
   ; u = dummy_base
   ; view_wiznotes = dummy_base
@@ -641,6 +643,13 @@ let person_selected_with_redirect self conf base p =
   | Some _ -> self.incorrect_request self conf base
   | None ->
     Wserver.http_redirect_temporarily (commd conf ^ Util.acces conf base p)
+
+let print_from_perso_template conf base f =
+  match find_person_in_env conf base "" with
+  | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
+  | _ ->
+     Perso.interp_templ ("tp0_" ^ f) conf base
+       (Gwdb.empty_person base (Adef.iper_of_int (-1)))
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
@@ -1190,6 +1199,12 @@ let defaultHandler : handler =
   ; change_wiz_vis = begin fun self conf base ->
       if conf.wizard then Wiznotes.change_wizard_visibility conf base
       else self.incorrect_request self conf base
+    end
+
+  ; tp = begin fun _self conf base ->
+      match p_getenv conf.env "v" with
+      | Some f -> print_from_perso_template conf base f
+      | None -> Hutil.incorrect_request conf
     end
 
   ; tt = begin fun _self conf base ->
