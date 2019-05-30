@@ -82,7 +82,7 @@
       %else;
         %apply;one_pvar(1)
       %end;
-      <tr class="last_row"><td><span class="fa fa-plus add_pvar"></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="last_row"><td><span class="fa fa-plus row_add_before"></td><td></td><td></td><td></td><td></td><td></td></tr>
     </tbody>
   </table>
 </form>
