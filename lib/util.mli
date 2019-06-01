@@ -116,6 +116,7 @@ val index_of_next_char : string -> int -> int
 val open_etc_file : string -> in_channel option
 val open_hed_trl : config -> string -> in_channel option
 val open_templ : config -> string -> in_channel option
+val open_templ_fname : config -> string -> (in_channel * string) option
 val string_with_macros :
   config -> (char * (unit -> string)) list -> string -> string
 val string_of_place : config -> string -> string
