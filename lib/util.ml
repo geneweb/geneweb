@@ -1344,6 +1344,16 @@ let open_templ conf fname =
         try Some (Secure.open_in std_fname) with Sys_error _ -> None
       else None
 
+let open_templ_fname conf fname =
+  try
+    let fname = etc_file_name conf fname in
+    Some (Secure.open_in fname, fname) with
+    Sys_error _ ->
+      let std_fname =
+        search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
+      in
+      try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
+
 let image_prefix conf = conf.image_prefix
 
 
