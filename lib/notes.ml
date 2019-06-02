@@ -390,11 +390,27 @@ let print conf base =
     Some "on" -> print_what_links conf base fnotes
   | _ ->
       let (nenv, s) = read_notes base fnotes in
-      let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-      let title = Util.safe_html title in
-      match p_getint conf.env "v" with
-        Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-      | None -> print_whole_notes conf base fnotes title s None
+      let templ =
+        try
+          let fname = "notes_" ^ (List.assoc "TYPE" nenv) in
+          Util.open_templ conf fname
+        with Not_found -> None
+      in
+      match templ with
+      | Some ic ->
+         begin match p_getenv conf.env "ajax" with
+         | Some "on" ->
+            let charset = if conf.charset = "" then "utf-8" else conf.charset in
+            Wserver.header "Content-type: application/json; charset=%s" charset ;
+            Wserver.printf "%s" s
+         | _ -> Templ.copy_from_templ conf [] ic
+         end
+      | None ->
+         let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+         let title = Util.safe_html title in
+         match p_getint conf.env "v" with
+         | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+         | None -> print_whole_notes conf base fnotes title s None
 
 let print_mod conf base =
   let fnotes =
@@ -402,12 +418,33 @@ let print_mod conf base =
       Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
+  let (env, s) = read_notes base fnotes in
+  let typ = try List.assoc "TYPE" env with Not_found -> "" in
+  let templ =
+    let fname = "notes_upd_" ^ typ in
+    Util.open_templ conf fname
+  in
   let title _ =
     Wserver.printf "%s - %s%s" (capitale (transl conf "base notes"))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let (env, s) = read_notes base fnotes in
-  Wiki.print_mod_view_page conf true "NOTES" fnotes title env s
+  match templ, p_getenv conf.env "notmpl" with
+  | Some _, Some "on" ->
+     Wiki.print_mod_view_page conf true "NOTES" fnotes title env s
+  | Some ic, _ ->
+      begin match p_getenv conf.env "ajax" with
+      | Some "on" ->
+         let s_digest =
+           List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s
+         in
+         let digest = Iovalue.digest s_digest in
+         let charset = if conf.charset = "" then "utf-8" else conf.charset in
+         Wserver.header "Content-type: application/json; charset=%s" charset ;
+         Wserver.printf "{\"digest\":\"%s\",\"r\":%s}" digest s
+      | _ -> Templ.copy_from_templ conf [] ic
+      end
+  | _ ->
+     Wiki.print_mod_view_page conf true "NOTES" fnotes title env s
 
 let update_notes_links_db conf fnotes s =
   let slen = String.length s in
@@ -448,7 +485,9 @@ let commit_notes conf base fnotes s =
   in
   Mutil.mkdir_p (Filename.dirname fpath);
   begin try Gwdb.commit_notes base fname s with
-    Sys_error _ -> Hutil.incorrect_request conf; raise Update.ModErr
+    Sys_error m ->
+      Printf.eprintf "Sys_error: %s\n" m;
+      Hutil.incorrect_request conf; raise Update.ModErr
   end;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db conf pg s

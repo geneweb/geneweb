@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Editeur de map</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
+  %include;css
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+  <style>
+  .in { background-color: coral !important; }
+  #selection { border:2px solid white; background:#1B94E0; opacity:0.4; filter:alpha(opacity=40); margin:0px; padding:0px; display:none; }
+  </style>
+  %include;hed
+</head>
+<body%body_prop;>
+<div class="container-fluid">
+%include;home
+<h1>Editeur de map</h1>
+
+<p id="fd_error"></p>
+
+<div class="form-group row">
+  <label for="page_title" class="col-form-label col-auto">[*title/titles]0</label>
+  <input type="text" class="form-control col-sm-10" id="page_title">
+</div>
+<div class="form-group row">
+  <div class="col-auto">Chemin</div>
+  <input id="doc" type="radio" name="path" value="doc" checked>
+  <label for="doc" class="col-form-label col-auto" title="%%sm=DOC&amp;s=">DOC</label>
+  <input id="public" type="radio" name="path" value="public">
+  <label for="public" class="col-form-label col-auto" title="gallery_path = %bvar.gallery_path;">[*iftitles/public/private]1</label>
+  <input id="private" type="radio" name="path" value="private">
+  <label for="private" class="col-form-label col-auto" title="gallery_path_private = %bvar.gallery_path_private;">[*iftitles/public/private]2</label>
+  <input id="other" type="radio" name="path" value="other">
+  <label for="other" class="col-form-label col-auto">Autre</label>
+  <input id="path" type="text" class="form-control col-sm-4" disabled>
+  <div class="col-auto">[*file]</div>
+  <input id="fname" type="text" class="form-control col-sm-1">
+  <button id="face_detection" class="btn btn-primary col-auto" disabled>Détection</button>
+</div>
+
+<div onmousedown="return false" id="frame">
+<map id="map" name="map"></map>
+<img id="image" usemap="#map" style="cursor: crosshair;">
+<div id="selection"></div>
+</div>
+<span id="legend"></span>
+
+<table id="map_table" class="display compact" style="width=100%">
+ <thead><tr>
+  <th>[*first name/first names]0</th>
+  <th>[*surname/surnames]0</th>
+  <th>#</th>
+  <th>[*comment]</th>
+  <th>shape</th>
+  <th>coords</th>
+  <th>Actions</th>
+ </tr></thead>
+</table>
+
+<form id="form" method="post" action="%action;">
+%( FIXME: hidden missing %)
+ <input type="hidden" name="m" value="MOD_NOTES_OK">
+ <input type="hidden" name="f" value="%evar.f;">
+ <input id="digest" type="hidden" name="digest">
+ <input id="notes" type="hidden" name="notes">
+ <button type="submit" class="btn btn-primary">Ok</button>
+ <a class="btn btn-secondary" href="%url;notmpl=on">Edit</a>
+</form>
+
+</div>
+%include;trl
+%include;copyr
+
+</div>
+%include;js
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="%if(cgi)%bvar.static_path;%end;js/jquery.maphilight.js"></script>
+<script async src="https://docs.opencv.org/4.1.0/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+<script src="https://docs.opencv.org/4.1.0/utils.js" type="text/javascript"></script>
+<script>
+function onOpenCvReady() {
+  $("#face_detection").prop("disabled",false);
+}
+
+var doc_path = "%prefix;m=DOC&s=";
+var public_path = "%bvar.gallery_path;";
+var private_path = "%bvar.gallery_path_private;";
+
+var table;
+
+// Selection
+var x1, y1, x2, y2;
+var selection = false;
+var gMOUSEUP = false;
+var gMOUSEDOWN = false;
+$(document).mouseup( function() {
+  gMOUSEUP = true;
+  gMOUSEDOWN = false;
+});
+$(document).mousedown( function() {
+  gMOUSEUP = false;
+  gMOUSEDOWN = true;
+});
+
+var global_cnt = 0;
+function add_new_row( x1, y1, x2, y2 ) {
+  var cnt = ++global_cnt;
+
+  var coords = "" + x1 + "," + y1 + "," + x2 + "," + y2;
+  var new_row = table.row.add( {
+    "fn": "",
+    "sn": "",
+    "oc": "",
+    "alt": "",
+    "shape": "rect",
+    "coords": coords
+  }).draw(false);
+  $("#map").append( "<area id='area" + cnt + "' shape='rect' coords='" + coords + "' alt='" + cnt + "' title='" + cnt + "'>" );
+  $("#legend").append( "<span class='legend' id='a" + cnt + "'>" + cnt + "</span> " );
+  new_row.node().id = "row" + cnt;
+}
+
+$(document).ready(function() {
+  $("#doc,#public,#private").click( function() {
+   $("#path").prop("disabled",true);
+  });
+  $("#other").click( function() {
+   $("#path").prop("disabled",false);
+  });
+  $("#doc,#public,#private,#other,#path,#fname").change( function() {
+   var path = $("input[name=path]:checked").val();
+   var fname = $("#fname").val();
+   if( fname != "" ) {
+     if( path == "doc" ) {
+       $("#image").attr( "src", doc_path + fname );
+     } else if( path == "private" ) {
+       $("#image").attr( "src", private_path + fname );
+     } else if( path == "public" ) {
+       $("#image").attr( "src", public_path + fname );
+     } else {
+       $("#image").attr( "src", $("#path").val() + fname );
+     }
+   }
+   $("#image").maphilight();
+  });
+
+  table = $('#map_table').DataTable( {
+     "ajax": {
+       "url": "%url;ajax=on",
+       "dataSrc": "r.map"
+     },
+     "deferRender": true,
+     "columns": %[
+       {
+         "data": "fn",
+         "render": function ( data, type, row, meta ) {
+           return "<input class='update' type='text' value='" + data + "'>";
+         }
+       },
+       {
+         "data": "sn",
+         "render": function ( data, type, row, meta ) {
+           return "<input class='update' type='text' value='" + data + "'>";
+         }
+       },
+       {
+         "data": "oc",
+         "render": function ( data, type, row, meta ) {
+           return "<input class='update' type='text' value='" + data + "' size='2'>";
+         }
+       },
+       {
+         "data": "alt",
+         "render": function ( data, type, row, meta ) {
+           return "<input class='update' type='text' value='" + data + "'>";
+         }
+       },
+       { "data": "shape" },
+       { "data": "coords" },
+       { "data": null, "defaultContent": '<a class="fa fa-trash-alt remove"></a>' }
+     %],
+     "rowCallback": function( row, data ) {
+       if( data.fn != "" && data.sn != "" ) {
+         var oc = data.oc;
+         if( oc == "") { oc = "0" }
+         data.gw = "[" + "[" + data.fn + "/" + data.sn + "/" + oc + "]" + "]";
+       } else {
+         data.gw = "";
+       }
+     },
+     "paging": false,
+     "ordering": false,
+     "searching": false,
+     "info": false,
+     "scrollY": "25vh",
+     "scrollCollapse": true,
+     "language": {
+       "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/[
+af: Afrikaans
+bg: Bulgarian
+br: FIXME
+ca: Catalan
+co: FIXME
+cs: Czech
+da: Danish
+de: German
+en: English
+eo: FIXME
+es: Spaicsh
+et: Estonian
+fi: Finnish
+fr: French
+he: Hebrew
+is: Icelandic
+it: Italian
+lv: Latvian
+nl: Dutch
+no: Norwegian-Nynorsk
+oc: FIXME
+pl: Polish
+pt: Portuguese
+pt-br: Portuguese-Brasil
+ro: Romanian
+ru: Russian
+sk: Slovak
+sl: Slovenian
+sv: Swedish
+zh: Chinese
+].json"
+     },
+    "initComplete": function( settings, json) {
+       $("#digest").val( json.digest );
+       json = json.r;
+       if( json.path == "doc" ) {
+         $("#doc").prop( "checked", true );
+       } else if( json.path == "private" ) {
+         $("#private").prop( "checked", true );
+       } else if( json.path == "public" ) {
+         $("#public").prop( "checked", true );
+       } else {
+         $("#other").prop( "checked", true );
+         $("#path")
+          .val( json.path )
+          .prop( "disabled", false );
+       }
+       $("#fname").val( json.img ).change();
+       $("#page_title").val( json.title );
+       json.map.forEach( function( i ) {
+         var cnt = ++global_cnt;
+
+         $("#map").append( "<area id='area" + cnt + "' shape='" + i.shape + "' coords='" + i.coords +
+            "' alt='" + cnt + "' title='" + cnt + "'>" );
+         if( i.fn != "" ) {
+           $("#legend").append( "<span class='legend' id='a" + cnt + "'>"+ cnt +
+              "-<a href='%prefix;&p=" + i.fn + "&n=" + i.sn + "&oc=" + i.oc + "' target='_blank'>" + i.alt + "</a> " );
+         } else {
+           $("#legend").append( "<span class='legend' id='a" + cnt + "'>" + cnt + "</span> " );
+         }
+         // TODO: is it ok ?
+         table.row(cnt-1).node().id = "row" + cnt;
+       });
+    } 
+  } );
+
+  $(document).on( "mouseover", ".legend", function(e) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#area" + n ).mouseover();
+    $( "#row" + n ).addClass( "in" );
+  });
+  $(document).on( "mouseout", ".legend", function(e) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#area" + n ).mouseout();
+    $( "#row" + n ).removeClass( "in" );
+  });
+  $(document).on( "click", "span.legend", function(e) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#row" + n ).find("input").first().focus();
+  });
+  $(document).on( "mouseover", "area", function(e) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#a" + n ).addClass( "in" );
+    $( "#row" + n ).addClass( "in" );
+  });
+  $(document).on( "mouseout", "area", function(e) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#a" + n ).removeClass( "in" );
+    $( "#row" + n ).removeClass( "in" );
+  });
+  $(document).on( "mouseover", "tr", function(e) {
+    if( typeof $(this).attr("id") !== "undefined" ) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $( "#area" + n ).mouseover();
+      $( "#a" + n ).addClass( "in" );
+    }
+  });
+  $(document).on( "mouseout", "tr", function(e) {
+    if( typeof $(this).attr("id") !== "undefined" ) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $( "#area" + n ).mouseout();
+      $( "#a" + n ).removeClass( "in" );
+    }
+  });
+
+  $(document).on( "change", ".update", function() {
+    table.cell( this.parentNode ).data( $(this).val() ).draw();
+  });
+
+  $(document).on( "click", ".remove", function (e) {
+    var tr = $(this).closest('tr');
+    var n = tr.attr("id").replace(/[a-z]/g, "");
+    $( "#area" + n ).remove();
+    $( "#a" + n ).remove();
+    table.row( tr ).remove().draw();
+  });
+
+  $("#face_detection").click( function() {
+   let src = cv.imread( $("#image").get(0) );
+   let gray = new cv.Mat();
+   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+   let faces = new cv.RectVector();
+   let faceCascade = new cv.CascadeClassifier();
+
+   // load pre-trained classifiers
+   let utils = new Utils('fd_error');
+   let faceCascadeFile = 'haarcascade_frontalface_default.xml';
+   utils.createFileFromUrl( faceCascadeFile, '%if(cgi)%bvar.static_path;%end;js/' + faceCascadeFile, () => {
+     faceCascade.load( faceCascadeFile );
+     // detect faces
+     let msize = new cv.Size(0, 0);
+     faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, msize, msize); // TODO: add a way to adjust parameters
+     for( let i = 0; i < faces.size(); ++i ) {
+       add_new_row( faces.get(i).x, faces.get(i).y, faces.get(i).x + faces.get(i).width, faces.get(i).y + faces.get(i).height );
+     }
+     faceCascade.delete();
+     faces.delete();
+     gray.delete();
+     src.delete();
+   });
+  });
+
+  $("#frame").mousedown( function(e) {
+    // Start a new selection
+    selection = true;
+    x1 = e.pageX;
+    y1 = e.pageY;
+  });
+  $("#frame").mousemove( function(e) {
+    if( selection ) {
+      // Selection in progress
+      x2 = e.pageX;
+      y2 = e.pageY;
+      
+      if( selection ) {
+        var TOP = (y1 < y2) ? y1 : y2;
+        var LEFT = (x1 < x2) ? x1 : x2;
+        var WIDTH = (x1 < x2) ? x2 - x1 : x1 - x2;
+        var HEIGHT = (y1 < y2) ? y2 - y1 : y1 - y2;
+
+        $("#selection").css({
+          position: 'absolute',
+          zIndex: 5000,
+          left: LEFT,
+          top: TOP,
+          width: WIDTH,
+          height: HEIGHT
+        });
+        $("#selection").show();
+      }
+    }
+  });
+  $("#frame").mouseup( function() {
+    // Selection completed
+    selection = false;
+    $("#selection").hide();
+
+    var pos = $("#frame").get(0).getBoundingClientRect();
+    x1 -= pos.left + pageXOffset;
+    x2 -= pos.left + pageXOffset;
+    y1 -= pos.top + pageYOffset;
+    y2 -= pos.top + pageYOffset;
+
+    if( x1 < x2 && y1 < y2 ) {
+      add_new_row( x1, y1, x2, y2 );
+    } else {
+      add_new_row( x2, y2, x1, y1 );
+    }
+  });
+  $("#frame").mouseenter( function() {
+    (gMOUSEDOWN) ? selection = true : selection = false;
+  });
+  $("#selection").mouseenter( function() {
+    (gMOUSEDOWN) ? selection = true : selection = false;
+  });
+  $("#frame").mouseleave( function() {
+    selection = false;
+  });
+
+  $( "#form" ).submit( function () {
+    event.preventDefault();
+    var res = {
+      "title": $("#page_title").val(),
+      "path": $("input[name=path]:checked").val(),
+      "img": $("#fname").val(),
+      "map": table.rows().data().toArray()
+    };
+    $("#notes").val( "TITLE=" + $("#page_title").val() + "\nTYPE=gallery\n" + JSON.stringify( res ) );
+    $(this).unbind('submit').submit();
+  });
+});
+</script>
+</body>
+</html>

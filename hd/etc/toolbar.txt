@@ -64,3 +64,64 @@ function insertTags (tagOpen, tagClose, sampleText) {
 <i class="far fa-window-minimize" alt="Ligne horizontale" title="Ligne horizontale"></i></a>
 <a class="ml-2" onclick="return insertTags('\[\[\[','\]\]\]','Lien_interne/Nom du lien');" href="javascript:;">
 <i class="fas fa-link" alt="Lien_interne/Nom du lien" title="Lien_interne/Nom du lien"></i></a>%nn;
+%if(evar.m = "MOD_NOTES")
+<div class="modal fade" id="init_gallery" tabindex="-1" role="dialog" aria-labbelledby="init_gallery_label" aria-hidden="true">
+ <div class="modal-dialog" role="document">
+  <div class="modal-content">
+   <div class="modal-header">
+     <h5 class="modal-title" id="init_gallery_label">Initialise une image map</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+   </div>
+   <div class="modal-body">
+    <div class="form-group row">
+     <label for="page_title" class="col-form-label col-auto">[*title/titles]0</label>
+     <input type="text" class="form-control col-sm-10" id="page_title">
+    </div>
+    <div class="form-group row">
+     <div class="col-auto">Chemin</div>
+      <input id="doc" type="radio" name="path" value="doc" checked>
+      <label for="doc" class="col-form-label col-auto" title="%%sm=DOC&amp;s=">DOC</label>
+      <input id="public" type="radio" name="path" value="public">
+      <label for="public" class="col-form-label col-auto" title="gallery_path = %bvar.gallery_path;">[*iftitles/public/private]1</label>
+      <input id="private" type="radio" name="path" value="private">
+      <label for="private" class="col-form-label col-auto" title="gallery_path_private = %bvar.gallery_path_private;">[*iftitles/public/private]2</label>
+      <input id="other" type="radio" name="path" value="other">
+      <label for="other" class="col-form-label col-auto">Autre</label>
+      <input id="path" type="text" class="form-control col-auto" disabled>
+     <div class="col-auto">[*file]</div>
+     <input id="fname" type="text" class="form-control col-auto">
+    </div>
+   </div>
+   <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary" onclick="init_gallery();">Ok</button>
+   </div>
+  </div>
+ </div>
+</div>
+<script>
+function init_tool() {
+  $("#doc,#public,#private").click( function() {
+   $("#path").prop("disabled",true);
+  });
+  $("#other").click( function() {
+   $("#path").prop("disabled",false);
+  });
+}
+function init_gallery() {
+ var title = $("#page_title").val();
+ var path = $("input[name=path]:checked").val();
+ var fname = $("#fname").val();
+ var res = {
+   "title": title,
+   "path": path,
+   "img": fname,
+   "map": []
+ };
+ $("#notes_comments").val( "TITLE=" + title +"\nTYPE=gallery\n" + JSON.stringify(res) );
+}
+</script>
+<a class="fa fa-images" data-toggle="modal" data-target="#init_gallery" href="javascript:;" onclick="init_tool();"></a>
+%end;

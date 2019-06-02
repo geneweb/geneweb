@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gallerie</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
+  %include;css
+  <style>
+  .in { background-color: coral; }
+  </style>
+  %include;hed
+</head>
+<body%body_prop;>
+<div class="container-fluid">
+<div class="small float-right">
+(<a href="%url;ref=on">[linked pages]</a>)
+</div>
+%include;home
+<h1 id="h1">Chargement en cours...</h1>
+%if(wizard)
+<div class="small float-right">
+(<a href="%prefix;m=MOD_NOTES&f=%evar.f;">[modify]</a>)
+</div>
+%end;
+
+<map id="map" name="map"></map>
+<img id="image" usemap="#map">
+Sur cette photo : <span id="legend"></span>
+<br><span id="unknown"></span>
+
+</div>
+%include;trl
+%include;copyr
+
+</div>
+%include;js
+<script src="%if(cgi)%bvar.static_path;%end;js/jquery.maphilight.js"></script>
+<script>
+var doc_path="%prefix;m=DOC&s=";
+var public_path="%bvar.gallery_path;";
+var private_path="%bvar.gallery_path_private;";
+$(document).ready(function() {
+  $.ajax( "%url;ajax=on" )
+  .done( function( json ) {
+    $("#h1").text( json.title );
+    if( json.path == "doc" ) {
+      $("#image").attr( "src", doc_path+json.img );
+    } else if( json.path == "private" ) {
+      $("#image").attr( "src", private_path+json.img );
+    } else if ( json.path == "public" ) {
+      $("#image").attr( "src", public_path+json.img );
+    } else {
+      $("#image").attr( "src", json.path+json.img );
+    }
+
+    var cnt = 1;
+    var sep = "";
+    var sep_u = "Non identifiés : ";
+    json.map.forEach( function( i ) {
+      var href = "";
+      if( i.fn != "" ) {
+        href = " href='%prefix;&p=" + i.fn + "&n=" + i.sn + "&oc=" + i.oc + "'";
+      }
+      $("#map").append( "<area id='area" + cnt + "' shape='" + i.shape + "' coords='" + i.coords + "' alt='" + i.alt + "' title='" + i.alt + "'" + href + ">" );
+      if( i.fn != "" ) {
+        $("#legend").append( sep + "<a class='legend' id='a" + cnt + "' href='%prefix;&p=" + i.fn + "&n=" + i.sn + "&oc=" + i.oc + "'>" + i.alt + "</a>" );
+        sep = ", ";
+      } else {
+        $("#unknown").append( sep_u + "<span class='legend' id='a" + cnt + "'>" + cnt + "</span>" );
+        sep_u = ", ";
+      }
+      cnt++;
+    });
+
+    $("#image").maphilight();
+
+    $(".legend").mouseover( function(e) {
+      $( "#area" + $(this).attr("id").replace(/[a-z]/g, "") ).mouseover();
+    }).mouseout( function(e) {
+      $( "#area" + $(this).attr("id").replace(/[a-z]/g, "") ).mouseout();
+    });
+
+    $("area").mouseover( function(e) {
+      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") ).addClass( "in" );
+    }).mouseout( function(e) {
+      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") ).removeClass( "in" );
+    });
+  })
+  .fail( function() {
+    $("#h1").text( "Erreur de chargement" );
+  })
+} );
+</script>
+</body>
+</html>
