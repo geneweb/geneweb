@@ -338,10 +338,6 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   Wserver.printf "<h1>";
   title false;
   Wserver.printf "</h1>\n";
-  begin match Util.open_etc_file "summary" with
-    Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-  end;
   Wserver.printf "<table border=\"0\" width=\"100%%\">\n";
   Wserver.printf "<tr>\n";
   Wserver.printf "<td>\n";
@@ -419,6 +415,7 @@ let print conf base =
         None -> p_getenv conf.env "v"
       | x -> x
     in
+    (* TODO get TITLE= content and pass it to print_whole_wiznote *)
     match f with
       Some wz ->
         let wz = Filename.basename wz in

@@ -86,10 +86,6 @@ let print_whole_notes conf base fnotes title s ho =
       Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
     end;
   Wserver.printf "</div>\n";
-  begin match Util.open_etc_file "summary" with
-    Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-  end;
   let file_path = file_path conf base in
   let s = string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
