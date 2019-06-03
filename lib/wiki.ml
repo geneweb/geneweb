@@ -325,15 +325,12 @@ let summary_of_tlsw_lines conf short lines =
     let lines =
       "<dl><dd>" :: "<table id=\"summary\" cellpadding=\"10\">" ::
       ("<tr><td align=\"" ^ conf.left ^ "\">") ::
-      ("<div style=\"text-align:center\"><b>" ^
-       capitale (message_txt conf 3) ^ "</b>") ::
-      "<script type=\"text/javascript\">" :: "//<![CDATA[" ::
-      "showTocToggle()" :: "//]]>" :: "</script>" :: "</div>" ::
-      "<div class=\"summary\" id=\"tocinside\">" ::
+      ("<button type=\"button\" class=\"btn btn-info\" \
+      	data-toggle=\"collapse\" data-target=\"#tocinside\">") ::
+       ("<b>" ^ (capitale (message_txt conf 3)) ^ "</b>") :: "</button>" ::
+      "<div id=\"tocinside\" class=\"collapse\">" ::
       List.rev_append rev_summary
-        ["</div>"; "</td></tr></table>"; "</dd></dl>";
-         "<script type=\"text/javascript\">"; "//<![CDATA["; "setTocToggle()";
-         "//]]>"; "</script>"]
+        ["</div>"; "</td></tr></table>"; "</dd></dl>"]
     in
     lines, sections_nums
 

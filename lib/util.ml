@@ -471,6 +471,7 @@ let safe_html_allowd_tags =
   ; ("http://www.w3.org/1999/xhtml", "ul")
   ; ("http://www.w3.org/1999/xhtml", "nav")
   ; ("http://www.w3.org/1999/xhtml", "section")
+  ; ("http://www.w3.org/1999/xhtml", "button")
   ]
 
 (** [escape_html str] replaces '&', '"', '<' and '>'
