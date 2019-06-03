@@ -303,13 +303,14 @@ let start_with ?(wildcard = false) ini i s =
   let rec loop i1 i2 =
     if i1 = inilen then true
     else if i2 = strlen
-      then
-        if wildcard && String.unsafe_get ini i1 = '_'
-        then loop (i1 + 1) i2 else false
-      else 
-        if String.unsafe_get s i2 = String.unsafe_get ini i1 ||
-          (wildcard && String.unsafe_get s i2 = ' ' && String.unsafe_get ini i1 = '_')
-        then loop (i1 + 1) (i2 + 1) else false
+    then
+      if wildcard && String.unsafe_get ini i1 = '_'
+      then loop (i1 + 1) i2 else false
+    else if String.unsafe_get s i2 = String.unsafe_get ini i1
+         || (wildcard && String.unsafe_get s i2 = ' '
+         && String.unsafe_get ini i1 = '_')
+    then loop (i1 + 1) (i2 + 1)
+    else false
   in
   loop 0 i
 
@@ -317,16 +318,16 @@ let contains ?(wildcard = false) str sub =
   let nbstr = nb_car_utf_8 str in
   let nbsub = nb_car_utf_8 sub in
   if not wildcard
-    then
-      let rec loop i =
-        if i + nbsub <= nbstr
-        then start_with ~wildcard sub i str || loop (i + 1)
-        else false
-      in loop 0
-    else
-      let rec loop i =
-        i <= nbstr && (start_with ~wildcard sub i str || loop (i + 1))
-      in loop 0
+  then
+    let rec loop i =
+      if i + nbsub <= nbstr
+      then start_with ~wildcard sub i str || loop (i + 1)
+      else false
+    in loop 0
+  else
+    let rec loop i =
+      i <= nbstr && (start_with ~wildcard sub i str || loop (i + 1))
+    in loop 0
 
 let get_particle list s =
   let rec loop = function
