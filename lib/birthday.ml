@@ -94,7 +94,7 @@ let gen_print conf base mois f_scan dead_people =
   end;
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  if List.for_all (fun l -> List.length l = 0) (Array.to_list tab) then
+  if Array.for_all ((=) []) tab then
     begin
       Wserver.printf "<p>\n";
       Wserver.printf "%s.\n" (capitale (transl conf "no anniversary"));
