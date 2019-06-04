@@ -351,7 +351,7 @@ let reconstitute_from_fevents nsck empty_string fevents marr div =
         if !found_marriage then loop marr div wit l
         else loop (mk_marr evt Engaged) div evt.efam_witnesses l
       | Efam_Marriage ->
-        mk_marr evt Married, div, wit
+        mk_marr evt Married, div, evt.efam_witnesses
       | Efam_MarriageContract ->
         if !found_marriage then loop marr div wit l
         else loop (mk_marr evt MarriageContract) div evt.efam_witnesses l
