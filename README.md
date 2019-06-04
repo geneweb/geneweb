@@ -82,7 +82,6 @@ $ ./configure --api
 
 * Try to keep the same coding style as the existing one.
 * New code should not contain any trailing whitespace.
-* If a unit test can be written
 * Each pull request should have a single clear purpose. If it containes
   multiple unrelated changes, those changes should be split into
   separate pull requests.
