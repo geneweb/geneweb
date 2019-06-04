@@ -1017,11 +1017,11 @@ let update_family_with_fevents conf base fam =
     marr
   in
   let divorce = div in
-  let witnesses = Array.to_list (Array.map fst witnesses) in
+  let witnesses = Array.map fst witnesses in
   {fam with marriage = marriage; marriage_place = marriage_place;
             marriage_note = marriage_note; marriage_src = marriage_src;
             relation = relation; divorce = divorce;
-            witnesses = Array.of_list witnesses}
+            witnesses = witnesses}
 
 let effective_mod conf base sfam scpl sdes =
   let fi = sfam.fam_index in
