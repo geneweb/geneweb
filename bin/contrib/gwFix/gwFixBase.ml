@@ -304,12 +304,14 @@ let fix_marriage_divorce ~verbosity1 ~verbosity2 base nb_fam fix =
       let marriage_note0 = get_marriage_note fam in
       let marriage_src0 = get_marriage_src fam in
       let divorce0 = get_divorce fam in
+      let witnesses0 = get_witnesses fam in
       let marr_data0 = (relation0, marriage0, marriage_place0, marriage_note0, marriage_src0) in
-      let (relation, marriage, marriage_place, marriage_note, marriage_src) as marr_data, divorce, _ =
+      let (relation, marriage, marriage_place, marriage_note, marriage_src) as marr_data, divorce, witnesses =
         UpdateFamOk.reconstitute_from_fevents false (insert_string base "")
           fevents marr_data0 divorce0
       in
-      if marr_data0 <> marr_data || divorce0 <> divorce then begin
+      let witnesses = Array.map fst witnesses in
+      if marr_data0 <> marr_data || divorce0 <> divorce || witnesses0 <> witnesses then begin
         if verbosity2 then begin suspend_with (fun () ->
             Printf.printf "*** Updating: %s & %s\n"
               (Gutil.designation base (poi base @@ get_father fam))
@@ -319,7 +321,7 @@ let fix_marriage_divorce ~verbosity1 ~verbosity2 base nb_fam fix =
         end ;
         let fam' =
           { (gen_family_of_family fam)
-            with relation ; marriage ; marriage_place ; marriage_note ; marriage_src ; divorce }
+            with relation ; marriage ; marriage_place ; marriage_note ; marriage_src ; divorce ; witnesses }
         in
         patch_family base ifam fam' ;
         incr fix
