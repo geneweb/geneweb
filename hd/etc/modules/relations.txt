@@ -92,26 +92,26 @@
       <li>%apply;capitalize(relation_type)[:]%nl;
         <ul>
           %apply;li_SDC("relation_him")
-            %apply;very_short_display_person_no_sex("relation_him").
+            %apply;very_short_display_person_no_sex("relation_him")
           </li>
           %apply;li_SDC("relation_her")
-            %apply;very_short_display_person_no_sex("relation_her").
+            %apply;very_short_display_person_no_sex("relation_her")
           </li>
         </ul>
       </li>
     %elseif;has_relation_him;
       %apply;li_SDC("relation_him")%apply;capitalize(relation_type)[:]%sp;
-        %apply;very_short_display_person_no_sex("relation_him").
+        %apply;very_short_display_person_no_sex("relation_him")
       </li>
     %elseif;has_relation_her;
       %apply;li_SDC("relation_her")%apply;capitalize(relation_type)[:]%sp;
-        %apply;very_short_display_person_no_sex("relation_her").
+        %apply;very_short_display_person_no_sex("relation_her")
       </li>
     %end;
   %end;
   %foreach;related;
     %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
-      %apply;very_short_display_person_no_sex("related").
+      %apply;very_short_display_person_no_sex("related")
     </li>
   %end;
   </ul>
@@ -144,12 +144,13 @@
       %incr_count;
     %end;
   %end;
+  %( this first heading is quite redoudant with h2 title! %)
   %if;(count>0)
-  <small>[*relations of] %first_name;.</small>
+    <h3>[*relations of] %self;</h3>
   %end;
   <ul>
   %foreach;relation;
-  %(godparents are displayed in timeline if has_event %)
+  %( godparents are displayed in timeline if has_event %)
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
         %apply;very_short_display_person_no_sex("relation_him")
@@ -209,31 +210,31 @@
   
   %reset_count;
   %foreach;event;%sp;
-      %foreach;event_witness;
-        %incr_count;
-      %end;
+    %foreach;event_witness;
+      %incr_count;
+    %end;
   %end;
   %if;(count>0)
-  <small>[*witness to events of] %first_name;.</small>
+    <h3>[*witness to events of] %first_name;</h3>
   %end;
-  <uL>
-  %foreach;event;%sp;
+  <ul>
+    %foreach;event;%sp;
       %reset_count;
       %foreach;event_witness;
         %incr_count;
       %end;
       %if;(count>0)
         <li>
-        %apply;capitalize(event.name) %if;(event.date.year!="")(%event.date.year;)%end;[:]
-        %foreach;event_witness;
-          %if;not is_first;, %end;%nn;
-          %apply;very_short_display_person_no_sex("event_witness")%nn;
-          %if;(event_witness_kind=[officer/officer/officers]0)%nn;
-            %sp;(%if;(event_witness.sex=1)[officer/officer/officers]1%else;[officer/officer/officers]0%end;)%end;%nn;
-        %end;.
+          %apply;capitalize(event.name) %if;(event.date.year!="")(%event.date.year;)%end;[:]
+          %foreach;event_witness;
+            %if;not is_first;, %end;%nn;
+            %apply;very_short_display_person_no_sex("event_witness")%nn;
+            %if;(event_witness_kind=[officer/officer/officers]0)%nn;
+              %sp;(%if;(event_witness.sex=1)[officer/officer/officers]1%else;[officer/officer/officers]0%end;)%end;%nn;
+          %end;.
         </li>
       %end
-  %end;
+    %end;
   </ul>
   
   %define;str(xxx,yyy)
@@ -244,21 +245,21 @@
     %incr_count;
   %end;
   %if;(count>0)
-  <small>%apply;str(first_name,sex).</small>
+    <h3>%apply;str(self,sex)</h3>
   %end;
   <ul>
-  %foreach;event_witness_relation;
-    %apply;li_SDC("event_witness_relation.person")
-      %apply;capitalize(event_witness_relation.event.name)%sp;
-        %if;(event_witness_relation.event.date.year!="")(%event_witness_relation.event.date.year;)%end;[:]
-      %if;(event_witness_relation_kind!=[witness/witnesses]0)(%event_witness_relation_kind;)%end;%sp;
-      %apply;very_short_display_person_no_sex("event_witness_relation.person")
-      %if;(event_witness_relation.event.spouse != "")
-      %sp;[and]
-      %apply;very_short_display_person_no_sex("event_witness_relation.event.spouse")
-      %end;.
-    </li>
-  %end;
+    %foreach;event_witness_relation;
+      %apply;li_SDC("event_witness_relation.person")
+        %apply;capitalize(event_witness_relation.event.name)%sp;
+          %if;(event_witness_relation.event.date.year!="")(%event_witness_relation.event.date.year;)%end;[:]
+        %if;(event_witness_relation_kind!=[witness/witnesses]0)(%event_witness_relation_kind;)%end;%sp;
+        %apply;very_short_display_person_no_sex("event_witness_relation.person")
+        %if;(event_witness_relation.event.spouse != "")
+        %sp;[and]
+        %apply;very_short_display_person_no_sex("event_witness_relation.event.spouse")
+        %end;.
+      </li>
+    %end;
   </ul>
   %nl;
 %end;

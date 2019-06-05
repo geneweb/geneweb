@@ -178,8 +178,7 @@
         %end;
       %end;
     %end;
-    <br class="d-none d-sm-none">
-    <span class="text-muted small mb-1">%dates;%(%birth_date.year;-%death_date.year; no italic?%)</span>
+    <span class="font-weight-light small">%dates;</span>
   </h1>
   </div> %( closing div just before h1 %)
 
