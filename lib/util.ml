@@ -1334,16 +1334,6 @@ let open_hed_trl conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
     Sys_error _ -> None
 
-let open_templ conf fname =
-  try Some (Secure.open_in (etc_file_name conf fname)) with
-    Sys_error _ ->
-      if true then
-        let std_fname =
-          search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
-        in
-        try Some (Secure.open_in std_fname) with Sys_error _ -> None
-      else None
-
 let open_templ_fname conf fname =
   try
     let fname = etc_file_name conf fname in
@@ -1354,8 +1344,9 @@ let open_templ_fname conf fname =
       in
       try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
 
-let image_prefix conf = conf.image_prefix
+let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
+let image_prefix conf = conf.image_prefix
 
 (*
    On cherche le fichier dans cet ordre :
