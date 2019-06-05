@@ -723,9 +723,7 @@ let short_dates_text conf base p =
             Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
           | _ -> ""
     in
-    if s <> "" then
-      " <em><bdo dir=\"ltr\" class=\"inline-short-dates-text\">" ^ s ^
-      "</bdo></em>"
+    if s <> "" then " <bdo dir=\"ltr\">" ^ s ^ "</bdo>"
     else s
   else ""
 

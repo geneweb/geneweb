@@ -12,7 +12,7 @@
   %include;hed
 </head>
 %define;book_of(xx)
-  [book of %s:::xx]
+  [book of %s:::xx]%nn;
 %end;
 %define;sosa_rel(xx)
   [<em>Sosa number</em> relative to %t:::xx]
@@ -61,27 +61,27 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
             %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
               %if;(not friend)
                 %if;(not cgi)
-                  <a href="%prefix;w=f" class="btn btn-outline-primary" role="button">[*wizard/wizards/friend/friends/exterior]2</a>
+                  <a href="%prefix;w=f" class="btn btn-outline-primary" role="button"><i class="fas fa-user-friends mr-1" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
                 %end;
               %else;
-                <a href="#" class="btn btn-primary disabled" role="button">[*wizard/wizards/friend/friends/exterior]2%sq;
+                <a href="#" class="btn btn-primary disabled" role="button"><i class="fas fa-user-friends mr-1" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2%sq;
                  %if;(user.ident != "") %user.ident;%end;</a>
               %end;
             %end;
             %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
               %if;(not wizard)
                 %if;(not cgi)
-                  <a href="%prefix;w=w" class="btn btn-outline-success" role="button">[*wizard/wizards/friend/friends/exterior]0</a>
+                  <a href="%prefix;w=w" class="btn btn-outline-success" role="button"><i class="fas fa-hat-wizard mr-1" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
                 %end;
               %else;
-                  <a href="#" class="btn btn-success disabled" role="button">[*wizard/wizards/friend/friends/exterior]0%sq;
+                  <a href="#" class="btn btn-success disabled" role="button"><i class="fas fa-hat-wizard mr-1" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0%sq;
                   %if;(user.ident != "") %user.ident;%end;</a>
               %end;
             %end;
             </div>
           %end;
           %if;((wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")) or (friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != "")))
-            <a class="btn btn-outline-danger btn-group btn-xs mt-1 ml-auto" href="%prefix;w=" role="button">[*disconnect]</a>
+            <a class="btn btn-outline-danger mt-1 ml-auto" href="%prefix;w=" role="button"><i class="fas fa-sign-out-alt mr-1" aria-hidden="true"></i>[*disconnect]</a>
           %end;
         %end;
       </div>
@@ -106,9 +106,10 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
              style="%if;(bvar.welcome_logo_style!="")%bvar.welcome_logo_style;%end;"
              alt="MyBase" title="MyBase"/>
         %else;
-          <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb"/>
+          %(<img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb"/>%)
         %end;
-        <h1 class="display-4">%apply;capitalize%with;[database]%end; %base.name;%if;(bvar.visitor_access!="no")<br><span class="text-small">%base.nb_persons; [person/persons]1%end;</span></h1>
+        <h1 class="font-weight-light">%apply;capitalize%with;[database]%end; %base.name;
+        %if;(bvar.visitor_access!="no")<br><span class="font-weight-light small">%base.nb_persons; [person/persons]1%end;</span></h1>
       </div>
     </div>
   </div>
@@ -116,147 +117,109 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     <div class="col mx-md-auto text-center">
       %if;(browsing_with_sosa_ref and bvar.visitor_access!="no")%apply;display_sosa_ref%with;%sosa_ref;%end;%end;
       %if;(bvar.motd != "")
-        <div>%apply;interp(bvar.motd)</div>
+        <h2 class="h3 font-weight-light">%apply;interp(bvar.motd)</h2>
       %end;
     </div>
   </div>
-  %if;(wizard or friend or bvar.visitor_access!="no")
-    <div class="row">
-      <div class="col-md-12 col-lg-10 mx-md-auto mt-md-1 mt-xl-3">
-        <div class="d-flex justify-content-around">
-          <div class="col-md align-self-center">
-            <div class="btn-group-vertical">
-              %if;(wizard and not base.has_notes)
-                <a class="btn btn-outline-primary" href="%prefix;m=MOD_NOTES">[*add base notes]</a>
-              %end;
-              %if;base.has_notes;
-                <a class="btn btn-outline-primary" href="%prefix;m=NOTES"><i class="far fa-file-alt fa-fw" aria-hidden="true"></i> [*base notes]</a>%base.title;
-              %end;
-              %if;has_misc_notes;
-                <a class="btn btn-outline-primary" href="%prefix;m=MISC_NOTES">[*base index notes]</a>
-              %end;
-              %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
-                   and (wizard or wiznotes_dir_exists)
-                   and bvar.authorized_wizards_notes = "yes")
-                 <a class="btn btn-outline-success" href="%prefix;m=WIZNOTES"><i class="far fa-file-alt fa-fw" aria-hidden="true"></i> [*base wizard notes]</a>
-              %end;
-              <a class="btn btn-outline-primary mt-2" href="%prefix;m=CAL"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i> [*calendar/calendars]1</a>
-              <a class="btn btn-outline-primary mt-2" href="%prefix;m=STAT"><i class="far fa-chart-bar fa-fw" aria-hidden="true"></i> [*statistics]</a>
-              <a class="btn btn-outline-primary mt-2" href="%prefix;m=ANM"><i class="fa fa-birthday-cake fa-fw" aria-hidden="true"></i> [*anniversaries]</a>
-            </div>
-          </div>
-          <div class="col-md-8 mt-3">
-            <div class="h5 ml-5 col">[*search/case sensitive]0[:]</div>
-            <form class="d-flex justify-content-end" method="get" action="%prefix;">
-              %hidden;
-              <input type="hidden" name="m" value="S">
-              <div class="col-10">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <a class="btn btn-lg btn-outline-secondary border-0" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=7><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-                    <a class="btn btn-lg btn-outline-secondary border-0" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=8><i class="fa fa-sort-amount-down fa-fw"></i></a>
-                  </div>
-                  <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
-                  <input type="search" id="surname" class="form-control form-control-lg border-top-0 border-right-0 border-left-0" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" autofocus tabindex=1>
-                </div>
-                <div class="input-group mt-2">
-                  <div class="input-group-prepend">
-                    <a class="btn btn-lg btn-outline-secondary border-0" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=9><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-                    <a class="btn btn-lg btn-outline-secondary border-0" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=10><i class="fa fa-sort-amount-down fa-fw"></i></a>
-                  </div>
-                  <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
-                  <input type="search" id="firstname" class="form-control form-control-lg border-top-0 border-right-0 border-left-0" name="p" placeholder="[*first name/first names]2" tabindex=2>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-lg btn-outline-primary" title="[*search/case sensitive]0 [person/persons]0" tabindex=3><i class="fa fa-search fa-fw"></i></button>
-            </form>
-            %if;(bvar.propose_titles != "no")
-              <form class="d-flex mt-5 justify-content-end" method="get" action="%action;">
-                %hidden;
-                <input type="hidden" name="m" value="TT">
-                <div class="col-9">
-                  <label for="titles" class="sr-only col-form-label col-sm-2">[*title/titles]0</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <a class="btn btn-outline-secondary btn-lg border-0" href="%prefix;m=TT;t=" tabindex=10 title="[*all the titles]"><i class="fa fa-list-ul fa-fw"></i></a>
-                    </div>
-                    <input type="search" class="form-control form-control-lg border-top-0 border-right-0 border-left-0" name="t" id="titles" placeholder="[*title/titles]0" maxlength="200" tabindex=4>
-                  </div>
-                  <label for="estates" class="sr-only col-form-label col-sm-2" >[*estate]0</label>
-                  <div class="input-group mt-2">
-                    <div class="input-group-prepend">
-                      <a class="btn btn-outline-secondary btn-lg border-0" href="%prefix;m=TT;p=*" tabindex=11 title="[*all the estates]"><i class="fa fa-list-ul fa-fw"></i></a>
-                    </div>
-                    <input type="search" class="form-control form-control-lg border-top-0 border-right-0 border-left-0" name="p" id="estates" placeholder="[*estate]0" maxlength="200" tabindex=5>
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-outline-primary btn-lg" title="[*search/case sensitive]0 [title/titles]0/[estate]" tabindex=6><i class="fa fa-search fa-fw"></i></button>
-              </form>
-            %end;
-          </div>
-          %if;(bvar.propose_place_surnames!="no")%nl;
-            <div class="d-flex justify-content-center align-self-center">
-              <form class="form-inline" id="form-place" method="get" action="%prefix;">
-                %hidden;
-                <input type="hidden" name="m" value="PS"%/>
-                <span class="">[*places] / [surname/surnames]0[:]</span>
-                <div class="input-group">
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="bi" id="bi" value="on">
-                    <label class="custom-control-label" title="[*birth place]" for="bi">[*birth]</label>
-                  </div>
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="bp" id="bp" value="on">
-                    <label class="custom-control-label" title="[*baptism place]" for="bp">[*baptism]</label>
-                  </div>
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="ma" id="ma" value="on">
-                    <label class="custom-control-label" title="[*marriage place]" for="ma">[*marriage/marriages]0</label>
-                  </div>
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="de" id="de" value="on">
-                    <label class="custom-control-label" title="[*death place]" for="de">[*death]</label>
-                  </div>
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="bu" id="bu" value="on">
-                    <label class="custom-control-label" title="[*burial place]" for="bu">[*burial]</label>
-                  </div>
-                  <button type="submit" class="btn btn-outline-primary border-0 text-secondary mx-2 mt-1" title="[*search/case sensitive]0 [places] / [surname/surnames]0"><i class="fa fa-search"></i> Search</button>
-                </div>
-              </form>
-            </div>
-          %end;
-          <div class="col-md-2 align-self-center">
-            <div class="btn-group-vertical">
-              %if;(has_history and bvar.history="yes")
-                <a class="btn btn-outline-primary" href="%prefix;m=HIST;k=20">[*history]</a>
-              %end;
-              %if;(bvar.disable_forum != "yes")
-                <a class="btn btn-outline-primary mt-2" href="%prefix;m=FORUM"><i class="far fa-comments fa-fw"></i> [*forum]</a>
-              %end;
-              %if;(bvar.hide_advanced_request = "no")
-                <a class="btn btn-outline-primary mt-2" href="%prefix;m=H;v=advanced"><i class="fa fa-search-plus fa-fw"></i> [*advanced request]1</a>
-              %end;
-              %if;(wizard and bvar.propose_add_family != "no")
-                <a class="btn btn-outline-success mt-4" href="%prefix;m=ADD_FAM" role="button" title="[*add::family/families]0 ([wizard/wizards/friend/friends/exterior]0)">[*add::family/families]0</a>
-              %end;
-            </div>
-          </div>
-        </div>
-      </div>
+  %if;(bvar.visitor_access!="no")
+    <div class="row justify-content-end mt-4"> 
+      <div class="col-9 h4 font-weight-light"><i class="fa fa-search fa-sm fa-fw mr-2 text-secondary"></i>[*search/case sensitive]0</div>
     </div>
-    %if;(wizard)
-      <div class="d-flex justify-content-center mt-xl-5 mt-md-3">
-        <div class="btn-group" role="group">
-          <span class="btn disabled text-success font-weight-bold">[*books][:]</span>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=fn" title="[*modify] %apply;book_of([first name/first names]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*first name/first names]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=sn" title="[*modify] %apply;book_of([surname/surnames]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*surname/surnames]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=occu" title="[*modify] %apply;book_of([occupation/occupations]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*occupation/occupations]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=src" title="[*modify] %apply;book_of([source/sources]1) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*source/sources]1</a>
-            <a class="btn text-success" role="button" href="%prefix;m=MOD_DATA;data=place" title="[*modify] %apply;book_of([places]) ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-book fa-fw"></i> [*places]</a>
+    <div class="row justify-content-center mt-2">
+      <form class="col-12" method="get" action="%prefix;">
+        %hidden;
+        <input type="hidden" name="m" value="S">
+        <div class="d-flex justify-content-center">
+          <div class="btn-group-vertical mr-2">
+            <a role="button" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
+            <a role="button" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
           </div>
+          <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
+          <input type="search" id="surname" class="form-control form-control-lg col-5" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" title="[*search/case sensitive]0 [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" autofocus tabindex=1>
+        </div>
+        <div class="d-flex justify-content-center mt-2">
+          <div class="btn-group-vertical  align-self-center mr-2">
+            <a role="button" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
+            <a role="button" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
+          </div>
+          <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
+          <input type="search" id="firstname" class="form-control form-control-lg col-5 border-top-0" name="p" placeholder="[*first name/first names]2" title="[*search/case sensitive]0 [first name/first names]2" tabindex=2>
+        </div>
+        <button type="submit" class="d-none btn btn-lg btn-outline-primary" title="[*search/case sensitive]0 [person/persons]0"><i class="fa fa-search fa-fw"></i></button>
+      </form>
+      %if;(bvar.propose_titles != "no")
+        <form class="col-12 mt-4" method="get" action="%action;">
+          %hidden;
+          <input type="hidden" name="m" value="TT">
+          <div class="d-flex justify-content-center">
+            <a class="mr-2 align-self-center" role="button" href="%prefix;m=TT;t=" title="[*all the titles]"><i class="fa fa-list-ul fa-fw"></i></a>
+            <label for="titles" class="sr-only col-form-label col-sm-2">[*title/titles]0</label>
+            <input type="search" class="form-control col-5 border-top-0 border-right-0 border-left-0" name="t" id="titles" placeholder="[*title/titles]0" maxlength="200" tabindex=3>
+          </div>
+          <div class="d-flex justify-content-center mt-2">
+            <a class="mr-2 align-self-center" role="button" href="%prefix;m=TT;p=*" title="[*all the estates]"><i class="fa fa-list-ul fa-fw"></i></a>
+            <label for="estates" class="sr-only col-form-label col-sm-2" >[*estate]0</label>
+            <input type="search" class="form-control col-5 border-top-0 border-right-0 border-left-0" name="p" id="estates" placeholder="[*estate]0" maxlength="200" tabindex=4>
+          </div>
+          <button type="submit" class="d-none btn btn-lg btn-outline-primary" title="[*search/case sensitive]0 [person/persons]0"><i class="fa fa-search fa-fw"></i></button>
+        </form>
+      %end;
+    </div>
+  %end;
+  <div class="d-flex justify-content-center mt-3">
+    <div class="btn-group">
+      %if;(wizard and not base.has_notes)
+        <a role="button" class="btn btn-outline-primary border-0" href="%prefix;m=MOD_NOTES">[*add base notes]</a>
+      %end;
+      %if;base.has_notes;
+        <a role="button" class="btn btn-outline-primary border-0" href="%prefix;m=NOTES">
+          <i class="far fa-file-alt fa-fw ml-2" aria-hidden="true"></i>[*base notes]</a>%base.title;
+      %end;
+      %if;has_misc_notes;
+        <a role="button" class="btn btn-outline-primary border-0" href="%prefix;m=MISC_NOTES">[*base index notes]</a>
+      %end;
+      %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
+           and (wizard or wiznotes_dir_exists)
+           and bvar.authorized_wizards_notes = "yes")
+         <a role="button" class="btn btn-outline-success border-0" href="%prefix;m=WIZNOTES"><i class="far fa-file-alt fa-fw mr-2" aria-hidden%"true"></i>[*base wizard notes]</a>
+      %end;
+      <a role="button" class="btn btn-outline-primary border-0" href="%prefix;m=STAT"><i class="far fa-chart-bar fa-fw mr-2" aria-hidden="true"></i>[*statistics]</a>
+      <a role="button" class="btn btn-outline-primary border-0" href="%prefix;m=ANM"><i class="fa fa-birthday-cake fa-fw mr-2" aria-hidden="true"></i>[*anniversaries]</a>
+      %if;(has_history and bvar.history="yes")
+        <a role="button" class="btn btn-outline-primary border-0" href="%prefix;m=HIST;k=20"><i class="fas fa-history fa-fw mr-2" aria-hidden="true"></i>[*history]</a>
+      %end;
+      %if;(bvar.disable_forum != "yes")
+        <a class="btn  btn-outline-primary border-0" href="%prefix;m=FORUM"><i class="far fa-comments fa-fw mr-2" aria-hidden="true"></i>[*forum]</a>
+      %end;           
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-self-center">
+    <h4><i class="fas fa-tools fa-xs mr-2"></i>[*tools][:]</h4>
+    <div class="btn-group align-self-center">
+    %if;(wizard and bvar.propose_add_family != "no")
+       <a role="button" class="mx-2" href="%prefix;m=ADD_FAM" title="[*add::family/families]0 ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-user-plus mr-1" aria-hidden="true"></i>[*add::family/families]0</a>·
+    %end;
+    %if;(bvar.propose_place_surnames!="no")
+      <a role="button" class="mx-2" href="%prefix;m=PS"><i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*places] [by] [surname/surnames]0</a>·
+    %end;
+    %if;(bvar.hide_advanced_request = "no")
+      <a role="button" class="mx-2" href="%prefix;m=H;v=advanced"><i class="fa fa-search-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>·
+    %end;
+    <a role="button" class="mx-2" href="%prefix;m=CAL"><i class="far fa-calendar-alt fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center ">
+    %if;(wizard)
+      <h4 class="ml-2 align-self-center"><i class="fas fa-book fa-xs mr-2"></i>[*books][:]</h4>
+      <div class="btn-group align-self-center ml-2">
+        <a role="button" href="%prefix;m=MOD_DATA;data=place" title="[*modify] %apply;book_of([places]) ([wizard/wizards/friend/friends/exterior]0)">[*places]</a> · 
+        <a role="button" href="%prefix;m=MOD_DATA;data=sn" title="[*modify] %apply;book_of([surname/surnames]1) ([wizard/wizards/friend/friends/exterior]0)">[*surname/surnames]1</a> · 
+        <a role="button" href="%prefix;m=MOD_DATA;data=fn" title="[*modify] %apply;book_of([first name/first names]1) ([wizard/wizards/friend/friends/exterior]0)">[*first name/first names]1</a> · 
+        <a role="button" href="%prefix;m=MOD_DATA;data=occu" title="[*modify] %apply;book_of([occupation/occupations]1) ([wizard/wizards/friend/friends/exterior]0)">[*occupation/occupations]1</a> · 
+        <a role="button" href="%prefix;m=MOD_DATA;data=src" title="[*modify] %apply;book_of([source/sources]1) ([wizard/wizards/friend/friends/exterior]0)">[*source/sources]1</a>
       </div>
     %end;
+  </div>
   <div class="row">
     <div class="col my-md-3 text-center">
       %if;(bvar.counter != "no")%apply;interp([
@@ -314,7 +277,9 @@ sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
     av dem till den här sidan, sedan %start_date;.
 zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     次访问本主页， 自从 %start_date;。
-])<br>%end;(%apply;interp([
+])
+%end;
+<br>(%apply;interp([
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
     href="%prefix;escache=0">link</a>.
@@ -395,20 +360,19 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 ]))
     </div>
   </div>
-  %else;
+  %if;(bvar.visitor_access="no")
     %let;lg;%lang;%in;
     <div class="text-center alert alert-danger font-weight-bold" role="alert">
       <i class="fa fa-warning fa-fw mr-2"></i><span>%apply;get_visitor_access_msg(lg)</span><span class="fa fa-warning fa-fw"></span>
     </div>
   %end;
-%include;trl
 <div class="text-center">
   <small>
     %include;version
   </small>
 </div>
+%include;trl
 %include;copyr
-
 </div>
 %include;js
 </body>

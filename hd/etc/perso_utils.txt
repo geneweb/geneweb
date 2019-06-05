@@ -295,8 +295,9 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a href="%prefix;%xx.access;" %nn;
-      class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%end;
+    %else;<a href="%prefix;%xx.access;"
+     class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%nn;
+    %end;
   %end;
 %end;
 
