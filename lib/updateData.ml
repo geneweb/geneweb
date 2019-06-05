@@ -754,8 +754,14 @@ let update_person conf base old new_input p =
       let first_name = get_first_name p in
       let s_first_name = sou base first_name in
       let s_first_name_lower = Name.lower s_first_name in
+      let ip = get_key_index p in
+      let ipl = persons_of_name base
+        (new_input ^ " " ^ (sou base (get_surname p)))
+      in
       let (first_name, occ) =
-        if old = s_first_name then
+        if List.mem ip ipl then
+          new_istr, get_occ p
+        else if old = s_first_name then
           new_istr,
           Gutil.find_free_occ base (sou base new_istr)
             (sou base (get_surname p)) 0
@@ -782,8 +788,14 @@ let update_person conf base old new_input p =
       let surname = get_surname p in
       let s_surname = sou base surname in
       let s_surname_lower = Name.lower s_surname in
+      let ip = get_key_index p in
+      let ipl = persons_of_name base
+        ((sou base (get_first_name p)) ^ " " ^ new_input)
+      in
       let (surname, occ) =
-        if old = s_surname then
+        if List.mem ip ipl then
+          new_istr, get_occ p
+        else if old = s_surname then
           new_istr,
           Gutil.find_free_occ base (sou base (get_first_name p))
             (sou base new_istr) 0
