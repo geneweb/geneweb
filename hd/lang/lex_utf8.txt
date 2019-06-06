@@ -14748,18 +14748,6 @@ sk: s :i:
 sl: z
 sv: med
 
-    with%t
-de: mit%t
-en: with%t
-es: cont%t
-fi: sekä%t
-fr: avec%t
-it: con%t
-nl: met%t
-no: med%t
-pt: com%t
-sv: med%t
-
     witness at marriage of %s and %s
 af: getuie by die troue van %s met %s
 bg: свидетел при брака на %s и %s
