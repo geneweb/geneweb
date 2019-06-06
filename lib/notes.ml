@@ -252,12 +252,13 @@ let notes_links_db conf base eliminate_unlinked =
     db2
 
 let print_linked_list conf base pgl =
+  let typ = p_getenv conf.env "type" in
   Wserver.printf "<ul>\n";
   List.iter
     (fun pg ->
-       Wserver.printf "<li>";
-       begin match pg with
-         NotesLinks.PgInd ip ->
+       begin match pg, typ with
+         NotesLinks.PgInd ip, None ->
+           Wserver.printf "<li>";
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
@@ -274,11 +275,13 @@ let print_linked_list conf base pgl =
                (Date.short_dates_text conf base p);
              Wserver.printf "</span>"
            end;
-           Wserver.printf "</tt>\n"
-       | NotesLinks.PgFam ifam ->
+           Wserver.printf "</tt>\n";
+           Wserver.printf "</li>\n"
+       | NotesLinks.PgFam ifam, None ->
            let fam = foi base ifam in
            let fath = pget conf base (get_father fam) in
            let moth = pget conf base (get_mother fam) in
+           Wserver.printf "<li>";
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
@@ -296,8 +299,10 @@ let print_linked_list conf base pgl =
              (Util.referenced_person_title_text conf base moth)
              (Date.short_dates_text conf base moth);
            Wserver.printf "</span>";
-           Wserver.printf "</tt>\n"
-       | NotesLinks.PgNotes ->
+           Wserver.printf "</tt>\n";
+           Wserver.printf "</li>\n"
+       | NotesLinks.PgNotes, None ->
+           Wserver.printf "<li>";
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
@@ -310,11 +315,19 @@ let print_linked_list conf base pgl =
              (commd conf);
            Wserver.printf "%s" (transl_nth conf "note/notes" 1);
            Wserver.printf "</a>\n";
-           Wserver.printf "</tt>\n"
-       | NotesLinks.PgMisc fnotes ->
+           Wserver.printf "</tt>\n";
+           Wserver.printf "</li>\n"
+       | NotesLinks.PgMisc fnotes, typ ->
            let (nenv, _) = read_notes base fnotes in
+           if match typ with
+             | Some t ->
+                 let n_type = try List.assoc "TYPE" nenv with Not_found -> "" in
+                 t = n_type
+             | None -> true
+           then begin
            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
            let title = Util.safe_html title in
+           Wserver.printf "<li>";
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
@@ -329,8 +342,11 @@ let print_linked_list conf base pgl =
            Wserver.printf "%s" fnotes;
            Wserver.printf "</a>";
            if title <> "" then Wserver.printf "(%s)" title;
-           Wserver.printf "</tt>\n"
-       | NotesLinks.PgWizard wizname ->
+           Wserver.printf "</tt>\n";
+           Wserver.printf "</li>\n"
+           end
+       | NotesLinks.PgWizard wizname, None ->
+           Wserver.printf "<li>";
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
@@ -348,9 +364,10 @@ let print_linked_list conf base pgl =
            Wserver.printf "(%s)"
              (transl_nth conf "wizard/wizards/friend/friends/exterior" 0);
            Wserver.printf "</i>";
-           Wserver.printf "</tt>\n"
-       end;
-       Wserver.printf "</li>\n")
+           Wserver.printf "</tt>\n";
+           Wserver.printf "</li>\n"
+       | _ -> ()
+       end)
     pgl;
   Wserver.printf "</ul>\n"
 

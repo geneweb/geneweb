@@ -10,6 +10,9 @@
   %include;css
   <style>
   .in { background-color: coral; }
+  .list_comma { display: inline; list-style: none; padding-left: 0; }
+  .list_comma li { display: inline; }
+  .list_comma li:not(:last-child):after { content: ", "; }
   </style>
   %include;hed
 </head>
@@ -28,8 +31,10 @@
 
 <map id="map" name="map"></map>
 <img id="image" usemap="#map">
-Sur cette photo : <span id="legend"></span>
-<br><span id="unknown"></span>
+Sur cette photo : <ul id="legend" class="list_comma"></ul>
+<div id="div_unknown" style="display: none;">
+[*unknown person][:] <ul id="unknown" class="list_comma"></ul>
+</div>
 
 </div>
 %include;trl
@@ -39,6 +44,13 @@ Sur cette photo : <span id="legend"></span>
 %include;js
 <script src="%if(cgi)%bvar.static_path;%end;js/jquery.maphilight.js"></script>
 <script>
+function get( v ) {
+  if( typeof v !== "undefined" ) {
+    return v
+  } else {
+    return ""
+  }
+}
 var doc_path="%prefix;m=DOC&s=";
 var public_path="%bvar.gallery_path;";
 var private_path="%bvar.gallery_path_private;";
@@ -57,20 +69,30 @@ $(document).ready(function() {
     }
 
     var cnt = 1;
-    var sep = "";
-    var sep_u = "Non identifiés : ";
-    json.map.forEach( function( i ) {
-      var href = "";
-      if( i.fn != "" ) {
-        href = " href='%prefix;&p=" + i.fn + "&n=" + i.sn + "&oc=" + i.oc + "'";
-      }
-      $("#map").append( "<area id='area" + cnt + "' shape='" + i.shape + "' coords='" + i.coords + "' alt='" + i.alt + "' title='" + i.alt + "'" + href + ">" );
-      if( i.fn != "" ) {
-        $("#legend").append( sep + "<a class='legend' id='a" + cnt + "' href='%prefix;&p=" + i.fn + "&n=" + i.sn + "&oc=" + i.oc + "'>" + i.alt + "</a>" );
-        sep = ", ";
-      } else {
-        $("#unknown").append( sep_u + "<span class='legend' id='a" + cnt + "'>" + cnt + "</span>" );
-        sep_u = ", ";
+    json.map.forEach( function( r ) {
+      if( get(r.t) == "" || r.t == "p" ) {
+        var href = "";
+        var txt = "";
+        var oc = get(r.oc);
+        if( oc != "" && oc != "0" ) { oc = "&oc=" + oc }
+        if( get(r.fn) != "" && get(r.sn) != "" ) {
+          href = " href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "'";
+          txt = r.fn + " " + r.sn;
+        }
+        if( get(r.alt) != "" ) { txt += " (" + r.alt + ")"; }
+        $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + txt + "' title='" + txt + "'" + href + ">" );
+        if( get(r.fn) != "" && get(r.sn) != "" ) {
+          $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "'>" + txt + "</a></span></li>" );
+        } else {
+          $("#unknown").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
+          $("#div_unknown").show();
+        }
+      } else if( r.t == "m" ) {
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='%prefix;m=NOTES&f=" + get(r.misc) + "'>" + get(r.alt) + "</a></span></li>" );
+      } else if( r.t == "g" ) {
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='%prefix;" + get(r.href) + "'>" + get(r.alt) + "</a></span></li>" );
+      } else if( r.t == "e" ) {
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + get(r.href) + "'>" + get(r.alt) + "</a></span></li>" );
       }
       cnt++;
     });
@@ -84,9 +106,9 @@ $(document).ready(function() {
     });
 
     $("area").mouseover( function(e) {
-      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") ).addClass( "in" );
+      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") + " span" ).addClass( "in" );
     }).mouseout( function(e) {
-      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") ).removeClass( "in" );
+      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") + " span" ).removeClass( "in" );
     });
   })
   .fail( function() {
