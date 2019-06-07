@@ -27,7 +27,6 @@
 #ifdef GWDB1
 (library (name db1link) (wrapped false) (libraries geneweb.gwdb1 geneweb) (modules db1link))
 (rule (copy gwc/gwc1.ml gwc.ml))
-(rule (copy ged2gwb/ged2gwb1.ml ged2gwb.ml))
 (executable
   (public_name gwc)
   (modules gwc)
@@ -38,22 +37,5 @@
   (public_name ged2gwb)
   (modules ged2gwb utf8List)
   (libraries unix str camlp5.gramlib geneweb.gwdb1 geneweb)
-)
-#endif
-
-#ifdef GWDB2
-(library (name db2link) (wrapped false) (libraries geneweb.gwdb2 geneweb) (modules db2link))
-(rule (copy gwc/gwc2.ml gwc.ml))
-(rule (copy ged2gwb/ged2gwb2.ml ged2gwb.ml))
-(executable
-  (public_name gwc)
-  (modules gwc)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries geneweb.gwdb2 geneweb geneweb.wserver gwclib db2link)
-)
-(executable
-  (public_name ged2gwb)
-  (modules ged2gwb utf8List)
-  (libraries unix str camlp5.gramlib geneweb.gwdb2 geneweb db2link)
 )
 #endif
