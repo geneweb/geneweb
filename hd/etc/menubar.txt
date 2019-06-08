@@ -426,8 +426,8 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 %foreach;img_in_keydir;
                   %incr_count;
                   <div class="carousel-item%if;is_first; active%end;">
-                    <a class="h-75" href="%prefix_base_password;&m=IM&i=%index;&s=images/%keydir;/%keydir_img_key;" target="_blank" rel="noopener">
-                      <img class="d-block w-100" src="?m=IM&i=%index;&s=images/%keydir;/%keydir_img_key;" alt="%count; slide">
+                    <a class="h-75" href="%prefix_base_password;&m=IM&i=%index;&s=%keydir_img_key;" target="_blank" rel="noopener">
+                      <img class="d-block w-100" src="?m=IM&i=%index;&s=%keydir_img_key;" alt="%count; slide">
                     </a>
                     <div class="carousel-caption d-none d-md-block%( text-dark%)">
                       <h5>%if;(keydir_img_notes="")%keydir_img;%else;%keydir_img_notes;%end;</h5>

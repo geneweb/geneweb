@@ -128,7 +128,7 @@
           <span id="which_img_show">[*send image with comment]</span></button>
       </form>
     </div>
-    %( *** Col 2 *** %)
+    %( *** Col 2 *** FIXME manage image cache properly (escache seems inoperative) %)
     <div class="col-6">
       %if;(has_image or has_old_image)
         <h1 class="display-4">[*portrait]0</h1>
@@ -136,10 +136,10 @@
         <strong><samp class="text-truncate" title="%base.name;.gwb%X;documents%X;portraits%X;">portraits%X;</samp></strong>
         %if;has_image;
           <div class="d-flex mt-1">
-            <a role="button" href="%prefix_base_password;&m=IM&i=%index;" target="_blank" rel="noopener"%sp;
+            <a role="button" href="%prefix_base_password;&escache=%evar.escache;&m=IM&i=%index;" target="_blank" rel="noopener"%sp;
             data-toggle="tooltip" data-html="true" data-placement="left"
             title='<strong>[*see] [portrait]</strong><br><span class="small">%portrait;</span>
-                   <br><img class="rounded my-1" src="%prefix_base_password;&m=IM&i=%index;" width="185px">'>
+                   <br><img class="rounded my-1" src="%prefix_base_password;&escache=%evar.escache;&m=IM&i=%index;" width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>
             <samp class="ml-4" title="%base.name;.gwb%X;documents%X;portraits%X;%portrait;">%portrait;</samp>
@@ -153,15 +153,15 @@
         %end;
         %if;has_old_image;
           <div class="d-flex %if;(has_image) mt-1%end;">
-            <a role="button" href="%prefix_base_password;&m=IMS&i=%index;" target="_blank" rel="noopener"
+            <a role="button" href="%prefix_base_password;&escache=%evar.escache;&m=IMS&i=%index;" target="_blank" rel="noopener"
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see] [portrait] [saved]0</strong><br><span class="small">saved%X;%portrait_saved;</span>
-                     <br><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;" width="185px">'>%nn;
+                     <br><img class="rounded my-1" src="%prefix_base_password;&escache=%evar.escache;&m=IMS&i=%index;" width="185px">'>%nn;
                <i class="far fa-file-image fa-fw text-primary"></i></a>%nn;
-            <a role="button" href="%prefix_base_password;&m=RESET_IMAGE_C_OK&i=%index;&idigest=%idigest;"
+            <a role="button" href="%prefix_base_password;&escache=%evar.escache;&m=RESET_IMAGE_C_OK&i=%index;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="left"
                title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [portrait] [saved]0</strong><br><span class="small">saved%X;%portrait_saved;</span>
-                      <br><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;" width="185px">'>%nn;     
+                      <br><img class="rounded my-1" src="%prefix_base_password;&escache=%evar.escache;&m=IMS&i=%index;" width="185px">'>%nn;     
               <i class="fas fa-retweet fa-rotate-90 fa-fw text-success"></i></a>
             <samp class="ml-1" title="%base.name;.gwb%X;documents%X;portraits%X;saved%X;%portrait_saved;"><strong>saved%X;</strong>%portrait_saved;</samp>
             <a role="button" class="ml-auto col-1" href="%prefix_base_password;&m=DEL_IMAGE_C_OK&i=%index;&idigest=%idigest;&delete=on"
