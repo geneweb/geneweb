@@ -15,9 +15,7 @@ li.female { list-style-type: circle; list-style-image: url('%image_prefix;/femal
       integrity="sha384-i1LQnF23gykqWXg6jxC2ZbCbUMxyw5gLZY6UiUS98LYV5unm8GWmfkIS6jqJfb4E" crossorigin="anonymous">
   %else;
     <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/bootstrap.min.css?version=4.3.1">
-    %if;(bvar.js_icon!="yes")
-      <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.min.css?version=5.9.0">
-    %end;
+    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.min.css?version=5.9.0">
   %end;
 %end;
 <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/css.css">
