@@ -16,6 +16,8 @@
   .list_comma li { display: inline; }
   .list_comma li:not(:last-child):after { content: ", "; }
   input:invalid { box-shadow: 0 0 1.5px 1px red; }
+  #image { cursor: crosshair; }
+  textarea { resize: both; }
   </style>
   %include;hed
 </head>
@@ -29,6 +31,10 @@
 <div class="form-group row">
   <label for="page_title" class="col-form-label col-auto">[*title/titles]0</label>
   <input type="text" class="form-control col-sm-10" id="page_title">
+</div>
+<div class="form-group row">
+  <label for="page_desc" class="col-form-label col-auto">Description</label>
+  <textarea class="form-control col-sm-10" id="page_desc"></textarea>
 </div>
 <div class="form-group row">
   <div class="col-auto">Chemin</div>
@@ -48,7 +54,7 @@
 
 <div onmousedown="return false" id="frame">
 <map id="map" name="map"></map>
-<img id="image" usemap="#map" style="cursor: crosshair;">
+<img id="image" usemap="#map">
 <div id="selection"></div>
 </div>
 <ul id="div_legend" class="list_comma"></ul>
@@ -67,7 +73,7 @@
 </table>
 
 <form id="form" method="post" action="%action;">
-%( FIXME: hidden missing %)
+ %hidden;
  <input type="hidden" name="m" value="MOD_NOTES_OK">
  <input type="hidden" name="f" value="%evar.f;">
  <input id="digest" type="hidden" name="digest">
@@ -121,16 +127,18 @@ $(document).mousedown( function() {
 
 var global_cnt = 0;
 function add_new_row( x1, y1, x2, y2 ) {
-  var cnt = ++global_cnt;
+  if( x2-x1 > 5 && y2-y1 > 5 ) {
+    var cnt = ++global_cnt;
 
-  var coords = "" + x1 + "," + y1 + "," + x2 + "," + y2;
-  var new_row = table.row.add( {
-    "shape": "rect",
-    "coords": coords
-  }).draw(false);
-  $("#map").append( "<area id='area" + cnt + "' shape='rect' coords='" + coords + "' alt='" + cnt + "' title='" + cnt + "'>" );
-  $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
-  new_row.node().id = "row" + cnt;
+    var coords = "" + x1 + "," + y1 + "," + x2 + "," + y2;
+    var new_row = table.row.add( {
+      "shape": "rect",
+      "coords": coords
+    }).draw(false);
+    $("#map").append( "<area id='area" + cnt + "' shape='rect' coords='" + coords + "' alt='" + cnt + "' title='" + cnt + "'>" );
+    $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
+    new_row.node().id = "row" + cnt;
+  }
 }
 
 $(document).ready(function() {
@@ -227,8 +235,11 @@ $(document).ready(function() {
          "defaultContent": "",
          "render": function ( data, type, row, meta ) {
            var disabled = "";
+           var placeholder = "";
            if( row.t != "e" && row.t != "g" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
+           if( row.t == "e" ) { placeholder = " placeholder='https://...'"; }
+           if( row.t == "g" ) { placeholder = " placeholder='m=...'"; }
+           return "<input class='form-control update' type='text' value='" + get(data) + "'" + placeholder + disabled + ">";
          }
        },
        {
@@ -336,6 +347,9 @@ zh: Chinese
        }
        $("#fname").val( json.img ).change();
        $("#page_title").val( json.title );
+       $("#page_desc").val( json.desc );
+
+       // Init map and legend from JSON
        json.map.forEach( function( r ) {
          var cnt = ++global_cnt;
 
@@ -351,6 +365,8 @@ zh: Chinese
          } else {
            $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
          }
+
+         // Make sure we can find the row in table
          table.row(cnt-1).node().id = "row" + cnt;
        });
     } 
@@ -399,7 +415,10 @@ zh: Chinese
     let td = table.cell( this.closest('td') );
     let tr = $(this).closest('tr');
 
+    // Propagate change to Datatables
     td.data( $(this).val() ).draw();
+
+    // This is needed to update rendering on other input fields
     if( this.nodeName == "SELECT" ) {
       tr.find("input.update").change();
     }
@@ -408,6 +427,7 @@ zh: Chinese
   $(document).on( "click", ".remove", function (e) {
     var tr = $(this).closest('tr');
     var n = tr.attr("id").replace(/[a-z]/g, "");
+
     $( "#area" + n ).remove();
     $( "#a" + n ).remove();
     table.row( tr ).remove().draw();
@@ -423,6 +443,7 @@ zh: Chinese
    // load pre-trained classifiers
    let utils = new Utils('fd_error');
    let faceCascadeFile = 'haarcascade_frontalface_default.xml';
+   // FIXME : It works only the first time
    utils.createFileFromUrl( faceCascadeFile, '%if(cgi)%bvar.static_path;%end;js/' + faceCascadeFile, () => {
      faceCascade.load( faceCascadeFile );
      // detect faces
@@ -443,6 +464,8 @@ zh: Chinese
     selection = true;
     x1 = e.pageX;
     y1 = e.pageY;
+    x2 = x1;
+    y2 = y1;
   });
   $("#frame").mousemove( function(e) {
     if( selection ) {
@@ -474,15 +497,15 @@ zh: Chinese
     $("#selection").hide();
 
     var pos = $("#frame").get(0).getBoundingClientRect();
-    x1 -= pos.left + pageXOffset;
-    x2 -= pos.left + pageXOffset;
-    y1 -= pos.top + pageYOffset;
-    y2 -= pos.top + pageYOffset;
+    var l_x1 = x1 - pos.left + pageXOffset;
+    var l_x2 = x2 - pos.left + pageXOffset;
+    var l_y1 = y1 - pos.top + pageYOffset;
+    var l_y2 = y2 - pos.top + pageYOffset;
 
-    if( x1 < x2 && y1 < y2 ) {
-      add_new_row( x1, y1, x2, y2 );
+    if( l_x1 < l_x2 && l_y1 < l_y2 ) {
+      add_new_row( l_x1, l_y1, l_x2, l_y2 );
     } else {
-      add_new_row( x2, y2, x1, y1 );
+      add_new_row( l_x2, l_y2, l_x1, l_y1 );
     }
   });
   $("#frame").mouseenter( function() {
@@ -499,10 +522,12 @@ zh: Chinese
     event.preventDefault();
     var res = {
       "title": $("#page_title").val(),
+      "desc": $("#page_desc").val(),
       "path": $("input[name=path]:checked").val(),
       "img": $("#fname").val(),
       "map": table.rows().data().toArray()
     };
+    // Cleanup data before to save
     for( i=0, ien=res.map.length ; i < ien ; i++ ) {
       if( res.map[i].t == "p" ) { delete res.map[i].misc ; delete res.map[i].href ; }
       if( res.map[i].t == "m" ) { delete res.map[i].fn ; delete res.map[i].sn ; delete res.map[i].oc ; delete res.map[i].href ; }

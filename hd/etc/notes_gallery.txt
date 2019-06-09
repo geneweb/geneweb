@@ -29,6 +29,8 @@
 </div>
 %end;
 
+<div id="description"></div>
+
 <map id="map" name="map"></map>
 <img id="image" usemap="#map">
 Sur cette photo : <ul id="legend" class="list_comma"></ul>
@@ -57,7 +59,8 @@ var private_path="%bvar.gallery_path_private;";
 $(document).ready(function() {
   $.ajax( "%url;ajax=on" )
   .done( function( json ) {
-    $("#h1").text( json.title );
+    $("#h1").html( json.title );
+    $("#description").html( json.desc );
     if( json.path == "doc" ) {
       $("#image").attr( "src", doc_path+json.img );
     } else if( json.path == "private" ) {
@@ -88,11 +91,17 @@ $(document).ready(function() {
           $("#div_unknown").show();
         }
       } else if( r.t == "m" ) {
-        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='%prefix;m=NOTES&f=" + get(r.misc) + "'>" + get(r.alt) + "</a></span></li>" );
+        var alt = get(r.alt);
+        if( alt == "") { alt = cnt }
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='%prefix;m=NOTES&f=" + get(r.misc) + "'>" + alt + "</a></span></li>" );
       } else if( r.t == "g" ) {
-        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='%prefix;" + get(r.href) + "'>" + get(r.alt) + "</a></span></li>" );
+        var alt = get(r.alt);
+        if( alt == "") { alt = cnt }
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='%prefix;" + get(r.href) + "'>" + alt + "</a></span></li>" );
       } else if( r.t == "e" ) {
-        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + get(r.href) + "'>" + get(r.alt) + "</a></span></li>" );
+        var alt = get(r.alt);
+        if( alt == "") { alt = cnt }
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + get(r.href) + "'>" + alt + "</a></span></li>" );
       }
       cnt++;
     });

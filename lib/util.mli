@@ -398,5 +398,7 @@ val escape_html : string -> string
  *)
 val safe_html : string -> string
 
+val safe_html_no_escape : string -> string
+
 (**/**)
 val init_cache_info : string -> Gwdb.base -> unit

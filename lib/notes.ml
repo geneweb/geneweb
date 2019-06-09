@@ -419,7 +419,7 @@ let print conf base =
          | Some "on" ->
             let charset = if conf.charset = "" then "utf-8" else conf.charset in
             Wserver.header "Content-type: application/json; charset=%s" charset ;
-            Wserver.printf "%s" s
+            Wserver.printf "%s" (safe_html_no_escape s) (* FIXME: format problem with attributes *)
          | _ -> Templ.copy_from_templ conf [] ic
          end
       | None ->
