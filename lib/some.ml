@@ -41,7 +41,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   Wserver.printf "</td>";
   Wserver.printf "<td>";
   Wserver.printf
-    "<img src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"%s>\n"
+    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
     (Util.image_prefix conf) "picto_branch.png" conf.xhs;
   Wserver.printf "</td>";
   Wserver.printf "<td>";
@@ -50,7 +50,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   Wserver.printf "</td>";
   Wserver.printf "<td>";
   Wserver.printf
-    "<img src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"%s>\n"
+    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
     (Util.image_prefix conf) "picto_alphabetic_order.png" conf.xhs;
   Wserver.printf "</td>";
   (* Ne pas oublier l'attribut nofollow pour les robots *)
@@ -100,7 +100,7 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "</td>";
   Wserver.printf "<td>";
   Wserver.printf
-    "<img src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"%s>\n"
+    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
     (Util.image_prefix conf) "picto_branch.png" conf.xhs;
   Wserver.printf "</td>";
   (* Ne pas oublier l'attribut nofollow pour les robots *)
@@ -125,7 +125,7 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "</td>";
   Wserver.printf "<td>";
   Wserver.printf
-    "<img src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"%s>\n"
+    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
     (Util.image_prefix conf) "picto_alphabetic_order.png" conf.xhs;
   Wserver.printf "</td>";
   Wserver.printf "<td>";
@@ -369,9 +369,9 @@ let has_children_with_that_name conf base des name =
 
 (* List selection bullets *)
 
-let bullet_sel_txt = "<tt>o</tt>"
-let bullet_unsel_txt = "<tt>+</tt>"
-let bullet_nosel_txt = "<tt>o</tt>"
+let bullet_sel_txt = "o"
+let bullet_unsel_txt = "+"
+let bullet_nosel_txt = "o"
 let print_selection_bullet conf =
   function
     Some (txt, sel) ->
@@ -385,9 +385,9 @@ let print_selection_bullet conf =
       in
       if conf.cancel_links then ()
       else
-        Wserver.printf "<a id=\"i%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt
+        Wserver.printf "<a id=\"if%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt
           (commd conf) req (if sel then "&u=" ^ txt else "")
-          (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
+          (if sel || List.mem_assoc "u" conf.env then "#if" ^ txt else "");
       Wserver.printf "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
       if conf.cancel_links then () else Wserver.printf "</a>";
       Wserver.printf "\n"
@@ -405,7 +405,7 @@ type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
 let print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
-  let rec loop is_first_level p =
+  let rec loop p =
     let u = pget conf base (get_iper p) in
     let family_list =
       List.map
@@ -428,107 +428,90 @@ let print_branch conf base psn name =
         (_, _, select) :: _ -> select
       | _ -> None
     in
+    let print_elem p with_link with_id with_sn =
+      let hl =
+        if with_link then "strong" else "em"
+      in
+      let render p =
+        if with_link then
+          if with_id then Util.reference conf base p
+          else Util.reference_noid conf base p 
+        else (fun s -> s)
+      in
+      Perso.print_sosa conf base p with_link;
+      Wserver.printf "<%s>%s</%s>%s\n"
+        hl
+        (render p
+           (if is_hide_names conf p && not (authorized_age conf base p) then "x"
+            else if not psn && not with_sn && p_surname base p = name then
+              person_text_without_surname conf base p
+            else person_text conf base p))
+        hl
+        (DateDisplay.short_dates_text conf base p)
+    in
+    Wserver.printf "<li>";
     print_selection_bullet conf first_select;
-    Perso.print_sosa conf base p true;
-    Wserver.printf "<strong>";
-    Wserver.printf "%s"
-      (Util.reference conf base p
-         (if is_hide_names conf p && not (authorized_age conf base p) then "x"
-          else if not psn && p_surname base p = name then
-            person_text_without_surname conf base p
-          else person_text conf base p));
-    Wserver.printf "</strong>";
-    Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
-    Wserver.printf "\n";
+    print_elem p true true false;
     if Array.length (get_family u) = 0 then ()
     else
       let _ =
         List.fold_left
-          (fun first (fam, c, select) ->
-             if not first then
-               begin
-                 if is_first_level then Wserver.printf "<br%s>\n" conf.xhs
-                 else Wserver.printf "</dd>\n<dd>\n";
-                 print_selection_bullet conf select;
-                 Perso.print_sosa conf base p false;
-                 begin
-                   Wserver.printf "<em>";
-                   Wserver.printf "%s"
-                     (if is_hide_names conf p &&
-                         not (authorized_age conf base p)
-                      then
-                        "x"
-                      else if not psn && p_surname base p = name then
-                        person_text_without_surname conf base p
-                      else person_text conf base p);
-                   Wserver.printf "</em>"
-                 end;
-                 Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
-                 Wserver.printf "\n"
-               end;
-             Wserver.printf "  &amp;";
+          (fun first (fam, sp, select) ->
+             if not first then begin
+               Wserver.printf "<li>";
+               print_selection_bullet conf select;
+               print_elem p false true false
+             end;
+             Wserver.printf " &amp;";
              Wserver.printf "%s\n"
-               (DateDisplay.short_marriage_date_text conf base fam p c);
-             Perso.print_sosa conf base c true;
-             Wserver.printf "<strong>";
-             Wserver.printf "%s"
-               (reference conf base c
-                  (if is_hide_names conf c && not (authorized_age conf base c)
-                   then
-                     "x"
-                   else person_text conf base c));
-             Wserver.printf "</strong>";
-             Wserver.printf "%s" (DateDisplay.short_dates_text conf base c);
-             Wserver.printf "\n";
+               (DateDisplay.short_marriage_date_text conf base fam p sp);
+             print_elem sp true false true;
              let children = get_children fam in
              begin match select with
                Some (_, true) ->
-                 Wserver.printf "<dl>\n";
+                 Wserver.printf "<ul>\n";
                  List.iter
                    (fun e ->
-                      Wserver.printf "<dd>\n";
-                      loop false (pget conf base e);
-                      Wserver.printf "</dd>\n")
+                      loop (pget conf base e);
+                      Wserver.printf "</li>\n")
                    (Array.to_list children);
-                 Wserver.printf "</dl>\n"
+                 Wserver.printf "</ul>\n"
              | Some (_, false) -> ()
              | None ->
                  if Array.length children <> 0 then
-                   begin
-                     Wserver.printf "<dl>";
-                     begin
-                       Wserver.printf "<dd>";
-                       Wserver.printf "...";
-                       Wserver.printf "</dd>"
-                     end;
-                     Wserver.printf "</dl>\n"
-                   end
+                   Wserver.printf "<ul class=\"posterity\">\
+                                   <li>...</li>\
+                                   </ul>\n";
              end;
+             Wserver.printf "</li>";
              false)
           true family_list
       in
-      ()
+      ();
+    Wserver.printf "</li>"
   in
   loop
 
-let print_one_branch conf base bh psn lev =
+let print_one_branch conf base bh psn =
+  Wserver.printf "<ul>\n";
   let p = bh.bh_ancestor in
   if bh.bh_well_named_ancestors = []
-  then let x = sou base (get_surname p) in print_branch conf base psn x lev p
+  then
+    let x = sou base (get_surname p) in
+    print_branch conf base psn x p
   else begin
+    Wserver.printf "<li>\n";
     if is_hidden p then Wserver.printf "&lt;&lt;"
     else wprint_geneweb_link conf (Util.acces conf base p) "&lt;&lt;" ;
-    Wserver.printf "\n";
+    Wserver.printf "\n<ul>\n";
     List.iter
       (fun p ->
          let x = sou base (get_surname p) in
-         Wserver.printf "<dl>\n";
-         Wserver.printf "<dd>\n";
-         print_branch conf base psn x false p;
-         Wserver.printf "</dd>\n";
-         Wserver.printf "</dl>\n")
-      bh.bh_well_named_ancestors
-  end
+         print_branch conf base psn x p)
+      bh.bh_well_named_ancestors;
+    Wserver.printf "</ul></li>\n"
+  end;
+  Wserver.printf "</ul>\n"
 
 let print_one_surname_by_branch conf base x xl (bhl, str) =
   let ancestors =
@@ -575,7 +558,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
   Util.print_tips_relationship conf;
   (* Menu afficher par branche/ordre alphabetique *)
   if br = None then print_branch_to_alphabetic conf x len;
-  Wserver.printf "<div style=\"white-space:nowrap\">\n";
+  Wserver.printf "<div id=\"surname_by_branch\">\n";
   if len > 1 && br = None then
     begin
       Wserver.printf "<dl>\n";
@@ -594,8 +577,8 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
                end;
              Wserver.printf "</dt>\n";
              Wserver.printf "<dd>\n";
-             print_one_branch conf base bh psn false;
-             Wserver.printf "</dd>\n";
+             print_one_branch conf base bh psn;
+             Wserver.printf "</dd>";
              n + 1)
           1 ancestors
       in
@@ -608,7 +591,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
       List.fold_left
         (fun n bh ->
            if br = None || br = Some n then
-             print_one_branch conf base bh psn true;
+             print_one_branch conf base bh psn;
            n + 1)
         1 ancestors
     in
