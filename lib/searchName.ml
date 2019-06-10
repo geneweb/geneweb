@@ -138,7 +138,7 @@ let name_with_roman_number str =
 
 let search_by_sosa conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with Failure _ -> None in
+  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
   match sosa_ref, sosa_nb with
     Some p, Some n ->
       if n <> Sosa.zero then
