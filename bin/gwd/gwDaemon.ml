@@ -32,6 +32,7 @@ let daemon = ref false
 let login_timeout = ref 1800
 let conn_timeout = ref 120
 let trace_failed_passwd = ref false
+let trace_templates = ref false
 let use_auth_digest_scheme = ref false
 let no_host_address = ref false
 let lexicon_list = ref []
@@ -124,7 +125,7 @@ let log_passwd_failed ar oc tm from request base_file =
 
 let copy_file fname =
   match Util.open_etc_file fname with
-    Some ic ->
+    Some (ic, _fname) ->
       begin try
         while true do let c = input_char ic in Wserver.printf "%c" c done
       with _ -> ()
@@ -287,13 +288,12 @@ let print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf.request ^ new_req
   in
   let env = ["old", conf.bname; "new", new_n; "link", link] in
-  match Util.open_etc_file "renamed" with
-    Some ic -> Util.html conf; Templ.copy_from_templ conf env ic
-  | None ->
+  include_template conf env "renamed"
+    (fun () ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
       Hutil.header conf title;
       Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
-      Hutil.trailer conf
+      Hutil.trailer conf)
 
 let log_redirect from request req =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
@@ -313,16 +313,13 @@ let print_redirected conf from request new_addr =
   let link = "http://" ^ new_addr ^ req in
   let env = ["link", link] in
   log_redirect from request req;
-  match Util.open_etc_file "redirect" with
-    Some ic ->
-      let conf = {conf with is_printed_by_template = false} in
-      Util.html conf; Templ.copy_from_templ conf env ic
-  | None ->
+  include_template conf env "redirect"
+    (fun () ->
       let title _ = Wserver.printf "Address changed" in
       Hutil.header conf title;
       Wserver.printf "Use the following address:\n<p>\n";
       Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
-      Hutil.trailer conf
+      Hutil.trailer conf)
 
 let propose_base conf =
   let title _ = Wserver.printf "Base" in
@@ -338,9 +335,8 @@ let propose_base conf =
   Hutil.trailer conf
 
 let general_welcome conf =
-  match Util.open_etc_file "index" with
-    Some ic -> Util.html conf; Templ.copy_from_templ conf [] ic
-  | None -> propose_base conf
+  include_template conf [] "index"
+    (fun () -> propose_base conf)
 
 let nonce_private_key =
   Lazy.from_fun
@@ -1173,6 +1169,7 @@ let make_conf from_addr request script_name env =
      manitou = manitou;
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
+     trace_templ = !trace_templates;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name; auth_scheme = ar.ar_scheme;
@@ -1871,6 +1868,9 @@ let main ~speclist () =
     ("-trace_failed_passwd", Arg.Set trace_failed_passwd,
      "\n       \
       Print the failed passwords in log (except if option -digest is set) ") ::
+    ("-trace_templ", Arg.Set trace_templates,
+     "\n       \
+      Print the full path to template files as html comment ") ::
     ("-nolock", Arg.Set Lock.no_lock_flag,
      "\n       Do not lock files before writing.") ::
     (if Sys.unix then

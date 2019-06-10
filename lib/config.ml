@@ -34,6 +34,7 @@ type config =
     supervisor : bool;
     wizard : bool;
     is_printed_by_template : bool;
+    trace_templ : bool;
     friend : bool;
     just_friend_wizard : bool;
     user : string;
@@ -105,6 +106,7 @@ let empty =
   ; api_port = 0
 #endif
   ; is_printed_by_template = false
+  ; trace_templ = false
   ; friend = false
   ; just_friend_wizard = false
   ; user = ""

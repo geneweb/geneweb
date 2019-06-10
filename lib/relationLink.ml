@@ -606,9 +606,7 @@ let print_relation_ok conf base info =
   in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
-  Opt.iter
-    (Templ.copy_from_templ conf conf.env)
-    (Util.open_templ conf "buttons_rel") ;
+  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   Wserver.printf "<p style=\"clear:both\"%s>\n" conf.xhs;
   print_relation_path conf base info;
   Hutil.trailer conf

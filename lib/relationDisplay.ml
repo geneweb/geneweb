@@ -866,9 +866,7 @@ let print_main_relationship conf base long p1 p2 rel =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Opt.iter
-    (Templ.copy_from_templ conf conf.env)
-    (Util.open_templ conf "buttons_rel") ;
+  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   begin match p_getenv conf.env "spouse" with
     Some "on" -> conf.senv <- conf.senv @ ["spouse", "on"]
   | _ -> ()
