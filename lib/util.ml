@@ -909,14 +909,18 @@ let geneweb_link conf href s =
 let wprint_geneweb_link conf href s =
   Wserver.printf "%s" (geneweb_link conf href s)
 
-let reference conf base p s =
+let reference_flags with_id conf base p s =
   let iper = get_iper p in
   if conf.cancel_links || is_hidden p then s
   else
     String.concat ""
-      ["<a href=\""; commd conf; acces conf base p; "\" id=\"i";
-       string_of_iper iper; "\">"; s; "</a>"]
+      ["<a href=\""; commd conf; acces conf base p;
+       if with_id then "\" id=\"i" else "";
+       string_of_int iper; "\">"; s; "</a>"]
 
+let reference = reference_flags true
+
+let reference_noid = reference_flags false
 
 (* ************************************************************************* *)
 (*  [Fonc] update_family_loop : config -> base -> person -> string -> string *)

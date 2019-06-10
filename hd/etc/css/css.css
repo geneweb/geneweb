@@ -1404,3 +1404,24 @@ span.notesourcecolor {
     word-wrap: break-word;
     max-width: 40%;
 }
+
+/* surname by branch m=N */
+#surname_by_branch {
+    white-space: nowrap;
+}
+#surname_by_branch dt {
+ margin-top: 1.5em;
+}
+#surname_by_branch ul, #surname_by_branch li {
+    list-style: none;
+    margin: 0;
+}
+/* Uncomment to get it event more compact
+#surname_by_branch ul.posterity {
+    display: inline;
+    padding: 0;
+}
+#surname_by_branch ul.posterity li {
+    display: inline;
+}
+*/
