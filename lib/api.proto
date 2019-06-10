@@ -321,24 +321,6 @@ enum RelationType {
   NO_RELATION = 43;
 }
 
-message PersonRelation {
-  required Person person = 1;
-  required RelationType relation = 2;
-}
-
-message FullPersonRelation {
-  required FullPerson person = 1;
-  required RelationType relation = 2;
-}
-
-message ListPersonRelation {
-  repeated PersonRelation person_relations = 1;
-}
-
-message ListFullPersonRelation {
-  repeated FullPersonRelation person_relations = 1;
-}
-
 message AnniversaryParams {
   optional int32 month = 1;
 }
@@ -676,23 +658,4 @@ message LastModifications {
 // ***************************************************************************
 message LastVisits {
   required string user = 1;
-}
-
-
-message CorrespondanceFamily {
-  required int32 index = 1;
-  required Person spouse = 2;
-  repeated Person children = 3;
-}
-
-message Correspondance {
-  required string base = 1;
-  required Person person = 2;
-  optional Person father = 3;
-  optional Person mother = 4;
-  repeated CorrespondanceFamily families = 5;
-}
-
-message CorrespondanceList {
-  repeated Correspondance correspondances = 1;
 }
