@@ -1158,6 +1158,9 @@ let base_path pref bname =
     else bfile
   else bfile
 
+let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
+let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
+
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
 (** [Description] : Renvoie le chemin vers le fichier de template passé
@@ -1241,8 +1244,8 @@ let open_etc_file fname =
     search_in_lang_path
       (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
   in
-  try Some (Secure.open_in fname1) with
-    Sys_error _ -> try Some (Secure.open_in fname2) with Sys_error _ -> None
+  try Some (Secure.open_in fname1, fname1) with
+    Sys_error _ -> try Some (Secure.open_in fname2, fname2) with Sys_error _ -> None
 
 let open_hed_trl conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
@@ -1259,6 +1262,14 @@ let open_templ_fname conf fname =
       try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
 
 let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
+
+let include_template conf env fname failure =
+  match open_etc_file fname with
+  | Some (ic, fname) ->
+    if conf.trace_templ then Wserver.printf "\n<!-- begin include %s -->\n" fname;
+    copy_from_templ conf env ic;
+    if conf.trace_templ then Wserver.printf "<!-- end include %s -->\n" fname;
+  | None -> failure ()
 
 let image_prefix conf = conf.image_prefix
 

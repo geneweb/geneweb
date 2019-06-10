@@ -108,7 +108,7 @@ val p_getenv : (string * string) list -> string -> string option
 val p_getint : (string * string) list -> string -> int option
 val create_env : string -> (string * string) list
 
-val open_etc_file : string -> in_channel option
+val open_etc_file : string -> (in_channel * string) option
 val open_hed_trl : config -> string -> in_channel option
 val open_templ : config -> string -> in_channel option
 val open_templ_fname : config -> string -> (in_channel * string) option
@@ -376,10 +376,28 @@ val safe_html : string -> string
 val string_with_macros
   : config -> (char * (unit -> string)) list -> string -> string
 
-
 (** [is_empty_name p]
     [false] if we knwon the first name or the last name of [p].
 *)
 val is_empty_name : person -> bool
 
 module IperSet : sig include Set.S with type elt = iper end
+
+(**/**)
+(* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
+val copy_from_templ_ref :
+  (config -> (string * string) list -> in_channel -> unit) ref
+
+(**/**)
+
+(** [include_template failure conf env fname]
+    Search [fname] in templates path en interpret it with [env] provided.
+
+    If the file can not be found, failure is called.
+*)
+val include_template
+  : config
+  -> (string * string) list
+  -> string
+  -> (unit -> unit)
+  -> unit

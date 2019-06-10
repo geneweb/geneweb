@@ -56,10 +56,7 @@ let header_without_http conf title =
     (Util.image_prefix conf);
   Wserver.printf "  <meta name=\"viewport\" content=\"width=device-width, \
                     initial-scale=1, shrink-to-fit=no\">\n";
-  begin match Util.open_templ conf "css" with
-    Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-  end;
+  Util.include_template conf [] "css" (fun () -> ());
   Templ.include_hed_trl conf "hed";
   Wserver.printf "\n</head>\n";
   let s =
@@ -113,10 +110,7 @@ let gen_trailer with_logo conf =
   Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
-  begin match Util.open_templ conf "js" with
-    Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-  end;
+  Util.include_template conf [] "js" (fun () -> ());
   Wserver.printf "</body>\n</html>\n"
 
 let trailer = gen_trailer true
@@ -148,7 +142,10 @@ let gen_interp header conf fname ifun env ep =
   begin try
     match Templ.input_templ conf fname with
       Some astl ->
-        if header then Util.html conf; Templ.interp_ast conf ifun env ep astl
+        if header then Util.html conf;
+        let full_name = Util.etc_file_name conf fname in
+        Templ.interp_ast conf ifun env ep
+          (Templ.begin_end_include conf full_name astl)
     | None -> error_cannot_access conf fname
   with e -> Templ.template_file := v; raise e
   end;

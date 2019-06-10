@@ -357,12 +357,8 @@ let log_count r =
   | None -> ()
 
 let print_moved conf s =
-  match Util.open_etc_file "moved" with
-    Some ic ->
-      let env = ["bname", conf.bname] in
-      let conf = {conf with is_printed_by_template = false} in
-      Util.html conf; Templ.copy_from_templ conf env ic
-  | None ->
+  Util.include_template conf ["bname", conf.bname] "moved"
+    (fun () ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname s in
       Hutil.header_no_page_title conf title;
       Wserver.printf "The database %s has moved to:\n<dl><dt><dd>\n"
@@ -371,7 +367,7 @@ let print_moved conf s =
       Wserver.print_string s;
       Wserver.printf "</a>";
       Wserver.printf "\n</dd></dt></dl>\n";
-      Hutil.trailer conf
+      Hutil.trailer conf)
 
 let print_no_index conf base =
   let title _ =

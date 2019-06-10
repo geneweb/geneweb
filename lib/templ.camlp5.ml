@@ -380,6 +380,13 @@ let strip_newlines_after_variables =
 
 let included_files = ref []
 
+let begin_end_include conf fname al =
+  if conf.trace_templ then
+    Atext ((0,0), "\n\n<!-- begin include " ^ fname ^ " -->\n")
+    :: al
+    @ [ Atext ((0,0), "<!-- end include " ^ fname ^ " -->\n") ]
+  else al
+
 let parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser bp
@@ -477,26 +484,18 @@ let parse_templ conf strm =
     let ast =
       try
         let file = get_value 0 strm in
-        (* Protection pour ne pas inclure plusieurs fois un même template ? *)
-        if not (List.mem file !included_files) then
-          let al =
-            match Util.open_templ_fname conf file with
-              Some (ic, fname) ->
-                let () = included_files := file :: !included_files in
-                let strm2 = Stream.of_channel ic in
-                let (al, _) = parse_astl [] false 0 [] strm2 in
-                let al =
-                  if Util.p_getenv conf.base_env "trace_templ" = Some "on" then
-                    Atext ((0,0), "<!-- begin include from " ^ fname ^ " -->\n")
-                    :: al
-                    @ [ Atext ((0,0), "<!-- end include from " ^ fname ^ " -->\n") ]
-                  else al
-                in
-                close_in ic; Some (Ainclude (file, al))
-            | None -> None
-          in
-          al
-        else None
+        match List.assoc_opt file !included_files with
+        | Some ast -> Some (Ainclude (file, ast))
+        | None ->
+          match Util.open_templ_fname conf file with
+          | Some (ic, fname) ->
+            let strm2 = Stream.of_channel ic in
+            let (al, _) = parse_astl [] false 0 [] strm2 in
+            close_in ic;
+            let al = begin_end_include conf fname al in
+            let () = included_files := (file, al) :: !included_files in
+            Some (Ainclude (file, al))
+          | None -> None
       with Stream.Failure | Stream.Error _ -> None
     in
     let (alk, tok) = parse_astl [] false 0 end_list strm in
@@ -1303,21 +1302,16 @@ let print_wid_hei fname =
     Some (wid, hei) -> Wserver.printf " width=\"%d\" height=\"%d\"" wid hei
   | None -> ()
 
-let copy_from_templ_fwd =
-  ref (fun _ -> raise (Match_failure ("templ.ml", 1296, 33)))
-let copy_from_templ conf env ic = !copy_from_templ_fwd conf env ic
-
 let print_copyright conf =
-  match Util.open_etc_file "copyr" with
-    Some ic -> copy_from_templ conf [] ic
-  | None ->
+  Util.include_template conf [] "copyr"
+    (fun () ->
       Wserver.printf "<hr style=\"margin:0\"%s>\n" conf.xhs;
       Wserver.printf "<div style=\"font-size: 80%%\">\n";
       Wserver.printf "<em>";
       Wserver.printf "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
       Wserver.printf "</em>";
       Wserver.printf "</div>\n";
-      Wserver.printf "<br%s>\n" conf.xhs
+      Wserver.printf "<br%s>\n" conf.xhs)
 
 let print_copyright_with_logo conf =
   let conf =
@@ -1329,9 +1323,7 @@ let print_copyright_with_logo conf =
   print_copyright conf
 
 let include_hed_trl conf name =
-  match Util.open_hed_trl conf name with
-    Some ic -> copy_from_templ conf [] ic
-  | None -> ()
+  Util.include_template conf [] name  (fun () -> ())
 
 let rec interp_ast conf ifun env =
   let m_env = ref env in
@@ -1521,9 +1513,15 @@ and print_var print_ast_list conf ifun env ep loc sl =
     with Not_found ->
       match sl with
         ["include"; templ] ->
-          begin match input_templ conf templ with
-            Some astl -> print_ast_list env ep astl
-          | None -> Wserver.printf " %%%s?" (String.concat "." sl)
+          begin match Util.open_templ_fname conf templ with
+            Some (_, fname) ->
+              begin match input_templ conf templ with
+                Some astl ->
+                    let () = included_files := (templ, astl) :: !included_files in
+                    print_ast_list env ep (begin_end_include conf fname astl)
+              | None -> Wserver.printf " %%%s?" (String.concat "." sl)
+              end
+            | None -> Wserver.printf " %%%s?" (String.concat "." sl)
           end
       | sl -> print_variable conf sl
   in
@@ -1567,4 +1565,4 @@ let copy_from_templ conf env ic =
   end;
   template_file := v
 
-let _ = copy_from_templ_fwd := copy_from_templ
+let _ = Util.copy_from_templ_ref := copy_from_templ

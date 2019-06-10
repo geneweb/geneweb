@@ -695,13 +695,9 @@ let print_mod_view_page conf can_edit mode fname title env s =
         conf.xhs
     end;
   Wserver.printf "<div class=\"row ml-3\">\n";
-  begin match Util.open_etc_file "toolbar" with
-    Some ic ->
-      Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
-      Templ.copy_from_templ conf ["name", "notes"] ic;
-      Wserver.printf "</div>\n";
-  | None -> ()
-  end;
+  Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
+  Util.include_template conf ["name", "notes"] "toolbar" ignore;
+  Wserver.printf "</div>\n";
   Wserver.printf "<textarea name=\"notes\" id=\"notes_comments\"";
   Wserver.printf " class=\"col-9 form-control\" rows=\"25\" cols=\"110\"%s>"
     (if can_edit then "" else " readonly=\"readonly\"");
@@ -717,13 +713,9 @@ let print_mod_view_page conf can_edit mode fname title env s =
         Wserver.printf "</button>\n"
       end
     end;
-  begin match Util.open_etc_file "accent" with
-    Some ic ->
-      Wserver.printf "<div class=\"col my-1 mr-2 text-monospace\">\n";
-      Templ.copy_from_templ conf ["name", "notes"] ic;
-      Wserver.printf "</div>\n";
-  | None -> ()
-  end;
+  Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
+  Util.include_template conf ["name", "notes"] "accent" ignore;
+  Wserver.printf "</div>\n";
   Wserver.printf "</div>\n";
   Wserver.printf "</form>\n";
   Hutil.trailer conf

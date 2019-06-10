@@ -213,9 +213,8 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
   if lev1 > 1 then Wserver.printf "</ul>\n"
 
 let include_templ conf name =
-  match Util.open_hed_trl conf name with
-  | Some ic -> Templ.copy_from_templ conf [] ic (* no env -> problem!! *)
-  | None -> (Wserver.printf "Failed to open: %s.txt" name)
+  Util.include_template conf [] name
+    (fun () -> (Wserver.printf "Failed to open: %s.txt" name))
 
 (* HTML main *)
 

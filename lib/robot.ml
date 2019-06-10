@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Util
 
 let magic_robot = "GWRB0007"
 
@@ -29,16 +28,14 @@ let robot_error conf cnt sec =
   Wserver.http Wserver.Forbidden;
   Wserver.header "Content-type: text/html; charset=iso-8859-1";
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
-  begin match open_etc_file "robot" with
-    Some ic -> Templ.copy_from_templ conf env ic
-  | None ->
+  Util.include_template conf env "robot"
+    (fun () ->
       let title _ = Wserver.printf "Access refused" in
       Wserver.printf "<head><title>";
       title true;
       Wserver.printf "</title>\n<body>\n<h1>";
       title false;
-      Wserver.printf "</body>\n"
-  end;
+      Wserver.printf "</body>\n");
   raise Exit
 
 let purge_who tm xcl sec =
