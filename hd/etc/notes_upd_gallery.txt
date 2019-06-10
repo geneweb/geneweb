@@ -59,7 +59,7 @@
 </div>
 <ul id="div_legend" class="list_comma"></ul>
 
-<table id="map_table" class="display compact" style="width=100%">
+<table id="map_table" class="display compact">
  <thead><tr>
   <th>Type</th>
   <th>[*first name/first names]0</th>
