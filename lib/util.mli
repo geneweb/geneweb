@@ -99,6 +99,7 @@ val person_title : config -> base -> person -> string
 val child_of_parent : config -> base -> person -> string
 
 val reference : config -> base -> person -> string -> string
+val reference_noid : config -> base -> person -> string -> string
 val no_reference : config -> base -> person -> string -> string
 val referenced_person_title_text : config -> base -> person -> string
 val referenced_person_text : config -> base -> person -> string
@@ -397,8 +398,6 @@ val escape_html : string -> string
    Text is escaped using [escape_html].
  *)
 val safe_html : string -> string
-
-val safe_html_no_escape : string -> string
 
 (**/**)
 val init_cache_info : string -> Gwdb.base -> unit

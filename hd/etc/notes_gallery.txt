@@ -18,13 +18,13 @@
 </head>
 <body%body_prop;>
 <div class="container-fluid">
-<div class="small float-right">
+<div class="small float-right mr-4 mt-2">
 (<a href="%url;ref=on">[linked pages]</a>)
 </div>
 %include;home
 <h1 id="h1">Chargement en cours...</h1>
 %if(wizard)
-<div class="small float-right">
+<div class="small float-right mr-4 mt-2">
 (<a href="%prefix;m=MOD_NOTES&f=%evar.f;">[modify]</a>)
 </div>
 %end;
