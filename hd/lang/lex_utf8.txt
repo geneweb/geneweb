@@ -1,3 +1,7 @@
+    on this image
+en: on this image
+fr: sur cette image
+
     reset to
 co: risturà
 en: reset to

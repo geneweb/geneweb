@@ -9,35 +9,35 @@
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
   <style>
-  .in { background-color: coral; }
-  .list_comma { display: inline; list-style: none; padding-left: 0; }
-  .list_comma li { display: inline; }
-  .list_comma li:not(:last-child):after { content: ", "; }
+    .in { background-color: coral; }
+    .list_comma li { display: inline; }
+    .list_comma li:not(:last-child):after { content: ", "; }
+    .list_comma li:last-child:after { content: "."; }
   </style>
   %include;hed
 </head>
 <body%body_prop;>
 <div class="container-fluid">
 <div class="small float-right mr-4 mt-2">
-(<a href="%url;ref=on">[linked pages]</a>)
+  (<a href="%url;ref=on">[linked pages]</a>)
 </div>
 %include;home
-<h1 id="h1">Chargement en cours...</h1>
+<h1 id="h1">Chargement en cours…</h1>
 %if(wizard)
-<div class="small float-right mr-4 mt-2">
-(<a href="%prefix;m=MOD_NOTES&f=%evar.f;">[modify]</a>)
-</div>
+  <div class="small float-right mr-4">
+    (<a href="%prefix;m=MOD_NOTES&f=%evar.f;">[modify]</a>)
+  </div>
 %end;
 
 <div id="description"></div>
 
 <map id="map" name="map"></map>
-<img id="image" usemap="#map" alt=""><!-- no src, managed on javascript side -->
-<div id="div_legend" style="display: none;">
-Sur cette photo : <ul id="legend" class="list_comma"></ul>
+<img id="image" class="mt-1" usemap="#map" alt=""><!-- no src, managed on javascript side -->
+<div class="d-none" id="div_legend">%nn;
+  [*on this image][:]%nn; <ul id="legend" class="d-inline list_comma list-unstyled p-0"></ul>
 </div>
-<div id="div_unknown" style="display: none;">
-[*unknown person][:] <ul id="unknown" class="list_comma"></ul>
+<div class="d-none" id="div_unknown">%nn;
+  [*unknown person][:]%nn; <ul id="unknown" class="d-inline list_comma list-unstyled pl-0"></ul>
 </div>
 
 </div>
@@ -82,7 +82,7 @@ $(document).ready(function() {
 
       if( get(r.t) == "" || r.t == "p" ) {
         var oc = get(r.oc);
-        if( oc != "" && oc != "0" ) { oc = "&oc=" + oc }
+        if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
         if( get(r.fn) != "" && get(r.sn) != "" ) {
           href = "%prefix;&p=" + r.fn + "&n=" + r.sn + oc;
           txt = r.fn + " " + r.sn;
@@ -90,23 +90,22 @@ $(document).ready(function() {
         if( get(r.alt) != "" ) { txt += " (" + r.alt + ")"; }
         if( get(r.fn) != "" && get(r.sn) != "" ) {
           $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-          $("#div_legend").show();
+          $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
         } else {
           $("#unknown").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
-          $("#div_unknown").show();
+          $("#div_unknown").addClass( "d-inline" ).removeClass( "d-none" );
         }
       } else if( r.t == "m" ) {
         href = "%prefix;m=NOTES&f=" + get(r.misc);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-        $("#div_legend").show();
+        $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
       } else if( r.t == "g" ) {
         href = "%prefix;" + get(r.href);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-        $("#div_legend").show();
-      } else if( r.t == "e" ) {
+        $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
         href = get(r.href);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-        $("#div_legend").show();
+        $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" )
       }
       if( href != "" ) { href = " href='"+ href + "'"; }
       $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + txt + "' title='" + txt + "'" + href + ">" );

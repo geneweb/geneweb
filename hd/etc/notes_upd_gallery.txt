@@ -1,85 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Éditeur d'image cliquable</title>
+  <title>Éditeur d’image cliquable</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+  %if;(bvar.use_cdn="yes")
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"
+      integrity="sha384-EkHEUZ6lErauT712zSr0DZ2uuCmi3DoQj6ecNdHQXpMpFNGAQ48WjfXCE5n20W+R" crossorigin="anonymous">
+  %else;
+    <link rel="stylesheet" href="%if(cgi)%bvar.static_path;%end;css/dataTables.bootstrap4.min.css?version=1.10.19">
+  %end;
   <style>
-  .in { background-color: coral !important; }
-  #selection { border:2px solid white; background:#1B94E0; opacity:0.4; filter:alpha(opacity=40); margin:0px; padding:0px; display:none; }
-  .list_comma { display: inline; list-style: none; padding-left: 0; }
-  .list_comma li { display: inline; }
-  .list_comma li:not(:last-child):after { content: ", "; }
-  .list_comma li:last-child:after { content: "."; }
-  input:invalid { box-shadow: 0 0 1.5px 1px red; }
-  #image { cursor: crosshair; }
+    .in { background-color: coral !important; }
+    #selection { border: 2px solid white; background: #1B94E0; opacity: 0.4; filter: alpha(opacity=40); display: none; }
+    .list_comma, .list_comma li { display: inline; }
+    .list_comma li:not(:last-child):after { content: ", "; }
+    .list_comma li:last-child:after { content: "."; }
+    input:invalid { box-shadow: 0 0 1.5px 1px red; }
+    #image { cursor: crosshair; }
+    .type { width: 10em; }
+    input[type=number] { width: 4em; }
+    table.dataTable td { vertical-align: middle; }
   </style>
   %include;hed
 </head>
 <body%body_prop;>
 <div class="container-fluid">
 %include;home
-<h1>Editeur de map</h1>
+<h1 class="mt-1">Éditeur d’image réactives</h1>
 
-<p id="fd_error"></p>
+<div id="fd_error"></div>
 
-<div class="form-group row">
-  <label for="page_title" class="col-form-label col-auto">[*title/titles]0</label>
-  <input type="text" class="form-control col-sm-10" id="page_title">
-</div>
-<div class="form-group row">
-  <label for="page_desc" class="col-form-label col-auto">Description</label>
-  <textarea class="form-control col-sm-10" id="page_desc"></textarea>
-</div>
-<div class="form-group row">
-  <div class="col-auto">Chemin</div>
-  <input id="doc" type="radio" name="path" value="doc" checked>
-  <label for="doc" class="col-form-label col-auto" title="%%sm=DOC&amp;s=">DOC</label>
-  <input id="public" type="radio" name="path" value="public">
-  <label for="public" class="col-form-label col-auto" title="gallery_path = %bvar.gallery_path;">[*iftitles/public/private]1</label>
-  <input id="private" type="radio" name="path" value="private">
-  <label for="private" class="col-form-label col-auto" title="gallery_path_private = %bvar.gallery_path_private;">[*iftitles/public/private]2</label>
-  <input id="other" type="radio" name="path" value="other">
-  <label for="other" class="col-form-label col-auto">Autre</label>
-  <input id="path" type="text" class="form-control col-sm-4" disabled>
-  <div class="col-auto">[*file]</div>
-  <input id="fname" type="text" class="form-control col-sm-1">
-  <button id="face_detection" class="btn btn-primary col-auto" disabled>Détection</button>
-</div>
-
-<div onmousedown="return false" id="frame">
-<map id="map" name="map"></map>
-<img id="image" usemap="#map">
-<div id="selection"></div>
-</div>
-<ul id="div_legend" class="list_comma"></ul>
-
-<table id="map_table" class="display compact">
- <thead><tr>
-  <th>Type</th>
-  <th>[*first name/first names]0</th>
-  <th>[*surname/surnames]0</th>
-  <th>#</th>
-  <th>[*miscellaneous notes]</th>
-  <th>href</th>
-  <th>[*comment]</th>
-  <th>Actions</th>
- </tr></thead>
-</table>
-
-<form id="form" method="post" action="%action;">
- %hidden;
- <input type="hidden" name="m" value="MOD_NOTES_OK">
- <input type="hidden" name="f" value="%evar.f;">
- <input id="digest" type="hidden" name="digest">
- <input id="notes" type="hidden" name="notes">
- <button type="submit" class="btn btn-primary">Ok</button>
- <a class="btn btn-secondary" href="%url;notmpl=on">Edit</a>
+<form id="form" class="mt-2" method="post" action="%action;">
+  <div class="col-sm-12 col-lg-9 mr-3">
+    <div class="form-row">
+      <label for="page_title" class="col-form-label col-sm-2">[*title/titles]0</label>
+      <input type="text" class="form-control col-sm-9" id="page_title">
+    </div>
+    <div class="form-row mt-2">
+      <label for="page_desc" class="col-form-label col-sm-2">Description</label>
+      <textarea class="form-control col-sm-9" id="page_desc" rows="1"></textarea>
+    </div>
+    <fieldset class="form-group mb-0  mt-2">
+      <div class="form-row">
+        <legend class="col-form-label col-sm-2 pt-2">Chemin</legend>
+        <div class="form-check form-check-inline col-sm-9 pl-2 pr-0">
+          <div class="custom-control custom-radio custom-control-inline">
+            <input id="doc" class="custom-control-input" type="radio" name="path" value="doc" checked>
+            <label for="doc" class="custom-control-label" title="m=DOC&s=…">DOC</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input id="public" class="custom-control-input" type="radio" name="path" value="public">
+            <label for="public" class="custom-control-label"
+              title="gallery_path=%bvar.gallery_path;">[*iftitles/public/private]1</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input id="private" class="custom-control-input" type="radio" name="path" value="private">
+            <label for="private" class="custom-control-label"
+              title="gallery_path_private=%bvar.gallery_path_private;">[*iftitles/public/private]2</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input id="other" class="custom-control-input" type="radio" name="path" value="other">
+            <label for="other" class="custom-control-label">Autre</label>
+          </div>
+          <input id="path" type="text" class="form-control flex-fill" placeholder="Autre chemin" disabled>
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-row mt-2">
+      <label for="fname" class="col-form-label col-sm-2">[*file]</label>
+      <div class="d-flex col-sm-9 px-0">
+      <input id="fname" type="text" class="form-control flex-fill">
+      <button id="face_detection" class="btn btn-primary ml-2 text-nowrap " disabled>Détection visages</button>
+      </div>
+    </div>
+  </div>
+  <div class="my-2 ml-2 mr-4">
+    <div id="frame" onmousedown="return false">
+      <map id="map" name="map"></map>
+      <img id="image" class="img-fluid" usemap="#map">
+      <div id="selection" class="m-0 p-0"></div>
+    </div>
+    <ul id="div_legend" class="list_comma list-unstyled pl-0"></ul>
+    <div class="table-responsive-md">
+      <table id="map_table" class="table table-sm">
+        <thead><tr>
+          <th id="type">Type</th>
+          <th>[*first name/first names]0</th>
+          <th>[*surname/surnames]0</th>
+          <th>#</th>
+          <th>[*note/notes]0</th>
+          <th>URL</th>
+          <th>[*comment]</th>
+          <th><i class="fa fa-trash-alt"></i></th>
+        </tr></thead>
+      </table>
+    </div>
+  </div>
+  %hidden;
+  <input type="hidden" name="m" value="MOD_NOTES_OK">
+  <input type="hidden" name="f" value="%evar.f;">
+  <input id="digest" type="hidden" name="digest">
+  <input id="notes" type="hidden" name="notes">
+  <div class="ml-4">
+    <button type="submit" form="form" class="btn btn-primary" title="[*validate/delete]0">OK</button>
+    <button class="btn btn-outline-primary" href="%url;notmpl=on">[*modify] [note/notes]0</button>
+  </div>
 </form>
 
 </div>
@@ -88,10 +118,18 @@
 
 </div>
 %include;js
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+%if;(bvar.use_cdn="yes")
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"
+    integrity="sha384-rgWRqC0OFPisxlUvl332tiM/qmaNxnlY46eksSZD84t+s2vZlqGeHrncwIRX7CGp" crossorigin="anonymous"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"
+    integrity="sha384-uiSTMvD1kcI19sAHJDVf68medP9HA2E2PzGis9Efmfsdb8p9+mvbQNgFhzii1MEX" crossorigin="anonymous"></script>
+%else;
+  <script src="%if(cgi)%bvar.static_path;%end;js/jquery.dataTables.min.js?version=1.10.19"></script>
+  <script src="%if(cgi)%bvar.static_path;%end;js/dataTables.bootstrap4.min.js?version=1.10.19"></script>
+%end;
 <script src="%if(cgi)%bvar.static_path;%end;js/jquery.maphilight.js"></script>
-<script async src="https://docs.opencv.org/4.1.0/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
-<script src="https://docs.opencv.org/4.1.0/utils.js" type="text/javascript"></script>
+<!--<script async src="https://docs.opencv.org/4.1.0/opencv.js" onload="onOpenCvReady();"></script>
+<script src="https://docs.opencv.org/4.1.0/utils.js"></script>-->
 <script>
 function get( v ) {
   if( typeof v !== "undefined" ) {
@@ -186,7 +224,7 @@ $(document).ready(function() {
            } else {
              s1 = " selected";
            }
-           return( "<select class='form-control update' row='" + meta.row + "'>" +
+           return( "<select class='form-control update type' row='" + meta.row + "'>" +
                    "<option value='p'" + s1 + ">[*person/persons]0</option>" +
                    "<option value='m'" + s2 + ">[*note/notes]0</option>" +
                    "<option value='g'" + s3 + " title='%prefix; + href'>GeneWeb</option>" +
@@ -218,7 +256,7 @@ $(document).ready(function() {
          "render": function ( data, type, row, meta ) {
            var disabled = "";
            if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' max='99' style='width: 4em;'" + disabled + ">";
+           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' max='200' step='1'" + disabled + ">";
          }
        },
        {
@@ -237,8 +275,8 @@ $(document).ready(function() {
            var disabled = "";
            var placeholder = "";
            if( row.t != "e" && row.t != "g" ) { disabled = " disabled"; }
-           if( row.t == "e" ) { placeholder = " placeholder='https://...'"; }
-           if( row.t == "g" ) { placeholder = " placeholder='m=...'"; }
+           if( row.t == "e" ) { placeholder = " placeholder='https://…'"; }
+           if( row.t == "g" ) { placeholder = " placeholder='m=…'"; }
            return "<input class='form-control update' type='text' value='" + get(data) + "'" + placeholder + disabled + ">";
          }
        },
@@ -249,7 +287,7 @@ $(document).ready(function() {
            return "<input class='form-control update' type='text' value='" + get(data) + "'>";
          }
        },
-       { "data": null, "defaultContent": '<a class="fa fa-trash-alt remove"></a>' }
+       { "data": null, "defaultContent": '<a class="fa fa-trash-alt text-danger remove" title="[*delete]"></a>' }
      %],
      "rowCallback": function( row, r ) {
        var cnt = row.id.replace(/[a-z]/g, "");
@@ -259,7 +297,7 @@ $(document).ready(function() {
            var oc2;
            if( oc != "" && oc != 0 ) { oc2 = "/" + oc ; oc = "&oc=" + oc; } else { oc2 = "" ; oc = "" }
            var txt = "";
-           if( get(r.alt) != "" ) { txt = " - (" + r.alt + ")"; }
+           if( get(r.alt) != "" ) { txt = " (" + r.alt + ")"; }
            $("#a"+cnt).html( cnt + " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + r.fn + " " + r.sn + txt + "</a>" );
            r.gw = "[" + "[" + r.fn + "/" + r.sn + oc2 + "]" + "]";
          } else {
@@ -294,8 +332,7 @@ $(document).ready(function() {
      "ordering": false,
      "searching": false,
      "info": false,
-     "scrollY": "25vh",
-     "scrollCollapse": true,
+
      "language": {
        "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/[
 af: Afrikaans
@@ -359,7 +396,7 @@ zh: Chinese
            var oc = get(r.oc);
            if( oc != "" && oc != 0 ) { oc = "&oc=" + oc; } else { oc = "" ; }
            var txt = "";
-           if( get(r.alt) != "" ) { txt = " - (" + r.alt + ")"; }
+           if( get(r.alt) != "" ) { txt = " (" + r.alt + ")"; }
            $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>"+ cnt +
               " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + r.fn + " " + r.sn + txt + "</a></span></li>" );
          } else {
@@ -369,7 +406,7 @@ zh: Chinese
          // Make sure we can find the row in table
          table.row(cnt-1).node().id = "row" + cnt;
        });
-    } 
+    }
   } );
 
   $(document).on( "mouseover", ".legend", function(e) {
@@ -472,7 +509,7 @@ zh: Chinese
       // Selection in progress
       x2 = Math.round(e.pageX);
       y2 = Math.round(e.pageY);
-      
+
       if( selection ) {
         var TOP = (y1 < y2) ? y1 : y2;
         var LEFT = (x1 < x2) ? x1 : x2;
