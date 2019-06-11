@@ -380,9 +380,9 @@ let strip_newlines_after_variables =
 
 let included_files = ref []
 
-let begin_end_include conf fname al =
+let begin_end_include conf fname al where =
   if Util.p_getenv conf.base_env "trace_templ" = Some "on" then
-    Atext ((0,0), "<!-- begin include from " ^ fname ^ " -->\n")
+    Atext ((0,0), "<!-- begin include (" ^ where ^ ") from: " ^ fname ^ " -->\n")
     :: al
     @ [ Atext ((0,0), "<!-- end include from " ^ fname ^ " -->\n") ]
   else al
@@ -486,21 +486,22 @@ let parse_templ conf strm =
         let file = get_value 0 strm in
         (* Protection pour ne pas inclure plusieurs fois un même template ? *)
         let _ = Printf.eprintf "parse_include: %s\n" file in
-        let _ = List.iter (fun f -> Printf.eprintf "included files: %s\n" f) !included_files in
+        let _ = List.iter (fun (f, _) -> Printf.eprintf "included files: %s\n" f) !included_files in
         let _ = flush stderr in
-        if not (List.mem file !included_files) then
+        if not (List.mem_assoc file !included_files) then
           let al =
             match Util.open_templ_fname conf file with
               Some (ic, fname) ->
-                let () = included_files := file :: !included_files in
                 let strm2 = Stream.of_channel ic in
                 let (al, _) = parse_astl [] false 0 [] strm2 in
-                close_in ic; 
-                Some (Ainclude (file, (begin_end_include conf fname al)))
+                close_in ic;
+                let al = begin_end_include conf fname al "parse" in
+                let () = included_files := (file, al) :: !included_files in
+                Some (Ainclude (file, al))
             | None -> None
           in
           al
-        else None
+        else Some (Ainclude (file, List.assoc file !included_files))
       with Stream.Failure | Stream.Error _ -> None
     in
     let (alk, tok) = parse_astl [] false 0 end_list strm in
@@ -1530,10 +1531,10 @@ and print_var print_ast_list conf ifun env ep loc sl =
           let _ = Printf.eprintf " print_var [include; %s]\n" templ in
           begin match Util.open_templ_fname conf templ with
             Some (_, fname) ->
-              let () = included_files := templ :: !included_files in
               begin match input_templ conf templ with
                 Some astl ->
-                    print_ast_list env ep (begin_end_include conf fname astl)
+                    let () = included_files := (templ, astl) :: !included_files in
+                    print_ast_list env ep (begin_end_include conf fname astl "print")
               | None -> Wserver.printf " %%%s?" (String.concat "." sl)
               end
             | None -> Wserver.printf " %%%s?" (String.concat "." sl)

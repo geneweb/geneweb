@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="%lang;">
-%clean_tpl_list;
 %trace.begin_head;
 <head>
   <!-- $Id: perso.txt,v7.00 01/03/2018 11:44:53 $ -->
