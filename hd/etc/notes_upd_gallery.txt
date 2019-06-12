@@ -295,39 +295,44 @@ $(document).ready(function() {
      %],
      "rowCallback": function( row, r ) {
        var cnt = row.id.replace(/[a-z]/g, "");
+       var txt = get(r.alt);
        if( get(r.t) == "" || r.t == "p" ) {
+         if( txt != "" ) { txt = " (" + txt + ")"; }
+         txt = get(r.fn) + " " + get(r.sn) + txt;
          if( get(r.fn) != "" && get(r.sn) != "" ) {
            var oc = get(r.oc);
            var oc2;
            if( oc != "" && oc != 0 ) { oc2 = "/" + oc ; oc = "&oc=" + oc; } else { oc2 = "" ; oc = "" }
-           var txt = "";
-           if( get(r.alt) != "" ) { txt = " (" + r.alt + ")"; }
-           $("#a"+cnt).html( cnt + " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + r.fn + " " + r.sn + txt + "</a>" );
+           $("#a"+cnt).html( cnt + " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + txt + "</a>" );
            r.gw = "[" + "[" + r.fn + "/" + r.sn + oc2 + "]" + "]";
          } else {
-           $("#a"+cnt).html( cnt );
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( cnt + txt );
            delete r.gw;
          }
        } else if ( r.t == "m" ) {
          if( get(r.misc) != "" ) {
-           $("#a"+cnt).html( cnt + " <a href='%prefix;&m=NOTES&f=" + r.misc + "' target='_blank'>" + get(r.alt) + "</a>" );
+           $("#a"+cnt).html( cnt + " <a href='%prefix;&m=NOTES&f=" + r.misc + "' target='_blank'>" + txt + "</a>" );
            r.gw = "[" + "[" + "[" + r.misc + "]" + "]" + "]";
          } else {
-           $("#a"+cnt).html( cnt );
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( cnt + txt );
            delete r.gw;
          }
        } else if ( r.t == "g" ) {
          if( get(r.href) != "" ) {
-           $("#a"+cnt).html( cnt + " <a href='%prefix;" + r.href + "' target='_blank'>" + get(r.alt) + "</a>" );
+           $("#a"+cnt).html( cnt + " <a href='%prefix;" + r.href + "' target='_blank'>" + txt + "</a>" );
          } else {
-           $("#a"+cnt).html( cnt );
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( cnt + txt );
          }
          delete r.gw;
        } else if ( r.t == "e" ) {
          if( get(r.href) != "" ) {
-           $("#a"+cnt).html( cnt + " <a href='" + r.href + "' target='_blank'>" + get(r.alt) + "</a>" );
+           $("#a"+cnt).html( cnt + " <a href='" + r.href + "' target='_blank'>" + txt + "</a>" );
          } else {
-           $("#a"+cnt).html( cnt );
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( cnt + txt );
          }
          delete r.gw;
        }

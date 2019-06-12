@@ -92,7 +92,7 @@ $(document).ready(function() {
           $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
           $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
         } else {
-          $("#unknown").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
+          $("#unknown").append( "<li class='legend' id='a" + cnt + "'><span>" + txt + "</span></li>" );
           $("#div_unknown").addClass( "d-inline" ).removeClass( "d-none" );
         }
       } else if( r.t == "m" ) {
@@ -103,6 +103,7 @@ $(document).ready(function() {
         href = "%prefix;" + get(r.href);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
         $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
+      } else if( r.t == "e" ) {
         href = get(r.href);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
         $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" )
