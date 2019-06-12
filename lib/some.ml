@@ -385,9 +385,9 @@ let print_selection_bullet conf =
       in
       if conf.cancel_links then ()
       else
-        Wserver.printf "<a id=\"i%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt
+        Wserver.printf "<a id=\"if%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt
           (commd conf) req (if sel then "&u=" ^ txt else "")
-          (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
+          (if sel || List.mem_assoc "u" conf.env then "#if" ^ txt else "");
       Wserver.printf "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
       if conf.cancel_links then () else Wserver.printf "</a>";
       Wserver.printf "\n"
