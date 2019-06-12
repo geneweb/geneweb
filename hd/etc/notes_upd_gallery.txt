@@ -74,8 +74,10 @@
     <div class="form-row mt-2">
       <label for="fname" class="col-form-label col-sm-2">[*file]</label>
       <div class="d-flex col-sm-9 px-0">
-      <input id="fname" type="text" class="form-control flex-fill">
-      <button id="face_detection" class="btn btn-primary ml-2 text-nowrap " disabled>Détection visages</button>
+        <input id="fname" type="text" class="form-control flex-fill">
+        %if(bvar.face_detection = "on")
+        <button id="face_detection" class="btn btn-primary ml-2 text-nowrap " disabled>Détection visages</button>
+        %end;
       </div>
     </div>
   </div>
@@ -108,7 +110,7 @@
   <input id="notes" type="hidden" name="notes">
   <div class="ml-4">
     <button type="submit" form="form" class="btn btn-primary" title="[*validate/delete]0">OK</button>
-    <button class="btn btn-outline-primary" href="%url;notmpl=on">[*modify] [note/notes]0</button>
+    <a class="btn btn-outline-primary" href="%url;notmpl=on">[*modify] [note/notes]0</a>
   </div>
 </form>
 
@@ -121,15 +123,17 @@
 %if;(bvar.use_cdn="yes")
   <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"
     integrity="sha384-rgWRqC0OFPisxlUvl332tiM/qmaNxnlY46eksSZD84t+s2vZlqGeHrncwIRX7CGp" crossorigin="anonymous"></script>
-  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"
-    integrity="sha384-uiSTMvD1kcI19sAHJDVf68medP9HA2E2PzGis9Efmfsdb8p9+mvbQNgFhzii1MEX" crossorigin="anonymous"></script>
+  %(<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"
+    integrity="sha384-uiSTMvD1kcI19sAHJDVf68medP9HA2E2PzGis9Efmfsdb8p9+mvbQNgFhzii1MEX" crossorigin="anonymous"></script>%)
 %else;
   <script src="%if(cgi)%bvar.static_path;%end;js/jquery.dataTables.min.js?version=1.10.19"></script>
-  <script src="%if(cgi)%bvar.static_path;%end;js/dataTables.bootstrap4.min.js?version=1.10.19"></script>
+  %(<script src="%if(cgi)%bvar.static_path;%end;js/dataTables.bootstrap4.min.js?version=1.10.19"></script>%)
 %end;
 <script src="%if(cgi)%bvar.static_path;%end;js/jquery.maphilight.js"></script>
-<!--<script async src="https://docs.opencv.org/4.1.0/opencv.js" onload="onOpenCvReady();"></script>
-<script src="https://docs.opencv.org/4.1.0/utils.js"></script>-->
+%if(bvar.face_detection = "on")
+<script async src="https://docs.opencv.org/4.1.0/opencv.js" onload="onOpenCvReady();"></script>
+<script src="https://docs.opencv.org/4.1.0/utils.js"></script>
+%end;
 <script>
 function get( v ) {
   if( typeof v !== "undefined" ) {

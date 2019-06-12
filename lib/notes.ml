@@ -397,6 +397,39 @@ let print_what_links conf base fnotes =
   end;
   Hutil.trailer conf
 
+let safe_gallery conf s =
+  let html s = safe_html (string_with_macros conf [] s) in
+  let safe_map e =
+    match e with
+    | `Assoc l -> `Assoc (List.map (function
+        | key, `String s when key = "alt"
+          -> key, `String (html s)
+        | e -> e
+      ) l)
+    | _ -> `Assoc []
+  in
+  let safe_json l =
+    List.map (function
+      | key, `String s when key = "title"
+        -> key, `String (html s)
+      | key, `String s when key = "desc"
+        -> key, `String (html s)
+      | "map", `List lmap
+        -> "map", `List (List.map safe_map lmap)
+      | e -> e
+    ) l
+  in
+  let json =
+    try Yojson.Basic.from_string s
+    with _ -> `Assoc []
+  in
+  let json =
+    match json with
+    | `Assoc l -> `Assoc (safe_json l)
+    | _ -> `Assoc []
+  in
+  Yojson.Basic.to_string json
+
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
@@ -407,11 +440,12 @@ let print conf base =
     Some "on" -> print_what_links conf base fnotes
   | _ ->
       let (nenv, s) = read_notes base fnotes in
-      let templ =
+      let (templ, typ) =
         try
-          let fname = "notes_" ^ (List.assoc "TYPE" nenv) in
-          Util.open_templ conf fname
-        with Not_found -> None
+          let typ = List.assoc "TYPE" nenv in
+          let fname = "notes_" ^ typ in
+          Util.open_templ conf fname, fname
+        with Not_found -> None, ""
       in
       match templ with
       | Some ic ->
@@ -419,8 +453,10 @@ let print conf base =
          | Some "on" ->
             let charset = if conf.charset = "" then "utf-8" else conf.charset in
             Wserver.header "Content-type: application/json; charset=%s" charset ;
-            (* FIXME: find a way to use safe_html *)
-            Wserver.printf "%s" (string_with_macros conf [] s)
+            Wserver.printf "%s" (match typ with
+              | "gallery" -> safe_gallery conf s
+              | _ -> s 
+            )
          | _ -> Templ.copy_from_templ conf [] ic
          end
       | None ->
