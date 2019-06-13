@@ -170,6 +170,10 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               %end;
               %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
                 <a class="dropdown-item" href="%url;cgl=on" target="_blank"><i class="fa fa-unlink fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
+                <a class="dropdown-item" href="https://www.geneanet.org/fonds/individus/?sourcename=&ignore_each_patronyme=&ignore_each_prenom=&type_periode=between&exact_day=&exact_month=&exact_year=&nom=%surname;&ignore_each_patronyme=&prenom=%first_name_full;&prenom_operateur=and&ignore_each_prenom=&place__0__=%place_short;&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=%birth_date.year;&to=%death_date.year;&exact_day=&exact_month=&exact_year=&go=1" target="_blank"><i class="fa fa-search fa-fw mr-2" title="Geneanet"></i>[
+en: Search on Geneanet
+fr: Rechercher sur Geneanet
+]</a>%nn;
               %end;
           %if;(not (bvar.wizard_just_friend="yes") and wizard)
                 <div class="dropdown-divider"></div>

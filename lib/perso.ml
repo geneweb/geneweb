@@ -4163,6 +4163,35 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "father_age_at_birth" -> string_of_parent_age conf base ep get_father
   | "first_name" ->
       if not p_auth && is_hide_names conf p then "x" else p_first_name base p
+  | "first_name_full" ->
+      if not p_auth && conf.hide_names then "x" else
+      let fn = p_first_name base p in
+      begin match get_first_names_aliases p with
+        [] -> fn
+      | first :: _ ->
+          let fna = sou base first in
+          let re = Str.regexp_string (Str.quote fn) in
+          begin try ignore (Str.search_forward re fna 0); fna
+          with Not_found -> fn
+          end
+      end
+  | "place_short" ->
+      if p_auth then
+        let s = sou base (get_birth_place p) in
+        let s =
+          if String.equal s "" then sou base (get_death_place p)
+          else s
+        in
+        let l_str = Str.split (Str.regexp ", ") s in
+        let rec loop liste =
+          match liste with
+            "?" :: others -> loop others
+          | first :: others when first.[1] = '[' -> loop others
+          | first :: _ -> first
+          | [] -> ""
+        in
+        loop l_str
+      else ""
   | "first_name_key" ->
       if is_hide_names conf p && not p_auth then ""
       else code_varenv (Name.lower (p_first_name base p))
