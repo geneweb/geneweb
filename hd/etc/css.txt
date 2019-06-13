@@ -21,3 +21,6 @@ li.female { list-style-type: circle; list-style-image: url('%image_prefix;/femal
   %end;
 %end;
 <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/css.css">
+%if;(bvar.css_prop != "")
+<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/%bvar.css_prop;">
+%end;
