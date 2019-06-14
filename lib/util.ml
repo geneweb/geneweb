@@ -3713,17 +3713,6 @@ let groupby ~key ~value list =
     list ;
   Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
 
-(* FIXME: merge this en Mutil.tr *)
-let str_replace ?(unsafe = false) c ~by str =
-  match String.rindex_opt str c with
-  | None -> str
-  | Some _ ->
-    let bytes = Bytes.(if unsafe then unsafe_of_string else of_string) str in
-    for i = 0 to Bytes.length bytes - 1 do
-      if Bytes.unsafe_get bytes i = c then Bytes.unsafe_set bytes i by
-    done ;
-    Bytes.(if unsafe then unsafe_to_string else to_string) bytes
-
 let str_nth_pos str nth =
   let strlen = String.length str in
   let rec loop n i =

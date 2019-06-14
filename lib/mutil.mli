@@ -5,7 +5,6 @@ val int_size : int
 val verbose : bool ref
 
 val list_iter_first : (bool -> 'a -> unit) -> 'a list -> unit
-val tr : char -> char -> string -> string
 val strip_all_trailing_spaces : string -> string
 
 val decline : char -> string -> string
@@ -36,6 +35,19 @@ val input_lexicon :
   string -> (string, string) Hashtbl.t -> (unit -> in_channel) -> unit
 
 module StrSet : Set.S with type elt = string
+
+(** [tr c1 c2 str]
+    Return a new string which is the same as [str] with all occurences of [c1]
+    replaced by [c2].
+    If [str] does not contain [c1]. [str] is returned intouched.
+
+ *)
+val tr : char -> char -> string -> string
+
+(** [unsafe_tr c1 c2 str]
+    Update [str] in place. Replace all occurences of [c1] replaced by [c2].
+ *)
+val unsafe_tr : char -> char -> string -> string
 
 (** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
     but it does not allocate an intermediate list.
