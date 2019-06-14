@@ -136,7 +136,8 @@ function init_gallery() {
    "map": []
  };
  $("#notes_comments").val( "TITLE=" + title +"\nTYPE=gallery\n" + JSON.stringify(res) );
+ $('#init_gallery').modal('hide')
 }
 </script>
-<a class="fa fa-images ml-2" data-toggle="modal" data-target="#init_gallery" href="javascript:;" onclick="init_tool();"></a>
+<a class="fa fa-images ml-2" data-toggle="modal" data-target="#init_gallery" href="javascript:;" onclick="init_tool();" title="Initialise imagemap"></a>
 %end;
