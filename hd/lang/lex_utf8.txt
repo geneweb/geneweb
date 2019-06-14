@@ -3410,7 +3410,7 @@ sv: begravning
     burial place
 co: locu di sepultura
 de: Ort der Bestattung
-en: Place of burial
+en: place of burial
 es: lugar de inhumación
 fi: Hautauspaikka
 fr: lieu d’inhumation
@@ -3425,7 +3425,7 @@ ru: место погребения
     burial src
 co: fonte di sepultura
 de: Ouellenangabe-Bestattung
-en: Source of burial
+en: source of burial
 es: fuente inhumación
 fi: Hautaustietojen lähde
 fr: source inhumation
@@ -4516,6 +4516,10 @@ pt: data de nascimento
 sv: födelsedatum
 ru: дата рождения
 
+    date of baptism
+en: date of baptism
+fr: date du baptême
+
     date of death
 co: data di trapassu
 de: Todestag
@@ -4545,6 +4549,10 @@ oc: data de maridatge
 pt: data de casamento
 sv: vigseldatum
 ru: дата бракосочетания
+
+    date of burial
+en: date of burial
+fr: date de la sépulture
 
     date/dates
 af: datum
