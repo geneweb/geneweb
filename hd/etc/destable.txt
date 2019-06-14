@@ -634,7 +634,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           %end;
           %reset_count2;
           %foreach;sorted_listc_item;
-            %if;(item.1=index)
+            %if;(item.1=spouse.index)
               %incr_count2;
             %end;
           %end;
