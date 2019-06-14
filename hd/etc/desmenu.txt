@@ -193,9 +193,21 @@ function table_spouse_disabled () {
         </p>
         <p>
           <label>
+            <input type="checkbox" id="t_baptism" name="baptism" value="on"%/>
+            [*date of baptism]
+          </label>
+          <label>
+            <input type="checkbox" id="t_baptism_place" name="baptism_place" value="on"%/>
+            [*baptism place]
+          </label>
+        </p>
+        <p>
+          <label>
             <input type="checkbox" id="t_marr" name="marr" value="on"%/>
             [*spouse/spouses]1
           </label>
+        </p>
+        <p>
           <input type="hidden" id="t_marr_on" name="marr" value=""%/>
           <label>
             <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>
@@ -205,6 +217,8 @@ function table_spouse_disabled () {
             <input type="checkbox" id="t_marr_place" name="marr_place" value="on"%/>
             [*where married]
           </label>
+        </p>
+        <p>
           <label>
             <input type="checkbox" id="t_child" name="child" value="on"%/>
             [*number of children]
@@ -219,16 +233,28 @@ function table_spouse_disabled () {
             <input type="checkbox" id="t_death_place" name="death_place" value="on"%/>
             [*where dead]
           </label>
+        </p>
+        <p>
           <label>
-            <input type="checkbox" id="t_age" name="age" value="on"%/>
-            [*age]
+            <input type="checkbox" id="t_burial" name="burial" value="on"%/>
+            [*date of burial]
+          </label>
+          <label>
+            <input type="checkbox" id="t_burial_place" name="burial_place" value="on"%/>
+            [*burial place]
           </label>
         </p>
         <p>
           <label>
+            <input type="checkbox" id="t_age" name="age" value="on"%/>
+            [*age]
+          </label>
+          <label>
             <input type="checkbox" id="t_occu" name="occu" value="on"%/>
             [*occupation/occupations]1
           </label>
+        </p>
+        <p>
           <label>
             <input type="checkbox" id="t_gen" name="gen" value="on"%/>
             [*display generation]

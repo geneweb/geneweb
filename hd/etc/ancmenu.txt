@@ -205,9 +205,21 @@ function no_options () {
       </p>
       <p>
         <label>
+          <input type="checkbox" id="t_baptism" name="baptism" value="on"%/>
+          [*date of baptism]
+        </label>
+        <label>
+          <input type="checkbox" id="t_baptism_place" name="baptism_place" value="on"%/>
+          [*baptism place]
+        </label>
+      </p>
+      <p>
+        <label>
           <input type="checkbox" id="t_marr" name="marr" value="on"%/>
           [*spouse/spouses]1
         </label>
+      </p>
+      <p>
         <label>
           <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>
           [*date of marriage]
@@ -216,6 +228,8 @@ function no_options () {
           <input type="checkbox" id="t_marr_place" name="marr_place" value="on"%/>
           [*where married]
         </label>
+     </p>
+     <p>
         <label>
           <input type="checkbox" id="t_child" name="child" value="on"%/>
           [*number of children]
@@ -233,8 +247,18 @@ function no_options () {
       </p>
       <p>
         <label>
+          <input type="checkbox" id="t_burial" name="burial" value="on"%/>
+          [*date of burial]
+        </label>
+        <label>
+          <input type="checkbox" id="t_burial_place" name="burial_place" value="on"%/>
+          [*burial place]
+        </label>
+      </p>
+      <p>
+        <label>
           <input type="checkbox" id="t_death_age" name="age" value="on"%/>
-          [*age]/[age at death]
+          [*age]/[*age at death]
         </label>
         <label>
           <input type="checkbox" id="t_occu" name="occu" value="on"%/>
