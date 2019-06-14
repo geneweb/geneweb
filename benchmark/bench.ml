@@ -1,3 +1,5 @@
+open Geneweb
+
 let bench name n fn arg =
   ignore @@ Benchmark.latency1 ~name n (List.map fn) arg
 
@@ -15,3 +17,7 @@ let () =
 ; bench "Sosa.branches" 1000000L (List.map Sosa.branches) [ sosa_list ]
 ; bench "Place.normalize" 10000000L Geneweb.Place.normalize
     [ "[foo-bar] - boobar (baz)" ; "[foo-bar] – boobar (baz)" ; "[foo-bar] — boobar (baz)" ]
+; bench "Mutil.unsafe_tr" 100000000L (fun s -> Mutil.unsafe_tr 'a' 'b' @@ "a" ^ s)
+    [ "aaaaaaaaaa" ; "bbbbbbbbbb" ; "abbbbbbbb" ; "bbbbbbbbba" ; "ababababab" ]
+; bench "Mutil.tr" 100000000L (fun s -> Mutil.tr 'a' 'b' @@ "a" ^ s)
+    [ "aaaaaaaaaa" ; "bbbbbbbbbb" ; "abbbbbbbb" ; "bbbbbbbbba" ; "ababababab" ]

@@ -367,15 +367,6 @@ val rev_iter : ('a -> unit) -> 'a list -> unit
  *)
 val groupby : key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list
 
-(** [str_replace ?unsafe c ~by str]
-    Return a new string which is the same as [str] with all occurences of [c]
-    replaced by [by].
-    If [str] does not contain [c]. [str] is returned intouched.
-
-    If [unsafe] is set to true, [str] is modified instead of a copy of [str].
- *)
-val str_replace : ?unsafe:bool -> char -> by:char -> string -> string
-
 (** [str_nth_pos str n]
     Return a position of the byte starting the [n]-th UTF8 character.
  *)

@@ -176,6 +176,16 @@ let tr c1 c2 s =
       (fun i -> let c = String.unsafe_get s i in if c = c1 then c2 else c)
   | None -> s
 
+let unsafe_tr c1 c2 s =
+  match String.rindex_opt s c1 with
+  | Some _ ->
+    let bytes = Bytes.unsafe_of_string s in
+    for i = 0 to Bytes.length bytes - 1 do
+      if Bytes.unsafe_get bytes i = c1 then Bytes.unsafe_set bytes i c2
+    done ;
+    Bytes.unsafe_to_string bytes
+  | None -> s
+
 let utf_8_of_iso_8859_1 str =
   let rec loop i len =
     if i = String.length str then Buff.get len
