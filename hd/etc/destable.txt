@@ -827,6 +827,9 @@ $(function () {
 $('.popover-dismiss').popover({
   trigger: 'focus'
 })
+$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 </script>
 
 </body>
