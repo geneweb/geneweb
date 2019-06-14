@@ -174,7 +174,9 @@ zh: 网络家谱
       <ul>
         %if;base.has_notes;
           <li>
-            <a href="%prefix;m=NOTES">[*base notes]</a>%base.title;
+            <a href="%prefix;m=NOTES">
+              %if(bvar.base_notes_title!="")%bvar.base_notes_title;%else;[*base notes]%end;
+            </a>
           </li>
         %end;
         %if;has_misc_notes;

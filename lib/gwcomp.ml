@@ -603,35 +603,40 @@ let get_mar_date str =
         | _ -> failwith str
       in
       let (relation, l) =
-        let decode_sex v c =
+        let decode_sex v c l =
           let decode_sex i =
             match c.[i] with
             | 'm' -> Male
             | 'f' -> Female
-            | _ -> Neuter
+            | '?' -> Neuter
+            | _ -> failwith __LOC__
           in
-          (v, decode_sex 0, decode_sex 1)
+          try (v, decode_sex 0, decode_sex 1), l
+          with _ -> (v, Male, Female), c :: l
         in
         match l with
         | "#nm" :: l ->
           (NotMarried, Male, Female), l
         | "#eng" :: l ->
           (Engaged, Male, Female), l
-        | "#noment" :: l -> (NoMention, Male, Female), l
+        | "#noment" :: c :: l ->
+          decode_sex MarriageLicense c l
+        | "#noment" :: l ->
+          (NoMention, Male, Female), l
         | "#nsck" :: c :: l when String.length c = 2 ->
-          decode_sex NoSexesCheckNotMarried c, l
+          decode_sex NoSexesCheckNotMarried c l
         | "#nsckm" :: c :: l when String.length c = 2 ->
-          decode_sex NoSexesCheckMarried c, l
+          decode_sex NoSexesCheckMarried c l
         | "#banns" :: c :: l when String.length c = 2 ->
-          decode_sex MarriageBann c, l
+          decode_sex MarriageBann c l
         | "#contract" :: c :: l when String.length c = 2 ->
-          decode_sex MarriageContract c, l
+          decode_sex MarriageContract c l
         | "#license" :: c :: l when String.length c = 2 ->
-          decode_sex MarriageLicense c, l
+          decode_sex MarriageLicense c l
         | "#pacs" :: c :: l when String.length c = 2 ->
-          decode_sex Pacs c, l
+          decode_sex Pacs c l
         | "#residence" :: c :: l when String.length c = 2 ->
-          decode_sex Residence c, l
+          decode_sex Residence c l
         | _ ->
           (Married, Male, Female), l
       in

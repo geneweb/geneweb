@@ -192,14 +192,7 @@ let macro conf base =
   | 'n' ->
       string_of_num (transl conf "(thousand separator)")
         (Sosa.of_int (nb_of_persons base))
-  | 'N' ->
-      let s = base_notes_read_first_line base "" in
-      let len = String.length s in
-      if len > 9 && String.sub s 0 5 = "<!-- " &&
-         String.sub s (len - 4) 4 = " -->"
-      then
-        " : " ^ String.sub s 5 (String.length s - 9)
-      else ""
+  | 'N' -> (try List.assoc "base_notes_title" conf.base_env with Not_found -> "")
   | 'o' -> image_prefix conf
   | 'q' ->
       let r = count conf in
@@ -482,17 +475,6 @@ let eval_var conf base env () _loc =
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
            (Sosa.of_int (Util.real_nb_of_persons conf base)))
-  | ["base"; "title"] ->
-      let s = base_notes_read_first_line base "" in
-      let len = String.length s in
-      let s =
-        if len > 9 && String.sub s 0 5 = "<!-- " &&
-           String.sub s (len - 4) 4 = " -->"
-        then
-          " : " ^ String.sub s 5 (String.length s - 9)
-        else ""
-      in
-      VVstring s
   | ["browsing_with_sosa_ref"] ->
       begin match get_env "sosa_ref" env with
         Vsosa_ref v -> VVbool (Lazy.force v <> None)

@@ -1334,18 +1334,19 @@ let open_hed_trl conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
     Sys_error _ -> None
 
-let open_templ conf fname =
-  try Some (Secure.open_in (etc_file_name conf fname)) with
+let open_templ_fname conf fname =
+  try
+    let fname = etc_file_name conf fname in
+    Some (Secure.open_in fname, fname) with
     Sys_error _ ->
-      if true then
-        let std_fname =
-          search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
-        in
-        try Some (Secure.open_in std_fname) with Sys_error _ -> None
-      else None
+      let std_fname =
+        search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
+      in
+      try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
+
+let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
 let image_prefix conf = conf.image_prefix
-
 
 (*
    On cherche le fichier dans cet ordre :
@@ -2115,7 +2116,7 @@ let relation_txt conf sex fam =
   | Residence ->
     ftransl_nth conf "residence%t to" is
   | NoMention ->
-    ftransl conf "with%t"
+    "%t" ^^ ftransl conf "with"
 
 let relation_date conf fam =
   match Adef.od_of_cdate (get_marriage fam) with
