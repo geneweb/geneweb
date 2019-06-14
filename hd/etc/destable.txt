@@ -818,6 +818,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %include;js
 <script>
 // Initialize Bootstrap tooltip and popover component, dismiss on next click function
+$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
@@ -827,6 +830,9 @@ $(function () {
 $('.popover-dismiss').popover({
   trigger: 'focus'
 })
+$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 </script>
 
 </body>
