@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="%lang;">
-%trace.begin_head;
 <head>
   <!-- $Id: perso.txt,v7.00 01/03/2018 11:44:53 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
@@ -18,22 +17,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
-%trace.begin_css;
   %include;css
-%trace.begin_hed;
   %include;hed
 </head>
-%trace.end_head;
 <body%body_prop;>
 %message_to_wizard;
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
-%trace.begin_perso_utils;
 %include;perso_utils
-%trace.begin_menubar;
 %include;menubar
 <div id="content" tabindex="-1">
-%trace.menubar_finished;
 
 %define;init_nb_asc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
@@ -86,13 +79,10 @@
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;
 
-%trace.begin_perso;
-
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
 %if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or
     (bvar.p_mod="" and evar.p_mod=""))
-  %trace.statique;
-  Statique
+  %(Statique%)
   %apply;init_cache(3, 2, 2)
   %if;(has_parents and (father.has_parents or mother.has_parents))
      <div class="collapse" id="collapseExample1">
@@ -118,16 +108,13 @@
     </div>
   </div>
 %else;
-  %trace.dynamic;
-  Dynamic
+  %(Dynamic %)
   %apply;init_cache(3, 2, 2)
   <div class="mt-2">
-    %trace.begin_for;
     %for;i;0;p_mod_nbr;
       %let;mmi;%apply;mm(i)%in;
       %let;ooi;%apply;oo(i)%in;
       %if;(mmi!="" and ooi!=0)
-        %trace.get_mod;
         %apply;get_mod(mmi, ooi)
       %end
     %end;

@@ -485,9 +485,6 @@ let parse_templ conf strm =
       try
         let file = get_value 0 strm in
         (* Protection pour ne pas inclure plusieurs fois un même template ? *)
-        let _ = Printf.eprintf "parse_include: %s\n" file in
-        let _ = List.iter (fun (f, _) -> Printf.eprintf "included files: %s\n" f) !included_files in
-        let _ = flush stderr in
         if not (List.mem_assoc file !included_files) then
           let al =
             match Util.open_templ_fname conf file with
@@ -701,7 +698,6 @@ let rec eval_variable conf =
       | None -> ""
       end
   | "time" :: sl -> eval_time_var conf sl
-  | ["trace"; message] -> Printf.eprintf "Trace: %s\n" message;flush stderr; ""
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
   | [s] -> eval_simple_variable conf s
@@ -741,7 +737,6 @@ and eval_simple_variable conf =
           else ""
       | None -> ""
       end
-  | "clean_tpl_list" -> included_files := []; ""
   | "doctype" -> Util.doctype conf ^ "\n"
   | "doctype_transitional" ->
       let doctype =
@@ -1528,7 +1523,6 @@ and print_var print_ast_list conf ifun env ep loc sl =
     with Not_found ->
       match sl with
         ["include"; templ] ->
-          let _ = Printf.eprintf " print_var [include; %s]\n" templ in
           begin match Util.open_templ_fname conf templ with
             Some (_, fname) ->
               begin match input_templ conf templ with
