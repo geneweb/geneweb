@@ -2818,18 +2818,13 @@ sv: dopplats
 ru: место крещения
 
     baptism src
-co: locu di battesimu
-de: Ort der Taufe
-en: Place of baptism
-es: lugar de bautismo
-fi: Kastepaikka
-fr: lieu de baptême
-it: luogo del battesimo
-nl: doopplaats
-no: Dåpssted
-oc: lòc de baptisme
-pt: local de batismo
-sv: dop
+co: fonte di battesimu
+en: Source of baptism
+es: fuente de bautismo
+fr: source de baptême
+it: fonte del battesimo
+oc: font de baptisme
+pt: fonte de batismo
 ru: свидетельство о крещении
 
     baptismLDS
