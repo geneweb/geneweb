@@ -180,7 +180,7 @@
     title="Cancel all URL links"%sp;
     href="%prefix_base_password;%nn;
           %foreach;env_binding;
-            %if;(env.key!="")&%env.key=%env.val;%end;%nn;
+            %if;(env.key!="" and env.key!="ns")&%env.key=%env.val;%end;%nn;
           %end;&cgl=on">%nn;
    <i class="fa fa-unlink fa-fw mr-1" aria-hidden="true"></i>[*cancel GeneWeb links]%nn;
   </a>
