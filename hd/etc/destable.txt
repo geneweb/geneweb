@@ -211,14 +211,12 @@
           data-content='%if;xxx.has_yyy_note;%apply;capitalize(xxx.yyy_note)%end;
                         %if;xxx.has_yyy_source;%if;xxx.has_yyy_note;<hr>%end;%apply;capitalize(xxx.yyy_source)%end;'
           title="%if;(xxx.has_yyy_note or xxx.has_yyy_source)
-                   <span class='font-weight-bold'>
                      %apply;a_of_b%with;
                        %if;(xxx.has_yyy_note and not xxx.has_yyy_source)[*note/notes]1%nn;
                        %elseif;(not xxx.has_yyy_note and xxx.has_yyy_source)[*source/sources]1%nn;
                        %elseif;(xxx.has_yyy_note and xxx.has_yyy_source)[*note/notes]1 [and] [source/sources]1%nn;
                        %end;
                      %and;[yyy]%end;
-                   </span>
                  %end;"%nn;
         %end;>%nn;
       %if;xxx.has_yyy_place;%xxx.yyy_place;%end;

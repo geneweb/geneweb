@@ -32,7 +32,7 @@
 %include;css
 %include;hed
 </head>
-<body%body_prop; id="ancsosa"
+<body%body_prop; id="ancsosa">
 %message_to_wizard;
 <div class="container-fluid">
 
@@ -1137,14 +1137,12 @@
           data-content='%if;ancestor.has_xxx_note;%apply;capitalize(ancestor.xxx_note)%end;
                         %if;ancestor.has_xxx_source;%if;ancestor.has_xxx_note;<hr>%end;%apply;capitalize(ancestor.xxx_source)%end;'
           title="%if;(ancestor.has_xxx_note or ancestor.has_xxx_source)
-                   <span class='font-weight-bold'>
                      %apply;a_of_b%with;
                        %if;(ancestor.has_xxx_note and not ancestor.has_xxx_source)[*note/notes]1%nn;
                        %elseif;(not ancestor.has_xxx_note and ancestor.has_xxx_source)[*source/sources]1%nn;
                        %elseif;(ancestor.has_xxx_note and ancestor.has_xxx_source)[*note/notes]1 [and] [source/sources]1%nn;
                        %end;
                      %and;[xxx]%end;
-                   </span>
                  %end;"%nn;
         %end;>%nn;
       %if;ancestor.has_xxx_place;%ancestor.xxx_place;%end;
