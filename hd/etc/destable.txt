@@ -244,7 +244,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %( numéro d'Aboville %)
   %if;(evar.num="on" and famx=1)
     %if;("yyy"="desc")
-      <td id="%labl0" class="text-center align-middle table_big_cell%if;(implx!=0) implex%end;"%rowspan;>
+      <td id="%labl0" class="text-center align-middle table_big_cell%if;(implx!=0 and not cancel_links) implex%end;"%rowspan;>
         %if;(labl!=1 and not cancel_links)
           <a class="table_big_anchor" title="[*navigation] [with] %xxx"%sp;
             href="%prefix_base_password;%access;;%nn;
