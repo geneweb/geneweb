@@ -43,16 +43,16 @@
 %define;image_MF(xxx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%xxx.index;"%sp;
-      title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;">%nn;
+      title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;"%sp;
   %end;
   %if;xxx.is_male;
-    <i class="fa fa-mars male mr-1"></i>%nn;
+    %if;cancel_links;♂ %else;class="fa fa-mars male%end;%nn;
   %elseif;xxx.is_female;
-    <i class="fa fa-venus female mr-1"></i>%nn;
+    %if;cancel_links;♀ %else;class="fa fa-venus female%end;%nn;
   %else;
-    <i class="fa fa-neuter neuter mr-1"></i>%nn;
-  %end;
-  %if;(wizard and not cancel_links)</a>%end;
+    %if;cancel_links;⚲ %else;class="fa fa-neuter neuter%end;%nn;
+  %end;%nn;
+  %if;(wizard and not cancel_links) mr-1"></a>%end;
 %end;
 
 %define;link(aaa,xxx,nnn)
@@ -782,11 +782,10 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %for;lev;0;max;
         %if;(evar.gen="on" and lev<max_desc_level)
           <tr>
-            <th scope="row" colspan="%nb_col;">[*generation/generations]0 %expr(lev+1)
-              <span class="sr-only"> (</span>%nn;
-              <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1)">%apply;desc_count_l(lev+1)</span>%nn;
-              <span class="sr-only">)</span>
-            </th>
+            <th class="text-left" scope="row" colspan="%nb_col;">
+              <span class="ml-1">[*generation/generations]0 %expr(lev+1)</span>
+              <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1)">%apply;desc_count_l(lev+1)</span>%nn;            
+            </th
           </tr>
         %end;
         %apply;one_level("self", 0, lev, "", "", 1)
@@ -806,9 +805,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %incr_count;
 %end;
 
-<p>[*total][:] %if;(evar.only="on")%apply;desc_count_l%with;%evar.v;%end; [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
-               %else;%apply;desc_count(max_desc_level) [descendants] %if;(evar.marr="on" or evar.t="I")(%count; [person/persons]1 [with root, spouses and unknowns])%end;</p>
-               %end;
+<p>[*total][:] %if;(evar.only="on")%apply;desc_count_l%with;%evar.v;%end; [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
+               %else;%apply;desc_count(max_desc_level) [descendants] %if;(evar.marr="on" or evar.t="I")(%count; [person/persons]1 [with root, spouses and unknowns])%end;
+               %end;.</p>
 
 %include;trl
 %include;copyr

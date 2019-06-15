@@ -92,18 +92,19 @@
   %end;
 %end;
 
-%define;image_MF(xx)
+%define;image_MF(xxx)
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
+    <a href="%prefix;m=MOD_IND;i=%xxx.index;"%sp;
+      title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;"%sp;
   %end;
-  %if;xx.is_male;
-    <i class="fa fa-mars male mr-1"></i>%nn;
-  %elseif;xx.is_female;
-    <i class="fa fa-venus female mr-1"></i>%nn;
+  %if;xxx.is_male;
+    %if;cancel_links;♂ %else;class="fa fa-mars male%end;%nn;
+  %elseif;xxx.is_female;
+    %if;cancel_links;♀ %else;class="fa fa-venus female%end;%nn;
   %else;
-    <i class="fa fa-neuter neuter mr-1"></i>%nn;
+    %if;cancel_links;⚲ %else;class="fa fa-neuter neuter%end;%nn;
   %end;%nn;
-  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
+  %if;(wizard and not cancel_links) mr-1"></a>%end;
 %end;
 
 %define;letter(xx)
@@ -2051,9 +2052,11 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %reset_count;
       %foreach;ancestor_level(l_v)
         %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
-          %if;(evar.gen="on")
+          %if;(evar.gen="on" and level!=1)
             <tr>
-              <td class="pl-2 font-weight-bold color-gray" colspan="%nb_col;">[*generation/generations]0 %level;</td>
+              <th class="text-left" scope="row" colspan="%nb_col;">
+                <span class="ml-1">[*generation/generations]0 %level;</span>
+              </th>
             </tr>
           %end;
         %end;
@@ -2069,7 +2072,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %end;
       %end;
     </table>
-    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)].</p>
   %else;
     <div class="mt-2">
       %( CSV header %)
