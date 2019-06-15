@@ -2805,7 +2805,7 @@ sv: dop
     baptism place
 co: locu di battesimu
 de: Ort der Taufe
-en: Place of baptism
+en: place of baptism
 es: lugar de bautismo
 fi: Kastepaikka
 fr: lieu de baptême
@@ -2819,7 +2819,7 @@ ru: место крещения
 
     baptism src
 co: fonte di battesimu
-en: Source of baptism
+en: source of baptism
 es: fuente de bautismo
 fr: source de baptême
 it: fonte del battesimo
@@ -2830,7 +2830,7 @@ ru: свидетельство о крещении
     baptismLDS
 co: battesimu LDS
 de: Taufe HLT
-en: Baptism (LDS)
+en: baptism (LDS)
 es: bausitsmo LDS
 fi: Kaste (LSD)
 fr: baptême LDS
