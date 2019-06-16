@@ -113,11 +113,13 @@ fr: compilé le %s à partir du commit %s
 co: lea ver di i zitelli
 en: link to children
 fr: lien vers les enfants
+no: lenke til barn
 
     link back to parents
 co: lea di ritornu ver di i genitori
 en: link back to parents
 fr: lien retour vers les parents
+no: lenke til foreldre
 
     presentation
 co: Prisentazione
@@ -128,6 +130,7 @@ he: הצגה
 it: Presentazione
 pl: Prezentacja
 ru: представление
+no: prensentasjon
 
     of
 co: di
@@ -148,11 +151,13 @@ en: The first name, name or occurrence of this person has changed. Please update
 co: vechju nome
 en: old name
 fr: ancien nom
+no: gammelt navn
 
     new name
 co: novu nome
 en: new name
 fr: nouveau nom
+no: nytt navn
 
     scale
 co: anni per generazione
@@ -6560,7 +6565,7 @@ is: börn
 it: da cui
 lv: bērni:
 nl: en hun kinderen
-no: barn
+no: med
 oc: enfants
 pl: dzieci
 pt: tiveram
@@ -6680,6 +6685,7 @@ sv: honom/henne
 co: u so/a so
 en: his/her
 fr: son/sa
+no: hans/hennes
 
     history
 co: cronulugia
@@ -8770,6 +8776,7 @@ sv: blandade noteringar
 co: fiura chì manca
 en: missing image
 fr: image manquante
+no: bilde mangler
 
     missing ancestors
 af: ontbrekende voorsate
@@ -9012,6 +9019,7 @@ sv: ändra bild
 co: modulu/moduli
 en: module/modules
 fr: module/modules
+no: modul/moduler
 
     months old
 af: maande oud
@@ -9111,6 +9119,7 @@ fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br /
 it: spiacenti, puoi aggiungere solo delle famiglie collegate al resto.<br />Questa restrizione è stata aggiunta dal proprietario del data base
 oc: o planhi, mas podètz pas apondre que de familhas ligadas.<br />Aquela restriccion foguèt aponduda pel proprietari d'aquela basa.
 ru: К сожалению, добавить можно только ветви, связанные с основным деревом.<br />Ограничение введено владельцем базы.
+no: beklager, du kan bare legge til familier som er koblet til andre.<br />Denne begrensningen er lagt til av database-eieren.
 
     murdered
 af: vermoor
@@ -9896,6 +9905,7 @@ co: nisunu/unu/dui/trè/quattru/cinque/sei/sette/ottu/nove/dece/ondeci/dodeci/tr
 de: kein/eins/zwei/drei/vier/fünf/sechs/sieben/acht/neun/zehn/elf/zwölf/dreizehn/vierzehn/füfnzehn/sechzehn/siebzehn/achtzehn/neunzehn/zwanzig/einundzwanzig/zweiundzwanzig/dreiundzwanzig/vierundzwanzig/fünfundzwanzig/sechsundzwanzig/siebenundzwanzig/achtundzwanzig/neunundzwanzig/dreißig/einunddreißig
 en: none/one/two/three/four/five/six/seven/eight/nine/ten/eleven/twelve/thirteen/fourteen/fifteen/sixteen/seventeen/eighteen/nineteen/twenty/twenty-one/twenty-two/twenty-two//twenty-three//twenty-four//twenty-five//twenty-six//twenty-seven//twenty-eight//twenty-nine/thirty/thirty-one
 fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/quartorze/quinze/seize/dix-sept/dix-huit/dix-neuf/vingt/vingt-et-un/vingt-deux/vingt-trois/vingt-quatre/vingt-cinq/vingt-six/vingt-sept/vingt-huit/vingt-neuf/trente/trente-un
+no: ingen/en/to/tre/fire/fem/seks/sju/åtte/ni/ti/elleve/tolv/tretten/fjorten/femten/seksten/sytten/atten/nitten/tjue/tjueen/tjueto/tjuetre/tjuefire/tjuefem/tjueseks/tjuesju/tjueåtte/tjueni/tretti/trettien
 
     number
 af: nommer
@@ -10409,6 +10419,7 @@ co: solu
 de: nur
 en: only
 fr: uniquement
+no: bare
 
     options
 co: ozzioni
