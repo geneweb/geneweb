@@ -1206,9 +1206,8 @@ let string_of_pevent_name conf base epers_name =
   | Epers_Will -> transl conf "will"
   | Epers_Name n -> sou base n
 
-let string_of_fevent_name conf base efam_name =
-  match efam_name with
-    Efam_Marriage -> transl conf "marriage event"
+let string_of_fevent_name conf base = function
+  | Efam_Marriage -> transl conf "marriage event"
   | Efam_NoMarriage -> transl conf "no marriage event"
   | Efam_NoMention -> transl conf "no mention"
   | Efam_Engage -> transl conf "engage event"
@@ -1221,6 +1220,10 @@ let string_of_fevent_name conf base efam_name =
   | Efam_PACS -> transl conf "PACS"
   | Efam_Residence -> transl conf "residence"
   | Efam_Name n -> sou base n
+
+let string_of_fevent conf base = function
+  | Efam_NoMention -> transl conf "no mention"
+  | x -> string_of_fevent_name conf base x
 
 let string_of_witness_kind conf sex witness_kind =
   match witness_kind with
@@ -1331,18 +1334,19 @@ let open_hed_trl conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
     Sys_error _ -> None
 
-let open_templ conf fname =
-  try Some (Secure.open_in (etc_file_name conf fname)) with
+let open_templ_fname conf fname =
+  try
+    let fname = etc_file_name conf fname in
+    Some (Secure.open_in fname, fname) with
     Sys_error _ ->
-      if true then
-        let std_fname =
-          search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
-        in
-        try Some (Secure.open_in std_fname) with Sys_error _ -> None
-      else None
+      let std_fname =
+        search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
+      in
+      try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
+
+let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
 let image_prefix conf = conf.image_prefix
-
 
 (*
    On cherche le fichier dans cet ordre :
@@ -2095,11 +2099,24 @@ let print_alphab_list crit print_elem liste =
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
   match get_relation fam with
-    NotMarried | NoSexesCheckNotMarried ->
-      ftransl_nth conf "relationship%t to" is
-  | Married | NoSexesCheckMarried -> ftransl_nth conf "married%t to" is
-  | Engaged -> ftransl_nth conf "engaged%t to" is
-  | NoMention -> let s = "%t " ^ transl conf "with" in valid_format "%t" s
+  | NotMarried
+  | NoSexesCheckNotMarried ->
+    ftransl_nth conf "relationship%t to" is
+  | MarriageContract
+  | MarriageLicense
+  | Married
+  | NoSexesCheckMarried ->
+    ftransl_nth conf "married%t to" is
+  | Engaged ->
+    ftransl_nth conf "engaged%t to" is
+  | MarriageBann ->
+    ftransl_nth conf "marriage banns%t to" is
+  | Pacs ->
+    ftransl_nth conf "pacsed%t to" is
+  | Residence ->
+    ftransl_nth conf "residence%t to" is
+  | NoMention ->
+    "%t" ^^ ftransl conf "with"
 
 let relation_date conf fam =
   match Adef.od_of_cdate (get_marriage fam) with

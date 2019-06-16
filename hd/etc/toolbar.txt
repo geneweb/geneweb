@@ -51,22 +51,16 @@ function insertTags (tagOpen, tagClose, sampleText) {
   return false;
 }
 --></script>
-
-<a onclick="return insertTags('\'\'\'','\'\'\'','Texte gras')" href="javascript:;">
-<img width="25" height="25" alt="Texte gras" title="Texte gras" src="%image_prefix;/button_bold.png"/></a>
-
-<a onclick="return insertTags('\'\'','\'\'','Texte italique');" href="javascript:;">
-<img width="25" height="25" alt="Texte italique" title="Texte italique" src="%image_prefix;/button_italic.png"/></a>
-
-<a onclick="return insertTags('\n*Element 1\n*Element 2\n*Element 3','','Liste a puces');" href="javascript:;">
-<img width="25" height="25" alt="Liste a puces" title="Liste a puces" src="%image_prefix;/button_list.png"/></a>
-
-<a onclick="return insertTags('\[\[\[','\]\]\]','Lien_interne/Nom du lien');" href="javascript:;">
-<img width="25" height="25" alt="Lien_interne/Nom du lien" title="Lien_interne/Nom du lien" src="%image_prefix;/button_link.png"/></a>
-
-<a onclick="return insertTags('\n== ',' ==\n','Titre de rubrique');" href="javascript:;">
-<img width="25" height="25" alt="Titre de rubrique" title="Titre de rubrique" src="%image_prefix;/button_headline.png"/></a>
-
-<a onclick="return insertTags('\n<hr />\n','','');" href="javascript:;">
-<img width="25" height="25" alt="Ligne horizontale" title="Ligne horizontale" src="%image_prefix;/button_hr.png"/></a>
-
+<a class="mx-1" onclick="return insertTags('\'\'\'','\'\'\'','Texte gras')" href="javascript:;">
+<i class="fas fa-bold" alt="Texte gras" title="Texte gras"></i></a>%nn;
+<a class="mx-1" onclick="return insertTags('\'\'','\'\'','Texte italique');" href="javascript:;">
+<i class="fas fa-italic" alt="Texte italique" title="Texte italique"></i></a>%nn;
+%( Liste à puce peu utile en l'état, intrusif et ne s’intègre pas au texte existant
+<a class="mx-1" onclick="return insertTags('\n*Element 1\n*Element 2\n*Element 3','','Liste a puces');" href="javascript:;">
+<i class="fas fa-list-ul" alt="Liste a puces" title="Liste a puces"></i></a>%nn;%)
+<a class="ml-2" onclick="return insertTags('\n== ',' ==\n','Titre de rubrique');" href="javascript:;">
+<i class="fas fa-heading" alt="Titre de rubrique" title="Titre de rubrique"></i></a>%nn;
+<a class="ml-2" onclick="return insertTags('\n<hr>\n','','');" href="javascript:;">
+<i class="far fa-window-minimize" alt="Ligne horizontale" title="Ligne horizontale"></i></a>
+<a class="ml-2" onclick="return insertTags('\[\[\[','\]\]\]','Lien_interne/Nom du lien');" href="javascript:;">
+<i class="fas fa-link" alt="Lien_interne/Nom du lien" title="Lien_interne/Nom du lien"></i></a>%nn;

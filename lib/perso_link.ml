@@ -289,6 +289,11 @@ let make_efam_link conf base fam_link =
     | `no_sexes_check_not_married -> NoSexesCheckNotMarried
     | `no_mention -> NoMention
     | `no_sexes_check_married -> NoSexesCheckMarried
+    | `marriage_bann -> MarriageBann
+    | `marriage_contract -> MarriageContract
+    | `marriage_license -> MarriageLicense
+    | `pacs -> Pacs
+    | `residence -> Residence
   in
   let divorce =
     match fam_link.MLink.Family.divorce_type with

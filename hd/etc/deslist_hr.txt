@@ -169,13 +169,13 @@
       %elseif;(not cancel_links)
         <a id="i_%index;" href="%prefix;&i=%index;">%self;</a> %dates;%if;(self.title!=""), %self.title;%end;%nn;
       %else;
-        %self; %dates;%if;(self has_title), %self.title;%end;%nn;
+        %self; %dates;%if;(self.title!=""), %self.title;%end;%nn;
       %end;
       %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small>%end;%sp;
       %if;(not cancel_links)
-        <a id="is_%spouse.index;_%family.index;" href="%prefix;&i=%spouse.index;">%spouse;</a> %spouse.dates;
+        <a id="is_%spouse.index;_%family.index;" href="%prefix;&i=%spouse.index;">%spouse;</a> %spouse.dates;%if;(spouse.title!=""), %spouse.title;%end;%nn;
       %else;
-       %spouse; %spouse.dates;
+       %spouse; %spouse.dates;%if;(spouse.title!=""), %spouse.title;%end;%nn;
       %end;
       %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
         %apply;add_in_sorted_list(spouse.index)

@@ -579,12 +579,17 @@ let update_fevents_with_family gen fam =
   let evt_marr =
     let name =
       match fam.relation with
-        Married -> Efam_Marriage
+      | Married -> Efam_Marriage
       | NotMarried -> Efam_NoMarriage
       | Engaged -> Efam_Engage
       | NoSexesCheckNotMarried -> Efam_NoMarriage
       | NoMention -> Efam_NoMention
       | NoSexesCheckMarried -> Efam_Marriage
+      | MarriageBann -> Efam_MarriageBann
+      | MarriageContract -> Efam_MarriageContract
+      | MarriageLicense -> Efam_MarriageLicense
+      | Pacs -> Efam_PACS
+      | Residence -> Efam_Residence
     in
     let witnesses = Array.map (fun ip -> ip, Witness) fam.witnesses in
     let evt =

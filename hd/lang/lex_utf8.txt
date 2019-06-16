@@ -4,19 +4,19 @@ en: reset to
 fr: restaurer
 
     select p_mod
-co: selezziunà i mudulli persunalizati (predefinitu zz)
-en: select personalized modules (default zz)
-fr: selectionner les modules personnalisés (défaut zz)
+co: selezziunà i mudulli persunalizati
+en: select personalized modules
+fr: selectionner les modules personnalisés
 
     last sosa level not navigable
-co: l'ultimu livellu di sosa ùn si pò micca navigà. Impiegate a lista di l'antenati.
-en: last sosa level not navigable. Use ancestors list.
-fr: le dernier niveau des sosa n'est pas navigable. Utilisez la liste des ancêtres.
+co: l'ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l'antenati.
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 
     with root, spouses and unknowns
 co: cù l'antenatu radica, i cumpagni è i scunnisciuti
 en: with root ancestor, spouses and unknowns
-fr: avec l'ancêtre racine, les conjoints et les inconnus
+fr: avec l’ancêtre racine, les conjoints et les inconnus
 
     hide portraits
 co: piattà i ritratti
@@ -4972,7 +4972,7 @@ co: affissà a numerotazione d'Aboville
 de: Sosa/Kekule-Nummer anzeigen
 en: Display d’Aboville number
 es: editar la numeración de Aboville
-fi: Näytä sosa-numero
+fi: Näytä Sosa-numero
 fr: afficher la numérotation d’Aboville
 it: visualizzare la numerazione d'Aboville
 nl: de d'Aboville nummering tonen
@@ -8847,15 +8847,15 @@ ru: родители неизвестны
 co: Sosa chì manca
 de: Fehlende SOSA
 en: missing Sosa numbers
-es: falta sosa
+es: falta Sosa
 fi: Sosa-numero
 fr: Sosa manquants
-it: sosa mancante
-nl: ontbrekende sosa's
+it: Sosa mancante
+nl: ontbrekende Sosa's
 no: Sosa-nummer
 oc: Sosa que mancan
-pt: sosa em falta
-sv: Saknade sosa
+pt: Sosa em falta
+sv: Saknade Sosa
 
     missing sources
 co: fonte chì mancanu
@@ -9266,7 +9266,7 @@ bg: навигация чрез числа на Соса относно %t
 br: merdeadur gant %t 'vel dave Sosa
 ca: navegació amb %t amb referència de "número Sosa"
 co: navigazione cù %t cum'è referenza Sosa
-cs: prohlížení s %t jako "sosa" referencí
+cs: prohlížení s %t jako "Sosa" referencí
 da: navigering med %t som reference for fortløbende anenummerering (Sosa o.a.)
 de: Navigation mit %t als Proband für die Ahnenkennziffern
 en: browse using %t as Sosa reference
@@ -11464,7 +11464,7 @@ eo: rilato%t kun
 es: parentesco%t con
 et: kooselu%t
 fi: suhde%t ja
-fr: relation%t avec
+fr: %t avec
 he:  קירבה
 is: sambúð%t með
 it: legame%t con
@@ -11480,6 +11480,42 @@ ru: приходится%t
 sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
+
+    pacsed%t to
+de: Eheähnliches Verhältnis%t mit
+en: Civil solidarity pact%t with
+es: Pacto civil de solidaridad%t con
+fi: Pacs-sopimuksella%t (kanssa)
+fr: PACS%t avec
+it: Unione civile%t con
+nl: Samenlevingscontract%t met
+no: Samboeravtale%t med
+pt: Pacto civil de solidariedade%t com
+sv: Sambo%t med
+
+    marriage banns%t to
+de: aufgebot zur Heirat%t mit
+en: marriage banns%t with
+es: proclamas de matrimonio%t con
+fi: kuuluutus aviolittoon%t (kanssa)
+fr: bans de mariage%t avec
+it: bandi di matrimonio%t con
+nl: huwelijksafkondiging%t met
+no: lysning%t med
+pt: editais de casamento%t com
+sv: lysning%t med
+
+    residence%t to
+de: gemeinsamer Wohnsitz%t mit
+en: residence%t with
+es: residencia%t con
+fi: asuu samassa taloudessa%t (kanssa)
+fr: résidence%t avec
+it: residenza%t con
+nl: woonplaats%t met
+no: bopel%t med
+pt: residência%t com
+sv: sammanboende%t med
 
     residence
 co: residenza
@@ -11547,7 +11583,7 @@ es: idéntico al nº Sosa
 fi: Sama kuin Sosa #
 fr: identique au n° Sosa
 it: identico al n° Sosa
-nl: identiek met sosa nr
+nl: identiek met Sosa nr
 no: Samme som Sosa #
 oc: identic(a) al n° Sosa #
 pt: idêntico ao nº Sosa
@@ -14677,6 +14713,22 @@ no: Testamente
 pt: testamento
 sv: Testament
 
+    relations of
+en: relations of
+fr: relations de
+
+    witness to events of
+en: witnesses to events of
+fr: témoins aux évènements de
+
+    participant/participant
+en: participant/participant
+fr: participant/participante
+
+    events to which %s was witness
+en: events to which %s was witness
+fr: évènements auxquels %s était témoin
+
     with
 af: met
 bg: с
@@ -15384,3 +15436,4 @@ fr: retirer le dernier module ajouté
 co: cupià a lea in u preme'papei
 en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
+

@@ -1,4 +1,4 @@
-<!-- $Id: css.txt, v7.00 10/04/2018 08:57:10 $ -->
+<!-- $Id: css.txt, v7.00 05/06/2019 04:17:26 $ -->
 <style>/* Put here only properties that uses variables */
 li.folder { list-style-type: disc; list-style-image: url('%image_prefix;/folder.png'); }
 li.file { list-style-type: circle; list-style-image: url('%image_prefix;/file.png'); }
@@ -9,13 +9,18 @@ li.female { list-style-type: circle; list-style-image: url('%image_prefix;/femal
 </style>
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
-      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css"
+      integrity="sha384-i1LQnF23gykqWXg6jxC2ZbCbUMxyw5gLZY6UiUS98LYV5unm8GWmfkIS6jqJfb4E" crossorigin="anonymous">
   %else;
-    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/bootstrap.min.css">
-    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.css">
+    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/bootstrap.min.css?version=4.3.1">
+    %if;(bvar.js_icon!="yes")
+      <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.min.css?version=5.9.0">
+    %end;
   %end;
 %end;
 <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/css.css">
+%if;(bvar.css_prop != "")
+<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/%bvar.css_prop;">
+%end;

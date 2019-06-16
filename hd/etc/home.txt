@@ -2,16 +2,16 @@
 %if;(not cancel_links)
   <div class="float-left">
     <div class="d-flex mt-2 fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
-      <a role="button" class="btn btn-link ml-0 p-1" href="%prefix;">%nn;
+      <a role="button" class="btn btn-link ml-0 p-0" href="%prefix;">%nn;
         <i class="fa fa-home fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
         <i class="sr-only">[*home]</i>%nn;
       </a>
-      <a role="button" class="btn btn-link  text-primary ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
+      <a role="button" class="btn btn-link  text-primary ml-0 p-0" data-toggle="modal" data-target="#searchmodal">%nn;
         <i class="fa fa-search fa-fw" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*search/case sensitive]0</span>%nn;
       </a>
       %if;(referer!="")
-        <a role="button" class="btn btn-link ml-0 p-1" href="%referer;" title="Revenir en arrière">%nn;
+        <a role="button" class="btn btn-link ml-0 p-0" href="%referer;" title="Revenir en arrière">%nn;
           <i class="fa fa-arrow-left fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
           <span class="sr-only">[*back]</span>%nn;
         </a>

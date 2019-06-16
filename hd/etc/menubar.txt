@@ -50,7 +50,7 @@
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
                         value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
-                        placeholder="%if;(evar.p_mod="")%bvar.p_mod;
+                        placeholder="%if;(evar.p_mod="" and bvar.p_mod!="")%bvar.p_mod;
                         (%base.name;.gwf)%else;[*select p_mod]%end;"
                         maxlength="30">
                       <div class="input-group-append">
@@ -109,7 +109,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               <li class="nav-item">
                 <a class="nav-link" href="%prefix_base_password;%if;(bvar.access_by_key="yes")%sosa_prev.access;%else;i=%sosa_prev.index;%end;;%nn;
                   %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i")%env.key=%env.val;;%end;%end;"
-                  title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only"><</span></a>%nn;
+                  title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only">&lt;</span></a>%nn;
               </li>
             %end;
             %if(sosa_next.index!="")
@@ -299,7 +299,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=CT;hi=H;v=5;scale=100;fs=17;sosa=on;" title="[*compact tree] [with] %self;"><span class="fa fa-th fa-fw mr-2"></span>[*compact tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=h7;wide=on;" title="[Arbre 7 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>7 [generation/generations]1</a>
-                <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=m;" title="[Arbre 9 gen]" class="ml-2">9 [generation/generations]1</a>
+                <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=m;" title="[Arbre 9 gen]">9 [generation/generations]1</a>
               </div>
             </li>
           %end;

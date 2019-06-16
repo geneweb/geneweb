@@ -292,8 +292,8 @@ let reconstitute_family conf base mod_f =
   in
   (* Attention, surtout pas les witnesses, parce que si on en créé un, *)
   (* on le créé aussi dans witness et on ne pourra jamais valider.     *)
-  let (marr, div) =
-    UpdateFamOk.reconstitute_from_fevents conf fevents
+  let (marr, div, _) =
+    UpdateFamOk.reconstitute_from_fevents (p_getenv conf.env "nsck" = Some "on") "" fevents
       (relation, marriage, marriage_place, marriage_note, marriage_src)
       divorce
   in

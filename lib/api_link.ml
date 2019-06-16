@@ -353,6 +353,11 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date) =
     match gen_f.divorce with

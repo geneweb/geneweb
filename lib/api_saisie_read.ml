@@ -729,6 +729,11 @@ let fam_to_piqi_family_link conf base ifath imoth sp ifam fam fam_link spouse_to
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date, divorce_date_long, divorce_date_conv, divorce_date_conv_long, divorce_cal, divorce_date_raw) =
     match gen_f.divorce with
@@ -993,6 +998,11 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date, divorce_date_long, divorce_date_conv, divorce_date_conv_long, divorce_cal, divorce_date_raw) =
     match gen_f.divorce with
@@ -3539,6 +3549,11 @@ let fam_to_piqi_family_tree conf base ifam =
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date) =
     match gen_f.divorce with
@@ -3592,6 +3607,11 @@ let fam_to_piqi_family_tree_link base ifam fam =
     | NoSexesCheckNotMarried -> `no_sexes_check_not_married
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
+    | MarriageBann -> `marriage_bann
+    | MarriageContract -> `marriage_contract
+    | MarriageLicense -> `marriage_license
+    | Pacs -> `pacs
+    | Residence -> `residence
   in
   let (divorce_type, divorce_date) =
     match gen_f.divorce with

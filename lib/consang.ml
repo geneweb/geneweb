@@ -38,36 +38,32 @@ type relationship_info =
 
 let half x = x *. 0.5
 
-let mark = ref 0
-let new_mark () = incr mark; !mark
-
 type visit = NotVisited | BeingVisited | Visited
+
+let rec noloop_aux base error tab i =
+  match tab.(i) with
+  | NotVisited ->
+    begin match get_parents (poi base (Adef.iper_of_int i)) with
+        Some ifam ->
+        let fam = foi base ifam in
+        let fath = get_father fam in
+        let moth = get_mother fam in
+        tab.(i) <- BeingVisited;
+        noloop_aux base error tab (Adef.int_of_iper fath);
+        noloop_aux base error tab (Adef.int_of_iper moth)
+      | None -> ()
+    end;
+    tab.(i) <- Visited
+  | BeingVisited -> error (OwnAncestor (poi base (Adef.iper_of_int i)))
+  | Visited -> ()
 
 let check_noloop base error =
   let tab = Array.make (nb_of_persons base) NotVisited in
-  let rec noloop i =
-    match tab.(i) with
-      NotVisited ->
-        begin match get_parents (poi base (Adef.iper_of_int i)) with
-          Some ifam ->
-            let fam = foi base ifam in
-            let fath = get_father fam in
-            let moth = get_mother fam in
-            tab.(i) <- BeingVisited;
-            noloop (Adef.int_of_iper fath);
-            noloop (Adef.int_of_iper moth)
-        | None -> ()
-        end;
-        tab.(i) <- Visited
-    | BeingVisited -> error (OwnAncestor (poi base (Adef.iper_of_int i)))
-    | Visited -> ()
-  in
-  for i = 0 to nb_of_persons base - 1 do
-    match tab.(i) with
-      NotVisited -> noloop i
-    | BeingVisited -> failwith "check_noloop algorithm error"
-    | Visited -> ()
-  done
+  for i = 0 to nb_of_persons base - 1 do noloop_aux base error tab i done
+
+let check_noloop_for_person_list base error ipl =
+  let tab = Array.make (nb_of_persons base) NotVisited in
+  List.iter (fun i -> noloop_aux base error tab @@ Adef.int_of_iper i) ipl
 
 exception TopologicalSortError of person
 
@@ -134,24 +130,6 @@ let topological_sort base poi =
        | _ -> assert false);
   tab
 
-let check_noloop_for_person_list base error ipl =
-  let tab = Array.make (nb_of_persons base) NotVisited in
-  let rec noloop ip =
-    let i = Adef.int_of_iper ip in
-    match tab.(i) with
-      NotVisited ->
-        begin match get_parents (poi base ip) with
-          Some ifam ->
-            let cpl = foi base ifam in
-            tab.(i) <- BeingVisited; Array.iter noloop (get_parent_array cpl)
-        | None -> ()
-        end;
-        tab.(i) <- Visited
-    | BeingVisited -> error (OwnAncestor (poi base ip))
-    | Visited -> ()
-  in
-  List.iter noloop ipl
-
 let phony_rel =
   {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
    inserted = 0; elim_ancestors = false; anc_stat1 = MaybeAnc;
@@ -177,6 +155,9 @@ let insert_branch_len ip lens (len, n, _ipl) =
 let consang_of p =
   if get_consang p = Adef.no_consang then 0.0
   else Adef.float_of_fix (get_consang p)
+
+let mark = ref 0
+let new_mark () = incr mark; !mark
 
 let relationship_and_links base ri b ip1 ip2 =
   let i1 = Adef.int_of_iper ip1 in

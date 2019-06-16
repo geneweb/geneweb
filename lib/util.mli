@@ -116,6 +116,7 @@ val index_of_next_char : string -> int -> int
 val open_etc_file : string -> in_channel option
 val open_hed_trl : config -> string -> in_channel option
 val open_templ : config -> string -> in_channel option
+val open_templ_fname : config -> string -> (in_channel * string) option
 val string_with_macros :
   config -> (char * (unit -> string)) list -> string -> string
 val string_of_place : config -> string -> string
@@ -179,8 +180,16 @@ val index_of_sex : sex -> int
 
 val string_of_pevent_name :
   config -> base -> istr gen_pers_event_name -> string
-val string_of_fevent_name :
-  config -> base -> istr gen_fam_event_name -> string
+
+(** [string_of_fevent_name conf base fevent_name]
+*)
+val string_of_fevent_name
+  : config -> base -> istr gen_fam_event_name -> string
+
+(** [string_of_fevent conf base fevent_name]
+*)
+val string_of_fevent
+  : config -> base -> istr gen_fam_event_name -> string
 
 (** [string_of_witness_kind conf sex wk]
     Return the string corresponding to wk according to [sex] and [conf].

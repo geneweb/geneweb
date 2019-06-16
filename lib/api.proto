@@ -42,6 +42,11 @@ enum MarriageType {
   NO_SEXES_CHECK_NOT_MARRIED = 3;
   NO_MENTION = 4;
   NO_SEXES_CHECK_MARRIED = 5;
+  MARRIAGE_BANN = 6;
+  MARRIAGE_CONTRACT = 7;
+  MARRIAGE_LICENSE = 8;
+  PACS = 9;
+  RESIDENCE = 10;
 }
 
 enum DivorceType {
@@ -314,24 +319,6 @@ enum RelationType {
   WITNESS = 42;
 
   NO_RELATION = 43;
-}
-
-message PersonRelation {
-  required Person person = 1;
-  required RelationType relation = 2;
-}
-
-message FullPersonRelation {
-  required FullPerson person = 1;
-  required RelationType relation = 2;
-}
-
-message ListPersonRelation {
-  repeated PersonRelation person_relations = 1;
-}
-
-message ListFullPersonRelation {
-  repeated FullPersonRelation person_relations = 1;
 }
 
 message AnniversaryParams {
@@ -608,8 +595,6 @@ message ModificationStatus {
   optional int32 index = 3;
 }
 
-
-
 enum NotifBirthdayParams {
   CLOSE_PERSON = 0;
   DESCEND_GRAND_PARENT = 1;
@@ -630,7 +615,6 @@ message NotificationBirthday {
   optional string firstname2 = 4;
   optional string firstname3 = 5;
 }
-
 
 // ***************************************************************************
 // Premiere saisie
@@ -674,23 +658,4 @@ message LastModifications {
 // ***************************************************************************
 message LastVisits {
   required string user = 1;
-}
-
-
-message CorrespondanceFamily {
-  required int32 index = 1;
-  required Person spouse = 2;
-  repeated Person children = 3;
-}
-
-message Correspondance {
-  required string base = 1;
-  required Person person = 2;
-  optional Person father = 3;
-  optional Person mother = 4;
-  repeated CorrespondanceFamily families = 5;
-}
-
-message CorrespondanceList {
-  repeated Correspondance correspondances = 1;
 }

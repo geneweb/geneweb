@@ -92,18 +92,10 @@ let print_info_base conf base =
 ;;
 
 
-(* ******************************************************************** *)
-(*  [Fonc] print_loop : config -> base -> Person                        *)
-(** [Description] : Si il y a une boucle dans la base, retourne la
-                    personne qui est son propre ancêtre, une personne
-                    vide sinon.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - Person : La personne qui est son propre ancêtre.
-    [Rem] : Non exporté en clair hors de ce module.                     *)
-(* ******************************************************************** *)
+
+(** [print_loop conf base]
+    If there is a loop in the base print a person being its own ancestor.
+    Otherwise, print a dummy (empty) person instead. **)
 let print_loop conf base =
   let (base_loop, pers) =
     (ref false, ref (poi base (Adef.iper_of_int (-1))))
@@ -113,10 +105,12 @@ let print_loop conf base =
   (* la boucle (on ne check pas la base en entier). Avec cette méthode, on  *)
   (* n'a pas de ce problème.                                                *)
   let () =
+    load_ascends_array base ;
+    load_couples_array base ;
     Consang.check_noloop base
-      (function
-        | OwnAncestor p -> base_loop := true; pers := p
-        | _ -> () )
+      (function OwnAncestor p -> base_loop := true ; pers := p | _ -> () ) ;
+    clear_ascends_array base ;
+    clear_couples_array base
   in
   let p =
     if !base_loop then
@@ -136,8 +130,6 @@ let print_loop conf base =
   in
   let data = data_person p in
   print_result conf data
-;;
-
 
 (* ******************************************************************** *)
 (*  [Fonc] print_info_ind : config -> base -> unit                      *)
@@ -2454,9 +2446,7 @@ let print_export conf base =
 *)
 
 
-
 (**/**) (* API_NOTIFICATION_BIRTHDAY *)
-
 
 (* !!! Repris de api_graph !!! *)
 
@@ -2469,21 +2459,6 @@ module Iper3 =
 
 module IperSet3 = Set.Make(Iper3) ;;
 
-
-
-(* ******************************************************************** *)
-(*  [Fonc] print_notification_birthday :
-             config -> base -> NotificationBirthday                     *)
-(** [Description] : Retourne le nombre d'anniversaires pour les
-                    notifications.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - NotificationBirthday : Le nombre d'anniversaire ainsi que les
-          trois premiers prénoms pour les anniversaires.
-    [Rem] : Non exporté en clair hors de ce module.                     *)
-(* ******************************************************************** *)
 let print_notification_birthday conf base =
   let params = get_params conf Mext.parse_notification_birthday_params in
   let ref_p = params.M.Notification_birthday_params.person in
@@ -2498,31 +2473,13 @@ let print_notification_birthday conf base =
     | Some p -> get_key_index p
     | None -> Adef.iper_of_int (-1)
   in
-  let p = poi base ip_proprio in
-  let list =
-    Api_graph.close_person_relation
-      conf base ip_proprio nb_asc nb_desc false
+  let ips =
+    (ip_proprio, nb_asc)
+    :: Array.fold_left
+      (fun acc f -> (Gutil.spouse ip_proprio (foi base f), nb_asc_sp) :: acc)
+      [] (get_family @@ pget conf base ip_proprio)
   in
-  let list =
-    List.fold_left
-      (fun accu ifam ->
-        let fam = foi base ifam in
-        let isp = Gutil.spouse ip_proprio fam in
-        let sp_list =
-          Api_graph.close_person_relation
-            conf base isp nb_asc_sp nb_desc false
-        in
-        List.rev_append accu sp_list)
-      list (Array.to_list (get_family p))
-  in
-  (* Rendre unique la liste. Un peu crado,
-     reprends le type IperSet de api_graph *)
-  let list =
-    IperSet3.elements
-      (List.fold_left
-         (fun accu elt -> IperSet3.add elt accu)
-         IperSet3.empty list)
-  in
+  let list = Api_graph.close_person_relation conf base ips nb_desc in
   (* On filtre la liste par rapport aux anniversaires. *)
   let list =
     match
@@ -2530,68 +2487,60 @@ let print_notification_birthday conf base =
        params.M.Notification_birthday_params.day)
     with
     | (Some month, Some day) ->
-        let (month, day) = (Int32.to_int month, Int32.to_int day) in
-        (* Anniversaire du jour. *)
-        List.fold_left
-          (fun accu (ip, _, _) ->
-            let p = poi base ip in
-            match Adef.od_of_cdate (get_birth p) with
-            | Some (Dgreg (d, _)) ->
-                if d.prec = Sure && get_death p = NotDead &&
-                   d.day = day && d.month = month
-                then (ip :: accu)
-                else accu
-            | _ -> accu)
-          [] (List.rev list)
+      let (month, day) = (Int32.to_int month, Int32.to_int day) in
+      (* Anniversaire du jour. *)
+      List.fold_left
+        (fun accu p ->
+           match Adef.od_of_cdate (get_birth p) with
+           | Some (Dgreg (d, _)) ->
+             if d.prec = Sure && get_death p = NotDead &&
+                d.day = day && d.month = month
+             then (p :: accu)
+             else accu
+           | _ -> accu)
+        [] (List.rev list)
     | (Some month, None) ->
-        let month = (Int32.to_int month) in
-        (* Anniversaire du mois. *)
-        List.fold_left
-          (fun accu (ip, _, _) ->
-            let p = poi base ip in
-            match Adef.od_of_cdate (get_birth p) with
-            | Some (Dgreg (d, _)) ->
-                if d.prec = Sure && get_death p = NotDead && d.month = month
-                then (ip :: accu)
-                else accu
-            | _ -> accu)
-          [] (List.rev list)
-    | _ -> List.map (fun (ip, _, _) -> ip) list
+      let month = (Int32.to_int month) in
+      (* Anniversaire du mois. *)
+      List.fold_left
+        (fun accu p ->
+           match Adef.od_of_cdate (get_birth p) with
+           | Some (Dgreg (d, _)) ->
+             if d.prec = Sure && get_death p = NotDead && d.month = month
+             then (p :: accu)
+             else accu
+           | _ -> accu)
+        [] (List.rev list)
+    | _ -> list
   in
   (* On filtre le proprio de la liste. *)
   let (list, has_proprio_birthday) =
     List.fold_left
-      (fun (accu, has_birthday) ip ->
-         if ip = ip_proprio then (accu, true) else (ip :: accu, has_birthday))
+      (fun (accu, has_birthday) p ->
+         if get_key_index p = ip_proprio then (accu, true) else (p :: accu, has_birthday))
       ([], false) (List.rev list)
   in
   let (fn1, fn2, fn3) =
     match list with
     | [] -> (None, None, None)
-    | [ip1] ->
-        let p1 = poi base ip1 in
-        (Some (sou base (get_first_name p1)), None, None)
-    | [ip1; ip2] ->
-        let p1 = poi base ip1 in
-        let p2 = poi base ip2 in
-        (Some (sou base (get_first_name p1)),
-         Some (sou base (get_first_name p2)), None)
-    | ip1 :: ip2 :: ip3 :: _ ->
-        let p1 = poi base ip1 in
-        let p2 = poi base ip2 in
-        let p3 = poi base ip3 in
-        (Some (sou base (get_first_name p1)),
-         Some (sou base (get_first_name p2)),
-         Some (sou base (get_first_name p3)))
+    | [p1] ->
+      (Some (sou base (get_first_name p1)), None, None)
+    | [p1; p2] ->
+      (Some (sou base (get_first_name p1)),
+       Some (sou base (get_first_name p2)), None)
+    | p1 :: p2 :: p3 :: _ ->
+      (Some (sou base (get_first_name p1)),
+       Some (sou base (get_first_name p2)),
+       Some (sou base (get_first_name p3)))
   in
   let notification_birthday =
     M.Notification_birthday.({
-      number = Int32.of_int (List.length list);
-      has_proprio_birthday = has_proprio_birthday;
-      firstname1 = fn1;
-      firstname2 = fn2;
-      firstname3 = fn3;
-    })
+        number = Int32.of_int (List.length list);
+        has_proprio_birthday = has_proprio_birthday;
+        firstname1 = fn1;
+        firstname2 = fn2;
+        firstname3 = fn3;
+      })
   in
   let data = Mext.gen_notification_birthday notification_birthday in
   print_result conf data

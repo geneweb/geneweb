@@ -574,12 +574,17 @@ and add_precision s p =
   | _ -> s
 and eval_relation_kind =
   function
-    Married -> "marr"
+  | Married -> "marr"
   | NotMarried -> "not_marr"
   | Engaged -> "engaged"
   | NoSexesCheckNotMarried -> "nsck"
   | NoSexesCheckMarried -> "nsckm"
   | NoMention -> "no_ment"
+  | MarriageBann -> "banns"
+  | MarriageContract -> "contract"
+  | MarriageLicense -> "license"
+  | Pacs -> "pacs"
+  | Residence ->"residence"
 and eval_special_var conf base =
   function
     ["include_perso_header"] -> (* TODO merge with mainstream includes ?? *)

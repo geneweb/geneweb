@@ -134,7 +134,7 @@
             </div>
           </div>
         </div>
-        <div id="rel_search" class="col mr-4">
+        <div id="rel_search">
           <p>%hidden;</p>
           <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
             <input type="hidden" name="em" value="R"%/>

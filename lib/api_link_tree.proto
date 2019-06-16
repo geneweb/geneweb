@@ -73,6 +73,11 @@ enum MarriageType {
   NO_SEXES_CHECK_NOT_MARRIED = 3;
   NO_MENTION = 4;
   NO_SEXES_CHECK_MARRIED = 5;
+  MARRIAGE_BANN = 6;
+  MARRIAGE_CONTRACT = 7;
+  MARRIAGE_LICENSE = 8;
+  PACS = 9;
+  RESIDENCE = 10;
 }
 
 enum DivorceType {
