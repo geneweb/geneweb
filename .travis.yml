@@ -7,15 +7,16 @@ os:
   - osx
 
 env:
-  - OCAML_VERSION=4.05 OPAM_VERSION=2.0.0
-  - OCAML_VERSION=4.06 OPAM_VERSION=2.0.0
-  - OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+  - OCAML_VERSION=4.05 OPAM_VERSION=2.0.3
+  - OCAML_VERSION=4.06 OPAM_VERSION=2.0.3
+  - OCAML_VERSION=4.07 OPAM_VERSION=2.0.3
+  - OCAML_VERSION=4.08 OPAM_VERSION=2.0.3
 
 matrix:
   fast_finish: true
   allow_failures:
     - os: osx
-      env: OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+      env: OCAML_VERSION=4.07 OPAM_VERSION=2.0.4
 
 # Needed until `opam depext geneweb` is fixed
 before_install:
