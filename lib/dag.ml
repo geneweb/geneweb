@@ -904,7 +904,7 @@ let print_slices_menu conf hts =
   Hutil.print_link_to_welcome conf true;
   Opt.iter
     (Templ.copy_from_templ conf conf.env)
-    (Util.open_templ conf "buttons_rel") ;
+    (Util.open_template conf "buttons_rel") ;
   Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.command;
   html_p conf;
   hidden_env conf;
@@ -970,7 +970,7 @@ let print_dag_page conf page_title hts next_txt =
   Hutil.header_no_page_title conf title;
   Opt.iter
     (Templ.copy_from_templ conf conf.env)
-    (Util.open_templ conf "buttons_rel") ;
+    (Util.open_template conf "buttons_rel") ;
   print_html_table conf hts;
   if next_txt <> "" then
     begin

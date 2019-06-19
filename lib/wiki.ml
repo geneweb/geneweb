@@ -701,7 +701,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
         conf.xhs
     end;
   Wserver.printf "<div class=\"row ml-3\">\n";
-  begin match Util.open_etc_file "toolbar" with
+  begin match Util.open_template conf "toolbar" with
     Some ic ->
       Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
       Templ.copy_from_templ conf ["name", "notes"] ic;
@@ -723,7 +723,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
         Wserver.printf "</button>\n"
       end
     end;
-  begin match Util.open_etc_file "accent" with
+  begin match Util.open_template conf "accent" with
     Some ic ->
       Wserver.printf "<div class=\"col my-1 mr-2 text-monospace\">\n";
       Templ.copy_from_templ conf ["name", "notes"] ic;
