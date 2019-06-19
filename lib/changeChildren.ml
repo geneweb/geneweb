@@ -35,7 +35,6 @@ let print_child_person conf base p =
   Wserver.printf "<input name=\"%s_first_name\" class=\"form-control\" \
 size=\"23\" maxlength=\"200\" id=\"%s_fn\" value=\"%s\">\n" var var 
 (Util.escape_html first_name);
->>>>>>> Porting Fabien's reorg work to current master. Allow sub-folders
   Wserver.printf "</td>\n";
   Wserver.printf "<td align=\"%s\">" conf.right;
   Wserver.printf "<label for=\"%s_occ\" class=\"mx-2 mb-0\">%s</label>"

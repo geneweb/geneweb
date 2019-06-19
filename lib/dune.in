@@ -10,5 +10,5 @@
             camlp5.gramlib
             geneweb.wserver
             markup)
- (modules_without_implementation config dbdisk def templAst)
+ (modules_without_implementation dbdisk def templAst)
 )

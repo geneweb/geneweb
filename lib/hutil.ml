@@ -114,7 +114,7 @@ let gen_trailer with_logo conf =
   Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
-  begin match Util.open_templ conf "js" with
+  begin match Util.open_template conf "js" with
   (* FIXME ?? balances header_without_http *)
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()

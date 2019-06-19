@@ -506,10 +506,10 @@ let print_mod_ok conf base =
     in
     let commit = commit_wiznotes conf base in
     let string_filter s = Util.safe_html @@ string_with_macros conf [] s in
-    let file_path = Notes.file_path conf base in
+    let file_path = Notes.file_path conf "" in
     let wi =
       {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
-       Wiki.wi_file_path = Notes.file_path conf;
+       Wiki.wi_file_path = file_path "";
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in

@@ -486,13 +486,6 @@ let parse_templ conf strm =
                 let () = included_files := file :: !included_files in
                 let strm2 = Stream.of_channel ic in
                 let (al, _) = parse_astl [] false 0 [] strm2 in
-                let al =
-                  if Util.p_getenv conf.base_env "trace_templ" = Some "on" then
-                    Atext ((0,0), "<!-- begin include from " ^ fname ^ " -->\n")
-                    :: al
-                    @ [ Atext ((0,0), "<!-- end include from " ^ fname ^ " -->\n") ]
-                  else al
-                in
                 close_in ic; Some (Ainclude (file, al))
             | None -> None
           in

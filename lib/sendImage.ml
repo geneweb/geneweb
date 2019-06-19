@@ -506,7 +506,7 @@ let print_image conf base = print_confirm_c conf base ""
 let effective_send_c_ok conf base p file file_name mode =
   let notes = match Util.p_getenv conf.env "notes" with
     Some v ->
-      Util.sanitize_html
+      Util.safe_html
         (only_printable_or_nl (Mutil.strip_all_trailing_spaces v))
     | None -> ""
   in
