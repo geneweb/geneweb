@@ -503,7 +503,7 @@ let print conf base =
         try
           let typ = List.assoc "TYPE" nenv in
           let fname = "notes_" ^ typ in
-          Util.open_templ conf fname, fname
+          Util.open_templ conf fname, typ
         with Not_found -> None, ""
       in
       match templ with
