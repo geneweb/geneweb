@@ -230,18 +230,18 @@ af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
 bg: От %start_date; насам е имало %nb_accesses; посещения, от които
     %nb_accesses_to_welcome; са на настоящата страница.
-br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :
+br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :%sp;
     %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
 ca: Hi ha hagut %nb_accesses; consultes, de les quals
     %nb_accesses_to_welcome; en aquesta pàgina, des del %start_date;.
 cs: %nb_accesses; přístupů, z toho %nb_accesses_to_welcome; na tuto
     stránku, od %start_date;.
-da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome;
-    af dem på denne side, siden %start_date;.
+da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome; af
+    dem på denne side, siden %start_date;.
 de: Seit dem %start_date; gab es %nb_accesses; Zugriffe, davon
     %nb_accesses_to_welcome; auf diese Seite.
-en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome;%sp;
-    of them to this page, since %start_date;.
+en: There has been %nb_accesses; accesses, %nb_accesses_to_welcome; of
+    them to this page, since %start_date;.
 eo: Estis %nb_accesses; alirejoj, el kiuj %nb_accesses_to_welcome; al
     ĉi tiu paĝo, ekde la %start_date;.
 es: Ha habido %nb_accesses; consultas, de las cuales
@@ -256,30 +256,30 @@ fr: Il y a eu %nb_accesses; consultations, dont %nb_accesses_to_welcome; à
     cette page, depuis le %start_date;.
 he: היו %nb_accesses; כניסות, כולל %nb_accesses_to_welcome;
     כניסות לעמוד זה, מאז %start_date;.
-is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome;
-    af þeim á þessa síðu, síðan %start_date;.
+is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome; af
+    þeim á þessa síðu, síðan %start_date;.
 it: Dal %start_date; ci sono stati %nb_accesses; accessi,
     %nb_accesses_to_welcome; dei quali a questa pagina.
 lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
     %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē.
 nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
     bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
-no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome;
-    av dem til denne siden, siden %start_date;.
+no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome; av
+    dem til denne siden, siden %start_date;.
 pl: Baza została od %start_date; odwiedzona %nb_accesses; razy (w tym
     %nb_accesses_to_welcome; razy strona tytułowa).
-pt: Houve %nb_accesses; consultas, das quais %nb_accesses_to_welcome;
-    foram a esta página, desde %start_date;.
-ro: Au avut loc %nb_accesses; accese din care %nb_accesses_to_welcome;
-    pe aceatsa pagina din %start_date;
-ru: Всего было %nb_accesses; обращений, из них %nb_accesses_to_welcome;
-    к этой странице, начиная с %start_date;.
+pt: Houve %nb_accesses; consultas, das quais %nb_accesses_to_welcome; foram
+    a esta página, desde %start_date;.
+ro: Au avut loc %nb_accesses; accese din care %nb_accesses_to_welcome; pe
+    aceatsa pagina din %start_date;
+ru: Всего было %nb_accesses; обращений, из них %nb_accesses_to_welcome; к
+    этой странице, начиная с %start_date;.
 sl: %nb_accesses; dostopov, %nb_accesses_to_welcome; od teh na to stran,
     od %start_date;.
-sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
-    av dem till den här sidan, sedan %start_date;.
-zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
-    次访问本主页， 自从 %start_date;。
+sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome; av
+    dem till den här sidan, sedan %start_date;.
+zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome; 次访问本主页，
+    自从 %start_date;。
 ])
 %end;
 <br>(%apply;interp([
