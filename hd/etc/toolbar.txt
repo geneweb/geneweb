@@ -66,7 +66,7 @@ function insertTags (tagOpen, tagClose, sampleText) {
 <i class="fas fa-link" alt="Lien_interne/Nom du lien" title="Lien_interne/Nom du lien"></i></a>%nn;
 %if(evar.m = "MOD_NOTES")
 <div class="modal fade" id="init_gallery" tabindex="-1" role="dialog" aria-labbelledby="init_gallery_label" aria-hidden="true">
-  <div class="modal-dialog <!--modal-xl-->" role="document"> <!-- TODO why js not working with modal-xl -->
+  <div class="modal-dialog modal-xl role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="init_gallery_label">Initialise une image map</h5>

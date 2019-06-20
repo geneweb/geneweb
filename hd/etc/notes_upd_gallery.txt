@@ -298,21 +298,21 @@ $(document).ready(function() {
        var txt = get(r.alt);
        if( get(r.t) == "" || r.t == "p" ) {
          if( txt != "" ) { txt = " (" + txt + ")"; }
-         txt = get(r.fn) + " " + get(r.sn) + txt;
+         txt = get(r.fn) + (r.fn == "" ? "" : " ") + get(r.sn) + txt;
          if( get(r.fn) != "" && get(r.sn) != "" ) {
            var oc = get(r.oc);
            var oc2;
            if( oc != "" && oc != 0 ) { oc2 = "/" + oc ; oc = "&oc=" + oc; } else { oc2 = "" ; oc = "" }
-           $("#a"+cnt).html( cnt + " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + txt + "</a>" );
+           $("#a"+cnt).html( "<span>" + cnt + " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + txt + "</a></span>" );
            r.gw = "[" + "[" + r.fn + "/" + r.sn + oc2 + "]" + "]";
          } else {
            if( txt != "" ) { txt = " " + txt; }
-           $("#a"+cnt).html( cnt + txt );
+           $("#a"+cnt).html( "<span>" + cnt + txt + "</span>" );
            delete r.gw;
          }
        } else if ( r.t == "m" ) {
          if( get(r.misc) != "" ) {
-           $("#a"+cnt).html( cnt + " <a href='%prefix;&m=NOTES&f=" + r.misc + "' target='_blank'>" + txt + "</a>" );
+           $("#a"+cnt).html( "<pan>" + cnt + " <a href='%prefix;&m=NOTES&f=" + r.misc + "' target='_blank'>" + txt + "</a></span>" );
            r.gw = "[" + "[" + "[" + r.misc + "]" + "]" + "]";
          } else {
            if( txt != "" ) { txt = " " + txt; }
@@ -321,7 +321,7 @@ $(document).ready(function() {
          }
        } else if ( r.t == "g" ) {
          if( get(r.href) != "" ) {
-           $("#a"+cnt).html( cnt + " <a href='%prefix;" + r.href + "' target='_blank'>" + txt + "</a>" );
+           $("#a"+cnt).html( "<span>" + cnt + " <a href='%prefix;" + r.href + "' target='_blank'>" + txt + "</a></span>" );
          } else {
            if( txt != "" ) { txt = " " + txt; }
            $("#a"+cnt).html( cnt + txt );
@@ -329,10 +329,10 @@ $(document).ready(function() {
          delete r.gw;
        } else if ( r.t == "e" ) {
          if( get(r.href) != "" ) {
-           $("#a"+cnt).html( cnt + " <a href='" + r.href + "' target='_blank'>" + txt + "</a>" );
+           $("#a"+cnt).html( "<span>" + cnt + " <a href='" + r.href + "' target='_blank'>" + txt + "</a></span>" );
          } else {
            if( txt != "" ) { txt = " " + txt; }
-           $("#a"+cnt).html( cnt + txt );
+           $("#a"+cnt).html( "<span>" + cnt + txt + "</span>" );
          }
          delete r.gw;
        }
@@ -341,7 +341,8 @@ $(document).ready(function() {
      "ordering": false,
      "searching": false,
      "info": false,
-
+     "scrollY": "25vh",
+     "scrollCollapse": true,
      "language": {
        "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/[
 af: Afrikaans
@@ -503,6 +504,7 @@ zh: Chinese
      gray.delete();
      src.delete();
    });
+   return false;
   });
 
   $("#frame").mousedown( function(e) {

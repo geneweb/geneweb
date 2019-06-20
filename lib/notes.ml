@@ -251,7 +251,61 @@ let notes_links_db conf base eliminate_unlinked =
     (fun (s1, _) (s2, _) -> Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 
-let print_linked_list conf base pgl =
+let json_extract_img conf s =
+  let extract l =
+    List.fold_left (fun state e ->
+      match state, e with
+      | (None, img), ("path", `String s) -> (Some s, img)
+      | (path, None), ("img", `String s) -> (path, Some s)
+      | state, _ -> state
+    ) (None, None) l
+  in
+  let json =
+    try Yojson.Basic.from_string s
+    with _ -> `Null
+  in
+  let path, img =
+    match json with
+    | `Assoc l -> extract l
+    | _ -> (None, None)
+  in
+  match path, img with
+  | Some path, Some img ->
+     begin match path with
+     | "doc" -> (Util.commd conf) ^ "m=DOC&s=" ^ img
+     | "private" ->
+        begin match Util.p_getenv conf.base_env "gallery_path_private" with
+        | Some s -> s ^ img
+        | None -> ""
+        end
+     | "public" ->
+        begin match Util.p_getenv conf.base_env "gallery_path" with
+        | Some s -> s ^ img
+        | None -> ""
+        end
+     | path -> path ^ img
+     end
+  | _ -> ""
+
+let print_linked_list_gallery conf base pgl =
+  Wserver.printf "<div class=\"flex_gallery\">\n";
+  List.iter
+    (fun pg ->
+       match pg with
+       | NotesLinks.PgMisc fnotes ->
+          let (nenv, s) = read_notes base fnotes in
+          if (try List.assoc "TYPE" nenv with Not_found -> "") = "gallery" then
+            Wserver.printf "<div class=\"item_gallery\">\
+                            <a href=\"%sm=NOTES&f=%s&\">\
+                            <img src=\"%s\">\
+                            </a>\
+                            </div>\n"
+              (commd conf) fnotes (json_extract_img conf s)
+       | _ -> ()
+    ) pgl;
+  Wserver.printf "</div>\n"
+
+let print_linked_list_standard conf base pgl =
   let typ = p_getenv conf.env "type" in
   Wserver.printf "<ul>\n";
   List.iter
@@ -370,6 +424,11 @@ let print_linked_list conf base pgl =
        end)
     pgl;
   Wserver.printf "</ul>\n"
+
+let print_linked_list conf base pgl =
+  match p_getenv conf.env "type" with
+  | Some "gallery" -> print_linked_list_gallery conf base pgl
+  | _ -> print_linked_list_standard conf base pgl
 
 let print_what_links conf base fnotes =
   let title h =

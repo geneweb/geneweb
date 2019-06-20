@@ -1404,3 +1404,26 @@ span.notesourcecolor {
     word-wrap: break-word;
     max-width: 40%;
 }
+
+.flex_gallery {
+  display: flex;
+  flex-wrap: wrap;
+}
+.item_gallery {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  margin: 5px;
+}
+.item_gallery img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}

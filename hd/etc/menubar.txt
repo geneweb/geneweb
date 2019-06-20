@@ -144,6 +144,18 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span>
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="%prefix;m=LINKED;%access;&type=" title="[*linked pages]">
+              <span class="fa fa-book fa-fw" aria-hidden="true"></span>
+              <span class="small align-top"><sup>%nb_linked_pages_type.;</sup></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="%prefix;m=LINKED;%access;&type=gallery" title="[*linked pages]">
+              <span class="fa fa-images fa-fw" aria-hidden="true"></span>
+              <span class="small align-top"><sup>%nb_linked_pages_type.gallery;</sup></span>
+            </a>
+          </li>
           %if;(not (bvar.wizard_just_friend="yes") and wizard)
             <li class="nav-item">
               <a class="nav-link %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK")active%end;" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;>%nn;

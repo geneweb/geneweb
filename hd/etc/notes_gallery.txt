@@ -34,7 +34,9 @@
 <map id="map" name="map"></map>
 <img id="image" class="mt-1" usemap="#map" alt=""><!-- no src, managed on javascript side -->
 <div class="d-none" id="div_legend">%nn;
-  [*on this image][:]%nn; <ul id="legend" class="d-inline list_comma list-unstyled p-0"></ul>
+  [*on this image][:]
+  <a id="rlm" href="%prefix;m=RLM" title="[*relations tree]"><img src="%image_prefix;/gui_create.png" height="18" alt="Tree"></a>
+  <ul id="legend" class="d-inline list_comma list-unstyled p-0"></ul>
 </div>
 <div class="d-none" id="div_unknown">%nn;
   [*unknown person][:]%nn; <ul id="unknown" class="d-inline list_comma list-unstyled pl-0"></ul>
@@ -75,6 +77,7 @@ $(document).ready(function() {
     }
 
     var cnt = 1;
+    var cnt_rlm = 1;
     json.map.forEach( function( r ) {
       var href = "";
       var txt = get(r.alt);
@@ -86,27 +89,29 @@ $(document).ready(function() {
         if( get(r.fn) != "" && get(r.sn) != "" ) {
           href = "%prefix;&p=" + r.fn + "&n=" + r.sn + oc;
           txt = r.fn + " " + r.sn;
+          if( get(r.alt) != "" ) { txt += " (" + r.alt + ")"; }
         }
-        if( get(r.alt) != "" ) { txt += " (" + r.alt + ")"; }
         if( get(r.fn) != "" && get(r.sn) != "" ) {
           $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-          $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
+          $("#div_legend").removeClass( "d-none" );
+          $("#rlm").attr( "href", $("#rlm").attr("href") + "&p" + cnt_rlm + "=" + r.fn + "&n" + cnt_rlm + "=" + r.sn + (get(r.oc) == "" ? "" : "&oc" + cnt_rlm + "=" + r.oc ) );
+          cnt_rlm++;
         } else {
           $("#unknown").append( "<li class='legend' id='a" + cnt + "'><span>" + txt + "</span></li>" );
-          $("#div_unknown").addClass( "d-inline" ).removeClass( "d-none" );
+          $("#div_unknown").removeClass( "d-none" );
         }
       } else if( r.t == "m" ) {
         href = "%prefix;m=NOTES&f=" + get(r.misc);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-        $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
+        $("#div_legend").removeClass( "d-none" );
       } else if( r.t == "g" ) {
         href = "%prefix;" + get(r.href);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-        $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" );
+        $("#div_legend").removeClass( "d-none" );
       } else if( r.t == "e" ) {
         href = get(r.href);
         $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "'>" + txt + "</a></span></li>" );
-        $("#div_legend").addClass( "d-inline" ).removeClass( "d-none" )
+        $("#div_legend").removeClass( "d-none" )
       }
       if( href != "" ) { href = " href='"+ href + "'"; }
       $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + txt + "' title='" + txt + "'" + href + ">" );
