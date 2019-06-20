@@ -179,9 +179,7 @@ let compute base bname =
 let main () =
   let bname = ref "" in
   let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>" in
-  let speclist =
-    [ "-version", Arg.Unit Util.print_version_commit, " print version and commit numbers" ]
-  in
+  let speclist = [] in
   let anonfun s =
     if !bname = "" then bname := s
     else raise (Arg.Bad "Cannot treat several databases")

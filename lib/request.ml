@@ -105,7 +105,6 @@ let family_m conf base =
       | "DEL_FAM_OK" -> handler.del_fam_ok
       | "DEL_IMAGE" -> handler.del_image
       | "DEL_IMAGE_OK" -> handler.del_image_ok
-      | "DEL_IMAGE_C_OK" -> handler.del_image_c_ok
       | "DEL_IND" -> handler.del_ind
       | "DEL_IND_OK" -> handler.del_ind_ok
       | "F" -> handler.f
@@ -123,7 +122,6 @@ let family_m conf base =
       | "HIST_CLEAN_OK" -> handler.hist_clean_ok
       | "HIST_DIFF" -> handler.hist_diff
       | "HIST_SEARCH" -> handler.hist_search
-      | "IMAGE_C" -> handler.image_c
       | "IMH" -> handler.imh
       | "INV_FAM" -> handler.inv_fam
       | "INV_FAM_OK" -> handler.inv_fam_ok
@@ -167,12 +165,10 @@ let family_m conf base =
       | "R" -> handler.r
       | "REQUEST" -> handler.request
       | "RL" -> handler.rl
-      | "RESET_IMAGE_C_OK" -> handler.reset_image_c_ok
       | "RLM" -> handler.rlm
       | "S" -> handler.s
       | "SND_IMAGE" -> handler.snd_image
       | "SND_IMAGE_OK" -> handler.snd_image_ok
-      | "SND_IMAGE_C_OK" -> handler.snd_image_c_ok
       | "SRC" -> handler.src
       | "STAT" -> handler.stat
       | "CHANGE_WIZ_VIS" -> handler.change_wiz_vis

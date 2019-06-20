@@ -310,7 +310,6 @@ and handler =
   ; del_fam_ok : handler_base
   ; del_image : handler_base
   ; del_image_ok : handler_base
-  ; del_image_c_ok : handler_base
   ; del_ind : handler_base
   ; del_ind_ok : handler_base
   ; f : handler_base
@@ -328,7 +327,6 @@ and handler =
   ; hist_clean_ok : handler_base
   ; hist_diff : handler_base
   ; hist_search : handler_base
-  ; image_c : handler_base
   ; imh : handler_base
   ; inv_fam : handler_base
   ; inv_fam_ok : handler_base
@@ -371,14 +369,12 @@ and handler =
   ; ps : handler_base
   ; r : handler_base
   ; request : handler_base
-  ; reset_image_c_ok : handler_base
   ; rl : handler_base
   ; rlm : handler_base
   ; s : handler_base
   ; src : handler_base
   ; snd_image : handler_base
   ; snd_image_ok : handler_base
-  ; snd_image_c_ok : handler_base
   ; stat : handler_base
   ; change_wiz_vis : handler_base
   ; tt : handler_base
@@ -493,7 +489,6 @@ let dummyHandler =
   ; del_fam_ok = dummy_base
   ; del_image = dummy_base
   ; del_image_ok = dummy_base
-  ; del_image_c_ok = dummy_base
   ; del_ind = dummy_base
   ; del_ind_ok = dummy_base
   ; f = dummy_base
@@ -511,7 +506,6 @@ let dummyHandler =
   ; hist_clean_ok = dummy_base
   ; hist_diff = dummy_base
   ; hist_search = dummy_base
-  ; image_c = dummy_base
   ; imh = dummy_base
   ; inv_fam = dummy_base
   ; inv_fam_ok = dummy_base
@@ -554,13 +548,11 @@ let dummyHandler =
   ; ps = dummy_base
   ; r = dummy_base
   ; request = dummy_base
-  ; reset_image_c_ok = dummy_base
   ; rl = dummy_base
   ; rlm = dummy_base
   ; s = dummy_base
   ; snd_image = dummy_base
   ; snd_image_ok = dummy_base
-  ; snd_image_c_ok = dummy_base
   ; src = dummy_base
   ; stat = dummy_base
   ; change_wiz_vis = dummy_base
@@ -837,11 +829,6 @@ let defaultHandler : handler =
       else self.incorrect_request self conf base
     end
 
-  ; del_image_c_ok = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print_c conf base
-      else self.incorrect_request self conf base
-    end
-
   ; del_ind = begin fun self conf base ->
       if conf.wizard then UpdateInd.print_del conf base
       else self.incorrect_request self conf base
@@ -900,11 +887,6 @@ let defaultHandler : handler =
 
   ; hist_search = begin fun _self conf base ->
       History.print_search conf base
-    end
-
-  ; image_c = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print_c conf base
-      else self.incorrect_request self conf base
     end
 
   ; imh = begin fun _self conf _base ->
@@ -1173,11 +1155,6 @@ let defaultHandler : handler =
       else self.incorrect_request self conf base
     end
 
-  ; reset_image_c_ok = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print_c conf base
-      else self.incorrect_request self conf base
-    end
-
   ; rl = begin fun _self conf base ->
       RelationLink.print conf base
     end
@@ -1198,12 +1175,6 @@ let defaultHandler : handler =
   ; snd_image_ok = begin fun self conf base ->
       if conf.wizard && conf.can_send_image then SendImage.print_send_ok conf base
       else self.incorrect_request self conf base
-    end
-
-  ; snd_image_c_ok = begin fun self conf base ->
-      if conf.wizard && conf.can_send_image then SendImage.print_c conf base
-      else
-        self.incorrect_request self conf base
     end
 
   ; src = begin fun _self conf base ->

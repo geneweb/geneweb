@@ -155,7 +155,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             </li>
           %end;
           <li class="nav-item dropdown">
-            <a id="load_once_copylink" class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="IMAGE_C" or evar.m="MRG" or evar.m="DEL_IND")active%end;"
+            <a id="load_once_copylink" class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="SND_IMAGE" or evar.m="MRG" or evar.m="DEL_IND")active%end;"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" title="[*tools] [person/persons]0">%nn;
               <span class="fa fa-user-cog" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*tools] [person/persons]0</span>%nn;
@@ -170,14 +170,14 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                   <i class="far fa-stop-circle fa-fw %sexcolor; mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]%nn;
                 </a>
               %end;
-              %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U" and evar.m!="IMAGE_C")
+              %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U" and evar.m!="SND_IMAGE")
                 <a class="dropdown-item" href="%url;cgl=on" target="_blank"><i class="fa fa-unlink fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
               %end;
           %if;(not (bvar.wizard_just_friend="yes") and wizard)
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
                 %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-                  <a class="dropdown-item" href="%prefix;m=IMAGE_C;i=%index;" %laI;><span class="far fa-image fa-fw mr-2"></span>[*add]/[delete] [image/images]0</a>
+                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="far fa-image fa-fw mr-2"></span>[*add]/[delete] [image/images]0</a>
                 %end;
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname; [with]…"><span class="fa fa-compress fa-fw text-danger mr-2"></span>[*merge::person/persons]1</a>
@@ -342,20 +342,6 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               %end;
             </div>
           </li>
-          %if;(keydir_img_nbr>0)
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="modal" data-target="#carousel_modal" title="[*photos & documents]">
-                <span class="fa fa-images fa-fw" aria-hidden="true"></span>%nn;
-                <span class="sr-only">[*image/images]1</span>%nn;
-              </a>
-            </li>
-          %end;
-          <li class="nav-item">
-            <a class="nav-link" href="%prefix;&m=IMAGE_C&i=%index;" title="[*add]/[remove] [image/images]0">
-              <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
-              <span class="sr-only">[*add]/[remove] [image/images]0</span>%nn;
-            </a>
-          </li>
         </ul>
       </div>
     </nav>
@@ -365,86 +351,3 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
     %include;cousins_tools
   %end;
 %end;
-%( Carousel of keydir images in a modal %)
-<div class="modal fade" id="carousel_modal" tabindex="-1" role="dialog" aria-labelledby="carouselmodal" aria-hidden="true">
-  <div class="modal-dialog%( modal-lg%)" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="carouselmodal">
-          <a href="?m=IMAGE_C;i=%index;" title="[*add]/[delete] [image/images]1">
-            <i class="far fa-folder-open fa-fw mr-1" aria-hidden="true"></i>%first_name; %surname;%if;(occ!="0") (%occ;)%end; |
-            <i class="far fa-image fa-fw mr-1" aria-hidden="true"></i>%keydir_img_nbr;%nn;
-          </a>
-        </h5>
-        <button class="btn btn-link btn-sm ml-2" type="button" data-target="#carousel" data-slide="prev">
-          <i class="fa fa-chevron-left" aria-hidden="true"></i>
-          <span class="sr-only">Previous</span>
-        </button>
-        <button class="btn btn-link btn-sm ml-1" type="button" data-target="#carousel" data-slide="next">
-          <i class="fa fa-chevron-right" aria-hidden="true"></i>
-          <span class="sr-only">Next</span>
-        </button>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      %if;(keydir_img_nbr>0)
-        <div class="modal-body">
-          %(navigation buttons | TODO: manage active, better looking too! with <li> active></li>%)
-          <!--<div class="btn-group btn-group-sm d-flex justify-content-center " role="group" aria-label="Slider button group">
-            <button class="btn btn-light mr-2" type="button" data-target="#carousel" data-slide="prev">
-              <i class="fa fa-chevron-left" aria-hidden="true"></i>
-              <span class="sr-only">Previous</span>
-            </button>
-            %let;keydirmax;%if;(keydir_img_nbr>9)9%else;%keydir_img_nbr;%end;%in;
-            %for;i;0;keydirmax;
-               <button class="btn btn-light%if;(keydirmax>5 and (i=3 or i=6)) ml-2%end;" type="button" data-target="#carousel" data-slide-to="%i;"%( title="%expr(i+1)"%)>
-                <i class="fas fa-circle" aria-hidden="true"></i>
-                <span class="sr-only">%expr(i+1)</span>
-              </button>
-            %end;
-            %if;(keydir_img_nbr>9)<button class="btn btn-light mx-1" type="button" href="#TODO">+10</button>%end;
-            <button class="btn btn-light ml-2" type="button" data-target="#carousel" data-slide="next">
-              <i class="fa fa-chevron-right" aria-hidden="true"></i>
-              <span class="sr-only">Next</span>
-            </button>
-          </div> -->
-          %(the carousel itself inside the body of the modal%)
-          <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="3000">
-            <ol class="carousel-indicators">
-              %for;i;0;keydirmax;
-                <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
-              %end;
-            </ol>
-            <div class="carousel-inner"%( style="max-height:600px;%)>
-              %reset_count;
-              %if;has_keydir;
-                %foreach;img_in_keydir;
-                  %incr_count;
-                  <div class="carousel-item%if;is_first; active%end;">
-                    <a class="h-75" href="%prefix_base_password;&m=IM&s=images/%keydir;/%keydir_img_key;" target="_blank" rel="noopener"><img class="d-block w-100" src="?m=IM&s=images/%keydir;/%keydir_img_key;" alt="%count; slide"></a>
-                    <div class="carousel-caption d-none d-md-block%( text-dark%)">
-                      <h5>%if;(keydir_img_notes="")%keydir_img;%else;%keydir_img_notes;%end;</h5>
-                      <p>%count;/%keydir_img_nbr;</p>
-                    </div>
-                  </div>
-                %end;
-              %end;
-            </div>
-            <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
-            </a>
-          </div>
-        </div>
-      %end;
-      %(<div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>%)
-    </div>
-  </div>
-</div>
