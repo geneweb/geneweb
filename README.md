@@ -23,7 +23,7 @@ The documentation is available online: http://geneweb.tuxfamily.org/
 Using [opam](https://opam.ocaml.org/):
 
 ```
-opam pin add -k git https://github.com:geneweb/geneweb --no-action
+opam pin add -k git https://github.com/geneweb/geneweb --no-action
 opam depext geneweb
 opam install geneweb
 ```
