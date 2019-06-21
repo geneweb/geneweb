@@ -1286,7 +1286,7 @@ let search_in_etc_path conf fname =
   else file
 
 let template_file_path conf fname =
-  Array.fold_left Filename.concat conf.path.dir_root [| "etc" ; fname ^ ".txt" |]
+  Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt"
 
 let open_template conf fname =
   if !Path.direct then
@@ -2302,13 +2302,11 @@ let string_of_decimal_num conf f =
   loop 0
 (* REORG  portraits, images  *)
 let personal_image_file_name conf str =
-  let fname1 =
-    String.concat
-      Filename.dir_sep [conf.path.dir_root; "documents"; "portraits"; str]
-  in
+  let fname1 = Filename.concat conf.path.dir_portraits str in
   fname1
 
 (* icons images *)
+(* TODO provide conf to allow for conf.path.dir_icons *)
 let image_file_name str =
   let fname1 =
     String.concat
@@ -2468,10 +2466,7 @@ let find_sosa_ref conf base =
 let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
-  let fname = String.concat
-      Filename.dir_sep [conf.path.dir_root; "etc"; "config.txt"]
-  in
-
+  let fname = conf.path.Path.file_conf in 
   let tmp_fname = fname ^ "2" in
   let oc =
     try Pervasives.open_out tmp_fname with
@@ -2504,7 +2499,7 @@ let create_topological_sort conf base =
       Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Array.make (nb_of_persons base) 0
   | _ ->
-      let bfile = conf.path.dir_root in
+      let bfile = conf.path.Path.dir_root in
       Lock.control (Mutil.lock_file bfile) false
         ~onerror:(fun () ->
             let () = load_ascends_array base in
@@ -2590,7 +2585,7 @@ let auto_image_file ?bak:(b=false) conf base p =
   let s = default_image_name base p in
   let f =
     Filename.concat
-      (if b then conf.path.dir_portraits_bak else conf.path.dir_portraits) s
+      (if b then conf.path.Path.dir_portraits_bak else conf.path.Path.dir_portraits) s
   in
   if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
@@ -2599,20 +2594,20 @@ let auto_image_file ?bak:(b=false) conf base p =
 
 let keydir conf base p =
   let s = default_image_name base p in
-  let f = Filename.concat conf.path.dir_images s in
+  let f = Filename.concat conf.path.Path.dir_images s in
   try if Sys.is_directory f then Some f else None
   with Sys_error _ -> None
 
 let keydir_old conf base p =
   let s = default_image_name base p in
-  let f = List.fold_left Filename.concat conf.path.dir_images [ s ; "saved" ] in
+  let f = List.fold_left Filename.concat conf.path.Path.dir_images [ s ; "saved" ] in
   try if Sys.is_directory f then Some f else None
   with Sys_error _ -> None
 
 let get_keydir_img_notes conf base p fname =
   let k = default_image_name base p in
   let fname =
-    List.fold_left Filename.concat conf.path.dir_images [ k ; fname ^ ".txt" ]
+    List.fold_left Filename.concat conf.path.Path.dir_images [ k ; fname ^ ".txt" ]
   in
   let s = if Sys.file_exists fname then
     let ic = Secure.open_in fname in
@@ -2624,7 +2619,7 @@ let get_keydir_img_notes conf base p fname =
 let out_keydir_img_notes conf base p fname s =
   let k = default_image_name base p in
   let fname =
-    List.fold_left Filename.concat conf.path.dir_images [ k ; fname ^ ".txt" ]
+    List.fold_left Filename.concat conf.path.Path.dir_images [ k ; fname ^ ".txt" ]
   in
   try
     let oc = Secure.open_out fname in
@@ -2902,7 +2897,7 @@ let (ht_cache_info : cache_info_t) = Hashtbl.create 1
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let cache_info conf =
-  Filename.concat conf.path.dir_root "cache_info"
+  Filename.concat conf.path.Path.dir_root "cache_info"
 
 
 (* ************************************************************************ *)
@@ -3029,7 +3024,7 @@ let commit_patches conf base =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      update_wf_trace conf conf.path.file_update_log
+      update_wf_trace conf conf.path.Path.file_update_log
 
 let short_f_month m =
   match m with
@@ -3476,7 +3471,7 @@ type cache_visited_t = (string, (iper * string) list) Hashtbl.t
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let cache_visited conf =
-  Filename.concat conf.path.dir_root "cache_visited"
+  Filename.concat conf.path.Path.dir_root "cache_visited"
 
 
 (* ************************************************************************ *)
