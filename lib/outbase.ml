@@ -263,8 +263,8 @@ let gen_output no_patches bname base =
   let tmp_fnames_inx_fn, tmp_fnames_inx_oc = tmp "fnames.inx" in
   let tmp_fnames_dat_fn, tmp_fnames_dat_oc = tmp "fnames.dat" in
   let tmp_strings_inx_fn, tmp_strings_inx_oc = tmp "strings.inx" in
-  (*let tmp_notes = Filename.concat bname "1notes" in REORG *)
-  let tmp_notes_d = Filename.concat bname "1notes_d" in
+  let tmp_notes = Filename.concat path.dir_my_base "1notes" in
+  let tmp_notes_d = Filename.concat path.dir_my_base "1notes_d" in
   if not no_patches then
     begin
       load_ascends_array base;
@@ -357,12 +357,13 @@ let gen_output no_patches bname base =
         seek_out tmp_strings_inx_oc Mutil.int_size;
         output_binary_int tmp_strings_inx_oc surname_pos;
         output_binary_int tmp_strings_inx_oc first_name_pos;
-        (*  REORG let s = base.data.bnotes.nread "" RnAll in
+        (*  REORG *)
+        let s = base.data.bnotes.nread "" RnAll in
             if s = "" then ()
             else
             begin let oc_not = Secure.open_out tmp_notes in
             output_string oc_not s; close_out oc_not
-            end;*)
+            end; (* *)
         close_out tmp_strings_inx_oc;
         List.iter
           (fun f ->
@@ -404,14 +405,15 @@ let gen_output no_patches bname base =
       mv tmp_fnames_dat_fn path.file_fnames_dat ;
       mv tmp_fnames_inx_fn path.file_fnames_inx ;
       mv tmp_strings_inx_fn path.file_strings_inx ;
-      (* REORG Mutil.rm (Filename.concat bname "notes");
-      if Sys.file_exists tmp_notes then
-        Mutil.rn tmp_notes (Filename.concat bname "notes");*)
+      (* REORG *)
+      Mutil.rm (Filename.concat path.dir_my_base path.notes_name);
       if Sys.file_exists tmp_notes_d then
-        begin let notes_d = Filename.concat bname "notes" in
+        begin let notes_d = path.dir_notes in
           Mutil.rm_rf notes_d; 
           Mutil.rn tmp_notes_d notes_d
         end;
+      if Sys.file_exists tmp_notes then
+        Mutil.rn tmp_notes (Filename.concat path.dir_my_base path.notes_name);
       Mutil.rm path.file_patches;
       Mutil.rm path.file_ts;
       Mutil.rm path.file_ts_visitor;

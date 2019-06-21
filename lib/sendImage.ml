@@ -212,10 +212,7 @@ let move_file_to_old conf fname bfname =
        let ext = extension_of_type typ in
        let new_file = fname ^ ext in
        if Sys.file_exists new_file then
-         let old_dir =
-           String.concat Filename.dir_sep
-            [conf.path.dir_root; "documents"; "images"; "saved"]
-         in
+         let old_dir = conf.path.dir_portraits_bak in
          let old_file = Filename.concat old_dir bfname ^ ext in
          if Sys.file_exists old_file then
            (try Sys.remove old_file with Sys_error _ -> ());
@@ -265,6 +262,7 @@ let image_type s =
                   Some (GIF, s)
               | None -> None
 
+(* TODO check on this *)
 let dump_bad_image conf s =
   match p_getenv conf.base_env "dump_bad_images" with
     Some "yes" ->
@@ -301,19 +299,11 @@ let effective_send_ok conf base p file =
         | _ -> typ, content
   in
   let bfname = default_image_name base p in
-  let bfdir =
-    let bfdir =
-       String.concat Filename.dir_sep [conf.path.dir_root; "documents"; "portraits";]
-    in
-    if Sys.file_exists bfdir then bfdir
-    else
-      let d = String.concat Filename.dir_sep [conf.path.dir_root; "documents"] in
-      let d1 = Filename.concat d "portraits" in
-      (try Unix.mkdir d 0o777 with Unix.Unix_error (_, _, _) -> ());
-      (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());
-      d1
-  in
-  let fname = Filename.concat bfdir bfname in
+  if not (Sys.file_exists conf.path.dir_portraits) then
+    begin
+    (try Unix.mkdir conf.path.dir_portraits 0o777 with Unix.Unix_error (_, _, _) -> ());
+    end;
+  let fname = Filename.concat conf.path.dir_portraits bfname in
   let _moved = move_file_to_old conf fname bfname in
   write_file (fname ^ extension_of_type typ) content;
   let changed =
@@ -351,8 +341,7 @@ let print_deleted conf base p =
 let effective_delete_ok conf base p =
   let bfname = default_image_name base p in
   let fname =
-     String.concat
-      Filename.dir_sep [conf.path.dir_root; "documents"; "portraits"; bfname]
+     Filename.concat conf.path.dir_portraits bfname
   in
   if move_file_to_old conf fname bfname = 0 then incorrect conf;
   let changed =

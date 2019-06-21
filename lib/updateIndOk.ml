@@ -912,14 +912,8 @@ let rename_image_file conf base op sp =
   (* REORG images, portraits *)
   if old_f <> "" || old_fs <> "" || old_d <> "" then
       let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
-      let f = String.concat
-        Filename.dir_sep
-          [conf.path.dir_root; "documents"; "portraits"; s]
-      in
-      let fs = String.concat
-        Filename.dir_sep
-          [conf.path.dir_root; "documents"; "portraits"; "saved"; s]
-      in
+      let f = Filename.concat conf.path.dir_portraits s in
+      let fs = Filename.concat conf.path.dir_portraits_bak s in
       let ext = Filename.extension old_f in
       (* only gif, png and jpf files are allowed there !! *)
       let new_f = f ^ ext in
@@ -929,26 +923,12 @@ let rename_image_file conf base op sp =
       (try Sys.rename old_fs new_fs with Sys_error _ -> ());
       let old_f = Filename.basename old_f in
       let old_key = Filename.chop_suffix old_f ext in
-      let old_d =
-        String.concat
-          Filename.dir_sep
-            [conf.path.dir_root; "documents"; "images"; old_key]
+      let old_d = Filename.concat conf.path.dir_images old_key in
+      let new_d = Filename.concat conf.path.dir_images s in
+      let old_d1 = String.concat Filename.dir_sep
+        [conf.path.dir_images; old_key; "saved"]
       in
-      let new_d =
-        String.concat
-          Filename.dir_sep
-            [conf.path.dir_root; "documents"; "images"; s]
-      in
-      let old_d1 =
-        String.concat
-          Filename.dir_sep
-            [conf.path.dir_root; "documents"; "images"; old_key; "saved"]
-      in
-      let new_d1 =
-        String.concat
-          Filename.dir_sep
-            [conf.path.dir_root; "documents"; "images"; s]
-      in
+      let new_d1 = Filename.concat conf.path.dir_images s in
       (* TODO check for pre-existing new_d *)
       (try Sys.rename old_d new_d with Sys_error _ -> ());
       (try Sys.rename old_d1 new_d1 with Sys_error _ -> ());

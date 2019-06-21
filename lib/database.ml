@@ -846,7 +846,7 @@ let opendb bname =
   in (* REORG notes *)
   let commit_notes fnotes s =
     Mutil.mkdir_p path.dir_notes ;
-    let fname = if fnotes = "" then "notes" else fnotes in
+    let fname = if fnotes = "" then path.notes_name else fnotes in
     let fname = Filename.concat path.dir_notes (fname ^ ".txt") in
     Mutil.rm (fname ^ "~");
     Mutil.rn fname (fname ^ "~");
@@ -856,6 +856,7 @@ let opendb bname =
       close_out oc
     end
   in
+  (* FIXME I dont understand this *)
   let ext_files () =
     let dir = Filename.concat path.dir_notes Filename.current_dir_name in
     Mutil.filter_map
