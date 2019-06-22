@@ -258,9 +258,9 @@ let missing_or_unused_msg lexicon repo log =
 (**/**) (* Missing translation. *)
 
 let lang_gw =
-  [ "af"; "bg"; "br"; "ca"; "cs"; "da"; "de"; "en"; "eo"; "es"; "et"; "fi";
-    "fr"; "he"; "is"; "it"; "lv"; "nl"; "no"; "pl"; "pt"; "pt-br"; "ro"; "ru";
-    "sl"; "sv"; "zh" ]
+  [ "af"; "ar"; "bg"; "br"; "ca"; "co"; "cs"; "da"; "de"; "en"; "en-us"; "eo"; "es"; "et"; "fi";
+    "fr"; "he"; "is"; "it"; "lv"; "nl"; "no"; "oc"; "pl"; "pt"; "pt-br"; "ro"; "ru";
+    "sk"; "sl"; "sv"; "zh" ]
 ;;
 
 let lang_gnt = [ "de"; "en"; "es"; "fi"; "fr"; "it"; "nl"; "no"; "sv" ] ;;
@@ -272,6 +272,17 @@ let missing_languages list languages =
     (fun accu lang ->
        if not (List.mem_assoc lang list) then (lang :: accu)
        else accu)
+    [] languages
+;;
+
+let merge_list2_into_list1 list1 list2 languages =
+  List.fold_left
+    (fun accu lang ->
+      let l1_t = try List.assoc lang list1 with Not_found -> "" in
+      let l2_t = try List.assoc lang list2 with Not_found -> "" in
+      if l2_t <> "" then ((lang, l2_t)  :: accu)
+      else if l1_t <> "" && l2_t = "" then ((lang, l1_t)  :: accu)
+      else accu)
     [] languages
 ;;
 
@@ -338,11 +349,39 @@ let sort_lexicon lexicon =
     !lex_sort
 ;;
 
+let merge_and_sort_lexicon lexicon =
+  let lex_sort = ref Lex_map.empty in
+  (match try Some (open_in lexicon) with Sys_error _ -> None with
+  | Some ic ->
+      (try
+        while true do
+          let msg = skip_to_next_message ic in
+          let list1 = get_all_versions ic in
+          let list2 = if Lex_map.mem msg !lex_sort
+            then Lex_map.find msg !lex_sort else []
+          in
+          let list = merge_list2_into_list1 list1 list2 lang_gw in
+          let list' = List.sort (fun (x, _) (y, _) -> compare x y) list in
+          lex_sort := Lex_map.add msg list' !lex_sort
+        done
+      with End_of_file -> ());
+      close_in ic
+  | None -> ());
+  Lex_map.iter
+    (fun msg list ->
+       print_endline msg;
+       List.iter
+         (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
+       print_string "\n")
+    !lex_sort
+;;
+
 
 (**/**) (* Main. *)
 
 let lexicon = ref "" ;;
 let lex_sort = ref false ;;
+let lex_merge = ref false ;;
 let missing_gw = ref false ;;
 let missing_gnt = ref false ;;
 let repo = ref "" ;;
@@ -350,6 +389,7 @@ let log = ref false ;;
 
 let speclist =
   [("-sort", Arg.Set lex_sort, ": sort the lexicon (both key and content).");
+   ("-merge", Arg.Set lex_merge, ": merge two lexicon (both key and content).");
    ("-missing_gw", Arg.Set missing_gw,
     ": print missing translation managed by gw.");
    ("-missing_gnt", Arg.Set missing_gnt,
@@ -369,6 +409,7 @@ let main () =
   Arg.parse speclist anonfun usage;
   if !lexicon = "" then (Arg.usage speclist usage; exit 2);
   if !lex_sort then sort_lexicon !lexicon
+  else if !lex_merge then merge_and_sort_lexicon !lexicon
   else if !missing_gw then missing_translation !lexicon lang_gw
   else if !missing_gnt then missing_translation !lexicon lang_gnt
   else if !lang_cust <> [] then missing_translation !lexicon !lang_cust
