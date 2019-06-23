@@ -547,7 +547,13 @@ let print_start conf base =
 
 (* code déplacé et modifié pour gérer advanced.txt *)
 let print conf base fname =
-  if Sys.file_exists (Util.template_file_path conf fname) then
+  let _ = Printf.eprintf "Print (srcfile): %s\n"
+    (Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt")
+  in
+  let _ = flush stderr in
+  if Sys.file_exists
+    (Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt")
+  then
     Hutil.interp conf fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
