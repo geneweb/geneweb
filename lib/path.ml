@@ -2,7 +2,10 @@
 let etc = ref "etc"
 let lang = ref "lang"
 let cnt = ref "cnt"
-(* all three paths are reset by the -hd parameter (if present) at start time *)
+let reorg = ref false
+(* all three paths are reset by gwDaemon with the -hd parameter
+   (if present) at start time
+*)
 let sharelib =
   Array.fold_left Filename.concat
     (try Sys.getenv "GWPREFIX" with Not_found -> "/usr") (* FIXME *)
@@ -25,7 +28,7 @@ type t =
   ; dir_password : string
   ; dir_bases : string
   ; dir_my_base : string
-  ; dir_binaries : string
+  ; dir_bin : string
   ; dir_cnt : string
   ; dir_lang : string
   ; dir_etc_d : string
@@ -70,11 +73,11 @@ let path_from_bname s =
     else s
   in
   let bdir = bname ^ ".gwb" in
+  let dir_bin = Filename.current_dir_name in (* TODO where gw sits -hd??*)
   let dir_bases = Secure.base_dir () in (* -bd argument *)
   let dir_my_base = Filename.concat dir_bases bdir in
-  let dir_binaries = Filename.current_dir_name in (* TODO where gw sits *)
   let dir_icons = Filename.concat dir_bases "images" in
-  let dir_etc_dist = Filename.concat dir_binaries "etc" in
+  let dir_etc_dist = Filename.concat dir_bin "etc" in
 #ifdef REORG
   let dir_etc_base = Filename.concat dir_my_base "etc" in
   let dir_cnt = Filename.concat dir_etc_base "cnt" in
@@ -101,7 +104,7 @@ let path_from_bname s =
   { file_conf = Filename.concat dir_bases config_name
 #endif
   ; dir_root = dir_my_base
-  ; dir_binaries = dir_binaries
+  ; dir_bin = dir_bin
   ; dir_bases = dir_bases
   ; dir_my_base = dir_my_base
   ; dir_password = dir_bases

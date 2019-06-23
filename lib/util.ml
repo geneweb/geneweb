@@ -1280,13 +1280,15 @@ let search_in_etc_path conf fname =
       | d :: dl ->
         let d = Filename.concat d "etc" in
         let f = Filename.concat d fname in
-        if Sys.file_exists f then f else loop dl
+        if Sys.file_exists f then f
+        else loop dl
     in
     loop @@ Secure.etc_path ()
   else file
 
+(* search in base specific templates *)
 let template_file_path conf fname =
-  Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt"
+  Filename.concat conf.path.Path.dir_etc_b fname ^ ".txt"
 
 let open_template conf fname =
   if !Path.direct then
@@ -2600,14 +2602,14 @@ let keydir conf base p =
 
 let keydir_old conf base p =
   let s = default_image_name base p in
-  let f = List.fold_left Filename.concat conf.path.Path.dir_images [ s ; "saved" ] in
+  let f = String.concat Filename.dir_sep [conf.path.Path.dir_images; s ; "saved" ] in
   try if Sys.is_directory f then Some f else None
   with Sys_error _ -> None
 
 let get_keydir_img_notes conf base p fname =
-  let k = default_image_name base p in
+  let s = default_image_name base p in
   let fname =
-    List.fold_left Filename.concat conf.path.Path.dir_images [ k ; fname ^ ".txt" ]
+    String.concat Filename.dir_sep [conf.path.Path.dir_images; s ; fname ^ ".txt" ]
   in
   let s = if Sys.file_exists fname then
     let ic = Secure.open_in fname in
@@ -2616,14 +2618,14 @@ let get_keydir_img_notes conf base p fname =
     else ""
   in s
 
-let out_keydir_img_notes conf base p fname s =
-  let k = default_image_name base p in
+let out_keydir_img_notes conf base p fname str =
+  let s = default_image_name base p in
   let fname =
-    List.fold_left Filename.concat conf.path.Path.dir_images [ k ; fname ^ ".txt" ]
+    List.fold_left Filename.concat conf.path.Path.dir_images [ s ; fname ^ ".txt" ]
   in
   try
     let oc = Secure.open_out fname in
-    output_string oc s;
+    output_string oc str;
     close_out oc;
   with Sys_error _ -> ()
 

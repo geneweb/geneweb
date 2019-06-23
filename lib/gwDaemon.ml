@@ -1856,6 +1856,7 @@ let main ~speclist () =
     " [options] where options are:"
   in
   let force_cgi = ref false in
+  (* REORG ?? *)
   let etc = Filename.dir_sep ^ "etc" in
   let lang = Filename.dir_sep ^ "lang" in
   let cnt = Filename.dir_sep ^ "lang" in
@@ -2023,7 +2024,8 @@ let main ~speclist () =
       (* this is where icons are locates. Should be -hd/images *)
       images_url := "file://" ^ slashify abs_dir
     end;
-  if !Path.cnt = Filename.current_dir_name then Path.cnt := Filename.concat (Secure.base_dir ()) "cnt" ;
+  if !Path.cnt = Filename.current_dir_name
+  then Path.cnt := Filename.concat (Secure.base_dir ()) "cnt" ;
   Wserver.stop_server := List.fold_left Filename.concat !Path.cnt ["STOP_SERVER"];
   let (query, cgi) =
     try Sys.getenv "QUERY_STRING", true with Not_found -> "", !force_cgi
