@@ -823,8 +823,10 @@ let opendb bname =
     with Not_found -> Hashtbl.add patches.h_name i [ip]
   in
   let read_notes fnotes rn_mode =
-    let fname = if fnotes = "" then "notes" else fnotes in
-    let fname = Filename.concat path.dir_notes (fname ^ ".txt") in
+    let fname =
+      if fnotes = "" then path.file_notes
+      else Filename.concat path.dir_notes (fnotes ^ ".txt")
+    in
     if Sys.file_exists fname then begin
       let ic = Secure.open_in fname in
       let str =
@@ -848,7 +850,8 @@ let opendb bname =
     Mutil.mkdir_p path.dir_notes ;
     let fname =
       if fnotes = "" then path.file_notes
-      else Filename.concat path.dir_notes (fnotes ^ ".txt") in
+      else Filename.concat path.dir_notes (fnotes ^ ".txt")
+    in
     Mutil.rm (fname ^ "~");
     Mutil.rn fname (fname ^ "~");
     if s <> "" then begin
