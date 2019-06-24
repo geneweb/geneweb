@@ -50,7 +50,6 @@ type t =
   ; file_forum : string
   ; file_history : string
   ; file_notes : string
-  ; notes_name : string
   ; file_notes_links : string
   ; file_snames_dat : string
   ; file_snames_inx : string
@@ -78,31 +77,16 @@ let path_from_bname s =
   let dir_my_base = Filename.concat dir_bases bdir in
   let dir_icons = Filename.concat dir_bases "images" in
   let dir_etc_dist = Filename.concat dir_bin "etc" in
-#ifdef REORG
-  let dir_etc_base = Filename.concat dir_my_base "etc" in
-  let dir_cnt = Filename.concat dir_etc_base "cnt" in
-  let dir_lang = Filename.concat dir_etc_base "lang" in
-  let dir_portraits = Filename.concat dir_documents "portraits" in
-  let dir_images = Filename.concat dir_documents "images" in
-  let config_name = "config.txt" in
-  let dir_notes = Filename.concat dir_my_base "notes" in
-  let notes_name = "notes.txt" in
-  let dir_history = Filename.concat dir_my_base "history" in
-  let dir_documents = Filename.concat dir_my_base "documents" in
-  { file_conf = Filename.concat dir_etc_base config_name
-#else
   let dir_etc_base = String.concat Filename.dir_sep [dir_bases; "etc"; bname] in
   let dir_cnt = String.concat Filename.dir_sep [dir_bases; "cnt"; bname] in
   let dir_lang = String.concat Filename.dir_sep [dir_bases; "lang"; bname] in
   let dir_portraits = String.concat Filename.dir_sep [dir_bases; "images"; bname] in
+  let dir_documents = String.concat Filename.dir_sep [dir_bases; "src"; bname] in
   let dir_images = String.concat Filename.dir_sep [dir_bases; "src"; bname; "images"] in
   let config_name = bname ^ ".gwf" in
   let dir_notes = Filename.concat dir_my_base "notes_d" in
-  let notes_name = "notes" in
-  let dir_history = Filename.concat dir_my_base "history" in
-  let dir_documents = String.concat Filename.dir_sep [dir_bases; "src"; bname] in
+  let dir_history = Filename.concat dir_my_base "history_d" in
   { file_conf = Filename.concat dir_bases config_name
-#endif
   ; dir_root = dir_my_base
   ; dir_bin = dir_bin
   ; dir_bases = dir_bases
@@ -113,7 +97,6 @@ let path_from_bname s =
   ; dir_icons = dir_icons
   ; dir_images = dir_images
   ; dir_notes = dir_notes
-  ; notes_name = notes_name
   ; dir_cnt = dir_cnt
   ; dir_lang = dir_lang
   ; dir_etc_d = dir_etc_dist
@@ -137,10 +120,10 @@ let path_from_bname s =
   ; file_names_inx = Filename.concat bdir "names.inx"
   ; file_names_acc = Filename.concat bdir "names.acc"
   ; file_patches = Filename.concat bdir "patches"
-  ; file_notes = Filename.concat bdir notes_name
+  ; file_notes = Filename.concat dir_my_base "notes"
   ; file_notes_aliases = Filename.concat dir_my_base "notes.alias"
   ; file_forum = Filename.concat dir_my_base "forum"
-  ; file_history = Filename.concat dir_history "history.txt"
+  ; file_history = Filename.concat dir_my_base "history"
   ; file_notes_links = Filename.concat dir_my_base "notes_links"
   ; file_wizard_log = Filename.concat dir_cnt "wizard.log"
   ; file_friend_log = Filename.concat dir_cnt "friends.log"
