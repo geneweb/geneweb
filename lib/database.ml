@@ -846,8 +846,9 @@ let opendb bname =
   in (* REORG notes *)
   let commit_notes fnotes s =
     Mutil.mkdir_p path.dir_notes ;
-    let fname = if fnotes = "" then path.notes_name else fnotes in
-    let fname = Filename.concat path.dir_notes (fname ^ ".txt") in
+    let fname =
+      if fnotes = "" then path.file_notes
+      else Filename.concat path.dir_notes (fnotes ^ ".txt") in
     Mutil.rm (fname ^ "~");
     Mutil.rn fname (fname ^ "~");
     if s <> "" then begin

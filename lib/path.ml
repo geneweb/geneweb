@@ -50,7 +50,6 @@ type t =
   ; file_forum : string
   ; file_history : string
   ; file_notes : string
-  ; notes_name : string
   ; file_notes_links : string
   ; file_snames_dat : string
   ; file_snames_inx : string
@@ -86,7 +85,7 @@ let path_from_bname s =
   let dir_images = Filename.concat dir_documents "images" in
   let config_name = "config.txt" in
   let dir_notes = Filename.concat dir_my_base "notes" in
-  let notes_name = "notes.txt" in
+  let file_notes = Filename.concat dir_notes "notes.txt" in
   let dir_history = Filename.concat dir_my_base "history" in
   { file_conf = Filename.concat dir_etc_base config_name
   ; dir_root = dir_my_base
@@ -99,7 +98,6 @@ let path_from_bname s =
   ; dir_icons = dir_icons
   ; dir_images = dir_images
   ; dir_notes = dir_notes
-  ; notes_name = notes_name
   ; dir_cnt = dir_cnt
   ; dir_lang = dir_lang
   ; dir_etc_d = dir_etc_dist
@@ -123,7 +121,7 @@ let path_from_bname s =
   ; file_names_inx = Filename.concat bdir "names.inx"
   ; file_names_acc = Filename.concat bdir "names.acc"
   ; file_patches = Filename.concat bdir "patches"
-  ; file_notes = Filename.concat bdir notes_name
+  ; file_notes = file_notes
   ; file_notes_aliases = Filename.concat dir_my_base "notes.alias"
   ; file_forum = Filename.concat dir_my_base "forum"
   ; file_history = Filename.concat dir_history "history.txt"
