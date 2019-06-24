@@ -339,11 +339,8 @@ let reconstitute_from_fevents nsck empty_string fevents marr div =
     found_marriage := true ;
     (kind, evt.efam_date, evt.efam_place, evt.efam_note, evt.efam_src)
   in
-  (* On veut cette fois ci que ce soit le dernier évènement *)
-  (* qui soit mis dans les évènements principaux.           *)
-  (* Si le dernier évènement est un mariage, on ignore tous les autres. *)
-  (* Si on trouve un contrat de mariage après le mariage, on veut tout  *)
-  (* quand même que le mariage soit pris par rapport au contrat.        *)
+  (* Marriage is more important than any other relation.
+     For other cases, latest event is the most important. *)
   let rec loop marr div wit = function
     | [] -> marr, div, wit
     | evt :: l -> match evt.efam_name with
@@ -351,7 +348,7 @@ let reconstitute_from_fevents nsck empty_string fevents marr div =
         if !found_marriage then loop marr div wit l
         else loop (mk_marr evt Engaged) div evt.efam_witnesses l
       | Efam_Marriage ->
-        mk_marr evt Married, div, evt.efam_witnesses
+        loop (mk_marr evt Married) div evt.efam_witnesses l
       | Efam_MarriageContract ->
         if !found_marriage then loop marr div wit l
         else loop (mk_marr evt MarriageContract) div evt.efam_witnesses l
