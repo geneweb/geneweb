@@ -559,8 +559,6 @@ let print_misc_notes conf base =
                in
                let c =
                  let f = file_path conf (path_of_fnotes f) in
-                 (* FIXME dir_password = dir_bases *)
-                 let f = Filename.concat conf.path.dir_password f in
                  if Sys.file_exists f then "" else " style=\"color:red\""
                in
                Wserver.printf "<li class=\"file\">\n";
