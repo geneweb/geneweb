@@ -18,8 +18,6 @@ let path_of_fnotes fnotes =
 
 let read_notes base fnotes =
   let fnotes = path_of_fnotes fnotes in
-  let _ = Printf.eprintf "Read_notes: %s\n" fnotes in
-  let _ = flush stderr in
   let s = base_notes_read base fnotes in Wiki.split_title_and_text s
 
 let print_search_form conf from_note =
