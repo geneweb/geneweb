@@ -2,7 +2,7 @@
 let etc = ref "etc"
 let lang = ref "lang"
 let cnt = ref "cnt"
-let reorg = ref false
+let reorg = ref true
 (* all three paths are reset by gwDaemon with the -hd parameter
    (if present) at start time
 *)
@@ -78,31 +78,17 @@ let path_from_bname s =
   let dir_my_base = Filename.concat dir_bases bdir in
   let dir_icons = Filename.concat dir_bases "images" in
   let dir_etc_dist = Filename.concat dir_bin "etc" in
-#ifdef REORG
   let dir_etc_base = Filename.concat dir_my_base "etc" in
   let dir_cnt = Filename.concat dir_etc_base "cnt" in
   let dir_lang = Filename.concat dir_etc_base "lang" in
+  let dir_documents = Filename.concat dir_my_base "documents" in
   let dir_portraits = Filename.concat dir_documents "portraits" in
   let dir_images = Filename.concat dir_documents "images" in
   let config_name = "config.txt" in
   let dir_notes = Filename.concat dir_my_base "notes" in
   let notes_name = "notes.txt" in
   let dir_history = Filename.concat dir_my_base "history" in
-  let dir_documents = Filename.concat dir_my_base "documents" in
   { file_conf = Filename.concat dir_etc_base config_name
-#else
-  let dir_etc_base = String.concat Filename.dir_sep [dir_bases; "etc"; bname] in
-  let dir_cnt = String.concat Filename.dir_sep [dir_bases; "cnt"; bname] in
-  let dir_lang = String.concat Filename.dir_sep [dir_bases; "lang"; bname] in
-  let dir_portraits = String.concat Filename.dir_sep [dir_bases; "images"; bname] in
-  let dir_images = String.concat Filename.dir_sep [dir_bases; "src"; bname; "images"] in
-  let config_name = bname ^ ".gwf" in
-  let dir_notes = Filename.concat dir_my_base "notes_d" in
-  let notes_name = "notes" in
-  let dir_history = Filename.concat dir_my_base "history" in
-  let dir_documents = String.concat Filename.dir_sep [dir_bases; "src"; bname] in
-  { file_conf = Filename.concat dir_bases config_name
-#endif
   ; dir_root = dir_my_base
   ; dir_bin = dir_bin
   ; dir_bases = dir_bases
