@@ -104,6 +104,7 @@ val index_of_next_char : string -> int -> int
 
 (** TODO *)
 val template_file_path : config -> string -> string
+val search_in_etc_path : config -> string -> string
 
 (** TODO *)
 val open_template : config -> string -> in_channel option
