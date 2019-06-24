@@ -544,15 +544,20 @@ let print_start conf base =
      Templ.print_foreach = print_foreach conf}
     env ()
 
-(* code déplacé et modifié pour gérer advanced.txt *)
+(* code déplacé et modifié pour gérer advanced.txt : m=H;v=advanced *)
 let print conf base fname =
-  let _ = Printf.eprintf "Print (srcfile): %s\n"
-    (Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt")
+  let fname1 =
+    Util.search_in_etc_path conf (fname ^ ".txt")
   in
-  let _ = flush stderr in
-  if Sys.file_exists
-    (Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt")
-  then
+  let fname2 =
+    Util.template_file_path conf (fname ^ ".txt")
+  in
+  let file =
+    if Sys.file_exists fname1 then fname1
+    else if Sys.file_exists fname2 then fname2
+    else ""
+  in
+  if file <> "" then
     Hutil.interp conf fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = (fun _env -> Templ.eval_transl conf);

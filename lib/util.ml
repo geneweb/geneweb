@@ -1288,7 +1288,7 @@ let search_in_etc_path conf fname =
 
 (* search in base specific templates *)
 let template_file_path conf fname =
-  Filename.concat conf.path.Path.dir_etc_b fname ^ ".txt"
+  Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt"
 
 let open_template conf fname =
   if !Path.direct then
