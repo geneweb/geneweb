@@ -57,6 +57,7 @@ ALL_EXE = \
 	bin/contrib/lex/lex_utils \
 	bin/contrib/misc/lower_string \
 	bin/contrib/oneshot/gwBaseCompatiblePlus \
+	bin/contrib/oneshot/gwFixFalseMarriageLicense \
 	bin/contrib/oneshot/gwExportAscCSV \
 	bin/contrib/oneshot/gwFixDateText \
 	bin/contrib/oneshot/gwRemoveImgGallery
