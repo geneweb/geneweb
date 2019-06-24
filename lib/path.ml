@@ -66,10 +66,12 @@ type t =
 (* some paths are relative to the current base dir (dir_my_base) *)
 
 let path_from_bname s =
+  let fname = Filename.basename s in
   let bname =
-    if Filename.check_suffix s ".gwb" then Filename.chop_suffix s ".gwb"
-    else if Filename.check_suffix s ".gwb/" then Filename.chop_suffix s ".gwb/"
-    else s
+    if Filename.check_suffix fname ".gwb" then Filename.chop_suffix fname ".gwb"
+    else if 
+      Filename.check_suffix fname ".gwb/" then Filename.chop_suffix fname ".gwb/"
+    else fname
   in
   let bdir = bname ^ ".gwb" in
   let dir_bin = Filename.current_dir_name in (* TODO where gw sits -hd??*)
