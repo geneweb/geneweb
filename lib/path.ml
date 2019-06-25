@@ -28,7 +28,6 @@ type t =
   ; dir_password : string
   ; dir_bases : string
   ; dir_my_base : string
-  ; dir_bin : string
   ; dir_cnt : string
   ; dir_lang : string
   ; dir_etc_d : string
@@ -74,11 +73,10 @@ let path_from_bname s =
     else fname
   in
   let bdir = bname ^ ".gwb" in
-  let dir_bin = Filename.current_dir_name in (* TODO where gw sits -hd??*)
   let dir_bases = Secure.base_dir () in (* -bd argument *)
   let dir_my_base = Filename.concat dir_bases bdir in
   let dir_icons = Filename.concat dir_bases "images" in
-  let dir_etc_dist = Filename.concat dir_bin "etc" in
+  let dir_etc_dist = Filename.concat (Secure.etc_path ()) "etc" in
   let dir_etc_base = Filename.concat dir_my_base "etc" in
   let dir_cnt = Filename.concat dir_etc_base "cnt" in
   let dir_lang = Filename.concat dir_etc_base "lang" in
@@ -90,7 +88,6 @@ let path_from_bname s =
   let config_name = "config.txt" in
   { file_conf = Filename.concat dir_etc_base config_name
   ; dir_root = dir_my_base
-  ; dir_bin = dir_bin
   ; dir_bases = dir_bases
   ; dir_my_base = dir_my_base
   ; dir_password = dir_bases
