@@ -25,7 +25,7 @@
 %message_to_wizard;
 <div class="container">
 %( do not use %include;perso_header %)
-%include.perso_header;
+%include_perso_header;
 
 %define;nav()
   <div class="container fixed-top" role="navigation">
