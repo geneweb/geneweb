@@ -1231,13 +1231,12 @@ let search_in_etc_path conf fname =
     match p_getenv conf.env "templ" with
       Some x when List.mem "*" config_templ -> x
     | Some x when List.mem x config_templ -> x
-    | Some _ | None ->
-        match config_templ with
-          [] | ["*"] -> ""
-        | x :: _ -> x
+    | Some _ | None -> ""
   in
-  let tpl = [ url_templ ] (*:: config_templ*) in
-  (* FIXME why do we concatenate both? *)
+  let tpl =
+    if url_templ <> "" then url_templ :: config_templ else config_templ
+  in
+  (* remove duplicates *)
   let tpl = List.fold_left
     (fun accu tpl -> if not (List.mem tpl accu) then tpl :: accu else accu)
     [] tpl
@@ -1246,42 +1245,52 @@ let search_in_etc_path conf fname =
   (* FIXME verify what we really want *)
   (* tpl is a list of template names!! which ones?? *)
   (* do we really expect a template list or just one!! *)
+  (* search in etc_base with and without templ*)
   let file =
+    (* search in base area with tpl *)
     if List.length tpl > 0 && List.hd tpl <> "" then
       let rec loop tpl =
         match tpl with
           [] -> ""
         | t :: l ->
             let t = if t = "*" then "" else t in
-            let etc_tpl_file =
-                (String.concat Filename.dir_sep ["etc"; t; fname])
+            let f =
+              if t = "" then fname
+              else Filename.concat t fname
             in
-            let etc_tpl_file =
-              (* here we want to scan etc_path for possible template folder *)
-              let rec loop1 =
-                function
-                | [] -> etc_tpl_file
-                | d :: dl ->
-                  let f = Filename.concat d etc_tpl_file in
-                  if Sys.file_exists f then f else loop1 dl
-              in
-              loop1 @@ Secure.etc_path ()
-            in
-            if Sys.file_exists etc_tpl_file then etc_tpl_file
-            else loop l
+            let f = Filename.concat conf.path.Path.dir_etc_b f in
+            if Sys.file_exists f then f else loop l
       in
       loop tpl
-    else ""
+    else
+      (* search in base area without tpl *)
+      let f = Filename.concat conf.path.Path.dir_etc_b fname in
+      if Sys.file_exists f then f else ""
   in
   if file = "" then
     let rec loop =
       function
       | [] -> fname
       | d :: dl ->
-        let d = Filename.concat d "etc" in
-        let f = Filename.concat d fname in
-        if Sys.file_exists f then f
-        else loop dl
+        let file =
+          let rec loop1 tpl =
+            match tpl with
+            | [] -> ""
+            | t :: l ->
+                let d1 = Filename.concat d "etc" in
+                let d1 = Filename.concat d1 t in
+                let f = Filename.concat d1 fname in
+                if Sys.file_exists f then f
+                else loop1 l
+          in
+          loop1 tpl
+        in
+        if file <> "" && Sys.file_exists file then file
+        else
+          let d1 = Filename.concat d "etc" in
+          let f = Filename.concat d1 fname in
+          if Sys.file_exists f then f
+          else loop dl
     in
     loop @@ Secure.etc_path ()
   else file
@@ -1295,9 +1304,9 @@ let open_template conf fname =
     try Some (Secure.open_in @@ Filename.concat !Path.etc (fname ^ ".txt"))
     with Sys_error _ -> None
   else
-    try Some (Secure.open_in @@ template_file_path conf fname)
-    with Sys_error _ ->
     try Some (Secure.open_in @@ search_in_etc_path conf (fname ^ ".txt") )
+    with Sys_error _ ->
+    try Some (Secure.open_in @@ template_file_path conf fname)
     with Sys_error _ -> None
 
 let body_prop conf =
@@ -2645,7 +2654,7 @@ let get_keydir_img_notes conf base p fname =
 let out_keydir_img_notes conf base p fname str =
   let s = default_image_name base p in
   let fname =
-    List.fold_left Filename.concat conf.path.Path.dir_images [ s ; fname ^ ".txt" ]
+    String.concat Filename.dir_sep [conf.path.Path.dir_images; s ; fname ^ ".txt" ]
   in
   try
     let oc = Secure.open_out fname in
