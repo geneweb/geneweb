@@ -439,9 +439,9 @@ let print_mod conf base mod_p =
     Util.string_gen_person
       base (gen_person_of_person (poi base (Adef.iper_of_int ip)))
   in
-  let callback sp =
+  let callback p =
     begin
-      let p = UpdateIndOk.effective_mod conf base sp in
+      let p = UpdateIndOk.effective_mod conf base p in
       let op = poi base p.key_index in
       let u = {family = get_family op} in
       patch_person base p.key_index p;
