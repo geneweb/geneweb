@@ -7,7 +7,7 @@
 
 let ok_path = ref []
 let lang_path_r = ref []
-let etc_path_r = ref []
+let etc_path_r = ref ""
 let base_dir_r = ref Filename.current_dir_name
 
 let decompose =
@@ -26,7 +26,7 @@ let decompose =
 let add_path path s = path := s :: !path; ok_path := decompose s :: !ok_path
 
 let add_lang_path = add_path lang_path_r
-let add_etc_path = add_path etc_path_r
+let set_etc_path s = etc_path_r := s
 let set_base_dir s = base_dir_r := s; ok_path := decompose s :: !ok_path
 let lang_path () = !lang_path_r
 let etc_path () = !etc_path_r
