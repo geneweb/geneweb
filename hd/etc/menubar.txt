@@ -355,9 +355,9 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             </li>
           %end;
           <li class="nav-item">
-            <a class="nav-link" href="%prefix;&m=IMAGE_C&i=%index;" title="[*add]/[remove] [image/images]0">
+            <a class="nav-link" href="%prefix;&m=IMAGE_C&i=%index;" title="[*add]/[delete] [image/images]0">
               <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
-              <span class="sr-only">[*add]/[remove] [image/images]0</span>%nn;
+              <span class="sr-only">[*add]/[delete] [image/images]0</span>%nn;
             </a>
           </li>
         </ul>
