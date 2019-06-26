@@ -83,59 +83,56 @@ let print_close_person_relations conf base =
   print_result conf @@
   Api_util.conv_data_list_person conf base filters list
 
-let pevents_aux base filter acc p =
-  List.fold_left
-    begin fun acc e ->
-      if filter e
-      then
-        let p =
-          { M.Reference_person.n = sou base @@ get_surname p
-          ; p = sou base @@ get_first_name p
-          ; oc = Int32.of_int @@ get_occ p
-          }
-        in
-        { M.Event_query_result.p
-        ; sp = None
-        ; pevent_name = Some (piqi_pevent_name_of_pevent_name e.epers_name)
-        ; fevent_name = None
-        ; date = piqi_date_of_date @@ Adef.date_of_cdate e.epers_date
-        ; place = sou base e.epers_place
-        ; note = sou base e.epers_note
-        ; src = sou base e.epers_src
-        } :: acc
-      else acc
-    end acc (get_pevents p)
+let event_aux_pers_to_piqi_person conf base =
+  Perso.build_sosa_ht conf base ;
+  load_image_ht conf ;
+  fun p ->
+    let base_loop = has_base_loop conf base in
+    Api_util.pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person false
 
-let fevents_aux base filter acc f =
-  List.fold_left
-    begin fun acc e ->
-      if filter e
-      then
-        let p =
-          let p = poi base @@ Gwdb.get_father f in
-          { M.Reference_person.n = sou base @@ get_surname p
-          ; p = sou base @@ get_first_name p
-          ; oc = Int32.of_int @@ get_occ p
-          }
-        in
-        let sp =
-          let p = poi base @@ Gwdb.get_mother f in
-          { M.Reference_person.n = sou base @@ get_surname p
-          ; p = sou base @@ get_first_name p
-          ; oc = Int32.of_int @@ get_occ p
-          }
-        in
-        { M.Event_query_result.p
-        ; sp = Some sp
-        ; pevent_name = None
-        ; fevent_name = Some (piqi_fevent_name_of_fevent_name e.efam_name)
-        ; date = piqi_date_of_date @@ Adef.date_of_cdate e.efam_date
-        ; place = sou base e.efam_place
-        ; note = sou base e.efam_note
-        ; src = sou base e.efam_src
-        } :: acc
+let pevents_aux conf base filter acc p =
+  match get_pevents p with
+  | [] -> acc
+  | events ->
+    let pers_to_piqi_person = event_aux_pers_to_piqi_person conf base in
+    List.fold_left
+      begin fun acc e ->
+        if filter e
+        then
+          begin
+            { M.Event_query_result.p = pers_to_piqi_person p
+            ; sp = None
+            ; pevent_name = Some (piqi_pevent_name_of_pevent_name e.epers_name)
+            ; fevent_name = None
+            ; date = piqi_date_of_date @@ Adef.date_of_cdate e.epers_date
+            ; place = sou base e.epers_place
+            ; note = sou base e.epers_note
+            ; src = sou base e.epers_src
+            } :: acc
+        end
       else acc
-    end acc (get_fevents f)
+    end acc events
+
+let fevents_aux conf base filter acc f =
+  match get_fevents f with
+  | [] -> acc
+  | events ->
+    let pers_to_piqi_person = event_aux_pers_to_piqi_person conf base in
+    List.fold_left
+      begin fun acc e ->
+        if filter e
+        then
+          { M.Event_query_result.p = pers_to_piqi_person @@ poi base @@ Gwdb.get_father f
+          ; sp = Some (pers_to_piqi_person @@ poi base @@ Gwdb.get_mother f)
+          ; pevent_name = None
+          ; fevent_name = Some (piqi_fevent_name_of_fevent_name e.efam_name)
+          ; date = piqi_date_of_date @@ Adef.date_of_cdate e.efam_date
+          ; place = sou base e.efam_place
+          ; note = sou base e.efam_note
+          ; src = sou base e.efam_src
+          } :: acc
+        else acc
+      end acc events
 
 let events_filters_aux params =
   let filter_pevents = List.map pevent_name_of_piqi_pevent_name params.M.Events_query_params.pevents in
@@ -187,8 +184,8 @@ let print_close_person_events conf base params close_persons_params =
   in
   let filter_p, filter_f = events_filters_aux params in
   List.fold_left
-    (fevents_aux base filter_f)
-    (List.fold_left (pevents_aux base filter_p) [] persons)
+    (fevents_aux conf base filter_f)
+    (List.fold_left (pevents_aux conf base filter_p) [] persons)
     families
 
 let print_select_events conf base =
@@ -200,8 +197,8 @@ let print_select_events conf base =
     | None ->
       let filter_p, filter_f = events_filters_aux params in
       Gwdb.Collection.fold
-        (fevents_aux base filter_f)
-        (Gwdb.Collection.fold (pevents_aux base filter_p) [] (Gwdb.persons base))
+        (fevents_aux conf base filter_f)
+        (Gwdb.Collection.fold (pevents_aux conf base filter_p) [] (Gwdb.persons base))
         (Gwdb.families base)
   in
   print_result conf @@
