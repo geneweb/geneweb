@@ -1776,6 +1776,7 @@ let print_mod_family_ok conf base =
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
             | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
         in
+        mod_family.Mwrite.Family.father.Mwrite.Person.create_link <- `link ;
         let (all_wl, all_ml, all_hr) =
           if mod_mother.Mwrite.Person.lastname = "?" &&
              mod_mother.Mwrite.Person.firstname = "?"
@@ -1793,6 +1794,7 @@ let print_mod_family_ok conf base =
                 c.Mwrite.Create_conflict.form <- Some `person_form2;
                 raise (Api_update_util.ModErrApiConflict c)
         in
+        mod_family.Mwrite.Family.mother.Mwrite.Person.create_link <- `link ;
         let (all_wl, all_ml, all_hr) =
           match Api_update_family.print_mod conf base ip mod_family with
           | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
