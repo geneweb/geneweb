@@ -27,7 +27,8 @@ val get_birth_death_date : person -> date option * date option * bool
 val before_date : dmy -> dmy -> bool
   (* [before_date d1 d2] = True if d2 before d1; I know, it is not logical *)
 
-(* return the day of the week given the date as parameter *)
+(** [get_wday conf date]
+    Return the day of the week for this [date] *)
 val get_wday : config -> date -> string
 
 val compare_date : date -> date -> int

@@ -6,35 +6,16 @@ open Def
 open Util
 open Gwdb
 
-
-(* ********************************************************************** *)
-(*  [Fonc] get_wday : config -> Def.date -> string                        *)
-(** [Description] : Renvoie le jour de la semaine correspondant à la date
-                    donnée en paramètre.
-    [Args] :
-      - conf : configuration de la base
-      - d    : date
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
-let get_wday conf d =
-  let jd =
-    match d with
-      Dgreg (d, _) ->
-        begin match d.prec with
-          Sure ->
-            if d.day <> 0 && d.month <> 0 then Calendar.sdn_of_gregorian d
-            else -1
-        | _ -> -1
-        end
-    | _ -> -1
-  in
-  let wday =
-    let jd_today = Calendar.sdn_of_gregorian conf.today in
-    let x = conf.today_wd - jd_today + jd in
-    if x < 0 then 6 + (x + 1) mod 7 else x mod 7
-  in
-  if jd <> -1 then " (" ^ transl_nth conf "(week day)" wday ^ ")" else ""
+let get_wday conf = function
+  | Dgreg ({ prec = Sure ; delta = 0 } as d, _) when d.day <> 0 && d.month <> 0 ->
+    let jd = Calendar.sdn_of_gregorian d in
+    let wday =
+      let jd_today = Calendar.sdn_of_gregorian conf.today in
+      let x = conf.today_wd - jd_today + jd in
+      if x < 0 then 6 + (x + 1) mod 7 else x mod 7
+    in
+    " (" ^ transl_nth conf "(week day)" wday ^ ")"
+  | _ -> ""
 
 let death_symbol conf =
   try List.assoc "death_symbol" conf.base_env
