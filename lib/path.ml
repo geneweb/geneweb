@@ -3,6 +3,8 @@ let etc = ref "etc"
 let lang = ref "lang"
 let cnt = ref "cnt"
 let reorg = ref false
+let direct = ref false
+
 (* all three paths are reset by gwDaemon with the -hd parameter
    (if present) at start time
 *)
@@ -10,7 +12,6 @@ let sharelib =
   Array.fold_left Filename.concat
     (try Sys.getenv "GWPREFIX" with Not_found -> "/usr") (* FIXME *)
     [| "share" ; "geneweb" |]
-let direct = ref false
 
 (* Lazy so that we can set [cnt] before actually accessing the file. *)
 let gwd_lock_file = lazy (Filename.concat !cnt "gwd.lck")
