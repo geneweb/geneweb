@@ -7,15 +7,17 @@ os:
   - osx
 
 env:
-  - OCAML_VERSION=4.05 OPAM_VERSION=2.0.0
-  - OCAML_VERSION=4.06 OPAM_VERSION=2.0.0
-  - OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+  - OCAML_VERSION=4.05
+  - OCAML_VERSION=4.06
+  - OCAML_VERSION=4.07
+  - OCAML_VERSION=4.08
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - os: osx
-      env: OCAML_VERSION=4.07 OPAM_VERSION=2.0.0
+
+cache:
+  directories:
+    - /home/travis/.opam/
 
 # Needed until `opam depext geneweb` is fixed
 before_install:
@@ -32,6 +34,7 @@ script:
     set -ex ;
     export OPAMYES=1 ;
     eval $(opam config env) ;
+  - if [[ "$OCAML_VERSION" == "4.08" ]] ; then opam pin add camlp5 https://github.com/camlp5/camlp5.git --no-action ; fi ;
     opam pin add geneweb . --no-action ;
     opam install geneweb --deps-only ;
     ./configure && make clean test install uninstall distrib clean ;
