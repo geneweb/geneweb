@@ -1157,11 +1157,12 @@ let families_record_access fam_index_ic fam_ic len =
    len = len; clear_array = fun () -> ()}
 
 let input_particles part_file =
-  if part_file = "" then
+  if part_file = "" || not (Sys.file_exists part_file) then
     ["af "; "d'"; "d’"; "dal "; "de "; "di "; "du "; "of "; "van ";
      "von und zu "; "von "; "zu "; "zur "; "AF "; "D'"; "D’"; "DAL "; "DE ";
      "DI "; "DU "; "OF "; "VAN "; "VON UND ZU "; "VON "; "ZU "; "ZUR "]
-  else Mutil.input_particles part_file
+  else
+    Mutil.input_particles part_file
 
 let empty_base : cbase =
   {c_persons = [| |]; c_ascends = [| |]; c_unions = [| |]; c_couples = [| |];
@@ -1268,7 +1269,7 @@ let write_file_contents fname text =
   let oc = open_out fname in output_string oc text; close_out oc
 
 let output_wizard_notes bdir wiznotes =
-  let wizdir = Filename.concat bdir "wiznotes" in
+  let wizdir = (Path.path_from_bname bdir).Path.dir_wiznotes in
   Mutil.rm_rf wizdir;
   if wiznotes = [] then ()
   else
@@ -1282,12 +1283,17 @@ let output_wizard_notes bdir wiznotes =
     end
 
 let output_particles_file bdir particles =
-  let oc = open_out (Filename.concat bdir "particles.txt") in
+  let bdir = Filename.basename bdir in
+  let dir_etc_b = (Path.path_from_bname bdir).Path.dir_etc_b in
+  if not (Sys.file_exists dir_etc_b) then
+    (try Mutil.mkdir_p dir_etc_b with _ -> ());
+  let oc = open_out (Path.path_from_bname bdir).Path.file_particles in
   List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
   close_out oc
 
 let output_command_line bdir =
-  let oc = open_out (Filename.concat bdir "command.txt") in
+  let bdir = Filename.basename bdir in
+  let oc = open_out (Path.path_from_bname bdir).Path.file_cmd in
   Printf.fprintf oc "%s" Sys.argv.(0);
   for i = 1 to Array.length Sys.argv - 1 do
     Printf.fprintf oc " %s" Sys.argv.(i)
@@ -1374,7 +1380,7 @@ let link next_family_fun bdir =
       output_wizard_notes bdir gen.g_wiznotes;
       output_particles_file bdir dsk_base.data.particles;
       (try Mutil.rm_rf tmp_dir with _ -> ());
-      (try Unix.rmdir "gw_tmp" with _ -> ());
+      (try Mutil.rm_rf "gw_tmp" with _ -> ());
       output_command_line bdir;
       Util.init_cache_info bdir base;
       true

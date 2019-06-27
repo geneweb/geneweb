@@ -103,7 +103,6 @@ val capitale : string -> string
 val index_of_next_char : string -> int -> int
 
 (** TODO *)
-val template_file_path : config -> string -> string
 val search_in_etc_path : config -> string -> string
 
 (** TODO *)
@@ -333,7 +332,6 @@ val print_image_sex : config -> person -> int -> unit
 val display_options : config -> string
 
 type cache_visited_t = (string, (iper * string) list) Hashtbl.t
-val cache_visited : config -> string
 val read_visited : config -> cache_visited_t
 val record_visited : config -> iper -> unit
 
@@ -405,7 +403,7 @@ val ls_r : string list -> string list
 (** [rm_rf dir]
     Remove directory [dir] and everything inside [dir].
 *)
-val rm_rf : string -> unit
+(*val rm_rf : string -> unit*)
 
 (** [rm fname]
     Remove [fname]. If [fname] does not exists, do nothing.

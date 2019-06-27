@@ -119,7 +119,7 @@ sv: Namnet du vill kalla din <font color=#2f6400><b>GeneWeb</b></font>
 <p>
 <table class="setup">
 <tr align=left><td>
-<input name=o size=30>
+<input name="o" size="30">
 [
 de: Wenn du nichts eingibst, wird der Name aus deiner <font
     color=#2f6400><b>GeneWeb</b></font>-Quelldatei abgeleitet.
@@ -152,7 +152,7 @@ sv: Välj de optioner du vill ha:
 <p>
 <table class="setup">
 <tr align=left>
-<td><input type=checkbox id=stats name=stats value=on>   </td>
+<td><input type=checkbox id=stats name=stats>   </td>
 <td><label for=stats>[
 de: Statistiken nach Abschluß der
     Operation ausgeben (sind dann in der Trace-Ausgabe sichtbar).
@@ -172,7 +172,7 @@ sv: Visa statistik på slutet (den kommer att synas i utskriften).
 <p>
 <table class="setup">
 <tr align=left>
-<td><input type=checkbox id=nc name=nc value=on>   </td>
+<td><input type=checkbox id=nc name=nc>   </td>
 <td><label for=nc>[
 de: Datenkonsistenz nicht überprüfen.
 en: Do not check the consistency of the data.
@@ -186,7 +186,7 @@ sv: Kontrollera inte att databasens data är OK.
 <p>
 <table class="setup">
 <tr align=left>
-<td><input type=checkbox id=cg name=cg value=on>   </td>
+<td><input type=checkbox id=cg name=cg>   </td>
 <td><label for=cg>[
 de: Initialisierung der Blutsverwandtschaften auch durchführen.
 en: End by the initialization of consanguinities.
@@ -201,14 +201,52 @@ sv: Avsluta med att beräkna blodsbanden.
 <p>
 <table class="setup">
 <tr align=left>
-<td><input type=checkbox id=f name=f value=on>   </td>
-<td><label for=f>[
-en: Delete database if already existing.
-fr: Détruire la base pré-existante.
+<td>-action</td>
+</tr>
+<tr valign="top">
+<td><input type=radio id=action name=action value="backup" valign="top">   </td>
+<td><label for=action>[
+en: Import the base and suppress existing data (creates a backup beforehand).<br>
+    <span style="font-size:80%%">Depending on size of the base and its
+    associated documents (images), this operation may take some time.</span>
+fr: Importer la base et écraser l'existant (crée une sauvegarde des données auparavant).<br>
+    <span style="font-size:80%%">En fonction de la taille de la base et des
+    documents associés (images), cette opération peut prendre un
+    certain temps.</span>
+]</label>
+<br>
+<input type=checkbox id=c name=c>
+<label for=c>
+%J{
+[
+en: Copy the saved etc/document/history/forum folders in the new base.<br>
+fr: Recopier les dossiers sauvegardés etc/document/history/forum dans la nouvelle base.<br>
+]
+|
+[
+en: Copy the saved history and forum folders in the new base.<br>
+fr: Recopier les dossiers sauvegardés history et forum dans la nouvelle base.<br>
+]
+}
+</label>
+</tr>
+<tr align=left>
+<td><input type=radio id=action name=action value="update">   </td>
+<td><label for=action>[
+en: Import the base without destroying possibly pre-existing folders.
+    (documents/etc/forum/history)
+fr: Importer la base sans détruire les dossiers annexes existant éventuellement.
+    (documents/etc/forum/history)
+]</label></td>
+</tr>
+<tr align=left>
+<td><input type=radio id=action name=action value="none">   </td>
+<td><label for=action>[
+en: No option.<br>
+fr: Pas d'option.<br>
 ]</label></td>
 </tr>
 </table>
-
 <p>
 <li>
 [

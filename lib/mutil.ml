@@ -442,10 +442,94 @@ let rm fname =
 let rn fname s =
   if Sys.file_exists fname then Sys.rename fname s
 
+let rec rm_rf file =
+  let infos = Unix.lstat file in
+  match infos.Unix.st_kind with
+  | Unix.S_REG | Unix.S_LNK ->
+      Unix.unlink file ;
+  | Unix.S_DIR->
+      let ls = Array.to_list (Sys.readdir file) in
+      List.iter
+        (fun f ->
+          if f <> "." && f <> ".."
+          then
+            rm_rf (Filename.concat file f) ) ls ;
+      (try Unix.rmdir file with _ -> ()) ;
+  | _ -> ()
+
+(* FIXME unlink and rmdir fail in some cases (dir symlinks)!! 
 let rm_rf dir =
   if Sys.file_exists dir then
     begin
-      let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
-      List.iter Unix.unlink files ;
-      List.iter Unix.rmdir directories
+      let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory
+      in
+      List.iter (fun f ->
+          let infos = Unix.lstat f in
+          match infos.Unix.st_kind with
+          | Unix.S_REG | Unix.S_LNK->
+              Unix.unlink f
+          | _ -> Printf.eprintf "Not a file %s!!\n" f ;
+        ) files ;
+      List.iter (fun d ->
+          let infos = Unix.lstat d in
+          match infos.Unix.st_kind with
+          | Unix.S_REG | Unix.S_LNK->
+              Unix.unlink d
+          | Unix.S_DIR->
+              Unix.rmdir d
+          | _ -> ()
+        ) directories
     end
+*)
+
+let buffer_size = 8192
+let buffer = Bytes.create buffer_size
+
+let file_copy input_name output_name =
+  let fd_in = Unix.openfile input_name [Unix.O_RDONLY] 0 in
+  let fd_out = Unix.openfile output_name
+    [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o666 in
+  let rec copy_loop () = match Unix.read fd_in buffer 0 buffer_size with
+    |  0 -> ()
+    | r -> ignore (Unix.write fd_out buffer 0 r); copy_loop ()
+  in
+  copy_loop ();
+  Unix.close fd_in ;
+  Unix.close fd_out
+  
+let set_infos filename infos =
+  if Sys.unix then
+    begin
+      Unix.utimes filename infos.Unix.st_atime infos.Unix.st_mtime ;
+      Unix.chmod filename infos.Unix.st_perm ;
+      try
+        Unix.chown filename infos.Unix.st_uid infos.Unix.st_gid
+      with Unix.Unix_error(Unix.EPERM,_,_) -> ()
+    end
+  else ()
+
+let rec copy_r source dest =
+  let infos = Unix.lstat source in
+  let fname = Filename.basename source in
+  if fname.[0] <> '.' then
+    match infos.Unix.st_kind with
+    | Unix.S_REG ->
+        file_copy source dest ;
+        set_infos dest infos
+    | Unix.S_LNK ->
+        let link = Unix.readlink source in
+        Unix.symlink link dest
+    | Unix.S_DIR->
+        mkdir_p dest ;
+        let ls = Array.to_list (Sys.readdir source) in
+        List.iter
+          (fun file ->
+            if file <> Filename.current_dir_name
+                && file <> Filename.parent_dir_name
+            then copy_r
+              (Filename.concat source file)
+              (Filename.concat dest file))
+          ls ;
+        set_infos dest infos
+    | _ -> ()
+  else ()

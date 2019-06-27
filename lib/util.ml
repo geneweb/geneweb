@@ -1242,9 +1242,6 @@ let search_in_etc_path conf fname =
     [] tpl
   in
   let tpl = List.rev tpl in
-  (* FIXME verify what we really want *)
-  (* tpl is a list of template names!! which ones?? *)
-  (* do we really expect a template list or just one!! *)
   (* search in etc_base with and without templ*)
   let file =
     (* search in base area with tpl *)
@@ -1268,11 +1265,13 @@ let search_in_etc_path conf fname =
       if Sys.file_exists f then f else ""
   in
   if file = "" then
+    (* search in distrib area *)
     let rec loop etc_d =
       match etc_d with
       | [] -> ""
       | etc_d :: l ->
           let file =
+            (* with template name *)
             let rec loop1 tpl =
               match tpl with
               | [] -> ""
@@ -1287,25 +1286,25 @@ let search_in_etc_path conf fname =
           in
           if file <> "" && Sys.file_exists file then file
           else
+            (* without template name *)
             let d1 = Filename.concat etc_d "etc" in
             let f = Filename.concat d1 fname in
             if Sys.file_exists f then f
             else loop l
-      in loop [(Secure.etc_path ()); Path.sharelib]
+      in loop [(Secure.gw_path ()); Path.sharelib]
   else file
-
-(* search in base specific templates *)
-let template_file_path conf fname =
-  Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt"
 
 let open_template conf fname =
   if !Path.direct then
-    try Some (Secure.open_in @@ Filename.concat conf.path.Path.dir_etc_d (fname ^ ".txt"))
+    try Some (Secure.open_in @@
+      Filename.concat conf.path.Path.dir_etc_d (fname ^ ".txt"))
     with Sys_error _ -> None
   else
-    try Some (Secure.open_in @@ search_in_etc_path conf (fname ^ ".txt") )
+    try Some (Secure.open_in @@
+      search_in_etc_path conf (fname ^ ".txt"))
     with Sys_error _ ->
-    try Some (Secure.open_in @@ template_file_path conf fname)
+    try Some (Secure.open_in @@
+      Filename.concat conf.path.Path.dir_etc_d (fname ^ ".txt"))
     with Sys_error _ -> None
 
 let body_prop conf =
@@ -2519,8 +2518,8 @@ let create_topological_sort conf base =
         (fun () ->
            let tstab_file =
              if conf.use_restrict && not conf.wizard && not conf.friend then
-               Filename.concat bfile "tstab_visitor"
-             else Filename.concat bfile "tstab"
+               conf.path.Path.file_ts_visitor
+             else conf.path.Path.file_ts
            in
            let r =
              try
@@ -3082,7 +3081,8 @@ let short_f_month m =
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
 let read_gen_auth_file fname =
-  let conf_path = Path.path_from_bname "" in (* FIXME *)
+  (* FIXME how to make file base specific?? *)
+  let conf_path = Path.path_from_bname "" in
   let fname = Filename.concat conf_path.dir_password fname in
   try
     let ic = Secure.open_in fname in
@@ -3497,18 +3497,6 @@ type cache_visited_t = (string, (iper * string) list) Hashtbl.t
 
 
 (* ************************************************************************ *)
-(*  [Fonc] cache_visited : config -> string                                 *)
-(** [Description] : Renvoie le chemin du fichier de cache.
-    [Args] :
-      - config : configuration de la base
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let cache_visited conf =
-  Filename.concat conf.path.Path.dir_root "cache_visited"
-
-
-(* ************************************************************************ *)
 (*  [Fonc] read_visited : string -> cache_visited_t                         *)
 (** [Description] : List le fichier de cache des dernières fiches visités.
     [Args] :
@@ -3517,7 +3505,7 @@ let cache_visited conf =
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let read_visited conf =
-  let fname = cache_visited conf in
+  let fname = conf.path.Path.file_cache_visited in
   try
     let ic = Secure.open_in_bin fname in
     let ht : cache_visited_t = input_value ic in
@@ -3536,7 +3524,7 @@ let read_visited conf =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let write_visited conf ht =
-  let fname = cache_visited conf in
+  let fname = conf.path.Path.file_cache_visited in
   try
     let oc = Secure.open_out_bin fname in
     output_value oc ht;
@@ -3712,10 +3700,12 @@ let ls_r dirs =
   in
   loop [] dirs
 
+(*
 let rm_rf dir =
   let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
   List.iter Unix.unlink files ;
   List.iter Unix.rmdir directories
+*)
 
 let init_cache_info bname base =
   match Gwdb.ascends_array base with
@@ -3739,10 +3729,11 @@ let init_cache_info bname base =
       let () =
         Hashtbl.add ht cache_nb_base_persons (string_of_int !nb_real_persons)
       in
-      let bdir =
-        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+      let bname =
+        if Filename.check_suffix bname ".gwb" then
+          Filename.chop_suffix bname ".gwb" else bname
       in
-      let fname = Filename.concat bdir "cache_info" in
+      let fname = (Path.path_from_bname bname).Path.file_cache_info in
       match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
         Some oc -> output_value oc ht; close_out oc
       | None -> ()

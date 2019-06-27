@@ -206,10 +206,8 @@ let input_lexicon lang =
   ht
 
 let add_lexicon bname fname lang ht =
-  (* TODO add Path.dir_root/"etc" to lang_path *)
-  Secure.add_lang_path 
-    (Filename.concat Path.((path_from_bname bname).dir_root) "etc");
-  let fname = Filename.concat "lang" fname in
+  (* add base specific lang path *)
+  Secure.add_lang_path (path_from_bname bname).dir_lang_b;
   Mutil.input_lexicon lang ht
     (fun () -> Secure.open_in (Util.search_in_lang_path fname))
 
@@ -1863,7 +1861,7 @@ let main ~speclist () =
   let speclist =
     ("-hd", Arg.String (fun x ->
       Path.etc := (x ^ etc); Path.lang := (x ^ lang); Path.cnt := (x ^ cnt);
-      Secure.set_etc_path x; Secure.add_lang_path x;),
+      Secure.set_gw_path x; Secure.add_lang_path x;),
      "<dir>\n       Directory where the static files are installed \
      (templates, icons, lexicon).") ::
     ("-bd", Arg.String Secure.set_base_dir,

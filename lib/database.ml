@@ -141,7 +141,7 @@ let index_of_string strings ic start_pos hash_len string_patches s =
           failwith "database access"
 
 let persons_of_first_name_or_surname base_data strings params =
-  let (_, _, proj, person_patches, names_inx, names_dat, bname) = params in
+  let (_, _, proj, person_patches, names_inx, names_dat, _bname) = params in
   let module IstrTree =
     Btree.Make
       (struct
@@ -149,14 +149,12 @@ let persons_of_first_name_or_surname base_data strings params =
         let compare = Dutil.compare_istr_fun base_data
       end)
   in
-  let fname_dat = Filename.concat bname names_dat in
   let bt =
     let btr = ref None in
     fun () ->
       match !btr with
         Some bt -> bt
       | None ->
-          (* let fname_inx = Filename.concat bname names_inx in *)
           let ic_inx = Secure.open_in_bin names_inx in
           (*
           let ab1 = Gc.allocated_bytes () in
@@ -177,7 +175,7 @@ let persons_of_first_name_or_surname base_data strings params =
     let ipera =
       try
         let pos = IstrTree.find istr (bt ()) in
-        let ic_dat = Secure.open_in_bin fname_dat in
+        let ic_dat = Secure.open_in_bin names_dat in
         seek_in ic_dat pos;
         let len = input_binary_int ic_dat in
         let rec read_loop ipera len =
@@ -261,15 +259,16 @@ let persons_of_name bname patches =
       Not_found -> Array.to_list ai
 
 let strings_of_fsname bname strings (_, person_patches) =
+  let conf_path = Path.path_from_bname bname in
   let t = ref None in
   fun s ->
     let s = Name.crush_lower s in
     let i = Hashtbl.hash s in
     let r =
-      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
+      let ic_inx = Secure.open_in_bin conf_path.file_names_inx in
       let ai =
         let i = i mod Dutil.table_size in
-        let fname_inx_acc = Filename.concat bname "names.acc" in
+        let fname_inx_acc = conf_path.file_names_acc in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
           seek_in ic_inx_acc (Iovalue.sizeof_long * (Dutil.table_size + i));
@@ -316,7 +315,7 @@ let verbose = Mutil.verbose
 
 let make_visible_record_access bname persons =
   let visible_ref = ref None in
-  let fname = Filename.concat bname "restrict" in
+  let fname = (Path.path_from_bname bname).Path.file_restrict in
   let read_or_create_visible () =
     let visible =
       try
@@ -734,8 +733,8 @@ let opendb bname =
     Sys.rename tmp_fname fname
   in
   let commit_patches () =
-    let tmp_fname = Filename.concat bname "1patches" in
-    let fname = Filename.concat bname "patches" in
+    let fname = path.file_patches in
+    let tmp_fname = fname ^ ".tmp" in
     let oc9 =
       try Secure.open_out_bin tmp_fname with
         Sys_error _ ->
@@ -887,11 +886,13 @@ let opendb bname =
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_surname_start_pos, (fun p -> p.surname),
-          snd patches.h_person, "snames.inx", "snames.dat", bname);
+          snd patches.h_person, path.file_snames_inx,
+          path.file_snames_dat, bname);
      persons_of_first_name =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_first_name_start_pos, (fun p -> p.first_name),
-          snd patches.h_person, "fnames.inx", "fnames.dat", bname);
+          snd patches.h_person, path.file_fnames_inx,
+          path.file_fnames_dat, bname);
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;
      patch_couple = patch_couple; patch_descend = patch_descend;

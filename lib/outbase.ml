@@ -26,10 +26,10 @@ let just_copy bname what oc oc_acc =
   if !verbose then Printf.eprintf "*** copying %s\n" what;
   flush stderr;
   let ic =
-    let ic = Secure.open_in_bin (Filename.concat bname "base") in
+    let ic = Secure.open_in_bin (Path.path_from_bname bname).Path.file_base in
     Dutil.check_magic ic; ic
   in
-  let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
+  let ic_acc = Secure.open_in_bin (Path.path_from_bname bname).Path.file_base_acc in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
@@ -263,8 +263,8 @@ let gen_output no_patches bname base =
   let tmp_fnames_inx_fn, tmp_fnames_inx_oc = tmp "fnames.inx" in
   let tmp_fnames_dat_fn, tmp_fnames_dat_oc = tmp "fnames.dat" in
   let tmp_strings_inx_fn, tmp_strings_inx_oc = tmp "strings.inx" in
-  let tmp_notes = Filename.concat path.dir_my_base "1notes" in
-  let tmp_notes_d = Filename.concat path.dir_my_base "1notes_d" in
+  let tmp_notes = Filename.concat path.dir_my_base "notes.tmp" in
+  let tmp_notes_d = Filename.concat path.dir_my_base "notes_d.tmp" in
   if not no_patches then
     begin
       load_ascends_array base;

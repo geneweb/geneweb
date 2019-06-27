@@ -4,14 +4,6 @@ open Geneweb
 open Def
 open Gwdb
 
-let fname = ref ""
-
-let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
-let speclist = []
-let anonfun s =
-  if !fname = "" then fname := s
-  else raise (Arg.Bad "Cannot treat several databases")
-
 let notes_links s =
   let slen = String.length s in
   let rec loop list_nt list_ind pos i =

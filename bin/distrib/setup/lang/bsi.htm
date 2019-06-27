@@ -22,7 +22,8 @@ sv: Applicering av "%d"
 
 <body %Vbody_prop;>
 
-<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<div style="background:url('images/gwlogo.png') no-repeat left top;
+  text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
 de: Funktion "%d" ausführen
@@ -36,7 +37,6 @@ sv: Applicering av "%d"
 ]
 </h1>
 </div>
-
 [
 de: Die Funktion "%d" wird nun auf deiner Datenbank "%a" ausgeführt.
     Warnung: Das kann, abhängig vom Einzelfall, zwischen einigen Sekunden 
@@ -60,9 +60,7 @@ lv: Darbîba "%d" tiks lietota datu bâzei "%a". Brîdinâjums: tas var aizòemt
 sv: Operationen "%d" kommer att appliceras på din databas "%a". Varning: det
     kan ta några sekunder eller några minuter, beroende på fallet. Ha tålamod.
 ]
-
-<p />
-
+<p>
 [
 de: Drücke diesen Knopf um zu starten:
 en: Push the button below to start:
@@ -73,16 +71,12 @@ it: Per iniziare, cliccate sul bottone qui sotto:
 lv: Nospiediet podziòu zemâk, lai sâktu:
 sv: Tryck på knappen nedan för att starta:
 ]
-
-<p />
-
+<p>
 <form method="post" action="%d">
 %h
 <dl><dt><dd><input type="submit" value="Ok" /></dl>
 </form>
-
 <p>
-
 [
 de: Zu deiner Information: Diese Funktion entspricht der Ausführung
     der folgenden Kommandos:
@@ -99,10 +93,12 @@ sv: Denna operation motsvarar de följande kommandona:
 
 <pre>
      $ cd "%w"
-     $ %x%/%d%p > comm.log
+     $ %x%/%d%p > %S
 </pre>
 
 [
-en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
-fr: <span style="color:#FF0000;">ATTENTION</span> : Le contenu du fichier %o sera écrasé.
+en: <span style="color:#FF0000;">WARNING</span>:
+    The content of file %o will be overwritten.
+fr: <span style="color:#FF0000;">ATTENTION</span> :
+    Le contenu du fichier %o sera écrasé.
 ]

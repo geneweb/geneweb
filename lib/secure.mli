@@ -2,10 +2,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 val lang_path : unit -> string list
-val etc_path : unit -> string
+val gw_path : unit -> string
 val base_dir : unit -> string
 val add_lang_path : string -> unit
-val set_etc_path : string -> unit
+val set_gw_path : string -> unit
 val set_base_dir : string -> unit
 
 val open_in : string -> in_channel
