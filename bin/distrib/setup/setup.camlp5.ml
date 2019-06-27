@@ -592,6 +592,9 @@ let rec copy_from_stream conf print strm =
                   let k1 = get_variable strm in
                   let k2 = get_variable strm in
                   print_if_else conf print (p_getenv conf.env k1 = Some k2) strm
+              | 'J' ->
+                  (* %J{reorg=true part|false part} *)
+                  print_if_else conf print (!Path.reorg) strm
               | 'O' ->
                   let fname = Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o"))) in
                   let fname = slashify_linux_dos fname in
@@ -601,7 +604,7 @@ let rec copy_from_stream conf print strm =
               | 'R' -> print (parameters_2 conf.env) (* same as p *)
               | _ ->
                   match p_getenv conf.env (String.make 1 c) with
-                    | Some v ->
+                  | Some v ->
                       begin match strm with parser
                         [< ''{' >] ->
                           let s = parse_upto '}' strm in
