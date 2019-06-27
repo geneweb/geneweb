@@ -461,10 +461,8 @@ let cut_at_equal s =
   | None -> (s, "")
 
 let read_base_env bname =
-  let fname = (* REORG *)
-    String.concat Filename.dir_sep
-      [Filename.current_dir_name; bname ^ ".gwb"; "etc"; "config.txt"]
-  in
+  let path = Path.path_from_bname bname in
+  let fname = path.Path.file_conf in
   match try Some (open_in fname) with Sys_error _ -> None with
   | Some ic ->
     let rec loop env =
@@ -862,19 +860,11 @@ let print_default_gwf_file conf =
      "perso_module_d=data_3col"; "perso_module_l=ligne"; "p_mod="]
   in
   let bname = try List.assoc "o" conf.env with Not_found -> "" in
-  let fname = (* REORG *)
-    String.concat Filename.dir_sep
-      [Filename.current_dir_name; bname ^ ".gwb"; "etc"; "config.txt"]
-  in
-  let d0 =
-    String.concat Filename.dir_sep
-      [Filename.current_dir_name; bname ^ ".gwb";]
-  in
+  let path = Path.path_from_bname bname in
+  let fname = path.Path.file_conf in
+  let d0 = path.Path.dir_my_base in
   (try Unix.mkdir d0 0o755 with Unix.Unix_error (_, _, _) -> ());
-  let d1 =
-    String.concat Filename.dir_sep
-      [Filename.current_dir_name; bname ^ ".gwb"; "etc"]
-  in
+  let d1 = path.Path.dir_etc_b in
   (try Unix.mkdir d1 0o755 with Unix.Unix_error (_, _, _) -> ());
   if Sys.file_exists fname then ()
   else
@@ -1529,25 +1519,19 @@ let gwf conf =
       Some f -> strip_spaces f
     | None -> ""
   in
+  let path = Path.path_from_bname in_base in
   if in_base = "" then print_file conf "err_miss.htm"
   else
     let benv = read_base_env in_base in
     let trailer_sys =
-      String.concat Filename.dir_sep
-        [!bin_dir; "etc"; "trl.txt"]
+      String.concat Filename.dir_sep [path.Path.dir_etc_d; "trl.txt"]
     in
     let trailer_sys =
       Util.escape_html
         (file_contents trailer_sys)
     in
-    (* REORG *)
     let trailer_user =
-      if !Path.reorg then
-        String.concat Filename.dir_sep
-          [Filename.current_dir_name; in_base ^ ".gwb"; "etc"; "trl.txt"]
-      else
-        String.concat Filename.dir_sep
-          [Filename.current_dir_name; "etc"; in_base; "trl.txt"]
+      String.concat Filename.dir_sep [path.Path.dir_etc_b; "trl.txt"]
     in
     let trailer_user =
       Util.escape_html
@@ -1564,16 +1548,10 @@ let gwf_1 conf =
       Some f -> strip_spaces f
     | None -> ""
   in
+  let path = Path.path_from_bname in_base in
   let benv = read_base_env in_base in
   let (vars, _) = variables "gwf_1.htm" in
-  let fname =
-    if !Path.reorg then 
-      String.concat Filename.dir_sep
-        [Filename.current_dir_name; in_base ^ ".gwb"; "etc"; "config.txt"]
-    else
-      String.concat Filename.dir_sep
-        [Filename.current_dir_name; in_base ^ ".gwf"]
-  in
+  let fname = path.Path.file_conf in
   let oc = open_out fname in
   let body_prop =
     match p_getenv conf.env "proposed_body_prop" with
@@ -1595,21 +1573,10 @@ let gwf_1 conf =
   close_out oc;
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
   let trl_file =
-    if !Path.reorg then
       String.concat Filename.dir_sep
-        [Filename.current_dir_name; in_base ^ ".gwb"; "etc"; "trl.txt"]
-    else
-      String.concat Filename.dir_sep 
-        [Filename.current_dir_name; "etc"; in_base; "trl.txt"]
+        [path.Path.dir_etc_b; "trl.txt"]
   in
-  let d1 = 
-    if !Path.reorg then
-      String.concat Filename.dir_sep
-        [Filename.current_dir_name; in_base ^ ".gwb"; "etc"]
-    else 
-      String.concat Filename.dir_sep
-        [Filename.current_dir_name; "etc"; in_base]
-  in
+  let d1 = path.Path.dir_etc_b in
   (try Unix.mkdir d1 0o755 with Unix.Unix_error (_, _, _) -> ());
   begin try
     if trl = "" then Sys.remove trl_file
