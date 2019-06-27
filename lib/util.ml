@@ -1268,26 +1268,30 @@ let search_in_etc_path conf fname =
       if Sys.file_exists f then f else ""
   in
   if file = "" then
-    let etc_d = Secure.etc_path () in
-    let file =
-      let rec loop1 tpl =
-        match tpl with
-        | [] -> ""
-        | t :: l ->
+    let rec loop etc_d =
+      match etc_d with
+      | [] -> ""
+      | etc_d :: l ->
+          let file =
+            let rec loop1 tpl =
+              match tpl with
+              | [] -> ""
+              | t :: l ->
+                  let d1 = Filename.concat etc_d "etc" in
+                  let d1 = Filename.concat d1 t in
+                  let f = Filename.concat d1 fname in
+                  if Sys.file_exists f then f
+                  else loop1 l
+            in
+            loop1 tpl
+          in
+          if file <> "" && Sys.file_exists file then file
+          else
             let d1 = Filename.concat etc_d "etc" in
-            let d1 = Filename.concat d1 t in
             let f = Filename.concat d1 fname in
             if Sys.file_exists f then f
-            else loop1 l
-      in
-      loop1 tpl
-    in
-    if file <> "" && Sys.file_exists file then file
-    else
-      let d1 = Filename.concat etc_d "etc" in
-      let f = Filename.concat d1 fname in
-      if Sys.file_exists f then f
-      else ""
+            else loop l
+      in loop [(Secure.etc_path ()); Path.sharelib]
   else file
 
 (* search in base specific templates *)
@@ -1296,7 +1300,7 @@ let template_file_path conf fname =
 
 let open_template conf fname =
   if !Path.direct then
-    try Some (Secure.open_in @@ Filename.concat !Path.etc (fname ^ ".txt"))
+    try Some (Secure.open_in @@ Filename.concat conf.path.Path.dir_etc_d (fname ^ ".txt"))
     with Sys_error _ -> None
   else
     try Some (Secure.open_in @@ search_in_etc_path conf (fname ^ ".txt") )
