@@ -124,12 +124,14 @@ let log_passwd_failed ar oc tm from request base_file =
 
 let copy_file fname =
   match Util.open_etc_file fname with
-    Some ic ->
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
       begin try
         while true do let c = input_char ic in Wserver.printf "%c" c done
       with _ -> ()
       end;
       close_in ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
       true
   | None -> false
 
@@ -288,7 +290,10 @@ let print_renamed conf new_n =
   in
   let env = ["old", conf.bname; "new", new_n; "link", link] in
   match Util.open_etc_file "renamed" with
-    Some ic -> Util.html conf; Templ.copy_from_templ conf env ic
+    Some (ic, fname) -> Util.html conf;
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf env ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
       Hutil.header conf title;
@@ -314,9 +319,12 @@ let print_redirected conf from request new_addr =
   let env = ["link", link] in
   log_redirect from request req;
   match Util.open_etc_file "redirect" with
-    Some ic ->
+    Some (ic, fname) ->
       let conf = {conf with is_printed_by_template = false} in
-      Util.html conf; Templ.copy_from_templ conf env ic
+      Util.html conf;
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf env ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None ->
       let title _ = Wserver.printf "Address changed" in
       Hutil.header conf title;
@@ -339,7 +347,10 @@ let propose_base conf =
 
 let general_welcome conf =
   match Util.open_etc_file "index" with
-    Some ic -> Util.html conf; Templ.copy_from_templ conf [] ic
+    Some (ic, fname) -> Util.html conf;
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf [] ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None -> propose_base conf
 
 let nonce_private_key =

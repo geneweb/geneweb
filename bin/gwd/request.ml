@@ -358,10 +358,13 @@ let log_count r =
 
 let print_moved conf s =
   match Util.open_etc_file "moved" with
-    Some ic ->
+    Some (ic, fname) ->
       let env = ["bname", conf.bname] in
       let conf = {conf with is_printed_by_template = false} in
-      Util.html conf; Templ.copy_from_templ conf env ic
+      Util.html conf;
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf env ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname s in
       Hutil.header_no_page_title conf title;

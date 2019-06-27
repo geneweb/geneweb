@@ -30,7 +30,10 @@ let robot_error conf cnt sec =
   Wserver.header "Content-type: text/html; charset=iso-8859-1";
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
   begin match open_etc_file "robot" with
-    Some ic -> Templ.copy_from_templ conf env ic
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf env ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None ->
       let title _ = Wserver.printf "Access refused" in
       Wserver.printf "<head><title>";

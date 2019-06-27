@@ -1241,8 +1241,8 @@ let open_etc_file fname =
     search_in_lang_path
       (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
   in
-  try Some (Secure.open_in fname1) with
-    Sys_error _ -> try Some (Secure.open_in fname2) with Sys_error _ -> None
+  try Some (Secure.open_in fname1, fname1) with
+    Sys_error _ -> try Some (Secure.open_in fname2, fname2) with Sys_error _ -> None
 
 let open_hed_trl conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with

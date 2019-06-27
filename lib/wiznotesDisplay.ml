@@ -339,7 +339,10 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   title false;
   Wserver.printf "</h1>\n";
   begin match Util.open_etc_file "summary" with
-    Some ic -> Templ.copy_from_templ conf [] ic
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf [] ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None -> ()
   end;
   Wserver.printf "<table border=\"0\" width=\"100%%\">\n";

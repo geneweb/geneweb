@@ -108,7 +108,7 @@ val p_getenv : (string * string) list -> string -> string option
 val p_getint : (string * string) list -> string -> int option
 val create_env : string -> (string * string) list
 
-val open_etc_file : string -> in_channel option
+val open_etc_file : string -> (in_channel * string) option
 val open_hed_trl : config -> string -> in_channel option
 val open_templ : config -> string -> in_channel option
 val open_templ_fname : config -> string -> (in_channel * string) option

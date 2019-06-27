@@ -696,10 +696,12 @@ let print_mod_view_page conf can_edit mode fname title env s =
     end;
   Wserver.printf "<div class=\"row ml-3\">\n";
   begin match Util.open_etc_file "toolbar" with
-    Some ic ->
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
       Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
       Templ.copy_from_templ conf ["name", "notes"] ic;
       Wserver.printf "</div>\n";
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None -> ()
   end;
   Wserver.printf "<textarea name=\"notes\" id=\"notes_comments\"";
@@ -718,10 +720,12 @@ let print_mod_view_page conf can_edit mode fname title env s =
       end
     end;
   begin match Util.open_etc_file "accent" with
-    Some ic ->
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
       Wserver.printf "<div class=\"col my-1 mr-2 text-monospace\">\n";
       Templ.copy_from_templ conf ["name", "notes"] ic;
       Wserver.printf "</div>\n";
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None -> ()
   end;
   Wserver.printf "</div>\n";

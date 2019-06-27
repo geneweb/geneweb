@@ -1311,7 +1311,10 @@ let copy_from_templ conf env ic = !copy_from_templ_fwd conf env ic
 
 let print_copyright conf =
   match Util.open_etc_file "copyr" with
-    Some ic -> copy_from_templ conf [] ic
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      copy_from_templ conf [] ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None ->
       Wserver.printf "<hr style=\"margin:0\"%s>\n" conf.xhs;
       Wserver.printf "<div style=\"font-size: 80%%\">\n";
