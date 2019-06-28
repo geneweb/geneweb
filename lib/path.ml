@@ -30,7 +30,8 @@ type t =
   ; dir_bases : string
   ; dir_my_base : string
   ; dir_cnt : string
-  ; dir_lang : string
+  ; dir_lang_d : string
+  ; dir_lang_b : string
   ; dir_etc_d : string
   ; dir_etc_b : string
   ; dir_history : string
@@ -80,7 +81,8 @@ let path_from_bname s =
   let dir_etc_dist = Filename.concat (Secure.etc_path ()) "etc" in
   let dir_etc_base = String.concat Filename.dir_sep [dir_bases; "etc"; bname] in
   let dir_cnt = String.concat Filename.dir_sep [dir_bases; "cnt"; bname] in
-  let dir_lang = String.concat Filename.dir_sep [dir_bases; "lang"; bname] in
+  let dir_lang_dist = String.concat (Secure.etc_path ()) "lang" in
+  let dir_lang_base = String.concat Filename.dir_sep [dir_bases; "lang"; bname] in
   let dir_documents = String.concat Filename.dir_sep [dir_bases; "src"; bname] in
   let dir_portraits = String.concat Filename.dir_sep [dir_bases; "images"; bname] in
   let dir_images = String.concat Filename.dir_sep [dir_bases; "src"; bname; "images"] in
@@ -98,7 +100,8 @@ let path_from_bname s =
   ; dir_images = dir_images
   ; dir_notes = dir_notes
   ; dir_cnt = dir_cnt
-  ; dir_lang = dir_lang
+  ; dir_lang_d = dir_lang_dist
+  ; dir_lang_b = dir_lang_base
   ; dir_etc_d = dir_etc_dist
   ; dir_etc_b = dir_etc_base
   ; dir_history = dir_history

@@ -95,7 +95,7 @@ let incr_request_counter =
 let lang_file_name conf fname =
   let fname1 =
     String.concat Filename.dir_sep
-      [conf.path.Path.dir_lang; conf.lang; (Filename.basename fname ^ ".txt")]
+      [conf.path.Path.dir_lang_b; conf.lang; (Filename.basename fname ^ ".txt")]
   in
   if Sys.file_exists fname1 then fname1
   else
@@ -106,7 +106,7 @@ let lang_file_name conf fname =
 let any_lang_file_name conf fname =
   let fname1 =
     String.concat Filename.dir_sep
-      [conf.path.Path.dir_lang; (Filename.basename fname ^ ".txt")]
+      [conf.path.Path.dir_lang_b; (Filename.basename fname ^ ".txt")]
   in
   if Sys.file_exists fname1 then fname1
   else
@@ -549,13 +549,8 @@ let print conf base fname =
   let fname1 =
     Util.search_in_etc_path conf (fname ^ ".txt")
   in
-  let fname2 =
-    Util.template_file_path conf (fname ^ ".txt")
-  in
   let file =
-    if Sys.file_exists fname1 then fname1
-    else if Sys.file_exists fname2 then fname2
-    else ""
+    if Sys.file_exists fname1 then fname1 else ""
   in
   if file <> "" then
     Hutil.interp conf fname

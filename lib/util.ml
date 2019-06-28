@@ -1242,9 +1242,6 @@ let search_in_etc_path conf fname =
     [] tpl
   in
   let tpl = List.rev tpl in
-  (* FIXME verify what we really want *)
-  (* tpl is a list of template names!! which ones?? *)
-  (* do we really expect a template list or just one!! *)
   (* search in etc_base with and without templ*)
   let file =
     (* search in base area with tpl *)
@@ -1268,11 +1265,13 @@ let search_in_etc_path conf fname =
       if Sys.file_exists f then f else ""
   in
   if file = "" then
+    (* search in distrib area *)
     let rec loop etc_d =
       match etc_d with
       | [] -> ""
       | etc_d :: l ->
           let file =
+            (* with template name *)
             let rec loop1 tpl =
               match tpl with
               | [] -> ""
@@ -1287,6 +1286,7 @@ let search_in_etc_path conf fname =
           in
           if file <> "" && Sys.file_exists file then file
           else
+            (* without template name *)
             let d1 = Filename.concat etc_d "etc" in
             let f = Filename.concat d1 fname in
             if Sys.file_exists f then f
@@ -1294,18 +1294,17 @@ let search_in_etc_path conf fname =
       in loop [(Secure.etc_path ()); Path.sharelib]
   else file
 
-(* search in base specific templates *)
-let template_file_path conf fname =
-  Filename.concat conf.path.Path.dir_etc_d fname ^ ".txt"
-
 let open_template conf fname =
   if !Path.direct then
-    try Some (Secure.open_in @@ Filename.concat conf.path.Path.dir_etc_d (fname ^ ".txt"))
+    try Some (Secure.open_in @@
+      Filename.concat conf.path.Path.dir_etc_d (fname ^ ".txt"))
     with Sys_error _ -> None
   else
-    try Some (Secure.open_in @@ search_in_etc_path conf (fname ^ ".txt") )
+    try Some (Secure.open_in @@
+      search_in_etc_path conf (fname ^ ".txt"))
     with Sys_error _ ->
-    try Some (Secure.open_in @@ template_file_path conf fname)
+    try Some (Secure.open_in @@
+      Filename.concat conf.path.Path.dir_etc_d (fname ^ ".txt"))
     with Sys_error _ -> None
 
 let body_prop conf =
