@@ -34,7 +34,10 @@ script:
     set -ex ;
     export OPAMYES=1 ;
     eval $(opam config env) ;
-  - if [[ "$OCAML_VERSION" == "4.08" ]] ; then opam pin add camlp5 https://github.com/camlp5/camlp5.git --no-action ; fi ;
+    if [[ "$OCAML_VERSION" == "4.08" ]] ; then
+      opam pin add camlp5 https://github.com/sagotch/camlp5.git#patch-1 -k git --no-action ;
+      opam pin add piqilib https://github.com/alavrik/piqi.git -k git --no-action ;
+    fi ;
     opam pin add geneweb . --no-action ;
     opam install geneweb --deps-only ;
     ./configure && make clean test install uninstall distrib clean ;
