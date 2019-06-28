@@ -20,9 +20,9 @@ with a Web interface and can be used off-line or as a Web service.
 [macosx-406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/6
 [macosx-407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/7
 [macosx-408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/8
-[win-407]:https://ci.appveyor.com/api/projects/status/k7e1c67m4hc22491/branch/master?svg=true
+[win-407]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
 [travis-link]:https://travis-ci.org/geneweb/geneweb
-[appveyor-link]:https://ci.appveyor.com/project/sagotch/geneweb
+[appveyor-link]:https://ci.appveyor.com/project/geneweb/geneweb
 
 ## Documentation
 
