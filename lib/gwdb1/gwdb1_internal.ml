@@ -386,9 +386,10 @@ let patch_person base ip (p : (iper, iper, istr) Def.gen_person) =
 let insert_person base = function
   | (_, _, { p = Some p ; a = Some a ; u = Some u }) ->
     let iper = nb_of_persons base in
-    patch_person base iper p ;
+    let p = { p with key_index = iper } in
     patch_ascend base iper a ;
     patch_union base iper u ;
+    patch_person base iper p ;
     iper
   | _ -> assert false
 
