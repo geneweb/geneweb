@@ -1863,7 +1863,7 @@ let main ~speclist () =
   let speclist =
     ("-hd", Arg.String (fun x ->
       Path.etc := (x ^ etc); Path.lang := (x ^ lang); Path.cnt := (x ^ cnt);
-      Secure.set_etc_path x; Secure.add_lang_path x;),
+      Secure.set_gw_path x; Secure.add_lang_path x;),
      "<dir>\n       Directory where the static files are installed \
      (templates, icons, lexicon).") ::
     ("-bd", Arg.String Secure.set_base_dir,

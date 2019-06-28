@@ -1291,7 +1291,7 @@ let search_in_etc_path conf fname =
             let f = Filename.concat d1 fname in
             if Sys.file_exists f then f
             else loop l
-      in loop [(Secure.etc_path ()); Path.sharelib]
+      in loop [(Secure.gw_path ()); Path.sharelib]
   else file
 
 let open_template conf fname =
