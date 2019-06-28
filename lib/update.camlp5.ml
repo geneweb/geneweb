@@ -1103,7 +1103,6 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
       with Not_found ->
         let o = if f = "?" || s = "?" then 0 else o in
         let empty_string = Gwdb.insert_string base "" in
-        let ip = Gwdb.insert_person base (Gwdb.empty_person base Gwdb.dummy_iper) in
         let (birth, birth_place, baptism, baptism_place) =
           match info with
             Some {ci_birth_date = b; ci_birth_place = bpl} ->
@@ -1153,16 +1152,15 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
            burial = UnknownBurial; burial_place = empty_string;
            burial_note = empty_string; burial_src = empty_string;
            pevents = []; notes = empty_string;
-           psources =
-             if f = "?" || s = "?" then empty_string
-             else Gwdb.insert_string base (only_printable src);
-           key_index = ip}
+           psources = Gwdb.insert_string base (only_printable src);
+           key_index = Gwdb.dummy_iper}
         in
         let a = {parents = None; consang = Adef.fix (-1)} in
         let u = {family = [| |]} in
-        patch_person base p.key_index p;
-        patch_ascend base p.key_index a;
-        patch_union base p.key_index u;
+        let ip =
+          insert_person base @@ Gwdb.person_of_gen_person base (p, a, u)
+        in
+        let p = { p with key_index = ip } in
         if f <> "?" && s <> "?" then
         begin
           patch_cache_info conf Util.cache_nb_base_persons
