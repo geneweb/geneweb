@@ -2517,8 +2517,8 @@ let create_topological_sort conf base =
         (fun () ->
            let tstab_file =
              if conf.use_restrict && not conf.wizard && not conf.friend then
-               Filename.concat bfile "tstab_visitor"
-             else Filename.concat bfile "tstab"
+               conf.path.Path.file_ts_visitor
+             else conf.path.Path.file_ts
            in
            let r =
              try

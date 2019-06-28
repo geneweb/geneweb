@@ -1282,12 +1282,14 @@ let output_wizard_notes bdir wiznotes =
     end
 
 let output_particles_file bdir particles =
-  let oc = open_out (Filename.concat bdir "particles.txt") in
+  let bdir = Filename.basename bdir in
+  let oc = open_out (Path.path_from_bname bdir).Path.file_particles in
   List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
   close_out oc
 
 let output_command_line bdir =
-  let oc = open_out (Filename.concat bdir "command.txt") in
+  let bdir = Filename.basename bdir in
+  let oc = open_out (Path.path_from_bname bdir).Path.file_cmd in
   Printf.fprintf oc "%s" Sys.argv.(0);
   for i = 1 to Array.length Sys.argv - 1 do
     Printf.fprintf oc " %s" Sys.argv.(i)

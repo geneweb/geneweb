@@ -26,10 +26,10 @@ let just_copy bname what oc oc_acc =
   if !verbose then Printf.eprintf "*** copying %s\n" what;
   flush stderr;
   let ic =
-    let ic = Secure.open_in_bin (Filename.concat bname "base") in
+    let ic = Secure.open_in_bin (Path.path_from_bname bname).Path.file_base in
     Dutil.check_magic ic; ic
   in
-  let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
+  let ic_acc = Secure.open_in_bin (Path.path_from_bname bname).Path.file_base_acc in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
