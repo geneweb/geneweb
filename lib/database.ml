@@ -156,7 +156,7 @@ let persons_of_first_name_or_surname base_data strings params =
       match !btr with
         Some bt -> bt
       | None ->
-          (* let fname_inx = Filename.concat bname names_inx in *)
+          let names_inx = Filename.concat bname names_inx in
           let ic_inx = Secure.open_in_bin names_inx in
           (*
           let ab1 = Gc.allocated_bytes () in
