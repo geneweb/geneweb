@@ -277,7 +277,8 @@ let comm_log conf =
   let bname = Filename.basename bname in
   let bname =
     if Filename.check_suffix bname ".gwb" ||
-      Filename.check_suffix bname ".gw"
+      Filename.check_suffix bname ".gw" ||
+      Filename.check_suffix bname ".ged"
     then
       Filename.remove_extension bname
     else bname
