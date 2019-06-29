@@ -205,15 +205,21 @@ let parameters_1 =
         let s = strip_spaces (decode_varenv s) in
         if k = "" || s = "" then loop comm bname env
         else if k = "opt" then loop comm bname env
-        else if k = "gwd_p" && s <> "" then loop (comm ^ " -gwd_p " ^ stringify s ) bname env
-        else if k = "anon" && s <> "" then loop (comm ^ " " ^ stringify s) (stringify s) env
+        else if k = "gwd_p" && s <> ""
+          then loop (comm ^ " -gwd_p " ^ stringify s ) bname env
+        else if k = "anon" && s <> ""
+          then loop (comm ^ " " ^ stringify s) (stringify s) env
         else if k = "a" then loop (comm ^ " -a") bname env
         else if k = "s" then loop (comm ^ " -s") bname env
-        else if k = "d" && s <> "" then loop (comm ^ " -d " ^ stringify s ) bname env
-        else if k = "i" && s <> "" then loop (comm ^ " -i " ^ stringify s) bname env
+        else if k = "d" && s <> ""
+          then loop (comm ^ " -d " ^ stringify s ) bname env
+        else if k = "i" && s <> ""
+          then loop (comm ^ " -i " ^ stringify s) bname env
         else if k = "bf" then loop (comm ^ " -bf") bname env
-        else if k = "del" && s <> "" then loop (comm ^ " -del " ^ stringify s) bname env
-        else if k = "cnt" && s <> "" then loop (comm ^ " -cnt " ^ stringify s) bname env
+        else if k = "del" && s <> ""
+          then loop (comm ^ " -del " ^ stringify s) bname env
+        else if k = "cnt" && s <> ""
+          then loop (comm ^ " -cnt " ^ stringify s) bname env
         else if k = "exact" then loop (comm ^ " -exact") bname env
         else if k = "o1" && s <> "" then
           let out = stringify s in
@@ -222,7 +228,13 @@ let parameters_1 =
           if s = "choice" then loop comm bname env
           else
             let out = stringify s in
-            let out = if out = "/notes/connex.txt" then bname  ^ ".gwb" ^ out else out in
+            (* notes/connex.txt is default value in connex.htm *)
+            let out =
+              if out = "notes/connex.txt" then 
+                if !Path.reorg then bname ^ ".gwb/notes/connex.txt"
+                else bname ^ ".gwb/notes_d/connex.txt" 
+              else out
+            in
             let out = slashify_linux_dos out in
             comm ^ " -o " ^ out ^ " > " ^ out
         else loop comm bname env
@@ -249,7 +261,8 @@ let parameters_2 =
         else if k = "ad" then loop (comm ^ " -ad ") env
         else if k = "d" then loop (comm ^ " -d ") env
         else if k = "mem" then loop (comm ^ " -mem") env
-        else if k = "o" then loop (comm ^ " -o " ^ stringify s ^ " > " ^ stringify s) env
+        else if k = "o"
+          then loop (comm ^ " -o " ^ stringify s ^ " > " ^ stringify s) env
         else loop comm env
     | [] -> comm
   in
@@ -261,14 +274,10 @@ let comm_log conf =
       Some f -> strip_spaces f
     | None -> ""
   in
+  let bname = Filename.basename bname in
   let bname =
-    match p_getenv conf.env "o" with
-      Some f -> strip_spaces f
-    | None -> bname
-  in
-  let bname =
-    if Filename.check_suffix bname ".gw" ||
-       Filename.check_suffix bname ".gwb"
+    if Filename.check_suffix bname ".gwb" ||
+      Filename.check_suffix bname ".gw"
     then
       Filename.remove_extension bname
     else bname
@@ -276,8 +285,10 @@ let comm_log conf =
   let comm_log =
     if bname = "" then "comm.log"
     else
-      String.concat Filename.dir_sep
-        [bname ^ ".gwb"; "etc"; "comm.log"]
+      if !Path.reorg then 
+        String.concat Filename.dir_sep
+          [bname ^ ".gwb"; "etc"; "comm.log"]
+      else "comm.log"
   in
   comm_log
 
@@ -350,7 +361,8 @@ let macro conf =
   | 'm' -> server_string conf
   | 'n' -> referer conf
   | 'o' -> strip_spaces (s_getenv conf.env "o")
-  | 'O' -> Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o")))
+  | 'O' -> Filename.remove_extension 
+      (Filename.basename (strip_spaces (s_getenv conf.env "o")))
   | 'p' -> parameters conf.env
   | 'q' -> Version.txt
   | 'u' -> Filename.dirname (abs_setup_dir ())
@@ -373,6 +385,7 @@ let macro conf =
   | 'P' -> string_of_int !gwd_port
   | 'Q' -> parameters_1 conf.env
   | 'R' -> parameters_2 conf.env
+  | 'S' -> comm_log conf
   | c -> "BAD MACRO " ^ String.make 1 c
 
 let get_variable strm =
@@ -528,6 +541,7 @@ let rec copy_from_stream conf print strm =
                 (* depending on when %f is called, conf may be sketchy *)
                 (* conf will know bvars from basename.gwf and evars from url *)
                 copy_from_stream conf print (Stream.of_string s)
+                  (* FIXME %g do we know basename at this point?? *)
           | 'g' -> print_specific_file conf print (comm_log conf) strm
           | 'h' ->
               print "<input type=hidden name=lang value=";
@@ -588,7 +602,8 @@ let rec copy_from_stream conf print strm =
                   print_specific_file conf print outfile strm;
               | 'I' ->
                   (* %Ivar;value;{var = value part|false part} *)
-                  (* var is a evar from url or a bvar from basename.gwf or setup.gwf *)
+                  (* var is a evar from url or a bvar
+                    from basename.gwf or setup.gwf *)
                   let k1 = get_variable strm in
                   let k2 = get_variable strm in
                   print_if_else conf print (p_getenv conf.env k1 = Some k2) strm
@@ -596,12 +611,15 @@ let rec copy_from_stream conf print strm =
                   (* %J{reorg=true part|false part} *)
                   print_if_else conf print (!Path.reorg) strm
               | 'O' ->
-                  let fname = Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o"))) in
+                  let fname = Filename.remove_extension
+                    (Filename.basename
+                      (strip_spaces (s_getenv conf.env "o"))) in
                   let fname = slashify_linux_dos fname in
                   print fname
               | 'P' -> print (string_of_int !gwd_port)
               | 'Q' -> print (parameters_1 conf.env) (* same as p *)
               | 'R' -> print (parameters_2 conf.env) (* same as p *)
+              | 'S' -> print (comm_log conf)
               | _ ->
                   match p_getenv conf.env (String.make 1 c) with
                   | Some v ->
@@ -1035,7 +1053,9 @@ let infer_rc conf rc =
 let gwc conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "gwc") in
-    exec_f conf (comm ^ parameters conf.env)
+    let commnd = comm ^ parameters conf.env in
+    (*Printf.eprintf "Cmd: %s\n" commnd;flush stderr;*)
+    exec_f conf commnd
   in
   let rc = if Sys.unix then rc else infer_rc conf rc in
   let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
@@ -1088,6 +1108,7 @@ let connex ok_file conf =
       (stringify (Filename.concat !bin_dir "connex")) ^ " " ^
       parameters_1 conf.env
     in
+    Printf.eprintf "Cmd: %s\n" commnd;flush stderr;
     if uname = "Darwin" then
       let launch = "tell application \"Terminal\" to do script " in
       Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd ^ " \"' " )
@@ -1571,7 +1592,8 @@ let gwf_1 conf =
        | _ -> Printf.fprintf oc "%s=%s\n" k (s_getenv conf.env k))
     vars;
   List.iter
-    (fun (k, v) -> if List.mem k vars then () else Printf.fprintf oc "%s=%s\n" k v)
+    (fun (k, v) ->
+      if List.mem k vars then () else Printf.fprintf oc "%s=%s\n" k v)
     benv;
   close_out oc;
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
@@ -1896,7 +1918,8 @@ let setup (addr, req) comm env_str =
   let s = only_addr () in
   if s <> saddr then
     let conf = {conf with env = ["anon", saddr; "o", s]} in
-    Printf.eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n" saddr s;
+    Printf.eprintf
+      "Invalid request from \"%s\"; only \"%s\" accepted.\n" saddr s;
     flush stderr;
     print_file conf "err_acc.htm"
   else if conf.comm = "" then print_file conf "welcome.htm"

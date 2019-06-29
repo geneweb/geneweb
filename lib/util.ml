@@ -3057,7 +3057,8 @@ let short_f_month m =
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
 let read_gen_auth_file fname =
-  let conf_path = Path.path_from_bname "" in (* FIXME *)
+  (* FIXME how to make file base specific?? *)
+  let conf_path = Path.path_from_bname "" in
   let fname = Filename.concat conf_path.dir_password fname in
   try
     let ic = Secure.open_in fname in

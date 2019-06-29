@@ -1268,7 +1268,7 @@ let write_file_contents fname text =
   let oc = open_out fname in output_string oc text; close_out oc
 
 let output_wizard_notes bdir wiznotes =
-  let wizdir = Filename.concat bdir "wiznotes" in
+  let wizdir = (Path.path_from_bname bdir).Path.dir_wiznotes in
   Mutil.rm_rf wizdir;
   if wiznotes = [] then ()
   else
