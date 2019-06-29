@@ -52,17 +52,16 @@ lv: <font color=#2f6400><b>GeneWeb</b></font> datnes izveide ir pabeigta.
 sv: Exporteringen av <font color=#2f6400><b>GeneWeb</b></font> källfilen
     är avslutad.
 ]
-
 <p>
 %Iodir;.;{
 [
 en: Files were reconstructed in the original sources directory.<br>
     Data created without origin file has been directed to the file
-    %o or to comm.log.
+    %o or to %S.
     It is up to you to manage this new source file, or to merge this data into existing files.
 fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br>
     Les nouvelles données sans fichier d'origine ont été redirigées vers le
-    fichier %o ou vers comm.log.
+    fichier %o ou vers %S.
     Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces 
     données aux fichiers existants.
 ]
@@ -77,9 +76,7 @@ it: Questa operazione ha creato un file chiamato "%o".
 lv: Rezultâtâ izveidota datne: "%o".
 sv: Den har skapat en fil benämnd "%o".
 ]
-
 <p>
-
 [
 de: Diese Datei steht im Verzeichnis "%w".
 en: This file is in the directory "%w".
@@ -88,25 +85,6 @@ fr: Ce fichier se trouve dans le répertoire "%w".
 it: Questo file si trova nella directory "%w".
 ]
 }
-<p>
-
-[
-en: Error messages in: %S.
-fr: Messages d'erreur dans : %S.
-]
-<pre>
-%g{- [
-de: empty file
-en: empty file
-es: fichero vacio
-fi: tyhjä tiedosto
-fr: fichier vide
-it: file vuoto
-lv: datne ir tukða
-sv: tom fil
-lv: datne ir tukða
-] -}
-</pre>
 <p>
 [
 de: Zurück zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmenü</a>.
@@ -121,3 +99,21 @@ lv: Jûs variet atgriezties <a href="gwsetup?lang=%l;v=welcome.htm">galvenajâ
     izvçlnç</a>.
 sv: Du kan återvända till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
 ]
+<p>
+[
+en: Alert messages in file <a href="gwsetup?lang=%l;v=bso_comm.htm;anon=%a">%S</a>.
+fr: Messages d’alerte dans le fichier <a href="gwsetup?lang=%l;v=bso_comm.htm;anon=%a">%S</a>.
+]
+<pre>
+%g{- [
+de: empty file
+en: empty file
+es: fichero vacio
+fi: tyhjä tiedosto
+fr: fichier vide
+it: file vuoto
+lv: datne ir tukða
+sv: tom fil
+lv: datne ir tukða
+] -}
+</pre>
