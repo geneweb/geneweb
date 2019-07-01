@@ -1632,7 +1632,7 @@ let rec compare_ls sl1 sl2 =
       (* soit plus petit que "2". J'espère qu'on ne casse pas  *)
       (* les performances à cause du try..with.                *)
       let c =
-        try Pervasives.compare (int_of_string s1) (int_of_string s2) with
+        try Stdlib.compare (int_of_string s1) (int_of_string s2) with
           Failure _ -> Gutil.alphabetic_order s1 s2
       in
       if c = 0 then compare_ls sl1 sl2 else c
@@ -1648,7 +1648,7 @@ module IperSet =
     (struct
        type t = iper
        let compare i1 i2 =
-         Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
+         Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
      end)
 
 

@@ -134,14 +134,14 @@ let strictly_after d1 d2 =
 let compare_date d1 d2 =
   match d1, d2 with
     Dgreg (dmy1, _), Dgreg (dmy2, _) ->
-      begin match Pervasives.compare dmy1.year dmy2.year with
+      begin match Stdlib.compare dmy1.year dmy2.year with
         0 ->
-          begin match Pervasives.compare dmy1.month dmy2.month with
+          begin match Stdlib.compare dmy1.month dmy2.month with
             0 ->
               (* Si l'une des deux dates n'est pas complète (mois ou jour *)
               (* égal à zéro), alors on ne distingue pas les deux dates.  *)
               if dmy1.day = 0 || dmy2.day = 0 then 0
-              else Pervasives.compare dmy1.day dmy2.day
+              else Stdlib.compare dmy1.day dmy2.day
           | x ->
               (* Idem ci-dessus. *)
               if dmy1.month = 0 || dmy2.month = 0 then 0 else x
@@ -203,15 +203,15 @@ let compare_event_date_prec d1 d2 =
 let compare_event_date d1 d2 =
   match d1, d2 with
     Dgreg (dmy1, _), Dgreg (dmy2, _) ->
-      begin match Pervasives.compare dmy1.year dmy2.year with
+      begin match Stdlib.compare dmy1.year dmy2.year with
         0 ->
-          begin match Pervasives.compare dmy1.month dmy2.month with
+          begin match Stdlib.compare dmy1.month dmy2.month with
             0 ->
               (* Si l'une des deux dates n'est pas complète (mois ou jour *)
               (* égal à zéro), alors on ne distingue pas les deux dates.  *)
               if dmy1.day = 0 || dmy2.day = 0 then 0
               else
-                begin match Pervasives.compare dmy1.day dmy2.day with
+                begin match Stdlib.compare dmy1.day dmy2.day with
                   0 -> compare_event_date_prec dmy1 dmy2
                 | x -> x
                 end

@@ -844,10 +844,10 @@ let print_dates conf base p =
 let compare_date d1 d2 =
   match d1, d2 with
     Dgreg (dmy1, _), Dgreg (dmy2, _) ->
-      begin match Pervasives.compare dmy1.year dmy2.year with
+      begin match Stdlib.compare dmy1.year dmy2.year with
         0 ->
-          begin match Pervasives.compare dmy1.month dmy2.month with
-            0 -> Pervasives.compare dmy1.day dmy2.day
+          begin match Stdlib.compare dmy1.month dmy2.month with
+            0 -> Stdlib.compare dmy1.day dmy2.day
           | x -> x
           end
       | x -> x

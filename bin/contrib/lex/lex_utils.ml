@@ -177,7 +177,7 @@ let get_msg_tpl repo =
 module StringSet = Set.Make
   (struct
     type t = string
-    let compare = Pervasives.compare
+    let compare = Stdlib.compare
    end)
 ;;
 
@@ -214,7 +214,7 @@ let missing_or_unused_msg lexicon repo log =
   let msg =
     sort_uniq
       (fun x y ->
-        Pervasives.compare
+        Stdlib.compare
           (String.lowercase_ascii x) (String.lowercase_ascii y))
       (List.rev_append msg_src msg_tpl)
   in
