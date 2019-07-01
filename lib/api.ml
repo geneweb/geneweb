@@ -534,7 +534,7 @@ let print_max_ancestors conf base =
           (struct
             type t = iper;;
             let compare i1 i2 =
-              Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2);;
+              Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2);;
            end)
   in
 
@@ -2454,7 +2454,7 @@ module Iper3 =
   struct
     type t = (Adef.iper * int * M.relation_type)
     let compare (i1, _, _) (i2, _, _) =
-      Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
+      Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
   end
 
 module IperSet3 = Set.Make(Iper3) ;;

@@ -1787,7 +1787,7 @@ let robot_exclude_arg s =
   with _ ->
     Printf.eprintf "Bad use of option -robot_xcl\n";
     Printf.eprintf "Use option -help for usage.\n";
-    flush Pervasives.stderr;
+    flush Stdlib.stderr;
     exit 2
 
 let slashify s =

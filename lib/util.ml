@@ -2545,10 +2545,10 @@ let write_default_sosa conf key =
   let fname = base_path [] (conf.bname ^ ".gwf") in
   let tmp_fname = fname ^ "2" in
   let oc =
-    try Pervasives.open_out tmp_fname with
+    try Stdlib.open_out tmp_fname with
       Sys_error _ -> failwith "the gwf database is not writable"
   in
-  List.iter (fun (k, v) -> Pervasives.output_string oc (k ^ "=" ^ v ^ "\n"))
+  List.iter (fun (k, v) -> Stdlib.output_string oc (k ^ "=" ^ v ^ "\n"))
     gwf;
   close_out oc;
   rm (fname ^ "~") ;

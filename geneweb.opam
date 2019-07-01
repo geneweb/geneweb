@@ -39,6 +39,7 @@ depends: [
   "ounit"
   "piqi"
   "piqilib"
+  "stdlib-shims"
   "redis"
   "redis-sync"
   "yojson"

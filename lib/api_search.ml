@@ -306,7 +306,7 @@ module Iper =
   struct
     type t = Adef.iper
     let compare i1 i2 =
-      Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
+      Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
   end
 
 module IperSet = Set.Make(Iper)

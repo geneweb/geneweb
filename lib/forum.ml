@@ -117,7 +117,7 @@ module MF : MF =
       {ic_fname = fname; ic_chan = open_in_bin fname; ic_ext = 0}
     let input_char ic = input_char ic.ic_chan
     let rec input_line ic =
-      try Pervasives.input_line ic.ic_chan with
+      try Stdlib.input_line ic.ic_chan with
         End_of_file ->
           let ext = ic.ic_ext + 1 in
           let fn = ic.ic_fname ^ "." ^ string_of_int ext in
