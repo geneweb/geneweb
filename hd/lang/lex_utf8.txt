@@ -8478,6 +8478,17 @@ sl: %t se je poročil z/%t se je poročila z
 sv: gift%t med
 zh: %t配偶是
 
+    marriage contract%t with
+de: ehevertrag vom%t mit
+en: marriage contract%t with
+es: contrato de matrimonio%t con
+fi: avioliittosopimus%t kanssa
+fr: contrat de mariage%t avec
+it: contratto di matrimonio%t con
+no: ekteskapskontrakt%t med
+pt: contrato de casamento%t com
+sv: giftermål%t med
+
     maternal grand-parents
 co: caccari materni
 de: Großeltern mütterlicherseits

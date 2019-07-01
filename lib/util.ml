@@ -2102,7 +2102,8 @@ let relation_txt conf sex fam =
   | NotMarried
   | NoSexesCheckNotMarried ->
     ftransl_nth conf "relationship%t to" is
-  | MarriageContract
+  | MarriageContract  ->
+    ftransl_nth conf "marriage contract%t with" is
   | MarriageLicense
   | Married
   | NoSexesCheckMarried ->
