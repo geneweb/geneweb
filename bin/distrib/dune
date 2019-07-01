@@ -1,14 +1,14 @@
 (include_subdirs unqualified)
 
 (executables
-  (public_names connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
-  (modules connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
+  (public_names connex gwc1 gwd gwu mk_consang setup update_nldb)
+  (modules connex gwc1 gwd gwu mk_consang setup update_nldb)
   (libraries geneweb geneweb.wserver)
 )
 
 (executables
-  (public_names ged2gwb ged2gwb2)
-  (modules ged2gwb ged2gwb2 utf8List)
+  (public_names ged2gwb)
+  (modules ged2gwb utf8List)
   (libraries unix str camlp5.gramlib geneweb)
 )
 
