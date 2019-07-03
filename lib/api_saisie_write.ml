@@ -966,7 +966,7 @@ let compute_warnings conf base resp =
 
 let compute_modification_status conf base ip ifam resp =
   let (surname, first_name, occ, index_person, surname_str, first_name_str) =
-    if ip <> Gwdb.dummy_iper then ("", "", None, None, None, None)
+    if ip = Gwdb.dummy_iper then ("", "", None, None, None, None)
     else
       let p = poi base ip in
       let surname = sou base (get_surname p) in
