@@ -188,7 +188,6 @@ let family_m conf base =
         begin match mode with
           | "API_ALL_PERSONS" -> handler.api_all_persons
           | "API_ALL_FAMILIES" -> handler.api_all_families
-          | "API_ANNIVERSARY" -> handler.api_anniversary
           | "API_BASE_WARNINGS" -> handler.api_base_warnings
           | "API_CLOSE_PERSONS" -> handler.api_close_persons
           | "API_CPL_REL" -> handler.api_cpl_rel

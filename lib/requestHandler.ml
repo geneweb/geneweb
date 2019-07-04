@@ -386,7 +386,6 @@ and handler =
 #ifdef API
   ; api_all_persons : handler_base
   ; api_all_families : handler_base
-  ; api_anniversary : handler_base
   ; api_base_warnings : handler_base
   ; api_close_persons : handler_base
   ; api_cpl_rel : handler_base
@@ -565,7 +564,6 @@ let dummyHandler =
 #ifdef API
   ; api_all_persons = dummy_base
   ; api_all_families = dummy_base
-  ; api_anniversary = dummy_base
   ; api_base_warnings = dummy_base
   ; api_close_persons = dummy_base
   ; api_cpl_rel = dummy_base
@@ -1226,10 +1224,6 @@ let defaultHandler : handler =
 
   ; api_all_families = begin fun _self conf base ->
       Api.print_all_families conf base
-    end
-
-  ; api_anniversary = begin fun _self conf base ->
-      Api.print_birthday conf base
     end
 
   ; api_base_warnings = begin fun _self conf base ->
