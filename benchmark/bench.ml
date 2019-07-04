@@ -1,5 +1,3 @@
-open Geneweb
-
 let bench name n fn arg =
   ignore @@ Benchmark.latency1 ~name n fn arg
 
