@@ -774,7 +774,7 @@ let empty_piqi_person_full conf ref_person base_loop =
     n = sn;
     p = fn;
     oc = occ;
-    index = Int32.of_int 0;
+    index = Gwdb.string_of_iper Gwdb.dummy_iper;
     sex = `unknown;
     lastname = "";
     firstname = "";
@@ -1205,7 +1205,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   let sn = Name.lower surname in
   let fn = Name.lower first_name in
   let occ = Int32.of_int (get_occ p) in
-  let index = Int32.of_int (Adef.int_of_iper gen_p.key_index) in
+  let index = Gwdb.string_of_iper gen_p.key_index in
   let publicname = if gen_p.public_name = "" then None else Some gen_p.public_name in
   let aliases = gen_p.aliases in
   let qualifiers =
@@ -1337,22 +1337,18 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
     if p_auth then Some gen_p.psources
     else None
   in
-  let related =
-    List.map
-      (fun ip -> M.Internal_int32.({value=Int32.of_int (Adef.int_of_iper ip);}))
-      (get_related p)
-  in
+  let related = List.map string_of_iper (get_related p) in
   let rparents =
     List.map
       (fun rp ->
         let father =
           match rp.r_fath with
-          | Some ip -> Some (Int32.of_int (Adef.int_of_iper ip))
+          | Some ip -> Some (Gwdb.string_of_iper ip)
           | None -> None
         in
         let mother =
           match rp.r_moth with
-          | Some ip -> Some (Int32.of_int (Adef.int_of_iper ip))
+          | Some ip -> Some (Gwdb.string_of_iper ip)
           | None -> None
         in
         let source = rp.r_sources in
@@ -1372,15 +1368,10 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
         }))
       gen_p.rparents
   in
-  let families =
-    List.map
-      (fun ifam ->
-        M.Internal_int32.({value = Int32.of_int (Adef.int_of_ifam ifam);}))
-      (Array.to_list (get_family p))
-  in
+  let families = List.map Gwdb.string_of_ifam (Array.to_list (get_family p)) in
   let parents =
     match get_parents p with
-     | Some ifam -> Some (Int32.of_int (Adef.int_of_ifam ifam))
+     | Some ifam -> Some ((Gwdb.string_of_ifam ifam))
      | None -> None
   in
   let baseprefix = conf.command
@@ -1469,7 +1460,7 @@ let fam_to_piqi_family conf base ifam =
     authorized_age conf base (pget conf base ifath) &&
     authorized_age conf base (pget conf base imoth)
   in
-  let index = Int32.of_int (Adef.int_of_ifam ifam) in
+  let index = Gwdb.string_of_ifam ifam in
   let fsources =
     if m_auth then Some gen_f.fsources
     else None
@@ -1511,16 +1502,12 @@ let fam_to_piqi_family conf base ifam =
     | Separated -> (`separated, None)
   in
   let witnesses =
-    List.map
-      (fun ip -> M.Internal_int32.({value= Int32.of_int (Adef.int_of_iper ip);}))
-      (Array.to_list gen_f.witnesses)
+    List.map Gwdb.string_of_iper (Array.to_list gen_f.witnesses)
   in
-  let father = Int32.of_int (Adef.int_of_iper ifath) in
-  let mother = Int32.of_int (Adef.int_of_iper imoth) in
+  let father = Gwdb.string_of_iper ifath in
+  let mother = Gwdb.string_of_iper imoth in
   let children =
-    List.map
-      (fun ip -> M.Internal_int32.({value= Int32.of_int (Adef.int_of_iper ip);}))
-      (Array.to_list (get_children fam))
+    List.map Gwdb.string_of_iper (Array.to_list (get_children fam))
   in
   {
     M.Full_family.fsources = fsources;
@@ -1551,7 +1538,7 @@ let fam_to_piqi_family conf base ifam =
 (* *********************************************************************** *)
 let fam_to_piqi_family_link base (ifath, imoth) ifam fam =
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
-  let index = Int32.of_int (Adef.int_of_ifam ifam) in
+  let index = (Gwdb.string_of_ifam ifam) in
   let fsources = None in
   let marriage =
     match Adef.od_of_cdate gen_f.marriage with
@@ -1584,8 +1571,8 @@ let fam_to_piqi_family_link base (ifath, imoth) ifam fam =
     | Separated -> (`separated, None)
   in
   let witnesses = [] in
-  let father = Int32.of_int (Adef.int_of_iper ifath) in
-  let mother = Int32.of_int (Adef.int_of_iper imoth) in
+  let father = Gwdb.string_of_iper ifath in
+  let mother = Gwdb.string_of_iper imoth in
   (* TODO ? *)
   let children = [] in
   {
@@ -1755,7 +1742,7 @@ module App_date_converter = Date_converter (Mapp)
 (* ************************************************************************** *)
 let pers_to_piqi_app_person conf base p =
   let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-  let index = Int32.of_int (Adef.int_of_iper gen_p.key_index) in
+  let index = Gwdb.string_of_iper gen_p.key_index in
   let sex =
     match gen_p.sex with
     | Male -> `male
@@ -1849,22 +1836,18 @@ let pers_to_piqi_app_person conf base p =
         }))
       gen_p.titles
   in
-  let related =
-    List.map
-      (fun ip -> Int32.of_int (Adef.int_of_iper ip))
-      gen_p.related
-  in
+  let related = List.map Gwdb.string_of_iper gen_p.related in
   let rparents =
     List.map
       (fun rp ->
         let father =
           match rp.r_fath with
-          | Some ip -> Some (Int32.of_int (Adef.int_of_iper ip))
+          | Some ip -> Some (Gwdb.string_of_iper ip)
           | None -> None
         in
         let mother =
           match rp.r_moth with
-          | Some ip -> Some (Int32.of_int (Adef.int_of_iper ip))
+          | Some ip -> Some (Gwdb.string_of_iper ip)
           | None -> None
         in
         let source = rp.r_sources in
@@ -1892,13 +1875,11 @@ let pers_to_piqi_app_person conf base p =
   in
   let parents =
     match get_parents p with
-     | Some ifam -> Some (Int32.of_int (Adef.int_of_ifam ifam))
+     | Some ifam -> Some ((Gwdb.string_of_ifam ifam))
      | None -> None
   in
   let families =
-    List.map
-      (fun ifam -> Int32.of_int (Adef.int_of_ifam ifam))
-      (Array.to_list (get_family p))
+    List.map Gwdb.string_of_ifam (Array.to_list (get_family p))
   in
   let events =
     List.map
@@ -1931,7 +1912,7 @@ let pers_to_piqi_app_person conf base p =
                  | Witness_GodParent -> `witness_godparent
                  | Witness_Officer -> `witness_officer
                in
-               let index = Int32.of_int (Adef.int_of_iper ip) in
+               let index = Gwdb.string_of_iper ip in
                Mapp.Witness_event.({
                  witness_type = witness_type;
                  witness = index;
@@ -1940,7 +1921,7 @@ let pers_to_piqi_app_person conf base p =
         in
         let index_spouse =
           match isp with
-          | Some ip -> Some (Int32.of_int (Adef.int_of_iper ip))
+          | Some ip -> Some (Gwdb.string_of_iper ip)
           | None -> None
         in
         {
@@ -2009,7 +1990,7 @@ let fam_to_piqi_app_family base ifam =
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let ifath = get_father fam in
   let imoth = get_mother fam in
-  let index = Int32.of_int (Adef.int_of_ifam gen_f.fam_index) in
+  let index = (Gwdb.string_of_ifam gen_f.fam_index) in
   let marriage =
     match Adef.od_of_cdate gen_f.marriage with
     | Some d -> Some (App_date_converter.piqi_date_of_date d)
@@ -2042,15 +2023,15 @@ let fam_to_piqi_app_family base ifam =
   in
   let witnesses =
     List.map
-      (fun ip -> Int32.of_int (Adef.int_of_iper ip))
+      Gwdb.string_of_iper
       (Array.to_list gen_f.witnesses)
   in
   let fsources = gen_f.fsources in
-  let father = Int32.of_int (Adef.int_of_iper ifath) in
-  let mother = Int32.of_int (Adef.int_of_iper imoth) in
+  let father = Gwdb.string_of_iper ifath in
+  let mother = Gwdb.string_of_iper imoth in
   let children =
     List.map
-      (fun ip -> Int32.of_int (Adef.int_of_iper ip))
+      Gwdb.string_of_iper
       (Array.to_list (get_children fam))
   in
   {
@@ -2224,7 +2205,7 @@ let person_node_map conf base l =
     PFull
       (List.rev_map
          (fun p ->
-           let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
+           let id = Gwdb.string_of_iper (get_key_index p) in
            let p =
              pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
            in
@@ -2237,7 +2218,7 @@ let person_node_map conf base l =
     PLight
       (List.rev_map
          (fun p ->
-           let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
+           let id = Gwdb.string_of_iper (get_key_index p) in
            let p =
              pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
            in

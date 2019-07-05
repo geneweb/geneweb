@@ -8,8 +8,8 @@ open Def
 open Util
 open Api_update_util
 
-let reconstitute_person conf base mod_p =
-  let key_index = Int32.to_int mod_p.Mwrite.Person.index in
+let reconstitute_person conf base mod_p : ('a, string * string * int * Update.create * string, string) gen_person =
+  let key_index = Gwdb.iper_of_string mod_p.Mwrite.Person.index in
   let first_name = no_html_tags (only_printable mod_p.Mwrite.Person.firstname) in
   let surname = no_html_tags (only_printable mod_p.Mwrite.Person.lastname) in
   (* S'il y a des caractères interdits, on les supprime *)
@@ -151,16 +151,6 @@ let reconstitute_person conf base mod_p =
     match mod_p.Mwrite.Person.death_type with
     | `not_dead -> NotDead
     | `dead -> DeadDontKnowWhen
-        (*
-        (match mod_p.Mwrite.Person.death_date with
-         | Some date ->
-             begin
-               match Api_update_util.date_of_piqi_date conf date with
-               | Some date -> Death (Unspecified, Adef.cdate_of_date date)
-               | None -> DeadDontKnowWhen
-             end
-         | None -> DeadDontKnowWhen)
-        *)
     | `dead_young -> DeadYoung
     | `dead_dont_know_when -> DeadDontKnowWhen
     | `dont_know_if_dead -> DontKnowIfDead
@@ -310,7 +300,7 @@ let reconstitute_person conf base mod_p =
      death_src = death_src; burial = burial; burial_place = burial_place;
      burial_note = burial_note; burial_src = burial_src; notes = notes;
      pevents = pevents;
-     psources = psources; key_index = Adef.iper_of_int key_index}
+     psources = psources; key_index}
   in
   (* On vérifie s'il y a des conflits de personne. *)
   (* Normalement, il ne doit plus y avoir de lever *)
@@ -346,40 +336,28 @@ let reconstitute_person conf base mod_p =
         {(r) with r_fath = fath; r_moth = moth})
       rparents
   in
-  {(p) with rparents = rparents_gw; pevents = pevents_gw }
+  { p with rparents = rparents_gw; pevents = pevents_gw ; related = [] }
 
 (**/**)
 
 
 let print_add conf base mod_p =
   try
-    let sp = reconstitute_person conf base mod_p in
-    (* !!! Il faut mettre certaines informations à jour *)
-    (*
-    let fn = mod_p.Mwrite.Person.firstname in
-    let sn = mod_p.Mwrite.Person.lastname in
-    let occ = find_free_occ_nobase fn sn in
-    let sp = {(sp) with key_index = Adef.iper_of_int (-1); occ = occ } in
-    *)
-    let sp = {(sp) with key_index = Adef.iper_of_int (-1)} in
+    let sp : ('a, string * string * int * Update.create * string, string) gen_person = reconstitute_person conf base mod_p in
+    let sp = {(sp) with key_index = Gwdb.dummy_iper} in
     (* On met à jour les occ. *)
     if sp.occ <> 0 then mod_p.Mwrite.Person.occ <- Some (Int32.of_int sp.occ);
-    let sp = UpdateIndOk.strip_person sp in
-    match UpdateIndOk.check_person conf sp with
+    let sp : ('a, string * string * int * Update.create * string, string) gen_person = UpdateIndOk.strip_person sp in
+    match UpdateIndOk.check_person conf (sp : ('a, string * string * int * Update.create * string, string) gen_person) with
     | Some err ->
         (* Correspond au cas ou fn/sn = ""/"?" *)
         (* => ne devrait pas se produire       *)
         Api_update_util.UpdateError err
     | None ->
-        let (p, a) = UpdateIndOk.effective_add conf base sp in
+        let (p, a) = UpdateIndOk.effective_add conf base (sp : ('a, string * string * int * Update.create * string, string) gen_person) in
         let u = {family = get_family (poi base p.key_index)} in
         let wl = UpdateIndOk.all_checks_person base p a u in
-        (* Déplacé dans Api_saisie_write.compute_modification_status *)
-        (*Util.commit_patches conf base;*)
         let changed = U_Add_person (Util.string_gen_person base p) in
-        (*
-        History.record conf base changed "ap";
-        *)
         let hr = [(fun () -> History.record conf base changed "ap")] in
         Api_update_util.UpdateSuccess (wl, [], hr)
   with
@@ -399,20 +377,14 @@ let print_del conf base ip =
   patch_person base ip p;
   delete_key base fn sn occ;
   Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
-  (* Déplacé dans Api_saisie_write.compute_modification_status *)
-  (*Util.commit_patches conf base;*)
   let changed = U_Delete_person op in
-  (*
-  History.record conf base changed "dp";
-  *)
   let hr = [(fun () -> History.record conf base changed "dp")] in
   Api_update_util.UpdateSuccess ([], [], hr)
-;;
 
 
 let print_mod_aux conf base mod_p callback =
   try
-    let p = reconstitute_person conf base mod_p in
+    let p : ('a, string * string * int * Update.create * string, string) gen_person = reconstitute_person conf base mod_p in
     let p = UpdateIndOk.strip_person p in
     let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
     let digest = Update.digest_person ini_ps in
@@ -430,14 +402,12 @@ let print_mod_aux conf base mod_p callback =
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
-;;
 
 
 let print_mod conf base mod_p =
-  let ip = Int32.to_int mod_p.Mwrite.Person.index in
+  let ip = Gwdb.iper_of_string mod_p.Mwrite.Person.index in
   let o_p =
-    Util.string_gen_person
-      base (gen_person_of_person (poi base (Adef.iper_of_int ip)))
+    Util.string_gen_person base (gen_person_of_person (poi base ip))
   in
   let callback p =
     begin
@@ -473,20 +443,7 @@ let print_mod conf base mod_p =
         let a = {parents = get_parents a; consang = get_consang a} in
         UpdateIndOk.all_checks_person base p a u
       in
-      (* Déplacé dans Api_saisie_write.compute_modification_status *)
-      (*Util.commit_patches conf base;*)
       let changed = U_Modify_person (o_p, (Util.string_gen_person base p)) in
-      (*
-      History.record conf base changed "mp";
-      *)
-      (*
-      if not (is_quest_string p.surname) &&
-         not (is_quest_string p.first_name) &&
-         not (is_old_person conf p)
-      then
-        Update.delete_topological_sort_v conf base
-      else ();
-      *)
       let hr =
         [(fun () -> History.record conf base changed "mp");
          (fun () ->
@@ -501,7 +458,6 @@ let print_mod conf base mod_p =
     end
   in
   print_mod_aux conf base mod_p callback
-;;
 
 
 (**/**) (* Fonctions pour la première saisie, i.e. on n'a pas de base ! *)
@@ -522,11 +478,10 @@ let find_free_occ_nobase fn sn =
       Hashtbl.add ht_occ key (succ occ);
       occ
     end
-;;
 
 
 let reconstitute_person_nobase conf mod_p =
-  let key_index = Int32.to_int mod_p.Mwrite.Person.index in
+  let key_index = Gwdb.iper_of_string mod_p.Mwrite.Person.index in
   let first_name = no_html_tags (only_printable mod_p.Mwrite.Person.firstname) in
   let surname = no_html_tags (only_printable mod_p.Mwrite.Person.lastname) in
   (* S'il y a des caractères interdits, on les supprime *)
@@ -561,24 +516,6 @@ let reconstitute_person_nobase conf mod_p =
         (* Impossible ! On ne peut pas lier, il n'y a pas de base. *)
         failwith "ErrorAddPersonNoBase"
   in
-  (*
-  let occ =
-    match
-      Gutil.person_of_string_key
-        base (first_name ^ "." ^ string_of_int occ ^ " " ^ surname)
-    with
-    | Some ip ->
-        if Adef.int_of_iper ip = key_index then occ
-        else
-          let occ = Api_update_util.find_free_occ base first_name surname in
-          let () =
-            if occ = 0 then mod_p.Mwrite.Person.occ <- None
-            else mod_p.Mwrite.Person.occ <- Some (Int32.of_int occ)
-          in
-          occ
-    | None -> occ
-  in
-  *)
   let image =
     match mod_p.Mwrite.Person.image with
     | Some s -> only_printable s
@@ -648,113 +585,6 @@ let reconstitute_person_nobase conf mod_p =
           t_nth = t_nth } )
       mod_p.Mwrite.Person.titles
   in
-  (* Non autorisé, à cause des problèmes de liaisons de personnes. *)
-  (*
-  let rparents =
-    List.fold_right
-      (fun r accu ->
-        match r.Mwrite.Relation_parent.person with
-        | Some person ->
-            let r_type =
-              match r.Mwrite.Relation_parent.rpt_type with
-              | `rpt_adoption_father | `rpt_adoption_mother -> Adoption
-              | `rpt_recognition_father | `rpt_recognition_mother -> Recognition
-              | `rpt_candidate_parent_father | `rpt_candidate_parent_mother -> CandidateParent
-              | `rpt_god_parent_father | `rpt_god_parent_mother -> GodParent
-              | `rpt_foster_parent_father | `rpt_foster_parent_mother -> FosterParent
-            in
-            let create_link = person.Mwrite.Person_link.create_link in
-            let (r_fath, r_moth) =
-              match create_link with
-              | `create_default_occ ->
-                  let sex =
-                    match person.Mwrite.Person_link.sex with
-                    | `male -> Male
-                    | `female -> Female
-                    | `unknown -> Neuter
-                  in
-                  let fn = person.Mwrite.Person_link.firstname in
-                  let sn = person.Mwrite.Person_link.lastname in
-                  let occ = 0 in
-                  (Some (fn, sn, occ, Update.Create (sex, None), ""), None)
-              | `create ->
-                  let sex =
-                    match person.Mwrite.Person_link.sex with
-                    | `male -> Male
-                    | `female -> Female
-                    | `unknown -> Neuter
-                  in
-                  let fn = person.Mwrite.Person_link.firstname in
-                  let sn = person.Mwrite.Person_link.lastname in
-                  let occ = find_free_occ_nobase fn sn in
-                  (*
-                  let occ = Api_update_util.find_free_occ base fn sn in
-                  *)
-                  (* On met à jour parce que si on veut le rechercher, *)
-                  (* il faut qu'on connaisse son occ.                  *)
-                  let () =
-                    if occ = 0 then person.Mwrite.Person_link.occ <- None
-                    else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
-                  in
-                  (Some (fn, sn, occ, Update.Create (sex, None), ""), None)
-              | `link ->
-                  (* impossible *)
-                  (match person.Mwrite.Person_link.sex with
-                   | `male ->
-                       let ip = Int32.to_int person.Mwrite.Person_link.index in
-                       let p = poi base (Adef.iper_of_int ip) in
-                       let fn = sou base (get_first_name p) in
-                       let sn = sou base (get_surname p) in
-                       let occ =
-                         if fn = "?" || sn = "?" then
-                           Adef.int_of_iper (get_key_index p)
-                         else get_occ p
-                       in
-                       (*
-                       let fn = person.Mwrite.Person_link.firstname in
-                       let sn = person.Mwrite.Person_link.lastname in
-                       let occ =
-                         get_occ
-                           (poi base
-                              (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
-                       in
-                       *)
-                       (Some (fn, sn, occ, Update.Link, ""), None)
-                   | _ ->
-                       let ip = Int32.to_int person.Mwrite.Person_link.index in
-                       let p = poi base (Adef.iper_of_int ip) in
-                       let fn = sou base (get_first_name p) in
-                       let sn = sou base (get_surname p) in
-                       let occ =
-                         if fn = "?" || sn = "?" then
-                           Adef.int_of_iper (get_key_index p)
-                         else get_occ p
-                       in
-                       (*
-                       let fn = person.Mwrite.Person_link.firstname in
-                       let sn = person.Mwrite.Person_link.lastname in
-                       let occ =
-                         get_occ
-                           (poi base
-                              (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
-                       in
-                       *)
-                       (None, Some (fn, sn, occ, Update.Link, "")))
-            in
-            let r_sources =
-              match r.Mwrite.Relation_parent.source with
-              | Some s -> s
-              | None -> ""
-            in
-            let r =
-              { r_type = r_type; r_fath = r_fath;
-                r_moth = r_moth; r_sources = r_sources }
-            in
-            r :: accu
-        | None -> accu)
-      mod_p.Mwrite.Person.rparents []
-  in
-  *)
   let rparents = [] in
   let access =
     match mod_p.Mwrite.Person.access with
@@ -777,16 +607,6 @@ let reconstitute_person_nobase conf mod_p =
     match mod_p.Mwrite.Person.death_type with
     | `not_dead -> NotDead
     | `dead -> DeadDontKnowWhen
-        (*
-        (match mod_p.Mwrite.Person.death_date with
-         | Some date ->
-             begin
-               match Api_update_util.date_of_piqi_date conf date with
-               | Some date -> Death (Unspecified, Adef.cdate_of_date date)
-               | None -> DeadDontKnowWhen
-             end
-         | None -> DeadDontKnowWhen)
-        *)
     | `dead_young -> DeadYoung
     | `dead_dont_know_when -> DeadDontKnowWhen
     | `dont_know_if_dead -> DontKnowIfDead
@@ -888,80 +708,6 @@ let reconstitute_person_nobase conf mod_p =
           | Some src -> only_printable src
           | None -> ""
         in
-        (* Non autorisé, à cause des problèmes de liaisons de personnes. *)
-        (*
-        let witnesses =
-          List.fold_right
-            (fun witness accu ->
-              match witness.Mwrite.Witness.person with
-              | Some person ->
-                  let wk =
-                    match witness.Mwrite.Witness.witness_type with
-                    | `witness -> Witness
-                    | `witness_godparent -> Witness_GodParent
-                  in
-                  let create_link = person.Mwrite.Person_link.create_link in
-                  let wit =
-                    (match create_link with
-                     | `create_default_occ ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | `unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ = 0 in
-                         ((fn, sn, occ, Update.Create (sex, None), ""), wk)
-                     | `create ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | ` unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ = find_free_occ_nobase fn sn in
-                         (*
-                         let occ = Api_update_util.find_free_occ base fn sn in
-                         *)
-                         (* On met à jour parce que si on veut le rechercher, *)
-                         (* il faut qu'on connaisse son occ.                  *)
-                         let () =
-                           if occ = 0 then person.Mwrite.Person_link.occ <- None
-                           else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
-                         in
-                         ((fn, sn, occ, Update.Create (sex, None), ""), wk)
-                     | `link ->
-                         (* impossible *)
-                         let ip = Int32.to_int person.Mwrite.Person_link.index in
-                         let p = poi base (Adef.iper_of_int ip) in
-                         let fn = sou base (get_first_name p) in
-                         let sn = sou base (get_surname p) in
-                         let occ =
-                           if fn = "?" || sn = "?" then
-                             Adef.int_of_iper (get_key_index p)
-                           else get_occ p
-                         in
-                         (*
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ =
-                           get_occ
-                             (poi base
-                                (Adef.iper_of_int
-                                   (Int32.to_int person.Mwrite.Person_link.index)))
-                         in
-                         *)
-                         ((fn, sn, occ, Update.Link, ""), wk))
-                  in
-                  wit :: accu
-              | None -> accu)
-            evt.Mwrite.Pevent.witnesses []
-        in
-        *)
         let witnesses = [] in
         (* strip evenement vide *)
         if name = Epers_Death && date = None && place = "" &&
@@ -991,13 +737,6 @@ let reconstitute_person_nobase conf mod_p =
   let (burial, burial_place, burial_note, burial_src) = bu in
   (* Maintenant qu'on a propagé les évènements, on a *)
   (* peut-être besoin de refaire un infer_death.     *)
-  (*
-  let death =
-    match death with
-    | DontKnowIfDead -> Update.infer_death conf birth baptism
-    | _ -> death
-  in
-  *)
   {first_name = first_name; surname = surname; occ = occ; image = image;
    first_names_aliases = first_names_aliases;
    surnames_aliases = surnames_aliases; public_name = public_name;
@@ -1011,7 +750,7 @@ let reconstitute_person_nobase conf mod_p =
    death_src = death_src; burial = burial; burial_place = burial_place;
    burial_note = burial_note; burial_src = burial_src; notes = notes;
    pevents = pevents;
-   psources = psources; key_index = Adef.iper_of_int key_index}
+   psources = psources; key_index}
 (* On vérifie s'il y a des conflits de personne. *)
 (* Normalement, il ne doit plus y avoir de lever *)
 (* de conflits par les autres modules : update,  *)
@@ -1021,14 +760,7 @@ let reconstitute_person_nobase conf mod_p =
 let print_add_nobase conf mod_p =
   try
     let sp = reconstitute_person_nobase conf mod_p in
-    (* !!! Il faut mettre certaines informations à jour *)
-    (*
-    let fn = mod_p.Mwrite.Person.firstname in
-    let sn = mod_p.Mwrite.Person.lastname in
-    let occ = find_free_occ_nobase fn sn in
-    let sp = {(sp) with key_index = Adef.iper_of_int (-1); occ = occ } in
-    *)
-    let sp = {(sp) with key_index = Adef.iper_of_int (-1)} in
+    let sp = {(sp) with key_index = Gwdb.dummy_iper} in
     (* On met à jour les occ. *)
     if sp.occ <> 0 then mod_p.Mwrite.Person.occ <- Some (Int32.of_int sp.occ);
     let _sp = UpdateIndOk.strip_person sp in

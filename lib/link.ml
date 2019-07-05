@@ -11,19 +11,19 @@ open Config
 (* La clé du cache est toujours (bname, ip) et on stocke les objets proto. *)
 
 (* Cache qui permet de savoir si une personne a des parents. *)
-let (ht_parents_cache : ((string * Def.iper), MLink.Family.t) Hashtbl.t) = Hashtbl.create 1 ;;
+let (ht_parents_cache : ((string * Gwdb.iper), MLink.Family.t) Hashtbl.t) = Hashtbl.create 1 ;;
 
 (* Cache qui permet de savoir si une personne des familles *)
-let (ht_families_cache : ((string * Def.iper), MLink.Family_link.t list) Hashtbl.t) = Hashtbl.create 1 ;;
+let (ht_families_cache : ((string * Gwdb.iper), MLink.Family_link.t list) Hashtbl.t) = Hashtbl.create 1 ;;
 
 (* Cache qui permet de savoir si pour un ifam donné, on a une famille *)
-let (ht_family_cache : ((string * Def.ifam), MLink.Family.t) Hashtbl.t) = Hashtbl.create 1 ;;
+let (ht_family_cache : ((string * Gwdb.ifam), MLink.Family.t) Hashtbl.t) = Hashtbl.create 1 ;;
 
 (* Cache qui permet de savoir si pour un iper donnée, on a une personne *)
-let (ht_person_cache : ((string * Def.iper), MLink.Person.t) Hashtbl.t) = Hashtbl.create 1 ;;
+let (ht_person_cache : ((string * Gwdb.iper), MLink.Person.t) Hashtbl.t) = Hashtbl.create 1 ;;
 
 (* Cache qui permet de connaître toutes les correspondances inter-arbre entre les personnes. *)
-let (ht_corresp : ((string * Def.iper), (string * Def.iper)) Hashtbl.t) = Hashtbl.create 1 ;;
+let (ht_corresp : ((string * Gwdb.iper), (string * Gwdb.iper)) Hashtbl.t) = Hashtbl.create 1 ;;
 
 
 (**/**) (* Quelques outils. *)
@@ -72,7 +72,7 @@ let chop_base_prefix base_prefix =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
-  let index = Some (Int32.of_int (Adef.int_of_iper ip)) in
+  let index = Some (Gwdb.string_of_iper ip) in
   let base_prefix = chop_base_prefix base_prefix in
   let data =
     MLink.Link_tree_params.({
@@ -142,13 +142,13 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
     (fun fam ->
        let base_prefix = fam.MLink.Family.baseprefix in
        let base_prefix = chop_base_prefix base_prefix in
-       let ifam = Adef.ifam_of_int (Int32.to_int fam.MLink.Family.ifam) in
+       let ifam = Gwdb.ifam_of_string fam.MLink.Family.ifam in
        Hashtbl.add ht_family_cache (base_prefix, ifam) fam;
        List.iter
          (fun c ->
            let base_prefix = c.MLink.Person_link.baseprefix in
            let base_prefix = chop_base_prefix base_prefix in
-           let ic = Adef.iper_of_int (Int32.to_int c.MLink.Person_link.ip) in
+           let ic = Gwdb.iper_of_string c.MLink.Person_link.ip in
            Hashtbl.add ht_parents_cache (base_prefix, ic) fam)
          fam.MLink.Family.children)
     families.MLink.Link_tree.families;
@@ -158,7 +158,7 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
     (fun p ->
        let base_prefix = p.MLink.Person.baseprefix in
        let base_prefix = chop_base_prefix base_prefix in
-       let ip = Adef.iper_of_int (Int32.to_int p.MLink.Person.ip) in
+       let ip = Gwdb.iper_of_string p.MLink.Person.ip in
        Hashtbl.add ht_person_cache (base_prefix, ip) p;
        let faml_cache =
          try Hashtbl.find ht_families_cache (base_prefix, ip) with
