@@ -2574,19 +2574,24 @@ let create_topological_sort conf base =
            in
            let r =
              try
-               let ic = Secure.open_in_bin tstab_file in
-               let r =
-                 try Some (Marshal.from_channel ic)
-                 with End_of_file | Failure _ ->
-                   (* tstab is probably corrupted *)
-                   Sys.remove tstab_file ;
-                   None
-               in
-               close_in ic; r
-             with Sys_error _ -> None
+               (* Let's invalidate tstab if it is too old. *)
+               if Unix.time () -. (Unix.stat tstab_file).Unix.st_mtime > 86400. (* one day *)
+               then (Sys.remove tstab_file ; None)
+               else
+                 let ic = Secure.open_in_bin tstab_file in
+                 let r =
+                   try Some (Marshal.from_channel ic)
+                   with End_of_file | Failure _ ->
+                     (* tstab is probably corrupted *)
+                     Sys.remove tstab_file ;
+                     None
+                 in
+                 close_in ic;
+                 r
+             with _ -> None
            in
            match r with
-             Some tstab -> tstab
+           | Some tstab -> tstab
            | None ->
              let () = load_ascends_array base in
              let () = load_couples_array base in
@@ -2595,12 +2600,10 @@ let create_topological_sort conf base =
              then
                base_visible_write base;
              begin
-               try
-                 let oc = Secure.open_out_bin tstab_file in
-                 Marshal.to_channel oc tstab
-                   [ Marshal.No_sharing ; Marshal.Closures ] ;
-                 close_out oc
-               with Sys_error _ -> ()
+               let oc = Secure.open_out_bin tstab_file in
+               Marshal.to_channel oc tstab
+                 [ Marshal.No_sharing ; Marshal.Closures ] ;
+               close_out oc
              end;
              tstab)
 
