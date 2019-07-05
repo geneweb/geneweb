@@ -68,11 +68,9 @@ let censor_base base per_tab fam_tab flag threshold =
     censor_person base per_tab flag threshold i false
     ) (Gwdb.ipers base)
 
-(* FIXME!!!! *)
-(* !!!!! base_visible_get !!!!! *)
 let restrict_base base per_tab fam_tab flag =
   Gwdb.Collection.iter (fun i ->
-      if base_visible_get base (fun _ -> false) (Obj.magic i)
+      if base_visible_get base (fun _ -> false) i
       then Gwdb.Marker.set per_tab i (Gwdb.Marker.get per_tab i lor flag)
     ) (Gwdb.ipers base) ;
   Gwdb.Collection.iter (fun i ->
