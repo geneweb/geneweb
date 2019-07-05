@@ -2322,8 +2322,8 @@ let add_indi gen r =
   (* On tri les évènements pour être sûr. *)
   let pevents =
     CheckItem.sort_events
-      ((fun evt -> CheckItem.Psort evt.epers_name),
-       (fun evt -> evt.epers_date))
+      (fun evt -> CheckItem.Psort evt.epers_name)
+      (fun evt -> evt.epers_date)
       pevents
   in
   let (bi, bp, de, bu) =
@@ -2861,7 +2861,8 @@ let add_fam_norm gen r adop_list =
   (* On tri les évènements pour être sûr. *)
   let fevents =
     CheckItem.sort_events
-      ((fun evt -> CheckItem.Fsort evt.efam_name), (fun evt -> evt.efam_date))
+      (fun evt -> CheckItem.Fsort evt.efam_name)
+      (fun evt -> evt.efam_date)
       fevents
   in
   let (marr, witn, div) =

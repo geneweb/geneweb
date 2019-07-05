@@ -653,8 +653,8 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   (* On tri les évènements pour être sûr. *)
   let fevents =
     CheckItem.sort_events
-      ((fun (name, _, _, _, _, _, _) -> CheckItem.Fsort name),
-       (fun (_, date, _, _, _, _, _) -> date))
+      (fun (name, _, _, _, _, _, _) -> CheckItem.Fsort name)
+      (fun (_, date, _, _, _, _, _) -> date)
       fevtl
   in
   let fevents =
@@ -767,8 +767,8 @@ let insert_pevents fname gen sb pevtl =
   else
     let pevents =
       CheckItem.sort_events
-        ((fun (name, _, _, _, _, _, _) -> CheckItem.Psort name),
-         (fun (_, date, _, _, _, _, _) -> date))
+        (fun (name, _, _, _, _, _, _) -> CheckItem.Psort name)
+        (fun (_, date, _, _, _, _, _) -> date)
         pevtl
     in
     let pevents =

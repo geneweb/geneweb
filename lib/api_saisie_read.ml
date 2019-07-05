@@ -1234,11 +1234,11 @@ let get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers
       (* On tri les témoins dans le même ordre que les évènements. *)
       let events_witnesses =
         CheckItem.sort_events
-          ((fun (_, _, (name, _, _, _, _, _, _)) ->
-            match name with
-            | Perso.Pevent n -> CheckItem.Psort n
-            | Perso.Fevent n -> CheckItem.Fsort n),
-           (fun (_, _, (_, date, _, _, _, _, _)) -> date))
+          (fun (_, _, (name, _, _, _, _, _, _)) ->
+             match name with
+             | Perso.Pevent n -> CheckItem.Psort n
+             | Perso.Fevent n -> CheckItem.Fsort n)
+          (fun (_, _, (_, date, _, _, _, _, _)) -> date)
           events_witnesses
       in
       List.map
