@@ -5,13 +5,13 @@
 (executables
   (public_names connex gwb2ged gwd gwdiff gwu setup update_nldb)
   (modules connex gwb2ged gwdiff gwd gwu setup update_nldb)
-  (libraries str %%%GWDB_PKG%%% geneweb geneweb.wserver)
+  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb.wserver geneweb)
 )
 
 (executables
   (public_names gwtp)
   (modules gwtp httpEnv iolight)
-  (libraries %%%GWDB_PKG%%% geneweb)
+  (libraries unix geneweb.wserver %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
 )
 
 (rule (copy mk_consang/mk_consang.ml consang.ml))
@@ -19,22 +19,22 @@
   (public_name consang)
   (modules consang)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries %%%GWDB_PKG%%% geneweb)
+  (libraries unix geneweb.wserver %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
 )
 
 #ifdef GWDB1
-(library (name db1link) (wrapped false) (libraries geneweb.gwdb1 geneweb) (modules db1link))
+(library (name db1link) (wrapped false) (libraries unix geneweb.wserver geneweb.gwdb1 geneweb) (modules db1link))
 (rule (copy gwc/gwc1.ml gwc.ml))
 (rule (copy ged2gwb/ged2gwb1.ml ged2gwb.ml))
 (executable
   (public_name gwc)
   (modules gwc)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries geneweb.gwdb1 geneweb geneweb.wserver db1link)
+  (libraries unix geneweb.wserver geneweb.gwdb1 geneweb db1link)
 )
 (executable
   (public_name ged2gwb)
   (modules ged2gwb utf8List)
-  (libraries unix str camlp5.gramlib geneweb.gwdb1 geneweb)
+  (libraries unix str camlp5.gramlib geneweb.wserver geneweb.gwdb1 geneweb)
 )
 #endif

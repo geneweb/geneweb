@@ -13,7 +13,7 @@
             geneweb.gwdb.mli
             geneweb.def
             geneweb.util
-            geneweb.wserver
+            geneweb.wserver.mli
             markup)
  (modules_without_implementation config templAst)
 )
