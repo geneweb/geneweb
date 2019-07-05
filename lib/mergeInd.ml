@@ -108,14 +108,14 @@ let print_differences conf base branches p1 p2 =
     (fun p ->
        match Adef.od_of_cdate (get_birth p) with
          None -> ""
-       | Some d -> Date.string_of_ondate conf d);
+       | Some d -> DateDisplay.string_of_ondate conf d);
   string_field (transl conf "birth" ^ " / " ^ transl conf "place")
     "birth_place" (fun p -> sou base (get_birth_place p));
   string_field (transl conf "baptism") "baptism"
     (fun p ->
        match Adef.od_of_cdate (get_baptism p) with
          None -> ""
-       | Some d -> Date.string_of_ondate conf d);
+       | Some d -> DateDisplay.string_of_ondate conf d);
   string_field (transl conf "baptism" ^ " / " ^ transl conf "place")
     "baptism_place" (fun p -> sou base (get_baptism_place p));
   string_field (transl conf "death") "death"
@@ -132,7 +132,7 @@ let print_differences conf base branches p1 p2 =
              | Disappeared -> transl_nth conf "disappeared" is
              | Unspecified -> transl_nth conf "died" is
            in
-           s ^ " " ^ Date.string_of_ondate conf (Adef.date_of_cdate cd)
+           s ^ " " ^ DateDisplay.string_of_ondate conf (Adef.date_of_cdate cd)
        | DeadYoung -> transl_nth conf "died young" is
        | DeadDontKnowWhen -> transl_nth conf "died" is
        | DontKnowIfDead | OfCourseDead -> "");
@@ -147,12 +147,12 @@ let print_differences conf base branches p1 p2 =
            transl_nth conf "buried" is ^
            (match Adef.od_of_cdate cod with
               None -> ""
-            | Some d -> " " ^ Date.string_of_ondate conf d)
+            | Some d -> " " ^ DateDisplay.string_of_ondate conf d)
        | Cremated cod ->
            transl_nth conf "cremated" is ^
            (match Adef.od_of_cdate cod with
               None -> ""
-            | Some d -> " " ^ Date.string_of_ondate conf d));
+            | Some d -> " " ^ DateDisplay.string_of_ondate conf d));
   string_field (transl conf "burial" ^ " / " ^ transl conf "place")
     "burial_place" (fun p -> sou base (get_burial_place p));
   Wserver.printf
@@ -277,9 +277,9 @@ let propose_merge_ind conf base branches p1 p2 =
              "<tr align=\"%s\"><td>%s%s</td><td>%s%s</td></tr>"
              conf.left
              (referenced_person_text conf base p1)
-             (Date.short_dates_text conf base p1)
+             (DateDisplay.short_dates_text conf base p1)
              (referenced_person_text conf base p2)
-             (Date.short_dates_text conf base p2))
+             (DateDisplay.short_dates_text conf base p2))
         ((get_iper p1, get_iper p2) :: branches);
       Wserver.printf "</table>\n"
     end ;

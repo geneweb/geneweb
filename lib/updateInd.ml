@@ -146,7 +146,7 @@ and eval_simple_var conf base env p =
             in
             let date =
               match Adef.od_of_cdate e.epers_date with
-                Some d -> Date.string_of_date conf d
+                Some d -> DateDisplay.string_of_date conf d
               | None -> ""
             in
             let place = Util.string_of_place conf (sou base e.epers_place) in

@@ -512,7 +512,7 @@ and eval_date_var conf date =
         Dgreg (d, _) -> VVstring (string_of_int d.month)
       | _ -> VVstring ""
       end
-  | [] -> VVstring (Util.translate_eval (Date.string_of_date conf date))
+  | [] -> VVstring (Util.translate_eval (DateDisplay.string_of_date conf date))
   | _ -> raise Not_found
 and eval_message_text_var conf base str so =
   function

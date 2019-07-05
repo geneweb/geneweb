@@ -202,7 +202,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
             in
             let date =
               match Adef.od_of_cdate e.efam_date with
-                Some d -> Date.string_of_date conf d
+                Some d -> DateDisplay.string_of_date conf d
               | None -> ""
             in
             let place = Util.string_of_place conf (sou base e.efam_place) in
@@ -890,7 +890,7 @@ let print_change_order conf base =
                 else "." ^ string_of_int (get_occ p));
              Wserver.printf "  &amp;";
              Wserver.printf "%s\n"
-               (Date.short_marriage_date_text conf base fam p sp);
+               (DateDisplay.short_marriage_date_text conf base fam p sp);
              Wserver.printf "%s%s %s" (p_first_name base sp)
                (if get_occ sp = 0 then ""
                 else "." ^ string_of_int (get_occ sp))

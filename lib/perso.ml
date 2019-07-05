@@ -24,7 +24,7 @@ let string_of_marriage_text conf base fam =
   let marriage_place = sou base (get_marriage_place fam) in
   let s =
     match marriage with
-      Some d -> " " ^ Date.string_of_ondate conf d
+      Some d -> " " ^ DateDisplay.string_of_ondate conf d
     | _ -> ""
   in
   match marriage_place with
@@ -89,7 +89,7 @@ let string_of_title conf base and_txt p (nth, name, title, places, dates) =
         (fun first (date_start, date_end) ->
            if not first then Buffer.add_string b ",\n";
            begin match date_start with
-             Some d -> Buffer.add_string b (Date.string_of_date conf d)
+             Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
            | None -> ()
            end;
            begin match date_end with
@@ -100,7 +100,7 @@ let string_of_title conf base and_txt p (nth, name, title, places, dates) =
            | _ -> ()
            end;
            begin match date_end with
-             Some d -> Buffer.add_string b (Date.string_of_date conf d)
+             Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
            | None -> ()
            end;
            false)
@@ -534,8 +534,8 @@ let get_death_text conf p p_auth =
         let d = Adef.date_of_cdate d in
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            Date.string_of_ondate tmp_conf d ^ Date.get_wday tmp_conf d
-        | _ -> Date.string_of_ondate tmp_conf d
+            DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
+        | _ -> DateDisplay.string_of_ondate tmp_conf d
         end
     | _ -> ""
   in
@@ -564,8 +564,8 @@ let get_baptism_text conf p p_auth =
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            Date.string_of_ondate tmp_conf d ^ Date.get_wday tmp_conf d
-        | _ -> Date.string_of_ondate tmp_conf d
+            DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
+        | _ -> DateDisplay.string_of_ondate tmp_conf d
         end
     | _ -> ""
   in
@@ -594,8 +594,8 @@ let get_birth_text conf p p_auth =
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            Date.string_of_ondate tmp_conf d ^ Date.get_wday tmp_conf d
-        | _ -> Date.string_of_ondate tmp_conf d
+            DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
+        | _ -> DateDisplay.string_of_ondate tmp_conf d
         end
     | _ -> ""
   in
@@ -618,8 +618,8 @@ let get_marriage_date_text conf fam p_auth =
     true, Some d ->
       begin match p_getenv conf.base_env "long_date" with
         Some "yes" ->
-          Date.string_of_ondate tmp_conf d ^ Date.get_wday tmp_conf d
-      | _ -> Date.string_of_ondate tmp_conf d
+          DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
+      | _ -> DateDisplay.string_of_ondate tmp_conf d
       end
   | _ -> ""
 
@@ -648,8 +648,8 @@ let get_burial_text conf p p_auth =
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
-                Date.string_of_ondate tmp_conf d ^ Date.get_wday tmp_conf d
-            | _ -> Date.string_of_ondate tmp_conf d
+                DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
+            | _ -> DateDisplay.string_of_ondate tmp_conf d
             end
         | _ -> ""
         end
@@ -682,8 +682,8 @@ let get_cremation_text conf p p_auth =
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
-                Date.string_of_ondate tmp_conf d ^ Date.get_wday tmp_conf d
-            | _ -> Date.string_of_ondate tmp_conf d
+                DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
+            | _ -> DateDisplay.string_of_ondate tmp_conf d
             end
         | _ -> ""
         end
@@ -1162,7 +1162,7 @@ let get_date_place conf base auth_for_all_anc p =
       else
         match d2 with
           Some (Dgreg (d, _)) ->
-            let a = CheckItem.time_elapsed d conf.today in
+            let a = Date.time_elapsed d conf.today in
             Util.strictly_after_private_years conf a
         | _ -> false
     in
@@ -2034,9 +2034,9 @@ and eval_simple_str_var conf base env (_, p_auth) =
                 Some d when m_auth ->
                   begin match p_getenv conf.base_env "long_date" with
                     Some "yes" ->
-                      " <em>" ^ Date.string_of_ondate conf d ^
-                      Date.get_wday conf d ^ "</em>"
-                  | _ -> " <em>" ^ Date.string_of_ondate conf d ^ "</em>"
+                      " <em>" ^ DateDisplay.string_of_ondate conf d ^
+                      DateDisplay.get_wday conf d ^ "</em>"
+                  | _ -> " <em>" ^ DateDisplay.string_of_ondate conf d ^ "</em>"
                   end
               | _ -> ""
               end
@@ -2052,9 +2052,9 @@ and eval_simple_str_var conf base env (_, p_auth) =
                     Some d when m_auth ->
                       begin match p_getenv conf.base_env "long_date" with
                         Some "yes" ->
-                          " <em>" ^ Date.string_of_ondate conf d ^
-                          Date.get_wday conf d ^ "</em>"
-                      | _ -> " <em>" ^ Date.string_of_ondate conf d ^ "</em>"
+                          " <em>" ^ DateDisplay.string_of_ondate conf d ^
+                          DateDisplay.get_wday conf d ^ "</em>"
+                      | _ -> " <em>" ^ DateDisplay.string_of_ondate conf d ^ "</em>"
                       end
                   | _ -> ""
                   end
@@ -2069,7 +2069,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             Divorced d ->
               let d = Adef.od_of_cdate d in
               begin match d with
-                Some d when m_auth -> Date.string_slash_of_date conf d
+                Some d when m_auth -> DateDisplay.string_slash_of_date conf d
               | _ -> ""
               end
           | _ -> raise Not_found
@@ -2242,8 +2242,8 @@ and eval_simple_str_var conf base env (_, p_auth) =
             true, Some s ->
               begin match p_getenv conf.base_env "long_date" with
                 Some "yes" ->
-                  Date.string_of_ondate conf s ^ Date.get_wday conf s
-              | _ -> Date.string_of_ondate conf s
+                  DateDisplay.string_of_ondate conf s ^ DateDisplay.get_wday conf s
+              | _ -> DateDisplay.string_of_ondate conf s
               end
           | _ -> ""
           end
@@ -2254,8 +2254,8 @@ and eval_simple_str_var conf base env (_, p_auth) =
                 true, Some s ->
                   begin match p_getenv conf.base_env "long_date" with
                     Some "yes" ->
-                      Date.string_of_ondate conf s ^ Date.get_wday conf s
-                  | _ -> Date.string_of_ondate conf s
+                      DateDisplay.string_of_ondate conf s ^ DateDisplay.get_wday conf s
+                  | _ -> DateDisplay.string_of_ondate conf s
                   end
               | _ -> ""
               end
@@ -2265,7 +2265,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
           begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
-            true, Some s -> Date.string_slash_of_date conf s
+            true, Some s -> DateDisplay.string_slash_of_date conf s
           | _ -> ""
           end
       | _ -> raise Not_found
@@ -3252,7 +3252,7 @@ and eval_date_field_var conf d =
   function
     ["prec"] ->
       begin match d with
-        Dgreg (dmy, _) -> VVstring (Util.escape_html (Date.prec_text conf dmy))
+        Dgreg (dmy, _) -> VVstring (Util.escape_html (DateDisplay.prec_text conf dmy))
       | _ -> VVstring ""
       end
   | ["day"] ->
@@ -3281,7 +3281,7 @@ and eval_date_field_var conf d =
       end
   | ["month"] ->
       begin match d with
-        Dgreg (dmy, _) -> VVstring (Date.month_text dmy)
+        Dgreg (dmy, _) -> VVstring (DateDisplay.month_text dmy)
       | _ -> VVstring ""
       end
   | ["month2"] ->
@@ -3309,7 +3309,7 @@ and eval_date_field_var conf d =
           end
       | _ -> VVstring ""
       end
-  | [] -> VVstring (Date.string_of_date_sep conf "&#010;  " d)
+  | [] -> VVstring (DateDisplay.string_of_date_sep conf "&#010;  " d)
   | _ -> raise Not_found
 and _eval_place_field_var conf place =
   function
@@ -3398,12 +3398,12 @@ and eval_str_event_field conf base (p, p_auth)
           Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
           Some (Dgreg (({prec = Sure | About | Maybe} as d2), _))
           when d1 <> d2 ->
-            let a = CheckItem.time_elapsed d1 d2 in
+            let a = Date.time_elapsed d1 d2 in
             let s =
               if not approx && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
             in
-            s ^ Date.string_of_age conf a
+            s ^ DateDisplay.string_of_age conf a
         | _ -> ""
       else ""
   | "name" ->
@@ -3414,15 +3414,15 @@ and eval_str_event_field conf base (p, p_auth)
       end
   | "date" ->
       begin match p_auth, Adef.od_of_cdate date with
-        true, Some d -> Date.string_of_date conf d
+        true, Some d -> DateDisplay.string_of_date conf d
       | _ -> ""
       end
   | "on_date" ->
       begin match p_auth, Adef.od_of_cdate date with
         true, Some d ->
           begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> Date.string_of_ondate conf d ^ Date.get_wday conf d
-          | _ -> Date.string_of_ondate conf d
+            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+          | _ -> DateDisplay.string_of_ondate conf d
           end
       | _ -> ""
       end
@@ -3505,7 +3505,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
           if d.prec = Sure && get_death p = NotDead then
             d.day = conf.today.day && d.month = conf.today.month &&
             d.year < conf.today.year ||
-            not (CheckItem.leap_year conf.today.year) && d.day = 29 &&
+            not (Date.leap_year conf.today.year) && d.day = 29 &&
             d.month = 2 && conf.today.day = 1 && conf.today.month = 3
           else false
       | _ -> false
@@ -3526,7 +3526,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
                   then
                     d.day = conf.today.day && d.month = conf.today.month &&
                     d.year < conf.today.year ||
-                    not (CheckItem.leap_year conf.today.year) && d.day = 29 &&
+                    not (Date.leap_year conf.today.year) && d.day = 29 &&
                     d.month = 2 && conf.today.day = 1 && conf.today.month = 3
                   else false
               | _ -> false
@@ -3549,7 +3549,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
           Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)),
           _
           when d1 <> d2 ->
-            let a = CheckItem.time_elapsed d1 d2 in
+            let a = Date.time_elapsed d1 d2 in
             a.year > 0 ||
             a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
         | _ -> false
@@ -3564,7 +3564,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             with
               Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
               Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)) ->
-                let a = CheckItem.time_elapsed d1 d2 in
+                let a = Date.time_elapsed d1 d2 in
                 a.year > 0 ||
                 a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
             | _ -> false
@@ -3947,8 +3947,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "age" ->
       begin match p_auth, Adef.od_of_cdate (get_birth p), get_death p with
         true, Some (Dgreg (d, _)), NotDead ->
-          let a = CheckItem.time_elapsed d conf.today in
-          Date.string_of_age conf a
+          let a = Date.time_elapsed d conf.today in
+          DateDisplay.string_of_age conf a
       | _ -> ""
       end
   | "alias" ->
@@ -4052,19 +4052,19 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "cremation_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
       else ""
-  | "dates" -> if p_auth then Date.short_dates_text conf base p else ""
+  | "dates" -> if p_auth then DateDisplay.short_dates_text conf base p else ""
   | "death_age" ->
       if p_auth then
         match Date.get_birth_death_date p with
           Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
           Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)), approx
           when d1 <> d2 ->
-            let a = CheckItem.time_elapsed d1 d2 in
+            let a = Date.time_elapsed d1 d2 in
             let s =
               if not approx && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
             in
-            s ^ Date.string_of_age conf a
+            s ^ DateDisplay.string_of_age conf a
         | _ -> ""
       else ""
   | "death_place" ->
@@ -4159,8 +4159,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
             with
               Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
               Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)) ->
-                let a = CheckItem.time_elapsed d1 d2 in
-                Date.string_of_age conf a
+                let a = Date.time_elapsed d1 d2 in
+                DateDisplay.string_of_age conf a
             | _ -> ""
           else ""
       | _ -> raise Not_found
@@ -4278,35 +4278,35 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match p_auth, Adef.od_of_cdate (get_baptism p) with
         true, Some d ->
           begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> Date.string_of_ondate conf d ^ Date.get_wday conf d
-          | _ -> Date.string_of_ondate conf d
+            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+          | _ -> DateDisplay.string_of_ondate conf d
           end
       | _ -> ""
       end
   | "slash_baptism_date" ->
       begin match p_auth, Adef.od_of_cdate (get_baptism p) with
-        true, Some d -> Date.string_slash_of_date conf d
+        true, Some d -> DateDisplay.string_slash_of_date conf d
       | _ -> ""
       end
   | "on_birth_date" ->
       begin match p_auth, Adef.od_of_cdate (get_birth p) with
         true, Some d ->
           begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> Date.string_of_ondate conf d ^ Date.get_wday conf d
-          | _ -> Date.string_of_ondate conf d
+            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+          | _ -> DateDisplay.string_of_ondate conf d
           end
       | _ -> ""
       end
   | "slash_birth_date" ->
       begin match p_auth, Adef.od_of_cdate (get_birth p) with
-        true, Some d -> Date.string_slash_of_date conf d
+        true, Some d -> DateDisplay.string_slash_of_date conf d
       | _ -> ""
       end
   | "slash_approx_birth_date" ->
       begin match
         p_auth, fst (Util.get_approx_birth_date_place conf base p)
       with
-        true, Some d -> Date.string_slash_of_date conf d
+        true, Some d -> DateDisplay.string_slash_of_date conf d
       | _ -> ""
       end
   | "on_burial_date" ->
@@ -4316,8 +4316,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
             true, Some d ->
               begin match p_getenv conf.base_env "long_date" with
                 Some "yes" ->
-                  Date.string_of_ondate conf d ^ Date.get_wday conf d
-              | _ -> Date.string_of_ondate conf d
+                  DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+              | _ -> DateDisplay.string_of_ondate conf d
               end
           | _ -> ""
           end
@@ -4342,7 +4342,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_burial p with
         Buried cod ->
           begin match p_auth, Adef.od_of_cdate cod with
-            true, Some d -> Date.string_slash_of_date conf d
+            true, Some d -> DateDisplay.string_slash_of_date conf d
           | _ -> ""
           end
       | _ -> raise Not_found
@@ -4354,8 +4354,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
             true, Some d ->
               begin match p_getenv conf.base_env "long_date" with
                 Some "yes" ->
-                  Date.string_of_ondate conf d ^ Date.get_wday conf d
-              | _ -> Date.string_of_ondate conf d
+                  DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+              | _ -> DateDisplay.string_of_ondate conf d
               end
           | _ -> ""
           end
@@ -4365,7 +4365,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_burial p with
         Cremated cod ->
           begin match p_auth, Adef.od_of_cdate cod with
-            true, Some d -> Date.string_slash_of_date conf d
+            true, Some d -> DateDisplay.string_slash_of_date conf d
           | _ -> ""
           end
       | _ -> raise Not_found
@@ -4375,22 +4375,22 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         true, Death (_, d) ->
           let d = Adef.date_of_cdate d in
           begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> Date.string_of_ondate conf d ^ Date.get_wday conf d
-          | _ -> Date.string_of_ondate conf d
+            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+          | _ -> DateDisplay.string_of_ondate conf d
           end
       | _ -> ""
       end
   | "slash_death_date" ->
       begin match p_auth, get_death p with
         true, Death (_, d) ->
-          let d = Adef.date_of_cdate d in Date.string_slash_of_date conf d
+          let d = Adef.date_of_cdate d in DateDisplay.string_slash_of_date conf d
       | _ -> ""
       end
   | "slash_approx_death_date" ->
       begin match
         p_auth, fst (Util.get_approx_death_date_place conf base p)
       with
-        true, Some d -> Date.string_slash_of_date conf d
+        true, Some d -> DateDisplay.string_slash_of_date conf d
       | _ -> ""
       end
   | "prev_fam_father" ->
@@ -4585,7 +4585,7 @@ and string_of_parent_age conf base (p, p_auth) parent =
           Adef.od_of_cdate (get_birth pp), Adef.od_of_cdate (get_birth p)
         with
           Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
-            Date.string_of_age conf (CheckItem.time_elapsed d1 d2)
+            DateDisplay.string_of_age conf (Date.time_elapsed d1 d2)
         | _ -> ""
       else ""
   | None -> raise Not_found
@@ -5566,8 +5566,7 @@ let print_foreach conf base print_ast eval_expr =
                | x -> x
              in
              match d1, d2 with
-               Some d1, Some d2 ->
-                 if CheckItem.strictly_before d1 d2 then -1 else 1
+               Some d1, Some d2 -> Date.compare_date d1 d2
              | _ -> -1)
           (List.rev list)
       in
@@ -5750,10 +5749,7 @@ let print_foreach conf base print_ast eval_expr =
              Adef.od_of_cdate (get_marriage fam1),
              Adef.od_of_cdate (get_marriage fam2)
            with
-             Some d1, Some d2 ->
-               if CheckItem.strictly_before d1 d2 then -1
-               else if CheckItem.strictly_before d2 d1 then 1
-               else 0
+           | Some d1, Some d2 -> Date.compare_date d1 d2
            | _ -> 0)
         list
     in

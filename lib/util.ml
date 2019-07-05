@@ -615,17 +615,17 @@ let strictly_after_private_years conf a =
 let is_old_person conf p =
   match
     Adef.od_of_cdate p.birth, Adef.od_of_cdate p.baptism, p.death,
-    CheckItem.date_of_death p.death
+    Date.date_of_death p.death
   with
     _, _, NotDead, _ when conf.private_years > 0 -> false
   | Some (Dgreg (d, _)), _, _, _ ->
-      let a = CheckItem.time_elapsed d conf.today in
+      let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | _, Some (Dgreg (d, _)), _, _ ->
-      let a = CheckItem.time_elapsed d conf.today in
+      let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | _, _, _, Some (Dgreg (d, _)) ->
-      let a = CheckItem.time_elapsed d conf.today in
+      let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | None, None, DontKnowIfDead, None ->
       p.access <> Private && conf.public_if_no_date
@@ -678,7 +678,7 @@ let authorized_age conf base p =
     else
       let check_date none = function
         | Some (Dgreg (d, _)) ->
-          strictly_after_private_years conf (CheckItem.time_elapsed d conf.today)
+          strictly_after_private_years conf (Date.time_elapsed d conf.today)
         | _ -> none ()
       in
       check_date
@@ -699,7 +699,7 @@ let authorized_age conf base p =
                        in
                        loop 0
                      end)
-                  (CheckItem.date_of_death (get_death p)) )
+                  (Date.date_of_death (get_death p)) )
              (Adef.od_of_cdate (get_baptism p)) )
         (Adef.od_of_cdate (get_birth p))
   end
@@ -2331,7 +2331,7 @@ let get_approx_birth_date_place conf base p =
   get_approx_date_place birth birth_place baptism baptism_place
 
 let get_approx_death_date_place conf base p =
-  let death = CheckItem.date_of_death (get_death p) in
+  let death = Date.date_of_death (get_death p) in
   let death_place = string_of_place conf (sou base (get_death_place p)) in
   let buri =
     match get_burial p with

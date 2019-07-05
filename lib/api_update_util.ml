@@ -616,7 +616,7 @@ let pers_to_piqi_simple_person conf base p =
     let (birth, death, _) = Date.get_birth_death_date p in
     let birth =
       match birth with
-      | Some d -> Date.string_slash_of_date conf d
+      | Some d -> DateDisplay.string_slash_of_date conf d
       | None -> ""
     in
     let birth_place =
@@ -628,7 +628,7 @@ let pers_to_piqi_simple_person conf base p =
     in
     let death =
       match death with
-      | Some d -> Date.string_slash_of_date conf d
+      | Some d -> DateDisplay.string_slash_of_date conf d
       | None -> ""
     in
     let death_place =
@@ -928,8 +928,7 @@ let pers_to_piqi_person_search_info conf base p =
              | x -> x
            in
            match (d1, d2) with
-           |(Some d1, Some d2) ->
-               if CheckItem.strictly_before d1 d2 then -1 else 1
+           |(Some d1, Some d2) -> Date.compare_date d1 d2
            | _ -> -1 )
       (List.rev list)
     in
@@ -1020,10 +1019,7 @@ let pers_to_piqi_person_search_info conf base p =
              (Adef.od_of_cdate (get_marriage fam1),
               Adef.od_of_cdate (get_marriage fam2))
            with
-           | (Some d1, Some d2) ->
-               if CheckItem.strictly_before d1 d2 then -1
-               else if CheckItem.strictly_before d2 d1 then 1
-               else 0
+           | (Some d1, Some d2) -> Date.compare_date d1 d2
            | _ -> 0 )
         list
     in

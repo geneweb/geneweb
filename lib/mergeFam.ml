@@ -31,7 +31,7 @@ let need_differences_selection conf base fam1 fam2 =
     (fun fam ->
        match Adef.od_of_cdate (get_marriage fam) with
          None -> ""
-       | Some d -> Date.string_of_ondate conf d) ||
+       | Some d -> DateDisplay.string_of_ondate conf d) ||
   need_selection (fun fam -> sou base (get_marriage_place fam)) ||
   need_selection
     (fun fam ->
@@ -40,7 +40,7 @@ let need_differences_selection conf base fam1 fam2 =
        | Separated -> "separated"
        | Divorced cod ->
            match Adef.od_of_cdate cod with
-             Some d -> Date.string_of_ondate conf d
+             Some d -> DateDisplay.string_of_ondate conf d
            | None -> "divorced")
 
 let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
@@ -100,7 +100,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     (fun fam ->
        match Adef.od_of_cdate (get_marriage fam) with
          None -> ""
-       | Some d -> Date.string_of_ondate conf d);
+       | Some d -> DateDisplay.string_of_ondate conf d);
   string_field
     (Util.translate_eval (transl_nth conf "marriage/marriages" 0) ^ " / " ^
      transl conf "place")
@@ -113,7 +113,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
        | Divorced cod ->
            let ds =
              match Adef.od_of_cdate cod with
-               Some d -> " " ^ Date.string_of_ondate conf d
+               Some d -> " " ^ DateDisplay.string_of_ondate conf d
              | None -> ""
            in
            transl conf "divorced" ^ ds);

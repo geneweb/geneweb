@@ -489,7 +489,7 @@ and eval_string s =
 and eval_person_field_var conf base env p =
   function
     ["access"] -> VVstring (Util.acces conf base p)
-  | ["dates"] -> VVstring (Date.short_dates_text conf base p)
+  | ["dates"] -> VVstring (DateDisplay.short_dates_text conf base p)
   | ["has_history"] ->
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in

@@ -113,9 +113,7 @@ let designation base p =
 
 let couple _ x y = Adef.couple x y
 
-let strictly_after = CheckItem.strictly_after
-let strictly_before_dmy = CheckItem.strictly_before_dmy
-let date_of_death = CheckItem.date_of_death
+let date_of_death = Date.date_of_death
 let year_of d = d.year
 
 let log_oc = ref stdout
@@ -2962,7 +2960,7 @@ let sort_by_date proj list =
     List.sort
       (fun e1 e2 ->
          match proj e1, proj e2 with
-           Some d1, Some d2 -> if not (strictly_after d1 d2) then -1 else 1
+         | Some d1, Some d2 -> Date.compare_date d1 d2
          | _ -> 1)
       list
   else list
@@ -3559,7 +3557,7 @@ let negative_dates base persons families =
     let p = persons.(i) in
     match Adef.od_of_cdate (get_birth p), date_of_death (get_death p) with
       Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
-        if year_of d1 > 0 && year_of d2 > 0 && strictly_before_dmy d2 d1 then
+        if year_of d1 > 0 && year_of d2 > 0 && Date.compare_dmy d2 d1 < 0 then
           negative_date_ancestors base persons families i
     | _ -> ()
   done

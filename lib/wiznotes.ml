@@ -113,7 +113,7 @@ let print_wizards_by_date conf list =
            prec = Sure; delta = 0}
         in
         Wserver.printf "%s"
-          (capitale (Date.string_of_ondate conf (Dgreg (dmy, Dgregorian)))));
+          (capitale (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian)))));
      (fun tm -> tm.Unix.tm_year),
      (fun tm -> Wserver.printf "%d" (tm.Unix.tm_year + 1900))]
   in
@@ -373,7 +373,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
       in
       Wserver.printf "<p>\n";
       Wserver.printf "<tt>(%s %02d:%02d)</tt>\n"
-        (Date.string_of_ondate conf (Dgreg (dmy, Dgregorian))) tm.Unix.tm_hour
+        (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian))) tm.Unix.tm_hour
         tm.Unix.tm_min;
       Wserver.printf "</p>\n"
     end;

@@ -269,7 +269,7 @@ let print_linked_list conf base pgl =
              Wserver.printf "<span class=\"mx-2\">";
              Wserver.printf "%s%s"
                (Util.referenced_person_title_text conf base p)
-               (Date.short_dates_text conf base p);
+               (DateDisplay.short_dates_text conf base p);
              Wserver.printf "</span>"
            end;
            Wserver.printf "</tt>\n"
@@ -290,9 +290,9 @@ let print_linked_list conf base pgl =
            Wserver.printf "<span class=\"mx-2\">";
            Wserver.printf "%s%s &amp; %s %s"
              (Util.referenced_person_title_text conf base fath)
-             (Date.short_dates_text conf base fath)
+             (DateDisplay.short_dates_text conf base fath)
              (Util.referenced_person_title_text conf base moth)
-             (Date.short_dates_text conf base moth);
+             (DateDisplay.short_dates_text conf base moth);
            Wserver.printf "</span>";
            Wserver.printf "</tt>\n"
        | NotesLinks.PgNotes ->
