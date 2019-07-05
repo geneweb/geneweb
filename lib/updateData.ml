@@ -22,10 +22,7 @@ module PersSet =
   Set.Make
     (struct
        type t = person
-       let compare p1 p2 =
-         let i1 = Adef.int_of_iper (get_key_index p1) in
-         let i2 = Adef.int_of_iper (get_key_index p2) in
-         Stdlib.compare i1 i2
+       let compare p1 p2 = compare (get_key_index p1) (get_key_index p2)
      end)
 
 module StringSet = Set.Make (struct type t = string let compare = compare end)
@@ -86,64 +83,54 @@ let get_data conf =
 let get_all_data conf base =
   let data_set = ref DataSet.empty in
   let (data, test_family) = get_data conf in
-  (* Ajoute toutes les "data" liés à un individu *)
-  let rec loop i =
-    if i = nb_of_persons base then ()
-    else
-      let p = pget conf base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter (fun i ->
+      let p = pget conf base i in
       List.iter
         (fun (label, fun_data) ->
            match fun_data with
              Person fun_data ->
-               let istr = fun_data p in
-               if not (is_empty_string istr) then
-                 data_set :=
-                   DataSet.add (istr, label, Hashtbl.hash istr) !data_set
+             let istr = fun_data p in
+             if not (is_empty_string istr) then
+               data_set :=
+                 DataSet.add (istr, label, Hashtbl.hash istr) !data_set
            | Pevent fun_data ->
-               List.iter
-                 (fun evt ->
-                    let istr = fun_data evt in
-                    if not (is_empty_string istr) then
-                      data_set :=
-                        DataSet.add (istr, label, Hashtbl.hash istr)
-                          !data_set)
-                 (get_pevents p)
+             List.iter
+               (fun evt ->
+                  let istr = fun_data evt in
+                  if not (is_empty_string istr) then
+                    data_set :=
+                      DataSet.add (istr, label, Hashtbl.hash istr)
+                        !data_set)
+               (get_pevents p)
            | _ -> ())
-        data;
-      loop (i + 1)
-  in
-  loop 0;
+        data)
+    (Gwdb.ipers base) ;
   (* Ajoute toutes les "data" liés à une famille *)
   if test_family then
-    begin let rec loop i =
-      if i = nb_of_families base then ()
-      else
-        let fam = foi base (Adef.ifam_of_int i) in
+    Gwdb.Collection.iter (fun i ->
+        let fam = foi base i in
         if is_deleted_family fam then ()
         else
           List.iter
             (fun (label, fun_data) ->
                match fun_data with
                  Family fun_data ->
-                   let istr = fun_data fam in
-                   if not (is_empty_string istr) then
-                     data_set :=
-                       DataSet.add (istr, label, Hashtbl.hash istr) !data_set
+                 let istr = fun_data fam in
+                 if not (is_empty_string istr) then
+                   data_set :=
+                     DataSet.add (istr, label, Hashtbl.hash istr) !data_set
                | Fevent fun_data ->
-                   List.iter
-                     (fun evt ->
-                        let istr = fun_data evt in
-                        if not (is_empty_string istr) then
-                          data_set :=
-                            DataSet.add (istr, label, Hashtbl.hash istr)
-                              !data_set)
-                     (get_fevents fam)
+                 List.iter
+                   (fun evt ->
+                      let istr = fun_data evt in
+                      if not (is_empty_string istr) then
+                        data_set :=
+                          DataSet.add (istr, label, Hashtbl.hash istr)
+                            !data_set)
+                   (get_fevents fam)
                | _ -> ())
-            data;
-        loop (i + 1)
-    in
-      loop 0
-    end;
+            data)
+      (Gwdb.ifams base) ;
   DataSet.elements !data_set
 
 
@@ -186,10 +173,8 @@ let get_person_from_data conf base =
   in
   (* Parcours tous les individus et ajoute dans la map les    *)
   (* individus en relation avec la "data" donné par la clé k. *)
-  let rec loop i =
-    if i = nb_of_persons base then ()
-    else
-      let p = pget conf base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter (fun i ->
+      let p = pget conf base i in
       List.iter
         (fun (label, fun_data) ->
            match fun_data with
@@ -209,17 +194,13 @@ let get_person_from_data conf base =
                       map_add key istr p)
                  (get_pevents p)
            | _ -> ())
-        data;
-      loop (i + 1)
-  in
-  loop 0;
+        data)
+    (Gwdb.ipers base) ;
   (* Parcours toutes les familles et ajoute dans la map les    *)
   (* individus en relation avec la "data" donnée par la clé k. *)
   if test_family then
-    begin let rec loop i =
-      if i = nb_of_families base then ()
-      else
-        let fam = foi base (Adef.ifam_of_int i) in
+    Gwdb.Collection.iter (fun i ->
+        let fam = foi base i in
         if is_deleted_family fam then ()
         else
           List.iter
@@ -247,11 +228,8 @@ let get_person_from_data conf base =
                           map_add key istr p)
                      (get_fevents fam)
                | _ -> ())
-            data;
-        loop (i + 1)
-    in
-      loop 0
-    end;
+            data)
+    (Gwdb.ifams base) ;
   (* On retourne la liste des couples ("data", persons list) *)
   let list = ref [] in
   PersMap.iter

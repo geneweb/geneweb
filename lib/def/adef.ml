@@ -1,9 +1,6 @@
 (* $Id: adef.ml,v 5.6 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-type iper = int
-type ifam = int
-type istr = int
 type fix = int
 
 let float_of_fix x = float x /. 1000000.0
@@ -12,13 +9,6 @@ external fix : int -> fix = "%identity"
 external fix_repr : fix -> int = "%identity"
 
 let no_consang = fix (-1)
-
-external int_of_iper : iper -> int = "%identity"
-external iper_of_int : int -> iper = "%identity"
-external int_of_ifam : ifam -> int = "%identity"
-external ifam_of_int : int -> ifam = "%identity"
-external int_of_istr : istr -> int = "%identity"
-external istr_of_int : int -> istr = "%identity"
 
 type date =
     Dgreg of dmy * calendar

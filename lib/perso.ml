@@ -15,10 +15,10 @@ let max_im_wid = 240
 let round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0
 
 let has_children base u =
-  List.exists
+  Array.exists
     (fun ifam ->
        let des = foi base ifam in Array.length (get_children des) > 0)
-    (Array.to_list (get_family u))
+    (get_family u)
 
 let string_of_marriage_text conf base fam =
   let marriage = Adef.od_of_cdate (get_marriage fam) in
@@ -163,8 +163,8 @@ let print_base_loop conf base p =
 type sosa_t =
   { tstab : (iper, int) Gwdb.Marker.t;
     mark : (iper, bool) Gwdb.Marker.t;
-    mutable last_zil : (Def.iper * Sosa.t) list;
-    sosa_ht : (Def.iper, (Sosa.t * Gwdb.person) option) Hashtbl.t }
+    mutable last_zil : (iper * Sosa.t) list;
+    sosa_ht : (iper, (Sosa.t * Gwdb.person) option) Hashtbl.t }
 
 let init_sosa_t conf base sosa_ref =
   let tstab =
@@ -266,7 +266,7 @@ let find_sosa conf base a sosa_ref_l t_sosa =
         else None
   | None -> None
 
-(* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
+(* [Type]: (iper, Sosa.t) Hashtbl.t *)
 let sosa_ht = Hashtbl.create 5003
 
 (* ************************************************************************ *)
@@ -293,7 +293,7 @@ let build_sosa_tree_ht conf base person =
   (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
   (* commence à l'indice 1 !                                            *)
   let sosa_accu =
-    Array.make (nb_persons + 1) (Sosa.zero, Adef.iper_of_int 0)
+    Array.make (nb_persons + 1) (Sosa.zero, dummy_iper)
   in
   let () = Array.set sosa_accu 1 (Sosa.one, get_key_index person) in
   let rec loop i len =
@@ -366,10 +366,10 @@ let next_sosa s =
   let sosa_list = Hashtbl.fold (fun k v acc -> (v, k) :: acc) sosa_ht [] in
   let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
   let rec find_n x lst = match lst with
-    | [] -> (Sosa.zero, Adef.iper_of_int 0)
+    | [] -> (Sosa.zero, dummy_iper)
     | (so, _) :: tl ->
         if (Sosa.eq so x) then
-          if tl = [] then (Sosa.zero, Adef.iper_of_int 0) else List.hd tl
+          if tl = [] then (Sosa.zero, dummy_iper) else List.hd tl
         else find_n x tl
   in
   let (so, ip) = find_n s sosa_list in
@@ -380,10 +380,10 @@ let prev_sosa s =
   let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
   let sosa_list = List.rev sosa_list in
   let rec find_n x lst = match lst with
-    | [] -> (Sosa.zero, Adef.iper_of_int 0)
+    | [] -> (Sosa.zero, dummy_iper)
     | (so, _) :: tl ->
         if (Sosa.eq so x) then
-          if tl = [] then (Sosa.zero, Adef.iper_of_int 0) else List.hd tl
+          if tl = [] then (Sosa.zero, dummy_iper) else List.hd tl
         else find_n x tl
   in
   let (so, ip) = find_n s sosa_list in
@@ -473,8 +473,8 @@ let print_sosa conf base p link =
         if conf.cancel_links || not link then ()
         else
           begin let sosa_link =
-            let i1 = string_of_int (Adef.int_of_iper (get_key_index p)) in
-            let i2 = string_of_int (Adef.int_of_iper (get_key_index ref)) in
+            let i1 = string_of_iper (get_key_index p) in
+            let i2 = string_of_iper (get_key_index ref) in
             let b2 = Sosa.to_string sosa_num in
             "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
           in
@@ -860,9 +860,8 @@ let next_generation conf base mark gpl =
       (fun gpl gp ->
          match gp with
            GP_person (n, ip, _) ->
-             let i = Adef.int_of_iper ip in
-             let m = mark.(i) in
-             if Sosa.eq m Sosa.zero then begin mark.(i) <- n; gp :: gpl end
+             let m = Gwdb.Marker.get mark ip in
+             if Sosa.eq m Sosa.zero then begin Gwdb.Marker.set mark ip n; gp :: gpl end
              else GP_same (n, m, ip) :: gpl
          | _ -> gp :: gpl)
       [] gpl
@@ -941,7 +940,7 @@ let get_all_generations conf base p =
       Some v -> v
     | None -> 0
   in
-  let mark = Array.make (nb_of_persons base) Sosa.zero in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
   let rec get_generations level gpll gpl =
     let gpll = gpl :: gpll in
     if level < max_level then
@@ -1149,11 +1148,11 @@ let get_date_place conf base auth_for_all_anc p =
     let d1 =
       if d1 <> None then d1
       else
-        List.fold_left
+        Array.fold_left
           (fun d ifam ->
              if d <> None then d
              else Adef.od_of_cdate (get_marriage (foi base ifam)))
-          d1 (Array.to_list (get_family p))
+          d1 (get_family p)
     in
     let d2 =
       match get_death p with
@@ -1181,11 +1180,11 @@ let get_date_place conf base auth_for_all_anc p =
       let pl = if pl <> "" then pl else sou base (get_burial_place p) in
       if pl <> "" then pl
       else
-        List.fold_left
+        Array.fold_left
           (fun pl ifam ->
              if pl <> "" then pl
              else sou base (get_marriage_place (foi base ifam)))
-          pl (Array.to_list (get_family p))
+          pl (get_family p)
     in
     (d1, d2, pl), auth_for_all_anc
   else (None, None, ""), false
@@ -1196,9 +1195,9 @@ type dup =
     DupFam of ifam * ifam
   | DupInd of iper * iper
   | NoDup
-type excl_dup = (Adef.iper * Adef.iper) list * (Adef.ifam * Adef.ifam) list
+type excl_dup = (iper * iper) list * (ifam * ifam) list
 
-let gen_excluded_possible_duplications conf s i_of_int =
+let gen_excluded_possible_duplications conf s i_of_string =
   match p_getenv conf.env s with
     Some s ->
       let rec loop ipl i =
@@ -1216,12 +1215,8 @@ let gen_excluded_possible_duplications conf s i_of_int =
             let s1 = String.sub s i (j - i) in
             let s2 = String.sub s (j + 1) (k - j - 1) in
             let ipl =
-              match
-                try Some (int_of_string s1, int_of_string s2) with
-                  Failure _ -> None
-              with
-                Some (i1, i2) -> (i_of_int i1, i_of_int i2) :: ipl
-              | None -> ipl
+              try (i_of_string s1, i_of_string s2) :: ipl
+              with _ -> ipl
             in
             loop ipl (k + 1)
       in
@@ -1229,8 +1224,8 @@ let gen_excluded_possible_duplications conf s i_of_int =
   | None -> []
 
 let excluded_possible_duplications conf =
-  gen_excluded_possible_duplications conf "iexcl" Adef.iper_of_int,
-  gen_excluded_possible_duplications conf "fexcl" Adef.ifam_of_int
+  gen_excluded_possible_duplications conf "iexcl" iper_of_string,
+  gen_excluded_possible_duplications conf "fexcl" ifam_of_string
 
 let first_possible_duplication base ip (iexcl, fexcl) =
   let ifaml = Array.to_list (get_family (poi base ip)) in
@@ -1327,12 +1322,11 @@ let merge_date_place conf base surn ((d1, d2, pl), auth) p =
 let build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark =
-    try
-      let n =
-        int_of_string (List.assoc "max_ancestor_implex" conf.base_env)
-      in
-      Array.make (nb_of_persons base) n
-    with Not_found | Failure _ -> Array.make (nb_of_persons base) 5
+    let n =
+      try int_of_string (List.assoc "max_ancestor_implex" conf.base_env)
+      with _ -> 5
+    in
+    Gwdb.iper_marker (Gwdb.ipers base) n
   in
   let auth = conf.wizard || conf.friend in
   let add_surname sosa p surn dp =
@@ -1343,14 +1337,14 @@ let build_surnames_list conf base v p =
     r := fst !r, sosa :: snd !r
   in
   let rec loop lev sosa p surn dp =
-    if mark.(Adef.int_of_iper (get_key_index p)) = 0 then ()
+    if Gwdb.Marker.get mark (get_key_index p) = 0 then ()
     else if lev = v then
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_surname sosa p surn dp
     else
       begin
-        mark.(Adef.int_of_iper (get_key_index p)) <-
-          mark.(Adef.int_of_iper (get_key_index p)) - 1;
+        Gwdb.Marker.set mark
+          (get_key_index p) (Gwdb.Marker.get mark (get_key_index p) - 1) ;
         match get_parents p with
           Some ifam ->
             let cpl = foi base ifam in
@@ -1408,7 +1402,7 @@ let build_surnames_list conf base v p =
 (* ************************************************************************* *)
 let build_list_eclair conf base v p =
   let ht = Hashtbl.create 701 in
-  let mark = Array.make (nb_of_persons base) false in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   (* Fonction d'ajout dans la Hashtbl. A la clé (surname, place) on associe *)
   (* la personne (pour l'interprétation dans le template), la possible date *)
   (* de début, la possible date de fin, la liste des personnes/évènements.  *)
@@ -1448,10 +1442,10 @@ let build_list_eclair conf base v p =
   in
   (* Fonction d'ajout de tous les évènements d'une personne (birth, bapt...). *)
   let add_person p surn =
-    if mark.(Adef.int_of_iper (get_key_index p)) then ()
+    if Gwdb.Marker.get mark (get_key_index p) then ()
     else
       begin
-        mark.(Adef.int_of_iper (get_key_index p)) <- true;
+        Gwdb.Marker.set mark (get_key_index p) true;
         add_surname p surn (get_birth_place p)
           (Adef.od_of_cdate (get_birth p));
         add_surname p surn (get_baptism_place p)
@@ -1468,12 +1462,12 @@ let build_list_eclair conf base v p =
           | _ -> None
         in
         add_surname p surn (get_burial_place p) burial;
-        List.iter
+        Array.iter
           (fun ifam ->
              let fam = foi base ifam in
              add_surname p surn (get_marriage_place fam)
                (Adef.od_of_cdate (get_marriage fam)))
-          (Array.to_list (get_family p))
+          (get_family p)
       end
   in
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
@@ -1623,13 +1617,7 @@ module SortedList =
   Set.Make (struct type t = string list let compare = compare_ls end)
 
 module IperSet =
-  Set.Make
-    (struct
-       type t = iper
-       let compare i1 i2 =
-         Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
-     end)
-
+  Set.Make (struct type t = iper let compare = compare end)
 
 (*
    Type pour représenté soit :
@@ -1653,7 +1641,7 @@ type 'a env =
   | Vcelll of cell list
   | Vcnt of int ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
-  | Vdmark of bool array ref
+  | Vdmark of (iper, bool) Marker.t ref
   | Vslist of SortedList.t ref
   | Vslistlm of string list list
   | Vind of person
@@ -2625,12 +2613,12 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       (* %qvar.index_v.surname;
          direct access to a person whose index value is v
       *)
-      let v0 = int_of_string v in
-      if v0 >= 0 && v0 < nb_of_persons base then
-        let ep = make_ep conf base (Adef.iper_of_int v0) in
+      let v0 = iper_of_string v in
+      (* if v0 >= 0 && v0 < nb_of_persons base then *)
+        let ep = make_ep conf base v0 in
         if is_hidden (fst ep) then raise Not_found
         else eval_person_field_var conf base env ep loc sl
-      else raise Not_found
+      (* else raise Not_found *)
   | "svar" :: i :: sl ->
       (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
          access to sosa si=n of a person pi ni
@@ -3735,11 +3723,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
 #endif
       | _ ->
           let b =
-            List.exists
+            Array.exists
               (fun ifam ->
                  let des = foi base ifam in
                  Array.length (get_children des) > 0)
-              (Array.to_list (get_family p))
+              (get_family p)
           in
           if b then b
           else
@@ -3939,7 +3927,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
        sou base (get_baptism_src p) <> "" ||
        sou base (get_death_src p) <> "" ||
        sou base (get_burial_src p) <> "" ||
-       List.exists
+       Array.exists
          (fun ifam ->
             let fam = foi base ifam in
             let isp = Gutil.spouse (get_key_index p) fam in
@@ -3949,7 +3937,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             m_auth &&
             (sou base (get_marriage_src fam) <> "" ||
              sou base (get_fsources fam) <> ""))
-         (Array.to_list (get_family p)))
+         (get_family p))
   | "has_surnames_aliases" ->
       if not p_auth && is_hide_names conf p then false
       else get_surnames_aliases p <> []
@@ -3975,7 +3963,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       end
   | "is_descendant" ->
       begin match get_env "desc_mark" env with
-        Vdmark r -> !r.(Adef.int_of_iper (get_key_index p))
+        Vdmark r -> (Gwdb.Marker.get !r (get_key_index p))
       | _ -> raise Not_found
       end
   | "is_female" -> get_sex p = Female
@@ -4136,8 +4124,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       (* deprecated since 5.00: rather use "i=%family.index;&ip=%index;" *)
       begin match get_env "fam" env with
         Vfam (ifam, _, _, _) ->
-          Printf.sprintf "i=%d&ip=%d" (Adef.int_of_ifam ifam)
-            (Adef.int_of_iper (get_key_index p))
+          Printf.sprintf "i=%s&ip=%s" (string_of_ifam ifam)
+            (string_of_iper (get_key_index p))
       | _ -> raise Not_found
       end
   | "father_age_at_birth" -> string_of_parent_age conf base ep get_father
@@ -4166,22 +4154,22 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "image_url" -> string_of_image_url conf base ep false
   | "ind_access" ->
       (* deprecated since 5.00: rather use "i=%index;" *)
-      "i=" ^ string_of_int (Adef.int_of_iper (get_key_index p))
+      "i=" ^ string_of_iper (get_key_index p)
   | "index" ->
       begin match get_env "p_link" env with
         Vbool _ -> ""
-      | _ -> string_of_int (Adef.int_of_iper (get_key_index p))
+      | _ -> string_of_iper (get_key_index p)
       end
   | "mark_descendants" ->
       begin match get_env "desc_mark" env with
         Vdmark r ->
-          let tab = Array.make (nb_of_persons base) false in
+          let tab = Gwdb.iper_marker (Gwdb.ipers base) false in
           let rec mark_descendants len p =
-            let i = Adef.int_of_iper (get_key_index p) in
-            if tab.(i) then ()
+            let i = (get_key_index p) in
+            if Gwdb.Marker.get tab i then ()
             else
               begin
-                tab.(i) <- true;
+                Gwdb.Marker.set tab i true;
                 let u = p in
                 for i = 0 to Array.length (get_family u) - 1 do
                   let des = foi base (get_family u).(i) in
@@ -4442,18 +4430,18 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "prev_fam_father" ->
       begin match get_env "prev_fam" env with
         Vfam (_, _, (ifath, _, _), _) ->
-          string_of_int (Adef.int_of_iper ifath)
+          string_of_iper ifath
       | _ -> raise Not_found
       end
   | "prev_fam_index" ->
       begin match get_env "prev_fam" env with
-        Vfam (ifam, _, _, _) -> string_of_int (Adef.int_of_ifam ifam)
+        Vfam (ifam, _, _, _) -> string_of_ifam ifam
       | _ -> raise Not_found
       end
   | "prev_fam_mother" ->
       begin match get_env "prev_fam" env with
         Vfam (_, _, (_, imoth, _), _) ->
-          string_of_int (Adef.int_of_iper imoth)
+          string_of_iper imoth
       | _ -> raise Not_found
       end
   | "public_name" ->
@@ -4482,9 +4470,10 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         Vsosa x ->
           begin match get_sosa conf base env x p with
             Some (n, q) ->
-              Printf.sprintf "m=RL&i1=%d&i2=%d&b1=1&b2=%s"
-                (Adef.int_of_iper (get_key_index p))
-                (Adef.int_of_iper (get_key_index q)) (Sosa.to_string n)
+              Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
+                (string_of_iper (get_key_index p))
+                (string_of_iper (get_key_index q))
+                (Sosa.to_string n)
           | None -> ""
           end
       | _ -> raise Not_found
@@ -4571,7 +4560,7 @@ and eval_str_family_field env (ifam, _, _, _) =
           string_of_int (Gwdb.Marker.get flevt ifam)
       | _ -> raise Not_found
       end
-  | "index" -> string_of_int (Adef.int_of_ifam ifam)
+  | "index" -> string_of_ifam ifam
   | "set_infinite_desc_level" ->
       begin match get_env "desc_level_table" env with
         Vdesclevtab levt ->
@@ -4973,7 +4962,7 @@ let print_foreach conf base print_ast eval_expr =
           end
       | _ -> raise Not_found
     in
-    let mark = Array.make (nb_of_persons base) Sosa.zero in
+    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
     let rec loop gpl i n =
       if i > max_level then ()
       else
@@ -4999,13 +4988,13 @@ let print_foreach conf base print_ast eval_expr =
         Vint n -> n
       | _ -> 0
     in
-    let mark = Array.make (nb_of_persons base) Sosa.zero in
+    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
     let rec loop gpl i =
       if i > max_level then ()
       else
         let env = ("gpl", Vgpl gpl) :: ("level", Vint i) :: env in
         List.iter (print_ast env ep) al;
-        for i = 0 to nb_of_persons base - 1 do mark.(i) <- Sosa.zero done;
+        Gwdb.Collection.iter (fun i -> Gwdb.Marker.set mark i Sosa.zero) (Gwdb.ipers base) ;
         let gpl = next_generation2 conf base mark gpl in loop gpl (succ i)
     in
     loop [GP_person (Sosa.one, get_key_index p, None)] 1
@@ -5046,9 +5035,9 @@ let print_foreach conf base print_ast eval_expr =
     let (p, max_level) =
       match el with
         [[e1]; [e2]] ->
-          let ip = eval_int_expr env ep e1 in
+          let ip = iper_of_string @@ eval_expr env ep e1 in
           let max_level = eval_int_expr env ep e2 in
-          pget conf base (Adef.iper_of_int ip), max_level
+          pget conf base ip, max_level
       | [[e]] -> p, eval_int_expr env ep e
       | [] ->
           begin match get_env "max_anc_level" env with
@@ -5922,7 +5911,7 @@ let gen_interp_templ menu title templ_fname conf base p =
      ("list", Vslist (ref SortedList.empty));
      ("listb", Vslist (ref SortedList.empty));
      ("listc", Vslist (ref SortedList.empty));
-     ("desc_mark", Vdmark (ref [| |]));
+     ("desc_mark", Vdmark (Obj.magic @@ ref 0)); (* FIXME !!!!! *)
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vsosa (ref []));
      ("sosa_ref", Vsosa_ref sosa_ref_l);

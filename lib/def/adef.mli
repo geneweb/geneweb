@@ -1,9 +1,6 @@
 (* $Id: adef.mli,v 5.6 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-type iper
-type ifam
-type istr
 type fix
 type cdate
 type 'person gen_couple
@@ -37,13 +34,6 @@ val cdate_of_date : date -> cdate
 val cdate_None : cdate
 val od_of_cdate : cdate -> date option
 val cdate_of_od : date option -> cdate
-
-external int_of_iper : iper -> int = "%identity"
-external iper_of_int : int -> iper = "%identity"
-external int_of_ifam : ifam -> int = "%identity"
-external ifam_of_int : int -> ifam = "%identity"
-external int_of_istr : istr -> int = "%identity"
-external istr_of_int : int -> istr = "%identity"
 
 exception Request_failure of string
 

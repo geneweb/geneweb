@@ -31,9 +31,9 @@ type relationship =
     mutable anc_stat2 : anc_stat }
 
 type relationship_info =
-  { tstab : (Def.iper, int) Gwdb.Marker.t
-  ; reltab : (Def.iper, relationship) Gwdb.Marker.t
-  ; mutable queue : Def.iper list array
+  { tstab : (Gwdb.iper, int) Gwdb.Marker.t
+  ; reltab : (Gwdb.iper, relationship) Gwdb.Marker.t
+  ; mutable queue : Gwdb.iper list array
   }
 
 let half x = x *. 0.5

@@ -37,8 +37,8 @@ let print conf base p =
 class=\"mx-3 mb-3\">\n" conf.command;
   Util.hidden_env conf;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND\">\n";
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
-    (Adef.int_of_iper (get_key_index p));
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_iper (get_key_index p));
   Wserver.printf "<span class=\"form-row align-items-center\">\n";
   Wserver.printf "<span class=\"col-auto\">\n";
   Wserver.printf "<span class=\"custom-control custom-radio\">\n";
@@ -62,10 +62,10 @@ size=\"50\" id=\"inlineinput\" autofocus>\n</span>\n"
          Wserver.printf "<div class=\"custom-control custom-radio\">\n";
          Wserver.printf
            "  <input type=\"radio\" class=\"custom-control-input\" \
-name=\"select\" id=\"%d\" value=\"%d\">\n" (Adef.int_of_iper (get_key_index p))
-(Adef.int_of_iper (get_key_index p));
+name=\"select\" id=\"%s\" value=\"%s\">\n" (string_of_iper (get_key_index p))
+(string_of_iper (get_key_index p));
          Wserver.printf "  <label class=\"custom-control-label\" \
-for=\"%d\">" (Adef.int_of_iper (get_key_index p));
+for=\"%s\">" (string_of_iper (get_key_index p));
          Update.print_person_parents_and_spouse conf base p;
          Wserver.printf "  </label>\n</div>\n";)
     list;
@@ -77,13 +77,16 @@ for=\"%d\">" (Adef.int_of_iper (get_key_index p));
   Hutil.trailer conf
 
 let print_possible_continue_merging conf base =
-  match p_getint conf.env "ini1", p_getint conf.env "ini2" with
+  match p_getenv conf.env "ini1", p_getenv conf.env "ini2" with
     Some ini1, Some ini2 ->
-      let p1 = poi base (Adef.iper_of_int ini1) in
-      let p2 = poi base (Adef.iper_of_int ini2) in
+      let ini1 = iper_of_string ini1 in
+      let ini2 = iper_of_string ini2 in
+      let p1 = poi base ini1 in
+      let p2 = poi base ini2 in
       Wserver.printf "\n";
       html_p conf;
-      Wserver.printf "<a href=%sm=MRG_IND&i=%d&i2=%d>" (commd conf) ini1 ini2;
+      Wserver.printf "<a href=%sm=MRG_IND&i=%s&i2=%s>" (commd conf)
+        (string_of_iper ini1) (string_of_iper ini2);
       Wserver.printf "%s" (capitale (transl conf "continue merging"));
       Wserver.printf "</a>";
       Wserver.printf "\n";
@@ -92,8 +95,9 @@ let print_possible_continue_merging conf base =
       print_someone base p2;
       Wserver.printf "\n"
   | _ ->
-      match p_getint conf.env "ip" with
+      match p_getenv conf.env "ip" with
         Some ip ->
+          let ip = iper_of_string ip in
           let s1 =
             match p_getenv conf.env "iexcl" with
               Some "" | None -> ""
@@ -107,13 +111,13 @@ let print_possible_continue_merging conf base =
           if s1 <> "" || s2 <> "" then
             begin
               Wserver.printf "<p>\n";
-              Wserver.printf "<a href=%sm=MRG_DUP&ip=%d%s%s>" (commd conf)
-                ip s1 s2;
+              Wserver.printf "<a href=%sm=MRG_DUP&ip=%s%s%s>" (commd conf)
+                (string_of_iper ip) s1 s2;
               Wserver.printf "%s"
                 (capitale (transl conf "continue merging"));
               Wserver.printf "</a>" ;
               begin
-                let p = poi base (Adef.iper_of_int ip) in
+                let p = poi base ip in
                 let s = person_text conf base p in
                 Wserver.printf "\n(%s)\n"
                   (transl_a_of_b conf

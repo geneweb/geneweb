@@ -507,9 +507,9 @@ let reconstitute_family conf base =
     | None -> ""
   in
   let fam_index =
-    match p_getint conf.env "i" with
-      Some i -> i
-    | None -> 0
+    match p_getenv conf.env "i" with
+      Some i -> Gwdb.ifam_of_string i
+    | None -> Gwdb.dummy_ifam
   in
   (* Mise à jour des évènements principaux. *)
   (* Attention, dans le cas où fevent est vide, i.e. on a valider   *)
@@ -573,7 +573,7 @@ let reconstitute_family conf base =
      witnesses = Array.of_list witnesses; relation = relation;
      divorce = divorce; fevents = events; comment = comment;
      origin_file = origin_file; fsources = fsources;
-     fam_index = Adef.ifam_of_int fam_index}
+     fam_index = fam_index}
   and cpl = Futil.parent conf.multi_parents (Array.of_list parents)
   and des = {children = Array.of_list children} in
   fam, cpl, des, ext
@@ -1042,8 +1042,11 @@ let effective_mod conf base sfam scpl sdes =
       (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
-    Futil.map_family_ps (Update.insert_person conf base psrc created_p)
-      (Gwdb.insert_string base) sfam
+    Futil.map_family_ps
+      (Update.insert_person conf base psrc created_p)
+      (fun f -> f)
+      (Gwdb.insert_string base)
+      sfam
   in
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
@@ -1162,7 +1165,7 @@ let effective_mod conf base sfam scpl sdes =
   Update.update_related_pointers base pi ol nl; fi, nfam, ncpl, ndes
 
 let effective_add conf base sfam scpl sdes =
-  let fi = Adef.ifam_of_int (nb_of_families base) in
+  let fi = insert_family base (empty_family base dummy_ifam) in
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
@@ -1174,8 +1177,11 @@ let effective_add conf base sfam scpl sdes =
       (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
-    Futil.map_family_ps (Update.insert_person conf base psrc created_p)
-      (Gwdb.insert_string base) sfam
+    Futil.map_family_ps
+      (Update.insert_person conf base psrc created_p)
+      (fun f -> f)
+      (Gwdb.insert_string base)
+      sfam
   in
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
@@ -1436,9 +1442,9 @@ let print_del_ok conf base wl =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  begin match p_getint conf.env "ip" with
+  begin match p_getenv conf.env "ip" with
     Some i ->
-      let p = poi base (Adef.iper_of_int i) in
+      let p = poi base (iper_of_string i) in
       Wserver.printf "<ul>\n";
       Wserver.printf "<li>\n";
       Wserver.printf "%s\n" (reference conf base p (person_text conf base p));
@@ -1488,10 +1494,10 @@ let print_add o_conf base =
       | _ -> false
     in
     let digest =
-      match p_getint conf.env "ip" with
+      match p_getenv conf.env "ip" with
         Some ip ->
           string_of_int
-            (Array.length (get_family (poi base (Adef.iper_of_int ip))))
+            (Array.length (get_family (poi base (iper_of_string ip))))
       | None -> ""
     in
     let sdigest = raw_get conf "digest" in
@@ -1517,14 +1523,15 @@ let print_add o_conf base =
           let (changed, act) =
             let fam = Util.string_gen_family base fam in
             let (ip, act) =
-              match p_getint conf.env "ip" with
+              match p_getenv conf.env "ip" with
                 Some i ->
-                  if Adef.int_of_iper (Adef.mother cpl) = i then
+                  let i = iper_of_string i in
+                  if Adef.mother cpl = i then
                     Adef.mother cpl, "af"
                   else
-                    let a = poi base (Adef.iper_of_int i) in
+                    let a = poi base i in
                     begin match get_parents a with
-                      Some x when x = ifam -> Adef.iper_of_int i, "aa"
+                      Some x when x = ifam -> i, "aa"
                     | _ -> Adef.father cpl, "af"
                     end
               | None -> Adef.father cpl, "af"
@@ -1550,9 +1557,9 @@ let print_add o_conf base =
   with Update.ModErr -> ()
 
 let print_del conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some i ->
-      let ifam = Adef.ifam_of_int i in
+      let ifam = ifam_of_string i in
       let fam = foi base ifam in
       if not (is_deleted_family fam) then
         begin
@@ -1561,8 +1568,8 @@ let print_del conf base =
           let changed =
             let gen_p =
               let p =
-                match p_getint conf.env "ip" with
-                  Some i when Adef.int_of_iper (get_mother fam) = i ->
+                match p_getenv conf.env "ip" with
+                  Some i when get_mother fam = iper_of_string i ->
                     poi base (get_mother fam)
                 | _ -> poi base (get_father fam)
               in
@@ -1612,9 +1619,9 @@ let print_mod o_conf base =
   let () = removed_string := [] in
   let o_f =
     let ifam =
-      match p_getint o_conf.env "i" with
-        Some i -> Adef.ifam_of_int i
-      | None -> Adef.ifam_of_int (-1)
+      match p_getenv o_conf.env "i" with
+        Some i -> ifam_of_string i
+      | None -> dummy_ifam
     in
     Util.string_gen_family base (gen_family_of_family (foi base ifam))
   in
@@ -1647,9 +1654,9 @@ let print_mod o_conf base =
     Util.commit_patches conf base;
     let changed =
       let ip =
-        match p_getint o_conf.env "ip" with
-          Some i -> Adef.iper_of_int i
-        | None -> Adef.iper_of_int (-1)
+        match p_getenv o_conf.env "ip" with
+          Some i -> iper_of_string i
+        | None -> dummy_iper
       in
       let p =
         Util.string_gen_person base (gen_person_of_person (poi base ip))
@@ -1664,15 +1671,17 @@ let print_mod o_conf base =
   print_mod_aux conf base callback
 
 let print_inv conf base =
-  match p_getint conf.env "i", p_getint conf.env "f" with
+  match p_getenv conf.env "i", p_getenv conf.env "f" with
     Some ip, Some ifam ->
-      let p = poi base (Adef.iper_of_int ip) in
+      let ip = iper_of_string ip in
+      let ifam = ifam_of_string ifam in
+      let p = poi base ip in
       begin try
-        effective_inv conf base (get_key_index p) p (Adef.ifam_of_int ifam);
+        effective_inv conf base (get_key_index p) p ifam;
         Util.commit_patches conf base;
         let changed =
           let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-          U_Invert_family (gen_p, Adef.ifam_of_int ifam)
+          U_Invert_family (gen_p, ifam)
         in
         History.record conf base changed "if"; print_inv_ok conf base p
       with Update.ModErr -> ()
@@ -1681,17 +1690,18 @@ let print_inv conf base =
 
 let print_change_order_ok conf base =
   match
-    p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n"
+    p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n"
   with
     Some ip, Some ifam, Some n ->
-      let p = poi base (Adef.iper_of_int ip) in
+      let ip = iper_of_string ip in
+      let ifam = ifam_of_string ifam in
+      let p = poi base ip in
       begin try
-        effective_chg_order base (get_key_index p) p
-          (Adef.ifam_of_int ifam) n;
+        effective_chg_order base (get_key_index p) p ifam n;
         Util.commit_patches conf base;
         let changed =
           let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-          U_Invert_family (gen_p, Adef.ifam_of_int ifam)
+          U_Invert_family (gen_p, ifam)
         in
         History.record conf base changed "if"; print_inv_ok conf base p
       with Update.ModErr -> ()
@@ -1699,10 +1709,11 @@ let print_change_order_ok conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some ifam ->
+      let ifam = Gwdb.ifam_of_string ifam in
       begin try
-        let fam = foi base (Adef.ifam_of_int ifam) in
+        let fam = foi base ifam in
         let o_f = Util.string_gen_family base (gen_family_of_family fam) in
         let ht = Hashtbl.create 50 in
         let _ =
@@ -1743,9 +1754,9 @@ let print_change_event_order conf base =
         Util.commit_patches conf base;
         let changed =
           let ip =
-            match p_getint conf.env "ip" with
-              Some i -> Adef.iper_of_int i
-            | None -> Adef.iper_of_int (-1)
+            match p_getenv conf.env "ip" with
+              Some i -> iper_of_string i
+            | None -> dummy_iper
           in
           let p =
             Util.string_gen_person base (gen_person_of_person (poi base ip))

@@ -195,7 +195,7 @@ let print_elem conf base is_surname (p, xl) =
        if not first then Wserver.printf "</li>\n<li>\n  ";
        Perso.print_sosa conf base x true;
        Wserver.printf "<a href=\"%s%s\" id=\"i%s\">" (commd conf)
-         (acces conf base x) (string_of_int (Adef.int_of_iper iper));
+         (acces conf base x) (string_of_iper iper);
        if is_surname then
          Wserver.printf "%s%s" (surname_without_particle base p) (surname_particle base p)
        else Wserver.printf "%s" (if p = "" then "?" else p);
@@ -398,7 +398,7 @@ let print_selection_bullet conf =
 let unselected_bullets conf =
   List.fold_left
     (fun sl (k, v) ->
-       try if k = "u" then int_of_string v :: sl else sl with Failure _ -> sl)
+       try if k = "u" then ifam_of_string v :: sl else sl with Failure _ -> sl)
     [] conf.env
 
 let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
@@ -420,9 +420,9 @@ let print_branch conf base psn name =
              if get_sex p = Female && p_surname base c = name then false
              else down
            in
-           let i = Adef.int_of_ifam ifam in
+           let i = ifam in
            let sel = not (List.mem i unsel_list) in
-           fam, c, (if down then Some (string_of_int i, sel) else None))
+           fam, c, (if down then Some (string_of_ifam i, sel) else None))
         (Array.to_list (get_family u))
     in
     let first_select =
