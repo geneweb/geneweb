@@ -491,7 +491,6 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp =
       let p = UpdateIndOk.effective_mod conf base sp in
       let p = redirect_relations_of_added_related base p ip2 rel_chil in
       redirect_added_families base p ip2 p2_family;
-      Update.update_misc_names_of_family base p.sex {family = p_family};
       patch_person base p.key_index p;
       patch_cache_info conf Util.cache_nb_base_persons
         (fun v -> let v = int_of_string v - 1 in string_of_int v);

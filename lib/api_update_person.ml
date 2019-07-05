@@ -428,12 +428,6 @@ let print_mod conf base mod_p =
         String.concat " " (List.map (sou base) sl)
       in
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
-      if not (eq_istr (get_surname op) p.surname) ||
-         not (List.for_all2 eq_istr (get_surnames_aliases op) p.surnames_aliases) ||
-         not (List.for_all2 (Futil.eq_titles eq_istr) (get_titles op) p.titles)
-      then
-        Update.update_misc_names_of_family base p.sex u
-      else ();
       let wl =
         let a = poi base p.key_index in
         let a = {parents = get_parents a; consang = get_consang a} in

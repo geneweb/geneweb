@@ -256,8 +256,8 @@ let persons_of_name bname patches =
       in
       close_in ic_inx; ai
     in
-    try let l = Hashtbl.find patches i in l @ Array.to_list ai with
-      Not_found -> Array.to_list ai
+    try let l = Hashtbl.find patches i in l @ Array.to_list ai
+    with Not_found -> Array.to_list ai
 
 let strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
@@ -403,7 +403,8 @@ type patches_ht =
     h_couple : int ref * (int, couple) Hashtbl.t;
     h_descend : int ref * (int, descend) Hashtbl.t;
     h_string : int ref * (int, string) Hashtbl.t;
-    h_name : (int, iper list) Hashtbl.t }
+    h_name : (int, iper list) Hashtbl.t
+  }
 
 (* Old structure of file "patches", kept for backward compatibility.
    After conversion, a new change will be saved with a magic number
@@ -756,9 +757,6 @@ let opendb bname =
       (snd patches.h_ascend);
     !r
   in
-  let is_patched_person ip =
-    Hashtbl.mem (snd patches.h_person) (Type.int_of_iper ip)
-  in
   let patch_person i p =
     let i = Type.int_of_iper i in
     persons.len <- max persons.len (i + 1);
@@ -908,7 +906,7 @@ let opendb bname =
      patch_couple = patch_couple; patch_descend = patch_descend;
      patch_name = patch_name; insert_string = insert_string;
      commit_patches = commit_patches; patched_ascends = patched_ascends;
-     is_patched_person = is_patched_person; commit_notes = commit_notes;
+     commit_notes = commit_notes;
      cleanup = cleanup}
   in
   {data = base_data; func = base_func}

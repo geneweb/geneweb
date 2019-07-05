@@ -237,25 +237,6 @@ let print_err_unknown conf _base (f, s, o) =
   in
   raise @@ ModErr err
 
-let update_misc_names_of_family base p_sex u =
-  match p_sex with
-  | Male ->
-    Array.iter
-      begin fun ifam ->
-        let fam = foi base ifam in
-        let fn ip =
-          List.iter
-            (fun name ->
-               if not (List.mem ip (Gutil.person_ht_find_all base name)) then
-                 Gutil.person_ht_add base name ip)
-            (person_misc_names base (poi base ip) get_titles)
-        in
-        fn (get_mother fam) ;
-        Array.iter fn (get_children fam)
-      end
-      u.family
-  | _ -> ()
-
 let delete_topological_sort_v conf _base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab_visitor" in
@@ -1101,13 +1082,6 @@ let print_create_conflict conf base p var =
 (* #endif *)
   raise @@ ModErr err
 
-let add_misc_names_for_new_persons base new_persons =
-  List.iter
-    (fun p ->
-       List.iter (fun n -> Gutil.person_ht_add base n p.key_index)
-         (gen_person_misc_names base p (fun p -> p.titles)))
-    new_persons
-
 let insert_person conf base src new_persons (f, s, o, create, var) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
@@ -1190,14 +1164,11 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         patch_ascend base p.key_index a;
         patch_union base p.key_index u;
         if f <> "?" && s <> "?" then
-          begin
-            patch_cache_info conf Util.cache_nb_base_persons
-              (fun v -> let v = int_of_string v + 1 in string_of_int v);
-            let fn = Util.translate_eval f in
-            let sn = Util.translate_eval s in
-            Gutil.person_ht_add base (fn ^ " " ^ sn) ip;
-            new_persons := p :: !new_persons
-          end;
+        begin
+          patch_cache_info conf Util.cache_nb_base_persons
+            (fun v -> let v = int_of_string v + 1 in string_of_int v);
+          new_persons := p :: !new_persons
+        end;
         ip
       end
   | Link ->

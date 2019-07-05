@@ -3306,7 +3306,7 @@ let make_base (persons, families, strings, bnotes) bdir =
        (fun _ -> raise (Match_failure ("ged2gwb/ged2gwb.camlp5", 3520, 45)));
      patched_ascends =
        (fun _ -> raise (Match_failure ("ged2gwb/ged2gwb.camlp5", 3520, 71)));
-     is_patched_person = (fun _ -> false); cleanup = fun () -> ()}
+     cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
 

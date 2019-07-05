@@ -883,12 +883,6 @@ let update_person_list conf base new_input list nb_pers max_updates =
             if action = "fn" || action = "sn" then
               begin let pi = np.key_index in
                 let op = poi base pi in
-                let key =
-                  sou base np.first_name ^ " " ^ sou base np.surname
-                in
-                patch_name base key pi;
-                Update.update_misc_names_of_family base (get_sex p)
-                  {family = get_family p};
                 let sp =
                   Futil.map_person_ps (fun ip -> ip)
                     (fun istr -> sou base istr) np

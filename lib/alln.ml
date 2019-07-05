@@ -235,10 +235,6 @@ let select_names conf base is_surnames ini need_whole_list =
     if is_surnames then persons_of_surname base
     else persons_of_first_name base
   in
-  let get_name =
-    if is_surnames then get_surname
-    else get_first_name
-  in
   let (list, len) =
     let start_k = Mutil.tr '_' ' ' ini in
     try
@@ -250,16 +246,6 @@ let select_names conf base is_surnames ini need_whole_list =
             let (list, len) =
               if s <> "?" then
                 let my_list = spi_find iii istr in
-                let my_list =
-                  List.fold_left
-                    (fun l ip ->
-                       if is_patched_person base ip then
-                         let p = poi base ip in
-                         let isn = get_name p in
-                         if eq_istr isn istr then ip :: l else l
-                       else ip :: l)
-                    [] my_list
-                in
                 let my_list =
                   if conf.use_restrict then
                     List.fold_left

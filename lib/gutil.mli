@@ -6,7 +6,6 @@ open Gwdb
 
 val spouse : iper -> family -> iper
 
-val person_ht_add : base -> string -> iper -> unit
 val person_not_a_key_find_all : base -> string -> iper list
 val person_ht_find_all : base -> string -> iper list
 val person_of_string_key : base -> string -> iper option

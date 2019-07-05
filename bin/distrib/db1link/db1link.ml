@@ -1257,7 +1257,7 @@ let linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir =
        (fun _ -> raise (Match_failure ("src/db1link.ml", 1374, 20)));
      patched_ascends =
        (fun _ -> raise (Match_failure ("src/db1link.ml", 1374, 46)));
-     is_patched_person = (fun _ -> false); cleanup = fun () -> ()}
+     cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
 

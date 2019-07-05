@@ -19,8 +19,6 @@ let parent_array = Adef.parent_array
 let spouse ip cpl =
   if ip = get_father cpl then get_mother cpl else get_father cpl
 
-let person_ht_add base s ip = patch_name base s ip
-
 let person_is_key base p k =
   let k = Name.crush_lower k in
   if k = Name.crush_lower (p_first_name base p ^ " " ^ p_surname base p) then
