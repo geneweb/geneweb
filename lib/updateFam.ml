@@ -752,7 +752,7 @@ let print_inv1 conf base p ifam1 ifam2 =
   Wserver.printf "<p>\n";
   Util.hidden_env conf;
   Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper (get_key_index p)) conf.xhs;
+    (string_of_iper (get_iper p)) conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
     (string_of_ifam ifam2) conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"%s>\n"
@@ -777,14 +777,14 @@ let print_add conf base =
           if get_sex p = Male ||
              get_sex p = Neuter && p_getenv conf.env "sex" = Some "M"
           then
-            person_key base (get_key_index p)
+            person_key base (get_iper p)
           else "", "", 0, Update.Create (Male, None), ""
         in
         let moth =
           if get_sex p = Female ||
              get_sex p = Neuter && p_getenv conf.env "sex" = Some "F"
           then
-            person_key base (get_key_index p)
+            person_key base (get_iper p)
           else "", "", 0, Update.Create (Female, None), ""
         in
         let digest = string_of_int (Array.length (get_family p)) in
@@ -881,7 +881,7 @@ let print_change_order conf base =
         Array.iteri
           (fun i ifam ->
              let fam = foi base ifam in
-             let sp = Gutil.spouse (get_key_index p) fam in
+             let sp = Gutil.spouse (get_iper p) fam in
              let sp = poi base sp in
              Wserver.printf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");

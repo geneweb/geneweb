@@ -285,7 +285,7 @@ let extract_henv conf base =
           ["pz", code_varenv (Name.lower first_name);
            "nz", code_varenv (Name.lower surname);
            "ocz", string_of_int (get_occ p)]
-        else ["iz", string_of_iper (get_key_index p)]
+        else ["iz", string_of_iper (get_iper p)]
       in
       conf.henv <- conf.henv @ x
   | None -> ()
@@ -403,7 +403,7 @@ let treat_request conf base =
       make_senv conf base;
       let conf =
         match Util.default_sosa_ref conf base with
-          Some p -> {conf with default_sosa_ref = get_key_index p, Some p}
+          Some p -> {conf with default_sosa_ref = get_iper p, Some p}
         | None -> conf
       in
       if only_special_env conf.env then

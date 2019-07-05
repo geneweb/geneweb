@@ -877,7 +877,7 @@ let check_conflict conf base sp ipl =
   List.iter
     (fun ip ->
        let p1 = poi base ip in
-       if get_key_index p1 <> sp.key_index &&
+       if get_iper p1 <> sp.key_index &&
           Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) =
             name &&
           get_occ p1 = sp.occ
@@ -1091,7 +1091,7 @@ let update_relations_of_related base ip old_related =
 let effective_del base warning p =
   let none = Gwdb.insert_string base "?" in
   let empty = Gwdb.insert_string base "" in
-  let ip = get_key_index p in
+  let ip = get_iper p in
   begin match get_parents p with
     Some ifam ->
       let des = foi base ifam in

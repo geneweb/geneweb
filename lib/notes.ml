@@ -283,7 +283,7 @@ let print_linked_list conf base pgl =
                Wserver.printf
                  "<a class=\"mx-2\" href=\"%sm=MOD_FAM&i=%s&ip=%s&\">"
                  (commd conf) (Gwdb.string_of_ifam ifam)
-                 (Gwdb.string_of_iper (Gwdb.get_key_index fath));
+                 (Gwdb.string_of_iper (Gwdb.get_iper fath));
                Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;

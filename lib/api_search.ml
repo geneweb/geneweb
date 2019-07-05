@@ -223,7 +223,7 @@ let select_both_all base ini_n ini_p maiden_name =
       | [] -> ()
       | ifam :: q ->
           let fam = foi base ifam in
-          let ip = Gutil.spouse (get_key_index p) fam in
+          let ip = Gutil.spouse (get_iper p) fam in
           let sp = poi base ip in
           if List.for_all (fun s -> find_fn sp s) ini_p then l := ip :: !l;
           loop q l
@@ -243,7 +243,7 @@ let select_both_all base ini_n ini_p maiden_name =
       | [] -> ()
       | ifam :: q ->
           let fam = foi base ifam in
-          let ip = Gutil.spouse (get_key_index p) fam in
+          let ip = Gutil.spouse (get_iper p) fam in
           let sp = poi base ip in
           let names =
             sou base (get_surname p) ^ " " ^ sou base (get_surname sp)
@@ -258,7 +258,7 @@ let select_both_all base ini_n ini_p maiden_name =
   in
   let list = ref [] in
   Gwdb.Collection.iter begin fun p ->
-    let ip = get_key_index p in
+    let ip = get_iper p in
     if List.for_all (fun s -> find_sn p s) ini_n then
       begin
         if List.for_all (fun s -> find_fn p s) ini_p then
@@ -296,7 +296,7 @@ let select_all base is_surnames ini =
   let list = ref [] in
   Gwdb.Collection.iter begin fun p ->
     if List.for_all (fun s -> find p s) ini
-    then list := get_key_index p :: !list
+    then list := get_iper p :: !list
   end (Gwdb.persons base) ;
   !list
 
@@ -461,7 +461,7 @@ let select_both_start_with_person base ini_n ini_p =
           (fun ini -> List.exists (fun name -> find name ini) first_names)
           ini_p
       in
-      if start_surname && start_firstname then (get_key_index p :: list)
+      if start_surname && start_firstname then (get_iper p :: list)
       else list
   end [] (Gwdb.persons base)
 
@@ -486,7 +486,7 @@ let select_start_with_person base get_field ini =
           (fun ini -> List.exists (fun name -> find name ini) names)
           ini
       in
-      if start_name then (get_key_index p :: list)
+      if start_name then (get_iper p :: list)
       else list
   end [] (Gwdb.persons base)
 
@@ -909,7 +909,7 @@ let select_both_link_person conf base ini_n ini_p =
       | [] -> ()
       | ifam :: q ->
           let fam = foi base ifam in
-          let ip = Gutil.spouse (get_key_index p) fam in
+          let ip = Gutil.spouse (get_iper p) fam in
           let sp = poi base ip in
           if List.for_all (fun s -> find_fn sp s) ini_p then l := ip :: !l;
           loop q l
@@ -929,7 +929,7 @@ let select_both_link_person conf base ini_n ini_p =
       | [] -> ()
       | ifam :: q ->
           let fam = foi base ifam in
-          let ip = Gutil.spouse (get_key_index p) fam in
+          let ip = Gutil.spouse (get_iper p) fam in
           let sp = poi base ip in
           let names =
             sou base (get_surname p) ^ " " ^ sou base (get_surname sp)
@@ -995,7 +995,7 @@ let select_both_link_person base ini_n ini_p max_res =
   fst @@ Gwdb.Collection.fold_until (fun (_, n) -> n < max_res) begin fun (list, n) p ->
     if List.for_all (fun s -> find_sn p s) ini_n then
       if List.for_all (fun s -> find_fn p s) ini_p then
-        (get_key_index p :: list, n + 1)
+        (get_iper p :: list, n + 1)
       else (list, n)
     else (list, n)
   end ([], 0) (Gwdb.persons base)
@@ -1017,7 +1017,7 @@ let select_link_person base get_field max_res ini =
   in
   fst @@ Gwdb.Collection.fold_until (fun (_, n) -> n < max_res) begin fun (list, n) p ->
       if List.for_all (fun s -> find p s) ini
-      then (get_key_index p :: list, n + 1)
+      then (get_iper p :: list, n + 1)
       else (list, n)
   end ([], 0) (Gwdb.persons base)
 

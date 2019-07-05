@@ -175,10 +175,10 @@ let init_sosa_t conf base sosa_ref =
   in
   let persons = Gwdb.ipers base in
   let mark = Gwdb.iper_marker persons false in
-  let last_zil = [get_key_index sosa_ref, Sosa.one] in
+  let last_zil = [get_iper sosa_ref, Sosa.one] in
   let sosa_ht = Hashtbl.create 5003 in
   let () =
-    Hashtbl.add sosa_ht (get_key_index sosa_ref) (Some (Sosa.one, sosa_ref))
+    Hashtbl.add sosa_ht (get_iper sosa_ref) (Some (Sosa.one, sosa_ref))
   in
   {tstab = tstab; mark = mark; last_zil = last_zil; sosa_ht = sosa_ht}
 
@@ -195,12 +195,12 @@ let find_sosa_aux conf base a p t_sosa =
       [] -> Left []
     | (ip, z) :: zil ->
         let _ = cache := (ip, z) :: !cache in
-        if ip = get_key_index a then Right z
+        if ip = get_iper a then Right z
         else if Gwdb.Marker.get t_sosa.mark ip then gene_find zil
         else
           begin
             Gwdb.Marker.set t_sosa.mark ip true;
-            if Gwdb.Marker.get t_sosa.tstab (get_key_index a)
+            if Gwdb.Marker.get t_sosa.tstab (get_iper a)
                <= Gwdb.Marker.get t_sosa.tstab ip
             then
               let _ = has_ignore := true in gene_find zil
@@ -257,11 +257,11 @@ let find_sosa_aux conf base a p t_sosa =
 let find_sosa conf base a sosa_ref_l t_sosa =
   match Lazy.force sosa_ref_l with
     Some p ->
-      if get_key_index a = get_key_index p then Some (Sosa.one, p)
+      if get_iper a = get_iper p then Some (Sosa.one, p)
       else
-        let u = pget conf base (get_key_index a) in
+        let u = pget conf base (get_iper a) in
         if has_children base u then
-          try Hashtbl.find t_sosa.sosa_ht (get_key_index a) with
+          try Hashtbl.find t_sosa.sosa_ht (get_iper a) with
             Not_found -> find_sosa_aux conf base a p t_sosa
         else None
   | None -> None
@@ -295,7 +295,7 @@ let build_sosa_tree_ht conf base person =
   let sosa_accu =
     Array.make (nb_persons + 1) (Sosa.zero, dummy_iper)
   in
-  let () = Array.set sosa_accu 1 (Sosa.one, get_key_index person) in
+  let () = Array.set sosa_accu 1 (Sosa.one, get_iper person) in
   let rec loop i len =
     if i > nb_persons then ()
     else
@@ -403,7 +403,7 @@ let prev_sosa s =
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
 let get_sosa_person p =
-  try Hashtbl.find sosa_ht (get_key_index p) with Not_found -> Sosa.zero
+  try Hashtbl.find sosa_ht (get_iper p) with Not_found -> Sosa.zero
 
 (* ********************************************************************** *)
 (*  [Fonc] has_history : config -> string -> bool                         *)
@@ -473,8 +473,8 @@ let print_sosa conf base p link =
         if conf.cancel_links || not link then ()
         else
           begin let sosa_link =
-            let i1 = string_of_iper (get_key_index p) in
-            let i2 = string_of_iper (get_key_index ref) in
+            let i1 = string_of_iper (get_iper p) in
+            let i2 = string_of_iper (get_iper ref) in
             let b2 = Sosa.to_string sosa_num in
             "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
           in
@@ -748,7 +748,7 @@ let max_cousin_level conf base p =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
       Not_found | Failure _ -> default_max_cousin_lev
   in
-  max_ancestor_level conf base (get_key_index p) max_lev + 1
+  max_ancestor_level conf base (get_iper p) max_lev + 1
 
 let limit_desc conf =
   match p_getint conf.base_env "max_desc_level" with
@@ -769,7 +769,7 @@ let make_desc_level_table conf base max_level p =
   let levt = Gwdb.iper_marker (Gwdb.ipers base) infinite in
   let flevt = Gwdb.ifam_marker (Gwdb.ifams base) infinite in
   let get = pget conf base in
-  let ini_ip = get_key_index p in
+  let ini_ip = get_iper p in
   let rec fill lev =
     function
       [] -> ()
@@ -949,7 +949,7 @@ let get_all_generations conf base p =
     else gpll
   in
   let gpll =
-    get_generations 1 [] [GP_person (Sosa.one, get_key_index p, None)]
+    get_generations 1 [] [GP_person (Sosa.one, get_iper p, None)]
   in
   let gpll = List.rev gpll in List.flatten gpll
 
@@ -1044,7 +1044,7 @@ let tree_generation_list conf base gv p =
              | _ ->
 #ifdef API
                  match
-                   Perso_link.get_parents_link base_prefix (get_key_index p)
+                   Perso_link.get_parents_link base_prefix (get_iper p)
                  with
                    Some family ->
                      let (ifath, imoth, ifam) =
@@ -1288,7 +1288,7 @@ let first_possible_duplication base ip (iexcl, fexcl) =
     loop_chil ipl
 
 let has_possible_duplications conf base p =
-  let ip = get_key_index p in
+  let ip = get_iper p in
   let excl = excluded_possible_duplications conf in
   first_possible_duplication base ip excl <> NoDup
 
@@ -1332,14 +1332,14 @@ let build_surnames_list conf base v p =
     r := fst !r, sosa :: snd !r
   in
   let rec loop lev sosa p surn dp =
-    if Gwdb.Marker.get mark (get_key_index p) = 0 then ()
+    if Gwdb.Marker.get mark (get_iper p) = 0 then ()
     else if lev = v then
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_surname sosa p surn dp
     else
       begin
         Gwdb.Marker.set mark
-          (get_key_index p) (Gwdb.Marker.get mark (get_key_index p) - 1) ;
+          (get_iper p) (Gwdb.Marker.get mark (get_iper p) - 1) ;
         match get_parents p with
           Some ifam ->
             let cpl = foi base ifam in
@@ -1432,15 +1432,15 @@ let build_list_eclair conf base v p =
                  end
              | None -> d
            in
-           pp, db, de, get_key_index p :: l)
+           pp, db, de, get_iper p :: l)
           p !r
   in
   (* Fonction d'ajout de tous les évènements d'une personne (birth, bapt...). *)
   let add_person p surn =
-    if Gwdb.Marker.get mark (get_key_index p) then ()
+    if Gwdb.Marker.get mark (get_iper p) then ()
     else
       begin
-        Gwdb.Marker.set mark (get_key_index p) true;
+        Gwdb.Marker.set mark (get_iper p) true;
         add_surname p surn (get_birth_place p)
           (Adef.od_of_cdate (get_birth p));
         add_surname p surn (get_baptism_place p)
@@ -1730,7 +1730,7 @@ let string_of_image_medium_size = gen_string_of_img_sz 160 120
 let string_of_image_small_size = gen_string_of_img_sz 100 75
 
 let get_sosa conf base env r p =
-  try List.assoc (get_key_index p) !r with
+  try List.assoc (get_iper p) !r with
     Not_found ->
       let s =
         match get_env "sosa_ref" env with
@@ -1741,7 +1741,7 @@ let get_sosa conf base env r p =
             end
         | _ -> None
       in
-      r := (get_key_index p, s) :: !r; s
+      r := (get_iper p, s) :: !r; s
 
 (* ************************************************************************** *)
 (*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
@@ -1787,7 +1787,7 @@ let events_list conf base p =
          let fam = foi base ifam in
          let ifath = get_father fam in
          let imoth = get_mother fam in
-         let isp = Gutil.spouse (get_key_index p) fam in
+         let isp = Gutil.spouse (get_iper p) fam in
          let m_auth =
            authorized_age conf base (pget conf base ifath) &&
            authorized_age conf base (pget conf base imoth)
@@ -2497,7 +2497,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
 #ifdef API
-          match Perso_link.get_father_link conf.command (get_key_index a) with
+          match Perso_link.get_father_link conf.command (get_iper a) with
             Some fath ->
               let ep = Perso_link.make_ep_link base fath in
               let conf = {conf with command = fath.MLink.Person.baseprefix} in
@@ -2522,7 +2522,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
 #ifdef API
-          match Perso_link.get_mother_link conf.command (get_key_index a) with
+          match Perso_link.get_mother_link conf.command (get_iper a) with
             Some moth ->
               let ep = Perso_link.make_ep_link base moth in
               let conf = {conf with command = moth.MLink.Person.baseprefix} in
@@ -2598,7 +2598,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
   | "pvar" :: v :: sl ->
       begin match find_person_in_env conf base v with
       | Some p ->
-          let ep = make_ep conf base (get_key_index p) in
+          let ep = make_ep conf base (get_iper p) in
           eval_person_field_var conf base env ep loc sl
       | None -> raise Not_found
       end
@@ -2631,7 +2631,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match p_getint conf.env ("s" ^ i) with
       | Some s ->
             let s0 = Sosa.of_int s in
-            let ip0 = get_key_index p0 in
+            let ip0 = get_iper p0 in
             begin match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
             | Some (p :: _) ->
                 let p_auth = authorized_age conf base p in
@@ -2648,7 +2648,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | Vsosa_ref v ->
           begin match Lazy.force v with
           | Some p ->
-              let ip = get_key_index p in
+              let ip = get_iper p in
               let s0 = Sosa.of_string s in
               begin match Util.branch_of_sosa conf base s0 (pget conf base ip) with
               | Some (p :: _) ->
@@ -2674,7 +2674,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match get_env "rel" env with
         Vrel ({r_type = rt}, Some p) ->
           eval_relation_field_var conf base env
-            (index_of_sex (get_sex p), rt, get_key_index p, false) loc sl
+            (index_of_sex (get_sex p), rt, get_iper p, false) loc sl
       | _ -> raise Not_found
       end
   | "relation_her" :: sl ->
@@ -2695,7 +2695,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         Vsosa_ref v ->
           begin match Lazy.force v with
             Some p ->
-              let ep = make_ep conf base (get_key_index p) in
+              let ep = make_ep conf base (get_iper p) in
               eval_person_field_var conf base env ep loc sl
           | None -> raise Not_found
           end
@@ -2775,7 +2775,7 @@ and eval_cell_field_var conf base env cell loc =
       begin match cell with
         Cell (p, Some ifam, _, _, _, base_prefix) ->
           if conf.bname = base_prefix then
-            let (f, c, a) = make_efam conf base (get_key_index p) ifam in
+            let (f, c, a) = make_efam conf base (get_iper p) ifam in
             eval_family_field_var conf base env (ifam, f, c, a) loc sl
           else
 #ifdef API
@@ -2793,7 +2793,7 @@ and eval_cell_field_var conf base env cell loc =
                       let ifath = Gwdb.iper_of_string fam_link.MLink.Family.ifath in
                       let imoth = Gwdb.iper_of_string fam_link.MLink.Family.imoth in
                       let cpl =
-                        let ip = get_key_index p in
+                        let ip = get_iper p in
                         if ip <> ifath && ip <> imoth then
                           match
                             Perso_link.get_person_link_with_base conf.command
@@ -2813,7 +2813,7 @@ and eval_cell_field_var conf base env cell loc =
                     else loop l
               in
               let faml =
-                Perso_link.get_family_link conf.command (get_key_index p)
+                Perso_link.get_family_link conf.command (get_iper p)
               in
               loop faml
             in
@@ -2852,7 +2852,7 @@ and eval_cell_field_var conf base env cell loc =
       begin match cell with
         Cell (p, _, _, _, _, base_prefix) ->
           if conf.bname = base_prefix then
-            let ep = make_ep conf base (get_key_index p) in
+            let ep = make_ep conf base (get_iper p) in
             eval_person_field_var conf base env ep loc sl
           else
             let conf = {conf with command = base_prefix} in
@@ -2987,7 +2987,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
            in
            let (p, _) = ep in VVstring (acces_n conf base "1" p ^ str)
        | sl ->
-           let ep = make_ep conf base (get_key_index p) in
+           let ep = make_ep conf base (get_iper p) in
            eval_person_field_var conf base env ep loc sl)
   | Eclair (_, place, db, de, p, persl, loc) ->
       function
@@ -3009,7 +3009,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           VVstring (string_of_int (List.length list))
       | ["place"] -> VVstring place
       | sl ->
-          let ep = make_ep conf base (get_key_index p) in
+          let ep = make_ep conf base (get_iper p) in
           eval_person_field_var conf base env ep loc sl
 and eval_num conf n =
   function
@@ -3070,7 +3070,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
 #ifdef API
-          match Perso_link.get_father_link conf.command (get_key_index p) with
+          match Perso_link.get_father_link conf.command (get_iper p) with
             Some fath ->
               let ep = Perso_link.make_ep_link base fath in
               let conf = {conf with command = fath.MLink.Person.baseprefix} in
@@ -3136,7 +3136,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
         let from_gen_desc = int_of_string from_gen_desc in
         let nb_desc = int_of_string nb_desc in
         let () =
-          Perso_link.init_cache conf base (get_key_index p) nb_asc
+          Perso_link.init_cache conf base (get_iper p) nb_asc
             from_gen_desc nb_desc
         in
         VVstring ""
@@ -3175,7 +3175,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
 #ifdef API
-          match Perso_link.get_mother_link conf.command (get_key_index p) with
+          match Perso_link.get_mother_link conf.command (get_iper p) with
             Some moth ->
               let ep = Perso_link.make_ep_link base moth in
               let conf = {conf with command = moth.MLink.Person.baseprefix} in
@@ -3243,7 +3243,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
       begin match get_env "fam" env with
         Vfam (ifam, _, _, _) ->
           let cpl = foi base ifam in
-          let ip = Gutil.spouse (get_key_index p) cpl in
+          let ip = Gutil.spouse (get_iper p) cpl in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
@@ -3652,7 +3652,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
           else
 #ifdef API
             let faml =
-              Perso_link.get_family_link conf.command (get_key_index p)
+              Perso_link.get_family_link conf.command (get_iper p)
             in
             let rec loop faml =
               match faml with
@@ -3664,7 +3664,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
                     Gwdb.ifam_of_string fam_link.MLink.Family.ifam
                   in
                   let cpl =
-                    let ip = get_key_index p in
+                    let ip = get_iper p in
                     if ip <> ifath && ip <> imoth then
                       match
                         Perso_link.get_person_link_with_base conf.command ip
@@ -3678,7 +3678,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
                     else ifath, imoth, (if ip = ifath then imoth else ifath)
                   in
                   let can_merge =
-                    Perso_link.can_merge_family conf.command (get_key_index p)
+                    Perso_link.can_merge_family conf.command (get_iper p)
                       [fam] fam_link cpl
                   in
                   if can_merge then
@@ -3833,7 +3833,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       ||
       List.length
         (Perso_link.get_family_correspondance conf.command
-           (get_key_index p)) >
+           (get_iper p)) >
         0
 #endif
   | "has_first_names_aliases" ->
@@ -3855,7 +3855,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
            Vstring baseprefix -> {conf with command = baseprefix}
          | _ -> conf
        in
-       Perso_link.get_parents_link conf.command (get_key_index p) <> None)
+       Perso_link.get_parents_link conf.command (get_iper p) <> None)
 #endif
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
@@ -3889,7 +3889,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             | _ -> conf
           in
           match
-            Perso_link.get_parents_link conf.command (get_key_index p)
+            Perso_link.get_parents_link conf.command (get_iper p)
           with
             Some family -> List.length family.MLink.Family.children > 1
           | None -> false
@@ -3906,7 +3906,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
        Array.exists
          (fun ifam ->
             let fam = foi base ifam in
-            let isp = Gutil.spouse (get_key_index p) fam in
+            let isp = Gutil.spouse (get_iper p) fam in
             let sp = poi base isp in
             (* On sait que p_auth vaut vrai. *)
             let m_auth = authorized_age conf base sp in
@@ -3939,7 +3939,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       end
   | "is_descendant" ->
       begin match get_env "desc_mark" env with
-        Vdmark r -> (Gwdb.Marker.get !r (get_key_index p))
+        Vdmark r -> (Gwdb.Marker.get !r (get_iper p))
       | _ -> raise Not_found
       end
   | "is_female" -> get_sex p = Female
@@ -4101,7 +4101,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_env "fam" env with
         Vfam (ifam, _, _, _) ->
           Printf.sprintf "i=%s&ip=%s" (string_of_ifam ifam)
-            (string_of_iper (get_key_index p))
+            (string_of_iper (get_iper p))
       | _ -> raise Not_found
       end
   | "father_age_at_birth" -> string_of_parent_age conf base ep get_father
@@ -4130,18 +4130,18 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "image_url" -> string_of_image_url conf base ep false
   | "ind_access" ->
       (* deprecated since 5.00: rather use "i=%index;" *)
-      "i=" ^ string_of_iper (get_key_index p)
+      "i=" ^ string_of_iper (get_iper p)
   | "index" ->
       begin match get_env "p_link" env with
         Vbool _ -> ""
-      | _ -> string_of_iper (get_key_index p)
+      | _ -> string_of_iper (get_iper p)
       end
   | "mark_descendants" ->
       begin match get_env "desc_mark" env with
         Vdmark r ->
           let tab = Gwdb.iper_marker (Gwdb.ipers base) false in
           let rec mark_descendants len p =
-            let i = (get_key_index p) in
+            let i = (get_iper p) in
             if Gwdb.Marker.get tab i then ()
             else
               begin
@@ -4246,7 +4246,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           string_of_int
             (List.length
                (Perso_link.get_family_correspondance conf.command
-                  (get_key_index p)))
+                  (get_iper p)))
 #else
       "0"
 #endif
@@ -4435,7 +4435,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "sosa_in_list" ->
       begin match get_env "all_gp" env with
         Vallgp all_gp ->
-          begin match get_link all_gp (get_key_index p) with
+          begin match get_link all_gp (get_iper p) with
             Some (GP_person (s, _, _)) -> Sosa.to_string s
           | _ -> ""
           end
@@ -4447,8 +4447,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           begin match get_sosa conf base env x p with
             Some (n, q) ->
               Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
-                (string_of_iper (get_key_index p))
-                (string_of_iper (get_key_index q))
+                (string_of_iper (get_iper p))
+                (string_of_iper (get_iper q))
                 (Sosa.to_string n)
           | None -> ""
           end
@@ -4733,7 +4733,7 @@ let print_foreach conf base print_ast eval_expr =
                 | _ -> conf
               in
               match
-                Perso_link.get_parents_link conf.command (get_key_index a)
+                Perso_link.get_parents_link conf.command (get_iper a)
               with
                 Some family ->
                   let (ifath, imoth, ifam) =
@@ -4788,7 +4788,7 @@ let print_foreach conf base print_ast eval_expr =
                 | _ -> conf
               in
               match
-                Perso_link.get_parents_link conf.command (get_key_index a)
+                Perso_link.get_parents_link conf.command (get_iper a)
               with
                 Some family ->
                   let (ifath, imoth, ifam) =
@@ -4956,7 +4956,7 @@ let print_foreach conf base print_ast eval_expr =
         List.iter (print_ast env ep) al;
         let gpl = next_generation conf base mark gpl in loop gpl (succ i) n
     in
-    loop [GP_person (Sosa.one, get_key_index p, None)] 1 0
+    loop [GP_person (Sosa.one, get_iper p, None)] 1 0
   and print_foreach_ancestor_level2 env al (p, _ as ep) =
     let max_lev = "max_anc_level" in
     let max_level =
@@ -4973,7 +4973,7 @@ let print_foreach conf base print_ast eval_expr =
         Gwdb.Collection.iter (fun i -> Gwdb.Marker.set mark i Sosa.zero) (Gwdb.ipers base) ;
         let gpl = next_generation2 conf base mark gpl in loop gpl (succ i)
     in
-    loop [GP_person (Sosa.one, get_key_index p, None)] 1
+    loop [GP_person (Sosa.one, get_iper p, None)] 1
   and print_foreach_anc_surn env el al loc (p, _ as ep) =
     let max_level =
       match el with
@@ -5137,7 +5137,7 @@ let print_foreach conf base print_ast eval_expr =
               in
               let rec loop i =
                 if i = Array.length (get_children fam) then -2
-                else if (get_children fam).(i) = get_key_index p then i
+                else if (get_children fam).(i) = get_iper p then i
                 else loop (i + 1)
               in
               loop 0
@@ -5163,7 +5163,7 @@ let print_foreach conf base print_ast eval_expr =
             (* On ajoute les enfants distants. *)
             let faml =
               Perso_link.get_families_of_parents conf.command
-                (get_key_index (fst ep)) isp
+                (get_iper (fst ep)) isp
             in
             List.iter
               (fun fam_link ->
@@ -5279,7 +5279,7 @@ let print_foreach conf base print_ast eval_expr =
             let c = pget conf base ic in
             List.iter
               (fun (name, _, _, _, _, wl, _ as evt) ->
-                 let (mem, wk) = Util.array_mem_witn conf base (get_key_index p) wl in
+                 let (mem, wk) = Util.array_mem_witn conf base (get_iper p) wl in
                  if mem then
                    match name with
                      Fevent _ ->
@@ -5320,7 +5320,7 @@ let print_foreach conf base print_ast eval_expr =
           | _ -> conf
         in
         let faml =
-          Perso_link.get_family_link conf.command (get_key_index p)
+          Perso_link.get_family_link conf.command (get_iper p)
         in
         let rec loop prev i faml =
           match faml with
@@ -5336,7 +5336,7 @@ let print_foreach conf base print_ast eval_expr =
                 Gwdb.ifam_of_string fam_link.MLink.Family.ifam
               in
               let cpl =
-                let ip = get_key_index p in
+                let ip = get_iper p in
                 if ip <> ifath && ip <> imoth then
                   match
                     Perso_link.get_person_link_with_base conf.command ip
@@ -5377,7 +5377,7 @@ let print_foreach conf base print_ast eval_expr =
               let fam = foi base ifam in
               let ifath = get_father fam in
               let imoth = get_mother fam in
-              let ispouse = Gutil.spouse (get_key_index p) fam in
+              let ispouse = Gutil.spouse (get_iper p) fam in
               let cpl = ifath, imoth, ispouse in
               let m_auth =
                 authorized_age conf base (pget conf base ifath) &&
@@ -5399,7 +5399,7 @@ let print_foreach conf base print_ast eval_expr =
 #ifdef API
         (* On ajoute les familles distantes. *)
         let faml =
-          Perso_link.get_family_link conf.command (get_key_index p)
+          Perso_link.get_family_link conf.command (get_iper p)
         in
         let rec loop prev i faml =
           match faml with
@@ -5414,7 +5414,7 @@ let print_foreach conf base print_ast eval_expr =
                 Gwdb.ifam_of_string fam_link.MLink.Family.ifam
               in
               let cpl =
-                let ip = get_key_index p in
+                let ip = get_iper p in
                 if ip <> ifath && ip <> imoth then
                   match
                     Perso_link.get_person_link_with_base conf.command ip
@@ -5431,7 +5431,7 @@ let print_foreach conf base print_ast eval_expr =
                 let fam =
                   List.map (foi base) (Array.to_list (get_family p))
                 in
-                Perso_link.can_merge_family conf.command (get_key_index p) fam
+                Perso_link.can_merge_family conf.command (get_iper p) fam
                   fam_link cpl
               in
               if can_merge then loop None i faml
@@ -5526,11 +5526,11 @@ let print_foreach conf base print_ast eval_expr =
                function
                  r :: rl ->
                    begin match r.r_fath with
-                     Some ip when ip = get_key_index p ->
+                     Some ip when ip = get_iper p ->
                        loop ((c, r) :: list) rl
                    | _ ->
                        match r.r_moth with
-                         Some ip when ip = get_key_index p ->
+                         Some ip when ip = get_iper p ->
                            loop ((c, r) :: list) rl
                        | _ -> loop list rl
                    end
@@ -5640,7 +5640,7 @@ let print_foreach conf base print_ast eval_expr =
           Array.fold_left
             (fun (srcl, i) ifam ->
                let fam = foi base ifam in
-               let isp = Gutil.spouse (get_key_index p) fam in
+               let isp = Gutil.spouse (get_iper p) fam in
                let sp = poi base isp in
                (* On sait que p_auth vaut vrai. *)
                let m_auth = authorized_age conf base sp in
@@ -5716,7 +5716,7 @@ let print_foreach conf base print_ast eval_expr =
               Array.iter
                 (fun ifam ->
                    let fam = foi base ifam in
-                   if Array.mem (get_key_index p) (get_witnesses fam) then
+                   if Array.mem (get_iper p) (get_witnesses fam) then
                      list := (ifam, fam) :: !list)
                 (get_family (pget conf base ic));
             make_list icl
@@ -5836,17 +5836,17 @@ let gen_interp_templ menu title templ_fname conf base p =
       let dlt () = make_desc_level_table conf base emal p in Lazy.from_fun dlt
     in
     let mal () =
-      Vint (max_ancestor_level conf base (get_key_index p) emal + 1)
+      Vint (max_ancestor_level conf base (get_iper p) emal + 1)
     in
     (* Static max ancestor level *)
     let smal () =
-      Vint (max_ancestor_level conf base (get_key_index p) 120 + 1)
+      Vint (max_ancestor_level conf base (get_iper p) 120 + 1)
     in
     (* Sosa_ref max ancestor level *)
     let srmal () =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
-        Vint (max_ancestor_level conf base (get_key_index sosa_ref) 120 + 1)
+        Vint (max_ancestor_level conf base (get_iper sosa_ref) 120 + 1)
       | _ -> Vint 0
     in
     let mcl () = Vint (max_cousin_level conf base p) in
@@ -5856,7 +5856,7 @@ let gen_interp_templ menu title templ_fname conf base p =
       Vint
         (max (max_descendant_level base desc_level_table_l)
            (Perso_link.max_interlinks_descendancy_level conf base
-              (get_key_index p) 10))
+              (get_iper p) 10))
 #else
       Vint (max_descendant_level base desc_level_table_l)
 #endif
@@ -5968,7 +5968,7 @@ let print_ancestors_dag conf base v p =
             loop set (lev - 1) (get_father cpl)
         | None -> set
     in
-    loop Dag.Pset.empty v (get_key_index p)
+    loop Dag.Pset.empty v (get_iper p)
   in
   let elem_txt p = Dag.Item (p, "") in
   (* Récupère les options d'affichage. *)

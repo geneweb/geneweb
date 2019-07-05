@@ -1232,7 +1232,7 @@ let effective_add conf base sfam scpl sdes =
          Some _ -> print_err_parents conf base p
        | None ->
            let a = {parents = Some fi; consang = Adef.fix (-1)} in
-           patch_ascend base (get_key_index p) a)
+           patch_ascend base (get_iper p) a)
     ndes.children;
   Update.add_misc_names_for_new_persons base !created_p;
   Update.update_misc_names_of_family base Male nfath_u;
@@ -1350,7 +1350,7 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
   List.iter
     (function
        ChangedOrderOfMarriages (p, _, after) ->
-         patch_union base (get_key_index p) {family = after}
+         patch_union base (get_iper p) {family = after}
      | ChangedOrderOfFamilyEvents (ifam, _, after) ->
          patch_family base ifam {gen_fam with fevents = after}
      | _ -> ())
@@ -1674,7 +1674,7 @@ let print_inv conf base =
       let ifam = ifam_of_string ifam in
       let p = poi base ip in
       begin try
-        effective_inv conf base (get_key_index p) p ifam;
+        effective_inv conf base (get_iper p) p ifam;
         Util.commit_patches conf base;
         let changed =
           let gen_p = Util.string_gen_person base (gen_person_of_person p) in
@@ -1694,7 +1694,7 @@ let print_change_order_ok conf base =
       let ifam = ifam_of_string ifam in
       let p = poi base ip in
       begin try
-        effective_chg_order base (get_key_index p) p ifam n;
+        effective_chg_order base (get_iper p) p ifam n;
         Util.commit_patches conf base;
         let changed =
           let gen_p = Util.string_gen_person base (gen_person_of_person p) in

@@ -1266,7 +1266,7 @@ let print_all_stats conf base =
   Gwdb.Collection.iter begin fun p ->
     let p_auth = Util.authorized_age conf base p in
     let faml = Array.to_list (get_family p) in
-    let ip = get_key_index p in
+    let ip = get_iper p in
 
     if get_sex p = Neuter then ()
     else
@@ -1470,7 +1470,7 @@ let print_all_stats conf base =
                       let m_auth =
                         p_auth &&
                           Util.authorized_age conf base
-                          (poi base (Gutil.spouse (get_key_index p) fam))
+                          (poi base (Gutil.spouse (get_iper p) fam))
                       in
                       if not m_auth then ()
                       else
