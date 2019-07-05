@@ -1,7 +1,7 @@
 (library
  (name dummy_gwdb)
  (libraries geneweb.def)
- (implements gwdb)
+ (implements geneweb.gwdb.mli)
  (modules gwdb)
 )
 
