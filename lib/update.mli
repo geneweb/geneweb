@@ -1,11 +1,11 @@
-(* $Id: update.mli,v 5.12 2008-01-08 02:08:00 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
 open Def
 open Gwdb
 
-exception ModErr
+exception ModErr of string
+
 type create_info =
   { ci_birth_date : date option;
     ci_birth_place : string;
@@ -39,6 +39,7 @@ val delete_topological_sort : config -> base -> unit
 val update_related_pointers : base -> iper -> iper list -> iper list -> unit
 
 val print_return : config -> unit
+val string_of_error : config -> base -> CheckItem.base_error -> string
 val print_error : config -> base -> CheckItem.base_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit
 val print_miscs : config -> base -> CheckItem.base_misc list -> unit
@@ -60,26 +61,6 @@ val print_someone : config -> base -> person -> unit
 
 val update_conf : config -> config
 
-#ifdef API
-
-(* Ajout pour l'API *)
-(* Erreurs possibles :
-     - "UnknownPerson"
-     - "AlreadyDefined"
-     - "OwnAncestor"
-     - "BadSexOfMarriedPerson"
-     - "BaseChanged"
-     - "BadDateFormat"
-     - "CreateConflictOcc"
-     - "AlreadyHasParent"
-     - "FatherShouldBeMale"
-     - "MotherShouldBeFemale"
-     - "Disconnected"
-     - "error"
-*)
-exception ModErrApi of string
 val bad_date : config -> dmy -> 'a
 val check_greg_day : config -> dmy -> unit
-
-#endif
 

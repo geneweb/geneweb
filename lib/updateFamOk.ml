@@ -609,18 +609,24 @@ let strip_array_persons pl =
   Array.of_list pl
 
 let error_family conf err =
+  let err' =
+    Printf.sprintf "%s%s%s"
+      (capitale (transl conf "error"))
+      (transl conf ":")
+      err
+  in
 #ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
-      raise (Update.ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
   Hutil.trailer conf;
-  raise Update.ModErr
+#ifdef API
+    end;
+#endif
+  raise @@ Update.ModErr err'
 
 let check_event_witnesses conf witnesses =
   let wl = Array.to_list witnesses in
@@ -685,8 +691,6 @@ let check_parents conf cpl =
          transl conf "first name missing")
 
 let check_family conf fam cpl =
-  (* N'est plus nécessaire avec les évènements. Est fait dans fevents. *)
-  (*let err_witness = check_witnesses conf base fam in*)
   let err_parents = check_parents conf cpl in
   let err_fevent_witness =
     (* On regarde si les témoins sont bien renseignés. *)
@@ -700,14 +704,6 @@ let check_family conf fam cpl =
     in
     loop fam.fevents
   in
-  (*
-  let err_witness =
-    match (err_witness, err_fevent_witness) with
-    [ (Some err, _) | (_, Some err) -> Some err
-    | (None, None) -> None ]
-  in
-  (err_witness, err_parents)
-  *)
   err_fevent_witness, err_parents
 
 let strip_family fam des =
@@ -718,101 +714,85 @@ let strip_family fam des =
   let des = {children = strip_array_persons des.children} in fam, des
 
 let print_err_parents conf base p =
+  let err =
+    Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
+      (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p))
+  in
 #ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
-        (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p))
-    in
-      raise (Update.ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "\n";
-  Wserver.printf (fcapitale (ftransl conf "%t already has parents"))
-    (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p));
-  Wserver.printf "\n";
+  Wserver.printf "\n%s\n" err;
   html_p conf;
-  Wserver.printf "<ul>\n";
-  html_li conf;
-  Wserver.printf "%s%s %d" (capitale (transl conf "first free number"))
+  Wserver.printf "<ul><li>%s%s %d</li></ul>\n"
+    (capitale (transl conf "first free number"))
     (Util.transl conf ":")
     (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
-  Wserver.printf "</ul>\n";
   Update.print_return conf;
   Hutil.trailer conf;
-  raise Update.ModErr
+#ifdef API
+    end;
+#endif
+  raise @@ Update.ModErr err
+
+let print_err_sex conf base p err =
+  let err =
+    Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p) err
+  in
+#ifdef API
+  if not !Api_conf.mode_api then begin
+#endif
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
+  Hutil.rheader conf title;
+  Wserver.printf "%s" err ;
+  Update.print_return conf;
+  Hutil.trailer conf;
+#ifdef API
+  end ;
+#endif
+  raise @@ Update.ModErr err
 
 let print_err_father_sex conf base p =
-#ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
-        (transl conf "should be male")
-    in
-      raise (Update.ModErrApi err)
-    end;
-#endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
-  Wserver.printf "\n%s" (referenced_person_text conf base p);
-  Wserver.printf "\n%s\n" (transl conf "should be male");
-  Update.print_return conf;
-  Hutil.trailer conf;
-  raise Update.ModErr
+  print_err_sex conf base p (transl conf "should be male")
 
 let print_err_mother_sex conf base p =
-#ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
-        (transl conf "should be female")
-    in
-      raise (Update.ModErrApi err)
-    end;
-#endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
-  Wserver.printf "\n%s" (referenced_person_text conf base p);
-  Wserver.printf "\n%s\n" (transl conf "should be female");
-  Update.print_return conf;
-  Hutil.trailer conf;
-  raise Update.ModErr
+  print_err_sex conf base p (transl conf "should be female")
 
 let print_err conf =
+  let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
 #ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
-      raise (Update.ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" err in
   Hutil.rheader conf title;
   Update.print_return conf;
   Hutil.trailer conf;
-  raise Update.ModErr
+#ifdef API
+  end;
+#endif
+  raise @@ Update.ModErr err
 
 let print_error_disconnected conf =
+  let err = Printf.sprintf "%s" (capitale (transl conf "msg error disconnected")) in
 #ifdef API
-  if !(Api_conf.mode_api) then
-    begin let err =
-      Printf.sprintf "%s" (capitale (transl conf "msg error disconnected"))
-    in
-      raise (Update.ModErrApi err)
-    end;
+  if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "%s" (capitale (transl conf "msg error disconnected"));
+  Wserver.printf "%s" err;
   Hutil.trailer conf;
-  raise Update.ModErr
+#ifdef API
+  end ;
+#endif
+  raise @@ Update.ModErr err
 
 let family_exclude pfams efam =
   let pfaml =
-    List.fold_right (fun fam faml -> if fam = efam then faml else fam :: faml)
-      (Array.to_list pfams) []
+    Array.fold_right
+      (fun fam faml -> if fam = efam then faml else fam :: faml)
+      pfams []
   in
   Array.of_list pfaml
 
@@ -1248,7 +1228,7 @@ let effective_inv conf base ip u ifam =
       ifam1 :: ifam2 :: ifaml ->
         if ifam2 = ifam then ifam2 :: ifam1 :: ifaml
         else ifam1 :: loop (ifam2 :: ifaml)
-    | _ -> Hutil.incorrect_request conf; raise Update.ModErr
+    | _ -> Hutil.incorrect_request conf; raise @@ Update.ModErr __LOC__
   in
   let u = {family = Array.of_list (loop (Array.to_list (get_family u)))} in
   patch_union base ip u
@@ -1486,75 +1466,73 @@ let print_add o_conf base =
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
-  try
-    let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
-    let redisp =
-      match p_getenv conf.env "return" with
-        Some _ -> true
-      | _ -> false
-    in
-    let digest =
-      match p_getenv conf.env "ip" with
-        Some ip ->
-          string_of_int
-            (Array.length (get_family (poi base (iper_of_string ip))))
-      | None -> ""
-    in
-    let sdigest = raw_get conf "digest" in
-    if digest <> "" && sdigest <> "" && digest <> sdigest then
-      Update.error_digest conf
-    else if ext || redisp then
-      UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
-    else if forbidden_disconnected conf scpl sdes then
-      print_error_disconnected conf
-    else
-      match check_family conf sfam scpl with
-        Some err, _ | _, Some err -> error_family conf err
-      | None, None ->
-          let (sfam, sdes) = strip_family sfam sdes in
-          let (ifam, fam, cpl, des) =
-            effective_add conf base sfam scpl sdes
+  let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
+  let redisp =
+    match p_getenv conf.env "return" with
+      Some _ -> true
+    | _ -> false
+  in
+  let digest =
+    match p_getenv conf.env "ip" with
+      Some ip ->
+      string_of_int
+        (Array.length (get_family (poi base (iper_of_string ip))))
+    | None -> ""
+  in
+  let sdigest = raw_get conf "digest" in
+  if digest <> "" && sdigest <> "" && digest <> sdigest then
+    Update.error_digest conf
+  else if ext || redisp then
+    UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
+  else if forbidden_disconnected conf scpl sdes then
+    print_error_disconnected conf
+  else
+    match check_family conf sfam scpl with
+      Some err, _ | _, Some err -> error_family conf err
+    | None, None ->
+      let (sfam, sdes) = strip_family sfam sdes in
+      let (ifam, fam, cpl, des) =
+        effective_add conf base sfam scpl sdes
+      in
+      let () = patch_parent_with_pevents base cpl in
+      let () = patch_children_with_pevents base des in
+      let (wl, ml) =
+        all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
+      in
+      let (changed, act) =
+        let fam = Util.string_gen_family base fam in
+        let (ip, act) =
+          match p_getenv conf.env "ip" with
+            Some i ->
+            let i = iper_of_string i in
+            if Adef.mother cpl = i then
+              Adef.mother cpl, "af"
+            else
+              let a = poi base i in
+              begin match get_parents a with
+                  Some x when x = ifam -> i, "aa"
+                | _ -> Adef.father cpl, "af"
+              end
+          | None -> Adef.father cpl, "af"
+        in
+        match act with
+          "af" ->
+          let gen_p =
+            Util.string_gen_person base
+              (gen_person_of_person (poi base ip))
           in
-          let () = patch_parent_with_pevents base cpl in
-          let () = patch_children_with_pevents base des in
-          let (wl, ml) =
-            all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
+          U_Add_family (gen_p, fam), "af"
+        | _ ->
+          let gen_p =
+            Util.string_gen_person base
+              (gen_person_of_person (poi base ip))
           in
-          let (changed, act) =
-            let fam = Util.string_gen_family base fam in
-            let (ip, act) =
-              match p_getenv conf.env "ip" with
-                Some i ->
-                  let i = iper_of_string i in
-                  if Adef.mother cpl = i then
-                    Adef.mother cpl, "af"
-                  else
-                    let a = poi base i in
-                    begin match get_parents a with
-                      Some x when x = ifam -> i, "aa"
-                    | _ -> Adef.father cpl, "af"
-                    end
-              | None -> Adef.father cpl, "af"
-            in
-            match act with
-              "af" ->
-                let gen_p =
-                  Util.string_gen_person base
-                    (gen_person_of_person (poi base ip))
-                in
-                U_Add_family (gen_p, fam), "af"
-            | _ ->
-                let gen_p =
-                  Util.string_gen_person base
-                    (gen_person_of_person (poi base ip))
-                in
-                U_Add_parent (gen_p, fam), "aa"
-          in
-          Util.commit_patches conf base;
-          History.record conf base changed act;
-          Update.delete_topological_sort conf base;
-          print_add_ok conf base (wl, ml) cpl des
-  with Update.ModErr -> ()
+          U_Add_parent (gen_p, fam), "aa"
+      in
+      Util.commit_patches conf base;
+      History.record conf base changed act;
+      Update.delete_topological_sort conf base;
+      print_add_ok conf base (wl, ml) cpl des
 
 let print_del conf base =
   match p_getenv conf.env "i" with
@@ -1584,28 +1562,26 @@ let print_del conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_aux conf base callback =
-  try
-    let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
-    let redisp =
-      match p_getenv conf.env "return" with
-        Some _ -> true
-      | _ -> false
-    in
-    let digest =
-      let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
-      Update.digest_family ini_sfam
-    in
-    if digest = raw_get conf "digest" then
-      if ext || redisp then
-        UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
-      else
-        match check_family conf sfam scpl with
-          Some err, _ | _, Some err -> error_family conf err
-        | None, None ->
-            let (sfam, sdes) = strip_family sfam sdes in
-            callback sfam scpl sdes
-    else Update.error_digest conf
-  with Update.ModErr -> ()
+  let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
+  let redisp =
+    match p_getenv conf.env "return" with
+      Some _ -> true
+    | _ -> false
+  in
+  let digest =
+    let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
+    Update.digest_family ini_sfam
+  in
+  if digest = raw_get conf "digest" then
+    if ext || redisp then
+      UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
+    else
+      match check_family conf sfam scpl with
+        Some err, _ | _, Some err -> error_family conf err
+      | None, None ->
+        let (sfam, sdes) = strip_family sfam sdes in
+        callback sfam scpl sdes
+  else Update.error_digest conf
 
 let family_structure base ifam =
   let fam = foi base ifam in get_parent_array fam, get_children fam
@@ -1673,16 +1649,13 @@ let print_inv conf base =
       let ip = iper_of_string ip in
       let ifam = ifam_of_string ifam in
       let p = poi base ip in
-      begin try
-        effective_inv conf base (get_iper p) p ifam;
-        Util.commit_patches conf base;
-        let changed =
-          let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-          U_Invert_family (gen_p, ifam)
-        in
-        History.record conf base changed "if"; print_inv_ok conf base p
-      with Update.ModErr -> ()
-      end
+      effective_inv conf base (get_iper p) p ifam;
+      Util.commit_patches conf base;
+      let changed =
+        let gen_p = Util.string_gen_person base (gen_person_of_person p) in
+        U_Invert_family (gen_p, ifam)
+      in
+      History.record conf base changed "if"; print_inv_ok conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_change_order_ok conf base =
@@ -1693,76 +1666,70 @@ let print_change_order_ok conf base =
       let ip = iper_of_string ip in
       let ifam = ifam_of_string ifam in
       let p = poi base ip in
-      begin try
-        effective_chg_order base (get_iper p) p ifam n;
-        Util.commit_patches conf base;
-        let changed =
-          let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-          U_Invert_family (gen_p, ifam)
-        in
-        History.record conf base changed "if"; print_inv_ok conf base p
-      with Update.ModErr -> ()
-      end
+      effective_chg_order base (get_iper p) p ifam n;
+      Util.commit_patches conf base;
+      let changed =
+        let gen_p = Util.string_gen_person base (gen_person_of_person p) in
+        U_Invert_family (gen_p, ifam)
+      in
+      History.record conf base changed "if"; print_inv_ok conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
-    Some ifam ->
-      let ifam = Gwdb.ifam_of_string ifam in
-      begin try
-        let fam = foi base ifam in
-        let o_f = Util.string_gen_family base (gen_family_of_family fam) in
-        let ht = Hashtbl.create 50 in
-        let _ =
-          List.fold_left (fun id evt -> Hashtbl.add ht id evt; succ id) 1
-            (get_fevents fam)
-        in
-        let sorted_fevents =
-          List.sort (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
-            (reconstitute_sorted_fevents conf 1)
-        in
-        let fevents =
-          List.fold_right
-            (fun (id, _) accu ->
-               try Hashtbl.find ht id :: accu with
-                 Not_found -> failwith "Sorting event")
-            sorted_fevents []
-        in
-        let fam = gen_family_of_family fam in
-        let fam = {fam with fevents = fevents} in
-        let fam = update_family_with_fevents conf base fam in
-        patch_family base fam.fam_index fam;
-        let a = foi base fam.fam_index in
-        let cpl = Futil.parent conf.multi_parents (get_parent_array a) in
-        let des = {children = get_children a} in
-        let wl =
-          let wl = ref [] in
-          let warning w = wl := w :: !wl in
-          let nfam = family_of_gen_family base (fam, cpl, des) in
-          CheckItem.family base warning fam.fam_index nfam;
-          List.iter
-            (function
-               ChangedOrderOfFamilyEvents (ifam, _, after) ->
-                 patch_family base ifam {fam with fevents = after}
-             | _ -> ())
-            !wl;
-          List.rev !wl
-        in
-        Util.commit_patches conf base;
-        let changed =
-          let ip =
-            match p_getenv conf.env "ip" with
-              Some i -> iper_of_string i
-            | None -> dummy_iper
-          in
-          let p =
-            Util.string_gen_person base (gen_person_of_person (poi base ip))
-          in
-          let n_f = Util.string_gen_family base fam in
-          U_Modify_family (p, o_f, n_f)
-        in
-        History.record conf base changed "mf";
-        print_change_event_order_ok conf base (wl, []) cpl des
-      with Update.ModErr -> ()
-      end
+  | Some ifam ->
+    let ifam = Gwdb.ifam_of_string ifam in
+    let fam = foi base ifam in
+    let o_f = Util.string_gen_family base (gen_family_of_family fam) in
+    let ht = Hashtbl.create 50 in
+    let _ =
+      List.fold_left (fun id evt -> Hashtbl.add ht id evt; succ id) 1
+        (get_fevents fam)
+    in
+    let sorted_fevents =
+      List.sort (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
+        (reconstitute_sorted_fevents conf 1)
+    in
+    let fevents =
+      List.fold_right
+        (fun (id, _) accu ->
+           try Hashtbl.find ht id :: accu with
+             Not_found -> failwith "Sorting event")
+        sorted_fevents []
+    in
+    let fam = gen_family_of_family fam in
+    let fam = {fam with fevents = fevents} in
+    let fam = update_family_with_fevents conf base fam in
+    patch_family base fam.fam_index fam;
+    let a = foi base fam.fam_index in
+    let cpl = Futil.parent conf.multi_parents (get_parent_array a) in
+    let des = {children = get_children a} in
+    let wl =
+      let wl = ref [] in
+      let warning w = wl := w :: !wl in
+      let nfam = family_of_gen_family base (fam, cpl, des) in
+      CheckItem.family base warning fam.fam_index nfam;
+      List.iter
+        (function
+            ChangedOrderOfFamilyEvents (ifam, _, after) ->
+            patch_family base ifam {fam with fevents = after}
+          | _ -> ())
+        !wl;
+      List.rev !wl
+    in
+    Util.commit_patches conf base;
+    let changed =
+      let ip =
+        match p_getenv conf.env "ip" with
+          Some i -> iper_of_string i
+        | None -> dummy_iper
+      in
+      let p =
+        Util.string_gen_person base (gen_person_of_person (poi base ip))
+      in
+      let n_f = Util.string_gen_family base fam in
+      U_Modify_family (p, o_f, n_f)
+    in
+    History.record conf base changed "mf";
+    print_change_event_order_ok conf base (wl, []) cpl des
   | _ -> Hutil.incorrect_request conf
