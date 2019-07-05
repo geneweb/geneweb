@@ -30,9 +30,6 @@ val print_person_parents_and_spouse : config -> base -> person -> unit
 val insert_person :
   config -> base -> string -> (iper, iper, istr) gen_person list ref -> key ->
     iper
-val add_misc_names_for_new_persons :
-  base -> (iper, iper, istr) gen_person list -> unit
-val update_misc_names_of_family : base -> sex -> ifam gen_union -> unit
 val delete_topological_sort_v : config -> base -> unit
 val delete_topological_sort : config -> base -> unit
 

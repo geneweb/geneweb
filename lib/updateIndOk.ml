@@ -941,15 +941,6 @@ let effective_mod conf base sp =
     begin let ipl = Gutil.person_ht_find_all base key in
       check_conflict conf base sp ipl; rename_image_file conf base op sp
     end;
-  let same_fn_sn =
-    Name.lower (Mutil.nominative sp.first_name) = Name.lower ofn &&
-    Name.lower (Mutil.nominative sp.surname) = Name.lower osn
-  in
-  if sp.first_name <> "?"
-  && sp.surname <> "?"
-  && (not same_fn_sn || oocc <> sp.occ)
-  && not same_fn_sn
-  then patch_name base key pi ;
   (* Si on modifie la personne pour lui ajouter un nom/prénom, alors *)
   (* il faut remettre le compteur du nombre de personne à jour.      *)
   if ofn = "?" && osn = "?" && sp.first_name <> "?" && sp.surname <> "?" then
@@ -961,13 +952,7 @@ let effective_mod conf base sp =
     Futil.map_person_ps (Update.insert_person conf base "" created_p)
       (Gwdb.insert_string base) sp
   in
-  let op_misc_names = person_misc_names base op get_titles in
   let np = {np with related = get_related op} in
-  let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
-  List.iter
-    (fun key ->
-       if List.mem key op_misc_names then () else Gutil.person_ht_add base key pi)
-    np_misc_names;
   let ol_rparents = rparents_of (get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
   let ol_pevents = pwitnesses_of (get_pevents op) in
@@ -983,7 +968,6 @@ let effective_add conf base sp =
   let key = fn ^ " " ^ sn in
   let ipl = Gutil.person_ht_find_all base key in
   check_conflict conf base sp ipl;
-  Gutil.person_ht_add base key pi;
   patch_cache_info conf Util.cache_nb_base_persons
     (fun v -> let v = int_of_string v + 1 in string_of_int v);
   let created_p = ref [] in
@@ -996,8 +980,7 @@ let effective_add conf base sp =
   patch_ascend base pi na;
   let nu = {family = [| |]} in
   patch_union base pi nu;
-  let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
-  List.iter (fun key -> Gutil.person_ht_add base key pi) np_misc_names; np, na
+  np, na
 
 let array_except v a =
   let rec loop i =
@@ -1403,11 +1386,6 @@ let print_mod o_conf base =
       String.concat " " (List.map (sou base) sl)
     in
     Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
-    if not (eq_istr (get_surname op) p.surname) ||
-       not (List.for_all2 eq_istr (get_surnames_aliases op) p.surnames_aliases) ||
-       not (List.for_all2 (Futil.eq_titles eq_istr) (get_titles op) p.titles)
-    then
-      Update.update_misc_names_of_family base p.sex u;
     let wl =
       let a = poi base p.key_index in
       let a = {parents = get_parents a; consang = get_consang a} in
@@ -1416,10 +1394,7 @@ let print_mod o_conf base =
     Util.commit_patches conf base;
     let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
     History.record conf base changed "mp";
-    if not (is_quest_string p.surname) &&
-       not (is_quest_string p.first_name) && not (is_old_person conf p)
-    then
-      Update.delete_topological_sort_v conf base;
+    Update.delete_topological_sort_v conf base;
     print_mod_ok conf base wl pgl p ofn osn oocc
   in
   print_mod_aux conf base callback

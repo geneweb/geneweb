@@ -196,18 +196,15 @@ let foi_batch base = List.map (foi base)
 let sou base i = base.data.strings.get (Type.int_of_istr i)
 let nb_of_persons base = base.data.persons.len
 let nb_of_families base = base.data.families.len
-let patch_person base ip p = base.func.Dbdisk.patch_person ip p
 let patch_ascend base ip a = base.func.Dbdisk.patch_ascend ip a
 let patch_union base ip u = base.func.Dbdisk.patch_union ip u
 let patch_family base ifam f = base.func.Dbdisk.patch_family ifam f
 let patch_descend base ifam d = base.func.Dbdisk.patch_descend ifam d
 let patch_couple base ifam c = base.func.Dbdisk.patch_couple ifam c
-let patch_name base s ip = base.func.Dbdisk.patch_name s ip
 let insert_string base s = base.func.Dbdisk.insert_string s
 let commit_patches base = base.func.Dbdisk.commit_patches ()
 let commit_notes base s = base.func.Dbdisk.commit_notes s
 
-let is_patched_person base ip = base.func.Dbdisk.is_patched_person ip
 let patched_ascends base = base.func.Dbdisk.patched_ascends ()
 let person_of_key base = base.func.Dbdisk.person_of_key
 let persons_of_name base = base.func.Dbdisk.persons_of_name
@@ -216,15 +213,6 @@ let persons_of_surname base = base.func.Dbdisk.persons_of_surname
 let base_visible_get base f =
   base.data.visible.v_get
     (fun p -> f ( (base, 0, {p = Some p; a = None; u = None})))
-
-let insert_person base = function
-  | (_, _, { p = Some p ; a = Some a ; u = Some u }) ->
-    let iper = nb_of_persons base in
-    patch_person base iper p ;
-    patch_ascend base iper a ;
-    patch_union base iper u ;
-    iper
-  | _ -> assert false
 
 let base_visible_write base = base.data.visible.v_write ()
 let base_particles base = base.data.particles
@@ -369,6 +357,40 @@ let gen_person_misc_names base p nobtit =
 
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
+
+let patch_misc_names base ip p =
+  List.iter
+    (fun s -> base.func.Dbdisk.patch_name s ip)
+    (gen_gen_person_misc_names base p p.titles (fun p -> (gen_person_of_person p).titles))
+
+let patch_person base ip (p : (iper, iper, istr) Def.gen_person) =
+  base.func.Dbdisk.patch_person ip p ;
+  let s = sou base p.first_name ^ " " ^ sou base p.surname in
+  base.func.Dbdisk.patch_name s ip ;
+  patch_misc_names base ip p ;
+  Array.iter
+    begin fun i ->
+      let cpl = base.data.couples.get i in
+      let m = Adef.mother cpl in
+      let f = Adef.father cpl in
+      patch_misc_names base m (gen_person_of_person @@ poi base m) ;
+      patch_misc_names base f (gen_person_of_person @@ poi base f) ;
+      Array.iter
+        begin
+          fun i -> patch_misc_names base i (gen_person_of_person @@ poi base i)
+        end
+        (base.data.descends.get i).children
+    end
+    (base.data.unions.get ip).Def.family
+
+let insert_person base = function
+  | (_, _, { p = Some p ; a = Some a ; u = Some u }) ->
+    let iper = nb_of_persons base in
+    patch_person base iper p ;
+    patch_ascend base iper a ;
+    patch_union base iper u ;
+    iper
+  | _ -> assert false
 
 module Collection = struct
 

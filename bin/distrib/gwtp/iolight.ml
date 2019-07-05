@@ -231,6 +231,7 @@ let input bname =
      commit_notes = commit_notes;
      patched_ascends =
        (fun _ -> raise (Match_failure ("gwtp/iolight.ml", 231, 23)));
-     is_patched_person = (fun _ -> false); cleanup = cleanup}
+     cleanup = cleanup
+    }
   in
   {data = base_data; func = base_func}

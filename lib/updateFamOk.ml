@@ -1109,8 +1109,6 @@ let effective_mod conf base sfam scpl sdes =
        if not (Array.mem ip ochildren) || not same_parents then
          patch_ascend base ip (find_asc ip))
     ndes.children;
-  Update.add_misc_names_for_new_persons base !created_p;
-  Update.update_misc_names_of_family base Male {family = get_family nfath};
   let ol =
     Array.fold_right (fun x acc -> x :: acc) owitnesses (fwitnesses_of ofevents)
   in
@@ -1190,8 +1188,6 @@ let effective_add conf base sfam scpl sdes =
            let a = {parents = Some fi; consang = Adef.fix (-1)} in
            patch_ascend base (get_iper p) a)
     ndes.children;
-  Update.add_misc_names_for_new_persons base !created_p;
-  Update.update_misc_names_of_family base Male nfath_u;
   let nl_witnesses = Array.to_list nfam.witnesses in
   let nl_fevents = fwitnesses_of nfam.fevents in
   let nl = List.append nl_witnesses nl_fevents in

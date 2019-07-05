@@ -132,11 +132,9 @@ val patch_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
 val patch_descend : base -> ifam -> iper Def.gen_descend -> unit
 val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
 
-val patch_name : base -> string -> iper -> unit
 val insert_string : base -> string -> istr
 val commit_patches : base -> unit
 val commit_notes : base -> string -> string -> unit
-val is_patched_person : base -> iper -> bool
 val patched_ascends : base -> iper list
 
 (** [insert_person base per]
