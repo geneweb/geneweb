@@ -305,7 +305,17 @@ val persons : base -> person Collection.t
 val ifams : base -> ifam Collection.t
 val families : base -> family Collection.t
 
+(** [dummy_collection x] create a dummy collection with no element.
+    [x] is only used for typing.
+    Useful for placeholders or for typing purpose. *)
+val dummy_collection : 'a -> 'a Collection.t
+
 (** {2 Useful markers} *)
 
 val iper_marker : iper Collection.t -> 'a -> (iper, 'a) Marker.t
 val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Marker.t
+
+(** [dummy_marker k v] create a dummy collection with no element.
+    [k] and [v] are only used for typing.
+    Useful for placeholders or for typing purpose. *)
+val dummy_marker : 'a -> 'b -> ('a, 'b) Marker.t

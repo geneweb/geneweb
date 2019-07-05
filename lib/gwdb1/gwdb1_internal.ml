@@ -458,5 +458,15 @@ let ifams base =
 
 let families base = Collection.map (foi base) (ifams base)
 
+let dummy_collection _ =
+  { Collection.length = -1
+  ; get = fun _ -> None
+  }
+
 let family_marker c i = Marker.make (fun f -> (Type.int_of_ifam @@ get_fam_index f)) c i
 let ifam_marker c i = Marker.make Type.int_of_ifam c i
+
+let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
+  { Marker.get = begin fun _ -> v end
+  ; set = begin fun _ _ -> () end
+  }
