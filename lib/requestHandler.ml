@@ -661,7 +661,7 @@ let defaultHandler : handler =
       let title _ =
         Wserver.printf "%s: \"%s\"" (capitale (transl conf "not found")) n
       in
-      Wserver.http HttpStatus.Not_Found;
+      Wserver.http Wserver.Not_Found;
       Hutil.rheader conf title;
       Hutil.print_link_to_welcome conf false;
       Hutil.trailer conf
@@ -674,7 +674,7 @@ let defaultHandler : handler =
           Wserver.printf "%s: \"%s %s\"" (capitale (transl conf "not found"))
             fname sname
         in
-        Wserver.http HttpStatus.Not_Found;
+        Wserver.http Wserver.Not_Found;
         Hutil.rheader conf title;
         Hutil.print_link_to_welcome conf false;
         Hutil.trailer conf

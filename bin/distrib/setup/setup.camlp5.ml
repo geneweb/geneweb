@@ -42,7 +42,7 @@ let charset conf =
   try Hashtbl.find conf.lexicon " !charset" with Not_found -> "utf-8"
 
 let header_no_page_title conf title =
-  Wserver.http HttpStatus.OK;
+  Wserver.http Wserver.OK;
   Wserver.header "Content-type: text/html; charset=%s" (charset conf);
   Wserver.printf
     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
@@ -753,7 +753,7 @@ let print_file conf bname =
   let ic_opt = try Some (open_in fname) with Sys_error _ -> None in
   match ic_opt with
     Some ic ->
-      Wserver.http HttpStatus.OK;
+      Wserver.http Wserver.OK;
       Wserver.header "Content-type: text/html; charset=%s" (charset conf);
       copy_from_stream conf (fun x -> Wserver.printf "%s" x)
         (Stream.of_channel ic);
@@ -1527,7 +1527,7 @@ let print_typed_file conf typ fname =
   let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
   match ic_opt with
     Some ic ->
-      Wserver.http HttpStatus.OK;
+      Wserver.http Wserver.OK;
       Wserver.header "Content-type: %s" typ;
       Wserver.header "Content-length: %d" (in_channel_length ic);
       begin try

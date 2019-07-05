@@ -26,7 +26,7 @@ type excl =
     mutable max_conn : int * string }
 
 let robot_error conf cnt sec =
-  Wserver.http HttpStatus.Forbidden;
+  Wserver.http Wserver.Forbidden;
   Wserver.header "Content-type: text/html; charset=iso-8859-1";
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
   begin match open_etc_file "robot" with
