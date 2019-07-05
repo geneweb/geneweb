@@ -319,14 +319,6 @@ let begin_centered conf =
     conf.border
 let end_centered _conf = Wserver.printf "</td></tr></table>\n"
 
-let html_br conf = Wserver.printf "<br%s>\n" conf.xhs
-
-let html_p _conf = Wserver.printf "<p>"; Wserver.printf "\n"
-
-let html_li _conf = Wserver.printf "<li>"; Wserver.printf "\n"
-
-let nl () = Wserver.printf "\013\010"
-
 let week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
   fun i -> let i = if i < 0 || i >= Array.length txt then 0 else i in txt.(i)
@@ -3194,90 +3186,6 @@ let html_highlight case_sens h s =
       | None -> loop false (i + 1) (Buff.store len s.[i])
   in
   loop false 0 0
-
-(* Wrapper to pretty print the produced XHTML (see Wserver.wrap_string) *)
-
-let b = Buffer.create 80
-let ind_bol = ref 0
-let ind_curr = ref 0
-let bol = ref false
-let after_less = ref false
-let after_slash = ref false
-let curr_tag = ref None
-let stack_in_error = ref false
-let tag_stack = ref []
-let check_tag_stack c =
-  if !stack_in_error then ()
-  else
-    match !curr_tag with
-      Some (tag1, topen, tag_found) ->
-        begin match c with
-          ' ' -> curr_tag := Some (tag1, topen, true)
-        | '>' ->
-            if topen then
-              begin tag_stack := tag1 :: !tag_stack; curr_tag := None end
-            else
-              begin match !tag_stack with
-                tag2 :: rest ->
-                  if tag1 = tag2 then
-                    begin tag_stack := rest; curr_tag := None end
-                  else
-                    begin
-                      Printf.eprintf "Tag <%s> ended by </%s>\n" tag2 tag1;
-                      stack_in_error := true
-                    end
-              | [] ->
-                  Printf.eprintf "Ending tag not opened </%s>\n" tag1;
-                  stack_in_error := true
-              end
-        | c ->
-            if tag_found then ()
-            else curr_tag := Some (tag1 ^ String.make 1 c, topen, false)
-        end
-    | None -> ()
-let xml_pretty_print s =
-  let rec loop i =
-    if i = String.length s then ""
-    else if !bol then
-      if s.[i] = ' ' || s.[i] = '\n' then loop (i + 1)
-      else begin bol := false; loop i end
-    else
-      match s.[i] with
-        '\n' ->
-          check_tag_stack ' ';
-          let ind = min !ind_bol !ind_curr in
-          let line = Buffer.contents b in
-          bol := true;
-          ind_bol := !ind_curr;
-          Buffer.clear b;
-          String.make (max 0 ind) ' ' ^ line ^ "\n" ^ loop (i + 1)
-      | c ->
-          let after_less_v = !after_less in
-          let after_slash_v = !after_slash in
-          after_less := false;
-          after_slash := false;
-          begin match c with
-            '<' -> after_less := true; curr_tag := Some ("", true, false)
-          | '/' ->
-              if after_less_v then
-                begin
-                  ind_curr := !ind_curr - 2;
-                  curr_tag := Some ("", false, false)
-                end
-              else after_slash := true
-          | '!' -> curr_tag := None
-          | '>' ->
-              if after_slash_v then
-                begin ind_curr := !ind_curr - 2; curr_tag := None end
-              else check_tag_stack c
-          | c ->
-              check_tag_stack c;
-              if after_less_v then ind_curr := !ind_curr + 2
-          end;
-          Buffer.add_char b c;
-          loop (i + 1)
-  in
-  loop 0
 
 (* Print list in columns with Gutil.alphabetic order *)
 

@@ -51,8 +51,6 @@ let header fmt =
     else failwith "Cannot write HTTP headers: page contents already started";
   printnl fmt
 
-let wrap_string = ref (fun s -> s)
-
 let printf fmt =
   if !printing_state <> Contents then
     begin
@@ -60,7 +58,7 @@ let printf fmt =
       printnl "";
       printing_state := Contents
     end;
-  Printf.ksprintf (fun s -> output_string !wserver_oc (!wrap_string s)) fmt
+  Printf.ksprintf (fun s -> output_string !wserver_oc s) fmt
 let wflush () = flush !wserver_oc
 
 let hexa_digit x =

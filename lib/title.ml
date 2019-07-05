@@ -386,16 +386,12 @@ let print_all_with_place_list conf base p list =
   let title _ = Wserver.printf "... %s\n" p in
   Hutil.header conf title;
   Wserver.printf "<ul>\n";
-  let _ =
-    List.fold_left
-      (fun list (_, t as x) ->
-         html_li conf;
-         give_access_someone conf base x [];
-         Wserver.printf ", %s\n" (sou base t.t_ident);
-         Wserver.printf "\n";
-         fst x :: list)
-      [] list
-  in
+  List.iter
+    (fun ((_, t) as x) ->
+       Wserver.printf "<li>" ;
+       give_access_someone conf base x [];
+       Wserver.printf ", %s<li>" (sou base t.t_ident) )
+    list ;
   Wserver.printf "</ul>\n";
   propose_tree_for_list list conf;
   Hutil.trailer conf

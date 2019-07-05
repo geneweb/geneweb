@@ -62,8 +62,7 @@ let print_differences conf base branches p1 p2 =
         ["iexcl"; "fexcl"]
   | _ -> ()
   end;
-  Wserver.printf "</p>\n";
-  html_p conf;
+  Wserver.printf "</p><p>";
   string_field (transl_nth conf "first name/first names" 0) "first_name"
     (fun p -> p_first_name base p);
   string_field (transl_nth conf "surname/surnames" 0) "surname"
@@ -156,12 +155,9 @@ let print_differences conf base branches p1 p2 =
             | Some d -> " " ^ Date.string_of_ondate conf d));
   string_field (transl conf "burial" ^ " / " ^ transl conf "place")
     "burial_place" (fun p -> sou base (get_burial_place p));
-  html_p conf;
   Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-primary btn-lg\">\n";
-  Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</form>\n"
+    {|</p><p><button type="submit" class="btn btn-primary btn-lg">%s</button></form>|}
+    (capitale (transl_nth conf "validate/delete" 0))
 
 let compatible_cdates cd1 cd2 =
   cd1 = cd2
@@ -252,60 +248,41 @@ let propose_merge_ind conf base branches p1 p2 =
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
   Hutil.header conf title;
-  if branches <> [] then
-    begin
-      Wserver.printf "%s%s\n" (capitale (transl conf "you must first merge"))
-        (transl conf ":");
-      begin
-        Wserver.printf "<ul>\n";
-        html_li conf;
-        begin
-          Wserver.printf "<a href=\"%s%s\">" (commd conf)
-            (acces conf base p1);
-          Merge.print_someone base p1;
-          Wserver.printf "</a>"
-        end;
-        Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
-        begin
-          Wserver.printf "<a href=\"%s%s\">" (commd conf)
-            (acces conf base p2);
-          Merge.print_someone base p2;
-          Wserver.printf "</a>"
-        end;
-        Wserver.printf "\n";
-        Wserver.printf "</ul>\n"
-      end;
-      html_p conf
-    end;
+  if branches <> [] then begin
+    Wserver.printf
+      "%s%s<ul><li><a href=\"%s%s\">"
+      (capitale (transl conf "you must first merge"))
+      (transl conf ":")
+      (commd conf)
+      (acces conf base p1);
+    Merge.print_someone base p1;
+    Wserver.printf "</a> %s <a href=\"%s%s\">"
+      (transl_nth conf "and" 0)
+      (commd conf)
+      (acces conf base p2);
+    Merge.print_someone base p2;
+    Wserver.printf "</a></li></ul><p></p>\n"
+  end;
   print_differences conf base branches p1 p2;
   if branches <> [] then
     begin
-      html_p conf;
-      Wserver.printf "<hr%s>\n" conf.xhs;
-      html_p conf;
-      Wserver.printf "%s%s\n" (capitale (transl_nth conf "branch/branches" 1))
-        (transl conf ":");
-      html_p conf;
-      begin
-        Wserver.printf "<table>\n";
-        List.iter
-          (fun (ip1, ip2) ->
-             let p1 = poi base ip1 in
-             let p2 = poi base ip2 in
-             Wserver.printf "<tr align=\"%s\">\n" conf.left;
-             Wserver.printf "<td>\n";
-             Wserver.printf "\n%s" (referenced_person_text conf base p1);
-             Wserver.printf "%s" (Date.short_dates_text conf base p1);
-             Wserver.printf "</td>\n";
-             Wserver.printf "<td>\n";
-             Wserver.printf "\n%s" (referenced_person_text conf base p2);
-             Wserver.printf "%s" (Date.short_dates_text conf base p2);
-             Wserver.printf "</td>\n";
-             Wserver.printf "</tr>\n")
-          ((get_iper p1, get_iper p2) :: branches);
-        Wserver.printf "</table>\n"
-      end
-    end;
+      Wserver.printf
+        "<p><hr></p><p>%s%s</p><table>"
+        (capitale (transl_nth conf "branch/branches" 1)) (transl conf ":") ;
+      List.iter
+        (fun (ip1, ip2) ->
+           let p1 = poi base ip1 in
+           let p2 = poi base ip2 in
+           Wserver.printf
+             "<tr align=\"%s\"><td>%s%s</td><td>%s%s</td></tr>"
+             conf.left
+             (referenced_person_text conf base p1)
+             (Date.short_dates_text conf base p1)
+             (referenced_person_text conf base p2)
+             (Date.short_dates_text conf base p2))
+        ((get_iper p1, get_iper p2) :: branches);
+      Wserver.printf "</table>\n"
+    end ;
   Hutil.trailer conf
 
 let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
@@ -459,18 +436,13 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   Wserver.printf "%s%s\n"
     (capitale (transl conf "you must first merge the 2 families"))
     (transl conf ":");
-  Wserver.printf "<ul>\n";
-  html_li conf;
-  Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base p1);
+  Wserver.printf "<ul><li><a href=\"%s%s\">"
+    (commd conf) (acces conf base p1);
   Merge.print_someone base p1;
-  Wserver.printf "</a>";
-  Wserver.printf "\n%s\n" (transl conf "with");
-  Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base p2);
+  Wserver.printf "</a> %s <a href=\"%s%s\">"
+    (transl conf "with") (commd conf) (acces conf base p2);
   Merge.print_someone base p2;
-  Wserver.printf "</a>";
-  Wserver.printf "\n";
-  Wserver.printf "</ul>\n";
-  html_p conf;
+  Wserver.printf "</a></li></ul><p>";
   MergeFam.print_differences conf base branches fam1 fam2;
   Hutil.trailer conf
 

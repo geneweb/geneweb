@@ -292,12 +292,7 @@ let print_renamed conf new_n =
   | None ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
       Hutil.header conf title;
-      Wserver.printf "<ul>\n";
-      Util.html_li conf;
-      Wserver.printf "<a href=\"%s\">\n" link;
-      Wserver.printf "%s" link;
-      Wserver.printf "</a>\n";
-      Wserver.printf "</ul>\n";
+      Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf
 
 let log_redirect from request req =
@@ -326,27 +321,20 @@ let print_redirected conf from request new_addr =
       let title _ = Wserver.printf "Address changed" in
       Hutil.header conf title;
       Wserver.printf "Use the following address:\n<p>\n";
-      Wserver.printf "<ul>\n";
-      Util.html_li conf;
-      Wserver.printf "<a href=\"%s\">" link;
-      Wserver.printf "%s" link;
-      Wserver.printf "</a>";
-      Wserver.printf "\n";
-      Wserver.printf "</ul>\n";
+      Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf
 
 let propose_base conf =
   let title _ = Wserver.printf "Base" in
   Hutil.header conf title;
-  Wserver.printf "<ul>\n";
-  Util.html_li conf;
+  Wserver.printf "<ul><li>";
   Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
   Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
-  Wserver.printf "</ul>\n";
+  Wserver.printf "</li></ul>";
   Hutil.trailer conf
 
 let general_welcome conf =

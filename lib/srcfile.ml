@@ -405,10 +405,8 @@ and copy_from_file conf base name mode =
     | Source -> source_file_name conf name
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
-    Some ic -> copy_from_channel conf base ic mode
-  | None ->
-      Wserver.printf "<em>... file not found: \"%s.txt\"</em>" name;
-      html_br conf
+  | Some ic -> copy_from_channel conf base ic mode
+  | None -> Wserver.printf "<em>... file not found: \"%s.txt\"</em><br>" name
 and copy_from_channel conf base ic mode =
   copy_from_stream conf base (Stream.of_channel ic) mode; close_in ic
 and copy_from_string conf base str mode =
@@ -437,10 +435,7 @@ let gen_print with_logo mode conf base fname =
   | _ ->
       let title _ = Wserver.printf "Error" in
       Hutil.header conf title;
-      Wserver.printf "<ul>\n";
-      html_li conf;
-      Wserver.printf "Cannot access file \"%s.txt\".\n" fname;
-      Wserver.printf "</ul>\n";
+      Wserver.printf "<ul><li>Cannot access file \"%s.txt\"</ul>" fname;
       Hutil.gen_trailer with_logo conf;
       raise Exit
 
@@ -546,28 +541,3 @@ let print conf base fname =
        Templ.print_foreach = print_foreach conf}
       [] ()
   else gen_print true Lang conf base fname
-
-(* lexicon (info) *)
-
-let print_lexicon conf _base =
-  let title _ = Wserver.printf "Lexicon" in
-  let fname = search_in_lang_path (Filename.concat "lang" "lex_utf8.txt") in
-  Hutil.header conf title;
-  begin match (try Some (Secure.open_in fname) with Sys_error _ -> None) with
-    Some ic ->
-      Wserver.printf "<pre dir=\"ltr\">\n";
-      begin try
-        while true do
-          match input_char ic with
-            '<' -> Wserver.printf "&lt;"
-          | c -> Wserver.printf "%c" c
-        done
-      with End_of_file -> ()
-      end;
-      Wserver.printf "</pre>\n";
-      close_in ic
-  | None ->
-      Wserver.printf "<em>... file not found: \"%s.txt\"</em>" "lexicon";
-      html_br conf
-  end;
-  Hutil.trailer conf

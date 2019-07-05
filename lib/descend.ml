@@ -99,7 +99,7 @@ let display_descendants_level conf base max_level ancestor =
     Wserver.printf " (%d %s)" !len
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
   Wserver.printf ".\n";
-  html_p conf;
+  Wserver.printf "<p>" ;
   print_alphab_list
     (fun (p, _) ->
        if is_hidden p then "?"
@@ -236,7 +236,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
              let c = Gutil.spouse (get_iper p) fam in
              let el = get_children fam in
              let c = pget conf base c in
-             if need_br then html_br conf;
+             if need_br then Wserver.printf "<br>" ;
              if not first then print_repeat_child conf base p1 c1 p;
              display_spouse conf base marks paths fam p c;
              Wserver.printf "\n";
@@ -265,7 +265,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                let c1 = pget conf base c1 in
                                if not first then
                                  begin
-                                   html_br conf;
+                                   Wserver.printf "<br>" ;
                                    print_repeat_child conf base p c e
                                  end;
                                display_spouse conf base marks paths fam e c1;
@@ -289,11 +289,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
 let last_label = ref ""
 
 let print_family conf base marks paths max_lev lev p =
-  if lev <> 0 then
-    begin
-      Wserver.printf "<tt><b>%s</b></tt>." (label_of_path paths p);
-      html_br conf
-    end;
+  if lev <> 0 then Wserver.printf "<tt><b>%s</b></tt>.<br>" (label_of_path paths p);
   let lab = label_of_path paths p in
   if lab < !last_label then failwith "print_family" else last_label := lab;
   ignore @@
@@ -391,17 +387,17 @@ let display_descendants_with_numbers conf base max_level ancestor =
   let p = ancestor in
   if authorized_age conf base p then
     begin match Adef.od_of_cdate (get_birth p), get_death p with
-      Some _, _ | _, Death (_, _) -> html_br conf
+      Some _, _ | _, Death (_, _) -> Wserver.printf "<br>"
     | _ -> ()
     end;
   Wserver.printf "%s." (capitale (text_to conf max_level));
-  html_p conf;
+  Wserver.printf "<p>" ;
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   print_families conf base marks paths max_level ancestor;
   if !total > 1 then
     begin
-      html_p conf;
+      Wserver.printf "<p>" ;
       Wserver.printf "%s%s %d %s" (capitale (transl conf "total"))
         (Util.transl conf ":") !total
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
@@ -425,7 +421,7 @@ let print_ref conf base paths p =
       (get_family p)
 
 let print_elem conf base paths precision (n, pll) =
-  html_li conf;
+  Wserver.printf "<li>" ;
   match List.rev pll with
     [[p]] ->
       Wserver.printf "<strong>%s %s %s</strong>" (surname_without_particle base n)
@@ -447,7 +443,7 @@ let print_elem conf base paths precision (n, pll) =
            in
            List.iter
              (fun p ->
-                html_li conf;
+                Wserver.printf "<li>" ;
                 Wserver.printf "<strong>";
                 wprint_geneweb_link conf (acces conf base p)
                   (p_first_name base p);

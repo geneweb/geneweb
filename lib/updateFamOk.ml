@@ -723,9 +723,8 @@ let print_err_parents conf base p =
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "\n%s\n" err;
-  html_p conf;
-  Wserver.printf "<ul><li>%s%s %d</li></ul>\n"
+  Wserver.printf "\n%s<p><ul><li>%s%s %d</li></ul>"
+    err
     (capitale (transl conf "first free number"))
     (Util.transl conf ":")
     (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
@@ -1372,7 +1371,7 @@ let print_family conf base (wl, ml) cpl des =
         des.children;
       Wserver.printf "</ul>\n"
     end;
-  Update.print_warnings_and_miscs conf base (wl, ml)
+  Update.print_warnings_and_miscs conf base wl ml
 
 let print_mod_ok conf base (wl, ml) cpl des =
   let title _ =

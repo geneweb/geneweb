@@ -44,7 +44,7 @@ val print_error : config -> base -> CheckItem.base_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit
 val print_miscs : config -> base -> CheckItem.base_misc list -> unit
 val print_warnings_and_miscs :
-  config -> base -> CheckItem.base_warning list * CheckItem.base_misc list ->
+  config -> base -> CheckItem.base_warning list -> CheckItem.base_misc list ->
     unit
 val error : config -> base -> CheckItem.base_error -> 'a
 
