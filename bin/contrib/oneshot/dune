@@ -1,4 +1,0 @@
-(executables
- (names gwRemoveImgGallery gwBaseCompatiblePlus gwFixDateText gwExportAscCSV gwFixAddEvent gwMostAsc gwFixFalseMarriageLicense)
-  (libraries geneweb)
-)

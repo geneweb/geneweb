@@ -1,4 +1,0 @@
-(executables
-  (names check_base)
-  (libraries geneweb geneweb.wserver)
-)
