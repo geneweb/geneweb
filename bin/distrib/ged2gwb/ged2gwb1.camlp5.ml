@@ -2681,7 +2681,7 @@ let add_fam_norm gen r adop_list =
     Left3 _ -> ()
   | Right3 (p, a, u) ->
       let u =
-        if not (List.mem i (Array.to_list (get_family u))) then
+        if not (Array.mem i (get_family u)) then
           union_of_gen_union {family = Array.append (get_family u) [| i |]}
         else u
       in
@@ -2692,7 +2692,7 @@ let add_fam_norm gen r adop_list =
     Left3 _ -> ()
   | Right3 (p, a, u) ->
       let u =
-        if not (List.mem i (Array.to_list (get_family u))) then
+        if not (Array.mem i (get_family u)) then
           union_of_gen_union {family = Array.append (get_family u) [| i |]}
         else u
       in
@@ -3080,7 +3080,7 @@ let pass3 gen fname =
                  in
                    gen.g_per.arr.(ip) <- Right3 (p, a, u)
                  end;
-               if List.mem ip (Array.to_list (get_witnesses fam)) then ()
+               if Array.mem ip (get_witnesses fam) then ()
                else
                  let fam =
                    family_of_gen_family
@@ -3402,11 +3402,11 @@ let check_parents_children base ascends unions couples descends =
     done;
     if !fam_to_delete <> [] then
       let (list, _) =
-        List.fold_left
+        Array.fold_left
           (fun (list, i) x ->
              if List.mem i !fam_to_delete then list, i + 1
              else x :: list, i + 1)
-          ([], 0) (Array.to_list (get_family u))
+          ([], 0) (get_family u)
       in
       unions.(i) <-
         union_of_gen_union {family = Array.of_list (List.rev list)}
@@ -3448,9 +3448,9 @@ let check_parents_children base ascends unions couples descends =
     done;
     if !to_delete <> [] then
       let l =
-        List.fold_right
+        Array.fold_right
           (fun ip l -> if List.mem ip !to_delete then l else ip :: l)
-          (Array.to_list (get_children des)) []
+          (get_children des) []
       in
       descends.(i) <- descend_of_gen_descend {children = Array.of_list l}
   done

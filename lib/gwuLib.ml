@@ -678,12 +678,9 @@ module Make (Select : Select) =
           [], _ | _, Some _ -> list
         | _ -> moth :: list
       in
-      List.fold_right
-        (fun p list ->
-           match get_pevents p with
-             [] -> list
-           | _ -> p :: list)
-        (Array.to_list m.m_chil) list
+      Array.fold_right
+        (fun p list -> if get_pevents p =  [] then list else p :: list)
+        m.m_chil list
 
     let print_pevents_for_person oc base gen p =
       let pevents = get_pevents p in
@@ -950,12 +947,12 @@ module Make (Select : Select) =
         | _, Some _ -> list
         | _ -> moth :: list
       in
-      List.fold_right
+      Array.fold_right
         (fun p list ->
-           match sou base (get_notes p) with
-             "" -> if put_events_in_notes base p then p :: list else list
-           | _ -> p :: list)
-        (Array.to_list m.m_chil) list
+           if sou base (get_notes p) = "" && not (put_events_in_notes base p)
+           then list
+           else p :: list)
+        m.m_chil list
 
     let notes_aliases bdir =
       let fname = Filename.concat bdir "notes.alias" in
@@ -1116,10 +1113,10 @@ module Make (Select : Select) =
             list
         else list
       in
-      List.fold_right
+      Array.fold_right
         (fun p list ->
            List.fold_right (concat_isolated p) (get_related p) list)
-        (Array.to_list m.m_chil) list
+        m.m_chil list
 
     let get_persons_with_relations base m list =
       let fath = m.m_fath in
@@ -1135,7 +1132,7 @@ module Make (Select : Select) =
         | _ -> (moth, false) :: list
       in
       let list =
-        List.fold_right
+        Array.fold_right
           (fun ip list ->
              let p = poi base ip in
              match get_rparents p, get_parents p with
@@ -1143,14 +1140,14 @@ module Make (Select : Select) =
              | {r_fath = Some x} :: _, _ when x <> get_iper m.m_fath ->
                  list
              | _ -> (p, false) :: list)
-          (Array.to_list (get_witnesses m.m_fam)) list
+          (get_witnesses m.m_fam) list
       in
-      List.fold_right
+      Array.fold_right
         (fun p list ->
            match get_rparents p with
              [] -> list
            | _ -> (p, false) :: list)
-        (Array.to_list m.m_chil) list
+        m.m_chil list
 
     let print_relation_parent oc base mark defined_p p =
       Printf.fprintf oc "%s %s%s" (correct_string base (get_surname p))

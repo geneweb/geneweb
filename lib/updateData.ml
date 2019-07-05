@@ -897,13 +897,13 @@ let update_person_list conf base new_input list nb_pers max_updates =
               end;
             patch_person base np.key_index np;
             if test_family then
-              begin let fam = Array.to_list (get_family p) in
-                List.iter
+              begin
+                Array.iter
                   (fun ifam ->
                      let fam = foi base ifam in
                      let nfam = update_family conf base old new_input fam in
                      patch_family base nfam.fam_index nfam)
-                  fam
+                  (get_family p)
               end;
             (* On met aussi à jour l'historique. *)
             let changed =

@@ -26,22 +26,17 @@ let sorp base ip =
   Update.Link, ""
 
 let merge_witnesses base wit1 wit2 =
-  let list =
-    List.fold_right
-      (fun wit list -> if List.mem wit list then list else wit :: list)
-      (List.map (sorp base) (Array.to_list wit1))
-      (List.map (sorp base) (Array.to_list wit2))
-  in
-  Array.of_list list
+  Array.of_list @@
+  Array.fold_right
+    (fun wit list -> if List.mem wit list then list else wit :: list)
+    (Array.map (sorp base) wit1)
+    (List.map (sorp base) (Array.to_list wit2))
 
 let merge_event_witnesses wit1 wit2 =
-  let list =
-    List.fold_right
-      (fun wit list -> if List.mem wit list then list else wit :: list)
-      (Array.to_list wit1) (Array.to_list wit2)
-  in
-  Array.of_list list
-
+  Array.of_list @@
+  Array.fold_right
+    (fun wit list -> if List.mem wit list then list else wit :: list)
+    wit1 (Array.to_list wit2)
 
 (* ********************************************************************** *)
 (*  [Fonc] merge_events : config -> list -> list -> list                  *)

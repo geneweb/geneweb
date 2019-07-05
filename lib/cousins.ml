@@ -24,14 +24,14 @@ let rec except x =
   | y :: l -> if x = y then l else y :: except x l
 
 let children_of base u =
-  List.fold_right
+  Array.fold_right
     (fun ifam list ->
-       let des = foi base ifam in Array.to_list (get_children des) @ list)
-    (Array.to_list (get_family u)) []
+       let des = foi base ifam in
+       Array.fold_right List.cons (get_children des) list)
+    (get_family u) []
 
 let children_of_fam base ifam =
-  let des = foi base ifam in
-  Array.to_list (get_children des)
+  Array.to_list (get_children @@ foi base ifam)
 
 let siblings_by conf base iparent ip =
   let list = children_of base (pget conf base iparent) in except ip list
@@ -66,13 +66,13 @@ let siblings conf base ip =
 let rec has_desc_lev conf base lev u =
   if lev <= 1 then true
   else
-    List.exists
+    Array.exists
       (fun ifam ->
          let des = foi base ifam in
-         List.exists
+         Array.exists
            (fun ip -> has_desc_lev conf base (lev - 1) (pget conf base ip))
-           (Array.to_list (get_children des)))
-      (Array.to_list (get_family u))
+           (get_children des))
+      (get_family u)
 
 let br_inter_is_empty b1 b2 =
   List.for_all (fun (ip, _) -> not (List.mem_assoc ip b2)) b1
@@ -135,28 +135,21 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
       (gen_person_title_text (reference_sp sp) std_access conf base sp)
       (Date.short_dates_text conf base sp)
   in
-  if match p_getenv conf.env "spouse" with
-       Some "on" -> false
-     | _ -> true
-  then
-    print_nospouse ()
-  else
-    let u = Array.to_list (get_family p2) in
-    match u with
-      [] -> print_nospouse ()
-    | _ ->
-        let _ =
-          List.fold_left
-            (fun a ifam ->
-               let cpl = foi base ifam in
-               let sp =
-                 if get_sex p2 = Female then pget conf base (get_father cpl)
-                 else pget conf base (get_mother cpl)
-               in
-               let _ = print_spouse sp a in false)
-            true u
-        in
-        ()
+  if p_getenv conf.env "spouse" = Some "on" then begin
+    match get_family p2 with
+    | [||] -> print_nospouse ()
+    | u ->
+      Array.iteri
+        (fun i ifam ->
+           let cpl = foi base ifam in
+           let sp =
+            if get_sex p2 = Female then pget conf base (get_father cpl)
+            else pget conf base (get_mother cpl)
+           in
+           print_spouse sp (i = 0))
+        u
+  end
+  else print_nospouse ()
 
 let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
   if lev > 0 && !cnt < max_cnt then
@@ -203,7 +196,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                        (Util.transl conf ":") (if with_sp = "" then "<br>" else "")
                  end;
                (* the function children_of returns *all* the children of ip *)
-               List.iter
+               Array.iter
                  (fun ifam ->
                     let children =
                       List.map
@@ -219,7 +212,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                         (person_title_text conf base sp) (Util.transl conf ":") ;
                     print_descend_upto conf base max_cnt ini_p ini_br (lev - 1) children;
                  )
-                 (Array.to_list (get_family p)) ;
+                 (get_family p) ;
             if lev <= 2 then Wserver.printf "</li>\n"
              end)
         children;

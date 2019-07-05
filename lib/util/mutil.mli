@@ -1,4 +1,3 @@
-(* $Id: mutil.mli,v 5.16 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 val int_size : int
@@ -50,12 +49,17 @@ val tr : char -> char -> string -> string
 val unsafe_tr : char -> char -> string -> string
 
 (** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
-    but it does not allocate an intermediate list.
+    but is more efficient.
 
     The list is constructed backward,
     so if [fn] have side effects it may not behave as excepted.
  *)
 val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
+
+(** [array_to_list_revmap fn a] is almost like [Array.to_list a |> List.rev_map fn]
+    but is more efficient.
+ *)
+val array_to_list_rev_map : ('a -> 'b) -> 'a array -> 'b list
 
 (** [start_with ?wildcard prefix off str]
     Test if [str] starts with [prefix] (at offset [off]).

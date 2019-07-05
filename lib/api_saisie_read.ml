@@ -460,27 +460,17 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
       | Siblings -> Array.length (get_family p) > 0
       | Children ->
            gen = max_gen - 1 && Array.length (get_family p) > 0
-           (*
-           fst (List.fold_left
-                  (fun (children_or_spouses, nb_fam) ifam ->
-                    let nb_fam = succ nb_fam in
-                    let fam = foi base ifam in
-                    let children = get_children fam in
-                    (children_or_spouses || Array.length children > 1 ||
-                       nb_fam > 1, nb_fam))
-                  (false, 0) (Array.to_list (get_family p)))
-           *)
       | Ancestor ->
           let has_parents = get_parents p <> None in
           (gen = max_gen - 1 && has_parents) ||
-           (fst (List.fold_left
+           (fst (Array.fold_left
                    (fun (children_or_spouses, nb_fam) ifam ->
                      let nb_fam = succ nb_fam in
                      let fam = foi base ifam in
                      let children = get_children fam in
                      (children_or_spouses || (gen > 1 && Array.length children > 1) || nb_fam > 1,
                       nb_fam))
-                   (false, 0) (Array.to_list (get_family p))))
+                   (false, 0) (get_family p)))
       | Spouse ->
           (get_parents p <> None) || Array.length (get_family p) > 1
     in
@@ -3111,20 +3101,10 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
       | Siblings -> Array.length (get_family p) > 0
       | Children ->
            gen = max_gen - 1 && Array.length (get_family p) > 0
-           (*
-           fst (List.fold_left
-                  (fun (children_or_spouses, nb_fam) ifam ->
-                    let nb_fam = succ nb_fam in
-                    let fam = foi base ifam in
-                    let children = get_children fam in
-                    (children_or_spouses || Array.length children > 1 ||
-                       nb_fam > 1, nb_fam))
-                  (false, 0) (Array.to_list (get_family p)))
-           *)
       | Ancestor ->
           let has_parents = get_parents p <> None in
           (gen = max_gen - 1 && has_parents) ||
-           (fst (List.fold_left
+           (fst (Array.fold_left
                    (fun (children_or_spouses, nb_fam) ifam ->
                      let nb_fam = succ nb_fam in
                      let fam = foi base ifam in
@@ -3133,7 +3113,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
                       (gen > 1 && Array.length children > 1) ||
                       nb_fam > 1,
                       nb_fam))
-                   (false, 0) (Array.to_list (get_family p))))
+                   (false, 0) (get_family p)))
       | Spouse ->
           let has_parents = get_parents p <> None in
           has_parents || Array.length (get_family p) > 1
@@ -3534,9 +3514,7 @@ let build_graph_desc_full conf base p max_gen =
                       i
                     with Not_found -> Hashtbl.add ht (get_iper sp) 1; 1
                   in
-                  let children =
-                    List.map (poi base) (Array.to_list (get_children fam))
-                  in
+                  let children = Mutil.array_to_list_map (poi base) (get_children fam) in
                   nodes := create_node sp ifam gen Spouse conf.command sp_factor :: !nodes;
                   edges := create_edge factor conf.command p sp_factor conf.command sp :: !edges;
                   if gen <> max_gen then
@@ -3687,7 +3665,7 @@ let build_graph_desc_full conf base p max_gen =
                                  else (ifath, imoth, if ip = ifath then imoth else ifath)
                                in
                                let can_merge =
-                                 let fam = List.map (foi base) (Array.to_list (get_family p)) in
+                                 let fam = Mutil.array_to_list_map (foi base) (get_family p) in
                                  Perso_link.can_merge_family conf.command (get_iper p) fam fam_link cpl
                                in
                                if can_merge then accu

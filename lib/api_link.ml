@@ -280,7 +280,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
     else None
   in
   let families =
-    List.fold_right
+    Array.fold_right
       (fun ifam accu ->
         let isp = Gutil.spouse ip (foi base ifam) in
         if isp = ip_spouse || ip_spouse = Gwdb.dummy_iper then
@@ -294,7 +294,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
           in
           fl :: accu
         else accu)
-      (Array.to_list (get_family p)) []
+      (get_family p) []
   in
   {
     MLink.Person.baseprefix = baseprefix;
@@ -372,23 +372,12 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
   in
   let children =
     if add_children then
-      List.map
+      Mutil.array_to_list_map
         (fun ip ->
-          let ip = Gwdb.string_of_iper ip in
-          MLink.Person_link.({
-            baseprefix = baseprefix;
-            ip = ip;
-          }))
-        (Array.to_list (get_children fam))
+           MLink.Person_link.{ baseprefix ; ip = Gwdb.string_of_iper ip })
+        (get_children fam)
     else
-      let pl =
-        let ip = Gwdb.string_of_iper ip in
-        MLink.Person_link.({
-          baseprefix = baseprefix;
-          ip = ip;
-        })
-      in
-      [pl]
+      [ MLink.Person_link.{ baseprefix ; ip = Gwdb.string_of_iper ip } ]
   in
   {
     MLink.Family.baseprefix = baseprefix;
@@ -486,10 +475,10 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
             List.fold_left
               (fun pl ifam ->
                 let fam = foi base ifam in
-                List.fold_left
+                Array.fold_left
                   (* Ne récupère pas les descendants si la génération suivante est inférieure à celle demandée. *)
                   (fun pl ic -> if gen - 1 <= -nb_desc then pl else (ic, gen - 1) :: pl)
-                  pl (Array.to_list (get_children fam)))
+                  pl (get_children fam))
               pl fam
           in
           loop_desc pl accu
@@ -761,7 +750,7 @@ let print_link_tree conf base =
                p_to_piqi_full_person conf base imoth (Gwdb.dummy_iper) :: accu
              end
          in
-         List.fold_left
+         Array.fold_left
            (fun accu ic ->
               if Hashtbl.mem ht ic then accu
               else
@@ -769,7 +758,7 @@ let print_link_tree conf base =
                   Hashtbl.add ht ic ();
                   p_to_piqi_full_person conf base ic (Gwdb.dummy_iper) :: accu
                 end)
-           accu (Array.to_list (get_children fam)))
+           accu (get_children fam))
       [] pl
   in
 

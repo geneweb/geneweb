@@ -260,9 +260,9 @@ let format_stats_m_f2 l1 l2 title series1 series2 =
       l2
   in
   let datas =
-    List.map
+    Mutil.array_to_list_map
       (fun s -> Mstats.Data_l.({data = Array.to_list s;}))
-      (Array.to_list data)
+      data
   in
   let labels = List.map Int32.of_int labels in
   Mstats.Stat.({
@@ -311,9 +311,9 @@ let format_stats_dmy l title series =
   in
   let () = loop 0 labels in
   let datas =
-    List.map
+    Mutil.array_to_list_map
       (fun s -> Mstats.Data_l.({data = Array.to_list s;}))
-      (Array.to_list data)
+      data
   in
   let labels = List.map Int32.of_int labels in
   Mstats.Stat.({
@@ -920,11 +920,10 @@ let print_ind_stats conf base =
               List.fold_left
                 (fun accu ip ->
                   let p = poi base ip in
-                  List.fold_left
+                  Array.fold_left
                     (fun accu ifam ->
-                      let fam = foi base ifam in
-                      Array.to_list (get_children fam) @ accu)
-                    accu (Array.to_list (get_family p)))
+                       Array.fold_right List.cons (get_children @@ foi base ifam) accu)
+                    accu (get_family p))
                 [] ipl
             in
             loop (gen + 1) next_gen (ipl :: accu)
