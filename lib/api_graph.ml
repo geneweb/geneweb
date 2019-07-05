@@ -199,29 +199,10 @@ let print_select_events conf base =
       print_close_person_events conf base params close_persons_params
     | None ->
       let filter_p, filter_f = events_filters_aux params in
-      let loop get fn len acc =
-        let rec loop acc i =
-          if i = len then acc
-          else match get i with
-            | Some x -> loop (fn acc x) (i + 1)
-            | None -> loop acc (i + 1)
-        in
-        loop acc 0
-      in
-      loop
-        (fun i ->
-           let f = foi base @@ Adef.ifam_of_int i in
-           if Gwdb.is_deleted_family f then None else Some f)
+      Gwdb.Collection.fold
         (fevents_aux base filter_f)
-        (Gwdb.nb_of_families base)
-      @@
-      (loop
-         (fun i ->
-            let p = poi base @@ Adef.iper_of_int i in
-            if Util.know base p then Some p else None)
-         (pevents_aux base filter_p)
-         (Gwdb.nb_of_persons base)
-         [])
+        (Gwdb.Collection.fold (pevents_aux base filter_p) [] (Gwdb.persons base))
+        (Gwdb.families base)
   in
   print_result conf @@
   Mext.gen_event_query_result_list { M.Event_query_result_list.events }
@@ -237,8 +218,8 @@ let build_graph_asc conf base p max_gen =
 *)
   let create_edge p_from p_to =
     M.Edge.({
-      from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));
-      to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
+      from_node = Gwdb.string_of_iper (get_key_index p_from);
+      to_node = Gwdb.string_of_iper (get_key_index p_to);
     })
   in
   let create_family ifam families =
@@ -327,10 +308,10 @@ let build_graph_asc_lia conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      Int64.of_int (Hashtbl.hash (baseprefix_from, get_key_index p_from))
+      string_of_int (Hashtbl.hash (baseprefix_from, get_key_index p_from)) (* FIXME!!! *)
     in
     let id_to =
-      Int64.of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to))
+      string_of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to))
     in
     M.Edge.({
       from_node = id_from;
@@ -341,7 +322,7 @@ let build_graph_asc_lia conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let uniq_id = Hashtbl.hash (base_prefix, get_key_index p) in
-    let id = Int64.of_int uniq_id in
+    let id = string_of_int uniq_id in
     (id, p)
   in
   let create_family ifam families =
@@ -403,8 +384,8 @@ let build_graph_asc_lia conf base p max_gen =
                                   match Perso_link.get_parents_link base_prefix ip with
                                   | Some family ->
                                       begin
-                                        let ifath = Adef.iper_of_int (Int32.to_int family.MLink.Family.ifath) in
-                                        let imoth = Adef.iper_of_int (Int32.to_int family.MLink.Family.imoth) in
+                                        let ifath = Gwdb.iper_of_string family.MLink.Family.ifath in
+                                        let imoth = Gwdb.iper_of_string family.MLink.Family.imoth in
                                         let fam_base_prefix = family.MLink.Family.baseprefix in
                                         match
                                           (Perso_link.get_person_link fam_base_prefix ifath,
@@ -492,8 +473,8 @@ let build_graph_desc conf base p max_gen =
   let ht = Hashtbl.create 42 in
   let create_edge p_from p_to =
     M.Edge.({
-      from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));
-      to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
+      from_node = Gwdb.string_of_iper (get_key_index p_from);
+      to_node = Gwdb.string_of_iper (get_key_index p_to);
     })
   in
   let create_family ifam families =
@@ -598,7 +579,7 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
   let base_loop = has_base_loop conf base in
   let () = Perso.build_sosa_ht conf base in
   let person_to_node p =
-    let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
+    let id = Gwdb.string_of_iper (get_key_index p) in
     let person =
       pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person
     in
@@ -610,8 +591,8 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
 *)
   let create_edge p_from p_to =
     M.Edge.({
-      from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));
-      to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
+      from_node = Gwdb.string_of_iper (get_key_index p_from);
+      to_node = Gwdb.string_of_iper (get_key_index p_to);
     })
   in
   let create_family ifam families =

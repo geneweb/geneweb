@@ -43,11 +43,6 @@ let print_info_base conf base =
          (Some p, sosa)
      | None -> (None, None)
   in
-  let sosa_or_first_ind =
-    match sosa_p with
-    | Some p -> Int64.of_int (Adef.int_of_iper (get_key_index p))
-    | None -> Int64.of_int 0
-  in
   let last_modified_person =
     try
       let ic = Secure.open_in_bin (History.file_name conf) in
@@ -61,22 +56,18 @@ let print_info_base conf base =
             match keyo with
             | Some key ->
               (match action with
-               | "mn" -> sosa_or_first_ind
+               | "mn" -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
                | _ ->
                  (match Gutil.person_ht_find_all base key with
-                  | [ip] -> Int64.of_int (Adef.int_of_iper ip)
-                  | _ -> sosa_or_first_ind))
-            | None -> sosa_or_first_ind
-          else sosa_or_first_ind
-        | None -> sosa_or_first_ind
+                  | [ip] -> Some (Gwdb.string_of_iper ip)
+                  | _ -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p))
+            | None -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+          else Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+        | None -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
       in
       close_in ic;
       last_modified_person
-    with Sys_error _ | _ -> sosa_or_first_ind
-  in
-  let last_modified_person =
-    if Gwdb.nb_of_persons base = 0 then None
-    else Some last_modified_person
+    with Sys_error _ | _ -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
   in
   let info_base =
     M.Infos_base.({
@@ -89,7 +80,6 @@ let print_info_base conf base =
   in
   let data = Mext.gen_infos_base info_base in
   print_result conf data
-;;
 
 
 
@@ -98,7 +88,7 @@ let print_info_base conf base =
     Otherwise, print a dummy (empty) person instead. **)
 let print_loop conf base =
   let (base_loop, pers) =
-    (ref false, ref (poi base (Adef.iper_of_int (-1))))
+    (ref false, ref (poi base (Gwdb.dummy_iper)))
   in
   (* On ne fait pas un Util.create_topological_sort conf base qui est certe *)
   (* plus rapide, mais qui dans de rare cas, n'est pas capable de remonter  *)
@@ -162,7 +152,6 @@ let print_info_ind conf base =
   in
   let data = data_person p in
   print_result conf data
-;;
 
 
 (* ******************************************************************** *)
@@ -196,7 +185,6 @@ let print_list_ref_person conf base =
     data_list_person_option conf base filters pl
   in
   print_result conf data
-;;
 
 
 (* ******************************************************************** *)
@@ -211,8 +199,8 @@ let print_list_ref_person conf base =
 (* ******************************************************************** *)
 let print_ref_person_from_ip conf base =
   let id = get_params conf Mext.parse_index in
-  let ip = Int32.to_int id.M.Index.index in
-  let p = poi base (Adef.iper_of_int ip) in
+  let ip = Gwdb.iper_of_string id.M.Index.index in
+  let p = poi base ip in
   let fn = Name.lower (sou base (get_first_name p)) in
   let sn = Name.lower (sou base (get_surname p)) in
   let occ = Int32.of_int (get_occ p) in
@@ -225,7 +213,6 @@ let print_ref_person_from_ip conf base =
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
-;;
 
 
 (**/**) (* API_FIRST_AVAILABLE_PERSON *)
@@ -248,32 +235,28 @@ let print_first_available_person conf base =
       oc = Int32.of_int 0;
     })
   in
-  let rec loop i nb_ind =
-    if i = nb_ind - 1 then empty_ref
+  let continue = ref true in
+  let res = ref empty_ref in
+  Gwdb.Collection.fold_until (fun () -> !continue) begin fun () p ->
+    if is_hide_names conf p || is_empty_or_quest_name p ||
+       not (authorized_age conf base p)
+    then ()
     else
-      let p = poi base (Adef.iper_of_int i) in
-      if is_hide_names conf p || is_empty_or_quest_name p ||
-         not (authorized_age conf base p)
-      then
-        loop (i + 1) nb_ind
-      else
+      begin
         let fn = Name.lower (sou base (get_first_name p)) in
         let sn = Name.lower (sou base (get_surname p)) in
         let occ = Int32.of_int (get_occ p) in
-        M.Reference_person.({
-          n = sn;
-          p = fn;
-          oc = occ;
-        })
-  in
-  let nb_ind = Gwdb.nb_of_persons base in
-  let ref_p =
-    if nb_ind = 0 then empty_ref
-    else loop 0 nb_ind
-  in
-  let data = Mext.gen_reference_person ref_p in
+        res :=
+          M.Reference_person.({
+              n = sn;
+              p = fn;
+              oc = occ;
+            }) ;
+        continue := false
+      end
+  end () (Gwdb.persons base) ;
+  let data = Mext.gen_reference_person !res in
   print_result conf data
-;;
 
 
 (**/**) (* API_SOSA *)
@@ -332,7 +315,6 @@ let print_find_sosa conf base =
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
-;;
 
 
 (**/**) (* API_LAST_MODIFIED_PERSONS *)
@@ -478,7 +460,6 @@ let print_last_modified_persons conf base =
   in
   let data = conv_data_list_person conf base filters list in
   print_result conf data
-;;
 
 
 (**/**) (* API_LAST_VISITED_PERSONS *)
@@ -514,7 +495,6 @@ let print_last_visited_persons conf base =
   in
   let data = data_list_person conf base filters list in
   print_result conf data
-;;
 
 
 (**/**) (* API_MAX_ANCESTORS *)
@@ -528,22 +508,16 @@ let print_last_visited_persons conf base =
     [Retour] : ReferencePerson
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-let print_max_ancestors conf base =
+let print_max_ancestors =
   let module IperSet =
-        Set.Make
-          (struct
-            type t = iper;;
-            let compare i1 i2 =
-              Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2);;
-           end)
+    Set.Make (struct type t = iper let compare = Stdlib.compare end)
   in
+  fun conf base ->
+  let ipers = Gwdb.ipers base in
+  let ancestors = Gwdb.iper_marker ipers IperSet.empty in
+  let mark = Gwdb.iper_marker ipers false in
 
-  let nb_ind = nb_of_persons base in
-  let ancestors = Array.make nb_ind IperSet.empty in
-  let mark = Array.make nb_ind false in
-
-  let has_children ip =
-    let p = poi base ip in
+  let has_children p =
     let fam = get_family p in
     let rec loop fam =
       match fam with
@@ -557,7 +531,7 @@ let print_max_ancestors conf base =
   in
 
   let rec nb_ancestors ip =
-    if mark.(Adef.int_of_iper ip) then ancestors.(Adef.int_of_iper ip)
+    if Gwdb.Marker.get mark ip then Gwdb.Marker.get ancestors ip
     else
       begin
         let anc =
@@ -565,7 +539,7 @@ let print_max_ancestors conf base =
           | Some ifam ->
               let cpl = foi base ifam in
               let anc =
-                IperSet.add (get_father cpl) ancestors.(Adef.int_of_iper ip)
+                IperSet.add (get_father cpl) @@ Gwdb.Marker.get ancestors ip
               in
               let anc =
                 IperSet.add (get_mother cpl) anc
@@ -578,39 +552,31 @@ let print_max_ancestors conf base =
               IperSet.union anc anc2
           | None -> IperSet.empty
         in
-        ancestors.(Adef.int_of_iper ip) <- anc;
-        mark.(Adef.int_of_iper ip) <- true;
+        Gwdb.Marker.set ancestors ip anc;
+        Gwdb.Marker.set mark ip true;
         anc
       end
   in
 
-  (*
-  let () = load_ascends_array base in
-  let () = load_couples_array base in
-  let () = load_descends_array base in
-  let () = load_unions_array base in
-  *)
-  let rec loop i =
-    if i = nb_ind then ()
-    else if has_children (Adef.iper_of_int i) then loop (succ i)
-    else if mark.(i) then loop (succ i)
+  Gwdb.Collection.iter begin fun p ->
+    if has_children p || Gwdb.Marker.get mark (get_key_index p) then ()
     else
       begin
-        let anc = nb_ancestors (Adef.iper_of_int i) in
-        ancestors.(i) <- anc;
-        mark.(i) <- true;
-        loop (succ i)
+        let i = get_key_index p in
+        let anc = nb_ancestors i in
+        Gwdb.Marker.set ancestors i anc;
+        Gwdb.Marker.set mark i true
       end
-  in
-  let () = loop 0 in
+  end (Gwdb.persons base) ;
+
   (* ip, nb_anc *)
-  let res = ref (0, 0) in
-  for i = 0 to nb_ind - 1 do
-    let nb = IperSet.cardinal ancestors.(i) in
+  let res = ref (Gwdb.dummy_iper, 0) in
+  Gwdb.Collection.iter begin fun i ->
+    let nb = IperSet.cardinal @@ Gwdb.Marker.get ancestors i in
     if nb > snd !res then res := (i, nb)
-    else ()
-  done;
-  let p = poi base (Adef.iper_of_int (fst !res)) in
+  end ipers ;
+
+  let p = poi base (fst !res) in
   let fn = Name.lower (sou base (get_first_name p)) in
   let sn = Name.lower (sou base (get_surname p)) in
   let occ = Int32.of_int (get_occ p) in
@@ -623,192 +589,129 @@ let print_max_ancestors conf base =
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
-;;
 
 
 (**/**) (* API_IMAGE *)
 
 let print_img conf base =
   let filters = get_filters conf in
+  let aux fp fl =
+    let () = Perso.build_sosa_ht conf base in
+    let () = load_image_ht conf in
+    let list =
+      Gwdb.Collection.fold begin fun acc p ->
+        match Api_util.find_image_file conf base p with
+        | Some img -> fp p img :: acc
+        | None -> acc
+      end [] (Gwdb.persons base)
+    in
+    if filters.nb_results then
+      let len = M.Internal_int32.({value = Int32.of_int (List.length list)}) in
+      let data = Mext.gen_internal_int32 len in
+      print_result conf data
+    else
+      print_result conf (fl list)
+  in
+  let base_loop = has_base_loop conf base in
   if p_getenvbin conf.env "full_infos" = Some "1" then
-    begin
-      let l = ref [] in
-      let base_loop = has_base_loop conf base in
-      let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf in
-      for i = 0 to nb_of_persons base - 1 do
-        let p = poi base (Adef.iper_of_int i) in
-        match Api_util.find_image_file conf base p with
-        | Some f ->
-            let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
-            l := M.Full_image.({person = p; img = f;}) :: !l
-        | None -> ()
-      done;
-      if filters.nb_results then
-        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
-        let data = Mext.gen_internal_int32 len in
-        print_result conf data
-      else
-        let list = M.List_full_images.({images = !l}) in
-        let data = Mext.gen_list_full_images list in
-        print_result conf data
-    end
+    aux
+      (fun p img ->
+         let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
+         M.Full_image.({person = p; img }))
+      (fun list ->
+         Mext.gen_list_full_images @@ M.List_full_images.({images = list}) )
   else
-    begin
-      let l = ref [] in
-      let base_loop = has_base_loop conf base in
-      let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf in
-      for i = 0 to nb_of_persons base - 1 do
-        let p = poi base (Adef.iper_of_int i) in
-        match Api_util.find_image_file conf base p with
-        | Some f ->
-            let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
-            l := M.Image.({person = p; img = f;}) :: !l
-        | None -> ()
-      done;
-      if filters.nb_results then
-        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
-        let data = Mext.gen_internal_int32 len in
-        print_result conf data
-      else
-        let list = M.List_images.({list_images = !l}) in
-        let data = Mext.gen_list_images list in
-        print_result conf data
-    end
-;;
+    aux
+      (fun p img ->
+         let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
+         M.Image.({person = p; img}))
+      (fun list ->
+         Mext.gen_list_images @@ M.List_images.({list_images = list}) )
 
 (**/**) (* API_IMAGE_EXT *)
 
 let print_img_ext conf base =
   let filters = get_filters conf in
+  let aux fp fl =
+    let () = Perso.build_sosa_ht conf base in
+    let () = load_image_ht conf in
+    let list =
+      Gwdb.Collection.fold begin fun acc p ->
+        let http = "http://" in
+        let img = sou base (get_image p) in
+        if not (is_empty_string (get_image p)) &&
+           String.length img > String.length http &&
+           String.sub img 0 (String.length http) = http
+        then
+          fp p img :: acc
+        else acc
+      end [] (Gwdb.persons base)
+    in
+    if filters.nb_results then
+      let len = M.Internal_int32.({value = Int32.of_int (List.length list)}) in
+      let data = Mext.gen_internal_int32 len in
+      print_result conf data
+    else print_result conf (fl list)
+  in
+  let base_loop = has_base_loop conf base in
   if p_getenvbin conf.env "full_infos" = Some "1" then
-    begin
-      let l = ref [] in
-      let base_loop = has_base_loop conf base in
-      let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf in
-      for i = 0 to nb_of_persons base - 1 do
-        let p = poi base (Adef.iper_of_int i) in
-        let http = "http://" in
-        let img = sou base (get_image p) in
-        if not (is_empty_string (get_image p)) &&
-             String.length img > String.length http &&
-               String.sub img 0 (String.length http) = http
-        then
-          let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
-          l := M.Full_image.({person = p; img = img;}) :: !l
-      done;
-      if filters.nb_results then
-        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
-        let data = Mext.gen_internal_int32 len in
-        print_result conf data
-      else
-        let list = M.List_full_images.({images = !l}) in
-        let data = Mext.gen_list_full_images list in
-        print_result conf data
-    end
+    aux
+      (fun p img ->
+         let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
+         M.Full_image.({person = p; img = img;}))
+      (fun list ->
+         Mext.gen_list_full_images @@ M.List_full_images.({images = list}) )
   else
-    begin
-      let l = ref [] in
-      let base_loop = has_base_loop conf base in
-      let () = Perso.build_sosa_ht conf base in
-      let () = load_image_ht conf in
-      for i = 0 to nb_of_persons base - 1 do
-        let p = poi base (Adef.iper_of_int i) in
-        let http = "http://" in
-        let img = sou base (get_image p) in
-        if not (is_empty_string (get_image p)) &&
-             String.length img > String.length http &&
-               String.sub img 0 (String.length http) = http
-        then
-          let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
-          l := M.Image.({person = p; img = img;}) :: !l
-      done;
-      if filters.nb_results then
-        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
-        let data = Mext.gen_internal_int32 len in
-        print_result conf data
-      else
-        let list = M.List_images.({list_images = !l}) in
-        let data = Mext.gen_list_images list in
-        print_result conf data
-    end
-;;
-
+    aux
+      (fun p img ->
+         let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
+         M.Image.({person = p; img = img;}))
+      (fun list -> Mext.gen_list_images @@ M.List_images.({list_images = list}))
 
 (**/**) (* API_IMAGE_ALL *)
 
 let print_img_all conf base =
   let filters = get_filters conf in
+  let aux fp fl =
+    let list =
+      Gwdb.Collection.fold begin fun acc p ->
+        if not (is_empty_string (get_image p)) then
+          let img = sou base (get_image p) in
+          fp p img :: acc
+        else
+          match Api_util.find_image_file conf base p with
+          | Some img -> fp p img :: acc
+          | None -> acc
+      end [] (Gwdb.persons base)
+    in
+    if filters.nb_results then
+      let len = M.Internal_int32.({value = Int32.of_int (List.length list)}) in
+      let data = Mext.gen_internal_int32 len in
+      print_result conf data
+    else
+      print_result conf (fl list)
+  in
+  let base_loop = has_base_loop conf base in
   if p_getenvbin conf.env "full_infos" = Some "1" then
-    begin
-      let l = ref [] in
-      let base_loop = has_base_loop conf base in
-      let () = Perso.build_sosa_ht conf base in
-      (* On commente pour la migration des portraits *)
-      (*let () = load_image_ht conf in*)
-      for i = 0 to nb_of_persons base - 1 do
-        let p = poi base (Adef.iper_of_int i) in
-        if not (is_empty_string (get_image p)) then
-          let img = sou base (get_image p) in
-          (* On commente pour la migration des portraits true => false *)
-          let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person false in
-          l := M.Full_image.({person = p; img = img;}) :: !l
-        else
-          match Api_util.find_image_file conf base p with
-          | Some f ->
-              let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person false in
-              l := M.Full_image.({person = p; img = f;}) :: !l
-          | None -> ()
-      done;
-      if filters.nb_results then
-        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
-        let data = Mext.gen_internal_int32 len in
-        print_result conf data
-      else
-        let list = M.List_full_images.({images = !l}) in
-        let data = Mext.gen_list_full_images list in
-        print_result conf data
-    end
+    aux
+      (fun p img ->
+         let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person false in
+         M.Full_image.({person = p; img = img;}))
+      (fun list -> Mext.gen_list_full_images @@ M.List_full_images.({images = list}) )
   else
-    begin
-      let l = ref [] in
-      let base_loop = has_base_loop conf base in
-      let () = Perso.build_sosa_ht conf base in
-      (* On commente pour la migration des portraits *)
-      (*let () = load_image_ht conf in*)
-      for i = 0 to nb_of_persons base - 1 do
-        let p = poi base (Adef.iper_of_int i) in
-        if not (is_empty_string (get_image p)) then
-          let img = sou base (get_image p) in
-          let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person false in
-          l := M.Image.({person = p; img = img;}) :: !l
-        else
-          match Api_util.find_image_file conf base p with
-          | Some f ->
-              let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person false in
-              l := M.Image.({person = p; img = f;}) :: !l
-          | None -> ()
-      done;
-      if filters.nb_results then
-        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
-        let data = Mext.gen_internal_int32 len in
-        print_result conf data
-      else
-        let list = M.List_images.({list_images = !l}) in
-        let data = Mext.gen_list_images list in
-        print_result conf data
-    end
-;;
-
+    aux
+      (fun p img ->
+         let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person false in
+         M.Image.({person = p; img}))
+      (fun list ->
+         Mext.gen_list_images @@ M.List_images.({list_images = list}))
 
 (**/**) (* API_IMAGE_APP *)
 
 let print_img_person conf base =
   let id = get_params conf Mext.parse_index in
-  let ip = Int32.to_int id.M.Index.index in
-  let p = poi base (Adef.iper_of_int ip) in
+  let ip = Gwdb.iper_of_string id.M.Index.index in
+  let p = poi base ip in
   let img_addr =
     match sou base (get_image p) with
     | "" ->
@@ -820,7 +723,6 @@ let print_img_person conf base =
   let img_from_ip = M.Image_address.({img = img_addr}) in
   let data = Mext.gen_image_address img_from_ip in
   print_result conf data
-;;
 
 
 
@@ -845,44 +747,37 @@ let print_updt_image conf base =
           patch_person base p.key_index p
       | None -> () )
     pers_img_l;
-  Gwdb.commit_patches base;
-;;
-
+  Gwdb.commit_patches base
 
 (**/**) (* API_REMOVE_IMAGE_EXT *)
 
 let print_remove_image_ext base =
-  for i = 0 to nb_of_persons base - 1 do
-    let p = poi base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter begin fun p ->
     let http = "http://" in
     let img = sou base (get_image p) in
     let is_ext =
       String.length img > String.length http &&
-        String.sub img 0 (String.length http) = http
+      String.sub img 0 (String.length http) = http
     in
     if img <> "" && is_ext then
       let p =
         {(gen_person_of_person p) with image = Gwdb.insert_string base ""}
       in
       patch_person base p.key_index p
-  done;
+  end (Gwdb.persons base) ;
   Gwdb.commit_patches base
-;;
-
 
 (**/**) (* API_REMOVE_IMAGE_EXT_ALL *)
 
 let print_remove_image_ext_all base =
-  for i = 0 to nb_of_persons base - 1 do
-    let p = poi base (Adef.iper_of_int i) in
+  Gwdb.Collection.iter begin fun p ->
     if not (is_empty_string (get_image p)) then
       let p =
         {(gen_person_of_person p) with image = Gwdb.insert_string base ""}
       in
       patch_person base p.key_index p
-  done;
+  end (Gwdb.persons base) ;
   Gwdb.commit_patches base
-;;
 
 (**/**) (* API_CHECK_BASE *)
 
@@ -955,7 +850,6 @@ let print_base_warnings conf base =
       Mext.gen_base_warnings base_warnings
   in
   print_result conf data
-;;
 
 
 (**/**) (* Récupération de toute une base. *)
@@ -973,16 +867,18 @@ let print_all_persons conf base =
     | (None, None) -> (0, nb_of_persons base)
   in
   let () = Perso.build_sosa_ht conf base in
-  let list = ref [] in
-  for i = from to limit - 1 do
-    if i < nb_of_persons base then
-      let p = poi base (Adef.iper_of_int i) in
-      list := p :: !list
-    else ()
-  done;
-  let data = data_list_person conf base filters (List.rev !list) in
+  let len = limit - from in
+  let list =
+    Gwdb.Collection.fold_until
+      (fun (_, n) -> n < len)
+      begin fun ((list, n) as acc) i ->
+        if n < from then acc
+        else (i :: list, n + 1)
+      end ([], 0) (Gwdb.ipers base)
+  in
+  let list = Gwdb.poi_batch base (List.rev @@ fst list) in
+  let data = data_list_person conf base filters list in
   print_result conf data
-;;
 
 
 let print_all_families conf base =
@@ -998,201 +894,52 @@ let print_all_families conf base =
     | (None, Some l) -> (0, Int32.to_int l)
     | (None, None) -> (0, nb_families)
   in
-  let list = ref [] in
-  for i = limit - 1 downto from do
-    if i < nb_families then
-      let ifam = Adef.ifam_of_int i in
-      list := fam_to_piqi_family conf base ifam :: !list
-    else ()
-  done;
+  let () = Perso.build_sosa_ht conf base in
+  let len = limit - from in
+  let list =
+    Gwdb.Collection.fold_until
+      (fun (_, n) -> n < len)
+      begin fun ((list, n) as acc) i ->
+        if n < from then acc
+        else (i :: list, n + 1)
+      end ([], 0) (Gwdb.ifams base)
+  in
   let data =
     if filters.nb_results then
-      let len = M.Internal_int32.({value = Int32.of_int (List.length !list)}) in
+      let len = M.Internal_int32.({value = Int32.of_int (List.length @@ fst list)}) in
       Mext.gen_internal_int32 len
     else
-      let list = M.List_full_families.({families = !list}) in
+      let list = List.map (fam_to_piqi_family conf base) (List.rev @@ fst list) in
+      let list = M.List_full_families.({families = list}) in
       Mext.gen_list_full_families list
   in
   print_result conf data
-;;
-
 
 module StringMap =
   Map.Make
     (struct
-      type t = string;;
-      let compare = Gutil.alphabetic_order ;;
-     end)
-;;
+      type t = string      let compare = Gutil.alphabetic_order      end)
 
 module IperSort =
   Set.Make
     (struct
-      type t = string * string ;;
-      let compare (sn1, fn1) (sn2, fn2) =
+      type t = string * string       let compare (sn1, fn1) (sn2, fn2) =
         let cmp = compare sn1 sn2 in
         if cmp = 0 then compare fn1 fn2
-        else cmp;;
-(*
+        else cmp(*
         let cmp = Gutil.alphabetic_order sn1 sn2 in
         if cmp = 0 then Gutil.alphabetic_order fn1 fn2
-        else cmp;;
-*)
+        else cmp*)
      end)
-;;
 
-let print_all_full_person conf base =
-  let base_loop = has_base_loop conf base in
-  let () = Perso.build_sosa_ht conf base in
-  let fname = "/tmp/pb_base_data.log" in
-  let fname2 = "/tmp/pb_base_index.log" in
-  let fname3 = "/tmp/pb_base_index_surname.log" in
-  let () = load_ascends_array base in
-  let () = load_strings_array base in
-  let () = load_couples_array base in
-  let () = load_unions_array base in
-  let () = load_descends_array base in
-  let () = load_image_ht conf in
-(*  let l = ref IperSort.empty in*)
-  let index_map = ref StringMap.empty in
-  let add_to_map k v =
-    try
-      let l = StringMap.find k !index_map in
-      index_map := StringMap.add k (v :: l) !index_map
-    with Not_found -> index_map := StringMap.add k [v] !index_map
-  in
-
-  (try
-    let oc = open_out_bin fname in
-    let oc_index = open_out_bin fname2 in
-    let oc_index_surname = open_out_bin fname3 in
-    output_binary_int oc (nb_of_persons base);
-    output_binary_int oc (nb_of_families base);
-    output_binary_int oc 16;
-    output_binary_int oc 0;
-    let curr = ref 0 in
-    for i = 0 to nb_of_persons base - 1 do
-      let p = poi base (Adef.iper_of_int i) in
-      let sn = sou base (get_surname p) in
-      add_to_map sn i;
-      (*      let fn = sou base (get_first_name p) in*)
-      (*      l := IperSort.add (sn, fn) !l;*)
-      let p =
-        pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true
-      in
-      let data = Mext.gen_full_person p in
-      let data = data `pb in
-      Printf.fprintf oc "%s" data;
-      output_binary_int oc_index !curr;
-      curr := !curr + String.length data;
-    done;
-    flush oc;
-    seek_out oc 12;
-    output_binary_int oc (!curr + 16);
-    seek_out oc (!curr + 16);
-    curr := 0;
-    for i = 0 to nb_of_families base - 1 do
-      let fam = fam_to_piqi_family conf base (Adef.ifam_of_int i) in
-      let data = Mext.gen_full_family fam in
-      let data = data `pb in
-      Printf.fprintf oc "%s" data;
-      output_binary_int oc_index !curr;
-      curr := !curr + String.length data;
-    done;
-    flush oc;
-    (*
-      let list = IperSort.elements !l in
-      List.iter
-      (fun (sn, fn) -> Printf.fprintf oc "%s %s\n" sn fn)
-      list;
-      flush oc;
-    *)
-
-    StringMap.iter
-      (fun _ v -> List.iter (output_binary_int oc_index_surname) v)
-      !index_map;
-
-(*
-    StringMap.iter
-      (fun k v -> List.iter (fun i -> print_endline (string_of_int i)) v)
-      !index_map;
-    let _ = print_endline "\n\n" in
-*)
-
-    close_out oc;
-    close_out oc_index;
-    close_out oc_index_surname;
-  with Sys_error _ -> print_endline "error !!!");
-
-(*
-  (* On test ce qu'on a écrit... *)
-  (* lecture des noms par ordre alphabetique qui pointent vers des personnes *)
-  (try
-    let ic = open_in_bin fname in
-    let ic_index = open_in_bin fname2 in
-    let ic_index_surname = open_in_bin fname3 in
-
-    let surnamel = ref [] in
-
-    (try
-      begin
-        while true do
-          surnamel := input_binary_int ic_index_surname :: !surnamel
-        done;
-        close_in ic_index_surname
-      end
-    with End_of_file -> ());
-
-    surnamel := List.rev !surnamel;
-
-    seek_in ic 0;
-    let nb_person = input_binary_int ic in
-    let size = 4 * nb_person in
-
-
-    List.iter
-      (fun i_sn ->
-(*        let _ = print_endline ("i_sn = " ^ string_of_int i_sn) in*)
-        seek_in ic_index (i_sn * 4);
-        let i_p = input_binary_int ic_index in
-        let i_p2 =
-          if ((i_sn + 1) * 4) < size then
-            input_binary_int ic_index
-          else
-            begin
-              seek_in ic 12;
-              input_binary_int ic - 16
-            end
-        in
-(*        let _ = print_endline ("i_p = " ^ string_of_int i_p) in*)
-(*        let _ = print_endline ("i_p2 = " ^ string_of_int i_p2) in*)
-        let buff = String.create (i_p2 - i_p) in
-(*        let _ = print_endline ("buff = " ^ string_of_int (String.length buff)) in*)
-        seek_in ic (i_p + 16);
-        (* en fait c'est mieux really_input ... mais pourquoi ... *)
-        let _ = really_input ic buff 0 (String.length buff) in
-(*        let _ = print_endline buff in*)
-        let ppp = Mext.parse_full_person buff `pb in
-        print_endline (ppp.M.Full_person.lastname))
-      !surnamel;
-
-    close_in ic_index;
-    close_in ic;
-
-  with Sys_error _ -> print_endline "error 2 !!!");
-*)
-
-  Util.html conf ;
-  Wserver.printf "Gagné !!!";
-;;
-
+let print_all_full_person _conf _base = () (* FIXME!!! *)
 
 (**/**) (* Version app *)
 
 module NameSort =
   Set.Make
     (struct
-      type t = int * string * string * string * Def.date option
+      type t = iper * string * string * string * Def.date option
       let compare (i1, sn1, fn1, _, d1) (i2, sn2, fn2, _, d2) =
         if sn1 = sn2 then
           if fn1 = fn2 then
@@ -1206,28 +953,9 @@ module NameSort =
             | (None, Some _) -> 1
             | _ -> compare i1 i2
           else compare fn1 fn2
-        else compare sn1 sn2;;
-     end)
-;;
+        else compare sn1 sn2     end)
 
-module NameSortMap =
-  Map.Make
-    (struct
-      type t = string ;;
-      let compare = compare ;;
-     end)
-;;
-
-let intSetTab = ref (Array.make 1 0);;
-
-module IntSet =
-  Set.Make
-    (struct
-      type t = int;;
-      let compare x y = compare !intSetTab.(x) !intSetTab.(y);;
-     end)
-;;
-
+module NameSortMap = Map.Make (String)
 
 (*
    Fichier base_info :
@@ -1253,10 +981,10 @@ let print_export_info conf export_directory =
       let sosa_ref =
         match Util.find_sosa_ref conf base with
         | Some p ->
-            (output_char oc '\001'; Adef.int_of_iper (get_key_index p))
-        | None -> (output_char oc '\000'; 0)
+            (output_char oc '\001'; get_key_index p)
+        | None -> (output_char oc '\000'; Gwdb.dummy_iper) (* FIXME??? *)
       in
-      output_binary_int oc sosa_ref;
+      output_string oc (Gwdb.string_of_iper sosa_ref);
       let timestamp = string_of_float (Unix.time ()) in
       let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
       output_binary_int oc (String.length timestamp);
@@ -1266,7 +994,6 @@ let print_export_info conf export_directory =
       (* IO.write_i32 oc timestamp; *)
       close_out oc;
   | None -> ()
-;;
 
 
 (*
@@ -1284,7 +1011,6 @@ let print_export_person conf export_directory =
     | None -> failwith "fork base"
   in
   let base = fork_base in
-
   let fname_inx = Filename.concat export_directory "pb_base_person.inx" in
   let fname_dat = Filename.concat export_directory "pb_base_person.dat" in
   match
@@ -1295,9 +1021,7 @@ let print_export_person conf export_directory =
       let curr = ref 0 in
       (* offset delete *)
       output_binary_int oc_dat 0;
-      for i = 0 to nb_of_persons base - 1 do
-        let ip = Adef.iper_of_int i in
-        let p = poi base ip in
+      Gwdb.Collection.iter begin fun p ->
         let pers_app = pers_to_piqi_app_person conf base p in
         let data = Mext_app.gen_person pers_app in
         let data = data `pb in
@@ -1308,14 +1032,13 @@ let print_export_person conf export_directory =
         output_binary_int oc_inx !curr;
         (* Attention a ne pas oublier offset delete => +4 *)
         curr := !curr + 4 + String.length data;
-      done;
+      end (Gwdb.persons base) ;
       (* mise à jour de offset delete maintenant qu'on a fini *)
       seek_out oc_dat 0;
       output_binary_int oc_dat !curr;
       close_out oc_dat;
       close_out oc_inx;
   | _ -> ()
-;;
 
 
 (*
@@ -1344,8 +1067,7 @@ let print_export_family conf export_directory =
       let curr = ref 0 in
       (* offset delete *)
       output_binary_int oc_dat 0;
-      for i = 0 to nb_of_families base - 1 do
-        let ifam = Adef.ifam_of_int i in
+      Gwdb.Collection.iter begin fun ifam ->
         let fam_app = fam_to_piqi_app_family base ifam in
         let data = Mext_app.gen_family fam_app in
         let data = data `pb in
@@ -1356,14 +1078,13 @@ let print_export_family conf export_directory =
         output_binary_int oc_inx !curr;
         (* Attention a ne pas oublier offset delete => +4 *)
         curr := !curr + 4 + String.length data;
-      done;
+      end (Gwdb.ifams base) ;
       (* mise à jour de offset delete maintenant qu'on a fini *)
       seek_out oc_dat 0;
       output_binary_int oc_dat !curr;
       close_out oc_dat;
       close_out oc_inx;
   | _ -> ()
-;;
 
 
 (*
@@ -1393,9 +1114,7 @@ let print_person_note conf export_directory =
       let curr = ref 4 in
       (* note vide *)
       output_binary_int oc_dat 0;
-      for i = 0 to nb_of_persons base - 1 do
-        let ip = Adef.iper_of_int i in
-        let p = poi base ip in
+      Gwdb.Collection.iter begin fun p ->
         let data = sou base (get_notes p) in
         if data = "" then
           (* On pointe vers la note vide. *)
@@ -1408,11 +1127,10 @@ let print_person_note conf export_directory =
             output_string oc_dat data;
             curr := !curr + 4 + String.length data;
           end;
-      done;
+      end (Gwdb.persons base) ;
       close_out oc_dat;
       close_out oc_inx;
   | _ -> ()
-;;
 
 
 (*
@@ -1442,9 +1160,7 @@ let print_family_note conf export_directory =
       let curr = ref 4 in
       (* note vide *)
       output_binary_int oc_dat 0;
-      for i = 0 to nb_of_families base - 1 do
-        let ifam = Adef.ifam_of_int i in
-        let fam = foi base ifam in
+      Gwdb.Collection.iter begin fun fam ->
         let data = sou base (get_comment fam) in
         if data = "" then
           (* On pointe vers la note vide. *)
@@ -1457,37 +1173,34 @@ let print_family_note conf export_directory =
             output_string oc_dat data;
             curr := !curr + 4 + String.length data;
           end;
-      done;
+      end (Gwdb.families base) ;
       close_out oc_dat;
       close_out oc_inx;
   | _ -> ()
-;;
 
 
 let export_img conf base =
   let prog = "convert" in
-  (* Attention, en version finale ne pas garder le / 2 *)
-  for i = 0 to (nb_of_persons base - 1) / 2 do
-    let ip = Adef.iper_of_int i in
-    let p = poi base ip in
+  let i = ref (-1) in
+  Gwdb.Collection.iter begin fun p ->
+    incr i ;
     let img = Util.auto_image_file conf base p in
     if not (is_empty_string (get_image p)) || img <> None then
       match img with
       | Some file ->
           let file = "/home/geneweb/bases/" ^ file in
-          let dest = "/tmp/pb_base/img/" ^ string_of_int (i mod 10) ^ "/" in
+          let dest = "/tmp/pb_base/img/" ^ string_of_int (!i mod 10) ^ "/" in
           Mutil.mkdir_p dest;
           let pid =
             Unix.create_process
               prog
               [| prog;
-                 "-resize"; "90x90"; file; dest ^ "/" ^ string_of_int i ^ ".jpg" |]
+                 "-resize"; "90x90"; file; dest ^ "/" ^ string_of_int !i ^ ".jpg" |]
               Unix.stdin Unix.stdout Unix.stderr
           in
           ignore (Unix.waitpid [] pid)
       | None -> ()
-  done
-;;
+  end (Gwdb.persons base)
 
 
 (*
@@ -1533,8 +1246,16 @@ let build_relative_name base p =
   let list = add_from_list list (get_first_names_aliases p) in
   let list = add_from_list list (get_surnames_aliases p) in
   List.rev list
-;;
 
+
+let iperSetTab = ref (Hashtbl.create 0)
+
+module IntSet =
+  Set.Make
+    (struct
+      type t = iper
+      let compare x y = compare (Hashtbl.find !iperSetTab x) (Hashtbl.find !iperSetTab y)
+    end)
 
 
 let print_index_search conf export_directory =
@@ -1573,8 +1294,8 @@ let print_index_search conf export_directory =
 
   begin
     try
-      for i = 0 to nb_of_persons base - 1 do
-        let p = poi base (Adef.iper_of_int i) in
+      Gwdb.Collection.iter begin fun p ->
+        let i = get_key_index p in
         let fn = sou base (get_first_name p) in
         let sn = sou base (get_surname p) in
         if sn = "?" && fn = "?" then ()
@@ -1596,17 +1317,17 @@ let print_index_search conf export_directory =
             Util.rev_iter (fun fn -> add_to_map fn i) (String.split_on_char ' ' fn);
             Util.rev_iter (fun n -> add_to_map n i) (String.split_on_char ' ' r);
           end
-      done;
+      end (Gwdb.persons base) ;
 
-      intSetTab := Array.make (nb_of_persons base) 0;
+      iperSetTab := Hashtbl.create (nb_of_persons base) ;
       let nb_tab = ref 0 in
 
       let oc_name_inx = open_out_bin fname_inx in
       List.iter
         (fun (i, _, _, _, _) ->
-          output_binary_int oc_name_inx i;
+          output_string oc_name_inx @@ Gwdb.string_of_iper i;
           incr nb_tab;
-          Array.set !intSetTab i !nb_tab)
+          Hashtbl.add !iperSetTab i !nb_tab)
         (NameSort.elements !list_inx);
       close_out oc_name_inx;
 
@@ -1635,7 +1356,7 @@ let print_index_search conf export_directory =
                  IntSet.empty v)
           in
           output_binary_int oc_name_i (List.length vv);
-          List.iter (output_binary_int oc_name_i) vv;
+          List.iter (fun i -> output_string oc_name_i @@ Gwdb.string_of_iper i) vv;
 
           offset_i := !offset_i + 4 + (4 * (List.length vv)))
         !list_map;
@@ -1678,7 +1399,6 @@ let print_index_search conf export_directory =
 
     with Sys_error _ -> ()
   end
-;;
 
 
 (*
@@ -1700,29 +1420,26 @@ let print_ascends_index conf export_directory =
     with Sys_error _ -> None
   with
   | Some oc ->
-      for i = 0 to nb_of_persons base - 1 do
-        let ip = Adef.iper_of_int i in
-        let p = poi base ip in
-        match get_parents p with
-        | Some ifam ->
-            begin
-              let cpl = foi base ifam in
-              let father = get_father cpl in
-              let mother = get_mother cpl in
-              output_char oc '\001';
-              output_binary_int oc (Adef.int_of_iper father);
-              output_binary_int oc (Adef.int_of_iper mother);
-            end
-        | None ->
-            begin
-              output_char oc '\000';
-              output_binary_int oc 0;
-              output_binary_int oc 0;
-            end
-      done;
+    Gwdb.Collection.iter begin fun p ->
+      match get_parents p with
+      | Some ifam ->
+        begin
+          let cpl = foi base ifam in
+          let father = get_father cpl in
+          let mother = get_mother cpl in
+          output_char oc '\001';
+          output_string oc (Gwdb.string_of_iper father);
+          output_string oc (Gwdb.string_of_iper mother);
+        end
+      | None ->
+        begin
+          output_char oc '\000';
+          output_binary_int oc 0;
+          output_binary_int oc 0;
+        end
+      end (Gwdb.persons base);
       close_out oc;
   | _ -> ()
-;;
 
 
 let print_export conf base =
@@ -1800,335 +1517,7 @@ let print_export conf base =
     try Unix.rmdir tmp_export_directory with Unix.Unix_error (_, _, _) -> ()
   in
 
-
-  Util.html conf ;
-;;
-
-
-(**/**) (* Version app, synchro !!! *)
-
-
-module IntIdSet =
-  Set.Make
-    (struct
-      type t = int;;
-      let compare = compare;;
-     end)
-;;
-
-open Database;;
-
-
-let full_synchro conf synchro timestamp =
-  let last_import = ref None in
-  let bdir =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  (* Suppression potentiel du fichier patch. *)
-  (match synchro.synch_list with
-  | (last_timestamp, _, _) :: _ ->
-      let fname_synchro = Filename.concat bdir "synchro_patches" in
-      let fname_cmd = Filename.concat bdir "command.txt" in
-      (match
-         try Some (open_in (Util.base_path [] fname_cmd))
-         with Sys_error _ -> None
-       with
-       | Some ic ->
-           let fd = Unix.descr_of_in_channel ic in
-           let stats = Unix.fstat fd in
-           close_in ic;
-           last_import := Some stats.Unix.st_mtime;
-           if float_of_string last_timestamp < stats.Unix.st_mtime then
-             try Sys.remove fname_synchro with Sys_error _ -> ()
-           else ()
-       | None -> ());
-  | _ -> ());
-  (* On clean le fichier synchro des trop vieilles modifs. *)
-  (match !last_import with
-  | Some last_mod ->
-      let bname = Util.base_path [] bdir in
-      let new_synchro = Database.input_synchro bname in
-      let list =
-        List.fold_right
-          (fun (ts, ipl, ifaml) accu ->
-            if (float_of_string ts < last_mod) then accu
-            else (ts, ipl, ifaml) :: accu)
-          new_synchro.synch_list []
-      in
-      let new_synchro = {synch_list = list} in
-      (* Si on a rien modifier, ça ne sert à rien de faire la mise à *)
-      (* jour du fichier synchro, parce qu'on modifie la date de     *)
-      (* dernière modification pour rien.                            *)
-      if synchro = new_synchro then ()
-      else
-        begin
-          let tmp_fname = Filename.concat bname "1synchro_patches" in
-          let fname = Filename.concat bname "synchro_patches" in
-          let oc9 =
-            try Secure.open_out_bin tmp_fname
-            with Sys_error _ ->
-              raise (Adef.Request_failure "the database is not writable")
-          in
-          Mutil.output_value_no_sharing oc9 (synchro : Database.synchro_patch);
-          close_out oc9;
-          Mutil.remove_file (fname ^ "~");
-          (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
-          (try Sys.rename tmp_fname fname with Sys_error _ -> ());
-        end
-  | _ -> ());
-  (* Si timestamp plus petit que import, alors synchro totale. *)
-  match !last_import with
-  | Some last_mod -> if timestamp < last_mod then true else false
-  | _ -> false
-;;
-
-
-let print_synchro_patch_mobile conf base =
-  let params = get_params conf Mext.parse_synchro_params in
-  let export_directory = params.M.Synchro_params.export_directory in
-  let timestamp = params.M.Synchro_params.timestamp in
-
-  (* On créé un dossier temporaire pour aller plus vite qu'écrire sur le NAS. *)
-  let tmp_export_directory =
-    let _ = Random.self_init () in
-    let rec loop i =
-      let file =
-        "/tmp/" ^ conf.bname ^ "." ^ string_of_int (Random.int 1000000) ^ "/"
-      in
-      if not (Sys.file_exists file) then file
-      else if i < 5 then loop (i + 1)
-      else exit 2
-    in
-    loop 0
-  in
-  let _ =
-    try Unix.mkdir tmp_export_directory 0o777
-    with Unix.Unix_error (_, _, _) -> exit 2
-  in
-
-  (* Récupération du fichier synchro. *)
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  let bname = Util.base_path [] bname in
-  let synchro = Database.input_synchro bname in
-  (* Toutes les dernières modifications. *)
-  let timestamp = float_of_string timestamp in
-  let (ip_list, ifam_list) =
-    List.fold_right
-      (fun (t_stamp, ip_list, ifam_list) (accu_ip_list, accu_ifam_list) ->
-        let t_stamp = float_of_string t_stamp in
-        if t_stamp > timestamp then
-          (accu_ip_list @ ip_list, accu_ifam_list @ ifam_list)
-        else (accu_ip_list, accu_ifam_list))
-      synchro.synch_list ([], [])
-  in
-  let last_timestamp =
-    match synchro.synch_list with
-    | (timestamp, _, _) :: _ -> timestamp
-    | _ -> ""
-  in
-  (* On rend unique les ids. *)
-  let ip_list =
-    IntIdSet.elements
-      (List.fold_left
-         (fun accu i -> IntIdSet.add i accu)
-         IntIdSet.empty ip_list)
-  in
-  let ifam_list =
-    IntIdSet.elements
-      (List.fold_left
-         (fun accu i -> IntIdSet.add i accu)
-         IntIdSet.empty ifam_list)
-  in
-  let len_ip_list = List.length ip_list in
-  let len_ifam_list = List.length ifam_list in
-
-  (* Ecriture du fichier synchro. *)
-  let fname = Filename.concat tmp_export_directory "pb_base_synchro.patches" in
-  let () =
-    match
-      try Some (open_out_bin fname)
-      with Sys_error _ -> None
-    with
-    | Some oc ->
-        if full_synchro conf synchro timestamp then
-          (* si 0 il faut re-synchroniser la base. *)
-          output_char oc '\000'
-        else
-          begin
-            (* si 1 il faut appliquer le patch. *)
-            output_char oc '\001';
-            output_binary_int oc (String.length last_timestamp);
-            output_string oc last_timestamp;
-            (* nb persons et families *)
-            output_binary_int oc (Util.real_nb_of_persons conf base);
-            output_binary_int oc (nb_of_families base);
-            (* sosa *)
-            let sosa_ref =
-              match Util.find_sosa_ref conf base with
-              | Some p ->
-                  (output_char oc '\001'; Adef.int_of_iper (get_key_index p))
-              | None -> (output_char oc '\000'; 0)
-            in
-            output_binary_int oc sosa_ref;
-            (* nb pers modified, id len pers *)
-            output_binary_int oc len_ip_list;
-            List.iter
-              (fun i ->
-                let ip = Adef.iper_of_int i in
-                let p = poi base ip in
-                let pers_app = pers_to_piqi_app_person conf base p in
-                let data = Mext_app.gen_person pers_app in
-                let data = data `pb in
-                (* id, longueur de la personne puis données de la personne *)
-                output_binary_int oc i;
-                output_binary_int oc (String.length data);
-                output_string oc data)
-              ip_list;
-            (* nb fam modified, id len fam *)
-            output_binary_int oc len_ifam_list;
-            List.iter
-              (fun i ->
-                let ifam = Adef.ifam_of_int i in
-                let fam_app = fam_to_piqi_app_family base ifam in
-                let data = Mext_app.gen_family fam_app in
-                let data = data `pb in
-                (* id, longueur de la famille puis données de la famille *)
-                output_binary_int oc i;
-                output_binary_int oc (String.length data);
-                output_string oc data)
-              ifam_list;
-            (* nb pers modified, id len pers_note *)
-            output_binary_int oc len_ip_list;
-            List.iter
-              (fun i ->
-                let ip = Adef.iper_of_int i in
-                let p = poi base ip in
-                let data = sou base (get_notes p) in
-                if data = "" then
-                  begin
-                    (* On pointe vers la note vide. *)
-                    output_binary_int oc i;
-                    output_binary_int oc 0
-                  end
-                else
-                  begin
-                    (* id, longueur de la personne puis données de la personne *)
-                    output_binary_int oc i;
-                    output_binary_int oc (String.length data);
-                    output_string oc data
-                  end)
-              ip_list;
-            (* nb fam modified, id len fam_note *)
-            output_binary_int oc len_ifam_list;
-            List.iter
-              (fun i ->
-                let ifam = Adef.ifam_of_int i in
-                let fam = foi base ifam in
-                let data = sou base (get_comment fam) in
-                if data = "" then
-                  begin
-                    (* On pointe vers la note vide. *)
-                    output_binary_int oc i;
-                    output_binary_int oc 0
-                  end
-                else
-                  begin
-                    (* id, longueur de la personne puis données de la personne *)
-                    output_binary_int oc i;
-                    output_binary_int oc (String.length data);
-                    output_string oc data
-                  end)
-              ifam_list;
-            (* nb pers modified, id has_parents id_father id_mother *)
-            output_binary_int oc len_ip_list;
-            List.iter
-              (fun i ->
-                let ip = Adef.iper_of_int i in
-                let p = poi base ip in
-                output_binary_int oc i;
-                match get_parents p with
-                | Some ifam ->
-                    begin
-                      let cpl = foi base ifam in
-                      let father = get_father cpl in
-                      let mother = get_mother cpl in
-                      output_char oc '\001';
-                      output_binary_int oc (Adef.int_of_iper father);
-                      output_binary_int oc (Adef.int_of_iper mother);
-                    end
-                | None ->
-                    begin
-                      output_char oc '\000';
-                      output_binary_int oc 0;
-                      output_binary_int oc 0;
-                    end)
-              ip_list;
-            (* number of character => to be modified
-               when we actually know the number. *)
-            let nb_char = ref 0 in
-            let pos_nb_char = pos_out oc in
-            output_binary_int oc !nb_char;
-            (* id nb_word len_word word *)
-            List.iter
-              (fun i ->
-                let ip = Adef.iper_of_int i in
-                let p = poi base ip in
-                let fn = sou base (get_first_name p) in
-                let sn = sou base (get_surname p) in
-                if sn = "?" && fn = "?" then ()
-                else
-                  begin
-                    let fn = Name.lower fn in
-                    let sn = Name.lower sn in
-                    let r = build_relative_name base p in
-                    output_binary_int oc i;
-                    let (split_l, nb_words, nb_chars) =
-                      List.fold_left
-                        (fun (split_l, nb_words, nb_chars) s ->
-                           (* FIXME: Does order matter or not? *)
-                           let l = String.split_on_char ' ' s |> List.rev in
-                           let sub_nb_chars =
-                             match List.length l with
-                             | 0 -> 0
-                             | x -> String.length s - (x - 1)
-                           in
-                          (List.rev_append split_l l,
-                           nb_words + List.length l,
-                           nb_chars + sub_nb_chars))
-                        ([], 0, 0) (sn :: fn :: r)
-                    in
-                    nb_char := 4 + 4 + (4 * nb_words) + nb_chars + !nb_char;
-                    output_binary_int oc nb_words;
-                    List.iter
-                      (fun s ->
-                        output_binary_int oc (String.length s);
-                        output_string oc s)
-                      split_l
-                  end)
-              ip_list;
-            (* update nb_char *)
-            seek_out oc pos_nb_char;
-            output_binary_int oc !nb_char;
-          end;
-        close_out oc;
-    | _ -> exit 2
-  in
-
-  (* move file *)
-  let _ =
-    (Sys.command ("mv " ^ tmp_export_directory ^ "/* " ^ export_directory))
-  in
-  let _ =
-    try Unix.rmdir tmp_export_directory with Unix.Unix_error (_, _, _) -> ()
-  in
-
-  Util.html conf ;
-;;
-
+  Util.html conf
 
 let print_export_search conf base =
   let () = load_strings_array base in
@@ -2168,8 +1557,7 @@ let print_export_search conf base =
     try Unix.rmdir tmp_export_directory with Unix.Unix_error (_, _, _) -> ()
   in
 
-  Util.html conf ;
-;;
+  Util.html conf
 
 
 (*
@@ -2211,7 +1599,7 @@ let print_export conf base =
       let sosa_ref =
         match Util.find_sosa_ref conf base with
         | Some p ->
-            (output_char oc_info '\001'; Adef.int_of_iper (get_key_index p))
+            (output_char oc_info '\001'; (get_key_index p))
         | None -> (output_char oc_info '\000'; 0)
       in
       output_binary_int oc_info sosa_ref;
@@ -2346,7 +1734,6 @@ let print_export conf base =
 
 
   Util.html conf ;
-;;
 *)
 
 
@@ -2364,7 +1751,7 @@ let print_notification_birthday conf base =
   let ip_proprio =
     match piqi_ref_person_to_person base ref_p with
     | Some p -> get_key_index p
-    | None -> Adef.iper_of_int (-1)
+    | None -> Gwdb.dummy_iper
   in
   let ips =
     (ip_proprio, nb_asc)

@@ -817,7 +817,6 @@ let print_ind_stats conf base =
   let params =
     get_params conf (fun a b -> Mext_stats.parse_stats_params a b)
   in
-  let nb_pers = nb_of_persons base in
 
   (* nombre d'ascendants *)
   let (ancestors, stats_ancestors) =
@@ -842,9 +841,9 @@ let print_ind_stats conf base =
     in
     match params.Mstats.Stats_params.i with
     | Some i ->
-        let ip = Adef.iper_of_int (Int32.to_int i) in
+        let ip = Gwdb.iper_of_string i in
         let ancestors = loop 0 [ip] [] in
-        let mark = Array.make nb_pers false in
+        let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
         let (datas_found, datas_diss) =
           List.fold_left
             (fun (datas_found, datas_diss) l ->
@@ -852,8 +851,8 @@ let print_ind_stats conf base =
               let diss =
                 List.fold_left
                   (fun accu ip ->
-                    if mark.(Adef.int_of_iper ip) then accu
-                    else begin mark.(Adef.int_of_iper ip) <- true; succ accu end)
+                    if Gwdb.Marker.get mark ip then accu
+                    else begin Gwdb.Marker.set mark ip true; succ accu end)
                   0 l
               in
               let data_found =
@@ -932,9 +931,9 @@ let print_ind_stats conf base =
     in
     match params.Mstats.Stats_params.i with
     | Some i ->
-        let ip = Adef.iper_of_int (Int32.to_int i) in
+        let ip = Gwdb.iper_of_string i in
         let descendants = loop 0 [ip] [] in
-        let mark = Array.make nb_pers false in
+        let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
         let (datas_found, datas_diss) =
           List.fold_left
             (fun (datas_found, datas_diss) l ->
@@ -942,8 +941,8 @@ let print_ind_stats conf base =
               let diss =
                 List.fold_left
                   (fun accu ip ->
-                    if mark.(Adef.int_of_iper ip) then accu
-                    else begin mark.(Adef.int_of_iper ip) <- true; succ accu end)
+                    if Gwdb.Marker.get mark ip then accu
+                    else begin Gwdb.Marker.set mark ip true; succ accu end)
                   0 l
               in
               let data_found =
@@ -996,16 +995,16 @@ let print_ind_stats conf base =
 
   (* répartition homme femme sur la descendance *)
   let stats_descendants_m_f =
-    let mark = Array.make nb_pers false in
+    let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
     let (nb_male, nb_female) =
       List.fold_left
         (fun (nb_male, nb_female) l ->
           List.fold_left
             (fun (nb_male, nb_female) ip ->
-              if mark.(Adef.int_of_iper ip) then (nb_male, nb_female)
+              if Gwdb.Marker.get mark ip then (nb_male, nb_female)
               else
                 begin
-                  mark.(Adef.int_of_iper ip) <- true;
+                  Gwdb.Marker.set mark ip true;
                   let p = poi base ip in
                   match get_sex p with
                   | Male -> (nb_male + 1, nb_female)
@@ -1264,11 +1263,10 @@ let print_all_stats conf base =
   let ht_young_dad = Hashtbl.create nb_pers in
   let ht_young_mom = Hashtbl.create nb_pers in
 
-  for i = 0 to nb_pers - 1 do
-    let ip = Adef.iper_of_int i in
-    let p = poi base ip in
+  Gwdb.Collection.iter begin fun p ->
     let p_auth = Util.authorized_age conf base p in
     let faml = Array.to_list (get_family p) in
+    let ip = get_key_index p in
 
     if get_sex p = Neuter then ()
     else
@@ -1680,12 +1678,11 @@ let print_all_stats conf base =
             end;
         | _ -> ()
       end;
-  done;
+  end
+    (Gwdb.persons base) ;
 
-  for i = 0 to nb_fam - 1 do
-    let ifam = Adef.ifam_of_int i in
-    let fam = foi base ifam in
-      begin
+  Gwdb.Collection.iter begin fun fam ->
+    let ifam = get_fam_index fam in
         let m_auth =
           let father = poi base (get_father fam) in
           let mother = poi base (get_mother fam) in
@@ -2111,7 +2108,7 @@ let print_all_stats conf base =
             end
         | _ -> ()
       end
-  done;
+        (Gwdb.families base);
 
   (* Nom le plus long *)
   let _longuest_name =

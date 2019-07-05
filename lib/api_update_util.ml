@@ -645,7 +645,7 @@ let husband_wife conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_simple_person conf base p =
-  let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
+  let index = Gwdb.string_of_iper (get_key_index p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -726,7 +726,7 @@ let pers_to_piqi_simple_person conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_person_search conf base p =
-  let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
+  let index = Gwdb.string_of_iper (get_key_index p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -787,7 +787,7 @@ let pers_to_piqi_person_search conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_person_search_info conf base p =
-  let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
+  let index = Gwdb.string_of_iper (get_key_index p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -1149,7 +1149,7 @@ let pers_to_piqi_person_search_info conf base p =
 (* ************************************************************************** *)
 let pers_to_piqi_person_link conf base p =
   let create_link = `link in
-  let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
+  let index = Gwdb.string_of_iper (get_key_index p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -1159,7 +1159,7 @@ let pers_to_piqi_person_link conf base p =
   let first_name = sou base (get_first_name p) in
   let surname = sou base (get_surname p) in
   let occ =
-    if first_name = "?" || surname = "?" then Adef.int_of_iper (get_key_index p)
+    if first_name = "?" || surname = "?" then -1 (* FIXME!!! *)
     else get_occ p
   in
   let occ = if occ = 0 then None else Some (Int32.of_int occ) in
@@ -1193,7 +1193,7 @@ let pers_to_piqi_person_link conf base p =
 let pers_to_piqi_mod_person conf base p =
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   let create_link = `link in
-  let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
+  let index = Gwdb.string_of_iper (get_key_index p) in
   let sex =
     match get_sex p with
     | Male -> `male
@@ -1203,7 +1203,7 @@ let pers_to_piqi_mod_person conf base p =
   let surname = sou base (get_surname p) in
   let first_name = sou base (get_first_name p) in
   let occ =
-    if first_name = "?" || surname = "?" then Adef.int_of_iper (get_key_index p)
+    if first_name = "?" || surname = "?" then -1 (* FIXME!!! *)
     else get_occ p
   in
   let occ =
@@ -1378,7 +1378,7 @@ let pers_to_piqi_mod_person conf base p =
           }
         in
         (* Que pour les personnes qui existent. *)
-        if Adef.int_of_iper (get_key_index p) >= 0 && death_type != `not_dead then
+        if get_key_index p <> dummy_iper && death_type != `not_dead then
           let death =
             {
               Mwrite.Pevent.pevent_type = Some `epers_death;
@@ -1439,11 +1439,7 @@ let pers_to_piqi_mod_person conf base p =
           pevents @ [death]
         end;
   in
-  let related =
-    List.map
-      (fun ip -> Int32.of_int (Adef.int_of_iper ip))
-      (get_related p)
-  in
+  let related = List.map Gwdb.string_of_iper (get_related p) in
   let rparents =
     List.fold_right
       (fun rp accu ->
@@ -1502,12 +1498,12 @@ let pers_to_piqi_mod_person conf base p =
   in
   let parents =
     match get_parents p with
-    | Some ifam -> Some (Int32.of_int (Adef.int_of_ifam ifam))
+    | Some ifam -> Some ((Gwdb.string_of_ifam ifam))
     | None -> None
   in
   let families =
     List.map
-      (fun ifam -> Int32.of_int (Adef.int_of_ifam ifam))
+      (fun ifam -> (Gwdb.string_of_ifam ifam))
       (Array.to_list (get_family p))
   in
   {
@@ -1551,7 +1547,7 @@ let pers_to_piqi_mod_person conf base p =
 (* ************************************************************************ *)
 let fam_to_piqi_mod_family conf base ifam fam =
   let digest = "" in
-  let index = Int32.of_int (Adef.int_of_ifam ifam) in
+  let index = (Gwdb.string_of_ifam ifam) in
   let fevents =
     List.map
       (fun evt ->
@@ -1625,9 +1621,7 @@ let fam_to_piqi_mod_family conf base ifam fam =
   in
   (* Compatibilité avec GeneWeb. *)
   let old_witnesses =
-    List.map
-      (fun ip -> Int32.of_int (Adef.int_of_iper ip))
-      (Array.to_list (get_witnesses fam))
+    List.map Gwdb.string_of_iper (Array.to_list (get_witnesses fam))
   in
   {
     Mwrite.Family.digest = digest;
@@ -1657,10 +1651,10 @@ let fam_to_piqi_mod_family conf base ifam fam =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let piqi_mod_person_of_person_start conf base start_p =
-  let p = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
+  let p = Gwdb.empty_person base (Gwdb.dummy_iper) in
   let mod_p = pers_to_piqi_mod_person conf base p in
   (* Les index négatifs ne marchent pas. *)
-  mod_p.Mwrite.Person.index <- Int32.of_int 0;
+  mod_p.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
   mod_p.Mwrite.Person.lastname <- start_p.M.Person_start.lastname;
   mod_p.Mwrite.Person.firstname <- start_p.M.Person_start.firstname;
   mod_p.Mwrite.Person.sex <- start_p.M.Person_start.sex;
@@ -1720,13 +1714,13 @@ let piqi_mod_person_of_person_start conf base start_p =
 
 
 let piqi_empty_family conf base ifam =
-  let father = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
-  let mother = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
+  let father = Gwdb.empty_person base (Gwdb.dummy_iper) in
+  let mother = Gwdb.empty_person base (Gwdb.dummy_iper) in
   let father = pers_to_piqi_mod_person conf base father in
   let mother = pers_to_piqi_mod_person conf base mother in
   (* Les index négatifs ne marchent pas ! *)
-  father.Mwrite.Person.index <- Int32.of_int 0;
-  mother.Mwrite.Person.index <- Int32.of_int 0;
+  father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
   (* Par défaut, les access sont en Private, on passe en Iftitles. *)
   father.Mwrite.Person.access <- `access_iftitles;
   mother.Mwrite.Person.access <- `access_iftitles;
@@ -1747,7 +1741,7 @@ let piqi_empty_family conf base ifam =
   in
   {
     Mwrite.Family.digest = "";
-    index = Int32.of_int (Adef.int_of_ifam ifam);
+    index = (Gwdb.string_of_ifam ifam);
     fevents = fevents;
     fsources = None;
     comment = None;
@@ -1765,13 +1759,12 @@ let reconstitute_somebody base person =
   let create_link = person.Mwrite.Person_link.create_link in
   let (fn, sn, occ, create, var, force_create) = match create_link with
     | `link ->
-      let ip = Int32.to_int person.Mwrite.Person_link.index in
-      let p = poi base (Adef.iper_of_int ip) in
+      let ip = Gwdb.iper_of_string person.Mwrite.Person_link.index in
+      let p = poi base ip in
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
       let occ =
-        if fn = "?" || sn = "?" then
-          Adef.int_of_iper (get_key_index p)
+        if fn = "?" || sn = "?" then -1 (* FIXME!!! *)
         else get_occ p
       in
       (fn, sn, occ, Update.Link, "", false)

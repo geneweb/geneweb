@@ -257,9 +257,8 @@ let select_both_all base ini_n ini_p maiden_name =
         loop (Array.to_list (get_family p)) l
   in
   let list = ref [] in
-  for i = 0 to nb_of_persons base - 1 do
-    let ip = Adef.iper_of_int i in
-    let p = poi base ip in
+  Gwdb.Collection.iter begin fun p ->
+    let ip = get_key_index p in
     if List.for_all (fun s -> find_sn p s) ini_n then
       begin
         if List.for_all (fun s -> find_fn p s) ini_p then
@@ -269,7 +268,7 @@ let select_both_all base ini_n ini_p maiden_name =
     else
       (* On cherche une partie du nom de jeune fille dans les noms donnés. *)
       if maiden_name then add_maiden2 p ini_n ini_p list
-  done;
+  end (Gwdb.persons base) ;
   !list
 
 let select_all base is_surnames ini =
@@ -295,18 +294,17 @@ let select_all base is_surnames ini =
     loop ini []
   in
   let list = ref [] in
-  for i = 0 to nb_of_persons base - 1 do
-    if List.for_all (fun s -> find (poi base (Adef.iper_of_int i)) s) ini
-    then list := (Adef.iper_of_int i) :: !list
-  done;
+  Gwdb.Collection.iter begin fun p ->
+    if List.for_all (fun s -> find p s) ini
+    then list := get_key_index p :: !list
+  end (Gwdb.persons base) ;
   !list
 
 
 module Iper =
   struct
-    type t = Adef.iper
-    let compare i1 i2 =
-      Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
+    type t = Gwdb.iper
+    let compare = Stdlib.compare
   end
 
 module IperSet = Set.Make(Iper)
@@ -445,10 +443,7 @@ let select_both_start_with_person base ini_n ini_p =
   in
   let ini_n = cut_at_space (code_varenv (Name.lower ini_n)) [] in
   let ini_p = cut_at_space (code_varenv (Name.lower ini_p)) [] in
-  let rec loop i list nb_res =
-    if (*nb_res < max_res &&*) i < nb_of_persons base then
-      let ip = Adef.iper_of_int i in
-      let p = poi base ip in
+  Gwdb.Collection.fold begin fun list p ->
       let surnames =
         cut_at_space (code_varenv (Name.lower (sou base (get_surname p)))) []
       in
@@ -466,12 +461,9 @@ let select_both_start_with_person base ini_n ini_p =
           (fun ini -> List.exists (fun name -> find name ini) first_names)
           ini_p
       in
-      if start_surname && start_firstname then
-        loop (i + 1) (ip :: list) (nb_res + 1)
-      else loop (i + 1) list nb_res
-    else list
-  in
-  loop 0 [] 0
+      if start_surname && start_firstname then (get_key_index p :: list)
+      else list
+  end [] (Gwdb.persons base)
 
 let select_start_with_person base get_field ini =
   let find n x = string_start_with x n in
@@ -485,10 +477,7 @@ let select_start_with_person base get_field ini =
     else (decode_varenv s :: acc)
   in
   let ini = cut_at_space (code_varenv (Name.lower ini)) [] in
-  let rec loop i list nb_res =
-    if (*nb_res < max_res &&*) i < nb_of_persons base then
-      let ip = Adef.iper_of_int i in
-      let p = poi base ip in
+  Gwdb.Collection.fold begin fun list p ->
       let names =
         cut_at_space (code_varenv (Name.lower (sou base (get_field p)))) []
       in
@@ -497,11 +486,9 @@ let select_start_with_person base get_field ini =
           (fun ini -> List.exists (fun name -> find name ini) names)
           ini
       in
-      if start_name then loop (i + 1) (ip :: list) (nb_res + 1)
-      else loop (i + 1) list nb_res
-    else list
-  in
-  loop 0 [] 0
+      if start_name then (get_key_index p :: list)
+      else list
+  end [] (Gwdb.persons base)
 
 
 let select_start_with_auto_complete base mode max_res ini =
@@ -629,16 +616,14 @@ let select_all_auto_complete _ base get_field max_res ini =
   in
   let string_set = ref StrSetAutoComplete.empty in
   let nb_res = ref 0 in
-  for i = 0 to nb_of_persons base - 1 do
-    if !nb_res < max_res then
-      if List.for_all (fun s -> find (poi base (Adef.iper_of_int i)) s) ini
+  Gwdb.Collection.fold_until (fun () -> !nb_res < max_res) begin fun () p ->
+      if List.for_all (fun s -> find p s) ini
       then
         begin
-        let p = poi base (Adef.iper_of_int i) in
         string_set := StrSetAutoComplete.add (sou base (get_field p)) !string_set;
         incr nb_res;
         end
-  done;
+  end () (Gwdb.persons base) ;
   List.sort Gutil.alphabetic_order (StrSetAutoComplete.elements !string_set)
 
 
@@ -881,7 +866,7 @@ module IperSetLinkPerson =
   Set.Make
     (struct
       type t = iper
-      let compare ip1 ip2 = compare (Adef.int_of_iper ip1) (Adef.int_of_iper ip2)
+      let compare ip1 ip2 = compare (ip1) (ip2)
      end)
 
 (*
@@ -1007,18 +992,13 @@ let select_both_link_person base ini_n ini_p max_res =
     in
     loop ini_p []
   in
-  let rec loop i list nb_res =
-    if nb_res < max_res && i < nb_of_persons base then
-      let ip = Adef.iper_of_int i in
-      let p = poi base ip in
-      if List.for_all (fun s -> find_sn p s) ini_n then
-        if List.for_all (fun s -> find_fn p s) ini_p then
-          loop (i + 1) (Adef.iper_of_int i :: list) (nb_res + 1)
-        else loop (i + 1) list nb_res
-      else loop (i + 1) list nb_res
-    else list
-  in
-  loop 0 [] 0
+  fst @@ Gwdb.Collection.fold_until (fun (_, n) -> n < max_res) begin fun (list, n) p ->
+    if List.for_all (fun s -> find_sn p s) ini_n then
+      if List.for_all (fun s -> find_fn p s) ini_p then
+        (get_key_index p :: list, n + 1)
+      else (list, n)
+    else (list, n)
+  end ([], 0) (Gwdb.persons base)
 
 let select_link_person base get_field max_res ini =
   let find p x = kmp x (sou base (get_field p)) in
@@ -1035,14 +1015,11 @@ let select_link_person base get_field max_res ini =
     in
     loop ini []
   in
-  let rec loop i list nb_res =
-    if nb_res < max_res && i < nb_of_persons base then
-      if List.for_all (fun s -> find (poi base (Adef.iper_of_int i)) s) ini
-      then loop (i + 1) (Adef.iper_of_int i :: list) (nb_res + 1)
-      else loop (i + 1) list nb_res
-    else list
-  in
-  loop 0 [] 0
+  fst @@ Gwdb.Collection.fold_until (fun (_, n) -> n < max_res) begin fun (list, n) p ->
+      if List.for_all (fun s -> find p s) ini
+      then (get_key_index p :: list, n + 1)
+      else (list, n)
+  end ([], 0) (Gwdb.persons base)
 
 let search_person_list base surname first_name =
   let _ = load_strings_array base in
