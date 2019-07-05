@@ -54,7 +54,7 @@ let read_wizard_notes fname =
   | None -> "", 0.
 
 let write_wizard_notes fname nn =
-  if nn = "" then Util.rm fname
+  if nn = "" then Mutil.rm fname
   else
     match try Some (Secure.open_out fname) with Sys_error _ -> None with
       Some oc ->

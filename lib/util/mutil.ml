@@ -4,6 +4,9 @@
 let int_size = 4
 let verbose = ref true
 
+let rm fname =
+  if Sys.file_exists fname then Sys.remove fname
+
 let list_iter_first f = function
   | [] -> ()
   | hd :: tl -> f true hd ; List.iter (f false) tl
