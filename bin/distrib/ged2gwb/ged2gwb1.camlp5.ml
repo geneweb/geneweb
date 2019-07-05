@@ -69,7 +69,7 @@ let union_of_gen_union u = u
 
 let get_comment f = f.Def.comment
 let get_divorce f = f.Def.divorce
-let get_fam_index f = f.Def.fam_index
+let get_ifam f = f.Def.fam_index
 let get_fsources f = f.Def.fsources
 let get_fevents f = f.Def.fevents
 let get_marriage f = f.Def.marriage
@@ -3326,7 +3326,7 @@ let check_parents_children base ascends unions couples descends =
     begin match get_parents a with
       Some ifam ->
         let fam = foi base ifam in
-        if get_fam_index fam = (-1) then
+        if get_ifam fam = (-1) then
           ascends.(i) <- ascend_with_parents a None
         else
           let cpl = coi base ifam in
@@ -3443,7 +3443,7 @@ let check_parents_children base ascends unions couples descends =
           Printf.fprintf !log_oc "=> added parents\n";
           Printf.fprintf !log_oc "\n";
           flush !log_oc;
-          let a = ascend_with_parents a (Some (get_fam_index fam)) in
+          let a = ascend_with_parents a (Some (get_ifam fam)) in
           ascends.((get_children des).(j)) <- a
     done;
     if !to_delete <> [] then
