@@ -6,10 +6,10 @@ let rec clear_descend_consang base cset mark ifam =
   let des = foi base ifam in
   Array.iter
     (fun ip ->
-       if not mark.(Adef.int_of_iper ip) then
+       if not (Gwdb.Marker.get mark ip) then
          begin
            cset (Adef.int_of_iper ip) Adef.no_consang;
-           mark.(Adef.int_of_iper ip) <- true;
+           Gwdb.Marker.set mark ip true ;
            let u = poi base ip in
            Array.iter (clear_descend_consang base cset mark) (get_family u)
          end)
@@ -36,30 +36,30 @@ let compute ?(verbosity = 2) base tlim from_scratch =
       let ts = Consang.topological_sort base poi in
       Consang.make_relationship_info base ts
     in
-    let consang_tab = Array.make (nb_of_families base) Adef.no_consang in
+    let persons = Gwdb.ipers base in
+    let families = Gwdb.ifams base in
+    let consang_tab = Gwdb.ifam_marker families Adef.no_consang in
     let cnt = ref 0 in
     if not from_scratch then
-      begin let mark = Array.make (nb_of_persons base) false in
-        match patched_ascends base with
-          [] -> ()
-        | list ->
-            List.iter
-              (fun ip ->
-                 let u = poi base ip in
-                 Array.iter (clear_descend_consang base cset mark)
-                   (get_family u))
-              list
+      begin
+        let mark = Gwdb.iper_marker persons false in
+        List.iter
+          (fun ip ->
+             let u = poi base ip in
+             Array.iter (clear_descend_consang base cset mark) (get_family u))
+          (patched_ascends base)
       end;
-    for i = 0 to nb_of_persons base - 1 do
-      if from_scratch then begin cset i Adef.no_consang; incr cnt end
-      else
-        let cg = cget i in
-        begin match fget i with
-          Some ifam -> consang_tab.(Adef.int_of_ifam ifam) <- cg
-        | None -> ()
+    Gwdb.Collection.iter (fun i ->
+        let i' = Adef.int_of_iper i in (* FIXME: remove this *)
+        if from_scratch then begin cset i' Adef.no_consang; incr cnt end
+        else
+          let cg = cget i' in
+          begin match fget i' with
+              Some ifam -> Gwdb.Marker.set consang_tab ifam cg
+            | None -> ()
         end;
         if cg = Adef.no_consang then incr cnt
-    done;
+      ) persons ;
     let max_cnt = !cnt in
     let most = ref None in
     if verbosity >= 1 then Printf.eprintf "To do: %d persons\n" max_cnt;
@@ -72,47 +72,43 @@ let compute ?(verbosity = 2) base tlim from_scratch =
     let running = ref true in
     let end_time = Unix.time () +. float tlim in
     while !running && (tlim < 0 || Unix.time () < end_time) do
-      running := false;
-      for i = 0 to nb_of_persons base - 1 do
-        if cget i = Adef.no_consang then
-          match fget i with
+      running := false ;
+      Gwdb.Collection.iter (fun i' ->
+          let i = Adef.int_of_iper i' in
+          if cget i = Adef.no_consang then
+            match fget i with
             Some ifam ->
-              let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
-              if pconsang = Adef.no_consang then
-                let cpl = foi base ifam in
-                let ifath = get_father cpl in
-                let imoth = get_mother cpl in
-                if cget (Adef.int_of_iper ifath) != Adef.no_consang &&
-                   cget (Adef.int_of_iper imoth) != Adef.no_consang
-                then
-                  let consang = relationship base tab ifath imoth in
-                  trace verbosity !cnt max_cnt;
-                  decr cnt;
-                  let cg = Adef.fix_of_float consang in
-                  cset i cg;
-                  consang_tab.(Adef.int_of_ifam ifam) <- cg;
-                  (if verbosity >= 2 then
-                     let better =
-                       match !most with
-                         Some m -> cg > cget m
-                       | None -> true
-                     in
-                     if better then
-                       begin
-                         Printf.eprintf "\nMax consanguinity %g for %s... "
-                           consang
-                           (Gutil.designation base (poi base (Adef.iper_of_int i)));
-                         flush stderr;
-                         most := Some i
-                       end)
-                else running := true
-              else
-                begin trace verbosity !cnt max_cnt; decr cnt; cset i pconsang end
+            let pconsang = Gwdb.Marker.get consang_tab ifam in
+            if pconsang = Adef.no_consang then
+              let cpl = foi base ifam in
+              let ifath = get_father cpl in
+              let imoth = get_mother cpl in
+              if cget (Adef.int_of_iper ifath) != Adef.no_consang &&
+                 cget (Adef.int_of_iper imoth) != Adef.no_consang
+              then
+                let consang = relationship base tab ifath imoth in
+                trace verbosity !cnt max_cnt;
+                decr cnt;
+                let cg = Adef.fix_of_float consang in
+                cset i cg;
+                Gwdb.Marker.set consang_tab ifam cg;
+                (if verbosity >= 2 then
+                   if match !most with Some m -> cg > cget m | None -> true then
+                     begin
+                       Printf.eprintf "\nMax consanguinity %g for %s... "
+                         consang
+                         (Gutil.designation base (poi base (Adef.iper_of_int i)));
+                       flush stderr;
+                       most := Some i
+                     end)
+              else running := true
+            else
+              begin trace verbosity !cnt max_cnt; decr cnt; cset i pconsang end
           | None ->
-              trace verbosity !cnt max_cnt;
-              decr cnt;
-              cset i (Adef.fix_of_float 0.0)
-      done
+            trace verbosity !cnt max_cnt;
+            decr cnt;
+            cset i (Adef.fix_of_float 0.0)
+        ) persons ;
     done;
     if max_cnt <> 0 then
       if verbosity >= 2 then begin

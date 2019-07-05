@@ -1,4 +1,3 @@
-(* $Id: birthDeath.ml,v 5.40 2008-11-03 15:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -39,31 +38,31 @@ let select conf base get_date find_oldest =
         Some {day = bd; month = bm; year = by; prec = Sure; delta = 0}
     | None -> None
   in
-  let rec loop q len i =
-    if i = nb_of_persons base then
-      let rec loop list q =
-        if Q.is_empty q then list, len
-        else let (e, q) = Q.take q in loop (e :: list) q
-      in
-      loop [] q
-    else
-      let p = pget conf base (Adef.iper_of_int i) in
-      match get_date p with
-        Some (Dgreg (d, cal)) ->
+  let (q, len) =
+    Gwdb.Collection.fold (fun (q, len) i ->
+        let p = pget conf base i in
+        match get_date p with
+        | Some (Dgreg (d, cal)) ->
           let aft =
             match ref_date with
-              Some ref_date -> Date.before_date d ref_date
+            | Some ref_date -> Date.before_date d ref_date
             | None -> false
           in
-          if aft then loop q len (i + 1)
+          if aft then (q, len)
           else
             let e = p, d, cal in
-            if len < n then loop (Q.add e q) (len + 1) (i + 1)
-            else loop (snd (Q.take (Q.add e q))) len (i + 1)
-      | _ -> loop q len (i + 1)
+            if len < n then ((Q.add e q), (len + 1))
+            else ((snd (Q.take (Q.add e q))), len)
+        | _ -> (q, len)
+      ) (Q.empty, 0) (Gwdb.ipers base)
   in
-  loop Q.empty 0 0
+  let rec loop list q =
+    if Q.is_empty q then list, len
+    else let (e, q) = Q.take q in loop (e :: list) q
+  in
+  loop [] q
 
+(* TODO? Factorize with select_person? *)
 let select_family conf base get_date find_oldest =
   let module QF =
     Pqueue.Make
@@ -90,32 +89,30 @@ let select_family conf base get_date find_oldest =
         Some {day = bd; month = bm; year = by; prec = Sure; delta = 0}
     | None -> None
   in
-  let rec loop q len i =
-    if i = nb_of_families base then
-      let rec loop list q =
-        if QF.is_empty q then list, len
-        else let (e, q) = QF.take q in loop (e :: list) q
-      in
-      loop [] q
-    else
-      let fam = foi base (Adef.ifam_of_int i) in
-      if is_deleted_family fam then loop q len (i + 1)
-      else
-        match get_date (Adef.ifam_of_int i) fam with
-          Some (Dgreg (d, cal)) ->
+  let (q, len) =
+    Gwdb.Collection.fold (fun (q, len) i ->
+        let fam = foi base i in
+        if is_deleted_family fam then (q, len)
+        else match get_date i fam with
+          | Some (Dgreg (d, cal)) ->
             let aft =
               match ref_date with
-                Some ref_date -> Date.before_date d ref_date
+              | Some ref_date -> Date.before_date d ref_date
               | None -> false
             in
-            if aft then loop q len (i + 1)
+            if aft then (q, len)
             else
-              let e = Adef.ifam_of_int i, fam, d, cal in
-              if len < n then loop (QF.add e q) (len + 1) (i + 1)
-              else loop (snd (QF.take (QF.add e q))) len (i + 1)
-        | _ -> loop q len (i + 1)
+              let e = i, fam, d, cal in
+              if len < n then (QF.add e q, len + 1)
+              else (snd (QF.take (QF.add e q)), len)
+          | _ -> (q, len)
+      ) (QF.empty, 0) (Gwdb.ifams base)
   in
-  loop QF.empty 0 0
+  let rec loop list q =
+    if QF.is_empty q then list, len
+    else let (e, q) = QF.take q in loop (e :: list) q
+  in
+  loop [] q
 
 let print_birth conf base =
   let (list, len) =
@@ -565,33 +562,29 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
   let men = Array.make (nb_intervals + 1) 0 in
   let wom = Array.make (nb_intervals + 1) 0 in
   (* TODO? Load person array *)
-  for i = 0 to nb_of_persons base - 1 do
-    let p = pget conf base (Adef.iper_of_int i) in
-    let sex = get_sex p in
-    let dea = get_death p in
-    if sex <> Neuter then
-      match Adef.od_of_cdate (get_birth p) with
-        Some (Dgreg (dmy, _)) ->
-        if not (Date.before_date dmy at_date) then
-          let a = CheckItem.time_elapsed dmy at_date in
-          let j = min nb_intervals (a.year / interval) in
-          let ok =
-            if dea = NotDead || dea = DontKnowIfDead && a.year < limit then
-              true
-            else
-              match dea with
-                Death (_, cd) ->
-                begin match Adef.date_of_cdate cd with
-                    Dgreg (d, _) -> Date.before_date d at_date
-                  | _ -> false
-                end
-              | _ -> false
-          in
-          if ok then
-            if sex = Male then men.(j) <- men.(j) + 1
-            else wom.(j) <- wom.(j) + 1
-      | Some (Dtext _) | None -> ()
-  done;
+  Gwdb.Collection.iter (fun i ->
+      let p = pget conf base i in
+      let sex = get_sex p in
+      let dea = get_death p in
+      if sex <> Neuter then
+        match Adef.od_of_cdate (get_birth p) with
+        | Some (Dgreg (dmy, _)) ->
+          if not (Date.before_date dmy at_date) then
+            let a = CheckItem.time_elapsed dmy at_date in
+            let j = min nb_intervals (a.year / interval) in
+            if (dea = NotDead || dea = DontKnowIfDead && a.year < limit)
+            || match dea with
+            | Death (_, cd) ->
+              begin match Adef.date_of_cdate cd with
+                | Dgreg (d, _) -> Date.before_date d at_date
+                | _ -> false
+              end
+            | _ -> false
+            then
+              if sex = Male then men.(j) <- men.(j) + 1
+              else wom.(j) <- wom.(j) + 1
+        | Some (Dtext _) | None -> ()
+    ) (Gwdb.ipers base) ;
   (men, wom)
 
 let print_population_pyramid conf base =

@@ -83,6 +83,7 @@ val get_witnesses : family -> iper array
 val get_father : family -> iper
 val get_mother : family -> iper
 val get_parent_array : family -> iper array
+val get_fam_index : family -> ifam
 
 val get_children : family -> iper array
 
@@ -102,7 +103,9 @@ val family_of_gen_family :
     family
 
 val poi : base -> iper -> person
+val poi_batch : base -> iper list -> person list
 val foi : base -> ifam -> family
+val foi_batch : base -> ifam list -> family list
 val sou : base -> istr -> string
 
 val nb_of_persons : base -> int
@@ -132,17 +135,29 @@ val persons_of_name : base -> string -> iper list
 val persons_of_first_name : base -> string_person_index
 val persons_of_surname : base -> string_person_index
 
+(** first [first/sur]name starting with that string *)
 val spi_first : string_person_index -> string -> istr
-  (* first [first/sur]name starting with that string *)
+
+(** next [first/sur]name by Gutil.alphabetical order *)
 val spi_next : string_person_index -> istr -> bool -> istr * int
-  (* next [first/sur]name by Gutil.alphabetical order *)
+
+(** all persons having that [first/sur]name *)
 val spi_find : string_person_index -> istr -> iper list
-  (* all persons having that [first/sur]name *)
 
 val base_visible_get : base -> (person -> bool) -> int -> bool
 val base_visible_write : base -> unit
 val base_particles : base -> string list
+
+(** [base_strings_of_first_name base x]
+    Return the list of first names (as [istr]) being equal to [x]
+    using  {!val:Name.crush_lower} comparison.
+*)
 val base_strings_of_first_name : base -> string -> istr list
+
+(** [base_strings_of_surname base x]
+    Return the list of surnames (as [istr]) being equal to [x]
+    using  {!val:Name.crush_lower} comparison.
+*)
 val base_strings_of_surname : base -> string -> istr list
 
 val load_ascends_array : base -> unit
@@ -190,3 +205,79 @@ val p_first_name : base -> person -> string
 val p_surname : base -> person -> string
 
 val date_of_last_change : base -> float
+
+module Collection : sig
+
+  (** Collections are sets of elements you want to traverse. *)
+  type 'a t
+
+  (** Return the number of elements of a colletion *)
+  val length : 'a t -> int
+
+  (** [map fn c]
+      Return a collection corresponding to [c]
+      where [fn] would have been applied to each of its elements.
+  *)
+  val map : ('a -> 'b) -> 'a t -> 'b t
+
+  (** [iter fn c]
+      Apply [fn] would have been applied to each elements of [c].
+  *)
+  val iter : ('a -> unit) -> 'a t -> unit
+
+  (** [iter fn c]
+      Apply [fn i] would have been applied to each elements of [c]
+      where [i] is the index (starting with 0) of the element.
+  *)
+  val iteri : (int -> 'a -> unit) -> 'a t -> unit
+
+  (** [fold fn acc c]
+      Combine each element of [c] into a single value using [fn].
+      [fn] first argument is the result computed so far as we traverse the
+      collection, and second element is the current element being combined.
+      [acc] is the starting combined value.
+  *)
+  val fold : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+
+  (** [fold continue fn acc c]
+      Same as [fold fn acc c], but computation stops as soon as [continue]
+      is not satisfied by combined value anymore.
+  *)
+  val fold_until : ('a -> bool) -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+
+  (** [iterator c]
+      Return a function returning [Some next_element] when it is called,
+      or [None] if you reached the end of the collection.
+  *)
+  val iterator : 'a t -> (unit -> 'a option)
+
+end
+
+module Marker : sig
+
+  (** Markers are way to annotate (add extra information to) elements of a {!val:Collection.t}. *)
+  type ('k, 'v) t
+
+  (** [get marker key]
+      Return the annotation associated to [key].
+  *)
+  val get : ('k, 'v) t -> 'k -> 'v
+
+  (** [set marker key value]
+      Set [value] as annotation associated to [key].
+  *)
+  val set : ('k, 'v) t -> 'k -> 'v -> unit
+
+end
+
+(** {2 Useful collections} *)
+
+val ipers : base -> iper Collection.t
+val persons : base -> person Collection.t
+val ifams : base -> ifam Collection.t
+val families : base -> family Collection.t
+
+(** {2 Useful markers} *)
+
+val iper_marker : iper Collection.t -> 'a -> (iper, 'a) Marker.t
+val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Marker.t

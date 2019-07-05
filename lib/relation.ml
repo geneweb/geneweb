@@ -257,34 +257,33 @@ type node =
     NotVisited
   | Visited of (bool * iper * famlink)
 
-let get_shortest_path_relation conf base ip1 ip2 excl_faml =
-  let mark_per = Array.make (nb_of_persons base) NotVisited in
-  let mark_fam = Array.make (nb_of_families base) false in
+(* FIXME: remove all these Aray.to_list *)
+let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
+  let mark_per = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
+  let mark_fam = Gwdb.ifam_marker (Gwdb.ifams base) false in
   List.iter
-    (fun i ->
-       let i = Adef.int_of_ifam i in
-       if i < Array.length mark_fam then mark_fam.(i) <- true)
+    (fun i -> Gwdb.Marker.set mark_fam i true)
     excl_faml;
   let parse_fam ifam =
-    if mark_fam.(Adef.int_of_ifam ifam) then []
+    if Gwdb.Marker.get mark_fam ifam then []
     else
       let fam = foi base ifam in
-      mark_fam.(Adef.int_of_ifam ifam) <- true;
+      Gwdb.Marker.set mark_fam ifam true;
       let result =
         [get_father fam, Parent, ifam; get_mother fam, Parent, ifam]
       in
       let result =
         result @
-        List.fold_right
+        Array.fold_right
           (fun child children -> (child, Sibling, ifam) :: children)
-          (Array.to_list (get_children (foi base ifam))) []
+          (get_children (foi base ifam)) []
       in
       let result =
         result @
         List.fold_right
           (fun fam children ->
              if ifam = fam then children
-             else if mark_fam.(Adef.int_of_ifam fam) then children
+             else if Gwdb.Marker.get mark_fam fam then children
              else
                List.fold_right
                  (fun child children -> (child, HalfSibling, fam) :: children)
@@ -295,7 +294,7 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
       List.fold_right
         (fun fam children ->
            if ifam = fam then children
-           else if mark_fam.(Adef.int_of_ifam fam) then children
+           else if Gwdb.Marker.get mark_fam fam then children
            else
              List.fold_right
                (fun child children -> (child, HalfSibling, fam) :: children)
@@ -306,10 +305,10 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
     let result =
       List.fold_right
         (fun ifam nb ->
-           if mark_fam.(Adef.int_of_ifam ifam) then nb
+           if Gwdb.Marker.get mark_fam ifam then nb
            else
              let fam = foi base ifam in
-             mark_fam.(Adef.int_of_ifam ifam) <- true;
+             Gwdb.Marker.set mark_fam ifam true;
              List.fold_right
                (fun child children -> (child, Child, ifam) :: children)
                (Array.to_list (get_children fam))
@@ -326,7 +325,7 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
     match List.hd path with
     | _, Self -> path
     | _, _ ->
-        match mark_per.(Adef.int_of_iper vertex) with
+        match Gwdb.Marker.get mark_per vertex with
           NotVisited -> assert false
         | Visited (_, v, f) -> make_path ((vertex, f) :: path) v
   in
@@ -350,10 +349,9 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
           let rec loop2 result =
             function
               (iper, fl, ifam) :: neighbourslist ->
-                begin match mark_per.(Adef.int_of_iper iper) with
+                begin match Gwdb.Marker.get mark_per iper with
                   NotVisited ->
-                    mark_per.(Adef.int_of_iper iper) <-
-                      Visited (source, vertex, fl);
+                    Gwdb.Marker.set mark_per iper (Visited (source, vertex, fl));
                     loop2 (iper :: result) neighbourslist
                 | Visited (s, v, f) ->
                     if s = source then loop2 result neighbourslist
@@ -385,8 +383,8 @@ let get_shortest_path_relation conf base ip1 ip2 excl_faml =
         Left (path, ifam) -> Some (path, ifam)
       | Right queue1 -> width_search queue1 visited1 queue2 visited2
   in
-  mark_per.(Adef.int_of_iper ip1) <- Visited (true, ip1, Self);
-  mark_per.(Adef.int_of_iper ip2) <- Visited (false, ip2, Self);
+  Gwdb.Marker.set mark_per ip1 @@ Visited (true, ip1, Self);
+  Gwdb.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
   width_search [ip1] 0 [ip2] 0
 
 let print_shortest_path conf base p1 p2 =
@@ -493,7 +491,7 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
   let rec loop ip dist =
     if dist <= len1 then []
     else
-      let lens = proj reltab.(Adef.int_of_iper ip) in
+      let lens = proj @@ Gwdb.Marker.get reltab ip in
       let rec loop1 =
         function
           ifam :: ifaml ->
@@ -1095,7 +1093,7 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
       try
         List.fold_left
           (fun n i ->
-             let u = tab.Consang.reltab.(i) in
+             let u = Gwdb.Marker.get tab.Consang.reltab i in
              List.fold_left
                (fun n (_, n1, _) ->
                   let n1 = if n1 < 0 then raise Exit else Sosa.of_int n1 in
@@ -1109,8 +1107,8 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
     let rl =
       List.fold_left
         (fun rl i ->
-           let u = tab.Consang.reltab.(i) in
-           let p = pget conf base (Adef.iper_of_int i) in
+           let u = Gwdb.Marker.get tab.Consang.reltab i in
+           let p = pget conf base i in
            List.fold_left
              (fun rl (len1, n1, _) ->
                 List.fold_left

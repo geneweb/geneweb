@@ -2570,7 +2570,7 @@ let create_topological_sort conf base =
       let () = load_ascends_array base in
       let () = load_couples_array base in
       Consang.topological_sort base (pget conf)
-  | Some "no_tstab" -> Array.make (nb_of_persons base) 0
+  | Some "no_tstab" -> Gwdb.iper_marker (Gwdb.ipers base) 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
       Lock.control (Mutil.lock_file bfile) false
@@ -2589,7 +2589,10 @@ let create_topological_sort conf base =
                let ic = Secure.open_in_bin tstab_file in
                let r =
                  try Some (Marshal.from_channel ic)
-                 with End_of_file | Failure _ -> None
+                 with End_of_file | Failure _ ->
+                   (* tstab is probably corrupted *)
+                   Sys.remove tstab_file ;
+                   None
                in
                close_in ic; r
              with Sys_error _ -> None
@@ -2606,7 +2609,8 @@ let create_topological_sort conf base =
              begin
                try
                  let oc = Secure.open_out_bin tstab_file in
-                 Marshal.to_channel oc tstab [Marshal.No_sharing];
+                 Marshal.to_channel oc tstab
+                   [ Marshal.No_sharing ; Marshal.Closures ] ;
                  close_out oc
                with Sys_error _ -> ()
              end;
@@ -3635,17 +3639,14 @@ let record_visited conf ip =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let init_cache_info conf base =
-  let nb_ind = Gwdb.nb_of_persons base in
   (* Reset le nombre réel de personnes d'une base. *)
-  let nb_real_persons = ref 0 in
-  for i = 0 to nb_ind - 1 do
-    let ip = Adef.iper_of_int i in
-    let p = poi base ip in
-    if know base p then incr nb_real_persons else ()
-  done;
+  let nb_real_persons =
+    Gwdb.Collection.fold
+      (fun i p -> if know base p then i + 1 else i) 0 (Gwdb.persons base)
+  in
   let () =
-    Hashtbl.add ht_cache_info cache_nb_base_persons
-      (string_of_int !nb_real_persons)
+    Hashtbl.add
+      ht_cache_info cache_nb_base_persons (string_of_int nb_real_persons)
   in
   write_cache_info conf
 
@@ -3759,22 +3760,20 @@ let init_cache_info bname base =
   | (_, _, _, None) ->
     begin
       (* Reset le nombre réel de personnes d'une base. *)
-      let nb_real_persons = ref 0 in
-      let nb_ind = Gwdb.nb_of_persons base in
       let is_empty_name p =
         (Gwdb.is_empty_string (Gwdb.get_surname p) ||
          Gwdb.is_quest_string (Gwdb.get_surname p)) &&
         (Gwdb.is_empty_string (Gwdb.get_first_name p) ||
          Gwdb.is_quest_string (Gwdb.get_first_name p))
       in
-      for i = 0 to nb_ind - 1 do
-        let ip = Adef.iper_of_int i in
-        let p = Gwdb.poi base ip in
-        if is_empty_name p then () else incr nb_real_persons
-      done;
+      let nb_real_persons =
+        Gwdb.Collection.fold begin fun acc p ->
+          if is_empty_name p then acc else acc + 1
+        end 0 (Gwdb.persons base)
+      in
       let ht = Hashtbl.create 1 in
       let () =
-        Hashtbl.add ht cache_nb_base_persons (string_of_int !nb_real_persons)
+        Hashtbl.add ht cache_nb_base_persons (string_of_int nb_real_persons)
       in
       let bdir =
         if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"

@@ -10,12 +10,6 @@ type generation_person =
   | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
   | GP_missing of Sosa.t * Adef.iper
 
-type sosa_t =
-  { tstab : int array;
-    mark : bool array;
-    mutable last_zil : (Def.iper * Sosa.t) list;
-    sosa_ht : (Def.iper, (Sosa.t * Gwdb.person) option) Hashtbl.t }
-
 val string_of_marriage_text : config -> base -> family -> string
 val interp_templ : string -> config -> base -> person -> unit
 val interp_templ_with_menu :
@@ -75,15 +69,17 @@ val string_of_image_small_size : config -> base -> person * bool -> string
 
 val get_link : generation_person list -> IperSet.elt -> generation_person option
 
-val find_sosa
-  : config -> base -> person -> person option Lazy.t -> sosa_t -> (Sosa.t * Gwdb.person) option
-
 (**)
 
 val infinite : int
 val limit_desc : config -> int
-val make_desc_level_table :
-  config -> base -> int -> person -> int array * int array
+val make_desc_level_table
+  : config
+  -> base
+  -> int
+  -> person
+  -> (IperSet.elt, int) Gwdb.Marker.t * (Def.ifam, int) Gwdb.Marker.t
+
 val default_max_cousin_lev : int
 
 type dup =

@@ -1,5 +1,6 @@
-(* $Id: consang.mli,v 5.5 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
+
+(* TODO: Def.iper -> Gwdb.iper *)
 
 open Def
 open Gwdb
@@ -18,17 +19,22 @@ type relationship =
     mutable anc_stat2 : anc_stat }
 
 type relationship_info =
-  { tstab : int array;
-    reltab : relationship array;
-    mutable queue : int list array }
+  { tstab : (Def.iper, int) Gwdb.Marker.t
+  ; reltab : (Def.iper, relationship) Gwdb.Marker.t
+  ; mutable queue : Def.iper list array
+  }
 
 exception TopologicalSortError of person
-val topological_sort : base -> (base -> iper -> person) -> int array
 
-val make_relationship_info : base -> int array -> relationship_info
+val topological_sort
+  : Gwdb.base
+  -> (Gwdb.base -> Def.iper -> Gwdb.person)
+  -> (Def.iper, int) Gwdb.Marker.t
+
+val make_relationship_info : base -> (Def.iper, int) Gwdb.Marker.t -> relationship_info
 
 val relationship_and_links :
-  base -> relationship_info -> bool -> iper -> iper -> float * int list
+  base -> relationship_info -> bool -> iper -> iper -> float * Def.iper list
 
 val check_noloop : base -> (person error -> unit) -> unit
 val check_noloop_for_person_list :

@@ -1364,7 +1364,7 @@ let link next_family_fun bdir =
     in
     let base = Gwdb1.ToGwdb.base base in
       Check.check_base base (set_error base gen) (set_warning base)
-        (fun i -> gen.g_def.(i)) changed_p !pr_stats;
+        (fun i -> gen.g_def.(Adef.int_of_iper i)) changed_p !pr_stats;
       flush stdout
     end;
   if not gen.g_errored then
