@@ -1685,8 +1685,6 @@ let print_all_stats conf base =
   for i = 0 to nb_fam - 1 do
     let ifam = Adef.ifam_of_int i in
     let fam = foi base ifam in
-    if is_deleted_family fam then ()
-    else
       begin
         let m_auth =
           let father = poi base (get_father fam) in

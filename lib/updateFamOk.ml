@@ -1561,28 +1561,25 @@ let print_del conf base =
     Some i ->
       let ifam = ifam_of_string i in
       let fam = foi base ifam in
-      if not (is_deleted_family fam) then
-        begin
-          effective_del base ifam fam;
-          Util.commit_patches conf base;
-          let changed =
-            let gen_p =
-              let p =
-                match p_getenv conf.env "ip" with
-                  Some i when get_mother fam = iper_of_string i ->
-                    poi base (get_mother fam)
-                | _ -> poi base (get_father fam)
-              in
-              Util.string_gen_person base (gen_person_of_person p)
-            in
-            let gen_fam =
-              Util.string_gen_family base (gen_family_of_family fam)
-            in
-            U_Delete_family (gen_p, gen_fam)
+      effective_del base ifam fam;
+      Util.commit_patches conf base;
+      let changed =
+        let gen_p =
+          let p =
+            match p_getenv conf.env "ip" with
+              Some i when get_mother fam = iper_of_string i ->
+              poi base (get_mother fam)
+            | _ -> poi base (get_father fam)
           in
-          History.record conf base changed "df";
-          Update.delete_topological_sort conf base
-        end;
+          Util.string_gen_person base (gen_person_of_person p)
+        in
+        let gen_fam =
+          Util.string_gen_family base (gen_family_of_family fam)
+        in
+        U_Delete_family (gen_p, gen_fam)
+      in
+      History.record conf base changed "df";
+      Update.delete_topological_sort conf base ;
       print_del_ok conf base []
   | _ -> Hutil.incorrect_request conf
 
