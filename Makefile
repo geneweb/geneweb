@@ -43,6 +43,7 @@ ALL_EXE = \
 	bin/contrib/gwFix/gwFixFromFileAlias \
 	bin/contrib/gwFix/gwFixFromFileDomicile \
 	bin/contrib/gwFix/gwFixY \
+	bin/contrib/gwbase/etc/check_apostr \
 	bin/contrib/gwbase/etc/public \
 	bin/contrib/gwbase/etc/public2 \
 	bin/contrib/gwpublic/gwiftitles \

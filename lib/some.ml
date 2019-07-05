@@ -182,7 +182,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
              if x = Name.strip_lower str then (str, istr, iperl) :: l else l)
           l [],
         Name.strip_lower
-      else l1, name_inj
+      else l1, name_inj ~viet:false ~apostr:false
     in
     if l1 = [] then l, Name.crush_lower else l1, name_inj
   in
@@ -213,11 +213,12 @@ let first_char s =
     let len = Name.nbc s.[0] in
     if len < String.length s then String.sub s 0 len else s
 
-let name_unaccent s =
+let name_unaccent ?(apostr=false) s =
   let rec copy i len =
     if i = String.length s then Buff.get len
     else
-      let (t, j) = Name.unaccent_utf_8 false s i in copy j (Buff.mstore len t)
+      let (t, j) = Name.unaccent_utf_8 ~apostr:apostr false s i in
+      copy j (Buff.mstore len t)
   in
   copy 0 0
 

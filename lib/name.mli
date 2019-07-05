@@ -1,13 +1,16 @@
 (* $Id: name.mli,v 5.2 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-val lower : string -> string
+val lower : ?viet:bool -> ?apostr:bool -> string -> string
   (* Name.lower:
+     - viet=true -> handle Latin supplemental (vietnameese)
+     - apostr=true -> suppress typographic apostrophe
      - uppercase -> lowercase
      - no accents
      - chars no letters and no numbers (except '.') => spaces (stripped)
      Key comparison (first name, surname, number) applies "lower" equality
-     on first names and surnames *)
+     on first names and surnames
+  *)
 val abbrev : string -> string
   (* Name.abbrev: suppress lowercase particles, shorten "saint" into "st" *)
 val strip : string -> string
@@ -41,7 +44,7 @@ val crush_lower : string -> string
 
 val next_chars_if_equiv : string -> int -> string -> int -> (int * int) option
 
-val unaccent_utf_8 : bool -> string -> int -> string * int
+val unaccent_utf_8 : ?viet:bool -> ?apostr:bool -> bool -> string -> int -> string * int
 val nbc : char -> int
 
 val forbidden_char : char list
