@@ -134,7 +134,6 @@ let get_children = cache_des (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Def.comment)
 let get_ifam = cache_fam (fun f -> f.Def.fam_index)
 let get_divorce = cache_fam (fun f -> f.Def.divorce)
-let get_fam_index = cache_fam (fun f -> f.Def.fam_index)
 let get_father = cache_cpl (fun c -> Adef.father c)
 let get_fevents = cache_fam (fun f -> f.Def.fevents)
 let get_fsources = cache_fam (fun f -> f.Def.fsources)
@@ -463,7 +462,7 @@ let dummy_collection _ =
   ; get = fun _ -> None
   }
 
-let family_marker c i = Marker.make (fun f -> (Type.int_of_ifam @@ get_fam_index f)) c i
+let family_marker c i = Marker.make (fun f -> (Type.int_of_ifam @@ get_ifam f)) c i
 let ifam_marker c i = Marker.make Type.int_of_ifam c i
 
 let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =

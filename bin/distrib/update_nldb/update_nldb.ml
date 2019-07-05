@@ -164,7 +164,7 @@ let compute base bdir =
       match notes_links (Buffer.contents buffer) with
       | ([], []) -> ()
       | list ->
-        db := NotesLinks.add_in_db !db (NotesLinks.PgFam (get_fam_index fam)) list ;
+        db := NotesLinks.add_in_db !db (NotesLinks.PgFam (get_ifam fam)) list ;
         ProgrBar.run i nb_fam
     ) (Gwdb.families base) ;
   ProgrBar.finish () ;

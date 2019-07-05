@@ -79,7 +79,6 @@ let get_witnesses _ = assert false
 let get_father _ = assert false
 let get_mother _ = assert false
 let get_parent_array _ = assert false
-let get_fam_index _ = assert false
 let get_children _ = assert false
 let gen_family_of_family _ = assert false
 let gen_couple_of_couple _ = assert false
