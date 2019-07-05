@@ -330,8 +330,11 @@ let extract_henv conf base =
 
 let set_owner conf =
   if Sys.unix then
-    let s = Unix.stat (Util.base_path [] (conf.bname ^ ".gwb")) in
-    try Unix.setgid s.Unix.st_gid; Unix.setuid s.Unix.st_uid with
+    try
+      let s = Unix.stat (Util.base_path [] (conf.bname ^ ".gwb")) in
+      Unix.setgid s.Unix.st_gid ;
+      Unix.setuid s.Unix.st_uid
+    with
       Unix.Unix_error (_, _, _) -> ()
 
 let log_count r =
