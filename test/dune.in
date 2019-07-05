@@ -6,7 +6,7 @@
  (modules gwdb)
 )
 
-(rule (copy# %{lib:geneweb.gwdb:gwdb.mli} gwdb.mli))
+(rule (copy# %{lib:geneweb.gwdb.mli:gwdb.mli} gwdb.mli))
 
 (executable
   (name test)
