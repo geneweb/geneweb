@@ -52,8 +52,7 @@ let rec censor_family base per_tab fam_tab flag threshold i no_check =
   if Gwdb.Marker.get fam_tab i <> 0 then ()
   else
     let fam = foi base i in
-    if is_deleted_family fam then ()
-    else if no_check || is_censored_couple base threshold fam then
+    if no_check || is_censored_couple base threshold fam then
       begin
         Gwdb.Marker.set fam_tab i (Gwdb.Marker.get fam_tab i lor flag);
         censor_spouse (get_father fam);
@@ -265,8 +264,6 @@ let select_surname base per_tab fam_tab no_spouses_parents surname =
   let surname = Name.strip_lower surname in
   Gwdb.Collection.iter (fun i ->
     let fam = foi base i in
-    if is_deleted_family fam then ()
-    else
       let fath = poi base (get_father fam) in
       let moth = poi base (get_mother fam) in
       if Name.strip_lower (sou base (get_surname fath)) = surname ||

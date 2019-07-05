@@ -333,8 +333,7 @@ let check_base_aux base error warning changed_p =
   Gwdb.Collection.iteri (fun i ifam ->
     ProgrBar.run i len ;
     let fam = foi base ifam in
-    if not @@ is_deleted_family fam
-    then CheckItem.family base warning ifam fam
+    CheckItem.family base warning ifam fam
     ) families ;
   ProgrBar.finish ();
   Consang.check_noloop base error

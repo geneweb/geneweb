@@ -158,11 +158,6 @@ val insert_family : base -> family -> ifam
 
 val delete_family : base -> ifam -> unit
 
-(* FIXME!
-   Delete this function
-   and do not return deleted families in family collections *)
-val is_deleted_family : family -> bool
-
 val person_of_key : base -> string -> string -> int -> iper option
 val persons_of_name : base -> string -> iper list
 val persons_of_first_name : base -> string_person_index

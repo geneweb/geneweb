@@ -193,9 +193,7 @@ let notes_links_db conf base eliminate_unlinked =
              NotesLinks.PgInd ip ->
                authorized_age conf base (pget conf base ip)
            | NotesLinks.PgFam ifam ->
-               let fam = foi base ifam in
-               if is_deleted_family fam then false
-               else authorized_age conf base (pget conf base (get_father fam))
+               authorized_age conf base (pget conf base (get_father @@ foi base ifam))
            | NotesLinks.PgNotes | NotesLinks.PgMisc _ |
              NotesLinks.PgWizard _ ->
                true

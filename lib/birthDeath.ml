@@ -92,8 +92,7 @@ let select_family conf base get_date find_oldest =
   let (q, len) =
     Gwdb.Collection.fold (fun (q, len) i ->
         let fam = foi base i in
-        if is_deleted_family fam then (q, len)
-        else match get_date i fam with
+        match get_date i fam with
           | Some (Dgreg (d, cal)) ->
             let aft =
               match ref_date with

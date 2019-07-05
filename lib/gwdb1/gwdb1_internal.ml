@@ -147,7 +147,6 @@ let get_origin_file = cache_fam (fun f -> f.Def.origin_file)
 let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
-let is_deleted_family = cache_fam (fun f -> f.Def.fam_index = dummy_ifam)
 
 type base = dsk_base
 
@@ -378,46 +377,51 @@ module Collection = struct
 
   type 'a t =
     { length : int
-    ; get : int -> 'a
+    ; get : int -> 'a option
     }
 
   let map (fn : 'a -> 'b) c =
     { length = c.length
-    ; get = (fun i -> fn (c.get i))
+    ; get = (fun i ->  match c.get i with Some x -> Some (fn x) | None -> None)
     }
 
   let length { length ; _ } = length
 
   let iter fn { get ; length } =
-    for i = 0 to length - 1 do fn (get i) done
+    for i = 0 to length - 1 do match get i with Some x -> fn x | None -> () done
 
   let iteri fn { get ; length } =
-    for i = 0 to length - 1 do fn i (get i) done
+    for i = 0 to length - 1 do match get i with Some x -> fn i x | None -> () done
 
   let fold fn acc { get ; length } =
     let rec loop acc i =
       if i = length then acc
-      else loop (fn acc (get i)) (i + 1)
+      else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
     in
     loop acc 0
 
   let fold_until continue fn acc { get ; length } =
     let rec loop acc i =
       if not (continue acc) || i = length then acc
-      else loop (fn acc (get i)) (i + 1)
+      else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
     in
     loop acc 0
 
   let iterator { get ; length } =
     let cursor = ref 0 in
-    fun () ->
+    let rec next () =
       if !cursor < length then
-        let v = Some (get !cursor) in
-        let () = incr cursor in
-        v
+        match get !cursor with
+        | None -> incr cursor ; next ()
+        |  v -> incr cursor ; v
       else None
+    in
+    next
 
 end
+
+
+
 
 (* FIXME: this implem only works for full fam/per arrays. Use hashtbl instead so partial
    collections would still be able to use this marker? *)
@@ -439,9 +443,10 @@ module Marker = struct
 
 end
 
+(* FIXME: do not wrap in option *)
 let ipers base =
   { Collection.length = nb_of_persons base
-  ; get = (fun i -> Type.iper_of_int i) }
+  ; get = (fun i -> Some (Type.iper_of_int i)) }
 
 let persons base = Collection.map (poi base) (ipers base)
 
@@ -450,7 +455,8 @@ let iper_marker c i = Marker.make Type.int_of_iper c i
 
 let ifams base =
   { Collection.length = nb_of_families base
-  ; get = (fun i -> Type.ifam_of_int i) }
+  ; get = (fun i -> let i = Type.ifam_of_int i in if i <> dummy_ifam then Some i else None)
+  }
 
 let families base = Collection.map (foi base) (ifams base)
 
