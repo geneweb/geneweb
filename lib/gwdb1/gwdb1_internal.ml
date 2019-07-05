@@ -120,6 +120,7 @@ let get_children = cache_des (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Def.comment)
 let get_ifam = cache_fam (fun f -> f.Def.fam_index)
 let get_divorce = cache_fam (fun f -> f.Def.divorce)
+let get_fam_index = cache_fam (fun f -> f.Def.fam_index)
 let get_father = cache_cpl (fun c -> Adef.father c)
 let get_fevents = cache_fam (fun f -> f.Def.fevents)
 let get_fsources = cache_fam (fun f -> f.Def.fsources)
@@ -150,8 +151,36 @@ let family_of_gen_family base (f, c, d) =
   (base, 0, {f = Some f; c = Some c; d = Some d})
 let poi base i =
   (base, Adef.int_of_iper i,{p = None; a = None; u = None})
+let poi_batch base = List.map (poi base)
+
+let no_family empty_string ifam =
+  { marriage = Adef.cdate_None
+  ; marriage_place = empty_string
+  ; marriage_note = empty_string
+  ; marriage_src = empty_string
+  ; witnesses = [||]
+  ; relation = Def.NoMention
+  ; divorce = Def.NotDivorced
+  ; fevents = []
+  ; comment = empty_string
+  ; origin_file = empty_string
+  ; fsources = empty_string
+  ; fam_index = ifam
+  }
+
+let no_couple =
+  Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1))
+
+let empty_family base i =
+  ( base, Adef.int_of_ifam i
+  , { f = Some (no_family (Adef.istr_of_int 0) i)
+    ; c = Some no_couple
+    ; d = Some { Def.children = [||] } })
+
 let foi base i =
   (base, Adef.int_of_ifam i, {f = None; c = None; d = None})
+let foi_batch base = List.map (foi base)
+
 let sou base i = base.data.strings.get (Adef.int_of_istr i)
 let nb_of_persons base = base.data.persons.len
 let nb_of_families base = base.data.families.len
@@ -312,3 +341,86 @@ let gen_person_misc_names base p nobtit =
 
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
+
+module Collection = struct
+
+  type 'a t =
+    { length : int
+    ; get : int -> 'a
+    }
+
+  let map (fn : 'a -> 'b) c =
+    { length = c.length
+    ; get = (fun i -> fn (c.get i))
+    }
+
+  let length { length ; _ } = length
+
+  let iter fn { get ; length } =
+    for i = 0 to length - 1 do fn (get i) done
+
+  let iteri fn { get ; length } =
+    for i = 0 to length - 1 do fn i (get i) done
+
+  let fold fn acc { get ; length } =
+    let rec loop acc i =
+      if i = length then acc
+      else loop (fn acc (get i)) (i + 1)
+    in
+    loop acc 0
+
+  let fold_until continue fn acc { get ; length } =
+    let rec loop acc i =
+      if not (continue acc) || i = length then acc
+      else loop (fn acc (get i)) (i + 1)
+    in
+    loop acc 0
+
+  let iterator { get ; length } =
+    let cursor = ref 0 in
+    fun () ->
+      if !cursor < length then
+        let v = Some (get !cursor) in
+        let () = incr cursor in
+        v
+      else None
+
+end
+
+(* FIXME: this implem only works for full fam/per arrays. Use hashtbl instead so partial
+   collections would still be able to use this marker? *)
+(* Also, if collection is modified during marking stuff, it won't work. *)
+module Marker = struct
+
+  type ('k, 'v) t =
+    { get : 'k -> 'v
+    ; set : 'k -> 'v -> unit
+    }
+
+  let make (k : 'a -> 'k) (c : 'a Collection.t) (i : 'v) : ('a, 'v) t =
+    let a = Array.make c.Collection.length i in
+    { get = (fun x -> Array.get a (k x) )
+    ; set = (fun x v -> Array.set a (k x) v) }
+
+  let get ({ get ; _ } : _ t) k = get k
+  let set ({ set ; _ } : _ t) k = set k
+
+end
+
+let ipers base =
+  { Collection.length = nb_of_persons base
+  ; get = (fun i -> Adef.iper_of_int i) }
+
+let persons base = Collection.map (poi base) (ipers base)
+
+let person_marker c i = Marker.make (fun p -> (Adef.int_of_iper @@ get_key_index p)) c i
+let iper_marker c i = Marker.make Adef.int_of_iper c i
+
+let ifams base =
+  { Collection.length = nb_of_families base
+  ; get = (fun i -> Adef.ifam_of_int i) }
+
+let families base = Collection.map (foi base) (ifams base)
+
+let family_marker c i = Marker.make (fun f -> (Adef.int_of_ifam @@ get_fam_index f)) c i
+let ifam_marker c i = Marker.make Adef.int_of_ifam c i

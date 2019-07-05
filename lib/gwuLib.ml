@@ -43,12 +43,13 @@ module Make (Select : Select) =
 
     let prepare_free_occ base =
       (* Parce qu'on est obligé ... *)
-      let sn = "?" in
-      let fn = "?" in
-      let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
-      Hashtbl.add ht_orig_occ key [0];
-      for i = 0 to nb_of_persons base - 1 do
-        let ip = Adef.iper_of_int i in
+      (* FIXME!!!!!!! *)
+      (* let sn = "?" in
+       * let fn = "?" in
+       * let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
+       * Hashtbl.add ht_orig_occ key [0]; *)
+      let ipers = Gwdb.ipers base in
+      Gwdb.Collection.iter (fun ip ->
         let p = poi base ip in
         let sn = sou base (get_surname p) in
         let fn = sou base (get_first_name p) in
@@ -64,7 +65,8 @@ module Make (Select : Select) =
               if List.mem occ l then Hashtbl.add ht_dup_occ ip occ
               else Hashtbl.replace ht_orig_occ key (occ :: l)
             with Not_found -> Hashtbl.add ht_orig_occ key [occ]
-      done;
+        )
+        ipers ;
       Hashtbl.iter
         (fun key l -> Hashtbl.replace ht_orig_occ key (List.sort compare l))
         ht_orig_occ;
@@ -401,11 +403,11 @@ module Make (Select : Select) =
       print_if_no_empty oc base "#rs" (get_burial_src p)
 
     type gen =
-      { mark : bool array;
-        mark_rel : bool array;
+      { mark : (iper, bool) Gwdb.Marker.t;
+        mark_rel : (iper, bool) Gwdb.Marker.t;
         per_sel : iper -> bool;
         fam_sel : ifam -> bool;
-        fam_done : bool array;
+        fam_done : (ifam, bool) Gwdb.Marker.t;
         mutable notes_pl_p : person list;
         mutable ext_files : (string * string list ref) list;
         mutable notes_alias : (string * string) list;
@@ -487,10 +489,10 @@ module Make (Select : Select) =
         | None -> false
       in
       let first_parent_definition =
-        if gen.mark.(Adef.int_of_iper (get_key_index p)) then false
+        if Gwdb.Marker.get gen.mark (get_key_index p) then false
         else
           begin
-            gen.mark.(Adef.int_of_iper (get_key_index p)) <- true;
+            Gwdb.Marker.set gen.mark (get_key_index p) true;
             true
           end
       in
@@ -560,11 +562,11 @@ module Make (Select : Select) =
         (correct_string base (get_first_name p))
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
-      if Array.length (get_family p) = 0 && get_parents p = None &&
-         not gen.mark.(Adef.int_of_iper (get_key_index p))
+      if Array.length (get_family p) = 0 && get_parents p = None
+         && not (Gwdb.Marker.get gen.mark (get_key_index p))
       then
         begin
-          gen.mark.(Adef.int_of_iper (get_key_index p)) <- true;
+          Gwdb.Marker.set gen.mark (get_key_index p) true;
           if has_infos base p then print_infos oc base false "" "" p
           else Printf.fprintf oc " 0";
           begin match sou base (get_notes p) with
@@ -896,7 +898,7 @@ module Make (Select : Select) =
             m.m_chil;
           Printf.fprintf oc "end\n"
       end;
-      gen.fam_done.(Adef.int_of_ifam m.m_ifam) <- true;
+      Gwdb.Marker.set gen.fam_done m.m_ifam true ;
       let f _ =
         Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
           (p_first_name base m.m_fath) (get_new_occ m.m_fath)
@@ -1156,10 +1158,10 @@ module Make (Select : Select) =
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
       if Array.length (get_family p) = 0 && get_parents p = None &&
-         not mark.(Adef.int_of_iper (get_key_index p))
+         not (Gwdb.Marker.get mark (get_key_index p))
       then
         begin
-          mark.(Adef.int_of_iper (get_key_index p)) <- true;
+          Gwdb.Marker.set mark (get_key_index p) true ;
           if has_infos base p then print_infos oc base false "" "" p
           else Printf.fprintf oc " 0";
           defined_p := p :: !defined_p
@@ -1276,17 +1278,17 @@ module Make (Select : Select) =
           (get_rparents p)
       in
       if surn <> "?" && fnam <> "?" && exist_relation &&
-         not gen.mark_rel.(Adef.int_of_iper (get_key_index p))
+         not (Gwdb.Marker.get gen.mark_rel (get_key_index p))
       then
         begin
-          gen.mark_rel.(Adef.int_of_iper (get_key_index p)) <- true;
+          Gwdb.Marker.set gen.mark_rel (get_key_index p) true;
           Printf.fprintf oc "\n";
           Printf.fprintf oc "rel %s %s%s" surn fnam
             (if get_new_occ p = 0 then ""
              else "." ^ string_of_int (get_new_occ p));
           if is_definition then
             begin
-              gen.mark.(Adef.int_of_iper (get_key_index p)) <- true;
+              Gwdb.Marker.set gen.mark (get_key_index p) true;
               def_p := p :: !def_p;
               if has_infos base p then print_infos oc base false "" "" p
               else Printf.fprintf oc " 0";
@@ -1439,8 +1441,7 @@ module Make (Select : Select) =
       let rec loop top p =
         for i = 0 to Array.length (get_family p) - 1 do
           let ifam = (get_family p).(i) in
-          match mark.(Adef.int_of_ifam ifam) with
-            NotScanned ->
+          if Gwdb.Marker.get mark ifam = NotScanned then begin
               let ifaml =
                 connected_families base (fun _ -> true) ifam (foi base ifam)
               in
@@ -1452,16 +1453,15 @@ module Make (Select : Select) =
                        (get_children desc))
                   [] ifaml
               in
-              if top ||
-                 List.exists (fun p -> eq_istr (get_surname p) surn) children
+              if top || List.exists (fun p -> eq_istr (get_surname p) surn) children
               then
                 begin
                   List.iter
-                    (fun ifam -> mark.(Adef.int_of_ifam ifam) <- ToSeparate)
+                    (fun ifam -> Gwdb.Marker.set mark ifam ToSeparate)
                     ifaml;
                   List.iter (loop false) children
                 end
-          | _ -> ()
+            end
         done
       in
       loop true p
@@ -1523,11 +1523,11 @@ module Make (Select : Select) =
     let mark_one_connex_component base mark ifam =
       let origin_file = sou base (get_origin_file (foi base ifam)) in
       let test_action loop len ifam =
-        if mark.(Adef.int_of_ifam ifam) = NotScanned &&
+        if Gwdb.Marker.get mark ifam = NotScanned &&
            sou base (get_origin_file (foi base ifam)) = origin_file
         then
           begin
-            mark.(Adef.int_of_ifam ifam) <- BeingScanned;
+            Gwdb.Marker.set mark ifam BeingScanned;
             loop (len + 1) ifam
           end
         else len
@@ -1536,8 +1536,8 @@ module Make (Select : Select) =
       let len = 1 + scan_connex_component base test_action 0 ifam in
       let set_mark x =
         let test_action loop () ifam =
-          if mark.(Adef.int_of_ifam ifam) = BeingScanned then
-            begin mark.(Adef.int_of_ifam ifam) <- x; loop () ifam end
+          if Gwdb.Marker.get mark ifam = BeingScanned then
+            begin Gwdb.Marker.set mark ifam x; loop () ifam end
         in
         test_action (fun _ _ -> ()) () ifam;
         scan_connex_component base test_action () ifam
@@ -1558,35 +1558,35 @@ module Make (Select : Select) =
 
     let mark_connex_components base mark ifam =
       let test_action _loop _len ifam =
-        if mark.(Adef.int_of_ifam ifam) = NotScanned then
+        if Gwdb.Marker.get mark ifam = NotScanned then
           mark_one_connex_component base mark ifam
       in
       scan_connex_component base test_action () ifam
 
     let add_small_connex_components base mark =
-      for i = 0 to nb_of_families base - 1 do
-        if mark.(i) = ToSeparate then
-          mark_connex_components base mark (Adef.ifam_of_int i)
-      done
+      Gwdb.Collection.iter
+        (fun i ->
+          if Gwdb.Marker.get mark i = ToSeparate
+          then mark_connex_components base mark i)
+        (Gwdb.ifams base)
 
     let separate base =
       match List.rev !separate_list with
-        [] -> (fun _ -> false)
+      | [] -> (fun _ -> false)
       | list ->
-          let mark = Array.make (nb_of_families base) NotScanned in
-          List.iter (mark_someone base mark) list;
-          add_small_connex_components base mark;
-          let len =
-            let rec loop len i =
-              if i = nb_of_families base then len
-              else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
-              else loop len (i + 1)
-            in
-            loop 0 0
-          in
-          Printf.eprintf "*** extracted %d families\n" len;
-          flush stderr;
-          fun ifam -> mark.(Adef.int_of_ifam ifam) = ToSeparate
+        let ifams = Gwdb.ifams base in
+        let mark = Gwdb.ifam_marker ifams NotScanned in
+        List.iter (mark_someone base mark) list;
+        add_small_connex_components base mark;
+        let len =
+          Gwdb.Collection.fold
+            (fun acc i ->
+               if Gwdb.Marker.get mark i = ToSeparate then (acc + 1) else acc)
+            0 ifams
+        in
+        Printf.eprintf "*** extracted %d families\n" len;
+        flush stderr;
+        fun ifam -> Gwdb.Marker.get mark ifam = ToSeparate
 
     let rs_printf oc s =
       let rec loop bol i =
@@ -1645,13 +1645,14 @@ module Make (Select : Select) =
               x
       in
       let gen =
-        let mark = Array.make (nb_of_persons base) false in
-        let mark_rel = Array.make (nb_of_persons base) false in
+        let ipers = Gwdb.ipers base in
+        let mark = Gwdb.iper_marker ipers false in
+        let mark_rel = Gwdb.iper_marker ipers false in
         let (per_sel, fam_sel) =
           Select.functions base anc desc !surnames ancdesc !no_spouses_parents
             !censor !with_siblings !maxlev
         in
-        let fam_done = Array.make (nb_of_families base) false in
+        let fam_done = Gwdb.ifam_marker (Gwdb.ifams base) false in
         {mark = mark; mark_rel = mark_rel; per_sel = per_sel;
          fam_sel = fam_sel; fam_done = fam_done; notes_pl_p = [];
          ext_files = []; notes_alias = notes_aliases in_dir;
@@ -1659,12 +1660,11 @@ module Make (Select : Select) =
       in
       let nb_fam = nb_of_families base in
       if !(Mutil.verbose) then ProgrBar.start ();
-      for i = 0 to nb_fam - 1 do
+      Gwdb.Collection.iteri (fun i ifam ->
         if !(Mutil.verbose) then ProgrBar.run i nb_fam;
-        let ifam = Adef.ifam_of_int i in
         let fam = foi base ifam in
         if is_deleted_family fam then ()
-        else if gen.fam_done.(i) then ()
+        else if Gwdb.Marker.get gen.fam_done ifam then ()
         else if gen.fam_sel ifam then
           let ifaml = connected_families base gen.fam_sel ifam fam in
           let (oc, first) =
@@ -1679,12 +1679,11 @@ module Make (Select : Select) =
                    {m_ifam = ifam; m_fam = fam;
                     m_fath = poi base (get_father fam);
                     m_moth = poi base (get_mother fam);
-                    m_chil =
-                      Array.map (fun ip -> poi base ip) (get_children fam)}
+                    m_chil = Array.map (fun ip -> poi base ip) (get_children fam)}
                  in
                  if empty_family base m then
                    begin
-                     gen.fam_done.(Adef.int_of_ifam m.m_ifam) <- true;
+                     Gwdb.Marker.set gen.fam_done m.m_ifam true ;
                      ml
                    end
                  else m :: ml)
@@ -1701,15 +1700,15 @@ module Make (Select : Select) =
               print_relations oc base gen ml;
               if not !old_gw then print_pevents oc base gen ml
             end
-      done;
+      ) (Gwdb.ifams base) ;
       (* Ajout des personnes isolée à l'export. On leur ajoute des    *)
       (* parents pour pouvoir utiliser les autres fonctions normales. *)
       (* Export que si c'est toute la base.                           *)
       if !isolated && anc = None && desc = None && ancdesc = None then
-        for i = 0 to nb_of_persons base - 1 do
-          if gen.mark.(i) || gen.mark_rel.(i) then ()
+        Gwdb.Collection.iter (fun i ->
+          if Gwdb.Marker.get gen.mark i || Gwdb.Marker.get gen.mark_rel i then ()
           else
-            let p = poi base (Adef.iper_of_int i) in
+            let p = poi base i in
             match get_parents p with
               Some _ -> ()
             | None ->
@@ -1743,9 +1742,9 @@ module Make (Select : Select) =
                   Printf.fprintf oc "\n";
                   print_empty_family oc base p;
                   print_notes_for_person oc base gen p;
-                  gen.mark.(i) <- true;
+                  Gwdb.Marker.set gen.mark i true;
                   print_isolated_relations oc base gen p
-        done;
+        ) (Gwdb.ipers base) ;
       if !(Mutil.verbose) then ProgrBar.finish ();
       if not !no_notes then
         let s = base_notes_read base "" in
