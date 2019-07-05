@@ -296,8 +296,8 @@ let select_all base is_surnames ini =
 
 module Iper =
   struct
-    type t = Gwdb.iper
-    let compare = Stdlib.compare
+    type t = Gwdb.person
+    let compare i1 i2 = Stdlib.compare (get_iper i1) (get_iper i2)
   end
 
 module IperSet = Set.Make(Iper)
@@ -306,10 +306,14 @@ let print_list conf base filters list =
   let person_l =
     IperSet.elements
       (List.fold_left
-         (fun accu p -> IperSet.add p accu)
+         begin fun acc p ->
+           let p = poi base p in
+           if apply_filters_p conf filters Perso.get_sosa_person p
+           then IperSet.add p acc
+           else acc
+         end
          IperSet.empty list)
   in
-  let person_l = List.rev_map (poi base) person_l in
   let person_l =
     if filters.nb_results then person_l
     else
@@ -325,7 +329,7 @@ let print_list conf base filters list =
           else comp)
         person_l
   in
-  let data = data_list_person conf base filters person_l in
+  let data = conv_data_list_person conf base filters person_l in
   print_result conf data
 
 (*

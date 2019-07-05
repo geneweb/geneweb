@@ -666,11 +666,16 @@ let print_cpl_relation conf base =
             let list =
               (function (_, _, (_, _, list), _) -> list) (List.hd rl)
             in
-            List.map (fun (p, _) -> p) (list)
+            List.fold_left
+              (fun acc (p, _) ->
+                if apply_filters_p conf filters Perso.get_sosa_person p
+                then p :: acc
+                else [])
+              [] list
         | None -> [])
     | _ -> []
   in
-  let data = data_list_person conf base filters list in
+  let data = conv_data_list_person conf base filters list in
   print_result conf data
 
 #endif
