@@ -9,7 +9,7 @@
 )
 
 (executables
-  (names gwtp)
+  (public_names gwtp)
   (modules gwtp httpEnv iolight)
   (libraries %%%GWDB_PKG%%% geneweb)
 )

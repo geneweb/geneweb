@@ -46,7 +46,6 @@ let simple_output bname base carray =
     Util.init_cache_info bname (Gwdb1.ToGwdb.base base)
 #endif
 
-
 let main () =
   Argl.parse speclist anonfun errmsg;
   if !fname = "" then
