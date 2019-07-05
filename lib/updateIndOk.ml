@@ -442,8 +442,7 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
   (* On tri les évènements pour être sûr. *)
   let pevents =
     CheckItem.sort_events
-      ((fun evt -> CheckItem.Psort evt.epers_name),
-       (fun evt -> evt.epers_date))
+      (fun evt -> CheckItem.Psort evt.epers_name) (fun evt -> evt.epers_date)
       pevents
   in
   let found_birth = ref false in

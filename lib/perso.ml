@@ -1777,6 +1777,11 @@ let events_list conf base p =
         (get_pevents p) []
     else []
   in
+  let get_name = function
+    | (Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
+    | (Fevent n, _, _, _, _, _, _) -> CheckItem.Fsort n
+  in
+  let get_date (_, date, _, _, _, _, _) = date in
   let fevents =
     (* On conserve l'ordre des familles. *)
     Array.fold_right
@@ -1804,22 +1809,10 @@ let events_list conf base p =
                (get_fevents fam) []
            else []
          in
-         CheckItem.merge_events
-           ((fun (name, _, _, _, _, _, _) ->
-               match name with
-                 Fevent n -> CheckItem.Fsort n
-               | _ -> failwith "events_list"),
-            (fun (_, date, _, _, _, _, _) -> date))
-           fam_fevents fevents)
+         CheckItem.merge_events get_name get_date fam_fevents fevents)
       (get_family p) []
   in
-  CheckItem.merge_events
-    ((fun (name, _, _, _, _, _, _) ->
-        match name with
-          Pevent n -> CheckItem.Psort n
-        | Fevent n -> CheckItem.Fsort n),
-     (fun (_, date, _, _, _, _, _) -> date))
-    pevents fevents
+  CheckItem.merge_events get_name get_date pevents fevents
 
 let make_ep conf base ip =
   let p = pget conf base ip in
@@ -5316,11 +5309,11 @@ let print_foreach conf base print_ast eval_expr =
     (* On tri les témoins dans le même ordre que les évènements. *)
     let events_witnesses =
       CheckItem.sort_events
-        ((fun (_, _, (name, _, _, _, _, _, _)) ->
-            match name with
-              Pevent n -> CheckItem.Psort n
-            | Fevent n -> CheckItem.Fsort n),
-         (fun (_, _, (_, date, _, _, _, _, _)) -> date))
+        (fun (_, _, (name, _, _, _, _, _, _)) ->
+           match name with
+           | Pevent n -> CheckItem.Psort n
+           | Fevent n -> CheckItem.Fsort n)
+        (fun (_, _, (_, date, _, _, _, _, _)) -> date)
         events_witnesses
     in
     List.iter

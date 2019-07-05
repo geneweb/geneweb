@@ -330,7 +330,7 @@ let reconstitute_from_fevents nsck empty_string fevents marr div =
   (* On tri les évènements pour être sûr. *)
   let fevents =
     CheckItem.sort_events
-      ((fun evt -> CheckItem.Fsort evt.efam_name), (fun evt -> evt.efam_date))
+      (fun evt -> CheckItem.Fsort evt.efam_name) (fun evt -> evt.efam_date)
       fevents
   in
   let found_marriage = ref false in

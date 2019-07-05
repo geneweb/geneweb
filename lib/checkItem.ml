@@ -236,16 +236,16 @@ let cmp_events (get_name, get_date) e1 e2 =
       else comp_date
   | _ -> compare_event_name (get_name e1) (get_name e2)
 
-let sort_events (get_name, get_date) events =
+let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2) events
 
-let merge_events (get_name, get_date) l1 l2 =
+let merge_events get_name get_date l1 l2 =
   List.merge (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2) l1 l2
 
 let sort_pevents warning p =
   let a =
     sort_events
-      ((fun evt -> Psort evt.epers_name), (fun evt -> evt.epers_date))
+      (fun evt -> Psort evt.epers_name) (fun evt -> evt.epers_date)
       (get_pevents p)
   in
   let b = get_pevents p in
@@ -253,7 +253,7 @@ let sort_pevents warning p =
 
 let sort_fevents warning (ifam, fam) =
   let a =
-    sort_events ((fun evt -> Fsort evt.efam_name), (fun evt -> evt.efam_date))
+    sort_events (fun evt -> Fsort evt.efam_name) (fun evt -> evt.efam_date)
       (get_fevents fam)
   in
   let b = get_fevents fam in
@@ -751,7 +751,7 @@ let child_has_sex warning child =
   if get_sex child = Neuter then warning (UndefinedSex child)
 
 let check_order_pfevents get_name get_date warning p events =
-  let events = sort_events (get_name, get_date) events in
+  let events = sort_events get_name get_date events in
   let rec loop = function
     | e1 :: e2 :: events ->
       if compare_event_name (get_name e1) (get_name e2) = 1
