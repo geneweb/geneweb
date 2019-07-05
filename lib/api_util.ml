@@ -121,12 +121,9 @@ let find_image_file conf base p =
 (* BIENTOT DEPRECATED *)
 let string_of_prec_dmy d =
   let s =
-    match (d.day, d.month, d.year) with
-     | (0, 0, _) -> string_of_int d.year
-     | (0, _, _) -> string_of_int d.month ^ "/" ^ string_of_int d.year
-     | _ ->
-        string_of_int d.day ^ "/" ^ string_of_int d.month ^ "/"
-         ^ string_of_int d.year
+    if d.month = 0 then string_of_int d.year
+    else if d.day = 0 then string_of_int d.month ^ "/" ^ string_of_int d.year
+    else string_of_int d.day ^ "/" ^ string_of_int d.month ^ "/" ^ string_of_int d.year
   in
   match d.prec with
    | Sure -> Mutil.nominative s
@@ -155,14 +152,14 @@ let string_of_dmy d =
     | _ -> ""
   in
   let date =
-    if (*d.day = 0 &&*) d.month = 0 then Printf.sprintf "%s" (soy d.year)
-    else if d.day = 0 then Printf.sprintf "%d/%s" d.month (soy d.year)
-    else Printf.sprintf "%d/%d/%s" d.day d.month (soy d.year)
+    if d.month = 0 then soy d.year
+    else if d.day = 0 then string_of_int d.month ^ "/" ^ soy d.year
+    else string_of_int d.day ^ "/" ^ string_of_int d.month ^ "/" ^ soy d.year
   in
   let delta =
     match d.prec with
-    | OrYear d2 -> Printf.sprintf "|%s" (soy d2.year2)
-    | YearInt d2 -> Printf.sprintf "..%s" (soy d2.year2)
+    | OrYear d2 -> "|" ^ soy d2.year2
+    | YearInt d2 -> ".." ^ soy d2.year2
     | _ -> ""
   in
   prec ^ date ^ delta
