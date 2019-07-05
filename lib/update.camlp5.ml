@@ -1256,7 +1256,6 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
               (fun v -> let v = int_of_string v + 1 in string_of_int v);
             let fn = Util.translate_eval f in
             let sn = Util.translate_eval s in
-            patch_key base ip fn sn o;
             Gutil.person_ht_add base (fn ^ " " ^ sn) ip;
             new_persons := p :: !new_persons
           end;

@@ -943,14 +943,11 @@ let effective_mod conf base sp =
     Name.lower (Mutil.nominative sp.first_name) = Name.lower ofn &&
     Name.lower (Mutil.nominative sp.surname) = Name.lower osn
   in
-  if sp.first_name <> "?" && sp.surname <> "?" &&
-     (not same_fn_sn || oocc <> sp.occ)
-  then
-    begin
-      delete_key base ofn osn oocc;
-      patch_key base pi sp.first_name sp.surname sp.occ;
-      if not same_fn_sn then patch_name base key pi
-    end;
+  if sp.first_name <> "?"
+  && sp.surname <> "?"
+  && (not same_fn_sn || oocc <> sp.occ)
+  && not same_fn_sn
+  then patch_name base key pi ;
   (* Si on modifie la personne pour lui ajouter un nom/prénom, alors *)
   (* il faut remettre le compteur du nombre de personne à jour.      *)
   if ofn = "?" && osn = "?" && sp.first_name <> "?" && sp.surname <> "?" then
@@ -984,7 +981,6 @@ let effective_add conf base sp =
   let key = fn ^ " " ^ sn in
   let ipl = Gutil.person_ht_find_all base key in
   check_conflict conf base sp ipl;
-  patch_key base pi fn sn sp.occ;
   Gutil.person_ht_add base key pi;
   patch_cache_info conf Util.cache_nb_base_persons
     (fun v -> let v = int_of_string v + 1 in string_of_int v);
@@ -1326,7 +1322,6 @@ let print_del conf base =
       let p = poi base ip in
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
-      let occ = get_occ p in
       let old_related = get_related p in
       let op = Util.string_gen_person base (gen_person_of_person p) in
       update_relations_of_related base ip old_related;
@@ -1336,7 +1331,6 @@ let print_del conf base =
       if fn <> "?" && sn <> "?" then
         patch_cache_info conf Util.cache_nb_base_persons
           (fun v -> let v = int_of_string v - 1 in string_of_int v);
-      delete_key base fn sn occ;
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
       Util.commit_patches conf base;
       let changed = U_Delete_person op in

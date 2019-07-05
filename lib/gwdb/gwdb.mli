@@ -134,8 +134,6 @@ val patch_descend : base -> ifam -> iper Def.gen_descend -> unit
 val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
 
 val patch_name : base -> string -> iper -> unit
-val patch_key : base -> iper -> string -> string -> int -> unit
-val delete_key : base -> string -> string -> int -> unit
 val insert_string : base -> string -> istr
 val commit_patches : base -> unit
 val commit_notes : base -> string -> string -> unit
