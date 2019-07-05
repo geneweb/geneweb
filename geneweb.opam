@@ -41,3 +41,14 @@ depends: [
   "ounit" { with-test }
   "stdlib-shims"
 ]
+
+depopts: [
+  "num"
+  "ocurl"
+  "piqi"
+  "piqilib"
+  "redis"
+  "redis-sync"
+  "yojson"
+  "zarith"
+]
