@@ -1,8 +1,7 @@
 (library
- (name wserver_mli)
+ (name wserver)
  (public_name geneweb.wserver.mli)
  (wrapped false)
  (libraries geneweb.def)
- (modules_without_implementation wserver)
- (flags (:standard -no-keep-locs))
+ (virtual_modules wserver)
 )

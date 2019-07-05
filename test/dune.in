@@ -1,12 +1,9 @@
 (library
  (name dummy_gwdb)
- (wrapped false)
- (flags (:standard -no-keep-locs))
  (libraries geneweb.def)
+ (implements gwdb)
  (modules gwdb)
 )
-
-(rule (copy# %{lib:geneweb.gwdb.mli:gwdb.mli} gwdb.mli))
 
 (executable
   (name test)

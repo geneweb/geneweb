@@ -30,7 +30,7 @@ EXE = \
 ###### [BEGIN] Generated files section
 
 CAMLP5_PA_EXTEND_FILES = \
-	bin/distrib/ged2gwb/ged2gwb1 \
+	bin/distrib/ged2gwb/ged2gwb \
 	lib/templ \
 	lib/update \
 	bin/distrib/setup/setup

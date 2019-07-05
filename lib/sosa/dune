@@ -1,8 +1,0 @@
-(library
- (name geneweb_sosa)
- (public_name geneweb.sosa)
- (wrapped false)
- (flags (:standard -no-keep-locs))
-)
-
-(rule (copy# %{lib:geneweb.sosa.mli:sosa.mli} sosa.mli))
