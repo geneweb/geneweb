@@ -1,6 +1,16 @@
+(library
+ (name dummy_gwdb)
+ (wrapped false)
+ (flags       (:standard -no-keep-locs))
+ (libraries geneweb.def)
+ (modules gwdb)
+)
+
+(rule (copy# %{lib:geneweb.gwdb:gwdb.mli} gwdb.mli))
+
 (executable
   (name test)
-  (libraries %%%SOSA_PKG%%% %%%GWDB_PKG%%% geneweb oUnit)
+  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb oUnit)
   (modules test test_place test_sosa test_utils)
 )
 
