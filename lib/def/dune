@@ -1,0 +1,5 @@
+(library
+ (name def)
+ (public_name geneweb.def)
+ (wrapped false)
+)

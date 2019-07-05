@@ -3605,8 +3605,9 @@ let finish_base base (persons, families, _, _) =
   check_parents_sex base persons families;
   check_parents_children base ascends unions couples descends;
   if !try_negative_dates then negative_dates base persons families;
-  let base = Gwdb.base_of_base1 base in
+  let base = base in
   if !do_check then
+    let base = Gwdb1.ToGwdb.base base in
     Check.check_base base
       (fun x -> Check.print_base_error !log_oc base x; Printf.fprintf !log_oc "\n")
       (function

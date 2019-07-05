@@ -1,4 +1,3 @@
-(* $Id: gwdb.mli,v 5.102 2007-03-02 11:44:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Adef
@@ -191,12 +190,3 @@ val p_first_name : base -> person -> string
 val p_surname : base -> person -> string
 
 val date_of_last_change : base -> float
-
-(**/**)
-(** For database builders *)
-
-val base_of_base1 : Dbdisk.dsk_base -> base
-val dsk_person_of_person : person -> Dbdisk.dsk_person
-
-val apply_base1 : base -> (Dbdisk.dsk_base -> unit) -> unit
-val apply_base2 : base -> (Db2disk.db2 -> unit) -> unit

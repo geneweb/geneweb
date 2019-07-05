@@ -1,0 +1,8 @@
+(library
+ (name gwdb)
+ (public_name geneweb.gwdb)
+ (wrapped false)
+ (libraries geneweb.def)
+ (modules_without_implementation gwdb)
+ (flags       (:standard -no-keep-locs))
+)

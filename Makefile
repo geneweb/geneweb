@@ -15,25 +15,22 @@ DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
 
 EXE = \
-	bin/distrib/connex.exe \
-	bin/distrib/ged2gwb.exe \
-	bin/distrib/ged2gwb2.exe \
-	bin/distrib/gwb2ged.exe \
-	bin/distrib/gwc1.exe \
-	bin/distrib/gwc2.exe \
-	bin/distrib/gwd.exe \
-	bin/distrib/gwdiff.exe \
-	bin/distrib/gwtp.exe \
-	bin/distrib/gwu.exe \
-	bin/distrib/mk_consang.exe \
-	bin/distrib/setup.exe \
-	bin/distrib/update_nldb.exe \
+	bin/distrib/connex \
+	bin/distrib/consang \
+	bin/distrib/ged2gwb \
+	bin/distrib/gwb2ged \
+	bin/distrib/gwc \
+	bin/distrib/gwd \
+	bin/distrib/gwdiff \
+	bin/distrib/gwtp \
+	bin/distrib/gwu \
+	bin/distrib/setup \
+	bin/distrib/update_nldb \
 
 ###### [BEGIN] Generated files section
 
 CAMLP5_PA_EXTEND_FILES = \
-	bin/distrib/ged2gwb/ged2gwb \
-	bin/distrib/ged2gwb/ged2gwb2 \
+	bin/distrib/ged2gwb/ged2gwb1 \
 	lib/templ \
 	lib/update \
 	bin/distrib/setup/setup
@@ -66,7 +63,7 @@ lib/gwlib.ml:
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
-CPPO_D=$(API_D)
+CPPO_D=$(API_D) $(GWDB_D)
 
 %/dune: %/dune.in
 	cat $< \
@@ -75,6 +72,7 @@ CPPO_D=$(API_D)
 	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
 	-e "s/%%%API_PKG%%%/$(API_PKG)/g" \
 	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
+	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
 	> $@
 
 hd/etc/version.txt:
@@ -154,15 +152,11 @@ distrib: exe
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "127.0.0.1" > $(DISTRIB_DIR)/gw/only.txt
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
-	cp $(BUILD_DISTRIB_DIR)gwc1.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwc1.exe $(DISTRIB_DIR)/gw/gwc1$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwc2.exe $(DISTRIB_DIR)/gw/gwc2$(EXT);
-	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
-	cp $(BUILD_DISTRIB_DIR)mk_consang.exe $(DISTRIB_DIR)/gw/mk_consang$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
+	cp $(BUILD_DISTRIB_DIR)consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
 	cp $(BUILD_DISTRIB_DIR)ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT);
-	cp $(BUILD_DISTRIB_DIR)ged2gwb2.exe $(DISTRIB_DIR)/gw/ged2gwb2$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT);
 	cp $(BUILD_DISTRIB_DIR)connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);

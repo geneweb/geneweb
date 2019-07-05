@@ -4,13 +4,16 @@
  (synopsis "GeneWeb library")
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
-            %%%API_PKG%%%
             %%%SOSA_PKG%%%
+            %%%API_PKG%%%
             str
             stdlib-shims
             camlp5
             camlp5.gramlib
+            geneweb.gwdb
+            geneweb.def
+            geneweb.util
             geneweb.wserver
             markup)
- (modules_without_implementation config dbdisk def templAst)
+ (modules_without_implementation config templAst)
 )

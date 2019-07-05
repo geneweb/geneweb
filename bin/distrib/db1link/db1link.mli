@@ -1,6 +1,8 @@
 (* $Id: db1link.mli,v 5.2 2008-01-15 11:06:04 ddr Exp $ *)
 (* Copyright (c) 2007-2008 INRIA *)
 
+open Geneweb
+
 type file_info =
   { mutable f_curr_src_file : string;
     mutable f_curr_gwo_file : string;

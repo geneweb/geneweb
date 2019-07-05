@@ -874,39 +874,6 @@ let simple conf =
   else if not (good_name out_file) then print_file conf "err_name.htm"
   else print_file conf "bso.htm"
 
-let simple2 conf =
-  let ged =
-    match p_getenv conf.env "anon" with
-      Some f -> strip_spaces f
-    | None -> ""
-  in
-  let ged =
-    if Filename.check_suffix (String.lowercase_ascii ged) ".ged" then ged
-    else ""
-  in
-  let out_file =
-    match p_getenv conf.env "o" with
-      Some f -> strip_spaces f
-    | _ -> ""
-  in
-  let out_file =
-    if ged = "" then out_file
-    else if out_file = "" then out_name_of_ged ged
-    else out_file
-  in
-  let env = ("f", "on") :: conf.env in
-  let env = list_replace "anon" ged env in
-  let conf =
-    {comm = if ged = "" then "gwc2" else "ged2gwb2";
-     env = list_replace "o" out_file env; lang = conf.lang;
-     request = conf.request; lexicon = conf.lexicon}
-  in
-  if ged <> "" && not (Sys.file_exists ged) then
-    print_file conf "err_unkn.htm"
-  else if out_file = "" then print_file conf "err_miss.htm"
-  else if not (good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "bso.htm"
-
 let gwc_or_ged2gwb out_name_of_in_name conf =
   let fname =
     match p_getenv conf.env "fname" with
@@ -941,55 +908,13 @@ let gwc_or_ged2gwb out_name_of_in_name conf =
   else if not (good_name out_file) then print_file conf "err_name.htm"
   else print_file conf "bso.htm"
 
-let gwc2_or_ged2gwb2 out_name_of_in_name conf =
-  let fname =
-    match p_getenv conf.env "fname" with
-    | Some f -> strip_spaces f
-    | None -> ""
-  in
-  let in_file =
-    match p_getenv conf.env "anon" with
-      Some f -> strip_spaces f
-    | None -> ""
-  in
-  let in_file =
-    if fname = "" then in_file
-    else in_file ^ (if Sys.unix then "/" else "\\") ^ fname
-  in
-  let conf = conf_with_env conf "anon" in_file in
-  let out_file =
-    match p_getenv conf.env "o" with
-      Some f -> strip_spaces f
-    | _ -> ""
-  in
-  let out_file =
-    if out_file = "" then out_name_of_in_name in_file else out_file
-  in
-  (* clean up env *)
-  let conf = conf_with_env conf "body_prop" "" in
-  let conf = conf_with_env conf "fname" "" in
-  let conf = conf_with_env conf "o" out_file in
-  if in_file = "" || out_file = "" then print_file conf "err_miss.htm"
-  else if not (Sys.file_exists in_file) && not (String.contains fname '*')
-  then print_file conf "err_unkn.htm"
-  else if not (good_name out_file) then print_file conf "err_name.htm"
-  else print_file conf "bso.htm"
-
 let gwc_check conf =
   let conf = {conf with env = ("nofail", "on") :: ("f", "on") :: conf.env} in
   gwc_or_ged2gwb out_name_of_gw conf
 
-let gwc2_check conf =
-  let conf = {conf with env = ("nofail", "on") :: ("f", "on") :: conf.env} in
-  gwc2_or_ged2gwb2 out_name_of_gw conf
-
 let ged2gwb_check conf =
   let conf = {conf with env = ("f", "on") :: conf.env} in
   gwc_or_ged2gwb out_name_of_ged conf
-
-let ged2gwb2_check conf =
-  let conf = {conf with env = ("f", "on") :: conf.env} in
-  gwc2_or_ged2gwb2 out_name_of_ged conf
 
 (*ifdef WINDOWS then*)
 let infer_rc conf rc =
@@ -1002,19 +927,6 @@ let infer_rc conf rc =
 let gwc conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "gwc") in
-    exec_f (comm ^ parameters conf.env)
-  in
-  let rc = if Sys.unix then rc else infer_rc conf rc in
-  let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
-  (try Sys.remove gwo with Sys_error _ -> ());
-  Printf.eprintf "\n";
-  flush stderr;
-  if rc > 1 then print_file conf "bso_err.htm"
-  else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
-
-let gwc2 conf =
-  let rc =
-    let comm = stringify (Filename.concat !bin_dir "gwc2") in
     exec_f (comm ^ parameters conf.env)
   in
   let rc = if Sys.unix then rc else infer_rc conf rc in
@@ -1338,7 +1250,7 @@ let cleanup_1 conf =
       Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
     end;
   flush stderr;
-  Mutil.rm_rf (Filename.concat "old" in_base_dir);
+  Util.rm_rf (Filename.concat "old" in_base_dir);
   if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
   else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
   flush stderr;
@@ -1398,7 +1310,7 @@ let rename conf =
 let delete conf = print_file conf "delete_1.htm"
 
 let delete_1 conf =
-  List.iter (fun (k, v) -> if v = "del" then Mutil.rm_rf (k ^ ".gwb")) conf.env;
+  List.iter (fun (k, v) -> if v = "del" then Util.rm_rf (k ^ ".gwb")) conf.env;
   print_file conf "del_ok.htm"
 
 let merge conf =
@@ -1577,17 +1489,6 @@ let ged2gwb conf =
   if rc > 1 then print_file conf "bso_err.htm"
   else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
 
-let ged2gwb2 conf =
-  let rc =
-    let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
-  in
-  let rc = if Sys.unix then rc else infer_rc conf rc in
-  Printf.eprintf "\n";
-  flush stderr;
-  if rc > 1 then print_file conf "bso_err.htm"
-  else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
-
 let consang conf ok_file =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
@@ -1669,7 +1570,6 @@ let setup_comm_ok conf =
   function
     "gwsetup" -> setup_gen conf
   | "simple" -> simple conf
-  | "simple2" -> simple2 conf
   | "recover" -> recover conf
   | "recover_1" -> recover_1 conf
   | "recover_2" -> recover_2 conf
@@ -1685,11 +1585,6 @@ let setup_comm_ok conf =
         Some "check" -> gwc_check conf
       | _ -> gwc conf
       end
-  | "gwc2" ->
-      begin match p_getenv conf.env "opt" with
-        Some "check" -> gwc2_check conf
-      | _ -> gwc2 conf
-      end
   | "gwu" ->
       begin match p_getenv conf.env "opt" with
         Some "check" -> gwu conf
@@ -1699,11 +1594,6 @@ let setup_comm_ok conf =
       begin match p_getenv conf.env "opt" with
         Some "check" -> ged2gwb_check conf
       | _ -> ged2gwb conf
-      end
-  | "ged2gwb2" ->
-      begin match p_getenv conf.env "opt" with
-        Some "check" -> ged2gwb2_check conf
-      | _ -> ged2gwb2 conf
       end
   | "gwb2ged" ->
       begin match p_getenv conf.env "opt" with

@@ -14,6 +14,8 @@ OS_TYPE=
 
 API_D=
 API_PKG=
+GWDB_D=
+GWDB_PKG=
 SOSA_PKG=
 
 while [[ $# -ne 0 ]]; do
@@ -21,6 +23,9 @@ while [[ $# -ne 0 ]]; do
     --api)
       API_PKG="piqirun.ext redis-sync yojson curl";
       API_D="-D API" ;;
+    --gwdb1)
+      GWDB_D="-D GWDB1" ;
+      GWDB_PKG="geneweb.gwdb1" ;;
     --sosa-num)
       SOSA_PKG="geneweb.sosa-num" ;;
     --sosa-zarith)
@@ -30,6 +35,12 @@ while [[ $# -ne 0 ]]; do
   esac
   [[ $# -gt 0 ]] && shift
 done
+
+if [[ $GWDB_D == "" ]] ; then
+  echo -e "\\x1b[33m[WARNING]\\x1b[0m GWDB is not set, using gwdb1" ;
+  GWDB_D="-D GWDB1" ;
+  GWDB_PKG="geneweb.gwdb1" ;
+fi ;
 
 if [[ $SOSA_PKG == "" ]] ; then
   echo -e "\\x1b[33m[WARNING]\\x1b[0m SOSA is not set, using geneweb.sosa" ;
@@ -97,6 +108,8 @@ print_tools() {
 print_vars() {
   echo "API_D=${API_D}"
   echo "API_PKG=${API_PKG}"
+  echo "GWDB_D=${GWDB_D}"
+  echo "GWDB_PKG=${GWDB_PKG}"
   echo "SOSA_PKG=${SOSA_PKG}"
 }
 
