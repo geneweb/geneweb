@@ -1,43 +1,8 @@
-(* $Id: searchName.ml,v 1.00 2014-07-08 11:26:10 flh Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
 open Gwdb
 open Util
-
-(* tools *)
-
-(*
-value gen_person_is_std_key misc conf base p k =
-  let k = Name.strip_lower k in
-  if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p) then
-    True
-  else if
-    misc &&
-    List.exists (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
-  then
-    True
-  else False
-;
-
-value person_is_std_key_approx = gen_person_is_std_key True;
-value person_is_std_key_exact = gen_person_is_std_key False;
-
-value select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl ->
-       if person_is_std_key_exact conf base p k then [p :: pl] else pl)
-    pl []
-;
-
-value select_std_approx conf base pl k =
-  List.fold_right
-    (fun p pl ->
-       if person_is_std_key_approx conf base p k then [p :: pl] else pl)
-    pl []
-;
-*)
 
 let empty_surname_or_firsntame base p =
   is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
@@ -147,50 +112,6 @@ let search_by_sosa conf base an =
         | _ -> []
       else []
   | _ -> []
-
-(*
-value gen_search_approx_key std_key conf base an =
-  let ipl = Gutil.person_not_a_key_find_all base an in
-  let (an, ipl) =
-    if ipl = [] then
-      match name_with_roman_number an with
-      [ Some an1 ->
-          let ipl = Gutil.person_ht_find_all base an1 in
-          if ipl = [] then (an, []) else (an1, ipl)
-      | None -> (an, ipl) ]
-    else (an, ipl)
-  in
-  let pl =
-    List.fold_left
-      (fun l ip ->
-         let p = pget conf base ip in
-         if is_hidden p then l else [p :: l])
-    [] ipl
-  in
-  let spl =
-    if std_key then select_std_approx conf base pl an
-    else select_std_eq conf base pl an
-  in
-  let pl =
-    if std_key then
-      if spl = [] then
-        if pl = [] then try_find_with_one_first_name conf base an else pl
-      else spl
-    else spl
-  in
-  let pl =
-    if not conf.wizard && not conf.friend then
-      List.fold_right
-        (fun p pl ->
-           if not (is_hide_names conf p) || Util.authorized_age conf base p
-           then [p :: pl]
-           else pl)
-        pl []
-    else pl
-  in
-  compact_list conf base pl
-;
-*)
 
 let search_partial_key conf base an =
   let ipl = Gutil.person_not_a_key_find_all base an in
