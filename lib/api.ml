@@ -471,19 +471,23 @@ let print_last_visited_persons conf base =
   let filters = get_filters conf in
   let list =
     if user = "" then []
-    else
-      let ht = Util.read_visited conf in
-      try Hashtbl.find ht user with
-      Not_found -> []
+    else try Hashtbl.find (Util.read_visited conf) user with Not_found -> []
   in
   (* On ne supprime pas le fichier de cache, même après un envoi Gendcom, *)
   (* donc on vérifie que les personnes existent toujours dans la base.    *)
   let list =
     List.fold_right
-      (fun (ip, _) accu -> try poi base ip :: accu with _ -> accu)
+      begin fun (ip, _) accu ->
+        try
+          let p = poi base ip in
+          if apply_filters_p conf filters (Perso.get_single_sosa conf base) p
+          then p :: accu
+          else accu
+        with _ -> accu
+      end
       list []
   in
-  let data = data_list_person conf base filters list in
+  let data = conv_data_list_person conf base filters list in
   print_result conf data
 
 
@@ -860,7 +864,8 @@ let print_all_persons conf base =
       end ([], 0) (Gwdb.ipers base)
   in
   let list = Gwdb.poi_batch base (List.rev @@ fst list) in
-  let data = data_list_person conf base filters list in
+  let list = List.filter (apply_filters_p conf filters Perso.get_sosa_person) list in
+  let data = conv_data_list_person conf base filters list in
   print_result conf data
 
 

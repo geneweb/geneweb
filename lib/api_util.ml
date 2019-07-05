@@ -2097,31 +2097,6 @@ let conv_data_list_person conf base filters l =
         let list = M.List_full_persons.({persons = pl}) in
         Mext.gen_list_full_persons list
 
-let data_list_person conf base filters l =
-  let compute_sosa =
-    if List.length l > 1 then
-      let () = Perso.build_sosa_ht conf base in
-      Perso.get_sosa_person
-    else (Perso.get_single_sosa conf base)
-  in
-  let load_img =
-    if List.length l > 20 then let () = load_image_ht conf in true
-    else false
-  in
-  let l = List.filter (apply_filters_p conf filters compute_sosa) l in
-  if filters.nb_results then
-    let len = M.Internal_int32.({value = Int32.of_int (List.length l)}) in
-    Mext.gen_internal_int32 len
-  else
-    let l = person_map conf base l compute_sosa load_img in
-    match l with
-    | PLight pl ->
-        let list = M.List_persons.({list_persons = pl}) in
-        Mext.gen_list_persons list
-    | PFull pl ->
-        let list = M.List_full_persons.({persons = pl}) in
-        Mext.gen_list_full_persons list
-
 let data_list_person_option conf base filters l =
   let compute_sosa =
     if List.length l > 1 then
