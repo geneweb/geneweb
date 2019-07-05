@@ -2,5 +2,5 @@
  (name sosa_num)
  (public_name geneweb.sosa-num)
  (libraries num)
- (implements sosa)
+ (implements geneweb.sosa.mli)
 )

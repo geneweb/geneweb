@@ -19,6 +19,6 @@
  (name gwdb1)
  (public_name geneweb.gwdb1)
  (libraries gwdb1_internal)
- (implements gwdb)
+ (implements geneweb.gwdb.mli)
  (modules gwdb)
 )
