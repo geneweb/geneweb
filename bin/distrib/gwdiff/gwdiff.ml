@@ -39,13 +39,13 @@ let person_string base iper =
   let fn = sou base (get_first_name p) in
   let sn = sou base (get_surname p) in
   if sn = "?" || fn = "?" then
-    fn ^ " " ^ sn ^ " (#" ^ string_of_int (Adef.int_of_iper iper) ^ ")"
+    fn ^ " " ^ sn ^ " (#" ^ string_of_iper iper ^ ")"
   else fn ^ "." ^ string_of_int (get_occ p) ^ " " ^ sn
 
 let person_link bname base iper target =
   if !html then
-    Printf.sprintf "<A HREF=\"%s%s_w?i=%d\" TARGET=\"%s\">%s</A>" !root bname
-      (Adef.int_of_iper iper) target (person_string base iper)
+    Printf.sprintf "<A HREF=\"%s%s_w?i=%s\" TARGET=\"%s\">%s</A>" !root bname
+      (string_of_iper iper) target (person_string base iper)
   else person_string base iper
 
 let print_message base1 msg =
@@ -341,10 +341,10 @@ let compatible_parents base1 base2 iper1 iper2 =
       print_p_messages base1 base2 iper1 iper2 [MsgParentsMissing]
 
 let rec ddiff base1 base2 iper1 iper2 d_tab =
-  let d_check = d_tab.(Adef.int_of_iper iper1) in
+  let d_check = Gwdb.Marker.get d_tab iper1 in
   if List.mem iper2 d_check then ()
   else
-    let _ = d_tab.(Adef.int_of_iper iper1) <- iper2 :: d_check in
+    let _ = Gwdb.Marker.set d_tab iper1 (iper2 :: d_check) in
     let spouse f iper =
       if iper = get_father f then get_mother f else get_father f
     in
@@ -424,7 +424,7 @@ let addiff base1 base2 iper1 iper2 d_tab =
 (* Main *)
 
 let gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
-  let desc_tab = Array.make (nb_of_persons base1) [] in
+  let desc_tab = Gwdb.iper_marker (Gwdb.ipers base1) [] in
   match d_mode, ad_mode with
     true, _ | false, false -> ddiff base1 base2 iper1 iper2 desc_tab
   | false, true -> addiff base1 base2 iper1 iper2 desc_tab
