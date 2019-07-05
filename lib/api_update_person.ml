@@ -366,16 +366,12 @@ let print_add conf base mod_p =
 
 let print_del conf base ip =
   let p = poi base ip in
-  let fn = sou base (get_first_name p) in
-  let sn = sou base (get_surname p) in
-  let occ = get_occ p in
   let old_related = get_related p in
   let op = Util.string_gen_person base (gen_person_of_person p) in
   UpdateIndOk.update_relations_of_related base ip old_related;
   let warning _ = () in
   let p = UpdateIndOk.effective_del base warning p in
   patch_person base ip p;
-  delete_key base fn sn occ;
   Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
   let changed = U_Delete_person op in
   let hr = [(fun () -> History.record conf base changed "dp")] in

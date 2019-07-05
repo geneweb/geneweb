@@ -379,8 +379,6 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 
   in
   patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (get_key_index p2);
-  delete_key base (sou base (get_first_name p2)) (sou base (get_surname p2))
-    (get_occ p2);
   let p2 = UpdateIndOk.effective_del base warning p2 in
   patch_person base p2.key_index p2;
   let s =
