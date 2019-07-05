@@ -439,12 +439,6 @@ module Collection = struct
 
 end
 
-
-
-
-(* FIXME: this implem only works for full fam/per arrays. Use hashtbl instead so partial
-   collections would still be able to use this marker? *)
-(* Also, if collection is modified during marking stuff, it won't work. *)
 module Marker = struct
 
   type ('k, 'v) t =
@@ -462,22 +456,28 @@ module Marker = struct
 
 end
 
-(* FIXME: do not wrap in option *)
-let ipers base =
+let pers_colletion fn base =
   { Collection.length = nb_of_persons base
-  ; get = (fun i -> Some (Type.iper_of_int i)) }
+  ; get = (fun i ->
+        let p = poi base i in
+        if get_iper p = dummy_iper then None else Some (fn p))
+  }
 
-let persons base = Collection.map (poi base) (ipers base)
+let ipers = pers_colletion get_iper
+let persons = pers_colletion (fun p -> p)
 
 let person_marker c i = Marker.make (fun p -> (Type.int_of_iper @@ get_iper p)) c i
 let iper_marker c i = Marker.make Type.int_of_iper c i
 
-let ifams base =
+let fam_collection fn base =
   { Collection.length = nb_of_families base
-  ; get = (fun i -> let i = Type.ifam_of_int i in if i <> dummy_ifam then Some i else None)
+  ; get = (fun i ->
+        let f = foi base i in
+        if get_ifam f = dummy_ifam then None else Some (fn f))
   }
 
-let families base = Collection.map (foi base) (ifams base)
+let ifams = fam_collection get_ifam
+let families = fam_collection (fun f -> f)
 
 let dummy_collection _ =
   { Collection.length = -1
