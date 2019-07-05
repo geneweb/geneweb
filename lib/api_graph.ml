@@ -210,12 +210,6 @@ let print_select_events conf base =
 (* Graphe d'ascendance *)
 
 let build_graph_asc conf base p max_gen =
-(*
-  let () = load_ascends_array base in
-  let () = load_unions_array base in
-  let () = load_couples_array base in
-  let () = Perso.build_sosa_ht conf base in
-*)
   let create_edge p_from p_to =
     M.Edge.({
       from_node = Gwdb.string_of_iper (get_key_index p_from);
@@ -255,8 +249,6 @@ let build_graph_asc conf base p max_gen =
   let families = ref [] in
   nodes := p :: !nodes;
   loop [(p, 1)] nodes edges families
-;;
-
 
 let print_graph_asc conf base =
   let params = get_params conf Mext.parse_graph_params in
@@ -291,18 +283,10 @@ let print_graph_asc conf base =
           Mext.gen_graph graph
   in
   print_result conf data
-;;
-
 
 (* Graphe d'ascendance lia *)
 
 let build_graph_asc_lia conf base p max_gen =
-(*
-  let () = load_ascends_array base in
-  let () = load_unions_array base in
-  let () = load_couples_array base in
-  let () = Perso.build_sosa_ht conf base in
-*)
   let ht = Hashtbl.create 42 in
   let create_edge baseprefix_from p_from baseprefix_to p_to =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
@@ -423,8 +407,6 @@ let build_graph_asc_lia conf base p max_gen =
   let families = ref [] in
   nodes := create_node p conf.command :: !nodes;
   loop [(p, 1)] nodes edges families
-;;
-
 
 let print_graph_asc_lia conf base =
   let params = get_params conf Mext.parse_graph_params in
@@ -459,17 +441,10 @@ let print_graph_asc_lia conf base =
           Mext.gen_graph graph
   in
   print_result conf data
-;;
 
 (* Graphe de descendance *)
 
 let build_graph_desc conf base p max_gen =
-(*
-  let () = load_descends_array base in
-  let () = load_unions_array base in
-  let () = load_couples_array base in
-  let () = Perso.build_sosa_ht conf base in
-*)
   let ht = Hashtbl.create 42 in
   let create_edge p_from p_to =
     M.Edge.({
@@ -534,8 +509,6 @@ let build_graph_desc conf base p max_gen =
   let families = ref [] in
   nodes := p :: !nodes;
   loop [(p, 1)] nodes edges families
-;;
-
 
 let print_graph_desc conf base =
   let params = get_params conf Mext.parse_graph_params in
@@ -570,25 +543,9 @@ let print_graph_desc conf base =
           Mext.gen_graph graph
   in
   print_result conf data
-;;
-
 
 (* Calcul de relation entre deux personnes *)
 let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
-(*
-  let base_loop = has_base_loop conf base in
-  let () = Perso.build_sosa_ht conf base in
-  let person_to_node p =
-    let id = Gwdb.string_of_iper (get_key_index p) in
-    let person =
-      pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person
-    in
-    M.Node.({
-      id = id;
-      person = person;
-    })
-  in
-*)
   let create_edge p_from p_to =
     M.Edge.({
       from_node = Gwdb.string_of_iper (get_key_index p_from);
@@ -648,8 +605,6 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
   in
   List.iter (fun (a, _) -> create_link a) list;
   (!nodes, !edges, !families)
-;;
-
 
 let print_graph_rel conf base =
   let params = get_params conf Mext.parse_graph_rel_params in
@@ -694,20 +649,12 @@ let print_graph_rel conf base =
           Mext.gen_graph graph
   in
   print_result conf data
-(*
-  let graph = M.Graph.({nodes = nodes; edges = edges}) in
-  let data = Mext.gen_graph graph in
-  print_result conf data
-*)
-;;
-
 
 let print_cpl_relation conf base =
   let params = get_params conf Mext.parse_cpl_rel_params in
   let filters = get_filters conf in
   let ref_p1 = params.M.Cpl_rel_params.person1 in
   let ref_p2 = params.M.Cpl_rel_params.person2 in
-(*  let base_loop = has_base_loop conf base in*)
   let list =
     match (piqi_ref_person_to_person base ref_p1,
            piqi_ref_person_to_person base ref_p2) with
