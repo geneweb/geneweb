@@ -336,7 +336,6 @@ and handler =
   ; linked : handler_base
   ; ll : handler_base
   ; lm : handler_base
-  ; lex : handler_base
   ; misc_notes : handler_base
   ; misc_notes_search : handler_base
   ; mod_data : handler_base
@@ -514,7 +513,6 @@ let dummyHandler =
   ; linked = dummy_base
   ; ll = dummy_base
   ; lm = dummy_base
-  ; lex = dummy_base
   ; misc_notes = dummy_base
   ; misc_notes_search = dummy_base
   ; mod_data = dummy_base
@@ -929,10 +927,6 @@ let defaultHandler : handler =
   ; lm = begin fun self conf base ->
       if conf.wizard || conf.friend then BirthDeath.print_marriage conf base
       else self.incorrect_request self conf base
-    end
-
-  ; lex = begin fun _self conf base ->
-      Srcfile.print_lexicon conf base
     end
 
   ; misc_notes = begin fun _self conf base ->

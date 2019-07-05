@@ -130,7 +130,6 @@ let family_m conf base =
       | "LINKED" -> handler.linked
       | "LL" -> handler.ll
       | "LM" -> handler.lm
-      | "LEX" -> handler.lex
       | "MISC_NOTES" -> handler.misc_notes
       | "MISC_NOTES_SEARCH" -> handler.misc_notes_search
       | "MOD_DATA" -> handler.mod_data
@@ -372,7 +371,7 @@ let print_no_index conf base =
   let link = url_no_index conf base in
   Hutil.header conf title;
   Wserver.printf "<ul>\n";
-  html_li conf;
+  Wserver.printf "<li>" ;
   Wserver.printf "<a href=\"http://%s\">\n" link;
   Wserver.printf "%s" link;
   Wserver.printf "</a>\n";
@@ -445,7 +444,7 @@ let treat_request_on_possibly_locked_base conf bfile =
       in
       Hutil.rheader conf title;
       Wserver.printf "<ul>";
-      Util.html_li conf;
+      Wserver.printf "<li>" ;
       Wserver.printf "%s" (Util.capitale (transl conf "cannot access base"));
       Wserver.printf " \"%s\".</ul>\n" conf.bname;
       begin match e with
