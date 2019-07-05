@@ -211,7 +211,6 @@ let family_m conf base =
           | "API_MAX_ANCESTORS" -> handler.api_max_ancestors
           | "API_NB_ANCESTORS" -> handler.api_nb_ancestors
           | "API_NOTIFICATION_BIRTHDAY" -> handler.api_notification_birthday
-          | "API_PRINT_INDEX" -> handler.api_print_index
           | "API_PRINT_EXPORT" -> handler.api_print_export
           | "API_PRINT_EXPORT_SEARCH" -> handler.api_print_export_search
           | "API_PRINT_SYNCHRO" -> handler.api_print_synchro
