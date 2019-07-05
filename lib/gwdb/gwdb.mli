@@ -267,7 +267,7 @@ module Collection : sig
   *)
   val fold : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
 
-  (** [fold continue fn acc c]
+  (** [fold_until continue fn acc c]
       Same as [fold fn acc c], but computation stops as soon as [continue]
       is not satisfied by combined value anymore.
   *)

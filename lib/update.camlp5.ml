@@ -1,6 +1,4 @@
-(* $Id: update.ml,v 5.48 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
-
 
 open Config
 open Def
@@ -27,7 +25,6 @@ type key = string * string * int * create * string
 
 let infer_death_from_age a =
   if a > 120 then OfCourseDead (*TODO private_years??? *)
-  (* TODO: TO BE REMOVED else if a <= 80 then NotDead *)
   else DontKnowIfDead
 
 let infer_death_from_date conf d =
