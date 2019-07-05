@@ -1,5 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+open Geneweb
 open Gwcomp
 open Dbdisk
 open Def
@@ -1346,10 +1347,10 @@ let link next_family_fun bdir =
     linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir
   in
   Hashtbl.clear gen.g_patch_p;
-  let base = Gwdb.base_of_base1 dsk_base in
+  let base = dsk_base in
   if !do_check && gen.g_pcnt > 0 then
     begin let changed_p (ip, p, o_sex, o_rpar) =
-      let p = Gwdb.dsk_person_of_person p in
+      let p = Gwdb1.dsk_person_of_person (Gwdb1.OfGwdb.person p) in
       let p =
         {p with sex = fold_option (fun s -> s) p.sex o_sex;
          rparents =
@@ -1361,6 +1362,7 @@ let link next_family_fun bdir =
       in
       let i = Adef.int_of_iper ip in Hashtbl.replace gen.g_patch_p i p
     in
+    let base = Gwdb1.ToGwdb.base base in
       Check.check_base base (set_error base gen) (set_warning base)
         (fun i -> gen.g_def.(i)) changed_p !pr_stats;
       flush stdout
@@ -1368,7 +1370,7 @@ let link next_family_fun bdir =
   if not gen.g_errored then
     begin
       if !do_consang then
-        (let _ = (ConsangAll.compute base (-1) true : _ option) in ());
+        (let _ = (ConsangAll.compute (Gwdb1.ToGwdb.base base) (-1) true : _ option) in ());
       Gc.compact ();
       Outbase.output bdir dsk_base;
       output_wizard_notes bdir gen.g_wiznotes;
@@ -1376,7 +1378,7 @@ let link next_family_fun bdir =
       (try Mutil.remove_dir tmp_dir with _ -> ());
       (try Unix.rmdir "gw_tmp" with _ -> ());
       output_command_line bdir;
-      Util.init_cache_info bdir base;
+      Util.init_cache_info bdir (Gwdb1.ToGwdb.base base);
       true
     end
   else false

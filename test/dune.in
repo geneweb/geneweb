@@ -1,6 +1,6 @@
 (executable
   (name test)
-  (libraries %%%SOSA_PKG%%% geneweb oUnit)
+  (libraries %%%SOSA_PKG%%% %%%GWDB_PKG%%% geneweb oUnit)
   (modules test test_place test_sosa test_utils)
 )
 

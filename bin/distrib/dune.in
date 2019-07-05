@@ -1,25 +1,40 @@
+(env (dev (flags (-w -33) ) ) )
+
 (include_subdirs unqualified)
 
 (executables
-  (public_names connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
-  (modules connex gwc1 gwc2 gwd gwu mk_consang setup update_nldb)
-  (libraries %%%SOSA_PKG%%% geneweb geneweb.wserver)
+  (public_names connex gwb2ged gwd gwdiff gwu setup update_nldb)
+  (modules connex gwb2ged gwdiff gwd gwu setup update_nldb)
+  (libraries str %%%GWDB_PKG%%% geneweb geneweb.wserver)
 )
 
 (executables
-  (public_names ged2gwb ged2gwb2)
-  (modules ged2gwb ged2gwb2 utf8List)
-  (libraries unix str camlp5.gramlib %%%SOSA_PKG%%% geneweb)
-)
-
-(executables
-  (public_names gwb2ged gwdiff)
-  (modules gwb2ged gwdiff)
-  (libraries str %%%SOSA_PKG%%% geneweb)
-)
-
-(executables
-  (public_names gwtp)
+  (names gwtp)
   (modules gwtp httpEnv iolight)
-  (libraries %%%SOSA_PKG%%% geneweb)
+  (libraries %%%GWDB_PKG%%% geneweb)
 )
+
+(rule (copy mk_consang/mk_consang.ml consang.ml))
+(executable
+  (public_name consang)
+  (modules consang)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (libraries %%%GWDB_PKG%%% geneweb)
+)
+
+#ifdef GWDB1
+(library (name db1link) (wrapped false) (libraries geneweb.gwdb1 geneweb) (modules db1link))
+(rule (copy gwc/gwc1.ml gwc.ml))
+(rule (copy ged2gwb/ged2gwb1.ml ged2gwb.ml))
+(executable
+  (public_name gwc)
+  (modules gwc)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (libraries geneweb.gwdb1 geneweb geneweb.wserver db1link)
+)
+(executable
+  (public_name ged2gwb)
+  (modules ged2gwb utf8List)
+  (libraries unix str camlp5.gramlib geneweb.gwdb1 geneweb)
+)
+#endif
