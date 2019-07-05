@@ -361,7 +361,7 @@ let print_add conf base mod_p =
         let hr = [(fun () -> History.record conf base changed "ap")] in
         Api_update_util.UpdateSuccess (wl, [], hr)
   with
-  | Update.ModErrApi s -> Api_update_util.UpdateError s
+  | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
 let print_del conf base ip =
@@ -396,7 +396,7 @@ let print_mod_aux conf base mod_p callback =
       let _ = Update.error_digest conf in
       Api_update_util.UpdateError "BaseChanged"
   with
-  | Update.ModErrApi s -> Api_update_util.UpdateError s
+  | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
 
@@ -766,7 +766,7 @@ let print_add_nobase conf mod_p =
     (* On n'appelle pas CheckItem car ils ne sont pas révélateurs *)
     Api_update_util.UpdateSuccess ([], [], [])
   with
-  | Update.ModErrApi s -> Api_update_util.UpdateError s
+  | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
 #endif

@@ -172,7 +172,7 @@ let check_person_conflict conf base sp =
           let key = fn ^ " " ^ sn in
           let ipl = Gutil.person_ht_find_all base key in
           (try UpdateIndOk.check_conflict conf base sp ipl
-           with Update.ModErrApi _ ->
+           with Update.ModErr _ ->
              let conflict =
                let form = Some `person_form1 in
                let lastname = sp.surname in

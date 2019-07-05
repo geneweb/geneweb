@@ -215,7 +215,7 @@ let check_conflict conf base p key new_occ ipl =
        then
          begin
            print_conflict conf base (get_iper p) p1;
-           raise Update.ModErr
+           raise @@ Update.ModErr __LOC__
          end)
     ipl
 
@@ -224,7 +224,7 @@ let error_person conf err =
   Hutil.rheader conf title;
   Wserver.printf "%s\n" (capitale err);
   Hutil.trailer conf;
-  raise Update.ModErr
+  raise @@ Update.ModErr __LOC__
 
 let rename_image_file conf base p (nfn, nsn, noc) =
   match auto_image_file conf base p with
@@ -297,30 +297,28 @@ let print_update_child conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_change_ok conf base p =
-  try
-    let ipl = select_children_of base p in
-    let parent_surname = p_surname base p in
-    let redisp =
-      match p_getenv conf.env "return" with
-        Some _ -> true
-      | _ -> false
+  let ipl = select_children_of base p in
+  let parent_surname = p_surname base p in
+  let redisp =
+    match p_getenv conf.env "return" with
+      Some _ -> true
+    | _ -> false
+  in
+  if redisp then print_update_child conf base
+  else begin
+    check_digest conf (digest_children base ipl);
+    let changed =
+      try change_children conf base parent_surname ipl
+      with FirstNameMissing _ -> error_person conf (transl conf "first name missing")
     in
-    if redisp then print_update_child conf base
-    else begin
-      check_digest conf (digest_children base ipl);
-      let changed =
-        try change_children conf base parent_surname ipl
-        with FirstNameMissing _ -> error_person conf (transl conf "first name missing")
-      in
-      Util.commit_patches conf base;
-      let changed =
-        U_Change_children_name
-          (Util.string_gen_person base (gen_person_of_person p), changed)
-      in
-      History.record conf base changed "cn";
-      print_change_done conf base p
-    end
-  with Update.ModErr -> ()
+    Util.commit_patches conf base;
+    let changed =
+      U_Change_children_name
+        (Util.string_gen_person base (gen_person_of_person p), changed)
+    in
+    History.record conf base changed "cn";
+    print_change_done conf base p
+  end
 
 let print_ok o_conf base =
   let conf = Update.update_conf o_conf in

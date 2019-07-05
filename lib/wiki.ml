@@ -849,32 +849,30 @@ let print_ok conf wi edit_mode fname title_is_1st s =
 let print_mod_ok conf wi edit_mode fname read_string commit string_filter
     title_is_1st =
   let fname = fname (Util.p_getenv conf.env "f") in
-  try
-    match edit_mode fname with
-      Some edit_mode ->
-        let old_string =
-          let (e, s) = read_string fname in
-          List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
-        in
-        let sub_part =
-          match Util.p_getenv conf.env "notes" with
-            Some v -> Mutil.strip_all_trailing_spaces v
-          | None -> failwith "notes unbound"
-        in
-        let digest =
-          match Util.p_getenv conf.env "digest" with
-            Some s -> s
-          | None -> ""
-        in
-        if digest <> Iovalue.digest old_string then Update.error_digest conf
-        else
-          let s =
-            match Util.p_getint conf.env "v" with
-              Some v -> insert_sub_part old_string v sub_part
-            | None -> sub_part
-          in
-          if s <> old_string then commit fname s;
-          let sub_part = string_filter sub_part in
-          print_ok conf wi edit_mode fname title_is_1st sub_part
-    | None -> Hutil.incorrect_request conf
-  with Update.ModErr -> ()
+  match edit_mode fname with
+    Some edit_mode ->
+    let old_string =
+      let (e, s) = read_string fname in
+      List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
+    in
+    let sub_part =
+      match Util.p_getenv conf.env "notes" with
+        Some v -> Mutil.strip_all_trailing_spaces v
+      | None -> failwith "notes unbound"
+    in
+    let digest =
+      match Util.p_getenv conf.env "digest" with
+        Some s -> s
+      | None -> ""
+    in
+    if digest <> Iovalue.digest old_string then Update.error_digest conf
+    else
+      let s =
+        match Util.p_getint conf.env "v" with
+          Some v -> insert_sub_part old_string v sub_part
+        | None -> sub_part
+      in
+      if s <> old_string then commit fname s;
+      let sub_part = string_filter sub_part in
+      print_ok conf wi edit_mode fname title_is_1st sub_part
+  | None -> Hutil.incorrect_request conf

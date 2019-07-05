@@ -735,23 +735,22 @@ let print_add_ok conf base =
   then
     visualize conf base mess
   else if mess.m_ident = "" || mess.m_text = "" then print conf base
-  else
+  else begin
     let title _ =
       Wserver.printf "%s" (capitale (transl conf "message added"))
     in
-    try
-      let mods = moderators conf in
-      forum_add conf base (mods <> []) mess;
-      Hutil.header conf title;
-      Hutil.print_link_to_welcome conf true;
-      if mods <> [] then
-        Wserver.printf "<p>%s. %s.</p>"
-          (capitale (transl conf "this forum is moderated"))
-          (capitale (transl conf "your message is waiting for validation"));
-      Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-        (capitale (transl conf "database forum"));
-      Hutil.trailer conf
-    with Update.ModErr -> ()
+    let mods = moderators conf in
+    forum_add conf base (mods <> []) mess;
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf true;
+    if mods <> [] then
+      Wserver.printf "<p>%s. %s.</p>"
+        (capitale (transl conf "this forum is moderated"))
+        (capitale (transl conf "your message is waiting for validation"));
+    Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+      (capitale (transl conf "database forum"));
+    Hutil.trailer conf
+  end
 
 (* Deleting a message *)
 
@@ -795,11 +794,10 @@ let delete_forum_message conf base pos =
       if a && conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
          passwd_in_file conf "wizard" ||
          conf.manitou || conf.supervisor
-      then
-        try
-          forum_del conf pos;
-          print_del_ok conf (find_next_pos conf pos)
-        with Update.ModErr -> ()
+      then begin
+        forum_del conf pos;
+        print_del_ok conf (find_next_pos conf pos)
+      end
       else print_forum_headers conf base
   | None -> print_forum_headers conf base
 
