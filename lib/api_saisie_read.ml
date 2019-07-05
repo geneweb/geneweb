@@ -402,7 +402,7 @@ let event_to_piqi_event pevt_name fevt_name =
 let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
   if is_restricted conf base (get_iper p) then
     {
-      Mread.Person_tree.index = Gwdb.string_of_iper Gwdb.dummy_iper;
+      Mread.Person_tree.index = Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
       sex = `unknown;
       lastname = "x";
       firstname = "x";
@@ -417,7 +417,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
     }
   else
     let p_auth = authorized_age conf base p in
-    let index = Gwdb.string_of_iper (get_iper p) in
+    let index = Int32.of_string @@ Gwdb.string_of_iper (get_iper p) in
     let sex =
       match get_sex p with
       | Male -> `male
@@ -492,7 +492,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
 (* Common functions to build a SimplePerson or a FichePerson. *)
 let get_restricted_person () =
   let restricted_person = Mread.default_person () in
-  restricted_person.Mread.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  restricted_person.Mread.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   restricted_person.Mread.Person.lastname <- "x";
   restricted_person.Mread.Person.firstname <- "x";
   restricted_person
@@ -559,14 +559,14 @@ let fill_surname_aliases p_auth gen_p =
 let pers_to_piqi_simple_person conf base p base_prefix =
   if is_restricted conf base (get_iper p) then
     let restricted_person = Mread.default_simple_person() in
-    restricted_person.Mread.Simple_person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+    restricted_person.Mread.Simple_person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
     restricted_person.Mread.Simple_person.lastname <- "x";
     restricted_person.Mread.Simple_person.firstname <- "x";
     restricted_person.Mread.Simple_person.visible_for_visitors <- false;
     restricted_person
   else
     let p_auth = authorized_age conf base p in
-    let index = Gwdb.string_of_iper (get_iper p) in
+    let index = Int32.of_string @@ Gwdb.string_of_iper (get_iper p) in
     let visible_for_visitors = is_visible conf base p in
     let sex =
       match get_sex p with
@@ -698,7 +698,7 @@ let fam_to_piqi_family_link conf base (ifath : Gwdb.iper) imoth sp ifam fam fam_
   let p_auth = true in
   let m_auth = true in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
-  let index = Gwdb.string_of_ifam gen_f.fam_index in
+  let index = Int32.of_string @@ Gwdb.string_of_ifam gen_f.fam_index in
   let (marriage_date, marriage_date_long, marriage_date_conv, marriage_date_conv_long, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_cdate gen_f.marriage) with
     | (true, Some d) ->
@@ -967,7 +967,7 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
     authorized_age conf base (pget conf base imoth)
   in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
-  let index = Gwdb.string_of_ifam gen_f.fam_index in
+  let index = Int32.of_string @@ Gwdb.string_of_ifam gen_f.fam_index in
   let (marriage_date, marriage_date_long, marriage_date_conv, marriage_date_conv_long, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_cdate gen_f.marriage) with
     | (true, Some d) ->
@@ -1050,7 +1050,7 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
          List.fold_right
            (fun c_link accu ->
               let baseprefix = c_link.MLink.Person_link.baseprefix in
-              let ip_c = Gwdb.iper_of_string c_link.MLink.Person_link.ip in
+              let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
               match Perso_link.get_person_link baseprefix ip_c with
               | Some c_link ->
                   let can_merge =
@@ -1103,9 +1103,9 @@ let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_
            Perso_link.make_efam_link conf base fam_link
          in
          let (ifath, imoth, ifam) =
-           (Gwdb.iper_of_string fam_link.MLink.Family.ifath,
-            Gwdb.iper_of_string fam_link.MLink.Family.imoth,
-            Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
+           (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
+            Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
+            Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
          in
          let cpl =
            let ip = get_iper p in
@@ -1115,7 +1115,7 @@ let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_
                  conf.command ip fam_link.MLink.Family.baseprefix
              with
              | Some p ->
-                 let ip = Gwdb.iper_of_string p.MLink.Person.ip in
+                 let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
                  (ifath, imoth, if ip = ifath then imoth else ifath)
              | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
            else (ifath, imoth, if ip = ifath then imoth else ifath)
@@ -1413,9 +1413,9 @@ let fill_occupation conf base p_auth gen_p =
 let fill_index conf p p_auth =
   if not p_auth && (is_hide_names conf p)
   then
-    Gwdb.string_of_iper Gwdb.dummy_iper
+    Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper
   else
-    Gwdb.string_of_iper (get_iper p)
+    Int32.of_string @@ Gwdb.string_of_iper (get_iper p)
 
 let fill_sources conf base p p_auth gen_p is_main_person =
   if p_auth && is_main_person then
@@ -1459,8 +1459,8 @@ let fill_parents conf base p base_prefix =
     match Perso_link.get_parents_link base_prefix ip with
     | Some family ->
         begin
-          let ifath = Gwdb.iper_of_string family.MLink.Family.ifath in
-          let imoth = Gwdb.iper_of_string family.MLink.Family.imoth in
+          let ifath = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath in
+          let imoth = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth in
           let fam_base_prefix = family.MLink.Family.baseprefix in
           match
             (Perso_link.get_person_link fam_base_prefix ifath,
@@ -1515,8 +1515,8 @@ let fill_fiche_parents conf base p base_prefix nb_asc nb_asc_max with_parent_fam
         match Perso_link.get_parents_link base_prefix ip with
         | Some family ->
             begin
-              let ifath = Gwdb.iper_of_string family.MLink.Family.ifath in
-              let imoth = Gwdb.iper_of_string family.MLink.Family.imoth in
+              let ifath = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath in
+              let imoth = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth in
               let fam_base_prefix = family.MLink.Family.baseprefix in
               match
                 (Perso_link.get_person_link fam_base_prefix ifath,
@@ -1930,7 +1930,7 @@ let pers_to_piqi_person conf base p base_prefix is_main_person =
 let fill_ref_if_is_main_person conf base is_main_person =
   if is_main_person then
     match Util.find_sosa_ref conf base with
-      | Some ref -> ( Some (Gwdb.string_of_iper (get_iper ref))
+      | Some ref -> ( Some (Int32.of_string @@ Gwdb.string_of_iper (get_iper ref))
                     , Some (pers_to_piqi_person conf base ref conf.command false) )
       | None -> (None, None)
   else
@@ -2093,13 +2093,13 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix is_main_person nb_asc 
 (* ********************************************************************* *)
 let print_person_tree conf base =
   let params = get_params conf Mext_read.parse_index_person in
-  let ip = Gwdb.iper_of_string params.Mread.Index_person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mread.Index_person.index in
   (* Construction de la base avec calcul des sosas           *)
   (* Si iz présent, on prend iz comme souche pour le calcul  *)
   (* Sinon on prend la souche de l'arbre                     *)
   let () =
     match params.Mread.Index_person.indexz with
-      | Some n -> Perso.build_sosa_tree_ht conf base (poi base (Gwdb.iper_of_string n))
+      | Some n -> Perso.build_sosa_tree_ht conf base (poi base (Gwdb.iper_of_string @@ Int32.to_string n))
       | None -> Perso.build_sosa_ht conf base
     in
   let p = poi base ip in
@@ -2221,7 +2221,7 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
   | exception _ -> print_error conf `not_found
   | Some index ->
     (* Traite l'index *)
-    let ip = Gwdb.iper_of_string index in
+    let ip = Gwdb.iper_of_string @@ Int32.to_string index in
     if identifier_person.Mread.Identifier_person.track_visit = Some true
     then record_visited conf ip;
     print_result_from_ip conf base ip
@@ -2328,10 +2328,10 @@ let build_graph_asc_v2 conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
+      Int64.of_string @@ string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
+      Int64.of_string @@ string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -2342,7 +2342,7 @@ let build_graph_asc_v2 conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
-    let id = string_of_int uniq_id in
+    let id = Int64.of_string @@ string_of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
     Mread.Node.({
       id = id;
@@ -2414,8 +2414,8 @@ let build_graph_asc_v2 conf base p max_gen =
                           match Perso_link.get_parents_link base_prefix ip with
                           | Some family ->
                               begin
-                                let ifath = Gwdb.iper_of_string family.MLink.Family.ifath in
-                                let imoth = Gwdb.iper_of_string family.MLink.Family.imoth in
+                                let ifath = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath in
+                                let imoth = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth in
                                 let fam_base_prefix = family.MLink.Family.baseprefix in
                                 match
                                   (Perso_link.get_person_link fam_base_prefix ifath,
@@ -2477,10 +2477,10 @@ let build_graph_desc_v2 conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
+      Int64.of_string @@ string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
+      Int64.of_string @@ string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -2491,9 +2491,9 @@ let build_graph_desc_v2 conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
-    let id = string_of_int uniq_id in
+    let id = Int64.of_string @@ string_of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
-    let ifam = Gwdb.string_of_ifam ifam in
+    let ifam = Int64.of_string @@ Gwdb.string_of_ifam ifam in
     Mread.Node.({
       id = id;
       person = p;
@@ -2582,9 +2582,9 @@ let build_graph_desc_v2 conf base p max_gen =
                                     List.fold_left
                                       (fun accu fam_link ->
                                         let (ifath, imoth, ifam) =
-                                          (Gwdb.iper_of_string fam_link.MLink.Family.ifath,
-                                           Gwdb.iper_of_string fam_link.MLink.Family.imoth,
-                                           Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
+                                          (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
+                                           Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
+                                           Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
                                         in
                                         let cpl =
                                           let ip = get_iper p in
@@ -2594,7 +2594,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                               conf.command ip fam_link.MLink.Family.baseprefix
                                           with
                                           | Some p ->
-                                              let ip = Gwdb.iper_of_string p.MLink.Person.ip in
+                                              let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
                                               (ifath, imoth, if ip = ifath then imoth else ifath)
                                           | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
                                           else (ifath, imoth, if ip = ifath then imoth else ifath)
@@ -2610,7 +2610,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                         List.fold_left
                                           (fun accu c_link ->
                                             let baseprefix = c_link.MLink.Person_link.baseprefix in
-                                            let ip_c = Gwdb.iper_of_string c_link.MLink.Person_link.ip in
+                                            let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
                                             match Perso_link.get_person_link baseprefix ip_c with
                                             | Some c_link ->
                                                 let can_merge =
@@ -2665,9 +2665,9 @@ let build_graph_desc_v2 conf base p max_gen =
                           List.fold_left
                             (fun accu fam_link ->
                                let (ifath, imoth, _) =
-                                 (Gwdb.iper_of_string fam_link.MLink.Family.ifath,
-                                  Gwdb.iper_of_string fam_link.MLink.Family.imoth,
-                                  Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
+                                 (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
+                                  Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
+                                  Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
                                in
                                let cpl =
                                  let ip = get_iper p in
@@ -2677,7 +2677,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                        conf.command ip fam_link.MLink.Family.baseprefix
                                    with
                                    | Some p ->
-                                       let ip = Gwdb.iper_of_string p.MLink.Person.ip in
+                                       let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
                                        (ifath, imoth, if ip = ifath then imoth else ifath)
                                    | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
                                  else (ifath, imoth, if ip = ifath then imoth else ifath)
@@ -2693,7 +2693,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                  | Some sp ->
                                      let (sp, _) = Perso_link.make_ep_link base sp in
                                      let baseprefix = fam_link.MLink.Family.baseprefix in
-                                     let ifam = Gwdb.ifam_of_string fam_link.MLink.Family.ifam in
+                                     let ifam = Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam in
                                      let sp_factor =
                                        try
                                          let i = Hashtbl.find ht (baseprefix, get_iper sp) + 1 in
@@ -2713,7 +2713,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                               List.fold_left
                                                 (fun accu c_link ->
                                                    let baseprefix = c_link.MLink.Person_link.baseprefix in
-                                                   let ip_c = Gwdb.iper_of_string c_link.MLink.Person_link.ip in
+                                                   let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
                                                    match Perso_link.get_person_link baseprefix ip_c with
                                                    | Some c_link ->
                                                      let (c, _) = Perso_link.make_ep_link base c_link in
@@ -2768,7 +2768,7 @@ let print_result_graph_tree_v2 conf base ip =
   (* Sinon on prend la souche de l'arbre                     *)
   let () =
     match params.Mread.Graph_tree_params.indexz with
-      | Some n -> Perso.build_sosa_tree_ht conf base (poi base (Gwdb.iper_of_string n))
+      | Some n -> Perso.build_sosa_tree_ht conf base (poi base (Gwdb.iper_of_string @@ Int32.to_string n))
       | None -> Perso.build_sosa_ht conf base
     in
   let p = poi base ip in
@@ -2785,7 +2785,7 @@ let print_result_graph_tree_v2 conf base ip =
   let nodes_asc =
     List.rev_map
       (fun p ->
-        let id = Gwdb.string_of_iper (get_iper p) in
+        let id = Int32.of_string @@ Gwdb.string_of_iper (get_iper p) in
         let p = pers_to_piqi_person_tree conf base p in
         Mread.Node.({
           id = id;
@@ -2814,7 +2814,7 @@ let print_result_graph_tree_v2 conf base ip =
               (* Pour les liens inter arbres, on rend l'id unique avec *)
               (* le prefix de la base et l'index de la personne.       *)
               let uniq_id = Hashtbl.hash (conf.command, ic) in
-              let id = string_of_int uniq_id in
+              let id = Int64.of_string @@ string_of_int uniq_id in
               let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
               let node =
                 Mread.Node.({
@@ -2844,7 +2844,7 @@ let print_result_graph_tree_v2 conf base ip =
                       (* Pour les liens inter arbres, on rend l'id unique avec *)
                       (* le prefix de la base et l'index de la personne.       *)
                       let uniq_id = Hashtbl.hash (conf.command, ic) in
-                      let id = string_of_int uniq_id in
+                      let id = Int64.of_string @@ string_of_int uniq_id in
                       let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
                       Mread.Node.({
                         id = id;
@@ -2859,7 +2859,7 @@ let print_result_graph_tree_v2 conf base ip =
                 (* Pour les liens inter arbres, on rend l'id unique avec *)
                 (* le prefix de la base et l'index de la personne.       *)
                 let uniq_id = Hashtbl.hash (conf.command, ic) in
-                let id = string_of_int uniq_id in
+                let id = Int64.of_string @@ string_of_int uniq_id in
                 let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
                 let node =
                   Mread.Node.({
@@ -2907,7 +2907,7 @@ let print_result_graph_tree_v2 conf base ip =
 let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix =
   if is_restricted conf base (get_iper p) then
     {
-      Mread.Person_tree_full.index = Gwdb.string_of_iper Gwdb.dummy_iper;
+      Mread.Person_tree_full.index = Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
       sex = `unknown;
       lastname = "x";
       firstname = "x";
@@ -2944,7 +2944,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
   else
     let gen_p = Util.string_gen_person base (gen_person_of_person p) in
     let p_auth = authorized_age conf base p in
-    let index = Gwdb.string_of_iper gen_p.key_index in
+    let index = Int32.of_string @@ Gwdb.string_of_iper gen_p.key_index in
     let sex =
       match gen_p.sex with
       | Male -> `male
@@ -3176,7 +3176,7 @@ let fam_to_piqi_family_tree conf base ifam =
     authorized_age conf base (pget conf base ifath) &&
     authorized_age conf base (pget conf base imoth)
   in
-  let index = Gwdb.string_of_ifam ifam in
+  let index = Int32.of_string @@ Gwdb.string_of_ifam ifam in
   let fsources =
     if m_auth then Some gen_f.fsources
     else None
@@ -3243,7 +3243,7 @@ let fam_to_piqi_family_tree conf base ifam =
 (* *********************************************************************** *)
 let fam_to_piqi_family_tree_link base ifam fam =
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
-  let index = Gwdb.string_of_ifam ifam in
+  let index = Int32.of_string @@ Gwdb.string_of_ifam ifam in
   let fsources = None in
   let marriage =
     match Adef.od_of_cdate gen_f.marriage with
@@ -3301,10 +3301,10 @@ let build_graph_asc_full conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
+      Int64.of_string @@ string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
+      Int64.of_string @@ string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -3391,8 +3391,8 @@ let build_graph_asc_full conf base p max_gen =
                           match Perso_link.get_parents_link base_prefix ip with
                           | Some family ->
                               begin
-                                let ifath = Gwdb.iper_of_string family.MLink.Family.ifath in
-                                let imoth = Gwdb.iper_of_string family.MLink.Family.imoth in
+                                let ifath = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath in
+                                let imoth = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth in
                                 let fam_base_prefix = family.MLink.Family.baseprefix in
                                 let (ifam, fam, _, _) = Perso_link.make_efam_link conf base family in
                                 match
@@ -3456,10 +3456,10 @@ let build_graph_desc_full conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
+      Int64.of_string @@ string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
+      Int64.of_string @@string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -3472,7 +3472,7 @@ let build_graph_desc_full conf base p max_gen =
     let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix in
-    let ifam = Gwdb.string_of_ifam ifam in
+    let ifam = Int64.of_string @@ Gwdb.string_of_ifam ifam in
     Mread.Node_full.({
       id = id;
       person = p;
@@ -3563,9 +3563,9 @@ let build_graph_desc_full conf base p max_gen =
                                     List.fold_left
                                       (fun accu fam_link ->
                                         let (ifath, imoth, ifam) =
-                                          (Gwdb.iper_of_string fam_link.MLink.Family.ifath,
-                                           Gwdb.iper_of_string fam_link.MLink.Family.imoth,
-                                           Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
+                                          (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
+                                           Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
+                                           Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
                                         in
                                         let cpl =
                                           let ip = get_iper p in
@@ -3575,7 +3575,7 @@ let build_graph_desc_full conf base p max_gen =
                                               conf.command ip fam_link.MLink.Family.baseprefix
                                           with
                                           | Some p ->
-                                              let ip = Gwdb.iper_of_string p.MLink.Person.ip in
+                                              let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
                                               (ifath, imoth, if ip = ifath then imoth else ifath)
                                           | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
                                           else (ifath, imoth, if ip = ifath then imoth else ifath)
@@ -3592,7 +3592,7 @@ let build_graph_desc_full conf base p max_gen =
                                         List.fold_left
                                           (fun accu c_link ->
                                             let baseprefix = c_link.MLink.Person_link.baseprefix in
-                                            let ip_c = Gwdb.iper_of_string c_link.MLink.Person_link.ip in
+                                            let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
                                             match Perso_link.get_person_link baseprefix ip_c with
                                             | Some c_link ->
                                                 let can_merge =
@@ -3647,9 +3647,9 @@ let build_graph_desc_full conf base p max_gen =
                           List.fold_left
                             (fun accu fam_link ->
                                let (ifath, imoth, _) =
-                                 (Gwdb.iper_of_string fam_link.MLink.Family.ifath,
-                                  Gwdb.iper_of_string fam_link.MLink.Family.imoth,
-                                  Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
+                                 (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
+                                  Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
+                                  Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
                                in
                                let cpl =
                                  let ip = get_iper p in
@@ -3659,7 +3659,7 @@ let build_graph_desc_full conf base p max_gen =
                                        conf.command ip fam_link.MLink.Family.baseprefix
                                    with
                                    | Some p ->
-                                       let ip = Gwdb.iper_of_string p.MLink.Person.ip in
+                                       let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
                                        (ifath, imoth, if ip = ifath then imoth else ifath)
                                    | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
                                  else (ifath, imoth, if ip = ifath then imoth else ifath)
@@ -3675,7 +3675,7 @@ let build_graph_desc_full conf base p max_gen =
                                  | Some sp ->
                                      let (sp, _) = Perso_link.make_ep_link base sp in
                                      let baseprefix = fam_link.MLink.Family.baseprefix in
-                                     let ifam = Gwdb.ifam_of_string fam_link.MLink.Family.ifam in
+                                     let ifam = Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam in
                                      let sp_factor =
                                        try
                                          let i = Hashtbl.find ht (baseprefix, get_iper sp) + 1 in
@@ -3701,7 +3701,7 @@ let build_graph_desc_full conf base p max_gen =
                                               List.fold_left
                                                 (fun accu c_link ->
                                                    let baseprefix = c_link.MLink.Person_link.baseprefix in
-                                                   let ip_c = Gwdb.iper_of_string c_link.MLink.Person_link.ip in
+                                                   let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
                                                    match Perso_link.get_person_link baseprefix ip_c with
                                                    | Some c_link ->
                                                      let (c, _) = Perso_link.make_ep_link base c_link in

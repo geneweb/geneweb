@@ -120,7 +120,7 @@ let print_person_search_list conf base =
 (* ************************************************************************ *)
 let print_person_search_info conf base =
   let params = get_params conf Mext_write.parse_index_person in
-  let ip = Gwdb.iper_of_string params.Mwrite.Index_person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person.index in
   let p = poi base ip in
   let pers = Api_update_util.pers_to_piqi_person_search_info conf base p in
   let data = Mext_write.gen_person_search_info pers in
@@ -973,7 +973,7 @@ let compute_modification_status conf base ip ifam resp =
       let p = poi base ip in
       let surname = sou base (get_surname p) in
       let first_name = sou base (get_first_name p) in
-      let index_person = Some (Gwdb.string_of_iper ip) in
+      let index_person = Some (Int32.of_string @@ Gwdb.string_of_iper ip) in
       let occ = get_occ p in
       let occ = if occ = 0 then None else Some (Int32.of_int occ) in
       let surname_str = Some (sou base (get_surname p)) in
@@ -987,7 +987,7 @@ let compute_modification_status conf base ip ifam resp =
   in
   let sn = if surname = "" then None else Some (Name.lower surname) in
   let fn = if first_name = "" then None else Some (Name.lower first_name) in
-  let index_family = if ifam = Gwdb.dummy_ifam then None else Some (Gwdb.string_of_ifam ifam) in
+  let index_family = if ifam = Gwdb.dummy_ifam then None else Some (Int32.of_string @@ Gwdb.string_of_ifam ifam) in
   let (is_base_updated, warnings, miscs, conflict, history_records) =
     compute_warnings conf base resp
   in
@@ -1050,7 +1050,7 @@ let print_add_ind_start_ok conf base =
         })
     | Api_update_util.UpdateSuccess _ ->
         Util.commit_patches conf base;
-        let ip = Gwdb.iper_of_string mod_p.Mwrite.Person.index in
+        let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
         let p = poi base ip in
         let fn = Name.lower (sou base (get_first_name p)) in
         let sn = Name.lower (sou base (get_surname p)) in
@@ -1081,7 +1081,7 @@ let print_add_ind_start_ok conf base =
 (* ************************************************************************ *)
 let print_mod_ind conf base =
   let params = get_params conf Mext_write.parse_index_person in
-  let ip = Gwdb.iper_of_string params.Mwrite.Index_person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person.index in
   let p = poi base ip in
   let mod_p = Api_update_util.pers_to_piqi_mod_person conf base p in
   let data = Mext_write.gen_person mod_p in
@@ -1101,7 +1101,7 @@ let print_mod_ind conf base =
 let print_mod_ind_ok conf base =
   let mod_p = get_params conf Mext_write.parse_person in
   let resp = Api_update_person.print_mod conf base mod_p in
-  let ip = Gwdb.iper_of_string mod_p.Mwrite.Person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
   let data = compute_modification_status conf base ip Gwdb.dummy_ifam resp in
   print_result conf data
 
@@ -1119,7 +1119,7 @@ let print_mod_ind_ok conf base =
 let print_add_ind_ok conf base =
   let mod_p = get_params conf Mext_write.parse_person in
   let resp = Api_update_person.print_add conf base mod_p in
-  let ip = Gwdb.iper_of_string mod_p.Mwrite.Person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
   let data = compute_modification_status conf base ip Gwdb.dummy_ifam resp in
   print_result conf data
 
@@ -1174,7 +1174,7 @@ let compute_redirect_person conf base ip =
 (* ************************************************************************ *)
 let print_del_ind_ok conf base =
   let params = get_params conf Mext_write.parse_index_person in
-  let ip = Gwdb.iper_of_string params.Mwrite.Index_person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person.index in
   let ip_redirect = compute_redirect_person conf base ip in
   (* Si la personne n'a pas d'enfant, on veut alors *)
   (* également le délier de sa/ses famille/s        *)
@@ -1234,9 +1234,9 @@ let print_del_ind_ok conf base =
 (* ************************************************************************ *)
 let print_del_fam_ok conf base =
   let params = get_params conf Mext_write.parse_index_person_and_family in
-  let ip = Gwdb.iper_of_string params.Mwrite.Index_person_and_family.index_person in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_person in
   let ifam =
-    Gwdb.ifam_of_string params.Mwrite.Index_person_and_family.index_family
+    Gwdb.ifam_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_family
   in
   let resp = Api_update_family.print_del conf base ip ifam in
   let data =
@@ -1246,7 +1246,7 @@ let print_del_fam_ok conf base =
 
 let set_parents_fields conf base p linked created =
   linked.Mwrite.Person.create_link <- `link;
-  created.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  created.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   created.Mwrite.Person.access <- `access_iftitles;
   created.Mwrite.Person.create_link <- `create_default_occ;
   created.Mwrite.Person.digest <- "";
@@ -1284,7 +1284,7 @@ let compute_add_family conf base p =
   let mother = Api_update_util.pers_to_piqi_mod_person conf base p_mother in
   (* Les index négatifs ne marchent pas ! *)
   (* Par défaut, les access sont en Private, on passe en Iftitles. *)
-  family.Mwrite.Family.index <- Gwdb.string_of_ifam Gwdb.dummy_ifam;
+  family.Mwrite.Family.index <- Int32.of_string @@ Gwdb.string_of_ifam Gwdb.dummy_ifam;
   if adding_to_father
   then begin
     mother.Mwrite.Person.sex <- `female ;
@@ -1311,7 +1311,7 @@ let compute_add_family conf base p =
 (* ************************************************************************ *)
 let print_add_family conf base =
   let params = get_params conf Mext_write.parse_index_person in
-  let ip = Gwdb.iper_of_string params.Mwrite.Index_person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person.index in
   let p = poi base ip in
   let surname = sou base (get_surname p) in
   let first_name = sou base (get_first_name p) in
@@ -1522,10 +1522,10 @@ let compute_add_family_ok conf base mod_family =
 (* ************************************************************************ *)
 let print_add_family_ok conf base =
   let add_family_ok = get_params conf Mext_write.parse_add_family_ok in
-  let ip = Gwdb.iper_of_string add_family_ok.Mwrite.Add_family_ok.index_person in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string add_family_ok.Mwrite.Add_family_ok.index_person in
   let mod_family = add_family_ok.Mwrite.Add_family_ok.family in
   let resp = compute_add_family_ok conf base mod_family in
-  let ifam = Gwdb.ifam_of_string mod_family.Mwrite.Family.index in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
 
@@ -1542,7 +1542,7 @@ let print_add_family_ok conf base =
 (* ************************************************************************ *)
 let print_mod_family_request conf base =
   let params = get_params conf Mext_write.parse_add_child_request in
-  let ip = Gwdb.iper_of_string params.Mwrite.Add_child_request.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Add_child_request.index in
   let p = poi base ip in
   let spouses =
     Array.fold_right
@@ -1550,8 +1550,8 @@ let print_mod_family_request conf base =
          let cpl = foi base ifam in
          let isp = Gutil.spouse ip cpl in
          let sp = poi base isp in
-         let index_family = Gwdb.string_of_ifam ifam in
-         let index_person = Gwdb.string_of_iper isp in
+         let index_family = Int32.of_string @@ Gwdb.string_of_ifam ifam in
+         let index_person = Int32.of_string @@ Gwdb.string_of_iper isp in
          let sex =
            match get_sex sp with
            | Male -> `male
@@ -1627,8 +1627,8 @@ let print_mod_family_request conf base =
 (* ************************************************************************ *)
 let print_mod_family conf base =
   let params = get_params conf Mext_write.parse_index_person_and_family in
-  let ip = Gwdb.iper_of_string params.Mwrite.Index_person_and_family.index_person in
-  let ifam = Gwdb.ifam_of_string params.Mwrite.Index_person_and_family.index_family in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_person in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_family in
   let p = poi base ip in
   let fam = foi base ifam in
   let surname = sou base (get_surname p) in
@@ -1668,7 +1668,7 @@ let print_mod_family conf base =
 (* ************************************************************************ *)
 let print_mod_family_ok conf base =
   let edit_family_ok = get_params conf Mext_write.parse_edit_family_ok in
-  let ip = Gwdb.iper_of_string edit_family_ok.Mwrite.Edit_family_ok.index_person in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string edit_family_ok.Mwrite.Edit_family_ok.index_person in
   let mod_family = edit_family_ok.Mwrite.Edit_family_ok.family in
   let mod_father = mod_family.Mwrite.Family.father in
   let mod_mother = mod_family.Mwrite.Family.mother in
@@ -1727,7 +1727,7 @@ let print_mod_family_ok conf base =
     | Update.ModErr s -> Api_update_util.UpdateError s
     | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
   in
-  let ifam = Gwdb.ifam_of_string mod_family.Mwrite.Family.index in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
 
@@ -1746,7 +1746,7 @@ let print_mod_family_ok conf base =
 (* ************************************************************************ *)
 let print_add_parents conf base =
   let params = get_params conf Mext_write.parse_index_person in
-  let ip = Gwdb.iper_of_string params.Mwrite.Index_person.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person.index in
   let p = poi base ip in
   let surname = sou base (get_surname p) in
   let first_name = sou base (get_first_name p) in
@@ -1759,9 +1759,9 @@ let print_add_parents conf base =
   father.Mwrite.Person.digest <- "";
   mother.Mwrite.Person.digest <- "";
   (* Les index négatifs ne marchent pas ! *)
-  family.Mwrite.Family.index <- Gwdb.string_of_ifam Gwdb.dummy_ifam;
-  father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
-  mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  family.Mwrite.Family.index <- Int32.of_string @@ Gwdb.string_of_ifam Gwdb.dummy_ifam;
+  father.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
+  mother.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   (* On met à jour la famille avec l'enfant. *)
   let child = Api_update_util.pers_to_piqi_person_link conf base p in
   family.Mwrite.Family.children <- [child];
@@ -1831,14 +1831,14 @@ let do_mod_fam_add_child_aux conf base name ip mod_c mod_f fn =
           let occ = Opt.map_default 0 Int32.to_int child.Mwrite.Person_link.occ in
           match person_of_key base mod_c.Mwrite.Person.firstname mod_c.Mwrite.Person.lastname occ with
           | Some ip_child ->
-            mod_c.Mwrite.Person.index <- Gwdb.string_of_iper ip_child;
+            mod_c.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper ip_child;
             mod_c.Mwrite.Person.occ <- child.Mwrite.Person_link.occ;
             mod_c.Mwrite.Person.create_link <- `link ; (* child has been created already *)
             let digest = Update.digest_person (UpdateInd.string_person_of base @@ poi base ip_child) in
             mod_c.Mwrite.Person.digest <- digest;
             if mod_c.Mwrite.Person.death_type = `dont_know_if_dead
             then begin
-              let ifam = Gwdb.ifam_of_string mod_f.Mwrite.Family.index in
+              let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_f.Mwrite.Family.index in
               mod_c.Mwrite.Person.death_type <-
                 piqi_death_type_of_death (Update.infer_death_from_parents conf base @@ foi base ifam)
             end ;
@@ -1854,7 +1854,7 @@ let do_mod_fam_add_child_aux conf base name ip mod_c mod_f fn =
     | Update.ModErr s -> Api_update_util.UpdateError s
     | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
   in
-  let ifam = Gwdb.ifam_of_string mod_f.Mwrite.Family.index in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_f.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
 
@@ -1868,7 +1868,7 @@ let do_mod_fam_add_child conf base ifam ip mod_c =
    (Api_update_family.print_mod conf base ip)
 
 let print_add_child_ok_aux conf base add_child_ok =
-  let ip = Gwdb.iper_of_string add_child_ok.Mwrite.Add_child_ok.index_person in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string add_child_ok.Mwrite.Add_child_ok.index_person in
   let mod_c = add_child_ok.Mwrite.Add_child_ok.child in
   if add_child_ok.Mwrite.Add_child_ok.new_family then begin
     let p = poi base ip in
@@ -1877,7 +1877,7 @@ let print_add_child_ok_aux conf base add_child_ok =
       conf base "ErrorAddChildAndFamily" ip mod_c mod_f
       (compute_add_family_ok conf base)
   end else begin
-    let ifam = Gwdb.ifam_of_string add_child_ok.Mwrite.Add_child_ok.index_family in
+    let ifam = Gwdb.ifam_of_string @@ Int32.to_string add_child_ok.Mwrite.Add_child_ok.index_family in
     do_mod_fam_add_child conf base ifam ip mod_c
   end
 
@@ -1897,7 +1897,7 @@ let print_add_child_ok conf base =
 (* ************************************************************************ *)
 let print_add_parents_ok conf base =
   let add_parents_ok = get_params conf Mext_write.parse_add_parents_ok in
-  let ip = Gwdb.iper_of_string add_parents_ok.Mwrite.Add_parents_ok.index_person in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string add_parents_ok.Mwrite.Add_parents_ok.index_person in
   let mod_family = add_parents_ok.Mwrite.Add_parents_ok.family in
   let mod_father = mod_family.Mwrite.Family.father in
   let mod_mother = mod_family.Mwrite.Family.mother in
@@ -1905,8 +1905,8 @@ let print_add_parents_ok conf base =
     if mod_father.Mwrite.Person.create_link = `link
     && mod_mother.Mwrite.Person.create_link = `link
     then
-      let ifath = Gwdb.iper_of_string mod_father.Mwrite.Person.index in
-      let imoth = Gwdb.iper_of_string mod_mother.Mwrite.Person.index in
+      let ifath = Gwdb.iper_of_string @@ Int32.to_string mod_father.Mwrite.Person.index in
+      let imoth = Gwdb.iper_of_string @@ Int32.to_string mod_mother.Mwrite.Person.index in
       let families = get_family (poi base ifath) in
       let len = Array.length families in
       try
@@ -1950,7 +1950,7 @@ let print_add_parents_ok conf base =
     end ->
     let add_child_ok =
       { Mwrite.Add_child_ok.index_person = add_parents_ok.Mwrite.Add_parents_ok.index_person
-      ; index_family = Gwdb.string_of_ifam ifam
+      ; index_family = Int32.of_string @@ Gwdb.string_of_ifam ifam
       ; new_family = false
       ; child = Api_update_util.pers_to_piqi_mod_person conf base @@ Gwdb.poi base ip
       }
@@ -2007,7 +2007,7 @@ let print_add_parents_ok conf base =
           in
           let all_wl = match existing_fam with
             | Some ifam ->
-              let ifam' = Gwdb.ifam_of_string mod_family.Mwrite.Family.index in
+              let ifam' = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
               Def.PossibleDuplicateFam (ifam, ifam') :: all_wl
             | _ -> all_wl
           in
@@ -2033,7 +2033,7 @@ let print_add_parents_ok conf base =
 (* ************************************************************************ *)
 let print_add_child conf base =
   let params = get_params conf Mext_write.parse_add_child_request in
-  let ip = Gwdb.iper_of_string params.Mwrite.Add_child_request.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Add_child_request.index in
   let ifam = params.Mwrite.Add_child_request.index_family in
   let p = poi base ip in
   let family_spouse =
@@ -2042,8 +2042,8 @@ let print_add_child conf base =
          let cpl = foi base ifam in
          let isp = Gutil.spouse ip cpl in
          let sp = poi base isp in
-         let index_family = Gwdb.string_of_ifam ifam in
-         let index_person = Gwdb.string_of_iper isp in
+         let index_family = Int32.of_string @@ Gwdb.string_of_ifam ifam in
+         let index_person = Int32.of_string @@ Gwdb.string_of_iper isp in
          let sex =
            match get_sex sp with
            | Male -> `male
@@ -2088,7 +2088,7 @@ let print_add_child conf base =
   (* On supprime le digest car on créé un enfant *)
   child.Mwrite.Person.digest <- "";
   (* Les index négatifs ne marchent pas ! *)
-  child.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  child.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   (* Par défaut, les access sont en Private, on passe en Iftitles. *)
   child.Mwrite.Person.access <- `access_iftitles;
   (* On met l'enfant en mode Create. *)
@@ -2108,7 +2108,7 @@ let print_add_child conf base =
     | x -> child.Mwrite.Person.death_type <- x
   in
   (* On prend le nom du père *)
-  let child_surname = infer_surname conf base p ifam in
+  let child_surname = infer_surname conf base p @@ Opt.map Int32.to_string ifam in
   child.Mwrite.Person.lastname <- child_surname;
   let add_child =
     Mwrite.Add_child.({
@@ -2134,7 +2134,7 @@ let print_add_child conf base =
 (* ************************************************************************ *)
 let print_add_sibling conf base =
   let params = get_params conf Mext_write.parse_add_sibling_request in
-  let ip = Gwdb.iper_of_string params.Mwrite.Add_sibling_request.index in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Add_sibling_request.index in
   let p = poi base ip in
   let father =
     Opt.map (fun ifam -> poi base @@ get_father @@ foi base ifam) (get_parents p)
@@ -2146,7 +2146,7 @@ let print_add_sibling conf base =
   (* On supprime le digest car on créé un enfant *)
   sibling.Mwrite.Person.digest <- "";
   (* Les index négatifs ne marchent pas ! *)
-  sibling.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  sibling.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   (* Par défaut, les access sont en Private, on passe en Iftitles. *)
   sibling.Mwrite.Person.access <- `access_iftitles;
   (* On met le frère/soeur en mode Create. *)
@@ -2198,7 +2198,7 @@ let print_add_sibling conf base =
 (* ************************************************************************ *)
 let print_add_sibling_ok conf base =
   let add_sibling_ok = get_params conf Mext_write.parse_add_sibling_ok in
-  let ip = Gwdb.iper_of_string add_sibling_ok.Mwrite.Add_sibling_ok.index_person in
+  let ip = Gwdb.iper_of_string @@ Int32.to_string add_sibling_ok.Mwrite.Add_sibling_ok.index_person in
   let mod_c = add_sibling_ok.Mwrite.Add_sibling_ok.sibling in
   let p = poi base ip in
   (* Le nouvel enfant à créer. *)
@@ -2238,9 +2238,9 @@ let print_add_sibling_ok conf base =
             father.Mwrite.Person.digest <- "";
             mother.Mwrite.Person.digest <- "";
             (* Les index négatifs ne marchent pas ! *)
-            family.Mwrite.Family.index <- Gwdb.string_of_ifam Gwdb.dummy_ifam;
-            father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
-            mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+            family.Mwrite.Family.index <- Int32.of_string @@ Gwdb.string_of_ifam Gwdb.dummy_ifam;
+            father.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
+            mother.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
             (* On met à jour la famille avec l'enfant. *)
             let child = Api_update_util.pers_to_piqi_person_link conf base p in
             family.Mwrite.Family.children <- [child; create_sibling];
@@ -2257,7 +2257,7 @@ let print_add_sibling_ok conf base =
               with
               | Api_update_util.UpdateSuccess (wl, ml, hr) ->
                   (* On ajoute une famille donc l'ifam est nouveau *)
-                  let () = new_ifam := Gwdb.ifam_of_string family.Mwrite.Family.index in
+                  let () = new_ifam := Gwdb.ifam_of_string @@ Int32.to_string family.Mwrite.Family.index in
                   (wl, ml, hr)
               | Api_update_util.UpdateError s -> raise (Update.ModErr s)
               | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
@@ -2276,7 +2276,7 @@ let print_add_sibling_ok conf base =
                 in
                 match person_of_key base fn sn occ with
                 | Some ip_sibling ->
-                    mod_c.Mwrite.Person.index <- Gwdb.string_of_iper ip_sibling;
+                    mod_c.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper ip_sibling;
                     mod_c.Mwrite.Person.occ <- create_sibling.Mwrite.Person_link.occ;
                     (* On calcul le digest maintenant que l'enfant est créé. *)
                     let sibling = poi base ip_sibling in
@@ -2333,7 +2333,7 @@ let print_add_sibling_ok conf base =
                   in
                   match person_of_key base fn sn occ with
                   | Some ip_sibling ->
-                      mod_c.Mwrite.Person.index <- Gwdb.string_of_iper ip_sibling;
+                      mod_c.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper ip_sibling;
                       mod_c.Mwrite.Person.occ <- create_sibling.Mwrite.Person_link.occ;
                       (* On calcul le digest maintenant que l'enfant est créé. *)
                       let sibling = poi base ip_sibling in
@@ -2447,13 +2447,13 @@ let compute_add_first_fam conf =
   (* On ré-initialise un certain nombre de valeurs. *)
   add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.digest <- "";
   add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.create_link <- `create_default_occ;
-  add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.occ <- None;
   add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.access <- `access_iftitles;
 
   add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.digest <- "";
   add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.create_link <- `create_default_occ;
-  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   (* On n'autorise pas les parents de meme sexe. *)
   add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.sex <- `male;
   add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.occ <- None;
@@ -2461,7 +2461,7 @@ let compute_add_first_fam conf =
 
   add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.digest <- "";
   add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.create_link <- `create_default_occ;
-  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   (* On n'autorise pas les parents de meme sexe. *)
   add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.sex <- `female;
   add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.occ <- None;
@@ -2469,7 +2469,7 @@ let compute_add_first_fam conf =
 
   add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.digest <- "";
   add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.create_link <- `create_default_occ;
-  add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+  add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
   add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.occ <- None;
   add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.access <- `access_iftitles;
 
@@ -2484,7 +2484,7 @@ let compute_add_first_fam conf =
           begin
             mod_c.Mwrite.Person.digest <- "";
             mod_c.Mwrite.Person.create_link <- `create_default_occ;
-            mod_c.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+            mod_c.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
             mod_c.Mwrite.Person.occ <- None;
             mod_c.Mwrite.Person.access <- `access_iftitles;
             mod_c :: accu
@@ -2654,13 +2654,13 @@ let print_add_first_fam_ok conf base =
           (* surtout si c'est des personnes vides.          *)
           family.Mwrite.Family.father.Mwrite.Person.digest <- "";
           family.Mwrite.Family.father.Mwrite.Person.create_link <- `create_default_occ;
-          family.Mwrite.Family.father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+          family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
           family.Mwrite.Family.father.Mwrite.Person.occ <- None;
           family.Mwrite.Family.father.Mwrite.Person.access <- `access_iftitles;
 
           family.Mwrite.Family.mother.Mwrite.Person.digest <- "";
           family.Mwrite.Family.mother.Mwrite.Person.create_link <- `create_default_occ;
-          family.Mwrite.Family.mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+          family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
           family.Mwrite.Family.mother.Mwrite.Person.occ <- None;
           family.Mwrite.Family.mother.Mwrite.Person.access <- `access_iftitles;
 
@@ -2674,9 +2674,9 @@ let print_add_first_fam_ok conf base =
           then ()
           else family.Mwrite.Family.mother <- mod_mother;
           (* Les index négatifs ne marchent pas ! *)
-          family.Mwrite.Family.index <- Gwdb.string_of_ifam Gwdb.dummy_ifam;
-          family.Mwrite.Family.father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
-          family.Mwrite.Family.mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+          family.Mwrite.Family.index <- Int32.of_string @@ Gwdb.string_of_ifam Gwdb.dummy_ifam;
+          family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
+          family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
           (* On met à jour les sexes. *)
           family.Mwrite.Family.father.Mwrite.Person.sex <- `male;
           family.Mwrite.Family.mother.Mwrite.Person.sex <- `female;
@@ -2724,7 +2724,7 @@ let print_add_first_fam_ok conf base =
               in
               match person_of_key base fn sn occ with
               | Some ip ->
-                  mod_p.Mwrite.Person.index <- Gwdb.string_of_iper ip
+                  mod_p.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper ip
               | None -> failwith "ErrorAddFirstFamNoChildFound"
             in
             (all_wl, all_ml, all_hr)
@@ -2752,7 +2752,7 @@ let print_add_first_fam_ok conf base =
                   in
                   (match person_of_key base fn sn occ with
                   | Some ip_child ->
-                      mod_p.Mwrite.Person.index <- Gwdb.string_of_iper ip_child;
+                      mod_p.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper ip_child;
                       mod_p.Mwrite.Person.occ <-
                         create_child.Mwrite.Person_link.occ;
                       (* On calcul le digest maintenant que l'enfant est créé. *)
@@ -2774,8 +2774,8 @@ let print_add_first_fam_ok conf base =
         in
 
         (* Normalement, on a réussi à mettre à jour l'ip de la personne. *)
-        let () = ip := Gwdb.iper_of_string mod_p.Mwrite.Person.index in
-        let () = ifam := Gwdb.ifam_of_string fam_asc.Mwrite.Family.index in
+        let () = ip := Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
+        let () = ifam := Gwdb.ifam_of_string @@ Int32.to_string fam_asc.Mwrite.Family.index in
 
         (* On crée la famille avec les enfants. *)
         let fam_desc =
@@ -2786,13 +2786,13 @@ let print_add_first_fam_ok conf base =
           (* surtout si c'est des personnes vides.          *)
           family.Mwrite.Family.father.Mwrite.Person.digest <- "";
           family.Mwrite.Family.father.Mwrite.Person.create_link <- `create_default_occ;
-          family.Mwrite.Family.father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+          family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
           family.Mwrite.Family.father.Mwrite.Person.occ <- None;
           family.Mwrite.Family.father.Mwrite.Person.access <- `access_iftitles;
 
           family.Mwrite.Family.mother.Mwrite.Person.digest <- "";
           family.Mwrite.Family.mother.Mwrite.Person.create_link <- `create_default_occ;
-          family.Mwrite.Family.mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+          family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
           family.Mwrite.Family.mother.Mwrite.Person.occ <- None;
           family.Mwrite.Family.mother.Mwrite.Person.access <- `access_iftitles;
 
@@ -2814,7 +2814,7 @@ let print_add_first_fam_ok conf base =
               family.Mwrite.Family.mother <- mod_p;
             end;
           (* Les index négatifs ne marchent pas ! *)
-          family.Mwrite.Family.index <- Gwdb.string_of_ifam Gwdb.dummy_ifam;
+          family.Mwrite.Family.index <- Int32.of_string @@ Gwdb.string_of_ifam Gwdb.dummy_ifam;
           (* On n'autorise pas les parents de meme sexe. *)
           (* On met les parents en mode Create. *)
           if mod_p.Mwrite.Person.sex = `male then
@@ -2824,12 +2824,12 @@ let print_add_first_fam_ok conf base =
               let digest = Update.digest_person (UpdateInd.string_person_of base p) in
               family.Mwrite.Family.father.Mwrite.Person.digest <- digest;
               family.Mwrite.Family.mother.Mwrite.Person.create_link <- `create_default_occ;
-              family.Mwrite.Family.mother.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+              family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
             end
           else
             begin
               family.Mwrite.Family.father.Mwrite.Person.create_link <- `create_default_occ;
-              family.Mwrite.Family.father.Mwrite.Person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
+              family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
               family.Mwrite.Family.mother.Mwrite.Person.create_link <- `link;
               let p = poi base !ip in
               let digest = Update.digest_person (UpdateInd.string_person_of base p) in
@@ -2883,7 +2883,7 @@ let print_add_first_fam_ok conf base =
                   in
                   (match person_of_key base fn sn occ with
                   | Some ip_child ->
-                      mod_child.Mwrite.Person.index <- Gwdb.string_of_iper ip_child;
+                      mod_child.Mwrite.Person.index <- Int32.of_string @@ Gwdb.string_of_iper ip_child;
                       (* On calcul le digest maintenant que l'enfant est créé. *)
                       let child = poi base ip_child in
                       let digest =
