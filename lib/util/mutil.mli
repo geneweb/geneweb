@@ -78,6 +78,11 @@ val contains : ?wildcard:bool -> string -> string -> bool
     If no such [p] exists, empty string [""] is returned. *)
 val get_particle : string list -> string -> string
 
+(** [rm fname]
+    Remove [fname]. If [fname] does not exists, do nothing.
+*)
+val rm : string -> unit
+
 (** [string_of_int_sep "," 1000000] is ["1,000,000"]
 *)
 val string_of_int_sep : string -> int -> string

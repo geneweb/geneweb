@@ -389,11 +389,6 @@ val ls_r : string list -> string list
 *)
 val rm_rf : string -> unit
 
-(** [rm fname]
-    Remove [fname]. If [fname] does not exists, do nothing.
-*)
-val rm : string -> unit
-
 (** [escape_html str] replaces '&', '"', '\'', '<' and '>'
     with their corresponding character entities (using entity number) *)
 val escape_html : string -> string
