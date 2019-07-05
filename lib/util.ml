@@ -712,13 +712,13 @@ let authorized_age conf base p =
         (Adef.od_of_cdate (get_birth p))
   end
 
-let is_restricted (conf : config) base ip =
+let is_restricted (conf : config) base (ip : iper) =
   let fct p =
     not (is_quest_string (get_surname p)) &&
     not (is_quest_string (get_first_name p)) &&
     not (authorized_age conf base p)
   in
-  if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
+  if conf.use_restrict then base_visible_get base fct ip
   else false
 
 let pget (conf : config) base ip =
@@ -728,7 +728,7 @@ let pget (conf : config) base ip =
 let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (sou base) fam
+  Futil.map_family_ps (fun p -> p) (fun f -> f) (sou base) fam
 
 let is_hidden p = is_empty_string (get_surname p)
 
@@ -785,7 +785,7 @@ let acces_n conf base n x =
     (if get_occ x <> 0 then "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
   else
-    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_key_index x)) ^
+    "i" ^ n ^ "=" ^ string_of_iper (get_key_index x) ^
     (if conf.wizard && get_occ x <> 0 then
        "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
@@ -1018,7 +1018,7 @@ let reference conf base p s =
   else
     String.concat ""
       ["<a href=\""; commd conf; acces conf base p; "\" id=\"i";
-       string_of_int (Adef.int_of_iper iper); "\">"; s; "</a>"]
+       string_of_iper iper; "\">"; s; "</a>"]
 
 
 (* ************************************************************************* *)
@@ -1050,12 +1050,12 @@ let update_family_loop conf base p s =
     in
     if conf.wizard then
       if List.length res = 1 then
-        let iper = string_of_int (Adef.int_of_iper iper) in
-        let ifam = string_of_int (Adef.int_of_ifam (List.hd res)) in
+        let iper = string_of_iper iper in
+        let ifam = string_of_ifam (List.hd res) in
         "<a href=\"" ^ commd conf ^ "m=MOD_FAM&i=" ^ ifam ^ "&ip=" ^ iper ^
         "\">" ^ s ^ "</a>"
       else
-        let iper = string_of_int (Adef.int_of_iper iper) in
+        let iper = string_of_iper iper in
         "<a href=\"" ^ commd conf ^ "m=U&i=" ^ iper ^ "\">" ^ s ^ "</a>"
     else s
 
@@ -1401,9 +1401,9 @@ let url_no_index conf base =
   let scratch s = code_varenv (Name.lower (sou base s)) in
   let get_a_person v =
     try
-      let i = int_of_string v in
-      if i >= 0 && i < nb_of_persons base then
-        let p = pget conf base (Adef.iper_of_int i) in
+      let i = iper_of_string v in
+      (* if i >= 0 && i < nb_of_persons base then *)
+        let p = pget conf base i in
         if is_hide_names conf p && not (authorized_age conf base p) ||
            is_hidden p
         then
@@ -1412,14 +1412,14 @@ let url_no_index conf base =
           let f = scratch (get_first_name p) in
           let s = scratch (get_surname p) in
           let oc = string_of_int (get_occ p) in Some (f, s, oc)
-      else None
+      (* else None *)
     with Failure _ -> None
   in
   let get_a_family v =
     try
-      let i = int_of_string v in
-        if i >= 0 && i < nb_of_families base then
-          let fam = foi base (Adef.ifam_of_int i) in
+      let i = ifam_of_string v in
+        (* if i >= 0 && i < nb_of_families base then *)
+          let fam = foi base i in
           if is_deleted_family fam then None
           else
             let p = pget conf base (get_father fam) in
@@ -1431,14 +1431,14 @@ let url_no_index conf base =
               let u = pget conf base (get_father fam) in
               let n =
                 let rec loop k =
-                  if (get_family u).(k) = Adef.ifam_of_int i then
+                  if (get_family u).(k) = i then
                     string_of_int k
                   else loop (k + 1)
                 in
                 loop 0
               in
               Some (f, s, oc, n)
-        else None
+        (* else None *)
     with Failure _ -> None
   in
   let env =
@@ -2482,12 +2482,12 @@ let limited_image_size max_wid max_hei fname size =
   | None -> None
 
 let find_person_in_env conf base suff =
-  match p_getint conf.env ("i" ^ suff) with
+  match p_getenv conf.env ("i" ^ suff) with
     Some i ->
-      if i >= 0 && i < nb_of_persons base then
-        let p = pget conf base (Adef.iper_of_int i) in
+      (* if i >= 0 && i < nb_of_persons base then *)
+        let p = pget conf base (Gwdb.iper_of_string i) in
         if is_hidden p then None else Some p
-      else None
+      (* else None *)
   | None ->
       match
         p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff)
@@ -2848,7 +2848,7 @@ let wprint_hidden_person conf base pref p =
     end
   else
     wprint_hidden conf pref "i"
-      (string_of_int (Adef.int_of_iper (get_key_index p)))
+      (string_of_iper (get_key_index p))
 
 exception Ok
 

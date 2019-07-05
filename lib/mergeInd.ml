@@ -29,19 +29,19 @@ let print_differences conf base branches p1 p2 =
   Util.hidden_env conf;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\"%s>\n"
     conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i1\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper (get_key_index p1)) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper (get_key_index p2)) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"i1\" value=\"%s\"%s>\n"
+    (string_of_iper (get_key_index p1)) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%s\"%s>\n"
+    (string_of_iper (get_key_index p2)) conf.xhs;
   begin let rec loop =
     function
       [ip1, ip2] ->
         Wserver.printf
-          "<input type=\"hidden\" name=\"ini1\" value=\"%d\"%s>\n"
-          (Adef.int_of_iper ip1) conf.xhs;
+          "<input type=\"hidden\" name=\"ini1\" value=\"%s\"%s>\n"
+          (string_of_iper ip1) conf.xhs;
         Wserver.printf
-          "<input type=\"hidden\" name=\"ini2\" value=\"%d\"%s>\n"
-          (Adef.int_of_iper ip2) conf.xhs
+          "<input type=\"hidden\" name=\"ini2\" value=\"%s\"%s>\n"
+          (string_of_iper ip2) conf.xhs
     | _ :: branches -> loop branches
     | _ -> ()
   in
@@ -308,7 +308,7 @@ let propose_merge_ind conf base branches p1 p2 =
     end;
   Hutil.trailer conf
 
-let reparent_ind base warning ip1 ip2 =
+let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
   let a1 = poi base ip1 in
   let a2 = poi base ip2 in
   match get_parents a1, get_parents a2 with
@@ -333,7 +333,7 @@ let reparent_ind base warning ip1 ip2 =
       end
   | _ -> ()
 
-let effective_merge_ind conf base warning p1 p2 =
+let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 p2 =
   let u2 = poi base (get_key_index p2) in
   if Array.length (get_family u2) <> 0 then
     begin
@@ -404,15 +404,15 @@ let effective_merge_ind conf base warning p1 p2 =
 let is_ancestor base p1 p2 =
   let ip1 = get_key_index p1 in
   let ip2 = get_key_index p2 in
-  let visited = Array.make (nb_of_persons base) false in
+  let visited = Gwdb.iper_marker (Gwdb.ipers base) false in
   let rec loop ip =
-    if visited.(Adef.int_of_iper ip) then false
+    if Gwdb.Marker.get visited ip then false
     else if ip = ip1 then true
     else
       begin
-        visited.(Adef.int_of_iper ip) <- true;
+        Gwdb.Marker.set visited ip true ;
         match get_parents (poi base ip) with
-          Some ifam ->
+        | Some ifam ->
             let cpl = foi base ifam in
             loop (get_father cpl) || loop (get_mother cpl)
         | None -> false
@@ -589,8 +589,9 @@ let print_merged conf base wl p =
   Wserver.printf "%s\n" (referenced_person_text conf base p);
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
-  begin match p_getenv conf.env "m", p_getint conf.env "ip" with
+  begin match p_getenv conf.env "m", p_getenv conf.env "ip" with
     Some "MRG_DUP_IND_Y_N", Some ip ->
+      let ip = iper_of_string ip in
       let s1 =
         match p_getenv conf.env "iexcl" with
           Some "" | None -> ""
@@ -602,11 +603,11 @@ let print_merged conf base wl p =
         | Some s -> "&fexcl=" ^ s
       in
       Wserver.printf "<p>\n";
-      Wserver.printf "<a href=%sm=MRG_DUP&ip=%d%s%s>" (commd conf) ip s1 s2;
+      Wserver.printf "<a href=%sm=MRG_DUP&ip=%s%s%s>" (commd conf) (string_of_iper ip) s1 s2;
       Wserver.printf "%s" (capitale (transl conf "continue merging"));
       Wserver.printf "</a>";
       begin
-        let p =  poi base (Adef.iper_of_int ip) in
+        let p =  poi base ip in
         let s = person_text conf base p in
         Wserver.printf "\n(%s)\n"
           (Util.transl_a_of_b conf
@@ -639,13 +640,13 @@ let merge conf base p1 p2 propose_merge_ind =
 
 let print conf base =
   let p1 =
-    match p_getint conf.env "i" with
-      Some i1 -> Some (poi base (Adef.iper_of_int i1))
+    match p_getenv conf.env "i" with
+      Some i1 -> Some (poi base (iper_of_string i1))
     | None -> None
   in
   let p2 =
-    match p_getint conf.env "i2" with
-      Some i2 -> Some (poi base (Adef.iper_of_int i2))
+    match p_getenv conf.env "i2" with
+      Some i2 -> Some (poi base (iper_of_string i2))
     | None ->
         match p_getenv conf.env "select", p_getenv conf.env "n" with
           (Some "input" | None), Some n ->
@@ -655,7 +656,7 @@ let print conf base =
             | _ -> None
             end
         | Some x, (Some "" | None) ->
-            Some (poi base (Adef.iper_of_int (int_of_string x)))
+            Some (poi base (iper_of_string x))
         | _ -> None
   in
   match p1, p2 with

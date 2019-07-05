@@ -31,17 +31,15 @@ let print_no_candidate conf base p =
   Wserver.printf "</ul>\n";
   Hutil.trailer conf
 
-let input_excl int_of_i excl =
+let input_excl string_of_i excl =
   List.fold_left
     (fun s (i1, i2) ->
-       let t =
-         string_of_int (int_of_i i1) ^ "," ^ string_of_int (int_of_i i2)
-       in
+       let t = string_of_i i1 ^ "," ^ string_of_i i2 in
        if s = "" then t else s ^ "," ^ t)
     "" excl
 
-let print_input_excl conf int_of_i excl excl_name =
-  let s = input_excl int_of_i excl in
+let print_input_excl conf string_of_i excl excl_name =
+  let s = input_excl string_of_i excl in
   if s = "" then ()
   else
     Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
@@ -69,14 +67,14 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Wserver.printf
     "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_IND_Y_N\"%s>\n"
     conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper ip) conf.xhs;
-  print_input_excl conf Adef.int_of_iper ((ip1, ip2) :: iexcl) "iexcl";
-  print_input_excl conf Adef.int_of_ifam fexcl "fexcl";
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper ip1) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"select\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper ip2) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n"
+    (string_of_iper ip) conf.xhs;
+  print_input_excl conf string_of_iper ((ip1, ip2) :: iexcl) "iexcl";
+  print_input_excl conf string_of_ifam fexcl "fexcl";
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+    (string_of_iper ip1) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"select\" value=\"%s\"%s>\n"
+    (string_of_iper ip2) conf.xhs;
   Wserver.printf "<input type=\"submit\" name=\"answer_y\" value=\"%s\"%s>\n"
     (transl_nth conf "Y/N" 0) conf.xhs;
   Wserver.printf "<input type=\"submit\" name=\"answer_n\" value=\"%s\"%s>\n"
@@ -118,14 +116,14 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Wserver.printf
     "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_FAM_Y_N\"%s>\n"
     conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper ip) conf.xhs;
-  print_input_excl conf Adef.int_of_iper iexcl "iexcl";
-  print_input_excl conf Adef.int_of_ifam ((ifam1, ifam2) :: fexcl) "fexcl";
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-    (Adef.int_of_ifam ifam1) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%d\"%s>\n"
-    (Adef.int_of_ifam ifam2) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n"
+    (string_of_iper ip) conf.xhs;
+  print_input_excl conf string_of_iper iexcl "iexcl";
+  print_input_excl conf string_of_ifam ((ifam1, ifam2) :: fexcl) "fexcl";
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+    (string_of_ifam ifam1) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%s\"%s>\n"
+    (string_of_ifam ifam2) conf.xhs;
   Wserver.printf "<input type=\"submit\" name=\"answer_y\" value=\"%s\"%s>\n"
     (transl_nth conf "Y/N" 0) conf.xhs;
   Wserver.printf "<input type=\"submit\" name=\"answer_n\" value=\"%s\"%s>\n"
@@ -136,8 +134,8 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
 
 let main_page conf base =
   let ipp =
-    match p_getint conf.env "ip" with
-      Some i -> Some (Adef.iper_of_int i, poi base (Adef.iper_of_int i))
+    match p_getenv conf.env "ip" with
+    | Some i -> let i = iper_of_string i in Some (i, poi base i)
     | None -> None
   in
   let excl = Perso.excluded_possible_duplications conf in

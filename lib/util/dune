@@ -2,5 +2,5 @@
  (name util)
  (public_name geneweb.util)
  (wrapped false)
- (libraries geneweb.def geneweb.io)
+ (libraries geneweb.def geneweb.io geneweb.gwdb)
 )

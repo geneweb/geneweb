@@ -3,6 +3,18 @@
 open Dbdisk
 open Def
 
+type istr = Type.istr
+type ifam = Type.ifam
+type iper = Type.iper
+
+let string_of_iper = string_of_int
+let string_of_ifam = string_of_int
+let string_of_istr = string_of_int
+
+let iper_of_string = int_of_string
+let ifam_of_string = int_of_string
+let istr_of_string = int_of_string
+
 let cache f a (get, set) x =
   match get x with
   | Some v -> v
@@ -25,16 +37,18 @@ let no_person empty_string ip =
 let no_ascend = {parents = None; consang = Adef.no_consang}
 let no_union = {family = [| |]}
 
-type istr = dsk_istr
+let dummy_iper = Type.dummy_iper
+let dummy_ifam = Type.dummy_ifam
+let dummy_istr = Type.dummy_istr
 
 type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
 type pers_event = (iper, istr) Def.gen_pers_event
 type fam_event = (iper, istr) Def.gen_fam_event
 
-let eq_istr i1 i2 = Adef.int_of_istr i1 = Adef.int_of_istr i2
-let is_empty_string istr = Adef.int_of_istr istr = 0
-let is_quest_string istr = Adef.int_of_istr istr = 1
+let eq_istr i1 i2 = Type.int_of_istr i1 = Type.int_of_istr i2
+let is_empty_string istr = Type.int_of_istr istr = 0
+let is_quest_string istr = Type.int_of_istr istr = 1
 
 type string_person_index = istr Dbdisk.string_person_index
 
@@ -133,7 +147,7 @@ let get_origin_file = cache_fam (fun f -> f.Def.origin_file)
 let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
-let is_deleted_family = cache_fam (fun f -> f.Def.fam_index = Adef.ifam_of_int (-1))
+let is_deleted_family = cache_fam (fun f -> f.Def.fam_index = dummy_ifam)
 
 type base = dsk_base
 
@@ -144,13 +158,13 @@ let open_base bname : base =
 
 let close_base base = base.func.cleanup ()
 let empty_person base ip =
-  (base, Adef.int_of_iper ip, {p = Some (no_person (Adef.istr_of_int 0) ip);a = Some no_ascend; u = Some no_union})
+  (base, Type.int_of_iper ip, {p = Some (no_person (Type.istr_of_int 0) ip);a = Some no_ascend; u = Some no_union})
 let person_of_gen_person base (p, a, u) =
   (base, 0, {p = Some p; a = Some a; u = Some u})
 let family_of_gen_family base (f, c, d) =
   (base, 0, {f = Some f; c = Some c; d = Some d})
 let poi base i =
-  (base, Adef.int_of_iper i,{p = None; a = None; u = None})
+  (base, Type.int_of_iper i,{p = None; a = None; u = None})
 let poi_batch base = List.map (poi base)
 
 let no_family empty_string ifam =
@@ -169,19 +183,19 @@ let no_family empty_string ifam =
   }
 
 let no_couple =
-  Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1))
+  Adef.couple dummy_iper dummy_iper
 
 let empty_family base i =
-  ( base, Adef.int_of_ifam i
-  , { f = Some (no_family (Adef.istr_of_int 0) i)
+  ( base, Type.int_of_ifam i
+  , { f = Some (no_family (Type.istr_of_int 0) i)
     ; c = Some no_couple
     ; d = Some { Def.children = [||] } })
 
 let foi base i =
-  (base, Adef.int_of_ifam i, {f = None; c = None; d = None})
+  (base, Type.int_of_ifam i, {f = None; c = None; d = None})
 let foi_batch base = List.map (foi base)
 
-let sou base i = base.data.strings.get (Adef.int_of_istr i)
+let sou base i = base.data.strings.get (Type.int_of_istr i)
 let nb_of_persons base = base.data.persons.len
 let nb_of_families base = base.data.families.len
 let patch_person base ip p = base.func.Dbdisk.patch_person ip p
@@ -206,6 +220,15 @@ let persons_of_surname base = base.func.Dbdisk.persons_of_surname
 let base_visible_get base f =
   base.data.visible.v_get
     (fun p -> f ( (base, 0, {p = Some p; a = None; u = None})))
+
+let insert_person base = function
+  | (_, _, { p = Some p ; a = Some a ; u = Some u }) ->
+    let iper = nb_of_persons base in
+    patch_person base iper p ;
+    patch_ascend base iper a ;
+    patch_union base iper u ;
+    iper
+  | _ -> assert false
 
 let base_visible_write base = base.data.visible.v_write ()
 let base_particles base = base.data.particles
@@ -253,15 +276,24 @@ let date_of_last_change base =
 
 let apply_base1 base f = f base
 
+let insert_family base = function
+  | (_, _, { f = Some f ; c = Some c ; d = Some d }) ->
+    let ifam = nb_of_families base in
+    patch_family base ifam f ;
+    patch_couple base ifam c ;
+    patch_descend base ifam d ;
+    ifam
+  | _ -> assert false
+
 let delete_family base ifam =
-  let cpl = Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)) in
+  let cpl = Adef.couple dummy_iper dummy_iper in
   let fam =
     let empty = insert_string base "" in
     {marriage = Adef.cdate_None; marriage_place = empty;
      marriage_note = empty; marriage_src = empty; relation = Married;
      divorce = NotDivorced; fevents = []; witnesses = [| |];
      comment = empty; origin_file = empty; fsources = empty;
-     fam_index = Adef.ifam_of_int (-1)}
+     fam_index = dummy_ifam}
   in
   let des = {children = [| |]} in
   patch_family base ifam fam;
@@ -409,18 +441,18 @@ end
 
 let ipers base =
   { Collection.length = nb_of_persons base
-  ; get = (fun i -> Adef.iper_of_int i) }
+  ; get = (fun i -> Type.iper_of_int i) }
 
 let persons base = Collection.map (poi base) (ipers base)
 
-let person_marker c i = Marker.make (fun p -> (Adef.int_of_iper @@ get_key_index p)) c i
-let iper_marker c i = Marker.make Adef.int_of_iper c i
+let person_marker c i = Marker.make (fun p -> (Type.int_of_iper @@ get_key_index p)) c i
+let iper_marker c i = Marker.make Type.int_of_iper c i
 
 let ifams base =
   { Collection.length = nb_of_families base
-  ; get = (fun i -> Adef.ifam_of_int i) }
+  ; get = (fun i -> Type.ifam_of_int i) }
 
 let families base = Collection.map (foi base) (ifams base)
 
-let family_marker c i = Marker.make (fun f -> (Adef.int_of_ifam @@ get_fam_index f)) c i
-let ifam_marker c i = Marker.make Adef.int_of_ifam c i
+let family_marker c i = Marker.make (fun f -> (Type.int_of_ifam @@ get_fam_index f)) c i
+let ifam_marker c i = Marker.make Type.int_of_ifam c i

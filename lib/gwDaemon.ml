@@ -1149,7 +1149,7 @@ let make_conf from_addr request script_name env =
     !lexicon_list;
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
-  let default_sosa_ref = Adef.iper_of_int (-1), None in
+  let default_sosa_ref = Gwdb.dummy_iper, None in
   let ar =
     authorization from_addr request base_env passwd access_type utm base_file
       command

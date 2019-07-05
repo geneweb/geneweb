@@ -2,7 +2,17 @@
 
 open Adef
 
+type iper
+type ifam
 type istr
+
+val string_of_iper : iper -> string
+val string_of_ifam : ifam -> string
+val string_of_istr : istr -> string
+
+val iper_of_string : string -> iper
+val ifam_of_string : string -> ifam
+val istr_of_string : string -> istr
 
 type person
 type family
@@ -19,10 +29,15 @@ type base
 val open_base : string -> base
 val close_base : base -> unit
 
+val dummy_iper : iper
+val dummy_ifam : ifam
+val dummy_istr : istr
+
 val eq_istr : istr -> istr -> bool
 val is_empty_string : istr -> bool
 val is_quest_string : istr -> bool
 val empty_person : base -> iper -> person
+val empty_family : base -> ifam -> family
 
 val get_access : person -> Def.access
 val get_aliases : person -> istr list
@@ -65,7 +80,7 @@ val get_consang : person -> Adef.fix
 
 val get_family : person -> ifam array
 
-val gen_person_of_person : person -> (iper, istr) Def.gen_person
+val gen_person_of_person : person -> (iper, iper, istr) Def.gen_person
 
 val get_ifam : family -> ifam
 val get_comment : family -> istr
@@ -87,18 +102,18 @@ val get_fam_index : family -> ifam
 
 val get_children : family -> iper array
 
-val gen_family_of_family : family -> (iper, istr) Def.gen_family
+val gen_family_of_family : family -> (iper, ifam, istr) Def.gen_family
 val gen_couple_of_couple : family -> iper Def.gen_couple
 val gen_descend_of_descend : family -> iper Def.gen_descend
 
 val person_of_gen_person :
   base ->
-    (iper, istr) Def.gen_person * ifam Def.gen_ascend * ifam Def.gen_union ->
+    (iper, iper, istr) Def.gen_person * ifam Def.gen_ascend * ifam Def.gen_union ->
     person
 
 val family_of_gen_family :
   base ->
-    (iper, istr) Def.gen_family * iper Def.gen_couple *
+    (iper, ifam, istr) Def.gen_family * iper Def.gen_couple *
       iper Def.gen_descend ->
     family
 
@@ -111,10 +126,10 @@ val sou : base -> istr -> string
 val nb_of_persons : base -> int
 val nb_of_families : base -> int
 
-val patch_person : base -> iper -> (iper, istr) Def.gen_person -> unit
+val patch_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
 val patch_ascend : base -> iper -> ifam Def.gen_ascend -> unit
 val patch_union : base -> iper -> ifam Def.gen_union -> unit
-val patch_family : base -> ifam -> (iper, istr) Def.gen_family -> unit
+val patch_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
 val patch_descend : base -> ifam -> iper Def.gen_descend -> unit
 val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
 
@@ -127,7 +142,25 @@ val commit_notes : base -> string -> string -> unit
 val is_patched_person : base -> iper -> bool
 val patched_ascends : base -> iper list
 
+(** [insert_person base per]
+    Add a new person with the same properties as [per] in [base],
+    returning the fresh new {!type:iper} for this person.
+    [per] SHOULD be defined using [dummy_iper].
+*)
+val insert_person : base -> person -> iper
+
+(** [insert_family base fam]
+    Add a new family with the same properties as [fam] in [base],
+    returning the fresh new {!type:ifam} for this family.
+    [fam] SHOULD be defined using [dummy_ifam].
+*)
+val insert_family : base -> family -> ifam
+
 val delete_family : base -> ifam -> unit
+
+(* FIXME!
+   Delete this function
+   and do not return deleted families in family collections *)
 val is_deleted_family : family -> bool
 
 val person_of_key : base -> string -> string -> int -> iper option
@@ -144,7 +177,7 @@ val spi_next : string_person_index -> istr -> bool -> istr * int
 (** all persons having that [first/sur]name *)
 val spi_find : string_person_index -> istr -> iper list
 
-val base_visible_get : base -> (person -> bool) -> int -> bool
+val base_visible_get : base -> (person -> bool) -> iper -> bool
 val base_visible_write : base -> unit
 val base_particles : base -> string list
 
@@ -176,14 +209,16 @@ val clear_strings_array : base -> unit
 val clear_persons_array : base -> unit
 val clear_families_array : base -> unit
 
-val persons_array :
-  base ->
-    (int -> (iper, istr) Def.gen_person) *
-      (int -> (iper, istr) Def.gen_person -> unit)
-val ascends_array :
-  base ->
-    (int -> ifam option) * (int -> Adef.fix) * (int -> Adef.fix -> unit) *
-      Adef.fix array option
+val persons_array
+  : base
+  -> (int -> (iper, iper, istr) Def.gen_person)
+     * (int -> (iper, iper, istr) Def.gen_person -> unit)
+val ascends_array
+  : base
+  -> (iper -> ifam option)
+     * (iper -> Adef.fix)
+     * (iper -> Adef.fix -> unit)
+     * Adef.fix array option
 
 val base_notes_read : base -> string -> string
 val base_notes_read_first_line : base -> string -> string
@@ -193,8 +228,8 @@ val base_notes_dir : base -> string
 val base_wiznotes_dir : base -> string
 
 val gen_person_misc_names :
-  base -> (iper, istr) Def.gen_person ->
-    ((iper, istr) Def.gen_person -> istr Def.gen_title list) -> string list
+  base -> (iper, iper, istr) Def.gen_person ->
+    ((iper, iper, istr) Def.gen_person -> istr Def.gen_title list) -> string list
 
 val person_misc_names :
   base -> person -> (person -> title list) -> string list

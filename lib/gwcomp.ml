@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
+open Gwdb
 
 let magic_gwo = "GnWo000o"
 
@@ -13,7 +14,7 @@ type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 
 type somebody =
     Undefined of key
-  | Defined of (iper, string) gen_person
+  | Defined of (iper, iper, string) gen_person
 
 type gw_syntax =
     Family of
@@ -21,8 +22,8 @@ type gw_syntax =
         (string gen_fam_event_name * cdate * string * string * string *
            string * (somebody * sex * witness_kind) list)
           list *
-        ((iper, string) gen_person, string) gen_family *
-        (iper, string) gen_person gen_descend
+        ((iper, iper, string) gen_person, ifam, string) gen_family *
+        (iper, iper, string) gen_person gen_descend
   | Notes of key * string
   | Relations of somebody * sex * (somebody, string) gen_relation list
   | Pevent of
@@ -669,7 +670,7 @@ let create_person () =
    baptism_src = ""; death = DontKnowIfDead; death_place = "";
    death_note = ""; death_src = ""; burial = UnknownBurial; burial_place = "";
    burial_note = ""; burial_src = ""; pevents = []; notes = ""; psources = "";
-   key_index = Adef.iper_of_int (-1)}
+   key_index = Gwdb.dummy_iper}
 
 let bogus_def p n = p = "?" || n = "?"
 
@@ -1000,7 +1001,7 @@ let read_family ic fname =
              marriage_note = marr_note; marriage_src = marr_src;
              witnesses = [| |]; relation = relation; divorce = divorce;
              fevents = []; comment = comm; origin_file = fname;
-             fsources = fsrc; fam_index = Adef.ifam_of_int (-1)}
+             fsources = fsrc; fam_index = Gwdb.dummy_ifam}
           in
           let deo = {children = Array.of_list cles_enfants} in
           F_some
@@ -1012,7 +1013,7 @@ let read_family ic fname =
              marriage_note = marr_note; marriage_src = marr_src;
              witnesses = [| |]; relation = relation; divorce = divorce;
              fevents = []; comment = comm; origin_file = fname;
-             fsources = fsrc; fam_index = Adef.ifam_of_int (-1)}
+             fsources = fsrc; fam_index = Gwdb.dummy_ifam}
           in
           let deo = {children = [| |]} in
           F_some

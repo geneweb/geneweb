@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
+open Gwdb
 
 type auth_scheme_kind =
     NoAuth

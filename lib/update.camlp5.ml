@@ -341,8 +341,8 @@ let print_warning conf base =
          " " ^ someone_ref_text conf base moth ^ "\n");
       let print_list arr diff_arr =
         Array.iteri
-          (fun i ip ->
-             let p = poi base ip in
+          (fun i (* i *)p ->
+             let p = poi base p in
              Wserver.printf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
              if eq_istr (get_surname p) (get_surname fath) then
@@ -1175,21 +1175,22 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
   match create with
     Create (sex, info) ->
       begin try
-        if f = "?" || s = "?" then
-          if o <= 0 || o >= nb_of_persons base then raise Not_found
-          else
-            let ip = Adef.iper_of_int o in
-            let p = poi base ip in
-            if p_first_name base p = f && p_surname base p = s then ip
-            else raise Not_found
-        else
+          (* FIXMEEEEEEEEEEEEEEEEEe *)
+        (* if f = "?" || s = "?" then
+         *   if o <= 0 || o >= nb_of_persons base then raise Not_found
+         *   else
+         *     let ip = o in
+         *     let p = poi base ip in
+         *     if p_first_name base p = f && p_surname base p = s then ip
+         *     else raise Not_found
+         * else *)
           match person_of_key base f s o with
             Some ip -> print_create_conflict conf base (poi base ip) var
           | None -> raise Not_found
       with Not_found ->
         let o = if f = "?" || s = "?" then 0 else o in
-        let ip = Adef.iper_of_int (nb_of_persons base) in
         let empty_string = Gwdb.insert_string base "" in
+        let ip = Gwdb.insert_person base (Gwdb.empty_person base Gwdb.dummy_iper) in
         let (birth, birth_place, baptism, baptism_place) =
           match info with
             Some {ci_birth_date = b; ci_birth_place = bpl} ->
@@ -1262,15 +1263,16 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         ip
       end
   | Link ->
-      if f = "?" || s = "?" then
-        if o < 0 || o >= nb_of_persons base then
-          print_err_unknown conf base (f, s, o)
-        else
-          let ip = Adef.iper_of_int o in
-          let p = poi base ip in
-          if p_first_name base p = f && p_surname base p = s then ip
-          else print_err_unknown conf base (f, s, o)
-      else
+    (* FIXME !!!!!!! *)
+      (* if f = "?" || s = "?" then
+       *   if o < 0 || o >= nb_of_persons base then
+       *     print_err_unknown conf base (f, s, o)
+       *   else
+       *     let ip = Adef.iper_of_int o in
+       *     let p = poi base ip in
+       *     if p_first_name base p = f && p_surname base p = s then ip
+       *     else print_err_unknown conf base (f, s, o)
+       * else *)
         match person_of_key base f s o with
           Some ip -> ip
         | None -> print_err_unknown conf base (f, s, o)

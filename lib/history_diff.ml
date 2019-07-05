@@ -11,8 +11,8 @@ open Util
 type gen_record =
   { date : string;
     wizard : string;
-    gen_p : (iper, string) gen_person;
-    gen_f : (iper, string) gen_family list;
+    gen_p : (iper, iper, string) gen_person;
+    gen_f : (iper, ifam, string) gen_family list;
     gen_c : iper array list }
 
 
@@ -406,7 +406,7 @@ let print_clean_ok conf =
 let person_of_gen_p_key base gen_p =
   match person_of_key base gen_p.first_name gen_p.surname gen_p.occ with
     Some ip -> poi base ip
-  | None -> Gwdb.empty_person base (Adef.iper_of_int (-1))
+  | None -> Gwdb.empty_person base Gwdb.dummy_iper
 
 (* N'est pas forcément très précis. En effet, on enregistre que     *)
 (* les ipers. Or lors d'un nettoyage de la base, il se peut que     *)
@@ -713,7 +713,7 @@ let diff_string before after =
 type 'a env =
     Vgen_record of gen_record
   | Vfam of
-      (iper, string) gen_family option * (iper, string) gen_family option *
+      (iper, ifam, string) gen_family option * (iper, ifam, string) gen_family option *
         bool
   | Vchild of iper array option * iper array option
   | Vfevent of

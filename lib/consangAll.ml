@@ -8,7 +8,7 @@ let rec clear_descend_consang base cset mark ifam =
     (fun ip ->
        if not (Gwdb.Marker.get mark ip) then
          begin
-           cset (Adef.int_of_iper ip) Adef.no_consang;
+           cset ip Adef.no_consang;
            Gwdb.Marker.set mark ip true ;
            let u = poi base ip in
            Array.iter (clear_descend_consang base cset mark) (get_family u)
@@ -50,11 +50,10 @@ let compute ?(verbosity = 2) base tlim from_scratch =
           (patched_ascends base)
       end;
     Gwdb.Collection.iter (fun i ->
-        let i' = Adef.int_of_iper i in (* FIXME: remove this *)
-        if from_scratch then begin cset i' Adef.no_consang; incr cnt end
+         if from_scratch then begin cset i Adef.no_consang; incr cnt end
         else
-          let cg = cget i' in
-          begin match fget i' with
+          let cg = cget i in
+          begin match fget i with
               Some ifam -> Gwdb.Marker.set consang_tab ifam cg
             | None -> ()
         end;
@@ -73,8 +72,7 @@ let compute ?(verbosity = 2) base tlim from_scratch =
     let end_time = Unix.time () +. float tlim in
     while !running && (tlim < 0 || Unix.time () < end_time) do
       running := false ;
-      Gwdb.Collection.iter (fun i' ->
-          let i = Adef.int_of_iper i' in
+      Gwdb.Collection.iter (fun i ->
           if cget i = Adef.no_consang then
             match fget i with
             Some ifam ->
@@ -83,8 +81,8 @@ let compute ?(verbosity = 2) base tlim from_scratch =
               let cpl = foi base ifam in
               let ifath = get_father cpl in
               let imoth = get_mother cpl in
-              if cget (Adef.int_of_iper ifath) != Adef.no_consang &&
-                 cget (Adef.int_of_iper imoth) != Adef.no_consang
+              if cget ifath != Adef.no_consang
+              && cget imoth != Adef.no_consang
               then
                 let consang = relationship base tab ifath imoth in
                 trace verbosity !cnt max_cnt;
@@ -97,7 +95,7 @@ let compute ?(verbosity = 2) base tlim from_scratch =
                      begin
                        Printf.eprintf "\nMax consanguinity %g for %s... "
                          consang
-                         (Gutil.designation base (poi base (Adef.iper_of_int i)));
+                         (Gutil.designation base (poi base i));
                        flush stderr;
                        most := Some i
                      end)

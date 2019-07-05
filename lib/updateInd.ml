@@ -7,8 +7,6 @@ open Gwdb
 open TemplAst
 open Util
 
-let bogus_person_index = Adef.iper_of_int (-1)
-
 let string_person_of base p =
   let fp ip =
     let p = poi base ip in
@@ -243,7 +241,7 @@ and eval_simple_var conf base env p =
   | ["has_surnames_aliases"] -> bool_val (p.surnames_aliases <> [])
   | ["has_titles"] -> bool_val (p.titles <> [])
   | ["image"] -> str_val (Util.escape_html p.image)
-  | ["index"] -> str_val (string_of_int (Adef.int_of_iper p.key_index))
+  | ["index"] -> str_val (string_of_iper p.key_index)
   | ["is_female"] -> bool_val (p.sex = Female)
   | ["is_male"] -> bool_val (p.sex = Male)
   | ["is_first"] ->
@@ -713,7 +711,7 @@ and eval_is_relation_type rt =
 and eval_special_var conf base =
   function
     ["include_perso_header"] -> (* TODO merge with mainstream includes ?? *)
-      begin match p_getint conf.env "i" with
+      begin match p_getenv conf.env "i" with
         Some i ->
           let has_base_loop =
             try let _ = Util.create_topological_sort conf base in false with
@@ -721,7 +719,7 @@ and eval_special_var conf base =
           in
           if has_base_loop then VVstring ""
           else
-            let p = poi base (Adef.iper_of_int i) in
+            let p = poi base (iper_of_string i) in
             Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf
               base p;
             VVstring ""
@@ -847,8 +845,8 @@ let print_del1 conf base p =
   Util.hidden_env conf;
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"%s>\n"
     conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\"%s>\n"
-    (Adef.int_of_iper (get_key_index p)) conf.xhs;
+  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+    (string_of_iper (get_key_index p)) conf.xhs;
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
@@ -869,28 +867,28 @@ let print_add conf base =
      death_place = ""; death_note = ""; death_src = "";
      burial = UnknownBurial; burial_place = ""; burial_note = "";
      burial_src = ""; pevents = []; notes = ""; psources = "";
-     key_index = bogus_person_index}
+     key_index = dummy_iper}
   in
   print_update_ind conf base p ""
 
 let print_mod conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some i ->
-      let p = poi base (Adef.iper_of_int i) in
+      let p = poi base (iper_of_string i) in
       let sp = string_person_of base p in
       let digest = Update.digest_person sp in
       print_update_ind conf base sp digest
   | _ -> Hutil.incorrect_request conf
 
 let print_del conf base =
-  match p_getint conf.env "i" with
-    Some i -> let p = poi base (Adef.iper_of_int i) in print_del1 conf base p
+  match p_getenv conf.env "i" with
+    Some i -> let p = poi base (iper_of_string i) in print_del1 conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
-  match p_getint conf.env "i" with
+  match p_getenv conf.env "i" with
     Some i ->
-      let p = string_person_of base (poi base (Adef.iper_of_int i)) in
+      let p = string_person_of base (poi base (iper_of_string i)) in
       Hutil.interp conf "updindevt"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
