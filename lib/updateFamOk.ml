@@ -580,12 +580,10 @@ let reconstitute_family conf base =
 
 let strip_events fevents =
   let strip_array_witness pl =
-    let pl =
-      List.fold_right
-        (fun ((f, _, _, _, _), _ as p) pl -> if f = "" then pl else p :: pl)
-        (Array.to_list pl) []
-    in
-    Array.of_list pl
+    Array.of_list @@
+    Array.fold_right
+      (fun ((f, _, _, _, _), _ as p) pl -> if f = "" then pl else p :: pl)
+      pl []
   in
   List.fold_right
     (fun e accu ->
@@ -601,12 +599,10 @@ let strip_events fevents =
     fevents []
 
 let strip_array_persons pl =
-  let pl =
-    List.fold_right
-      (fun (f, _, _, _, _ as p) pl -> if f = "" then pl else p :: pl)
-      (Array.to_list pl) []
-  in
-  Array.of_list pl
+  Array.of_list @@
+  Array.fold_right
+    (fun (f, _, _, _, _ as p) pl -> if f = "" then pl else p :: pl)
+    pl []
 
 let error_family conf err =
   let err' =
@@ -629,42 +625,24 @@ let error_family conf err =
   raise @@ Update.ModErr err'
 
 let check_event_witnesses conf witnesses =
-  let wl = Array.to_list witnesses in
-  let rec loop wl =
-    match wl with
-      [] -> None
-    | ((fn, sn, _, _, _), _) :: l ->
-        if fn = "" && sn = "" then loop l
-        else if fn = "" || fn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "first name missing")
-        else if sn = "" || sn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "surname missing")
-        else loop l
+  let len = Array.length witnesses in
+  let rec loop i =
+    if i < len then begin
+      let ((fn, sn, _, _, _), _) = Array.unsafe_get witnesses i in
+      if fn = "" && sn = "" then loop (i + 1)
+      else if fn = "" || fn = "?" then
+        Some
+          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
+           transl conf "first name missing")
+      else if sn = "" || sn = "?" then
+        Some
+          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
+           transl conf "surname missing")
+      else loop (i + 1)
+    end
+    else None
   in
-  loop wl
-
-let check_witnesses conf fam =
-  let wl = Array.to_list fam.witnesses in
-  let rec loop wl =
-    match wl with
-      [] -> None
-    | (fn, sn, _, _, _) :: l ->
-        if fn = "" && sn = "" then loop l
-        else if fn = "" || fn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "first name missing")
-        else if sn = "" || sn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "surname missing")
-        else loop l
-  in
-  loop wl
+  loop 0
 
 let check_parents conf cpl =
   let (fa_fn, fa_sn, _, _, _) = Gutil.father cpl in
@@ -851,8 +829,7 @@ let infer_origin_file conf base ifam ncpl ndes =
 let fwitnesses_of fevents =
   List.fold_left
     (fun ipl e ->
-       List.fold_left (fun ipl (ip, _) -> ip :: ipl) ipl
-         (Array.to_list e.efam_witnesses))
+       Array.fold_left (fun ipl (ip, _) -> ip :: ipl) ipl e.efam_witnesses)
     [] fevents
 
 
@@ -1134,12 +1111,12 @@ let effective_mod conf base sfam scpl sdes =
     ndes.children;
   Update.add_misc_names_for_new_persons base !created_p;
   Update.update_misc_names_of_family base Male {family = get_family nfath};
-  let ol_witnesses = Array.to_list owitnesses in
-  let nl_witnesses = Array.to_list nfam.witnesses in
-  let ol_fevents = fwitnesses_of ofevents in
-  let nl_fevents = fwitnesses_of nfam.fevents in
-  let ol = List.append ol_witnesses ol_fevents in
-  let nl = List.append nl_witnesses nl_fevents in
+  let ol =
+    Array.fold_right (fun x acc -> x :: acc) owitnesses (fwitnesses_of ofevents)
+  in
+  let nl =
+    Array.fold_right (fun x acc -> x :: acc) nfam.witnesses (fwitnesses_of nfam.fevents)
+  in
   let pi = Adef.father ncpl in
   Update.update_related_pointers base pi ol nl; fi, nfam, ncpl, ndes
 
@@ -1253,9 +1230,9 @@ let effective_chg_order base ip u ifam n =
 let kill_family base ifam1 ip =
   let u = poi base ip in
   let l =
-    List.fold_right
+    Array.fold_right
       (fun ifam ifaml -> if ifam = ifam1 then ifaml else ifam :: ifaml)
-      (Array.to_list (get_family u)) []
+      (get_family u) []
   in
   let u = {family = Array.of_list l} in patch_union base ip u
 
@@ -1456,8 +1433,9 @@ let forbidden_disconnected conf scpl sdes =
     then
       false
     else
-      List.for_all (fun p -> get_create p <> Update.Link)
-        (Array.to_list sdes.children)
+      Array.for_all
+        (fun p -> get_create p <> Update.Link)
+        sdes.children
   else false
 
 let print_add o_conf base =

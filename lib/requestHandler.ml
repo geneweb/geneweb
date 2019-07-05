@@ -250,13 +250,13 @@ let specify conf base n pl =
              Wserver.printf ")</em>"
          end;
        begin let spouses =
-               List.fold_right
+               Array.fold_right
                  (fun ifam spouses ->
                     let cpl = foi base ifam in
                     let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
                     if p_surname base spouse <> "?" then spouse :: spouses
                     else spouses)
-                 (Array.to_list (get_family p)) []
+                 (get_family p) []
          in
          match spouses with
            [] -> ()

@@ -1180,11 +1180,9 @@ let print_del_ind_ok conf base =
   (* également le délier de sa/ses famille/s        *)
   let p = poi base ip in
   let has_children =
-    List.exists
-      (fun ifam ->
-        let des = foi base ifam in
-        Array.length (get_children des) > 0)
-      (Array.to_list (get_family p))
+    Array.exists
+      (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)
+      (get_family p)
   in
   let resp =
     try
@@ -1192,7 +1190,7 @@ let print_del_ind_ok conf base =
       let (all_wl, all_ml, all_hr) =
         if has_children then ([], [], [])
         else
-          List.fold_left
+          Array.fold_left
             (fun (all_wl, all_ml, all_hr) ifam ->
                match Api_update_family.print_del conf base ip ifam with
                | Api_update_util.UpdateSuccess (wl, ml, hr) ->
@@ -1200,7 +1198,7 @@ let print_del_ind_ok conf base =
                | Api_update_util.UpdateError s -> raise (Update.ModErr s)
                | Api_update_util.UpdateErrorConflict c ->
                     raise (Api_update_util.ModErrApiConflict c))
-            ([], [], []) (Array.to_list (get_family p))
+            ([], [], []) (get_family p)
       in
       let (all_wl, all_ml, all_hr) =
         match Api_update_person.print_del conf base ip with
@@ -2039,7 +2037,7 @@ let print_add_child conf base =
   let ifam = params.Mwrite.Add_child_request.index_family in
   let p = poi base ip in
   let family_spouse =
-    List.fold_right
+    Array.fold_right
       (fun ifam accu ->
          let cpl = foi base ifam in
          let isp = Gutil.spouse ip cpl in
@@ -2081,7 +2079,7 @@ let print_add_child conf base =
            }
          in
          family_spouse :: accu)
-      (Array.to_list (get_family p)) []
+      (get_family p) []
   in
   let surname = sou base (get_surname p) in
   let first_name = sou base (get_first_name p) in

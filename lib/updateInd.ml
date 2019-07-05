@@ -153,12 +153,12 @@ and eval_simple_var conf base env p =
             let note = sou base e.epers_note in
             let src = sou base e.epers_src in
             let wit =
-              List.fold_right
+              Array.fold_right
                 (fun (w, wk) accu ->
                    (Util.string_of_witness_kind conf (get_sex p) wk ^ ": " ^
                     Util.person_text conf base (poi base w)) ::
                    accu)
-                (Array.to_list e.epers_witnesses) []
+                e.epers_witnesses []
             in
             let s = String.concat ", " [name; date; place; note; src] in
             let sw = String.concat ", " wit in str_val (s ^ ", " ^ sw)
@@ -796,18 +796,18 @@ let print_foreach print_ast _eval_expr =
         begin match
           (try Some (List.nth list (i - 1)) with Failure _ -> None)
         with
-          Some e ->
-            let rec loop first wcnt =
-              function
-                _ :: l ->
-                  let env =
-                    ("wcnt", Vint wcnt) :: ("first", Vbool first) ::
-                    ("last", Vbool (l = [])) :: env
-                  in
-                  List.iter (print_ast env p) al; loop false (wcnt + 1) l
-              | [] -> ()
-            in
-            loop true 1 (Array.to_list e.epers_witnesses)
+        | Some e ->
+          let last = Array.length e.epers_witnesses - 1 in
+          Array.iteri
+            begin fun i _ ->
+              let env =
+                ("wcnt", Vint (i + 1))
+                :: ("first", Vbool (i = 0))
+                :: ("last", Vbool (i = last)) :: env
+              in
+              List.iter (print_ast env p) al
+            end
+            e.epers_witnesses
         | None -> ()
         end
     | _ -> ()

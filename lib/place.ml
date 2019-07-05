@@ -127,7 +127,6 @@ let get_all =
   array
 
 let print_html_places_surnames conf base (array : (string list * (string * iper list) list) array) =
-  let list = Array.to_list array in
   let link_to_ind =
     match p_getenv conf.base_env "place_surname_link_to_ind" with
       Some "yes" -> true
@@ -170,7 +169,7 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
     | [] -> List.iter (fun _ -> Wserver.printf "</ul></li>\n") prev
   in
   Wserver.printf "<ul>\n";
-  loop [] list;
+  loop [] (Array.to_list array) ;
   Wserver.printf "</ul>\n"
 
 let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death ~add_burial =
@@ -185,7 +184,6 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
   in
   let title _ = Wserver.printf "%s" (capitale (transl conf "place")) in
   Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s2 s1) array ;
-  let list = Array.to_list array in
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_baptism = p_getenv conf.env "bp" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
@@ -200,20 +198,15 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<p>\n";
-  Wserver.printf "<a href=\"%sm=PS%s&k=\">" (commd conf) opt;
-  Wserver.printf "%s" (transl conf "long display");
-  Wserver.printf "</a>";
-  Wserver.printf "</p>\n";
-  Wserver.printf "<p>\n";
-  List.iter
+  Wserver.printf
+    "<p><a href=\"%sm=PS%s&k=\">%s</a></p><p>"
+    (commd conf) opt (transl conf "long display") ;
+  Array.iter
     (fun (s, x) ->
-       Wserver.printf "<a href=\"%sm=PS%s&k=%s\">" (commd conf) opt
-         (Util.code_varenv s);
-       Wserver.printf "%s" s;
-       Wserver.printf "</a>";
-       Wserver.printf " (%d),\n" x)
-    list;
+       Wserver.printf
+         "<a href=\"%sm=PS%s&k=%s\">%s</a> (%d),\n"
+         (commd conf) opt (Util.code_varenv s) s x)
+    array ;
   Wserver.printf "</p>\n";
   Hutil.trailer conf
 

@@ -473,32 +473,28 @@ let build_graph_desc conf base p max_gen =
             else
               begin
                 Hashtbl.add ht (get_iper p) true;
-                let ifam = get_family p in
                 let l =
                   (* fold_right pour le tri des mariages. *)
-                  List.fold_right
+                  Array.fold_right
                     (fun ifam accu ->
                       let fam = foi base ifam in
                       let sp = poi base (Gutil.spouse (get_iper p) fam) in
-                      let children =
-                        List.map (poi base) (Array.to_list (get_children fam))
-                      in
                       nodes := sp :: !nodes;
-                      if gen <> max_gen then
-                        begin
-                          nodes := children @ !nodes;
-                          List.iter
+                      if gen <> max_gen then begin
+                        let children = Array.map (poi base) (get_children fam) in
+                          nodes := Array.fold_right (fun x acc -> x :: acc) children !nodes;
+                          Array.iter
                             (fun c ->
                               edges := (create_edge p c) :: !edges;
                               edges := (create_edge sp c) :: !edges)
                             children;
                           create_family ifam families;
-                          List.fold_right
+                          Array.fold_right
                             (fun c accu -> (c, gen + 1) :: accu)
                             children accu
                         end
                       else accu)
-                    (Array.to_list ifam) l
+                    (get_family p) l
                 in
                 loop l nodes edges families
               end
@@ -578,7 +574,6 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
     let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
     match (b1, b2) with
     | (Some b1, Some b2) ->
-(*        nodes := person_to_node a :: !nodes;*)
         nodes := a :: !nodes;
         let _ =
           List.fold_left
@@ -598,9 +593,7 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
               p)
             a b2;
         in
-        List.iter
-          (fun ifam -> create_family ifam families)
-          (Array.to_list (get_family a))
+        Array.iter (fun ifam -> create_family ifam families) (get_family a)
     | _ -> ()
   in
   List.iter (fun (a, _) -> create_link a) list;

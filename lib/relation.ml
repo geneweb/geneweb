@@ -270,56 +270,51 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
       let fam = foi base ifam in
       Gwdb.Marker.set mark_fam ifam true;
       let result =
-        [get_father fam, Parent, ifam; get_mother fam, Parent, ifam]
-      in
-      let result =
-        result @
         Array.fold_right
-          (fun child children -> (child, Sibling, ifam) :: children)
-          (get_children (foi base ifam)) []
-      in
-      let result =
-        result @
-        List.fold_right
           (fun fam children ->
              if ifam = fam then children
              else if Gwdb.Marker.get mark_fam fam then children
              else
-               List.fold_right
+               Array.fold_right
                  (fun child children -> (child, HalfSibling, fam) :: children)
-                 (Array.to_list (get_children (foi base fam))) children)
-          (Array.to_list (get_family (pget conf base (get_father fam)))) []
+                 (get_children (foi base fam)) children)
+          (get_family (pget conf base (get_mother fam))) []
       in
-      result @
-      List.fold_right
-        (fun fam children ->
-           if ifam = fam then children
-           else if Gwdb.Marker.get mark_fam fam then children
-           else
-             List.fold_right
-               (fun child children -> (child, HalfSibling, fam) :: children)
-               (Array.to_list (get_children (foi base fam))) children)
-        (Array.to_list (get_family (pget conf base (get_mother fam)))) []
+      let result =
+        Array.fold_right
+          (fun fam children ->
+             if ifam = fam then children
+             else if Gwdb.Marker.get mark_fam fam then children
+             else
+               Array.fold_right
+                 (fun child children -> (child, HalfSibling, fam) :: children)
+                 (get_children (foi base fam)) children)
+          (get_family (pget conf base (get_father fam))) result
+      in
+      let result =
+        Array.fold_right
+          (fun child children -> (child, Sibling, ifam) :: children)
+          (get_children (foi base ifam))
+          result
+      in
+      (get_father fam, Parent, ifam)
+      :: (get_mother fam, Parent, ifam)
+      :: result
   in
   let neighbours iper =
-    let result =
-      List.fold_right
-        (fun ifam nb ->
-           if Gwdb.Marker.get mark_fam ifam then nb
-           else
-             let fam = foi base ifam in
-             Gwdb.Marker.set mark_fam ifam true;
-             List.fold_right
-               (fun child children -> (child, Child, ifam) :: children)
-               (Array.to_list (get_children fam))
-               [get_father fam, Mate, ifam; get_mother fam, Mate, ifam] @
-             nb)
-        (Array.to_list (get_family (pget conf base iper))) []
-    in
-    result @
-    (match get_parents (pget conf base iper) with
-       Some ifam -> parse_fam ifam
-     | _ -> [])
+    Array.fold_right
+      (fun ifam nb ->
+         if Gwdb.Marker.get mark_fam ifam then nb
+         else
+           let fam = foi base ifam in
+           Gwdb.Marker.set mark_fam ifam true;
+           Array.fold_right
+             (fun child children -> (child, Child, ifam) :: children)
+             (get_children fam)
+             [get_father fam, Mate, ifam; get_mother fam, Mate, ifam] @
+           nb)
+      (get_family (pget conf base iper))
+      (Opt.map_default [] parse_fam (get_parents (pget conf base iper) ) )
   in
   let rec make_path path vertex =
     match List.hd path with
@@ -1141,7 +1136,7 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
 
 let known_spouses_list conf base p excl_p =
   let u = p in
-  List.fold_left
+  Array.fold_left
     (fun spl ifam ->
        let sp = pget conf base (Gutil.spouse (get_iper p) (foi base ifam)) in
        if sou base (get_first_name sp) <> "?" &&
@@ -1150,7 +1145,7 @@ let known_spouses_list conf base p excl_p =
        then
          sp :: spl
        else spl)
-    [] (Array.to_list (get_family u))
+    [] (get_family u)
 
 let merge_relations rl1 rl2 =
   List.merge

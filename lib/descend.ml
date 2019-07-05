@@ -178,13 +178,13 @@ let labelled conf base marks max_lev lev ip =
      Some ifam ->
      let fam = foi base ifam in
      let el = get_children fam in
-     List.exists
+     Array.exists
        (fun ie ->
           let e = pget conf base ie in
           let u = e in
           Array.length (get_family u) <> 0 &&
           not (close_to_end conf base marks max_lev lev e))
-       (Array.to_list el)
+       el
    | _ -> false)
 
 let label_of_path paths p =
@@ -229,60 +229,58 @@ let total = ref 0
 let print_family_locally conf base marks paths max_lev lev p1 c1 e =
   let rec loop lev p =
     if lev < max_lev then
-      let _ =
-        List.fold_left
-          (fun (cnt, first, need_br) ifam ->
-             let fam = foi base ifam in
-             let c = Gutil.spouse (get_iper p) fam in
-             let el = get_children fam in
-             let c = pget conf base c in
-             if need_br then Wserver.printf "<br>" ;
-             if not first then print_repeat_child conf base p1 c1 p;
-             display_spouse conf base marks paths fam p c;
-             Wserver.printf "\n";
-             let print_children =
-               get_sex p = Male ||
-               not (Gwdb.Marker.get marks (get_iper c))
-             in
-             if print_children then
-               Wserver.printf "<ol start=\"%d\">\n" (succ cnt);
-             let cnt =
-               List.fold_left
-                 (fun cnt ie ->
-                    let e = pget conf base ie in
-                    if print_children then
-                      begin
-                        Wserver.printf "<li type=\"A\"> ";
-                        print_child conf base p c e;
-                        Wserver.printf "\n";
-                        incr total;
-                        if succ lev = max_lev then
-                          Mutil.list_iter_first
-                            (fun first ifam ->
-                               let fam = foi base ifam in
-                               let c1 = Gutil.spouse ie fam in
-                               let el = get_children fam in
-                               let c1 = pget conf base c1 in
-                               if not first then
-                                 begin
-                                   Wserver.printf "<br>" ;
-                                   print_repeat_child conf base p c e
-                                 end;
-                               display_spouse conf base marks paths fam e c1;
-                               if Array.length el <> 0 then
-                                 Wserver.printf ".....";
-                               Wserver.printf "\n")
-                            (Array.to_list (get_family (pget conf base ie)))
-                        else loop (succ lev) e
-                      end;
-                    succ cnt)
-                 cnt (Array.to_list el)
-             in
-             if print_children then Wserver.printf "</ol>\n";
-             cnt, false, not print_children)
-          (0, true, false) (Array.to_list (get_family p))
-      in
-      ()
+      ignore @@
+      Array.fold_left
+        begin fun (cnt, first, need_br) ifam ->
+          let fam = foi base ifam in
+          let c = Gutil.spouse (get_iper p) fam in
+          let el = get_children fam in
+          let c = pget conf base c in
+          if need_br then Wserver.printf "<br>" ;
+          if not first then print_repeat_child conf base p1 c1 p;
+          display_spouse conf base marks paths fam p c;
+          Wserver.printf "\n";
+          let print_children =
+            get_sex p = Male || not (Gwdb.Marker.get marks (get_iper c))
+          in
+          if print_children then Wserver.printf "<ol start=\"%d\">\n" (succ cnt);
+          let cnt =
+            Array.fold_left
+              begin fun cnt ie ->
+                let e = pget conf base ie in
+                if print_children then
+                  begin
+                    Wserver.printf "<li type=\"A\"> ";
+                    print_child conf base p c e;
+                    Wserver.printf "\n";
+                    incr total;
+                    if succ lev = max_lev then
+                      Array.iteri
+                        begin fun i ifam ->
+                          let fam = foi base ifam in
+                          let c1 = Gutil.spouse ie fam in
+                          let el = get_children fam in
+                          let c1 = pget conf base c1 in
+                          if i <> 0 then
+                            begin
+                              Wserver.printf "<br>" ;
+                              print_repeat_child conf base p c e
+                            end ;
+                          display_spouse conf base marks paths fam e c1;
+                          if Array.length el <> 0 then Wserver.printf ".....";
+                          Wserver.printf "\n"
+                        end
+                        (get_family (pget conf base ie))
+                    else loop (succ lev) e
+                  end ;
+                succ cnt
+              end
+              cnt el
+          in
+          if print_children then Wserver.printf "</ol>\n";
+          cnt, false, not print_children
+        end
+        (0, true, false) (get_family p)
   in
   loop lev e
 
@@ -837,11 +835,12 @@ let print_person_table conf base p lab =
         Wserver.printf "</td>\n"
       end
     else
-      begin let n =
-        List.fold_left
-          (fun n ifam -> n + Array.length (get_children (foi base ifam))) 0
-          (Array.to_list (get_family p))
-      in
+      begin
+        let n =
+          Array.fold_left
+            (fun n ifam -> n + Array.length (get_children (foi base ifam))) 0
+            (get_family p)
+        in
         Wserver.printf "<td>\n";
         Wserver.printf "%d &nbsp;" n;
         Wserver.printf "</td>\n"
@@ -981,16 +980,16 @@ let build_desc conf base l =
         let nx_accu =
           (* On fait des fold_left pour garder l'ordre des enfants. *)
           (* lab correspond au numéro d'Aboville de p.              *)
-          List.fold_left
+          Array.fold_left
             (fun accu ifam ->
                let fam = foi base ifam in
-               List.fold_left
+               Array.fold_left
                  (fun accu ip ->
                     let _ = incr cnt in
                     (pget conf base ip, lab ^ string_of_int !cnt ^ ".") ::
                     accu)
-                 accu (Array.to_list (get_children fam)))
-            accu (Array.to_list (get_family p))
+                 accu (get_children fam))
+            accu (get_family p)
         in
         loop l nx_accu
   in
@@ -1076,13 +1075,15 @@ let make_tree_hts conf base gv p =
     if v = 0 then n + max 1 (Array.length (get_family u))
     else if Array.length (get_family u) = 0 then n + 1
     else
-      List.fold_left (fun n ifam -> fam_nb_column n v (foi base ifam)) n
-        (Array.to_list (get_family u))
+      Array.fold_left
+        (fun n ifam -> fam_nb_column n v (foi base ifam)) n
+        (get_family u)
   and fam_nb_column n v des =
     if Array.length (get_children des) = 0 then n + 1
     else
-      List.fold_left (fun n iper -> nb_column n (v - 1) (pget conf base iper))
-        n (Array.to_list (get_children des))
+      Array.fold_left
+        (fun n iper -> nb_column n (v - 1) (pget conf base iper))
+        n (get_children des)
   in
   let vertical_bar_txt v tdl po =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
@@ -1108,23 +1109,23 @@ let make_tree_hts conf base gv p =
   let spouses_vertical_bar_txt v tdl po =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
     match po with
-      Some (p, _) when Array.length (get_family p) > 0 ->
-        fst
-          (List.fold_left
-             (fun (tdl, first) ifam ->
-                let tdl =
-                  if first then tdl else (1, LeftA, TDnothing) :: tdl
-                in
-                let des = foi base ifam in
-                let td =
-                  if Array.length (get_children des) = 0 then
-                    1, LeftA, TDnothing
-                  else
-                    let ncol = fam_nb_column 0 (v - 1) des in
-                    2 * ncol - 1, CenterA, TDbar None
-                in
-                td :: tdl, false)
-             (tdl, true) (Array.to_list (get_family p)))
+    | Some (p, _) when Array.length (get_family p) > 0 ->
+      fst @@
+      Array.fold_left
+        (fun (tdl, first) ifam ->
+           let tdl =
+             if first then tdl else (1, LeftA, TDnothing) :: tdl
+           in
+           let des = foi base ifam in
+           let td =
+             if Array.length (get_children des) = 0 then
+               1, LeftA, TDnothing
+             else
+               let ncol = fam_nb_column 0 (v - 1) des in
+               2 * ncol - 1, CenterA, TDbar None
+           in
+           td :: tdl, false)
+        (tdl, true) (get_family p)
     | _ -> (1, LeftA, TDnothing) :: tdl
   in
   let spouses_vertical_bar v gen =
@@ -1134,47 +1135,47 @@ let make_tree_hts conf base gv p =
   let horizontal_bar_txt v tdl po =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
     match po with
-      Some (p, _) when Array.length (get_family p) > 0 ->
-        fst
-          (List.fold_left
-             (fun (tdl, first) ifam ->
-                let tdl =
-                  if first then tdl else (1, LeftA, TDnothing) :: tdl
-                in
-                let des = foi base ifam in
-                let tdl =
-                  if Array.length (get_children des) = 0 then
-                    (1, LeftA, TDnothing) :: tdl
-                  else if Array.length (get_children des) = 1 then
-                    let u = pget conf base (get_children des).(0) in
-                    let ncol = nb_column 0 (v - 1) u in
-                    (2 * ncol - 1, CenterA, TDbar None) :: tdl
-                  else
-                    let rec loop tdl i =
-                      if i = Array.length (get_children des) then tdl
-                      else
-                        let iper = (get_children des).(i) in
-                        let u = pget conf base iper in
-                        let tdl =
-                          if i > 0 then
-                            let align = CenterA in
-                            (1, align, TDhr align) :: tdl
-                          else tdl
-                        in
-                        let ncol = nb_column 0 (v - 1) u in
-                        let align =
-                          if i = 0 then RightA
-                          else if i = Array.length (get_children des) - 1 then
-                            LeftA
-                          else CenterA
-                        in
-                        let td = 2 * ncol - 1, align, TDhr align in
-                        loop (td :: tdl) (i + 1)
-                    in
-                    loop tdl 0
-                in
-                tdl, false)
-             (tdl, true) (Array.to_list (get_family p)))
+    | Some (p, _) when Array.length (get_family p) > 0 ->
+      fst @@
+      Array.fold_left
+        (fun (tdl, first) ifam ->
+           let tdl =
+             if first then tdl else (1, LeftA, TDnothing) :: tdl
+           in
+           let des = foi base ifam in
+           let tdl =
+             if Array.length (get_children des) = 0 then
+               (1, LeftA, TDnothing) :: tdl
+             else if Array.length (get_children des) = 1 then
+               let u = pget conf base (get_children des).(0) in
+               let ncol = nb_column 0 (v - 1) u in
+               (2 * ncol - 1, CenterA, TDbar None) :: tdl
+             else
+               let rec loop tdl i =
+                 if i = Array.length (get_children des) then tdl
+                 else
+                   let iper = (get_children des).(i) in
+                   let u = pget conf base iper in
+                   let tdl =
+                     if i > 0 then
+                       let align = CenterA in
+                       (1, align, TDhr align) :: tdl
+                     else tdl
+                   in
+                   let ncol = nb_column 0 (v - 1) u in
+                   let align =
+                     if i = 0 then RightA
+                     else if i = Array.length (get_children des) - 1 then
+                       LeftA
+                     else CenterA
+                   in
+                   let td = 2 * ncol - 1, align, TDhr align in
+                   loop (td :: tdl) (i + 1)
+               in
+               loop tdl 0
+           in
+           tdl, false)
+        (tdl, true) (get_family p)
     | _ -> (1, LeftA, TDnothing) :: tdl
   in
   let horizontal_bars v gen =
@@ -1257,23 +1258,22 @@ let make_tree_hts conf base gv p =
            Some (p, _) ->
              if Array.length (get_family p) = 0 then None :: gen
              else
-               List.fold_right
+               Array.fold_right
                  (fun ifam gen ->
                     let des = foi base ifam in
                     if Array.length (get_children des) = 0 then None :: gen
                     else
                       let age_auth =
-                        List.for_all
-                          (fun ip ->
-                             authorized_age conf base (pget conf base ip))
-                          (Array.to_list (get_children des))
+                        Array.for_all
+                          (fun ip -> authorized_age conf base (pget conf base ip))
+                          (get_children des)
                       in
-                      List.fold_right
+                      Array.fold_right
                         (fun iper gen ->
                            let g = pget conf base iper, age_auth in
                            Some g :: gen)
-                        (Array.to_list (get_children des)) gen)
-                 (Array.to_list (get_family p)) gen
+                        (get_children des) gen)
+                 (get_family p) gen
          | None -> None :: gen)
       gen []
   in

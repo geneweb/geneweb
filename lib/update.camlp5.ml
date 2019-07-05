@@ -239,19 +239,21 @@ let print_err_unknown conf _base (f, s, o) =
 
 let update_misc_names_of_family base p_sex u =
   match p_sex with
-    Male ->
-      List.iter
-        (fun ifam ->
-           let fam = foi base ifam in
-           List.iter
-             (fun ip ->
-                List.iter
-                  (fun name ->
-                     if not (List.mem ip (Gutil.person_ht_find_all base name)) then
-                       Gutil.person_ht_add base name ip)
-                  (person_misc_names base (poi base ip) get_titles))
-             (get_mother fam :: Array.to_list (get_children fam)))
-        (Array.to_list u.family)
+  | Male ->
+    Array.iter
+      begin fun ifam ->
+        let fam = foi base ifam in
+        let fn ip =
+          List.iter
+            (fun name ->
+               if not (List.mem ip (Gutil.person_ht_find_all base name)) then
+                 Gutil.person_ht_add base name ip)
+            (person_misc_names base (poi base ip) get_titles)
+        in
+        fn (get_mother fam) ;
+        Array.iter fn (get_children fam)
+      end
+      u.family
   | _ -> ()
 
 let delete_topological_sort_v conf _base =

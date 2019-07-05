@@ -275,44 +275,33 @@ let print_first_available_person conf base =
 (* ************************************************************************ *)
 let print_find_sosa conf base =
   let ref_person = get_params conf Mext.parse_reference_person in
-  let sn = ref_person.M.Reference_person.n in
-  let fn = ref_person.M.Reference_person.p in
-  let occ = ref_person.M.Reference_person.oc in
+  let n = ref_person.M.Reference_person.n in
+  let p = ref_person.M.Reference_person.p in
+  let oc = ref_person.M.Reference_person.oc in
   let ref_p =
-    match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
+    match Gwdb.person_of_key base p n (Int32.to_int oc) with
     | Some ip ->
-        let p = poi base ip in
-        let rec loop faml =
-          match faml with
-          | [] ->
-              (* On reconstruit la ref_person pour être sûr des accents. *)
-              M.Reference_person.({
-                n = Name.lower sn;
-                p = Name.lower fn;
-                oc = occ;
-              })
-          | ifam :: faml ->
-              let fam = foi base ifam in
-              match (Array.to_list (get_children fam)) with
-              | [] -> loop faml
-              | ip :: _ ->
-                  let sosa = poi base ip in
-                  let fn = Name.lower (sou base (get_first_name sosa)) in
-                  let sn = Name.lower (sou base (get_surname sosa)) in
-                  let occ = Int32.of_int (get_occ sosa) in
-                  M.Reference_person.({
-                    n = sn;
-                    p = fn;
-                    oc = occ;
-                  })
-        in
-        loop (Array.to_list (get_family p))
+      let arr = get_family (poi base ip) in
+      let len = Array.length arr in
+      let rec loop i =
+        if i < len
+        then begin
+          let fam = foi base (Array.unsafe_get arr i) in
+          match get_children fam with
+          | [||] -> loop (i + 1)
+          | arr ->
+            let sosa = poi base @@ Array.unsafe_get arr 0 in
+            let p = Name.lower (sou base (get_first_name sosa)) in
+            let n = Name.lower (sou base (get_surname sosa)) in
+            let oc = Int32.of_int (get_occ sosa) in
+            { M.Reference_person.n ; p ; oc }
+        end else
+          (* On reconstruit la ref_person pour être sûr des accents. *)
+          M.Reference_person.{ n = Name.lower n ; p = Name.lower p ; oc = oc }
+      in
+      loop 0
     | None ->
-        M.Reference_person.({
-          n = "";
-          p = "";
-          oc = Int32.of_int 0;
-        })
+        M.Reference_person.{ n = "" ; p = "" ; oc = Int32.of_int 0 ; }
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
@@ -519,16 +508,9 @@ let print_max_ancestors =
   let mark = Gwdb.iper_marker ipers false in
 
   let has_children p =
-    let fam = get_family p in
-    let rec loop fam =
-      match fam with
-      | [] -> false
-      | ifam :: l ->
-          let des = foi base ifam in
-          if Array.length (get_children des) > 0 then true
-          else loop l
-    in
-    loop (Array.to_list fam)
+    Array.exists
+      (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)
+      (get_family p)
   in
 
   let rec nb_ancestors ip =

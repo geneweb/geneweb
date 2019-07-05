@@ -1,4 +1,3 @@
-(* $Id: mutil.ml,v 5.19 2007-08-04 07:22:30 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 let int_size = 4
@@ -401,11 +400,10 @@ let input_lexicon lang ht open_fname =
   with Sys_error _ -> ()
 
 let array_to_list_map fn a =
-  let rec loop acc i =
-    if i < 0 then acc
-    else loop (fn (Array.unsafe_get a i) :: acc) (i - 1)
-  in
-  loop [] (Array.length a - 1)
+  Array.fold_right (fun x acc -> fn x :: acc) a []
+
+let array_to_list_rev_map fn a =
+  Array.fold_left (fun acc x -> fn x :: acc) [] a
 
 let string_of_int_sep sep x =
   let digits, len =

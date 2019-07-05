@@ -157,7 +157,7 @@ let error_conflict_person_link base (f, s, o, create, _, force_create) =
 
 let check_person_conflict conf base sp =
   (* Vérification de la personne. *)
-  if nb_of_persons base = 0 then ()
+  if nb_of_persons base = 0 then () (* FIXME: remove this ? *)
   else
     begin
       let op = poi base (sp.key_index) in
@@ -191,110 +191,34 @@ let check_person_conflict conf base sp =
              raise (ModErrApiConflict conflict))
         end;
       (* Vérification des rparents. *)
-      let rec loop rparents i =
-        match rparents with
-        | [] -> ()
-        | r :: l ->
-            match (r.r_fath, r.r_moth) with
-            | (Some (f, s, o, create, var, force_create), None) |
-              (None, Some (f, s, o, create, var, force_create)) ->
-                if error_conflict_person_link base (f, s, o, create, var, force_create) then
-                  let form = Some `person_form1 in
-                  let conflict =
-                    {
-                      Mwrite.Create_conflict.form = form;
-                      witness = false;
-                      rparents = true;
-                      event = false;
-                      pos = Some (Int32.of_int i);
-                      pos_witness = None;
-                      lastname = s;
-                      firstname = f;
-                    }
-                  in
-                  raise (ModErrApiConflict conflict)
-                else
-                  loop l (i + 1)
-            | _ ->
-              (* Dans l'API, ne peut pas arriver *)
-              loop l (i + 1)
-      in
-      loop sp.rparents 0;
-      (* Vérification des pevents. *)
-      let rec loop pevents i =
-        match pevents with
-        | [] -> ()
-        | evt :: l ->
-            begin
-            let rec loop2 witnesses j =
-              match witnesses with
-              | [] -> ()
-              | ((f, s, o, create, var, force_create), _) :: l ->
-                  if error_conflict_person_link base (f, s, o, create, var, force_create) then
-                    let form = Some `person_form1 in
-                    let conflict =
-                      {
-                        Mwrite.Create_conflict.form = form;
-                        witness = true;
-                        rparents = false;
-                        event = true;
-                        pos = Some (Int32.of_int i);
-                        pos_witness = Some (Int32.of_int j);
-                        lastname = s;
-                        firstname = f;
-                      }
-                    in
-                    raise (ModErrApiConflict conflict)
-                  else
-                    loop2 l (j + 1)
+      List.iteri begin fun i r ->
+        match (r.r_fath, r.r_moth) with
+        | (Some (f, s, o, create, var, force_create), None)
+        | (None, Some (f, s, o, create, var, force_create)) ->
+          if error_conflict_person_link base (f, s, o, create, var, force_create) then
+            let form = Some `person_form1 in
+            let conflict =
+              {
+                Mwrite.Create_conflict.form = form;
+                witness = false;
+                rparents = true;
+                event = false;
+                pos = Some (Int32.of_int i);
+                pos_witness = None;
+                lastname = s;
+                firstname = f;
+              }
             in
-            loop2 (Array.to_list evt.epers_witnesses) 0;
-            loop l (i + 1)
-            end
-      in
-      loop sp.pevents 0
-    end
-
-let check_family_conflict base sfam scpl sdes =
-  (* Vérification des parents. *)
-  let rec loop parents i =
-    match parents with
-    | [] -> ()
-    | (f, s, o, create, var, force_create) :: l ->
-        if error_conflict_person_link base (f, s, o, create, var, force_create) then
-          let form =
-            if i = 0 then Some `person_form1
-            else  Some `person_form2
-          in
-          let conflict =
-            {
-              Mwrite.Create_conflict.form = form;
-              witness = false;
-              rparents = false;
-              event = false;
-              pos = None;
-              pos_witness = None;
-              lastname = s;
-              firstname = f;
-            }
-          in
-          raise (ModErrApiConflict conflict)
-        else
-          loop l (i + 1)
-  in
-  loop (Array.to_list (Adef.parent_array scpl)) 0;
-  (* Vérification des fevents. *)
-  let rec loop fevents i =
-    match fevents with
-    | [] -> ()
-    | evt :: l ->
-        begin
-        let rec loop2 witnesses j =
-          match witnesses with
-          | [] -> ()
-          | ((f, s, o, create, var, force_create), _) :: l ->
+            raise (ModErrApiConflict conflict)
+        | _ -> failwith __LOC__ (* Dans l'API, ne peut pas arriver *)
+      end sp.rparents ;
+      (* Vérification des pevents. *)
+      List.iteri begin
+        fun i evt ->
+          Array.iteri begin
+            fun j ((f, s, o, create, var, force_create), _) ->
               if error_conflict_person_link base (f, s, o, create, var, force_create) then
-                let form = Some `family_form in
+                let form = Some `person_form1 in
                 let conflict =
                   {
                     Mwrite.Create_conflict.form = form;
@@ -308,39 +232,69 @@ let check_family_conflict base sfam scpl sdes =
                   }
                 in
                 raise (ModErrApiConflict conflict)
-              else
-                loop2 l (j + 1)
-        in
-        loop2 (Array.to_list evt.efam_witnesses) 0;
-        loop l (i + 1)
-        end
-  in
-  loop sfam.fevents 0;
-  (* Vérification des enfants. *)
-  let rec loop children i =
-    match children with
-    | [] -> ()
-    | (f, s, o, create, var, force_create) :: l ->
-        if error_conflict_person_link base (f, s, o, create, var, force_create) then
-          let form = Some `person_form1 in
-          let conflict =
-            {
-              Mwrite.Create_conflict.form = form;
-              witness = false;
-              rparents = false;
-              event = false;
-              pos = None;
-              pos_witness = None;
-              lastname = s;
-              firstname = f;
-            }
-          in
-          raise (ModErrApiConflict conflict)
-        else
-          loop l (i + 1)
-  in
-  loop (Array.to_list sdes.children) 0
+          end evt.epers_witnesses ;
+      end sp.pevents ;
+    end
 
+let check_family_conflict base sfam scpl sdes =
+  (* Vérification des parents. *)
+  Array.iteri begin fun i (f, s, o, create, var, force_create) ->
+    if error_conflict_person_link base (f, s, o, create, var, force_create) then
+      let form =
+        if i = 0 then Some `person_form1 else Some `person_form2
+      in
+      let conflict =
+        {
+          Mwrite.Create_conflict.form = form;
+          witness = false;
+          rparents = false;
+          event = false;
+          pos = None;
+          pos_witness = None;
+          lastname = s;
+          firstname = f;
+        }
+      in
+      raise (ModErrApiConflict conflict)
+  end (Adef.parent_array scpl) ;
+  (* Vérification des fevents. *)
+  List.iteri begin fun i evt ->
+    Array.iteri begin fun j ((f, s, o, create, var, force_create), _) ->
+      if error_conflict_person_link base (f, s, o, create, var, force_create) then
+        let form = Some `family_form in
+        let conflict =
+          {
+            Mwrite.Create_conflict.form = form;
+            witness = true;
+            rparents = false;
+            event = true;
+            pos = Some (Int32.of_int i);
+            pos_witness = Some (Int32.of_int j);
+            lastname = s;
+            firstname = f;
+          }
+        in
+        raise (ModErrApiConflict conflict)
+    end evt.efam_witnesses ;
+  end sfam.fevents ;
+  (* Vérification des enfants. *)
+  Array.iteri begin fun i (f, s, o, create, var, force_create) ->
+    if error_conflict_person_link base (f, s, o, create, var, force_create) then
+      let form = Some `person_form1 in
+      let conflict =
+        {
+          Mwrite.Create_conflict.form = form;
+          witness = false;
+          rparents = false;
+          event = false;
+          pos = Some (Int32.of_int i);
+          pos_witness = None;
+          lastname = s;
+          firstname = f;
+        }
+      in
+      raise (ModErrApiConflict conflict)
+  end sdes.children
 
 (**/**) (* Convertion d'une date. *)
 
@@ -878,7 +832,7 @@ let pers_to_piqi_person_search_info conf base p =
           | None -> None
         in
         let witnesses =
-          List.map
+          Mutil.array_to_list_map
             (fun (ip, wk) ->
                let witness_type =
                  match wk with
@@ -886,15 +840,9 @@ let pers_to_piqi_person_search_info conf base p =
                  | Witness_GodParent -> `witness_godparent
                  | Witness_Officer   -> `witness_officer
                in
-               let witness = poi base ip in
-               let witness =
-                 pers_to_piqi_simple_person conf base witness
-               in
-               Mwrite.Witness_event.({
-                 witness_type = witness_type;
-                 witness = witness;
-               }))
-            (Array.to_list w)
+               let witness = pers_to_piqi_simple_person conf base @@ poi base ip in
+               Mwrite.Witness_event.{ witness_type ; witness })
+            w
         in
         {
           Mwrite.Event.name = name;
@@ -1323,7 +1271,7 @@ let pers_to_piqi_mod_person conf base p =
          let note = sou base evt.epers_note in
          let src = sou base evt.epers_src in
          let witnesses =
-           List.map
+           Mutil.array_to_list_map
              (fun (ip, wk) ->
                 let witness_type =
                   match wk with
@@ -1333,11 +1281,8 @@ let pers_to_piqi_mod_person conf base p =
                 in
                 let p = poi base ip in
                 let person_link = pers_to_piqi_person_link conf base p in
-                Mwrite.Witness.({
-                  witness_type = witness_type;
-                  person = Some person_link;
-                }))
-             (Array.to_list evt.epers_witnesses)
+                Mwrite.Witness.{ witness_type ; person = Some person_link })
+             evt.epers_witnesses
          in
          {
            Mwrite.Pevent.pevent_type = pevent_type;
@@ -1493,9 +1438,7 @@ let pers_to_piqi_mod_person conf base p =
     | None -> None
   in
   let families =
-    List.map
-      (fun ifam -> (Gwdb.string_of_ifam ifam))
-      (Array.to_list (get_family p))
+    Mutil.array_to_list_map Gwdb.string_of_ifam (get_family p)
   in
   {
     Mwrite.Person.digest = digest;
@@ -1568,7 +1511,7 @@ let fam_to_piqi_mod_family conf base ifam fam =
          let note = sou base evt.efam_note in
          let src = sou base evt.efam_src in
          let witnesses =
-           List.map
+           Mutil.array_to_list_map
              (fun (ip, wk) ->
                 let witness_type =
                   match wk with
@@ -1578,11 +1521,8 @@ let fam_to_piqi_mod_family conf base ifam fam =
                 in
                 let p = poi base ip in
                 let person_link = pers_to_piqi_person_link conf base p in
-                Mwrite.Witness.({
-                  witness_type = witness_type;
-                  person = Some person_link;
-                }))
-             (Array.to_list evt.efam_witnesses)
+                Mwrite.Witness.{ witness_type; person = Some person_link })
+             evt.efam_witnesses
          in
          {
            Mwrite.Fevent.fevent_type = fevent_type;
@@ -1604,15 +1544,13 @@ let fam_to_piqi_mod_family conf base ifam fam =
   let mother = poi base (get_mother fam) in
   let mother = pers_to_piqi_mod_person conf base mother in
   let children =
-    List.map
-      (fun ip ->
-         let child = poi base ip in
-         pers_to_piqi_person_link conf base child)
-      (Array.to_list (get_children fam))
+    Mutil.array_to_list_map
+      (fun ip -> pers_to_piqi_person_link conf base @@ poi base ip)
+      (get_children fam)
   in
   (* Compatibilité avec GeneWeb. *)
   let old_witnesses =
-    List.map Gwdb.string_of_iper (Array.to_list (get_witnesses fam))
+    Mutil.array_to_list_map Gwdb.string_of_iper (get_witnesses fam)
   in
   {
     Mwrite.Family.digest = digest;

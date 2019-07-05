@@ -242,7 +242,7 @@ let advanced_search conf base max_answers =
     in
     let y = gets y in
     let test_date_place df =
-      List.exists
+      Array.exists
         (fun ifam ->
            let fam = foi base ifam in
            let father = poi base (get_father fam) in
@@ -255,7 +255,7 @@ let advanced_search conf base max_answers =
                name_incl y (sou base (get_marriage_place fam)) &&
                df (Adef.od_of_cdate (get_marriage fam))
            else false)
-        (Array.to_list (get_family p))
+        (get_family p)
     in
     match d1, d2 with
       Some d1, Some d2 ->
@@ -281,7 +281,7 @@ let advanced_search conf base max_answers =
     | _ ->
         if y = "" then empty_default_value
         else
-          List.exists
+          Array.exists
             (fun ifam ->
                let fam = foi base ifam in
                let father = poi base (get_father fam) in
@@ -291,7 +291,7 @@ let advanced_search conf base max_answers =
                then
                  name_incl y (sou base (get_marriage_place fam))
                else false)
-            (Array.to_list (get_family p))
+            (get_family p)
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status p =
