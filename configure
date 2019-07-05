@@ -9,7 +9,7 @@ MAKEFILE=Makefile.config
 
 STRIP=true
 RM=
-EXE=
+EXT=
 OS_TYPE=
 
 API_D=
@@ -59,19 +59,19 @@ check_os() {
   OS_TYPE=`uname -s`
   if [[ $OS_TYPE == "Linux" ]] ; then
     print_check_ok "Checking OS type" "Linux"
-    EXE=
+    EXT=
     RM="/bin/rm -f"
     STRIP=strip
   elif [[ $OS_TYPE == "Darwin" ]] ; then
     print_check_ok "Checking OS type" "Darwin"
-    EXE=
+    EXT=
     RM="/bin/rm -f"
     STRIP=strip
   else
     print_check_ok "Checking OS type" "WINDOWS"
     OS_TYPE="Win"
     CAMLP5F+=" -D WINDOWS"
-    EXE=".exe"
+    EXT=".exe"
     RM="rm -f"
     STRIP=true
   fi
@@ -91,7 +91,7 @@ print_tools() {
   echo "# Tools"
   echo "STRIP=${STRIP}"
   echo "RM=${RM}"
-  echo "EXE=${EXE}"
+  echo "EXT=${EXT}"
 }
 
 print_vars() {

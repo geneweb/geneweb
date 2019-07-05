@@ -14,7 +14,7 @@ bug-reports: "https://github.com/geneweb/geneweb/issues"
 
 build: [
   [ "./configure" "--api" ]
-  [ make "install-exe" ]
+  [ make "exe" ]
 ]
 
 install: [
