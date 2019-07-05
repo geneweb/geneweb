@@ -44,6 +44,7 @@ let print_info_base conf base =
      | None -> (None, None)
   in
   let last_modified_person =
+    let default () = Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p in
     try
       let ic = Secure.open_in_bin (History.file_name conf) in
       let (_, pos, wiz) = (1, in_channel_length ic, "") in
@@ -56,18 +57,18 @@ let print_info_base conf base =
             match keyo with
             | Some key ->
               (match action with
-               | "mn" -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+               | "mn" -> default ()
                | _ ->
                  (match Gutil.person_ht_find_all base key with
                   | [ip] -> Some (Gwdb.string_of_iper ip)
-                  | _ -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p))
-            | None -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
-          else Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
-        | None -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+                  | _ -> default ()))
+            | None -> default ()
+          else default ()
+        | None -> default ()
       in
       close_in ic;
       last_modified_person
-    with Sys_error _ | _ -> Opt.map (fun p -> Gwdb.string_of_iper (get_key_index p)) sosa_p
+    with Sys_error _ | _ -> default ()
   in
   let info_base =
     M.Infos_base.({
