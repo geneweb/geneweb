@@ -25,7 +25,7 @@ while [[ $# -ne 0 ]]; do
       API_D="-D API" ;;
     --gwdb1)
       GWDB_D="-D GWDB1" ;
-      GWDB_PKG="geneweb.gwdb1" ;;
+      GWDB_PKG="geneweb.gwdb1_internal geneweb.gwdb1" ;;
     --sosa-num)
       SOSA_PKG="geneweb.sosa-num" ;;
     --sosa-zarith)
@@ -39,7 +39,7 @@ done
 if [[ $GWDB_D == "" ]] ; then
   echo -e "\\x1b[33m[WARNING]\\x1b[0m GWDB is not set, using gwdb1" ;
   GWDB_D="-D GWDB1" ;
-  GWDB_PKG="geneweb.gwdb1" ;
+  GWDB_PKG="geneweb.gwdb1_internal geneweb.gwdb1" ;
 fi ;
 
 if [[ $SOSA_PKG == "" ]] ; then

@@ -19,7 +19,7 @@ geneweb.install
 
 # Generated from .camlp5 sources
 bin/distrib/setup/setup.ml
-bin/distrib/ged2gwb/ged2gwb1.ml
+bin/distrib/ged2gwb/ged2gwb.ml
 lib/api_saisie_piqi.ml
 lib/api_saisie_piqi_ext.ml
 lib/gwlib.ml

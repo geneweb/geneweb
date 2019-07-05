@@ -1,9 +1,6 @@
 (library
- (name wserver)
+ (name wserver_gw)
  (public_name geneweb.wserver)
- (wrapped false)
  (libraries unix)
- (flags (:standard -no-keep-locs))
+ (implements wserver)
 )
-
-(rule (copy# %{lib:geneweb.wserver.mli:wserver.mli} wserver.mli))

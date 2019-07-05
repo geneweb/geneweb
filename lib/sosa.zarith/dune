@@ -1,9 +1,6 @@
 (library
  (name sosa_zarith)
  (public_name geneweb.sosa-zarith)
- (wrapped false)
  (libraries zarith)
- (flags       (:standard -no-keep-locs))
+ (implements sosa)
 )
-
-(rule (copy# %{lib:geneweb.sosa.mli:sosa.mli} sosa.mli))
