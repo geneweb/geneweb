@@ -702,19 +702,16 @@ let opendb bname =
       strings_len "strings" (input_value : _ -> string array)
       (Iovalue.input : _ -> string)
   in
-  let cleanup_ref =
-    ref
-      (fun () ->
-         close_in ic;
-         begin match ic_acc with
-           Some ic_acc -> close_in ic_acc
-         | None -> ()
-         end;
-         match ic2 with
-           Some ic2 -> close_in ic2
-         | None -> ())
+  let cleanup () =
+    close_in ic;
+    begin match ic_acc with
+        Some ic_acc -> close_in ic_acc
+      | None -> ()
+    end;
+    match ic2 with
+      Some ic2 -> close_in ic2
+    | None -> ()
   in
-  let cleanup () = !cleanup_ref () in
   let commit_synchro () =
     let tmp_fname = Filename.concat bname "1synchro_patches" in
     let fname = Filename.concat bname "synchro_patches" in
