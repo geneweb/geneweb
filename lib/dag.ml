@@ -229,7 +229,7 @@ let string_of_item conf base =
   function
     Item (p, s) ->
       Util.referenced_person_title_text conf base p ^
-      Date.short_dates_text conf base p ^ (if s = "" then "" else " " ^ s)
+      DateDisplay.short_dates_text conf base p ^ (if s = "" then "" else " " ^ s)
 
 (* Print with HTML table tags: <table> <tr> <td> *)
 
@@ -858,7 +858,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                let d =
                  match ifamo with
                    Some ifam ->
-                   Date.short_marriage_date_text conf base (foi base ifam)
+                   DateDisplay.short_marriage_date_text conf base (foi base ifam)
                      p ps
                  | None -> ""
                in

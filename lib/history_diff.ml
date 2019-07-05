@@ -426,12 +426,12 @@ let person_of_iper_array conf base ipl =
 
 let string_of_cdate conf cod =
   match Adef.od_of_cdate cod with
-    Some d -> Date.string_slash_of_date conf d
+    Some d -> DateDisplay.string_slash_of_date conf d
   | None -> ""
 
 let string_of_death conf death =
   match death with
-    Death (_, cd) -> Date.string_slash_of_date conf (Adef.date_of_cdate cd)
+    Death (_, cd) -> DateDisplay.string_slash_of_date conf (Adef.date_of_cdate cd)
   | _ -> ""
 
 let string_of_burial conf burial =
@@ -1454,7 +1454,7 @@ let eval_predefined_apply conf _env f vl =
              Dgregorian)
         in
         let time = String.sub date_txt 11 8 in
-        Date.string_of_date conf date ^ ", " ^ time
+        DateDisplay.string_of_date conf date ^ ", " ^ time
       with Failure _ -> date_txt
       end
   | _ -> raise Not_found

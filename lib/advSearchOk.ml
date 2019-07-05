@@ -109,21 +109,21 @@ let advanced_search conf base max_answers =
       Some d1, Some d2 ->
         begin match df () with
           Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-            if CheckItem.strictly_before d d1 then false
-            else if CheckItem.strictly_before d2 d then false
+            if Date.compare_date d d1 < 0 then false
+            else if Date.compare_date d2 d < 0 then false
             else true
         | _ -> false
         end
     | Some d1, _ ->
         begin match df () with
           Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-            if CheckItem.strictly_before d d1 then false else true
+            if Date.compare_date d d1 < 0 then false else true
         | _ -> false
         end
     | _, Some d2 ->
         begin match df () with
           Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-            if CheckItem.strictly_after d d2 then false else true
+            if Date.compare_date d d2 > 0 then false else true
         | _ -> false
         end
     | _ -> empty_default_value
@@ -262,21 +262,21 @@ let advanced_search conf base max_answers =
         test_date_place
           (function
              Some (Dgreg (_, _) as d) ->
-               if CheckItem.strictly_before d d1 then false
-               else if CheckItem.strictly_before d2 d then false
+               if Date.compare_date d d1 < 0 then false
+               else if Date.compare_date d2 d < 0 then false
                else true
            | _ -> false)
     | Some d1, _ ->
         test_date_place
           (function
              Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-               if CheckItem.strictly_before d d1 then false else true
+               if Date.compare_date d d1 < 0 then false else true
            | _ -> false)
     | _, Some d2 ->
         test_date_place
           (function
              Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-               if CheckItem.strictly_after d d2 then false else true
+               if Date.compare_date d d2 > 0 then false else true
            | _ -> false)
     | _ ->
         if y = "" then empty_default_value
@@ -366,7 +366,7 @@ let print_result conf base max_answers (list, len) =
          Perso.print_sosa conf base p true;
          Wserver.printf "\n%s%s<em>"
            (referenced_person_text conf base p)
-           (Date.short_dates_text conf base p) ;
+           (DateDisplay.short_dates_text conf base p) ;
          specify_homonymous conf base p false;
          Wserver.printf "</em>")
       list;
@@ -408,14 +408,14 @@ let searching_fields conf =
       match getd date_prefix_field_name with
         Some d1, Some d2 ->
           Printf.sprintf "%s %s %s %s %s" search
-            (transl conf "between (date)") (Date.string_of_date conf d1)
-            (transl conf "and") (Date.string_of_date conf d2)
+            (transl conf "between (date)") (DateDisplay.string_of_date conf d1)
+            (transl conf "and") (DateDisplay.string_of_date conf d2)
       | Some d1, _ ->
           Printf.sprintf "%s %s %s" search (transl conf "after (date)")
-            (Date.string_of_date conf d1)
+            (DateDisplay.string_of_date conf d1)
       | _, Some d2 ->
           Printf.sprintf "%s %s %s" search (transl conf "before (date)")
-            (Date.string_of_date conf d2)
+            (DateDisplay.string_of_date conf d2)
       | _ -> search
     in
     if test_string place_prefix_field_name then

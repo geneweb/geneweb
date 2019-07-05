@@ -930,11 +930,7 @@ module NameSort =
         if sn1 = sn2 then
           if fn1 = fn2 then
             match (d1, d2) with
-            | (Some d1, Some d2) ->
-                if CheckItem.strictly_after d1 d2 then 1
-                else
-                  if CheckItem.strictly_after d2 d1 then -1
-                  else compare i1 i2
+            | (Some d1, Some d2) -> Date.compare_date d1 d2
             | (Some _, None) -> -1
             | (None, Some _) -> 1
             | _ -> compare i1 i2

@@ -106,7 +106,7 @@ let display_descendants_level conf base max_level ancestor =
        else String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
     (fun (p, c) ->
        Wserver.printf "\n%s" (referenced_person_title_text conf base p);
-       Wserver.printf "%s" (Date.short_dates_text conf base p);
+       Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
        if not (is_hidden p) && c > 1 then Wserver.printf " <em>(%d)</em>" c;
        Wserver.printf "\n")
     list;
@@ -202,7 +202,7 @@ let print_child conf base p1 p2 e =
     Wserver.printf "%s" (referenced_person_text_without_surname conf base e)
   else Wserver.printf "\n%s" (referenced_person_text conf base e);
   Wserver.printf "</strong>";
-  Wserver.printf "%s" (Date.short_dates_text conf base e)
+  Wserver.printf "%s" (DateDisplay.short_dates_text conf base e)
 
 let print_repeat_child conf base p1 p2 e =
   Wserver.printf "<em>";
@@ -215,14 +215,14 @@ let print_repeat_child conf base p1 p2 e =
 
 let display_spouse conf base marks paths fam p c =
   Wserver.printf "\n&amp;";
-  Wserver.printf "%s" (Date.short_marriage_date_text conf base fam p c);
+  Wserver.printf "%s" (DateDisplay.short_marriage_date_text conf base fam p c);
   Wserver.printf " ";
   Wserver.printf "<strong>";
   Wserver.printf "\n%s" (referenced_person_text conf base c);
   Wserver.printf "</strong>";
   if Gwdb.Marker.get marks (get_iper c)
   then Wserver.printf " (<tt><b>%s</b></tt>)" (label_of_path paths c)
-  else Wserver.printf "%s" (Date.short_dates_text conf base c)
+  else Wserver.printf "%s" (DateDisplay.short_dates_text conf base c)
 
 let total = ref 0
 
@@ -381,7 +381,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   let paths = Gwdb.iper_marker persons [] in
   Hutil.header conf title;
   total := 0;
-  Wserver.printf "%s" (Date.short_dates_text conf base ancestor);
+  Wserver.printf "%s" (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
   if authorized_age conf base p then
     begin match Adef.od_of_cdate (get_birth p), get_death p with
@@ -425,7 +425,7 @@ let print_elem conf base paths precision (n, pll) =
       Wserver.printf "<strong>%s %s %s</strong>" (surname_without_particle base n)
         (reference conf base p (person_text_without_surname conf base p))
         (surname_particle base n);
-      Wserver.printf "%s" (Date.short_dates_text conf base p);
+      Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
       print_ref conf base paths p;
       Wserver.printf "\n"
   | pll ->
@@ -452,7 +452,7 @@ let print_elem conf base paths precision (n, pll) =
                     specify_homonymous conf base p true;
                     Wserver.printf "</em>"
                   end;
-                Wserver.printf "%s" (Date.short_dates_text conf base p);
+                Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
                 print_ref conf base paths p;
                 Wserver.printf "\n")
              pl)
@@ -698,7 +698,7 @@ let print_person_table conf base p lab =
       let (date, place) = Util.get_approx_birth_date_place conf base p in
       let date =
         match date with
-          Some d -> Date.string_slash_of_date conf d
+          Some d -> DateDisplay.string_slash_of_date conf d
         | None -> ""
       in
       date, place
@@ -712,7 +712,7 @@ let print_person_table conf base p lab =
       let (date, place) = Util.get_approx_death_date_place conf base p in
       let date =
         match date with
-          Some d -> Date.string_slash_of_date conf d
+          Some d -> DateDisplay.string_slash_of_date conf d
         | None -> ""
       in
       date, place
@@ -784,7 +784,7 @@ let print_person_table conf base p lab =
             then
               let fam = foi base (get_family u).(0) in
               match Adef.od_of_cdate (get_marriage fam) with
-                Some d -> Date.string_slash_of_date conf d
+                Some d -> DateDisplay.string_slash_of_date conf d
               | _ -> "&nbsp;"
             else "&nbsp;"
           in
@@ -867,12 +867,12 @@ let print_person_table conf base p lab =
             Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
             Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)), approx
             when d1 <> d2 ->
-              let a = CheckItem.time_elapsed d1 d2 in
+              let a = Date.time_elapsed d1 d2 in
               let s =
                 if not approx && d1.prec = Sure && d2.prec = Sure then ""
                 else transl_decline conf "possibly (date)" "" ^ " "
               in
-              s ^ Date.string_of_age conf a
+              s ^ DateDisplay.string_of_age conf a
           | _ -> ""
       in
         Wserver.printf "%s &nbsp;" d
@@ -921,7 +921,7 @@ let print_person_table conf base p lab =
               then
                 let fam = foi base (get_family u).(i) in
                 match Adef.od_of_cdate (get_marriage fam) with
-                  Some d -> Date.string_slash_of_date conf d
+                  Some d -> DateDisplay.string_slash_of_date conf d
                 | _ -> "&nbsp;"
               else "&nbsp;"
             in
@@ -1194,7 +1194,7 @@ let make_tree_hts conf base gv p =
           let txt = person_title_text conf base p in
           let txt = reference conf base p txt in
           let txt =
-            if auth then txt ^ Date.short_dates_text conf base p else txt
+            if auth then txt ^ DateDisplay.short_dates_text conf base p else txt
           in
           let txt = txt ^ Dag.image_txt conf base p in
           let txt =
@@ -1229,11 +1229,11 @@ let make_tree_hts conf base gv p =
                 let txt = person_title_text conf base sp in
                 let txt = reference conf base sp txt in
                 let txt =
-                  if auth then txt ^ Date.short_dates_text conf base sp
+                  if auth then txt ^ DateDisplay.short_dates_text conf base sp
                   else txt
                 in
                 "&amp;" ^
-                (if auth then Date.short_marriage_date_text conf base fam p sp
+                (if auth then DateDisplay.short_marriage_date_text conf base fam p sp
                  else "") ^
                 "&nbsp;" ^ txt ^ Dag.image_txt conf base sp
               in
@@ -1319,7 +1319,7 @@ let print_aboville conf base max_level p =
     if num_aboville then Wserver.printf "<tt>%s</tt>\n" lab
     else Wserver.printf "%s\n" lab;
     Wserver.printf "%s%s\n" (referenced_person_title_text conf base p)
-      (Date.short_dates_text conf base p);
+      (DateDisplay.short_dates_text conf base p);
     let u = p in
     if lev < max_level then
       for i = 0 to Array.length (get_family u) - 1 do
@@ -1331,14 +1331,14 @@ let print_aboville conf base max_level p =
             let fam = foi base (get_family u).(i) in
             match Adef.od_of_cdate (get_marriage fam) with
               Some (Dgreg (d, _)) ->
-                let date = Date.prec_year_text conf d in
+                let date = DateDisplay.prec_year_text conf d in
                 "<font size=\"-2\"><em>" ^ date ^ "</em></font>"
             | _ -> ""
           else ""
         in
         Wserver.printf "&amp;%s %s%s\n" mdate
           (referenced_person_title_text conf base spouse)
-          (Date.short_dates_text conf base spouse)
+          (DateDisplay.short_dates_text conf base spouse)
       done;
     Wserver.printf "<br>\n";
     if lev < max_level then

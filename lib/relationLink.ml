@@ -179,7 +179,7 @@ let find_prev_branch conf base dist ia sa ipl =
 
 let someone_text conf base ip =
   let p = pget conf base ip in
-  referenced_person_title_text conf base p ^ Date.short_dates_text conf base p
+  referenced_person_title_text conf base p ^ DateDisplay.short_dates_text conf base p
 
 let spouse_text conf base end_sp ip ipl =
   match ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt") with
@@ -192,7 +192,7 @@ let spouse_text conf base end_sp ip ipl =
             if ip = get_father fam then get_mother fam else get_father fam
           in
           let d =
-            Date.short_marriage_date_text conf base fam
+            DateDisplay.short_marriage_date_text conf base fam
               (pget conf base (get_father fam))
               (pget conf base (get_mother fam))
           in
@@ -404,7 +404,7 @@ let other_parent_text_if_same conf base info =
           begin match other_parent with
             Some ip ->
               let d =
-                Date.short_marriage_date_text conf base (foi base ifam1)
+                DateDisplay.short_marriage_date_text conf base (foi base ifam1)
                   (pget conf base (get_father cpl1))
                   (pget conf base (get_mother cpl1))
               in

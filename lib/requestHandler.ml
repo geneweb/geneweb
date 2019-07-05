@@ -236,7 +236,7 @@ let specify conf base n pl =
            List.iter
              (fun t -> Wserver.printf "%s" (one_title_text base t)) tl
        end;
-       Wserver.printf "%s" (Date.short_dates_text conf base p);
+       Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
        if authorized_age conf base p then
          begin match get_first_names_aliases p with
              [] -> ()

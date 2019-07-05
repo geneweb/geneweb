@@ -20,8 +20,8 @@ let date_interval conf base t x =
   let found = ref false in
   let rec loop t x =
     let set d =
-      if CheckItem.strictly_before_dmy d !d1 then d1 := d;
-      if CheckItem.strictly_after_dmy d !d2 then d2 := d;
+      if Date.compare_dmy d !d1 < 0 then d1 := d;
+      if Date.compare_dmy d !d2 > 0 then d2 := d;
       found := true
     in
     begin match Adef.od_of_cdate (get_birth x) with
@@ -32,7 +32,7 @@ let date_interval conf base t x =
       Some (Dgreg (d, _)) -> set d
     | _ -> ()
     end;
-    begin match CheckItem.date_of_death (get_death x) with
+    begin match Date.date_of_death (get_death x) with
       Some (Dgreg (d, _)) -> set d
     | _ -> if get_death x = NotDead then set conf.today
     end;
@@ -77,23 +77,21 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
      Adef.od_of_cdate t2.t_date_end, get_death x2)
   with
     (_, Some (Dgreg (d1, _)), _, _), (_, Some (Dgreg (d2, _)), _, _) ->
-      if CheckItem.strictly_before_dmy d1 d2 then -1
-      else if d1.year = d2.year then
-        match
-          Adef.od_of_cdate t1.t_date_end, Adef.od_of_cdate t2.t_date_end
-        with
-          Some d1, Some d2 ->
-            if not (CheckItem.strictly_after d1 d2) then -1 else 1
-        | _ -> -1
-      else 1
-  | (_, _, Some (Dgreg (_, _) as d1), _),
-    (_, _, Some (Dgreg (_, _) as d2), _) ->
-      if not (CheckItem.strictly_before d2 d1) then -1 else 1
+    begin match Date.compare_dmy d1 d2 with
+      | 0 ->
+        begin match Adef.od_of_cdate t1.t_date_end, Adef.od_of_cdate t2.t_date_end with
+          | Some d1, Some d2 -> Date.compare_date d1 d2
+          | _ -> -1
+        end
+      | x -> x
+    end
+  | (_, _, Some (Dgreg (_, _) as d1), _), (_, _, Some (Dgreg (_, _) as d2), _) ->
+    Date.compare_date d1 d2
   | (_, _, _, Death (_, d1)), (_, Some d2, _, _)
-    when not (CheckItem.strictly_before d2 (Adef.date_of_cdate d1)) ->
+    when Date.compare_date (Adef.date_of_cdate d1) d2 <= 0 ->
       -1
   | (_, Some (Dgreg (_, _) as d1), _, _), (_, _, _, Death (_, d2))
-    when not (CheckItem.strictly_before d1 (Adef.date_of_cdate d2)) ->
+    when Date.compare_date d1 (Adef.date_of_cdate d2) > 0 ->
       1
   | _ ->
       match
@@ -101,9 +99,9 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
         date_interval conf base JustSelf x2
       with
         Some (d11, d12), Some (d21, d22) ->
-          if not (CheckItem.strictly_before_dmy d21 d12) then -1
-          else if not (CheckItem.strictly_before_dmy d11 d22) then 1
-          else if CheckItem.strictly_after_dmy d21 d11 then -1
+          if Date.compare_dmy d12 d21 <= 0 then -1
+          else if Date.compare_dmy d11 d22 >= 0 then 1
+          else if Date.compare_dmy d21 d11 > 0 then -1
           else 1
       | _ ->
           match
@@ -111,9 +109,9 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
             date_interval conf base AddSpouse x2
           with
             Some (d11, d12), Some (d21, d22) ->
-              if not (CheckItem.strictly_before_dmy d21 d12) then -1
-              else if not (CheckItem.strictly_before_dmy d11 d22) then 1
-              else if not (CheckItem.strictly_before_dmy d22 d12) then -1
+              if Date.compare_dmy d12 d21 <= 0 then -1
+              else if Date.compare_dmy d11 d22 >= 0 then 1
+              else if Date.compare_dmy d22 d12 >= 0 then -1
               else 1
           | _ ->
               match
@@ -121,9 +119,9 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
                 date_interval conf base AddChildren x2
               with
                 Some (d11, d12), Some (d21, d22) ->
-                  if not (CheckItem.strictly_before_dmy d21 d12) then -1
-                  else if not (CheckItem.strictly_before_dmy d11 d22) then 1
-                  else if not (CheckItem.strictly_before_dmy d22 d12) then -1
+                  if Date.compare_dmy d21 d12 >= 0 then -1
+                  else if Date.compare_dmy d11 d22 >= 0 then 1
+                  else if Date.compare_dmy d22 d12 >= 0 then -1
                   else 1
               | Some _, None -> -1
               | None, Some _ -> 1
@@ -295,7 +293,7 @@ let give_access_someone conf base (x, t) list =
   | _ -> Wserver.printf "%s" (person_text conf base x)
   end;
   Wserver.printf "\n";
-  Wserver.printf "%s" (Date.short_dates_text conf base x);
+  Wserver.printf "%s" (DateDisplay.short_dates_text conf base x);
   if t.t_nth <> 0 then
     Wserver.printf " (%s)"
       (if t.t_nth >= 100 then string_of_int t.t_nth

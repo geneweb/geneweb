@@ -60,7 +60,7 @@ let merge_events conf l1 l2 =
   let string_event_date e =
     match Adef.od_of_cdate e.efam_date with
       None -> ""
-    | Some d -> Date.string_of_ondate conf d
+    | Some d -> DateDisplay.string_of_ondate conf d
   in
   let can_merge_event e1 e2 =
     not

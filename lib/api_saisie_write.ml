@@ -83,9 +83,7 @@ let print_person_search_list conf base =
               (Adef.od_of_cdate (get_birth p1),
                Adef.od_of_cdate (get_birth p2))
              with
-             | (Some d1, Some d2) ->
-                 if CheckItem.strictly_before d1 d2 then -1
-                 else 1
+             | (Some d1, Some d2) -> Date.compare_date d1 d2
              | (Some _, _) -> -1
              | (_, Some _) -> 1
              | (_, _) -> 0)
@@ -690,7 +688,7 @@ let compute_warnings conf base resp =
     sou base (get_first_name p) ^ " " ^ sou base (get_surname p)
   in
   let print_someone_dates p =
-    print_someone p ^ " " ^ Date.short_dates_text conf base p
+    print_someone p ^ " " ^ DateDisplay.short_dates_text conf base p
   in
   match resp with
   | Api_update_util.UpdateErrorConflict c -> (false, [], [], Some c, [])
@@ -708,7 +706,7 @@ let compute_warnings conf base resp =
                            "the difference of age between %t and %t is quite important"))
                      (fun _ -> print_someone fath)
                      (fun _ -> print_someone moth))
-                  ^ ": " ^ (Date.string_of_age conf a)
+                  ^ ": " ^ (DateDisplay.string_of_age conf a)
                 in
                 w :: wl
             | BirthAfterDeath p ->
@@ -756,8 +754,8 @@ let compute_warnings conf base resp =
                    (fun _ ->
                      Gutil.designation base (poi base (get_mother cpl))))
                 ^ ": " ^
-                Gutil.designation base elder ^ (Date.short_dates_text conf base elder) ^
-                Gutil.designation base x ^ (Date.short_dates_text conf base x)
+                Gutil.designation base elder ^ (DateDisplay.short_dates_text conf base elder) ^
+                Gutil.designation base x ^ (DateDisplay.short_dates_text conf base x)
                 *)
             | CloseChildren (ifam, _, elder, x) ->
                 let cpl = foi base ifam in
@@ -779,7 +777,7 @@ let compute_warnings conf base resp =
                   (transl_nth
                      conf "died at an advanced age" (index_of_sex (get_sex p)))
                   ^ " " ^
-                  (Date.string_of_age conf a)
+                  (DateDisplay.string_of_age conf a)
                 in
                 w :: wl
             | DeadTooEarlyToBeFather (father, child) ->
@@ -864,7 +862,7 @@ let compute_warnings conf base resp =
                 let w =
                 Printf.sprintf "%s\n%s\n" (print_someone_dates p)
                   (transl conf "is a very young parent") ^
-                Printf.sprintf "(%s)" (Date.string_of_age conf a)
+                Printf.sprintf "(%s)" (DateDisplay.string_of_age conf a)
                 in
                 w :: wl
             | PossibleDuplicateFam (f1, _) ->
@@ -880,7 +878,7 @@ let compute_warnings conf base resp =
                 let w =
                 Printf.sprintf "%s\n%s\n" (print_someone p)
                   (transl conf "is a very old parent") ^
-                Printf.sprintf "(%s)" (Date.string_of_age conf a);
+                Printf.sprintf "(%s)" (DateDisplay.string_of_age conf a);
                 in
                 w :: wl
             | PEventOrder (p, e1, e2) ->
@@ -917,10 +915,10 @@ let compute_warnings conf base resp =
                      Printf.sprintf "%s %s %s-%s"
                        (sou base t.t_ident) (sou base t.t_place)
                        (match Adef.od_of_cdate t.t_date_start with
-                        | Some d -> Date.string_of_date conf d
+                        | Some d -> DateDisplay.string_of_date conf d
                         | _ -> "" )
                        (match Adef.od_of_cdate t.t_date_end with
-                        | Some d -> Date.string_of_date conf d
+                        | Some d -> DateDisplay.string_of_date conf d
                         | _ -> "" ))
                 in
                 w :: wl
@@ -950,7 +948,7 @@ let compute_warnings conf base resp =
                 print_someone p ^ " " ^
                   (Printf.sprintf
                      (ftransl conf "married at age %t")
-                     (fun _ -> Date.string_of_age conf a))
+                     (fun _ -> DateDisplay.string_of_age conf a))
                 in
                 w :: wl)
           wl []

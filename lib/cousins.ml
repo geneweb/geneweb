@@ -118,7 +118,7 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
     Perso.print_sosa conf base p2 true;
     Wserver.printf "%s%s"
       (gen_person_title_text reference std_access conf base p2)
-      (Date.short_dates_text conf base p2)
+      (DateDisplay.short_dates_text conf base p2)
   in
   let print_spouse sp first =
     incr cnt_sp;
@@ -129,11 +129,11 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
           (gen_person_title_text reference std_access conf base p2)
       end
     else Wserver.printf "<br%s>%s" conf.xhs (person_title_text conf base p2);
-    Wserver.printf "%s &amp; " (Date.short_dates_text conf base p2);
+    Wserver.printf "%s &amp; " (DateDisplay.short_dates_text conf base p2);
     Perso.print_sosa conf base sp true;
     Wserver.printf "%s%s"
       (gen_person_title_text (reference_sp sp) std_access conf base sp)
-      (Date.short_dates_text conf base sp)
+      (DateDisplay.short_dates_text conf base sp)
   in
   if p_getenv conf.env "spouse" = Some "on" then begin
     match get_family p2 with

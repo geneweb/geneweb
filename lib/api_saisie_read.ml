@@ -59,12 +59,12 @@ let partial_short_dates_text conf birth_date death_date p =
       | _ -> short_prec_year_text conf b )
   | (None, Some (Dtext _)) ->
       (match get_death p with
-      | Death (_, _) | DeadDontKnowWhen | DeadYoung -> Date.death_symbol conf
+      | Death (_, _) | DeadDontKnowWhen | DeadYoung -> DateDisplay.death_symbol conf
       | _ -> "" )
   | (None, None) ->
       (* La personne peut être décédée mais ne pas avoir de date. *)
       (match get_death p with
-      | Death (_, _) | DeadDontKnowWhen | DeadYoung -> Date.death_symbol conf
+      | Death (_, _) | DeadDontKnowWhen | DeadYoung -> DateDisplay.death_symbol conf
       | _ -> "" )
   | (_, _) -> ""
 
@@ -83,13 +83,13 @@ let short_dates_text conf base p =
     | (None, Some (Dgreg (d, _))) ->
       (match get_death p with
        | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-         Date.death_symbol conf ^ short_prec_year_text conf d
+         DateDisplay.death_symbol conf ^ short_prec_year_text conf d
        | _ -> "" )
     | (None, None) ->
       (* La personne peut être décédée mais ne pas avoir de date. *)
       (match get_death p with
        | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-         Date.death_symbol conf
+         DateDisplay.death_symbol conf
        | _ -> "" )
     (* On ne peut pas traiter les dates au format texte, mais on *)
     (* affiche tout de même les dates au format Dgreg.           *)
@@ -103,9 +103,9 @@ let code_french_date conf d m y =
   in
   let s =
     if m = 0 then ""
-    else s ^ (if s = "" then "" else " ") ^ Date.french_month conf (m - 1)
+    else s ^ (if s = "" then "" else " ") ^ DateDisplay.french_month conf (m - 1)
   in
-  s ^ (if s = "" then "" else " ") ^ Date.code_french_year conf y
+  s ^ (if s = "" then "" else " ") ^ DateDisplay.code_french_year conf y
 
 
 let encode_dmy conf d m y is_long =
@@ -129,7 +129,7 @@ let string_of_dmy conf d is_long =
         encode_dmy conf d2.day d2.month d2.year is_long
     | _ -> ""
   in
-  Date.string_of_prec_dmy conf sy sy2 d
+  DateDisplay.string_of_prec_dmy conf sy sy2 d
 
 (* ************************************************************************** *)
 (*  [Fonc] string_of_dmy_raw : Def.dmy -> string                              *)
@@ -188,7 +188,7 @@ let string_of_french_dmy conf d =
   code_french_date conf d.day d.month d.year
 
 let string_of_hebrew_dmy conf d =
-  Date.code_hebrew_date conf d.day d.month d.year
+  DateDisplay.code_hebrew_date conf d.day d.month d.year
 
 
 (* ************************************************************************** *)
@@ -228,24 +228,24 @@ let string_of_date_and_conv conf d =
         else ""
       in
       let date =
-        Date.string_of_dmy conf d1 ^ year_prec ^ " " ^
+        DateDisplay.string_of_dmy conf d1 ^ year_prec ^ " " ^
           transl_nth conf "gregorian/julian/french/hebrew" 1
       in
       (date, date, date_conv, date_conv_long, Some `julian)
   | Dgreg (d, Dfrench) ->
       let d1 = Calendar.french_of_gregorian d in
       let date = string_of_french_dmy conf d1 in
-      let date_long = Date.string_of_on_french_dmy conf d1 in
+      let date_long = DateDisplay.string_of_on_french_dmy conf d1 in
       let date_conv = gregorian_precision conf d false in
-      let date_conv_long = Date.string_of_dmy conf d
+      let date_conv_long = DateDisplay.string_of_dmy conf d
       in
       (date, date_long, date_conv, date_conv_long, Some `french)
   | Dgreg (d, Dhebrew) ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let date = string_of_hebrew_dmy conf d1 in
-      let date_long = Date.string_of_on_hebrew_dmy conf d1 in
+      let date_long = DateDisplay.string_of_on_hebrew_dmy conf d1 in
       let date_conv = gregorian_precision conf d false in
-      let date_conv_long = Date.string_of_dmy conf d
+      let date_conv_long = DateDisplay.string_of_dmy conf d
       in
       (date, date_long, date_conv, date_conv_long, Some `hebrew)
   | Dtext t -> ("(" ^ Util.safe_html (string_with_macros conf [] t) ^ ")", "", "", "", None)
@@ -599,7 +599,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
         let (birth_date, death_date, _) = Date.get_birth_death_date p in
         let birth =
           match birth_date with
-          | Some d -> Date.string_slash_of_date conf d
+          | Some d -> DateDisplay.string_slash_of_date conf d
           | None -> ""
         in
         let birth_raw =
@@ -616,7 +616,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
         in
         let death =
           match death_date with
-          | Some d -> Date.string_slash_of_date conf d
+          | Some d -> DateDisplay.string_slash_of_date conf d
           | None -> ""
         in
         let death_raw =
@@ -917,8 +917,7 @@ let get_related_piqi conf base p base_prefix gen_p has_relations pers_to_piqi_ca
              | x -> x
            in
            match (d1, d2) with
-           |(Some d1, Some d2) ->
-               if CheckItem.strictly_before d1 d2 then -1 else 1
+           | (Some d1, Some d2) -> Date.compare_date d1 d2
            | _ -> -1 )
       (List.rev list)
     in
@@ -1245,7 +1244,7 @@ let get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers
         (fun (p, wk, (name, date, _, _, _, _, isp)) ->
           let witness_date =
             match Adef.od_of_cdate date with
-            | Some (Dgreg (dmy, _)) -> " (" ^ Date.year_text dmy ^ ")"
+            | Some (Dgreg (dmy, _)) -> " (" ^ DateDisplay.year_text dmy ^ ")"
             | _ -> ""
           in
           let witnesses_name =

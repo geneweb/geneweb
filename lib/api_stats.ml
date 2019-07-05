@@ -1276,7 +1276,7 @@ let print_all_stats conf base =
             begin
               (* plus vieux *)
               if p_auth && d1 <> d2 then
-                let a = CheckItem.time_elapsed dmy1 dmy2 in
+                let a = Date.time_elapsed dmy1 dmy2 in
                 let r =
                   { s_year = dmy2.year - (dmy2.year mod periode);
                     s_sex = get_sex p;
@@ -1484,7 +1484,7 @@ let print_all_stats conf base =
                                         if dmy2.year < dmy.year then ()
                                         else
                                           begin
-                                            let a = CheckItem.time_elapsed dmy dmy2 in
+                                            let a = Date.time_elapsed dmy dmy2 in
                                             let v = a.year in
                                             let r =
                                               { s_year = dmy.year - (dmy.year mod periode);
@@ -1516,7 +1516,7 @@ let print_all_stats conf base =
                                               else
                                                 begin
                                                   if dmyf.year < dmym.year then
-                                                    let a = CheckItem.time_elapsed dmy dmyf in
+                                                    let a = Date.time_elapsed dmy dmyf in
                                                     begin
                                                       let v = a.year in
                                                       let r =
@@ -1530,7 +1530,7 @@ let print_all_stats conf base =
                                                       with Not_found -> Hashtbl.add ht_marr_time r.s_year [r]
                                                     end
                                                   else
-                                                    let a = CheckItem.time_elapsed dmy dmym in
+                                                    let a = Date.time_elapsed dmy dmym in
                                                     begin
                                                       let v = a.year in
                                                       let r =
@@ -1548,7 +1548,7 @@ let print_all_stats conf base =
                                                 if dmyf.year < dmy.year then ()
                                                 else
                                                   begin
-                                                    let a = CheckItem.time_elapsed dmy dmyf in
+                                                    let a = Date.time_elapsed dmy dmyf in
                                                     let v = a.year in
                                                     let r =
                                                       { s_year = dmy.year - (dmy.year mod periode);
@@ -1564,7 +1564,7 @@ let print_all_stats conf base =
                                                 if dmym.year > dmy.year then ()
                                                 else
                                                   begin
-                                                    let a = CheckItem.time_elapsed dmy dmym in
+                                                    let a = Date.time_elapsed dmy dmym in
                                                     let v = a.year in
                                                     let r =
                                                       { s_year = dmy.year - (dmy.year mod periode);
@@ -1587,7 +1587,7 @@ let print_all_stats conf base =
                                               if dmy.year > dmy2.year then ()
                                               else
                                                 begin
-                                                  let a = CheckItem.time_elapsed dmy dmy2 in
+                                                  let a = Date.time_elapsed dmy dmy2 in
                                                   let v = a.year in
                                                   let r =
                                                     { s_year = dmy.year - (dmy.year mod periode);
@@ -1659,7 +1659,7 @@ let print_all_stats conf base =
                                 match Date.get_birth_death_date c with
                                 | (Some (Dgreg (({prec = Sure | About | Maybe} as dmy2), _)), _, _) ->
                                     begin
-                                      let a = CheckItem.time_elapsed dmy1 dmy2 in
+                                      let a = Date.time_elapsed dmy1 dmy2 in
                                       try
                                         let n = Hashtbl.find ht ip in
                                         if n > a.year then Hashtbl.replace ht ip a.year
@@ -1707,7 +1707,7 @@ let print_all_stats conf base =
                       begin
                         if dmy1.day = 0 then ()
                         else
-                        let a1 = CheckItem.time_elapsed dmy1 dmy in
+                        let a1 = Date.time_elapsed dmy1 dmy in
                         let r1 =
                           { s_year = dmy1.year - (dmy1.year mod periode);
                             s_sex = get_sex p;
@@ -1721,7 +1721,7 @@ let print_all_stats conf base =
                       begin
                         if dmy2.day = 0 then ()
                         else
-                        let a2 = CheckItem.time_elapsed dmy2 dmy in
+                        let a2 = Date.time_elapsed dmy2 dmy in
                         let r2 =
                           { s_year = dmy2.year - (dmy2.year mod periode);
                             s_sex = get_sex sp;
@@ -1810,8 +1810,8 @@ let print_all_stats conf base =
                      (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _)) ->
                       if dmy1.day > 0 && dmy2.day > 0 then
                         let a =
-                          if dmy1.year < dmy2.year then CheckItem.time_elapsed dmy1 dmy2
-                          else CheckItem.time_elapsed dmy2 dmy2
+                          if dmy1.year < dmy2.year then Date.time_elapsed dmy1 dmy2
+                          else Date.time_elapsed dmy2 dmy2
                         in
                         let v = a.month + 12 * a.year in
                         begin
@@ -1889,7 +1889,7 @@ let print_all_stats conf base =
                           with
                           | ((Some (Dgreg (({prec = Sure} as dmy_c1), _)), _, _) ,
                              (Some (Dgreg (({prec = Sure} as dmy_c2), _)), _, _)) ->
-                              let a = CheckItem.time_elapsed dmy_c1 dmy_c2 in
+                              let a = Date.time_elapsed dmy_c1 dmy_c2 in
                               begin
                                 let v = a.month + 12 * a.year in
                                 let r =
@@ -1922,7 +1922,7 @@ let print_all_stats conf base =
                           begin
                             match Date.get_birth_death_date p with
                             | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = CheckItem.time_elapsed dmy_p dmy_c in
+                                let a = Date.time_elapsed dmy_p dmy_c in
                                 let v = a.year in
                                 begin
                                   let r1 =
@@ -1940,7 +1940,7 @@ let print_all_stats conf base =
                           begin
                             match Date.get_birth_death_date sp with
                             | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = CheckItem.time_elapsed dmy_p dmy_c in
+                                let a = Date.time_elapsed dmy_p dmy_c in
                                 let v = a.year in
                                 begin
                                   let r2 =
@@ -1973,7 +1973,7 @@ let print_all_stats conf base =
                           begin
                             match Date.get_birth_death_date p with
                             | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = CheckItem.time_elapsed dmy_p dmy_c in
+                                let a = Date.time_elapsed dmy_p dmy_c in
                                 let v = a.year in
                                 begin
                                   let r1 =
@@ -1991,7 +1991,7 @@ let print_all_stats conf base =
                           begin
                             match Date.get_birth_death_date sp with
                             | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = CheckItem.time_elapsed dmy_p dmy_c in
+                                let a = Date.time_elapsed dmy_p dmy_c in
                                 let v = a.year in
                                 begin
                                   let r2 =
@@ -2023,7 +2023,7 @@ let print_all_stats conf base =
                           begin
                             match Date.get_birth_death_date p with
                             | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = CheckItem.time_elapsed dmy_p dmy_c in
+                                let a = Date.time_elapsed dmy_p dmy_c in
                                 let v = a.year in
                                 begin
                                   let r1 =
@@ -2041,7 +2041,7 @@ let print_all_stats conf base =
                           begin
                             match Date.get_birth_death_date sp with
                             | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = CheckItem.time_elapsed dmy_p dmy_c in
+                                let a = Date.time_elapsed dmy_p dmy_c in
                                 let v = a.year in
                                 begin
                                   let r2 =
@@ -2080,7 +2080,7 @@ let print_all_stats conf base =
                           with
                           | ((Some (Dgreg (({prec = Sure} as dmy1), _)), _, _),
                              (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _)) ->
-                                let a = CheckItem.time_elapsed dmy1 dmy2 in
+                                let a = Date.time_elapsed dmy1 dmy2 in
                                 let v = a.month + 12 * a.year in
                                 begin
                                   let r =

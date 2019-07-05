@@ -150,7 +150,7 @@ let string_of_start_date conf =
         Dgreg
           ({day = d; month = m; year = y; prec = Sure; delta = 0}, Dgregorian)
       in
-      Util.translate_eval (Date.string_of_date conf d)
+      Util.translate_eval (DateDisplay.string_of_date conf d)
   | _ -> r.start_date
 
 let macro conf base =

@@ -179,7 +179,7 @@ let print_birth_day conf base day_name fphrase wd dt list =
       Wserver.printf "<p>\n";
       begin let txt =
         transl_decline conf "on (weekday day month year)"
-          (transl_nth conf "(week day)" wd ^ " " ^ Date.code_dmy conf dt)
+          (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
       in
         Wserver.printf fphrase
           (capitale day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
@@ -228,7 +228,7 @@ let propose_months conf mode =
 
 let day_after d =
   let (day, r) =
-    if d.day >= CheckItem.nb_days_in_month d.month d.year then 1, 1
+    if d.day >= Date.nb_days_in_month d.month d.year then 1, 1
     else succ d.day, 0
   in
   let (month, r) = if d.month + r > 12 then 1, 1 else d.month + r, 0 in
@@ -246,7 +246,7 @@ let print_anniv conf base day_name fphrase wd dt list =
       Wserver.printf "<p>\n";
       begin let txt =
         transl_decline conf "on (weekday day month year)"
-          (transl_nth conf "(week day)" wd ^ " " ^ Date.code_dmy conf dt)
+          (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
       in
         Wserver.printf fphrase
           (capitale day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
@@ -341,7 +341,7 @@ let print_marriage_day conf base day_name fphrase wd dt list =
            ("<b>" ^
             transl_decline conf "on (weekday day month year)"
               (transl_nth conf "(week day)" wd ^ " " ^
-               Date.code_dmy conf dt) ^
+               DateDisplay.code_dmy conf dt) ^
             "</b>"))
         (transl conf "the anniversary of marriage");
       Wserver.printf "...\n";
@@ -352,7 +352,7 @@ let match_dates conf base p d1 d2 =
   if d1.day = d2.day && d1.month = d2.month then authorized_age conf base p
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3 &&
-    not (CheckItem.leap_year d2.year)
+    not (Date.leap_year d2.year)
   then
     authorized_age conf base p
   else false
@@ -503,7 +503,7 @@ let match_mar_dates conf base cpl d1 d2 =
     authorized_age conf base (pget conf base (get_mother cpl))
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3 &&
-    not (CheckItem.leap_year d2.year)
+    not (Date.leap_year d2.year)
   then
     authorized_age conf base (pget conf base (get_father cpl)) &&
     authorized_age conf base (pget conf base (get_mother cpl))
