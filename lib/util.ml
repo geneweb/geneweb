@@ -785,7 +785,7 @@ let acces_n conf base n x =
     (if get_occ x <> 0 then "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
   else
-    "i" ^ n ^ "=" ^ string_of_iper (get_key_index x) ^
+    "i" ^ n ^ "=" ^ string_of_iper (get_iper x) ^
     (if conf.wizard && get_occ x <> 0 then
        "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
@@ -1013,7 +1013,7 @@ let wprint_geneweb_link conf href s =
   Wserver.printf "%s" (geneweb_link conf href s)
 
 let reference conf base p s =
-  let iper = get_key_index p in
+  let iper = get_iper p in
   if conf.cancel_links || is_hidden p then s
   else
     String.concat ""
@@ -1040,7 +1040,7 @@ let reference conf base p s =
 let update_family_loop conf base p s =
   if conf.cancel_links || is_hidden p then s
   else
-    let iper = get_key_index p in
+    let iper = get_iper p in
     let list = get_family p in
     let list = Array.map (fun ifam -> ifam, get_children (foi base ifam)) list in
     let res =
@@ -2141,7 +2141,7 @@ let child_of_parent conf base p =
       person_text conf base fath
     else gen_person_text (p_first_name, (fun _ _ -> "")) conf base fath
   in
-  let a = pget conf base (get_key_index p) in
+  let a = pget conf base (get_iper p) in
   let ifam =
     match get_parents a with
       Some ifam ->
@@ -2193,7 +2193,7 @@ let husband_wife conf base p all =
     let rec loop i =
       if i < Array.length (get_family p) then
         let fam = foi base (get_family p).(i) in
-        let conjoint = Gutil.spouse (get_key_index p) fam in
+        let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
         if know base conjoint
         then
@@ -2207,7 +2207,7 @@ let husband_wife conf base p all =
     let rec loop i res =
       if i < Array.length (get_family p) then
         let fam = foi base (get_family p).(i) in
-        let conjoint = Gutil.spouse (get_key_index p) fam in
+        let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
         if know base conjoint
         then
@@ -2664,7 +2664,7 @@ let old_sosa_of_branch conf base (ipl : (iper * sex) list) =
 (* FIXME: remove this and use branch_of_sosa only *)
 let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
-  |> Opt.map @@ List.map (fun p -> get_key_index p, get_sex p)
+  |> Opt.map @@ List.map (fun p -> get_iper p, get_sex p)
 
 let space_to_unders = Mutil.tr ' ' '_'
 
@@ -2844,7 +2844,7 @@ let wprint_hidden_person conf base pref p =
     end
   else
     wprint_hidden conf pref "i"
-      (string_of_iper (get_key_index p))
+      (string_of_iper (get_iper p))
 
 exception Ok
 
@@ -2856,7 +2856,7 @@ let has_nephews_or_nieces conf base p =
         let fam = foi base ifam in
         Array.iter
           (fun ip ->
-             if ip = get_key_index p then ()
+             if ip = get_iper p then ()
              else
                Array.iter
                  (fun ifam ->

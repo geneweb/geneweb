@@ -212,8 +212,8 @@ let print_select_events conf base =
 let build_graph_asc conf base p max_gen =
   let create_edge p_from p_to =
     M.Edge.({
-      from_node = Gwdb.string_of_iper (get_key_index p_from);
-      to_node = Gwdb.string_of_iper (get_key_index p_to);
+      from_node = Gwdb.string_of_iper (get_iper p_from);
+      to_node = Gwdb.string_of_iper (get_iper p_to);
     })
   in
   let create_family ifam families =
@@ -292,10 +292,10 @@ let build_graph_asc_lia conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_key_index p_from)) (* FIXME!!! *)
+      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from)) (* FIXME!!! *)
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to))
+      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to))
     in
     M.Edge.({
       from_node = id_from;
@@ -305,7 +305,7 @@ let build_graph_asc_lia conf base p max_gen =
   let create_node p base_prefix =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
-    let uniq_id = Hashtbl.hash (base_prefix, get_key_index p) in
+    let uniq_id = Hashtbl.hash (base_prefix, get_iper p) in
     let id = string_of_int uniq_id in
     (id, p)
   in
@@ -326,14 +326,14 @@ let build_graph_asc_lia conf base p max_gen =
         (!nodes, List.rev !edges, List.rev !families)
     | (p, gen) :: l ->
         try
-          let _ = Hashtbl.find ht (get_key_index p) in
+          let _ = Hashtbl.find ht (get_iper p) in
           loop l nodes edges families
         with Not_found ->
           begin
             if gen >= max_gen then loop l nodes edges families
             else
               begin
-                Hashtbl.add ht (get_key_index p) true;
+                Hashtbl.add ht (get_iper p) true;
                 match get_parents p with
                 | Some ifam ->
                     let cpl = foi base ifam in
@@ -347,7 +347,7 @@ let build_graph_asc_lia conf base p max_gen =
                     loop ((fath, gen + 1) :: (moth, gen + 1) :: l) nodes edges families
                 | None ->
                     (* lien inter arbre *)
-                    let ip = get_key_index p in
+                    let ip = get_iper p in
                     let () =
                       Perso_link.init_cache conf base ip (max_gen - gen) 0 0
                     in
@@ -358,13 +358,13 @@ let build_graph_asc_lia conf base p max_gen =
                         | [] -> ()
                         | (base_prefix, p, gen) :: l ->
                             try
-                              let _ = Hashtbl.find ht (get_key_index p) in
+                              let _ = Hashtbl.find ht (get_iper p) in
                               loop_parents l
                             with Not_found ->
                               begin
                                 if gen >= max_gen then loop_parents l
                                 else
-                                  let ip = get_key_index p in
+                                  let ip = get_iper p in
                                   match Perso_link.get_parents_link base_prefix ip with
                                   | Some family ->
                                       begin
@@ -383,8 +383,8 @@ let build_graph_asc_lia conf base p max_gen =
                                             nodes := create_node moth pmoth.MLink.Person.baseprefix :: !nodes;
                                             edges := create_edge base_prefix p pfath.MLink.Person.baseprefix fath :: !edges;
                                             edges := create_edge base_prefix p pmoth.MLink.Person.baseprefix moth :: !edges;
-                                            let ifath = get_key_index fath in
-                                            let imoth = get_key_index moth in
+                                            let ifath = get_iper fath in
+                                            let imoth = get_iper moth in
                                             let (ifam, fam, _, _) = Perso_link.make_efam_link conf base family in
                                             create_family_link (ifath, imoth) ifam fam families;
                                             let l =
@@ -448,8 +448,8 @@ let build_graph_desc conf base p max_gen =
   let ht = Hashtbl.create 42 in
   let create_edge p_from p_to =
     M.Edge.({
-      from_node = Gwdb.string_of_iper (get_key_index p_from);
-      to_node = Gwdb.string_of_iper (get_key_index p_to);
+      from_node = Gwdb.string_of_iper (get_iper p_from);
+      to_node = Gwdb.string_of_iper (get_iper p_to);
     })
   in
   let create_family ifam families =
@@ -464,7 +464,7 @@ let build_graph_desc conf base p max_gen =
         (!nodes, List.rev !edges, !families)
     | (p, gen) :: l ->
         try
-          let _ = Hashtbl.find ht (get_key_index p) in
+          let _ = Hashtbl.find ht (get_iper p) in
           loop l nodes edges families
         with Not_found ->
           begin
@@ -472,14 +472,14 @@ let build_graph_desc conf base p max_gen =
               loop l nodes edges families
             else
               begin
-                Hashtbl.add ht (get_key_index p) true;
+                Hashtbl.add ht (get_iper p) true;
                 let ifam = get_family p in
                 let l =
                   (* fold_right pour le tri des mariages. *)
                   List.fold_right
                     (fun ifam accu ->
                       let fam = foi base ifam in
-                      let sp = poi base (Gutil.spouse (get_key_index p) fam) in
+                      let sp = poi base (Gutil.spouse (get_iper p) fam) in
                       let children =
                         List.map (poi base) (Array.to_list (get_children fam))
                       in
@@ -548,8 +548,8 @@ let print_graph_desc conf base =
 let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
   let create_edge p_from p_to =
     M.Edge.({
-      from_node = Gwdb.string_of_iper (get_key_index p_from);
-      to_node = Gwdb.string_of_iper (get_key_index p_to);
+      from_node = Gwdb.string_of_iper (get_iper p_from);
+      to_node = Gwdb.string_of_iper (get_iper p_to);
     })
   in
   let create_family ifam families =
@@ -560,7 +560,7 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
   let edges = ref [] in
   let families = ref [] in
   let create_link a =
-    let ip = get_key_index a in
+    let ip = get_iper a in
     let p1 =
       match pp1 with
       | Some p1 -> p1
@@ -571,8 +571,8 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
       | Some p2 -> p2
       | _ -> p2
     in
-    let ip1 = get_key_index p1 in
-    let ip2 = get_key_index p2 in
+    let ip1 = get_iper p1 in
+    let ip2 = get_iper p2 in
     let dist = RelationLink.make_dist_tab conf base ip (max l1 l2 + 1) in
     let b1 = RelationLink.find_first_branch conf base dist ip l1 ip1 Neuter in
     let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in

@@ -60,7 +60,7 @@ val get_death_src : person -> istr
 val get_first_name : person -> istr
 val get_first_names_aliases : person -> istr list
 val get_image : person -> istr
-val get_key_index : person -> iper
+val get_iper : person -> iper
 val get_notes : person -> istr
 val get_occ : person -> int
 val get_occupation : person -> istr

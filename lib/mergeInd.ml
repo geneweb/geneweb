@@ -30,9 +30,9 @@ let print_differences conf base branches p1 p2 =
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\"%s>\n"
     conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"i1\" value=\"%s\"%s>\n"
-    (string_of_iper (get_key_index p1)) conf.xhs;
+    (string_of_iper (get_iper p1)) conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%s\"%s>\n"
-    (string_of_iper (get_key_index p2)) conf.xhs;
+    (string_of_iper (get_iper p2)) conf.xhs;
   begin let rec loop =
     function
       [ip1, ip2] ->
@@ -302,7 +302,7 @@ let propose_merge_ind conf base branches p1 p2 =
              Wserver.printf "%s" (Date.short_dates_text conf base p2);
              Wserver.printf "</td>\n";
              Wserver.printf "</tr>\n")
-          ((get_key_index p1, get_key_index p2) :: branches);
+          ((get_iper p1, get_iper p2) :: branches);
         Wserver.printf "</table>\n"
       end
     end;
@@ -334,24 +334,24 @@ let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
   | _ -> ()
 
 let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 p2 =
-  let u2 = poi base (get_key_index p2) in
+  let u2 = poi base (get_iper p2) in
   if Array.length (get_family u2) <> 0 then
     begin
       for i = 0 to Array.length (get_family u2) - 1 do
         let ifam = (get_family u2).(i) in
         let cpl = foi base ifam in
         let cpl =
-          if get_key_index p2 = get_father cpl then
-            Gutil.couple false (get_key_index p1) (get_mother cpl)
-          else if get_key_index p2 = get_mother cpl then
-            Gutil.couple false (get_father cpl) (get_key_index p1)
+          if get_iper p2 = get_father cpl then
+            Gutil.couple false (get_iper p1) (get_mother cpl)
+          else if get_iper p2 = get_mother cpl then
+            Gutil.couple false (get_father cpl) (get_iper p1)
           else assert false
         in
         patch_couple base ifam cpl
       done;
       let u1 = {family = Array.append (get_family p1) (get_family u2)} in
-      patch_union base (get_key_index p1) u1;
-      let u2 = {family = [| |]} in patch_union base (get_key_index p2) u2
+      patch_union base (get_iper p1) u1;
+      let u2 = {family = [| |]} in patch_union base (get_iper p2) u2
     end;
   let p1 =
     let get_string fn = if is_empty_string (fn p1) then fn p2 else fn p1 in
@@ -378,7 +378,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 
     }
   in
   patch_person base p1.key_index p1;
-  reparent_ind base warning p1.key_index (get_key_index p2);
+  reparent_ind base warning p1.key_index (get_iper p2);
   let p2 = UpdateIndOk.effective_del base warning p2 in
   patch_person base p2.key_index p2;
   let s =
@@ -400,8 +400,8 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 
   Notes.update_notes_links_db conf (NotesLinks.PgInd p1.key_index) s
 
 let is_ancestor base p1 p2 =
-  let ip1 = get_key_index p1 in
-  let ip2 = get_key_index p2 in
+  let ip1 = get_iper p1 in
+  let ip2 = get_iper p2 in
   let visited = Gwdb.iper_marker (Gwdb.ipers base) false in
   let rec loop ip =
     if Gwdb.Marker.get visited ip then false
@@ -434,7 +434,7 @@ let error_loop conf base p =
   Hutil.trailer conf
 
 let check_ind base p1 p2 =
-  if get_key_index p1 = get_key_index p2 then raise Same_person
+  if get_iper p1 = get_iper p2 then raise Same_person
   else if get_sex p1 <> get_sex p2 && get_sex p1 <> Neuter
           && get_sex p2 <> Neuter
   then raise Different_sexes
@@ -622,7 +622,7 @@ let merge conf base p1 p2 propose_merge_ind =
   let rev_wl = ref [] in
   let warning w = rev_wl := w :: !rev_wl in
   let (ok, changes_done) =
-    try_merge conf base warning [] (get_key_index p1) (get_key_index p2)
+    try_merge conf base warning [] (get_iper p1) (get_iper p2)
       false propose_merge_ind
   in
   if changes_done then Util.commit_patches conf base;
@@ -682,7 +682,7 @@ let rec kill_ancestors conf base included_self p nb_ind nb_fam =
   | None -> ()
   end;
   if included_self then
-    let ip = get_key_index p in
+    let ip = get_iper p in
     let warning _ = () in
     let p = UpdateIndOk.effective_del base warning p in
     patch_person base ip p; incr nb_ind

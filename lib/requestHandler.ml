@@ -48,7 +48,7 @@ let compact_list base xl =
   List.fold_right
     (fun p pl ->
        match pl with
-         p1 :: _ when get_key_index p = get_key_index p1 -> pl
+         p1 :: _ when get_iper p = get_iper p1 -> pl
        | _ -> p :: pl)
     pl []
 
@@ -253,7 +253,7 @@ let specify conf base n pl =
                List.fold_right
                  (fun ifam spouses ->
                     let cpl = foi base ifam in
-                    let spouse = pget conf base (Gutil.spouse (get_key_index p) cpl) in
+                    let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
                     if p_surname base spouse <> "?" then spouse :: spouses
                     else spouses)
                  (Array.to_list (get_family p)) []
@@ -631,7 +631,7 @@ let person_selected self conf base p =
   match p_getenv conf.senv "em" with
     Some "R" -> relation_print conf base p
   | Some _ -> self.incorrect_request self conf base
-  | None -> record_visited conf (get_key_index p); Perso.print conf base p
+  | None -> record_visited conf (get_iper p); Perso.print conf base p
 
 let person_selected_with_redirect self conf base p =
   match p_getenv conf.senv "em" with

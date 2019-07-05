@@ -388,8 +388,8 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
   width_search [ip1] 0 [ip2] 0
 
 let print_shortest_path conf base p1 p2 =
-  let ip1 = get_key_index p1 in
-  let ip2 = get_key_index p2 in
+  let ip1 = get_iper p1 in
+  let ip2 = get_iper p2 in
   if ip1 = ip2 then
     let title _ =
       Wserver.printf "%s" (capitale (transl conf "relationship"))
@@ -510,7 +510,7 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
       in
       loop1 (Array.to_list (get_family (pget conf base ip)))
   in
-  loop (get_key_index anc) x
+  loop (get_iper anc) x
 
 let parents_label conf base info =
   function
@@ -689,8 +689,8 @@ let nephew_label conf x p =
         (transl_nth conf "nth (generation)" n)
 
 let same_parents conf base p1 p2 =
-  get_parents (pget conf base (get_key_index p1)) =
-    get_parents (pget conf base (get_key_index p2))
+  get_parents (pget conf base (get_iper p1)) =
+    get_parents (pget conf base (get_iper p2))
 
 let print_link_name conf base n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
@@ -948,13 +948,13 @@ let print_dag_links conf base p1 p2 rl =
          List.fold_left
            (fun anc_map (p, n) ->
               let (pp1, pp2, nn, nt, maxlev) =
-                try M.find (get_key_index p) anc_map with
+                try M.find (get_iper p) anc_map with
                   Not_found -> pp1, pp2, 0, 0, 0
               in
               if nn >= max_br then anc_map
               else
                 let v = pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2) in
-                M.add (get_key_index p) v anc_map)
+                M.add (get_iper p) v anc_map)
            anc_map list)
       M.empty rl
   in
@@ -1005,7 +1005,7 @@ let print_dag_links conf base p1 p2 rl =
                (fun (l1, l2) (_, _, (x1, x2, list), _) ->
                   List.fold_left
                     (fun (l1, l2) (a, _) ->
-                       if get_key_index a = ip then
+                       if get_iper a = ip then
                          let l1 = if List.mem x1 l1 then l1 else x1 :: l1 in
                          let l2 = if List.mem x2 l2 then l2 else x2 :: l2 in
                          l1, l2
@@ -1143,10 +1143,10 @@ let known_spouses_list conf base p excl_p =
   let u = p in
   List.fold_left
     (fun spl ifam ->
-       let sp = pget conf base (Gutil.spouse (get_key_index p) (foi base ifam)) in
+       let sp = pget conf base (Gutil.spouse (get_iper p) (foi base ifam)) in
        if sou base (get_first_name sp) <> "?" &&
           sou base (get_surname sp) <> "?" &&
-          get_key_index sp <> get_key_index excl_p
+          get_iper sp <> get_iper excl_p
        then
          sp :: spl
        else spl)
@@ -1172,8 +1172,8 @@ let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
        List.fold_right
          (fun p2 sl ->
             let sol =
-              compute_simple_relationship conf base tstab (get_key_index p1)
-                (get_key_index p2)
+              compute_simple_relationship conf base tstab (get_iper p1)
+                (get_iper p2)
             in
             match sol with
               Some (rl, total, _, reltab) ->
@@ -1187,8 +1187,8 @@ let sp p = Some p
 let no_sp _ = None
 
 let compute_relationship conf base by_marr p1 p2 =
-  let ip1 = get_key_index p1 in
-  let ip2 = get_key_index p2 in
+  let ip1 = get_iper p1 in
+  let ip2 = get_iper p2 in
   if ip1 = ip2 then None
   else
     let tstab = Util.create_topological_sort conf base in
@@ -1233,7 +1233,7 @@ let compute_relationship conf base by_marr p1 p2 =
     if sl = [] then None else Some (sl, total, rel)
 
 let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
-  let ip = get_key_index a in
+  let ip = get_iper a in
   let sp1 =
     match pp1 with
       Some _ -> Some p1
@@ -1254,8 +1254,8 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       Some p2 -> p2
     | _ -> p2
   in
-  let ip1 = get_key_index p1 in
-  let ip2 = get_key_index p2 in
+  let ip1 = get_iper p1 in
+  let ip2 = get_iper p2 in
   let dist = RelationLink.make_dist_tab conf base ip (max l1 l2 + 1) in
   let b1 = RelationLink.find_first_branch conf base dist ip l1 ip1 Neuter in
   let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
@@ -1356,7 +1356,7 @@ let print_main_relationship conf base long p1 p2 rel =
   end;
   begin match rel with
     None ->
-      if get_key_index p1 = get_key_index p2 then
+      if get_iper p1 = get_iper p2 then
         Wserver.printf "%s\n"
           (capitale (transl conf "it is the same person!"))
       else
@@ -1436,13 +1436,13 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
           (fun (sl, n) p ->
              let sl =
                try
-                 let t = Hashtbl.find assoc_txt (get_key_index p) in
+                 let t = Hashtbl.find assoc_txt (get_iper p) in
                  "&t" :: string_of_int n :: "=" :: t :: sl
                with Not_found -> sl
              in
              let sl =
                "&i" :: string_of_int n :: "=" ::
-               string_of_iper (get_key_index p) :: sl
+               string_of_iper (get_iper p) :: sl
              in
              sl, n - 1)
           (sl, List.length pl2) (List.rev pl2)
@@ -1480,8 +1480,8 @@ let print_multi_relation conf base pl lim assoc_txt =
     let rec loop path =
       function
         p1 :: (p2 :: _ as pl) ->
-          let ip1 = get_key_index p1 in
-          let ip2 = get_key_index p2 in
+          let ip1 = get_iper p1 in
+          let ip2 = get_iper p2 in
           begin match get_shortest_path_relation conf base ip1 ip2 [] with
             Some (path1, _) ->
               let path =
@@ -1505,7 +1505,7 @@ let print_multi_relation conf base pl lim assoc_txt =
       Dag.Item
         (p,
          (try
-            let t = Hashtbl.find assoc_txt (get_key_index p) in
+            let t = Hashtbl.find assoc_txt (get_iper p) in
             "<b>(" ^ t ^ ")</b>"
           with Not_found -> ""))
     in
@@ -1553,7 +1553,7 @@ let print_multi conf base =
       match find_person_in_env conf base k with
         Some p ->
           begin match p_getenv conf.env ("t" ^ k) with
-            Some x -> Hashtbl.add assoc_txt (get_key_index p) x
+            Some x -> Hashtbl.add assoc_txt (get_iper p) x
           | None -> ()
           end;
           loop (p :: pl) (i + 1)

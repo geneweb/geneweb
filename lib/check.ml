@@ -9,7 +9,7 @@ open Gwdb
 let designation base p =
   let s = Gutil.designation base p in
   if String.get s 0 = '?' || String.get s (String.length s - 1) = '?'
-  then s ^ " (i=" ^ string_of_iper (get_key_index p) ^ ")"
+  then s ^ " (i=" ^ string_of_iper (get_iper p) ^ ")"
   else s
 
 let string_of_epers_name base epers_name =

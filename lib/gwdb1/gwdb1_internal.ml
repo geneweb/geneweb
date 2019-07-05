@@ -96,7 +96,7 @@ let get_family = cache_uni (fun u -> u.Def.family)
 let get_first_name = cache_per (fun p -> p.Def.first_name)
 let get_first_names_aliases = cache_per (fun p -> p.Def.first_names_aliases)
 let get_image = cache_per (fun p -> p.Def.image)
-let get_key_index = cache_per (fun p -> p.Def.key_index)
+let get_iper = cache_per (fun p -> p.Def.key_index)
 let get_notes = cache_per (fun p -> p.Def.notes)
 let get_occ = cache_per (fun p -> p.Def.occ)
 let get_occupation = cache_per (fun p -> p.Def.occupation)
@@ -448,7 +448,7 @@ let ipers base =
 
 let persons base = Collection.map (poi base) (ipers base)
 
-let person_marker c i = Marker.make (fun p -> (Type.int_of_iper @@ get_key_index p)) c i
+let person_marker c i = Marker.make (fun p -> (Type.int_of_iper @@ get_iper p)) c i
 let iper_marker c i = Marker.make Type.int_of_iper c i
 
 let ifams base =

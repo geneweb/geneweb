@@ -34,7 +34,7 @@ let get_death_src p = p.Def.death_src
 let get_first_name p = p.Def.first_name
 let get_first_names_aliases p = p.Def.first_names_aliases
 let get_image p = p.Def.image
-let get_key_index p = p.Def.key_index
+let get_iper p = p.Def.key_index
 let get_notes p = p.Def.notes
 let get_occ p = p.Def.occ
 let get_occupation p = p.Def.occupation
@@ -1473,7 +1473,7 @@ let adop_parent gen ip r =
         begin let p = person_with_related p (ip :: get_related p) in
           gen.g_per.arr.(i) <- Right3 (p, a, u)
         end;
-      Some (get_key_index p)
+      Some (get_iper p)
 
 let set_adop_fam gen ip which_parent fath moth =
   match gen.g_per.arr.(ip) with
@@ -3148,7 +3148,7 @@ let add_parents_to_isolated gen =
       Right3 (p, a, u) ->
         if get_parents a = None && Array.length (get_family u) = 0 &&
            get_rparents p = [] && get_related p = [] &&
-           not (Hashtbl.mem ht_missing_children (get_key_index p))
+           not (Hashtbl.mem ht_missing_children (get_iper p))
         then
           let fn = gen.g_str.arr.(get_first_name p) in
           let sn = gen.g_str.arr.(get_surname p) in
@@ -3161,7 +3161,7 @@ let add_parents_to_isolated gen =
               match gen.g_fam.arr.(ifam) with
                 Right3 (fam, cpl, _) ->
                   let des =
-                    descend_of_gen_descend {children = [| get_key_index p |]}
+                    descend_of_gen_descend {children = [| get_iper p |]}
                   in
                   gen.g_fam.arr.(ifam) <-
                     Right3 (fam, cpl, des);
@@ -3431,7 +3431,7 @@ let check_parents_children base ascends unions couples descends =
               Printf.fprintf !log_oc "=> deleted in this family\n";
               Printf.fprintf !log_oc "\n";
               flush !log_oc;
-              to_delete := get_key_index p :: !to_delete
+              to_delete := get_iper p :: !to_delete
             end
       | None ->
           Printf.fprintf !log_oc "%s has no parents but is the child of\n"
@@ -3529,7 +3529,7 @@ let rec negative_date_ancestors base persons families i =
          | _ -> get_death p}
   in
   persons.(i) <- p;
-  let u = uoi base (get_key_index p) in
+  let u = uoi base (get_iper p) in
   for i = 0 to Array.length (get_family u) - 1 do
     let j = (get_family u).(i) in
     let fam = families.(j) in
@@ -3543,7 +3543,7 @@ let rec negative_date_ancestors base persons families i =
         families.(j) <- fam
     | None -> ()
   done;
-  let a = aoi base (get_key_index p) in
+  let a = aoi base (get_iper p) in
   match get_parents a with
     Some ifam ->
       let cpl = coi base ifam in

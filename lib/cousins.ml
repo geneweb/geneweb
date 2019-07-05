@@ -208,7 +208,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                     let children =
                       List.map
                         (fun ip ->
-                           (ip, ia_asex, (get_key_index p, get_sex p) :: rev_br))
+                           (ip, ia_asex, (get_iper p, get_sex p) :: rev_br))
                         (children_of_fam base ifam)
                     in
                     let sp = get_spouse base ip ifam in
@@ -230,7 +230,7 @@ let sibling_has_desc_lev conf base lev (ip, _) =
   has_desc_lev conf base lev (pget conf base ip)
 
 let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
-  let sib = siblings conf base (get_key_index a) in
+  let sib = siblings conf base (get_iper a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then
     begin
       if lev1 > 1 then
@@ -266,7 +266,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     let rec loop sosa some =
       if !cnt < max_cnt && Sosa.gt last_sosa sosa then
         let some =
-          match Util.old_branch_of_sosa conf base (get_key_index p) sosa with
+          match Util.old_branch_of_sosa conf base (get_iper p) sosa with
             Some ((ia, _) :: _ as br) ->
               print_cousins_side_of conf base max_cnt (pget conf base ia) p br
                 lev1 lev2 ||
@@ -394,7 +394,7 @@ let print_anniv conf base p dead_people level =
            let leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2
          end)
     in
-    let a = P.add (get_key_index p, 0, 1) P.empty in
+    let a = P.add (get_iper p, 0, 1) P.empty in
     let rec loop set a =
       if P.is_empty a then set
       else
@@ -457,7 +457,7 @@ let print_anniv conf base p dead_people level =
     Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"C\"%s>\n"
       conf.xhs;
     Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-      (string_of_iper (get_key_index p)) conf.xhs;
+      (string_of_iper (get_iper p)) conf.xhs;
     Wserver.printf "<input type=\"hidden\" name=\"t\" value=\"%s\"%s>\n"
       (if dead_people then "AD" else "AN") conf.xhs
   in

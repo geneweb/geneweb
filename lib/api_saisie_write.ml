@@ -631,7 +631,7 @@ let rec infer_surname conf base p ifam =
       | Some ifam ->
           let ifam = Gwdb.ifam_of_string ifam in
           let fam = foi base ifam in
-          let isp = Gutil.spouse (get_key_index p) fam in
+          let isp = Gutil.spouse (get_iper p) fam in
           let sp = poi base isp in
           if get_sex sp = Male then infer_surname conf base sp None
           else ""
@@ -654,7 +654,7 @@ let rec infer_surname conf base p ifam =
                 let fam = get_family p in
                 let ifam = fam.(0) in
                 let fam = foi base ifam in
-                let isp = Gutil.spouse (get_key_index p) fam in
+                let isp = Gutil.spouse (get_iper p) fam in
                 let sp = poi base isp in
                 if sou base (get_surname sp) = "?" then ""
                 else sou base (get_surname sp)
@@ -1152,11 +1152,11 @@ let compute_redirect_person conf base ip =
       else
         match Util.find_sosa_ref conf base with
         | Some pz ->
-            let ipz = get_key_index pz in
+            let ipz = get_iper pz in
             (* Si on supprime le sosa ... *)
             if ip = ipz then
               match Util.default_sosa_ref conf base with
-              | Some p -> get_key_index p
+              | Some p -> get_iper p
               | None -> Gwdb.dummy_iper
             else ipz
         | None -> Gwdb.dummy_iper

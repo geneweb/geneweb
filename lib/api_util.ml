@@ -1113,7 +1113,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
     List.map
       (fun ifam ->
         let fam = foi base ifam in
-        let c = Gutil.spouse (get_key_index p) fam in
+        let c = Gutil.spouse (get_iper p) fam in
         (pget conf base c, fam) )
       faml
   in
@@ -2207,7 +2207,7 @@ let person_node_map conf base l =
     PFull
       (List.rev_map
          (fun p ->
-           let id = Gwdb.string_of_iper (get_key_index p) in
+           let id = Gwdb.string_of_iper (get_iper p) in
            let p =
              pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
            in
@@ -2220,7 +2220,7 @@ let person_node_map conf base l =
     PLight
       (List.rev_map
          (fun p ->
-           let id = Gwdb.string_of_iper (get_key_index p) in
+           let id = Gwdb.string_of_iper (get_iper p) in
            let p =
              pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
            in

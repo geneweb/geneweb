@@ -400,7 +400,7 @@ let event_to_piqi_event pevt_name fevt_name =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
-  if is_restricted conf base (get_key_index p) then
+  if is_restricted conf base (get_iper p) then
     {
       Mread.Person_tree.index = Gwdb.string_of_iper Gwdb.dummy_iper;
       sex = `unknown;
@@ -417,7 +417,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
     }
   else
     let p_auth = authorized_age conf base p in
-    let index = Gwdb.string_of_iper (get_key_index p) in
+    let index = Gwdb.string_of_iper (get_iper p) in
     let sex =
       match get_sex p with
       | Male -> `male
@@ -567,7 +567,7 @@ let fill_surname_aliases p_auth gen_p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_simple_person conf base p base_prefix =
-  if is_restricted conf base (get_key_index p) then
+  if is_restricted conf base (get_iper p) then
     let restricted_person = Mread.default_simple_person() in
     restricted_person.Mread.Simple_person.index <- Gwdb.string_of_iper Gwdb.dummy_iper;
     restricted_person.Mread.Simple_person.lastname <- "x";
@@ -576,7 +576,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
     restricted_person
   else
     let p_auth = authorized_age conf base p in
-    let index = Gwdb.string_of_iper (get_key_index p) in
+    let index = Gwdb.string_of_iper (get_iper p) in
     let visible_for_visitors = is_visible conf base p in
     let sex =
       match get_sex p with
@@ -902,11 +902,11 @@ let get_related_piqi conf base p base_prefix gen_p has_relations pers_to_piqi_ca
              function
              | r :: rl ->
                  (match r.r_fath with
-                 | Some ip when ip = get_key_index p ->
+                 | Some ip when ip = get_iper p ->
                      loop ((c, r) :: list) rl
                  | _ ->
                      (match r.r_moth with
-                     | Some ip when ip = get_key_index p ->
+                     | Some ip when ip = get_iper p ->
                          loop ((c, r) :: list) rl
                      | _ -> loop list rl))
              | [] -> list
@@ -967,7 +967,7 @@ let get_related_piqi conf base p base_prefix gen_p has_relations pers_to_piqi_ca
 (* ********************************************************************* *)
 let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witnesses_to_piqi_callback child_to_piqi_callback family_constructor =
   let fam = foi base ifam in
-  let sp = poi base (Gutil.spouse (get_key_index p) fam) in
+  let sp = poi base (Gutil.spouse (get_iper p) fam) in
   let spouse = spouse_to_piqi_callback conf base sp base_prefix in
   let ifath = get_father fam in
   let imoth = get_mother fam in
@@ -1053,7 +1053,7 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
   let children_link =
     let family_link =
       Perso_link.get_families_of_parents
-        conf.command (get_key_index p) (get_key_index sp)
+        conf.command (get_iper p) (get_iper sp)
     in
     List.fold_right
       (fun fam_link accu ->
@@ -1105,7 +1105,7 @@ let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_
   in
   (* lien inter arbre *)
   let families_link =
-    let ip = get_key_index p in
+    let ip = get_iper p in
     let families = Perso_link.get_family_link base_prefix ip in
     List.fold_right
       (fun fam_link accu ->
@@ -1118,7 +1118,7 @@ let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_
             Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
          in
          let cpl =
-           let ip = get_key_index p in
+           let ip = get_iper p in
            if ip <> ifath && ip <> imoth then
              match
                Perso_link.get_person_link_with_base
@@ -1132,7 +1132,7 @@ let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_
          in
          let can_merge =
            let fam = Mutil.array_to_list_map (foi base) (get_family p) in
-           Perso_link.can_merge_family conf.command (get_key_index p) fam fam_link cpl
+           Perso_link.can_merge_family conf.command (get_iper p) fam fam_link cpl
          in
          if can_merge then accu
          else
@@ -1224,7 +1224,7 @@ let get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers
               let c = pget conf base ic in
               List.iter
                 (fun ((name, _, _, _, _, wl, _) as evt) ->
-                  let (mem, wk) = Util.array_mem_witn conf base (get_key_index p) wl in
+                  let (mem, wk) = Util.array_mem_witn conf base (get_iper p) wl in
                   if mem then
                     (* Attention aux doublons pour les evenements famille. *)
                     match name with
@@ -1425,7 +1425,7 @@ let fill_index conf p p_auth =
   then
     Gwdb.string_of_iper Gwdb.dummy_iper
   else
-    Gwdb.string_of_iper (get_key_index p)
+    Gwdb.string_of_iper (get_iper p)
 
 let fill_sources conf base p p_auth gen_p is_main_person =
   if p_auth && is_main_person then
@@ -1465,7 +1465,7 @@ let fill_parents conf base p base_prefix =
     (father, mother)
   | None ->
     (* lien inter arbre *)
-    let ip = get_key_index p in
+    let ip = get_iper p in
     match Perso_link.get_parents_link base_prefix ip with
     | Some family ->
         begin
@@ -1520,7 +1520,7 @@ let fill_fiche_parents conf base p base_prefix nb_asc nb_asc_max with_parent_fam
         (father, mother)
     | None ->
         (* lien inter arbre *)
-        let ip = get_key_index p in
+        let ip = get_iper p in
         let base_prefix = conf.command in
         match Perso_link.get_parents_link base_prefix ip with
         | Some family ->
@@ -1863,7 +1863,7 @@ let fill_linked_page_if_is_main_person conf base p is_main_person =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_person conf base p base_prefix is_main_person =
-  if is_restricted conf base (get_key_index p) then
+  if is_restricted conf base (get_iper p) then
     get_restricted_person ()
   else
     let p_auth = authorized_age conf base p in
@@ -1940,7 +1940,7 @@ let pers_to_piqi_person conf base p base_prefix is_main_person =
 let fill_ref_if_is_main_person conf base is_main_person =
   if is_main_person then
     match Util.find_sosa_ref conf base with
-      | Some ref -> ( Some (Gwdb.string_of_iper (get_key_index ref))
+      | Some ref -> ( Some (Gwdb.string_of_iper (get_iper ref))
                     , Some (pers_to_piqi_person conf base ref conf.command false) )
       | None -> (None, None)
   else
@@ -1966,7 +1966,7 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix is_main_person nb_asc 
   (* Generates a fiche person by default. *)
   let piqi_fiche_person = Mread.default_fiche_person() in
   (* If the access is restricted, returns the person with default fields. *)
-  if is_restricted conf base (get_key_index p) then
+  if is_restricted conf base (get_iper p) then
     get_restricted_person ()
   else
     begin
@@ -2137,14 +2137,14 @@ let search_index conf base an search_order =
     | Sosa::le ->
       begin match SearchName.search_by_sosa conf base an with
         | [] ->  loop le
-        | [p] -> Some (get_key_index p)
+        | [p] -> Some (get_iper p)
         | _ -> None
       end
     | Key::le ->
       let pl = SearchName.search_by_key conf base an in
       begin match pl with
         | [] ->  loop le
-        | [p] -> Some (get_key_index p)
+        | [p] -> Some (get_iper p)
         | _ -> None
       end
     | Surname::le ->
@@ -2158,13 +2158,13 @@ let search_index conf base an search_order =
     | ApproxKey::le ->
       begin match SearchName.search_approx_key conf base an with
         | [] ->  loop le
-        | [p] -> Some (get_key_index p)
+        | [p] -> Some (get_iper p)
         | _ -> None
       end
     | PartialKey::le ->
       begin match SearchName.search_partial_key conf base an with
         | [] ->  loop le
-        | [p] -> Some (get_key_index p)
+        | [p] -> Some (get_iper p)
         | _ -> None
       end
     | _ -> None
@@ -2338,10 +2338,10 @@ let build_graph_asc_v2 conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_key_index p_from, factor_from))
+      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
+      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -2351,7 +2351,7 @@ let build_graph_asc_v2 conf base p max_gen =
   let create_node p gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
-    let uniq_id = Hashtbl.hash (base_prefix, get_key_index p, factor) in
+    let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
     let id = string_of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
     Mread.Node.({
@@ -2378,24 +2378,24 @@ let build_graph_asc_v2 conf base p max_gen =
             match get_parents p with
             | Some ifam ->
                 let factor =
-                  try Hashtbl.find ht (get_key_index p) with Not_found -> 1
+                  try Hashtbl.find ht (get_iper p) with Not_found -> 1
                 in
                 let cpl = foi base ifam in
                 let fath = poi base (get_father cpl) in
                 let moth = poi base (get_mother cpl) in
                 let fath_factor =
                   try
-                    let i = Hashtbl.find ht (get_key_index fath) + 1 in
-                    Hashtbl.replace ht (get_key_index fath) i;
+                    let i = Hashtbl.find ht (get_iper fath) + 1 in
+                    Hashtbl.replace ht (get_iper fath) i;
                     i
-                  with Not_found -> Hashtbl.add ht (get_key_index fath) 1; 1
+                  with Not_found -> Hashtbl.add ht (get_iper fath) 1; 1
                 in
                 let moth_factor =
                   try
-                    let i = Hashtbl.find ht (get_key_index moth) + 1 in
-                    Hashtbl.replace ht (get_key_index moth) i;
+                    let i = Hashtbl.find ht (get_iper moth) + 1 in
+                    Hashtbl.replace ht (get_iper moth) i;
                     i
-                  with Not_found -> Hashtbl.add ht (get_key_index moth) 1; 1
+                  with Not_found -> Hashtbl.add ht (get_iper moth) 1; 1
                 in
                 nodes := create_node fath gen Ancestor conf.command fath_factor :: !nodes;
                 nodes := create_node moth gen Ancestor conf.command moth_factor :: !nodes;
@@ -2405,7 +2405,7 @@ let build_graph_asc_v2 conf base p max_gen =
                 loop ((fath, gen + 1) :: (moth, gen + 1) :: l)
             | None ->
                 (* lien inter arbre *)
-                let ip = get_key_index p in
+                let ip = get_iper p in
                 let () =
                   Perso_link.init_cache conf base ip (max_gen - gen) 0 0
                 in
@@ -2418,9 +2418,9 @@ let build_graph_asc_v2 conf base p max_gen =
                         if gen >= max_gen then loop_parents l
                         else
                           let factor =
-                            try Hashtbl.find ht (base_prefix, get_key_index p) with Not_found -> 1
+                            try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
                           in
-                          let ip = get_key_index p in
+                          let ip = get_iper p in
                           match Perso_link.get_parents_link base_prefix ip with
                           | Some family ->
                               begin
@@ -2437,17 +2437,17 @@ let build_graph_asc_v2 conf base p max_gen =
                                     let (moth, _) = Perso_link.make_ep_link base pmoth in
                                     let fath_factor =
                                       try
-                                        let i = Hashtbl.find ht (fam_base_prefix, get_key_index fath) + 1 in
-                                        Hashtbl.replace ht (fam_base_prefix, get_key_index fath) i;
+                                        let i = Hashtbl.find ht (fam_base_prefix, get_iper fath) + 1 in
+                                        Hashtbl.replace ht (fam_base_prefix, get_iper fath) i;
                                         i
-                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_key_index fath) 1; 1
+                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_iper fath) 1; 1
                                     in
                                     let moth_factor =
                                       try
-                                        let i = Hashtbl.find ht (fam_base_prefix, get_key_index moth) + 1 in
-                                        Hashtbl.replace ht (fam_base_prefix, get_key_index moth) i;
+                                        let i = Hashtbl.find ht (fam_base_prefix, get_iper moth) + 1 in
+                                        Hashtbl.replace ht (fam_base_prefix, get_iper moth) i;
                                         i
-                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_key_index moth) 1; 1
+                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_iper moth) 1; 1
                                     in
                                     nodes := create_node fath gen Ancestor pfath.MLink.Person.baseprefix fath_factor :: !nodes;
                                     nodes := create_node moth gen Ancestor pmoth.MLink.Person.baseprefix moth_factor :: !nodes;
@@ -2487,10 +2487,10 @@ let build_graph_desc_v2 conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_key_index p_from, factor_from))
+      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
+      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -2500,7 +2500,7 @@ let build_graph_desc_v2 conf base p max_gen =
   let create_node p ifam gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
-    let uniq_id = Hashtbl.hash (base_prefix, get_key_index p, factor) in
+    let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
     let id = string_of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
     let ifam = Gwdb.string_of_ifam ifam in
@@ -2526,20 +2526,20 @@ let build_graph_desc_v2 conf base p max_gen =
         else
           begin
             let factor =
-              try Hashtbl.find ht (get_key_index p) with Not_found -> 1
+              try Hashtbl.find ht (get_iper p) with Not_found -> 1
             in
             let ifam = get_family p in
             let l =
               Array.fold_left
                 (fun accu ifam  ->
                   let fam = foi base ifam in
-                  let sp = poi base (Gutil.spouse (get_key_index p) fam) in
+                  let sp = poi base (Gutil.spouse (get_iper p) fam) in
                   let sp_factor =
                     try
-                      let i = Hashtbl.find ht (get_key_index sp) + 1 in
-                      Hashtbl.replace ht (get_key_index sp) i;
+                      let i = Hashtbl.find ht (get_iper sp) + 1 in
+                      Hashtbl.replace ht (get_iper sp) i;
                       i
-                    with Not_found -> Hashtbl.add ht (get_key_index sp) 1; 1
+                    with Not_found -> Hashtbl.add ht (get_iper sp) 1; 1
                   in
                   let children =
                     Mutil.array_to_list_map (poi base) (get_children fam)
@@ -2552,10 +2552,10 @@ let build_graph_desc_v2 conf base p max_gen =
                         (fun c ->
                           let c_factor =
                             try
-                              let i = Hashtbl.find ht (get_key_index c) + 1 in
-                              Hashtbl.replace ht (get_key_index c) i;
+                              let i = Hashtbl.find ht (get_iper c) + 1 in
+                              Hashtbl.replace ht (get_iper c) i;
                               i
-                            with Not_found -> Hashtbl.add ht (get_key_index c) 1; 1
+                            with Not_found -> Hashtbl.add ht (get_iper c) 1; 1
                           in
                           nodes := create_node c ifam gen Children conf.command c_factor :: !nodes;
                           edges := create_edge factor conf.command p c_factor conf.command c :: !edges;
@@ -2570,7 +2570,7 @@ let build_graph_desc_v2 conf base p max_gen =
 
                       (* lien inter arbre *)
                       let () =
-                        Perso_link.init_cache conf base (get_key_index p) 1 1 (max_gen - gen)
+                        Perso_link.init_cache conf base (get_iper p) 1 1 (max_gen - gen)
                       in
                       let () =
                         let ht = Hashtbl.create 42 in
@@ -2582,11 +2582,11 @@ let build_graph_desc_v2 conf base p max_gen =
                               else
                                 begin
                                   let factor =
-                                    try Hashtbl.find ht (base_prefix, get_key_index p) with Not_found -> 1
+                                    try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
                                   in
                                   let family_link =
                                     Perso_link.get_families_of_parents
-                                      base_prefix (get_key_index p) (get_key_index sp)
+                                      base_prefix (get_iper p) (get_iper sp)
                                   in
                                   let children_link =
                                     List.fold_left
@@ -2597,7 +2597,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                            Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
                                         in
                                         let cpl =
-                                          let ip = get_key_index p in
+                                          let ip = get_iper p in
                                           if ip <> ifath && ip <> imoth then
                                           match
                                             Perso_link.get_person_link_with_base
@@ -2632,10 +2632,10 @@ let build_graph_desc_v2 conf base p max_gen =
                                                   let (c, _) = Perso_link.make_ep_link base c_link in
                                                   let c_factor =
                                                     try
-                                                      let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
-                                                      Hashtbl.replace ht (baseprefix, get_key_index c) i;
+                                                      let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
+                                                      Hashtbl.replace ht (baseprefix, get_iper c) i;
                                                       i
-                                                    with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
+                                                    with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
                                                   in
                                                   nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
                                                   edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
@@ -2658,7 +2658,7 @@ let build_graph_desc_v2 conf base p max_gen =
 
             (* lien inter arbre *)
             let () =
-              Perso_link.init_cache conf base (get_key_index p) 1 1 (max_gen - gen)
+              Perso_link.init_cache conf base (get_iper p) 1 1 (max_gen - gen)
             in
             let () =
               let ht = Hashtbl.create 42 in
@@ -2669,7 +2669,7 @@ let build_graph_desc_v2 conf base p max_gen =
                     if gen >= max_gen then loop_desc l
                     else
                       begin
-                        let ip = get_key_index p in
+                        let ip = get_iper p in
                         let families = Perso_link.get_family_link base_prefix ip in
                         let l =
                           List.fold_left
@@ -2680,7 +2680,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                   Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
                                in
                                let cpl =
-                                 let ip = get_key_index p in
+                                 let ip = get_iper p in
                                  if ip <> ifath && ip <> imoth then
                                    match
                                      Perso_link.get_person_link_with_base
@@ -2694,7 +2694,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                in
                                let can_merge =
                                  let fam = Mutil.array_to_list_map (foi base) (get_family p) in
-                                 Perso_link.can_merge_family conf.command (get_key_index p) fam fam_link cpl
+                                 Perso_link.can_merge_family conf.command (get_iper p) fam fam_link cpl
                                in
                                if can_merge then accu
                                else
@@ -2706,10 +2706,10 @@ let build_graph_desc_v2 conf base p max_gen =
                                      let ifam = Gwdb.ifam_of_string fam_link.MLink.Family.ifam in
                                      let sp_factor =
                                        try
-                                         let i = Hashtbl.find ht (baseprefix, get_key_index sp) + 1 in
-                                         Hashtbl.replace ht (baseprefix, get_key_index sp) i;
+                                         let i = Hashtbl.find ht (baseprefix, get_iper sp) + 1 in
+                                         Hashtbl.replace ht (baseprefix, get_iper sp) i;
                                          i
-                                       with Not_found -> Hashtbl.add ht (baseprefix, get_key_index sp) 1; 1
+                                       with Not_found -> Hashtbl.add ht (baseprefix, get_iper sp) 1; 1
                                      in
                                      nodes := create_node sp ifam gen Spouse baseprefix sp_factor :: !nodes;
                                      edges := create_edge factor base_prefix p sp_factor baseprefix sp :: !edges;
@@ -2729,10 +2729,10 @@ let build_graph_desc_v2 conf base p max_gen =
                                                      let (c, _) = Perso_link.make_ep_link base c_link in
                                                      let c_factor =
                                                        try
-                                                         let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
-                                                         Hashtbl.replace ht (baseprefix, get_key_index c) i;
+                                                         let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
+                                                         Hashtbl.replace ht (baseprefix, get_iper c) i;
                                                          i
-                                                       with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
+                                                       with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
                                                      in
                                                      nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
                                                      edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
@@ -2795,7 +2795,7 @@ let print_result_graph_tree_v2 conf base ip =
   let nodes_asc =
     List.rev_map
       (fun p ->
-        let id = Gwdb.string_of_iper (get_key_index p) in
+        let id = Gwdb.string_of_iper (get_iper p) in
         let p = pers_to_piqi_person_tree conf base p in
         Mread.Node.({
           id = id;
@@ -2915,7 +2915,7 @@ let print_result_graph_tree_v2 conf base ip =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix =
-  if is_restricted conf base (get_key_index p) then
+  if is_restricted conf base (get_iper p) then
     {
       Mread.Person_tree_full.index = Gwdb.string_of_iper Gwdb.dummy_iper;
       sex = `unknown;
@@ -3321,10 +3321,10 @@ let build_graph_asc_full conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_key_index p_from, factor_from))
+      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
+      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -3334,7 +3334,7 @@ let build_graph_asc_full conf base p max_gen =
   let create_node p gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
-    let uniq_id = Hashtbl.hash (base_prefix, get_key_index p, factor) in
+    let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix in
     Mread.Node_full.({
@@ -3365,24 +3365,24 @@ let build_graph_asc_full conf base p max_gen =
             match get_parents p with
             | Some ifam ->
                 let factor =
-                  try Hashtbl.find ht (get_key_index p) with Not_found -> 1
+                  try Hashtbl.find ht (get_iper p) with Not_found -> 1
                 in
                 let cpl = foi base ifam in
                 let fath = poi base (get_father cpl) in
                 let moth = poi base (get_mother cpl) in
                 let fath_factor =
                   try
-                    let i = Hashtbl.find ht (get_key_index fath) + 1 in
-                    Hashtbl.replace ht (get_key_index fath) i;
+                    let i = Hashtbl.find ht (get_iper fath) + 1 in
+                    Hashtbl.replace ht (get_iper fath) i;
                     i
-                  with Not_found -> Hashtbl.add ht (get_key_index fath) 1; 1
+                  with Not_found -> Hashtbl.add ht (get_iper fath) 1; 1
                 in
                 let moth_factor =
                   try
-                    let i = Hashtbl.find ht (get_key_index moth) + 1 in
-                    Hashtbl.replace ht (get_key_index moth) i;
+                    let i = Hashtbl.find ht (get_iper moth) + 1 in
+                    Hashtbl.replace ht (get_iper moth) i;
                     i
-                  with Not_found -> Hashtbl.add ht (get_key_index moth) 1; 1
+                  with Not_found -> Hashtbl.add ht (get_iper moth) 1; 1
                 in
                 nodes := create_node fath gen Ancestor conf.command fath_factor :: !nodes;
                 nodes := create_node moth gen Ancestor conf.command moth_factor :: !nodes;
@@ -3392,7 +3392,7 @@ let build_graph_asc_full conf base p max_gen =
                 loop ((fath, gen + 1) :: (moth, gen + 1) :: l)
             | None ->
                 (* lien inter arbre *)
-                let ip = get_key_index p in
+                let ip = get_iper p in
                 let () =
                   Perso_link.init_cache conf base ip (max_gen - gen) 0 0
                 in
@@ -3405,9 +3405,9 @@ let build_graph_asc_full conf base p max_gen =
                         if gen >= max_gen then loop_parents l
                         else
                           let factor =
-                            try Hashtbl.find ht (base_prefix, get_key_index p) with Not_found -> 1
+                            try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
                           in
-                          let ip = get_key_index p in
+                          let ip = get_iper p in
                           match Perso_link.get_parents_link base_prefix ip with
                           | Some family ->
                               begin
@@ -3425,17 +3425,17 @@ let build_graph_asc_full conf base p max_gen =
                                     let (moth, _) = Perso_link.make_ep_link base pmoth in
                                     let fath_factor =
                                       try
-                                        let i = Hashtbl.find ht (fam_base_prefix, get_key_index fath) + 1 in
-                                        Hashtbl.replace ht (fam_base_prefix, get_key_index fath) i;
+                                        let i = Hashtbl.find ht (fam_base_prefix, get_iper fath) + 1 in
+                                        Hashtbl.replace ht (fam_base_prefix, get_iper fath) i;
                                         i
-                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_key_index fath) 1; 1
+                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_iper fath) 1; 1
                                     in
                                     let moth_factor =
                                       try
-                                        let i = Hashtbl.find ht (fam_base_prefix, get_key_index moth) + 1 in
-                                        Hashtbl.replace ht (fam_base_prefix, get_key_index moth) i;
+                                        let i = Hashtbl.find ht (fam_base_prefix, get_iper moth) + 1 in
+                                        Hashtbl.replace ht (fam_base_prefix, get_iper moth) i;
                                         i
-                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_key_index moth) 1; 1
+                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_iper moth) 1; 1
                                     in
                                     nodes := create_node fath gen Ancestor pfath.MLink.Person.baseprefix fath_factor :: !nodes;
                                     nodes := create_node moth gen Ancestor pmoth.MLink.Person.baseprefix moth_factor :: !nodes;
@@ -3476,10 +3476,10 @@ let build_graph_desc_full conf base p max_gen =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
     let id_from =
-      string_of_int (Hashtbl.hash (baseprefix_from, get_key_index p_from, factor_from))
+      string_of_int (Hashtbl.hash (baseprefix_from, get_iper p_from, factor_from))
     in
     let id_to =
-      string_of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
+      string_of_int (Hashtbl.hash (baseprefix_to, get_iper p_to, factor_to))
     in
     Mread.Edge.({
       from_node = id_from;
@@ -3489,7 +3489,7 @@ let build_graph_desc_full conf base p max_gen =
   let create_node p ifam gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
     (* le prefix de la base et l'index de la personne.       *)
-    let uniq_id = Hashtbl.hash (base_prefix, get_key_index p, factor) in
+    let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix in
     let ifam = Gwdb.string_of_ifam ifam in
@@ -3519,20 +3519,20 @@ let build_graph_desc_full conf base p max_gen =
         else
           begin
             let factor =
-              try Hashtbl.find ht (get_key_index p) with Not_found -> 1
+              try Hashtbl.find ht (get_iper p) with Not_found -> 1
             in
             let ifam = get_family p in
             let l =
               List.fold_left
                 (fun accu ifam  ->
                   let fam = foi base ifam in
-                  let sp = poi base (Gutil.spouse (get_key_index p) fam) in
+                  let sp = poi base (Gutil.spouse (get_iper p) fam) in
                   let sp_factor =
                     try
-                      let i = Hashtbl.find ht (get_key_index sp) + 1 in
-                      Hashtbl.replace ht (get_key_index sp) i;
+                      let i = Hashtbl.find ht (get_iper sp) + 1 in
+                      Hashtbl.replace ht (get_iper sp) i;
                       i
-                    with Not_found -> Hashtbl.add ht (get_key_index sp) 1; 1
+                    with Not_found -> Hashtbl.add ht (get_iper sp) 1; 1
                   in
                   let children =
                     List.map (poi base) (Array.to_list (get_children fam))
@@ -3545,10 +3545,10 @@ let build_graph_desc_full conf base p max_gen =
                         (fun c ->
                           let c_factor =
                             try
-                              let i = Hashtbl.find ht (get_key_index c) + 1 in
-                              Hashtbl.replace ht (get_key_index c) i;
+                              let i = Hashtbl.find ht (get_iper c) + 1 in
+                              Hashtbl.replace ht (get_iper c) i;
                               i
-                            with Not_found -> Hashtbl.add ht (get_key_index c) 1; 1
+                            with Not_found -> Hashtbl.add ht (get_iper c) 1; 1
                           in
                           nodes := create_node c ifam gen Children conf.command c_factor :: !nodes;
                           edges := create_edge factor conf.command p c_factor conf.command c :: !edges;
@@ -3563,7 +3563,7 @@ let build_graph_desc_full conf base p max_gen =
 
                       (* lien inter arbre *)
                       let () =
-                        Perso_link.init_cache conf base (get_key_index p) 1 1 (max_gen - gen)
+                        Perso_link.init_cache conf base (get_iper p) 1 1 (max_gen - gen)
                       in
                       let () =
                         let ht = Hashtbl.create 42 in
@@ -3575,11 +3575,11 @@ let build_graph_desc_full conf base p max_gen =
                               else
                                 begin
                                   let factor =
-                                    try Hashtbl.find ht (base_prefix, get_key_index p) with Not_found -> 1
+                                    try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
                                   in
                                   let family_link =
                                     Perso_link.get_families_of_parents
-                                      base_prefix (get_key_index p) (get_key_index sp)
+                                      base_prefix (get_iper p) (get_iper sp)
                                   in
                                   let children_link =
                                     List.fold_left
@@ -3590,7 +3590,7 @@ let build_graph_desc_full conf base p max_gen =
                                            Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
                                         in
                                         let cpl =
-                                          let ip = get_key_index p in
+                                          let ip = get_iper p in
                                           if ip <> ifath && ip <> imoth then
                                           match
                                             Perso_link.get_person_link_with_base
@@ -3626,10 +3626,10 @@ let build_graph_desc_full conf base p max_gen =
                                                   let (c, _) = Perso_link.make_ep_link base c_link in
                                                   let c_factor =
                                                     try
-                                                      let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
-                                                      Hashtbl.replace ht (baseprefix, get_key_index c) i;
+                                                      let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
+                                                      Hashtbl.replace ht (baseprefix, get_iper c) i;
                                                       i
-                                                    with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
+                                                    with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
                                                   in
                                                   nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
                                                   edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
@@ -3652,7 +3652,7 @@ let build_graph_desc_full conf base p max_gen =
 
             (* lien inter arbre *)
             let () =
-              Perso_link.init_cache conf base (get_key_index p) 1 1 (max_gen - gen)
+              Perso_link.init_cache conf base (get_iper p) 1 1 (max_gen - gen)
             in
             let () =
               let ht = Hashtbl.create 42 in
@@ -3663,7 +3663,7 @@ let build_graph_desc_full conf base p max_gen =
                     if gen >= max_gen then loop_desc l
                     else
                       begin
-                        let ip = get_key_index p in
+                        let ip = get_iper p in
                         let families = Perso_link.get_family_link base_prefix ip in
                         let l =
                           List.fold_left
@@ -3674,7 +3674,7 @@ let build_graph_desc_full conf base p max_gen =
                                   Gwdb.ifam_of_string fam_link.MLink.Family.ifam)
                                in
                                let cpl =
-                                 let ip = get_key_index p in
+                                 let ip = get_iper p in
                                  if ip <> ifath && ip <> imoth then
                                    match
                                      Perso_link.get_person_link_with_base
@@ -3688,7 +3688,7 @@ let build_graph_desc_full conf base p max_gen =
                                in
                                let can_merge =
                                  let fam = List.map (foi base) (Array.to_list (get_family p)) in
-                                 Perso_link.can_merge_family conf.command (get_key_index p) fam fam_link cpl
+                                 Perso_link.can_merge_family conf.command (get_iper p) fam fam_link cpl
                                in
                                if can_merge then accu
                                else
@@ -3700,10 +3700,10 @@ let build_graph_desc_full conf base p max_gen =
                                      let ifam = Gwdb.ifam_of_string fam_link.MLink.Family.ifam in
                                      let sp_factor =
                                        try
-                                         let i = Hashtbl.find ht (baseprefix, get_key_index sp) + 1 in
-                                         Hashtbl.replace ht (baseprefix, get_key_index sp) i;
+                                         let i = Hashtbl.find ht (baseprefix, get_iper sp) + 1 in
+                                         Hashtbl.replace ht (baseprefix, get_iper sp) i;
                                          i
-                                       with Not_found -> Hashtbl.add ht (baseprefix, get_key_index sp) 1; 1
+                                       with Not_found -> Hashtbl.add ht (baseprefix, get_iper sp) 1; 1
                                      in
                                      nodes := create_node sp ifam gen Spouse baseprefix sp_factor :: !nodes;
                                      edges := create_edge factor base_prefix p sp_factor baseprefix sp :: !edges;
@@ -3729,10 +3729,10 @@ let build_graph_desc_full conf base p max_gen =
                                                      let (c, _) = Perso_link.make_ep_link base c_link in
                                                      let c_factor =
                                                        try
-                                                         let i = Hashtbl.find ht (baseprefix, get_key_index c) + 1 in
-                                                         Hashtbl.replace ht (baseprefix, get_key_index c) i;
+                                                         let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
+                                                         Hashtbl.replace ht (baseprefix, get_iper c) i;
                                                          i
-                                                       with Not_found -> Hashtbl.add ht (baseprefix, get_key_index c) 1; 1
+                                                       with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
                                                      in
                                                      nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
                                                      edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;

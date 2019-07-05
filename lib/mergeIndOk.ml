@@ -230,7 +230,7 @@ let reconstitute conf base p1 p2 =
      pevents = list (Futil.map_pers_event (sorp base) (sou base)) get_pevents;
      notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
      psources = merge_strings base (get_psources p1) ", " (get_psources p2);
-     key_index = get_key_index p1}
+     key_index = get_iper p1}
   in
   (* On fait la fusion des évènements à partir *)
   (* de la fusion des évènements principaux.   *)

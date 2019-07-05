@@ -846,7 +846,7 @@ let print_del1 conf base p =
   Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"%s>\n"
     conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper (get_key_index p)) conf.xhs;
+    (string_of_iper (get_iper p)) conf.xhs;
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
