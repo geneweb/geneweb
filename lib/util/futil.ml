@@ -84,11 +84,7 @@ let map_relation_ps fp fs r =
      end;
    r_sources = fs r.r_sources}
 
-let map_person_ps
- =
- (* FIXME!!!! *)
- Obj.magic @@
- fun fp fs p ->
+let map_person_ps fp fs p =
   { first_name = fs p.first_name
   ; surname = fs p.surname
   ; occ = p.occ
@@ -99,7 +95,7 @@ let map_person_ps
   ; qualifiers = List.map fs p.qualifiers
   ; titles = List.map (map_title_strings fs) p.titles
   ; rparents = List.map (map_relation_ps fp fs) p.rparents
-  ; related = p.related
+  ; related = List.map fp p.related
   ; aliases = List.map fs p.aliases
   ;  occupation = fs p.occupation
   ; sex = p.sex
