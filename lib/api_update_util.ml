@@ -46,25 +46,22 @@ let new_gutil_find_free_occ base f s i =
 let ht_free_occ = Hashtbl.create 33 ;;
 let api_find_free_occ base fn sn =
   let key = Name.lower (fn ^ " " ^ sn) in
-  (* Dans le cas où on ne rempli pas nom/prénom, on renvoit directement 0 *)
-  if key = "" then 0
-  else
-    try
-      begin
-        let free_occ = Hashtbl.find ht_free_occ key in
-        let free_occ = succ free_occ in
-        let base_free_occ = new_gutil_find_free_occ base fn sn free_occ in
-        let occ = max free_occ base_free_occ in
-        Hashtbl.add ht_free_occ key occ;
-        occ
-      end
-    with Not_found ->
-      begin
-        (* On regarde dans la base quelle est le occ dispo. *)
-        let free_occ = Gutil.find_free_occ base fn sn 0 in
-        Hashtbl.add ht_free_occ key free_occ;
-        free_occ
-      end
+  try
+    begin
+      let free_occ = Hashtbl.find ht_free_occ key in
+      let free_occ = succ free_occ in
+      let base_free_occ = new_gutil_find_free_occ base fn sn free_occ in
+      let occ = max free_occ base_free_occ in
+      Hashtbl.add ht_free_occ key occ;
+      occ
+    end
+  with Not_found ->
+    begin
+      (* On regarde dans la base quelle est le occ dispo. *)
+      let free_occ = Gutil.find_free_occ base fn sn 0 in
+      Hashtbl.add ht_free_occ key free_occ;
+      free_occ
+    end
 
 
 (**/**) (* Type de retour de modification. *)
@@ -1158,10 +1155,7 @@ let pers_to_piqi_person_link conf base p =
   in
   let first_name = sou base (get_first_name p) in
   let surname = sou base (get_surname p) in
-  let occ =
-    if first_name = "?" || surname = "?" then -1 (* FIXME!!! *)
-    else get_occ p
-  in
+  let occ = get_occ p in
   let occ = if occ = 0 then None else Some (Int32.of_int occ) in
   let dates = Api_saisie_read.short_dates_text conf base p in
   let dates =
@@ -1202,10 +1196,7 @@ let pers_to_piqi_mod_person conf base p =
   in
   let surname = sou base (get_surname p) in
   let first_name = sou base (get_first_name p) in
-  let occ =
-    if first_name = "?" || surname = "?" then -1 (* FIXME!!! *)
-    else get_occ p
-  in
+  let occ = get_occ p in
   let occ =
     (* Cas particulier pour les personnes sans clé, et principalement *)
     (* ? ?. On ne renvoie pas le occ, comme ça si la personne existe  *)
@@ -1763,10 +1754,7 @@ let reconstitute_somebody base person =
       let p = poi base ip in
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
-      let occ =
-        if fn = "?" || sn = "?" then -1 (* FIXME!!! *)
-        else get_occ p
-      in
+      let occ = get_occ p in
       (fn, sn, occ, Update.Link, "", false)
     | _ ->
       let sex =
