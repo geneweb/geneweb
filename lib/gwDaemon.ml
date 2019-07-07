@@ -1505,6 +1505,7 @@ type misc_fname =
   | Eot of string
   | Ttf of string
   | Woff2 of string
+  | Xml of string
   | Other of string
 
 let content_misc len misc_fname =
@@ -1519,6 +1520,7 @@ let content_misc len misc_fname =
     | Eot fname -> fname, "application/font-eot"
     | Ttf fname -> fname, "application/font-ttf"
     | Woff2 fname -> fname, "application/font-woff2"
+    | Xml fname -> fname, "application/xml"
     | Other fname -> fname, "text/plain"
   in
   Wserver.header "Content-type: %s" t;
@@ -1531,7 +1533,7 @@ let content_misc len misc_fname =
 let print_misc_file misc_fname =
   match misc_fname with
     Css fname | Js fname | Otf fname | Svg fname | Woff fname | Eot fname |
-    Ttf fname | Woff2 fname ->
+    Ttf fname | Woff2 fname | Xml fname ->
       begin
         try
           let ic = Secure.open_in_bin fname in
@@ -1563,6 +1565,7 @@ let misc_request fname =
       else if Filename.check_suffix fname ".eot" then Eot fname
       else if Filename.check_suffix fname ".ttf" then Ttf fname
       else if Filename.check_suffix fname ".woff2" then Woff2 fname
+      else if Filename.check_suffix fname ".xml" then Xml fname
       else Other fname
     in
     print_misc_file misc_fname

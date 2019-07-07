@@ -64,3 +64,80 @@ function insertTags (tagOpen, tagClose, sampleText) {
 <i class="far fa-window-minimize" alt="Ligne horizontale" title="Ligne horizontale"></i></a>
 <a class="ml-2" onclick="return insertTags('\[\[\[','\]\]\]','Lien_interne/Nom du lien');" href="javascript:;">
 <i class="fas fa-link" alt="Lien_interne/Nom du lien" title="Lien_interne/Nom du lien"></i></a>%nn;
+%if(evar.m = "MOD_NOTES")
+<div class="modal fade" id="init_gallery" tabindex="-1" role="dialog" aria-labbelledby="init_gallery_label" aria-hidden="true">
+  <div class="modal-dialog modal-xl role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="init_gallery_label">Initialise une image map</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label for="page_title" class="col-form-label col-sm-2">[*title/titles]0</label>
+          <input type="text" class="form-control col-sm-10" id="page_title">
+        </div>
+        <fieldset class="form-group mb-0 mt-2">
+          <div class="form-row">
+            <legend class="col-form-label col-sm-2 pt-2">Chemin</legend>
+            <div class="form-check form-check-inline col-sm-9 pl-2 pr-0">
+              <div class="custom-control custom-radio custom-control-inline">
+                <input id="doc" class="custom-control-input" type="radio" name="path" value="doc" checked>
+                <label for="doc" class="custom-control-label" title="m=DOC&s=…">DOC</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input id="public" class="custom-control-input" type="radio" name="path" value="public">
+                <label for="public" class="custom-control-label"
+                  title="gallery_path=%bvar.gallery_path;">[*iftitles/public/private]1</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input id="private" class="custom-control-input" type="radio" name="path" value="private">
+                <label for="private" class="custom-control-label"
+                  title="gallery_path_private=%bvar.gallery_path_private;">[*iftitles/public/private]2</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input id="other" class="custom-control-input" type="radio" name="path" value="other">
+                <label for="other" class="custom-control-label">Autre</label>
+              </div>
+              <input id="path" type="text" class="form-control col-auto flex-fill" placeholder="Autre chemin" disabled>
+            </div>
+          </div>
+        </fieldset>
+        <div class="form-row mt-2">
+          <label for="fname" class="col-form-label col-sm-2">[*file]</label>
+          <input id="fname" type="text" class="form-control col-sm-10">
+        </div>
+      </div>
+      <div class="modal-footer">
+       <button type="button" class="btn btn-primary" onclick="init_gallery();">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function init_tool() {
+  $("#doc,#public,#private").click( function() {
+   $("#path").prop("disabled",true);
+  });
+  $("#other").click( function() {
+   $("#path").prop("disabled",false);
+  });
+}
+function init_gallery() {
+ var title = $("#page_title").val();
+ var path = $("input[name=path]:checked").val();
+ var fname = $("#fname").val();
+ var res = {
+   "title": title,
+   "path": path,
+   "img": fname,
+   "map": []
+ };
+ $("#notes_comments").val( "TITLE=" + title +"\nTYPE=gallery\n" + JSON.stringify(res) );
+ $('#init_gallery').modal('hide')
+}
+</script>
+<a class="fa fa-images ml-2" data-toggle="modal" data-target="#init_gallery" href="javascript:;" onclick="init_tool();" title="Initialise imagemap"></a>
+%end;

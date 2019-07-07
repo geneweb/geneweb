@@ -29,7 +29,7 @@ val print_what_links : config -> base -> person -> unit
 
 val links_to_ind :
   config -> base -> (NotesLinks.page * ('a * ('b * 'c) list)) list -> 'b ->
-    NotesLinks.page list
+    string option -> NotesLinks.page list
 
 val build_sosa_tree_ht : config -> base -> person -> unit
 val build_sosa_ht : config -> base -> unit
