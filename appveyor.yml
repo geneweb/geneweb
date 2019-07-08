@@ -1,9 +1,24 @@
+skip_commits:
+  files:
+    - CHANGES
+    - ICHANGES
+    - etc/
+    - geneweb.opam
+    - .gitignore
+    - hd/
+    - INSTALL
+    - LICENSE
+    - README.md
+    - man/
+    - .travis.yml
+
 platform:
   - x86
 
 environment:
   CYG_ROOT: C:/cygwin
   CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
+  OPAM_PACKAGES: 'benchmark camlp5 cppo dune markup ocaml ounit num stdlib-shims zarith'
 
 install:
   - 'set OPAMYES=1'
@@ -11,12 +26,15 @@ install:
   - '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
   - '%CYG_BASH% "tar -xf opam64.tar.xz"'
   - '%CYG_BASH% "opam64/install.sh"'
-  - '%CYG_BASH% "opam init default \"https://github.com/fdopen/opam-repository-mingw.git#opam2\" -c \"ocaml-variants.4.07.1+mingw64\" --disable-sandboxing"'
-  - '%CYG_BASH% "eval $(opam env)"'
-  - '%CYG_BASH% "opam pin add --no-action -k path geneweb.dev ${APPVEYOR_BUILD_FOLDER}"'
+  - '%CYG_BASH% "opam init default \"https://github.com/fdopen/opam-repository-mingw.git#opam2\" -c \"ocaml-variants.4.07.1+mingw64c\" --disable-sandboxing"'
+  - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
+  - '%CYG_BASH% "opam pin add markup https://github.com/geneanet/markup.ml -k git --no-action"'
   - '%CYG_BASH% "opam update"'
-  - '%CYG_BASH% "opam install geneweb.dev --with-test --deps-only"'
+  - '%CYG_BASH% "opam install depext depext-cygwinports"'
+  - '%CYG_BASH% "opam depext ${OPAM_PACKAGES}"'
+  - '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
 
 build_script:
   - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure && make clean test bench distrib clean"'
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && opam install num && ./configure --sosa-num && make clean test bench distrib clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure --sosa-num && make clean test bench distrib clean"'
+#  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure --sosa-zarith && make clean test bench distrib clean"'
