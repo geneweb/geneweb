@@ -337,11 +337,6 @@ let month_txt =
   in
   fun i -> let i = if i < 0 || i >= Array.length txt then 0 else i in txt.(i)
 
-(* Returns true if sub is a substring of str or false otherwise. *)
-let string_exists str sub =
-  let re = Str.regexp_string sub in
-  try ignore (Str.search_forward re str 0); true with Not_found -> false
-
 let string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
   Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT" (week_day_txt lt.Unix.tm_wday)
@@ -2788,7 +2783,7 @@ let has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
     not (is_empty_string (get_image p)) &&
     (conf.wizard || conf.friend ||
-     not (string_exists (sou base (get_image p)) "/private/")) ||
+     not (Mutil.contains (sou base (get_image p)) "/private/")) ||
     auto_image_file conf base p <> None
   else false
 
