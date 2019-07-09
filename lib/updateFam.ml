@@ -27,8 +27,8 @@ let person_key base ip =
   let first_name = sou base (get_first_name p) in
   let surname = sou base (get_surname p) in
   let occ =
-    (* if first_name = "?" || surname = "?" then Adef.int_of_iper ip
-     * else *) get_occ p
+    if first_name = "?" || surname = "?" then int_of_string @@ Gwdb.string_of_iper ip (* FIXME *)
+    else get_occ p
   in
   first_name, surname, occ, Update.Link, ""
 
