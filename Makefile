@@ -32,7 +32,6 @@ EXE = \
 CAMLP5_PA_EXTEND_FILES = \
 	bin/distrib/ged2gwb/ged2gwb \
 	lib/templ \
-	lib/update \
 	bin/distrib/setup/setup
 
 CAMLP5_Q_MLAST_FILES = \
