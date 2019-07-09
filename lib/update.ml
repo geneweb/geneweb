@@ -219,18 +219,18 @@ let print_return conf =
   Wserver.printf "</p>\n"
 
 let print_err_unknown conf _base (f, s, o) =
-(* #ifdef API *)
+#ifdef API
   if not !Api_conf.mode_api then begin
-(* #endif *)
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
     (capitale (transl conf "unknown person")) (transl conf ":") f o s;
   print_return conf;
   Hutil.trailer conf;
-(* #ifdef API *)
+#ifdef API
     end;
-(* #endif *)
+#endif
   let err =
     Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
       (capitale (transl conf "unknown person")) (transl conf ":") f o s
@@ -709,18 +709,18 @@ let print_warnings_and_miscs conf base wl ml =
 
 let error conf base x =
   let err = string_of_error conf base x in
-(* #ifdef API *)
+#ifdef API
   if not !Api_conf.mode_api then begin
-(* #endif *)
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s" err;
   Wserver.printf "\n";
   print_return conf;
   Hutil.trailer conf;
-(* #ifdef API *)
+#ifdef API
   end ;
-(* #endif *)
+#endif
   raise @@ ModErr err
 
 let error_locked conf =
@@ -788,17 +788,17 @@ let error_digest conf =
     Printf.sprintf @@
     fcapitale (ftransl conf "the base has changed; do \"back\", \"reload\", and refill the form")
   in
-(* #ifdef API *)
+#ifdef API
   if not !Api_conf.mode_api then begin
-(* #endif *)
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>%s.\n</p>\n" err ;
   Hutil.trailer conf;
-(* #ifdef API *)
+#ifdef API
   end;
-(* #endif *)
+#endif
   raise @@ ModErr err
 
 let digest_person p = Iovalue.digest p
@@ -823,16 +823,16 @@ let bad_date conf d =
          | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a)
       d
   in
-(* #ifdef API *)
+#ifdef API
   if not !Api_conf.mode_api then begin
-(* #endif *)
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title ;
   Wserver.printf "%s" err ;
   Hutil.trailer conf ;
-(* #ifdef API *)
+#ifdef API
     end;
-(* #endif *)
+#endif
   raise @@ ModErr err
 
 let int_of_field s =
@@ -1067,9 +1067,9 @@ let print_create_conflict conf base p var =
          Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
       (fun _ -> "</a>.");
   in
-(* #ifdef API *)
+#ifdef API
   if not !Api_conf.mode_api then begin
-(* #endif *)
+#endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s" err ;
@@ -1124,9 +1124,9 @@ let print_create_conflict conf base p var =
   Wserver.printf "</form>\n";
   print_same_name conf base p;
   Hutil.trailer conf;
-(* #ifdef API *)
+#ifdef API
   end ;
-(* #endif *)
+#endif
   raise @@ ModErr err
 
 let insert_person conf base src new_persons (f, s, o, create, var) =
