@@ -21,6 +21,8 @@ let () =
     [ "aaaaaaaaaa" ; "bbbbbbbbbb" ; "abbbbbbbb" ; "bbbbbbbbba" ; "ababababab" ]
 ; bench "Mutil.tr" 100000000L (fun s -> Mutil.tr 'a' 'b' @@ "a" ^ s)
     [ "aaaaaaaaaa" ; "bbbbbbbbbb" ; "abbbbbbbb" ; "bbbbbbbbba" ; "ababababab" ]
+; bench "Mutil.contains" 10000000L (Mutil.contains "foobarbaz")
+    [ "foo" ; "bar" ; "baz" ; "foobarbaz!" ]
 
 ; begin match Sys.getenv "BENCH_BASE" with
   | exception Not_found -> ()
