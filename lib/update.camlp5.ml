@@ -982,33 +982,80 @@ let reconstitute_date conf var =
           if txt = "" then None else Some (Dtext txt)
       | _ -> None
 
-let rec parse_int n =
-  parser
-    [< ''0'..'9' as i;
-       a = parse_int (10 * n + Char.code i - Char.code '0') ?! >] ->
-      a
-  | [< >] -> n
+let rec parse_int n (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+    Some ('0'..'9' as i) ->
+      Stream.junk strm__;
+      parse_int (10 * n + Char.code i - Char.code '0') strm__
+  | _ -> n
 
-let parse_r_parent =
-  parser
-    [< ''f' >] -> 0
-  | [< ''m' >] -> 1
+let parse_r_parent (strm__ : _ Stream.t) =
+  match Stream.peek strm__ with
+    Some 'f' -> Stream.junk strm__; 0
+  | Some 'm' -> Stream.junk strm__; 1
+  | _ -> raise Stream.Failure
 
 let text_of_var conf =
   function
     "pa1" -> transl_nth conf "him/her" 0
   | "pa2" -> transl_nth conf "him/her" 1
   | var ->
-      match Stream.of_string var with parser
-        [< ''r'; pos = parse_int 0; ''_'; pn = parse_r_parent >] ->
-          transl_nth conf "relation/relations" 0 ^ " " ^ string_of_int pos ^
-          " - " ^ transl_nth conf "father/mother" pn
-      | [< ''w'; ''i'; ''t'; ''n'; pos = parse_int 0 >] ->
-          transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int pos
-      | [< ''c'; ''h'; pos = parse_int 0 >] ->
-          Util.translate_eval (transl_nth conf "child/children" 0) ^ " " ^
-          string_of_int pos
-      | [< >] -> var
+      let (strm__ : _ Stream.t) = Stream.of_string var in
+      match Stream.peek strm__ with
+        Some 'r' ->
+          Stream.junk strm__;
+          let pos =
+            try parse_int 0 strm__ with
+              Stream.Failure -> raise (Stream.Error "")
+          in
+          begin match Stream.peek strm__ with
+            Some '_' ->
+              Stream.junk strm__;
+              let pn =
+                try parse_r_parent strm__ with
+                  Stream.Failure -> raise (Stream.Error "")
+              in
+              transl_nth conf "relation/relations" 0 ^ " " ^
+              string_of_int pos ^ " - " ^ transl_nth conf "father/mother" pn
+          | _ -> raise (Stream.Error "")
+          end
+      | Some 'w' ->
+          Stream.junk strm__;
+          begin match Stream.peek strm__ with
+            Some 'i' ->
+              Stream.junk strm__;
+              begin match Stream.peek strm__ with
+                Some 't' ->
+                  Stream.junk strm__;
+                  begin match Stream.peek strm__ with
+                    Some 'n' ->
+                      Stream.junk strm__;
+                      let pos =
+                        try parse_int 0 strm__ with
+                          Stream.Failure -> raise (Stream.Error "")
+                      in
+                      transl_nth conf "witness/witnesses" 0 ^ " " ^
+                      string_of_int pos
+                  | _ -> raise (Stream.Error "")
+                  end
+              | _ -> raise (Stream.Error "")
+              end
+          | _ -> raise (Stream.Error "")
+          end
+      | Some 'c' ->
+          Stream.junk strm__;
+          begin match Stream.peek strm__ with
+            Some 'h' ->
+              Stream.junk strm__;
+              let pos =
+                try parse_int 0 strm__ with
+                  Stream.Failure -> raise (Stream.Error "")
+              in
+              Util.translate_eval (transl_nth conf "child/children" 0) ^ " " ^
+              string_of_int pos
+          | _ -> raise (Stream.Error "")
+          end
+      | _ -> var
 
 let print_create_conflict conf base p var =
   let err =
