@@ -1835,8 +1835,6 @@ let mode_local env =
   | Vfam _ -> false
   | _ -> true
 
-(* let env = ['i', (fun () -> Util.default_image_name base p)] in *)
-
 let get_note_source conf base env auth no_note note_source =
   if auth && not no_note then
     let s = string_with_macros conf env note_source in
@@ -3947,7 +3945,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         (sou base (get_birth_note p))
   | "birth_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
+      get_note_source conf base env p_auth false
         (sou base (get_birth_src p))
   | "baptism_place" ->
       if p_auth then
@@ -3959,7 +3957,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         (sou base (get_baptism_note p))
   | "baptism_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
+      get_note_source conf base env p_auth false
         (sou base (get_baptism_src p))
   | "burial_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
@@ -3970,7 +3968,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         (sou base (get_burial_note p))
   | "burial_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
+      get_note_source conf base env p_auth false
         (sou base (get_burial_src p))
   | "child_name" ->
       let force_surname =
@@ -4016,7 +4014,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         (sou base (get_death_note p))
   | "death_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note 
+      get_note_source conf base env p_auth false
         (sou base (get_death_src p))
   | "died" -> string_of_died conf p p_auth
   | "fam_access" ->
