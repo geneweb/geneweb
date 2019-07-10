@@ -219,23 +219,22 @@ let print_return conf =
   Wserver.printf "</p>\n"
 
 let print_err_unknown conf _base (f, s, o) =
+  let err =
+    Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
+      (capitale (transl conf "unknown person")) (transl conf ":") f o s
+  in
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
-    (capitale (transl conf "unknown person")) (transl conf ":") f o s;
+  Wserver.printf "%s" err ;
   print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-    end;
+    end else raise @@ ModErr err
 #endif
-  let err =
-    Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
-      (capitale (transl conf "unknown person")) (transl conf ":") f o s
-  in
-  raise @@ ModErr err
 
 let delete_topological_sort_v conf _base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
@@ -718,10 +717,10 @@ let error conf base x =
   Wserver.printf "\n";
   print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end ;
+  end else raise @@ ModErr err
 #endif
-  raise @@ ModErr err
 
 let error_locked conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
@@ -796,10 +795,10 @@ let error_digest conf =
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>%s.\n</p>\n" err ;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end;
+  end else raise @@ ModErr err
 #endif
-  raise @@ ModErr err
 
 let digest_person p = Iovalue.digest p
 let digest_family (fam, cpl, des) = Iovalue.digest (fam, cpl, des)
@@ -830,10 +829,10 @@ let bad_date conf d =
   Hutil.rheader conf title ;
   Wserver.printf "%s" err ;
   Hutil.trailer conf ;
+  exit 1
 #ifdef API
-    end;
+    end else raise @@ ModErr err
 #endif
-  raise @@ ModErr err
 
 let int_of_field s =
   try Some (int_of_string (String.trim s)) with Failure _ -> None
@@ -1124,10 +1123,10 @@ let print_create_conflict conf base p var =
   Wserver.printf "</form>\n";
   print_same_name conf base p;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end ;
+  end else raise @@ ModErr err
 #endif
-  raise @@ ModErr err
 
 let insert_person conf base src new_persons (f, s, o, create, var) =
   let f = if f = "" then "?" else f in

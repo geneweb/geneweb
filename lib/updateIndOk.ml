@@ -753,16 +753,17 @@ let error_person conf err =
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end ;
+  end else
+    let err =
+      Printf.sprintf "%s%s%s"
+        (capitale (transl conf "error"))
+        (capitale (transl conf ":"))
+        err
+    in
+    raise @@ Update.ModErr err
 #endif
-  let err =
-    Printf.sprintf "%s%s%s"
-      (capitale (transl conf "error"))
-      (capitale (transl conf ":"))
-      err
-  in
-  raise @@ Update.ModErr err
 
 let strip_pevents p =
   let strip_array_witness pl =
@@ -840,20 +841,21 @@ let print_conflict conf base p =
   Wserver.printf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end ;
+  end else
+    let err =
+      Printf.sprintf
+        (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+        ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+         p_surname base p ^ "\"")
+        (fun _ ->
+           Printf.sprintf "%s %s" (sou base (get_first_name p))
+             (sou base (get_surname p)))
+        (fun _ -> ".")
+    in
+    raise @@ Update.ModErr err
 #endif
-  let err =
-    Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-       p_surname base p ^ "\"")
-      (fun _ ->
-         Printf.sprintf "%s %s" (sou base (get_first_name p))
-           (sou base (get_surname p)))
-      (fun _ -> ".")
-   in
-   raise @@ Update.ModErr err
 
 let print_cannot_change_sex conf base p =
 #ifdef API
@@ -865,13 +867,14 @@ let print_cannot_change_sex conf base p =
   Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
   Update.print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end;
-#endif
+  end else
   let err =
     Printf.sprintf "%s." (capitale (transl conf "cannot change sex of a married person"))
   in
   raise @@ Update.ModErr err
+#endif
 
 let check_conflict conf base sp ipl =
   let name = Name.lower (sp.first_name ^ " " ^ sp.surname) in

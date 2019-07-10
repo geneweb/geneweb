@@ -605,12 +605,6 @@ let strip_array_persons pl =
     pl []
 
 let error_family conf err =
-  let err' =
-    Printf.sprintf "%s%s%s"
-      (capitale (transl conf "error"))
-      (transl conf ":")
-      err
-  in
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
@@ -619,10 +613,17 @@ let error_family conf err =
   Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-    end;
+    end else
+    let err' =
+      Printf.sprintf "%s%s%s"
+        (capitale (transl conf "error"))
+        (transl conf ":")
+        err
+    in
+    raise @@ Update.ModErr err'
 #endif
-  raise @@ Update.ModErr err'
 
 let check_event_witnesses conf witnesses =
   let len = Array.length witnesses in
@@ -708,10 +709,10 @@ let print_err_parents conf base p =
     (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
   Update.print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-    end;
+    end else raise @@ Update.ModErr err
 #endif
-  raise @@ Update.ModErr err
 
 let print_err_sex conf base p err =
   let err =
@@ -725,10 +726,10 @@ let print_err_sex conf base p err =
   Wserver.printf "%s" err ;
   Update.print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end ;
+  end else raise @@ Update.ModErr err
 #endif
-  raise @@ Update.ModErr err
 
 let print_err_father_sex conf base p =
   print_err_sex conf base p (transl conf "should be male")
@@ -745,10 +746,10 @@ let print_err conf =
   Hutil.rheader conf title;
   Update.print_return conf;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end;
+  end else raise @@ Update.ModErr err
 #endif
-  raise @@ Update.ModErr err
 
 let print_error_disconnected conf =
   let err = Printf.sprintf "%s" (capitale (transl conf "msg error disconnected")) in
@@ -760,10 +761,10 @@ let print_error_disconnected conf =
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "%s" err;
   Hutil.trailer conf;
+  exit 1
 #ifdef API
-  end ;
+  end else raise @@ Update.ModErr err
 #endif
-  raise @@ Update.ModErr err
 
 let family_exclude pfams efam =
   let pfaml =
