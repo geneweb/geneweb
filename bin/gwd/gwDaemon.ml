@@ -124,14 +124,12 @@ let log_passwd_failed ar oc tm from request base_file =
 
 let copy_file fname =
   match Util.open_etc_file fname with
-    Some (ic, fname) ->
-      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+    Some (ic, _fname) ->
       begin try
         while true do let c = input_char ic in Wserver.printf "%c" c done
       with _ -> ()
       end;
       close_in ic;
-      Wserver.printf "<!-- end copy from %s -->\n" fname;
       true
   | None -> false
 
