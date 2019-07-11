@@ -208,6 +208,7 @@ let main () =
         in
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
         if Db1link.link next_family_fun bdir then
+          begin
           try
             List.iter (fun f ->
                 let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
@@ -220,6 +221,7 @@ let main () =
             with _ ->
               Printf.eprintf "*** database created, but problem with save_list\n" ;
               flush stderr ; exit 22
+          end
         else
           begin
             Printf.eprintf "*** database not created\n";
