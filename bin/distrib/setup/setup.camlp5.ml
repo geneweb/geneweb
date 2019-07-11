@@ -1068,10 +1068,11 @@ let gwc conf =
         let comm = comm ^ parameters conf.env in
         exec_f conf comm true "gwc"
       in
+      Printf.eprintf "Return code(1) %d\n" rc ;
       let rc = if Sys.unix then rc else infer_rc conf rc in
       let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
       (try Sys.remove gwo with Sys_error _ -> ());
-      Printf.eprintf "Return code %d\n" rc ;
+      Printf.eprintf "Return code(2) %d\n" rc ;
       if rc > 1 then
         if rc = 22 then print_file conf "err_gwc_1.htm"
         else print_file conf "err_bso.htm"
