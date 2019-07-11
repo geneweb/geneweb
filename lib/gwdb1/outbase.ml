@@ -182,7 +182,7 @@ let output_strings_hash oc2 base =
   for i = 0 to Array.length taba - 1 do output_binary_int oc2 taba.(i) done;
   for i = 0 to Array.length tabl - 1 do output_binary_int oc2 tabl.(i) done
 
-let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
+let output_name_index_aux fn oc2 base inx dat =
   let module IstrTree =
     Btree.Make
       (struct
@@ -193,64 +193,33 @@ let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
   let bt = ref IstrTree.empty in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base (Type.iper_of_int i) in
-    let a = try IstrTree.find p.surname !bt with Not_found -> [] in
-    bt := IstrTree.add p.surname (p.key_index :: a) !bt
+    let a = try IstrTree.find (fn p) !bt with Not_found -> [] in
+    bt := IstrTree.add (fn p) (p.key_index :: a) !bt
   done;
   (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
      i.e. the created database can be still read by these versions but this
      table will not be used in versions >= 4.10 *)
   Mutil.output_value_no_sharing oc2 (!bt : iper list IstrTree.t);
   (* new table created from version >= 4.10 *)
-  let oc_sn_dat = Secure.open_out_bin tmp_snames_dat in
+  let oc_dat = Secure.open_out_bin dat in
   let bt2 =
     IstrTree.map
       (fun ipl ->
-         let i = pos_out oc_sn_dat in
-         output_binary_int oc_sn_dat (List.length ipl);
+         let i = pos_out oc_dat in
+         output_binary_int oc_dat (List.length ipl);
          List.iter
-           (fun ip -> output_binary_int oc_sn_dat (Type.int_of_iper ip)) ipl;
+           (fun ip -> output_binary_int oc_dat (Type.int_of_iper ip)) ipl;
          i)
       !bt
   in
-  close_out oc_sn_dat;
-  let oc_sn_inx = Secure.open_out_bin tmp_snames_inx in
-  Mutil.output_value_no_sharing oc_sn_inx (bt2 : int IstrTree.t);
-  close_out oc_sn_inx
+  close_out oc_dat;
+  let oc_inx = Secure.open_out_bin inx in
+  Mutil.output_value_no_sharing oc_inx (bt2 : int IstrTree.t);
+  close_out oc_inx
 
-let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
-  let module IstrTree =
-    Btree.Make
-      (struct
-        type t = istr
-        let compare = Dutil.compare_istr_fun base.data
-      end)
-  in
-  let bt = ref IstrTree.empty in
-  for i = 0 to base.data.persons.len - 1 do
-    let p = Dutil.poi base (Type.iper_of_int i) in
-    let a = try IstrTree.find p.first_name !bt with Not_found -> [] in
-    bt := IstrTree.add p.first_name (p.key_index :: a) !bt
-  done;
-  (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
-     i.e. the created database can be still read by these versions but this
-     table will not be used in versions >= 4.10 *)
-  Mutil.output_value_no_sharing oc2 (!bt : iper list IstrTree.t);
-  (* new table created from version >= 4.10 *)
-  let oc_fn_dat = Secure.open_out_bin tmp_fnames_dat in
-  let bt2 =
-    IstrTree.map
-      (fun ipl ->
-         let i = pos_out oc_fn_dat in
-         output_binary_int oc_fn_dat (List.length ipl);
-         List.iter
-           (fun ip -> output_binary_int oc_fn_dat (Type.int_of_iper ip)) ipl;
-         i)
-      !bt
-  in
-  close_out oc_fn_dat;
-  let oc_fn_inx = Secure.open_out_bin tmp_fnames_inx in
-  Mutil.output_value_no_sharing oc_fn_inx (bt2 : int IstrTree.t);
-  close_out oc_fn_inx
+let output_surname_index = output_name_index_aux (fun p -> p.surname)
+
+let output_first_name_index = output_name_index_aux (fun p -> p.first_name)
 
 let gen_output no_patches bname base =
   let bname =
