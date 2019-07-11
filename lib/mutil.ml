@@ -445,18 +445,23 @@ let rn fname s =
 
 let rec rm_rf file =
   let infos = Unix.lstat file in
-  match infos.Unix.st_kind with
-  | Unix.S_REG | Unix.S_LNK ->
-      Unix.unlink file ;
-  | Unix.S_DIR->
-      let ls = Array.to_list (Sys.readdir file) in
-      List.iter
-        (fun f ->
-          if f <> "." && f <> ".."
-          then
-            rm_rf (Filename.concat file f) ) ls ;
-      (try Unix.rmdir file with _ -> ()) ;
-  | _ -> ()
+  try
+    match infos.Unix.st_kind with
+    | Unix.S_REG | Unix.S_LNK ->
+        Unix.unlink file ;
+    | Unix.S_DIR->
+        let ls = Array.to_list (Sys.readdir file) in
+        List.iter
+          (fun f ->
+            if f <> "." && f <> ".."
+            then
+              rm_rf (Filename.concat file f) ) ls ;
+        (try Unix.rmdir file with _ -> ()) ;
+    | _ -> ()
+  with
+    Unix.Unix_error (code, funct, param) ->
+      Printf.eprintf "Unix_error %s %s %s\n" (Unix.error_message code) funct param ;
+      exit 2
 
 (*
 let rm_rf dir =
@@ -497,24 +502,29 @@ let rec copy_r source dest =
   let infos = Unix.lstat source in
   let fname = Filename.basename source in
   if fname <> "." || fname <> ".." then
-    match infos.Unix.st_kind with
-    | Unix.S_REG ->
-        file_copy source dest ;
-        set_infos dest infos
-    | Unix.S_LNK ->
-        let link = Unix.readlink source in
-        Unix.symlink link dest
-    | Unix.S_DIR->
-        mkdir_p dest ;
-        let ls = Array.to_list (Sys.readdir source) in
-        List.iter
-          (fun file ->
-            if file <> Filename.current_dir_name
-                && file <> Filename.parent_dir_name
-            then copy_r
-              (Filename.concat source file)
-              (Filename.concat dest file))
-          ls ;
-        set_infos dest infos
-    | _ -> ()
+    try
+      match infos.Unix.st_kind with
+      | Unix.S_REG ->
+          file_copy source dest ;
+          set_infos dest infos
+      | Unix.S_LNK ->
+          let link = Unix.readlink source in
+          Unix.symlink link dest
+      | Unix.S_DIR->
+          mkdir_p dest ;
+          let ls = Array.to_list (Sys.readdir source) in
+          List.iter
+            (fun file ->
+              if file <> Filename.current_dir_name
+                  && file <> Filename.parent_dir_name
+              then copy_r
+                (Filename.concat source file)
+                (Filename.concat dest file))
+            ls ;
+          set_infos dest infos
+      | _ -> ()
+    with
+      Unix.Unix_error (code, funct, param) ->
+        Printf.eprintf "Unix_error %s %s %s\n" (Unix.error_message code) funct param ;
+        exit 2
   else ()
