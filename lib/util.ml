@@ -2483,32 +2483,28 @@ let limited_image_size max_wid max_hei fname size =
 let find_person_in_env conf base suff =
   match p_getenv conf.env ("i" ^ suff) with
     Some i ->
-      (* if i >= 0 && i < nb_of_persons base then *)
-        let p = pget conf base (Gwdb.iper_of_string i) in
-        if is_hidden p then None else Some p
-      (* else None *)
+    (* if i >= 0 && i < nb_of_persons base then *)
+    let p = pget conf base (Gwdb.iper_of_string i) in
+    if is_hidden p then None else Some p
+  (* else None *)
   | None ->
-      match
-        p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff)
-      with
-        Some p, Some n ->
-          let occ =
-            match p_getint conf.env ("oc" ^ suff) with
-              Some oc -> oc
-            | None -> 0
-          in
-          begin match person_of_key base p n occ with
-            Some ip ->
-              let p = pget conf base ip in
-              if is_hidden p then None
-              else if
-                not (is_hide_names conf p) || authorized_age conf base p
-              then
-                Some p
-              else None
-          | None -> None
-          end
-      | _ -> None
+    match
+      p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff)
+    with
+      Some p, Some n ->
+      let occ = Opt.default 0 @@ p_getint conf.env ("oc" ^ suff)  in
+      begin match person_of_key base p n occ with
+          Some ip ->
+          let p = pget conf base ip in
+          if is_hidden p then None
+          else if
+            not (is_hide_names conf p) || authorized_age conf base p
+          then
+            Some p
+          else None
+        | None -> None
+      end
+    | _ -> None
 
 let person_exists conf base (fn, sn, oc) =
   match p_getenv conf.base_env "red_if_not_exist" with
@@ -3696,3 +3692,16 @@ let init_cache_info bname base =
       | None -> ()
     end
   | _ -> ()
+
+
+let split_sname_ss = Mutil.split_sname
+
+let split_sname_is base i =
+  Gwdb.sou base i
+  |> split_sname_ss
+
+let split_fname_ss = Mutil.split_fname
+
+let split_fname_is base i =
+  Gwdb.sou base i
+  |> split_fname_ss

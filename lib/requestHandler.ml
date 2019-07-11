@@ -65,6 +65,7 @@ let cut_words str =
   in
   loop 0 0
 
+(* FIXME !!! Exactly the same as SearchName.try_find_with_one_first_name !!! *)
 let try_find_with_one_first_name conf base n =
   let n1 = Name.abbrev (Name.lower n) in
   match String.index_opt n1 ' ' with
@@ -72,8 +73,9 @@ let try_find_with_one_first_name conf base n =
     let fn = String.sub n1 0 i in
     let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
     let (list, _) =
-      Some.persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base)) get_surname sn
+      Some.persons_of_fsname base base_strings_of_surname
+        (spi_find (persons_of_surname base))
+        sn
     in
     List.fold_left
       (fun pl (_, _, ipl) ->
@@ -1035,7 +1037,9 @@ let defaultHandler : handler =
 
   ; n = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some v -> Some.surname_print conf base Some.surname_not_found v
+      | Some v ->
+        Some.search_surname conf base v (p_getenv conf.env "o" <> Some "i")
+        |> Some.print_surname conf base Some.surname_not_found v
       | _ -> Alln.print_surnames conf base
     end
 
@@ -1067,7 +1071,8 @@ let defaultHandler : handler =
             match pl with
             | [] ->
               conf.cancel_links <- false ;
-              Some.surname_print conf base self.unknown n
+              Some.search_surname conf base n (p_getenv conf.env "o" <> Some "i")
+              |> Some.print_surname conf base self.unknown n
             | [p] ->
               if sosa_acc || Gutil.person_of_string_key base n <> None ||
                  person_is_std_key conf base p n
@@ -1083,10 +1088,11 @@ let defaultHandler : handler =
                 Some fn, Some sn -> search (fn ^ " " ^ sn)
               | Some fn, None ->
                 conf.cancel_links <- false ;
-                Some.first_name_print conf base fn
+                Some.print_first_name conf base fn (Some.search_first_name conf base fn)
               | None, Some sn ->
                 conf.cancel_links <- false ;
-                Some.surname_print conf base self.unknown sn
+                Some.search_surname conf base sn (p_getenv conf.env "o" <> Some "i")
+                |> Some.print_surname conf base self.unknown sn
               | None, None -> self.incorrect_request self conf base
           end
         | Some i ->
@@ -1111,7 +1117,8 @@ let defaultHandler : handler =
 
   ; p = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some v -> Some.first_name_print conf base v
+      | Some v ->
+        Some.print_first_name conf base v (Some.search_first_name conf base v)
       | None -> Alln.print_first_names conf base
     end
 

@@ -52,8 +52,8 @@ let try_find_with_one_first_name conf base n =
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let (list, _) =
-        Some.persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base)) get_surname sn
+        Some.persons_of_fsname base base_strings_of_surname
+          (spi_find (persons_of_surname base)) sn
       in
       List.fold_left
         (fun pl (_, _, ipl) ->
@@ -229,20 +229,18 @@ let search conf base an search_order specify unknown =
         | pl -> specify conf base an pl
         end
     | Surname :: l ->
-        let pl = Some.search_surname conf base an in
-        begin match pl with
-          [] -> loop l
-        | _ ->
-            conf.cancel_links <- false;
-            Some.search_surname_print conf base unknown an
+      begin match Some.search_surname conf base an true with
+        | (_, [_, (_, iperl)], _) as list when iperl <> [] ->
+          conf.cancel_links <- false;
+          Some.print_surname conf base unknown an list
+        | _ -> loop l
         end
     | FirstName :: l ->
-        let pl = Some.search_first_name conf base an in
-        begin match pl with
-          [] -> loop l
-        | _ ->
+        begin match Some.search_first_name conf base an with
+          | [] -> loop l
+          | list ->
             conf.cancel_links <- false;
-            Some.search_first_name_print conf base an
+            Some.print_first_name conf base an list
         end
     | ApproxKey :: l ->
         let pl = search_approx_key conf base an in
@@ -262,7 +260,9 @@ let search conf base an search_order specify unknown =
         end
     | DefaultSurname :: _ ->
         conf.cancel_links <- false;
-        Some.search_surname_print conf base unknown an
+        (* FIXME: is (p_getenv conf.env "o" <> Some "i") always trus here? *)
+        Some.search_surname conf base an (p_getenv conf.env "o" <> Some "i")
+        |> Some.print_surname conf base unknown an
   in
   loop search_order
 

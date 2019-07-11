@@ -137,7 +137,7 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "</table>";
   Wserver.printf "<br%s>\n" conf.xhs
 
-let persons_of_fsname conf base base_strings_of_fsname find proj x =
+let persons_of_fsname base base_strings_of_fsname find x =
   (* list of strings index corresponding to the crushed lower first name
      or surname "x" *)
   let istrl = base_strings_of_fsname base x in
@@ -147,21 +147,9 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
     List.fold_right
       (fun istr l ->
          let str = Mutil.nominative (sou base istr) in
-         if Name.crush_lower str = x ||
-            List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
-         then
-           let iperl = find istr in
-           (* maybe they are not the good ones because of changes in the
-              database; checking... *)
-           let iperl =
-             List.fold_left
-               (fun iperl iper ->
-                  if eq_istr (proj (pget conf base iper)) istr then
-                    iper :: iperl
-                  else iperl)
-               [] iperl
-           in
-           if iperl = [] then l else (str, istr, iperl) :: l
+         if Name.crush_lower str = x
+         || List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
+         then match find istr with [] -> l | iperl -> (str, istr, iperl) :: l
          else l)
       istrl []
   in
@@ -170,7 +158,9 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
       let x = Name.lower x in
       List.fold_right
         (fun (str, istr, iperl) l ->
-           if x = Name.lower str then (str, istr, iperl) :: l else l)
+           if x = Name.lower str
+           then (str, istr, iperl) :: l
+           else l)
         l [],
       Name.lower
     in
@@ -304,17 +294,17 @@ let rec merge_insert (sstr, (strl, iperl) as x) =
       else (sstr, (StrSet.union strl strl1, iperl @ iperl1)) :: l
   | [] -> [x]
 
-let persons_of_absolute_first_name conf base x =
-  let istrl = base_strings_of_first_name base x in
+let persons_of_absolute_name_aux conf base base_strings_of persons_of get_field x =
+  let istrl = base_strings_of base x in
   List.fold_right
     (fun istr l ->
        let str = sou base istr in
        if str = x then
-         let iperl = spi_find (persons_of_first_name base) istr in
+         let iperl = spi_find (persons_of base) istr in
          let iperl =
            List.fold_left
              (fun iperl iper ->
-                if eq_istr (get_first_name (pget conf base iper)) istr then
+                if eq_istr (get_field (pget conf base iper)) istr then
                   iper :: iperl
                 else iperl)
              [] iperl
@@ -323,16 +313,21 @@ let persons_of_absolute_first_name conf base x =
        else l)
     istrl []
 
-let first_name_print conf base x =
-  let (list, _) =
-    if p_getenv conf.env "t" = Some "A" then
-      persons_of_absolute_first_name conf base x,
-      (fun _ -> raise (Match_failure ("src/some.ml", 347, 51)))
-    else if x = "" then
-      [], (fun _ -> raise (Match_failure ("src/some.ml", 348, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base)) get_first_name x
+let persons_of_absolute_first_name conf base x =
+  persons_of_absolute_name_aux
+    conf
+    base
+    base_strings_of_first_name
+    persons_of_first_name
+    get_first_name
+    x
+
+let search_aux conf base of_absolute base_strings_of persons_of x =
+  let list, name_inj =
+    if p_getenv conf.env "t" = Some "A"
+    then of_absolute conf base x, (fun x -> x)
+    else if x = "" then [], (fun _ -> assert false)
+    else persons_of_fsname base base_strings_of (spi_find (persons_of base)) x
   in
   let list =
     List.map
@@ -341,23 +336,7 @@ let first_name_print conf base x =
       list
   in
   let list = List.fold_right merge_insert list [] in
-  (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
-  match list with
-    [] -> first_name_not_found conf x
-  | [_, (strl, iperl)] ->
-      let iperl = List.sort_uniq compare iperl in
-      let pl = List.map (pget conf base) iperl in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-             if not (is_hide_names conf p) || authorized_age conf base p then
-               p :: pl
-             else pl)
-          pl []
-      in
-      first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf x list
+  list, name_inj
 
 let has_children_with_that_name conf base des name =
   let compare_name n1 n2 =
@@ -763,44 +742,25 @@ let select_ancestors conf base name_inj ipl =
            bh :: bhl)
     [] ipl
 
-let persons_of_absolute_surname conf base x =
-  let istrl = base_strings_of_surname base x in
-  List.fold_right
-    (fun istr l ->
-       let str = sou base istr in
-       if str = x then
-         let iperl = spi_find (persons_of_surname base) istr in
-         let iperl =
-           List.fold_left
-             (fun iperl iper ->
-                if eq_istr (get_surname (pget conf base iper)) istr then
-                  iper :: iperl
-                else iperl)
-             [] iperl
-         in
-         if iperl = [] then l else (str, istr, iperl) :: l
-       else l)
-    istrl []
-
 module PerSet = Set.Make (struct type t = iper let compare = compare end)
 
-let surname_print conf base not_found_fun x =
+let persons_of_absolute_surname conf base x =
+  persons_of_absolute_name_aux
+    conf
+    base
+    base_strings_of_surname
+    persons_of_surname
+    get_surname
+    x
+
+let search_surname conf base x branch =
   let (list, name_inj) =
-    if p_getenv conf.env "t" = Some "A" then
-      persons_of_absolute_surname conf base x, (fun x -> x)
-    else if x = "" then
-      [], (fun _ -> raise (Match_failure ("src/some.ml", 825, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base)) get_surname x
+    search_aux conf base
+      persons_of_absolute_surname
+      base_strings_of_surname
+      persons_of_surname
+      x
   in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-         Name.lower str, (StrSet.add str StrSet.empty, iperl))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
   let (iperl, _) =
     List.fold_right
       (fun (str, (_, iperl1)) (iperl, strl) ->
@@ -815,206 +775,62 @@ let surname_print conf base not_found_fun x =
       list (PerSet.empty, [])
   in
   let iperl = PerSet.elements iperl in
-  (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
-  match p_getenv conf.env "o" with
-    Some "i" ->
-      let pl =
-        List.fold_right (fun ip ipl -> pget conf base ip :: ipl) iperl []
-      in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-             if not (is_hide_names conf p) || authorized_age conf base p then
-               p :: pl
-             else pl)
-          pl []
-      in
-      print_family_alphabetic x conf base pl
-  | _ ->
-      let bhl = select_ancestors conf base name_inj iperl in
-      let bhl =
-        List.map
-          (fun bh ->
-             {bh_ancestor = pget conf base bh.bh_ancestor;
-              bh_well_named_ancestors =
-                List.map (pget conf base) bh.bh_well_named_ancestors})
-          bhl
-      in
-      match bhl, list with
-        [], _ -> not_found_fun conf x
-      | _, [s, (strl, _)] ->
-          print_one_surname_by_branch conf base x strl (bhl, s)
-      | _ ->
-          let strl = List.map fst list in
-          print_several_possible_surnames x conf base (bhl, strl)
-
-
-(**/**)
-(* TODO: refactoring avec les fonctions ci-dessus !!! *)
-
-
-let search_surname conf base x =
-  let (list, name_inj) =
-    if p_getenv conf.env "t" = Some "A" then
-      persons_of_absolute_surname conf base x, (fun x -> x)
-    else if x = "" then
-      [], (fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base)) get_surname x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-         Name.lower str, (StrSet.add str StrSet.empty, iperl))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  let (iperl, _) =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-         let len = List.length iperl1 in
-         let strl =
-           try
-             let len1 = List.assoc str strl in
-             (str, len + len1) :: List.remove_assoc str strl
-           with Not_found -> (str, len) :: strl
-         in
-         List.fold_right PerSet.add iperl1 iperl, strl)
-      list (PerSet.empty, [])
-  in
-  let iperl = PerSet.elements iperl in
-  let bhl = select_ancestors conf base name_inj iperl in
   let bhl =
-    List.map
-      (fun bh ->
-         {bh_ancestor = pget conf base bh.bh_ancestor;
-          bh_well_named_ancestors =
-            List.map (pget conf base) bh.bh_well_named_ancestors})
-      bhl
+    if branch then
+      select_ancestors conf base name_inj iperl
+      |> List.map
+        begin fun bh ->
+          { bh_ancestor = pget conf base bh.bh_ancestor
+          ; bh_well_named_ancestors =
+              List.map (pget conf base) bh.bh_well_named_ancestors
+          }
+        end
+    else []
   in
-  match bhl, list with
-    [], _ -> []
-  | _, [_, (_, iperl)] -> iperl
-  | _ -> []
+  bhl, list, iperl
 
-let search_surname_print conf base not_found_fun x =
-  let (list, name_inj) =
-    if p_getenv conf.env "t" = Some "A" then
-      persons_of_absolute_surname conf base x, (fun x -> x)
-    else if x = "" then
-      [], (fun _ -> raise (Match_failure ("src/some.ml", 942, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base)) get_surname x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-         Name.lower str, (StrSet.add str StrSet.empty, iperl))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  let (iperl, _) =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-         let len = List.length iperl1 in
-         let strl =
-           try
-             let len1 = List.assoc str strl in
-             (str, len + len1) :: List.remove_assoc str strl
-           with Not_found -> (str, len) :: strl
-         in
-         List.fold_right PerSet.add iperl1 iperl, strl)
-      list (PerSet.empty, [])
-  in
-  let iperl = PerSet.elements iperl in
+let print_surname conf base not_found_fun x list =
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
-    Some "i" ->
-      let pl =
-        List.fold_right (fun ip ipl -> pget conf base ip :: ipl) iperl []
-      in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-             if not (is_hide_names conf p) || authorized_age conf base p then
-               p :: pl
-             else pl)
-          pl []
-      in
-      print_family_alphabetic x conf base pl
-  | _ ->
-      let bhl = select_ancestors conf base name_inj iperl in
-      let bhl =
-        List.map
-          (fun bh ->
-             {bh_ancestor = pget conf base bh.bh_ancestor;
-              bh_well_named_ancestors =
-                List.map (pget conf base) bh.bh_well_named_ancestors})
-          bhl
-      in
-      match bhl, list with
-        [], _ -> not_found_fun conf x
-      | _, [s, (strl, _)] ->
-          print_one_surname_by_branch conf base x strl (bhl, s)
-      | _ ->
-          let strl = List.map (fun (s, _) -> s) list in
-          print_several_possible_surnames x conf base (bhl, strl)
+  | Some "i" ->
+    let (_, _, iperl) = list in
+    Util.filter_map
+      begin fun i ->
+        let p = pget conf base i in
+        if not (is_hide_names conf p) || authorized_age conf base p (* FIXME: should be &&? *)
+        then Some p
+        else None
+      end iperl
+    |> print_family_alphabetic x conf base
+  | _ -> match list with
+    | [], _, _ -> not_found_fun conf x
+    | bhl, [ s, (strl, _) ], _ ->
+      print_one_surname_by_branch conf base x strl (bhl, s)
+    | bhl, list, _ ->
+      let strl = List.map fst list in
+      print_several_possible_surnames x conf base (bhl, strl)
 
 let search_first_name conf base x =
-  let (list, _) =
-    if p_getenv conf.env "t" = Some "A" then
-      persons_of_absolute_first_name conf base x,
-      (fun _ -> raise (Match_failure ("src/some.ml", 1007, 51)))
-    else if x = "" then
-      [], (fun _ -> raise (Match_failure ("src/some.ml", 1008, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base)) get_first_name x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-         Name.lower str, (StrSet.add str StrSet.empty, iperl))
-      list
-  in
-  List.fold_right merge_insert list []
+  fst @@
+  search_aux conf base
+    persons_of_absolute_first_name
+    base_strings_of_first_name
+    persons_of_first_name
+    x
 
-let search_first_name_print conf base x =
-  let (list, _) =
-    if p_getenv conf.env "t" = Some "A" then
-      persons_of_absolute_first_name conf base x,
-      (fun _ -> raise (Match_failure ("src/some.ml", 1025, 51)))
-    else if x = "" then
-      [], (fun _ -> raise (Match_failure ("src/some.ml", 1026, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base)) get_first_name x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-         Name.lower str, (StrSet.add str StrSet.empty, iperl))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  (* Construction de la table des sosa de la base *)
+let print_first_name conf base x list =
   let () = Perso.build_sosa_ht conf base in
   match list with
-    [] -> first_name_not_found conf x
+  | [] -> first_name_not_found conf x
   | [_, (strl, iperl)] ->
-      let iperl = List.sort_uniq compare iperl in
-      let pl = List.map (pget conf base) iperl in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-             if not (is_hide_names conf p) || authorized_age conf base p then
-               p :: pl
-             else pl)
-          pl []
-      in
-      first_name_print_list conf base x strl pl
+    List.sort_uniq compare iperl
+    |> Util.filter_map
+      begin fun i ->
+        let p = pget conf base i in
+        if not (is_hide_names conf p) || authorized_age conf base p (* FIXME: should be &&? *)
+        then Some p
+        else None
+      end
+    |> first_name_print_list conf base x strl
   | _ -> select_first_name conf x list

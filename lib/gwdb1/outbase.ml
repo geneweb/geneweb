@@ -88,30 +88,39 @@ let just_copy bname what oc oc_acc =
   in
   loop 0
 
+let split_sname =
+  let r = Str.regexp "[ -]" in
+  fun base i -> Str.split r @@ base.data.strings.get i
+
+let split_fname base i =
+  String.split_on_char ' ' @@ base.data.strings.get i
+
+(* /!\ Keep it sync with Database.name_index_key /!\ *)
+let name_index_key s =
+  Hashtbl.hash (Name.crush_lower (Name.abbrev s)) mod Dutil.table_size
+
 let make_name_index base =
   let t = Array.make Dutil.table_size [| |] in
-  let add_name key valu =
-    let key = Name.crush (Name.abbrev key) in
-    let i = Hashtbl.hash key mod Array.length t in
-    if Array.mem valu t.(i) then ()
-    else t.(i) <- Array.append [| valu |] t.(i)
-  in
-  let rec add_names ip =
-    function
-      [] -> ()
-    | n :: nl -> add_name n ip; add_names ip nl
+  let add_name key value =
+    let i = name_index_key key in
+    if not @@ Array.mem value t.(i)
+    then t.(i) <- Array.append [| value |] t.(i)
   in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
     let first_name = Dutil.p_first_name base p in
     let surname = Dutil.p_surname base p in
-    if first_name <> "?" && surname <> "?" then
+    if first_name <> "?" && surname <> "?" then begin
       let names =
-        Name.lower (first_name ^ " " ^ surname) ::
-        Dutil.dsk_person_misc_names base p (fun p -> p.titles)
+        Name.lower (first_name ^ " " ^ surname)
+        :: List.map Name.lower (split_fname base p.first_name)
+        @ List.map Name.lower (split_sname base p.surname)
+        @ Dutil.dsk_person_misc_names base p (fun p -> p.titles)
       in
-      add_names p.key_index names
+      List.iter (fun i -> add_name i p.key_index) names
+    end
   done;
+  (* Array.iter (fun i -> print_endline @@ base.data.strings.get i) t.(i) ; *)
   t
 
 let create_name_index oc_inx oc_inx_acc base =
@@ -135,10 +144,15 @@ let make_strings_of_fsname base =
     let p = Dutil.poi base (Type.iper_of_int i) in
     let first_name = Dutil.p_first_name base p in
     let surname = Dutil.p_surname base p in
-    if first_name <> "?" then add_name t first_name p.first_name;
+    if first_name <> "?" then
+      List.iter (fun (s, i) -> add_name t s i) @@
+      (first_name, p.first_name)
+      :: List.map (fun s -> (s, base.func.insert_string s)) (split_fname base p.first_name) ;
     if surname <> "?" then
       begin
-        add_name t surname p.surname;
+        List.iter (fun (s, i) -> add_name t s i) @@
+        (surname, p.surname)
+        :: List.map (fun s -> (s, base.func.insert_string s)) (split_sname base p.surname) ;
         List.iter (fun sp -> add_name t sp p.surname)
           (Mutil.surnames_pieces surname)
       end
@@ -193,8 +207,10 @@ let output_name_index_aux fn oc2 base inx dat =
   let bt = ref IstrTree.empty in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base (Type.iper_of_int i) in
-    let a = try IstrTree.find (fn p) !bt with Not_found -> [] in
-    bt := IstrTree.add (fn p) (p.key_index :: a) !bt
+    List.iter begin fun k ->
+      let a = try IstrTree.find k !bt with Not_found -> [] in
+      bt := IstrTree.add k (p.key_index :: a) !bt
+    end (fn p)
   done;
   (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
      i.e. the created database can be still read by these versions but this
@@ -217,9 +233,23 @@ let output_name_index_aux fn oc2 base inx dat =
   Mutil.output_value_no_sharing oc_inx (bt2 : int IstrTree.t);
   close_out oc_inx
 
-let output_surname_index = output_name_index_aux (fun p -> p.surname)
+let output_surname_index oc2 base =
+  output_name_index_aux
+    begin fun p ->
+      split_sname base p.surname
+      |> List.map base.func.insert_string
+      |> List.cons p.surname
+    end
+ oc2 base
 
-let output_first_name_index = output_name_index_aux (fun p -> p.first_name)
+let output_first_name_index oc2 base =
+  output_name_index_aux
+    begin fun p ->
+      split_fname base p.first_name
+      |> List.map base.func.insert_string
+      |> List.cons p.first_name
+    end
+    oc2 base
 
 let gen_output no_patches bname base =
   let bname =
@@ -239,6 +269,17 @@ let gen_output no_patches bname base =
   let tmp_notes_d = Filename.concat bname "1notes_d" in
   if not no_patches then
     begin
+      (* prepare name indices strings *)
+      let r = Str.regexp "[ -]" in
+      for i = 0 to base.data.persons.len - 1 do
+        let p = Dutil.poi base (Type.iper_of_int i) in
+        base.data.strings.get p.surname
+        |> Str.split r
+        |> List.iter (fun s -> ignore @@ base.func.insert_string s) ;
+        base.data.strings.get p.first_name
+        |> String.split_on_char ' '
+        |> List.iter (fun s -> ignore @@ base.func.insert_string s) ;
+      done ;
       load_ascends_array base;
       load_unions_array base;
       load_couples_array base;
@@ -303,7 +344,8 @@ let gen_output no_patches bname base =
     close_out oc;
     close_out oc_acc;
     if not no_patches then
-      begin let oc_inx = Secure.open_out_bin tmp_names_inx in
+      begin
+        let oc_inx = Secure.open_out_bin tmp_names_inx in
         let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
         let oc2 = Secure.open_out_bin tmp_strings_inx in
         try

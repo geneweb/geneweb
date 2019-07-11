@@ -358,30 +358,65 @@ let gen_person_misc_names base p nobtit =
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
 
-let patch_misc_names base ip p =
-  List.iter
-    (fun s -> base.func.Dbdisk.patch_name s ip)
-    (gen_gen_person_misc_names base p p.titles (fun p -> (gen_person_of_person p).titles))
+let names base p =
+  let fn = sou base p.first_name in
+  let sn = sou base p.surname in
+  let s = fn ^ " " ^ sn in
+  let sn_list = Mutil.split_sname sn in
+  let fn_list = Mutil.split_fname fn in
+  s
+  :: fn
+  :: sn
+  :: sn_list
+  @ fn_list
+  @ gen_gen_person_misc_names base p p.titles (fun p -> (gen_person_of_person p).titles)
 
 let patch_person base ip (p : (iper, iper, istr) Def.gen_person) =
+  let diff on nn =
+    let on = List.map (fun s -> (Name.crush_lower s, s)) on in
+    let nn = List.map (fun s -> (Name.crush_lower s, s)) nn in
+    let on = List.sort_uniq (fun (a, _) (b, _) -> compare a b) on in
+    let nn = List.sort_uniq (fun (a, _) (b, _) -> compare a b) nn in
+    let rec loop rm add on nn = match on, nn with
+      | [], nn -> rm, List.map snd nn @ add
+      | on, [] -> List.map snd on @ rm, add
+      | ohd :: otl, nhd :: ntl ->
+        if ohd = nhd then loop rm add otl ntl
+        else if compare (fst ohd) (fst nhd) < 0 then loop (snd ohd :: rm) add otl nn
+        else loop rm (snd nhd :: add) on ntl
+    in
+    loop [] [] on nn
+  in
+  let patch_names ip on nn =
+    let rm, add = diff on nn in
+    base.func.Dbdisk.patch_name rm add ip
+  in
+  let on = try names base (gen_person_of_person @@ poi base ip) with _ -> [] in
+  let fam () =
+    Array.fold_left
+      begin fun acc i ->
+        let cpl = base.data.couples.get i in
+        let m = Adef.mother cpl in
+        let f = Adef.father cpl in
+        (m, names base (gen_person_of_person @@ poi base m))
+        :: (f, names base (gen_person_of_person @@ poi base f))
+        :: Array.fold_left
+          begin fun acc i ->
+            (i, names base (gen_person_of_person @@ poi base i)) :: acc
+          end
+          acc
+          (base.data.descends.get i).children
+      end
+      [] (base.data.unions.get ip).Def.family
+  in
+  let ofam = fam () in
   base.func.Dbdisk.patch_person ip p ;
-  let s = sou base p.first_name ^ " " ^ sou base p.surname in
-  base.func.Dbdisk.patch_name s ip ;
-  patch_misc_names base ip p ;
-  Array.iter
-    begin fun i ->
-      let cpl = base.data.couples.get i in
-      let m = Adef.mother cpl in
-      let f = Adef.father cpl in
-      patch_misc_names base m (gen_person_of_person @@ poi base m) ;
-      patch_misc_names base f (gen_person_of_person @@ poi base f) ;
-      Array.iter
-        begin
-          fun i -> patch_misc_names base i (gen_person_of_person @@ poi base i)
-        end
-        (base.data.descends.get i).children
-    end
-    (base.data.unions.get ip).Def.family
+  let nn = names base p in
+  patch_names ip on nn ;
+  let nfam = fam () in
+  List.iter
+    (fun (i, nn) -> patch_names i (try List.assoc i ofam with Not_found -> []) nn)
+    nfam
 
 let insert_person base = function
   | (_, _, { p = Some p ; a = Some a ; u = Some u }) ->

@@ -58,7 +58,7 @@ type base_func =
     patch_family : ifam -> dsk_family -> unit;
     patch_couple : ifam -> dsk_couple -> unit;
     patch_descend : ifam -> dsk_descend -> unit;
-    patch_name : string -> iper -> unit;
+    patch_name : string list -> string list -> iper -> unit;
     insert_string : string -> istr;
     commit_patches : unit -> unit;
     commit_notes : string -> string -> unit;

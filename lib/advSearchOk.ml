@@ -78,23 +78,29 @@ let advanced_search conf base max_answers =
   let hd = Hashtbl.create 73 in
   let gets x =
     try Hashtbl.find hs x with
-      Not_found ->
-        let v =
-          match p_getenv conf.env x with
-            Some v -> v
-          | None -> ""
-        in
-        Hashtbl.add hs x v; v
+    | Not_found ->
+      let v =
+        match p_getenv conf.env x with
+        | Some v -> v
+        | None -> ""
+      in
+      Hashtbl.add hs x v; v
+  in
+  let fn_list =
+    match p_getenv conf.env "first_name" with
+    | Some s -> List.sort_uniq compare @@ List.map Name.lower @@ Util.split_fname_ss s
+    | None -> []
+  in
+  let sn_list =
+    match p_getenv conf.env "surname" with
+    | Some s -> List.sort_uniq compare @@ List.map Name.lower @@ Util.split_sname_ss s
+    | None -> []
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
   (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
-  let apply_to_field_value p x cmp empty_default_value =
-    let y = gets x in
-    if y = "" then empty_default_value
-    else if authorized_age conf base p then cmp y
-    else false
-  in
+  let apply_to_field_value x cmp empty_default_value =
+    match gets x with "" -> empty_default_value | y -> cmp y in
   (* Check if the date matches with the person event. *)
   let match_date p x df empty_default_value =
     let (d1, d2) =
@@ -126,7 +132,7 @@ let advanced_search conf base max_answers =
       | _ -> empty_default_value
   in
   let match_sex p empty_default_value =
-    apply_to_field_value p "sex"
+    apply_to_field_value "sex"
       (function
          "M" -> get_sex p = Male
        | "F" -> get_sex p = Female
@@ -189,39 +195,57 @@ let advanced_search conf base max_answers =
       empty_default_value
   in
   let match_baptism_place p empty_default_value =
-    apply_to_field_value p bapt_place_field_name
+    apply_to_field_value bapt_place_field_name
       (fun x -> name_incl x (sou base (get_baptism_place p)))
       empty_default_value
   in
   let match_birth_place p empty_default_value =
-    apply_to_field_value p birth_place_field_name
+    apply_to_field_value birth_place_field_name
       (fun x -> name_incl x (sou base (get_birth_place p)))
       empty_default_value
   in
   let match_death_place p empty_default_value =
-    apply_to_field_value p death_place_field_name
+    apply_to_field_value death_place_field_name
       (fun x -> name_incl x (sou base (get_death_place p)))
       empty_default_value
   in
   let match_burial_place p empty_default_value =
-    apply_to_field_value p burial_place_field_name
+    apply_to_field_value burial_place_field_name
       (fun x -> name_incl x (sou base (get_burial_place p)))
       empty_default_value
   in
   let match_occupation p empty_default_value =
-    apply_to_field_value p "occu"
+    apply_to_field_value "occu"
       (fun x -> name_incl x (sou base (get_occupation p))) empty_default_value
   in
-  let match_first_name p empty_default_value =
-    apply_to_field_value p "first_name"
-      (fun x -> name_eq x (p_first_name base p)) empty_default_value
+  let match_first_name p =
+    match fn_list with
+    | [] -> true
+    | _ ->
+      let list =
+        Gwdb.get_first_name p
+        |> Util.split_fname_is base
+        |> List.map Name.lower
+      in
+      if gets "exact_first_name" = "on"
+      then List.sort_uniq compare list = fn_list
+      else List.for_all (fun s -> List.mem s list) fn_list
   in
-  let match_surname p empty_default_value =
-    apply_to_field_value p "surname" (fun x -> name_eq x (p_surname base p))
-      empty_default_value
+  let match_surname p =
+    match sn_list with
+    | [] -> true
+    | _ ->
+      let list =
+        Gwdb.get_surname p
+        |> Util.split_sname_is base
+        |> List.map Name.lower
+      in
+      if gets "exact_surname" = "on"
+      then List.sort_uniq compare list = sn_list
+      else List.for_all (fun s -> List.mem s list) sn_list
   in
   let match_married p empty_default_value =
-    apply_to_field_value p "married"
+    apply_to_field_value "married"
       (function
          "Y" -> get_family p <> [| |]
        | "N" -> get_family p = [| |]
@@ -230,23 +254,19 @@ let advanced_search conf base max_answers =
   in
   let match_marriage p x y empty_default_value =
     let (d1, d2) =
-      try Hashtbl.find hd x with
-        Not_found ->
-          let v =
-            reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
-          in
-          Hashtbl.add hd x v; v
+      try Hashtbl.find hd x
+      with Not_found ->
+        let v = reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2") in
+        Hashtbl.add hd x v ;
+        v
     in
     let y = gets y in
     let test_date_place df =
       Array.exists
         (fun ifam ->
            let fam = foi base ifam in
-           let father = poi base (get_father fam) in
-           let mother = poi base (get_mother fam) in
-           if authorized_age conf base father &&
-              authorized_age conf base mother
-           then
+           let spouse = poi base (Gutil.spouse (get_iper p) fam) in
+           if authorized_age conf base spouse then
              if y = "" then df (Adef.od_of_cdate (get_marriage fam))
              else
                name_incl y (sou base (get_marriage_place fam)) &&
@@ -255,28 +275,26 @@ let advanced_search conf base max_answers =
         (get_family p)
     in
     match d1, d2 with
-      Some d1, Some d2 ->
-        test_date_place
-          (function
-             Some (Dgreg (_, _) as d) ->
-               if Date.compare_date d d1 < 0 then false
-               else if Date.compare_date d2 d < 0 then false
-               else true
-           | _ -> false)
+    | Some d1, Some d2 ->
+      test_date_place
+        begin function
+          | Some (Dgreg (_, _) as d) ->
+            if Date.compare_date d d1 < 0 then false
+            else if Date.compare_date d2 d < 0 then false
+            else true
+          | _ -> false end
     | Some d1, _ ->
-        test_date_place
-          (function
-             Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-               if Date.compare_date d d1 < 0 then false else true
-           | _ -> false)
+      test_date_place
+        begin function
+          | Some (Dgreg (_, _) as d) -> if Date.compare_date d d1 < 0 then false else true
+          | _ -> false end
     | _, Some d2 ->
-        test_date_place
-          (function
-             Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-               if Date.compare_date d d2 > 0 then false else true
-           | _ -> false)
+      test_date_place
+        begin function
+          | Some (Dgreg (_, _) as d) -> if Date.compare_date d d2 > 0 then false else true
+          | _ -> false end
     | _ ->
-        if y = "" then empty_default_value
+      if y = "" then empty_default_value
         else
           Array.exists
             (fun ifam ->
@@ -292,8 +310,11 @@ let advanced_search conf base max_answers =
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status p =
-    match_sex p true && match_first_name p true && match_surname p true &&
-    match_married p true && match_occupation p true
+    match_sex p true
+    && match_first_name p
+    && match_surname p
+    && match_married p true
+    && match_occupation p true
   in
   let match_person ((list, len) as acc) p search_type =
     if search_type <> "OR"
@@ -327,32 +348,38 @@ let advanced_search conf base max_answers =
     else acc
   in
   let list, len =
-  if gets "first_name" <> "" || gets "surname" <> "" then
-    let (slist, _) =
-      if gets "first_name" <> "" then
-        Some.persons_of_fsname conf base base_strings_of_first_name
-          (spi_find (persons_of_first_name base)) get_first_name
-          (gets "first_name")
-      else
-        Some.persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base)) get_surname (gets "surname")
-    in
-    let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-    let rec loop ((_, len) as acc) = function
-      | [] -> acc
-      | _ when len > max_answers -> acc
-      | ip :: l ->
-        loop (match_person acc (pget conf base ip) search_type) l
-    in
-    loop ([], 0) slist
-  else
-    Gwdb.Collection.fold_until
-      (fun (_, len) -> len <= max_answers)
-      (fun acc i -> match_person acc (pget conf base i) search_type)
-      ([], 0)
-      (Gwdb.ipers base)
+    if gets "first_name" <> "" || gets "surname" <> "" then
+      let slist =
+        if gets "first_name" <> "" then
+          Some.persons_of_fsname base base_strings_of_first_name
+            (spi_find (persons_of_first_name base))
+            (List.hd fn_list)
+          |> fst
+          |> List.map (fun (_, _, list) -> list)
+          |> List.flatten
+        else
+          Some.persons_of_fsname base base_strings_of_surname
+            (spi_find (persons_of_surname base))
+            (List.hd sn_list)
+          |> fst
+          |> List.map (fun (_, _, list) -> list)
+          |> List.flatten
+      in
+      let rec loop ((_, len) as acc) = function
+        | [] -> acc
+        | _ when len > max_answers -> acc
+        | ip :: l ->
+          loop (match_person acc (pget conf base ip) search_type) l
+      in
+      loop ([], 0) slist
+    else
+      Gwdb.Collection.fold_until
+        (fun (_, len) -> len <= max_answers)
+        (fun acc i -> match_person acc (pget conf base i) search_type)
+        ([], 0)
+        (Gwdb.ipers base)
   in
-  List.rev list, len
+  list, len
 
 let print_result conf base max_answers (list, len) =
   let list =

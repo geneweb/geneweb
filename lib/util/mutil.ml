@@ -152,6 +152,7 @@ let input_particles fname =
 
 let saints = ["saint"; "sainte"]
 
+(* FIXME: merge with split_sn *)
 let surnames_pieces surname =
   let surname = Name.lower surname in
   let flush i0 i1 =
@@ -169,6 +170,13 @@ let surnames_pieces surname =
     else loop i0 iw (i + 1)
   in
   loop 0 0 0
+
+let split_sname =
+  let r = Str.regexp "[ -]" in
+  Str.split r
+
+let split_fname =
+  String.split_on_char ' '
 
 let tr c1 c2 s =
   match String.rindex_opt s c1 with

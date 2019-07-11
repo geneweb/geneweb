@@ -406,5 +406,17 @@ val safe_html : string -> string
 *)
 val is_empty_name : person -> bool
 
+(** Alias of {!val:Mutil.split_sname} *)
+val split_sname_ss : string -> string list
+
+(** See {!val:split_sname_ss} *)
+val split_sname_is : Gwdb.base -> Gwdb.istr -> string list
+
+(** Alias of {!val:Mutil.split_fname} *)
+val split_fname_ss : string -> string list
+
+(** See {!val:split_fname_ss} *)
+val split_fname_is : Gwdb.base -> Gwdb.istr -> string list
+
 (**/**)
 val init_cache_info : string -> Gwdb.base -> unit
