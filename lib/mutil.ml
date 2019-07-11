@@ -437,10 +437,14 @@ let ls_r dirs =
   loop [] dirs
 
 let rm fname =
-  if Sys.file_exists fname then Sys.remove fname
+  if Sys.file_exists fname then
+  try Sys.remove fname
+  with Sys_error _ -> Printf.eprintf "Sys_error %s\n" fname
 
 let rn fname s =
-  if Sys.file_exists fname then Sys.rename fname s
+  if Sys.file_exists fname then
+  try Sys.rename fname s
+  with  Sys_error _ -> Printf.eprintf "Sys_error %s %s\n" fname s
 
 (*
 let rec rm_rf file =

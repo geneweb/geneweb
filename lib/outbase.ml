@@ -406,14 +406,16 @@ let gen_output no_patches bname base =
       mv tmp_fnames_inx_fn path.file_fnames_inx ;
       mv tmp_strings_inx_fn path.file_strings_inx ;
       (* REORG *)
-      if Sys.file_exists path.file_notes then Mutil.rm path.file_notes ;
       if Sys.file_exists tmp_notes_d then
         begin let notes_d = path.dir_notes in
           Mutil.rm_rf notes_d ; 
           Mutil.rn tmp_notes_d notes_d
         end ;
       if Sys.file_exists tmp_notes then
-        Mutil.rn tmp_notes path.file_notes ;
+        begin 
+          Mutil.rm path.file_notes ;
+          Mutil.rn tmp_notes path.file_notes
+        end ;
       Mutil.rm path.file_patches ;
       Mutil.rm path.file_ts ;
       Mutil.rm path.file_ts_visitor ;
