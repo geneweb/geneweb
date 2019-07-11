@@ -442,6 +442,7 @@ let rm fname =
 let rn fname s =
   if Sys.file_exists fname then Sys.rename fname s
 
+
 let rec rm_rf file =
   let infos = Unix.lstat file in
   match infos.Unix.st_kind with
@@ -457,29 +458,13 @@ let rec rm_rf file =
       (try Unix.rmdir file with _ -> ()) ;
   | _ -> ()
 
-(* FIXME unlink and rmdir fail in some cases (dir symlinks)!! 
+(*
 let rm_rf dir =
-  if Sys.file_exists dir then
-    begin
-      let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory
-      in
-      List.iter (fun f ->
-          let infos = Unix.lstat f in
-          match infos.Unix.st_kind with
-          | Unix.S_REG | Unix.S_LNK->
-              Unix.unlink f
-          | _ -> Printf.eprintf "Not a file %s!!\n" f ;
-        ) files ;
-      List.iter (fun d ->
-          let infos = Unix.lstat d in
-          match infos.Unix.st_kind with
-          | Unix.S_REG | Unix.S_LNK->
-              Unix.unlink d
-          | Unix.S_DIR->
-              Unix.rmdir d
-          | _ -> ()
-        ) directories
-    end
+  let (directories, files) = ls_r [dir] |> List.partition
+    (fun d -> (Unix.lstat d).Unix.st_kind = Unix.S_DIR)
+  in
+  List.iter Unix.unlink files ;
+  List.iter Unix.rmdir directories
 *)
 
 let buffer_size = 8192

@@ -1071,7 +1071,9 @@ let gwc conf =
       let rc = if Sys.unix then rc else infer_rc conf rc in
       let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
       (try Sys.remove gwo with Sys_error _ -> ());
-      if rc > 1 then print_file conf "err_bso.htm"
+      if rc > 1 then
+        if rc = 22 then print_file conf "err_gwc_1.htm"
+        else print_file conf "err_bso.htm"
       else begin
         flush stderr;
         if not (Sys.file_exists file_conf) then print_default_gwf_file conf ;

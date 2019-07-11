@@ -202,28 +202,32 @@ let main () =
       false
       ~onerror:Lock.print_error_and_exit
       (fun () ->
-         let bdir =
-           if Filename.check_suffix !out_file ".gwb" then !out_file
-           else !out_file ^ ".gwb"
-         in
-         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-         if Db1link.link next_family_fun bdir then 
+        let bdir =
+          if Filename.check_suffix !out_file ".gwb" then !out_file
+          else !out_file ^ ".gwb"
+        in
+        let next_family_fun = next_family_fun_templ (List.rev !gwo) in
+        if Db1link.link next_family_fun bdir then
+          try
             List.iter (fun f ->
-              let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
-              if Sys.file_exists tmp_f then
-                begin
-                  if Sys.file_exists f then Mutil.rm_rf f ;
-                  Mutil.copy_r tmp_f f
-                end
-              else () ) save_list
-         else
-           begin
-             Printf.eprintf "*** database not created\n";
-             flush stderr;
-             exit 2
-           end)
-  end (* just_comp *)
-  else Printf.eprintf "just_comp\n"
+                let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
+                if Sys.file_exists tmp_f then
+                  begin
+                    if Sys.file_exists f then Mutil.rm_rf f ;
+                    Mutil.copy_r tmp_f f
+                  end
+                else () ) save_list
+            with _ ->
+              Printf.eprintf "*** database created, but problem with save_list\n" ;
+              flush stderr ; exit 22
+        else
+          begin
+            Printf.eprintf "*** database not created\n";
+            flush stderr;
+            exit 2
+          end)
+  end
+  else ()
 
 let print_exc =
   function
