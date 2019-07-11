@@ -428,7 +428,7 @@ let print_branch conf base psn name =
         (_, _, select) :: _ -> select
       | _ -> None
     in
-    let print_elem p with_link with_id =
+    let print_elem p with_link with_id with_sn =
       let hl =
         if with_link then "strong" else "em"
       in
@@ -443,15 +443,15 @@ let print_branch conf base psn name =
         hl
         (render p
            (if is_hide_names conf p && not (authorized_age conf base p) then "x"
-            else if not psn && p_surname base p = name then
+            else if not psn && not with_sn && p_surname base p = name then
               person_text_without_surname conf base p
             else person_text conf base p))
         hl
-        (Date.short_dates_text conf base p)
+        (DateDisplay.short_dates_text conf base p)
     in
     Wserver.printf "<li>";
     print_selection_bullet conf first_select;
-    print_elem p true true;
+    print_elem p true true false;
     if Array.length (get_family u) = 0 then ()
     else
       let _ =
@@ -460,12 +460,12 @@ let print_branch conf base psn name =
              if not first then begin
                Wserver.printf "<li>";
                print_selection_bullet conf select;
-               print_elem p false true
+               print_elem p false true false
              end;
              Wserver.printf " &amp;";
              Wserver.printf "%s\n"
-               (Date.short_marriage_date_text conf base fam p sp);
-             print_elem sp true false;
+               (DateDisplay.short_marriage_date_text conf base fam p sp);
+             print_elem sp true false true;
              let children = get_children fam in
              begin match select with
                Some (_, true) ->
