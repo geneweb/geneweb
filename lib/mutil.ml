@@ -496,7 +496,7 @@ let set_infos filename infos =
 let rec copy_r source dest =
   let infos = Unix.lstat source in
   let fname = Filename.basename source in
-  if fname.[0] <> '.' then
+  if fname <> "." || fname <> ".." then
     match infos.Unix.st_kind with
     | Unix.S_REG ->
         file_copy source dest ;
