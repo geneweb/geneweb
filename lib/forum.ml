@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Def
 open TemplAst
 open Util
@@ -84,7 +85,7 @@ module MF : MF =
       | None -> ()
       end;
       close_out oc;
-      Util.rm fname ;
+      Mutil.rm fname ;
       Sys.rename tmp fname
     let patch fname pos str =
       let fname =
@@ -110,14 +111,14 @@ module MF : MF =
           end;
           close_in ic;
           close_out oc;
-          Util.rm fname ;
+          Mutil.rm fname ;
           Sys.rename tmp_fname fname
       | None -> ()
     let open_in fname =
       {ic_fname = fname; ic_chan = open_in_bin fname; ic_ext = 0}
     let input_char ic = input_char ic.ic_chan
     let rec input_line ic =
-      try Pervasives.input_line ic.ic_chan with
+      try Stdlib.input_line ic.ic_chan with
         End_of_file ->
           let ext = ic.ic_ext + 1 in
           let fn = ic.ic_fname ^ "." ^ string_of_int ext in
@@ -159,8 +160,7 @@ module MF : MF =
   end
 
 let forum_file conf =
-  let fn = Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum" in
-  MF.filename_of_string fn
+  MF.filename_of_string conf.path.file_forum
 
 (* Black list *)
 
@@ -181,7 +181,7 @@ let match_strings regexp s =
 let can_post conf =
   try
     let fname = List.assoc "forum_exclude_file" conf.base_env in
-    let fname = Util.base_path [] fname in
+    let fname = Filename.concat conf.path.dir_root fname in
     let ic = open_in fname in
     let rec loop () =
       match try Some (input_line ic) with End_of_file -> None with
@@ -354,7 +354,7 @@ let moderators conf =
   match p_getenv conf.base_env "moderator_file" with
     None | Some "" -> []
   | Some fname ->
-      let fname = Util.base_path [] fname in
+      let fname = Filename.concat conf.path.dir_root fname in
       match try Some (Secure.open_in fname) with Sys_error _ -> None with
         Some ic ->
           let list =
@@ -523,7 +523,7 @@ and eval_message_text_var conf base str so =
       let s =
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in

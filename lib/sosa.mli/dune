@@ -1,0 +1,7 @@
+(library
+ (name sosa)
+ (public_name geneweb.sosa.mli)
+ (wrapped false)
+ (modules_without_implementation sosa)
+ (flags       (:standard -no-keep-locs))
+)

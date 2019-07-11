@@ -955,8 +955,7 @@ module Make (Select : Select) =
            | _ -> p :: list)
         (Array.to_list m.m_chil) list
 
-    let notes_aliases bdir =
-      let fname = Filename.concat bdir "notes.alias" in
+    let notes_aliases fname =
       match try Some (Secure.open_in fname) with Sys_error _ -> None with
         Some ic ->
           let rec loop list =
@@ -1614,6 +1613,7 @@ module Make (Select : Select) =
     let maxlev = ref (-1)
 
     let gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
+      let path = Path.path_from_bname in_dir in
       let to_separate = separate base in
       let anc =
         match anc with
@@ -1654,7 +1654,7 @@ module Make (Select : Select) =
         let fam_done = Array.make (nb_of_families base) false in
         {mark = mark; mark_rel = mark_rel; per_sel = per_sel;
          fam_sel = fam_sel; fam_done = fam_done; notes_pl_p = [];
-         ext_files = []; notes_alias = notes_aliases in_dir;
+         ext_files = []; notes_alias = notes_aliases path.Path.file_notes_aliases;
          pevents_pl_p = []}
       in
       let nb_fam = nb_of_families base in
@@ -1761,17 +1761,12 @@ module Make (Select : Select) =
               (add_linked_files gen (fun _ -> "database notes") s [] : _ list)
           end;
         begin try
-          let files =
-            Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
-          in
+          let files = Sys.readdir path.Path.file_notes_aliases in
           Array.sort compare files;
           for i = 0 to Array.length files - 1 do
             let file = files.(i) in
             if Filename.check_suffix file ".txt" then
-              let wfile =
-                List.fold_left Filename.concat in_dir
-                  [base_wiznotes_dir base; file]
-              in
+              let wfile = Filename.concat path.Path.dir_wiznotes file in
               let s = read_file_contents wfile in
               ignore
                 (add_linked_files gen (fun _ -> "wizard \"" ^ file ^ "\"") s
@@ -1818,18 +1813,13 @@ module Make (Select : Select) =
                end)
           (List.sort compare gen.ext_files);
         try
-          let files =
-            Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
-          in
+          let files = Sys.readdir path.Path.dir_wiznotes in
           Array.sort compare files;
           for i = 0 to Array.length files - 1 do
             let file = files.(i) in
             if Filename.check_suffix file ".txt" then
               let wizid = Filename.chop_suffix file ".txt" in
-              let wfile =
-                List.fold_left Filename.concat in_dir
-                  [base_wiznotes_dir base; file]
-              in
+              let wfile = Filename.concat path.Path.dir_wiznotes file in
               let s = String.trim (read_file_contents wfile) in
               Printf.fprintf oc "\nwizard-note %s\n" wizid;
               rs_printf oc s;

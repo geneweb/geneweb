@@ -3,6 +3,7 @@
 
 open Dbdisk
 open Def
+open Path
 
 type person = dsk_person
 type ascend = dsk_ascend
@@ -140,7 +141,7 @@ let index_of_string strings ic start_pos hash_len string_patches s =
           failwith "database access"
 
 let persons_of_first_name_or_surname base_data strings params =
-  let (_, _, proj, person_patches, names_inx, names_dat, bname) = params in
+  let (_, _, proj, person_patches, names_inx, names_dat, _bname) = params in
   let module IstrTree =
     Btree.Make
       (struct
@@ -148,15 +149,13 @@ let persons_of_first_name_or_surname base_data strings params =
         let compare = Dutil.compare_istr_fun base_data
       end)
   in
-  let fname_dat = Filename.concat bname names_dat in
   let bt =
     let btr = ref None in
     fun () ->
       match !btr with
         Some bt -> bt
       | None ->
-          let fname_inx = Filename.concat bname names_inx in
-          let ic_inx = Secure.open_in_bin fname_inx in
+          let ic_inx = Secure.open_in_bin names_inx in
           (*
           let ab1 = Gc.allocated_bytes () in
           *)
@@ -176,7 +175,7 @@ let persons_of_first_name_or_surname base_data strings params =
     let ipera =
       try
         let pos = IstrTree.find istr (bt ()) in
-        let ic_dat = Secure.open_in_bin fname_dat in
+        let ic_dat = Secure.open_in_bin names_dat in
         seek_in ic_dat pos;
         let len = input_binary_int ic_dat in
         let rec read_loop ipera len =
@@ -226,21 +225,22 @@ let persons_of_first_name_or_surname base_data strings params =
 
 let persons_of_name bname patches =
   let t = ref None in
+  let conf_path = Path.path_from_bname bname in
   fun s ->
     let s = Name.crush_lower s in
     let i = Hashtbl.hash s in
     let ai =
-      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
+      let ic_inx = Secure.open_in_bin conf_path.file_names_inx in
       let ai =
         let i = i mod Dutil.table_size in
-        let fname_inx_acc = Filename.concat bname "names.acc" in
-        if Sys.file_exists fname_inx_acc then
-          let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
+        if Sys.file_exists conf_path.file_names_acc then begin
+          let ic_inx_acc = Secure.open_in_bin conf_path.file_names_acc in
           seek_in ic_inx_acc (Iovalue.sizeof_long * i);
           let pos = input_binary_int ic_inx_acc in
           close_in ic_inx_acc;
           seek_in ic_inx pos;
           (Iovalue.input ic_inx : iper array)
+        end
         else
           let a =
             match !t with
@@ -259,15 +259,16 @@ let persons_of_name bname patches =
       Not_found -> Array.to_list ai
 
 let strings_of_fsname bname strings (_, person_patches) =
+  let conf_path = Path.path_from_bname bname in
   let t = ref None in
   fun s ->
     let s = Name.crush_lower s in
     let i = Hashtbl.hash s in
     let r =
-      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
+      let ic_inx = Secure.open_in_bin conf_path.file_names_inx in
       let ai =
         let i = i mod Dutil.table_size in
-        let fname_inx_acc = Filename.concat bname "names.acc" in
+        let fname_inx_acc = conf_path.file_names_acc in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
           seek_in ic_inx_acc (Iovalue.sizeof_long * (Dutil.table_size + i));
@@ -314,7 +315,7 @@ let verbose = Mutil.verbose
 
 let make_visible_record_access bname persons =
   let visible_ref = ref None in
-  let fname = Filename.concat bname "restrict" in
+  let fname = (Path.path_from_bname bname).Path.file_restrict in
   let read_or_create_visible () =
     let visible =
       try
@@ -533,9 +534,9 @@ let magic_patch = "GnPa0001"
 let check_patch_magic ic =
   really_input_string ic (String.length magic_patch) = magic_patch
 
-let input_patches bname =
+let input_patches fname =
   try
-    let ic = Secure.open_in_bin (Filename.concat bname "patches") in
+    let ic = Secure.open_in_bin fname in
       let r =
         if check_patch_magic ic then (input_value ic : patches_ht)
         else
@@ -574,9 +575,9 @@ let input_patches bname =
        h_descend = ref 0, Hashtbl.create 1;
        h_string = ref 0, Hashtbl.create 1; h_name = Hashtbl.create 1}
 
-let input_synchro bname =
+let input_synchro fname =
   try
-    let ic = Secure.open_in_bin (Filename.concat bname "synchro_patches") in
+    let ic = Secure.open_in_bin fname in
     let r : synchro_patch = input_value ic in
     close_in ic ;
     r
@@ -606,16 +607,12 @@ let person_of_key persons strings persons_of_name first_name surname occ =
     find ipl
 
 let opendb bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
-  let patches = input_patches bname in
-  let synchro = input_synchro bname in
-  let particles =
-    Mutil.input_particles (Filename.concat bname "particles.txt")
-  in
+  let path = Path.path_from_bname bname in
+  let patches = input_patches path.Path.file_patches in
+  let synchro = input_synchro path.Path.file_synchro_patches in
+  let particles = Mutil.input_particles path.file_particles in
   let ic =
-    let ic = Secure.open_in_bin (Filename.concat bname "base") in
+    let ic = Secure.open_in_bin path.file_base in
     Dutil.check_magic ic;
     ic
   in
@@ -631,14 +628,14 @@ let opendb bname =
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
   let ic_acc =
-    try Some (Secure.open_in_bin (Filename.concat bname "base.acc")) with
+    try Some (Secure.open_in_bin path.file_base_acc) with
       Sys_error _ ->
         Printf.eprintf "File base.acc not found; trying to continue...\n";
         flush stderr;
         None
   in
   let ic2 =
-    try Some (Secure.open_in_bin (Filename.concat bname "strings.inx")) with
+    try Some (Secure.open_in_bin path.file_strings_inx) with
       Sys_error _ ->
         Printf.eprintf "File strings.inx not found; trying to continue...\n";
         flush stderr;
@@ -716,8 +713,8 @@ let opendb bname =
   in
   let cleanup () = !cleanup_ref () in
   let commit_synchro () =
-    let tmp_fname = Filename.concat bname "1synchro_patches" in
-    let fname = Filename.concat bname "synchro_patches" in
+    let fname = path.file_synchro_patches in
+    let tmp_fname = fname ^ ".tmp" in
     let oc9 =
       try Secure.open_out_bin tmp_fname with
         Sys_error _ ->
@@ -731,13 +728,13 @@ let opendb bname =
     in
     Mutil.output_value_no_sharing oc9 (synchro : synchro_patch);
     close_out oc9;
-    Mutil.remove_file (fname ^ "~");
-    (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
-    try Sys.rename tmp_fname fname with Sys_error _ -> ()
+    Mutil.rm (fname ^ "~");
+    Sys.rename fname (fname ^ "~");
+    Sys.rename tmp_fname fname
   in
   let commit_patches () =
-    let tmp_fname = Filename.concat bname "1patches" in
-    let fname = Filename.concat bname "patches" in
+    let fname = path.file_patches in
+    let tmp_fname = fname ^ ".tmp" in
     let oc9 =
       try Secure.open_out_bin tmp_fname with
         Sys_error _ ->
@@ -746,9 +743,9 @@ let opendb bname =
     output_string oc9 magic_patch;
     Mutil.output_value_no_sharing oc9 (patches : patches_ht);
     close_out oc9;
-    Mutil.remove_file (fname ^ "~");
-    (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
-    (try Sys.rename tmp_fname fname with Sys_error _ -> ());
+    Mutil.rm (fname ^ "~");
+    Sys.rename fname (fname ^ "~");
+    Sys.rename tmp_fname fname;
     commit_synchro ()
   in
   let patched_ascends () =
@@ -826,14 +823,14 @@ let opendb bname =
   in
   let read_notes fnotes rn_mode =
     let fname =
-      if fnotes = "" then "notes"
-      else Filename.concat "notes_d" (fnotes ^ ".txt")
+      if fnotes = "" then path.file_notes
+      else Filename.concat path.dir_notes (fnotes ^ ".txt")
     in
-    try
-      let ic = Secure.open_in (Filename.concat bname fname) in
+    if Sys.file_exists fname then begin
+      let ic = Secure.open_in fname in
       let str =
         match rn_mode with
-          RnDeg -> if in_channel_length ic = 0 then "" else " "
+        | RnDeg -> if in_channel_length ic = 0 then "" else " "
         | Rn1Ln -> (try input_line ic with End_of_file -> "")
         | RnAll ->
           let rec loop len =
@@ -845,42 +842,32 @@ let opendb bname =
       in
       close_in ic ;
       str
-    with Sys_error _ -> ""
-  in
+    end
+    else ""
+  in (* REORG notes *)
   let commit_notes fnotes s =
+    Mutil.mkdir_p path.dir_notes ;
     let fname =
-      if fnotes = "" then "notes"
-      else
-        begin
-          begin try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with
-            _ -> ()
-          end;
-          Filename.concat "notes_d" (fnotes ^ ".txt")
-        end
+      if fnotes = "" then path.file_notes
+      else Filename.concat path.dir_notes (fnotes ^ ".txt")
     in
-    let fname = Filename.concat bname fname in
-    (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
-    (try Sys.rename fname (fname ^ "~") with _ -> ());
-    if s = "" then ()
-    else
-      let oc = Secure.open_out fname in output_string oc s; close_out oc; ()
+    Mutil.rm (fname ^ "~");
+    Mutil.rn fname (fname ^ "~");
+    if s <> "" then begin
+      let oc = Secure.open_out fname in
+      output_string oc s;
+      close_out oc
+    end
   in
+  (* FIXME I dont understand this *)
   let ext_files () =
-    let top = Filename.concat bname "notes_d" in
-    let rec loop list subdir =
-      let dir = Filename.concat top subdir in
-      try
-        let files = Sys.readdir dir in
-        Array.fold_left
-          (fun files file ->
-             let f = Filename.concat subdir file in
-             if Filename.check_suffix f ".txt" then
-               Filename.chop_suffix f ".txt" :: files
-             else loop files f)
-          list files
-      with Sys_error _ -> list
-    in
-    loop [] Filename.current_dir_name
+    let dir = Filename.concat path.dir_notes Filename.current_dir_name in
+    Mutil.filter_map
+      (fun f ->
+         if Filename.check_suffix f ".txt"
+         then Some (Filename.chop_suffix f ".txt")
+         else None)
+      (Mutil.ls_r [dir])
   in
   let bnotes =
     {nread = read_notes; norigin_file = norigin_file; efiles = ext_files}
@@ -899,11 +886,13 @@ let opendb bname =
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_surname_start_pos, (fun p -> p.surname),
-          snd patches.h_person, "snames.inx", "snames.dat", bname);
+          snd patches.h_person, path.file_snames_inx,
+          path.file_snames_dat, bname);
      persons_of_first_name =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_first_name_start_pos, (fun p -> p.first_name),
-          snd patches.h_person, "fnames.inx", "fnames.dat", bname);
+          snd patches.h_person, path.file_fnames_inx,
+          path.file_fnames_dat, bname);
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;
      patch_couple = patch_couple; patch_descend = patch_descend;

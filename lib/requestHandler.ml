@@ -94,8 +94,8 @@ let find_all conf base an =
   match sosa_ref, sosa_nb with
     Some p, Some n ->
     if n <> Sosa.zero then
-      match Util.branch_of_sosa conf base (get_key_index p) n with
-        Some ((ip, _) :: _) -> [pget conf base ip], true
+      match Util.branch_of_sosa conf base n p with
+        Some (p :: _) -> [p], true
       | _ -> [], false
     else [], false
   | _ ->
@@ -372,9 +372,9 @@ and handler =
   ; rl : handler_base
   ; rlm : handler_base
   ; s : handler_base
+  ; src : handler_base
   ; snd_image : handler_base
   ; snd_image_ok : handler_base
-  ; src : handler_base
   ; stat : handler_base
   ; change_wiz_vis : handler_base
   ; tt : handler_base
@@ -386,7 +386,6 @@ and handler =
 #ifdef API
   ; api_all_persons : handler_base
   ; api_all_families : handler_base
-  ; api_anniversary : handler_base
   ; api_base_warnings : handler_base
   ; api_close_persons : handler_base
   ; api_cpl_rel : handler_base
@@ -565,7 +564,6 @@ let dummyHandler =
 #ifdef API
   ; api_all_persons = dummy_base
   ; api_all_families = dummy_base
-  ; api_anniversary = dummy_base
   ; api_base_warnings = dummy_base
   ; api_close_persons = dummy_base
   ; api_cpl_rel = dummy_base
@@ -795,7 +793,7 @@ let defaultHandler : handler =
     end
 
   ; conn_wiz = begin fun self conf base ->
-      if conf.wizard then Wiznotes.connected_wizards conf base
+      if conf.wizard then Wiznotes.connected_wizards conf
       else self.incorrect_request self conf base
     end
 
@@ -986,7 +984,7 @@ let defaultHandler : handler =
     end
 
   ; mod_wiznotes = begin fun self conf base ->
-      if conf.authorized_wizards_notes then Wiznotes.print_mod conf base
+      if conf.authorized_wizards_notes then Wiznotes.print_mod conf
       else self.incorrect_request self conf base
     end
 
@@ -1188,7 +1186,7 @@ let defaultHandler : handler =
     end
 
   ; change_wiz_vis = begin fun self conf base ->
-      if conf.wizard then Wiznotes.change_wizard_visibility conf base
+      if conf.wizard then Wiznotes.change_wizard_visibility conf
       else self.incorrect_request self conf base
     end
 
@@ -1204,7 +1202,7 @@ let defaultHandler : handler =
     end
 
   ; view_wiznotes = begin fun self conf base ->
-      if conf.wizard && conf.authorized_wizards_notes then Wiznotes.print_view conf base
+      if conf.wizard && conf.authorized_wizards_notes then Wiznotes.print_view conf
       else self.incorrect_request self conf base
     end
 
@@ -1226,10 +1224,6 @@ let defaultHandler : handler =
 
   ; api_all_families = begin fun _self conf base ->
       Api.print_all_families conf base
-    end
-
-  ; api_anniversary = begin fun _self conf base ->
-      Api.print_birthday conf base
     end
 
   ; api_base_warnings = begin fun _self conf base ->

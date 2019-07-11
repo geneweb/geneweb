@@ -53,7 +53,7 @@
       %if;(wizard and not cancel_links)
         <a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" %nn;
           class="normal_anchor" target="_blank" %nn;
-          title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%nn;
+          title="%apply;a_of_b%with;[*add picture]0%and;%xxx;%end;">%nn;
       %end;
       <img class="small_image align-self-center rounded ml-0" style="height:70%%"
         src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"

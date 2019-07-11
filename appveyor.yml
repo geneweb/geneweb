@@ -1,5 +1,3 @@
-# Not building with API because piqi does not compile on windows
-
 platform:
   - x86
 
@@ -15,10 +13,10 @@ install:
   - '%CYG_BASH% "opam64/install.sh"'
   - '%CYG_BASH% "opam init default \"https://github.com/fdopen/opam-repository-mingw.git#opam2\" -c \"ocaml-variants.4.07.1+mingw64\" --disable-sandboxing"'
   - '%CYG_BASH% "eval $(opam env)"'
+  - '%CYG_BASH% "opam pin add --no-action -k path geneweb.dev ${APPVEYOR_BUILD_FOLDER}"'
   - '%CYG_BASH% "opam update"'
-  - '%CYG_BASH% "opam pin add --no-action markup git://github.com/geneanet/markup.ml"'
-  - '%CYG_BASH% "opam depext camlp5 cppo dune markup ounit"'
-  - '%CYG_BASH% "opam install camlp5 cppo dune markup ounit"'
+  - '%CYG_BASH% "opam install geneweb.dev --with-test --deps-only"'
 
 build_script:
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure && make clean test distrib clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure && make clean test bench distrib clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && opam install num && ./configure --sosa-num && make clean test bench distrib clean"'

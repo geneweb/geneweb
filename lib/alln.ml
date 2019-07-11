@@ -11,7 +11,7 @@ let default_max_cnt = 2000
 let ini len k =
   let ini_k = Util.str_sub ~pad:'_' k 0 len in
   (* ini_k is "a fresh string": we can use unsafe. *)
-  Util.str_replace ~unsafe:true ' ' ~by:'_' ini_k
+  Mutil.unsafe_tr ' ' '_' ini_k
 
 let particle_at_the_end base is_surnames s =
   if is_surnames then

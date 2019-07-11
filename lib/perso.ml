@@ -6,6 +6,7 @@ module MLink = Api_link_tree_piqi
 #endif
 
 open Config
+open Path
 open Def
 open Gwdb
 open TemplAst
@@ -15,10 +16,9 @@ let max_im_wid = 240
 let round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0
 
 let has_children base u =
-  List.exists
-    (fun ifam ->
-       let des = foi base ifam in Array.length (get_children des) > 0)
-    (Array.to_list (get_family u))
+  Array.exists
+    (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)
+    (get_family u)
 
 let string_of_marriage_text conf base fam =
   let marriage = Adef.od_of_cdate (get_marriage fam) in
@@ -146,10 +146,6 @@ let nobility_titles_list conf base p =
        | _ -> (t_nth, t_name, t_ident, [t_place], t_dates) :: l)
     titles []
 
-let string_of_num sep num =
-  let len = ref 0 in
-  Sosa.print (fun x -> len := Buff.mstore !len x) sep num; Buff.get !len
-
 let print_base_loop conf base p =
   Wserver.printf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
@@ -268,21 +264,6 @@ let find_sosa conf base a sosa_ref_l t_sosa =
             Not_found -> find_sosa_aux conf base a p t_sosa
         else None
   | None -> None
-
-let rec get_p_of_sosa conf base s p =
-  if Sosa.eq s Sosa.one then (Some p)
-  else
-    let ns = Sosa.sosa_gen_up s in
-    let c = Sosa.branch s in
-    match get_parents p with
-      | Some ifam ->
-          let cpl = foi base ifam in
-          let pm = pget conf base (get_mother cpl) in
-          let pf = pget conf base (get_father cpl) in
-          if c = '0' then get_p_of_sosa conf base ns pf
-          else get_p_of_sosa conf base ns pm
-      | None -> None
-
 
 (* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
 let sosa_ht = Hashtbl.create 5003
@@ -510,7 +491,7 @@ let print_sosa conf base p link =
             Printf.sprintf (fcapitale (ftransl conf "direct ancestor of %s"))
               direct_ancestor ^
             Printf.sprintf ", Sosa: %s"
-              (string_of_num (transl conf "(thousand separator)") sosa_num)
+              (Sosa.to_string_sep (transl conf "(thousand separator)") sosa_num)
         in
         Wserver.printf "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
           (image_prefix conf) title;
@@ -1632,7 +1613,7 @@ let rec compare_ls sl1 sl2 =
       (* soit plus petit que "2". J'espère qu'on ne casse pas  *)
       (* les performances à cause du try..with.                *)
       let c =
-        try Pervasives.compare (int_of_string s1) (int_of_string s2) with
+        try Stdlib.compare (int_of_string s1) (int_of_string s2) with
           Failure _ -> Gutil.alphabetic_order s1 s2
       in
       if c = 0 then compare_ls sl1 sl2 else c
@@ -1648,7 +1629,7 @@ module IperSet =
     (struct
        type t = iper
        let compare i1 i2 =
-         Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
+         Stdlib.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
      end)
 
 
@@ -1760,9 +1741,9 @@ let gen_string_of_img_sz max_wid max_hei conf base (p, p_auth) =
   if p_auth then
     let v = image_and_size conf base p (limited_image_size max_wid max_hei) in
     match v with
-      Some (_, _, Some (width, height)) ->
+      Some (_, Some (width, height)) ->
         Format.sprintf " width=\"%d\" height=\"%d\"" width height
-    | Some (_, _, None) -> Format.sprintf " height=\"%d\"" max_hei
+    | Some (_, None) -> Format.sprintf " height=\"%d\"" max_hei
     | None -> ""
   else ""
 let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
@@ -1795,9 +1776,7 @@ let get_sosa conf base env r p =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_linked_page conf base p s =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
+  let db = NotesLinks.read_db_from_file conf.path.file_notes_links in
   let db = Notes.merge_possible_aliases conf db in
   let key =
     let fn = Name.lower (sou base (get_first_name p)) in
@@ -2050,7 +2029,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -2167,6 +2146,16 @@ and eval_simple_str_var conf base env (_, p_auth) =
         Vcnt c -> incr c; ""
       | _ -> ""
       end
+  | "keydir_img" ->
+      begin match get_env "keydir_img" env with
+        Vstring s -> s
+      | _ -> raise Not_found
+      end
+  | "keydir_img_key" ->
+      begin match get_env "keydir_img" env with
+        Vstring s -> (Mutil.tr '+' ' ' (code_varenv s))
+      | _ -> raise Not_found
+      end
   | "lazy_force" ->
       begin match get_env "lazy_print" env with
         Vlazyp r ->
@@ -2205,7 +2194,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -2224,7 +2213,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -2423,12 +2412,14 @@ and eval_compound_var conf base env (a, _ as ep) loc =
   | ["base"; "name"] -> VVstring conf.bname
   | ["base"; "nb_persons"] ->
       VVstring
-        (string_of_num (Util.transl conf "(thousand separator)")
-           (Sosa.of_int (nb_of_persons base)))
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           (nb_of_persons base))
   | ["base"; "real_nb_persons"] ->
       VVstring
-        (string_of_num (Util.transl conf "(thousand separator)")
-           (Sosa.of_int (Util.real_nb_of_persons conf base)))
+        (Mutil.string_of_int_sep
+           (Util.transl conf "(thousand separator)")
+           (Util.real_nb_of_persons conf base))
   | "birth_witness" :: sl ->
       begin match get_env "birth_witness" env with
         Vind p ->
@@ -2665,9 +2656,8 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | Some s ->
             let s0 = Sosa.of_int s in
             let ip0 = get_key_index p0 in
-            begin match Util.branch_of_sosa conf base ip0 s0 with
-            | Some ((ip, _) :: _) ->
-                let p = poi base ip in
+            begin match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
+            | Some (p :: _) ->
                 let p_auth = authorized_age conf base p in
                 eval_person_field_var conf base env (p, p_auth) loc sl
             | _ -> raise Not_found
@@ -2684,9 +2674,8 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           | Some p ->
               let ip = get_key_index p in
               let s0 = Sosa.of_string s in
-              begin match Util.branch_of_sosa conf base ip s0 with
-              | Some ((ip, _) :: _) ->
-                  let p = poi base ip in
+              begin match Util.branch_of_sosa conf base s0 (pget conf base ip) with
+              | Some (p :: _) ->
                   let p_auth = authorized_age conf base p in
                   eval_person_field_var conf base env (p, p_auth) loc sl
               | _ -> raise Not_found
@@ -2699,7 +2688,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       (* %sosa_anc_p.sosa.first_name;
          direct access to a person whose sosa relative to current person
       *)
-      begin match get_p_of_sosa conf base (Sosa.of_string s) a with
+      begin match Util.p_of_sosa conf base (Sosa.of_string s) a with
       | Some np ->
         let np_auth = authorized_age conf base np in
         eval_person_field_var conf base env (np, np_auth) loc sl
@@ -2956,25 +2945,19 @@ and eval_ancestor_field_var conf base env gp loc =
       | _ -> VVstring ""
       end
   | ["interval"] ->
+    let to_string x =
+      Mutil.string_of_int_sep
+        (transl conf "(thousand separator)")
+        (int_of_string @@ Sosa.to_string x)
+    in
       begin match gp with
         GP_interv (Some (n1, n2, Some (n3, n4))) ->
           let n2 = Sosa.sub n2 Sosa.one in
           let n4 = Sosa.sub n4 Sosa.one in
-          let sep = transl conf "(thousand separator)" in
-          let r =
-            Sosa.to_string_sep sep n1 ^ "-" ^ Sosa.to_string_sep sep n2 ^
-            " = " ^ Sosa.to_string_sep sep n3 ^ "-" ^
-            Sosa.to_string_sep sep n4
-          in
-          VVstring r
+          VVstring (to_string n1 ^ "-" ^ to_string n2 ^ " = " ^ to_string n3 ^ "-" ^ to_string n4)
       | GP_interv (Some (n1, n2, None)) ->
           let n2 = Sosa.sub n2 Sosa.one in
-          let sep = transl conf "(thousand separator)" in
-          let r =
-            Sosa.to_string_sep sep n1 ^ "-" ^ Sosa.to_string_sep sep n2 ^
-            " = ..."
-          in
-          VVstring r
+          VVstring (to_string n1 ^ "-" ^ to_string n2 ^ " = ...")
       | GP_interv None -> VVstring "..."
       | _ -> VVstring ""
       end
@@ -3064,11 +3047,13 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           eval_person_field_var conf base env ep loc sl
 and eval_num conf n =
   function
-    ["hexa"] -> "0x" ^ Sosa.to_string_sep_base "" 16 n
-  | ["octal"] -> "0o" ^ Sosa.to_string_sep_base "" 8 n
-  | ["lvl"] -> string_of_int (String.length (Sosa.to_string_sep_base "" 2 n))
+    ["hexa"] -> Printf.sprintf "0x%X" @@ int_of_string (Sosa.to_string n)
+  | ["octal"] -> Printf.sprintf "0x%o" @@ int_of_string (Sosa.to_string n)
+  | ["lvl"] -> string_of_int @@ Sosa.gen n
   | ["v"] -> Sosa.to_string n
-  | [] -> Sosa.to_string_sep (transl conf "(thousand separator)") n
+  | [] -> Mutil.string_of_int_sep
+            (transl conf "(thousand separator)")
+            (int_of_string @@ Sosa.to_string n)
   | _ -> raise Not_found
 and eval_person_field_var conf base env (p, p_auth as ep) loc =
   function
@@ -3490,12 +3475,15 @@ and eval_str_event_field conf base (p, p_auth)
   | "note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base note in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -3512,11 +3500,11 @@ and eval_str_event_field conf base (p, p_auth)
         let src =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_file_path = Notes.file_path conf;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
-          Wiki.syntax_links conf wi (sou base src)
+          Wiki.syntax_links conf wi src
         in
         Util.safe_html @@ string_with_macros conf env src
       else ""
@@ -3901,6 +3889,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
   | "has_image" -> Util.has_image conf base p
+  | "has_keydir" -> Util.has_keydir conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -4053,12 +4042,15 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "birth_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_birth_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4072,12 +4064,15 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "baptism_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_baptism_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4090,12 +4085,15 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "burial_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_burial_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4143,12 +4141,15 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "death_note" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_death_note p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4195,6 +4196,52 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_env "p_link" env with
         Vbool _ -> ""
       | _ -> string_of_int (Adef.int_of_iper (get_key_index p))
+      end
+  | "keydir" -> default_image_name base p
+  | "keydir_img_nbr" ->
+    string_of_int (List.length (get_keydir conf base p))
+  | "keydir_img_notes" ->
+      begin match get_env "keydir_img_notes" env with
+        Vstring f ->
+          let ext = Filename.extension f in
+          let fname = Filename.chop_suffix f ext in
+          get_keydir_img_notes conf base p fname
+      | _ -> raise Not_found
+      end
+  | "keydir_img_src" ->
+      begin match get_env "keydir_img_src" env with
+        Vstring f ->
+          begin
+            let ext = Filename.extension f in
+            let fname = Filename.chop_suffix f ext in
+            let n = get_keydir_img_notes conf base p fname in
+            match (String.index_opt n '\n') with
+              Some i ->
+                let s1 = if (String.length n) > i then (String.sub n (i + 1)
+                  (String.length n - i - 1)) else ""
+                in
+                begin
+                  match (String.index_opt s1 '\n') with
+                    Some j -> String.sub s1 0 j
+                  | None -> ""
+                end
+            | None -> ""
+          end
+      | _ -> raise Not_found
+      end
+  | "keydir_img_title" ->
+      begin match get_env "keydir_img_title" env with
+        Vstring f ->
+          begin
+            let ext = Filename.extension f in
+            let fname = Filename.chop_suffix f ext in
+            let n = get_keydir_img_notes conf base p fname in
+            match (String.index_opt n '\n') with
+              Some i ->
+                String.sub n 0 i
+            | None -> ""
+          end
+      | _ -> raise Not_found
       end
   | "mark_descendants" ->
       begin match get_env "desc_mark" env with
@@ -4315,12 +4362,15 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "notes" | "pnotes" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_notes p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4337,7 +4387,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let s =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_file_path = Notes.file_path conf;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
@@ -4397,12 +4447,15 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "psources" ->
       if p_auth && not conf.no_note then
         let env = ['i', (fun () -> Util.default_image_name base p)] in
+        let env = ('k', (fun () ->
+          string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
+        in
         let s = sou base (get_psources p) in
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
           {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_file_path = Notes.file_path conf;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -4526,7 +4579,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_file_path = Notes.file_path conf;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -4638,7 +4691,7 @@ and string_of_image_url conf base (p, p_auth) html =
       image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
     in
     match v with
-      Some (true, fname, _) ->
+      Some (`File fname, _) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
         let k = default_image_name base p in
@@ -4646,7 +4699,7 @@ and string_of_image_url conf base (p, p_auth) html =
           (if html then "H" else "")
           (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b
           k
-    | Some (false, link, _) -> link
+    | Some (`Url link, _) -> link
     | None -> ""
   else ""
 and string_of_parent_age conf base (p, p_auth) parent =
@@ -4949,6 +5002,7 @@ let print_foreach conf base print_ast eval_expr =
         print_foreach_event_witness_relation env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
+    | "img_in_keydir" -> print_foreach_img_in_keydir env al ep
     | "nobility_title" -> print_foreach_nobility_title env al ep
     | "parent" -> print_foreach_parent env al ep
     | "qualifier" -> print_foreach_qualifier env al ep
@@ -5549,6 +5603,25 @@ let print_foreach conf base print_ast eval_expr =
         List.iter (print_ast env ep) al; loop (succ i)
     in
     loop 1
+  and print_foreach_img_in_keydir env al (p, p_auth as ep) =
+    if not p_auth && is_hide_names conf p then ()
+    else
+      let list = get_keydir conf base p in
+      let rec loop first cnt =
+        function
+          a :: l ->
+          let env =
+            ("keydir_img", Vstring a) ::
+            ("keydir_img_notes", Vstring a) ::
+            ("keydir_img_title", Vstring a) ::
+            ("keydir_img_src", Vstring a) ::
+            ("first", Vbool first) :: ("last", Vbool (l = [])) ::
+            ("cnt", Vint cnt) :: env
+          in
+            List.iter (print_ast env ep) al; loop false (cnt + 1) l
+        | [] -> ()
+      in
+      loop true 1 list
   and print_foreach_nobility_title env al (p, p_auth as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
@@ -5939,9 +6012,7 @@ let gen_interp_templ menu title templ_fname conf base p =
       Vint (max_descendant_level desc_level_table_m)
     in
     let nldb () =
-      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-      let fname = Filename.concat bdir "notes_links" in
-      let db = NotesLinks.read_db_from_file fname in
+      let db = NotesLinks.read_db_from_file conf.path.file_notes_links in
       let db = Notes.merge_possible_aliases conf db in Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
@@ -5971,10 +6042,12 @@ let gen_interp_templ menu title templ_fname conf base p =
   in
   if menu then
     let size =
-      match Util.open_templ conf templ_fname with
-        Some ic ->
-          let fd = Unix.descr_of_in_channel ic in
-          let stats = Unix.fstat fd in close_in ic; stats.Unix.st_size
+      match Util.open_template conf templ_fname with
+      | Some ic ->
+        let fd = Unix.descr_of_in_channel ic in
+        let stats = Unix.fstat fd in
+        close_in ic;
+        stats.Unix.st_size
       | None -> 0
     in
     if size = 0 then Hutil.header conf title
@@ -6075,9 +6148,7 @@ let print_what_links conf base p =
       let fn = Name.lower (sou base (get_first_name p)) in
       let sn = Name.lower (sou base (get_surname p)) in fn, sn, get_occ p
     in
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-    let fname = Filename.concat bdir "notes_links" in
-    let db = NotesLinks.read_db_from_file fname in
+    let db = NotesLinks.read_db_from_file conf.path.file_notes_links in
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h =

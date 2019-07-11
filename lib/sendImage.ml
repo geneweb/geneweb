@@ -1,9 +1,10 @@
-(* $Id: sendImage.ml,v 5.7 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: sendImage.ml,v 5.7 2019-03-12 09:58:44 ddr Exp $ *)
 
 open Config
 open Def
 open Gwdb
 open Util
+open Path
 
 type image_type = JPEG | GIF | PNG
 
@@ -211,12 +212,11 @@ let move_file_to_old conf fname bfname =
        let ext = extension_of_type typ in
        let new_file = fname ^ ext in
        if Sys.file_exists new_file then
-         let old_dir =
-           Filename.concat (Util.base_path ["images"] conf.bname) "old"
-         in
+         let old_dir = conf.path.dir_portraits_bak in
          let old_file = Filename.concat old_dir bfname ^ ext in
-         Util.rm old_file ;
-         Mutil.mkdir_p old_dir ;
+         if Sys.file_exists old_file then
+           (try Sys.remove old_file with Sys_error _ -> ());
+         (try Unix.mkdir old_dir 0o777 with Unix.Unix_error (_, _, _) -> ());
          begin try Unix.rename new_file old_file with
            Unix.Unix_error (_, _, _) -> ()
          end;
@@ -262,6 +262,7 @@ let image_type s =
                   Some (GIF, s)
               | None -> None
 
+(* TODO check on this *)
 let dump_bad_image conf s =
   match p_getenv conf.base_env "dump_bad_images" with
     Some "yes" ->
@@ -298,17 +299,11 @@ let effective_send_ok conf base p file =
         | _ -> typ, content
   in
   let bfname = default_image_name base p in
-  let bfdir =
-    let bfdir = Util.base_path ["images"] conf.bname in
-    if Sys.file_exists bfdir then bfdir
-    else
-      let d = Filename.concat (Secure.base_dir ()) "images" in
-      let d1 = Filename.concat d conf.bname in
-      (try Unix.mkdir d 0o777 with Unix.Unix_error (_, _, _) -> ());
-      (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());
-      d1
-  in
-  let fname = Filename.concat bfdir bfname in
+  if not (Sys.file_exists conf.path.dir_portraits) then
+    begin
+    (try Unix.mkdir conf.path.dir_portraits 0o777 with Unix.Unix_error (_, _, _) -> ());
+    end;
+  let fname = Filename.concat conf.path.dir_portraits bfname in
   let _moved = move_file_to_old conf fname bfname in
   write_file (fname ^ extension_of_type typ) content;
   let changed =
@@ -345,7 +340,9 @@ let print_deleted conf base p =
 
 let effective_delete_ok conf base p =
   let bfname = default_image_name base p in
-  let fname = Filename.concat (Util.base_path ["images"] conf.bname) bfname in
+  let fname =
+     Filename.concat conf.path.dir_portraits bfname
+  in
   if move_file_to_old conf fname bfname = 0 then incorrect conf;
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
@@ -360,3 +357,5 @@ let print_del_ok conf base =
         effective_delete_ok conf base p
     | None -> incorrect conf
   with Update.ModErr -> ()
+  
+

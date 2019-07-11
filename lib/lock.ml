@@ -4,7 +4,7 @@
 let no_lock_flag = ref false
 
 let print_error_and_exit () =
-  Printf.printf "\nSorry. Impossible to lock base.\n";
+  Printf.eprintf "\nSorry. Impossible to lock base.\n";
   flush stdout;
   exit 2
 

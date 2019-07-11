@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Util
 
 (* TLSW: Text Language Stolen to Wikipedia
@@ -51,11 +52,10 @@ let section_level s len =
 
 let notes_aliases conf =
   let fname =
-    match p_getenv conf.base_env "notes_alias_file" with
-      Some f -> Util.base_path [] f
-    | None ->
-        Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
-          "notes.alias"
+    Opt.map_default
+      conf.path.file_notes_aliases
+      (Filename.concat conf.path.dir_root)
+      (p_getenv conf.base_env "notes_alias_file")
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
     Some ic ->
@@ -162,6 +162,7 @@ let syntax_links conf wi s =
           in
           let c =
             let f = wi.wi_file_path (fname_of_path fpath) in
+            let f = Filename.concat conf.path.dir_password f in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
@@ -700,7 +701,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
         conf.xhs
     end;
   Wserver.printf "<div class=\"row ml-3\">\n";
-  begin match Util.open_etc_file "toolbar" with
+  begin match Util.open_template conf "toolbar" with
     Some ic ->
       Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
       Templ.copy_from_templ conf ["name", "notes"] ic;
@@ -722,7 +723,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
         Wserver.printf "</button>\n"
       end
     end;
-  begin match Util.open_etc_file "accent" with
+  begin match Util.open_template conf "accent" with
     Some ic ->
       Wserver.printf "<div class=\"col my-1 mr-2 text-monospace\">\n";
       Templ.copy_from_templ conf ["name", "notes"] ic;

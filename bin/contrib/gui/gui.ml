@@ -30,6 +30,7 @@ let lang = ref default_lang
 let lexicon_mtime = ref 0.0
 let lexicon_file = Filename.concat bin_dir "gui_lex.txt"
 
+(* REORG TODO conflit avec notre config.txt? *)
 let config_gui_file = Filename.concat bin_dir "config.txt"
 
 (**/**) (* Gestion du dictionnaire des langues pour GUI. *)
@@ -127,8 +128,9 @@ let rec cut_at_equal s =
     String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
   with Not_found -> s, ""
 
+(* REORG config *)
 let read_base_env conf bname =
-  let fname = Filename.concat conf.bases_dir (bname ^ ".gwf") in
+  let fname = (Path.path_from_bname bname).Path.file_conf in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
       let env =
@@ -144,8 +146,9 @@ let read_base_env conf bname =
       close_in ic; env
   | None -> []
 
+(* REORG config *)
 let write_base_env conf bname env =
-  let fname = Filename.concat conf.bases_dir (bname ^ ".gwf") in
+  let fname = (Path.path_from_bname bname).Path.file_conf in
   match try Some (open_out fname) with Sys_error _ -> None with
     Some oc ->
       List.iter (fun (k, v) -> Printf.fprintf oc "%s=%s\n" k v) env; close_out oc
@@ -335,7 +338,7 @@ let delete_base conf bname =
     (btn_ok#connect#clicked
        (fun () ->
           let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-          Util.rm_rf base; wnd#destroy ()));
+          Mutil.rm_rf base; wnd#destroy ()));
   wnd#show ()
 
 
@@ -432,7 +435,7 @@ let print_default_gwf_file conf bname =
      "template", "*"; "long_date", "no"; "counter", "no";
      "full_siblings", "yes"; "hide_advanced_request", "no"]
   in
-  let fname = Filename.concat conf.bases_dir (bname ^ ".gwf") in
+  let fname = (Path.path_from_bname bname).Path.file_conf in
   if Sys.file_exists fname then () else write_base_env conf bname gwf
 
 let create_base conf bname src_file =
@@ -447,7 +450,7 @@ let create_base conf bname src_file =
             ged2gwb2 conf bname src_file
           else error_popup (transl "Unknown file")
         end;
-      let gwf_file = Filename.concat conf.bases_dir (bname ^ ".gwf") in
+      let gwf_file = (Path.path_from_bname bname).Path.file_conf in
       if Sys.file_exists gwf_file then ()
       else print_default_gwf_file conf bname
     end

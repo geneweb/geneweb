@@ -65,6 +65,18 @@ let mutil_compare_after_particle _ =
   test "d'aboville" "d'artagnan" ;
   test "descartes" "dupont"
 
+let mutil_string_of_int_sep _ =
+  let test sep exp int =
+    assert_equal ~printer:(fun s -> s) exp (Mutil.string_of_int_sep sep int)
+  in
+  test "," "1" 1 ;
+  test "," "10" 10 ;
+  test "," "100" 100 ;
+  test "," "1,000" 1000 ;
+  test "," "10,000" 10000 ;
+  test "," "100,000" 100000 ;
+  test "," "1,000,000" 1000000
+
 let util_str_sub _ =
   let test ?pad e s i j =
     let i = Util.str_nth_pos s i in
@@ -97,6 +109,7 @@ let suite =
     ; "mutil_start_with" >:: mutil_start_with
     ; "mutil_arabian_romian" >:: mutil_arabian_romian
     ; "mutil_compare_after_particle" >:: mutil_compare_after_particle
+    ; "mutil_string_of_int_sep" >:: mutil_string_of_int_sep
     ]
   ; "Util" >:::
     [ "util_str_sub" >:: util_str_sub

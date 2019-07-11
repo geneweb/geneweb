@@ -7,15 +7,7 @@ open Gwdb
 
 val add_lang_path : string -> unit
 val set_base_dir : string -> unit
-val cnt_dir : string ref
 val image_prefix : config -> string
-val base_path : string list -> string -> string
-
-val find_misc_file : string -> string
-
-val search_in_lang_path : string -> string
-
-val etc_file_name : config -> string -> string
 
 val escache_value : base -> string
 val commit_patches : config -> base -> unit
@@ -35,11 +27,8 @@ val unauthorized : config -> string -> unit
 val string_of_ctime : config -> string
 
 val commd : config -> string
-val commd_2 : config -> string
 val prefix_base : config -> string
 val prefix_base_password : config -> string
-val prefix_base_2 : config -> string
-val prefix_base_password_2 : config -> string
 val code_varenv : string -> string
 val decode_varenv : string -> string
 val hidden_env : config -> unit
@@ -113,10 +102,14 @@ val create_env : string -> (string * string) list
 val capitale : string -> string
 val index_of_next_char : string -> int -> int
 
-val open_etc_file : string -> in_channel option
-val open_hed_trl : config -> string -> in_channel option
-val open_templ : config -> string -> in_channel option
-val open_templ_fname : config -> string -> (in_channel * string) option
+(** TODO *)
+val search_in_etc_path : config -> string -> string
+
+(** TODO *)
+val open_template : config -> string -> in_channel option
+
+val search_in_lang_path : string -> string
+
 val string_with_macros :
   config -> (char * (unit -> string)) list -> string -> string
 val string_of_place : config -> string -> string
@@ -215,25 +208,68 @@ val get_request_string : string list -> string
 
 val create_topological_sort : config -> base -> int array
 
-val branch_of_sosa :
-  config -> base -> iper -> Sosa.t -> (iper * sex) list option
-val sosa_of_branch : (iper * sex) list -> Sosa.t
+(** [p_of_sosa conf base sosa p0]
+    Get the sosa [sosa] of [p0] if it exists
+*)
+val p_of_sosa : config -> base -> Sosa.t -> person -> person option
+
+(** [branch_of_sosa conf base sosa p0]
+    Get all the lineage to go from [p0]'s sosa [sosa] to [p0]
+*)
+val branch_of_sosa : config -> base -> Sosa.t -> person -> person list option
+
+(** [sosa_of_branch branch]
+    Given a path of person to follow [branch], return the sosa number
+    of the last person of this list. No check is done to ensure that
+    given persons are actually parents.
+*)
+val sosa_of_branch : person list -> Sosa.t
+
+(** @deprecated Use [branch_of_sosa] instead *)
+val old_branch_of_sosa : config -> base -> iper -> Sosa.t -> (iper * sex) list option
+
+(** @deprecated Use [sosa_of_branch] instead *)
+val old_sosa_of_branch : config -> base -> (iper * sex) list -> Sosa.t
 
 val has_image : config -> base -> person -> bool
 val image_file_name : string -> string
-val source_image_file_name : string -> string -> string
 
-val image_size : string -> (int * int) option
+val has_keydir : config -> base -> person -> bool
+val keydir : config -> base -> person -> string option
+val get_keydir : config -> base -> person -> string list
+val get_keydir_old : config -> base -> person -> string list
+val out_keydir_img_notes : config -> base -> person -> string -> string -> unit
+val get_keydir_img_notes : config -> base -> person -> string -> string
+
 val limited_image_size :
   int -> int -> string -> (int * int) option -> (int * int) option
-val image_and_size :
-  config -> base -> person ->
-    (string -> (int * int) option -> (int * int) option) ->
-    (bool * string * (int * int) option) option
+val image_size : string -> (int * int) option
 
+(** [default_image_name_of_key fn sn oc]
+    Default portrait filename (without extension).
+
+    e.g. [default_image_name_of_key "Jean Claude" "DUPOND" 3]
+    = ["jean_claude.3.dupond"]
+ *)
 val default_image_name_of_key : string -> string -> int -> string
+
+(** [default_image_name base p]
+    See {!val:default_image_name_of_key}
+*)
 val default_image_name : base -> person -> string
-val auto_image_file : config -> base -> person -> string option
+
+(** [auto_image_file ?bak conf base p]
+    Return the path to portrait image of [p].
+    If [backup] is set to [true],
+    return the path to the backuped version of this file.
+*)
+val auto_image_file : ?bak:bool -> config -> base -> person -> string option
+
+(** [image_and_size ?bak conf base p image_size] *)
+val image_and_size
+  : ?bak:bool -> config -> base -> person ->
+  (string -> (int * int) option -> (int * int) option) ->
+  ([> `File of string | `Url of string ] * (int * int) option) option
 
 val only_printable : string -> string
 val only_printable_or_nl : string -> string
@@ -296,7 +332,6 @@ val print_image_sex : config -> person -> int -> unit
 val display_options : config -> string
 
 type cache_visited_t = (string, (iper * string) list) Hashtbl.t
-val cache_visited : config -> string
 val read_visited : config -> cache_visited_t
 val record_visited : config -> iper -> unit
 
@@ -348,15 +383,6 @@ val rev_iter : ('a -> unit) -> 'a list -> unit
  *)
 val groupby : key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list
 
-(** [str_replace ?unsafe c ~by str]
-    Return a new string which is the same as [str] with all occurences of [c]
-    replaced by [by].
-    If [str] does not contain [c]. [str] is returned intouched.
-
-    If [unsafe] is set to true, [str] is modified instead of a copy of [str].
- *)
-val str_replace : ?unsafe:bool -> char -> by:char -> string -> string
-
 (** [str_nth_pos str n]
     Return a position of the byte starting the [n]-th UTF8 character.
  *)
@@ -377,12 +403,12 @@ val ls_r : string list -> string list
 (** [rm_rf dir]
     Remove directory [dir] and everything inside [dir].
 *)
-val rm_rf : string -> unit
+(*val rm_rf : string -> unit*)
 
 (** [rm fname]
     Remove [fname]. If [fname] does not exists, do nothing.
-*)
 val rm : string -> unit
+*)
 
 (** [escape_html str] replaces '&', '"', '\'', '<' and '>'
     with their corresponding character entities (using entity number) *)

@@ -83,9 +83,14 @@ let print_differences conf base branches p1 p2 =
     (fun p ->
        let v = image_and_size conf base p (limited_image_size 75 100) in
        match v with
-         Some (false, link, _) ->
+         Some (`Url link, _) ->
            "<img src=\"" ^ link ^
            "\" style=\"max-width:75px; max-height:100px\" />"
+       | Some (`File _, _) ->
+          (Printf.sprintf
+            "<img src=\"%sm=IM&p=%s&n=%s&oc=%d\
+            \" style=\"max-width:75px; max-height:100px\" />" (commd conf)
+            (p_first_name base p) (p_surname base p) (get_occ p))
        | _ -> sou base (get_image p));
   string_field (transl conf "public name") "public_name"
     (fun p -> sou base (get_public_name p));
@@ -200,14 +205,14 @@ let compatible_divorces d1 d2 = d1 = d2
 let compatible_relation_kinds rk1 rk2 = rk1 = rk2
 
 let compatible_titles t1 t2 =
-  Futil.eq_lists (Futil.eq_titles eq_istr) t1 t2 || t2 = []
+  List.for_all2 (Futil.eq_titles eq_istr) t1 t2 || t2 = []
 
 let compatible_pevents pevt1 pevt2 = pevt1 = [] && pevt2 = []
 
 let compatible_fevents fevt1 fevt2 = fevt1 = [] && fevt2 = []
 
 let compatible_strings_lists sl1 sl2 =
-  sl2 = [] || Futil.eq_lists eq_istr sl1 sl2
+  sl2 = [] || List.for_all2 eq_istr sl1 sl2
 
 let compatible_notes base s1 s2 =
   compatible_strings s1 s2 || sou base s1 = sou base s2
@@ -354,46 +359,28 @@ let effective_merge_ind conf base warning p1 p2 =
       let u2 = {family = [| |]} in patch_union base (get_key_index p2) u2
     end;
   let p1 =
-    {(gen_person_of_person p1) with sex =
-      if get_sex p2 <> Neuter then get_sex p2 else get_sex p1;
-     birth =
-       if get_birth p1 = Adef.cdate_None then get_birth p2 else get_birth p1;
-     birth_place =
-       if is_empty_string (get_birth_place p1) then get_birth_place p2
-       else get_birth_place p1;
-     birth_src =
-       if is_empty_string (get_birth_src p1) then get_birth_src p2
-       else get_birth_src p1;
-     baptism =
-       if get_baptism p1 = Adef.cdate_None then get_baptism p2
-       else get_baptism p1;
-     baptism_place =
-       if is_empty_string (get_baptism_place p1) then get_baptism_place p2
-       else get_baptism_place p1;
-     baptism_src =
-       if is_empty_string (get_baptism_src p1) then get_baptism_src p2
-       else get_baptism_src p1;
-     death =
-       if get_death p1 = DontKnowIfDead then get_death p2 else get_death p1;
-     death_place =
-       if is_empty_string (get_death_place p1) then get_death_place p2
-       else get_death_place p1;
-     death_src =
-       if is_empty_string (get_death_src p1) then get_death_src p2
-       else get_death_src p1;
-     burial =
-       if get_burial p1 = UnknownBurial then get_burial p2 else get_burial p1;
-     burial_place =
-       if is_empty_string (get_burial_place p1) then get_burial_place p2
-       else get_burial_place p1;
-     burial_src =
-       if is_empty_string (get_burial_src p1) then get_burial_src p2
-       else get_burial_src p1;
-     occupation =
-       if is_empty_string (get_occupation p1) then get_occupation p2
-       else get_occupation p1;
-     notes =
-       if is_empty_string (get_notes p1) then get_notes p2 else get_notes p1}
+    let get_string fn = if is_empty_string (fn p1) then fn p2 else fn p1 in
+    {(gen_person_of_person p1) with
+     sex = if get_sex p2 <> Neuter then get_sex p2 else get_sex p1
+     ; birth = if get_birth p1 = Adef.cdate_None then get_birth p2 else get_birth p1
+     ; birth_place = get_string get_birth_place
+     ; birth_src = get_string get_birth_src
+     ; baptism =
+         if get_baptism p1 = Adef.cdate_None then get_baptism p2
+         else get_baptism p1
+     ; baptism_place = get_string get_baptism_place
+     ; baptism_src = get_string get_baptism_src
+     ; death =
+         if get_death p1 = DontKnowIfDead then get_death p2 else get_death p1
+     ; death_place = get_string get_death_place
+     ; death_src = get_string get_death_src
+     ; burial =
+         if get_burial p1 = UnknownBurial then get_burial p2 else get_burial p1
+     ; burial_place = get_string get_burial_place
+     ; burial_src = get_string get_burial_src
+     ; occupation = get_string get_occupation
+     ; notes = get_string get_notes
+    }
   in
   patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (get_key_index p2);

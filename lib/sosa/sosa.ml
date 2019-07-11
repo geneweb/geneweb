@@ -7,7 +7,21 @@ let max_mul_base = max_int / base
 
 let zero = [| |]
 let one = [| 1 |]
+
+let of_int i =
+  if i < 0 then invalid_arg "Sosa.of_int"
+  else if i = 0 then zero
+  else if i < base then [| i |]
+  else [| i mod base; i / base |]
+
+let to_int = function
+  | [||] -> 0
+  | [| i |] -> i
+  | [| m ; d |] -> d * base + m
+  | _ -> assert false
+
 let eq x y = x = y
+
 let gt x y =
   if Array.length x > Array.length y then true
   else if Array.length x < Array.length y then false
@@ -19,6 +33,7 @@ let gt x y =
       else loop (i - 1)
     in
     loop (Array.length x - 1)
+
 let twice x =
   let l =
     let rec loop i r =
@@ -30,6 +45,7 @@ let twice x =
     loop 0 0
   in
   Array.of_list l
+
 let half x =
   let l =
     let rec loop i r v =
@@ -44,7 +60,9 @@ let half x =
     loop (Array.length x - 1) 0 []
   in
   Array.of_list l
+
 let even x = if Array.length x = 0 then true else x.(0) land 1 = 0
+
 let inc x n =
   let l =
     let rec loop i r =
@@ -54,6 +72,7 @@ let inc x n =
     loop 0 n
   in
   Array.of_list l
+
 let add x y =
   let l =
     let rec loop i r =
@@ -70,6 +89,7 @@ let add x y =
     loop 0 0
   in
   Array.of_list l
+
 let normalize =
   let rec loop =
     function
@@ -77,6 +97,7 @@ let normalize =
     | x :: l -> let r = loop l in if x = 0 && r = [] then r else x :: r
   in
   loop
+
 let sub x y =
   let l =
     let rec loop i r =
@@ -93,6 +114,7 @@ let sub x y =
     loop 0 0
   in
   Array.of_list (normalize l)
+
 let mul0 x n =
   if n > max_mul_base then invalid_arg "Sosa.mul"
   else
@@ -104,6 +126,7 @@ let mul0 x n =
       loop 0 0
     in
     Array.of_list l
+
 let mul x n =
   if n < max_mul_base then mul0 x n
   else
@@ -114,6 +137,7 @@ let mul x n =
           (n / max_mul_base)
     in
     loop zero x n
+
 let div x n =
   if n > max_mul_base then invalid_arg "Sosa.div"
   else
@@ -127,20 +151,9 @@ let div x n =
       loop (Array.length x - 1) [] 0
     in
     Array.of_list (normalize l)
+
 let modl x n =
-  let r = sub x (mul0 (div x n) n) in if Array.length r = 0 then 0 else r.(0)
-
-let of_int i =
-  if i < 0 then invalid_arg "Sosa.of_int"
-  else if i = 0 then zero
-  else if i < base then [| i |]
-  else [| i mod base; i / base |]
-
-let to_int = function
-  | [||] -> 0
-  | [| i |] -> i
-  | [| m ; d |] -> d * base + m
-  | _ -> assert false
+  of_int @@ let r = sub x (mul0 (div x n) n) in if Array.length r = 0 then 0 else r.(0)
 
 let rec exp_gen x1 x2 n =
   if n = 0 || x1 = zero then one
@@ -150,24 +163,8 @@ let rec exp_gen x1 x2 n =
 let exp x n =
   exp_gen x x n
 
-let print f sep x =
-  if eq x zero then f "0"
-  else
-    let digits =
-      let rec loop d x =
-        if eq x zero then d else loop (modl x 10 :: d) (div x 10)
-      in
-      loop [] x
-    in
-    let _ =
-      List.fold_left
-        (fun n d ->
-           f (string_of_int d); if n > 0 && n mod 3 = 0 then f sep; n - 1)
-        (List.length digits - 1) digits
-    in
-    ()
-
 let code_of_digit d =
+  let d = to_int d in
   if d < 10 then Char.code '0' + d else Char.code 'A' + (d - 10)
 
 let to_string_sep_base sep base x =
@@ -177,7 +174,7 @@ let to_string_sep_base sep base x =
     in
     loop [] x
   in
-  let digits = if digits = [] then [0] else digits in
+  let digits = if digits = [] then [zero] else digits in
   let len = List.length digits in
   let slen = String.length sep in
   let s = Bytes.create (len + (len - 1) / 3 * slen) in
@@ -193,6 +190,7 @@ let to_string_sep_base sep base x =
   Bytes.unsafe_to_string s
 
 let to_string_sep sep = to_string_sep_base sep 10
+
 let to_string = to_string_sep_base "" 10
 
 let of_string s =
@@ -210,17 +208,11 @@ let gen x =
   let s = to_string_sep_base "" 2 x in
   String.length s (* coherent with %sosa.lvl *)
 
-let branch x =
-  let s = to_string_sep_base "" 2 x in
-  if (String.length s) > 1 then s.[1] else '0'
-
-let sosa_gen_up x =
-  if eq x one then zero
+let branches x =
+  if eq x one then []
   else
     let s = to_string_sep_base "" 2 x in
-    let s = if String.length s > 2 then
-        "0b" ^ (String.sub s 0 1) ^ (String.sub s 2 (String.length s -2))
-      else "0b1"
-    in
-    let is = int_of_string s in
-    of_int is
+    let rec loop acc i =
+      if i <= 0 then acc
+      else loop (Char.code s.[i] - Char.code '0' :: acc) (i - 1)
+    in loop [] (String.length s - 1)

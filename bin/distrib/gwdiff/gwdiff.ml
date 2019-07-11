@@ -542,6 +542,10 @@ let main () =
   let base2 = if !in_file1 != !in_file2 then load_base !in_file2 else base1 in
   let iper1 = person_of_key base1 !p1_fn !p1_sn !p1_occ in
   let iper2 = person_of_key base2 !p2_fn !p2_sn !p2_occ in
+  Printf.printf "<!-- running gwdiff -->\n";
+  Printf.printf "<!-- %s: %s.%d %s -->\n" !in_file1 !p1_fn !p1_occ !p1_sn ;
+  Printf.printf "<!-- %s: %s.%d %s -->\n" !in_file2 !p2_fn !p2_occ !p2_sn ;
+  Printf.printf "\n";
   if !html then Printf.printf "<BODY>\n";
   begin match iper1, iper2 with
     None, _ ->

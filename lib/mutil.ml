@@ -82,8 +82,6 @@ let nominative s =
     Some _ -> decline 'n' s
   | _ -> s
 
-let remove_file f = try Sys.remove f with Sys_error _ -> ()
-
 let mkdir_p x =
   let rec loop x =
     let y = Filename.dirname x in
@@ -91,17 +89,6 @@ let mkdir_p x =
     try Unix.mkdir x 0o755 with Unix.Unix_error (_, _, _) -> ()
   in
   loop x
-
-let rec remove_dir d =
-  begin try
-    let files = Sys.readdir d in
-    for i = 0 to Array.length files - 1 do
-      remove_dir (Filename.concat d files.(i));
-      remove_file (Filename.concat d files.(i))
-    done
-  with Sys_error _ -> ()
-  end;
-  try Unix.rmdir d with Unix.Unix_error (_, _, _) -> ()
 
 let lock_file bname =
   let bname =
@@ -174,6 +161,16 @@ let tr c1 c2 s =
     String.init
       (String.length s)
       (fun i -> let c = String.unsafe_get s i in if c = c1 then c2 else c)
+  | None -> s
+
+let unsafe_tr c1 c2 s =
+  match String.rindex_opt s c1 with
+  | Some _ ->
+    let bytes = Bytes.unsafe_of_string s in
+    for i = 0 to Bytes.length bytes - 1 do
+      if Bytes.unsafe_get bytes i = c1 then Bytes.unsafe_set bytes i c2
+    done ;
+    Bytes.unsafe_to_string bytes
   | None -> s
 
 let utf_8_of_iso_8859_1 str =
@@ -393,3 +390,131 @@ let array_to_list_map fn a =
     else loop (fn (Array.unsafe_get a i) :: acc) (i - 1)
   in
   loop [] (Array.length a - 1)
+
+let string_of_int_sep sep x =
+  let digits, len =
+    let rec loop (d, l) x =
+      if x = 0 then (d, l) else loop (Char.chr (Char.code '0' + x mod 10) :: d, l + 1) (x / 10)
+    in
+    loop ([], 0) x
+  in
+  let digits, len = if digits = [] then ['0'], 1 else digits, len in
+  let slen = String.length sep in
+  let s = Bytes.create (len + (len - 1) / 3 * slen) in
+  let _ =
+    List.fold_left
+      (fun (i, j) c ->
+         Bytes.set s j c ;
+         if i < len - 1 && (len - 1 - i) mod 3 = 0 then
+           begin String.blit sep 0 s (j + 1) slen; i + 1, j + 1 + slen end
+         else i + 1, j + 1)
+      (0, 0) digits
+  in
+  Bytes.unsafe_to_string s
+
+let rec filter_map fn = function
+  | [] -> []
+  | hd :: tl ->
+    match fn hd with
+    | Some x -> x :: filter_map fn tl
+    | None -> filter_map fn tl
+
+let rec rev_iter fn = function
+  | [] -> ()
+  | hd :: tl -> let () = rev_iter fn tl in fn hd
+
+let ls_r dirs =
+  let rec loop result = function
+    | f :: fs when Sys.is_directory f ->
+      Sys.readdir f
+      |> Array.to_list
+      |> List.rev_map (Filename.concat f)
+      |> List.rev_append fs
+      |> loop (f :: result)
+    | f :: fs -> loop (f :: result) fs
+    | [] -> result
+  in
+  loop [] dirs
+
+let rm fname =
+  if Sys.file_exists fname then Sys.remove fname
+
+let rn fname s =
+  if Sys.file_exists fname then Sys.rename fname s
+
+
+let rec rm_rf file =
+  let infos = Unix.lstat file in
+  match infos.Unix.st_kind with
+  | Unix.S_REG | Unix.S_LNK ->
+      Unix.unlink file ;
+  | Unix.S_DIR->
+      let ls = Array.to_list (Sys.readdir file) in
+      List.iter
+        (fun f ->
+          if f <> "." && f <> ".."
+          then
+            rm_rf (Filename.concat file f) ) ls ;
+      (try Unix.rmdir file with _ -> ()) ;
+  | _ -> ()
+
+(*
+let rm_rf dir =
+  let (directories, files) = ls_r [dir] |> List.partition
+    (fun d -> (Unix.lstat d).Unix.st_kind = Unix.S_DIR)
+  in
+  List.iter Unix.unlink files ;
+  List.iter Unix.rmdir directories
+*)
+
+let buffer_size = 8192
+let buffer = Bytes.create buffer_size
+
+let file_copy input_name output_name =
+  let fd_in = Unix.openfile input_name [Unix.O_RDONLY] 0 in
+  let fd_out = Unix.openfile output_name
+    [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o666 in
+  let rec copy_loop () = match Unix.read fd_in buffer 0 buffer_size with
+    |  0 -> ()
+    | r -> ignore (Unix.write fd_out buffer 0 r); copy_loop ()
+  in
+  copy_loop ();
+  Unix.close fd_in ;
+  Unix.close fd_out
+  
+let set_infos filename infos =
+  if Sys.unix then
+    begin
+      Unix.utimes filename infos.Unix.st_atime infos.Unix.st_mtime ;
+      Unix.chmod filename infos.Unix.st_perm ;
+      try
+        Unix.chown filename infos.Unix.st_uid infos.Unix.st_gid
+      with Unix.Unix_error(Unix.EPERM,_,_) -> ()
+    end
+  else ()
+
+let rec copy_r source dest =
+  let infos = Unix.lstat source in
+  let fname = Filename.basename source in
+  if fname.[0] <> '.' then
+    match infos.Unix.st_kind with
+    | Unix.S_REG ->
+        file_copy source dest ;
+        set_infos dest infos
+    | Unix.S_LNK ->
+        let link = Unix.readlink source in
+        Unix.symlink link dest
+    | Unix.S_DIR->
+        mkdir_p dest ;
+        let ls = Array.to_list (Sys.readdir source) in
+        List.iter
+          (fun file ->
+            if file <> Filename.current_dir_name
+                && file <> Filename.parent_dir_name
+            then copy_r
+              (Filename.concat source file)
+              (Filename.concat dest file))
+          ls ;
+        set_infos dest infos
+    | _ -> ()
+  else ()

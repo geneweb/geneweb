@@ -135,6 +135,7 @@ type string_person =
     Sp of int
   | SpNew of string
 
+(* REORG TODO particles *)
 let sorted_patched_person_strings db2 is_first_name =
   let particles =
     Mutil.input_particles (Filename.concat db2.bdir2 "particles.txt")
@@ -434,11 +435,12 @@ let children_array2 db2 =
          db2.patches.nb_fam_ini);
   tab
 
+(* REORG notes *)
 let read_notes db2 fnotes rn_mode =
   let bdir = db2.bdir2 in
+  let fname = if fnotes = "" then "notes" else fnotes in
   let fname =
-    if fnotes = "" then "notes.txt"
-    else Filename.concat "notes_d" (fnotes ^ ".txt")
+    Filename.concat "notes" (fname ^ ".txt")
   in
   match
     try Some (Secure.open_in (Filename.concat bdir fname)) with
@@ -470,18 +472,17 @@ let commit_patches2 db2 =
   output_string oc magic_patch;
   Mutil.output_value_no_sharing oc db2.patches;
   close_out oc;
-  Mutil.remove_file (fname ^ "~");
+  Mutil.rm (fname ^ "~");
   (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
   Sys.rename (fname ^ "1") fname
 
+(* REORG notes *)
 let commit_notes2 db2 fnotes s =
   let bdir = db2.bdir2 in
   if fnotes <> "" then
-    (try Unix.mkdir (Filename.concat bdir "notes_d") 0o755 with _ -> ());
-  let fname =
-    if fnotes = "" then "notes.txt"
-    else Filename.concat "notes_d" (fnotes ^ ".txt")
-  in
+    (try Unix.mkdir (Filename.concat bdir "notes") 0o755 with _ -> ());
+  let fname = if fnotes = "" then "notes.txt" else fnotes in
+  let fname = Filename.concat "notes" (fname ^ ".txt") in
   let fname = Filename.concat bdir fname in
   (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
   (try Sys.rename fname (fname ^ "~") with _ -> ());

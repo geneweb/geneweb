@@ -120,8 +120,16 @@ lib/gwlib.ml:
 	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
+CPPO_D=$(API_D)
+
 %/dune: %/dune.in
-	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
+	cat $< \
+	| cppo -n $(CPPO_D) \
+	| sed \
+	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
+	-e "s/%%%API_PKG%%%/$(API_PKG)/g" \
+	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
+	> $@
 
 hd/etc/version.txt:
 	echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
@@ -131,9 +139,16 @@ hd/etc/version.txt:
 
 ###### [End] Generated files section
 
-GENERATED_FILES_DEP = hd/etc/version.txt lib/gwlib.ml $(CAMLP5_FILES:=.ml) lib/dune
+GENERATED_FILES_DEP = \
+	hd/etc/version.txt \
+	lib/gwlib.ml \
+	$(CAMLP5_FILES:=.ml) \
+	benchmark/dune \
+	bin/distrib/dune \
+	lib/dune \
+	test/dune \
 
-ifdef API
+ifdef API_D
 piqi:
 	$(foreach p, $(wildcard lib/*.proto), \
 		piqi of-proto --normalize $(p) ; \
@@ -239,9 +254,13 @@ doc: | piqi $(GENERATED_FILES_DEP)
 	dune build @doc
 .PHONY: doc
 
-test: install-exe
+test: | piqi $(GENERATED_FILES_DEP)
 	dune build @runtest
 .PHONY: test
+
+bench: | piqi $(GENERATED_FILES_DEP)
+	dune build @runbench
+.PHONY: bench
 
 clean:
 	$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml

@@ -138,12 +138,12 @@ let name_with_roman_number str =
 
 let search_by_sosa conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with Failure _ -> None in
+  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
   match sosa_ref, sosa_nb with
     Some p, Some n ->
       if n <> Sosa.zero then
-        match Util.branch_of_sosa conf base (get_key_index p) n with
-          Some ((ip, _) :: _) -> [pget conf base ip]
+        match Util.branch_of_sosa conf base n (pget conf base @@ get_key_index p) with
+          Some (p :: _) -> [p]
         | _ -> []
       else []
   | _ -> []
@@ -262,6 +262,8 @@ let search_approx_key conf base an =
   compact_list base pl
 
 (* recherche par clé, i.e. prenom.occ nom *)
+(* le recherche sur prenom.occ.nom devrait aussi fonctionner *)
+(* see Gutil.split_key for implementation  *)
 let search_by_key conf base an =
   match Gutil.person_of_string_key base an with
     Some ip ->

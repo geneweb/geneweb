@@ -139,15 +139,12 @@ let input bname =
   in
   let cleanup () = close_in ic in
   let read_notes fnotes rn_mode =
+    let fname = if fnotes = "" then "notes" else fnotes in
     let fname =
-      if fnotes = "" then "notes"
-      else Filename.concat "notes_d" (fnotes ^ ".txt")
+      Filename.concat (Path.path_from_bname bname).Path.dir_notes (fname ^ ".txt")
     in
-    match
-      try Some (Secure.open_in (Filename.concat bname fname)) with
-        Sys_error _ -> None
-    with
-      Some ic ->
+    match try Some (Secure.open_in fname) with Sys_error _ -> None with
+    | Some ic ->
         let str =
           match rn_mode with
             RnDeg -> if in_channel_length ic = 0 then "" else " "
@@ -164,16 +161,11 @@ let input bname =
     | None -> ""
   in
   let commit_notes fnotes s =
-    let fname =
-      if fnotes = "" then "notes"
-      else
-        begin
-          begin try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with
-            _ -> ()
-          end;
-          Filename.concat "notes_d" (fnotes ^ ".txt")
-        end
-    in
+    let dir_notes = (Path.path_from_bname bname).Path.dir_notes in
+    if not (Sys.file_exists dir_notes)
+    then Unix.mkdir dir_notes 0o755 ;
+    let fname = if fnotes = "" then "notes" else fnotes in
+    let fname = Filename.concat dir_notes (fname ^ ".txt") in
     let fname = Filename.concat bname fname in
     (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
     (try Sys.rename fname (fname ^ "~") with _ -> ());

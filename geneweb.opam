@@ -1,5 +1,7 @@
 opam-version: "2.0"
 
+synopsis: "Genealogy library and software"
+
 maintainer: [ "Julien Sagot <julien.sagot@geneanet.org>" ]
 
 authors: [ "Daniel de Rauglaudre" ]
@@ -30,21 +32,12 @@ pin-depends: [
 ]
 
 depends: [
+  "benchmark" { with-test }
   "camlp5" { build }
   "cppo" { build }
-  "dune" { build>= "1.1.1" }
+  "dune" { build >= "1.1.1" }
   "markup"
   "ocaml" { >= "4.05" }
-  "ocurl" { = "0.8.1" }
-  "ounit"
-  "piqi"
-  "piqilib"
-  "redis"
-  "redis-sync"
-  "yojson"
-]
-
-depexts: [
-  [ [ "ubuntu" "linux" ] [ "protobuf-compiler" ] ]
-  [ [ "homebrew" "osx" ] [ "protobuf" ] ]
+  "ounit" { with-test }
+  "stdlib-shims"
 ]

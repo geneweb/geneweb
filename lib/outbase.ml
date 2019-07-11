@@ -26,10 +26,10 @@ let just_copy bname what oc oc_acc =
   if !verbose then Printf.eprintf "*** copying %s\n" what;
   flush stderr;
   let ic =
-    let ic = Secure.open_in_bin (Filename.concat bname "base") in
+    let ic = Secure.open_in_bin (Path.path_from_bname bname).Path.file_base in
     Dutil.check_magic ic; ic
   in
-  let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
+  let ic_acc = Secure.open_in_bin (Path.path_from_bname bname).Path.file_base_acc in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
@@ -200,7 +200,7 @@ let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
      table will not be used in versions >= 4.10 *)
   Mutil.output_value_no_sharing oc2 (!bt : iper list IstrTree.t);
   (* new table created from version >= 4.10 *)
-  let oc_sn_dat = Secure.open_out_bin tmp_snames_dat in
+  let oc_sn_dat = tmp_snames_dat in
   let bt2 =
     IstrTree.map
       (fun ipl ->
@@ -212,11 +212,11 @@ let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
       !bt
   in
   close_out oc_sn_dat;
-  let oc_sn_inx = Secure.open_out_bin tmp_snames_inx in
+  let oc_sn_inx = tmp_snames_inx in
   Mutil.output_value_no_sharing oc_sn_inx (bt2 : int IstrTree.t);
   close_out oc_sn_inx
 
-let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
+let output_first_name_index oc2 base oc_fn_inx oc_fn_dat =
   let module IstrTree =
     Btree.Make
       (struct
@@ -235,7 +235,6 @@ let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
      table will not be used in versions >= 4.10 *)
   Mutil.output_value_no_sharing oc2 (!bt : iper list IstrTree.t);
   (* new table created from version >= 4.10 *)
-  let oc_fn_dat = Secure.open_out_bin tmp_fnames_dat in
   let bt2 =
     IstrTree.map
       (fun ipl ->
@@ -247,26 +246,25 @@ let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
       !bt
   in
   close_out oc_fn_dat;
-  let oc_fn_inx = Secure.open_out_bin tmp_fnames_inx in
   Mutil.output_value_no_sharing oc_fn_inx (bt2 : int IstrTree.t);
   close_out oc_fn_inx
 
 let gen_output no_patches bname base =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
-  (try Unix.mkdir bname 0o755 with _ -> ());
-  let tmp_base = Filename.concat bname "1base" in
-  let tmp_base_acc = Filename.concat bname "1base.acc" in
-  let tmp_names_inx = Filename.concat bname "1names.inx" in
-  let tmp_names_acc = Filename.concat bname "1names.acc" in
-  let tmp_snames_inx = Filename.concat bname "1snames.inx" in
-  let tmp_snames_dat = Filename.concat bname "1snames.dat" in
-  let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
-  let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
-  let tmp_strings_inx = Filename.concat bname "1strings.inx" in
-  let tmp_notes = Filename.concat bname "1notes" in
-  let tmp_notes_d = Filename.concat bname "1notes_d" in
+  let open Path in
+  let tmp fname = Filename.open_temp_file ~mode:[ Open_binary ] ~perms:0o644 fname "" in
+  let path = path_from_bname bname in
+  Mutil.mkdir_p path.dir_root ;
+  let tmp_base_fn, tmp_base_oc =  tmp "base" in
+  let tmp_base_acc_fn, tmp_base_acc_oc = tmp "base.acc" in
+  let tmp_names_inx_fn, tmp_names_inx_oc = tmp "names.inx" in
+  let tmp_names_acc_fn, tmp_names_acc_oc = tmp "names.acc" in
+  let tmp_snames_inx_fn, tmp_snames_inx_oc = tmp "snames.inx" in
+  let tmp_snames_dat_fn, tmp_snames_dat_oc = tmp "snames.dat" in
+  let tmp_fnames_inx_fn, tmp_fnames_inx_oc = tmp "fnames.inx" in
+  let tmp_fnames_dat_fn, tmp_fnames_dat_oc = tmp "fnames.dat" in
+  let tmp_strings_inx_fn, tmp_strings_inx_oc = tmp "strings.inx" in
+  let tmp_notes = Filename.concat path.dir_my_base "notes.tmp" in
+  let tmp_notes_d = Filename.concat path.dir_my_base "notes_d.tmp" in
   if not no_patches then
     begin
       load_ascends_array base;
@@ -275,164 +273,151 @@ let gen_output no_patches bname base =
       load_descends_array base;
       load_strings_array base
     end;
-  let oc = Secure.open_out_bin tmp_base in
-  let oc_acc = Secure.open_out_bin tmp_base_acc in
   let output_array arrname arr =
-    let bpos = pos_out oc in
+    let bpos = pos_out tmp_base_oc in
     if !verbose then Printf.eprintf "*** saving %s array\n" arrname;
     flush stderr;
-    arr.output_array oc;
-    let epos = Iovalue.output_array_access oc_acc arr.get arr.len bpos in
-    if epos <> pos_out oc then count_error epos (pos_out oc)
+    arr.output_array tmp_base_oc;
+    let epos = Iovalue.output_array_access tmp_base_acc_oc arr.get arr.len bpos in
+    if epos <> pos_out tmp_base_oc then count_error epos (pos_out tmp_base_oc)
   in
   begin try
-    output_string oc Dutil.magic_gwb;
-    output_binary_int oc base.data.persons.len;
-    output_binary_int oc base.data.families.len;
-    output_binary_int oc base.data.strings.len;
-    let array_start_indexes = pos_out oc in
-    output_binary_int oc 0;
-    output_binary_int oc 0;
-    output_binary_int oc 0;
-    output_binary_int oc 0;
-    output_binary_int oc 0;
-    output_binary_int oc 0;
-    output_binary_int oc 0;
-    Mutil.output_value_no_sharing oc (base.data.bnotes.norigin_file : string);
-    let persons_array_pos = pos_out oc in
+    output_string tmp_base_oc Dutil.magic_gwb;
+    output_binary_int tmp_base_oc base.data.persons.len;
+    output_binary_int tmp_base_oc base.data.families.len;
+    output_binary_int tmp_base_oc base.data.strings.len;
+    let array_start_indexes = pos_out tmp_base_oc in
+    output_binary_int tmp_base_oc 0;
+    output_binary_int tmp_base_oc 0;
+    output_binary_int tmp_base_oc 0;
+    output_binary_int tmp_base_oc 0;
+    output_binary_int tmp_base_oc 0;
+    output_binary_int tmp_base_oc 0;
+    output_binary_int tmp_base_oc 0;
+    Mutil.output_value_no_sharing tmp_base_oc (base.data.bnotes.norigin_file : string);
+    let persons_array_pos = pos_out tmp_base_oc in
     if not no_patches then output_array "persons" base.data.persons
-    else just_copy bname "persons" oc oc_acc;
-    let ascends_array_pos = pos_out oc in
+    else just_copy bname "persons" tmp_base_oc tmp_base_acc_oc;
+    let ascends_array_pos = pos_out tmp_base_oc in
     if not no_patches then () else trace "saving ascends";
     output_array "ascends" base.data.ascends;
-    let unions_array_pos = pos_out oc in
+    let unions_array_pos = pos_out tmp_base_oc in
     if not no_patches then output_array "unions" base.data.unions
-    else just_copy bname "unions" oc oc_acc;
-    let families_array_pos = pos_out oc in
+    else just_copy bname "unions" tmp_base_oc tmp_base_acc_oc;
+    let families_array_pos = pos_out tmp_base_oc in
     if not no_patches then output_array "families" base.data.families
-    else just_copy bname "families" oc oc_acc;
-    let couples_array_pos = pos_out oc in
+    else just_copy bname "families" tmp_base_oc tmp_base_acc_oc;
+    let couples_array_pos = pos_out tmp_base_oc in
     if not no_patches then output_array "couples" base.data.couples
-    else just_copy bname "couples" oc oc_acc;
-    let descends_array_pos = pos_out oc in
+    else just_copy bname "couples" tmp_base_oc tmp_base_acc_oc;
+    let descends_array_pos = pos_out tmp_base_oc in
     if not no_patches then output_array "descends" base.data.descends
-    else just_copy bname "descends" oc oc_acc;
-    let strings_array_pos = pos_out oc in
+    else just_copy bname "descends" tmp_base_oc tmp_base_acc_oc;
+    let strings_array_pos = pos_out tmp_base_oc in
     if not no_patches then output_array "strings" base.data.strings
-    else just_copy bname "strings" oc oc_acc;
-    seek_out oc array_start_indexes;
-    output_binary_int oc persons_array_pos;
-    output_binary_int oc ascends_array_pos;
-    output_binary_int oc unions_array_pos;
-    output_binary_int oc families_array_pos;
-    output_binary_int oc couples_array_pos;
-    output_binary_int oc descends_array_pos;
-    output_binary_int oc strings_array_pos;
+    else just_copy bname "strings" tmp_base_oc tmp_base_acc_oc;
+    seek_out tmp_base_oc array_start_indexes;
+    output_binary_int tmp_base_oc persons_array_pos;
+    output_binary_int tmp_base_oc ascends_array_pos;
+    output_binary_int tmp_base_oc unions_array_pos;
+    output_binary_int tmp_base_oc families_array_pos;
+    output_binary_int tmp_base_oc couples_array_pos;
+    output_binary_int tmp_base_oc descends_array_pos;
+    output_binary_int tmp_base_oc strings_array_pos;
     base.data.families.clear_array ();
     base.data.descends.clear_array ();
-    close_out oc;
-    close_out oc_acc;
-    if not no_patches then
-      begin let oc_inx = Secure.open_out_bin tmp_names_inx in
-        let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
-        let oc2 = Secure.open_out_bin tmp_strings_inx in
-        try
-          trace "create name index";
-          output_binary_int oc_inx 0;
-          create_name_index oc_inx oc_inx_acc base;
-          base.data.ascends.clear_array ();
-          base.data.unions.clear_array ();
-          base.data.couples.clear_array ();
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let surname_or_first_name_pos = pos_out oc_inx in
-          trace "create strings of fsname";
-          create_strings_of_fsname oc_inx oc_inx_acc base;
-          seek_out oc_inx 0;
-          output_binary_int oc_inx surname_or_first_name_pos;
-          close_out oc_inx;
-          close_out oc_inx_acc;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
-          trace "create string index";
-          output_strings_hash oc2 base;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let surname_pos = pos_out oc2 in
-          trace "create surname index";
-          output_surname_index oc2 base tmp_snames_inx tmp_snames_dat;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let first_name_pos = pos_out oc2 in
-          trace "create first name index";
-          output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat;
-          seek_out oc2 Mutil.int_size;
-          output_binary_int oc2 surname_pos;
-          output_binary_int oc2 first_name_pos;
-          let s = base.data.bnotes.nread "" RnAll in
-          if s = "" then ()
-          else
+    close_out tmp_base_oc;
+    close_out tmp_base_acc_oc;
+    if not no_patches then begin try
+        trace "create name index";
+        output_binary_int tmp_names_inx_oc 0;
+        create_name_index tmp_names_inx_oc tmp_names_acc_oc base;
+        base.data.ascends.clear_array ();
+        base.data.unions.clear_array ();
+        base.data.couples.clear_array ();
+        if !save_mem then begin trace "compacting"; Gc.compact () end;
+        let surname_or_first_name_pos = pos_out tmp_names_inx_oc in
+        trace "create strings of fsname";
+        create_strings_of_fsname tmp_names_inx_oc tmp_names_acc_oc base;
+        seek_out tmp_names_inx_oc 0;
+        output_binary_int tmp_names_inx_oc surname_or_first_name_pos;
+        close_out tmp_names_inx_oc;
+        close_out tmp_names_acc_oc;
+        if !save_mem then begin trace "compacting"; Gc.compact () end;
+        trace "create string index";
+        output_strings_hash tmp_strings_inx_oc base;
+        if !save_mem then begin trace "compacting"; Gc.compact () end;
+        let surname_pos = pos_out tmp_strings_inx_oc in
+        trace "create surname index";
+        output_surname_index tmp_strings_inx_oc base tmp_snames_inx_oc tmp_snames_dat_oc;
+        if !save_mem then begin trace "compacting"; Gc.compact () end;
+        let first_name_pos = pos_out tmp_strings_inx_oc in
+        trace "create first name index";
+        output_first_name_index tmp_strings_inx_oc base tmp_fnames_inx_oc tmp_fnames_dat_oc;
+        seek_out tmp_strings_inx_oc Mutil.int_size;
+        output_binary_int tmp_strings_inx_oc surname_pos;
+        output_binary_int tmp_strings_inx_oc first_name_pos;
+        (*  REORG *)
+        let s = base.data.bnotes.nread "" RnAll in
+            if s = "" then ()
+            else
             begin let oc_not = Secure.open_out tmp_notes in
-              output_string oc_not s; close_out oc_not
-            end;
-          close_out oc2;
-          List.iter
-            (fun f ->
-               let s = base.data.bnotes.nread f RnAll in
-               let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
-               Mutil.mkdir_p (Filename.dirname fname);
-               let oc = open_out fname in output_string oc s; close_out oc)
-            (List.rev (base.data.bnotes.efiles ()))
-        with e ->
-          (try close_out oc_inx with _ -> ());
-          (try close_out oc_inx_acc with _ -> ());
-          (try close_out oc2 with _ -> ());
-          raise e
-      end;
+            output_string oc_not s; close_out oc_not
+            end; (* *)
+        close_out tmp_strings_inx_oc;
+        List.iter
+          (fun f ->
+             let s = base.data.bnotes.nread f RnAll in
+             let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
+             Mutil.mkdir_p (Filename.dirname fname);
+             let oc = open_out fname in output_string oc s; close_out oc)
+          (List.rev (base.data.bnotes.efiles ()))
+      with e ->
+        (try close_out tmp_names_inx_oc with _ -> ());
+        (try close_out tmp_names_acc_oc with _ -> ());
+        (try close_out tmp_strings_inx_oc with _ -> ());
+        raise e
+    end;
     trace "ok"
   with e ->
-    (try close_out oc with _ -> ());
-    (try close_out oc_acc with _ -> ());
-    Mutil.remove_file tmp_base;
-    Mutil.remove_file tmp_base_acc;
-    if not no_patches then
-      begin
-        Mutil.remove_file tmp_names_inx;
-        Mutil.remove_file tmp_names_acc;
-        Mutil.remove_file tmp_strings_inx;
-        Mutil.remove_dir tmp_notes_d
-      end;
+    (try close_out tmp_base_oc with _ -> ());
+    (try close_out tmp_base_acc_oc with _ -> ());
+    Mutil.rm tmp_base_fn;
+    Mutil.rm tmp_base_acc_fn;
+    Mutil.rm tmp_names_inx_fn;
+    Mutil.rm tmp_names_acc_fn;
+    Mutil.rm tmp_strings_inx_fn;
+    Mutil.rm_rf tmp_notes_d ;
     raise e
   end;
   close_base base;
-  Mutil.remove_file (Filename.concat bname "base");
-  Sys.rename tmp_base (Filename.concat bname "base");
-  Mutil.remove_file (Filename.concat bname "base.acc");
-  Sys.rename tmp_base_acc (Filename.concat bname "base.acc");
+  Mutil.rm path.file_base ;
+  Mutil.rn tmp_base_fn path.file_base ;
+  Mutil.rm path.file_base_acc;
+  Mutil.rn tmp_base_acc_fn path.file_base_acc;
   if not no_patches then
     begin
-      Mutil.remove_file (Filename.concat bname "names.inx");
-      Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
-      Mutil.remove_file (Filename.concat bname "names.acc");
-      Sys.rename tmp_names_acc (Filename.concat bname "names.acc");
-      Mutil.remove_file (Filename.concat bname "snames.dat");
-      Sys.rename tmp_snames_dat (Filename.concat bname "snames.dat");
-      Mutil.remove_file (Filename.concat bname "snames.inx");
-      Sys.rename tmp_snames_inx (Filename.concat bname "snames.inx");
-      Mutil.remove_file (Filename.concat bname "fnames.dat");
-      Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
-      Mutil.remove_file (Filename.concat bname "fnames.inx");
-      Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
-      Mutil.remove_file (Filename.concat bname "strings.inx");
-      Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
-      Mutil.remove_file (Filename.concat bname "notes");
-      if Sys.file_exists tmp_notes then
-        Sys.rename tmp_notes (Filename.concat bname "notes");
+      let mv src dst = Mutil.rm dst ; Sys.rename src dst in
+      mv tmp_names_inx_fn path.file_names_inx ;
+      mv tmp_names_acc_fn path.file_names_acc ;
+      mv tmp_snames_dat_fn path.file_snames_dat ;
+      mv tmp_snames_inx_fn path.file_snames_inx ;
+      mv tmp_fnames_dat_fn path.file_fnames_dat ;
+      mv tmp_fnames_inx_fn path.file_fnames_inx ;
+      mv tmp_strings_inx_fn path.file_strings_inx ;
+      (* REORG *)
+      Mutil.rm path.file_notes;
       if Sys.file_exists tmp_notes_d then
-        begin let notes_d = Filename.concat bname "notes_d" in
-          Mutil.remove_dir notes_d; Sys.rename tmp_notes_d notes_d
+        begin let notes_d = path.dir_notes in
+          Mutil.rm_rf notes_d; 
+          Mutil.rn tmp_notes_d notes_d
         end;
-      Mutil.remove_file (Filename.concat bname "patches");
-      Mutil.remove_file (Filename.concat bname "patches~");
-      Mutil.remove_file (Filename.concat bname "tstab");
-      Mutil.remove_file (Filename.concat bname "tstab_visitor");
-      Mutil.remove_file (Filename.concat bname "restrict")
+      if Sys.file_exists tmp_notes then
+        Mutil.rn tmp_notes path.file_notes;
+      Mutil.rm path.file_patches;
+      Mutil.rm path.file_ts;
+      Mutil.rm path.file_ts_visitor;
+      Mutil.rm path.file_restrict
     end
 
 let output = gen_output false

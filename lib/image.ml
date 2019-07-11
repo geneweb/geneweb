@@ -26,7 +26,7 @@ let content ct len fname =
   Wserver.wflush ()
 
 (* ************************************************************************** *)
-(*  [Fonc] print_image_type : string -> string -> bool                        *)
+(*  [Fonc] print_image_type : config -> string -> string -> bool              *)
 (** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
                     utilisant Wserver.
     [Args] :
@@ -71,19 +71,21 @@ let print_image_file fname =
      (".htm", "text/html"); (".html", "text/html")]
 
 (* ************************************************************************** *)
-(*  [Fonc] print_personal_image : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(*  [Fonc] print_personal_image : Config.config -> Gwdb.base ->               *)
+(*                   Gwdb.person -> string -> unit                            *)
 (** [Description] : Affiche l'image d'une personne en réponse HTTP.
     [Args] :
       - conf : configuration de la requête
       - base : base de donnée sélectionnée
       - p : personne dans la base dont il faut afficher l'image
+      - saved : "" ou "saved" dossier où peut être sauvegardé l'image
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-let print_personal_image conf base p =
-  match Util.image_and_size conf base p (fun _ _ -> Some (1, 1)) with
-    Some (true, f, _) ->
-      if print_image_file f then () else Hutil.incorrect_request conf
+let print_personal_image ?bak conf base p =
+  match Util.image_and_size ?bak conf base p (fun _ _ -> Some (1, 1)) with
+    Some (`File f, _) ->
+      if not (print_image_file f) then Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
@@ -100,21 +102,41 @@ let print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  if fname = Filename.basename fname then
-    let fname = Util.source_image_file_name conf.bname fname in
-    if print_image_file fname then () else Hutil.incorrect_request conf
-  else Hutil.incorrect_request conf
+  let fname =
+    let fname1 = Filename.concat conf.path.Path.dir_images fname in
+    if Sys.file_exists fname1 then fname1
+    else let fname2 = Filename.concat conf.path.Path.dir_documents fname in
+      if Sys.file_exists fname2 then fname2
+      else Util.search_in_lang_path (Filename.concat "images" fname)
+  in
+  if Sys.file_exists fname then
+    (if not (print_image_file fname) then Hutil.incorrect_request conf)
+  else Hutil.error_message conf (Printf.sprintf "Cannot access file %s\n" fname)
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
 let print conf base =
-  match Util.p_getenv conf.env "s" with
-    Some f -> print_source_image conf f
-  | None ->
-      match Util.find_person_in_env conf base "" with
-        Some p -> print_personal_image conf base p
-      | _ -> Hutil.incorrect_request conf
+  match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
+  | (Some f, Some p) ->
+      let keydir = Util.default_image_name base p in
+      print_source_image conf (Filename.concat keydir f)
+  | (Some f, _) ->
+      print_source_image conf f
+  | (_, Some p) ->
+      print_personal_image conf base p
+  | (_, _) -> Hutil.incorrect_request conf
+
+let print_saved conf base =
+  match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
+  | (Some f, Some p) ->
+      let keydir = Util.default_image_name base p in
+      print_source_image conf (Filename.concat (Filename.concat keydir "saved") f)
+  | (Some f, _) ->
+      print_source_image conf f
+  | (_, Some p) ->
+      print_personal_image ~bak:true conf base p
+  | (_, _) -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
 (*  [Fonc] print_html : config -> 'a -> unit                                  *)
@@ -128,7 +150,7 @@ let print_html conf =
   Wserver.printf "<img src=\"%s" (Util.commd conf);
   Mutil.list_iter_first
     (fun first (k, v) ->
-       let v = if k = "m" then "IM" else v in
+       let v = if k = "m" then "DOC" else v in
        Wserver.printf "%s%s=%s" (if first then "" else "&") k v)
     conf.env;
   Wserver.printf "\"%s>\n</body>\n</html>" conf.xhs

@@ -12,8 +12,8 @@ module DataSet =
     (struct
        type t = Gwdb.istr * string * int
        let compare (_, s1, i1) (_, s2, i2) =
-         let comp_s = Pervasives.compare s1 s2 in
-         if comp_s = 0 then Pervasives.compare i1 i2 else comp_s
+         let comp_s = Stdlib.compare s1 s2 in
+         if comp_s = 0 then Stdlib.compare i1 i2 else comp_s
      end)
 
 module PersMap = Map.Make (struct type t = int let compare = compare end)
@@ -25,7 +25,7 @@ module PersSet =
        let compare p1 p2 =
          let i1 = Adef.int_of_iper (get_key_index p1) in
          let i2 = Adef.int_of_iper (get_key_index p2) in
-         Pervasives.compare i1 i2
+         Stdlib.compare i1 i2
      end)
 
 module StringSet = Set.Make (struct type t = string let compare = compare end)

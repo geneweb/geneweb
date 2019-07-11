@@ -788,10 +788,6 @@ let print_link_name conf base n p1 p2 sol =
   in
   Wserver.printf "%s.\n" (Util.translate_eval s)
 
-let wprint_num conf n =
-  Sosa.print (fun x -> Wserver.printf "%s" x)
-    (transl conf "(thousand separator)") n
-
 let string_of_big_int conf i =
   let sep = transl conf "(thousand separator)" in
   let rec glop i =
@@ -1323,9 +1319,8 @@ let print_main_relationship conf base long p1 p2 rel =
     if Sosa.eq total Sosa.zero then ()
     else
       begin
-        Wserver.printf " (";
-        wprint_num conf total;
-        Wserver.printf " %s)"
+        Wserver.printf " (%s %s)"
+          (Sosa.to_string_sep (transl conf "(thousand separator)") total)
           (transl_nth conf "relationship link/relationship links"
              (if Sosa.eq total Sosa.one then 0 else 1))
       end
@@ -1344,7 +1339,7 @@ let print_main_relationship conf base long p1 p2 rel =
   Hutil.print_link_to_welcome conf true;
   Opt.iter
     (Templ.copy_from_templ conf conf.env)
-    (Util.open_templ conf "buttons_rel") ;
+    (Util.open_template conf "buttons_rel") ;
   begin match p_getenv conf.env "spouse" with
     Some "on" -> conf.senv <- conf.senv @ ["spouse", "on"]
   | _ -> ()

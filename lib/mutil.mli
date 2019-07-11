@@ -1,19 +1,16 @@
-(* $Id: mutil.mli,v 5.16 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
+
+(** Misc utilities independants from any other Geneweb module. *)
 
 val int_size : int
 val verbose : bool ref
 
 val list_iter_first : (bool -> 'a -> unit) -> 'a list -> unit
-val tr : char -> char -> string -> string
 val strip_all_trailing_spaces : string -> string
 
 val decline : char -> string -> string
 val nominative : string -> string
 
-val remove_file : string -> unit
-val mkdir_p : string -> unit
-val remove_dir : string -> unit
 val lock_file : string -> string
 
 val output_value_no_sharing : out_channel -> _ -> unit
@@ -37,6 +34,19 @@ val input_lexicon :
 
 module StrSet : Set.S with type elt = string
 
+(** [tr c1 c2 str]
+    Return a new string which is the same as [str] with all occurences of [c1]
+    replaced by [c2].
+    If [str] does not contain [c1]. [str] is returned intouched.
+
+ *)
+val tr : char -> char -> string -> string
+
+(** [unsafe_tr c1 c2 str]
+    Update [str] in place. Replace all occurences of [c1] replaced by [c2].
+ *)
+val unsafe_tr : char -> char -> string -> string
+
 (** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
     but it does not allocate an intermediate list.
 
@@ -44,6 +54,16 @@ module StrSet : Set.S with type elt = string
     so if [fn] have side effects it may not behave as excepted.
  *)
 val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
+
+(** [filter_map fn list] is a combination of map and filter.
+    Not tail-recursive.
+*)
+val filter_map : ('a -> 'b option) -> 'a list -> 'b list
+
+(** [rev_iter fn list] is like [List.iter fn (List.rev list)].
+    Not tail-recursive.
+*)
+val rev_iter : ('a -> unit) -> 'a list -> unit
 
 (** [start_with ?wildcard prefix off str]
     Test if [str] starts with [prefix] (at offset [off]).
@@ -65,3 +85,38 @@ val contains : ?wildcard:bool -> string -> string -> bool
     Return [p] where [p] is in [particles] and is prefix of [name].
     If no such [p] exists, empty string [""] is returned. *)
 val get_particle : string list -> string -> string
+
+(** [string_of_int_sep "," 1000000] is ["1,000,000"]
+*)
+val string_of_int_sep : string -> int -> string
+
+(** [ls_rs dirs]
+    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
+*)
+val ls_r : string list -> string list
+
+(** [rm_rf dir]
+    Remove directory [dir] and everything inside [dir].
+*)
+val rm_rf : string -> unit
+
+(** [rm fname]
+    Remove [fname]. If [fname] does not exists, do nothing.
+*)
+val rm : string -> unit
+
+(** [rn fname s]
+    Rename [fname] to [s]. If [fname] does not exists, do nothing.
+*)
+val rn : string -> string -> unit
+
+(** [mkdir_p d]
+    Create [d] directory.
+    No error if existing, make parent directories as needed
+*)
+val mkdir_p : string -> unit
+
+(** [copy_r s d]
+    Copy recirsively source [s] into destination [d]
+*)
+val copy_r : string -> string -> unit
