@@ -1270,7 +1270,7 @@ let write_file_contents fname text =
 
 let output_wizard_notes bdir wiznotes =
   let wizdir = (Path.path_from_bname bdir).Path.dir_wiznotes in
-  Mutil.rm_rf wizdir;
+  Mutil.rm_rf wizdir ;
   if wiznotes = [] then ()
   else
     begin

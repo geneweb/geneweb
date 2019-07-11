@@ -442,35 +442,37 @@ let rm fname =
 let rn fname s =
   if Sys.file_exists fname then Sys.rename fname s
 
-
-let rec rm_rf file =
-  let infos = Unix.lstat file in
-  try
-    match infos.Unix.st_kind with
-    | Unix.S_REG | Unix.S_LNK ->
-        Unix.unlink file ;
-    | Unix.S_DIR->
-        let ls = Array.to_list (Sys.readdir file) in
-        List.iter
-          (fun f ->
-            if f <> "." && f <> ".."
-            then
-              rm_rf (Filename.concat file f) ) ls ;
-        (try Unix.rmdir file with _ -> ()) ;
-    | _ -> ()
-  with
-    Unix.Unix_error (code, funct, param) ->
-      Printf.eprintf "Unix_error %s %s %s\n" (Unix.error_message code) funct param ;
-      exit 2
-
 (*
-let rm_rf dir =
-  let (directories, files) = ls_r [dir] |> List.partition
-    (fun d -> (Unix.lstat d).Unix.st_kind = Unix.S_DIR)
-  in
-  List.iter Unix.unlink files ;
-  List.iter Unix.rmdir directories
+let rec rm_rf file =
+  if Sys.file_exists file then
+    let infos = Unix.lstat file in
+    try
+      match infos.Unix.st_kind with
+      | Unix.S_REG | Unix.S_LNK ->
+          Unix.unlink file ;
+      | Unix.S_DIR->
+          let ls = Array.to_list (Sys.readdir file) in
+          List.iter
+            (fun f ->
+              if f <> "." && f <> ".."
+              then
+                rm_rf (Filename.concat file f) ) ls ;
+          (try Unix.rmdir file with _ -> ()) ;
+      | _ -> ()
+    with
+      Unix.Unix_error (code, funct, param) ->
+        Printf.eprintf "Unix_error %s %s %s\n" (Unix.error_message code) funct param ;
+        exit 2
+  else ()
 *)
+
+
+let rm_rf dir =
+  if Sys.file_exists dir then
+    let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
+    List.iter Sys.remove files ;
+    List.iter Unix.rmdir directories
+  else ()
 
 let buffer_size = 8192
 let buffer = Bytes.create buffer_size

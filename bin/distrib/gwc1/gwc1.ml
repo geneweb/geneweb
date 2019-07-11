@@ -174,13 +174,13 @@ let main () =
             let base_bak = !out_file ^ date in
             Mutil.rn bdir base_bak ;
             Printf.eprintf "Backup %s into %s\n" bdir (!out_file ^ date) ;
-            (* create empty base folder structure *)
+            (* create empty base folder structure
             Unix.mkdir (Path.path_from_bname bname).Path.dir_my_base 0o766 ;
             Unix.mkdir (Path.path_from_bname bname).Path.dir_etc_b 0o766 ;
             Unix.mkdir (Path.path_from_bname bname).Path.dir_notes 0o766 ;
             Unix.mkdir (Path.path_from_bname bname).Path.dir_wiznotes 0o766 ;
             Unix.mkdir (Path.path_from_bname bname).Path.dir_cnt 0o766 ;
-            Unix.mkdir (Path.path_from_bname bname).Path.dir_lang_b 0o766 ;
+            Unix.mkdir (Path.path_from_bname bname).Path.dir_lang_b 0o766 ; *)
             base_bak
           end
         else ""
@@ -214,28 +214,27 @@ let main () =
           else !out_file ^ ".gwb"
         in
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-        if Db1link.link next_family_fun bdir then
-          begin
-            Printf.eprintf "Trying save_list (%d)\n" (List.length save_list) ;
-            try
-              List.iter (fun f ->
-                  let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
-                  if Sys.file_exists tmp_f then
-                    begin
-                      if Sys.file_exists f then Mutil.rm_rf f ;
-                      Mutil.copy_r tmp_f f
-                    end
-                  else () ) save_list
-              with _ ->
-                Printf.eprintf "*** database created, but problem with save_list\n" ;
-                flush stderr ; exit 22
-          end
+        if Db1link.link next_family_fun bdir then ()
         else
           begin
             Printf.eprintf "*** database not created\n";
             flush stderr;
             exit 2
-          end)
+          end) ;
+    Printf.eprintf "Trying save_list (%d)\n" (List.length save_list) ;
+    try
+      List.iter (fun f ->
+          let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
+          if Sys.file_exists tmp_f then
+            begin
+              Mutil.rm_rf f ; Mutil.copy_r tmp_f f
+            end
+          else () ) save_list
+    with _ ->
+      begin
+        Printf.eprintf "*** database created, but problem with save_list\n" ;
+        flush stderr ; exit 22
+      end ;
   end
   else ()
 

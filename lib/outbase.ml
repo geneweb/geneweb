@@ -358,35 +358,35 @@ let gen_output no_patches bname base =
         output_binary_int tmp_strings_inx_oc surname_pos;
         output_binary_int tmp_strings_inx_oc first_name_pos;
         (*  REORG *)
-        let s = base.data.bnotes.nread "" RnAll in
-            if s = "" then ()
-            else
-            begin let oc_not = Secure.open_out tmp_notes in
-            output_string oc_not s; close_out oc_not
-            end; (* *)
-        close_out tmp_strings_inx_oc;
         List.iter
           (fun f ->
              let s = base.data.bnotes.nread f RnAll in
              let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
              Mutil.mkdir_p (Filename.dirname fname);
              let oc = open_out fname in output_string oc s; close_out oc)
-          (List.rev (base.data.bnotes.efiles ()))
+          (List.rev (base.data.bnotes.efiles ())) ;
+        let s = base.data.bnotes.nread "" RnAll in
+        if s = "" then ()
+        else
+        begin let oc_not = Secure.open_out tmp_notes in
+        output_string oc_not s; close_out oc_not
+        end ;
+        close_out tmp_strings_inx_oc ;
       with e ->
-        (try close_out tmp_names_inx_oc with _ -> ());
-        (try close_out tmp_names_acc_oc with _ -> ());
-        (try close_out tmp_strings_inx_oc with _ -> ());
+        (try close_out tmp_names_inx_oc with _ -> ()) ;
+        (try close_out tmp_names_acc_oc with _ -> ()) ;
+        (try close_out tmp_strings_inx_oc with _ -> ()) ;
         raise e
     end;
     trace "ok"
   with e ->
-    (try close_out tmp_base_oc with _ -> ());
-    (try close_out tmp_base_acc_oc with _ -> ());
-    Mutil.rm tmp_base_fn;
-    Mutil.rm tmp_base_acc_fn;
-    Mutil.rm tmp_names_inx_fn;
-    Mutil.rm tmp_names_acc_fn;
-    Mutil.rm tmp_strings_inx_fn;
+    (try close_out tmp_base_oc with _ -> ()) ;
+    (try close_out tmp_base_acc_oc with _ -> ()) ;
+    Mutil.rm tmp_base_fn ;
+    Mutil.rm tmp_base_acc_fn ;
+    Mutil.rm tmp_names_inx_fn ;
+    Mutil.rm tmp_names_acc_fn ;
+    Mutil.rm tmp_strings_inx_fn ;
     Mutil.rm_rf tmp_notes_d ;
     raise e
   end;
@@ -406,17 +406,17 @@ let gen_output no_patches bname base =
       mv tmp_fnames_inx_fn path.file_fnames_inx ;
       mv tmp_strings_inx_fn path.file_strings_inx ;
       (* REORG *)
-      Mutil.rm path.file_notes;
+      if Sys.file_exists path.file_notes then Mutil.rm path.file_notes ;
       if Sys.file_exists tmp_notes_d then
         begin let notes_d = path.dir_notes in
-          Mutil.rm_rf notes_d; 
+          Mutil.rm_rf notes_d ; 
           Mutil.rn tmp_notes_d notes_d
-        end;
+        end ;
       if Sys.file_exists tmp_notes then
-        Mutil.rn tmp_notes path.file_notes;
-      Mutil.rm path.file_patches;
-      Mutil.rm path.file_ts;
-      Mutil.rm path.file_ts_visitor;
+        Mutil.rn tmp_notes path.file_notes ;
+      Mutil.rm path.file_patches ;
+      Mutil.rm path.file_ts ;
+      Mutil.rm path.file_ts_visitor ;
       Mutil.rm path.file_restrict
     end
 
