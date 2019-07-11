@@ -3496,7 +3496,7 @@ and eval_str_event_field conf base (p, p_auth)
         let env = ('k', (fun () ->
           string_of_int (Adef.int_of_iper (get_key_index p)))) :: env
         in
-        let src = string_with_macros conf env src in
+        let src = string_with_macros conf env (sou base src) in
         let src =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
