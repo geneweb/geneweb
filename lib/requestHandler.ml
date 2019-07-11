@@ -90,7 +90,7 @@ let try_find_with_one_first_name conf base n =
 
 let find_all conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with Failure _ -> None in
+  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
   match sosa_ref, sosa_nb with
     Some p, Some n ->
     if n <> Sosa.zero then
