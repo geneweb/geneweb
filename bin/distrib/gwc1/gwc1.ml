@@ -185,7 +185,7 @@ let main () =
       else ""
     in
     let save_list =
-      if !copy && !action = "backup" then
+      if !action = "backup" then
         let file_forum = (Path.path_from_bname bname).Path.file_forum in
         let dir_history = (Path.path_from_bname bname).Path.dir_history in
         let file_history = (Path.path_from_bname bname).Path.file_history in
@@ -202,12 +202,14 @@ let main () =
         Printf.eprintf "\n"
       end ;
     if !action = "backup" && not !copy && save_list <> [] then
+      let _ = Printf.eprintf "Clean save_list forlers\n" in
       try
         List.iter (fun f ->
           let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
           if Sys.file_exists tmp_f then Mutil.rm_rf f
           else () ) save_list 
       with _ -> Printf.eprintf "*** problem with save_list\n" ;
+    Printf.eprintf "Start creating base\n" ;
     Lock.control
       (Mutil.lock_file !out_file)
       false
