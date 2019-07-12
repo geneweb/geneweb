@@ -33,7 +33,6 @@ INSTALL_EXE = \
 
 ALL_EXE = \
 	$(INSTALL_EXE) \
-	bin/contrib/gui/gui \
 	bin/contrib/gwFix/gwFindCpl \
 	bin/contrib/gwFix/gwFixBase \
 	bin/contrib/gwFix/gwFixBurial \
