@@ -738,15 +738,15 @@ and print_specific_file_tail conf print fname strm =
       else copy_from_stream conf print (Stream.of_string s)
   | _ -> ()
 and print_selector conf print =
+  let win = not Sys.unix in
   let sel =
     try getenv conf.env "sel" with
       Not_found -> try Sys.getenv "HOME" with Not_found -> Sys.getcwd ()
   in
   let list =
     let sel =
-      if Sys.unix then sel
-      else if String.length sel = 3 && sel.[1] = ':' && sel.[2] = '\\' then
-        sel ^ "."
+      if win && String.length sel = 3 && sel.[1] = ':' && sel.[2] = '\\'
+      then sel ^ "."
       else sel
     in
     try
@@ -811,6 +811,18 @@ and print_selector conf print =
         print "sel=";
         let d = code_varenv d in
         print d;
+        let d =
+          if win && String.length d > 4 &&
+              d.[1] = ':' && d.[2] = '%' && d.[3] = '5' && d.[4] = 'C' then
+            (String.sub d 0 1) ^ ":\\" ^ (String.sub d 5 (String.length d - 5))
+          else d
+        in
+        let d = (* a second time as we may have c:\\xxx *)
+          if win && String.length d > 4 &&
+              d.[1] = ':' && d.[2] = '%' && d.[3] = '5' && d.[4] = 'C' then
+            (String.sub d 0 1) ^ ":\\" ^ (String.sub d 5 (String.length d - 5))
+          else d
+        in
         print "\">";
         print x;
         print "</a>";
