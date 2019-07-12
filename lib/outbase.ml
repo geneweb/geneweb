@@ -265,6 +265,7 @@ let gen_output no_patches bname base =
   let tmp_strings_inx_fn, tmp_strings_inx_oc = tmp "strings.inx" in
   let tmp_notes = Filename.concat path.dir_my_base "notes.tmp" in
   let tmp_notes_d = Filename.concat path.dir_my_base "notes_d.tmp" in
+  let tmp_wiznotes_d = Filename.concat path.dir_my_base "wiznotes_d.tmp" in
   if not no_patches then
     begin
       load_ascends_array base;
@@ -410,6 +411,11 @@ let gen_output no_patches bname base =
         begin let notes_d = path.dir_notes in
           Mutil.rm_rf notes_d ;
           Mutil.rn tmp_notes_d notes_d
+        end ;
+      if Sys.file_exists tmp_wiznotes_d then
+        begin let wiznotes_d = path.dir_wiznotes in
+          Mutil.rm_rf wiznotes_d ;
+          Mutil.rn tmp_wiznotes_d wiznotes_d
         end ;
       if Sys.file_exists tmp_notes then
         begin 
