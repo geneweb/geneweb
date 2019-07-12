@@ -810,7 +810,6 @@ and print_selector conf print =
           conf.env;
         print "sel=";
         let d = code_varenv d in
-        print d;
         let d =
           if win && String.length d > 4 &&
               d.[1] = ':' && d.[2] = '%' && d.[3] = '5' && d.[4] = 'C' then
@@ -823,6 +822,7 @@ and print_selector conf print =
             (String.sub d 0 1) ^ ":\\" ^ (String.sub d 5 (String.length d - 5))
           else d
         in
+        print d;
         print "\">";
         print x;
         print "</a>";
@@ -1413,9 +1413,15 @@ let cleanup_1 conf =
   else print_file conf "ok_clean.htm"
 
 let rec check_new_names conf l1 l2 =
+  let _ = Printf.eprintf "L1: " in
+  let _ = List.iter (fun (k, v) -> Printf.eprintf "k=%s, v=%s ," k v) l1 in
+  let _ = Printf.eprintf "\nL2: " in
+  let _ = List.iter (fun x -> Printf.eprintf "x=%s ," (strip_spaces x)) l2 in
+  let _ = Printf.eprintf "\n" in
+  let _ = flush stderr in
   match l1, l2 with
     (k, v) :: l, x :: m ->
-      if k <> x then begin print_file conf "err_outd.htm"; raise Exit end
+      if k <> (strip_spaces x) then begin print_file conf "err_outd.htm"; raise Exit end
       else if not (good_name v) then
         let conf = {conf with env = ("o", v) :: conf.env} in
         print_file conf "err_name.htm"; raise Exit

@@ -176,15 +176,8 @@ let main () =
               tm.Unix.tm_hour tm.Unix.tm_min
             in
             let base_bak = !out_file ^ date in
-            Mutil.rn bdir base_bak ;
+            Mutil.copy_r bdir base_bak ;
             Printf.eprintf "Backup %s into %s\n" bdir (!out_file ^ date) ;
-            (* create empty base folder structure
-            Unix.mkdir (Path.path_from_bname bname).Path.dir_my_base 0o766 ;
-            Unix.mkdir (Path.path_from_bname bname).Path.dir_etc_b 0o766 ;
-            Unix.mkdir (Path.path_from_bname bname).Path.dir_notes 0o766 ;
-            Unix.mkdir (Path.path_from_bname bname).Path.dir_wiznotes 0o766 ;
-            Unix.mkdir (Path.path_from_bname bname).Path.dir_cnt 0o766 ;
-            Unix.mkdir (Path.path_from_bname bname).Path.dir_lang_b 0o766 ; *)
             base_bak
           end
         else ""
@@ -231,7 +224,7 @@ let main () =
           let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
           if Sys.file_exists tmp_f then
             begin
-              Mutil.rm_rf f ; Mutil.copy_r tmp_f f
+             (* Mutil.rm_rf f ;*) Mutil.copy_r tmp_f f
             end
           else () ) save_list
     with _ ->

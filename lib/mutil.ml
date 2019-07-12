@@ -538,7 +538,7 @@ let rec copy_r source dest =
           set_infos dest infos
       | Unix.S_LNK ->
           let link = Unix.readlink source in
-          Unix.symlink link dest
+          if Sys.file_exists dest then Unix.unlink dest ; Unix.symlink link dest
       | Unix.S_DIR->
           mkdir_p dest ;
           let ls = Array.to_list (Sys.readdir source) in
