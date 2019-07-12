@@ -201,6 +201,13 @@ let main () =
         List.iter (fun s -> Printf.eprintf ", %s" s) save_list;
         Printf.eprintf "\n"
       end ;
+    if !action = "backup" && not !copy && save_list <> [] then
+      try
+        List.iter (fun f ->
+          let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
+          if Sys.file_exists tmp_f then Mutil.rm_rf f
+          else () ) save_list 
+      with _ -> Printf.eprintf "*** problem with save_list\n" ;
     Lock.control
       (Mutil.lock_file !out_file)
       false
@@ -218,20 +225,6 @@ let main () =
             flush stderr;
             exit 2
           end) ;
-    Printf.eprintf "Trying save_list (%d)\n" (List.length save_list) ;
-    try
-      List.iter (fun f ->
-          let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
-          if Sys.file_exists tmp_f then
-            begin
-             (* Mutil.rm_rf f ;*) Mutil.copy_r tmp_f f
-            end
-          else () ) save_list
-    with _ ->
-      begin
-        Printf.eprintf "*** database created, but problem with save_list\n" ;
-        flush stderr ; exit 22
-      end ;
   end
   else ()
 
