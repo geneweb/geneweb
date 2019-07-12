@@ -809,19 +809,16 @@ and print_selector conf print =
              then begin print k; print "="; print v; print ";" end)
           conf.env;
         print "sel=";
+        (* suppress encoding
         let d = code_varenv d in
-        let d =
-          if win && String.length d > 4 &&
-              d.[1] = ':' && d.[2] = '%' && d.[3] = '5' && d.[4] = 'C' then
-            (String.sub d 0 1) ^ ":\\" ^ (String.sub d 5 (String.length d - 5))
+        let d =  ( * may need second time as we may have c:\\xxx * )
+          if win && String.length d > 6 &&
+              d.[1] = '%' && d.[2] = '3' && d.[3] = 'A' && 
+              d.[4] = '%' && d.[5] = '5' && d.[6] = 'C'  then
+            (String.sub d 0 1) ^ ":\\" ^ (String.sub d 7 (String.length d - 7))
           else d
         in
-        let d = (* a second time as we may have c:\\xxx *)
-          if win && String.length d > 4 &&
-              d.[1] = ':' && d.[2] = '%' && d.[3] = '5' && d.[4] = 'C' then
-            (String.sub d 0 1) ^ ":\\" ^ (String.sub d 5 (String.length d - 5))
-          else d
-        in
+        *)
         print d;
         print "\">";
         print x;
