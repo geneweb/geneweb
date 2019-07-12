@@ -810,11 +810,6 @@ and print_selector conf print =
           conf.env;
         print "sel=";
         let d = code_varenv d in
-        let d = if Sys.unix then d
-          else begin
-            (String.sub d 0 1) ^ ":\\" ^ (String.sub d 9 (String.length d - 9))
-          end
-        in
         print d;
         print "\">";
         print x;
