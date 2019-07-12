@@ -408,7 +408,7 @@ let gen_output no_patches bname base =
       (* REORG *)
       if Sys.file_exists tmp_notes_d then
         begin let notes_d = path.dir_notes in
-          Mutil.rm_rf notes_d ; 
+          Mutil.rm_rf notes_d ;
           Mutil.rn tmp_notes_d notes_d
         end ;
       if Sys.file_exists tmp_notes then

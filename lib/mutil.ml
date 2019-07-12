@@ -439,12 +439,16 @@ let ls_r dirs =
 let rm fname =
   if Sys.file_exists fname then
   try Sys.remove fname
-  with Sys_error _ -> Printf.eprintf "Sys_error %s\n" fname
+  with Sys_error _ -> 
+    begin Printf.eprintf "Sys_error rm %s\n" fname ; exit 2
+    end
 
 let rn fname s =
   if Sys.file_exists fname then
   try Sys.rename fname s
-  with  Sys_error _ -> Printf.eprintf "Sys_error %s %s\n" fname s
+  with Sys_error _ ->
+    begin Printf.eprintf "Sys_error rn %s %s\n" fname s ; exit 2
+    end
 
 (*
 let rec rm_rf file =
@@ -465,8 +469,10 @@ let rec rm_rf file =
       | _ -> ()
     with
       Unix.Unix_error (code, funct, param) ->
-        Printf.eprintf "Unix_error %s %s %s\n" (Unix.error_message code) funct param ;
-        exit 2
+        begin
+          Printf.eprintf "Unix_error %s %s %s\n"
+            (Unix.error_message code) funct param ; exit 2
+        end
   else ()
 *)
 
@@ -474,8 +480,21 @@ let rec rm_rf file =
 let rm_rf dir =
   if Sys.file_exists dir then
     let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
-    List.iter Sys.remove files ;
-    List.iter Unix.rmdir directories
+    List.iter 
+    (fun f ->
+      try Sys.remove f
+      with Unix.Unix_error (code, funct, param) ->
+        begin
+          Printf.eprintf "Unix_error rm_rf %s %s %s\n"
+            (Unix.error_message code) funct param ; exit 2
+        end) files ;
+    List.iter 
+    (fun d ->
+      try Unix.rmdir d
+      with Sys_error _ -> 
+        begin
+          Printf.eprintf "Sys_error rr_rf %s \n" d ; exit 2
+        end) directories
   else ()
 
 let buffer_size = 8192
@@ -500,7 +519,11 @@ let set_infos filename infos =
       Unix.chmod filename infos.Unix.st_perm ;
       try
         Unix.chown filename infos.Unix.st_uid infos.Unix.st_gid
-      with Unix.Unix_error(Unix.EPERM,_,_) -> ()
+      with Unix.Unix_error (code, funct, param) ->
+        begin
+          Printf.eprintf "Unix_error %s %s %s\n"
+            (Unix.error_message code) funct param ; exit 2
+        end
     end
   else ()
 
@@ -531,6 +554,8 @@ let rec copy_r source dest =
       | _ -> ()
     with
       Unix.Unix_error (code, funct, param) ->
-        Printf.eprintf "Unix_error %s %s %s\n" (Unix.error_message code) funct param ;
-        exit 2
+        begin
+          Printf.eprintf "Unix_error %s %s %s\n"
+            (Unix.error_message code) funct param ; exit 2
+        end
   else ()

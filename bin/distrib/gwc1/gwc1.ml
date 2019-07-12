@@ -124,8 +124,12 @@ let main () =
   Mutil.verbose := false;
   Argl.parse speclist anonfun errmsg;
   Secure.set_base_dir (Filename.dirname !out_file);
+  if !action = "update" then copy := false ;
   if !force then action := "backup" ;
-  if !upd then action := "update" ;
+  if !upd then
+    begin
+      action := "update" ; copy := false
+    end ;
   if !force && !upd then copy := true ;
   let gwo = ref [] in
   List.iter

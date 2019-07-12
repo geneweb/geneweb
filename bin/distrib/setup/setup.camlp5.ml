@@ -789,6 +789,7 @@ and print_selector conf print =
     List.fold_left (fun max_len (_, x) -> max max_len (String.length x)) 0
       list
   in
+  let list = List.sort compare list in
   let min_interv = 2 in
   let line_len = 72 in
   let n_by_line = max 1 ((line_len + min_interv) / (max_len + min_interv)) in
@@ -808,7 +809,13 @@ and print_selector conf print =
              then begin print k; print "="; print v; print ";" end)
           conf.env;
         print "sel=";
-        print (code_varenv d);
+        let d = code_varenv d in
+        let d = if Sys.unix then d
+          else begin
+            (String.sub d 0 1) ^ ":\\" ^ (String.sub d 9 (String.length d - 9))
+          end
+        in
+        print d;
         print "\">";
         print x;
         print "</a>";

@@ -21,7 +21,9 @@ sv: Importera en GeneWeb källfil
 
 <body %Vbody_prop;>
 
-<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<div style="background:url('images/gwlogo.png')
+  no-repeat left top; text-align:center;
+  height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
 de: GeneWeb-Quelldatei importieren
@@ -67,9 +69,12 @@ fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers :
 </td></tr>
 <tr align=left><td>
 <ul><li>[
-en: or provide directly the name of the GeneWeb source file(s) relative to the path above.<br>
-    If this parameter contains the '*' character, you must provide a unique name for created database.
-fr: ou donnez directement le nom du ou des fichiers source GeneWeb en complément du chemin ci-dessus.<br>
+en: or provide directly the name of the GeneWeb source file(s) relative to the
+    path above.<br>
+    If this parameter contains the '*' character, you must provide a unique
+    name for created database.
+fr: ou donnez directement le nom du ou des fichiers source GeneWeb en
+    complément du chemin ci-dessus.<br>
     Si ce paramètre contient le caractère '*', il sera impératif de fournir un
     nom unique pour la base qui sera créée.
 ]
@@ -89,12 +94,13 @@ fr: Note :
 <td>[
 en: ../ allows you to reach the parent directory.<br>
     On Windows operating systems, this will be
-    insufficient to change the drive letter (C:\ -> D:\), but you can do this directly
-    in the URL in your navigator.
+    insufficient to change the drive letter (C:\ -> D:\), but you can do
+    this directly in the URL in your navigator.
 fr: ../ vous permet de naviguer vers le dossier parent.<br>
     Sur les systèmes d’exploitation Windows, ceci ne
-    vous permettra pas de changer la lettre du disque (C:\ -> D:\), mais vous pouvez faire
-    ce changement directement dans l'URL de votre navigateur.
+    vous permettra pas de changer la lettre du disque (C:\ -> D:\),
+    mais vous pouvez faire ce changement directement dans l'URL de votre
+    navigateur.
 ]</td></tr>
 </table>
 </span>
@@ -201,15 +207,16 @@ sv: Avsluta med att beräkna blodsbanden.
 <p>
 <table class="setup">
 <tr align=left>
-<td>-action</td>
+<td colspan="2">-action</td>
 </tr>
 <tr valign="top">
 <td><input type=radio id=action name=action value="backup" valign="top">   </td>
 <td><label for=action>[
 en: Import the base and suppress existing data (creates a backup beforehand).<br>
-    <span style="font-size:80%%">Depending on size of the base and its
+    <span style="font-size:80%%">Depending on the size of the base and its
     associated documents (images), this operation may take some time.</span>
-fr: Importer la base et écraser l'existant (crée une sauvegarde des données auparavant).<br>
+fr: Importer la base et écraser l'existant (crée une sauvegarde des données
+    auparavant).<br>
     <span style="font-size:80%%">En fonction de la taille de la base et des
     documents associés (images), cette opération peut prendre un
     certain temps.</span>
@@ -220,7 +227,8 @@ fr: Importer la base et écraser l'existant (crée une sauvegarde des données a
 %J{
 [
 en: Copy the saved etc/document/history/forum folders in the new base.<br>
-fr: Recopier les dossiers sauvegardés etc/document/history/forum dans la nouvelle base.<br>
+fr: Recopier les dossiers sauvegardés etc/document/history/forum dans
+    la nouvelle base.<br>
 ]
 |
 [
@@ -230,13 +238,15 @@ fr: Recopier les dossiers sauvegardés history et forum dans la nouvelle base.<b
 }
 </label>
 </tr>
-<tr align=left>
+<tr valign="top">
 <td><input type=radio id=action name=action value="update">   </td>
 <td><label for=action>[
-en: Import the base without destroying possibly pre-existing folders.
-    (documents/etc/forum/history)
-fr: Importer la base sans détruire les dossiers annexes existant éventuellement.
-    (documents/etc/forum/history)
+en: Import the base without destroying possibly pre-existing folders
+    (documents/etc/forum/history).<br>
+    <span style="font-size:80%%">The "copy" option above will be ignored.</span>
+fr: Importer la base sans détruire les dossiers annexes existant éventuellement
+    (documents/etc/forum/history).<br>
+    <span style="font-size:80%%">L'option "recopier" ci-dessus sera ignorée.</span>
 ]</label></td>
 </tr>
 <tr align=left>
