@@ -1270,7 +1270,7 @@ let write_file_contents fname text =
 
 let output_wizard_notes bdir wiznotes =
   let wizdir = (Path.path_from_bname bdir).Path.dir_wiznotes in
-  Mutil.rm_rf wizdir ;
+  if Sys.file_exists wizdir then Mutil.rm_rf wizdir ;
   if wiznotes = [] then ()
   else
     begin
@@ -1378,9 +1378,11 @@ let link next_family_fun bdir =
       Gc.compact ();
       Outbase.output bdir dsk_base;
       output_wizard_notes bdir gen.g_wiznotes;
+      if !Mutil.verbose then Printf.eprintf "*** wizdir created\n";
       output_particles_file bdir dsk_base.data.particles;
       (try Mutil.rm_rf tmp_dir with _ -> ());
       (try Mutil.rm_rf "gw_tmp" with _ -> ());
+      if !Mutil.verbose then Printf.eprintf "*** tmp_dir gw_tmp dirs suppressed\n";
       output_command_line bdir;
       Util.init_cache_info bdir base;
       true

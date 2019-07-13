@@ -440,43 +440,44 @@ let rm fname =
   if Sys.file_exists fname then
   try Sys.remove fname
   with Sys_error _ -> 
-    begin Printf.eprintf "Sys_error rm %s\n" fname ; exit 2
+    begin Printf.eprintf "Sys_error (rm) %s\n" fname ; exit 2
     end
 
 let rn fname s =
   if Sys.file_exists fname then
   try Sys.rename fname s
   with Sys_error _ ->
-    begin Printf.eprintf "Sys_error rn %s %s\n" fname s ; exit 2
+    begin Printf.eprintf "Sys_error (rn) %s %s\n" fname s ; exit 2
     end
 
-(*
+(* check Sys.file_exists before calling rm_rf *)
 let rec rm_rf file =
-  if Sys.file_exists file then
     let infos = Unix.lstat file in
     try
       match infos.Unix.st_kind with
-      | Unix.S_REG | Unix.S_LNK ->
-          Unix.unlink file ;
+      (* FIXME échoue quand même si il y a un symlink *)
       | Unix.S_DIR->
+        begin
           let ls = Array.to_list (Sys.readdir file) in
           List.iter
-            (fun f ->
-              if f <> "." && f <> ".."
-              then
-                rm_rf (Filename.concat file f) ) ls ;
-          (try Unix.rmdir file with _ -> ()) ;
-      | _ -> ()
+            (fun f -> rm_rf (Filename.concat file f)) ls ;
+          Unix.rmdir file ;
+        end
+      | _ -> try Unix.unlink file
+             with Unix.Unix_error (code, funct, param) ->
+             begin
+              Printf.eprintf "Unix_error (rm_rf) %s %s %s\n"
+                (Unix.error_message code) funct param ; exit 2
+             end
     with
       Unix.Unix_error (code, funct, param) ->
         begin
-          Printf.eprintf "Unix_error %s %s %s\n"
+          Printf.eprintf "Unix_error (rm_rf) %s %s %s\n"
             (Unix.error_message code) funct param ; exit 2
         end
-  else ()
-*)
 
-
+(* FIXME cette fonction échoue si il y a un symlink parmi les fichiers *)
+(*
 let rm_rf dir =
   if Sys.file_exists dir then
     let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
@@ -485,17 +486,20 @@ let rm_rf dir =
       try Sys.remove f
       with Unix.Unix_error (code, funct, param) ->
         begin
-          Printf.eprintf "Unix_error rm_rf %s %s %s\n"
-            (Unix.error_message code) funct param ; exit 2
+          Printf.eprintf "Unix_error (rm_rf) %s %s %s\n"
+            (Unix.error_message code) funct param ;
+          flush stderr; exit 2
         end) files ;
     List.iter 
     (fun d ->
       try Unix.rmdir d
       with Sys_error _ -> 
         begin
-          Printf.eprintf "Sys_error rr_rf %s \n" d ; exit 2
+          Printf.eprintf "Sys_error (rm_rf) %s \n" d ;
+          flush stderr; exit 2
         end) directories
   else ()
+*)
 
 let buffer_size = 8192
 let buffer = Bytes.create buffer_size
@@ -521,7 +525,7 @@ let set_infos filename infos =
         Unix.chown filename infos.Unix.st_uid infos.Unix.st_gid
       with Unix.Unix_error (code, funct, param) ->
         begin
-          Printf.eprintf "Unix_error %s %s %s\n"
+          Printf.eprintf "Unix_error (set_infos) %s %s %s\n"
             (Unix.error_message code) funct param ; exit 2
         end
     end
@@ -555,7 +559,7 @@ let rec copy_r source dest =
     with
       Unix.Unix_error (code, funct, param) ->
         begin
-          Printf.eprintf "Unix_error %s %s %s\n"
+          Printf.eprintf "Unix_error (copy_r) %s %s %s\n"
             (Unix.error_message code) funct param ; exit 2
         end
   else ()

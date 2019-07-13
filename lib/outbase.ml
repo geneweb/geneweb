@@ -265,7 +265,7 @@ let gen_output no_patches bname base =
   let tmp_strings_inx_fn, tmp_strings_inx_oc = tmp "strings.inx" in
   let tmp_notes = Filename.concat path.dir_my_base "notes.tmp" in
   let tmp_notes_d = Filename.concat path.dir_my_base "notes_d.tmp" in
-  let tmp_wiznotes_d = Filename.concat path.dir_my_base "wiznotes_d.tmp" in
+  let _tmp_wiznotes_d = Filename.concat path.dir_my_base "wiznotes_d.tmp" in
   if not no_patches then
     begin
       load_ascends_array base;
@@ -388,7 +388,7 @@ let gen_output no_patches bname base =
     Mutil.rm tmp_names_inx_fn ;
     Mutil.rm tmp_names_acc_fn ;
     Mutil.rm tmp_strings_inx_fn ;
-    Mutil.rm_rf tmp_notes_d ;
+    if Sys.file_exists tmp_notes_d then Mutil.rm_rf tmp_notes_d ;
     raise e
   end;
   close_base base;
@@ -396,6 +396,7 @@ let gen_output no_patches bname base =
   Mutil.rn tmp_base_fn path.file_base ;
   Mutil.rm path.file_base_acc;
   Mutil.rn tmp_base_acc_fn path.file_base_acc;
+  if !verbose then Printf.eprintf "*** tmp_base renamed to %s\n" path.file_base;
   if not no_patches then
     begin
       let mv src dst = Mutil.rm dst ; Sys.rename src dst in
@@ -406,26 +407,26 @@ let gen_output no_patches bname base =
       mv tmp_fnames_dat_fn path.file_fnames_dat ;
       mv tmp_fnames_inx_fn path.file_fnames_inx ;
       mv tmp_strings_inx_fn path.file_strings_inx ;
+      if !verbose then Printf.eprintf "*** tmp_acc/inx files moved\n" ;
       (* REORG *)
       if Sys.file_exists tmp_notes_d then
         begin let notes_d = path.dir_notes in
-          Mutil.rm_rf notes_d ;
+          if Sys.file_exists notes_d then Mutil.rm_rf notes_d ;
           Mutil.rn tmp_notes_d notes_d
         end ;
-      if Sys.file_exists tmp_wiznotes_d then
-        begin let wiznotes_d = path.dir_wiznotes in
-          Mutil.rm_rf wiznotes_d ;
-          Mutil.rn tmp_wiznotes_d wiznotes_d
-        end ;
+      if !verbose then Printf.eprintf "*** tmp_notes_d moved\n" ;
+      (* wiznotes (and particles) are handled in db1link.ml *)
       if Sys.file_exists tmp_notes then
         begin 
           Mutil.rm path.file_notes ;
           Mutil.rn tmp_notes path.file_notes
         end ;
+      if !verbose then Printf.eprintf "*** tmp_notes moved\n" ;
       Mutil.rm path.file_patches ;
       Mutil.rm path.file_ts ;
       Mutil.rm path.file_ts_visitor ;
-      Mutil.rm path.file_restrict
-    end
+      Mutil.rm path.file_restrict ;
+      if !verbose then Printf.eprintf "*** outbase finished\n"
+end
 
 let output = gen_output false

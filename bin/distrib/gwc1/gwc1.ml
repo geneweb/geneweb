@@ -66,7 +66,7 @@ let next_family_fun_templ gwo_list fi =
 
 let just_comp = ref false
 let out_file = ref (Filename.concat Filename.current_dir_name "a")
-let action = ref ""
+let action = ref "none"
 let copy = ref false
 
 let separate = ref false
@@ -131,6 +131,8 @@ let main () =
       action := "update" ; copy := false
     end ;
   if !force && !upd then copy := true ;
+  if !Mutil.verbose then Printf.eprintf "Starting gwc with action=%s, -c=%s\n" !action
+    (if !copy then "on" else "off") ;
   let gwo = ref [] in
   List.iter
     (fun (x, separate, shift) ->
@@ -201,32 +203,38 @@ let main () =
         List.iter (fun s -> Printf.eprintf ", %s" s) save_list;
         Printf.eprintf "\n"
       end ;
-    if !action = "backup" && not !copy && save_list <> [] then
-      let _ = Printf.eprintf "Clean save_list forlers\n" in
-      try
-        List.iter (fun f ->
-          let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
-          if Sys.file_exists tmp_f then Mutil.rm_rf f
-          else () ) save_list 
-      with _ -> Printf.eprintf "*** problem with save_list\n" ;
-    Printf.eprintf "Start creating base\n" ;
-    Lock.control
-      (Mutil.lock_file !out_file)
-      false
-      ~onerror:Lock.print_error_and_exit
-      (fun () ->
-        let bdir =
-          if Filename.check_suffix !out_file ".gwb" then !out_file
-          else !out_file ^ ".gwb"
-        in
-        let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-        if Db1link.link next_family_fun bdir then ()
-        else
-          begin
-            Printf.eprintf "*** database not created\n";
-            flush stderr;
-            exit 2
-          end) ;
+    if !Mutil.verbose then Printf.eprintf "Clean save_list folders\n" ;
+    try
+      begin
+      List.iter (fun f ->
+        let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
+        if Sys.file_exists tmp_f then Mutil.rm_rf f
+        else () ) save_list ;
+      Printf.eprintf "Start creating base\n" ;
+      Lock.control
+        (Mutil.lock_file !out_file)
+        false
+        ~onerror:Lock.print_error_and_exit
+        (fun () ->
+          let bdir =
+            if Filename.check_suffix !out_file ".gwb" then !out_file
+            else !out_file ^ ".gwb"
+          in
+          let next_family_fun = next_family_fun_templ (List.rev !gwo) in
+          if Db1link.link next_family_fun bdir then
+            if !Mutil.verbose then Printf.eprintf "*** database created\n"
+          else
+            begin
+              if !Mutil.verbose then Printf.eprintf "*** database not created\n";
+              flush stderr;
+              exit 21
+            end) ;
+      end
+    with _ ->
+      begin
+        if !Mutil.verbose then Printf.eprintf "*** problem with save_list\n" ;
+        exit 22
+      end ;
   end
   else ()
 

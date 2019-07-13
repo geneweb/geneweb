@@ -396,8 +396,12 @@ let parse_upto_void lim =
   loop 0
 
 let is_directory x =
-  try (Unix.lstat x).Unix.st_kind = Unix.S_DIR with
-    Unix.Unix_error (_, _, _) -> false
+  try (Unix.lstat x).Unix.st_kind = Unix.S_DIR
+  with Unix.Unix_error (code, funct, param) ->
+    begin
+      Printf.eprintf "Unix_error (is_directory) %s %s %s\n"
+        (Unix.error_message code) funct param ; false
+    end
 
 let server_string conf =
   let s = Wserver.extract_param "host: " '\r' conf.request in
@@ -1079,13 +1083,13 @@ let gwc conf =
         let comm = comm ^ parameters conf.env in
         exec_f conf comm true "gwc"
       in
-      Printf.eprintf "Return code(1) %d\n" rc ;
+      Printf.eprintf "Return code(gwc) %d\n" rc ;
       let rc = if Sys.unix then rc else infer_rc conf rc in
       let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
       (try Sys.remove gwo with Sys_error _ -> ());
-      Printf.eprintf "Return code(2) %d\n" rc ;
       if rc > 1 then
-        if rc = 22 then print_file conf "err_gwc_1.htm"
+        if rc = 21 then print_file conf "err_gwc_1.htm"
+        else if rc = 22 then print_file conf "err_gwc_2.htm"
         else print_file conf "err_bso.htm"
       else begin
         flush stderr;
