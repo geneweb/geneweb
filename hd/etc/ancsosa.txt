@@ -1133,8 +1133,8 @@
           %elseif;(ancestor.has_xxx_note and ancestor.has_xxx_source) notesource%nn;
           %end;
         %end;"%sp;
-        %if;(evar.ns="on")
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
+        %if;(evar.ns="on" and (ancestor.has_xxx_note or ancestor.has_xxx_source)) tabindex="0"
+          data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;ancestor.has_xxx_note;%apply;capitalize(ancestor.xxx_note)%end;
                         %if;ancestor.has_xxx_source;%if;ancestor.has_xxx_note;<hr>%end;%apply;capitalize(ancestor.xxx_source)%end;'
           title="%if;(ancestor.has_xxx_note or ancestor.has_xxx_source)
@@ -1193,8 +1193,8 @@
         %elseif;(ancestor.has_notes and ancestor.has_psources) notesource%nn;
         %end;
     %end;"%sp;
-    %if;(evar.ns="on" and (ancestor.has_notes or ancestor.has_psources))
-      tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"%sp;
+    %if;(evar.ns="on" and (ancestor.has_notes or ancestor.has_psources)) tabindex="0"
+      data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
       data-content='%if;(ancestor.has_notes)%ancestor.notes;%end;
                     %if;(ancestor.has_psources)
                       %if;(ancestor.has_notes)<hr>%end;
@@ -1284,8 +1284,8 @@
               %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
               %end;
             %end;"%sp;
-            %if;(evar.ns="on")
-              tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
+            %if;(evar.ns="on" and (has_marriage_note or has_marriage_source)) tabindex="0"
+              data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(has_marriage_note)%marriage_note;%end;
                             %if;(has_marriage_source)
                               %if;(has_marriage_note)<hr>%end;
@@ -1323,8 +1323,8 @@
                     %elseif;(has_fnotes and has_fsources) notesource%nn;
                     %end;
                   %end;"
-                %if;(evar.ns="on")
-                tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
+                %if;(evar.ns="on" and (has_fsources or has_fnotes)) tabindex="0" 
+                data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
                 data-content='%if;(has_fnotes)%fnotes;%end;
                               %if;(has_fsources)
                                 %if;(has_fnotes)<hr>%end;
@@ -1386,8 +1386,8 @@
                   %elseif;(spouse.has_pnotes and spouse.has_psources) notesource%nn;
                   %end;
                 %end;"
-              %if;(evar.ns="on")
-              tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
+              %if;(evar.ns="on" and (spouse.has_psources or spouse.has_pnotes)) tabindex="0"
+              data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(spouse.has_pnotes)%spouse.pnotes;%end;
                             %if;(spouse.has_psources)
                               %if;(spouse.has_pnotes)<hr>%end;
@@ -1431,8 +1431,8 @@
                 %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
                 %end;
               %end;"
-              %if;(evar.ns="on")
-                tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
+              %if;(evar.ns="on" and (has_marriage_note or has_marriage_source)) tabindex="0"
+                data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
                 data-content='%if;(has_marriage_note)%marriage_note;%end;
                               %if;(has_marriage_source)
                                 %if;(has_marriage_note)<hr>%end;
@@ -1461,8 +1461,8 @@
                 %elseif;(has_fnotes and has_fsources) notesource%nn;
                 %end;
               %end;"%sp;
-              %if;(evar.ns="on")
-                tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
+              %if;(evar.ns="on" and (has_fnotes or has_fsources)) tabindex="0" 
+                data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
                 data-content='%if;(has_fnotes)%fnotes;%end;
                               %if;(has_fsources)
                                 %if;(has_fnotes)<hr>%end;
