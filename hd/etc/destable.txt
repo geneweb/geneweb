@@ -206,8 +206,8 @@
           %elseif;(xxx.has_yyy_note and xxx.has_yyy_source) notesource%nn;
           %end;
         %end;"%sp;
-        %if;(evar.ns="on")
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
+        %if;(evar.ns="on" and (xxx.has_yyy_source or xxx.has_yyy_note)) tabindex="0"
+          data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;xxx.has_yyy_note;%apply;capitalize(xxx.yyy_note)%end;
                         %if;xxx.has_yyy_source;%if;xxx.has_yyy_note;<hr>%end;%apply;capitalize(xxx.yyy_source)%end;'
           title="%if;(xxx.has_yyy_note or xxx.has_yyy_source)
@@ -437,7 +437,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
               %end;
             %end;'%nn;
             %rowspan;%nn;
-            %if;(evar.ns="on") tabindex="0"%sp;
+            %if;(evar.ns="on" and (has_marriage_note or has_marriage_source)) tabindex="0"
               data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
               data-content='%if;(has_marriage_note)%marriage_note;%end;
                             %if;(has_marriage_note and has_marriage_source)<hr>%end;
@@ -514,7 +514,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
               %end;
             %end;"%nn;
             %rowspan;%nn;
-            %if;(evar.ns="on") tabindex="0"%sp;
+            %if;(evar.ns="on" and (has_fnotes or has_fsources)) tabindex="0"
               data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
               data-content='%if;(has_fnotes)%fnotes;%end;
                             %if;(has_fnotes and has_fsources)<hr>%end;
