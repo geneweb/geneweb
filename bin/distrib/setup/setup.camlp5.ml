@@ -1394,7 +1394,8 @@ let cleanup_1 conf =
       Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
     end;
   flush stderr;
-  Mutil.rm_rf (Filename.concat "old" in_base_dir);
+  let old_base_dir = Filename.concat "old" in_base_dir in
+  if Sys.file_exists old_base_dir then Mutil.rm_rf old_base_dir;
   if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
   else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
   flush stderr;
@@ -1413,6 +1414,14 @@ let cleanup_1 conf =
     let conf = {conf with comm = "gwc"} in print_file conf "err_bsi.htm"
   else print_file conf "ok_clean.htm"
 
+let replace_spaces_by_plus s =
+  let rec loop i len =
+    if i = String.length s then Buff.get len
+    else if s.[i] = ' ' then loop (i + 1) (Buff.mstore len "+")
+    else loop (i + 1) (Buff.store len s.[i])
+  in
+  loop 0 0
+
 let rec check_new_names conf l1 l2 =
   let _ = Printf.eprintf "L1: " in
   let _ = List.iter (fun (k, v) -> Printf.eprintf "k=%s, v=%s ," k v) l1 in
@@ -1422,7 +1431,7 @@ let rec check_new_names conf l1 l2 =
   let _ = flush stderr in
   match l1, l2 with
     (k, v) :: l, x :: m ->
-      if k <> (strip_spaces x) then begin print_file conf "err_outd.htm"; raise Exit end
+      if k <> (replace_spaces_by_plus x) then begin print_file conf "err_outd.htm"; raise Exit end
       else if not (good_name v) then
         let conf = {conf with env = ("o", v) :: conf.env} in
         print_file conf "err_name.htm"; raise Exit
@@ -1460,7 +1469,8 @@ let rename conf =
 let delete conf = print_file conf "delete_1.htm"
 
 let delete_1 conf =
-  List.iter (fun (k, v) -> if v = "del" then Mutil.rm_rf (k ^ ".gwb")) conf.env;
+  List.iter (fun (k, v) -> if v = "del" then
+    if Sys.file_exists (k ^ ".gwb") then Mutil.rm_rf (k ^ ".gwb")) conf.env;
   print_file conf "ok_del.htm"
 
 let merge conf =
