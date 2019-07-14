@@ -187,7 +187,7 @@ let main () =
       else ""
     in
     let save_list =
-      if !action = "backup" then
+      if !copy then
         let file_forum = (Path.path_from_bname bname).Path.file_forum in
         let dir_history = (Path.path_from_bname bname).Path.dir_history in
         let file_history = (Path.path_from_bname bname).Path.file_history in
@@ -203,14 +203,17 @@ let main () =
         List.iter (fun s -> Printf.eprintf ", %s" s) save_list;
         Printf.eprintf "\n"
       end ;
-    if !Mutil.verbose then Printf.eprintf "Clean save_list folders\n" ;
     try
       begin
-      List.iter (fun f ->
-        let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
-        if Sys.file_exists tmp_f then Mutil.rm_rf f
-        else () ) save_list ;
-      Printf.eprintf "Start creating base\n" ;
+      if not !copy && save_list <> [] then
+        begin
+          if !Mutil.verbose then Printf.eprintf "Clean save_list folders\n" ;
+          List.iter (fun f ->
+            let tmp_f = (Filename.concat base_bak (Filename.basename f)) in
+            if Sys.file_exists tmp_f then Mutil.rm_rf f
+            else () ) save_list 
+        end ;
+      if !Mutil.verbose then Printf.eprintf "Start creating base\n" ;
       Lock.control
         (Mutil.lock_file !out_file)
         false
@@ -223,6 +226,7 @@ let main () =
           let next_family_fun = next_family_fun_templ (List.rev !gwo) in
           if Db1link.link next_family_fun bdir then
             if !Mutil.verbose then Printf.eprintf "*** database created\n"
+            else ()
           else
             begin
               if !Mutil.verbose then Printf.eprintf "*** database not created\n";

@@ -225,6 +225,7 @@ let move base basename =
             end
         end
   done;
+  Printf.eprintf "End of ifam loop, commit patches\n";
   if !ask_for_delete > 0 then Gwdb.commit_patches base ;
   if !statistics then begin
     Printf.printf "<br>\nStatistics:<br>\n";

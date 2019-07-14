@@ -172,9 +172,9 @@ let parameters =
             let out = stringify s in
             (* notes/connex.txt is default value in connex.htm *)
             let out =
-              if out = "notes/connex.txt" || out = "notes\\connex.txt" then 
-                if !Path.reorg then bname ^ ".gwb/notes/connex.txt"
-                else bname ^ ".gwb/notes_d/connex.txt" 
+              if out = "notes/connex.txt" || out = "notes\\connex.txt" then
+                Filename.concat
+                  (Path.path_from_bname bname).Path.dir_notes "connex.txt"
               else out
             in
             let out = slashify_linux_dos out in
@@ -210,51 +210,6 @@ let parameters =
                 loop (comm ^ " -" ^ s ^ k) bname env
               else loop (comm ^ " -" ^ k ^ " " ^ stringify s) bname env
           end
-    | [] -> comm
-  in
-  loop "" ""
-
-let _parameters_1 =
-  let rec loop comm bname =
-    function
-    | (k, s) :: env ->
-        let k = strip_spaces (decode_varenv k) in
-        let s = strip_spaces (decode_varenv s) in
-        if k = "" || s = "" then loop comm bname env
-        else if k = "opt" then loop comm bname env
-        else if k = "gwd_p" && s <> ""
-          then loop (comm ^ " -gwd_p " ^ stringify s ) bname env
-        else if k = "anon" && s <> ""
-          then loop (comm ^ " " ^ stringify s) (stringify s) env
-        else if k = "a" then loop (comm ^ " -a") bname env
-        else if k = "s" then loop (comm ^ " -s") bname env
-        else if k = "d" && s <> ""
-          then loop (comm ^ " -d " ^ stringify s ) bname env
-        else if k = "i" && s <> ""
-          then loop (comm ^ " -i " ^ stringify s) bname env
-        else if k = "bf" then loop (comm ^ " -bf") bname env
-        else if k = "del" && s <> ""
-          then loop (comm ^ " -del " ^ stringify s) bname env
-        else if k = "cnt" && s <> ""
-          then loop (comm ^ " -cnt " ^ stringify s) bname env
-        else if k = "exact" then loop (comm ^ " -exact") bname env
-        else if k = "o1" && s <> "" then
-          let out = stringify s in
-          comm ^ " > " ^ out
-        else if k = "o" && s <> "" then
-          if s = "choice" then loop comm bname env
-          else
-            let out = stringify s in
-            (* notes/connex.txt is default value in connex.htm *)
-            let out =
-              if out = "notes/connex.txt" || out = "notes\\connex.txt" then 
-                if !Path.reorg then bname ^ ".gwb/notes/connex.txt"
-                else bname ^ ".gwb/notes_d/connex.txt" 
-              else out
-            in
-            let out = slashify_linux_dos out in
-            comm ^ " > " ^ out
-        else loop comm bname env
     | [] -> comm
   in
   loop "" ""
@@ -311,13 +266,7 @@ let comm_log conf which_bin =
       Some f -> strip_spaces f
     | None -> ""
   in
-  let oname =
-    match p_getenv conf.env "o" with
-      Some f -> strip_spaces f
-    | None -> ""
-  in
   let bname = Filename.basename bname in
-  let oname = Filename.basename oname in
   let bname =
     if Filename.check_suffix bname ".gwb" ||
       Filename.check_suffix bname ".gw" ||
@@ -326,6 +275,12 @@ let comm_log conf which_bin =
       Filename.remove_extension bname
     else bname
   in
+  let oname =
+    match p_getenv conf.env "o" with
+      Some f -> strip_spaces f
+    | None -> ""
+  in
+  let oname = if oname <> "" then Filename.basename oname else oname in
   let oname =
     if Filename.check_suffix oname ".gwb" ||
       Filename.check_suffix oname ".gw" ||
@@ -337,15 +292,25 @@ let comm_log conf which_bin =
   let which = if which_bin = "gwsetup" && which_url <> ""
     then which_url else which_bin
   in
-  let bname = if which = "gwc" && oname <> "" then oname else bname in
   let comm_log =
     if bname = "" || bname = "." then which ^ ".log"
+    else if which = "connex" then
+      begin
+      if oname = "" then 
+        if !Path.reorg then
+          let log_dir = (Path.path_from_bname bname).Path.dir_etc_b in
+          let _ = if not (Sys.file_exists log_dir) then Mutil.mkdir_p log_dir in
+          Filename.concat log_dir (which ^ ".log")
+        else which ^ ".log"
+      else if oname = "connex.txt" then
+        let notes_dir = (Path.path_from_bname bname).Path.dir_notes in
+        let _ = if not (Sys.file_exists notes_dir) then Mutil.mkdir_p notes_dir in
+        Filename.concat notes_dir "connex.txt"
+      else oname
+      end
     else
       if !Path.reorg then
-        let log_dir = 
-          String.concat Filename.dir_sep
-            [bname ^ ".gwb"; "etc"]
-        in
+        let log_dir = (Path.path_from_bname bname).Path.dir_etc_b in
         let _ = if not (Sys.file_exists log_dir) then Mutil.mkdir_p log_dir in
         Filename.concat log_dir (which ^ ".log")
       else which ^ ".log"
@@ -903,8 +868,8 @@ let error conf str =
   Wserver.printf "<em>%s</em>\n" (String.capitalize_ascii str);
   trailer conf
 
-let exec_f conf comm out which =
-  let s = if out then comm ^ " > " ^ (comm_log conf which) else comm in
+let exec_f conf comm _out which =
+  let s = comm ^ " > " ^ (comm_log conf which) in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
   Printf.eprintf "$ %s\n" s;
@@ -1122,10 +1087,32 @@ let connex_check conf =
 let connex conf =
   let comm =
     (stringify (Filename.concat !bin_dir "connex")) ^ " " ^
-    parameters conf.env
+    (parameters conf.env) ^ " > " ^ (comm_log conf "connex")
   in
   let rc =
-    exec_f conf comm false "connex"
+    match p_getenv conf.env "del" with
+    | Some _ ->
+        let ic = Unix.open_process_in "uname" in
+        let uname = input_line ic in
+        let () = close_in ic in
+        let commnd =
+          "cd " ^ (Sys.getcwd ()) ^ "; tput bel;" ^ comm
+        in
+        if uname = "Darwin" then
+          let launch = "tell application \"Terminal\" to do script " in
+          Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd ^ " \"' " )
+        else if uname = "Linux" then
+          (* non testé ! *)
+          Sys.command ("xterm -e \" " ^ commnd ^ " \" ")
+        else if Sys.win32 then
+          (* à compléter et tester ! *)
+          Sys.command (comm)
+        else begin
+          Printf.eprintf "%s (%s) %s (%s)\n"
+            "Unknown Os_type" Sys.os_type "or wrong uname response" uname;
+          exit 2
+        end
+    | None -> exec_f conf comm true "connex"
   in
   flush stderr;
   if rc > 1 then print_file conf "err_bsi.htm"
@@ -1378,13 +1365,14 @@ let cleanup_1 conf =
       Some f -> strip_spaces f
     | None -> ""
   in
-  let in_base_dir = in_base ^ ".gwb" in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
   let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
   let _ = Sys.command c in
+  (*
+  let in_base_dir = in_base ^ ".gwb" in
   Printf.eprintf "$ mkdir old\n";
   (try Unix.mkdir "old" 0o755 with Unix.Unix_error (_, _, _) -> ());
   if Sys.unix then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
@@ -1400,18 +1388,22 @@ let cleanup_1 conf =
   else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
   flush stderr;
   Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
-  let c =
-    Filename.concat !bin_dir "gwc" ^ " tmp.gw -nofail -o " ^ in_base ^
-    " > " ^ (comm_log conf "cleanup") ^ ">&1" (* FIXME is this &1 correct "2>$1"? *)
+  *)
+  let comm =
+    Filename.concat !bin_dir ("gwc" ^ " tmp.gw -nofail -f -c -v -o " ^ in_base)
   in
-  Printf.eprintf "$ %s\n" c;
+  let rc =
+    exec_f conf comm true "gwc"
+  in
   flush stderr;
-  let rc = Sys.command c in
   let rc = if Sys.unix then rc else infer_rc conf rc in
-  Printf.eprintf "\n";
+  Printf.eprintf "Return code (%d)\n" rc ;
   flush stderr;
+  let conf = {conf with comm = "gwc"} in
   if rc > 1 then
-    let conf = {conf with comm = "gwc"} in print_file conf "err_bsi.htm"
+    if rc = 21 then print_file conf "err_gwc_1.htm"
+    else if rc = 22 then print_file conf "err_gwc_2.htm"
+    else print_file conf "err_bsi.htm"
   else print_file conf "ok_clean.htm"
 
 let replace_spaces_by_plus s =
@@ -1520,7 +1512,7 @@ let merge_1 conf =
           (fun s b ->
              if s = "" then " " ^ b ^ ".gw" else s ^ " -sep " ^ b ^ ".gw")
           "" bases ^
-        " -f -o " ^ out_file ^ " > " ^ (comm_log conf "merge") ^ "2>&1"
+        " -f -o " ^ out_file ^ " > " ^ (comm_log conf "gwc") ^ "2>&1"
       in
       Printf.eprintf "$ %s\n" c; flush stderr; Sys.command c
   in
