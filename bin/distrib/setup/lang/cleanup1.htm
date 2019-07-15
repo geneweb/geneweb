@@ -110,26 +110,6 @@ sv: Denna operation motsvarar de följande kommandona:
 <pre>
      $ cd "%w"
      $ %x%/gwu %a -o tmp.gw
-     $ mkdir old
-     [
-de: Unter Unix:
-en: Under Unix:
-fi: Unixissa:
-fr: Sous Unix :
-it: Sotto Unix:
-]
-        $ rm -rf old/%a.gwb
-        $ mv %a.gwb old/.
-     [
-de: Unter MSdos:
-en: Under MSdos:
-fi: MS-DOS:ssa:
-fr: Sous MSdos :
-it: Sotto MSdos
-]
-        $ del old\%a.gwb\*.*
-        $ rmdir old\%a.gwb
-        $ move %a.gwb old\.
-     $ %x%/gwc tmp.gw -nofail -o %a > %S
+     $ %x%/gwc tmp.gw -nofail -f -c -o %a > %S
 </pre>
 

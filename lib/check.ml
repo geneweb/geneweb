@@ -198,7 +198,7 @@ let print_base_warning oc base =
       Printf.fprintf oc "%s\n" (designation base p);
       Printf.fprintf oc "has incorrect title dates as:\n";
       Printf.fprintf oc "  %s %s\n" (sou base t.t_ident) (sou base t.t_place)
-  | UndefinedSex _ -> ()
+  | UndefinedSex p -> Printf.fprintf oc "undefined sex for %s\n" (designation base p)
   | WitnessDateAfterDeath p ->
       Printf.fprintf oc "%s\n" (designation base p);
       Printf.fprintf oc "was witness after his/her death\n"

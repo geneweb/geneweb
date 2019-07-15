@@ -308,6 +308,19 @@ let comm_log conf which_bin =
         Filename.concat notes_dir "connex.txt"
       else oname
       end
+    else if which = "gwc" then
+      begin
+      if oname = "" then
+        if !Path.reorg then
+          let log_dir = (Path.path_from_bname bname).Path.dir_etc_b in
+          let _ = if not (Sys.file_exists log_dir) then Mutil.mkdir_p log_dir in
+          Filename.concat log_dir (which ^ ".log")
+        else which ^ ".log"
+      else
+        let log_dir = (Path.path_from_bname bname).Path.dir_etc_b in
+        let _ = if not (Sys.file_exists log_dir) then Mutil.mkdir_p log_dir in
+        Filename.concat log_dir which ^ ".log"
+      end
     else
       if !Path.reorg then
         let log_dir = (Path.path_from_bname bname).Path.dir_etc_b in
@@ -868,7 +881,7 @@ let error conf str =
   Wserver.printf "<em>%s</em>\n" (String.capitalize_ascii str);
   trailer conf
 
-let exec_f conf comm _out which =
+let exec_f conf comm which =
   let s = comm ^ " > " ^ (comm_log conf which) in
   Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
   flush stderr;
@@ -1046,7 +1059,7 @@ let gwc conf =
       let rc =
         let comm = stringify (Filename.concat !bin_dir "gwc") in
         let comm = comm ^ parameters conf.env in
-        exec_f conf comm true "gwc"
+        exec_f conf comm "gwc"
       in
       Printf.eprintf "Return code(gwc) %d\n" rc ;
       let rc = if Sys.unix then rc else infer_rc conf rc in
@@ -1069,7 +1082,7 @@ let gwdiff conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     (* FIXME exec_f expects -anon to be set *)
-    exec_f conf (comm ^ parameters_2 conf.env) false "gwdiff"
+    exec_f conf (comm ^ parameters_2 conf.env) "gwdiff"
   in
   Printf.eprintf "\n";
   flush stderr;
@@ -1112,7 +1125,7 @@ let connex conf =
             "Unknown Os_type" Sys.os_type "or wrong uname response" uname;
           exit 2
         end
-    | None -> exec_f conf comm true "connex"
+    | None -> exec_f conf comm "connex"
   in
   flush stderr;
   if rc > 1 then print_file conf "err_bsi.htm"
@@ -1163,7 +1176,7 @@ let gwb2ged = gwu_or_gwb2ged_check ".ged"
 let gwb2ged_or_gwu_1 ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env) true "gwu_or_2ged"
+    exec_f conf (comm ^ parameters conf.env) "gwu_or_2ged"
   in
   Printf.eprintf "\n";
   flush stderr;
@@ -1334,19 +1347,23 @@ let recover_2 conf =
         Printf.eprintf "$ cd \"%s\"\n" dir;
         flush stderr;
         Sys.chdir dir;
-        let c =
-          Filename.concat !bin_dir src_to_new ^ " " ^ tmp ^ " -f -o " ^
-          out_file ^ " > " ^ (comm_log conf "recover")
+        let comm =
+          Filename.concat !bin_dir src_to_new ^ " " ^ tmp ^ " -f -c -o " ^
+          out_file
         in
-        Printf.eprintf "$ %s\n" c;
+        let rc =
+          exec_f conf comm "gwc"
+        in
         flush stderr;
-        let rc = Sys.command c in
         let rc = if Sys.unix then rc else infer_rc conf rc in
         Printf.eprintf "\n"; flush stderr; rc
       end
     else rc
   in
-  if rc > 1 then begin Sys.chdir dir; print_file conf "err_reco.htm" end
+  if rc > 1 then
+    if rc = 21 then print_file conf "err_gwc_1.htm"
+    else if rc = 22 then print_file conf "err_gwc_2.htm"
+    else print_file conf "err_reco.htm"
   else print_file conf "ok_recover.htm"
 
 let cleanup conf =
@@ -1355,7 +1372,7 @@ let cleanup conf =
       Some f -> strip_spaces f
     | None -> ""
   in
-  let conf = {conf with comm = "."} in
+  let conf = {conf with comm = "gwc"} in
   if in_base = "" then print_file conf "err_miss.htm"
   else print_file conf "cleanup1.htm"
 
@@ -1365,40 +1382,23 @@ let cleanup_1 conf =
       Some f -> strip_spaces f
     | None -> ""
   in
-  Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
+  Printf.eprintf "$ cd \"%s\"\n" (Sys.getcwd ()) ;
   flush stderr;
   let c = Filename.concat !bin_dir "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
-  Printf.eprintf "$ %s\n" c;
-  flush stderr;
+  Printf.eprintf "$ %s\n" c ;
+  flush stderr ;
   let _ = Sys.command c in
-  (*
-  let in_base_dir = in_base ^ ".gwb" in
-  Printf.eprintf "$ mkdir old\n";
-  (try Unix.mkdir "old" 0o755 with Unix.Unix_error (_, _, _) -> ());
-  if Sys.unix then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
-  else
-    begin
-      Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
-      Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
-    end;
-  flush stderr;
-  let old_base_dir = Filename.concat "old" in_base_dir in
-  if Sys.file_exists old_base_dir then Mutil.rm_rf old_base_dir;
-  if Sys.unix then Printf.eprintf "$ mv %s old/.\n" in_base_dir
-  else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
-  flush stderr;
-  Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
-  *)
   let comm =
-    Filename.concat !bin_dir ("gwc" ^ " tmp.gw -nofail -f -c -v -o " ^ in_base)
+    Filename.concat !bin_dir ("gwc" ^ " tmp.gw -nofail -f -c -o " ^ in_base)
   in
   let rc =
-    exec_f conf comm true "gwc"
+    exec_f conf comm "gwc"
   in
   flush stderr;
   let rc = if Sys.unix then rc else infer_rc conf rc in
   Printf.eprintf "Return code (%d)\n" rc ;
-  flush stderr;
+  flush stderr ;
+  if Sys.file_exists "tmp.gw" then Mutil.rm "tmp.gw" ;
   let conf = {conf with comm = "gwc"} in
   if rc > 1 then
     if rc = 21 then print_file conf "err_gwc_1.htm"
@@ -1471,7 +1471,9 @@ let merge conf =
       Some f -> strip_spaces f
     | _ -> ""
   in
-  let conf = {conf with comm = "."} in
+  let conf = {conf with comm = "gwc"} in
+  let conf = {conf with env = ("anon", out_file) :: 
+    ("which", "gwc") :: conf.env} in
   let bases = selected conf.env in
   if out_file = "" || List.length bases < 2 then
     print_file conf "err_miss.htm"
@@ -1506,17 +1508,20 @@ let merge_1 conf =
   let rc =
     if rc <> 0 then rc
     else
-      let c =
+      let comm =
         Filename.concat !bin_dir "gwc" ^
         List.fold_left
           (fun s b ->
              if s = "" then " " ^ b ^ ".gw" else s ^ " -sep " ^ b ^ ".gw")
-          "" bases ^
-        " -f -o " ^ out_file ^ " > " ^ (comm_log conf "gwc") ^ "2>&1"
+          "" bases ^ " -f -o " ^ out_file
       in
-      Printf.eprintf "$ %s\n" c; flush stderr; Sys.command c
+      exec_f conf comm "gwc"
   in
-  if rc > 1 then print_file conf "err_bso.htm"
+  let conf = {conf with comm = "gwc"} in
+  if rc > 1 then
+    if rc = 21 then print_file conf "err_gwc_1.htm"
+    else if rc = 22 then print_file conf "err_gwc_2.htm"
+    else print_file conf "err_bso.htm"
   else print_file conf "ok_merge.htm"
 
 let read_gwd_arg () =
@@ -1653,7 +1658,7 @@ let gwd_1 conf =
 let ged2gwb conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ " -fne '\"\"'" ^ parameters conf.env) true "ged2gwb"
+    exec_f conf (comm ^ " -fne '\"\"'" ^ parameters conf.env) "ged2gwb"
   in
   let rc = if Sys.unix then rc else infer_rc conf rc in
   Printf.eprintf "\n";
@@ -1666,7 +1671,7 @@ let ged2gwb conf =
 let consang conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env) true "consang"
+    exec_f conf (comm ^ parameters conf.env) "consang"
   in
   Printf.eprintf "\n";
   flush stderr;
@@ -1676,7 +1681,7 @@ let consang conf =
 let update_nldb conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f conf (comm ^ parameters conf.env) true "upd_nldb"
+    exec_f conf (comm ^ parameters conf.env) "upd_nldb"
   in
   Printf.eprintf "\n";
   flush stderr;
