@@ -27,212 +27,119 @@ module PersSet =
 
 module StringSet = Set.Make (struct type t = string let compare = compare end)
 
-type fun_data_p_f =
-    Person of (person -> istr)
-  | Family of (family -> istr)
-  | Pevent of ((iper, istr) gen_pers_event -> istr)
-  | Fevent of ((iper, istr) gen_fam_event -> istr)
-
-
-(* ******************************************************************** *)
-(*  [Fonc] get_data : config -> (string * fun x -> istr) list * bool    *)
-(** [Description] : Renvoie la liste des labels et fonctions pour
-                    récupérer les données que l'on veut modifier.
-    [Args] :
-      - conf : configuration
-    [Retour] :
-      - (string * fun x -> istr) list * bool : La liste des données que
-           l'on souhaite modifier ainsi qu'un boolean pour savoir s'il
-           faut tester la famille.
-    [Rem] : Non exporté en clair hors de ce module.                     *)
-(* ******************************************************************** *)
 let get_data conf =
   match p_getenv conf.env "data" with
-    Some "occu" -> ["occu", Person get_occupation], false
+  | Some "occu" ->
+    [ "occu", get_occupation ], [], [], []
   | Some "place" ->
-      ["bi", Person get_birth_place; "bp", Person get_baptism_place;
-       "de", Person get_death_place; "bu", Person get_burial_place;
-       "pe", Pevent (fun evt -> evt.epers_place);
-       "ma", Family get_marriage_place;
-       "fe", Fevent (fun evt -> evt.efam_place)],
-      true
+    ( [ "bi", get_birth_place
+      ; "bp", get_baptism_place
+      ; "de", get_death_place
+      ; "bu", get_burial_place
+      ]
+    , [ "pe", (fun evt -> evt.epers_place) ]
+    , [ "ma", get_marriage_place ]
+    , [ "fe", (fun evt -> evt.efam_place) ]
+    )
   | Some "src" ->
-      ["bi", Person get_birth_src; "bp", Person get_baptism_src;
-       "de", Person get_death_src; "bu", Person get_burial_src;
-       "pe", Pevent (fun evt -> evt.epers_src); "p", Person get_psources;
-       "ma", Family get_marriage_src; "fe", Fevent (fun evt -> evt.efam_src);
-       "f", Family get_fsources],
-      true
-  | Some "fn" -> ["fn", Person get_first_name], false
-  | Some "sn" -> ["sn", Person get_surname], false
-  | _ -> [], false
+    ( [ "bi", get_birth_src
+      ; "bp", get_baptism_src
+      ; "de", get_death_src
+      ; "bu", get_burial_src
+      ; "p", get_psources
+      ]
+    , [ "pe", (fun evt -> evt.epers_src) ]
+    , [ "ma", get_marriage_src
+      ; "f", get_fsources ]
+    , [ "fe", (fun evt -> evt.efam_src) ]
+    )
+  | Some "fn" ->
+    ( [ "fn", get_first_name ], [], [], [] )
+  | Some "sn" ->
+    ( [ "sn", get_surname ], [], [], [] )
+  | _ -> [], [], [], []
 
-
-(* ******************************************************************** *)
-(*  [Fonc] get_all_data : config -> base -> DataSet.elt list            *)
-(** [Description] : Construit la liste de toutes les données de la base
-                    que l'on veut modifier et leur associe une clé unique.
-    [Args] :
-      - conf : configuration
-      - base : base
-    [Retour] :
-      - (Gwdb.istr * int) list : La liste sans doublon de toutes les
-          sources de la base avec leur clé.
-    [Rem] : Non exporté en clair hors de ce module.                     *)
-(* ******************************************************************** *)
 let get_all_data conf base =
-  let data_set = ref DataSet.empty in
-  let (data, test_family) = get_data conf in
-  Gwdb.Collection.iter (fun i ->
-      let p = pget conf base i in
-      List.iter
-        (fun (label, fun_data) ->
-           match fun_data with
-             Person fun_data ->
-             let istr = fun_data p in
-             if not (is_empty_string istr) then
-               data_set :=
-                 DataSet.add (istr, label, Hashtbl.hash istr) !data_set
-           | Pevent fun_data ->
-             List.iter
-               (fun evt ->
-                  let istr = fun_data evt in
-                  if not (is_empty_string istr) then
-                    data_set :=
-                      DataSet.add (istr, label, Hashtbl.hash istr)
-                        !data_set)
-               (get_pevents p)
-           | _ -> ())
-        data)
-    (Gwdb.ipers base) ;
-  (* Ajoute toutes les "data" liés à une famille *)
-  if test_family then
-    Gwdb.Collection.iter (fun i ->
-        let fam = foi base i in
-          List.iter
-            (fun (label, fun_data) ->
-               match fun_data with
-                 Family fun_data ->
-                 let istr = fun_data fam in
-                 if not (is_empty_string istr) then
-                   data_set :=
-                     DataSet.add (istr, label, Hashtbl.hash istr) !data_set
-               | Fevent fun_data ->
-                 List.iter
-                   (fun evt ->
-                      let istr = fun_data evt in
-                      if not (is_empty_string istr) then
-                        data_set :=
-                          DataSet.add (istr, label, Hashtbl.hash istr)
-                            !data_set)
-                   (get_fevents fam)
-               | _ -> ())
-            data)
-      (Gwdb.ifams base) ;
-  DataSet.elements !data_set
+  let (get_p, get_pe, get_f, get_fe) = get_data conf in
+  let aux : 'a . 'a -> DataSet.t -> (string * ('a -> istr)) -> DataSet.t  = fun arg acc (label, get) ->
+    let istr = get arg in
+    if not (is_empty_string istr) then DataSet.add (istr, label, Hashtbl.hash istr) acc
+    else acc
+  in
+  let acc =
+    Gwdb.Collection.fold
+      begin fun acc i ->
+        let p = pget conf base i in
+        let acc = List.fold_left (aux p) acc get_p in
+        let pevents = get_pevents p in
+        List.fold_left (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc pevents) acc get_pe
+      end DataSet.empty (Gwdb.ipers base)
+  in
+  let acc =
+    if get_f = [] && get_fe = [] then acc
+    else
+      Gwdb.Collection.fold
+        begin fun acc i ->
+          let f = foi base i in
+          let acc = List.fold_left (aux f) acc get_f in
+          let fevents = get_fevents f in
+          List.fold_left (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc fevents) acc get_fe
+        end acc (Gwdb.ifams base)
+  in
+  DataSet.elements acc
 
+let env_keys conf (get_p, get_pe, get_f, get_fe) =
+  let aux acc (k, _) = (k, Opt.default (-1) (p_getint conf.env k)) :: acc in
+  List.fold_left aux
+    (List.fold_left aux
+       (List.fold_left aux
+          (List.fold_left aux [] get_p)
+          get_pe)
+       get_f)
+    get_fe
 
-(* ************************************************************************** *)
-(*  [Fonc] get_person_from_data :
-             config -> base -> (Gwdb.istr * PersSet.elt list) list            *)
-(** [Description] : Construit a partir de la clé d'une donnée, l'ensemble des
-                    personnes en relation avec cette donnée.
-    [Args] :
-      - conf : configuration
-      - base : base
-    [Retour] :
-      - (Gwdb.istr * person list) : retourne la liste des adresses des données
-          ainsi que la liste des personnes en relation avec cette donnée.
-    [Rem] : Non exporté en clair hors de ce module.                           *)
-(* ************************************************************************** *)
 let get_person_from_data conf base =
-  let (data, test_family) = get_data conf in
-  let env_keys =
-    let list = List.map fst data in
-    List.map
-      (fun key ->
-         match p_getint conf.env key with
-           Some hash -> key, hash
-         | None -> key, -1)
-      list
-  in
-  let pers_map = ref PersMap.empty in
-  (* Fonction d'ajout dans la map des personnes (PersMap).         *)
-  (* k = key, istr = data, p = person.                             *)
-  (* A la clé k est associé le binding (istr, ensemble d'individu) *)
-  let map_add k istr p =
+  let (get_p, get_pe, get_f, get_fe) = get_data conf in
+  let keys = env_keys conf (get_p, get_pe, get_f, get_fe) in
+  let add acc k istr p =
     try
-      let (istr, set) = PersMap.find k !pers_map in
-      let set = PersSet.add p set in
-      pers_map := PersMap.add k (istr, set) !pers_map
+      let (istr, set) = PersMap.find k acc in
+      PersMap.add k (istr, (PersSet.add p set)) acc
     with Not_found ->
-      let set = PersSet.add p PersSet.empty in
-      pers_map := PersMap.add k (istr, set) !pers_map
+      PersMap.add k (istr, PersSet.add p PersSet.empty) acc
   in
-  (* Parcours tous les individus et ajoute dans la map les    *)
-  (* individus en relation avec la "data" donné par la clé k. *)
-  Gwdb.Collection.iter (fun i ->
-      let p = pget conf base i in
-      List.iter
-        (fun (label, fun_data) ->
-           match fun_data with
-             Person fun_data ->
-               let istr = fun_data p in
-               let hash_istr = Hashtbl.hash istr in
-               let key = List.assoc label env_keys in
-               if not (is_empty_string istr) && hash_istr = key then
-                 map_add key istr p
-           | Pevent fun_data ->
-               List.iter
-                 (fun evt ->
-                    let istr = fun_data evt in
-                    let hash_istr = Hashtbl.hash istr in
-                    let key = List.assoc label env_keys in
-                    if not (is_empty_string istr) && hash_istr = key then
-                      map_add key istr p)
-                 (get_pevents p)
-           | _ -> ())
-        data)
-    (Gwdb.ipers base) ;
-  (* Parcours toutes les familles et ajoute dans la map les    *)
-  (* individus en relation avec la "data" donnée par la clé k. *)
-  if test_family then
-    Gwdb.Collection.iter (fun i ->
-        let fam = foi base i in
-          List.iter
-            (fun (label, fun_data) ->
-               match fun_data with
-                 Family fun_data ->
-                   let istr = fun_data fam in
-                   let hash_istr = Hashtbl.hash istr in
-                   let key = List.assoc label env_keys in
-                   if not (is_empty_string istr) && hash_istr = key then
-                     let p = pget conf base (get_father fam) in
-                     map_add key istr p;
-                     let p = pget conf base (get_mother fam) in
-                     map_add key istr p
-               | Fevent fun_data ->
-                   List.iter
-                     (fun evt ->
-                        let istr = fun_data evt in
-                        let hash_istr = Hashtbl.hash istr in
-                        let key = List.assoc label env_keys in
-                        if not (is_empty_string istr) && hash_istr = key then
-                          let p = pget conf base (get_father fam) in
-                          map_add key istr p;
-                          let p = pget conf base (get_mother fam) in
-                          map_add key istr p)
-                     (get_fevents fam)
-               | _ -> ())
-            data)
-    (Gwdb.ifams base) ;
-  (* On retourne la liste des couples ("data", persons list) *)
-  let list = ref [] in
-  PersMap.iter
-    (fun _ (istr, pset) -> list := (istr, PersSet.elements pset) :: !list)
-    !pers_map;
-  !list
-
+  let aux = fun fn arg acc (label, get) ->
+    let istr = get arg in
+    let k = List.assoc label keys in
+    if not (is_empty_string istr) && k = Hashtbl.hash istr then fn acc k istr else acc
+  in
+  let acc =
+    Gwdb.Collection.fold
+      begin fun acc i ->
+        let p = pget conf base i in
+        let add acc k istr = add acc k istr p in
+        let acc = List.fold_left (aux add p) acc get_p in
+        let pevents = get_pevents p in
+        List.fold_left (fun acc fn -> List.fold_left (fun acc e -> aux add e acc fn) acc pevents) acc get_pe
+      end PersMap.empty (Gwdb.ipers base)
+  in
+  let acc =
+    if get_f = [] && get_fe = [] then acc
+    else
+      Gwdb.Collection.fold
+        begin fun acc i ->
+          let f = foi base i in
+          let add acc k istr =
+            add (add acc k istr (pget conf base (get_father f))) k istr (pget conf base (get_mother f))
+          in
+          let acc = List.fold_left (aux add f) acc get_f in
+          let fevents = get_fevents f in
+          List.fold_left (fun acc fn -> List.fold_left (fun acc e -> aux add e acc fn) acc fevents) acc get_fe
+        end acc (Gwdb.ifams base)
+  in
+  PersMap.fold
+    (fun _ (istr, pset) acc -> (istr, PersSet.elements pset) :: acc)
+    acc []
 
 (* ************************************************************************** *)
 (*  [Fonc] combine_by_ini : string -> (string * 'a * 'b) list ->
@@ -352,7 +259,6 @@ let print_title conf ini len =
         title ini
     end
 
-
 (* ************************************************************************** *)
 (*  [Fonc] print_long : config -> base -> (string * (string * int) list) list
                            -> int -> unit                                     *)
@@ -367,29 +273,13 @@ let print_title conf ini len =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let print_long conf list len =
-  let env_keys =
-    let list = ref [] in
-    let keys = List.map fst (fst (get_data conf)) in
-    let _ =
-      List.map
-        (fun key ->
-           match p_getint conf.env key with
-             Some hash -> list := (key, hash) :: !list
-           | None -> ())
-        keys
-    in
-    List.sort (fun (s1, _) (s2, _) -> compare s1 s2) !list
+  let keys =
+    env_keys conf (get_data conf)
+    |> List.sort (fun (s1, _) (s2, _) -> compare s1 s2)
+    |> List.filter (function (_, -1) -> false | _ -> true)
   in
-  let data =
-    match p_getenv conf.env "data" with
-      Some s -> s
-    | None -> ""
-  in
-  let ini =
-    match p_getenv conf.env "s" with
-      Some s -> s
-    | None -> ""
-  in
+  let data = Opt.default "" (p_getenv conf.env "data") in
+  let ini = Opt.default "" (p_getenv conf.env "s") in
   (* Construit à partir de la liste de (src * hash) la liste dont      *)
   (* le premier composant est les premières lettres de la sources.     *)
   (* Attention, il ne faut pas faire String.length ini + 1 parce qu'en *)
@@ -458,7 +348,7 @@ let print_long conf list len =
            (fun (s, k) ->
               let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
               Wserver.printf "<li>\n";
-              if k <> env_keys then
+              if k <> keys then
                 let k =
                   List.fold_left
                     (fun accu (k, i) ->
@@ -484,7 +374,7 @@ let print_long conf list len =
                            Wserver.printf
                              "<input type=\"hidden\" name=\"%s\" value=\"%d\"%s>\n"
                              s i conf.xhs)
-                        env_keys;
+                        keys;
                       Wserver.printf
                         "<input type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"%s>\n"
                         conf.xhs;
@@ -559,16 +449,8 @@ let print_long conf list len =
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
 let print_short conf list len =
-  let data =
-    match p_getenv conf.env "data" with
-      Some s -> s
-    | None -> ""
-  in
-  let ini =
-    match p_getenv conf.env "s" with
-      Some s -> s
-    | None -> ""
-  in
+  let data = Opt.default "" (p_getenv conf.env "data") in
+  let ini = Opt.default "" (p_getenv conf.env "s") in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -860,7 +742,7 @@ let update_family conf base old new_istr fam =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
 let update_person_list conf base new_input list nb_pers max_updates =
-  let (_, test_family) = get_data conf in
+  let test_family = match get_data conf with _, _, [], [] -> false | _ -> true in
   let action =
     match p_getenv conf.env "data" with
       Some "occu" -> "co"
@@ -929,34 +811,13 @@ let update_person_list conf base new_input list nb_pers max_updates =
     [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
 let print_mod_ok conf base =
-  let data =
-    match p_getenv conf.env "data" with
-      Some s -> s
-    | None -> ""
+  let data = Opt.default "" (p_getenv conf.env "data") in
+  let ini = Opt.default "" (p_getenv conf.env "s") in
+  let keys =
+    env_keys conf (get_data conf)
+    |> List.sort (fun (s1, _) (s2, _) -> compare s1 s2)
   in
-  let ini =
-    match p_getenv conf.env "s" with
-      Some s -> s
-    | None -> ""
-  in
-  let env_keys =
-    let list = ref [] in
-    let keys = List.map fst (fst (get_data conf)) in
-    let _ =
-      List.map
-        (fun key ->
-           match p_getint conf.env key with
-             Some hash -> list := (key, hash) :: !list
-           | None -> ())
-        keys
-    in
-    List.sort (fun (s1, _) (s2, _) -> compare s1 s2) !list
-  in
-  let new_input =
-    match p_getenv conf.env "nx_input" with
-      Some s -> only_printable s
-    | None -> ""
-  in
+  let new_input = Opt.map_default "" only_printable (p_getenv conf.env "nx_input") in
   let list = get_person_from_data conf base in
   let list = List.map (fun (istr, perl) -> sou base istr, perl) list in
   let nb_pers =
@@ -1010,7 +871,7 @@ let print_mod_ok conf base =
                  Wserver.printf
                    "<input type=\"hidden\" name=\"%s\" value=\"%d\"%s>\n" s i
                    conf.xhs)
-              env_keys;
+              keys;
             Wserver.printf
               "<input type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"%s>\n"
               conf.xhs;
@@ -1092,11 +953,7 @@ let remove_suburb s =
 (* ********************************************************************* *)
 let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
-  let ini =
-    match p_getenv conf.env "s" with
-      Some s -> s
-    | None -> ""
-  in
+  let ini = Opt.default "" (p_getenv conf.env "s") in
   let list = get_all_data conf base in
   (* ! rev_map  = tail-rec ! *)
   let list = List.rev_map (fun (istr, s, k) -> sou base istr, s, k) list in
@@ -1144,11 +1001,7 @@ let build_list conf base =
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
 let build_list_short conf list =
-  let ini =
-    match p_getenv conf.env "s" with
-      Some s -> s
-    | None -> ""
-  in
+  let ini = Opt.default "" (p_getenv conf.env "s") in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -1196,11 +1049,7 @@ let build_list_short conf list =
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
 let build_list_long conf list =
-  let ini =
-    match p_getenv conf.env "s" with
-      Some s -> s
-    | None -> ""
-  in
+  let ini = Opt.default "" (p_getenv conf.env "s") in
   (* Construit à partir de la liste de (src * hash) la liste dont      *)
   (* le premier composant est les premières lettres de la sources.     *)
   (* Attention, il ne faut pas faire String.length ini + 1 parce qu'en *)
@@ -1296,11 +1145,7 @@ and eval_simple_str_var conf _base env _xx =
           Vlist_data l -> List.length l
         | _ -> 0
       in
-      let ini =
-        match p_getenv conf.env "s" with
-          Some s -> s
-        | None -> ""
-      in
+      let ini = Opt.default "" (p_getenv conf.env "s") in
       let (book_of, title) = translate_title conf in
       let result =
         if ini = "" then Printf.sprintf " (%d %s)" len title
@@ -1314,11 +1159,7 @@ and eval_compound_var conf base env xx sl =
   let rec loop =
     function
       [s] -> eval_simple_str_var conf base env xx s
-    | ["evar"; s] ->
-        begin match p_getenv conf.env s with
-          Some s -> s
-        | None -> ""
-        end
+    | ["evar"; s] -> Opt.default "" (p_getenv conf.env s)
     | "encode" :: sl -> code_varenv (loop sl)
     | "escape" :: sl -> Util.escape_html (loop sl)
     | "html_encode" :: sl -> no_html_tags (loop sl)
@@ -1345,16 +1186,9 @@ let print_foreach conf print_ast _eval_expr =
     | _ -> raise Not_found
   and print_foreach_entry env xx _el al =
     let env_keys =
-      let keys = List.map fst (fst (get_data conf)) in
-      let list =
-        List.fold_left
-          (fun accu key ->
-             match p_getint conf.env key with
-               Some hash -> (key, hash) :: accu
-             | None -> accu)
-          [] keys
-      in
-      List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list
+      env_keys conf (get_data conf)
+      |> List.filter (function (_, -1) -> false | _ -> true)
+      |> List.sort (fun (s1, _) (s2, _) -> compare s1 s2)
     in
     let list =
       match get_env "list" env with
