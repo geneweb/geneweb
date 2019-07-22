@@ -1,3 +1,6 @@
+    list too long
+en: the list is too long
+fr: la liste est trop longue
 
 
     rlm_nbr too large

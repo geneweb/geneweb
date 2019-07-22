@@ -188,6 +188,7 @@ let get_all =
     ('a * 'c) array ->
   let ht_size = 2048 in (* FIXME: find the good heuristic *)
   let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
+  let long = p_getenv conf.env "display" = Some "long" in
   let ht_add istr p =
     let key : 'a = sou base istr |> normalize |> fold_place in
     if filter key then begin
@@ -195,7 +196,7 @@ let get_all =
       | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
       | None ->
         Hashtbl.add ht key (mk_value None p) ;
-        if Hashtbl.length ht > max_length then raise List_too_long
+        if Hashtbl.length ht > max_length && long then raise List_too_long
       end
     end
   in
@@ -325,7 +326,7 @@ let print_place_list conf opt long link_to_ind max_rlm_nbr pl_l =
         Wserver.printf
           "<a href=\"%sm=PS%s%s%s\" title=\"%s\">%s</a>"
             (commd conf) opt ("&k=" ^ (Util.code_varenv p2))
-            (if not long then "&long=on" else "") title (p1) ;
+            (if not long then "&display=long" else "&display=short") title (p1) ;
         if link_to_ind && cnt < max_rlm_nbr then
           begin
           Wserver.printf " (<a href=\"%sm=L%s%s&nb=%d%s" (commd conf)
@@ -336,7 +337,7 @@ let print_place_list conf opt long link_to_ind max_rlm_nbr pl_l =
             | (so, _, ipl) :: t_pl ->
                 Wserver.printf "&p%d=%s" cnt so ;
                 List.iteri (fun i ip ->
-                  Wserver.printf "&i%d=%d" (i + cnt) (Type.int_of_iper ip))
+                  Wserver.printf "&i%d=%s" (i + cnt) (Gwdb.string_of_iper ip))
                 ipl ;
                 loop3 (cnt + List.length ipl) t_pl
             | _ -> ()
@@ -353,7 +354,7 @@ let print_place_list conf opt long link_to_ind max_rlm_nbr pl_l =
 
 let print_html_places_surnames_short conf _base max_rlm_nbr link_to_ind
   (array : ((string * string list) * (string * iper list) list) array) =
-  let long = p_getenv conf.env "long" = Some "on" in
+  let long = p_getenv conf.env "display" = Some "long" in
   let k = match p_getenv conf.env "k" with | Some s -> s | _ -> "" in
   let opt = get_opt conf in
   let pl_sn_list = Array.to_list array in
@@ -443,8 +444,9 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
         Wserver.printf " (<a href=\"%sm=L%s%s&nb=%d" (commd conf)
           ("&k=" ^ (Util.code_varenv so))
           opt len ;
+        Wserver.printf "&p0=%s" so ;
         List.iteri (fun i ip ->
-          Wserver.printf "&i%d=%d" i (Type.int_of_iper ip))
+          Wserver.printf "&i%d=%s" i (Gwdb.string_of_iper ip))
         ips ;
         Wserver.printf "\" title=\"%s\">%d</a>)"
           (capitale (transl conf "summary book ascendants")) (List.length ips)
@@ -499,7 +501,7 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
     | [] -> List.iter (fun _ -> Wserver.printf "</ul></li>\n") prev
   in
   Wserver.printf "<ul>\n";
-  loop [] (Array.to_list array) ;
+  loop [] list ;
   Wserver.printf "</ul>\n"
 
 let print_buttons conf _base =
@@ -511,16 +513,14 @@ let print_buttons conf _base =
      Templ.print_foreach = (fun _ -> raise Not_found)}
     [] ()
 
-let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage max_length =
-  let filter = if ini = "" then fun _ -> true else fun x -> List.hd x = ini in
+let print_all_places_surnames_long conf base _ini ~add_birth ~add_baptism
+  ~add_death ~add_burial ~add_marriage max_length short filter =
   let inverted =
     try List.assoc "places_inverted" conf.base_env = "yes"
     with Not_found -> false
   in
-  let opt = get_opt conf in
-  let long = p_getenv conf.env "long" = Some "on" in
   let array =
-    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
+    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage
       ("", []) [] (fold_place_long inverted) filter
       (fun prev p ->
          let value = (get_surname p, get_iper p) in
@@ -542,16 +542,11 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_de
     Wserver.printf "%s / %s" (capitale (transl conf "place"))
       (capitale (transl_nth conf "surname/surnames" 0))
   in
+  let opt = get_opt conf in
+  let long = p_getenv conf.env "display" = Some "long" in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   print_buttons conf base;
-  Wserver.printf "<p>\n";
-  Wserver.printf "<a href=\"%sm=PS%s%s%s\">" (commd conf) opt
-  (if long then "" else "&long=on")
-  (  match p_getenv conf.env "k" with
-    | Some ini -> "&k=" ^ ini
-    | None -> ""
-  );
   let max_rlm_nbr =
     match p_getenv conf.env "max_rlm_nbr" with
     | Some n -> if n = "" then 
@@ -571,10 +566,24 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_de
     | Some "yes" -> true
     | _ -> false
   in
-  Wserver.printf "%s" (capitale
-    (transl conf (if long then "short display" else "long display"))) ;
-  Wserver.printf "</a>";
-  Wserver.printf "</p>\n";
+  let t = if short then (Printf.sprintf "%s" (capitale
+    (transl conf "list too long"))) else ""
+  in
+  let href =
+    if short then ""
+    else
+      Printf.sprintf "href=\"%sm=PS%s%s%s\" title=\"%s\"" (commd conf) opt
+      (if long then "&display=short" else "&display=long")
+      (  match p_getenv conf.env "k" with
+        | Some ini -> "&k=" ^ ini
+        | None -> ""
+      ) t
+  in
+  Wserver.printf "<p>\n<a %s>%s</a>" href
+    (capitale (transl conf
+      (if long then "short display" else "long display"))) ;
+  if short then Wserver.printf " (%s)\n" t;
+  Wserver.printf "<p>\n";
   if array <> [||] then 
     if long then 
       print_html_places_surnames conf base max_rlm_nbr link_to_ind array
@@ -616,14 +625,17 @@ let print_all_places_surnames conf base =
   let add_baptism = p_getenv conf.env "bp" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
-  match p_getenv conf.env "k" with
-  | Some ini ->
-    print_all_places_surnames_long conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      (if ini = "" then fun _ -> true else fun (_, x) -> find_in conf x ini)
-  | None ->
-    print_all_places_surnames_long conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      (fun _ -> true)
-<<<<<<< HEAD
-=======
-
->>>>>>> p0 was missing in m=L list in long mode
+  let lim = try int_of_string @@ List.assoc "short_place_threshold" conf.base_env with _ -> 500 in
+  let (ini, filter) =
+    match p_getenv conf.env "k" with
+    | Some ini ->
+        (ini, (if ini = "" then fun _ -> true else fun (_, x) -> find_in conf x ini))
+    | None -> ("", (fun _ -> true))
+  in
+  try
+    print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_death
+      ~add_burial ~add_marriage lim false filter
+  with List_too_long ->
+    let conf = {conf with env = ("display", "short") :: conf.env} in
+    print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_death
+      ~add_burial ~add_marriage lim true filter

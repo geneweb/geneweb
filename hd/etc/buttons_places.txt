@@ -77,7 +77,7 @@
           %elseif;(bvar.max_rlm_nbr!="")"%bvar.max_rlm_nbr;"
           %else;"80"%end;>
       <label class="label ml-1" title="[*max nbr title]">[*max nbr]</label>
-      %if;(evar.long="on")<input type="hidden" name="long" id="long" value="on">%end;
+      %if;(evar.display="long")<input type="hidden" name="display" id="display" value="long">%end;
       <button type="submit" class="btn btn-primary btn-sm ml-4"
         title="[*search/case sensitive]0 [surname/surnames]1 /
           [places] [and] [event/events]1">
