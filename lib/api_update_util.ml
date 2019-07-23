@@ -278,7 +278,7 @@ let check_family_conflict base sfam scpl sdes =
     end evt.efam_witnesses ;
   end sfam.fevents ;
   (* Vérification des enfants. *)
-  Array.iteri begin fun i (f, s, o, create, var, force_create) ->
+  Array.iter begin fun (f, s, o, create, var, force_create) ->
     if error_conflict_person_link base (f, s, o, create, var, force_create) then
       let form = Some `person_form1 in
       let conflict =
@@ -287,7 +287,7 @@ let check_family_conflict base sfam scpl sdes =
           witness = false;
           rparents = false;
           event = false;
-          pos = Some (Int32.of_int i);
+          pos = None;
           pos_witness = None;
           lastname = s;
           firstname = f;
