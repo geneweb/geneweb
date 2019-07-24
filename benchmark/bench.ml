@@ -27,6 +27,9 @@ let () =
   | bname when bname <> "" ->
     let conf =
       {Config.from="";manitou=false;supervisor=false;wizard=false;
+#ifdef API
+       api_host="";api_port=0;
+#endif
        is_printed_by_template=false;friend=false;
        just_friend_wizard=false;user="";username="";
        auth_scheme=Config.NoAuth;pure_xhtml=false;command="";
