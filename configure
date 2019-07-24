@@ -17,6 +17,7 @@ API_PKG=
 GWDB_D=
 GWDB_PKG=
 SOSA_PKG=
+DUNE_DIRS_EXCLUDE=
 
 while [[ $# -ne 0 ]]; do
   case $1 in
@@ -27,8 +28,10 @@ while [[ $# -ne 0 ]]; do
       GWDB_D="-D GWDB1" ;
       GWDB_PKG="geneweb.gwdb1_internal geneweb.gwdb1" ;;
     --sosa-num)
+      DUNE_DIRS_EXCLUDE="$DUNE_DIRS_EXCLUDE sosa.array sosa.zarith"
       SOSA_PKG="geneweb.sosa-num" ;;
     --sosa-zarith)
+      DUNE_DIRS_EXCLUDE="$DUNE_DIRS_EXCLUDE sosa.array sosa.num"
       SOSA_PKG="geneweb.sosa-zarith" ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
@@ -44,6 +47,7 @@ fi ;
 
 if [[ $SOSA_PKG == "" ]] ; then
   echo -e "\\x1b[33m[WARNING]\\x1b[0m SOSA is not set, using geneweb.sosa" ;
+  DUNE_DIRS_EXCLUDE="$DUNE_DIRS_EXCLUDE sosa.num sosa.zarith" ;
   SOSA_PKG="geneweb.sosa" ;
 fi ;
 
@@ -111,6 +115,7 @@ print_vars() {
   echo "GWDB_D=${GWDB_D}"
   echo "GWDB_PKG=${GWDB_PKG}"
   echo "SOSA_PKG=${SOSA_PKG}"
+  echo "DUNE_DIRS_EXCLUDE=${DUNE_DIRS_EXCLUDE}"
 }
 
 print_makefile() {

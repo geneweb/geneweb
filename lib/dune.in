@@ -1,3 +1,5 @@
+(dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
+
 (library
  (name geneweb)
  (public_name geneweb)
