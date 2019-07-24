@@ -1,6 +1,7 @@
 <!-- $Id: buttons_places.txt v7.00 28/01/2019 05:47:07 $ -->
 <!-- Copyright (c) 1998-2019 INRIA -->
 %( Boutons de configurations et d'options %)
+
 <form class="form-group mx-1" name="evt_url" method="get" action="%action;">
   <input type="hidden" name="m" value="PS">
   <div class="form-inline">
@@ -14,38 +15,49 @@
       <span>[*event/events]1[:]</span>
       <div class="custom-control custom-checkbox ml-2">
         <input type="checkbox" class="custom-control-input" name="bi"
-          id="bi" value="on"
+          onclick="test_all()" id="bi" value="on"
           %if;(evar.bi!="" and evar.bi="on") checked%end;>
         <label class="custom-control-label" title="[*birth place]"
           for="bi">[*birth]</label>
       </div>
       <div class="custom-control custom-checkbox ml-2">
         <input type="checkbox" class="custom-control-input" name="bp"
-          id="bp" value="on"
+          onclick="test_all()" id="bp" value="on"
           %if;(evar.bp!="" and evar.bp="on") checked%end;>
         <label class="custom-control-label" title="[*baptism place]"
           for="bp">[*baptism]</label>
       </div>
       <div class="custom-control custom-checkbox ml-2">
         <input type="checkbox" class="custom-control-input" name="ma"
-          id="ma" value="on"
+          onclick="test_all()" id="ma" value="on"
           %if;(evar.ma!="" and evar.ma="on") checked%end;>
         <label class="custom-control-label" title="[*marriage place]"
           for="ma">[*marriage/marriages]0</label>
       </div>
       <div class="custom-control custom-checkbox ml-2">
         <input type="checkbox" class="custom-control-input" name="de"
-          id="de" value="on"
+          onclick="test_all()" id="de" value="on"
           %if;(evar.de!="" and evar.de="on") checked%end;>
         <label class="custom-control-label" title="[*death place]"
           for="de">[*death]</label>
       </div>
       <div class="custom-control custom-checkbox ml-2">
         <input type="checkbox" class="custom-control-input" name="bu"
-          id="bu" value="on"
+          onclick="test_all()" id="bu" value="on"
           %if;(evar.bu!="" and evar.bu="on") checked%end;>
         <label class="custom-control-label" title="[*burial place]"
           for="bu">[*burial]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-4">
+        <input type="checkbox" class="custom-control-input" name="all"
+          id="all" value="on"
+          %if;((evar.bi!="" and evar.bi="on") and
+          (evar.bp!="" and evar.bp="on") and
+          (evar.ma!="" and evar.ma="on") and
+          (evar.de!="" and evar.de="on") and
+          (evar.bu!="" and evar.bu="on")) checked%end;>
+        <label class="custom-control-label" title="[*all]"
+          for="all">[*all]</label>
       </div>
     </div>
     <div class="form-group">
@@ -121,3 +133,33 @@
   </a>
   </div>
 </div>
+<script>
+
+function toggle (btn, state) {
+  if (state) 
+    { document.getElementById(btn).setAttribute( "value", "on") ;
+      document.getElementById(btn).checked = true; }
+  else
+    { document.getElementById(btn).setAttribute( "value", "") ;
+      document.getElementById(btn).checked = false; } ;
+};
+
+function test_all () {
+  var bi = document.getElementById("bi").checked;
+  var bp = document.getElementById("bp").checked;
+  var ma = document.getElementById("ma").checked;
+  var de = document.getElementById("de").checked;
+  var bu = document.getElementById("bu").checked;
+  var state = bi && bp && ma && de && bp;
+  document.getElementById("all").checked = state;
+};
+
+document.getElementById("all").onclick = function() {
+  var state = document.getElementById("all").checked ;
+  toggle ("bi", state) ;
+  toggle ("bp", state) ;
+  toggle ("ma", state) ;
+  toggle ("de", state) ;
+  toggle ("bu", state) ;
+};
+</script>

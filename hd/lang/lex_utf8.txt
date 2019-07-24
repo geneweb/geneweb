@@ -1,3 +1,7 @@
+    all
+en: all
+fr: tous
+
     list too long
 en: the list is too long
 fr: la liste est trop longue
