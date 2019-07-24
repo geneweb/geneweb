@@ -13,22 +13,18 @@ dev-repo: "git://github.com/geneweb/geneweb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 
 build: [
-  [ "./configure" "--api" ]
+  [ "./configure" ]
   [ make "exe" ]
 ]
 
 install: [
-  [ "./configure" "--api" ]
+  [ "./configure" ]
   [ make "install" ]
 ]
 
 remove: [
-  [ "./configure" "--api" ]
+  [ "./configure" ]
   [ make "uninstall" ]
-]
-
-pin-depends: [
-  [ "markup.dev" "git://github.com/geneanet/markup.ml" ]
 ]
 
 depends: [
