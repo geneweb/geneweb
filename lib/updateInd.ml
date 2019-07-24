@@ -60,11 +60,6 @@ let strip_br str =
   if len > 4 && (String.sub str (len - 4) 4) = "<br>" then
     (String.sub str 0 (len - 4)) else str
 
-let include_hed_trl conf name =
-  match Util.open_templ conf name with
-    Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-
 let rec eval_var conf base env p _loc sl =
   try eval_special_var conf base sl with
     Not_found -> eval_simple_var conf base env p sl
@@ -829,7 +824,7 @@ and eval_special_var conf base =
   | ["include"; "perso_header"] ->
       (* TODO merge with mainstream includes ?? *)
       (* for perso_header, we need a person! *)
-      begin match p_getint conf.env "i" with
+      begin match p_getenv conf.env "i" with
         Some i ->
           let has_base_loop =
             try let _ = Util.create_topological_sort conf base in false with
@@ -837,7 +832,7 @@ and eval_special_var conf base =
           in
           if has_base_loop then str_val (Printf.sprintf "has base loop")
           else
-            let p = poi base (iper_of_string i) in
+            let p = poi base (Gwdb.iper_of_string i) in
             Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf
               base p;
             str_val ""
@@ -1025,7 +1020,7 @@ let print_add conf base =
 let print_mod conf base =
   match p_getenv conf.env "i" with
     Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = poi base (Gwdb.iper_of_string i) in
       let sp = string_person_of base p in
       let digest = Update.digest_person sp in
       print_update_ind conf base sp digest
@@ -1033,13 +1028,16 @@ let print_mod conf base =
 
 let print_del conf base =
   match p_getenv conf.env "i" with
-    Some i -> let p = poi base (iper_of_string i) in print_del1 conf base p
+    Some i -> let p = poi base
+      (Gwdb.iper_of_string i) in print_del1 conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
     Some i ->
-      let p = string_person_of base (poi base (iper_of_string i)) in
+      let p = string_person_of base
+        (poi base (Gwdb.iper_of_string i))
+      in
       Hutil.interp conf "updindevt"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);

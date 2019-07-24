@@ -387,7 +387,7 @@ let get_extension_old conf keydir =
 let print_confirm_c conf base save_m report =
   match p_getint conf.env "i" with
   | Some ip ->
-      let p = poi base (Adef.iper_of_int ip) in
+      let p = poi base (Gwdb.iper_of_string (string_of_int ip)) in
       let sp = UpdateInd.string_person_of base p in
       let digest = default_image_name base p in
       let new_env =
@@ -538,7 +538,7 @@ let effective_delete_c_ok conf base p =
   in
     (* TODO verify we dont destroy a saved image
         having the same name as portrait! *)
-  if delete then Util.rm
+  if delete then Mutil.rm
     (String.concat Filename.dir_sep [full_dir; "saved"; file])
   else
     if (move_file_to_old full_dir file) = 0 then incorrect conf;
@@ -635,9 +635,9 @@ let print_c conf base =
     begin match p_getenv conf.env "m" with
     | Some m ->
       let save_m = m in
-      begin match p_getint conf.env "i" with
+      begin match p_getenv conf.env "i" with
       | Some ip ->
-          let p = poi base (Adef.iper_of_int ip) in
+          let p = poi base (Gwdb.iper_of_string ip) in
           let digest = default_image_name base p in
           let (conf, report) =
             begin match m with
