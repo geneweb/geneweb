@@ -12,14 +12,14 @@ with a Web interface and can be used off-line or as a Web service.
 | OCaml 4.07 | [![linux-407]][travis-link] | [![macosx-407]][travis-link] | [![win-407]][appveyor-link]
 | OCaml 4.08 | [![linux-408]][travis-link] | [![macosx-408]][travis-link] | -
 
-[linux-405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/1
-[linux-406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/2
-[linux-407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/3
-[linux-408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/4
-[macosx-405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/5
-[macosx-406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/6
-[macosx-407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/7
-[macosx-408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/phonetic/branches/master/8
+[linux-405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/1
+[linux-406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/2
+[linux-407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/3
+[linux-408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/4
+[macosx-405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/5
+[macosx-406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/6
+[macosx-407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/7
+[macosx-408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/8
 [win-407]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
 [travis-link]:https://travis-ci.org/geneweb/geneweb
 [appveyor-link]:https://ci.appveyor.com/project/geneweb/geneweb
