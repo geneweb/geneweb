@@ -399,7 +399,8 @@ let treat_request conf base =
   with
     Some s, _, _ -> print_moved conf s
   | _, Some "no_index", _ -> print_no_index conf base
-  | _, _, Some "IM" -> ImageDisplay.print conf base
+  | _, _, Some "IM" -> Image.print conf base
+  | _, _, Some "IMS" -> Image.print ~bak:true conf base
   | _, _, Some "DOC" ->
       begin match p_getenv conf.env "s" with
         Some f ->
