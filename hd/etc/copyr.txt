@@ -78,25 +78,17 @@
             </div>
           %end;
         </div>
-      %end;
-      <div class="d-inline-flex flex-column justify-content-end">
-        <div class="ml-auto">
-          <a role="button"
-            href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%if;(evar.digest="")%suffix;%end;"
-            title="%if(evar.templ!="templm")templm%else;defaut template%end;">%nn;
-            <span class="fab fa-markdown" aria-hidden="true"></span>%nn;
-            <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;defaut template%end;</span>%nn;
-          </a>
-          GeneWeb v. %version;
-        </div>
-        <div class="btn-group">
-          <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2019</span>
-          <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang!="en")/%lang;%end;" class="ml-1"
-            target="_blank" rel="noreferrer, noopener" title="Documentation GeneWeb">%nn;
-            <i class="fab fa-wikipedia-w"></i></a>%nn;
-          <a href="https://github.com/geneweb/geneweb" class="ml-1"
-            target="_blank" rel="noreferrer, noopener" title="GeneWeb on Github">%nn;
-            <i class="fab fa-github"></i></a>
+        %end;
+      </div>
+      <div class="d-flex flex-xs-column flex-md-row ml-md-auto p-sm-2 align-items-center">
+        <div class="btn-sm-group">
+        <a href="https://github.com/geneweb/geneweb" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb sources on GitHub">%nn;
+        <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
+        <span class="align-self-center mx-1">
+          &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017%if;(connections!="") %connections;%end;%nn;
+        </span>
+        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang!="en")/%lang;%end;" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb documentation MediaWiki">%nn;
+        <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb wiki"/></a>
         </div>
       </div>
     </div>
