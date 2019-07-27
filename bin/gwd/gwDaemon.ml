@@ -1608,7 +1608,21 @@ let extract_multipart boundary str =
         | Some var, None ->
             let var = strip_quotes var in
             let (s, i) = next_line i in
-            if s = "" then let (s, i) = next_line i in (var, s) :: loop i
+            let i = skip_nl i in
+            if s = "" then
+              let (s, i) = 
+                let rec loop1 acc i =
+                  let (s, i1) = next_line i in
+                  if s = boundary || s = boundary ^ "--" then
+                    let acc = String.sub acc 0 (* remove last \n *)
+                      (String.length acc - (String.length "\n"))
+                    in
+                    let acc = Wserver.encode acc in
+                    (acc, i) (* i remembers last boundary for a fresh loop *)
+                  else loop1 (acc ^ s ^ "\n") i1
+                in loop1 "" i
+              in
+              (var, s) :: loop i
             else loop i
         | _ -> loop i
       else if s = boundary ^ "--" then []
