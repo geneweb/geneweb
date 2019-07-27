@@ -2567,14 +2567,6 @@ let default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
-(*let auto_image_file conf base p =
-  let s = default_image_name base p in
-  let f = Filename.concat (base_path ["images"] conf.bname) s in
-  if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
-  else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
-  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
-  else None
-*)
 let auto_image_file ?bak:(b=false) conf base p =
   let s = default_image_name base p in
   let dir =

@@ -1614,8 +1614,10 @@ let extract_multipart boundary str =
                 let rec loop1 acc i =
                   let (s, i1) = next_line i in
                   if s = boundary || s = boundary ^ "--" then
-                    let acc = String.sub acc 0 (* remove last \n *)
-                      (String.length acc - (String.length "\n"))
+                    let acc =
+                      if acc <> "" then String.sub acc 0 (* remove last \n *)
+                        (String.length acc - (String.length "\n"))
+                      else acc
                     in
                     let acc = Wserver.encode acc in
                     (acc, i) (* i remembers last boundary for a fresh loop *)

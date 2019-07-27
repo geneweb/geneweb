@@ -21,16 +21,10 @@ let incorrect_content_type conf base p s =
   let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<p>\n";
-  Wserver.printf "<em style=\"font-size:smaller\">";
+  Wserver.printf "<p>\n<em style=\"font-size:smaller\">";
   Wserver.printf "Error: incorrect image content type: %s" s;
-  Wserver.printf "</em>\n";
-  Wserver.printf "</p>\n";
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>\n";
-  Wserver.print_string (referenced_person_title_text conf base p);
-  Wserver.printf "</li>\n";
-  Wserver.printf "</ul>\n";
+  Wserver.printf "</em>\n</p>\n<ul>\n<li>\n%s</li>\n</ul>\n"
+    (referenced_person_title_text conf base p);
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
 
@@ -43,12 +37,8 @@ let error_too_big_image conf base p len max_len =
     conf.xhs;
   Wserver.printf "Maximum authorized in this database: %d bytes<br%s>\n"
     max_len conf.xhs;
-  Wserver.printf "</em></p>\n";
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>\n";
-  Wserver.print_string (referenced_person_title_text conf base p);
-  Wserver.printf "</li>\n";
-  Wserver.printf "</ul>\n";
+  Wserver.printf "</em></p>\n<ul>\n<li>\n%s</li>\n</ul>\n"
+    (referenced_person_title_text conf base p);
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
 
@@ -59,19 +49,14 @@ let raw_get conf key =
 let print_link_delete_image conf base p =
   if Util.has_image conf base p then
     begin
-      Wserver.printf "<p>\n";
-      begin
-        Wserver.printf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
-          (string_of_iper (get_iper p));
-        Wserver.printf "%s %s" (Utf8.capitalize (transl conf "delete"))
-          (transl_nth conf "image/images" 0);
-        Wserver.printf "</a>"
-      end;
-      Wserver.printf "</p>\n"
+      Wserver.printf "<p>\n<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
+        (string_of_iper (get_iper p));
+      Wserver.printf "%s %s" (capitale (transl conf "delete"))
+        (transl_nth conf "image/images" 0);
+      Wserver.printf "</a></p>\n"
     end
 
 (* Send image form *)
-
 let print_send_image conf base p =
   let title h =
     if Util.has_image conf base p then
@@ -109,14 +94,11 @@ let print_send_image conf base p =
   Wserver.printf "%s%s\n" (Utf8.capitalize (transl conf "file")) (Util.transl conf ":");
   Wserver.printf "<input \
 type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" \
-maxlength=\"250\" accept=\"image/*\"%s>\n"
+maxlength=\"250\" accept=\"image/*\"%s>\n</p>\n"
     conf.xhs;
-  Wserver.printf "</p>\n";
   begin match p_getint conf.base_env "max_images_size" with
     Some len ->
-      Wserver.printf "<p>\n";
-      Wserver.printf "(maximum authorized size = %d bytes)\n" len;
-      Wserver.printf "</p>\n"
+      Wserver.printf "<p>\n(maximum authorized size = %d bytes)\n</p>\n" len
   | None -> ()
   end;
   Wserver.printf
@@ -186,11 +168,8 @@ let print_sent conf base p =
     Wserver.print_string (Utf8.capitalize (transl conf "image received"))
   in
   Hutil.header conf title;
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>";
-  Wserver.print_string (referenced_person_text conf base p);
-  Wserver.printf "</li>";
-  Wserver.printf "</ul>\n";
+  Wserver.printf "<ul><li>\n%s\n</li></ul>\n"
+    (referenced_person_text conf base p);
   Hutil.trailer conf
 
 let write_file fname content =
@@ -199,9 +178,11 @@ let write_file fname content =
 
 let move_file_to_old dir file  =
   let save_dir = Filename.concat dir "saved" in
+  let fname = Filename.basename file in
   if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
-  let orig_file = Filename.concat dir file in
-  let saved_file = Filename.concat save_dir file in
+  let orig_file = Filename.concat dir fname in
+  let saved_file = Filename.concat save_dir fname in
+  (* TODO handle rn errors *)
   Mutil.rn orig_file saved_file;
   let orig_file_t = (Filename.remove_extension orig_file) ^ ".txt" in
   let saved_file_t = (Filename.remove_extension saved_file) ^ ".txt" in
@@ -292,12 +273,14 @@ let effective_send_ok conf base p file =
       (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());
       d1
   in
-  let fname = Filename.concat bfdir bfname in
-  write_file (fname ^ extension_of_type typ) content;
+  let fname = bfname ^ extension_of_type typ in
+  let _moved = move_file_to_old bfdir bfname in
+  write_file (Filename.concat bfdir fname) content;
   let changed =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
-  History.record conf base changed "si" (*; print_sent conf base p*)
+  History.record conf base changed "si";
+  print_sent conf base p
 
 let print_send_ok conf base =
   let ip =
@@ -321,8 +304,11 @@ let print_deleted conf base p =
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =
-  (* TODO check if image exists *)
-  let file = default_image_name base p in
+  let file = 
+    match auto_image_file conf base p with
+    | Some f -> f
+    | None -> incorrect conf;
+  in
   let dir = Util.base_path ["images"] conf.bname in
   if (move_file_to_old dir file = 0) then incorrect conf;
   let changed =
