@@ -552,18 +552,10 @@ let ls_r dirs =
   loop [] dirs
 
 let rm fname =
-  try if Sys.file_exists fname then Sys.remove fname
-  with Failure _ -> 
-    begin
-      Printf.eprintf "Rm failed: %s\n" fname; flush stderr
-    end
+  if Sys.file_exists fname then Sys.remove fname
 
 let rn fname s =
-  try if Sys.file_exists fname then Sys.rename fname s
-  with Failure _ -> 
-    begin
-      Printf.eprintf "Rn failed: %s to %s\n" fname s; flush stderr
-    end
+  if Sys.file_exists fname then Sys.rename fname s
 
 let rm_rf dir =
   if Sys.file_exists dir then

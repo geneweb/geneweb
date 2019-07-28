@@ -177,17 +177,22 @@ let write_file fname content =
   output_string oc content; flush oc; close_out oc
 
 let move_file_to_old dir file  =
-  let save_dir = Filename.concat dir "saved" in
-  let fname = Filename.basename file in
-  if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
-  let orig_file = Filename.concat dir fname in
-  let saved_file = Filename.concat save_dir fname in
-  (* TODO handle rn errors *)
-  Mutil.rn orig_file saved_file;
-  let orig_file_t = (Filename.remove_extension orig_file) ^ ".txt" in
-  let saved_file_t = (Filename.remove_extension saved_file) ^ ".txt" in
-  Mutil.rn orig_file_t saved_file_t;
-  if Sys.file_exists saved_file then 1 else 0
+  try
+    begin
+    let save_dir = Filename.concat dir "saved" in
+    let fname = Filename.basename file in
+    if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
+    let orig_file = Filename.concat dir fname in
+    let saved_file = Filename.concat save_dir fname in
+    (* TODO handle rn errors *)
+    Mutil.rn orig_file saved_file;
+    let orig_file_t = (Filename.remove_extension orig_file) ^ ".txt" in
+    let saved_file_t = (Filename.remove_extension saved_file) ^ ".txt" in
+    if Sys.file_exists orig_file_t then
+      Mutil.rn orig_file_t saved_file_t;
+    1
+    end
+  with _ -> 0
 
 let normal_image_type s =
   if String.length s > 10 && Char.code s.[0] = 0xff && Char.code s.[1] = 0xd8
