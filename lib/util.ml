@@ -368,19 +368,6 @@ let default_safe_html_allowed_tags =
   ; ("http://www.w3.org/1999/xhtml", "section")
   ]
 
-(* ********************************************************************* *)
-(*  [Fonc] value sanitize_html : string -> string                        *)
-(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
-                    les éléments dangereux.
-    [Args] :
-      - html_str : Chaîne de caractères à assainir.
-    [Retour] : La chaîne de caractères assainie.                         *)
-(* ********************************************************************* *)
-let sanitize_html html_str =
-  (* Enlève les évènements DOM. *)
-  let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
-  Str.global_replace regexp_dom_events "" html_str
-
 (** [escape_html str] replaces '&', '"', '<' and '>'
     with their corresponding character entities (using entity number) *)
 let escape_html str =
