@@ -1,3 +1,7 @@
+    warning refresh
+en: refresh the page only after having clicked on the main icon
+fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l'icone
+
     select input
 de: wählen
 en: choose file
