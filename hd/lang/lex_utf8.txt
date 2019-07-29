@@ -1,6 +1,6 @@
     warning refresh
-en: refresh the page only after having clicked on the main icon
-fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l'icone
+en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
+fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l'icone car cela répéterait l'échange des images.
 
     select input
 de: wählen

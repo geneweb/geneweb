@@ -180,10 +180,13 @@
                       <br><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;" width="185px">'>%nn;     
               <i class="far fa-trash-alt text-danger"></i></a>
           </div>
-        %end;
-        <a class="d_flex" href="%prefix;&m=IMAGE_C&i=%index;" title="[*add]/[delete] [image/images]0">
+          <table style="line-height:0.8;" class="mt-2"><tr>
+          <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=IMAGE_C&i=%index;" title="[*add]/[delete] [image/images]0">
             <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
-        </a>%sp;<small>[*warning refresh]</small>%nn;
+          </a></td><td>&nbsp;</td>
+          <td><small>[*warning refresh]</small>%nn;</td>
+          </tr></table>
+        %end;
       %end;
       %if;(keydir_img_nbr>0)
         <h1 class="display-4">[*image/images]1</h1>
@@ -263,6 +266,12 @@
             </div>
           </div>
         %end;
+        <table style="line-height:0.8;" class="mt-2"><tr>
+        <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=IMAGE_C&i=%index;" title="[*add]/[delete] [image/images]0">
+          <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
+        </a></td><td>&nbsp;</td>
+        <td><small>[*warning refresh]</small>%nn;</td>
+        </tr></table>
       %end;
     </div>
   </div>
