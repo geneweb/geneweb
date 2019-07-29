@@ -859,11 +859,38 @@ let rename_image_file conf base op sp =
     Some old_f ->
       let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
       let f = Filename.concat (Util.base_path ["images"] conf.bname) s in
-      let new_f =
-        if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
+      let new_f = (* TODO check order and list of accepted extensions *)
+        if Filename.check_suffix old_f ".jpg" then f ^ ".jpg"
+        else if Filename.check_suffix old_f ".png" then f ^ ".png"
+        else f ^ ".gif"
       in
       (try Sys.rename old_f new_f with Sys_error _ -> ())
   | _ -> ()
+
+let rename_keydir conf base op sp =
+  match auto_image_file ~bak:true conf base op with
+    Some old_fb ->
+      let k2 = default_image_name_of_key sp.first_name sp.surname sp.occ in
+      let new_fb = String.concat Filename.dir_sep
+        [(Util.base_path ["images"] conf.bname); "saved"; k2]
+      in
+      let new_fb =
+        if Filename.check_suffix old_fb ".jpg" then new_fb ^ ".jpg"
+        else if Filename.check_suffix old_fb ".png" then new_fb ^ ".png"
+        else new_fb ^ ".gif"
+      in
+      (try Sys.rename old_fb new_fb with Sys_error _ -> ())
+  | _ -> ();
+  match default_image_name base op with
+    old_kd ->
+      let new_kd = default_image_name_of_key sp.first_name sp.surname sp.occ in
+      let old_kd = String.concat Filename.dir_sep
+        [(Util.base_path ["src"] conf.bname); "images"; old_kd]
+      in
+      let new_kd = String.concat Filename.dir_sep
+        [(Util.base_path ["src"] conf.bname); "images"; new_kd]
+      in
+      (try Sys.rename old_kd new_kd with Sys_error _ -> ())
 
 let rparents_of rparents =
   List.fold_left
@@ -889,15 +916,19 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let ofn = p_first_name base op in
   let osn = p_surname base op in
   let oocc = get_occ op in
-  if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then begin
-    match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
-    | Some p' when p' <> pi && Some p' <> skip_conflict ->
-      print_conflict conf base (poi base p')
-    | _ ->
-      rename_image_file conf base op sp
-  end ;
-  if List.assoc_opt "nsck" conf.env <> Some "on"
-  then check_sex_married ?prerr conf base sp op ;
+  if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
+  else
+    begin let ipl = Gutil.person_ht_find_all base key in
+      check_conflict conf base sp ipl; 
+      rename_image_file conf base op sp;
+      rename_keydir conf base op sp
+    end;
+  (* Si on modifie la personne pour lui ajouter un nom/prénom, alors *)
+  (* il faut remettre le compteur du nombre de personne à jour.      *)
+  if ofn = "?" && osn = "?" && sp.first_name <> "?" && sp.surname <> "?" then
+    patch_cache_info conf Util.cache_nb_base_persons
+      (fun v -> let v = int_of_string v + 1 in string_of_int v);
+  check_sex_married conf base sp op;
   let created_p = ref [] in
   let np =
     Futil.map_person_ps (Update.insert_person conf base "" created_p)

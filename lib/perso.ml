@@ -4113,7 +4113,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "keydir_img_nbr" ->
     string_of_int (List.length (get_keydir conf base p))
   | "keydir_img_notes" ->
-      begin match get_env "keydir_img_notes" env with
+      begin match get_env "keydir_img" env with
         Vstring f ->
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
@@ -4121,7 +4121,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | _ -> raise Not_found
       end
   | "keydir_img_src" ->
-      begin match get_env "keydir_img_src" env with
+      begin match get_env "keydir_img" env with
         Vstring f ->
           begin
             let ext = Filename.extension f in
@@ -4142,7 +4142,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | _ -> raise Not_found
       end
   | "keydir_img_title" ->
-      begin match get_env "keydir_img_title" env with
+      begin match get_env "keydir_img" env with
         Vstring f ->
           begin
             let ext = Filename.extension f in
@@ -5498,10 +5498,8 @@ let print_foreach conf base print_ast eval_expr =
           a :: l ->
           let env =
             ("keydir_img", Vstring a) ::
-            ("keydir_img_notes", Vstring a) ::
-            ("keydir_img_title", Vstring a) ::
-            ("keydir_img_src", Vstring a) ::
-            ("first", Vbool first) :: ("last", Vbool (l = [])) ::
+            ("first", Vbool first) :: 
+            ("last", Vbool (l = [])) ::
             ("cnt", Vint cnt) :: env
           in
             List.iter (print_ast env ep) al; loop false (cnt + 1) l

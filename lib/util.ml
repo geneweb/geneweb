@@ -2554,6 +2554,10 @@ let default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
+(* *********************************************************************** *)
+(* Returns the full path to default_image_name                             *)
+(*  [bak] (optionnal) returns the path to the saved copy                   *)
+(* *********************************************************************** *)
 let auto_image_file ?bak:(b=false) conf base p =
   let s = default_image_name base p in
   let dir =
