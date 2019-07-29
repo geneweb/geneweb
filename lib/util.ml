@@ -368,9 +368,30 @@ let default_safe_html_allowed_tags =
   ; ("http://www.w3.org/1999/xhtml", "section")
   ]
 
-(** [escape_html str] replaces '&', '"', '<' and '>'
-    with their corresponding character entities (using entity number) *)
-let escape_html str =
+let safe_html_allowed_tags =
+  lazy begin
+    if !allowed_tags_file = "" then default_safe_html_allowed_tags
+    else begin
+      let ic = open_in !allowed_tags_file in
+      let rec loop tags =
+        match input_line ic with
+        | tag ->
+          let ns, tag =
+            match String.split_on_char ' ' tag with
+            | [ ns ; tag ] -> (ns, tag)
+            | [ tag ] -> "http://www.w3.org/1999/xhtml", tag
+            | _ -> assert false
+          in
+          loop ((ns, String.lowercase_ascii tag) :: tags)
+        | exception End_of_file ->
+          close_in ic ;
+          tags
+      in
+      loop []
+    end
+  end
+
+let escape_aux count blit str =
   let strlen = String.length str in
   let rec loop acc i =
     if i < strlen
@@ -384,6 +405,19 @@ let escape_html str =
       in loop 0 0
   in
   loop 0 0
+
+(* ********************************************************************* *)
+(*  [Fonc] value sanitize_html : string -> string                        *)
+(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
+                    les éléments dangereux.
+    [Args] :
+      - html_str : Chaîne de caractères à assainir.
+    [Retour] : La chaîne de caractères assainie.                         *)
+(* ********************************************************************* *)
+let _sanitize_html html_str =
+  (* Enlève les évènements DOM. *)
+  let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
+  Str.global_replace regexp_dom_events "" html_str
 
 (** [escape_html str] replaces '&', '"', '<' and '>'
     with their corresponding character entities (using entity number) *)
@@ -2554,10 +2588,14 @@ let default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
-(* *********************************************************************** *)
-(* Returns the full path to default_image_name                             *)
-(*  [bak] (optionnal) returns the path to the saved copy                   *)
-(* *********************************************************************** *)
+(*let auto_image_file conf base p =
+  let s = default_image_name base p in
+  let f = Filename.concat (base_path ["images"] conf.bname) s in
+  if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
+  else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
+  else None
+*)
 let auto_image_file ?bak:(b=false) conf base p =
   let s = default_image_name base p in
   let dir =

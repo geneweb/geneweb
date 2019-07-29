@@ -916,19 +916,16 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let ofn = p_first_name base op in
   let osn = p_surname base op in
   let oocc = get_occ op in
-  if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
-  else
-    begin let ipl = Gutil.person_ht_find_all base key in
-      check_conflict conf base sp ipl; 
+  if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then begin
+    match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
+    | Some p' when p' <> pi && Some p' <> skip_conflict ->
+      print_conflict conf base (poi base p')
+    | _ ->
       rename_image_file conf base op sp;
       rename_keydir conf base op sp
-    end;
-  (* Si on modifie la personne pour lui ajouter un nom/prénom, alors *)
-  (* il faut remettre le compteur du nombre de personne à jour.      *)
-  if ofn = "?" && osn = "?" && sp.first_name <> "?" && sp.surname <> "?" then
-    patch_cache_info conf Util.cache_nb_base_persons
-      (fun v -> let v = int_of_string v + 1 in string_of_int v);
-  check_sex_married conf base sp op;
+  end ;
+  if List.assoc_opt "nsck" conf.env <> Some "on"
+  then check_sex_married ?prerr conf base sp op ;
   let created_p = ref [] in
   let np =
     Futil.map_person_ps (Update.insert_person conf base "" created_p)

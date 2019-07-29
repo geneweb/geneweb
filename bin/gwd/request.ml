@@ -105,8 +105,6 @@ let family_m conf base =
       | "DAG" -> handler.dag
       | "DEL_FAM" -> handler.del_fam
       | "DEL_FAM_OK" -> handler.del_fam_ok
-      | "DEL_IMAGE" -> handler.del_image
-      | "DEL_IMAGE_OK" -> handler.del_image_ok
       | "DEL_IMAGE_C_OK" -> handler.del_image_c_ok
       | "DEL_IND" -> handler.del_ind
       | "DEL_IND_OK" -> handler.del_ind_ok
@@ -171,8 +169,6 @@ let family_m conf base =
       | "RESET_IMAGE_C_OK" -> handler.reset_image_c_ok
       | "RLM" -> handler.rlm
       | "S" -> handler.s
-      | "SND_IMAGE" -> handler.snd_image
-      | "SND_IMAGE_OK" -> handler.snd_image_ok
       | "SND_IMAGE_C_OK" -> handler.snd_image_c_ok
       | "SRC" -> handler.src
       | "STAT" -> handler.stat
@@ -375,7 +371,7 @@ let print_moved conf s =
       Wserver.print_string s;
       Wserver.printf "</a>";
       Wserver.printf "\n</dd></dt></dl>\n";
-      Hutil.trailer conf)
+      Hutil.trailer conf
 
 let print_no_index conf base =
   let title _ =
@@ -399,8 +395,8 @@ let treat_request conf base =
   with
     Some s, _, _ -> print_moved conf s
   | _, Some "no_index", _ -> print_no_index conf base
-  | _, _, Some "IM" -> Image.print conf base
-  | _, _, Some "IMS" -> Image.print ~bak:true conf base
+  | _, _, Some "IM" -> ImageDisplay.print conf base
+  | _, _, Some "IMS" -> ImageDisplay.print ~bak:true conf base
   | _, _, Some "DOC" ->
       begin match p_getenv conf.env "s" with
         Some f ->
@@ -478,11 +474,10 @@ let this_request_updates_database conf =
       begin match x with
         "ADD_FAM_OK" | "ADD_IND_OK" | "CHANGE_WIZ_VIS" | "CHG_CHN_OK" |
         "CHG_EVT_IND_ORD_OK" | "CHG_EVT_FAM_ORD_OK" | "CHG_FAM_ORD_OK" |
-        "DEL_FAM_OK" | "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" |
+        "DEL_FAM_OK" | "DEL_IND_OK" | "INV_FAM_OK" |
         "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" |
         "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" |
-        "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "MOD_DATA_OK" |
-        "SND_IMAGE_OK" ->
+        "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "MOD_DATA_OK" ->
           true
       | "API_BASE_WARNINGS" | "API_IMAGE_UPDATE" | "API_REMOVE_IMAGE_EXT" |
         "API_REMOVE_IMAGE_EXT_ALL" | "API_DEL_PERSON_OK" |

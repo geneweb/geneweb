@@ -1610,7 +1610,7 @@ let extract_multipart boundary str =
             let (s, i) = next_line i in
             let i = skip_nl i in
             if s = "" then
-              let (s, i) = 
+              let (s, i) =
                 let rec loop1 acc i =
                   let (s, i1) = next_line i in
                   if s = boundary || s = boundary ^ "--" then

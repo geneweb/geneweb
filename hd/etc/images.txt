@@ -177,7 +177,7 @@
             <a role="button" class="ml-auto col-1" href="%prefix_base_password;&m=DEL_IMAGE_C_OK&i=%index;&idigest=%idigest;&delete=on"
               data-toggle="tooltip" data-html="true" data-placement="left"
                title='<i class="far fa-trash-alt text-danger mr-1"></i><strong>[*delete] [portrait] [saved]0</strong><br><span class="small">saved%X;%portrait_saved;</span>
-                      <br><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;" width="185px">'>%nn;     
+                      <br><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;" width="185px">'>%nn;
               <i class="far fa-trash-alt text-danger"></i></a>
           </div>
           <table style="line-height:0.8;" class="mt-2"><tr>
@@ -249,7 +249,7 @@
             <a role="button" href="%prefix_base_password;&m=RESET_IMAGE_C_OK&i=%index;&mode=others&file_name=%keydir_img_old_key;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="top"
                title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [saved images]0</strong><br><span class="small">%keydir_img_old;</span>
-                      <br><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;&s=%keydir_img_old_key;" width="185px">'>%nn;     
+                      <br><img class="rounded my-1" src="%prefix_base_password;&m=IMS&i=%index;&s=%keydir_img_old_key;" width="185px">'>%nn;
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;
             </a>%nn;
             <samp class="text-truncate ml-1" title="%images_store;%X;saved%X;%keydir_img_old;">%keydir_img_old;</samp>

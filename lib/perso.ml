@@ -5498,7 +5498,7 @@ let print_foreach conf base print_ast eval_expr =
           a :: l ->
           let env =
             ("keydir_img", Vstring a) ::
-            ("first", Vbool first) :: 
+            ("first", Vbool first) ::
             ("last", Vbool (l = [])) ::
             ("cnt", Vint cnt) :: env
           in

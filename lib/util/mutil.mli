@@ -204,3 +204,8 @@ val read_or_create
   -> (in_channel -> 'a)
   -> (out_channel -> 'a)
   -> 'a
+
+(** [rn fname s]
+    Rename [fname] to [s]. If [fname] does not exists, do nothing.
+*)
+val rn : string -> string -> unit

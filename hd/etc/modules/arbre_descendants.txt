@@ -51,7 +51,7 @@
       %if;not cancel_links;</a>%end;
     %elseif;(bvar.default_image="yes")
       %if;(wizard and not cancel_links)
-        <a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" %nn;
+        <a href="%xxx.bname_prefix;m=IMAGE_C;i=%xxx.index;" %nn;
           class="normal_anchor" target="_blank" %nn;
           title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%nn;
       %end;

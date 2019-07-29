@@ -45,122 +45,6 @@ let error_too_big_image conf base p len max_len =
 let raw_get conf key =
   try List.assoc key conf.env with Not_found -> incorrect conf
 
-(* print delete image link *)
-let print_link_delete_image conf base p =
-  if Util.has_image conf base p then
-    begin
-      Wserver.printf "<p>\n<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
-        (string_of_iper (get_iper p));
-      Wserver.printf "%s %s" (capitale (transl conf "delete"))
-        (transl_nth conf "image/images" 0);
-      Wserver.printf "</a></p>\n"
-    end
-
-(* Send image form *)
-let print_send_image conf base p =
-  let title h =
-    if Util.has_image conf base p then
-      Wserver.print_string
-        (Utf8.capitalize
-           (transl_decline conf "modify" (transl_nth conf "image/images" 0)))
-    else
-      Wserver.print_string
-        (Utf8.capitalize
-           (transl_decline conf "add" (transl_nth conf "image/images" 0)));
-    if h then ()
-    else
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
-      Wserver.printf ": ";
-      Wserver.printf "%s %s" fn sn;
-      Util.print_reference conf fn (get_occ p) sn
-  in
-  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "<h2>\n";
-  title false;
-  Wserver.printf "</h2>\n";
-  Wserver.printf
-    "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
-    conf.command;
-  Wserver.printf "<p>\n";
-  Util.hidden_env conf;
-  Wserver.printf
-    "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"%s>\n" conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper (get_iper p)) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n"
-    digest conf.xhs;
-  Wserver.printf "%s%s\n" (Utf8.capitalize (transl conf "file")) (Util.transl conf ":");
-  Wserver.printf "<input \
-type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" \
-maxlength=\"250\" accept=\"image/*\"%s>\n</p>\n"
-    conf.xhs;
-  begin match p_getint conf.base_env "max_images_size" with
-    Some len ->
-      Wserver.printf "<p>\n(maximum authorized size = %d bytes)\n</p>\n" len
-  | None -> ()
-  end;
-  Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg mt-2\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</form>\n";
-  print_link_delete_image conf base p;
-  Hutil.trailer conf
-
-let print conf base =
-  match p_getenv conf.env "i" with
-    Some ip ->
-      let p = poi base (iper_of_string ip) in
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
-      if sou base (get_image p) <> "" || fn = "?" || sn = "?" then
-        Hutil.incorrect_request conf
-      else print_send_image conf base p
-  | _ -> Hutil.incorrect_request conf
-
-(* Delete image form *)
-
-let print_delete_image conf base p =
-  let title h =
-    Wserver.print_string
-      (Utf8.capitalize
-         (transl_decline conf "delete" (transl_nth conf "image/images" 0)));
-    if h then ()
-    else
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
-      let occ =
-        (* if fn = "?" || sn = "?" then Adef.int_of_iper (get_iper p)
-         * else  *)get_occ p
-      in
-      Wserver.printf ": "; Wserver.printf "%s.%d %s" fn occ sn
-  in
-  Hutil.header conf title;
-  Wserver.printf "<form method=\"post\" action=\"%s\">" conf.command;
-  Util.hidden_env conf;
-  Wserver.printf
-    "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\
-     <input type=\"hidden\" name=\"i\" value=\"%s\">\
-     <p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>\
-     </form>"
-    (string_of_iper (get_iper p))
-    (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Hutil.trailer conf
-
-let print_del conf base =
-  match p_getenv conf.env "i" with
-    Some ip ->
-      let p = poi base (iper_of_string ip) in
-      if sou base (get_image p) <> "" then Hutil.incorrect_request conf
-      else
-        begin match auto_image_file conf base p with
-          Some _ -> print_delete_image conf base p
-        | _ -> Hutil.incorrect_request conf
-        end
-  | _ -> Hutil.incorrect_request conf
-
 (* Send image form validated *)
 
 let print_sent conf base p =
@@ -309,7 +193,7 @@ let print_deleted conf base p =
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =
-  let file = 
+  let file =
     match auto_image_file conf base p with
     | Some f -> f
     | None -> incorrect conf;
@@ -680,7 +564,7 @@ let print_c conf base =
                 else conf, "digest error"
             | "IMAGE_C" ->
                 conf, "image"
-            | _ -> 
+            | _ ->
                 conf, "incorrect request"
             end
           in
@@ -689,12 +573,12 @@ let print_c conf base =
           | "incorrect request" -> Hutil.incorrect_request conf
           | _ -> print_confirm_c conf base save_m report
           end
-      | None -> 
+      | None ->
           Hutil.incorrect_request conf
       end
     | None -> Hutil.incorrect_request conf
     end
   (* em!="" second pass, ignore *)
-  | Some _ -> 
+  | Some _ ->
       print_confirm_c conf base "IMAGE_C" ""
   end
