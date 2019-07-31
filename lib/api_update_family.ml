@@ -10,13 +10,6 @@ open Util
 open Api_update_util
 
 let reconstitute_family conf base mod_f =
-  (* Valeurs par défaut qui seront écrasées par reconstitute_from_fevents. *)
-  let relation = NoMention in
-  let marriage = Adef.cdate_None in
-  let marriage_place = "" in
-  let marriage_note = "" in
-  let marriage_src = "" in
-  let divorce = NotDivorced in
   (* Attention, si witnesses est vide, on va supprimer des témoins (qui sont
      en double parce que dans GeneWeb, ils sont récupérés une fois dans fevents
      et une fois dans le bloc hidden. Du coup à la validation, on supprime
@@ -259,8 +252,6 @@ let reconstitute_family conf base mod_f =
   (* on le créé aussi dans witness et on ne pourra jamais valider.     *)
   let (marr, div, _) =
     UpdateFamOk.reconstitute_from_fevents (p_getenv conf.env "nsck" = Some "on") "" fevents
-      (relation, marriage, marriage_place, marriage_note, marriage_src)
-      divorce
   in
   let (relation, marriage, marriage_place,
        marriage_note, marriage_src) =
