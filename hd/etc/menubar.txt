@@ -273,7 +273,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     <a class="dropdown-item" href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index"><span class="fa fa-trash fa-fw text-danger mr-2"></span>[*delete::family/families]0</a>
                     %if;(family_cnt != 1)
                       %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
-                        <a class="dropdown-item" href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;"><span class="fa fa-user-times fa-fw mr-1">[*merge::family/families]1</a>
+                        <a class="dropdown-item" href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;"><span class="fa fa-user-times fa-fw mr-2"></span>[*merge::family/families]1</a>
                       %end;
                     %end;
                   %end;
