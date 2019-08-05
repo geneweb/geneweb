@@ -390,33 +390,7 @@ let reconstitute_from_fevents nsck empty_string fevents =
   marr, div, wit
 
 let reconstitute_family conf base =
-  let ext = false in
-  let (witnesses, ext) =
-    let rec loop i ext =
-      match
-        try Some (reconstitute_somebody conf ("witn" ^ string_of_int i)) with
-          Failure _ -> None
-      with
-        Some c ->
-          let (witnesses, ext) = loop (i + 1) ext in
-          begin match p_getenv conf.env ("ins_witn" ^ string_of_int i) with
-            Some "on" ->
-              let new_witn = "", "", 0, Update.Create (Neuter, None), "" in
-              c :: new_witn :: witnesses, true
-          | _ -> c :: witnesses, ext
-          end
-      | None -> [], ext
-    in
-    loop 1 ext
-  in
-  let (witnesses, ext) =
-    match p_getenv conf.env "ins_witn0" with
-      Some "on" ->
-        let new_witn = "", "", 0, Update.Create (Neuter, None), "" in
-        new_witn :: witnesses, true
-    | _ -> witnesses, ext
-  in
-  let (events, ext) = reconstitute_events conf ext 1 in
+  let (events, ext) = reconstitute_events conf false 1 in
   let (events, ext) = reconstitute_insert_event conf ext 0 events in
   let surname = getn conf "pa1" "sn" in
   let (children, ext) =
@@ -486,6 +460,8 @@ let reconstitute_family conf base =
   (* Attention, surtout pas les witnesses, parce que si on en créé un, *)
   (* on le créé aussi dans witness et on ne pourra jamais valider.     *)
   let (marr, div, _) =
+    (* FIXME: Use witnesses (and Array.map fst witnesses)
+       when witnesses will be added inplace *)
     reconstitute_from_fevents (p_getenv conf.env "nsck" = Some "on") "" events
   in
   let (relation, marriage, marriage_place, marriage_note, marriage_src) =
@@ -525,7 +501,7 @@ let reconstitute_family conf base =
   let fam =
     {marriage = marriage; marriage_place = marriage_place;
      marriage_note = marriage_note; marriage_src = marriage_src;
-     witnesses = Array.of_list witnesses; relation = relation;
+     witnesses = [||]; relation = relation;
      divorce = divorce; fevents = events; comment = comment;
      origin_file = origin_file; fsources = fsources;
      fam_index = fam_index}
