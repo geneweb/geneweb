@@ -150,27 +150,6 @@ let input_particles fname =
     loop [] 0
   with Sys_error _ -> []
 
-let saints = ["saint"; "sainte"]
-
-(* FIXME: merge with split_sn *)
-let surnames_pieces surname =
-  let surname = Name.lower surname in
-  let flush i0 i1 =
-    if i1 > i0 then [String.sub surname i0 (i1 - i0)] else []
-  in
-  let rec loop i0 iw i =
-    if i = String.length surname then
-      if i0 = 0 then [] else if i > i0 + 3 then flush i0 i else []
-    else if surname.[i] = ' ' then
-      if i > iw + 3 then
-        let w = String.sub surname iw (i - iw) in
-        if List.mem w saints then loop i0 (i + 1) (i + 1)
-        else flush i0 i @ loop (i + 1) (i + 1) (i + 1)
-      else loop i0 (i + 1) (i + 1)
-    else loop i0 iw (i + 1)
-  in
-  loop 0 0 0
-
 let split_sname =
   let r = Str.regexp "[ -]" in
   Str.split r

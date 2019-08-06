@@ -175,8 +175,7 @@ let gen_person_misc_names first_name surname public_name qualifiers aliases
       first_name :: (first_names_aliases @ pn)
     in
     let surnames =
-      surname ::
-      (Mutil.surnames_pieces surname @ surnames_aliases @ qualifiers)
+      surname :: (Mutil.split_sname surname @ surnames_aliases @ qualifiers)
     in
     let surnames =
       List.fold_left
@@ -185,8 +184,8 @@ let gen_person_misc_names first_name surname public_name qualifiers aliases
            if husband_surname = "?" then husband_surnames_aliases @ list
            else
              husband_surname ::
-             (Mutil.surnames_pieces husband_surname @
-              husband_surnames_aliases @ list))
+             (Mutil.split_sname husband_surname
+              @ husband_surnames_aliases @ list))
         surnames husbands
     in
     let list = public_names in

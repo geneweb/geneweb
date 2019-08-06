@@ -20,7 +20,6 @@ val output_array_no_sharing : out_channel -> (int -> _) -> int -> unit
 val name_key : string -> string
 val initial : string -> int
 val input_particles : string -> string list
-val surnames_pieces : string -> string list
 
 val utf_8_of_iso_8859_1 : string -> string
 val iso_8859_1_of_utf_8 : string -> string

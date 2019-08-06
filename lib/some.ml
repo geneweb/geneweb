@@ -148,7 +148,6 @@ let persons_of_fsname base base_strings_of_fsname find x =
       (fun istr l ->
          let str = Mutil.nominative (sou base istr) in
          if Name.crush_lower str = x
-         || List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
          then match find istr with [] -> l | iperl -> (str, istr, iperl) :: l
          else l)
       istrl []

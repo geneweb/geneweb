@@ -152,9 +152,7 @@ let make_strings_of_fsname base =
       begin
         List.iter (fun (s, i) -> add_name t s i) @@
         (surname, p.surname)
-        :: List.map (fun s -> (s, base.func.insert_string s)) (split_sname base p.surname) ;
-        List.iter (fun sp -> add_name t sp p.surname)
-          (Mutil.surnames_pieces surname)
+        :: List.map (fun s -> (s, base.func.insert_string s)) (split_sname base p.surname)
       end
   done;
   t
