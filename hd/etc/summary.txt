@@ -3,23 +3,29 @@
 <script>
 <!--
 function showTocToggle() {
-  show="[visualize/show/hide/summary]1";
-  hide="[visualize/show/hide/summary]2";
-  if (document.getElementById) {
-    show_disp=' style="display:none;"';
-    hide_disp='';
-    document.writeln('<span class="toctoggle">' +
-    '(<a href="javascript:toggleToc()" class="internal">' +
-    '<span id="showlink"' + show_disp + '>' + show + '</span>' +
-    '<span id="hidelink"' + hide_disp + '>' + hide + '</span>'
-    + '</a>)</span>');
+  var anchor = document.getElementById('toctoggleanchor');
+  if (anchor) {
+    var show="[visualize/show/hide/summary]1";
+    var hide="[visualize/show/hide/summary]2";
+    var show_disp=' style="display:none;"';
+    var hide_disp='';
+    var d = document.createElement ('span') ;
+    d.className = 'toctoggle' ;
+    d.innerHTML =
+    ' (<a href="javascript:toggleToc()" class="internal">'
+    + '<span id="showlink"' + show_disp + '>' + show + '</span>'
+    + '<span id="hidelink"' + hide_disp + '>' + hide + '</span>'
+    + '</a>)</span>' ;
+    anchor.appendChild(d);
   }
 }
+
 function setTocToggle() {
   var cookiePos = document.cookie.indexOf("hidetoc=");
   if (cookiePos > -1 && document.cookie.charAt(cookiePos + 8) == 1)
     toggleToc();
 }
+
 function toggleToc() {
   var toc = document.getElementById('tocinside');
   var showlink = document.getElementById('showlink');
@@ -38,5 +44,7 @@ function toggleToc() {
     document.cookie = "hidetoc=1";
   }
 }
+
+document.addEventListener("DOMContentLoaded", (function(){showTocToggle();setTocToggle();}))
 -->
 </script>
