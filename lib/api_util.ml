@@ -727,6 +727,7 @@ let empty_piqi_person_light conf ref_person base_loop =
     n = sn;
     p = fn;
     oc = occ;
+    index = Int32.of_string @@ Gwdb.string_of_iper Gwdb.dummy_iper;
     sex = `unknown;
     lastname = "";
     firstname = "";
@@ -1126,11 +1127,13 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
   let baseprefix = conf.command
   in
   let visible = is_visible conf base p in
+  let index = Int32.of_string @@ Gwdb.string_of_iper gen_p.key_index in
   {
     M.Person.sosa = sosa_p;
     n = sn;
     p = fn;
     oc = occ;
+    index;
     sex = sex;
     lastname = surname;
     firstname = first_name;

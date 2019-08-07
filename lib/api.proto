@@ -135,6 +135,7 @@ message Person {
   required bool descend = 21;
   required bool visible_for_visitors = 22;
   required string baseprefix = 23;
+  required int32 index = 24;
 }
 
 message FullPerson {
