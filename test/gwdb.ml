@@ -151,7 +151,7 @@ module Collection = struct
   let map _ = assert false
   let iter _ = assert false
   let iteri _ = assert false
-  let fold _ = assert false
+  let fold ?from:_ ?until:_ _ = assert false
   let fold_until _ = assert false
   let iterator _ = assert false
 end
