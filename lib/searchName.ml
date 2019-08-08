@@ -209,90 +209,92 @@ type search_type =
   | PartialKey
   | DefaultSurname
 
-let search conf base an search_order specify unknown =
+let search conf base fn sn search_order specify unknown =
+  let an = fn ^ " " ^ sn in
   let rec loop l =
     match l with
-      [] -> unknown conf an
+    | [] -> unknown conf an
     | Sosa :: l ->
-        let pl = search_by_sosa conf base an in
-        begin match pl with
+      let pl = search_by_sosa conf base an in
+      begin match pl with
           [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+          record_visited conf (get_iper p); Perso.print conf base p
         | _ -> loop l
-        end
+      end
     | Key :: l ->
-        let pl = search_by_key conf base an in
-        begin match pl with
+      let pl = search_by_key conf base an in
+      begin match pl with
           [] -> loop l
         | [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+          record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
-        end
+      end
     | Surname :: l ->
-      begin match Some.search_surname conf base an true with
+      begin match Some.search_surname conf base sn true with
         | (_, [_, (_, iperl)], _) as list when iperl <> [] ->
-          conf.cancel_links <- false;
           Some.print_surname conf base unknown an list
         | _ -> loop l
-        end
+      end
     | FirstName :: l ->
-        begin match Some.search_first_name conf base an with
-          | [] -> loop l
-          | list ->
-            conf.cancel_links <- false;
-            Some.print_first_name conf base an list
-        end
+      begin match Some.search_first_name conf base fn with
+        | [] -> loop l
+        | list when sn = "" -> Some.print_first_name conf base an list
+        | list ->
+          begin match
+              let (_, _, iperl) = Some.search_surname conf base sn false in
+              List.filter (function (_, (_, [])) -> false | _ -> true) @@
+              List.map
+                begin fun (s, (i, ips)) ->
+                  (s, (i, List.filter (fun i -> List.mem i iperl) ips))
+                end
+                list
+            with
+            | [] -> loop l
+            | [ (_, (_, [p])) ] ->
+              let p = Gwdb.poi base p in
+              record_visited conf (get_iper p);
+              Perso.print conf base p
+            | list -> Some.print_first_name conf base an list
+          end
+      end
     | ApproxKey :: l ->
-        let pl = search_approx_key conf base an in
-        begin match pl with
+      let pl = search_approx_key conf base an in
+      begin match pl with
           [] -> loop l
         | [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+          record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
-        end
+      end
     | PartialKey :: l ->
-        let pl = search_partial_key conf base an in
-        begin match pl with
+      let pl = search_partial_key conf base an in
+      begin match pl with
           [] -> loop l
         | [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+          record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
-        end
+      end
     | DefaultSurname :: _ ->
-        conf.cancel_links <- false;
-        (* FIXME: is (p_getenv conf.env "o" <> Some "i") always trus here? *)
-        Some.search_surname conf base an (p_getenv conf.env "o" <> Some "i")
-        |> Some.print_surname conf base unknown an
+      (* FIXME: is (p_getenv conf.env "o" <> Some "i") always trus here? *)
+      Some.search_surname conf base an (p_getenv conf.env "o" <> Some "i")
+      |> Some.print_surname conf base unknown an
   in
   loop search_order
 
-
-(* ************************************************************************ *)
-(*  [Fonc] print : conf -> string -> unit                                   *)
-(** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
-      trouver la meilleure combinaison de résultat pour afficher la réponse
-      la plus probable.
-    [Args] :
-      - conf : configuration de la base
-      - base : base
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let print conf base specify unknown =
   let real_input label =
     match p_getenv conf.env label with
-      Some s -> if s = "" then None else Some s
+    | Some s -> if s = "" then None else Some s
     | None -> None
   in
   match real_input "p", real_input "n" with
-    Some fn, Some sn ->
-      let order = [Key; ApproxKey; PartialKey] in
-      search conf base (fn ^ " " ^ sn) order specify unknown
+  | Some fn, Some sn ->
+    let order = [Key; FirstName;ApproxKey; PartialKey] in
+    search conf base fn sn order specify unknown
   | Some fn, None ->
-      let order = [FirstName] in search conf base fn order specify unknown
+    let order = [ FirstName ] in search conf base fn "" order specify unknown
   | None, Some sn ->
-      let order =
-        [Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname]
-      in
-      search conf base sn order specify unknown
+    let order =
+      [Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname]
+    in
+    search conf base "" sn order specify unknown
   | None, None -> Hutil.incorrect_request conf
