@@ -357,6 +357,7 @@ let advanced_search conf base max_answers =
           |> fst
           |> List.map (fun (_, _, list) -> list)
           |> List.flatten
+          |> List.sort_uniq compare
         else
           Some.persons_of_fsname base base_strings_of_surname
             (spi_find (persons_of_surname base))
@@ -364,6 +365,7 @@ let advanced_search conf base max_answers =
           |> fst
           |> List.map (fun (_, _, list) -> list)
           |> List.flatten
+          |> List.sort_uniq compare
       in
       let rec loop ((_, len) as acc) = function
         | [] -> acc
