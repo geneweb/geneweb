@@ -201,13 +201,12 @@ let search_by_key conf base an =
 (* main *)
 
 type search_type =
-    Sosa
+  | Sosa
   | Key
   | Surname
   | FirstName
   | ApproxKey
   | PartialKey
-  | DefaultSurname
 
 let search conf base fn sn search_order specify unknown =
   let an = fn ^ " " ^ sn in
@@ -273,10 +272,6 @@ let search conf base fn sn search_order specify unknown =
           record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
       end
-    | DefaultSurname :: _ ->
-      (* FIXME: is (p_getenv conf.env "o" <> Some "i") always trus here? *)
-      Some.search_surname conf base an (p_getenv conf.env "o" <> Some "i")
-      |> Some.print_surname conf base unknown an
   in
   loop search_order
 
@@ -288,13 +283,13 @@ let print conf base specify unknown =
   in
   match real_input "p", real_input "n" with
   | Some fn, Some sn ->
-    let order = [Key; FirstName;ApproxKey; PartialKey] in
+    let order = [ Key ; FirstName ; ApproxKey ; PartialKey ] in
     search conf base fn sn order specify unknown
   | Some fn, None ->
     let order = [ FirstName ] in search conf base fn "" order specify unknown
   | None, Some sn ->
     let order =
-      [Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname]
+      [ Sosa ; Key ; Surname ; ApproxKey ; PartialKey ]
     in
     search conf base "" sn order specify unknown
   | None, None -> Hutil.incorrect_request conf
