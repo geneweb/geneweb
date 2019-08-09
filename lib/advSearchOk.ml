@@ -88,13 +88,13 @@ let advanced_search conf base max_answers =
   in
   let fn_list =
     match p_getenv conf.env "first_name" with
+    | Some "" | None -> []
     | Some s -> List.sort_uniq compare @@ List.map Name.lower @@ Util.split_fname_ss s
-    | None -> []
   in
   let sn_list =
     match p_getenv conf.env "surname" with
+    | Some "" | None -> []
     | Some s -> List.sort_uniq compare @@ List.map Name.lower @@ Util.split_sname_ss s
-    | None -> []
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
