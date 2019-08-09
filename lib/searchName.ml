@@ -209,7 +209,7 @@ type search_type =
   | PartialKey
 
 let search conf base fn sn search_order specify unknown =
-  let an = fn ^ " " ^ sn in
+  let an = if fn <> "" then if sn <> "" then fn ^ " " ^ sn else fn else sn in
   let rec loop l =
     match l with
     | [] -> unknown conf an
