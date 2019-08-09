@@ -2045,51 +2045,59 @@ let print_person_tree conf base =
   let data = Mext_read.gen_person pers_piqi in
   print_result conf data
 
-(* ********************************************************************* *)
-(*  [Fonc] search_index : conf -> base -> key -> search_index_type list  *)
-(** [Description] : Retourne l'index d'une personne en fonction de mots clé
-    [Args] :
-      - conf  : configuration de la base
-      - base  : base de donnée
-      - key  : mot clé
-      - list  : liste du type de recherche à faire
-    [Retour] : index|None
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-type search_index_type =  Sosa | Key | Surname | FirstName | ApproxKey | PartialKey;;
-let search_index conf base an search_order =
-  let rec loop l =
-    match l with
-    | Sosa::le ->
+
+type search_index_type =  Sosa | Key | Surname | FirstName | ApproxKey | PartialKey
+let search_index conf base fn sn search_order =
+  let an = fn ^ " " ^ sn in
+  let rec loop = function
+    | Sosa :: tl ->
       begin match SearchName.search_by_sosa conf base an with
-        | [] ->  loop le
+        | [] ->  loop tl
         | [p] -> Some (get_iper p)
         | _ -> None
       end
-    | Key::le ->
+    | Key :: tl ->
       let pl = SearchName.search_by_key conf base an in
       begin match pl with
-        | [] ->  loop le
+        | [] ->  loop tl
         | [p] -> Some (get_iper p)
         | _ -> None
       end
-    | Surname::le ->
-      if Some.search_surname conf base an = []
-      then loop le
-      else None
-    | FirstName::le ->
-      if Some.search_first_name conf base an = []
-      then loop le
-      else None
-    | ApproxKey::le ->
+    | Surname :: tl ->
+      begin match Some.search_surname conf base sn false with
+        | (_, [_, (_, [ip])], _) -> Some ip
+        | (_, [], _) -> loop tl
+        | _ -> None
+      end
+    | FirstName :: tl ->
+      begin match Some.search_first_name conf base fn with
+        | [] -> loop tl
+        | [(_, (_, [i]))] when sn = "" -> Some i
+        | list ->
+          if sn = "" then None
+          else begin match
+              let (_, _, iperl) = Some.search_surname conf base sn false in
+              List.filter (function (_, (_, [])) -> false | _ -> true) @@
+              List.map
+                begin fun (s, (i, ips)) ->
+                  (s, (i, List.filter (fun i -> List.mem i iperl) ips))
+                end
+                list
+            with
+            | [] -> loop tl
+            | [ (_, (_, [i])) ] -> Some i
+            | _ -> None
+          end
+      end
+    | ApproxKey :: tl ->
       begin match SearchName.search_approx_key conf base an with
-        | [] ->  loop le
+        | [] ->  loop tl
         | [p] -> Some (get_iper p)
         | _ -> None
       end
-    | PartialKey::le ->
+    | PartialKey :: tl ->
       begin match SearchName.search_partial_key conf base an with
-        | [] ->  loop le
+        | [] ->  loop tl
         | [p] -> Some (get_iper p)
         | _ -> None
       end
@@ -2195,14 +2203,11 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
         | (Some fn, None) -> (fn, "")
         | _ -> print_error conf `bad_request; ("", "")
       in
-      let (an, order) =
-        if fn = "" then
-          (sn, [ Sosa; Key; Surname; ApproxKey; PartialKey ])
-        else if sn = "" then
-          (fn, [ FirstName ])
-        else
-          (fn ^ " " ^ sn, [ Key; ApproxKey; PartialKey ])
-      in match search_index conf base an order with
+      let order =
+        if fn = "" then [ Sosa; Key; Surname; ApproxKey; PartialKey ]
+        else if sn = "" then [ FirstName ]
+        else [ Key; ApproxKey; PartialKey ]
+      in match search_index conf base fn sn order with
       | Some ip ->
         if identifier_person.Mread.Identifier_person.track_visit = Some true
         then record_visited conf ip;
