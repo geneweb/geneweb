@@ -231,13 +231,13 @@ let search conf base fn sn search_order specify unknown =
     | Surname :: l ->
       begin match Some.search_surname conf base sn true with
         | (_, [_, (_, iperl)], _) as list when iperl <> [] ->
-          Some.print_surname conf base unknown an list
+          SomeDisplay.print_surname conf base unknown an list
         | _ -> loop l
       end
     | FirstName :: l ->
       begin match Some.search_first_name conf base fn with
         | [] -> loop l
-        | list when sn = "" -> Some.print_first_name conf base an list
+        | list when sn = "" -> SomeDisplay.print_first_name conf base an list
         | list ->
           begin match
               let (_, _, iperl) = Some.search_surname conf base sn false in
@@ -253,7 +253,7 @@ let search conf base fn sn search_order specify unknown =
               let p = Gwdb.poi base p in
               record_visited conf (get_iper p);
               Perso.print conf base p
-            | list -> Some.print_first_name conf base an list
+            | list -> SomeDisplay.print_first_name conf base an list
           end
       end
     | ApproxKey :: l ->

@@ -1039,7 +1039,7 @@ let defaultHandler : handler =
       match p_getenv conf.env "v" with
       | Some v ->
         Some.search_surname conf base v (p_getenv conf.env "o" <> Some "i")
-        |> Some.print_surname conf base Some.surname_not_found v
+        |> SomeDisplay.print_surname conf base SomeDisplay.surname_not_found v
       | _ -> Alln.print_surnames conf base
     end
 
@@ -1072,7 +1072,7 @@ let defaultHandler : handler =
             | [] ->
               conf.cancel_links <- false ;
               Some.search_surname conf base n (p_getenv conf.env "o" <> Some "i")
-              |> Some.print_surname conf base self.unknown n
+              |> SomeDisplay.print_surname conf base self.unknown n
             | [p] ->
               if sosa_acc || Gutil.person_of_string_key base n <> None ||
                  person_is_std_key conf base p n
@@ -1088,11 +1088,11 @@ let defaultHandler : handler =
                 Some fn, Some sn -> search (fn ^ " " ^ sn)
               | Some fn, None ->
                 conf.cancel_links <- false ;
-                Some.print_first_name conf base fn (Some.search_first_name conf base fn)
+                SomeDisplay.print_first_name conf base fn (Some.search_first_name conf base fn)
               | None, Some sn ->
                 conf.cancel_links <- false ;
                 Some.search_surname conf base sn (p_getenv conf.env "o" <> Some "i")
-                |> Some.print_surname conf base self.unknown sn
+                |> SomeDisplay.print_surname conf base self.unknown sn
               | None, None -> self.incorrect_request self conf base
           end
         | Some i ->
@@ -1118,7 +1118,7 @@ let defaultHandler : handler =
   ; p = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some v ->
-        Some.print_first_name conf base v (Some.search_first_name conf base v)
+        SomeDisplay.print_first_name conf base v (Some.search_first_name conf base v)
       | None -> Alln.print_first_names conf base
     end
 
