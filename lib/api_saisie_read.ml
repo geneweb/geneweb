@@ -2064,19 +2064,19 @@ let search_index conf base fn sn search_order =
         | _ -> None
       end
     | Surname :: tl ->
-      begin match Some.search_surname conf base sn false with
-        | (_, [_, (_, [ip])], _) -> Some ip
-        | (_, [], _) -> loop tl
+      begin match Some.search_surname base sn with
+        | [_, (_, [ip])], _ -> Some ip
+        | [], _ -> loop tl
         | _ -> None
       end
     | FirstName :: tl ->
-      begin match Some.search_first_name conf base fn with
+      begin match Some.search_first_name base fn with
         | [] -> loop tl
         | [(_, (_, [i]))] when sn = "" -> Some i
         | list ->
           if sn = "" then None
           else begin match
-              let (_, _, iperl) = Some.search_surname conf base sn false in
+              let iperl = Some.ipers @@ fst @@ Some.search_surname base sn in
               List.filter (function (_, (_, [])) -> false | _ -> true) @@
               List.map
                 begin fun (s, (i, ips)) ->
