@@ -208,7 +208,7 @@ type search_type =
   | ApproxKey
   | PartialKey
 
-let search conf base fn sn search_order specify unknown =
+let search conf base specify unknown one surname firstname fn sn search_order =
   let an = if fn <> "" then if sn <> "" then fn ^ " " ^ sn else fn else sn in
   let rec loop l =
     match l with
@@ -216,28 +216,26 @@ let search conf base fn sn search_order specify unknown =
     | Sosa :: l ->
       let pl = search_by_sosa conf base an in
       begin match pl with
-          [p] ->
-          record_visited conf (get_iper p); Perso.print conf base p
+        | [p] -> one conf base p
         | _ -> loop l
       end
     | Key :: l ->
       let pl = search_by_key conf base an in
       begin match pl with
-          [] -> loop l
-        | [p] ->
-          record_visited conf (get_iper p); Perso.print conf base p
+        | [] -> loop l
+        | [p] -> one conf base p
         | pl -> specify conf base an pl
       end
     | Surname :: l ->
       begin match Some.search_surname base sn with
         | [_, (_, iperl)], _ as list when iperl <> [] ->
-          SomeDisplay.print_surname conf base unknown an list
+          surname conf base unknown an list
         | _ -> loop l
       end
     | FirstName :: l ->
       begin match Some.search_first_name base fn with
         | [] -> loop l
-        | list when sn = "" -> SomeDisplay.print_first_name conf base an list
+        | list when sn = "" -> firstname conf base an list
         | list ->
           begin match
               let iperl = Some.ipers @@ fst @@ Some.search_surname base sn in
@@ -249,47 +247,41 @@ let search conf base fn sn search_order specify unknown =
                 list
             with
             | [] -> loop l
-            | [ (_, (_, [p])) ] ->
-              let p = Gwdb.poi base p in
-              record_visited conf (get_iper p);
-              Perso.print conf base p
-            | list -> SomeDisplay.print_first_name conf base an list
+            | [ (_, (_, [p])) ] -> one conf base (Gwdb.poi base p)
+            | list -> firstname conf base an list
           end
       end
     | ApproxKey :: l ->
       let pl = search_approx_key conf base an in
       begin match pl with
-          [] -> loop l
-        | [p] ->
-          record_visited conf (get_iper p); Perso.print conf base p
+        | [] -> loop l
+        | [p] -> one conf base p
         | pl -> specify conf base an pl
       end
     | PartialKey :: l ->
       let pl = search_partial_key conf base an in
       begin match pl with
-          [] -> loop l
-        | [p] ->
-          record_visited conf (get_iper p); Perso.print conf base p
+        | [] -> loop l
+        | [p] -> one conf base p
         | pl -> specify conf base an pl
       end
   in
   loop search_order
 
 let print conf base specify unknown =
+  let aux =
+    search conf base specify unknown
+      (fun conf base p -> record_visited conf (get_iper p) ; Perso.print conf base p)
+      SomeDisplay.print_surname
+      SomeDisplay.print_first_name
+  in
   let real_input label =
     match p_getenv conf.env label with
     | Some s -> if s = "" then None else Some s
     | None -> None
   in
   match real_input "p", real_input "n" with
-  | Some fn, Some sn ->
-    let order = [ Key ; FirstName ; ApproxKey ; PartialKey ] in
-    search conf base fn sn order specify unknown
-  | Some fn, None ->
-    let order = [ FirstName ] in search conf base fn "" order specify unknown
-  | None, Some sn ->
-    let order =
-      [ Sosa ; Key ; Surname ; ApproxKey ; PartialKey ]
-    in
-    search conf base "" sn order specify unknown
+  | Some fn, Some sn -> aux fn sn [ Key ; FirstName ; ApproxKey ; PartialKey ]
+  | Some fn, None -> aux fn "" [ FirstName ]
+  | None, Some sn -> aux "" sn [ Sosa ; Key ; Surname ; ApproxKey ; PartialKey ]
   | None, None -> Hutil.incorrect_request conf
