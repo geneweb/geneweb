@@ -1044,7 +1044,6 @@ let defaultHandler : handler =
           | hd :: tl ->
             let (list, inj) = Some.search_surname base hd in
             ( Util.filter_map begin fun (string, (s, ipl)) ->
-                  let () = print_endline @@ Printf.sprintf "%s: %d" __LOC__ (List.length ipl) in
                   let ipl = List.filter (fun i -> Some.match_surname base false tl (poi base i)) ipl in
                   if [] <> ipl then Some (string, (s, ipl)) else None
                 end list
