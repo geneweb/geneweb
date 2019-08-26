@@ -219,30 +219,10 @@ let advanced_search conf base max_answers =
       (fun x -> name_incl x (sou base (get_occupation p))) empty_default_value
   in
   let match_first_name p =
-    match fn_list with
-    | [] -> true
-    | _ ->
-      let list =
-        Gwdb.get_first_name p
-        |> Util.split_fname_is base
-        |> List.map Name.lower
-      in
-      if gets "exact_first_name" = "on"
-      then List.sort_uniq compare list = fn_list
-      else List.for_all (fun s -> List.mem s list) fn_list
+    Some.match_first_name base (gets "exact_first_name" = "on") fn_list p
   in
   let match_surname p =
-    match sn_list with
-    | [] -> true
-    | _ ->
-      let list =
-        Gwdb.get_surname p
-        |> Util.split_sname_is base
-        |> List.map Name.lower
-      in
-      if gets "exact_surname" = "on"
-      then List.sort_uniq compare list = sn_list
-      else List.for_all (fun s -> List.mem s list) sn_list
+    Some.match_surname base (gets "exact_surname" = "on") sn_list p
   in
   let match_married p empty_default_value =
     apply_to_field_value "married"

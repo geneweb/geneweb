@@ -229,8 +229,8 @@ let search conf base fn sn search_order specify unknown =
         | pl -> specify conf base an pl
       end
     | Surname :: l ->
-      begin match Some.search_surname conf base sn true with
-        | (_, [_, (_, iperl)], _) as list when iperl <> [] ->
+      begin match Some.search_surname conf base sn with
+        | [_, (_, iperl)], _ as list when iperl <> [] ->
           SomeDisplay.print_surname conf base unknown an list
         | _ -> loop l
       end
@@ -240,7 +240,7 @@ let search conf base fn sn search_order specify unknown =
         | list when sn = "" -> SomeDisplay.print_first_name conf base an list
         | list ->
           begin match
-              let (_, _, iperl) = Some.search_surname conf base sn false in
+              let iperl = Some.ipers @@ fst @@ Some.search_surname conf base sn in
               List.filter (function (_, (_, [])) -> false | _ -> true) @@
               List.map
                 begin fun (s, (i, ips)) ->

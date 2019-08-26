@@ -1038,8 +1038,19 @@ let defaultHandler : handler =
   ; n = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some v ->
-        Some.search_surname conf base v (p_getenv conf.env "o" <> Some "i")
-        |> SomeDisplay.print_surname conf base SomeDisplay.surname_not_found v
+        let list =
+          match Mutil.split_sname v |> List.map Name.lower with
+          | [] -> [], fun x -> x
+          | hd :: tl ->
+            let (list, inj) = Some.search_surname conf base hd in
+            ( Util.filter_map begin fun (string, (s, ipl)) ->
+                  let () = print_endline @@ Printf.sprintf "%s: %d" __LOC__ (List.length ipl) in
+                  let ipl = List.filter (fun i -> Some.match_surname base false tl (poi base i)) ipl in
+                  if [] <> ipl then Some (string, (s, ipl)) else None
+                end list
+            , inj )
+        in
+        SomeDisplay.print_surname conf base SomeDisplay.surname_not_found v list
       | _ -> Alln.print_surnames conf base
     end
 
@@ -1071,7 +1082,7 @@ let defaultHandler : handler =
             match pl with
             | [] ->
               conf.cancel_links <- false ;
-              Some.search_surname conf base n (p_getenv conf.env "o" <> Some "i")
+              Some.search_surname conf base n
               |> SomeDisplay.print_surname conf base self.unknown n
             | [p] ->
               if sosa_acc || Gutil.person_of_string_key base n <> None ||
@@ -1091,7 +1102,7 @@ let defaultHandler : handler =
                 SomeDisplay.print_first_name conf base fn (Some.search_first_name conf base fn)
               | None, Some sn ->
                 conf.cancel_links <- false ;
-                Some.search_surname conf base sn (p_getenv conf.env "o" <> Some "i")
+                Some.search_surname conf base sn
                 |> SomeDisplay.print_surname conf base self.unknown sn
               | None, None -> self.incorrect_request self conf base
           end
@@ -1118,7 +1129,17 @@ let defaultHandler : handler =
   ; p = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some v ->
-        SomeDisplay.print_first_name conf base v (Some.search_first_name conf base v)
+        let list =
+          match Mutil.split_fname v |> List.map Name.lower with
+          | [] -> []
+          | hd :: tl ->
+            let list = Some.search_first_name conf base hd in
+            Util.filter_map begin fun (string, (s, ipl)) ->
+              let ipl = List.filter (fun i -> Some.match_first_name base false tl (poi base i)) ipl in
+              if [] <> ipl then Some (string, (s, ipl)) else None
+            end list
+        in
+        SomeDisplay.print_first_name conf base v list
       | None -> Alln.print_first_names conf base
     end
 

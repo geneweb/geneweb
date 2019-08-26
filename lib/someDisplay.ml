@@ -588,25 +588,24 @@ let print_family_alphabetic x conf base liste =
         (print_elem conf base false) liste;
       Hutil.trailer conf
 
-let print_surname conf base not_found_fun x list =
+let print_surname conf base not_found_fun x (list, inj) =
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
   | Some "i" ->
-    let (_, _, iperl) = list in
-    Util.filter_map
-      begin fun i ->
-        let p = pget conf base i in
-        if not (is_hide_names conf p) || authorized_age conf base p (* FIXME: should be &&? *)
-        then Some p
-        else None
-      end iperl
+    Some.ipers list
+    |> Util.filter_map begin fun i ->
+      let p = pget conf base i in
+      if not (is_hide_names conf p) || authorized_age conf base p (* FIXME: should be &&? *)
+      then Some p
+      else None
+    end
     |> print_family_alphabetic x conf base
-  | _ -> match list with
-    | [], _, _ -> not_found_fun conf x
-    | bhl, [ s, (strl, _) ], _ ->
+  | _ -> match Some.branches conf base inj (Some.ipers list), list with
+    | [], _ -> not_found_fun conf x
+    | bhl, [ s, (strl, _) ] ->
       print_one_surname_by_branch conf base x strl (bhl, s)
-    | bhl, list, _ ->
+    | bhl, list ->
       let strl = List.map fst list in
       print_several_possible_surnames x conf base (bhl, strl)
 

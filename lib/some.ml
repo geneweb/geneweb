@@ -157,8 +157,6 @@ let select_ancestors conf base name_inj ipl =
            bh :: bhl)
     [] ipl
 
-module PerSet = Set.Make (struct type t = iper let compare = compare end)
-
 let persons_of_absolute_surname conf base x =
   persons_of_absolute_name_aux
     conf
@@ -168,46 +166,68 @@ let persons_of_absolute_surname conf base x =
     get_surname
     x
 
-let search_surname conf base x branch =
-  let (list, name_inj) =
-    search_aux conf base
-      persons_of_absolute_surname
-      base_strings_of_surname
-      persons_of_surname
-      x
-  in
-  let (iperl, _) =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-         let len = List.length iperl1 in
-         let strl =
-           try
-             let len1 = List.assoc str strl in
-             (str, len + len1) :: List.remove_assoc str strl
-           with Not_found -> (str, len) :: strl
-         in
-         List.fold_right PerSet.add iperl1 iperl, strl)
-      list (PerSet.empty, [])
-  in
-  let iperl = PerSet.elements iperl in
-  let bhl =
-    if branch then
-      select_ancestors conf base name_inj iperl
-      |> List.map
-        begin fun bh ->
-          { bh_ancestor = pget conf base bh.bh_ancestor
-          ; bh_well_named_ancestors =
-              List.map (pget conf base) bh.bh_well_named_ancestors
-          }
-        end
-    else []
-  in
-  bhl, list, iperl
+(** [(result, injection) = search_surname conf base x]
+    where [result] is the list of matching iper list
+    and [injection] is the function used to normalize
+    strings during comparison.
+*)
+let search_surname conf base x
+  : (string * (StrSet.t * iper list)) list * (string -> string) =
+  search_aux conf base
+    persons_of_absolute_surname
+    base_strings_of_surname
+    persons_of_surname
+    x
 
-let search_first_name conf base x =
+let search_first_name conf base x : (string * (StrSet.t * iper list)) list =
   fst @@
   search_aux conf base
     persons_of_absolute_first_name
     base_strings_of_first_name
     persons_of_first_name
     x
+
+(* Helpers *)
+
+let match_first_name base exact fn_list p =
+  match fn_list with
+  | [] -> true
+  | _ ->
+    let list =
+      Gwdb.get_first_name p
+      |> Util.split_fname_is base
+      |> List.map Name.lower
+    in
+    if exact
+    then List.sort compare list = List.sort compare fn_list
+    else List.for_all (fun s -> List.mem s list) fn_list
+
+let match_surname base exact sn_list p =
+  match sn_list with
+  | [] -> true
+  | _ ->
+    let list =
+      Gwdb.get_surname p
+      |> Util.split_sname_is base
+      |> List.map Name.lower
+    in
+    if exact
+    then List.sort compare list = List.sort compare sn_list
+    else List.for_all (fun s -> List.mem s list) sn_list
+
+(** [ipers search_result]
+    Return the list of ipers from a first name or surname search. *)
+let ipers : (string * (StrSet.t * iper list)) list -> iper list =
+  List.fold_left
+    begin fun acc (_, (_, ipl)) ->
+      List.fold_left (fun acc i -> if List.mem i acc then acc else i :: acc) acc ipl
+    end []
+
+let branches conf base (inj : string -> string) (ipl : iper list) : person branch_head list =
+  select_ancestors conf base inj ipl
+  |> List.map begin fun bh ->
+    { bh_ancestor = pget conf base bh.bh_ancestor
+    ; bh_well_named_ancestors =
+        List.map (pget conf base) bh.bh_well_named_ancestors
+    }
+  end
