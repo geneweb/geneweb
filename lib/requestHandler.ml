@@ -1042,7 +1042,7 @@ let defaultHandler : handler =
           match Mutil.split_sname v |> List.map Name.lower with
           | [] -> [], fun x -> x
           | hd :: tl ->
-            let (list, inj) = Some.search_surname conf base hd in
+            let (list, inj) = Some.search_surname base hd in
             ( Util.filter_map begin fun (string, (s, ipl)) ->
                   let () = print_endline @@ Printf.sprintf "%s: %d" __LOC__ (List.length ipl) in
                   let ipl = List.filter (fun i -> Some.match_surname base false tl (poi base i)) ipl in
@@ -1082,7 +1082,7 @@ let defaultHandler : handler =
             match pl with
             | [] ->
               conf.cancel_links <- false ;
-              Some.search_surname conf base n
+              Some.search_surname base n
               |> SomeDisplay.print_surname conf base self.unknown n
             | [p] ->
               if sosa_acc || Gutil.person_of_string_key base n <> None ||
@@ -1099,10 +1099,10 @@ let defaultHandler : handler =
                 Some fn, Some sn -> search (fn ^ " " ^ sn)
               | Some fn, None ->
                 conf.cancel_links <- false ;
-                SomeDisplay.print_first_name conf base fn (Some.search_first_name conf base fn)
+                SomeDisplay.print_first_name conf base fn (Some.search_first_name base fn)
               | None, Some sn ->
                 conf.cancel_links <- false ;
-                Some.search_surname conf base sn
+                Some.search_surname base sn
                 |> SomeDisplay.print_surname conf base self.unknown sn
               | None, None -> self.incorrect_request self conf base
           end
@@ -1133,7 +1133,7 @@ let defaultHandler : handler =
           match Mutil.split_fname v |> List.map Name.lower with
           | [] -> []
           | hd :: tl ->
-            let list = Some.search_first_name conf base hd in
+            let list = Some.search_first_name base hd in
             Util.filter_map begin fun (string, (s, ipl)) ->
               let ipl = List.filter (fun i -> Some.match_first_name base false tl (poi base i)) ipl in
               if [] <> ipl then Some (string, (s, ipl)) else None

@@ -54,39 +54,9 @@ let rec merge_insert (sstr, (strl, iperl) as x) =
       else (sstr, (StrSet.union strl strl1, iperl @ iperl1)) :: l
   | [] -> [x]
 
-let persons_of_absolute_name_aux conf base base_strings_of persons_of get_field x =
-  let istrl = base_strings_of base x in
-  List.fold_right
-    (fun istr l ->
-       let str = sou base istr in
-       if str = x then
-         let iperl = spi_find (persons_of base) istr in
-         let iperl =
-           List.fold_left
-             (fun iperl iper ->
-                if eq_istr (get_field (pget conf base iper)) istr then
-                  iper :: iperl
-                else iperl)
-             [] iperl
-         in
-         if iperl = [] then l else (str, istr, iperl) :: l
-       else l)
-    istrl []
-
-let persons_of_absolute_first_name conf base x =
-  persons_of_absolute_name_aux
-    conf
-    base
-    base_strings_of_first_name
-    persons_of_first_name
-    get_first_name
-    x
-
-let search_aux conf base of_absolute base_strings_of persons_of x =
+let search_aux base base_strings_of persons_of x =
   let list, name_inj =
-    if p_getenv conf.env "t" = Some "A"
-    then of_absolute conf base x, (fun x -> x)
-    else if x = "" then [], (fun _ -> assert false)
+    if x = "" then [], (fun _ -> assert false)
     else persons_of_fsname base base_strings_of (spi_find (persons_of base)) x
   in
   let list =
@@ -157,32 +127,21 @@ let select_ancestors conf base name_inj ipl =
            bh :: bhl)
     [] ipl
 
-let persons_of_absolute_surname conf base x =
-  persons_of_absolute_name_aux
-    conf
-    base
-    base_strings_of_surname
-    persons_of_surname
-    get_surname
-    x
-
 (** [(result, injection) = search_surname conf base x]
     where [result] is the list of matching iper list
     and [injection] is the function used to normalize
     strings during comparison.
 *)
-let search_surname conf base x
+let search_surname base x
   : (string * (StrSet.t * iper list)) list * (string -> string) =
-  search_aux conf base
-    persons_of_absolute_surname
+  search_aux base
     base_strings_of_surname
     persons_of_surname
     x
 
-let search_first_name conf base x : (string * (StrSet.t * iper list)) list =
+let search_first_name base x : (string * (StrSet.t * iper list)) list =
   fst @@
-  search_aux conf base
-    persons_of_absolute_first_name
+  search_aux base
     base_strings_of_first_name
     persons_of_first_name
     x
