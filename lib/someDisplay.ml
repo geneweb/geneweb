@@ -277,6 +277,15 @@ let unselected_bullets conf =
 
 let alphabetic1 n1 n2 = Gutil.alphabetic n1 n2
 
+let has_children_with_that_name conf base des name =
+  let compare_name n1 n2 =
+    if p_getenv conf.env "t" = Some "A" then n1 = n2
+    else Name.lower n1 = Name.lower n2
+  in
+  List.exists
+    (fun ip -> compare_name (p_surname base (pget conf base ip)) name)
+    (Array.to_list (get_children des))
+
 let print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
   let rec loop is_first_level p =

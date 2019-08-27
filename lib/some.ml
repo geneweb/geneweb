@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
 open Gwdb
 open Util
 
@@ -67,15 +66,6 @@ let search_aux base base_strings_of persons_of x =
   in
   let list = List.fold_right merge_insert list [] in
   list, name_inj
-
-let has_children_with_that_name conf base des name =
-  let compare_name n1 n2 =
-    if p_getenv conf.env "t" = Some "A" then n1 = n2
-    else Name.lower n1 = Name.lower n2
-  in
-  List.exists
-    (fun ip -> compare_name (p_surname base (pget conf base ip)) name)
-    (Array.to_list (get_children des))
 
 let insert_at_position_in_family children ip ipl =
   let rec loop child_list ipl =
