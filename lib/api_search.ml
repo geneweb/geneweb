@@ -314,11 +314,11 @@ let print_list conf base filters list =
         (fun p1 p2 ->
           let sn1 = Name.lower (p_surname base p1) in
           let sn2 = Name.lower (p_surname base p2) in
-          let comp = Gutil.alphabetic_order sn1 sn2 in
+          let comp = Gutil.alphabetic sn1 sn2 in
           if comp = 0 then
             let fn1 = Name.lower (p_first_name base p1) in
             let fn2 = Name.lower (p_first_name base p2) in
-            Gutil.alphabetic_order fn1 fn2
+            Gutil.alphabetic fn1 fn2
           else comp)
         person_l
   in
@@ -577,8 +577,7 @@ let select_start_with_auto_complete base mode max_res ini =
               | _ -> ()
           in loop istr []
     end;
-  List.sort Gutil.alphabetic_order (StrSet.elements !string_set)
-
+  List.sort Gutil.alphabetic (StrSet.elements !string_set)
 
 let select_all_auto_complete _ base get_field max_res ini =
   let find p x = kmp x (sou base (get_field p)) in
@@ -605,8 +604,7 @@ let select_all_auto_complete _ base get_field max_res ini =
         incr nb_res;
         end
   end () (Gwdb.persons base) ;
-  List.sort Gutil.alphabetic_order (StrSet.elements !string_set)
-
+  List.sort Gutil.alphabetic (StrSet.elements !string_set)
 
 let load_dico_lieu conf pl_mode =
   let fname =
@@ -688,9 +686,9 @@ let complete_with_dico conf nb max mode ini list =
     in
     let dico_place = reduce_dico mode list format (load_dico_lieu conf mode) in
     List.rev_append
-      (List.sort (fun a b -> Gutil.alphabetic_order b a) list)
-      (List.sort Gutil.alphabetic_order dico_place)
-  | _ -> List.sort Gutil.alphabetic_order list
+      (List.sort (fun a b -> Gutil.alphabetic b a) list)
+      (List.sort Gutil.alphabetic dico_place)
+  | _ -> List.sort Gutil.alphabetic list
 
 let search_auto_complete conf base mode place_mode max n =
   let aux data =
@@ -740,7 +738,7 @@ let search_auto_complete conf base mode place_mode max n =
         if !nb < max then reduce acc tl
         else acc
     in
-    List.sort Gutil.alphabetic_order (reduce [] list)
+    List.sort Gutil.alphabetic (reduce [] list)
 
   | _ ->
     if Name.lower n = "" then []

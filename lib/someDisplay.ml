@@ -275,7 +275,7 @@ let unselected_bullets conf =
        try if k = "u" then ifam_of_string v :: sl else sl with Failure _ -> sl)
     [] conf.env
 
-let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
+let alphabetic1 n1 n2 = Gutil.alphabetic n1 n2
 
 let print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in

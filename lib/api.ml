@@ -893,7 +893,7 @@ let print_all_families conf base =
 module StringMap =
   Map.Make
     (struct
-      type t = string      let compare = Gutil.alphabetic_order      end)
+      type t = string      let compare = Gutil.alphabetic      end)
 
 module IperSort =
   Set.Make
@@ -902,8 +902,8 @@ module IperSort =
         let cmp = compare sn1 sn2 in
         if cmp = 0 then compare fn1 fn2
         else cmp(*
-        let cmp = Gutil.alphabetic_order sn1 sn2 in
-        if cmp = 0 then Gutil.alphabetic_order fn1 fn2
+        let cmp = Gutil.alphabetic sn1 sn2 in
+        if cmp = 0 then Gutil.alphabetic fn1 fn2
         else cmp*)
      end)
 

@@ -51,7 +51,7 @@ let create_cache base mode cache_file =
         (Gwdb.families base)
   in
   let cache = List.rev_map (sou base) (IstrSet.elements cache) in
-  let cache = List.sort Gutil.alphabetic_order cache in
+  let cache = List.sort Gutil.alphabetic cache in
   let oc = Secure.open_out_bin cache_file in
   Marshal.to_channel oc cache [ Marshal.No_sharing ] ;
   close_out oc

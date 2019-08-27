@@ -593,14 +593,14 @@ let build_list_short conf list =
     let ini_list = remove_dup ini_list in
     (* Si la liste des ini n'a qu'un élément, on calcul on 'rang' d'après *)
     if List.length ini_list = 1 then build_ini list (len + 1)
-    else List.sort Gutil.alphabetic_order ini_list
+    else List.sort Gutil.alphabetic ini_list
   in
   build_ini list (String.length ini)
 
 let build_list_long conf list : (string * (istr * string) list) list =
   let ini = Opt.default "" (p_getenv conf.env "s") in
   let list = combine_by_ini ini list in
-  List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list
+  List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic ini1 ini2) list
 
 type 'a env =
     Vlist_data of (istr * string) list
@@ -721,8 +721,8 @@ let print_foreach conf print_ast _eval_expr =
             (fun (_, s1) (_, s2) ->
                let rss1 = remove_suburb s1 in
                let rss2 = remove_suburb s2 in
-               if rss1 = rss2 then Gutil.alphabetic_order s1 s2
-               else Gutil.alphabetic_order rss1 rss2)
+               if rss1 = rss2 then Gutil.alphabetic s1 s2
+               else Gutil.alphabetic rss1 rss2)
             l
       | _ -> []
     in

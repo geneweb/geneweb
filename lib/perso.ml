@@ -1368,10 +1368,10 @@ let build_surnames_list conf base v p =
   List.sort
     (fun (s1, _) (s2, _) ->
        match
-         Gutil.alphabetic_order (surname_without_particle base s1) (surname_without_particle base s2)
+         Gutil.alphabetic (surname_without_particle base s1) (surname_without_particle base s2)
        with
          0 ->
-           Gutil.alphabetic_order (surname_particle base s1)
+           Gutil.alphabetic (surname_particle base s1)
              (surname_particle base s2)
        | x -> x)
     !list
@@ -1497,14 +1497,14 @@ let build_list_eclair conf base v p =
   List.sort
     (fun (s1, pl1, _, _, _, _) (s2, pl2, _, _, _, _) ->
        match
-         Gutil.alphabetic_order (surname_without_particle base s1) (surname_without_particle base s2)
+         Gutil.alphabetic (surname_without_particle base s1) (surname_without_particle base s2)
        with
          0 ->
            begin match
-             Gutil.alphabetic_order (surname_particle base s1)
+             Gutil.alphabetic (surname_particle base s1)
                (surname_particle base s2)
            with
-             0 -> Gutil.alphabetic_order pl1 pl2
+             0 -> Gutil.alphabetic pl1 pl2
            | x -> x
            end
        | x -> x)
@@ -1596,7 +1596,7 @@ let rec compare_ls sl1 sl2 =
       (* les performances à cause du try..with.                *)
       let c =
         try Stdlib.compare (int_of_string s1) (int_of_string s2) with
-          Failure _ -> Gutil.alphabetic_order s1 s2
+          Failure _ -> Gutil.alphabetic s1 s2
       in
       if c = 0 then compare_ls sl1 sl2 else c
   | _ :: _, [] -> 1

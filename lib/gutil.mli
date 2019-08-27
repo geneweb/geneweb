@@ -16,9 +16,7 @@ val person_of_string_dot_key : base -> string -> iper option
 val designation : base -> person -> string
 
 val trim_trailing_spaces : string -> string
-val alphabetic_utf_8 : string -> string -> int
 val alphabetic : string -> string -> int
-val alphabetic_order : string -> string -> int
 
 val arg_list_of_string : string -> string list
 
