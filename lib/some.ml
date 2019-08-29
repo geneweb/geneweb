@@ -200,7 +200,19 @@ let ipers : (string * (StrSet.t * iper list)) list -> iper list =
     end []
 
 let branches conf base (inj : string -> string) (ipl : iper list) : person branch_head list =
-  select_ancestors conf base inj ipl
+  let a = select_ancestors conf base inj ipl in
+  (* Avoid having the same person in two branches. *)
+  let rec reduce acc = function
+    | [] -> acc
+    | hd :: tl ->
+      let acc =
+        if List.exists (fun x -> List.mem hd.bh_ancestor @@ x.bh_ancestor :: x.bh_well_named_ancestors) acc
+        then acc
+        else hd :: List.filter (fun x -> not @@ List.mem x.bh_ancestor hd.bh_well_named_ancestors) acc
+      in
+      reduce acc tl
+  in
+  reduce [] a
   |> List.map begin fun bh ->
     { bh_ancestor = pget conf base bh.bh_ancestor
     ; bh_well_named_ancestors =
