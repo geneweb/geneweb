@@ -87,34 +87,32 @@ let select_ancestors conf base name_inj ipl =
     (fun bhl ip ->
        let p = pget conf base ip in
        match get_parents p with
-         Some ifam ->
-           let fam = foi base ifam in
-           let ifath = get_father fam in
-           let imoth = get_mother fam in
-           let fath = pget conf base ifath in
-           let moth = pget conf base imoth in
-           let s = str_inj (get_surname p) in
-           if str_inj (get_surname fath) <> s &&
-              str_inj (get_surname moth) <> s
-           then
-             let rec loop =
-               function
-                 bh :: bhl ->
-                   if bh.bh_ancestor = ifath || bh.bh_ancestor = imoth then
-                     let bh =
-                       {bh with bh_well_named_ancestors =
-                         insert_at_position_in_family (get_children fam) ip
-                           bh.bh_well_named_ancestors}
-                     in
-                     bh :: bhl
-                   else bh :: loop bhl
-               | [] -> [{bh_ancestor = ifath; bh_well_named_ancestors = [ip]}]
-             in
-             loop bhl
-           else bhl
+       | Some ifam ->
+         let fam = foi base ifam in
+         let ifath = get_father fam in
+         let imoth = get_mother fam in
+         let fath = pget conf base ifath in
+         let moth = pget conf base imoth in
+         let s = str_inj (get_surname p) in
+         if str_inj (get_surname fath) <> s && str_inj (get_surname moth) <> s
+         then
+           let rec loop =
+             function
+             | bh :: bhl -> if bh.bh_ancestor = ifath || bh.bh_ancestor = imoth then
+                 let bh =
+                   {bh with bh_well_named_ancestors =
+                              insert_at_position_in_family (get_children fam) ip
+                                bh.bh_well_named_ancestors}
+                 in
+                 bh :: bhl
+               else bh :: loop bhl
+             | [] -> [{bh_ancestor = ifath; bh_well_named_ancestors = [ip]}]
+           in
+           loop bhl
+         else bhl
        | _ ->
-           let bh = {bh_ancestor = ip; bh_well_named_ancestors = []} in
-           bh :: bhl)
+         let bh = {bh_ancestor = ip; bh_well_named_ancestors = []} in
+         bh :: bhl)
     [] ipl
 
 (** [(result, injection) = search_surname conf base x]
@@ -163,6 +161,35 @@ let match_surname base ~exact sn_list p =
     if exact
     then List.sort compare list = List.sort compare sn_list
     else List.for_all (fun s -> List.mem s list) sn_list
+
+(** [search_surname base sn]
+    Decompose [sn] and use [search_surname].
+*)
+let search_surnames base s =
+  match Mutil.split_sname s |> List.map Name.lower with
+  | [] -> [], fun x -> x
+  | hd :: tl ->
+    let (list, inj) = search_surname base hd in
+    ( Util.filter_map
+        begin fun (string, (s, ipl)) ->
+          let ipl = List.filter (fun i -> match_surname base ~exact:false tl (poi base i)) ipl in
+          if [] <> ipl then Some (string, (s, ipl)) else None
+        end list
+    , inj )
+
+(** [search_first_names base fn]
+    Decompose [fn] and use [search_first_name].
+*)
+let search_first_names base s =
+  match Mutil.split_fname s |> List.map Name.lower with
+  | [] -> []
+  | hd :: tl ->
+    let list = search_first_name base hd in
+    Util.filter_map
+      begin fun (string, (s, ipl)) ->
+        let ipl = List.filter (fun i -> match_first_name base ~exact:false tl (poi base i)) ipl in
+        if [] <> ipl then Some (string, (s, ipl)) else None
+      end list
 
 (** [ipers search_result]
     Return the list of ipers from a first name or surname search. *)

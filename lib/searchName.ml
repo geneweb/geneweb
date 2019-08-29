@@ -227,7 +227,7 @@ let search conf base specify unknown one surname firstname fn sn search_order =
         | pl -> specify conf base an pl
       end
     | Surname :: l ->
-      begin match Some.search_surname base sn with
+      begin match Some.search_surnames base sn with
         | [_, (_, iperl)], _ as list when iperl <> [] ->
           surname conf base unknown an list
         | _ -> loop l
