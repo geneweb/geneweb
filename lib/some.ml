@@ -138,7 +138,7 @@ let search_first_name base x : (string * (StrSet.t * iper list)) list =
 
 (* Helpers *)
 
-let match_first_name base exact fn_list p =
+let match_first_name base ~exact fn_list p =
   match fn_list with
   | [] -> true
   | _ ->
@@ -151,7 +151,7 @@ let match_first_name base exact fn_list p =
     then List.sort compare list = List.sort compare fn_list
     else List.for_all (fun s -> List.mem s list) fn_list
 
-let match_surname base exact sn_list p =
+let match_surname base ~exact sn_list p =
   match sn_list with
   | [] -> true
   | _ ->

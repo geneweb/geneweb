@@ -929,7 +929,7 @@ let defaultHandler : handler =
           | hd :: tl ->
             let (list, inj) = Some.search_surname base hd in
             ( Util.filter_map begin fun (string, (s, ipl)) ->
-                  let ipl = List.filter (fun i -> Some.match_surname base false tl (poi base i)) ipl in
+                  let ipl = List.filter (fun i -> Some.match_surname base ~exact:false tl (poi base i)) ipl in
                   if [] <> ipl then Some (string, (s, ipl)) else None
                 end list
             , inj )
@@ -967,7 +967,7 @@ let defaultHandler : handler =
           | hd :: tl ->
             let list = Some.search_first_name base hd in
             Util.filter_map begin fun (string, (s, ipl)) ->
-              let ipl = List.filter (fun i -> Some.match_first_name base false tl (poi base i)) ipl in
+              let ipl = List.filter (fun i -> Some.match_first_name base ~exact:false tl (poi base i)) ipl in
               if [] <> ipl then Some (string, (s, ipl)) else None
             end list
         in

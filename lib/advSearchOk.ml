@@ -219,10 +219,10 @@ let advanced_search conf base max_answers =
       (fun x -> name_incl x (sou base (get_occupation p))) empty_default_value
   in
   let match_first_name p =
-    Some.match_first_name base (gets "exact_first_name" = "on") fn_list p
+    Some.match_first_name base ~exact:(gets "exact_first_name" = "on") fn_list p
   in
   let match_surname p =
-    Some.match_surname base (gets "exact_surname" = "on") sn_list p
+    Some.match_surname base ~exact:(gets "exact_surname" = "on") sn_list p
   in
   let match_married p empty_default_value =
     apply_to_field_value "married"
