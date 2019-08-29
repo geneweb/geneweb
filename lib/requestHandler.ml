@@ -923,17 +923,7 @@ let defaultHandler : handler =
   ; n = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some v ->
-        let list =
-          match Mutil.split_sname v |> List.map Name.lower with
-          | [] -> [], fun x -> x
-          | hd :: tl ->
-            let (list, inj) = Some.search_surname base hd in
-            ( Util.filter_map begin fun (string, (s, ipl)) ->
-                  let ipl = List.filter (fun i -> Some.match_surname base ~exact:false tl (poi base i)) ipl in
-                  if [] <> ipl then Some (string, (s, ipl)) else None
-                end list
-            , inj )
-        in
+        let list = Some.search_surnames base v in
         SomeDisplay.print_surname conf base SomeDisplay.surname_not_found v list
       | _ -> Alln.print_surnames conf base
     end
@@ -961,16 +951,7 @@ let defaultHandler : handler =
   ; p = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some v ->
-        let list =
-          match Mutil.split_fname v |> List.map Name.lower with
-          | [] -> []
-          | hd :: tl ->
-            let list = Some.search_first_name base hd in
-            Util.filter_map begin fun (string, (s, ipl)) ->
-              let ipl = List.filter (fun i -> Some.match_first_name base ~exact:false tl (poi base i)) ipl in
-              if [] <> ipl then Some (string, (s, ipl)) else None
-            end list
-        in
+        let list = Some.search_first_names base v in
         SomeDisplay.print_first_name conf base v list
       | None -> Alln.print_first_names conf base
     end
