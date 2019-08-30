@@ -642,212 +642,109 @@ let get_field mode =
   | `firstname -> get_first_name
   | _ -> failwith "get_field"
 
-
 let search_auto_complete conf base mode place_mode max_res n =
-  if mode = `place then
-    begin
-      let conf = {(conf) with env = ("data", "place") :: conf.env } in
-      let list = UpdateData.get_all_data conf base in
-      (* On fait un rev_map (tail-rec) parce que si le nombre de *)
-      (* données est trop important, on casser la pile d'appels. *)
-      let list = List.rev_map (fun (istr, s, k) -> (sou base istr, s, k)) list in
-      (* On tri la liste avant de la combiner *)
-      (* sinon on n'élimine pas les doublons. *)
-      let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
-      (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
-      (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
-      (* les sources dans un seul index pour de meilleures performances.   *)
-      let list = UpdateData.combine list in
-      let string_set1 = ref StringSetAutoComplete.empty in
-      (*
-      let rec loop place =
-        let (_, place) =
-          try Api_util.split place ','
-          with Not_found -> ("", "")
-        in
-        if place = "" then ()
-        else
-          begin
-            string_set1 := StringSetAutoComplete.add place !string_set1;
-            loop place
-          end
-      in
-      *)
-      let () =
-        List.iter
-          (fun (place, _) ->
-             begin
-               string_set1 := StringSetAutoComplete.add place !string_set1;
-               (*loop place*)
-             end)
-          list
-      in
-      let list = StringSetAutoComplete.elements !string_set1 in
-      (* Fonction qui à une liste de données retourne la *)
-      (* liste de toutes les données commençant par ini. *)
-      let nb_res = ref 0 in
-      let string_set = ref StrSetAutoComplete.empty in
-      let ini = Mutil.tr '_' ' ' n in
-      let place_format =
-        match p_getenv conf.base_env "places_format" with
-        | None -> []
-        | Some s ->
-          try
-            List.map
-              (function
-                | "Subdivision" -> `subdivision
-                | "Town" -> `town
-                | "Area code" -> `area_code
-                | "County" -> `county
-                | "Region" -> `region
-                | "Country" -> `country
-                | _ -> raise Not_found)
-              (String.split_on_char ',' s)
-          with Not_found -> []
-      in
-      let len_place_format = List.length place_format in
-      let rec reduce l accu mode_dico max_res =
-        match l with
-        | [] -> ()
+  let aux data =
+    let conf = { conf with env = ("data", data) :: conf.env } in
+    UpdateData.get_all_data conf base
+    |> List.fold_left
+      (fun set (istr, _, _) -> StringSetAutoComplete.add (sou base istr) set)
+      StringSetAutoComplete.empty
+    |> StringSetAutoComplete.elements
+  in
+  match mode with
+
+  | `place ->
+    let list = aux "place" in
+    let nb_res = ref 0 in
+    let ini = Name.lower @@ Mutil.tr '_' ' ' n in
+    let place_format =
+      match p_getenv conf.base_env "places_format" with
+      | None -> []
+      | Some s ->
+        try
+          List.map
+            (function
+              | "Subdivision" -> `subdivision
+              | "Town" -> `town
+              | "Area code" -> `area_code
+              | "County" -> `county
+              | "Region" -> `region
+              | "Country" -> `country
+              | _ -> raise Not_found)
+            (String.split_on_char ',' s)
+        with Not_found -> []
+    in
+    let len_place_format = List.length place_format in
+    let reduce dico l =
+      let rec loop acc = function
+        | [] -> acc
         | data :: l ->
-            begin
-              let k =  Mutil.tr '_' ' ' data in
-              let (has_subdivision, i) =
-                try
-                  (true, String.rindex k ']')
-                with Not_found -> (false, 0)
-              in
-              let k =
-                if has_subdivision && place_mode <> Some `subdivision then
-                  let s =
-                    String.sub k (i + 1) (String.length k - i - 1)
-                  in
-                  Mutil.strip_all_trailing_spaces s
-                else k
-              in
-              if string_start_with (Name.lower ini) (Name.lower k) then
-                begin
-                  let tmps =
-                    if has_subdivision && place_mode = Some `subdivision then
-                      let s = String.sub k (i + 1) (String.length k - i - 1) in
-                      if s = "" then 1
-                      else Util.nb_char_occ ',' s + 2
-                    else Util.nb_char_occ ',' k + 2
-                  in
-                  if len_place_format = 0 || tmps = len_place_format || mode_dico then
-                  begin
-                    let data =
-                      if mode_dico && len_place_format > 0 then
-                        let expl_data = String.split_on_char ',' data |> List.rev in
-                        String.concat ", " @@
-                        Util.filter_map
-                          (function
-                            | `town -> List.nth_opt expl_data 4
-                            | `area_code -> List.nth_opt expl_data 3
-                            | `county -> List.nth_opt expl_data 2
-                            | `region -> List.nth_opt expl_data 1
-                            | `country -> List.nth_opt expl_data 0
-                            | _ -> None)
-                          place_format
-                      else
-                        data
-                    in
-                  string_set := StrSetAutoComplete.add data !string_set;
-                  incr nb_res;
-                  end
-                end;
-              if !nb_res > max_res then ()
-              else reduce l accu mode_dico max_res
-            end
-      in
-      let () = reduce list [] false max_res in
-      let base_place = StrSetAutoComplete.elements !string_set in
-      let found_res = StrSetAutoComplete.cardinal !string_set in
-      let dico_place =
-        if found_res >= max_res then []
-        else
-          begin
-            match place_mode with
-            | Some pl_mode ->
-                let dico = load_dico_lieu conf pl_mode in
-                string_set := StrSetAutoComplete.empty;
-                reduce dico [] true (max_res - found_res);
-                StrSetAutoComplete.elements !string_set;
-                (*
-                (match pl_mode with
-                 | `town -> reduce towns []
-                 | `area_code -> reduce area_codes []
-                 | `county -> reduce countys []
-                 | `region -> reduce regions []
-                 | `country -> reduce countrys []
-                 | _ -> ())
-                *)
-            | None -> []
-          end;
-      in
-      let base_place = List.sort Gutil.alphabetic_order base_place in
-      let dico_place = List.sort Gutil.alphabetic_order dico_place in
-      base_place @ dico_place
-      (*
-      List.sort Gutil.alphabetic_order (StrSetAutoComplete.elements !string_set)
-      *)
-    end
-  else
-    begin
-      if mode = `source then
-        begin
-          let conf = {(conf) with env = ("data", "src") :: conf.env } in
-          let list = UpdateData.get_all_data conf base in
-          (* On fait un rev_map (tail-rec) parce que si le nombre de *)
-          (* données est trop important, on casser la pile d'appels. *)
-          let list = List.rev_map (fun (istr, s, k) -> (sou base istr, s, k)) list in
-          (* On tri la liste avant de la combiner *)
-          (* sinon on n'élimine pas les doublons. *)
-          let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
-          (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
-          (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
-          (* les sources dans un seul index pour de meilleures performances.   *)
-          let list = UpdateData.combine list in
-          let string_set1 = ref StringSetAutoComplete.empty in
-          let () =
-            List.iter
-              (fun (src, _) ->
-                 begin
-                   string_set1 := StringSetAutoComplete.add src !string_set1;
-                 end)
-              list
+          let acc =
+            let k =  Mutil.tr '_' ' ' data in
+            let k =
+              if place_mode <> Some `subdivision
+              then UpdateData.remove_suburb k
+              else k
+            in
+            if string_start_with ini (Name.lower k) then begin
+              let tmps = Util.nb_char_occ ',' k + 2 in
+              if len_place_format = 0 || tmps = len_place_format || dico then begin
+                let data =
+                  if dico && len_place_format > 0 then
+                    let expl_data = String.split_on_char ',' data |> List.rev in
+                    String.concat ", " @@
+                    Util.filter_map begin function
+                      | `town -> List.nth_opt expl_data 4
+                      | `area_code -> List.nth_opt expl_data 3
+                      | `county -> List.nth_opt expl_data 2
+                      | `region -> List.nth_opt expl_data 1
+                      | `country -> List.nth_opt expl_data 0
+                      | _ -> None
+                    end
+                      place_format
+                  else
+                    data
+                in
+                incr nb_res ;
+                data :: acc
+              end else acc
+            end else acc
           in
-          let list = StringSetAutoComplete.elements !string_set1 in
-          (* Fonction qui à une liste de données retourne la *)
-          (* liste de toutes les données commençant par ini. *)
-          let nb_res = ref 0 in
-          let string_set = ref StrSetAutoComplete.empty in
-          let ini = Mutil.tr '_' ' ' n in
-          let rec reduce l accu =
-            match l with
-            | [] -> ()
-            | data :: l ->
-                begin
-                  let k =  Mutil.tr '_' ' ' data in
-                  if string_start_with (Name.lower ini) (Name.lower k) then
-                    begin
-                      string_set := StrSetAutoComplete.add data !string_set;
-                      incr nb_res;
-                    end;
-                  if !nb_res > max_res then ()
-                  else reduce l accu
-                end
-          in
-          let () = reduce list [] in
-          List.sort Gutil.alphabetic_order (StrSetAutoComplete.elements !string_set)
-        end
-      else
-        begin
-          let _ = load_strings_array base in
-          if Name.lower n = "" then []
-          else select_start_with_auto_complete base mode max_res n
-        end
-    end
+          if !nb_res < max_res then loop acc l else acc
+      in loop [] l
+    in
+    let base_place = reduce false list in
+    let dico_place =
+      match place_mode with
+      | Some pl_mode when !nb_res < max_res -> reduce true (load_dico_lieu conf pl_mode)
+      | _ -> []
+    in
+    List.rev_append
+      (List.sort (fun a b -> Gutil.alphabetic_order b a) base_place)
+      (List.sort Gutil.alphabetic_order dico_place)
+
+  | `source ->
+    let list = aux "src" in
+    let nb_res = ref 0 in
+    let ini = Name.lower @@ Mutil.tr '_' ' ' n in
+    let rec reduce acc = function
+      | [] -> acc
+      | hd :: tl ->
+        let k =  Mutil.tr '_' ' ' hd in
+        let acc =
+          if string_start_with ini (Name.lower k)
+            then (incr nb_res ; hd :: acc)
+            else acc
+        in
+        if !nb_res < max_res then reduce acc tl
+        else acc
+    in
+    List.sort Gutil.alphabetic_order (reduce [] list)
+
+  | _ ->
+    if Name.lower n = "" then []
+    else ( load_strings_array base
+         ; select_start_with_auto_complete base mode max_res n )
 
 let select_both_link_person base ini_n ini_p max_res =
   let find_sn p x = kmp x (sou base (get_surname p)) in

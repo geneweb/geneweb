@@ -39,11 +39,7 @@ let print_auto_complete conf base =
     else
       Api_search.search_auto_complete conf base mode place_mode max_res s
   in
-  let result =
-    Mwrite.Auto_complete_result.({
-      result = list;
-    })
-  in
+  let result = { Mwrite.Auto_complete_result. result = list } in
   let data = Mext_write.gen_auto_complete_result result in
   print_result conf data
 
