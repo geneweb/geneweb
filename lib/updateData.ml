@@ -914,53 +914,19 @@ let remove_suburb s =
     String.sub s sub_start (String.length s - sub_start)
   else s
 
-(* ********************************************************************* *)
-(*  [Fonc] build_list : config -> base ->
-                          (string * (string * int) list) list            *)
-(** [Description] : Récupère la liste de toutes les "données" de la base.
-    [Args] :
-      - conf : configuration
-      - base : base
-    [Retour] : Retourne la liste des données
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
+(** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
-  let ini = Opt.default "" (p_getenv conf.env "s") in
+  let ini = Opt.to_string @@ p_getenv conf.env "s" in
   let list = get_all_data conf base in
-  (* ! rev_map  = tail-rec ! *)
-  let list = List.rev_map (fun (istr, s, k) -> sou base istr, s, k) list in
-  (* On tri la liste avant de la combiner *)
-  (* sinon on n'élimine pas les doublons. *)
-  let list =
-    List.sort
-      (fun (s1, _, _) (s2, _, _) ->
-         (fun s1 s2 ->
-            let rss1 = remove_suburb s1 in
-            let rss2 = remove_suburb s2 in
-            (* Same place. *)
-            if rss1 = rss2 then
-              if s1 = rss2 then 1 else if rss1 = s2 then -1 else compare s1 s2
-            else if rss1 > rss2 then 1
-            else if rss1 < rss2 then -1
-            else compare s1 s2)
-           s1 s2)
-      list
-  in
-  (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
-  (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
-  (* les sources dans un seul index pour de meilleures performances.   *)
-  let list = combine list in
-  (* Fonction qui à une liste de données retourne la *)
-  (* liste de toutes les données commençant par ini. *)
-  let reduce l =
-    List.filter
-      (fun (data, _) ->
-         Mutil.start_with ~wildcard:true ini 0 @@ remove_suburb data)
-      l
-  in
-  if ini <> "" then reduce list else list
-
+  if ini <> "" then
+    Util.filter_map begin fun (istr, s, k) ->
+      let str = sou base istr in
+      if Mutil.start_with ~wildcard:true ini 0 @@ remove_suburb str
+      then Some (str, s, k)
+      else None
+    end list
+  else List.rev_map (fun (istr, s, k) -> sou base istr, s, k) list
 
 (* ************************************************************************* *)
 (*  [Fonc] build_list_short : config -> base -> (string * 'a) list
@@ -1241,7 +1207,7 @@ let print_mod conf base =
   match p_getenv conf.env "data" with
   | Some ("place" | "src" | "occu" | "fn" | "sn") ->
     let list = build_list conf base in
-    let env = ["list", Vlist_data list] in
+    let env = ["list", Vlist_data (List.rev_map (fun (a,b,c) -> (a,[b,c])) list)] in
     Hutil.interp conf "upddata"
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
