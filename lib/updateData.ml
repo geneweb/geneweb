@@ -184,35 +184,8 @@ let combine_by_ini ini list =
   in
   List.fold_left (fun new_l (ini_k, l) -> (ini_k, l) :: new_l) [] list
 
-
-(* ************************************************************************** *)
-(*  [Fonc] combine : ('a * 'b * 'c) list -> ('a * ('b * 'c) list) list        *)
-(** [Description] :
-    [Args] :
-      - list : la liste de triplets
-    [Retour] :
-      - ('a * ('b * 'c) list) list
-    [Rem] : Non exporté en clair hors de ce module.                           *)
-(* ************************************************************************** *)
-let combine list =
-  let list =
-    let rec loop new_list =
-      function
-        [] -> new_list
-      | (k, s, cnt) :: list ->
-          let new_list =
-            match new_list with
-              [] -> [k, [s, cnt]]
-            | (ini_k1, l) :: ll ->
-                if ini_k1 = k then (ini_k1, (s, cnt) :: l) :: ll
-                else (k, [s, cnt]) :: (ini_k1, l) :: ll
-          in
-          loop new_list list
-    in
-    loop [] list
-  in
-  List.fold_left (fun new_l (ini_k, l) -> (ini_k, l) :: new_l) [] list
-
+let combine : ('a * 'b * 'c) list -> ('a * ('b * 'c) list) list = fun list ->
+  Util.groupby ~key:(fun (a, _, _) -> a) ~value:(fun (_, b, c) -> (b, c)) list
 
 (* ************************************************************************** *)
 (*  [Fonc] translate_title : config -> string * string                       *)
