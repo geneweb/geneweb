@@ -10,16 +10,7 @@ open Util
 open Api_def
 open Api_util
 
-let string_start_with ini s =
-  let rec loop i1 i2 =
-    if i1 = String.length ini then true
-    else if i2 = String.length s then
-      if ini.[i1] = '_' then loop (i1 + 1) i2
-      else false
-    else if s.[i2] = ini.[i1] || s.[i2] = ' ' && ini.[i1] = '_' then
-      loop (i1 + 1) (i2 + 1)
-    else false
-  in loop 0 0
+let string_start_with ini s = Mutil.start_with ~wildcard:true ini 0 s
 
 (* Algo de Knuth-Morris-Pratt *)
 let init_next p =
