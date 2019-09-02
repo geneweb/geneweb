@@ -646,10 +646,7 @@ let search_auto_complete conf base mode place_mode max_res n =
   let aux data =
     let conf = { conf with env = ("data", data) :: conf.env } in
     UpdateData.get_all_data conf base
-    |> List.fold_left
-      (fun set (istr, _, _) -> StringSetAutoComplete.add (sou base istr) set)
-      StringSetAutoComplete.empty
-    |> StringSetAutoComplete.elements
+    |> List.map (fun (istr, _, _) -> sou base istr)
   in
   match mode with
 
