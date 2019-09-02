@@ -156,9 +156,7 @@
                   <label class="sr-only" for="firstname">[*first name/first names]0</label>
                   <input type="search" id="firstname" class="form-control" name="fn" placeholder="[*first name/first names]0" autofocus/>
                   <label class="sr-only" for="surname">[*surname/surnames]0</label>
-                  <input type="search" id="surname" class="form-control" name="sn" placeholder="[*surname/surnames]0"/>
-                  <label class="sr-only" for="n">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
-                  <input type="search" id="n" class="form-control" name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…"/>
+                  <input type="search" id="surname" class="form-control" name="sn" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"/>
             </div>
           </div>
           <div id="rel_form_cousin" onclick="document.getElementById('radio_C').checked = 'checked'; main();">
