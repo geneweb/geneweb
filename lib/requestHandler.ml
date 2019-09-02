@@ -930,7 +930,7 @@ let defaultHandler : handler =
 
   ; ng = begin fun self conf base -> match p_getenv conf.env "select" with
       | Some "input" | None ->
-        SearchName.print conf base specify self.unknown
+        SearchName.print conf base specify self.unknown ~sn:"sn" ~fn:"fn"
       | Some i -> relation_print conf base (pget conf base (iper_of_string i))
     end
 
@@ -991,7 +991,7 @@ let defaultHandler : handler =
     end
 
   ; s = begin fun self conf base ->
-      SearchName.print conf base specify self.unknown
+      SearchName.print conf base specify self.unknown ~sn:"n" ~fn:"p"
     end
 
   ; snd_image = begin fun self conf base ->

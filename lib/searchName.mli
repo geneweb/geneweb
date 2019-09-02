@@ -33,10 +33,12 @@ val search
   -> search_type list
   -> unit
 
-(** [print conf base specify unknown]
-    Uses ["p"] and ["n"] values from [conf.env] and try
+(** [print ~fn ~sn conf base specify unknown]
+    Uses [fn] and [sn] parameters from [conf.env] and try
     to choose the best search function based on these inputs
     (they may be empty).
+    [fn] is expected to be a first name.
+    [sn] can be a surname, the whole key (first name + surname), a sosa number.
 
     A single result redirect to individual page.
     Multiple results call the [specify] function
@@ -47,4 +49,6 @@ val print
   -> base
   -> (config -> base -> string -> person list -> unit)
   -> (config -> string -> unit)
+  -> fn:string
+  -> sn:string
   -> unit

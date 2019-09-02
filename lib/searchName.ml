@@ -268,7 +268,7 @@ let search conf base specify unknown one surname firstname fn sn search_order =
   in
   loop search_order
 
-let print conf base specify unknown =
+let print conf base specify unknown ~fn ~sn =
   let aux =
     search conf base specify unknown
       (fun conf base p -> record_visited conf (get_iper p) ; Perso.print conf base p)
@@ -280,7 +280,7 @@ let print conf base specify unknown =
     | Some s -> if s = "" then None else Some s
     | None -> None
   in
-  match real_input "p", real_input "n" with
+  match real_input fn, real_input sn with
   | Some fn, Some sn -> aux fn sn [ Key ; FirstName ; ApproxKey ; PartialKey ]
   | Some fn, None -> aux fn "" [ FirstName ]
   | None, Some sn -> aux "" sn [ Sosa ; Key ; Surname ; ApproxKey ; PartialKey ]
