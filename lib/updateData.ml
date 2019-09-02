@@ -141,51 +141,8 @@ let get_person_from_data conf base =
     (fun _ (istr, pset) acc -> (istr, PersSet.elements pset) :: acc)
     acc []
 
-(* ************************************************************************** *)
-(*  [Fonc] combine_by_ini : string -> (string * 'a * 'b) list ->
-                              (string * ('a * 'b) list) list                  *)
-(** [Description] : Retourne une liste en recombinant toutes les chaines en
-                    fonction de leur début de chaîne.
-    [Args] :
-      - ini  : les premières lettres de la chaîne
-      - list : la liste composée des premières lettres de la chaîne, 'a, 'b
-    [Retour] :
-      - (string * ('a * 'b) list) list
-    [Rem] : Non exporté en clair hors de ce module.                           *)
-(* ************************************************************************** *)
-let combine_by_ini ini list =
-  let list =
-    let rec loop new_list =
-      function
-        [] -> new_list
-      | (k, s, cnt) :: list ->
-          let ini_k =
-            if String.length k > String.length ini then
-              String.sub k 0 (index_of_next_char k (String.length ini))
-            else k ^ String.make (String.length ini + 1 - String.length k) '_'
-          in
-          let ini_k = Bytes.unsafe_of_string ini_k in
-          for i = 0 to Bytes.length ini_k - 1 do
-            if Bytes.get ini_k i = ' ' then Bytes.set ini_k i '_'
-          done;
-          let ini_k = Bytes.unsafe_to_string ini_k in
-          let new_list =
-            if ini_k = "_" then new_list
-            else
-              match new_list with
-                [] -> [ini_k, [s, cnt]]
-              | (ini_k1, l) :: ll ->
-                  if ini_k1 = ini_k then (ini_k1, (s, cnt) :: l) :: ll
-                  else (ini_k, [s, cnt]) :: (ini_k1, l) :: ll
-          in
-          loop new_list list
-    in
-    loop [] list
-  in
-  List.fold_left (fun new_l (ini_k, l) -> (ini_k, l) :: new_l) [] list
-
-let combine : ('a * 'b * 'c) list -> ('a * ('b * 'c) list) list = fun list ->
-  Util.groupby ~key:(fun (a, _, _) -> a) ~value:(fun (_, b, c) -> (b, c)) list
+let combine_by_ini ini =
+  Alln.groupby_ini (Util.str_length ini + 1)
 
 (* ************************************************************************** *)
 (*  [Fonc] translate_title : config -> string * string                       *)
