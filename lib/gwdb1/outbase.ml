@@ -88,12 +88,9 @@ let just_copy bname what oc oc_acc =
   in
   loop 0
 
-let split_sname =
-  let r = Str.regexp "[ -]" in
-  fun base i -> Str.split r @@ base.data.strings.get i
+let split_sname base i = Mutil.split_sname @@ base.data.strings.get i
 
-let split_fname base i =
-  String.split_on_char ' ' @@ base.data.strings.get i
+let split_fname base i = Mutil.split_fname @@ base.data.strings.get i
 
 (* /!\ Keep it sync with Database.name_index_key /!\ *)
 let name_index_key s =

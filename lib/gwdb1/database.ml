@@ -111,12 +111,9 @@ the corresponding list of persons holding this surname
 
 exception Found of int
 
-let split_sname =
-  let r = Str.regexp "[ -]" in
-  fun strings i -> Str.split r @@ strings.get i
+let split_sname strings i = Mutil.split_sname @@ strings.get i
 
-let split_fname strings i =
-  String.split_on_char ' ' @@ strings.get i
+let split_fname strings i = Mutil.split_fname @@ strings.get i
 
 let hashtbl_right_assoc s ht =
   try
