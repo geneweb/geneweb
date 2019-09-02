@@ -321,7 +321,7 @@ let print_alphabetic conf base is_surnames =
     let list = List.map (fun (s, _, _) -> s, 1) list in
     print_alphabetic_big conf base is_surnames ini list 1 true
   else if len >= 50 || ini = "" then
-    let list = groupby_ini (String.length ini + 1) list in
+    let list = groupby_ini (Util.str_length ini + 1) list in
     if all then
       if len > default_max_cnt then Hutil.incorrect_request conf
       else print_alphabetic_all conf base is_surnames ini list len
@@ -384,7 +384,7 @@ let print_short conf base is_surnames =
   let (list, len) = select_names conf base is_surnames ini true in
   if len > default_max_cnt then Hutil.incorrect_request conf
   else
-    let list = groupby_ini (String.length ini + 1) list in
+    let list = groupby_ini (Util.str_length ini + 1) list in
     print_alphabetic_short conf base is_surnames ini list len
 
 (* main *)

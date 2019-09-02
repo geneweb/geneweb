@@ -353,7 +353,7 @@ val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 *)
 val rev_iter : ('a -> unit) -> 'a list -> unit
 
-(** [group_by ~key ~value list]
+(** [groupby ~key ~value list]
     Group the elements returning the same key together.
     Ordering of elements is unspecified.
  *)
@@ -370,6 +370,11 @@ val str_nth_pos : string -> int -> int
     not the [start-th] UTF8-character.
 *)
 val str_sub : ?pad:char -> string -> int -> int -> string
+
+(** [str_length s]
+    Return the number of character in [s] (UTF8-friendly).
+*)
+val str_length : string -> int
 
 (** [ls_rs dirs]
     List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
