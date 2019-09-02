@@ -124,6 +124,14 @@ let rec capitale_utf_8 s =
 let index_of_next_char s i =
   min (String.length s) (i + max 1 (Name.nbc s.[i]))
 
+let str_length s =
+  let len = String.length s in
+  let rec loop acc i =
+    if i = len then acc
+    else loop (acc + 1) (index_of_next_char s i)
+  in
+  loop 0 0
+
 let capitale s = capitale_utf_8 s
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
