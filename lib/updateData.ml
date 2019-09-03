@@ -1,22 +1,10 @@
-(* $Id: source.ml,v 0.01 2012-07-12 10:19:08 flh Exp $ *)
-(* Copyright (c) 1998-2007 INRIA *)
-
 open Config
 open Def
 open Gwdb
 open TemplAst
 open Util
 
-module DataSet =
-  Set.Make
-    (struct
-       type t = Gwdb.istr * string * int
-       let compare (_, s1, i1) (_, s2, i2) =
-         let comp_s = Stdlib.compare s1 s2 in
-         if comp_s = 0 then Stdlib.compare i1 i2 else comp_s
-     end)
-
-module PersMap = Map.Make (struct type t = int let compare = compare end)
+module PersMap = Map.Make (struct type t = istr let compare = compare end)
 
 module PersSet =
   Set.Make
@@ -25,45 +13,46 @@ module PersSet =
        let compare p1 p2 = compare (get_iper p1) (get_iper p2)
      end)
 
-module StringSet = Set.Make (struct type t = string let compare = compare end)
+module StringSet = Set.Make (String)
+module IstrSet = Set.Make (struct type t = istr let compare = compare end)
 
 let get_data conf =
   match p_getenv conf.env "data" with
   | Some "occu" ->
-    [ "occu", get_occupation ], [], [], []
+    [ get_occupation ], [], [], []
   | Some "place" ->
-    ( [ "bi", get_birth_place
-      ; "bp", get_baptism_place
-      ; "de", get_death_place
-      ; "bu", get_burial_place
+    ( [ get_birth_place
+      ; get_baptism_place
+      ; get_death_place
+      ; get_burial_place
       ]
-    , [ "pe", (fun evt -> evt.epers_place) ]
-    , [ "ma", get_marriage_place ]
-    , [ "fe", (fun evt -> evt.efam_place) ]
+    , [ (fun evt -> evt.epers_place) ]
+    , [ get_marriage_place ]
+    , [ (fun evt -> evt.efam_place) ]
     )
   | Some "src" ->
-    ( [ "bi", get_birth_src
-      ; "bp", get_baptism_src
-      ; "de", get_death_src
-      ; "bu", get_burial_src
-      ; "p", get_psources
+    ( [ get_birth_src
+      ; get_baptism_src
+      ; get_death_src
+      ; get_burial_src
+      ; get_psources
       ]
-    , [ "pe", (fun evt -> evt.epers_src) ]
-    , [ "ma", get_marriage_src
-      ; "f", get_fsources ]
-    , [ "fe", (fun evt -> evt.efam_src) ]
+    , [ (fun evt -> evt.epers_src) ]
+    , [ get_marriage_src
+      ; get_fsources ]
+    , [ (fun evt -> evt.efam_src) ]
     )
   | Some "fn" ->
-    ( [ "fn", get_first_name ], [], [], [] )
+    ( [ get_first_name ], [], [], [] )
   | Some "sn" ->
-    ( [ "sn", get_surname ], [], [], [] )
+    ( [ get_surname ], [], [], [] )
   | _ -> [], [], [], []
 
 let get_all_data conf base =
   let (get_p, get_pe, get_f, get_fe) = get_data conf in
-  let aux : 'a . 'a -> DataSet.t -> (string * ('a -> istr)) -> DataSet.t  = fun arg acc (label, get) ->
+  let aux : 'a . 'a -> IstrSet.t -> ('a -> istr) -> IstrSet.t  = fun arg acc get ->
     let istr = get arg in
-    if not (is_empty_string istr) then DataSet.add (istr, label, Hashtbl.hash istr) acc
+    if not (is_empty_string istr) then IstrSet.add istr acc
     else acc
   in
   let acc =
@@ -73,7 +62,7 @@ let get_all_data conf base =
         let acc = List.fold_left (aux p) acc get_p in
         let pevents = get_pevents p in
         List.fold_left (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc pevents) acc get_pe
-      end DataSet.empty (Gwdb.ipers base)
+      end IstrSet.empty (Gwdb.ipers base)
   in
   let acc =
     if get_f = [] && get_fe = [] then acc
@@ -86,38 +75,23 @@ let get_all_data conf base =
           List.fold_left (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc fevents) acc get_fe
         end acc (Gwdb.ifams base)
   in
-  DataSet.elements acc
-
-let env_keys conf (get_p, get_pe, get_f, get_fe) =
-  let aux acc (k, _) = (k, Opt.default (-1) (p_getint conf.env k)) :: acc in
-  List.fold_left aux
-    (List.fold_left aux
-       (List.fold_left aux
-          (List.fold_left aux [] get_p)
-          get_pe)
-       get_f)
-    get_fe
+  IstrSet.elements acc
 
 let get_person_from_data conf base =
   let (get_p, get_pe, get_f, get_fe) = get_data conf in
-  let keys = env_keys conf (get_p, get_pe, get_f, get_fe) in
-  let add acc k istr p =
-    try
-      let (istr, set) = PersMap.find k acc in
-      PersMap.add k (istr, (PersSet.add p set)) acc
-    with Not_found ->
-      PersMap.add k (istr, PersSet.add p PersSet.empty) acc
+  let istr = Gwdb.istr_of_string @@ List.assoc "key" conf.env in
+  let add acc (istr : istr) p =
+    try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
+    with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
   in
-  let aux = fun fn arg acc (label, get) ->
-    let istr = get arg in
-    let k = List.assoc label keys in
-    if not (is_empty_string istr) && k = Hashtbl.hash istr then fn acc k istr else acc
+  let aux = fun (fn : PersSet.t PersMap.t -> istr -> PersSet.t PersMap.t) arg acc get ->
+    let istr' = get arg in if istr = istr' then fn acc istr else acc
   in
   let acc =
     Gwdb.Collection.fold
       begin fun acc i ->
         let p = pget conf base i in
-        let add acc k istr = add acc k istr p in
+        let add acc istr = add acc istr p in
         let acc = List.fold_left (aux add p) acc get_p in
         let pevents = get_pevents p in
         List.fold_left (fun acc fn -> List.fold_left (fun acc e -> aux add e acc fn) acc pevents) acc get_pe
@@ -129,8 +103,8 @@ let get_person_from_data conf base =
       Gwdb.Collection.fold
         begin fun acc i ->
           let f = foi base i in
-          let add acc k istr =
-            add (add acc k istr (pget conf base (get_father f))) k istr (pget conf base (get_mother f))
+          let add acc istr =
+            add (add acc istr (pget conf base (get_father f))) istr (pget conf base (get_mother f))
           in
           let acc = List.fold_left (aux add f) acc get_f in
           let fevents = get_fevents f in
@@ -138,11 +112,34 @@ let get_person_from_data conf base =
         end acc (Gwdb.ifams base)
   in
   PersMap.fold
-    (fun _ (istr, pset) acc -> (istr, PersSet.elements pset) :: acc)
+    (fun istr pset acc -> (istr, PersSet.elements pset) :: acc)
     acc []
 
-let combine_by_ini ini =
-  Alln.groupby_ini (Util.str_length ini + 1)
+
+(* ********************************************************************* *)
+(*  [Fonc] remove_suburb : string -> string                              *)
+(** [Description] : Enlève le lieu-dit (de la forme
+      "[Lieu-dit] - Commune...") d'une chaîne de caractères.
+    [Args] :
+      - s : chaîne de caractères contenant le lieu-dit.
+    [Retour] : Retourne la chaîne de caractères dont le lieu-dit a été
+      enlevé.
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let remove_suburb s =
+  let re = Str.regexp "^\\[.+\\] - " in
+  let matched = Str.string_match re s 0 in
+  if matched then
+    let sub_start = Str.match_end () in
+    String.sub s sub_start (String.length s - sub_start)
+  else s
+
+let combine_by_ini ini list =
+  let len = Util.str_length ini + 1 in
+  Util.groupby
+    ~key:(fun (_, s) -> Alln.ini len @@ remove_suburb s)
+    ~value:(fun x -> x)
+    list
 
 let translate_title conf =
   let title =
@@ -468,10 +465,6 @@ let update_person_list conf base new_input list nb_pers max_updates =
 let print_mod_ok conf base =
   let data = Opt.default "" (p_getenv conf.env "data") in
   let ini = Opt.default "" (p_getenv conf.env "s") in
-  let keys =
-    env_keys conf (get_data conf)
-    |> List.sort (fun (s1, _) (s2, _) -> compare s1 s2)
-  in
   let new_input = Opt.map_default "" only_printable (p_getenv conf.env "nx_input") in
   let list = get_person_from_data conf base in
   let list = List.map (fun (istr, perl) -> sou base istr, perl) list in
@@ -514,87 +507,34 @@ let print_mod_ok conf base =
           (transl_nth conf "modification/modifications"
              (if nb_pers > 1 then 1 else 0));
       Wserver.printf "</p>\n";
-      if nb_pers > max_updates then
-        begin
-          Wserver.printf "<form method=\"post\" action=\"%s\">\n"
-            conf.command;
-          begin
-            Wserver.printf "<p>\n";
-            Util.hidden_env conf;
-            List.iter
-              (fun (s, i) ->
-                 Wserver.printf
-                   "<input type=\"hidden\" name=\"%s\" value=\"%d\"%s>\n" s i
-                   conf.xhs)
-              keys;
-            Wserver.printf
-              "<input type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"%s>\n"
-              conf.xhs;
-            Wserver.printf
-              "<input type=\"hidden\" name=\"data\" value=\"%s\"%s>\n" data
-              conf.xhs;
-            Wserver.printf
-              "<input type=\"hidden\" name=\"s\" value=\"%s\"%s>\n" ini
-              conf.xhs;
-            Wserver.printf
-              "<input type=\"hidden\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"data\"%s>\n"
-              (Util.escape_html (only_printable new_input)) conf.xhs;
-            Wserver.printf "%s"
-              (capitale (transl conf "continue correcting"));
-            begin
-              Wserver.printf
-                "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-              Wserver.printf "%s"
-                (capitale (transl_nth conf "validate/delete" 0));
-              Wserver.printf "</button>\n"
-            end;
-            Wserver.printf "</p>\n"
-          end;
-          Wserver.printf "</form>\n"
-        end;
-      Wserver.printf "<p>\n";
-      Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\" id=\"reference\">"
-        (commd conf) data ini;
-      Wserver.printf "%s" (capitale (transl conf "new modification"));
-      Wserver.printf "</a>";
-      Wserver.printf "</p>\n";
+      if nb_pers > max_updates then begin
+        Wserver.printf {|<form method="post" action="%s"><p>|} conf.command ;
+        Util.hidden_env conf;
+        Wserver.printf {|<input type="hidden" name="key" value="%s">|} (List.assoc "key" conf.env) ;
+        Wserver.printf {|<input type="hidden" name="m" value="MOD_DATA_OK">|} ;
+        Wserver.printf {|<input type="hidden" name="data" value="%s">|} data ;
+        Wserver.printf {|<input type="hidden" name="s" value="%s">|} ini ;
+        Wserver.printf {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="%s" id="data">|}
+          (Util.escape_html (only_printable new_input)) ;
+        Wserver.printf "%s" (capitale (transl conf "continue correcting"));
+        Wserver.printf {|<button type="submit" class="btn btn-secondary btn-lg">|};
+        Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+        Wserver.printf "</button></p></form>" ;
+      end ;
+      Wserver.printf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
+        (commd conf) data ini  (capitale (transl conf "new modification")) ;
       Hutil.trailer conf
     end
   else
-    let title _ =
-      Wserver.printf "%s" (capitale (transl conf "no modification"))
-    in
+    let title _ = Wserver.printf "%s" (capitale (transl conf "no modification")) in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
-    Wserver.printf "<p>\n";
-    Wserver.printf "<a href=\"%sm=MOD_DATA&data=%s&s=%s\" id=\"reference\">" (commd conf) data
-      ini;
-    Wserver.printf "%s" (capitale (transl conf "new modification"));
-    Wserver.printf "</a>";
-    Wserver.printf "</p>\n";
+    Wserver.printf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
+      (commd conf) data ini (capitale (transl conf "new modification")) ;
     Hutil.trailer conf
 
 
 (**/**) (* template *)
-
-
-(* ********************************************************************* *)
-(*  [Fonc] remove_suburb : string -> string                              *)
-(** [Description] : Enlève le lieu-dit (de la forme
-      "[Lieu-dit] - Commune...") d'une chaîne de caractères.
-    [Args] :
-      - s : chaîne de caractères contenant le lieu-dit.
-    [Retour] : Retourne la chaîne de caractères dont le lieu-dit a été
-      enlevé.
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let remove_suburb s =
-  let re = Str.regexp "^\\[.+\\] - " in
-  let matched = Str.string_match re s 0 in
-  if matched then
-    let sub_start = Str.match_end () in
-    String.sub s sub_start (String.length s - sub_start)
-  else s
 
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
@@ -602,13 +542,13 @@ let build_list conf base =
   let ini = Opt.to_string @@ p_getenv conf.env "s" in
   let list = get_all_data conf base in
   if ini <> "" then
-    Util.filter_map begin fun (istr, s, k) ->
+    Util.filter_map begin fun istr ->
       let str = sou base istr in
       if Mutil.start_with ~wildcard:true ini 0 @@ remove_suburb str
-      then Some (str, s, k)
+      then Some (istr, str)
       else None
     end list
-  else List.rev_map (fun (istr, s, k) -> sou base istr, s, k) list
+  else List.rev_map (fun istr -> istr, sou base istr) list
 
 (* ************************************************************************* *)
 (*  [Fonc] build_list_short : config -> base -> (string * 'a) list
@@ -635,7 +575,7 @@ let build_list_short conf list =
     (* caractère soit codé sur plusieurs octets.         *)
     let ini_list =
       List.rev_map
-        (fun (s, _) ->
+        (fun (_, s) ->
            let s = remove_suburb s in
            if String.length s > len then
              String.sub s 0 (index_of_next_char s len)
@@ -657,49 +597,15 @@ let build_list_short conf list =
   in
   build_ini list (String.length ini)
 
-
-(* ************************************************************************* *)
-(*  [Fonc] build_list_long : config -> base -> (string * 'a) list ->
-                               (string * (string * 'a) list) list            *)
-(** [Description] :
-    [Args] :
-      - conf : configuration
-      - base : base
-      - list : la liste des "data"
-    [Retour] : La liste des couples (initiale de "data", "data")
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let build_list_long conf list =
+let build_list_long conf list : (string * (istr * string) list) list =
   let ini = Opt.default "" (p_getenv conf.env "s") in
-  (* Construit à partir de la liste de (src * hash) la liste dont      *)
-  (* le premier composant est les premières lettres de la sources.     *)
-  (* Attention, il ne faut pas faire String.length ini + 1 parce qu'en *)
-  (* utf8, il se peut que le caractère soit codé sur plusieurs octets. *)
-  let list =
-    List.map
-      (fun (s, k) ->
-         let s1 = remove_suburb s in
-         let ini =
-           if String.length s1 > String.length ini then
-             String.sub s1 0 (index_of_next_char s1 (String.length ini))
-           else ini
-         in
-         ini, s, k)
-      list
-  in
-  (* Re-combine la liste en fonction des premières *)
-  (* lettres afin de pouvoir poser des ancres.     *)
   let list = combine_by_ini ini list in
-  (* Astuce pour gérer les espaces. *)
-  let list = List.map (fun (ini, l) -> Mutil.tr ' ' '_' ini, l) list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list
 
-
 type 'a env =
-    Vlist_data of (string * (string * int) list) list
+    Vlist_data of (istr * string) list
   | Vlist_ini of string list
-  | Vlist_value of (string * (string * int) list) list
-  | Venv_keys of (string * int) list
+  | Vlist_value of (istr * string) list
   | Vint of int
   | Vstring of string
   | Vother of 'a
@@ -725,36 +631,18 @@ and eval_simple_var conf base env xx =
         Not_found -> str_val (eval_simple_str_var conf base env xx s)
       end
   | _ -> raise Not_found
-and eval_simple_bool_var _conf _base env _xx =
-  function
-    "is_modified" ->
-      let k =
-        match get_env "keys" env with
-          Venv_keys k -> k
-        | _ -> []
-      in
-      let env_keys =
-        match get_env "env_keys" env with
-          Venv_keys env_keys -> env_keys
-        | _ -> []
-      in
-      k = env_keys
+and eval_simple_bool_var _conf _base env _xx = function
+  | "is_modified" -> begin match get_env "key" env with
+      | Vstring _ as x -> get_env "entry_key" env = x
+      | _ -> false
+    end
   | _ -> raise Not_found
 and eval_simple_str_var conf _base env _xx =
   function
     "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_value" -> eval_string_env "entry_value" env
+  | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
-  | "keys" ->
-      let k =
-        match get_env "keys" env with
-          Venv_keys k -> k
-        | _ -> []
-      in
-      List.fold_left
-        (fun accu (k, i) -> accu ^ k ^ "=" ^ string_of_int i ^ "&") "" k
-  | "key_name" -> eval_string_env "key_name" env
-  | "key_value" -> eval_int_env "key_value" env
   | "nb_results" ->
       begin match get_env "list" env with
         Vlist_data l -> string_of_int (List.length l)
@@ -803,27 +691,23 @@ let print_foreach conf print_ast _eval_expr =
       ["initial"] -> print_foreach_initial env xx al
     | ["entry"] -> print_foreach_entry env xx el al
     | ["value"] -> print_foreach_value env xx al
-    | ["env_keys"] -> print_foreach_env_keys env xx el al
     | _ -> raise Not_found
   and print_foreach_entry env xx _el al =
-    let env_keys =
-      env_keys conf (get_data conf)
-      |> List.filter (function (_, -1) -> false | _ -> true)
-      |> List.sort (fun (s1, _) (s2, _) -> compare s1 s2)
-    in
     let list =
       match get_env "list" env with
         Vlist_data l -> l
       | _ -> []
     in
     let list = build_list_long conf list in
-    let env = ("env_keys", Venv_keys env_keys) :: env in
+    let k = Opt.to_string @@ p_getenv conf.env "key" in
     let rec loop =
       function
-        (ini_k, list_v) :: l ->
+        (ini_k, (list_v : (istr * string) list)) :: l ->
           let env =
-            ("entry_ini", Vstring ini_k) ::
-            ("list_value", Vlist_value list_v) :: env
+            ("key", Vstring k)
+            :: ("entry_ini", Vstring ini_k)
+            :: ("list_value", Vlist_value list_v)
+            :: env
           in
           List.iter (print_ast env xx) al; loop l
       | [] -> ()
@@ -834,7 +718,7 @@ let print_foreach conf print_ast _eval_expr =
       match get_env "list_value" env with
         Vlist_value l ->
           List.sort
-            (fun (s1, _) (s2, _) ->
+            (fun (_, s1) (_, s2) ->
                let rss1 = remove_suburb s1 in
                let rss2 = remove_suburb s2 in
                if rss1 = rss2 then Gutil.alphabetic_order s1 s2
@@ -844,10 +728,11 @@ let print_foreach conf print_ast _eval_expr =
     in
     let rec loop =
       function
-        (s, k) :: l ->
-          let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
+        (i, s) :: l ->
           let env =
-            ("entry_value", Vstring s) :: ("keys", Venv_keys k) :: env
+            ("entry_value", Vstring s)
+            :: ("entry_key", Vstring (string_of_istr i))
+            :: env
           in
           List.iter (print_ast env xx) al; loop l
       | [] -> ()
@@ -868,20 +753,6 @@ let print_foreach conf print_ast _eval_expr =
       | [] -> ()
     in
     loop ini_list
-  and print_foreach_env_keys env xx _el al =
-    let env_keys =
-      match get_env "env_keys" env with
-        Venv_keys env_keys -> env_keys
-      | _ -> []
-    in
-    let rec loop =
-      function
-        (s, i) :: l ->
-          let env = ("key_name", Vstring s) :: ("key_value", Vint i) :: env in
-          List.iter (print_ast env xx) al; loop l
-      | [] -> ()
-    in
-    loop env_keys
   in
   print_foreach
 
@@ -889,7 +760,7 @@ let print_mod conf base =
   match p_getenv conf.env "data" with
   | Some ("place" | "src" | "occu" | "fn" | "sn") ->
     let list = build_list conf base in
-    let env = ["list", Vlist_data (List.rev_map (fun (a,b,c) -> (a,[b,c])) list)] in
+    let env = ["list", Vlist_data list] in
     Hutil.interp conf "upddata"
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);

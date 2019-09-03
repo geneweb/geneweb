@@ -64,14 +64,12 @@
             %foreach;value;
               <li class="list-unstyled ml-4">
                 %if;not is_modified;
-                  <a href="%prefix;m=MOD_DATA;data=%evar.data;;%keys;s=%encode.evar.s;#mod">%escape.entry_value;</a>
+                  <a href="%prefix;m=MOD_DATA&data=%evar.data;&key=%entry_key;&s=%encode.evar.s;#mod">%escape.entry_value;</a>
                 %else;
                   <form class="form-inline my-2" method="post" action="%action;" id="mod">
                     <div class="text-muted w-100">%escape.entry_value;</div>
                     %hidden;
-                    %foreach;env_keys;
-                      <input type="hidden" name="%key_name;" value="%key_value;">
-                    %end;
+                    <input type="hidden" name="key" value="%entry_key;">
                     <input type="hidden" name="m" value="MOD_DATA_OK">
                     <input type="hidden" name="data" value="%evar.data;">
                     <input type="hidden" name="s" value="%evar.s;">
