@@ -15,15 +15,6 @@ type filters =
   }
 ;;
 
-
-module StringSetAutoComplete =
-  Set.Make
-    (struct
-      type t = string ;;
-      let compare = compare ;;
-     end)
-;;
-
 module PlaceSetAutoComplete =
   Set.Make
     (struct
@@ -48,6 +39,5 @@ module PlaceSetAutoComplete =
 ;;
 
 type cache_type =
-  | Cache_string of (string list)
   | Cache_place of (Def.place list)
 ;;

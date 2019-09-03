@@ -35,7 +35,7 @@ let print_auto_complete conf base =
   let place_mode = params.Mwrite.Auto_complete.place_field in
   let list =
     if nb_of_persons base > 100000 then
-      Api_saisie_autocomplete.get_list_from_cache conf base s max_res mode
+      Api_saisie_autocomplete.get_list_from_cache conf base mode place_mode max_res s
     else
       Api_search.search_auto_complete conf base mode place_mode max_res s
   in
