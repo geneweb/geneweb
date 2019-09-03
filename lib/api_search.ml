@@ -646,7 +646,7 @@ let search_auto_complete conf base mode place_mode max_res n =
   let aux data =
     let conf = { conf with env = ("data", data) :: conf.env } in
     UpdateData.get_all_data conf base
-    |> List.map (fun (istr, _, _) -> sou base istr)
+    |> List.rev_map (fun istr -> sou base istr)
   in
   match mode with
 
@@ -671,54 +671,58 @@ let search_auto_complete conf base mode place_mode max_res n =
             (String.split_on_char ',' s)
         with Not_found -> []
     in
-    let len_place_format = List.length place_format in
-    let reduce dico l =
+    let reduce_perso list =
+      List.fold_left begin fun acc str ->
+        if Mutil.start_with ~wildcard:true ini 0 @@ Name.lower @@ Mutil.tr '_' ' ' str
+        then str :: acc
+        else acc
+      end [] list
+    in
+    let reduce_dico list =
       let rec loop acc = function
         | [] -> acc
-        | data :: l ->
+        | hd :: tl ->
           let acc =
-            let k =  Mutil.tr '_' ' ' data in
+            let k =  Mutil.tr '_' ' ' hd in
             let k =
               if place_mode <> Some `subdivision
               then UpdateData.remove_suburb k
               else k
             in
             if string_start_with ini (Name.lower k) then begin
-              let tmps = Util.nb_char_occ ',' k + 2 in
-              if len_place_format = 0 || tmps = len_place_format || dico then begin
-                let data =
-                  if dico && len_place_format > 0 then
-                    let expl_data = String.split_on_char ',' data |> List.rev in
-                    String.concat ", " @@
-                    Util.filter_map begin function
-                      | `town -> List.nth_opt expl_data 4
-                      | `area_code -> List.nth_opt expl_data 3
-                      | `county -> List.nth_opt expl_data 2
-                      | `region -> List.nth_opt expl_data 1
-                      | `country -> List.nth_opt expl_data 0
-                      | _ -> None
-                    end
-                      place_format
-                  else
-                    data
-                in
-                incr nb_res ;
-                data :: acc
-              end else acc
+              let hd =
+                if place_format <> [] then
+                  let expl_hd = String.split_on_char ',' hd in
+                  String.concat ", " @@
+                  Util.filter_map begin function
+                    | `town -> List.nth_opt expl_hd 0
+                    | `area_code -> List.nth_opt expl_hd 1
+                    | `county -> List.nth_opt expl_hd 2
+                    | `region -> List.nth_opt expl_hd 3
+                    | `country -> List.nth_opt expl_hd 4
+                    | _ -> None
+                  end
+                    place_format
+                else
+                  hd
+              in
+              incr nb_res ;
+              hd :: acc
             end else acc
           in
-          if !nb_res < max_res then loop acc l else acc
-      in loop [] l
+          if !nb_res < max_res then loop acc tl else acc
+      in loop [] list
     in
-    let base_place = reduce false list in
-    let dico_place =
-      match place_mode with
-      | Some pl_mode when !nb_res < max_res -> reduce true (load_dico_lieu conf pl_mode)
-      | _ -> []
-    in
-    List.rev_append
-      (List.sort (fun a b -> Gutil.alphabetic_order b a) base_place)
-      (List.sort Gutil.alphabetic_order dico_place)
+
+    let base_place = reduce_perso list in
+    begin match place_mode with
+      | Some pl_mode when !nb_res < max_res ->
+        let dico_place = reduce_dico (load_dico_lieu conf pl_mode) in
+        List.rev_append
+          (List.sort (fun a b -> Gutil.alphabetic_order b a) base_place)
+          (List.sort Gutil.alphabetic_order dico_place)
+      | _ -> List.sort Gutil.alphabetic_order base_place
+    end
 
   | `source ->
     let list = aux "src" in
