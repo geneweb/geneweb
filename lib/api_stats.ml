@@ -22,24 +22,6 @@ let list_uniq l =
   in
   List.rev l
 
-let nsplit s c =
-  if s = "" then []
-  else
-    let rec loop list i j =
-      if i = 0 then
-        if s.[i] = c then ("" :: list)
-        else
-          let ss = String.sub s 0 j in
-          (ss :: list)
-      else
-        if s.[i] = c then
-          let ss = String.sub s (i + 1) (j - i - 1) in
-          loop (ss :: list) (i - 1) i
-        else loop list (i - 1) j
-    in
-    let len = String.length s in
-    loop [] (len - 1) len
-
 let get_wday conf d =
   let jd =
     match d with
@@ -1048,7 +1030,7 @@ let print_ind_stats conf base =
             if p_auth then
               let s = sou base (proj p) in
               let sl =
-                if split then nsplit s ' '
+                if split then String.split_on_char ' ' s
                 else [s]
               in
               List.iter
@@ -1116,7 +1098,7 @@ let print_ind_stats conf base =
               begin
                 let s = sou base (proj p) in
                 let sl =
-                  if split then nsplit s ','
+                  if split then String.split_on_char ',' s
                   else [s]
                 in
                 List.iter
@@ -1623,7 +1605,7 @@ let print_all_stats conf base =
                           let (s, n) = Hashtbl.find ht_occupation k in
                           Hashtbl.replace ht_occupation k (s, (n + 1))
                         with Not_found -> Hashtbl.add ht_occupation k (s, 1))
-                    (nsplit (sou base (get_occupation p)) ',');
+                    (String.split_on_char ',' (sou base (get_occupation p)));
                   List.iter
                     (fun e ->
                       let s = sou base e.epers_note in
@@ -2185,7 +2167,7 @@ let print_all_stats conf base =
                  let (s, n) = Hashtbl.find ht_first_name k in
                  Hashtbl.replace ht_first_name k (s, (n + len))
                with Not_found -> Hashtbl.add ht_first_name k (s, len))
-           (nsplit s ' '))
+           (String.split_on_char ' ' s))
       list;
     (*
     let res = ref [] in
