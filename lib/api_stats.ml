@@ -1213,7 +1213,6 @@ let print_ind_stats conf base =
 let print_all_stats conf base =
   let periode = 5 in
   let nb_pers = nb_of_persons base in
-  let nb_fam = nb_of_families base in
 
   let ht_longuest = Hashtbl.create nb_pers in
   let ht_day_birth = Hashtbl.create 7 in
@@ -1240,14 +1239,10 @@ let print_all_stats conf base =
   let ht_occupation = Hashtbl.create nb_pers in
   let ht_surname = Hashtbl.create nb_pers in
   let ht_first_name = Hashtbl.create nb_pers in
-  let ht_max_child = Hashtbl.create nb_fam in
-  let ht_young_dad = Hashtbl.create nb_pers in
-  let ht_young_mom = Hashtbl.create nb_pers in
 
   Gwdb.Collection.iter begin fun p ->
     let p_auth = Util.authorized_age conf base p in
     let faml = Array.to_list (get_family p) in
-    let ip = get_iper p in
 
     if get_sex p = Neuter then ()
     else
@@ -1621,49 +1616,12 @@ let print_all_stats conf base =
               else ()
             end;
 
-            (* jeune père et jeune mère *)
-            begin
-              let ht = if get_sex p = Male then ht_young_dad else ht_young_mom in
-              let rec loop l =
-                match l with
-                | [] -> ()
-                | ifam :: l ->
-                    begin
-                      let fam = foi base ifam in
-                      let rec loopc lc =
-                        match lc with
-                        | [] -> loop l
-                        | ic :: lc ->
-                            begin
-                              let c = poi base ic in
-                              let c_auth = Util.authorized_age conf base c in
-                              if c_auth then
-                                match Date.get_birth_death_date c with
-                                | (Some (Dgreg (({prec = Sure | About | Maybe} as dmy2), _)), _, _) ->
-                                    begin
-                                      let a = Date.time_elapsed dmy1 dmy2 in
-                                      try
-                                        let n = Hashtbl.find ht ip in
-                                        if n > a.year then Hashtbl.replace ht ip a.year
-                                        else ()
-                                      with Not_found -> Hashtbl.add ht ip a.year
-                                    end
-                                | _ -> loopc lc
-                              else ()
-                            end
-                      in
-                      loopc (Array.to_list (get_children fam))
-                    end
-              in
-              loop faml
-            end;
         | _ -> ()
       end;
   end
     (Gwdb.persons base) ;
 
   Gwdb.Collection.iter begin fun fam ->
-    let ifam = get_ifam fam in
         let m_auth =
           let father = poi base (get_father fam) in
           let mother = poi base (get_mother fam) in
@@ -2081,31 +2039,10 @@ let print_all_stats conf base =
                 | _ -> ()
               end;
 
-              (* plus grand nombre d'enfants *)
-              begin
-                Hashtbl.add ht_max_child ifam (Array.length (get_children fam))
-              end;
-
             end
         | _ -> ()
       end
         (Gwdb.families base);
-
-  (* Nom le plus long *)
-  let _longuest_name =
-    let () = load_strings_array base in
-    let (list, _) = Alln.select_names conf base true "" true in
-    let list =
-      List.sort
-        (fun (k1, _, _) (k2, _, _) ->
-          let len1 = String.length k1 in
-          let len2 = String.length k2 in
-          if len1 > len2 then -1
-          else 1)
-        list
-    in
-    List.map (fun (s, _, _) -> s) (Util.reduce_list 10 list)
-  in
 
   (* Nom les plus fréquents *)
   let () =
@@ -2159,30 +2096,6 @@ let print_all_stats conf base =
                with Not_found -> Hashtbl.add ht_first_name k (s, len))
            (String.split_on_char ' ' s))
       list;
-  in
-
-  (* plus grand nombre d'enfants suite et fin *)
-  let _max_child =
-    let res = ref [] in
-    Hashtbl.iter (fun ifam n -> res := (ifam, n) :: !res) ht_max_child;
-    let l = List.sort (fun (_, n1) (_, n2) -> if n1 > n2 then -1 else 1) !res in
-    Util.reduce_list 10 l
-  in
-
-  (* plus jeune pere *)
-  let _youngest_dad =
-    let res = ref [] in
-    Hashtbl.iter (fun ip n -> res := (ip, n) :: !res) ht_young_dad;
-    let l = List.sort (fun (_, n1) (_, n2) -> compare n1 n2) !res in
-    Util.reduce_list 10 l
-  in
-
-  (* plus jeune mere *)
-  let _youngest_mom =
-    let res = ref [] in
-    Hashtbl.iter (fun ip n -> res := (ip, n) :: !res) ht_young_mom;
-    let l = List.sort (fun (_, n1) (_, n2) -> compare n1 n2) !res in
-    Util.reduce_list 10 l
   in
 
   let all_stats = [] in
