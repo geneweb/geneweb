@@ -22,36 +22,17 @@ let list_uniq l =
   in
   List.rev l
 
-let get_wday conf d =
-  let jd =
-    match d with
-    | Dgreg (d, _)  ->
-        begin
-          match d.prec with
-          | Sure ->
-              if (d.day <> 0 && d.month <> 0) then Calendar.sdn_of_gregorian d
-              else -1
-          | _ -> -1
-        end
-    | _ -> -1
-  in
-  let wday =
+let wday conf = function
+  | Dgreg ({ prec = Sure ; delta = 0 } as d, _) when d.day <> 0 && d.month <> 0 ->
+    let jd = Calendar.sdn_of_gregorian d in
     let jd_today = Calendar.sdn_of_gregorian conf.today in
     let x = conf.today_wd - jd_today + jd in
-    if x < 0 then 6 + (x + 1) mod 7 else x mod 7
-  in
-  if jd <> -1 then wday else -1
-
-let get_month d =
-  match d with
-  | Dgreg (d, _)  ->
-      begin
-        match d.prec with
-        | Sure -> if d.month <> 0 then d.month else -1
-        | _ -> -1
-      end
+    ((if x < 0 then 6 + (x + 1) mod 7 else x mod 7) + 6) mod 7
   | _ -> -1
 
+let md = function
+  | Dgreg ({ prec = Sure ; month }, _) when month <> 0 -> month - 1
+  | _ -> -1
 
 type record_stats =
   { s_year : int;
@@ -1240,863 +1221,343 @@ let print_all_stats conf base =
   let ht_surname = Hashtbl.create nb_pers in
   let ht_first_name = Hashtbl.create nb_pers in
 
+  let aux1 ht dmy s_sex s_value =
+    let r =
+      { s_year = dmy.year - (dmy.year mod periode) ; s_sex ; s_value; }
+    in
+    match Hashtbl.find_opt ht r.s_year with
+    | Some l -> Hashtbl.replace ht r.s_year (r :: l)
+    | None -> Hashtbl.add ht r.s_year [r]
+  in
+
+  let aux2 ht dmy s_sex s_value =
+    if s_value <> -1 then
+      let r =
+        { s_year = dmy.year - (dmy.year mod periode) ; s_sex ; s_value }
+      in
+      match Hashtbl.find_opt ht (r.s_year, r.s_value) with
+      | Some l -> Hashtbl.replace ht (r.s_year, r.s_value) (r :: l)
+      | None -> Hashtbl.add ht (r.s_year, r.s_value) [r]
+  in
+
+  load_strings_array base ;
+  load_persons_array base ;
+
   Gwdb.Collection.iter begin fun p ->
-    let p_auth = Util.authorized_age conf base p in
-    let faml = Array.to_list (get_family p) in
 
-    if get_sex p = Neuter then ()
-    else
-      begin
-        match Date.get_birth_death_date p with
-        | (Some (Dgreg (({prec = Sure} as dmy1), _) as d1),
-           Some (Dgreg (({prec = Sure} as dmy2), _) as d2), _) ->
-            begin
-              (* plus vieux *)
-              if p_auth && d1 <> d2 then
-                let a = Date.time_elapsed dmy1 dmy2 in
-                let r =
-                  { s_year = dmy2.year - (dmy2.year mod periode);
-                    s_sex = get_sex p;
-                    s_value = a.year; }
-                in
-                begin
-                  try
-                    let l = Hashtbl.find ht_longuest r.s_year in
-                    Hashtbl.replace ht_longuest r.s_year (r :: l)
-                  with Not_found -> Hashtbl.add ht_longuest r.s_year [r]
-                end
-              else ()
-            end;
+    if Util.authorized_age conf base p then begin
 
-            (* jour de naissance *)
+      begin (* Count surnames *)
+        let s = sou base @@ get_surname p in
+        let k = Name.lower s in
+        if k <> "?" && k <> "" then match Hashtbl.find_opt ht_surname k with
+          | Some (s, n) -> Hashtbl.replace ht_surname k (s, succ n)
+          | None -> Hashtbl.add ht_surname k (s, 1)
+      end ;
+
+      begin (* Count first names *)
+        let s = sou base @@ get_first_name p in
+        List.iter begin fun s ->
+          let k = Name.lower s in
+          if k <> "?" && k <> "" then match Hashtbl.find_opt ht_first_name k with
+            | Some (s, n) -> Hashtbl.replace ht_first_name k (s, (succ n))
+            | None -> Hashtbl.add ht_first_name k (s, 1)
+        end (String.split_on_char ' ' @@ Name.strip_c s '"')
+      end ;
+
+      if get_sex p = Neuter then ()
+      else
+        begin
+          match Date.get_birth_death_date p with
+          | (Some (Dgreg (({prec = Sure} as dmy1), _) as d1),
+             Some (Dgreg (({prec = Sure} as dmy2), _) as d2), _) ->
+
+            let s_sex = get_sex p in
+
+            (* Oldest person *)
+            if d1 <> d2 then aux1 ht_longuest dmy2 s_sex (Date.time_elapsed dmy1 dmy2).year ;
+
+            (* Sex repartition *)
+            aux1 ht_male_female dmy1 s_sex 1 ;
+
+            (* Day of birth *)
+            if dmy1.day > 0 then aux2 ht_day_birth dmy1 s_sex (wday conf d1) ;
+
+            (* Month of birth *)
+            if dmy1.month > 0 then aux2 ht_month_birth dmy1 s_sex (md d1) ;
+
+            (* Month of death *)
+            if dmy2.month > 0 then aux2 ht_month_death dmy2 s_sex (md d2) ;
+
+            (* Astrological sign *)
+            if dmy1.day > 0 then
+              aux2 ht_astro dmy1 s_sex begin
+                if dmy1.day >= 15 && dmy1.month = 4 || dmy1.day <= 15 && dmy1.month = 5 then 0
+                else if dmy1.day >= 16 && dmy1.month = 5 || dmy1.day <= 15 && dmy1.month = 6 then 1
+                else if dmy1.day >= 16 && dmy1.month = 6 || dmy1.day <= 15 && dmy1.month = 7 then 2
+                else if dmy1.day >= 16 && dmy1.month = 7 || dmy1.day <= 15 && dmy1.month = 8 then 3
+                else if dmy1.day >= 16 && dmy1.month = 8 || dmy1.day <= 15 && dmy1.month = 9 then 4
+                else if dmy1.day >= 16 && dmy1.month = 9 || dmy1.day <= 15 && dmy1.month = 10 then 5
+                else if dmy1.day >= 16 && dmy1.month = 10 || dmy1.day <= 15 && dmy1.month = 11 then 6
+                else if dmy1.day >= 16 && dmy1.month = 11 || dmy1.day <= 15 && dmy1.month = 12 then 7
+                else if dmy1.day >= 16 && dmy1.month = 12 || dmy1.day <= 14 && dmy1.month = 1 then 8
+                else if dmy1.day >= 15 && dmy1.month = 1 || dmy1.day <= 14 && dmy1.month = 2 then 9
+                else if dmy1.day >= 15 && dmy1.month = 2 || dmy1.day <= 14 && dmy1.month = 3 then 10
+                else if dmy1.day >= 15 && dmy1.month = 3 || dmy1.day <= 14 && dmy1.month = 4 then 11
+                else -1
+              end ;
+
+            (* Average union/person *)
+            aux1 ht_moy_marr dmy1 s_sex @@ Array.length (get_family p) ;
+
+            (* Moon phase *)
+            if dmy1.delta = 0 && dmy1.day > 0 then
+              aux2 ht_moon dmy1 s_sex begin
+                let jd = Calendar.sdn_of_gregorian dmy1 in
+                let (mp, md) = Calendar.moon_phase_of_sdn jd in
+                match mp with
+                | None ->
+                  let md = float_of_int md in
+                  if md <= 3.69 then 1
+                  else if md <= 11.07 then 2
+                  else if md <= 18.45 then 3
+                  else if md <= 25.83 then 4
+                  else 1
+                | Some (Calendar.NewMoon, _, _) -> 1
+                | Some (Calendar.FirstQuarter, _, _) -> 2
+                | Some (Calendar.FullMoon, _, _) -> 3
+                | Some (Calendar.LastQuarter, _, _) -> 4
+              end ;
+
+            (* Average union duration *)
             begin
-              if p_auth && dmy1.day > 0 then
-                let wd = get_wday conf d1 in
-                if wd <> -1 then
-                  let wd = (wd + 6) mod 7 in
-                  let r =
-                    { s_year = dmy1.year - (dmy1.year mod periode);
-                      s_sex = get_sex p;
-                      s_value = wd; }
-                  in
-                  begin
-                    try
-                      let l = Hashtbl.find ht_day_birth (r.s_year, r.s_value) in
-                      Hashtbl.replace ht_day_birth (r.s_year, r.s_value) (r :: l)
-                    with Not_found -> Hashtbl.add ht_day_birth (r.s_year, r.s_value) [r]
+              let fams = get_family p in
+              let len = Array.length fams in
+              let rec loop i =
+                if i = len then ()
+                else begin
+                  let ifam = Array.unsafe_get fams i in
+                  let fam = foi base ifam in
+                  if not @@ Util.authorized_age conf base (poi base (Gutil.spouse (get_iper p) fam))
+                  then loop (i + 1)
+                  else begin match Adef.od_of_cdate (get_marriage fam) with
+                    | Some (Dgreg ({ prec = Sure } as dmy, _)) ->
+                      begin match get_divorce fam with
+                        | Divorced co ->
+                          begin match Adef.od_of_cdate co with
+                            | Some (Dgreg ({ prec = Sure } as dmy2, _)) ->
+                              if dmy2.year >= dmy.year
+                              then aux1 ht_marr_time dmy Neuter (Date.time_elapsed dmy dmy2).year ;
+                              loop (i + 1)
+                            | _ -> loop (i + 1)
+                          end
+                        | _ ->
+                          if i = len - 1 then begin
+                            let father = poi base (get_father fam) in
+                            let mother = poi base (get_mother fam) in
+                            match
+                              ( Date.get_birth_death_date father
+                              , Date.get_birth_death_date mother)
+                            with
+                            | ( (_, Some (Dgreg (dmyf, _)), _)
+                              , (_, Some (Dgreg (dmym, _)), _)) ->
+                              if dmyf.year < dmy.year || dmym.year < dmy.year then ()
+                              else if dmyf.year < dmym.year
+                              then aux1 ht_marr_time dmy Neuter (Date.time_elapsed dmy dmyf).year
+                              else aux1 ht_marr_time dmy Neuter (Date.time_elapsed dmy dmym).year
+                            | ((_, Some (Dgreg (dmyf, _)), _) , _) ->
+                              if dmyf.year >= dmy.year
+                              then aux1 ht_marr_time dmy Neuter (Date.time_elapsed dmy dmyf).year
+                            | (_, (_, Some (Dgreg (dmym, _)), _)) ->
+                              if dmym.year <= dmy.year
+                              then aux1 ht_marr_time dmy Neuter (Date.time_elapsed dmy dmym).year
+                            | _ -> ()
+                          end else begin
+                            let ifam2 = Array.unsafe_get fams (i + 1) in
+                            let fam2 = foi base ifam2 in
+                            match Adef.od_of_cdate (get_marriage fam2) with
+                            | Some (Dgreg ({ prec = Sure } as dmy2, _)) ->
+                              if dmy.year <= dmy2.year
+                              then aux1 ht_marr_time dmy Neuter (Date.time_elapsed dmy dmy2).year ;
+                              loop (i + 1)
+                            | _ -> loop (i + 2)
+                          end
+                      end
+                    | _ -> loop (i + 1)
                   end
-                else ()
-              else ()
-            end;
-
-            (* mois de naissance *)
-            begin
-              if p_auth && dmy1.month > 0 then
-                let md = get_month d1 in
-                if md <> -1 then
-                  let md = md - 1 in
-                  let r =
-                    { s_year = dmy1.year - (dmy1.year mod periode);
-                      s_sex = get_sex p;
-                      s_value = md; }
-                  in
-                  begin
-                    try
-                      let l = Hashtbl.find ht_month_birth (r.s_year, r.s_value) in
-                      Hashtbl.replace ht_month_birth (r.s_year, r.s_value) (r :: l)
-                    with Not_found -> Hashtbl.add ht_month_birth (r.s_year, r.s_value) [r]
-                  end
-                else ()
-              else ()
-            end;
-
-            (* mois de décès *)
-            begin
-              if p_auth && dmy2.month > 0 then
-                let md = get_month d2 in
-                if md <> -1 then
-                  let md = md - 1 in
-                  let r =
-                    { s_year = dmy2.year - (dmy2.year mod periode);
-                      s_sex = get_sex p;
-                      s_value = md; }
-                  in
-                  begin
-                    try
-                      let l = Hashtbl.find ht_month_death (r.s_year, r.s_value) in
-                      Hashtbl.replace ht_month_death (r.s_year, r.s_value) (r :: l)
-                    with Not_found -> Hashtbl.add ht_month_death (r.s_year, r.s_value) [r]
-                  end
-                else ()
-              else ()
-            end;
-
-            (* répartition homme femme *)
-            begin
-              if p_auth then
-                let r =
-                  { s_year = dmy1.year - (dmy1.year mod periode);
-                    s_sex = get_sex p;
-                    s_value = 1; }
-                in
-                begin
-                  try
-                    let l = Hashtbl.find ht_male_female r.s_year in
-                    Hashtbl.replace ht_male_female r.s_year (r :: l)
-                  with Not_found -> Hashtbl.add ht_male_female r.s_year [r]
                 end
-              else ()
-            end;
-
-            (* signe astrologique *)
-            begin
-              if p_auth && dmy1.day > 0 then
-                begin
-                  let v =
-                    if dmy1.day >= 15 && dmy1.month = 4 || dmy1.day <= 15 && dmy1.month = 5 then 0
-                    else if dmy1.day >= 16 && dmy1.month = 5 || dmy1.day <= 15 && dmy1.month = 6 then 1
-                    else if dmy1.day >= 16 && dmy1.month = 6 || dmy1.day <= 15 && dmy1.month = 7 then 2
-                    else if dmy1.day >= 16 && dmy1.month = 7 || dmy1.day <= 15 && dmy1.month = 8 then 3
-                    else if dmy1.day >= 16 && dmy1.month = 8 || dmy1.day <= 15 && dmy1.month = 9 then 4
-                    else if dmy1.day >= 16 && dmy1.month = 9 || dmy1.day <= 15 && dmy1.month = 10 then 5
-                    else if dmy1.day >= 16 && dmy1.month = 10 || dmy1.day <= 15 && dmy1.month = 11 then 6
-                    else if dmy1.day >= 16 && dmy1.month = 11 || dmy1.day <= 15 && dmy1.month = 12 then 7
-                    else if dmy1.day >= 16 && dmy1.month = 12 || dmy1.day <= 14 && dmy1.month = 1 then 8
-                    else if dmy1.day >= 15 && dmy1.month = 1 || dmy1.day <= 14 && dmy1.month = 2 then 9
-                    else if dmy1.day >= 15 && dmy1.month = 2 || dmy1.day <= 14 && dmy1.month = 3 then 10
-                    else if dmy1.day >= 15 && dmy1.month = 3 || dmy1.day <= 14 && dmy1.month = 4 then 11
-                    else -1
-                  in
-                  if v <> -1 then
-                    let r =
-                      { s_year = dmy1.year - (dmy1.year mod periode);
-                        s_sex = get_sex p;
-                        s_value = v; }
-                    in
-                    try
-                      let l = Hashtbl.find ht_astro (r.s_year, r.s_value) in
-                      Hashtbl.replace ht_astro (r.s_year, r.s_value) (r :: l)
-                    with Not_found -> Hashtbl.add ht_astro (r.s_year, r.s_value) [r]
-                  else ()
-                end
-              else ()
-            end;
-
-            (* influence de la lune *)
-            begin
-              if p_auth && dmy1.delta = 0 && dmy1.day > 0 then
-                begin
-                  try
-                    begin
-                      let jd = Calendar.sdn_of_gregorian dmy1 in
-                      let (mp, md) = Calendar.moon_phase_of_sdn jd in
-                      let i =
-                        match mp with
-                        | None ->
-                            let md = float_of_int md in
-                            if md <= 3.69 then 1
-                            else if md <= 11.07 then 2
-                            else if md <= 18.45 then 3
-                            else if md <= 25.83 then 4
-                            else 1
-                        | Some (Calendar.NewMoon, _, _) -> 1
-                        | Some (Calendar.FirstQuarter, _, _) -> 2
-                        | Some (Calendar.FullMoon, _, _) -> 3
-                        | Some (Calendar.LastQuarter, _, _) -> 4
-                      in
-                      let r =
-                        { s_year = dmy1.year - (dmy1.year mod periode);
-                          s_sex = get_sex p;
-                          s_value = i; }
-                      in
-                      try
-                        let l = Hashtbl.find ht_moon (r.s_year, r.s_value) in
-                        Hashtbl.replace ht_moon (r.s_year, r.s_value) (r :: l)
-                      with Not_found -> Hashtbl.add ht_moon (r.s_year, r.s_value) [r]
-                    end
-                  with Failure _ -> ()
-                end
-              else ()
-            end;
-
-            (* nombre moyen d'union *)
-            begin
-              if p_auth then
-                let v = Array.length (get_family p) in
-                let r =
-                  { s_year = dmy1.year - (dmy1.year mod periode);
-                    s_sex = get_sex p;
-                    s_value = v; }
-                in
-                try
-                  let l = Hashtbl.find ht_moy_marr r.s_year in
-                  Hashtbl.replace ht_moy_marr r.s_year (r :: l)
-                with Not_found -> Hashtbl.add ht_moy_marr r.s_year [r]
-              else ()
-            end;
-
-            (* durée moyenne union *)
-            begin
-              let rec loop l =
-                match l with
-                | [] -> ()
-                | ifam :: l ->
-                    begin
-                      let fam = foi base ifam in
-                      let m_auth =
-                        p_auth &&
-                          Util.authorized_age conf base
-                          (poi base (Gutil.spouse (get_iper p) fam))
-                      in
-                      if not m_auth then ()
-                      else
-                        match Adef.od_of_cdate (get_marriage fam) with
-                        | Some (Dgreg (({prec = Sure}) as dmy, _)) ->
-                            begin
-                              match get_divorce fam with
-                              | Divorced co ->
-                                  begin
-                                    match Adef.od_of_cdate co with
-                                    | Some (Dgreg (({prec = Sure}) as dmy2, _)) ->
-                                        if dmy2.year < dmy.year then ()
-                                        else
-                                          begin
-                                            let a = Date.time_elapsed dmy dmy2 in
-                                            let v = a.year in
-                                            let r =
-                                              { s_year = dmy.year - (dmy.year mod periode);
-                                                s_sex = Neuter;
-                                                s_value = v; }
-                                            in
-                                            try
-                                              let l = Hashtbl.find ht_marr_time r.s_year in
-                                              Hashtbl.replace ht_marr_time r.s_year (r :: l)
-                                            with Not_found -> Hashtbl.add ht_marr_time r.s_year [r]
-                                          end;
-                                        loop l
-                                    | _ -> loop l
-                                  end
-                              | _ ->
-                                  begin
-                                    match l with
-                                    | [] ->
-                                        begin
-                                          let father = poi base (get_father fam) in
-                                          let mother = poi base (get_mother fam) in
-                                          match
-                                            (Date.get_birth_death_date father,
-                                             Date.get_birth_death_date mother)
-                                          with
-                                          | ((_, Some (Dgreg (dmyf, _)), _) ,
-                                             (_, Some (Dgreg (dmym, _)), _)) ->
-                                              if dmyf.year < dmy.year || dmym.year < dmy.year then ()
-                                              else
-                                                begin
-                                                  if dmyf.year < dmym.year then
-                                                    let a = Date.time_elapsed dmy dmyf in
-                                                    begin
-                                                      let v = a.year in
-                                                      let r =
-                                                        { s_year = dmy.year - (dmy.year mod periode);
-                                                          s_sex = Neuter;
-                                                          s_value = v; }
-                                                      in
-                                                      try
-                                                        let l = Hashtbl.find ht_marr_time r.s_year in
-                                                        Hashtbl.replace ht_marr_time r.s_year (r :: l)
-                                                      with Not_found -> Hashtbl.add ht_marr_time r.s_year [r]
-                                                    end
-                                                  else
-                                                    let a = Date.time_elapsed dmy dmym in
-                                                    begin
-                                                      let v = a.year in
-                                                      let r =
-                                                        { s_year = dmy.year - (dmy.year mod periode);
-                                                          s_sex = Neuter;
-                                                          s_value = v; }
-                                                      in
-                                                      try
-                                                        let l = Hashtbl.find ht_marr_time r.s_year in
-                                                        Hashtbl.replace ht_marr_time r.s_year (r :: l)
-                                                      with Not_found -> Hashtbl.add ht_marr_time r.s_year [r]
-                                                    end
-                                                end
-                                          | ((_, Some (Dgreg (dmyf, _)), _) , _) ->
-                                                if dmyf.year < dmy.year then ()
-                                                else
-                                                  begin
-                                                    let a = Date.time_elapsed dmy dmyf in
-                                                    let v = a.year in
-                                                    let r =
-                                                      { s_year = dmy.year - (dmy.year mod periode);
-                                                        s_sex = Neuter;
-                                                        s_value = v; }
-                                                    in
-                                                    try
-                                                      let l = Hashtbl.find ht_marr_time r.s_year in
-                                                      Hashtbl.replace ht_marr_time r.s_year (r :: l)
-                                                    with Not_found -> Hashtbl.add ht_marr_time r.s_year [r]
-                                                  end
-                                          | (_, (_, Some (Dgreg (dmym, _)), _)) ->
-                                                if dmym.year > dmy.year then ()
-                                                else
-                                                  begin
-                                                    let a = Date.time_elapsed dmy dmym in
-                                                    let v = a.year in
-                                                    let r =
-                                                      { s_year = dmy.year - (dmy.year mod periode);
-                                                        s_sex = Neuter;
-                                                        s_value = v; }
-                                                    in
-                                                    try
-                                                      let l = Hashtbl.find ht_marr_time r.s_year in
-                                                      Hashtbl.replace ht_marr_time r.s_year (r :: l)
-                                                    with Not_found -> Hashtbl.add ht_marr_time r.s_year [r]
-                                                  end
-                                          | _ -> ()
-                                        end;
-                                        loop l
-                                    | ifam2 :: l2 ->
-                                        begin
-                                          let fam2 = foi base ifam2 in
-                                          match Adef.od_of_cdate (get_marriage fam2) with
-                                          | Some (Dgreg (({prec = Sure}) as dmy2, _)) ->
-                                              if dmy.year > dmy2.year then ()
-                                              else
-                                                begin
-                                                  let a = Date.time_elapsed dmy dmy2 in
-                                                  let v = a.year in
-                                                  let r =
-                                                    { s_year = dmy.year - (dmy.year mod periode);
-                                                      s_sex = Neuter;
-                                                      s_value = v; }
-                                                  in
-                                                  try
-                                                    let l = Hashtbl.find ht_marr_time r.s_year in
-                                                    Hashtbl.replace ht_marr_time r.s_year (r :: l)
-                                                  with Not_found -> Hashtbl.add ht_marr_time r.s_year [r]
-                                                end;
-                                              loop l
-                                          | _ -> loop l2
-                                        end
-                                  end
-                            end
-                        | _ -> loop l
-                    end
               in
-              loop faml
+              loop 0
             end;
 
-            (* profession les plus frequente *)
+            (* Most common occupations *)
             begin
-              if p_auth then
-                begin
-                  List.iter
-                    (fun s ->
-                      let k = Name.lower s in
-                      if k = "" then ()
-                      else
-                        try
-                          let (s, n) = Hashtbl.find ht_occupation k in
-                          Hashtbl.replace ht_occupation k (s, (n + 1))
-                        with Not_found -> Hashtbl.add ht_occupation k (s, 1))
-                    (String.split_on_char ',' (sou base (get_occupation p)));
-                  List.iter
-                    (fun e ->
-                      let s = sou base e.epers_note in
-                      let k = Name.lower s in
-                      if k = "" then ()
-                      else
-                        try
-                          let (s, n) = Hashtbl.find ht_occupation k in
-                          Hashtbl.replace ht_occupation k (s, (n + 1))
-                        with Not_found -> Hashtbl.add ht_occupation k (s, 1))
-                    (List.filter (fun e -> e.epers_name = Epers_Occupation) (get_pevents p));
-                end
-              else ()
-            end;
+              List.iter begin fun s ->
+                let k = Name.lower s in
+                if k <> "" then match Hashtbl.find_opt ht_occupation k with
+                  | Some (s, n) -> Hashtbl.replace ht_occupation k (s, (n + 1))
+                  | None -> Hashtbl.add ht_occupation k (s, 1)
+              end (String.split_on_char ',' (sou base (get_occupation p)));
+              List.iter begin fun e ->
+                if e.epers_name = Epers_Occupation then
+                  let s = sou base e.epers_note in
+                  let k = Name.lower s in
+                  if k <> "" then match Hashtbl.find_opt ht_occupation k with
+                    | Some (s, n) -> Hashtbl.replace ht_occupation k (s, (n + 1))
+                    | None -> Hashtbl.add ht_occupation k (s, 1)
+              end (get_pevents p) ;
+            end ;
 
-        | _ -> ()
-      end;
-  end
-    (Gwdb.persons base) ;
+          | _ -> ()
+
+        end;
+    end
+  end (Gwdb.persons base) ;
+
+  clear_strings_array base ;
+
+  load_families_array base ;
 
   Gwdb.Collection.iter begin fun fam ->
-        let m_auth =
-          let father = poi base (get_father fam) in
-          let mother = poi base (get_mother fam) in
-          Util.authorized_age conf base father &&
-            Util.authorized_age conf base mother
-        in
-        let childrenl = Array.to_list (get_children fam) in
+    let f = poi base (get_father fam) in
+    let m = poi base (get_mother fam) in
+    if Util.authorized_age conf base f
+    && Util.authorized_age conf base m
+    then begin match Adef.od_of_cdate (get_marriage fam) with
+      | Some (Dgreg ({ prec = Sure } as dmy, _) as d) -> begin
 
-        match Adef.od_of_cdate (get_marriage fam) with
-        | Some (Dgreg (({prec = Sure}) as dmy, _) as d) ->
-            begin
-              let p = poi base (get_father fam) in
-              let sp = poi base (get_mother fam) in
+          (* Age at wedding *)
+          begin
+            match
+              (Date.get_birth_death_date f, Date.get_birth_death_date m)
+            with
+            | ( (Some (Dgreg (({prec = Sure} as dmy1), _)), _, _)
+              , (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _) ) ->
+              if dmy1.day > 0
+              then aux1 ht_marr_age dmy1 (get_sex f) (Date.time_elapsed dmy1 dmy).year ;
+              if dmy2.day > 0
+              then aux1 ht_marr_age dmy2 (get_sex m) (Date.time_elapsed dmy2 dmy).year ;
+            | _ -> ()
+          end;
 
-              (* age au mariage *)
-              begin
-                if m_auth then
-                  match
-                    (Date.get_birth_death_date p, Date.get_birth_death_date sp)
-                  with
-                  | ((Some (Dgreg (({prec = Sure} as dmy1), _)), _, _),
-                     (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _)) ->
-                      begin
-                        if dmy1.day = 0 then ()
-                        else
-                        let a1 = Date.time_elapsed dmy1 dmy in
-                        let r1 =
-                          { s_year = dmy1.year - (dmy1.year mod periode);
-                            s_sex = get_sex p;
-                            s_value = a1.year; }
-                        in
-                        try
-                          let l = Hashtbl.find ht_marr_age r1.s_year in
-                          Hashtbl.replace ht_marr_age r1.s_year (r1 :: l)
-                        with Not_found -> Hashtbl.add ht_marr_age r1.s_year [r1]
-                      end;
-                      begin
-                        if dmy2.day = 0 then ()
-                        else
-                        let a2 = Date.time_elapsed dmy2 dmy in
-                        let r2 =
-                          { s_year = dmy2.year - (dmy2.year mod periode);
-                            s_sex = get_sex sp;
-                            s_value = a2.year; }
-                        in
-                        try
-                          let l = Hashtbl.find ht_marr_age r2.s_year in
-                          Hashtbl.replace ht_marr_age r2.s_year (r2 :: l)
-                        with Not_found -> Hashtbl.add ht_marr_age r2.s_year [r2]
-                      end;
-                  | _ -> ()
-                else ()
-              end;
-
-              (* jour de mariage *)
-              begin
-                if m_auth && dmy.day > 0 then
-                  let wd = get_wday conf d in
-                  if wd <> -1 then
-                    let wd = (wd + 6) mod 7 in
-                    let r1 =
-                      { s_year = dmy.year - (dmy.year mod periode);
-                        s_sex = get_sex p;
-                        s_value = wd; }
-                    in
-                    let r2 =
-                      { s_year = dmy.year - (dmy.year mod periode);
-                        s_sex = get_sex sp;
-                        s_value = wd; }
-                    in
-                    begin
-                      try
-                        let l = Hashtbl.find ht_day_marr (r1.s_year, r1.s_value) in
-                        Hashtbl.replace ht_day_marr (r1.s_year, r1.s_value) (r1 :: l)
-                      with Not_found -> Hashtbl.add ht_day_marr (r1.s_year, r1.s_value) [r1]
-                    end;
-                    begin
-                      try
-                        let l = Hashtbl.find ht_day_marr (r2.s_year, r2.s_value) in
-                        Hashtbl.replace ht_day_marr (r2.s_year, r2.s_value) (r2 :: l)
-                      with Not_found -> Hashtbl.add ht_day_marr (r2.s_year, r2.s_value) [r2]
-                    end;
-                  else ()
-                else ()
-              end;
-
-              (* mois de mariage *)
-              begin
-                if m_auth && dmy.month > 0 then
-                  let md = get_month d in
-                  if md <> -1 then
-                    let md = md - 1 in
-                    let r1 =
-                      { s_year = dmy.year - (dmy.year mod periode);
-                        s_sex = get_sex p;
-                        s_value = md; }
-                    in
-                    let r2 =
-                      { s_year = dmy.year - (dmy.year mod periode);
-                        s_sex = get_sex sp;
-                        s_value = md; }
-                    in
-                    begin
-                      try
-                        let l = Hashtbl.find ht_month_marr (r1.s_year, r1.s_value) in
-                        Hashtbl.replace ht_month_marr (r1.s_year, r1.s_value) (r1 :: l)
-                      with Not_found -> Hashtbl.add ht_month_marr (r1.s_year, r1.s_value) [r1]
-                    end;
-                    begin
-                      try
-                        let l = Hashtbl.find ht_month_marr (r2.s_year, r2.s_value) in
-                        Hashtbl.replace ht_month_marr (r2.s_year, r2.s_value) (r2 :: l)
-                      with Not_found -> Hashtbl.add ht_month_marr (r2.s_year, r2.s_value) [r2]
-                    end;
-                  else ()
-                else ()
-              end;
-
-              (* différence age couple *)
-              begin
-                if m_auth then
-                  match
-                    (Date.get_birth_death_date p, Date.get_birth_death_date sp)
-                  with
-                  | ((Some (Dgreg (({prec = Sure} as dmy1), _)), _, _),
-                     (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _)) ->
-                      if dmy1.day > 0 && dmy2.day > 0 then
-                        let a =
-                          if dmy1.year < dmy2.year then Date.time_elapsed dmy1 dmy2
-                          else Date.time_elapsed dmy2 dmy2
-                        in
-                        let v = a.month + 12 * a.year in
-                        begin
-                          let r1 =
-                            { s_year = dmy.year - (dmy.year mod periode);
-                              s_sex = get_sex p;
-                              s_value = v; }
-                          in
-                          try
-                            let l = Hashtbl.find ht_marr_diff_age_cpl r1.s_year in
-                            Hashtbl.replace ht_marr_diff_age_cpl r1.s_year (r1 :: l)
-                          with Not_found -> Hashtbl.add ht_marr_diff_age_cpl r1.s_year [r1]
-                        end;
-                        begin
-                          let r2 =
-                            { s_year = dmy.year - (dmy.year mod periode);
-                              s_sex = get_sex sp;
-                              s_value = v; }
-                          in
-                          try
-                            let l = Hashtbl.find ht_marr_diff_age_cpl r2.s_year in
-                            Hashtbl.replace ht_marr_diff_age_cpl r2.s_year (r2 :: l)
-                          with Not_found -> Hashtbl.add ht_marr_diff_age_cpl r2.s_year [r2]
-                        end;
-                      else ()
-                  | _ -> ()
-                else ()
-              end;
-
-              (* taux de fecondite *)
-              begin
-                let v = Array.length (get_children fam) in
-                begin
-                  let r1 =
-                    { s_year = dmy.year - (dmy.year mod periode);
-                      s_sex = Neuter;
-                      s_value = v; }
-                  in
-                  try
-                    let l = Hashtbl.find ht_fecondite r1.s_year in
-                    Hashtbl.replace ht_fecondite r1.s_year (r1 :: l)
-                  with Not_found -> Hashtbl.add ht_fecondite r1.s_year [r1]
-                end;
-                begin
-                  let r2 =
-                    { s_year = dmy.year - (dmy.year mod periode);
-                      s_sex = Neuter;
-                      s_value = v; }
-                  in
-                  try
-                    let l = Hashtbl.find ht_fecondite r2.s_year in
-                    Hashtbl.replace ht_fecondite r2.s_year (r2 :: l)
-                  with Not_found -> Hashtbl.add ht_fecondite r2.s_year [r2]
-                end;
-              end;
-
-              (* interval entre naissance *)
-              begin
-                (* On prend le parti que les enfants sont triés ! *)
-                let rec loop l =
-                  match l with
-                  | [] | [_] -> ()
-                  | ic1 :: ic2 :: l ->
-                      let c1 = poi base ic1 in
-                      let c2 = poi base ic2 in
-                      let c_auth =
-                        Util.authorized_age conf base c1 &&
-                          Util.authorized_age conf base c2
-                      in
-                      begin
-                        if c_auth then
-                          match
-                            (Date.get_birth_death_date c1,
-                             Date.get_birth_death_date c2)
-                          with
-                          | ((Some (Dgreg (({prec = Sure} as dmy_c1), _)), _, _) ,
-                             (Some (Dgreg (({prec = Sure} as dmy_c2), _)), _, _)) ->
-                              let a = Date.time_elapsed dmy_c1 dmy_c2 in
-                              begin
-                                let v = a.month + 12 * a.year in
-                                let r =
-                                  { s_year = dmy_c1.year - (dmy_c1.year mod periode);
-                                    s_sex = Neuter;
-                                    s_value = v; }
-                                in
-                                try
-                                  let l = Hashtbl.find ht_diff_age_child r.s_year in
-                                  Hashtbl.replace ht_diff_age_child r.s_year (r :: l)
-                                with Not_found -> Hashtbl.add ht_diff_age_child r.s_year [r]
-                              end
-                          | _ -> ()
-                        else ()
-                      end;
-                      loop (ic2 :: l)
-                in
-                loop childrenl
-              end;
-
-              (* age moyen à la naissance *)
-              begin
-                List.iter
-                  (fun ic ->
-                    let c = poi base ic in
-                    let c_auth = Util.authorized_age conf base c in
-                    if c_auth then
-                      match Date.get_birth_death_date c with
-                      | (Some (Dgreg (({prec = Sure} as dmy_c), _)), _, _) ->
-                          begin
-                            match Date.get_birth_death_date p with
-                            | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = Date.time_elapsed dmy_p dmy_c in
-                                let v = a.year in
-                                begin
-                                  let r1 =
-                                    { s_year = dmy_c.year - (dmy_c.year mod periode);
-                                      s_sex = get_sex p;
-                                      s_value = v; }
-                                  in
-                                  try
-                                    let l = Hashtbl.find ht_moy_age_birth r1.s_year in
-                                    Hashtbl.replace ht_moy_age_birth r1.s_year (r1 :: l)
-                                  with Not_found -> Hashtbl.add ht_moy_age_birth r1.s_year [r1]
-                                end;
-                            | _ -> ()
-                          end;
-                          begin
-                            match Date.get_birth_death_date sp with
-                            | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = Date.time_elapsed dmy_p dmy_c in
-                                let v = a.year in
-                                begin
-                                  let r2 =
-                                    { s_year = dmy_c.year - (dmy_c.year mod periode);
-                                      s_sex = get_sex p;
-                                      s_value = v; }
-                                  in
-                                  try
-                                    let l = Hashtbl.find ht_moy_age_birth r2.s_year in
-                                    Hashtbl.replace ht_moy_age_birth r2.s_year (r2 :: l)
-                                  with Not_found -> Hashtbl.add ht_moy_age_birth r2.s_year [r2]
-                                end;
-                            | _ -> ()
-                          end;
-                      | _ -> ()
-                    else ())
-                  childrenl
-              end;
-
-              (* age moyen à la première naissance *)
-              begin
-                match childrenl with
-                | [] -> ()
-                | ic :: _ ->
-                    let c = poi base ic in
-                    let c_auth = Util.authorized_age conf base c in
-                    if c_auth then
-                      match Date.get_birth_death_date c with
-                      | (Some (Dgreg (({prec = Sure} as dmy_c), _)), _, _) ->
-                          begin
-                            match Date.get_birth_death_date p with
-                            | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = Date.time_elapsed dmy_p dmy_c in
-                                let v = a.year in
-                                begin
-                                  let r1 =
-                                    { s_year = dmy_c.year - (dmy_c.year mod periode);
-                                      s_sex = get_sex p;
-                                      s_value = v; }
-                                  in
-                                  try
-                                    let l = Hashtbl.find ht_moy_age_first_birth r1.s_year in
-                                    Hashtbl.replace ht_moy_age_first_birth r1.s_year (r1 :: l)
-                                  with Not_found -> Hashtbl.add ht_moy_age_first_birth r1.s_year [r1]
-                                end;
-                            | _ -> ()
-                          end;
-                          begin
-                            match Date.get_birth_death_date sp with
-                            | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = Date.time_elapsed dmy_p dmy_c in
-                                let v = a.year in
-                                begin
-                                  let r2 =
-                                    { s_year = dmy_c.year - (dmy_c.year mod periode);
-                                      s_sex = get_sex sp;
-                                      s_value = v; }
-                                  in
-                                  try
-                                    let l = Hashtbl.find ht_moy_age_first_birth r2.s_year in
-                                    Hashtbl.replace ht_moy_age_first_birth r2.s_year (r2 :: l)
-                                  with Not_found -> Hashtbl.add ht_moy_age_first_birth r2.s_year [r2]
-                                end;
-                            | _ -> ()
-                          end;
-                      | _ -> ()
-                    else ()
-              end;
-
-              (* age moyen à la dernière naissance *)
-              begin
-                match List.rev childrenl with
-                | [] -> ()
-                | ic :: _ ->
-                    let c = poi base ic in
-                    let c_auth = Util.authorized_age conf base c in
-                    if c_auth then
-                      match Date.get_birth_death_date c with
-                      | (Some (Dgreg (({prec = Sure} as dmy_c), _)), _, _) ->
-                          begin
-                            match Date.get_birth_death_date p with
-                            | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = Date.time_elapsed dmy_p dmy_c in
-                                let v = a.year in
-                                begin
-                                  let r1 =
-                                    { s_year = dmy_c.year - (dmy_c.year mod periode);
-                                      s_sex = get_sex p;
-                                      s_value = v; }
-                                  in
-                                  try
-                                    let l = Hashtbl.find ht_moy_age_last_birth r1.s_year in
-                                    Hashtbl.replace ht_moy_age_last_birth r1.s_year (r1 :: l)
-                                  with Not_found -> Hashtbl.add ht_moy_age_last_birth r1.s_year [r1]
-                                end;
-                            | _ -> ()
-                          end;
-                          begin
-                            match Date.get_birth_death_date sp with
-                            | (Some (Dgreg (({prec = Sure} as dmy_p), _)), _, _) ->
-                                let a = Date.time_elapsed dmy_p dmy_c in
-                                let v = a.year in
-                                begin
-                                  let r2 =
-                                    { s_year = dmy_c.year - (dmy_c.year mod periode);
-                                      s_sex = get_sex sp;
-                                      s_value = v; }
-                                  in
-                                  try
-                                    let l = Hashtbl.find ht_moy_age_last_birth r2.s_year in
-                                    Hashtbl.replace ht_moy_age_last_birth r2.s_year (r2 :: l)
-                                  with Not_found -> Hashtbl.add ht_moy_age_last_birth r2.s_year [r2]
-                                end;
-                            | _ -> ()
-                          end;
-                      | _ -> ()
-                    else ()
-              end;
-
-              (* différence age premier et dernier enfant *)
-              begin
-                let children = childrenl in
-                match (children, List.rev children) with
-                | (ic1 :: _, ic2 :: _) ->
-                    begin
-                      if ic1 = ic2 then ()
-                      else
-                        let c1 = poi base ic1 in
-                        let c2 = poi base ic2 in
-                        let c_auth =
-                          Util.authorized_age conf base c1 &&
-                            Util.authorized_age conf base c2
-                        in
-                        if c_auth then
-                          match
-                            (Date.get_birth_death_date c1, Date.get_birth_death_date c2)
-                          with
-                          | ((Some (Dgreg (({prec = Sure} as dmy1), _)), _, _),
-                             (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _)) ->
-                                let a = Date.time_elapsed dmy1 dmy2 in
-                                let v = a.month + 12 * a.year in
-                                begin
-                                  let r =
-                                    { s_year = dmy2.year - (dmy2.year mod periode);
-                                      s_sex = Neuter;
-                                      s_value = v; }
-                                  in
-                                  try
-                                    let l = Hashtbl.find ht_diff_age_extr_child r.s_year in
-                                    Hashtbl.replace ht_diff_age_extr_child r.s_year (r :: l)
-                                  with Not_found -> Hashtbl.add ht_diff_age_extr_child r.s_year [r]
-                                end;
-                          | _ -> ()
-                        else ()
-                    end
-                | _ -> ()
-              end;
-
+          (* Day of wedding *)
+          begin
+            if dmy.day > 0 then begin
+              let wd = wday conf d in
+              aux2 ht_day_marr dmy (get_sex f) wd ;
+              aux2 ht_day_marr dmy (get_sex m) wd ;
             end
-        | _ -> ()
-      end
-        (Gwdb.families base);
+          end ;
 
-  (* Nom les plus fréquents *)
-  let () =
-    let () = load_strings_array base in
-    let (list, _) = Alln.select_names conf base true "" true in
-    let list =
-      List.sort
-        (fun (k1, _, _) (k2, _, _) ->
-          let len1 = String.length k1 in
-          let len2 = String.length k2 in
-          if len1 > len2 then -1
-          else 1)
-        list
-    in
-    List.iter
-      (fun (s, _, len) ->
-        let k = Name.lower s in
-        if k = "?" || k = "" then ()
-        else
-          try
-            let (s, n) = Hashtbl.find ht_surname k in
-            Hashtbl.replace ht_surname k (s, (n + len))
-          with Not_found -> Hashtbl.add ht_surname k (s, len))
-      list;
-  in
+          (* Month of wedding *)
+          begin
+            if dmy.month > 0 then begin
+              let md = md d in
+              aux2 ht_month_marr dmy (get_sex f) md ;
+              aux2 ht_month_marr dmy (get_sex m) md ;
+            end
+          end ;
 
-  (* Prénom les plus fréquents *)
-  let () =
-    let () = load_strings_array base in
-    let (list, _) = Alln.select_names conf base false "" true in
-    let list =
-      List.sort
-        (fun (k1, _, _) (k2, _, _) ->
-          let len1 = String.length k1 in
-          let len2 = String.length k2 in
-          if len1 > len2 then -1
-          else 1)
-        list
-    in
-    List.iter
-      (fun (s, _, len) ->
-         List.iter
-           (fun s ->
-             let s = Name.strip_c s '"' in
-             let k = Name.lower s in
-             if k = "?" || k = "" then ()
-             else
-               try
-                 let (s, n) = Hashtbl.find ht_first_name k in
-                 Hashtbl.replace ht_first_name k (s, (n + len))
-               with Not_found -> Hashtbl.add ht_first_name k (s, len))
-           (String.split_on_char ' ' s))
-      list;
-  in
+          (* Age difference in a couple *)
+          begin
+            match ( Date.get_birth_death_date f
+                  , Date.get_birth_death_date m )
+            with
+            | ( (Some (Dgreg (({prec = Sure} as dmy1), _)), _, _)
+              , (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _) )
+              when dmy1.day > 0 && dmy2.day > 0 ->
+              let a =
+                if dmy1.year < dmy2.year then Date.time_elapsed dmy1 dmy2
+                else Date.time_elapsed dmy2 dmy2
+              in
+              let v = a.month + 12 * a.year in
+              aux1 ht_marr_diff_age_cpl dmy (get_sex f) v ;
+              aux1 ht_marr_diff_age_cpl dmy (get_sex m) v
+            | _ -> ()
+          end ;
+
+          let children = get_children fam in
+          let len =  Array.length children in
+
+          (* Fertility rate *)
+          begin
+            aux1 ht_fecondite dmy (get_sex f) len ;
+            aux1 ht_fecondite dmy (get_sex m) len ;
+          end ;
+
+          (* Interval between siblings *)
+          (* This one assume that sibling are sorted *)
+          begin
+            let rec loop i =
+              if i < len - 1 then begin
+                let c1 = poi base (Array.unsafe_get children i) in
+                let c2 = poi base (Array.unsafe_get children @@ i + 1) in
+                if Util.authorized_age conf base c1
+                && Util.authorized_age conf base c2
+                then begin match
+                    ( Date.get_birth_death_date c1
+                    , Date.get_birth_death_date c2 )
+                  with
+                  | ( (Some (Dgreg (({prec = Sure} as dmy_c1), _)), _, _)
+                    , (Some (Dgreg (({prec = Sure} as dmy_c2), _)), _, _) ) ->
+                    let a = Date.time_elapsed dmy_c1 dmy_c2 in
+                    let v = a.month + 12 * a.year in
+                    aux1 ht_diff_age_child dmy_c1 Neuter v
+                  | _ -> ()
+                end ;
+                loop (i + 1)
+              end
+            in
+            loop 0
+          end ;
+
+          let aux_age_at_birth ht ic =
+              let c = poi base ic in
+              if Util.authorized_age conf base c then
+                match Date.get_birth_death_date c with
+                | (Some (Dgreg (({ prec = Sure } as dmy_c), _)), _, _) ->
+                  let aux p = match Date.get_birth_death_date p with
+                    | (Some (Dgreg (({ prec = Sure } as dmy_p), _)), _, _) ->
+                      aux1 ht dmy_c (get_sex p) (Date.time_elapsed dmy_p dmy_c).year
+                    | _ -> ()
+                  in
+                  aux f ;
+                  aux m
+                | _ -> ()
+          in
+
+          (* Average age at birth *)
+          Array.iter (aux_age_at_birth ht_moy_age_birth) children ;
+
+          (* Average age at first birth *)
+          (* FIXME: should be based on the person, not the family *)
+          if len > 0 then aux_age_at_birth ht_moy_age_first_birth (Array.unsafe_get children 0) ;
+
+          (* Average age at last birth *)
+          (* FIXME: should be based on the person, not the family *)
+          if len > 0 then aux_age_at_birth ht_moy_age_last_birth (Array.unsafe_get children @@ len - 1) ;
+
+          (* Difference between first and last child *)
+          if len > 1 then begin
+            let c1 = poi base @@ Array.unsafe_get children 0 in
+            let c2 = poi base @@ Array.unsafe_get children @@ len - 1 in
+            if Util.authorized_age conf base c1
+            && Util.authorized_age conf base c2
+            then match (Date.get_birth_death_date c1, Date.get_birth_death_date c2) with
+              | ( (Some (Dgreg (({prec = Sure} as dmy1), _)), _, _)
+                , (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _) ) ->
+                let a = Date.time_elapsed dmy1 dmy2 in
+                let v = a.month + 12 * a.year in
+                aux1 ht_diff_age_extr_child dmy2 Neuter v
+              | _ -> ()
+          end ;
+        end
+      | _ -> ()
+    end
+  end (Gwdb.families base);
+
+  clear_persons_array base ;
+  clear_families_array base ;
 
   let all_stats = [] in
   let series_m_f = [`serie_male; `serie_female] in
