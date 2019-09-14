@@ -745,12 +745,12 @@ let defaultHandler : handler =
     end
 
   ; chg_chn = begin fun self conf base ->
-      if conf.wizard then ChangeChildren.print conf base
+      if conf.wizard then ChangeChildrenDisplay.print conf base
       else self.incorrect_request self conf base
     end
 
   ; chg_chn_ok = begin fun self conf base ->
-      if conf.wizard then ChangeChildren.print_ok conf base
+      if conf.wizard then ChangeChildrenDisplay.print_ok conf base
       else self.incorrect_request self conf base
     end
 
