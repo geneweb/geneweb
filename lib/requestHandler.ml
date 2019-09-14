@@ -796,7 +796,7 @@ let defaultHandler : handler =
     end
 
   ; dag = begin fun _self conf base ->
-      Dag.print conf base
+      DagDisplay.print conf base
     end
 
   ; del_fam = begin fun self conf base ->

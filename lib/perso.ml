@@ -5880,7 +5880,7 @@ let print_ancestors_dag conf base v p =
     in
     loop Dag.Pset.empty v (get_iper p)
   in
-  let elem_txt p = Dag.Item (p, "") in
+  let elem_txt p = DagDisplay.Item (p, "") in
   (* Récupère les options d'affichage. *)
   let options = Util.display_options conf in
   let vbar_txt ip =
@@ -5889,7 +5889,7 @@ let print_ancestors_dag conf base v p =
       (acces conf base p)
   in
   let page_title = Util.capitale (Util.transl conf "tree") in
-  Dag.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title ""
+  DagDisplay.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title ""
 
 let print_ascend conf base p =
   match

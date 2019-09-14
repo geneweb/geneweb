@@ -161,8 +161,8 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   in
   let (set, d) = dag_of_relation_path conf base path in
   let page_title = capitale (transl conf "relationship") in
-  let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
-  Dag.print_slices_menu_or_dag_page conf page_title hts next_txt
+  let hts = DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
+  DagDisplay.print_slices_menu_or_dag_page conf page_title hts next_txt
 
 let add_common_parent base ip1 ip2 set =
   let a1 = poi base ip1 in
@@ -206,7 +206,7 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
     in
     let set = ind_set_of_relation_path base path in
     let page_title = capitale (transl conf "relationship") in
-    Dag.make_and_print_dag conf base elem_txt vbar_txt invert set []
+    DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set []
       page_title next_txt
 
 let next_relation_link_txt conf ip1 ip2 excl_faml =
@@ -245,7 +245,7 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
     Hutil.header_no_page_title conf title; Hutil.trailer conf
   else
     let next_txt = next_relation_link_txt conf ip1 ip2 (ifam :: excl_faml) in
-    let elem_txt p = Dag.Item (p, "") in
+    let elem_txt p = DagDisplay.Item (p, "") in
     let vbar_txt ip =
       let u = pget conf base ip in
       let excl_faml = Array.to_list (get_family u) @ excl_faml in
@@ -1497,7 +1497,7 @@ let print_multi_relation conf base pl lim assoc_txt =
   if path = [] then print_no_relationship conf base pl
   else
     let elem_txt p =
-      Dag.Item
+      DagDisplay.Item
         (p,
          (try
             let t = Hashtbl.find assoc_txt (get_iper p) in
