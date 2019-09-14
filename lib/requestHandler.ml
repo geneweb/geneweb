@@ -705,25 +705,25 @@ let defaultHandler : handler =
     end
 
   ; anm = begin fun _self conf _base ->
-      Birthday.print_anniversaries conf
+      BirthdayDisplay.print_anniversaries conf
     end
 
   ; an = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some x -> Birthday.print_birth conf base (int_of_string x)
-      | _ -> Birthday.print_menu_birth conf base
+      | Some x -> BirthdayDisplay.print_birth conf base (int_of_string x)
+      | _ -> BirthdayDisplay.print_menu_birth conf base
     end
 
   ; ad = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some x -> Birthday.print_dead conf base (int_of_string x)
-      | _ -> Birthday.print_menu_dead conf base
+      | Some x -> BirthdayDisplay.print_dead conf base (int_of_string x)
+      | _ -> BirthdayDisplay.print_menu_dead conf base
     end
 
   ; am = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some x -> Birthday.print_marriage conf base (int_of_string x)
-      | _ -> Birthday.print_menu_marriage conf base
+      | Some x -> BirthdayDisplay.print_marriage conf base (int_of_string x)
+      | _ -> BirthdayDisplay.print_menu_marriage conf base
     end
 
   ; as_ok = begin fun _self conf base ->

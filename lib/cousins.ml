@@ -455,10 +455,10 @@ let print_anniv conf base p dead_people level =
       (if dead_people then "AD" else "AN") conf.xhs
   in
   match p_getint conf.env "v" with
-    Some i -> Birthday.gen_print conf base i f_scan dead_people
+    Some i -> BirthdayDisplay.gen_print conf base i f_scan dead_people
   | _ ->
-      if dead_people then Birthday.gen_print_menu_dead conf base f_scan mode
-      else Birthday.gen_print_menu_birth conf base f_scan mode
+      if dead_people then BirthdayDisplay.gen_print_menu_dead conf base f_scan mode
+      else BirthdayDisplay.gen_print_menu_birth conf base f_scan mode
 
 let cousmenu_print = Perso.interp_templ "cousmenu"
 
