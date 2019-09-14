@@ -1,4 +1,3 @@
-(* $Id: advSearchOk.ml,v 5.14 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -354,27 +353,6 @@ let advanced_search conf base max_answers =
   in
   List.rev list, len
 
-let print_result conf base max_answers (list, len) =
-  let list =
-    if len > max_answers then Util.reduce_list max_answers list else list
-  in
-  if len = 0 then Wserver.printf "%s\n" (capitale (transl conf "no match"))
-  else
-    let () = Perso.build_sosa_ht conf base in
-    Wserver.printf "<ul>\n";
-    List.iter
-      (fun p ->
-         Wserver.printf "<li>" ;
-         Perso.print_sosa conf base p true;
-         Wserver.printf "\n%s%s<em>"
-           (referenced_person_text conf base p)
-           (DateDisplay.short_dates_text conf base p) ;
-         specify_homonymous conf base p false;
-         Wserver.printf "</em>")
-      list;
-    if len > max_answers then Wserver.printf "<li>...</li>";
-    Wserver.printf "</ul>\n"
-
 let searching_fields conf =
   let test_string x =
     match p_getenv conf.env x with
@@ -528,20 +506,3 @@ let searching_fields conf =
   in
   let sep = if search <> "" then "," else "" in
   string_field "occu" (search ^ sep)
-
-let print conf base =
-  let title _ =
-    Wserver.printf "%s" (capitale (transl_nth conf "advanced request" 0))
-  in
-  let max_answers =
-    match p_getint conf.env "max" with
-      Some n -> n
-    | None -> 100
-  in
-  Hutil.header conf title;
-  Wserver.printf "<p>\n";
-  Wserver.printf "%s %s." (capitale (transl conf "searching all"))
-    (searching_fields conf);
-  Wserver.printf "</p>\n";
-  let list = advanced_search conf base max_answers in
-  print_result conf base max_answers list; Hutil.trailer conf

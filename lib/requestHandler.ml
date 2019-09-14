@@ -727,7 +727,7 @@ let defaultHandler : handler =
     end
 
   ; as_ok = begin fun _self conf base ->
-      AdvSearchOk.print conf base
+      AdvSearchOkDisplay.print conf base
     end
 
   ; b = begin fun _self conf base ->
