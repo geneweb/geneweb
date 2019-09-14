@@ -731,7 +731,7 @@ let defaultHandler : handler =
     end
 
   ; b = begin fun _self conf base ->
-      if conf.wizard || conf.friend then BirthDeath.print_birth conf base
+      if conf.wizard || conf.friend then BirthDeathDisplay.print_birth conf base
     end
 
   ; c = begin fun self conf base ->
@@ -899,12 +899,12 @@ let defaultHandler : handler =
     end
 
   ; lb = begin fun self conf base ->
-      if conf.wizard || conf.friend then BirthDeath.print_birth conf base
+      if conf.wizard || conf.friend then BirthDeathDisplay.print_birth conf base
       else self.incorrect_request self conf base
     end
 
   ; ld = begin fun self conf base ->
-      if conf.wizard || conf.friend then BirthDeath.print_death conf base
+      if conf.wizard || conf.friend then BirthDeathDisplay.print_death conf base
       else self.incorrect_request self conf base
     end
 
@@ -915,11 +915,11 @@ let defaultHandler : handler =
     end
 
   ; ll = begin fun _self conf base ->
-      BirthDeath.print_longest_lived conf base
+      BirthDeathDisplay.print_longest_lived conf base
     end
 
   ; lm = begin fun self conf base ->
-      if conf.wizard || conf.friend then BirthDeath.print_marriage conf base
+      if conf.wizard || conf.friend then BirthDeathDisplay.print_marriage conf base
       else self.incorrect_request self conf base
     end
 
@@ -1100,12 +1100,12 @@ let defaultHandler : handler =
     end
 
   ; oa = begin fun self conf base ->
-      if conf.wizard || conf.friend then BirthDeath.print_oldest_alive conf base
+      if conf.wizard || conf.friend then BirthDeathDisplay.print_oldest_alive conf base
       else self.incorrect_request self conf base
     end
 
   ; oe = begin fun self conf base ->
-      if conf.wizard || conf.friend then BirthDeath.print_oldest_engagements conf base
+      if conf.wizard || conf.friend then BirthDeathDisplay.print_oldest_engagements conf base
       else self.incorrect_request self conf base
     end
 
@@ -1116,7 +1116,7 @@ let defaultHandler : handler =
     end
 
   ; pop_pyr = begin fun self conf base ->
-      if conf.wizard || conf.friend then BirthDeath.print_population_pyramid conf base
+      if conf.wizard || conf.friend then BirthDeathDisplay.print_population_pyramid conf base
       else self.incorrect_request self conf base
     end
 
@@ -1170,7 +1170,7 @@ let defaultHandler : handler =
     end
 
   ; stat = begin fun _self conf _base ->
-      BirthDeath.print_statistics conf
+      BirthDeathDisplay.print_statistics conf
     end
 
   ; change_wiz_vis = begin fun self conf base ->
