@@ -214,7 +214,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
       "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" info.bd
       info.td_prop;
   Wserver.printf "%s\n" (someone_text conf base ip);
-  Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip));
+  Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip));
   if s <> "" then
     begin
       Wserver.printf "<br%s>\n" conf.xhs;
@@ -222,7 +222,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
       Wserver.printf " %s\n" s;
       match spo with
         Some ip ->
-          Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip))
+          Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip))
       | _ -> ()
     end;
   if in_tab && (info.bd > 0 || info.td_prop <> "") then
@@ -421,12 +421,12 @@ let print_someone_and_other_parent_if_same conf base info =
       "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" info.bd
       info.td_prop;
   Wserver.printf "%s\n" (someone_text conf base info.ip);
-  Wserver.printf "%s" (Dag.image_txt conf base (pget conf base info.ip));
+  Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base info.ip));
   begin match other_parent_text_if_same conf base info with
     Some (s, ip) ->
       Wserver.printf "<br%s>\n" conf.xhs;
       Wserver.printf "%s" s;
-      Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip))
+      Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip))
   | None -> ()
   end;
   if info.bd > 0 || info.td_prop <> "" then
@@ -732,7 +732,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
            | None -> spl)
         [ip1, "3"; ip2, "4"] []
     in
-    let elem_txt p = Dag.Item (p, "") in
+    let elem_txt p = DagDisplay.Item (p, "") in
     let vbar_txt _ = "" in
     let invert =
       match Util.p_getenv conf.env "invert" with
@@ -740,7 +740,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
       | _ -> false
     in
     let page_title = Util.capitale (Util.transl conf "tree") in
-    Dag.make_and_print_dag conf base elem_txt vbar_txt invert set spl
+    DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
       page_title ""
   with Exit -> Hutil.incorrect_request conf
 

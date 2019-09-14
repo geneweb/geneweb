@@ -1196,7 +1196,7 @@ let make_tree_hts conf base gv p =
           let txt =
             if auth then txt ^ DateDisplay.short_dates_text conf base p else txt
           in
-          let txt = txt ^ Dag.image_txt conf base p in
+          let txt = txt ^ DagDisplay.image_txt conf base p in
           let txt =
             if bd > 0 || td_prop <> "" then
               Printf.sprintf
@@ -1235,7 +1235,7 @@ let make_tree_hts conf base gv p =
                 "&amp;" ^
                 (if auth then DateDisplay.short_marriage_date_text conf base fam p sp
                  else "") ^
-                "&nbsp;" ^ txt ^ Dag.image_txt conf base sp
+                "&nbsp;" ^ txt ^ DagDisplay.image_txt conf base sp
               in
               let s =
                 if bd > 0 || td_prop <> "" then
@@ -1307,7 +1307,7 @@ let print_tree conf base v p =
        transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s s)
   in
   let hts = make_tree_hts conf base gv p in
-  Dag.print_slices_menu_or_dag_page conf page_title hts ""
+  DagDisplay.print_slices_menu_or_dag_page conf page_title hts ""
 
 let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
