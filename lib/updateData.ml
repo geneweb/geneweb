@@ -137,7 +137,7 @@ let remove_suburb s =
 let combine_by_ini ini list =
   let len = Util.str_length ini + 1 in
   Util.groupby
-    ~key:(fun (_, s) -> Alln.ini len @@ remove_suburb s)
+    ~key:(fun (_, s) -> AllnDisplay.ini len @@ remove_suburb s)
     ~value:(fun x -> x)
     list
 

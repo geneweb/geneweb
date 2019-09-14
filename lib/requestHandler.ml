@@ -1036,7 +1036,7 @@ let defaultHandler : handler =
   ; n = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some v -> Some.surname_print conf base Some.surname_not_found v
-      | _ -> Alln.print_surnames conf base
+      | _ -> AllnDisplay.print_surnames conf base
     end
 
   ; ng = begin fun self conf base ->
@@ -1112,7 +1112,7 @@ let defaultHandler : handler =
   ; p = begin fun _self conf base ->
       match p_getenv conf.env "v" with
       | Some v -> Some.first_name_print conf base v
-      | None -> Alln.print_first_names conf base
+      | None -> AllnDisplay.print_first_names conf base
     end
 
   ; pop_pyr = begin fun self conf base ->
