@@ -736,7 +736,7 @@ let defaultHandler : handler =
 
   ; c = begin fun self conf base ->
       match find_person_in_env conf base "" with
-      | Some p -> Cousins.print conf base p
+      | Some p -> CousinsDisplay.print conf base p
       | _ -> self.very_unknown self conf base
     end
 
