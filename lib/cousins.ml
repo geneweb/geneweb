@@ -1,4 +1,3 @@
-(* $Id: cousins.ml,v 5.17 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -18,11 +17,6 @@ let brother_label conf x =
       Printf.sprintf (ftransl conf "%s cousins")
         (transl_nth conf "nth (cousin)" (n - 1))
 
-let rec except x =
-  function
-    [] -> []
-  | y :: l -> if x = y then l else y :: except x l
-
 let children_of base u =
   Array.fold_right
     (fun ifam list ->
@@ -34,7 +28,7 @@ let children_of_fam base ifam =
   Array.to_list (get_children @@ foi base ifam)
 
 let siblings_by conf base iparent ip =
-  let list = children_of base (pget conf base iparent) in except ip list
+  let list = children_of base (pget conf base iparent) in List.filter ((<>) ip) list
 
 let merge_siblings l1 l2 =
   let l =
