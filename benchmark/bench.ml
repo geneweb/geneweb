@@ -47,14 +47,16 @@ let () =
        public_if_titles=false;public_if_no_date=false;
        cancel_links=false;setup_link=false;access_by_key=false;
        private_years=0;hide_names=false;use_restrict=false;
-       no_image=false;no_note=false;bname="";cgi_passwd="";
+       no_image=false;no_note=false;bname="";
+#ifdef CGI
+       cgi_passwd="";
+#endif
        env=[];senv=[];henv=[];base_env=[];allowed_titles=lazy[];
        denied_titles=lazy[];xhs="";request=[];
        lexicon=Hashtbl.create 16;charset="";is_rtl=false;left="";
        right="";auth_file="";border=0;n_connect=None;
        today={Def.day=0;month=0;year=0;delta=0;prec=Def.Sure};
-       today_wd=0;time=0,0,0;ctime=0.;image_prefix="";
-       b_arg_for_basename=false}
+       today_wd=0;time=0,0,0;ctime=0.;image_prefix=""}
     in
     bench
       "UpdateData.get_all_data"
