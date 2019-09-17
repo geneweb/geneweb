@@ -17,15 +17,11 @@ matrix:
 
 cache:
   directories:
-    - /home/travis/.opam/
-
-cache:
-  directories:
-    - /home/travis/.opam/
+    - $HOME/.opam/
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install protobuf ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq && sudo apt-get install -qq protobuf-compiler ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install protobuf ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq protobuf-compiler ; fi
 
 install:
   - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh ;
@@ -37,11 +33,9 @@ script:
     export DEPS='benchmark camlp5 cppo dune markup ocaml ounit num ocurl piqi piqilib redis redis-sync stdlib-shims yojson zarith' ;
     eval $(opam config env) ;
     if [[ "$OCAML_VERSION" == "4.08" ]] ; then
-      opam pin add camlp5 https://github.com/sagotch/camlp5.git#patch-1 -k git --no-action ;
       opam pin add piqilib https://github.com/alavrik/piqi.git --no-action ;
       opam pin add piqi https://github.com/geneanet/piqi-ocaml.git --no-action ;
     fi ;
-    opam pin add markup https://github.com/geneanet/markup.ml -k git --no-action ;
     opam update ;
     opam install depext ;
     opam depext $DEPS ;
