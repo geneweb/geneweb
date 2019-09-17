@@ -1,7 +1,8 @@
 open Geneweb
 
 let bench name n fn arg =
-  ignore @@ Benchmark.latency1 ~name n (List.map fn) arg
+  if match Sys.getenv_opt "BENCH_FN" with None -> true | Some x -> x = name
+  then ignore @@ Benchmark.latency1 ~name n (List.map fn) arg
 
 let list =
   [1;2;10;100;1000;10000;100000;1000000;10000000;100000000;1000000000]
