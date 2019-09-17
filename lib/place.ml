@@ -5,11 +5,34 @@ open Config
 open Gwdb
 open Util
 
-let normalize =
-  (* petit hack en attendant une vraie gestion des lieux transforme
-     "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)" *)
-  let r = Str.regexp "^\\[\\([^]]+\\)\\] *- *\\(.*\\)" in
-  fun s -> Str.global_replace r "\\1, \\2" s
+(** Transform ["[foo-bar] - boobar (baz)"] into ["foo-bar, boobar (baz)"] *)
+let normalize s =
+  let len = String.length s in
+  if len = 0 then ""
+  else begin
+    if String.unsafe_get s 0 = '[' then begin
+      match String.index_opt s ']' with
+      | None -> s
+      | Some i ->
+        match
+          let rec loop b i =
+            if i = len then None
+            else match String.unsafe_get s i with
+              | ' ' -> loop b (i + 1)
+              | '-' when not b -> loop true (i + 1)
+              | _ -> if b then Some i else None
+          in loop false (i + 1)
+        with
+        | None -> s
+        | Some j ->
+          let b = Bytes.create (len - j + i + 1) in
+          Bytes.blit_string s 1 b 0 (i - 1) ;
+          Bytes.unsafe_set b (i - 1) ',' ;
+          Bytes.unsafe_set b i ' ' ;
+          Bytes.blit_string s j b (i + 1) (len - j) ;
+          Bytes.unsafe_to_string b
+    end else s
+  end
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
