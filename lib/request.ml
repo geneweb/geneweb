@@ -383,14 +383,14 @@ let treat_request conf base =
   with
     Some s, _, _ -> print_moved conf s
   | _, Some "no_index", _ -> print_no_index conf base
-  | _, _, Some "IM" -> Image.print conf base
+  | _, _, Some "IM" -> ImageDisplay.print conf base
   | _, _, Some "DOC" ->
       begin match p_getenv conf.env "s" with
         Some f ->
           if Filename.check_suffix f ".txt" then
             let f = Filename.chop_suffix f ".txt" in
             Srcfile.print_source conf base f
-          else Image.print conf base
+          else ImageDisplay.print conf base
       | None -> Hutil.incorrect_request conf
       end
   | _ ->

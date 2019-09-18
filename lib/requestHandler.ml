@@ -880,7 +880,7 @@ let defaultHandler : handler =
     end
 
   ; imh = begin fun _self conf _base ->
-      Image.print_html conf
+      ImageDisplay.print_html conf
     end
 
   ; inv_fam = begin fun self conf base ->

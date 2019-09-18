@@ -1465,7 +1465,7 @@ let image_request script_name env =
       in
       let fname = Filename.basename fname in
       let fname = Util.image_file_name fname in
-      let _ = Image.print_image_file fname in true
+      let _ = ImageDisplay.print_image_file fname in true
   | _ ->
       let s = script_name in
       if Mutil.start_with "images/" 0 s then
@@ -1476,7 +1476,7 @@ let image_request script_name env =
         (* image. Si on ne fait pas de basename, alors ça marche.       *)
         (* let fname = Filename.basename fname in *)
         let fname = Util.image_file_name fname in
-        let _ = Image.print_image_file fname in true
+        let _ = ImageDisplay.print_image_file fname in true
       else false
 
 
