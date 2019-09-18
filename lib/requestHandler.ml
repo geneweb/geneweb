@@ -835,21 +835,21 @@ let defaultHandler : handler =
       | _ -> self.very_unknown self conf base
     end
 
-  ; forum = if_enabled_forum Forum.print
+  ; forum = if_enabled_forum ForumDisplay.print
 
-  ; forum_add = if_enabled_forum Forum.print_add
+  ; forum_add = if_enabled_forum ForumDisplay.print_add
 
-  ; forum_add_ok = if_enabled_forum Forum.print_add_ok
+  ; forum_add_ok = if_enabled_forum ForumDisplay.print_add_ok
 
-  ; forum_del = if_enabled_forum Forum.print_del
+  ; forum_del = if_enabled_forum ForumDisplay.print_del
 
-  ; forum_p_p = if_enabled_forum Forum.print_access_switch
+  ; forum_p_p = if_enabled_forum ForumDisplay.print_access_switch
 
-  ; forum_search = if_enabled_forum Forum.print_search
+  ; forum_search = if_enabled_forum ForumDisplay.print_search
 
-  ; forum_val = if_enabled_forum Forum.print_valid
+  ; forum_val = if_enabled_forum ForumDisplay.print_valid
 
-  ; forum_view = if_enabled_forum Forum.print
+  ; forum_view = if_enabled_forum ForumDisplay.print
 
   ; h = begin fun _self conf base ->
       match p_getenv conf.env "v" with
