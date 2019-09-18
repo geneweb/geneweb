@@ -419,8 +419,8 @@ let has_history conf base p p_auth =
   let fn = sou base (get_first_name p) in
   let sn = sou base (get_surname p) in
   let occ = get_occ p in
-  let person_file = History_diff.history_file fn sn occ in
-  p_auth && Sys.file_exists (History_diff.history_path conf person_file)
+  let person_file = HistoryDiff.history_file fn sn occ in
+  p_auth && Sys.file_exists (HistoryDiff.history_path conf person_file)
 
 (* ******************************************************************** *)
 (*  [Fonc] get_single_sosa : config -> base -> person -> Sosa.t          *)
@@ -4040,7 +4040,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else
         let fn = sou base (get_first_name p) in
         let sn = sou base (get_surname p) in
-        let occ = get_occ p in History_diff.history_file fn sn occ
+        let occ = get_occ p in HistoryDiff.history_file fn sn occ
   | "image" -> if not p_auth then "" else sou base (get_image p)
   | "image_html_url" -> string_of_image_url conf base ep true
   | "image_size" -> string_of_image_size conf base ep

@@ -230,7 +230,7 @@ let gen_record conf base changed action =
       end
   | _ -> ()
   end;
-  History_diff.record_diff conf base changed;
+  HistoryDiff.record_diff conf base changed;
   (* Effet de bord des modifications en masse : on peut facilement  *)
   (* créer 5000 nouveaux processus à chaque mise à jour.            *)
   (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
@@ -494,12 +494,12 @@ and eval_person_field_var conf base env p =
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
       let occ = get_occ p in
-      let person_file = History_diff.history_file fn sn occ in
-      VVbool (Sys.file_exists (History_diff.history_path conf person_file))
+      let person_file = HistoryDiff.history_file fn sn occ in
+      VVbool (Sys.file_exists (HistoryDiff.history_path conf person_file))
   | ["history_file"] ->
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
-      let occ = get_occ p in VVstring (History_diff.history_file fn sn occ)
+      let occ = get_occ p in VVstring (HistoryDiff.history_file fn sn occ)
   | ["is_invisible"] ->
       let conf = {conf with wizard = false; friend = false} in
       VVbool (not (Util.authorized_age conf base p))

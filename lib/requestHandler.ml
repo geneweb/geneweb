@@ -862,17 +862,17 @@ let defaultHandler : handler =
     end
 
   ; hist_clean = begin fun self conf base ->
-      if conf.wizard then History_diff.print_clean conf
+      if conf.wizard then HistoryDiffDisplay.print_clean conf
       else self.incorrect_request self conf base
     end
 
   ; hist_clean_ok = begin fun self conf base ->
-      if conf.wizard then History_diff.print_clean_ok conf
+      if conf.wizard then HistoryDiffDisplay.print_clean_ok conf
       else self.incorrect_request self conf base
     end
 
   ; hist_diff = begin fun _self conf base ->
-      History_diff.print conf base
+      HistoryDiffDisplay.print conf base
     end
 
   ; hist_search = begin fun _self conf base ->
