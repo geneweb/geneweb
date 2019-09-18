@@ -443,7 +443,7 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
     (transl conf "with") (commd conf) (acces conf base p2);
   MergeDisplay.print_someone base p2;
   Wserver.printf "</a></li></ul><p>";
-  MergeFam.print_differences conf base branches fam1 fam2;
+  MergeFamDisplay.print_differences conf base branches fam1 fam2;
   Hutil.trailer conf
 
 let effective_merge_fam base ifam1 fam1 ifam2 fam2 =

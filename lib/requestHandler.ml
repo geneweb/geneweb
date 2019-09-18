@@ -1004,7 +1004,7 @@ let defaultHandler : handler =
     end
 
   ; mrg_fam = begin fun self conf base ->
-      if conf.wizard then MergeFam.print conf base
+      if conf.wizard then MergeFamDisplay.print conf base
       else self.incorrect_request self conf base
     end
 
