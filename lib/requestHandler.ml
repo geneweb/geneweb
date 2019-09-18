@@ -1024,12 +1024,12 @@ let defaultHandler : handler =
     end
 
   ; mrg_ind_ok = begin fun self conf base ->
-      if conf.wizard then MergeIndOk.print_merge conf base
+      if conf.wizard then MergeIndOkDisplay.print_merge conf base
       else self.incorrect_request self conf base
     end
 
   ; mrg_mod_ind_ok = begin fun self conf base ->
-      if conf.wizard then MergeIndOk.print_mod_merge conf base
+      if conf.wizard then MergeIndOkDisplay.print_mod_merge conf base
       else self.incorrect_request self conf base
     end
 
