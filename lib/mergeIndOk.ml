@@ -289,7 +289,7 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 
       Notes.print_linked_list conf base pgl2
     end;
 
-  Merge.print_possible_continue_merging conf base;
+  MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
 let redirect_relations_of_added_related base p ip2 rel_chil =

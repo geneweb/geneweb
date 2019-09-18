@@ -207,7 +207,7 @@ let print_mod_merge_ok conf base wl cpl des =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   UpdateFamOk.print_family conf base wl cpl des;
-  Merge.print_possible_continue_merging conf base;
+  MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
 let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
