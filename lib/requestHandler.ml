@@ -989,17 +989,17 @@ let defaultHandler : handler =
     end
 
   ; mrg_dup = begin fun self conf base ->
-      if conf.wizard then MergeDup.main_page conf base
+      if conf.wizard then MergeDupDisplay.main_page conf base
       else self.incorrect_request self conf base
     end
 
   ; mrg_dup_ind_y_n = begin fun self conf base ->
-      if conf.wizard then MergeDup.answ_ind_y_n conf base
+      if conf.wizard then MergeDupDisplay.answ_ind_y_n conf base
       else self.incorrect_request self conf base
     end
 
   ; mrg_dup_fam_y_n = begin fun self conf base ->
-      if conf.wizard then MergeDup.answ_fam_y_n conf base
+      if conf.wizard then MergeDupDisplay.answ_fam_y_n conf base
       else self.incorrect_request self conf base
     end
 
