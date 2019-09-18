@@ -1,8 +1,8 @@
 open Geneweb
 
-let bench name n fn arg =
+let bench ?(t=1) name fn arg =
   if match Sys.getenv_opt "BENCH_FN" with None -> true | Some x -> x = name
-  then ignore @@ Benchmark.latency1 ~name n (List.map fn) arg
+  then ignore @@ Benchmark.throughput1 ~name t (List.map fn) arg
 
 let list =
   [1;2;10;100;1000;10000;100000;1000000;10000000;100000000;1000000000]
@@ -11,18 +11,18 @@ let sosa_list =
   List.map Sosa.of_int list
 
 let () =
-  bench "Sosa.gen" 1000000L (List.map Sosa.gen) [ sosa_list ]
-; bench "Sosa.to_string_sep" 1000000L (List.map @@ Sosa.to_string_sep ",") [ sosa_list ]
-; bench "Sosa.to_string" 1000000L (List.map Sosa.to_string) [ sosa_list ]
-; bench "Sosa.of_string" 1000000L (List.map Sosa.of_string) [ List.map string_of_int list ]
-; bench "Sosa.branches" 1000000L (List.map Sosa.branches) [ sosa_list ]
-; bench "Place.normalize" 10000000L Geneweb.Place.normalize
+  bench "Sosa.gen" (List.map Sosa.gen) [ sosa_list ]
+; bench "Sosa.to_string_sep" (List.map @@ Sosa.to_string_sep ",") [ sosa_list ]
+; bench "Sosa.to_string" (List.map Sosa.to_string) [ sosa_list ]
+; bench "Sosa.of_string" (List.map Sosa.of_string) [ List.map string_of_int list ]
+; bench "Sosa.branches" (List.map Sosa.branches) [ sosa_list ]
+; bench "Place.normalize" Geneweb.Place.normalize
     [ "[foo-bar] - boobar (baz)" ; "[foo-bar] – boobar (baz)" ; "[foo-bar] — boobar (baz)" ]
-; bench "Mutil.unsafe_tr" 100000000L (fun s -> Mutil.unsafe_tr 'a' 'b' @@ "a" ^ s)
+; bench "Mutil.unsafe_tr" (fun s -> Mutil.unsafe_tr 'a' 'b' @@ "a" ^ s)
     [ "aaaaaaaaaa" ; "bbbbbbbbbb" ; "abbbbbbbb" ; "bbbbbbbbba" ; "ababababab" ]
-; bench "Mutil.tr" 100000000L (fun s -> Mutil.tr 'a' 'b' @@ "a" ^ s)
+; bench "Mutil.tr" (fun s -> Mutil.tr 'a' 'b' @@ "a" ^ s)
     [ "aaaaaaaaaa" ; "bbbbbbbbbb" ; "abbbbbbbb" ; "bbbbbbbbba" ; "ababababab" ]
-; bench "Mutil.contains" 10000000L (Mutil.contains "foobarbaz")
+; bench "Mutil.contains" (Mutil.contains "foobarbaz")
     [ "foo" ; "bar" ; "baz" ; "foobarbaz!" ]
 
 ; begin match Sys.getenv "BENCH_BASE" with
@@ -52,7 +52,7 @@ let () =
        b_arg_for_basename=false}
     in
     bench
-      "UpdateData.get_all_data" 500L
+      "UpdateData.get_all_data"
       begin fun conf ->
             let base = Gwdb.open_base bname in
             let data = UpdateData.get_all_data conf base in
