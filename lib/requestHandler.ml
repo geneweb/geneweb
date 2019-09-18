@@ -983,7 +983,7 @@ let defaultHandler : handler =
 
   ; mrg = begin fun self conf base ->
       if conf.wizard then match find_person_in_env conf base "" with
-        | Some p -> Merge.print conf base p
+        | Some p -> MergeDisplay.print conf base p
         | _ -> self.very_unknown self conf base
       else self.incorrect_request self conf base
     end
