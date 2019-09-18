@@ -156,4 +156,4 @@ let answ_ind_y_n conf base =
 
 let answ_fam_y_n conf base =
   let yes = p_getenv conf.env "answer_y" <> None in
-  if yes then MergeFam.print conf base else main_page conf base
+  if yes then MergeFamDisplay.print conf base else main_page conf base
