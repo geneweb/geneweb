@@ -894,7 +894,7 @@ let defaultHandler : handler =
     end
 
   ; kill_anc = begin fun self conf base ->
-      if conf.wizard then MergeInd.print_kill_ancestors conf base
+      if conf.wizard then MergeIndDisplay.print_kill_ancestors conf base
       else self.incorrect_request self conf base
     end
 
@@ -1019,7 +1019,7 @@ let defaultHandler : handler =
     end
 
   ; mrg_ind = begin fun self conf base ->
-      if conf.wizard then MergeInd.print conf base
+      if conf.wizard then MergeIndDisplay.print conf base
       else self.incorrect_request self conf base
     end
 
