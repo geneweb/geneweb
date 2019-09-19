@@ -303,7 +303,7 @@ let rec copy_from_stream conf base strm mode =
     | 'l' -> no_tables
     | 'm' -> notes_links conf <> []
     | 'n' -> not (base_notes_are_empty base "")
-    | 'o' -> Sys.file_exists (Wiznotes.dir conf base)
+    | 'o' -> Sys.file_exists (WiznotesDisplay.dir conf base)
     | 'p' ->
         begin match p_getenv conf.base_env (get_variable strm) with
           Some "" | None -> false
@@ -508,7 +508,7 @@ let eval_var conf base env () _loc =
       end
   | ["start_date"] -> VVstring (string_of_start_date conf)
   | ["wiznotes_dir_exists"] ->
-      VVbool (Sys.file_exists (Wiznotes.dir conf base))
+      VVbool (Sys.file_exists (WiznotesDisplay.dir conf base))
   | _ -> raise Not_found
 
 let print_foreach _conf _print_ast _eval_expr = raise Not_found
