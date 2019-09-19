@@ -684,7 +684,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
       Left ip ->
         let p = pget conf base ip in
         let txt =
-          string_of_item conf base (elem_txt p) ^ image_txt conf base p
+          (image_txt conf base p) ^ string_of_item conf base (elem_txt p)
         in
         let spouses =
           if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
