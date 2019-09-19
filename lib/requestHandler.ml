@@ -785,7 +785,7 @@ let defaultHandler : handler =
     end
 
   ; conn_wiz = begin fun self conf base ->
-      if conf.wizard then Wiznotes.connected_wizards conf base
+      if conf.wizard then WiznotesDisplay.connected_wizards conf base
       else self.incorrect_request self conf base
     end
 
@@ -972,12 +972,12 @@ let defaultHandler : handler =
     end
 
   ; mod_wiznotes = begin fun self conf base ->
-      if conf.authorized_wizards_notes then Wiznotes.print_mod conf base
+      if conf.authorized_wizards_notes then WiznotesDisplay.print_mod conf base
       else self.incorrect_request self conf base
     end
 
   ; mod_wiznotes_ok = begin fun self conf base ->
-      if conf.authorized_wizards_notes then Wiznotes.print_mod_ok conf base
+      if conf.authorized_wizards_notes then WiznotesDisplay.print_mod_ok conf base
       else self.incorrect_request self conf base
     end
 
@@ -1174,7 +1174,7 @@ let defaultHandler : handler =
     end
 
   ; change_wiz_vis = begin fun self conf base ->
-      if conf.wizard then Wiznotes.change_wizard_visibility conf base
+      if conf.wizard then WiznotesDisplay.change_wizard_visibility conf base
       else self.incorrect_request self conf base
     end
 
@@ -1190,17 +1190,17 @@ let defaultHandler : handler =
     end
 
   ; view_wiznotes = begin fun self conf base ->
-      if conf.wizard && conf.authorized_wizards_notes then Wiznotes.print_view conf base
+      if conf.wizard && conf.authorized_wizards_notes then WiznotesDisplay.print_view conf base
       else self.incorrect_request self conf base
     end
 
   ; wiznotes = begin fun self conf base ->
-      if conf.authorized_wizards_notes then Wiznotes.print conf base
+      if conf.authorized_wizards_notes then WiznotesDisplay.print conf base
       else self.incorrect_request self conf base
     end
 
   ; wiznotes_search = begin fun self conf base ->
-      if conf.authorized_wizards_notes then Wiznotes.print_search conf base
+      if conf.authorized_wizards_notes then WiznotesDisplay.print_search conf base
       else self.incorrect_request self conf base
     end
 
