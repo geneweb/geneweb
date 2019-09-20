@@ -1121,7 +1121,7 @@ let defaultHandler : handler =
     end
 
   ; ps = begin fun _self conf base ->
-      Place.print_all_places_surnames conf base
+      PlaceDisplay.print_all_places_surnames conf base
     end
 
   ; r = begin fun self conf base ->
