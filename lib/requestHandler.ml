@@ -169,7 +169,7 @@ let relation_print conf base p =
         Some p1 -> conf.senv <- []; Some p1
       | None -> None
   in
-  Relation.print conf base p p1
+  RelationDisplay.print conf base p p1
 
 let specify conf base n pl =
   let title _ = Wserver.printf "%s : %s" n (transl conf "specify") in
@@ -1146,7 +1146,7 @@ let defaultHandler : handler =
     end
 
   ; rlm = begin fun _self conf base ->
-      Relation.print_multi conf base
+      RelationDisplay.print_multi conf base
     end
 
   ; s = begin fun self conf base ->
