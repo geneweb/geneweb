@@ -296,7 +296,7 @@ let print_renamed conf new_n =
       Hutil.trailer conf
 
 let log_redirect from request req =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
+  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ())
     (fun () ->
        Log.with_log
@@ -504,7 +504,7 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
   (not check_from || addr1 = addr2) && base1_pw1 = base2_pw2
 
 let get_actlog check_from utm from_addr base_password =
-  let fname = Srcfile.adm_file "actlog" in
+  let fname = SrcfileDisplay.adm_file "actlog" in
   try
     let ic = Secure.open_in fname in
       let tmout = float_of_int !login_timeout in
@@ -546,7 +546,7 @@ let get_actlog check_from utm from_addr base_password =
   with Sys_error _ -> [], ATnormal, false
 
 let set_actlog list =
-  let fname = Srcfile.adm_file "actlog" in
+  let fname = SrcfileDisplay.adm_file "actlog" in
   try
     let oc = Secure.open_out fname in
     List.iter
@@ -558,7 +558,7 @@ let set_actlog list =
   with Sys_error _ -> ()
 
 let get_token check_from utm from_addr base_password =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
+  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ATnormal)
     (fun () ->
        let (list, r, changed) =
@@ -580,7 +580,7 @@ let random_self_init () =
   Random.init seed
 
 let set_token utm from_addr base_file acc user =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
+  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> "")
     (fun () ->
        random_self_init ();
@@ -1297,7 +1297,7 @@ let log_and_robot_check conf auth from request script_name contents =
          let tm = Unix.time () in
          log oc tm conf from auth request script_name contents)
   else
-    Lock.control (Srcfile.adm_file "gwd.lck") true
+    Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
       ~onerror:ignore
       (fun () ->
          Log.with_log_opt
@@ -1317,7 +1317,7 @@ let log_and_robot_check conf auth from request script_name contents =
               | None -> ()))
 
 let is_robot from =
-  Lock.control (Srcfile.adm_file "gwd.lck") true
+  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> false)
     (fun () ->
        let (robxcl, _) = Robot.robot_excl () in
@@ -1395,7 +1395,7 @@ let conf_and_connection from request script_name contents env =
           if is_robot from then Robot.robot_error conf 0 0
           else
             let tm = Unix.time () in
-            Lock.control (Srcfile.adm_file "gwd.lck") true
+            Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
               ~onerror:(fun () -> ())
               (fun () ->
                  Log.with_log

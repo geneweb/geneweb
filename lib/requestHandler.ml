@@ -853,7 +853,7 @@ let defaultHandler : handler =
 
   ; h = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some f -> Srcfile.print conf base f
+      | Some f -> SrcfileDisplay.print conf base f
       | None -> Hutil.incorrect_request conf
     end
 
@@ -1165,7 +1165,7 @@ let defaultHandler : handler =
 
   ; src = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some f -> Srcfile.print_source conf base f
+      | Some f -> SrcfileDisplay.print_source conf base f
       | _ -> Hutil.incorrect_request conf
     end
 

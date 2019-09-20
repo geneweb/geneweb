@@ -1998,7 +1998,7 @@ and eval_simple_bool_var conf base env =
       let v = extract_var "file_exists_" s in
       if v <> "" then
         let v = code_varenv v in
-        let s = Srcfile.source_file_name conf v in Sys.file_exists s
+        let s = SrcfileDisplay.source_file_name conf v in Sys.file_exists s
       else raise Not_found
 and eval_simple_str_var conf base env (_, p_auth) =
   function
@@ -2011,7 +2011,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "comment" | "fnotes" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth conf.no_note 
+          get_note_source conf base [] m_auth conf.no_note
             (sou base (get_comment fam))
       | _ -> raise Not_found
       end
