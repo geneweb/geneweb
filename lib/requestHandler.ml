@@ -924,11 +924,11 @@ let defaultHandler : handler =
     end
 
   ; misc_notes = begin fun _self conf base ->
-      Notes.print_misc_notes conf base
+      NotesDisplay.print_misc_notes conf base
     end
 
   ; misc_notes_search = begin fun _self conf base ->
-      Notes.print_misc_notes_search conf base
+      NotesDisplay.print_misc_notes_search conf base
     end
 
   ; mod_data = begin fun self conf base ->
@@ -962,12 +962,12 @@ let defaultHandler : handler =
     end
 
   ; mod_notes = begin fun self conf base ->
-      if conf.wizard then Notes.print_mod conf base
+      if conf.wizard then NotesDisplay.print_mod conf base
       else self.incorrect_request self conf base
     end
 
   ; mod_notes_ok = begin fun self conf base ->
-      if conf.wizard then Notes.print_mod_ok conf base
+      if conf.wizard then NotesDisplay.print_mod_ok conf base
       else self.incorrect_request self conf base
     end
 
@@ -1096,7 +1096,7 @@ let defaultHandler : handler =
     end
 
   ; notes = begin fun _self conf base ->
-      Notes.print conf base
+      NotesDisplay.print conf base
     end
 
   ; oa = begin fun self conf base ->
