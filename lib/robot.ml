@@ -61,7 +61,7 @@ let output_excl oc xcl =
   output_string oc magic_robot; output_value oc (xcl : excl)
 
 let robot_excl () =
-  let fname = Srcfile.adm_file "robot" in
+  let fname = SrcfileDisplay.adm_file "robot" in
   let xcl =
     match try Some (Secure.open_in_bin fname) with _ -> None with
       Some ic ->

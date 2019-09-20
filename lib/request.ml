@@ -389,7 +389,7 @@ let treat_request conf base =
         Some f ->
           if Filename.check_suffix f ".txt" then
             let f = Filename.chop_suffix f ".txt" in
-            Srcfile.print_source conf base f
+            SrcfileDisplay.print_source conf base f
           else ImageDisplay.print conf base
       | None -> Hutil.incorrect_request conf
       end
@@ -406,15 +406,15 @@ let treat_request conf base =
         begin
           begin match p_getenv conf.base_env "counter" with
             Some "no" -> ()
-          | _ -> let r = Srcfile.incr_welcome_counter conf in log_count r
+          | _ -> let r = SrcfileDisplay.incr_welcome_counter conf in log_count r
           end;
-          Srcfile.print_start conf base
+          SrcfileDisplay.print_start conf base
         end
       else
         begin
           begin match p_getenv conf.base_env "counter" with
             Some "no" -> ()
-          | _ -> let r = Srcfile.incr_request_counter conf in log_count r
+          | _ -> let r = SrcfileDisplay.incr_request_counter conf in log_count r
           end;
           match p_getenv conf.env "ptempl" with
             Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
