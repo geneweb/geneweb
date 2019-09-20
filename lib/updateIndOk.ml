@@ -1168,7 +1168,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
         (capitale (transl conf "new name")) (transl conf ":") nfn nsn snocc;
       Wserver.printf "<span>%s%s</span>"
         (capitale (transl conf "linked pages")) (transl conf ":");
-      Notes.print_linked_list conf base pgl
+      NotesDisplay.print_linked_list conf base pgl
     end;
   Hutil.trailer conf
 

@@ -46,14 +46,14 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 
         (capitale (transl conf "old name")) (transl conf ":") ofn1 osn1 soocc1;
       Wserver.printf "<span>%s%s</span>"
         (capitale (transl conf "linked pages")) (transl conf ":");
-      Notes.print_linked_list conf base pgl1;
+      NotesDisplay.print_linked_list conf base pgl1;
       let soocc2 = if oocc2 <> 0 then Printf.sprintf "/%d" oocc2 else "" in
       Wserver.printf "<span class=\"unselectable float-left\">%s 2%s</span>\n\
                       <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
         (capitale (transl conf "old name")) (transl conf ":") ofn2 osn2 soocc2;
       Wserver.printf "<span>%s%s</span>"
         (capitale (transl conf "linked pages")) (transl conf ":");
-      Notes.print_linked_list conf base pgl2
+      NotesDisplay.print_linked_list conf base pgl2
     end;
 
   MergeDisplay.print_possible_continue_merging conf base;
