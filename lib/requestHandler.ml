@@ -1179,7 +1179,7 @@ let defaultHandler : handler =
     end
 
   ; tt = begin fun _self conf base ->
-      Title.print conf base
+      TitleDisplay.print conf base
     end
 
   ; u = begin fun self conf base ->
