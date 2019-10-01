@@ -33,11 +33,12 @@ let bench () =
         ; "[foo-bar] - baz, boobar, barboo"
         ; "baz, boobar"
         ]
+    ; bench "Name.lower" Name.lower
+        [ "étienne" ; "Étienne" ; "ÿvette" ; "Ÿvette" ; "Ĕtienne" ]
     ]
   in
   match Sys.getenv_opt "BENCH_BASE" with
   | Some bname when bname <> "" ->
-
     let conf =
       {Config.from="";manitou=false;supervisor=false;wizard=false;
        #ifdef API
