@@ -32,10 +32,8 @@ script:
     export OPAMYES=1 ;
     export DEPS='benchmark camlp5 cppo dune markup ocaml ounit num ocurl piqi piqilib redis redis-sync stdlib-shims yojson zarith' ;
     eval $(opam config env) ;
-    if [[ "$OCAML_VERSION" == "4.08" ]] ; then
-      opam pin add piqilib https://github.com/alavrik/piqi.git --no-action ;
-      opam pin add piqi https://github.com/geneanet/piqi-ocaml.git --no-action ;
-    fi ;
+    opam pin list ;
+    opam pin add piqi https://github.com/geneanet/piqi-ocaml.git --no-action ;
     opam update ;
     opam install depext ;
     opam depext $DEPS ;
