@@ -13,28 +13,24 @@ skip_commits:
     - .travis.yml
 
 platform:
-  - x86
+  - x64
 
 environment:
-  CYG_ROOT: C:/cygwin
+  CYG_ROOT: C:/cygwin64
   CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-  OPAM_PACKAGES: 'benchmark camlp5 cppo dune markup ocaml ounit num stdlib-shims zarith'
+  OPAM_PACKAGES: 'benchmark camlp5 cppo dune markup num ounit stdlib-shims zarith'
 
 install:
   - 'set OPAMYES=1'
-  - '%CYG_ROOT%\setup-x86.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gtk2.0'
+  - 'set PATH=%PATH%;%CYG_ROOT%\usr\x86_64-w64-mingw32\sys-root\mingw\bin'
+  - '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp'
   - '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
-  - '%CYG_BASH% "tar -xf opam64.tar.xz"'
-  - '%CYG_BASH% "opam64/install.sh"'
-  - '%CYG_BASH% "opam init default \"https://github.com/fdopen/opam-repository-mingw.git#opam2\" -c \"ocaml-variants.4.07.1+mingw64c\" --disable-sandboxing"'
-  - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
-  - '%CYG_BASH% "opam pin add markup https://github.com/geneanet/markup.ml -k git --no-action"'
-  - '%CYG_BASH% "opam update"'
-  - '%CYG_BASH% "opam install depext depext-cygwinports"'
-  - '%CYG_BASH% "opam depext ${OPAM_PACKAGES}"'
+  - '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
+  - '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.09.0+mingw64c --disable-sandboxing"'
   - '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
+  - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
 
 build_script:
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure && make clean test bench distrib clean"'
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure --sosa-num && make clean test bench distrib clean"'
-#  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && eval $(opam env) && ./configure --sosa-zarith && make clean test bench distrib clean"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure --gwdb1 && make test bench distrib"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure --gwdb1 --sosa-num && make clean test bench"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure --gwdb1 --sosa-zarith && make clean test bench "'
