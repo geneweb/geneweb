@@ -11,6 +11,7 @@ env:
   - OCAML_VERSION=4.06
   - OCAML_VERSION=4.07
   - OCAML_VERSION=4.08
+  - OCAML_VERSION=4.09
 
 matrix:
   fast_finish: true
@@ -33,6 +34,8 @@ script:
     export DEPS='benchmark camlp5 cppo dune markup ocaml ounit num ocurl piqi piqilib redis redis-sync stdlib-shims yojson zarith' ;
     eval $(opam config env) ;
     opam pin list ;
+    opam pin remove markup --no-action ;  # $HOME/.opam/ is cached, we may need to unpin
+    opam pin remove piqilib --no-action ; # $HOME/.opam/ is cached, we may need to unpin
     opam pin add piqi https://github.com/geneanet/piqi-ocaml.git --no-action ;
     opam update ;
     opam install depext ;
