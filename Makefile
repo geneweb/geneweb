@@ -1,11 +1,13 @@
+ifneq ($(MAKECMDGOALS),ci)
 Makefile.config: configure
 	@if [ -e "$@" ]; then \
 	  echo "configure file has changed. Please rerun ./configure"; exit 1; \
 	else \
 	  echo "Please run ./configure first"; exit 1; \
 	fi
-
 include Makefile.config
+endif
+
 -include Makefile.local
 
 # Variables for packagers.
@@ -58,14 +60,17 @@ $(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
 	    && echo " Done!")
 
 lib/gwlib.ml:
-	echo "let prefix =" > $@
-	echo "  try Sys.getenv \"GWPREFIX\"" >> $@
-	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
+	@echo -n "Generating $@..."
+	@echo "let prefix =" > $@
+	@echo "  try Sys.getenv \"GWPREFIX\"" >> $@
+	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
+	@echo " Done!"
 
 CPPO_D=$(API_D) $(GWDB_D)
 
 %/dune: %/dune.in
-	cat $< \
+	@echo -n "Generating $@..." \
+	&& cat $< \
 	| cppo -n $(CPPO_D) \
 	| sed \
 	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
@@ -73,12 +78,15 @@ CPPO_D=$(API_D) $(GWDB_D)
 	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
-	> $@
+	> $@ \
+	&& echo " Done!"
 
 hd/etc/version.txt:
-	echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
-	echo "$$(date '+%Y-%m-%d'):" >> $@
-	echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')]" >> $@
+	@echo -n "Generating $@..."
+	@echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
+	@echo "$$(date '+%Y-%m-%d'):" >> $@
+	@echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')]" >> $@
+	@echo " Done!"
 .PHONY:hd/etc/version.txt
 
 ###### [End] Generated files section
@@ -198,8 +206,35 @@ bench: | piqi $(GENERATED_FILES_DEP)
 	dune build @runbench
 .PHONY: bench
 
+BENCH_FILE ?= /tmp/geneweb-bench.bin
+
+bench-marshal: | piqi $(GENERATED_FILES_DEP) benchmark/bench.exe
+ifdef BENCH_NAME
+	_build/default/benchmark/bench.exe --marshal --name ${BENCH_NAME} ${BENCH_FILE}
+else
+	 $(error BENCH_NAME variable is empty)
+endif
+.PHONY: bench-marshal
+
+bench-tabulate: | piqi $(GENERATED_FILES_DEP) benchmark/bench.exe
+	_build/default/benchmark/bench.exe --tabulate ${BENCH_FILE}
+.PHONY: bench-tabulate
+
 clean:
-	$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
-	$(RM) -r $(DISTRIB_DIR)
-	dune clean
+	@echo -n "Cleaning..."
+	@$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
+	@$(RM) -r $(DISTRIB_DIR)
+	@dune clean
+	@echo " Done!"
 .PHONY: clean
+
+
+ci:
+	@./configure && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
+	@./configure --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
+	@./configure --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
+ifneq ($(OS_TYPE),Win)
+	@./configure --api && BENCH_NAME=api $(MAKE) -s clean bench-marshal test clean
+endif
+	@$(MAKE) -s bench-tabulate
+.PHONY: ci

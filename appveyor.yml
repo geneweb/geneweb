@@ -31,6 +31,4 @@ install:
   - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
 
 build_script:
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure --gwdb1 && make test bench distrib"'
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure --gwdb1 --sosa-num && make clean test bench"'
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure --gwdb1 --sosa-zarith && make clean test bench "'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && make ci"'

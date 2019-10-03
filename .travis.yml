@@ -41,7 +41,4 @@ script:
     opam install depext ;
     opam depext $DEPS ;
     opam install $DEPS ;
-    ./configure && make clean test bench distrib clean ;
-    ./configure --sosa-num && make clean test bench distrib clean ;
-    ./configure --sosa-zarith && make clean test bench distrib clean ;
-    ./configure --api && make clean test bench distrib clean ;
+    make ci ;
