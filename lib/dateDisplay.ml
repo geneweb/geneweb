@@ -332,12 +332,13 @@ let string_of_ondate_aux conf =
         if d1.month > 0 && d1.month < 3 ||
            d1.month = 3 && d1.day > 0 && d1.day < 25
         then
-          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+          Printf.sprintf " (%d %s)"
+            (d1.year - 1) (transl_nth conf "gregorian/julian/french/hebrew" 1)
         else ""
       in
       let s =
-        string_of_on_dmy conf d1 ^ year_prec ^ " " ^
-        transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
+        Printf.sprintf "%s%s%s"
+        (string_of_on_dmy conf d1) year_prec cal_prec
       in
       if d1.day > 0 && not conf.cancel_links then
         Printf.sprintf
@@ -393,12 +394,13 @@ let string_of_date_aux conf sep =
         if d1.month > 0 && d1.month < 3 ||
            d1.month = 3 && d1.day > 0 && d1.day < 25
         then
-          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+          Printf.sprintf " (%d %s)"
+            (d1.year - 1) (transl_nth conf "gregorian/julian/french/hebrew" 1)
         else ""
       in
       let s =
-        string_of_dmy conf d1 ^ year_prec ^ sep ^
-        transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
+        Printf.sprintf "%s%s%s%s"
+        (string_of_dmy conf d1) year_prec sep cal_prec
       in
       if d1.day > 0 && not conf.cancel_links then
         Printf.sprintf
