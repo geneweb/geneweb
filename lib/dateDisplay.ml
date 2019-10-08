@@ -394,14 +394,11 @@ let string_of_date_aux conf sep =
         if d1.month > 0 && d1.month < 3 ||
            d1.month = 3 && d1.day > 0 && d1.day < 25
         then
-          Printf.sprintf " (%d %s)"
-            (d1.year - 1) (transl_nth conf "gregorian/julian/french/hebrew" 1)
+           " (" ^ (string_of_int (d1.year - 1)) ^ " " ^
+           (transl_nth conf "gregorian/julian/french/hebrew" 1) ^ ")"
         else ""
       in
-      let s =
-        Printf.sprintf "%s%s%s%s"
-        (string_of_dmy conf d1) year_prec sep cal_prec
-      in
+      let s = (string_of_dmy conf d1) ^ year_prec ^ sep ^ cal_prec in
       if d1.day > 0 && not conf.cancel_links then
         Printf.sprintf
           "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
