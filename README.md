@@ -9,9 +9,9 @@ with a Web interface and can be used off-line or as a Web service.
 | ---:       | :---:             | :---:             | :---:
 | OCaml 4.05 | [![l405]][travis] | [![m405]][travis] | -
 | OCaml 4.06 | [![l406]][travis] | [![m406]][travis] | -
-| OCaml 4.07 | [![l407]][travis] | [![m407]][travis] | [![win-407]][appveyor]
+| OCaml 4.07 | [![l407]][travis] | [![m407]][travis] | -
 | OCaml 4.08 | [![l408]][travis] | [![m408]][travis] | -
-| OCaml 4.09 | [![l409]][travis] | [![m409]][travis] | -
+| OCaml 4.09 | [![l409]][travis] | [![m409]][travis] | [![win-409]][appveyor]
 
 [l405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/1
 [l406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/2
@@ -23,7 +23,7 @@ with a Web interface and can be used off-line or as a Web service.
 [m407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/8
 [m408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/9
 [m409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/10
-[win-407]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
+[win-409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
 [travis]:https://travis-ci.org/geneweb/geneweb
 [appveyor]:https://ci.appveyor.com/project/geneweb/geneweb
 
