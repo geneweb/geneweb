@@ -314,10 +314,11 @@ let gregorian_precision conf d =
     transl conf "between (date)" ^ " " ^ string_of_on_dmy conf d ^ " " ^
     transl_nth conf "and" 0 ^ " " ^ string_of_on_dmy conf d2
 
-let string_of_ondate_aux conf =
+let string_of_date_aux conf on sep =
+  let dmy = if on then string_of_on_dmy else string_of_dmy in
   function
     Dgreg (d, Dgregorian) ->
-      let s = string_of_on_dmy conf d in
+      let s = dmy conf d in
       if d.day > 0 && not conf.cancel_links then
         Printf.sprintf
           "<a href=\"%sm=CAL&yg=%d&mg=%d&dg=%d&tg=1\" class=\"date\">%s</a>"
@@ -329,17 +330,9 @@ let string_of_ondate_aux conf =
       in
       let d1 = Calendar.julian_of_gregorian d in
       let year_prec =
-        if d1.month > 0 && d1.month < 3 ||
-           d1.month = 3 && d1.day > 0 && d1.day < 25
-        then
-          Printf.sprintf " (%d %s)"
-            (d1.year - 1) (transl_nth conf "gregorian/julian/french/hebrew" 1)
-        else ""
+        sep ^ (transl_nth conf "gregorian/julian/french/hebrew" 1)
       in
-      let s =
-        Printf.sprintf "%s%s%s"
-        (string_of_on_dmy conf d1) year_prec cal_prec
-      in
+      let s = (dmy conf d1) ^ year_prec ^ sep ^ cal_prec in
       if d1.day > 0 && not conf.cancel_links then
         Printf.sprintf
           "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
@@ -356,76 +349,25 @@ let string_of_ondate_aux conf =
         else s
       in
       begin match d.prec with
-        Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
+        Sure -> s ^ sep ^ " (" ^ gregorian_precision conf d ^ ")"
       | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
       end
   | Dgreg (d, Dhebrew) ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let s = string_of_on_hebrew_dmy conf d1 in
       begin match d.prec with
-        Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
+        Sure -> s ^ sep ^ " (" ^ gregorian_precision conf d ^ ")"
       | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
       end
   | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")"
 
 let string_of_ondate conf d =
-  Util.translate_eval (string_of_ondate_aux conf d)
+  Util.translate_eval (string_of_date_aux conf true " " d)
 
 let string_of_date conf =
   function
     Dgreg (d, _) -> string_of_dmy conf d
   | Dtext t -> t
-
-let string_of_date_aux conf sep =
-  function
-    Dgreg (d, Dgregorian) ->
-      let s = string_of_dmy conf d in
-      if d.day > 0 && not conf.cancel_links then
-        Printf.sprintf
-          "<a href=\"%sm=CAL&yg=%d&mg=%d&dg=%d&tg=1\" class=\"date\">%s</a>"
-          (commd conf) d.year d.month d.day s
-      else s
-  | Dgreg (d, Djulian) ->
-      let cal_prec =
-        if d.year < 1582 then "" else " (" ^ gregorian_precision conf d ^ ")"
-      in
-      let d1 = Calendar.julian_of_gregorian d in
-      let year_prec =
-        if d1.month > 0 && d1.month < 3 ||
-           d1.month = 3 && d1.day > 0 && d1.day < 25
-        then
-           " (" ^ (string_of_int (d1.year - 1)) ^ " " ^
-           (transl_nth conf "gregorian/julian/french/hebrew" 1) ^ ")"
-        else ""
-      in
-      let s = (string_of_dmy conf d1) ^ year_prec ^ sep ^ cal_prec in
-      if d1.day > 0 && not conf.cancel_links then
-        Printf.sprintf
-          "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
-          (commd conf) d1.year d1.month d1.day s
-      else s
-  | Dgreg (d, Dfrench) ->
-      let d1 = Calendar.french_of_gregorian d in
-      let s = string_of_on_french_dmy conf d1 in
-      let s =
-        if d1.day > 0 && not conf.cancel_links then
-          Printf.sprintf
-            "<a href=\"%sm=CAL&yf=%d&mf=%d&df=%d&tf=1\" class=\"date\">%s</a>"
-            (commd conf) d1.year d1.month d1.day s
-        else s
-      in
-      begin match d.prec with
-        Sure -> s ^ sep ^ " (" ^ gregorian_precision conf d ^ ")"
-      | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
-      end
-  | Dgreg (d, Dhebrew) ->
-      let d1 = Calendar.hebrew_of_gregorian d in
-      let s = string_of_on_hebrew_dmy conf d1 in
-      begin match d.prec with
-        Sure -> s ^ sep ^ " (" ^ gregorian_precision conf d ^ ")"
-      | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
-      end
-  | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")"
 
 (* ********************************************************************** *)
 (*  [Fonc] string_of_date_sep : config -> Def.date -> string -> string    *)
@@ -442,7 +384,7 @@ let string_of_date_sep conf sep d =
   (* On ne veut pas les liens html dans les dates, *)
   (* donc on met cgl à on                          *)
   let conf = {conf with cancel_links = true} in
-  Util.translate_eval (string_of_date_aux conf sep d)
+  Util.translate_eval (string_of_date_aux conf false sep d)
 
 
 (* ********************************************************************** *)

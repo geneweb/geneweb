@@ -10,7 +10,6 @@ val get_wday : config -> date -> string
 
 val code_dmy : config -> dmy -> string
 val string_of_ondate : config -> date -> string
-val string_of_ondate_aux : config -> date -> string
 val string_of_date : config -> date -> string
 val string_of_date_sep : config -> string -> date -> string
 val string_slash_of_date : config -> date -> string
