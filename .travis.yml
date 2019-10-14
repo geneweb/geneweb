@@ -36,7 +36,7 @@ script:
     opam pin list ;
     opam pin remove markup --no-action ;
     opam pin remove piqilib --no-action ;
-    opam pin add piqi https://github.com/geneanet/piqi-ocaml.git --no-action ;
+    opam pin remove piqi --no-action ;
     opam update ;
     opam install depext ;
     opam depext $DEPS ;
