@@ -31,4 +31,4 @@ install:
   - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
 
 build_script:
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && make ci"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && BENCH_FILE=geneweb-bench.tmp.bin make ci"'
