@@ -122,11 +122,17 @@ let log_passwd_failed ar oc tm from request base_file =
   Printf.fprintf oc "  Agent: %s\n" user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
-let copy_file ?(trace = true) fname =
+let include_template ?(trace = true) conf env fname failure =
   match Util.open_etc_file fname with
-    Some (ic, fname) ->
-      if trace = true then
-        Wserver.printf "<!-- begin copy from %s -->\n" fname;
+  | Some (ic, fname) ->
+    if trace then Wserver.printf "<!-- begin include %s -->\n" fname;
+    Templ.copy_from_templ conf env ic;
+    if trace then Wserver.printf "<!-- end include %s -->\n" fname;
+  | None -> failure ()
+
+let copy_file fname =
+  match Util.open_etc_file fname with
+    Some (ic, _fname) ->
       begin try
         while true do let c = input_char ic in Wserver.printf "%c" c done
       with _ -> ()
@@ -143,7 +149,7 @@ let robots_txt () =
   Log.with_log (fun oc -> Printf.fprintf oc "Robot request\n");
   Wserver.http Wserver.OK;
   Wserver.header "Content-type: text/plain";
-  if copy_file ~trace:false "robots" then ()
+  if copy_file "robots" then ()
   else
     begin Wserver.printf "User-Agent: *\n"; Wserver.printf "Disallow: /\n" end
 
@@ -289,16 +295,12 @@ let print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf.request ^ new_req
   in
   let env = ["old", conf.bname; "new", new_n; "link", link] in
-  match Util.open_etc_file "renamed" with
-    Some (ic, fname) -> Util.html conf;
-      Wserver.printf "<!-- begin copy from %s -->\n" fname;
-      Templ.copy_from_templ conf env ic;
-      Wserver.printf "<!-- end copy from %s -->\n" fname;
-  | None ->
+  include_template conf env "renamed"
+    (fun () ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
       Hutil.header conf title;
       Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
-      Hutil.trailer conf
+      Hutil.trailer conf)
 
 let log_redirect from request req =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
@@ -318,14 +320,8 @@ let print_redirected conf from request new_addr =
   let link = "http://" ^ new_addr ^ req in
   let env = ["link", link] in
   log_redirect from request req;
-  match Util.open_etc_file "redirect" with
-    Some (ic, fname) ->
-      let conf = {conf with is_printed_by_template = false} in
-      Util.html conf;
-      Wserver.printf "<!-- begin copy from %s -->\n" fname;
-      Templ.copy_from_templ conf env ic;
-      Wserver.printf "<!-- end copy from %s -->\n" fname;
-  | None ->
+  include_template conf env "redirect"
+    (fun () ->
       let title _ = Wserver.printf "Address changed" in
       Hutil.header conf title;
       Wserver.printf "Use the following address:\n<p>\n";
@@ -346,12 +342,19 @@ let propose_base conf =
   Hutil.trailer conf
 
 let general_welcome conf =
-  match Util.open_etc_file "index" with
-    Some (ic, fname) -> Util.html conf;
-      Wserver.printf "<!-- begin copy from %s -->\n" fname;
-      Templ.copy_from_templ conf [] ic;
-      Wserver.printf "<!-- end copy from %s -->\n" fname;
-  | None -> propose_base conf
+  include_template conf [] "index"
+    (fun () ->
+      let title _ = Wserver.printf "Base" in
+      Hutil.header conf title;
+      Wserver.printf "<ul><li>";
+      Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
+      Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
+      Wserver.printf
+        "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
+      Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+      Wserver.printf "</button>\n";
+      Wserver.printf "</li></ul>";
+      Hutil.trailer conf)
 
 let nonce_private_key =
   Lazy.from_fun
