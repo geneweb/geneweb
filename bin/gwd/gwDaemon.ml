@@ -122,9 +122,11 @@ let log_passwd_failed ar oc tm from request base_file =
   Printf.fprintf oc "  Agent: %s\n" user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
-let copy_file fname =
+let copy_file ?(trace = true) fname =
   match Util.open_etc_file fname with
-    Some (ic, _fname) ->
+    Some (ic, fname) ->
+      if trace = true then
+        Wserver.printf "<!-- begin copy from %s -->\n" fname;
       begin try
         while true do let c = input_char ic in Wserver.printf "%c" c done
       with _ -> ()
@@ -141,7 +143,7 @@ let robots_txt () =
   Log.with_log (fun oc -> Printf.fprintf oc "Robot request\n");
   Wserver.http Wserver.OK;
   Wserver.header "Content-type: text/plain";
-  if copy_file "robots" then ()
+  if copy_file ~trace:false "robots" then ()
   else
     begin Wserver.printf "User-Agent: *\n"; Wserver.printf "Disallow: /\n" end
 
