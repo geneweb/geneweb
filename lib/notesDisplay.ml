@@ -71,7 +71,10 @@ let print_whole_notes conf base fnotes title s ho =
     end;
   Wserver.printf "</div>\n";
   begin match Util.open_etc_file "summary" with
-    Some ic -> Templ.copy_from_templ conf [] ic
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf [] ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None -> ()
   end;
   let file_path = file_path conf base in
@@ -105,7 +108,10 @@ let print_notes_part conf base fnotes title s cnt0 =
     (fun _ -> Wserver.print_string (if title = "" then fnotes else title));
   Hutil.print_link_to_welcome conf true;
   begin match Util.open_etc_file "summary" with
-    Some ic -> Templ.copy_from_templ conf [] ic
+    Some (ic, fname) ->
+      Wserver.printf "<!-- begin copy from %s -->\n" fname;
+      Templ.copy_from_templ conf [] ic;
+      Wserver.printf "<!-- end copy from %s -->\n" fname;
   | None -> ()
   end;
   if cnt0 = 0 && title <> "" then
