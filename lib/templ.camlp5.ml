@@ -382,9 +382,9 @@ let included_files = ref []
 
 let begin_end_include conf fname al where =
   if Util.p_getenv conf.base_env "trace_templ" = Some "on" then
-    Atext ((0,0), "<!-- begin include (" ^ where ^ ") from: " ^ fname ^ " -->\n")
+    Atext ((0,0), "<!-- begin include (" ^ where ^ ") " ^ fname ^ " -->\n")
     :: al
-    @ [ Atext ((0,0), "<!-- end include from " ^ fname ^ " -->\n") ]
+    @ [ Atext ((0,0), "<!-- end include " ^ fname ^ " -->\n") ]
   else al
 
 let parse_templ conf strm =
@@ -484,7 +484,7 @@ let parse_templ conf strm =
     let ast =
       try
         let file = get_value 0 strm in
-        (* Protection pour ne pas inclure plusieurs fois un même template ? *)
+        (* Protection pour ne pas "parser" plusieurs fois le même template ? *)
         if not (List.mem_assoc file !included_files) then
           let al =
             match Util.open_templ_fname conf file with
