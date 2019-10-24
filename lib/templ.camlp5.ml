@@ -1305,24 +1305,16 @@ let print_wid_hei fname =
     Some (wid, hei) -> Wserver.printf " width=\"%d\" height=\"%d\"" wid hei
   | None -> ()
 
-let copy_from_templ_fwd =
-  ref (fun _ -> raise (Match_failure ("templ.ml", 1296, 33)))
-let copy_from_templ conf env ic = !copy_from_templ_fwd conf env ic
-
 let print_copyright conf =
-  match Util.open_etc_file "copyr" with
-    Some (ic, fname) ->
-      Wserver.printf "<!-- begin copy from %s -->\n" fname;
-      copy_from_templ conf [] ic;
-      Wserver.printf "<!-- end copy from %s -->\n" fname;
-  | None ->
+  Util.include_template conf [] "copyr"
+    (fun () ->
       Wserver.printf "<hr style=\"margin:0\"%s>\n" conf.xhs;
       Wserver.printf "<div style=\"font-size: 80%%\">\n";
       Wserver.printf "<em>";
       Wserver.printf "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
       Wserver.printf "</em>";
       Wserver.printf "</div>\n";
-      Wserver.printf "<br%s>\n" conf.xhs
+      Wserver.printf "<br%s>\n" conf.xhs)
 
 let print_copyright_with_logo conf =
   let conf =
@@ -1334,9 +1326,7 @@ let print_copyright_with_logo conf =
   print_copyright conf
 
 let include_hed_trl conf name =
-  match Util.open_hed_trl conf name with
-    Some ic -> copy_from_templ conf [] ic
-  | None -> ()
+  Util.include_template conf [] name  (fun () -> ())
 
 let rec interp_ast conf ifun env =
   let m_env = ref env in
@@ -1578,4 +1568,4 @@ let copy_from_templ conf env ic =
   end;
   template_file := v
 
-let _ = copy_from_templ_fwd := copy_from_templ
+let _ = Util.copy_from_templ_ref := copy_from_templ

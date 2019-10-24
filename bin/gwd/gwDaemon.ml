@@ -122,14 +122,6 @@ let log_passwd_failed ar oc tm from request base_file =
   Printf.fprintf oc "  Agent: %s\n" user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
-let include_template ?(trace = true) conf env fname failure =
-  match Util.open_etc_file fname with
-  | Some (ic, fname) ->
-    if trace then Wserver.printf "<!-- begin include %s -->\n" fname;
-    Templ.copy_from_templ conf env ic;
-    if trace then Wserver.printf "<!-- end include %s -->\n" fname;
-  | None -> failure ()
-
 let copy_file fname =
   match Util.open_etc_file fname with
     Some (ic, _fname) ->

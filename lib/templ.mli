@@ -7,7 +7,6 @@ type 'a vother
 type 'a env = (string * 'a) list
 
 val eval_transl : config -> bool -> string -> string -> string
-val copy_from_templ : config -> (string * string) list -> in_channel -> unit
 val begin_end_include : config -> string -> ast list -> string -> ast list
 
 type ('a, 'b) interp_fun =

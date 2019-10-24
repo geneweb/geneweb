@@ -381,3 +381,17 @@ val string_with_macros
     [false] if we knwon the first name or the last name of [p].
 *)
 val is_empty_name : person -> bool
+
+(**/**)
+val init_cache_info : string -> Gwdb.base -> unit
+
+(**/**)
+(* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
+val copy_from_templ_ref :
+  (config -> (string * string) list -> in_channel -> unit) ref
+
+(**/**)
+val copy_from_templ : config -> (string * string) list -> in_channel -> unit
+
+val include_template : ?trace:bool -> config -> (string * string) list -> string ->
+  (unit -> unit) -> unit

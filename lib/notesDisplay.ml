@@ -70,13 +70,7 @@ let print_whole_notes conf base fnotes title s ho =
       Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
     end;
   Wserver.printf "</div>\n";
-  begin match Util.open_etc_file "summary" with
-    Some (ic, fname) ->
-      Wserver.printf "<!-- begin copy from %s -->\n" fname;
-      Templ.copy_from_templ conf [] ic;
-      Wserver.printf "<!-- end copy from %s -->\n" fname;
-  | None -> ()
-  end;
+  Util.include_template conf [] "summary" (fun () -> ());
   let file_path = file_path conf base in
   let s = string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
@@ -107,13 +101,7 @@ let print_notes_part conf base fnotes title s cnt0 =
   Hutil.header_no_page_title conf
     (fun _ -> Wserver.print_string (if title = "" then fnotes else title));
   Hutil.print_link_to_welcome conf true;
-  begin match Util.open_etc_file "summary" with
-    Some (ic, fname) ->
-      Wserver.printf "<!-- begin copy from %s -->\n" fname;
-      Templ.copy_from_templ conf [] ic;
-      Wserver.printf "<!-- end copy from %s -->\n" fname;
-  | None -> ()
-  end;
+  Util.include_template conf [] "summary" (fun () -> ());
   if cnt0 = 0 && title <> "" then
     begin
       Wserver.printf "<br%s>\n" conf.xhs;
@@ -130,7 +118,6 @@ let print_notes_part conf base fnotes title s cnt0 =
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
   Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines; Hutil.trailer conf
-
 
 let print_linked_list conf base pgl =
   Wserver.printf "<ul>\n";
