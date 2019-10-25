@@ -381,8 +381,8 @@ let strip_newlines_after_variables =
 let included_files = ref []
 
 let begin_end_include conf fname al where =
-  if Util.p_getenv conf.base_env "trace_templ" = Some "on" then
-    Atext ((0,0), "<!-- begin include (" ^ where ^ ") " ^ fname ^ " -->\n")
+  if conf.trace_templ then 
+    Atext ((0,0), "\n<!-- begin include (" ^ where ^ ") " ^ fname ^ " -->\n")
     :: al
     @ [ Atext ((0,0), "<!-- end include " ^ fname ^ " -->\n") ]
   else al

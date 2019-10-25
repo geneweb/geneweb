@@ -393,5 +393,5 @@ val copy_from_templ_ref :
 (**/**)
 val copy_from_templ : config -> (string * string) list -> in_channel -> unit
 
-val include_template : ?trace:bool -> config -> (string * string) list -> string ->
+val include_template : config -> (string * string) list -> string ->
   (unit -> unit) -> unit

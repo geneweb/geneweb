@@ -1263,12 +1263,12 @@ let open_templ_fname conf fname =
 
 let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
-let include_template ?(trace = true) conf env fname failure =
+let include_template conf env fname failure =
   match open_etc_file fname with
   | Some (ic, fname) ->
-    if trace then Wserver.printf "<!-- begin include %s -->\n" fname;
+    if conf.trace_templ then Wserver.printf "\n<!-- begin include %s -->\n" fname;
     copy_from_templ conf env ic;
-    if trace then Wserver.printf "<!-- end include %s -->\n" fname;
+    if conf.trace_templ then Wserver.printf "<!-- end include %s -->\n" fname;
   | None -> failure ()
 
 let image_prefix conf = conf.image_prefix

@@ -34,6 +34,7 @@ type config =
     supervisor : bool;
     wizard : bool;
     is_printed_by_template : bool;
+    trace_templ : bool;
     friend : bool;
     just_friend_wizard : bool;
     user : string;
