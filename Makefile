@@ -233,7 +233,7 @@ ci:
 	@./configure && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
 	@./configure --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
 	@./configure --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
-ifneq ($(OS_TYPE),Win)
+ifndef OS
 	@./configure --api && BENCH_NAME=api $(MAKE) -s clean bench-marshal test clean
 endif
 	@$(MAKE) -s bench-tabulate
