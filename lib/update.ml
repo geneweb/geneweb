@@ -840,8 +840,8 @@ let bad_date conf d =
 
 let int_of_field s =
   match int_of_string (String.trim s) with
-  | x when x > 0 -> Some x
-  | _ | exception Failure _ -> None
+  | exception Failure _ -> None
+  | x -> if x > 0 then Some x else None
 
 let reconstitute_date_dmy2 conf var =
   let m =
