@@ -31,7 +31,7 @@ install:
 script:
   - set -ex ;
     export OPAMYES=1 ;
-    export DEPS='benchmark camlp5 cppo dune markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode yojson zarith' ;
+    export DEPS='benchmark camlp5 cppo dune markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode.0.2.0 yojson zarith' ;
     eval $(opam config env) ;
     opam pin list ;
     opam pin remove markup --no-action ;
