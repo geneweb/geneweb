@@ -21,7 +21,7 @@ cache:
     - $HOME/.opam/
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install protobuf ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install protobuf ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq protobuf-compiler ; fi
 
 install:
