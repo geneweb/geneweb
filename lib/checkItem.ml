@@ -694,12 +694,21 @@ let array_mem x a =
     else if x = a.(i) then true
     else loop (i + 1)
   in loop 0
+  
+let array_mem_witn x a =
+  let rec loop i =
+    if i = Array.length a then false
+    else 
+      let (p, _k) = a.(i) in
+      if x = p then true
+    else loop (i + 1)
+  in loop 0
 
 let check_person_dates_as_witness base warning p =
   let ip = get_iper p in
-  let related_pers = list_uniq (List.sort compare (get_related p)) in
+  let related_p = list_uniq (List.sort compare (get_related p)) in
   let related_fam =
-    let list = ref [] in
+    let list_f = ref [] in
     begin let rec make_list =
       function
       | ic :: icl ->
@@ -707,23 +716,19 @@ let check_person_dates_as_witness base warning p =
           if get_sex c = Male then
             Array.iter
               (fun ifam ->
-                 let fam = foi base ifam in
-                 if array_mem ip (get_witnesses fam)
-                 then
-                  begin
-                    list := (ifam, fam) :: !list;
-                    make_list icl
-                  end
-                 else make_list icl)
-              (get_family (poi base ic))
+                let fam = foi base ifam in
+                if array_mem ip (get_witnesses fam) then
+                  list_f := (ifam, fam) :: !list_f;
+                make_list icl)
+              (get_family c)
           else make_list icl
       | [] -> ()
       in
-      make_list related_pers
+      make_list related_p
     end;
-    !list
+    !list_f
   in
-  let list =
+  let related_fam =
     List.sort
       (fun (_, fam1) (_, fam2) ->
          match
@@ -766,7 +771,45 @@ let check_person_dates_as_witness base warning p =
           loop l
         in
         loop (get_fevents fam)
-    ) list
+    ) related_fam;
+  let related_pers =
+    let list_p = ref [] in
+    begin let rec make_list =
+      function
+      | ic :: icl ->
+          let c = poi base ic in
+          List.iter
+            (fun evt ->
+              if array_mem_witn ip evt.epers_witnesses then
+                list_p := evt :: !list_p;
+              make_list icl)
+            (get_pevents c)
+      | [] -> ()
+      in
+      make_list related_p
+    end;
+    !list_p
+  in
+  List.iter
+    (fun evt ->
+       begin match Adef.od_of_cdate evt.epers_date with
+         Some (Dgreg (_, _) as d2) ->
+            begin match Adef.od_of_cdate (get_birth p) with
+              Some (Dgreg (_, _) as d1) ->
+                if strictly_before d2 d1 then
+                  warning (PWitnessEventBeforeBirth (p, evt))
+            | _ -> ()
+            end;
+            begin match get_death p with
+              Death (_, d3) ->
+                let d3 = Adef.date_of_cdate d3 in
+                if strictly_after d2 d3 then
+                  warning (PWitnessEventAfterDeath (p, evt))
+            | _ -> ()
+            end;
+        | _ -> ()
+        end;
+    ) related_pers
 
 let check_pevents base warning p =
   check_order_pevents warning p ;
