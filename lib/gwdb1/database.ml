@@ -384,17 +384,6 @@ type synchro_patch =
 
 (* Input *)
 
-let apply_patches tab f patches plen =
-  if plen = 0 then tab
-  else
-    let new_tab =
-      if plen > Array.length tab then
-        let new_tab = Array.make plen (Obj.magic 0) in
-        Array.blit tab 0 new_tab 0 (Array.length tab); new_tab
-      else tab
-    in
-    Hashtbl.iter (fun i v -> new_tab.(i) <- f v) patches; new_tab
-
 type patches_ht =
   { h_person : int ref * (int, person) Hashtbl.t;
     h_ascend : int ref * (int, ascend) Hashtbl.t;
@@ -423,111 +412,63 @@ module Old =
         p_name : (int * iper list) list ref }
   end
 
-let phony_person =
-  {first_name = 0; surname = 0; occ = 0; image = 0; first_names_aliases = [];
-   surnames_aliases = []; public_name = 0; qualifiers = []; aliases = [];
-   titles = []; rparents = []; related = []; occupation = 0; sex = Neuter;
-   access = IfTitles; birth = Adef.cdate_None; birth_place = 0;
-   birth_note = 0; birth_src = 0; baptism = Adef.cdate_None;
-   baptism_place = 0; baptism_note = 0; baptism_src = 0;
-   death = DontKnowIfDead; death_place = 0; death_note = 0; death_src = 0;
-   burial = UnknownBurial; burial_place = 0; burial_note = 0; burial_src = 0;
-   pevents = []; notes = 0; psources = 0; key_index = Type.iper_of_int 0}
+let apply_patches tab patches plen =
+  if plen = 0 then tab
+  else begin
+    let new_tab =
+      if plen > Array.length tab then
+        let new_tab = Array.make plen (Obj.magic 0) in
+        Array.blit tab 0 new_tab 0 (Array.length tab) ;
+        new_tab
+      else tab
+    in
+    Hashtbl.iter (Array.set new_tab) patches ;
+    new_tab
+  end
 
-let phony_family =
-  {marriage = Adef.cdate_None; marriage_place = 0; marriage_note = 0;
-   marriage_src = 0; witnesses = [| |]; relation = Married;
-   divorce = NotDivorced; fevents = []; comment = 0; origin_file = 0;
-   fsources = 0; fam_index = Type.ifam_of_int 0}
-
-let ext phony v =
-  let rlen = Array.length (Obj.magic v) in
-  let alen = Array.length (Obj.magic phony) in
-  if rlen = alen then v
-  else if rlen < alen then
-    let x = Array.copy (Obj.magic phony) in
-    Array.blit (Obj.magic v) 0 x 0 rlen; Obj.magic x
-  else failwith "this is a GeneWeb base, but not compatible; please upgrade"
-
-let array_ext phony fa =
-  let a = Obj.magic fa in
-  if Array.length a = 0 then fa
-  else
-    let rlen = Array.length a.(0) in
-    let alen = Array.length (Obj.magic phony) in
-    if rlen = alen then fa
-    else if rlen < alen then
-      begin
-        if Sys.unix then
-          if !verbose then
-            begin
-              Printf.eprintf "*** extending records from size %d to size %d\n"
-                rlen alen;
-              flush stderr
-            end;
-        for i = 0 to Array.length a - 1 do
-          let x = Array.copy (Obj.magic phony) in
-          Array.blit a.(i) 0 x 0 rlen; a.(i) <- x
-        done;
-        fa
-      end
-    else failwith "this is a GeneWeb base, but not compatible; please upgrade"
-
-let make_record_access ic ic_acc shift array_pos (plenr, patches) len name
-    input_array input_item =
-  let v_ext v =
-    if name = "persons" then ext phony_person v
-    else if name = "families" then ext phony_family v
-    else v
-  in
-  let v_arr_ext v =
-    if name = "persons" then array_ext phony_person v
-    else if name = "families" then array_ext phony_family v
-    else v
-  in
+let make_record_access ic ic_acc shift array_pos (plenr, patches) len name input_array input_item =
   let tab = ref None in
   let cleared = ref false in
   let gen_get i =
-    match !tab with
-      Some x -> x.(i)
+    match Hashtbl.find_opt patches i with
+    | Some v -> v
     | None ->
-        try let v = Hashtbl.find patches i in v_ext v with
-          Not_found ->
-            if i < 0 || i >= len then
-              failwith
-                ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
-            else
-              match ic_acc with
-                Some ic_acc ->
-                  seek_in ic_acc (shift + Iovalue.sizeof_long * i);
-                  let pos = input_binary_int ic_acc in
-                  seek_in ic pos; let v = input_item ic in v_ext v
-              | None ->
-                  Printf.eprintf "Sorry; I really need base.acc\n";
-                  flush stderr;
-                  failwith "cannot access database"
+      match !tab with
+      | Some x -> x.(i)
+      | None ->
+        if i < 0 || i >= len then failwith ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
+        else match ic_acc with
+          | Some ic_acc ->
+            seek_in ic_acc (shift + Iovalue.sizeof_long * i);
+            let pos = input_binary_int ic_acc in
+            seek_in ic pos ;
+            input_item ic
+          | None ->
+            Printf.eprintf "Sorry; I really need base.acc\n";
+            flush stderr;
+            failwith "cannot access database"
   in
-  let rec array () =
+  let array () =
     match !tab with
-      Some x -> x
+    | Some x -> x
     | None ->
-        if Sys.unix then
-          if !verbose then
-            begin
-              Printf.eprintf "*** read %s%s\n" name
-                (if !cleared then " (again)" else "");
-              flush stderr
-            end;
-        seek_in ic array_pos;
-        let v = input_array ic in
-        let v = v_arr_ext v in
-        let t = apply_patches v v_ext patches r.len in tab := Some t; t
-  and r =
-    {load_array = (fun () -> let _ = array () in ()); get = gen_get;
-     set = (fun i v -> (array ()).(i) <- v); len = max len !plenr;
-     output_array =
-       (fun oc -> Mutil.output_value_no_sharing oc (array () : _ array));
-     clear_array = fun () -> cleared := true; tab := None}
+      seek_in ic array_pos;
+      let t = input_array ic in
+      tab := Some t ;
+      t
+  in
+  let rec r =
+    { load_array = (fun () -> ignore @@ array ())
+    ; get = gen_get
+    ; set = (fun i v -> (array ()).(i) <- v)
+    ; len = max len !plenr
+    ; output_array = begin fun oc ->
+        let v = array () in
+        let a = apply_patches v patches r.len in
+        Mutil.output_value_no_sharing oc (a : _ array)
+      end
+    ; clear_array = (fun () -> cleared := true ; tab := None)
+    }
   in
   r
 
