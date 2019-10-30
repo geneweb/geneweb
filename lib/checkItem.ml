@@ -706,6 +706,8 @@ let array_mem_witn x a =
 
 let check_person_dates_as_witness base warning p =
   let ip = get_iper p in
+  let birth_date = Adef.od_of_cdate (get_birth p) in
+  let death_date = get_death p in
   let related_p = list_uniq (List.sort compare (get_related p)) in
   let related_fam =
     let list_f = ref [] in
@@ -752,19 +754,20 @@ let check_person_dates_as_witness base warning p =
              Some (Dgreg (_, _) as d2) ->
                Array.iter
                  (fun (iw, _) ->
-                    let p = poi base iw in
-                    begin match Adef.od_of_cdate (get_birth p) with
-                      Some (Dgreg (_, _) as d1) ->
-                        if strictly_before d2 d1 then
-                          warning (FWitnessEventBeforeBirth (p, evt))
-                    | _ -> ()
-                    end;
-                    match get_death p with
-                      Death (_, d3) ->
-                        let d3 = Adef.date_of_cdate d3 in
-                        if strictly_after d2 d3 then
-                          warning (FWitnessEventAfterDeath (p, evt))
-                    | _ -> ())
+                    if ip = iw then
+                    begin
+                      match birth_date with
+                        Some (Dgreg (_, _) as d1) ->
+                          if strictly_before d2 d1 then
+                            warning (FWitnessEventBeforeBirth (p, evt))
+                      | _ -> ();
+                      match death_date with
+                        Death (_, d3) ->
+                          let d3 = Adef.date_of_cdate d3 in
+                          if strictly_after d2 d3 then
+                            warning (FWitnessEventAfterDeath (p, evt))
+                      | _ -> ()
+                    end;)
                  evt.efam_witnesses
             | _ -> ()
             end;
@@ -794,13 +797,13 @@ let check_person_dates_as_witness base warning p =
     (fun evt ->
        begin match Adef.od_of_cdate evt.epers_date with
          Some (Dgreg (_, _) as d2) ->
-            begin match Adef.od_of_cdate (get_birth p) with
+            begin match birth_date with
               Some (Dgreg (_, _) as d1) ->
                 if strictly_before d2 d1 then
                   warning (PWitnessEventBeforeBirth (p, evt))
             | _ -> ()
             end;
-            begin match get_death p with
+            begin match death_date with
               Death (_, d3) ->
                 let d3 = Adef.date_of_cdate d3 in
                 if strictly_after d2 d3 then
