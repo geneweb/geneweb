@@ -676,39 +676,11 @@ let check_witness_pevents base warning p =
        | _ -> ())
     (get_pevents p)
 
-let list_uniq l =
-  let ht = Hashtbl.create (List.length l) in
-  let l =
-    List.fold_left
-      (fun accu x ->
-        let hash = Hashtbl.hash x in
-        if Hashtbl.mem ht hash then accu
-        else begin Hashtbl.add ht hash (); x :: accu end)
-      [] l
-  in
-  List.rev l
-
-let array_mem x a =
-  let rec loop i =
-    if i = Array.length a then false
-    else if x = a.(i) then true
-    else loop (i + 1)
-  in loop 0
-  
-let array_mem_witn x a =
-  let rec loop i =
-    if i = Array.length a then false
-    else 
-      let (p, _k) = a.(i) in
-      if x = p then true
-    else loop (i + 1)
-  in loop 0
-
 let check_person_dates_as_witness base warning p =
   let ip = get_iper p in
   let birth_date = Adef.od_of_cdate (get_birth p) in
   let death_date = get_death p in
-  let related_p = list_uniq (List.sort compare (get_related p)) in
+  let related_p = List.sort_uniq compare (get_related p) in
   let related_fam =
     let list_f = ref [] in
     begin let rec make_list =
@@ -719,7 +691,7 @@ let check_person_dates_as_witness base warning p =
             Array.iter
               (fun ifam ->
                 let fam = foi base ifam in
-                if array_mem ip (get_witnesses fam) then
+                if Array.mem ip (get_witnesses fam) then
                   list_f := (ifam, fam) :: !list_f;
                 make_list icl)
               (get_family c)
@@ -730,26 +702,10 @@ let check_person_dates_as_witness base warning p =
     end;
     !list_f
   in
-  let related_fam =
-    List.sort
-      (fun (_, fam1) (_, fam2) ->
-         match
-           (Adef.od_of_cdate (get_marriage fam1),
-            Adef.od_of_cdate (get_marriage fam2))
-         with
-           (Some d1, Some d2) ->
-             if strictly_before d1 d2 then -1
-             else if strictly_before d2 d1 then 1
-             else 0
-         | _ -> 0 )
-    related_fam
-  in
   List.iter
     (fun (_ifam, fam) ->
-      let rec loop fevents =
-        match fevents with
-          [] -> ()
-        | evt :: l ->
+        List.iter 
+          (fun (evt) ->
            begin match Adef.od_of_cdate evt.efam_date with
              Some (Dgreg (_, _) as d2) ->
                Array.iter
@@ -770,10 +726,8 @@ let check_person_dates_as_witness base warning p =
                     end;)
                  evt.efam_witnesses
             | _ -> ()
-            end;
-          loop l
-        in
-        loop (get_fevents fam)
+            end;)
+        (get_fevents fam)
     ) related_fam;
   let related_pers =
     let list_p = ref [] in
@@ -783,7 +737,7 @@ let check_person_dates_as_witness base warning p =
           let c = poi base ic in
           List.iter
             (fun evt ->
-              if array_mem_witn ip evt.epers_witnesses then
+              if Array.exists (fun (p, _) -> ip = p) evt.epers_witnesses then
                 list_p := evt :: !list_p;
               make_list icl)
             (get_pevents c)
