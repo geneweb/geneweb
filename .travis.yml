@@ -34,7 +34,7 @@ install:
 script:
   - set -ex ;
     export OPAMYES=1 ;
-    export DEPS='benchmark camlp5.7.12 cppo dune.1.11.4 jingoo markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode.0.2.0 uucp uunf uutf yojson zarith' ;
+    export DEPS='benchmark calendars camlp5.7.12 cppo dune.1.11.4 jingoo markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode.0.2.0 uucp uunf uutf yojson zarith' ;
     eval $(opam config env) ;
     opam update ;
     opam install depext ;
