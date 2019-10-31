@@ -18,7 +18,7 @@ platform:
 environment:
   CYG_ROOT: C:/cygwin64
   CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-  OPAM_PACKAGES: 'benchmark camlp5 cppo dune markup num ocaml ounit stdlib-shims unidecode.0.2.0 zarith'
+  OPAM_PACKAGES: 'benchmark calendars camlp5 cppo dune markup num ocaml ounit stdlib-shims unidecode.0.2.0 zarith'
 
 install:
   - 'set OPAMYES=1'
@@ -27,6 +27,7 @@ install:
   - '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
   - '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
   - '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.09.0+mingw64c --disable-sandboxing"'
+  - '%CYG_BASH% "opam pin add -yn https://github.com/geneweb/calendars.git"'
   - '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
   - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
 

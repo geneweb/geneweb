@@ -31,9 +31,10 @@ install:
 script:
   - set -ex ;
     export OPAMYES=1 ;
-    export DEPS='benchmark camlp5 cppo dune markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode.0.2.0 yojson zarith' ;
+    export DEPS='benchmark calendars camlp5 cppo dune markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode.0.2.0 yojson zarith' ;
     eval $(opam config env) ;
     opam pin list ;
+    opam pin add -yn https://github.com/geneweb/calendars.git ;
     opam pin remove markup --no-action ;
     opam pin remove piqilib --no-action ;
     opam pin remove piqi --no-action ;

@@ -2,5 +2,5 @@
  (name util)
  (public_name geneweb.util)
  (wrapped false)
- (libraries stdlib-shims unidecode geneweb.def geneweb.io geneweb.gwdb.mli)
+ (libraries stdlib-shims calendars unidecode geneweb.def geneweb.io geneweb.gwdb.mli)
 )
