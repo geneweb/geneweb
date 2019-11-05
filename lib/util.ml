@@ -189,7 +189,7 @@ let gen_decline_basic wt s =
     if String.rindex_opt wt '/' <> None then
         (* special case for Spanish *)
         if String.length s > 0 && start_with_hi_i s then
-          nth_field wt 1 ^ Mutil.decline 'n' s
+          nth_field wt 1 ^ Mutil.decline 'n' s1
         else nth_field wt 0 ^ Mutil.decline 'n' s1
     else wt ^ Mutil.decline 'n' s1
   else if len >= 3 && wt.[len-3] = ':' && wt.[len-1] = ':' then

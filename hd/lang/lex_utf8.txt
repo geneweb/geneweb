@@ -2357,7 +2357,7 @@ da: og
 de: und
 en: and
 eo: kaj
-es: y/e 
+es: y/e
 et: ja
 fi: ja
 fr: et
