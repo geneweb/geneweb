@@ -217,14 +217,14 @@ sv: %1 till %2
 
     %d %s starting with %s
 co: %d %s principiendu da "%s"
-de: %d %s beginnend mit "%s"
-en: %d %s starting with "%s"
+de: %d %s beginnend mit „%s”
+en: %d %s starting with “%s”
 es: %d %s comenzando con "%s"
 fi: %d %s ensimmäisenä "%s"
-fr: %d %s commençant par "%s"
-it: %d %s partendo da "%s"
+fr: %d %s commençant par « %s »
+it: %d %s partendo da «%s»
 nl: %d %s beginnend met "%s"
-no: %d %s som starter med "%s"
+no: %d %s som starter med «%s»
 oc: %d %s que comença amb "%s"
 pt: %d %s começados por '%s'
 ru: %d %s начиная с "%s"
@@ -485,7 +485,7 @@ eo: la nobeltitolaj datoj de %t estas malkorektaj: %t
 es: las fechas de un título de %t son incorrectas: %t
 et: isiku %t tiitli kuupäev %t on vigane
 fi: henkilön %t arvonimen päivämäärässä %t on virhe
-fr: %t a des dates de titre incorrectes : %t
+fr: %t a des dates de titre incorrectes : %t
 he:  תאריכים לתארים של %t אינם נכונים: %t
 is: %t hefur vitlausa dagsetningu %t
 it: alcune date dei titoli di %t sono incorrette: %t
@@ -546,7 +546,7 @@ eo: %t naskiĝis pli ol 2 jaroj post la morto de sia patro %t
 es: %t ha nacido más de 2 años después de la muerte de su padre %
 et: %t on sündinud enam kui 2 aastat pärast oma isa %t surma
 fi: %t on syntynyt yli 2 vuotta isänsä kuoleman jälkeen %t
-fr: %t est né(e) plus de 2 ans après la mort de son père %t
+fr: %t est né(e) plus de 2 ans après la mort de son père %t
 he: %t  נלד(ה) יותר משנתיים אחרי מוות האב
 is: %t er fædd(ur) meira en 2 árum eftir andlát föður síns %t
 it: %t sarebbe nato più di 2 anni dopo la morte di suo padre %t
@@ -617,7 +617,7 @@ co: %t: %s nanzu a/u so %s
 de: %t: %s vor seiner/ihrer %s
 en: %t: %s before their %s
 es: %t : %s antes de su %s
-fr: %t : %s avant son/sa %s
+fr: %t : %s avant son/sa %s
 it: %t : %s prima della suo/sua %s
 pt: %t: %s antes de seu/sua %s
 ru: %t: %s до их %s
@@ -809,7 +809,7 @@ zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
 af:  
 ar: .
 bg:  
-br: .
+br:  
 ca: .
 co:  
 cs:  
@@ -932,9 +932,9 @@ sv: bryllingar
 af: :
 ar: :
 bg: :
-br:  :
+br:  :
 ca: :
-co:  :
+co:  :
 cs: :
 da: :
 de: :
@@ -943,7 +943,7 @@ eo: :
 es: :
 et: :
 fi: :
-fr:  :
+fr:  :
 he: :
 is: :
 it: :
@@ -1062,7 +1062,7 @@ en: a 3rd cousin
 eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 et: kolmanda astme nõbu:g:--o
-fi: kolmas serkku:g:nnen serkun
+fi: kolmas serkku:g:nnen serkun
 fr: un cousin issu d’issus de germains/une cousine issue d’issus de germains/un(e) cousin(e) issu(e) d’issus de germains
 he:  בן-דוד שלישי/ בת-דוד שלישית
 is: fjórmenningur
@@ -3889,20 +3889,20 @@ br: klikit war "%s"
 ca: premeu sobre "%s"
 co: cliccà nant'à "%s"
 cs: klikněte "%s"
-da: klik "%s"
-de: klicke auf "%s"
-en: click on "%s"
-eo: kliku "%s"
+da: klik »%s«
+de: klicke auf „%s”
+en: click on “%s”
+eo: kliku “%s”
 es: cliquear "%s"
 et: klõpsa "%s"
 fi: napsauta "%s"
-fr: cliquez sur « %s »
+fr: cliquez sur « %s »
 he:   לחץ "%s"
 is: Ýtið "%s"
-it: seleziona "%s"
+it: seleziona «%s»
 lv: spiest "%s"
 nl: klik "%s"
-no: klikk "%s"
+no: klikk «%s»
 oc: clicatz sus "%s"
 pl: kliknij "%s"
 pt: clicar "%s"
@@ -6793,12 +6793,12 @@ sv: Har ingen familj
 
     help modify data
 co: Fate casu ! E currezzioni fatte in u dizziunariu mudificanu l'inseme di i dati chì currispondenu in a basa.
-de: Klicken Sie auf das zu korrigierende "Listen-Element": alle Dateien Ihres Baumes werden sofort korrigiert.
+de: Klicken Sie auf das zu korrigierende „Listen-Element”: alle Dateien Ihres Baumes werden sofort korrigiert.
 en: Be carefull. Modifications that are made in the “book” update the corresponding element in the entire database.
 es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente.
 fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti.
 fr: Attention ! Les corrections dans le dictionnaire modifient l’ensemble des données correspondantes dans la base.
-it: Clicca su « l’elemento della lista » che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette.
+it: Clicca su «l’elemento della lista» che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette.
 nl: Kliop op het 'lijstelement" dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd  worden.
 no: Klikk 'Oppdater' for å editere og hele ditt slektstre vil automatisk bli oppdatert.
 oc: CLicatz sus l'element de modificar e totas las fichas del seu arbre seràn corregidas sulpic.
@@ -8280,7 +8280,7 @@ eo: estas maŝo en la datenbazo: %s estas sia propra avo
 es: referencia circulár en la base de datos: %s es su propio ancestro
 et: silmus andmebaasis: %s on iseenda esivanem
 fi: silmukka tietokannassa: %s on oma esivanhempansa
-fr: boucle dans la base de données : %s est son propre ancêtre
+fr: boucle dans la base de données : %s est son propre ancêtre
 he:  מעגל במאגר הנתונים: %s  צאצא(ה) לאצמו/לאצמה
 is: villa í gagnagrunni: %s er sinn eigin forfaðir/afkomandi
 it: loop nel data-base: %s è antenato(a) di se stesso(a)
@@ -10402,7 +10402,7 @@ eo: nombro de la vivantaj personoj:
 es: número de personas vivas:
 et: elavaid inimesi:
 fi: elossa olevien lukumäärä:
-fr: nombre de personnes vivantes :
+fr: nombre de personnes vivantes :
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi:
 lv: dzīvo personu skaits:
@@ -11796,7 +11796,7 @@ de: anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
 es: opciones de edición de los árboles de parentesco:
 fi: näyttötapa:
-fr: options d’affichage des arbres :
+fr: options d’affichage des arbres :
 it: opzioni di visualizzazione degli alberi di parentela:
 nl: toonopties van de verwantschapsstambomen
 no: visningsmåte
@@ -11856,7 +11856,7 @@ de: Verknüpfungen :
 en: shortcuts:
 es: atajos :
 fi: oikotie:
-fr: raccourcis :
+fr: raccourcis :
 it: scorciatoie :
 nl: binnenweg :
 no: snarvei:
@@ -12312,7 +12312,7 @@ de: Partner auswählen
 en: Select spouse
 es: elija un cónyuge
 fi: Valitse puoliso
-fr: choisissez un conjoint :
+fr: choisissez un conjoint :
 it: scegli un coniuge
 nl: kies een partner
 no: Velg ektefelle
@@ -12336,7 +12336,7 @@ eo: Vi povas elekti alian lingvon inter la sekvantajn:
 es: Ver en:
 et: Võid valida ka mõne muu keele järgnevatest:
 fi: Näytä:
-fr: afficher en :
+fr: afficher en :
 is: Þú getur valið milli eftirfarandi tungumála:
 it: Vista in:
 lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
@@ -12846,11 +12846,11 @@ eo: Sosa referenco: %t
 es: referencia Sosa: %t
 et: Sosa viidet: %t
 fi: Sosa-viitteenä: %t
-fr: référence Sosa : %t
+fr: référence Sosa : %t
 he:  כאזכור Sosa: %t
 it: riferimento Sosa : %t
 lv: Sosa pakāpes: %t
-nl: Sosareferentie : %t
+nl: Sosareferentie : %t
 oc: referéncia de Sosa: %t
 pt: referência Sosa: %t
 ro: referinta Sosa: %t
@@ -13542,19 +13542,19 @@ ca: la base ha canviat, fer "back", "reload" i completeu novament el formulari
 co: a basa hè cambiata, rivene à a pagina precedente, attualizà, è riempie torna u furmulariu
 cs: databáze se změnila; vraťte se zpět (back), znovu načtěte stránku (reload) a vyplňte formulář
 da: databasen er ændret; gå tilbage, klik for opdatering og udfyld formularen igen
-de: die Datenbank wurde verändert; drücke bitte "zurück (back)", "neu laden (reload)" und fülle das Formular neu aus
-en: the base has changed; do "back", "reload", and refill the form
-eo: la bazo ŝangis; faru "malantaŭe", "reŝargi", kaj replenigu la formularon
+de: die Datenbank wurde verändert; drücke bitte „zurück (back)“, „neu laden (reload)“ und fülle das Formular neu aus
+en: the base has changed; do “back”, “reload”, and refill the form
+eo: la bazo ŝangis; faru “malantaŭe”, “reŝargi”, kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud: mine tagasi, värskenda lehekülg ja täida vorm uuesti
 fi: tietokanta on muuttunut; valitse "takaisin", "lataa uudelleen" ja täytä lomake uudelleen
-fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
+fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
 he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerðu "Back", "Reload", og settu aftur í formið
-it: la base è cambiata; fate "back", "reload" e rifate la scheda
+it: la base è cambiata; fate «back», «reload» e rifate la scheda
 lv: datu bāzē ir veiktas izmaiņas; nospiediet "back", "reload", un aizpildiet formu
 nl: het bestand is veranderd; klik "back", "reload" en vul de details nogmaals in
-no: databasen er endret; gå tilbake, klikk "oppfrisk", og fyll ut formularet på nytt
+no: databasen er endret; gå tilbake, klikk «oppfrisk», og fyll ut formularet på nytt
 oc: la basa foguèt modificada, tornatz enrè e tornatz cargar e tornatz editar la ficha
 pl: w bazie zostały dokonane zmiany; kliknij "wstecz" i "odśwież", a następnie ponownie wprowadź dane
 pt: a base mudou: fazer "back", "reload" e preencher novamente o formulário
@@ -13744,7 +13744,7 @@ eo: la sliparo estas provizore riglata: provu denove. Se tio ne funkcios, atendu
 es: la base está temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar nuevamente
 et: fail on ajutiselt lukustatud: proovi uuesti
 fi: tiedosto on lukkiutunut, yritä hetken kuluttua uudelleen
-fr: le fichier est temporairement verrouillé : essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
+fr: le fichier est temporairement verrouillé : essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
 he:  הקובץ נעול זמנית: לחקות ולנסות שוב
 is: skjalið er læst í augnablikinu, reyndu aftur
 it: l'archivio è temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
@@ -14065,7 +14065,7 @@ de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
 en: %d entries have been successfully updated
 es: la modificación ha sido hecha: %d ficha/s corregida/s
 fi: %d tietuetta on onnistuneesti päivitetty
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
 it: la modifica è stata effettuata : %d scheda/e corretta/e
 nl: wijziging goed uitgevoerd : %d fiche(n) verbeterd
 no: %d registreringer er blitt oppdatert
@@ -14240,20 +14240,20 @@ br: evit ouzhpennañ ur bugel d'un tiegezh e ranker implij "%s"
 ca: per afegir un fill a una família, utilitzeu "%s"
 co: per aghjunghje un(a) zitellu(a) à una famiglia, impiegà "%s"
 cs: pro přidání dítěte do rodiny použij "%s"
-da: brug "%s" for at føje et barn til en familie
-de: um ein Kind zu einer Familie hinzuzufügen, benutze "%s"
-en: to add a child to a family, use "%s"
-eo: por aldoni infanon al familio, uzu "%s"
+da: brug »%s« for at føje et barn til en familie
+de: um ein Kind zu einer Familie hinzuzufügen, benutze „%s“
+en: to add a child to a family, use “%s”
+eo: por aldoni infanon al familio, uzu “%s”
 es: para agregar un hijo a una familia, utiliza "%s"
 et: lapse lisamiseks perre kasuta "%st"
 fi: lisätäksesi perheeseen lapsen käytä "%s"
-fr: pour ajouter un enfant à une famille, utiliser « %s »
+fr: pour ajouter un enfant à une famille, utiliser « %s »
 he:  להוסיף ילד למשפחה, השתמש ב-"%s"
 is: til að bæta barni við fjölskyldu, notaðu "%s"
-it: per aggiungere un figlio ad una famiglia, scegliere "%s"
+it: per aggiungere un figlio ad una famiglia, scegliere «%s»
 lv: lai pievienotu bērnu ģimenei, lietojiet "%s"
 nl: gebruik "%s" om een kind aan een gezin toe te voegen
-no: for å knytte et barn til en familie, bruk "%s"
+no: for å knytte et barn til en familie, bruk «%s»
 oc: per apondre un enfant a una familha, utilizatz "%s"
 pl: aby dodać dziecko do pary rodziców użyj "%s"
 pt: para acrescentar um filho a uma família utilizar "%s"
@@ -14919,20 +14919,20 @@ br: implijit "liammañ" kentoc'h eget "sevel"
 ca: utilitzeu "reunir" en lloc de "crear"
 co: impiegà "unisce" invvece di "creà"
 cs: použij "svázat" namísto "vytvořit"
-da: anvend "forbind" i stedet for "opret"
-de: benutze "verbinden" an Stelle von "erzeugen"
-en: use "link" instead of "create"
-eo: uzu "bindi" anstataù ol "krei"
+da: anvend »forbind« i stedet for »opret«
+de: benutze „verbinden“ an Stelle von „erzeugen”
+en: use “link” instead of “create”
+eo: uzu “bindi” anstataù ol “krei”
 es: utilise "reunir" en lugar de "crear"
 et: vali "loo" asemel "viita"
 fi: käytä toimintoa "linkitä" toiminnon "luo" sijaan
-fr: utilisez « relier » au lieu de « créer »
+fr: utilisez « relier » au lieu de « créer »
 he:  להשתמש ב-"קשר" במקום "עשה"
 is: notaðu "tengja" í stað "búa til"
-it: usare "link" invece di "create"
+it: usare «link» invece di «create»
 lv: "izveidot" vietā lietojiet "saite"
 nl: gebruik "connectie" inplaats van "creëren"
-no: bruk "koble" istedet for "opprett"
+no: bruk «koble» istedet for «opprett»
 oc: utilizatz "religar" al lòc de "crear"
 pl: użyj "link" zamiast "utwórz"
 pt: use "ligar" em lugar de "criar"
