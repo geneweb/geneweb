@@ -811,7 +811,7 @@ let get var key env =
 
 let get_number var key env =
   match p_getint env (var ^ "_" ^ key) with
-  | Some x when x > 0 -> Some x
+  | Some x when x <> 0 -> Some x
   | _ -> None
 
 let bad_date conf d =
@@ -841,7 +841,7 @@ let bad_date conf d =
 let int_of_field s =
   match int_of_string (String.trim s) with
   | exception Failure _ -> None
-  | x -> if x > 0 then Some x else None
+  | x -> if x <> 0 then Some x else None
 
 let reconstitute_date_dmy2 conf var =
   let m =
