@@ -467,7 +467,7 @@ let print_last_visited_persons conf base =
   let filters = get_filters conf in
   let list =
     if user = "" then []
-    else try Hashtbl.find (Util.read_visited conf) user with Not_found -> []
+    else Opt.default [] @@ Hashtbl.find_opt (Util.read_visited conf) user
   in
   (* On ne supprime pas le fichier de cache, même après un envoi Gendcom, *)
   (* donc on vérifie que les personnes existent toujours dans la base.    *)

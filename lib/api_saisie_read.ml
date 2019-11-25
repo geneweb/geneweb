@@ -2300,9 +2300,7 @@ let build_graph_asc_v2 conf base p max_gen =
           begin
             match get_parents p with
             | Some ifam ->
-                let factor =
-                  try Hashtbl.find ht (get_iper p) with Not_found -> 1
-                in
+                let factor = Opt.default 1 @@ Hashtbl.find_opt ht (get_iper p) in
                 let cpl = foi base ifam in
                 let fath = poi base (get_father cpl) in
                 let moth = poi base (get_mother cpl) in
@@ -2340,9 +2338,7 @@ let build_graph_asc_v2 conf base p max_gen =
                     | (base_prefix, p, gen) :: l ->
                         if gen >= max_gen then loop_parents l
                         else
-                          let factor =
-                            try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
-                          in
+                          let factor = Opt.default 1 @@ Hashtbl.find_opt ht (base_prefix, get_iper p) in
                           let ip = get_iper p in
                           match Perso_link.get_parents_link base_prefix ip with
                           | Some family ->
@@ -2448,9 +2444,7 @@ let build_graph_desc_v2 conf base p max_gen =
         if gen >= max_gen then loop l
         else
           begin
-            let factor =
-              try Hashtbl.find ht (get_iper p) with Not_found -> 1
-            in
+            let factor = Opt.default 1 @@ Hashtbl.find_opt ht (get_iper p) in
             let ifam = get_family p in
             let l =
               Array.fold_left
@@ -2504,8 +2498,7 @@ let build_graph_desc_v2 conf base p max_gen =
                               if gen >= max_gen then loop_child l
                               else
                                 begin
-                                  let factor =
-                                    try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
+                                  let factor = Opt.default 1 @@ Hashtbl.find_opt ht (base_prefix, get_iper p)
                                   in
                                   let family_link =
                                     Perso_link.get_families_of_parents
@@ -3277,9 +3270,7 @@ let build_graph_asc_full conf base p max_gen =
           begin
             match get_parents p with
             | Some ifam ->
-                let factor =
-                  try Hashtbl.find ht (get_iper p) with Not_found -> 1
-                in
+                let factor = Opt.default 1 @@ Hashtbl.find_opt ht (get_iper p) in
                 let cpl = foi base ifam in
                 let fath = poi base (get_father cpl) in
                 let moth = poi base (get_mother cpl) in
@@ -3317,9 +3308,7 @@ let build_graph_asc_full conf base p max_gen =
                     | (base_prefix, p, gen) :: l ->
                         if gen >= max_gen then loop_parents l
                         else
-                          let factor =
-                            try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
-                          in
+                          let factor = Opt.default 1 @@ Hashtbl.find_opt ht (base_prefix, get_iper p) in
                           let ip = get_iper p in
                           match Perso_link.get_parents_link base_prefix ip with
                           | Some family ->
@@ -3431,9 +3420,7 @@ let build_graph_desc_full conf base p max_gen =
         if gen >= max_gen then loop l
         else
           begin
-            let factor =
-              try Hashtbl.find ht (get_iper p) with Not_found -> 1
-            in
+            let factor = Opt.default 1 @@ Hashtbl.find_opt ht (get_iper p) in
             let ifam = get_family p in
             let l =
               List.fold_left
@@ -3486,8 +3473,7 @@ let build_graph_desc_full conf base p max_gen =
                               else
                                 begin
                                   let factor =
-                                    try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
-                                  in
+                                    Opt.default 1 @@ Hashtbl.find_opt ht (base_prefix, get_iper p) in
                                   let family_link =
                                     Perso_link.get_families_of_parents
                                       base_prefix (get_iper p) (get_iper sp)

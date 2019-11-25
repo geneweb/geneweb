@@ -76,14 +76,12 @@ let advanced_search conf base max_answers =
   let hs = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
   let gets x =
-    try Hashtbl.find hs x with
-      Not_found ->
-        let v =
-          match p_getenv conf.env x with
-            Some v -> v
-          | None -> ""
-        in
-        Hashtbl.add hs x v; v
+    match Hashtbl.find_opt hs x with
+    | Some x -> x
+    | None ->
+      let v = Opt.default "" @@ p_getenv conf.env x in
+      Hashtbl.add hs x v;
+      v
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
@@ -97,12 +95,14 @@ let advanced_search conf base max_answers =
   (* Check if the date matches with the person event. *)
   let match_date p x df empty_default_value =
     let (d1, d2) =
-      try Hashtbl.find hd x with
-        Not_found ->
-          let v =
-            reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
-          in
-          Hashtbl.add hd x v; v
+      match Hashtbl.find_opt hd x with
+      | Some x -> x
+      | None ->
+        let v =
+          reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
+        in
+        Hashtbl.add hd x v;
+        v
     in
     authorized_age conf base p
     && match d1, d2 with
@@ -229,12 +229,14 @@ let advanced_search conf base max_answers =
   in
   let match_marriage p x y empty_default_value =
     let (d1, d2) =
-      try Hashtbl.find hd x with
-        Not_found ->
-          let v =
-            reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
-          in
-          Hashtbl.add hd x v; v
+      match Hashtbl.find_opt hd x with
+      | Some x -> x
+      | None ->
+        let v =
+          reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
+        in
+        Hashtbl.add hd x v;
+        v
     in
     let y = gets y in
     let test_date_place df =

@@ -161,8 +161,7 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
        let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
        Hashtbl.add ht_person_cache (base_prefix, ip) p;
        let faml_cache =
-         try Hashtbl.find ht_families_cache (base_prefix, ip) with
-         Not_found -> []
+         Opt.default [] @@ Hashtbl.find_opt ht_families_cache (base_prefix, ip)
        in
        Hashtbl.replace ht_families_cache (base_prefix, ip)
          (p.MLink.Person.families @ faml_cache);
@@ -230,7 +229,7 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
     (fun k _ ->
       let l =
         if Hashtbl.mem ht_corresp k then []
-        else try Hashtbl.find_all ht_corresp_tmp k with Not_found -> []
+        else Hashtbl.find_all ht_corresp_tmp k
       in
       let ht = Hashtbl.create 1 in
       let rec loop accu l =

@@ -102,7 +102,7 @@ let load_image_ht conf =
         with _ -> ())
     images
 
-let find_image_ht name = try Hashtbl.find ht_img name with Not_found -> ""
+let find_image_ht name = Opt.default "" @@ Hashtbl.find_opt ht_img name
 
 (* Cas inverse, on teste que pour une personne donc pas besoin *)
 (* de charger toute la Hashtbl.                                *)

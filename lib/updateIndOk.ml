@@ -1414,9 +1414,7 @@ let print_change_event_order conf base =
     in
     let pevents =
       List.fold_right
-        (fun (id, _) accu ->
-           try Hashtbl.find ht id :: accu with
-             Not_found -> failwith "Sorting event")
+        (fun (id, _) accu -> Hashtbl.find ht id :: accu)
         sorted_pevents []
     in
     let p = gen_person_of_person p in

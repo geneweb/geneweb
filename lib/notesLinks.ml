@@ -144,7 +144,10 @@ let read_db_from_file fname =
       close_in ic; r
   | None -> []
 
-let share ht s = try Hashtbl.find ht s with Not_found -> Hashtbl.add ht s s; s
+let share ht s =
+  match Hashtbl.find_opt ht s with
+  | Some x -> x
+  | None -> Hashtbl.add ht s s; s
 
 let option f =
   function

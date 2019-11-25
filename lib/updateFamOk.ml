@@ -995,11 +995,13 @@ let effective_mod conf base sfam scpl sdes =
   done;
   let cache = Hashtbl.create 101 in
   let find_asc ip =
-    try Hashtbl.find cache ip with
-      Not_found ->
-        let a = poi base ip in
-        let a = {parents = get_parents a; consang = get_consang a} in
-        Hashtbl.add cache ip a; a
+    match Hashtbl.find_opt cache ip with
+    | Some x -> x
+    | None ->
+      let a = poi base ip in
+      let a = {parents = get_parents a; consang = get_consang a} in
+      Hashtbl.add cache ip a ;
+      a
   in
   let same_parents =
     Adef.father ncpl = ofather && Adef.mother ncpl = omother
@@ -1596,9 +1598,7 @@ let print_change_event_order conf base =
     in
     let fevents =
       List.fold_right
-        (fun (id, _) accu ->
-           try Hashtbl.find ht id :: accu with
-             Not_found -> failwith "Sorting event")
+        (fun (id, _) accu -> Hashtbl.find ht id :: accu)
         sorted_fevents []
     in
     let fam = gen_family_of_family fam in

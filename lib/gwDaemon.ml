@@ -1148,7 +1148,7 @@ let make_conf from_addr request script_name env =
         Not_found -> false
   in
   let is_rtl =
-    try Hashtbl.find lexicon " !dir" = "rtl" with Not_found -> false
+    match Hashtbl.find_opt lexicon " !dir" with Some "rtl" -> true | _ -> false
   in
   let manitou =
     try

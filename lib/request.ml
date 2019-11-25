@@ -434,7 +434,9 @@ let treat_request_on_possibly_locked_base conf bfile =
       close_base base
   | Right e ->
       let transl conf w =
-        try Hashtbl.find conf.lexicon w with Not_found -> "[" ^ w ^ "]"
+        match Hashtbl.find_opt conf.lexicon w with
+        | Some x -> x
+        | None -> "[" ^ w ^ "]"
       in
       let title _ =
         Wserver.printf "%s" (Util.capitale (transl conf "error"))

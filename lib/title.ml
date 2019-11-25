@@ -224,8 +224,9 @@ let select_all2 proj conf base =
       (fun t ->
          let s = sou base (proj t) in
          let cnt =
-           try Hashtbl.find ht s with
-             Not_found -> let cnt = ref 0 in Hashtbl.add ht s cnt; cnt
+           match Hashtbl.find_opt ht s with
+           | Some x -> x
+           | None -> let cnt = ref 0 in Hashtbl.add ht s cnt ; cnt
          in
          incr cnt)
       (nobtit conf base x)

@@ -185,8 +185,8 @@ let find_sosa_aux conf base a p t_sosa =
   let cache = ref [] in
   let has_ignore = ref false in
   let ht_add ht k v new_sosa =
-    match try Hashtbl.find ht k with Not_found -> v with
-      Some (z, _) -> if not (Sosa.gt new_sosa z) then Hashtbl.replace ht k v
+    match Opt.default v (Hashtbl.find_opt ht k) with
+    | Some (z, _) -> if not (Sosa.gt new_sosa z) then Hashtbl.replace ht k v
     | _ -> ()
   in
   let rec gene_find =
@@ -259,9 +259,10 @@ let find_sosa conf base a sosa_ref_l t_sosa =
       if get_iper a = get_iper p then Some (Sosa.one, p)
       else
         let u = pget conf base (get_iper a) in
-        if has_children base u then
-          try Hashtbl.find t_sosa.sosa_ht (get_iper a) with
-            Not_found -> find_sosa_aux conf base a p t_sosa
+        if has_children base u
+        then match Hashtbl.find_opt t_sosa.sosa_ht (get_iper a) with
+          | Some x -> x
+          | None -> find_sosa_aux conf base a p t_sosa
         else None
   | None -> None
 
@@ -402,7 +403,7 @@ let prev_sosa s =
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
 let get_sosa_person p =
-  try Hashtbl.find sosa_ht (get_iper p) with Not_found -> Sosa.zero
+  Opt.default Sosa.zero @@ Hashtbl.find_opt sosa_ht (get_iper p)
 
 (* ********************************************************************** *)
 (*  [Fonc] has_history : config -> string -> bool                         *)
@@ -1323,8 +1324,12 @@ let build_surnames_list conf base v p =
   let auth = conf.wizard || conf.friend in
   let add_surname sosa p surn dp =
     let r =
-      try Hashtbl.find ht surn with
-        Not_found -> let r = ref ((fst dp, p), []) in Hashtbl.add ht surn r; r
+      match Hashtbl.find_opt ht surn with
+      | Some x -> x
+      | None ->
+        let r = ref ((fst dp, p), []) in
+        Hashtbl.add ht surn r;
+        r
     in
     r := fst !r, sosa :: snd !r
   in
@@ -1404,9 +1409,12 @@ let build_list_eclair conf base v p =
     if not (is_empty_string pl) then
       let pl = Util.string_of_place conf (sou base pl) in
       let r =
-        try Hashtbl.find ht (surn, pl) with
-          Not_found ->
-            let r = ref (p, None, None, []) in Hashtbl.add ht (surn, pl) r; r
+        match Hashtbl.find_opt ht (surn, pl) with
+        | Some x -> x
+        | None ->
+          let r = ref (p, None, None, []) in
+          Hashtbl.add ht (surn, pl) r;
+          r
       in
       (* Met la jour le binding : dates et liste des iper. *)
       r :=

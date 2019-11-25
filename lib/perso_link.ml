@@ -338,20 +338,18 @@ let make_efam_link conf base fam_link =
 let get_person_link_with_base base_prefix ip base_distante =
   let base_prefix = Link.chop_base_prefix base_prefix in
   let base_distante = Link.chop_base_prefix base_distante in
-  try Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip)) with
-    Not_found ->
-      try
-        let rec loop l =
-          match l with
-            [] -> raise Not_found
-          | (base_prefix, ip) :: l ->
-              if base_prefix = base_distante then base_prefix, ip else loop l
-        in
-        let (base_prefix, ip) =
-          loop (Hashtbl.find_all Link.ht_corresp (base_prefix, ip))
-        in
-        Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip))
-      with Not_found -> None
+  match Hashtbl.find_opt Link.ht_person_cache (base_prefix, ip) with
+  | Some _ as x -> x
+  | None ->
+    let rec loop l =
+      match l with
+      | [] -> None
+      | (base_prefix, ip) :: l ->
+        if base_prefix = base_distante
+        then Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip))
+        else loop l
+    in
+    loop (Hashtbl.find_all Link.ht_corresp (base_prefix, ip))
 
 
 (* ************************************************************************** *)
@@ -483,18 +481,16 @@ let get_mother_link base_prefix ip =
 (* ************************************************************************** *)
 let get_family_correspondance base_prefix ip =
   let base_prefix = Link.chop_base_prefix base_prefix in
-  try Hashtbl.find Link.ht_families_cache (base_prefix, ip) with
-    Not_found ->
-      try
-        let l = Hashtbl.find_all Link.ht_corresp (base_prefix, ip) in
-        List.fold_left
-          (fun accu (base_prefix, ip) ->
-             try
-               Hashtbl.find Link.ht_families_cache (base_prefix, ip) @ accu
-             with Not_found -> accu)
-          [] l
-      with Not_found -> []
-
+  match Hashtbl.find_opt Link.ht_families_cache (base_prefix, ip) with
+  | Some x -> x
+  | None ->
+    let l = Hashtbl.find_all Link.ht_corresp (base_prefix, ip) in
+    List.fold_left
+      (fun accu (base_prefix, ip) ->
+         match Hashtbl.find_opt Link.ht_families_cache (base_prefix, ip) with
+         | Some x -> x @ accu
+         | None -> accu)
+      [] l
 
 (* ************************************************************************** *)
 (*  [Fonc] get_family_link : string -> iper -> Family.t list             *)

@@ -92,8 +92,9 @@ module Make (Select : Select) =
         ht_dup_occ
 
     let get_new_occ p =
-      try Hashtbl.find ht_dup_occ (get_iper p) with
-        Not_found -> get_occ p
+      match Hashtbl.find_opt ht_dup_occ (get_iper p) with
+      | Some x -> x
+      | None -> get_occ p
 
     type mfam =
       { m_ifam : ifam;
@@ -1613,14 +1614,15 @@ module Make (Select : Select) =
         if out_dir = "" then out_oc, out_oc_first
         else if fname = "" then out_oc, out_oc_first
         else
-          try Hashtbl.find src_oc_ht fname with
-            Not_found ->
-              let oc = open_out (Filename.concat out_dir fname) in
-              let x = oc, ref true in
-              if !raw_output then () else Printf.fprintf oc "encoding: utf-8\n";
-              if !old_gw then Printf.fprintf oc "\n" else Printf.fprintf oc "gwplus\n\n";
-              Hashtbl.add src_oc_ht fname x;
-              x
+          match Hashtbl.find_opt src_oc_ht fname with
+          | Some x -> x
+          | None ->
+            let oc = open_out (Filename.concat out_dir fname) in
+            let x = oc, ref true in
+            if !raw_output then () else Printf.fprintf oc "encoding: utf-8\n";
+            if !old_gw then Printf.fprintf oc "\n" else Printf.fprintf oc "gwplus\n\n";
+            Hashtbl.add src_oc_ht fname x;
+            x
       in
       let gen =
         let ipers = Gwdb.ipers base in

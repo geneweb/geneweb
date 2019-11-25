@@ -166,7 +166,8 @@ let nth_field w n =
 
 let tnf s = "[" ^ s ^ "]"
 
-let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
+let transl conf w =
+  match Hashtbl.find_opt conf.lexicon w with Some x -> x | None -> tnf w
 
 let transl_nth conf w n =
   try nth_field (Hashtbl.find conf.lexicon w) n with
