@@ -1,6 +1,6 @@
 (library
  (name gwdb1_internal)
- (public_name geneweb.gwdb1_internal)
+ (public_name geneweb-gwdb-legacy.internal)
  (wrapped false)
  (libraries geneweb.def geneweb.wserver.mli geneweb.util geneweb.io)
  (modules_without_implementation dbdisk)
@@ -17,7 +17,7 @@
 
 (library
  (name gwdb1)
- (public_name geneweb.gwdb1)
+ (public_name geneweb-gwdb-legacy)
  (libraries gwdb1_internal)
  (implements geneweb.gwdb.mli)
  (modules gwdb)
