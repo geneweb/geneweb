@@ -13,8 +13,8 @@ dev-repo: "git://github.com/geneweb/geneweb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 
 build: [
-  [ "./configure" ]
-  [ "dune" "build" "-p" "geneweb" "-j" jobs ]
+  [ "ocaml" "./configure.ml" ]
+  [ "dune" "build" "-p" name "-j" jobs ]
 ]
 
 depends: [
@@ -28,3 +28,5 @@ depends: [
   "stdlib-shims"
   "unidecode" { = "0.2.0" }
 ]
+
+conflict-class: [ "geneweb-bin" ]

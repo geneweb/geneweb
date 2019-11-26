@@ -66,7 +66,7 @@ $ opam install camlp5 cppo dune markup ounit
 
 1. Run the configuration script
    ```
-   $ ./configure
+   $ ocaml ./configure.ml
    ```
 2. Build the distibution
    ```
@@ -88,7 +88,7 @@ $ opam install ocurl piqi piqilib redis redis-sync yojson
 Then, tell the configure script to enable API.
 
 ```
-$ ./configure --api
+$ ocaml ./configure.ml --api
 ```
 
 ### Coding style

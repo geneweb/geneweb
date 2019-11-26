@@ -15,7 +15,7 @@ dev-repo: "git://github.com/geneweb/geneweb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 
 build: [
-  [ "./configure" "--api" ]
+  [ "ocaml" "./configure.ml" "--api" ]
   [ "dune" "build" "-p" name "-j" jobs ]
 ]
 

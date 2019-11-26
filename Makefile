@@ -1,9 +1,9 @@
 ifneq ($(MAKECMDGOALS),ci)
-Makefile.config: configure
+Makefile.config: configure.ml
 	@if [ -e "$@" ]; then \
-	  echo "configure file has changed. Please rerun ./configure"; exit 1; \
+	  echo "configure file has changed. Please rerun ocaml ./configure.ml"; exit 1; \
 	else \
-	  echo "Please run ./configure first"; exit 1; \
+	  echo "Please run ocaml ./configure.ml first"; exit 1; \
 	fi
 include Makefile.config
 endif
@@ -231,11 +231,11 @@ clean:
 
 
 ci:
-	@./configure && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
-	@./configure --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
-	@./configure --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
+	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
+	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
+	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
 ifndef OS
-	@./configure --api && BENCH_NAME=api $(MAKE) -s clean bench-marshal test clean
+	@ocaml ./configure.ml --api && BENCH_NAME=api $(MAKE) -s clean bench-marshal test clean
 endif
 	@$(MAKE) -s bench-tabulate
 .PHONY: ci
