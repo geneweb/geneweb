@@ -14,7 +14,7 @@ bug-reports: "https://github.com/geneweb/geneweb/issues"
 
 build: [
   [ "./configure" ]
-  [ "dune" "build" "-p" name "-j" jobs ]
+  [ "dune" "build" "-p" "geneweb" "-j" jobs ]
 ]
 
 depends: [
@@ -28,5 +28,3 @@ depends: [
   "stdlib-shims"
   "unidecode" { = "0.2.0" }
 ]
-
-conflict-class: [ "geneweb" ]

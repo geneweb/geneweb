@@ -77,6 +77,7 @@ CPPO_D=$(API_D) $(GWDB_D)
 	-e "s/%%%API_PKG%%%/$(API_PKG)/g" \
 	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
+	-e "s/%%%WSERVER_PKG%%%/$(WSERVER_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
 	> $@ \
 	&& echo " Done!"

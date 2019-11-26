@@ -17,6 +17,7 @@ API_PKG=
 GWDB_D=
 GWDB_PKG=
 SOSA_PKG=
+WSERVER_PKG=geneweb-wserver
 DUNE_DIRS_EXCLUDE=
 
 while [[ $# -ne 0 ]]; do
@@ -24,15 +25,15 @@ while [[ $# -ne 0 ]]; do
     --api)
       API_PKG="piqirun.ext redis-sync yojson curl";
       API_D="-D API" ;;
-    --gwdb1)
+    --gwdb-legacy)
       GWDB_D="-D GWDB1" ;
-      GWDB_PKG="geneweb.gwdb1_internal geneweb.gwdb1" ;;
+      GWDB_PKG="geneweb-gwdb-legacy geneweb-gwdb-legacy.internal" ;;
     --sosa-num)
       DUNE_DIRS_EXCLUDE="$DUNE_DIRS_EXCLUDE sosa.array sosa.zarith"
-      SOSA_PKG="geneweb.sosa-num" ;;
+      SOSA_PKG="geneweb-sosa-num" ;;
     --sosa-zarith)
       DUNE_DIRS_EXCLUDE="$DUNE_DIRS_EXCLUDE sosa.array sosa.num"
-      SOSA_PKG="geneweb.sosa-zarith" ;;
+      SOSA_PKG="geneweb-sosa-zarith" ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
@@ -40,15 +41,15 @@ while [[ $# -ne 0 ]]; do
 done
 
 if [[ $GWDB_D == "" ]] ; then
-  echo -e "\\x1b[33m[WARNING]\\x1b[0m GWDB is not set, using gwdb1" ;
+  echo -e "\\x1b[33m[WARNING]\\x1b[0m GWDB is not set, using --gwdb-legacy" ;
   GWDB_D="-D GWDB1" ;
-  GWDB_PKG="geneweb.gwdb1_internal geneweb.gwdb1" ;
+  GWDB_PKG="geneweb-gwdb-legacy geneweb-gwdb-legacy.internal" ;
 fi ;
 
 if [[ $SOSA_PKG == "" ]] ; then
   echo -e "\\x1b[33m[WARNING]\\x1b[0m SOSA is not set, using geneweb.sosa" ;
   DUNE_DIRS_EXCLUDE="$DUNE_DIRS_EXCLUDE sosa.num sosa.zarith" ;
-  SOSA_PKG="geneweb.sosa" ;
+  SOSA_PKG="geneweb-sosa" ;
 fi ;
 
 # Functions that print the checked information
@@ -115,6 +116,7 @@ print_vars() {
   echo "GWDB_D=${GWDB_D}"
   echo "GWDB_PKG=${GWDB_PKG}"
   echo "SOSA_PKG=${SOSA_PKG}"
+  echo "WSERVER_PKG=${WSERVER_PKG}"
   echo "DUNE_DIRS_EXCLUDE=${DUNE_DIRS_EXCLUDE}"
 }
 

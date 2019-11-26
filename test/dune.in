@@ -7,7 +7,7 @@
 
 (executable
   (name test)
-  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb.wserver geneweb oUnit stdlib-shims)
+  (libraries %%%WSERVER_PKG%%% %%%SOSA_PKG%%% dummy_gwdb geneweb oUnit stdlib-shims)
   (modules test test_place test_sosa test_utils)
 )
 
