@@ -17,24 +17,24 @@ DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
 
 EXE = \
-	bin/distrib/connex.exe \
-	bin/distrib/consang.exe \
-	bin/distrib/ged2gwb.exe \
-	bin/distrib/gwb2ged.exe \
-	bin/distrib/gwc.exe \
-	bin/distrib/gwd.exe \
-	bin/distrib/gwdiff.exe \
-	bin/distrib/gwtp.exe \
-	bin/distrib/gwu.exe \
-	bin/distrib/setup.exe \
-	bin/distrib/update_nldb.exe \
+	bin/connex.exe \
+	bin/consang.exe \
+	bin/ged2gwb.exe \
+	bin/gwb2ged.exe \
+	bin/gwc.exe \
+	bin/gwd.exe \
+	bin/gwdiff.exe \
+	bin/gwtp.exe \
+	bin/gwu.exe \
+	bin/setup.exe \
+	bin/update_nldb.exe \
 
 ###### [BEGIN] Generated files section
 
 CAMLP5_PA_EXTEND_FILES = \
-	bin/distrib/ged2gwb/ged2gwb \
+	bin/ged2gwb/ged2gwb \
 	lib/templ \
-	bin/distrib/setup/setup
+	bin/setup/setup
 
 CAMLP5_Q_MLAST_FILES = \
 	lib/templ
@@ -97,7 +97,7 @@ GENERATED_FILES_DEP = \
 	lib/gwlib.ml \
 	$(CAMLP5_FILES:=.ml) \
 	benchmark/dune \
-	bin/distrib/dune \
+	bin/dune \
 	lib/dune \
 	test/dune \
 
@@ -133,7 +133,7 @@ install: geneweb.install
 uninstall: geneweb.install
 	dune uninstall geneweb
 
-BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/distrib/
+BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
 distrib: exe
 	$(RM) -r $(DISTRIB_DIR)
@@ -173,17 +173,17 @@ distrib: exe
 	cp $(BUILD_DISTRIB_DIR)update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
 	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp
 	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp/lang
-	cp bin/distrib/gwtp/README $(DISTRIB_DIR)/gw/gwtp_tmp/.
+	cp bin/gwtp/README $(DISTRIB_DIR)/gw/gwtp_tmp/.
 	cp $(BUILD_DISTRIB_DIR)/gwtp.exe $(DISTRIB_DIR)/gw/gwtp_tmp/gwtp$(EXT)
-	cp bin/distrib/gwtp/lang/*.txt $(DISTRIB_DIR)/gw/gwtp_tmp/lang/.
+	cp bin/gwtp/lang/*.txt $(DISTRIB_DIR)/gw/gwtp_tmp/lang/.
 	mkdir $(DISTRIB_DIR)/gw/setup
-	cp bin/distrib/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
+	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
 	mkdir $(DISTRIB_DIR)/gw/setup/lang
-	cp bin/distrib/setup/setup.gwf $(DISTRIB_DIR)/gw/setup/
-	cp bin/distrib/setup/setup.css $(DISTRIB_DIR)/gw/setup/
-	cp bin/distrib/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
-	cp bin/distrib/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp bin/distrib/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
+	cp bin/setup/setup.gwf $(DISTRIB_DIR)/gw/setup/
+	cp bin/setup/setup.css $(DISTRIB_DIR)/gw/setup/
+	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
+	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
+	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	$(RM) $(DISTRIB_DIR)/exe-version.txt
 	echo "Commit: `git log  -1 | grep commit | cut -c8-15`, `date`"      > $(DISTRIB_DIR)/commit.txt
