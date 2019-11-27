@@ -19,6 +19,8 @@ let gwdb = ref `None
 
 let set_api () = api := true
 
+let set_sosa_legacy () = assert (!sosa = `None) ; sosa := `Legacy
+
 let set_sosa_zarith () = assert (!sosa = `None) ; sosa := `Zarith
 
 let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
@@ -32,6 +34,9 @@ let speclist =
   ; ( "--gwdb-legacy"
     , Arg.Unit set_gwdb_legacy
     , "Use legacy backend" )
+  ; ( "--sosa-legacy"
+    , Arg.Unit set_sosa_legacy
+    , "Use Sosa module implementation" )
   ; ( "--sosa-num"
     , Arg.Unit set_sosa_num
     , "Use Sosa module implementation based on `num` library" )
@@ -49,9 +54,14 @@ let () =
     | true -> "-D API", "piqirun.ext redis-sync yojson curl"
     | false -> "", ""
   in
+  if !sosa = `None then begin
+    if installed "zarith" then set_sosa_zarith ()
+    else if installed "num" then set_sosa_num ()
+    else set_sosa_legacy ()
+  end ;
   let sosa_pkg =
     match !sosa with
-    | `None ->
+    | `Legacy ->
       exclude_dir "sosa.num" ;
       exclude_dir "sosa.zarith" ;
       "geneweb-sosa"
@@ -63,6 +73,7 @@ let () =
       exclude_dir "sosa.array" ;
       exclude_dir "sosa.num" ;
       "geneweb-sosa-zarith"
+    | `None -> assert false
   in
   let wserver_pkg = "geneweb-wserver" in
   let gwdb_d, gwdb_pkg =
