@@ -1,6 +1,6 @@
 (library
  (name util)
- (public_name geneweb.util)
+ (public_name geneweb-lib.util)
  (wrapped false)
- (libraries stdlib-shims unidecode geneweb.def geneweb.io geneweb.gwdb.mli)
+ (libraries stdlib-shims unidecode geneweb-lib.def geneweb-lib.io geneweb-lib.gwdb.mli)
 )
