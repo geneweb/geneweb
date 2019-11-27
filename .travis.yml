@@ -2,19 +2,21 @@ sudo: required
 
 language: c
 
-os:
-  - linux
-  - osx
-
-env:
-  - OCAML_VERSION=4.05
-  - OCAML_VERSION=4.06
-  - OCAML_VERSION=4.07
-  - OCAML_VERSION=4.08
-  - OCAML_VERSION=4.09
-
-matrix:
+jobs:
   fast_finish: true
+  include:
+  - os: linux
+    env: OCAML_VERSION=4.05
+  - os: linux
+    env: OCAML_VERSION=4.06
+  - os: linux
+    env: OCAML_VERSION=4.07
+  - os: linux
+    env: OCAML_VERSION=4.08
+  - os: linux
+    env: OCAML_VERSION=4.09
+  - os: osx
+    env: OCAML_VERSION=4.09
 
 cache:
   directories:
