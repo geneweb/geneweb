@@ -113,25 +113,23 @@ piqi:
 endif
 .PHONY: piqi
 
-geneweb.install:
-	dune build @install
-.PHONY: geneweb.install
-
 %.exe: | piqi $(GENERATED_FILES_DEP)
 	dune build $@
 exe:
 	dune build $(ALL_EXE:=.exe)
 .DEFAULT_GOAL = exe
 
-geneweb.install exe: $(GENERATED_FILES_DEP) piqi
+install uninstall exe: $(GENERATED_FILES_DEP) piqi
 
 ###### [BEGIN] Installation / Distribution section
 
-install: geneweb.install
-	dune install geneweb
+install:
+	dune build @install
+	dune install
 
-uninstall: geneweb.install
-	dune uninstall geneweb
+uninstall:
+	dune build @install
+	dune uninstall
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
