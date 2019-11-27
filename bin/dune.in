@@ -5,7 +5,7 @@
   (package geneweb-bin)
   (name marshal_dico_place)
   (public_name marshal_dico_place)
-  (libraries unix %%%GWDB_PKG%%% geneweb %%%WSERVER_PKG%%%)
+  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
   (modules marshal_dico_place)
 )
 #else
@@ -19,13 +19,13 @@
   (public_name consang)
   (modules consang)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries unix %%%WSERVER_PKG%%% %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )
 
 (library
   (name db1link)
   (wrapped false)
-  (libraries unix %%%WSERVER_PKG%%% %%%GWDB_PKG%%% geneweb)
+  (libraries unix %%%GWDB_PKG%%% %%%WSERVER_PKG%%% geneweb)
   (modules db1link)
 )
 
@@ -34,14 +34,14 @@
   (public_name gwc)
   (modules gwc)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries unix %%%WSERVER_PKG%%% %%%GWDB_PKG%%% geneweb db1link)
+  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb db1link)
 )
 
 (executable
   (package geneweb-bin)
   (public_name ged2gwb)
   (modules ged2gwb utf8List)
-  (libraries unix str camlp5.gramlib %%%WSERVER_PKG%%% %%%GWDB_PKG%%% geneweb)
+  (libraries unix str camlp5.gramlib %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )
 
 #else
@@ -63,5 +63,5 @@
   (package geneweb-bin)
   (public_names gwtp)
   (modules gwtp httpEnv iolight)
-  (libraries unix %%%WSERVER_PKG%%% %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )

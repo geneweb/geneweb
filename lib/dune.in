@@ -6,7 +6,6 @@
  (synopsis "GeneWeb library")
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
-            %%%SOSA_PKG%%%
             %%%API_PKG%%%
             str
             stdlib-shims
@@ -14,6 +13,7 @@
             camlp5.gramlib
             geneweb.gwdb.mli
             geneweb.def
+            geneweb.sosa.mli
             geneweb.util
             geneweb.wserver.mli
             markup)
