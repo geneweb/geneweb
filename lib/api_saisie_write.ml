@@ -701,17 +701,17 @@ let compute_warnings conf base resp =
                   (Printf.sprintf
                      (fcapitale
                         (ftransl conf
-                           "the difference of age between %t and %t is quite important"))
-                     (fun _ -> print_someone fath)
-                     (fun _ -> print_someone moth))
+                           "the difference of age between %s and %s is quite important"))
+                     (print_someone fath)
+                     (print_someone moth))
                   ^ ": " ^ (DateDisplay.string_of_age conf a)
                 in
                 w :: wl
             | BirthAfterDeath p ->
                 let w =
                 Printf.sprintf
-                  (ftransl conf "%t died before his/her birth")
-                  (fun _ -> print_someone_dates p)
+                  (ftransl conf "%s died before his/her birth")
+                  (print_someone_dates p)
                 in
                 w :: wl
             | ChangedOrderOfChildren _ -> wl
@@ -746,7 +746,7 @@ let compute_warnings conf base resp =
                 (Printf.sprintf
                    (fcapitale
                       (ftransl conf
-                         "the following children of %t and %t are not in order"))
+                         "the following children of %s and %s are not in order"))
                    (fun _ ->
                      Gutil.designation base (poi base (get_father cpl)))
                    (fun _ ->
@@ -761,9 +761,9 @@ let compute_warnings conf base resp =
                 (Printf.sprintf
                    (fcapitale
                       (ftransl conf
-                         "the following children of %t and %t are born very close"))
-                   (fun _ -> print_someone (poi base (get_father cpl)))
-                   (fun _ -> print_someone (poi base (get_mother cpl))))
+                         "the following children of %s and %s are born very close"))
+                   (print_someone (poi base (get_father cpl)))
+                   (print_someone (poi base (get_mother cpl))))
                 ^ ": " ^
                 print_someone_dates elder ^ " " ^ print_someone_dates x
                 in
@@ -782,16 +782,16 @@ let compute_warnings conf base resp =
                 let w =
                 Printf.sprintf
                   (ftransl conf "\
-          %t is born more than 2 years after the death of his/her father %t")
-                  (fun _ -> print_someone_dates child)
-                  (fun _ -> print_someone_dates father)
+          %s is born more than 2 years after the death of his/her father %s")
+                  (print_someone_dates child)
+                  (print_someone_dates father)
                 in
                 w :: wl
             | FEventOrder (p, e1, e2) ->
                 let w =
                   Printf.sprintf
-                    (ftransl conf "%t's %s before his/her %s")
-                    (fun _ -> print_someone_dates p)
+                    (ftransl conf "%s's %s before his/her %s")
+                    (print_someone_dates p)
                     (Util.string_of_fevent_name conf base e1.efam_name)
                     (Util.string_of_fevent_name conf base e2.efam_name)
                 in
@@ -799,16 +799,16 @@ let compute_warnings conf base resp =
             | FWitnessEventAfterDeath (p, e) ->
                 let w =
                   Printf.sprintf
-                    (ftransl conf "%t witnessed the %s after his/her death")
-                    (fun _ -> print_someone_dates p)
+                    (ftransl conf "%s witnessed the %s after his/her death")
+                    (print_someone_dates p)
                     (Util.string_of_fevent_name conf base e.efam_name)
                 in
                 w :: wl
             | FWitnessEventBeforeBirth (p, e) ->
                 let w =
                   Printf.sprintf
-                    (ftransl conf "%t witnessed the %s before his/her birth")
-                    (fun _ -> print_someone_dates p)
+                    (ftransl conf "%s witnessed the %s before his/her birth")
+                    (print_someone_dates p)
                     (Util.string_of_fevent_name conf base e.efam_name)
                 in
                 w :: wl
@@ -816,8 +816,8 @@ let compute_warnings conf base resp =
                 let w =
                 Printf.sprintf
                   (fcapitale
-                     (ftransl conf "%t's sex is not coherent with his/her relations"))
-                  (fun _ -> print_someone p)
+                     (ftransl conf "%s's sex is not coherent with his/her relations"))
+                  (print_someone p)
                 in
                 w :: wl
             | IncoherentAncestorDate (anc, p) ->
@@ -830,23 +830,23 @@ let compute_warnings conf base resp =
             | MarriageDateAfterDeath p ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "marriage had occurred after the death of %t"))
-                  (fun _ -> print_someone_dates p)
+                  (fcapitale (ftransl conf "marriage had occurred after the death of %s"))
+                  (print_someone_dates p)
                 in
                 w :: wl
             | MarriageDateBeforeBirth p ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "marriage had occurred before the birth of %t"))
-                  (fun _ -> print_someone_dates p)
+                  (fcapitale (ftransl conf "marriage had occurred before the birth of %s"))
+                  (print_someone_dates p)
                 in
                 w :: wl
             | MotherDeadAfterChildBirth (mother, child) ->
                 let w =
                 Printf.sprintf
-                  (ftransl conf "%t is born after the death of his/her mother %t")
-                  (fun _ -> print_someone_dates child)
-                  (fun _ -> print_someone_dates mother)
+                  (ftransl conf "%s is born after the death of his/her mother %s")
+                  (print_someone_dates child)
+                  (print_someone_dates mother)
                 in
                 w :: wl
             | ParentBornAfterChild (p, c) ->
@@ -882,8 +882,8 @@ let compute_warnings conf base resp =
             | PEventOrder (p, e1, e2) ->
                 let w =
                   Printf.sprintf
-                    (ftransl conf "%t's %s before his/her %s")
-                    (fun _ -> print_someone_dates p)
+                    (ftransl conf "%s's %s before his/her %s")
+                    (print_someone_dates p)
                     (Util.string_of_pevent_name conf base e1.epers_name)
                     (Util.string_of_pevent_name conf base e2.epers_name)
                 in
@@ -891,26 +891,25 @@ let compute_warnings conf base resp =
             | PWitnessEventAfterDeath (p, e) ->
                 let w =
                   Printf.sprintf
-                    (ftransl conf "%t witnessed the %s after his/her death")
-                    (fun _ -> print_someone_dates p)
+                    (ftransl conf "%s witnessed the %s after his/her death")
+                    (print_someone_dates p)
                     (Util.string_of_pevent_name conf base e.epers_name)
                 in
                 w :: wl
             | PWitnessEventBeforeBirth (p, e) ->
                 let w =
                   Printf.sprintf
-                    (ftransl conf "%t witnessed the %s before his/her birth")
-                    (fun _ -> print_someone_dates p)
+                    (ftransl conf "%s witnessed the %s before his/her birth")
+                    (print_someone_dates p)
                     (Util.string_of_pevent_name conf base e.epers_name)
                 in
                 w :: wl
             | TitleDatesError (p, t) ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
-                  (fun _ -> print_someone_dates p)
-                  (fun _ ->
-                     Printf.sprintf "%s %s %s-%s"
+                  (fcapitale (ftransl conf "%s has incorrect title dates: %s"))
+                  (print_someone_dates p)
+                  (Printf.sprintf "%s %s %s-%s"
                        (sou base t.t_ident) (sou base t.t_place)
                        (match Adef.od_of_cdate t.t_date_start with
                         | Some d -> DateDisplay.string_of_date conf d
@@ -923,30 +922,30 @@ let compute_warnings conf base resp =
             | UndefinedSex p ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "undefined sex for %t"))
-                  (fun _ -> print_someone p)
+                  (fcapitale (ftransl conf "undefined sex for %s"))
+                  (print_someone p)
                 in
                 w :: wl
             | WitnessDateAfterDeath p ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "%t was witness after his/her death"))
-                  (fun _ -> print_someone_dates p)
+                  (fcapitale (ftransl conf "%s was witness after his/her death"))
+                  (print_someone_dates p)
                 in
                 w :: wl
             | WitnessDateBeforeBirth p ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "%t was witness before his/her birth"))
-                  (fun _ -> print_someone_dates p)
+                  (fcapitale (ftransl conf "%s was witness before his/her birth"))
+                  (print_someone_dates p)
                 in
                 w :: wl
             | YoungForMarriage (p, a) ->
                 let w =
                 print_someone p ^ " " ^
                   (Printf.sprintf
-                     (ftransl conf "married at age %t")
-                     (fun _ -> DateDisplay.string_of_age conf a))
+                     (ftransl conf "married at age %s")
+                     (DateDisplay.string_of_age conf a))
                 in
                 w :: wl)
           wl []
@@ -2405,7 +2404,7 @@ let check_input_person conf mod_p =
       if mod_p.Mwrite.Person.sex = `unknown then
         let err =
           Printf.sprintf
-            (ftransl conf "undefined sex for %t") (fun _ -> designation ())
+            (ftransl conf "undefined sex for %s") (designation ())
         in
         raise (Update.ModErr err)
       else ()

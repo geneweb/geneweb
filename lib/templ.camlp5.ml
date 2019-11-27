@@ -862,15 +862,16 @@ let apply_format conf nth s1 s2 =
       Some n -> Util.ftransl_nth conf s n
     | None -> Util.ftransl conf s
   in
-  match Util.check_format "%t" s1 with
-    Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
+  match Util.check_format "%s" s1 with
+    Some s3 -> Printf.sprintf (transl_nth_format s3) s2
   | None ->
-      match Util.check_format "%s" s1 with
-        Some s3 -> Printf.sprintf (transl_nth_format s3) s2
+      match Util.check_format "%d" s1 with
+        Some s3 -> Printf.sprintf (transl_nth_format s3) (int_of_string s2)
       | None ->
-          match Util.check_format "%d" s1 with
-            Some s3 -> Printf.sprintf (transl_nth_format s3) (int_of_string s2)
+          match Util.check_format "%t" s1 with
+            Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
           | None ->
+              (* TODO possibly add %s%d and %d%s *)
               match Util.check_format "%s%s" s1 with
                 Some s3 ->
                   let (s21, s22) =

@@ -193,7 +193,7 @@ val string_of_fevent
 val string_of_witness_kind : config -> sex -> witness_kind -> string
 
 val relation_txt :
-  config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format
+  config -> sex -> family -> (string -> 'a, 'b, 'c, 'd, 'd, 'a) format6
 
 val string_of_decimal_num : config -> float -> string
 

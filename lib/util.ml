@@ -2092,23 +2092,23 @@ let relation_txt conf sex fam =
   match get_relation fam with
   | NotMarried
   | NoSexesCheckNotMarried ->
-    ftransl_nth conf "relationship%t to" is
+    ftransl_nth conf "relationship%s to" is
   | MarriageContract  ->
-    ftransl_nth conf "marriage contract%t with" is
+    ftransl_nth conf "marriage contract%s with" is
   | MarriageLicense
   | Married
   | NoSexesCheckMarried ->
-    ftransl_nth conf "married%t to" is
+    ftransl_nth conf "married%s to" is
   | Engaged ->
-    ftransl_nth conf "engaged%t to" is
+    ftransl_nth conf "engaged%s to" is
   | MarriageBann ->
-    ftransl_nth conf "marriage banns%t to" is
+    ftransl_nth conf "marriage banns%s to" is
   | Pacs ->
-    ftransl_nth conf "pacsed%t to" is
+    ftransl_nth conf "pacsed%s to" is
   | Residence ->
-    ftransl_nth conf "residence%t to" is
+    ftransl_nth conf "residence%s to" is
   | NoMention ->
-    "%t" ^^ ftransl conf "with"
+    "%s" ^^ ftransl conf "with"
 
 let relation_date conf fam =
   match Adef.od_of_cdate (get_marriage fam) with
@@ -2195,7 +2195,7 @@ let husband_wife conf base p all =
         let conjoint = pget conf base conjoint in
         if not @@ is_empty_name conjoint
         then
-          translate_eval (Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> ""))
+          translate_eval (Printf.sprintf (relation_txt conf (get_sex p) fam) "")
         else loop (i + 1)
       else ""
     in

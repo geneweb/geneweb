@@ -59,8 +59,8 @@ let print_birth conf base =
 let print_death conf base =
   let (list, len) = select conf base death_date false in
   let title _ =
-    Wserver.printf (fcapitale (ftransl conf "the latest %t deaths"))
-      (fun _ -> string_of_int len)
+    Wserver.printf (fcapitale (ftransl conf "the latest %s deaths"))
+      (string_of_int len)
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -166,8 +166,8 @@ let print_death conf base =
                 "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"%s>" len
                 conf.xhs
         in
-        Wserver.printf (fcapitale (ftransl conf "the latest %t deaths"))
-          (fun _ -> ds)
+        Wserver.printf (fcapitale (ftransl conf "the latest %s deaths"))
+          (ds)
       end;
       Wserver.printf "\n... (%s...\n" (transl conf "before");
       Wserver.printf
@@ -385,8 +385,8 @@ let old_print_statistics conf =
       begin
         Wserver.printf "<li>";
         Wserver.printf "<a href=\"%sm=LD&k=%d\">" (commd conf) n;
-        Wserver.printf (ftransl conf "the latest %t deaths")
-          (fun _ -> string_of_int n);
+        Wserver.printf (ftransl conf "the latest %s deaths")
+          (string_of_int n);
         Wserver.printf "</a>";
         Wserver.printf "</li>\n"
       end;

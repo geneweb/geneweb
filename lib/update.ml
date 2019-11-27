@@ -271,12 +271,11 @@ let print_first_name_strong _conf base p =
 let string_of_error conf base = function
   | AlreadyDefined p ->
     Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+      (fcapitale (ftransl conf "name %s already used by %sthis person%s"))
       ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
        p_surname base p ^ "\"")
-      (fun _ ->
-         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-      (fun _ -> "</a>.")
+      (Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+      ("</a>.")
   | OwnAncestor p ->
     Printf.sprintf "%s\n%s" (print_someone_strong conf base p)
       (transl conf "would be his/her own ancestor")
@@ -306,14 +305,13 @@ let print_warning conf base =
       Wserver.printf
         (fcapitale
            (ftransl conf
-              "the difference of age between %t and %t is quite important"))
-        (fun _ -> print_someone_strong conf base fath)
-        (fun _ -> print_someone_strong conf base moth);
+              "the difference of age between %s and %s is quite important"))
+        (print_someone_strong conf base fath)
+        (print_someone_strong conf base moth);
       Wserver.printf ": %s" (DateDisplay.string_of_age conf a)
   | BirthAfterDeath p ->
-      Wserver.printf (ftransl conf "%t died before his/her birth")
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+      Wserver.printf (ftransl conf "%s died before his/her birth")
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | ChangedOrderOfChildren (ifam, _, before, after) ->
       let cpl = foi base ifam in
@@ -359,9 +357,9 @@ let print_warning conf base =
       Wserver.printf
         (fcapitale
            (ftransl conf
-              "the following children of %t and %t are not in order"))
-        (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
-        (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
+              "the following children of %s and %s are not in order"))
+        (print_someone_strong conf base (poi base (get_father cpl)))
+        (print_someone_strong conf base (poi base (get_mother cpl)));
       Wserver.printf ":\n";
       Wserver.printf "<ul>\n";
       Wserver.printf "<li>";
@@ -476,9 +474,9 @@ let print_warning conf base =
       Wserver.printf
         (fcapitale
            (ftransl conf
-              "the following children of %t and %t are born very close"))
-        (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
-        (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
+              "the following children of %s and %s are born very close"))
+        (print_someone_strong conf base (poi base (get_father cpl)))
+        (print_someone_strong conf base (poi base (get_mother cpl)));
       Wserver.printf ":\n";
       Wserver.printf "<ul>\n";
       Wserver.printf "<li>";
@@ -498,37 +496,33 @@ let print_warning conf base =
   | DeadTooEarlyToBeFather (father, child) ->
       Wserver.printf
         (ftransl conf "\
-%t is born more than 2 years after the death of his/her father %t")
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base child)
+%s is born more than 2 years after the death of his/her father %s")
+        (Printf.sprintf "%s%s" (print_someone_strong conf base child)
              (DateDisplay.short_dates_text conf base child))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base father)
+        (Printf.sprintf "%s%s" (print_someone_strong conf base father)
              (DateDisplay.short_dates_text conf base father))
   | FEventOrder (p, e1, e2) ->
-      Wserver.printf (fcapitale (ftransl conf "%t's %s before his/her %s"))
-        (fun _ -> print_someone_strong conf base p)
+      Wserver.printf (fcapitale (ftransl conf "%s's %s before his/her %s"))
+        (print_someone_strong conf base p)
         (Util.string_of_fevent_name conf base e1.efam_name)
         (Util.string_of_fevent_name conf base e2.efam_name)
   | FWitnessEventAfterDeath (p, e) ->
       Wserver.printf
-        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+        (fcapitale (ftransl conf "%s witnessed the %s after his/her death"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_fevent_name conf base e.efam_name)
   | FWitnessEventBeforeBirth (p, e) ->
       Wserver.printf
-        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+        (fcapitale (ftransl conf "%s witnessed the %s before his/her birth"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_fevent_name conf base e.efam_name)
   | IncoherentSex (p, _, _) ->
       Wserver.printf
         (fcapitale
-           (ftransl conf "%t's sex is not coherent with his/her relations"))
-        (fun _ -> print_someone_strong conf base p)
+           (ftransl conf "%s's sex is not coherent with his/her relations"))
+        (print_someone_strong conf base p)
   | IncoherentAncestorDate (anc, p) ->
       Wserver.printf "%s has a younger ancestor %s"
         (print_someone_strong conf base p)
@@ -536,25 +530,21 @@ let print_warning conf base =
   | MarriageDateAfterDeath p ->
       Wserver.printf
         (fcapitale
-           (ftransl conf "marriage had occurred after the death of %t"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+           (ftransl conf "marriage had occurred after the death of %s"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | MarriageDateBeforeBirth p ->
       Wserver.printf
         (fcapitale
-           (ftransl conf "marriage had occurred before the birth of %t"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+           (ftransl conf "marriage had occurred before the birth of %s"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | MotherDeadAfterChildBirth (mother, child) ->
       Wserver.printf
-        (ftransl conf "%t is born after the death of his/her mother %t")
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base child)
+        (ftransl conf "%s is born after the death of his/her mother %s")
+        (Printf.sprintf "%s%s" (print_someone_strong conf base child)
              (DateDisplay.short_dates_text conf base child))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base mother)
+        (Printf.sprintf "%s%s" (print_someone_strong conf base mother)
              (DateDisplay.short_dates_text conf base mother))
   | ParentBornAfterChild (p, c) ->
       Wserver.printf "%s\n%s\n%s" (print_someone_strong conf base p)
@@ -575,32 +565,28 @@ let print_warning conf base =
       (print_someone_strong conf base @@ poi base @@ get_father f)
       (print_someone_strong conf base @@ poi base @@ get_mother f)
   | PEventOrder (p, e1, e2) ->
-      Wserver.printf (fcapitale (ftransl conf "%t's %s before his/her %s"))
-        (fun _ -> print_someone_strong conf base p)
+      Wserver.printf (fcapitale (ftransl conf "%s's %s before his/her %s"))
+        (print_someone_strong conf base p)
         (Util.string_of_pevent_name conf base e1.epers_name)
         (Util.string_of_pevent_name conf base e2.epers_name)
   | PWitnessEventAfterDeath (p, e) ->
       Wserver.printf
-        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+        (fcapitale (ftransl conf "%s witnessed the %s after his/her death"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_pevent_name conf base e.epers_name)
   | PWitnessEventBeforeBirth (p, e) ->
       Wserver.printf
-        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+        (fcapitale (ftransl conf "%s witnessed the %s before his/her birth"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_pevent_name conf base e.epers_name)
   | TitleDatesError (p, t) ->
       Wserver.printf
-        (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+        (fcapitale (ftransl conf "%s has incorrect title dates: %s"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
-        (fun _ ->
-           Printf.sprintf "<strong>%s %s</strong> <em>%s-%s</em>"
+        (Printf.sprintf "<strong>%s %s</strong> <em>%s-%s</em>"
              (sou base t.t_ident) (sou base t.t_place)
              (match Adef.od_of_cdate t.t_date_start with
                 Some d -> DateDisplay.string_of_date conf d
@@ -609,24 +595,22 @@ let print_warning conf base =
                 Some d -> DateDisplay.string_of_date conf d
               | _ -> ""))
   | UndefinedSex p ->
-      Wserver.printf (fcapitale (ftransl conf "undefined sex for %t"))
-        (fun _ -> print_someone_strong conf base p)
+      Wserver.printf (fcapitale (ftransl conf "undefined sex for %s"))
+        (print_someone_strong conf base p)
   | WitnessDateAfterDeath p ->
       Wserver.printf
-        (fcapitale (ftransl conf "%t was witness after his/her death"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+        (fcapitale (ftransl conf "%s was witness after his/her death"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | WitnessDateBeforeBirth p ->
       Wserver.printf
-        (fcapitale (ftransl conf "%t was witness before his/her birth"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+        (fcapitale (ftransl conf "%s was witness before his/her birth"))
+        (Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | YoungForMarriage (p, a) ->
       Wserver.printf "%s\n" (print_someone_strong conf base p);
-      Wserver.printf (ftransl conf "married at age %t")
-        (fun _ -> DateDisplay.string_of_age conf a)
+      Wserver.printf (ftransl conf "married at age %s")
+        (DateDisplay.string_of_age conf a)
 
 let print_warnings conf base wl =
   print_list_aux conf base "warnings" wl @@ fun conf base wl ->
@@ -1065,12 +1049,11 @@ let text_of_var conf =
 let print_create_conflict conf base p var =
   let err =
     Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+      (fcapitale (ftransl conf "name %s already used by %sthis person%s"))
       ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
        p_surname base p ^ "\" (" ^ text_of_var conf var ^ ")")
-      (fun _ ->
-         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-      (fun _ -> "</a>.");
+      (Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+      ("</a>.");
   in
 #ifdef API
   if not !Api_conf.mode_api then begin

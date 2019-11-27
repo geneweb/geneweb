@@ -411,246 +411,246 @@ sk: %s, bude %s
 sl: %s, bo %s od
 sv: %s, är det %s till
 
-    %t already has parents
-af: %t het reeds ouers
-bg: %t вече има родители
-br: %t en deus kerent endeo
-ca: els pares de %t ja existeixen
-co: %t hà dighjà genitori
-cs: %t už má rodiče
-da: %t har allerede forældre
-de: %t hat schon Eltern
-en: %t already has parents
-eo: %t havas jam gepatrojn
-es: los padres de %t ya existen
-et: isikul %t on juba vanemad
-fi: henkilöllä %t on jo vanhemmat
-fr: %t a déjà des parents
-he:   ל- %t יש כבר הורים
-is: %t er þegar með foreldra
-it: %t ha già dei genitori
-lv: %t jau ir vecāki
-nl: %t heeft al ouders
-no: %t har allerede foreldre
-oc: los parents de %t existisson ja
-pl: %t już ma rodziców
-pt: os pais de %t já existem
-ro: %t are deja parinti
-ru: %t уже имеет родителей
-sk: %t už má rodičov
-sl: %t že ima starše
-sv: %t har redan föräldrar
+    %s already has parents
+af: %s het reeds ouers
+bg: %s вече има родители
+br: %s en deus kerent endeo
+ca: els pares de %s ja existeixen
+co: %s hà dighjà genitori
+cs: %s už má rodiče
+da: %s har allerede forældre
+de: %s hat schon Eltern
+en: %s already has parents
+eo: %s havas jam gepatrojn
+es: los padres de %s ya existen
+et: isikul %s on juba vanemad
+fi: henkilöllä %s on jo vanhemmat
+fr: %s a déjà des parents
+he:   ל- %s יש כבר הורים
+is: %s er þegar með foreldra
+it: %s ha già dei genitori
+lv: %s jau ir vecāki
+nl: %s heeft al ouders
+no: %s har allerede foreldre
+oc: los parents de %s existisson ja
+pl: %s już ma rodziców
+pt: os pais de %s já existem
+ro: %s are deja parinti
+ru: %s уже имеет родителей
+sk: %s už má rodičov
+sl: %s že ima starše
+sv: %s har redan föräldrar
 
-    %t died before his/her birth
-af: %t is dood voor sy/haar geboorte
-bg: %t умира преди раждането си
-br: %t zo marv a-raok e c'h(he g)anedigezh
-ca: %t va morir abans del seu naixement
-co: %t hè mortu(a) nanzu a so nascita
-cs: %t zemřel před svým narozením/zemřela před svým narozením
-da: %t er døde før fødslen
-de: %t ist vor der Geburt gestorben
-en: %t died before his/her birth
-eo: %t mortis antaù sia naskiĝo
-es: %t ha muerto antes de su nacimiento
-et: %t suri enne oma sündi
-fi: %t on kuollut ennen syntymäänsä
-fr: %t est mort(e) avant sa naissance
-he: %t מת לפני הולדתו/הולדתה
-is: %t lést áður en hann/hún fæddist
-it: %t sarebbe morto prima della sua nascita
-lv: %t miris pirms viņš/viņa dzimusi
-nl: %t zou dood zijn voor zijn/haar geboorte
-no: %t døde før sin fødsel
-oc: %t moriguèt abans la naissença
-pl: %t zmarł przed swymi narodzinami/zmarła przed swymi narodzinami
-pt: %t morreu antes de nascer
-ro: %t a murit inaninte de nastere
-ru: %t умер перед его/ее рождением
-sk: %t zomrel pred svojim narodením/zomrela pred svojim narodením
-sl: %t je umrl pred svojim rojstvom/umrla pred svojim rojstvom
-sv: %t dog före sin egen födelse
+    %s died before his/her birth
+af: %s is dood voor sy/haar geboorte
+bg: %s умира преди раждането си
+br: %s zo marv a-raok e c'h(he g)anedigezh
+ca: %s va morir abans del seu naixement
+co: %s hè mortu(a) nanzu a so nascita
+cs: %s zemřel před svým narozením/zemřela před svým narozením
+da: %s er døde før fødslen
+de: %s ist vor der Geburt gestorben
+en: %s died before his/her birth
+eo: %s mortis antaù sia naskiĝo
+es: %s ha muerto antes de su nacimiento
+et: %s suri enne oma sündi
+fi: %s on kuollut ennen syntymäänsä
+fr: %s est mort(e) avant sa naissance
+he: %s מת לפני הולדתו/הולדתה
+is: %s lést áður en hann/hún fæddist
+it: %s sarebbe morto prima della sua nascita
+lv: %s miris pirms viņš/viņa dzimusi
+nl: %s zou dood zijn voor zijn/haar geboorte
+no: %s døde før sin fødsel
+oc: %s moriguèt abans la naissença
+pl: %s zmarł przed swymi narodzinami/zmarła przed swymi narodzinami
+pt: %s morreu antes de nascer
+ro: %s a murit inaninte de nastere
+ru: %s умер перед его/ее рождением
+sk: %s zomrel pred svojim narodením/zomrela pred svojim narodením
+sl: %s je umrl pred svojim rojstvom/umrla pred svojim rojstvom
+sv: %s dog före sin egen födelse
 
-    %t has incorrect title dates: %t
-af: %t die datum voor sy titel is verkeerd: %t
-bg: %t има некоректни данни за титла: %t
-br: %t en(he) deus deiziadoù-tiltloù direizh : %t
-ca: %t té les dates d'un títol incorrectes
-co: %t hà date di tituli incurretti : %t
-cs: %t má nesprávné údaje o titulech: %t
-da: %t har ukorrekte titeldatoangivelser: %t
-de: die Datumsangaben eines Titels von %t sind falsch: %t
-en: %t has incorrect title dates: %t
-eo: la nobeltitolaj datoj de %t estas malkorektaj: %t
-es: las fechas de un título de %t son incorrectas: %t
-et: isiku %t tiitli kuupäev %t on vigane
-fi: henkilön %t arvonimen päivämäärässä %t on virhe
-fr: %t a des dates de titre incorrectes : %t
-he:  תאריכים לתארים של %t אינם נכונים: %t
-is: %t hefur vitlausa dagsetningu %t
-it: alcune date dei titoli di %t sono incorrette: %t
-lv: %t ir nekorekti datumi: %t
-nl: %t de data voor titels zijn niet correct
-no: %t har feil titeldato %t
-oc: %t a las datas d'un títol incorrèctas: %t
-pl: %t ma wpisane nieprawidłowe daty używania tytułu
-pt: as datas de um título de %t não estão correctas
-pt-br: as datas de um título de %t não estão corretas
-ro: %t are data de titlu incorrecta %t
-ru: %t имеет неправильное название даты: %t
-sk: %t má nesprávne údaje o tituloch: %t
-sl: %t ima napačne datume naslova
-sv: %t har felaktiga titeldatum: %t
+    %s has incorrect title dates: %s
+af: %s die datum voor sy titel is verkeerd: %s
+bg: %s има некоректни данни за титла: %s
+br: %s en(he) deus deiziadoù-tiltloù direizh : %s
+ca: %s té les dates d'un títol incorrectes
+co: %s hà date di tituli incurretti : %s
+cs: %s má nesprávné údaje o titulech: %s
+da: %s har ukorrekte titeldatoangivelser: %s
+de: die Datumsangaben eines Titels von %s sind falsch: %s
+en: %s has incorrect title dates: %s
+eo: la nobeltitolaj datoj de %s estas malkorektaj: %s
+es: las fechas de un título de %s son incorrectas: %s
+et: isiku %s tiitli kuupäev %s on vigane
+fi: henkilön %s arvonimen päivämäärässä %s on virhe
+fr: %s a des dates de titre incorrectes : %s
+he:  תאריכים לתארים של %s אינם נכונים: %s
+is: %s hefur vitlausa dagsetningu %s
+it: alcune date dei titoli di %s sono incorrette: %s
+lv: %s ir nekorekti datumi: %s
+nl: %s de data voor titels zijn niet correct
+no: %s har feil titeldato %s
+oc: %s a las datas d'un títol incorrèctas: %s
+pl: %s ma wpisane nieprawidłowe daty używania tytułu
+pt: as datas de um título de %s não estão correctas
+pt-br: as datas de um título de %s não estão corretas
+ro: %s are data de titlu incorrecta %s
+ru: %s имеет неправильное название даты: %s
+sk: %s má nesprávne údaje o tituloch: %s
+sl: %s ima napačne datume naslova
+sv: %s har felaktiga titeldatum: %s
 
-    %t is born after the death of his/her mother %t
-af: %t is gebore na die afsterwe van sy/haar moeder %t
-bg: %t ражда се след смъртта на майка си %t
-br: %t a zo bet ganet goude marv e vamm (he mamm) %t
-ca: %t va néixer després de la mort de la seva mare
-co: %t hè natu(a) dopu a morte di a so mamma %t
-cs: %t narozen/narozena po smrti své matky %t
-da: %t er født efter moderens død %t
-de: %t ist nach dem Tod der Mutter %t geboren
-en: %t is born after the death of his/her mother %t
-eo: %t naskiĝis post la morto de sia patrino %t
-es: %t ha nacido después de la muerte de su madre %t
-et: %t on sündinud pärast oma ema %t surma
-fi: %t on syntynyt äitinsä kuoleman jälkeen %t
-fr: %t est né(e) après la mort de sa mère %t
-he: %t  נלד(ה) אחרי מוות האם
-is: %t er fædd(ur) eftir andlát móður sinnar %t
-it: %t sarebbe nato dopo la morte di sua madre %t
-lv: %t dzimis pēc viņa/viņas mātes nāves %t
-nl: %t zou geboren zijn na de dood van zijn/haar moeder %t
-no: %t er født etter sin mors død %t
-oc: %t es nascut/da après la mòrt de la maire
-pl: %t urodził się/urodziła się po śmierci swojej matki: %t
-pt: %t nasceu depois do óbito da mãe
-ro: %t e nascut dupa decesul mamei
-ru: %t родился после смерти его/ее матери %t
-sk: %t narodený/narodená po smrti svojej matky %t
-sl: %t je rojen(a) po smrti svoje matere
-sv: %t är född efter att sin egen mor dog %t
+    %s is born after the death of his/her mother %s
+af: %s is gebore na die afsterwe van sy/haar moeder %s
+bg: %s ражда се след смъртта на майка си %s
+br: %s a zo bet ganet goude marv e vamm (he mamm) %s
+ca: %s va néixer després de la mort de la seva mare
+co: %s hè natu(a) dopu a morte di a so mamma %s
+cs: %s narozen/narozena po smrti své matky %s
+da: %s er født efter moderens død %s
+de: %s ist nach dem Tod der Mutter %s geboren
+en: %s is born after the death of his/her mother %s
+eo: %s naskiĝis post la morto de sia patrino %s
+es: %s ha nacido después de la muerte de su madre %s
+et: %s on sündinud pärast oma ema %s surma
+fi: %s on syntynyt äitinsä kuoleman jälkeen %s
+fr: %s est né(e) après la mort de sa mère %s
+he: %s  נלד(ה) אחרי מוות האם
+is: %s er fædd(ur) eftir andlát móður sinnar %s
+it: %s sarebbe nato dopo la morte di sua madre %s
+lv: %s dzimis pēc viņa/viņas mātes nāves %s
+nl: %s zou geboren zijn na de dood van zijn/haar moeder %s
+no: %s er født etter sin mors død %s
+oc: %s es nascut/da après la mòrt de la maire
+pl: %s urodził się/urodziła się po śmierci swojej matki: %s
+pt: %s nasceu depois do óbito da mãe
+ro: %s e nascut dupa decesul mamei
+ru: %s родился после смерти его/ее матери %s
+sk: %s narodený/narodená po smrti svojej matky %s
+sl: %s je rojen(a) po smrti svoje matere
+sv: %s är född efter att sin egen mor dog %s
 
-    %t is born more than 2 years after the death of his/her father %t
-af: %t is gebore meer as 2 jaar na die afsterwe van sy/haar vader %t
-bg: %t се ражда по-късно от две години след смъртта на баща си  %t
-br: %t a zo bet ganet ouzhpenn daou vloaz goude marv e dad (he zad) %t
-ca: %t va néixer més de dos anys després de la mort del seu pare
-co: %t hè natu(a) più di 2 anni dopu a morte di u so babbu %t
-cs: %t narozen/narozena více než dva roky po smrti svého otce: %t
-da: %t er født senere end 2 å efter faderens død %t
-de: %t ist mehr als 2 Jahre nach dem Tod des Vaters %t geboren
-en: %t is born more than 2 years after the death of his/her father %t
-eo: %t naskiĝis pli ol 2 jaroj post la morto de sia patro %t
-es: %t ha nacido más de 2 años después de la muerte de su padre %
-et: %t on sündinud enam kui 2 aastat pärast oma isa %t surma
-fi: %t on syntynyt yli 2 vuotta isänsä kuoleman jälkeen %t
-fr: %t est né(e) plus de 2 ans après la mort de son père %t
-he: %t  נלד(ה) יותר משנתיים אחרי מוות האב
-is: %t er fædd(ur) meira en 2 árum eftir andlát föður síns %t
-it: %t sarebbe nato più di 2 anni dopo la morte di suo padre %t
-lv: %t ir dzimis vairāk kā 2 gadus pēc sava tēva nāves %t
-nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
-no: %t er født mer enn 2 år etter sin fars død %t
-oc: %t es nascut/da mai de dos ans après la mòrt del paire
-pl: %t urodził się/urodziła się ponad 2 lata po śmierci swojego ojca: %t
-pt: %t nasceu mais de 2 anos depois do óbito do pai
-ro: %t e nascut mai mult de doi ani dupa decesul tatalui
-ru: %t родился более, чем через 2 года после смерти его/ее отца %t
-sk: %t narodený/narodená viac ako dva roky po smrti svojho otca: %t
-sl: %t je rojen(a) več kot 2 leti po smrti svojega očeta
-sv: %t är född mer än 2 år efter att sin egen far dog %t
+    %s is born more than 2 years after the death of his/her father %s
+af: %s is gebore meer as 2 jaar na die afsterwe van sy/haar vader %s
+bg: %s се ражда по-късно от две години след смъртта на баща си  %s
+br: %s a zo bet ganet ouzhpenn daou vloaz goude marv e dad (he zad) %s
+ca: %s va néixer més de dos anys després de la mort del seu pare
+co: %s hè natu(a) più di 2 anni dopu a morte di u so babbu %s
+cs: %s narozen/narozena více než dva roky po smrti svého otce: %s
+da: %s er født senere end 2 å efter faderens død %s
+de: %s ist mehr als 2 Jahre nach dem Tod des Vaters %s geboren
+en: %s is born more than 2 years after the death of his/her father %s
+eo: %s naskiĝis pli ol 2 jaroj post la morto de sia patro %s
+es: %s ha nacido más de 2 años después de la muerte de su padre %
+et: %s on sündinud enam kui 2 aastat pärast oma isa %s surma
+fi: %s on syntynyt yli 2 vuotta isänsä kuoleman jälkeen %s
+fr: %s est né(e) plus de 2 ans après la mort de son père %s
+he: %s  נלד(ה) יותר משנתיים אחרי מוות האב
+is: %s er fædd(ur) meira en 2 árum eftir andlát föður síns %s
+it: %s sarebbe nato più di 2 anni dopo la morte di suo padre %s
+lv: %s ir dzimis vairāk kā 2 gadus pēc sava tēva nāves %s
+nl: %s is geboren meer dan twee jaar na de dood van zijn/haar vader
+no: %s er født mer enn 2 år etter sin fars død %s
+oc: %s es nascut/da mai de dos ans après la mòrt del paire
+pl: %s urodził się/urodziła się ponad 2 lata po śmierci swojego ojca: %s
+pt: %s nasceu mais de 2 anos depois do óbito do pai
+ro: %s e nascut mai mult de doi ani dupa decesul tatalui
+ru: %s родился более, чем через 2 года после смерти его/ее отца %s
+sk: %s narodený/narodená viac ako dva roky po smrti svojho otca: %s
+sl: %s je rojen(a) več kot 2 leti po smrti svojega očeta
+sv: %s är född mer än 2 år efter att sin egen far dog %s
 
-    %t was witness after his/her death
-co: %t era testimone dopu a so morta
-de: %t war Zeitzeuge nach seinem Tod
-en: %t was a witness after their death
-es: %t era testigo tras su muerte
-fi: %t oli todistaja hänen kuolemansa jälkeen
-fr: %t était témoin après sa mort
-it: %t era testimone dopo la sua morte
-nl: %t was getuige na zijn overlijden
-no: %t var vitne etter deres død
-oc: %t foguèt testimòni après la mòrt
-pt: %t foi testemunha após a sua morte
-ru: %t был(а) свидетелем после своей смерти
-sv: %t var vittne vid hennes/hans död
+    %s was witness after his/her death
+co: %s era testimone dopu a so morta
+de: %s war Zeitzeuge nach seinem Tod
+en: %s was a witness after their death
+es: %s era testigo tras su muerte
+fi: %s oli todistaja hänen kuolemansa jälkeen
+fr: %s était témoin après sa mort
+it: %s era testimone dopo la sua morte
+nl: %s was getuige na zijn overlijden
+no: %s var vitne etter deres død
+oc: %s foguèt testimòni après la mòrt
+pt: %s foi testemunha após a sua morte
+ru: %s был(а) свидетелем после своей смерти
+sv: %s var vittne vid hennes/hans död
 
-    %t was witness before his/her birth
-co: %t era testimone nanzu a so nascita
-de: %t war Zeitzeuge vor seiner Geburt
-en: %t was a witness before their birth
-es: %t era testigo antes de su nacimiento
-fi: %t oli todistaja ennen hänen syntymäänsä
-fr: %t était témoin avant sa naissance
-it: %t era testimone prima della sua nascita
-nl: %t was getuige voor zijn geboorte
-no: %t var vitne før deres fødsel
-oc: %t foguèt testimòni abans la naissença
-pt: %t foi testemunha antes do seu nascimento
-ru: %t был(а) свидетелем до своего рождения
-sv: %t var vittne innan hennes/hans död
+    %s was witness before his/her birth
+co: %s era testimone nanzu a so nascita
+de: %s war Zeitzeuge vor seiner Geburt
+en: %s was a witness before their birth
+es: %s era testigo antes de su nacimiento
+fi: %s oli todistaja ennen hänen syntymäänsä
+fr: %s était témoin avant sa naissance
+it: %s era testimone prima della sua nascita
+nl: %s was getuige voor zijn geboorte
+no: %s var vitne før deres fødsel
+oc: %s foguèt testimòni abans la naissença
+pt: %s foi testemunha antes do seu nascimento
+ru: %s был(а) свидетелем до своего рождения
+sv: %s var vittne innan hennes/hans död
 
-    %t witnessed the %s after his/her death
-co: %t hè statu testimone d[i']%s dopu a so morta
-de: %t war Zeuge bei der %s nach seinem Tod
-en: %t was a witness at a %s after their own death
-es: %t ha sido testigo de %s después de su muerte
-fr: %t a été témoin de %s après sa mort
-it: %t è stato testimone del %s dopo la sua morte
-pt: %t foi testemunha de %s depois da sua morte
-ru: %t был(а) свидетелем %s после его/её смерти
+    %s witnessed the %s after his/her death
+co: %s hè statu testimone d[i']%s dopu a so morta
+de: %s war Zeuge bei der %s nach seinem Tod
+en: %s was a witness at a %s after their own death
+es: %s ha sido testigo de %s después de su muerte
+fr: %s a été témoin de %s après sa mort
+it: %s è stato testimone del %s dopo la sua morte
+pt: %s foi testemunha de %s depois da sua morte
+ru: %s был(а) свидетелем %s после его/её смерти
 
-    %t witnessed the %s before his/her birth
-co: %t hè statu testimone d[i']%s nanzu a so nascita
-de: %t war Zeuge bei der %s vor seiner Geburt
-en: %t was a witness at a %s before their own birth
-es: %t ha sido testigo de %s antes de su nacimiento
-fr: %t a été témoin de %s avant sa naissance
-it: %t è stato testimone del %s prima della sua nascita
-pt: %t foi testemunha de %s antes do seu nascimento
-ru: %t был(а) свидетелем %s до его/её рождения
+    %s witnessed the %s before his/her birth
+co: %s hè statu testimone d[i']%s nanzu a so nascita
+de: %s war Zeuge bei der %s vor seiner Geburt
+en: %s was a witness at a %s before their own birth
+es: %s ha sido testigo de %s antes de su nacimiento
+fr: %s a été témoin de %s avant sa naissance
+it: %s è stato testimone del %s prima della sua nascita
+pt: %s foi testemunha de %s antes do seu nascimento
+ru: %s был(а) свидетелем %s до его/её рождения
 
-    %t's %s before his/her %s
-co: %t: %s nanzu a/u so %s
-de: %t: %s vor seiner/ihrer %s
-en: %t: %s before their %s
-es: %t : %s antes de su %s
-fr: %t : %s avant son/sa %s
-it: %t : %s prima della suo/sua %s
-pt: %t: %s antes de seu/sua %s
-ru: %t: %s до их %s
+    %s's %s before his/her %s
+co: %s: %s nanzu a/u so %s
+de: %s: %s vor seiner/ihrer %s
+en: %s: %s before their %s
+es: %s : %s antes de su %s
+fr: %s : %s avant son/sa %s
+it: %s : %s prima della suo/sua %s
+pt: %s: %s antes de seu/sua %s
+ru: %s: %s до их %s
 
-    %t's sex is not coherent with his/her relations
-af: %t se geslag stem nie ooreen met sy/haar verwantskap nie
-bg: полът на %t не се съгласува с посочените взаимоотношения
-br: reizh %t ne glot ket gant al liammoù anezhañ(anezhi)
-ca: el sexe de %t no és coherent amb les seves relacions
-co: u sessu di %t ùn currisponde micca à e so rilazioni
-cs: pohlaví %t se neshoduje s jeho/jejími vztahy
-da: %t's køn er ikke kohærent med hans/hendes forbindelser
-de: %t's Geschlecht stimmt nicht mit ihren/seinen Beziehungen überein
-en: %t's sex is not coherent with his/her relations
-eo: la sekso de %t ne koheras kun siaj rilatoj
-es: el género de %t es incoherente con sus relaciones
-et: isiku %t sugu ei sobi tema suhetega
-fi: henkilön %t sukupuoli ja hänen suhteensa eivät täsmää
-fr: le sexe de %t n’est pas cohérent avec ses relations
-he:  המין של %t לא מתאים ליחסיו/ליחסיה
-is: kyn %t er ekki í samræmi við skyldleika
-it: il sesso di %t non e' coerente con le sue relazioni
-lv: personas %t neatbilst viņa/viņas attiecībām
-nl: het geslacht van %t klopt niet met zijn/haar relaties
-no: %ts kjønn er uforenlig med forbindelsene hans/hennes
-oc: lo sèxe de %t es pas coerent amb las relacions
-pl: %t: jego/jej płeć nie odpowiada jego/jej związkom
-pt: o sexo de %t não é coerente com suas relações
-ro: %t are genul incoerent cu relatia
-ru: пол %t не стыкуется с его/ее взаимоотношениями
-sk: pohlavie %t sa nezhodnuje s jeho/jej vzťahmi
-sl: spol %t ni usklajen z zvezami
-sv: %ts kön stämmer inte överens med sina relationer
+    %s's sex is not coherent with his/her relations
+af: %s se geslag stem nie ooreen met sy/haar verwantskap nie
+bg: полът на %s не се съгласува с посочените взаимоотношения
+br: reizh %s ne glot ket gant al liammoù anezhañ(anezhi)
+ca: el sexe de %s no és coherent amb les seves relacions
+co: u sessu di %s ùn currisponde micca à e so rilazioni
+cs: pohlaví %s se neshoduje s jeho/jejími vztahy
+da: %s's køn er ikke kohærent med hans/hendes forbindelser
+de: %s's Geschlecht stimmt nicht mit ihren/seinen Beziehungen überein
+en: %s's sex is not coherent with his/her relations
+eo: la sekso de %s ne koheras kun siaj rilatoj
+es: el género de %s es incoherente con sus relaciones
+et: isiku %s sugu ei sobi tema suhetega
+fi: henkilön %s sukupuoli ja hänen suhteensa eivät täsmää
+fr: le sexe de %s n’est pas cohérent avec ses relations
+he:  המין של %s לא מתאים ליחסיו/ליחסיה
+is: kyn %s er ekki í samræmi við skyldleika
+it: il sesso di %s non e' coerente con le sue relazioni
+lv: personas %s neatbilst viņa/viņas attiecībām
+nl: het geslacht van %s klopt niet met zijn/haar relaties
+no: %ss kjønn er uforenlig med forbindelsene hans/hennes
+oc: lo sèxe de %s es pas coerent amb las relacions
+pl: %s: jego/jej płeć nie odpowiada jego/jej związkom
+pt: o sexo de %s não é coerente com suas relações
+ro: %s are genul incoerent cu relatia
+ru: пол %s не стыкуется с его/ее взаимоотношениями
+sk: pohlavie %s sa nezhodnuje s jeho/jej vzťahmi
+sl: spol %s ni usklajen z zvezami
+sv: %ss kön stämmer inte överens med sina relationer
 
     (date)
 af: 1 %m %y/%d %m %y/%m %y/%y
@@ -959,35 +959,35 @@ sk: :
 sl: :
 sv: :
 
-    <em>Sosa number</em> relative to %t
-af: <em>Sosa nommer</em> relatief tot %t
-bg: <em>число на Соса</em> относно %t
-br: <em>niverenn Sosa</em> e keñver %t
-ca: <em>número "Sosa"</em>relatiu a %t
-co: <em>numeru Sosa</em> rilativu à %t
-cs: <em>"Sosa" číslo</em> vztažené k %t
-da: <em>Sosa-nummer</em>, refererende til %t
-de: <em>Ahnenkennziffer</em> relativ zu %t
-en: <em>Sosa number</em> relative to %t
-eo: <em>numero Sosa</em> relative al %t
-es: <em>número Sosa</em> respecto a %t
-et: <em>Sosa number</em> %t suhtes
-fi: <em>Sosa-numero</em> %t suhteen
-fr: <em>numéro Sosa</em> par rapport à %t
-he: <em> מספר Sosa </em> ביחס ל- %t
-is: <em>Sosa númer</em> tengt %t
-it: <em>Numero Sosa</em> relativo a %t
-lv: <em>SOSA pakāpe</em> attiecībā pret %t
-nl: <em>Sosa nummer</em> ten opzichte van %t
-no: <em>Anenummer</em> i forhold til %t
-oc: <em>numèro Sosa</em>relatiu a %t
-pl: <em>numer "Sosa"</em>, odnoszący się do: %t
-pt: <em>número Sosa</em> em relação a %t
+    <em>Sosa number</em> relative to %s
+af: <em>Sosa nommer</em> relatief tot %s
+bg: <em>число на Соса</em> относно %s
+br: <em>niverenn Sosa</em> e keñver %s
+ca: <em>número "Sosa"</em>relatiu a %s
+co: <em>numeru Sosa</em> rilativu à %s
+cs: <em>"Sosa" číslo</em> vztažené k %s
+da: <em>Sosa-nummer</em>, refererende til %s
+de: <em>Ahnenkennziffer</em> relativ zu %s
+en: <em>Sosa number</em> relative to %s
+eo: <em>numero Sosa</em> relative al %s
+es: <em>número Sosa</em> respecto a %s
+et: <em>Sosa number</em> %s suhtes
+fi: <em>Sosa-numero</em> %s suhteen
+fr: <em>numéro Sosa</em> par rapport à %s
+he: <em> מספר Sosa </em> ביחס ל- %s
+is: <em>Sosa númer</em> tengt %s
+it: <em>Numero Sosa</em> relativo a %s
+lv: <em>SOSA pakāpe</em> attiecībā pret %s
+nl: <em>Sosa nummer</em> ten opzichte van %s
+no: <em>Anenummer</em> i forhold til %s
+oc: <em>numèro Sosa</em>relatiu a %s
+pl: <em>numer "Sosa"</em>, odnoszący się do: %s
+pt: <em>número Sosa</em> em relação a %s
 ro: <em>numar Sosa</em> in relatie cu
-ru: <em>Sosa номер</em> относительно %t
-sk: <em>"Sosa" číslo</em> vo vzťahu k %t
-sl: <em>številka"Sosa"</em>, v odnosu z %t
-sv: <em>annummer</em> med %t som proband (Kekules system)
+ru: <em>Sosa номер</em> относительно %s
+sk: <em>"Sosa" číslo</em> vo vzťahu k %s
+sl: <em>številka"Sosa"</em>, v odnosu z %s
+sv: <em>annummer</em> med %s som proband (Kekules system)
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
@@ -5517,35 +5517,35 @@ sk: snúbenci
 sl: zaroka
 sv: förlovad
 
-    engaged%t to
-af: verloof%t aan
-bg: сгоден%t с/сгодена%t с
-br: dimezet%t gant
-ca: promès%t amb/promesa%t amb
-co: fidanzatu%t cù/fidanzata%t cù
+    engaged%s to
+af: verloof%s aan
+bg: сгоден%s с/сгодена%s с
+br: dimezet%s gant
+ca: promès%s amb/promesa%s amb
+co: fidanzatu%s cù/fidanzata%s cù
 cs: zasnoubený s/zasnoubená s
-da: forlovet%t med
-de: verlobt%t mit
-en: engaged%t to
-eo: fianĉigita%t kun/fianĉinigita%t kun
-es: comprometido%t con/comprometida%t con
-et: kihlatud%t
-fi: kihloissa%t kanssa
-fr: fiancé%t avec/fiancée%t avec
-he:   התארס  %t עם/ התארסה  %t עם
-is: trúlofaðist%t
-it: fidanzato%t con/fidanzata%t con
-lv: saderināts%t ar
-nl: verloofd%t met
-no: forlovet%t med
-oc: promés%t amb/promesa%t amb
-pl: zaręczony%t z:/zaręczona%t z:
-pt: noivo%t de/noiva%t de
-ro: logodit%t cu/logodita%t cu
-ru: %t помолвлен с
-sk: zasnúbený %t s/zasnúbená %t s
+da: forlovet%s med
+de: verlobt%s mit
+en: engaged%s to
+eo: fianĉigita%s kun/fianĉinigita%s kun
+es: comprometido%s con/comprometida%s con
+et: kihlatud%s
+fi: kihloissa%s kanssa
+fr: fiancé%s avec/fiancée%s avec
+he:   התארס  %s עם/ התארסה  %s עם
+is: trúlofaðist%s
+it: fidanzato%s con/fidanzata%s con
+lv: saderināts%s ar
+nl: verloofd%s met
+no: forlovet%s med
+oc: promés%s amb/promesa%s amb
+pl: zaręczony%s z:/zaręczona%s z:
+pt: noivo%s de/noiva%s de
+ro: logodit%s cu/logodita%s cu
+ru: %s помолвлен с
+sk: zasnúbený %s s/zasnúbená %s s
 sl: zaročen z %/zaročena z
-sv: förlovad%t med
+sv: förlovad%s med
 
     error
 af: fout
@@ -8414,17 +8414,17 @@ no: Ta ut lysning
 pt: proibição de casamento
 sv: Förbjudet äktenskap
 
-    marriage banns%t to
-de: aufgebot zur Heirat%t mit
-en: marriage banns%t with
-es: proclamas de matrimonio%t con
-fi: kuuluutus aviolittoon%t (kanssa)
-fr: bans de mariage%t avec
-it: bandi di matrimonio%t con
-nl: huwelijksafkondiging%t met
-no: lysning%t med
-pt: editais de casamento%t com
-sv: lysning%t med
+    marriage banns%s to
+de: aufgebot zur Heirat%s mit
+en: marriage banns%s with
+es: proclamas de matrimonio%s con
+fi: kuuluutus aviolittoon%s (kanssa)
+fr: bans de mariage%s avec
+it: bandi di matrimonio%s con
+nl: huwelijksafkondiging%s met
+no: lysning%s med
+pt: editais de casamento%s com
+sv: lysning%s med
 
     marriage contract
 co: cuntrattu di matrimoniu
@@ -8467,63 +8467,63 @@ no: Ekteskap
 pt: casamento
 sv: Bröllop
 
-    marriage had occurred after the death of %t
-af: huwelik plaasgevind het nadat %t dood
-bg: е сключен бракът място след смъртта на %t
-ca: el matrimoni es va dur a terme després de la mort de %t
-co: matrimoniu s'hè fattu dopu a morte di %t
-cs: manželství se konalo po smrti %t
-da: ægteskabet fandt sted efter %t død
-de: die Ehe wurde nach dem Tod von %t geschlossen
-en: marriage had occurred after the death of %t
-eo: geedzeco okazis post %t morto
-es: matrimonio después de la muerte de %t
-et: abiellusid pärast %t surma
-fi: avioliitto on solmittu jälkeen %t kuoleman
-fr: mariage a eu lieu après la mort de %t
-is: hjónaband átti sér stað eftir %t dauða
-it: matrimonio celebrato dopo la morte di %t
-lv: laulības notika pēc %t nāves
-nl: huwelijk vond plaats na de dood van %t
-no: ekteskap fant sted etter %t døden
-oc: data del maridatge après la mòrt de %t
-pl: małżeństwo miało miejsce po śmierci %t
-pt: casamento ocorreu após a morte %t
-ro: căsătoria a avut loc după moartea %t
-ru: свадьба состоялась после смерти %t
-sk: Manželstvo sa konalo po smrti %t
-sl: poroka je potekala po smrti %t
-sv: äktenskapet ägde rum efter %t döden
-zh: 結婚後%t死亡的地方
+    marriage had occurred after the death of %s
+af: huwelik plaasgevind het nadat %s dood
+bg: е сключен бракът място след смъртта на %s
+ca: el matrimoni es va dur a terme després de la mort de %s
+co: matrimoniu s'hè fattu dopu a morte di %s
+cs: manželství se konalo po smrti %s
+da: ægteskabet fandt sted efter %s død
+de: die Ehe wurde nach dem Tod von %s geschlossen
+en: marriage had occurred after the death of %s
+eo: geedzeco okazis post %s morto
+es: matrimonio después de la muerte de %s
+et: abiellusid pärast %s surma
+fi: avioliitto on solmittu jälkeen %s kuoleman
+fr: mariage a eu lieu après la mort de %s
+is: hjónaband átti sér stað eftir %s dauða
+it: matrimonio celebrato dopo la morte di %s
+lv: laulības notika pēc %s nāves
+nl: huwelijk vond plaats na de dood van %s
+no: ekteskap fant sted etter %s døden
+oc: data del maridatge après la mòrt de %s
+pl: małżeństwo miało miejsce po śmierci %s
+pt: casamento ocorreu após a morte %s
+ro: căsătoria a avut loc după moartea %s
+ru: свадьба состоялась после смерти %s
+sk: Manželstvo sa konalo po smrti %s
+sl: poroka je potekala po smrti %s
+sv: äktenskapet ägde rum efter %s döden
+zh: 結婚後%s死亡的地方
 
-    marriage had occurred before the birth of %t
-af: huwelik plaasgevind het voor %t geboorte
-bg: е сключен бракът преди раждането на %t
-ca: el matrimoni es va dur a terme abans del naixement de %t
-co: matrimoniu s'hè fattu nanzu a nascita di %t
-cs: manželství bylo uzavřeno před narozením %t
-da: Ægteskabet fandt sted før %t fødslen
-de: die Ehe wurde vor der Geburt von %t geschlossen
-en: marriage had occurred before the birth of %t
-eo: geedzeco okazis antaŭ ol %t naskiĝo
-es: matrimonio antes del nacimiento de %t
-et: abielu toimus enne %t sündi
-fi: avioliitto on solmittu ennen %t syntymää
-fr: mariage a eu lieu avant la naissance de %t
-is: hjónaband átti sér stað áður en %t fæðingu
-it: matrimonio celebrato prima della nascita di %t
-lv: laulība tika noslēgta pirms %t dzimšanas
-nl: huwelijk vond plaats vóór de geboorte van %t
-no: ekteskap fant sted før %t fødsel
-oc: data del maridatge abans la naissença de %t
-pl: małżeństwo zostało zawarte przed urodzeniem %t
-pt: casamento ocorreu antes do nascimento %t
-ro: căsătoria a avut loc înainte de naştere %t
-ru: Свадьба состоялась до рождения %t
-sk: manželstvo bolo uzavreté pred narodením %t
-sl: sklenjena zakonska zveza pred rojstvom %t
-sv: äktenskapet ägde rum före %t födseln
-zh: 結婚前%t出生的地方
+    marriage had occurred before the birth of %s
+af: huwelik plaasgevind het voor %s geboorte
+bg: е сключен бракът преди раждането на %s
+ca: el matrimoni es va dur a terme abans del naixement de %s
+co: matrimoniu s'hè fattu nanzu a nascita di %s
+cs: manželství bylo uzavřeno před narozením %s
+da: Ægteskabet fandt sted før %s fødslen
+de: die Ehe wurde vor der Geburt von %s geschlossen
+en: marriage had occurred before the birth of %s
+eo: geedzeco okazis antaŭ ol %s naskiĝo
+es: matrimonio antes del nacimiento de %s
+et: abielu toimus enne %s sündi
+fi: avioliitto on solmittu ennen %s syntymää
+fr: mariage a eu lieu avant la naissance de %s
+is: hjónaband átti sér stað áður en %s fæðingu
+it: matrimonio celebrato prima della nascita di %s
+lv: laulība tika noslēgta pirms %s dzimšanas
+nl: huwelijk vond plaats vóór de geboorte van %s
+no: ekteskap fant sted før %s fødsel
+oc: data del maridatge abans la naissença de %s
+pl: małżeństwo zostało zawarte przed urodzeniem %s
+pt: casamento ocorreu antes do nascimento %s
+ro: căsătoria a avut loc înainte de naştere %s
+ru: Свадьба состоялась до рождения %s
+sk: manželstvo bolo uzavreté pred narodením %s
+sl: sklenjena zakonska zveza pred rojstvom %s
+sv: äktenskapet ägde rum före %s födseln
+zh: 結婚前%s出生的地方
 
     marriage licence
 co: licenza di matrimoniu
@@ -8552,65 +8552,65 @@ oc: nòtas sul maridatge
 pt: notas de casamento
 sv: anteckningar om vigseln
 
-    marriage of %t after his/her death
-af: huwelik van %t na sy/haar afsterwe
-bg: брак на %t след неговата/нейната смърт
-br: eured %t goude e/he v/marv
-ca: casament de %t després de la seva mort
-co: matrimoniu di %t dopu a so morte
-cs: sňatek s %t po své smrti
-da: giftermål af %t efter hans/hendes død
-de: Heirat von %t nach seinem/ihrem Tod
-en: marriage of %t after his/her death
-eo: edz(in)iĝo de %t post sia morto
-es: casamiento de %t después de su muerte
-et: %t abiellus pärast oma surma
-fi: %t olisi naitu vainajana
-fr: mariage de %t après sa mort
-he:  נישואין של %t אחרי מותו/מותה
-is: giftist %t eftir andlát hans/hennar
-it: matrimonio di %t dopo la sua morte
-lv: %t kāzas pēc viņa(s) nāves
-nl: huwelijk van %t na zijn/haar dood
-no: ekteskap med %t etter ektefellens død
-oc: maridatge de %t après la mòrt
-pl: małżeństwo z %t po śmierci
-pt: casamento de %t depois da sua morte
-ro: casatoria %t este dupa deces
-ru: брак %t после его/ее смерти
+    marriage of %s after his/her death
+af: huwelik van %s na sy/haar afsterwe
+bg: брак на %s след неговата/нейната смърт
+br: eured %s goude e/he v/marv
+ca: casament de %s després de la seva mort
+co: matrimoniu di %s dopu a so morte
+cs: sňatek s %s po své smrti
+da: giftermål af %s efter hans/hendes død
+de: Heirat von %s nach seinem/ihrem Tod
+en: marriage of %s after his/her death
+eo: edz(in)iĝo de %s post sia morto
+es: casamiento de %s después de su muerte
+et: %s abiellus pärast oma surma
+fi: %s olisi naitu vainajana
+fr: mariage de %s après sa mort
+he:  נישואין של %s אחרי מותו/מותה
+is: giftist %s eftir andlát hans/hennar
+it: matrimonio di %s dopo la sua morte
+lv: %s kāzas pēc viņa(s) nāves
+nl: huwelijk van %s na zijn/haar dood
+no: ekteskap med %s etter ektefellens død
+oc: maridatge de %s après la mòrt
+pl: małżeństwo z %s po śmierci
+pt: casamento de %s depois da sua morte
+ro: casatoria %s este dupa deces
+ru: брак %s после его/ее смерти
 sk: svadba s t% po svojej smrti
-sl: %t se je poročil(a) po svoji smrti
-sv: äktenskap med %t före makens/makans död
+sl: %s se je poročil(a) po svoji smrti
+sv: äktenskap med %s före makens/makans död
 
-    marriage of %t before his/her birth
-af: huwelik van %t voor sy/haar geboorte
-bg: брак на %t преди неговото/нейното раждане
-br: eured %t a-raok e/he c'h/ganedigezh
-ca: casament de %t abans del seu naixement
-co: matrimoniu di %t nanzu a so nascita
-cs: sňatek s %t před svým narozením
-da: giftermål af %t før hans/hendes fødsel
-de: Heirat von %t vor seiner/ihrer Geburt
-en: marriage of %t before his/her birth
-eo: edz(in)iĝo de %t antaù sia naskiĝo
-es: casamiento de %t antes de su nacimiento
-et: %t abiellus enne oma sündi
-fi: %t olisi naitu ennen syntymää
-fr: mariage de %t avant sa naissance
-he:  נישואין של %t לפני הולדתו/הולדתה
-is: gistist %t fyrir fæðingu hans/hennar
-it: matrimonio di %t prima della sua nascita
-lv: %t kāzas pirms viņa(s) dzimšanas
-nl: huwelijk van %t voor zijn/haar geboorte
-no: ekteskap med %t før ektefellens fødsel
-oc: maridatge de %t abans la naissença
-pl: małżeństwo z %t przed narodzeniem
-pt: casamento de %t antes do seu nascimento
-ro: casatoria %t inaninte de nastere
-ru: брак %t перед его/ее рождением
-sk: sobáš s %t pred svojim narodením
-sl: %t se je poročil(a) pred svojim rojstvom
-sv: äktenskap med %t före makens/makans födelse
+    marriage of %s before his/her birth
+af: huwelik van %s voor sy/haar geboorte
+bg: брак на %s преди неговото/нейното раждане
+br: eured %s a-raok e/he c'h/ganedigezh
+ca: casament de %s abans del seu naixement
+co: matrimoniu di %s nanzu a so nascita
+cs: sňatek s %s před svým narozením
+da: giftermål af %s før hans/hendes fødsel
+de: Heirat von %s vor seiner/ihrer Geburt
+en: marriage of %s before his/her birth
+eo: edz(in)iĝo de %s antaù sia naskiĝo
+es: casamiento de %s antes de su nacimiento
+et: %s abiellus enne oma sündi
+fi: %s olisi naitu ennen syntymää
+fr: mariage de %s avant sa naissance
+he:  נישואין של %s לפני הולדתו/הולדתה
+is: gistist %s fyrir fæðingu hans/hennar
+it: matrimonio di %s prima della sua nascita
+lv: %s kāzas pirms viņa(s) dzimšanas
+nl: huwelijk van %s voor zijn/haar geboorte
+no: ekteskap med %s før ektefellens fødsel
+oc: maridatge de %s abans la naissença
+pl: małżeństwo z %s przed narodzeniem
+pt: casamento de %s antes do seu nascimento
+ro: casatoria %s inaninte de nastere
+ru: брак %s перед его/ее рождением
+sk: sobáš s %s pred svojim narodením
+sl: %s se je poročil(a) pred svojim rojstvom
+sv: äktenskap med %s före makens/makans födelse
 
     marriage place
 co: locu di l'unione
@@ -8718,77 +8718,77 @@ sk: manželia
 sl: poroka
 sv: gift
 
-    married at age %t
-af: getroud op ouderdom %t
-bg: в брак от %t-годишна възраст
-br: euredet d'an oad a %t
-ca: casat a l'edat de %t
-co: maritatu à l'età di %t
-cs: oženil se ve věku %t/vdala se ve věku %t
-da: gift i alderen %t
-de: verheiratet mit %t Jahren
-en: married at age %t
-eo: edziĝinta je la aĝo de %t jaroj
-es: casado a la edad de %t
-et: abiellus %t aastasena
-fi: vihitty %t vuoden ikäisenä
-fr: marié(e) à l’âge de %t
-he:  התחתן בגיל %t
-is: giftist %t ára
-it: sposato(a) all'età di %t
-lv: precējies %t gadu vecumā
-nl: gehuwd op de leeftijd van %t
-no: gift %t år gammel
-oc: maridat(da) a %t ans
-pl: ożenił się w wieku %t lat/wyszła za mąż w wieku %t lat
-pt: casado com a idade de %t
-ro: casatorit la virsta de %t
-ru: в браке с %t лет
-sk: oženil sa vo veku %t/vydala sa vo veku %t
-sl: se je poročil ko je imel %t/se je poročila ko je imela %t
-sv: gift vid %t ålder
+    married at age %s
+af: getroud op ouderdom %s
+bg: в брак от %s-годишна възраст
+br: euredet d'an oad a %s
+ca: casat a l'edat de %s
+co: maritatu à l'età di %s
+cs: oženil se ve věku %s/vdala se ve věku %s
+da: gift i alderen %s
+de: verheiratet mit %s Jahren
+en: married at age %s
+eo: edziĝinta je la aĝo de %s jaroj
+es: casado a la edad de %s
+et: abiellus %s aastasena
+fi: vihitty %s vuoden ikäisenä
+fr: marié(e) à l’âge de %s
+he:  התחתן בגיל %s
+is: giftist %s ára
+it: sposato(a) all'età di %s
+lv: precējies %s gadu vecumā
+nl: gehuwd op de leeftijd van %s
+no: gift %s år gammel
+oc: maridat(da) a %s ans
+pl: ożenił się w wieku %s lat/wyszła za mąż w wieku %s lat
+pt: casado com a idade de %s
+ro: casatorit la virsta de %s
+ru: в браке с %s лет
+sk: oženil sa vo veku %s/vydala sa vo veku %s
+sl: se je poročil ko je imel %s/se je poročila ko je imela %s
+sv: gift vid %s ålder
 
-    married%t to
-af: getroud met %t
-bg: встъпва в брак%t с
-br: euredet %t gant
-ca: casat%t amb/casada%t amb
-co: maritatu%t cù/maritata%t cù
-cs: %t si vzal/%t si vzala
-da: gift%t med
-de: verheiratet%t mit
-en: married%t to
-eo: edziĝinta%t kun
-es: casado%t con/casada%t con
-et: abielu%t
-fi: puoliso%t
-fr: marié%t avec/mariée%t avec
-he:   התחתן  %t עם/ התחתנה  %t עם
-is: giftist%t
-it: sposato%t con/sposata%t con
-lv: precību %t precējies ar /precību %t precējusies ar
-nl: gehuwd%t met
-no: gift%t med
+    married%s to
+af: getroud met %s
+bg: встъпва в брак%s с
+br: euredet %s gant
+ca: casat%s amb/casada%s amb
+co: maritatu%s cù/maritata%s cù
+cs: %s si vzal/%s si vzala
+da: gift%s med
+de: verheiratet%s mit
+en: married%s to
+eo: edziĝinta%s kun
+es: casado%s con/casada%s con
+et: abielu%s
+fi: puoliso%s
+fr: marié%s avec/mariée%s avec
+he:   התחתן  %s עם/ התחתנה  %s עם
+is: giftist%s
+it: sposato%s con/sposata%s con
+lv: precību %s precējies ar /precību %s precējusies ar
+nl: gehuwd%s met
+no: gift%s med
 oc: maridat amb/maridada amb
-pl: żona (ślub: %t):/mąż (ślub: %t):
-pt: casado%t com/casada%t com
-ro: casatorit%t cu
-ru: в браке с%t
-sk: %t si vzal/%t si vzala
-sl: %t se je poročil z/%t se je poročila z
-sv: gift%t med
-zh: %t配偶是
+pl: żona (ślub: %s):/mąż (ślub: %s):
+pt: casado%s com/casada%s com
+ro: casatorit%s cu
+ru: в браке с%s
+sk: %s si vzal/%s si vzala
+sl: %s se je poročil z/%s se je poročila z
+sv: gift%s med
+zh: %s配偶是
 
-    marriage contract%t with
-de: ehevertrag vom%t mit
-en: marriage contract%t with
-es: contrato de matrimonio%t con
-fi: avioliittosopimus%t kanssa
-fr: contrat de mariage%t avec
-it: contratto di matrimonio%t con
-no: ekteskapskontrakt%t med
-pt: contrato de casamento%t com
-sv: giftermål%t med
+    marriage contract%s with
+de: ehevertrag vom%s mit
+en: marriage contract%s with
+es: contrato de matrimonio%s con
+fi: avioliittosopimus%s kanssa
+fr: contrat de mariage%s avec
+it: contratto di matrimonio%s con
+no: ekteskapskontrakt%s med
+pt: contrato de casamento%s com
+sv: giftermål%s med
 
     maternal grand-parents
 co: caccari materni
@@ -9547,36 +9547,36 @@ sk: meno
 sl: ime
 sv: namn
 
-    name %s already used by %tthis person%t
-af: %s is reeds gebruik deur %t
-bg: името %s вече е използвано %tза друг човек%t
-br: anv %s implijet endeo gant %tan den-mañ%t
-ca: nom %s ja utilitzat per %taquesta persona%t
-co: nome %s dighjà adupratu da %tsta persona%t
-cs: jméno %s už má tato %tosoba%t
-da: navn %s er allerede anvendt af %tdenne person%t
-de: Name %s wird schon bei %tdieser Person%t benutzt
-en: name %s already used by %tthis person%t
-eo: nomo %s jam uzita de %ttiu persono%t
-es: nombre %s ya utilizado por %testa persona%t
-et: nimi %s on juba kasutuses %tsellel inimesel%t
-fi: nimi %s on jo käytössä %ttällä henkilöllä%t
-fr: nom %s déjà utilisé par %tcette personne%t
-he:  השם %s בשימוש כבר ע"י %tאדם זה%t
-is: nafnið %s er þegar í %tnotkun af%t
-it: nome %s già utilizzato da %tquesta persona%t
-lv: vārds - %s jau ir %tšai personai%t
-nl: de naam %s is al gebruikt door %tdeze persoon%t
-no: navn %s brukes allerede av %tdenne personen%t
-oc: nom %s ja utilizat per %taquela persona%t
-pl: imię %s jest już używane przez %ttę osobę%t
-pt: apelido %s já utilizado por %testa pessoa%t
-pt-br: nome %s já utilizado por %testa pessoa%t
-ro: numele %s est in uz de %taceasta persoana%t
-ru: имя %s уже использовано %tэтим человеком%t
-sk: meno %s už má táto %tosoba%t
-sl: ime %s že uporablja %tta oseba%t
-sv: namn %s används redan av %tdenna person%t
+    name %s already used by %sthis person%s
+af: %s is reeds gebruik deur %s
+bg: името %s вече е използвано %sза друг човек%s
+br: anv %s implijet endeo gant %san den-mañ%s
+ca: nom %s ja utilitzat per %saquesta persona%s
+co: nome %s dighjà adupratu da %ssta persona%s
+cs: jméno %s už má tato %sosoba%s
+da: navn %s er allerede anvendt af %sdenne person%s
+de: Name %s wird schon bei %sdieser Person%s benutzt
+en: name %s already used by %sthis person%s
+eo: nomo %s jam uzita de %stiu persono%s
+es: nombre %s ya utilizado por %sesta persona%s
+et: nimi %s on juba kasutuses %ssellel inimesel%s
+fi: nimi %s on jo käytössä %ställä henkilöllä%s
+fr: nom %s déjà utilisé par %scette personne%s
+he:  השם %s בשימוש כבר ע"י %sאדם זה%s
+is: nafnið %s er þegar í %snotkun af%s
+it: nome %s già utilizzato da %squesta persona%s
+lv: vārds - %s jau ir %sšai personai%s
+nl: de naam %s is al gebruikt door %sdeze persoon%s
+no: navn %s brukes allerede av %sdenne personen%s
+oc: nom %s ja utilizat per %saquela persona%s
+pl: imię %s jest już używane przez %stę osobę%s
+pt: apelido %s já utilizado por %sesta pessoa%s
+pt-br: nome %s já utilizado por %sesta pessoa%s
+ro: numele %s est in uz de %saceasta persoana%s
+ru: имя %s уже использовано %sэтим человеком%s
+sk: meno %s už má táto %sosoba%s
+sl: ime %s že uporablja %sta oseba%s
+sv: namn %s används redan av %sdenna person%s
 
     name changed. update linked pages
 co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l'anziana chjave inghjò.
@@ -9632,35 +9632,35 @@ ru: навигация
 sl: pregled
 sv: navigering
 
-    navigation with %t as Sosa reference
-af: stap met %t as Sosa verwysing
-bg: навигация чрез числа на Соса относно %t
-br: merdeadur gant %t 'vel dave Sosa
-ca: navegació amb %t amb referència de "número Sosa"
-co: navigazione cù %t cum'è referenza Sosa
-cs: prohlížení s %t jako "Sosa" referencí
-da: navigering med %t som reference for fortløbende anenummerering (Sosa o.a.)
-de: Navigation mit %t als Proband für die Ahnenkennziffern
-en: browse using %t as Sosa reference
-eo: navigado kun %t kiel Sosa referenco
-es: navegación con %t como referencia de Sosa
-et: navigeerimine kasutades %t Sosa viidet
-fi: navigointi käyttäen %t Sosa-viitteenä
-fr: naviguer avec %t comme Sosa racine
-he:  ניוות עם %t כאזכור Sosa
-is: leiðsögn með %t sem Sosa tilvísun
-it: percorso con %t come riferimento Sosa
-lv: meklēt senčus -> %t pēc Sosa pakāpes
-nl: navigatie met %t als proband
-no: navigering med %t som Anenummer
-oc: navigacion amb %t coma numèro Sosa de referéncia
-pl: nawigacja z numerami "Sosa" odnoszącymi się do osoby: %t
-pt: navegação com %t como a referência Sosa
-ro: navigatie cu %t referinta Sosa
-ru: навигация с %t как ссылка Sosa
-sk: prezeranie s %t ako referenciou "Sosa"
-sl: pregled z %t kot Sosa
-sv: navigering med %t som proband (Kekules system)
+    navigation with %s as Sosa reference
+af: stap met %s as Sosa verwysing
+bg: навигация чрез числа на Соса относно %s
+br: merdeadur gant %s 'vel dave Sosa
+ca: navegació amb %s amb referència de "número Sosa"
+co: navigazione cù %s cum'è referenza Sosa
+cs: prohlížení s %s jako "Sosa" referencí
+da: navigering med %s som reference for fortløbende anenummerering (Sosa o.a.)
+de: Navigation mit %s als Proband für die Ahnenkennziffern
+en: browse using %s as Sosa reference
+eo: navigado kun %s kiel Sosa referenco
+es: navegación con %s como referencia de Sosa
+et: navigeerimine kasutades %s Sosa viidet
+fi: navigointi käyttäen %s Sosa-viitteenä
+fr: naviguer avec %s comme Sosa racine
+he:  ניוות עם %s כאזכור Sosa
+is: leiðsögn með %s sem Sosa tilvísun
+it: percorso con %s come riferimento Sosa
+lv: meklēt senčus -> %s pēc Sosa pakāpes
+nl: navigatie met %s als proband
+no: navigering med %s som Anenummer
+oc: navigacion amb %s coma numèro Sosa de referéncia
+pl: nawigacja z numerami "Sosa" odnoszącymi się do osoby: %s
+pt: navegação com %s como a referência Sosa
+ro: navigatie cu %s referinta Sosa
+ru: навигация с %s как ссылка Sosa
+sk: prezeranie s %s ako referenciou "Sosa"
+sl: pregled z %s kot Sosa
+sv: navigering med %s som proband (Kekules system)
 
     nb branches
 co: num. ghjembe
@@ -10909,17 +10909,17 @@ no: Borgelig vielse
 pt: PACS
 sv: Borgerligt äktenskap
 
-    pacsed%t to
-de: Eheähnliches Verhältnis%t mit
-en: Civil solidarity pact%t with
-es: Pacto civil de solidaridad%t con
-fi: Pacs-sopimuksella%t (kanssa)
-fr: PACS%t avec
-it: Unione civile%t con
-nl: Samenlevingscontract%t met
-no: Samboeravtale%t med
-pt: Pacto civil de solidariedade%t com
-sv: Sambo%t med
+    pacsed%s to
+de: Eheähnliches Verhältnis%s mit
+en: Civil solidarity pact%s with
+es: Pacto civil de solidaridad%s con
+fi: Pacs-sopimuksella%s (kanssa)
+fr: PACS%s avec
+it: Unione civile%s con
+nl: Samenlevingscontract%s met
+no: Samboeravtale%s med
+pt: Pacto civil de solidariedade%s com
+sv: Sambo%s med
 
     parents
 af: ouers
@@ -11864,36 +11864,36 @@ oc: acorchas:
 pt: atalhos:
 ru: Ссылки:
 
-    relationship%t to
-af: verwantskap%t met
-bg: има връзка%t с
-br: kerentiezh %t gant
-ca: parentesc%t amb
-co: parentia%t cù
-cs: %t vztah s
-da: forbindelse%t med
-de: in einer Beziehung%t mit
-en: relationship%t to
-eo: rilato%t kun
-es: parentesco%t con
-et: kooselu%t
-fi: suhde%t ja
-fr: %t avec
+    relationship%s to
+af: verwantskap%s met
+bg: има връзка%s с
+br: kerentiezh %s gant
+ca: parentesc%s amb
+co: parentia%s cù
+cs: %s vztah s
+da: forbindelse%s med
+de: in einer Beziehung%s mit
+en: relationship%s to
+eo: rilato%s kun
+es: parentesco%s con
+et: kooselu%s
+fi: suhde%s ja
+fr: %s avec
 he:  קירבה
-is: sambúð%t með
-it: legame%t con
-lv: %t attiecības ar
-nl: verbonden%t met
-no: familie%t med
-oc: parentat%t avec
-pl: związek%t z:
-pt: relacionado%t com/relacionada%t com
-pt-br: junto%t com
-ro: relatia%t cu
-ru: приходится%t
-sk: vzťah %t s
-sl: zveza z %t
-sv: förhållande%t med
+is: sambúð%s með
+it: legame%s con
+lv: %s attiecības ar
+nl: verbonden%s met
+no: familie%s med
+oc: parentat%s avec
+pl: związek%s z:
+pt: relacionado%s com/relacionada%s com
+pt-br: junto%s com
+ro: relatia%s cu
+ru: приходится%s
+sk: vzťah %s s
+sl: zveza z %s
+sv: förhållande%s med
 
     remove last module
 co: caccià l'ultimu modulu aghjuntu
@@ -11920,17 +11920,17 @@ no: Bopel
 pt: residência
 sv: Bostad
 
-    residence%t to
-de: gemeinsamer Wohnsitz%t mit
-en: residence%t with
-es: residencia%t con
-fi: asuu samassa taloudessa%t (kanssa)
-fr: résidence%t avec
-it: residenza%t con
-nl: woonplaats%t met
-no: bopel%t med
-pt: residência%t com
-sv: sammanboende%t med
+    residence%s to
+de: gemeinsamer Wohnsitz%s mit
+en: residence%s with
+es: residencia%s con
+fi: asuu samassa taloudessa%s (kanssa)
+fr: résidence%s avec
+it: residenza%s con
+nl: woonplaats%s met
+no: bopel%s med
+pt: residência%s com
+sv: sammanboende%s med
 
     retired
 co: ritirata
@@ -12836,26 +12836,26 @@ sk: Sosa
 sl: številka Sosa
 sv: annummer
 
-    Sosa reference: %t
-af: Sosa verwysing: %t
-ca: referència de "número Sosa": %t
-co: referenza Sosa : %t
-de: Sosa Referenz: %t
-en: Family Tree Root: %t
-eo: Sosa referenco: %t
-es: referencia Sosa: %t
-et: Sosa viidet: %t
-fi: Sosa-viitteenä: %t
-fr: référence Sosa : %t
-he:  כאזכור Sosa: %t
-it: riferimento Sosa : %t
-lv: Sosa pakāpes: %t
-nl: Sosareferentie : %t
-oc: referéncia de Sosa: %t
-pt: referência Sosa: %t
-ro: referinta Sosa: %t
-ru: ссылка Sosa: %t
-sk: referenciou "Sosa": %t
+    Sosa reference: %s
+af: Sosa verwysing: %s
+ca: referència de "número Sosa": %s
+co: referenza Sosa : %s
+de: Sosa Referenz: %s
+en: Family Tree Root: %s
+eo: Sosa referenco: %s
+es: referencia Sosa: %s
+et: Sosa viidet: %s
+fi: Sosa-viitteenä: %s
+fr: référence Sosa : %s
+he:  כאזכור Sosa: %s
+it: riferimento Sosa : %s
+lv: Sosa pakāpes: %s
+nl: Sosareferentie : %s
+oc: referéncia de Sosa: %s
+pt: referência Sosa: %s
+ro: referinta Sosa: %s
+ru: ссылка Sosa: %s
+sk: referenciou "Sosa": %s
 
     source/sources
 af: bron/bronne
@@ -13654,20 +13654,20 @@ sk: pozajtra
 sl: pojutrišnem
 sv: i övermorgon
 
-    the difference of age between %t and %t is quite important
-co: a sfarenza d'età trà %t è %t pare assai impurtante
-de: der Altersunterschied zwischen %t und %t ist sehr groß
-en: Date of birth of %t and %t are too far together
-es: la diferencia de edad entre %t y %t es grande
-fi: Henkilöiden %t ja %t ikäero on liian suuri
-fr: la différence d’âge entre %t et %t est assez importante
-it: il divario d'età tra %t e %t è importante
-nl: leeftijdsverschil tussen %t en %t is vrij belangrijk
-no: Fødselsdato til %t og %t er for langt fra hverandre
-oc: la diferéncia d’atge entre %t e %t es pro importanta
-pt: a diferença de idade entre %t e %t é bastante importante
-ru: значительная разница в возрасте между %t и %t
-sv: Skillnaden i ålder mellan %t och %t är mycket viktig
+    the difference of age between %s and %s is quite important
+co: a sfarenza d'età trà %s è %s pare assai impurtante
+de: der Altersunterschied zwischen %s und %s ist sehr groß
+en: Date of birth of %s and %s are too far together
+es: la diferencia de edad entre %s y %s es grande
+fi: Henkilöiden %s ja %s ikäero on liian suuri
+fr: la différence d’âge entre %s et %s est assez importante
+it: il divario d'età tra %s e %s è importante
+nl: leeftijdsverschil tussen %s en %s is vrij belangrijk
+no: Fødselsdato til %s og %s er for langt fra hverandre
+oc: la diferéncia d’atge entre %s e %s es pro importanta
+pt: a diferença de idade entre %s e %s é bastante importante
+ru: значительная разница в возрасте между %s и %s
+sv: Skillnaden i ålder mellan %s och %s är mycket viktig
 
     the father-in-law/the mother-in-law
 af: die skoonpa/die skoonma
@@ -13760,50 +13760,50 @@ sk: súbor je uzamknutý, skúste znova.
 sl: ta datoteka je začasno zaklenjena: prosimo poskusite znova. Če še vedno ne deluje, prosimo počakajte trenutek
 sv: filen är temporärt låst: försök igen. Om det ändå inte fungerar, vänta ett tag innan nästa försök
 
-    the following children of %t and %t are born very close
-co: e date di nascita di sti zitelli di %t è %t parenu troppu vicine
-de: das Geburtsdatum der Kinder %t und %t liegt sehr nah beieinander
-en: Date of birth of the children of %t and %t are too close together
-es: las fechas de nacimiento de los siguientes hijos de %t y de %t son muy próximas
-fi: Henkilöiden %t ja %t lasten syntymäajat ovat liian lähellä toisiaan
-fr: les enfants suivants de %t et de %t sont nés très rapprochés
-it: le date di nascita dei seguenti figli di %t e di %t sono vicinissime
-nl: volgende kinderen van %t en van %t zijn zeer kort na elkaar geboren
-no: Fødselsdato til barnet til %t og %t er for nærme hverandre
-oc: aqueles enfants de %t e %t son nascuts plan trop apressats
-pt: os seguintes filhos de %t e de %t nasceram muito próximos
-ru: даты рождения детей %t и %t очень близки
-sv: Följande barn till %t och %t är födda mycket tätt
+    the following children of %s and %s are born very close
+co: e date di nascita di sti zitelli di %s è %s parenu troppu vicine
+de: das Geburtsdatum der Kinder %s und %s liegt sehr nah beieinander
+en: Date of birth of the children of %s and %s are too close together
+es: las fechas de nacimiento de los siguientes hijos de %s y de %s son muy próximas
+fi: Henkilöiden %s ja %s lasten syntymäajat ovat liian lähellä toisiaan
+fr: les enfants suivants de %s et de %s sont nés très rapprochés
+it: le date di nascita dei seguenti figli di %s e di %s sono vicinissime
+nl: volgende kinderen van %s en van %s zijn zeer kort na elkaar geboren
+no: Fødselsdato til barnet til %s og %s er for nærme hverandre
+oc: aqueles enfants de %s e %s son nascuts plan trop apressats
+pt: os seguintes filhos de %s e de %s nasceram muito próximos
+ru: даты рождения детей %s и %s очень близки
+sv: Följande barn till %s och %s är födda mycket tätt
 
-    the following children of %t and %t are not in order
-af: die volgende kinders van %t and %t is nie in die regte volgorde nie
-bg: следните деца на %t и %t не са в хронологичен ред
-br: ar vugale-mañ, re %t ha %t n'int ket en urzh mat
-ca: els fills següents de %t i %t no estan en ordre cronològic
-co: i zitelli di %t è %t chì seguitanu ùn sò micca in l'ordine
-cs: následující děti rodičů %t a %t nejsou v chronologickém pořadí
-da: de følgende børn af %t og %t er ikke i kronologisk orden
-de: die folgenden Kinder von %t und %t sind nicht geordnet
-en: the following children of %t and %t are not in chronological order
-eo: la sekvantaj infanoj de %t kaj %t ne estas orde
-es: los hijos siguientes de %t y %t no están presentados en orden
-et: %t ja %t lastest järgnevad ei ole vanuse järjekorras
-fi: %t ja %t lapsista seuraavat eivät ole ikäjärjestyksessä
-fr: les enfants suivants de %t et de %t ne sont pas dans l’ordre
-he:  הילדים של %t ו-%t לא בסדר נכון
-is: þessi börn %t og %t eru ekki í röð
-it: i seguenti figli di %t and %t non sono in ordine d'età
-lv: %t un %t sekojošais bērns nav secībā
-nl: de kinderen van %t en %t staan niet in de goede volgorde
-no: følgende barn av %t og %t er ikke i kronologisk rekkefølge
-oc: los enfants %t e %t son pas dins l'òrdre cronologic
-pl: nastepujące dzieci (rodzice: %t i %t) nie są ułożone w porządku chronologicznym
-pt: os seguintes filhos de %t e %t não estão apresentados em ordem
-ro: urmatori copii a lui %t si %t nu sint in ordine cronologica
-ru: следующие дети %t и %t - идут не по порядку
-sk: nasledujúce deti rodičov %t a %t nie sú chronologicky
-sl: naslednji otroci od %t in %t niso po vrstnem redu
-sv: de följande barnen till %t och %t är inte i kronologiskordning
+    the following children of %s and %s are not in order
+af: die volgende kinders van %s and %s is nie in die regte volgorde nie
+bg: следните деца на %s и %s не са в хронологичен ред
+br: ar vugale-mañ, re %s ha %s n'int ket en urzh mat
+ca: els fills següents de %s i %s no estan en ordre cronològic
+co: i zitelli di %s è %s chì seguitanu ùn sò micca in l'ordine
+cs: následující děti rodičů %s a %s nejsou v chronologickém pořadí
+da: de følgende børn af %s og %s er ikke i kronologisk orden
+de: die folgenden Kinder von %s und %s sind nicht geordnet
+en: the following children of %s and %s are not in chronological order
+eo: la sekvantaj infanoj de %s kaj %s ne estas orde
+es: los hijos siguientes de %s y %s no están presentados en orden
+et: %s ja %s lastest järgnevad ei ole vanuse järjekorras
+fi: %s ja %s lapsista seuraavat eivät ole ikäjärjestyksessä
+fr: les enfants suivants de %s et de %s ne sont pas dans l’ordre
+he:  הילדים של %s ו-%s לא בסדר נכון
+is: þessi börn %s og %s eru ekki í röð
+it: i seguenti figli di %s and %s non sono in ordine d'età
+lv: %s un %s sekojošais bērns nav secībā
+nl: de kinderen van %s en %s staan niet in de goede volgorde
+no: følgende barn av %s og %s er ikke i kronologisk rekkefølge
+oc: los enfants %s e %s son pas dins l'òrdre cronologic
+pl: nastepujące dzieci (rodzice: %s i %s) nie są ułożone w porządku chronologicznym
+pt: os seguintes filhos de %s e %s não estão apresentados em ordem
+ro: urmatori copii a lui %s si %s nu sint in ordine cronologica
+ru: следующие дети %s и %s - идут не по порядку
+sk: nasledujúce deti rodičov %s a %s nie sú chronologicky
+sl: naslednji otroci od %s in %s niso po vrstnem redu
+sv: de följande barnen till %s och %s är inte i kronologiskordning
 
     the grandchildren
 af: die kleinkinders
@@ -14017,35 +14017,35 @@ pt: as últimas %d uniões registadas
 ru: последние %d зарегистрированных браков
 sv: Det senast %d registreade äktenskapet
 
-    the latest %t deaths
-af: die laaste %t afsterwes
-bg: последните %t умирания
-br: ar %t tremenvan diwezhañ
-ca: les %t defunciones
-co: i %t ultimi trapassi
-cs: posledních %t úmrtí
-da: de seneste %t dødsfald
-de: die letzten %t Ableben
-en: latest %t deaths
-eo: la lastaj %t mortoj
-es: las %t últimas defunciones
-et: viimased %t surma
-fi: viimeiset %t kuolemantapausta
-fr: les %t derniers décès
-he: %t המתים האחרונים
-is: síðustu %t andlát
-it: le ultime %t morti
-lv: pēdējie %t mirušie
-nl: de %t recentste overledenen
-no: de siste %t døde
-oc: los %t darrièrs decèsses
-pl: %t ostatnich zgonów
-pt: os %t óbitos mais recentes
-ro: ultimi %t decedati
-ru: %t последних смертей
-sk: posledných %t úmrtí
-sl: zadnjih %t smrti
-sv: de senaste %t avlidna
+    the latest %s deaths
+af: die laaste %s afsterwes
+bg: последните %s умирания
+br: ar %s tremenvan diwezhañ
+ca: les %s defunciones
+co: i %s ultimi trapassi
+cs: posledních %s úmrtí
+da: de seneste %s dødsfald
+de: die letzten %s Ableben
+en: latest %s deaths
+eo: la lastaj %s mortoj
+es: las %s últimas defunciones
+et: viimased %s surma
+fi: viimeiset %s kuolemantapausta
+fr: les %s derniers décès
+he: %s המתים האחרונים
+is: síðustu %s andlát
+it: le ultime %s morti
+lv: pēdējie %s mirušie
+nl: de %s recentste overledenen
+no: de siste %s døde
+oc: los %s darrièrs decèsses
+pl: %s ostatnich zgonów
+pt: os %s óbitos mais recentes
+ro: ultimi %s decedati
+ru: %s последних смертей
+sk: posledných %s úmrtí
+sl: zadnjih %s smrti
+sv: de senaste %s avlidna
 
     the modification impacted %d persons
 co: a mudificazione hè stata fatta bè : %d scheda(e) curretta(e)
@@ -14733,35 +14733,35 @@ sk: strýkovia a tety
 sl: strici in tete
 sv: farbröder-morbröder och fastrar-mostrar
 
-    undefined sex for %t
-af: geslag onbekend vir %t
-bg: не е определен полът на %t
-br: ar reizh n'eo ket termenet evit %t
-ca: no s'ha definit el sexe de %t
-co: sessu micca definitu per %t
-cs: neznámé pohlaví pro %t
-da: udefineret køn for %t
-de: Geschlecht nicht definiert für %t
-en: undefined sex for %t
-eo: sekso nedifinita por %t
-es: sexo no definido por %t
-et: %t sugu on määratlemata
-fi: henkilön %t sukupuoli tuntematon
-fr: sexe indéfini pour %t
-he:  המין של %t לא מוגדר
-is: kyn ekki skilgreint fyrir %t
-it: sesso indefinito per %t
-lv: nenoskaidrots dzimums personai %t
-nl: onbepaald geslacht voor %t
-no: udefinert kjønn for %t
-oc: sèxe pas definit per %t
-pl: %t ma nieokreśloną płeć
-pt: sexo indefinido para %t
-ro: gen nedefinit pentru %t
-ru: неизвестный пол у %t
-sk: nedefinované pohlavie pre %t
-sl: %t nima določenega spola
-sv: odefinierat kön för %t
+    undefined sex for %s
+af: geslag onbekend vir %s
+bg: не е определен полът на %s
+br: ar reizh n'eo ket termenet evit %s
+ca: no s'ha definit el sexe de %s
+co: sessu micca definitu per %s
+cs: neznámé pohlaví pro %s
+da: udefineret køn for %s
+de: Geschlecht nicht definiert für %s
+en: undefined sex for %s
+eo: sekso nedifinita por %s
+es: sexo no definido por %s
+et: %s sugu on määratlemata
+fi: henkilön %s sukupuoli tuntematon
+fr: sexe indéfini pour %s
+he:  המין של %s לא מוגדר
+is: kyn ekki skilgreint fyrir %s
+it: sesso indefinito per %s
+lv: nenoskaidrots dzimums personai %s
+nl: onbepaald geslacht voor %s
+no: udefinert kjønn for %s
+oc: sèxe pas definit per %s
+pl: %s ma nieokreśloną płeć
+pt: sexo indefinido para %s
+ro: gen nedefinit pentru %s
+ru: неизвестный пол у %s
+sk: nedefinované pohlavie pre %s
+sl: %s nima določenega spola
+sv: odefinierat kön för %s
 
     unknown person
 af: onbekende persoon

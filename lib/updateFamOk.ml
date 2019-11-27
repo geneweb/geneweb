@@ -627,8 +627,8 @@ let strip_family fam des =
 
 let print_err_parents conf base p =
   let err =
-    Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
-      (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p))
+    Printf.sprintf (fcapitale (ftransl conf "%s already has parents"))
+      (Printf.sprintf "\n%s" (referenced_person_text conf base p))
   in
 #ifdef API
   if not !Api_conf.mode_api then begin

@@ -4498,8 +4498,7 @@ and obsolete_eval conf base env (p, _) loc =
           Vfam (_, fam, _, m_auth) ->
             let format = relation_txt conf (get_sex p) fam in
             Printf.sprintf (fcapitale format)
-              (fun _ ->
-                 if m_auth then string_of_marriage_text conf base fam else "")
+              (if m_auth then string_of_marriage_text conf base fam else "")
         | _ -> raise Not_found
       in
       obsolete loc "4.08" "married_to" "" (str_val s)

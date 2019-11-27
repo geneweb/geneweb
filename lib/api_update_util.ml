@@ -572,7 +572,7 @@ let husband_wife conf base p =
       if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
       then
         let relation =
-          Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
+          Printf.sprintf (relation_txt conf (get_sex p) fam) ""
         in
         translate_eval
           (relation ^ " " ^ (person_text_no_html conf base conjoint))

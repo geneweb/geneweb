@@ -845,13 +845,12 @@ let print_conflict conf base p =
 #endif
   let err =
     Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+      (fcapitale (ftransl conf "name %s already used by %sthis person%s"))
       ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
        p_surname base p ^ "\"")
-      (fun _ ->
-         Printf.sprintf "%s %s" (sou base (get_first_name p))
+      (Printf.sprintf "%s %s" (sou base (get_first_name p))
            (sou base (get_surname p)))
-      (fun _ -> ".")
+      (".")
    in
    raise @@ Update.ModErr err
 

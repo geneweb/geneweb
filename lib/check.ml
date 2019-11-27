@@ -206,7 +206,7 @@ let print_base_warning oc base =
       Printf.fprintf oc "%s\n" (designation base p);
       Printf.fprintf oc "was witness before his/her birth\n"
   | YoungForMarriage (p, a) ->
-      Printf.fprintf oc "%s married at age %d\n" (designation base p) a.year
+      Printf.fprintf oc "%s married at age: %d\n" (designation base p) a.year
 
 type stats =
   { mutable men : int;
