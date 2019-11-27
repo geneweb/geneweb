@@ -15358,6 +15358,10 @@ sk: áno/nie
 sl: da/ne
 sv: J/N
 
+    years/months/days
+en: years/months/days
+fr: années/mois/jours
+
     year/month/day
 af: jaar/maand/dag
 ar: سنة/شهر/يوم

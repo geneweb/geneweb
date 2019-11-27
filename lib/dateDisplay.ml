@@ -491,26 +491,49 @@ let string_slash_of_date conf date =
       " (" ^ transl_nth conf "gregorian/julian/french/hebrew" 3 ^ ")"
   | Dtext t -> t
 
+let negative_age a =
+  let ny = a.year + 1 in
+  let nm = if a.day = 0 then a.month - 12 else a.month - 11 in
+  let nd = a.day - 30 in
+  {day = nd; month = nm; year = ny; prec = Sure; delta = 0;}
+
+(* year may be <0, but not month or days *)
+(* -3 days is year=-1;month=11;days=28   *)
 let string_of_age conf a =
-  match a with
-    {day = 0; month = 0; year = y} ->
-      if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
-      else if y = 1 then transl conf "one year old"
-      else transl conf "birth"
-  | {day = 0; month = m; year = y} ->
-      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
-      else if y > 0 || m > 1 then
-        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
-      else if m = 1 then transl conf "one month old"
-      else transl conf "less than one month old"
-  | {day = d; month = m; year = y} ->
-      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
-      else if y > 0 || m > 1 then
-        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
-      else if m = 1 then transl conf "one month old"
-      else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
-      else if d = 1 then transl conf "one day old"
-      else "0"
+  if a.year < 0 then
+    let a2 = negative_age a in
+    if a2.year < 0 then
+      if a2.year < -1 then
+        string_of_int a2.year ^ " " ^ transl_nth conf "years/months/days" 0
+      else
+        string_of_int a2.year ^ " " ^ transl_nth conf "year/month/day" 0
+    else if a2.month < 0 then
+      string_of_int a2.month ^ " " ^ transl_nth conf "year/month/day" 1
+    else
+      if a2.day < -1 then 
+        string_of_int a2.day ^ " " ^ transl_nth conf "years/months/days" 2
+      else
+        string_of_int a2.day ^ " " ^ transl_nth conf "year/month/day" 2
+  else
+    match a with
+    | {day = 0; month = 0; year = y} ->
+        if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
+        else if y = 1 then transl conf "one year old"
+        else transl conf "birth"
+    | {day = 0; month = m; year = y} ->
+        if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
+        else if y > 0 || m > 1 then
+          string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+        else if m = 1 then transl conf "one month old"
+        else transl conf "less than one month old"
+    | {day = d; month = m; year = y} ->
+        if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
+        else if y > 0 || m > 1 then
+          string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+        else if m = 1 then transl conf "one month old"
+        else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
+        else if d = 1 then transl conf "one day old"
+        else "0"
 
 
 (* ************************************************************************ *)
