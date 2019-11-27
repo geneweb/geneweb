@@ -1,7 +1,7 @@
 (library
  (name dummy_gwdb)
- (libraries geneweb.def stdlib-shims)
- (implements geneweb.gwdb.mli)
+ (libraries geneweb-lib.def stdlib-shims)
+ (implements geneweb-lib.gwdb.mli)
  (modules gwdb)
 )
 

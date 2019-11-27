@@ -1,7 +1,7 @@
 (library
  (name gwdb_mli)
- (public_name geneweb.gwdb.mli)
+ (public_name geneweb-lib.gwdb.mli)
  (wrapped false)
- (libraries geneweb.def)
+ (libraries geneweb-lib.def)
  (virtual_modules gwdb)
 )
