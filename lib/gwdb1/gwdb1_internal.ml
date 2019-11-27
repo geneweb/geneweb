@@ -196,6 +196,7 @@ let foi_batch base = List.map (foi base)
 let sou base i = base.data.strings.get (Type.int_of_istr i)
 let nb_of_persons base = base.data.persons.len
 let nb_of_families base = base.data.families.len
+let bname base = Filename.(remove_extension @@ basename base.data.bdir)
 let patch_ascend base ip a = base.func.Dbdisk.patch_ascend ip a
 let patch_union base ip u = base.func.Dbdisk.patch_union ip u
 let patch_family base ifam f = base.func.Dbdisk.patch_family ifam f

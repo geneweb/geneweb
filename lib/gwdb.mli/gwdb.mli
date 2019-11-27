@@ -124,6 +124,7 @@ val sou : base -> istr -> string
 
 val nb_of_persons : base -> int
 val nb_of_families : base -> int
+val bname : base -> string
 
 val patch_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
 val patch_ascend : base -> iper -> ifam Def.gen_ascend -> unit
