@@ -62,9 +62,9 @@ let bench () =
        today_wd=0;time=0,0,0;ctime=0.;image_prefix="";
        b_arg_for_basename=false}
     in
-    let bench_w_base name fn args =
+    let bench_w_base ?t name fn args =
       let base = Gwdb.open_base bname in
-      let r = bench name (fn base) args in
+      let r = bench ?t name (fn base) args in
       Gwdb.close_base base ;
       r
     in
@@ -86,6 +86,17 @@ let bench () =
       end
       [ { conf with Config.env = ["data","src"] ; wizard = true }
       ; { conf with Config.env = ["data","place"] ; wizard = true } ]
+    ::
+    bench_w_base "Check.check_base" ~t:10
+      begin fun base _conf ->
+        Check.check_base base
+          (Sys.opaque_identity ignore)
+          (Sys.opaque_identity ignore)
+          (fun _ -> true)
+          (Sys.opaque_identity ignore)
+          false
+      end
+      [ conf ]
     :: suite
   | _ -> suite
 
