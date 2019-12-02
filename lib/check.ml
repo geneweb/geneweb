@@ -227,16 +227,15 @@ let rec check_ancestors base warning year year_tab ip ini_p =
     match get_parents p with
     | Some ifam ->
       let fam = foi base ifam in
-      let f = fun get ->
-        let ip = get fam in
+      let f ip =
         let year = Gwdb.Marker.get year_tab ip in
         if fst year = max_int
         then check_ancestors base warning new_year year_tab ip new_ini_p
         else if snd year && fst year >= new_year then
           warning (IncoherentAncestorDate (poi base ip, new_ini_p))
       in
-      f get_father ;
-      f get_mother
+      f @@ get_father fam ;
+      f @@ get_mother fam
     | None -> ()
 
 let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
@@ -245,30 +244,47 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
     Gwdb.load_families_array base ;
     Gwdb.load_ascends_array base ;
   end ;
-  if verbose then Printf.eprintf "check persons\n";
   let persons = Gwdb.ipers base in
   let len = Gwdb.Collection.length persons in
   let year_tab = Gwdb.iper_marker persons (max_int, false) in
-  if verbose then ProgrBar.start ();
-  Gwdb.Collection.iteri begin fun i ip ->
-    if verbose then ProgrBar.run i len ;
-    let p = poi base ip in
-    if fst @@ Gwdb.Marker.get year_tab ip = max_int
-    then check_ancestors base warning max_int year_tab ip p ;
-    match CheckItem.person ~onchange:false base warning p with
-    | Some ippl -> List.iter changed_p ippl
-    | None -> ()
-  end persons ;
-  if verbose then ProgrBar.finish ();
-  if verbose then Printf.eprintf "check families\n";
+  if verbose then begin
+    Printf.eprintf "check persons\n" ;
+    ProgrBar.start () ;
+    Gwdb.Collection.iteri begin fun i ip ->
+      ProgrBar.run i len ;
+      let p = poi base ip in
+      if fst @@ Gwdb.Marker.get year_tab ip = max_int
+      then check_ancestors base warning max_int year_tab ip p ;
+      match CheckItem.person ~onchange:false base warning p with
+      | Some ippl -> List.iter changed_p ippl
+      | None -> ()
+    end persons ;
+    ProgrBar.finish ()
+  end else begin
+    Gwdb.Collection.iter begin fun ip ->
+      let p = poi base ip in
+      if fst @@ Gwdb.Marker.get year_tab ip = max_int
+      then check_ancestors base warning max_int year_tab ip p ;
+      match CheckItem.person ~onchange:false base warning p with
+      | Some ippl -> List.iter changed_p ippl
+      | None -> ()
+    end persons ;
+  end ;
   let families = Gwdb.ifams base in
   let len = Gwdb.Collection.length families in
-  if verbose then ProgrBar.start ();
-  Gwdb.Collection.iteri begin fun i ifam ->
-    if verbose then ProgrBar.run i len ;
-    CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
-  end families ;
-  if verbose then ProgrBar.finish ();
+  if verbose then begin
+    Printf.eprintf "check families\n" ;
+    ProgrBar.start ();
+    Gwdb.Collection.iteri begin fun i ifam ->
+      ProgrBar.run i len ;
+      CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
+    end families ;
+    ProgrBar.finish ();
+  end else begin
+    Gwdb.Collection.iter begin fun ifam ->
+      CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
+    end families ;
+  end ;
   Consang.check_noloop base error ;
   if not mem then begin
     Gwdb.clear_persons_array base ;
