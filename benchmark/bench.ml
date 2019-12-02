@@ -62,15 +62,23 @@ let bench () =
        today_wd=0;time=0,0,0;ctime=0.;image_prefix="";
        b_arg_for_basename=false}
     in
-    bench
+    let bench_w_base name fn args =
+      let base = Gwdb.open_base bname in
+      let r = bench name (fn base) args in
+      Gwdb.close_base base ;
+      r
+    in
+    bench_w_base
       "UpdateData.get_all_data"
-      begin fun conf ->
-        let base = Gwdb.open_base bname in
-        let data = UpdateData.get_all_data conf base in
-        Gwdb.close_base base ;
-        data
-      end
+      begin fun base conf -> UpdateData.get_all_data conf base end
       [ { conf with Config.env = ["data","place"] } ]
+    ::
+    bench_w_base
+      "UpdateData.build_list_short"
+      begin fun base conf ->
+        UpdateData.build_list_short conf @@ UpdateData.build_list conf base
+      end
+      [ { conf with Config.env = ["data","src"] ; wizard = true } ]
     :: suite
   | _ -> suite
 
