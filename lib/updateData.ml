@@ -417,8 +417,6 @@ let update_person_list conf base new_input list nb_pers max_updates =
   (* que la base à été mise à jour.                                    *)
   History.notify conf base action
 
-(**/**) (* template *)
-
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
@@ -441,18 +439,14 @@ let build_list_short conf list =
   (* mêmes lettres. On calcul alors à partir de quelle *)
   (* lettre de ini, les sources sont différentes.      *)
   (* ex: eta -> etat -> etat_ -> ... -> etat_civil     *)
-  let rec build_ini l len =
-    (* Attention, il ne faut pas faire String.length     *)
-    (* ini + 1 parce qu'en utf8, il se peut que le       *)
-    (* caractère soit codé sur plusieurs octets.         *)
-    let ini_list =
-      List.rev_map
-        (fun (_, s) ->
-           let s = Place.without_suburb s in
-           if String.length s > len then
-             String.sub s 0 (Utf8.next s len)
-           else s ^ String.make (len + 1 - String.length s) '_')
-        l
+  let rec build_ini l i =
+    let inis =
+      List.rev_map begin fun (_, s) ->
+        let s = Place.without_suburb s in
+        if String.length s > i
+        then String.sub s 0 (Utf8.next s i)
+        else s ^ String.make (i + 1 - String.length s) '_'
+      end l
     in
     (* Fonction pour supprimer les doublons. *)
     let remove_dup list =
@@ -461,11 +455,11 @@ let build_list_short conf list =
            StringSet.empty list)
     in
     (* Astuce pour gérer les espaces. *)
-    let ini_list = List.rev_map (fun p -> Mutil.tr ' ' '_' p) ini_list in
-    let ini_list = remove_dup ini_list in
-    (* Si la liste des ini n'a qu'un élément, on calcul on 'rang' d'après *)
-    if List.length ini_list = 1 then build_ini list (len + 1)
-    else List.sort Gutil.alphabetic_order ini_list
+    let inis = List.rev_map (fun p -> Mutil.tr ' ' '_' p) inis in
+    let inis = remove_dup inis in
+    match inis with
+    | [ ini ] -> build_ini list (String.length ini)
+    | list -> List.sort Gutil.alphabetic_order list
   in
   build_ini list (String.length ini)
 
