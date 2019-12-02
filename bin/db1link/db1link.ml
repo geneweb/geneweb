@@ -1349,25 +1349,31 @@ let link next_family_fun bdir =
   in
   Hashtbl.clear gen.g_patch_p;
   let base = dsk_base in
-  if !do_check && gen.g_pcnt > 0 then
-    begin let changed_p (ip, p, o_sex, o_rpar) =
+  if !do_check && gen.g_pcnt > 0 then begin
+    let changed_p (ip, p, o_sex, o_rpar) =
       let p = Gwdb1.dsk_person_of_person (Gwdb1.OfGwdb.person p) in
       let p =
-        {p with sex = fold_option (fun s -> s) p.sex o_sex;
-         rparents =
-           fold_option
-             (List.map
-                (Futil.map_relation_ps Gwdb1.OfGwdb.iper
-                   (fun _ -> 0)))
-             p.rparents o_rpar}
+        { p with sex = fold_option (fun s -> s) p.sex o_sex
+               ; rparents =
+                   fold_option
+                     (List.map
+                        (Futil.map_relation_ps Gwdb1.OfGwdb.iper
+                           (fun _ -> 0)))
+                     p.rparents o_rpar }
       in
       let i = Gwdb1.OfGwdb.iper ip in Hashtbl.replace gen.g_patch_p i p
     in
     let base = Gwdb1.ToGwdb.base base in
-      Check.check_base base (set_error base gen) (set_warning base)
-        (fun i -> gen.g_def.(Gwdb1.OfGwdb.iper i)) changed_p !pr_stats;
-      flush stdout
-    end;
+    Check.check_base
+      base (set_error base gen) (set_warning base) changed_p ;
+    if !pr_stats then Stats.(print_stats base @@ stat_base base) ;
+    Gwdb.Collection.iter begin fun i ->
+      if not (gen.g_def.(Gwdb1.OfGwdb.iper i))
+      then
+        Printf.printf "Undefined: %s\n"
+          (Gutil.designation base @@ Gwdb.poi base i)
+    end (Gwdb.ipers base) ;
+  end ;
   if not gen.g_errored then
     begin
       if !do_consang then
