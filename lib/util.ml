@@ -121,17 +121,6 @@ let rec capitale_utf_8 s =
             (String.sub s 2 (String.length s - 2))
       | _ -> s
 
-let index_of_next_char s i =
-  min (String.length s) (i + Name.nbc s.[i])
-
-let str_length s =
-  let len = String.length s in
-  let rec loop acc i =
-    if i = len then acc
-    else loop (acc + 1) (index_of_next_char s i)
-  in
-  loop 0 0
-
 let capitale s = capitale_utf_8 s
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
@@ -3623,32 +3612,6 @@ let groupby ~key ~value list =
        else Hashtbl.add h k [v])
     list ;
   Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
-
-let str_nth_pos str nth =
-  let strlen = String.length str in
-  let rec loop n i =
-    if n = nth then i
-    else if i >= strlen then raise (Invalid_argument "str_sub")
-    else loop (n + 1) (index_of_next_char str i)
-  in
-  loop 0 0
-
-let str_sub ?pad str start len =
-  let strlen = String.length str in
-  let n, i =
-    let rec loop n i =
-      if n = len || strlen = i then (n, i)
-      else loop (n + 1) (index_of_next_char str i)
-    in
-    loop 0 start
-  in
-  if n = len then String.sub str start (i - start)
-  else match pad with
-    | None -> raise (Invalid_argument "str_sub")
-    | Some pad ->
-      let bytes = Bytes.make (i - start + len - n) pad in
-      Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str) ;
-      Bytes.unsafe_to_string bytes
 
 let ls_r dirs =
   let rec loop result = function

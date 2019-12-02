@@ -6,7 +6,7 @@ let default_max_cnt = Alln.default_max_cnt
 
 (* tools *)
 let ini len k =
-  let ini_k = Util.str_sub ~pad:'_' k 0 len in
+  let ini_k = Utf8.sub ~pad:'_' k 0 len in
   (* ini_k is "a fresh string": we can use unsafe. *)
   Mutil.unsafe_tr ' ' '_' ini_k
 
@@ -262,7 +262,7 @@ let print_alphabetic conf base is_surnames =
     let list = List.map (fun (s, _, _) -> s, 1) list in
     print_alphabetic_big conf base is_surnames ini list 1 true
   else if len >= 50 || ini = "" then
-    let list = groupby_ini (Util.str_length ini + 1) list in
+    let list = groupby_ini (Utf8.length ini + 1) list in
     if all then
       if len > default_max_cnt then Hutil.incorrect_request conf
       else print_alphabetic_all conf base is_surnames ini list len
@@ -325,7 +325,7 @@ let print_short conf base is_surnames =
   let (list, len) = Alln.select_names conf base is_surnames ini true in
   if len > default_max_cnt then Hutil.incorrect_request conf
   else
-    let list = groupby_ini (Util.str_length ini + 1) list in
+    let list = groupby_ini (Utf8.length ini + 1) list in
     print_alphabetic_short conf base is_surnames ini list len
 
 (* main *)

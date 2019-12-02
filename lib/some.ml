@@ -210,7 +210,7 @@ let first_char s =
   (* Si la personne n'a pas de prénom/nom, on renvoie '?' *)
   if s = "" then "?"
   else
-    let len = Name.nbc s.[0] in
+    let len = Utf8.next s 0 in
     if len < String.length s then String.sub s 0 len else s
 
 let name_unaccent s =

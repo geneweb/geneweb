@@ -116,7 +116,7 @@ let get_person_from_data conf base =
     acc []
 
 let combine_by_ini ini list =
-  let len = Util.str_length ini + 1 in
+  let len = Utf8.length ini + 1 in
   Util.groupby
     ~key:(fun (_, s) -> AllnDisplay.ini len @@ Place.without_suburb s)
     ~value:(fun x -> x)
@@ -559,7 +559,7 @@ let build_list_short conf list =
         (fun (_, s) ->
            let s = Place.without_suburb s in
            if String.length s > len then
-             String.sub s 0 (index_of_next_char s len)
+             String.sub s 0 (Utf8.next s len)
            else s ^ String.make (len + 1 - String.length s) '_')
         l
     in

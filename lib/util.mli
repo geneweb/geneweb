@@ -107,7 +107,6 @@ val p_getenv : (string * string) list -> string -> string option
 val p_getint : (string * string) list -> string -> int option
 val create_env : string -> (string * string) list
 val capitale : string -> string
-val index_of_next_char : string -> int -> int
 
 val open_etc_file : string -> in_channel option
 val open_hed_trl : config -> string -> in_channel option
@@ -358,23 +357,6 @@ val rev_iter : ('a -> unit) -> 'a list -> unit
     Ordering of elements is unspecified.
  *)
 val groupby : key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list
-
-(** [str_nth_pos str n]
-    Return a position of the byte starting the [n]-th UTF8 character.
- *)
-val str_nth_pos : string -> int -> int
-
-(** [str_sub ?pad s start len]
-    Return a fresh UTF8-friendly substring of [len] characters, padded if needed.
-    Be careful [start] is the index of the byte where to start in [s],
-    not the [start-th] UTF8-character.
-*)
-val str_sub : ?pad:char -> string -> int -> int -> string
-
-(** [str_length s]
-    Return the number of character in [s] (UTF8-friendly).
-*)
-val str_length : string -> int
 
 (** [ls_rs dirs]
     List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
