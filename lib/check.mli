@@ -9,6 +9,7 @@ val print_base_warning : out_channel -> base -> CheckItem.base_warning -> unit
 
 val check_base
   : ?verbose:bool
+  -> ?mem:bool
   -> base
   -> (CheckItem.base_error -> unit)
   -> (CheckItem.base_warning -> unit)

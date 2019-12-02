@@ -239,7 +239,12 @@ let rec check_ancestors base warning year year_tab ip ini_p =
       f get_mother
     | None -> ()
 
-let check_base ?(verbose = false) base error warning changed_p =
+let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
+  if not mem then begin
+    Gwdb.load_persons_array base ;
+    Gwdb.load_families_array base ;
+    Gwdb.load_ascends_array base ;
+  end ;
   if verbose then Printf.eprintf "check persons\n";
   let persons = Gwdb.ipers base in
   let len = Gwdb.Collection.length persons in
@@ -264,4 +269,9 @@ let check_base ?(verbose = false) base error warning changed_p =
     CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
   end families ;
   if verbose then ProgrBar.finish ();
-  Consang.check_noloop base error
+  Consang.check_noloop base error ;
+  if not mem then begin
+    Gwdb.clear_persons_array base ;
+    Gwdb.clear_families_array base ;
+    Gwdb.clear_ascends_array base ;
+  end
