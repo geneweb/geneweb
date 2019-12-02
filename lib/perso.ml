@@ -5697,7 +5697,7 @@ let eval_predefined_apply conf env f vl =
   | "hexa", [s] -> Util.hexa_string s
   | "initial", [s] ->
       if String.length s = 0 then ""
-      else String.sub s 0 (Util.index_of_next_char s 0)
+      else String.sub s 0 (Utf8.next s 0)
   | "lazy_print", [v] ->
       begin match get_env "lazy_print" env with
         Vlazyp r -> r := Some v; ""

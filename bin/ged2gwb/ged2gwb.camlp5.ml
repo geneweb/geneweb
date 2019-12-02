@@ -1125,7 +1125,7 @@ let capitalize_word s =
         if Char.code c < 128 then
           copy (i + 1) (Buff.store len c) (particle s (i + 1))
         else
-          let nbc = Name.nbc s.[i] in
+          let nbc = Utf8.nbc s.[i] in
           if nbc = 1 || i + nbc > String.length s then
             copy (i + 1) (Buff.store len s.[i]) true
           else
@@ -1159,7 +1159,7 @@ let uppercase_word s =
         if Char.code c < 128 then
           copy (i + 1) (Buff.store len c) (particle s (i + 1))
         else
-          let nbc = Name.nbc s.[i] in
+          let nbc = Utf8.nbc s.[i] in
           if nbc = 1 || i + nbc > String.length s then
             copy (i + 1) (Buff.store len s.[i]) false
           else

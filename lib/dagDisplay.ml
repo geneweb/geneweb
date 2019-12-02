@@ -169,7 +169,7 @@ let displayed_next_char s i =
               | _ -> Some (i, j)
           in
           loop1 (i + 1)
-      | c -> Some (i, i + max 1 (Name.nbc c))
+      | c -> Some (i, i + Utf8.nbc c)
   in
   loop i
 
