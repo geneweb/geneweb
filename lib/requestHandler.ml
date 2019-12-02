@@ -932,12 +932,12 @@ let defaultHandler : handler =
     end
 
   ; mod_data = begin fun self conf base ->
-      if conf.wizard then UpdateData.print_mod conf base
+      if conf.wizard then UpdateDataDisplay.print_mod conf base
       else self.incorrect_request self conf base
     end
 
   ; mod_data_ok = begin fun self conf base ->
-      if conf.wizard then UpdateData.print_mod_ok conf base
+      if conf.wizard then UpdateDataDisplay.print_mod_ok conf base
       else self.incorrect_request self conf base
     end
 
