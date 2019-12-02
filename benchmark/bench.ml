@@ -92,9 +92,7 @@ let bench () =
         Check.check_base base
           (Sys.opaque_identity ignore)
           (Sys.opaque_identity ignore)
-          (fun _ -> true)
           (Sys.opaque_identity ignore)
-          false
       end
       [ conf ]
     :: suite

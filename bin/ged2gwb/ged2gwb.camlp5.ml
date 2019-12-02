@@ -3607,12 +3607,17 @@ let finish_base base (persons, families, _, _) =
   if !try_negative_dates then negative_dates base persons families;
   if !do_check then
     let base = Gwdb1.ToGwdb.base base in
-    Check.check_base base
-      (fun x -> Check.print_base_error !log_oc base x; Printf.fprintf !log_oc "\n")
-      (function
-         UndefinedSex _ -> ()
-       | x -> Check.print_base_warning !log_oc base x; Printf.fprintf !log_oc "\n")
-      (fun _ -> true) (fun _ -> ()) false;
+    let base_error x =
+      Check.print_base_error !log_oc base x ;
+      Printf.fprintf !log_oc "\n"
+    in
+    let base_warning = function
+      | UndefinedSex _ -> ()
+      | x ->
+        Check.print_base_warning !log_oc base x ;
+        Printf.fprintf !log_oc "\n"
+    in
+    Check.check_base base base_error base_warning ignore ;
   flush !log_oc
 
 let output_command_line bname =
