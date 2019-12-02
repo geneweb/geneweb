@@ -74,11 +74,18 @@ let bench () =
       [ { conf with Config.env = ["data","place"] } ]
     ::
     bench_w_base
+      "UpdateData.build_list"
+      begin fun base conf -> UpdateData.build_list conf base end
+      [ { conf with Config.env = ["data","src"] ; wizard = true }
+      ; { conf with Config.env = ["data","place"] ; wizard = true } ]
+    ::
+    bench_w_base
       "UpdateData.build_list_short"
       begin fun base conf ->
         UpdateData.build_list_short conf @@ UpdateData.build_list conf base
       end
-      [ { conf with Config.env = ["data","src"] ; wizard = true } ]
+      [ { conf with Config.env = ["data","src"] ; wizard = true }
+      ; { conf with Config.env = ["data","place"] ; wizard = true } ]
     :: suite
   | _ -> suite
 
