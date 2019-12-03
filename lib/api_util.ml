@@ -692,6 +692,33 @@ let person_to_reference_person base p =
 let empty_reference_person =
   { M.Reference_person.n = "" ; p = "" ; oc = 0l }
 
+let date_to_opt_string d =
+  match Adef.od_of_cdate d with
+  | Some d -> Some (string_of_date d)
+  | _ -> None
+
+
+let person_to_warning_person base p =
+  let lastname = sou base (get_surname p) in
+  let firstname = sou base (get_first_name p) in
+  let birth_date = date_to_opt_string @@ get_birth p in
+  let death_date =
+    match get_death p with
+    | Death (_, d) -> date_to_opt_string d
+    | _ -> None
+  in
+  let oc = Int32.of_int (get_occ p) in
+  let n = Name.lower lastname in
+  let p = Name.lower firstname in
+  { M.Warning_person.n
+  ; p
+  ; oc
+  ; firstname
+  ; lastname
+  ; birth_date
+  ; death_date
+  }
+
 (**/**) (* Fonctions de transformation person <=> piqi person *)
 
 let piqi_ref_person_to_person base ref_person =
