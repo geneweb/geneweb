@@ -77,10 +77,10 @@ let mutil_string_of_int_sep _ =
   test "," "100,000" 100000 ;
   test "," "1,000,000" 1000000
 
-let util_str_sub _ =
+let utf8_sub _ =
   let test ?pad e s i j =
-    let i = Util.str_nth_pos s i in
-    assert_equal e ~printer:(fun x -> x) (Util.str_sub ?pad s i j)
+    let i = Utf8.get s i in
+    assert_equal e ~printer:(fun x -> x) (Utf8.sub ?pad s i j)
   in
   test "日" "日本語" 0 1 ;
   test "日本語" "日本語" 0 3 ;
@@ -111,8 +111,10 @@ let suite =
     ; "mutil_compare_after_particle" >:: mutil_compare_after_particle
     ; "mutil_string_of_int_sep" >:: mutil_string_of_int_sep
     ]
+  ; "Utf8" >:::
+    [ "utf8_sub" >:: utf8_sub
+    ]
   ; "Util" >:::
-    [ "util_str_sub" >:: util_str_sub
-    ; "util_safe_html" >:: util_safe_html
+    [ "util_safe_html" >:: util_safe_html
     ]
   ]

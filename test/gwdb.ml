@@ -168,3 +168,4 @@ let dummy_collection _ = assert false
 let iper_marker _ = assert false
 let ifam_marker _ = assert false
 let dummy_marker _ = assert false
+let bname _ = assert false

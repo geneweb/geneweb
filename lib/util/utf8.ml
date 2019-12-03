@@ -17,7 +17,7 @@ let nbc c =
 let next s i =
   i + nbc s.[i]
 
-(** [Utf8.nth s n] returns the index where the [n]-th character
+(** [Utf8.get s n] returns the index where the [n]-th character
     starts in string [s].
 *)
 let get s i =
