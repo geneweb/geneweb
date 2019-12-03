@@ -1039,23 +1039,11 @@ let print_add_ind_start_ok conf base =
   let ref_p =
     match resp with
     | Api_update_util.UpdateError _  | Api_update_util.UpdateErrorConflict _ ->
-        M.Reference_person.({
-          n = "";
-          p = "";
-          oc = Int32.of_int 0;
-        })
+      empty_reference_person
     | Api_update_util.UpdateSuccess _ ->
         Util.commit_patches conf base;
         let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
-        let p = poi base ip in
-        let fn = Name.lower (sou base (get_first_name p)) in
-        let sn = Name.lower (sou base (get_surname p)) in
-        let occ = Int32.of_int (get_occ p) in
-        M.Reference_person.({
-          n = sn;
-          p = fn;
-          oc = occ;
-        })
+        person_to_reference_person base @@ poi base ip
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
