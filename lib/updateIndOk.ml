@@ -746,7 +746,7 @@ let check_person conf p =
 
 let error_person conf err =
 #ifdef API
-  if !Api_conf.mode_api then begin
+  if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   Hutil.rheader conf title;
