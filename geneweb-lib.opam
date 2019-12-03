@@ -26,6 +26,7 @@ depends: [
   "ocaml" { >= "4.05" }
   "ounit" { with-test }
   "stdlib-shims"
+  "uucp"
   "unidecode" { = "0.2.0" }
 ]
 
