@@ -707,7 +707,6 @@ let print_remove_image_ext_all base =
 
 (**/**) (* API_CHECK_BASE *)
 
-
 (* ********************************************************************* *)
 (*  [Fonc] print_base_warnings : config -> base -> unit                  *)
 (** [Description] : Renvoie les listes des erreurs et warnings d'une base.
@@ -740,18 +739,11 @@ let print_base_warnings conf base =
     in
     loop !warnings []
   in
-  let base_loop =
-    List.exists (function OwnAncestor _ -> true | _ -> false) !errors
-  in
-  Perso.build_sosa_ht conf base ;
-  load_image_ht conf ;
   List.iter
-    (Api_warnings.add_error_to_piqi_warning_list
-       conf base base_loop Perso.get_sosa_person true)
+    (Api_warnings.add_error_to_piqi_warning_list base)
     !errors ;
   List.iter
-    (Api_warnings.add_warning_to_piqi_warning_list
-       conf base base_loop Perso.get_sosa_person true)
+    (Api_warnings.add_warning_to_piqi_warning_list conf base)
     warnings ;
   let data =
     if filters.nb_results then

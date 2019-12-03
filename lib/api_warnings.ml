@@ -49,408 +49,211 @@ let young_for_marriage = ref []
 let old_individual = ref []
 
 
-
-(* ********************************************************************* *)
-(*  [Fonc] add_error_to_piqi_warning_list :
-             config -> base -> bool -> person error -> unit              *)
-(** [Description] : Fonction qui ajoute une erreur dans la liste des
-                    "piqi warning" correspondante.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - base_loop : liste de personnes
-      - error     :
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let add_error_to_piqi_warning_list conf base base_loop compute_sosa load_img error =
-  match error with
+(** [add_error_to_piqi_warning_list base error]
+    Convert [error] and add it to corresponding error list
+*)
+let add_error_to_piqi_warning_list base = function
   | AlreadyDefined p ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w = M.Warning_already_defined.({person = p}) in
-      set_list already_defined w
+    set_list
+      already_defined
+      M.Warning_already_defined.{person = person_to_warning_person base p }
   | OwnAncestor p ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w = M.Warning_own_ancestor.({person = p}) in
-      set_list own_ancestor w
+    set_list
+      own_ancestor
+      M.Warning_own_ancestor.{person = person_to_warning_person base p }
   | BadSexOfMarriedPerson p ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w = M.Warning_bad_sex_of_married_person.({person = p}) in
-      set_list bad_sex_of_married_person w
+    set_list
+      bad_sex_of_married_person
+      M.Warning_bad_sex_of_married_person.{person = person_to_warning_person base p }
 
-
-(* ********************************************************************* *)
-(*  [Fonc] add_warning_to_piqi_warning_list :
-             config -> base -> bool -> (person, _, _) warning -> unit    *)
-(** [Description] : Fonction qui ajoute un warning dans la liste des
-                    "piqi warning" correspondante.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - base_loop : liste de personnes
-      - warning   :
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img warning =
-  match warning with
+let add_warning_to_piqi_warning_list conf base =
+  let p2wp = person_to_warning_person in
+  let pn2s = Util.string_of_pevent_name conf base in
+  function
   | BigAgeBetweenSpouses (fath, moth, dmy) ->
-      let father =
-        pers_to_piqi_person_full conf base fath base_loop compute_sosa load_img
-      in
-      let mother =
-        pers_to_piqi_person_full conf base moth base_loop compute_sosa load_img
-      in
-      let date = string_of_prec_dmy dmy in
-      let w =
-        M.Warning_big_age_between_spouses.({
-          father = father;
-          mother = mother;
-          date = date;
-        })
-      in
-      set_list big_age_between_spouses w
+    set_list big_age_between_spouses
+      M.Warning_big_age_between_spouses.{
+        father = p2wp base fath
+      ; mother = p2wp base moth
+      ; date = string_of_prec_dmy dmy
+      }
   | BirthAfterDeath p ->
-      let p = pers_to_piqi_person_full conf base p base_loop compute_sosa load_img in
-      let w = M.Warning_birth_after_death.({person = p}) in
-      set_list birth_after_death w
+    set_list birth_after_death
+      M.Warning_birth_after_death.{ person = p2wp base p }
   | IncoherentSex (p, _, _) ->
-      let p = pers_to_piqi_person_full conf base p base_loop compute_sosa load_img in
-      let w =
-        M.Warning_incoherent_sex.({
-          person = p;
-        })
-      in
-      set_list incoherent_sex w
+    set_list incoherent_sex
+      M.Warning_incoherent_sex.{ person = p2wp base p }
   | ChangedOrderOfChildren (ifam, _, _, _) ->
       let cpl = foi base ifam in
-      let f = poi base (get_father cpl) in
-      let m = poi base (get_mother cpl) in
-      let father =
-        pers_to_piqi_person_full conf base f base_loop compute_sosa load_img
-      in
-      let mother =
-        pers_to_piqi_person_full conf base m base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_changed_order_of_children.({
-          father = father;
-          mother = mother;
-        })
-      in
-      set_list changed_order_of_children w
+      set_list changed_order_of_children
+        M.Warning_changed_order_of_children.{
+          father = p2wp base @@ poi base @@ get_father cpl 
+        ; mother = p2wp base @@ poi base @@ get_mother cpl 
+        }
   | ChangedOrderOfMarriages (p, _, _) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_changed_order_of_marriages.({
-          person = p;
-        })
-      in
-      set_list changed_order_of_marriages w
+    set_list changed_order_of_marriages
+      M.Warning_changed_order_of_marriages.{ person = p2wp base p }
   | ChangedOrderOfFamilyEvents (ifam, _, _) ->
       let cpl = foi base ifam in
-      let f = poi base (get_father cpl) in
-      let m = poi base (get_mother cpl) in
-      let father =
-        pers_to_piqi_person_full conf base f base_loop compute_sosa load_img
-      in
-      let mother =
-        pers_to_piqi_person_full conf base m base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_changed_order_of_family_events.({
-          father = father;
-          mother = mother;
-        })
-      in
-      set_list changed_order_of_family_events w
+      set_list changed_order_of_family_events
+        M.Warning_changed_order_of_family_events.{
+          father = p2wp base @@ poi base @@ get_father cpl
+        ; mother = p2wp base @@ poi base @@ get_mother cpl
+        }
   | ChangedOrderOfPersonEvents (p, _, _) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_changed_order_of_person_events.({
-          person = p;
-        })
-      in
-      set_list changed_order_of_person_events w
+    set_list changed_order_of_person_events
+      M.Warning_changed_order_of_person_events.{ person = p2wp base p }
   | ChildrenNotInOrder (ifam, _, _, _) ->
       let cpl = foi base ifam in
-      let f = poi base (get_father cpl) in
-      let m = poi base (get_mother cpl) in
-      let father =
-        pers_to_piqi_person_full conf base f base_loop compute_sosa load_img
-      in
-      let mother =
-        pers_to_piqi_person_full conf base m base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_children_not_in_order.({
-          father = father;
-          mother = mother;
-        })
-      in
-      set_list children_not_in_order w
+      set_list children_not_in_order
+        M.Warning_children_not_in_order.{
+          father = p2wp base @@ poi base @@ get_father cpl
+        ; mother = p2wp base @@ poi base @@ get_mother cpl
+        }
   | CloseChildren (ifam, _, c1, c2) ->
       let cpl = foi base ifam in
-      let f = poi base (get_father cpl) in
-      let m = poi base (get_mother cpl) in
-      let father =
-        pers_to_piqi_person_full conf base f base_loop compute_sosa load_img
-      in
-      let mother =
-        pers_to_piqi_person_full conf base m base_loop compute_sosa load_img
-      in
-      let child1 =
-        pers_to_piqi_person_full conf base c1 base_loop compute_sosa load_img
-      in
-      let child2 =
-        pers_to_piqi_person_full conf base c2 base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_close_children.({
-          father = father;
-          mother = mother;
-          child1 = child1;
-          child2 = child2;
-        })
-      in
-      set_list close_children w
+      set_list close_children
+        M.Warning_close_children.{
+          father = p2wp base @@ poi base @@ get_father cpl
+        ; mother = p2wp base @@ poi base @@ get_mother cpl
+        ; child1 = p2wp base c1 
+        ; child2 = p2wp base c2 
+        }
   | DeadOld (p, dmy) ->
-      let p = pers_to_piqi_person_full conf base p base_loop compute_sosa load_img in
-      let date = string_of_prec_dmy dmy in
-      let w =
-        M.Warning_dead_old.({
-          person = p;
-          date = date;
-        })
-      in
-      set_list dead_old w
+    set_list dead_old
+      M.Warning_dead_old.{
+        person = p2wp base p 
+        ; date = string_of_prec_dmy dmy ;
+      }
   | DeadTooEarlyToBeFather (f, s) ->
-      let father =
-        pers_to_piqi_person_full conf base f base_loop compute_sosa load_img
-      in
-      let son =
-        pers_to_piqi_person_full conf base s base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_dead_too_early_to_be_father.({
-          father = father;
-          son = son;
-        })
-      in
-      set_list dead_too_early_to_be_father w
+    set_list dead_too_early_to_be_father
+      M.Warning_dead_too_early_to_be_father.{
+        father = p2wp base f
+        ; son = p2wp base s;
+      }
   | FEventOrder (p, e1, e2) ->
-      let p = pers_to_piqi_person_full conf base p base_loop compute_sosa load_img in
-      let e1 = Util.string_of_fevent_name conf base e1.efam_name in
-      let e2 = Util.string_of_fevent_name conf base e2.efam_name in
-      let w =
-        M.Warning_fevent_order.({
-          person = p;
-          event1 = e1;
-          event2 = e2;
-        })
-      in
-      set_list fevent_order w
+    set_list fevent_order
+      M.Warning_fevent_order.{
+        person = p2wp base p 
+        ; event1 = Util.string_of_fevent_name conf base e1.efam_name 
+        ; event2 = Util.string_of_fevent_name conf base e2.efam_name ;
+      }
   | FWitnessEventAfterDeath (p, e) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let e = Util.string_of_fevent_name conf base e.efam_name in
-      let w =
-        M.Warning_fwitness_event_after_death.({
-          person = p;
-          event = e;
-        })
-      in
-      set_list fevent_witness_after_death w
+    set_list fevent_witness_after_death
+      M.Warning_fwitness_event_after_death.{
+        person = p2wp base p
+        ; event = Util.string_of_fevent_name conf base e.efam_name ;
+      }
   | FWitnessEventBeforeBirth (p, e) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let e = Util.string_of_fevent_name conf base e.efam_name in
-      let w =
-        M.Warning_fwitness_event_before_birth.({
-          person = p;
-          event = e;
-        })
-      in
-      set_list fevent_witness_before_birth w
+    set_list fevent_witness_before_birth
+      M.Warning_fwitness_event_before_birth.{
+        person = p2wp base p
+      ; event = Util.string_of_fevent_name conf base e.efam_name
+    }
   | IncoherentAncestorDate (a, p) ->
       let ancestor =
-        pers_to_piqi_person_full conf base a base_loop compute_sosa load_img
+        p2wp base a
       in
       let person =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
+        p2wp base p
       in
       let w =
-        M.Warning_incoherent_ancestor_date.({
-          person = person;
-          ancestor = ancestor;
-        })
+        M.Warning_incoherent_ancestor_date.{
+          person = person
+        ; ancestor = ancestor
+        }
       in
       set_list incoherent_ancestor_date w
   | MarriageDateAfterDeath p ->
       let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
+        p2wp base p
       in
-      let w = M.Warning_marriage_date_after_death.({person = p}) in
+      let w = M.Warning_marriage_date_after_death.{person = p} in
       set_list marriage_date_after_death w
   | MarriageDateBeforeBirth p ->
       let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
+        p2wp base p
       in
-      let w = M.Warning_marriage_date_before_birth.({person = p}) in
+      let w = M.Warning_marriage_date_before_birth.{person = p} in
       set_list marriage_date_before_birth w
   | MotherDeadAfterChildBirth (m, c) ->
-      let mother =
-        pers_to_piqi_person_full conf base m base_loop compute_sosa load_img
-      in
-      let child =
-        pers_to_piqi_person_full conf base c base_loop compute_sosa load_img
-      in
-      (* Étrangement c'est le seul message qui se lit de droite à gauche *)
-      (* Naissance de l'enfant après la mort de sa mère => on le renomme *)
-      let w =
-        M.Warning_mother_dead_before_child_birth.({
-          mother = mother;
-          child = child;
-        })
-      in
-      set_list mother_dead_before_child_birth w
+    (* Étrangement c'est le seul message qui se lit de droite à gauche *)
+    (* Naissance de l'enfant après la mort de sa mère => on le renomme *)
+    set_list mother_dead_before_child_birth
+      M.Warning_mother_dead_before_child_birth.{
+        mother = p2wp base m
+      ; child = p2wp base c
+      }
   | ParentBornAfterChild (p, c) ->
-      let parent =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let child =
-        pers_to_piqi_person_full conf base c base_loop compute_sosa load_img
-      in
-      let w =
-        M.Warning_parent_born_after_child.({
-          parent = parent;
-          child = child;
-        })
-      in
-      set_list parent_born_after_child w
+    set_list parent_born_after_child
+      M.Warning_parent_born_after_child.{
+        parent = p2wp base p
+      ; child = p2wp base c
+      }
   | ParentTooOld (p, dmy) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let date = string_of_prec_dmy dmy in
-      let w =
-        M.Warning_parent_too_old.({
-          parent = p;
-          date = date;
-        })
-      in
-      set_list parent_too_old w
+    set_list parent_too_old 
+      M.Warning_parent_too_old.{
+        parent = p2wp base p
+      ; date = string_of_prec_dmy dmy
+      }
   | ParentTooYoung (p, dmy) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let date = string_of_prec_dmy dmy in
-      let w =
-        M.Warning_parent_too_young.({
-          parent = p;
-          date = date;
-        })
-      in
-      set_list parent_too_young w
+    set_list parent_too_young
+      M.Warning_parent_too_young.{
+        parent = p2wp base p
+      ; date = string_of_prec_dmy dmy
+      }
   | PossibleDuplicateFam (f1, f2) ->
     let f1 = fam_to_piqi_family conf base f1 in
     let f2 = fam_to_piqi_family conf base f2 in
       let w =
-        M.Warning_possible_duplicate_fam.({
-          family1 = f1;
-          family2 = f2;
-        })
+        M.Warning_possible_duplicate_fam.{
+          family1 = f1
+        ; family2 = f2
+        }
       in
       set_list possible_duplicate_fam w
   | PEventOrder (p, e1, e2) ->
-      let p = pers_to_piqi_person_full conf base p base_loop compute_sosa load_img in
-      let e1 = Util.string_of_pevent_name conf base e1.epers_name in
-      let e2 = Util.string_of_pevent_name conf base e2.epers_name in
-      let w =
-        M.Warning_pevent_order.({
-          person = p;
-          event1 = e1;
-          event2 = e2;
-        })
-      in
-      set_list pevent_order w
+    set_list pevent_order
+      M.Warning_pevent_order.{
+        person = p2wp base p
+      ; event1 = pn2s e1.epers_name
+      ; event2 = pn2s e2.epers_name
+      }
   | PWitnessEventAfterDeath (p, e) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let e = Util.string_of_pevent_name conf base e.epers_name in
-      let w =
-        M.Warning_pwitness_event_after_death.({
-          person = p;
-          event = e;
-        })
-      in
-      set_list pevent_witness_after_death w
+    set_list pevent_witness_after_death
+      M.Warning_pwitness_event_after_death.{
+        person = p2wp base p
+      ; event = pn2s e.epers_name
+      }
   | PWitnessEventBeforeBirth (p, e) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let e = Util.string_of_pevent_name conf base e.epers_name in
-      let w =
-        M.Warning_pwitness_event_before_birth.({
-          person = p;
-          event = e;
-        })
-      in
-      set_list pevent_witness_before_birth w
+    set_list pevent_witness_before_birth
+      M.Warning_pwitness_event_before_birth.{
+        person = p2wp base p
+      ; event = pn2s e.epers_name
+      }
   | TitleDatesError (p, _) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w = M.Warning_title_dates_error.({person = p}) in
-      set_list title_dates_error w
+    set_list title_dates_error
+      M.Warning_title_dates_error.{ person = p2wp base p }
   | UndefinedSex p ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w = M.Warning_undefined_sex.({person = p}) in
-      set_list undefined_sex w
+    set_list undefined_sex
+      M.Warning_undefined_sex.{ person = p2wp base p }
   | WitnessDateAfterDeath p ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w = M.Warning_witness_date_after_death.({person = p}) in
-      set_list witness_date_after_death w
+    set_list witness_date_after_death
+      M.Warning_witness_date_after_death.{ person = p2wp base p }
   | WitnessDateBeforeBirth p ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let w = M.Warning_witness_date_before_birth.({person = p}) in
-      set_list witness_date_before_birth w
+    set_list witness_date_before_birth
+      M.Warning_witness_date_before_birth.{ person = p2wp base p }
   | YoungForMarriage (p, dmy) ->
-      let p =
-        pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
-      in
-      let date = string_of_prec_dmy dmy in
-      let w =
-        M.Warning_young_for_marriage.({
-          person = p;
-          date = date;
-        })
-      in
-      set_list young_for_marriage w
+    set_list young_for_marriage
+      M.Warning_young_for_marriage.{
+        person = p2wp base p
+      ; date = string_of_prec_dmy dmy
+      }
 
 let create_piqi_warnings () =
   (* Ajouter une limite. Pour pierfit, on peut
      exploser la taille des données à envoyer. *)
-  M.Base_warnings.({
+  M.Base_warnings.{
     warning_already_defined = !already_defined;
     warning_own_ancestor = !own_ancestor;
     warning_bad_sex_of_married_person = !bad_sex_of_married_person;
@@ -477,6 +280,6 @@ let create_piqi_warnings () =
     warning_old_individual = !old_individual;
     warning_witness_date_after_death = !witness_date_after_death;
     warning_witness_date_before_birth = !witness_date_before_birth;
-  })
+  }
 
 #endif
