@@ -683,22 +683,17 @@ let print_result conf data =
   Util.html ~content_type conf ;
   Wserver.printf "%s" data
 
+let person_to_reference_person base p =
+  { M.Reference_person.n = Name.lower @@ sou base @@ get_surname p
+  ; p = Name.lower @@ sou base @@ get_first_name p
+  ; oc = Int32.of_int (get_occ p)
+  }
+
+let empty_reference_person =
+  { M.Reference_person.n = "" ; p = "" ; oc = 0l }
 
 (**/**) (* Fonctions de transformation person <=> piqi person *)
 
-
-(* ********************************************************************* *)
-(*  [Fonc] piqi_ref_person_to_person :
-      base ->  Reference_person -> option person                         *)
-(** [Description] : Renvoie une option personne à partir d'une référence
-                    piqi person.
-    [Args] :
-      - base : base de donnée
-      - ref_person : Reference_person
-    [Retour] :
-      - option person : Retourne une option personne.
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
 let piqi_ref_person_to_person base ref_person =
   let sn = ref_person.M.Reference_person.n in
   let fn = ref_person.M.Reference_person.p in
@@ -1795,16 +1790,7 @@ let data_list_person_option conf base filters l =
                   if apply_filters_p conf filters compute_sosa p then
                     pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
                   else
-                    let fn = Name.lower (sou base (get_first_name p)) in
-                    let sn = Name.lower (sou base (get_surname p)) in
-                    let occ = Int32.of_int (get_occ p) in
-                    let ref_p =
-                      M.Reference_person.({
-                        n = sn;
-                        p = fn;
-                        oc = occ;
-                      })
-                    in
+                    let ref_p = person_to_reference_person base p in
                     empty_piqi_person_full conf ref_p base_loop
               | PLight ref_p -> empty_piqi_person_full conf ref_p base_loop )
             l)
@@ -1817,16 +1803,7 @@ let data_list_person_option conf base filters l =
                   if apply_filters_p conf filters compute_sosa p then
                     pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
                   else
-                    let fn = Name.lower (sou base (get_first_name p)) in
-                    let sn = Name.lower (sou base (get_surname p)) in
-                    let occ = Int32.of_int (get_occ p) in
-                    let ref_p =
-                      M.Reference_person.({
-                        n = sn;
-                        p = fn;
-                        oc = occ;
-                      })
-                    in
+                    let ref_p = person_to_reference_person base p in
                     empty_piqi_person_light conf ref_p base_loop
               | PLight ref_p -> empty_piqi_person_light conf ref_p base_loop )
             l)
