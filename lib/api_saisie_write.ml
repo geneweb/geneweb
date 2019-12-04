@@ -502,161 +502,67 @@ let print_config conf base =
 
 (**/**) (* Fonctions qui calcul "l'inférence" du nom de famille. *)
 
-let all_children_surname_are_the_same base fam =
+type children_surname =
+  | NoChild
+  | NoSurname
+  | Surname of string
+
+let children_surname base fam =
   let count = ref 0 in
   let fam' =
-    Array.map
-      (fun i -> let c = get_children @@ foi base i in count := !count + Array.length c ; c)
-      fam
+    Array.map begin fun i ->
+      let c = get_children @@ foi base i in
+      count := !count + Array.length c ;
+      c
+    end fam
   in
-  let all_children_surname = Array.make !count "" in
+  let surnames = Array.make !count "" in
   count := 0 ;
-  Array.iter
-    (Array.iter (fun i ->
-         all_children_surname.(!count) <- sou base @@ get_surname @@ poi base i ;
-         incr count) )
-    fam' ;
-  match all_children_surname with
-  | [||] -> (false, "")
-  | [|x|] -> (true, x)
+  Array.iter begin Array.iter begin fun i ->
+      surnames.(!count) <- sou base @@ get_surname @@ poi base i ;
+      incr count
+    end end fam' ;
+  match surnames with
+  | [||] -> NoChild
+  | [|x|] -> Surname x
   | a ->
     let x_crush = Name.crush_lower a.(0) in
     if Array.for_all (fun n -> Name.crush_lower n = x_crush) a
-    then (true, a.(0))
-    else (false, "")
+    then Surname a.(0)
+    else NoSurname
 
-(* ************************************************************************ *)
-(*  [Fonc] infer_surname : config -> base -> person -> string               *)
-(** [Description] : Renvoie le nom de famille qui peut être attribué à une
-                    personne. Si aucun nom ne peut être trouvé, on renvoi
-                    vide.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - person : la personne à partir de laquelle on calcul le nom
-    [Retour] :
-      - string : le potentiel nom hérité.
-                                                                           *)
-(* ************************************************************************ *)
+let infer_surname_from_parents base surname p =
+  match get_parents p with
+  | Some ifam -> begin
+      let g_fam = foi base ifam in
+      let g_father = poi base (get_father g_fam) in
+      if Name.crush_lower surname
+         = Name.crush_lower (sou base (get_surname g_father))
+      then surname
+      else ""
+    end
+  | None -> ""
+
+(** [infer_surname conf base p ifam] *)
 let rec infer_surname conf base p ifam =
   let surname = sou base (get_surname p) in
   if surname = "?" then ""
-  else
-    if get_sex p = Male then
-      (* On prend le nom de la fratrie parce que y'a de *)
-      (* grande chance que ce soit le même.             *)
-      let fam = get_family p in
-      if Array.length fam > 0 then
-        begin
-          if Array.exists (fun ifam -> [||] <> get_children (foi base ifam)) fam then
-            let all_children_surname_are_the_same, name =
-              all_children_surname_are_the_same base fam
-            in
-            if all_children_surname_are_the_same then
-              (* On fait une recherche métaphone. *)
-              let (primary_surname, secondary_surname) =
-                Metaphone.double_metaphone surname
-              in
-              let (primary_name, secondary_name) = Metaphone.double_metaphone name in
-              if primary_surname = primary_name ||
-                 secondary_surname = secondary_name
-              then surname
-              else ""
-            else ""
-          else
-            begin
-              match get_parents p with
-              | Some ifam ->
-                  begin
-                    let g_fam = foi base ifam in
-                    let g_father = poi base (get_father g_fam) in
-                    if Name.crush_lower surname =
-                       Name.crush_lower (sou base (get_surname g_father))
-                    then
-                      surname
-                    else
-                      (* On fait une recherche métaphone. *)
-                      let (primary_father, secondary_father) =
-                        Metaphone.double_metaphone surname
-                      in
-                      let (primary_g_father, secondary_g_father) =
-                        Metaphone.double_metaphone
-                          (sou base (get_surname g_father))
-                      in
-                      if primary_father = primary_g_father ||
-                         secondary_father = secondary_g_father
-                      then surname
-                      else ""
-                  end
-              | None -> surname
-            end
-        end
-      (* On regarde si le nom est pareil sur 2 générations. *)
-      else
-        begin
-          match get_parents p with
-          | Some ifam ->
-              begin
-                let g_fam = foi base ifam in
-                let g_father = poi base (get_father g_fam) in
-                if Name.crush_lower surname =
-                   Name.crush_lower (sou base (get_surname g_father))
-                then
-                  surname
-                else
-                  (* On fait une recherche métaphone. *)
-                  let (primary_father, secondary_father) =
-                    Metaphone.double_metaphone surname
-                  in
-                  let (primary_g_father, secondary_g_father) =
-                    Metaphone.double_metaphone
-                      (sou base (get_surname g_father))
-                  in
-                  if primary_father = primary_g_father ||
-                     secondary_father = secondary_g_father
-                  then surname
-                  else ""
-              end
-          | None -> surname
-        end
-    else
-      (* Si on a envoyé dans l'objet AddChildRequest l'index de la famille,  *)
-      (* et que la personne selectionnée est une femme, on relance le calcul avec *)
-      (* le nom du père.                                                           *)
-      match ifam with
-      | Some ifam ->
-          let ifam = Gwdb.ifam_of_string ifam in
-          let fam = foi base ifam in
-          let isp = Gutil.spouse (get_iper p) fam in
-          let sp = poi base isp in
-          if get_sex sp = Male then infer_surname conf base sp None
-          else ""
-      | None ->
-          (* On prend le nom de la fratrie parce que y'a de *)
-          (* grande chance que ce soit le même.             *)
-          let fam = get_family p in
-          if Array.length fam > 0 then
-            begin
-              if Array.exists (fun ifam -> [||] <> get_children (foi base ifam)) fam then
-                let all_children_surname_are_the_same, name =
-                  all_children_surname_are_the_same base fam
-                in
-                (* On ne fait pas de recherche métaphone *)
-                (* car on est dans le cas d'une femme.   *)
-                if all_children_surname_are_the_same then name
-                else ""
-              else
-              if Array.length (get_family p) = 1 then
-                let fam = get_family p in
-                let ifam = fam.(0) in
-                let fam = foi base ifam in
-                let isp = Gutil.spouse (get_iper p) fam in
-                let sp = poi base isp in
-                if sou base (get_surname sp) = "?" then ""
-                else sou base (get_surname sp)
-              else ""
-            end
-          else ""
+  else match ifam with
+    | Some ifam ->
+      let ifam = Gwdb.ifam_of_string ifam in
+      let fam = foi base ifam in
+      (* if p is not in the couple, father's iper is returned by [spouse] *)
+      let isp = Gutil.spouse (get_iper p) fam in
+      let sp = poi base isp in
+      if get_sex sp = Male then infer_surname conf base sp None
+      else ""
+    | None ->
+      if get_sex p = Male && Array.length (get_family p) > 0
+      then match children_surname base (get_family p) with
+        | NoSurname -> ""
+        | Surname s -> s
+        | NoChild -> infer_surname_from_parents base surname p
+      else infer_surname_from_parents base surname p
 
 (* FIXME: factorize *)
 let piqi_death_type_of_death = function
