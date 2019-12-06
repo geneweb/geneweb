@@ -30,8 +30,6 @@ val print_del : config -> base -> unit
 
 val print_change_event_order : config -> base -> unit
 
-
-
 (* Ajout pour l'API *)
 val effective_add
   : config -> base -> (iper, Update.key, string) Def.gen_person
@@ -59,5 +57,3 @@ val reconstitute_from_pevents :
       (Def.death * string * string * string) *
       (Def.burial * string * string * string) *
       ('a, string) Def.gen_pers_event list
-val check_conflict :
-  config -> base -> (iper, 'a, string) Def.gen_person -> iper list -> unit
