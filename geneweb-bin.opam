@@ -27,6 +27,7 @@ depends: [
   "ounit" { with-test }
   "stdlib-shims"
   "unidecode" { = "0.2.0" }
+  "uucp"
 ]
 
 conflict-class: [ "geneweb-bin" ]

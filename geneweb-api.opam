@@ -34,6 +34,7 @@ depends: [
   "redis-sync"
   "stdlib-shims"
   "unidecode" { = "0.2.0" }
+  "uucp"
   "yojson"
 ]
 
