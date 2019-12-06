@@ -855,7 +855,6 @@ let print_conflict conf base p =
    in
    raise @@ Update.ModErr err
 
-
 let default_prerr conf base = function
   | BadSexOfMarriedPerson p as err ->
     let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
@@ -876,21 +875,6 @@ let print_cannot_change_sex ?(prerr = default_prerr) conf base p =
     Printf.sprintf "%s." (Utf8.capitalize (transl conf "cannot change sex of a married person"))
   in
   raise @@ Update.ModErr err
-
-let check_conflict conf base sp ipl =
-  let name = Name.lower (sp.first_name ^ " " ^ sp.surname) in
-  List.iter
-    (fun ip ->
-       let p1 = poi base ip in
-       if get_iper p1 <> sp.key_index &&
-          Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) =
-            name &&
-          get_occ p1 = sp.occ
-       then
-       (* TODO probably better to use Update.print_create_conflict
-          but one additionnal parameter (var) I dont understand ?? *)
-         print_conflict conf base p1)
-    ipl
 
 let check_sex_married ?prerr conf base sp op =
   if sp.sex <> get_sex op
@@ -933,20 +917,16 @@ let pwitnesses_of pevents =
 let effective_mod ?prerr ?skip_conflict conf base sp =
   let pi = sp.key_index in
   let op = poi base pi in
-  let key = sp.first_name ^ " " ^ sp.surname in
   let ofn = p_first_name base op in
   let osn = p_surname base op in
   let oocc = get_occ op in
-  if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
-  else
-    begin
-      let ipl = match skip_conflict with
-        | Some i -> List.filter ((<>) i) @@ Gutil.person_ht_find_all base key
-        | None -> Gutil.person_ht_find_all base key
-      in
-      check_conflict conf base sp ipl ;
+  if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then begin
+    match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
+    | Some p' when p' <> pi && Some p' <> skip_conflict ->
+      print_conflict conf base (poi base p')
+    | _ ->
       rename_image_file conf base op sp
-    end;
+  end ;
   if List.assoc_opt "nsck" conf.env <> Some "on"
   then check_sex_married ?prerr conf base sp op ;
   let created_p = ref [] in
@@ -964,11 +944,10 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let pi = np.key_index in Update.update_related_pointers base pi ol nl; np
 
 let effective_add conf base sp =
-  let fn = Util.translate_eval sp.first_name in
-  let sn = Util.translate_eval sp.surname in
-  let key = fn ^ " " ^ sn in
-  let ipl = Gutil.person_ht_find_all base key in
-  check_conflict conf base sp ipl;
+  begin match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
+    | Some p' -> print_conflict conf base (poi base p')
+    | _ -> ()
+  end ;
   let created_p = ref [] in
   let pi =
     insert_person base (no_person dummy_iper) no_ascend no_union

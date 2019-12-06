@@ -306,7 +306,7 @@ let reconstitute_person conf base mod_p : ('a, string * string * int * Update.cr
   (* Normalement, il ne doit plus y avoir de lever *)
   (* de conflits par les autres modules : update,  *)
   (* updateIndOk et updateFamOk.                   *)
-  let _err = Api_update_util.check_person_conflict conf base p in
+  let _err = Api_update_util.check_person_conflict base p in
   (* Maintenant qu'on a fini les conflit, on remet l'objet person *)
   (* tel que pour GeneWeb, c'est à dire qu'on supprime l'option   *)
   (* force_create.                                                *)

@@ -155,7 +155,7 @@ let error_conflict_person_link base (f, s, o, create, _, force_create) =
       else false
   | _ -> false
 
-let check_person_conflict conf base sp =
+let check_person_conflict base sp =
   (* Vérification de la personne. *)
   if nb_of_persons base = 0 then () (* FIXME: remove this ? *)
   else
@@ -164,32 +164,27 @@ let check_person_conflict conf base sp =
       let ofn = sou base (get_first_name op) in
       let osn = sou base (get_surname op) in
       let oocc = get_occ op in
-      if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
-      else
-        begin
-          let fn = Util.translate_eval sp.first_name in
-          let sn = Util.translate_eval sp.surname in
-          let key = fn ^ " " ^ sn in
-          let ipl = Gutil.person_ht_find_all base key in
-          (try UpdateIndOk.check_conflict conf base sp ipl
-           with Update.ModErr _ ->
-             let conflict =
-               let form = Some `person_form1 in
-               let lastname = sp.surname in
-               let firstname = sp.first_name in
-               {
-                 Mwrite.Create_conflict.form = form;
-                 witness = false;
-                 rparents = false;
-                 event = false;
-                 pos = None;
-                 pos_witness = None;
-                 lastname = lastname;
-                 firstname = firstname;
-               }
-             in
-             raise (ModErrApiConflict conflict))
-        end;
+      if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then begin
+        match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
+        | Some p' when p' <> sp.key_index ->
+          let conflict =
+            let form = Some `person_form1 in
+            let lastname = sp.surname in
+            let firstname = sp.first_name in
+            {
+              Mwrite.Create_conflict.form = form;
+              witness = false;
+              rparents = false;
+              event = false;
+              pos = None;
+              pos_witness = None;
+              lastname = lastname;
+              firstname = firstname;
+            }
+          in
+          raise (ModErrApiConflict conflict)
+        | _ -> ()
+      end ;
       (* Vérification des rparents. *)
       List.iteri begin fun i r ->
         match (r.r_fath, r.r_moth) with
