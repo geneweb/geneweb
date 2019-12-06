@@ -32,9 +32,9 @@ The documentation is available online: http://geneweb.tuxfamily.org/
 Using [opam](https://opam.ocaml.org/):
 
 ```
-opam pin add geneweb -k git https://github.com/geneweb/geneweb --no-action
-opam depext geneweb
-opam install geneweb
+opam pin add geneweb-bin -k git https://github.com/geneweb/geneweb --no-action
+opam depext geneweb-bin
+opam install geneweb-bin
 ```
 
 ## Getting involved
