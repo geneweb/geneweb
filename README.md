@@ -69,6 +69,11 @@ $ opam install camlp5 cppo dune markup ounit
    $ make clean distrib
    ```
 
+You can have a description of available configuration options using
+```
+$ ocaml ./configure.ml --help
+```
+
 ### Building the API
 
 The API uses the Google Protocol Buffer to exchange information

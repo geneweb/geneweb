@@ -36,13 +36,13 @@ let speclist =
     , "Use legacy backend" )
   ; ( "--sosa-legacy"
     , Arg.Unit set_sosa_legacy
-    , "Use Sosa module implementation" )
+    , "Use legacy Sosa module implementation" )
   ; ( "--sosa-num"
     , Arg.Unit set_sosa_num
     , "Use Sosa module implementation based on `num` library" )
   ; ( "--sosa-zarith"
     , Arg.Unit set_sosa_zarith
-    , "Sosa module implementation based on `zarith` library" )
+    , "Use Sosa module implementation based on `zarith` library" )
   ]
 
 let () =
