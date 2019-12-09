@@ -28,6 +28,7 @@ depends: [
   "stdlib-shims"
   "unidecode" { = "0.2.0" }
   "uucp"
+  "uutf"
 ]
 
 conflict-class: [ "geneweb" ]
