@@ -7,29 +7,14 @@ jobs:
   include:
   - os: linux
     env: OCAML_VERSION=4.05
-    cache:
-      directories:
-      - $HOME/.opam/
   - os: linux
     env: OCAML_VERSION=4.06
-    cache:
-      directories:
-      - $HOME/.opam/
   - os: linux
     env: OCAML_VERSION=4.07
-    cache:
-      directories:
-      - $HOME/.opam/
   - os: linux
     env: OCAML_VERSION=4.08
-    cache:
-      directories:
-      - $HOME/.opam/
   - os: linux
     env: OCAML_VERSION=4.09
-    cache:
-      directories:
-      - $HOME/.opam/
   - os: osx
     env: OCAML_VERSION=4.09
 
