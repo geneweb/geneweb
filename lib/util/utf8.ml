@@ -58,6 +58,33 @@ let sub ?pad str start len =
       Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str) ;
       Bytes.unsafe_to_string bytes
 
+(**/**)
+(* cmap_utf_8 code code comes from
+   http://erratique.ch/software/uucp/doc/Uucp.Case.html *)
+let cmap_utf_8 cmap s =
+  let b = Buffer.create (String.length s * 2) in
+  let add_map _ _ u =
+    let u = match u with `Malformed _ -> Uutf.u_rep | `Uchar u -> u in
+    match cmap u with
+    | `Self -> Uutf.Buffer.add_utf_8 b u
+    | `Uchars us -> List.iter (Uutf.Buffer.add_utf_8 b) us
+  in
+  Uutf.String.fold_utf_8 add_map () s;
+  Buffer.contents b
+(**/**)
+
+let lowercase s = cmap_utf_8 Uucp.Case.Map.to_lower s
+
+let uppercase s = cmap_utf_8 Uucp.Case.Map.to_upper s
+
+let capitalize s =
+  let first = ref true in
+  let cmap u =
+    if !first then (first := false ; Uucp.Case.Map.to_upper u)
+    else `Self
+  in
+  cmap_utf_8 cmap s
+
 module C = struct
 
   type t = Str of string | Chr of char | Empty
