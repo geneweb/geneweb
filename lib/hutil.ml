@@ -1,4 +1,3 @@
-(* $Id: hutil.ml,v 5.11 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config
@@ -13,7 +12,7 @@ let commd_no_params conf =
 
 let link_to_referer conf =
   let referer = Util.get_referer conf in
-  let back = Util.capitale (Util.transl conf "back") in
+  let back = Utf8.capitalize (Util.transl conf "back") in
   if referer <> "" then
     Printf.sprintf "<a href=\"%s\">\
          <span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span>\
@@ -34,7 +33,7 @@ let gen_print_link_to_welcome f conf right_aligned =
       Wserver.printf "<a href=\"%s\">\
          <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
        </a>\n"
-        (commd_no_params conf) (Util.capitale (Util.transl conf "home"));
+        (commd_no_params conf) (Utf8.capitalize (Util.transl conf "home"));
       if right_aligned then Wserver.printf "</div>\n"
       else Wserver.printf "</p>\n"
     end
@@ -124,7 +123,7 @@ let trailer = gen_trailer true
 
 let incorrect_request conf =
   let title _ =
-    Wserver.printf "%s" (Util.capitale (Util.transl conf "incorrect request"))
+    Wserver.printf "%s" (Utf8.capitalize (Util.transl conf "incorrect request"))
   in
   Wserver.http Wserver.Bad_Request;
   header conf title;
