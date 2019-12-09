@@ -40,7 +40,7 @@
 (executable
   (package geneweb-bin)
   (public_name ged2gwb)
-  (modules ged2gwb utf8List)
+  (modules ged2gwb)
   (libraries unix str camlp5.gramlib %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )
 

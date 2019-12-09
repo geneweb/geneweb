@@ -981,18 +981,6 @@ let infer_death birth bapt =
 
 (* Fonctions utiles pour la mise en forme des noms. *)
 
-(* Hashtbl (utf8.ml) qui font la correspondance entre : *)
-(*   - l'encoding -> le nom                             *)
-(*   - le nom     -> l'encoding                         *)
-let (ht_e_n, ht_n_e) =
-  let ht_e_n = Hashtbl.create 5003 in
-  let ht_n_e = Hashtbl.create 5003 in
-  List.iter
-    (fun (encoding, name) ->
-       Hashtbl.add ht_n_e name encoding; Hashtbl.add ht_e_n encoding name)
-    Utf8List.utf8_list;
-  ht_e_n, ht_n_e
-
 let string_ini_eq s1 i s2 =
   let rec loop i j =
     if j = String.length s2 then true
@@ -1055,124 +1043,10 @@ let rec is_a_public_name s i =
     end
   end
 
-let gen_lowercase_uppercase_utf8_letter lower s =
-  (* liste des code hexa correspondant à l'encodage du caractère e. *)
-  let list_of_encodings e =
-    let rec loop len e l =
-      if e = "" then l
-      else
-        let i = String.index e '/' in
-        let j =
-          try String.index_from e (i + 1) '/' with
-            Not_found -> String.length e
-        in
-        let k = "0" ^ String.sub e (i + 1) (j - 1) in
-        loop (len + 1) (String.sub e j (String.length e - j))
-          (int_of_string k :: l)
-    in
-    let l = loop 0 e [] in List.rev l
-  in
-  (* l'encodage du caractère s. *)
-  let encoding =
-    let rec loop i s e =
-      if i = String.length s then e
-      else
-        let e = e ^ Printf.sprintf "/x%x" (Char.code s.[i]) in
-        loop (i + 1) s e
-    in
-    loop 0 s ""
-  in
-  try
-    let name = Hashtbl.find ht_e_n encoding in
-    let name =
-      if lower then Str.replace_first (Str.regexp "CAPITAL") "SMALL" name
-      else Str.replace_first (Str.regexp "SMALL") "CAPITAL" name
-    in
-    let new_encoding = Hashtbl.find ht_n_e name in
-    let (el, len) =
-      let l = list_of_encodings new_encoding in l, List.length l
-    in
-    let s = Bytes.create len in
-    let rec loop i el s =
-      match el with
-        [] -> Bytes.unsafe_to_string s
-      | e :: ell -> let _s = Bytes.set s i (Char.chr e) in loop (i + 1) ell s
-    in
-    loop 0 el s
-  with Not_found -> s
-
-let lowercase_utf8_letter = gen_lowercase_uppercase_utf8_letter true
-let uppercase_utf8_letter = gen_lowercase_uppercase_utf8_letter false
-
-let capitalize_word s =
-  let rec copy i len uncap =
-    if i = String.length s then Buff.get len
-    else
-      match s.[i] with
-      'a'..'z' as c ->
-        let c =
-          if uncap then c
-          else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
-        in
-        copy (i + 1) (Buff.store len c) true
-      | 'A'..'Z' as c ->
-        let c =
-          if not uncap then c
-          else Char.chr (Char.code c - Char.code 'A' + Char.code 'a')
-        in
-        copy (i + 1) (Buff.store len c) true
-      | c ->
-        if Char.code c < 128 then
-          copy (i + 1) (Buff.store len c) (particle s (i + 1))
-        else
-          let nbc = Utf8.nbc s.[i] in
-          if nbc = 1 || i + nbc > String.length s then
-            copy (i + 1) (Buff.store len s.[i]) true
-          else
-            let s = String.sub s i nbc in
-            let s =
-              if not uncap then uppercase_utf8_letter s
-              else lowercase_utf8_letter s
-            in
-            let (t, j) = s, i + nbc in copy j (Buff.mstore len t) true
-  in
-  copy 0 0 (particle s 0)
-
-let uppercase_word s =
-  let rec copy i len uncap =
-    if i = String.length s then Buff.get len
-    else
-      match s.[i] with
-      'a'..'z' as c ->
-        let c =
-          if uncap then c
-          else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
-        in
-        copy (i + 1) (Buff.store len c) uncap
-      | 'A'..'Z' as c ->
-        let c =
-          if not uncap then c
-          else Char.chr (Char.code c - Char.code 'A' + Char.code 'a')
-        in
-        copy (i + 1) (Buff.store len c) uncap
-      | c ->
-        if Char.code c < 128 then
-          copy (i + 1) (Buff.store len c) (particle s (i + 1))
-        else
-          let nbc = Utf8.nbc s.[i] in
-          if nbc = 1 || i + nbc > String.length s then
-            copy (i + 1) (Buff.store len s.[i]) false
-          else
-            let s = String.sub s i nbc in
-            let s = if uncap then s else uppercase_utf8_letter s in
-            let (t, j) = s, i + nbc in
-            copy j (Buff.mstore len t) false
-  in
-  copy 0 0 (particle s 0)
 
 module Buff2 = Buff.Make (struct  end)
 
-let capitalize_name s =
+let aux fn s =
   (* On initialise le buffer à la valeur de s. *)
   let _ = Buff2.mstore 0 s in
   let rec loop len k =
@@ -1187,7 +1061,7 @@ let capitalize_name s =
              start_with_int w
           then
             w
-          else capitalize_word w
+          else fn w
         in
         let len =
           let rec loop len k =
@@ -1200,33 +1074,9 @@ let capitalize_name s =
   in
   loop 0 0
 
-let uppercase_name s =
-  (* On initialise le buffer à la valeur de s. *)
-  let _ = Buff2.mstore 0 s in
-  let rec loop len k =
-    let i = next_word_pos s k in
-    if i = String.length s then Buff2.get (String.length s)
-    else
-      let j = next_sep_pos s i in
-      if j > i then
-        let w = String.sub s i (j - i) in
-        let w =
-          if is_roman_int w || particle s i || List.mem w public_name_word ||
-             start_with_int w
-          then
-            w
-          else uppercase_word w
-        in
-        let len =
-          let rec loop len k =
-            if k = i then len else loop (Buff2.store len s.[k]) (k + 1)
-          in
-          loop len k
-        in
-        loop (Buff2.mstore len w) j
-      else Buff2.get len
-  in
-  loop 0 0
+let capitalize_name = aux Utf8.capitalize
+
+let uppercase_name = aux Utf8.uppercase
 
 let get_lev0 =
   parser
