@@ -663,12 +663,6 @@ let print_err_sex conf base p err =
 #endif
   raise @@ Update.ModErr err
 
-let print_err_father_sex conf base p =
-  print_err_sex conf base p (transl conf "should be male")
-
-let print_err_mother_sex conf base p =
-  print_err_sex conf base p (transl conf "should be female")
-
 let print_err conf =
   let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
 #ifdef API
@@ -906,7 +900,7 @@ let update_family_with_fevents conf base fam =
             relation = relation; divorce = divorce;
             witnesses = witnesses}
 
-let effective_mod_aux conf base sfam scpl sdes fi oorigin =
+let effective_mod_aux conf base sfam scpl sdes fi oorigin set_sex =
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
@@ -938,23 +932,17 @@ let effective_mod_aux conf base sfam scpl sdes fi oorigin =
   in
 #endif
   let sfam = { sfam with relation = nfam.relation } in
-  if sfam.relation <> NoSexesCheckNotMarried
-  && sfam.relation <> NoSexesCheckMarried
+  if p_getenv conf.env "nsck" <> Some "on"
   then begin
-    begin match get_sex nfath with
-      | Female -> print_err_father_sex conf base nfath
-      | Male -> ()
+    let aux p sex msg =
+      match get_sex p with
       | Neuter ->
-        let nfath = {(gen_person_of_person nfath) with sex = Male} in
-        patch_person base nfath.key_index nfath
-    end ;
-    begin match get_sex nmoth with
-      | Male -> print_err_mother_sex conf base nmoth
-      | Female -> ()
-      | Neuter ->
-        let nmoth = {(gen_person_of_person nmoth) with sex = Female} in
-        patch_person base nmoth.key_index nmoth
-    end
+        if set_sex
+        then patch_person base (get_iper p) { (gen_person_of_person p) with sex }
+      | s -> if s <> sex then print_err_sex conf base p (transl conf msg)
+    in
+    aux nfath Male "should be male" ;
+    aux nmoth Female "should be female" ;
   end ;
   if Adef.father ncpl = Adef.mother ncpl then print_err conf ;
   let nfam =
@@ -985,7 +973,7 @@ let effective_mod conf base sfam scpl sdes =
   in
   let ochildren = get_children (foi base fi) in
   let nfam, ncpl, ndes =
-    effective_mod_aux conf base sfam scpl sdes fi (Some oorigin)
+    effective_mod_aux conf base sfam scpl sdes fi (Some oorigin) false
   in
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do
@@ -1056,7 +1044,7 @@ let effective_mod conf base sfam scpl sdes =
 let effective_add conf base sfam scpl sdes =
   let fi = insert_family base (empty_family base dummy_ifam) in
   let nfam, ncpl, ndes =
-    effective_mod_aux conf base sfam scpl sdes fi None
+    effective_mod_aux conf base sfam scpl sdes fi None true
   in
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
