@@ -26,7 +26,7 @@ let notes_links s =
           loop list_nt list_ind pos j
       | NotesLinks.WLperson (j, key, _, text) ->
           let list_ind =
-            let link = {NotesLinks.lnTxt = text; NotesLinks.lnPos = pos} in
+            let link = { NLDB.lnTxt = text ; lnPos = pos } in
             (key, link) :: list_ind
           in
           loop list_nt list_ind (pos + 1) j
@@ -56,7 +56,7 @@ let compute base bdir =
   flush stderr;
   let list = notes_links (base_notes_read base "") in
   if list = ([], []) then ()
-  else (let pg = NotesLinks.PgNotes in NotesLinks.update_db bdir pg list);
+  else (let pg = NLDB.PgNotes in NotesLinks.update_db base pg list);
   Printf.eprintf "--- wizard notes\n";
   flush stderr;
   begin try
@@ -74,15 +74,15 @@ let compute base bdir =
             begin
               Printf.eprintf "%s... " wizid;
               flush stderr;
-              let pg = NotesLinks.PgWizard wizid in
-              NotesLinks.update_db bdir pg list
+              let pg = NLDB.PgWizard wizid in
+              NotesLinks.update_db base pg list
             end
       done;
       Printf.eprintf "\n";
       flush stderr
     with Sys_error _ -> ()
   end;
-  let db = ref (NotesLinks.read_db bdir) in
+  let db = ref (read_nldb base) in
   Printf.eprintf "--- misc notes\n";
   flush stderr;
   let ndir = Filename.concat bdir (base_notes_dir base) in
@@ -104,7 +104,7 @@ let compute base bdir =
             in
             Printf.eprintf "%s...\n" fnotes;
             flush stderr;
-            let pg = NotesLinks.PgMisc fnotes in
+            let pg = NLDB.PgMisc fnotes in
             db := NotesLinks.add_in_db !db pg list
         else
           loop (Filename.concat dir file)
@@ -144,7 +144,7 @@ let compute base bdir =
       match notes_links (Buffer.contents buffer) with
       | ([], []) -> ()
       | list ->
-        db := NotesLinks.add_in_db !db (NotesLinks.PgInd (get_iper p)) list
+        db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list
     ) (Gwdb.persons base) ;
   ProgrBar.finish () ;
   Printf.eprintf "--- families notes\n"; flush stderr;
@@ -164,11 +164,11 @@ let compute base bdir =
       match notes_links (Buffer.contents buffer) with
       | ([], []) -> ()
       | list ->
-        db := NotesLinks.add_in_db !db (NotesLinks.PgFam (get_ifam fam)) list ;
+        db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list ;
         ProgrBar.run i nb_fam
     ) (Gwdb.families base) ;
   ProgrBar.finish () ;
-  NotesLinks.write_db bdir !db
+  write_nldb base !db
 
 let main () =
   Argl.parse speclist anonfun errmsg;

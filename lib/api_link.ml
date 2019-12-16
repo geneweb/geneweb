@@ -287,10 +287,9 @@ let p_to_piqi_full_person conf base ip ip_spouse =
           let baseprefix = conf.command in
           let index = Int32.of_string @@ Gwdb.string_of_ifam ifam in
           let fl =
-            MLink.Family_link.({
-              baseprefix = baseprefix;
-              ifam = index;
-            })
+            { MLink.Family_link.baseprefix
+            ; ifam = index
+            }
           in
           fl :: accu
         else accu)

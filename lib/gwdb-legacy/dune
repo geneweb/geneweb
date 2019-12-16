@@ -1,0 +1,19 @@
+(library
+  (name gwdb_legacy)
+  (public_name geneweb-gwdb-legacy)
+  (implements geneweb-lib.gwdb_driver.mli)
+  (libraries
+    geneweb-lib.def
+    geneweb-lib.wserver.mli
+    geneweb-lib.util
+    geneweb-lib.io
+  )
+  (modules_without_implementation dbdisk)
+  (modules
+    database
+    dbdisk
+    dutil
+    gwdb_driver
+    outbase
+  )
+)

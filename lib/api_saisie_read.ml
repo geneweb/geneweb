@@ -2277,11 +2277,10 @@ let build_graph_asc_v2 conf base p max_gen =
     let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
     let id = Int64.of_string @@ string_of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
-    Mread.Node.({
-      id = id;
-      person = p;
-      ifam = None;
-    })
+    { Mread.Node.id = id
+    ; person = p
+    ; ifam = None
+    }
   in
 (*
   let create_family ifam families =
@@ -2427,11 +2426,10 @@ let build_graph_desc_v2 conf base p max_gen =
     let id = Int64.of_string @@ string_of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
     let ifam = Int64.of_string @@ Gwdb.string_of_ifam ifam in
-    Mread.Node.({
-      id = id;
-      person = p;
-      ifam = Some ifam;
-    })
+    { Mread.Node.id = id
+    ; person = p
+    ; ifam = Some ifam
+    }
   in
 (*
   let create_family ifam families =
@@ -2750,11 +2748,10 @@ let print_result_graph_tree_v2 conf base ip =
               let id = Int64.of_string @@ string_of_int uniq_id in
               let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
               let node =
-                Mread.Node.({
-                  id = id;
-                  person = c;
-                  ifam = None;
-                })
+                { Mread.Node.id = id
+                ; person = c
+                ; ifam = None
+                }
               in
               node :: accu)
           (get_children fam) []
@@ -2779,11 +2776,10 @@ let print_result_graph_tree_v2 conf base ip =
                       let uniq_id = Hashtbl.hash (conf.command, ic) in
                       let id = Int64.of_string @@ string_of_int uniq_id in
                       let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
-                      Mread.Node.({
-                        id = id;
-                        person = c;
-                        ifam = None;
-                      }))
+                      { Mread.Node.id = id
+                      ; person = c
+                      ; ifam = None
+                      })
                     l
                 in
                 (List.rev before, after)
@@ -2795,11 +2791,10 @@ let print_result_graph_tree_v2 conf base ip =
                 let id = Int64.of_string @@ string_of_int uniq_id in
                 let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
                 let node =
-                  Mread.Node.({
-                    id = id;
-                    person = c;
-                    ifam = None;
-                  })
+                  { Mread.Node.id = id
+                  ; person = c
+                  ; ifam = None
+                  }
                 in
                 split_at_person (node :: before) after l
         in
@@ -3250,11 +3245,10 @@ let build_graph_asc_full conf base p max_gen =
     let uniq_id = Hashtbl.hash (base_prefix, get_iper p, factor) in
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix in
-    Mread.Node_full.({
-      id = id;
-      person = p;
-      ifam = None;
-    })
+    { Mread.Node_full.id = id
+    ; person = p
+    ; ifam = None
+    }
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
@@ -3406,11 +3400,10 @@ let build_graph_desc_full conf base p max_gen =
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix in
     let ifam = Int64.of_string @@ Gwdb.string_of_ifam ifam in
-    Mread.Node_full.({
-      id = id;
-      person = p;
-      ifam = Some ifam;
-    })
+    { Mread.Node_full.id = id
+    ; person = p
+    ; ifam = Some ifam
+    }
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then

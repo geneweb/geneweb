@@ -81,11 +81,11 @@ let () =
     | `None -> assert false
   in
   let wserver_pkg = "geneweb-wserver" in
-  let gwdb_d, gwdb_pkg =
+  let gwdb_pkg =
     match !gwdb with
     | `None
     | `Legacy ->
-      "-D GWDB1", "geneweb-gwdb-legacy geneweb-gwdb-legacy.internal"
+      "geneweb-gwdb-legacy" ;
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, camlp5f, ext, rm, strip =
@@ -109,7 +109,6 @@ let () =
   var "EXT" ext ;
   var "API_D" api_d ;
   var "API_PKG" api_pkg ;
-  var "GWDB_D" gwdb_d ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
   var "WSERVER_PKG" wserver_pkg ;

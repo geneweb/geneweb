@@ -481,7 +481,8 @@ let commit_wiznotes conf base wz s =
   let fname = wzfile wddir wz in
   (try Unix.mkdir wddir 0o755 with Unix.Unix_error (_, _, _) -> ());
   write_wizard_notes fname s;
-  let pg = NotesLinks.PgWizard wz in Notes.update_notes_links_db conf pg s
+  let pg = Def.NLDB.PgWizard wz in
+  Notes.update_notes_links_db base pg s
 
 let print_mod_ok conf base =
   let auth_file =
@@ -651,7 +652,8 @@ let do_change_wizard_visibility conf base x set_vis =
       if not found && not set_vis then Printf.fprintf oc "%s\n" conf.user;
       close_out oc;
       let file = Filename.concat wddir "connected.deny" in
-      Mutil.remove_file file; Sys.rename tmp_file file
+      Mutil.rm file ;
+      Sys.rename tmp_file file
     end;
   do_connected_wizards conf base x
 

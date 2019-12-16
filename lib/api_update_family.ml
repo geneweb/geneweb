@@ -414,31 +414,6 @@ let print_add conf base mod_f mod_fath mod_moth =
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c)
 
 
-let print_del conf base ip ifam =
-  let fam = foi base ifam in
-      begin
-        UpdateFamOk.effective_del base ifam fam;
-        let changed =
-          let gen_p =
-            let p =
-              if ip = get_mother fam then poi base (get_mother fam)
-              else poi base (get_father fam)
-            in
-            Util.string_gen_person base (gen_person_of_person p)
-          in
-          let gen_fam =
-            Util.string_gen_family base (gen_family_of_family fam)
-          in
-          U_Delete_family (gen_p, gen_fam)
-        in
-        let hr =
-          [(fun () -> History.record conf base changed "df");
-           (fun () -> Update.delete_topological_sort conf base)]
-        in
-        Api_update_util.UpdateSuccess ([], [], hr)
-      end
-
-
 let print_mod_aux conf base mod_f callback =
   try
     let (sfam, scpl, sdes) = reconstitute_family conf base mod_f in
@@ -481,7 +456,7 @@ let print_mod conf base ip mod_f =
         let sl = loop (fam.fevents) sl in
         String.concat " " (List.map (sou base) sl)
       in
-      Notes.update_notes_links_db conf (NotesLinks.PgFam ifam) s;
+      Notes.update_notes_links_db base (NLDB.PgFam ifam) s;
       let nfs = (Adef.parent_array cpl, des.children) in
       let onfs = Some (ofs, nfs) in
       let (wl, ml) =

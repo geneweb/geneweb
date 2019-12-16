@@ -27,9 +27,14 @@ val infer_death_from_parents : config -> base -> family -> death
 val print_same_name : config -> base -> person -> unit
 val print_person_parents_and_spouse : config -> base -> person -> unit
 
-val insert_person :
-  config -> base -> string -> (iper, iper, istr) gen_person list ref -> key ->
-    iper
+val insert_person
+  : config
+  -> base
+  -> string
+  -> (iper, iper, istr) gen_person list ref
+  -> key
+  -> iper
+
 val delete_topological_sort_v : config -> base -> unit
 val delete_topological_sort : config -> base -> unit
 

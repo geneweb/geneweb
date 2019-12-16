@@ -24,7 +24,6 @@ EXE = \
 	bin/gwc.exe \
 	bin/gwd.exe \
 	bin/gwdiff.exe \
-	bin/gwtp.exe \
 	bin/gwu.exe \
 	bin/setup.exe \
 	bin/update_nldb.exe \
@@ -32,7 +31,6 @@ EXE = \
 ###### [BEGIN] Generated files section
 
 CAMLP5_PA_EXTEND_FILES = \
-	bin/ged2gwb/ged2gwb \
 	lib/templ \
 	bin/setup/setup
 
@@ -66,7 +64,7 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
-CPPO_D=$(API_D) $(GWDB_D)
+CPPO_D=$(API_D)
 
 %/dune: %/dune.in Makefile.config
 	@echo -n "Generating $@..." \
@@ -173,11 +171,6 @@ distrib: exe
 	cp $(BUILD_DISTRIB_DIR)gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);
 	cp $(BUILD_DISTRIB_DIR)setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
 	cp $(BUILD_DISTRIB_DIR)update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
-	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp
-	mkdir $(DISTRIB_DIR)/gw/gwtp_tmp/lang
-	cp bin/gwtp/README $(DISTRIB_DIR)/gw/gwtp_tmp/.
-	cp $(BUILD_DISTRIB_DIR)/gwtp.exe $(DISTRIB_DIR)/gw/gwtp_tmp/gwtp$(EXT)
-	cp bin/gwtp/lang/*.txt $(DISTRIB_DIR)/gw/gwtp_tmp/lang/.
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
 	mkdir $(DISTRIB_DIR)/gw/setup/lang

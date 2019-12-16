@@ -132,7 +132,7 @@ let print_linked_list conf base pgl =
     (fun pg ->
        Wserver.printf "<li>";
        begin match pg with
-         NotesLinks.PgInd ip ->
+         | Def.NLDB.PgInd ip ->
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
@@ -150,7 +150,7 @@ let print_linked_list conf base pgl =
              Wserver.printf "</span>"
            end;
            Wserver.printf "</tt>\n"
-       | NotesLinks.PgFam ifam ->
+       | Def.NLDB.PgFam ifam ->
            let fam = foi base ifam in
            let fath = pget conf base (get_father fam) in
            let moth = pget conf base (get_mother fam) in
@@ -172,7 +172,7 @@ let print_linked_list conf base pgl =
              (DateDisplay.short_dates_text conf base moth);
            Wserver.printf "</span>";
            Wserver.printf "</tt>\n"
-       | NotesLinks.PgNotes ->
+       | Def.NLDB.PgNotes ->
            Wserver.printf "<tt>";
            if conf.wizard then
              begin
@@ -186,7 +186,7 @@ let print_linked_list conf base pgl =
            Wserver.printf "%s" (transl_nth conf "note/notes" 1);
            Wserver.printf "</a>\n";
            Wserver.printf "</tt>\n"
-       | NotesLinks.PgMisc fnotes ->
+       | Def.NLDB.PgMisc fnotes ->
            let (nenv, _) = read_notes base fnotes in
            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
            let title = Util.safe_html title in
@@ -205,7 +205,7 @@ let print_linked_list conf base pgl =
            Wserver.printf "</a>";
            if title <> "" then Wserver.printf "(%s)" title;
            Wserver.printf "</tt>\n"
-       | NotesLinks.PgWizard wizname ->
+       | Def.NLDB.PgWizard wizname ->
            Wserver.printf "<tt>";
            if conf.wizard then
              begin

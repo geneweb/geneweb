@@ -12,8 +12,6 @@
 (dirs :standard \ dico_place)
 #endif
 
-#ifdef GWDB1
-
 (executable
   (package geneweb-bin)
   (public_name consang)
@@ -22,19 +20,12 @@
   (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )
 
-(library
-  (name db1link)
-  (wrapped false)
-  (libraries unix %%%GWDB_PKG%%% %%%WSERVER_PKG%%% geneweb)
-  (modules db1link)
-)
-
 (executable
   (package geneweb-bin)
   (public_name gwc)
-  (modules gwc)
+  (modules gwc db1link)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb db1link)
+  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )
 
 (executable
@@ -43,12 +34,6 @@
   (modules ged2gwb)
   (libraries unix str camlp5.gramlib %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )
-
-#else
-
-(dirs %{dirs} \ consang \ db1link \ ged2gwb)
-
-#endif
 
 (include_subdirs unqualified)
 
@@ -74,11 +59,4 @@
   (public_names connex gwb2ged gwdiff gwu setup update_nldb)
   (modules connex gwb2ged gwdiff gwu setup update_nldb)
   (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
-)
-
-(executables
-  (package geneweb-bin)
-  (public_names gwtp)
-  (modules gwtp httpEnv iolight)
-  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )

@@ -159,9 +159,4 @@ let main () =
              exit 2
            end)
 
-let print_exc =
-  function
-    Failure txt -> Printf.printf "Failed: %s\n" txt; flush stdout; exit 2
-  | exc -> Printexc.print raise exc
-
-let _ = try main () with exc -> print_exc exc
+let _ = main ()

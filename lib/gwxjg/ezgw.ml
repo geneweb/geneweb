@@ -49,12 +49,8 @@ let env = empty
 
 let get_env x = match x with Some x -> x | None -> raise Not_found
 
-let safe_sou base istr k =
-  if istr = dummy_istr then ""
-  else k @@ sou base istr
-
 let mk_note conf base env note =
-  safe_sou base note @@ fun s ->
+  let s = sou base note in
   let s = string_with_macros conf env s in
   let lines = Wiki.html_of_tlsw conf s in
   let wi =
@@ -85,7 +81,7 @@ module Person = struct
   let birth_date p = Adef.od_of_cdate (get_birth p)
 
   let birth_place conf base p =
-    safe_sou base (get_birth_place p) @@ Util.string_of_place conf
+    Util.string_of_place conf @@ sou base (get_birth_place p)
 
   let birth_note conf base p =
     mk_person_note conf base p (get_birth_note p)
@@ -93,7 +89,7 @@ module Person = struct
   let baptism_date p = Adef.od_of_cdate (get_baptism p)
 
   let baptism_place conf base p =
-    safe_sou base (get_baptism_place p) @@ Util.string_of_place conf
+    Util.string_of_place conf @@ sou base (get_baptism_place p)
 
   let baptism_note conf base p =
     mk_person_note conf base p (get_baptism_note p)
@@ -102,7 +98,7 @@ module Person = struct
     get_burial p
 
   let burial_place conf base p =
-    safe_sou base (get_burial_place p) @@ Util.string_of_place conf
+    Util.string_of_place conf @@ sou base (get_burial_place p)
 
   let burial_note conf base p =
     mk_person_note conf base p (get_burial_note p)
@@ -116,7 +112,7 @@ module Person = struct
     else 0.
 
   let cremation_place conf base p =
-    safe_sou base (get_burial_place p) @@ Util.string_of_place conf
+    Util.string_of_place conf @@ sou base (get_burial_place p)
 
   let dates conf base p =
     DateDisplay.short_dates_text conf base p
@@ -125,7 +121,7 @@ module Person = struct
     get_death p
 
   let death_place conf base p =
-    safe_sou base (get_death_place p) @@ Util.string_of_place conf
+    Util.string_of_place conf @@ sou base (get_death_place p)
 
   let death_note conf base p =
     mk_person_note conf base p (get_death_note p)
@@ -172,9 +168,7 @@ module Person = struct
     | _ -> false
 
   let linked_page conf base p s =
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-    let fname = Filename.concat bdir "notes_links" in
-    let db = NotesLinks.read_db_from_file fname in
+    let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     let key =
       let fn = Name.lower (sou base (get_first_name p)) in
@@ -254,7 +248,7 @@ module Person = struct
     | None -> []
 
   let public_name base p =
-    safe_sou base (get_public_name p) @@ fun x -> x
+    sou base (get_public_name p)
 
   let qualifier base p =
     match get_qualifiers p with
@@ -268,7 +262,7 @@ module Person = struct
     index_of_sex (get_sex p)
 
   let psources base p =
-    safe_sou base (get_psources p) @@ fun x -> x
+    sou base (get_psources p)
 
   let surname base p =
     p_surname base p
@@ -352,13 +346,13 @@ module Event = struct
     Adef.od_of_cdate d
 
   let place conf base (_, _, p, _, _, _, _) =
-    safe_sou base p @@ Util.string_of_place conf
+    Util.string_of_place conf @@ sou base p
 
   let spouse_opt (_, _, _, _, _, _, isp) =
     isp
 
   let src base (_, _, _, _, s, _, _) =
-    safe_sou base s @@ fun x -> x
+    sou base s
 
   let kind (n, _, _, _, _, _, _) =
     match n with

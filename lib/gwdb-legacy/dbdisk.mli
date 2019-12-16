@@ -1,32 +1,23 @@
-(* $Id: def.mli,v 5.22 2008-01-08 11:58:46 ddr Exp $ *)
-(* Copyright (c) 1998-2007 INRIA *)
+type fix = Adef.fix (* FIXME: expose its type *)
+type cdate = Def.cdate (* FIXME: expose its type *)
 
-type ('a, 'b) choice =
-    Left of 'a
-  | Right of 'b
+type date = Def.date =
+  | Dgreg of dmy * calendar
+  | Dtext of string
+and calendar = Def.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and dmy = Def.dmy =
+  { day : int; month : int; year : int; prec : precision; delta : int }
+and dmy2 = Def.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+and precision = Def.precision =
+  | Sure
+  | About
+  | Maybe
+  | Before
+  | After
+  | OrYear of dmy2
+  | YearInt of dmy2
 
-type cdate = Adef.cdate
-
-type date =
-  Adef.date =
-      Dgreg of dmy * calendar
-    | Dtext of string
-and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
-and dmy =
-  Adef.dmy =
-    { day : int; month : int; year : int; prec : precision; delta : int }
-and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
-and precision =
-  Adef.precision =
-      Sure
-    | About
-    | Maybe
-    | Before
-    | After
-    | OrYear of dmy2
-    | YearInt of dmy2
-
-type relation_kind =
+type relation_kind = Def.relation_kind =
   | Married
   | NotMarried
   | Engaged
@@ -39,32 +30,34 @@ type relation_kind =
   | Pacs
   | Residence
 
-type divorce =
+type divorce = Def.divorce =
   | NotDivorced
   | Divorced of cdate
   | Separated
 
-type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
-type death =
-    NotDead
+type death_reason = Def.death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
+
+type death = Def.death =
+  | NotDead
   | Death of death_reason * cdate
   | DeadYoung
   | DeadDontKnowWhen
   | DontKnowIfDead
   | OfCourseDead
 
-type burial =
-    UnknownBurial
+type burial = Def.burial =
+  | UnknownBurial
   | Buried of cdate
   | Cremated of cdate
 
-type access = IfTitles | Public | Private
+type access = Def.access = IfTitles | Public | Private
 
-type 'string gen_title_name =
-    Tmain
+type 'string gen_title_name = 'string Def.gen_title_name =
+  | Tmain
   | Tname of 'string
   | Tnone
-type 'string gen_title =
+
+type 'string gen_title = 'string Def.gen_title =
   { t_name : 'string gen_title_name;
     t_ident : 'string;
     t_place : 'string;
@@ -72,10 +65,10 @@ type 'string gen_title =
     t_date_end : cdate;
     t_nth : int }
 
-type witness_kind = Witness | Witness_GodParent | Witness_Officer
+type witness_kind = Def.witness_kind = Witness | Witness_GodParent | Witness_Officer
 
-type 'string gen_pers_event_name =
-    Epers_Birth
+type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
+  | Epers_Birth
   | Epers_Baptism
   | Epers_Death
   | Epers_Burial
@@ -126,7 +119,8 @@ type 'string gen_pers_event_name =
   | Epers_VenteBien
   | Epers_Will
   | Epers_Name of 'string
-type ('person, 'string) gen_pers_event =
+
+type ('person, 'string) gen_pers_event = ('person, 'string) Def.gen_pers_event =
   { epers_name : 'string gen_pers_event_name;
     epers_date : cdate;
     epers_place : 'string;
@@ -135,8 +129,8 @@ type ('person, 'string) gen_pers_event =
     epers_src : 'string;
     epers_witnesses : ('person * witness_kind) array }
 
-type 'string gen_fam_event_name =
-    Efam_Marriage
+type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
+  | Efam_Marriage
   | Efam_NoMarriage
   | Efam_NoMention
   | Efam_Engage
@@ -149,7 +143,8 @@ type 'string gen_fam_event_name =
   | Efam_PACS
   | Efam_Residence
   | Efam_Name of 'string
-type ('person, 'string) gen_fam_event =
+
+type ('person, 'string) gen_fam_event = ('person, 'string) Def.gen_fam_event =
   { efam_name : 'string gen_fam_event_name;
     efam_date : cdate;
     efam_place : 'string;
@@ -158,19 +153,22 @@ type ('person, 'string) gen_fam_event =
     efam_src : 'string;
     efam_witnesses : ('person * witness_kind) array }
 
+type relation_type = Def.relation_type =
+  | Adoption
+  | Recognition
+  | CandidateParent
+  | GodParent
+  | FosterParent
 
-type relation_type =
-  Adoption | Recognition | CandidateParent | GodParent | FosterParent
-
-type ('person, 'string) gen_relation =
+type ('person, 'string) gen_relation = ('person, 'string) Def.gen_relation =
   { r_type : relation_type;
     r_fath : 'person option;
     r_moth : 'person option;
     r_sources : 'string }
 
-type sex = Male | Female | Neuter
+type sex = Def.sex = Male | Female | Neuter
 
-type place =
+type place = Def.place =
   { other : string;
     town : string;
     township : string;
@@ -182,7 +180,7 @@ type place =
 
 (* person *)
 
-type ('iper, 'person, 'string) gen_person =
+type ('iper, 'person, 'string) gen_person = ('iper, 'person, 'string) Def.gen_person =
   { first_name : 'string;
     surname : 'string;
     occ : int;
@@ -219,14 +217,13 @@ type ('iper, 'person, 'string) gen_person =
     psources : 'string;
     key_index : 'iper }
 
+type 'family gen_ascend = 'family Def.gen_ascend = { parents : 'family option; consang : fix }
 
-type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
-
-type 'family gen_union = { family : 'family array }
+type 'family gen_union = 'family Def.gen_union = { family : 'family array }
 
 (* family *)
 
-type ('person, 'ifam, 'string) gen_family =
+type ('person, 'ifam, 'string) gen_family = ('person, 'ifam, 'string) Def.gen_family =
   { marriage : cdate;
     marriage_place : 'string;
     marriage_note : 'string;
@@ -240,16 +237,17 @@ type ('person, 'ifam, 'string) gen_family =
     fsources : 'string;
     fam_index : 'ifam }
 
-type 'person gen_couple = 'person Adef.gen_couple
+type 'person gen_couple = 'person Def.gen_couple (* FIXME: expose its type *)
 
-type 'person gen_descend = { children : 'person array }
+type 'person gen_descend = 'person Def.gen_descend = { children : 'person array }
 
-type 'person error =
-    AlreadyDefined of 'person
+type 'person error = 'person Def.error =
+  | AlreadyDefined of 'person
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person
 
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
+  ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) Def.warning =
   | BigAgeBetweenSpouses of 'person * 'person * dmy
   | BirthAfterDeath of 'person
   | IncoherentSex of 'person * int * int
@@ -283,58 +281,68 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | YoungForMarriage of 'person * dmy
   | OldForMarriage of 'person * dmy
 
-type ('person, 'descend, 'title) misc = MissingSources
+type ('person, 'descend, 'title) misc = ('person, 'descend, 'title) Def.misc = MissingSources
 
-type rn_mode = RnAll | Rn1Ln | RnDeg
+type dsk_person = (int, int, int) gen_person
+type dsk_ascend = int gen_ascend
+type dsk_union = int gen_union
+type dsk_family = (int, int, int) gen_family
+type dsk_couple = int gen_couple
+type dsk_descend = int gen_descend
 
-type base_notes =
-  { nread : string -> rn_mode -> string
-  ; norigin_file : string
-  ; efiles : unit -> string list
+type dsk_title = int gen_title
+
+type 'a record_access =
+  { load_array : unit -> unit
+  ; get : int -> 'a
+  ; get_nopending : int -> 'a
+  ; set : int -> 'a -> unit
+  ; mutable len : int
+  ; output_array : out_channel -> unit
+  ; clear_array : unit -> unit
   }
 
-(* Historique des modifications *)
+type string_person_index =
+  { find : int -> int list
+  ; cursor : string -> int
+  ; next : int -> int
+  }
 
-type ('iper, 'person, 'family, 'string) base_changed =
-    U_Add_person of ('iper, 'person, 'string) gen_person
-  | U_Modify_person of
-      ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person
-  | U_Delete_person of ('iper, 'person, 'string) gen_person
-  | U_Merge_person of
-      ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person *
-        ('iper, 'person, 'string) gen_person
-  | U_Send_image of ('iper, 'person, 'string) gen_person
-  | U_Delete_image of ('iper, 'person, 'string) gen_person
-  | U_Add_family of
-      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family
-  | U_Modify_family of
-      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family *
-        ('person, 'family, 'string) gen_family
-  | U_Delete_family of
-      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family
-  | U_Invert_family of ('iper, 'person, 'string) gen_person * 'family
-  | U_Merge_family of
-      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family *
-        ('person, 'family, 'string) gen_family * ('person, 'family, 'string) gen_family
-  | U_Change_children_name of
-      ('iper, 'person, 'string) gen_person *
-        ((string * string * int * 'person) * (string * string * int * 'person)) list
-  | U_Add_parent of
-      ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family
-  | U_Kill_ancestors of ('iper, 'person, 'string) gen_person
-  | U_Multi of
-      ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person * bool
-  | U_Notes of int option * string
+type visible_record_access =
+  { v_write : unit -> unit; v_get : (dsk_person -> bool) -> int -> bool }
 
-module NLDB = struct
-  type ('a, 'b) page =
-    | PgInd of 'a
-    | PgFam of 'b
-    | PgNotes
-    | PgMisc of string
-    | PgWizard of string
-  type key = string * string * int
-  type ind = { lnTxt : string option ; lnPos : int }
-  type ('a, 'b) t = ( ('a, 'b) page
-                      * (string list * (key * ind) list) ) list
-end
+type base_data =
+  { persons : dsk_person record_access
+  ; ascends : dsk_ascend record_access
+  ; unions : dsk_union record_access
+  ; visible : visible_record_access
+  ; families : dsk_family record_access
+  ; couples : dsk_couple record_access
+  ; descends : dsk_descend record_access
+  ; strings : string record_access
+  ; particles : string list
+  ; bnotes : Def.base_notes
+  ; bdir : string
+  }
+
+type base_func =
+  { person_of_key : string -> string -> int -> int option
+  ; persons_of_name : string -> int list
+  ; strings_of_fsname : string -> int list
+  ; persons_of_surname : string_person_index
+  ; persons_of_first_name : string_person_index
+  ; patch_person : int -> dsk_person -> unit
+  ; patch_ascend : int -> dsk_ascend -> unit
+  ; patch_union : int -> dsk_union -> unit
+  ; patch_family : int -> dsk_family -> unit
+  ; patch_couple : int -> dsk_couple -> unit
+  ; patch_descend : int -> dsk_descend -> unit
+  ; patch_name : string -> int -> unit
+  ; insert_string : string -> int
+  ; commit_patches : unit -> unit
+  ; commit_notes : string -> string -> unit
+  ; cleanup : unit -> unit
+  ; nb_of_real_persons : unit -> int
+  }
+
+type dsk_base = { data : base_data; func : base_func }

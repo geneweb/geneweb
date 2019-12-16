@@ -770,7 +770,7 @@ let fwitnesses_of fevents =
 let patch_person_with_pevents base ip =
   let p = poi base ip in
   let p = gen_person_of_person p in
-  let empty_string = Gwdb.insert_string base "" in
+  let empty_string = Gwdb.empty_string in
   let evt ~name ?(date = Adef.cdate_None) ~place ~src ~note () =
     {epers_name = name; epers_date = date;
      epers_place = place; epers_reason = empty_string;
@@ -1051,7 +1051,7 @@ let effective_mod conf base nsck sfam scpl sdes =
   Update.update_related_pointers base pi ol nl; fi, nfam, ncpl, ndes
 
 let effective_add conf base nsck sfam scpl sdes =
-  let fi = insert_family base (empty_family base dummy_ifam) in
+  let fi = insert_family base (no_family dummy_ifam) no_couple no_descend in
   let origin_file _nfam ncpl ndes = infer_origin_file conf base fi ncpl ndes in
   let (nfath_p, nmoth_p, nfam, ncpl, ndes) =
     aux_effective_mod conf base nsck sfam scpl sdes fi origin_file
@@ -1104,33 +1104,23 @@ let effective_chg_order base ip u ifam n =
   let fam = UpdateFam.change_order u ifam n in
   let u = {family = Array.of_list fam} in patch_union base ip u
 
-let kill_family base ifam1 ip =
-  let u = poi base ip in
-  let l =
-    Array.fold_right
-      (fun ifam ifaml -> if ifam = ifam1 then ifaml else ifam :: ifaml)
-      (get_family u) []
-  in
-  let u = {family = Array.of_list l} in patch_union base ip u
-
-let kill_parents base ip =
-  let a = {parents = None; consang = Adef.fix (-1)} in patch_ascend base ip a
-
-let effective_del base ifam fam =
-  kill_family base ifam (get_father fam);
-  kill_family base ifam (get_mother fam);
-  Array.iter (kill_parents base) (get_children fam);
-  delete_family base ifam
-
-let array_forall2 f a1 a2 =
-  if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
-  else
-    let rec loop i =
-      if i = Array.length a1 then true
-      else if f a1.(i) a2.(i) then loop (i + 1)
-      else false
+let effective_del conf base ip fam =
+  let ifam = get_ifam fam in
+  delete_family base ifam ;
+  let changed =
+    let gen_p =
+      let p =
+        if ip = get_mother fam then poi base (get_mother fam)
+        else poi base (get_father fam)
+      in
+      Util.string_gen_person base (gen_person_of_person p)
     in
-    loop 0
+    let gen_fam =
+      Util.string_gen_family base (gen_family_of_family fam)
+    in
+    U_Delete_family (gen_p, gen_fam)
+  in
+  History.record conf base changed "df"
 
 let is_a_link =
   function
@@ -1159,10 +1149,10 @@ let need_check_noloop (scpl, sdes, onfs) =
     match onfs with
       Some ((opar, ochil), (npar, nchil)) ->
         not
-          (array_forall2 (is_created_or_already_there opar) npar
+          (Mutil.array_forall2 (is_created_or_already_there opar) npar
              (Gutil.parent_array scpl)) ||
         not
-          (array_forall2 (is_created_or_already_there ochil) nchil
+          (Mutil.array_forall2 (is_created_or_already_there ochil) nchil
              sdes.children)
     | None -> true
   else false
@@ -1286,6 +1276,21 @@ let print_del_ok conf base wl =
   end;
   Update.print_warnings conf base wl;
   Hutil.trailer conf
+
+let print_del conf base =
+  match p_getenv conf.env "i" with
+  | Some i ->
+    let ifam = ifam_of_string i in
+    let fam = foi base ifam in
+    let ip =
+      match p_getenv conf.env "ip" with
+      | Some i when get_mother fam = iper_of_string i -> get_mother fam
+      | _ -> get_father fam
+    in
+    effective_del conf base ip fam ;
+    Util.commit_patches conf base;
+    print_del_ok conf base []
+  | _ -> Hutil.incorrect_request conf
 
 let print_inv_ok conf base p =
   let title _ =
@@ -1435,8 +1440,8 @@ let print_add_parents o_conf base =
                 let f = foi base ifam in
                 let sfam = gen_family_of_family f in
                 let o_f = Util.string_gen_family base sfam in
-                let scpl = gen_couple_of_couple f in
-                let sdes = { children = Array.append (gen_descend_of_descend f).children [|child|] } in
+                let scpl = Gwdb.gen_couple_of_family f in
+                let sdes = { children = Array.append (gen_descend_of_family f).children [|child|] } in
                 patch_descend base ifam sdes ;
                 patch_ascend base child { parents = Some ifam
                                         ; consang = Adef.fix (-1) } ;
@@ -1463,33 +1468,6 @@ let print_add_parents o_conf base =
       end
     | _ -> print_add o_conf base
   else print_add o_conf base
-
-let print_del conf base =
-  match p_getenv conf.env "i" with
-    Some i ->
-      let ifam = ifam_of_string i in
-      let fam = foi base ifam in
-      effective_del base ifam fam;
-      Util.commit_patches conf base;
-      let changed =
-        let gen_p =
-          let p =
-            match p_getenv conf.env "ip" with
-              Some i when get_mother fam = iper_of_string i ->
-              poi base (get_mother fam)
-            | _ -> poi base (get_father fam)
-          in
-          Util.string_gen_person base (gen_person_of_person p)
-        in
-        let gen_fam =
-          Util.string_gen_family base (gen_family_of_family fam)
-        in
-        U_Delete_family (gen_p, gen_fam)
-      in
-      History.record conf base changed "df";
-      Update.delete_topological_sort conf base ;
-      print_del_ok conf base []
-  | _ -> Hutil.incorrect_request conf
 
 let print_mod_aux conf base callback =
   let nsck = p_getenv conf.env "nsck" = Some "on" in
@@ -1550,7 +1528,7 @@ let print_mod o_conf base =
       in
       String.concat " " (List.map (sou base) sl)
     in
-    Notes.update_notes_links_db conf (NotesLinks.PgFam ifam) s;
+    Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
     let nfs = Adef.parent_array cpl, des.children in
     let onfs = Some (ofs, nfs) in
     let (wl, ml) =

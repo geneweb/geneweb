@@ -375,9 +375,8 @@ let display_descendants_with_numbers conf base max_level ancestor =
             let s2 = person_text_no_html conf base ancestor in
             transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s1 s2))
   in
-  let persons = Gwdb.ipers base in
-  let marks = Gwdb.iper_marker persons false in
-  let paths = Gwdb.iper_marker persons [] in
+  let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
+  let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
   Hutil.header conf title;
   total := 0;
   Wserver.printf "%s" (DateDisplay.short_dates_text conf base ancestor);
@@ -513,24 +512,20 @@ let display_descendant_index conf base max_level ancestor =
     else Wserver.printf "%s" txt
   in
   Hutil.header conf title;
-  let persons = Gwdb.ipers base in
-  let marks = Gwdb.iper_marker persons false in
-  let paths = Gwdb.iper_marker persons [] in
+  let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
+  let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   let list =
-    Gwdb.Collection.fold
-      (fun acc i ->
-         let p = pget conf base i in
-         if p_first_name base p <> "?"
-         && p_surname base p <> "?"
-         && p_first_name base p <> "x"
-         && (not (is_hide_names conf p) || authorized_age conf base p)
-         then i :: acc
-         else acc
-      )
-      []
-      persons
+    Gwdb.Collection.fold begin fun acc p ->
+      (* FIXME: pget *)
+      if p_first_name base p <> "?"
+      && p_surname base p <> "?"
+      && p_first_name base p <> "x"
+      && (not (is_hide_names conf p) || authorized_age conf base p)
+      then get_iper p :: acc
+      else acc
+    end  [] (persons base)
   in
   sort_and_display conf base paths true list;
   Hutil.trailer conf
@@ -542,38 +537,34 @@ let display_spouse_index conf base max_level ancestor =
       (Utf8.capitalize (transl conf "index of the spouses (non descendants)"))
   in
   Hutil.header conf title;
-  let persons = Gwdb.ipers base in
-  let marks = Gwdb.iper_marker persons false in
-  let paths = Gwdb.iper_marker persons [] in
+  let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
+  let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   let list =
-    Gwdb.Collection.fold
-      (fun acc i ->
-         if Gwdb.Marker.get paths i <> [] then
-           let p = pget conf base i in
-           if p_first_name base p <> "?"
-           && p_surname base p <> "?"
-           && p_first_name base p <> "x"
-           then
-             Array.fold_left
-               (fun acc ifam ->
-                  let c = Gutil.spouse (get_iper p) (foi base ifam) in
-                  if Gwdb.Marker.get paths c = [] then
-                    let c = pget conf base c in
-                    if p_first_name base c <> "?"
-                    && p_surname base c <> "?"
-                    && p_first_name base p <> "x"
-                    && (not (is_hide_names conf c) || authorized_age conf base c)
-                    && not (List.mem (get_iper c) acc)
-                    then get_iper c :: acc
-                    else acc
-                  else acc)
-               acc (get_family p)
-           else acc
-         else acc)
-      []
-      persons
+    Gwdb.Collection.fold begin fun acc p ->
+      (* FIXME: pget *)
+      let i = get_iper p in
+      if Gwdb.Marker.get paths i <> [] then
+        if p_first_name base p <> "?"
+        && p_surname base p <> "?"
+        && p_first_name base p <> "x"
+        then
+          Array.fold_left begin fun acc ifam ->
+            let c = Gutil.spouse (get_iper p) (foi base ifam) in
+            if Gwdb.Marker.get paths c = [] then
+              let c = pget conf base c in
+              if p_first_name base c <> "?"
+              && p_surname base c <> "?"
+              && p_first_name base p <> "x"
+              && (not (is_hide_names conf c) || authorized_age conf base c)
+              && not (List.mem (get_iper c) acc)
+              then get_iper c :: acc
+              else acc
+            else acc
+          end acc (get_family p)
+        else acc
+      else acc end [] (persons base)
   in
   sort_and_display conf base paths false list;
   Hutil.trailer conf

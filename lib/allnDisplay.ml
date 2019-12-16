@@ -49,7 +49,7 @@ let print_title conf base is_surnames ini len =
   if ini <> "" then
     Wserver.printf " %s %s" (transl conf "starting with") ini
   else
-    Wserver.printf " (%d %s)" (Util.real_nb_of_persons conf base)
+    Wserver.printf " (%d %s)" (Gwdb.nb_of_real_persons base)
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
 
 let displayify s = s
