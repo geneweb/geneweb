@@ -413,9 +413,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   match p_getenv o_conf.env "i2" with
     Some i2 ->
       let conf = Update.update_conf o_conf in
-      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-      let fname = Filename.concat bdir "notes_links" in
-      let db = NotesLinks.read_db_from_file fname in
+      let db = Gwdb.read_nldb base in
       let (ofn1, osn1, oocc1) = (o_p1.first_name, o_p1.surname, o_p1.occ) in
       let key1 = Name.lower ofn1, Name.lower osn1, oocc1 in
       let pgl1 = Perso.links_to_ind conf base db key1 in
@@ -432,14 +430,8 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
       let p = UpdateIndOk.effective_mod ~skip_conflict:ip2 conf base sp in
       let p = redirect_relations_of_added_related base p ip2 rel_chil in
       redirect_added_families base p ip2 p2_family;
-      let warning _ = () in
-      let p2 = UpdateIndOk.effective_del base warning p2 in
-      patch_person base p2.key_index p2;
-      let u2 = {family = [| |]} in
-      patch_union base p2.key_index u2;
+      UpdateIndOk.effective_del conf base p2 ;
       patch_person base p.key_index p;
-      patch_cache_info conf Util.cache_nb_base_persons
-        (fun v -> let v = int_of_string v - 1 in string_of_int v);
       let u = {family = Array.append p_family p2_family} in
       if p2_family <> [| |] then patch_union base p.key_index u;
       Consang.check_noloop_for_person_list base (Update.error conf base)

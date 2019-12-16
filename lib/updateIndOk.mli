@@ -4,9 +4,7 @@ open Config
 open Def
 open Gwdb
 
-val effective_del :
-  base -> (CheckItem.base_warning -> unit) -> person ->
-    (iper, iper, istr) gen_person
+val effective_del : config -> base -> person -> unit
 
 val effective_mod
   : ?skip_conflict:iper
@@ -32,13 +30,13 @@ val print_change_event_order : config -> base -> unit
 
 
 (* Ajout pour l'API *)
-val effective_add :
-  config -> base -> (iper, Update.key, string) Def.gen_person ->
-    (iper, iper, istr) Def.gen_person * 'a Def.gen_ascend
+val effective_add
+  : config -> base -> (iper, Update.key, string) Def.gen_person
+  -> (iper, iper, istr) Def.gen_person * ifam Def.gen_ascend
 val raw_get : config -> string -> string
-val strip_person :
-  (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person ->
-    (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
+val strip_person
+  : (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
+  -> (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
 val check_person :
   config -> (iper, string * string * 'b * 'c * 'd, string) Def.gen_person ->
     string option

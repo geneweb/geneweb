@@ -275,11 +275,6 @@ let rec stream_line (strm__ : _ Stream.t) =
 
 type src_mode = Lang | Source
 
-let notes_links conf =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  NotesLinks.read_db_from_file fname
-
 let rec copy_from_stream conf base strm mode =
   let echo = ref true in
   let no_tables = browser_doesnt_have_tables conf in
@@ -300,7 +295,7 @@ let rec copy_from_stream conf base strm mode =
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
-    | 'm' -> notes_links conf <> []
+    | 'm' -> Gwdb.read_nldb base <> []
     | 'n' -> not (base_notes_are_empty base "")
     | 'o' -> Sys.file_exists (WiznotesDisplay.dir conf base)
     | 'p' ->
@@ -467,14 +462,14 @@ let eval_var conf base env () _loc =
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (Util.real_nb_of_persons conf base))
+           (Gwdb.nb_of_real_persons base))
   | ["browsing_with_sosa_ref"] ->
       begin match get_env "sosa_ref" env with
         Vsosa_ref v -> VVbool (Lazy.force v <> None)
       | _ -> raise Not_found
       end
   | ["has_history"] -> VVbool (Sys.file_exists (History.file_name conf))
-  | ["has_misc_notes"] -> VVbool (notes_links conf <> [])
+  | ["has_misc_notes"] -> VVbool (Gwdb.read_nldb base <> [])
   | ["nb_accesses"] ->
       let r = count conf in
       let s =

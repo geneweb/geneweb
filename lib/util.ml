@@ -642,10 +642,8 @@ let string_gen_family base fam =
 let is_hidden p = is_empty_string (get_surname p)
 
 let is_empty_name p =
-  (Gwdb.is_empty_string (Gwdb.get_surname p) ||
-   Gwdb.is_quest_string (Gwdb.get_surname p)) &&
-  (Gwdb.is_empty_string (Gwdb.get_first_name p) ||
-   Gwdb.is_quest_string (Gwdb.get_first_name p))
+  Gwdb.is_quest_string (Gwdb.get_surname p)
+  && Gwdb.is_quest_string (Gwdb.get_first_name p)
 
 let is_public conf base p =
   get_access p = Public ||
@@ -2848,103 +2846,6 @@ let of_course_died conf p =
     Some (Dgreg (d, _)) -> conf.today.year - d.year > 120
   | _ -> false
 
-
-(* Hashtbl pour avoir le plus de flexibilité. *)
-(* TODO : il faudrait que ce soit intégrer dans la base directement. *)
-type cache_info_t = (string, string) Hashtbl.t
-
-(* valeur dans le cache. *)
-let cache_nb_base_persons = "cache_nb_persons"
-
-(* Hashtbl utilisée tant qu'on a pas commit le patch. *)
-let (ht_cache_info : cache_info_t) = Hashtbl.create 1
-
-
-(* ************************************************************************ *)
-(*  [Fonc] cache_info : config -> string                                    *)
-(** [Description] : Renvoie le chemin du fichier de cache d'info de la base.
-    [Args] :
-      - config : configuration de la base
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let cache_info conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (base_path [] bname) "cache_info"
-
-
-(* ************************************************************************ *)
-(*  [Fonc] read_cache_info : config -> cache_info_t                         *)
-(** [Description] : Lit le fichier de cache pour les infos d'une base.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Hashtbl cache_info_t
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let read_cache_info conf =
-  let fname = cache_info conf in
-  try
-    let ic = Secure.open_in_bin fname in
-    let ht : cache_info_t = input_value ic in close_in ic; ht
-  with Sys_error _ -> ht_cache_info
-
-
-(* ************************************************************************ *)
-(*  [Fonc] write_cache_info : config -> cache_info_t -> unit                *)
-(** [Description] : Met à jour le fichier de cache des infos d'une base.
-    [Args] :
-      - conf : configuration de la base
-      - ht   : Hashtbl cache_info_t
-    [Retour] : unit
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
-let write_cache_info conf =
-  let ht_cache = read_cache_info conf in
-  (* On met à jour la table en mémoire, avec toutes les valeurs qui *)
-  (* sont dans le cache fichier mais pas dans celle en mémoire.     *)
-  let () =
-    Hashtbl.iter
-      (fun k v ->
-         if not (Hashtbl.mem ht_cache_info k) then
-           Hashtbl.add ht_cache_info k v)
-      ht_cache
-  in
-  let fname = cache_info conf in
-  try
-    let oc = Secure.open_out_bin fname in
-    output_value oc ht_cache_info;
-    close_out oc
-  with Sys_error _ -> ()
-
-
-(* ************************************************************************ *)
-(*  [Fonc] patch_cache_info :
-             config -> ((string * string) -> (string * string)) -> unit     *)
-(** [Description] : Met à jour le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-      - (key, value) : la clé et valeur de cache à mettre à jour
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let patch_cache_info conf k f =
-  (* On met à jour le cache avec la nouvelle valeur. *)
-  (* Si la clé n'existe pas dans la liste, c'est pas grave, elle sera *)
-  (* ajouté lors de la création du cache.                             *)
-  try
-    let v = Hashtbl.find ht_cache_info k in
-    Hashtbl.replace ht_cache_info k (f v)
-  with Not_found ->
-    try
-      let cache_info = read_cache_info conf in
-      let v = Hashtbl.find cache_info k in
-      Hashtbl.replace ht_cache_info k (f v)
-    with Not_found -> ()
-
-
 let escache_value base =
   let t = Gwdb.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in string_of_int v
@@ -2991,7 +2892,6 @@ let update_wf_trace conf fname =
 
 let commit_patches conf base =
   Gwdb.commit_patches base;
-  write_cache_info conf;
   conf.henv <-
     List.map
       (fun (k, v) -> if k = "escache" then k, escache_value base else k, v)
@@ -3451,47 +3351,6 @@ let record_visited conf ip =
 
 (**/**)
 
-
-(* ************************************************************************ *)
-(*  [Fonc] init_cache_info : config -> unit                                 *)
-(** [Description] : Créé le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
-let init_cache_info conf base =
-  (* Reset le nombre réel de personnes d'une base. *)
-  let nb_real_persons =
-    Gwdb.Collection.fold
-      (fun i p -> if not @@ is_empty_name p then i + 1 else i) 0 (Gwdb.persons base)
-  in
-  let () =
-    Hashtbl.add
-      ht_cache_info cache_nb_base_persons (string_of_int nb_real_persons)
-  in
-  write_cache_info conf
-
-
-(* ************************************************************************ *)
-(*  [Fonc] real_nb_of_persons conf : config -> int                          *)
-(** [Description] : Renvoie le nombre de personnes réelles (sans ? ?) d'une
-                    base, à partir du fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : nombre de personne sans ? ?
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let real_nb_of_persons conf base =
-  let real_nb_person () =
-    let ht = read_cache_info conf in
-    let nb = Hashtbl.find ht cache_nb_base_persons in int_of_string nb
-  in
-  try real_nb_person () with
-    Not_found ->
-      try init_cache_info conf base; real_nb_person () with
-        _ -> Gwdb.nb_of_persons base
-
 let array_mem_witn conf base x a =
   let rec loop i =
     if i = Array.length a then (false, "")
@@ -3550,27 +3409,3 @@ let rm_rf dir =
   let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
   List.iter Unix.unlink files ;
   List.iter Unix.rmdir directories
-
-let init_cache_info bname base =
-  match Gwdb.ascends_array base with
-  | (_, _, _, None) ->
-    begin
-      (* Reset le nombre réel de personnes d'une base. *)
-      let nb_real_persons =
-        Gwdb.Collection.fold begin fun acc p ->
-          if is_empty_name p then acc else acc + 1
-        end 0 (Gwdb.persons base)
-      in
-      let ht = Hashtbl.create 1 in
-      let () =
-        Hashtbl.add ht cache_nb_base_persons (string_of_int nb_real_persons)
-      in
-      let bdir =
-        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-      in
-      let fname = Filename.concat bdir "cache_info" in
-      match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
-        Some oc -> output_value oc ht; close_out oc
-      | None -> ()
-    end
-  | _ -> ()

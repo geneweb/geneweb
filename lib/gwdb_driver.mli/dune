@@ -1,0 +1,7 @@
+(library
+ (name gwdb_driver_mli)
+ (public_name geneweb-lib.gwdb_driver.mli)
+ (wrapped false)
+ (libraries geneweb-lib.def)
+ (virtual_modules gwdb_driver)
+)

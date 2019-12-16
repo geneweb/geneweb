@@ -90,8 +90,8 @@ let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
   let a1 = poi base ip1 in
   let a2 = poi base ip2 in
   match get_parents a1, get_parents a2 with
-    None, Some ifam ->
-      let des = gen_descend_of_descend (foi base ifam) in
+  | None, Some ifam ->
+      let des = gen_descend_of_family (foi base ifam) in
       let rec replace i =
         if des.children.(i) = ip2 then des.children.(i) <- ip1
         else replace (i + 1)
@@ -104,7 +104,7 @@ let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
       let children = get_children fam in
       begin match CheckItem.sort_children base children with
         Some (b, a) ->
-          let des = gen_descend_of_descend fam in
+          let des = gen_descend_of_family fam in
           patch_descend base ifam des;
           warning (ChangedOrderOfChildren (ifam, fam, b, a))
       | None -> ()
@@ -157,8 +157,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 
   in
   patch_person base p1.key_index p1;
   reparent_ind base warning p1.key_index (get_iper p2);
-  let p2 = UpdateIndOk.effective_del base warning p2 in
-  patch_person base p2.key_index p2;
+  UpdateIndOk.effective_del conf base p2 ;
   let s =
     let sl =
       [p1.notes; p1.occupation; p1.birth_note; p1.birth_src; p1.baptism_note;
@@ -175,7 +174,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 
     in
     String.concat " " (List.map (sou base) sl)
   in
-  Notes.update_notes_links_db conf (NotesLinks.PgInd p1.key_index) s
+  Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s
 
 let is_ancestor base p1 p2 =
   let ip1 = get_iper p1 in
@@ -217,7 +216,7 @@ let merge_ind conf base warning branches p1 p2 changes_done propose_merge_ind =
   else
     begin propose_merge_ind conf base branches p1 p2; false, changes_done end
 
-let effective_merge_fam base ifam1 fam1 ifam2 fam2 =
+let effective_merge_fam conf base ifam1 fam1 fam2 =
   let des1 = fam1 in
   let des2 = fam2 in
   let fam1 =
@@ -240,7 +239,7 @@ let effective_merge_fam base ifam1 fam1 ifam2 fam2 =
     let _ = (CheckItem.sort_children base children : _ option) in
     {children = children}
   in
-  UpdateFamOk.effective_del base ifam2 fam2;
+  UpdateFamOk.effective_del conf base Gwdb.dummy_iper fam2;
   for i = 0 to Array.length (get_children des2) - 1 do
     let ip = (get_children des2).(i) in
     let a = {parents = Some ifam1; consang = Adef.fix (-1)} in
@@ -254,7 +253,7 @@ let merge_fam conf base branches ifam1 ifam2 fam1 fam2 ip1 ip2 changes_done prop
   let p2 = poi base ip2 in
   if compatible_fam fam1 fam2 then
     begin
-      effective_merge_fam base ifam1 fam1 ifam2 fam2 ;
+      effective_merge_fam conf base ifam1 fam1 fam2 ;
       true, true
     end
   else
@@ -327,12 +326,11 @@ let rec kill_ancestors conf base included_self p nb_ind nb_fam =
       let cpl = foi base ifam in
       kill_ancestors conf base true (poi base (get_father cpl)) nb_ind nb_fam;
       kill_ancestors conf base true (poi base (get_mother cpl)) nb_ind nb_fam;
-      UpdateFamOk.effective_del base ifam (foi base ifam);
+      UpdateFamOk.effective_del conf base Gwdb.dummy_iper cpl ;
       incr nb_fam
   | None -> ()
   end;
-  if included_self then
-    let ip = get_iper p in
-    let warning _ = () in
-    let p = UpdateIndOk.effective_del base warning p in
-    patch_person base ip p; incr nb_ind
+  if included_self then begin
+    UpdateIndOk.effective_del conf base p ;
+    incr nb_ind
+  end

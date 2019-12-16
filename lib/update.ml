@@ -1138,7 +1138,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
           | None -> raise Not_found
       with Not_found ->
         let o = if f = "?" || s = "?" then 0 else o in
-        let empty_string = Gwdb.insert_string base "" in
+        let empty_string = Gwdb.empty_string in
         let (birth, birth_place, baptism, baptism_place) =
           match info with
             Some {ci_birth_date = b; ci_birth_place = bpl} ->
@@ -1191,18 +1191,10 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
            psources = Gwdb.insert_string base (only_printable src);
            key_index = Gwdb.dummy_iper}
         in
-        let a = {parents = None; consang = Adef.fix (-1)} in
-        let u = {family = [| |]} in
-        let ip =
-          insert_person base @@ Gwdb.person_of_gen_person base (p, a, u)
-        in
-        let p = { p with key_index = ip } in
-        if f <> "?" && s <> "?" then
-        begin
-          patch_cache_info conf Util.cache_nb_base_persons
-            (fun v -> let v = int_of_string v + 1 in string_of_int v);
-          new_persons := p :: !new_persons
-        end;
+        let a = no_ascend in
+        let u = no_union in
+        let ip = insert_person base p a u in
+        if f <> "?" && s <> "?" then new_persons := { p with key_index = ip } :: !new_persons ;
         ip
       end
   | Link ->
@@ -1271,7 +1263,7 @@ let update_conf conf =
 
 let rec list_except x =
   function
-    y :: l -> if x = y then l else y :: list_except x l
+  | y :: l -> if x = y then l else y :: list_except x l
   | [] -> invalid_arg "list_except"
 
 let update_related_pointers base pi ol nl =

@@ -27,8 +27,7 @@ let merge_possible_aliases conf db =
       (fun (pg, (sl, il)) ->
          let pg =
            match pg with
-             NotesLinks.PgMisc f ->
-               NotesLinks.PgMisc (Wiki.map_notes aliases f)
+           | Def.NLDB.PgMisc f -> Def.NLDB.PgMisc (Wiki.map_notes aliases f)
            | x -> x
          in
          let sl = List.map (Wiki.map_notes aliases) sl in pg, (sl, il))
@@ -60,22 +59,23 @@ let merge_possible_aliases conf db =
     [] db
 
 let notes_links_db conf base eliminate_unlinked =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
+  let db = Gwdb.read_nldb base in
   let db = merge_possible_aliases conf db in
   let db2 =
     List.fold_left
       (fun db2 (pg, (sl, _il)) ->
          let record_it =
+           let open Def.NLDB in
            match pg with
-             NotesLinks.PgInd ip ->
-               authorized_age conf base (pget conf base ip)
-           | NotesLinks.PgFam ifam ->
-               authorized_age conf base (pget conf base (get_father @@ foi base ifam))
-           | NotesLinks.PgNotes | NotesLinks.PgMisc _ |
-             NotesLinks.PgWizard _ ->
-               true
+           | PgInd ip ->
+             pget conf base ip
+             |> authorized_age conf base
+           | PgFam ifam ->
+             foi base ifam
+             |> get_father
+             |> pget conf base
+             |> authorized_age conf base
+           | PgNotes | PgMisc _ | PgWizard _ -> true
          in
          if record_it then
            List.fold_left
@@ -93,11 +93,11 @@ let notes_links_db conf base eliminate_unlinked =
   let set =
     List.fold_left
       (fun set (pg, (sl, _il)) ->
+         let open Def.NLDB in
          match pg with
-           NotesLinks.PgInd _ | NotesLinks.PgFam _ | NotesLinks.PgNotes |
-           NotesLinks.PgWizard _ ->
+         | PgInd _ | PgFam _ | PgNotes | PgWizard _ ->
              List.fold_left (fun set s -> StrSet.add s set) set sl
-         | NotesLinks.PgMisc s -> Hashtbl.add misc s sl; set)
+         | PgMisc s -> Hashtbl.add misc s sl; set)
       StrSet.empty db
   in
   let mark = Hashtbl.create 1 in
@@ -128,7 +128,7 @@ let notes_links_db conf base eliminate_unlinked =
     (fun (s1, _) (s2, _) -> Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 
-let update_notes_links_db conf fnotes s =
+let update_notes_links_db base fnotes s =
   let slen = String.length s in
   let (list_nt, list_ind) =
     let rec loop list_nt list_ind pos i =
@@ -144,7 +144,7 @@ let update_notes_links_db conf fnotes s =
             loop list_nt list_ind pos j
         | NotesLinks.WLperson (j, key, _, txt) ->
             let list_ind =
-              let link = {NotesLinks.lnTxt = txt; NotesLinks.lnPos = pos} in
+              let link = {Def.NLDB.lnTxt = txt; Def.NLDB.lnPos = pos} in
               (key, link) :: list_ind
             in
             loop list_nt list_ind (pos + 1) j
@@ -153,12 +153,11 @@ let update_notes_links_db conf fnotes s =
     in
     loop [] [] 1 0
   in
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  NotesLinks.update_db bdir fnotes (list_nt, list_ind)
+  NotesLinks.update_db base fnotes (list_nt, list_ind)
 
 let commit_notes conf base fnotes s =
   let pg =
-    if fnotes = "" then NotesLinks.PgNotes else NotesLinks.PgMisc fnotes
+    if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes
   in
   let fname = path_of_fnotes fnotes in
   let fpath =
@@ -168,4 +167,4 @@ let commit_notes conf base fnotes s =
   Mutil.mkdir_p (Filename.dirname fpath);
   Gwdb.commit_notes base fname s ;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-  update_notes_links_db conf pg s
+  update_notes_links_db base pg s

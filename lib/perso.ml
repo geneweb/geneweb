@@ -172,8 +172,7 @@ let init_sosa_t conf base sosa_ref =
         let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
         Hutil.rheader conf title; print_base_loop conf base p
   in
-  let persons = Gwdb.ipers base in
-  let mark = Gwdb.iper_marker persons false in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   let last_zil = [get_iper sosa_ref, Sosa.one] in
   let sosa_ht = Hashtbl.create 5003 in
   let () =
@@ -286,8 +285,7 @@ let build_sosa_tree_ht conf base person =
   let () = load_ascends_array base in
   let () = load_couples_array base in
   let nb_persons = nb_of_persons base in
-  let ipers = Gwdb.ipers base in
-  let mark = Gwdb.iper_marker ipers false in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   (* Tableau qui va socker au fur et à mesure les ancêtres du person. *)
   (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
   (* commence à l'indice 1 !                                            *)
@@ -1557,7 +1555,7 @@ let build_list_eclair conf base v p =
 
 let linked_page_text conf base p s key str (pg, (_, il)) =
   match pg with
-    NotesLinks.PgMisc pg ->
+    Def.NLDB.PgMisc pg ->
       let list = List.map snd (List.filter (fun (k, _) -> k = key) il) in
       List.fold_right
         (fun text str ->
@@ -1568,12 +1566,12 @@ let linked_page_text conf base p s key str (pg, (_, il)) =
                if v = "" then raise Not_found
                else Util.nth_field v (Util.index_of_sex (get_sex p))
              in
-             match text.NotesLinks.lnTxt with
+             match text.Def.NLDB.lnTxt with
                Some "" -> str
              | _ ->
                  let str1 =
                    let v =
-                     let text = text.NotesLinks.lnTxt in
+                     let text = text.Def.NLDB.lnTxt in
                      match text with
                        Some text ->
                          let rec loop i len =
@@ -1601,7 +1599,7 @@ let linked_page_text conf base p s key str (pg, (_, il)) =
                    else
                      Printf.sprintf
                        "%s<a href=\"%sm=NOTES&f=%s#p_%d\">%s</a>%s" a
-                       (commd conf) pg text.NotesLinks.lnPos b c
+                       (commd conf) pg text.Def.NLDB.lnPos b c
                  in
                  if str = "" then str1 else str ^ ", " ^ str1
            with Not_found -> str)
@@ -1614,12 +1612,12 @@ let links_to_ind conf base db key =
       (fun pgl (pg, (_, il)) ->
          let record_it =
            match pg with
-             NotesLinks.PgInd ip ->
+             Def.NLDB.PgInd ip ->
                authorized_age conf base (pget conf base ip)
-           | NotesLinks.PgFam ifam ->
+           | Def.NLDB.PgFam ifam ->
                authorized_age conf base (pget conf base (get_father @@ foi base ifam))
-           | NotesLinks.PgNotes | NotesLinks.PgMisc _ |
-             NotesLinks.PgWizard _ ->
+           | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ |
+             Def.NLDB.PgWizard _ ->
                true
          in
          if record_it then
@@ -1685,7 +1683,7 @@ type 'a env =
   | Vbool of bool
   | Vint of int
   | Vgpl of generation_person list
-  | Vnldb of NotesLinks.notes_links_db
+  | Vnldb of (Gwdb.iper, Gwdb.ifam) Def.NLDB.t
   | Vstring of string
   | Vsosa_ref of person option Lazy.t
   | Vsosa of (iper * (Sosa.t * person) option) list ref
@@ -1797,9 +1795,7 @@ let get_sosa conf base env r p =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_linked_page conf base p s =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
+  let db = Gwdb.read_nldb base in
   let db = Notes.merge_possible_aliases conf db in
   let key =
     let fn = Name.lower (sou base (get_first_name p)) in
@@ -2407,7 +2403,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (Util.real_nb_of_persons conf base))
+           (Gwdb.nb_of_real_persons base))
   | "birth_witness" :: sl ->
       begin match get_env "birth_witness" env with
         Vind p ->
@@ -3109,7 +3105,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
             List.exists
               (fun (pg, (_, il)) ->
                  match pg with
-                   NotesLinks.PgMisc pg ->
+                   Def.NLDB.PgMisc pg ->
                      if List.mem_assoc key il then
                        let (nenv, _) = Notes.read_notes base pg in
                        List.mem_assoc s nenv
@@ -5821,10 +5817,9 @@ let gen_interp_templ menu title templ_fname conf base p =
       Vint (max_descendant_level base desc_level_table_m)
     in
     let nldb () =
-      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-      let fname = Filename.concat bdir "notes_links" in
-      let db = NotesLinks.read_db_from_file fname in
-      let db = Notes.merge_possible_aliases conf db in Vnldb db
+      let db = Gwdb.read_nldb base in
+      let db = Notes.merge_possible_aliases conf db in
+      Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p);
@@ -5957,9 +5952,7 @@ let print_what_links conf base p =
       let fn = Name.lower (sou base (get_first_name p)) in
       let sn = Name.lower (sou base (get_surname p)) in fn, sn, get_occ p
     in
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-    let fname = Filename.concat bdir "notes_links" in
-    let db = NotesLinks.read_db_from_file fname in
+    let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h =

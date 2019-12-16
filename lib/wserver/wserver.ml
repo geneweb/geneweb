@@ -22,6 +22,7 @@ let wserver_sock = ref Unix.stdout
 let wsocket () = !wserver_sock
 
 let wserver_oc = ref stdout
+let woc () = !wserver_oc
 
 let wflush () = flush !wserver_oc
 
@@ -93,7 +94,7 @@ let print_string s =
       if !printing_state = Nothing then http OK;
       printnl "";
       printing_state := Contents
-    end;
+    end ;
   output_string !wserver_oc s
 
 let hexa_digit x =

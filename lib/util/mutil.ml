@@ -6,6 +6,9 @@ let verbose = ref true
 let rm fname =
   if Sys.file_exists fname then Sys.remove fname
 
+let mv src dst =
+  if Sys.file_exists src then Sys.rename src dst
+
 let list_iter_first f = function
   | [] -> ()
   | hd :: tl -> f true hd ; List.iter (f false) tl
@@ -84,8 +87,6 @@ let nominative s =
     Some _ -> decline 'n' s
   | _ -> s
 
-let remove_file f = try Sys.remove f with Sys_error _ -> ()
-
 let mkdir_p x =
   let rec loop x =
     let y = Filename.dirname x in
@@ -99,7 +100,7 @@ let rec remove_dir d =
     let files = Sys.readdir d in
     for i = 0 to Array.length files - 1 do
       remove_dir (Filename.concat d files.(i));
-      remove_file (Filename.concat d files.(i))
+      rm (Filename.concat d files.(i))
     done
   with Sys_error _ -> ()
   end;
@@ -112,9 +113,6 @@ let lock_file bname =
     else bname
   in
   bname ^ ".lck"
-
-let output_value_no_sharing oc v =
-  Marshal.to_channel oc v [Marshal.No_sharing]
 
 let initial n =
   let rec loop i =
@@ -247,13 +245,6 @@ let strip_all_trailing_spaces s =
       | c -> Buffer.add_char b c; loop (i + 1)
   in
   loop 0
-
-let output_array_no_sharing oc arr_get arr_len =
-  let header_pos = Iovalue.create_output_value_header oc in
-  Iovalue.output_block_header oc 0 arr_len;
-  for i = 0 to arr_len - 1 do Iovalue.output oc (arr_get i) done;
-  let pos_end = Iovalue.patch_output_value_header oc header_pos in
-  seek_out oc pos_end
 
 let roman_of_arabian n =
   let build one five ten =
@@ -455,3 +446,30 @@ let check_magic magic ic =
   if in_channel_length ic - pos < len then false
   else if magic = really_input_string ic len then true
   else begin seek_in ic pos ; false end
+
+let array_except v a =
+  let rec loop i =
+    if i = Array.length a then Array.copy a
+    else if a.(i) = v then
+      Array.append (Array.sub a 0 i)
+        (Array.sub a (i + 1) (Array.length a - i - 1))
+    else loop (i + 1)
+  in
+  loop 0
+
+let default_particles =
+  let upper =
+    [ "AF " ; "D'" ; "D’" ; "DAL " ; "DE " ; "DES " ; "DI " ; "DU " ; "OF "
+    ; "VAN " ; "VON UND ZU " ; "VON " ; "Y " ; "ZU " ; "ZUR " ]
+  in
+  List.rev_append (List.rev_map String.lowercase_ascii upper) upper
+
+let array_forall2 f a1 a2 =
+  if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
+  else
+    let rec loop i =
+      if i = Array.length a1 then true
+      else if f a1.(i) a2.(i) then loop (i + 1)
+      else false
+    in
+    loop 0
