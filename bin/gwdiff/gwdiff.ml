@@ -424,7 +424,9 @@ let addiff base1 base2 iper1 iper2 d_tab =
 (* Main *)
 
 let gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
-  let desc_tab = Gwdb.iper_marker (Gwdb.ipers base1) [] in
+  let desc_tab =
+    Gwdb.Marker.make (Gwdb.Collection.length @@ Gwdb.ipers base1) []
+  in
   match d_mode, ad_mode with
     true, _ | false, false -> ddiff base1 base2 iper1 iper2 desc_tab
   | false, true -> addiff base1 base2 iper1 iper2 desc_tab

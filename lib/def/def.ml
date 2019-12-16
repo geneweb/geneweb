@@ -295,6 +295,11 @@ type ('person, 'descend, 'title) misc = MissingSources
 
 type rn_mode = RnAll | Rn1Ln | RnDeg
 
+type base_notes =
+  { nread : string -> rn_mode -> string
+  ; norigin_file : string
+  ; efiles : unit -> string list
+  }
 
 (* Historique des modifications *)
 
@@ -328,3 +333,16 @@ type ('iper, 'person, 'family, 'string) base_changed =
   | U_Multi of
       ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person * bool
   | U_Notes of int option * string
+
+module NLDB = struct
+  type ('a, 'b) page =
+    | PgInd of 'a
+    | PgFam of 'b
+    | PgNotes
+    | PgMisc of string
+    | PgWizard of string
+  type key = string * string * int
+  type ind = { lnTxt : string option ; lnPos : int }
+  type ('a, 'b) t = ( ('a, 'b) page
+                      * (string list * (key * ind) list) ) list
+end

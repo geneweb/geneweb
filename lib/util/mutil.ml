@@ -455,3 +455,30 @@ let check_magic magic ic =
   if in_channel_length ic - pos < len then false
   else if magic = really_input_string ic len then true
   else begin seek_in ic pos ; false end
+
+let array_except v a =
+  let rec loop i =
+    if i = Array.length a then Array.copy a
+    else if a.(i) = v then
+      Array.append (Array.sub a 0 i)
+        (Array.sub a (i + 1) (Array.length a - i - 1))
+    else loop (i + 1)
+  in
+  loop 0
+
+let default_particles =
+  let upper =
+    [ "AF " ; "D'" ; "D’" ; "DAL " ; "DE " ; "DES " ; "DI " ; "DU " ; "OF "
+    ; "VAN " ; "VON UND ZU " ; "VON " ; "Y " ; "ZU " ; "ZUR " ]
+  in
+  List.rev_append (List.rev_map String.lowercase_ascii upper) upper
+
+let array_forall2 f a1 a2 =
+  if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
+  else
+    let rec loop i =
+      if i = Array.length a1 then true
+      else if f a1.(i) a2.(i) then loop (i + 1)
+      else false
+    in
+    loop 0

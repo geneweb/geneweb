@@ -116,3 +116,19 @@ val check_magic : string -> in_channel -> bool
     by any change in program or data representation.
 *)
 val executable_magic : string
+
+(** [array_except value array]
+    Return a new array containing all the elements
+    from [array] except the first occurence of [value]
+ *)
+val array_except : 'a -> 'a array -> 'a array
+
+(** List of default particles used in GeneWeb *)
+val default_particles : string list
+
+(** [array_forall2 p a b]
+    Checks if all elements of the arrays satisfy the predicate [p].
+    That is, it returns [(p a1 b1) && (p a2 b2) && ... && (p an bn)].
+    Raise Invalid_argument if the two lists are determined to have different lengths.
+*)
+val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool

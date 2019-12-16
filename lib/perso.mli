@@ -21,9 +21,12 @@ val print : config -> base -> person -> unit
 val print_ascend : config -> base -> person -> unit
 val print_what_links : config -> base -> person -> unit
 
-val links_to_ind :
-  config -> base -> (NotesLinks.page * ('a * ('b * 'c) list)) list -> 'b ->
-    NotesLinks.page list
+val links_to_ind
+  : Config.config
+  -> Gwdb.base
+  -> ((iper, ifam) Def.NLDB.page * ('a * ((string * string * int) * 'b) list)) list
+  -> string * string * int
+  -> (iper, ifam) Def.NLDB.page list
 
 val build_sosa_tree_ht : config -> base -> person -> unit
 val build_sosa_ht : config -> base -> unit
@@ -46,7 +49,7 @@ val linked_page_text
   -> string
   -> 'a
   -> string
-  -> NotesLinks.page * ('b * ('a * NotesLinks.ind_link) list)
+  -> (iper, ifam) Def.NLDB.page * ('b * ('a * Def.NLDB.ind) list)
   -> string
 
 module IperSet : sig include Set.S with type elt = iper end

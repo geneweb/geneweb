@@ -1036,8 +1036,8 @@ let print_add_ind_ok conf base =
      - sur le sosa
      - sur l'accueil
 *)
-let compute_redirect_person conf base ip =
-  let p = poi base ip in
+let compute_redirect_person conf base p =
+  let ip = get_iper p in
   match get_parents p with
   | Some ifam ->
       let fam = foi base ifam in
@@ -1065,87 +1065,26 @@ let compute_redirect_person conf base ip =
             else ipz
         | None -> Gwdb.dummy_iper
 
-
-(* ************************************************************************ *)
-(*  [Fonc] print_del_ind_ok : config -> base -> ModificationStatus          *)
-(** [Description] : Fonction qui supprime une personne de la base.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - status : les informations si la modification s'est bien passée.
-                                                                           *)
-(* ************************************************************************ *)
 let print_del_ind_ok conf base =
   let params = get_params conf Mext_write.parse_index_person in
   let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person.index in
-  let ip_redirect = compute_redirect_person conf base ip in
-  (* Si la personne n'a pas d'enfant, on veut alors *)
-  (* également le délier de sa/ses famille/s        *)
   let p = poi base ip in
-  let has_children =
-    Array.exists
-      (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)
-      (get_family p)
-  in
-  let resp =
-    try
-      (* Déliaison de toutes les familles. *)
-      let (all_wl, all_ml, all_hr) =
-        if has_children then ([], [], [])
-        else
-          Array.fold_left
-            (fun (all_wl, all_ml, all_hr) ifam ->
-               match Api_update_family.print_del conf base ip ifam with
-               | Api_update_util.UpdateSuccess (wl, ml, hr) ->
-                   (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-               | Api_update_util.UpdateError s -> raise (Update.ModErr s)
-               | Api_update_util.UpdateErrorConflict c ->
-                    raise (Api_update_util.ModErrApiConflict c))
-            ([], [], []) (get_family p)
-      in
-      let (all_wl, all_ml, all_hr) =
-        match Api_update_person.print_del conf base ip with
-        | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-        | Api_update_util.UpdateError s -> raise (Update.ModErr s)
-        | Api_update_util.UpdateErrorConflict c ->
-            raise (Api_update_util.ModErrApiConflict c)
-      in
-      Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
-    with
-    | Update.ModErr s -> Api_update_util.UpdateError s
-    | Api_update_util.ModErrApiConflict c ->
-        Api_update_util.UpdateErrorConflict c
-  in
-  let data =
-    compute_modification_status conf base ip_redirect Gwdb.dummy_ifam resp (* FIXME??? *)
-  in
+  let wl, ml, hr = UpdateIndOk.effective_del conf base p ; [], [], [] in (* FIXME *)
+  let ip_redirect = compute_redirect_person conf base p in
+  let resp = Api_update_util.UpdateSuccess (wl, ml, hr) in
+  let data = compute_modification_status conf base ip_redirect Gwdb.dummy_ifam resp in
   print_result conf data
-
 
 (**/**) (* Fonctions de modification famille. *)
 
-
-(* ************************************************************************ *)
-(*  [Fonc] print_del_fam_ok : config -> base -> ModificationStatus          *)
-(** [Description] : Fonction qui supprime une famille de la base.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - status : les informations si la modification s'est bien passée.
-                                                                           *)
-(* ************************************************************************ *)
 let print_del_fam_ok conf base =
   let params = get_params conf Mext_write.parse_index_person_and_family in
   let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_person in
-  let ifam =
-    Gwdb.ifam_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_family
-  in
-  let resp = Api_update_family.print_del conf base ip ifam in
-  let data =
-    compute_modification_status conf base ip Gwdb.dummy_ifam resp
-  in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_family in
+  let fam = foi base ifam in
+  let wl, ml, hr = UpdateFamOk.effective_del conf base ip fam ; [], [], [] in (* FIXME *)
+  let resp = Api_update_util.UpdateSuccess (wl, ml, hr) in
+  let data = compute_modification_status conf base ip Gwdb.dummy_ifam resp in
   print_result conf data
 
 let set_parents_fields conf base p linked created =

@@ -61,12 +61,11 @@ let rec noloop_aux base error tab i =
     running [check_noloop]
 *)
 let check_noloop base error =
-  let persons = Gwdb.ipers base in
-  let tab = Gwdb.iper_marker persons NotVisited in
-  Gwdb.Collection.iter (noloop_aux base error tab) persons
+  let tab = Marker.make (nb_of_persons base) NotVisited in
+  Gwdb.Collection.iter (noloop_aux base error tab) (Gwdb.ipers base)
 
 let check_noloop_for_person_list base error list =
-  let tab = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
+  let tab = Marker.make (nb_of_persons base) NotVisited in
   List.iter (noloop_aux base error tab) list
 
 exception TopologicalSortError of person
@@ -81,7 +80,7 @@ exception TopologicalSortError of person
 *)
 let topological_sort base poi =
   let persons = Gwdb.ipers base in
-  let tab = Gwdb.iper_marker persons 0 in
+  let tab = Marker.make (nb_of_persons base) 0 in
   let cnt = ref 0 in
   Gwdb.Collection.iter (fun i ->
       let a = poi base i in
@@ -139,7 +138,7 @@ let phony_rel =
    anc_stat2 = MaybeAnc}
 
 let make_relationship_info base tstab =
-  let tab = Gwdb.iper_marker (Gwdb.ipers base) phony_rel in
+  let tab = Marker.make (nb_of_persons base) phony_rel in
   {tstab = tstab; reltab = tab; queue = [| |]}
 
 let rec insert_branch_len_rec (len, n, ip as x) =

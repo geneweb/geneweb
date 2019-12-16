@@ -806,7 +806,9 @@ let print_ind_stats conf base =
     | Some i ->
         let ip = Gwdb.iper_of_string @@ Int32.to_string i in
         let ancestors = loop 0 [ip] [] in
-        let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+        let mark =
+          Gwdb.Marker.make (Gwdb.Collection.length @@ Gwdb.ipers base) false
+        in
         let (datas_found, datas_diss) =
           List.fold_left
             (fun (datas_found, datas_diss) l ->
@@ -895,7 +897,9 @@ let print_ind_stats conf base =
     | Some i ->
         let ip = Gwdb.iper_of_string @@ Int32.to_string i in
         let descendants = loop 0 [ip] [] in
-        let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+        let mark =
+          Gwdb.Marker.make (Gwdb.Collection.length @@ Gwdb.ipers base) false
+        in
         let (datas_found, datas_diss) =
           List.fold_left
             (fun (datas_found, datas_diss) l ->
@@ -957,7 +961,9 @@ let print_ind_stats conf base =
 
   (* répartition homme femme sur la descendance *)
   let stats_descendants_m_f =
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+    let mark =
+      Gwdb.Marker.make (Gwdb.Collection.length @@ Gwdb.ipers base) false
+    in
     let (nb_male, nb_female) =
       List.fold_left
         (fun (nb_male, nb_female) l ->

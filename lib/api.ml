@@ -61,7 +61,7 @@ let print_info_base conf base =
       nb_families = Int64.of_int (Gwdb.nb_of_families base);
       sosa = sosa;
       last_modified_person = Opt.map Int64.of_string last_modified_person;
-      real_nb_persons = Some (Int64.of_int (Util.real_nb_of_persons conf base));
+      real_nb_persons = Some (Int64.of_int (Gwdb.nb_of_real_persons base));
     })
   in
   let data = Mext.gen_infos_base info_base in
@@ -458,9 +458,12 @@ let print_max_ancestors =
   in
   fun conf base ->
   let ipers = Gwdb.ipers base in
-  let ancestors = Gwdb.iper_marker ipers IperSet.empty in
-  let mark = Gwdb.iper_marker ipers false in
-
+  let ancestors =
+    Gwdb.Marker.make (Gwdb.Collection.length @@ Gwdb.ipers base) IperSet.empty
+  in
+  let mark =
+    Gwdb.Marker.make (Gwdb.Collection.length @@ Gwdb.ipers base) false
+  in
   let has_children p =
     Array.exists
       (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)

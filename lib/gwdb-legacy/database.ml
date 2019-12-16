@@ -1,9 +1,7 @@
-(* $Id: database.ml,v 5.19 2007-06-06 15:22:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk
 open Def
-open Type
 
 type person = dsk_person
 type ascend = dsk_ascend
@@ -118,7 +116,7 @@ let hashtbl_right_assoc s ht =
   with Found x -> x
 
 let index_of_string strings ic start_pos hash_len string_patches s =
-  try Type.istr_of_int (hashtbl_right_assoc s string_patches) with
+  try hashtbl_right_assoc s string_patches with
     Not_found ->
       match ic, hash_len with
         Some ic, Some hash_len ->
@@ -127,7 +125,7 @@ let index_of_string strings ic start_pos hash_len string_patches s =
           let i1 = input_binary_int ic in
           let rec loop i =
             if i = -1 then raise Not_found
-            else if strings.get i = s then Type.istr_of_int i
+            else if strings.get i = s then i
             else
               begin
                 seek_in ic (start_pos + (hash_len + i) * Mutil.int_size);
@@ -145,7 +143,7 @@ let persons_of_first_name_or_surname base_data strings params =
   let module IstrTree =
     Btree.Make
       (struct
-        type t = istr
+        type t = int
         let compare = Dutil.compare_istr_fun base_data
       end)
   in
@@ -156,12 +154,12 @@ let persons_of_first_name_or_surname base_data strings params =
       match !btr with
         Some bt -> bt
       | None ->
-          let fname_inx = Filename.concat bname names_inx in
-          let ic_inx = Secure.open_in_bin fname_inx in
+        let fname_inx = Filename.concat bname names_inx in
+        let ic_inx = Secure.open_in_bin fname_inx in
           (*
           let ab1 = Gc.allocated_bytes () in
           *)
-          let bt : int IstrTree.t = input_value ic_inx in
+        let bt : int IstrTree.t = input_value ic_inx in
           (*
           let ab2 = Gc.allocated_bytes () in
           Printf.eprintf "*** new database created by version >= 4.10\n";
@@ -169,9 +167,9 @@ let persons_of_first_name_or_surname base_data strings params =
             names_inx (ab2 -. ab1);
           flush stderr;
           *)
-          close_in ic_inx;
-          btr := Some bt;
-          bt
+        close_in ic_inx;
+        btr := Some bt;
+        bt
   in
   let find istr =
     let ipera =
@@ -183,7 +181,7 @@ let persons_of_first_name_or_surname base_data strings params =
         let rec read_loop ipera len =
           if len = 0 then ipera
           else
-            let iper = Type.iper_of_int (input_binary_int ic_dat) in
+            let iper = input_binary_int ic_dat in
             read_loop (iper :: ipera) (len - 1)
         in
         let ipera = read_loop [] len in close_in ic_dat; ipera
@@ -193,8 +191,8 @@ let persons_of_first_name_or_surname base_data strings params =
     Hashtbl.iter
       (fun i p ->
          let istr1 = proj p in
-         if istr1 = istr && not (List.mem (Type.iper_of_int i) !ipera)
-         then ipera := Type.iper_of_int i :: !ipera)
+         if istr1 = istr && not (List.mem i !ipera)
+         then ipera := i :: !ipera)
       person_patches;
     !ipera
   in
@@ -204,20 +202,20 @@ let persons_of_first_name_or_surname base_data strings params =
       match !btr with
         Some bt -> bt
       | None ->
-          let bt = ref (bt ()) in
-          Hashtbl.iter
-            (fun _i p ->
-               let istr1 = proj p in
-               try let _ = IstrTree.find istr1 !bt in () with
-                 Not_found -> bt := IstrTree.add istr1 0 !bt)
-            person_patches;
-          btr := Some !bt;
-          !bt
+        let bt = ref (bt ()) in
+        Hashtbl.iter
+          (fun _i p ->
+             let istr1 = proj p in
+             try let _ = IstrTree.find istr1 !bt in () with
+               Not_found -> bt := IstrTree.add istr1 0 !bt)
+          person_patches;
+        btr := Some !bt;
+        !bt
   in
   let cursor str =
     IstrTree.key_after
       (fun key ->
-         Dutil.compare_names base_data str (strings.get (Type.int_of_istr key)))
+         Dutil.compare_names base_data str (strings.get key))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -241,7 +239,7 @@ let persons_of_name bname patches =
           let pos = input_binary_int ic_inx_acc in
           close_in ic_inx_acc;
           seek_in ic_inx pos;
-          (Iovalue.input ic_inx : iper array)
+          (Iovalue.input ic_inx : int array)
         else
           let a =
             match !t with
@@ -275,7 +273,7 @@ let strings_of_fsname bname strings (_, person_patches) =
           let pos = input_binary_int ic_inx_acc in
           close_in ic_inx_acc;
           seek_in ic_inx pos;
-          (Iovalue.input ic_inx : istr array)
+          (Iovalue.input ic_inx : int array)
         else
           let a =
             match !t with
@@ -295,12 +293,12 @@ let strings_of_fsname bname strings (_, person_patches) =
     Hashtbl.iter
       (fun _ p ->
          if not (List.mem p.first_name !l) then
-           begin let s1 = strings.get (Type.int_of_istr p.first_name) in
+           begin let s1 = strings.get p.first_name in
              let s1 = Mutil.nominative s1 in
              if s = Name.crush_lower s1 then l := p.first_name :: !l
            end;
          if not (List.mem p.surname !l) then
-           let s1 = strings.get (Type.int_of_istr p.surname) in
+           let s1 = strings.get p.surname in
            let s1 = Mutil.nominative s1 in
            if s = Name.crush_lower s1 then l := p.surname :: !l)
       person_patches;
@@ -392,7 +390,7 @@ type patches_ht =
     h_couple : int ref * (int, couple) Hashtbl.t;
     h_descend : int ref * (int, descend) Hashtbl.t;
     h_string : int ref * (int, string) Hashtbl.t;
-    h_name : (int, iper list) Hashtbl.t
+    h_name : (int, int list) Hashtbl.t
   }
 
 (* Old structure of file "patches", kept for backward compatibility.
@@ -409,7 +407,7 @@ module Old =
         p_couple : (int * couple) list ref;
         p_descend : (int * descend) list ref;
         p_string : (int * string) list ref;
-        p_name : (int * iper list) list ref }
+        p_name : (int * int list) list ref }
   end
 
 let apply_patches tab patches plen =
@@ -534,11 +532,11 @@ let person_of_key persons strings persons_of_name first_name surname occ =
     let rec find =
       function
         ip :: ipl ->
-          let p = persons.get (Type.int_of_iper ip) in
+          let p = persons.get ip in
           if occ = p.occ &&
              first_name =
-               Name.lower (strings.get (Type.int_of_istr p.first_name)) &&
-             surname = Name.lower (strings.get (Type.int_of_istr p.surname))
+               Name.lower (strings.get p.first_name) &&
+             surname = Name.lower (strings.get p.surname)
           then
             Some ip
           else find ipl
@@ -673,65 +671,91 @@ let opendb bname =
     (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
     try Sys.rename tmp_fname fname with Sys_error _ -> ()
   in
+  let nbp_fname = Filename.concat bname "nb_persons" in
+  let is_empty_name p =
+    (0 = p.surname || 1 = p.surname)
+    && (0 = p.first_name || 1 = p.first_name)
+  in
+  let npb_init () =
+    let cnt = ref 0 in
+    for i = 0 to persons.len - 1 do
+      if not @@ is_empty_name @@ persons.get i then incr cnt
+    done ;
+    let oc = Secure.open_out_bin nbp_fname in
+    output_value oc !cnt ;
+    close_out oc ;
+    !cnt
+  in
+  let nbp_read () =
+    if Sys.file_exists nbp_fname
+    then begin
+      let ic = Secure.open_in_bin nbp_fname in
+      let x : int = input_value ic in
+      close_in ic ;
+      x
+    end else npb_init ()
+  in
+  let nbp_update () =
+    let nbp =
+      Hashtbl.fold begin fun ip p acc ->
+        if (ip = -1 || is_empty_name (persons.get ip) ) && not (is_empty_name p)
+        then acc + 1
+        else if
+          (not (ip <> -1 && is_empty_name (persons.get ip) ) && is_empty_name p )
+        then acc - 1
+        else acc
+      end (snd patches.h_person) 0
+    in
+    if nbp <> 0 then begin
+      let oc = Secure.open_out_bin nbp_fname in
+      output_value oc (nbp_read () + nbp) ;
+      close_out oc
+    end
+  in
   let commit_patches () =
     let tmp_fname = Filename.concat bname "1patches" in
     let fname = Filename.concat bname "patches" in
-    let oc9 =
-      try Secure.open_out_bin tmp_fname with
-        Sys_error _ ->
-          raise (Adef.Request_failure "the database is not writable")
-    in
+    let oc9 = Secure.open_out_bin tmp_fname in
     output_string oc9 magic_patch;
     Mutil.output_value_no_sharing oc9 (patches : patches_ht);
     close_out oc9;
     Mutil.remove_file (fname ^ "~");
     (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
-    (try Sys.rename tmp_fname fname with Sys_error _ -> ());
+    Sys.rename tmp_fname fname ;
+    nbp_update () ;
     commit_synchro ()
   in
-  let patched_ascends () =
-    let r = ref [] in
-    Hashtbl.iter (fun i _ -> r := Type.iper_of_int i :: !r)
-      (snd patches.h_ascend);
-    !r
-  in
   let patch_person i p =
-    let i = Type.int_of_iper i in
     persons.len <- max persons.len (i + 1);
     fst patches.h_person := persons.len;
     Hashtbl.replace (snd patches.h_person) i p;
     synchro_person := i :: !synchro_person
   in
   let patch_ascend i a =
-    let i = Type.int_of_iper i in
     ascends.len <- max ascends.len (i + 1);
     fst patches.h_ascend := ascends.len;
     Hashtbl.replace (snd patches.h_ascend) i a;
     synchro_person := i :: !synchro_person
   in
   let patch_union i a =
-    let i = Type.int_of_iper i in
     unions.len <- max unions.len (i + 1);
     fst patches.h_union := ascends.len;
     Hashtbl.replace (snd patches.h_union) i a;
     synchro_person := i :: !synchro_person
   in
   let patch_family i f =
-    let i = Type.int_of_ifam i in
     families.len <- max families.len (i + 1);
     fst patches.h_family := families.len;
     Hashtbl.replace (snd patches.h_family) i f;
     synchro_family := i :: !synchro_family
   in
   let patch_couple i c =
-    let i = Type.int_of_ifam i in
     couples.len <- max couples.len (i + 1);
     fst patches.h_couple := couples.len;
     Hashtbl.replace (snd patches.h_couple) i c;
     synchro_family := i :: !synchro_family
   in
   let patch_descend i c =
-    let i = Type.int_of_ifam i in
     descends.len <- max descends.len (i + 1);
     fst patches.h_descend := descends.len;
     Hashtbl.replace (snd patches.h_descend) i c;
@@ -748,7 +772,7 @@ let opendb bname =
         strings.len <- max strings.len (i + 1);
         fst patches.h_string := strings.len;
         Hashtbl.replace (snd patches.h_string) i s;
-        Type.istr_of_int i
+        i
   in
   let patch_name s ip =
     let s = Name.crush_lower s in
@@ -821,30 +845,41 @@ let opendb bname =
     {nread = read_notes; norigin_file = norigin_file; efiles = ext_files}
   in
   let base_data =
-    {persons = persons; ascends = ascends; unions = unions;
-     visible = make_visible_record_access bname persons; families = families;
-     couples = couples; descends = descends; strings = strings;
-     particles = particles; bnotes = bnotes; bdir = bname}
+    { persons
+    ; ascends
+    ; unions
+    ; visible = make_visible_record_access bname persons
+    ; families
+    ; couples
+    ; descends
+    ; strings
+    ; particles
+    ; bnotes
+    ; bdir = bname
+    }
   in
   let persons_of_name = persons_of_name bname patches.h_name in
   let base_func =
-    {person_of_key = person_of_key persons strings persons_of_name;
-     persons_of_name = persons_of_name;
-     strings_of_fsname = strings_of_fsname bname strings patches.h_person;
-     persons_of_surname =
-       persons_of_first_name_or_surname base_data strings
-         (ic2, ic2_surname_start_pos, (fun p -> p.surname),
-          snd patches.h_person, "snames.inx", "snames.dat", bname);
-     persons_of_first_name =
-       persons_of_first_name_or_surname base_data strings
-         (ic2, ic2_first_name_start_pos, (fun p -> p.first_name),
-          snd patches.h_person, "fnames.inx", "fnames.dat", bname);
-     patch_person = patch_person; patch_ascend = patch_ascend;
-     patch_union = patch_union; patch_family = patch_family;
-     patch_couple = patch_couple; patch_descend = patch_descend;
-     patch_name = patch_name; insert_string = insert_string;
-     commit_patches = commit_patches; patched_ascends = patched_ascends;
-     commit_notes = commit_notes;
-     cleanup = cleanup}
+    { person_of_key = person_of_key persons strings persons_of_name
+    ; persons_of_name = persons_of_name
+    ; strings_of_fsname = strings_of_fsname bname strings patches.h_person
+    ; persons_of_surname =
+        persons_of_first_name_or_surname base_data strings
+          (ic2, ic2_surname_start_pos, (fun p -> p.surname),
+           snd patches.h_person, "snames.inx", "snames.dat", bname)
+    ; persons_of_first_name =
+        persons_of_first_name_or_surname base_data strings
+          (ic2, ic2_first_name_start_pos, (fun p -> p.first_name),
+           snd patches.h_person, "fnames.inx", "fnames.dat", bname)
+    ; patch_person = patch_person; patch_ascend = patch_ascend
+    ; patch_union = patch_union; patch_family = patch_family
+    ; patch_couple = patch_couple; patch_descend = patch_descend
+    ; patch_name = patch_name; insert_string = insert_string
+    ; commit_patches = commit_patches
+    ; commit_notes = commit_notes
+    ; cleanup = cleanup
+    ; nb_of_real_persons = nbp_read
+    }
   in
-  {data = base_data; func = base_func}
+  { data = base_data
+  ; func = base_func }

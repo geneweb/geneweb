@@ -11,7 +11,7 @@
             stdlib-shims
             camlp5
             camlp5.gramlib
-            geneweb-lib.gwdb.mli
+            geneweb-lib.gwdb_driver.mli
             geneweb-lib.def
             geneweb-lib.sosa.mli
             geneweb-lib.util

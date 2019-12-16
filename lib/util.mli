@@ -309,17 +309,6 @@ val cache_visited : config -> string
 val read_visited : config -> cache_visited_t
 val record_visited : config -> iper -> unit
 
-type cache_info_t = (string, string) Hashtbl.t
-
-(* valeur dans le cache. *)
-val cache_nb_base_persons : string
-
-val cache_info : config -> string
-val read_cache_info : config -> cache_info_t
-val patch_cache_info : config -> string -> (string -> string) -> unit
-
-val real_nb_of_persons : config -> base -> int
-
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
     and returns corresponding [string_of_witness_kind] if so.
 *)
@@ -386,6 +375,3 @@ val safe_html : string -> string
     [false] if we knwon the first name or the last name of [p].
 *)
 val is_empty_name : person -> bool
-
-(**/**)
-val init_cache_info : string -> Gwdb.base -> unit

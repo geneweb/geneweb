@@ -282,8 +282,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
   end ;
   let persons = Gwdb.ipers base in
   let len = Gwdb.Collection.length persons in
-
-  let year_tab = Gwdb.iper_marker persons dummy_date in
+  let year_tab = Gwdb.Marker.make len dummy_date in
   if verbose then begin
     Printf.eprintf "check persons\n" ;
     ProgrBar.start () ;

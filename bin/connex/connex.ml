@@ -138,7 +138,7 @@ let move base basename =
   let () = close_in ic in
   Printf.printf "Computed on %s<br><br>\n" date;
   flush stderr;
-  let mark = Gwdb.ifam_marker (Gwdb.ifams base) false in
+  let mark = Gwdb.Marker.make (Gwdb.Collection.length @@ Gwdb.ifams base) false in
   let min = ref max_int in
   let max = ref 0 in
   let hts = Hashtbl.create 100 in

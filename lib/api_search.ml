@@ -61,7 +61,7 @@ let kmp p s =
       - ListPersons : Retourne une liste de personnes.
                                                                               *)
 (* ************************************************************************** *)
-let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
+let get_list_of_select_start_with conf base ini_n ini_p letter =
     let name =
     (* Si le nom est défini, on parcourt un tableau de noms *)
     if "" <> ini_n
@@ -131,12 +131,12 @@ let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
                 (* Sort totalement de l'itération puisque les personnes ne sont plus définies *)
                 else list
               in
-              match spi_next name istr need_whole_list with
-              | (istr, _) -> loop istr list
+              match spi_next name istr with
+              | istr -> loop istr list
               | exception Not_found -> list
             else
-              match spi_next name istr need_whole_list with
-              | (istr, _) -> loop istr list
+              match spi_next name istr with
+              | istr -> loop istr list
               | exception Not_found -> list
         (* Première itération, on initialise au passage list comme tableau vide *)
         in loop istr []
@@ -157,7 +157,7 @@ let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
       - ListPersons : Retourne une liste de personnes.
                                                                               *)
 (* ************************************************************************** *)
-let select_start_with conf base ini_n ini_p need_whole_list =
+let select_start_with conf base ini_n ini_p =
   let ini_n = Util.name_key base ini_n in
   let start =
     if ini_n <> ""
@@ -168,11 +168,11 @@ let select_start_with conf base ini_n ini_p need_whole_list =
   in
   let list_min =
     let letter = String.lowercase_ascii (String.sub start 0 1) in
-    get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter
+    get_list_of_select_start_with conf base ini_n ini_p letter
   in
   let list_maj =
     let letter = String.uppercase_ascii (String.sub start 0 1) in
-    get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter
+    get_list_of_select_start_with conf base ini_n ini_p letter
   in
   List.rev_append list_maj list_min
 
@@ -347,7 +347,7 @@ let print_search conf base =
         else
           let maiden_name = search_params.M.Search_params.maiden_name in
           match search_params.M.Search_params.search_type with
-          | `starting_with -> select_start_with conf base n fs true
+          | `starting_with -> select_start_with conf base n fs
           | `approximative -> select_both_all base n fs maiden_name
           | `lastname_or_firstname ->
                let list_n = select_all base true n in
@@ -362,7 +362,7 @@ let print_search conf base =
           []
         else
           match search_params.M.Search_params.search_type with
-          | `starting_with -> select_start_with conf base n "" true
+          | `starting_with -> select_start_with conf base n ""
           | `approximative -> select_all base true n
           | `lastname_or_firstname -> select_all base true n
       in
@@ -374,7 +374,7 @@ let print_search conf base =
           []
         else
           match search_params.M.Search_params.search_type with
-          | `starting_with -> select_start_with conf base "" fs true
+          | `starting_with -> select_start_with conf base "" fs
           | `approximative -> select_all base false fs
           | `lastname_or_firstname -> select_all base false fs
       in
@@ -473,7 +473,6 @@ let select_start_with_person base get_field ini =
   end [] (Gwdb.persons base)
 
 let select_start_with_auto_complete base mode max_res ini =
-  let need_whole_list = true in
   let name =
     match mode with
     | `lastname -> persons_of_surname base
@@ -505,14 +504,14 @@ let select_start_with_auto_complete base mode max_res ini =
               begin
                 string_set := StrSet.add s !string_set;
                 incr nb_res;
-                match spi_next name istr need_whole_list with
-                | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+                match spi_next name istr with
+                | istr when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
                 | _ -> ()
                 | exception Not_found -> ()
               end
             else
-              match spi_next name istr need_whole_list with
-              | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+              match spi_next name istr with
+              | istr when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
               | _ -> ()
               | exception Not_found -> ()
           in loop istr
@@ -537,15 +536,15 @@ let select_start_with_auto_complete base mode max_res ini =
                 begin
                   string_set := StrSet.add s !string_set;
                   incr nb_res;
-                  match spi_next name istr need_whole_list with
+                  match spi_next name istr with
                   | exception Not_found -> ()
-                  | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+                  | istr when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
                   | _ -> ()
                 end
               else
-                match spi_next name istr need_whole_list with
+                match spi_next name istr with
                 | exception Not_found -> ()
-                | (istr, _) when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
+                | istr when !nb_res < max_res && (String.sub k 0 1) = letter -> loop istr
                 | _ -> ()
             in loop istr
         | exception Not_found -> ()
@@ -565,15 +564,15 @@ let select_start_with_auto_complete base mode max_res ini =
               begin
                 string_set := StrSet.add (sou base istr) !string_set;
                 incr nb_res;
-                match spi_next name istr need_whole_list with
+                match spi_next name istr with
                 | exception Not_found -> ()
-                | (istr, _) when !nb_res < max_res -> loop istr list
+                | istr when !nb_res < max_res -> loop istr list
                 | _ -> ()
               end
             else
-              match spi_next name istr need_whole_list with
+              match spi_next name istr with
               | exception Not_found -> ()
-              | (istr, _) when !nb_res < max_res -> loop istr list
+              | istr when !nb_res < max_res -> loop istr list
               | _ -> ()
           in loop istr []
     end;
