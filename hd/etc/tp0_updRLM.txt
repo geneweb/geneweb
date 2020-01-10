@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>[*modify::tree]</title>
+  <meta name="robots" content="none"%/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
+  %include;css
+  %include;hed
+</head>
+
+%define;one_pvar_line(znz,zocz,zfnz,zsnz,zbdz,ztz,zparamz)
+  <trzparamz>
+    <td>
+     <span class="fa fa-plus row_add_before"></span>
+     <span class="fa fa-long-arrow-alt-up row_move_up"></span>
+     <br>
+     <span class="fa fa-minus row_del"></span>
+     <span class="fa fa-long-arrow-alt-down row_move_down"></span>
+    </td>
+    <td><input name="oc" class="form-control reset_bd_text" size="5" value="zocz"></td>
+    <td><input name="p" class="form-control reset_bd_text" size="30" value="zfnz"></td>
+    <td><input name="n" class="form-control reset_bd_text" size="30" value="zsnz"></td>
+    <td class="bd_text">zbdz</td>
+    <td><input name="t" class="form-control" size="30" value="ztz"></td>
+  </tr>
+%end;
+
+%define;one_pvar(zz)
+  %if(evar.izz != "" or evar.pzz != "")
+    %let;tmp;
+      %if;pvar.zz.has_birth_date; %pvar.zz.slash_birth_date;
+      %elseif;pvar.zz.has_baptism_date; %pvar.zz.slash_baptism_date;
+      %end;
+      %sp;-%sp;%nn;
+      %if;pvar.zz.has_death_date;%pvar.zz.slash_death_date;
+      %elseif;pvar.zz.has_burial_date;%pvar.zz.slash_burial_date;
+      %elseif;pvar.zz.has_cremation_date;%pvar.zz.slash_cremation_date;
+      %end;
+    %in;
+    %apply;one_pvar_line("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, tmp, evar.tzz, "")
+    %apply;one_pvar(zz+1)
+  %end;
+%end;
+
+%define;my_hidden(xx)
+  %if(evar.xx != "")<input type="hidden" name="xx" value="%evar.xx;">%end;
+%end;
+
+<body%body_prop;>
+<div class="container-fluid">
+
+<form id="upd" method="post" action="%action;">
+  <div class="row justify-content-center">
+    <h2 class="mx-auto">[*edit tree]</h2>
+    <input type="submit" class="btn btn-primary mx-auto" value="OK">
+  </div>
+
+  %hidden;
+  <input type="hidden" name="m" value='RLM'>
+  %apply;my_hidden("spouse")
+  %apply;my_hidden("image")
+  %apply;my_hidden("bd")
+  %apply;my_hidden("new")
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <td></td>
+        <td>#</td>
+        <td>[*first name/first names]0</td>
+        <td>[*surname/surnames]0</td>
+        <td>[*birth] - [*death]</td>
+        <td>[*text]</td>
+      </tr>
+    </thead>
+    <tbody>
+      %apply;one_pvar_line("", "", "", "", "", "", " id='template_line' style='display:none;'")
+      %if(evar.i0 != "" and evar.p0 != "")
+        %apply;one_pvar(0)
+      %else;
+        %apply;one_pvar(1)
+      %end;
+      <tr class="last_row"><td><span class="fa fa-plus row_add_before"></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+</form>
+
+%if(not cancel_links)
+  %include;trl
+  %include;copyr
+%end;
+</div>
+%include;js
+<script>
+$(document).on( "click", ".row_add_before", function() {
+ $(this).closest("tr").before( $("#template_line").clone().removeAttr("id").removeAttr("style").get(0) );
+} );
+$(document).on( "click", ".row_del", function() {
+ $(this).closest('tr').remove();
+} );
+$(document).on( "click", ".row_move_up", function() {
+  var row = $(this).closest( "tr" );
+  if( row.index() >  1 ) { // The first row is a template
+    row.insertBefore( row.prev() );
+  }
+} );
+$(document).on( "click", ".row_move_down", function() {
+  var row = $(this).closest( "tr" );
+  var row_next = row.next();
+  if( 0 != row_next.length && !row_next.hasClass("last_row") ) {
+    row.insertAfter( row_next );
+  }
+} );
+$(document).on( "change", ".reset_bd_text", function() {
+  $(this).closest( "tr" ).children( ".bd_text").html( "" );
+} );
+$("#upd").submit( function() {
+  event.preventDefault();
+  $(this).find("tr").each( function( index ) {
+    if( $(this).attr("id") == "template_line" ) {
+      $(this).find( "input[name=oc]" ).prop("disabled", true);
+      $(this).find( "input[name=p]" ).prop("disabled", true);
+      $(this).find( "input[name=n]" ).prop("disabled", true);
+      $(this).find( "input[name=t]" ).prop("disabled", true);
+    } else {
+      $(this).find( "input[name=oc]" ).attr("name", "oc"+(index-1) );
+      $(this).find( "input[name=p]" ).attr("name", "p"+(index-1) );
+      $(this).find( "input[name=n]" ).attr("name", "n"+(index-1) );
+      $(this).find( "input[name=t]" ).attr("name", "t"+(index-1) );
+    }
+  });
+  $(this).unbind('submit').submit();
+} );
+</script>
+</body>
+</html>
