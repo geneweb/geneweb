@@ -163,6 +163,8 @@ let rec exp_gen x1 x2 n =
 let exp x n =
   exp_gen x x n
 
+let compare x y = if gt x y then 1 else if eq x y then 0 else -1
+
 let code_of_digit d =
   let d = to_int d in
   if d < 10 then Char.code '0' + d else Char.code 'A' + (d - 10)

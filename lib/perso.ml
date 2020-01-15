@@ -363,7 +363,7 @@ let next_sosa s =
   (* La clé de la table est l'iper de la personne et on lui associe son numéro
     de sosa. On inverse pour trier sur les sosa *)
   let sosa_list = Hashtbl.fold (fun k v acc -> (v, k) :: acc) sosa_ht [] in
-  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> Sosa.compare s1 s2) sosa_list in
   let rec find_n x lst = match lst with
     | [] -> (Sosa.zero, dummy_iper)
     | (so, _) :: tl ->
@@ -376,7 +376,7 @@ let next_sosa s =
 
 let prev_sosa s =
   let sosa_list = Hashtbl.fold (fun k v acc -> (v, k) :: acc) sosa_ht [] in
-  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> Sosa.compare s1 s2) sosa_list in
   let sosa_list = List.rev sosa_list in
   let rec find_n x lst = match lst with
     | [] -> (Sosa.zero, dummy_iper)
@@ -3199,7 +3199,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           | Some (n, _) ->
               begin match prev_sosa n with
               | (so, ip) ->
-                if so = Sosa.zero then VVstring ""
+                if Sosa.eq so Sosa.zero then VVstring ""
                 else
                   let p = poi base ip in
                   let p_auth = authorized_age conf base p in
