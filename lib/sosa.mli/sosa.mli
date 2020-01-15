@@ -6,6 +6,7 @@ val zero : t
 val one : t
 val eq : t -> t -> bool
 val gt : t -> t -> bool
+val compare : t -> t -> int
 val add : t -> t -> t
 val sub : t -> t -> t
 val twice : t -> t

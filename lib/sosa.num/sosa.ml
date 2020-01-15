@@ -17,6 +17,8 @@ let div x y = Big_int.div_big_int x (Big_int.big_int_of_int y)
 let modl x y = Big_int.mod_big_int x (Big_int.big_int_of_int y)
 let exp = Big_int.power_big_int_positive_int
 
+let compare x y = if gt x y then 1 else if eq x y then 0 else -1
+
 let inc sosa increment = Big_int.add_big_int sosa (of_int increment)
 let even =
   let two = Big_int.big_int_of_int 2 in

@@ -17,6 +17,8 @@ let div x y = Z.div x (Z.of_int y)
 let modl x y = Z.rem x (Z.of_int y)
 let exp = Z.pow
 
+let compare = Z.compare
+
 let inc sosa increment = Z.add sosa (of_int increment)
 let even = Z.is_even
 let twice = let two = Z.succ Z.one in fun sosa -> Z.mul sosa two
