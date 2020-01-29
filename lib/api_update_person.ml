@@ -400,7 +400,7 @@ let print_mod_aux conf base mod_p callback =
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
 
-let print_mod conf base mod_p =
+let print_mod ?(fexclude = []) conf base mod_p =
   let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
   let o_p =
     Util.string_gen_person base (gen_person_of_person (poi base ip))
@@ -431,6 +431,13 @@ let print_mod conf base mod_p =
       let wl =
         let a = poi base p.key_index in
         let a = {parents = get_parents a; consang = get_consang a} in
+        let family =
+          Array.of_list @@
+          Array.fold_right begin fun ifam acc ->
+            if List.mem ifam fexclude then acc else ifam :: acc
+          end u.family []
+        in
+        let u = { family } in
         UpdateIndOk.all_checks_person base p a u
       in
       let changed = U_Modify_person (o_p, (Util.string_gen_person base p)) in

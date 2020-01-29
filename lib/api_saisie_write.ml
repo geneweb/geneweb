@@ -1670,6 +1670,8 @@ let print_mod_family_ok conf base =
   let mod_family = edit_family_ok.Mwrite.Edit_family_ok.family in
   let mod_father = mod_family.Mwrite.Family.father in
   let mod_mother = mod_family.Mwrite.Family.mother in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
+  let fexclude = [ ifam ] in
   (*
      On modifie une famille, il faut effectuer les actions suivantes :
        - modification du père => MOD_IND
@@ -1688,7 +1690,7 @@ let print_mod_family_ok conf base =
           *)
             ([], [], [])
           else
-            match Api_update_person.print_mod conf base mod_father with
+            match Api_update_person.print_mod ~fexclude conf base mod_father with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErr s)
             | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
@@ -1703,7 +1705,7 @@ let print_mod_family_ok conf base =
           *)
             (all_wl, all_ml, all_hr)
           else
-            match Api_update_person.print_mod conf base mod_mother with
+            match Api_update_person.print_mod ~fexclude conf base mod_mother with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErr s)
             | Api_update_util.UpdateErrorConflict c ->
@@ -1725,7 +1727,6 @@ let print_mod_family_ok conf base =
     | Update.ModErr s -> Api_update_util.UpdateError s
     | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
   in
-  let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
 
