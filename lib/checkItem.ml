@@ -686,18 +686,22 @@ let check_parent_marriage_age warning fam p =
     | { efam_name = (Efam_Marriage|Efam_PACS) ; efam_date ; _ } :: list ->
         begin match Adef.od_of_cdate efam_date with
           | Some (Dgreg (g2, _) as d2) ->
-            begin match Adef.od_of_cdate (get_birth p) with
-              | Some (Dgreg (g1, _) as d1) ->
-                if strictly_before d2 d1
-                then warning (MarriageDateBeforeBirth p)
-                else
-                  let e = Date.time_elapsed g1 g2 in
-                  if strictly_younger e min_age_marriage
-                  then warning (YoungForMarriage (p, e))
-                  else if strictly_older e max_age_marriage
-                  then warning (OldForMarriage (p, e))
-                  else loop list
-              | _ -> loop list
+            begin match Date.date_of_death (get_death p) with
+              | Some d1 when strictly_after d2 d1 ->
+                warning (MarriageDateAfterDeath p)
+              | _ ->
+                match Adef.od_of_cdate (get_birth p) with
+                | Some (Dgreg (g1, _) as d1) ->
+                  if strictly_before d2 d1
+                  then warning (MarriageDateBeforeBirth p)
+                  else
+                    let e = Date.time_elapsed g1 g2 in
+                    if strictly_younger e min_age_marriage
+                    then warning (YoungForMarriage (p, e))
+                    else if strictly_older e max_age_marriage
+                    then warning (OldForMarriage (p, e))
+                    else loop list
+                | _ -> loop list
             end
           | _ -> loop list
         end
