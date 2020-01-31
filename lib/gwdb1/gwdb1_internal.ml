@@ -20,7 +20,9 @@ let cache f a (get, set) x =
   | Some v -> v
   | None -> let v = f a in set x (Some v) ; v
 
-let no_person empty_string ip =
+let empty_string = 0
+
+let no_person ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
    public_name = empty_string; qualifiers = []; titles = []; rparents = [];
@@ -156,7 +158,7 @@ let open_base bname : base =
 
 let close_base base = base.func.cleanup ()
 let empty_person base ip =
-  (base, Type.int_of_iper ip, {p = Some (no_person (Type.istr_of_int 0) ip);a = Some no_ascend; u = Some no_union})
+  (base, Type.int_of_iper ip, {p = Some (no_person ip);a = Some no_ascend; u = Some no_union})
 let person_of_gen_person base (p, a, u) =
   (base, 0, {p = Some p; a = Some a; u = Some u})
 let family_of_gen_family base (f, c, d) =

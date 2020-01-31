@@ -36,6 +36,7 @@ val dummy_istr : istr
 val eq_istr : istr -> istr -> bool
 val is_empty_string : istr -> bool
 val is_quest_string : istr -> bool
+val empty_string : istr
 val empty_person : base -> iper -> person
 val empty_family : base -> ifam -> family
 
