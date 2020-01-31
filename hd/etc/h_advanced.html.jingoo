@@ -29,27 +29,6 @@
 
   {%- set row = "row form-group" -%}
 
-  {%- macro columns (s, m, l, xl) -%}
-    col-sm-{{ s }} col-md-{{ m }} col-lg-{{ l }} {% if xl %}col-xl-{{ xl }}{% endif %}
-  {%- endmacro -%}
-
-  {%- macro checkbox (class="", name, label, small, medium, large, xlarge) -%}
-    <div class="form-check {{ class }}">
-      <input class="form-check-input" id="{{ name }}" name="{{ name }}" type="checkbox" checked="checked">
-      <label class="form-check-label" for="{{ name }}">{{ label }}</label>
-    </div>
-  {%- endmacro checkbox -%}
-
-  {%- macro formRadio (name, value, label, checked) -%}
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="{{ name }}" value="{{ value }}"
-             {% if checked %}checked{% endif %}>
-      <label class="form-check-label" for="{{ id }}">
-        {{ label|capitalize }}
-      </label>
-    </div>
-  {%- endmacro -%}
-
   {%- macro date_place (title, prefix) -%}
     <div class="{{ columns (12, 6, 6) }}">
       {%- if title -%}
@@ -129,9 +108,9 @@
                     </label>
                   </div>
                   <div class="{{ columns (12, 8, 8, 10) }}">
-                    {{ formRadio ("sex", "M", 'M/F'|trans(0)) }}
-                    {{ formRadio ("sex", "F", 'M/F'|trans(1)) }}
-                    {{ formRadio ("sex", "N", 'indifferent'|trans(2), true) }}
+                    {{ inputRadio ("sex", "M", 'M/F'|trans(0)) }}
+                    {{ inputRadio ("sex", "F", 'M/F'|trans(1)) }}
+                    {{ inputRadio ("sex", "N", 'indifferent'|trans(2), true) }}
                   </div>
                 </div>
                 <div class="{{ row }}">
@@ -159,9 +138,9 @@
                     </label>
                   </div>
                   <div class="{{ columns (8, 8, 8, 10) }}">
-                    {{ formRadio ("married", "Y", 'Y/N'|trans(0)) }}
-                    {{ formRadio ("married", "N", 'Y/N'|trans(1)) }}
-                    {{ formRadio ("married", "A", 'indifferent'|trans(2), true) }}
+                    {{ inputRadio ("married", "Y", 'Y/N'|trans(0)) }}
+                    {{ inputRadio ("married", "N", 'Y/N'|trans(1)) }}
+                    {{ inputRadio ("married", "A", 'indifferent'|trans(2), true) }}
                   </div>
                 </div>
                 <div class="{{ row }}">
@@ -196,11 +175,11 @@
                 <div class="row">
                   {{ date_place (null, '') }}
                   <div class="{{ columns (12, 6, 6) }}">
-                    {{ checkbox ('event_birth', 'birth'|trans|capitalize, 12, 6, 6) }}
-                    {{ checkbox ('event_bapt', 'baptism'|trans|capitalize, 12, 6, 6) }}
-                    {{ checkbox ('event_marriage', 'marriage event'|trans|capitalize, 12, 12, 12, 12) }}
-                    {{ checkbox ('event_death', 'death'|trans|capitalize, 12, 6, 6) }}
-                    {{ checkbox ('event_burial', 'burial'|trans|capitalize, 12, 6, 6) }}
+                    {{ inputCheckbox ('event_birth', 'birth'|trans|capitalize, 12, 6, 6) }}
+                    {{ inputCheckbox ('event_bapt', 'baptism'|trans|capitalize, 12, 6, 6) }}
+                    {{ inputCheckbox ('event_marriage', 'marriage event'|trans|capitalize, 12, 12, 12, 12) }}
+                    {{ inputCheckbox ('event_death', 'death'|trans|capitalize, 12, 6, 6) }}
+                    {{ inputCheckbox ('event_burial', 'burial'|trans|capitalize, 12, 6, 6) }}
                   </div>
                 </div>
               </div>
@@ -267,11 +246,11 @@
               / {{ 'event/events'|trans(0) }}
               / {{ 'surname/surnames'|trans(0) }}
             </strong>
-            {{ checkbox (class="ml-2", "bi",'birth'|trans|capitalize|capitalize, 12, 12, 12) }}
-            {{ checkbox (class="ml-2", "bp",'baptism'|trans|capitalize, 12, 12, 12) }}
-            {{ checkbox (class="ml-2", "de",'death'|trans|capitalize, 12, 12, 12) }}
-            {{ checkbox (class="ml-2", "bu",'burial'|trans|capitalize, 12, 12, 12) }}
-            {{ checkbox (class="ml-2", "ma",'marriage/marriages'|trans(0)|capitalize) }}
+            {{ inputCheckbox (class="ml-2", "bi",'birth'|trans|capitalize|capitalize, 12, 12, 12) }}
+            {{ inputCheckbox (class="ml-2", "bp",'baptism'|trans|capitalize, 12, 12, 12) }}
+            {{ inputCheckbox (class="ml-2", "de",'death'|trans|capitalize, 12, 12, 12) }}
+            {{ inputCheckbox (class="ml-2", "bu",'burial'|trans|capitalize, 12, 12, 12) }}
+            {{ inputCheckbox  (class="ml-2", "ma",'marriage/marriages'|trans(0)|capitalize) }}
             <button class="btn btn-outline-success ml-auto" type="submit">
               {{ 'visualize/show/hide/summary'|trans(0)|capitalize }}
             </button>

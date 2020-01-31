@@ -1,5 +1,6 @@
 {%- include 'perso_utils.jingoo' -%}
 {%- include 'utils.jingoo' -%}
+{%- include 'html_utils.jingoo' -%}
 {%- include 'perso_pagebar.html.jingoo' -%}
 
 {%- extends "template.jingoo" -%}
@@ -119,23 +120,6 @@
     </label>
   </div>
 {%- endmacro oryear -%}
-
-{%- macro option (value, cond, label) -%}
-  <option value="{{ value }}"{% if cond %} selected="selected"{% endif %}>
-    {%--%}{{ label }}{%--%}
-  </option>
-{%- endmacro option -%}
-
-{%- macro radio (name,value,cond,label) -%}
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="{{ name }}" value="{{ value }}" {% if cond %} checked="checked"{% endif %}>
-    <label class="form-check-label" for="{{ name }}">{{ label|capitalize }}</label>
-  </div>
-{%- endmacro -%}
-
-{%- macro columns (s, m, l) -%}
-  col-sm-{{ s }} col-md-{{ m }} col-lg-{{ l }}
-{%- endmacro columns -%}
 
 {%- set form_row = "row form-group " -%}
 
@@ -317,9 +301,9 @@
       <div class="{{ form_row }}">
         {{ line_label ("", "sex"|trans) }}
         <div class="{{ line_control }}">
-          {{ radio (prefix+i+"_sex","M", (p ? p.sex == 0 : false), "male/female/neuter"|trans(0)) }}
-          {{ radio (prefix+i+"_sex","F", (p ? p.sex == 1 : false), "male/female/neuter"|trans(1)) }}
-          {{ radio (prefix+i+"_sex","N", (p ? p.sex != 0 && p.sex != 1 : true), "male/female/neuter"|trans(2)) }}
+          {{ inputRadio (prefix+i+"_sex","M", "male/female/neuter"|trans(0), (p ? p.sex == 0 : false)) }}
+          {{ inputRadio (prefix+i+"_sex","F", "male/female/neuter"|trans(1), (p ? p.sex == 1 : false)) }}
+          {{ inputRadio (prefix+i+"_sex","N", "male/female/neuter"|trans(2), (p ? p.sex != 0 && p.sex != 1 : true)) }}
         </div>
       </div>
 
@@ -371,7 +355,13 @@
 
 {%- macro print_parent_form (xcnt, xx, txt) -%}
   <div class="{{ columns (12, 12, 6) }}">
-    {{ print_person_form ("pa", xcnt, xx, txt, null) }}
+    {{ print_person_form ("pa", xcnt, xx,
+                          xx.sex == 0
+                          ? "father/mother"|trans(0)
+                          : xx.sex == 1
+                            ? "father/mother"|trans(1)
+                            : "father/mother"|trans(0) + ' / ' + "father/mother"|trans(1)|capitalize
+                          , null) }}
   </div>
 {%- endmacro print_parent_form -%}
 
@@ -501,7 +491,18 @@
 
 <div class="container">
 
-  <h1 class="border-bottom text-center">{{ "modify"|trans|capitalize }} {{ "family/families"|trans(0) }}</h1>
+  <h1 class="border-bottom text-center">
+    {%- switch conf.env.m -%}
+      {%- case "ADD_FAM" || "ADD_FAM_OK" -%}
+      {{ 'add'|trans|capitalize }} {{ 'family/families'|trans(0) }}
+      {%- case "ADD_PAR" -%}
+      {{ 'add'|trans|capitalize }} {{ 'parents' }} {# TODO: print children #}
+      {%- case "MOD_FAM" || "MOD_FAM_OK" -%}
+      {{ "modify"|trans|capitalize }} {{ "family/families"|trans(0) }}
+      {%- case "MRG_DUP_FAM_Y_N" || "MRG_FAM" || "MRG_FAM_OK" || "MRG_MOD_FAM_OK" -%}
+      {{ 'merge'|trans|capitalize }} {{ 'family/families'|trans(1) }} # {{ env.i }}
+    {%- endswitch -%}
+  </h1>
 
   <form method="post" action="{{ conf.command }}" class="{# form-gw-old #}"  name="form_fam">
     {# <input type="image" src="images/transparent.gif" style="cursor:default" class="radio"> #}
@@ -535,8 +536,15 @@
     {{ section_title('parents'|trans|capitalize) }}
 
     <div class="row">
-      {{ print_parent_form (1, family.father, "father/mother"|trans(0)) }}
-      {{ print_parent_form (2, family.mother, "father/mother"|trans(1)) }}
+      {{ print_parent_form (1, family.father) }}
+      {{ print_parent_form (2, family.mother) }}
+    </div>
+    <div class="row mt-2">
+      <div class="{{ columns (12,12,12) }}">
+      {{ inputCheckbox ("nsck", 'no sexes check'|trans|capitalize,
+                        family.father && family.mother
+                        && family.father.sex == 0 && family.mother.sex == 1) }}
+      </div>
     </div>
 
     {{ section_title("event/events"|trans(1)|capitalize) }}

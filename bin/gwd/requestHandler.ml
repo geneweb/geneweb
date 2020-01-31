@@ -702,10 +702,45 @@ let defaultHandler : handler =
       | _ -> self.very_unknown self conf base
     end
 
-  ; add_fam = begin fun self conf base ->
-      if conf.wizard then UpdateFam.print_add conf base
-      else self.incorrect_request self conf base
-    end
+  ; add_fam = restricted_wizard begin fun self conf base ->
+        let iroot, root, ifath, father, imoth, mother, digest =
+          match find_person_in_env conf base "p" with
+          | Some p ->
+            let digest = string_of_int (Array.length (get_family p)) in
+            let p' = Gwxjg.Data.get_n_mk_person conf base (get_iper p) in
+            if get_sex p = Male || get_sex p = Neuter
+            then (get_iper p, p', get_iper p, p', dummy_iper, Tnull, digest)
+            else
+              (get_iper p, p', dummy_iper, Tnull, get_iper p, p', digest)
+          | None ->
+            (dummy_iper, Tnull, dummy_iper, Tnull, dummy_iper, Tnull, "")
+        in
+        let f = Gwdb.empty_family base dummy_ifam in
+        let d = Gwdb.gen_descend_of_descend f in
+        let c = Gwdb.gen_couple_of_couple f in
+        let f = Gwdb.gen_family_of_family f in
+        let empty = Gwdb.insert_string base "" in
+        let f = { f with fevents = [ { efam_name = Efam_Marriage
+                                     ; efam_date = Adef.cdate_None
+                                     ; efam_place = empty
+                                     ; efam_reason = empty
+                                     ; efam_note = empty
+                                     ; efam_src = empty
+                                     ; efam_witnesses = [||]
+                                     } ]
+                }
+        in
+        let f = Gwdb.family_of_gen_family base (f, c, d) in
+        let cpl = (ifath, imoth, iroot) in
+        let family = Gwxjg.Data.mk_family conf base (dummy_ifam, f, cpl, true) in
+        let models =
+          ("digest", Tstr digest)
+          :: ("family", family)
+          :: ("root", root)
+          :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"updfam" ~models
+      end
 
   ; add_fam_ok = begin fun self conf base ->
       if conf.wizard then UpdateFamOk.print_add conf base
