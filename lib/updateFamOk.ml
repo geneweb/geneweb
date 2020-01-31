@@ -391,7 +391,7 @@ let reconstitute_from_fevents nsck empty_string fevents =
   let div = Opt.default NotDivorced !found_divorce in
   marr, div, wit
 
-let reconstitute_family conf base =
+let reconstitute_family conf base nsck =
   let (events, ext) = reconstitute_events conf false 1 in
   let (events, ext) = reconstitute_insert_event conf ext 0 events in
   let surname = getn conf "pa1" "sn" in
@@ -464,7 +464,7 @@ let reconstitute_family conf base =
   let (marr, div, _) =
     (* FIXME: Use witnesses (and Array.map fst witnesses)
        when witnesses will be added inplace *)
-    reconstitute_from_fevents (p_getenv conf.env "nsck" = Some "on") "" events
+    reconstitute_from_fevents nsck "" events
   in
   let (relation, marriage, marriage_place, marriage_note, marriage_src) =
     marr
@@ -1048,7 +1048,7 @@ let effective_mod conf base sfam scpl sdes =
   let pi = Adef.father ncpl in
   Update.update_related_pointers base pi ol nl; fi, nfam, ncpl, ndes
 
-let effective_add conf base sfam scpl sdes =
+let effective_add conf base nsck sfam scpl sdes =
   let fi = insert_family base (empty_family base dummy_ifam) in
   let created_p = ref [] in
   let psrc =
@@ -1081,26 +1081,21 @@ let effective_add conf base sfam scpl sdes =
     else nfam
   in
 #endif
-  let sfam = {sfam with relation = nfam.relation} in
-  if sfam.relation <> NoSexesCheckNotMarried &&
-     sfam.relation <> NoSexesCheckMarried
-  then
-    begin
-      begin match get_sex nfath_p with
-        Female -> print_err_father_sex conf base nfath_p
+  if not nsck then begin
+    begin match get_sex nfath_p with
+      | Female -> print_err_father_sex conf base nfath_p
       | Male -> ()
       | _ ->
-          let nfath_p = {(gen_person_of_person nfath_p) with sex = Male} in
-          patch_person base nfath_p.key_index nfath_p
-      end;
-      match get_sex nmoth_p with
-        Male -> print_err_mother_sex conf base nmoth_p
-      | Female -> ()
-      | _ ->
-          let nmoth_p = {(gen_person_of_person nmoth_p) with sex = Female} in
-          patch_person base nmoth_p.key_index nmoth_p
-    end
-  else if Adef.father ncpl = Adef.mother ncpl then print_err conf;
+        let nfath_p = {(gen_person_of_person nfath_p) with sex = Male} in
+        patch_person base nfath_p.key_index nfath_p
+    end;
+    match get_sex nmoth_p with
+      Male -> print_err_mother_sex conf base nmoth_p
+    | Female -> ()
+    | _ ->
+      let nmoth_p = {(gen_person_of_person nmoth_p) with sex = Female} in
+      patch_person base nmoth_p.key_index nmoth_p
+  end else if Adef.father ncpl = Adef.mother ncpl then print_err conf;
   let nfam = {nfam with origin_file = origin_file; fam_index = fi} in
   patch_family base fi nfam;
   patch_couple base fi ncpl;
@@ -1369,7 +1364,8 @@ let print_add o_conf base =
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
-  let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
+  let nsck = p_getenv conf.env "nsck" = Some "on" in
+  let (sfam, scpl, sdes, ext) = reconstitute_family conf base nsck in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true
@@ -1395,7 +1391,7 @@ let print_add o_conf base =
     | None, None ->
       let (sfam, sdes) = strip_family sfam sdes in
       let (ifam, fam, cpl, des) =
-        effective_add conf base sfam scpl sdes
+        effective_add conf base nsck sfam scpl sdes
       in
       let () = patch_parent_with_pevents base cpl in
       let () = patch_children_with_pevents base des in
@@ -1444,7 +1440,8 @@ let print_add o_conf base =
    Else, create a new union. *)
 let print_add_parents o_conf base =
   let conf = Update.update_conf o_conf in
-  let (sfam, scpl, sdes, _) = reconstitute_family conf base in
+  let nsck = p_getenv conf.env "nsck" = Some "on" in
+  let (sfam, scpl, sdes, _) = reconstitute_family conf base nsck in
   if sfam.marriage = Adef.cdate_None
   && sfam.marriage_place = ""
   && sfam.marriage_note = ""
@@ -1540,7 +1537,8 @@ let print_del conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_aux conf base callback =
-  let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
+  let nsck = p_getenv conf.env "nsck" = Some "on" in
+  let (sfam, scpl, sdes, ext) = reconstitute_family conf base nsck in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true

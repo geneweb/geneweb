@@ -336,7 +336,7 @@ let print_add conf base mod_f mod_fath mod_moth =
           begin
             let (sfam, sdes) = UpdateFamOk.strip_family sfam sdes in
             let (ifam, fam, cpl, des) =
-              UpdateFamOk.effective_add conf base sfam scpl sdes
+              UpdateFamOk.effective_add conf base true sfam scpl sdes
             in
             let () = UpdateFamOk.patch_parent_with_pevents base cpl in
             let () = UpdateFamOk.patch_children_with_pevents base des in
