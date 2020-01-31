@@ -55,7 +55,7 @@ let odate = function
   | _ -> None
 
 let obirth x =
-  Adef.od_of_cdate (get_birth x) |> odate
+  get_birth x |> Adef.od_of_cdate |> odate
 
 type 'string event_name =
     Psort of 'string gen_pers_event_name
@@ -548,23 +548,28 @@ let check_order_pevents warning p =
     (p)
     (get_pevents p)
 
+let check_witness_pevents_aux warning evt date b d p =
+  begin match b with
+    | Some (Dgreg (d1, _)) ->
+      if strictly_before_dmy date d1
+      then warning (PWitnessEventBeforeBirth (p, evt))
+    | _ -> ()
+  end ;
+  match d with
+  | Some (Dgreg (d3, _)) ->
+    if strictly_after_dmy date d3
+    then warning (PWitnessEventAfterDeath (p, evt))
+  | _ -> ()
+
 let check_witness_pevents base warning p =
   List.iter begin fun evt ->
     match Adef.od_of_cdate evt.epers_date with
     | Some (Dgreg (d2, _)) ->
       Array.iter begin fun (iw, _) ->
         let p = poi base iw in
-        begin match Adef.od_of_cdate (get_birth p) with
-          | Some (Dgreg (d1, _)) ->
-            if strictly_before_dmy d2 d1
-            then warning (PWitnessEventBeforeBirth (p, evt))
-          | _ -> ()
-        end;
-        match Date.date_of_death @@ get_death p with
-        | Some (Dgreg (d3, _)) ->
-          if strictly_after_dmy d2 d3
-          then warning (PWitnessEventAfterDeath (p, evt))
-        | _ -> ()
+        check_witness_pevents_aux warning evt d2
+          (Adef.od_of_cdate @@ get_birth p)
+          (Date.date_of_death @@ get_death p) p
       end evt.epers_witnesses
     | _ -> ()
   end (get_pevents p)
@@ -659,23 +664,28 @@ let check_order_fevents base warning fam =
     (p)
     (get_fevents fam)
 
+let check_witness_fevents_aux warning evt date b d p =
+  begin match b with
+    | Some (Dgreg (d1, _)) ->
+      if strictly_before_dmy date d1
+      then warning (FWitnessEventBeforeBirth (p, evt))
+    | _ -> ()
+  end ;
+  match d with
+  | Some (Dgreg (d3, _)) ->
+    if strictly_after_dmy date d3
+    then warning (FWitnessEventAfterDeath (p, evt))
+  | _ -> ()
+
 let check_witness_fevents base warning fam =
   List.iter begin fun evt ->
     match Adef.od_of_cdate evt.efam_date with
     | Some (Dgreg (d2, _)) ->
       Array.iter begin fun (iw, _) ->
         let p = poi base iw in
-        begin match Adef.od_of_cdate (get_birth p) with
-          | Some (Dgreg (d1, _)) ->
-            if strictly_before_dmy d2 d1
-            then warning (FWitnessEventBeforeBirth (p, evt))
-          | _ -> ()
-        end;
-        match Date.date_of_death @@ get_death p with
-        | Some (Dgreg (d3, _)) ->
-          if strictly_after_dmy d2 d3
-          then warning (FWitnessEventAfterDeath (p, evt))
-        | _ -> ()
+        check_witness_fevents_aux warning evt d2
+          (Adef.od_of_cdate @@ get_birth p)
+          (Date.date_of_death @@ get_death p) p
       end evt.efam_witnesses
     | _ -> ()
   end (get_fevents fam)
@@ -748,6 +758,31 @@ let on_person_update base warning p =
       child_born_after_his_parent warning p moth ;
       check_siblings base warning (i, fam) ignore
     | _ -> ()
+  end ;
+  let b = Adef.od_of_cdate (get_birth p) in
+  let d = Date.date_of_death @@ get_death p in
+  let iper = get_iper p in
+  if b <> None || d <> None then begin
+    List.iter begin fun i ->
+      let r = poi base i in
+      List.iter begin fun e ->
+        match Adef.od_of_cdate e.epers_date with
+        | Some (Dgreg (date, _))
+          when Array.exists (fun (i', _) -> iper = i') e.epers_witnesses
+          -> check_witness_pevents_aux warning e date b d p
+        | _ -> ()
+      end (get_pevents r) ;
+      Array.iter begin fun i ->
+        let f = foi base i in
+        List.iter begin fun e ->
+        match Adef.od_of_cdate e.efam_date with
+        | Some (Dgreg (date, _))
+          when Array.exists (fun (i', _) -> iper = i') e.efam_witnesses
+          -> check_witness_fevents_aux warning e date b d p
+        | _ -> ()
+        end (get_fevents f)
+      end (get_family r)
+    end (get_related p)
   end ;
   Array.iter begin fun ifam ->
     let fam = foi base ifam in
