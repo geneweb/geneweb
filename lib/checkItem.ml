@@ -15,7 +15,7 @@ let max_death_before_lim_date_death = 100
 let min_parent_age = 11
 let max_father_age = 70
 let max_mother_age = 55
-let min_age_marriage = 13
+let min_age_marriage = 12
 let max_age_marriage = 100
 let max_siblings_gap = 50
 
