@@ -20,6 +20,7 @@ let close_base _ = assert false
 let dummy_iper = Obj.magic 0
 let dummy_ifam = Obj.magic 0
 let dummy_istr = Obj.magic 0
+let empty_string = Obj.magic 0
 let eq_istr _ = assert false
 let is_empty_string _ = assert false
 let is_quest_string _ = assert false
