@@ -217,7 +217,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
       let fam2 = foi base ifam2 in
       UpdateFamOk.effective_del base ifam2 fam2;
       let (ifam, fam, cpl, des) =
-        UpdateFamOk.effective_mod conf base sfam scpl sdes
+        UpdateFamOk.effective_mod conf base true sfam scpl sdes
       in
       let wl =
         UpdateFamOk.all_checks_family conf base ifam fam cpl des

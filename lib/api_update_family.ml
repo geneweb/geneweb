@@ -465,7 +465,7 @@ let print_mod conf base ip mod_f =
     begin
       let ofs = UpdateFamOk.family_structure base sfam.fam_index in
       let (ifam, fam, cpl, des) =
-        UpdateFamOk.effective_mod conf base sfam scpl sdes
+        UpdateFamOk.effective_mod conf base true sfam scpl sdes
       in
       let () = UpdateFamOk.patch_parent_with_pevents base cpl in
       let () = UpdateFamOk.patch_children_with_pevents base des in
