@@ -906,21 +906,11 @@ let update_family_with_fevents conf base fam =
             relation = relation; divorce = divorce;
             witnesses = witnesses}
 
-let effective_mod conf base sfam scpl sdes =
-  let fi = sfam.fam_index in
-  let (oorigin, owitnesses, ofevents) =
-    let ofam = foi base fi in
-    get_origin_file ofam, get_witnesses ofam, get_fevents ofam
-  in
-  let (oarr, ofather, omother) =
-    let ocpl = foi base fi in
-    get_parent_array ocpl, get_father ocpl, get_mother ocpl
-  in
-  let ochildren = get_children (foi base fi) in
+let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-      Some s -> String.trim s
+    | Some s -> String.trim s
     | None -> ""
   in
   let ncpl =
@@ -937,8 +927,8 @@ let effective_mod conf base sfam scpl sdes =
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
-  let nfath = poi base (Adef.father ncpl) in
-  let nmoth = poi base (Adef.mother ncpl) in
+  let nfath_p = poi base (Adef.father ncpl) in
+  let nmoth_p = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
 #ifdef API
   let nfam =
@@ -947,38 +937,50 @@ let effective_mod conf base sfam scpl sdes =
     else nfam
   in
 #endif
-  let sfam = {sfam with relation = nfam.relation} in
-  if sfam.relation <> NoSexesCheckNotMarried &&
-     sfam.relation <> NoSexesCheckMarried
-  then
-    begin
-      begin match get_sex nfath with
-        Female -> print_err_father_sex conf base nfath
+  if not nsck then begin
+    begin match get_sex nfath_p with
+      | Female -> print_err_father_sex conf base nfath_p
       | Male -> ()
-      | Neuter ->
-          let nfath = {(gen_person_of_person nfath) with sex = Male} in
-          patch_person base nfath.key_index nfath
-      end;
-      match get_sex nmoth with
-        Male -> print_err_mother_sex conf base nmoth
-      | Female -> ()
-      | Neuter ->
-          let nmoth = {(gen_person_of_person nmoth) with sex = Female} in
-          patch_person base nmoth.key_index nmoth
+      | _ ->
+        let nfath_p = {(gen_person_of_person nfath_p) with sex = Male} in
+        patch_person base nfath_p.key_index nfath_p
     end;
+    match get_sex nmoth_p with
+      Male -> print_err_mother_sex conf base nmoth_p
+    | Female -> ()
+    | _ ->
+      let nmoth_p = {(gen_person_of_person nmoth_p) with sex = Female} in
+      patch_person base nmoth_p.key_index nmoth_p
+  end ;
   if Adef.father ncpl = Adef.mother ncpl then print_err conf ;
-  let nfam =
-    let origin_file =
-      if sfam.origin_file = "" then
-        if sou base oorigin <> "" then oorigin
-        else infer_origin_file conf base fi ncpl ndes
-      else nfam.origin_file
-    in
-    {nfam with origin_file = origin_file; fam_index = fi}
-  in
+  let origin_file = origin_file nfam ncpl ndes in
+  let nfam = { nfam with origin_file ; fam_index = fi } in
   patch_family base fi nfam;
   patch_couple base fi ncpl;
   patch_descend base fi ndes;
+  (nfath_p, nmoth_p, nfam, ncpl, ndes)
+
+let effective_mod conf base nsck sfam scpl sdes =
+  let fi = sfam.fam_index in
+  let (oorigin, owitnesses, ofevents) =
+    let ofam = foi base fi in
+    get_origin_file ofam, get_witnesses ofam, get_fevents ofam
+  in
+  let (oarr, ofather, omother) =
+    let ocpl = foi base fi in
+    get_parent_array ocpl, get_father ocpl, get_mother ocpl
+  in
+  let ochildren = get_children (foi base fi) in
+  let origin_file nfam ncpl ndes =
+    if sfam.origin_file = ""
+    then
+      if sou base oorigin <> "" then oorigin
+      else infer_origin_file conf base fi ncpl ndes
+    else nfam.origin_file
+  in
+  let (_, _, nfam, ncpl, ndes) =
+    aux_effective_mod conf base nsck sfam scpl sdes fi origin_file
+  in
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do
     if not (Array.mem oarr.(i) narr) then
@@ -1050,56 +1052,10 @@ let effective_mod conf base sfam scpl sdes =
 
 let effective_add conf base nsck sfam scpl sdes =
   let fi = insert_family base (empty_family base dummy_ifam) in
-  let created_p = ref [] in
-  let psrc =
-    match p_getenv conf.env "psrc" with
-      Some s -> String.trim s
-    | None -> ""
+  let origin_file _nfam ncpl ndes = infer_origin_file conf base fi ncpl ndes in
+  let (nfath_p, nmoth_p, nfam, ncpl, ndes) =
+    aux_effective_mod conf base nsck sfam scpl sdes fi origin_file
   in
-  let ncpl =
-    Futil.map_couple_p conf.multi_parents
-      (Update.insert_person conf base psrc created_p) scpl
-  in
-  let nfam =
-    Futil.map_family_ps
-      (Update.insert_person conf base psrc created_p)
-      (fun f -> f)
-      (Gwdb.insert_string base)
-      sfam
-  in
-  let ndes =
-    Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
-  in
-  let origin_file = infer_origin_file conf base fi ncpl ndes in
-  let nfath_p = poi base (Adef.father ncpl) in
-  let nmoth_p = poi base (Adef.mother ncpl) in
-  let nfam = update_family_with_fevents conf base nfam in
-#ifdef API
-  let nfam =
-    (* En mode api, on gère directement la relation de même sexe. *)
-    if !(Api_conf.mode_api) then {nfam with relation = sfam.relation}
-    else nfam
-  in
-#endif
-  if not nsck then begin
-    begin match get_sex nfath_p with
-      | Female -> print_err_father_sex conf base nfath_p
-      | Male -> ()
-      | _ ->
-        let nfath_p = {(gen_person_of_person nfath_p) with sex = Male} in
-        patch_person base nfath_p.key_index nfath_p
-    end;
-    match get_sex nmoth_p with
-      Male -> print_err_mother_sex conf base nmoth_p
-    | Female -> ()
-    | _ ->
-      let nmoth_p = {(gen_person_of_person nmoth_p) with sex = Female} in
-      patch_person base nmoth_p.key_index nmoth_p
-  end else if Adef.father ncpl = Adef.mother ncpl then print_err conf;
-  let nfam = {nfam with origin_file = origin_file; fam_index = fi} in
-  patch_family base fi nfam;
-  patch_couple base fi ncpl;
-  patch_descend base fi ndes;
   let nfath_u = {family = Array.append (get_family nfath_p) [| fi |]} in
   let nmoth_u = {family = Array.append (get_family nmoth_p) [| fi |]} in
   patch_union base (Adef.father ncpl) nfath_u;
@@ -1390,9 +1346,8 @@ let print_add o_conf base =
       Some err, _ | _, Some err -> error_family conf err
     | None, None ->
       let (sfam, sdes) = strip_family sfam sdes in
-      let (ifam, fam, cpl, des) =
-        effective_add conf base nsck sfam scpl sdes
-      in
+      let nsck = p_getenv conf.env "nsck" = Some "on" in
+      let (ifam, fam, cpl, des) = effective_add conf base nsck sfam scpl sdes in
       let () = patch_parent_with_pevents base cpl in
       let () = patch_children_with_pevents base des in
       let (wl, ml) =
@@ -1577,7 +1532,8 @@ let print_mod o_conf base =
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
     let ofs = family_structure base sfam.fam_index in
-    let (ifam, fam, cpl, des) = effective_mod conf base sfam scpl sdes in
+    let nsck = p_getenv conf.env "nsck" = Some "on" in
+    let (ifam, fam, cpl, des) = effective_mod conf base nsck sfam scpl sdes in
     let () = patch_parent_with_pevents base cpl in
     let () = patch_children_with_pevents base des in
     let s =
