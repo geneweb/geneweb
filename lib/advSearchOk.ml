@@ -326,8 +326,8 @@ let advanced_search conf base max_answers =
     else acc
   in
   let list, len =
-  if "on" = gets "sosa_filter" then
-    match Util.find_sosa_ref conf base with
+  if "on" = gets "sosa_filter"
+  then match Util.find_sosa_ref conf base with
     | Some sosa_ref ->
       let rec loop p acc =
         let acc = match_person acc p search_type in
@@ -335,10 +335,10 @@ let advanced_search conf base max_answers =
         | Some ifam ->
           let fam = foi base ifam in
           loop
-            (Gwdb.poi base @@ get_father fam)
-            (loop (Gwdb.poi base @@ get_mother fam) acc)
+            (pget conf base @@ get_father fam)
+            (loop (pget conf base @@ get_mother fam) acc)
         | None -> acc
-      in loop sosa_ref ([], 0)
+      in loop (pget conf base @@ get_iper sosa_ref) ([], 0)
     | None -> [], 0
   else if gets "first_name" <> "" || gets "surname" <> "" then
     let (slist, _) =
