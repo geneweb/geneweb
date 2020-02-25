@@ -1,4 +1,3 @@
-(* $Id: date.ml,v 5.17 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
@@ -66,6 +65,11 @@ let time_elapsed d1 d2 =
       in
       let year = a2 - a1 - r in
       {day = day; month = month; year = year; prec = prec; delta = 0}
+
+let time_elapsed_opt d1 d2 =
+  match d1.prec, d2.prec with
+  | After, After | Before, Before -> None
+  | _ -> Some (time_elapsed d1 d2)
 
 let date_of_death =
   function

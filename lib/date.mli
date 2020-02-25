@@ -1,4 +1,3 @@
-(* $Id: date.mli,v 5.4 2007-03-14 00:39:57 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
@@ -19,6 +18,11 @@ val nb_days_in_month : int -> int -> int
     - [Maybe] for other cases
  *)
 val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
+
+(** Same as [time_elapsed], but will return [None]
+    if computation is not possible
+    (e.g. time_elapsed_opt /1839 /1859). *)
+val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
 
 val date_of_death : Def.death -> Adef.date option
 
