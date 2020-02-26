@@ -27,6 +27,8 @@ let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
 
 let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
 
+let release = ref false
+
 let speclist =
   [ ( "--api"
     , Arg.Unit set_api
@@ -34,6 +36,9 @@ let speclist =
   ; ( "--gwdb-legacy"
     , Arg.Unit set_gwdb_legacy
     , "Use legacy backend" )
+  ; ( "--release"
+    , Arg.Set release
+    , "Use release profile (no debug informations)" )
   ; ( "--sosa-legacy"
     , Arg.Unit set_sosa_legacy
     , "Use legacy Sosa module implementation" )
@@ -82,6 +87,7 @@ let () =
     | `Legacy ->
       "-D GWDB1", "geneweb-gwdb-legacy geneweb-gwdb-legacy.internal"
   in
+  let dune_profile = if !release then "release" else "dev" in
   let os_type, camlp5f, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
@@ -108,4 +114,5 @@ let () =
   var "SOSA_PKG" sosa_pkg ;
   var "WSERVER_PKG" wserver_pkg ;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude ;
+  var "DUNE_PROFILE" dune_profile ;
   close_out ch

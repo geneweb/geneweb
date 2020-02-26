@@ -82,6 +82,9 @@ CPPO_D=$(API_D) $(GWDB_D)
 	> $@ \
 	&& echo " Done!"
 
+dune-workspace: dune-workspace.in Makefile.config
+	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
+
 hd/etc/version.txt:
 	@echo -n "Generating $@..."
 	@echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
@@ -100,6 +103,7 @@ GENERATED_FILES_DEP = \
 	bin/dune \
 	lib/dune \
 	test/dune \
+	dune-workspace \
 
 ifdef API_D
 piqi:
