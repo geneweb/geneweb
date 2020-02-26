@@ -95,6 +95,14 @@ let bench () =
           (Sys.opaque_identity ignore)
       end
       [ conf ]
+    ::
+    bench_w_base "Perso.first_possible_duplication" ~t:10
+      begin fun base _conf ->
+        Gwdb.Collection.fold begin fun acc p ->
+          (Perso.first_possible_duplication base (Gwdb.get_iper p) ([], [])) :: acc
+        end [] (Gwdb.persons base)
+      end
+      [ conf ]
     :: suite
   | _ -> suite
 
