@@ -1221,68 +1221,113 @@ let excluded_possible_duplications conf =
   gen_excluded_possible_duplications conf "iexcl" iper_of_string,
   gen_excluded_possible_duplications conf "fexcl" ifam_of_string
 
+let first_possible_duplication_children iexcl len child eq =
+  let rec loop i =
+    if i = len then NoDup
+    else begin
+      let c1 = child i in
+      let rec loop' j =
+        if j = len then loop (i + 1)
+        else begin
+          let c2 = child j in
+          let ic1 = get_iper c1 in
+          let ic2 = get_iper c2 in
+          if List.mem (ic1, ic2) iexcl then loop' (j + 1)
+          else if eq (get_first_name c1) (get_first_name c2)
+          then DupInd (ic1, ic2)
+          else loop' (j + 1)
+        end
+      in loop' (i + 1)
+    end
+  in loop 0
+
 let first_possible_duplication base ip (iexcl, fexcl) =
-  let ifaml = Array.to_list (get_family (poi base ip)) in
-  let cand_spouse =
-    let rec loop_spouse =
-      function
-        ifam1 :: ifaml1 ->
-          let isp1 = Gutil.spouse ip (foi base ifam1) in
-          let sp1 = poi base isp1 in
-          let fn1 = get_first_name sp1 in
-          let sn1 = get_surname sp1 in
-          let rec loop_same =
-            function
-              ifam2 :: ifaml2 ->
-                let isp2 = Gutil.spouse ip (foi base ifam2) in
-                if isp2 = isp1 then
-                  if not (List.mem (ifam1, ifam2) fexcl) then
-                    DupFam (ifam1, ifam2)
-                  else loop_same ifaml2
-                else
-                  let sp2 = poi base isp2 in
-                  if List.mem (isp1, isp2) iexcl then loop_same ifaml2
-                  else if
-                    eq_istr (get_first_name sp2) fn1 &&
-                    eq_istr (get_surname sp2) sn1
-                  then
-                    DupInd (isp1, isp2)
-                  else loop_same ifaml2
-            | [] -> loop_spouse ifaml1
-          in
-          loop_same ifaml1
-      | [] -> NoDup
-    in
-    loop_spouse ifaml
+  let str =
+    let cache = ref [] in
+    fun i ->
+      match List.assoc_opt i !cache with
+      | Some s -> s
+      | None ->
+        let s = Name.lower @@ sou base i in
+        cache := (i, s) :: !cache ;
+        s
   in
-  if cand_spouse <> NoDup then cand_spouse
-  else
-    let ipl =
-      List.rev @@
-      List.fold_left
-        (fun acc x ->
-           Array.fold_left
-             (fun acc x -> x :: acc) acc (get_children (foi base x)))
-        [] ifaml
+  let eq i1 i2 = str i1 = str i2 in
+  let p = poi base ip in
+  match get_family p with
+  | [| |] -> NoDup
+  | [| ifam |] ->
+    let children = get_children @@ foi base ifam in
+    let len = Array.length children in
+    if len < 2 then NoDup
+    else begin
+      let child i = poi base @@ Array.unsafe_get children i in
+      first_possible_duplication_children iexcl len child eq
+    end
+  | ifams ->
+    let len = Array.length ifams in
+    let fams = Array.make len None in
+    let spouses = Array.make len None in
+    let fam i =
+      match Array.unsafe_get fams i with
+      | Some f -> f
+      | None ->
+        let f = foi base @@ Array.unsafe_get ifams i in
+        Array.unsafe_set fams i (Some f) ;
+        f
     in
-    let rec loop_chil =
-      function
-        ip1 :: ipl1 ->
-          let p1 = poi base ip1 in
-          let fn1 = get_first_name p1 in
-          let rec loop_same =
-            function
-              ip2 :: ipl2 ->
-                let p2 = poi base ip2 in
-                if List.mem (ip1, ip2) iexcl then loop_same ipl2
-                else if eq_istr (get_first_name p2) fn1 then DupInd (ip1, ip2)
-                else loop_same ipl2
-            | [] -> loop_chil ipl1
-          in
-          loop_same ipl1
-      | [] -> NoDup
+    let spouse i =
+      match Array.unsafe_get spouses i with
+      | Some sp -> sp
+      | None ->
+        let sp = poi base @@ Gutil.spouse ip @@ fam i in
+        Array.unsafe_set spouses i (Some sp) ;
+        sp
     in
-    loop_chil ipl
+    let dup =
+      let rec loop i =
+        if i = len then NoDup
+        else
+          let sp1 = spouse i in
+          let rec loop' j =
+            if j = len then loop (i + 1)
+            else
+              let sp2 = spouse j in
+              if get_iper sp1 = get_iper sp2
+              then
+                let ifam1 = Array.unsafe_get ifams i in
+                let ifam2 = Array.unsafe_get ifams j in
+                if not (List.mem (ifam2, ifam2) fexcl)
+                then DupFam (ifam1, ifam2)
+                else loop' (j + 1)
+              else
+                let isp1 = get_iper sp1 in
+                let isp2 = get_iper sp2 in
+                if List.mem (isp1, isp2) iexcl then loop' (j + 1)
+                else if eq (get_first_name sp1) (get_first_name sp2)
+                     && eq (get_surname sp1) (get_surname sp2)
+                then DupInd (isp1, isp2)
+                else loop' (j + 1)
+          in loop' (i + 1)
+      in loop 0
+    in
+    if dup <> NoDup then dup
+    else begin
+      let ichildren =
+        Array.fold_left Array.append [||] @@ Array.init len (fun i -> get_children @@ fam i)
+      in
+      let len = Array.length ichildren in
+      let children = Array.make len None in
+      let child i =
+        match Array.unsafe_get children i with
+        | Some c -> c
+        | None ->
+          let c = poi base @@ Array.unsafe_get ichildren i in
+          Array.unsafe_set children i (Some c) ;
+          c
+      in
+      first_possible_duplication_children iexcl len child eq
+    end
 
 let has_possible_duplications conf base p =
   let ip = get_iper p in
