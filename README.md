@@ -55,7 +55,7 @@ pull requests, bugs reports, ideas...
 ### Install dependencies
 
 ```
-$ opam install camlp5 cppo dune markup ounit
+$ opam install camlp5 cppo dune markup ounit uucp unidecode
 ```
 
 ### Build instructions
