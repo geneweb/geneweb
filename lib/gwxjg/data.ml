@@ -1243,12 +1243,32 @@ let mk_conf conf =
   end
 
 let mk_env conf base =
-  (* FIXME browsing_with_sosa_ref *)
   let prefix = Tstr (Util.commd conf) in
   let prefix_base = Tstr (Util.prefix_base conf) in
   let sosa_ref =
-    box_lazy @@
-    lazy (mk_opt (unsafe_mk_person conf base) (Util.find_sosa_ref conf base) )
+    box_lazy @@ lazy begin
+      match Util.p_getenv conf.Config.env "iz" with
+      | Some i -> get_n_mk_person conf base (Gwdb.iper_of_string i)
+      | None ->
+        match Util.p_getenv conf.env "pz" with
+        | None ->
+          begin match Util.p_getenv conf.base_env "default_sosa_ref" with
+            | Some n when n <> "" ->
+              begin match Gutil.person_ht_find_all base n with
+                | [ ip ] -> get_n_mk_person conf base ip
+                | _ -> Tnull
+              end
+            | _ -> Tnull
+          end
+        | Some p ->
+          match Util.p_getenv conf.env ("nz") with
+          | None -> Tnull
+          | Some n ->
+            let occ = Opt.default 0 (Util.p_getint conf.env "ocz") in
+            match Gwdb.person_of_key base p n occ with
+            | Some ip -> get_n_mk_person conf base ip
+            | None -> Tnull
+    end
   in
   Tpat begin function
       | "prefix" -> prefix
