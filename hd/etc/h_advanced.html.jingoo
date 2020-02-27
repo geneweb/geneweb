@@ -1,3 +1,5 @@
+{%- include 'html_utils.jingoo' -%}
+
 {%- extends "template.jingoo" -%}
 
 {% block title %}{{ 'advanced request'|trans|capitalize }}{% endblock %}
@@ -151,10 +153,16 @@
                     <input class="form-control" type="text" name="occu" id="occu">
                   </div>
                 </div>
+	        {% if env.sosa_ref %}
+                <div class="row">
+                  <div class="{{ columns (12, 12, 12, 12) }}">
+                    {{ inputCheckbox ('sosa_filter', 'advanced_search_sosa_checkbox'|trans|capitalize, checked=false, 12, 12, 12, 12) }}
+                  </div>
+                </div>
+                {% endif %}
               </div>
             </div>
           </div>
-
           <div role="tabpanel">
             <ul class="px-3 nav nav-tabs" role="tablist">
               <li role="tab">

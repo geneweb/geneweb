@@ -1874,6 +1874,18 @@ sl: napredno iskanje/napredno<br>iskanje
 sv: avancerad sökning/avancerad<br>sökning
 zh: 高级访问请求/高级访问请求
 
+    advanced_search_sosa_checkbox
+de: Begrenzt auf die direkten Vorfahren der Ausgangsperson (Sosa)
+en: limit to the direct ancestry of the root person (Sosa/Ahnentafel)
+es: limitar a los antepasados directos de la persona tronco (Sosa)
+fi: rajaa suoraan juurihenkilön esivanhempaan (Sosa/Ahnentafel)
+fr: limiter aux ancêtres directs de la souche (sosas)
+it: limitare agli avi diretti della persona stipite (Sosa)
+nl: beperken tot de rechtstreekse voorouders van de bronpersoon (Sosa)
+no: begrens til direkte stamfar til rotpersonen (Sosa/Ahnentafel)
+pt: limitar aos antepassados directos da pessoa raiz da árvore (Sosa/Ahnentafel)
+sv: begränsa till direkta förfäder till rotpersonen (Sosa/Ahnentafel)
+
     after
 af: na
 bg: след
