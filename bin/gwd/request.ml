@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+open Geneweb
+
 module type MakeIn = sig
   val handler : RequestHandler.handler
 end
@@ -107,6 +109,7 @@ let family_m conf base =
       | "DEL_IND" -> handler.del_ind
       | "DEL_IND_OK" -> handler.del_ind_ok
       | "F" -> handler.f
+      | "FAM" -> handler.fam
       | "FORUM" -> handler.forum
       | "FORUM_ADD" -> handler.forum_add
       | "FORUM_ADD_OK" -> handler.forum_add_ok
@@ -115,6 +118,8 @@ let family_m conf base =
       | "FORUM_SEARCH" -> handler.forum_search
       | "FORUM_VAL" -> handler.forum_val
       | "FORUM_VIEW" -> handler.forum_view
+      | "FTIMELINE" -> handler.ftimeline
+      | "FTREE" -> handler.ftree
       | "H" -> handler.h
       | "HIST" -> handler.hist
       | "HIST_CLEAN" -> handler.hist_clean
@@ -124,10 +129,12 @@ let family_m conf base =
       | "IMH" -> handler.imh
       | "INV_FAM" -> handler.inv_fam
       | "INV_FAM_OK" -> handler.inv_fam_ok
+      | "ITREE" -> handler.itree
       | "KILL_ANC" -> handler.kill_anc
       | "LB" -> handler.lb
       | "LD" -> handler.ld
       | "LINKED" -> handler.linked
+      | "LIST_IND" -> handler.list_ind
       | "LL" -> handler.ll
       | "LM" -> handler.lm
       | "MISC_NOTES" -> handler.misc_notes
@@ -158,6 +165,7 @@ let family_m conf base =
       | "OA" -> handler.oa
       | "OE" -> handler.oe
       | "P" -> handler.p
+      | "PROGRESS" -> handler.progress
       | "POP_PYR" -> handler.pop_pyr
       | "PS" -> handler.ps
       | "R" -> handler.r
@@ -173,6 +181,7 @@ let family_m conf base =
       | "TT" -> handler.tt
       | "U" -> handler.u
       | "VIEW_WIZNOTES" -> handler.view_wiznotes
+      | "WARNINGS" -> handler.warnings
       | "WIZNOTES" -> handler.wiznotes
       | "WIZNOTES_SEARCH" -> handler.wiznotes_search
 #ifdef API
@@ -256,7 +265,7 @@ let family_m_nobase conf =
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
   let () = Api_conf.set_mode_api () in
   match p_getenv conf.env "m" with
-    Some "API_ADD_FIRST_FAM" -> handler.api_add_first_fam handler conf
+  | Some "API_ADD_FIRST_FAM" -> handler.api_add_first_fam handler conf
   | Some _ | None -> ()
 #else
   Hutil.incorrect_request conf

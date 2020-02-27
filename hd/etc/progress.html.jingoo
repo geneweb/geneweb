@@ -1,0 +1,43 @@
+{%- extends "template.jingoo" -%}
+
+{%- block body -%}
+
+  <style>
+    progress {
+    border-width: 1px 0 ;
+    }
+    progress:first-child { border-left-width: 1px ; }
+    progress:last-child { border-right-width: 1px ; }
+  </style>
+
+  {% if title %}<h1>{{ title }}</h1>{% endif %}
+
+  <p>{{ 'progress_description'|trans }}</p>
+
+  <div class="d-flex align-items-center mx-auto">
+    {% for i in steps %}
+      <progress class="flex-grow-1" id="step-{{ i }}" max="100" value="0">
+      </progress>
+    {% endfor %}
+  </div>
+
+  <script>
+
+    var evtSource = new EventSource('{{ env.prefix }}m=PROGRESS&token={{ source }}');
+
+    {% for i in steps %}
+      evtSource.addEventListener("step-{{ i }}", function(e) {
+      console.log ("{{ i }}");
+      document.querySelector("#step-{{ i }}").value = e.data ;
+      });
+    {% endfor %}
+
+    evtSource.addEventListener("step-redirect", function(e) {
+    console.log ("foo");
+    evtSource.close () ;
+    location.reload(true);
+    });
+
+  </script>
+
+{% endblock %}

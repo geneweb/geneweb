@@ -1,7 +1,10 @@
+open Geneweb
 open Config
 open Def
 open Gwdb
 open Util
+open Jingoo
+open Jg_types
 
 (*** Utils ***)
 
@@ -314,6 +317,7 @@ and handler =
   ; del_ind : handler_base
   ; del_ind_ok : handler_base
   ; f : handler_base
+  ; fam : handler_base
   ; forum : handler_base
   ; forum_add : handler_base
   ; forum_add_ok : handler_base
@@ -322,6 +326,8 @@ and handler =
   ; forum_search : handler_base
   ; forum_val : handler_base
   ; forum_view : handler_base
+  ; ftree : handler_base
+  ; ftimeline : handler_base
   ; h : handler_base
   ; hist : handler_base
   ; hist_clean : handler_base
@@ -331,10 +337,12 @@ and handler =
   ; imh : handler_base
   ; inv_fam : handler_base
   ; inv_fam_ok : handler_base
+  ; itree : handler_base
   ; kill_anc : handler_base
   ; lb : handler_base
   ; ld : handler_base
   ; linked : handler_base
+  ; list_ind : handler_base
   ; ll : handler_base
   ; lm : handler_base
   ; misc_notes : handler_base
@@ -365,6 +373,7 @@ and handler =
   ; oa : handler_base
   ; oe : handler_base
   ; p : handler_base
+  ; progress : handler_base
   ; pop_pyr : handler_base
   ; ps : handler_base
   ; r : handler_base
@@ -380,6 +389,7 @@ and handler =
   ; tt : handler_base
   ; u : handler_base
   ; view_wiznotes : handler_base
+  ; warnings : handler_base
   ; wiznotes : handler_base
   ; wiznotes_search : handler_base
   ; _no_mode : handler_base
@@ -489,6 +499,7 @@ let dummyHandler =
   ; del_ind = dummy_base
   ; del_ind_ok = dummy_base
   ; f = dummy_base
+  ; fam = dummy_base
   ; forum = dummy_base
   ; forum_add = dummy_base
   ; forum_add_ok = dummy_base
@@ -497,6 +508,8 @@ let dummyHandler =
   ; forum_search = dummy_base
   ; forum_val = dummy_base
   ; forum_view = dummy_base
+  ; ftree = dummy_base
+  ; ftimeline = dummy_base
   ; h = dummy_base
   ; hist = dummy_base
   ; hist_clean = dummy_base
@@ -506,10 +519,12 @@ let dummyHandler =
   ; imh = dummy_base
   ; inv_fam = dummy_base
   ; inv_fam_ok = dummy_base
+  ; itree = dummy_base
   ; kill_anc = dummy_base
   ; lb = dummy_base
   ; ld = dummy_base
   ; linked = dummy_base
+  ; list_ind = dummy_base
   ; ll = dummy_base
   ; lm = dummy_base
   ; misc_notes = dummy_base
@@ -540,6 +555,7 @@ let dummyHandler =
   ; oa = dummy_base
   ; oe = dummy_base
   ; p = dummy_base
+  ; progress = dummy_base
   ; pop_pyr = dummy_base
   ; ps = dummy_base
   ; r = dummy_base
@@ -555,6 +571,7 @@ let dummyHandler =
   ; tt = dummy_base
   ; u = dummy_base
   ; view_wiznotes = dummy_base
+  ; warnings = dummy_base
   ; wiznotes = dummy_base
   ; wiznotes_search = dummy_base
   ; _no_mode = dummy_base
@@ -621,6 +638,10 @@ let dummyHandler =
   ; fallback = dummy_base
   }
 
+let restricted_wizard fn self conf base =
+  if conf.wizard then fn self conf base
+  else self.incorrect_request self conf base
+
 let person_selected self conf base p =
   match p_getenv conf.senv "em" with
     Some "R" -> relation_print conf base p
@@ -681,10 +702,45 @@ let defaultHandler : handler =
       | _ -> self.very_unknown self conf base
     end
 
-  ; add_fam = begin fun self conf base ->
-      if conf.wizard then UpdateFam.print_add conf base
-      else self.incorrect_request self conf base
-    end
+  ; add_fam = restricted_wizard begin fun self conf base ->
+        let iroot, root, ifath, father, imoth, mother, digest =
+          match find_person_in_env conf base "p" with
+          | Some p ->
+            let digest = string_of_int (Array.length (get_family p)) in
+            let p' = Gwxjg.Data.get_n_mk_person conf base (get_iper p) in
+            if get_sex p = Male || get_sex p = Neuter
+            then (get_iper p, p', get_iper p, p', dummy_iper, Tnull, digest)
+            else
+              (get_iper p, p', dummy_iper, Tnull, get_iper p, p', digest)
+          | None ->
+            (dummy_iper, Tnull, dummy_iper, Tnull, dummy_iper, Tnull, "")
+        in
+        let f = Gwdb.empty_family base dummy_ifam in
+        let d = Gwdb.gen_descend_of_descend f in
+        let c = Gwdb.gen_couple_of_couple f in
+        let f = Gwdb.gen_family_of_family f in
+        let empty = Gwdb.insert_string base "" in
+        let f = { f with fevents = [ { efam_name = Efam_Marriage
+                                     ; efam_date = Adef.cdate_None
+                                     ; efam_place = empty
+                                     ; efam_reason = empty
+                                     ; efam_note = empty
+                                     ; efam_src = empty
+                                     ; efam_witnesses = [||]
+                                     } ]
+                }
+        in
+        let f = Gwdb.family_of_gen_family base (f, c, d) in
+        let cpl = (ifath, imoth, iroot) in
+        let family = Gwxjg.Data.mk_family conf base (dummy_ifam, f, cpl, true) in
+        let models =
+          ("digest", Tstr digest)
+          :: ("family", family)
+          :: ("root", root)
+          :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"updfam" ~models
+      end
 
   ; add_fam_ok = begin fun self conf base ->
       if conf.wizard then UpdateFamOk.print_add conf base
@@ -842,6 +898,19 @@ let defaultHandler : handler =
       | _ -> self.very_unknown self conf base
     end
 
+  ; fam = begin fun self conf base ->
+      match Util.p_getenv conf.env "i" with
+      | Some i ->
+        let ifam = Gwdb.ifam_of_string i in
+        let models =
+          ( "family"
+          , Gwxjg.Data.get_n_mk_family conf base ifam @@ Gwdb.foi base ifam)
+          :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"fam" ~models
+      | _ -> self.incorrect_request self conf base
+    end
+
   ; forum = if_enabled_forum ForumDisplay.print
 
   ; forum_add = if_enabled_forum ForumDisplay.print_add
@@ -858,10 +927,38 @@ let defaultHandler : handler =
 
   ; forum_view = if_enabled_forum ForumDisplay.print
 
-  ; h = begin fun _self conf base ->
-      match p_getenv conf.env "v" with
+  ; ftree = begin fun self conf base ->
+      match Util.p_getenv conf.env "i" with
+      | Some i ->
+        let ifam = Gwdb.ifam_of_string i in
+        let models =
+          ( "family"
+          , Gwxjg.Data.get_n_mk_family conf base ifam @@ Gwdb.foi base ifam)
+          :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"ftree" ~models
+      | _ -> self.incorrect_request self conf base
+    end
+
+  ; ftimeline = begin fun self conf base ->
+      match Util.p_getenv conf.env "i" with
+      | Some i ->
+        let ifam = Gwdb.ifam_of_string i in
+        let models =
+          ( "family"
+          , Gwxjg.Data.get_n_mk_family conf base ifam @@ Gwdb.foi base ifam)
+          :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"ftimeline" ~models
+      | _ -> self.incorrect_request self conf base
+    end
+
+  ; h = begin fun self conf base ->
+      match Util.p_getenv conf.env "v" with
+      | Some "advanced" ->
+        JgInterp.render ~conf ~file:"h_advanced" ~models:(Gwxjg.Data.default_env conf base)
       | Some f -> SrcfileDisplay.print conf base f
-      | None -> Hutil.incorrect_request conf
+      | None -> self.incorrect_request self conf base
     end
 
   ; hist = begin fun _self conf base ->
@@ -900,6 +997,15 @@ let defaultHandler : handler =
       else self.incorrect_request self conf base
     end
 
+  ; itree = begin fun self conf base ->
+      match find_person_in_env conf base "" with
+      | Some p ->
+        let root = Gwxjg.Data.get_n_mk_person conf base (get_iper p) in
+        JgInterp.render ~conf ~file:"itree"
+          ~models:(("root", root) :: Gwxjg.Data.default_env conf base)
+      | _ -> self.very_unknown self conf base
+    end
+
   ; kill_anc = begin fun self conf base ->
       if conf.wizard then MergeIndDisplay.print_kill_ancestors conf base
       else self.incorrect_request self conf base
@@ -919,6 +1025,73 @@ let defaultHandler : handler =
       match find_person_in_env conf base "" with
       | Some p -> Perso.print_what_links conf base p
       | _ -> self.very_unknown self conf base
+    end
+
+  ; list_ind = begin fun self conf base ->
+      let open List_ind in
+      let num = (Opt.default 1 @@ Util.p_getint conf.env "pg") - 1 in
+      let size = Opt.default 2000 @@ Util.p_getint conf.env "sz" in
+      let fifo = List_ind.list_ind_file conf ^ "_progress" in
+      let aux () =
+        let models = ("source", Tstr (Filename.basename fifo))
+                     :: ("steps", Tarray [|Tint 1 ; Tint 2|])
+                     :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"progress" ~models ;
+      in
+      if Sys.file_exists fifo then aux ()
+      else if not (is_cache_iper_inorder_uptodate conf base)
+      then begin
+        let pid = Unix.fork () in
+        if pid <> 0 then begin
+          exit 0
+        end else begin
+          Wserver.close_connection () ;
+          let oc = Unix.openfile fifo [ Unix.O_WRONLY ; O_CREAT ; O_TRUNC ] 0o777 in
+          let progress step i =
+            let out = "event:step-" ^ step ^ "\ndata:" ^ string_of_int i ^ "\n\n" in
+            let out = Bytes.unsafe_of_string out in
+            ignore @@ Unix.write oc out 0 (Bytes.length out)
+          in
+          build_cache_iper_inorder progress conf base ;
+          progress "redirect" 100 ;
+          ignore @@ Unix.write oc (Bytes.unsafe_of_string "EOF") 0 3 ;
+          Unix.unlink fifo ;
+        end
+      end else begin
+        let page_count, letters, ipers, num =
+          read_cache_iper_inorder conf num size
+        in
+        let persons =
+          Array.map begin fun i ->
+            Gwxjg.Data.unsafe_mk_person conf base @@ Gwdb.poi base i
+          end ipers
+        in
+        let anchorAtIndex =
+          let fst_idx = size * num in
+          let list = List.map (fun (c, i) -> (i - fst_idx, c)) letters  in
+          Jg_types.func_arg1_no_kw @@ function
+          | Tint i ->
+            begin match List.assoc_opt i list with
+              |  Some s -> Tstr s
+              | None -> Tnull
+            end
+          | x -> Jg_types.func_failure [x]
+        in
+        let letters =
+          List.map begin fun (c, i) ->
+            Tset [ Tstr c ; Tint (i / size + 1) ]
+          end letters
+        in
+        let models = ("letters", Tlist letters)
+                     :: ("anchorAtIndex", anchorAtIndex)
+                     :: ("persons", Tarray persons)
+                     :: ("page_num", Tint (num + 1))
+                     :: ("page_count", Tint page_count)
+                     :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"list_ind" ~models
+      end
     end
 
   ; ll = begin fun _self conf base ->
@@ -948,9 +1121,26 @@ let defaultHandler : handler =
       else self.incorrect_request self conf base
     end
 
-  ; mod_fam = begin fun self conf base ->
-      if conf.wizard then UpdateFam.print_mod conf base
-      else self.incorrect_request self conf base
+  ; mod_fam = restricted_wizard begin fun self conf base ->
+      match Util.p_getenv conf.env "i" with
+      | Some i ->
+        let root =
+          match find_person_in_env conf base "p" with
+          | Some p -> Gwxjg.Data.get_n_mk_person conf base (get_iper p)
+          | None -> Tnull
+        in
+        let ifam = ifam_of_string i in
+        let sfam = UpdateFam.string_family_of conf base ifam in
+        let digest = Update.digest_family sfam in
+        let models =
+          ("digest", Tstr digest)
+          :: ( "family"
+             , Gwxjg.Data.get_n_mk_family conf base ifam @@ Gwdb.foi base ifam)
+          :: ("root", root)
+          :: Gwxjg.Data.default_env conf base
+        in
+        JgInterp.render ~conf ~file:"updfam" ~models
+      | _ -> self.incorrect_request self conf base
     end
 
   ; mod_fam_ok = begin fun self conf base ->
@@ -1122,6 +1312,40 @@ let defaultHandler : handler =
       | None -> AllnDisplay.print_first_names conf base
     end
 
+  ; progress = begin fun self conf base ->
+      match p_getenv conf.env "token" with
+      | Some v ->
+        let v = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) v in
+        let fd = Unix.openfile v [ Unix.O_RDONLY ] 0o000 in
+        Wserver.header "Content-Type: text/event-stream" ;
+        let buffer = Bytes.create 4096 in
+        begin try
+            let rec loop off =
+              match Unix.read fd buffer off (4096 - off) with
+              | 0 -> Unix.sleepf 0.1 ; loop off
+              | n ->
+                let s = Bytes.sub_string buffer 0 (off + n) in
+                let ri = String.rindex s '\n' in
+                let s' =
+                  if ri = String.length s - 1 then s
+                  else String.sub s 0 ri
+                in
+                let list = String.split_on_char '\n' s' in
+                List.iter begin function
+                  | "EOF" -> Wserver.wflush () ; raise End_of_file
+                  | s -> Wserver.print_string @@ s ^ "\n"
+                end list ;
+                Wserver.wflush () ;
+                let off = off + n - String.length s' in
+                if off < 0 then Bytes.blit buffer ri buffer 0 (String.length s - ri) ;
+                loop off
+            in
+            loop 0
+          with End_of_file -> Unix.close fd
+        end ;
+      | None -> self.incorrect_request self conf base
+    end
+
   ; pop_pyr = begin fun self conf base ->
       if conf.wizard || conf.friend then BirthDeathDisplay.print_population_pyramid conf base
       else self.incorrect_request self conf base
@@ -1199,6 +1423,18 @@ let defaultHandler : handler =
   ; view_wiznotes = begin fun self conf base ->
       if conf.wizard && conf.authorized_wizards_notes then WiznotesDisplay.print_view conf base
       else self.incorrect_request self conf base
+    end
+
+  ; warnings = begin fun _self conf base ->
+      let ht = Hashtbl.create 1024 in
+      Check.check_base base ignore (fun x -> Hashtbl.replace ht x ()) ignore ;
+      let warnings = Hashtbl.fold begin fun w () acc ->
+          Gwxjg.Data.mk_warning conf base w :: acc
+        end ht [] in
+      let models = ("warnings", Tlist warnings)
+                   :: Gwxjg.Data.default_env conf base
+      in
+      JgInterp.render ~conf ~file:"warnings" ~models
     end
 
   ; wiznotes = begin fun self conf base ->

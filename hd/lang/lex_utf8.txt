@@ -1,4 +1,4 @@
-     !dates order
+    !dates order
 af: yyyymmdd
 ar: ddmmyyyy
 bg: ddmmyyyy
@@ -29,11 +29,11 @@ sk: ddmmyyyy
 sl: ddmmyyyy
 sv: ddmmyyyy
 
-     !dir
+    !dir
 ar: rtl
 he: rtl
 
-     !languages
+    !languages
 af: af=Afrikaans/bg=Bulgaars/br=Bretons/ca=Catalan/co=Korsikaans/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/et=Estnies/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/lv=Lets/nl=Nederlands/no=Noorweegs/oc=Oksitaans/pl=Pools/pt=Portugees/pt-br=Portugees-in-Brazilië/ro=Roemeens/ru=Russies/sk=Slowaaks/sl=Sloweens/sv=Sweeds/zh=Chinees
 bg: af=бурски/bg=български/br=бретонски/ca=каталонски/co=корсикан/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/oc=окситански/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sk=Словашки език/sl=словенски/sv=шведски/zh=китайски
 br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/co=korseg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/oc=okitaneg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sk=Slovakeg/sl=sloveneg/sv=svedeg/zh=sinaeg
@@ -65,125 +65,125 @@ sl: af=afrikaanščina/bg=bolgarščina/br=bretonščina/ca=katalonščina/co=ko
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/co=korsikanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/oc=occitanska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sk=slovakiska/sl=slovenska/sv=svenska/zh=kinesiska
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/zh=中文
 
-     the first branch
-af:  om die eerste staak te sien
-bg:  за да видите първия клон
-br:  evit gwelout ar skourr kentañ
-ca:  per veure la primera branca
-co:  a prima ghjemba
-cs:  abyste viděli první
-da:  for at se den første
-de:  Erster Zweig
-en:  first line
-eo:  por vidi la unuan branĉon
-es:  la primera rama
-et:  esimese haru vaatamiseks
-fi:  ensimmäinen sukuhaara
-fr:  la première
-he:   לראות את הענף הראשון
-is:  til að sjá fyrstu grein
-it:  il primo ramo
-lv:  skatīt pirmo zaru
-nl:  de eerste tak
-no:  den første grenen
-oc:  la primièra branca
-pl:  aby zobaczyć pierwszą linię (gałąź)
-pt:  para ver o primeiro ramo
-ro:  pentru a vedea primul
-ru:  чтобы увидеть первую ветку
-sk:  aby ste videli prvú vetvu
-sl:  za prikaz prve veje
-sv:  den första grenen
+    the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
+de: Erster Zweig
+en: first line
+eo: por vidi la unuan branĉon
+es: la primera rama
+et: esimese haru vaatamiseks
+fi: ensimmäinen sukuhaara
+fr: la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: il primo ramo
+lv: skatīt pirmo zaru
+nl: de eerste tak
+no: den første grenen
+oc: la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: den första grenen
 
-     to see the first branch
-af:  om die eerste staak te sien
-bg:  за да видите първия клон
-br:  evit gwelout ar skourr kentañ
-ca:  per veure la primera branca
-co:  per fighjà a prima ghjemba
-cs:  abyste viděli první
-da:  for at se den første
+    to see the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: per fighjà a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
 de: , um den ersten zu sehen
-en:  to see the first one
-eo:  por vidi la unuan branĉon
-es:  para ver la primera rama
-et:  esimese haru vaatamiseks
-fi:  nähdäksesi ensimmäisen haaran
-fr:  pour voir la première
-he:   לראות את הענף הראשון
-is:  til að sjá fyrstu grein
-it:  per vedere il primo
-lv:  skatīt pirmo zaru
-nl:  om de eerste tak te zien
-no:  for å se den første
-oc:  per veire la primièra branca
-pl:  aby zobaczyć pierwszą linię (gałąź)
-pt:  para ver o primeiro ramo
-ro:  pentru a vedea primul
-ru:  чтобы увидеть первую ветку
-sk:  aby ste videli prvú vetvu
-sl:  za prikaz prve veje
-sv:  för att se den första
+en: to see the first one
+eo: por vidi la unuan branĉon
+es: para ver la primera rama
+et: esimese haru vaatamiseks
+fi: nähdäksesi ensimmäisen haaran
+fr: pour voir la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: per vedere il primo
+lv: skatīt pirmo zaru
+nl: om de eerste tak te zien
+no: for å se den første
+oc: per veire la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: för att se den första
 
-     to see the first relationship link
-af:  om die eerste te sien
-bg:  за да видите първата родствена връзка
-br:  evit gwelout al liamm kentañ
-ca:  per veure el primer vincle de parentesc
-co:  per fighjà a prima lea
-cs:  zobrazit první
-da:  for at se det første
+    to see the first relationship link
+af: om die eerste te sien
+bg: за да видите първата родствена връзка
+br: evit gwelout al liamm kentañ
+ca: per veure el primer vincle de parentesc
+co: per fighjà a prima lea
+cs: zobrazit první
+da: for at se det første
 de: , um die erste zu sehen
-en:  to see the first one
-eo:  por vidi la unuan ligon de parenceco
-es:  para ver el primer vínculo de parentesco
-et:  esimese sugulussuhte vaatamiseks
-fi:  nähdäksesi ensimmäisen sukulaisuuden
-fr:  pour voir le premier
-he:   לראות את הקשר המשפחתי הראשון
-is:  til að sjá fyrstu tengsl
-it:  per vedere il primo
-lv:  skatīt pirmo attiecību saiti
-nl:  om de eerste te zien
-no:  for å se den første
-oc:  per veire lo primièr ligam de parentatge
-pl:  aby zobaczyć pierwszą linię pokrewieństwa
-pt:  para ver o primeiro link
-ro:  pentru a vedea prima relatie
-ru:  чтобы увидеть первую связь отношения
-sk:  zobraziť prvý vzťah
-sl:  za prikaz prve sorodstvene povezave
-sv:  för att se den första
+en: to see the first one
+eo: por vidi la unuan ligon de parenceco
+es: para ver el primer vínculo de parentesco
+et: esimese sugulussuhte vaatamiseks
+fi: nähdäksesi ensimmäisen sukulaisuuden
+fr: pour voir le premier
+he:  לראות את הקשר המשפחתי הראשון
+is: til að sjá fyrstu tengsl
+it: per vedere il primo
+lv: skatīt pirmo attiecību saiti
+nl: om de eerste te zien
+no: for å se den første
+oc: per veire lo primièr ligam de parentatge
+pl: aby zobaczyć pierwszą linię pokrewieństwa
+pt: para ver o primeiro link
+ro: pentru a vedea prima relatie
+ru: чтобы увидеть первую связь отношения
+sk: zobraziť prvý vzťah
+sl: za prikaz prve sorodstvene povezave
+sv: för att se den första
 
-     to try again with this number
-af:  om weer te probeer met die nommer
-bg:  за опит с този номер
-br:  evit esaiñ en-dro gant an niverenn-se
-ca:  per tornar a provar aquest número
-co:  per pruvà torna cù stu numeru
-cs:  zkusit znovu s tímto číslem
-da:  for at forsøge igen med dette nummer
+    to try again with this number
+af: om weer te probeer met die nommer
+bg: за опит с този номер
+br: evit esaiñ en-dro gant an niverenn-se
+ca: per tornar a provar aquest número
+co: per pruvà torna cù stu numeru
+cs: zkusit znovu s tímto číslem
+da: for at forsøge igen med dette nummer
 de: , um es mit dieser Nummer nochmals zu versuchen
-en:  to try again with this number
-eo:  por reprovi kun ĉi tiu numero
-es:  para ensayar de nuevo con este número
+en: to try again with this number
+eo: por reprovi kun ĉi tiu numero
+es: para ensayar de nuevo con este número
 et: , proovimaks uuesti selle numbriga
-fi:  yrittääksesi uudelleen tällä numerolla
-fr:  pour réessayer avec ce numéro
-he:  לנסות שוב עם המספר הזה
-is:  til að reyna þetta aftur með þessu númeri
-it:  per provare di nuovo con questo numero
-lv:  mēģiniet vēlreiz ar šo nummuru
+fi: yrittääksesi uudelleen tällä numerolla
+fr: pour réessayer avec ce numéro
+he: לנסות שוב עם המספר הזה
+is: til að reyna þetta aftur með þessu númeri
+it: per provare di nuovo con questo numero
+lv: mēģiniet vēlreiz ar šo nummuru
 nl: , om dit nummer weer te proberen
-no:  for å prøve igjen med dette nummeret
-oc:  per tornar ensajar amb aquel numèro
-pl:  aby ponowić z tym numerem
-pt:  para tentar novamente com este número
-ro:  incearca din nou cu acest numar
-ru:  для того, чтобы пытаться снова с этим числом
-sk:  skúsiť znovu s týmto číslom
-sl:  za ponoven poskus s to številko
-sv:  för att försöka igen med detta nummer
+no: for å prøve igjen med dette nummeret
+oc: per tornar ensajar amb aquel numèro
+pl: aby ponowić z tym numerem
+pt: para tentar novamente com este número
+ro: incearca din nou cu acest numar
+ru: для того, чтобы пытаться снова с этим числом
+sk: skúsiť znovu s týmto číslom
+sl: za ponoven poskus s to številko
+sv: för att försöka igen med detta nummer
 
     %1 of %2
 af: %1 van %2
@@ -1874,6 +1874,18 @@ sl: napredno iskanje/napredno<br>iskanje
 sv: avancerad sökning/avancerad<br>sökning
 zh: 高级访问请求/高级访问请求
 
+    advanced_search_sosa_checkbox
+de: Begrenzt auf die direkten Vorfahren der Ausgangsperson (Sosa)
+en: limit to the direct ancestry of the root person (Sosa/Ahnentafel)
+es: limitar a los antepasados directos de la persona tronco (Sosa)
+fi: rajaa suoraan juurihenkilön esivanhempaan (Sosa/Ahnentafel)
+fr: limiter aux ancêtres directs de la souche (sosas)
+it: limitare agli avi diretti della persona stipite (Sosa)
+nl: beperken tot de rechtstreekse voorouders van de bronpersoon (Sosa)
+no: begrens til direkte stamfar til rotpersonen (Sosa/Ahnentafel)
+pt: limitar aos antepassados directos da pessoa raiz da árvore (Sosa/Ahnentafel)
+sv: begränsa till direkta förfäder till rotpersonen (Sosa/Ahnentafel)
+
     after
 af: na
 bg: след
@@ -2528,6 +2540,10 @@ oc: quin individú que siá dins l'arbre
 pt: qualquer pessoa da árvore
 ru: любой человек в генеалогическом дереве
 sv: en person i ditt träd
+
+    apply modifications
+en: apply modifications
+fr: appliquer les modifications
 
     are
 af: is
@@ -6399,6 +6415,10 @@ en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 pt: exibir na largura total/exibir em duas colunas
 
+    full-screen
+en: full-screen
+fr: plein écran
+
     funeral
 co: murtoriu
 de: Bestattung
@@ -6642,6 +6662,30 @@ ru: муж/жена
 sk: manžel/manželka
 sl: mož/žena
 sv: partner/partner
+
+    h_advanced_or
+de: Einzelpersonen, passend zu mindestens einem der Ereignisse
+en: individuals related to at least one event
+es: Individuos correspondientes a menos de uno de ese eventos
+fi: henkilöt, jotka liittyvät ainakin yhteen tapahtumaan
+fr: individus correspondant à au moins un des événements
+it: individui corrispondenti a almeno uno di questi eventi
+nl: personen die minstens met één van de evenementen overeenkomen
+no: personer relatert til minst en hendelse
+pt: pessoas relacionadas com pelo menos um evento
+sv: individer relaterade till åtminstone en händelse
+
+    h_advanced_and
+de: Einzelpersonen, passend zu allen Ereignissen
+en: individuals related to all the events
+es: individuos correspondientes a todos los eventos
+fi: kaikkiin tapahtumiin liittyvät henkilöt
+fr: individus correspondant à tous les événements
+it: individui corrispondenti a tutti questi eventi
+nl: personen die overeenkomen met alle evenementen
+no: personer relatert til alle hendelsene
+pt: pessoas relacionadas com todos os eventos
+sv: individer relaterade till alla händelser
 
     h7-tree
 co: arburu in H di 7 generazione
@@ -7549,6 +7593,18 @@ sk: zoznam manželov/manželiek (bez potomkov)
 sl: seznam mož/žena (brez potomcev)
 sv: förteckning över makarna (icke ättlingar)
 
+    indifferent
+de: gleichgültig
+en: all
+es: indiferente
+fi: yhdentekevä
+fr: indifférent
+it: indifferente
+nl: onverschillig
+no: uviktig
+pt: indiferente
+sv: oviktigt
+
     individual notes
 co: note individuale
 de: Hinweis zur Person
@@ -8095,7 +8151,7 @@ oc: lista rapida
 pt: listar por nome, local e data
 sv: Index
 
-    list/list (ancestors)
+    list
 af: lys
 bg: списък
 br: roll
@@ -8160,6 +8216,18 @@ fr: liste des dictionnaires
 oc: lista dels diccionaris
 pt: lista de dicionários
 ru: список словарей
+
+    list_ind_title
+de: Liste aller Personen des Baumes
+en: List of all individuals in the family tree
+es: Lista de todos los individuos del árbol
+fi: Kaikkien sukupuussa esiintyvien henkilöiden luettelo
+fr: liste de tous les individus de l'arbre
+it: Elenco di tutti gli individui dell'albero
+nl: Lijst van alle personen van de stamboom
+no: Liste over alle personer i slektstreet
+pt: Lista de todas as pessoas na árvore genealógica
+sv: En lista på alla personer i familjeträden
 
     living after %s
 co: vivu(a) dopu %s
@@ -8805,6 +8873,18 @@ pt: avós maternos
 ru: бабушка и дедушка по материнской линии
 sv: mormor och morfar
 
+    max.
+de: Maximum
+en: maximum
+es: máximo
+fi: maks.
+fr: max.
+it: massimo
+nl: maximum
+no: maks.
+pt: máximo
+sv: maximum
+
     maximum
 af: maksimum
 bg: най-много
@@ -9026,6 +9106,18 @@ no: Verneplikt
 pt: serviço militar
 ru: военная служба
 sv: Värnplikt
+
+    min.
+de: Minimum
+en: minimum
+es: mínimo
+fi: väh.
+fr: min.
+it: minimo
+nl: minimum
+no: min.
+pt: mínimo
+sv: minimum
 
     miscellaneous
 co: diversu
@@ -11417,6 +11509,10 @@ sk: súkromé
 sl: zasebno
 sv: privat
 
+    progress_description
+en: Page is loading. Please wait.
+fr: La page est en train d'être générée, merci de patienter.
+
     property
 co: pruprietà
 de: persönliches Eigentum
@@ -12456,6 +12552,10 @@ ru: разделены
 sk: odlúčení
 sl: živela narazen
 sv: separerat
+
+    settings
+en: settings
+fr: réglages
 
     several answers
 af: verskeie antwoorde
@@ -15532,4 +15632,3 @@ ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
-
