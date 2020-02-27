@@ -2,8 +2,7 @@
   col-sm-{{ s }} col-md-{{ m }} col-lg-{{ l }}
 {%- endmacro columns -%}
 
-{# FIXME: remove or use small, medium, large, xlarge #}
-{%- macro inputCheckbox (class="", checked=false, name, label, small, medium, large, xlarge) -%}
+{%- macro inputCheckbox (class="", checked=false, name, label) -%}
   <div class="form-check {{ class }}">
     <input class="form-check-input" id="{{ name }}" name="{{ name }}" type="checkbox" {% if checked %}checked="checked"{% endif %}>
     <label class="form-check-label" for="{{ name }}">{{ label }}</label>

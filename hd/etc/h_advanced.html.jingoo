@@ -156,7 +156,7 @@
 	        {% if env.sosa_ref %}
                 <div class="row">
                   <div class="{{ columns (12, 12, 12, 12) }}">
-                    {{ inputCheckbox ('sosa_filter', 'advanced_search_sosa_checkbox'|trans|capitalize, checked=false, 12, 12, 12, 12) }}
+                    {{ inputCheckbox ('sosa_filter', 'advanced_search_sosa_checkbox'|trans|capitalize, checked=false) }}
                   </div>
                 </div>
                 {% endif %}
@@ -183,11 +183,11 @@
                 <div class="row">
                   {{ date_place (null, '') }}
                   <div class="{{ columns (12, 6, 6) }}">
-                    {{ inputCheckbox ('event_birth', 'birth'|trans|capitalize, 12, 6, 6) }}
-                    {{ inputCheckbox ('event_bapt', 'baptism'|trans|capitalize, 12, 6, 6) }}
-                    {{ inputCheckbox ('event_marriage', 'marriage event'|trans|capitalize, 12, 12, 12, 12) }}
-                    {{ inputCheckbox ('event_death', 'death'|trans|capitalize, 12, 6, 6) }}
-                    {{ inputCheckbox ('event_burial', 'burial'|trans|capitalize, 12, 6, 6) }}
+                    {{ inputCheckbox ('event_birth', 'birth'|trans|capitalize) }}
+                    {{ inputCheckbox ('event_bapt', 'baptism'|trans|capitalize) }}
+                    {{ inputCheckbox ('event_marriage', 'marriage event'|trans|capitalize) }}
+                    {{ inputCheckbox ('event_death', 'death'|trans|capitalize) }}
+                    {{ inputCheckbox ('event_burial', 'burial'|trans|capitalize) }}
                   </div>
                 </div>
               </div>
@@ -254,10 +254,10 @@
               / {{ 'event/events'|trans(0) }}
               / {{ 'surname/surnames'|trans(0) }}
             </strong>
-            {{ inputCheckbox (class="ml-2", "bi",'birth'|trans|capitalize|capitalize, 12, 12, 12) }}
-            {{ inputCheckbox (class="ml-2", "bp",'baptism'|trans|capitalize, 12, 12, 12) }}
-            {{ inputCheckbox (class="ml-2", "de",'death'|trans|capitalize, 12, 12, 12) }}
-            {{ inputCheckbox (class="ml-2", "bu",'burial'|trans|capitalize, 12, 12, 12) }}
+            {{ inputCheckbox (class="ml-2", "bi",'birth'|trans|capitalize|capitalize) }}
+            {{ inputCheckbox (class="ml-2", "bp",'baptism'|trans|capitalize) }}
+            {{ inputCheckbox (class="ml-2", "de",'death'|trans|capitalize) }}
+            {{ inputCheckbox (class="ml-2", "bu",'burial'|trans|capitalize) }}
             {{ inputCheckbox  (class="ml-2", "ma",'marriage/marriages'|trans(0)|capitalize) }}
             <button class="btn btn-outline-success ml-auto" type="submit">
               {{ 'visualize/show/hide/summary'|trans(0)|capitalize }}
