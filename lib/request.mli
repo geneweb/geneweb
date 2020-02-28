@@ -10,4 +10,4 @@ module type MakeOut = sig
   val treat_request_on_nobase : Config.config -> unit
 end
 
-module Make (H : MakeIn) : MakeOut
+module Make (_ : MakeIn) : MakeOut
