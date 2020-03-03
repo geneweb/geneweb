@@ -739,7 +739,7 @@ let search_auto_complete conf base mode place_mode max n =
             else acc
         in
         if !nb < max then reduce acc tl
-        else acc
+        else List.rev acc
     in
     reduce [] list
 
