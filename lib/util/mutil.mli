@@ -102,3 +102,11 @@ val string_of_int_sep : string -> int -> string
     Comparison function for lists, using [cmp] to compare each elements
 *)
 val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
+
+(** [check_magic magic ic]
+    Read (and consume) the [magic] string at the beggining of [ic]
+    and return [true].
+    If [ic] does not start with [magic], reset the reading position
+    of [ic] to where is was before you call [check_magic] and return [false].
+*)
+val check_magic : string -> in_channel -> bool

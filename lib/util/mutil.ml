@@ -446,3 +446,10 @@ let rec list_compare cmp l1 l2 =
   | [], [] -> 0
   | [], _ -> -1
   | _, [] -> 1
+
+let check_magic magic ic =
+  let len = String.length magic in
+  let pos = pos_in ic in
+  if in_channel_length ic - pos < len then false
+  else if magic = really_input_string ic len then true
+  else begin seek_in ic pos ; false end
