@@ -1,4 +1,3 @@
-(* $Id: util.ml,v 5.130 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -2493,25 +2492,19 @@ let create_topological_sort conf base =
                Filename.concat bfile "tstab_visitor"
              else Filename.concat bfile "tstab"
            in
-           let r =
-             try
-               (* Let's invalidate tstab if it is too old. *)
-               if Unix.time () -. (Unix.stat tstab_file).Unix.st_mtime > 86400. (* one day *)
-               then (Sys.remove tstab_file ; None)
-               else
-                 let ic = Secure.open_in_bin tstab_file in
-                 let r =
-                   try Some (Marshal.from_channel ic)
-                   with End_of_file | Failure _ ->
-                     (* tstab is probably corrupted *)
-                     Sys.remove tstab_file ;
-                     None
-                 in
-                 close_in ic;
-                 r
-             with _ -> None
-           in
-           match r with
+           match
+             if Sys.file_exists tstab_file
+             then begin
+               let ic = Secure.open_in_bin tstab_file in
+               let tstab =
+                 if Mutil.check_magic Mutil.executable_magic ic
+                 then Some (Marshal.from_channel ic)
+                 else None
+               in
+               close_in ic ;
+               tstab
+             end else None
+           with
            | Some tstab -> tstab
            | None ->
              let () = load_ascends_array base in
@@ -2522,6 +2515,7 @@ let create_topological_sort conf base =
                base_visible_write base;
              begin
                let oc = Secure.open_out_bin tstab_file in
+               output_string oc Mutil.executable_magic ;
                Marshal.to_channel oc tstab
                  [ Marshal.No_sharing ; Marshal.Closures ] ;
                close_out oc

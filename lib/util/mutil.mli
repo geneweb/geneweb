@@ -110,3 +110,9 @@ val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
     of [ic] to where is was before you call [check_magic] and return [false].
 *)
 val check_magic : string -> in_channel -> bool
+
+(** Magic string generated from the md5sum of the running executable.
+    It can be used for volatile files which can be easily corrupted
+    by any change in program or data representation.
+*)
+val executable_magic : string
