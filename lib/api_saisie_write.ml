@@ -1689,14 +1689,7 @@ let print_add_parents conf base =
       father.Mwrite.Person.death_type <- x ;
       mother.Mwrite.Person.death_type <- x
   in
-  (* On calcul le nom du père. *)
-  let () =
-    if get_sex p = Male then
-      let father_surname = infer_surname conf base p None in
-      father.Mwrite.Person.lastname <- father_surname;
-    else
-      father.Mwrite.Person.lastname <- surname;
-  in
+  father.Mwrite.Person.lastname <- surname ;
   let add_parents =
     {
       Mwrite.Add_parents.person_lastname = surname;
