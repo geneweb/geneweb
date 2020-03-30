@@ -1,0 +1,7 @@
+(library
+ (name dump)
+ (public_name geneweb-lib.dump)
+ (wrapped false)
+ (libraries def ppx_import ppx_deriving.show)
+ (preprocess (staged_pps ppx_import ppx_deriving.show))
+)

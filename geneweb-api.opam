@@ -28,6 +28,8 @@ depends: [
   "ocaml" { >= "4.05" }
   "ocurl"
   "ounit" { with-test }
+  "ppx_deriving"
+  "ppx_import"
   "piqi"
   "piqilib"
   "redis"

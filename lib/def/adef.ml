@@ -1,7 +1,6 @@
-(* $Id: adef.ml,v 5.6 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-type fix = int
+type fix = int [@@deriving show]
 
 let float_of_fix x = float x /. 1000000.0
 let fix_of_float x = truncate (x *. 1000000.0 +. 0.5)
@@ -11,7 +10,7 @@ external fix_repr : fix -> int = "%identity"
 let no_consang = fix (-1)
 
 type date =
-    Dgreg of dmy * calendar
+  | Dgreg of dmy * calendar
   | Dtext of string
 and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
 and dmy =
@@ -27,7 +26,7 @@ and precision =
   | YearInt of dmy2
 
 type cdate =
-    Cgregorian of int
+  | Cgregorian of int
   | Cjulian of int
   | Cfrench of int
   | Chebrew of int

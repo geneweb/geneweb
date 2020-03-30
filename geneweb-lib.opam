@@ -25,6 +25,8 @@ depends: [
   "markup"
   "ocaml" { >= "4.05" }
   "ounit" { with-test }
+  "ppx_deriving"
+  "ppx_import"
   "stdlib-shims"
   "unidecode" { = "0.2.0" }
   "uucp"

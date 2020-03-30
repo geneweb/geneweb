@@ -1,4 +1,3 @@
-(* $Id: def.mli,v 5.22 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 type ('a, 'b) choice =
@@ -6,25 +5,26 @@ type ('a, 'b) choice =
   | Right of 'b
 
 type cdate = Adef.cdate
+type fix = Adef.fix
 
 type date =
   Adef.date =
-      Dgreg of dmy * calendar
-    | Dtext of string
+  | Dgreg of dmy * calendar
+  | Dtext of string
 and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
 and dmy =
   Adef.dmy =
-    { day : int; month : int; year : int; prec : precision; delta : int }
+  { day : int; month : int; year : int; prec : precision; delta : int }
 and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 and precision =
   Adef.precision =
-      Sure
-    | About
-    | Maybe
-    | Before
-    | After
-    | OrYear of dmy2
-    | YearInt of dmy2
+  | Sure
+  | About
+  | Maybe
+  | Before
+  | After
+  | OrYear of dmy2
+  | YearInt of dmy2
 
 type f_relation_kind =
   | Married
@@ -47,8 +47,9 @@ type divorce =
   | Separated
 
 type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
+
 type death =
-    NotDead
+  | NotDead
   | Death of death_reason * cdate
   | DeadYoung
   | DeadDontKnowWhen
@@ -56,16 +57,17 @@ type death =
   | OfCourseDead
 
 type burial =
-    UnknownBurial
+  | UnknownBurial
   | Buried of cdate
   | Cremated of cdate
 
 type access = IfTitles | Public | Private
 
 type 'string gen_title_name =
-    Tmain
+  | Tmain
   | Tname of 'string
   | Tnone
+
 type 'string gen_title =
   { t_name : 'string gen_title_name;
     t_ident : 'string;
@@ -77,7 +79,7 @@ type 'string gen_title =
 type witness_kind = Witness | Witness_GodParent | Witness_Officer
 
 type 'string gen_pers_event_name =
-    Epers_Birth
+  | Epers_Birth
   | Epers_Baptism
   | Epers_Death
   | Epers_Burial
@@ -128,6 +130,7 @@ type 'string gen_pers_event_name =
   | Epers_VenteBien
   | Epers_Will
   | Epers_Name of 'string
+
 type ('person, 'string) gen_pers_event =
   { epers_name : 'string gen_pers_event_name;
     epers_date : cdate;
@@ -138,7 +141,7 @@ type ('person, 'string) gen_pers_event =
     epers_witnesses : ('person * witness_kind) array }
 
 type 'string gen_fam_event_name =
-    Efam_Marriage
+  | Efam_Marriage
   | Efam_NoMarriage
   | Efam_NoMention
   | Efam_Engage
@@ -151,6 +154,7 @@ type 'string gen_fam_event_name =
   | Efam_PACS
   | Efam_Residence
   | Efam_Name of 'string
+
 type ('person, 'string) gen_fam_event =
   { efam_name : 'string gen_fam_event_name;
     efam_date : cdate;
@@ -160,9 +164,12 @@ type ('person, 'string) gen_fam_event =
     efam_src : 'string;
     efam_witnesses : ('person * witness_kind) array }
 
-
 type relation_type =
-  Adoption | Recognition | CandidateParent | GodParent | FosterParent
+  | Adoption
+  | Recognition
+  | CandidateParent
+  | GodParent
+  | FosterParent
 
 type ('person, 'string) gen_relation =
   { r_type : relation_type;
@@ -221,8 +228,7 @@ type ('iper, 'person, 'string) gen_person =
     psources : 'string;
     key_index : 'iper }
 
-
-type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
+type 'family gen_ascend = { parents : 'family option; consang : fix }
 
 type 'family gen_union = { family : 'family array }
 
@@ -247,7 +253,7 @@ type 'person gen_couple = 'person Adef.gen_couple
 type 'person gen_descend = { children : 'person array }
 
 type 'person error =
-    AlreadyDefined of 'person
+  | AlreadyDefined of 'person
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person
 
