@@ -429,14 +429,14 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
       let p2_family = get_family p2 in
       let warning _ = () in
       MergeInd.reparent_ind base warning sp.key_index ip2;
+      let p = UpdateIndOk.effective_mod conf base sp in
+      let p = redirect_relations_of_added_related base p ip2 rel_chil in
+      redirect_added_families base p ip2 p2_family;
       let warning _ = () in
       let p2 = UpdateIndOk.effective_del base warning p2 in
       patch_person base p2.key_index p2;
       let u2 = {family = [| |]} in
       patch_union base p2.key_index u2;
-      let p = UpdateIndOk.effective_mod conf base sp in
-      let p = redirect_relations_of_added_related base p ip2 rel_chil in
-      redirect_added_families base p ip2 p2_family;
       patch_person base p.key_index p;
       patch_cache_info conf Util.cache_nb_base_persons
         (fun v -> let v = int_of_string v - 1 in string_of_int v);
