@@ -88,7 +88,6 @@ let family_m conf base =
       | "AD" -> handler.ad
       | "AM" -> handler.am
       | "AS_OK" -> handler.as_ok
-      | "B" -> handler.b
       | "C" -> handler.c
       | "CAL" -> handler.cal
       | "CHG_CHN" -> handler.chg_chn
