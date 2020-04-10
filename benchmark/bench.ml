@@ -39,6 +39,30 @@ let bench () =
         [ "Jean-Baptiste Emmanuel" ; "Jean Baptiste Emmanuel" ]
     ; bench "Name.split_sname" Name.split_sname
         [ "Jean-Baptiste Emmanuel" ; "Jean Baptiste Emmanuel" ]
+    ; bench ~t:2 "Calendar" begin fun () ->
+        let febLength year : int =
+          if (if year < 0 then year + 1 else year) mod 4 = 0 then 29 else 28
+        in
+        let monthLength =
+          [| 31 ; 28 ; 31 ; 30 ; 31 ; 30 ; 31 ; 31 ; 30 ; 31 ; 30 ; 31 |]
+        in
+        for year = -4713 to 10000 do
+          if year <> 0 then
+            for month = 1 to 12 do
+              let len =
+                if month = 2
+                then febLength (year)
+                else Array.get monthLength @@ month - 1
+              in
+              for day = 1 to len do
+                let d = { Def.day ; month ; year ; delta = 0
+                        ; prec = Def.Sure } in
+                (Sys.opaque_identity ignore)
+                  (Calendar.julian_of_sdn Def.Sure @@ Calendar.sdn_of_julian d)
+              done
+            done
+        done
+      end [ () ]
     ]
   in
   match Sys.getenv_opt "BENCH_BASE" with
