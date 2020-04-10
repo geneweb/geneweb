@@ -1029,12 +1029,17 @@ let text_of_var conf =
       let pn = match String.get var (i + 1) with 'f' -> 0 | 'm' -> 1 | _ -> assert false in
       transl_nth conf "relation/relations" 0 ^ " " ^ string_of_int pos
       ^ " - " ^ transl_nth conf "father/mother" pn
-    | 'w' when String.length var >= 5
-            && String.unsafe_get var 1 = 'i'
-            && String.unsafe_get var 2 = 't'
-            && String.unsafe_get var 3 = 'n' ->
-      let (pos, _) = parse_int var 4 in
-      transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int pos
+    | 'e' ->
+      let (epos, i) = parse_int var 1 in
+      assert (String.get var i = '_') ;
+      assert (String.get var (i + 1) = 'w') ;
+      assert (String.get var (i + 2) = 'i') ;
+      assert (String.get var (i + 3) = 't') ;
+      assert (String.get var (i + 4) = 'n') ;
+      let (wpos, _) = parse_int var (i + 5) in
+      let a = transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int wpos in
+      let b = transl_nth conf "event/events" 0 ^ " " ^ string_of_int epos in
+      transl_a_of_b conf a b b
     | 'c' when String.length var >= 3 && String.unsafe_get var 1 = 'h' ->
       let (pos, _) = parse_int var 2 in
       Util.translate_eval (transl_nth conf "child/children" 0)
