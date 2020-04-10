@@ -294,7 +294,6 @@ and handler =
   ; ad : handler_base
   ; am : handler_base
   ; as_ok : handler_base
-  ; b : handler_base
   ; c : handler_base
   ; cal : handler_base
   ; chg_chn : handler_base
@@ -469,7 +468,6 @@ let dummyHandler =
   ; ad = dummy_base
   ; am = dummy_base
   ; as_ok = dummy_base
-  ; b = dummy_base
   ; c = dummy_base
   ; cal = dummy_base
   ; chg_chn = dummy_base
@@ -736,10 +734,6 @@ let defaultHandler : handler =
 
   ; as_ok = begin fun _self conf base ->
       AdvSearchOkDisplay.print conf base
-    end
-
-  ; b = begin fun _self conf base ->
-      if conf.wizard || conf.friend then BirthDeathDisplay.print_birth conf base
     end
 
   ; c = begin fun self conf base ->
