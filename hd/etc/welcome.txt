@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-<!-- $Id: welcome.txt, v.7.00 11/01/2020 02:10:38 $ -->
+<!-- $Id: welcome.txt, v.7.00 12/01/2020 11:35:58 $ -->
   <title>GeneWeb – %base.name;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">	  <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
   %include;hed
@@ -38,52 +38,51 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
 <body%body_prop;>
 <div class="container">
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
-    <div class="d-none d-lg-block col-2 order-md-1"></div>
+    %if;(bvar.auth_file="" and bvar.wizard_passwd!="" or bvar.friend_passwd!="")
+      <div class="d-none d-lg-block col-2 order-md-1"></div>
+    %end;
     <div class="col-xs-12 col-md-auto order-md-3 ml-md-auto px-0">
-        <div class="d-flex flex-column">
-          %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""
-            or bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
-            %if;(cgi and (not wizard and not friend))
-              <form class="form-inline" method="post" action="%action;">
-                %hidden;
-                <div class="input-group mt-1">
-                  %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
-                  <input type="text" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
-                  placeholder="[user/password/cancel]0:[user/password/cancel]1" aria-label="password input" aria-describedby="username:password" autofocus>
-                  <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary">OK</button>
-                  </div>
-                </div>
-              </form>
-            %end;
-            %if;(bvar.auth_file = "")
-              <div class="btn-group btn-group-xs mt-1" role="group">
-              %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
-                %if;(not friend)
-                  %if;(not cgi)
-                    <a href="%prefix;w=f" class="btn btn-outline-primary text-nowrap" role="button" title="[*wizard/wizards/friend/friends/exterior]2"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
-                  %end;
-                %else;
-                  <a href="#" class="btn btn-primary disabled text-nowrap" role="button"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
-                %end;
-              %end;
-              %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
-                %if;(not wizard)
-                  %if;(not cgi)
-                    <a href="%prefix;w=w" class="btn btn-outline-success text-nowrap" role="button"  title="[*wizard/wizards/friend/friends/exterior]0"><i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
-                  %end;
-                %else;
-                    <a href="#" class="btn btn-success disabled text-nowrap" role="button"><i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
-                %end;
-              %end;
+      <div class="d-flex flex-column">
+        %if;(cgi and (not wizard or not friend))
+          <form class="form-inline" method="post" action="%action;">
+            %hidden;
+            <div class="input-group mt-1">
+              %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
+              <input type="text" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
+              placeholder="[user/password/cancel]0:[user/password/cancel]1" aria-label="password input" aria-describedby="username:password" autofocus>
+              <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">OK</button>
               </div>
-            %end;
-            %if;(user.ident != "")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>
-            %if;((wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")) or (friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != "")))
-              <a class="btn btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-sign-out-alt mr-1" aria-hidden="true"></i>[*disconnect]</a>
+            </div>
+          </form>
+        %end;
+        %if;(bvar.auth_file = "")
+          <div class="btn-group btn-group-xs mt-1" role="group">
+          %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+            %if;(not friend)
+              %if;(not cgi)
+                <a href="%prefix;w=f" class="btn btn-outline-primary text-nowrap" role="button" title="[*wizard/wizards/friend/friends/exterior]2"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
+              %end;
+            %else;
+              <a href="#" class="btn btn-primary disabled text-nowrap" role="button"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
             %end;
           %end;
-        </div>
+          %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+            %if;(not wizard)
+              %if;(not cgi)
+                <a href="%prefix;w=w" class="btn btn-outline-success text-nowrap" role="button"  title="[*wizard/wizards/friend/friends/exterior]0"><i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
+              %end;
+            %else;
+                <a href="#" class="btn btn-success disabled text-nowrap" role="button"><i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
+            %end;
+          %end;
+          </div>
+        %end;
+        %if;(user.ident != "")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>%end;
+        %if;((wizard or friend) and (bvar.wizard_passwd!="" or bvar.friend_passwd!=""))
+          <a class="btn btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-sign-out-alt mr-1" aria-hidden="true"></i>[*disconnect]</a>
+        %end;
+      </div>
     </div>
     <div class="mt-3 mt-md-0 order-md-2 flex-fill text-lg-center align-self-md-center">
       %if;(bvar.welcome_logo!="")
@@ -165,27 +164,27 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     <div class="h4 text-lg-center"><i class="fas fa-tools fa-sm fa-fw text-secondary mr-1"></i>[*tools]</div>
     <div class="d-inline-flex justify-content-lg-center">
       %if;(wizard and not base.has_notes)
-        <a role="button" class="btn btn-outline-primary" href="%prefix;m=MOD_NOTES">[*add base notes]</a> 
+        <a role="button" class="btn btn-outline-primary mr-1" href="%prefix;m=MOD_NOTES">[*add base notes]</a>
       %end;
       %if;base.has_notes;
-        <a role="button" class="btn btn-outline-primary" href="%prefix;m=NOTES">
+        <a role="button" class="btn btn-outline-primary mr-1" href="%prefix;m=NOTES">
           %if;(bvar.base_notes_title="")
             <i class="far fa-file-alt fa-fw mr-1" aria-hidden="true"></i>[*base notes]
           %else;%bvar.base_notes_title;%end;
-        </a> 
+        </a>
       %end;
       %if;has_misc_notes;
-        <a role="button" class="btn btn-outline-primary" href="%prefix;m=MISC_NOTES"><i class="fas fa-align-justify fa-fw mr-1" aria-hidden="true"></i>[*base index notes]</a> 
+        <a role="button" class="btn btn-outline-primary mr-1" href="%prefix;m=MISC_NOTES"><i class="fas fa-align-justify fa-fw mr-1" aria-hidden="true"></i>[*base index notes]</a>
       %end;
       %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
            and (wizard or wiznotes_dir_exists)
            and bvar.authorized_wizards_notes = "yes")
-         <a role="button" class="btn btn-outline-success text-success" href="%prefix;m=WIZNOTES"><i class="far fa-file-alt fa-fw mr-1" aria-hidden%"true"></i>[*base wizard notes]</a> 
+         <a role="button" class="btn btn-outline-success text-success mr-1" href="%prefix;m=WIZNOTES"><i class="far fa-file-alt fa-fw mr-1" aria-hidden%"true"></i>[*base wizard notes]</a>
       %end;
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=STAT"><i class="far fa-chart-bar fa-fw mr-1" aria-hidden="true"></i>[*statistics]</a> 
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=ANM"><i class="fa fa-birthday-cake fa-fw mr-1" aria-hidden="true"></i>[*anniversaries]</a> 
+      <a role="button" class="btn btn-outline-primary mr-1" href="%prefix;m=STAT"><i class="far fa-chart-bar fa-fw mr-1" aria-hidden="true"></i>[*statistics]</a>
+      <a role="button" class="btn btn-outline-primary%if;(has_history and bvar.history="yes") mr-1%end;" href="%prefix;m=ANM"><i class="fa fa-birthday-cake fa-fw mr-1" aria-hidden="true"></i>[*anniversaries]</a>
       %if;(has_history and bvar.history="yes")
-        <a role="button" class="btn btn-outline-primary" href="%prefix;m=HIST;k=20"><i class="fas fa-history fa-fw mr-1" aria-hidden="true"></i>[*history]</a> 
+        <a role="button" class="btn btn-outline-primary%if;(bvar.disable_forum!="yes") mr-1%end;" href="%prefix;m=HIST;k=20"><i class="fas fa-history fa-fw mr-1" aria-hidden="true"></i>[*history]</a>
       %end;
       %if;(bvar.disable_forum != "yes")
         <a class="btn  btn-outline-primary" href="%prefix;m=FORUM"><i class="far fa-comments fa-fw mr-1" aria-hidden="true"></i>[*forum]</a>
@@ -193,26 +192,26 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     </div>
     <div class="d-inline-flex justify-content-lg-center mt-1 mt-lg-2">
       %if;(wizard and bvar.propose_add_family != "no")
-        <a role="button" class="btn btn-outline-success" href="%prefix;m=ADD_FAM" title="[*add::family/families]0 ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-user-plus mr-1" aria-hidden="true"></i>[*add::family/families]0</a> 
+        <a role="button" class="btn btn-outline-success mr-1" href="%prefix;m=ADD_FAM" title="[*add::family/families]0 ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-user-plus mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
       %end;
       %if;(bvar.propose_place_surnames!="no")
-        <a role="button" class="btn btn-outline-primary" href="%prefix;m=PS&bi=on&ba=on&ma=on&de=on&bu=on"><i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*places]/[surname/surnames]0</a> 
+        <a role="button" class="btn btn-outline-primary mr-1" href="%prefix;m=PS&bi=on&ba=on&ma=on&de=on&bu=on"><i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*places]/[surname/surnames]0</a>
       %end;
       %if;(bvar.hide_advanced_request = "no")
-        <a role="button" class="btn btn-outline-primary" href="%prefix;m=H;v=advanced"><i class="fa fa-search-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a> 
+        <a role="button" class="btn btn-outline-primary mr-1" href="%prefix;m=H;v=advanced"><i class="fa fa-search-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>
       %end;
-      <a role="button" class="btn btn-outline-primary" href="%prefix;m=CAL"><i class="far fa-calendar-alt fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
+      <a role="button" class="btn btn-outline-primary mr-1" href="%prefix;m=CAL"><i class="far fa-calendar-alt fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
     </div>
   </div>
   %if;wizard;
     <div class="d-flex flex-column flex-lg-row justify-content-lg-center mt-2 mt-lg-4">
       <div class="h4 align-self-lg-center mr-lg-2"><i class="fas fa-book fa-sm fa-fw text-secondary mr-1"></i>[*books]</div>
       <div class="d-inline-flex justify-content-lg-center">
-        <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_DATA;data=fn" title="[*modify] %apply;book_of([first name/first names]1) ([wizard/wizards/friend/friends/exterior]0)">[*first name/first names]1</a> 
-        <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_DATA;data=sn" title="[*modify] %apply;book_of([surname/surnames]1) ([wizard/wizards/friend/friends/exterior]0)">[*surname/surnames]1</a> 
-        <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_DATA;data=place" title="[*modify] %apply;book_of([places]) ([wizard/wizards/friend/friends/exterior]0)">[*places]</a> 
-        <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_DATA;data=occu" title="[*modify] %apply;book_of([occupation/occupations]1) ([wizard/wizards/friend/friends/exterior]0)">[*occupation/occupations]1</a> 
-        <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_DATA;data=src" title="[*modify] %apply;book_of([source/sources]1) ([wizard/wizards/friend/friends/exterior]0)">[*source/sources]1</a>
+        <a role="button" class="btn btn-outline-success mr-1" href="%prefix;m=MOD_DATA;data=fn" title="[*modify] %apply;book_of([first name/first names]1) ([wizard/wizards/friend/friends/exterior]0)">[*first name/first names]1</a> 
+        <a role="button" class="btn btn-outline-success mr-1" href="%prefix;m=MOD_DATA;data=sn" title="[*modify] %apply;book_of([surname/surnames]1) ([wizard/wizards/friend/friends/exterior]0)">[*surname/surnames]1</a> 
+        <a role="button" class="btn btn-outline-success mr-1" href="%prefix;m=MOD_DATA;data=place" title="[*modify] %apply;book_of([places]) ([wizard/wizards/friend/friends/exterior]0)">[*places]</a> 
+        <a role="button" class="btn btn-outline-success mr-1" href="%prefix;m=MOD_DATA;data=occu" title="[*modify] %apply;book_of([occupation/occupations]1) ([wizard/wizards/friend/friends/exterior]0)">[*occupation/occupations]1</a> 
+        <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_DATA;data=src" title="[*modify] %apply;book_of([source/sources]1) ([wizard/wizards/friend/friends/exterior]0)">[*source/sources]1</a>
       </div>
     </div>
   %end;
