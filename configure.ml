@@ -95,7 +95,7 @@ let () =
       close_in p ;
       line
     with
-    | "Linux" | "Darwin" as os_type -> os_type, "", "", "/bin/rm -f", "strip"
+    | "Linux" | "Darwin" | "FreeBSD" as os_type -> os_type, "", "", "/bin/rm -f", "strip"
     | _ -> "Win", " -D WINDOWS", ".exe", "rm -f", "true"
   in
 
