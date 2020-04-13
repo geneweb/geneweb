@@ -30,4 +30,4 @@ script:
     opam install depext ;
     opam depext $DEPS ;
     opam install $DEPS ;
-    make ci ;
+    if [[ "$TRAVIS_OS_NAME" == "freebsd" ]]; then gmake ci ; else make ci ; fi ;
