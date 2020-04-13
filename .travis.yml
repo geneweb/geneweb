@@ -7,25 +7,12 @@ jobs:
   include:
   - os: freebsd
     env: OCAML_VERSION=4.05
-  - os: linux
-    env: OCAML_VERSION=4.05
-  - os: linux
-    env: OCAML_VERSION=4.06
-  - os: linux
-    env: OCAML_VERSION=4.07
-  - os: linux
-    env: OCAML_VERSION=4.08
-  - os: linux
-    env: OCAML_VERSION=4.09
-  - os: linux
-    env: OCAML_VERSION=4.10
-  - os: osx
-    env: OCAML_VERSION=4.09
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then command -v protoc >/dev/null 2>&1 || (brew update && brew install protobuf) ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then command -v protoc >/dev/null 2>&1 || sudo apt-get install -qq protobuf-compiler ; fi
   - if [[ "$TRAVIS_OS_NAME" == "freebsd" ]]; then command -v protoc >/dev/null 2>&1 || sudo pkg install -qy protobuf ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "freebsd" ]]; then command -v wget >/dev/null 2>&1 || sudo pkg install -qy wget ; fi
 
 install:
   - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh ;
