@@ -31,8 +31,6 @@ let reconstitute_date conf var =
     Some d -> Some (Dgreg (d, Dgregorian))
   | None -> None
 
-let name_eq x y = Name.abbrev (Name.lower x) = Name.abbrev (Name.lower y)
-
 let rec skip_spaces x i =
   if i = String.length x then i
   else if String.unsafe_get x i = ' ' then skip_spaces x (i + 1)
@@ -62,9 +60,7 @@ let string_incl x y =
   in
   loop 0
 
-let name_incl x y =
-  let x = Name.abbrev (Name.lower x) in
-  let y = Name.abbrev (Name.lower y) in string_incl x y
+let abbrev_lower x = Name.abbrev (Name.lower x)
 
 (* Get the field name of an event criteria depending of the search type. *)
 let get_event_field_name gets event_criteria event_name search_type =
@@ -106,17 +102,23 @@ let advanced_search conf base max_answers =
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
   (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
-  let apply_to_field_value p x cmp empty_default_value =
+  let apply_to_field_value_raw p x cmp empty_default_value =
     let y = gets x in
     if y = "" then empty_default_value
     else if authorized_age conf base p then cmp y
     else false
   in
-  let apply_to_field_values p x cmp empty_default_value =
+  let apply_to_field_value p x get cmp empty_default_value =
+    let y = gets x in
+    if y = "" then empty_default_value
+    else if authorized_age conf base p then cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
+    else false
+  in
+  let apply_to_field_values p x get cmp empty_default_value =
     let y = getss x in
     if y = [] then empty_default_value
     else if authorized_age conf base p
-    then List.exists cmp y
+    then let s = abbrev_lower @@ sou base @@ get p in List.exists (fun s' -> cmp (abbrev_lower s') s) y
     else false
   in
   (* Check if the date matches with the person event. *)
@@ -150,11 +152,12 @@ let advanced_search conf base max_answers =
       | _ -> empty_default_value
   in
   let match_sex p empty_default_value =
-    apply_to_field_value p "sex"
-      (function
-         "M" -> get_sex p = Male
-       | "F" -> get_sex p = Female
-       | _ -> true)
+    apply_to_field_value_raw p "sex"
+      begin function
+        | "M" -> get_sex p = Male
+        | "F" -> get_sex p = Female
+        | _ -> true
+      end
       empty_default_value
   in
   let bapt_date_field_name =
@@ -212,44 +215,42 @@ let advanced_search conf base max_answers =
          | _ -> None)
       empty_default_value
   in
+  let cmp_place = if "on" = gets "exact_place" then (=) else string_incl in
   let match_baptism_place p empty_default_value =
-    apply_to_field_values p bapt_place_field_name
-      (fun x -> name_incl x (sou base (get_baptism_place p)))
-      empty_default_value
+    apply_to_field_values
+      p bapt_place_field_name get_baptism_place cmp_place empty_default_value
   in
   let match_birth_place p empty_default_value =
-    apply_to_field_values p birth_place_field_name
-      (fun x -> name_incl x (sou base (get_birth_place p)))
-      empty_default_value
+    apply_to_field_values
+      p birth_place_field_name get_birth_place cmp_place empty_default_value
   in
   let match_death_place p empty_default_value =
-    apply_to_field_values p death_place_field_name
-      (fun x -> name_incl x (sou base (get_death_place p)))
-      empty_default_value
+    apply_to_field_values
+      p death_place_field_name get_death_place cmp_place empty_default_value
   in
   let match_burial_place p empty_default_value =
-    apply_to_field_values p burial_place_field_name
-      (fun x -> name_incl x (sou base (get_burial_place p)))
-      empty_default_value
+    apply_to_field_values
+      p burial_place_field_name get_burial_place cmp_place empty_default_value
   in
   let match_occupation p empty_default_value =
-    apply_to_field_value p "occu"
-      (fun x -> name_incl x (sou base (get_occupation p))) empty_default_value
+    apply_to_field_value
+      p "occu" get_occupation string_incl empty_default_value
   in
   let match_first_name p empty_default_value =
-    apply_to_field_value p "first_name"
-      (fun x -> name_eq x (p_first_name base p)) empty_default_value
+    apply_to_field_value_raw p "first_name"
+      (fun x -> (abbrev_lower x = abbrev_lower (p_first_name base p))) empty_default_value
   in
   let match_surname p empty_default_value =
-    apply_to_field_value p "surname" (fun x -> name_eq x (p_surname base p))
-      empty_default_value
+    apply_to_field_value_raw p "surname"
+      (fun x -> (abbrev_lower x = abbrev_lower (p_surname base p))) empty_default_value
   in
   let match_married p empty_default_value =
-    apply_to_field_value p "married"
-      (function
-         "Y" -> get_family p <> [| |]
-       | "N" -> get_family p = [| |]
-       | _ -> true)
+    apply_to_field_value_raw p "married"
+      begin function
+        | "Y" -> get_family p <> [| |]
+        | "N" -> get_family p = [| |]
+        | _ -> true
+      end
       empty_default_value
   in
   let match_marriage p x y empty_default_value =
@@ -261,25 +262,24 @@ let advanced_search conf base max_answers =
           in
           Hashtbl.add hd x v; v
     in
-    let y = gets y in
+    let y = abbrev_lower @@ gets y in
     let test_date_place df =
-      Array.exists
-        (fun ifam ->
-           let fam = foi base ifam in
-           let father = poi base (get_father fam) in
-           let mother = poi base (get_mother fam) in
-           if authorized_age conf base father &&
-              authorized_age conf base mother
-           then
-             if y = "" then df (Adef.od_of_cdate (get_marriage fam))
-             else
-               name_incl y (sou base (get_marriage_place fam)) &&
-               df (Adef.od_of_cdate (get_marriage fam))
-           else false)
-        (get_family p)
+      Array.exists begin fun ifam ->
+        let fam = foi base ifam in
+        let father = poi base (get_father fam) in
+        let mother = poi base (get_mother fam) in
+        if authorized_age conf base father &&
+           authorized_age conf base mother
+        then
+          if y = "" then df (Adef.od_of_cdate (get_marriage fam))
+          else
+            string_incl y (abbrev_lower @@ sou base (get_marriage_place fam))
+            && df (Adef.od_of_cdate (get_marriage fam))
+        else false
+      end (get_family p)
     in
     match d1, d2 with
-      Some d1, Some d2 ->
+    | Some d1, Some d2 ->
         test_date_place
           (function
              Some (Dgreg (_, _) as d) ->
@@ -302,17 +302,15 @@ let advanced_search conf base max_answers =
     | _ ->
         if y = "" then empty_default_value
         else
-          Array.exists
-            (fun ifam ->
-               let fam = foi base ifam in
-               let father = poi base (get_father fam) in
-               let mother = poi base (get_mother fam) in
-               if authorized_age conf base father &&
-                  authorized_age conf base mother
-               then
-                 name_incl y (sou base (get_marriage_place fam))
-               else false)
-            (get_family p)
+          Array.exists begin fun ifam ->
+            let fam = foi base ifam in
+            let father = poi base (get_father fam) in
+            let mother = poi base (get_mother fam) in
+            if authorized_age conf base father
+            && authorized_age conf base mother
+            then string_incl y (abbrev_lower @@ sou base (get_marriage_place fam))
+            else false
+          end (get_family p)
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status p =
@@ -407,7 +405,7 @@ let searching_fields conf base =
       let rec loop acc i =
         let k = x ^ "_" ^ string_of_int i in
         match p_getenv conf.env k with
-        | Some v -> loop (if acc == "" then v else acc ^ " / " ^ v) (i + 1)
+        | Some v -> loop (if acc = "" then v else if v = "" then acc else acc ^ " / " ^ v) (i + 1)
         | None -> acc
       in
       loop "" 1
