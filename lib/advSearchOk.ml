@@ -92,7 +92,7 @@ let advanced_search conf base max_answers =
         let rec loop acc i =
           let k = x ^ "_" ^ string_of_int i in
           match p_getenv conf.env k with
-          | Some v -> loop (v :: acc) (i + 1)
+          | Some v -> loop (if v <> "" then v :: acc else acc) (i + 1)
           | None -> acc
         in
         let v = loop [] 1 in
