@@ -74,16 +74,34 @@ let get_event_field_name gets event_criteria event_name search_type =
 
 let advanced_search conf base max_answers =
   let hs = Hashtbl.create 73 in
+  let hss = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
   let gets x =
     try Hashtbl.find hs x with
       Not_found ->
-        let v =
-          match p_getenv conf.env x with
-            Some v -> v
-          | None -> ""
+      let v =
+        match p_getenv conf.env x with
+          Some v -> v
+        | None -> ""
+      in
+      Hashtbl.add hs x v; v
+  in
+  let getss x =
+    let y = gets x in
+    if y <> "" then [ y ]
+    else
+      match Hashtbl.find_opt hss @@ x with
+      | Some v -> v
+      | None ->
+        let rec loop acc i =
+          let k = x ^ "_" ^ string_of_int i in
+          match p_getenv conf.env k with
+          | Some v -> loop (v :: acc) (i + 1)
+          | None -> acc
         in
-        Hashtbl.add hs x v; v
+        let v = loop [] 1 in
+        Hashtbl.add hss x v ;
+        v
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
@@ -92,6 +110,13 @@ let advanced_search conf base max_answers =
     let y = gets x in
     if y = "" then empty_default_value
     else if authorized_age conf base p then cmp y
+    else false
+  in
+  let apply_to_field_values p x cmp empty_default_value =
+    let y = getss x in
+    if y = [] then empty_default_value
+    else if authorized_age conf base p
+    then List.exists cmp y
     else false
   in
   (* Check if the date matches with the person event. *)
@@ -188,22 +213,22 @@ let advanced_search conf base max_answers =
       empty_default_value
   in
   let match_baptism_place p empty_default_value =
-    apply_to_field_value p bapt_place_field_name
+    apply_to_field_values p bapt_place_field_name
       (fun x -> name_incl x (sou base (get_baptism_place p)))
       empty_default_value
   in
   let match_birth_place p empty_default_value =
-    apply_to_field_value p birth_place_field_name
+    apply_to_field_values p birth_place_field_name
       (fun x -> name_incl x (sou base (get_birth_place p)))
       empty_default_value
   in
   let match_death_place p empty_default_value =
-    apply_to_field_value p death_place_field_name
+    apply_to_field_values p death_place_field_name
       (fun x -> name_incl x (sou base (get_death_place p)))
       empty_default_value
   in
   let match_burial_place p empty_default_value =
-    apply_to_field_value p burial_place_field_name
+    apply_to_field_values p burial_place_field_name
       (fun x -> name_incl x (sou base (get_burial_place p)))
       empty_default_value
   in
@@ -310,8 +335,7 @@ let advanced_search conf base max_answers =
       else acc
     else if
       match_civil_status p
-      && (gets "place" = "" && gets "date2_yyyy" = ""
-          && gets "date1_yyyy" = ""
+      && (getss "place" = [] && gets "date2_yyyy" = "" && gets "date1_yyyy" = ""
           || (match_baptism_date p false || match_baptism_place p false)
           && match_baptism_date p true && match_baptism_place p true
           || (match_birth_date p false || match_birth_place p false)
@@ -372,20 +396,23 @@ let advanced_search conf base max_answers =
   e.g. "Search all Pierre, born in Paris, died in Paris"
 *)
 let searching_fields conf base =
-  let test_string x =
-    match p_getenv conf.env x with
-      Some v -> if v <> "" then true else false
-    | None -> false
-  in
   let test_date x =
     reconstitute_date conf (x ^ "1") <> None
     || reconstitute_date conf (x ^ "2") <> None
   in
   let gets x =
     match p_getenv conf.env x with
-      Some v -> v
-    | None -> ""
+    | Some v when v <> "" -> v
+    | _ ->
+      let rec loop acc i =
+        let k = x ^ "_" ^ string_of_int i in
+        match p_getenv conf.env k with
+        | Some v -> loop (if acc == "" then v else acc ^ " / " ^ v) (i + 1)
+        | None -> acc
+      in
+      loop "" 1
   in
+  let test_string x = gets x <> "" in
   let getd x =
     reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
   in
