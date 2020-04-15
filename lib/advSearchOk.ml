@@ -362,15 +362,21 @@ let advanced_search conf base max_answers =
         | None -> acc
       in loop (pget conf base @@ get_iper sosa_ref) ([], 0)
     | None -> [], 0
-  else if gets "first_name" <> "" || gets "surname" <> "" then
+  else if gets "first_name" <> "" || getss "surname" <> [] then
     let (slist, _) =
       if gets "first_name" <> "" then
         Some.persons_of_fsname conf base base_strings_of_first_name
           (spi_find (persons_of_first_name base)) get_first_name
           (gets "first_name")
       else
-        Some.persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base)) get_surname (gets "surname")
+        let list =
+          List.map
+            (Some.persons_of_fsname conf base base_strings_of_surname
+               (spi_find (persons_of_surname base)) get_surname)
+            (getss "surname")
+        in
+        ( list |> List.map fst |> List.flatten |> List.sort_uniq compare
+        , list |> List.hd |> snd)
     in
     let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
     let rec loop ((_, len) as acc) = function
