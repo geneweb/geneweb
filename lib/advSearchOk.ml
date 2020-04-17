@@ -72,15 +72,25 @@ let advanced_search conf base max_answers =
   let hs = Hashtbl.create 73 in
   let hss = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
+  let getd x =
+    try Hashtbl.find hd x
+    with Not_found ->
+      let v =
+        reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
+      in
+      Hashtbl.add hd x v ;
+      v
+  in
   let gets x =
-    try Hashtbl.find hs x with
-      Not_found ->
+    try Hashtbl.find hs x
+    with Not_found ->
       let v =
         match p_getenv conf.env x with
-          Some v -> v
+        | Some v -> v
         | None -> ""
       in
-      Hashtbl.add hs x v; v
+      Hashtbl.add hs x v ;
+      v
   in
   let getss x =
     let y = gets x in
@@ -114,23 +124,20 @@ let advanced_search conf base max_answers =
     else if authorized_age conf base p then cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
     else false
   in
+  let do_compare p y get cmp =
+    let s = abbrev_lower @@ sou base @@ get p in
+    List.exists (fun s' -> cmp (abbrev_lower s') s) y
+  in
   let apply_to_field_values p x get cmp empty_default_value =
     let y = getss x in
     if y = [] then empty_default_value
     else if authorized_age conf base p
-    then let s = abbrev_lower @@ sou base @@ get p in List.exists (fun s' -> cmp (abbrev_lower s') s) y
+    then do_compare p y get cmp
     else false
   in
   (* Check if the date matches with the person event. *)
   let match_date p x df empty_default_value =
-    let (d1, d2) =
-      try Hashtbl.find hd x with
-        Not_found ->
-          let v =
-            reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
-          in
-          Hashtbl.add hd x v; v
-    in
+    let (d1, d2) = getd x in
     authorized_age conf base p
     && match d1, d2 with
       | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
@@ -254,63 +261,41 @@ let advanced_search conf base max_answers =
       empty_default_value
   in
   let match_marriage p x y empty_default_value =
-    let (d1, d2) =
-      try Hashtbl.find hd x with
-        Not_found ->
-          let v =
-            reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
-          in
-          Hashtbl.add hd x v; v
-    in
-    let y = abbrev_lower @@ gets y in
+    let (d1, d2) = getd x in
+    let y = getss y in
     let test_date_place df =
       Array.exists begin fun ifam ->
         let fam = foi base ifam in
-        let father = poi base (get_father fam) in
-        let mother = poi base (get_mother fam) in
-        if authorized_age conf base father &&
-           authorized_age conf base mother
-        then
-          if y = "" then df (Adef.od_of_cdate (get_marriage fam))
-          else
-            string_incl y (abbrev_lower @@ sou base (get_marriage_place fam))
-            && df (Adef.od_of_cdate (get_marriage fam))
+        let sp = poi base @@ Gutil.spouse (get_iper p) fam in
+        if authorized_age conf base sp
+        then df fam && (y = [] || do_compare fam y get_marriage_place cmp_place)
         else false
       end (get_family p)
     in
     match d1, d2 with
     | Some d1, Some d2 ->
-        test_date_place
-          (function
-             Some (Dgreg (_, _) as d) ->
-               if Date.compare_date d d1 < 0 then false
-               else if Date.compare_date d2 d < 0 then false
-               else true
-           | _ -> false)
+      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
+        | Some (Dgreg (_, _) as d) ->
+          if Date.compare_date d d1 < 0 then false
+          else if Date.compare_date d2 d < 0 then false
+          else true
+        | _ -> false
+      end
     | Some d1, _ ->
-        test_date_place
-          (function
-             Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-               if Date.compare_date d d1 < 0 then false else true
-           | _ -> false)
+      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
+        | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+          if Date.compare_date d d1 < 0 then false else true
+        | _ -> false
+      end
     | _, Some d2 ->
-        test_date_place
-          (function
-             Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-               if Date.compare_date d d2 > 0 then false else true
-           | _ -> false)
+      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
+        | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+          if Date.compare_date d d2 > 0 then false else true
+        | _ -> false
+      end
     | _ ->
-        if y = "" then empty_default_value
-        else
-          Array.exists begin fun ifam ->
-            let fam = foi base ifam in
-            let father = poi base (get_father fam) in
-            let mother = poi base (get_mother fam) in
-            if authorized_age conf base father
-            && authorized_age conf base mother
-            then string_incl y (abbrev_lower @@ sou base (get_marriage_place fam))
-            else false
-          end (get_family p)
+        if y = [] then empty_default_value
+        else test_date_place (fun _ -> true)
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status p =
