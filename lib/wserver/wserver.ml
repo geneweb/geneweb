@@ -8,6 +8,8 @@ type httpStatus =
   | Forbidden (* 403 *)
   | Not_Found (* 404 *)
 
+let connection_closed = ref false
+
 let eprintf = Printf.eprintf
 
 let sock_in = ref "wserver.sin"
@@ -20,6 +22,11 @@ let wserver_sock = ref Unix.stdout
 let wsocket () = !wserver_sock
 
 let wserver_oc = ref stdout
+
+let close_connection () =
+  (try Unix.close !wserver_sock with _ -> ()) ;
+  (try close_out !wserver_oc with _ -> ());
+  connection_closed := true
 
 let printnl fmt =
   Printf.ksprintf
@@ -464,6 +471,9 @@ let skip_possible_remaining_chars fd =
     in
     loop ()
   with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
+
+let skip_possible_remaining_chars fd =
+  if not !connection_closed then skip_possible_remaining_chars fd
 
 let check_stopping () =
   if Sys.file_exists !stop_server then
