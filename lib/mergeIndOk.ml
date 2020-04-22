@@ -429,7 +429,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
       let p2_family = get_family p2 in
       let warning _ = () in
       MergeInd.reparent_ind base warning sp.key_index ip2;
-      let p = UpdateIndOk.effective_mod conf base sp in
+      let p = UpdateIndOk.effective_mod ~skip_conflict:ip2 conf base sp in
       let p = redirect_relations_of_added_related base p ip2 rel_chil in
       redirect_added_families base p ip2 p2_family;
       let warning _ = () in
