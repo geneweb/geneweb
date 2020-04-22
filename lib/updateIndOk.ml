@@ -928,7 +928,7 @@ let pwitnesses_of pevents =
     [] pevents
 
 (* sp.death *)
-let effective_mod conf base sp =
+let effective_mod ?skip_conflict conf base sp =
   let pi = sp.key_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
@@ -937,8 +937,13 @@ let effective_mod conf base sp =
   let oocc = get_occ op in
   if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
   else
-    begin let ipl = Gutil.person_ht_find_all base key in
-      check_conflict conf base sp ipl; rename_image_file conf base op sp
+    begin
+      let ipl = match skip_conflict with
+        | Some i -> List.filter ((<>) i) @@ Gutil.person_ht_find_all base key
+        | None -> Gutil.person_ht_find_all base key
+      in
+      check_conflict conf base sp ipl ;
+      rename_image_file conf base op sp
     end;
   (* Si on modifie la personne pour lui ajouter un nom/prénom, alors *)
   (* il faut remettre le compteur du nombre de personne à jour.      *)
