@@ -26,6 +26,8 @@ val f :
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)
 
+val close_connection : unit -> unit
+
 val printf : ('a, unit, string, unit) format4 -> 'a
     (* To be called to print page contents. *)
 
