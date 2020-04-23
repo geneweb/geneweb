@@ -125,15 +125,19 @@ let advanced_search conf base max_answers =
     else false
   in
   let do_compare p y get cmp =
-    let s = abbrev_lower @@ sou base @@ get p in
+    let s = abbrev_lower @@ get p in
     List.exists (fun s' -> cmp (abbrev_lower s') s) y
   in
-  let apply_to_field_values p x get cmp empty_default_value =
+  let apply_to_field_values_raw p x get cmp empty_default_value =
     let y = getss x in
     if y = [] then empty_default_value
     else if authorized_age conf base p
     then do_compare p y get cmp
     else false
+  in
+  let apply_to_field_values p x get cmp empty_default_value =
+    let get p = sou base @@ get p in
+    apply_to_field_values_raw p x get cmp empty_default_value
   in
   (* Check if the date matches with the person event. *)
   let match_date p x df empty_default_value =
@@ -244,12 +248,10 @@ let advanced_search conf base max_answers =
       p "occu" get_occupation string_incl empty_default_value
   in
   let match_first_name p empty_default_value =
-    apply_to_field_value_raw p "first_name"
-      (fun x -> (abbrev_lower x = abbrev_lower (p_first_name base p))) empty_default_value
+    apply_to_field_values_raw p "first_name" (p_first_name base) (=) empty_default_value
   in
   let match_surname p empty_default_value =
-    apply_to_field_value_raw p "surname"
-      (fun x -> (abbrev_lower x = abbrev_lower (p_surname base p))) empty_default_value
+    apply_to_field_values_raw p "surname" (p_surname base) (=) empty_default_value
   in
   let match_married p empty_default_value =
     apply_to_field_value_raw p "married"
@@ -268,7 +270,8 @@ let advanced_search conf base max_answers =
         let fam = foi base ifam in
         let sp = poi base @@ Gutil.spouse (get_iper p) fam in
         if authorized_age conf base sp
-        then df fam && (y = [] || do_compare fam y get_marriage_place cmp_place)
+        then df fam && (y = []
+                        || do_compare fam y (fun f -> sou base @@ get_marriage_place f) cmp_place)
         else false
       end (get_family p)
     in
