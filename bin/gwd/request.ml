@@ -72,7 +72,8 @@ let make_senv conf base =
 let family_m conf base =
   let open RequestHandler in
   let handler = H.handler in
-<<<<<<< HEAD
+  if conf.wizard || conf.friend ||
+      List.assoc_opt "visitor_access" conf.base_env <> Some "no" then
   let p =
     match p_getenv conf.env "m" with
     | None -> handler._no_mode
@@ -177,186 +178,77 @@ let family_m conf base =
       | "VIEW_WIZNOTES" -> handler.view_wiznotes
       | "WIZNOTES" -> handler.wiznotes
       | "WIZNOTES_SEARCH" -> handler.wiznotes_search
-=======
-  if conf.wizard || conf.friend ||
-      List.assoc_opt "visitor_access" conf.base_env <> Some "no" then
-    let p =
-      match p_getenv conf.env "m" with
-      | None -> handler._no_mode
-      | Some s -> match s with
-        | "A" -> handler.a
-        | "ADD_FAM" -> handler.add_fam
-        | "ADD_FAM_OK" -> handler.add_fam_ok
-        | "ADD_IND" -> handler.add_ind
-        | "ADD_IND_OK" -> handler.add_ind_ok
-        | "ADD_PAR" -> handler.add_par
-        | "ADD_PAR_OK" -> handler.add_par_ok
-        | "ANM" -> handler.anm
-        | "AN" -> handler.an
-        | "AD" -> handler.ad
-        | "AM" -> handler.am
-        | "AS_OK" -> handler.as_ok
-        | "B" -> handler.b
-        | "C" -> handler.c
-        | "CAL" -> handler.cal
-        | "CHG_CHN" -> handler.chg_chn
-        | "CHG_CHN_OK" -> handler.chg_chn_ok
-        | "CHG_EVT_IND_ORD" -> handler.chg_evt_ind_ord
-        | "CHG_EVT_IND_ORD_OK" -> handler.chg_evt_ind_ord_ok
-        | "CHG_EVT_FAM_ORD" -> handler.chg_evt_fam_ord
-        | "CHG_EVT_FAM_ORD_OK" -> handler.chg_evt_fam_ord_ok
-        | "CHG_FAM_ORD" -> handler.chg_fam_ord
-        | "CHG_FAM_ORD_OK" -> handler.chg_fam_ord_ok
-        | "CONN_WIZ" -> handler.conn_wiz
-        | "D" -> handler.d
-        | "DAG" -> handler.dag
-        | "DEL_FAM" -> handler.del_fam
-        | "DEL_FAM_OK" -> handler.del_fam_ok
-        | "DEL_IMAGE" -> handler.del_image
-        | "DEL_IMAGE_OK" -> handler.del_image_ok
-        | "DEL_IND" -> handler.del_ind
-        | "DEL_IND_OK" -> handler.del_ind_ok
-        | "F" -> handler.f
-        | "FORUM" -> handler.forum
-        | "FORUM_ADD" -> handler.forum_add
-        | "FORUM_ADD_OK" -> handler.forum_add_ok
-        | "FORUM_DEL" -> handler.forum_del
-        | "FORUM_P_P" -> handler.forum_p_p
-        | "FORUM_SEARCH" -> handler.forum_search
-        | "FORUM_VAL" -> handler.forum_val
-        | "FORUM_VIEW" -> handler.forum_view
-        | "H" -> handler.h
-        | "HIST" -> handler.hist
-        | "HIST_CLEAN" -> handler.hist_clean
-        | "HIST_CLEAN_OK" -> handler.hist_clean_ok
-        | "HIST_DIFF" -> handler.hist_diff
-        | "HIST_SEARCH" -> handler.hist_search
-        | "IMH" -> handler.imh
-        | "INV_FAM" -> handler.inv_fam
-        | "INV_FAM_OK" -> handler.inv_fam_ok
-        | "KILL_ANC" -> handler.kill_anc
-        | "LB" -> handler.lb
-        | "LD" -> handler.ld
-        | "LINKED" -> handler.linked
-        | "LL" -> handler.ll
-        | "LM" -> handler.lm
-        | "MISC_NOTES" -> handler.misc_notes
-        | "MISC_NOTES_SEARCH" -> handler.misc_notes_search
-        | "MOD_DATA" -> handler.mod_data
-        | "MOD_DATA_OK" -> handler.mod_data_ok
-        | "MOD_FAM" -> handler.mod_fam
-        | "MOD_FAM_OK" -> handler.mod_fam_ok
-        | "MOD_IND" -> handler.mod_ind
-        | "MOD_IND_OK" -> handler.mod_ind_ok
-        | "MOD_NOTES" -> handler.mod_notes
-        | "MOD_NOTES_OK" -> handler.mod_notes_ok
-        | "MOD_WIZNOTES" -> handler.mod_wiznotes
-        | "MOD_WIZNOTES_OK" -> handler.mod_wiznotes_ok
-        | "MRG" -> handler.mrg
-        | "MRG_DUP" -> handler.mrg_dup
-        | "MRG_DUP_IND_Y_N" -> handler.mrg_dup_ind_y_n
-        | "MRG_DUP_FAM_Y_N" -> handler.mrg_dup_fam_y_n
-        | "MRG_FAM" -> handler.mrg_fam
-        | "MRG_FAM_OK" -> handler.mrg_fam_ok
-        | "MRG_MOD_FAM_OK" -> handler.mrg_mod_fam_ok
-        | "MRG_IND" -> handler.mrg_ind
-        | "MRG_IND_OK" -> handler.mrg_ind_ok
-        | "MRG_MOD_IND_OK" -> handler.mrg_mod_ind_ok
-        | "N" -> handler.n
-        | "NG" -> handler.ng
-        | "NOTES" -> handler.notes
-        | "OA" -> handler.oa
-        | "OE" -> handler.oe
-        | "P" -> handler.p
-        | "POP_PYR" -> handler.pop_pyr
-        | "PS" -> handler.ps
-        | "R" -> handler.r
-        | "REQUEST" -> handler.request
-        | "RL" -> handler.rl
-        | "RLM" -> handler.rlm
-        | "S" -> handler.s
-        | "SND_IMAGE" -> handler.snd_image
-        | "SND_IMAGE_OK" -> handler.snd_image_ok
-        | "SRC" -> handler.src
-        | "STAT" -> handler.stat
-        | "CHANGE_WIZ_VIS" -> handler.change_wiz_vis
-        | "TT" -> handler.tt
-        | "U" -> handler.u
-        | "VIEW_WIZNOTES" -> handler.view_wiznotes
-        | "WIZNOTES" -> handler.wiznotes
-        | "WIZNOTES_SEARCH" -> handler.wiznotes_search
->>>>>>> Add visitor_access control before allowing request
 #ifdef API
-        | mode
-          when
-            try
-              String.get mode 0 = 'A' && String.get mode 1 = 'P' &&
-              String.get mode 2 = 'I' && String.get mode 3 = '_'
-            with _ -> false ->
-          (* On passe en mode API, i.e. que les exceptions API sont levées. *)
-          let () = Api_conf.set_mode_api () in
-          begin match mode with
-            | "API_ALL_PERSONS" -> handler.api_all_persons
-            | "API_ALL_FAMILIES" -> handler.api_all_families
-            | "API_BASE_WARNINGS" -> handler.api_base_warnings
-            | "API_CLOSE_PERSONS" -> handler.api_close_persons
-            | "API_CPL_REL" -> handler.api_cpl_rel
-            | "API_GRAPH_ASC" -> handler.api_graph_asc
-            | "API_GRAPH_ASC_LIA" -> handler.api_graph_asc_lia
-            | "API_GRAPH_DESC" -> handler.api_graph_desc
-            | "API_GRAPH_REL" -> handler.api_graph_rel
-            | "API_FIRST_AVAILABLE_PERSON" -> handler.api_first_available_person
-            | "API_FIND_SOSA" -> handler.api_find_sosa
-            | "API_INFO_BASE" -> handler.api_info_base
-            | "API_INFO_IND" -> handler.api_info_ind
-            | "API_IMAGE" -> handler.api_image
-            | "API_IMAGE_EXT" -> handler.api_image_ext
-            | "API_IMAGE_ALL" -> handler.api_image_all
-            | "API_IMAGE_PERSON" -> handler.api_image_person
-            | "API_IMAGE_UPDATE" -> handler.api_image_update
-            | "API_LAST_MODIFIED_PERSONS" -> handler.api_last_modified_persons
-            | "API_LAST_VISITED_PERSONS" -> handler.api_last_visited_persons
-            | "API_LIST_PERSONS" -> handler.api_list_persons
-            | "API_LOOP_BASE" -> handler.api_loop_base
-            | "API_MAX_ANCESTORS" -> handler.api_max_ancestors
-            | "API_NB_ANCESTORS" -> handler.api_nb_ancestors
-            | "API_NOTIFICATION_BIRTHDAY" -> handler.api_notification_birthday
-            | "API_REF_PERSON_FROM_ID" -> handler.api_ref_person_from_id
-            | "API_REMOVE_IMAGE_EXT" -> handler.api_remove_image_ext
-            | "API_REMOVE_IMAGE_EXT_ALL" -> handler.api_remove_image_ext_all
-            | "API_SEARCH" -> handler.api_search
-            | "API_GRAPH_TREE_V2" -> handler.api_graph_tree_v2
-            | "API_PERSON_TREE" -> handler.api_person_tree
-            | "API_FICHE_PERSON" -> handler.api_fiche_person
-            | "API_AUTO_COMPLETE" -> handler.api_auto_complete
-            | "API_GET_CONFIG" -> handler.api_get_config
-            | "API_PERSON_SEARCH_LIST" -> handler.api_person_search_list
-            | "API_GET_PERSON_SEARCH_INFO" -> handler.api_get_person_search_info
-            | "API_ADD_CHILD" -> handler.api_add_child
-            | "API_ADD_CHILD_OK" -> handler.api_add_child_ok
-            | "API_ADD_FAMILY" -> handler.api_add_family
-            | "API_ADD_FAMILY_OK" -> handler.api_add_family_ok
-            | "API_ADD_FIRST_FAM_OK" -> handler.api_add_first_fam_ok
-            | "API_ADD_PARENTS" -> handler.api_add_parents
-            | "API_ADD_PARENTS_OK" -> handler.api_add_parents_ok
-            | "API_ADD_PERSON_OK" -> handler.api_add_person_ok
-            | "API_ADD_PERSON_START_OK" -> handler.api_add_person_start_ok
-            | "API_ADD_SIBLING" -> handler.api_add_sibling
-            | "API_ADD_SIBLING_OK" -> handler.api_add_sibling_ok
-            | "API_EDIT_FAMILY_REQUEST" -> handler.api_edit_family_request
-            | "API_EDIT_FAMILY" -> handler.api_edit_family
-            | "API_EDIT_FAMILY_OK" -> handler.api_edit_family_ok
-            | "API_EDIT_PERSON" -> handler.api_edit_person
-            | "API_EDIT_PERSON_OK" -> handler.api_edit_person_ok
-            | "API_DEL_FAMILY_OK" -> handler.api_del_family_ok
-            | "API_DEL_PERSON_OK" -> handler.api_del_person_ok
-            | "API_LINK_TREE" -> handler.api_link_tree
-            | "API_STATS" -> handler.api_stats
-            | "API_SELECT_EVENTS" -> handler.api_select_events
-            | unknown -> handler.fallback unknown
-          end
+      | mode
+        when
+          try
+            String.get mode 0 = 'A' && String.get mode 1 = 'P' &&
+            String.get mode 2 = 'I' && String.get mode 3 = '_'
+          with _ -> false ->
+        (* On passe en mode API, i.e. que les exceptions API sont levées. *)
+        let () = Api_conf.set_mode_api () in
+        begin match mode with
+          | "API_ALL_PERSONS" -> handler.api_all_persons
+          | "API_ALL_FAMILIES" -> handler.api_all_families
+          | "API_BASE_WARNINGS" -> handler.api_base_warnings
+          | "API_CLOSE_PERSONS" -> handler.api_close_persons
+          | "API_CPL_REL" -> handler.api_cpl_rel
+          | "API_GRAPH_ASC" -> handler.api_graph_asc
+          | "API_GRAPH_ASC_LIA" -> handler.api_graph_asc_lia
+          | "API_GRAPH_DESC" -> handler.api_graph_desc
+          | "API_GRAPH_REL" -> handler.api_graph_rel
+          | "API_FIRST_AVAILABLE_PERSON" -> handler.api_first_available_person
+          | "API_FIND_SOSA" -> handler.api_find_sosa
+          | "API_INFO_BASE" -> handler.api_info_base
+          | "API_INFO_IND" -> handler.api_info_ind
+          | "API_IMAGE" -> handler.api_image
+          | "API_IMAGE_EXT" -> handler.api_image_ext
+          | "API_IMAGE_ALL" -> handler.api_image_all
+          | "API_IMAGE_PERSON" -> handler.api_image_person
+          | "API_IMAGE_UPDATE" -> handler.api_image_update
+          | "API_LAST_MODIFIED_PERSONS" -> handler.api_last_modified_persons
+          | "API_LAST_VISITED_PERSONS" -> handler.api_last_visited_persons
+          | "API_LIST_PERSONS" -> handler.api_list_persons
+          | "API_LOOP_BASE" -> handler.api_loop_base
+          | "API_MAX_ANCESTORS" -> handler.api_max_ancestors
+          | "API_NB_ANCESTORS" -> handler.api_nb_ancestors
+          | "API_NOTIFICATION_BIRTHDAY" -> handler.api_notification_birthday
+          | "API_REF_PERSON_FROM_ID" -> handler.api_ref_person_from_id
+          | "API_REMOVE_IMAGE_EXT" -> handler.api_remove_image_ext
+          | "API_REMOVE_IMAGE_EXT_ALL" -> handler.api_remove_image_ext_all
+          | "API_SEARCH" -> handler.api_search
+          | "API_GRAPH_TREE_V2" -> handler.api_graph_tree_v2
+          | "API_PERSON_TREE" -> handler.api_person_tree
+          | "API_FICHE_PERSON" -> handler.api_fiche_person
+          | "API_AUTO_COMPLETE" -> handler.api_auto_complete
+          | "API_GET_CONFIG" -> handler.api_get_config
+          | "API_PERSON_SEARCH_LIST" -> handler.api_person_search_list
+          | "API_GET_PERSON_SEARCH_INFO" -> handler.api_get_person_search_info
+          | "API_ADD_CHILD" -> handler.api_add_child
+          | "API_ADD_CHILD_OK" -> handler.api_add_child_ok
+          | "API_ADD_FAMILY" -> handler.api_add_family
+          | "API_ADD_FAMILY_OK" -> handler.api_add_family_ok
+          | "API_ADD_FIRST_FAM_OK" -> handler.api_add_first_fam_ok
+          | "API_ADD_PARENTS" -> handler.api_add_parents
+          | "API_ADD_PARENTS_OK" -> handler.api_add_parents_ok
+          | "API_ADD_PERSON_OK" -> handler.api_add_person_ok
+          | "API_ADD_PERSON_START_OK" -> handler.api_add_person_start_ok
+          | "API_ADD_SIBLING" -> handler.api_add_sibling
+          | "API_ADD_SIBLING_OK" -> handler.api_add_sibling_ok
+          | "API_EDIT_FAMILY_REQUEST" -> handler.api_edit_family_request
+          | "API_EDIT_FAMILY" -> handler.api_edit_family
+          | "API_EDIT_FAMILY_OK" -> handler.api_edit_family_ok
+          | "API_EDIT_PERSON" -> handler.api_edit_person
+          | "API_EDIT_PERSON_OK" -> handler.api_edit_person_ok
+          | "API_DEL_FAMILY_OK" -> handler.api_del_family_ok
+          | "API_DEL_PERSON_OK" -> handler.api_del_person_ok
+          | "API_LINK_TREE" -> handler.api_link_tree
+          | "API_STATS" -> handler.api_stats
+          | "API_SELECT_EVENTS" -> handler.api_select_events
+          | unknown -> handler.fallback unknown
+        end
 #endif
-        | unknown -> handler.fallback unknown
+      | unknown -> handler.fallback unknown
     in
     p handler conf base
   else
