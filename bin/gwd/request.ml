@@ -72,6 +72,8 @@ let make_senv conf base =
 let family_m conf base =
   let open RequestHandler in
   let handler = H.handler in
+  if conf.wizard || conf.friend ||
+      List.assoc_opt "visitor_access" conf.base_env <> Some "no" then
   let p =
     match p_getenv conf.env "m" with
     | None -> handler._no_mode
@@ -247,8 +249,17 @@ let family_m conf base =
         end
 #endif
       | unknown -> handler.fallback unknown
-  in
-  p handler conf base
+    in
+    p handler conf base
+  else
+    begin
+      let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+      Hutil.rheader conf title;
+      Wserver.printf "<ul>\n<li>\n%s \"%s\" %s.</li>\n</ul>"
+        (Utf8.capitalize (transl conf "base")) conf.bname
+        (Utf8.capitalize (transl conf "reserved to friends or wizards"));
+      Hutil.trailer conf
+    end
 
 let family_m_nobase conf =
 #ifdef API

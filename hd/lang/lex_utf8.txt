@@ -2799,6 +2799,10 @@ pt: bar mitzvah
 ru: бар-мицва
 sv: Bar Mitzvah
 
+    base
+en: base
+fr: base
+
     base index notes
 af: notas
 ar: بطاقات
@@ -11907,6 +11911,10 @@ co: caccià l’ultimu modulu aghjuntu
 en: remove the last added module
 fr: retirer le dernier module ajouté
 pt: remover o último módulo adicionado
+
+    reserved to friends or wizards
+en: reserved to friends or wizards
+fr: réservée aux amis et magiciens
 
     reset to
 co: risturà
