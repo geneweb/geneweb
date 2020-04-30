@@ -2558,7 +2558,6 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | _ -> raise Not_found
       end
   | "number_of_descendants" :: sl ->
-      (* FIXME: what is the difference with number_of_descendants_at_level??? *)
       begin match get_env "level" env with
         Vint i ->
           begin match get_env "desc_level_table" env with
@@ -2574,18 +2573,23 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           end
       | _ -> raise Not_found
       end
-  | "number_of_descendants_at_level" :: sl ->
+  | "number_of_persons_at_level" :: sl ->
       begin match get_env "level" env with
         Vint i ->
           begin match get_env "desc_level_table" env with
             Vdesclevtab t ->
             let m = fst (Lazy.force t) in
-            let cnt =
+            let cnt1 =
               Gwdb.Collection.fold (fun cnt ip ->
                   if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
                 ) 0 (Gwdb.ipers base)
-              in
-              VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
+            in
+            let cnt0 =
+              Gwdb.Collection.fold (fun cnt ip ->
+                  if Gwdb.Marker.get m ip <= i-1 then cnt + 1 else cnt
+                ) 0 (Gwdb.ipers base)
+            in
+              VVstring (eval_num conf (Sosa.of_int (cnt1 - cnt0)) sl)
           | _ -> raise Not_found
           end
       | _ -> raise Not_found
