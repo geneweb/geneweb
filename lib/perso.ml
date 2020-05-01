@@ -4548,13 +4548,19 @@ and obsolete_eval conf base env (p, _) loc =
 
 let eval_transl conf base env upp s c =
   match c with
-    "n" | "s" | "w" | "f" | "c" ->
+  | "x" | "count" | "n" | "sex" | "s" | "w"
+  | "f" | "nb_families" | "c" | "nb_children" ->
       let n =
         match c with
-          "n" ->
+        | "x" | "count" ->
+            begin match get_env "count" env with
+              Vcnt x -> !x
+            | _ -> 1
+            end
+        | "n" | "sex" ->
             (* replaced by %apply;nth([...],sex) *)
             begin match get_env "p" env with
-              Vind p -> 1 - index_of_sex (get_sex p)
+              Vind p -> index_of_sex (get_sex p)
             | _ -> 2
             end
         | "s" ->
@@ -4571,12 +4577,12 @@ let eval_transl conf base env upp s c =
                 if Array.length (get_witnesses fam) <= 1 then 0 else 1
             | _ -> 0
             end
-        | "f" ->
+        | "f" | "nb_families" ->
             begin match get_env "p" env with
               Vind p -> if Array.length (get_family p) <= 1 then 0 else 1
             | _ -> 0
             end
-        | "c" ->
+        | "c" | "nb_children" ->
             begin match get_env "fam" env with
               Vfam (_, fam, _, _) ->
                 if Array.length (get_children fam) <= 1 then 0 else 1

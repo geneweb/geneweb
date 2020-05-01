@@ -88,10 +88,16 @@ let rec transl_num_index =
     [< ''0'..'9' as c >] -> String.make 1 c ^ transl_num_index strm__
   | [< >] -> ""
 
+let rec transl_var_index =
+  parser
+    [< ''a'..'z' as c >] -> String.make 1 c ^ transl_var_index strm__
+  | [< ''_' as c >] -> String.make 1 c ^ transl_var_index strm__
+  | [< >] -> ""
+
 let transl_index =
   parser
     [< ''0'..'9' as c >] -> String.make 1 c ^ transl_num_index strm__
-  | [< ''a'..'z' as c >] -> String.make 1 c
+  | [< ''a'..'z' as c >] -> String.make 1 c ^ transl_var_index strm__
   | [< >] -> ""
 
 let lexicon_word =
