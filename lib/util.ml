@@ -1352,7 +1352,7 @@ let url_no_index conf base =
       function
         [] -> []
       | ("opt", "no_index") :: l -> loop l
-      | (("dsrc" | "escache" | "oc" | "templ"), _) :: l -> loop l
+      | (("dsrc" | "escache" | "templ"), _) :: l -> loop l
       | ("i", v) :: l -> new_env "i" v (fun x -> x) l
       | ("ei", v) :: l -> new_env "ei" v (fun x -> "e" ^ x) l
       | (k, v) :: l when String.length k = 2 && k.[0] = 'i' ->
@@ -1389,7 +1389,9 @@ let url_no_index conf base =
   let suff =
     List.fold_right
       (fun (x, v) s ->
-         let sep = if s = "" then "" else "&" in x ^ "=" ^ v ^ sep ^ s)
+        if v != "" then
+          let sep = if s = "" then "" else "&" in x ^ "=" ^ v ^ sep ^ s
+        else s )
       (("lang", conf.lang) :: env) ""
   in
   if conf.b_arg_for_basename then addr ^ "?b=" ^ conf.bname ^ "&" ^ suff
