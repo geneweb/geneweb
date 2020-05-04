@@ -23,10 +23,30 @@ let wsocket () = !wserver_sock
 
 let wserver_oc = ref stdout
 
+let wflush () = flush !wserver_oc
+
+let skip_possible_remaining_chars fd =
+  let b = Bytes.create 3 in
+  try
+    let rec loop () =
+      match Unix.select [fd] [] [] 5.0 with
+      | [_], [], [] ->
+        let len = Unix.read fd b 0 (Bytes.length b) in
+        if len = Bytes.length b then loop ()
+      | _ -> ()
+    in
+    loop ()
+  with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
+
 let close_connection () =
-  (try Unix.close !wserver_sock with _ -> ()) ;
-  (try close_out !wserver_oc with _ -> ());
-  connection_closed := true
+  if not !connection_closed then begin
+    wflush () ;
+    Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND ;
+    skip_possible_remaining_chars !wserver_sock ;
+    (* Closing the channel flushes the data and closes the underlying file descriptor *)
+    close_out !wserver_oc ;
+    connection_closed := true
+  end
 
 let printnl fmt =
   Printf.ksprintf
@@ -66,7 +86,6 @@ let printf fmt =
       printing_state := Contents
     end;
   Printf.ksprintf (fun s -> output_string !wserver_oc s) fmt
-let wflush () = flush !wserver_oc
 
 let print_string s =
   if !printing_state <> Contents then
@@ -460,19 +479,6 @@ let wait_and_compact s =
     end
 
 let skip_possible_remaining_chars fd =
-  let b = Bytes.create 3 in
-  try
-    let rec loop () =
-      match Unix.select [fd] [] [] 5.0 with
-        [_], [], [] ->
-          let len = Unix.read fd b 0 (Bytes.length b) in
-          if len = Bytes.length b then loop ()
-      | _ -> ()
-    in
-    loop ()
-  with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
-
-let skip_possible_remaining_chars fd =
   if not !connection_closed then skip_possible_remaining_chars fd
 
 let check_stopping () =
@@ -498,20 +504,12 @@ let accept_connection tmout max_clients callback s =
           Unix.close s;
           wserver_sock := t;
           wserver_oc := Unix.out_channel_of_descr t;
-          (*
-             j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
-                        try Unix.close t with _ -> ();
-          *)
           treat_connection tmout callback addr t
         with
           Unix.Unix_error (Unix.ECONNRESET, "read", _) -> ()
         | exc -> try print_err_exc exc; flush stderr with _ -> ()
         end;
-        (try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ());
-        (try Unix.shutdown Unix.stdout Unix.SHUTDOWN_SEND with _ -> ());
-        skip_possible_remaining_chars t;
-        (try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ());
-        (try Unix.shutdown Unix.stdin Unix.SHUTDOWN_RECEIVE with _ -> ());
+          close_connection () ;
         exit 0
     | Some id ->
         Unix.close t;
