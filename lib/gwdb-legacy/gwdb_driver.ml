@@ -674,7 +674,7 @@ let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
 let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
 
 let read_or_create_visible base =
-  let fname = Filename.concat (bname base) "restrict" in
+  let fname = Filename.concat base.data.bdir "restrict" in
   let visible =
     try
       let ic = Secure.open_in fname in
@@ -687,7 +687,7 @@ let read_or_create_visible base =
   visible
 
 let base_visible_write base =
-  let fname = Filename.concat (bname base) "restrict" in
+  let fname = Filename.concat base.data.bdir "restrict" in
   match !visible_ref with
   | Some visible ->
     let oc = Secure.open_out fname in
