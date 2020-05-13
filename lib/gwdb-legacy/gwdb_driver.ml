@@ -676,12 +676,16 @@ let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
 let read_or_create_visible base =
   let fname = Filename.concat base.data.bdir "restrict" in
   let visible =
-    try
+    if Sys.file_exists fname then
       let ic = Secure.open_in fname in
-      let visible = input_value ic in
-        close_in ic ;
-        visible
-    with Sys_error _ -> Hashtbl.create (nb_of_persons base)
+      let visible =
+        if Mutil.check_magic Mutil.executable_magic ic
+        then input_value ic
+        else Hashtbl.create (nb_of_persons base)
+      in
+      close_in ic ;
+      visible
+    else Hashtbl.create (nb_of_persons base)
   in
   visible_ref := Some visible ;
   visible
@@ -691,6 +695,7 @@ let base_visible_write base =
   match !visible_ref with
   | Some visible ->
     let oc = Secure.open_out fname in
+    output_string oc Mutil.executable_magic ;
     output_value oc visible;
     close_out oc
   | None -> ()
