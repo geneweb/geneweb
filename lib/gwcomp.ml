@@ -556,7 +556,7 @@ let get_pevent_name str l =
 
 let get_fevent_name str l =
   match l with
-    "#marr" :: l' -> Efam_Marriage, l'
+  | "#marr" :: l' -> Efam_Marriage, l'
   | "#nmar" :: l' -> Efam_NoMarriage, l'
   | "#nmen" :: l' -> Efam_NoMention, l'
   | "#enga" :: l' -> Efam_Engage, l'
@@ -566,10 +566,11 @@ let get_fevent_name str l =
   | "#marb" :: l' -> Efam_MarriageBann, l'
   | "#marc" :: l' -> Efam_MarriageContract, l'
   | "#marl" :: l' -> Efam_MarriageLicense, l'
+  | "#pacs" :: l' -> Efam_PACS, l'
   | "#resi" :: l' -> Efam_Residence, l'
   | s :: l' ->
-      if s.[0] = '#' then Efam_Name (String.sub s 1 (String.length s - 1)), l'
-      else failwith str
+    if s.[0] = '#' then Efam_Name (String.sub s 1 (String.length s - 1)), l'
+    else failwith str
   | _ -> failwith str
 
 let get_optional_event_date l =
