@@ -35,6 +35,13 @@
   (libraries unix str camlp5.gramlib %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )
 
+(executable
+  (package geneweb-bin)
+  (public_name gwfixbase)
+  (modules gwfixbase)
+  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb-lib)
+)
+
 (include_subdirs unqualified)
 
 (library
