@@ -24,6 +24,7 @@ EXE = \
 	bin/gwc.exe \
 	bin/gwd.exe \
 	bin/gwdiff.exe \
+	bin/gwfixbase.exe \
 	bin/gwu.exe \
 	bin/setup.exe \
 	bin/update_nldb.exe \
@@ -161,14 +162,15 @@ distrib: exe
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "127.0.0.1" > $(DISTRIB_DIR)/gw/only.txt
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
-	cp $(BUILD_DISTRIB_DIR)gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
+	cp $(BUILD_DISTRIB_DIR)connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
 	cp $(BUILD_DISTRIB_DIR)consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
 	cp $(BUILD_DISTRIB_DIR)ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT);
-	cp $(BUILD_DISTRIB_DIR)connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT);
 	cp $(BUILD_DISTRIB_DIR)setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
 	cp $(BUILD_DISTRIB_DIR)update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
 	mkdir $(DISTRIB_DIR)/gw/setup
