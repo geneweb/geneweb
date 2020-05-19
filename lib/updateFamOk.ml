@@ -340,7 +340,7 @@ let reconstitute_from_fevents nsck empty_string fevents =
     | None -> found_marriage := e
     | Some ((NoMention|Residence), _, _, _, _, _)
       when kind <> NoMention && kind <> Residence -> found_marriage := e
-    | Some (Married, _, _, _, _, _) -> ()
+    | Some (Married, _, _, _, _, _) when kind <> Married -> ()
     | _ -> if kind = Married then found_marriage := e
   in
   let mk_div kind =
@@ -357,7 +357,7 @@ let reconstitute_from_fevents nsck empty_string fevents =
     | [] -> ()
     | evt :: l -> match evt.efam_name with
       | Efam_Engage -> mk_marr evt Engaged ; loop l
-      | Efam_Marriage -> mk_marr evt Married
+      | Efam_Marriage -> mk_marr evt Married ; loop l
       | Efam_MarriageContract -> mk_marr evt MarriageContract ; loop l
       | Efam_NoMention -> mk_marr evt NoMention ; loop l
       | Efam_MarriageBann -> mk_marr evt MarriageBann ; loop l
