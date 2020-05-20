@@ -517,15 +517,15 @@ let display_descendant_index conf base max_level ancestor =
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   let list =
-    Gwdb.Collection.fold begin fun acc p ->
-      (* FIXME: pget *)
+    Gwdb.Collection.fold begin fun acc i ->
+      let p = pget conf base i in
       if p_first_name base p <> "?"
       && p_surname base p <> "?"
       && p_first_name base p <> "x"
       && (not (is_hide_names conf p) || authorized_age conf base p)
       then get_iper p :: acc
       else acc
-    end  [] (persons base)
+    end [] (ipers base)
   in
   sort_and_display conf base paths true list;
   Hutil.trailer conf
@@ -542,9 +542,8 @@ let display_spouse_index conf base max_level ancestor =
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   let list =
-    Gwdb.Collection.fold begin fun acc p ->
-      (* FIXME: pget *)
-      let i = get_iper p in
+    Gwdb.Collection.fold begin fun acc i ->
+      let p = pget conf base i in
       if Gwdb.Marker.get paths i <> [] then
         if p_first_name base p <> "?"
         && p_surname base p <> "?"
@@ -564,7 +563,7 @@ let display_spouse_index conf base max_level ancestor =
             else acc
           end acc (get_family p)
         else acc
-      else acc end [] (persons base)
+      else acc end [] (ipers base)
   in
   sort_and_display conf base paths false list;
   Hutil.trailer conf
