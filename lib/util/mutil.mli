@@ -133,3 +133,10 @@ val default_particles : string list
     Raise Invalid_argument if the two lists are determined to have different lengths.
 *)
 val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
+
+(** [list_replace old_v new_v list]
+    Return the same list as [list] were the first occurence of [old_v]
+    has been replaced by [new_v]. If [old_v] is unbound, the list is
+    returned unchanged.
+*)
+val list_replace : 'a -> 'a -> 'a list -> 'a list
