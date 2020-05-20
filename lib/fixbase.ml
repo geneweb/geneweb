@@ -25,9 +25,6 @@ let mk_pevent name date place note src =
 let of_pevent e =
   e.epers_date, e.epers_place, e.epers_note, e.epers_src
 
-let fix_pevent_patch base fn p =
-  patch_person base (get_iper p) (fn (gen_person_of_person p) )
-
 let find_pevent names pevents =
   List.find_opt (fun x -> List.mem x.epers_name names) pevents
 
@@ -73,14 +70,14 @@ let fix_pevents ?report base pp =
   let (death, death_place, death_note, death_src), pevents =
     let death =
       match p.death with
-      | Death (r, d) -> d
+      | Death (_, d) -> d
       | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead -> Adef.cdate_None
     in
     aux Epers_Death death p.death_place p.death_note p.death_src empty_de pevents
   in
   let death =
     match p.death with
-    | Death (r, d) -> p.death
+    | Death _ -> p.death
     | NotDead when death <> Adef.cdate_None -> Death (Unspecified, death)
     | x -> x
   in
