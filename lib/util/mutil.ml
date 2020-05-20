@@ -473,3 +473,10 @@ let array_forall2 f a1 a2 =
       else false
     in
     loop 0
+
+let rec list_replace old_v new_v = function
+  | [] -> []
+  | hd :: tl ->
+    if hd = old_v
+    then new_v :: tl
+    else hd :: list_replace old_v new_v tl

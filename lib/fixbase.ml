@@ -32,6 +32,7 @@ let find_pevent names pevents =
   List.find_opt (fun x -> List.mem x.epers_name names) pevents
 
 let fix_pevents ?report base pp =
+  (* Should it use UpdateIndOk.reconstitute_from_pevents? *)
   let p = gen_person_of_person pp in
   let empty_bi = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
   let empty_bp = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
@@ -46,7 +47,22 @@ let fix_pevents ?report base pp =
         then mk_pevent name date place note src :: pevents
         else pevents
       in (date, place, note, src), pevents
-    | Some e -> (of_pevent e, pevents)
+    | Some e ->
+      let e' =
+        { epers_name = e.epers_name
+        ; epers_date =
+            if e.epers_date = Adef.cdate_None then date else e.epers_date
+        ; epers_place =
+            if e.epers_place = Gwdb.empty_string then place else e.epers_place
+        ; epers_reason = e.epers_reason
+        ; epers_note =
+            if e.epers_note = Gwdb.empty_string then note else e.epers_note
+        ; epers_src =
+            if e.epers_src = Gwdb.empty_string then src else e.epers_src
+        ; epers_witnesses = e.epers_witnesses
+        }
+      in
+      (of_pevent e', Mutil.list_replace e e' pevents)
   in
   let (birth, birth_place, birth_note, birth_src), pevents =
     aux Epers_Birth p.birth p.birth_place p.birth_note p.birth_src empty_bi pevents
@@ -57,21 +73,16 @@ let fix_pevents ?report base pp =
   let (death, death_place, death_note, death_src), pevents =
     let death =
       match p.death with
-      | Death (_, d) -> d
-      | NotDead
-      | DeadYoung
-      | DeadDontKnowWhen
-      | DontKnowIfDead
-      | OfCourseDead
-        -> Adef.cdate_None
+      | Death (r, d) -> d
+      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead -> Adef.cdate_None
     in
     aux Epers_Death death p.death_place p.death_note p.death_src empty_de pevents
   in
   let death =
-    if death <> Adef.cdate_None then Death (Unspecified, death)
-    else match p.death with
-      | Death (_, d) -> assert false
-      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead as x -> x
+    match p.death with
+    | Death (r, d) -> p.death
+    | NotDead when death <> Adef.cdate_None -> Death (Unspecified, death)
+    | x -> x
   in
   let (burial, burial_place, burial_note, burial_src), pevents =
     match p.burial with
