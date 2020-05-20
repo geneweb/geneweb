@@ -85,6 +85,7 @@ let fix_marriage_divorce =
   aux "Fix families' marriage and divorce" Fixbase.fix_marriage_divorce
 
 let check
+    ~dry_run
     ~verbosity
     ~fast
     ~f_parents
@@ -114,20 +115,22 @@ let check
   if !fevents_witnesses then check_fevents_witnesses ~v1 ~v2 base nb_fam fix;
   if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
   if fast then begin clear_strings_array base ; clear_persons_array base end ;
-  if !fix <> 0 then begin
-    Gwdb.commit_patches base ;
-    if v1 then begin
-      Printf.printf "%n changes commited\n" !fix ;
-      flush stdout
+  if not !dry_run then begin
+    if !fix <> 0 then begin
+      Gwdb.commit_patches base ;
+      if v1 then begin
+        Printf.printf "%n changes commited\n" !fix ;
+        flush stdout
+      end
     end
+    else if v1 then begin
+      Printf.printf "No change\n" ;
+      flush stdout
+    end ;
+    if v1 then (Printf.printf "Rebuilding the indexes..\n" ; flush stdout) ;
+    Gwdb.sync base ;
+    if v1 then (Printf.printf "Done" ; flush stdout)
   end
-  else if v1 then begin
-    Printf.printf "No change\n" ;
-    flush stdout
-  end ;
-  if v1 then (Printf.printf "Rebuilding the indexes..\n" ; flush stdout) ;
-  Gwdb.sync base ;
-  if v1 then (Printf.printf "Done" ; flush stdout)
 
 (**/**)
 
@@ -142,9 +145,11 @@ let p_NBDS = ref false
 let pevents_witnesses = ref false
 let fevents_witnesses = ref false
 let marriage_divorce = ref false
+let dry_run = ref false
 
 let speclist =
-  [ ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode")
+  [ ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)")
+  ; ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode")
   ; ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode")
   ; ("-fast", Arg.Set fast, " fast mode. Needs more memory.")
   ; ("-families-parents", Arg.Set f_parents, " missing doc")
@@ -186,6 +191,7 @@ let main () =
     p_NBDS := true
   end ;
   check
+    ~dry_run
     ~fast
     ~verbosity
     ~f_parents
