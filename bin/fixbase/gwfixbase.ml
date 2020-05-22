@@ -57,7 +57,7 @@ let aux txt (fn : ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> bas
         flush stdout ;
         ProgrBar.restart !i' n
       end
-    else None in
+    else Some begin fun _ -> incr cnt end in
   fn ?report progress base ;
   if v1 then ProgrBar.finish ()
 
