@@ -1,11 +1,33 @@
-type iper = unit
 type ifam = unit
+type iper = unit
 type istr = unit
-type person
-type family
-type string_person_index
-type base
+
 type 'a cursor = { length : int ; get : int -> 'a option }
+type base
+type fam_event = (iper, istr) Def.gen_fam_event
+type family
+type pers_event = (iper, istr) Def.gen_pers_event
+type person
+type relation = (iper, istr) Def.gen_relation
+type string_person_index
+type title = istr Def.gen_title
+
+module Collection = struct
+  type 'a t
+  let length _ = assert false
+  let map _ = assert false
+  let iter _ = assert false
+  let iteri _ = assert false
+  let fold ?from:_ ?until:_ _ = assert false
+  let fold_until _ = assert false
+  let iterator _ = assert false
+end
+
+module Marker = struct
+  type ('k, 'v) t
+  let get _ = assert false
+  let set _ = assert false
+end
 
 let base_notes_are_empty _ = assert false
 let base_notes_dir _ = assert false
@@ -15,6 +37,8 @@ let base_notes_read_first_line _ = assert false
 let base_particles _ = assert false
 let base_strings_of_first_name _ = assert false
 let base_strings_of_surname _ = assert false
+let base_visible_get _ = assert false
+let base_visible_write _ = assert false
 let base_wiznotes_dir _ = assert false
 let bname _ = assert false
 let clear_ascends_array _ = assert false
@@ -34,18 +58,86 @@ let delete_descend _ = assert false
 let delete_family _ = assert false
 let delete_person _ = assert false
 let delete_union _ = assert false
+let dummy_collection _ = assert false
 let dummy_ifam = ()
 let dummy_iper = ()
+let dummy_marker _ = assert false
+let empty_family _ = assert false
+let empty_person _ = assert false
 let empty_string = ()
 let eq_istr _ = assert false
 let families _ = assert false
+let families _ = assert false
+let family_of_gen_family _ = assert false
+let foi _ = assert false
+let gen_ascend_of_person _ = assert false
+let gen_couple_of_family _ = assert false
+let gen_descend_of_family _ = assert false
+let gen_family_of_family _ = assert false
+let gen_person_of_person _ = assert false
+let gen_union_of_person _ = assert false
+let get_access _ = assert false
+let get_aliases _ = assert false
 let get_ascend _ = assert false
+let get_baptism _ = assert false
+let get_baptism_note _ = assert false
+let get_baptism_place _ = assert false
+let get_baptism_src _ = assert false
+let get_birth _ = assert false
+let get_birth_note _ = assert false
+let get_birth_place _ = assert false
+let get_birth_src _ = assert false
+let get_burial _ = assert false
+let get_burial_note _ = assert false
+let get_burial_place _ = assert false
+let get_burial_src _ = assert false
+let get_children _ = assert false
+let get_comment _ = assert false
+let get_consang _ = assert false
 let get_couple _ = assert false
+let get_death _ = assert false
+let get_death_note _ = assert false
+let get_death_place _ = assert false
+let get_death_src _ = assert false
 let get_descend _ = assert false
+let get_divorce _ = assert false
 let get_family _ = assert false
+let get_father _ = assert false
+let get_fevents _ = assert false
+let get_first_name _ = assert false
+let get_first_names_aliases _ = assert false
+let get_fsources _ = assert false
+let get_ifam _ = assert false
+let get_image _ = assert false
+let get_iper _ = assert false
+let get_marriage _ = assert false
+let get_marriage_note _ = assert false
+let get_marriage_place _ = assert false
+let get_marriage_src _ = assert false
+let get_mother _ = assert false
+let get_notes _ = assert false
+let get_occ _ = assert false
+let get_occupation _ = assert false
+let get_origin_file _ = assert false
+let get_parent_array _ = assert false
+let get_parents _ = assert false
 let get_person _ = assert false
+let get_pevents _ = assert false
+let get_psources _ = assert false
+let get_public_name _ = assert false
+let get_qualifiers _ = assert false
+let get_related _ = assert false
+let get_relation _ = assert false
+let get_rparents _ = assert false
+let get_sex _ = assert false
+let get_surname _ = assert false
+let get_surnames_aliases _ = assert false
+let get_titles _ = assert false
 let get_union _ = assert false
+let get_witnesses _ = assert false
+let ifam_marker _ = assert false
 let ifam_of_string _ = assert false
+let ifams _ = assert false
 let insert_ascend _ = assert false
 let insert_couple _ = assert false
 let insert_descend _ = assert false
@@ -53,7 +145,9 @@ let insert_family _ = assert false
 let insert_person _ = assert false
 let insert_string _ = assert false
 let insert_union _ = assert false
+let iper_marker _ = assert false
 let iper_of_string _ = assert false
+let ipers _ = assert false
 let is_empty_string _ = assert false
 let is_quest_string _ = assert false
 let istr_of_string _ = assert false
@@ -65,11 +159,67 @@ let load_persons_array _ = assert false
 let load_strings_array _ = assert false
 let load_unions_array _ = assert false
 let make  _ = assert false
+let make _ = assert false
 let nb_of_families _ = assert false
 let nb_of_persons _ = assert false
 let nb_of_real_persons _ = assert false
 let new_ifam _ = assert false
 let new_iper _ = assert false
+let no_ascend = { Def.parents = None ; consang = Adef.no_consang }
+let no_couple = Adef.couple dummy_iper dummy_iper
+let no_descend = { Def.children = [||] }
+let no_family ifam =
+  { Def.marriage = Adef.cdate_None
+  ; marriage_place = empty_string
+  ; marriage_note = empty_string
+  ; marriage_src = empty_string
+  ; witnesses = [||]
+  ; relation = Def.NoMention
+  ; divorce = Def.NotDivorced
+  ; fevents = []
+  ; comment = empty_string
+  ; origin_file = empty_string
+  ; fsources = empty_string
+  ; fam_index = ifam
+  }
+let no_person ip =
+  { Def.first_name = empty_string
+  ; surname = empty_string
+  ; occ = 0
+  ; image = empty_string
+  ; first_names_aliases = []
+  ; surnames_aliases = []
+  ; public_name = empty_string
+  ; qualifiers = []
+  ; titles = []
+  ; rparents = []
+  ; related = []
+  ; aliases = []
+  ; occupation = empty_string
+  ; sex = Neuter
+  ; access = Private
+  ; birth = Adef.cdate_None
+  ; birth_place = empty_string
+  ; birth_note = empty_string
+  ; birth_src = empty_string
+  ; baptism = Adef.cdate_None
+  ; baptism_place = empty_string
+  ; baptism_note = empty_string
+  ; baptism_src = empty_string
+  ; death = DontKnowIfDead
+  ; death_place = empty_string
+  ; death_note = empty_string
+  ; death_src = empty_string
+  ; burial = UnknownBurial
+  ; burial_place = empty_string
+  ; burial_note = empty_string
+  ; burial_src = empty_string
+  ; pevents = []
+  ; notes = empty_string
+  ; psources = empty_string
+  ; key_index = ip }
+let no_union = { Def.family = [||] }
+
 let open_base _ = assert false
 let patch_ascend _ = assert false
 let patch_couple _ = assert false
@@ -77,11 +227,14 @@ let patch_descend _ = assert false
 let patch_family _ = assert false
 let patch_person _ = assert false
 let patch_union _ = assert false
+let person_of_gen_person _ = assert false
 let person_of_key _ = assert false
+let persons _ = assert false
 let persons _ = assert false
 let persons_of_first_name _ = assert false
 let persons_of_name _ = assert false
 let persons_of_surname _ = assert false
+let poi _ = assert false
 let quest_string = ()
 let read_nldb _ = assert false
 let sou _ = assert false
