@@ -153,6 +153,7 @@ let json_of_pevent_name = function
 let json_of_event_witness_kind witness_kind = match witness_kind with
   | Witness -> `String "witness"
   | Witness_GodParent -> `String "godparent"
+  | Witness_Officer -> `String "officer"
 
 let json_of_event_witness bname (person, witness_kind) =
   filter_out_null @@

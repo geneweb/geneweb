@@ -70,6 +70,7 @@ let print_relations oc base ip =
 let witness_kind = function
   | Def.Witness -> "witness"
   | Witness_GodParent -> "godparent"
+  | Witness_Officer -> "officer"
 
 let print_pevent_witness oc base ip =
   let bname = bname base in

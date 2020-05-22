@@ -203,8 +203,6 @@ let clear_families_array = legacy L.clear_families_array
 
 let date_of_last_change = legacy L.date_of_last_change
 
-type 'a cursor = 'a L.cursor = { length : int ; get : int -> 'a option; }
-
 let persons = legacy L.persons
 let families = legacy L.families
 
