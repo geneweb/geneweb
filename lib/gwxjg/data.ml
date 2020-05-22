@@ -1030,21 +1030,6 @@ let mk_base base =
 let stringify s =
   Printf.sprintf (if String.contains s '\'' then "\"%s\"" else "'%s'") s
 
-let twigify filter =
-  func_arg1_no_kw @@ function
-  | Tstr s ->
-    let s =
-      let len = String.length s in
-      if len = 0 then ""
-      else if String.get s 0 = '{' && String.get s (len - 1) = '}'
-      then String.sub s 2 (len - 4)
-      else stringify s
-    in
-    Tstr (Printf.sprintf "{{%s|%s}}" s filter)
-  | x -> failwith_type_error_1 filter x
-
-let twig = Tpat (fun s -> twigify s)
-
 let trans (conf : Config.config) =
   let trad ~kwargs s i =
     try
@@ -1286,7 +1271,6 @@ let default_env conf base =
   :: ("json_encode", func_arg1_no_kw (fun x -> Tstr (json_encode x) ))
   :: ("base", mk_base base)
   :: ("conf", conf_env)
-  :: ("TWIG", twig)
   :: ("LOG", log)
   :: ("CAST", module_CAST)
   :: []
