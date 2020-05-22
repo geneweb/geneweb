@@ -104,6 +104,7 @@ module J = struct
     , match member "type" json with
     | `String "godparent" -> Def.Witness_GodParent
     | `String "witness" -> Def.Witness
+    | `String "officer" -> Def.Witness_Officer
     | _ -> assert false )
 
   let pevent_of_json json =
@@ -440,6 +441,7 @@ let commit_patches_r base get_person get_ascend get_union get_couple =
       let witness_kind = function
         | Def.Witness -> "witness"
         | Witness_GodParent -> "godparent"
+        | Witness_Officer -> "officer"
       in
       List.fold_left begin fun acc e ->
         Array.fold_left begin fun acc (i, wk) ->
