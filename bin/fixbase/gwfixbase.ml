@@ -45,7 +45,8 @@ let aux txt (fn : ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> bas
   let progress =
     if v2
     then (fun i n -> ProgrBar.run i n ; i' := i)
-    else ProgrBar.run
+    else if v1 then ProgrBar.run
+    else fun _ _ -> ()
   in
   let report =
     if v2
