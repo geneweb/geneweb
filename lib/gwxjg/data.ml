@@ -1097,11 +1097,6 @@ let trans (conf : Config.config) =
     | x -> Jingoo.Jg_types.failwith_type_error_1 "trans" x
   end
 
-let get_person conf base = func_arg1_no_kw @@ function
-  | Tint i -> get_n_mk_person conf base (Gwdb.iper_of_string @@ string_of_int i)
-  | Tstr i -> get_n_mk_person conf base (Gwdb.iper_of_string i)
-  | x -> failwith_type_error_1 "GET_PERSON" x
-
 (* copy/paste from Yojson adapted to Jingoo *)
 module Yojson_write = struct
 
@@ -1258,14 +1253,32 @@ let module_CAST =
     | _ -> raise Not_found
   end
 
-let default_env conf base (* p *) =
+let module_GWDB conf base = begin
+  let poi = func_arg1_no_kw @@ function
+    | Tstr i -> get_n_mk_person conf base (Gwdb.iper_of_string i)
+    | x -> failwith_type_error_1 "GWDB.poi" x
+  in
+  let foi = func_arg1_no_kw @@ function
+    | Tstr i ->
+      let i = Gwdb.ifam_of_string i in
+      get_n_mk_family conf base i (Gwdb.foi base i)
+    | x -> failwith_type_error_1 "GWDB.foi" x
+  in
+  Tpat begin function
+    | "poi" -> poi
+    | "foi" -> foi
+    | _ -> raise Not_found
+  end
+end
+
+let default_env conf base =
   let conf_env = mk_conf conf in
   let module_NAME = module_NAME base in
   ("trans", trans conf)
   :: ("DATE", module_date conf)
   :: ("OPT", module_OPT)
   :: ("NAME", module_NAME)
-  :: ("GET_PERSON", get_person conf base)
+  :: ("GWDB", module_GWDB conf base)
   :: ("env", mk_env conf base)
   :: ("decode_varenv", decode_varenv)
   :: ("encode_varenv", encode_varenv)
