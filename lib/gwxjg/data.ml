@@ -1274,19 +1274,3 @@ let default_env conf base =
   :: ("LOG", log)
   :: ("CAST", module_CAST)
   :: []
-
-let sandbox (conf : Config.config) base =
-  let aux ifam =
-    let cpl = Gwdb.foi base ifam in
-    get_n_mk_family conf base ifam cpl
-  in
-  let get_family = func_arg1_no_kw @@ function
-    | Tint i -> aux (Gwdb.ifam_of_string @@ string_of_int i)
-    | Tstr i -> aux (Gwdb.ifam_of_string i)
-    | x -> failwith_type_error_1 "GET_FAMILY" x
-  in
-  let () = Random.self_init () in
-  ("GET_FAMILY", get_family)
-  :: ("RANDOM_IPER", Tvolatile (fun () -> Tint (Random.int (Gwdb.nb_of_persons base))))
-  :: ("RANDOM_IFAM", Tvolatile (fun () -> Tint (Random.int (Gwdb.nb_of_families base))))
-  :: default_env conf base
