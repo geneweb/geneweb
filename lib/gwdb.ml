@@ -104,6 +104,8 @@ and delete_family base ifam =
   rm_union base ifam moth ;
   Array.iter (fun i -> patch_ascend base i no_ascend) children ;
   Gwdb_driver.delete_family base ifam ;
+  Gwdb_driver.delete_couple base ifam ;
+  Gwdb_driver.delete_descend base ifam ;
   if is_empty_p base fath then delete_person base fath ;
   if is_empty_p base moth then delete_person base moth ;
   Array.iter (fun i -> if is_empty_p base i then delete_person base i) children
