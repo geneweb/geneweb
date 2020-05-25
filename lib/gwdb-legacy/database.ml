@@ -135,7 +135,7 @@ let index_of_string strings ic start_pos hash_len string_patches string_pending 
    running `gwfixbase -index /path/to/base.gwb`
 *)
 let old_persons_of_first_name_or_surname base_data params =
-  let (proj, person_patches, names_inx, names_dat, bname) = params in
+  let (proj, _, person_patches, names_inx, names_dat, bname) = params in
   let module IstrTree =
     Btree.Make
       (struct
@@ -267,7 +267,7 @@ let binary_search_next arr cmp =
   in aux None 0 (Array.length arr - 1)
 
 let new_persons_of_first_name_or_surname base_data params =
-  let (proj, person_patches, names_inx, names_dat, bname) = params in
+  let (name, aliases, person_patches, names_inx, names_dat, bname) = params in
   let fname_dat = Filename.concat bname names_dat in
   let bt =
     lazy begin
@@ -283,9 +283,12 @@ let new_persons_of_first_name_or_surname base_data params =
        is not used by [find] but only by [cursor] and [next] *)
     lazy begin
       let ht = Dutil.IntHT.create 0 in
+      let aux k =
+        if not @@ Dutil.IntHT.mem ht k then Dutil.IntHT.add ht k []
+      in
       Hashtbl.iter begin fun _ p ->
-        let k = proj p in
-        if not @@ Dutil.IntHT.mem ht k  then Dutil.IntHT.add ht k []
+        aux (name p) ;
+        List.iter aux (aliases p) ;
       end person_patches ;
       let a = Array.make (Dutil.IntHT.length ht) (0, []) in
       ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
@@ -315,10 +318,12 @@ let new_persons_of_first_name_or_surname base_data params =
         let ipera = read_loop [] len in close_in ic_dat; ipera
       with Not_found -> []
     in
-    Hashtbl.fold begin fun i p acc ->
-      let istr1 = proj p in
+    let aux i istr1 acc =
       if istr1 = istr then if List.mem i acc then acc else i :: acc
       else if List.mem i acc then Mutil.list_except i acc else acc
+    in
+    Hashtbl.fold begin fun i p acc ->
+      List.fold_left (fun acc istr1 -> aux i istr1 acc) (aux i (name p) acc) (aliases p)
     end person_patches ipera
   in
   let cursor str =
@@ -1036,13 +1041,13 @@ let opendb bname =
     ; persons_of_surname =
         persons_of_first_name_or_surname version
           base_data
-          ((fun p -> p.surname),
-           snd patches.h_person, "snames.inx", "snames.dat", bname)
+          ( (fun p -> p.surname), (fun p -> p.surnames_aliases)
+          , snd patches.h_person, "snames.inx", "snames.dat", bname)
     ; persons_of_first_name =
         persons_of_first_name_or_surname version
           base_data
-          ((fun p -> p.first_name),
-           snd patches.h_person, "fnames.inx", "fnames.dat", bname)
+          ( (fun p -> p.first_name), (fun p -> p.first_names_aliases)
+          , snd patches.h_person, "fnames.inx", "fnames.dat", bname)
     ; patch_person = patch_person; patch_ascend = patch_ascend
     ; patch_union = patch_union; patch_family = patch_family
     ; patch_couple = patch_couple; patch_descend = patch_descend
