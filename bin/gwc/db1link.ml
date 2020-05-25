@@ -72,7 +72,7 @@ let set_error base gen x =
   check_error gen
 
 let set_warning base x =
-  Printf.printf "\nWarning: " ;
+  Printf.printf "Warning: " ;
   Check.print_base_warning stdout base x
 
 let poi base i = base.c_persons.(i)
