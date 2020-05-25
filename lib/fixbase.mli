@@ -22,6 +22,7 @@ type patch =
   | Fix_AddedRelatedFromPevent of Gwdb.iper * Gwdb.iper
   | Fix_AddedRelatedFromFevent of Gwdb.iper * Gwdb.iper
   | Fix_MarriageDivorce of Gwdb.ifam
+  | Fix_MissingSpouse of Gwdb.ifam * Gwdb.iper
 
 val check_NBDS : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
@@ -38,3 +39,5 @@ val check_pevents_witnesses : ?report:(patch -> unit) -> (int -> int -> unit) ->
 val check_fevents_witnesses : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
 val fix_marriage_divorce : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
+
+val fix_missing_spouses : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit

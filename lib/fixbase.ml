@@ -11,6 +11,7 @@ type patch =
   | Fix_AddedRelatedFromPevent of iper * iper
   | Fix_AddedRelatedFromFevent of iper * iper
   | Fix_MarriageDivorce of ifam
+  | Fix_MissingSpouse of ifam * iper
 
 let mk_pevent name date place note src =
   { epers_name = name
@@ -294,4 +295,24 @@ let fix_marriage_divorce ?report progress base =
       | Some fn -> fn (Fix_MarriageDivorce (get_ifam fam))
       | None -> ()
     end
+  end (Gwdb.families base)
+
+let fix_missing_spouses ?report progress base =
+  let nb_fam = nb_of_families base in
+  Gwdb.Collection.iteri begin fun i fam ->
+    progress i nb_fam ;
+    let aux i =
+      let p = poi base i in
+      if get_iper p = Gwdb.dummy_iper then begin
+        Gwdb.patch_union
+          base i { family = [| get_ifam fam |] } ;
+        Gwdb.patch_person
+          base i { (gen_person_of_person p) with key_index = i } ;
+        match report with
+        | Some fn -> fn (Fix_MissingSpouse (get_ifam fam, i))
+        | None -> ()
+      end
+    in
+    aux @@ get_father fam ;
+    aux @@ get_mother fam ;
   end (Gwdb.families base)

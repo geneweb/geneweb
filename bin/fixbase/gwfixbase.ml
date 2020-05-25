@@ -35,6 +35,10 @@ let aux txt (fn : ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> bas
     | Fix_MarriageDivorce (ifam) ->
       Printf.sprintf "Fixed marriage and/or divorce info of %s"
         (string_of_f ifam)
+    | Fix_MissingSpouse (ifam, iper) ->
+      Printf.sprintf "Fixed missing spouse (%s) in family %s"
+        (string_of_p iper)
+        (string_of_f ifam)
   in
   let i' = ref 0 in
   if v1 then begin
