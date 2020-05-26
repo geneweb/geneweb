@@ -192,7 +192,7 @@ let delete_person base ip =
     ; pevents = []
     ; notes = empty_string
     ; psources = empty_string
-    ; key_index = dummy_iper
+    ; key_index = ip
     }
 
 let delete_ascend base ip =
@@ -633,15 +633,15 @@ module Marker = struct
 
 end
 
-let pers_colletion fn base =
+let persons base =
   { Collection.length = nb_of_persons base
-  ; get = (fun i ->
-        let p = poi base i in
-        if get_iper p = dummy_iper then None else Some (fn p))
+  ; get = (fun i -> Some (poi base i))
   }
 
-let ipers = pers_colletion get_iper
-let persons = pers_colletion (fun p -> p)
+let ipers base =
+  { Collection.length = nb_of_persons base
+  ; get = (fun i -> Some i)
+  }
 
 let iper_marker c i = Marker.make (fun i -> i) c i
 
