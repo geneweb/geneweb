@@ -39,7 +39,9 @@ let get_gen_family = getf Gwdb_driver.gen_family_of_family
 let get_gen_couple = getf Gwdb_driver.gen_couple_of_family
 let get_gen_descend = getf Gwdb_driver.gen_descend_of_family
 
-let rec delete_person base ip =
+let rec delete_person excl base ip =
+  let iexcl, fexcl = excl in
+  assert (not @@ List.mem ip iexcl) ;
   let spouse c =
     let f = Adef.father c in
     if ip = f then Adef.mother c else f
@@ -75,7 +77,10 @@ let rec delete_person base ip =
         if Array.length d.children > 1 then (false, ipers, ifams)
         else begin
           let sp = spouse @@ get_gen_couple base ifam in
-          if is_empty_p base sp ~ifam then (del, sp :: ipers, ifam :: ifams)
+          if List.mem sp iexcl
+          then (del, ipers, ifams)
+          else if is_empty_p base sp ~ifam
+          then (del, sp :: ipers, ifam :: ifams)
           else (false, ipers, ifams)
         end
       end (true, ipers, ifams) u.family
@@ -85,8 +90,16 @@ let rec delete_person base ip =
   else Gwdb_driver.patch_person base ip
       { (no_person ip) with first_name = quest_string
                           ; surname = quest_string } ;
-  List.iter (delete_person base) ipers ;
-  List.iter (delete_family base) ifams
+  let iexcl = if del then ip :: iexcl else iexcl in
+  let excl = iexcl, fexcl in
+  let excl =
+    List.fold_left begin fun excl ip ->
+      delete_person excl base ip
+    end excl ipers
+  in
+  List.fold_left begin fun excl ifam ->
+    delete_family excl base ifam
+  end excl ifams
 
 and is_empty_p ?ifam base sp =
   (get_gen_ascend base sp).parents = None
@@ -95,7 +108,9 @@ and is_empty_p ?ifam base sp =
      { (no_person sp) with first_name = quest_string
                          ; surname = quest_string }
 
-and delete_family base ifam =
+and delete_family excl base ifam =
+  let iexcl, fexcl = excl in
+  assert (not @@ List.mem ifam fexcl) ;
   let fam = foi base ifam in
   let fath = get_father fam in
   let moth = get_mother fam in
@@ -106,15 +121,32 @@ and delete_family base ifam =
   Gwdb_driver.delete_family base ifam ;
   Gwdb_driver.delete_couple base ifam ;
   Gwdb_driver.delete_descend base ifam ;
-  if is_empty_p base fath then delete_person base fath ;
-  if is_empty_p base moth then delete_person base moth ;
-  Array.iter (fun i -> if is_empty_p base i then delete_person base i) children
+  let fexcl = ifam :: fexcl in
+  let excl = iexcl, fexcl in
+  let excl =
+    if not (List.mem fath iexcl) && is_empty_p base fath
+    then delete_person excl base fath
+    else excl
+  in
+  let excl =
+    if not (List.mem moth iexcl) && is_empty_p base moth
+    then delete_person excl base moth
+    else excl
+  in
+  Array.fold_left begin fun excl i ->
+    if not (List.mem i iexcl) && is_empty_p base i
+    then delete_person excl base i
+    else excl
+  end excl children
 
 and rm_union base ifam iper =
   { family = (get_gen_union base iper).family
              |> Mutil.array_except ifam
   }
   |> patch_union base iper
+
+let delete_person base iper = ignore @@ delete_person ([], []) base iper
+let delete_family base ifam = ignore @@ delete_family ([], []) base ifam
 
 (**/**)
 (** Misc *)
