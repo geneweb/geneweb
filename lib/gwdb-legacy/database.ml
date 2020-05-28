@@ -213,8 +213,8 @@ let persons_of_first_name_or_surname base_data strings params =
         Hashtbl.iter
           (fun _i p ->
              let istr1 = proj p in
-             try let _ = IstrTree.find istr1 !bt in () with
-               Not_found -> bt := IstrTree.add istr1 0 !bt)
+             if not @@ IstrTree.mem istr1 !bt
+             then bt := IstrTree.add istr1 0 !bt)
           person_patches;
         btr := Some !bt;
         !bt
