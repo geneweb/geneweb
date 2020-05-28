@@ -150,6 +150,7 @@ let p_NBDS = ref false
 let pevents_witnesses = ref false
 let fevents_witnesses = ref false
 let marriage_divorce = ref false
+let index = ref false
 let dry_run = ref false
 
 let speclist =
@@ -165,6 +166,7 @@ let speclist =
   ; ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc")
   ; ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc")
   ; ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc")
+  ; ("-index", Arg.Set index, " rebuild index. It is automatically enable by any other option.")
   ]
 
 let anonfun i = bname := i
@@ -184,6 +186,7 @@ let main () =
   || !fevents_witnesses
   || !marriage_divorce
   || !p_NBDS
+  || !index
   then ()
   else begin
     f_parents := true ;
