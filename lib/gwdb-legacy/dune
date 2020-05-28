@@ -10,6 +10,7 @@
   )
   (modules_without_implementation dbdisk)
   (modules
+    btree
     database
     dbdisk
     dutil

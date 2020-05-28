@@ -1,4 +1,4 @@
-(copy_files %{project_root}/lib/gwdb-legacy/{database.ml,database.mli,dbdisk.mli,dutil.ml,dutil.mli,outbase.ml})
+(copy_files %{project_root}/lib/gwdb-legacy/{btree.ml,database.ml,database.mli,dbdisk.mli,dutil.ml,dutil.mli,outbase.ml})
 (rule (copy %{project_root}/lib/gwdb-legacy/gwdb_driver.ml gwdb_driver_legacy.ml))
 
 (library
@@ -14,6 +14,7 @@
   )
   (modules_without_implementation dbdisk)
   (modules
+    btree
     database
     dbdisk
     dutil
