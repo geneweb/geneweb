@@ -1,4 +1,3 @@
-open Def
 open Gwdb_driver_legacy
 open Dbdisk
 

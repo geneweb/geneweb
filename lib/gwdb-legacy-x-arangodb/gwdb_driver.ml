@@ -155,6 +155,7 @@ let insert_string = legacy L.insert_string
 
 let commit_patches b =
   opt b begin fun a ->
+    let open Dbdisk in
     let b = b.legacy in
     A.commit_patches
       a
@@ -205,14 +206,6 @@ let date_of_last_change = legacy L.date_of_last_change
 
 let persons = legacy L.persons
 let families = legacy L.families
-
-let get_person b = b.legacy.data.persons.get
-let get_ascend b = b.legacy.data.ascends.get
-let get_union b = b.legacy.data.unions.get
-
-let get_family b = b.legacy.data.families.get
-let get_couple b = b.legacy.data.couples.get
-let get_descend b = b.legacy.data.descends.get
 
 let make particles bname arrays =
   let legacy = L.make particles bname arrays in
@@ -299,8 +292,6 @@ let get_witnesses = L.get_witnesses
 let person_of_gen_person b = L.person_of_gen_person b.legacy
 let family_of_gen_family b = L.family_of_gen_family b.legacy
 
-let gen_couple_of_couple = L.gen_couple_of_family
-let gen_descend_of_descend = L.gen_descend_of_family
 let gen_family_of_family = L.gen_family_of_family
 let gen_person_of_person = L.gen_person_of_person
 let gen_ascend_of_person = L.gen_ascend_of_person

@@ -637,7 +637,7 @@ let union_of_json = function
 
 let no_ascend = { parents = None ; consang = Adef.no_consang }
 
-let consang_of_json iper js =
+let consang_of_json js =
   match J.member "consang" @@ J.member "person" js with
   | `Null -> Adef.no_consang
   | `Number f -> Adef.fix @@ int_of_string f
@@ -648,8 +648,8 @@ let cache_pau_js base js =
   let iper = p.key_index in
   let a =
     match J.member "parents" @@ J.member "person" js with
-    | `String x -> { parents = Some x ; consang = consang_of_json iper js }
-    | _ -> { no_ascend with consang = consang_of_json iper js }
+    | `String x -> { parents = Some x ; consang = consang_of_json js }
+    | _ -> { no_ascend with consang = consang_of_json js }
   in
   let u =
     match J.member "unions" @@ J.member "person" js with
