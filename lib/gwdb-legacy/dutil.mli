@@ -24,4 +24,10 @@ val output_value_no_sharing : out_channel -> _ -> unit
 val output_array_no_sharing : out_channel -> (int -> _) -> int -> unit
 val int_size : int
 
-module IntHT : sig include module type of Hashtbl.Make (struct include Int let hash x = x end) end
+module IntHT : sig
+  include module type of Hashtbl.Make (struct
+      type t = int
+      let equal = (=)
+      let hash x = x
+    end)
+end
