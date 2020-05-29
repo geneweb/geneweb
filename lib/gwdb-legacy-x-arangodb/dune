@@ -1,4 +1,4 @@
-(copy_files %{project_root}/lib/gwdb-legacy/{btree.ml,database.ml,database.mli,dbdisk.mli,dutil.ml,dutil.mli,outbase.ml})
+(copy_files %{project_root}/lib/gwdb-legacy/{btree.ml,database.ml,database.mli,dbdisk.mli,dutil.ml,dutil.mli,gwdb_gc.ml,outbase.ml})
 (rule (copy %{project_root}/lib/gwdb-legacy/gwdb_driver.ml gwdb_driver_legacy.ml))
 
 (library
@@ -23,6 +23,7 @@
     gwdb_driver_arango
     gwdb_driver_env
     gwdb_driver_legacy
+    gwdb_gc
     http_curl
     json
     json_jsonaf

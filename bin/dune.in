@@ -12,6 +12,18 @@
 (dirs :standard \ dico_place)
 #endif
 
+#ifdef GENEWEB_GWDB_LEGACY
+(executable
+  (package geneweb-bin)
+  (public_name gwgc)
+  (modules gwgc)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
+)
+#else
+(dirs :dirs \ gwgc)
+#endif
+
 (executable
   (package geneweb-bin)
   (public_name consang)
@@ -49,7 +61,7 @@
   (public_name geneweb-gwd-lib)
   (wrapped true)
   (libraries geneweb geneweb-jingoo jingoo unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwDaemon jgInterp request requestHandler)
 )
 
@@ -57,7 +69,7 @@
   (package geneweb-bin)
   (public_name gwd)
   (libraries geneweb geneweb-jingoo geneweb-gwd-lib unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwd)
 )
 

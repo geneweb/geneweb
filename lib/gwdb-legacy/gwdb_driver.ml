@@ -227,71 +227,12 @@ let new_iper base = base.data.persons.len
 
 let new_ifam base = base.data.families.len
 
-let record_access_of tab =
-  { Dbdisk.load_array = (fun () -> ())
-  ; get = (fun i -> tab.(i))
-  ; get_nopending = (fun i -> tab.(i))
-  ; set = (fun i v -> tab.(i) <- v)
-  ; output_array = (fun oc -> Dutil.output_value_no_sharing oc (tab : _ array))
-  ; len = Array.length tab
-  ; clear_array = fun () -> () }
-
 (* FIXME: lock *)
 let sync ?scratch:_ base =
   Outbase.output base
 
-let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbdisk.dsk_base =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname
-    else bname ^ ".gwb"
-  in
-  let (persons, ascends, unions) = persons in
-  let (families, couples, descends) = families in
-  let data : Dbdisk.base_data =
-    { persons = record_access_of persons
-    ; ascends = record_access_of ascends
-    ; unions = record_access_of unions
-    ; families = record_access_of families
-    ; visible =
-       { v_write = (fun _ -> assert false)
-       ; v_get = (fun _ -> assert false)
-       }
-    ; couples = record_access_of couples
-    ; descends = record_access_of descends
-    ; strings = record_access_of strings
-    ; particles
-    ; bnotes = bnotes
-    ; bdir = bdir }
-  in
-  let func : Dbdisk.base_func =
-    { person_of_key = (fun _ -> assert false)
-    ; persons_of_name = (fun _ -> assert false)
-    ; strings_of_fsname = (fun _ -> assert false)
-    ; persons_of_surname =
-       { find = (fun _ -> assert false)
-       ; cursor = (fun _ -> assert false)
-       ; next = (fun _ -> assert false)
-       }
-    ; persons_of_first_name =
-       { find = (fun _ -> assert false)
-       ; cursor = (fun _ -> assert false)
-       ; next = (fun _ -> assert false)
-       }
-    ; patch_person = (fun _ -> assert false)
-    ; patch_ascend = (fun _ -> assert false)
-    ; patch_union = (fun _ -> assert false)
-    ; patch_family = (fun _ -> assert false)
-    ; patch_couple = (fun _ -> assert false)
-    ; patch_descend = (fun _ -> assert false)
-    ; patch_name = (fun _ -> assert false)
-    ; insert_string = (fun _ -> assert false)
-    ; commit_patches = (fun _ -> assert false)
-    ; commit_notes = (fun _ -> assert false)
-    ; cleanup = (fun _ -> ())
-    ; nb_of_real_persons = (fun _ -> assert false)
-    }
-  in
-  sync ~scratch:true { data ; func ; version = GnWb0021 } ;
+let make bname particles arrays : Dbdisk.dsk_base =
+  sync ~scratch:true (Database.make bname particles arrays) ;
   open_base bname
 
 let bfname base fname =

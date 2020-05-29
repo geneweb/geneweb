@@ -15,6 +15,7 @@
     dbdisk
     dutil
     gwdb_driver
+    gwdb_gc
     outbase
   )
 )
