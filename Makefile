@@ -65,7 +65,7 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
-CPPO_D=$(API_D)
+CPPO_D=$(API_D) $(GWDB_D)
 
 %/dune: %/dune.in Makefile.config
 	@echo -n "Generating $@..." \

@@ -122,6 +122,12 @@ let map_person_ps fp fs p =
   ; key_index = p.key_index
   }
 
+let map_ascend_f ff a =
+  begin match a.parents with
+    | Some f -> { parents = Some (ff f) ; consang = a.consang }
+    | None -> { parents = None ; consang = a.consang }
+  end
+
 let map_union_f ff u = {family = Array.map ff u.family}
 
 let map_family_ps fp ff fs fam =
