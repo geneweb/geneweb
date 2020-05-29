@@ -41,7 +41,7 @@ let get_gen_descend = getf Gwdb_driver.gen_descend_of_family
 
 let rec delete_person excl base ip =
   let iexcl, fexcl = excl in
-  assert (not @@ List.mem ip iexcl) ;
+  assert (ip <> dummy_iper && not @@ List.mem ip iexcl) ;
   let spouse c =
     let f = Adef.father c in
     if ip = f then Adef.mother c else f
@@ -110,7 +110,7 @@ and is_empty_p ?ifam base sp =
 
 and delete_family excl base ifam =
   let iexcl, fexcl = excl in
-  assert (not @@ List.mem ifam fexcl) ;
+  assert (ifam <> dummy_ifam && not @@ List.mem ifam fexcl) ;
   let fam = foi base ifam in
   let fath = get_father fam in
   let moth = get_mother fam in
