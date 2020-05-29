@@ -480,3 +480,12 @@ let rec list_replace old_v new_v = function
     if hd = old_v
     then new_v :: tl
     else hd :: list_replace old_v new_v tl
+
+let list_except x =
+  let rec loop acc = function
+    | [] -> []
+    | hd :: tl ->
+      if hd = x then List.rev_append acc tl
+      else loop (hd :: acc) tl
+  in
+  loop []

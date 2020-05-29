@@ -6,8 +6,8 @@ open Def
 type name_index_data = int array array
 type strings_of_fsname = int array array
 
-let magic_gwb = "GnWb0020"
-let magic_gwb_iso_8859_1 = "GnWb001y"
+let magic_GnWb0020 = "GnWb0020"
+let magic_GnWb0021 = "GnWb0021"
 let table_size = 0x3fff
 
 let poi base i = base.data.persons.get i
@@ -49,15 +49,6 @@ let dsk_person_misc_names base p nobtit =
     (if p.sex = Female then husbands base p else [])
     (father_titles_places base p nobtit)
 
-let check_magic ic =
-  let b = really_input_string ic (String.length magic_gwb) in
-  if b <> magic_gwb then
-    if b = magic_gwb_iso_8859_1
-    then failwith "this is a iso_8859_1 GeneWeb base, but you need utf-8"
-    else if String.sub magic_gwb 0 4 = String.sub b 0 4
-    then failwith "this is a GeneWeb base, but not compatible"
-    else failwith "this is not a GeneWeb base, or it is a very old version"
-
 let compare_names base_data s1 s2 =
   Mutil.compare_after_particle base_data.particles s1 s2
 
@@ -79,3 +70,5 @@ let output_array_no_sharing oc arr_get arr_len =
   for i = 0 to arr_len - 1 do Iovalue.output oc (arr_get i) done;
   let pos_end = Iovalue.patch_output_value_header oc header_pos in
   seek_out oc pos_end
+
+module IntHT = Hashtbl.Make (struct include Int let hash x = x end)
