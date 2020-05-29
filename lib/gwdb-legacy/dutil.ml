@@ -71,4 +71,8 @@ let output_array_no_sharing oc arr_get arr_len =
   let pos_end = Iovalue.patch_output_value_header oc header_pos in
   seek_out oc pos_end
 
-module IntHT = Hashtbl.Make (struct include Int let hash x = x end)
+module IntHT = Hashtbl.Make (struct
+    type t = int
+    let equal = (=)
+    let hash x = x
+  end)
