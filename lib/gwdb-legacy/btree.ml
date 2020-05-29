@@ -26,12 +26,9 @@ module type S =
   sig
     type key
     type +'a t
-    val empty: 'a t
     val mem:  key -> 'a t -> bool
     val add: key -> 'a -> 'a t -> 'a t
-    val update: key -> ('a option -> 'a option) -> 'a t -> 'a t
     val find: key -> 'a t -> 'a
-    val map: ('a -> 'b) -> 'a t -> 'b t
     (* Added for GeneWeb *)
     val key_after : (key -> int) -> 'a t -> key
     val next : key -> 'a t -> key
@@ -83,8 +80,6 @@ module Make(Ord: OrderedType) : S with type key = Ord.t = struct
       end else
         Node{l; v=x; d; r; h=(if hl >= hr then hl + 1 else hr + 1)}
 
-    let empty = Empty
-
     let rec add x data = function
         Empty ->
           Node{l=Empty; v=x; d=data; r=Empty; h=1}
@@ -113,53 +108,6 @@ module Make(Ord: OrderedType) : S with type key = Ord.t = struct
       | Node {l; v; r} ->
           let c = Ord.compare x v in
           c = 0 || mem x (if c < 0 then l else r)
-
-    let rec min_binding = function
-        Empty -> raise Not_found
-      | Node {l=Empty; v; d} -> (v, d)
-      | Node {l} -> min_binding l
-
-    let rec remove_min_binding = function
-        Empty -> invalid_arg "Map.remove_min_elt"
-      | Node {l=Empty; r} -> r
-      | Node {l; v; d; r} -> bal (remove_min_binding l) v d r
-
-    let merge t1 t2 =
-      match (t1, t2) with
-        (Empty, t) -> t
-      | (t, Empty) -> t
-      | (_, _) ->
-          let (x, d) = min_binding t2 in
-          bal t1 x d (remove_min_binding t2)
-
-    let rec update x f = function
-        Empty ->
-          begin match f None with
-          | None -> Empty
-          | Some data -> Node{l=Empty; v=x; d=data; r=Empty; h=1}
-          end
-      | Node {l; v; d; r; h} as m ->
-          let c = Ord.compare x v in
-          if c = 0 then begin
-            match f (Some d) with
-            | None -> merge l r
-            | Some data ->
-                if d == data then m else Node{l; v=x; d=data; r; h}
-          end else if c < 0 then
-            let ll = update x f l in
-            if l == ll then m else bal ll v d r
-          else
-            let rr = update x f r in
-            if r == rr then m else bal l v d rr
-
-    let rec map f = function
-        Empty ->
-          Empty
-      | Node {l; v; d; r; h} ->
-          let l' = map f l in
-          let d' = f d in
-          let r' = map f r in
-          Node{l=l'; v; d=d'; r=r'; h}
 
     (* Added for GeneWeb *)
 

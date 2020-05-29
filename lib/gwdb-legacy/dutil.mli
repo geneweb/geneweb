@@ -5,11 +5,10 @@ open Dbdisk
 type name_index_data = int array array
 type strings_of_fsname = int array array
 
-val magic_gwb : string
-val magic_gwb_iso_8859_1 : string
+val magic_GnWb0020 : string
+val magic_GnWb0021 : string
 val table_size : int
 
-val check_magic : in_channel -> unit
 val compare_istr_fun : Dbdisk.base_data -> int -> int -> int
 val compare_names : Dbdisk.base_data -> string -> string -> int
 
@@ -24,3 +23,5 @@ val p_surname : dsk_base -> dsk_person -> string
 val output_value_no_sharing : out_channel -> _ -> unit
 val output_array_no_sharing : out_channel -> (int -> _) -> int -> unit
 val int_size : int
+
+module IntHT : sig include module type of Hashtbl.Make (struct include Int let hash x = x end) end

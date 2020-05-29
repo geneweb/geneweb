@@ -145,8 +145,13 @@ let index_of_string strings ic start_pos hash_len string_patches string_pending 
         flush stderr;
         failwith "database access"
 
-let persons_of_first_name_or_surname base_data strings params =
-  let (_, _, proj, person_patches, names_inx, names_dat, bname) = params in
+(* deprecated version using the old btree implementation.
+   It will be kept for a while, but it will eventually be remove.
+   Rebuilding the indexes with new implementation is as simple as
+   running `gwfixbase -index /path/to/base.gwb`
+*)
+let old_persons_of_first_name_or_surname base_data params =
+  let (proj, person_patches, names_inx, names_dat, bname) = params in
   let module IstrTree =
     Btree.Make
       (struct
@@ -222,11 +227,167 @@ let persons_of_first_name_or_surname base_data strings params =
   let cursor str =
     IstrTree.key_after
       (fun key ->
-         Dutil.compare_names base_data str (strings.get key))
+         Dutil.compare_names base_data str (base_data.strings.get key))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
   {find = find; cursor = cursor; next = next}
+
+let binary_search arr cmp =
+  if arr = [||] then raise Not_found ;
+  let rec aux low high =
+    if high <= low then
+      if cmp arr.(low) = 0 then low
+      else raise Not_found
+    else
+      let mid = (low + high) / 2 in
+      let c = cmp arr.(mid) in
+      if c < 0 then
+        aux low (mid - 1)
+      else if c > 0 then
+        aux (mid + 1) high
+      else
+        mid
+  in aux 0 (Array.length arr - 1)
+
+let binary_search_key_after arr cmp =
+  if arr = [||] then raise Not_found ;
+  let rec aux acc low high =
+    if high <= low then
+      if cmp arr.(low) = 0 then low
+      else match acc with Some x -> x | None -> raise Not_found
+    else
+      let mid = (low + high) / 2 in
+      let c = cmp arr.(mid) in
+      if c < 0 then
+        aux (Some mid) low (mid - 1)
+      else if c > 0 then
+        aux acc (mid + 1) high
+      else
+        mid
+  in aux None 0 (Array.length arr - 1)
+
+let binary_search_next arr cmp =
+  if arr = [||] then raise Not_found ;
+  let rec aux acc low high =
+    if high <= low then
+      if cmp arr.(low) < 0 then low
+      else match acc with Some x -> x | None -> raise Not_found
+    else
+      let mid = (low + high) / 2 in
+      let c = cmp arr.(mid) in
+      if c < 0 then
+        aux (Some mid) low (mid - 1)
+      else
+        aux acc (mid + 1) high
+  in aux None 0 (Array.length arr - 1)
+
+let new_persons_of_first_name_or_surname base_data params =
+  let (proj, person_patches, names_inx, names_dat, bname) = params in
+  let fname_dat = Filename.concat bname names_dat in
+  let bt =
+    lazy begin
+      let fname_inx = Filename.concat bname names_inx in
+      let ic_inx = Secure.open_in_bin fname_inx in
+      let bt : (int * int) array = input_value ic_inx in
+      close_in ic_inx ;
+      bt
+    end
+  in
+  let patched =
+    (* This is not useful to keep the list of ipers here because [patched]
+       is not used by [find] but only by [cursor] and [next] *)
+    lazy begin
+      let ht = Dutil.IntHT.create 0 in
+      Hashtbl.iter begin fun _ p ->
+        let k = proj p in
+        if not @@ Dutil.IntHT.mem ht k  then Dutil.IntHT.add ht k []
+      end person_patches ;
+      let a = Array.make (Dutil.IntHT.length ht) (0, []) in
+      ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
+      Array.sort (fun (k, _) (k', _) -> Dutil.compare_istr_fun base_data k k') a ;
+      a
+    end
+  in
+  let find istr =
+    let ipera =
+      try
+        let bt = Lazy.force bt in
+        let s = base_data.strings.get istr in
+        let cmp (k, _) =
+          if k = istr then 0
+          else Dutil.compare_names base_data s (base_data.strings.get k)
+        in
+        let pos = snd @@ bt.(binary_search bt cmp) in
+        let ic_dat = Secure.open_in_bin fname_dat in
+        seek_in ic_dat pos ;
+        let len = input_binary_int ic_dat in
+        let rec read_loop ipera len =
+          if len = 0 then ipera
+          else
+            let iper = input_binary_int ic_dat in
+            read_loop (iper :: ipera) (len - 1)
+        in
+        let ipera = read_loop [] len in close_in ic_dat; ipera
+      with Not_found -> []
+    in
+    Hashtbl.fold begin fun i p acc ->
+      let istr1 = proj p in
+      if istr1 = istr then if List.mem i acc then acc else i :: acc
+      else if List.mem i acc then Mutil.list_except i acc else acc
+    end person_patches ipera
+  in
+  let cursor str =
+    let bt = Lazy.force bt in
+    let patched = Lazy.force patched in
+    let cmp (k, _) = Dutil.compare_names base_data str (base_data.strings.get k) in
+    let istr1 = try fst bt.(binary_search_key_after bt cmp) with Not_found -> -1 in
+    let istr2 = try fst patched.(binary_search_key_after patched cmp) with Not_found -> -1 in
+    if istr2 = -1 then
+      if istr1 = -1 then
+        raise Not_found
+      else
+        istr1
+    else if istr1 = -1 then
+      istr2
+    else if istr1 = istr2 then
+      istr1
+    else
+      let c =
+        Dutil.compare_names base_data (base_data.strings.get istr1) (base_data.strings.get istr2)
+      in
+    if c < 0 then istr1 else istr2
+  in
+  let next istr =
+    let bt = Lazy.force bt in
+    let patched = Lazy.force patched in
+    let s = base_data.strings.get istr in
+    let cmp (k, _) =
+      if k = istr then 0
+      else Dutil.compare_names base_data s (base_data.strings.get k)
+    in
+    let istr1 = try fst bt.(binary_search_next bt cmp) with Not_found -> -1 in
+    let istr2 = try fst patched.(binary_search_next patched cmp) with Not_found -> -1 in
+    if istr2 = -1 then
+      if istr1 = -1 then
+        raise Not_found
+      else
+        istr1
+    else if istr1 = -1 then
+      istr2
+    else if istr1 = istr2 then
+      istr1
+    else
+      let c =
+        Dutil.compare_names base_data (base_data.strings.get istr1) (base_data.strings.get istr2)
+      in
+      if c < 0 then istr1 else istr2
+  in
+  { find ; cursor ; next }
+
+let persons_of_first_name_or_surname = function
+  | GnWb0021 -> new_persons_of_first_name_or_surname
+  | GnWb0020 -> old_persons_of_first_name_or_surname
 
 (* Search index for a given name in file names.inx *)
 
@@ -570,10 +731,13 @@ let opendb bname =
   let particles =
     Mutil.input_particles (Filename.concat bname "particles.txt")
   in
-  let ic =
-    let ic = Secure.open_in_bin (Filename.concat bname "base") in
-    Dutil.check_magic ic;
-    ic
+  let ic = Secure.open_in_bin (Filename.concat bname "base") in
+  let version =
+    if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
+    else if Mutil.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
+    else if really_input_string ic 4 = "GnWb"
+    then failwith "this is a GeneWeb base, but not compatible"
+    else failwith "this is not a GeneWeb base, or it is a very old version"
   in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
@@ -606,16 +770,12 @@ let opendb bname =
       Some ic2 -> Some (input_binary_int ic2)
     | None -> None
   in
-  let ic2_surname_start_pos =
-    match ic2 with
-      Some ic2 -> Some (input_binary_int ic2)
-    | None -> None
-  in
-  let ic2_first_name_start_pos =
-    match ic2 with
-      Some ic2 -> Some (input_binary_int ic2)
-    | None -> None
-  in
+  if true then begin match ic2 with
+    | Some ic2 ->
+      ignore @@ (input_binary_int ic2) ; (* ic2_surname_start_pos *)
+      ignore @@ (input_binary_int ic2) ; (* ic2_first_name_start_pos *)
+    | None -> ()
+  end ;
   let shift = 0 in
   let persons =
     make_record_access ic ic_acc shift persons_array_pos patches.h_person pending.h_person
@@ -893,12 +1053,14 @@ let opendb bname =
     ; persons_of_name = persons_of_name
     ; strings_of_fsname = strings_of_fsname bname strings patches.h_person
     ; persons_of_surname =
-        persons_of_first_name_or_surname base_data strings
-          (ic2, ic2_surname_start_pos, (fun p -> p.surname),
+        persons_of_first_name_or_surname version
+          base_data
+          ((fun p -> p.surname),
            snd patches.h_person, "snames.inx", "snames.dat", bname)
     ; persons_of_first_name =
-        persons_of_first_name_or_surname base_data strings
-          (ic2, ic2_first_name_start_pos, (fun p -> p.first_name),
+        persons_of_first_name_or_surname version
+          base_data
+          ((fun p -> p.first_name),
            snd patches.h_person, "fnames.inx", "fnames.dat", bname)
     ; patch_person = patch_person; patch_ascend = patch_ascend
     ; patch_union = patch_union; patch_family = patch_family
@@ -911,4 +1073,5 @@ let opendb bname =
     }
   in
   { data = base_data
-  ; func = base_func }
+  ; func = base_func
+  ; version }

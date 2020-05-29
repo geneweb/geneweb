@@ -114,38 +114,30 @@ let output_strings_hash oc2 base =
   for i = 0 to Array.length taba - 1 do output_binary_int oc2 taba.(i) done;
   for i = 0 to Array.length tabl - 1 do output_binary_int oc2 tabl.(i) done
 
-let output_name_index_aux get oc base names_inx names_dat =
-  let module IstrTree =
-    Btree.Make
-      (struct
-        type t = int
-        let compare = Dutil.compare_istr_fun base.data
-      end)
-  in
-  let bt = ref IstrTree.empty in
+let output_name_index_aux get _oc base names_inx names_dat =
+  let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    bt := IstrTree.update (get p) begin function
-        | Some list -> Some (p.key_index :: list)
-        | None -> Some [ p.key_index ] end !bt
+    let k = get p in
+    match Dutil.IntHT.find_opt ht k with
+    | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
+    | None -> Dutil.IntHT.add ht k [ p.key_index ]
   done ;
-  (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
-     i.e. the created database can be still read by these versions but this
-     table will not be used in versions >= 4.10 *)
-  Dutil.output_value_no_sharing oc (!bt : int list IstrTree.t);
-  (* new table created from version >= 4.10 *)
-  let oc_sn_dat = Secure.open_out_bin names_dat in
+  let a = Array.make (Dutil.IntHT.length ht) (0, []) in
+  ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
+  Array.sort (fun (k, _) (k', _) -> Dutil.compare_istr_fun base.data k k') a ;
+  let oc_n_dat = Secure.open_out_bin names_dat in
   let bt2 =
-    IstrTree.map begin fun ipl ->
-      let i = pos_out oc_sn_dat in
-      output_binary_int oc_sn_dat (List.length ipl);
-      List.iter
-        (fun ip -> output_binary_int oc_sn_dat ip) ipl;
-      i end !bt
+    Array.map begin fun (i, ipl) ->
+      let off = pos_out oc_n_dat in
+      output_binary_int oc_n_dat (List.length ipl) ;
+      List.iter (output_binary_int oc_n_dat) ipl ;
+      (i, off)
+    end a
   in
-  close_out oc_sn_dat;
+  close_out oc_n_dat ;
   let oc_n_inx = Secure.open_out_bin names_inx in
-  Dutil.output_value_no_sharing oc_n_inx (bt2 : int IstrTree.t);
+  Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array) ;
   close_out oc_n_inx
 
 let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
@@ -192,7 +184,7 @@ let output base =
     if epos <> pos_out oc then count_error epos (pos_out oc)
   in
   begin try
-      output_string oc Dutil.magic_gwb;
+      output_string oc Dutil.magic_GnWb0021;
       output_binary_int oc base.data.persons.len;
       output_binary_int oc base.data.families.len;
       output_binary_int oc base.data.strings.len;

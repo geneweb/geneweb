@@ -291,7 +291,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; nb_of_real_persons = (fun _ -> assert false)
     }
   in
-  sync ~scratch:true { data ; func } ;
+  sync ~scratch:true { data ; func ; version = GnWb0021 } ;
   open_base bname
 
 let bfname base fname =

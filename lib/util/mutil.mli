@@ -140,3 +140,6 @@ val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
     returned unchanged.
 *)
 val list_replace : 'a -> 'a -> 'a list -> 'a list
+
+(** [list_except old_v new_v list] *)
+val list_except : 'a -> 'a list -> 'a list
