@@ -36,14 +36,14 @@ let select_names conf base is_surnames ini _need_whole_list =
                 if cnt = 0 then list, len
                 else
                   match list with
-                    (k1, s1, cnt1) :: list1 ->
-                      if k = k1 then (k1, s1, cnt1 + cnt) :: list1, len - 1
-                      else (k, s, cnt) :: list, len
-                  | [] -> [k, s, cnt], len
+                  | (k1, s1, cnt1) :: list1 ->
+                    if k = k1 then (k1, s1, cnt1 + cnt) :: list1, len
+                    else (k, s, cnt) :: list, (len + 1)
+                  | [] -> [k, s, cnt], (len + 1)
               else list, len
             in
             match spi_next iii istr with
-            | istr -> loop istr (len + 1) list
+            | istr -> loop istr len list
             | exception Not_found -> list, len
           else list, len
         in
