@@ -166,15 +166,7 @@ module J = struct
     | "residence" -> Residence
     | s -> failwith s
 
-  let fevent_witness_kind_of_json = function
-    | "witness" -> Witness
-    | "godparent" -> Witness_GodParent
-    (* | `String "officer" -> Witness_Officer *)
-    | _ -> assert false
-
-  let fevent_witness_of_json json =
-    ( get_string "person" json
-    , fevent_witness_kind_of_json (get_string "type" json) )
+  let fevent_witness_of_json = pevent_witness_of_json
 
   let fevent_of_json json =
     { efam_place = get_string "place" json
