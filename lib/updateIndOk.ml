@@ -889,15 +889,17 @@ let check_conflict conf base sp ipl =
     ipl
 
 let check_sex_married conf base sp op =
-  if sp.sex <> get_sex op then
-    let no_check =
-      Array.for_all
-        (fun ifam ->
-           let r = get_relation (foi base ifam) in
-           r = NoSexesCheckNotMarried || r = NoSexesCheckMarried)
-        (get_family op)
-    in
-    if not no_check then print_cannot_change_sex conf base op
+  if sp.sex <> get_sex op
+  && Array.exists begin fun ifam ->
+       let fam = foi base ifam in
+       match get_relation fam with
+       | NotMarried | Married ->
+         (* these have NoSexCheck variants. *)
+         (sp.sex = Male && sp.key_index <> get_father fam)
+         || (sp.sex = Female && sp.key_index <> get_mother fam)
+       | _ -> get_sex op <> Neuter
+     end (get_family op)
+  then print_cannot_change_sex conf base op
 
 let rename_image_file conf base op sp =
   match auto_image_file conf base op with
