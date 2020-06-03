@@ -20,6 +20,15 @@ let count_error computed found =
   flush stderr;
   exit 2
 
+let output_index_aux oc_inx oc_inx_acc ni =
+  let bpos = pos_out oc_inx in
+  Dutil.output_value_no_sharing oc_inx ni ;
+  let epos =
+    Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
+      bpos
+  in
+  if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+
 let make_name_index base =
   let t = Array.make Dutil.table_size [] in
   for i = 0 to base.data.persons.len - 1 do
@@ -36,14 +45,7 @@ let make_name_index base =
   Array.map Array.of_list t
 
 let create_name_index oc_inx oc_inx_acc base =
-  let ni = make_name_index base in
-  let bpos = pos_out oc_inx in
-  Dutil.output_value_no_sharing oc_inx (ni : Dutil.name_index_data);
-  let epos =
-    Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
-      bpos
-  in
-  if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+  output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
 let add_name t key valu =
   let key = Name.crush_lower key in
@@ -67,13 +69,7 @@ let make_strings_of_fsname base =
   t
 
 let create_strings_of_fsname oc_inx oc_inx_acc base =
-  let t = make_strings_of_fsname base in
-  let bpos = pos_out oc_inx in
-  Dutil.output_value_no_sharing oc_inx (t : Dutil.strings_of_fsname);
-  let epos =
-    Iovalue.output_array_access oc_inx_acc (Array.get t) (Array.length t) bpos
-  in
-  if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+  output_index_aux oc_inx oc_inx_acc (make_strings_of_fsname base)
 
 let is_prime a =
   let rec loop b =
