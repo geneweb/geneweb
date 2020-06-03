@@ -47,3 +47,12 @@ val forbidden_char : char list
 
 (** [concat fn sn] is [fn ^ " " ^ sn] but faster. *)
 val concat : string -> string -> string
+
+(** [split_sname s] split the surname [s] in parts composing it.
+    e.g. [split_sname base "Foo-Bar"] is [[ "Foo" ; "Bar"]] *)
+val split_sname  : string -> string list
+
+(** [split_fname s] split the string [s] representing multiple first names
+    into this list of firstname.
+    e.g. [split_fname base "Foo-Bar Baz"] is [[ "Foo-Bar" ; "Baz"]] *)
+val split_fname : string -> string list

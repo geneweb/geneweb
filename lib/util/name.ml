@@ -189,3 +189,19 @@ let concat_aux fn l1 sn l2 =
 
 let concat fn sn =
   concat_aux fn (String.length fn) sn (String.length sn)
+
+(* Copy/paste from String.split_on_char adapted to our needs *)
+let split_sname s =
+  let open String in
+  let r = ref [] in
+  let j = ref (length s) in
+  for i = length s - 1 downto 0 do
+    if match unsafe_get s i with ' ' | '-' -> true | _ -> false then begin
+      r := sub s (i + 1) (!j - i - 1) :: !r;
+      j := i
+    end
+  done;
+  sub s 0 !j :: !r
+
+let split_fname =
+  String.split_on_char ' '
