@@ -53,7 +53,7 @@ let try_find_with_one_first_name conf base n =
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let (list, _) =
         Some.persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base)) get_surname sn
+          (spi_find (persons_of_surname base)) get_surname Name.split_sname sn
       in
       List.fold_left
         (fun pl (_, _, ipl) ->

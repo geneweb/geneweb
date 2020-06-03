@@ -355,12 +355,12 @@ let advanced_search conf base max_answers =
       if gets "first_name" <> "" then
         Some.persons_of_fsname conf base base_strings_of_first_name
           (spi_find (persons_of_first_name base)) get_first_name
-          (gets "first_name")
+          Name.split_fname (gets "first_name")
       else
         let list =
           List.map
             (Some.persons_of_fsname conf base base_strings_of_surname
-               (spi_find (persons_of_surname base)) get_surname)
+               (spi_find (persons_of_surname base)) get_surname Name.split_sname)
             (getss "surname")
         in
         ( list |> List.map fst |> List.flatten |> List.sort_uniq compare

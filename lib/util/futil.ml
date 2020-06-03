@@ -179,7 +179,7 @@ let gen_person_misc_names
     let s_surnames =
       s_surname ::
       Mutil.list_rev_map_append sou surnames_aliases
-        (Mutil.list_rev_map_append sou qualifiers @@ Mutil.surnames_pieces s_surname)
+        (Mutil.list_rev_map_append sou qualifiers @@ Name.split_sname s_surname)
     in
     let s_surnames =
       Array.fold_left begin fun s_list (husband_surname, husband_surnames_aliases) ->
@@ -189,7 +189,7 @@ let gen_person_misc_names
           let s_husband_surname = Mutil.nominative @@ sou husband_surname in
           s_husband_surname ::
           Mutil.list_rev_map_append sou husband_surnames_aliases
-            (List.rev_append (Mutil.surnames_pieces s_husband_surname) s_list)
+            (List.rev_append (Name.split_sname s_husband_surname) s_list)
       end s_surnames husbands
     in
     (* (public names) *)

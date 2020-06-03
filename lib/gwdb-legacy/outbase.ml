@@ -68,7 +68,7 @@ let make_strings_of_fsname base =
     if surname <> "?" then
       begin
         add_name surname p.surname ;
-        List.iter (fun sp -> add_name sp p.surname) (Mutil.surnames_pieces surname)
+        List.iter (fun sp -> add_name sp p.surname) (Name.split_sname surname)
       end
   done ;
   Array.map Array.of_list t
