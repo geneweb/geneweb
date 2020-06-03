@@ -30,6 +30,16 @@ val eq_title_names :
 val parent : bool -> 'a array -> 'a gen_couple
 
 val gen_person_misc_names :
-  string -> string -> string -> string list -> string list -> string list ->
-    string list -> string Def.gen_title list -> (string * string list) list ->
-    string list -> string list
+  ('a -> string) ->
+  'a ->
+  'a ->
+  'a ->
+  'a ->
+  'a ->
+  'a list ->
+  'a list ->
+  'a list ->
+  'a list ->
+  'a Def.gen_title list ->
+  ('a * 'a list) array ->
+  'a Def.gen_title list -> string list

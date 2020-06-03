@@ -152,93 +152,94 @@ let map_couple_p multi_parents fp cpl =
 
 let map_descend_p fp des = {children = Array.map fp des.children}
 
-let gen_person_misc_names first_name surname public_name qualifiers aliases
-    first_names_aliases surnames_aliases titles husbands
-    father_titles_places =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
-  if first_name = "?" || surname = "?" then []
+let gen_person_misc_names
+    sou empty_string quest_string
+    first_name surname public_name qualifiers
+    aliases first_names_aliases surnames_aliases
+    titles
+    husbands
+    father_titles_places
+  =
+  if first_name = quest_string || surname = quest_string then []
   else
-    let public_names =
-      let titles_names =
-        let tnl = ref [] in
-        List.iter
-          (fun t ->
-             match t.t_name with
-               Tmain | Tnone -> ()
-             | Tname x -> tnl := x :: !tnl)
-          titles;
-        !tnl
-      in
-      if public_name = "" || titles = [] then titles_names
-      else public_name :: titles_names
+    let s_first_name = Mutil.nominative @@ sou first_name in
+    let s_surname = Mutil.nominative @@ sou surname in
+    let s_titles_names =
+      List.fold_left begin fun acc t ->
+        match t.t_name with
+        | Tmain | Tnone -> acc
+        | Tname x -> sou x :: acc
+      end [] titles
     in
-    let first_names =
-      let pn =
-        if public_name <> "" && titles = [] then public_name :: public_names
-        else public_names
-      in
-      first_name :: (first_names_aliases @ pn)
+    let s_public_names =
+      if public_name = empty_string then s_titles_names
+      else sou public_name :: s_titles_names
     in
-    let surnames =
-      surname ::
-      (Mutil.surnames_pieces surname @ surnames_aliases @ qualifiers)
+    let s_first_names = s_first_name :: (* List.rev_append *) List.rev_map sou first_names_aliases (* public_names *) in
+    let s_surnames =
+      s_surname ::
+      Mutil.list_rev_map_append sou surnames_aliases
+        (Mutil.list_rev_map_append sou qualifiers @@ Mutil.surnames_pieces s_surname)
     in
-    let surnames =
-      List.fold_left
-        (fun list (husband_surname, husband_surnames_aliases) ->
-           let husband_surname = Mutil.nominative husband_surname in
-           if husband_surname = "?" then husband_surnames_aliases @ list
-           else
-             husband_surname ::
-             (Mutil.surnames_pieces husband_surname @
-              husband_surnames_aliases @ list))
-        surnames husbands
+    let s_surnames =
+      Array.fold_left begin fun s_list (husband_surname, husband_surnames_aliases) ->
+        if husband_surname = quest_string
+        then Mutil.list_rev_map_append sou husband_surnames_aliases s_list
+        else
+          let s_husband_surname = Mutil.nominative @@ sou husband_surname in
+          s_husband_surname ::
+          Mutil.list_rev_map_append sou husband_surnames_aliases
+            (List.rev_append (Mutil.surnames_pieces s_husband_surname) s_list)
+      end s_surnames husbands
     in
-    let list = public_names in
+    (* (public names) *)
+    let s_list = s_public_names in
+    (* + (first names) x (surnames) *)
+    let s_list =
+      List.fold_left begin fun list f ->
+        List.fold_left begin fun list s -> Name.concat f s :: list end list s_surnames
+      end s_list s_first_names
+    in
+    (* + (first names + (title | (public name)) ) x (titles places) *)
+    let s_list =
+      (* let first_names = first_name :: first_names_aliases in *)
+      List.fold_left begin fun list t ->
+        let s = t.t_place in
+        if s = empty_string then list
+        else
+          let s = sou s in
+          let s_first_names =
+            match t.t_name with
+            | Tname f -> sou f :: s_first_names
+            | Tmain | Tnone ->
+              if public_name = empty_string
+              then s_first_names
+              else sou public_name :: s_first_names
+          in
+          List.fold_left (fun list f -> Name.concat f s :: list) list s_first_names
+      end s_list titles
+    in
+    (* + (first names) x (father's title places) *)
     let list =
-      List.fold_left
-        (fun list f ->
-           List.fold_left (fun list s -> (f ^ " " ^ s) :: list) list surnames)
-        list first_names
-    in
-    let list =
-      let first_names = first_name :: first_names_aliases in
-      List.fold_left
-        (fun list t ->
-           let s = t.t_place in
-           if s = "" then list
-           else
-             let first_names =
-               match t.t_name with
-                 Tname f -> f :: first_names
-               | Tmain | Tnone ->
-                   let f = public_name in
-                   if f = "" then first_names else f :: first_names
-             in
-             List.fold_left (fun list f -> (f ^ " " ^ s) :: list) list
-               first_names)
-        list titles
-    in
-    let list =
-      if father_titles_places = [] then list
+      if father_titles_places = [] then s_list
       else
-        let first_names = first_name :: first_names_aliases in
-        List.fold_left
-          (fun list s ->
-             if s = "" then list
-             else
-               List.fold_left (fun list f -> (f ^ " " ^ s) :: list) list
-                 first_names)
-          list father_titles_places
+        List.fold_left begin fun list t ->
+          let s = t.t_place in
+          if s = empty_string then list
+          else
+            let s = sou s in
+            List.fold_left (fun list f -> Name.concat f s :: list) list s_first_names
+        end s_list father_titles_places
     in
-    let list = List.rev_append aliases list in
-    let fn = Name.lower (first_name ^ " " ^ surname) in
-    List.fold_left
-      (fun list s ->
-         let s = Name.lower s in
-         if s = fn || List.mem s list then list else s :: list)
-      [] list
+    let list = Mutil.list_rev_map_append sou aliases list in
+    list
+(* List.sort_uniq compare list *)
+(* let fn = Name.lower (Name.concat first_name surname) in
+ * List.fold_left
+ *   (fun list s ->
+ *      let s = Name.lower s in
+ *      if s = fn || List.mem s list then list else s :: list)
+ *   [] list *)
 
 let rec eq_lists eq l1 l2 =
   match l1, l2 with

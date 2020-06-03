@@ -143,3 +143,7 @@ val list_replace : 'a -> 'a -> 'a list -> 'a list
 
 (** [list_except old_v new_v list] *)
 val list_except : 'a -> 'a list -> 'a list
+
+val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
+
+val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
