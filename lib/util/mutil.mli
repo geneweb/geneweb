@@ -154,3 +154,8 @@ val list_except : 'a -> 'a list -> 'a list
     the result is meaningless.
 *)
 val input_file_ic : in_channel -> string
+
+val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
+
+val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
+
