@@ -47,26 +47,31 @@ let make_name_index base =
 let create_name_index oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
-let add_name t key valu =
-  let key = Name.crush_lower key in
-  let i = Hashtbl.hash key mod Array.length t in
-  if Array.mem valu t.(i) then () else t.(i) <- Array.append [| valu |] t.(i)
-
 let make_strings_of_fsname base =
-  let t = Array.make Dutil.table_size [| |] in
+  let t = Array.make Dutil.table_size [] in
+  let add_name (key : string) (value : int) =
+    (* abbrev? *)
+    let key = Hashtbl.hash (Name.crush_lower key) mod Array.length t in
+    let rec loop acc = function
+      | [] -> Array.set t key @@ List.rev_append acc [ value ]
+      | hd :: tl ->
+        let cmp = compare hd value in
+        if cmp > 0 then Array.set t key @@ List.rev_append acc (value :: tl)
+        else if cmp < 0 then loop (hd :: acc) tl
+    in loop [] (Array.get t key)
+  in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base i in
     let first_name = Dutil.p_first_name base p in
     let surname = Dutil.p_surname base p in
-    if first_name <> "?" then add_name t first_name p.first_name;
+    if first_name <> "?" then add_name first_name p.first_name;
     if surname <> "?" then
       begin
-        add_name t surname p.surname;
-        List.iter (fun sp -> add_name t sp p.surname)
-          (Mutil.surnames_pieces surname)
+        add_name surname p.surname ;
+        List.iter (fun sp -> add_name sp p.surname) (Mutil.surnames_pieces surname)
       end
-  done;
-  t
+  done ;
+  Array.map Array.of_list t
 
 let create_strings_of_fsname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_fsname base)
