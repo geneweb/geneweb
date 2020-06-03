@@ -44,3 +44,6 @@ val next_chars_if_equiv : string -> int -> string -> int -> (int * int) option
 val unaccent_utf_8 : bool -> string -> int -> string * int
 
 val forbidden_char : char list
+
+(** [concat fn sn] is [fn ^ " " ^ sn] but faster. *)
+val concat : string -> string -> string
