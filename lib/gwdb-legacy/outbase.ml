@@ -50,19 +50,13 @@ module StringSet = Set.Make (String)
 module IntSet = Set.Make (Int)
 
 let make_strings_of_fsname base =
-  let particles =
-    List.fold_left
-      begin fun set p -> StringSet.add (Name.crush_lower p) set end
-      StringSet.empty base.data.particles
-  in
   let t = Array.make Dutil.table_size IntSet.empty in
   let add_name (key : string) (value : int) =
-    if not @@ StringSet.mem key particles then
-      let key = Dutil.name_index key in
-      let set = Array.get t key in
-      let set' = IntSet.add value set in
-      if set == set' then ()
-      else Array.set t key set'
+    let key = Dutil.name_index key in
+    let set = Array.get t key in
+    let set' = IntSet.add value set in
+    if set == set' then ()
+    else Array.set t key set'
   in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base i in
