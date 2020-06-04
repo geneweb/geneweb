@@ -56,3 +56,15 @@ val split_sname  : string -> string list
     into this list of firstname.
     e.g. [split_fname base "Foo-Bar Baz"] is [[ "Foo-Bar" ; "Baz"]] *)
 val split_fname : string -> string list
+
+(** [split_sname_callback fn s]
+    Same as [split_sname], but call [fn] with substring indices instead of building
+    a list
+*)
+val split_sname_callback : (int -> int -> unit) -> string -> unit
+
+(** [split_fname_callback fn s]
+    Same as [split_fname], but call [fn] with substring indices instead of building
+    a list
+*)
+val split_fname_callback : (int -> int -> unit) -> string -> unit
