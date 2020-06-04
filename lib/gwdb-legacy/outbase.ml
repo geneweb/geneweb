@@ -47,31 +47,42 @@ let make_name_index base =
 let create_name_index oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
+module StringSet = Set.Make (String)
+
+module IntSet = Set.Make (Int)
+
 let make_strings_of_fsname base =
-  let t = Array.make Dutil.table_size [] in
+  let particles =
+    List.fold_left
+      begin fun set p -> StringSet.add (Name.crush_lower p) set end
+      StringSet.empty base.data.particles
+  in
+  let t = Array.make Dutil.table_size IntSet.empty in
   let add_name (key : string) (value : int) =
     (* abbrev? *)
-    let key = Hashtbl.hash (Name.crush_lower key) mod Array.length t in
-    let rec loop acc = function
-      | [] -> Array.set t key @@ List.rev_append acc [ value ]
-      | hd :: tl ->
-        let cmp = compare hd value in
-        if cmp > 0 then Array.set t key @@ List.rev_append acc (value :: tl)
-        else if cmp < 0 then loop (hd :: acc) tl
-    in loop [] (Array.get t key)
+    let key = Name.crush_lower key in
+    if key <> "" && not @@ StringSet.mem key particles then
+      let key = Hashtbl.hash key mod Dutil.table_size in
+      let set = Array.get t key in
+      let set' = IntSet.add value set in
+      if set == set' then ()
+      else Array.set t key set'
   in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base i in
     let first_name = Dutil.p_first_name base p in
     let surname = Dutil.p_surname base p in
-    if first_name <> "?" then add_name first_name p.first_name;
+    if first_name <> "?" then
+      List.iter (fun s -> add_name s p.first_name) @@ Name.split_fname first_name ;
     if surname <> "?" then
-      begin
-        add_name surname p.surname ;
-        List.iter (fun sp -> add_name sp p.surname) (Name.split_sname surname)
-      end
+      List.iter (fun s -> add_name s p.surname) @@ Name.split_sname surname ;
   done ;
-  Array.map Array.of_list t
+  Array.map begin fun set ->
+    let a = Array.make (IntSet.cardinal set) 0 in
+    let i = ref 0 in
+    IntSet.iter (fun e -> Array.set a !i e ; incr i) set ;
+    a
+  end t
 
 let create_strings_of_fsname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_fsname base)
