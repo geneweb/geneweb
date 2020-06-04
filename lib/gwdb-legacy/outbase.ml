@@ -62,11 +62,11 @@ let make_strings_of_fsname base =
     let p = Dutil.poi base i in
     let first_name = Dutil.p_first_name base p in
     let surname = Dutil.p_surname base p in
-    if first_name <> "?" then
+    if first_name <> "?" then (* kill it? *)
       Name.split_fname_callback
         (fun i j -> add_name (String.sub first_name i j) p.first_name)
         first_name ;
-    if surname <> "?" then
+    if surname <> "?" then (* kill it? *)
       Name.split_sname_callback
         (fun i j -> add_name (String.sub surname i j) p.surname)
         surname ;
@@ -218,11 +218,12 @@ let output base =
       base.data.descends.clear_array ();
       close_out oc;
       close_out oc_acc;
-      begin let oc_inx = Secure.open_out_bin tmp_names_inx in
+      begin
+        let oc_inx = Secure.open_out_bin tmp_names_inx in
         let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
         try
           trace "create name index";
-          output_binary_int oc_inx 0;
+          output_binary_int oc_inx 0; (* room for fsname index *)
           create_name_index oc_inx oc_inx_acc base;
           base.data.ascends.clear_array ();
           base.data.unions.clear_array ();
@@ -231,7 +232,7 @@ let output base =
           let surname_or_first_name_pos = pos_out oc_inx in
           trace "create strings of fsname";
           create_strings_of_fsname oc_inx oc_inx_acc base;
-          seek_out oc_inx 0;
+          seek_out oc_inx 0; (* fsname index *)
           output_binary_int oc_inx surname_or_first_name_pos;
           close_out oc_inx;
           close_out oc_inx_acc;

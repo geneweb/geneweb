@@ -437,20 +437,22 @@ let strings_of_fsname bname strings (_, person_patches) =
       in
       close_in ic_inx; ai
     in
-    let l = ref (Array.to_list r) in
-    Hashtbl.iter
-      (fun _ p ->
-         if not (List.mem p.first_name !l) then
-           begin let s1 = strings.get p.first_name in
-             let s1 = Mutil.nominative s1 in
-             if s = Name.crush_lower s1 then l := p.first_name :: !l
-           end;
-         if not (List.mem p.surname !l) then
-           let s1 = strings.get p.surname in
-           let s1 = Mutil.nominative s1 in
-           if s = Name.crush_lower s1 then l := p.surname :: !l)
-      person_patches;
-    !l
+    Hashtbl.fold begin fun _ p acc ->
+      let acc =
+        if not (List.mem p.first_name acc)
+        && strings.get p.first_name
+           |> Name.split_fname
+           |> List.exists (fun s -> i = Dutil.name_index s)
+        then p.first_name :: acc
+        else acc
+      in
+      if not (List.mem p.surname acc)
+      && strings.get p.surname
+         |> Name.split_sname
+         |> List.exists (fun s -> i = Dutil.name_index s)
+      then p.surname :: acc
+      else acc
+    end person_patches (Array.to_list r)
 (**)
 
 (* Restrict file *)
