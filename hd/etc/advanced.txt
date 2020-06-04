@@ -136,9 +136,23 @@
         </div>
       </div>
       <div class="row">
+        <div class="col-3"></div>
+        <div class="form-check col-9">
+          <input class="form-check-input" type="checkbox" name="exact_first_name" value="on" checked>
+          <label class="form-check-label" for="exact_first_name">[*exact]</label>
+        </div>
+      </div>
+      <div class="row">
         <label for="surname" class="col-form-label col-3">[*surname/surnames]0</label>
         <div class="col-9">
           <input type="text" class="form-control" name="surname" id="surname" placeholder="[*surname/surnames]0">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3"></div>
+        <div class="form-check col-9">
+          <input class="form-check-input" type="checkbox" name="exact_surname" value="on">
+          <label class="form-check-label" for="exact_surname" checked>[*exact]</label>
         </div>
       </div>
       <div class="row mt-3">
