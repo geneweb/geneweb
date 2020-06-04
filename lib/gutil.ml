@@ -125,22 +125,6 @@ let find_same_name base p =
   in
   List.sort (fun p1 p2 -> compare (get_occ p1) (get_occ p2)) pl
 
-let trim_trailing_spaces s =
-  let len = String.length s in
-  let len' =
-    let rec loop i =
-      if i = -1 then 0
-      else
-        match String.unsafe_get s i with
-        | ' ' | '\r' | '\n' | '\t' -> loop (i - 1)
-        | _ -> i + 1
-    in
-    loop (len - 1)
-  in
-  if len' = 0 then ""
-  else if len' = len then s
-  else String.sub s 0 len'
-
 let alphabetic_utf_8 n1 n2 =
   let rec loop i1 i2 =
     if i1 >= String.length n1 && i2 >= String.length n2 then i1 - i2

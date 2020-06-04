@@ -366,6 +366,22 @@ let print conf base =
   in
   print_forum_message conf base r None
 
+let trim_trailing_spaces s =
+  let len = String.length s in
+  let len' =
+    let rec loop i =
+      if i = -1 then 0
+      else
+        match String.unsafe_get s i with
+        | ' ' | '\r' | '\n' | '\t' -> loop (i - 1)
+        | _ -> i + 1
+    in
+    loop (len - 1)
+  in
+  if len' = 0 then ""
+  else if len' = len then s
+  else String.sub s 0 len'
+
 let print_add_ok conf base =
   let mess =
     let time =
@@ -376,7 +392,7 @@ let print_add_ok conf base =
     let ident = String.trim (get conf "Ident") in
     let email = String.trim (get conf "Email") in
     let subject = String.trim (get conf "Subject") in
-    let text = Gutil.trim_trailing_spaces (get1 conf "Text") in
+    let text = trim_trailing_spaces (get1 conf "Text") in
     {m_time = time; m_date = Dtext ""; m_hour = ""; m_waiting = false;
      m_from = ""; m_ident = ident; m_wizard = ""; m_friend = "";
      m_email = email; m_access = ""; m_subject = subject; m_wiki = "";
