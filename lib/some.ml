@@ -136,9 +136,7 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "</table>";
   Wserver.printf "<br%s>\n" conf.xhs
 
-let persons_of_fsname conf base base_strings_of_fsname find proj split x =
-  (* list of strings index corresponding to the crushed lower first name
-     or surname "x" *)
+let old_persons_of_fsname conf base base_strings_of_fsname find proj split x =
   let istrl = base_strings_of_fsname base x in
   (* selecting the persons who have this first name or surname *)
   let l =
@@ -147,7 +145,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj split x =
       (fun istr l ->
          let str = Mutil.nominative (sou base istr) in
          if Name.crush_lower str = x
-            || List.mem x (List.map Name.crush_lower @@ split str)
+         || List.mem x (List.map Name.crush_lower @@ split str)
          then
            let iperl = find istr in
            (* maybe they are not the good ones because of changes in the
@@ -330,7 +328,7 @@ let first_name_print conf base x =
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 348, 29)))
     else
-      persons_of_fsname conf base base_strings_of_first_name
+      old_persons_of_fsname conf base base_strings_of_first_name
         (spi_find (persons_of_first_name base)) get_first_name
         Name.split_fname x
   in
@@ -789,7 +787,7 @@ let surname_print conf base not_found_fun x =
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 825, 29)))
     else
-      persons_of_fsname conf base base_strings_of_surname
+      old_persons_of_fsname conf base base_strings_of_surname
         (spi_find (persons_of_surname base)) get_surname
         Name.split_sname
         x
@@ -861,7 +859,7 @@ let search_surname conf base x =
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
     else
-      persons_of_fsname conf base base_strings_of_surname
+      old_persons_of_fsname conf base base_strings_of_surname
         (spi_find (persons_of_surname base)) get_surname Name.split_sname x
   in
   let list =
@@ -906,7 +904,7 @@ let search_surname_print conf base not_found_fun x =
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 942, 29)))
     else
-      persons_of_fsname conf base base_strings_of_surname
+      old_persons_of_fsname conf base base_strings_of_surname
         (spi_find (persons_of_surname base)) get_surname Name.split_sname x
   in
   let list =
@@ -972,7 +970,7 @@ let search_first_name conf base x =
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 1008, 29)))
     else
-      persons_of_fsname conf base base_strings_of_first_name
+      old_persons_of_fsname conf base base_strings_of_first_name
         (spi_find (persons_of_first_name base)) get_first_name Name.split_fname x
   in
   let list =
@@ -991,7 +989,7 @@ let search_first_name_print conf base x =
     else if x = "" then
       [], (fun _ -> raise (Match_failure ("src/some.ml", 1026, 29)))
     else
-      persons_of_fsname conf base base_strings_of_first_name
+      old_persons_of_fsname conf base base_strings_of_first_name
         (spi_find (persons_of_first_name base)) get_first_name Name.split_fname x
   in
   let list =

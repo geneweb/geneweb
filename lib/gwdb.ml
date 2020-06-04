@@ -217,3 +217,79 @@ let gen_gen_person_misc_names base p nobtit nobtit_fun =
 
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
+
+(** Search for all persons matching [x].
+    Be carefull, [split x] MUST be equal to [[x]]
+
+    i.e. [x] is already a result of [Name.split_fname]
+    or [Name.split_sname]
+
+    This is an approximative search, and you will need
+    to refine the result.
+
+    The result of this search is (string, istr, iper list) list.
+    For example, searching for "ferdinand", you may get:
+    [[ ("Ferdinand Henri", 94, [20])
+     ; ("Achille Ferdinand Alfred", 171, [38])
+     ; ("Ferdinand", 209, [46;100])
+     ]]
+
+    This function is not meant to be used directly. You should use
+    {!val:persons_of_fname} or {!val:persons_of_sname} instead.
+ *)
+let persons_of_fsname base strings_of persons_of split x =
+  let find = spi_find (persons_of base) in
+  let istrl = strings_of base x in
+  let x = Name.crush_lower x in
+  List.fold_right begin fun istr l ->
+    let str = Mutil.nominative (sou base istr) in
+    if List.mem x (List.map Name.crush_lower @@ split str)
+    then match find istr with
+      | [] -> l
+      | iperl -> (str, istr, iperl) :: l
+    else l
+  end istrl []
+
+(** See {!val:persons_of_fsname} *)
+let persons_of_sname base =
+  persons_of_fsname base base_strings_of_surname persons_of_surname Name.split_sname
+
+(** See {!val:persons_of_fsname} *)
+let persons_of_fname base =
+  persons_of_fsname base base_strings_of_first_name persons_of_first_name Name.split_fname
+
+(** A helper meant to be used with the result of {!val:persons_of_fsname}.
+
+    Tests if splitted value match evrything in [list].
+
+    If [exact] is [true] (default is [false],
+    it return [false] if [p] match more than [list].
+
+    Order does not matter, whether or not [exact] is [true].
+
+    This function is not meant to be used directly. You should use
+    {!val:match_first_name} or {!val:match_surname} instead.
+ *)
+let match_aux get split base ~exact list p =
+  match list with
+  | [] -> true
+  | _ ->
+    let list' =
+      get p
+      |> sou base
+      |> split
+      |> List.map Name.lower
+    in
+    if exact
+    then List.sort compare list = List.sort compare list'
+    else List.for_all (fun s -> List.mem s list') list
+
+(** See {!val:match_aux} *)
+let match_first_name
+  : base -> exact:bool -> string list -> person -> bool =
+  match_aux get_first_name Name.split_fname
+
+(** See {!val:match_aux} *)
+let match_surname
+  : base -> exact:bool -> string list -> person -> bool =
+  match_aux get_surname Name.split_sname

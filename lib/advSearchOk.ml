@@ -109,6 +109,16 @@ let advanced_search conf base max_answers =
         Hashtbl.add hss x v ;
         v
   in
+  let fn_list =
+    List.map begin fun s ->
+      List.sort_uniq compare @@ List.map Name.lower @@ Name.split_fname s
+    end (getss "first_name")
+  in
+  let sn_list =
+    List.map begin fun s ->
+      List.sort_uniq compare @@ List.map Name.lower @@ Name.split_sname s
+    end (getss "surname")
+  in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
   (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
@@ -247,11 +257,17 @@ let advanced_search conf base max_answers =
     apply_to_field_value
       p "occu" get_occupation string_incl empty_default_value
   in
-  let match_first_name p empty_default_value =
-    apply_to_field_values_raw p "first_name" (p_first_name base) (=) empty_default_value
+  let match_first_name p =
+      fn_list = []
+      || List.exists begin fun l ->
+        Gwdb.match_first_name base ~exact:(gets "exact_first_name" = "on") l p
+      end fn_list
   in
-  let match_surname p empty_default_value =
-    apply_to_field_values_raw p "surname" (p_surname base) (=) empty_default_value
+  let match_surname p =
+    sn_list = []
+    || List.exists begin fun l ->
+      Gwdb.match_surname base ~exact:(gets "exact_surname" = "on") l p
+    end sn_list
   in
   let match_married p empty_default_value =
     apply_to_field_value_raw p "married"
@@ -302,8 +318,11 @@ let advanced_search conf base max_answers =
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status p =
-    match_sex p true && match_first_name p true && match_surname p true &&
-    match_married p true && match_occupation p true
+    match_sex p true
+    && match_first_name p
+    && match_surname p
+    && match_married p true
+    && match_occupation p true
   in
   let match_person ((list, len) as acc) p search_type =
     if search_type <> "OR"
@@ -350,30 +369,28 @@ let advanced_search conf base max_answers =
         | None -> acc
       in loop (pget conf base @@ get_iper sosa_ref) ([], 0)
     | None -> [], 0
-  else if gets "first_name" <> "" || getss "surname" <> [] then
-    let (slist, _) =
-      if gets "first_name" <> "" then
-        Some.persons_of_fsname conf base base_strings_of_first_name
-          (spi_find (persons_of_first_name base)) get_first_name
-          Name.split_fname (gets "first_name")
-      else
-        let list =
-          List.map
-            (Some.persons_of_fsname conf base base_strings_of_surname
-               (spi_find (persons_of_surname base)) get_surname Name.split_sname)
-            (getss "surname")
-        in
-        ( list |> List.map fst |> List.flatten |> List.sort_uniq compare
-        , list |> List.hd |> snd)
-    in
-    let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-    let rec loop ((_, len) as acc) = function
-      | [] -> acc
-      | _ when len > max_answers -> acc
-      | ip :: l ->
-        loop (match_person acc (pget conf base ip) search_type) l
-    in
-    loop ([], 0) slist
+  else
+    if fn_list <> [] || sn_list <> [] then
+      let list =
+        if sn_list <> [] then
+          List.map (Gwdb.persons_of_sname base) (List.hd sn_list)
+        else
+          List.map (Gwdb.persons_of_fname base) (List.hd fn_list)
+      in
+      let list =
+        list
+        |> List.flatten
+        |> List.map (fun (_, _, list) -> list)
+        |> List.flatten
+        |> List.sort_uniq compare
+      in
+      let rec loop ((_, len) as acc) = function
+        | [] -> acc
+        | _ when len > max_answers -> acc
+        | ip :: l ->
+          loop (match_person acc (pget conf base ip) search_type) l
+      in
+      loop ([], 0) list
   else
     Gwdb.Collection.fold_until
       (fun (_, len) -> len <= max_answers)
