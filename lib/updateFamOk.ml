@@ -578,8 +578,8 @@ let check_event_witnesses conf witnesses =
   loop 0
 
 let check_parents conf cpl =
-  let (fa_fn, fa_sn, _, _, _) = Gutil.father cpl in
-  let (mo_fn, mo_sn, _, _, _) = Gutil.mother cpl in
+  let (fa_fn, fa_sn, _, _, _) = Adef.father cpl in
+  let (mo_fn, mo_sn, _, _, _) = Adef.mother cpl in
   match (fa_fn = "", fa_sn = ""), (mo_fn = "", mo_sn = "") with
     (true, true), (true, true) | (true, true), (false, false) |
     (false, false), (true, true) | (false, false), (false, false) ->
@@ -1143,14 +1143,14 @@ let is_created_or_already_there ochil_arr nchil schil =
 (* Improvement : check the name on the parents/children if they linked *)
 
 let need_check_noloop (scpl, sdes, onfs) =
-  if Array.exists is_a_link (Gutil.parent_array scpl) ||
+  if Array.exists is_a_link (Adef.parent_array scpl) ||
      Array.exists is_a_link sdes.children
   then
     match onfs with
       Some ((opar, ochil), (npar, nchil)) ->
         not
           (Mutil.array_forall2 (is_created_or_already_there opar) npar
-             (Gutil.parent_array scpl)) ||
+             (Adef.parent_array scpl)) ||
         not
           (Mutil.array_forall2 (is_created_or_already_there ochil) nchil
              sdes.children)
@@ -1310,8 +1310,8 @@ let forbidden_disconnected conf scpl sdes =
       Not_found -> false
   in
   if no_dec then
-    if get_create (Gutil.father scpl) = Update.Link ||
-       get_create (Gutil.mother scpl) = Update.Link
+    if get_create (Adef.father scpl) = Update.Link ||
+       get_create (Adef.mother scpl) = Update.Link
     then
       false
     else

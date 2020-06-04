@@ -17,9 +17,6 @@ val designation : base -> person -> string
 
 val sort_person_list : base -> person list -> person list
 
-val father : 'a gen_couple -> 'a
-val mother : 'a gen_couple -> 'a
 val couple : bool -> 'a -> 'a -> 'a gen_couple
-val parent_array : 'a gen_couple -> 'a array
 
 val find_free_occ : base -> string -> string -> int -> int

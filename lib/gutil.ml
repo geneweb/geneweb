@@ -10,11 +10,8 @@ let designation base p =
   Mutil.iso_8859_1_of_utf_8
     (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
 
-let father = Adef.father
-let mother = Adef.mother
 let couple multi fath moth =
   if not multi then Adef.couple fath moth else Adef.multi_couple fath moth
-let parent_array = Adef.parent_array
 
 let spouse ip cpl =
   if ip = get_father cpl then get_mother cpl else get_father cpl

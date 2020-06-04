@@ -125,7 +125,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
         | _ -> None
       in
       eval_date_var d s
-  | "father" :: sl -> eval_key (Gutil.father cpl) sl
+  | "father" :: sl -> eval_key (Adef.father cpl) sl
   | ["fsources"] -> str_val (Util.escape_html fam.fsources)
   | ["is_first"] ->
       begin match get_env "first" env with
@@ -148,7 +148,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
       let k =
         match get_env "cnt" env with
           Vint i ->
-            let arr = Gutil.parent_array cpl in
+            let arr = Adef.parent_array cpl in
             let i = i - 1 in
             if i >= 0 && i < Array.length arr then arr.(i)
             else if i >= 0 && i < 1 && Array.length arr = 0 then
@@ -618,7 +618,7 @@ let print_foreach print_ast _eval_expr =
     | ["fevent"] -> print_foreach_fevent env fcd al fam.fevents
     | ["fwitness"] -> print_foreach_fwitness env fcd al fam.fevents
     | ["witness"] -> print_foreach_witness env fcd al fam.witnesses
-    | ["parent"] -> print_foreach_parent env fcd al (Gutil.parent_array cpl)
+    | ["parent"] -> print_foreach_parent env fcd al (Adef.parent_array cpl)
     | _ -> raise Not_found
   and print_foreach_child env fcd al arr =
     for i = 0 to max 1 (Array.length arr) - 1 do
