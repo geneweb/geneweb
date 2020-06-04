@@ -269,7 +269,7 @@ let print_main conf base auth_file =
     if by_alphab_order then
       List.sort
         (fun (_, (_, (o1, _))) (_, (_, (o2, _))) ->
-           Gutil.alphabetic_order o1 o2)
+           Utf8.compare o1 o2)
         list
     else list
   in

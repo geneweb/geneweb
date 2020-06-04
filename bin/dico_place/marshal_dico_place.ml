@@ -33,11 +33,11 @@ let write_dico_place_set lang =
         done
       with End_of_file -> close_in ic
     end ;
-    (List.sort Gutil.alphabetic (StrSet.elements !string_set_town),
-     List.sort Gutil.alphabetic (StrSet.elements !string_set_area_code),
-     List.sort Gutil.alphabetic (StrSet.elements !string_set_county),
-     List.sort Gutil.alphabetic (StrSet.elements !string_set_region),
-     List.sort Gutil.alphabetic (StrSet.elements !string_set_country))
+    (List.sort Utf8.compare (StrSet.elements !string_set_town),
+     List.sort Utf8.compare (StrSet.elements !string_set_area_code),
+     List.sort Utf8.compare (StrSet.elements !string_set_county),
+     List.sort Utf8.compare (StrSet.elements !string_set_region),
+     List.sort Utf8.compare (StrSet.elements !string_set_country))
   in
   let generate name data =
     let fname_set = "dico_place_" ^ name ^ "_" ^ lang ^ ".list" in

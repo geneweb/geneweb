@@ -225,7 +225,7 @@ let first_name_print_list conf base x1 xl liste =
     let l =
       List.sort
         (fun x1 x2 ->
-           match Gutil.alphabetic (p_surname base x1) (p_surname base x2) with
+           match Utf8.compare (p_surname base x1) (p_surname base x2) with
              0 ->
              begin match
                  Adef.od_of_cdate (get_birth x1),
@@ -242,7 +242,7 @@ let first_name_print_list conf base x1 xl liste =
       (fun l x ->
          let px = p_surname base x in
          match l with
-           (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
+           (p, l1) :: l when Utf8.compare px p = 0 -> (p, x :: l1) :: l
          | _ -> (px, [x]) :: l)
       [] l
   in
@@ -400,8 +400,6 @@ let unselected_bullets conf =
        try if k = "u" then ifam_of_string v :: sl else sl with Failure _ -> sl)
     [] conf.env
 
-let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
-
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
 let print_branch conf base psn name =
@@ -547,7 +545,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     | _ ->
         List.sort
           (fun p1 p2 ->
-             alphabetic1 (p_first_name base p1.bh_ancestor)
+             Utf8.compare (p_first_name base p1.bh_ancestor)
                (p_first_name base p2.bh_ancestor))
           bhl
   in
@@ -677,7 +675,7 @@ let print_family_alphabetic x conf base liste =
       List.sort
         (fun x1 x2 ->
            match
-             alphabetic1 (p_first_name base x2) (p_first_name base x1)
+             Utf8.compare (p_first_name base x2) (p_first_name base x1)
            with
              0 -> compare (get_occ x1) (get_occ x2)
            | n -> n)
@@ -687,7 +685,7 @@ let print_family_alphabetic x conf base liste =
       (fun l x ->
          let px = p_first_name base x in
          match l with
-           (p, l1) :: l when alphabetic1 px p = 0 -> (p, x :: l1) :: l
+           (p, l1) :: l when Utf8.compare px p = 0 -> (p, x :: l1) :: l
          | _ -> (px, [x]) :: l)
       [] l
   in

@@ -16,7 +16,7 @@ let particle_at_the_end base is_surnames s =
   else s
 
 let compare_particle_at_the_end base is_surnames a b =
-  Gutil.alphabetic_order
+  Utf8.compare
     (particle_at_the_end base is_surnames a)
     (particle_at_the_end base is_surnames b)
 
@@ -25,7 +25,7 @@ let groupby_ini len list =
   |> Util.groupby
     ~key:(fun (k, _, _) -> ini len k)
     ~value:(fun (_, s, c) -> (s, c))
-  |> List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b)
+  |> List.sort (fun (a, _) (b, _) -> Utf8.compare a b)
 
 let groupby_count list =
   list
@@ -309,7 +309,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
             Wserver.printf "%s" (particle_at_the_end base is_surnames s);
             if href <> "" || name <> "" then Wserver.printf "</a>";
             Wserver.printf " (%d)" cnt)
-         (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);
+         (List.sort (fun (a, _) (b, _) -> Utf8.compare a b) l);
        Wserver.printf "\n";
        Wserver.printf "</p>\n")
     list;

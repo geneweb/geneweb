@@ -20,7 +20,7 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
     Wserver.printf "\">%s</a> (%d)" sn len
   in
   let print_sn_list (snl : (string * iper list) list) =
-    let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
+    let snl = List.sort (fun (sn1, _) (sn2, _) -> Utf8.compare sn1 sn2) snl in
     Wserver.printf "<li>\n";
     Mutil.list_iter_first (fun first x -> if not first then Wserver.printf ",\n" ; print_sn x) snl ;
     Wserver.printf "\n";
@@ -79,7 +79,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       (fun x -> x)
       max_int
   in
-  Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) array ;
+  Array.sort (fun (s1, _) (s2, _) -> Utf8.compare s1 s2) array ;
   let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "place")) in
   print_aux conf title begin fun () ->
     let opt = print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage in
@@ -124,7 +124,7 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_de
     | _, [] -> 1
     | [], _ -> -1
     | s1 :: pl11, s2 :: pl22 ->
-      match Gutil.alphabetic_order s1 s2 with
+      match Utf8.compare s1 s2 with
       | 0 -> sort_place_utf8 pl11 pl22
       | x -> x
   in

@@ -218,8 +218,8 @@ let print_foreach conf print_ast _eval_expr =
           (fun (_, s1) (_, s2) ->
              let rss1 = Place.without_suburb s1 in
              let rss2 = Place.without_suburb s2 in
-             if rss1 = rss2 then Gutil.alphabetic_order s1 s2
-             else Gutil.alphabetic_order rss1 rss2)
+             if rss1 = rss2 then Utf8.compare s1 s2
+             else Utf8.compare rss1 rss2)
           l
       | _ -> []
     in

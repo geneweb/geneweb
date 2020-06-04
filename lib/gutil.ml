@@ -125,66 +125,6 @@ let find_same_name base p =
   in
   List.sort (fun p1 p2 -> compare (get_occ p1) (get_occ p2)) pl
 
-let alphabetic_utf_8 n1 n2 =
-  let rec loop i1 i2 =
-    if i1 >= String.length n1 && i2 >= String.length n2 then i1 - i2
-    else if i1 >= String.length n1 then -1
-    else if i2 >= String.length n2 then 1
-    else
-      let (cv1, ii1) = Name.unaccent_utf_8 false n1 i1 in
-      let (cv2, ii2) = Name.unaccent_utf_8 false n2 i2 in
-      let c =
-        if cv1 = cv2 then
-          compare (String.sub n1 i1 (ii1 - i1)) (String.sub n2 i2 (ii2 - i2))
-        else compare cv1 cv2
-      in
-      if c = 0 then loop ii1 ii2 else c
-  in
-  if n1 = n2 then 0 else loop 0 0
-
-let alphabetic_value =
-  let tab = Array.make 256 0 in
-  for i = 0 to 255 do tab.(i) <- 10 * i done;
-  tab.(Char.code '\xE0')(*'à'*) <- tab.(Char.code 'a') + 1;
-  tab.(Char.code '\xE1')(*'á'*) <- tab.(Char.code 'a') + 2;
-  tab.(Char.code '\xE2')(*'â'*) <- tab.(Char.code 'a') + 3;
-  tab.(Char.code '\xE8')(*'è'*) <- tab.(Char.code 'e') + 1;
-  tab.(Char.code '\xE9')(*'é'*) <- tab.(Char.code 'e') + 2;
-  tab.(Char.code '\xEA')(*'ê'*) <- tab.(Char.code 'e') + 3;
-  tab.(Char.code '\xEB')(*'ë'*) <- tab.(Char.code 'e') + 4;
-  tab.(Char.code '\xF4')(*'ô'*) <- tab.(Char.code 'o') + 1;
-  tab.(Char.code '\xC1')(*'Á'*) <- tab.(Char.code 'A') + 2;
-  tab.(Char.code '\xC6')(*'Æ'*) <- tab.(Char.code 'A') + 5;
-  tab.(Char.code '\xC8')(*'È'*) <- tab.(Char.code 'E') + 1;
-  tab.(Char.code '\xC9')(*'É'*) <- tab.(Char.code 'E') + 2;
-  tab.(Char.code '\xD6')(*'Ö'*) <- tab.(Char.code 'O') + 4;
-  tab.(Char.code '?') <- 3000;
-  fun x -> tab.(Char.code x)
-
-let alphabetic_iso_8859_1 n1 n2 =
-  let rec loop i1 i2 =
-    if i1 = String.length n1 && i2 = String.length n2 then i1 - i2
-    else if i1 = String.length n1 then -1
-    else if i2 = String.length n2 then 1
-    else
-      let c1 = n1.[i1] in
-      let c2 = n2.[i2] in
-      if alphabetic_value c1 < alphabetic_value c2 then -1
-      else if alphabetic_value c1 > alphabetic_value c2 then 1
-      else loop (succ i1) (succ i2)
-  in
-  if n1 = n2 then 0 else loop (Mutil.initial n1) (Mutil.initial n2)
-
-(* ??? *)
-let alphabetic n1 n2 =
-  (*
-    if Mutil.utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
-  *)
-  alphabetic_iso_8859_1 n1 n2
-
-let alphabetic_order n1 n2 =
-  alphabetic_utf_8 n1 n2
-
 let sort_person_list base pl =
   List.sort
     (fun p1 p2 ->
@@ -205,13 +145,15 @@ let sort_person_list base pl =
        | _, _, Some _, _ -> -1
        | _, _, _, Death (_, _) -> -1
        | _ ->
-           let c = alphabetic (p_surname base p1) (p_surname base p2) in
-           if c = 0 then
-             let c =
-               alphabetic (p_first_name base p1) (p_first_name base p2)
-             in
-             if c = 0 then compare (get_occ p1) (get_occ p2) else c
-           else c)
+         let c =
+           Utf8.compare (p_surname base p1) (p_surname base p2)
+         in
+         if c = 0 then
+           let c =
+             Utf8.compare (p_first_name base p1) (p_first_name base p2)
+           in
+           if c = 0 then compare (get_occ p1) (get_occ p2) else c
+         else c)
     pl
 
 let find_free_occ base f s _i =

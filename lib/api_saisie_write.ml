@@ -73,9 +73,9 @@ let print_person_search_list conf base =
         let sn1 = sou base (get_surname p1) in
         let fn2 = sou base (get_first_name p2) in
         let sn2 = sou base (get_surname p2) in
-        let cmp_sn = Gutil.alphabetic_order sn1 sn2 in
+        let cmp_sn = Utf8.compare sn1 sn2 in
         if cmp_sn = 0 then
-          let cmp_fn = Gutil.alphabetic_order fn1 fn2 in
+          let cmp_fn = Utf8.compare fn1 fn2 in
           if cmp_fn = 0 then
             (match
               (Adef.od_of_cdate (get_birth p1),
@@ -298,7 +298,7 @@ let print_config conf base =
   let transl_pevent_sec =
     List.sort
       (fun msg1 msg2 ->
-        Gutil.alphabetic_order
+        Utf8.compare
           msg1.Mwrite.Transl_pevent_name.sval
           msg2.Mwrite.Transl_pevent_name.sval)
       transl_pevent_sec
@@ -320,7 +320,7 @@ let print_config conf base =
   let transl_pevent_LDS =
     List.sort
       (fun msg1 msg2 ->
-        Gutil.alphabetic_order
+        Utf8.compare
           msg1.Mwrite.Transl_pevent_name.sval
           msg2.Mwrite.Transl_pevent_name.sval)
       transl_pevent_LDS

@@ -63,11 +63,11 @@ let compare_places s1 s2 =
   let ss2, s2 = split_suburb s2 in
   match
     Mutil.list_compare
-      Gutil.alphabetic_order
+      Utf8.compare
       (String.split_on_char ',' s1)
       (String.split_on_char ',' s2)
   with
-  | 0 -> Gutil.alphabetic_order ss1 ss2
+  | 0 -> Utf8.compare ss1 ss2
   | x -> x
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
