@@ -64,8 +64,6 @@ let move_with_backup src dst =
 
     strings.inx - index for strings, surnames, first names
        length of the strings offset array : binary_int
-       offset of surnames index           : binary_int
-       offset of first names index        : binary_int
        strings hash table index           : 2 arrays of binary_ints
          strings offset array (length = prime after 10 * strings array length)
            - associating a hash value of the string modulo length
@@ -73,20 +71,6 @@ let move_with_backup src dst =
          strings list array (length = string array length)
            - associating a string index
            - to the index of the next index holding the same hash value
-       -- the following table has been obsolete since version 4.10
-       -- it has been replaced by snames.inx/sname.dat which use
-       -- much less memory
-       surnames index                     : value
-         binary tree
-          - associating the string index of a surname
-          - to the corresponding list of persons holding this surname
-       -- the following table has been obsolete since version 4.10
-       -- it has been replaced by fnames.inx/fname.dat which use
-       -- much less memory
-       first_names index                  : value
-         binary tree
-          - associating the string index of a first name
-          - to the corresponding list of persons holding this first name
 
     snames.inx - index for surnames
        binary tree
@@ -764,7 +748,7 @@ let opendb bname =
         flush stderr;
         None
   in
-  let ic2_string_start_pos = 3 * Dutil.int_size in
+  let ic2_string_start_pos = Dutil.int_size in
   let ic2_string_hash_len =
     match ic2 with
       Some ic2 -> Some (input_binary_int ic2)

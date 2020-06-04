@@ -99,7 +99,8 @@ let is_prime a =
 
 let rec prime_after n = if is_prime n then n else prime_after (n + 1)
 
-let output_strings_hash oc2 base =
+let output_strings_hash tmp_strings_inx base =
+  let oc = Secure.open_out_bin tmp_strings_inx in
   let () = base.data.strings.load_array () in
   let strings_array = base.data.strings in
   let taba =
@@ -113,13 +114,12 @@ let output_strings_hash oc2 base =
     let ia = Hashtbl.hash (base.data.strings.get i) mod Array.length taba in
     tabl.(i) <- taba.(ia); taba.(ia) <- i
   done;
-  output_binary_int oc2 (Array.length taba);
-  output_binary_int oc2 0;
-  output_binary_int oc2 0;
-  for i = 0 to Array.length taba - 1 do output_binary_int oc2 taba.(i) done;
-  for i = 0 to Array.length tabl - 1 do output_binary_int oc2 tabl.(i) done
+  output_binary_int oc (Array.length taba);
+  for i = 0 to Array.length taba - 1 do output_binary_int oc taba.(i) done;
+  for i = 0 to Array.length tabl - 1 do output_binary_int oc tabl.(i) done;
+  close_out oc
 
-let output_name_index_aux get _oc base names_inx names_dat =
+let output_name_index_aux get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
@@ -145,11 +145,11 @@ let output_name_index_aux get _oc base names_inx names_dat =
   Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array) ;
   close_out oc_n_inx
 
-let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
-  output_name_index_aux (fun p -> p.surname) oc2 base tmp_snames_inx tmp_snames_dat
+let output_surname_index base tmp_snames_inx tmp_snames_dat =
+  output_name_index_aux (fun p -> p.surname) base tmp_snames_inx tmp_snames_dat
 
-let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
-  output_name_index_aux (fun p -> p.first_name) oc2 base tmp_fnames_inx tmp_fnames_dat
+let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
+  output_name_index_aux (fun p -> p.first_name) base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =
   let oc = open_out fname in
@@ -230,7 +230,6 @@ let output base =
       close_out oc_acc;
       begin let oc_inx = Secure.open_out_bin tmp_names_inx in
         let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
-        let oc2 = Secure.open_out_bin tmp_strings_inx in
         try
           trace "create name index";
           output_binary_int oc_inx 0;
@@ -248,25 +247,19 @@ let output base =
           close_out oc_inx_acc;
           if !save_mem then begin trace "compacting"; Gc.compact () end;
           trace "create string index";
-          output_strings_hash oc2 base;
+          output_strings_hash tmp_strings_inx base;
           if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let surname_pos = pos_out oc2 in
           trace "create surname index";
-          output_surname_index oc2 base tmp_snames_inx tmp_snames_dat;
+          output_surname_index base tmp_snames_inx tmp_snames_dat;
           if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let first_name_pos = pos_out oc2 in
           trace "create first name index";
-          output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat;
-          seek_out oc2 Dutil.int_size;
-          output_binary_int oc2 surname_pos;
-          output_binary_int oc2 first_name_pos;
+          output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
           let s = base.data.bnotes.Def.nread "" Def.RnAll in
           if s = "" then ()
           else
             begin let oc_not = Secure.open_out tmp_notes in
               output_string oc_not s; close_out oc_not
             end;
-          close_out oc2;
           List.iter
             (fun f ->
                let s = base.data.bnotes.Def.nread f Def.RnAll in
@@ -278,7 +271,6 @@ let output base =
         with e ->
           (try close_out oc_inx with _ -> ());
           (try close_out oc_inx_acc with _ -> ());
-          (try close_out oc2 with _ -> ());
           raise e
       end;
       trace "ok" ;
