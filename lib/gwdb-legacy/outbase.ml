@@ -36,9 +36,7 @@ let make_name_index base =
     if p.first_name <> 1 && p.first_name <> 1
     then begin
       List.iter (fun i -> Array.set t i @@ p.key_index :: Array.get t i) @@
-      Mutil.list_map_sort_uniq begin fun key ->
-        Hashtbl.hash (Name.crush (Name.abbrev (Name.lower key))) mod Dutil.table_size
-      end @@
+      Mutil.list_map_sort_uniq Dutil.name_index @@
       Dutil.dsk_person_misc_names base p (fun p -> p.titles)
     end
   done ;
@@ -59,10 +57,8 @@ let make_strings_of_fsname base =
   in
   let t = Array.make Dutil.table_size IntSet.empty in
   let add_name (key : string) (value : int) =
-    (* crush_lower is crush o abrrev o lower *)
-    let key = Name.crush_lower key in
-    if key <> "" && not @@ StringSet.mem key particles then
-      let key = Hashtbl.hash key mod Dutil.table_size in
+    if not @@ StringSet.mem key particles then
+      let key = Dutil.name_index key in
       let set = Array.get t key in
       let set' = IntSet.add value set in
       if set == set' then ()

@@ -72,3 +72,5 @@ module IntHT = Hashtbl.Make (struct
     let equal = (=)
     let hash x = x
   end)
+
+let name_index s = Hashtbl.hash (Name.crush_lower s) mod table_size

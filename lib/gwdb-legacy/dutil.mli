@@ -31,3 +31,9 @@ module IntHT : sig
       let hash x = x
     end)
 end
+
+(** [name_index s]
+    Compute the index of crush_lowered version of s
+    in an array of size {!val:table_size}.
+*)
+val name_index : string -> int

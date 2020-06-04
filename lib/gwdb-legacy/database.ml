@@ -378,12 +378,10 @@ let persons_of_first_name_or_surname = function
 let persons_of_name bname patches =
   let t = ref None in
   fun s ->
-    let s = Name.crush_lower s in
-    let i = Hashtbl.hash s in
+    let i = Dutil.name_index s in
     let ai =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
-        let i = i mod Dutil.table_size in
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
@@ -412,12 +410,10 @@ let persons_of_name bname patches =
 let strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
   fun s ->
-    let s = Name.crush_lower s in
-    let i = Hashtbl.hash s in
+    let i = Dutil.name_index s in
     let r =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
-        let i = i mod Dutil.table_size in
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
@@ -948,8 +944,7 @@ let opendb bname =
   in
   let patch_name s ip =
     (* FIXME: pending patches? *)
-    let s = Name.crush_lower s in
-    let i = Hashtbl.hash s in
+    let i = Dutil.name_index s in
     try
       let ipl = Hashtbl.find patches.h_name i in
       if List.mem ip ipl then ()
