@@ -59,7 +59,7 @@ let make_strings_of_fsname base =
   in
   let t = Array.make Dutil.table_size IntSet.empty in
   let add_name (key : string) (value : int) =
-    (* abbrev? *)
+    (* crush_lower is crush o abrrev o lower *)
     let key = Name.crush_lower key in
     if key <> "" && not @@ StringSet.mem key particles then
       let key = Hashtbl.hash key mod Dutil.table_size in
@@ -73,9 +73,13 @@ let make_strings_of_fsname base =
     let first_name = Dutil.p_first_name base p in
     let surname = Dutil.p_surname base p in
     if first_name <> "?" then
-      List.iter (fun s -> add_name s p.first_name) @@ Name.split_fname first_name ;
+      Name.split_fname_callback
+        (fun i j -> add_name (String.sub first_name i j) p.first_name)
+        first_name ;
     if surname <> "?" then
-      List.iter (fun s -> add_name s p.surname) @@ Name.split_sname surname ;
+      Name.split_sname_callback
+        (fun i j -> add_name (String.sub surname i j) p.surname)
+        surname ;
   done ;
   Array.map begin fun set ->
     let a = Array.make (IntSet.cardinal set) 0 in
