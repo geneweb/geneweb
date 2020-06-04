@@ -201,23 +201,6 @@ let alphabetic n1 n2 =
 let alphabetic_order n1 n2 =
   alphabetic_utf_8 n1 n2
 
-let arg_list_of_string line =
-  let rec loop list i len quote =
-    if i = String.length line then
-      if len = 0 then List.rev list else List.rev (Buff.get len :: list)
-    else
-      match quote, line.[i] with
-        Some c1, c2 ->
-          if c1 = c2 then loop list (i + 1) len None
-          else loop list (i + 1) (Buff.store len c2) quote
-      | None, ' ' ->
-          let list = if len = 0 then list else Buff.get len :: list in
-          loop list (i + 1) 0 quote
-      | None, ('"' | '\'' as c) -> loop list (i + 1) 0 (Some c)
-      | None, c -> loop list (i + 1) (Buff.store len c) None
-  in
-  loop [] 0 0 None
-
 let sort_person_list base pl =
   List.sort
     (fun p1 p2 ->

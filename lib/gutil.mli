@@ -20,8 +20,6 @@ val alphabetic_utf_8 : string -> string -> int
 val alphabetic : string -> string -> int
 val alphabetic_order : string -> string -> int
 
-val arg_list_of_string : string -> string list
-
 val sort_person_list : base -> person list -> person list
 
 val father : 'a gen_couple -> 'a
