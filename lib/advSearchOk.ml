@@ -260,13 +260,15 @@ let advanced_search conf base max_answers =
   let match_first_name p =
       fn_list = []
       || List.exists begin fun l ->
-        Gwdb.match_first_name base ~exact:(gets "exact_first_name" = "on") l p
+        Gwdb.match_first_name
+          base ~aliases:false ~exact:(gets "exact_first_name" = "on") l p
       end fn_list
   in
   let match_surname p =
     sn_list = []
     || List.exists begin fun l ->
-      Gwdb.match_surname base ~exact:(gets "exact_surname" = "on") l p
+      Gwdb.match_surname
+        base ~aliases:false ~exact:(gets "exact_surname" = "on") l p
     end sn_list
   in
   let match_married p empty_default_value =

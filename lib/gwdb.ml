@@ -269,27 +269,44 @@ let persons_of_fname base =
 
     This function is not meant to be used directly. You should use
     {!val:match_first_name} or {!val:match_surname} instead.
- *)
-let match_aux get split base ~exact list p =
+*)
+let match_aux get ?get_aliases split base ~exact list p =
   match list with
   | [] -> true
   | _ ->
-    let list' =
+    let cmp list' =
+      if exact
+      then List.sort compare list = List.sort compare list'
+      else List.for_all (fun s -> List.mem s list') list
+    in
+    begin
       get p
       |> sou base
       |> split
       |> List.map Name.lower
-    in
-    if exact
-    then List.sort compare list = List.sort compare list'
-    else List.for_all (fun s -> List.mem s list') list
+      |> cmp
+    end
+    || match get_aliases with
+    | None -> false
+    | Some get ->
+      List.exists begin fun s ->
+        s
+        |> sou base
+        |> split
+        |> List.map Name.lower
+        |> cmp
+      end (get p)
 
 (** See {!val:match_aux} *)
 let match_first_name
-  : base -> exact:bool -> string list -> person -> bool =
-  match_aux get_first_name Name.split_fname
+  : base -> exact:bool -> aliases:bool -> string list -> person -> bool =
+  fun base ~exact ~aliases list p ->
+  let get_aliases = if aliases then Some get_first_names_aliases else None in
+  match_aux get_first_name ?get_aliases Name.split_fname base ~exact list p
 
 (** See {!val:match_aux} *)
 let match_surname
-  : base -> exact:bool -> string list -> person -> bool =
-  match_aux get_surname Name.split_sname
+  : base -> exact:bool -> aliases:bool -> string list -> person -> bool =
+  fun base ~exact ~aliases list p ->
+  let get_aliases = if aliases then Some get_surnames_aliases else None in
+  match_aux get_surname ?get_aliases Name.split_fname base ~exact list p
