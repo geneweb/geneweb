@@ -66,10 +66,22 @@ let make_strings_of_fsname base =
       Name.split_fname_callback
         (fun i j -> add_name (String.sub first_name i j) p.first_name)
         first_name ;
+    List.iter begin fun s ->
+      let s = base.data.strings.get s in
+      Name.split_fname_callback
+        (fun i j -> add_name (String.sub s i j) p.first_name)
+        s
+    end p.first_names_aliases ;
     if surname <> "?" then (* kill it? *)
       Name.split_sname_callback
         (fun i j -> add_name (String.sub surname i j) p.surname)
         surname ;
+    List.iter begin fun s ->
+      let s = base.data.strings.get s in
+      Name.split_fname_callback
+        (fun i j -> add_name (String.sub s i j) p.surname)
+        s
+    end p.first_names_aliases ;
   done ;
   Array.map begin fun set ->
     let a = Array.make (IntSet.cardinal set) 0 in
