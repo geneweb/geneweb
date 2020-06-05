@@ -112,7 +112,7 @@ let errmsg =
 
 let main () =
   Mutil.verbose := false;
-  Argl.parse speclist anonfun errmsg;
+  Arg.parse speclist anonfun errmsg;
   Secure.set_base_dir (Filename.dirname !out_file);
   let gwo = ref [] in
   List.iter

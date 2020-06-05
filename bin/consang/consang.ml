@@ -27,7 +27,7 @@ type ('index, 'item) field_info =
     fi_dir : string }
 
 let main () =
-  Argl.parse speclist anonfun errmsg;
+  Arg.parse speclist anonfun errmsg;
   if !fname = "" then
     begin
       Printf.eprintf "Missing file name\n";

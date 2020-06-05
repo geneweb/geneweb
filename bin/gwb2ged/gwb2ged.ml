@@ -848,7 +848,7 @@ let anonfun s =
   | ASwaitDescSurn -> desc_2nd := s; arg_state := ASnone
 
 let main () =
-  Argl.parse speclist anonfun errmsg;
+  Arg.parse speclist anonfun errmsg;
   Secure.set_base_dir (Filename.dirname !ifile);
   let anc =
     if !anc_1st <> "" then

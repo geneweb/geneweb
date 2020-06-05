@@ -1944,7 +1944,7 @@ module Make (Select : Select) =
 
     let main () =
       Mutil.verbose := false;
-      Argl.parse speclist anonfun errmsg;
+      Arg.parse speclist anonfun errmsg;
       if !in_file = "" then
         begin
           Printf.printf "Missing base\n";

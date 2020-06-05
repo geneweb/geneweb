@@ -477,7 +477,7 @@ let errmsg =
    Options are: "
 
 let check_args () =
-  Argl.parse speclist anonfun errmsg;
+  Arg.parse speclist anonfun errmsg;
   if !in_file1 = "" then
     begin
       Printf.printf "Missing reference data base\n";

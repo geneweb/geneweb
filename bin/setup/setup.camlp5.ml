@@ -1832,7 +1832,7 @@ let intro () =
         else !default_lang, !default_lang
     else !default_lang, !default_lang
   in
-  Argl.parse speclist anonfun usage;
+  Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
   default_lang := default_setup_lang;
   let (gwd_lang, setup_lang) =
