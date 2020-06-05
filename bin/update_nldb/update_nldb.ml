@@ -171,7 +171,7 @@ let compute base bdir =
   write_nldb base !db
 
 let main () =
-  Argl.parse speclist anonfun errmsg;
+  Arg.parse speclist anonfun errmsg;
   if !fname = "" then
     begin
       Printf.eprintf "Missing database name\n";

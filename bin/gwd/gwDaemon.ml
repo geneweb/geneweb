@@ -1765,7 +1765,7 @@ let arg_parse_in_file fname speclist anonfun errmsg =
         [x] -> Gutil.arg_list_of_string x
       | _ -> list
     in
-    Argl.parse_list speclist anonfun errmsg list
+    Arg.parse_argv (Array.of_list list) speclist anonfun errmsg
   with Sys_error _ -> ()
 
 let robot_exclude_arg s =
@@ -1949,7 +1949,7 @@ let main ~speclist () =
       end;
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun
     usage;
-  Argl.parse speclist anonfun usage;
+  Arg.parse speclist anonfun usage;
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
