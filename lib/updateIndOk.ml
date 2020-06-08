@@ -893,12 +893,8 @@ let check_sex_married conf base sp op =
   if sp.sex <> get_sex op
   && Array.exists begin fun ifam ->
        let fam = foi base ifam in
-       match get_relation fam with
-       | NotMarried | Married ->
-         (* these have NoSexCheck variants. *)
-         (sp.sex = Male && sp.key_index <> get_father fam)
-         || (sp.sex = Female && sp.key_index <> get_mother fam)
-       | _ -> get_sex op <> Neuter
+       (sp.sex = Male && sp.key_index <> get_father fam)
+       || (sp.sex = Female && sp.key_index <> get_mother fam)
      end (get_family op)
   then print_cannot_change_sex conf base op
 
