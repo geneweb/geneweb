@@ -193,30 +193,24 @@ let is_label_note lbl =
   in
   loop 0
 
+let print_aux conf param value submit =
+  Wserver.printf {|<p><form method="post" action="%s">|} conf.command;
+  List.iter begin fun (x, v) ->
+    (* Only textarea can contain newline. *)
+    Wserver.printf {|<textarea style="display:none;" name="%s">|} x ;
+    Wserver.print_string (Util.escape_html (decode_varenv v)) ;
+    Wserver.print_string "</textarea>"
+  end (conf.henv @ conf.env) ;
+  Wserver.printf {|<input type="hidden" name="%s" value="%s">|} param value ;
+  Wserver.printf {|<input type="submit" value="%s">|} submit ;
+  Wserver.printf {|</form></p>|}
+
 let print_return conf =
-  Wserver.printf "<p>\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       (* Seul un textarea peut contenir des sauts de ligne. *)
-       (* On remplace donc l'input par un textarea.          *)
-       if x = "notes" || x = "comment" || is_label_note x then
-         begin
-           Wserver.printf "<textarea style=\"display:none;\" name=\"%s\">\n"
-             x;
-           Wserver.printf "%s" (Util.escape_html (decode_varenv v));
-           Wserver.printf "</textarea>\n"
-         end
-       else
-         Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-           x (Util.escape_html (decode_varenv v)) conf.xhs)
-    (conf.henv @ conf.env);
-  Wserver.printf "<input type=\"hidden\" name=\"return\" value=\"on\"%s>\n"
-    conf.xhs;
-  Wserver.printf "<input type=\"submit\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "back")) conf.xhs;
-  Wserver.printf "</form>\n";
-  Wserver.printf "</p>\n"
+  print_aux conf "return" "ok" (Utf8.capitalize (transl conf "back"))
+
+let print_continue
+    conf ?(continue = Utf8.capitalize (transl conf "continue")) param value =
+  print_aux conf param value continue
 
 let print_err_unknown conf _base (f, s, o) =
 #ifdef API
