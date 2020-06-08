@@ -863,7 +863,8 @@ let print_cannot_change_sex conf base p =
   Hutil.rheader conf title;
   Update.print_error conf base (BadSexOfMarriedPerson p);
   Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
-  Update.print_return conf;
+  Update.print_return conf ;
+  Update.print_continue conf "nsck" "on" ;
   Hutil.trailer conf;
 #ifdef API
   end;
@@ -947,7 +948,7 @@ let effective_mod ?skip_conflict conf base sp =
       check_conflict conf base sp ipl ;
       rename_image_file conf base op sp
     end;
-  check_sex_married conf base sp op;
+  if List.assoc_opt "nsck" conf.env <> Some "on" then check_sex_married conf base sp op ;
   let created_p = ref [] in
   let np =
     Futil.map_person_ps (Update.insert_person conf base "" created_p)

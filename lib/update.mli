@@ -40,7 +40,17 @@ val delete_topological_sort : config -> base -> unit
 
 val update_related_pointers : base -> iper -> iper list -> iper list -> unit
 
+(** Helper function printing a hidden form containing current env,
+    with a submit button "return", plus a hidden field [return=on].  *)
 val print_return : config -> unit
+
+(** [print_continue conf param value]
+    Helper function printing a hidden form containing current env,
+    with a submit button "continue", plus a hidden field [param=value].
+    Optionnal [continue] parameter is the label used for the submit button.
+*)
+val print_continue : config -> ?continue:string -> string -> string -> unit
+
 val string_of_error : config -> base -> CheckItem.base_error -> string
 val print_error : config -> base -> CheckItem.base_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit
