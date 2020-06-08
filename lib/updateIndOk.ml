@@ -855,17 +855,24 @@ let print_conflict conf base p =
    in
    raise @@ Update.ModErr err
 
-let print_cannot_change_sex conf base p =
+
+let default_prerr conf base = function
+  | BadSexOfMarriedPerson p as err ->
+    let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+    Hutil.rheader conf title;
+    Update.print_error conf base err ;
+    Wserver.printf "<ul><li>%s</li></ul>" (Util.referenced_person_text conf base p);
+    Update.print_return conf ;
+    Update.print_continue conf "nsck" "on" ;
+    Hutil.trailer conf
+  | _ -> assert false
+
+
+let print_cannot_change_sex ?(prerr = default_prerr) conf base p =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
-  Update.print_error conf base (BadSexOfMarriedPerson p);
-  Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
-  Update.print_return conf ;
-  Update.print_continue conf "nsck" "on" ;
-  Hutil.trailer conf;
+  prerr conf base (BadSexOfMarriedPerson p)
 #ifdef API
   end;
 #endif
@@ -889,14 +896,14 @@ let check_conflict conf base sp ipl =
          print_conflict conf base p1)
     ipl
 
-let check_sex_married conf base sp op =
+let check_sex_married ?prerr conf base sp op =
   if sp.sex <> get_sex op
   && Array.exists begin fun ifam ->
        let fam = foi base ifam in
        (sp.sex = Male && sp.key_index <> get_father fam)
        || (sp.sex = Female && sp.key_index <> get_mother fam)
      end (get_family op)
-  then print_cannot_change_sex conf base op
+  then print_cannot_change_sex ?prerr conf base op
 
 let rename_image_file conf base op sp =
   match auto_image_file conf base op with
@@ -927,7 +934,7 @@ let pwitnesses_of pevents =
     [] pevents
 
 (* sp.death *)
-let effective_mod ?skip_conflict conf base sp =
+let effective_mod ?prerr ?skip_conflict conf base sp =
   let pi = sp.key_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
@@ -944,7 +951,8 @@ let effective_mod ?skip_conflict conf base sp =
       check_conflict conf base sp ipl ;
       rename_image_file conf base op sp
     end;
-  if List.assoc_opt "nsck" conf.env <> Some "on" then check_sex_married conf base sp op ;
+  if List.assoc_opt "nsck" conf.env <> Some "on"
+  then check_sex_married ?prerr conf base sp op ;
   let created_p = ref [] in
   let np =
     Futil.map_person_ps (Update.insert_person conf base "" created_p)
@@ -1281,7 +1289,7 @@ let print_mod_aux conf base callback =
       | None -> callback p
   else Update.error_digest conf
 
-let print_mod o_conf base =
+let print_mod ?prerr o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
@@ -1305,7 +1313,7 @@ let print_mod o_conf base =
     Perso.links_to_ind conf base db key
   in
   let callback sp =
-    let p = effective_mod conf base sp in
+    let p = effective_mod ?prerr conf base sp in
     let op = poi base p.key_index in
     let u = {family = get_family op} in
     patch_person base p.key_index p;

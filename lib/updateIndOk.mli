@@ -1,17 +1,20 @@
-(* $Id: updateIndOk.mli,v 5.6 2008-01-21 13:28:12 ddr Exp $ *)
-
 open Config
 open Def
 open Gwdb
 
 val effective_del : config -> base -> person -> unit
 
+(** [effective_mod prerr ?skip_conflict conf base sp] *)
 val effective_mod
-  : ?skip_conflict:iper
+  : ?prerr:(config -> base -> person error -> unit)
+  -> ?skip_conflict:iper
   -> config
   -> base
   -> (iper, Update.key, string) gen_person
   -> (iper, iper, istr) gen_person
+
+val print_mod
+  : ?prerr:(config -> base -> person error -> unit) -> config -> base -> unit
 
 val all_checks_person :
   base -> (iper, iper, istr) gen_person -> ifam gen_ascend ->
@@ -24,7 +27,7 @@ val rename_image_file :
 
 val print_add : config -> base -> unit
 val print_del : config -> base -> unit
-val print_mod : config -> base -> unit
+
 val print_change_event_order : config -> base -> unit
 
 
