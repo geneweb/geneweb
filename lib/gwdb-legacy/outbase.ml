@@ -66,6 +66,7 @@ let make_strings_of_fsname base =
     let aux split istr =
       if istr <> 1 then begin
         let s = base.data.strings.get istr in
+        add_name s istr ;
         split (fun i j -> add_name (String.sub s i j) istr) s
       end
     in
