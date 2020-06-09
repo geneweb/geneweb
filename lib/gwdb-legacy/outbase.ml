@@ -49,6 +49,9 @@ module StringSet = Set.Make (String)
 
 module IntSet = Set.Make (Int)
 
+(* For each first name/surname and aliases,
+   associate it with the list of [Dutil.name_index] (run on splitted values)
+*)
 let make_strings_of_fsname base =
   let t = Array.make Dutil.table_size IntSet.empty in
   let add_name (key : string) (value : int) =
@@ -60,28 +63,16 @@ let make_strings_of_fsname base =
   in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base i in
-    let first_name = Dutil.p_first_name base p in
-    let surname = Dutil.p_surname base p in
-    if first_name <> "?" then (* kill it? *)
-      Name.split_fname_callback
-        (fun i j -> add_name (String.sub first_name i j) p.first_name)
-        first_name ;
-    List.iter begin fun s ->
-      let s = base.data.strings.get s in
-      Name.split_fname_callback
-        (fun i j -> add_name (String.sub s i j) p.first_name)
-        s
-    end p.first_names_aliases ;
-    if surname <> "?" then (* kill it? *)
-      Name.split_sname_callback
-        (fun i j -> add_name (String.sub surname i j) p.surname)
-        surname ;
-    List.iter begin fun s ->
-      let s = base.data.strings.get s in
-      Name.split_fname_callback
-        (fun i j -> add_name (String.sub s i j) p.surname)
-        s
-    end p.first_names_aliases ;
+    let aux split istr =
+      if istr <> 1 then begin
+        let s = base.data.strings.get istr in
+        split (fun i j -> add_name (String.sub s i j) istr) s
+      end
+    in
+    aux Name.split_fname_callback p.first_name ;
+    List.iter (aux Name.split_fname_callback) p.first_names_aliases ;
+    aux Name.split_sname_callback p.surname ;
+    List.iter (aux Name.split_fname_callback) p.first_names_aliases ;
   done ;
   Array.map begin fun set ->
     let a = Array.make (IntSet.cardinal set) 0 in
@@ -121,14 +112,20 @@ let output_strings_hash tmp_strings_inx base =
   for i = 0 to Array.length tabl - 1 do output_binary_int oc tabl.(i) done;
   close_out oc
 
-let output_name_index_aux get base names_inx names_dat =
+(* Associate istr to persons.
+   A person is associated with its first name/surname and aliases
+*)
+let output_name_index_aux get gets base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    let k = get p in
-    match Dutil.IntHT.find_opt ht k with
-    | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
-    | None -> Dutil.IntHT.add ht k [ p.key_index ]
+    let aux k =
+      match Dutil.IntHT.find_opt ht k with
+      | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
+      | None -> Dutil.IntHT.add ht k [ p.key_index ]
+    in
+    aux (get p) ;
+    List.iter aux (gets p)
   done ;
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
   ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
@@ -148,10 +145,10 @@ let output_name_index_aux get base names_inx names_dat =
   close_out oc_n_inx
 
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
-  output_name_index_aux (fun p -> p.surname) base tmp_snames_inx tmp_snames_dat
+  output_name_index_aux (fun p -> p.surname) (fun p -> p.surnames_aliases) base tmp_snames_inx tmp_snames_dat
 
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
-  output_name_index_aux (fun p -> p.first_name) base tmp_fnames_inx tmp_fnames_dat
+  output_name_index_aux (fun p -> p.first_name) (fun p -> p.first_names_aliases) base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =
   let oc = open_out fname in
