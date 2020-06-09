@@ -867,15 +867,11 @@ let default_prerr conf base = function
     Hutil.trailer conf
   | _ -> assert false
 
-
 let print_cannot_change_sex ?(prerr = default_prerr) conf base p =
 #ifdef API
-  if not !Api_conf.mode_api then begin
+  if not !Api_conf.mode_api then
 #endif
-  prerr conf base (BadSexOfMarriedPerson p)
-#ifdef API
-  end;
-#endif
+  prerr conf base (BadSexOfMarriedPerson p) ;
   let err =
     Printf.sprintf "%s." (Utf8.capitalize (transl conf "cannot change sex of a married person"))
   in
