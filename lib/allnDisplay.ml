@@ -309,7 +309,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
             Wserver.printf "%s" (particle_at_the_end base is_surnames s);
             if href <> "" || name <> "" then Wserver.printf "</a>";
             Wserver.printf " (%d)" cnt)
-         (List.sort (fun (a, _) (b, _) -> Utf8.compare a b) l);
+         (List.sort (fun (a, _) (b, _) -> compare_particle_at_the_end base is_surnames a b) l);
        Wserver.printf "\n";
        Wserver.printf "</p>\n")
     list;
