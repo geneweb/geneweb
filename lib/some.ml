@@ -66,7 +66,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   else
     begin
       Wserver.printf "<a href=\"%sm=N&o=i&v=%s\" rel=\"nofollow\">"
-        (commd conf) (code_varenv x ^ "&t=N");
+        (commd conf) (code_varenv x ^ "&t=A");
       Wserver.printf "%s"
         (transl_nth conf "display by/branch/alphabetic order" 2);
       Wserver.printf "</a>"
@@ -637,7 +637,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   in
   let list = List.sort compare list in
   let access txt sn =
-    geneweb_link conf ("m=N&v=" ^ code_varenv sn ^ "&t=N") txt
+    geneweb_link conf ("m=N&v=" ^ code_varenv sn ^ "&t=A") txt
   in
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
     (fun (_, txt, sn) -> Wserver.printf "%s" (access txt sn)) list;
