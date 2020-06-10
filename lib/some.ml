@@ -711,53 +711,11 @@ let print_family_alphabetic x conf base liste =
         (print_elem conf base false) liste;
       Hutil.trailer conf
 
-let insert_at_position_in_family children ip ipl =
-  let rec loop child_list ipl =
-    match child_list, ipl with
-      ip1 :: ipl1, ip2 :: ipl2 ->
-        if ip1 = ip2 then if ip = ip1 then ipl else ip2 :: loop ipl1 ipl2
-        else if ip = ip1 then ip1 :: ipl
-        else loop ipl1 ipl
-    | _ :: _, [] -> [ip]
-    | [], _ -> assert false
-  in
-  loop (Array.to_list children) ipl
 
-let select_ancestors conf base name_inj ipl =
-  let str_inj s = name_inj (sou base s) in
-  List.fold_left
-    (fun bhl ip ->
-       let p = pget conf base ip in
-       match get_parents p with
-         Some ifam ->
-           let fam = foi base ifam in
-           let ifath = get_father fam in
-           let imoth = get_mother fam in
-           let fath = pget conf base ifath in
-           let moth = pget conf base imoth in
-           let s = str_inj (get_surname p) in
-           if str_inj (get_surname fath) <> s &&
-              str_inj (get_surname moth) <> s
-           then
-             let rec loop =
-               function
-                 bh :: bhl ->
-                   if bh.bh_ancestor = ifath || bh.bh_ancestor = imoth then
-                     let bh =
-                       {bh with bh_well_named_ancestors =
-                         insert_at_position_in_family (get_children fam) ip
-                           bh.bh_well_named_ancestors}
-                     in
-                     bh :: bhl
-                   else bh :: loop bhl
-               | [] -> [{bh_ancestor = ifath; bh_well_named_ancestors = [ip]}]
-             in
-             loop bhl
-           else bhl
-       | _ ->
-           let bh = {bh_ancestor = ip; bh_well_named_ancestors = []} in
-           bh :: bhl)
-    [] ipl
+let select_ancestors conf base inj ipl =
+  List.map begin fun br ->
+    { bh_ancestor = List.hd br ; bh_well_named_ancestors = List.tl br }
+  end (Util.branches conf base inj ipl)
 
 let persons_of_absolute_surname conf base x =
   let istrl = base_strings_of_surname base x in

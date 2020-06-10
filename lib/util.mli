@@ -375,3 +375,12 @@ val safe_html : string -> string
     [false] if we knwon the first name or the last name of [p].
 *)
 val is_empty_name : person -> bool
+
+(** Group persons by line. Should be used with the result of a search
+    function. *)
+val branches
+ : config
+ -> base
+ -> (string -> string)
+ -> iper list
+ -> iper list list

@@ -3411,3 +3411,54 @@ let rm_rf dir =
   let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
   List.iter Unix.unlink files ;
   List.iter Unix.rmdir directories
+
+let insert_at_position_in_family children ip ipl =
+  let rec loop child_list ipl =
+    match child_list, ipl with
+      ip1 :: ipl1, ip2 :: ipl2 ->
+        if ip1 = ip2 then if ip = ip1 then ipl else ip2 :: loop ipl1 ipl2
+        else if ip = ip1 then ip1 :: ipl
+        else loop ipl1 ipl
+    | _ :: _, [] -> [ip]
+    | [], _ -> assert false
+  in
+  loop (Array.to_list children) ipl
+
+let branches conf base inj ipers =
+  let inj s = inj (sou base s) in
+  List.fold_left begin fun branches ip ->
+    let p = pget conf base ip in
+    match get_parents p with
+    | Some ifam ->
+      let fam = foi base ifam in
+      let ifath = get_father fam in
+      let imoth = get_mother fam in
+      let fath = pget conf base ifath in
+      let moth = pget conf base imoth in
+      let ss = inj (get_surname p) :: List.map inj (get_surnames_aliases p) in
+      let aux p =
+        let aux s = let s = inj s in List.for_all ((<>) s) ss in
+        aux (get_surname p)
+        && List.for_all aux (get_surnames_aliases p)
+      in
+      if aux fath && aux moth
+      || not (List.mem ifath ipers || List.mem imoth ipers)
+      then
+        let rec loop =
+          function
+          | (br_hd :: br_tl) as br :: branches ->
+            if br_hd = ifath || br_hd = imoth
+            then
+              (br_hd :: insert_at_position_in_family (get_children fam) ip br_tl)
+              :: branches
+            else br :: loop branches
+          | [] -> [ [ ifath ;  ip ] ]
+          | _ -> assert false
+        in
+        loop branches
+      else if not (List.mem ifath ipers || List.mem imoth ipers)
+      then [ ip ] :: branches
+      else branches
+    | _ ->
+      [ ip ] :: branches
+  end [] ipers
