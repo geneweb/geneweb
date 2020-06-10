@@ -32,40 +32,31 @@ let select_approx_key conf base pl k =
        else pl)
     pl []
 
-let cut_words str =
-  let rec loop beg i =
-    if i < String.length str then
-      match str.[i] with
-        ' ' ->
-          if beg = i then loop (succ beg) (succ i)
-          else String.sub str beg (i - beg) :: loop (succ i) (succ i)
-      | _ -> loop beg (succ i)
-    else if beg = i then []
-    else [String.sub str beg (i - beg)]
-  in
-  loop 0 0
-
 let try_find_with_one_first_name conf base n =
   let n1 = Name.abbrev (Name.lower n) in
   match String.index_opt n1 ' ' with
-    Some i ->
-      let fn = String.sub n1 0 i in
-      let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
-      let (list, _) =
-        Some.old_persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base)) get_surname Name.split_sname sn
-      in
-      List.fold_left
-        (fun pl (_, _, ipl) ->
-           List.fold_left
-             (fun pl ip ->
-                let p = pget conf base ip in
-                let fn1 =
-                  Name.abbrev (Name.lower (sou base (get_first_name p)))
-                in
-                if List.mem fn (cut_words fn1) then p :: pl else pl)
-             pl ipl)
-        [] list
+  | Some i ->
+    let fn = String.sub n1 0 i in
+    let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
+    let (list, _) =
+      Some.new_persons_of_fsname conf base
+        base_strings_of_surname
+        (fun istr -> spi_find (Gwdb.persons_of_surname base) istr)
+        get_surname
+        Name.split_sname
+        sn
+    in
+    List.fold_left
+      (fun pl (_, _, ipl) ->
+         List.fold_left
+           (fun pl ip ->
+              let p = pget conf base ip in
+              let fn1 =
+                Name.abbrev (Name.lower (sou base (get_first_name p)))
+              in
+              if List.mem fn (String.split_on_char ' ' fn1) then p :: pl else pl)
+           pl ipl)
+      [] list
   | None -> []
 
 let compact_list base xl =
@@ -201,98 +192,92 @@ let search_by_key conf base an =
 (* main *)
 
 type search_type =
-    Sosa
+  | Sosa
   | Key
   | Surname
   | FirstName
   | ApproxKey
   | PartialKey
-  | DefaultSurname
 
-let search conf base an search_order specify unknown =
+let search conf base specify unknown one surname firstname fn sn search_order =
+  let an = if fn <> "" then if sn <> "" then fn ^ " " ^ sn else fn else sn in
   let rec loop l =
     match l with
-      [] -> unknown conf an
+    | [] -> unknown conf an
     | Sosa :: l ->
-        let pl = search_by_sosa conf base an in
-        begin match pl with
-          [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+      let pl = search_by_sosa conf base an in
+      begin match pl with
+        | [p] -> one conf base p
         | _ -> loop l
-        end
+      end
     | Key :: l ->
-        let pl = search_by_key conf base an in
-        begin match pl with
-          [] -> loop l
-        | [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+      let pl = search_by_key conf base an in
+      begin match pl with
+        | [] -> loop l
+        | [p] -> one conf base p
         | pl -> specify conf base an pl
-        end
+      end
     | Surname :: l ->
-        let pl = Some.search_surname conf base an in
-        begin match pl with
-          [] -> loop l
-        | _ ->
-            conf.cancel_links <- false;
-            Some.search_surname_print conf base unknown an
-        end
+      begin match Some.search_surname conf base sn with
+        | [], _ -> loop l
+        | list ->
+          surname conf base unknown an list
+      end
     | FirstName :: l ->
-        let pl = Some.search_first_name conf base an in
-        begin match pl with
-          [] -> loop l
-        | _ ->
-            conf.cancel_links <- false;
-            Some.search_first_name_print conf base an
-        end
+      begin match fst @@ Some.search_first_name conf base fn with
+        | [] -> loop l
+        | list when sn = "" -> firstname conf base an list
+        | list ->
+          begin match
+              let iperl =
+                Some.search_surname conf base sn
+                |> fst
+                |> List.map (fun (_, (_, list)) -> list)
+                |> List.flatten
+              in
+              List.filter (function (_, (_, [])) -> false | _ -> true) @@
+              List.map
+                begin fun (s, (i, ips)) ->
+                  (s, (i, List.filter (fun i -> List.mem i iperl) ips))
+                end
+                list
+            with
+            | [] -> loop l
+            | [ (_, (_, [p])) ] -> one conf base (Gwdb.poi base p)
+            | list -> firstname conf base an list
+          end
+      end
     | ApproxKey :: l ->
-        let pl = search_approx_key conf base an in
-        begin match pl with
-          [] -> loop l
-        | [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+      let pl = search_approx_key conf base an in
+      begin match pl with
+        | [] -> loop l
+        | [p] -> one conf base p
         | pl -> specify conf base an pl
-        end
+      end
     | PartialKey :: l ->
-        let pl = search_partial_key conf base an in
-        begin match pl with
-          [] -> loop l
-        | [p] ->
-            record_visited conf (get_iper p); Perso.print conf base p
+      let pl = search_partial_key conf base an in
+      begin match pl with
+        | [] -> loop l
+        | [p] -> one conf base p
         | pl -> specify conf base an pl
-        end
-    | DefaultSurname :: _ ->
-        conf.cancel_links <- false;
-        Some.search_surname_print conf base unknown an
+      end
   in
   loop search_order
 
-
-(* ************************************************************************ *)
-(*  [Fonc] print : conf -> string -> unit                                   *)
-(** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
-      trouver la meilleure combinaison de résultat pour afficher la réponse
-      la plus probable.
-    [Args] :
-      - conf : configuration de la base
-      - base : base
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let print conf base specify unknown =
+let print conf base specify unknown ~fn ~sn =
+  let aux =
+    search conf base specify unknown
+      (fun conf base p -> record_visited conf (get_iper p) ; Perso.print conf base p)
+      Some.print_surname
+      Some.print_first_name
+  in
   let real_input label =
     match p_getenv conf.env label with
-      Some s -> if s = "" then None else Some s
+    | Some s -> if s = "" then None else Some s
     | None -> None
   in
-  match real_input "p", real_input "n" with
-    Some fn, Some sn ->
-      let order = [Key; ApproxKey; PartialKey] in
-      search conf base (fn ^ " " ^ sn) order specify unknown
-  | Some fn, None ->
-      let order = [FirstName] in search conf base fn order specify unknown
-  | None, Some sn ->
-      let order =
-        [Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname]
-      in
-      search conf base sn order specify unknown
+  match real_input fn, real_input sn with
+  | Some fn, Some sn -> aux fn sn [ Key ; FirstName ; ApproxKey ; PartialKey ]
+  | Some fn, None -> aux fn "" [ FirstName ]
+  | None, Some sn -> aux "" sn [ Sosa ; Key ; Surname ; ApproxKey ; PartialKey ]
   | None, None -> Hutil.incorrect_request conf

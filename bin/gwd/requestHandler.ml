@@ -53,119 +53,6 @@ let name_with_roman_number str =
   in
   loop false 0 0
 
-let compact_list base xl =
-  let pl = Gutil.sort_person_list base xl in
-  List.fold_right
-    (fun p pl ->
-       match pl with
-         p1 :: _ when get_iper p = get_iper p1 -> pl
-       | _ -> p :: pl)
-    pl []
-
-let cut_words str =
-  let rec loop beg i =
-    if i < String.length str then
-      match str.[i] with
-        ' ' ->
-        if beg = i then loop (succ beg) (succ i)
-        else String.sub str beg (i - beg) :: loop (succ i) (succ i)
-      | _ -> loop beg (succ i)
-    else if beg = i then []
-    else [String.sub str beg (i - beg)]
-  in
-  loop 0 0
-
-let try_find_with_one_first_name conf base n =
-  let n1 = Name.abbrev (Name.lower n) in
-  match String.index_opt n1 ' ' with
-    Some i ->
-    let fn = String.sub n1 0 i in
-    let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
-    let (list, _) =
-      Some.old_persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base)) get_surname Name.split_sname sn
-    in
-    List.fold_left
-      (fun pl (_, _, ipl) ->
-         List.fold_left
-           (fun pl ip ->
-              let p = pget conf base ip in
-              let fn1 =
-                Name.abbrev (Name.lower (sou base (get_first_name p)))
-              in
-              if List.mem fn (cut_words fn1) then p :: pl else pl)
-           pl ipl)
-      [] list
-  | None -> []
-
-let find_all conf base an =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
-  match sosa_ref, sosa_nb with
-    Some p, Some n ->
-    if n <> Sosa.zero then
-      match Util.branch_of_sosa conf base n p with
-        Some (p :: _) -> [p], true
-      | _ -> [], false
-    else [], false
-  | _ ->
-    match Gutil.person_of_string_key base an with
-      Some ip ->
-      let pl =
-        let p = pget conf base ip in if is_hidden p then [] else [p]
-      in
-      let pl =
-        if not conf.wizard && not conf.friend then
-          List.fold_right
-            (fun p pl ->
-               if not (is_hide_names conf p) ||
-                  Util.authorized_age conf base p
-               then
-                 p :: pl
-               else pl)
-            pl []
-        else pl
-      in
-      pl, false
-    | None ->
-      let ipl = Gutil.person_not_a_key_find_all base an in
-      let (an, ipl) =
-        if ipl = [] then
-          match name_with_roman_number an with
-            Some an1 ->
-            let ipl = Gutil.person_ht_find_all base an1 in
-            if ipl = [] then an, [] else an1, ipl
-          | None -> an, ipl
-        else an, ipl
-      in
-      let pl =
-        List.fold_left
-          (fun l ip ->
-             let p = pget conf base ip in
-             if is_hidden p then l else p :: l)
-          [] ipl
-      in
-      let spl = select_std_eq conf base pl an in
-      let pl =
-        if spl = [] then
-          if pl = [] then try_find_with_one_first_name conf base an
-          else pl
-        else spl
-      in
-      let pl =
-        if not conf.wizard && not conf.friend then
-          List.fold_right
-            (fun p pl ->
-               if not (is_hide_names conf p) ||
-                  Util.authorized_age conf base p
-               then
-                 p :: pl
-               else pl)
-            pl []
-        else pl
-      in
-      compact_list base pl, false
-
 let relation_print conf base p =
   let p1 =
     match p_getenv conf.senv "ei" with
@@ -1046,64 +933,15 @@ let defaultHandler : handler =
 
   ; n = begin fun _self conf base ->
       match p_getenv conf.env "v" with
-      | Some v -> Some.surname_print conf base Some.surname_not_found v
+      | Some v ->
+        Some.surname_print conf base Some.surname_not_found v
       | _ -> AllnDisplay.print_surnames conf base
     end
 
-  ; ng = begin fun self conf base ->
-      (* Rétro-compatibilité <= 6.06 *)
-      let env =
-        match p_getenv conf.env "n" with
-          Some n ->
-          begin match p_getenv conf.env "t" with
-              Some "P" -> ("fn", n) :: conf.env
-            | Some "N" -> ("sn", n) :: conf.env
-            | _ -> ("v", n) :: conf.env
-          end
-        | None -> conf.env
-      in
-      let conf = {conf with env = env} in
-      (* Nouveau mode de recherche. *)
-      begin match p_getenv conf.env "select" with
-          Some "input" | None ->
-          (* Récupère le contenu non vide de la recherche. *)
-          let real_input label =
-            match p_getenv conf.env label with
-              Some s -> if s = "" then None else Some s
-            | None -> None
-          in
-          (* Recherche par clé, sosa, alias ... *)
-          let search n =
-            let (pl, sosa_acc) = find_all conf base n in
-            match pl with
-            | [] ->
-              conf.cancel_links <- false ;
-              Some.surname_print conf base self.unknown n
-            | [p] ->
-              if sosa_acc || Gutil.person_of_string_key base n <> None ||
-                 person_is_std_key conf base p n
-              then
-                person_selected_with_redirect self conf base p
-              else specify conf base n pl
-            | pl -> specify conf base n pl
-          in
-          begin match real_input "v" with
-              Some n -> search n
-            | None ->
-              match real_input "fn", real_input "sn" with
-                Some fn, Some sn -> search (fn ^ " " ^ sn)
-              | Some fn, None ->
-                conf.cancel_links <- false ;
-                Some.first_name_print conf base fn
-              | None, Some sn ->
-                conf.cancel_links <- false ;
-                Some.surname_print conf base self.unknown sn
-              | None, None -> self.incorrect_request self conf base
-          end
-        | Some i ->
-          relation_print conf base
-            (pget conf base (iper_of_string i))
-      end
+  ; ng = begin fun self conf base -> match p_getenv conf.env "select" with
+      | Some "input" | None ->
+        SearchName.print conf base specify self.unknown ~sn:"sn" ~fn:"fn"
+      | Some i -> relation_print conf base (pget conf base (iper_of_string i))
     end
 
   ; notes = begin fun _self conf base ->
@@ -1161,7 +999,7 @@ let defaultHandler : handler =
     end
 
   ; s = begin fun self conf base ->
-      SearchName.print conf base specify self.unknown
+      SearchName.print conf base specify self.unknown ~sn:"n" ~fn:"p"
     end
 
   ; snd_image = begin fun self conf base ->
