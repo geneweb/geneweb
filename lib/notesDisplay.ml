@@ -138,7 +138,7 @@ let print_linked_list conf base pgl =
              begin
                Wserver.printf "<a class=\"mx-2\" href=\"%s&i=%s&\">"
                  (commd conf) (Gwdb.string_of_iper ip);
-               Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
            begin
@@ -161,7 +161,7 @@ let print_linked_list conf base pgl =
                  "<a class=\"mx-2\" href=\"%sm=MOD_FAM&i=%s&ip=%s&\">"
                  (commd conf) (Gwdb.string_of_ifam ifam)
                  (Gwdb.string_of_iper (Gwdb.get_iper fath));
-               Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
            Wserver.printf "<span class=\"mx-2\">";
@@ -178,7 +178,7 @@ let print_linked_list conf base pgl =
              begin
                Wserver.printf "<a class=\"mx-2\" href=\"%sm=MOD_NOTES&\">"
                  (commd conf);
-               Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
            Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES\">"
@@ -196,7 +196,7 @@ let print_linked_list conf base pgl =
                Wserver.printf
                  "<a class=\"mx-2\" href=\"%sm=MOD_NOTES&f=%s&\">"
                  (commd conf) fnotes;
-               Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
            Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES&f=%s&\">"
@@ -212,10 +212,10 @@ let print_linked_list conf base pgl =
                Wserver.printf
                  "<a class=\"mx-2\" href=\"%sm=MOD_WIZNOTES&f=%s&\">"
                  (commd conf) (code_varenv wizname);
-               Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
                Wserver.printf "</a>"
              end;
-           Wserver.printf "<a class=\"mx-2\" href=\"%sm=WIZNOTES&v=%s\">"
+           Wserver.printf "<a class=\"mx-2\" href=\"%sm=WIZNOTES&f=%s\">"
              (commd conf) (code_varenv wizname);
            Wserver.printf "%s" wizname;
            Wserver.printf "</a>";
