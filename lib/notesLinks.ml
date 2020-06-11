@@ -35,7 +35,7 @@ let misc_notes_link s i =
         let rec loop j =
           if j = slen then i
           else if
-            j < slen - 3 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
+            j <= slen - 3 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
           then
             j + 3
           else loop (j + 1)
@@ -60,7 +60,7 @@ let misc_notes_link s i =
       let j =
         let rec loop j =
           if j = slen then i
-          else if j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' then j + 2
+          else if j <= slen - 2 && s.[j] = ']' && s.[j+1] = ']' then j + 2
           else loop (j + 1)
         in
         loop (i + 2)
