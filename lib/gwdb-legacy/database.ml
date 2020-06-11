@@ -375,7 +375,7 @@ let new_persons_of_first_name_or_surname base_data params =
   { find ; cursor ; next }
 
 let persons_of_first_name_or_surname = function
-  | GnWb0021 -> new_persons_of_first_name_or_surname
+  | GnWb0022 | GnWb0021 -> new_persons_of_first_name_or_surname
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
 (* Search index for a given name in file names.inx *)
@@ -720,7 +720,8 @@ let opendb bname =
   in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
   let version =
-    if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
+    if Mutil.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
+    else if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
     else if Mutil.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
     else if really_input_string ic 4 = "GnWb"
     then failwith "this is a GeneWeb base, but not compatible"
@@ -751,7 +752,11 @@ let opendb bname =
         flush stderr;
         None
   in
-  let ic2_string_start_pos = Dutil.int_size in
+  let ic2_string_start_pos =
+    match version with
+    | GnWb0022 -> Dutil.int_size
+    | GnWb0021 | GnWb0020 -> 3 * Dutil.int_size
+  in
   let ic2_string_hash_len =
     match ic2 with
       Some ic2 -> Some (input_binary_int ic2)
@@ -1122,4 +1127,4 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; nb_of_real_persons = (fun _ -> assert false)
     }
   in
-  { data ; func ; version = GnWb0021 }
+  { data ; func ; version = GnWb0022 }

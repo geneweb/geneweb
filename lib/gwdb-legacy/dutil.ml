@@ -8,6 +8,7 @@ type strings_of_fsname = int array array
 
 let magic_GnWb0020 = "GnWb0020"
 let magic_GnWb0021 = "GnWb0021"
+let magic_GnWb0022 = "GnWb0022"
 let table_size = 0x3fff
 
 let poi base i = base.data.persons.get i

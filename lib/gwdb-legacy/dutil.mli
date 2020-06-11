@@ -7,6 +7,7 @@ type strings_of_fsname = int array array
 
 val magic_GnWb0020 : string
 val magic_GnWb0021 : string
+val magic_GnWb0022 : string
 val table_size : int
 
 val compare_istr_fun : Dbdisk.base_data -> int -> int -> int
