@@ -48,8 +48,7 @@ let suite =
             ; WLnone
             ]
             "[[[aaa/bbb]]], [[ccc/ddd]], http://site.com/eee#fff"
-          ;
-          test
+        ; test
             [ WLnone
             ; WLperson (12, ("aaa", "bbb", 0), "aaa bbb", None)
             ; WLnone
@@ -57,6 +56,7 @@ let suite =
             ; WLnone
             ]
             "[[[aaa/bbb]], [[ccc/ddd]], http://site.com/eee#fff"
+        ; test [ WLnone ] "[[[aaa/"
         end
     ]
   ]
