@@ -3,89 +3,78 @@
     only:
       - master
 
-  skip_commits:
-    files:
-      - CHANGES
-      - ICHANGES
-      - etc/
-      - geneweb.opam
-      - .gitignore
-      - hd/
-      - INSTALL
-      - LICENSE
-      - README.md
-      - man/
-      - .travis.yml
-
   platform:
     - x64
 
+  init:
+    - ps: $env:PKG_VERSION = $env:APPVEYOR_REPO_COMMIT.SubString(0,8)
+
   environment:
-    CYG_ROOT: C:/cygwin64
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-    OPAM_PACKAGES: 'benchmark camlp5 cppo dune.1.11.4 jingoo markup num ocaml ounit stdlib-shims unidecode.0.2.0 uucp uunf uutf zarith'
+    OPAM_PACKAGES: 'camlp5.7.12 cppo dune.1.11.4 jingoo markup ocaml ounit stdlib-shims unidecode.0.2.0 uucp uutf uunf'
+    matrix:
+      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+        CYG_ROOT: C:/cygwin64
+        PKG_OS: win64
+      - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
+        PACKAGE_UPDATE: 'sudo apt-get update'
+        PACKAGE_INSTALLER: 'sudo apt-get install -qq'
+        PKG_OS: linux
+      - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+        PACKAGE_UPDATE: 'brew update'
+        PACKAGE_INSTALLER: 'brew install'
+        PKG_OS: macos-10.14
+      - APPVEYOR_BUILD_WORKER_IMAGE: macos
+        PACKAGE_UPDATE: 'brew update'
+        PACKAGE_INSTALLER: 'brew install'
+        PKG_OS: macos-10.15
 
   install:
-    - 'set OPAMYES=1'
-    - 'set PATH=%PATH%;%CYG_ROOT%\usr\x86_64-w64-mingw32\sys-root\mingw\bin'
-    - '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp'
-    - '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
-    - '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
-    - '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.09.0+mingw64c --disable-sandboxing"'
-    - '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
-    - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
+    # windows environnement
+    - cmd: 'choco install -y innosetup'
+    - cmd: 'set OPAMYES=1'
+    - cmd: 'set PATH=%PATH%;%CYG_ROOT%\usr\x86_64-w64-mingw32\sys-root\mingw\bin'
+    - cmd: '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp'
+    - cmd: '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
+    - cmd: '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
+    - cmd: '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.09.1+mingw64c --disable-sandboxing"'
+    - cmd: '%CYG_BASH% "opam update"'
+    - cmd: '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
+    - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
+    # unix environnement
+    - sh: 'export OPAMYES=1'
+    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "macos" || "$APPVEYOR_BUILD_WORKER_IMAGE" == "macos-mojave" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
+    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "Ubuntu1604" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
+    - sh: '$PACKAGE_UPDATE'
+    - sh: '$PACKAGE_INSTALLER opam'
+    - sh: 'opam init --compiler=4.09.1'
+    - sh: 'eval $(opam config env)'
+    - sh: 'opam update'
+    - sh: 'opam install $OPAM_PACKAGES'
+
+  test_script:
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make test"'
+    - sh: 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make test'
 
   build_script:
-    - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && BENCH_FILE=geneweb-bench.tmp.bin make ci"'
-    - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy && make clean distrib"'
-    - 7z a geneweb.zip %APPVEYOR_BUILD_FOLDER%\distribution
-    - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-zarith && make clean distrib"'
-    - 7z a geneweb-zarith.zip %APPVEYOR_BUILD_FOLDER%\distribution
+    - sh : 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib'
+    - sh : 'zip -r geneweb-$PKG_OS-$PKG_VERSION.zip distribution/*'
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib"'
+    - cmd: 'iscc geneweb.iss'
+    - cmd: 7z a geneweb-%PKG_OS%-%PKG_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\distribution
 
   artifacts:
-    - path: geneweb.zip
+    - path: geneweb-%PKG_OS%-%PKG_VERSION%.zip
       name: GeneWeb with default options
-    - path: geneweb-zarith.zip
-      name: GeneWeb with --sosa-zarith option
+    - path: geneweb-win64-%PKG_VERSION%-installer.exe
+      name: Win64 installer for GeneWeb
 
--
-  branches:
-    except:
-      - master
-
-  skip_commits:
-    files:
-      - CHANGES
-      - ICHANGES
-      - etc/
-      - geneweb.opam
-      - .gitignore
-      - hd/
-      - INSTALL
-      - LICENSE
-      - README.md
-      - man/
-      - .travis.yml
-
-  platform:
-    - x64
-
-  environment:
-    CYG_ROOT: C:/cygwin64
-    CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-    OPAM_PACKAGES: 'benchmark camlp5 cppo dune.1.11.4 jingoo markup num ocaml ounit stdlib-shims unidecode.0.2.0 uucp uutf zarith'
-
-  install:
-    - 'set OPAMYES=1'
-    - 'set PATH=%PATH%;%CYG_ROOT%\usr\x86_64-w64-mingw32\sys-root\mingw\bin'
-    - '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp'
-    - '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
-    - '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
-    - '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.09.0+mingw64c --disable-sandboxing"'
-    - '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
-    - '%CYG_BASH% "eval $(ocaml-env cygwin)"'
-
-  build_script:
-    - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && BENCH_FILE=geneweb-bench.tmp.bin make ci"'
-    - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy && make clean distrib"'
-    - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-zarith && make clean distrib"'
+  deploy:
+    release: 'Geneweb %PKG_VERSION%'
+    description: 'Geneweb %PKG_VERSION% built by appveyor'
+    provider: GitHub
+    auth_token:
+      secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
+    artifact: /geneweb-%PKG_OS%-%PKG_VERSION%.zip|geneweb-win64-%PKG_VERSION%-installer.exe/
+    draft: false
+    prerelease: false

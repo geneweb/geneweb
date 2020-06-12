@@ -17,13 +17,10 @@ jobs:
     env: OCAML_VERSION=4.09
   - os: linux
     env: OCAML_VERSION=4.10
-  - os: osx
-    env: OCAML_VERSION=4.09
   - os: freebsd
     env: OCAML_VERSION=4.09
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then command -v protoc >/dev/null 2>&1 || (brew update && brew install protobuf) ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then command -v protoc >/dev/null 2>&1 || sudo apt-get install -qq protobuf-compiler ; fi
   - if [[ "$TRAVIS_OS_NAME" == "freebsd" ]]; then command -v protoc >/dev/null 2>&1 || sudo pkg install -qy protobuf ; fi
 
@@ -34,12 +31,8 @@ install:
 script:
   - set -ex ;
     export OPAMYES=1 ;
-    export DEPS='benchmark camlp5 cppo dune.1.11.4 jingoo markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode.0.2.0 uucp uunf uutf yojson zarith' ;
+    export DEPS='benchmark camlp5.7.12 cppo dune.1.11.4 jingoo markup num ocaml ounit ocurl piqi piqilib redis redis-sync stdlib-shims unidecode.0.2.0 uucp uunf uutf yojson zarith' ;
     eval $(opam config env) ;
-    opam pin list ;
-    opam pin remove markup --no-action ;
-    opam pin remove piqilib --no-action ;
-    opam pin remove piqi --no-action ;
     opam update ;
     opam install depext ;
     opam depext $DEPS ;
