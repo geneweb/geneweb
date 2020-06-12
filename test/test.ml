@@ -6,5 +6,6 @@ let _ =
     Test_utils.suite
     @ Test_sosa.suite
     @ Test_place.suite
+    @ Test_wiki.suite
   end
 
