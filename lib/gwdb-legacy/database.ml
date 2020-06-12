@@ -443,20 +443,19 @@ let strings_of_fsname bname strings (_, person_patches) =
       close_in ic_inx; ai
     in
     Hashtbl.fold begin fun _ p acc ->
-      let acc =
-        if not (List.mem p.first_name acc)
-        && strings.get p.first_name
-           |> Name.split_fname
+      let aux split acc istr =
+        if not (List.mem istr acc)
+        && strings.get istr
+           |> split
            |> List.exists (fun s -> i = Dutil.name_index s)
-        then p.first_name :: acc
+        then istr :: acc
         else acc
       in
-      if not (List.mem p.surname acc)
-      && strings.get p.surname
-         |> Name.split_sname
-         |> List.exists (fun s -> i = Dutil.name_index s)
-      then p.surname :: acc
-      else acc
+      let acc = aux Name.split_fname acc p.first_name in
+      let acc = List.fold_left (aux Name.split_fname) acc p.first_names_aliases in
+      let acc = aux Name.split_sname acc p.surname in
+      let acc = List.fold_left (aux Name.split_sname) acc p.surnames_aliases in
+      acc
     end person_patches (Array.to_list r)
 (**)
 
