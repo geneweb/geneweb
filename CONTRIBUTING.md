@@ -14,6 +14,7 @@ When proposing a PR:
 - Add some documentation if relevant.
 - Add some unit tests if relevant.
 - Add some benchmarks if relevant.
+- Add some comments around blocks/functions if relevant.
 
 Some reasons why a PR could be refused:
 
