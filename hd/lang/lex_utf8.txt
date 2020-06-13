@@ -658,7 +658,7 @@ ar: 1 %m %y/%d %m %y/%m %y/%y
 bg: 1 %m %y/%d %m %y/%m %y/%y
 br: 1añ %m %y/%d %m %y/%m %y/%y
 ca: 1 d[e |']%m de %y/%d d[e |']%m de %y/%m de %y/%y
-co: 1<sup>u</sup> d[i']%m %y/%d d[i']%m %y/d[i']%m %y/in u %y
+co: 1<sup>u</sup> d[i |']%m %y/%d d[i |']%m %y/d[i |']%m %y/in u %y
 cs: 1. %m %y/%d. %m %y/%m %y/%y
 da: 1. %m %y/%d. %m %y/%m %y/%y
 de: 1. %m %y/%d. %m %y/%m %y/%y
