@@ -1,5 +1,7 @@
 open Geneweb
 open OUnit2
+open Config
+open Def
 
 let mutil_contains _ =
   let str = "foo bar" in
@@ -103,6 +105,45 @@ let util_safe_html _ =
     {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
     (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|})
 
+let util_transl_a_of_b _ =
+  let conf = Config.empty in
+  let conf = {conf with env = ("lang", "fr") :: conf.env} in
+  let _ = Hashtbl.add conf.lexicon "%1 of %2" "%1 d[e |']%2" in
+  let test aaa (s1, s2, s2_raw) =
+    let bbb = Util.transl_a_of_b conf s1 s2 s2_raw in
+    assert_equal aaa bbb
+  in
+    test "naissance de <b>Jean</b>" ("naissance", "<b>Jean</b>", "Jean")
+  ; test "naissance d'<b>André</b>" ("naissance", "<b>André</b>", "André")
+
+let datedisplay_string_of_date _ =
+  let conf = Config.empty in
+  let conf = {conf with env = ("lang", "co") :: conf.env} in
+  let _ = Hashtbl.add conf.lexicon "(date)"
+    "1<sup>u</sup> d[i |']%m %y/%d d[i |']%m %y/d[i |']%m %y/in u %y"
+  in
+  let _ = Hashtbl.add conf.lexicon "(month)"
+    "ghjennaghju/ferraghju/marzu/aprile/maghju/ghjugnu/lugliu/aostu/sittembre/uttobre/nuvembre/dicembre"
+  in
+ let test aaa cal (d, m, y) =
+    let date = Dgreg ({day = d; month = m; year = y; prec = Sure; delta = 0}, cal) in
+    let bbb = DateDisplay.string_of_date conf date in
+    let _ = if not (aaa = bbb) then Printf.eprintf "\n%s\n" bbb else () in
+    assert_equal aaa bbb
+  in
+    test "4 d'aostu 1974" Dgregorian (4, 8, 1974)
+  ; test "4 di sittembre 1974" Dgregorian (4, 9, 1974)
+  ; test "1<sup>u</sup> di ferraghju 1974" Dgregorian (1, 2, 1974)
+  ; test "di marzu 1974" Dgregorian (0, 3, 1974)
+  ; test "d'aprile 1974" Dgregorian (0, 4, 1974)
+  ; test "in u 1974" Dgregorian (0, 0, 1974)
+  ; let _ = Hashtbl.add conf.lexicon "(date)"
+    "1<sup>u</sup> d[i']%m %y/%d d[i %m %y/d[i |'%m %y/in u %y"
+  in
+    test "1<sup>u</sup> d[i']ferraghju 1974" Dgregorian (1, 2, 1974)
+  ; test "d[i |'marzu 1975" Dgregorian (0, 3, 1975)
+  ; test "4 d[i sittembre 1974" Dgregorian (4, 9, 1974)
+
 let suite =
   [ "Mutil" >:::
     [ "mutil_contains" >:: mutil_contains
@@ -116,5 +157,7 @@ let suite =
     ]
   ; "Util" >:::
     [ "util_safe_html" >:: util_safe_html
+    ; "util_transl_a_of_b" >:: util_transl_a_of_b
+    ; "datedisplay_string_of_date" >:: datedisplay_string_of_date
     ]
   ]

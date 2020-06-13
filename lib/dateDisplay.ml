@@ -35,16 +35,22 @@ let code_date conf encoding d m y =
         match encoding.[i] with
           '%' when i + 1 < String.length encoding ->
             let s = apply_date_code encoding.[i+1] in s, i + 1
-        | '['
-          when
-            i + 5 < String.length encoding && encoding.[i+3] = ']' &&
-            encoding.[i+4] = '%' ->
-            let s = apply_date_code encoding.[i+5] in
-            let s1 =
-              if start_with_vowel s then String.make 1 encoding.[i+2]
-              else String.make 1 encoding.[i+1] ^ " "
-            in
-            s1 ^ s, i + 5
+        | '[' ->
+            begin try (* code similar to Util.gen_decline *)
+              let len = String.length encoding in
+              let j = String.index_from encoding i ']' in
+              let k = String.index_from encoding i '|' in
+              if k < j && j + 2 < len && encoding.[j + 1] = '%' then
+                let s = apply_date_code encoding.[j + 2] in
+                let s1 =
+                  if start_with_vowel s then String.sub encoding (k + 1) (j - k - 1)
+                  else String.sub encoding (i + 1) (k - i - 1)
+                in
+                s1 ^ s, j + 2
+              else
+                String.make 1 '[', i
+            with Not_found -> String.make 1 '[', i
+            end
         | c -> String.make 1 c, i
       in
       s ^ loop (i + 1)
