@@ -3396,13 +3396,16 @@ let groupby ~key ~value list =
 
 let ls_r dirs =
   let rec loop result = function
-    | f :: fs when Sys.is_directory f ->
-      Sys.readdir f
-      |> Array.to_list
-      |> List.rev_map (Filename.concat f)
-      |> List.rev_append fs
-      |> loop (f :: result)
-    | f :: fs -> loop (f :: result) fs
+    | f :: fs ->
+      if Sys.file_exists f then
+        if Sys.is_directory f then
+          Sys.readdir f
+          |> Array.to_list
+          |> List.rev_map (Filename.concat f)
+          |> List.rev_append fs
+          |> loop (f :: result)
+        else loop (f :: result) fs
+      else loop (result) fs
     | [] -> result
   in
   loop [] dirs
