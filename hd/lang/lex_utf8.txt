@@ -1,4 +1,4 @@
-     !dates order
+    !dates order
 af: yyyymmdd
 ar: ddmmyyyy
 bg: ddmmyyyy
@@ -29,11 +29,11 @@ sk: ddmmyyyy
 sl: ddmmyyyy
 sv: ddmmyyyy
 
-     !dir
+    !dir
 ar: rtl
 he: rtl
 
-     !languages
+    !languages
 af: af=Afrikaans/bg=Bulgaars/br=Bretons/ca=Catalan/co=Korsikaans/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/et=Estnies/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/lv=Lets/nl=Nederlands/no=Noorweegs/oc=Oksitaans/pl=Pools/pt=Portugees/pt-br=Portugees-in-Brazilië/ro=Roemeens/ru=Russies/sk=Slowaaks/sl=Sloweens/sv=Sweeds/zh=Chinees
 bg: af=бурски/bg=български/br=бретонски/ca=каталонски/co=корсикан/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/oc=окситански/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sk=Словашки език/sl=словенски/sv=шведски/zh=китайски
 br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/co=korseg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/oc=okitaneg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sk=Slovakeg/sl=sloveneg/sv=svedeg/zh=sinaeg
@@ -65,132 +65,132 @@ sl: af=afrikaanščina/bg=bolgarščina/br=bretonščina/ca=katalonščina/co=ko
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/co=korsikanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/oc=occitanska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sk=slovakiska/sl=slovenska/sv=svenska/zh=kinesiska
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/zh=中文
 
-     the first branch
-af:  om die eerste staak te sien
-bg:  за да видите първия клон
-br:  evit gwelout ar skourr kentañ
-ca:  per veure la primera branca
-co:  a prima ghjemba
-cs:  abyste viděli první
-da:  for at se den første
-de:  Erster Zweig
-en:  first line
-eo:  por vidi la unuan branĉon
-es:  la primera rama
-et:  esimese haru vaatamiseks
-fi:  ensimmäinen sukuhaara
-fr:  la première
-he:   לראות את הענף הראשון
-is:  til að sjá fyrstu grein
-it:  il primo ramo
-lv:  skatīt pirmo zaru
-nl:  de eerste tak
-no:  den første grenen
-oc:  la primièra branca
-pl:  aby zobaczyć pierwszą linię (gałąź)
-pt:  para ver o primeiro ramo
-ro:  pentru a vedea primul
-ru:  чтобы увидеть первую ветку
-sk:  aby ste videli prvú vetvu
-sl:  za prikaz prve veje
-sv:  den första grenen
+    the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
+de: Erster Zweig
+en: first line
+eo: por vidi la unuan branĉon
+es: la primera rama
+et: esimese haru vaatamiseks
+fi: ensimmäinen sukuhaara
+fr: la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: il primo ramo
+lv: skatīt pirmo zaru
+nl: de eerste tak
+no: den første grenen
+oc: la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: den första grenen
 
-     to see the first branch
-af:  om die eerste staak te sien
-bg:  за да видите първия клон
-br:  evit gwelout ar skourr kentañ
-ca:  per veure la primera branca
-co:  per fighjà a prima ghjemba
-cs:  abyste viděli první
-da:  for at se den første
+    to see the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: per fighjà a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
 de: , um den ersten zu sehen
-en:  to see the first one
-eo:  por vidi la unuan branĉon
-es:  para ver la primera rama
-et:  esimese haru vaatamiseks
-fi:  nähdäksesi ensimmäisen haaran
-fr:  pour voir la première
-he:   לראות את הענף הראשון
-is:  til að sjá fyrstu grein
-it:  per vedere il primo
-lv:  skatīt pirmo zaru
-nl:  om de eerste tak te zien
-no:  for å se den første
-oc:  per veire la primièra branca
-pl:  aby zobaczyć pierwszą linię (gałąź)
-pt:  para ver o primeiro ramo
-ro:  pentru a vedea primul
-ru:  чтобы увидеть первую ветку
-sk:  aby ste videli prvú vetvu
-sl:  za prikaz prve veje
-sv:  för att se den första
+en: to see the first one
+eo: por vidi la unuan branĉon
+es: para ver la primera rama
+et: esimese haru vaatamiseks
+fi: nähdäksesi ensimmäisen haaran
+fr: pour voir la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: per vedere il primo
+lv: skatīt pirmo zaru
+nl: om de eerste tak te zien
+no: for å se den første
+oc: per veire la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: för att se den första
 
-     to see the first relationship link
-af:  om die eerste te sien
-bg:  за да видите първата родствена връзка
-br:  evit gwelout al liamm kentañ
-ca:  per veure el primer vincle de parentesc
-co:  per fighjà a prima lea
-cs:  zobrazit první
-da:  for at se det første
+    to see the first relationship link
+af: om die eerste te sien
+bg: за да видите първата родствена връзка
+br: evit gwelout al liamm kentañ
+ca: per veure el primer vincle de parentesc
+co: per fighjà a prima lea
+cs: zobrazit první
+da: for at se det første
 de: , um die erste zu sehen
-en:  to see the first one
-eo:  por vidi la unuan ligon de parenceco
-es:  para ver el primer vínculo de parentesco
-et:  esimese sugulussuhte vaatamiseks
-fi:  nähdäksesi ensimmäisen sukulaisuuden
-fr:  pour voir le premier
-he:   לראות את הקשר המשפחתי הראשון
-is:  til að sjá fyrstu tengsl
-it:  per vedere il primo
-lv:  skatīt pirmo attiecību saiti
-nl:  om de eerste te zien
-no:  for å se den første
-oc:  per veire lo primièr ligam de parentatge
-pl:  aby zobaczyć pierwszą linię pokrewieństwa
-pt:  para ver o primeiro link
-ro:  pentru a vedea prima relatie
-ru:  чтобы увидеть первую связь отношения
-sk:  zobraziť prvý vzťah
-sl:  za prikaz prve sorodstvene povezave
-sv:  för att se den första
+en: to see the first one
+eo: por vidi la unuan ligon de parenceco
+es: para ver el primer vínculo de parentesco
+et: esimese sugulussuhte vaatamiseks
+fi: nähdäksesi ensimmäisen sukulaisuuden
+fr: pour voir le premier
+he:  לראות את הקשר המשפחתי הראשון
+is: til að sjá fyrstu tengsl
+it: per vedere il primo
+lv: skatīt pirmo attiecību saiti
+nl: om de eerste te zien
+no: for å se den første
+oc: per veire lo primièr ligam de parentatge
+pl: aby zobaczyć pierwszą linię pokrewieństwa
+pt: para ver o primeiro link
+ro: pentru a vedea prima relatie
+ru: чтобы увидеть первую связь отношения
+sk: zobraziť prvý vzťah
+sl: za prikaz prve sorodstvene povezave
+sv: för att se den första
 
-     to try again with this number
-af:  om weer te probeer met die nommer
-bg:  за опит с този номер
-br:  evit esaiñ en-dro gant an niverenn-se
-ca:  per tornar a provar aquest número
-co:  per pruvà torna cù stu numeru
-cs:  zkusit znovu s tímto číslem
-da:  for at forsøge igen med dette nummer
+    to try again with this number
+af: om weer te probeer met die nommer
+bg: за опит с този номер
+br: evit esaiñ en-dro gant an niverenn-se
+ca: per tornar a provar aquest número
+co: per pruvà torna cù stu numeru
+cs: zkusit znovu s tímto číslem
+da: for at forsøge igen med dette nummer
 de: , um es mit dieser Nummer nochmals zu versuchen
-en:  to try again with this number
-eo:  por reprovi kun ĉi tiu numero
-es:  para ensayar de nuevo con este número
+en: to try again with this number
+eo: por reprovi kun ĉi tiu numero
+es: para ensayar de nuevo con este número
 et: , proovimaks uuesti selle numbriga
-fi:  yrittääksesi uudelleen tällä numerolla
-fr:  pour réessayer avec ce numéro
-he:  לנסות שוב עם המספר הזה
-is:  til að reyna þetta aftur með þessu númeri
-it:  per provare di nuovo con questo numero
-lv:  mēģiniet vēlreiz ar šo nummuru
+fi: yrittääksesi uudelleen tällä numerolla
+fr: pour réessayer avec ce numéro
+he: לנסות שוב עם המספר הזה
+is: til að reyna þetta aftur með þessu númeri
+it: per provare di nuovo con questo numero
+lv: mēģiniet vēlreiz ar šo nummuru
 nl: , om dit nummer weer te proberen
-no:  for å prøve igjen med dette nummeret
-oc:  per tornar ensajar amb aquel numèro
-pl:  aby ponowić z tym numerem
-pt:  para tentar novamente com este número
-ro:  incearca din nou cu acest numar
-ru:  для того, чтобы пытаться снова с этим числом
-sk:  skúsiť znovu s týmto číslom
-sl:  za ponoven poskus s to številko
-sv:  för att försöka igen med detta nummer
+no: for å prøve igjen med dette nummeret
+oc: per tornar ensajar amb aquel numèro
+pl: aby ponowić z tym numerem
+pt: para tentar novamente com este número
+ro: incearca din nou cu acest numar
+ru: для того, чтобы пытаться снова с этим числом
+sk: skúsiť znovu s týmto číslom
+sl: za ponoven poskus s to številko
+sv: för att försöka igen med detta nummer
 
     %1 of %2
 af: %1 van %2
 bg: %1 на :a:%2
 br: %1 eus %2
 ca: %1 de %2
-co: %1 di %2
+co: %1 d[i |’]%2
 cs: %1 :g:%2
 da: %1 til %2
 de: %1 von :d:%2
@@ -217,14 +217,14 @@ sv: %1 till %2
 
     %d %s starting with %s
 co: %d %s principiendu da « %s »
-de: %d %s beginnend mit "%s"
-en: %d %s starting with "%s"
+de: %d %s beginnend mit „%s”
+en: %d %s starting with “%s”
 es: %d %s comenzando con "%s"
 fi: %d %s ensimmäisenä "%s"
-fr: %d %s commençant par "%s"
-it: %d %s partendo da "%s"
+fr: %d %s commençant par « %s »
+it: %d %s partendo da «%s»
 nl: %d %s beginnend met "%s"
-no: %d %s som starter med "%s"
+no: %d %s som starter med «%s»
 oc: %d %s que comença amb "%s"
 pt: %d %s começados por '%s'
 ru: %d %s начиная с "%s"
@@ -476,7 +476,7 @@ af: %t die datum voor sy titel is verkeerd: %t
 bg: %t има некоректни данни за титла: %t
 br: %t en(he) deus deiziadoù-tiltloù direizh : %t
 ca: %t té les dates d'un títol incorrectes
-co: %t hà date di tituli incurretti : %t
+co: %t hà date di tituli incurretti : %t
 cs: %t má nesprávné údaje o titulech: %t
 da: %t har ukorrekte titeldatoangivelser: %t
 de: die Datumsangaben eines Titels von %t sind falsch: %t
@@ -485,7 +485,7 @@ eo: la nobeltitolaj datoj de %t estas malkorektaj: %t
 es: las fechas de un título de %t son incorrectas: %t
 et: isiku %t tiitli kuupäev %t on vigane
 fi: henkilön %t arvonimen päivämäärässä %t on virhe
-fr: %t a des dates de titre incorrectes : %t
+fr: %t a des dates de titre incorrectes : %t
 he:  תאריכים לתארים של %t אינם נכונים: %t
 is: %t hefur vitlausa dagsetningu %t
 it: alcune date dei titoli di %t sono incorrette: %t
@@ -546,7 +546,7 @@ eo: %t naskiĝis pli ol 2 jaroj post la morto de sia patro %t
 es: %t ha nacido más de 2 años después de la muerte de su padre %
 et: %t on sündinud enam kui 2 aastat pärast oma isa %t surma
 fi: %t on syntynyt yli 2 vuotta isänsä kuoleman jälkeen %t
-fr: %t est né(e) plus de 2 ans après la mort de son père %t
+fr: %t est né(e) plus de 2 ans après la mort de son père %t
 he: %t  נלד(ה) יותר משנתיים אחרי מוות האב
 is: %t er fædd(ur) meira en 2 árum eftir andlát föður síns %t
 it: %t sarebbe nato più di 2 anni dopo la morte di suo padre %t
@@ -593,7 +593,7 @@ ru: %t был(а) свидетелем до своего рождения
 sv: %t var vittne innan hennes/hans död
 
     %t witnessed the %s after his/her death
-co: %t hè stata(u) testimone di %s dopu a so morta
+co: %t hè statu testimone di %s dopu a so morta
 de: %t war Zeuge bei der %s nach seinem Tod
 en: %t was a witness at a %s after their own death
 es: %t ha sido testigo de %s después de su muerte
@@ -603,7 +603,7 @@ pt: %t foi testemunha de %s depois da sua morte
 ru: %t был(а) свидетелем %s после его/её смерти
 
     %t witnessed the %s before his/her birth
-co: %t hè stata(u) testimone di %s nanzu a so nascita
+co: %t hè statu testimone di %s nanzu a so nascita
 de: %t war Zeuge bei der %s vor seiner Geburt
 en: %t was a witness at a %s before their own birth
 es: %t ha sido testigo de %s antes de su nacimiento
@@ -617,7 +617,7 @@ co: %t: %s nanzu a/u so %s
 de: %t: %s vor seiner/ihrer %s
 en: %t: %s before their %s
 es: %t : %s antes de su %s
-fr: %t : %s avant son/sa %s
+fr: %t : %s avant son/sa %s
 it: %t : %s prima della suo/sua %s
 pt: %t: %s antes de seu/sua %s
 ru: %t: %s до их %s
@@ -809,7 +809,7 @@ zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
 af:  
 ar: .
 bg:  
-br: .
+br:  
 ca: .
 co:  
 cs:  
@@ -932,9 +932,9 @@ sv: bryllingar
 af: :
 ar: :
 bg: :
-br:  :
+br:  :
 ca: :
-co:  :
+co:  :
 cs: :
 da: :
 de: :
@@ -943,7 +943,7 @@ eo: :
 es: :
 et: :
 fi: :
-fr:  :
+fr:  :
 he: :
 is: :
 it: :
@@ -1062,7 +1062,7 @@ en: a 3rd cousin
 eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 et: kolmanda astme nõbu:g:--o
-fi: kolmas serkku:g:nnen serkun
+fi: kolmas serkku:g:nnen serkun
 fr: un cousin issu d’issus de germains/une cousine issue d’issus de germains/un(e) cousin(e) issu(e) d’issus de germains
 he:  בן-דוד שלישי/ בת-דוד שלישית
 is: fjórmenningur
@@ -2620,7 +2620,7 @@ sl: sočasno
 sv: samtidigt
 
     available genealogies
-co: lista di e genealugie dispunibule (impiegà gwsetup)
+co: lista di e genealugie dispunibule (impiegheghja gwsetup)
 en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 pt: lista das genealogias disponíveis (utilize gwsetup)
@@ -3465,7 +3465,7 @@ af: stop GeneWeb-skakels
 bg: без GeneWeb-линкове
 br: nulañ al liammoù GeneWeb
 ca: anul·lar els lligams GeneWeb
-co: piattà i ligami
+co: affissera simplice senza e leie
 cs: zrušit spoje GeneWebu
 da: uden GeneWeb-links
 de: GeneWeb-Links entfernen
@@ -3734,7 +3734,7 @@ sl: zamenjan vrstni red otrok
 sv: ändrade ordningen för barnen
 
     changed order of family's events
-co: cambiu di l’ordine di l’evvenimenti famigliale
+co: cambiu di l’ordine di l’avvenimenti famigliale
 de: ändern der Reihenfolge familiäre Ereignisse
 en: change order of family events
 es: cambio del orden de los acontecimientos familiares
@@ -3760,7 +3760,7 @@ ru: порядок браков был изменён
 sv: Utbytt ordning för bröllop
 
     changed order of person's events
-co: cambiu di l’ordine di l’evvenimenti di l’individuu
+co: cambiu di l’ordine di l’avvenimenti di l’individuu
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
@@ -3887,22 +3887,22 @@ af: druk "%s"
 bg: щракнете на "%s"
 br: klikit war "%s"
 ca: premeu sobre "%s"
-co: cliccà nant’à « %s »
+co: cliccà nant’à « %s »
 cs: klikněte "%s"
-da: klik "%s"
-de: klicke auf "%s"
-en: click on "%s"
-eo: kliku "%s"
+da: klik »%s«
+de: klicke auf „%s”
+en: click on “%s”
+eo: kliku “%s”
 es: cliquear "%s"
 et: klõpsa "%s"
 fi: napsauta "%s"
-fr: cliquez sur « %s »
+fr: cliquez sur « %s »
 he:   לחץ "%s"
 is: Ýtið "%s"
-it: seleziona "%s"
+it: seleziona «%s»
 lv: spiest "%s"
 nl: klik "%s"
-no: klikk "%s"
+no: klikk «%s»
 oc: clicatz sus "%s"
 pl: kliknij "%s"
 pt: clicar "%s"
@@ -4410,7 +4410,7 @@ ru: кремация
 sv: Kremering
 
     custom event
-co: evvenimentu persunalizatu
+co: avvenimentu persunalizatu
 en: custom event
 fr: événement personnalisé
 pt: evento personalizado
@@ -4792,7 +4792,7 @@ ru: демобилизация
 sv: Demobilisering
 
     descendant tree view
-co: arburu di descendenza
+co: arburiscenza discendente
 en: descendant tree view
 fr: arborescence descendante
 pt: árvore compacta de descendentes
@@ -4829,7 +4829,7 @@ sv: ättlingar
 zh:  后代
 
     descendants at the generation
-co: discendenti fin’à a generazione…
+co: discendenti fin’à a generazione...
 de: Generation der Nachkommen ...
 en: list by name
 es: descendientes en la generación...
@@ -5087,7 +5087,7 @@ sl: prikaži s pomočjo izsekov/širina izseka/prekrivanje/skupna širina
 sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
     display by/branch/alphabetic order
-co: affissà da :/ghjemba/ordine alfabeticu
+co: affissà da :/ghjemba/ordine alfabeticu
 de: anzuzeigen/nach Zweigen/alphabetisch geordnet
 en: display by/line/alphabetical order
 es: edición por:/ramas/orden alfabético
@@ -5399,7 +5399,7 @@ pt: dotação LDS
 sv: Donation (LDS)
 
     edit tree
-co: mudufucà u graficu
+co: mudificà u graficu
 en: edit the graph
 fr: éditer le graphe
 pt: editar o gráfico
@@ -5612,7 +5612,7 @@ sv: plats
 zh:  地点
 
     event/events
-co: evvenimentu/evvenimenti
+co: avvenimentu/avvenimenti
 de: Ereignis/Ereignisse
 en: event/events
 es: evento/eventos
@@ -5626,12 +5626,12 @@ ru: событие/события
 sv: Händelse/Händelse
 
     events to which %s was witness
-co: evvenimenti per quelli %s era testimone
+co: avvenimenti induve %s era testimoniu
 en: events to which %s was witness
 fr: évènements auxquels %s était témoin
 
     events tree
-co: arburu di l’evvenimenti
+co: arburu di l’avvenimenti
 en: tree of events
 fr: arbre des événements
 pt: árvore de eventos
@@ -5772,7 +5772,7 @@ sl: družina dodana
 sv: ny familj tillagd
 
     family birthday
-co: anniversariu di i parenti
+co: natalizii di i parenti
 de: Geburtstage naher Angehöriger
 en: family birthday
 es: cumpleaños de amigos
@@ -6689,7 +6689,7 @@ ru: сводные братья или сёстры
 sv: Halvsyskon
 
     happy birthday to them!
-co: felice anniversariu !
+co: felice nataliziu !
 de: Herzlichen Glückwunsch zum Geburtstag!
 en: happy birthday to them!
 es: ¡Feliz cumpleaños!
@@ -6708,7 +6708,7 @@ af: Geluk met jou verjaarsdag!
 bg: Честит рожден ден!
 br: kalz a vloavezhioù all deoc'h!
 ca: per molts anys
-co: felice anniversariu !
+co: felice nataliziu !
 cs: všechno nejlepší k narozeninám!
 da: til lykke med fødselsdagen!
 de: Herzlichen Glückwunsch zum Geburtstag!
@@ -6753,7 +6753,7 @@ af: met as kinders
 bg: деца
 br: anezho ez eo bet ganet bugale
 ca: fills
-co: avendu cum’è zitelli :
+co: avendu cum’è zitelli :
 cs: měli spolu děti
 da: børn
 de: ihre Kinder
@@ -6795,13 +6795,13 @@ ru: супруг(а) и дети не известы
 sv: Har ingen familj
 
     help modify data
-co: Fate casu ! E currezzioni fatte in u dizziunariu mudificheghjanu l’inseme di i dati chì currispondenu in a basa.
-de: Klicken Sie auf das zu korrigierende "Listen-Element": alle Dateien Ihres Baumes werden sofort korrigiert.
+co: Fate casu ! E currezzioni fatte in u dizziunariu mudificheghjanu l’inseme di i dati chì currispondenu in a basa.
+de: Klicken Sie auf das zu korrigierende „Listen-Element”: alle Dateien Ihres Baumes werden sofort korrigiert.
 en: Be carefull. Modifications that are made in the “book” update the corresponding element in the entire database.
 es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente.
 fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti.
 fr: Attention ! Les corrections dans le dictionnaire modifient l’ensemble des données correspondantes dans la base.
-it: Clicca su « l’elemento della lista » che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette.
+it: Clicca su «l’elemento della lista» che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette.
 nl: Kliop op het 'lijstelement" dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd  worden.
 no: Klikk 'Oppdater' for å editere og hele ditt slektstre vil automatisk bli oppdatert.
 oc: CLicatz sus l'element de modificar e totas las fichas del seu arbre seràn corregidas sulpic.
@@ -6949,7 +6949,7 @@ fr: accueil
 pt: início
 
     horizontal tree
-co: arburu d’ascendenza
+co: arburiscenza ascendente
 en: horizontal tree
 fr: arborescence ascendante
 pt: árvore compacta de ascendentes
@@ -7574,7 +7574,7 @@ fr: chronologie simple/chronologie détaillée
 pt: cronologia simples/cronologia detalhada
 
     input database
-co: Ci vole à scrive quì u nome di a basa di dati à impiegà :
+co: Scrivite quì u nome sanu di a basa di dati à impiegà :
 en: Please, enter the name of the database you want to use:
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
 pt: Introduza o nome da base de dados que quer utilizar:
@@ -7829,7 +7829,7 @@ af: is dieselfde persoon!
 bg: това е същият човек!
 br: a zo an hevelep den !
 ca: és la mateixa persona
-co: hè a listessa persona !
+co: hè a listessa persona !
 cs: je ta samá osoba!
 da: det er den samme person!
 de: es ist die selbe Person!
@@ -8274,7 +8274,7 @@ af: fout in die databasis: %s sy/haar eie voorvader
 bg: зацикляне в базата от данни
 br: dol er bon roadoù : % a zo e/he hendad dezhañ/i e/hec'h-unan
 ca: bucle a la base de dades: %s és avantpassat d'ell mateix
-co: referenza circulare in a basa di dati : %s hè u so propiu antenatu
+co: referenza circulare in a basa di dati : %s hè u so propiu antenatu
 cs: smyčka v databázi: %s je svůj předek
 da: loop i databasen: %s er sin egen ane
 de: Schleife in der Datenbank: %s ist sein/ihr eigener Vorfahr
@@ -8283,7 +8283,7 @@ eo: estas maŝo en la datenbazo: %s estas sia propra avo
 es: referencia circulár en la base de datos: %s es su propio ancestro
 et: silmus andmebaasis: %s on iseenda esivanem
 fi: silmukka tietokannassa: %s on oma esivanhempansa
-fr: boucle dans la base de données : %s est son propre ancêtre
+fr: boucle dans la base de données : %s est son propre ancêtre
 he:  מעגל במאגר הנתונים: %s  צאצא(ה) לאצמו/לאצמה
 is: villa í gagnagrunni: %s er sinn eigin forfaðir/afkomandi
 it: loop nel data-base: %s è antenato(a) di se stesso(a)
@@ -8543,7 +8543,7 @@ pt: licença de casamento
 sv: Äktenskapslicens
 
     marriage notes/marriages notes
-co: note apprupositu di l’unione/note apprupositu di l’unioni
+co: note apprupositu di l’unione/note apprupositu di l'unioni
 de: notizen zu den Ehen
 en: marriage notes/marriages notes
 es: notas de matrionios
@@ -9132,7 +9132,7 @@ fr: sans date
 pt: sem data
 
     missing events
-co: evvenimenti chì mancanu
+co: avvenimenti chì mancanu
 de: Fehlende Ereignisse
 en: missing events
 es: faltan eventos
@@ -9317,13 +9317,13 @@ sl: spremeni
 sv: ändra
 
     modify family %s event order
-co: intervertisce l’evvenimenti di a famiglie %s
+co: intervertisce l’avvenimenti di a famiglia %s
 en: permute the events of family %s
 fr: permuter les événements de la famille %s
 pt: permutar os eventos da família %s
 
     modify person event order
-co: intervertisce l’evvenimenti individuali
+co: intervertisce l’avvenimenti individuali
 en: permute personnal events
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
@@ -9584,7 +9584,7 @@ sl: ime %s že uporablja %tta oseba%t
 sv: namn %s används redan av %tdenna person%t
 
     name changed. update linked pages
-co: U nome, a casata, o un’occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l’anziana chjave inghjò.
+co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l’anziana chjave inghjò.
 en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
 fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
 pt: O primeiro nome, apelido ou ocorrência desta pessoa foi alterada. Por favor actualize as páginas ligadas à chave antiga abaixo.
@@ -9698,7 +9698,7 @@ ru: дети
 sv: nb barn
 
     nb events
-co: num. evvenimenti
+co: num. avvenimenti
 de: Ereignisse
 en: nb events
 es: núm. eventos
@@ -9738,7 +9738,7 @@ it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
 nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
 no: velg en annen utregningsmåte og beregn påny
 oc: podètz ensajar amb un autre metòde de calcul de relacion
-pt: pode recomeçar utilizando um novo método de cálculo
+pt: pode recomeçar utilizando um novo método de cálculo 
 ru: попытайтесь найти родственную связь другим образом
 sv: välj ett annat uträkningssätt och räkna ut igen
 
@@ -9765,7 +9765,7 @@ no: nytt navn
 pt: nome novo
 
     next relationship path
-co: passeghju seguente
+co: chjassu seguente
 de: nächster Verwandtschaftsgrad
 en: Next relationship path
 es: siguiente ruta de parentesco
@@ -9840,7 +9840,7 @@ af: geen verjaarsdag
 bg: няма рожден ден
 br: deiz ganedigezh ebet
 ca: no hi ha cap aniversari
-co: nisunu anniversariu
+co: nisunu nataliziu
 cs: žádné narozeniny
 da: ingen fødselsdag
 de: kein Geburtstag
@@ -10203,7 +10203,7 @@ af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16d
 bg: n-ти/първи/втори/трети/четвърти/пети/шести/седми/осми/девети/десети/единадесети/дванадесети/тринадесети/четиринадесети/петнадесети/шестнадесети/седемнадесети/осемнадесети/деветнадесети/двадесети/21-и/22-и/23-и/24-и/25-и/26-и/27-и/28-и/29-и/30-и/31-и/32-и/33-и/34-и/35-и/36-и/37-и/38-и/39-и/40-и/41-и/42-и/43-и/44-и/45-и/46-и/47-и/48-и/49-и/50-и/51-и/52-и/53-и/54-и/55-и/56-и/57-и/58-и/59-и/60-и/61-и/62-и/63-и/64-и/65-и/66-и/67-и/68-и/69-и/70-и/71-и/72-и/73-и/74-и/75-и/76-и/77-и/78-и/79-и/80-и/81-и/82-и/83-и/84-и/85-и/86-и/87-и/88-и/89-и/90-и/91-и/92-и/93-и/94-и/95-и/96-и/97-и/98-и/99-и
 br: n-vet/1añ/eil/3de/4re/5vet/6vet/7vet/8vet/9vet/10vet/11vet/12vet/13vet/14vet/15vet/16vet/17vet/18vet/19vet/20vet/21vet/22vet/23vet/24vet/25vet/26vet/27vet/28vet/29vet/30vet/31vet/32vet/33vet/34vet/35vet/36vet/37vet/38vet/39vet/40vet/41vet/42vet/43vet/44vet/45vet/46vet/47vet/48vet/49vet/50vet/51vet/52vet/53vet/54vet/55vet/56vet/57vet/58vet/59vet/60vet/61vet/62vet/63vet/64vet/65vet/66vet/67vet/68vet/69vet/70vet/71vet/72vet/73vet/74vet/75vet/76vet/77vet/78vet/79vet/80vet/81vet/82vet/83vet/84vet/85vet/86vet/87vet/88vet/89vet/90vet/91vet/92vet/93vet/94vet/95vet/96vet/97vet/98vet/99vet/100vet/101vet/102vet/103vet/104vet
 ca: n-èssim/1er/2on/3er/4rt/5è/6è/7è/8è/9è/10è/11è/12è/13è/14è/15è/16è/17è/18è/19è/20è/21è/22mo/23è/24è/25è/26è/27è/28è/29è/30è/31è/32è/33è/34è/35è/36è/37è/38è/39è/40è/41è/42è/43è/44è/45è/46è/47è/48è/49è/50è/51è/52è/53è/54è/55è/56è/57è/58è/59è/60è/61è/62è/63è/64è/65è/66è/67è/68è/69è/70è/71è/72è/73è/74è/75è/76è/77è/78è/79è/80è/81è/82è/83è/84è/85è/86è/87è/88è/89è/90è/91è/92è/93è/94è/95è/96è/97è/98è/99è
-co: n-esimu/1u/2u/3u/4u/5u/6u/7u/8u/9u/10u/11u/12u/13u/14u/15u/16u/17u/18u/19u/20u/21u/22u/23u/24u/25u/26u/27u/28u/29u/30u/31u/32u/33u/34u/35u/36u/37u/38u/39u/40u/41u/42u/43u/44u/45u/46u/47u/48u/49u/50u/51u/52u/53u/54u/55u/56u/57u/58u/59u/60u/61u/62u/63u/64u/65u/66u/67u/68u/69u/70u/71u/72u/73u/74u/75u/76u/77u/78u/79u/80u/81u/82u/83u/84u/85u/86u/87u/88u/89u/90u/91u/92u/93u/94u/95u/96u/97u/98u/99u
+co: n-esimu/1<sup>u</sup>/2<sup>u</sup>/3<sup>u</sup>/4<sup>u</sup>/5<sup>u</sup>/6<sup>u</sup>/7<sup>u</sup>/8<sup>u</sup>/9<sup>u</sup>/10<sup>u</sup>/11<sup>u</sup>/12<sup>u</sup>/13<sup>u</sup>/14<sup>u</sup>/15<sup>u</sup>/16<sup>u</sup>/17<sup>u</sup>/18<sup>u</sup>/19<sup>u</sup>/20<sup>u</sup>/21<sup>u</sup>/22<sup>u</sup>/23<sup>u</sup>/24<sup>u</sup>/25<sup>u</sup>/26<sup>u</sup>/27<sup>u</sup>/28<sup>u</sup>/29<sup>u</sup>/30<sup>u</sup>/31<sup>u</sup>/32<sup>u</sup>/33<sup>u</sup>/34<sup>u</sup>/35<sup>u</sup>/36<sup>u</sup>/37<sup>u</sup>/38<sup>u</sup>/39<sup>u</sup>/40<sup>u</sup>/41<sup>u</sup>/42<sup>u</sup>/43<sup>u</sup>/44<sup>u</sup>/45<sup>u</sup>/46<sup>u</sup>/47<sup>u</sup>/48<sup>u</sup>/49<sup>u</sup>/50<sup>u</sup>/51<sup>u</sup>/52<sup>u</sup>/53<sup>u</sup>/54<sup>u</sup>/55<sup>u</sup>/56<sup>u</sup>/57<sup>u</sup>/58<sup>u</sup>/59<sup>u</sup>/60<sup>u</sup>/61<sup>u</sup>/62<sup>u</sup>/63<sup>u</sup>/64<sup>u</sup>/65<sup>u</sup>/66<sup>u</sup>/67<sup>u</sup>/68<sup>u</sup>/69<sup>u</sup>/70<sup>u</sup>/71<sup>u</sup>/72<sup>u</sup>/73<sup>u</sup>/74<sup>u</sup>/75<sup>u</sup>/76<sup>u</sup>/77<sup>u</sup>/78<sup>u</sup>/79<sup>u</sup>/80<sup>u</sup>/81<sup>u</sup>/82<sup>u</sup>/83<sup>u</sup>/84<sup>u</sup>/85<sup>u</sup>/86<sup>u</sup>/87<sup>u</sup>/88<sup>u</sup>/89<sup>u</sup>/90<sup>u</sup>/91<sup>u</sup>/92<sup>u</sup>/93<sup>u</sup>/94<sup>u</sup>/95<sup>u</sup>/96<sup>u</sup>/97<sup>u</sup>/98<sup>u</sup>/99<sup>u</sup>
 cs: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 da: ordenstal/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 de: n-ten/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -10367,7 +10367,7 @@ ru: количество детей
 sv: antal barn
 
     number of events
-co: numeru d’evvenimenti
+co: numeru d’avvenimenti
 de: Anzahl der Ereignisse
 en: number of events
 es: número de eventos
@@ -10398,7 +10398,7 @@ sv: Antal individer
 
     number of living persons:
 bg: брой на живите лица:
-co: numeru di persone vive
+co: numeru di persone vive :
 cs: pocet zijucich osob:
 da: antal nulevende personer:
 de: Anzahl der lebenden Personen:
@@ -10407,7 +10407,7 @@ eo: nombro de la vivantaj personoj:
 es: número de personas vivas:
 et: elavaid inimesi:
 fi: elossa olevien lukumäärä:
-fr: nombre de personnes vivantes :
+fr: nombre de personnes vivantes :
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi:
 lv: dzīvo personu skaits:
@@ -10423,7 +10423,7 @@ sl: število živih oseb
 sv: antal levande personer:
 
     n° d'Aboville
-co: N° d’Aboville
+co: n° d’Aboville
 de: Nr. Aboville
 en: d'Aboville number
 es: N° de Aboville
@@ -10524,7 +10524,7 @@ ar: توفي
 bg: починал
 br: marvet
 ca: mort
-co: mortu(a) di sicuru
+co: forse mortu(a)
 cs: zemřel
 da: død
 de: sicherlich bereits verstorben
@@ -10915,7 +10915,6 @@ pt: PACS
 sv: Borgerligt äktenskap
 
     pacsed%t to
-co: PACS%t cù
 de: Eheähnliches Verhältnis%t mit
 en: Civil solidarity pact%t with
 es: Pacto civil de solidaridad%t con
@@ -11146,7 +11145,7 @@ sl: osebe z istim imenom
 sv: personer som har samma namn
 
     photos & documents
-co: Fiure & Ducumenti
+co: Fiure è Ducumenti
 de: Fotos & Dokumente
 en: Archive & Pictures
 es: Fotos & documentos
@@ -11545,7 +11544,7 @@ af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
 bg: припознат син/припозната дъщеря/припознато дете
 br: mab anavezet/merc'h anavezet/bugel anavezet
 ca: fill reconegut/filla reconeguda/fills reconeguts
-co: figliolu riccunisciutu/figliola riccunisciuta/figliolu(a) riccunisciutu(a)
+co: figliolu ricunisciutu/figliola ricunisciuta/figliolu(a) ricunisciutu(a)
 cs: uznaný syn/uznaná dcera/uznané dítě
 da: anerkendt søn/anerkendt datter/anerkendt barn
 de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
@@ -11575,7 +11574,7 @@ af: erkennende vader/erkennende moeder/erkennende ouders
 bg: припознал баща/припознала майка/припознали родители
 br: an tad en deus e(hec'h) anavezet/ar vamm he deus e(hec'h) anavezet/ar gerent o deus e (hec'h) anavezet
 ca: pare reconegut/mare reconeguda/pares reconeguts
-co: babbu l’avendu riccunisciutu(a)/mamma l’avendu riccunisciutu(a)/genitori l’avendu riccunisciutu(a)
+co: babbu l’avendu ricunisciutu(a)/mamma l’avendu ricunisciutu(a)/genitori l’avendu ricunisciutu(a)
 cs: uznaný otec/uznaná matka/uznaní rodiče
 da: sig vedkendende fader/sig vedkendende moder/sig vedkendende forældre
 de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
@@ -11799,12 +11798,12 @@ ru: искать связь
 sv: uträkningssätt
 
     relationship display options
-co: ozzioni per affissà l’arburi di parentia :
+co: ozzioni per affissà l’arburi di parentia :
 de: anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
 es: opciones de edición de los árboles de parentesco:
 fi: näyttötapa:
-fr: options d’affichage des arbres :
+fr: options d’affichage des arbres :
 it: opzioni di visualizzazione degli alberi di parentela:
 nl: toonopties van de verwantschapsstambomen
 no: visningsmåte
@@ -11814,7 +11813,7 @@ ru: настройки отображения
 sv: sätt att visa
 
     relationship link between
-co: lea di parentia cù…
+co: lea di parentia cù...
 de: verwandt mit ...
 en: family link with...
 es: parentesco con...
@@ -11833,7 +11832,7 @@ af: verwantskap/verwantskappe
 bg: родствена връзка/родствени връзки
 br: liamm a gerentiezh/liammoù a gerentiezh
 ca: grau de parentesc/graus de parentesc
-co: lea di parentia/ligami di parentia
+co: leia di parentia/leie di parentia
 cs: vztah/vztahy
 da: slægtskabsforbindelse/slægtskabsforbindelser
 de: Verwandtschaft/Verwandtschaften
@@ -11859,12 +11858,12 @@ sl: sorodnik/sorodnikov
 sv: anlinje/anlinjer
 
     relationship shortcut
-co: accurtatoghju :
+co: accurtatoghji :
 de: Verknüpfungen :
 en: shortcuts:
 es: atajos :
 fi: oikotie:
-fr: raccourcis :
+fr: raccourcis :
 it: scorciatoie :
 nl: binnenweg :
 no: snarvei:
@@ -11877,7 +11876,7 @@ af: verwantskap%t met
 bg: има връзка%t с
 br: kerentiezh %t gant
 ca: parentesc%t amb
-co: parentia%t cù
+co: %t cù
 cs: %t vztah s
 da: forbindelse%t med
 de: in einer Beziehung%t mit
@@ -12002,7 +12001,7 @@ ru: тот же предок, что и у Sosa
 sv: Samma ättling som n° Sosa
 
     scale
-co: anni per generazione
+co: anni à a generazione
 en: years by generation
 fr: années par génération
 pt: anos por geração
@@ -12166,7 +12165,7 @@ ru: смотри также
 sv: visa också
 
     see ascendants notes/sources
-co: fighjà e note & e fonte
+co: fighjà e note è e fonte
 de: siehe Notizen/Quellen
 en: View notes/sources
 es: ver las notas/fuentes
@@ -12196,7 +12195,7 @@ ru: смотри изображения предков
 sv: Se kommande generations bilder
 
     see descendants notes/sources
-co: fighjà e note & e fonte
+co: fighjà e note è e fonte
 de: siehe Notizen/Quellen
 en: View notes/sources
 es: ver las notas/fuentes
@@ -12301,13 +12300,13 @@ ru: выберите букву
 sv: välj en bokstav
 
     select a month to see all the anniversaries
-co: selezziunà un mese per fighjà tutti l’anniversarii
+co: selezziunà un mese per fighjà tutti l’anniversarii.
 de: zum zeigen der Geburtstage den Monat auswählen.
 en: select a month to see all the anniversaries.
 es: elegir un mes para ver todos los cumpleaños.
 fi: valitse kuukausi nähdäksesi kaikki syntymäpäivät.
 fr: sélectionnez un mois pour voir tous les anniversaires.
-it: scegliere un mese per vedere tutti i comlpeanni.
+it: scegliere un mese per vedere tutti i compleanni.
 nl: een maand kiezen om alle verjaardagen te zien.
 no: velg en måned for å vise alle fødselsdager.
 oc: causissètz-vos un mes per veire los aniversaris.
@@ -12316,12 +12315,12 @@ ru: выберите месяц
 sv: välj en månad för att visa alla födelsedagar.
 
     select a spouse
-co: selezziunà un(a) cumpagnu(a)
+co: selezziunà un(a) cumpagnu(a) :
 de: Partner auswählen
 en: Select spouse
 es: elija un cónyuge
 fi: Valitse puoliso
-fr: choisissez un conjoint :
+fr: choisissez un conjoint :
 it: scegli un coniuge
 nl: kies een partner
 no: Velg ektefelle
@@ -12336,7 +12335,7 @@ ar: بإمكانك إختيار لغة أخرى من بين اللغات الت�
 bg: Можете да изберете друг език за съобщения измежду следните:
 br: Dibab a c'hellit ur yezh all etre ar re-mañ:
 ca: Podeu seleccionar una altre llengua, hi ha disponibles les següents:
-co: affissà in :
+co: affissà in :
 cs: Zvolte jazyk pro prohlížení databáze:
 da: Du kan vælge fremstilling på et andet sprog blandt de følgende:
 de: Blick auf:
@@ -12345,7 +12344,7 @@ eo: Vi povas elekti alian lingvon inter la sekvantajn:
 es: Ver en:
 et: Võid valida ka mõne muu keele järgnevatest:
 fi: Näytä:
-fr: afficher en :
+fr: afficher en :
 is: Þú getur valið milli eftirfarandi tungumála:
 it: Vista in:
 lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
@@ -12567,7 +12566,7 @@ af: kortste pad
 bg: най-кратък път
 br: ar berrañ hent
 ca: drecera
-co: passeghju u più cortu
+co: chjassu u più cortu
 cs: nejkratší cesta
 da: korteste vej
 de: Auf kürzestem Weg
@@ -12771,7 +12770,7 @@ fr: fils/filles/enfants
 pt: filhos/filhas/filhos
 
     sort by/branch/alphabetic order
-co: urganizà da :/ghjemba/ordine alfabeticu
+co: urganizà da :/ghjemba/ordine alfabeticu
 de: sortieren nach: /Zweige/Alphabet
 en: sort by/line/alphabetical order
 es: organizar por: ramas/orden alfabético
@@ -12786,7 +12785,7 @@ ru: сортировать по:/ветви/алфавиту
 sv: visas efter:/grenar/alfabetisk ordning
 
     sort by/date begin/alphabetic order/nb individuals/nb events
-co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’evvenimenti
+co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’avvenimenti
 de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Ereignisse
 en: sort by/date/alphabetical order/number of individuals/number of events
 es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
@@ -12801,7 +12800,7 @@ ru: сортировать по:/дате/алфавиту/людям/событ
 sv: Sortera efter datum börja alfabetisk ordning/nb individer/nb haändelser
 
     sort by/generation/alphabetic order
-co: urganizà da :/generazione/ordine alfabeticu
+co: urganizà da :/generazione/ordine alfabeticu
 de: sortieren nach: /Generationen/Alphabet
 en: sort by/generation/alphabetical order
 es: organizar por: generación/orden alfabético
@@ -12848,18 +12847,18 @@ sv: annummer
     Sosa reference: %t
 af: Sosa verwysing: %t
 ca: referència de "número Sosa": %t
-co: referenza Sosa : %t
+co: referenza Sosa : %t
 de: Sosa Referenz: %t
 en: Family Tree Root: %t
 eo: Sosa referenco: %t
 es: referencia Sosa: %t
 et: Sosa viidet: %t
 fi: Sosa-viitteenä: %t
-fr: référence Sosa : %t
+fr: référence Sosa : %t
 he:  כאזכור Sosa: %t
 it: riferimento Sosa : %t
 lv: Sosa pakāpes: %t
-nl: Sosareferentie : %t
+nl: Sosareferentie : %t
 oc: referéncia de Sosa: %t
 pt: referência Sosa: %t
 ro: referinta Sosa: %t
@@ -13548,22 +13547,22 @@ af: die databasis het verander; gaan "terug", "herlaai" en vul die vorm weer in
 bg: базата от данни е променена; натиснете "back" и "reload" и попълнете отново формуляра
 br: ar bon roadoù a zo kemmet : distroit d'ar bajenn a-raok, grit "hizivaat ar bajenn", ha grit en-dro ar reolskrid
 ca: la base ha canviat, fer "back", "reload" i completeu novament el formulari
-co: a basa hè stata cambiata ; rivene à a pagina precedente, attualizà, è riempie torna u furmulariu
+co: a basa hà cambiata : rivene à a pagina precedente, attualizà, è riempie torna u furmulariu
 cs: databáze se změnila; vraťte se zpět (back), znovu načtěte stránku (reload) a vyplňte formulář
 da: databasen er ændret; gå tilbage, klik for opdatering og udfyld formularen igen
-de: die Datenbank wurde verändert; drücke bitte "zurück (back)", "neu laden (reload)" und fülle das Formular neu aus
-en: the base has changed; do "back", "reload", and refill the form
-eo: la bazo ŝangis; faru "malantaŭe", "reŝargi", kaj replenigu la formularon
+de: die Datenbank wurde verändert; drücke bitte „zurück (back)“, „neu laden (reload)“ und fülle das Formular neu aus
+en: the base has changed; do “back”, “reload”, and refill the form
+eo: la bazo ŝangis; faru “malantaŭe”, “reŝargi”, kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud: mine tagasi, värskenda lehekülg ja täida vorm uuesti
 fi: tietokanta on muuttunut; valitse "takaisin", "lataa uudelleen" ja täytä lomake uudelleen
-fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
+fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
 he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerðu "Back", "Reload", og settu aftur í formið
-it: la base è cambiata; fate "back", "reload" e rifate la scheda
+it: la base è cambiata; fate «back», «reload» e rifate la scheda
 lv: datu bāzē ir veiktas izmaiņas; nospiediet "back", "reload", un aizpildiet formu
 nl: het bestand is veranderd; klik "back", "reload" en vul de details nogmaals in
-no: databasen er endret; gå tilbake, klikk "oppfrisk", og fyll ut formularet på nytt
+no: databasen er endret; gå tilbake, klikk «oppfrisk», og fyll ut formularet på nytt
 oc: la basa foguèt modificada, tornatz enrè e tornatz cargar e tornatz editar la ficha
 pl: w bazie zostały dokonane zmiany; kliknij "wstecz" i "odśwież", a następnie ponownie wprowadź dane
 pt: a base mudou: fazer "back", "reload" e preencher novamente o formulário
@@ -13578,7 +13577,7 @@ af: die verjaarsdag
 bg: рожденият ден
 br: deiz-ganedigezh
 ca: l'aniversari
-co: l’anniversariu
+co: u nataliziu
 cs: narozeniny
 da: fødselsdagen
 de: der Geburtstag
@@ -13744,7 +13743,7 @@ af: die lêer is tydelik gesluit: probeer asseblief later weer
 bg: файлът е временно заключен; опитайте отново. Ако това не помага, изчакайте малко преди да опитате пак
 br: ar fichennaoueg a zo morailhet evit ar poent: klaskit ober ur wech c'hoazh. Ma ne da ket en-dro, gortozit un tamm a-raok adkregiñ ganti
 ca: la base està temporalment tancada: provar de nou. Si això no funciona, espereu uns moments abans de tornar a provar
-co: u schedariu hè bluccatu : pruvate torna. S’ella ùn funzionneghja micca, aspettate una cria nanzu di pruvà torna.
+co: u schedariu hè bluccatu : pruvate torna. S’ella ùn funzionneghja micca, aspettate una cria nanzu di pruvà torna.
 cs: soubor je dočasně uzamčen: zkuste to znova. Pokud to stále nefunguje, chvíli počkejte a pak to zkuste znovu.
 da: filen er midlertidigt låst: prøv igen. Hvis dette gentagne gange ikke fungerer, da vent lidt inden næste forsøg
 de: die Datei ist z.Z. geschützt: versuche es bitte nochmal. Wenn das nicht funktioniert, bitte eine Weile warten und nochmal probieren.
@@ -13753,7 +13752,7 @@ eo: la sliparo estas provizore riglata: provu denove. Se tio ne funkcios, atendu
 es: la base está temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar nuevamente
 et: fail on ajutiselt lukustatud: proovi uuesti
 fi: tiedosto on lukkiutunut, yritä hetken kuluttua uudelleen
-fr: le fichier est temporairement verrouillé : essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
+fr: le fichier est temporairement verrouillé : essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
 he:  הקובץ נעול זמנית: לחקות ולנסות שוב
 is: skjalið er læst í augnablikinu, reyndu aftur
 it: l'archivio è temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
@@ -13783,6 +13782,19 @@ oc: aqueles enfants de %t e %t son nascuts plan trop apressats
 pt: os seguintes filhos de %t e de %t nasceram muito próximos
 ru: даты рождения детей %t и %t очень близки
 sv: Följande barn till %t och %t är födda mycket tätt
+
+    the following children of %t and %t are born very distant
+co: e date di nascita di sti zitelli di %t è %t parenu troppu alluntanate
+de: Der Altersunterschied zwischen den 2 Kindern %t und %t ist extrem groß
+en: important age gap between the two children %t et %t
+es: importante diferencia de edad entre los niños %t y %t
+fi: merkityksellinen ikäero kahden lapsen %t ja %t välillä
+fr: les enfants suivants de %t et de %t ont des naissances très éloignées
+it: differenza di età molto importante tra i due figli %t e %t
+nl: belangrijk leeftijdsverschil tussen de twee kinderen %t en %t
+no: viktig aldersgap mellom de to barna %t et %t
+pt: diferença de idades importante entre os filhos %t e %t
+sv: viktigt åldersskillnad mellan de två barnen %t och %t
 
     the following children of %t and %t are not in order
 af: die volgende kinders van %t and %t is nie in die regte volgorde nie
@@ -14057,12 +14069,12 @@ sl: zadnjih %t smrti
 sv: de senaste %t avlidna
 
     the modification impacted %d persons
-co: a mudificazione hè stata fatta bè : %d scheda(e) curretta(e)
+co: a mudificazione hè stata fatta bè : %d scheda(e) curretta(e)
 de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
 en: %d entries have been successfully updated
 es: la modificación ha sido hecha: %d ficha/s corregida/s
 fi: %d tietuetta on onnistuneesti päivitetty
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
 it: la modifica è stata effettuata : %d scheda/e corretta/e
 nl: wijziging goed uitgevoerd : %d fiche(n) verbeterd
 no: %d registreringer er blitt oppdatert
@@ -14235,22 +14247,22 @@ af: om 'n kind by te voeg by 'n familie, gebruik "%s"
 bg: за да добавите дете към семейство, използвайте "%s"
 br: evit ouzhpennañ ur bugel d'un tiegezh e ranker implij "%s"
 ca: per afegir un fill a una família, utilitzeu "%s"
-co: per aghjunghje un(a) zitellu(a) à una famiglia, impiegà « %s »
+co: per aghjunghje un(a) zitellu(a) à una famiglia, impiegà « %s »
 cs: pro přidání dítěte do rodiny použij "%s"
-da: brug "%s" for at føje et barn til en familie
-de: um ein Kind zu einer Familie hinzuzufügen, benutze "%s"
-en: to add a child to a family, use "%s"
-eo: por aldoni infanon al familio, uzu "%s"
+da: brug »%s« for at føje et barn til en familie
+de: um ein Kind zu einer Familie hinzuzufügen, benutze „%s“
+en: to add a child to a family, use “%s”
+eo: por aldoni infanon al familio, uzu “%s”
 es: para agregar un hijo a una familia, utiliza "%s"
 et: lapse lisamiseks perre kasuta "%st"
 fi: lisätäksesi perheeseen lapsen käytä "%s"
-fr: pour ajouter un enfant à une famille, utiliser « %s »
+fr: pour ajouter un enfant à une famille, utiliser « %s »
 he:  להוסיף ילד למשפחה, השתמש ב-"%s"
 is: til að bæta barni við fjölskyldu, notaðu "%s"
-it: per aggiungere un figlio ad una famiglia, scegliere "%s"
+it: per aggiungere un figlio ad una famiglia, scegliere «%s»
 lv: lai pievienotu bērnu ģimenei, lietojiet "%s"
 nl: gebruik "%s" om een kind aan een gezin toe te voegen
-no: for å knytte et barn til en familie, bruk "%s"
+no: for å knytte et barn til en familie, bruk «%s»
 oc: per apondre un enfant a una familha, utilizatz "%s"
 pl: aby dodać dziecko do pary rodziców użyj "%s"
 pt: para acrescentar um filho a uma família utilizar "%s"
@@ -14658,7 +14670,7 @@ fr: arbre des témoins
 pt: árvore de testemunhas
 
     trees & lists
-co: Arburi & Liste
+co: Arburi è Liste
 de: Bäume & Listen
 en: Charts & Lists
 es: Árboles & listas
@@ -14914,22 +14926,22 @@ af: gebruik "koppel" eerder as "skep"
 bg: използвайте "да се свърже" вместо "да се създаде"
 br: implijit "liammañ" kentoc'h eget "sevel"
 ca: utilitzeu "reunir" en lloc de "crear"
-co: impiegate « unisce » invvece di « creà »
+co: impiegà « unisce » invvece di « creà »
 cs: použij "svázat" namísto "vytvořit"
-da: anvend "forbind" i stedet for "opret"
-de: benutze "verbinden" an Stelle von "erzeugen"
-en: use "link" instead of "create"
-eo: uzu "bindi" anstataù ol "krei"
+da: anvend »forbind« i stedet for »opret«
+de: benutze „verbinden“ an Stelle von „erzeugen”
+en: use “link” instead of “create”
+eo: uzu “bindi” anstataù ol “krei”
 es: utilise "reunir" en lugar de "crear"
 et: vali "loo" asemel "viita"
 fi: käytä toimintoa "linkitä" toiminnon "luo" sijaan
-fr: utilisez « relier » au lieu de « créer »
+fr: utilisez « relier » au lieu de « créer »
 he:  להשתמש ב-"קשר" במקום "עשה"
 is: notaðu "tengja" í stað "búa til"
-it: usare "link" invece di "create"
+it: usare «link» invece di «create»
 lv: "izveidot" vietā lietojiet "saite"
 nl: gebruik "connectie" inplaats van "creëren"
-no: bruk "koble" istedet for "opprett"
+no: bruk «koble» istedet for «opprett»
 oc: utilizatz "religar" al lòc de "crear"
 pl: użyj "link" zamiast "utwórz"
 pt: use "ligar" em lugar de "criar"
@@ -15191,10 +15203,10 @@ sl: z
 sv: med
 
     with root, spouses and unknowns
-co: cù l’antenatu radica, i cumpagni è i scunnisciuti
+co: cù l’antenatu di a radica, i cumpagni è i scunnisciuti
 en: with root ancestor, spouses and unknowns
 fr: avec l’ancêtre racine, les conjoints et les inconnus
-pt: com o antepassado raiz, cônjuges e desconhecidos
+pt: com o antepassado raiz, cônjuges e desconhecidos 
 
     witness at %s of
 co: testimone à u %s di
@@ -15233,7 +15245,7 @@ sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
 
     witness to events of
-co: testimoni à l’evvenimenti di
+co: testimoni à l’avvenimenti di
 en: witnesses to events of
 fr: témoins aux évènements de
 
