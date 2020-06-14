@@ -500,14 +500,14 @@ let input_file_ic ic =
     if len = 0 then ""
     else
       let buffer = Buffer.create len in
-      let rec loop pos =
+      let rec loop () =
         match input_line ic with
         | line ->
           Buffer.add_string buffer line ;
-          let pos' = pos_in ic in
-          if pos' < len
-          || (seek_in ic @@ pos' - 1 ; input_char ic) = '\n'
+          let pos = pos_in ic in
+          if pos < len
+          || (seek_in ic @@ pos - 1 ; input_char ic) = '\n'
           then Buffer.add_char buffer '\n' ;
-          loop pos'
+          loop ()
         | exception End_of_file -> Buffer.contents buffer
-      in loop (pos_in ic)
+      in loop ()
