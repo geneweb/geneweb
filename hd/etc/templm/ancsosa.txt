@@ -13,12 +13,14 @@
     %elseif;(evar.t = "N" and evar.only = "on")
       [*generation/generations]0 %l_v;
     %else;
-      %apply;a_of_b%with;
+      %apply;a_of_b2%with;
         %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
       %and;
         %if;(public_name != "")%public_name;%else;%first_name;%end;
         %if;(qualifier != "") %qualifier;%end;
         %sp;%surname;
+      %and;
+        %if;(public_name != "")%public_name;%else;%first_name_key;%end;
       %end;
     %end;
   </title>
@@ -66,7 +68,7 @@
 %message_to_wizard;
 
 <h1>%nn;
-  %apply;a_of_b%with;
+  %apply;a_of_b2%with;
     %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
   %and;
     %if;(not cancel_links)<a href="%prefix;%access;">%end;
@@ -75,6 +77,8 @@
       %sp;%surname;
       %if;(alias != "") <em>(%alias;)</em>%end;
     %if;(not cancel_links)</a>%end;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name_key;%end;
   %end;
   %sp;%dates;
 </h1>
