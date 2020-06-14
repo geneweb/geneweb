@@ -143,3 +143,14 @@ val list_replace : 'a -> 'a -> 'a list -> 'a list
 
 (** [list_except old_v new_v list] *)
 val list_except : 'a -> 'a list -> 'a list
+
+(** Read the content of a file.
+    Starts from the position where it is when calling [input_file_ic],
+    and read until the end of the file.
+
+    This function avoid crashes with text files on Windows platform.
+
+    If the channel is opened on a file that is not a regular file,
+    the result is meaningless.
+*)
+val input_file_ic : in_channel -> string

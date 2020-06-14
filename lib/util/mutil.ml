@@ -489,3 +489,25 @@ let list_except x =
       else loop (hd :: acc) tl
   in
   loop []
+
+let input_file_ic ic =
+  let len = in_channel_length ic in
+  if Sys.unix then
+    let bytes = Bytes.create len in
+    really_input ic bytes 0 len ;
+    Bytes.unsafe_to_string bytes
+  else
+    if len = 0 then ""
+    else
+      let buffer = Buffer.create len in
+      let rec loop pos =
+        match input_line ic with
+        | line ->
+          Buffer.add_string buffer line ;
+          let pos' = pos_in ic in
+          if pos' < len
+          || (seek_in ic @@ pos' - 1 ; input_char ic) = '\n'
+          then Buffer.add_char buffer '\n' ;
+          loop pos'
+        | exception End_of_file -> Buffer.contents buffer
+      in loop (pos_in ic)
