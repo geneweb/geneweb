@@ -158,7 +158,6 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
       Output.print_string conf "</ul>\n"
     end
 
-
 let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
   let sib = siblings conf base (get_iper a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then
@@ -385,8 +384,6 @@ let print_anniv conf base p dead_people level =
     if dead_people then BirthdayDisplay.gen_print_menu_dead conf base f_scan mode
     else BirthdayDisplay.gen_print_menu_birth conf base f_scan mode
 
-let cousmenu_print = Perso.interp_templ "cousmenu"
-
 let print conf base p =
   let max_lev =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
@@ -406,4 +403,4 @@ let print conf base p =
   | (_, _, Some (("AN" | "AD") as t)) when conf.wizard || conf.friend ->
     print_anniv conf base p (t = "AD") max_lev
   | _ ->
-    cousmenu_print conf base p
+    Perso.interp_templ "cousmenu" conf base p
