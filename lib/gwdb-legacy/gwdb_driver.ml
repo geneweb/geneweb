@@ -286,11 +286,7 @@ let base_notes_read_aux base fnotes mode =
       match mode with
       | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
       | Def.Rn1Ln -> (try input_line ic with End_of_file -> "")
-      | Def.RnAll ->
-        let n = in_channel_length ic in
-        let s = Bytes.create n in
-        really_input ic s 0 n ;
-        Bytes.unsafe_to_string s
+      | Def.RnAll -> Mutil.input_file_ic ic
     in
     close_in ic ;
     str
