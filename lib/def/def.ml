@@ -26,7 +26,7 @@ and precision =
     | OrYear of dmy2
     | YearInt of dmy2
 
-type f_relation_kind =
+type relation_kind =
   | Married
   | NotMarried
   | Engaged
@@ -38,8 +38,6 @@ type f_relation_kind =
   | MarriageLicense
   | Pacs
   | Residence
-
-type relation_kind = f_relation_kind
 
 type divorce =
   | NotDivorced
@@ -252,7 +250,7 @@ type 'person error =
   | BadSexOfMarriedPerson of 'person
 
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
-    BigAgeBetweenSpouses of 'person * 'person * dmy
+  | BigAgeBetweenSpouses of 'person * 'person * dmy
   | BirthAfterDeath of 'person
   | IncoherentSex of 'person * int * int
   | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array
@@ -260,9 +258,10 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | ChangedOrderOfFamilyEvents of 'family * 'fevent list * 'fevent list
   | ChangedOrderOfPersonEvents of 'person * 'pevent list * 'pevent list
   | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
-  | CloseChildren of 'family * 'descend * 'person * 'person
+  | CloseChildren of 'family * 'person * 'person
   | DeadOld of 'person * dmy
   | DeadTooEarlyToBeFather of 'person * 'person
+  | DistantChildren of 'family * 'person * 'person
   | FEventOrder of 'person * 'fevent * 'fevent
   | FWitnessEventAfterDeath of 'person * 'fevent
   | FWitnessEventBeforeBirth of 'person * 'fevent
@@ -282,11 +281,17 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | WitnessDateAfterDeath of 'person
   | WitnessDateBeforeBirth of 'person
   | YoungForMarriage of 'person * dmy
+  | OldForMarriage of 'person * dmy
 
 type ('person, 'descend, 'title) misc = MissingSources
 
 type rn_mode = RnAll | Rn1Ln | RnDeg
 
+type base_notes =
+  { nread : string -> rn_mode -> string
+  ; norigin_file : string
+  ; efiles : unit -> string list
+  }
 
 (* Historique des modifications *)
 
@@ -320,3 +325,16 @@ type ('iper, 'person, 'family, 'string) base_changed =
   | U_Multi of
       ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person * bool
   | U_Notes of int option * string
+
+module NLDB = struct
+  type ('a, 'b) page =
+    | PgInd of 'a
+    | PgFam of 'b
+    | PgNotes
+    | PgMisc of string
+    | PgWizard of string
+  type key = string * string * int
+  type ind = { lnTxt : string option ; lnPos : int }
+  type ('a, 'b) t = ( ('a, 'b) page
+                      * (string list * (key * ind) list) ) list
+end

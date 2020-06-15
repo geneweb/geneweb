@@ -25,18 +25,7 @@ open Api_util
 let print_info_base conf base =
   let (sosa_p, sosa) =
      match Util.find_sosa_ref conf base with
-     | Some p ->
-         let fn = Name.lower (sou base (get_first_name p)) in
-         let sn = Name.lower (sou base (get_surname p)) in
-         let occ = Int32.of_int (get_occ p) in
-         let sosa =
-           Some M.Reference_person.({
-             n = sn;
-             p = fn;
-             oc = occ;
-           })
-         in
-         (Some p, sosa)
+     | Some p -> (Some p, Some (person_to_reference_person base p))
      | None -> (None, None)
   in
   let last_modified_person =
@@ -72,7 +61,7 @@ let print_info_base conf base =
       nb_families = Int64.of_int (Gwdb.nb_of_families base);
       sosa = sosa;
       last_modified_person = Opt.map Int64.of_string last_modified_person;
-      real_nb_persons = Some (Int64.of_int (Util.real_nb_of_persons conf base));
+      real_nb_persons = Some (Int64.of_int (Gwdb.nb_of_real_persons base));
     })
   in
   let data = Mext.gen_infos_base info_base in
@@ -106,13 +95,7 @@ let print_loop conf base =
       pers_to_piqi_person conf base !pers !base_loop
         (Perso.get_single_sosa conf base) false
     else
-      let ref_pers =
-        M.Reference_person.({
-          n = "";
-          p = "";
-          oc = Int32.of_int 0;
-        })
-      in
+      let ref_pers = empty_reference_person in
       empty_piqi_person conf ref_pers false
   in
   let data = data_person p in
@@ -197,17 +180,7 @@ let print_list_ref_person conf base =
 let print_ref_person_from_ip conf base =
   let id = get_params conf Mext.parse_index in
   let ip = Gwdb.iper_of_string @@ Int32.to_string id.M.Index.index in
-  let p = poi base ip in
-  let fn = Name.lower (sou base (get_first_name p)) in
-  let sn = Name.lower (sou base (get_surname p)) in
-  let occ = Int32.of_int (get_occ p) in
-  let ref_p =
-    M.Reference_person.({
-      n = sn;
-      p = fn;
-      oc = occ;
-    })
-  in
+  let ref_p = person_to_reference_person base @@ poi base ip in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
 
@@ -225,13 +198,7 @@ let print_ref_person_from_ip conf base =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let print_first_available_person conf base =
-  let empty_ref =
-    M.Reference_person.({
-      n = "";
-      p = "";
-      oc = Int32.of_int 0;
-    })
-  in
+  let empty_ref = empty_reference_person in
   let continue = ref true in
   let res = ref empty_ref in
   Gwdb.Collection.fold_until (fun () -> !continue) begin fun () p ->
@@ -240,15 +207,7 @@ let print_first_available_person conf base =
     then ()
     else
       begin
-        let fn = Name.lower (sou base (get_first_name p)) in
-        let sn = Name.lower (sou base (get_surname p)) in
-        let occ = Int32.of_int (get_occ p) in
-        res :=
-          M.Reference_person.({
-              n = sn;
-              p = fn;
-              oc = occ;
-            }) ;
+        res := person_to_reference_person base p ;
         continue := false
       end
   end () (Gwdb.persons base) ;
@@ -286,18 +245,13 @@ let print_find_sosa conf base =
           match get_children fam with
           | [||] -> loop (i + 1)
           | arr ->
-            let sosa = poi base @@ Array.unsafe_get arr 0 in
-            let p = Name.lower (sou base (get_first_name sosa)) in
-            let n = Name.lower (sou base (get_surname sosa)) in
-            let oc = Int32.of_int (get_occ sosa) in
-            { M.Reference_person.n ; p ; oc }
+            person_to_reference_person base @@ poi base @@ Array.unsafe_get arr 0
         end else
           (* On reconstruit la ref_person pour être sûr des accents. *)
-          M.Reference_person.{ n = Name.lower n ; p = Name.lower p ; oc = oc }
+          person_to_reference_person base @@ poi base ip
       in
       loop 0
-    | None ->
-        M.Reference_person.{ n = "" ; p = "" ; oc = Int32.of_int 0 ; }
+    | None -> empty_reference_person
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
@@ -504,9 +458,8 @@ let print_max_ancestors =
   in
   fun conf base ->
   let ipers = Gwdb.ipers base in
-  let ancestors = Gwdb.iper_marker ipers IperSet.empty in
-  let mark = Gwdb.iper_marker ipers false in
-
+  let ancestors = Gwdb.iper_marker (Gwdb.ipers base) IperSet.empty in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   let has_children p =
     Array.exists
       (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)
@@ -558,18 +511,7 @@ let print_max_ancestors =
     let nb = IperSet.cardinal @@ Gwdb.Marker.get ancestors i in
     if nb > snd !res then res := (i, nb)
   end ipers ;
-
-  let p = poi base (fst !res) in
-  let fn = Name.lower (sou base (get_first_name p)) in
-  let sn = Name.lower (sou base (get_surname p)) in
-  let occ = Int32.of_int (get_occ p) in
-  let ref_p =
-    M.Reference_person.({
-      n = sn;
-      p = fn;
-      oc = occ;
-    })
-  in
+  let ref_p = person_to_reference_person base @@ poi base (fst !res) in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
 
@@ -764,7 +706,6 @@ let print_remove_image_ext_all base =
 
 (**/**) (* API_CHECK_BASE *)
 
-
 (* ********************************************************************* *)
 (*  [Fonc] print_base_warnings : config -> base -> unit                  *)
 (** [Description] : Renvoie les listes des erreurs et warnings d'une base.
@@ -780,8 +721,7 @@ let print_base_warnings conf base =
   let errors = ref [] in
   let warnings = ref [] in
   Check.check_base base
-    (Api_warnings.set_list errors) (Api_warnings.set_list warnings)
-    (fun _ -> true) (fun _ -> ()) false;
+    (Api_warnings.set_list errors) (Api_warnings.set_list warnings) ignore ;
   (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
   (* levé par plusieurs fonctions différents selon le context.       *)
   let warnings =
@@ -798,31 +738,12 @@ let print_base_warnings conf base =
     in
     loop !warnings []
   in
-  let base_loop = has_base_loop conf base in
-  let () = Perso.build_sosa_ht conf base in
-  let () = load_image_ht conf in
   List.iter
-    (Api_warnings.add_error_to_piqi_warning_list
-       conf base base_loop Perso.get_sosa_person true)
-    !errors;
+    (Api_warnings.add_error_to_piqi_warning_list base)
+    !errors ;
   List.iter
-    (Api_warnings.add_warning_to_piqi_warning_list
-       conf base base_loop Perso.get_sosa_person true)
-    warnings;
-  (* On propage les modifications pour les warnings ChangedOrderOf... *)
-  List.iter
-    (fun warn ->
-      (match warn with
-      | ChangedOrderOfChildren (ifam, _, _, after) ->
-          patch_descend base ifam {children = after}
-      | ChangedOrderOfMarriages (p, _, after) ->
-          patch_union base (get_iper p) {family = after}
-      | _ -> ()))
-    warnings;
-  (* Attention, les FLEX peuvent aussi faire un calcul de warning, *)
-  (* mais on n'applique pas la modification de la base.            *)
-  if conf.wizard then Util.commit_patches conf base
-  else ();
+    (Api_warnings.add_warning_to_piqi_warning_list conf base)
+    warnings ;
   let data =
     if filters.nb_results then
       let len = List.length !errors + List.length warnings in

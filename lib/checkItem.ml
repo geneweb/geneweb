@@ -1,6 +1,3 @@
-(* $Id: checkItem.ml,v 1.11 2007-09-05 13:16:45 ddr Exp $ *)
-(* Copyright (c) 2006-2007 INRIA *)
-
 open Def
 open Gwdb
 
@@ -18,27 +15,47 @@ let max_death_before_lim_date_death = 100
 let min_parent_age = 11
 let max_father_age = 70
 let max_mother_age = 55
-let lim_date_marriage = 1850
-let min_age_marriage = 13
-let average_marriage_age = 20
+let min_age_marriage = 12
+let max_age_marriage = 100
+let max_siblings_gap = 50
+
+(* Check if d1 < d2 *)
+let strictly_before_dmy d1 d2 =
+  match Date.compare_dmy_opt ~strict:true d1 d2 with
+  | Some x -> x < 0
+  | None -> false
 
 let strictly_before d1 d2 =
   match d1, d2 with
-  | Dgreg (d1, _), Dgreg (d2, _) ->
-    begin
-      try Date.compare_dmy ~strict:true d1 d2 < 0
-      with Date.Not_comparable -> false
-    end
+  | Dgreg (d1, _), Dgreg (d2, _) -> strictly_before_dmy d1 d2
   | _ -> false
+
+let strictly_after_dmy d1 d2 =
+  match Date.compare_dmy_opt ~strict:true d1 d2 with
+  | Some x -> x > 0
+  | None -> false
 
 let strictly_after d1 d2 =
   match d1, d2 with
-  | Dgreg (d1, _), Dgreg (d2, _) ->
-    begin
-      try Date.compare_dmy ~strict:true d1 d2 > 0
-      with Date.Not_comparable -> false
-    end
+  | Dgreg (d1, _), Dgreg (d2, _) -> strictly_after_dmy d1 d2
   | _ -> false
+
+let strictly_younger age year =
+  match age.prec with
+  | After -> false
+  | _ -> age.year < year
+
+let strictly_older age year =
+  match age.prec with
+  | Before -> false
+  | _ -> age.year > year
+
+let odate = function
+  | Some (Dgreg (d, _)) -> Some d
+  | _ -> None
+
+let obirth x =
+  get_birth x |> Adef.od_of_cdate |> odate
 
 type 'string event_name =
     Psort of 'string gen_pers_event_name
@@ -76,56 +93,26 @@ let compare_event_name name1 name2 =
   | _, Psort Epers_Death -> -1
   | _ -> 0
 
-let compare_event_date_prec d1 d2 =
-  match d1.prec, d2.prec with
-    Before, _ -> -1
-  | _, Before -> 1
-  | After, _ -> 1
-  | _, After -> -1
-  | _ -> 0
-
-(* Compare les dates sans prendre en compte les dates textes. *)
-let compare_event_date d1 d2 =
-  match d1, d2 with
-    Dgreg (dmy1, _), Dgreg (dmy2, _) ->
-      begin match Stdlib.compare dmy1.year dmy2.year with
-        0 ->
-          begin match Stdlib.compare dmy1.month dmy2.month with
-            0 ->
-              (* Si l'une des deux dates n'est pas complète (mois ou jour *)
-              (* égal à zéro), alors on ne distingue pas les deux dates.  *)
-              if dmy1.day = 0 || dmy2.day = 0 then 0
-              else
-                begin match Stdlib.compare dmy1.day dmy2.day with
-                  0 -> compare_event_date_prec dmy1 dmy2
-                | x -> x
-                end
-          | x ->
-              (* Idem ci-dessus. *)
-              if dmy1.month = 0 || dmy2.month = 0 then 0 else x
-          end
-      | x -> x
-      end
-  | _ -> 0
-
-let cmp_events (get_name, get_date) e1 e2 =
-  match Adef.od_of_cdate (get_date e1), Adef.od_of_cdate (get_date e2) with
-    Some d1, Some d2 ->
-      (* On utilise compare_event_date parce qu'on ne veut *)
-      (* pas prendre en compte les dates textes, on veut   *)
-      (* que l'évènement soit plus important pour le tri.  *)
-      let comp_date = compare_event_date d1 d2 in
-      if comp_date = 0 then compare_event_name (get_name e1) (get_name e2)
-      else comp_date
+let cmp_events get_name get_date e1 e2 =
+  match Adef.od_of_cdate (get_date e1) with
+  | Some (Dgreg (d1, _)) -> begin
+      match Adef.od_of_cdate (get_date e2) with
+      | Some (Dgreg (d2, _)) ->
+        begin match Date.compare_dmy_opt ~strict:false d1 d2 with
+          | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
+          | Some x -> x
+        end
+      | _ -> compare_event_name (get_name e1) (get_name e2)
+    end
   | _ -> compare_event_name (get_name e1) (get_name e2)
 
 let sort_events get_name get_date events =
-  List.stable_sort (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2) events
+  List.stable_sort (fun e1 e2 -> cmp_events get_name get_date e1 e2) events
 
 let merge_events get_name get_date l1 l2 =
-  List.merge (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2) l1 l2
+  List.merge (fun e1 e2 -> cmp_events get_name get_date e1 e2) l1 l2
 
-let sort_pevents warning p =
+let changed_pevents_order warning p =
   let a =
     sort_events
       (fun evt -> Psort evt.epers_name) (fun evt -> evt.epers_date)
@@ -134,7 +121,7 @@ let sort_pevents warning p =
   let b = get_pevents p in
   if compare b a <> 0 then warning (ChangedOrderOfPersonEvents (p, b, a))
 
-let sort_fevents warning (ifam, fam) =
+let changed_fevents_order warning (ifam, fam) =
   let a =
     sort_events (fun evt -> Fsort evt.efam_name) (fun evt -> evt.efam_date)
       (get_fevents fam)
@@ -163,45 +150,29 @@ let titles_after_birth warning p t =
       ()
   | _ -> ()
 
-let check_person_age base warning p =
+let check_person_age warning p =
+  let aux d1 d2 =
+    Date.time_elapsed_opt d1 d2 |> Opt.iter @@ fun a ->
+    if a.year < 0 then warning (BirthAfterDeath p)
+    else if d2.year > lim_date_death then begin
+      if strictly_older a max_death_after_lim_date_death
+      then warning (DeadOld (p, a))
+    end else if strictly_older a max_death_before_lim_date_death
+    then warning (DeadOld (p, a))
+  in
   (* On pourrait faire un calcul sur la descendance ou l'ascendance si  *)
   (* on ne trouve rien ... mais c'est peut être un peu trop gourmand    *)
   (* juste pour un warning ?                                            *)
-  let first_found_date =
-    match
-      Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p)
-    with
-      Some (Dgreg (d, _)), _ -> Some d
-    | _, Some (Dgreg (d, _)) -> Some d
-    | _ ->
-        let rec loop i =
-          if i >= Array.length (get_family p) then None
-          else
-            let fam = foi base (get_family p).(i) in
-            match Adef.od_of_cdate (get_marriage fam) with
-              Some (Dgreg (d, _)) ->
-                let d = {d with year = d.year - average_marriage_age} in
-                Some d
-            | _ -> loop (i + 1)
-        in
-        loop 0
-  in
-  let is_dead =
-    match get_death p with
-      Death (_, _) | DeadYoung | DeadDontKnowWhen -> true
-    | OfCourseDead -> true
-    | _ -> false
-  in
-  if is_dead then
-    match first_found_date, Date.date_of_death (get_death p) with
-      Some d1, Some (Dgreg (d2, _)) ->
-        let a = Date.time_elapsed d1 d2 in
-        if d2.year > lim_date_death then
-          (if a.year > max_death_after_lim_date_death then
-             warning (DeadOld (p, a)))
-        else if a.year > max_death_before_lim_date_death then
-          warning (DeadOld (p, a))
-    | _ -> ()
+  match Date.date_of_death (get_death p) with
+  | Some (Dgreg (d2, _)) ->
+    begin
+      match Adef.od_of_cdate (get_birth p) with
+      | Some (Dgreg (d, _)) -> aux d d2
+      | _ -> match Adef.od_of_cdate (get_baptism p) with
+        | Some (Dgreg (d, _)) -> aux d d2
+        | _ -> ()
+    end
+  | _ -> ()
 
 let try_to_fix_relation_sex base warning p_ref =
   let p_index = Some (get_iper p_ref) in
@@ -258,9 +229,8 @@ let try_to_fix_relation_sex base warning p_ref =
                 rel :: rparents, changed, not_changed)
              (get_rparents p) ([], 0, 0)
          in
-         let _ =
-           fixed := !fixed + changed; not_fixed := !not_fixed + not_changed
-         in
+         fixed := !fixed + changed;
+         not_fixed := !not_fixed + not_changed ;
          if changed > 0 then (ip, p, None, Some rparents) :: changed_related
          else changed_related)
       (get_related p_ref) []
@@ -300,97 +270,25 @@ let related_sex_is_coherent base warning p_ref =
       else None
   | None -> try_to_fix_relation_sex base warning p_ref
 
-let check_difference_age_between_cpl base warning ifath imoth =
-  let fath = poi base ifath in
-  let moth = poi base imoth in
+let check_difference_age_between_cpl warning fath moth =
   let find_date p =
-    match
-      Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p)
-    with
-      Some (Dgreg (d, _)), _ -> Some d
-    | _, Some (Dgreg (d, _)) -> Some d
-    | _ -> None
+    match Adef.od_of_cdate (get_birth p) with
+    | Some (Dgreg (d, _)) -> Some d
+    | _ -> match Adef.od_of_cdate (get_baptism p) with
+      | Some (Dgreg (d, _)) -> Some d
+      | _ -> None
   in
-  match find_date fath, find_date moth with
-    Some d1, Some d2 ->
-      let a = Date.time_elapsed d1 d2 in
-      if a.year > max_age_btw_cpl then
-        warning (BigAgeBetweenSpouses (fath, moth, a))
-  | _ -> ()
-
-let year_of d = d.year
-
-let check_normal_marriage_date_for_someone base warning witn fam ip =
-  let p = poi base ip in
-  match Adef.od_of_cdate (get_marriage fam) with
-    Some (Dgreg (g2, _) as d2) ->
-      begin match Adef.od_of_cdate (get_birth p) with
-        Some (Dgreg (g1, _) as d1) ->
-          if strictly_before d2 d1 then
-            if witn then warning (WitnessDateBeforeBirth p)
-            else warning (MarriageDateBeforeBirth p)
-          else if
-            not witn && year_of g2 > lim_date_marriage &&
-            year_of (Date.time_elapsed g1 g2) < min_age_marriage
-          then
-            warning (YoungForMarriage (p, Date.time_elapsed g1 g2))
-      | _ -> ()
-      end;
-      begin match get_death p with
-        Death (_, d3) ->
-          let d3 = Adef.date_of_cdate d3 in
-          if strictly_after d2 d3 then
-            if witn then warning (WitnessDateAfterDeath p)
-            else warning (MarriageDateAfterDeath p)
-      | _ -> ()
-      end
-  | _ -> ()
-
-
-(* ************************************************************************* *)
-(*  [Fonc] check_normal_marriage_date_for_witness :
-      base -> (Def.warning -> unit) ->
-        (ifam * family) -> unit                                              *)
-(** [Description] : Vérifie les dates des témoins par rapport à la date du
-                    mariage.
-    [Args] :
-      - base    : base
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - ifam    : ifam
-      - family  : family
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let check_normal_marriage_date_for_witness base warning (ifam, fam) =
-  let wl = foi base ifam in
-  Array.iter
-    (fun ip -> check_normal_marriage_date_for_someone base warning true fam ip)
-    (get_witnesses wl)
-
-
-(* ************************************************************************* *)
-(*  [Fonc] check_normal_marriage_date_for_parent :
-      base -> (Def.warning -> unit) ->
-        (ifam * family) -> unit                                              *)
-(** [Description] : Vérifie les dates du conjoint1 et du conjoint2 par
-                    rapport à la date du mariage.
-    [Args] :
-      - base    : base
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - ifam    : ifam
-      - family  : family
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let check_normal_marriage_date_for_parent base warning (ifam, fam) =
-  let cpl = foi base ifam in
-  check_normal_marriage_date_for_someone base warning false fam
-    (get_father cpl);
-  check_normal_marriage_date_for_someone base warning false fam
-    (get_mother cpl);
-  check_difference_age_between_cpl base warning (get_father cpl)
-    (get_mother cpl)
-
+  match find_date fath with
+  | None -> ()
+  | Some d1 ->
+    match find_date moth with
+    | None -> ()
+    | Some d2 ->
+      (if d1.year < d2.year then Date.time_elapsed_opt d1 d2
+       else Date.time_elapsed_opt d2 d1)
+      |> Opt.iter @@ fun a ->
+      if strictly_older a max_age_btw_cpl
+      then warning (BigAgeBetweenSpouses (fath, moth, a))
 
 (*
  * Semi sort children by birth dates.
@@ -492,25 +390,7 @@ let sort_children base children =
     Some b -> Some (b, children)
   | None -> None
 
-let sort_children2 base warning ifam des =
-  let b = get_children des in
-  match sort_children base b with
-    None -> b
-  | Some (b, a) -> warning (ChangedOrderOfChildren (ifam, des, b, a)); a
-
-
-(* ********************************************************************** *)
-(*  [Fonc] check_marriages_order :
-             base -> (Def.warning -> unit) -> person -> unit              *)
-(** [Description] : Trie les famillies en fonction des dates de mariages.
-    [Args] :
-      - base    : base de donnée
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - p       : person
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                       *)
-(* ********************************************************************** *)
-let check_marriages_order base warning p =
+let changed_marriages_order base warning p =
   let b = Array.copy (get_family p) in
   (* Astuce : on construire un tableau identique à la famille dans *)
   (* lequel on remplace toutes les dates inconnues par la dernière *)
@@ -553,81 +433,94 @@ let check_marriages_order base warning p =
       loop 0 (get_family p)
     end
 
-let close_siblings warning x np ifam des =
-  match np, Adef.od_of_cdate (get_birth x) with
-    None, _ -> ()
-  | Some (elder, d1), Some d2 ->
-      begin match d1, d2 with
-        Dgreg (d1, _), Dgreg (d2, _) ->
-          let d = Date.time_elapsed d1 d2 in
-          (* On vérifie les jumeaux ou naissances proches. *)
-          if d.year = 0 && d.month = 0 && d.day < max_days_btw_sibl then ()
-          else if d.year = 0 && d.month < max_month_btw_sibl then
-            warning (CloseChildren (ifam, des, elder, x))
+let close_siblings warning x np ifam =
+  match np with
+  | Some (elder, d1) ->
+    begin match odate @@ Adef.od_of_cdate (get_birth x) with
+      | Some d2 ->
+        Date.time_elapsed_opt d1 d2 |> Opt.iter @@ fun d ->
+        (* On vérifie les jumeaux ou naissances proches. *)
+        if d.year = 0
+        && (d.month < max_month_btw_sibl)
+        && (d.month <> 0 || d.day >= max_days_btw_sibl)
+        then warning (CloseChildren (ifam, elder, x))
       | _ -> ()
-      end
+    end
   | _ -> ()
 
-let born_after_his_elder_sibling warning x np ifam des =
-  match np, Adef.od_of_cdate (get_birth x), get_death x with
-    None, _, _ -> ()
-  | Some (elder, d1), Some d2, _ ->
-      if strictly_after d1 d2 then
+let born_after_his_elder_sibling warning x b np ifam des =
+  match np with
+  | None -> ()
+  | Some (elder, d1) ->
+    match b with
+    | Some d2 ->
+      if strictly_after_dmy d1 d2 then
         warning (ChildrenNotInOrder (ifam, des, elder, x))
-  | Some (elder, d1), _, Death (_, d2) ->
-      let d2 = Adef.date_of_cdate d2 in
-      if strictly_after d1 d2 then
-        warning (ChildrenNotInOrder (ifam, des, elder, x))
+    | None -> match odate @@ Date.date_of_death (get_death x) with
+      | Some d2 ->
+        if strictly_after_dmy d1 d2 then
+          warning (ChildrenNotInOrder (ifam, des, elder, x))
+      | None -> ()
+
+let siblings_gap gap child = function
+  | None -> gap
+  | Some b ->
+    match gap with
+    | None -> Some ((b, child), (b, child))
+    | Some ((min, minp), (max, maxp)) ->
+      Some
+        ( (if strictly_before_dmy b min then (b, child) else (min, minp))
+        , (if strictly_after_dmy b max then (b, child) else (max, maxp)) )
+
+let child_born_after_his_parent warning x parent =
+  match Adef.od_of_cdate (get_birth parent) with
+  | Some (Dgreg (g1, _)) ->
+    begin match Adef.od_of_cdate (get_birth x) with
+      | Some (Dgreg (g2, _)) ->
+        if strictly_after_dmy g1 g2 then warning (ParentBornAfterChild (parent, x))
+        else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun a ->
+          if strictly_younger a min_parent_age
+          then warning (ParentTooYoung (parent, a))
+          else if (get_sex parent = Female && strictly_older a max_mother_age)
+               || (get_sex parent = Male && strictly_older a max_father_age)
+          then warning (ParentTooOld (parent, a))
+      | _ -> match Date.date_of_death (get_death x) with
+        | Some (Dgreg (g2, _)) ->
+          if strictly_after_dmy g1 g2 then warning (ParentBornAfterChild (parent, x))
+          else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun a ->
+            if strictly_younger a min_parent_age
+            then warning (ParentTooYoung (parent, a))
+        | _ -> ()
+    end
   | _ -> ()
 
-let child_born_after_his_parent base warning x iparent =
-  let parent = poi base iparent in
-  match
-    Adef.od_of_cdate (get_birth parent), Adef.od_of_cdate (get_birth x),
-    Date.date_of_death (get_death x)
-  with
-    Some (Dgreg (g1, _) as d1), Some (Dgreg (g2, _) as d2), _ ->
-      if strictly_after d1 d2 then warning (ParentBornAfterChild (parent, x))
-      else
-        let a = Date.time_elapsed g1 g2 in
-        if year_of a < min_parent_age then
-          warning (ParentTooYoung (parent, a))
-        else if
-          get_sex parent = Female && year_of a > max_mother_age ||
-          get_sex parent = Male && year_of a > max_father_age
-        then
-          warning (ParentTooOld (parent, a))
-  | Some (Dgreg (g1, _) as d1), _, Some (Dgreg (g2, _) as d2) ->
-      if strictly_after d1 d2 then warning (ParentBornAfterChild (parent, x))
-      else
-        let a = Date.time_elapsed g1 g2 in
-        if year_of a < min_parent_age then
-          warning (ParentTooYoung (parent, a))
+let child_born_before_mother_death warning x mother =
+  match Adef.od_of_cdate (get_birth x) with
+  | Some (Dgreg (d1, _)) ->
+    begin
+      match Date.date_of_death @@ get_death mother with
+      | Some (Dgreg (d2, _)) ->
+        if strictly_after_dmy d1 d2
+        then warning (MotherDeadAfterChildBirth (mother, x))
+      | _ -> ()
+    end
   | _ -> ()
 
-let child_born_before_mother_death base warning x imoth =
-  let mother = poi base imoth in
-  match Adef.od_of_cdate (get_birth x), get_death mother with
-    Some d1, Death (_, d2) ->
-      let d2 = Adef.date_of_cdate d2 in
-      if strictly_after d1 d2 then
-        warning (MotherDeadAfterChildBirth (mother, x))
-  | _ -> ()
-
-let possible_father base warning x ifath =
-  let father = poi base ifath in
-  match Adef.od_of_cdate (get_birth x), Date.date_of_death (get_death father) with
-    Some (Dgreg ({prec = Before}, _)), _ |
-    _, Some (Dgreg ({prec = After}, _)) ->
-      ()
-  | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
-      let a2 =
-        match d2 with
-          {prec = YearInt dmy2} -> dmy2.year2
-        | {prec = OrYear dmy2} -> dmy2.year2
-        | {year = a} -> a
-      in
-      if year_of d1 > a2 + 1 then warning (DeadTooEarlyToBeFather (father, x))
+let possible_father warning x father =
+  match Adef.od_of_cdate (get_birth x) with
+  | Some (Dgreg (d1, _)) when d1.prec <> Before ->
+    begin
+      match Date.date_of_death (get_death father) with
+      | Some (Dgreg (d2, _)) when d2.prec <> After ->
+        let a2 =
+          match d2 with
+          | {prec = YearInt dmy2} -> dmy2.year2
+          | {prec = OrYear dmy2} -> dmy2.year2
+          | {year = a} -> a
+        in
+        if d1.year > a2 + 1 then warning (DeadTooEarlyToBeFather (father, x))
+      | _ -> ()
+    end
   | _ -> ()
 
 let child_has_sex warning child =
@@ -652,69 +545,76 @@ let check_order_pevents warning p =
     (p)
     (get_pevents p)
 
+let check_witness_pevents_aux warning evt date b d p =
+  begin match b with
+    | Some (Dgreg (d1, _)) ->
+      if strictly_before_dmy date d1
+      then warning (PWitnessEventBeforeBirth (p, evt))
+    | _ -> ()
+  end ;
+  match d with
+  | Some (Dgreg (d3, _)) ->
+    if strictly_after_dmy date d3
+    then warning (PWitnessEventAfterDeath (p, evt))
+  | _ -> ()
+
 let check_witness_pevents base warning p =
-  List.iter
-    (fun evt ->
-       match Adef.od_of_cdate evt.epers_date with
-         Some (Dgreg (_, _) as d2) ->
-           Array.iter
-             (fun (iw, _) ->
-                let p = poi base iw in
-                begin match Adef.od_of_cdate (get_birth p) with
-                  Some (Dgreg (_, _) as d1) ->
-                    if strictly_before d2 d1 then
-                      warning (PWitnessEventBeforeBirth (p, evt))
-                | _ -> ()
-                end;
-                match get_death p with
-                  Death (_, d3) ->
-                    let d3 = Adef.date_of_cdate d3 in
-                    if strictly_after d2 d3 then
-                      warning (PWitnessEventAfterDeath (p, evt))
-                | _ -> ())
-             evt.epers_witnesses
-       | _ -> ())
-    (get_pevents p)
+  List.iter begin fun evt ->
+    match Adef.od_of_cdate evt.epers_date with
+    | Some (Dgreg (d2, _)) ->
+      Array.iter begin fun (iw, _) ->
+        let p = poi base iw in
+        check_witness_pevents_aux warning evt d2
+          (Adef.od_of_cdate @@ get_birth p)
+          (Date.date_of_death @@ get_death p) p
+      end evt.epers_witnesses
+    | _ -> ()
+  end (get_pevents p)
 
 let check_pevents base warning p =
   check_order_pevents warning p ;
   check_witness_pevents base warning p
 
-(* ************************************************************************* *)
-(*  [Fonc] check_children :
-      base -> (Def.warning -> unit) ->
-        (ifam * family) -> unit                                              *)
-(** [Description] : Vérifie toutes les informations des enfants d'une famille.
-    [Args] :
-      - base    : base
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - ifam    : ifam
-      - family  : family
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let check_children base warning (ifam, fam) =
-  let cpl = fam in
-  let des = fam in
-  let after = sort_children2 base warning ifam des in
-  ignore @@
-  Array.fold_left
-    (fun np child ->
-       let child = poi base child in
-       check_pevents base warning child;
-       born_after_his_elder_sibling warning child np ifam des;
-       close_siblings warning child np ifam des;
-       child_born_after_his_parent base warning child
-         (get_father cpl);
-       child_born_after_his_parent base warning child
-         (get_mother cpl);
-       child_born_before_mother_death base warning child (get_mother cpl);
-       possible_father base warning child (get_father cpl);
-       child_has_sex warning child;
-       match Adef.od_of_cdate (get_birth child) with
-         Some d -> Some (child, d)
-       | _ -> np)
-    None after
+let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
+  let children =
+    if onchange then
+      let b = get_children fam in
+      match sort_children base b with
+      | None -> b
+      | Some (b, a) ->
+        warning (ChangedOrderOfChildren (ifam, fam, b, a)) ;
+        a
+    else get_children fam
+  in
+  let (_, gap) =
+    Array.fold_left begin fun (np, gap) child ->
+      let child = poi base child in
+      let b = obirth child in
+      let gap = siblings_gap gap child b in
+      born_after_his_elder_sibling warning child b np ifam fam;
+      close_siblings warning child np ifam ;
+      callback child ;
+      let np = match b with
+        | Some d -> Some (child, d)
+        | _ -> np
+      in
+      (np, gap)
+    end (None, None) children
+  in
+  match gap with
+  | Some ((d1, p1), (d2, p2)) ->
+    Date.time_elapsed_opt d1 d2 |> Opt.iter @@ fun e ->
+    if e.year > max_siblings_gap then warning (DistantChildren (ifam, p1, p2))
+   | _ -> ()
+
+let check_children ?(onchange = true) base warning (ifam, fam) fath moth =
+  check_siblings ~onchange base warning (ifam, fam) @@ fun child ->
+  check_pevents base warning child;
+  child_born_after_his_parent warning child fath;
+  child_born_after_his_parent warning child moth;
+  child_born_before_mother_death warning child moth;
+  possible_father warning child fath;
+  child_has_sex warning child
 
 let has_family_sources fam =
   not
@@ -752,7 +652,7 @@ let check_sources base misc ifam fam =
     if has_person_sources fath && has_person_sources moth then ()
     else misc MissingSources
 
-let check_order_fevents base warning (_ifam, fam) =
+let check_order_fevents base warning fam =
   let p = poi base (get_father fam) in
   check_order_pfevents
     (fun evt -> Fsort evt.efam_name)
@@ -761,145 +661,143 @@ let check_order_fevents base warning (_ifam, fam) =
     (p)
     (get_fevents fam)
 
-let check_witness_fevents base warning (_ifam, fam) =
-  List.iter
-    (fun evt ->
-       match Adef.od_of_cdate evt.efam_date with
-         Some (Dgreg (_, _) as d2) ->
-           Array.iter
-             (fun (iw, _) ->
-                let p = poi base iw in
-                begin match Adef.od_of_cdate (get_birth p) with
-                  Some (Dgreg (_, _) as d1) ->
-                    if strictly_before d2 d1 then
-                      warning (FWitnessEventBeforeBirth (p, evt))
-                | _ -> ()
-                end;
-                match get_death p with
-                  Death (_, d3) ->
-                    let d3 = Adef.date_of_cdate d3 in
-                    if strictly_after d2 d3 then
-                      warning (FWitnessEventAfterDeath (p, evt))
-                | _ -> ())
-             evt.efam_witnesses
-       | _ -> ())
-    (get_fevents fam)
+let check_witness_fevents_aux warning evt date b d p =
+  begin match b with
+    | Some (Dgreg (d1, _)) ->
+      if strictly_before_dmy date d1
+      then warning (FWitnessEventBeforeBirth (p, evt))
+    | _ -> ()
+  end ;
+  match d with
+  | Some (Dgreg (d3, _)) ->
+    if strictly_after_dmy date d3
+    then warning (FWitnessEventAfterDeath (p, evt))
+  | _ -> ()
 
-let check_marriage_age base warning (_ifam, fam) ip =
-  let p = poi base ip in
-  let rec loop fevents =
-    match fevents with
-      [] -> ()
-    | e :: l ->
-        match e.efam_name with
-          Efam_Marriage ->
-            begin match Adef.od_of_cdate e.efam_date with
-              Some (Dgreg (g2, _)) ->
-                begin match Adef.od_of_cdate (get_birth p) with
-                  Some (Dgreg (g1, _)) ->
-                    if year_of g2 > lim_date_marriage &&
-                       year_of (Date.time_elapsed g1 g2) < min_age_marriage
-                    then
-                      warning (YoungForMarriage (p, Date.time_elapsed g1 g2))
-                    else loop l
-                | _ -> loop l
-                end
-            | _ -> loop l
+let check_witness_fevents base warning fam =
+  List.iter begin fun evt ->
+    match Adef.od_of_cdate evt.efam_date with
+    | Some (Dgreg (d2, _)) ->
+      Array.iter begin fun (iw, _) ->
+        let p = poi base iw in
+        check_witness_fevents_aux warning evt d2
+          (Adef.od_of_cdate @@ get_birth p)
+          (Date.date_of_death @@ get_death p) p
+      end evt.efam_witnesses
+    | _ -> ()
+  end (get_fevents fam)
+
+let check_parent_marriage_age warning fam p =
+  let rec loop = function
+    | [] -> ()
+    | { efam_name = (Efam_Marriage|Efam_PACS) ; efam_date ; _ } :: list ->
+        begin match Adef.od_of_cdate efam_date with
+          | Some (Dgreg (g2, _) as d2) ->
+            begin match Date.date_of_death (get_death p) with
+              | Some d1 when strictly_after d2 d1 ->
+                warning (MarriageDateAfterDeath p)
+              | _ ->
+                match Adef.od_of_cdate (get_birth p) with
+                | Some (Dgreg (g1, _) as d1) ->
+                  if strictly_before d2 d1
+                  then warning (MarriageDateBeforeBirth p)
+                  else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun e ->
+                    if strictly_younger e min_age_marriage
+                    then warning (YoungForMarriage (p, e))
+                    else if strictly_older e max_age_marriage
+                    then warning (OldForMarriage (p, e))
+                    else loop list
+                | _ -> loop list
             end
-        | _ -> loop l
+          | _ -> loop list
+        end
+      | _ :: list -> loop list
   in
   loop (get_fevents fam)
 
-
-let check_reduce_fevents base warning (ifam, fam) =
-  let cpl = foi base ifam in
-  check_order_fevents base warning (ifam, fam);
-  check_marriage_age base warning (ifam, fam) (get_father cpl);
-  check_marriage_age base warning (ifam, fam) (get_mother cpl);
-  check_difference_age_between_cpl base warning (get_father cpl)
-    (get_mother cpl)
-
-let check_fevents base warning (ifam, fam) =
-  let cpl = foi base ifam in
-  check_order_fevents base warning (ifam, fam);
-  check_witness_fevents base warning (ifam, fam);
-  check_marriage_age base warning (ifam, fam) (get_father cpl);
-  check_marriage_age base warning (ifam, fam) (get_mother cpl);
-  check_difference_age_between_cpl base warning (get_father cpl)
-    (get_mother cpl)
-
+let check_parents warning fam fath moth =
+  check_parent_marriage_age warning fam fath ;
+  check_parent_marriage_age warning fam moth ;
+  check_difference_age_between_cpl warning fath moth
 
 (* main *)
 
-
-(* ************************************************************************* *)
-(*  [Fonc] person : base -> (Def.warning -> unit) -> person -> unit          *)
-(** [Description] : Vérifie les warnings d'une personne à la validation du
-                    formulaire individu.
-    [Args] :
-      - base    : base
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - p       : person
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let person base warning p =
+let person ?(onchange = true) base warning p =
   check_pevents base warning p;
-  check_person_age base warning p;
+  check_person_age warning p;
   List.iter (titles_after_birth warning p) (get_titles p);
-  sort_pevents warning p;
+  if onchange then changed_pevents_order warning p ;
   related_sex_is_coherent base warning p
 
+let family ?(onchange = true) base warning ifam fam =
+  let fath = poi base @@ get_father fam in
+  let moth = poi base @@ get_mother fam in
+  check_order_fevents base warning fam ;
+  check_witness_fevents base warning fam ;
+  check_parents warning fam fath moth ;
+  check_children ~onchange base warning (ifam, fam) fath moth ;
+  if onchange then begin
+    changed_fevents_order warning (ifam, fam);
+    let father = poi base (get_father fam) in
+    let mother = poi base (get_mother fam) in
+    changed_marriages_order base warning father;
+    changed_marriages_order base warning mother
+  end
 
-(* ************************************************************************* *)
-(*  [Fonc] family :
-      base -> (Def.warning -> unit) -> ifam -> family -> unit                *)
-(** [Description] : En cas de modification d'une famille, on vérifie toutes
-                    les personnes accessibles après la validation du
-                    formulaire (famille).
-                    Vérifie s'il y a des erreurs ou des warnings pour le
-                    couple, les parents du couple, les témoins et les enfants
-                    du couple.
-    [Args] :
-      - base    : base
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - ifam    : ifam
-      - fam     : family
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let family base warning ifam fam =
-  check_normal_marriage_date_for_parent base warning (ifam, fam);
-  check_normal_marriage_date_for_witness base warning (ifam, fam);
-  check_fevents base warning (ifam, fam);
-  check_children base warning (ifam, fam);
-  sort_fevents warning (ifam, fam);
-  let father = poi base (get_father fam) in
-  let mother = poi base (get_mother fam) in
-  check_marriages_order base warning father;
-  check_marriages_order base warning mother
-
-
-(* ************************************************************************* *)
-(*  [Fonc] reduce_family :
-      base -> (Def.warning -> unit) -> ifam -> family -> unit                *)
-(** [Description] : En cas de modification d'une personne, on ne vérifie que
-                    les personnes accessibles après la validation du
-                    formulaire (individu).
-                    Vérifie s'il y a des erreurs ou des warnings pour le
-                    couple, les parents du couple et les enfants du couple.
-    [Args] :
-      - base    : base
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - ifam    : ifam
-      - fam     : family
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let reduce_family base warning ifam fam =
-  check_normal_marriage_date_for_parent base warning (ifam, fam);
-  check_reduce_fevents base warning (ifam, fam);
-  check_children base warning (ifam, fam)
+let on_person_update base warning p =
+  begin match get_parents p with
+    | Some i ->
+      let fam = foi base i in
+      let fath = poi base @@ get_father fam in
+      let moth = poi base @@ get_mother fam in
+      child_born_after_his_parent warning p fath ;
+      child_born_after_his_parent warning p moth ;
+      check_siblings base warning (i, fam) ignore
+    | _ -> ()
+  end ;
+  let b = Adef.od_of_cdate (get_birth p) in
+  let d = Date.date_of_death @@ get_death p in
+  let iper = get_iper p in
+  if b <> None || d <> None then begin
+    List.iter begin fun i ->
+      let r = poi base i in
+      List.iter begin fun e ->
+        match Adef.od_of_cdate e.epers_date with
+        | Some (Dgreg (date, _))
+          when Array.exists (fun (i', _) -> iper = i') e.epers_witnesses
+          -> check_witness_pevents_aux warning e date b d p
+        | _ -> ()
+      end (get_pevents r) ;
+      Array.iter begin fun i ->
+        let f = foi base i in
+        List.iter begin fun e ->
+        match Adef.od_of_cdate e.efam_date with
+        | Some (Dgreg (date, _))
+          when Array.exists (fun (i', _) -> iper = i') e.efam_witnesses
+          -> check_witness_fevents_aux warning e date b d p
+        | _ -> ()
+        end (get_fevents f)
+      end (get_family r)
+    end (get_related p)
+  end ;
+  Array.iter begin fun ifam ->
+    let fam = foi base ifam in
+    let fath, moth =
+      if get_iper p = get_father fam
+      then p, poi base @@ get_mother fam
+      else poi base @@ get_father fam, p
+    in
+    check_parent_marriage_age warning fam p ;
+    check_difference_age_between_cpl warning fath moth ;
+    Array.iter begin fun child ->
+      let child = poi base child in
+      child_born_after_his_parent warning child p ;
+      match get_sex p with
+      | Male -> possible_father warning child p ;
+      | Female -> child_born_before_mother_death warning child p
+      | Neuter -> ()
+    end (get_children fam)
+  end (get_family p)
 
 
 (* ************************************************************************* *)

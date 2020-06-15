@@ -27,15 +27,30 @@ val infer_death_from_parents : config -> base -> family -> death
 val print_same_name : config -> base -> person -> unit
 val print_person_parents_and_spouse : config -> base -> person -> unit
 
-val insert_person :
-  config -> base -> string -> (iper, iper, istr) gen_person list ref -> key ->
-    iper
+val insert_person
+  : config
+  -> base
+  -> string
+  -> (iper, iper, istr) gen_person list ref
+  -> key
+  -> iper
+
 val delete_topological_sort_v : config -> base -> unit
 val delete_topological_sort : config -> base -> unit
 
 val update_related_pointers : base -> iper -> iper list -> iper list -> unit
 
+(** Helper function printing a hidden form containing current env,
+    with a submit button "return", plus a hidden field [return=on].  *)
 val print_return : config -> unit
+
+(** [print_continue conf param value]
+    Helper function printing a hidden form containing current env,
+    with a submit button "continue", plus a hidden field [param=value].
+    Optionnal [continue] parameter is the label used for the submit button.
+*)
+val print_continue : config -> ?continue:string -> string -> string -> unit
+
 val string_of_error : config -> base -> CheckItem.base_error -> string
 val print_error : config -> base -> CheckItem.base_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit

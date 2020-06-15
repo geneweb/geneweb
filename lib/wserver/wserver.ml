@@ -8,6 +8,8 @@ type httpStatus =
   | Forbidden (* 403 *)
   | Not_Found (* 404 *)
 
+let connection_closed = ref false
+
 let eprintf = Printf.eprintf
 
 let sock_in = ref "wserver.sin"
@@ -20,6 +22,32 @@ let wserver_sock = ref Unix.stdout
 let wsocket () = !wserver_sock
 
 let wserver_oc = ref stdout
+let woc () = !wserver_oc
+
+let wflush () = flush !wserver_oc
+
+let skip_possible_remaining_chars fd =
+  let b = Bytes.create 3 in
+  try
+    let rec loop () =
+      match Unix.select [fd] [] [] 5.0 with
+      | [_], [], [] ->
+        let len = Unix.read fd b 0 (Bytes.length b) in
+        if len = Bytes.length b then loop ()
+      | _ -> ()
+    in
+    loop ()
+  with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
+
+let close_connection () =
+  if not !connection_closed then begin
+    wflush () ;
+    Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND ;
+    skip_possible_remaining_chars !wserver_sock ;
+    (* Closing the channel flushes the data and closes the underlying file descriptor *)
+    close_out !wserver_oc ;
+    connection_closed := true
+  end
 
 let printnl fmt =
   Printf.ksprintf
@@ -59,7 +87,15 @@ let printf fmt =
       printing_state := Contents
     end;
   Printf.ksprintf (fun s -> output_string !wserver_oc s) fmt
-let wflush () = flush !wserver_oc
+
+let print_string s =
+  if !printing_state <> Contents then
+    begin
+      if !printing_state = Nothing then http OK;
+      printnl "";
+      printing_state := Contents
+    end ;
+  output_string !wserver_oc s
 
 let hexa_digit x =
   if x >= 10 then Char.chr (Char.code 'A' + x - 10)
@@ -444,17 +480,7 @@ let wait_and_compact s =
     end
 
 let skip_possible_remaining_chars fd =
-  let b = Bytes.create 3 in
-  try
-    let rec loop () =
-      match Unix.select [fd] [] [] 5.0 with
-        [_], [], [] ->
-          let len = Unix.read fd b 0 (Bytes.length b) in
-          if len = Bytes.length b then loop ()
-      | _ -> ()
-    in
-    loop ()
-  with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
+  if not !connection_closed then skip_possible_remaining_chars fd
 
 let check_stopping () =
   if Sys.file_exists !stop_server then
@@ -479,20 +505,12 @@ let accept_connection tmout max_clients callback s =
           Unix.close s;
           wserver_sock := t;
           wserver_oc := Unix.out_channel_of_descr t;
-          (*
-             j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
-                        try Unix.close t with _ -> ();
-          *)
           treat_connection tmout callback addr t
         with
           Unix.Unix_error (Unix.ECONNRESET, "read", _) -> ()
         | exc -> try print_err_exc exc; flush stderr with _ -> ()
         end;
-        (try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ());
-        (try Unix.shutdown Unix.stdout Unix.SHUTDOWN_SEND with _ -> ());
-        skip_possible_remaining_chars t;
-        (try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ());
-        (try Unix.shutdown Unix.stdin Unix.SHUTDOWN_RECEIVE with _ -> ());
+          close_connection () ;
         exit 0
     | Some id ->
         Unix.close t;

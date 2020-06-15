@@ -57,10 +57,12 @@ let rec noloop_aux base error tab i =
   | BeingVisited -> error (OwnAncestor (poi base i))
   | Visited -> ()
 
+(** It is highly recommended to load ascends and couples array before
+    running [check_noloop]
+*)
 let check_noloop base error =
-  let persons = Gwdb.ipers base in
-  let tab = Gwdb.iper_marker persons NotVisited in
-  Gwdb.Collection.iter (noloop_aux base error tab) persons
+  let tab = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
+  Gwdb.Collection.iter (noloop_aux base error tab) (Gwdb.ipers base)
 
 let check_noloop_for_person_list base error list =
   let tab = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
@@ -76,10 +78,9 @@ exception TopologicalSortError of person
      relationship computation (stopping the computation when the ancestor
      list of one of the person is exhausted).
 *)
-
 let topological_sort base poi =
   let persons = Gwdb.ipers base in
-  let tab = Gwdb.iper_marker persons 0 in
+  let tab = Gwdb.iper_marker (Gwdb.ipers base) 0 in
   let cnt = ref 0 in
   Gwdb.Collection.iter (fun i ->
       let a = poi base i in

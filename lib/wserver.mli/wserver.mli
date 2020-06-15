@@ -26,8 +26,13 @@ val f :
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)
 
+val close_connection : unit -> unit
+
 val printf : ('a, unit, string, unit) format4 -> 'a
     (* To be called to print page contents. *)
+
+val print_string : string -> unit
+(* To be called to print page contents. *)
 
 val header : ('a, unit, string, unit) format4 -> 'a
     (* To print an http header line *)
@@ -69,6 +74,7 @@ val extract_param : string -> char -> string list -> string
 val get_request_and_content : char Stream.t -> string list * string
 
 val wsocket : unit -> Unix.file_descr
+val woc : unit -> out_channel
 
 val sock_in : string ref
 val sock_out : string ref

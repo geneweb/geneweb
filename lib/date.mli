@@ -1,4 +1,3 @@
-(* $Id: date.mli,v 5.4 2007-03-14 00:39:57 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
@@ -11,8 +10,19 @@ val nb_days_in_month : int -> int -> int
 (** [time_elapsed start stop]
     Compute the time elapsed between [start] and [stop].
     If [stop] is prior to [start], resulting [dmy]'s field
-    are negative (but correct). *)
+    are negative (but correct).
+    Resulting [prec] can be:
+    - [Sure] for exact duration
+    - [Before] for "less than" duration
+    - [After] for "more than" duration
+    - [Maybe] for other cases
+ *)
 val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
+
+(** Same as [time_elapsed], but will return [None]
+    if computation is not possible
+    (e.g. time_elapsed_opt /1839 /1859). *)
+val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
 
 val date_of_death : Def.death -> Adef.date option
 
@@ -41,6 +51,11 @@ exception Not_comparable
     is false by default (see [Not_comparable])
 *)
 val compare_dmy : ?strict:bool -> dmy -> dmy -> int
+
+(** [compare_dmy_opt ?strict d1 d2]
+    Same as [compare_dmy], but do not raise an exception
+*)
+val compare_dmy_opt : ?strict:bool -> dmy -> dmy -> int option
 
 (** [compare_date d1 d2]
     If both [d1] and [d2] are [Dgreg] date, uses [compare_dmy]

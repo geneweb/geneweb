@@ -1,0 +1,32 @@
+(copy_files %{project_root}/lib/gwdb-legacy/{btree.ml,database.ml,database.mli,dbdisk.mli,dutil.ml,dutil.mli,gwdb_gc.ml,outbase.ml})
+(rule (copy %{project_root}/lib/gwdb-legacy/gwdb_driver.ml gwdb_driver_legacy.ml))
+
+(library
+  (name gwdb_legacy_x_arangodb)
+  (public_name geneweb-gwdb-legacy-x-arangodb)
+  (implements geneweb-lib.gwdb_driver.mli)
+  (libraries
+    curl
+    geneweb-lib.def
+    geneweb-lib.util
+    jsonaf
+    yojson
+  )
+  (modules_without_implementation dbdisk)
+  (modules
+    btree
+    database
+    dbdisk
+    dutil
+    gwdb_arango_migrate
+    gwdb_driver
+    gwdb_driver_arango
+    gwdb_driver_env
+    gwdb_driver_legacy
+    gwdb_gc
+    http_curl
+    json
+    json_jsonaf
+    outbase
+  )
+)

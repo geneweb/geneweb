@@ -364,20 +364,6 @@ let print_add conf base mod_p =
   | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
-let print_del conf base ip =
-  let p = poi base ip in
-  let old_related = get_related p in
-  let op = Util.string_gen_person base (gen_person_of_person p) in
-  UpdateIndOk.update_relations_of_related base ip old_related;
-  let warning _ = () in
-  let p = UpdateIndOk.effective_del base warning p in
-  patch_person base ip p;
-  Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
-  let changed = U_Delete_person op in
-  let hr = [(fun () -> History.record conf base changed "dp")] in
-  Api_update_util.UpdateSuccess ([], [], hr)
-
-
 let print_mod_aux conf base mod_p callback =
   try
     let p : ('a, string * string * int * Update.create * string, string) gen_person = reconstitute_person conf base mod_p in
@@ -400,7 +386,7 @@ let print_mod_aux conf base mod_p callback =
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
 
-let print_mod conf base mod_p =
+let print_mod ?(fexclude = []) conf base mod_p =
   let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
   let o_p =
     Util.string_gen_person base (gen_person_of_person (poi base ip))
@@ -427,10 +413,17 @@ let print_mod conf base mod_p =
         in
         String.concat " " (List.map (sou base) sl)
       in
-      Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
+      Notes.update_notes_links_db base (NLDB.PgInd p.key_index) s;
       let wl =
         let a = poi base p.key_index in
         let a = {parents = get_parents a; consang = get_consang a} in
+        let family =
+          Array.of_list @@
+          Array.fold_right begin fun ifam acc ->
+            if List.mem ifam fexclude then acc else ifam :: acc
+          end u.family []
+        in
+        let u = { family } in
         UpdateIndOk.all_checks_person base p a u
       in
       let changed = U_Modify_person (o_p, (Util.string_gen_person base p)) in

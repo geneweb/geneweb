@@ -106,8 +106,6 @@ val update_family_loop : config -> base -> person -> string -> string
 val p_getenv : (string * string) list -> string -> string option
 val p_getint : (string * string) list -> string -> int option
 val create_env : string -> (string * string) list
-val capitale : string -> string
-val index_of_next_char : string -> int -> int
 
 val open_etc_file : string -> in_channel option
 val open_hed_trl : config -> string -> in_channel option
@@ -311,17 +309,6 @@ val cache_visited : config -> string
 val read_visited : config -> cache_visited_t
 val record_visited : config -> iper -> unit
 
-type cache_info_t = (string, string) Hashtbl.t
-
-(* valeur dans le cache. *)
-val cache_nb_base_persons : string
-
-val cache_info : config -> string
-val read_cache_info : config -> cache_info_t
-val patch_cache_info : config -> string -> (string -> string) -> unit
-
-val real_nb_of_persons : config -> base -> int
-
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
     and returns corresponding [string_of_witness_kind] if so.
 *)
@@ -353,23 +340,11 @@ val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 *)
 val rev_iter : ('a -> unit) -> 'a list -> unit
 
-(** [group_by ~key ~value list]
+(** [groupby ~key ~value list]
     Group the elements returning the same key together.
     Ordering of elements is unspecified.
  *)
 val groupby : key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list
-
-(** [str_nth_pos str n]
-    Return a position of the byte starting the [n]-th UTF8 character.
- *)
-val str_nth_pos : string -> int -> int
-
-(** [str_sub ?pad s start len]
-    Return a fresh UTF8-friendly substring of [len] characters, padded if needed.
-    Be careful [start] is the index of the byte where to start in [s],
-    not the [start-th] UTF8-character.
-*)
-val str_sub : ?pad:char -> string -> int -> int -> string
 
 (** [ls_rs dirs]
     List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
@@ -400,6 +375,3 @@ val safe_html : string -> string
     [false] if we knwon the first name or the last name of [p].
 *)
 val is_empty_name : person -> bool
-
-(**/**)
-val init_cache_info : string -> Gwdb.base -> unit

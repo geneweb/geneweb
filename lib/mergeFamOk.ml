@@ -197,27 +197,26 @@ let print_merge conf base =
       in
       let scpl =
         Futil.map_couple_p conf.multi_parents (UpdateFam.person_key base)
-          (gen_couple_of_couple (foi base sfam.fam_index))
+          (gen_couple_of_family (foi base sfam.fam_index))
       in
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl cpl des =
-  let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
+  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   UpdateFamOk.print_family conf base wl cpl des;
-  Merge.print_possible_continue_merging conf base;
+  MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
 let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
   match p_getenv conf.env "i2" with
     Some i2 ->
       let ifam2 = ifam_of_string i2 in
-      let fam2 = foi base ifam2 in
-      UpdateFamOk.effective_del base ifam2 fam2;
+      UpdateFamOk.effective_del conf base Gwdb.dummy_iper (foi base ifam2);
       let (ifam, fam, cpl, des) =
-        UpdateFamOk.effective_mod conf base sfam scpl sdes
+        UpdateFamOk.effective_mod conf base true sfam scpl sdes
       in
       let wl =
         UpdateFamOk.all_checks_family conf base ifam fam cpl des
@@ -238,7 +237,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
         in
         String.concat " " (List.map (sou base) sl)
       in
-      Notes.update_notes_links_db conf (NotesLinks.PgFam ifam) s;
+      Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
       let changed =
         let gen_p =
           let p =

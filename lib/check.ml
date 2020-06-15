@@ -85,20 +85,20 @@ let string_of_efam_name base efam_name =
 let print_base_error oc base =
   function
     AlreadyDefined p ->
-      Printf.fprintf oc "%s\nis defined several times\n" (designation base p)
+      Printf.fprintf oc "%s is defined several times\n" (designation base p)
   | OwnAncestor p ->
-      Printf.fprintf oc "%s\nis his/her own ancestor\n" (designation base p)
+      Printf.fprintf oc "%s is his/her own ancestor\n" (designation base p)
   | BadSexOfMarriedPerson p ->
-      Printf.fprintf oc "%s\n  bad sex for a married person\n" (designation base p)
+      Printf.fprintf oc "%s bad sex for a married person\n" (designation base p)
 
 let print_base_warning oc base =
   function
-    BigAgeBetweenSpouses (fath, moth, a) ->
+  | BigAgeBetweenSpouses (p1, p2, a) ->
       Printf.fprintf oc
         "The difference of age between %s and %s is quite important: %d\n"
-        (designation base fath) (designation base moth) a.year
+        (designation base p1) (designation base p2) a.year
   | BirthAfterDeath p ->
-      Printf.fprintf oc "%s\n  born after his/her death\n" (designation base p)
+      Printf.fprintf oc "%s born after his/her death\n" (designation base p)
   | ChangedOrderOfChildren (ifam, _, _, _) ->
       let cpl = foi base ifam in
       Printf.fprintf oc "Changed order of children of %s and %s\n"
@@ -123,36 +123,45 @@ let print_base_warning oc base =
   | ChangedOrderOfPersonEvents (p, _, _) ->
       Printf.fprintf oc "Changed order of person's events for %s\n"
         (designation base p)
-  | CloseChildren (ifam, _, elder, x) ->
+  | CloseChildren (ifam, c1, c2) ->
       let cpl = foi base ifam in
       Printf.fprintf oc
         "The following children of\n  %s\nand\n  %s\nare born very close:\n"
         (designation base (poi base (get_father cpl)))
         (designation base (poi base (get_mother cpl)));
-      Printf.fprintf oc "- %s\n" (designation base elder);
-      Printf.fprintf oc "- %s\n" (designation base x)
+      Printf.fprintf oc "- %s\n" (designation base c1);
+      Printf.fprintf oc "- %s\n" (designation base c2)
+
   | DeadOld (p, a) ->
       Printf.fprintf oc "%s died at the advanced age of %d years old\n"
         (designation base p) a.year
   | DeadTooEarlyToBeFather (father, child) ->
-      Printf.fprintf oc "%s\n" (designation base child);
+      Printf.fprintf oc "%s " (designation base child);
       Printf.fprintf oc
-        "  is born more than 2 years after the death of his/her father\n";
-      Printf.fprintf oc "%s\n" (designation base father)
+        "is born more than 2 years after the death of his/her father";
+      Printf.fprintf oc " %s\n" (designation base father)
+  | DistantChildren (ifam, p1, p2) ->
+      let cpl = foi base ifam in
+      Printf.fprintf oc
+        "The following children of\n  %s\nand\n  %s\nare born very close:\n"
+        (designation base (poi base (get_father cpl)))
+        (designation base (poi base (get_mother cpl)));
+      Printf.fprintf oc "- %s\n" (designation base p1);
+      Printf.fprintf oc "- %s\n" (designation base p2)
   | FEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_efam_name base e1.efam_name)
         (string_of_efam_name base e2.efam_name)
   | FWitnessEventAfterDeath (p, e) ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s after his/her death\n"
         (string_of_efam_name base e.efam_name)
   | FWitnessEventBeforeBirth (p, e) ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s before his/her birth\n"
         (string_of_efam_name base e.efam_name)
   | IncoherentSex (p, fixed, not_fixed) ->
-      Printf.fprintf oc "%s\n  sex not coherent with relations" (designation base p);
+      Printf.fprintf oc "%s sex not coherent with relations" (designation base p);
       if fixed > 0 then
         if not_fixed > 0 then
           Printf.fprintf oc " (fixed in %d of the %d cases)" fixed
@@ -160,17 +169,17 @@ let print_base_warning oc base =
         else Printf.fprintf oc " (fixed)";
       Printf.fprintf oc "\n"
   | IncoherentAncestorDate (anc, p) ->
-      Printf.fprintf oc "%s\n" (designation base p);
-      Printf.fprintf oc "  has a younger ancestor:\n";
-      Printf.fprintf oc "%s\n" (designation base anc)
+      Printf.fprintf oc "%s " (designation base p);
+      Printf.fprintf oc "  has a younger ancestor:";
+      Printf.fprintf oc " %s\n" (designation base anc)
   | MarriageDateAfterDeath p ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "marriage after his/her death\n"
   | MarriageDateBeforeBirth p ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "marriage before his/her birth\n"
   | MotherDeadAfterChildBirth (mother, child) ->
-      Printf.fprintf oc "%s\n  is born after the death of his/her mother\n%s\n"
+      Printf.fprintf oc "%s is born after the death of his/her mother %s\n"
         (designation base child) (designation base mother)
   | ParentBornAfterChild (parent, child) ->
       Printf.fprintf oc "%s born after his/her child %s\n" (designation base parent)
@@ -187,193 +196,144 @@ let print_base_warning oc base =
         (string_of_epers_name base e1.epers_name)
         (string_of_epers_name base e2.epers_name)
   | PWitnessEventAfterDeath (p, e) ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s after his/her death\n"
         (string_of_epers_name base e.epers_name)
   | PWitnessEventBeforeBirth (p, e) ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s before his/her birth\n"
         (string_of_epers_name base e.epers_name)
   | TitleDatesError (p, t) ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "has incorrect title dates as:\n";
-      Printf.fprintf oc "  %s %s\n" (sou base t.t_ident) (sou base t.t_place)
-  | UndefinedSex _ -> ()
+      Printf.fprintf oc " %s %s\n" (sou base t.t_ident) (sou base t.t_place)
+  | UndefinedSex p ->
+      Printf.fprintf oc "Undefined sex for %s\n" (designation base p);
   | WitnessDateAfterDeath p ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "was witness after his/her death\n"
   | WitnessDateBeforeBirth p ->
-      Printf.fprintf oc "%s\n" (designation base p);
+      Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "was witness before his/her birth\n"
-  | YoungForMarriage (p, a) ->
+  | YoungForMarriage (p, a)
+  | OldForMarriage (p, a) ->
       Printf.fprintf oc "%s married at age %d\n" (designation base p) a.year
 
-type stats =
-  { mutable men : int;
-    mutable women : int;
-    mutable neutre : int;
-    mutable noname : int;
-    mutable oldest_father : int * person;
-    mutable oldest_mother : int * person;
-    mutable youngest_father : int * person;
-    mutable youngest_mother : int * person;
-    mutable oldest_dead : int * person;
-    mutable oldest_still_alive : int * person }
-
-let birth_year p =
-  match Adef.od_of_cdate (get_birth p) with
-    Some d ->
-      begin match d with
-        Dgreg ({year = y; prec = Sure}, _) -> Some y
-      | _ -> None
-      end
-  | _ -> None
-
-let death_year current_year p =
-  match get_death p with
-    Death (_, d) ->
-      begin match Adef.date_of_cdate d with
-        Dgreg ({year = y; prec = Sure}, _) -> Some y
-      | _ -> None
-      end
-  | NotDead -> Some current_year
-  | _ -> None
-
-let update_stats base current_year s p =
-  begin match get_sex p with
-    Male -> s.men <- s.men + 1
-  | Female -> s.women <- s.women + 1
-  | Neuter -> s.neutre <- s.neutre + 1
-  end;
-  if p_first_name base p = "?" && p_surname base p = "?" then
-    s.noname <- s.noname + 1;
-  begin match birth_year p, death_year current_year p with
-    Some y1, Some y2 ->
-      let age = y2 - y1 in
-      if age > fst s.oldest_dead && get_death p <> NotDead then
-        s.oldest_dead <- age, p;
-      if age > fst s.oldest_still_alive && get_death p = NotDead then
-        s.oldest_still_alive <- age, p
-  | _ -> ()
-  end;
-  match birth_year p, get_parents p with
-    Some y2, Some ifam ->
-      let cpl = foi base ifam in
-      begin match birth_year (poi base (get_father cpl)) with
-        Some y1 ->
-          let age = y2 - y1 in
-          if age > fst s.oldest_father then
-            s.oldest_father <- age, poi base (get_father cpl);
-          if age < fst s.youngest_father then
-            s.youngest_father <- age, poi base (get_father cpl)
-      | _ -> ()
-      end;
-      begin match birth_year (poi base (get_mother cpl)) with
-        Some y1 ->
-          let age = y2 - y1 in
-          if age > fst s.oldest_mother then
-            s.oldest_mother <- age, poi base (get_mother cpl);
-          if age < fst s.youngest_mother then
-            s.youngest_mother <- age, poi base (get_mother cpl)
-      | _ -> ()
-      end
-  | _ -> ()
+type check_date = CheckBefore of int | CheckAfter of int | CheckOther of int | CheckInfered of check_date
 
 let min_year_of p =
+  let aux = function
+    | { prec = After ; year } -> CheckAfter year
+    | { prec = Before ; year } -> CheckBefore year
+    | { year } -> CheckOther year
+  in
   match Adef.od_of_cdate (get_birth p) with
-    Some (Dgreg (d, _)) -> Some d.year
+  | Some (Dgreg (d, _)) -> Some (aux d)
   | Some (Dtext _) | None -> None
 
+let dummy_date = CheckInfered (CheckOther max_int)
+
 let rec check_ancestors base warning year year_tab ip ini_p =
-  if fst @@ Gwdb.Marker.get year_tab ip = max_int then
+  let infer = function
+    | CheckBefore i -> CheckInfered (CheckBefore (pred i))
+    | CheckAfter i -> CheckInfered (CheckAfter (pred i))
+    | CheckOther i -> CheckInfered (CheckOther (pred i))
+    | CheckInfered (CheckBefore i) -> CheckInfered (CheckBefore (pred i))
+    | CheckInfered (CheckAfter i) -> CheckInfered (CheckAfter (pred i))
+    | CheckInfered (CheckOther i) -> CheckInfered (CheckOther (pred i))
+    | _ -> assert false
+  in
+  let own = function CheckInfered _ -> false | _ -> true in
+  let test a b p p' =
+    match a, b with
+    | CheckAfter y
+    , (CheckBefore y' | CheckOther y' | CheckInfered (CheckBefore y') | CheckInfered (CheckOther y'))
+      when y >= y' ->
+      warning (IncoherentAncestorDate (Lazy.force p, p'))
+    | _ -> ()
+  in
+  if Gwdb.Marker.get year_tab ip = dummy_date then
     let p = poi base ip in
-    let new_year_o = min_year_of p in
-    let (new_year, new_ini_p, own_year) =
-      match new_year_o with
-        Some y -> y, p, true
-      | None -> year - 1, ini_p, false
+    let (new_year, new_ini_p) =
+      match min_year_of p with
+      | Some y -> y, p
+      | None -> infer year, ini_p
     in
-    Gwdb.Marker.set year_tab ip (new_year, own_year) ;
-    if new_year >= year then warning (IncoherentAncestorDate (p, ini_p));
+    Gwdb.Marker.set year_tab ip new_year ;
+    test new_year year (lazy p) ini_p ;
     match get_parents p with
     | Some ifam ->
       let fam = foi base ifam in
-      let f = fun get ->
-        let ip = get fam in
+      let f ip =
         let year = Gwdb.Marker.get year_tab ip in
-        if fst year = max_int
+        if year = dummy_date
         then check_ancestors base warning new_year year_tab ip new_ini_p
-        else if snd year && fst year >= new_year then
-          warning (IncoherentAncestorDate (poi base ip, new_ini_p))
+        else if own year then test year new_year (lazy (poi base ip)) new_ini_p
       in
-      f get_father ;
-      f get_mother
+      f @@ get_father fam ;
+      f @@ get_mother fam
     | None -> ()
 
-let check_base_aux base error warning changed_p =
-  Printf.eprintf "check persons\n";
+let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
+  if not mem then begin
+    Gwdb.load_persons_array base ;
+    Gwdb.load_ascends_array base ;
+    Gwdb.load_unions_array base ;
+    Gwdb.load_couples_array base ;
+  end ;
   let persons = Gwdb.ipers base in
   let len = Gwdb.Collection.length persons in
-  let year_tab = Gwdb.iper_marker persons (max_int, false) in
-  ProgrBar.start ();
-  Gwdb.Collection.iteri (fun i ip ->
-    ProgrBar.run i len ;
-    let p = poi base ip in
-    if fst @@ Gwdb.Marker.get year_tab ip = max_int
-    then check_ancestors base warning max_int year_tab ip p ;
-    match CheckItem.person base warning p with
-    | Some ippl -> List.iter changed_p ippl
-    | None -> ()
-    ) persons ;
-  ProgrBar.finish ();
-  Printf.eprintf "check families\n";
+  let year_tab = Gwdb.iper_marker (Gwdb.ipers base) dummy_date in
+  if verbose then begin
+    Printf.eprintf "check persons\n" ;
+    ProgrBar.start () ;
+    Gwdb.Collection.iteri begin fun i ip ->
+      ProgrBar.run i len ;
+      let p = poi base ip in
+      if Gwdb.Marker.get year_tab ip = dummy_date
+      then check_ancestors base warning dummy_date year_tab ip p ;
+      match CheckItem.person ~onchange:false base warning p with
+      | Some ippl -> List.iter changed_p ippl
+      | None -> ()
+    end persons ;
+    ProgrBar.finish ()
+  end else begin
+    Gwdb.Collection.iter begin fun ip ->
+      let p = poi base ip in
+      if Gwdb.Marker.get year_tab ip = dummy_date
+      then check_ancestors base warning dummy_date year_tab ip p ;
+      match CheckItem.person ~onchange:false base warning p with
+      | Some ippl -> List.iter changed_p ippl
+      | None -> ()
+    end persons ;
+  end ;
+  if not mem then begin
+    Gwdb.clear_unions_array base ;
+    Gwdb.load_families_array base ;
+    Gwdb.load_descends_array base ;
+  end ;
   let families = Gwdb.ifams base in
   let len = Gwdb.Collection.length families in
-  ProgrBar.start ();
-  Gwdb.Collection.iteri (fun i ifam ->
-    ProgrBar.run i len ;
-    let fam = foi base ifam in
-    CheckItem.family base warning ifam fam
-    ) families ;
-  ProgrBar.finish ();
-  Consang.check_noloop base error
-
-let check_base base error warning def changed_p pr_stats =
-  let s =
-    let y = 1000, poi base Gwdb.dummy_iper in
-    let o = 0, poi base Gwdb.dummy_iper in
-    {men = 0; women = 0; neutre = 0; noname = 0; oldest_father = o;
-     oldest_mother = o; youngest_father = y; youngest_mother = y;
-     oldest_dead = o; oldest_still_alive = o}
-  in
-  let current_year = (Unix.localtime (Unix.time ())).Unix.tm_year + 1900 in
-  check_base_aux base error warning changed_p;
-  Gwdb.Collection.iter (fun i ->
-    let p = poi base i in
-    if not (def i) then Printf.printf "Undefined: %s\n" (designation base p);
-    if pr_stats then update_stats base current_year s p;
-    flush stdout
-    ) (Gwdb.ipers base) ;
-  if pr_stats then
-    begin
-      Printf.printf "\n";
-      Printf.printf "%d men\n" s.men;
-      Printf.printf "%d women\n" s.women;
-      Printf.printf "%d unknown sex\n" s.neutre;
-      Printf.printf "%d unnamed\n" s.noname;
-      Printf.printf "Oldest: %s, %d\n" (designation base (snd s.oldest_dead))
-        (fst s.oldest_dead);
-      Printf.printf "Oldest still alive: %s, %d\n"
-        (designation base (snd s.oldest_still_alive))
-        (fst s.oldest_still_alive);
-      Printf.printf "Youngest father: %s, %d\n"
-        (designation base (snd s.youngest_father)) (fst s.youngest_father);
-      Printf.printf "Youngest mother: %s, %d\n"
-        (designation base (snd s.youngest_mother)) (fst s.youngest_mother);
-      Printf.printf "Oldest father: %s, %d\n"
-        (designation base (snd s.oldest_father)) (fst s.oldest_father);
-      Printf.printf "Oldest mother: %s, %d\n"
-        (designation base (snd s.oldest_mother)) (fst s.oldest_mother);
-      Printf.printf "\n";
-      flush stdout
-    end
+  if verbose then begin
+    Printf.eprintf "check families\n" ;
+    ProgrBar.start ();
+    Gwdb.Collection.iteri begin fun i ifam ->
+      ProgrBar.run i len ;
+      CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
+    end families ;
+    ProgrBar.finish ();
+  end else begin
+    Gwdb.Collection.iter begin fun ifam ->
+      CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
+    end families ;
+  end ;
+  if not mem then begin
+    Gwdb.clear_persons_array base ;
+    Gwdb.clear_families_array base ;
+    Gwdb.clear_descends_array base ;
+  end ;
+  Consang.check_noloop base error ;
+  if not mem then begin
+    Gwdb.clear_ascends_array base ;
+    Gwdb.clear_couples_array base ;
+  end

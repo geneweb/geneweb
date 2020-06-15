@@ -35,15 +35,13 @@ let print_auto_complete conf base =
   let place_mode = params.Mwrite.Auto_complete.place_field in
   let list =
     if nb_of_persons base > 100000 then
-      Api_saisie_autocomplete.get_list_from_cache conf base s max_res mode
+      let cache = Api_saisie_autocomplete.get_list_from_cache conf base mode max_res s in
+      let ini = Name.lower @@ Mutil.tr '_' ' ' s in
+      Api_search.complete_with_dico conf (ref @@ List.length cache) max_res place_mode ini cache
     else
       Api_search.search_auto_complete conf base mode place_mode max_res s
   in
-  let result =
-    Mwrite.Auto_complete_result.({
-      result = list;
-    })
-  in
+  let result = { Mwrite.Auto_complete_result. result = list } in
   let data = Mext_write.gen_auto_complete_result result in
   print_result conf data
 
@@ -504,161 +502,67 @@ let print_config conf base =
 
 (**/**) (* Fonctions qui calcul "l'inférence" du nom de famille. *)
 
-let all_children_surname_are_the_same base fam =
+type children_surname =
+  | NoChild
+  | NoSurname
+  | Surname of string
+
+let children_surname base fam =
   let count = ref 0 in
   let fam' =
-    Array.map
-      (fun i -> let c = get_children @@ foi base i in count := !count + Array.length c ; c)
-      fam
+    Array.map begin fun i ->
+      let c = get_children @@ foi base i in
+      count := !count + Array.length c ;
+      c
+    end fam
   in
-  let all_children_surname = Array.make !count "" in
+  let surnames = Array.make !count "" in
   count := 0 ;
-  Array.iter
-    (Array.iter (fun i ->
-         all_children_surname.(!count) <- sou base @@ get_surname @@ poi base i ;
-         incr count) )
-    fam' ;
-  match all_children_surname with
-  | [||] -> (false, "")
-  | [|x|] -> (true, x)
+  Array.iter begin Array.iter begin fun i ->
+      surnames.(!count) <- sou base @@ get_surname @@ poi base i ;
+      incr count
+    end end fam' ;
+  match surnames with
+  | [||] -> NoChild
+  | [|x|] -> Surname x
   | a ->
     let x_crush = Name.crush_lower a.(0) in
     if Array.for_all (fun n -> Name.crush_lower n = x_crush) a
-    then (true, a.(0))
-    else (false, "")
+    then Surname a.(0)
+    else NoSurname
 
-(* ************************************************************************ *)
-(*  [Fonc] infer_surname : config -> base -> person -> string               *)
-(** [Description] : Renvoie le nom de famille qui peut être attribué à une
-                    personne. Si aucun nom ne peut être trouvé, on renvoi
-                    vide.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - person : la personne à partir de laquelle on calcul le nom
-    [Retour] :
-      - string : le potentiel nom hérité.
-                                                                           *)
-(* ************************************************************************ *)
+let infer_surname_from_parents base surname p =
+  match get_parents p with
+  | Some ifam -> begin
+      let g_fam = foi base ifam in
+      let g_father = poi base (get_father g_fam) in
+      if Name.crush_lower surname
+         = Name.crush_lower (sou base (get_surname g_father))
+      then surname
+      else ""
+    end
+  | None -> ""
+
+(** [infer_surname conf base p ifam] *)
 let rec infer_surname conf base p ifam =
   let surname = sou base (get_surname p) in
   if surname = "?" then ""
-  else
-    if get_sex p = Male then
-      (* On prend le nom de la fratrie parce que y'a de *)
-      (* grande chance que ce soit le même.             *)
-      let fam = get_family p in
-      if Array.length fam > 0 then
-        begin
-          if Array.exists (fun ifam -> [||] <> get_children (foi base ifam)) fam then
-            let all_children_surname_are_the_same, name =
-              all_children_surname_are_the_same base fam
-            in
-            if all_children_surname_are_the_same then
-              (* On fait une recherche métaphone. *)
-              let (primary_surname, secondary_surname) =
-                Metaphone.double_metaphone surname
-              in
-              let (primary_name, secondary_name) = Metaphone.double_metaphone name in
-              if primary_surname = primary_name ||
-                 secondary_surname = secondary_name
-              then surname
-              else ""
-            else ""
-          else
-            begin
-              match get_parents p with
-              | Some ifam ->
-                  begin
-                    let g_fam = foi base ifam in
-                    let g_father = poi base (get_father g_fam) in
-                    if Name.crush_lower surname =
-                       Name.crush_lower (sou base (get_surname g_father))
-                    then
-                      surname
-                    else
-                      (* On fait une recherche métaphone. *)
-                      let (primary_father, secondary_father) =
-                        Metaphone.double_metaphone surname
-                      in
-                      let (primary_g_father, secondary_g_father) =
-                        Metaphone.double_metaphone
-                          (sou base (get_surname g_father))
-                      in
-                      if primary_father = primary_g_father ||
-                         secondary_father = secondary_g_father
-                      then surname
-                      else ""
-                  end
-              | None -> surname
-            end
-        end
-      (* On regarde si le nom est pareil sur 2 générations. *)
-      else
-        begin
-          match get_parents p with
-          | Some ifam ->
-              begin
-                let g_fam = foi base ifam in
-                let g_father = poi base (get_father g_fam) in
-                if Name.crush_lower surname =
-                   Name.crush_lower (sou base (get_surname g_father))
-                then
-                  surname
-                else
-                  (* On fait une recherche métaphone. *)
-                  let (primary_father, secondary_father) =
-                    Metaphone.double_metaphone surname
-                  in
-                  let (primary_g_father, secondary_g_father) =
-                    Metaphone.double_metaphone
-                      (sou base (get_surname g_father))
-                  in
-                  if primary_father = primary_g_father ||
-                     secondary_father = secondary_g_father
-                  then surname
-                  else ""
-              end
-          | None -> surname
-        end
-    else
-      (* Si on a envoyé dans l'objet AddChildRequest l'index de la famille,  *)
-      (* et que la personne selectionnée est une femme, on relance le calcul avec *)
-      (* le nom du père.                                                           *)
-      match ifam with
-      | Some ifam ->
-          let ifam = Gwdb.ifam_of_string ifam in
-          let fam = foi base ifam in
-          let isp = Gutil.spouse (get_iper p) fam in
-          let sp = poi base isp in
-          if get_sex sp = Male then infer_surname conf base sp None
-          else ""
-      | None ->
-          (* On prend le nom de la fratrie parce que y'a de *)
-          (* grande chance que ce soit le même.             *)
-          let fam = get_family p in
-          if Array.length fam > 0 then
-            begin
-              if Array.exists (fun ifam -> [||] <> get_children (foi base ifam)) fam then
-                let all_children_surname_are_the_same, name =
-                  all_children_surname_are_the_same base fam
-                in
-                (* On ne fait pas de recherche métaphone *)
-                (* car on est dans le cas d'une femme.   *)
-                if all_children_surname_are_the_same then name
-                else ""
-              else
-              if Array.length (get_family p) = 1 then
-                let fam = get_family p in
-                let ifam = fam.(0) in
-                let fam = foi base ifam in
-                let isp = Gutil.spouse (get_iper p) fam in
-                let sp = poi base isp in
-                if sou base (get_surname sp) = "?" then ""
-                else sou base (get_surname sp)
-              else ""
-            end
-          else ""
+  else match ifam with
+    | Some ifam ->
+      let ifam = Gwdb.ifam_of_string ifam in
+      let fam = foi base ifam in
+      (* if p is not in the couple, father's iper is returned by [spouse] *)
+      let isp = Gutil.spouse (get_iper p) fam in
+      let sp = poi base isp in
+      if get_sex sp = Male then infer_surname conf base sp None
+      else ""
+    | None ->
+      if get_sex p = Male && Array.length (get_family p) > 0
+      then match children_surname base (get_family p) with
+        | NoSurname -> ""
+        | Surname s -> s
+        | NoChild -> infer_surname_from_parents base surname p
+      else infer_surname_from_parents base surname p
 
 (* FIXME: factorize *)
 let piqi_death_type_of_death = function
@@ -698,14 +602,14 @@ let compute_warnings conf base resp =
         List.fold_right
           (fun w wl ->
             match w with
-            | BigAgeBetweenSpouses (fath, moth, a) ->
+            | BigAgeBetweenSpouses (p1, p2, a) ->
                 let w =
                   (Printf.sprintf
                      (fcapitale
                         (ftransl conf
                            "the difference of age between %t and %t is quite important"))
-                     (fun _ -> print_someone fath)
-                     (fun _ -> print_someone moth))
+                     (fun _ -> print_someone p1)
+                     (fun _ -> print_someone p2))
                   ^ ": " ^ (DateDisplay.string_of_age conf a)
                 in
                 w :: wl
@@ -757,7 +661,7 @@ let compute_warnings conf base resp =
                 Gutil.designation base elder ^ (DateDisplay.short_dates_text conf base elder) ^
                 Gutil.designation base x ^ (DateDisplay.short_dates_text conf base x)
                 *)
-            | CloseChildren (ifam, _, elder, x) ->
+            | CloseChildren (ifam, c1, c2) ->
                 let cpl = foi base ifam in
                 let w =
                 (Printf.sprintf
@@ -767,7 +671,20 @@ let compute_warnings conf base resp =
                    (fun _ -> print_someone (poi base (get_father cpl)))
                    (fun _ -> print_someone (poi base (get_mother cpl))))
                 ^ ": " ^
-                print_someone_dates elder ^ " " ^ print_someone_dates x
+                print_someone_dates c1 ^ " " ^ print_someone_dates c2
+                in
+                w :: wl
+            | DistantChildren (ifam, p1, p2) ->
+                let cpl = foi base ifam in
+                let w =
+                (Printf.sprintf
+                   (fcapitale
+                      (ftransl conf
+                         "the following children of %t and %t are born very distant"))
+                   (fun _ -> print_someone (poi base (get_father cpl)))
+                   (fun _ -> print_someone (poi base (get_mother cpl))))
+                ^ ": " ^
+                print_someone_dates p1 ^ " " ^ print_someone_dates p2
                 in
                 w :: wl
             | DeadOld (p, a) ->
@@ -943,7 +860,8 @@ let compute_warnings conf base resp =
                   (fun _ -> print_someone_dates p)
                 in
                 w :: wl
-            | YoungForMarriage (p, a) ->
+            | YoungForMarriage (p, a)
+            | OldForMarriage (p, a) ->
                 let w =
                 print_someone p ^ " " ^
                   (Printf.sprintf
@@ -958,7 +876,7 @@ let compute_warnings conf base resp =
           (fun m ml ->
             match m with
             | MissingSources ->
-                let m = (capitale (transl conf "missing sources")) in
+                let m = Utf8.capitalize (transl conf "missing sources") in
                 m :: ml)
           ml []
       in
@@ -1041,23 +959,11 @@ let print_add_ind_start_ok conf base =
   let ref_p =
     match resp with
     | Api_update_util.UpdateError _  | Api_update_util.UpdateErrorConflict _ ->
-        M.Reference_person.({
-          n = "";
-          p = "";
-          oc = Int32.of_int 0;
-        })
+      empty_reference_person
     | Api_update_util.UpdateSuccess _ ->
         Util.commit_patches conf base;
         let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
-        let p = poi base ip in
-        let fn = Name.lower (sou base (get_first_name p)) in
-        let sn = Name.lower (sou base (get_surname p)) in
-        let occ = Int32.of_int (get_occ p) in
-        M.Reference_person.({
-          n = sn;
-          p = fn;
-          oc = occ;
-        })
+        person_to_reference_person base @@ poi base ip
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
@@ -1130,8 +1036,8 @@ let print_add_ind_ok conf base =
      - sur le sosa
      - sur l'accueil
 *)
-let compute_redirect_person conf base ip =
-  let p = poi base ip in
+let compute_redirect_person conf base p =
+  let ip = get_iper p in
   match get_parents p with
   | Some ifam ->
       let fam = foi base ifam in
@@ -1159,87 +1065,26 @@ let compute_redirect_person conf base ip =
             else ipz
         | None -> Gwdb.dummy_iper
 
-
-(* ************************************************************************ *)
-(*  [Fonc] print_del_ind_ok : config -> base -> ModificationStatus          *)
-(** [Description] : Fonction qui supprime une personne de la base.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - status : les informations si la modification s'est bien passée.
-                                                                           *)
-(* ************************************************************************ *)
 let print_del_ind_ok conf base =
   let params = get_params conf Mext_write.parse_index_person in
   let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person.index in
-  let ip_redirect = compute_redirect_person conf base ip in
-  (* Si la personne n'a pas d'enfant, on veut alors *)
-  (* également le délier de sa/ses famille/s        *)
   let p = poi base ip in
-  let has_children =
-    Array.exists
-      (fun ifam -> Array.length (get_children @@ foi base ifam) > 0)
-      (get_family p)
-  in
-  let resp =
-    try
-      (* Déliaison de toutes les familles. *)
-      let (all_wl, all_ml, all_hr) =
-        if has_children then ([], [], [])
-        else
-          Array.fold_left
-            (fun (all_wl, all_ml, all_hr) ifam ->
-               match Api_update_family.print_del conf base ip ifam with
-               | Api_update_util.UpdateSuccess (wl, ml, hr) ->
-                   (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-               | Api_update_util.UpdateError s -> raise (Update.ModErr s)
-               | Api_update_util.UpdateErrorConflict c ->
-                    raise (Api_update_util.ModErrApiConflict c))
-            ([], [], []) (get_family p)
-      in
-      let (all_wl, all_ml, all_hr) =
-        match Api_update_person.print_del conf base ip with
-        | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-        | Api_update_util.UpdateError s -> raise (Update.ModErr s)
-        | Api_update_util.UpdateErrorConflict c ->
-            raise (Api_update_util.ModErrApiConflict c)
-      in
-      Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
-    with
-    | Update.ModErr s -> Api_update_util.UpdateError s
-    | Api_update_util.ModErrApiConflict c ->
-        Api_update_util.UpdateErrorConflict c
-  in
-  let data =
-    compute_modification_status conf base ip_redirect Gwdb.dummy_ifam resp (* FIXME??? *)
-  in
+  let wl, ml, hr = UpdateIndOk.effective_del conf base p ; [], [], [] in (* FIXME *)
+  let ip_redirect = compute_redirect_person conf base p in
+  let resp = Api_update_util.UpdateSuccess (wl, ml, hr) in
+  let data = compute_modification_status conf base ip_redirect Gwdb.dummy_ifam resp in
   print_result conf data
-
 
 (**/**) (* Fonctions de modification famille. *)
 
-
-(* ************************************************************************ *)
-(*  [Fonc] print_del_fam_ok : config -> base -> ModificationStatus          *)
-(** [Description] : Fonction qui supprime une famille de la base.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - status : les informations si la modification s'est bien passée.
-                                                                           *)
-(* ************************************************************************ *)
 let print_del_fam_ok conf base =
   let params = get_params conf Mext_write.parse_index_person_and_family in
   let ip = Gwdb.iper_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_person in
-  let ifam =
-    Gwdb.ifam_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_family
-  in
-  let resp = Api_update_family.print_del conf base ip ifam in
-  let data =
-    compute_modification_status conf base ip Gwdb.dummy_ifam resp
-  in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string params.Mwrite.Index_person_and_family.index_family in
+  let fam = foi base ifam in
+  let wl, ml, hr = UpdateFamOk.effective_del conf base ip fam ; [], [], [] in (* FIXME *)
+  let resp = Api_update_util.UpdateSuccess (wl, ml, hr) in
+  let data = compute_modification_status conf base ip Gwdb.dummy_ifam resp in
   print_result conf data
 
 let set_parents_fields conf base p linked created =
@@ -1670,6 +1515,8 @@ let print_mod_family_ok conf base =
   let mod_family = edit_family_ok.Mwrite.Edit_family_ok.family in
   let mod_father = mod_family.Mwrite.Family.father in
   let mod_mother = mod_family.Mwrite.Family.mother in
+  let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
+  let fexclude = [ ifam ] in
   (*
      On modifie une famille, il faut effectuer les actions suivantes :
        - modification du père => MOD_IND
@@ -1688,7 +1535,7 @@ let print_mod_family_ok conf base =
           *)
             ([], [], [])
           else
-            match Api_update_person.print_mod conf base mod_father with
+            match Api_update_person.print_mod ~fexclude conf base mod_father with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErr s)
             | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
@@ -1703,7 +1550,7 @@ let print_mod_family_ok conf base =
           *)
             (all_wl, all_ml, all_hr)
           else
-            match Api_update_person.print_mod conf base mod_mother with
+            match Api_update_person.print_mod ~fexclude conf base mod_mother with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErr s)
             | Api_update_util.UpdateErrorConflict c ->
@@ -1725,7 +1572,6 @@ let print_mod_family_ok conf base =
     | Update.ModErr s -> Api_update_util.UpdateError s
     | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
   in
-  let ifam = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
 
@@ -1782,14 +1628,7 @@ let print_add_parents conf base =
       father.Mwrite.Person.death_type <- x ;
       mother.Mwrite.Person.death_type <- x
   in
-  (* On calcul le nom du père. *)
-  let () =
-    if get_sex p = Male then
-      let father_surname = infer_surname conf base p None in
-      father.Mwrite.Person.lastname <- father_surname;
-    else
-      father.Mwrite.Person.lastname <- surname;
-  in
+  father.Mwrite.Person.lastname <- surname ;
   let add_parents =
     {
       Mwrite.Add_parents.person_lastname = surname;
@@ -1941,7 +1780,7 @@ let print_add_parents_ok conf base =
           ; event_perso = None
           } ] ->
         begin match date with
-          | None | Some  { Mwrite.Date.dmy = None ; text = None } -> true
+          | None | Some { Mwrite.Date.dmy = (Some { Mwrite.Dmy.year = None ; _ } | None) ; text = None } -> true
           | _ -> false
         end
       | _ -> false

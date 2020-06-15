@@ -1,4 +1,3 @@
-(* $Id: relationLink.ml,v 5.20 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -214,7 +213,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
       "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" info.bd
       info.td_prop;
   Wserver.printf "%s\n" (someone_text conf base ip);
-  Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip));
+  Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip));
   if s <> "" then
     begin
       Wserver.printf "<br%s>\n" conf.xhs;
@@ -222,7 +221,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
       Wserver.printf " %s\n" s;
       match spo with
         Some ip ->
-          Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip))
+          Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip))
       | _ -> ()
     end;
   if in_tab && (info.bd > 0 || info.td_prop <> "") then
@@ -421,12 +420,12 @@ let print_someone_and_other_parent_if_same conf base info =
       "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" info.bd
       info.td_prop;
   Wserver.printf "%s\n" (someone_text conf base info.ip);
-  Wserver.printf "%s" (Dag.image_txt conf base (pget conf base info.ip));
+  Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base info.ip));
   begin match other_parent_text_if_same conf base info with
     Some (s, ip) ->
       Wserver.printf "<br%s>\n" conf.xhs;
       Wserver.printf "%s" s;
-      Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip))
+      Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip))
   | None -> ()
   end;
   if info.bd > 0 || info.td_prop <> "" then
@@ -596,7 +595,7 @@ let print_relation_path conf base info =
 let print_relation_ok conf base info =
   let title _ =
     Wserver.printf "%s"
-      (capitale (transl_nth conf "relationship link/relationship links" 0));
+      (Utf8.capitalize (transl_nth conf "relationship link/relationship links" 0));
     begin match info.pb1, info.nb1 with
       None, None -> ()
     | _ -> Wserver.printf " %d" info.c1
@@ -732,15 +731,15 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
            | None -> spl)
         [ip1, "3"; ip2, "4"] []
     in
-    let elem_txt p = Dag.Item (p, "") in
+    let elem_txt p = DagDisplay.Item (p, "") in
     let vbar_txt _ = "" in
     let invert =
       match Util.p_getenv conf.env "invert" with
         Some "on" -> true
       | _ -> false
     in
-    let page_title = Util.capitale (Util.transl conf "tree") in
-    Dag.make_and_print_dag conf base elem_txt vbar_txt invert set spl
+    let page_title = Utf8.capitalize (Util.transl conf "tree") in
+    DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
       page_title ""
   with Exit -> Hutil.incorrect_request conf
 

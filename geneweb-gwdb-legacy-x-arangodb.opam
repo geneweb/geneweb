@@ -1,0 +1,17 @@
+opam-version: "2.0"
+
+synopsis: "Gwdb module implementation based on geneweb-gwdb-legacy with a copy of data in an arangodb base."
+
+maintainer: [ "Julien Sagot <julien.sagot@geneanet.org>" ]
+
+authors: [ "Daniel de Rauglaudre" ]
+
+homepage: "http://geneweb.org"
+
+dev-repo: "git://github.com/geneweb/geneweb"
+
+bug-reports: "https://github.com/geneweb/geneweb/issues"
+
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]

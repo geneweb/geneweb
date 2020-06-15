@@ -1,14 +1,21 @@
-(* $Id: updateIndOk.mli,v 5.6 2008-01-21 13:28:12 ddr Exp $ *)
-
 open Config
 open Def
 open Gwdb
 
-val effective_del :
-  base -> (CheckItem.base_warning -> unit) -> person ->
-    (iper, iper, istr) gen_person
-val effective_mod :
-  config -> base -> (iper, Update.key, string) gen_person -> (iper, iper, istr) gen_person
+val effective_del : config -> base -> person -> unit
+
+(** [effective_mod prerr ?skip_conflict conf base sp] *)
+val effective_mod
+  : ?prerr:(config -> base -> person error -> unit)
+  -> ?skip_conflict:iper
+  -> config
+  -> base
+  -> (iper, Update.key, string) gen_person
+  -> (iper, iper, istr) gen_person
+
+val print_mod
+  : ?prerr:(config -> base -> person error -> unit) -> config -> base -> unit
+
 val all_checks_person :
   base -> (iper, iper, istr) gen_person -> ifam gen_ascend ->
     ifam gen_union -> CheckItem.base_warning list
@@ -20,19 +27,19 @@ val rename_image_file :
 
 val print_add : config -> base -> unit
 val print_del : config -> base -> unit
-val print_mod : config -> base -> unit
+
 val print_change_event_order : config -> base -> unit
 
 
 
 (* Ajout pour l'API *)
-val effective_add :
-  config -> base -> (iper, Update.key, string) Def.gen_person ->
-    (iper, iper, istr) Def.gen_person * 'a Def.gen_ascend
+val effective_add
+  : config -> base -> (iper, Update.key, string) Def.gen_person
+  -> (iper, iper, istr) Def.gen_person * ifam Def.gen_ascend
 val raw_get : config -> string -> string
-val strip_person :
-  (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person ->
-    (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
+val strip_person
+  : (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
+  -> (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
 val check_person :
   config -> (iper, string * string * 'b * 'c * 'd, string) Def.gen_person ->
     string option

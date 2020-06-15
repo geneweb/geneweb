@@ -169,11 +169,10 @@ let init_sosa_t conf base sosa_ref =
   let tstab =
     try Util.create_topological_sort conf base with
       Consang.TopologicalSortError p ->
-        let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
+        let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
         Hutil.rheader conf title; print_base_loop conf base p
   in
-  let persons = Gwdb.ipers base in
-  let mark = Gwdb.iper_marker persons false in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   let last_zil = [get_iper sosa_ref, Sosa.one] in
   let sosa_ht = Hashtbl.create 5003 in
   let () =
@@ -286,8 +285,7 @@ let build_sosa_tree_ht conf base person =
   let () = load_ascends_array base in
   let () = load_couples_array base in
   let nb_persons = nb_of_persons base in
-  let ipers = Gwdb.ipers base in
-  let mark = Gwdb.iper_marker ipers false in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   (* Tableau qui va socker au fur et à mesure les ancêtres du person. *)
   (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
   (* commence à l'indice 1 !                                            *)
@@ -363,7 +361,7 @@ let next_sosa s =
   (* La clé de la table est l'iper de la personne et on lui associe son numéro
     de sosa. On inverse pour trier sur les sosa *)
   let sosa_list = Hashtbl.fold (fun k v acc -> (v, k) :: acc) sosa_ht [] in
-  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> Sosa.compare s1 s2) sosa_list in
   let rec find_n x lst = match lst with
     | [] -> (Sosa.zero, dummy_iper)
     | (so, _) :: tl ->
@@ -376,7 +374,7 @@ let next_sosa s =
 
 let prev_sosa s =
   let sosa_list = Hashtbl.fold (fun k v acc -> (v, k) :: acc) sosa_ht [] in
-  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> Sosa.compare s1 s2) sosa_list in
   let sosa_list = List.rev sosa_list in
   let rec find_n x lst = match lst with
     | [] -> (Sosa.zero, dummy_iper)
@@ -419,8 +417,8 @@ let has_history conf base p p_auth =
   let fn = sou base (get_first_name p) in
   let sn = sou base (get_surname p) in
   let occ = get_occ p in
-  let person_file = History_diff.history_file fn sn occ in
-  p_auth && Sys.file_exists (History_diff.history_path conf person_file)
+  let person_file = HistoryDiff.history_file fn sn occ in
+  p_auth && Sys.file_exists (HistoryDiff.history_path conf person_file)
 
 (* ******************************************************************** *)
 (*  [Fonc] get_single_sosa : config -> base -> person -> Sosa.t          *)
@@ -1221,68 +1219,113 @@ let excluded_possible_duplications conf =
   gen_excluded_possible_duplications conf "iexcl" iper_of_string,
   gen_excluded_possible_duplications conf "fexcl" ifam_of_string
 
+let first_possible_duplication_children iexcl len child eq =
+  let rec loop i =
+    if i = len then NoDup
+    else begin
+      let c1 = child i in
+      let rec loop' j =
+        if j = len then loop (i + 1)
+        else begin
+          let c2 = child j in
+          let ic1 = get_iper c1 in
+          let ic2 = get_iper c2 in
+          if List.mem (ic1, ic2) iexcl then loop' (j + 1)
+          else if eq (get_first_name c1) (get_first_name c2)
+          then DupInd (ic1, ic2)
+          else loop' (j + 1)
+        end
+      in loop' (i + 1)
+    end
+  in loop 0
+
 let first_possible_duplication base ip (iexcl, fexcl) =
-  let ifaml = Array.to_list (get_family (poi base ip)) in
-  let cand_spouse =
-    let rec loop_spouse =
-      function
-        ifam1 :: ifaml1 ->
-          let isp1 = Gutil.spouse ip (foi base ifam1) in
-          let sp1 = poi base isp1 in
-          let fn1 = get_first_name sp1 in
-          let sn1 = get_surname sp1 in
-          let rec loop_same =
-            function
-              ifam2 :: ifaml2 ->
-                let isp2 = Gutil.spouse ip (foi base ifam2) in
-                if isp2 = isp1 then
-                  if not (List.mem (ifam1, ifam2) fexcl) then
-                    DupFam (ifam1, ifam2)
-                  else loop_same ifaml2
-                else
-                  let sp2 = poi base isp2 in
-                  if List.mem (isp1, isp2) iexcl then loop_same ifaml2
-                  else if
-                    eq_istr (get_first_name sp2) fn1 &&
-                    eq_istr (get_surname sp2) sn1
-                  then
-                    DupInd (isp1, isp2)
-                  else loop_same ifaml2
-            | [] -> loop_spouse ifaml1
-          in
-          loop_same ifaml1
-      | [] -> NoDup
-    in
-    loop_spouse ifaml
+  let str =
+    let cache = ref [] in
+    fun i ->
+      match List.assoc_opt i !cache with
+      | Some s -> s
+      | None ->
+        let s = Name.lower @@ sou base i in
+        cache := (i, s) :: !cache ;
+        s
   in
-  if cand_spouse <> NoDup then cand_spouse
-  else
-    let ipl =
-      List.rev @@
-      List.fold_left
-        (fun acc x ->
-           Array.fold_left
-             (fun acc x -> x :: acc) acc (get_children (foi base x)))
-        [] ifaml
+  let eq i1 i2 = str i1 = str i2 in
+  let p = poi base ip in
+  match get_family p with
+  | [| |] -> NoDup
+  | [| ifam |] ->
+    let children = get_children @@ foi base ifam in
+    let len = Array.length children in
+    if len < 2 then NoDup
+    else begin
+      let child i = poi base @@ Array.unsafe_get children i in
+      first_possible_duplication_children iexcl len child eq
+    end
+  | ifams ->
+    let len = Array.length ifams in
+    let fams = Array.make len None in
+    let spouses = Array.make len None in
+    let fam i =
+      match Array.unsafe_get fams i with
+      | Some f -> f
+      | None ->
+        let f = foi base @@ Array.unsafe_get ifams i in
+        Array.unsafe_set fams i (Some f) ;
+        f
     in
-    let rec loop_chil =
-      function
-        ip1 :: ipl1 ->
-          let p1 = poi base ip1 in
-          let fn1 = get_first_name p1 in
-          let rec loop_same =
-            function
-              ip2 :: ipl2 ->
-                let p2 = poi base ip2 in
-                if List.mem (ip1, ip2) iexcl then loop_same ipl2
-                else if eq_istr (get_first_name p2) fn1 then DupInd (ip1, ip2)
-                else loop_same ipl2
-            | [] -> loop_chil ipl1
-          in
-          loop_same ipl1
-      | [] -> NoDup
+    let spouse i =
+      match Array.unsafe_get spouses i with
+      | Some sp -> sp
+      | None ->
+        let sp = poi base @@ Gutil.spouse ip @@ fam i in
+        Array.unsafe_set spouses i (Some sp) ;
+        sp
     in
-    loop_chil ipl
+    let dup =
+      let rec loop i =
+        if i = len then NoDup
+        else
+          let sp1 = spouse i in
+          let rec loop' j =
+            if j = len then loop (i + 1)
+            else
+              let sp2 = spouse j in
+              if get_iper sp1 = get_iper sp2
+              then
+                let ifam1 = Array.unsafe_get ifams i in
+                let ifam2 = Array.unsafe_get ifams j in
+                if not (List.mem (ifam2, ifam2) fexcl)
+                then DupFam (ifam1, ifam2)
+                else loop' (j + 1)
+              else
+                let isp1 = get_iper sp1 in
+                let isp2 = get_iper sp2 in
+                if List.mem (isp1, isp2) iexcl then loop' (j + 1)
+                else if eq (get_first_name sp1) (get_first_name sp2)
+                     && eq (get_surname sp1) (get_surname sp2)
+                then DupInd (isp1, isp2)
+                else loop' (j + 1)
+          in loop' (i + 1)
+      in loop 0
+    in
+    if dup <> NoDup then dup
+    else begin
+      let ichildren =
+        Array.fold_left Array.append [||] @@ Array.init len (fun i -> get_children @@ fam i)
+      in
+      let len = Array.length ichildren in
+      let children = Array.make len None in
+      let child i =
+        match Array.unsafe_get children i with
+        | Some c -> c
+        | None ->
+          let c = poi base @@ Array.unsafe_get ichildren i in
+          Array.unsafe_set children i (Some c) ;
+          c
+      in
+      first_possible_duplication_children iexcl len child eq
+    end
 
 let has_possible_duplications conf base p =
   let ip = get_iper p in
@@ -1512,7 +1555,7 @@ let build_list_eclair conf base v p =
 
 let linked_page_text conf base p s key str (pg, (_, il)) =
   match pg with
-    NotesLinks.PgMisc pg ->
+    Def.NLDB.PgMisc pg ->
       let list = List.map snd (List.filter (fun (k, _) -> k = key) il) in
       List.fold_right
         (fun text str ->
@@ -1523,12 +1566,12 @@ let linked_page_text conf base p s key str (pg, (_, il)) =
                if v = "" then raise Not_found
                else Util.nth_field v (Util.index_of_sex (get_sex p))
              in
-             match text.NotesLinks.lnTxt with
+             match text.Def.NLDB.lnTxt with
                Some "" -> str
              | _ ->
                  let str1 =
                    let v =
-                     let text = text.NotesLinks.lnTxt in
+                     let text = text.Def.NLDB.lnTxt in
                      match text with
                        Some text ->
                          let rec loop i len =
@@ -1556,7 +1599,7 @@ let linked_page_text conf base p s key str (pg, (_, il)) =
                    else
                      Printf.sprintf
                        "%s<a href=\"%sm=NOTES&f=%s#p_%d\">%s</a>%s" a
-                       (commd conf) pg text.NotesLinks.lnPos b c
+                       (commd conf) pg text.Def.NLDB.lnPos b c
                  in
                  if str = "" then str1 else str ^ ", " ^ str1
            with Not_found -> str)
@@ -1569,12 +1612,12 @@ let links_to_ind conf base db key =
       (fun pgl (pg, (_, il)) ->
          let record_it =
            match pg with
-             NotesLinks.PgInd ip ->
+             Def.NLDB.PgInd ip ->
                authorized_age conf base (pget conf base ip)
-           | NotesLinks.PgFam ifam ->
+           | Def.NLDB.PgFam ifam ->
                authorized_age conf base (pget conf base (get_father @@ foi base ifam))
-           | NotesLinks.PgNotes | NotesLinks.PgMisc _ |
-             NotesLinks.PgWizard _ ->
+           | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ |
+             Def.NLDB.PgWizard _ ->
                true
          in
          if record_it then
@@ -1640,7 +1683,7 @@ type 'a env =
   | Vbool of bool
   | Vint of int
   | Vgpl of generation_person list
-  | Vnldb of NotesLinks.notes_links_db
+  | Vnldb of (Gwdb.iper, Gwdb.ifam) Def.NLDB.t
   | Vstring of string
   | Vsosa_ref of person option Lazy.t
   | Vsosa of (iper * (Sosa.t * person) option) list ref
@@ -1752,9 +1795,7 @@ let get_sosa conf base env r p =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_linked_page conf base p s =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
+  let db = Gwdb.read_nldb base in
   let db = Notes.merge_possible_aliases conf db in
   let key =
     let fn = Name.lower (sou base (get_first_name p)) in
@@ -1998,7 +2039,7 @@ and eval_simple_bool_var conf base env =
       let v = extract_var "file_exists_" s in
       if v <> "" then
         let v = code_varenv v in
-        let s = Srcfile.source_file_name conf v in Sys.file_exists s
+        let s = SrcfileDisplay.source_file_name conf v in Sys.file_exists s
       else raise Not_found
 and eval_simple_str_var conf base env (_, p_auth) =
   function
@@ -2011,7 +2052,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "comment" | "fnotes" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth conf.no_note 
+          get_note_source conf base [] m_auth conf.no_note
             (sou base (get_comment fam))
       | _ -> raise Not_found
       end
@@ -2362,7 +2403,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (Util.real_nb_of_persons conf base))
+           (Gwdb.nb_of_real_persons base))
   | "birth_witness" :: sl ->
       begin match get_env "birth_witness" env with
         Vind p ->
@@ -3064,7 +3105,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
             List.exists
               (fun (pg, (_, il)) ->
                  match pg with
-                   NotesLinks.PgMisc pg ->
+                   Def.NLDB.PgMisc pg ->
                      if List.mem_assoc key il then
                        let (nenv, _) = Notes.read_notes base pg in
                        List.mem_assoc s nenv
@@ -3199,7 +3240,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           | Some (n, _) ->
               begin match prev_sosa n with
               | (so, ip) ->
-                if so = Sosa.zero then VVstring ""
+                if Sosa.eq so Sosa.zero then VVstring ""
                 else
                   let p = poi base ip in
                   let p_auth = authorized_age conf base p in
@@ -4040,7 +4081,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else
         let fn = sou base (get_first_name p) in
         let sn = sou base (get_surname p) in
-        let occ = get_occ p in History_diff.history_file fn sn occ
+        let occ = get_occ p in HistoryDiff.history_file fn sn occ
   | "image" -> if not p_auth then "" else sou base (get_image p)
   | "image_html_url" -> string_of_image_url conf base ep true
   | "image_size" -> string_of_image_size conf base ep
@@ -4554,7 +4595,7 @@ let eval_transl conf base env upp s c =
         | _ -> assert false
       in
       let r = Util.translate_eval (Util.transl_nth conf s n) in
-      if upp then capitale r else r
+      if upp then Utf8.capitalize r else r
   | _ -> Templ.eval_transl conf upp s c
 
 let print_foreach conf base print_ast eval_expr =
@@ -5697,7 +5738,7 @@ let eval_predefined_apply conf env f vl =
   | "hexa", [s] -> Util.hexa_string s
   | "initial", [s] ->
       if String.length s = 0 then ""
-      else String.sub s 0 (Util.index_of_next_char s 0)
+      else String.sub s 0 (Utf8.next s 0)
   | "lazy_print", [v] ->
       begin match get_env "lazy_print" env with
         Vlazyp r -> r := Some v; ""
@@ -5776,10 +5817,9 @@ let gen_interp_templ menu title templ_fname conf base p =
       Vint (max_descendant_level base desc_level_table_m)
     in
     let nldb () =
-      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-      let fname = Filename.concat bdir "notes_links" in
-      let db = NotesLinks.read_db_from_file fname in
-      let db = Notes.merge_possible_aliases conf db in Vnldb db
+      let db = Gwdb.read_nldb base in
+      let db = Notes.merge_possible_aliases conf db in
+      Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p);
@@ -5880,7 +5920,7 @@ let print_ancestors_dag conf base v p =
     in
     loop Dag.Pset.empty v (get_iper p)
   in
-  let elem_txt p = Dag.Item (p, "") in
+  let elem_txt p = DagDisplay.Item (p, "") in
   (* Récupère les options d'affichage. *)
   let options = Util.display_options conf in
   let vbar_txt ip =
@@ -5888,8 +5928,8 @@ let print_ancestors_dag conf base v p =
     Printf.sprintf "%sm=A&t=T&v=%d&%s&dag=on&%s" (commd conf) v options
       (acces conf base p)
   in
-  let page_title = Util.capitale (Util.transl conf "tree") in
-  Dag.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title ""
+  let page_title = Utf8.capitalize (Util.transl conf "tree") in
+  DagDisplay.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title ""
 
 let print_ascend conf base p =
   match
@@ -5912,13 +5952,11 @@ let print_what_links conf base p =
       let fn = Name.lower (sou base (get_first_name p)) in
       let sn = Name.lower (sou base (get_surname p)) in fn, sn, get_occ p
     in
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-    let fname = Filename.concat bdir "notes_links" in
-    let db = NotesLinks.read_db_from_file fname in
+    let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h =
-      Wserver.printf "%s%s " (capitale (transl conf "linked pages"))
+      Wserver.printf "%s%s " (Utf8.capitalize (transl conf "linked pages"))
         (Util.transl conf ":");
       if h then Wserver.printf "%s" (simple_person_text conf base p true)
       else
@@ -5927,6 +5965,6 @@ let print_what_links conf base p =
     in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
-    Notes.print_linked_list conf base pgl;
+    NotesDisplay.print_linked_list conf base pgl;
     Hutil.trailer conf
   else Hutil.incorrect_request conf

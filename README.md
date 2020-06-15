@@ -5,24 +5,26 @@ with a Web interface and can be used off-line or as a Web service.
 
 ## Build status
 
-|            | Linux                       | macOS                        | Windows (mingw64)
-| ---:       | :---:                       | :---:                        | :---:
-| OCaml 4.05 | [![linux-405]][travis-link] | [![macosx-405]][travis-link] | -
-| OCaml 4.06 | [![linux-406]][travis-link] | [![macosx-406]][travis-link] | -
-| OCaml 4.07 | [![linux-407]][travis-link] | [![macosx-407]][travis-link] | [![win-407]][appveyor-link]
-| OCaml 4.08 | [![linux-408]][travis-link] | [![macosx-408]][travis-link] | -
+|            | Linux             | macOS             | FreeBSD           | Windows (mingw64)
+| ---:       | :---:             | :---:             | :---:             | :---:
+| OCaml 4.05 | [![l405]][travis] | -                 | -                 | -
+| OCaml 4.06 | [![l406]][travis] | -                 | -                 | -
+| OCaml 4.07 | [![l407]][travis] | -                 | -                 | -
+| OCaml 4.08 | [![l408]][travis] | -                 | -                 | -
+| OCaml 4.09 | [![l409]][travis] | [![m409]][travis] | [![f409]][travis] | [![win-409]][appveyor]
+| OCaml 4.10 | [![l410]][travis] | -                 | -                 | -
 
-[linux-405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/1
-[linux-406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/2
-[linux-407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/3
-[linux-408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/4
-[macosx-405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/5
-[macosx-406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/6
-[macosx-407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/7
-[macosx-408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/8
-[win-407]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
-[travis-link]:https://travis-ci.org/geneweb/geneweb
-[appveyor-link]:https://ci.appveyor.com/project/geneweb/geneweb
+[l405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/1
+[l406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/2
+[l407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/3
+[l408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/4
+[l409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/5
+[l410]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/6
+[m409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/7
+[f409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/8
+[win-409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
+[travis]:https://travis-ci.org/geneweb/geneweb
+[appveyor]:https://ci.appveyor.com/project/geneweb/geneweb
 
 ## Documentation
 
@@ -33,9 +35,9 @@ The documentation is available online: http://geneweb.tuxfamily.org/
 Using [opam](https://opam.ocaml.org/):
 
 ```
-opam pin add -k git https://github.com/geneweb/geneweb --no-action
-opam depext geneweb
-opam install geneweb
+opam pin add geneweb-bin -k git https://github.com/geneweb/geneweb --no-action
+opam depext geneweb-bin
+opam install geneweb-bin
 ```
 
 ## Getting involved
@@ -56,19 +58,24 @@ pull requests, bugs reports, ideas...
 ### Install dependencies
 
 ```
-$ opam install camlp5 cppo dune markup ounit
+$ opam install camlp5 cppo dune jingoo markup ounit uucp unidecode
 ```
 
 ### Build instructions
 
 1. Run the configuration script
    ```
-   $ ./configure
+   $ ocaml ./configure.ml
    ```
 2. Build the distibution
    ```
    $ make clean distrib
    ```
+
+You can have a description of available configuration options using
+```
+$ ocaml ./configure.ml --help
+```
 
 ### Building the API
 
@@ -85,7 +92,7 @@ $ opam install ocurl piqi piqilib redis redis-sync yojson
 Then, tell the configure script to enable API.
 
 ```
-$ ./configure --api
+$ ocaml ./configure.ml --api
 ```
 
 ### Coding style

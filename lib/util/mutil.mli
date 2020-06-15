@@ -9,13 +9,9 @@ val strip_all_trailing_spaces : string -> string
 val decline : char -> string -> string
 val nominative : string -> string
 
-val remove_file : string -> unit
 val mkdir_p : string -> unit
 val remove_dir : string -> unit
 val lock_file : string -> string
-
-val output_value_no_sharing : out_channel -> _ -> unit
-val output_array_no_sharing : out_channel -> (int -> _) -> int -> unit
 
 val name_key : string -> string
 val initial : string -> int
@@ -61,6 +57,13 @@ val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
  *)
 val array_to_list_rev_map : ('a -> 'b) -> 'a array -> 'b list
 
+(** [array_assoc k arr]
+    returns the value associated with key [k] in the array of pairs [arr].
+    That is, [array_assoc k [| ... ; (k,v) ; ... |] = v]
+    if [(k,v)] is the leftmost binding of a in array [arr].
+    Raise [Not_found] if there is no value associated with [k] in [arr]. *)
+val array_assoc : 'k -> ('k * 'v) array -> 'v
+
 (** [start_with ?wildcard prefix off str]
     Test if [str] starts with [prefix] (at offset [off]).
     If [wildcard] is set to [true], occurences of ['_'] in [prefix]
@@ -87,6 +90,67 @@ val get_particle : string list -> string -> string
 *)
 val rm : string -> unit
 
+(** [mv src dst]
+    Move [src] to [dst]. If [src] does not exists, do nothing.
+*)
+val mv : string -> string -> unit
+
 (** [string_of_int_sep "," 1000000] is ["1,000,000"]
 *)
 val string_of_int_sep : string -> int -> string
+
+(** [list_compare cmp l1 l2]
+    Comparison function for lists, using [cmp] to compare each elements
+*)
+val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
+
+(** [check_magic magic ic]
+    Read (and consume) the [magic] string at the beggining of [ic]
+    and return [true].
+    If [ic] does not start with [magic], reset the reading position
+    of [ic] to where is was before you call [check_magic] and return [false].
+*)
+val check_magic : string -> in_channel -> bool
+
+(** Magic string generated from the md5sum of the running executable.
+    It can be used for volatile files which can be easily corrupted
+    by any change in program or data representation.
+*)
+val executable_magic : string
+
+(** [array_except value array]
+    Return a new array containing all the elements
+    from [array] except the first occurence of [value]
+ *)
+val array_except : 'a -> 'a array -> 'a array
+
+(** List of default particles used in GeneWeb *)
+val default_particles : string list
+
+(** [array_forall2 p a b]
+    Checks if all elements of the arrays satisfy the predicate [p].
+    That is, it returns [(p a1 b1) && (p a2 b2) && ... && (p an bn)].
+    Raise Invalid_argument if the two lists are determined to have different lengths.
+*)
+val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
+
+(** [list_replace old_v new_v list]
+    Return the same list as [list] were the first occurence of [old_v]
+    has been replaced by [new_v]. If [old_v] is unbound, the list is
+    returned unchanged.
+*)
+val list_replace : 'a -> 'a -> 'a list -> 'a list
+
+(** [list_except old_v new_v list] *)
+val list_except : 'a -> 'a list -> 'a list
+
+(** Read the content of a file.
+    Starts from the position where it is when calling [input_file_ic],
+    and read until the end of the file.
+
+    This function avoid crashes with text files on Windows platform.
+
+    If the channel is opened on a file that is not a regular file,
+    the result is meaningless.
+*)
+val input_file_ic : in_channel -> string

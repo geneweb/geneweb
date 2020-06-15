@@ -6,6 +6,9 @@ let verbose = ref true
 let rm fname =
   if Sys.file_exists fname then Sys.remove fname
 
+let mv src dst =
+  if Sys.file_exists src then Sys.rename src dst
+
 let list_iter_first f = function
   | [] -> ()
   | hd :: tl -> f true hd ; List.iter (f false) tl
@@ -84,8 +87,6 @@ let nominative s =
     Some _ -> decline 'n' s
   | _ -> s
 
-let remove_file f = try Sys.remove f with Sys_error _ -> ()
-
 let mkdir_p x =
   let rec loop x =
     let y = Filename.dirname x in
@@ -99,7 +100,7 @@ let rec remove_dir d =
     let files = Sys.readdir d in
     for i = 0 to Array.length files - 1 do
       remove_dir (Filename.concat d files.(i));
-      remove_file (Filename.concat d files.(i))
+      rm (Filename.concat d files.(i))
     done
   with Sys_error _ -> ()
   end;
@@ -112,9 +113,6 @@ let lock_file bname =
     else bname
   in
   bname ^ ".lck"
-
-let output_value_no_sharing oc v =
-  Marshal.to_channel oc v [Marshal.No_sharing]
 
 let initial n =
   let rec loop i =
@@ -247,13 +245,6 @@ let strip_all_trailing_spaces s =
       | c -> Buffer.add_char b c; loop (i + 1)
   in
   loop 0
-
-let output_array_no_sharing oc arr_get arr_len =
-  let header_pos = Iovalue.create_output_value_header oc in
-  Iovalue.output_block_header oc 0 arr_len;
-  for i = 0 to arr_len - 1 do Iovalue.output oc (arr_get i) done;
-  let pos_end = Iovalue.patch_output_value_header oc header_pos in
-  seek_out oc pos_end
 
 let roman_of_arabian n =
   let build one five ten =
@@ -405,6 +396,16 @@ let array_to_list_map fn a =
 let array_to_list_rev_map fn a =
   Array.fold_left (fun acc x -> fn x :: acc) [] a
 
+let array_assoc k a =
+  let len = Array.length a in
+  let rec loop i =
+    if i = len then raise Not_found
+    else
+      let (k', v) = Array.unsafe_get a i in
+      if k' = k then v
+      else loop (i + 1)
+  in loop 0
+
 let string_of_int_sep sep x =
   let digits, len =
     let rec loop (d, l) x =
@@ -425,3 +426,88 @@ let string_of_int_sep sep x =
       (0, 0) digits
   in
   Bytes.unsafe_to_string s
+
+let rec list_compare cmp l1 l2 =
+  match l1, l2 with
+  | x1 :: l1, x2 :: l2 -> begin
+      match cmp x1 x2 with
+      | 0 -> list_compare cmp l1 l2
+      | x -> x
+    end
+  | [], [] -> 0
+  | [], _ -> -1
+  | _, [] -> 1
+
+let executable_magic = Digest.file Sys.executable_name
+
+let check_magic magic ic =
+  let len = String.length magic in
+  let pos = pos_in ic in
+  if in_channel_length ic - pos < len then false
+  else if magic = really_input_string ic len then true
+  else begin seek_in ic pos ; false end
+
+let array_except v a =
+  let rec loop i =
+    if i = Array.length a then Array.copy a
+    else if a.(i) = v then
+      Array.append (Array.sub a 0 i)
+        (Array.sub a (i + 1) (Array.length a - i - 1))
+    else loop (i + 1)
+  in
+  loop 0
+
+let default_particles =
+  let upper =
+    [ "AF " ; "D'" ; "D’" ; "DAL " ; "DE " ; "DES " ; "DI " ; "DU " ; "OF "
+    ; "VAN " ; "VON UND ZU " ; "VON " ; "Y " ; "ZU " ; "ZUR " ]
+  in
+  List.rev_append (List.rev_map String.lowercase_ascii upper) upper
+
+let array_forall2 f a1 a2 =
+  if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
+  else
+    let rec loop i =
+      if i = Array.length a1 then true
+      else if f a1.(i) a2.(i) then loop (i + 1)
+      else false
+    in
+    loop 0
+
+let rec list_replace old_v new_v = function
+  | [] -> []
+  | hd :: tl ->
+    if hd = old_v
+    then new_v :: tl
+    else hd :: list_replace old_v new_v tl
+
+let list_except x =
+  let rec loop acc = function
+    | [] -> []
+    | hd :: tl ->
+      if hd = x then List.rev_append acc tl
+      else loop (hd :: acc) tl
+  in
+  loop []
+
+let input_file_ic ic =
+  let len = in_channel_length ic in
+  if Sys.unix then
+    let bytes = Bytes.create len in
+    really_input ic bytes 0 len ;
+    Bytes.unsafe_to_string bytes
+  else
+    if len = 0 then ""
+    else
+      let buffer = Buffer.create len in
+      let rec loop () =
+        match input_line ic with
+        | line ->
+          Buffer.add_string buffer line ;
+          let pos = pos_in ic in
+          if pos < len
+          || (seek_in ic @@ pos - 1 ; input_char ic) = '\n'
+          then Buffer.add_char buffer '\n' ;
+          loop ()
+        | exception End_of_file -> Buffer.contents buffer
+      in loop ()

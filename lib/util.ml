@@ -1,4 +1,3 @@
-(* $Id: util.ml,v 5.130 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -48,88 +47,11 @@ let start_with_hi_i s =
     | 'h' -> String.length s > 1 && s.[1] = 'i'
     | _ -> false
   else false
-let match_begin s t =
-  let rec loop i j =
-    if i >= String.length s || j >= String.length t then true
-    else if s.[i] = t.[j] then loop (i + 1) (j + 1)
-    else false
-  in
-  loop 0 0
-
-let amp_capitalize capitale s =
-  if String.length s <= 1 then s
-  else if match_begin s "&iexcl;" then
-    "&iexcl;" ^ capitale (String.sub s 7 (String.length s - 7))
-  else if match_begin s "&aelig;" then
-    "&AElig;" ^ String.sub s 7 (String.length s - 7)
-  else
-    match s.[1] with
-      'a'..'z' ->
-        "&" ^
-        String.make 1
-          (Char.chr (Char.code s.[1] - Char.code 'a' + Char.code 'A')) ^
-        String.sub s 2 (String.length s - 2)
-    | _ -> s
-
-
-(* Copied from Ocaml < 4.03. To be removed with proper utf8 support *)
-let uppercase c =
-  if (c >= 'a' && c <= 'z')
-  || (c >= '\224' && c <= '\246')
-  || (c >= '\248' && c <= '\254')
-  then Char.unsafe_chr(Char.code c - 32)
-  else c
-
-let rec capitale_utf_8 s =
-  if String.length s = 0 then ""
-  else
-    let c = s.[0] in
-    if c = '&' then amp_capitalize capitale_utf_8 s
-    else if c = '<' then
-      let rec loop i =
-        if i = String.length s then s
-        else if s.[i] = '>' then
-          let s1 = String.sub s (i + 1) (String.length s - i - 1) in
-          String.sub s 0 (i + 1) ^ capitale_utf_8 s1
-        else loop (i + 1)
-      in
-      loop 1
-    else if Char.code c < 0b10000000 then String.capitalize_ascii s
-    else if String.length s = 1 then s
-    else
-      match Char.code c with
-        0xC3 when Char.code s.[1] <> 0xBF ->
-        let c1 = uppercase (Char.chr (Char.code s.[1] + 0x40)) in
-        let c1 = Char.chr (Char.code c1 - 0x40) in
-          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
-      | 0xC3 when Char.code s.[1] = 0xBF ->
-          (* ÿ *)
-          let c = Char.chr 0xC5 in
-          let c1 = Char.chr 0xB8 in
-          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
-      | 0xC4 | 0xC5 | 0xC6 | 0xC7 ->
-          let c1 = Char.chr (Char.code s.[1] - 1) in
-          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
-      | 0xD0 when Char.code s.[1] >= 0xB0 ->
-          (* cyrillic lowercase *)
-          let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
-          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
-      | 0xD1 when Char.code s.[1] < 0x90 ->
-          (* cyrillic lowercase again *)
-          let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
-          Printf.sprintf "%c%c%s" (Char.chr 0xD0) c1
-            (String.sub s 2 (String.length s - 2))
-      | _ -> s
-
-let index_of_next_char s i =
-  min (String.length s) (i + max 1 (Name.nbc s.[i]))
-
-let capitale s = capitale_utf_8 s
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
 let fcapitale (a : ('a, 'b, 'c, 'd) format4) : ('a, 'b, 'c, 'd) format4 =
-  Scanf.format_from_string (capitale (string_of_format a)) a
+  Scanf.format_from_string (Utf8.capitalize (string_of_format a)) a
 
 let nth_field_abs w n =
   let rec start i n =
@@ -328,11 +250,6 @@ let month_txt =
        "Nov"; "Dec" |]
   in
   fun i -> let i = if i < 0 || i >= Array.length txt then 0 else i in txt.(i)
-
-(* Returns true if sub is a substring of str or false otherwise. *)
-let string_exists str sub =
-  let re = Str.regexp_string sub in
-  try ignore (Str.search_forward re str 0); true with Not_found -> false
 
 let string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
@@ -725,10 +642,8 @@ let string_gen_family base fam =
 let is_hidden p = is_empty_string (get_surname p)
 
 let is_empty_name p =
-  (Gwdb.is_empty_string (Gwdb.get_surname p) ||
-   Gwdb.is_quest_string (Gwdb.get_surname p)) &&
-  (Gwdb.is_empty_string (Gwdb.get_first_name p) ||
-   Gwdb.is_quest_string (Gwdb.get_first_name p))
+  Gwdb.is_quest_string (Gwdb.get_surname p)
+  && Gwdb.is_quest_string (Gwdb.get_first_name p)
 
 let is_public conf base p =
   get_access p = Public ||
@@ -1437,7 +1352,7 @@ let url_no_index conf base =
       function
         [] -> []
       | ("opt", "no_index") :: l -> loop l
-      | (("dsrc" | "escache" | "oc" | "templ"), _) :: l -> loop l
+      | (("dsrc" | "escache" | "templ"), _) :: l -> loop l
       | ("i", v) :: l -> new_env "i" v (fun x -> x) l
       | ("ei", v) :: l -> new_env "ei" v (fun x -> "e" ^ x) l
       | (k, v) :: l when String.length k = 2 && k.[0] = 'i' ->
@@ -1474,7 +1389,9 @@ let url_no_index conf base =
   let suff =
     List.fold_right
       (fun (x, v) s ->
-         let sep = if s = "" then "" else "&" in x ^ "=" ^ v ^ sep ^ s)
+        if v != "" then
+          let sep = if s = "" then "" else "&" in x ^ "=" ^ v ^ sep ^ s
+        else s )
       (("lang", conf.lang) :: env) ""
   in
   if conf.b_arg_for_basename then addr ^ "?b=" ^ conf.bname ^ "&" ^ suff
@@ -2575,25 +2492,19 @@ let create_topological_sort conf base =
                Filename.concat bfile "tstab_visitor"
              else Filename.concat bfile "tstab"
            in
-           let r =
-             try
-               (* Let's invalidate tstab if it is too old. *)
-               if Unix.time () -. (Unix.stat tstab_file).Unix.st_mtime > 86400. (* one day *)
-               then (Sys.remove tstab_file ; None)
-               else
-                 let ic = Secure.open_in_bin tstab_file in
-                 let r =
-                   try Some (Marshal.from_channel ic)
-                   with End_of_file | Failure _ ->
-                     (* tstab is probably corrupted *)
-                     Sys.remove tstab_file ;
-                     None
-                 in
-                 close_in ic;
-                 r
-             with _ -> None
-           in
-           match r with
+           match
+             if Sys.file_exists tstab_file
+             then begin
+               let ic = Secure.open_in_bin tstab_file in
+               let tstab =
+                 if Mutil.check_magic Mutil.executable_magic ic
+                 then Some (Marshal.from_channel ic)
+                 else None
+               in
+               close_in ic ;
+               tstab
+             end else None
+           with
            | Some tstab -> tstab
            | None ->
              let () = load_ascends_array base in
@@ -2604,6 +2515,7 @@ let create_topological_sort conf base =
                base_visible_write base;
              begin
                let oc = Secure.open_out_bin tstab_file in
+               output_string oc Mutil.executable_magic ;
                Marshal.to_channel oc tstab
                  [ Marshal.No_sharing ; Marshal.Closures ] ;
                close_out oc
@@ -2780,7 +2692,7 @@ let has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
     not (is_empty_string (get_image p)) &&
     (conf.wizard || conf.friend ||
-     not (string_exists (sou base (get_image p)) "/private/")) ||
+     not (Mutil.contains (sou base (get_image p)) "/private/")) ||
     auto_image_file conf base p <> None
   else false
 
@@ -2936,103 +2848,6 @@ let of_course_died conf p =
     Some (Dgreg (d, _)) -> conf.today.year - d.year > 120
   | _ -> false
 
-
-(* Hashtbl pour avoir le plus de flexibilité. *)
-(* TODO : il faudrait que ce soit intégrer dans la base directement. *)
-type cache_info_t = (string, string) Hashtbl.t
-
-(* valeur dans le cache. *)
-let cache_nb_base_persons = "cache_nb_persons"
-
-(* Hashtbl utilisée tant qu'on a pas commit le patch. *)
-let (ht_cache_info : cache_info_t) = Hashtbl.create 1
-
-
-(* ************************************************************************ *)
-(*  [Fonc] cache_info : config -> string                                    *)
-(** [Description] : Renvoie le chemin du fichier de cache d'info de la base.
-    [Args] :
-      - config : configuration de la base
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let cache_info conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (base_path [] bname) "cache_info"
-
-
-(* ************************************************************************ *)
-(*  [Fonc] read_cache_info : config -> cache_info_t                         *)
-(** [Description] : Lit le fichier de cache pour les infos d'une base.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Hashtbl cache_info_t
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let read_cache_info conf =
-  let fname = cache_info conf in
-  try
-    let ic = Secure.open_in_bin fname in
-    let ht : cache_info_t = input_value ic in close_in ic; ht
-  with Sys_error _ -> ht_cache_info
-
-
-(* ************************************************************************ *)
-(*  [Fonc] write_cache_info : config -> cache_info_t -> unit                *)
-(** [Description] : Met à jour le fichier de cache des infos d'une base.
-    [Args] :
-      - conf : configuration de la base
-      - ht   : Hashtbl cache_info_t
-    [Retour] : unit
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
-let write_cache_info conf =
-  let ht_cache = read_cache_info conf in
-  (* On met à jour la table en mémoire, avec toutes les valeurs qui *)
-  (* sont dans le cache fichier mais pas dans celle en mémoire.     *)
-  let () =
-    Hashtbl.iter
-      (fun k v ->
-         if not (Hashtbl.mem ht_cache_info k) then
-           Hashtbl.add ht_cache_info k v)
-      ht_cache
-  in
-  let fname = cache_info conf in
-  try
-    let oc = Secure.open_out_bin fname in
-    output_value oc ht_cache_info;
-    close_out oc
-  with Sys_error _ -> ()
-
-
-(* ************************************************************************ *)
-(*  [Fonc] patch_cache_info :
-             config -> ((string * string) -> (string * string)) -> unit     *)
-(** [Description] : Met à jour le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-      - (key, value) : la clé et valeur de cache à mettre à jour
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let patch_cache_info conf k f =
-  (* On met à jour le cache avec la nouvelle valeur. *)
-  (* Si la clé n'existe pas dans la liste, c'est pas grave, elle sera *)
-  (* ajouté lors de la création du cache.                             *)
-  try
-    let v = Hashtbl.find ht_cache_info k in
-    Hashtbl.replace ht_cache_info k (f v)
-  with Not_found ->
-    try
-      let cache_info = read_cache_info conf in
-      let v = Hashtbl.find cache_info k in
-      Hashtbl.replace ht_cache_info k (f v)
-    with Not_found -> ()
-
-
 let escache_value base =
   let t = Gwdb.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in string_of_int v
@@ -3079,7 +2894,6 @@ let update_wf_trace conf fname =
 
 let commit_patches conf base =
   Gwdb.commit_patches base;
-  write_cache_info conf;
   conf.henv <-
     List.map
       (fun (k, v) -> if k = "escache" then k, escache_value base else k, v)
@@ -3384,7 +3198,7 @@ let gen_print_tips conf s =
 let print_tips_relationship conf =
   if p_getenv conf.env "em" = Some "R" || p_getenv conf.env "m" = Some "C"
   then
-    let s = capitale (transl conf "select person to compute relationship") in
+    let s = Utf8.capitalize (transl conf "select person to compute relationship") in
     gen_print_tips conf s
 
 
@@ -3539,47 +3353,6 @@ let record_visited conf ip =
 
 (**/**)
 
-
-(* ************************************************************************ *)
-(*  [Fonc] init_cache_info : config -> unit                                 *)
-(** [Description] : Créé le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
-let init_cache_info conf base =
-  (* Reset le nombre réel de personnes d'une base. *)
-  let nb_real_persons =
-    Gwdb.Collection.fold
-      (fun i p -> if not @@ is_empty_name p then i + 1 else i) 0 (Gwdb.persons base)
-  in
-  let () =
-    Hashtbl.add
-      ht_cache_info cache_nb_base_persons (string_of_int nb_real_persons)
-  in
-  write_cache_info conf
-
-
-(* ************************************************************************ *)
-(*  [Fonc] real_nb_of_persons conf : config -> int                          *)
-(** [Description] : Renvoie le nombre de personnes réelles (sans ? ?) d'une
-                    base, à partir du fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : nombre de personne sans ? ?
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-let real_nb_of_persons conf base =
-  let real_nb_person () =
-    let ht = read_cache_info conf in
-    let nb = Hashtbl.find ht cache_nb_base_persons in int_of_string nb
-  in
-  try real_nb_person () with
-    Not_found ->
-      try init_cache_info conf base; real_nb_person () with
-        _ -> Gwdb.nb_of_persons base
-
 let array_mem_witn conf base x a =
   let rec loop i =
     if i = Array.length a then (false, "")
@@ -3621,32 +3394,6 @@ let groupby ~key ~value list =
     list ;
   Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
 
-let str_nth_pos str nth =
-  let strlen = String.length str in
-  let rec loop n i =
-    if n = nth then i
-    else if i >= strlen then raise (Invalid_argument "str_sub")
-    else loop (n + 1) (index_of_next_char str i)
-  in
-  loop 0 0
-
-let str_sub ?pad str start len =
-  let strlen = String.length str in
-  let n, i =
-    let rec loop n i =
-      if n = len || strlen = i then (n, i)
-      else loop (n + 1) (index_of_next_char str i)
-    in
-    loop 0 start
-  in
-  if n = len then String.sub str start (i - start)
-  else match pad with
-    | None -> raise (Invalid_argument "str_sub")
-    | Some pad ->
-      let bytes = Bytes.make (i - start + len - n) pad in
-      Bytes.blit (Bytes.unsafe_of_string str) start bytes 0 (String.length str) ;
-      Bytes.unsafe_to_string bytes
-
 let ls_r dirs =
   let rec loop result = function
     | f :: fs when Sys.is_directory f ->
@@ -3664,27 +3411,3 @@ let rm_rf dir =
   let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
   List.iter Unix.unlink files ;
   List.iter Unix.rmdir directories
-
-let init_cache_info bname base =
-  match Gwdb.ascends_array base with
-  | (_, _, _, None) ->
-    begin
-      (* Reset le nombre réel de personnes d'une base. *)
-      let nb_real_persons =
-        Gwdb.Collection.fold begin fun acc p ->
-          if is_empty_name p then acc else acc + 1
-        end 0 (Gwdb.persons base)
-      in
-      let ht = Hashtbl.create 1 in
-      let () =
-        Hashtbl.add ht cache_nb_base_persons (string_of_int nb_real_persons)
-      in
-      let bdir =
-        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-      in
-      let fname = Filename.concat bdir "cache_info" in
-      match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
-        Some oc -> output_value oc ht; close_out oc
-      | None -> ()
-    end
-  | _ -> ()

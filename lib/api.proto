@@ -321,71 +321,80 @@ message AllFamiliesParams {
   optional int32 limit = 2;
 }
 
+message WarningPerson {
+  required string n = 1;
+  required string p = 2;
+  required int32 oc = 3;
+  required string lastname = 6;
+  required string firstname = 7;
+  optional string birth_date = 8;
+  optional string death_date = 9;
+}
 
 message WarningAlreadyDefined {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningOwnAncestor {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningBadSexOfMarriedPerson {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningBirthAfterDeath {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningIncoherentSex {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningChangedOrderOfChildren {
-  required FullPerson father = 1;
-  required FullPerson mother = 2;
+  required WarningPerson father = 1;
+  required WarningPerson mother = 2;
 }
 
 message WarningChangedOrderOfMarriages {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningChildrenNotInOrder {
-  required FullPerson father = 1;
-  required FullPerson mother = 2;
+  required WarningPerson father = 1;
+  required WarningPerson mother = 2;
 }
 
 message WarningDeadTooEarlyToBeFather {
-  required FullPerson son = 1;
-  required FullPerson father = 2;
+  required WarningPerson son = 1;
+  required WarningPerson father = 2;
 }
 
 message WarningIncoherentAncestorDate {
-  required FullPerson person = 1;
-  required FullPerson ancestor = 2;
+  required WarningPerson person = 1;
+  required WarningPerson ancestor = 2;
 }
 
 message WarningMarriageDateAfterDeath {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningMarriageDateBeforeBirth {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningMotherDeadBeforeChildBirth {
-  required FullPerson mother = 1;
-  required FullPerson child = 2;
+  required WarningPerson mother = 1;
+  required WarningPerson child = 2;
 }
 
 message WarningParentBornAfterChild {
-  required FullPerson parent = 1;
-  required FullPerson child = 2;
+  required WarningPerson parent = 1;
+  required WarningPerson child = 2;
 }
 
 message WarningParentTooYoung {
-  required FullPerson parent = 1;
+  required WarningPerson parent = 1;
   required string date = 2;
 }
 
@@ -395,92 +404,104 @@ message WarningPossibleDuplicateFam {
 }
 
 message WarningTitleDatesError {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningUndefinedSex {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningYoungForMarriage {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
+  required string date = 2;
+}
+
+message WarningOldForMarriage {
+  required WarningPerson person = 1;
   required string date = 2;
 }
 
 message WarningParentTooOld {
-  required FullPerson parent = 1;
+  required WarningPerson parent = 1;
   required string date = 2;
 }
 
 message WarningCloseChildren {
-  required FullPerson father = 1;
-  required FullPerson mother = 2;
-  required FullPerson child1 = 3;
-  required FullPerson child2 = 4;
+  required WarningPerson father = 1;
+  required WarningPerson mother = 2;
+  required WarningPerson child1 = 3;
+  required WarningPerson child2 = 4;
+}
+
+message WarningDistantChildren {
+  required WarningPerson father = 1;
+  required WarningPerson mother = 2;
+  required WarningPerson child1 = 3;
+  required WarningPerson child2 = 4;
 }
 
 message WarningBigAgeBetweenSpouses {
-  required FullPerson father = 1;
-  required FullPerson mother = 2;
+  required WarningPerson father = 1;
+  required WarningPerson mother = 2;
   required string date = 3;
 }
 
 message WarningDeadOld {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string date = 3;
 }
 
 message WarningOldIndividual {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string date = 3;
 }
 
 message WarningWitnessDateAfterDeath {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningWitnessDateBeforeBirth {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningChangedOrderOfFamilyEvents {
-  required FullPerson father = 1;
-  required FullPerson mother = 2;
+  required WarningPerson father = 1;
+  required WarningPerson mother = 2;
 }
 
 message WarningChangedOrderOfPersonEvents {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
 }
 
 message WarningFeventOrder {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string event1 = 2;
   required string event2 = 3;
 }
 
 message WarningFwitnessEventAfterDeath {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string event = 2;
 }
 
 message WarningFwitnessEventBeforeBirth {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string event = 2;
 }
 
 message WarningPeventOrder {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string event1 = 2;
   required string event2 = 3;
 }
 
 message WarningPwitnessEventAfterDeath {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string event = 2;
 }
 
 message WarningPwitnessEventBeforeBirth {
-  required FullPerson person = 1;
+  required WarningPerson person = 1;
   required string event = 2;
 }
 
@@ -511,6 +532,8 @@ message BaseWarnings {
   repeated WarningOldIndividual warning_old_individual = 23;
   repeated WarningWitnessDateAfterDeath warning_witness_date_after_death = 24;
   repeated WarningWitnessDateBeforeBirth warning_witness_date_before_birth = 25;
+  repeated WarningOldForMarriage warning_old_for_marriage = 27;
+  repeated WarningDistantChildren warning_distant_children = 28;
 }
 
 message FilterDate {

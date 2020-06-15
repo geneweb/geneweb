@@ -746,11 +746,11 @@ let check_person conf p =
 
 let error_person conf err =
 #ifdef API
-  if !Api_conf.mode_api then begin
+  if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s\n" (capitale err);
+  Wserver.printf "%s\n" (Utf8.capitalize err);
   Update.print_return conf;
   Hutil.trailer conf;
 #ifdef API
@@ -758,8 +758,8 @@ let error_person conf err =
 #endif
   let err =
     Printf.sprintf "%s%s%s"
-      (capitale (transl conf "error"))
-      (capitale (transl conf ":"))
+      (Utf8.capitalize (transl conf "error"))
+      (Utf8.capitalize (transl conf ":"))
       err
   in
   raise @@ Update.ModErr err
@@ -804,7 +804,7 @@ let print_conflict conf base p =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
@@ -812,14 +812,14 @@ let print_conflict conf base p =
   in
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>";
-  Wserver.printf "%s%s %d.\n" (capitale (transl conf "first free number"))
+  Wserver.printf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
     (Util.transl conf ":") free_n;
   Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
   Wserver.printf "%s.\n" (transl conf " to try again with this number");
   Wserver.printf "</li>";
   Wserver.printf "<li>";
-  Wserver.printf "%s " (capitale (transl conf "or"));
+  Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
   Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
   Wserver.printf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
@@ -834,9 +834,9 @@ let print_conflict conf base p =
   Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
     free_n conf.xhs;
   Wserver.printf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"
-    (capitale (transl conf "create")) conf.xhs;
+    (Utf8.capitalize (transl conf "create")) conf.xhs;
   Wserver.printf "<input type=\"submit\" name=\"return\" value=\"%s\"%s>\n"
-    (capitale (transl conf "back")) conf.xhs;
+    (Utf8.capitalize (transl conf "back")) conf.xhs;
   Wserver.printf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
@@ -855,21 +855,25 @@ let print_conflict conf base p =
    in
    raise @@ Update.ModErr err
 
-let print_cannot_change_sex conf base p =
+
+let default_prerr conf base = function
+  | BadSexOfMarriedPerson p as err ->
+    let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+    Hutil.rheader conf title;
+    Update.print_error conf base err ;
+    Wserver.printf "<ul><li>%s</li></ul>" (Util.referenced_person_text conf base p);
+    Update.print_return conf ;
+    Update.print_continue conf "nsck" "on" ;
+    Hutil.trailer conf
+  | _ -> assert false
+
+let print_cannot_change_sex ?(prerr = default_prerr) conf base p =
 #ifdef API
-  if not !Api_conf.mode_api then begin
+  if not !Api_conf.mode_api then
 #endif
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  Hutil.rheader conf title;
-  Update.print_error conf base (BadSexOfMarriedPerson p);
-  Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
-  Update.print_return conf;
-  Hutil.trailer conf;
-#ifdef API
-  end;
-#endif
+  prerr conf base (BadSexOfMarriedPerson p) ;
   let err =
-    Printf.sprintf "%s." (capitale (transl conf "cannot change sex of a married person"))
+    Printf.sprintf "%s." (Utf8.capitalize (transl conf "cannot change sex of a married person"))
   in
   raise @@ Update.ModErr err
 
@@ -888,16 +892,14 @@ let check_conflict conf base sp ipl =
          print_conflict conf base p1)
     ipl
 
-let check_sex_married conf base sp op =
-  if sp.sex <> get_sex op then
-    let no_check =
-      Array.for_all
-        (fun ifam ->
-           let r = get_relation (foi base ifam) in
-           r = NoSexesCheckNotMarried || r = NoSexesCheckMarried)
-        (get_family op)
-    in
-    if not no_check then print_cannot_change_sex conf base op
+let check_sex_married ?prerr conf base sp op =
+  if sp.sex <> get_sex op
+  && Array.exists begin fun ifam ->
+       let fam = foi base ifam in
+       (sp.sex = Male && sp.key_index <> get_father fam)
+       || (sp.sex = Female && sp.key_index <> get_mother fam)
+     end (get_family op)
+  then print_cannot_change_sex ?prerr conf base op
 
 let rename_image_file conf base op sp =
   match auto_image_file conf base op with
@@ -928,7 +930,7 @@ let pwitnesses_of pevents =
     [] pevents
 
 (* sp.death *)
-let effective_mod conf base sp =
+let effective_mod ?prerr ?skip_conflict conf base sp =
   let pi = sp.key_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
@@ -937,15 +939,16 @@ let effective_mod conf base sp =
   let oocc = get_occ op in
   if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
   else
-    begin let ipl = Gutil.person_ht_find_all base key in
-      check_conflict conf base sp ipl; rename_image_file conf base op sp
+    begin
+      let ipl = match skip_conflict with
+        | Some i -> List.filter ((<>) i) @@ Gutil.person_ht_find_all base key
+        | None -> Gutil.person_ht_find_all base key
+      in
+      check_conflict conf base sp ipl ;
+      rename_image_file conf base op sp
     end;
-  (* Si on modifie la personne pour lui ajouter un nom/prénom, alors *)
-  (* il faut remettre le compteur du nombre de personne à jour.      *)
-  if ofn = "?" && osn = "?" && sp.first_name <> "?" && sp.surname <> "?" then
-    patch_cache_info conf Util.cache_nb_base_persons
-      (fun v -> let v = int_of_string v + 1 in string_of_int v);
-  check_sex_married conf base sp op;
+  if List.assoc_opt "nsck" conf.env <> Some "on"
+  then check_sex_married ?prerr conf base sp op ;
   let created_p = ref [] in
   let np =
     Futil.map_person_ps (Update.insert_person conf base "" created_p)
@@ -961,35 +964,25 @@ let effective_mod conf base sp =
   let pi = np.key_index in Update.update_related_pointers base pi ol nl; np
 
 let effective_add conf base sp =
-  let pi = Gwdb.insert_person base (Gwdb.empty_person base Gwdb.dummy_iper) in
   let fn = Util.translate_eval sp.first_name in
   let sn = Util.translate_eval sp.surname in
   let key = fn ^ " " ^ sn in
   let ipl = Gutil.person_ht_find_all base key in
   check_conflict conf base sp ipl;
-  patch_cache_info conf Util.cache_nb_base_persons
-    (fun v -> let v = int_of_string v + 1 in string_of_int v);
   let created_p = ref [] in
+  let pi =
+    insert_person base (no_person dummy_iper) no_ascend no_union
+  in
   let np =
-    Futil.map_person_ps (Update.insert_person conf base "" created_p)
-      (Gwdb.insert_string base) {sp with key_index = pi}
+    Futil.map_person_ps
+      (Update.insert_person conf base "" created_p)
+      (Gwdb.insert_string base)
+      { sp with key_index = pi }
   in
-  patch_person base pi np;
-  let na = {parents = None; consang = Adef.fix (-1)} in
-  patch_ascend base pi na;
-  let nu = {family = [| |]} in
-  patch_union base pi nu;
-  np, na
-
-let array_except v a =
-  let rec loop i =
-    if i = Array.length a then a
-    else if a.(i) = v then
-      Array.append (Array.sub a 0 i)
-        (Array.sub a (i + 1) (Array.length a - i - 1))
-    else loop (i + 1)
-  in
-  loop 0
+  patch_person base pi np ;
+  patch_ascend base pi no_ascend ;
+  patch_union base pi no_union ;
+  np, no_ascend
 
 let update_relations_of_related base ip old_related =
   List.iter
@@ -1028,15 +1021,15 @@ let update_relations_of_related base ip old_related =
            (get_pevents p1) ([], false)
        in
        if rparents_are_different || pevents_are_different then
-         begin let p = gen_person_of_person p1 in
+         begin
+           let p = gen_person_of_person p1 in
            let rparents =
              if rparents_are_different then rparents else p.rparents
            in
            let pevents =
              if pevents_are_different then pevents else p.pevents
            in
-           patch_person base ip1
-             {p with rparents = rparents; pevents = pevents}
+           patch_person base ip1 {p with rparents ; pevents }
          end;
        let families = get_family p1 in
        for i = 0 to Array.length families - 1 do
@@ -1067,50 +1060,29 @@ let update_relations_of_related base ip old_related =
            let fevents =
              if fevents_are_different then fevents else fam.fevents
            in
-           patch_family base ifam
-             {fam with witnesses = witnesses; fevents = fevents}
+           patch_family base ifam { fam with witnesses ; fevents }
        done)
     old_related
 
-let effective_del base warning p =
-  let none = Gwdb.insert_string base "?" in
-  let empty = Gwdb.insert_string base "" in
+let effective_del conf base p =
   let ip = get_iper p in
-  begin match get_parents p with
-    Some ifam ->
-      let des = foi base ifam in
-      let des =
-        let children = array_except ip (get_children des) in
-        begin match CheckItem.sort_children base children with
-          Some (b, a) -> warning (ChangedOrderOfChildren (ifam, des, b, a))
-        | None -> ()
-        end;
-        {children = children}
-      in
-      patch_descend base ifam des;
-      let asc = {parents = None; consang = Adef.fix (-1)} in
-      patch_ascend base ip asc
-  | None -> ()
-  end;
+  let old_related = get_related p in
+  let op = Util.string_gen_person base (gen_person_of_person p) in
+  update_relations_of_related base ip old_related;
+  let ip = get_iper p in
   let old_rparents = rparents_of (get_rparents p) in
   let old_pevents = pwitnesses_of (get_pevents p) in
   let old = List.append old_rparents old_pevents in
   Update.update_related_pointers base ip old [];
-  {first_name = none; surname = none; occ = 0; image = empty;
-   public_name = empty; qualifiers = []; aliases = []; sex = get_sex p;
-   first_names_aliases = []; surnames_aliases = []; titles = [];
-   rparents = []; related = []; occupation = empty; access = IfTitles;
-   birth = Adef.cdate_None; birth_place = empty; birth_note = empty;
-   birth_src = empty; baptism = Adef.cdate_None; baptism_place = empty;
-   baptism_note = empty; baptism_src = empty; death = DontKnowIfDead;
-   death_place = empty; death_note = empty; death_src = empty;
-   burial = UnknownBurial; burial_place = empty; burial_note = empty;
-   burial_src = empty; pevents = []; notes = empty; psources = empty;
-   key_index = ip}
+  delete_person base ip ;
+  Notes.update_notes_links_db base (Def.NLDB.PgInd (get_iper p)) "";
+  Util.commit_patches conf base;
+  let changed = U_Delete_person op in
+  History.record conf base changed "dp"
 
 let print_mod_ok conf base wl pgl p ofn osn oocc =
   let title _ =
-    Wserver.printf "%s" (capitale (transl conf "person modified"))
+    Wserver.printf "%s" (Utf8.capitalize (transl conf "person modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1130,7 +1102,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   | _ ->
       Wserver.printf "<p>\n";
       Wserver.printf "%s, %s %s %s :"
-        (capitale (transl_nth conf "relation/relations" 0))
+        (Utf8.capitalize (transl_nth conf "relation/relations" 0))
         (transl conf "first name missing") (transl conf "or")
         (transl conf "surname missing");
       Wserver.printf "<ul>\n";
@@ -1162,13 +1134,13 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
       let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
       Wserver.printf "<span class=\"unselectable float-left\">%s%s</span>\n\
                       <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
-        (capitale (transl conf "old name")) (transl conf ":") ofn osn soocc;
+        (Utf8.capitalize (transl conf "old name")) (transl conf ":") ofn osn soocc;
       Wserver.printf "<span class=\"unselectable float-left\">%s%s</span>\n\
                       <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
-        (capitale (transl conf "new name")) (transl conf ":") nfn nsn snocc;
+        (Utf8.capitalize (transl conf "new name")) (transl conf ":") nfn nsn snocc;
       Wserver.printf "<span>%s%s</span>"
-        (capitale (transl conf "linked pages")) (transl conf ":");
-      Notes.print_linked_list conf base pgl
+        (Utf8.capitalize (transl conf "linked pages")) (transl conf ":");
+      NotesDisplay.print_linked_list conf base pgl
     end;
   Hutil.trailer conf
 
@@ -1198,41 +1170,30 @@ let relation_sex_is_coherent base warning p =
 let all_checks_person base p a u =
   let wl = ref [] in
   let warning w = wl := w :: !wl in
-  let _ =
-    (let p = person_of_gen_person base (p, a, u) in
-     CheckItem.person base warning p :
-     _ option)
-  in
+  let pp = person_of_gen_person base (p, a, u) in
+  ignore @@ CheckItem.person base warning pp ;
   relation_sex_is_coherent base warning p;
-  begin match a.parents with
-    Some ifam ->
-      CheckItem.reduce_family base warning ifam (foi base ifam)
-  | _ -> ()
-  end;
-  Array.iter
-    (fun ifam ->
-       CheckItem.reduce_family base warning ifam (foi base ifam))
-    u.family;
+  CheckItem.on_person_update base warning pp ;
   let wl = List.sort_uniq compare !wl in
   List.iter
     (function
-       ChangedOrderOfChildren (ifam, _, _, after) ->
-         patch_descend base ifam {children = after}
-     | ChangedOrderOfPersonEvents (_, _, after) ->
-         patch_person base p.key_index {p with pevents = after}
-     | _ -> ())
+      | ChangedOrderOfChildren (ifam, _, _, after) ->
+        patch_descend base ifam { children = after }
+      | ChangedOrderOfPersonEvents (_, _, after) ->
+        patch_person base p.key_index { p with pevents = after }
+      | _ -> ())
     wl;
   wl
 
 let print_add_ok conf base wl p =
-  let title _ = Wserver.printf "%s" (capitale (transl conf "person added")) in
+  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "person added")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
       Wserver.printf "<h2 class=\"error\">%s</h2>\n"
-        (capitale (transl conf "forbidden char"));
+        (Utf8.capitalize (transl conf "forbidden char"));
       List.iter (Wserver.printf "<p>%s</p>") !removed_string
     end;
   (* Si on a supprimé des relations, on les mentionne *)
@@ -1254,7 +1215,7 @@ value print_add_ok conf base wl p =
 
 let print_del_ok conf =
   let title _ =
-    Wserver.printf "%s" (capitale (transl conf "person deleted"))
+    Wserver.printf "%s" (Utf8.capitalize (transl conf "person deleted"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf false;
@@ -1262,7 +1223,7 @@ let print_del_ok conf =
 
 let print_change_event_order_ok conf base wl p =
   let title _ =
-    Wserver.printf "%s" (capitale (transl conf "person modified"))
+    Wserver.printf "%s" (Utf8.capitalize (transl conf "person modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1299,25 +1260,11 @@ let print_add o_conf base =
 
 let print_del conf base =
   match p_getenv conf.env "i" with
-    Some i ->
-      let ip = iper_of_string i in
-      let p = poi base ip in
-      let fn = sou base (get_first_name p) in
-      let sn = sou base (get_surname p) in
-      let old_related = get_related p in
-      let op = Util.string_gen_person base (gen_person_of_person p) in
-      update_relations_of_related base ip old_related;
-      let warning _ = () in
-      let p = effective_del base warning p in
-      patch_person base ip p;
-      if fn <> "?" && sn <> "?" then
-        patch_cache_info conf Util.cache_nb_base_persons
-          (fun v -> let v = int_of_string v - 1 in string_of_int v);
-      Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
-      Util.commit_patches conf base;
-      let changed = U_Delete_person op in
-      History.record conf base changed "dp";
-      print_del_ok conf
+  | Some i ->
+    let ip = iper_of_string i in
+    let p = poi base ip in
+    effective_del conf base p ;
+    print_del_ok conf
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_aux conf base callback =
@@ -1338,7 +1285,7 @@ let print_mod_aux conf base callback =
       | None -> callback p
   else Update.error_digest conf
 
-let print_mod o_conf base =
+let print_mod ?prerr o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
@@ -1357,14 +1304,12 @@ let print_mod o_conf base =
   let key = Name.lower ofn, Name.lower osn, oocc in
   let conf = Update.update_conf o_conf in
   let pgl =
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-    let fname = Filename.concat bdir "notes_links" in
-    let db = NotesLinks.read_db_from_file fname in
+    let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     Perso.links_to_ind conf base db key
   in
   let callback sp =
-    let p = effective_mod conf base sp in
+    let p = effective_mod ?prerr conf base sp in
     let op = poi base p.key_index in
     let u = {family = get_family op} in
     patch_person base p.key_index p;
@@ -1384,7 +1329,7 @@ let print_mod o_conf base =
       in
       String.concat " " (List.map (sou base) sl)
     in
-    Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
+    Notes.update_notes_links_db base (Def.NLDB.PgInd p.key_index) s;
     let wl =
       let a = poi base p.key_index in
       let a = {parents = get_parents a; consang = get_consang a} in

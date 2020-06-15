@@ -1,7 +1,7 @@
 (library
  (name wserver)
- (public_name geneweb.wserver.mli)
+ (public_name geneweb-lib.wserver.mli)
  (wrapped false)
- (libraries geneweb.def)
+ (libraries geneweb-lib.def)
  (virtual_modules wserver)
 )
