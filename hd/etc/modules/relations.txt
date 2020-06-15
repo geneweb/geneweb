@@ -42,7 +42,7 @@
       %incr_count;i%count;=%sosa_ref.index;;%nn;
       t%count;=sosa_1;%nn;
     %end;
-  " title="[*relations tree] (and witness at his event)"
+  " title="[*relations tree] ([and] [witnesses at his events])"
   %reset_count;
 %end;
 
