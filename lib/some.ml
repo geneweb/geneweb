@@ -136,7 +136,7 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "</table>";
   Wserver.printf "<br%s>\n" conf.xhs
 
-let new_persons_of_fsname conf base base_strings_of_fsname find proj split x =
+let new_persons_of_fsname base base_strings_of_fsname find split x =
   let list =
     let filter = Name.crush_lower in
     let x = filter x in
@@ -664,13 +664,13 @@ let print_family_alphabetic x conf base liste =
         (print_elem conf base false) liste;
       Hutil.trailer conf
 
-let search_aux persons_of_absolute strings spi get split conf base x =
+let search_aux persons_of_absolute strings spi split conf base x =
   let (list, inj) =
     if p_getenv conf.env "t" = Some "A"
     then persons_of_absolute conf base x
     else if x = ""
     then ([], (fun _ -> assert false))
-    else new_persons_of_fsname conf base strings (spi_find (spi base)) get split x
+    else new_persons_of_fsname base strings (spi_find (spi base)) split x
   in
   let lower = String.lowercase_ascii in
   let list =
@@ -739,21 +739,19 @@ let print_surname conf base not_found_fun x (list, inj) =
       let strl = List.map fst list in
       print_several_possible_surnames x conf base (bhl, strl)
 
-let search_surname conf base x =
+let search_surname base x =
   search_aux
     persons_of_absolute_surname
     base_strings_of_surname
     persons_of_surname
-    get_surname
-    Name.split_sname conf base x
+    Name.split_sname base x
 
-let search_first_name conf base x =
+let search_first_name base x =
   search_aux
     persons_of_absolute_first_name
     base_strings_of_first_name
     persons_of_first_name
-    get_first_name
-    Name.split_fname conf base x
+    Name.split_fname base x
 
 let first_name_print conf base x =
   search_first_name conf base x

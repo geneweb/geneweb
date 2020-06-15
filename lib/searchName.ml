@@ -39,10 +39,9 @@ let try_find_with_one_first_name conf base n =
     let fn = String.sub n1 0 i in
     let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
     let (list, _) =
-      Some.new_persons_of_fsname conf base
+      Some.new_persons_of_fsname base
         base_strings_of_surname
         (fun istr -> spi_find (Gwdb.persons_of_surname base) istr)
-        get_surname
         Name.split_sname
         sn
     in
