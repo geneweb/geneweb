@@ -15235,9 +15235,17 @@ sk: svedok na svadbe %s a %s
 sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
 
-    witness to events of
+    witnesses at his events
+en: witnesses at his events
+fr: témoins à ses évènements
+
+    witnesses to events of
 en: witnesses to events of
 fr: témoins aux évènements de
+
+    witnesses to my events and godparents
+en: witnesses to my events and godparents
+fr: témoins à mes évènements et parrains/marraines
 
     witness tree
 co: arburu di i testimoni
