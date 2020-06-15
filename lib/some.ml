@@ -136,7 +136,7 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "</table>";
   Wserver.printf "<br%s>\n" conf.xhs
 
-let new_persons_of_fsname base base_strings_of_fsname find split x =
+let persons_of_fsname base base_strings_of_fsname find split x =
   let list =
     let filter = Name.crush_lower in
     let x = filter x in
@@ -670,7 +670,7 @@ let search_aux persons_of_absolute strings spi split conf base x =
     then persons_of_absolute conf base x
     else if x = ""
     then ([], (fun _ -> assert false))
-    else new_persons_of_fsname base strings (spi_find (spi base)) split x
+    else persons_of_fsname base strings (spi_find (spi base)) split x
   in
   let lower = String.lowercase_ascii in
   let list =
