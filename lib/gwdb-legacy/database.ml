@@ -318,9 +318,11 @@ let new_persons_of_first_name_or_surname base_data params =
         let ipera = read_loop [] len in close_in ic_dat; ipera
       with Not_found -> []
     in
+    let patched = Hashtbl.fold (fun i _ acc -> i :: acc) person_patches [] in
+    let ipera = List.filter (fun i -> not @@ List.mem i patched) ipera in
     let aux i istr1 acc =
       if istr1 = istr then if List.mem i acc then acc else i :: acc
-      else if List.mem i acc then Mutil.list_except i acc else acc
+      else acc
     in
     Hashtbl.fold begin fun i p acc ->
       List.fold_left (fun acc istr1 -> aux i istr1 acc) (aux i (name p) acc) (aliases p)
