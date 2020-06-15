@@ -5664,6 +5664,30 @@ sk: presne
 sl: točno
 sv: exakt
 
+    search_exact_fn
+de: genaue Suche
+en: exact search
+es: búsqueda exacta
+fi: tarkka haku
+fr: recherche exacte
+it: ricerca esatta
+nl: exact zoeken
+no: eksakt søk
+pt: pesquisa exata
+sv: exakt sökning
+
+    search_exact_sn
+de: genaue Suche
+en: exact search
+es: búsqueda exacta
+fi: tarkka haku
+fr: recherche exacte
+it: ricerca esatta
+nl: exact zoeken
+no: eksakt søk
+pt: pesquisa exata
+sv: exakt sökning
+
     excommunication
 co: scumunicazione
 de: Exkommunizierung
