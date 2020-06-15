@@ -690,7 +690,7 @@ let search_aux persons_of_absolute strings spi split conf base x =
   sort [] list, inj
 
 let filter_hidden conf base =
-  List.filter_map begin fun i ->
+  Util.filter_map begin fun i ->
     let p = pget conf base i in
     if not (is_hide_names conf p) || authorized_age conf base p
     then Some p
