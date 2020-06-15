@@ -279,7 +279,7 @@ let rec merge_insert acc (sstr, (strl, iperl) as x) = match acc with
 (** A person with name [n] is selected if [String.lowercase_ascii n = x].
     Until full utf8 case mapping is supported.
 *)
-let persons_of_absolute_aux strings spi get split conf base x =
+let persons_of_absolute_aux strings spi get aliases split conf base x =
   let lower = String.lowercase_ascii in
   let x = lower x in
   ( let istrs = strings base @@ List.hd @@ split x in
@@ -290,7 +290,8 @@ let persons_of_absolute_aux strings spi get split conf base x =
         let ipers =
           (* Filter out hidden persons *)
           List.fold_left begin fun ipers iper ->
-            if eq_istr (get (pget conf base iper)) istr
+            let p = pget conf base iper in
+            if eq_istr (get p) istr || List.exists (eq_istr istr) (aliases p)
             then iper :: ipers
             else ipers
           end [] ipers
@@ -305,6 +306,7 @@ let persons_of_absolute_first_name =
     base_strings_of_first_name
     persons_of_first_name
     get_first_name
+    get_first_names_aliases
     Name.split_fname
 
 let persons_of_absolute_surname =
@@ -312,6 +314,7 @@ let persons_of_absolute_surname =
     base_strings_of_surname
     persons_of_surname
     get_surname
+    get_surnames_aliases
     Name.split_sname
 
 let has_children_with_that_name conf base des name =
