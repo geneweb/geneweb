@@ -47,7 +47,8 @@ let create_name_index oc_inx oc_inx_acc base =
 
 module StringSet = Set.Make (String)
 
-module IntSet = Set.Make (Int)
+(* Int module is available for OCaml >= 4.08 *)
+module IntSet = Set.Make (struct type t = int let compare = compare end)
 
 (* For each first name/surname and aliases,
    associate it with the list of [Dutil.name_index] (run on splitted values)
