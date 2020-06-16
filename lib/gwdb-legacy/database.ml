@@ -254,7 +254,7 @@ let binary_search_key_after arr cmp =
   if arr = [||] then raise Not_found ;
   let rec aux acc low high =
     if high <= low then
-      if cmp arr.(low) = 0 then low
+      if cmp arr.(low) <= 0 then low
       else match acc with Some x -> x | None -> raise Not_found
     else
       let mid = (low + high) / 2 in
