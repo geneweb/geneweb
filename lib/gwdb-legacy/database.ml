@@ -914,36 +914,42 @@ let opendb bname =
     commit_synchro ()
   in
   let patch_person i p =
+    assert (i <> -1) ;
     persons.len <- max persons.len (i + 1);
     fst pending.h_person := persons.len;
     Hashtbl.replace (snd pending.h_person) i p;
     synchro_person := i :: !synchro_person
   in
   let patch_ascend i a =
+    assert (i <> -1) ;
     ascends.len <- max ascends.len (i + 1);
     fst pending.h_ascend := ascends.len;
     Hashtbl.replace (snd pending.h_ascend) i a;
     synchro_person := i :: !synchro_person
   in
   let patch_union i a =
+    assert (i <> -1) ;
     unions.len <- max unions.len (i + 1);
     fst pending.h_union := ascends.len;
     Hashtbl.replace (snd pending.h_union) i a;
     synchro_person := i :: !synchro_person
   in
   let patch_family i f =
+    assert (i <> -1) ;
     families.len <- max families.len (i + 1);
     fst pending.h_family := families.len;
     Hashtbl.replace (snd pending.h_family) i f;
     synchro_family := i :: !synchro_family
   in
   let patch_couple i c =
+    assert (i <> -1) ;
     couples.len <- max couples.len (i + 1);
     fst pending.h_couple := couples.len;
     Hashtbl.replace (snd pending.h_couple) i c;
     synchro_family := i :: !synchro_family
   in
   let patch_descend i c =
+    assert (i <> -1) ;
     descends.len <- max descends.len (i + 1);
     fst pending.h_descend := descends.len;
     Hashtbl.replace (snd pending.h_descend) i c;
