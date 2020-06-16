@@ -36,8 +36,11 @@ let suite =
       end
     ; "compare_places" >:: begin fun _ ->
         let test exp a b =
-          assert_equal ~printer:string_of_int exp (Place.compare_places a b)
-        ; assert_equal ~printer:string_of_int (-exp) (Place.compare_places b a)
+          let aux x = if x = 0 then 0 else if x < 0 then -1 else 1 in
+          assert_equal
+            ~printer:string_of_int exp (aux @@ Place.compare_places a b)
+        ; assert_equal
+            ~printer:string_of_int (-exp) (aux @@ Place.compare_places b a)
         in
         test 0 "boobar (baz)" "boobar (baz)"
       ; test (-1) "baz (boobar)" "boobar (baz)"
