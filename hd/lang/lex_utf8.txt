@@ -130,7 +130,7 @@ af: om die eerste te sien
 bg: за да видите първата родствена връзка
 br: evit gwelout al liamm kentañ
 ca: per veure el primer vincle de parentesc
-co: per fighjà a prima lea
+co: per fighjà a prima leia
 cs: zobrazit první
 da: for at se det første
 de: , um die erste zu sehen
@@ -4234,7 +4234,7 @@ sl: nadaljevano
 sv: forts
 
     copy link
-co: cupià a lea in u preme’papei
+co: cupià a leia in u preme’papei
 en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
 pt: copiar o link para a área de transferência
@@ -5205,7 +5205,7 @@ ru: влючая супругов
 sv: visa makar
 
     display this marriage in this order
-co: move st’unione à a so pusizione
+co: piazzà st’unione à a so pusizione
 de: diese Verbindung an seine Position setzen
 en: Change order of marriage
 es: colocar esta unión en posición
@@ -5419,7 +5419,7 @@ ru: образование
 sv: Utbildning
 
     election
-co: votu
+co: elezzione
 de: Wahl
 en: Election
 es: élección
@@ -5912,7 +5912,7 @@ sl: družina/družine
 sv: familj/familjer
 
     familyLinkLDS
-co: lea di parentia LDS
+co: leia di parentia LDS
 de: Familien Link-HLT
 en: Family Link (LDS)
 es: enlace familiar LDS
@@ -6397,7 +6397,7 @@ fr: arbre complet
 pt: árvore completa
 
     full width/columns
-co: affissu larghezza sana/affissu nant’à duie culonne
+co: affissera larghezza sana/affissera nant’à duie culonne
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 pt: exibir na largura total/exibir em duas colunas
@@ -6753,7 +6753,7 @@ af: met as kinders
 bg: деца
 br: anezho ez eo bet ganet bugale
 ca: fills
-co: avendu cum’è zitelli :
+co: cù
 cs: měli spolu děti
 da: børn
 de: ihre Kinder
@@ -8003,7 +8003,7 @@ sl: poveži
 sv: länk
 
     link back to parents
-co: lea di ritornu ver di i genitori
+co: leia di ritornu ver di i genitori
 en: link back to parents
 fr: lien retour vers les parents
 no: lenke til foreldre
@@ -8014,7 +8014,7 @@ af: mense tussen
 bg: родство между
 br: liamm etre
 ca: lligam entre
-co: lea trà
+co: leia trà
 cs: vztah mezi
 da: slægtskab mellem
 de: Beziehung zwischen
@@ -8040,14 +8040,14 @@ sl: sorodstvo med
 sv: släktskap emellan
 
     link to children
-co: lea ver di i zitelli
+co: leia ver di i zitelli
 en: link to children
 fr: lien vers les enfants
 no: lenke til barn
 pt: link para as crianças
 
     link to use
-co: lea à impiegà
+co: leia à impiegà
 de: Link zu verwenden
 en: link to use
 fr: lien à utiliser
@@ -9183,7 +9183,7 @@ pt: Sosa em falta
 sv: Saknade Sosa
 
     missing sources
-co: fonte chì mancanu
+co: fonti chì mancanu
 de: fehlende Quellenangaben
 en: missing sources
 es: faltan fuentes
@@ -9885,7 +9885,7 @@ af: geen bekende verwantskap tussen %s en %s
 bg: няма данни за родство между %s и %s
 br: ne gaver ket al liamm a gerentiezh etre %s ha %s
 ca: cap lligam de parentesc conegut entre %s i %s
-co: nisuna lea di parentia cunnisciuta tra %s è %s
+co: nisuna leia di parentia cunnisciuta tra %s è %s
 cs: žádný známý vztah mezi :i:%s a :i:%s
 da: intet kendt slægtskab mellem %s og %s
 de: %s und %s sind anscheinend nicht verwandt
@@ -10234,7 +10234,7 @@ af: n/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28
 bg: n-т/първ/втор/трет/четвърт/пет/шест/седм/осм/девет/десет/единадесет/дванадесет/тринадесет/четиринадесет/петнадесет/шестнадесет/седемнадесет/осемнадесет/деветнадесет/двадесет/21-/22-/23-/24-/25-/26-/27-/28-/29-/30-/31-/32-/33-/34-/35-/36-/37-/38-/39-/40-/41-/42-/43-/44-/45-/46-/47-/48-/49-/50-/51-/52-/53-/54-/55-/56-/57-/58-/59-/60-/61-/62-/63-/64-/65-/66-/67-/68-/69-/70-/71-/72-/73-/74-/75-/76-/77-/78-/79-/80-/81-/82-/83-/84-/85-/86-/87-/88-/89-/90-/91-/92-/93-/94-/95-/96-/97-/98-/99-
 br: n-vet/eil/3de/4re/5vet/6vet/7vet/8vet/9vet/10vet/11vet/12vet/13vet/14vte/15vte/16vet/17vet/18vet/19vet/20vet/21vet/22vet/23vet/24vet/25vet/26vet/27vet/28vet/29vet/30vet/31vet/32vet/33vet/34vet/35vet/36vet/37vet/38vet/39vet/40vet/41vet/42vet/43vet/44vet/45vet/46vet/47vet/48vet/49vet/50vet/51vet/52vet/53vet/54vet/55vet/56vet/57vet/58vet/59vet/60vet/61vet/62vet/63vet/64vet/65vet/66vet/67vet/68vet/69vet/70vet/71vet/72vet/73vet/74vet/75vet/76vet/77vet/78vet/79vet/80vet/81vet/82vet/83vet/84vet/85vet/86vet/87vet/88vet/89vet/90vet/91vet/92vet/93vet/94vet/95vet/96vet/97vet/98vet/99vet
 ca: n-èssim/1er/2on/3er/4rt/5è/6è/7è/8è/9è/10è/11è/12è/13è/14è/15è/16è/17è/18è/19è/20è/21è/22mo/23è/24è/25è/26è/27è/28è/29è/30è/31è/32è/33è/34è/35è/36è/37è/38è/39è/40è/41è/42è/43è/44è/45è/46è/47è/48è/49è/50è/51è/52è/53è/54è/55è/56è/57è/58è/59è/60è/61è/62è/63è/64è/65è/66è/67è/68è/69è/70è/71è/72è/73è/74è/75è/76è/77è/78è/79è/80è/81è/82è/83è/84è/85è/86è/87è/88è/89è/90è/91è/92è/93è/94è/95è/96è/97è/98è/99è
-co: n-esimu/1u/2u/3u/4u/5u/6u/7u/8u/9u/10u/11u/12u/13u/14u/15u/16u/17u/18u/19u/20u/21u/22u/23u/24u/25u/26u/27u/28u/29u/30u/31u/32u/33u/34u/35u/36u/37u/38u/39u/40u/41u/42u/43u/44u/45u/46u/47u/48u/49u/50u/51u/52u/53u/54u/55u/56u/57u/58u/59u/60u/61u/62u/63u/64u/65u/66u/67u/68u/69u/70u/71u/72u/73u/74u/75u/76u/77u/78u/79u/80u/81u/82u/83u/84u/85u/86u/87u/88u/89u/90u/91u/92u/93u/94u/95u/96u/97u/98u/99u
+co: n-<sup>esimu</sup>/1<sup>u</sup>/2<sup>u</sup>/3<sup>u</sup>/4<sup>u</sup>/5<sup>u</sup>/6<sup>u</sup>/7<sup>u</sup>/8<sup>u</sup>/9<sup>u</sup>/10<sup>u</sup>/11<sup>u</sup>/12<sup>u</sup>/13<sup>u</sup>/14<sup>u</sup>/15<sup>u</sup>/16<sup>u</sup>/17<sup>u</sup>/18<sup>u</sup>/19<sup>u</sup>/20<sup>u</sup>/21<sup>u</sup>/22<sup>u</sup>/23<sup>u</sup>/24<sup>u</sup>/25<sup>u</sup>/26<sup>u</sup>/27<sup>u</sup>/28<sup>u</sup>/29<sup>u</sup>/30<sup>u</sup>/31<sup>u</sup>/32<sup>u</sup>/33<sup>u</sup>/34<sup>u</sup>/35<sup>u</sup>/36<sup>u</sup>/37<sup>u</sup>/38<sup>u</sup>/39<sup>u</sup>/40<sup>u</sup>/41<sup>u</sup>/42<sup>u</sup>/43<sup>u</sup>/44<sup>u</sup>/45<sup>u</sup>/46<sup>u</sup>/47<sup>u</sup>/48<sup>u</sup>/49<sup>u</sup>/50<sup>u</sup>/51<sup>u</sup>/52<sup>u</sup>/53<sup>u</sup>/54<sup>u</sup>/55<sup>u</sup>/56<sup>u</sup>/57<sup>u</sup>/58<sup>u</sup>/59<sup>u</sup>/60<sup>u</sup>/61<sup>u</sup>/62<sup>u</sup>/63<sup>u</sup>/64<sup>u</sup>/65<sup>u</sup>/66<sup>u</sup>/67<sup>u</sup>/68<sup>u</sup>/69<sup>u</sup>/70<sup>u</sup>/71<sup>u</sup>/72<sup>u</sup>/73<sup>u</sup>/74<sup>u</sup>/75<sup>u</sup>/76<sup>u</sup>/77<sup>u</sup>/78<sup>u</sup>/79<sup>u</sup>/80<sup>u</sup>/81<sup>u</sup>/82<sup>u</sup>/83<sup>u</sup>/84<sup>u</sup>/85<sup>u</sup>/86<sup>u</sup>/87<sup>u</sup>/88<sup>u</sup>/89<sup>u</sup>/90<sup>u</sup>/91<sup>u</sup>/92<sup>u</sup>/93<sup>u</sup>/94<sup>u</sup>/95<sup>u</sup>/96<sup>u</sup>/97<sup>u</sup>/98<sup>u</sup>/99<sup>u</sup>
 cs: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 da: nte/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 de: n-ten/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -10265,7 +10265,7 @@ af: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16d
 bg: n-то/първо/второ/трето/четвърто/пето/шесто/седмо/осмо/девето/десето/единадесето/дванадесето/тринадесето/четиринадесето/петнадесето/шестнадесето/седемнадесето/осемнадесето/деветнадесето/двадесето/21-о/22-о/23-о/24-о/25-о/26-о/27-о/28-о/29-о/30-о/31-о/32-о/33-о/34-о/35-о/36-о/37-о/38-о/39-о/40-о/41-о/42-о/43-о/44-о/45-о/46-о/47-о/48-о/49-о/50-о/51-о/52-о/53-о/54-о/55-о/56-о/57-о/58-о/59-о/60-о/61-о/62-о/63-о/64-о/65-о/66-о/67-о/68-о/69-о/70-о/71-о/72-о/73-о/74-о/75-о/76-о/77-о/78-о/79-о/80-о/81-о/82-о/83-о/84-о/85-о/86-о/87-о/88-о/89-о/90-о/91-о/92-о/93-о/94-о/95-о/96-о/97-о/98-о/99-о
 br: n-vet/1añ/eil/3de/4re/5vet/6vet/7vet/8vet/9vet/10vet/11vet/12vet/13vet/14vet/15vet/16vet/17vet/18vet/19vet/20vet/21vet/22vet/23vet/24vet/25vet/26vet/27vet/28vet/29vet/30vet/31vet/32vet/33vet/34vet/35vet/36vet/37vet/38vet/39vet/40vet/41vet/42vet/43vet/44vet/45vet/46vet/47vet/48vet/49vet/50vet/51vet/52vet/53vet/54vet/55vet/56vet/57vet/58vet/59vet/60vet/61vet/62vet/63vet/64vet/65vet/66vet/67vet/68vet/69vet/70vet/71vet/72vet/73vet/74vet/75vet/76vet/77vet/78vet/79vet/80vet/81vet/82vet/83vet/84vet/85vet/86vet/87vet/88vet/89vet/90vet/91vet/92vet/93vet/94vet/95vet/96vet/97vet/98vet/99vet/100vet/101vet/102vet/103vet/104vet
 ca: n-èssima/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
-co: n-esima/1<sup>a</sup>/2<sup>a</sup>/3<sup>a</sup>/4<sup>a</sup>/5<sup>a</sup>/6<sup>a</sup>/7<sup>a</sup>/8<sup>a</sup>/9<sup>a</sup>/10<sup>a</sup>/11<sup>a</sup>/12<sup>a</sup>/13<sup>a</sup>/14<sup>a</sup>/15<sup>a</sup>/16<sup>a</sup>/17<sup>a</sup>/18<sup>a</sup>/19<sup>a</sup>/20<sup>a</sup>/21<sup>a</sup>/22<sup>a</sup>/23<sup>a</sup>/24<sup>a</sup>/25<sup>a</sup>/26<sup>a</sup>/27<sup>a</sup>/28<sup>a</sup>/29<sup>a</sup>/30<sup>a</sup>/31<sup>a</sup>/32<sup>a</sup>/33<sup>a</sup>/34<sup>a</sup>/35<sup>a</sup>/36<sup>a</sup>/37<sup>a</sup>/38<sup>a</sup>/39<sup>a</sup>/40<sup>a</sup>/41<sup>a</sup>/42<sup>a</sup>/43<sup>a</sup>/44<sup>a</sup>/45<sup>a</sup>/46<sup>a</sup>/47<sup>a</sup>/48<sup>a</sup>/49<sup>a</sup>/50<sup>a</sup>/51<sup>a</sup>/52<sup>a</sup>/53<sup>a</sup>/54<sup>a</sup>/55<sup>a</sup>/56<sup>a</sup>/57<sup>a</sup>/58<sup>a</sup>/59<sup>a</sup>/60<sup>a</sup>/61<sup>a</sup>/62<sup>a</sup>/63<sup>a</sup>/64<sup>a</sup>/65<sup>a</sup>/66<sup>a</sup>/67<sup>a</sup>/68<sup>a</sup>/69<sup>a</sup>/70<sup>a</sup>/71<sup>a</sup>/72<sup>a</sup>/73<sup>a</sup>/74<sup>a</sup>/75<sup>a</sup>/76<sup>a</sup>/77<sup>a</sup>/78<sup>a</sup>/79<sup>a</sup>/80<sup>a</sup>/81<sup>a</sup>/82<sup>a</sup>/83<sup>a</sup>/84<sup>a</sup>/85<sup>a</sup>/86<sup>a</sup>/87<sup>a</sup>/88<sup>a</sup>/89<sup>a</sup>/90<sup>a</sup>/91<sup>a</sup>/92<sup>a</sup>/93<sup>a</sup>/94<sup>a</sup>/95<sup>a</sup>/96<sup>a</sup>/97<sup>a</sup>/98<sup>a</sup>/99<sup>a</sup>
+co: n-<sup>esima</sup>/1<sup>a</sup>/2<sup>a</sup>/3<sup>a</sup>/4<sup>a</sup>/5<sup>a</sup>/6<sup>a</sup>/7<sup>a</sup>/8<sup>a</sup>/9<sup>a</sup>/10<sup>a</sup>/11<sup>a</sup>/12<sup>a</sup>/13<sup>a</sup>/14<sup>a</sup>/15<sup>a</sup>/16<sup>a</sup>/17<sup>a</sup>/18<sup>a</sup>/19<sup>a</sup>/20<sup>a</sup>/21<sup>a</sup>/22<sup>a</sup>/23<sup>a</sup>/24<sup>a</sup>/25<sup>a</sup>/26<sup>a</sup>/27<sup>a</sup>/28<sup>a</sup>/29<sup>a</sup>/30<sup>a</sup>/31<sup>a</sup>/32<sup>a</sup>/33<sup>a</sup>/34<sup>a</sup>/35<sup>a</sup>/36<sup>a</sup>/37<sup>a</sup>/38<sup>a</sup>/39<sup>a</sup>/40<sup>a</sup>/41<sup>a</sup>/42<sup>a</sup>/43<sup>a</sup>/44<sup>a</sup>/45<sup>a</sup>/46<sup>a</sup>/47<sup>a</sup>/48<sup>a</sup>/49<sup>a</sup>/50<sup>a</sup>/51<sup>a</sup>/52<sup>a</sup>/53<sup>a</sup>/54<sup>a</sup>/55<sup>a</sup>/56<sup>a</sup>/57<sup>a</sup>/58<sup>a</sup>/59<sup>a</sup>/60<sup>a</sup>/61<sup>a</sup>/62<sup>a</sup>/63<sup>a</sup>/64<sup>a</sup>/65<sup>a</sup>/66<sup>a</sup>/67<sup>a</sup>/68<sup>a</sup>/69<sup>a</sup>/70<sup>a</sup>/71<sup>a</sup>/72<sup>a</sup>/73<sup>a</sup>/74<sup>a</sup>/75<sup>a</sup>/76<sup>a</sup>/77<sup>a</sup>/78<sup>a</sup>/79<sup>a</sup>/80<sup>a</sup>/81<sup>a</sup>/82<sup>a</sup>/83<sup>a</sup>/84<sup>a</sup>/85<sup>a</sup>/86<sup>a</sup>/87<sup>a</sup>/88<sup>a</sup>/89<sup>a</sup>/90<sup>a</sup>/91<sup>a</sup>/92<sup>a</sup>/93<sup>a</sup>/94<sup>a</sup>/95<sup>a</sup>/96<sup>a</sup>/97<sup>a</sup>/98<sup>a</sup>/99<sup>a</sup>
 cs: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 da: nte/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 de: n-ten/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -10524,7 +10524,7 @@ ar: توفي
 bg: починал
 br: marvet
 ca: mort
-co: forse mortu(a)
+co: sicuramente mortu(a)
 cs: zemřel
 da: død
 de: sicherlich bereits verstorben
@@ -11574,7 +11574,7 @@ af: erkennende vader/erkennende moeder/erkennende ouders
 bg: припознал баща/припознала майка/припознали родители
 br: an tad en deus e(hec'h) anavezet/ar vamm he deus e(hec'h) anavezet/ar gerent o deus e (hec'h) anavezet
 ca: pare reconegut/mare reconeguda/pares reconeguts
-co: babbu l’avendu ricunisciutu(a)/mamma l’avendu ricunisciutu(a)/genitori l’avendu ricunisciutu(a)
+co: u babbu l’avendu ricunisciutu(a)/a mamma l’avendu ricunisciutu(a)/i genitori l’avendu ricunisciutu(a)
 cs: uznaný otec/uznaná matka/uznaní rodiče
 da: sig vedkendende fader/sig vedkendende moder/sig vedkendende forældre
 de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
@@ -11726,7 +11726,7 @@ af: aangetroude verwantskappe
 bg: родство чрез брак
 br: liammoù a gerentiezh dre euredennoù
 ca: parentiu polític
-co: lea d’apparentamentu
+co: leia d’apparentamentu
 cs: příbuzenské vztahy přes svatby
 da: slægtskaber ved giftermål
 de: Heiratsbeziehungen
@@ -11813,7 +11813,7 @@ ru: настройки отображения
 sv: sätt att visa
 
     relationship link between
-co: lea di parentia cù...
+co: leia di parentia cù...
 de: verwandt mit ...
 en: family link with...
 es: parentesco con...
@@ -12007,7 +12007,7 @@ fr: années par génération
 pt: anos por geração
 
     scellentChildLDS
-co: lea eterna di i zitelli LDS
+co: leia eterna di zitelli LDS
 de: HLT Kindes-Siege
 en: Sealing Child (LDS)
 es: sellamiento de hijo LDS
@@ -12020,7 +12020,7 @@ pt: selamento de criança LDS
 sv: Besegling med barn (LDS)
 
     scellentParentLDS
-co: lea eterna cù i genitori LDS
+co: leia eterna cù i genitori LDS
 de: HTL Eltern-Versiegelung
 en: Sealing Parent (LDS)
 es: sellamiento con padres LDS
@@ -12033,7 +12033,7 @@ pt: selamento aos pais LDS
 sv: Besegling med föräldrar (LDS)
 
     scellentSpouseLDS
-co: lea eterna cù a sposa LDS
+co: leia eterna cù a sposa LDS
 de: HTL Ehepartner-Versiegelung
 en: Sealing Spouse (LDS)
 es:  sellamiento con cónyuge LDS
@@ -13547,7 +13547,7 @@ af: die databasis het verander; gaan "terug", "herlaai" en vul die vorm weer in
 bg: базата от данни е променена; натиснете "back" и "reload" и попълнете отново формуляра
 br: ar bon roadoù a zo kemmet : distroit d'ar bajenn a-raok, grit "hizivaat ar bajenn", ha grit en-dro ar reolskrid
 ca: la base ha canviat, fer "back", "reload" i completeu novament el formulari
-co: a basa hà cambiata : rivene à a pagina precedente, attualizà, è riempie torna u furmulariu
+co: a basa hà cambiatu : rivene à a pagina precedente, attualizà, è riempie torna u furmulariu
 cs: databáze se změnila; vraťte se zpět (back), znovu načtěte stránku (reload) a vyplňte formulář
 da: databasen er ændret; gå tilbage, klik for opdatering og udfyld formularen igen
 de: die Datenbank wurde verändert; drücke bitte „zurück (back)“, „neu laden (reload)“ und fülle das Formular neu aus
@@ -14069,7 +14069,7 @@ sl: zadnjih %t smrti
 sv: de senaste %t avlidna
 
     the modification impacted %d persons
-co: a mudificazione hè stata fatta bè : %d scheda(e) curretta(e)
+co: a mudificazione hè riesciuta : %d scheda(e) curretta(e)
 de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
 en: %d entries have been successfully updated
 es: la modificación ha sido hecha: %d ficha/s corregida/s
@@ -14907,7 +14907,7 @@ sv: uppdatera
 zh:  更新
 
     update family
-co: rigirà l’unioni
+co: amministrà l’unioni
 de: Lebensgemeinschaften verwalten
 en: Edit Family
 es: administrar las uniones
@@ -15244,10 +15244,20 @@ sk: svedok na svadbe %s a %s
 sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
 
+    witness at his events
+co: testimoni à i so avvenimenti
+en: witnesses at his events
+fr: témoins à ses évènements
+
     witness to events of
 co: testimoni à l’avvenimenti di
 en: witnesses to events of
 fr: témoins aux évènements de
+
+    witness to my events and godparents
+co: testimoni à i mo avvenimenti è cumpare/cummare
+en: witness to my events and godparents
+fr: témoins à mes évènements et parrains/marraines
 
     witness tree
 co: arburu di i testimoni
