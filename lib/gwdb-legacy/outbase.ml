@@ -74,7 +74,7 @@ let make_strings_of_fsname base =
     aux Name.split_fname_callback p.first_name ;
     List.iter (aux Name.split_fname_callback) p.first_names_aliases ;
     aux Name.split_sname_callback p.surname ;
-    List.iter (aux Name.split_fname_callback) p.surnames_aliases ;
+    List.iter (aux Name.split_sname_callback) p.surnames_aliases ;
   done ;
   Array.map begin fun set ->
     let a = Array.make (IntSet.cardinal set) 0 in
