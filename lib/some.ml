@@ -139,11 +139,11 @@ let print_alphabetic_to_branch conf x =
 let persons_of_fsname base base_strings_of_fsname find split x =
   let list =
     let filter = Name.crush_lower in
-    let x = filter x in
+    let x' = filter x in
     List.fold_left begin fun acc istr ->
       let str = Mutil.nominative (sou base istr) in
-      if filter str = x
-      || List.mem x (List.map filter @@ split str)
+      if filter str = x'
+      || List.mem x' (List.map filter @@ split str)
       then
         let iperl = find istr in
         if iperl = [] then acc else (str, istr, iperl) :: acc
@@ -281,8 +281,8 @@ let rec merge_insert acc (sstr, (strl, iperl) as x) = match acc with
 *)
 let persons_of_absolute_aux strings spi get aliases split conf base x =
   let lower = String.lowercase_ascii in
-  let x = lower x in
   ( let istrs = strings base @@ List.hd @@ split x in
+    let x = lower x in
     List.fold_right begin fun istr l ->
       let str = sou base istr in
       if lower str = x then
@@ -576,7 +576,6 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
 
 let print_several_possible_surnames x conf base (_, homonymes) =
   let fx = x in
-  List.iter (fun sn -> print_endline @@ Printf.sprintf "%s: %s%!\n" __LOC__ sn) homonymes ;
   let x = match homonymes with x :: _ -> x | _ -> x in
   let title _ =
     Wserver.printf "%s \"%s\" : %s"
