@@ -162,3 +162,7 @@ val input_file_ic : in_channel -> string
     {{:http://unicode.org/glossary/#replacement_character}the replacement character}
 *)
 val normalize_utf_8 : string -> string
+
+val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
+
+val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list

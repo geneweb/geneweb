@@ -190,37 +190,31 @@ let p_surname base p = Mutil.nominative (sou base (get_surname p))
 
 let husbands base gp =
   let p = poi base gp.key_index in
-  Array.map
-    (fun ifam ->
-       let fam = foi base ifam in
-       let husband = poi base (get_father fam) in
-       let husband_surname = p_surname base husband in
-       let husband_surnames_aliases =
-         List.map (sou base) (get_surnames_aliases husband)
-       in
-       husband_surname, husband_surnames_aliases)
-    (get_family p)
+  Array.map begin fun ifam ->
+    let fam = foi base ifam in
+    let husband = poi base (get_father fam) in
+    let husband_surname = get_surname husband in
+    let husband_surnames_aliases = get_surnames_aliases husband in
+    husband_surname, husband_surnames_aliases
+  end (get_family p)
 
 let father_titles_places base p nobtit =
   match get_parents (poi base p.key_index) with
   | Some ifam ->
     let fam = foi base ifam in
     let fath = poi base (get_father fam) in
-    List.map (fun t -> sou base t.t_place) (nobtit fath)
+    (nobtit fath)
   | None -> []
 
 let gen_gen_person_misc_names base p nobtit nobtit_fun =
-  let sou = sou base in
-  Futil.gen_person_misc_names (sou p.first_name) (sou p.surname)
-    (sou p.public_name) (List.map sou p.qualifiers) (List.map sou p.aliases)
-    (List.map sou p.first_names_aliases) (List.map sou p.surnames_aliases)
-    (List.map (Futil.map_title_strings sou) nobtit)
-    (if p.sex = Female then Array.to_list (husbands base p) else [])
+  Futil.gen_person_misc_names
+    (sou base) empty_string quest_string
+    p.first_name p.surname p.public_name p.qualifiers p.aliases
+    p.first_names_aliases p.surnames_aliases
+    nobtit
+    (if p.sex = Female then husbands base p else [||])
     (father_titles_places base p nobtit_fun)
-
-let gen_person_misc_names base p nobtit =
-  gen_gen_person_misc_names base p (nobtit p)
-    (fun p -> nobtit (gen_person_of_person p))
+  |> List.map Name.lower
 
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
