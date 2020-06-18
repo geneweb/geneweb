@@ -526,3 +526,130 @@ let normalize_utf_8 s =
   Uutf.String.fold_utf_8 add_uchar () s ;
   add `End ;
   Buffer.contents b
+
+(* Copied from OCaml's List.sort_uniq and adapted to our needs
+   (commit e5ebec7 from Nov 7, 2019) *)
+let list_map_sort_uniq (fn : 'a -> 'b) l =
+  let open List in
+  let rec rev_merge l1 l2 accu =
+    match l1, l2 with
+    | [], l2 -> rev_append l2 accu
+    | l1, [] -> rev_append l1 accu
+    | h1::t1, h2::t2 ->
+      let c = compare h1 h2 in
+      if c = 0 then rev_merge t1 t2 (h1::accu)
+      else if c < 0
+      then rev_merge t1 l2 (h1::accu)
+      else rev_merge l1 t2 (h2::accu)
+  in
+  let rec rev_merge_rev l1 l2 accu =
+    match l1, l2 with
+    | [], l2 -> rev_append l2 accu
+    | l1, [] -> rev_append l1 accu
+    | h1::t1, h2::t2 ->
+      let c = compare h1 h2 in
+      if c = 0 then rev_merge_rev t1 t2 (h1::accu)
+      else if c > 0
+      then rev_merge_rev t1 l2 (h1::accu)
+      else rev_merge_rev l1 t2 (h2::accu)
+  in
+  let rec sort n l =
+    match n, l with
+    | 2, x1 :: x2 :: tl ->
+      let x1 = fn x1 in
+      let x2 = fn x2 in
+      let s =
+        let c = compare x1 x2 in
+        if c = 0 then [x1] else if c < 0 then [x1; x2] else [x2; x1]
+      in
+      (s, tl)
+    | 3, x1 :: x2 :: x3 :: tl ->
+      let x1 = fn x1 in
+      let x2 = fn x2 in
+      let x3 = fn x3 in
+      let s =
+        let c = compare x1 x2 in
+        if c = 0 then
+          let c = compare x2 x3 in
+          if c = 0 then [x2] else if c < 0 then [x2; x3] else [x3; x2]
+        else if c < 0 then
+          let c = compare x2 x3 in
+          if c = 0 then [x1; x2]
+          else if c < 0 then [x1; x2; x3]
+          else
+            let c = compare x1 x3 in
+            if c = 0 then [x1; x2]
+            else if c < 0 then [x1; x3; x2]
+            else [x3; x1; x2]
+        else
+          let c = compare x1 x3 in
+          if c = 0 then [x2; x1]
+          else if c < 0 then [x2; x1; x3]
+          else
+            let c = compare x2 x3 in
+            if c = 0 then [x2; x1]
+            else if c < 0 then [x2; x3; x1]
+            else [x3; x2; x1]
+      in
+      (s, tl)
+    | n, l ->
+      let n1 = n asr 1 in
+      let n2 = n - n1 in
+      let s1, l2 = rev_sort n1 l in
+      let s2, tl = rev_sort n2 l2 in
+      (rev_merge_rev s1 s2 [], tl)
+  and rev_sort n l =
+    match n, l with
+    | 2, x1 :: x2 :: tl ->
+      let x1 = fn x1 in
+      let x2 = fn x2 in
+      let s =
+        let c = compare x1 x2 in
+        if c = 0 then [x1] else if c > 0 then [x1; x2] else [x2; x1]
+      in
+      (s, tl)
+    | 3, x1 :: x2 :: x3 :: tl ->
+      let x1 = fn x1 in
+      let x2 = fn x2 in
+      let x3 = fn x3 in
+      let s =
+        let c = compare x1 x2 in
+        if c = 0 then
+          let c = compare x2 x3 in
+          if c = 0 then [x2] else if c > 0 then [x2; x3] else [x3; x2]
+        else if c > 0 then
+          let c = compare x2 x3 in
+          if c = 0 then [x1; x2]
+          else if c > 0 then [x1; x2; x3]
+          else
+            let c = compare x1 x3 in
+            if c = 0 then [x1; x2]
+            else if c > 0 then [x1; x3; x2]
+            else [x3; x1; x2]
+        else
+          let c = compare x1 x3 in
+          if c = 0 then [x2; x1]
+          else if c > 0 then [x2; x1; x3]
+          else
+            let c = compare x2 x3 in
+            if c = 0 then [x2; x1]
+            else if c > 0 then [x2; x3; x1]
+            else [x3; x2; x1]
+      in
+      (s, tl)
+    | n, l ->
+      let n1 = n asr 1 in
+      let n2 = n - n1 in
+      let s1, l2 = sort n1 l in
+      let s2, tl = sort n2 l2 in
+      (rev_merge s1 s2 [], tl)
+  in
+  let len = length l in
+  if len < 2 then List.map fn l else fst (sort len l)
+
+let list_rev_map_append f l1 l2 =
+  let rec aux acc = function
+    | [] -> acc
+    | hd :: tl -> aux (f hd :: acc) tl
+  in
+  aux l2 l1

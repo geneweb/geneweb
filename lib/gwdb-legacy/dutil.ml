@@ -21,33 +21,29 @@ let p_first_name base p = Mutil.nominative (sou base p.first_name)
 let p_surname base p = Mutil.nominative (sou base p.surname)
 
 let husbands base p =
-  let u = uoi base p.key_index in
-  List.map
-    (fun ifam ->
-       let cpl = coi base ifam in
-       let husband = poi base (Adef.father cpl) in
-       let husband_surname = p_surname base husband in
-       let husband_surnames_aliases =
-         List.map (sou base) husband.surnames_aliases
-       in
-       husband_surname, husband_surnames_aliases)
-    (Array.to_list u.family)
+  Array.map begin fun ifam ->
+    let cpl = coi base ifam in
+    let husband = poi base (Adef.father cpl) in
+    let husband_surname = husband.surname in
+    let husband_surnames_aliases = husband.surnames_aliases in
+    husband_surname, husband_surnames_aliases
+  end (uoi base p.key_index).family
 
 let father_titles_places base p nobtit =
   match (aoi base p.key_index).parents with
-    Some ifam ->
-      let cpl = coi base ifam in
-      let fath = poi base (Adef.father cpl) in
-      List.map (fun t -> sou base t.t_place) (nobtit fath)
+  | Some ifam ->
+    let cpl = coi base ifam in
+    let fath = poi base (Adef.father cpl) in
+    (nobtit fath)
   | None -> []
 
 let dsk_person_misc_names base p nobtit =
-  let sou = sou base in
-  Futil.gen_person_misc_names (sou p.first_name) (sou p.surname)
-    (sou p.public_name) (List.map sou p.qualifiers) (List.map sou p.aliases)
-    (List.map sou p.first_names_aliases) (List.map sou p.surnames_aliases)
-    (List.map (Futil.map_title_strings sou) (nobtit p))
-    (if p.sex = Female then husbands base p else [])
+  Futil.gen_person_misc_names
+    (sou base) 0 1
+    p.first_name p.surname p.public_name p.qualifiers p.aliases
+    p.first_names_aliases p.surnames_aliases
+    (nobtit p)
+    (if p.sex = Female then husbands base p else [||])
     (father_titles_places base p nobtit)
 
 let compare_names base_data s1 s2 =

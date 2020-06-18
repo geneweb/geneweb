@@ -85,40 +85,13 @@ let date_of_last_change base =
   in
   s.Unix.st_mtime
 
-let husbands base (gp : (iper, iper, istr) Def.gen_person) =
-  let p = base.data.unions.get gp.Def.key_index in
-  Array.map begin fun ifam ->
-    let fam = base.data.couples.get ifam in
-    let husband = base.data.persons.get (Adef.father fam) in
-    let husband_surname = Mutil.nominative (sou base husband.surname) in
-    let husband_surnames_aliases =
-      List.map (sou base) husband.surnames_aliases
-    in
-    husband_surname, husband_surnames_aliases
-  end p.family
-
-let father_titles_places base (p : (iper, iper, istr) Def.gen_person) nobtit =
-  match (base.data.ascends.get p.Def.key_index).parents with
-  | Some ifam ->
-    let fam = base.data.couples.get ifam in
-    let fath = base.data.persons.get (Adef.father fam) in
-    List.map (fun t -> sou base t.t_place) (nobtit fath)
-  | None -> []
-
-let gen_gen_person_misc_names base (p : (iper, iper, istr) Def.gen_person) nobtit nobtit_fun =
-  let sou = sou base in
-  Futil.gen_person_misc_names (sou p.Def.first_name) (sou p.Def.surname)
-    (sou p.Def.public_name) (List.map sou p.Def.qualifiers) (List.map sou p.Def.aliases)
-    (List.map sou p.Def.first_names_aliases) (List.map sou p.Def.surnames_aliases)
-    (List.map (Futil.map_title_strings sou) nobtit)
-    (if p.Def.sex = Def.Female then Array.to_list (husbands base p) else [])
-    (father_titles_places base p nobtit_fun)
+let gen_gen_person_misc_names = Dutil.dsk_person_misc_names
 
 let patch_misc_names base ip (p : (iper, iper, istr) Def.gen_person) =
   let p = { p with Def.key_index = ip } in
   List.iter
     (fun s -> base.func.Dbdisk.patch_name s ip)
-    (gen_gen_person_misc_names base p p.Def.titles (fun p -> p.titles))
+    (gen_gen_person_misc_names base p (fun p -> p.Def.titles))
 
 let patch_person base ip (p : (iper, iper, istr) Def.gen_person) =
   base.func.Dbdisk.patch_person ip p ;
