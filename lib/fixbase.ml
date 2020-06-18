@@ -14,6 +14,7 @@ type patch =
   | Fix_MarriageDivorce of ifam
   | Fix_MissingSpouse of ifam * iper
   | Fix_WrongUTF8Encoding of Gwdb.ifam option * Gwdb.iper option * Gwdb.istr * Gwdb.istr
+  | Fix_UpdatedOcc of iper * int * int
 
 let mk_pevent name date place note src =
   { epers_name = name
@@ -357,3 +358,71 @@ let fix_utf8_sequence ?report progress base =
     let p' = Futil.map_person_ps fp (fs None (Some iper)) p in
     if p' <> p then Gwdb.patch_person base iper p' ;
   end (Gwdb.persons base)
+
+let fix_key ?report progress base =
+  let nb_ind = nb_of_persons base in
+  let ipers = Gwdb.ipers base in
+  let skip = Gwdb.iper_marker ipers false in
+  Gwdb.Collection.iteri begin fun i ip ->
+    progress i nb_ind ;
+    let p = poi base ip in
+    let f = Gwdb.p_first_name base p in
+    let s = Gwdb.p_surname base p in
+    if f <> "?" && s <> "?" then begin
+      let key = Name.concat f s in
+      let ipers = Gwdb.persons_of_name base key in
+      let f = Name.lower f in
+      let s = Name.lower s in
+      let list =
+        let rec loop acc = function
+          | ip :: tl ->
+            let p = poi base ip in
+            if Name.lower @@ p_first_name base p = f
+            && Name.lower @@ p_surname base p = s
+            then loop ((get_iper p, get_occ p) :: acc) tl
+            else loop acc tl
+          | [] -> acc
+        in
+        loop [] ipers
+      in
+      let rev_list = List.sort (fun a b -> compare b a) list in
+      let cnt = ref 0 in
+      let mem_occ occ acc list =
+        List.exists (fun (_, o) -> o = occ) acc
+        || List.exists (fun (_, o) -> o = occ) list
+      in
+      let rec new_occ acc list =
+        if mem_occ !cnt acc list then (incr cnt ; new_occ acc list)
+        else !cnt
+      in
+      let rec loop acc list =
+        match acc with
+        | [] -> begin
+            match list with
+            | [] -> failwith key
+            | (ip, occ):: tl ->
+              Gwdb.Marker.set skip ip true ;
+              loop [ (ip, occ) ] tl
+          end
+        | acc ->
+          match list with
+          | [] -> acc
+          | (ip, occ) :: tl ->
+            if not @@ Gwdb.Marker.get skip ip then begin
+              Gwdb.Marker.set skip ip true ;
+              if mem_occ occ acc tl then begin
+                let occ' = new_occ acc list in
+                Gwdb.patch_person base ip
+                  { (Gwdb.gen_person_of_person (poi base ip) ) with occ = occ' } ;
+                begin match report with
+                  | Some fn -> fn (Fix_UpdatedOcc (ip, occ, occ'))
+                  | None -> ()
+                end ;
+                loop ((ip, occ') :: acc) tl
+              end else
+                loop ((ip, occ) :: acc) tl
+            end else loop ((ip, occ) :: acc) tl
+      in
+      ignore @@ loop [] rev_list
+    end
+  end ipers

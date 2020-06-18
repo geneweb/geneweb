@@ -52,6 +52,9 @@ let aux txt (fn : ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> bas
            | None -> assert false)
         (string_of_istr i)
         (string_of_istr i')
+    | Fix_UpdatedOcc (iper, oocc, nocc) ->
+      Printf.sprintf "Uptated occ for %s: %d -> %d"
+        (string_of_p iper) oocc nocc
   in
   let i' = ref 0 in
   if v1 then begin
@@ -105,6 +108,9 @@ let fix_marriage_divorce =
 let fix_utf8_sequence =
   aux "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
 
+let fix_key =
+  aux "Fix duplicate keys" Fixbase.fix_key
+
 let check
     ~dry_run
     ~verbosity
@@ -118,6 +124,7 @@ let check
     ~fevents_witnesses
     ~marriage_divorce
     ~invalid_utf8
+    ~key
     bname =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
@@ -137,6 +144,7 @@ let check
   if !fevents_witnesses then check_fevents_witnesses ~v1 ~v2 base nb_fam fix;
   if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
   if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
+  if !key then fix_key ~v1 ~v2 base nb_ind fix;
   if fast then begin clear_strings_array base ; clear_persons_array base end ;
   if not !dry_run then begin
     if !fix <> 0 then begin
@@ -169,6 +177,7 @@ let pevents_witnesses = ref false
 let fevents_witnesses = ref false
 let marriage_divorce = ref false
 let invalid_utf8 = ref false
+let key = ref false
 let index = ref false
 let dry_run = ref false
 
@@ -185,6 +194,7 @@ let speclist =
   ; ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc")
   ; ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc")
   ; ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc")
+  ; ("-person-key", Arg.Set key, " missing doc")
   ; ("-index", Arg.Set index, " rebuild index. It is automatically enable by any other option.")
   ; ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc")
   ]
@@ -207,6 +217,7 @@ let main () =
   || !marriage_divorce
   || !p_NBDS
   || !invalid_utf8
+  || !key
   || !index
   then ()
   else begin
@@ -219,6 +230,7 @@ let main () =
     marriage_divorce := true ;
     p_NBDS := true ;
     invalid_utf8 := true ;
+    key := true ;
   end ;
   check
     ~dry_run
@@ -233,6 +245,7 @@ let main () =
     ~fevents_witnesses
     ~marriage_divorce
     ~invalid_utf8
+    ~key
     !bname
 
 let _ = main ()
