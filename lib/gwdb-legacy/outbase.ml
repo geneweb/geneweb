@@ -21,30 +21,19 @@ let count_error computed found =
   exit 2
 
 let make_name_index base =
-  let t = Array.make Dutil.table_size [| |] in
-  let add_name key valu =
-    let key = Name.crush (Name.abbrev key) in
-    let i = Hashtbl.hash key mod Array.length t in
-    if Array.mem valu t.(i) then ()
-    else t.(i) <- Array.append [| valu |] t.(i)
-  in
-  let rec add_names ip =
-    function
-      [] -> ()
-    | n :: nl -> add_name n ip; add_names ip nl
-  in
+  let t = Array.make Dutil.table_size [] in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    let first_name = Dutil.p_first_name base p in
-    let surname = Dutil.p_surname base p in
-    if first_name <> "?" && surname <> "?" then
-      let names =
-        Name.lower (first_name ^ " " ^ surname) ::
-        Dutil.dsk_person_misc_names base p (fun p -> p.titles)
-      in
-      add_names p.key_index names
-  done;
-  t
+    if p.first_name <> 1 && p.first_name <> 1
+    then begin
+      List.iter (fun i -> Array.set t i @@ p.key_index :: Array.get t i) @@
+      Mutil.list_map_sort_uniq begin fun key ->
+        Hashtbl.hash (Name.crush (Name.abbrev (Name.lower key))) mod Dutil.table_size
+      end @@
+      Dutil.dsk_person_misc_names base p (fun p -> p.titles)
+    end
+  done ;
+  Array.map Array.of_list t
 
 let create_name_index oc_inx oc_inx_acc base =
   let ni = make_name_index base in
