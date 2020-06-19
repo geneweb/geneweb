@@ -109,6 +109,16 @@ let advanced_search conf base max_answers =
         Hashtbl.add hss x v ;
         v
   in
+  let fn_list =
+    List.map begin fun s ->
+      List.sort_uniq compare @@ List.map Name.lower @@ Name.split_fname s
+    end (getss "first_name")
+  in
+  let sn_list =
+    List.map begin fun s ->
+      List.sort_uniq compare @@ List.map Name.lower @@ Name.split_sname s
+    end (getss "surname")
+  in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
   (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
@@ -247,11 +257,29 @@ let advanced_search conf base max_answers =
     apply_to_field_value
       p "occu" get_occupation string_incl empty_default_value
   in
-  let match_first_name p empty_default_value =
-    apply_to_field_values_raw p "first_name" (p_first_name base) (=) empty_default_value
+  let match_name search_list exact : string list -> bool =
+    let eq : string list -> string list -> bool =
+      if exact
+      then fun x search ->
+        List.sort compare search = List.sort compare x
+      else fun x search ->
+        List.for_all (fun s -> List.mem s x) search
+    in
+    fun x -> List.exists (eq x) search_list
   in
-  let match_surname p empty_default_value =
-    apply_to_field_values_raw p "surname" (p_surname base) (=) empty_default_value
+  let match_first_name =
+    if fn_list = [] then fun _ -> true
+    else
+      let eq = match_name fn_list (gets "exact_first_name" = "on") in
+      fun p ->
+        eq (List.map Name.lower @@ Name.split_fname @@ sou base @@ get_first_name p)
+  in
+  let match_surname =
+    if sn_list = [] then fun _ -> true
+    else
+      let eq = match_name sn_list (gets "exact_surname" = "on") in
+      fun p ->
+        eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
   in
   let match_married p empty_default_value =
     apply_to_field_value_raw p "married"
@@ -301,13 +329,16 @@ let advanced_search conf base max_answers =
         else test_date_place (fun _ -> true)
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
-  let match_civil_status p =
-    match_sex p true && match_first_name p true && match_surname p true &&
-    match_married p true && match_occupation p true
+  let match_civil_status ~skip_fname ~skip_sname p =
+    match_sex p true
+    && (skip_fname || match_first_name p)
+    && (skip_sname || match_surname p)
+    && match_married p true
+    && match_occupation p true
   in
-  let match_person ((list, len) as acc) p search_type =
+  let match_person ?(skip_fname = false) ?(skip_sname = false) ((list, len) as acc) p search_type =
     if search_type <> "OR"
-    then if match_civil_status p
+    then if match_civil_status ~skip_fname ~skip_sname p
          && match_baptism_date p true
          && match_baptism_place p true
          && match_birth_date p true
@@ -320,7 +351,7 @@ let advanced_search conf base max_answers =
       then (p :: list, len +1)
       else acc
     else if
-      match_civil_status p
+      match_civil_status ~skip_fname ~skip_sname p
       && (getss "place" = [] && gets "date2_yyyy" = "" && gets "date1_yyyy" = ""
           || (match_baptism_date p false || match_baptism_place p false)
           && match_baptism_date p true && match_baptism_place p true
@@ -350,30 +381,52 @@ let advanced_search conf base max_answers =
         | None -> acc
       in loop (pget conf base @@ get_iper sosa_ref) ([], 0)
     | None -> [], 0
-  else if gets "first_name" <> "" || getss "surname" <> [] then
-    let (slist, _) =
-      if gets "first_name" <> "" then
-        Some.persons_of_fsname conf base base_strings_of_first_name
-          (spi_find (persons_of_first_name base)) get_first_name
-          (gets "first_name")
-      else
-        let list =
-          List.map
-            (Some.persons_of_fsname conf base base_strings_of_surname
-               (spi_find (persons_of_surname base)) get_surname)
-            (getss "surname")
-        in
-        ( list |> List.map fst |> List.flatten |> List.sort_uniq compare
-        , list |> List.hd |> snd)
+  else if fn_list <> [] || sn_list <> [] then
+    let list_aux strings_of split n_list exact =
+      List.map begin List.map begin fun x ->
+        let eq = match_name n_list exact in
+        let istrs = strings_of base x in
+        List.fold_left begin fun acc istr ->
+          let str = Mutil.nominative (sou base istr) in
+          if eq (List.map Name.lower @@ split str)
+          then istr :: acc
+          else acc
+        end [] istrs
+      end end n_list
+      |> List.flatten
+      |> List.flatten
+      |> List.sort_uniq compare
+      |> List.map (spi_find @@ Gwdb.persons_of_surname base)
+      |> List.flatten
+      |> List.sort_uniq compare
     in
-    let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
+    let skip_fname, skip_sname, list =
+      if sn_list <> [] then
+        ( false
+        , true
+        , list_aux
+            base_strings_of_surname
+            Name.split_sname
+            sn_list
+            (gets "exact_surname" = "on")
+        )
+    else
+        ( true
+        , false
+        , list_aux
+            base_strings_of_first_name
+            Name.split_fname
+            fn_list
+            (gets "exact_first_name" = "on")
+        )
+    in
     let rec loop ((_, len) as acc) = function
       | [] -> acc
       | _ when len > max_answers -> acc
       | ip :: l ->
-        loop (match_person acc (pget conf base ip) search_type) l
+        loop (match_person ~skip_fname ~skip_sname acc (pget conf base ip) search_type) l
     in
-    loop ([], 0) slist
+    loop ([], 0) list
   else
     Gwdb.Collection.fold_until
       (fun (_, len) -> len <= max_answers)
