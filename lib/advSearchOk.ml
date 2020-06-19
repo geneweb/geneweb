@@ -382,7 +382,7 @@ let advanced_search conf base max_answers =
       in loop (pget conf base @@ get_iper sosa_ref) ([], 0)
     | None -> [], 0
   else if fn_list <> [] || sn_list <> [] then
-    let list_aux strings_of split n_list exact =
+    let list_aux strings_of persons_of split n_list exact =
       List.map begin List.map begin fun x ->
         let eq = match_name n_list exact in
         let istrs = strings_of base x in
@@ -396,7 +396,7 @@ let advanced_search conf base max_answers =
       |> List.flatten
       |> List.flatten
       |> List.sort_uniq compare
-      |> List.map (spi_find @@ Gwdb.persons_of_surname base)
+      |> List.map (spi_find @@ persons_of base)
       |> List.flatten
       |> List.sort_uniq compare
     in
@@ -405,7 +405,8 @@ let advanced_search conf base max_answers =
         ( false
         , true
         , list_aux
-            base_strings_of_surname
+            Gwdb.base_strings_of_surname
+            Gwdb.persons_of_surname
             Name.split_sname
             sn_list
             (gets "exact_surname" = "on")
@@ -414,7 +415,8 @@ let advanced_search conf base max_answers =
         ( true
         , false
         , list_aux
-            base_strings_of_first_name
+            Gwdb.base_strings_of_first_name
+            Gwdb.persons_of_first_name
             Name.split_fname
             fn_list
             (gets "exact_first_name" = "on")
