@@ -179,3 +179,47 @@ let strip_lower s = strip (lower s)
 (* crush_lower *)
 
 let crush_lower s = crush (abbrev (lower s))
+
+let concat_aux fn l1 sn l2 =
+  let b = Bytes.create (l1 + l2 + 1) in
+  Bytes.blit_string fn 0 b 0 l1 ;
+  Bytes.blit_string sn 0 b (l1 + 1) l2 ;
+  Bytes.unsafe_set b l1 ' ' ;
+  Bytes.unsafe_to_string b
+
+let concat fn sn =
+  concat_aux fn (String.length fn) sn (String.length sn)
+
+(* Copy/paste from String.split_on_char adapted to our needs *)
+let split_sname_callback fn s =
+  let open String in
+  let j = ref (length s) in
+  for i = length s - 1 downto 0 do
+    if match unsafe_get s i with ' ' | '-' -> true | _ -> false then begin
+      fn (i + 1) (!j - i - 1) ;
+      j := i
+    end
+  done;
+  fn 0 !j
+
+(* Copy/paste from String.split_on_char adapted to our needs *)
+let split_fname_callback fn s =
+  let open String in
+  let j = ref (length s) in
+  for i = length s - 1 downto 0 do
+    if unsafe_get s i = ' ' then begin
+      fn (i + 1) (!j - i - 1) ;
+      j := i
+    end
+  done;
+  fn 0 !j
+
+let split_sname s =
+  let r = ref [] in
+  split_sname_callback (fun i j -> r := String.sub s i j :: !r) s ;
+  !r
+
+let split_fname s =
+  let r = ref [] in
+  split_fname_callback (fun i j -> r := String.sub s i j :: !r) s ;
+  !r

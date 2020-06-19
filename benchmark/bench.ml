@@ -35,6 +35,10 @@ let bench () =
         ]
     ; bench "Name.lower" Name.lower
         [ "étienne" ; "Étienne" ; "ÿvette" ; "Ÿvette" ; "Ĕtienne" ]
+    ; bench "Name.split_fname" Name.split_fname
+        [ "Jean-Baptiste Emmanuel" ; "Jean Baptiste Emmanuel" ]
+    ; bench "Name.split_sname" Name.split_sname
+        [ "Jean-Baptiste Emmanuel" ; "Jean Baptiste Emmanuel" ]
     ]
   in
   match Sys.getenv_opt "BENCH_BASE" with
