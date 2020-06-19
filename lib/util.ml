@@ -40,14 +40,6 @@ let start_with_vowel s =
     | _ -> false
   else false
 
-let start_with_hi_i s =
-  if String.length s > 0 then
-    match Char.lowercase_ascii s.[0] with
-      'i' -> true
-    | 'h' -> String.length s > 1 && s.[1] = 'i'
-    | _ -> false
-  else false
-
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
 let fcapitale (a : ('a, 'b, 'c, 'd) format4) : ('a, 'b, 'c, 'd) format4 =
@@ -86,34 +78,29 @@ let transl_nth conf w n =
   try nth_field (Hashtbl.find conf.lexicon w) n with
     Not_found -> tnf (nth_field w n)
 
-let plus_decl s =
-  match String.rindex_opt s '+' with
-    Some i ->
-      if i > 0 && s.[i-1] = ' ' then
-        let start = String.sub s 0 (i - 1) in
-        let decl = String.sub s (i - 1) (String.length s - (i - 1)) in
-        Some (start, decl)
-      else None
-  | None -> None
-
 let gen_decline_basic wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
-  if String.rindex_opt wt '/' <> None then
-    if String.rindex_opt wt '/' <> None then
-        (* special case for Spanish *)
-        if String.length s > 0 && start_with_hi_i s then
-          nth_field wt 1 ^ Mutil.decline 'n' s
-        else nth_field wt 0 ^ Mutil.decline 'n' s1
-    else wt ^ Mutil.decline 'n' s1
-  else if len >= 3 && wt.[len-3] = ':' && wt.[len-1] = ':' then
+  if len >= 3 && wt.[len-3] = ':' && wt.[len-1] = ':' then
     let start = String.sub wt 0 (len - 3) in
     start ^ Mutil.decline wt.[len-2] s
   else
-    match plus_decl wt with
-      Some (start, " +before") ->
+    match String.rindex_opt s '+' with
+    | Some i ->
+      if i > 0
+      && s.[i-1] = ' '
+      && String.length s - i = 7
+      && String.get s (i + 1) = 'b'
+      && String.get s (i + 2) = 'e'
+      && String.get s (i + 3) = 'f'
+      && String.get s (i + 4) = 'o'
+      && String.get s (i + 5) = 'r'
+      && String.get s (i + 6) = 'e'
+      then
+        let start = String.sub s 0 (i - 1) in
         if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
-    | _ -> wt ^ Mutil.decline 'n' s1
+      else wt ^ Mutil.decline 'n' s1
+    | None -> wt ^ Mutil.decline 'n' s1
 
 let transl_decline conf w s = Translate.eval (gen_decline_basic (transl conf w) s)
 
