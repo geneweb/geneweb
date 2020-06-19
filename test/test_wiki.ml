@@ -1,8 +1,9 @@
 open Geneweb
 open OUnit2
+open NotesLinks
 
 let pp_wiki_link = function
-  | NotesLinks.WLpage (a,b,c,d,e) ->
+  | WLpage (a,b,c,d,e) ->
     "WLpage " ^
     [%show: int * (string list * string) * string * string * string]
       (a,b,c,d,e)
@@ -18,17 +19,17 @@ let pp_wiki_link = function
 
 let suite =
   [ "wikitext" >:::
-    [ "NotesLinks.misc_notes_link" >:: begin fun _ ->
+    [ "misc_notes_link" >:: begin fun _ ->
           let test exp inp =
             let len = String.length inp in
             let rec loop acc i =
               if i = len then List.rev acc
-              else match NotesLinks.misc_notes_link inp i with
-                | NotesLinks.WLpage (j,_,_,_,_)
-                | NotesLinks.WLperson (j, _, _, _)
-                | NotesLinks.WLwizard (j, _, _) as x ->
+              else match misc_notes_link inp i with
+                | WLpage (j,_,_,_,_)
+                | WLperson (j, _, _, _)
+                | WLwizard (j, _, _) as x ->
                   loop (x :: acc) j
-                | NotesLinks.WLnone ->
+                | WLnone ->
                   match acc with
                   | [] ->
                     loop (WLnone :: acc) (i + 1)
@@ -57,6 +58,10 @@ let suite =
             ]
             "[[[aaa/bbb]], [[ccc/ddd]], http://site.com/eee#fff"
         ; test [ WLnone ] "[[[aaa/"
+        ; test [ WLnone ] "[[[]]]"
+        ; test [ WLnone ] "[[[w"
+        ; test [ WLnone ] "[[]]"
+        ; test [ WLnone ] "[[w"
         end
     ]
   ]
