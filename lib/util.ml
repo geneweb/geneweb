@@ -3407,7 +3407,8 @@ let ls_r dirs =
   in
   loop [] dirs
 
-let rm_rf dir =
-  let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
-  List.iter Unix.unlink files ;
-  List.iter Unix.rmdir directories
+let rm_rf f =
+  if Sys.file_exists f then
+    let (directories, files) = ls_r [f] |> List.partition Sys.is_directory in
+    List.iter Unix.unlink files ;
+    List.iter Unix.rmdir directories
