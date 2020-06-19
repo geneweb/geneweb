@@ -328,7 +328,8 @@ type base_data =
 type base_func =
   { person_of_key : string -> string -> int -> int option
   ; persons_of_name : string -> int list
-  ; strings_of_fsname : string -> int list
+  ; strings_of_sname : string -> int list
+  ; strings_of_fname : string -> int list
   ; persons_of_surname : string_person_index
   ; persons_of_first_name : string_person_index
   ; patch_person : int -> dsk_person -> unit
@@ -345,7 +346,7 @@ type base_func =
   ; nb_of_real_persons : unit -> int
   }
 
-type base_version = GnWb0020 | GnWb0021 | GnWb0022
+type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023
 
 type dsk_base = { data : base_data
                 ; func : base_func

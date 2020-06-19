@@ -49,12 +49,18 @@ let move_with_backup src dst =
        strings offsets   : array of binary_ints
 
     names.inx - index for names, strings of first names and surnames
-       offset to 2nd index : binary_int
+       offset to sindex : binary_int
+       offset to findex : binary_int
        1st index (names) : value
          array, length = "table_size", associating:
           - a hash value of a "crushed" (module "Name") name (modulo length)
           - to the array of indexes of the corresponding persons
-       2nd index (first names and surnames strings) : value
+       2nd index (surnames strings) : value
+         array, length = "table_size", associating:
+          - a hash value of the "crushed" (module "Name") first name or
+            surname (modulo length)
+          - to the array of the corresponding string indexes
+       3rd index (surnames strings) : value
          array, length = "table_size", associating:
           - a hash value of the "crushed" (module "Name") first name or
             surname (modulo length)
@@ -64,8 +70,6 @@ let move_with_backup src dst =
 
     strings.inx - index for strings, surnames, first names
        length of the strings offset array : binary_int
-       offset of surnames index           : binary_int
-       offset of first names index        : binary_int
        strings hash table index           : 2 arrays of binary_ints
          strings offset array (length = prime after 10 * strings array length)
            - associating a hash value of the string modulo length
@@ -73,20 +77,6 @@ let move_with_backup src dst =
          strings list array (length = string array length)
            - associating a string index
            - to the index of the next index holding the same hash value
-       -- the following table has been obsolete since version 4.10
-       -- it has been replaced by snames.inx/sname.dat which use
-       -- much less memory
-       surnames index                     : value
-         binary tree
-          - associating the string index of a surname
-          - to the corresponding list of persons holding this surname
-       -- the following table has been obsolete since version 4.10
-       -- it has been replaced by fnames.inx/fname.dat which use
-       -- much less memory
-       first_names index                  : value
-         binary tree
-          - associating the string index of a first name
-          - to the corresponding list of persons holding this first name
 
     snames.inx - index for surnames
        binary tree
@@ -331,10 +321,12 @@ let new_persons_of_first_name_or_surname base_data params =
         let ipera = read_loop [] len in close_in ic_dat; ipera
       with Not_found -> []
     in
+    let patched = Hashtbl.fold (fun i _ acc -> i :: acc) person_patches [] in
+    let ipera = List.filter (fun i -> not @@ List.mem i patched) ipera in
     Hashtbl.fold begin fun i p acc ->
       let istr1 = proj p in
       if istr1 = istr then if List.mem i acc then acc else i :: acc
-      else if List.mem i acc then Mutil.list_except i acc else acc
+      else acc
     end person_patches ipera
   in
   let cursor str =
@@ -386,7 +378,7 @@ let new_persons_of_first_name_or_surname base_data params =
   { find ; cursor ; next }
 
 let persons_of_first_name_or_surname = function
-  | GnWb0022 | GnWb0021 -> new_persons_of_first_name_or_surname
+  | GnWb0023 | GnWb0022 | GnWb0021 -> new_persons_of_first_name_or_surname
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
 (* Search index for a given name in file names.inx *)
@@ -394,12 +386,10 @@ let persons_of_first_name_or_surname = function
 let persons_of_name bname patches =
   let t = ref None in
   fun s ->
-    let s = Name.crush_lower s in
-    let i = Hashtbl.hash s in
+    let i = Dutil.name_index s in
     let ai =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
-        let i = i mod Dutil.table_size in
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
@@ -430,15 +420,13 @@ let persons_of_name bname patches =
       end (Array.to_list ai) patches
     | None -> Array.to_list ai
 
-let strings_of_fsname bname strings (_, person_patches) =
+let old_strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
   fun s ->
-    let s = Name.crush_lower s in
-    let i = Hashtbl.hash s in
+    let i = Dutil.name_index s in
     let r =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
-        let i = i mod Dutil.table_size in
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then
           let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
@@ -462,21 +450,77 @@ let strings_of_fsname bname strings (_, person_patches) =
       in
       close_in ic_inx; ai
     in
-    let l = ref (Array.to_list r) in
-    Hashtbl.iter
-      (fun _ p ->
-         if not (List.mem p.first_name !l) then
-           begin let s1 = strings.get p.first_name in
-             let s1 = Mutil.nominative s1 in
-             if s = Name.crush_lower s1 then l := p.first_name :: !l
-           end;
-         if not (List.mem p.surname !l) then
-           let s1 = strings.get p.surname in
-           let s1 = Mutil.nominative s1 in
-           if s = Name.crush_lower s1 then l := p.surname :: !l)
-      person_patches;
-    !l
+    Hashtbl.fold begin fun _ p acc ->
+      let aux split acc istr =
+        if not (List.mem istr acc)
+        && strings.get istr
+           |> split
+           |> List.exists (fun s -> i = Dutil.name_index s)
+        then istr :: acc
+        else acc
+      in
+      let acc = aux Name.split_fname acc p.first_name in
+      let acc = aux Name.split_sname acc p.surname in
+      acc
+    end person_patches (Array.to_list r)
 (**)
+
+
+(** offset: 1 pour sname 2 pour fname *)
+let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings (_, person_patches) =
+  let t = ref None in
+  fun s ->
+    let i = Dutil.name_index s in
+    let r =
+      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
+      let ai =
+        let fname_inx_acc = Filename.concat bname "names.acc" in
+        if Sys.file_exists fname_inx_acc then
+          let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
+          seek_in ic_inx_acc (Iovalue.sizeof_long * (offset_acc * Dutil.table_size + i));
+          let pos = input_binary_int ic_inx_acc in
+          close_in ic_inx_acc;
+          seek_in ic_inx pos;
+          (Iovalue.input ic_inx : int array)
+        else
+          let a =
+            match !t with
+            | Some a -> a
+            | None ->
+              seek_in ic_inx offset_inx ;
+              let pos = input_binary_int ic_inx in
+              seek_in ic_inx pos;
+              let a : Dutil.strings_of_fsname = input_value ic_inx in
+              t := Some a;
+              a
+          in
+          a.(i)
+      in
+      close_in ic_inx; ai
+    in
+    Hashtbl.fold begin fun _ p acc ->
+      let istr = get p in
+      if not (List.mem istr acc)
+      && strings.get istr
+         |> split
+         |> List.exists (fun s -> i = Dutil.name_index s)
+      then istr :: acc
+      else acc
+    end person_patches (Array.to_list r)
+
+let new_strings_of_sname =
+  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.surname)
+
+let new_strings_of_fname =
+  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
+
+let strings_of_sname = function
+  | GnWb0023 -> new_strings_of_sname
+  | _ -> old_strings_of_fsname
+
+let strings_of_fname = function
+  | GnWb0023 -> new_strings_of_fname
+  | _ -> old_strings_of_fsname
 
 (* Restrict file *)
 
@@ -738,7 +782,8 @@ let opendb bname =
   in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
   let version =
-    if Mutil.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
+    if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
+    else if Mutil.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
     else if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
     else if Mutil.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
     else if really_input_string ic 4 = "GnWb"
@@ -772,7 +817,7 @@ let opendb bname =
   in
   let ic2_string_start_pos =
     match version with
-    | GnWb0022 -> Dutil.int_size
+    | GnWb0023 | GnWb0022 -> Dutil.int_size
     | GnWb0021 | GnWb0020 -> 3 * Dutil.int_size
   in
   let ic2_string_hash_len =
@@ -980,8 +1025,7 @@ let opendb bname =
   in
   let patch_name s ip =
     (* FIXME: pending patches? *)
-    let s = Name.crush_lower s in
-    let i = Hashtbl.hash s in
+    let i = Dutil.name_index s in
     try
       let ipl = Hashtbl.find patches.h_name i in
       if List.mem ip ipl then ()
@@ -1067,7 +1111,8 @@ let opendb bname =
   let base_func =
     { person_of_key = person_of_key persons strings persons_of_name
     ; persons_of_name = persons_of_name
-    ; strings_of_fsname = strings_of_fsname bname strings patches.h_person
+    ; strings_of_sname = strings_of_sname version bname strings patches.h_person
+    ; strings_of_fname = strings_of_fname version bname strings patches.h_person
     ; persons_of_surname =
         persons_of_first_name_or_surname version
           base_data
@@ -1127,7 +1172,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
   let func : Dbdisk.base_func =
     { person_of_key = (fun _ -> assert false)
     ; persons_of_name = (fun _ -> assert false)
-    ; strings_of_fsname = (fun _ -> assert false)
+    ; strings_of_sname = (fun _ -> assert false)
+    ; strings_of_fname = (fun _ -> assert false)
     ; persons_of_surname =
        { find = (fun _ -> assert false)
        ; cursor = (fun _ -> assert false)
@@ -1152,4 +1198,4 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; nb_of_real_persons = (fun _ -> assert false)
     }
   in
-  { data ; func ; version = GnWb0021 }
+  { data ; func ; version = GnWb0023 }

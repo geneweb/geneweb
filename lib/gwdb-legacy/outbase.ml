@@ -20,6 +20,15 @@ let count_error computed found =
   flush stderr;
   exit 2
 
+let output_index_aux oc_inx oc_inx_acc ni =
+  let bpos = pos_out oc_inx in
+  Dutil.output_value_no_sharing oc_inx ni ;
+  let epos =
+    Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
+      bpos
+  in
+  if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+
 let make_name_index base =
   let t = Array.make Dutil.table_size [] in
   for i = 0 to base.data.persons.len - 1 do
@@ -27,53 +36,56 @@ let make_name_index base =
     if p.first_name <> 1 && p.first_name <> 1
     then begin
       List.iter (fun i -> Array.set t i @@ p.key_index :: Array.get t i) @@
-      Mutil.list_map_sort_uniq begin fun key ->
-        Hashtbl.hash (Name.crush (Name.abbrev (Name.lower key))) mod Dutil.table_size
-      end @@
+      Mutil.list_map_sort_uniq Dutil.name_index @@
       Dutil.dsk_person_misc_names base p (fun p -> p.titles)
     end
   done ;
   Array.map Array.of_list t
 
 let create_name_index oc_inx oc_inx_acc base =
-  let ni = make_name_index base in
-  let bpos = pos_out oc_inx in
-  Dutil.output_value_no_sharing oc_inx (ni : Dutil.name_index_data);
-  let epos =
-    Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
-      bpos
+  output_index_aux oc_inx oc_inx_acc (make_name_index base)
+
+module StringSet = Set.Make (String)
+module IntSet = Set.Make (struct type t = int let compare = compare end)
+
+let make_strings_of_fsname_aux split get base =
+  let t = Array.make Dutil.table_size IntSet.empty in
+  let add_name (key : string) (value : int) =
+    let key = Dutil.name_index key in
+    let set = Array.get t key in
+    let set' = IntSet.add value set in
+    if set == set' then ()
+    else Array.set t key set'
   in
-  if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
-
-let add_name t key valu =
-  let key = Name.crush_lower key in
-  let i = Hashtbl.hash key mod Array.length t in
-  if Array.mem valu t.(i) then () else t.(i) <- Array.append [| valu |] t.(i)
-
-let make_strings_of_fsname base =
-  let t = Array.make Dutil.table_size [| |] in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base i in
-    let first_name = Dutil.p_first_name base p in
-    let surname = Dutil.p_surname base p in
-    if first_name <> "?" then add_name t first_name p.first_name;
-    if surname <> "?" then
-      begin
-        add_name t surname p.surname;
-        List.iter (fun sp -> add_name t sp p.surname)
-          (Mutil.surnames_pieces surname)
+    let aux istr =
+      if istr <> 1 then begin
+        let s = base.data.strings.get istr in
+        add_name s istr ;
+        split (fun i j -> add_name (String.sub s i j) istr) s
       end
-  done;
-  t
+    in
+    aux (get p)
+  done ;
+  Array.map begin fun set ->
+    let a = Array.make (IntSet.cardinal set) 0 in
+    let i = ref 0 in
+    IntSet.iter (fun e -> Array.set a !i e ; incr i) set ;
+    a
+  end t
 
-let create_strings_of_fsname oc_inx oc_inx_acc base =
-  let t = make_strings_of_fsname base in
-  let bpos = pos_out oc_inx in
-  Dutil.output_value_no_sharing oc_inx (t : Dutil.strings_of_fsname);
-  let epos =
-    Iovalue.output_array_access oc_inx_acc (Array.get t) (Array.length t) bpos
-  in
-  if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+let make_strings_of_fname =
+  make_strings_of_fsname_aux Name.split_fname_callback (fun p -> p.first_name)
+
+let make_strings_of_sname =
+  make_strings_of_fsname_aux Name.split_sname_callback (fun p -> p.surname)
+
+let create_strings_of_sname oc_inx oc_inx_acc base =
+  output_index_aux oc_inx oc_inx_acc (make_strings_of_sname base)
+
+let create_strings_of_fname oc_inx oc_inx_acc base =
+  output_index_aux oc_inx oc_inx_acc (make_strings_of_fname base)
 
 let is_prime a =
   let rec loop b =
@@ -83,7 +95,8 @@ let is_prime a =
 
 let rec prime_after n = if is_prime n then n else prime_after (n + 1)
 
-let output_strings_hash oc2 base =
+let output_strings_hash tmp_strings_inx base =
+  let oc = Secure.open_out_bin tmp_strings_inx in
   let () = base.data.strings.load_array () in
   let strings_array = base.data.strings in
   let taba =
@@ -97,13 +110,15 @@ let output_strings_hash oc2 base =
     let ia = Hashtbl.hash (base.data.strings.get i) mod Array.length taba in
     tabl.(i) <- taba.(ia); taba.(ia) <- i
   done;
-  output_binary_int oc2 (Array.length taba);
-  output_binary_int oc2 0;
-  output_binary_int oc2 0;
-  for i = 0 to Array.length taba - 1 do output_binary_int oc2 taba.(i) done;
-  for i = 0 to Array.length tabl - 1 do output_binary_int oc2 tabl.(i) done
+  output_binary_int oc (Array.length taba);
+  for i = 0 to Array.length taba - 1 do output_binary_int oc taba.(i) done;
+  for i = 0 to Array.length tabl - 1 do output_binary_int oc tabl.(i) done;
+  close_out oc
 
-let output_name_index_aux get _oc base names_inx names_dat =
+(* Associate istr to persons.
+   A person is associated with its first name/surname and aliases
+*)
+let output_name_index_aux get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
@@ -129,11 +144,11 @@ let output_name_index_aux get _oc base names_inx names_dat =
   Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array) ;
   close_out oc_n_inx
 
-let output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
-  output_name_index_aux (fun p -> p.surname) oc2 base tmp_snames_inx tmp_snames_dat
+let output_surname_index base tmp_snames_inx tmp_snames_dat =
+  output_name_index_aux (fun p -> p.surname) base tmp_snames_inx tmp_snames_dat
 
-let output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
-  output_name_index_aux (fun p -> p.first_name) oc2 base tmp_fnames_inx tmp_fnames_dat
+let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
+  output_name_index_aux (fun p -> p.first_name) base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =
   let oc = open_out fname in
@@ -173,7 +188,7 @@ let output base =
     if epos <> pos_out oc then count_error epos (pos_out oc)
   in
   begin try
-      output_string oc Dutil.magic_GnWb0021;
+      output_string oc Dutil.magic_GnWb0023;
       output_binary_int oc base.data.persons.len;
       output_binary_int oc base.data.families.len;
       output_binary_int oc base.data.strings.len;
@@ -212,45 +227,46 @@ let output base =
       base.data.descends.clear_array ();
       close_out oc;
       close_out oc_acc;
-      begin let oc_inx = Secure.open_out_bin tmp_names_inx in
+      begin
+        let oc_inx = Secure.open_out_bin tmp_names_inx in
         let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
-        let oc2 = Secure.open_out_bin tmp_strings_inx in
         try
           trace "create name index";
-          output_binary_int oc_inx 0;
+          output_binary_int oc_inx 0; (* room for sname index *)
+          output_binary_int oc_inx 0; (* room for fname index *)
           create_name_index oc_inx oc_inx_acc base;
           base.data.ascends.clear_array ();
           base.data.unions.clear_array ();
           base.data.couples.clear_array ();
           if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let surname_or_first_name_pos = pos_out oc_inx in
-          trace "create strings of fsname";
-          create_strings_of_fsname oc_inx oc_inx_acc base;
-          seek_out oc_inx 0;
-          output_binary_int oc_inx surname_or_first_name_pos;
+          let surname_pos = pos_out oc_inx in
+          trace "create strings of sname";
+          create_strings_of_sname oc_inx oc_inx_acc base;
+          let first_name_pos = pos_out oc_inx in
+          trace "create strings of fname";
+          create_strings_of_fname oc_inx oc_inx_acc base;
+          seek_out oc_inx 0; (* sname index *)
+          output_binary_int oc_inx surname_pos;
+          seek_out oc_inx 1; (* fname index *)
+          output_binary_int oc_inx first_name_pos;
           close_out oc_inx;
           close_out oc_inx_acc;
           if !save_mem then begin trace "compacting"; Gc.compact () end;
+          Gc.compact () ;
           trace "create string index";
-          output_strings_hash oc2 base;
+          output_strings_hash tmp_strings_inx base;
           if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let surname_pos = pos_out oc2 in
           trace "create surname index";
-          output_surname_index oc2 base tmp_snames_inx tmp_snames_dat;
+          output_surname_index base tmp_snames_inx tmp_snames_dat;
           if !save_mem then begin trace "compacting"; Gc.compact () end;
-          let first_name_pos = pos_out oc2 in
           trace "create first name index";
-          output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat;
-          seek_out oc2 Dutil.int_size;
-          output_binary_int oc2 surname_pos;
-          output_binary_int oc2 first_name_pos;
+          output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
           let s = base.data.bnotes.Def.nread "" Def.RnAll in
           if s = "" then ()
           else
             begin let oc_not = Secure.open_out tmp_notes in
               output_string oc_not s; close_out oc_not
             end;
-          close_out oc2;
           List.iter
             (fun f ->
                let s = base.data.bnotes.Def.nread f Def.RnAll in
@@ -262,7 +278,6 @@ let output base =
         with e ->
           (try close_out oc_inx with _ -> ());
           (try close_out oc_inx_acc with _ -> ());
-          (try close_out oc2 with _ -> ());
           raise e
       end;
       trace "ok" ;
