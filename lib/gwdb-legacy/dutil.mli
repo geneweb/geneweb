@@ -8,6 +8,7 @@ type strings_of_fsname = int array array
 val magic_GnWb0020 : string
 val magic_GnWb0021 : string
 val magic_GnWb0022 : string
+val magic_GnWb0023 : string
 val table_size : int
 
 val compare_istr_fun : Dbdisk.base_data -> int -> int -> int
@@ -32,3 +33,9 @@ module IntHT : sig
       let hash x = x
     end)
 end
+
+(** [name_index s]
+    Compute the index of crush_lowered version of s
+    in an array of size {!val:table_size}.
+*)
+val name_index : string -> int

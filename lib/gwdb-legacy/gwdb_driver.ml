@@ -32,8 +32,6 @@ let spi_next (spi : string_person_index) istr = spi.next istr
 
 type base = dsk_base
 
-let base_strings_of_first_name_or_surname base s = base.func.strings_of_fsname s
-
 let open_base bname : base = Database.opendb bname
 
 let close_base base = base.func.cleanup ()
@@ -58,8 +56,8 @@ let persons_of_first_name base = base.func.Dbdisk.persons_of_first_name
 let persons_of_surname base = base.func.Dbdisk.persons_of_surname
 
 let base_particles base = base.data.particles
-let base_strings_of_first_name = base_strings_of_first_name_or_surname
-let base_strings_of_surname = base_strings_of_first_name_or_surname
+let base_strings_of_first_name base s = base.func.strings_of_fname s
+let base_strings_of_surname base s = base.func.strings_of_sname s
 
 let load_ascends_array base = base.data.ascends.load_array ()
 let load_unions_array base = base.data.unions.load_array ()

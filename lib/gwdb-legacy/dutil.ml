@@ -9,6 +9,7 @@ type strings_of_fsname = int array array
 let magic_GnWb0020 = "GnWb0020"
 let magic_GnWb0021 = "GnWb0021"
 let magic_GnWb0022 = "GnWb0022"
+let magic_GnWb0023 = "GnWb0023"
 let table_size = 0x3fff
 
 let poi base i = base.data.persons.get i
@@ -73,3 +74,5 @@ module IntHT = Hashtbl.Make (struct
     let equal = (=)
     let hash x = x
   end)
+
+let name_index s = Hashtbl.hash (Name.crush_lower s) mod table_size
