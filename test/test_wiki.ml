@@ -6,15 +6,15 @@ let pp_wiki_link = function
     "WLpage " ^
     [%show: int * (string list * string) * string * string * string]
       (a,b,c,d,e)
-  | WLperson (a,b,c,d) ->
+  | NotesLinks.WLperson (a,b,c,d) ->
     "WLperson" ^
     [%show: int * (string * string * int) * string * string option]
       (a,Obj.magic b,c,d)
-  | WLwizard (a,b,c) ->
+  | NotesLinks.WLwizard (a,b,c) ->
     "WLwizard" ^
     [%show: int * string * string]
       (a,b,c)
-  | WLnone -> "WLnone"
+  | NotesLinks.WLnone -> "WLnone"
 
 let suite =
   [ "wikitext" >:::
@@ -57,6 +57,10 @@ let suite =
             ]
             "[[[aaa/bbb]], [[ccc/ddd]], http://site.com/eee#fff"
         ; test [ WLnone ] "[[[aaa/"
+        ; test [ WLnone ] "[[[]]]"
+        ; test [ WLnone ] "[[[w"
+        ; test [ WLnone ] "[[]]"
+        ; test [ WLnone ] "[[w"
         end
     ]
   ]
