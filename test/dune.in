@@ -8,7 +8,15 @@
 (executable
   (name test)
   (libraries %%%WSERVER_PKG%%% %%%SOSA_PKG%%% dummy_gwdb geneweb oUnit stdlib-shims)
-  (modules test test_place test_sosa test_utils)
+  (preprocess (pps ppx_deriving.show))
+  (modules
+    test
+    test_place
+    test_sosa
+    test_utils
+    test_utils
+    test_wiki
+    )
 )
 
 (alias (name runtest) (action (run ./test.exe) ) )
