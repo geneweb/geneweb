@@ -63,7 +63,7 @@ let header_without_http conf title =
   Templ.include_hed_trl conf "hed";
   Wserver.printf "\n</head>\n";
   let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
+    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
       Not_found -> ""
   in
   let s = s ^ Util.body_prop conf in

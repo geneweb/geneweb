@@ -89,7 +89,7 @@
 <form name="upd" method="post" action="%action;">
 <div id="jq" style="display:none"> </div>
 <p style="display:none;">
-  <span id=dmy>[ !dates order]0</span>
+  <span id=dmy>[!dates order]0</span>
   %hidden;
   %include;upd_datalist
   <input type="hidden" name="digest" value="%digest;"%/>

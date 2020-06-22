@@ -249,7 +249,7 @@ let translate_dmy conf (fst, snd, trd) cal short =
         if y1 >= 1 && y1 < 4000 then Mutil.roman_of_arabian y1 else y
     | _ -> y
   in
-  match transl conf " !dates order" with
+  match transl conf "!dates order" with
     "yymmdd" | "yyyymmdd" -> translate_year fst, translate_month snd, trd
   | "mmddyyyy" -> translate_month fst, snd, translate_year trd
   | _ -> fst, translate_month snd, translate_year trd
@@ -269,7 +269,7 @@ let translate_dmy conf (fst, snd, trd) cal short =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let decode_dmy conf d =
-  match transl conf " !dates order" with
+  match transl conf "!dates order" with
     "dmyyyy" ->
       string_of_int d.day, string_of_int d.month, string_of_int d.year
   | "mmddyyyy" ->

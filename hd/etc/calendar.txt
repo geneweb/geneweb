@@ -67,11 +67,11 @@
 %end;
 
 %define;calendar(ccc, nnn, vvv, lll, fun_yyy)
-  %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+  %if;([!dates order] = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
     %apply;fun_day("ccc", "nnn")
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_yyy("ccc", "nnn")
-  %elseif;([ !dates order] = "mmddyyyy")
+  %elseif;([!dates order] = "mmddyyyy")
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_day("ccc", "nnn")
     %apply;fun_yyy("ccc", "nnn")
@@ -101,11 +101,11 @@
           <thead>
             <tr>
               <th class="py-2">&nbsp;</th>
-            %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+            %if;([!dates order] = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
               <th class="text-center" colspan="3">[*year/month/day]2</th>
               <th class="text-center" colspan="3">[*year/month/day]1</th>
               <th class="text-center" colspan="3">[*year/month/day]0</th>
-            %elseif;([ !dates order] = "mmddyyyy")
+            %elseif;([!dates order] = "mmddyyyy")
               <th class="text-center" colspan="3">[*year/month/day]1</th>
               <th class="text-center" colspan="3">[*year/month/day]2</th>
               <th class="text-center" colspan="3">[*year/month/day]0</th>
