@@ -36,9 +36,9 @@
 %in;
 %let;ak7;  (X) [delete::]
 %in;
-%let;lta;%if;([ !dates order]0 = "ddmmyyyy")
+%let;lta;%if;([!dates order]0 = "ddmmyyyy")
            [year/month/day]2 [year/month/day]1 [year/month/day]0
-         %elseif;([ !dates order]0 = "mmddyyyy")
+         %elseif;([!dates order]0 = "mmddyyyy")
            [year/month/day]1 [year/month/day]2 [year/month/day]0
          %else;
            [year/month/day]0 [year/month/day]1 [year/month/day]2
@@ -67,7 +67,7 @@
 %let;l_on6; list="dlsrc"%if;(bvar.datalist_src = 2) onkeyup="ldl(this,'src',event)"%end;%in;
 %let;l_on7; list="dlsn"%if;(bvar.datalist_sn = 2) onkeyup="tUC(this);ldl(this,'sn',event)"%end;%in;
 %let;l_on8; list="dlfn"%if;(bvar.datalist_fn = 2) onkeyup="tUC1(this);ldl(this,'fn',event)"%end;%in;
-%let;ldmy;%if;([ !dates order]0 = "ddmmyyyy")dd%elseif;([ !dates order]0 = "mmddyyyy")mm%else;yy%end;%in;
+%let;ldmy;%if;([!dates order]0 = "ddmmyyyy")dd%elseif;([!dates order]0 = "mmddyyyy")mm%else;yy%end;%in;
 %define;date(z1,z2,z3,z4)
   %let;l_dd;%if;(z2.day != "" and z2.day < 10)0%end;%z2.day;%in;
   %let;l_mm;%if;(z2.month != "" and z2.month < 10)0%end;%z2.month;%in;

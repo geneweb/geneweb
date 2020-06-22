@@ -1122,7 +1122,7 @@ let eval_string_expr conf (eval_var, eval_apply) e =
 
 let print_body_prop conf =
   let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
+    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
       Not_found -> ""
   in
   Wserver.printf "%s" (s ^ Util.body_prop conf)
@@ -1380,7 +1380,7 @@ let rec interp_ast conf ifun env =
             let astl = parse_templ conf (Stream.of_string s) in
             String.concat "" (eval_ast_list env ep astl)
         | "language_name", [VVstring s] ->
-            Translate.language_name s (Util.transl conf " !languages")
+            Translate.language_name s (Util.transl conf "!languages")
         | "nth", [VVstring s1; VVstring s2] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             Util.translate_eval (Util.nth_field s1 n)

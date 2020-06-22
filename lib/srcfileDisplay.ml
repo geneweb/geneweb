@@ -161,7 +161,7 @@ let macro conf base =
       end
   | 'b' ->
       let s =
-        try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
+        try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
           Not_found -> ""
       in
       s ^ body_prop conf
@@ -360,7 +360,7 @@ let rec copy_from_stream conf base strm mode =
                 in
                 loop 0
               in
-              let lang_def = transl conf " !languages" in
+              let lang_def = transl conf "!languages" in
               Wserver.printf "%s" (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =

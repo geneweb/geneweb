@@ -18,9 +18,9 @@
 %let;ol1;%if;(wikiplace != ",,,,")wikiPlace('wikiplace','%lang;','%wikiplace');%end;%in;
 
 %define;date(xx)
-  %if;([ !dates order]0 = "ddmmyyyy")
+  %if;([!dates order]0 = "ddmmyyyy")
     <input name="xx_dd" %ltd;%/><input name="xx_mm" %ltm;%/><input id="xx_yyyy" name="xx_yyyy" %lty;%/>
-  %elseif;([ !dates order]0 = "mmddyyyy")
+  %elseif;([!dates order]0 = "mmddyyyy")
     <input name="xx_mm" %ltm;%/><input name="xx_dd" %ltd;%/><input id="xx_yyyy" name="xx_yyyy" %lty;%/>
   %else;
     <input id="xx_yyyy" name="xx_yyyy" %lty;%/></label><input name="xx_mm" %ltm;%/></label><input name="xx_dd" %ltd;%/>
