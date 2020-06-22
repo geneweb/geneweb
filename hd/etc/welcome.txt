@@ -18,7 +18,7 @@
   [<em>Sosa number</em> relative to %t:::xx]
 %end;
 %define;display_sosa_ref(xx)
-  [*Sosa reference: %t:::xx]
+  [*sosa reference: %t:::xx]
 %end;
 %define;get_visitor_access_msg(lg)
   %if;(bvar.visitor_access_msg_lg!="")
@@ -123,6 +123,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
   %end;
 
   %if;(bvar.visitor_access!="no" or wizard or friend)
+    <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
+      %if;(browsing_with_sosa_ref)<h4>%apply;display_sosa_ref%with;%sosa_ref;%end;</h4>%end;
+    </div>
     <div class="row justify-content-center mt-3 mt-md-4 mt-lg-5">
       <div class="col-lg-7 ml-lg-4 ml-xl-5 h4">
         <i class="fa fa-search fa-sm fa-fw mr-1 text-secondary"></i>[*search/case sensitive]0</div>

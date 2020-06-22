@@ -1,4 +1,7 @@
 <!-- $Id: home.txt,v7.00-exp 10/01/2018 20:11:37 $ -->
+%define;display_sosa_ref(xx)
+  [*sosa reference: %t:::xx]
+%end;
 %if;(not cancel_links)
   <div class="float-left">
     <div class="d-flex mt-2 fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
@@ -28,13 +31,16 @@
             <div class="d-flex justify-content-center">
               <h5 class="rounded modal-title my-2 text-center w-50 align-self-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h5>
               <div class="col-8">
+                %if;(browsing_with_sosa_ref)
+                  <h5>%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
+                %end;
                 <label class="sr-only" for="n">Search public name</label>
-                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]"
+                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
                   autofocus>
                 <label class="sr-only" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg mt-2" name="p" placeholder="[*first name/first names]0">
               </div>
-              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-search fa-lg mx-2"></i> [*search/case sensitive]0</button>
+              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-search fa-lg mx-2"></i> [*search/case sensitive]0</button>
             </div>
           </form>
         </div>

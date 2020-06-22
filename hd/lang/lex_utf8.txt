@@ -12852,7 +12852,7 @@ sk: Sosa
 sl: številka Sosa
 sv: annummer
 
-    Sosa reference: %t
+    sosa reference: %t
 af: Sosa verwysing: %t
 ca: referència de "número Sosa": %t
 co: referenza Sosa : %t
