@@ -727,7 +727,6 @@
           %foreach;child.family;
             <br>
             └ %apply;detail_wedding()%sp;
-            %apply;image_MF("spouse")
             %apply;short_display_person("spouse")
             %if;(nb_children!=0)<div class="float-right">%nb_children;</div>%end;
           %end;
