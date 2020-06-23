@@ -12,6 +12,7 @@ type patch =
   | Fix_AddedRelatedFromFevent of iper * iper
   | Fix_MarriageDivorce of ifam
   | Fix_MissingSpouse of ifam * iper
+  | Fix_WrongUTF8Encoding of Gwdb.ifam option * Gwdb.iper option * Gwdb.istr * Gwdb.istr
 
 let mk_pevent name date place note src =
   { epers_name = name
@@ -316,3 +317,48 @@ let fix_missing_spouses ?report progress base =
     aux @@ get_father fam ;
     aux @@ get_mother fam ;
   end (Gwdb.families base)
+
+let fix_utf8_sequence ?report progress base =
+  let normalize_utf_8 ifam iper i =
+    let s = Gwdb.sou base i in
+    let b = Buffer.create (String.length s * 3) in
+    let n = Uunf.create `NFC in
+    let rec add v = match Uunf.add n v with
+      | `Uchar u -> Uutf.Buffer.add_utf_8 b u; add `Await
+      | `Await | `End -> ()
+    in
+    let add_uchar _ _ = function
+      | `Malformed _ -> add (`Uchar Uutf.u_rep)
+      | `Uchar _ as u -> add u
+    in
+    Uutf.String.fold_utf_8 add_uchar () s ;
+    add `End ;
+    let s' = Buffer.contents b in
+    let i' = Gwdb.insert_string base s' in
+    if i <> i'
+    then begin match report with
+      | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, i, i'))
+      | None -> ()
+    end ;
+    i'
+  in
+  let nbf = nb_of_families base in
+  let nbp = nb_of_persons base in
+  let nb = nbp + nbf in
+  let fp i = i in
+  let ff i = i in
+  let fs ifam iper i = normalize_utf_8 ifam iper i in
+  Gwdb.Collection.iteri begin fun i fam ->
+    progress i nb ;
+    let ifam = Gwdb.get_ifam fam in
+    let f = Gwdb.gen_family_of_family fam in
+    let f' = Futil.map_family_ps fp ff (fs (Some ifam) None) f in
+    if f' <> f then Gwdb.patch_family base ifam f' ;
+  end (Gwdb.families base) ;
+  Gwdb.Collection.iteri begin fun i per ->
+    progress (nbf + i) nb ;
+    let iper = Gwdb.get_iper per in
+    let p = Gwdb.gen_person_of_person per in
+    let p' = Futil.map_person_ps fp (fs None (Some iper)) p in
+    if p' <> p then Gwdb.patch_person base iper p' ;
+  end (Gwdb.persons base)
