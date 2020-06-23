@@ -59,10 +59,14 @@
                         <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-times fa-lg mx-1"></i></button>
                       </div>
                     </div>
-                    %apply;input_hidden("first_name_key_val","p")
-                    %apply;input_hidden("surname_key_val","n")
-                    %if;(occ!=0)
-                      %apply;input_hidden("occ","oc")
+                    %if;(evar.i="")
+                      %apply;input_hidden("first_name_key_val","p")
+                      %apply;input_hidden("surname_key_val","n")
+                      %if;(occ!=0)
+                        %apply;input_hidden("occ","oc")
+                      %end;
+                    %else;
+                      %apply;input_hidden("evar.i","i")
                     %end;
                     %apply;input_hidden("evar.v","v")
                     %apply;input_hidden("evar.image","image")
