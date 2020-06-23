@@ -321,19 +321,7 @@ let fix_missing_spouses ?report progress base =
 let fix_utf8_sequence ?report progress base =
   let normalize_utf_8 ifam iper i =
     let s = Gwdb.sou base i in
-    let b = Buffer.create (String.length s * 3) in
-    let n = Uunf.create `NFC in
-    let rec add v = match Uunf.add n v with
-      | `Uchar u -> Uutf.Buffer.add_utf_8 b u; add `Await
-      | `Await | `End -> ()
-    in
-    let add_uchar _ _ = function
-      | `Malformed _ -> add (`Uchar Uutf.u_rep)
-      | `Uchar _ as u -> add u
-    in
-    Uutf.String.fold_utf_8 add_uchar () s ;
-    add `End ;
-    let s' = Buffer.contents b in
+    let s' = Mutil.normalize_utf_8 s in
     let i' = Gwdb.insert_string base s' in
     if i <> i'
     then begin match report with

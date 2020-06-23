@@ -154,3 +154,9 @@ val list_except : 'a -> 'a list -> 'a list
     the result is meaningless.
 *)
 val input_file_ic : in_channel -> string
+
+(** [normalize_utf_8 s]
+    Return [s] with all malformed UTF-8 character replaced by
+    {{:http://unicode.org/glossary/#replacement_character}the replacement character}
+*)
+val normalize_utf_8 : string -> string
