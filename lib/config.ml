@@ -1,4 +1,3 @@
-(* $Id: config.mli,v 5.19 2007-07-25 14:19:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
@@ -92,3 +91,68 @@ type config =
     (* if true, the base name is in the b argument of the query string: ?b=BASE&...
        if false, the base name is the last element of the uri path: .../base?... *)
     b_arg_for_basename : bool }
+
+(**/**)
+(**  A dummy {!type:config} value, with uninitialized fields.
+     Used for testing purpose *)
+let empty =
+  { from = ""
+  ; manitou = false
+  ; supervisor = false
+  ; wizard = false
+#ifdef API
+  ; api_host = ""
+  ; api_port = 0
+#endif
+  ; is_printed_by_template = false
+  ; friend = false
+  ; just_friend_wizard = false
+  ; user = ""
+  ; username = ""
+  ; auth_scheme = NoAuth
+  ; pure_xhtml = false
+  ; command = ""
+  ; indep_command = ""
+  ; highlight = ""
+  ; lang = ""
+  ; default_lang = ""
+  ; default_sosa_ref = Gwdb.dummy_iper, None
+  ; multi_parents = false
+  ; can_send_image = false
+  ; authorized_wizards_notes = false
+  ; public_if_titles = false
+  ; public_if_no_date = false
+  ; cancel_links = false
+  ; setup_link = false
+  ; access_by_key = false
+  ; private_years = 0
+  ; hide_names = false
+  ; use_restrict = false
+  ; no_image = false
+  ; no_note = false
+  ; bname = ""
+  ; cgi_passwd = ""
+  ; env = []
+  ; senv = []
+  ; henv = []
+  ; base_env = []
+  ; allowed_titles = lazy []
+  ; denied_titles = lazy []
+  ; xhs = ""
+  ; request = []
+  ; lexicon = Hashtbl.create 16
+  ; charset = ""
+  ; is_rtl = false
+  ; left = ""
+  ; right = ""
+  ; auth_file = ""
+  ; border = 0
+  ; n_connect = None
+  ; today = { Def.day = 0 ; month = 0 ; year = 0 ; delta = 0 ; prec = Def.Sure }
+  ; today_wd = 0
+  ; time = 0,0,0
+  ; ctime = 0.
+  ; image_prefix=""
+  ; b_arg_for_basename = false
+  }
+(**/**)

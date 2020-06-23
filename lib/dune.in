@@ -17,5 +17,5 @@
             geneweb-lib.util
             geneweb-lib.wserver.mli
             markup)
- (modules_without_implementation config templAst)
+ (modules_without_implementation templAst)
 )
