@@ -18,6 +18,6 @@ build: [
 
 depends: [
   "geneweb-lib"
-  "jingoo"
+  "jingoo" { >= "1.4.0" }
   "unix"
 ]
