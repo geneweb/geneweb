@@ -43,11 +43,10 @@ module Make (Select : Select) =
 
     let prepare_free_occ base =
       (* Parce qu'on est obligé ... *)
-      (* FIXME!!!!!!! *)
-      (* let sn = "?" in
-       * let fn = "?" in
-       * let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
-       * Hashtbl.add ht_orig_occ key [0]; *)
+      let sn = "?" in
+      let fn = "?" in
+      let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
+      Hashtbl.add ht_orig_occ key [0];
       Gwdb.Collection.iter begin fun ip ->
         let p = poi base ip in
         let sn = sou base (get_surname p) in
