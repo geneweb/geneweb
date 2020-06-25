@@ -392,7 +392,6 @@ let insert_person gen so =
         print_two_spellings
           so.surname so.first_name x.m_occ
           (p_surname gen.g_base x) (p_first_name gen.g_base x) occ ;
-        gen.g_def.(ip) <- true;
         check_error gen
       end;
   if not gen.g_errored then
