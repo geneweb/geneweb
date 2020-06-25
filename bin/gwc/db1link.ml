@@ -125,7 +125,7 @@ let check_error gen = gen.g_errored <- true
 
 (** Function that will be called if base's checker will find an error *)
 let set_error base gen x =
-  Printf.printf "\nError: ";
+  Printf.printf "Error: ";
   Check.print_base_error stdout base x;
   check_error gen
 
@@ -391,6 +391,18 @@ let find_first_available_occ gen fn sn occ =
   in
   loop occ
 
+let print_oc_aux = function 0 -> "" | n -> "." ^ string_of_int n
+
+let print_two_spellings n1 p1 oc1 n2 p2 oc2 =
+  Printf.printf "Person defined with two spellings: \"%s%s %s\" & \"%s%s %s\"\n"
+    p1 (print_oc_aux oc1) n1 p2 (print_oc_aux oc2) n2
+
+let print_person_already_defined n1 p1 oc1 n2 p2 oc2 =
+  Printf.printf "Person already defined: \"%s%s %s\"" p1 (print_oc_aux oc1) n1;
+  if p1 <> p2 || n1 <> n2 then
+    Printf.printf "as name: \"%s%s %s\"\n" p2 (print_oc_aux oc2) n2
+  else Printf.printf "\n"
+
 (** Insert person's reference in the base and modifies all coresponding
     fields in [gen] and returns its entry and entry's index in the base.
     In details:
@@ -464,14 +476,10 @@ let insert_undefined state gen key =
       sou gen.g_base x.m_first_name <> key.pk_first_name
       || sou gen.g_base x.m_surname <> key.pk_surname
     then (
-      Printf.printf "\nPerson defined with two spellings:\n";
-      Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
-        (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
-        key.pk_surname;
-      Printf.printf "  \"%s%s %s\"\n"
+      print_two_spellings key.pk_surname key.pk_first_name x.m_occ
+        (p_surname gen.g_base x)
         (p_first_name gen.g_base x)
-        (match occ with 0 -> "" | n -> "." ^ string_of_int n)
-        (p_surname gen.g_base x);
+        occ;
       gen.g_def.(ip) <- true;
       check_error gen);
   (x, ip)
@@ -550,22 +558,24 @@ let insert_person state gen so =
   in
   (* if person wad defined before (not just referenced) *)
   if gen.g_def.(ip) then (
-    (* print error about person beeing already defined *)
-    Printf.printf "\nPerson already defined: \"%s%s %s\"\n" so.first_name
-      (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
-      so.surname;
-    if
-      p_first_name gen.g_base x <> so.first_name
-      || p_surname gen.g_base x <> so.surname
-    then
-      Printf.printf "as name: \"%s%s %s\"\n"
-        (p_first_name gen.g_base x)
-        (match occ with 0 -> "" | n -> "." ^ string_of_int n)
-        (p_surname gen.g_base x);
+    print_person_already_defined so.surname so.first_name x.m_occ
+      (p_surname gen.g_base x)
+      (p_first_name gen.g_base x)
+      occ;
     flush stdout;
     check_error gen)
-  else (* else set it as defined *)
-    gen.g_def.(ip) <- true;
+  else gen.g_def.(ip) <- true;
+  if not gen.g_errored then
+    if
+      sou gen.g_base x.m_first_name <> so.first_name
+      || sou gen.g_base x.m_surname <> so.surname
+    then (
+      print_two_spellings so.surname so.first_name x.m_occ
+        (p_surname gen.g_base x)
+        (p_first_name gen.g_base x)
+        occ;
+      gen.g_def.(ip) <- true;
+      check_error gen);
   if not gen.g_errored then
     if
       sou gen.g_base x.m_first_name <> so.first_name
@@ -646,17 +656,15 @@ let insert_somebody state gen = function
 let check_parents_not_already_defined gen ix fath moth =
   let x = poi gen.g_base ix in
   match (aoi gen.g_base ix).parents with
+  | None -> ()
   | Some int ->
       let cpl = coi gen.g_base int in
       let p = Adef.father cpl in
       let m = Adef.mother cpl in
       Printf.printf
-        "I cannot add \"%s\", child of\n\
-        \    - \"%s\"\n\
-        \    - \"%s\",\n\
-         because this persons still exists as child of\n\
-        \    - \"%s\"\n\
-        \    - \"%s\"." (designation gen.g_base x)
+        "I cannot add \"%s\", child of \"%s\" & \"%s\", because this persons \
+         still exists as child of \"%s\" & \"%s\".\n"
+        (designation gen.g_base x)
         (designation gen.g_base fath)
         (designation gen.g_base moth)
         (designation gen.g_base (poi gen.g_base p))
@@ -667,14 +675,13 @@ let check_parents_not_already_defined gen ix fath moth =
               x.death := DontKnowIfDead;
       *)
       check_error gen
-  | _ -> ()
 
 (** Assign sex to the person's entry if it's unitialised.
     Print message if sexes are different. *)
 let notice_sex gen p s =
   if p.m_sex = Neuter then p.m_sex <- s
   else if p.m_sex <> s && s <> Neuter then
-    Printf.printf "\nInconsistency about the sex of\n  %s %s\n"
+    Printf.printf "Inconsistency about the sex of %s %s\n"
       (p_first_name gen.g_base p)
       (p_surname gen.g_base p)
 
