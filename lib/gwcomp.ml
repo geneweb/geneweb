@@ -332,11 +332,16 @@ let get_burial l =
       end
   | _ -> UnknownBurial, l
 
-let get_optional_sexe =
-  function
-    "h" :: l -> Male, l
-  | "f" :: l -> Female, l
-  | l -> Neuter, l
+(** [legacy] is an associative list for old special cases handling *)
+let get_optional_sex legacy = function
+  | ("#m"|"#m:") :: tl -> Male, tl
+  | ("#f"|"#f:") :: tl -> Female, tl
+  | (hd :: tl) as list ->
+    begin match List.assoc_opt hd legacy with
+      | Some s -> s, tl
+      | None -> Neuter, list
+    end
+  | [] -> Neuter, []
 
 let make_int x =
   let rec loop found n i =
@@ -876,12 +881,7 @@ let loop_witn line ic =
   let rec loop_witn acc str =
     match fields str with
       ("wit" | "wit:") :: l ->
-      let (sex, l) =
-        match l with
-          "m:" :: l -> Male, l
-        | "f:" :: l -> Female, l
-        | l -> Neuter, l
-      in
+      let (sex, l) = get_optional_sex [ "m:", Male ; "f:", Female ] l in
       let (wkind, l) = get_event_witness_kind l in
       let (wk, _, l) = parse_parent str l in
       if l <> [] then failwith str;
@@ -907,13 +907,8 @@ let read_family ic fname =
       let (witn, line) =
         let rec loop =
           function
-            Some (str, ("wit" | "wit:") :: l) ->
-              let (sex, l) =
-                match l with
-                  "m:" :: l -> Male, l
-                | "f:" :: l -> Female, l
-                | l -> Neuter, l
-              in
+          | Some (str, ("wit" | "wit:") :: l) ->
+              let (sex, l) = get_optional_sex [ "m:", Male ; "f:", Female ] l in
               let (wk, _, l) = parse_parent str l in
               if l <> [] then failwith str;
               let (witn, line) = loop (read_line ic) in
@@ -988,7 +983,7 @@ let read_family ic fname =
             let rec loop children =
               match read_line ic with
                 Some (str, "-" :: l) ->
-                  let (sex, l) = get_optional_sexe l in
+                  let (sex, l) = get_optional_sex [ "h", Male ; "f", Female ] l in
                   let (child, l) = parse_child str surname sex csrc cbp l in
                   if l <> [] then failwith str else loop (child :: children)
               | Some (_, ["end"]) -> children
@@ -1057,12 +1052,7 @@ let read_family ic fname =
       F_some (Wnotes (wizid, notes), read_line ic)
   | Some (str, "rel" :: l) ->
       let (sb, _, l) = parse_parent str l in
-      let (sex, l) =
-        match l with
-          "#h" :: l -> Male, l
-        | "#f" :: l -> Female, l
-        | l -> Neuter, l
-      in
+      let (sex, l) = get_optional_sex [ "#h", Male ] l in
       if l <> [] then failwith "str"
       else
         begin match read_line ic with

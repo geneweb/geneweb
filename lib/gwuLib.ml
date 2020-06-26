@@ -506,13 +506,15 @@ module Make (Select : Select) =
         if has_infos then print_infos oc base false "" "" p
         else if first_name <> "?" && surname <> "?" then Printf.fprintf oc " 0"
 
+    let print_sex oc p =
+      match get_sex p with
+      | Male -> Printf.fprintf oc " #m"
+      | Female -> Printf.fprintf oc " #f"
+      | Neuter -> ()
+
     let print_child oc base fam_surname csrc cbp p =
       Printf.fprintf oc "-";
-      begin match get_sex p with
-        Male -> Printf.fprintf oc " h"
-      | Female -> Printf.fprintf oc " f"
-      | _ -> ()
-      end;
+      print_sex oc p ;
       Printf.fprintf oc " %s" (s_correct_string (sou base (get_first_name p)));
       if p_first_name base p = "?" && p_surname base p = "?" then ()
       else if get_new_occ p = 0 then ()
@@ -647,11 +649,7 @@ module Make (Select : Select) =
            if gen.per_sel ip then
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
-             end;
+             print_sex oc p ;
              Printf.fprintf oc ": ";
              begin match wk with
                Witness_GodParent -> Printf.fprintf oc "#godp "
@@ -751,11 +749,7 @@ module Make (Select : Select) =
            if gen.per_sel ip then
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
-             end;
+             print_sex oc p ;
              Printf.fprintf oc ": ";
              begin match wk with
                Witness_GodParent -> Printf.fprintf oc "#godp "
@@ -855,11 +849,7 @@ module Make (Select : Select) =
            if gen.per_sel ip then
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
-             end;
+             print_sex oc p ;
              Printf.fprintf oc ": ";
              print_witness oc base gen p;
              Printf.fprintf oc "\n")
@@ -964,11 +954,7 @@ module Make (Select : Select) =
           (fun (ip, wk) ->
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
-             end;
+             print_sex oc p ;
              Printf.fprintf oc ": ";
              begin match wk with
                Witness_GodParent -> Printf.fprintf oc "#godp "
@@ -1265,10 +1251,7 @@ module Make (Select : Select) =
               def_p := p :: !def_p;
               if has_infos base p then print_infos oc base false "" "" p
               else Printf.fprintf oc " 0";
-              match get_sex p with
-                Male -> Printf.fprintf oc " #h"
-              | Female -> Printf.fprintf oc " #f"
-              | Neuter -> ()
+              print_sex oc p ;
             end;
           Printf.fprintf oc "\n";
           Printf.fprintf oc "beg\n";
