@@ -554,13 +554,17 @@ module Make (Select : Select) =
       bogus_person base m.m_fath && bogus_person base m.m_moth &&
       Array.for_all (bogus_person base) m.m_chil
 
+    let is_isolated p =
+      match get_parents p with
+      | Some _ -> false
+      | None -> Array.length (get_family p) = 0
+
     let print_witness oc base gen p =
       Printf.fprintf oc "%s %s%s" (correct_string base (get_surname p))
         (correct_string base (get_first_name p))
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
-      if Array.length (get_family p) = 0 && get_parents p = None
-         && not (Gwdb.Marker.get gen.mark (get_iper p))
+      if is_isolated p && not (Gwdb.Marker.get gen.mark (get_iper p))
       then
         begin
           Gwdb.Marker.set gen.mark (get_iper p) true;
@@ -1055,27 +1059,21 @@ module Make (Select : Select) =
              print_notes_for_person oc base gen p)
         pl
 
-    let is_isolated p =
-      match get_parents p with
-        Some _ -> false
-      | None -> Array.length (get_family p) = 0
-
     let is_definition_for_parent p =
       match get_parents p with
         Some _ -> false
       | None -> true
 
-    let get_isolated_related base m list =
+    let get_isolated_related base gen m list =
       let concat_isolated p_relation ip list =
         let p = poi base ip in
         if List.mem_assq p list then list
         else if is_isolated p then
           match get_rparents p with
-            {r_fath = Some x} :: _ when x = get_iper p_relation ->
-              list @ [p, true]
-          | {r_fath = None; r_moth = Some x} :: _
-            when x = get_iper p_relation ->
-              list @ [p, true]
+          | ({ r_fath = Some x ; _} | { r_moth = Some x ; _ }) :: _ ->
+            if x = get_iper p_relation
+            then list @ [ p, not (Gwdb.Marker.get gen.mark (get_iper p)) ]
+            else list
           | _ -> list
         else list
       in
@@ -1281,7 +1279,7 @@ module Make (Select : Select) =
 
     let print_relations oc base gen ml =
       let pl = List.fold_right (get_persons_with_relations base) ml [] in
-      let pl = List.fold_right (get_isolated_related base) ml pl in
+      let pl = List.fold_right (get_isolated_related base gen) ml pl in
       let pl =
         List.fold_right
           (fun p pl -> if list_memf eq_key_fst p pl then pl else p :: pl) pl
