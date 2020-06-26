@@ -232,12 +232,53 @@ let print_first_name_strong _conf base p =
   Wserver.printf "<strong>%s%s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
-let string_of_error conf base = function
+let text_of_var conf =
+  let parse_int s i =
+    let j =
+      let rec loop j =
+        if j = String.length s
+        || match String.unsafe_get s j with '0'..'9' -> false | _ -> true
+        then j
+        else loop (j + 1)
+      in
+      loop i
+    in
+    (int_of_string @@ String.sub s i (j - i), j)
+  in
+  function
+  | "pa1" -> transl_nth conf "him/her" 0
+  | "pa2" -> transl_nth conf "him/her" 1
+  | var -> match String.get var 0 with
+    | 'r' ->
+      let (pos, i) = parse_int var 1 in
+      assert (String.get var i = '_') ;
+      let pn = match String.get var (i + 1) with 'f' -> 0 | 'm' -> 1 | _ -> assert false in
+      transl_nth conf "relation/relations" 0 ^ " " ^ string_of_int pos
+      ^ " - " ^ transl_nth conf "father/mother" pn
+    | 'e' ->
+      let (epos, i) = parse_int var 1 in
+      assert (String.get var i = '_') ;
+      assert (String.get var (i + 1) = 'w') ;
+      assert (String.get var (i + 2) = 'i') ;
+      assert (String.get var (i + 3) = 't') ;
+      assert (String.get var (i + 4) = 'n') ;
+      let (wpos, _) = parse_int var (i + 5) in
+      let a = transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int wpos in
+      let b = transl_nth conf "event/events" 0 ^ " " ^ string_of_int epos in
+      transl_a_of_b conf a b b
+    | 'c' when String.length var >= 3 && String.unsafe_get var 1 = 'h' ->
+      let (pos, _) = parse_int var 2 in
+      Util.translate_eval (transl_nth conf "child/children" 0)
+      ^ " " ^ string_of_int pos
+    | _ -> var
+
+let string_of_error var conf base = function
   | AlreadyDefined p ->
     Printf.sprintf
       (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
       ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-       p_surname base p ^ "\"")
+       p_surname base p ^ "\""
+       ^ if var = "" then "" else " (" ^ text_of_var conf var ^ ")")
       (fun _ ->
          Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
       (fun _ -> "</a>.")
@@ -248,8 +289,8 @@ let string_of_error conf base = function
     Printf.sprintf "%s."
       (Utf8.capitalize (transl conf "cannot change sex of a married person"))
 
-let print_error conf base e =
-  Wserver.printf "%s" @@ string_of_error conf base e
+let print_error var conf base e =
+  Wserver.print_string @@ string_of_error var conf base e
 
 let someone_ref_text conf base p =
   "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
@@ -691,7 +732,7 @@ let print_warnings_and_miscs conf base wl ml =
   end
 
 let error conf base x =
-  let err = string_of_error conf base x in
+  let err = string_of_error "" conf base x in
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
@@ -957,71 +998,16 @@ let reconstitute_date conf var =
           if txt = "" then None else Some (Dtext txt)
       | _ -> None
 
-let parse_int s i =
-  let j =
-    let rec loop j =
-      if j = String.length s
-      || match String.unsafe_get s j with '0'..'9' -> false | _ -> true
-      then j
-      else loop (j + 1)
-    in
-    loop i
-  in
-  (int_of_string @@ String.sub s i (j - i), j)
-
-let text_of_var conf =
-  function
-  | "pa1" -> transl_nth conf "him/her" 0
-  | "pa2" -> transl_nth conf "him/her" 1
-  | var -> match String.get var 0 with
-    | 'r' ->
-      let (pos, i) = parse_int var 1 in
-      assert (String.get var i = '_') ;
-      let pn = match String.get var (i + 1) with 'f' -> 0 | 'm' -> 1 | _ -> assert false in
-      transl_nth conf "relation/relations" 0 ^ " " ^ string_of_int pos
-      ^ " - " ^ transl_nth conf "father/mother" pn
-    | 'e' ->
-      let (epos, i) = parse_int var 1 in
-      assert (String.get var i = '_') ;
-      assert (String.get var (i + 1) = 'w') ;
-      assert (String.get var (i + 2) = 'i') ;
-      assert (String.get var (i + 3) = 't') ;
-      assert (String.get var (i + 4) = 'n') ;
-      let (wpos, _) = parse_int var (i + 5) in
-      let a = transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int wpos in
-      let b = transl_nth conf "event/events" 0 ^ " " ^ string_of_int epos in
-      transl_a_of_b conf a b b
-    | 'c' when String.length var >= 3 && String.unsafe_get var 1 = 'h' ->
-      let (pos, _) = parse_int var 2 in
-      Util.translate_eval (transl_nth conf "child/children" 0)
-      ^ " " ^ string_of_int pos
-    | _ -> var
-
-let print_create_conflict conf base p var =
-  let err =
-    Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-       p_surname base p ^ "\" (" ^ text_of_var conf var ^ ")")
-      (fun _ ->
-         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-      (fun _ -> "</a>.");
-  in
+let print_create_conflict link conf base p var =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
   let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s" err ;
+  print_error var conf base (AlreadyDefined p);
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Util.print_hidden_env conf ;
-  Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\"%s>\n" var
-    conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
-    free_n conf.xhs;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>";
   Wserver.printf "%s%s %d. \n" (Utf8.capitalize (transl conf "first free number"))
@@ -1036,23 +1022,31 @@ let print_create_conflict conf base p var =
   Wserver.printf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
   Wserver.printf "</li>";
-  Wserver.printf "<li>";
-  Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
-  Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Wserver.printf " %s %s." (transl_nth conf "and" 0)
-    (transl conf "use \"link\" instead of \"create\"");
-  Wserver.printf "</li>";
+  if link then begin
+    Wserver.printf "<li>";
+    Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
+    Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
+    Wserver.printf " %s %s." (transl_nth conf "and" 0)
+      (transl conf "use \"link\" instead of \"create\"");
+    Wserver.printf "</li>";
+  end ;
   Wserver.printf "</ul>\n";
-  Wserver.printf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "create")) conf.xhs;
-  Wserver.printf "<input type=\"submit\" name=\"return\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "back")) conf.xhs;
+  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Util.print_hidden_env conf ;
+  if var <> "" then
+    Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var ;
+  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n" free_n ;
+  Wserver.printf "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
+    (Utf8.capitalize (transl conf "create")) ;
+  Wserver.printf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
+    (Utf8.capitalize (transl conf "back")) ;
   Wserver.printf "</form>\n";
   print_same_name conf base p;
   Hutil.trailer conf;
 #ifdef API
   end ;
 #endif
+  let err = string_of_error var conf base (AlreadyDefined p) in
   raise @@ ModErr err
 
 let insert_person conf base src new_persons (f, s, o, create, var) =
@@ -1071,7 +1065,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             else raise Not_found
         else
           match person_of_key base f s o with
-            Some ip -> print_create_conflict conf base (poi base ip) var
+            Some ip -> print_create_conflict true conf base (poi base ip) var
           | None -> raise Not_found
       with Not_found ->
         let o = if f = "?" || s = "?" then 0 else o in

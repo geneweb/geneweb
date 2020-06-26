@@ -801,61 +801,13 @@ let strip_person p =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 
 let print_conflict conf base p =
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
-  Update.print_error conf base (AlreadyDefined p);
-  let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
-  in
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>";
-  Wserver.printf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
-    (Util.transl conf ":") free_n;
-  Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
-    (transl conf "create");
-  Wserver.printf "%s.\n" (transl conf " to try again with this number");
-  Wserver.printf "</li>";
-  Wserver.printf "<li>";
-  Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
-  Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Wserver.printf " %s %s." (transl_nth conf "and" 0)
-    (transl conf "change it (the number) yourself");
-  Wserver.printf "</li>";
-  Wserver.printf "</ul>\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Util.print_hidden_env conf ;
-  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
-    free_n conf.xhs;
-  Wserver.printf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "create")) conf.xhs;
-  Wserver.printf "<input type=\"submit\" name=\"return\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "back")) conf.xhs;
-  Wserver.printf "</form>\n";
-  Update.print_same_name conf base p;
-  Hutil.trailer conf;
-#ifdef API
-  end ;
-#endif
-  let err =
-    Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-       p_surname base p ^ "\"")
-      (fun _ ->
-         Printf.sprintf "%s %s" (sou base (get_first_name p))
-           (sou base (get_surname p)))
-      (fun _ -> ".")
-   in
-   raise @@ Update.ModErr err
+  Update.print_create_conflict false conf base p ""
 
 let default_prerr conf base = function
   | BadSexOfMarriedPerson p as err ->
     let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
     Hutil.rheader conf title;
-    Update.print_error conf base err ;
+    Update.print_error "" conf base err ;
     Wserver.printf "<ul><li>%s</li></ul>" (Util.referenced_person_text conf base p);
     Update.print_return conf ;
     Update.print_continue conf "nsck" "on" ;

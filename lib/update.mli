@@ -51,8 +51,22 @@ val print_return : config -> unit
 *)
 val print_continue : config -> ?continue:string -> string -> string -> unit
 
-val string_of_error : config -> base -> CheckItem.base_error -> string
-val print_error : config -> base -> CheckItem.base_error -> unit
+(** [print_create_conflict link conf base p var]
+    Handle errors when a key is not available for person cration.
+
+    In API mode: raise an Mod_error
+
+    In regular mode, print an error page, with a form containing current env
+    plus hidden inputs for [free_occ] containing the next occ available for the
+    conflicting key.
+    If [var] is not empty, also add a hidden input "field" containing [var] value.
+
+    Two submit buttons are printed with values "return" and "create".
+*)
+val print_create_conflict : bool -> config -> base -> person -> string -> unit
+
+val string_of_error : string -> config -> base -> CheckItem.base_error -> string
+val print_error : string -> config -> base -> CheckItem.base_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit
 val print_miscs : config -> base -> CheckItem.base_misc list -> unit
 val print_warnings_and_miscs :

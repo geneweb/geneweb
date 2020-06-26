@@ -144,41 +144,8 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
-  Update.print_error conf base (AlreadyDefined p);
-  let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
-  in
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>";
-  Wserver.printf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
-    (Util.transl conf ":") free_n;
-  Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
-    (transl conf "create");
-  Wserver.printf "%s.\n" (transl conf " to try again with this number");
-  Wserver.printf "</li>";
-  Wserver.printf "<li>";
-  Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
-  Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Wserver.printf " %s %s." (transl_nth conf "and" 0)
-    (transl conf "change it (the number) yourself");
-  Wserver.printf "</li>";
-  Wserver.printf "</ul>\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Util.print_hidden_env conf ;
-  begin let var = "c" ^ string_of_iper ip_var in
-    Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var
-  end;
-  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
-    free_n;
-  Wserver.printf  "<button type=\"submit\" name=\"create\" \
-class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "create"));
-  Wserver.printf "<button type=\"submit\" name=\"return\" \
-class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "back"));
-  Wserver.printf "</form>\n";
-  Update.print_same_name conf base p;
-  Hutil.trailer conf;
+  let var = "c" ^ string_of_iper ip_var in
+  Update.print_create_conflict false conf base p var ;
   raise @@ Update.ModErr __LOC__
 
 let error_person conf err =
@@ -187,7 +154,6 @@ let error_person conf err =
   Wserver.printf "%s\n" (Utf8.capitalize err);
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
-
 
 let print_update_child conf base =
   match p_getenv conf.env "m" with
