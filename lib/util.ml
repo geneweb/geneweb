@@ -3412,3 +3412,15 @@ let rm_rf f =
     let (directories, files) = ls_r [f] |> List.partition Sys.is_directory in
     List.iter Unix.unlink files ;
     List.iter Unix.rmdir directories
+
+let print_hidden_env conf =
+  let aux =
+    List.iter begin fun (x, v) ->
+      (* Only textarea can contain newline. *)
+      Wserver.printf {|<textarea style="display:none;" name="%s">|} x ;
+      Wserver.print_string (escape_html (decode_varenv v)) ;
+      Wserver.print_string "</textarea>"
+    end
+  in
+  aux conf.henv ;
+  aux conf.env ;

@@ -826,11 +826,7 @@ let print_conflict conf base p =
   Wserver.printf "</li>";
   Wserver.printf "</ul>\n";
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
-         (Util.escape_html (decode_varenv v)) conf.xhs)
-    (conf.henv @ conf.env);
+  Util.print_hidden_env conf ;
   Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
     free_n conf.xhs;
   Wserver.printf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"

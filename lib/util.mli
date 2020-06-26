@@ -375,3 +375,6 @@ val safe_html : string -> string
     [false] if we knwon the first name or the last name of [p].
 *)
 val is_empty_name : person -> bool
+
+(** Print [conf.henv] and [conf.env] as hidden textareas *)
+val print_hidden_env : config -> unit

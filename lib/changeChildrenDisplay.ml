@@ -166,11 +166,7 @@ let print_conflict conf base ip_var p =
   Wserver.printf "</li>";
   Wserver.printf "</ul>\n";
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
-         (Util.escape_html (decode_varenv v)))
-    (conf.henv @ conf.env);
+  Util.print_hidden_env conf ;
   begin let var = "c" ^ string_of_iper ip_var in
     Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var
   end;

@@ -168,39 +168,9 @@ let print_same_name conf base p =
       Wserver.printf "</ul>\n";
       Wserver.printf "</p>\n"
 
-
-(* ************************************************************************* *)
-(*  [Fonc] is_label_note : string -> bool                                    *)
-(** [Description] : Test si le label contient le mot 'note' pour savoir si
-      dans les évènement secondaires, il faut traiter la note comme un
-      textarea.
-    [Args] :
-      - lbl : le label
-    [Retour] :
-      - bool
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let is_label_note lbl =
-  let rec loop i =
-    if i = String.length lbl then false
-    else if lbl.[i] = 'n' then
-      let note = "note" in
-      if String.length note + i <= String.length lbl then
-        let sub_x = String.sub lbl i (String.length note) in
-        if sub_x = note then true else loop (i + String.length note)
-      else false
-    else loop (i + 1)
-  in
-  loop 0
-
 let print_aux conf param value submit =
   Wserver.printf {|<p><form method="post" action="%s">|} conf.command;
-  List.iter begin fun (x, v) ->
-    (* Only textarea can contain newline. *)
-    Wserver.printf {|<textarea style="display:none;" name="%s">|} x ;
-    Wserver.print_string (Util.escape_html (decode_varenv v)) ;
-    Wserver.print_string "</textarea>"
-  end (conf.henv @ conf.env) ;
+  Util.print_hidden_env conf ;
   Wserver.printf {|<input type="hidden" name="%s" value="%s">|} param value ;
   Wserver.printf {|<input type="submit" value="%s">|} submit ;
   Wserver.printf {|</form></p>|}
@@ -749,20 +719,7 @@ let error_locked conf =
   Wserver.printf "<tr>\n";
   Wserver.printf "<td>\n";
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       if x = "retry" then ()
-       else if x = "notes" || is_label_note x then
-         begin
-           Wserver.printf "<textarea style=\"display:none;\" name=\"%s\">\n"
-             x;
-           Wserver.printf "%s" (Util.escape_html (decode_varenv v));
-           Wserver.printf "</textarea>\n"
-         end
-       else
-         Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-           x (Util.escape_html (decode_varenv v)) conf.xhs)
-    (conf.henv @ conf.env);
+  Util.print_hidden_env conf ;
   (* just to see in the traces... *)
   Wserver.printf "<input type=\"hidden\" name=\"retry\" value=\"%s\"%s>\n"
     (Util.escape_html conf.user) conf.xhs;
@@ -1060,21 +1017,7 @@ let print_create_conflict conf base p var =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
   Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       (* Seul un textarea peut contenir des sauts de ligne. *)
-       (* On remplace donc l'input par un textarea.          *)
-       if x = "notes" || is_label_note x then
-         begin
-           Wserver.printf "<textarea style=\"display:none;\" name=\"%s\">\n"
-             x;
-           Wserver.printf "%s" (Util.escape_html (decode_varenv v));
-           Wserver.printf "</textarea>\n"
-         end
-       else
-         Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-           x (Util.escape_html (decode_varenv v)) conf.xhs)
-    (conf.henv @ conf.env);
+  Util.print_hidden_env conf ;
   Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\"%s>\n" var
     conf.xhs;
   Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
