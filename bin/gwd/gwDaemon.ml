@@ -318,7 +318,7 @@ let print_redirected conf from request new_addr =
       Hutil.header conf title;
       Wserver.printf "Use the following address:\n<p>\n";
       Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
-      Hutil.trailer conf
+      Hutil.trailer conf)
 
 let propose_base conf =
   let title _ = Wserver.printf "Base" in
@@ -343,7 +343,7 @@ let general_welcome conf =
       Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
       Wserver.printf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+      Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
       Wserver.printf "</button>\n";
       Wserver.printf "</li></ul>";
       Hutil.trailer conf)

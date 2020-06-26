@@ -106,6 +106,7 @@ let empty =
   ; api_port = 0
 #endif
   ; is_printed_by_template = false
+  ; trace_templ = false
   ; friend = false
   ; just_friend_wizard = false
   ; user = ""

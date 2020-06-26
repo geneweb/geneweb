@@ -383,9 +383,6 @@ val string_with_macros
 val is_empty_name : person -> bool
 
 (**/**)
-val init_cache_info : string -> Gwdb.base -> unit
-
-(**/**)
 (* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
 val copy_from_templ_ref :
   (config -> (string * string) list -> in_channel -> unit) ref
