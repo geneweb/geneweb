@@ -380,9 +380,9 @@ let strip_newlines_after_variables =
 
 let included_files = ref []
 
-let begin_end_include conf fname al where =
+let begin_end_include conf fname al =
   if conf.trace_templ then
-    Atext ((0,0), "\n<!-- begin include (" ^ where ^ ") " ^ fname ^ " -->\n")
+    Atext ((0,0), "\n\n<!-- begin include " ^ fname ^ " -->\n")
     :: al
     @ [ Atext ((0,0), "<!-- end include " ^ fname ^ " -->\n") ]
   else al
@@ -492,7 +492,7 @@ let parse_templ conf strm =
                 let strm2 = Stream.of_channel ic in
                 let (al, _) = parse_astl [] false 0 [] strm2 in
                 close_in ic;
-                let al = begin_end_include conf fname al "parse" in
+                let al = begin_end_include conf fname al in
                 let () = included_files := (file, al) :: !included_files in
                 Some (Ainclude (file, al))
             | None -> None
@@ -1521,7 +1521,7 @@ and print_var print_ast_list conf ifun env ep loc sl =
               begin match input_templ conf templ with
                 Some astl ->
                     let () = included_files := (templ, astl) :: !included_files in
-                    print_ast_list env ep (begin_end_include conf fname astl "print")
+                    print_ast_list env ep (begin_end_include conf fname astl)
               | None -> Wserver.printf " %%%s?" (String.concat "." sl)
               end
             | None -> Wserver.printf " %%%s?" (String.concat "." sl)

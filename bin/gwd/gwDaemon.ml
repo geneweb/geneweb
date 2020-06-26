@@ -335,18 +335,7 @@ let propose_base conf =
 
 let general_welcome conf =
   include_template conf [] "index"
-    (fun () ->
-      let title _ = Wserver.printf "Base" in
-      Hutil.header conf title;
-      Wserver.printf "<ul><li>";
-      Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
-      Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
-      Wserver.printf
-        "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-      Wserver.printf "</button>\n";
-      Wserver.printf "</li></ul>";
-      Hutil.trailer conf)
+    (fun () -> propose_base conf)
 
 let nonce_private_key =
   Lazy.from_fun
