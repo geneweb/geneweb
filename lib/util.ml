@@ -915,6 +915,7 @@ let reference_flags with_id conf base p s =
   else
     String.concat ""
       ["<a href=\""; commd conf; acces conf base p;
+       if with_id then "\" id=\"i" else "";
        if with_id then string_of_iper iper else "";
        "\">"; s; "</a>"]
 
