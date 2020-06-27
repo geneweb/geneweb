@@ -1765,7 +1765,9 @@ let arg_parse_in_file fname speclist anonfun errmsg =
         [x] -> Gutil.arg_list_of_string x
       | _ -> list
     in
-    Arg.parse_argv ~current:(ref 0) (Array.of_list list) speclist anonfun errmsg
+    Arg.parse_argv
+      ~current:(ref 0) (Array.of_list @@ Sys.argv.(0) :: list)
+      speclist anonfun errmsg
   with Sys_error _ -> ()
 
 let robot_exclude_arg s =
