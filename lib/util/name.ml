@@ -30,6 +30,16 @@ let next_chars_if_equiv s i t j =
     if s1 = t1 then Some (i1, j1) else None
 
 let lower s =
+  let s = 
+    let rec loop s i =
+      if i > (String.length s - 2) then s
+      else
+        if (Char.code s.[i]) = 0xE2 && (Char.code s.[i+1]) = 0x80 && (Char.code s.[i+2]) = 0x99 then
+          loop ((String.sub s 0 (i)) ^ "'" ^
+            (String.sub s (i + 3) (String.length s - i - 3))) (i + 4)
+        else loop s (i + 1)
+    in loop s 0
+  in
   let rec copy special i len =
     if i = String.length s then Buff.get len
     else if Char.code s.[i] < 0x80 then match s.[i] with
