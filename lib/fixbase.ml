@@ -8,6 +8,7 @@ type patch =
   | Fix_ParentDeleted of iper
   | Fix_AddedChild of ifam
   | Fix_RemovedUnion of iper * ifam
+  | Fix_RemovedDuplicateUnion of iper * ifam
   | Fix_AddedRelatedFromPevent of iper * iper
   | Fix_AddedRelatedFromFevent of iper * iper
   | Fix_MarriageDivorce of ifam
@@ -217,7 +218,13 @@ let check_persons_families ?report progress base =
       Array.of_list @@
       Array.fold_right begin fun ifam acc ->
         let cpl = foi base ifam in
-        if not @@ Array.mem ip (get_parent_array cpl) then
+        if List.mem ifam acc then begin
+          match report with
+          | Some fn ->
+            fn (Fix_RemovedDuplicateUnion (ip, ifam)) ;
+            acc
+          | None -> acc
+        end else if not @@ Array.mem ip (get_parent_array cpl) then
           match report with
           | Some fn ->
             fn (Fix_RemovedUnion (ip, ifam)) ;

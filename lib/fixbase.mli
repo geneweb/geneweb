@@ -19,6 +19,7 @@ type patch =
   | Fix_ParentDeleted of Gwdb.iper
   | Fix_AddedChild of Gwdb.ifam
   | Fix_RemovedUnion of Gwdb.iper * Gwdb.ifam
+  | Fix_RemovedDuplicateUnion of Gwdb.iper * Gwdb.ifam
   | Fix_AddedRelatedFromPevent of Gwdb.iper * Gwdb.iper
   | Fix_AddedRelatedFromFevent of Gwdb.iper * Gwdb.iper
   | Fix_MarriageDivorce of Gwdb.ifam

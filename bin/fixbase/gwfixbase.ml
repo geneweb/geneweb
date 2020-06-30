@@ -27,6 +27,10 @@ let aux txt (fn : ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> bas
       Printf.sprintf "Removing ifam %s from [%s] unions"
         (string_of_ifam ifam)
         (string_of_p ip) ;
+    | Fix_RemovedDuplicateUnion (ip, ifam) ->
+      Printf.sprintf "Removing duplicate ifam %s from [%s] unions"
+        (string_of_ifam ifam)
+        (string_of_p ip) ;
     | Fix_AddedRelatedFromPevent (ip, ip2)
     | Fix_AddedRelatedFromFevent (ip, ip2) ->
       Printf.sprintf "Added related %s to %s"
