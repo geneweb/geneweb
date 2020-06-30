@@ -422,8 +422,13 @@ let persons_of_name bname patches =
       in
       close_in ic_inx; ai
     in
-    try let l = Hashtbl.find patches i in l @ Array.to_list ai
-    with Not_found -> Array.to_list ai
+    match Hashtbl.find_opt patches i with
+    | Some patches ->
+      List.fold_left begin fun acc ip ->
+        if Array.mem ip ai then acc
+        else ip :: acc
+      end (Array.to_list ai) patches
+    | None -> Array.to_list ai
 
 let strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
