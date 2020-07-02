@@ -285,7 +285,7 @@
         %elseif;(bvar.default_image="yes")
           <img class="align-self-start mx-1 my-4" src="%image_prefix;/img_unknown_%if;(spouse.is_female)wo%elseif;(spouse.is_male)%else;u_%end;man.png" alt="[missing image]"%/>%nn;
         %else;
-          <div class="big_image noimage rounded align-text-center display-1 text-center text-muted px-5 mx-2 pt-1 pb-4">?</div>%nn;
+          <div class="big_image noimage rounded align-text-center display-1 text-center text-muted px-5 mx-2 pt-1 pb-4">&nbsp;</div>%nn;
         %end;
         <div class="flex-column">
           %(<div class="ml-2 mr-1">
@@ -320,7 +320,7 @@
                     %elseif;(bvar.default_image="yes")
                       <img class="small_image rounded align-self-center" src="%image_prefix;/img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]" title="%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;"%/>%nn;
                     %else;
-                      <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>%nn;
+                      <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>%nn;
                     %end;
                     <div class="ml-2 align-self-center">
                       %apply;short_display_person_tree("parent")<br>
@@ -357,7 +357,7 @@
                   <img class="small_image align-self-center rounded ml-2" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"
                     title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;"%/>%nn;
                 %else;
-                  <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-2 pb-2">?</span>
+                  <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>
                 %end;
                 <div class="ml-2 align-self-center">
                   %if;(count2=0)<ul>%apply;li_SD("child")%end;%nn;
@@ -386,7 +386,7 @@
               %elseif;(bvar.default_image="yes")
                 <img class="small_image rounded align-self-center ml-2" src="%image_prefix;/img_unknown_%if;(witness.is_female)wo%elseif;(witness.is_male)%else;u_%end;man.png" alt="[missing image]" title="[witness/witnesses]0"%/>
               %else;
-                <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+                <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>
               %end;
               <div class="ml-2 align-self-center">%nn;
                 %apply;short_display_person_tree("witness")<br>

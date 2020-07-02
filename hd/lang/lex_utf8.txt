@@ -10635,6 +10635,7 @@ co: u
 cs: dne
 da: den
 de: am
+en: on
 eo: la
 es: el
 et: :i:
@@ -10657,6 +10658,7 @@ zh:  于
     on (weekday day month year)
 br: d'ar
 co: u
+en: on
 et: :i:
 fi: :e:
 oc: lo
