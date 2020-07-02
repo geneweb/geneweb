@@ -111,7 +111,7 @@
   %elseif(k_cnt=1)
     %foreach;event_witness
       %if;(event_witness_kind=[kindx]0)
-        %if;(event_witness.sex=1)<br>[*kindx]1%else;[*kindx]0%end;[:]%nn;
+        %if;(event_witness.sex=1)<br>[*kindx]1%else;[*kindx]0%end;[:]
       %end;
     %end;
   %end;
@@ -542,19 +542,19 @@
                         %foreach;relation;
                           %if;(has_relation_him and has_relation_her)
                             %if;(relation_type=[godfather/godmother/godparents]2)
-                              <span class="text-nowrap">[*godfather/godmother/godparents]0[:]%nn;
+                              <span class="text-nowrap">[*godfather/godmother/godparents]0[:]
                               %apply;short_display_person("relation_him").</span><br>
-                              <span class="text-nowrap">[*godfather/godmother/godparents]1[:]%nn;
+                              <span class="text-nowrap">[*godfather/godmother/godparents]1[:]
                               %apply;short_display_person("relation_her").</span>
                             %end;
                           %elseif;has_relation_him;
                             %if;(relation_type=[godfather/godmother/godparents]0)
-                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]%nn;
+                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]
                               %apply;short_display_person("relation_him").</span>
                             %end;
                           %elseif;has_relation_her;
                             %if;(relation_type=[godfather/godmother/godparents]1)
-                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]%nn;
+                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]
                               %apply;short_display_person("relation_her").</span>
                             %end;
                           %end;
