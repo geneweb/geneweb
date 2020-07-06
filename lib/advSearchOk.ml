@@ -121,18 +121,16 @@ let advanced_search conf base max_answers =
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
-  (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
-  let apply_to_field_value_raw p x cmp empty_default_value =
+  (* Return empty_field_value if the field is empty. Apply function cmp to the field value. *)
+  let apply_to_field_value_raw x cmp empty_default_value =
     let y = gets x in
     if y = "" then empty_default_value
-    else if authorized_age conf base p then cmp y
-    else false
+    else cmp y
   in
   let apply_to_field_value p x get cmp empty_default_value =
     let y = gets x in
     if y = "" then empty_default_value
-    else if authorized_age conf base p then cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
-    else false
+    else cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
   in
   let do_compare p y get cmp =
     let s = abbrev_lower @@ get p in
@@ -141,19 +139,16 @@ let advanced_search conf base max_answers =
   let apply_to_field_values_raw p x get cmp empty_default_value =
     let y = getss x in
     if y = [] then empty_default_value
-    else if authorized_age conf base p
-    then do_compare p y get cmp
-    else false
+    else do_compare p y get cmp
   in
   let apply_to_field_values p x get cmp empty_default_value =
     let get p = sou base @@ get p in
     apply_to_field_values_raw p x get cmp empty_default_value
   in
   (* Check if the date matches with the person event. *)
-  let match_date p x df empty_default_value =
+  let match_date x df empty_default_value =
     let (d1, d2) = getd x in
-    authorized_age conf base p
-    && match d1, d2 with
+    match d1, d2 with
       | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
         begin match df () with
           | Some (Dgreg (d, _)) ->
@@ -173,7 +168,7 @@ let advanced_search conf base max_answers =
       | _ -> empty_default_value
   in
   let match_sex p empty_default_value =
-    apply_to_field_value_raw p "sex"
+    apply_to_field_value_raw "sex"
       begin function
         | "M" -> get_sex p = Male
         | "F" -> get_sex p = Female
@@ -212,15 +207,15 @@ let advanced_search conf base max_answers =
     get_event_field_name gets "place" "marriage" search_type
   in
   let match_baptism_date p empty_default_value =
-    match_date p bapt_date_field_name
+    match_date bapt_date_field_name
       (fun () -> Adef.od_of_cdate (get_baptism p)) empty_default_value
   in
   let match_birth_date p empty_default_value =
-    match_date p birth_date_field_name
+    match_date birth_date_field_name
       (fun () -> Adef.od_of_cdate (get_birth p)) empty_default_value
   in
   let match_death_date p empty_default_value =
-    match_date p death_date_field_name
+    match_date death_date_field_name
       (fun () ->
          match get_death p with
            Death (_, cd) -> Some (Adef.date_of_cdate cd)
@@ -228,7 +223,7 @@ let advanced_search conf base max_answers =
       empty_default_value
   in
   let match_burial_date p empty_default_value =
-    match_date p burial_date_field_name
+    match_date burial_date_field_name
       (fun () ->
          match get_burial p with
            Buried cod -> Adef.od_of_cdate cod
@@ -282,7 +277,7 @@ let advanced_search conf base max_answers =
         eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
   in
   let match_married p empty_default_value =
-    apply_to_field_value_raw p "married"
+    apply_to_field_value_raw "married"
       begin function
         | "Y" -> get_family p <> [| |]
         | "N" -> get_family p = [| |]
@@ -314,13 +309,13 @@ let advanced_search conf base max_answers =
       end
     | Some d1, _ ->
       test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
-        | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+        | Some (Dgreg (_, _) as d) ->
           if Date.compare_date d d1 < 0 then false else true
         | _ -> false
       end
     | _, Some d2 ->
       test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
-        | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+        | Some (Dgreg (_, _) as d) ->
           if Date.compare_date d d2 > 0 then false else true
         | _ -> false
       end
@@ -336,33 +331,30 @@ let advanced_search conf base max_answers =
     && match_married p true
     && match_occupation p true
   in
+  (* match_person also filter out persons not satisfying [authorized_age] *)
   let match_person ?(skip_fname = false) ?(skip_sname = false) ((list, len) as acc) p search_type =
-    if search_type <> "OR"
-    then if match_civil_status ~skip_fname ~skip_sname p
-         && match_baptism_date p true
-         && match_baptism_place p true
-         && match_birth_date p true
-         && match_birth_place p true
-         && match_burial_date p true
-         && match_burial_place p true
-         && match_death_date p true
-         && match_death_place p true
-         && match_marriage p marriage_date_field_name marriage_place_field_name true
-      then (p :: list, len +1)
-      else acc
-    else if
-      match_civil_status ~skip_fname ~skip_sname p
-      && (getss "place" = [] && gets "date2_yyyy" = "" && gets "date1_yyyy" = ""
-          || (match_baptism_date p false || match_baptism_place p false)
-          && match_baptism_date p true && match_baptism_place p true
-          || (match_birth_date p false || match_birth_place p false)
-          && match_birth_date p true && match_birth_place p true
-          || (match_burial_date p false || match_burial_place p false)
-          && match_burial_date p true && match_burial_place p true
-          || (match_death_date p false || match_death_place p false)
-          && match_death_date p true && match_death_place p true
-          || match_marriage p marriage_date_field_name marriage_place_field_name false
-         )
+    if authorized_age conf base p
+    && match_civil_status ~skip_fname ~skip_sname p
+    && if search_type <> "OR"
+       then match_baptism_date p true
+            && match_baptism_place p true
+            && match_birth_date p true
+            && match_birth_place p true
+            && match_burial_date p true
+            && match_burial_place p true
+            && match_death_date p true
+            && match_death_place p true
+            && match_marriage p marriage_date_field_name marriage_place_field_name true
+       else getss "place" = [] && gets "date2_yyyy" = "" && gets "date1_yyyy" = ""
+            || (match_baptism_date p false || match_baptism_place p false)
+               && match_baptism_date p true && match_baptism_place p true
+            || (match_birth_date p false || match_birth_place p false)
+               && match_birth_date p true && match_birth_place p true
+            || (match_burial_date p false || match_burial_place p false)
+               && match_burial_date p true && match_burial_place p true
+            || (match_death_date p false || match_death_place p false)
+               && match_death_date p true && match_death_place p true
+            || match_marriage p marriage_date_field_name marriage_place_field_name false
     then (p :: list, len + 1)
     else acc
   in
