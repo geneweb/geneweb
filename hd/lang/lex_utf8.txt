@@ -2800,6 +2800,7 @@ ru: бар-мицва
 sv: Bar Mitzvah
 
     base
+co: basa
 en: base
 fr: base
 
@@ -2872,7 +2873,7 @@ af: Medewerkers notas
 bg: администратори бележки
 br: strobinellerien notennoù
 ca: administrador notes
-co: note di i streghi
+co: note di i maghi
 cs: wizards notes
 da: bidragydere noter
 de: Meisters Notizen
@@ -5672,6 +5673,7 @@ sl: točno
 sv: exakt
 
     search_exact_fn
+co: ricerca esatta
 de: genaue Suche
 en: exact search
 es: búsqueda exacta
@@ -5684,6 +5686,7 @@ pt: pesquisa exata
 sv: exakt sökning
 
     search_exact_sn
+co: ricerca esatta
 de: genaue Suche
 en: exact search
 es: búsqueda exacta
@@ -11939,6 +11942,7 @@ fr: retirer le dernier module ajouté
 pt: remover o último módulo adicionado
 
     reserved to friends or wizards
+co: riservatu à l’amichi è à i maghi
 en: reserved to friends or wizards
 fr: réservée aux amis et magiciens
 
@@ -15340,7 +15344,7 @@ af: Medewerkers/Medewerkers/vriend/vriend/exterior
 bg: администратор/администратори/приятел/приятели/външен потребител
 br: strobineller/strobinellerien/mignon/mignon/exterior
 ca: administrador/administrador/amic/amic/exterior
-co: stregu/streghi/amicu/amichi/furesteru
+co: magu/maghi/amicu/amichi/furesteru
 cs: wizard/wizards/friend/friends/exterior
 da: bidragyder/bidragydere/betroet/betroet/exterior
 de: Meister/Meisters/Freund/Freunde/exterior
@@ -15586,4 +15590,3 @@ ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
-
