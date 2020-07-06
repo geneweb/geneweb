@@ -500,10 +500,12 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings (_, 
     in
     Hashtbl.fold begin fun _ p acc ->
       let istr = get p in
+      let str = strings.get istr in
       if not (List.mem istr acc)
-      && strings.get istr
-         |> split
-         |> List.exists (fun s -> i = Dutil.name_index s)
+      && match split str  with
+      | [ s ] -> i = Dutil.name_index s
+      | list ->
+        List.exists (fun s -> i = Dutil.name_index s) (str :: list)
       then istr :: acc
       else acc
     end person_patches (Array.to_list r)
