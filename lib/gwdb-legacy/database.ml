@@ -452,10 +452,12 @@ let old_strings_of_fsname bname strings (_, person_patches) =
     in
     Hashtbl.fold begin fun _ p acc ->
       let aux split acc istr =
+        let str = strings.get istr in
         if not (List.mem istr acc)
-        && strings.get istr
-           |> split
-           |> List.exists (fun s -> i = Dutil.name_index s)
+        && match split str with
+        | [ s ] -> i = Dutil.name_index s
+        | list ->
+          List.exists (fun s -> i = Dutil.name_index s) (str :: list)
         then istr :: acc
         else acc
       in
@@ -502,7 +504,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings (_, 
       let istr = get p in
       let str = strings.get istr in
       if not (List.mem istr acc)
-      && match split str  with
+      && match split str with
       | [ s ] -> i = Dutil.name_index s
       | list ->
         List.exists (fun s -> i = Dutil.name_index s) (str :: list)
