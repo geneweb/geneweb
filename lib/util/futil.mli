@@ -1,24 +1,48 @@
-(* $Id: futil.mli,v 5.5 2007-03-05 05:18:23 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def
 
-val map_title_strings : ('a -> 'b) -> 'a gen_title -> 'b gen_title
-val map_pers_event :
-  ('a -> 'c) -> ('b -> 'd) -> ('a, 'b) gen_pers_event ->
-    ('c, 'd) gen_pers_event
-val map_fam_event :
-  ('a -> 'c) -> ('b -> 'd) -> ('a, 'b) gen_fam_event -> ('c, 'd) gen_fam_event
+val map_title_strings
+  : ?fd:(Def.date -> Def.date)
+  -> ('a -> 'b)
+  -> 'a gen_title
+  -> 'b gen_title
+
+val map_pers_event
+  : ?fd:(Def.date -> Def.date)
+  -> ('a -> 'c)
+  -> ('b -> 'd)
+  -> ('a, 'b) gen_pers_event
+  -> ('c, 'd) gen_pers_event
+
+val map_fam_event
+  : ?fd:(Def.date -> Def.date)
+  -> ('a -> 'c)
+  -> ('b -> 'd)
+  -> ('a, 'b) gen_fam_event
+  -> ('c, 'd) gen_fam_event
+
 val map_relation_ps :
   ('a -> 'c) -> ('b -> 'd) -> ('a, 'b) gen_relation -> ('c, 'd) gen_relation
 
-val map_person_ps :
-  ('b -> 'd) -> ('c -> 'e) -> ('a, 'b, 'c) gen_person -> ('a, 'd, 'e) gen_person
+val map_person_ps
+  : ?fd:(Def.date -> Def.date)
+  -> ('b -> 'd)
+  -> ('c -> 'e)
+  -> ('a, 'b, 'c) gen_person
+  -> ('a, 'd, 'e) gen_person
+
 val map_ascend_f : ('a -> 'b) -> 'a gen_ascend -> 'b gen_ascend
 val map_union_f : ('a -> 'b) -> 'a gen_union -> 'b gen_union
 
-val map_family_ps :
-  ('a -> 'b) -> ('c -> 'd) -> ('e -> 'f) -> ('a, 'c, 'e) gen_family -> ('b, 'd, 'f) gen_family
+val map_family_ps
+  : ?fd:(Def.date -> Def.date)
+  -> ('a -> 'b)
+  -> ('c -> 'd)
+  -> ('e -> 'f)
+  -> ('a, 'c, 'e) gen_family
+  -> ('b, 'd, 'f) gen_family
+
 val map_couple_p : bool -> ('a -> 'b) -> 'a gen_couple -> 'b gen_couple
 val map_descend_p : ('a -> 'b) -> 'a gen_descend -> 'b gen_descend
 
