@@ -13,7 +13,7 @@ type patch =
   | Fix_AddedRelatedFromFevent of iper * iper
   | Fix_MarriageDivorce of ifam
   | Fix_MissingSpouse of ifam * iper
-  | Fix_WrongUTF8Encoding of Gwdb.ifam option * Gwdb.iper option * Gwdb.istr * Gwdb.istr
+  | Fix_WrongUTF8Encoding of Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
   | Fix_UpdatedOcc of iper * int * int
 
 let mk_pevent name date place note src =
@@ -327,13 +327,22 @@ let fix_missing_spouses ?report progress base =
   end (Gwdb.families base)
 
 let fix_utf8_sequence ?report progress base =
+  let normalize_utf_8_date ifam iper s =
+    let s' = Mutil.normalize_utf_8 s in
+    if s <> s'
+    then begin match report with
+      | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, None))
+      | None -> ()
+    end ;
+    s'
+  in
   let normalize_utf_8 ifam iper i =
     let s = Gwdb.sou base i in
     let s' = Mutil.normalize_utf_8 s in
     let i' = Gwdb.insert_string base s' in
     if i <> i'
     then begin match report with
-      | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, i, i'))
+      | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, Some (i, i')))
       | None -> ()
     end ;
     i'
@@ -344,18 +353,22 @@ let fix_utf8_sequence ?report progress base =
   let fp i = i in
   let ff i = i in
   let fs ifam iper i = normalize_utf_8 ifam iper i in
+  let fd ifam iper = function
+    | Dtext d -> Dtext (normalize_utf_8_date ifam iper d)
+    | d -> d
+  in
   Gwdb.Collection.iteri begin fun i fam ->
     progress i nb ;
     let ifam = Gwdb.get_ifam fam in
     let f = Gwdb.gen_family_of_family fam in
-    let f' = Futil.map_family_ps fp ff (fs (Some ifam) None) f in
+    let f' = Futil.map_family_ps ~fd:(fd (Some ifam) None) fp ff (fs (Some ifam) None) f in
     if f' <> f then Gwdb.patch_family base ifam f' ;
   end (Gwdb.families base) ;
   Gwdb.Collection.iteri begin fun i per ->
     progress (nbf + i) nb ;
     let iper = Gwdb.get_iper per in
     let p = Gwdb.gen_person_of_person per in
-    let p' = Futil.map_person_ps fp (fs None (Some iper)) p in
+    let p' = Futil.map_person_ps ~fd:(fd None (Some iper)) fp (fs None (Some iper)) p in
     if p' <> p then Gwdb.patch_person base iper p' ;
   end (Gwdb.persons base)
 

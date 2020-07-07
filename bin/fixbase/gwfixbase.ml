@@ -43,15 +43,16 @@ let aux txt (fn : ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> bas
       Printf.sprintf "Fixed missing spouse (%s) in family %s"
         (string_of_p iper)
         (string_of_f ifam)
-    | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, i, i') ->
-      Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s -> %s"
+    | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
+      Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
         (match ifam_opt with
          | Some i -> "ifam " ^ string_of_ifam i
          | None -> match iper_opt with
            | Some i -> "iper " ^ string_of_iper i
            | None -> assert false)
-        (string_of_istr i)
-        (string_of_istr i')
+        (match opt with
+         | Some (i, i') -> string_of_istr i ^ " -> " ^ string_of_istr i'
+         | None -> "Dtext")
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
       Printf.sprintf "Uptated occ for %s: %d -> %d"
         (string_of_p iper) oocc nocc
