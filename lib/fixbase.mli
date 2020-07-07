@@ -24,7 +24,7 @@ type patch =
   | Fix_AddedRelatedFromFevent of Gwdb.iper * Gwdb.iper
   | Fix_MarriageDivorce of Gwdb.ifam
   | Fix_MissingSpouse of Gwdb.ifam * Gwdb.iper
-  | Fix_WrongUTF8Encoding of Gwdb.ifam option * Gwdb.iper option * Gwdb.istr * Gwdb.istr
+  | Fix_WrongUTF8Encoding of Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
   | Fix_UpdatedOcc of Gwdb.iper * int * int
 
 val check_NBDS : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
