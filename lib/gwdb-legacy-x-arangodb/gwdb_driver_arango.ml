@@ -366,7 +366,7 @@ let commit_patches_f base sou get_family get_couple get_descend =
       | Some p -> p
     in
     let f = aux base.patch_family get_family in
-    let f = Futil.map_family_ps (fun i -> i) sou sou f in
+    let f = Futil.map_family_ps (fun i -> i) (fun i -> i) sou f in
     let c = aux base.patch_couple get_couple in
     let d = aux base.patch_descend get_descend in
     let bname = base.bname in
