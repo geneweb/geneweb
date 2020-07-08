@@ -49,8 +49,9 @@
     - cmd: '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
     - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
     # unix environnement
-    - sh: 'set OPAMYES=1'
-    - sh: 'sudo chown -R appveyor:staff $HOME/.cache' # for macos only : permissions issue
+    - sh: 'export OPAMYES=1'
+    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "macOS" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
+    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "Ubuntu1604" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
     - sh: '$PACKAGE_UPDATE'
     - sh: '$PACKAGE_INSTALLER opam'
     - sh: 'opam init --compiler=4.09.1'
