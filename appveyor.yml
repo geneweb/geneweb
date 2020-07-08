@@ -61,7 +61,7 @@
 
   test_script:
     - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make test"'
-    - sh: 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make ci'
+    - sh: 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make test'
 
   build_script:
     - sh : 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib'
