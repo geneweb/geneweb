@@ -80,6 +80,6 @@
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
-    artifact: geneweb-%PKG_NAME%
+    artifact: geneweb-%PKG_NAME%.zip
     draft: true
     prerelease: false
