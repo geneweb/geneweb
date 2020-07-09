@@ -5,7 +5,7 @@
 #define MyVersion "7.00"
 #define MyCommit GetEnv('APPVEYOR_REPO_COMMIT')
 #define MyDistribution "distribution\"
-#define MyOutputDir "distribution\"
+#define MyOutputDir GetEnv('APPVEYOR_BUILD_FOLDER')
 #define MyApplowName "geneweb"
 #define MyAppShortName "gw"
 #define MyAppPublisher "GeneWeb"

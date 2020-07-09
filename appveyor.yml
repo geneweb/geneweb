@@ -68,11 +68,13 @@
     - sh : 'zip -r geneweb-$PKG_NAME.zip distribution/*'
     - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib"'
     - cmd: 'iscc geneweb.iss'
-    - cmd: 7z a geneweb-%PKG_NAME%.zip %APPVEYOR_BUILD_FOLDER%\distribution\geneweb-install.exe
+    - cmd: 7z a geneweb.zip %APPVEYOR_BUILD_FOLDER%\distribution
 
   artifacts:
     - path: geneweb-%PKG_NAME%.zip
       name: GeneWeb with default options
+    - path: geneweb-install.exe
+      name: Win64 installer for GeneWeb
 
   deploy:
     release: 'Geneweb pre-release %APPVEYOR_REPO_COMMIT%'
@@ -80,6 +82,8 @@
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
-    artifact: geneweb-%PKG_NAME%.zip
-    draft: true
-    prerelease: false
+    artifact:
+      - geneweb-%PKG_NAME%.zip
+      - geneweb-install.exe
+    draft: false
+    prerelease: true
