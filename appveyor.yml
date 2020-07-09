@@ -82,6 +82,6 @@
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
-    artifact: (geneweb-%PKG_NAME%.zip|geneweb-install.exe)
+    artifact: /geneweb-%PKG_NAME%.zip|geneweb-install.exe/
     draft: false
     prerelease: true
