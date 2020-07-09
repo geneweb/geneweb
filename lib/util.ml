@@ -312,7 +312,9 @@ let prefix_base_password_2 conf =
 let code_varenv = Wserver.encode
 let decode_varenv = Wserver.decode
 
-let safe_html_allowd_tags =
+let allowed_tags_file = ref ""
+
+let default_safe_html_allowed_tags =
   [ ("http://www.w3.org/1999/xhtml", "a")
   ; ("http://www.w3.org/1999/xhtml", "area")
   ; ("http://www.w3.org/1999/xhtml", "b")
@@ -365,6 +367,29 @@ let safe_html_allowd_tags =
   ; ("http://www.w3.org/1999/xhtml", "nav")
   ; ("http://www.w3.org/1999/xhtml", "section")
   ]
+
+let safe_html_allowed_tags =
+  lazy begin
+    if !allowed_tags_file = "" then default_safe_html_allowed_tags
+    else begin
+      let ic = open_in !allowed_tags_file in
+      let rec loop tags =
+        match input_line ic with
+        | tag ->
+          let ns, tag =
+            match String.split_on_char ' ' tag with
+            | [ ns ; tag ] -> (ns, tag)
+            | [ tag ] -> "http://www.w3.org/1999/xhtml", tag
+            | _ -> assert false
+          in
+          loop ((ns, String.lowercase_ascii tag) :: tags)
+        | exception End_of_file ->
+          close_in ic ;
+          tags
+      in
+      loop []
+    end
+  end
 
 (** [escape_html str] replaces '&', '"', '<' and '>'
     with their corresponding character entities (using entity number) *)
@@ -436,7 +461,7 @@ let safe_html s =
   let stack = ref [] in
   let make_safe = function
     | `Start_element (name, attrs) ->
-      if not @@ List.mem name safe_html_allowd_tags then begin
+      if not @@ List.mem name @@ Lazy.force safe_html_allowed_tags then begin
         stack := `KO :: !stack ;
         `Comment ""
       end else begin
@@ -1513,52 +1538,6 @@ let email_addr s i =
       if len = 0 then None else Some i
   | None -> None
 
-let tag_id s i =
-  let rec loop i len =
-    if i = String.length s then Buff.get len
-    else
-      match s.[i] with
-        'a'..'z' | 'A'..'Z' | '0'..'9' | '!' | '-' ->
-          loop (i + 1) (Buff.store len (Char.lowercase_ascii s.[i]))
-      | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len
-  in
-  loop i 0
-
-let default_good_tag_list =
-  "!--" :: List.map snd safe_html_allowd_tags
-
-let allowed_tags_file = ref ""
-
-let good_tag_list_fun () =
-  if !allowed_tags_file <> "" then
-    try
-      let ic = open_in !allowed_tags_file in
-      let rec loop tags =
-        match input_line ic with
-        | tg -> loop (String.lowercase_ascii tg :: tags)
-        | exception End_of_file ->
-          close_in ic;
-          tags
-      in
-      loop []
-    with Sys_error _ -> default_good_tag_list
-  else default_good_tag_list
-
-let good_tags_list = Lazy.from_fun good_tag_list_fun
-let good_tag s i = List.mem (tag_id s i) (Lazy.force good_tags_list)
-
-module Lbuff = Buff.Make (struct  end)
-
-let filter_html_tags s =
-  let rec loop len i =
-    if i < String.length s then
-      if s.[i] = '<' && not (good_tag s (i + 1)) then
-        loop (Lbuff.mstore len "&lt;") (i + 1)
-      else loop (Lbuff.store len s.[i]) (i + 1)
-    else Lbuff.get len
-  in
-  loop 0 0
-
 let get_variable s i =
   let rec loop len i =
     if i = String.length s then Buff.get len, [], i
@@ -1687,7 +1666,7 @@ let string_with_macros conf env s =
                       Buffer.add_string buff "&amp;"
                     else Buffer.add_char buff s.[i];
                     loop tt (i + 1)
-    else filter_html_tags (Buffer.contents buff)
+    else safe_html (Buffer.contents buff)
   in
   loop Out 0
 
