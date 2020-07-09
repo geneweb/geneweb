@@ -68,7 +68,7 @@
     - sh : 'zip -r geneweb-$PKG_NAME.zip distribution/*'
     - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib"'
     - cmd: 'iscc geneweb.iss'
-    - cmd: 7z a geneweb-$PKG_NAME.zip %APPVEYOR_BUILD_FOLDER%\distribution
+    - cmd: 7z a geneweb-%PKG_NAME%.zip %APPVEYOR_BUILD_FOLDER%\distribution
 
   artifacts:
     - path: geneweb-%PKG_NAME%.zip
