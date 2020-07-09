@@ -82,8 +82,16 @@
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
-    artifact:
-      - geneweb-%PKG_NAME%.zip
-      - geneweb-install.exe
+    artifact: geneweb-%PKG_NAME%.zip
+    draft: false
+    prerelease: true
+
+  deploy:
+    release: 'Geneweb pre-release %APPVEYOR_REPO_COMMIT%'
+    description: '%APPVEYOR_REPO_COMMIT_MESSAGE%'
+    provider: GitHub
+    auth_token:
+      secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
+    artifact: geneweb-install.exe
     draft: false
     prerelease: true
