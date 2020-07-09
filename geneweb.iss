@@ -3,7 +3,7 @@
 
 #define MyAppName "GeneWeb"
 #define MyVersion "7.00"
-#define MyCommit "{%APPVEYOR_REPO_COMMIT}"
+#define MyCommit "{#GetEnv('APPVEYOR_REPO_COMMIT')}"
 #define MyDistribution "distribution\"
 #define MyOutputDir "distribution\"
 #define MyApplowName "geneweb"
