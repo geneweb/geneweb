@@ -15,15 +15,15 @@
     matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CYG_ROOT: C:/cygwin64
-        PKG_NAME: 'win64-%PKG_VERSION%'
+        PKG_OS: win64
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
         PACKAGE_UPDATE: 'sudo apt-get update'
         PACKAGE_INSTALLER: 'sudo apt-get install -qq'
-        PKG_NAME: 'deb-%PKG_VERSION%'
+        PKG_OS: linux
       - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
         PACKAGE_UPDATE: 'brew update'
         PACKAGE_INSTALLER: 'brew install'
-        PKG_NAME: 'macos-%PKG_VERSION%'
+        PKG_OS: macos
 
   install:
     # windows environnement
@@ -54,13 +54,13 @@
 
   build_script:
     - sh : 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib'
-    - sh : 'zip -r geneweb-$PKG_NAME.zip distribution/*'
+    - sh : 'zip -r geneweb-%PKG_OS%-%PKG_VERSION%.zip distribution/*'
     - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib"'
     - cmd: 'iscc geneweb.iss'
-    - cmd: 7z a geneweb-%PKG_NAME%.zip %APPVEYOR_BUILD_FOLDER%\distribution
+    - cmd: 7z a geneweb-%PKG_OS%-%PKG_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\distribution
 
   artifacts:
-    - path: geneweb-%PKG_NAME%.zip
+    - path: geneweb-%PKG_OS%-%PKG_VERSION%.zip
       name: GeneWeb with default options
     - path: geneweb-%PKG_VERSION%-install.exe
       name: Win64 installer for GeneWeb
@@ -71,6 +71,6 @@
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
-    artifact: /geneweb-%PKG_NAME%.zip|geneweb-%PKG_VERSION%-install.exe/
+    artifact: /geneweb-%PKG_OS%-%PKG_VERSION%.zip|geneweb-%PKG_VERSION%-install.exe/
     draft: false
     prerelease: true
