@@ -20,15 +20,15 @@
     matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CYG_ROOT: C:/cygwin64
-        PKG_NAME: win64-%PKG_VERSION%
+        PKG_NAME: 'win64-%PKG_VERSION%'
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
         PACKAGE_UPDATE: 'sudo apt-get update'
         PACKAGE_INSTALLER: 'sudo apt-get install -qq'
-        PKG_NAME: deb-%PKG_VERSION%
+        PKG_NAME: 'deb-%PKG_VERSION%'
       - APPVEYOR_BUILD_WORKER_IMAGE: macOS
         PACKAGE_UPDATE: 'brew update'
         PACKAGE_INSTALLER: 'brew install'
-        PKG_NAME: macos-%PKG_VERSION%
+        PKG_NAME: 'macos-%PKG_VERSION%'
 
   install:
     # windows environnement
