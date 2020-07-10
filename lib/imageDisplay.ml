@@ -48,7 +48,7 @@ let print_image_type fname ctype =
         else
           let olen = min (Bytes.length buf) len in
           really_input ic buf 0 olen;
-          Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+          Wserver.print_string (Bytes.sub_string buf 0 olen);
           loop (len - olen)
       in
       loop len; close_in ic; true

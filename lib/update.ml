@@ -143,7 +143,7 @@ let print_person_parents_and_spouse conf base p =
   Wserver.printf "%s.%d %s" (p_first_name base p) (get_occ p)
     (p_surname base p);
   Wserver.printf "</a>";
-  Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
+  Wserver.print_string (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
   if (String.length cop) > 0 then Wserver.printf ", %s" cop;
   let hbw = Util.husband_wife conf base p true in
@@ -216,7 +216,7 @@ let print_err_unknown conf _base (f, s, o) =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
     (Utf8.capitalize (transl conf "unknown person")) (transl conf ":") f o s;
@@ -279,7 +279,7 @@ let string_of_error conf base = function
       (Utf8.capitalize (transl conf "cannot change sex of a married person"))
 
 let print_error conf base e =
-  Wserver.printf "%s" @@ string_of_error conf base e
+  Wserver.print_string @@ string_of_error conf base e
 
 let someone_ref_text conf base p =
   "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
@@ -316,7 +316,7 @@ let print_warning conf base =
       Wserver.printf "%s\n"
         (Utf8.capitalize (transl conf "changed order of children"));
       Wserver.printf "-&gt;\n";
-      Wserver.printf "%s"
+      Wserver.print_string
         (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
          " " ^ someone_ref_text conf base moth ^ "\n");
       let print_list arr diff_arr =
@@ -328,7 +328,7 @@ let print_warning conf base =
              if eq_istr (get_surname p) (get_surname fath) then
                print_first_name conf base p
              else print_someone conf base p;
-             Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
+             Wserver.print_string (DateDisplay.short_dates_text conf base p);
              Wserver.printf "\n";
              Wserver.printf "</li>\n")
           arr
@@ -360,11 +360,11 @@ let print_warning conf base =
       Wserver.printf "<ul>\n";
       Wserver.printf "<li>";
       print_first_name_strong conf base elder;
-      Wserver.printf "%s" (DateDisplay.short_dates_text conf base elder);
+      Wserver.print_string (DateDisplay.short_dates_text conf base elder);
       Wserver.printf "</li>";
       Wserver.printf "<li>";
       print_first_name_strong conf base x;
-      Wserver.printf "%s" (DateDisplay.short_dates_text conf base x);
+      Wserver.print_string (DateDisplay.short_dates_text conf base x);
       Wserver.printf "</li>";
       Wserver.printf "</ul>\n"
   | ChangedOrderOfMarriages (p, before, after) ->
@@ -477,11 +477,11 @@ let print_warning conf base =
       Wserver.printf "<ul>\n";
       Wserver.printf "<li>";
       print_first_name_strong conf base c1;
-      Wserver.printf "%s" (DateDisplay.short_dates_text conf base c1);
+      Wserver.print_string (DateDisplay.short_dates_text conf base c1);
       Wserver.printf "</li>";
       Wserver.printf "<li>";
       print_first_name_strong conf base c2;
-      Wserver.printf "%s" (DateDisplay.short_dates_text conf base c2);
+      Wserver.print_string (DateDisplay.short_dates_text conf base c2);
       Wserver.printf "</li>";
       Wserver.printf "</ul>\n"
   | DistantChildren (ifam, p1, p2) ->
@@ -496,11 +496,11 @@ let print_warning conf base =
       Wserver.printf "<ul>\n";
       Wserver.printf "<li>";
       print_first_name_strong conf base p1;
-      Wserver.printf "%s" (DateDisplay.short_dates_text conf base p1);
+      Wserver.print_string (DateDisplay.short_dates_text conf base p1);
       Wserver.printf "</li>";
       Wserver.printf "<li>";
       print_first_name_strong conf base p2;
-      Wserver.printf "%s" (DateDisplay.short_dates_text conf base p2);
+      Wserver.print_string (DateDisplay.short_dates_text conf base p2);
       Wserver.printf "</li>";
       Wserver.printf "</ul>\n"
   | DeadOld (p, a) ->
@@ -725,9 +725,9 @@ let error conf base x =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s" err;
+  Wserver.print_string err;
   Wserver.printf "\n";
   print_return conf;
   Hutil.trailer conf;
@@ -737,7 +737,7 @@ let error conf base x =
   raise @@ ModErr err
 
 let error_locked conf =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "<p>\n";
   Wserver.printf
@@ -756,7 +756,7 @@ let error_locked conf =
          begin
            Wserver.printf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
-           Wserver.printf "%s" (Util.escape_html (decode_varenv v));
+           Wserver.print_string (Util.escape_html (decode_varenv v));
            Wserver.printf "</textarea>\n"
          end
        else
@@ -804,7 +804,7 @@ let error_digest conf =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>%s.\n</p>\n" err ;
@@ -842,9 +842,9 @@ let bad_date conf d =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title ;
-  Wserver.printf "%s" err ;
+  Wserver.print_string err ;
   Hutil.trailer conf ;
 #ifdef API
     end;
@@ -1053,9 +1053,9 @@ let print_create_conflict conf base p var =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s" err ;
+  Wserver.print_string err ;
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
@@ -1068,7 +1068,7 @@ let print_create_conflict conf base p var =
          begin
            Wserver.printf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
-           Wserver.printf "%s" (Util.escape_html (decode_varenv v));
+           Wserver.print_string (Util.escape_html (decode_varenv v));
            Wserver.printf "</textarea>\n"
          end
        else

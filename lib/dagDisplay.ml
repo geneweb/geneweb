@@ -113,8 +113,8 @@ let print_table conf hts =
         end;
         Wserver.printf ">";
         begin match td with
-          TDitem s -> Wserver.printf "%s" s
-        | TDtext s -> Wserver.printf "%s" s
+          TDitem s -> Wserver.print_string s
+        | TDtext s -> Wserver.print_string s
         | TDnothing -> Wserver.printf "&nbsp;"
         | TDbar None -> Wserver.printf "|"
         | TDbar (Some s) ->
@@ -632,7 +632,7 @@ let print_table_pre conf hts =
               else if pos1 < pos then displayed_sub outs 0 (pos2 - pos)
               else displayed_sub outs (pos1 - pos) (pos2 - pos1)
           in
-          Wserver.printf "%s" clipped_outs;
+          Wserver.print_string clipped_outs;
           loop (pos + sz) (col + colspan) (j + 1)
       in
       loop 0 0 0
@@ -759,7 +759,7 @@ let print_slices_menu conf hts =
     Utf8.capitalize
       (transl_nth conf "display by slices/slice width/overlap/total width" n)
   in
-  let title _ = Wserver.printf "%s" (txt 0) in
+  let title _ = Wserver.print_string (txt 0) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Opt.iter
@@ -826,7 +826,7 @@ let print_dag_page conf page_title hts next_txt =
     in
     {conf with base_env = ("doctype", doctype) :: conf.base_env}
   in
-  let title _ = Wserver.printf "%s" page_title in
+  let title _ = Wserver.print_string page_title in
   Hutil.header_no_page_title conf title;
   Opt.iter
     (Templ.copy_from_templ conf conf.env)

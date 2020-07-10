@@ -10,9 +10,9 @@ let print_link conf base p =
   Wserver.printf "%s.%d %s" (sou base (get_first_name p)) (get_occ p)
     (sou base (get_surname p));
   Wserver.printf "</a>";
-  Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
+  Wserver.print_string (DateDisplay.short_dates_text conf base p);
   match main_title conf base p with
-    Some t -> Wserver.printf "%s" (one_title_text base t)
+    Some t -> Wserver.print_string (one_title_text base t)
   | None -> ()
 
 let print_no_candidate conf base p =

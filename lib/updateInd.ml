@@ -834,7 +834,7 @@ let print_update_ind conf base p digest =
 let print_del1 conf base p =
   let title _ =
     let s = transl_nth conf "person/persons" 0 in
-    Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "delete" s))
+    Wserver.print_string (Utf8.capitalize (transl_decline conf "delete" s))
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Wserver.printf "<h2>\n";
@@ -849,7 +849,7 @@ let print_del1 conf base p =
     (string_of_iper (get_iper p)) conf.xhs;
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";

@@ -76,7 +76,7 @@ let print_children conf base ipl =
 let print_change conf base p =
   let title _ =
     let s = transl conf "change children's names" in
-    Wserver.printf "%s" (Utf8.capitalize s)
+    Wserver.print_string (Utf8.capitalize s)
   in
   let children = select_children_of base p in
   let digest = digest_children base children in
@@ -85,7 +85,7 @@ let print_change conf base p =
     title false;
   begin
     let s = person_text conf base p in
-    Wserver.printf "%s" (Util.transl_a_of_b conf "" (reference conf base p s) s)
+    Wserver.print_string (Util.transl_a_of_b conf "" (reference conf base p s) s)
   end ;
   Wserver.printf " %s" (DateDisplay.short_dates_text conf base p);
   Wserver.printf "</h2>\n";
@@ -100,7 +100,7 @@ let print_change conf base p =
   Wserver.printf "\n";
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-primary btn-lg ml-5 mb-2\">";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
   Wserver.printf "\n";
@@ -114,7 +114,7 @@ let print conf base =
 
 let print_children_list conf base u =
   Wserver.printf "<h4>";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "child/children" 1));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "child/children" 1));
   Wserver.printf "</h4>";
   Wserver.printf "\n<p>\n";
   Wserver.printf "<ul>\n";
@@ -135,7 +135,7 @@ let print_children_list conf base u =
 let print_change_done conf base p =
   let title _ =
     let s = transl conf "children's names changed" in
-    Wserver.printf "%s" (Utf8.capitalize s)
+    Wserver.print_string (Utf8.capitalize s)
   in
   Hutil.header conf title;
   Wserver.printf "\n%s" (reference conf base p (person_text conf base p));
@@ -144,7 +144,7 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
@@ -186,7 +186,7 @@ class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "b
   raise @@ Update.ModErr __LOC__
 
 let error_person conf err =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s\n" (Utf8.capitalize err);
   Hutil.trailer conf;

@@ -42,9 +42,9 @@ let print_title conf base is_surnames ini len =
       Wserver.printf (fcapitale (ftransl conf "the %d surnames")) len
     else Wserver.printf (fcapitale (ftransl conf "the %d first names")) len
   else if is_surnames then
-    Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
+    Wserver.print_string (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   else
-    Wserver.printf "%s"
+    Wserver.print_string
       (Utf8.capitalize (transl_nth conf "first name/first names" 0));
   if ini <> "" then
     Wserver.printf " %s %s" (transl conf "starting with") ini
@@ -80,7 +80,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     (fun (ini_k, _) ->
        Wserver.printf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
          (Util.code_varenv ini_k);
-       Wserver.printf "%s" (tr '_' "&nbsp;" (displayify ini_k));
+       Wserver.print_string (tr '_' "&nbsp;" (displayify ini_k));
        Wserver.printf "</a>\n")
     list;
   Wserver.printf "</p>\n";
@@ -98,7 +98,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
           begin
             Wserver.printf "<a href=\"%sm=%s&tri=A&o=A&k=%s\">" (commd conf)
               mode ini;
-            Wserver.printf "%s" (transl conf "long display");
+            Wserver.print_string (transl conf "long display");
             Wserver.printf "</a>"
           end;
           Wserver.printf "</li>\n"
@@ -108,7 +108,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
           begin
             Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s\">" (commd conf)
               mode ini;
-            Wserver.printf "%s" (transl conf "short display");
+            Wserver.print_string (transl conf "short display");
             Wserver.printf "</a>"
           end;
           Wserver.printf "</li>\n"
@@ -138,7 +138,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
     (fun (ini_k, _) ->
        let ini = ini_k in
        Wserver.printf "<a href=\"#a%s\">" ini;
-       Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
+       Wserver.print_string (Mutil.tr '_' ' ' ini);
        Wserver.printf "</a>\n")
     list;
   Wserver.printf "</p>\n";
@@ -148,7 +148,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
        let ini = ini_k in
        Wserver.printf "<li>\n";
        Wserver.printf "<a id=\"a%s\">" ini_k;
-       Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
+       Wserver.print_string (Mutil.tr '_' ' ' ini);
        Wserver.printf "</a>\n";
        Wserver.printf "<ul>\n";
        List.iter
@@ -182,7 +182,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
            Wserver.printf "<li>";
            Wserver.printf "<a href=\"%sm=%s&v=%s&t=A\">" (commd conf) mode
              (code_varenv s);
-           Wserver.printf "%s" (particle_at_the_end base is_surnames s);
+           Wserver.print_string (particle_at_the_end base is_surnames s);
            Wserver.printf "</a>";
            Wserver.printf " (%d)" cnt;
            Wserver.printf "</li>\n")
@@ -212,7 +212,7 @@ let print_frequency_any conf base is_surnames list len =
                   Wserver.printf "<li>";
                   Wserver.printf "<a href=\"%sm=%s&v=%s\">" (commd conf) mode
                     (code_varenv (Name.lower s));
-                  Wserver.printf "%s" (particle_at_the_end base is_surnames s);
+                  Wserver.print_string (particle_at_the_end base is_surnames s);
                   Wserver.printf "</a>";
                   incr n;
                   Wserver.printf "</li>\n")
@@ -283,7 +283,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
         (fun (ini_k, _) ->
            let ini = ini_k in
            Wserver.printf "<a href=\"#a%s\">" ini;
-           Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
+           Wserver.print_string (Mutil.tr '_' ' ' ini);
            Wserver.printf "</a>\n")
         list;
       Wserver.printf "</p>\n"
@@ -306,7 +306,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
             if not first then Wserver.printf ",\n";
             if href <> "" || name <> "" then
               Wserver.printf "<a%s%s>" href name;
-            Wserver.printf "%s" (particle_at_the_end base is_surnames s);
+            Wserver.print_string (particle_at_the_end base is_surnames s);
             if href <> "" || name <> "" then Wserver.printf "</a>";
             Wserver.printf " (%d)" cnt)
          (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);

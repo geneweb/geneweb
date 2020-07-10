@@ -29,7 +29,7 @@ let gen_print_link_to_welcome f conf right_aligned =
       else Wserver.printf "<p>\n";
       f ();
       let str = link_to_referer conf in
-      if str = "" then () else Wserver.printf "%s" str;
+      if str = "" then () else Wserver.print_string str;
       Wserver.printf "<a href=\"%s\">\
          <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
        </a>\n"
@@ -123,7 +123,7 @@ let trailer = gen_trailer true
 
 let incorrect_request conf =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (Util.transl conf "incorrect request"))
+    Wserver.print_string (Utf8.capitalize (Util.transl conf "incorrect request"))
   in
   Wserver.http Wserver.Bad_Request;
   header conf title;

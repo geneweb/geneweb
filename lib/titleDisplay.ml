@@ -54,10 +54,10 @@ let give_access_someone conf base (x, t) list =
       Wserver.printf "%s <em>%s</em> %s" (sou base n) (sou base nn)
         (p_surname base x)
   | Tname n, _, [] -> Wserver.printf "%s %s" (sou base n) (p_surname base x)
-  | _ -> Wserver.printf "%s" (person_text conf base x)
+  | _ -> Wserver.print_string (person_text conf base x)
   end;
   Wserver.printf "\n";
-  Wserver.printf "%s" (DateDisplay.short_dates_text conf base x);
+  Wserver.print_string (DateDisplay.short_dates_text conf base x);
   if t.t_nth <> 0 then
     Wserver.printf " (%s)"
       (if t.t_nth >= 100 then string_of_int t.t_nth
@@ -67,13 +67,13 @@ let give_access_someone conf base (x, t) list =
 let give_access_title conf t p =
   Wserver.printf "<a href=\"%sm=TT&sm=S&t=%s&p=%s\">" (commd conf)
     (code_varenv t) (code_varenv p);
-  Wserver.printf "%s" (Utf8.capitalize t);
+  Wserver.print_string (Utf8.capitalize t);
   Wserver.printf "</a>\n"
 
 let give_access_all_titles conf t absolute =
   Wserver.printf "<a href=\"%sm=TT&sm=S&t=%s%s\">" (commd conf)
     (code_varenv t) (if absolute then "&a=A" else "");
-  Wserver.printf "%s" (if absolute then t else Utf8.capitalize t);
+  Wserver.print_string (if absolute then t else Utf8.capitalize t);
   Wserver.printf "</a>"
 
 let give_access_all_places conf t =
@@ -111,7 +111,7 @@ let print_title_place_list conf base t p t_equiv list =
   let absolute = p_getenv conf.env "a" = Some "A" in
   let title h =
     if h || absolute then
-      begin Wserver.printf "%s" t; if p <> "" then Wserver.printf " %s" p end
+      begin Wserver.print_string t; if p <> "" then Wserver.printf " %s" p end
     else
       Mutil.list_iter_first
         (fun first t ->
@@ -176,11 +176,11 @@ let print_all_with_place conf base p =
 
 let print_places_list conf base t t_equiv list =
   let title h =
-    if h || List.length t_equiv = 1 then Wserver.printf "%s" t
+    if h || List.length t_equiv = 1 then Wserver.print_string t
     else
       Mutil.list_iter_first
         (fun first t ->
-           Wserver.printf "%s" (if first then "" else ", ");
+           Wserver.print_string (if first then "" else ", ");
            give_access_all_titles conf t true)
         t_equiv
   in
@@ -222,14 +222,14 @@ let print_titles conf base p =
     begin
       Wserver.printf "<a href=\"%sm=TT&sm=A&p=%s\">" (commd conf)
         (code_varenv p);
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "the whole list"));
+      Wserver.print_string (Utf8.capitalize (transl conf "the whole list"));
       Wserver.printf "</a>\n"
     end;
   Hutil.trailer conf
 
 let print_all_titles conf base =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "all the titles"))
+    Wserver.print_string (Utf8.capitalize (transl conf "all the titles"))
   in
   let list =
     let l = select_all_titles conf base in
@@ -245,7 +245,7 @@ let print_all_titles conf base =
 
 let print_all_places conf base =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "all the estates"))
+    Wserver.print_string (Utf8.capitalize (transl conf "all the estates"))
   in
   let list =
     let l = select_all_places conf base in

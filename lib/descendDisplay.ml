@@ -42,7 +42,7 @@ let descendants_title conf base p h =
     translate_eval
       (transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s1 s2)
   in
-  Wserver.printf "%s" (Utf8.capitalize s)
+  Wserver.print_string (Utf8.capitalize s)
 
 let display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -93,7 +93,7 @@ let display_descendants_level conf base max_level ancestor =
       [] list
   in
   Hutil.header conf (descendants_title conf base ancestor);
-  Wserver.printf "%s" (Utf8.capitalize (text_level conf max_level));
+  Wserver.print_string (Utf8.capitalize (text_level conf max_level));
   if !len > 1 then
     Wserver.printf " (%d %s)" !len
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
@@ -105,7 +105,7 @@ let display_descendants_level conf base max_level ancestor =
        else String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
     (fun (p, c) ->
        Wserver.printf "\n%s" (referenced_person_title_text conf base p);
-       Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
+       Wserver.print_string (DateDisplay.short_dates_text conf base p);
        if not (is_hidden p) && c > 1 then Wserver.printf " <em>(%d)</em>" c;
        Wserver.printf "\n")
     list;
@@ -198,30 +198,30 @@ let print_child conf base p1 p2 e =
   if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
      get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
   then
-    Wserver.printf "%s" (referenced_person_text_without_surname conf base e)
+    Wserver.print_string (referenced_person_text_without_surname conf base e)
   else Wserver.printf "\n%s" (referenced_person_text conf base e);
   Wserver.printf "</strong>";
-  Wserver.printf "%s" (DateDisplay.short_dates_text conf base e)
+  Wserver.print_string (DateDisplay.short_dates_text conf base e)
 
 let print_repeat_child conf base p1 p2 e =
   Wserver.printf "<em>";
   if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
      get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
   then
-    Wserver.printf "%s" (person_text_without_surname conf base e)
-  else Wserver.printf "%s" (person_text conf base e);
+    Wserver.print_string (person_text_without_surname conf base e)
+  else Wserver.print_string (person_text conf base e);
   Wserver.printf "</em>"
 
 let display_spouse conf base marks paths fam p c =
   Wserver.printf "\n&amp;";
-  Wserver.printf "%s" (DateDisplay.short_marriage_date_text conf base fam p c);
+  Wserver.print_string (DateDisplay.short_marriage_date_text conf base fam p c);
   Wserver.printf " ";
   Wserver.printf "<strong>";
   Wserver.printf "\n%s" (referenced_person_text conf base c);
   Wserver.printf "</strong>";
   if Gwdb.Marker.get marks (get_iper c)
   then Wserver.printf " (<tt><b>%s</b></tt>)" (label_of_path paths c)
-  else Wserver.printf "%s" (DateDisplay.short_dates_text conf base c)
+  else Wserver.print_string (DateDisplay.short_dates_text conf base c)
 
 let total = ref 0
 
@@ -379,7 +379,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
   Hutil.header conf title;
   total := 0;
-  Wserver.printf "%s" (DateDisplay.short_dates_text conf base ancestor);
+  Wserver.print_string (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
   if authorized_age conf base p then
     begin match Adef.od_of_cdate (get_birth p), get_death p with
@@ -423,7 +423,7 @@ let print_elem conf base paths precision (n, pll) =
       Wserver.printf "<strong>%s %s %s</strong>" (surname_without_particle base n)
         (reference conf base p (person_text_without_surname conf base p))
         (surname_particle base n);
-      Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
+      Wserver.print_string (DateDisplay.short_dates_text conf base p);
       print_ref conf base paths p;
       Wserver.printf "\n"
   | pll ->
@@ -450,7 +450,7 @@ let print_elem conf base paths precision (n, pll) =
                     specify_homonymous conf base p true;
                     Wserver.printf "</em>"
                   end;
-                Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
+                Wserver.print_string (DateDisplay.short_dates_text conf base p);
                 print_ref conf base paths p;
                 Wserver.printf "\n")
              pl)
@@ -509,7 +509,7 @@ let display_descendant_index conf base max_level ancestor =
          string_of_iper (get_iper ancestor) ^ "&v=" ^
          string_of_int max_level ^ "&t=C")
         txt
-    else Wserver.printf "%s" txt
+    else Wserver.print_string txt
   in
   Hutil.header conf title;
   let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -533,7 +533,7 @@ let display_descendant_index conf base max_level ancestor =
 let display_spouse_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title _ =
-    Wserver.printf "%s"
+    Wserver.print_string
       (Utf8.capitalize (transl conf "index of the spouses (non descendants)"))
   in
   Hutil.header conf title;
@@ -583,36 +583,36 @@ let print_desc_table_header conf =
   let nb_col = ref 2 in
   Wserver.printf "<tr class=\"descends_table_header\">\n";
   Wserver.printf "<th>\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl conf "n° d'Aboville"));
+  Wserver.print_string (Utf8.capitalize (transl conf "n° d'Aboville"));
   Wserver.printf "</th>\n";
   Wserver.printf "<th>\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "person/persons" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "person/persons" 0));
   Wserver.printf "</th>\n";
   if p_getenv conf.env "birth" = Some "on" then
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "date of birth"));
+      Wserver.print_string (Utf8.capitalize (transl conf "date of birth"));
       Wserver.printf "</th>\n"
     end;
   if p_getenv conf.env "birth_place" = Some "on" then
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "where born"));
+      Wserver.print_string (Utf8.capitalize (transl conf "where born"));
       Wserver.printf "</th>\n"
     end;
   if p_getenv conf.env "marr" = Some "on" then
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "spouse/spouses" 1));
+      Wserver.print_string (Utf8.capitalize (transl_nth conf "spouse/spouses" 1));
       Wserver.printf "</th>\n"
     end;
   if p_getenv conf.env "marr_date" = Some "on" then
     begin
       Wserver.printf "<th>\n";
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "date of marriage"));
+      Wserver.print_string (Utf8.capitalize (transl conf "date of marriage"));
       incr nb_col;
       Wserver.printf "</th>\n"
     end;
@@ -620,20 +620,20 @@ let print_desc_table_header conf =
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "where married"));
+      Wserver.print_string (Utf8.capitalize (transl conf "where married"));
       Wserver.printf "</th>\n"
     end;
   if p_getenv conf.env "child" = Some "on" then
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "nb children"));
+      Wserver.print_string (Utf8.capitalize (transl conf "nb children"));
       Wserver.printf "</th>\n"
     end;
   if p_getenv conf.env "death" = Some "on" then
     begin
       Wserver.printf "<th>\n";
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "date of death"));
+      Wserver.print_string (Utf8.capitalize (transl conf "date of death"));
       incr nb_col;
       Wserver.printf "</th>\n"
     end;
@@ -641,21 +641,21 @@ let print_desc_table_header conf =
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "where dead"));
+      Wserver.print_string (Utf8.capitalize (transl conf "where dead"));
       Wserver.printf "</th>\n"
     end;
   if p_getenv conf.env "death_age" = Some "on" then
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "age at death"));
+      Wserver.print_string (Utf8.capitalize (transl conf "age at death"));
       Wserver.printf "</th>\n"
     end;
   if p_getenv conf.env "occu" = Some "on" then
     begin
       Wserver.printf "<th>\n";
       incr nb_col;
-      Wserver.printf "%s"
+      Wserver.print_string
         (Utf8.capitalize (transl_nth conf "occupation/occupations" 1));
       Wserver.printf "</th>\n"
     end;
@@ -721,7 +721,7 @@ let print_person_table conf base p lab =
   (* afficher est vide, comme ça, on ne casse pas le rowspan.     *)
   Wserver.printf "<tr>\n";
   Wserver.printf "<td %s>\n" rowspan;
-  Wserver.printf "%s" lab;
+  Wserver.print_string lab;
   Wserver.printf "</td>\n";
   Wserver.printf "<td %s>\n" rowspan;
   Util.print_image_sex conf p 11;
@@ -730,7 +730,7 @@ let print_person_table conf base p lab =
   if p_getenv conf.env "birth" = Some "on" then
     begin
       Wserver.printf "<td %s>\n" rowspan;
-      Wserver.printf "%s" birth;
+      Wserver.print_string birth;
       Wserver.printf "</td>\n"
     end;
   if p_getenv conf.env "birth_place" = Some "on" then
@@ -777,7 +777,7 @@ let print_person_table conf base p lab =
               | _ -> "&nbsp;"
             else "&nbsp;"
           in
-          Wserver.printf "%s" mdate
+          Wserver.print_string mdate
         else Wserver.printf "&nbsp;"
       end;
       Wserver.printf "</td>\n"
@@ -837,7 +837,7 @@ let print_person_table conf base p lab =
   if p_getenv conf.env "death" = Some "on" then
     begin
       Wserver.printf "<td %s>\n" rowspan;
-      Wserver.printf "%s" death;
+      Wserver.print_string death;
       Wserver.printf "</td>\n"
     end;
   if p_getenv conf.env "death_place" = Some "on" then
@@ -914,7 +914,7 @@ let print_person_table conf base p lab =
                 | _ -> "&nbsp;"
               else "&nbsp;"
             in
-              Wserver.printf "%s" mdate
+              Wserver.print_string mdate
             end;
             Wserver.printf "</td>\n"
           end;

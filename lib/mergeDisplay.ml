@@ -12,7 +12,7 @@ let print_someone base p =
 
 let print conf base p =
   let title h =
-    Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "merge" ""));
+    Wserver.print_string (Utf8.capitalize (transl_decline conf "merge" ""));
     if h then ()
     else
       begin
@@ -71,7 +71,7 @@ for=\"%s\">" (string_of_iper (get_iper p));
     list;
   Wserver.printf "<button type=\"submit\" \
  class=\"btn btn-primary btn-lg mt-2\">";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
   Hutil.trailer conf

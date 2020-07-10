@@ -213,7 +213,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
       "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" info.bd
       info.td_prop;
   Wserver.printf "%s\n" (someone_text conf base ip);
-  Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip));
+  Wserver.print_string (DagDisplay.image_txt conf base (pget conf base ip));
   if s <> "" then
     begin
       Wserver.printf "<br%s>\n" conf.xhs;
@@ -221,7 +221,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
       Wserver.printf " %s\n" s;
       match spo with
         Some ip ->
-          Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip))
+          Wserver.print_string (DagDisplay.image_txt conf base (pget conf base ip))
       | _ -> ()
     end;
   if in_tab && (info.bd > 0 || info.td_prop <> "") then
@@ -420,12 +420,12 @@ let print_someone_and_other_parent_if_same conf base info =
       "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" info.bd
       info.td_prop;
   Wserver.printf "%s\n" (someone_text conf base info.ip);
-  Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base info.ip));
+  Wserver.print_string (DagDisplay.image_txt conf base (pget conf base info.ip));
   begin match other_parent_text_if_same conf base info with
     Some (s, ip) ->
       Wserver.printf "<br%s>\n" conf.xhs;
-      Wserver.printf "%s" s;
-      Wserver.printf "%s" (DagDisplay.image_txt conf base (pget conf base ip))
+      Wserver.print_string s;
+      Wserver.print_string (DagDisplay.image_txt conf base (pget conf base ip))
   | None -> ()
   end;
   if info.bd > 0 || info.td_prop <> "" then
@@ -594,7 +594,7 @@ let print_relation_path conf base info =
 
 let print_relation_ok conf base info =
   let title _ =
-    Wserver.printf "%s"
+    Wserver.print_string
       (Utf8.capitalize (transl_nth conf "relationship link/relationship links" 0));
     begin match info.pb1, info.nb1 with
       None, None -> ()

@@ -39,7 +39,7 @@ let print_birth conf base =
            end;
          Wserver.printf "<li>";
          Wserver.printf "<b>";
-         Wserver.printf "%s" (referenced_person_text conf base p);
+         Wserver.print_string (referenced_person_text conf base p);
          Wserver.printf "</b>";
          Wserver.printf ",\n";
          if future then
@@ -105,7 +105,7 @@ let print_death conf base =
              in
              Wserver.printf "<li>";
              Wserver.printf "<b>";
-             Wserver.printf "%s" (referenced_person_text conf base p);
+             Wserver.print_string (referenced_person_text conf base p);
              Wserver.printf "</b>";
              Wserver.printf ", %s <em>%s</em>"
                (transl_nth conf "died" (index_of_sex (get_sex p)))
@@ -182,7 +182,7 @@ let print_death conf base =
       Wserver.printf ")\n";
       Wserver.printf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+      Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
       Wserver.printf "</button>\n";
       Wserver.printf "</p>\n";
       Wserver.printf "</form>\n"
@@ -255,7 +255,7 @@ let print_longest_lived conf base =
     (fun (p, d, _) ->
        Wserver.printf "<li>\n";
        Wserver.printf "<strong>\n";
-       Wserver.printf "%s" (referenced_person_text conf base p);
+       Wserver.print_string (referenced_person_text conf base p);
        Wserver.printf "</strong>%s" (DateDisplay.short_dates_text conf base p);
        Wserver.printf "\n(%d %s)" d.year (transl conf "years old");
        Wserver.printf ".";
@@ -292,13 +292,13 @@ let print_marr_or_eng conf base title list =
            end;
          Wserver.printf "<li>";
          Wserver.printf "<b>";
-         Wserver.printf "%s"
+         Wserver.print_string
            (referenced_person_text conf base
               (pget conf base (get_father cpl)));
          Wserver.printf "</b>\n";
          Wserver.printf "%s\n" (transl_nth conf "and" 0);
          Wserver.printf "<b>";
-         Wserver.printf "%s"
+         Wserver.print_string
            (referenced_person_text conf base
               (pget conf base (get_mother cpl)));
          Wserver.printf "</b>";
@@ -365,7 +365,7 @@ let print_oldest_engagements conf base =
   print_marr_or_eng conf base title list
 
 let old_print_statistics conf =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "statistics")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "statistics")) in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env) with
       Not_found | Failure _ -> 20

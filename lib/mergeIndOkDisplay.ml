@@ -18,7 +18,7 @@ let print_merge conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "merge done")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "\n%s\n"

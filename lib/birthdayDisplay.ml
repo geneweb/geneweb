@@ -127,12 +127,12 @@ let print_anniversary_list conf base dead_people dt liste =
          begin
            Wserver.printf "<em>";
            begin match date_event with
-             DeBirth -> Wserver.printf "%s" (transl conf "birth")
-           | DeDeath _ -> Wserver.printf "%s" (transl conf "death")
+             DeBirth -> Wserver.print_string (transl conf "birth")
+           | DeDeath _ -> Wserver.print_string (transl conf "death")
            end;
            Wserver.printf "</em>\n";
            Wserver.printf "-&gt; ";
-           Wserver.printf "%s" (txt_of conf base p);
+           Wserver.print_string (txt_of conf base p);
            Wserver.printf "\n<em>%s %d" (transl conf "in (year)") a;
            Wserver.printf " (";
            Wserver.printf (ftransl conf "%d years ago") (conf.today.year - a);
@@ -140,13 +140,13 @@ let print_anniversary_list conf base dead_people dt liste =
          end
        else
          begin
-           Wserver.printf "%s" (txt_of conf base p);
+           Wserver.print_string (txt_of conf base p);
            match get_death p with
              NotDead ->
                Wserver.printf " <em>";
                begin match a_ref - a with
-                 0 -> Wserver.printf "%s" (transl conf "birth")
-               | 1 -> Wserver.printf "%s" (transl conf "one year old")
+                 0 -> Wserver.print_string (transl conf "birth")
+               | 1 -> Wserver.print_string (transl conf "one year old")
                | n -> Wserver.printf "%d %s" n (transl conf "years old")
                end;
                Wserver.printf "</em>"
@@ -191,7 +191,7 @@ let print_birth_day conf base day_name fphrase wd dt list =
 let propose_months conf mode =
   begin_centered conf;
   Wserver.printf "<span>";
-  Wserver.printf "%s"
+  Wserver.print_string
     (Utf8.capitalize (transl conf "select a month to see all the anniversaries"));
   Wserver.printf "</span>";
   Wserver.printf "<table border=\"%d\">\n" conf.border;
@@ -208,7 +208,7 @@ let propose_months conf mode =
     begin
       Wserver.printf "<option value=\"%d\"%s>" i
         (if i = conf.today.month then " selected=\"selected\"" else "");
-      Wserver.printf "%s"
+      Wserver.print_string
         (Utf8.capitalize (Util.translate_eval (transl_nth conf "(month)" (i - 1))));
       Wserver.printf "</option>\n"
     end
@@ -216,7 +216,7 @@ let propose_months conf mode =
   Wserver.printf "</select>\n";
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";
@@ -291,11 +291,11 @@ let print_marriage conf base month =
         List.iter
           (fun (fam, year) ->
              Wserver.printf "<li>" ;
-             Wserver.printf "%s"
+             Wserver.print_string
                (referenced_person_title_text conf base
                   (pget conf base (get_father fam)));
              Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
-             Wserver.printf "%s"
+             Wserver.print_string
                (referenced_person_title_text conf base
                   (pget conf base (get_mother fam)));
              Wserver.printf ", <em>%s %d</em>\n" (transl conf "in (year)")
@@ -315,7 +315,7 @@ let print_anniversaries_of_marriage conf base list =
          (referenced_person_title_text conf base
             (pget conf base (get_father fam)));
        Wserver.printf "%s\n" (transl_nth conf "and" 0);
-       Wserver.printf "%s"
+       Wserver.print_string
          (referenced_person_title_text conf base
             (pget conf base (get_mother fam)));
        Wserver.printf ", <em>%s %d\n(" (transl conf "in (year)") year;
@@ -357,7 +357,7 @@ let match_dates conf base p d1 d2 =
   else false
 
 let gen_print_menu_birth conf base f_scan mode =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "birthdays")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "birthdays")) in
   let tom = day_after conf.today in
   let aft = day_after tom in
   let list_tod = ref [] in
@@ -421,7 +421,7 @@ let print_menu_birth conf base =
 
 let gen_print_menu_dead conf base f_scan mode =
   let title _ =
-    Wserver.printf "%s"
+    Wserver.print_string
       (Utf8.capitalize (transl conf "anniversaries of dead people"))
   in
   let tom = day_after conf.today in
@@ -510,7 +510,7 @@ let match_mar_dates conf base cpl d1 d2 =
 
 let print_menu_marriage conf base =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "anniversaries of marriage"))
+    Wserver.print_string (Utf8.capitalize (transl conf "anniversaries of marriage"))
   in
   let tom = day_after conf.today in
   let aft = day_after tom in

@@ -253,7 +253,7 @@ let family_m conf base =
     p handler conf base
   else
     begin
-      let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+      let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
       Hutil.rheader conf title;
       Wserver.printf "<ul>\n<li>\n%s \"%s\" %s.</li>\n</ul>"
         (Utf8.capitalize (transl conf "base")) conf.bname
@@ -368,21 +368,21 @@ let print_moved conf s =
       Wserver.printf "The database %s has moved to:\n<dl><dt><dd>\n"
         conf.bname;
       Wserver.printf "<a href=\"%s\">" s;
-      Wserver.printf "%s" s;
+      Wserver.print_string s;
       Wserver.printf "</a>";
       Wserver.printf "\n</dd></dt></dl>\n";
       Hutil.trailer conf
 
 let print_no_index conf base =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "link to use"))
+    Wserver.print_string (Utf8.capitalize (transl conf "link to use"))
   in
   let link = url_no_index conf base in
   Hutil.header conf title;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>" ;
   Wserver.printf "<a href=\"http://%s\">\n" link;
-  Wserver.printf "%s" link;
+  Wserver.print_string link;
   Wserver.printf "</a>\n";
   Wserver.printf "</ul>\n";
   Hutil.print_link_to_welcome conf false;
@@ -449,12 +449,12 @@ let treat_request_on_possibly_locked_base conf bfile =
         try Hashtbl.find conf.lexicon w with Not_found -> "[" ^ w ^ "]"
       in
       let title _ =
-        Wserver.printf "%s" (Utf8.capitalize (transl conf "error"))
+        Wserver.print_string (Utf8.capitalize (transl conf "error"))
       in
       Hutil.rheader conf title;
       Wserver.printf "<ul>";
       Wserver.printf "<li>" ;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "cannot access base"));
+      Wserver.print_string (Utf8.capitalize (transl conf "cannot access base"));
       Wserver.printf " \"%s\".</ul>\n" conf.bname;
       begin match e with
         Sys_error _ -> ()

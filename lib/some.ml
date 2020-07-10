@@ -35,7 +35,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   Wserver.printf "<tr>";
   Wserver.printf "<td>";
   Wserver.printf "<b>";
-  Wserver.printf "%s"
+  Wserver.print_string
     (Utf8.capitalize (transl_nth conf "display by/branch/alphabetic order" 0));
   Wserver.printf "</b>";
   Wserver.printf "</td>";
@@ -59,7 +59,7 @@ let print_branch_to_alphabetic conf x nb_branch =
     begin
       Wserver.printf "<a href=\"%sm=N&o=i&v=%s\" rel=\"nofollow\">"
         (commd conf) (code_varenv x ^ "&t=A");
-      Wserver.printf "%s"
+      Wserver.print_string
         (transl_nth conf "display by/branch/alphabetic order" 2);
       Wserver.printf "</a>"
     end
@@ -67,7 +67,7 @@ let print_branch_to_alphabetic conf x nb_branch =
     begin
       Wserver.printf "<a href=\"%sm=N&o=i&v=%s\" rel=\"nofollow\">"
         (commd conf) (code_varenv x ^ "&t=N");
-      Wserver.printf "%s"
+      Wserver.print_string
         (transl_nth conf "display by/branch/alphabetic order" 2);
       Wserver.printf "</a>"
     end;
@@ -94,7 +94,7 @@ let print_alphabetic_to_branch conf x =
   Wserver.printf "<tr>";
   Wserver.printf "<td>";
   Wserver.printf "<b>";
-  Wserver.printf "%s"
+  Wserver.print_string
     (Utf8.capitalize (transl_nth conf "display by/branch/alphabetic order" 0));
   Wserver.printf "</b>";
   Wserver.printf "</td>";
@@ -109,7 +109,7 @@ let print_alphabetic_to_branch conf x =
     begin
       Wserver.printf "<a href=\"%sm=N&v=%s\" rel=\"nofollow\">" (commd conf)
         (code_varenv x ^ "&t=A");
-      Wserver.printf "%s"
+      Wserver.print_string
         (transl_nth conf "display by/branch/alphabetic order" 1);
       Wserver.printf "</a>"
     end
@@ -117,7 +117,7 @@ let print_alphabetic_to_branch conf x =
     begin
       Wserver.printf "<a href=\"%sm=NG&sn=%s\" rel=\"nofollow\">" (commd conf)
         (code_varenv x);
-      Wserver.printf "%s"
+      Wserver.print_string
         (transl_nth conf "display by/branch/alphabetic order" 1);
       Wserver.printf "</a>"
     end;
@@ -129,7 +129,7 @@ let print_alphabetic_to_branch conf x =
     (Util.image_prefix conf) "picto_alphabetic_order.png" conf.xhs;
   Wserver.printf "</td>";
   Wserver.printf "<td>";
-  Wserver.printf "%s"
+  Wserver.print_string
     (transl_nth conf "display by/branch/alphabetic order" 2);
   Wserver.printf "</td>";
   Wserver.printf "</tr>";
@@ -197,9 +197,9 @@ let print_elem conf base is_surname (p, xl) =
          (acces conf base x) (string_of_iper iper);
        if is_surname then
          Wserver.printf "%s%s" (surname_without_particle base p) (surname_particle base p)
-       else Wserver.printf "%s" (if p = "" then "?" else p);
+       else Wserver.print_string (if p = "" then "?" else p);
        Wserver.printf "</a>";
-       Wserver.printf "%s" (DateDisplay.short_dates_text conf base x);
+       Wserver.print_string (DateDisplay.short_dates_text conf base x);
        Wserver.printf "<em>";
        specify_homonymous conf base x true;
        Wserver.printf "</em>")
@@ -247,7 +247,7 @@ let first_name_print_list conf base x1 xl liste =
       [] l
   in
   let title h =
-    if h || p_getenv conf.env "t" = Some "A" then Wserver.printf "%s" x1
+    if h || p_getenv conf.env "t" = Some "A" then Wserver.print_string x1
     else
       Mutil.list_iter_first
         (fun first x ->
@@ -388,7 +388,7 @@ let print_selection_bullet conf =
         Wserver.printf "<a id=\"if%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt
           (commd conf) req (if sel then "&u=" ^ txt else "")
           (if sel || List.mem_assoc "u" conf.env then "#if" ^ txt else "");
-      Wserver.printf "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
+      Wserver.print_string (if sel then bullet_sel_txt else bullet_unsel_txt);
       if conf.cancel_links then () else Wserver.printf "</a>";
       Wserver.printf "\n"
   | None -> Wserver.printf "%s\n" bullet_nosel_txt
@@ -542,7 +542,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
           Not_found -> false
   in
   let title h =
-    if h || p_getenv conf.env "t" = Some "A" then Wserver.printf "%s" x
+    if h || p_getenv conf.env "t" = Some "A" then Wserver.print_string x
     else
       Mutil.list_iter_first
         (fun first x ->
@@ -626,7 +626,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
     geneweb_link conf ("m=N&v=" ^ code_varenv sn ^ "&t=N") txt
   in
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
-    (fun (_, txt, sn) -> Wserver.printf "%s" (access txt sn)) list;
+    (fun (_, txt, sn) -> Wserver.print_string (access txt sn)) list;
   Wserver.printf "<p>\n";
   Wserver.printf "<em style=\"font-size:80%%\">\n";
   Wserver.printf "%s " (Utf8.capitalize (transl conf "click"));
@@ -634,7 +634,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
     (if List.length homonymes = 1 then code_varenv x ^ "&t=A"
      else code_varenv fx)
     (transl conf "here");
-  Wserver.printf "%s" (transl conf "for the first names by alphabetic order");
+  Wserver.print_string (transl conf "for the first names by alphabetic order");
   Wserver.printf ".</em>\n";
   Wserver.printf "</p>\n";
   Hutil.trailer conf

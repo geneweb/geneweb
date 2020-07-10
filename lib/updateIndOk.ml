@@ -748,7 +748,7 @@ let error_person conf err =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s\n" (Utf8.capitalize err);
   Update.print_return conf;
@@ -804,7 +804,7 @@ let print_conflict conf base p =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
@@ -857,7 +857,7 @@ let print_conflict conf base p =
 
 let default_prerr conf base = function
   | BadSexOfMarriedPerson p as err ->
-    let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+    let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
     Hutil.rheader conf title;
     Update.print_error conf base err ;
     Wserver.printf "<ul><li>%s</li></ul>" (Util.referenced_person_text conf base p);
@@ -1061,7 +1061,7 @@ let effective_del conf base p =
 
 let print_mod_ok conf base wl pgl p ofn osn oocc =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "person modified"))
+    Wserver.print_string (Utf8.capitalize (transl conf "person modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1088,7 +1088,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
       List.iter
         (fun s ->
            Wserver.printf "<li>";
-           Wserver.printf "%s" s;
+           Wserver.print_string s;
            Wserver.printf "</li>")
         !deleted_relation;
       Wserver.printf "</ul>\n";
@@ -1165,7 +1165,7 @@ let all_checks_person base p a u =
   wl
 
 let print_add_ok conf base wl p =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "person added")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "person added")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
@@ -1194,7 +1194,7 @@ value print_add_ok conf base wl p =
 
 let print_del_ok conf =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "person deleted"))
+    Wserver.print_string (Utf8.capitalize (transl conf "person deleted"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf false;
@@ -1202,7 +1202,7 @@ let print_del_ok conf =
 
 let print_change_event_order_ok conf base wl p =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "person modified"))
+    Wserver.print_string (Utf8.capitalize (transl conf "person modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;

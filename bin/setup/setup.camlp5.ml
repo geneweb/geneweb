@@ -755,7 +755,7 @@ let print_file conf bname =
     Some ic ->
       Wserver.http Wserver.OK;
       Wserver.header "Content-type: text/html; charset=%s" (charset conf);
-      copy_from_stream conf (fun x -> Wserver.printf "%s" x)
+      copy_from_stream conf (fun x -> Wserver.print_string x)
         (Stream.of_channel ic);
       close_in ic;
       trailer conf

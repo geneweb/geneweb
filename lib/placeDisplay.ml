@@ -15,7 +15,7 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
     let len = List.length ips in
     Wserver.printf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
-    then Wserver.printf "%s" (acces conf base @@ pget conf base @@ List.hd ips)
+    then Wserver.print_string (acces conf base @@ pget conf base @@ List.hd ips)
     else Wserver.printf "m=N&v=%s" (code_varenv sn);
     Wserver.printf "\">%s</a> (%d)" sn len
   in
@@ -80,7 +80,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       max_int
   in
   Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) array ;
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "place")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "place")) in
   print_aux conf title begin fun () ->
     let opt = print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage in
     Wserver.printf

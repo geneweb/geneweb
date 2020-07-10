@@ -38,7 +38,7 @@ let print_search_form conf from_note =
   Wserver.printf "</label>\n";
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "search/case sensitive" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "search/case sensitive" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";
@@ -49,7 +49,7 @@ let print_search_form conf from_note =
 let print_whole_notes conf base fnotes title s ho =
   let title = Util.safe_html title in
   Hutil.header_no_page_title conf
-    (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
+    (fun _ -> Wserver.print_string (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
       begin
@@ -102,7 +102,7 @@ let print_whole_notes conf base fnotes title s ho =
 let print_notes_part conf base fnotes title s cnt0 =
   let title = Util.safe_html title in
   Hutil.header_no_page_title conf
-    (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
+    (fun _ -> Wserver.print_string (if title = "" then fnotes else title));
   Hutil.print_link_to_welcome conf true;
   begin match Util.open_etc_file "summary" with
     Some ic -> Templ.copy_from_templ conf [] ic
@@ -183,7 +183,7 @@ let print_linked_list conf base pgl =
              end;
            Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES\">"
              (commd conf);
-           Wserver.printf "%s" (transl_nth conf "note/notes" 1);
+           Wserver.print_string (transl_nth conf "note/notes" 1);
            Wserver.printf "</a>\n";
            Wserver.printf "</tt>\n"
        | Def.NLDB.PgMisc fnotes ->
@@ -201,7 +201,7 @@ let print_linked_list conf base pgl =
              end;
            Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES&f=%s&\">"
              (commd conf) fnotes;
-           Wserver.printf "%s" fnotes;
+           Wserver.print_string fnotes;
            Wserver.printf "</a>";
            if title <> "" then Wserver.printf "(%s)" title;
            Wserver.printf "</tt>\n"
@@ -217,7 +217,7 @@ let print_linked_list conf base pgl =
              end;
            Wserver.printf "<a class=\"mx-2\" href=\"%sm=WIZNOTES&f=%s\">"
              (commd conf) (code_varenv wizname);
-           Wserver.printf "%s" wizname;
+           Wserver.print_string wizname;
            Wserver.printf "</a>";
            Wserver.printf "<i>";
            Wserver.printf "(%s)"
@@ -239,7 +239,7 @@ let print_what_links conf base fnotes =
         Wserver.printf "[";
         begin
           Wserver.printf "<a href=\"%sm=NOTES&f=%s\">" (commd conf) fnotes;
-          Wserver.printf "%s" fnotes;
+          Wserver.print_string fnotes;
           Wserver.printf "</a>"
         end;
         Wserver.printf "]";
@@ -333,7 +333,7 @@ let print_misc_notes conf base =
     | None -> ""
   in
   let title h =
-    Wserver.printf "%s"
+    Wserver.print_string
       (if d = "" then
          Utf8.capitalize (Util.translate_eval (transl conf "miscellaneous notes"))
        else if h then "- " ^ d ^ " -"
@@ -402,7 +402,7 @@ let print_misc_notes conf base =
                Wserver.printf "<tt>[";
                Wserver.printf "<a href=\"%sm=NOTES&f=%s\"%s>" (commd conf) f
                  c;
-               Wserver.printf "%s" r;
+               Wserver.print_string r;
                Wserver.printf "</a>";
                Wserver.printf "]</tt>%s\n"
                  (if txt = "" then "" else " : " ^ txt);

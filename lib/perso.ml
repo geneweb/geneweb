@@ -169,7 +169,7 @@ let init_sosa_t conf base sosa_ref =
   let tstab =
     try Util.create_topological_sort conf base with
       Consang.TopologicalSortError p ->
-        let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+        let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
         Hutil.rheader conf title; print_base_loop conf base p
   in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -5958,7 +5958,7 @@ let print_what_links conf base p =
     let title h =
       Wserver.printf "%s%s " (Utf8.capitalize (transl conf "linked pages"))
         (Util.transl conf ":");
-      if h then Wserver.printf "%s" (simple_person_text conf base p true)
+      if h then Wserver.print_string (simple_person_text conf base p true)
       else
         Wserver.printf "<a href=\"%s%s\">%s</a>" (commd conf)
           (acces conf base p) (simple_person_text conf base p true)

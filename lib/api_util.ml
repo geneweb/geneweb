@@ -681,7 +681,7 @@ let print_result conf data =
   in
   let data = data output in
   Util.html ~content_type conf ;
-  Wserver.printf "%s" data
+  Wserver.print_string data
 
 let person_to_reference_person base p =
   { M.Reference_person.n = Name.lower @@ sou base @@ get_surname p
