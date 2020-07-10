@@ -19,7 +19,7 @@ let print_clean conf =
   match p_getenv conf.env "f" with
     Some f when f <> "" ->
       let title _ =
-        Wserver.printf "%s" (Utf8.capitalize (transl conf "clean history"))
+        Wserver.print_string (Utf8.capitalize (transl conf "clean history"))
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
@@ -54,7 +54,7 @@ let print_clean conf =
       Wserver.printf "</ul>\n";
       Wserver.printf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+      Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
       Wserver.printf "</button>\n";
       Wserver.printf "</form>\n";
       Hutil.trailer conf
@@ -82,7 +82,7 @@ let print_clean_ok conf =
   match p_getenv conf.env "f" with
     Some f when f <> "" ->
       let title _ =
-        Wserver.printf "%s" (Utf8.capitalize (transl conf "history cleaned"))
+        Wserver.print_string (Utf8.capitalize (transl conf "history cleaned"))
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;

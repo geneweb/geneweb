@@ -684,27 +684,27 @@ let print_dates conf base p =
   begin match Adef.od_of_cdate (get_birth p) with
     Some d ->
       Wserver.printf "%s " (cap (transl_nth conf "born" is));
-      Wserver.printf "%s" (string_of_ondate conf d);
+      Wserver.print_string (string_of_ondate conf d);
       if birth_place <> "" then Wserver.printf ",\n"
   | None ->
       if birth_place <> "" then
         Wserver.printf "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
   end;
   if birth_place <> "" then
-    Wserver.printf "%s" (string_of_place conf birth_place);
+    Wserver.print_string (string_of_place conf birth_place);
   let baptism = Adef.od_of_cdate (get_baptism p) in
   let baptism_place = sou base (get_baptism_place p) in
   begin match baptism with
     Some d ->
       Wserver.printf "%s " (cap (transl_nth conf "baptized" is));
-      Wserver.printf "%s" (string_of_ondate conf d);
+      Wserver.print_string (string_of_ondate conf d);
       if baptism_place <> "" then Wserver.printf ",\n"
   | None ->
       if baptism_place <> "" then
         Wserver.printf "%s\n-&nbsp;" (cap (transl_nth conf "baptized" is))
   end;
   if baptism_place <> "" then
-    Wserver.printf "%s" (string_of_place conf baptism_place);
+    Wserver.print_string (string_of_place conf baptism_place);
   let death_place = sou base (get_death_place p) in
   begin match get_death p with
     Death (dr, d) ->
@@ -718,10 +718,10 @@ let print_dates conf base p =
       in
       let d = Adef.date_of_cdate d in
       Wserver.printf "%s " (cap dr_w);
-      Wserver.printf "%s" (string_of_ondate conf d);
+      Wserver.print_string (string_of_ondate conf d);
       if death_place <> "" then Wserver.printf ",\n"
   | DeadYoung ->
-      Wserver.printf "%s" (cap (transl_nth conf "died young" is));
+      Wserver.print_string (cap (transl_nth conf "died young" is));
       if death_place <> "" then Wserver.printf "\n-&nbsp;"
   | DeadDontKnowWhen ->
       begin match death_place, get_burial p with
@@ -729,14 +729,14 @@ let print_dates conf base p =
       | _ ->
           if death_place <> "" || not (of_course_died conf p) then
             begin
-              Wserver.printf "%s" (cap (transl_nth conf "died" is));
+              Wserver.print_string (cap (transl_nth conf "died" is));
               if death_place <> "" then Wserver.printf "\n-&nbsp;"
             end
       end
   | DontKnowIfDead | NotDead | OfCourseDead -> ()
   end;
   if death_place <> "" then
-    Wserver.printf "%s" (string_of_place conf death_place);
+    Wserver.print_string (string_of_place conf death_place);
   let burial_date_place cod =
     let place = sou base (get_burial_place p) in
     begin match Adef.od_of_cdate cod with
@@ -745,14 +745,14 @@ let print_dates conf base p =
         if place <> "" then Wserver.printf ",\n"
     | None -> if place <> "" then Wserver.printf " -&nbsp;"
     end;
-    if place <> "" then Wserver.printf "%s" (string_of_place conf place)
+    if place <> "" then Wserver.print_string (string_of_place conf place)
   in
   begin match get_burial p with
     Buried cod ->
-      Wserver.printf "%s" (cap (transl_nth conf "buried" is));
+      Wserver.print_string (cap (transl_nth conf "buried" is));
       burial_date_place cod
   | Cremated cod ->
-      Wserver.printf "%s" (cap (transl_nth conf "cremated" is));
+      Wserver.print_string (cap (transl_nth conf "cremated" is));
       burial_date_place cod
   | UnknownBurial -> ()
   end;

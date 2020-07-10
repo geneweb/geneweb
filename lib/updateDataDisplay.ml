@@ -49,7 +49,7 @@ let print_mod_ok conf base =
     begin
       update_person_list conf base new_input list nb_pers max_updates;
       let title _ =
-        Wserver.printf "%s" (Utf8.capitalize (transl conf "modification successful"))
+        Wserver.print_string (Utf8.capitalize (transl conf "modification successful"))
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
@@ -81,9 +81,9 @@ let print_mod_ok conf base =
         Wserver.printf {|<input type="hidden" name="s" value="%s">|} ini ;
         Wserver.printf {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="%s" id="data">|}
           (Util.escape_html (only_printable new_input)) ;
-        Wserver.printf "%s" (Utf8.capitalize (transl conf "continue correcting"));
+        Wserver.print_string (Utf8.capitalize (transl conf "continue correcting"));
         Wserver.printf {|<button type="submit" class="btn btn-secondary btn-lg">|};
-        Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+        Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
         Wserver.printf "</button></p></form>" ;
       end ;
       Wserver.printf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
@@ -91,7 +91,7 @@ let print_mod_ok conf base =
       Hutil.trailer conf
     end
   else
-    let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "no modification")) in
+    let title _ = Wserver.print_string (Utf8.capitalize (transl conf "no modification")) in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Wserver.printf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}

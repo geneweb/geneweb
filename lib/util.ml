@@ -907,7 +907,7 @@ let geneweb_link conf href s =
   else "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
 
 let wprint_geneweb_link conf href s =
-  Wserver.printf "%s" (geneweb_link conf href s)
+  Wserver.print_string (geneweb_link conf href s)
 
 let reference_flags with_id conf base p s =
   let iper = get_iper p in
@@ -2210,7 +2210,7 @@ let specify_homonymous conf base p specify_public_name =
         (if cop = "" then "" else ", " ^ cop) ^
         (if hw = "" then if fc = "" then "" else ", " ^ fc else ", " ^ hw) ^ "."
       in
-      Wserver.printf "%s" s
+      Wserver.print_string s
 
 
 (* ************************************************************************** *)
@@ -3153,7 +3153,7 @@ let gen_print_tips conf s =
   Wserver.printf "<table>\n";
   Wserver.printf "<tr>\n";
   Wserver.printf "<td>\n";
-  Wserver.printf "%s" s;
+  Wserver.print_string s;
   Wserver.printf "</td>\n";
   Wserver.printf "</tr>\n";
   Wserver.printf "</table>\n";

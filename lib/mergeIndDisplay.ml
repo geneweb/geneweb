@@ -163,7 +163,7 @@ let print_differences conf base branches p1 p2 =
 let propose_merge_ind conf base branches p1 p2 =
   let title _ =
     let s = transl_nth conf "person/persons" 1 in
-    Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "merge" s))
+    Wserver.print_string (Utf8.capitalize (transl_decline conf "merge" s))
   in
   Hutil.header conf title;
   if branches <> [] then begin
@@ -204,7 +204,7 @@ let propose_merge_ind conf base branches p1 p2 =
   Hutil.trailer conf
 
 let error_loop conf base p =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<strong>%s%s %s</strong>" (p_first_name base p)
@@ -217,7 +217,7 @@ let error_loop conf base p =
 let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
-    Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "merge" s))
+    Wserver.print_string (Utf8.capitalize (transl_decline conf "merge" s))
   in
   Hutil.header conf title;
   Wserver.printf "%s%s\n"
@@ -234,7 +234,7 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   Hutil.trailer conf
 
 let not_found_or_incorrect conf =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s %s %s %s %s\n" (Utf8.capitalize (transl conf "not found"))
     (transl conf "or") (transl conf "several answers") (transl conf "or")
@@ -242,19 +242,19 @@ let not_found_or_incorrect conf =
   Hutil.trailer conf
 
 let same_person conf =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s\n" (Utf8.capitalize (transl conf "it is the same person!"));
   Hutil.trailer conf
 
 let different_sexes conf =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Wserver.printf "%s.\n" (Utf8.capitalize (transl conf "incompatible sexes"));
   Hutil.trailer conf
 
 let print_merged conf base wl p =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "merge done")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
@@ -277,7 +277,7 @@ let print_merged conf base wl p =
       in
       Wserver.printf "<p>\n";
       Wserver.printf "<a href=%sm=MRG_DUP&ip=%s%s%s>" (commd conf) (string_of_iper ip) s1 s2;
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "continue merging"));
+      Wserver.print_string (Utf8.capitalize (transl conf "continue merging"));
       Wserver.printf "</a>";
       begin
         let p =  poi base ip in

@@ -361,14 +361,14 @@ let rec copy_from_stream conf base strm mode =
                 loop 0
               in
               let lang_def = transl conf "!languages" in
-              Wserver.printf "%s" (Translate.language_name lang lang_def)
+              Wserver.print_string (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =
                 try List.assoc (get_variable strm) conf.base_env with
                   Not_found -> ""
               in
               copy_from_string conf base txt mode
-          | c -> Wserver.printf "%s" (macro conf base c)
+          | c -> Wserver.print_string (macro conf base c)
           end
       | c -> if !echo then Wserver.printf "%c" c
     done
@@ -392,7 +392,7 @@ and src_translate conf base nomin strm echo mode =
     else copy_from_stream conf base (Stream.of_string s) mode
   else
     let s = lexicon_translate conf base nomin strm c in
-    if not !echo then () else Wserver.printf "%s" s
+    if not !echo then () else Wserver.print_string s
 and copy_from_file conf base name mode =
   let fname =
     match mode with
@@ -423,7 +423,7 @@ let gen_print with_logo mode conf base fname =
   in
   match channel with
     Some ic ->
-      let title _ = Wserver.printf "%s" fname in
+      let title _ = Wserver.print_string fname in
       Hutil.header_without_page_title conf title;
       copy_from_channel conf base ic mode;
       Hutil.gen_trailer with_logo conf

@@ -98,7 +98,7 @@ let print_wizards_by_alphabetic_order conf list =
       in
       let s2 = String.sub wname islash (String.length wname - islash) in
       Wserver.printf "%s (%s)" s2 s1
-    else Wserver.printf "%s" wname;
+    else Wserver.print_string wname;
     if with_link then Wserver.printf "</a>"
   in
   let order (_, (_, (ord, _)), _, _) = ord in
@@ -112,7 +112,7 @@ let print_wizards_by_date conf list =
           {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1; day = 0;
            prec = Sure; delta = 0}
         in
-        Wserver.printf "%s"
+        Wserver.print_string
           (Utf8.capitalize (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian)))));
      (fun tm -> tm.Unix.tm_year),
      (fun tm -> Wserver.printf "%d" (tm.Unix.tm_year + 1900))]
@@ -300,7 +300,7 @@ let print_main conf base auth_file =
         Wserver.printf "%s " (Utf8.capitalize (transl conf "click"));
         Wserver.printf "<a href=\"%sm=WIZNOTES&o=H\">%s</a>\n" (commd conf)
           (transl conf "here");
-        Wserver.printf "%s"
+        Wserver.print_string
           (transl conf
              "for the list ordered by the date of the last modification");
         Wserver.printf ".</em>\n";
@@ -321,7 +321,7 @@ let print_main conf base auth_file =
     begin print_old_wizards conf old_list; print_search_form conf "" end;
   Hutil.trailer conf
 
-let wizard_page_title wizname _ = Wserver.printf "%s" wizname
+let wizard_page_title wizname _ = Wserver.print_string wizname
 
 let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   let wizname =
@@ -385,7 +385,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
 
 let print_part_wiznote conf base wz s cnt0 =
   let title = wz in
-  Hutil.header_no_page_title conf (fun _ -> Wserver.printf "%s" title);
+  Hutil.header_no_page_title conf (fun _ -> Wserver.print_string title);
   let s = Util.safe_html @@ string_with_macros conf [] s in
   let lines = Wiki.extract_sub_part s cnt0 in
   let lines = if cnt0 = 0 then title :: "<br /><br />" :: lines else lines in
@@ -544,10 +544,10 @@ let print_connected_wizard conf first wddir wz tm_user =
            Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
              (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
              tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec);
-      Wserver.printf "%s" wz;
+      Wserver.print_string wz;
       Wserver.printf "</a>"
     end
-  else Wserver.printf "%s" wz;
+  else Wserver.print_string wz;
   Wserver.printf " ";
   Wserver.printf
     "<a href=\"%sm=HIST&k=20&wiz=%s\" style=\"text-decoration:none\">"
@@ -572,7 +572,7 @@ let print_connected_wizard conf first wddir wz tm_user =
 
 let do_connected_wizards conf base (_, _, _, wl) =
   let title _ =
-    Wserver.printf "%s"
+    Wserver.print_string
       (Utf8.capitalize (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
   in
   Hutil.header conf title;

@@ -274,7 +274,7 @@ let message_txt conf n =
 
 let print_del_ok conf next_pos =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "message deleted"))
+    Wserver.print_string (Utf8.capitalize (transl conf "message deleted"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -293,7 +293,7 @@ let print_valid_ok conf pos del =
   let mess =
     if del then transl conf "message deleted" else transl conf "message added"
   in
-  let title _ = Wserver.printf "%s" (Utf8.capitalize mess) in
+  let title _ = Wserver.print_string (Utf8.capitalize mess) in
   let next_pos = find_next_pos conf pos in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -392,7 +392,7 @@ let print_add_ok conf base =
   else if mess.m_ident = "" || mess.m_text = "" then print conf base
   else begin
     let title _ =
-      Wserver.printf "%s" (Utf8.capitalize (transl conf "message added"))
+      Wserver.print_string (Utf8.capitalize (transl conf "message added"))
     in
     let mods = moderators conf in
     forum_add conf base (mods <> []) mess;

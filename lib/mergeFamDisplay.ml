@@ -124,7 +124,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
 let merge_fam1 conf base fam1 fam2 =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
-    Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "merge" s))
+    Wserver.print_string (Utf8.capitalize (transl_decline conf "merge" s))
   in
   Hutil.header conf title; print_differences conf base [] fam1 fam2; Hutil.trailer conf
 

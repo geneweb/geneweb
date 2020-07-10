@@ -1125,7 +1125,7 @@ let print_body_prop conf =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
       Not_found -> ""
   in
-  Wserver.printf "%s" (s ^ Util.body_prop conf)
+  Wserver.print_string (s ^ Util.body_prop conf)
 
 type 'a vother =
     Vdef of string list * ast list
@@ -1451,7 +1451,7 @@ let rec interp_ast conf ifun env =
     | Aapply (loc, f, ell) -> print_apply env ep loc f ell
     | Alet (k, v, al) -> print_let env ep k v al
     | Afor (i, min, max, al) -> print_for env ep i min max al
-    | x -> Wserver.printf "%s" (eval_ast env ep x)
+    | x -> Wserver.print_string (eval_ast env ep x)
   and print_ast_list env ep =
     function
       [] -> m_env := env
@@ -1469,7 +1469,7 @@ let rec interp_ast conf ifun env =
     match get_def ifun.get_vother f env with
       Some (xl, al) ->
         templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
-    | None -> Wserver.printf "%s" (eval_apply env ep loc f vl)
+    | None -> Wserver.print_string (eval_apply env ep loc f vl)
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
     let env = set_val ifun.set_vother k v env in print_ast_list env ep al
@@ -1504,7 +1504,7 @@ and print_var print_ast_list conf ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try
       match eval_var sl with
-        VVstring s -> Wserver.printf "%s" s
+        VVstring s -> Wserver.print_string s
       | VVbool true -> Wserver.printf "1"
       | VVbool false -> Wserver.printf "0"
       | VVother f -> print_var1 f []
@@ -1529,7 +1529,7 @@ and print_simple_variable conf =
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found
 and print_variable conf sl =
-  try Wserver.printf "%s" (eval_variable conf sl) with
+  try Wserver.print_string (eval_variable conf sl) with
     Not_found ->
       try
         match sl with

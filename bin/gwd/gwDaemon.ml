@@ -332,7 +332,7 @@ let propose_base conf =
   Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</li></ul>";
   Hutil.trailer conf
@@ -1530,7 +1530,7 @@ let print_misc_file misc_fname =
             else
               let olen = min (Bytes.length buf) len in
               really_input ic buf 0 olen;
-              Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+              Wserver.print_string (Bytes.sub_string buf 0 olen);
               loop (len - olen)
           in
           loop len; close_in ic; true

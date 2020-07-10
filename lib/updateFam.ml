@@ -689,7 +689,7 @@ let print_update_fam conf base fcd digest =
 let print_del1 conf base ifam =
   let title _ =
     let s = transl_nth conf "family/families" 0 in
-    Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "delete" s))
+    Wserver.print_string (Utf8.capitalize (transl_decline conf "delete" s))
   in
   let p =
     match p_getenv conf.env "ip" with
@@ -718,7 +718,7 @@ let print_del1 conf base ifam =
   Wserver.printf "<p>\n";
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";
@@ -727,7 +727,7 @@ let print_del1 conf base ifam =
 
 let print_inv1 conf base p ifam1 ifam2 =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "invert" ""))
+    Wserver.print_string (Utf8.capitalize (transl_decline conf "invert" ""))
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
@@ -761,7 +761,7 @@ let print_inv1 conf base p ifam1 ifam2 =
   Wserver.printf "<p>\n";
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</p>\n";
   Wserver.printf "</form>\n";
@@ -903,7 +903,7 @@ let print_change_order conf base =
       let (before, after) = get_family p, Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
       let title _ =
-        Wserver.printf "%s" (Utf8.capitalize (transl_decline conf "invert" ""))
+        Wserver.print_string (Utf8.capitalize (transl_decline conf "invert" ""))
       in
       Perso.interp_templ_with_menu title "perso_header" conf base p;
       Wserver.printf "<h2>\n";
@@ -943,7 +943,7 @@ let print_change_order conf base =
       Wserver.printf "<p>\n";
       Wserver.printf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+      Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
       Wserver.printf "</button>\n";
       Wserver.printf "</p>\n";
       Wserver.printf "</form>\n";

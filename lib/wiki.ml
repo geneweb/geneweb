@@ -667,7 +667,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
       begin
         Wserver.printf "<a href=\"%sm=%s%s%s\">" (commd conf) mode
           (if has_v then "&v=" ^ string_of_int v else "") sfn;
-        Wserver.printf "%s" (message_txt conf 0);
+        Wserver.print_string (message_txt conf 0);
         Wserver.printf "</a>"
       end;
       Wserver.printf ")\n";
@@ -705,7 +705,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Wserver.printf "<textarea name=\"notes\" id=\"notes_comments\"";
   Wserver.printf " class=\"col-9 form-control\" rows=\"25\" cols=\"110\"%s>"
     (if can_edit then "" else " readonly=\"readonly\"");
-  Wserver.printf "%s" (Util.escape_html sub_part);
+  Wserver.print_string (Util.escape_html sub_part);
   Wserver.printf "</textarea>";
   if can_edit then
     begin
@@ -713,7 +713,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
         Wserver.printf
           "<button type=\"submit\" class=\"btn btn-outline-primary btn-lg";
         Wserver.printf " col-4 py-3 mt-2 mb-3 mx-auto order-3\">";
-        Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+        Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
         Wserver.printf "</button>\n"
       end
     end;
@@ -811,7 +811,7 @@ let split_title_and_text s =
 
 let print_ok conf wi edit_mode fname title_is_1st s =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (Util.transl conf "notes modified"))
+    Wserver.print_string (Utf8.capitalize (Util.transl conf "notes modified"))
   in
   Hutil.header_no_page_title conf title;
   Wserver.printf "<div style=\"text-align:center\">\n";

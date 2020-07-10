@@ -232,12 +232,12 @@ let specify conf base n pl =
          | t :: _ ->
            Wserver.printf "<a href=\"%s%s\">\n" (commd conf)
              (acces conf base p);
-           Wserver.printf "%s" (titled_person_text conf base p t);
+           Wserver.print_string (titled_person_text conf base p t);
            Wserver.printf "</a>\n";
            List.iter
-             (fun t -> Wserver.printf "%s" (one_title_text base t)) tl
+             (fun t -> Wserver.print_string (one_title_text base t)) tl
        end;
-       Wserver.printf "%s" (DateDisplay.short_dates_text conf base p);
+       Wserver.print_string (DateDisplay.short_dates_text conf base p);
        if authorized_age conf base p then
          begin match get_first_names_aliases p with
              [] -> ()
@@ -246,7 +246,7 @@ let specify conf base n pl =
              Mutil.list_iter_first
                (fun first fna ->
                   if not first then Wserver.printf ", ";
-                  Wserver.printf "%s" (sou base fna))
+                  Wserver.print_string (sou base fna))
                fnal;
              Wserver.printf ")</em>"
          end;

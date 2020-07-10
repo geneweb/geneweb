@@ -16,7 +16,7 @@ let extension_of_type =
 let incorrect conf = Hutil.incorrect_request conf; raise @@ Update.ModErr __LOC__
 
 let incorrect_content_type conf base p s =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p>\n";
@@ -26,14 +26,14 @@ let incorrect_content_type conf base p s =
   Wserver.printf "</p>\n";
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>\n";
-  Wserver.printf "%s" (referenced_person_title_text conf base p);
+  Wserver.print_string (referenced_person_title_text conf base p);
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
 
 let error_too_big_image conf base p len max_len =
-  let title _ = Wserver.printf "%s" (Utf8.capitalize (transl conf "error")) in
+  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Wserver.printf "<p><em style=\"font-size:smaller\">";
@@ -44,7 +44,7 @@ let error_too_big_image conf base p len max_len =
   Wserver.printf "</em></p>\n";
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>\n";
-  Wserver.printf "%s" (referenced_person_title_text conf base p);
+  Wserver.print_string (referenced_person_title_text conf base p);
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
   Hutil.trailer conf;
@@ -73,11 +73,11 @@ let print_link_delete_image conf base p =
 let print_send_image conf base p =
   let title h =
     if Util.has_image conf base p then
-      Wserver.printf "%s"
+      Wserver.print_string
         (Utf8.capitalize
            (transl_decline conf "modify" (transl_nth conf "image/images" 0)))
     else
-      Wserver.printf "%s"
+      Wserver.print_string
         (Utf8.capitalize
            (transl_decline conf "add" (transl_nth conf "image/images" 0)));
     if h then ()
@@ -118,7 +118,7 @@ type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\"
   end;
   Wserver.printf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg mt-2\">\n";
-  Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
   Wserver.printf "</button>\n";
   Wserver.printf "</form>\n";
   print_link_delete_image conf base p;
@@ -139,7 +139,7 @@ let print conf base =
 
 let print_delete_image conf base p =
   let title h =
-    Wserver.printf "%s"
+    Wserver.print_string
       (Utf8.capitalize
          (transl_decline conf "delete" (transl_nth conf "image/images" 0)));
     if h then ()
@@ -180,12 +180,12 @@ let print_del conf base =
 
 let print_sent conf base p =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "image received"))
+    Wserver.print_string (Utf8.capitalize (transl conf "image received"))
   in
   Hutil.header conf title;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>";
-  Wserver.printf "%s" (referenced_person_text conf base p);
+  Wserver.print_string (referenced_person_text conf base p);
   Wserver.printf "</li>";
   Wserver.printf "</ul>\n";
   Hutil.trailer conf
@@ -322,7 +322,7 @@ let print_send_ok conf base =
 
 let print_deleted conf base p =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl conf "image deleted"))
+    Wserver.print_string (Utf8.capitalize (transl conf "image deleted"))
   in
   Hutil.header conf title;
   Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);

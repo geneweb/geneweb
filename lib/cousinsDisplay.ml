@@ -64,7 +64,7 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
     if first then
       begin
         Perso.print_sosa conf base p2 true;
-        Wserver.printf "%s"
+        Wserver.print_string
           (gen_person_title_text reference std_access conf base p2)
       end
     else Wserver.printf "<br%s>%s" conf.xhs (person_title_text conf base p2);
@@ -229,19 +229,19 @@ let print_cousins conf base p lev1 lev2 =
     in
     if lev1 = lev2 then
       let s = txt_fun (brother_label conf lev1) in
-      Wserver.printf "%s" (Utf8.capitalize (Util.translate_eval s))
+      Wserver.print_string (Utf8.capitalize (Util.translate_eval s))
     else if lev1 = 2 && lev2 = 1 then
       let s = txt_fun (transl_nth conf "an uncle/an aunt" 4) in
-      Wserver.printf "%s" (Utf8.capitalize (Util.translate_eval s))
+      Wserver.print_string (Utf8.capitalize (Util.translate_eval s))
     else if lev1 = 3 && lev2 = 1 then
       let s = txt_fun (transl_nth conf "a great-uncle/a great-aunt" 4) in
-      Wserver.printf "%s" (Utf8.capitalize (Util.translate_eval s))
+      Wserver.print_string (Utf8.capitalize (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 2 then
       let s = txt_fun (transl_nth conf "a nephew/a niece" 4) in
-      Wserver.printf "%s" (Utf8.capitalize (Util.translate_eval s))
+      Wserver.print_string (Utf8.capitalize (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 3 then
       let s = txt_fun (transl_nth conf "a great-nephew/a great-niece" 4) in
-      Wserver.printf "%s" (Utf8.capitalize (Util.translate_eval s))
+      Wserver.print_string (Utf8.capitalize (Util.translate_eval s))
     else
       Wserver.printf "%s %d / %s %d" (Utf8.capitalize (transl conf "ancestors")) lev1
         (Utf8.capitalize (transl conf "descendants")) lev2

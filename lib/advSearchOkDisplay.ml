@@ -27,7 +27,7 @@ let print_result conf base max_answers (list, len) =
 
 let print conf base =
   let title _ =
-    Wserver.printf "%s" (Utf8.capitalize (transl_nth conf "advanced request" 0))
+    Wserver.print_string (Utf8.capitalize (transl_nth conf "advanced request" 0))
   in
   let max_answers =
     match p_getint conf.env "max" with
