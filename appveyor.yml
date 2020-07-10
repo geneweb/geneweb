@@ -6,7 +6,7 @@
   platform:
     - x64
 
-    init:
+  init:
     - ps: $env:PKG_VERSION = $env:appveyor_repo_tag_name ?? $env:appveyor_repo_commit.SubString(0,8)
     - ps: $env:IS_PRERELEASE = !$env:appveyor_repo_tag
 
