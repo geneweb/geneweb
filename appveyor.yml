@@ -69,6 +69,10 @@
     - path: geneweb-%PKG_VERSION%-install.exe
       name: Win64 installer for GeneWeb
   
+  before_deploy:
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && git diff --shortstat v6.08..HEAD > changelog.txt"'
+    - sh: git diff --shortstat v6.08..HEAD > changelog.txt
+    - ps: ${env:RELEASE_DESCRIPTION} = ( Get-Content -LiteralPath changelog.txt -Encoding UTF8 ) -join "`n";
 
   deploy:
     release: 'Geneweb %PKG_VERSION%'
