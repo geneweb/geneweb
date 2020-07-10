@@ -70,12 +70,13 @@
       name: Win64 installer for GeneWeb
   
   before_deploy:
-    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && export DESCRIPTION=$(git log --format=%s v6.08..HEAD | awk {print} ORS=\\\\n)"'
-    - sh: export DESCRIPTION=$(git log --format=%s v6.08..HEAD | | awk {print} ORS=\\\\n)
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && git log --format=%s v6.08..HEAD > changelog.txt"'
+    - sh: git log --format=%s v6.08..HEAD > changelog.txt
+    - ps: ${env:RELEASE_DESCRIPTION} = ( Get-Content -LiteralPath changelog.txt -Encoding UTF8 ) -join "`n";
  
   deploy:
     release: 'Geneweb %PKG_VERSION%'
-    description: '%DESCRIPTION%'
+    description: '%RELEASE_DESCRIPTION%'
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
