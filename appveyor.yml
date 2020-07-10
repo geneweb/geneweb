@@ -23,7 +23,11 @@
       - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
         PACKAGE_UPDATE: 'brew update'
         PACKAGE_INSTALLER: 'brew install'
-        PKG_OS: macos
+        PKG_OS: macos-10.14
+      - APPVEYOR_BUILD_WORKER_IMAGE: macos
+        PACKAGE_UPDATE: 'brew update'
+        PACKAGE_INSTALLER: 'brew install'
+        PKG_OS: macos-10.15
 
   install:
     # windows environnement
@@ -39,7 +43,7 @@
     - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
     # unix environnement
     - sh: 'export OPAMYES=1'
-    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "macOS" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
+    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "macos" || "$APPVEYOR_BUILD_WORKER_IMAGE" == "macos-mojave" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
     - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "Ubuntu1604" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
     - sh: '$PACKAGE_UPDATE'
     - sh: '$PACKAGE_INSTALLER opam'
@@ -67,7 +71,6 @@
 
   deploy:
     release: 'Geneweb %PKG_VERSION%'
-    description: '%PKG_VERSION%'
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
