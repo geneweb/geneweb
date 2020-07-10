@@ -20,7 +20,7 @@
         PACKAGE_UPDATE: 'sudo apt-get update'
         PACKAGE_INSTALLER: 'sudo apt-get install -qq'
         PKG_NAME: 'deb-%PKG_VERSION%'
-      - APPVEYOR_BUILD_WORKER_IMAGE: macOS
+      - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
         PACKAGE_UPDATE: 'brew update'
         PACKAGE_INSTALLER: 'brew install'
         PKG_NAME: 'macos-%PKG_VERSION%'
