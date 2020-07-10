@@ -70,8 +70,8 @@
       name: Win64 installer for GeneWeb
   
   before_deploy:
-    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && git log --format=%s v6.08..HEAD > changelog.txt"'
-    - sh: git log --format=%s v6.08..HEAD > changelog.txt
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && git diff --stat v6.08..HEAD > changelog.txt"'
+    - sh: git diff --stat v6.08..HEAD > changelog.txt
     - ps: ${env:RELEASE_DESCRIPTION} = ( Get-Content -LiteralPath changelog.txt -Encoding UTF8 ) -join "`n";
  
   deploy:
