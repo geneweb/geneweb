@@ -7,12 +7,7 @@
     - x64
 
   init:
-    - ps: if ($env:appveyor_repo_tag_name) {
-            $env:PKG_VERSION = $env:appveyor_repo_tag_name ;
-          } else {
-            $env:PKG_VERSION = $env:appveyor_repo_commit.SubString(0,8) ;
-          }
-    - ps: $env:IS_PRERELEASE = !$env:appveyor_repo_tag
+    - ps: $env:PKG_VERSION = $env:APPVEYOR_REPO_COMMIT.SubString(0,8)
 
   environment:
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
@@ -78,4 +73,4 @@
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
     artifact: /geneweb-%PKG_NAME%.zip|geneweb-%PKG_VERSION%-install.exe/
     draft: false
-    prerelease: '%IS_PRERELEASE%'
+    prerelease: true
