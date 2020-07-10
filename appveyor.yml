@@ -70,7 +70,7 @@
       name: Win64 installer for GeneWeb
   
   before_deploy:
-    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && export DESCRIPTION=$(git log --format=%s v6.08..HEAD | | awk {print} ORS=\\\\n)"'
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && export DESCRIPTION=$(git log --format=%s v6.08..HEAD | awk {print} ORS=\\\\n)"'
     - sh: export DESCRIPTION=$(git log --format=%s v6.08..HEAD | | awk {print} ORS=\\\\n)
  
   deploy:
