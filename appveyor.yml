@@ -3,22 +3,12 @@
     only:
       - nightly-build
 
-  skip_commits:
-    files:
-      - CHANGES
-      - ICHANGES
-      - etc/
-      - geneweb.opam
-      - .gitignore
-      - hd/
-      - INSTALL
-      - LICENSE
-      - README.md
-      - man/
-      - .travis.yml
-
   platform:
     - x64
+
+    init:
+    - ps: $env:PKG_VERSION = $env:appveyor_repo_tag_name ?? $env:appveyor_repo_commit.SubString(0,8)
+    - ps: $env:IS_PRERELEASE = !$env:appveyor_repo_tag
 
   environment:
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
@@ -26,15 +16,15 @@
     matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CYG_ROOT: C:/cygwin64
-        PKG_NAME: win64
+        PKG_NAME: win64-%PKG_VERSION%
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
         PACKAGE_UPDATE: 'sudo apt-get update'
         PACKAGE_INSTALLER: 'sudo apt-get install -qq'
-        PKG_NAME: deb
+        PKG_NAME: deb-%PKG_VERSION%
       - APPVEYOR_BUILD_WORKER_IMAGE: macOS
         PACKAGE_UPDATE: 'brew update'
         PACKAGE_INSTALLER: 'brew install'
-        PKG_NAME: macos
+        PKG_NAME: macos-%PKG_VERSION%
 
   install:
     # windows environnement
@@ -73,15 +63,15 @@
   artifacts:
     - path: geneweb-%PKG_NAME%.zip
       name: GeneWeb with default options
-    - path: geneweb-install.exe
+    - path: geneweb-%PKG_VERSION%-install.exe
       name: Win64 installer for GeneWeb
 
   deploy:
-    release: 'Geneweb pre-release %APPVEYOR_REPO_COMMIT%'
-    description: '%APPVEYOR_REPO_COMMIT_MESSAGE%'
+    release: 'Geneweb %PKG_VERSION%'
+    description: '%PKG_VERSION%'
     provider: GitHub
     auth_token:
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
-    artifact: /geneweb-%PKG_NAME%.zip|geneweb-install.exe/
+    artifact: /geneweb-%PKG_NAME%.zip|geneweb-%PKG_VERSION%-install.exe/
     draft: false
-    prerelease: true
+    prerelease: %IS_PRERELEASE%

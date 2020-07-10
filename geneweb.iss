@@ -2,8 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "GeneWeb"
-#define MyVersion "7.00"
-#define MyCommit GetEnv('APPVEYOR_REPO_COMMIT')
+#define MyVersion GetEnv('PKG_VERSION')
 #define MyDistribution "distribution\"
 #define MyOutputDir GetEnv('APPVEYOR_BUILD_FOLDER')
 #define MyApplowName "geneweb"
@@ -15,7 +14,7 @@
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 OutputDir={#MyOutputDir}
-OutputBaseFilename=geneweb-install
+OutputBaseFilename=geneweb-{#MyVersion}-install
 SetupIconfile="{#MyDistribution}gw\images\icone_gwsetup.ico"
 
 DisableWelcomePage=no
@@ -23,14 +22,14 @@ DisableWelcomePage=no
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{70C9041C-A917-4AF3-A510-8842CC0FFCC8}
 AppName={#MyAppName}
-AppVersion={#MyVersion}-{#MyCommit}
-AppVerName={#MyAppName} {#MyVersion}-{#MyCommit}
+AppVersion={#MyVersion}
+AppVerName={#MyAppName} {#MyVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={userdocs}\{#MyApplowName}-{#MyVersion}-{#MyCommit}
-DefaultGroupName={#MyAppName}-{#MyVersion}-{#MyCommit}
+DefaultDirName={userdocs}\{#MyApplowName}-{#MyVersion}
+DefaultGroupName={#MyAppName}-{#MyVersion}
 LicenseFile="{#MyDistribution}LICENSE.txt"
 PrivilegesRequired=admin
 Compression=lzma
@@ -43,18 +42,18 @@ WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 Source: "{#MyDistribution}*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Gwsetup"; Filename: "{app}\gwsetup.bat"; IconFilename: "{app}\gw\images\icone_gwsetup.ico"; Flags: runminimized; Comment: "Daemon Gwsetup {#MyAppName} {#MyVersion}-{#MyCommit}"
-Name: "{group}\Gwd"; Filename: "{app}\gwd.bat"; IconFilename: "{app}\gw\images\icone_gwd.ico"; Flags: runminimized; Comment: "Daemon Gwd {#MyAppName} {#MyVersion}-{#MyCommit}"
+Name: "{group}\Gwsetup"; Filename: "{app}\gwsetup.bat"; IconFilename: "{app}\gw\images\icone_gwsetup.ico"; Flags: runminimized; Comment: "Daemon Gwsetup {#MyAppName} {#MyVersion}"
+Name: "{group}\Gwd"; Filename: "{app}\gwd.bat"; IconFilename: "{app}\gw\images\icone_gwd.ico"; Flags: runminimized; Comment: "Daemon Gwd {#MyAppName} {#MyVersion}"
 Name: "{group}\START.htm"; Filename: "{app}\START.htm";
-Name: "{group}\{#MyAppName} {#MyVersion}-{#MyCommit}"; Filename: "{app}";
-Name: "{group}\{cm:UninstallProgram,{#MyAppName} {#MyVersion}-{#MyCommit}}"; Filename: "{uninstallexe}";
+Name: "{group}\{#MyAppName} {#MyVersion}"; Filename: "{app}";
+Name: "{group}\{cm:UninstallProgram,{#MyAppName} {#MyVersion}}"; Filename: "{uninstallexe}";
 
-Name: "{commondesktop}\Gwsetup"; Filename: "{app}\gwsetup.bat"; Tasks: desktopicon; IconFilename: "{app}\gw\images\icone_gwsetup.ico"; Flags: runminimized; Comment: "Daemon Gwsetup {#MyAppName} {#MyVersion}-{#MyCommit}"
-Name: "{commondesktop}\Gwd"; Filename: "{app}\gwd.bat"; Tasks: desktopicon; IconFilename: "{app}\gw\images\icone_gwd.ico"; Flags: runminimized; Comment: "Daemon Gwd {#MyAppName} {#MyVersion}-{#MyCommit}"
+Name: "{commondesktop}\Gwsetup"; Filename: "{app}\gwsetup.bat"; Tasks: desktopicon; IconFilename: "{app}\gw\images\icone_gwsetup.ico"; Flags: runminimized; Comment: "Daemon Gwsetup {#MyAppName} {#MyVersion}"
+Name: "{commondesktop}\Gwd"; Filename: "{app}\gwd.bat"; Tasks: desktopicon; IconFilename: "{app}\gw\images\icone_gwd.ico"; Flags: runminimized; Comment: "Daemon Gwd {#MyAppName} {#MyVersion}"
 Name: "{commondesktop}\START.htm"; Filename: "{app}\START.htm"; Tasks: desktopicon;
 
-Name: "{userappdata}\Gwsetup"; Filename: "{app}\gwsetup.bat"; Tasks: quicklaunchicon; IconFilename: "{app}\gw\images\icone_gwsetup.ico"; Flags: runminimized; Comment: "Daemon Gwsetup {#MyAppName} {#MyVersion}-{#MyCommit}"
-Name: "{userappdata}\Gwd"; Filename: "{app}\gwd.bat"; Tasks: quicklaunchicon; IconFilename: "{app}\gw\images\icone_gwd.ico"; Flags: runminimized; Comment: "Daemon Gwd {#MyAppName} {#MyVersion}-{#MyCommit}"
+Name: "{userappdata}\Gwsetup"; Filename: "{app}\gwsetup.bat"; Tasks: quicklaunchicon; IconFilename: "{app}\gw\images\icone_gwsetup.ico"; Flags: runminimized; Comment: "Daemon Gwsetup {#MyAppName} {#MyVersion}"
+Name: "{userappdata}\Gwd"; Filename: "{app}\gwd.bat"; Tasks: quicklaunchicon; IconFilename: "{app}\gw\images\icone_gwd.ico"; Flags: runminimized; Comment: "Daemon Gwd {#MyAppName} {#MyVersion}"
 Name: "{userappdata}\START.htm"; Filename: "{app}\START.htm"; Tasks: quicklaunchicon;
 
 [Run]
