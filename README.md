@@ -32,6 +32,18 @@ The documentation is available online: http://geneweb.tuxfamily.org/
 
 ## Installation (for users)
 
+WARNING: before installing a new version of GeneWeb, it is highly recommended to save
+your bases into .gw formated files.
+
+When installing a version of GeneWeb with the "pre-release" qualifier, you are
+participating to the collective test effort (thanks for your contribution). You should keep aside the previous version 
+you were using, and refrain from extensive updates or additions in your bases
+until the "release" qualifier is effective.
+
+Any problem you encounter or issue you want to raise should be entered on the issue page
+of the GitHub repository (https://github.com/geneweb/geneweb/issues)
+
+
 Download the file corresponding to your environment from the releases page:
 ```
 https://github.com/geneweb/geneweb/releases
