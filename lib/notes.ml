@@ -6,13 +6,8 @@ open Util
 
 module StrSet = Mutil.StrSet
 
-let file_path conf base fname =
-  Util.base_path []
-    (List.fold_left Filename.concat (conf.bname ^ ".gwb")
-       [base_notes_dir base; fname ^ ".txt"])
-
 let path_of_fnotes fnotes =
-  match NotesLinks.check_file_name fnotes with
+  match Wiki.check_file_name fnotes with
     Some (dl, f) -> List.fold_right Filename.concat dl f
   | None -> ""
 
@@ -128,32 +123,20 @@ let notes_links_db conf base eliminate_unlinked =
     (fun (s1, _) (s2, _) -> Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 
+let notelinks s =
+  let doc = Wiki.doc_of_string s in
+  let links = Wiki.notelinks doc in
+  List.fold_left begin fun (nt, ind) -> function
+    | Wiki.WLpage (_, fn, _, _) ->
+      if List.mem fn nt then (nt, ind) else (fn :: nt, ind)
+    | Wiki.WLperson (id, key, _, txt) ->
+      let link = { Def.NLDB.lnTxt = txt ; Def.NLDB.lnPos = id } in
+      (nt, (key, link) :: ind)
+    | Wiki.WLwizard _ -> (nt, ind)
+  end ([], []) links
+
 let update_notes_links_db base fnotes s =
-  let slen = String.length s in
-  let (list_nt, list_ind) =
-    let rec loop list_nt list_ind pos i =
-      if i = slen then list_nt, list_ind
-      else if i + 1 < slen && s.[i] = '%' then
-        loop list_nt list_ind pos (i + 2)
-      else
-        match NotesLinks.misc_notes_link s i with
-          NotesLinks.WLpage (j, _, lfname, _, _) ->
-            let list_nt =
-              if List.mem lfname list_nt then list_nt else lfname :: list_nt
-            in
-            loop list_nt list_ind pos j
-        | NotesLinks.WLperson (j, key, _, txt) ->
-            let list_ind =
-              let link = {Def.NLDB.lnTxt = txt; Def.NLDB.lnPos = pos} in
-              (key, link) :: list_ind
-            in
-            loop list_nt list_ind (pos + 1) j
-        | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind pos j
-        | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1)
-    in
-    loop [] [] 1 0
-  in
-  NotesLinks.update_db base fnotes (list_nt, list_ind)
+  Gwdb.update_db base fnotes @@ notelinks s
 
 let commit_notes conf base fnotes s =
   let pg =

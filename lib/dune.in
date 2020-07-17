@@ -16,6 +16,8 @@
             geneweb-lib.sosa.mli
             geneweb-lib.util
             geneweb-lib.wserver.mli
-            markup)
+            markup
+            wikitext
+ )
  (modules_without_implementation templAst)
 )

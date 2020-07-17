@@ -840,7 +840,7 @@ let insert_bnotes fname gen nfname str =
   let nfname =
     if nfname = "" then ""
     else
-      match NotesLinks.check_file_name nfname with
+      match Wiki.check_file_name nfname with
         Some (dl, f) -> List.fold_right Filename.concat dl f
       | None -> "bad"
   in
