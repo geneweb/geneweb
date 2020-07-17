@@ -1873,30 +1873,21 @@ let mode_local env =
   | Vfam _ -> false
   | _ -> true
 
-let get_note_source conf base env auth no_note note_source =
+let get_note_source conf base m env auth no_note s =
   if auth && not no_note then
-    let s = string_with_macros conf env note_source in
-    let lines = Wiki.html_of_tlsw conf s in
-    let lines =
-      (* remove enclosing <p> .. </p> if any *)
-      if List.length lines > 2 then
-        match lines with
-        | "<p>" :: remain ->
-          if List.hd (List.rev remain) = "</p>"
-          then List.rev (List.tl (List.rev remain))
-          else lines
-        | _ -> lines
-      else lines
+    let interp =
+      match m with `block -> Wiki.interp ?edit:None
+                 | `inline -> Wiki.interp_inline
     in
-    let wi =
-      {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-       Wiki.wi_file_path = Notes.file_path conf base;
-       Wiki.wi_person_exists = person_exists conf base;
-       Wiki.wi_always_show_link = conf.wizard || conf.friend}
-    in
-    let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
-    Util.safe_html @@ if conf.pure_xhtml then Util.check_xhtml s else s
+    let s = interp conf base ~env s in
+    if conf.pure_xhtml then Util.check_xhtml s else s
   else ""
+
+let get_note conf base env auth i =
+  get_note_source conf base `block env auth conf.no_note (sou base i)
+
+let get_source conf base env auth i =
+  get_note_source conf base `inline env auth false (sou base i)
 
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl with
@@ -1993,7 +1984,6 @@ and eval_simple_bool_var conf base env =
           | _ -> raise Not_found
       end
 
-
   | "is_first" ->
       begin match get_env "first" env with
         Vbool x -> x
@@ -2049,8 +2039,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "comment" | "fnotes" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth conf.no_note
-            (sou base (get_comment fam))
+          get_note conf base [] m_auth (get_comment fam)
       | _ -> raise Not_found
       end
   | "count" ->
@@ -2192,15 +2181,13 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "marriage_note" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth conf.no_note
-            (sou base (get_marriage_note fam))
+          get_note conf base [] m_auth (get_marriage_note fam)
       | _ -> raise Not_found
       end
   | "marriage_source" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth false
-            (sou base (get_marriage_src fam))
+          get_source conf base [] m_auth (get_marriage_src fam)
       | _ -> raise Not_found
       end
   | "max_anc_level" ->
@@ -3448,10 +3435,10 @@ and eval_str_event_field conf base (p, p_auth)
       if p_auth then Util.string_of_place conf (sou base place) else ""
   | "note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note (sou base note)
+      get_note conf base env p_auth note
   | "src" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false (sou base src)
+      get_source conf base env p_auth src
   | _ -> raise Not_found
 and eval_event_field_var conf base env (p, p_auth)
     (name, date, place, note, src, w, isp) loc =
@@ -3977,35 +3964,29 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else ""
   | "birth_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_birth_note p))
+      get_note conf base env p_auth (get_birth_note p)
   | "birth_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_birth_src p))
+      get_source conf base env p_auth (get_birth_src p)
   | "baptism_place" ->
       if p_auth then
         Util.string_of_place conf (sou base (get_baptism_place p))
       else ""
   | "baptism_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_baptism_note p))
+      get_note conf base env p_auth (get_baptism_note p)
   | "baptism_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_baptism_src p))
+      get_source conf base env p_auth (get_baptism_src p)
   | "burial_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
       else ""
   | "burial_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_burial_note p))
+      get_note conf base env p_auth (get_burial_note p)
   | "burial_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_burial_src p))
+      get_source conf base env p_auth (get_burial_src p)
   | "child_name" ->
       let force_surname =
         match get_parents p with
@@ -4046,12 +4027,10 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else ""
   | "death_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_death_note p))
+      get_note conf base env p_auth (get_death_note p)
   | "death_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_death_src p))
+      get_source conf base env p_auth (get_death_src p)
   | "died" -> string_of_died conf p p_auth
   | "fam_access" ->
       (* deprecated since 5.00: rather use "i=%family.index;&ip=%index;" *)
@@ -4211,15 +4190,13 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       end
   | "notes" | "pnotes" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_notes p))
+      get_note conf base env p_auth (get_notes p)
   | "occ" ->
       if is_hide_names conf p && not p_auth then ""
       else string_of_int (get_occ p)
   | "occupation" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_occupation p))
+      get_source conf base env p_auth (get_occupation p)
   | "on_baptism_date" ->
       begin match p_auth, Adef.od_of_cdate (get_baptism p) with
         true, Some d ->
@@ -4271,8 +4248,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       end
   | "psources" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_psources p))
+      get_source conf base env p_auth (get_psources p)
   | "slash_burial_date" ->
       begin match get_burial p with
         Buried cod ->
@@ -4383,17 +4359,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_env "src" env with
         Vstring s ->
           let env = ['i', (fun () -> Util.default_image_name base p)] in
-          let s =
-            let wi =
-              {Wiki.wi_mode = "NOTES";
-               Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
-               Wiki.wi_person_exists = person_exists conf base;
-               Wiki.wi_always_show_link = conf.wizard || conf.friend}
-            in
-            Wiki.syntax_links conf wi s
-          in
-          Util.safe_html @@ string_with_macros conf env s
+          get_note_source conf base `inline env true false s
       | _ -> raise Not_found
       end
   | "surname" ->

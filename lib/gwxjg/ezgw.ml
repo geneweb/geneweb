@@ -49,23 +49,19 @@ let env = empty
 
 let get_env x = match x with Some x -> x | None -> raise Not_found
 
-let mk_note conf base env note =
-  let s = sou base note in
-  let s = string_with_macros conf env s in
-  let lines = Wiki.html_of_tlsw conf s in
-  let wi =
-    { Wiki.wi_mode = "NOTES"
-    ; Wiki.wi_cancel_links = conf.cancel_links
-    ; Wiki.wi_file_path = Notes.file_path conf base
-    ; Wiki.wi_person_exists = person_exists conf base
-    ; Wiki.wi_always_show_link = conf.wizard || conf.friend
-    }
-  in
-  Wiki.syntax_links conf wi (String.concat "\n" lines)
+let mk_note conf base env i =
+  Wiki.interp conf base ~env @@ sou base i
+
+let mk_src conf base env i =
+  Wiki.interp_inline conf base ~env @@ sou base i
 
 let mk_person_note conf base p note =
   let env = ['i', (fun () -> Util.default_image_name base p)] in
   mk_note conf base env note
+
+let mk_person_src conf base p note =
+  let env = ['i', (fun () -> Util.default_image_name base p)] in
+  mk_src conf base env note
 
 let sex_of_index = function
   | 0 -> Male

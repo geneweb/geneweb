@@ -323,15 +323,17 @@ let print_main conf base auth_file =
 
 let wizard_page_title wizname _ = Wserver.print_string wizname
 
-let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
+(* FIXME: _ho *)
+let print_whole_wiznote conf base auth_file wz wfile (s, date) _ho =
   let wizname =
     let wizdata = read_auth_file auth_file in
     try fst (List.assoc wz wizdata) with Not_found -> wz
   in
-  let edit_opt =
-    let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-    Some (can_edit, "WIZNOTES", code_varenv wz)
-  in
+  (* FIXME *)
+  (* let edit_opt =
+   *   let can_edit = conf.wizard && conf.user = wz || conf.manitou in
+   *   Some (can_edit, "WIZNOTES", code_varenv wz)
+   * in *)
   let title = wizard_page_title wizname in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
@@ -345,23 +347,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   Wserver.printf "<table border=\"0\" width=\"100%%\">\n";
   Wserver.printf "<tr>\n";
   Wserver.printf "<td>\n";
-  begin let s = Util.safe_html @@ string_with_macros conf [] s in
-    let s =
-      let wi =
-        {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-         Wiki.wi_file_path = Notes.file_path conf base;
-         Wiki.wi_person_exists = person_exists conf base;
-         Wiki.wi_always_show_link = conf.wizard || conf.friend}
-      in
-      Wiki.html_with_summary_of_tlsw conf wi edit_opt s
-    in
-    let s =
-      match ho with
-        Some (case_sens, h) -> html_highlight case_sens h s
-      | None -> s
-    in
-    Wserver.printf "%s\n" (Util.safe_html @@ if conf.pure_xhtml then Util.check_xhtml s else s)
-  end;
+  Wserver.print_string @@ Wiki.interp conf base s ;
   Wserver.printf "</td>\n";
   Wserver.printf "</tr>\n";
   Wserver.printf "</table>\n";
@@ -384,20 +370,12 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   Hutil.trailer conf
 
 let print_part_wiznote conf base wz s cnt0 =
-  let title = wz in
-  Hutil.header_no_page_title conf (fun _ -> Wserver.print_string title);
-  let s = Util.safe_html @@ string_with_macros conf [] s in
-  let lines = Wiki.extract_sub_part s cnt0 in
-  let lines = if cnt0 = 0 then title :: "<br /><br />" :: lines else lines in
-  let file_path = Notes.file_path conf base in
+  Hutil.header_no_page_title conf (fun _ -> Wserver.print_string wz) ;
+  let s = if cnt0 = 0 then wz ^ "<nowiki><br><br></nowiki>" ^ s else s in
   let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-  let wi =
-    {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-     Wiki.wi_file_path = file_path;
-     Wiki.wi_person_exists = person_exists conf base;
-     Wiki.wi_always_show_link = conf.wizard || conf.friend}
-  in
-  Wiki.print_sub_part conf wi can_edit "WIZNOTES" (code_varenv wz) cnt0 lines;
+  let s = Wiki.extract_sub_part s cnt0 in
+  let doc = Wiki.doc_of_string s in
+  WikiDisplay.print_sub_part conf base can_edit "WIZNOTES" (code_varenv wz) cnt0 doc ;
   Hutil.trailer conf
 
 let wizard_auth_file_name conf =
@@ -431,50 +409,32 @@ let print conf base =
         end
     | None -> print_main conf base auth_file
 
-let print_mod conf base =
+let print_aux mode conf base =
   let auth_file =
-    match
-      p_getenv conf.base_env "wizard_descr_file",
-      p_getenv conf.base_env "wizard_passwd_file"
+    match p_getenv conf.base_env "wizard_descr_file"
+        , p_getenv conf.base_env "wizard_passwd_file"
     with
-      (Some "" | None), (Some "" | None) -> ""
+    | (Some "" | None), (Some "" | None) -> ""
     | Some auth_file, _ -> auth_file
     | _, Some auth_file -> auth_file
   in
   if auth_file = "" then Hutil.incorrect_request conf
-  else
-    match p_getenv conf.env "f" with
-      Some wz ->
-        let wz = Filename.basename wz in
-        let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-        if can_edit then
-          let title = wizard_page_title wz in
-          let wfile = wzfile (dir conf base) wz in
-          let (s, _) = read_wizard_notes wfile in
-          Wiki.print_mod_view_page conf true "WIZNOTES" wz title [] s
-        else Hutil.incorrect_request conf
-    | None -> Hutil.incorrect_request conf
-
-let print_view conf base =
-  let auth_file =
-    match
-      p_getenv conf.base_env "wizard_descr_file",
-      p_getenv conf.base_env "wizard_passwd_file"
-    with
-      (Some "" | None), (Some "" | None) -> ""
-    | Some auth_file, _ -> auth_file
-    | _, Some auth_file -> auth_file
-  in
-  if auth_file = "" then Hutil.incorrect_request conf
-  else
-    match p_getenv conf.env "f" with
-      Some wz ->
-        let wz = Filename.basename wz in
+  else match p_getenv conf.env "f" with
+    | Some wz ->
+      let wz = Filename.basename wz in
+      if mode = `view
+      || (mode = `edit && (conf.wizard && conf.user = wz || conf.manitou))
+      then
         let title = wizard_page_title wz in
         let wfile = wzfile (dir conf base) wz in
         let (s, _) = read_wizard_notes wfile in
-        Wiki.print_mod_view_page conf false "WIZNOTES" wz title [] s
+        WikiDisplay.print_mod_view_page conf base (mode = `edit) "WIZNOTES" wz title [] s
+      else Hutil.incorrect_request conf
     | None -> Hutil.incorrect_request conf
+
+let print_mod = print_aux `edit
+
+let print_view = print_aux `view
 
 let commit_wiznotes conf base wz s =
   let wddir = dir conf base in
@@ -505,21 +465,12 @@ let print_mod_ok conf base =
       if conf.wizard && conf.user = wz || conf.manitou then Some "WIZNOTES"
       else None
     in
-    let mode = "NOTES" in
     let read_string wz =
       [], fst (read_wizard_notes (wzfile (dir conf base) wz))
     in
     let commit = commit_wiznotes conf base in
     let string_filter s = Util.safe_html @@ string_with_macros conf [] s in
-    let file_path = Notes.file_path conf base in
-    let wi =
-      {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
-       Wiki.wi_file_path = file_path;
-       Wiki.wi_person_exists = person_exists conf base;
-       Wiki.wi_always_show_link = conf.wizard || conf.friend}
-    in
-    Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
-      false
+    WikiDisplay.print_mod_ok conf base edit_mode fname read_string commit string_filter false
 
 let wizard_denying wddir =
   let fname = Filename.concat wddir "connected.deny" in

@@ -208,17 +208,7 @@ and eval_message_text_var conf base str so =
   function
     ["wiki"] ->
     let s = string_with_macros conf [] str in
-    let lines = Wiki.html_of_tlsw conf s in
-    let s = String.concat "\n" lines in
-    let s =
-      let wi =
-        {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-         Wiki.wi_file_path = Notes.file_path conf base;
-         Wiki.wi_person_exists = person_exists conf base;
-         Wiki.wi_always_show_link = conf.wizard || conf.friend}
-      in
-      Wiki.syntax_links conf wi s
-    in
+    let s = Wiki.html_of_wiki conf base s in
     let s =
       match so with
         Some h ->

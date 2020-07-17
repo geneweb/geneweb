@@ -279,31 +279,6 @@ type graph_more_info =
 
 (* ************************************************************************** *)
 (*  [Fonc] event_to_piqi_event : string -> event_type                         *)
-(** [Description] : Convertit les balises wiki des notes en html.
-    [Args] :
-      - conf
-      - base
-      - env
-      - wiki_notes       : les notes au format wiki
-      - separator_string : caractère de séparations entre les lignes
-    [Retour] :
-      - html_notes : les notes au format html                                 *)
-(* ************************************************************************** *)
-let convert_wiki_notes_to_html_notes conf base env wiki_notes separator_string =
-    let html_notes = string_with_macros conf env wiki_notes in
-    let lines = Wiki.html_of_tlsw conf html_notes in
-    let wi =
-        {Wiki.wi_mode = "NOTES";
-        Wiki.wi_cancel_links = conf.cancel_links;
-        Wiki.wi_file_path = Notes.file_path conf base;
-        Wiki.wi_person_exists = person_exists conf base;
-        Wiki.wi_always_show_link = conf.wizard || conf.friend}
-    in
-    let html_notes = Wiki.syntax_links conf wi (String.concat separator_string lines) in
-    if conf.pure_xhtml then Util.check_xhtml html_notes else html_notes
-
-(* ************************************************************************** *)
-(*  [Fonc] event_to_piqi_event : string -> event_type                         *)
 (** [Description] : Retourne à partir d'un évènement (gwdb) un évènement (piqi)
     [Args] :
       - evt_name : nom de l'évènement
@@ -678,25 +653,11 @@ let fam_to_piqi_family_link conf base (ifath : Gwdb.iper) imoth sp ifam fam fam_
       gen_f.witnesses
   in
   let notes =
-    if m_auth && not conf.no_note then
-      let s = gen_f.comment in
-      convert_wiki_notes_to_html_notes conf base [] s "\n"
+    if m_auth && not conf.no_note then Wiki.interp conf base gen_f.comment
     else ""
   in
   let fsources =
-    if m_auth then
-      let s = gen_f.fsources in
-      let s =
-        let wi =
-          {Wiki.wi_mode = "NOTES";
-           Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
-           Wiki.wi_person_exists = person_exists conf base;
-           Wiki.wi_always_show_link = conf.wizard || conf.friend}
-        in
-        Wiki.syntax_links conf wi s
-      in
-      string_with_macros conf [] s
+    if m_auth then Wiki.interp_inline conf base gen_f.fsources
     else ""
   in
   let children =
@@ -750,25 +711,13 @@ let fill_events conf base p base_prefix p_auth pers_to_piqi_callback witness_con
           if not conf.no_note then
             begin
               let env = [('i', fun () -> Util.default_image_name base p)] in
-              let s = sou base note in
-              convert_wiki_notes_to_html_notes conf base env s "\n"
+              Wiki.interp conf base ~env (sou base note)
             end
           else ""
         in
         let src =
-          let s = sou base src in
           let env = [('i', fun () -> Util.default_image_name base p)] in
-          let s =
-            let wi =
-              {Wiki.wi_mode = "NOTES";
-               Wiki.wi_cancel_links = conf.cancel_links;
-               Wiki.wi_file_path = Notes.file_path conf base;
-               Wiki.wi_person_exists = person_exists conf base;
-               Wiki.wi_always_show_link = conf.wizard || conf.friend}
-            in
-            Wiki.syntax_links conf wi s
-          in
-          string_with_macros conf env s
+          Wiki.interp_inline conf base ~env (sou base src)
         in
         let spouse =
           Opt.map (fun ip -> pers_to_piqi_callback conf base (poi base ip) base_prefix) isp
@@ -946,25 +895,11 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
       gen_f.witnesses
   in
   let notes =
-    if m_auth && not conf.no_note then
-      let s = gen_f.comment in
-      convert_wiki_notes_to_html_notes conf base [] s "\n"
+    if m_auth && not conf.no_note then Wiki.interp conf base gen_f.comment
     else ""
   in
   let fsources =
-    if m_auth then
-      let s = gen_f.fsources in
-      let s =
-        let wi =
-          {Wiki.wi_mode = "NOTES";
-           Wiki.wi_cancel_links = conf.cancel_links;
-           Wiki.wi_file_path = Notes.file_path conf base;
-           Wiki.wi_person_exists = person_exists conf base;
-           Wiki.wi_always_show_link = conf.wizard || conf.friend}
-        in
-        Wiki.syntax_links conf wi s
-      in
-      string_with_macros conf [] s
+    if m_auth then Wiki.interp_inline conf base gen_f.fsources
     else ""
   in
   let children =
@@ -1329,19 +1264,8 @@ let fill_burial conf p_auth gen_p =
       | _ -> ("", "", "", "", None)
 
 let fill_occupation conf base p_auth gen_p =
-  if p_auth then
-        let s = gen_p.occupation in
-        let s =
-          let wi =
-            {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-             Wiki.wi_file_path = Notes.file_path conf base;
-             Wiki.wi_person_exists = person_exists conf base;
-             Wiki.wi_always_show_link = conf.wizard || conf.friend}
-          in
-          Wiki.syntax_links conf wi s
-        in
-        string_with_macros conf [] s
-      else ""
+  if p_auth then Wiki.interp_inline conf base gen_p.occupation
+  else ""
 
 let fill_index conf p p_auth =
   if not p_auth && (is_hide_names conf p)
@@ -1352,20 +1276,9 @@ let fill_index conf p p_auth =
 
 let fill_sources conf base p p_auth gen_p is_main_person =
   if p_auth && is_main_person then
-    let s = gen_p.psources in
     let env = [('i', fun () -> Util.default_image_name base p)] in
-    let s =
-      let wi =
-        {Wiki.wi_mode = "NOTES";
-         Wiki.wi_cancel_links = conf.cancel_links;
-         Wiki.wi_file_path = Notes.file_path conf base;
-         Wiki.wi_person_exists = person_exists conf base;
-         Wiki.wi_always_show_link = conf.wizard || conf.friend}
-      in
-      Wiki.syntax_links conf wi s
-    in
-    string_with_macros conf env s
-    else ""
+    Wiki.interp_inline conf base ~env gen_p.psources
+  else ""
 
 let fill_parents conf base p base_prefix =
   match get_parents p with
@@ -1555,8 +1468,7 @@ let fiche_event_witness_constructor event_witness_type husband wife =
 let fill_notes conf base p p_auth is_main_person gen_p =
   if p_auth && not conf.no_note && is_main_person then
     let env = [('i', fun () -> Util.default_image_name base p)] in
-    let s = gen_p.notes in
-    convert_wiki_notes_to_html_notes conf base env s "\n"
+    Wiki.interp conf base ~env gen_p.notes
   else ""
 
 let simple_relation_person_constructor r_type p =

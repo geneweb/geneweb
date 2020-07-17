@@ -1573,10 +1573,6 @@ let expand_env =
     | _ -> s
 
 let string_with_macros conf env s =
-  let start_with s i p =
-    i + String.length p <= String.length s &&
-    String.lowercase_ascii (String.sub s i (String.length p)) = p
-  in
   let buff = Buffer.create 1000 in
   let rec loop tt i =
     if i < String.length s then
@@ -1624,7 +1620,7 @@ let string_with_macros conf env s =
       else
         match tt with
           In_a_href ->
-            let tt = if start_with s i "</a>" then Out else In_a_href in
+            let tt = if Mutil.start_with "</a>" i s then Out else In_a_href in
             Buffer.add_char buff s.[i]; loop tt (i + 1)
         | In_norm ->
             let tt = if s.[i] = '>' then Out else In_norm in
@@ -1644,8 +1640,8 @@ let string_with_macros conf env s =
                     loop Out j
                 | None ->
                     let tt =
-                      if start_with s i "<a href=" ||
-                         start_with s i "<a\nhref="
+                      if Mutil.start_with "<a href=" i s ||
+                         Mutil.start_with "<a\nhref=" i s
                       then
                         In_a_href
                       else if s.[i] = '<' then In_norm
@@ -2927,24 +2923,7 @@ let start_equiv_with case_sens s m i =
       Some (i, j) -> test i j
     | None -> None
 
-let rec in_text case_sens s m =
-  let rec loop in_tag i =
-    if i = String.length m then false
-    else if in_tag then loop (m.[i] <> '>') (i + 1)
-    else if m.[i] = '<' then loop true (i + 1)
-    else if m.[i] = '[' && i + 1 < String.length m && m.[i+1] = '[' then
-      match NotesLinks.misc_notes_link m i with
-        NotesLinks.WLpage (j, _, _, _, text) |
-        NotesLinks.WLperson (j, _, text, _) |
-        NotesLinks.WLwizard (j, _, text) ->
-          if in_text case_sens s text then true else loop false j
-      | NotesLinks.WLnone -> loop false (i + 1)
-    else
-      match start_equiv_with case_sens s m i with
-        Some _ -> true
-      | None -> loop false (i + 1)
-  in
-  loop false 0
+let in_text _case_sens _s _m = false (* FIXME *)
 
 let html_highlight case_sens h s =
   let ht i j =
