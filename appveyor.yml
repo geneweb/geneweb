@@ -58,7 +58,7 @@
 
   build_script:
     - sh : 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib'
-    - sh : 'zip -r geneweb-%PKG_OS%-%PKG_VERSION%.zip distribution/*'
+    - sh : 'zip -r geneweb-$PKG_OS-$PKG_VERSION.zip distribution/*'
     - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib"'
     - cmd: 'iscc geneweb.iss'
     - cmd: 7z a geneweb-%PKG_OS%-%PKG_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\distribution
