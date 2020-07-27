@@ -444,13 +444,24 @@ let commit_patches_r base get_person get_ascend get_union get_couple =
       end r (p.pevents)
     end ipers
   in
-  let _ =
-    let query =
-      {| {"query":"FOR r IN geneweb_relations FILTER r.basename == "|}
-      ^ bname
-      ^ {|" REMOVE { _key: r._key } IN geneweb_relation", "ttl": 0} |}
+  let () =
+    let ipers =
+      List.rev_map fst base.patch_union
+      |> List.rev_append (List.rev_map fst base.patch_ascend)
+      |> List.rev_append (List.rev_map fst base.patch_person)
+      |> List.rev_map (Json.handler_of_iper bname)
     in
-    base.post "_api/cursor" query
+    if ipers <> [] then
+      let query =
+        let ipers = Yojson.Basic.to_string (`List ipers) in
+        {|FOR r IN geneweb_relations FILTER r.basename == "|} ^ bname
+        ^ {|" AND (r._from IN |} ^ ipers ^ {| OR r._to IN |} ^ ipers ^ {|)|}
+        ^ {| REMOVE r._key IN geneweb_relations|}
+      in
+      `Assoc [ "query", `String query ; "ttl", `Int 0 ]
+      |> Yojson.Basic.to_string
+      |> base.post "_api/cursor"
+      |> ignore
   in
   let data = Yojson.Basic.to_string @@ `List (List.flatten @@ persons @ ascends @ unions) in
   ignore @@

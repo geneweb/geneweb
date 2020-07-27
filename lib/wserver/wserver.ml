@@ -505,12 +505,12 @@ let accept_connection tmout max_clients callback s =
           Unix.close s;
           wserver_sock := t;
           wserver_oc := Unix.out_channel_of_descr t;
-          treat_connection tmout callback addr t
+          treat_connection tmout callback addr t ;
+          close_connection ()
         with
           Unix.Unix_error (Unix.ECONNRESET, "read", _) -> ()
         | exc -> try print_err_exc exc; flush stderr with _ -> ()
         end;
-          close_connection () ;
         exit 0
     | Some id ->
         Unix.close t;
