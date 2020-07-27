@@ -591,7 +591,7 @@ let authorized_age conf base p =
              (fun () ->
                 check_date
                   (fun () ->
-                     (death = DontKnowIfDead && get_access p <> Private && conf.public_if_no_date)
+                     (get_access p <> Private && conf.public_if_no_date)
                      || begin
                        let families = get_family p in
                        let len = Array.length families in
