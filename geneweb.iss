@@ -14,7 +14,7 @@
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 OutputDir={#MyOutputDir}
-OutputBaseFilename=geneweb-{#MyVersion}-install
+OutputBaseFilename=geneweb-win64-{#MyVersion}-installer
 SetupIconfile="{#MyDistribution}gw\images\icone_gwsetup.ico"
 
 DisableWelcomePage=no

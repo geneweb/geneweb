@@ -66,7 +66,7 @@
   artifacts:
     - path: geneweb-%PKG_OS%-%PKG_VERSION%.zip
       name: GeneWeb with default options
-    - path: geneweb-%PKG_VERSION%-install.exe
+    - path: geneweb-win64-%PKG_VERSION%-installer.exe
       name: Win64 installer for GeneWeb
 
   deploy:
