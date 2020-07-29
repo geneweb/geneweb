@@ -38,30 +38,32 @@ let suffix d df =
   in
   loop (d, df)
 
-let check_open fname =
-  try
-    if String.contains fname '\000' then raise Exit;
+let check fname =
+  if String.contains fname '\000' then false
+  else
     let df = decompose fname in
-    let rec loop =
-      function
-        d :: dl ->
-          begin match suffix d df with
-            Some bf -> if List.mem Filename.parent_dir_name bf then raise Exit
+    let rec loop = function
+      | d :: dl ->
+        begin match suffix d df with
+          | Some bf -> not (List.mem Filename.parent_dir_name bf)
           | None -> loop dl
-          end
+        end
       | [] ->
-          if Filename.is_relative fname then
-            (if List.mem Filename.parent_dir_name df then raise Exit)
-          else raise Exit
+        if Filename.is_relative fname
+        then not (List.mem Filename.parent_dir_name df)
+        else false
     in
     loop !ok_path
-  with Exit ->
+
+let check_open fname =
+  if not (check fname) then begin
     if Sys.unix then
       begin
         Printf.eprintf "*** secure rejects open %s\n" (String.escaped fname);
         flush stderr
       end;
     raise (Sys_error "invalid access")
+  end
 
 let open_in fname = check_open fname; Stdlib.open_in fname
 let open_in_bin fname = check_open fname; Stdlib.open_in_bin fname
