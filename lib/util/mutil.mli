@@ -166,3 +166,22 @@ val normalize_utf_8 : string -> string
 val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
 
 val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
+
+(** [read_or_create ?magic fname read write]
+
+    If [fname] exists (and starts with [magic] if this one is provided),
+    [read] function is used on the file.
+    If it does not (or does not start with [magic]),
+    [write] function is used on the file.
+
+    This function takes care of locking and closing files so you must not take care of
+    that in [read]/[write].
+    It also takes care of writing [magic] at the beginning of the file before calling
+    [write]
+*)
+val read_or_create
+  : ?magic:string
+  -> string
+  -> (in_channel -> 'a)
+  -> (out_channel -> 'a)
+  -> 'a

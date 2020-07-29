@@ -653,3 +653,57 @@ let list_rev_map_append f l1 l2 =
     | hd :: tl -> aux (f hd :: acc) tl
   in
   aux l2 l1
+
+(* POSIX lockf(3), and fcntl(2), releases its locks when the process
+   that holds the locks closes ANY file descriptor that was open on that file.
+
+   i.e. Do not close channels before releasing the lock.
+*)
+let read_or_create ?magic fname read write =
+  assert (Secure.check fname) ;
+  let fd = Unix.openfile fname [ Unix.O_RDWR ; O_CREAT ] 0o666 in
+  let ic = Unix.in_channel_of_descr fd in
+  let writelock lock =
+    assert (Unix.lseek fd 1 Unix.SEEK_SET = 1) ;
+    Unix.lockf fd lock 1 ;
+    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
+  in
+  let readlock lock =
+    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0) ;
+    Unix.lockf fd lock 1 ;
+    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
+  in
+  let rec rd k =
+    seek_in ic 0 ;
+    if match magic with None -> true | Some m -> check_magic m ic
+    then
+      try
+        let res = read ic in
+        close_in ic ;
+        res
+      with _ -> k ()
+    else k ()
+  and wr () =
+    (* remove all present locks *)
+    Unix.lockf fd Unix.F_ULOCK 0 ;
+    (* prevent readers from acquiring cache file *)
+    writelock Unix.F_LOCK ;
+    (* wait for current readers to finish reading
+       and prevent other writer from acquiring cache file.*)
+    readlock Unix.F_LOCK ;
+    (* check if another writer has already updated the cache file
+       and update it if not *)
+    rd begin fun () ->
+      let oc = open_out_bin fname in
+      begin match magic with Some m -> output_string oc m | None -> () end ;
+      let res = write oc in
+      flush oc ;
+      close_out oc ;
+      close_in ic ;
+      res
+    end
+  in
+  writelock Unix.F_LOCK ;
+  readlock Unix.F_RLOCK ;
+  writelock Unix.F_ULOCK ;
+  rd wr
