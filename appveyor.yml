@@ -77,4 +77,4 @@
       secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
     artifact: /geneweb-%PKG_OS%-%PKG_VERSION%.zip|geneweb-%PKG_VERSION%-install.exe/
     draft: false
-    prerelease: true
+    prerelease: false
