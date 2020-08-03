@@ -94,27 +94,30 @@ let log =
   end
   ^ " 2>&1"
 
-let delete progress bdir =
+let delete ?(collections = []) progress bdir =
   let bname = Filename.(remove_extension @@ basename bdir) in
-  let aux per collection =
-    let query =
-      {| {"query":"FOR x IN |} ^ collection ^ {| FILTER x.basename == \"|}
-      ^ bname ^ {|\" REMOVE { _key: x._key } IN |} ^ collection ^ {|","ttl":0}|}
-    in
-    Http_curl.send
-      ~tmout:0
-      [ "Content-Type: application/json" ]
-      (`POST query)
-      (Gwdb_driver_env.url ^ "/_api/cursor")
-      (fun s -> String.length s) ;
-    progress `arango_disable 100 per
+  let aux mode mode' collection =
+    if collections = [] || List.mem mode' collections then begin
+      let query =
+        {| {"query":"FOR x IN |} ^ collection ^ {| FILTER x.basename == \"|}
+        ^ bname ^ {|\" REMOVE { _key: x._key } IN |} ^ collection ^ {|","ttl":0}|}
+      in
+      progress mode 100 0 ;
+      Http_curl.send
+        ~tmout:0
+        [ "Content-Type: application/json" ]
+        (`POST query)
+        (Gwdb_driver_env.url ^ "/_api/cursor")
+        (fun s -> String.length s) ;
+      progress mode 100 100
+    end
   in
-  aux 33 "geneweb_persons" ;
-  aux 66 "geneweb_families" ;
-  aux 100 "geneweb_relations" ;
+  aux `geneweb_persons `persons "geneweb_persons" ;
+  aux `geneweb_families `families "geneweb_families" ;
+  aux `geneweb_relations `relations "geneweb_relations" ;
   Mutil.rm @@ Filename.concat bdir "use_arango"
 
-let import ?(mem = false) progress bdir =
+let import ?(mem = false) ?(collections = []) progress bdir =
   let base = open_base bdir in
   let aux collection =
     Unix.open_process_out @@
@@ -132,7 +135,7 @@ let import ?(mem = false) progress bdir =
     load_ascends_array base ;
     load_unions_array base ;
   end ;
-  let () =
+  if collections = [] || List.mem `persons collections then begin
     let oc = aux "geneweb_persons" in
     let len = Dbdisk.(base.data.persons.len) - 1 in
     for i = 0 to len do
@@ -146,13 +149,13 @@ let import ?(mem = false) progress bdir =
       end
     done ;
     close_out oc
-  in
+  end ;
   if not mem then begin
     load_families_array base ;
     load_couples_array base ;
     load_descends_array base
   end ;
-  let () =
+  if collections = [] || List.mem `relations collections then begin
     let oc = aux "geneweb_relations" in
     let len = Dbdisk.(base.data.persons.len) - 1 in
     for i = 0 to len do
@@ -162,13 +165,13 @@ let import ?(mem = false) progress bdir =
       end
     done ;
     close_out oc
-  in
+  end ;
   if not mem then begin
     clear_persons_array base ;
     clear_ascends_array base ;
     clear_unions_array base ;
   end ;
-  let () =
+  if collections = [] || List.mem `families collections then begin
     let oc = aux "geneweb_families" in
     let len = Dbdisk.(base.data.families.len) - 1 in
     for i = 0 to len do
@@ -182,7 +185,7 @@ let import ?(mem = false) progress bdir =
       end
     done ;
     close_out oc
-  in
+  end ;
   if not mem then begin
     clear_strings_array base ;
     clear_families_array base ;
