@@ -96,11 +96,17 @@ let log =
 
 let delete ?(collections = []) progress bdir =
   let bname = Filename.(remove_extension @@ basename bdir) in
+  let bdir =
+    let open Filename in
+    concat
+      (dirname bdir)
+      (remove_extension (basename bdir) ^ ".gwb")
+  in
   let aux mode mode' collection =
     if collections = [] || List.mem mode' collections then begin
       let query =
         {| {"query":"FOR x IN |} ^ collection ^ {| FILTER x.basename == \"|}
-        ^ bname ^ {|\" REMOVE { _key: x._key } IN |} ^ collection ^ {|","ttl":0}|}
+        ^ bname ^ {|\" REMOVE x._key IN |} ^ collection ^ {|","ttl":0}|}
       in
       progress mode 100 0 ;
       Http_curl.send
@@ -115,7 +121,7 @@ let delete ?(collections = []) progress bdir =
   aux `geneweb_persons `persons "geneweb_persons" ;
   aux `geneweb_families `families "geneweb_families" ;
   aux `geneweb_relations `relations "geneweb_relations" ;
-  Mutil.rm @@ Filename.concat bdir "use_arango"
+  if collections = [] then Mutil.rm @@ Filename.concat bdir "use_arango"
 
 let import ?(mem = false) ?(collections = []) progress bdir =
   let base = open_base bdir in
