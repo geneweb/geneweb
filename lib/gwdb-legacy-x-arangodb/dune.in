@@ -10,6 +10,7 @@
     geneweb-lib.def
     geneweb-lib.util
     jsonaf
+    syslog
     yojson
   )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))

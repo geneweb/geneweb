@@ -183,6 +183,7 @@ end
 module HTTP = struct include Http_curl end
 
 let curl =
+  let slog = Syslog.openlog ~flags:[`LOG_PID] "gwdb_driver_arango" in
   let state = ref @@ Angstrom.Buffered.parse Jsonaf.parse in
   let write data =
     begin match !state with
@@ -193,12 +194,25 @@ let curl =
   in
   let cnt = ref 0 in
   fun ?(header = []) m url ->
-    incr cnt ;
-    state := Angstrom.Buffered.parse Jsonaf.parse ;
-    HTTP.send header m url write ;
-    match Angstrom.Buffered.state_to_result !state with
-    | Ok js -> js
-    | Error msg -> failwith msg
+    try
+      incr cnt ;
+      state := Angstrom.Buffered.parse Jsonaf.parse ;
+      HTTP.send header m url write ;
+      match Angstrom.Buffered.state_to_result !state with
+      | Ok js ->
+        if try J.get_bool "error" js with _ -> false
+        then
+          "URL: " ^ url ^ "\n" ^ "ARANGODB ERROR: " ^ J.show js
+          |> Syslog.syslog slog `LOG_ERR ;
+        js
+      | Error msg ->
+        "URL: " ^ url ^ "\n" ^ "JSON PARSING ERROR: " ^ msg
+        |> Syslog.syslog slog `LOG_ERR ;
+        failwith msg
+    with e ->
+      "URL: " ^ url ^ "\n" ^ "FAILURE: " ^ Printexc.to_string e
+      |> Syslog.syslog slog `LOG_ERR ;
+      raise e
 
 type iper = string
 type ifam = string
