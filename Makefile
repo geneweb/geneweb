@@ -65,7 +65,7 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
-CPPO_D=$(API_D) $(GWDB_D)
+CPPO_D=$(API_D) $(GWDB_D) $(OS_D)
 
 %/dune: %/dune.in Makefile.config
 	@echo -n "Generating $@..." \
@@ -101,6 +101,7 @@ GENERATED_FILES_DEP = \
 	benchmark/dune \
 	bin/dune \
 	lib/dune \
+	lib/gwdb-legacy-x-arangodb/dune \
 	test/dune \
 	dune-workspace \
 

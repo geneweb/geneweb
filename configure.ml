@@ -97,17 +97,17 @@ let () =
       , "geneweb-gwdb-legacy-x-arangodb")
   in
   let dune_profile = if !release then "release" else "dev" in
-  let os_type, camlp5f, ext, rm, strip =
+  let os_type, os_d, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
       let line = input_line p in
       close_in p ;
       line
     with
-    | "Linux" | "Darwin" | "FreeBSD" as os_type -> os_type, "", "", "/bin/rm -f", "strip"
+    | "Linux" | "Darwin" | "FreeBSD" as os_type ->
+      os_type, " -D UNIX", "", "/bin/rm -f", "strip"
     | _ -> "Win", " -D WINDOWS", ".exe", "rm -f", "true"
   in
-
   let ch = open_out "Makefile.config" in
   let writeln s = output_string ch @@ s ^ "\n" in
   let var name value = writeln @@ name ^ "=" ^ value in
@@ -118,6 +118,7 @@ let () =
   var "EXT" ext ;
   var "API_D" api_d ;
   var "GWDB_D" gwdb_d ;
+  var "OS_D" os_d ;
   var "API_PKG" api_pkg ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
