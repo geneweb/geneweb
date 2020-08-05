@@ -661,7 +661,7 @@ let list_rev_map_append f l1 l2 =
 *)
 let read_or_create ?magic fname read write =
   assert (Secure.check fname) ;
-  let fd = Unix.openfile fname [ Unix.O_RDWR ; O_CREAT ] 0o666 in
+  let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
   let ic = Unix.in_channel_of_descr fd in
   let writelock lock =
     assert (Unix.lseek fd 1 Unix.SEEK_SET = 1) ;
