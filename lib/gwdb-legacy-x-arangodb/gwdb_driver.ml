@@ -155,6 +155,9 @@ let insert_string = legacy L.insert_string
 
 let commit_patches b =
   opt b begin fun a ->
+#ifndef WINDOWS
+        if Unix.fork () <> 0 then begin
+#endif
     let open Dbdisk in
     let b = b.legacy in
     A.commit_patches
@@ -165,7 +168,11 @@ let commit_patches b =
       b.data.unions.get
       b.data.families.get
       b.data.couples.get
-      b.data.descends.get
+      b.data.descends.get ;
+#ifndef WINDOWS
+        exit 0 ;
+        end;
+#endif
   end ;
   L.commit_patches b.legacy
 
@@ -213,9 +220,16 @@ let make particles bname arrays =
     if use_arango legacy
     then Some begin
         let bdir = legacy.Dbdisk.data.Dbdisk.bdir in
+#ifndef WINDOWS
+        if Unix.fork () <> 0 then begin
+#endif
         (* FIXME: implement Gwdb_driver_arango.make *)
         Gwdb_arango_migrate.delete (fun _ _ _ -> ()) bdir ;
         Gwdb_arango_migrate.import (fun _ _ _ -> ()) bdir ;
+#ifndef WINDOWS
+        exit 0 ;
+        end;
+#endif
         A.open_base bdir
       end
     else None

@@ -12,6 +12,7 @@
     jsonaf
     yojson
   )
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules_without_implementation dbdisk)
   (modules
     btree

@@ -9,6 +9,7 @@ Makefile.local
 benchmark/dune
 bin/dune
 lib/dune
+lib/gwdb-legacy-x-arangodb/dune
 test/dune
 
 dune-workspace
