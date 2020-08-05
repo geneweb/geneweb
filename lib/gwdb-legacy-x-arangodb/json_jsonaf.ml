@@ -39,6 +39,9 @@ let get_list name fn js =
   | `Null -> []
   | _ -> assert false
 
+let get_bool name js =
+  to_bool (member name js)
+
 let show = Jsonaf.to_string
 
 let int i = `Number (string_of_int i)
