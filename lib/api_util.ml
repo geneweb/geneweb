@@ -699,6 +699,7 @@ let date_to_opt_string d =
 
 
 let person_to_warning_person base p =
+  let iper = Gwdb.string_of_iper (get_iper p) in
   let lastname = sou base (get_surname p) in
   let firstname = sou base (get_first_name p) in
   let birth_date = date_to_opt_string @@ get_birth p in
@@ -717,6 +718,7 @@ let person_to_warning_person base p =
   ; lastname
   ; birth_date
   ; death_date
+  ; iper
   }
 
 (**/**) (* Fonctions de transformation person <=> piqi person *)
