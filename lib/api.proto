@@ -329,6 +329,7 @@ message WarningPerson {
   required string firstname = 7;
   optional string birth_date = 8;
   optional string death_date = 9;
+  required string iper = 10;
 }
 
 message WarningAlreadyDefined {
