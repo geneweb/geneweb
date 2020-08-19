@@ -674,7 +674,7 @@ let print_foreach print_ast _eval_expr =
 let print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
     Some
-      ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
+      ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let env = ["digest", Vstring digest] in
       Hutil.interp conf "updfam"

@@ -10,7 +10,7 @@
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
-    %elseif;(evar_m = "ADD_PAR")[*add::parents]0%nn;
+    %elseif;(evar_m = "ADD_PAR" or evar_m = "ADD_PAR_OK")[*add::parents]0%nn;
     %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
       [*modify::family/families]0 # %evar_i;
     %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
@@ -501,7 +501,7 @@ $(document).ready(function(){
 <h1 %if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="")class="mt-5"%end;>%nn;
   %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
     [*add::family/families]0
-  %elseif;(evar_m = "ADD_PAR")
+  %elseif;(evar_m = "ADD_PAR" or evar_m="ADD_PAR_OK")
     [*add::parents] %foreach;child;%child.first_name;%if;(child.occ!="").%child.occ;%end; %child.surname;%end;
   %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
     [*modify::family/families]0 # %evar_i;
@@ -522,7 +522,7 @@ $(document).ready(function(){
     %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;"%/>%nl;%end;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
-    %elseif;(evar_m = "ADD_PAR")
+    %elseif;(evar_m = "ADD_PAR" or evar_m="ADD_PAR_OK")
       <input type="hidden" name="m" value="ADD_PAR_OK"%/>%nl;
     %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
       <input type="hidden" name="m" value="MOD_FAM_OK"%/>%nl;
