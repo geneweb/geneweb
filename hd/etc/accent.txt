@@ -40,7 +40,7 @@ function write_ch(v) {
 <a onclick="return write_ch('„')" href="#">„</a>
 <a onclick="return write_ch('“')" href="#">“</a>
 <a onclick="return write_ch('”')" href="#">”</a>
-<a onclick="return write_ch(' ')" href="#">&amp;nnbsp;</a>
+<a onclick="return write_ch(' ')" href="#">&amp;nbsp;</a>
 <br>
 <a onclick="return write_ch('Á')" href="#">Á</a>
 <a onclick="return write_ch('á')" href="#">á</a>
