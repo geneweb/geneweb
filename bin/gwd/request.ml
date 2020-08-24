@@ -373,15 +373,15 @@ let print_moved conf s =
       Wserver.printf "\n</dd></dt></dl>\n";
       Hutil.trailer conf
 
-let print_no_index conf base =
+let print_no_index ?(pwd=true) conf base =
   let title _ =
     Wserver.printf "%s" (Utf8.capitalize (transl conf "link to use"))
   in
-  let link = url_no_index conf base in
+  let link = url_no_index ~pwd:pwd conf base in
   Hutil.header conf title;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>" ;
-  Wserver.printf "<a href=\"http://%s\">\n" link;
+  Wserver.printf "<a href=\"%s\">\n" link;
   Wserver.printf "%s" link;
   Wserver.printf "</a>\n";
   Wserver.printf "</ul>\n";
@@ -394,7 +394,8 @@ let treat_request conf base =
     p_getenv conf.env "m"
   with
     Some s, _, _ -> print_moved conf s
-  | _, Some "no_index", _ -> print_no_index conf base
+  | _, Some "no_index", _ -> print_no_index ~pwd:true conf base
+  | _, Some "no_index_no_pwd", _ -> print_no_index ~pwd:false conf base
   | _, _, Some "IM" -> ImageDisplay.print conf base
   | _, _, Some "DOC" ->
       begin match p_getenv conf.env "s" with

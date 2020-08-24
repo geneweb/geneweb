@@ -266,48 +266,40 @@ let unauthorized conf auth_type =
   Wserver.printf "<ul><li>%s</ul>\n" auth_type;
   Wserver.printf "</body>\n"
 
-let commd conf =
+let commd ?(amp="&") conf =
   let c = conf.command ^ "?" in
+  let amp1 = if amp = "" then "&" else "" in
   List.fold_left (fun c (k, v) ->
     if ( (k = "oc" || k = "ocz") && v = "0" ) || v = "" then c
-    else c ^ k ^ "=" ^ v ^ "&") c (conf.henv @ conf.senv)
+    else c ^ amp1 ^ k ^ "=" ^ v ^ amp) c (conf.henv @ conf.senv)
 
 let commd_2 conf =
-  let c = conf.command ^ "?" in
-  List.fold_left (fun c (k, v) ->
-    if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
-      c else c ^ "&" ^ k ^ "=" ^ v ) c (conf.henv @ conf.senv)
+  commd ~amp:"" conf
 
-
-let prefix_base conf =
-  if conf.b_arg_for_basename then conf.command ^ "?b=" ^ conf.bname ^ "&"
-  else conf.command ^ "?"
+let prefix_base ?(pwd=true) ?(amp="&") conf =
+  let command =
+    if pwd then conf.command
+    else
+      match String.index_opt conf.command '_' with
+      | Some i -> String.sub conf.command 0 i
+      | None -> conf.command
+  in
+  if conf.b_arg_for_basename then
+    if pwd && not (conf.cgi_passwd = "") then
+      command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ amp
+    else
+      command ^ "?b=" ^ conf.bname ^ amp
+  else
+    command ^ "?"
 
 let prefix_base_2 conf =
-  if conf.b_arg_for_basename then
-    conf.command ^ "?b=" ^ conf.bname
-  else
-    conf.command ^ "?"
+  prefix_base ~amp:"" conf
 
 let prefix_base_password conf =
-  if conf.b_arg_for_basename then
-    if conf.cgi_passwd = "" then
-      conf.command ^ "?b=" ^ conf.bname ^ "&"
-    else
-      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ "&"
-  else
-    conf.command ^ "?"
-
+  prefix_base ~pwd:true conf
 
 let prefix_base_password_2 conf =
-  if conf.b_arg_for_basename then
-    if conf.cgi_passwd = "" then
-      conf.command ^ "?b=" ^ conf.bname
-    else
-      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd
-  else
-    conf.command ^ "?"
-
+  prefix_base ~pwd:true ~amp:"" conf
 
 let code_varenv = Wserver.encode
 let decode_varenv = Wserver.decode
@@ -1299,7 +1291,7 @@ let get_request_string request =
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
     script_name ^ "?" ^ query_string
 
-let url_no_index conf base =
+let url_no_index ?(pwd=true) conf base =
   let scratch s = code_varenv (Name.lower (sou base s)) in
   let get_a_person v =
     try
@@ -1343,7 +1335,9 @@ let url_no_index conf base =
     let rec loop =
       function
         [] -> []
+        (* "w", v is not part of conf.env *)
       | ("opt", "no_index") :: l -> loop l
+      | ("opt", "no_index_no_pwd") :: l -> loop l
       | (("dsrc" | "escache" | "templ"), _) :: l -> loop l
       | ("i", v) :: l -> new_env "i" v (fun x -> x) l
       | ("ei", v) :: l -> new_env "ei" v (fun x -> "e" ^ x) l
@@ -1369,15 +1363,6 @@ let url_no_index conf base =
     in
     loop conf.env
   in
-  let addr =
-    let pref =
-      let s = get_request_string conf.request in
-      match String.rindex_opt s '?' with
-        Some i -> String.sub s 0 i
-      | None -> s
-    in
-    get_server_string conf.request ^ pref
-  in
   let suff =
     List.fold_right
       (fun (x, v) s ->
@@ -1386,8 +1371,7 @@ let url_no_index conf base =
         else s )
       (("lang", conf.lang) :: env) ""
   in
-  if conf.b_arg_for_basename then addr ^ "?b=" ^ conf.bname ^ "&" ^ suff
-  else addr ^ "?" ^ suff
+  (prefix_base ~pwd:pwd conf) ^ suff
 
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then

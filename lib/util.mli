@@ -30,9 +30,9 @@ val html : ?content_type:string -> config -> unit
 val unauthorized : config -> string -> unit
 val string_of_ctime : config -> string
 
-val commd : config -> string
+val commd : ?amp:string -> config -> string
 val commd_2 : config -> string
-val prefix_base : config -> string
+val prefix_base : ?pwd:bool -> ?amp:string -> config -> string
 val prefix_base_password : config -> string
 val prefix_base_2 : config -> string
 val prefix_base_password_2 : config -> string
@@ -119,7 +119,7 @@ val place_of_string : config -> string -> place option
 val filter_html_tags : string -> string
 val allowed_tags_file : string ref
 val body_prop : config -> string
-val url_no_index : config -> base -> string
+val url_no_index : ?pwd:bool -> config -> base -> string
 val message_to_wizard : config -> unit
 val check_xhtml : string -> string
 
