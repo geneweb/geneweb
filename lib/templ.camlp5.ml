@@ -1315,7 +1315,12 @@ let print_copyright conf =
       Wserver.printf "<br%s>\n" conf.xhs
 
 let print_copyright_with_logo conf =
-  let conf = {conf with env = ("with_logo", "yes") :: conf.env} in
+  let conf =
+    match List.assoc_opt "with_logo" conf.env with
+    | Some "yes" -> conf
+    | Some v -> { conf with env = Mutil.list_replace ("with_logo", v) ("with_logo", "yes") conf.env }
+    | None -> { conf with env = ("with_logo", "yes") :: conf.env }
+  in
   print_copyright conf
 
 let include_hed_trl conf name =
