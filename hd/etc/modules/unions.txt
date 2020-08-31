@@ -63,14 +63,14 @@
     %elseif;are_not_married;[relationship%t to:::date]0%nn;
     %elseif;are_engaged;[engaged%t to:::date]0%nn;
     %elseif;is_no_sexes_check;[relationship%t to:::date]0%nn;
-    %elseif;is_no_mention;date [with]%nn;
+    %elseif;is_no_mention;date [%twith:::date]%nn;
     %end;
   %else;
     %if;are_married;[married%t to:::date]1%nn;
     %elseif;are_not_married;[relationship%t to:::date]1%nn;
     %elseif;are_engaged;[engaged%t to:::date]1%nn;
     %elseif;is_no_sexes_check;[relationship%t to:::date]1%nn;
-    %elseif;is_no_mention;date [with]%nn;
+    %elseif;is_no_mention;date [%twith:::date]%nn;
     %end;
   %end;
 %end;

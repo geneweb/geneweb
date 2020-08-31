@@ -15,6 +15,9 @@ val lock_file : string -> string
 
 val name_key : string -> string
 val initial : string -> int
+val trim_leading : string -> string
+val trim_trailing : string -> string
+val trim_leading_and_trailing : string -> string
 val input_particles : string -> string list
 val surnames_pieces : string -> string list
 

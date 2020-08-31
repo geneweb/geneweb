@@ -933,7 +933,7 @@ and eval_transl_lexicon conf upp s c =
           in
           Util.transl_decline conf s1 s3
   in
-  let r = Util.translate_eval r in if upp then Utf8.capitalize r else r
+  let r = Util.translate_eval r in if upp then Utf8.capitalize (Mutil.trim_leading r) else r
 
 let nb_errors = ref 0
 
@@ -1325,20 +1325,6 @@ let print_copyright_with_logo conf =
 let include_hed_trl conf name =
   Util.include_template conf [] name  (fun () -> ())
 
-let strip_leading_sp str =
-  let start =
-    let rec loop i =
-      if i = String.length str then i
-      else if str.[i] = ' ' then loop (i + 1)
-      else i
-    in
-    loop 0
-  in
-  let stop = String.length str in
-  if start = 0 then str
-  else if start >= stop then ""
-  else String.sub str start (stop - start)
-
 let rec interp_ast conf ifun env =
   let m_env = ref env in
   let rec eval_ast env ep a = string_of_expr_val (eval_ast_expr env ep a)
@@ -1391,7 +1377,7 @@ let rec interp_ast conf ifun env =
         let sl = List.map (eval_ast env ep) al in String.concat "" sl
     | None ->
         match f, vl with
-        | "capitalize", [VVstring s] -> Utf8.capitalize (strip_leading_sp s)
+        | "capitalize", [VVstring s] -> Utf8.capitalize (Mutil.trim_leading s)
         | "interp", [VVstring s] ->
             let astl = parse_templ conf (Stream.of_string s) in
             String.concat "" (eval_ast_list env ep astl)
