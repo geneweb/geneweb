@@ -522,7 +522,7 @@ $(document).ready(function(){
     %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;"%/>%nl;%end;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
-    %elseif;(evar_m = "ADD_PAR")
+    %elseif;(evar_m = "ADD_PAR" or evar_m = "ADD_PAR_OK")
       <input type="hidden" name="m" value="ADD_PAR_OK"%/>%nl;
     %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
       <input type="hidden" name="m" value="MOD_FAM_OK"%/>%nl;
