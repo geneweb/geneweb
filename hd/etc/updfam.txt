@@ -424,17 +424,17 @@ $(document).ready(function(){
     <div class="col-sm-auto mt-2">
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex="male")checked%end;%/> [M/F]0
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(fwitness.create.sex="male")checked%end;%/> [M/F]0
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex="neuter")checked%end;%/> ?
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(fwitness.create.sex="neuter")checked%end;%/> ?
         </label>
       </div>
       <div class="form-check form-check-inline">
         <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex="female")checked%end;%/> [M/F]1
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(fwitness.create.sex="female")checked%end;%/> [M/F]1
         </label>
       </div>
     </div>
