@@ -157,7 +157,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
             name="p" placeholder="[*first name/first names]2"
             title="[*search/case sensitive]0 [first name/first names]2" tabindex=2>
         </div>
-        <button type="submit" class="d-none btn btn-lg btn-outline-primary" title="[*search/case sensitive]0 [person/persons]0"><i class="fa fa-search fa-fw"></i></button>
+        <button type="submit"
+          style="position:absolute;margin-left:-1000px" %(hack for Safari: make button visible, but off screen %)
+          title="[*search/case sensitive]0 [person/persons]0"><i class="fa fa-search fa-fw"></i></button>
       </form>
       %if;(bvar.propose_titles != "no")
         <form class="col-12 mt-2 mt-md-3 mt-lg-4" method="get" action="%action;">
@@ -181,7 +183,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
               name="p" id="estates" placeholder="[*estate]0" maxlength="200" tabindex=4>
           </div>
           <button type="submit"
-            class="d-none btn btn-lg btn-outline-primary"
+            style="position:absolute;margin-left:-1000px" %(hack for Safari: make button visible, but off screen %)
             title="[*search/case sensitive]0 [person/persons]0"><i class="fa fa-search fa-fw"></i></button>
         </form>
       %end;

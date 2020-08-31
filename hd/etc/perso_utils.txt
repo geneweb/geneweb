@@ -491,7 +491,7 @@
     %elseif;are_not_married;[*relationship%t to:::date_place]0%nn;
     %elseif;are_engaged;[*engaged%t to:::date_place]0%nn;
     %elseif;is_no_sexes_check;[*relationship%t to:::date_place]0%nn;
-    %elseif;is_no_mention;[*with]%nn;
+    %elseif;is_no_mention;[with]%nn;
     %elseif;are_marriage_banns;[*marriage banns%t to:::date_place]0%nn;
     %elseif;are_marriage_contract;[*marriage contract%t with:::date_place]0%nn;
     %elseif;are_marriage_license;[*married%t to:::date_place]0%nn;
@@ -503,7 +503,7 @@
     %elseif;are_not_married;[*relationship%t to:::date_place]1%nn;
     %elseif;are_engaged;[*engaged%t to:::date_place]1%nn;
     %elseif;is_no_sexes_check;[*relationship%t to:::date_place]1%nn;
-    %elseif;is_no_mention;[*with]%nn;
+    %elseif;is_no_mention;[with]%nn;
     %elseif;are_marriage_banns;[*marriage banns%t to:::date_place]1%nn;
     %elseif;are_marriage_contract;[*marriage contract%t with:::date_place]1%nn;
     %elseif;are_marriage_license;[*married%t to:::date_place]1%nn;

@@ -8804,7 +8804,7 @@ it: sposato%t con/sposata%t con
 lv: precību %t precējies ar /precību %t precējusies ar
 nl: gehuwd%t met
 no: gift%t med
-oc: maridat amb/maridada amb
+oc: maridat%t amb/maridada%t amb
 pl: żona (ślub: %t):/mąż (ślub: %t):
 pt: casado%t com/casada%t com
 ro: casatorit%t cu
@@ -10688,6 +10688,7 @@ co: u
 en: on
 et: :i:
 fi: :e:
+fr: le
 oc: lo
 pl: w :a:
 pt: em
@@ -11918,8 +11919,8 @@ eo: rilato%t kun
 es: parentesco%t con
 et: kooselu%t
 fi: suhde%t ja
-fr: %t avec
-he:  קירבה
+fr: relation%t avec
+he:  קירבה %t
 is: sambúð%t með
 it: legame%t con
 lv: %t attiecības ar
