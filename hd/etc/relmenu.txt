@@ -250,6 +250,8 @@
             <label class="form-check-label"><input type="checkbox" class="form-check-input" name="spouse" value="on"%/> [*display spouse]</label>
           </div>
           <div class="form-check">
+            %( default value if "image" is undefined is "on" %)
+            <input type="hidden" name="image" value="off">
             <label class="form-check-label"><input type="checkbox" class="form-check-input" name="image" value="on"%/> [*display picture]1</label>
           </div>
           <div class="form-check">
