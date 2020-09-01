@@ -788,7 +788,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           <tr>
             <th class="text-left" scope="row" colspan="%nb_col;">
               <span class="ml-1">[*generation/generations]0 %expr(lev+1)</span>
-              <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1)">%apply;desc_count_l(lev+1)</span>%nn;            
+              <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1) (old count/new count)">%apply;desc_count_l(lev+1)</span>%nn;            
             </th
           </tr>
         %end;
