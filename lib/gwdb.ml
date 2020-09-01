@@ -42,10 +42,6 @@ let get_gen_descend = getf Gwdb_driver.gen_descend_of_family
 let rec delete_person excl base ip =
   let iexcl, fexcl = excl in
   assert (ip <> dummy_iper && not @@ List.mem ip iexcl) ;
-  let spouse c =
-    let f = Adef.father c in
-    if ip = f then Adef.mother c else f
-  in
   let a = get_gen_ascend base ip in
   let ipers, ifams =
     match a.parents with
@@ -72,16 +68,28 @@ let rec delete_person excl base ip =
     if u.family = [||] then (true, [], [])
     else
       Array.fold_left begin fun (del, ipers, ifams) ifam ->
-        (* let f = get_family base ifam in *)
-        let d = get_gen_descend base ifam in
-        if Array.length d.children > 1 then (false, ipers, ifams)
+        let cpl = get_gen_couple base ifam in
+        (* Test if ip is really in union in order to prevent "false positive" *)
+        let fath = Adef.father cpl in
+        let moth = Adef.mother cpl in
+        if fath = ip || moth = ip
+        then begin
+          let d = get_gen_descend base ifam in
+          if Array.length d.children > 1 then (false, ipers, ifams)
+          else begin
+            let sp = if ip = fath then moth else fath in
+            if List.mem sp iexcl
+            then (del, ipers, ifams)
+            else if is_empty_p base sp ~ifam
+            then (del, sp :: ipers, ifam :: ifams)
+            else (false, ipers, ifams)
+          end
+        end
         else begin
-          let sp = spouse @@ get_gen_couple base ifam in
-          if List.mem sp iexcl
-          then (del, ipers, ifams)
-          else if is_empty_p base sp ~ifam
-          then (del, sp :: ipers, ifam :: ifams)
-          else (false, ipers, ifams)
+          (* Data are probably partially deleted.
+             It is likely to happen when merging persons. *)
+          rm_union base ifam ip ;
+          (del, ipers, ifams)
         end
       end (true, ipers, ifams) u.family
   in
@@ -145,7 +153,15 @@ and rm_union base ifam iper =
   }
   |> patch_union base iper
 
+(** [delete_person base iper] and [delete_family base ifam]
+    recursively delete data trying to do clever things:
+    - if data to be deleted is linked and useful,
+      it is replaced by empty data (and is actually deleted otherwise)
+    - if empty data is linked to deleted data, the former is deleted as well
+ *)
 let delete_person base iper = ignore @@ delete_person ([], []) base iper
+
+(** See {!val:delete_person}  *)
 let delete_family base ifam = ignore @@ delete_family ([], []) base ifam
 
 (**/**)

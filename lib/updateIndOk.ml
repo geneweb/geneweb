@@ -1053,7 +1053,7 @@ let effective_del conf base p =
   let old_pevents = pwitnesses_of (get_pevents p) in
   let old = List.append old_rparents old_pevents in
   Update.update_related_pointers base ip old [];
-  delete_person base ip ;
+  Gwdb.delete_person base ip ;
   Notes.update_notes_links_db base (Def.NLDB.PgInd (get_iper p)) "";
   Util.commit_patches conf base;
   let changed = U_Delete_person op in
