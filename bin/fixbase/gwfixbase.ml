@@ -85,7 +85,7 @@ let check_NBDS =
   aux "Check persons' NBDS" Fixbase.check_NBDS
 
 let check_families_parents =
-  aux "Check persons' parents" Fixbase.check_families_parents
+  aux "Check families' parents" Fixbase.check_families_parents
 
 let check_families_children =
   aux "Check families' children" Fixbase.check_families_children
