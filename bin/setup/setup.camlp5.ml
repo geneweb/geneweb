@@ -954,6 +954,21 @@ let gwdiff ok_file conf =
     in
     print_file conf ok_file
 
+
+let gwfixbase_check conf =
+  print_file conf "bsi_fix.htm"
+
+let gwfixbase ok_file conf =
+  let rc =
+    let comm = stringify (Filename.concat !bin_dir conf.comm) in
+    exec_f (comm ^ parameters conf.env)
+  in
+  Printf.eprintf "\n";
+  flush stderr;
+  if rc > 1 then print_file conf "bsi_err.htm"
+  else
+    print_file conf ok_file
+
 let connex_check conf =
   print_file conf "bsi_connex.htm"
 
@@ -1623,6 +1638,11 @@ let setup_comm_ok conf =
        begin match p_getenv conf.env "opt" with
       | Some "check" -> gwdiff_check conf
       | _ -> gwdiff "gwdiff_ok.htm" conf
+      end
+  | "gwfixbase" ->
+       begin match p_getenv conf.env "opt" with
+      | Some "check" -> gwfixbase_check conf
+      | _ -> gwfixbase "gwfix_ok.htm" conf
       end
 
   | x ->
