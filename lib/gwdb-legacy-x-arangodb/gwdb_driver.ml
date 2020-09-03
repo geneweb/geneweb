@@ -156,7 +156,7 @@ let insert_string = legacy L.insert_string
 let commit_patches b =
   opt b begin fun a ->
 #ifndef WINDOWS
-        if Unix.fork () <> 0 then begin
+    if Unix.fork () = 0 then begin
 #endif
     let open Dbdisk in
     let b = b.legacy in
@@ -221,7 +221,7 @@ let make particles bname arrays =
     then Some begin
         let bdir = legacy.Dbdisk.data.Dbdisk.bdir in
 #ifndef WINDOWS
-        if Unix.fork () <> 0 then begin
+        if Unix.fork () = 0 then begin
 #endif
         (* FIXME: implement Gwdb_driver_arango.make *)
         Gwdb_arango_migrate.delete (fun _ _ _ -> ()) bdir ;
