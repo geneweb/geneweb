@@ -234,3 +234,12 @@ let gen_gen_person_misc_names base p nobtit nobtit_fun =
 
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
+
+let add_in_db db who (nt, ind) =
+  let db = List.remove_assoc who db in
+  if nt = [] && ind = [] then db
+  else (who, (nt, ind)) :: db
+
+let update_db base who list =
+  write_nldb base @@
+  add_in_db (read_nldb base) who list

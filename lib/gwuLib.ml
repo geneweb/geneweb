@@ -1758,7 +1758,7 @@ module Make (Select : Select) =
             [] -> ()
           | (f, _) :: files ->
               let fn =
-                match NotesLinks.check_file_name f with
+                match Wiki.check_file_name f with
                   Some (dl, f) -> List.fold_right Filename.concat dl f
                 | None -> "bad"
               in
@@ -1773,7 +1773,7 @@ module Make (Select : Select) =
         List.iter
           (fun (f, r) ->
              let fn =
-               match NotesLinks.check_file_name f with
+               match Wiki.check_file_name f with
                  Some (dl, f) -> List.fold_right Filename.concat dl f
                | None -> "bad"
              in

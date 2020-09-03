@@ -74,18 +74,9 @@ let print_whole_notes conf base fnotes title s ho =
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
-  let file_path = file_path conf base in
   let s = string_with_macros conf [] s in
-  let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
-  let s =
-    let wi =
-      {Wiki.wi_mode = "NOTES"; Wiki.wi_file_path = file_path;
-       Wiki.wi_cancel_links = conf.cancel_links;
-       Wiki.wi_person_exists = person_exists conf base;
-       Wiki.wi_always_show_link = conf.wizard || conf.friend}
-    in
-    Wiki.html_with_summary_of_tlsw conf wi edit_opt s
-  in
+  let edit = if conf.wizard then Some (conf.wizard, "NOTES", fnotes) else None in
+  let s = Wiki.html_of_wiki ?edit conf base s in
   let s = Util.safe_html s in
   let s =
     match ho with
@@ -115,15 +106,9 @@ let print_notes_part conf base fnotes title s cnt0 =
       Wserver.printf "<h1>%s</h1>\n" title
     end;
   let s = string_with_macros conf [] s in
-  let lines = Wiki.extract_sub_part s cnt0 in
-  let mode = "NOTES" in
-  let wi =
-    {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
-     Wiki.wi_file_path = file_path conf base;
-     Wiki.wi_person_exists = person_exists conf base;
-     Wiki.wi_always_show_link = conf.wizard || conf.friend}
-  in
-  Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines; Hutil.trailer conf
+  let doc = Wiki.doc_of_string s in
+  WikiDisplay.print_sub_part conf base conf.wizard "NOTES" fnotes cnt0 doc ;
+  Hutil.trailer conf
 
 
 let print_linked_list conf base pgl =
@@ -258,7 +243,7 @@ let print_what_links conf base fnotes =
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-      Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      Some f -> if Wiki.check_file_name f <> None then f else ""
     | None -> ""
   in
   match p_getenv conf.env "ref" with
@@ -274,7 +259,7 @@ let print conf base =
 let print_mod conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-      Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      Some f -> if Wiki.check_file_name f <> None then f else ""
     | None -> ""
   in
   let title _ =
@@ -282,28 +267,19 @@ let print_mod conf base =
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let (env, s) = read_notes base fnotes in
-  Wiki.print_mod_view_page conf true "NOTES" fnotes title env s
+  WikiDisplay.print_mod_view_page conf base true "NOTES" fnotes title env s
 
 let print_mod_ok conf base =
   let fname =
     function
-      Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      Some f -> if Wiki.check_file_name f <> None then f else ""
     | None -> ""
   in
   let edit_mode _ = if conf.wizard then Some "NOTES" else None in
-  let mode = "NOTES" in
   let read_string = read_notes base in
   let commit = commit_notes conf base in
   let string_filter = string_with_macros conf [] in
-  let file_path = file_path conf base in
-  let wi =
-    {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
-     Wiki.wi_file_path = file_path;
-     Wiki.wi_person_exists = person_exists conf base;
-     Wiki.wi_always_show_link = conf.wizard || conf.friend}
-  in
-  Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
-    true
+  WikiDisplay.print_mod_ok conf base edit_mode fname read_string commit string_filter true
 
 let begin_text_without_html_tags lim s =
   let rec loop i size len =
@@ -349,12 +325,12 @@ let print_misc_notes conf base =
                String.sub f (String.length d)
                  (String.length f - String.length d)
              in
-             if d = "" || r <> "" && r.[0] = NotesLinks.char_dir_sep then
+             if d = "" || r <> "" && r.[0] = Wiki.char_dir_sep then
                let r =
                  if d = "" then r else String.sub r 1 (String.length r - 1)
                in
                try
-                 let i = String.index r NotesLinks.char_dir_sep in
+                 let i = String.index r Wiki.char_dir_sep in
                  let r = String.sub r 0 i in
                  match list with
                    (r', None) :: _ when r = r' -> list
@@ -375,7 +351,7 @@ let print_misc_notes conf base =
           begin
             Wserver.printf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf)
               (try
-                 let i = String.rindex d NotesLinks.char_dir_sep in
+                 let i = String.rindex d Wiki.char_dir_sep in
                  let d = String.sub d 0 i in "&d=" ^ d
                with Not_found -> "");
             Wserver.printf "<tt>&lt;--</tt>";
@@ -395,7 +371,7 @@ let print_misc_notes conf base =
                  else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
                in
                let c =
-                 let f = file_path conf base (path_of_fnotes f) in
+                 let f = Wiki.file_path conf base (path_of_fnotes f) in
                  if Sys.file_exists f then "" else " style=\"color:red\""
                in
                Wserver.printf "<li class=\"file\">\n";
@@ -412,7 +388,7 @@ let print_misc_notes conf base =
                Wserver.printf "<tt>";
                Wserver.printf "<a href=\"%sm=MISC_NOTES&d=%s\">" (commd conf)
                  (if d = "" then r
-                  else d ^ String.make 1 NotesLinks.char_dir_sep ^ r);
+                  else d ^ String.make 1 Wiki.char_dir_sep ^ r);
                Wserver.printf "%s " r;
                Wserver.printf "--&gt;";
                Wserver.printf "</a>";
