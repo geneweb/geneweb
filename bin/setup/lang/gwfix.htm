@@ -25,9 +25,9 @@ fr: Corrige une base et reclacule l'index
 </h1>
 </div>
 
-<form method=GET action="gwfixbase">
-<input type=hidden name=opt value="check">
-<input type=hidden name=lang value="%l">
+<form method="GET" action="gwfixbase">
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
 
 <table>
 <tr>
@@ -41,7 +41,7 @@ fr: Sélectionnez la base de données :
 <p>
 <table class="setup">
 %b{<tr align=left>
-<td><input type=radio name=anon value="%a">   </td>
+<td><input type="radio" name="anon" value="%a">   </td>
 <td>%a</td></tr>|
 <tr align=left><td>- [
 de: keine Datenbank vorhanden
@@ -74,7 +74,7 @@ fr: (aucune option est équivalent à les sélectionner toutes).
 <p>
 <table class="setup">
 <tr align=left>
-<td><input type=checkbox name=dry-run value="on">   </td>
+<td><input type="checkbox" name="dry-run" value="on">   </td>
 <td>[
 en: do not commit changes (only traces).
 fr: ne pas effectuer les changements (traces seules).
@@ -83,8 +83,8 @@ fr: ne pas effectuer les changements (traces seules).
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=q value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="q" value="on">   </td>
 <td>[
 en: quiet mode.
 fr: peu de traces.
@@ -93,8 +93,8 @@ fr: peu de traces.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=qq value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="qq" value="on">   </td>
 <td>[
 en: very quiet mode.
 fr: pas de traces du tout.
@@ -103,8 +103,8 @@ fr: pas de traces du tout.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=fast value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="fast" value="on">   </td>
 <td>[
 en: fast mode. Needs more memory
 fr: mode rapide. Nécessite plus de mémoire.
@@ -113,8 +113,8 @@ fr: mode rapide. Nécessite plus de mémoire.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=families-parents value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="families-parents" value="on">   </td>
 <td>[
 en: families' parents.
 fr: families' parents.
@@ -123,8 +123,8 @@ fr: families' parents.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=families-children value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="families-children" value="on">   </td>
 <td>[
 en: families' children.
 fr: families' children.
@@ -133,8 +133,8 @@ fr: families' children.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=persons-NBDS value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="persons-NBDS" value="on">   </td>
 <td>[
 en: persons' NBDS.
 fr: persons' NBDS.
@@ -143,8 +143,8 @@ fr: persons' NBDS.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=persons-parents value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="persons-parents" value="on">   </td>
 <td>[
 en: persons' parents.
 fr: persons' parents.
@@ -153,8 +153,8 @@ fr: persons' parents.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=persons-families value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="persons-families" value="on">   </td>
 <td>[
 en: persons' families.
 fr: persons' families.
@@ -163,8 +163,8 @@ fr: persons' families.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=pevents-witnesses value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="pevents-witnesses" value="on">   </td>
 <td>[
 en: pevents' witnesses.
 fr: pevents' witnesses.
@@ -173,8 +173,8 @@ fr: pevents' witnesses.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=fevents-witnesses value=on>   </td>
+<tr align="left">
+<td><input type="checkbox" name="fevents-witnesses" value=on>   </td>
 <td>[
 en: fevents' witnesses.
 fr: fevents' witnesses.
@@ -183,8 +183,8 @@ fr: fevents' witnesses.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=marriage-divorce value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="marriage-divorce" value="on">   </td>
 <td>[
 en: marriage divorce.
 fr: marriage divorce.
@@ -193,8 +193,8 @@ fr: marriage divorce.
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=index value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="index" value="on">   </td>
 <td>[
 en: index. Automatically enabled by any other option
 fr: index. Activé automatiquement par les autres options
@@ -203,8 +203,8 @@ fr: index. Activé automatiquement par les autres options
 </table>
 <p>
 <table class="setup">
-<tr align=left>
-<td><input type=checkbox name=help value="on">   </td>
+<tr align="left">
+<td><input type="checkbox" name="help" value="on">   </td>
 <td>[
 en: help.
 fr: help.
@@ -225,7 +225,7 @@ sv: Tryck sedan på denna knapp:
 ]
 
 <p>
-<input type=submit value="[
+<input type="submit" value="[
 [
 en: Fix base
 fr: Fix base
