@@ -71,3 +71,11 @@ val gen_person_misc_names :
   'a Def.gen_title list ->
   ('a * 'a list) array ->
   'a Def.gen_title list -> string list
+
+(** Get info about (birth, baptism, death, burial) in personal events  *)
+val reconstitute_from_pevents
+  : ('a, 'b) Def.gen_pers_event list
+  -> (Def.cdate * 'b * 'b * 'b) option
+     * (Def.cdate * 'b * 'b * 'b) option
+     * (Def.death * 'b * 'b * 'b) option
+     * (Def.burial * 'b * 'b * 'b) option

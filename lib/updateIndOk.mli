@@ -46,14 +46,13 @@ val update_relations_of_related : base -> iper -> iper list -> unit
 val reconstitute_death :
   config -> Def.date option -> Def.date option -> string -> Def.burial ->
     string -> Def.death
+
 val reconstitute_from_pevents :
-  ('a, string) Def.gen_pers_event list -> bool ->
-    Def.cdate * string * string * string ->
-    Def.cdate * string * string * string ->
-    Def.death * string * string * string ->
-    Def.burial * string * string * string ->
-    (Def.cdate * string * string * string) *
-      (Def.cdate * string * string * string) *
-      (Def.death * string * string * string) *
-      (Def.burial * string * string * string) *
-      ('a, string) Def.gen_pers_event list
+  ('a, string) Def.gen_pers_event list ->
+  bool ->
+  Def.death ->
+  (Def.cdate * string * string * string) *
+  (Def.cdate * string * string * string) *
+  (Def.death * string * string * string) *
+  (Def.burial * string * string * string) *
+  ('a, string) Def.gen_pers_event list

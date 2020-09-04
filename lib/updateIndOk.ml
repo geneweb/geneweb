@@ -438,136 +438,49 @@ let reconstitute_burial conf burial_place =
   | Some "Cremated" -> Cremated (Adef.cdate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x)
 
-let reconstitute_from_pevents pevents ext bi bp de bu =
+let reconstitute_from_pevents pevents ext de =
   (* On tri les évènements pour être sûr. *)
   let pevents =
     CheckItem.sort_events
       (fun evt -> CheckItem.Psort evt.epers_name) (fun evt -> evt.epers_date)
       pevents
   in
-  let found_birth = ref false in
-  let found_baptism = ref false in
-  let found_death = ref false in
-  let found_burial = ref false in
-  let death_reason_std_fields =
-    let (death_std_fields, _, _, _) = de in
-    match death_std_fields with
-      Death (dr, _) -> dr
-    | _ -> Unspecified
-  in
-  let rec loop pevents bi bp de bu =
-    match pevents with
-      [] -> bi, bp, de, bu
-    | evt :: l ->
-        match evt.epers_name with
-          Epers_Birth ->
-            if !found_birth then loop l bi bp de bu
-            else
-              let bi =
-                evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src
-              in
-              let () = found_birth := true in loop l bi bp de bu
-        | Epers_Baptism ->
-            if !found_baptism then loop l bi bp de bu
-            else
-              let bp =
-                evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src
-              in
-              let () = found_baptism := true in loop l bi bp de bu
-        | Epers_Death ->
-            if !found_death then loop l bi bp de bu
-            else
-              let death =
-                match Adef.od_of_cdate evt.epers_date with
-                  Some d ->
-                    Death (death_reason_std_fields, Adef.cdate_of_date d)
-                | None ->
-                    let (death, _, _, _) = de in
-                    (* On ajoute DontKnowIfDead dans le cas où tous les *)
-                    (* champs sont vides.                               *)
-                    match death with
-                      DeadYoung | DeadDontKnowWhen | OfCourseDead |
-                      DontKnowIfDead as death ->
-                        death
-                    | _ -> DeadDontKnowWhen
-              in
-              let de =
-                death, evt.epers_place, evt.epers_note, evt.epers_src
-              in
-              let () = found_death := true in loop l bi bp de bu
-        | Epers_Burial ->
-            if !found_burial then loop l bi bp de bu
-            else
-              let bu =
-                Buried evt.epers_date, evt.epers_place, evt.epers_note,
-                evt.epers_src
-              in
-              let () = found_burial := true in loop l bi bp de bu
-        | Epers_Cremation ->
-            if !found_burial then loop l bi bp de bu
-            else
-              let bu =
-                Cremated evt.epers_date, evt.epers_place, evt.epers_note,
-                evt.epers_src
-              in
-              let () = found_burial := true in loop l bi bp de bu
-        | _ -> loop l bi bp de bu
-  in
-  let (bi, bp, de, bu) = loop pevents bi bp de bu in
-  (* Hack *)
   let pevents =
-    if not !found_death then
-      let remove_evt = ref false in
-      List.fold_left
-        (fun accu evt ->
-           if not !remove_evt then
-             if evt.epers_name = Epers_Name "" then
-               begin remove_evt := true; accu end
-             else evt :: accu
-           else evt :: accu)
-        [] (List.rev pevents)
+    if not ext
+    then List.filter (fun e -> e.epers_name <> Epers_Name "") pevents
     else pevents
   in
+  let (bi', bp', de', bu') = Futil.reconstitute_from_pevents pevents in
+  let bi = Opt.default (Adef.cdate_None, "", "", "") bi' in
+  let bp = Opt.default (Adef.cdate_None, "", "", "") bp' in
+  let del = 0 in
+  let del = if de' = None then succ del else del in
+  let del = if bu' = None then succ del else del in
+  let de, bu =
+    match de' with
+    | Some x -> x, Opt.default (UnknownBurial, "", "", "") bu'
+    | None ->
+      match bu' with
+      | Some y -> (DeadDontKnowWhen, "", "", ""), y
+      | None ->
+        if de = NotDead then (NotDead, "", "", ""), (UnknownBurial, "", "", "")
+        else (DontKnowIfDead, "", "", ""), (UnknownBurial, "", "", "")
+  in
+  (* Hack: remove empty pevents corresponding to empty death/burial *)
+  (* This is a very ugly hack which forces templates to have
+     death and burial events displayed even if empty. *)
+  (* At least, we should have a variable to specify if the form use this hack
+     or not. *)
   let pevents =
-    if not !found_burial then
-      let remove_evt = ref false in
-      List.fold_left
-        (fun accu evt ->
-           if not !remove_evt then
-             if evt.epers_name = Epers_Name "" then
-               begin remove_evt := true; accu end
-             else evt :: accu
-           else evt :: accu)
-        [] (List.rev pevents)
-    else pevents
+    let rec loop n pevents =
+      if n = 0 then pevents
+      else match pevents with
+      | { epers_name = Epers_Name "" ; _ } :: tl ->
+        loop (n - 1) tl
+      | hd :: tl -> hd :: loop n tl
+      | [] -> assert false
+    in loop del pevents
   in
-  let pevents =
-    if not ext then
-      let remove_evt = ref false in
-      List.fold_left
-        (fun accu evt ->
-           if not !remove_evt then
-             if evt.epers_name = Epers_Name "" then
-               begin remove_evt := true; accu end
-             else evt :: accu
-           else evt :: accu)
-        [] (List.rev pevents)
-    else pevents
-  in
-  (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
-  let bi = if not !found_birth then Adef.cdate_None, "", "", "" else bi in
-  let bp = if not !found_baptism then Adef.cdate_None, "", "", "" else bp in
-  let de =
-    if not !found_death then
-      if !found_burial then DeadDontKnowWhen, "", "", ""
-      else
-        let (death, _, _, _) = de in
-        match death with
-          NotDead -> NotDead, "", "", ""
-        | _ -> DontKnowIfDead, "", "", ""
-    else de
-  in
-  let bu = if not !found_burial then UnknownBurial, "", "", "" else bu in
   bi, bp, de, bu, pevents
 
 let reconstitute_person conf =
@@ -625,37 +538,14 @@ let reconstitute_person conf =
     | _ -> Neuter
   in
   let birth = Update.reconstitute_date conf "birth" in
-  let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
-  let birth_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "birth_note"))
-  in
-  let birth_src = only_printable (get conf "birth_src") in
   let bapt = Update.reconstitute_date conf "bapt" in
-  let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
-  let bapt_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "bapt_note"))
-  in
-  let bapt_src = only_printable (get conf "bapt_src") in
   let burial_place =
     no_html_tags (only_printable (get conf "burial_place"))
   in
-  let burial_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "burial_note"))
-  in
-  let burial_src = only_printable (get conf "burial_src") in
   let burial = reconstitute_burial conf burial_place in
   let death_place = no_html_tags (only_printable (get conf "death_place")) in
-  let death_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "death_note"))
-  in
-  let death_src = only_printable (get conf "death_src") in
   let death =
     reconstitute_death conf birth bapt death_place burial burial_place
-  in
-  let death_place =
-    match death with
-      Death (_, _) | DeadYoung | DeadDontKnowWhen -> death_place
-    | _ -> ""
   in
   let death =
     match death, burial with
@@ -672,10 +562,10 @@ let reconstitute_person conf =
   (* Mise à jour des évènements principaux. *)
   let (bi, bp, de, bu, pevents) =
     reconstitute_from_pevents pevents ext
-      (Adef.cdate_of_od birth, birth_place, birth_note, birth_src)
-      (Adef.cdate_of_od bapt, bapt_place, bapt_note, bapt_src)
-      (death, death_place, death_note, death_src)
-      (burial, burial_place, burial_note, burial_src)
+      (* (Adef.cdate_of_od birth, birth_place, birth_note, birth_src)
+       * (Adef.cdate_of_od bapt, bapt_place, bapt_note, bapt_src) *)
+      death(* , death_place, death_note, death_src) *)
+      (* (burial, burial_place, burial_note, burial_src) *)
   in
   let (birth, birth_place, birth_note, birth_src) = bi in
   let (bapt, bapt_place, bapt_note, bapt_src) = bp in

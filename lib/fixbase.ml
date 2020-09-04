@@ -33,7 +33,6 @@ let find_pevent names pevents =
   List.find_opt (fun x -> List.mem x.epers_name names) pevents
 
 let fix_pevents ?report base pp =
-  (* Should it use UpdateIndOk.reconstitute_from_pevents? *)
   let p = gen_person_of_person pp in
   let empty_bi = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
   let empty_bp = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
