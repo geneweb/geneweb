@@ -573,95 +573,76 @@ let check_witness_pevents base warning p =
 
 let check_person_dates_as_witness base warning p =
   let ip = get_iper p in
-  let birth_date = Adef.od_of_cdate (get_birth p) in
-  let death_date = get_death p in
-  let related_p = List.sort_uniq compare (get_related p) in
+  let birth_date =
+    match Adef.od_of_cdate (get_birth p) with
+    | Some (Dgreg (_, _) as d) -> Some d
+    | _ -> None
+  in
+  let death_date =
+    match get_death p with
+    | Death (_, d3) -> Some (Adef.date_of_cdate d3)
+    | _ -> None
+  in
+  let aux date w1 w2 = fun evt ->
+    begin match Adef.od_of_cdate (date evt) with
+      | Some (Dgreg (_, _) as d) ->
+        begin match birth_date with
+          | Some (Dgreg (_, _) as d') -> if strictly_before d d' then w1 evt
+          | _ -> ()
+        end ;
+        begin match death_date with
+          | Some d' -> if strictly_after d d' then w2 evt
+          | _ -> ()
+        end
+      | _ -> ()
+    end
+  in
+  let related_p = get_related p in
   let related_fam =
-    let list_f = ref [] in
-    begin let rec make_list =
-      function
-      | ic :: icl ->
-          let c = poi base ic in
-          if get_sex c = Male then
-            Array.iter
-              (fun ifam ->
-                let fam = foi base ifam in
-                if Array.mem ip (get_witnesses fam) then
-                  list_f := (ifam, fam) :: !list_f;
-                make_list icl)
-              (get_family c)
-          else make_list icl
-      | [] -> ()
-      in
-      make_list related_p
-    end;
-    !list_f
+    List.fold_left begin fun acc ir ->
+      let r = poi base ir in
+      if get_sex r = Male
+      then
+        Array.fold_left
+          begin fun acc ifam ->
+            let fam = foi base ifam in
+            if Array.mem ip (get_witnesses fam)
+            then fam :: acc
+            else acc
+          end acc (get_family r)
+      else acc
+    end [] related_p
   in
-  List.iter
-    (fun (_ifam, fam) ->
-        List.iter 
-          (fun (evt) ->
-           begin match Adef.od_of_cdate evt.efam_date with
-             Some (Dgreg (_, _) as d2) ->
-               Array.iter
-                 (fun (iw, _) ->
-                    if ip = iw then
-                    begin
-                      match birth_date with
-                        Some (Dgreg (_, _) as d1) ->
-                          if strictly_before d2 d1 then
-                            warning (FWitnessEventBeforeBirth (p, evt))
-                      | _ -> ();
-                      match death_date with
-                        Death (_, d3) ->
-                          let d3 = Adef.date_of_cdate d3 in
-                          if strictly_after d2 d3 then
-                            warning (FWitnessEventAfterDeath (p, evt))
-                      | _ -> ()
-                    end;)
-                 evt.efam_witnesses
-            | _ -> ()
-            end;)
-        (get_fevents fam)
-    ) related_fam;
+  List.iter begin fun fam ->
+    List.iter begin fun evt ->
+      if Array.exists (fun (i, _) -> i = ip) evt.efam_witnesses
+      then
+        aux
+          (fun e -> e.efam_date)
+          (fun e -> warning (FWitnessEventBeforeBirth (p, e)))
+          (fun e -> warning (FWitnessEventAfterDeath (p, e)))
+          evt
+    end (get_fevents fam)
+  end related_fam ;
   let related_pers =
-    let list_p = ref [] in
-    begin let rec make_list =
-      function
-      | ic :: icl ->
-          let c = poi base ic in
-          List.iter
-            (fun evt ->
-              if Array.exists (fun (p, _) -> ip = p) evt.epers_witnesses then
-                list_p := evt :: !list_p;
-              make_list icl)
-            (get_pevents c)
-      | [] -> ()
-      in
-      make_list related_p
-    end;
-    !list_p
+    List.fold_left begin fun acc ir ->
+      let r = poi base ir in
+      List.fold_left
+        begin fun acc e ->
+          if Array.exists (fun (p, _) -> ip = p) e.epers_witnesses
+          then e :: acc
+          else acc
+        end
+        acc (get_pevents r)
+    end [] related_p
   in
-  List.iter
-    (fun evt ->
-       begin match Adef.od_of_cdate evt.epers_date with
-         Some (Dgreg (_, _) as d2) ->
-            begin match birth_date with
-              Some (Dgreg (_, _) as d1) ->
-                if strictly_before d2 d1 then
-                  warning (PWitnessEventBeforeBirth (p, evt))
-            | _ -> ()
-            end;
-            begin match death_date with
-              Death (_, d3) ->
-                let d3 = Adef.date_of_cdate d3 in
-                if strictly_after d2 d3 then
-                  warning (PWitnessEventAfterDeath (p, evt))
-            | _ -> ()
-            end;
-        | _ -> ()
-        end;
-    ) related_pers
+  List.iter begin fun evt ->
+    aux
+      (fun e -> e.epers_date)
+      (fun e -> warning (PWitnessEventBeforeBirth (p, e)))
+      (fun e -> warning (PWitnessEventAfterDeath (p, e)))
+      evt
+  end related_pers
 
 let check_pevents base warning p =
   check_order_pevents warning p ;
