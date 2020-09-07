@@ -19,6 +19,9 @@ jobs:
     env: OCAML_VERSION=4.10
   - os: freebsd
     env: OCAML_VERSION=4.09
+  allowed_failures:
+  - os: linux
+    env: OCAML_VERSION=4.10
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then command -v protoc >/dev/null 2>&1 || sudo apt-get install -qq protobuf-compiler ; fi
