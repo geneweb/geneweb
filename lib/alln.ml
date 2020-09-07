@@ -23,21 +23,22 @@ let select_names conf base is_surnames ini _need_whole_list =
           if Mutil.start_with ~wildcard:true ini 0 k then
             let (list, len) =
               if s <> "?" then
-                let my_list = spi_find iii istr in
-                let my_list =
+                let ips = spi_find iii istr in
+                let cnt =
                   if conf.use_restrict then
-                    List.fold_left begin fun l ip ->
-                      if is_restricted conf base ip then l else ip :: l
-                    end [] my_list
+                    List.fold_left begin fun acc i ->
+                      if is_restricted conf base i
+                      then acc
+                      else acc + 1
+                    end 0 ips
                   else if conf.hide_names then
-                    List.fold_left begin fun l ip ->
-                      if get_access (poi base ip) = Def.Private
-                      then l
-                      else ip :: l
-                    end [] my_list
-                  else my_list
+                    List.fold_left begin fun acc i ->
+                      if get_access (poi base i) = Def.Private
+                      then acc
+                      else acc + 1
+                    end 0 ips
+                  else List.length ips
                 in
-                let cnt = List.length my_list in
                 if cnt = 0 then list, len
                 else
                   match list with
