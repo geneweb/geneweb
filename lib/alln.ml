@@ -12,6 +12,27 @@ type t =
   | Result of (string * string * int) list
   | Specify of string list
 
+let first_letters conf base is_surnames =
+  let iii =
+    if is_surnames then persons_of_surname base
+    else persons_of_first_name base
+  in
+  try
+    let rec loop istr list =
+      let s = Translate.eval (Mutil.nominative (sou base istr)) in
+      let k = Util.name_key base s in
+      let c = Utf8.sub k 0 1 in
+      let list =
+        match list with
+        | hd :: tl -> if hd = c then list else c :: list
+        | [] -> [c]
+      in
+      match spi_next iii istr with
+      | istr -> loop istr list
+      | exception Not_found -> list
+    in loop (spi_first iii "") []
+  with Not_found -> []
+
 (** [select_names conf base is_surnames ini limit]
     Select up to [limit] first names/surnames starting with [ini].
     If more values are available, return [Specify] with different
