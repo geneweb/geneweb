@@ -224,17 +224,12 @@ let print_alphabetic conf base is_surnames =
     | _ -> ""
   in
   if p_getenv conf.base_env "fast_alphabetic" = Some "yes" && ini = ""
-  then
-    let list =
-      let rec loop list c =
-        let list = String.make 1 c :: list in
-        if c = 'A' then list
-        else loop list (Char.chr (Char.code c - 1))
-      in
-      loop [] 'Z'
-    in
+  then begin
+    load_strings_array base ;
+    let list = Alln.first_letters conf base is_surnames in
+    let list = List.sort Gutil.alphabetic_order list in
     print_alphabetic_big conf base is_surnames ini list 1 true
-  else begin
+  end else begin
     let all =
       match p_getenv conf.env "o" with
       | Some "A" -> true
