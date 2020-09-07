@@ -530,9 +530,18 @@ let check_order_pfevents get_name get_date warning p events =
   let events = sort_events get_name get_date events in
   let rec loop = function
     | e1 :: e2 :: events ->
-      if compare_event_name (get_name e1) (get_name e2) = 1
-      then warning p e1 e2 ;
-      loop (e2 :: events)
+      begin match get_name e1 with
+        | Psort (Epers_Name _) | Fsort (Efam_Name _) ->
+          loop (e2 :: events)
+        | n1 ->
+          match  get_name e2 with
+          | Psort (Epers_Name _) | Fsort (Efam_Name _) ->
+            loop (e1 :: events)
+          | n2 ->
+            if compare_event_name n1 n2 = 1
+            then warning p e1 e2 ;
+            loop (e2 :: events)
+      end
     | _ -> ()
   in
   loop events
