@@ -26,10 +26,15 @@ let select_names conf base is_surnames ini _need_whole_list =
                 let my_list = spi_find iii istr in
                 let my_list =
                   if conf.use_restrict then
-                    List.fold_left
-                      (fun l ip ->
-                         if is_restricted conf base ip then l else ip :: l)
-                      [] my_list
+                    List.fold_left begin fun l ip ->
+                      if is_restricted conf base ip then l else ip :: l
+                    end [] my_list
+                  else if conf.hide_names then
+                    List.fold_left begin fun l ip ->
+                      if get_access (poi base ip) = Def.Private
+                      then l
+                      else ip :: l
+                    end [] my_list
                   else my_list
                 in
                 let cnt = List.length my_list in
