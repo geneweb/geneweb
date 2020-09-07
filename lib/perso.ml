@@ -740,80 +740,6 @@ let max_ancestor_level conf base ip max_lev =
   in
   loop 0 ip; !x
 
-(* count nbr of cousins. Inspired from displayCousins *)
-(* %cousins.l1.l2; will return the same count as the total computed by m=C;v1=l1;v2=l2 *)
-
-let default_max_cnt = Cousins.default_max_cnt
-
-let cnt = ref 0
-
-let rec count_descend_upto conf base max_cnt ini_p ini_br lev children =
-  if lev > 0 && !cnt < max_cnt then
-    begin
-      List.iter
-        (fun (ip, ia_asex, rev_br) ->
-           let p = pget conf base ip in
-           (* détecter l'époux de p, parent des enfants qui seront listés *)
-           (* if more than one spouse, this will be split on multiple lines *)
-           (* we ignore the case where two spouses, but only one with descendants! *)
-           let br = List.rev ((ip, get_sex p) :: rev_br) in
-           let is_valid_rel = Cousins.br_inter_is_empty ini_br br in
-           if is_valid_rel && !cnt < max_cnt && Cousins.has_desc_lev conf base lev p
-           then
-             begin
-               if lev = 1 then incr cnt;
-               (* the function children_of returns *all* the children of ip *)
-               Array.iter
-                 (fun ifam ->
-                    let children =
-                      List.map
-                        (fun ip ->
-                           (ip, ia_asex, (get_iper p, get_sex p) :: rev_br))
-                        (Cousins.children_of_fam base ifam)
-                    in
-                    count_descend_upto conf base max_cnt ini_p ini_br (lev - 1) children
-                 )
-                 (get_family p) ;
-             end)
-        children;
-    end
-
-let count_cousins_side_of conf base max_cnt a ini_p ini_br _lev1 lev2 =
-  let sib = Cousins.siblings conf base (get_iper a) in
-  if List.exists (Cousins.sibling_has_desc_lev conf base lev2) sib then
-    begin
-      let sib = List.map (fun (ip, ia_asex) -> ip, ia_asex, []) sib in
-      count_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
-      true
-    end
-  else false
-
-let count_cousins_lev conf base max_cnt p lev1 lev2 =
-  let first_sosa =
-    let rec loop sosa lev =
-      if lev <= 1 then sosa else loop (Sosa.twice sosa) (lev - 1)
-    in
-    loop Sosa.one lev1
-  in
-  let last_sosa = Sosa.twice first_sosa in
-  let some =
-    let rec loop sosa some =
-      if !cnt < max_cnt && Sosa.gt last_sosa sosa then
-        let some =
-          match Util.old_branch_of_sosa conf base (get_iper p) sosa with
-            Some ((ia, _) :: _ as br) ->
-            count_cousins_side_of conf base max_cnt (pget conf base ia) p br
-              lev1 lev2 ||
-            some
-          | _ -> some
-        in
-        loop (Sosa.inc sosa 1) some
-      else some
-    in
-    loop first_sosa false
-  in
-  if some then ()
-
 let get_descendants_at_level base p lev2 =
   match lev2 with
   | 0 -> []
@@ -835,6 +761,8 @@ let get_descendants_at_level base p lev2 =
     in
     loop [] 1 (get_family p)
 
+let cnt = CousinsCount.cnt
+
 let count_cousins conf base p lev1 lev2 =
   match (lev1, lev2) with
   | (0, 0) -> 1 (* self *)
@@ -845,12 +773,12 @@ let count_cousins conf base p lev1 lev2 =
   | (_, _) ->
         let max_cnt =
           try int_of_string (List.assoc "max_cousins" conf.base_env) with
-            Not_found | Failure _ -> default_max_cnt
+            Not_found | Failure _ -> Cousins.default_max_cnt
         in
         cnt := 0;
         (* Construction de la table des sosa de la base *)
         let () = build_sosa_ht conf base in
-        count_cousins_lev conf base max_cnt p lev1 lev2;
+        CousinsCount.print_cousins_lev conf base max_cnt p lev1 lev2 false print_sosa;
         !cnt
 
 (* end of cousins count *)
