@@ -27,12 +27,14 @@ let groupby_ini len list =
     ~value:(fun (_, s, c) -> (s, c))
   |> List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b)
 
-let groupby_count list =
-  list
-  |> Util.groupby
-    ~key:(fun (_, _, c) -> c)
-    ~value:(fun (_, s, _) -> s)
-  |> List.sort (fun (a, _) (b, _) -> compare b a)
+let groupby_count = function
+  | Alln.Specify _ -> assert false
+  | Alln.Result list ->
+    list
+    |> Util.groupby
+      ~key:(fun (_, _, c) -> c)
+      ~value:(fun (_, s, _) -> s)
+    |> List.sort (fun (a, _) (b, _) -> compare b a)
 
 (* print *)
 
@@ -76,57 +78,40 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
   let mode = if is_surnames then "N" else "P" in
   Hutil.header conf title;
   Wserver.printf "<p class=\"search_name\">\n";
-  List.iter
-    (fun (ini_k, _) ->
-       Wserver.printf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
-         (Util.code_varenv ini_k);
-       Wserver.print_string (tr '_' "&nbsp;" (displayify ini_k));
-       Wserver.printf "</a>\n")
-    list;
-  Wserver.printf "</p>\n";
-  if len <= default_max_cnt && not too_big then
-    begin
-      begin
-        Wserver.printf "<p>";
-        Wserver.printf "%s:" (Utf8.capitalize (transl conf "the whole list"));
-        Wserver.printf "</p>\n"
-      end;
-      begin
-        Wserver.printf "<ul>\n";
-        begin
-          Wserver.printf "<li>";
-          begin
-            Wserver.printf "<a href=\"%sm=%s&tri=A&o=A&k=%s\">" (commd conf)
-              mode ini;
-            Wserver.print_string (transl conf "long display");
-            Wserver.printf "</a>"
-          end;
-          Wserver.printf "</li>\n"
-        end;
-        begin
-          Wserver.printf "<li>";
-          begin
-            Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s\">" (commd conf)
-              mode ini;
-            Wserver.print_string (transl conf "short display");
-            Wserver.printf "</a>"
-          end;
-          Wserver.printf "</li>\n"
-        end;
-        begin
-          Wserver.printf "<li>";
-          begin
-            Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s&cgl=on\">"
-              (commd conf) mode ini;
-            Wserver.printf "%s + %s" (transl conf "short display")
-              (transl conf "cancel GeneWeb links");
-            Wserver.printf "</a>"
-          end;
-          Wserver.printf "</li>\n"
-        end;
-        Wserver.printf "</ul>\n"
-      end
-    end;
+  List.iter begin fun ini_k ->
+    if ini_k = ini
+    then
+      Wserver.printf "<a href=\"%sm=%s&tri=A&v=%s\">" (commd conf) mode
+        (Util.code_varenv ini_k)
+    else
+      Wserver.printf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
+        (Util.code_varenv ini_k);
+    Wserver.print_string (tr '_' "&nbsp;" (displayify ini_k));
+    Wserver.printf "</a>\n"
+  end list ;
+  if not too_big then begin
+    Wserver.printf "</p>\n";
+    Wserver.printf "<p>";
+    Wserver.printf "%s:" (Utf8.capitalize (transl conf "the whole list"));
+    Wserver.printf "</p>\n" ;
+    Wserver.printf "<ul>\n";
+    Wserver.printf "<li>";
+    Wserver.printf "<a href=\"%sm=%s&tri=A&o=A&k=%s\">" (commd conf) mode ini;
+    Wserver.print_string (transl conf "long display");
+    Wserver.printf "</a>";
+    Wserver.printf "</li>\n";
+    Wserver.printf "<li>";
+    Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s\">" (commd conf) mode ini;
+    Wserver.print_string (transl conf "short display");
+    Wserver.printf "</a>";
+    Wserver.printf "</li>\n";
+    Wserver.printf "<li>";
+    Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s&cgl=on\">" (commd conf) mode ini;
+    Wserver.printf "%s + %s" (transl conf "short display") (transl conf "cancel GeneWeb links");
+    Wserver.printf "</a>";
+    Wserver.printf "</li>\n";
+    Wserver.printf "</ul>\n" ;
+  end ;
   Hutil.trailer conf
 
 let print_alphabetic_all conf base is_surnames ini list len =
@@ -228,46 +213,47 @@ let print_frequency_any conf base is_surnames list len =
 
 let print_frequency conf base is_surnames =
   let () = load_strings_array base in
-  let (list, len) = Alln.select_names conf base is_surnames "" true in
+  let (list, len) = Alln.select_names conf base is_surnames "" max_int in
   let list = groupby_count list in
   print_frequency_any conf base is_surnames list len
 
 let print_alphabetic conf base is_surnames =
   let ini =
     match p_getenv conf.env "k" with
-      Some k -> k
+    | Some k -> k
     | _ -> ""
   in
-  let fast =
-    p_getenv conf.base_env "fast_alphabetic" = Some "yes" && ini = ""
-  in
-  let _ = if fast || String.length ini < 2 then load_strings_array base in
-  let all =
-    match p_getenv conf.env "o" with
-      Some "A" -> true
-    | _ -> false
-  in
-  let (list, len) =
-    if fast then
-      let rec loop list len c =
-        let list = (String.make 1 c, "", 1) :: list in
-        if c = 'A' then list, len
-        else loop list (len + 1) (Char.chr (Char.code c - 1))
+  if p_getenv conf.base_env "fast_alphabetic" = Some "yes" && ini = ""
+  then
+    let list =
+      let rec loop list c =
+        let list = String.make 1 c :: list in
+        if c = 'A' then list
+        else loop list (Char.chr (Char.code c - 1))
       in
-      loop [] 0 'Z'
-    else
-      Alln.select_names conf base is_surnames ini all
-  in
-  if fast then
-    let list = List.map (fun (s, _, _) -> s, 1) list in
+      loop [] 'Z'
+    in
     print_alphabetic_big conf base is_surnames ini list 1 true
-  else if len >= 50 || ini = "" then
-    let list = groupby_ini (Utf8.length ini + 1) list in
-    if all then
-      if len > default_max_cnt then Hutil.incorrect_request conf
-      else print_alphabetic_all conf base is_surnames ini list len
-    else print_alphabetic_big conf base is_surnames ini list len false
-  else print_alphabetic_small conf base is_surnames ini list len
+  else begin
+    let all =
+      match p_getenv conf.env "o" with
+      | Some "A" -> true
+      | _ -> false
+    in
+    if String.length ini < 2 then load_strings_array base ;
+    let (list, len) =
+      Alln.select_names conf base is_surnames ini (if all then max_int else 50)
+    in
+    match list with
+    | Alln.Specify keys ->
+      let keys = List.sort Gutil.alphabetic_order keys in
+      print_alphabetic_big conf base is_surnames ini keys len (not all)
+    | Alln.Result list ->
+      if len >= 50 || ini = "" then
+        let list = groupby_ini (Utf8.length ini + 1) list in
+        print_alphabetic_all conf base is_surnames ini list len
+      else print_alphabetic_small conf base is_surnames ini list len
+  end
 
 (* short print *)
 
@@ -318,13 +304,13 @@ let print_alphabetic_short conf base is_surnames ini list len =
 let print_short conf base is_surnames =
   let ini =
     match p_getenv conf.env "k" with
-      Some k -> k
+    | Some k -> k
     | _ -> ""
   in
   let _ = if String.length ini < 2 then load_strings_array base in
-  let (list, len) = Alln.select_names conf base is_surnames ini true in
-  if len > default_max_cnt then Hutil.incorrect_request conf
-  else
+  match Alln.select_names conf base is_surnames ini max_int with
+  | Specify _, _ -> Hutil.incorrect_request conf
+  | Result list, len ->
     let list = groupby_ini (Utf8.length ini + 1) list in
     print_alphabetic_short conf base is_surnames ini list len
 
