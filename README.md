@@ -19,9 +19,9 @@ with a Web interface and can be used off-line or as a Web service.
 [l407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/3
 [l408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/4
 [l409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/5
-[l410]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/6
+[l410]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/7
 [m409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
-[f409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/7
+[f409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/6
 [win-409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
 [travis]:https://travis-ci.org/geneweb/geneweb
 [appveyor]:https://ci.appveyor.com/project/geneweb/geneweb
