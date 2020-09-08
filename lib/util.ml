@@ -456,7 +456,7 @@ let escape_attribute str =
 
    Markup.ml automatically return tags names in lowercase.
  *)
-let safe_html s =
+let safe_html_aux escape_text s =
   let open Markup in
   let stack = ref [] in
   let make_safe = function
@@ -487,8 +487,10 @@ let safe_html s =
   |> parse_html ~context:(`Fragment "body")
   |> signals
   |> map make_safe
-  |> write_html ~escape_text:escape_html ~escape_attribute
+  |> write_html ~escape_text ~escape_attribute
   |> to_string
+
+let safe_html = safe_html_aux escape_html
 
 let no_html_tags s =
   let rec need_code i =
@@ -1666,7 +1668,7 @@ let string_with_macros conf env s =
                       Buffer.add_string buff "&amp;"
                     else Buffer.add_char buff s.[i];
                     loop tt (i + 1)
-    else safe_html (Buffer.contents buff)
+    else safe_html_aux (fun s -> s) (Buffer.contents buff)
   in
   loop Out 0
 

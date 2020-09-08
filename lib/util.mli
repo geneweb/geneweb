@@ -112,8 +112,6 @@ val open_etc_file : string -> in_channel option
 val open_hed_trl : config -> string -> in_channel option
 val open_templ : config -> string -> in_channel option
 val open_templ_fname : config -> string -> (in_channel * string) option
-val string_with_macros :
-  config -> (char * (unit -> string)) list -> string -> string
 val string_of_place : config -> string -> string
 val place_of_string : config -> string -> place option
 val allowed_tags_file : string ref
@@ -370,6 +368,14 @@ val escape_html : string -> string
    Text is escaped using [escape_html].
  *)
 val safe_html : string -> string
+
+(** [string_with_macros conf env s]
+    Return a string with "%xxx" macro replaced by their value.
+    Also filter unsafe html tags.
+*)
+val string_with_macros
+  : config -> (char * (unit -> string)) list -> string -> string
+
 
 (** [is_empty_name p]
     [false] if we knwon the first name or the last name of [p].
