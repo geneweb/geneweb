@@ -663,6 +663,7 @@ let read_or_create ?magic fname read write =
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
   let ic = Unix.in_channel_of_descr fd in
+#ifndef WINDOWS
   let writelock lock =
     assert (Unix.lseek fd 1 Unix.SEEK_SET = 1) ;
     Unix.lockf fd lock 1 ;
@@ -673,6 +674,7 @@ let read_or_create ?magic fname read write =
     Unix.lockf fd lock 1 ;
     assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
   in
+#endif
   let rec rd k =
     seek_in ic 0 ;
     if match magic with None -> true | Some m -> check_magic m ic
@@ -684,6 +686,7 @@ let read_or_create ?magic fname read write =
       with _ -> k ()
     else k ()
   and wr () =
+#ifndef WINDOWS
     (* remove all present locks *)
     Unix.lockf fd Unix.F_ULOCK 0 ;
     (* prevent readers from acquiring cache file *)
@@ -691,6 +694,7 @@ let read_or_create ?magic fname read write =
     (* wait for current readers to finish reading
        and prevent other writer from acquiring cache file.*)
     readlock Unix.F_LOCK ;
+#endif
     (* check if another writer has already updated the cache file
        and update it if not *)
     rd begin fun () ->
@@ -703,7 +707,9 @@ let read_or_create ?magic fname read write =
       res
     end
   in
+#ifndef WINDOWS
   writelock Unix.F_LOCK ;
   readlock Unix.F_RLOCK ;
   writelock Unix.F_ULOCK ;
+#endif
   rd wr

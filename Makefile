@@ -102,6 +102,7 @@ GENERATED_FILES_DEP = \
 	bin/dune \
 	lib/dune \
 	lib/gwdb-legacy-x-arangodb/dune \
+	lib/util/dune \
 	test/dune \
 	dune-workspace \
 
