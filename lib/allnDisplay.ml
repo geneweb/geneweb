@@ -226,7 +226,7 @@ let print_alphabetic conf base is_surnames =
   if p_getenv conf.base_env "fast_alphabetic" = Some "yes" && ini = ""
   then begin
     load_strings_array base ;
-    let list = Alln.first_letters conf base is_surnames in
+    let list = Alln.first_letters base is_surnames in
     let list = List.sort Gutil.alphabetic_order list in
     print_alphabetic_big conf base is_surnames ini list 1 true
   end else begin
@@ -304,8 +304,8 @@ let print_short conf base is_surnames =
   in
   let _ = if String.length ini < 2 then load_strings_array base in
   match Alln.select_names conf base is_surnames ini max_int with
-  | Specify _, _ -> Hutil.incorrect_request conf
-  | Result list, len ->
+  | Alln.Specify _, _ -> Hutil.incorrect_request conf
+  | Alln.Result list, len ->
     let list = groupby_ini (Utf8.length ini + 1) list in
     print_alphabetic_short conf base is_surnames ini list len
 

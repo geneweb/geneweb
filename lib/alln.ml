@@ -12,7 +12,7 @@ type t =
   | Result of (string * string * int) list
   | Specify of string list
 
-let first_letters conf base is_surnames =
+let first_letters base is_surnames =
   let iii =
     if is_surnames then persons_of_surname base
     else persons_of_first_name base
@@ -24,7 +24,7 @@ let first_letters conf base is_surnames =
       let c = Utf8.sub k 0 1 in
       let list =
         match list with
-        | hd :: tl -> if hd = c then list else c :: list
+        | hd :: _ -> if hd = c then list else c :: list
         | [] -> [c]
       in
       match spi_next iii istr with
@@ -98,7 +98,7 @@ let select_names conf base is_surnames ini limit =
                     then
                       let k = cut k in
                       match List.sort_uniq compare (List.map (fun (k, _, _) -> cut k) acc) with
-                      | (hd :: tl) as acc when hd = k -> Specify acc, len + 1
+                      | (hd :: _) as acc when hd = k -> Specify acc, len + 1
                       | acc -> Specify (k :: acc), len + 1
                     else Result ((k, s, cnt) :: acc), len + 1
                   | Specify (k1 :: tl) ->
