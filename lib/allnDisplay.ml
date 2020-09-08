@@ -242,7 +242,8 @@ let print_alphabetic conf base is_surnames =
     match list with
     | Alln.Specify keys ->
       let keys = List.sort Gutil.alphabetic_order keys in
-      print_alphabetic_big conf base is_surnames ini keys len (not all)
+      let too_big = not all && List.length keys > Alln.default_max_cnt in
+      print_alphabetic_big conf base is_surnames ini keys len too_big
     | Alln.Result list ->
       if len >= 50 || ini = "" then
         let list = groupby_ini (Utf8.length ini + 1) list in
