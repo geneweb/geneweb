@@ -2,6 +2,7 @@
  (name util)
  (public_name geneweb-lib.util)
  (wrapped false)
+ (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries
    stdlib-shims
    unidecode

@@ -178,6 +178,8 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
     that in [read]/[write].
     It also takes care of writing [magic] at the beginning of the file before calling
     [write]
+
+    On Windows, file is not locked.
 *)
 val read_or_create
   : ?magic:string
