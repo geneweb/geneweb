@@ -303,24 +303,31 @@ let rec merge_insert (sstr, (strl, iperl) as x) =
       else (sstr, (StrSet.union strl strl1, iperl @ iperl1)) :: l
   | [] -> [x]
 
-let persons_of_absolute_first_name conf base x =
-  let istrl = base_strings_of_first_name base x in
-  List.fold_right
-    (fun istr l ->
-       let str = sou base istr in
-       if str = x then
-         let iperl = spi_find (persons_of_first_name base) istr in
-         let iperl =
-           List.fold_left
-             (fun iperl iper ->
-                if eq_istr (get_first_name (pget conf base iper)) istr then
-                  iper :: iperl
-                else iperl)
-             [] iperl
-         in
-         if iperl = [] then l else (str, istr, iperl) :: l
-       else l)
-    istrl []
+let persons_of_absolute base_strings_of persons_of get_field conf base x =
+  let istrl = base_strings_of base x in
+  List.fold_right begin fun istr l ->
+    let str = sou base istr in
+    if str = x then
+      let iperl = spi_find (persons_of base) istr in
+      let iperl =
+        List.fold_left begin fun iperl iper ->
+          let p = pget conf base iper in
+          if eq_istr (get_field p) istr
+          && Util.authorized_age conf base p
+          then iper :: iperl
+          else iperl
+        end [] iperl
+      in
+      if iperl = [] then l else (str, istr, iperl) :: l
+    else l
+  end istrl []
+
+let persons_of_absolute_first_name =
+  persons_of_absolute base_strings_of_first_name persons_of_first_name get_first_name
+
+let persons_of_absolute_surname =
+  persons_of_absolute base_strings_of_surname persons_of_surname get_surname
+
 
 let first_name_print conf base x =
   let (list, _) =
@@ -744,25 +751,6 @@ let select_ancestors conf base name_inj ipl =
            let bh = {bh_ancestor = ip; bh_well_named_ancestors = []} in
            bh :: bhl)
     [] ipl
-
-let persons_of_absolute_surname conf base x =
-  let istrl = base_strings_of_surname base x in
-  List.fold_right
-    (fun istr l ->
-       let str = sou base istr in
-       if str = x then
-         let iperl = spi_find (persons_of_surname base) istr in
-         let iperl =
-           List.fold_left
-             (fun iperl iper ->
-                if eq_istr (get_surname (pget conf base iper)) istr then
-                  iper :: iperl
-                else iperl)
-             [] iperl
-         in
-         if iperl = [] then l else (str, istr, iperl) :: l
-       else l)
-    istrl []
 
 module PerSet = Set.Make (struct type t = iper let compare = compare end)
 
