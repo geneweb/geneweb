@@ -1656,7 +1656,16 @@ let string_with_macros conf env s =
                       Buffer.add_string buff "&amp;"
                     else Buffer.add_char buff s.[i];
                     loop tt (i + 1)
-    else safe_html_aux (fun s -> s) (Buffer.contents buff)
+    else
+      let escape =
+        escape_aux
+          begin function '&' -> 5 (* "&amp;" *) | _ -> 1 end
+          begin fun buf ibuf istr loop -> function
+            | '&' -> Bytes.blit_string "&amp;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+            | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
+          end
+      in
+      safe_html_aux escape (Buffer.contents buff)
   in
   loop Out 0
 
