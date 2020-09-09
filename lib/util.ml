@@ -391,53 +391,64 @@ let safe_html_allowed_tags =
     end
   end
 
-(** [escape_html str] replaces '&', '"', '<' and '>'
-    with their corresponding character entities (using entity number) *)
-let escape_html str =
+let escape_aux count blit str =
   let strlen = String.length str in
   let rec loop acc i =
-    if i < strlen then
-      match String.unsafe_get str i with
-      | '&' | '"' | '\'' | '<' | '>' -> loop (acc + 5) (i + 1) (* "&#xx;" *)
-      | _ -> loop (acc + 1) (i + 1)
+    if i < strlen
+    then loop (acc + count (String.unsafe_get str i)) (i + 1)
     else if acc = strlen then str
     else
       let buf = Bytes.create acc in
       let rec loop istr ibuf =
         if istr = strlen then Bytes.unsafe_to_string buf
-        else match String.unsafe_get str istr with
-          | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-          | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-          | '\'' -> Bytes.blit_string "&#39;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-          | '<' -> Bytes.blit_string "&#60;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-          | '>' -> Bytes.blit_string "&#62;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-          | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
+        else blit buf ibuf istr loop (String.unsafe_get str istr)
       in loop 0 0
   in
   loop 0 0
 
+(** [escape_html str] replaces '&', '"', '<' and '>'
+    with their corresponding character entities (using entity number) *)
+let escape_html =
+  escape_aux
+    begin function
+      | '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *)
+      | _ -> 1
+    end
+    begin fun buf ibuf istr loop -> function
+      | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '\'' -> Bytes.blit_string "&#39;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '<' -> Bytes.blit_string "&#60;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '>' -> Bytes.blit_string "&#62;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
+    end
+
 (** [escape_attribute str] only escapes double quote and ampersand.
     Since we will return normalized HTML, ['"'] should be the only
     dangerous character here. *)
-let escape_attribute str =
-  let strlen = String.length str in
-  let rec loop acc i =
-    if i < strlen then
-      match String.unsafe_get str i with
-      | '&' | '"' -> loop (acc + 5) (i + 1) (* "&#xx;" *)
-      | _ -> loop (acc + 1) (i + 1)
-    else if acc = strlen then str
-    else
-      let buf = Bytes.create acc in
-      let rec loop istr ibuf =
-        if istr = strlen then Bytes.unsafe_to_string buf
-        else match String.unsafe_get str istr with
-          | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-          | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-          | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
-      in loop 0 0
-  in
-  loop 0 0
+let escape_attribute =
+  escape_aux
+    begin function
+      | '&' | '"' -> 5 (* "&#xx;" *)
+      | _ -> 1
+    end
+    begin fun buf ibuf istr loop -> function
+      | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
+    end
+
+let no_html_tags =
+  escape_aux
+    begin function
+      | '<' | '>' -> 4 (* "&{l,g}t;" *)
+      | _ -> 1
+    end
+    begin fun buf ibuf istr loop -> function
+      | '<' -> Bytes.blit_string "&lt;" 0 buf ibuf 4 ; loop (istr + 1) (ibuf + 4)
+      | '>' -> Bytes.blit_string "&gt;" 0 buf ibuf 4 ; loop (istr + 1) (ibuf + 4)
+      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
+    end
 
 (* Few notes:
 
@@ -491,29 +502,6 @@ let safe_html_aux escape_text s =
   |> to_string
 
 let safe_html = safe_html_aux escape_html
-
-let no_html_tags s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-        '<' | '>' -> true
-      | _ -> need_code (i + 1)
-    else false
-  in
-  if need_code 0 then
-    let rec loop i len =
-      if i = String.length s then Buff.get len
-      else
-        let (len, next_i) =
-          match s.[i] with
-            '<' -> Buff.mstore len "&lt;", i + 1
-          | '>' -> Buff.mstore len "&gt;", i + 1
-          | c -> Buff.store len c, i + 1
-        in
-        loop next_i len
-    in
-    loop 0 0
-  else s
 
 (* Version 1 => moche *)
 let clean_html_tags s l =
