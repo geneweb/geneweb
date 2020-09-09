@@ -116,6 +116,13 @@ let util_transl_a_of_b _ =
     test "naissance de <b>Jean</b>" ("naissance", "<b>Jean</b>", "Jean")
   ; test "naissance d'<b>André</b>" ("naissance", "<b>André</b>", "André")
 
+let util_string_with_macros _ =
+  let conf = Config.empty in
+  assert_equal
+    ~printer:(fun s -> s)
+    {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
+    (Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
+
 let datedisplay_string_of_date _ =
   let conf = Config.empty in
   let conf = {conf with env = ("lang", "co") :: conf.env} in
@@ -158,6 +165,7 @@ let suite =
   ; "Util" >:::
     [ "util_safe_html" >:: util_safe_html
     ; "util_transl_a_of_b" >:: util_transl_a_of_b
+    ; "util_string_with_macros" >:: util_string_with_macros
     ; "datedisplay_string_of_date" >:: datedisplay_string_of_date
     ]
   ]
