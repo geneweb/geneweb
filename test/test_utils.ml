@@ -123,6 +123,12 @@ let util_string_with_macros _ =
     {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
     (Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
 
+let util_no_html_tags _ =
+  assert_equal
+    ~printer:(fun s -> s)
+    {|&lt;a href="mailto:jean@dupond.net"&gt;jean@dupond.net&lt;/a&gt; - le 1 &amp; 2|}
+    (Util.no_html_tags {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|})
+
 let datedisplay_string_of_date _ =
   let conf = Config.empty in
   let conf = {conf with env = ("lang", "co") :: conf.env} in
@@ -167,5 +173,6 @@ let suite =
     ; "util_transl_a_of_b" >:: util_transl_a_of_b
     ; "util_string_with_macros" >:: util_string_with_macros
     ; "datedisplay_string_of_date" >:: datedisplay_string_of_date
+    ; "util_no_html_tags" >:: util_no_html_tags
     ]
   ]
