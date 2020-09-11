@@ -699,8 +699,9 @@ let read_or_create ?magic fname read write =
        and update it if not *)
     rd begin fun () ->
       let oc = open_out_bin fname in
-      begin match magic with Some m -> output_string oc m | None -> () end ;
+      begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
       let res = write oc in
+      begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
       flush oc ;
       close_out oc ;
       close_in ic ;
