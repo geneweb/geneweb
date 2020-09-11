@@ -171,7 +171,7 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 
     If [fname] exists (and starts with [magic] if this one is provided),
     [read] function is used on the file.
-    If it does not (or does not start with [magic]),
+    If it does not, or does not start with [magic], or if [read] raise an exception,
     [write] function is used on the file.
 
     This function takes care of locking and closing files so you must not take care of
