@@ -97,7 +97,11 @@ let select_names conf base is_surnames ini limit =
                     if len >= limit
                     then
                       let k = cut k in
-                      match List.sort_uniq compare (List.map (fun (k, _, _) -> cut k) acc) with
+                      match
+                        List.sort_uniq
+                          (fun a b -> compare b a)
+                          (List.map (fun (k, _, _) -> cut k) acc)
+                      with
                       | (hd :: _) as acc when hd = k -> Specify acc, len + 1
                       | acc -> Specify (k :: acc), len + 1
                     else Result ((k, s, cnt) :: acc), len + 1
