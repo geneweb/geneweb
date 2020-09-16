@@ -8,7 +8,7 @@ open Util
 module StrSet = Mutil.StrSet
 
 let not_found conf txt x =
-  let title _ = Wserver.printf "%s: \"%s\"" (Utf8.capitalize txt) x in
+  let title _ = Wserver.printf "%s: \"%s\"" (Utf8.capitalize txt) (Util.escape_html x) in
   Hutil.rheader conf title; Hutil.print_link_to_welcome conf false; Hutil.trailer conf
 
 let first_name_not_found conf =
