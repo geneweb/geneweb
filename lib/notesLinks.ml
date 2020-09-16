@@ -47,9 +47,11 @@ let misc_notes_link s i =
         let (fname, anchor, text) =
           try
             let k = String.rindex b '/' in
-            let j = try String.index b '#' with Not_found -> k in
-            String.sub b 0 j, String.sub b j (k - j),
-            String.sub b (k + 1) (String.length b - k - 1)
+            let j = try String.rindex_from b k '#' with Not_found -> k in
+            ( String.sub b 0 j
+            , String.sub b j (k - j)
+            , String.sub b (k + 1) (String.length b - k - 1)
+            )
           with Not_found -> b, "", b
         in
         match check_file_name fname with
