@@ -62,6 +62,9 @@ let suite =
         ; test [ WLnone ] "[[[w"
         ; test [ WLnone ] "[[]]"
         ; test [ WLnone ] "[[w"
+        ; test
+            [ WLpage (34, ([], "d_azincourt"), "d_azincourt", "","d&#039;Azincourt")]
+            "[[[d_azincourt/d&#039;Azincourt]]]"
         end
     ]
   ]
