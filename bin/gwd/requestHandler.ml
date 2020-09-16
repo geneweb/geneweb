@@ -652,7 +652,8 @@ let defaultHandler : handler =
 
   ; unknown = begin fun conf n ->
       let title _ =
-        Wserver.printf "%s: \"%s\"" (Utf8.capitalize (transl conf "not found")) n
+        Wserver.printf "%s: \"%s\"" (Utf8.capitalize (transl conf "not found"))
+          (Util.escape_html n)
       in
       Wserver.http Wserver.Not_Found;
       Hutil.rheader conf title;
@@ -665,7 +666,7 @@ let defaultHandler : handler =
       | Some sname, Some fname ->
         let title _ =
           Wserver.printf "%s: \"%s %s\"" (Utf8.capitalize (transl conf "not found"))
-            fname sname
+            (Util.escape_html fname) (Util.escape_html sname)
         in
         Wserver.http Wserver.Not_Found;
         Hutil.rheader conf title;
