@@ -43,11 +43,10 @@ module Make (Select : Select) =
 
     let prepare_free_occ base =
       (* Parce qu'on est obligé ... *)
-      (* FIXME!!!!!!! *)
-      (* let sn = "?" in
-       * let fn = "?" in
-       * let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
-       * Hashtbl.add ht_orig_occ key [0]; *)
+      let sn = "?" in
+      let fn = "?" in
+      let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
+      Hashtbl.add ht_orig_occ key [0];
       Gwdb.Collection.iter begin fun ip ->
         let p = poi base ip in
         let sn = sou base (get_surname p) in
@@ -507,13 +506,21 @@ module Make (Select : Select) =
         if has_infos then print_infos oc base false "" "" p
         else if first_name <> "?" && surname <> "?" then Printf.fprintf oc " 0"
 
+    let print_sex oc p legacy =
+      if !old_gw then legacy ()
+      else match get_sex p with
+        | Male -> Printf.fprintf oc " #m"
+        | Female -> Printf.fprintf oc " #f"
+        | Neuter -> ()
+
     let print_child oc base fam_surname csrc cbp p =
       Printf.fprintf oc "-";
-      begin match get_sex p with
-        Male -> Printf.fprintf oc " h"
-      | Female -> Printf.fprintf oc " f"
-      | _ -> ()
-      end;
+      print_sex oc p begin fun () ->
+        match get_sex p with
+        | Male -> Printf.fprintf oc " h"
+        | Female -> Printf.fprintf oc " f"
+        | _ -> ()
+      end ;
       Printf.fprintf oc " %s" (s_correct_string (sou base (get_first_name p)));
       if p_first_name base p = "?" && p_surname base p = "?" then ()
       else if get_new_occ p = 0 then ()
@@ -555,13 +562,17 @@ module Make (Select : Select) =
       bogus_person base m.m_fath && bogus_person base m.m_moth &&
       Array.for_all (bogus_person base) m.m_chil
 
+    let is_isolated p =
+      match get_parents p with
+      | Some _ -> false
+      | None -> Array.length (get_family p) = 0
+
     let print_witness oc base gen p =
       Printf.fprintf oc "%s %s%s" (correct_string base (get_surname p))
         (correct_string base (get_first_name p))
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
-      if Array.length (get_family p) = 0 && get_parents p = None
-         && not (Gwdb.Marker.get gen.mark (get_iper p))
+      if is_isolated p && not (Gwdb.Marker.get gen.mark (get_iper p))
       then
         begin
           Gwdb.Marker.set gen.mark (get_iper p) true;
@@ -644,10 +655,11 @@ module Make (Select : Select) =
            if gen.per_sel ip then
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
+             print_sex oc p begin fun () ->
+               match get_sex p with
+               | Male -> Printf.fprintf oc " m"
+               | Female -> Printf.fprintf oc " f"
+               | _ -> ()
              end;
              Printf.fprintf oc ": ";
              begin match wk with
@@ -748,11 +760,12 @@ module Make (Select : Select) =
            if gen.per_sel ip then
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
-             end;
+             print_sex oc p begin fun () ->
+               match get_sex p with
+               | Male -> Printf.fprintf oc " m"
+               | Female -> Printf.fprintf oc " f"
+               | _ -> ()
+             end ;
              Printf.fprintf oc ": ";
              begin match wk with
                Witness_GodParent -> Printf.fprintf oc "#godp "
@@ -852,11 +865,12 @@ module Make (Select : Select) =
            if gen.per_sel ip then
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
-             end;
+             print_sex oc p begin fun () ->
+               match get_sex p with
+               | Male -> Printf.fprintf oc " m"
+               | Female -> Printf.fprintf oc " f"
+               | _ -> ()
+             end ;
              Printf.fprintf oc ": ";
              print_witness oc base gen p;
              Printf.fprintf oc "\n")
@@ -961,11 +975,12 @@ module Make (Select : Select) =
           (fun (ip, wk) ->
              let p = poi base ip in
              Printf.fprintf oc "wit";
-             begin match get_sex p with
-               Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> ()
-             end;
+             print_sex oc p begin fun () ->
+               match get_sex p with
+               | Male -> Printf.fprintf oc " m"
+               | Female -> Printf.fprintf oc " f"
+               | _ -> ()
+             end ;
              Printf.fprintf oc ": ";
              begin match wk with
                Witness_GodParent -> Printf.fprintf oc "#godp "
@@ -1056,27 +1071,21 @@ module Make (Select : Select) =
              print_notes_for_person oc base gen p)
         pl
 
-    let is_isolated p =
-      match get_parents p with
-        Some _ -> false
-      | None -> Array.length (get_family p) = 0
-
     let is_definition_for_parent p =
       match get_parents p with
         Some _ -> false
       | None -> true
 
-    let get_isolated_related base m list =
+    let get_isolated_related base gen m list =
       let concat_isolated p_relation ip list =
         let p = poi base ip in
         if List.mem_assq p list then list
         else if is_isolated p then
           match get_rparents p with
-            {r_fath = Some x} :: _ when x = get_iper p_relation ->
-              list @ [p, true]
-          | {r_fath = None; r_moth = Some x} :: _
-            when x = get_iper p_relation ->
-              list @ [p, true]
+          | ({ r_fath = Some x ; _} | { r_moth = Some x ; _ }) :: _ ->
+            if x = get_iper p_relation
+            then list @ [ p, not (Gwdb.Marker.get gen.mark (get_iper p)) ]
+            else list
           | _ -> list
         else list
       in
@@ -1268,10 +1277,12 @@ module Make (Select : Select) =
               def_p := p :: !def_p;
               if has_infos base p then print_infos oc base false "" "" p
               else Printf.fprintf oc " 0";
-              match get_sex p with
-                Male -> Printf.fprintf oc " #h"
-              | Female -> Printf.fprintf oc " #f"
-              | Neuter -> ()
+              print_sex oc p begin fun () ->
+                match get_sex p with
+                | Male -> Printf.fprintf oc " #h"
+                | Female -> Printf.fprintf oc " #f"
+                | Neuter -> ()
+              end ;
             end;
           Printf.fprintf oc "\n";
           Printf.fprintf oc "beg\n";
@@ -1282,7 +1293,7 @@ module Make (Select : Select) =
 
     let print_relations oc base gen ml =
       let pl = List.fold_right (get_persons_with_relations base) ml [] in
-      let pl = List.fold_right (get_isolated_related base) ml pl in
+      let pl = List.fold_right (get_isolated_related base gen) ml pl in
       let pl =
         List.fold_right
           (fun p pl -> if list_memf eq_key_fst p pl then pl else p :: pl) pl
