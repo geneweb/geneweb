@@ -39,7 +39,7 @@ let transl conf w =
   try Hashtbl.find conf.lexicon w with Not_found -> "[" ^ w ^ "]"
 
 let charset conf =
-  try Hashtbl.find conf.lexicon " !charset" with Not_found -> "utf-8"
+  try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
 
 let header_no_page_title conf title =
   Wserver.http Wserver.OK;
@@ -542,7 +542,7 @@ let rec copy_from_stream conf print strm =
                   end
               | 'L' ->
                   let lang = get_variable strm in
-                  let lang_def = transl conf " !languages" in
+                  let lang_def = transl conf "!languages" in
                   print (Translate.language_name lang lang_def)
               | 'V' | 'F' ->
                   let k = get_variable strm in
