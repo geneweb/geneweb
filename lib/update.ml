@@ -1085,7 +1085,7 @@ let print_create_conflict conf base p var =
     (transl conf ":") free_n;
   Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
-  Wserver.printf "%s." (transl conf " to try again with this number");
+  Wserver.printf " %s." (transl conf "to try again with this number");
   Wserver.printf "</li>";
   Wserver.printf "<li>";
   Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
