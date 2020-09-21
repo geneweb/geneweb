@@ -554,15 +554,26 @@ let ipers base =
 
 let iper_marker c i = Marker.make (fun i -> i) c i
 
-let fam_collection fn base =
+let ifams ?(select = fun _ -> true) base =
   { Collection.length = nb_of_families base
-  ; get = (fun i ->
-        let f = foi base i in
-        if get_ifam f = dummy_ifam then None else Some (fn f))
+  ; get = begin fun i ->
+      if select i
+      then
+        if get_ifam (foi base i) = dummy_ifam
+        then None else Some i
+      else None
+    end
   }
 
-let ifams = fam_collection get_ifam
-let families = fam_collection (fun f -> f)
+let families ?(select = fun _ -> true) base =
+  { Collection.length = nb_of_families base
+  ; get = begin fun i ->
+      let f = foi base i in
+      if get_ifam f <> dummy_ifam && select f
+      then Some f
+      else None
+    end
+  }
 
 let dummy_collection _ =
   { Collection.length = -1

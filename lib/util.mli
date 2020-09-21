@@ -382,6 +382,7 @@ val string_with_macros
 val is_empty_name : person -> bool
 
 module IperSet : sig include Set.S with type elt = iper end
+module IfamSet : sig include Set.S with type elt = ifam end
 
 (**/**)
 (* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
@@ -401,3 +402,27 @@ val include_template
   -> string
   -> (unit -> unit)
   -> unit
+
+(** [select_masc conf base ips]
+    From [ips], a list matching ipers to a number of maximum generations,
+    get maximum ascendants of ipers up to these corresponding generations.
+
+    A person is maximum ascendant if their generation matches the maximum, or
+    if they do not have ancestors.
+
+    The result is a Hashtbl matching an iper to the corresponding person and
+    their generation.
+*)
+val select_masc : config -> base -> (iper * int) list -> (iper, (int * person)) Hashtbl.t
+
+(** [select_desc conf base gen_desc ips]
+    From [ips], a list matching ipers to a number of maximum generations,
+    get spouses and descendants of ipers up to these corresponding generations.
+*)
+val select_desc : config -> base -> int -> (iper * int) list -> (iper, person) Hashtbl.t
+
+(** [select_ascdesc conf base ips gen_desc]
+    Get maximum ascendants with {!val:select_masc}, and get their desc with
+    {!val:select_desc}
+ *)
+val select_mascdesc : config -> base -> (iper * int) list -> int -> (iper, person) Hashtbl.t

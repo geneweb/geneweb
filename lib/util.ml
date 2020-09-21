@@ -2372,12 +2372,12 @@ let limited_image_size max_wid max_hei fname size =
 
 let find_person_in_env conf base suff =
   match p_getenv conf.env ("i" ^ suff) with
-    Some i ->
+    Some i when i <> "" ->
       (* if i >= 0 && i < nb_of_persons base then *)
         let p = pget conf base (Gwdb.iper_of_string i) in
         if is_hidden p then None else Some p
       (* else None *)
-  | None ->
+  | _(* None *) ->
       match
         p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff)
       with
@@ -3379,3 +3379,46 @@ let rm_rf f =
     List.iter Unix.rmdir directories
 
 module IperSet = Set.Make (struct type t = iper let compare = Stdlib.compare end)
+module IfamSet = Set.Make (struct type t = ifam let compare = Stdlib.compare end)
+
+let select_masc conf base ips =
+  let asc = Hashtbl.create 32 in
+  (* Make sure that ref personne is first element of the list (because of implex) *)
+  let rec loop_asc max_gen gen ip =
+    if not @@ Hashtbl.mem asc ip then begin
+      let p = pget conf base ip in
+      match get_parents p with
+      | Some ifam when gen < max_gen ->
+        let cpl = foi base ifam in
+        loop_asc max_gen (gen + 1) (get_father cpl) ;
+        loop_asc max_gen (gen + 1) (get_mother cpl)
+      | _ -> Hashtbl.add asc ip (gen, p)
+    end
+  in
+  List.iter (fun (ip, max_gen) -> loop_asc max_gen 0 ip) ips ;
+  asc
+
+let select_desc conf base gen_desc ips =
+  let desc = Hashtbl.create 64 in
+  let skip = Hashtbl.create 64 in
+  let rec loop_desc gen ip =
+    if not @@ Hashtbl.mem skip ip then begin
+      let p = pget conf base ip in
+      Hashtbl.add skip ip true ;
+      Hashtbl.replace desc ip p ;
+      Array.iter
+        (fun ifam ->
+           let sp = Gutil.spouse ip (foi base ifam) in
+           Hashtbl.replace desc sp (pget conf base sp) )
+        (get_family p) ;
+      if gen > gen_desc then List.iter (loop_desc (gen - 1)) @@ children_of_p base p ;
+    end
+  in
+  List.iter (fun (ip, gen) -> loop_desc gen ip) ips ;
+  desc
+
+let select_mascdesc conf base ips gen_desc =
+  let asc = select_masc conf base ips in
+  let ips = Hashtbl.fold (fun ip (gen, _) acc -> (ip, gen) :: acc) asc [] in
+  let r =  select_desc conf base gen_desc ips  in
+  r
