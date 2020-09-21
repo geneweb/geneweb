@@ -1,3 +1,12 @@
+let _bench name fn =
+  let p1 = Sys.time () in
+  let t1 = Unix.gettimeofday () in
+  let res = fn () in
+  let t2 = Unix.gettimeofday () in
+  let p2 = Sys.time () in
+  Printf.printf "[%s]: %f seconds (~%f seconds of CPU time).\n" name (t2 -. t1) (p2 -. p1);
+  res
+
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -92,27 +101,39 @@ let check_file_name s =
 
 let of_wktxt ?(cnt = ref 0) =
   let rec inline = function
-    | W.Type.Link (3, s) ->
+    | W.Type.Link s ->
+      if String.length s > 4
+      && String.unsafe_get s 0 = '['
+      && String.unsafe_get s 1 = '['
+      && String.unsafe_get s (String.length s - 1) = ']'
+      && String.unsafe_get s (String.length s - 2) = ']'
+      then
       let (fname, anchor, text) =
         match String.rindex_opt s '/' with
         | Some k ->
           let j = Opt.default k (String.index_opt s '#') in
-          String.sub s 0 j, String.sub s j (k - j),
-          String.sub s (k + 1) (String.length s - k - 1)
-        | None -> s, "", s
+          ( String.sub s 2 (j - 2)
+          , String.sub s j (k - j)
+          , String.sub s (k + 1) (String.length s - k - 3)
+          )
+        | None ->
+          ( String.sub s 2 (String.length s - 3)
+          , ""
+          , String.sub s 2 (String.length s - 3) )
       in
-      begin match check_file_name fname with
+      match check_file_name fname with
         | Some pg_path -> (WLpage (pg_path, fname, anchor, text) : inline)
         | None -> failwith fname
-      end
-    | W.Type.Link (2, s) ->
-      begin
+      else if String.length s > 2
+      && String.unsafe_get s 0 = '['
+      && String.unsafe_get s (String.length s - 1) = ']'
+      then
         let (spe, b) =
           match String.index_opt s ':' with
           | Some i ->
-            ( Some (String.sub s 0 i)
-            , String.sub s (i + 1) (String.length s - i - 1) )
-          | None -> None, s
+            ( Some (String.sub s 1 (i - 1))
+            , String.sub s (i + 1) (String.length s - i - 2) )
+          | None -> None, String.sub s 1 (String.length s - 2)
         in
         let (b, text) =
           match String.rindex_opt b ';' with
@@ -165,19 +186,17 @@ let of_wktxt ?(cnt = ref 0) =
             WLperson (id, (fn, sn, oc), name, text)
           | None ->
             assert false
-      end
-    | W.Type.Link (n, s) ->
-      let n = n - 1 in
-      let pre = String.make n '[' in
-      let post = String.make n '[' in
-      let link url txt = String (Printf.sprintf {|<a href="%s">%s%s%s</a>|} url pre txt post) in
-      begin match String.index_opt s ' ' with
-        | None -> link s s
-        | Some pos ->
-          link
-            (String.sub s 0 pos)
-            (String.sub s (pos + 1) (String.length s - pos - 1))
-      end
+      else
+        let link url txt =
+          String (Printf.sprintf {|<a href="%s">%s</a>|} url txt)
+        in
+        begin match String.index_opt s ' ' with
+          | None -> link s s
+          | Some pos ->
+            link
+              (String.sub s 0 pos)
+              (String.sub s (pos + 1) (String.length s - pos - 1))
+        end
     | W.Type.Bold x -> Bold (List.map inline x)
     | W.Type.Italic x -> Italic (List.map inline x)
     | W.Type.String x | W.Type.NoWiki x -> String x
@@ -378,7 +397,7 @@ let replace_toc s doc =
 
 let html_of_wiki ?edit conf base s =
   try
-    let doc = W.doc_from_string s in
+    let doc = _bench __LOC__ @@ fun () -> W.doc_from_string s in
     let need_toc = need_toc doc in
     let doc, toc =
       match need_toc with
@@ -456,8 +475,8 @@ let html_of_wiki ?edit conf base s =
     in
     doc_to_string conf base doc
   with W.ParsingError (line, column, lexeme) ->
-    failwith @@ Printf.sprintf "Wikitext.ParsingError (%d, %d, %s)\n%s"
-      line column (String.escaped lexeme) s
+    failwith @@ Printf.sprintf "Wikitext.ParsingError (%d, %d, %s)"
+      line column (String.escaped lexeme)
 
 let title_regexp = Str.regexp "^\\(=+\\).*[^=]\\(=+\\)$"
 let extract_sub_part s v =

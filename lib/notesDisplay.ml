@@ -1,3 +1,12 @@
+let _bench name fn =
+  let p1 = Sys.time () in
+  let t1 = Unix.gettimeofday () in
+  let res = fn () in
+  let t2 = Unix.gettimeofday () in
+  let p2 = Sys.time () in
+  Printf.printf "[%s]: %f seconds (~%f seconds of CPU time).\n" name (t2 -. t1) (p2 -. p1);
+  res
+
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -74,10 +83,13 @@ let print_whole_notes conf base fnotes title s ho =
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
-  let s = string_with_macros conf [] s in
+  let s = _bench __LOC__ @@ fun () -> string_with_macros conf [] s in
+  print_endline __LOC__ ;
   let edit = if conf.wizard then Some (conf.wizard, "NOTES", fnotes) else None in
-  let s = Wiki.html_of_wiki ?edit conf base s in
-  let s = Util.safe_html s in
+  let s = _bench __LOC__ @@ fun () -> Wiki.html_of_wiki ?edit conf base s in
+  print_endline __LOC__ ;
+  let s = _bench __LOC__ @@ fun () -> Util.safe_html s in
+  print_endline __LOC__ ;
   let s =
     match ho with
       Some (case_sens, h) -> html_highlight case_sens h s
@@ -254,7 +266,7 @@ let print conf base =
       let title = Util.safe_html title in
       match p_getint conf.env "v" with
         Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-      | None -> print_whole_notes conf base fnotes title s None
+      | None -> _bench __LOC__ @@ fun () -> print_whole_notes conf base fnotes title s None
 
 let print_mod conf base =
   let fnotes =
