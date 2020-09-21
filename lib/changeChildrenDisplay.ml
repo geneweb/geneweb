@@ -78,7 +78,7 @@ let print_change conf base p =
     let s = transl conf "change children's names" in
     Wserver.print_string (Utf8.capitalize s)
   in
-  let children = select_children_of base p in
+  let children = children_of_p base p in
   let digest = digest_children base children in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Wserver.printf "<h2>";
@@ -199,7 +199,7 @@ let print_update_child conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_change_ok conf base p =
-  let ipl = select_children_of base p in
+  let ipl = children_of_p base p in
   let parent_surname = p_surname base p in
   let redisp =
     match p_getenv conf.env "return" with

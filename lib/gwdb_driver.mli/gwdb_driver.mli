@@ -271,8 +271,8 @@ end
 
 val ipers : base -> iper Collection.t
 val persons : base -> person Collection.t
-val ifams : base -> ifam Collection.t
-val families : base -> family Collection.t
+val ifams : ?select:(ifam -> bool) -> base -> ifam Collection.t
+val families : ?select:(family -> bool) -> base -> family Collection.t
 
 (** [dummy_collection x] create a dummy collection with no element.
     [x] is only used for typing.

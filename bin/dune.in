@@ -57,6 +57,46 @@
 (include_subdirs unqualified)
 
 (library
+  (name gwexport)
+  (public_name geneweb-gwexport-lib)
+  (libraries geneweb %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (modules gwexport)
+)
+
+(library
+  (name gwulib)
+  (public_name geneweb-gwu-lib)
+  (wrapped false)
+  (libraries geneweb gwexport %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (modules gwuLib)
+)
+
+(executables
+  (package geneweb-bin)
+  (public_names gwu)
+  (modules gwu)
+  (libraries geneweb gwexport gwulib str unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+)
+
+(library
+  (name gwb2gedlib)
+  (public_name geneweb-gwb2ged-lib)
+  (wrapped false)
+  (libraries geneweb gwexport %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (modules gwb2gedLib)
+)
+
+(executables
+  (package geneweb-bin)
+  (public_names gwb2ged)
+  (modules gwb2ged)
+  (libraries geneweb geneweb-gwb2ged-lib geneweb-gwu-lib str unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+)
+
+(library
   (name gwdlib)
   (public_name geneweb-gwd-lib)
   (wrapped true)
@@ -68,14 +108,14 @@
 (executable
   (package geneweb-bin)
   (public_name gwd)
-  (libraries geneweb geneweb-jingoo geneweb-gwd-lib unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+  (libraries geneweb geneweb-jingoo geneweb-gwb2ged-lib geneweb-gwd-lib geneweb-gwu-lib unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwd)
 )
 
 (executables
   (package geneweb-bin)
-  (public_names connex gwb2ged gwdiff gwu setup update_nldb)
-  (modules connex gwb2ged gwdiff gwu setup update_nldb)
+  (public_names connex gwdiff setup update_nldb)
+  (modules connex gwdiff setup update_nldb)
   (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
 )

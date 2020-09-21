@@ -14,38 +14,7 @@ open Api_def
 open Api_util
 
 let close_person_relation conf base ips gen_desc filters =
-  (* First, build the list of oldest ancestors of each branch *)
-  let asc = Hashtbl.create 32 in
-  (* Make sure that ref personne is first element of the list (because of implex) *)
-  let rec loop_asc max_gen gen ip =
-    if not @@ Hashtbl.mem asc ip then begin
-      let p = pget conf base ip in
-      match get_parents p with
-      | Some ifam when gen < max_gen ->
-        let cpl = foi base ifam in
-        loop_asc max_gen (gen + 1) (get_father cpl) ;
-        loop_asc max_gen (gen + 1) (get_mother cpl)
-      | _ -> Hashtbl.add asc ip (gen, p)
-    end
-  in
-  List.iter (fun (ip, max_gen) -> loop_asc max_gen 0 ip) ips ;
-  let desc = Hashtbl.create 64 in
-  let skip = Hashtbl.create 64 in
-  let rec loop_desc gen ip =
-    if not @@ Hashtbl.mem skip ip then begin
-      let p = pget conf base ip in
-      Hashtbl.add skip ip true ;
-      Hashtbl.replace desc ip p ;
-      Array.iter
-        (fun ifam ->
-           let sp = Gutil.spouse ip (foi base ifam) in
-           Hashtbl.replace desc sp (pget conf base sp) )
-        (get_family p) ;
-      if gen > gen_desc then
-        List.iter (loop_desc (gen - 1)) @@ ChangeChildren.select_children_of base p
-    end
-  in
-  Hashtbl.iter (fun ip (gen, _p) -> loop_desc gen ip) asc ;
+  let desc = Util.select_mascdesc conf base ips gen_desc in
   Hashtbl.fold
     (fun _k v acc ->
        if apply_filters_p conf filters Perso.get_sosa_person v

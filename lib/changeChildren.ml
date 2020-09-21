@@ -5,11 +5,6 @@ open Def
 open Gwdb
 open Util
 
-let select_children_of base p =
-  Array.fold_right
-    (fun ifam -> Array.fold_right List.cons (get_children @@ foi base ifam) )
-    (get_family p) []
-
 let digest_children base ipl =
   let l =
     List.map

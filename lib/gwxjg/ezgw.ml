@@ -103,7 +103,7 @@ module Person = struct
   let burial_note conf base p =
     mk_person_note conf base p (get_burial_note p)
 
-  let children base p = ChangeChildren.select_children_of base p
+  let children base p = Gwdb.children_of_p base p
 
   let consanguinity p =
     let c = get_consang p in

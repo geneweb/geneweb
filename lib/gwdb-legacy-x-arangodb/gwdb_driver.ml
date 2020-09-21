@@ -211,9 +211,6 @@ let clear_families_array = legacy L.clear_families_array
 
 let date_of_last_change = legacy L.date_of_last_change
 
-let persons = legacy L.persons
-let families = legacy L.families
-
 let make particles bname arrays =
   let legacy = L.make particles bname arrays in
   let arango =
@@ -315,8 +312,10 @@ let dummy_marker = L.dummy_marker
 let ifam_marker = L.ifam_marker
 let iper_marker = L.iper_marker
 let dummy_collection = L.dummy_collection
-let ifams = legacy L.ifams
 let ipers = legacy L.ipers
+let persons = legacy L.persons
+let ifams ?select = legacy (L.ifams ?select)
+let families ?select = legacy (L.families ?select)
 module Marker = L.Marker
 module Collection = L.Collection
 let base_visible_write b = L.base_visible_write b.legacy

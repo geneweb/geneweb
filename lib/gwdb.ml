@@ -234,3 +234,8 @@ let gen_gen_person_misc_names base p nobtit nobtit_fun =
 
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
+
+let children_of_p base p =
+  Array.fold_right
+    (fun ifam -> Array.fold_right List.cons (get_children @@ foi base ifam) )
+    (get_family p) []
