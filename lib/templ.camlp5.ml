@@ -951,7 +951,12 @@ let loc_of_expr =
 
 let templ_eval_var conf =
   function
-    ["cancel_links"] -> VVbool conf.cancel_links
+  | ["browsing_with_sosa_ref"] ->
+      begin match Util.p_getenv conf.env "sosa_ref" with
+        Some _ -> VVbool true
+      | _ -> VVbool false
+      end
+  | ["cancel_links"] -> VVbool conf.cancel_links
   | ["cgi"] -> VVbool !(Wserver.cgi)
   | ["false"] -> VVbool false
   | ["has_referer"] ->
