@@ -32,6 +32,7 @@ let daemon = ref false
 let login_timeout = ref 1800
 let conn_timeout = ref 120
 let trace_failed_passwd = ref false
+let trace_templates = ref false
 let use_auth_digest_scheme = ref false
 let no_host_address = ref false
 let lexicon_list = ref []
@@ -1124,10 +1125,6 @@ let make_conf from_addr request script_name env =
       if x = "" then !default_lang else x
     with Not_found -> !default_lang
   in
-  let trace_templ =
-    try List.assoc "trace_templ" base_env = "yes"
-    with Not_found -> false
-  in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
   List.iter
     (fun fname ->
@@ -1172,7 +1169,7 @@ let make_conf from_addr request script_name env =
      manitou = manitou;
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
-     trace_templ = trace_templ;
+     trace_templ = !trace_templates;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name; auth_scheme = ar.ar_scheme;
@@ -1871,6 +1868,9 @@ let main ~speclist () =
     ("-trace_failed_passwd", Arg.Set trace_failed_passwd,
      "\n       \
       Print the failed passwords in log (except if option -digest is set) ") ::
+    ("-trace_templ", Arg.Set trace_templates,
+     "\n       \
+      Print the full path to template files as html comment ") ::
     ("-nolock", Arg.Set Lock.no_lock_flag,
      "\n       Do not lock files before writing.") ::
     (if Sys.unix then
