@@ -1649,9 +1649,6 @@ let rec compare_ls sl1 sl2 =
 module SortedList =
   Set.Make (struct type t = string list let compare = compare_ls end)
 
-module IperSet =
-  Set.Make (struct type t = iper let compare = compare end)
-
 (*
    Type pour représenté soit :
      - la liste des branches patronymique

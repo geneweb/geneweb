@@ -453,9 +453,6 @@ let print_last_visited_persons conf base =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let print_max_ancestors =
-  let module IperSet =
-    Set.Make (struct type t = iper let compare = Stdlib.compare end)
-  in
   fun conf base ->
   let ipers = Gwdb.ipers base in
   let ancestors = Gwdb.iper_marker (Gwdb.ipers base) IperSet.empty in

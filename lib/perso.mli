@@ -52,8 +52,6 @@ val linked_page_text
   -> (iper, ifam) Def.NLDB.page * ('b * ('a * Def.NLDB.ind) list)
   -> string
 
-module IperSet : sig include Set.S with type elt = iper end
-
 val max_ancestor_level : config -> base -> iper -> int -> int
 
 val string_of_died : config -> person -> bool -> string
@@ -70,7 +68,7 @@ val string_of_image_size : config -> base -> person * bool -> string
 val string_of_image_medium_size : config -> base -> person * bool -> string
 val string_of_image_small_size : config -> base -> person * bool -> string
 
-val get_link : generation_person list -> IperSet.elt -> generation_person option
+val get_link : generation_person list -> Util.IperSet.elt -> generation_person option
 
 (**)
 
@@ -81,7 +79,7 @@ val make_desc_level_table
   -> base
   -> int
   -> person
-  -> (IperSet.elt, int) Gwdb.Marker.t * (ifam, int) Gwdb.Marker.t
+  -> (Util.IperSet.elt, int) Gwdb.Marker.t * (ifam, int) Gwdb.Marker.t
 
 val default_max_cousin_lev : int
 

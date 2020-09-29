@@ -3366,3 +3366,5 @@ let rm_rf f =
     let (directories, files) = ls_r [f] |> List.partition Sys.is_directory in
     List.iter Unix.unlink files ;
     List.iter Unix.rmdir directories
+
+module IperSet = Set.Make (struct type t = iper let compare = Stdlib.compare end)
