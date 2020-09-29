@@ -286,26 +286,22 @@ let select_all base is_surnames ini =
   end (Gwdb.persons base) ;
   !list
 
-
-module Iper =
-  struct
+module PersonSet = Set.Make (struct
     type t = Gwdb.person
     let compare i1 i2 = Stdlib.compare (get_iper i1) (get_iper i2)
-  end
-
-module IperSet = Set.Make(Iper)
+  end)
 
 let print_list conf base filters list =
   let person_l =
-    IperSet.elements
+    PersonSet.elements
       (List.fold_left
          begin fun acc p ->
            let p = poi base p in
            if apply_filters_p conf filters Perso.get_sosa_person p
-           then IperSet.add p acc
+           then PersonSet.add p acc
            else acc
          end
-         IperSet.empty list)
+         PersonSet.empty list)
   in
   let person_l =
     if filters.nb_results then person_l

@@ -381,3 +381,5 @@ val string_with_macros
     [false] if we knwon the first name or the last name of [p].
 *)
 val is_empty_name : person -> bool
+
+module IperSet : sig include Set.S with type elt = iper end
