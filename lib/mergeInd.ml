@@ -177,23 +177,23 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1 
   Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s
 
 let is_ancestor base p1 p2 =
+  let module IperSet = Util.IperSet in
   let ip1 = get_iper p1 in
   let ip2 = get_iper p2 in
-  let visited = Gwdb.iper_marker (Gwdb.ipers base) false in
-  let rec loop ip =
-    if Gwdb.Marker.get visited ip then false
-    else if ip = ip1 then true
-    else
-      begin
-        Gwdb.Marker.set visited ip true ;
+  let rec loop set = function
+    | [] -> false
+    | ip :: tl ->
+      if IperSet.mem ip set then false
+      else if ip = ip1 then true
+      else
+        let set = IperSet.add ip set in
         match get_parents (poi base ip) with
         | Some ifam ->
-            let cpl = foi base ifam in
-            loop (get_father cpl) || loop (get_mother cpl)
+          let cpl = foi base ifam in
+          loop set (get_father cpl :: get_mother cpl :: tl)
         | None -> false
-      end
   in
-  loop ip2
+  loop IperSet.empty [ip2]
 
 exception Error_loop of person
 exception Same_person
