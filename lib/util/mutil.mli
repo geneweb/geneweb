@@ -182,7 +182,8 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
     On Windows, file is not locked.
 *)
 val read_or_create
-  : ?magic:string
+  : ?wait:bool
+  -> ?magic:string
   -> string
   -> (in_channel -> 'a)
   -> (out_channel -> 'a)
