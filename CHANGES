@@ -1,3 +1,66 @@
+GeneWeb version 7.0.0
+--------------------
+
+This changelog note tries to reconstruct changes in GeneWeb since version 6.08.
+It may miss some details which might be added later if relevants.
+
+- Development environment: GeneWeb's development environment has been shifted to opam+dune,
+  and relies on a variety of external libraries. Dependencies are managed by opam.
+  See README for installation instructions
+
+- Code revision: GeneWeb code has been profoundly reorganised:
+  - files are now separated into a /bin and /lib folders.
+  - some functions have been isolated as external librairies and/or separate
+    repositories (contrib, unidecode)
+  - some files have been split in two parts, isolating the display functions from
+    the other functions
+  - front-end (GUI, API) functions and back-end (database) functions have been isolated
+    to facilitate development and direct plugin of new front and back-end solutions.
+  - many code factorization, optimisation and bug fixes
+
+- Archival format: the archival (gw) format has been upgraded to gwplus. gwc v7 reads
+  old .gw files, and gwu v7 can write old format files when launched with the parameter -old_gw.
+
+- Events are now first class citizens in GeneWeb (personal events and family events).
+  Events attributes are name, date, place, source and note. Witnesses can be attached to events.
+  The current implementation results in redundant data in the .gw file as birth, baptism, marriage,
+  death and burial are both reported in the traditional way (part of the person or family record)
+  and as personal or family events.
+  A specific .gwf variable (has_events) and a template command (%has_events;) allows to test for
+  events beyond birth, baptism, mariage, death and burial (see a.gwf for details).
+
+- History: bug fixes
+
+- GUI: the look of GeneWeb's interface has been revamped with a modern tool: html 5 and Bootstrap,
+  resulting in a better compatibility between screen formats (PC, tablet, phone).
+  Icons are display as font elements rather than images.
+
+-Templates: templates have been revised in multiple fashion
+  - new templates (H and I trees, family tree, ascendant and descendant tables)
+  - the variety of templates (a, b, c, ...) has been collapsed into a mechanism allowing
+    interactive selection of modules to form a page (left-most icon on the menubar).
+    Modules include identity, unions, parents, grand-parents, relations, notes,
+    sources, chronology and various trees.
+    Each module may take several forms inspired by the old a, b, c, .. templates.
+    A standard mechanism allows to add private modules.
+    A .gwf variable (p_mod) allows memorization of a particular module configuration
+    for a given base (see a.gwf for details).
+  - whenever possible, clickable items on a page point to the designated person
+    (first_name surname), its update page (sex of dates), its family update page (marriage date).
+
+- Advanced search: the advanced search page, and the underlying search mechanisms have
+  been updated for generality and efficiency. This is an ongoing effort.
+
+- Gwsetup: updated to include more options and more tools (connex, gwdiff, gwfixbase)
+
+- gwd: new launch parameters
+  - various API related parameters
+  - trace_templ -> Brackets template files with begin/end html comments (<!-- begin xxx ->)
+    including the full path name of the file
+
+- gwf:
+    new variables in the gwf file are described in the a.gwf default configuration file
+
 GeneWeb version 6.08
 --------------------
 
@@ -9,15 +72,15 @@ GeneWeb version 6.07
 
 * Added a detailed history. It allows you to compare two modifications of an
   individual and see what have changed.
-* New design for the search form in the welcome page. Instead of 3 radio 
+* New design for the search form in the welcome page. Instead of 3 radio
   buttons, there is now 3 input text. The first one allow you to search by
   first names. The second one by names. The last one by key (first name.occ
-  surname), public name, alias, sosa ... One trick is possible, you can 
-  enter first name(.occ) and name in the respective field and it will search 
+  surname), public name, alias, sosa ... One trick is possible, you can
+  enter first name(.occ) and name in the respective field and it will search
   by first name and surname.
 * Added the warning BigAgeBetweenSpouses, DeadOld (if dead after 1900 and aged
-  of 105 years old or if dead before 1900 and aged of 100 years old), 
-  OldIndividual (if not dead and aged more than 120 years old). Specify if the 
+  of 105 years old or if dead before 1900 and aged of 100 years old),
+  OldIndividual (if not dead and aged more than 120 years old). Specify if the
   warning "marriage before/after birth/death" applies to a witness or a couple.
 * Fix import Gedcom option for uppercase/lowercase name when using utf8.
 * New output : missing events.
@@ -30,7 +93,7 @@ GeneWeb version 6.06
 * ! New ! You can try the new graphical interface of GeneWeb. It's supposed
   to replace gwsetup at the end. Right now, it's a beta version so every
   thing is not finnished yet. Feedback is welcome.
-* Add three new warnings : ChangedOrderOfMarriages, CloseSiblings and 
+* Add three new warnings : ChangedOrderOfMarriages, CloseSiblings and
   ParentTooOld. Activate the warning YoungForMarriage.
 * Change totally the way to notify and record the changes of a base. There is
   now only one variable in your gwf file (notify_change) so you should update
@@ -41,31 +104,31 @@ GeneWeb version 6.06
   In the variable arguments, you may have :
     - KEY old_key new_key
     - VISIBLE key boolean
-  This modification should allow in a close future to be able to see what was 
+  This modification should allow in a close future to be able to see what was
   exactly modify in a person/family (eg: birth place, marriage date ...).
-* Add a "book of sources" and "book of occupations" just like the "book of 
-  places". The three functions uses the same variable in the gwf file: 
-  max_nb_updates (you should then update your gwf files). This variable 
-  allows to set up the maximum number of updates that can be done at a single 
+* Add a "book of sources" and "book of occupations" just like the "book of
+  places". The three functions uses the same variable in the gwf file:
+  max_nb_updates (you should then update your gwf files). This variable
+  allows to set up the maximum number of updates that can be done at a single
   time.
   Plus, this page is available as a template. For those who changed the values
-  in updind and updfam template for the fields place, source, occupation, 
+  in updind and updfam template for the fields place, source, occupation,
   beware to put the right value in the upddata template.
 * Add a field in the advanced request to search in the marriage informations.
-  This is just a small evolution, it is not meant to add other searching 
+  This is just a small evolution, it is not meant to add other searching
   fields again and again.
 * Add the occupation in the edition of a family form. One can create a
   family and specify the occupation of the father/mother and the children.
-  This is again a small evolution, it is not meant to add other fields again 
+  This is again a small evolution, it is not meant to add other fields again
   and again.
 * Add two new outputs : "liste-éclair" (Tiny tafel) and "book of ascendants".
-* "Better" display in the ascendants/descendants menu/list/tree and the 
-  relatives outputs. Add a few new options in the ascendants/descendants 
+* "Better" display in the ascendants/descendants menu/list/tree and the
+  relatives outputs. Add a few new options in the ascendants/descendants
   list/tree.
 * The way a date is displayed is now completely depedant of the "date order"
   in the language dictionary. For example, if your date order is dd/mm/yyyy,
   your date will be 01/02/1880. If instead it's d/m/yyyy, it will be displayed
-  as 1/2/1880. Format accepted now are : 
+  as 1/2/1880. Format accepted now are :
   - dmyyyy
   - mmddyyyy
   - yyyymmdd or yymmdd
@@ -79,14 +142,14 @@ GeneWeb version 6.06
 GeneWeb version 6.05
 --------------------
 
-* Optimization of the sosa computing in the template. Can be 3 to 40 times 
+* Optimization of the sosa computing in the template. Can be 3 to 40 times
   faster (mainly with the option display_sosa=yes).
-* New organization of the relationship computing page. Cousin and Relation 
-  are now in the same page. Should be easier to use (javascript must be 
+* New organization of the relationship computing page. Cousin and Relation
+  are now in the same page. Should be easier to use (javascript must be
   activated).
 * New ouput in the ascendants and descendants menu : display in table.
 * Added a link to browse in the descendants tree as in the ascendants tree.
-* Added a warning in case the source field is not complete. Beware, it may 
+* Added a warning in case the source field is not complete. Beware, it may
   not behave as you think.
   In order not to spoil the display, the warning will be display only like
   this :
@@ -95,14 +158,14 @@ GeneWeb version 6.05
       if there is any individual sources for him AND her then OK (no warning)
       else Warning missing sources
 * Add a warning if a witness is born/dead after/before marriage.
-* If you define a "sosa ref" in your gwf file, then GeneWeb will keep the gwf 
-  file up to date when the user modify the base (and potentially this 
+* If you define a "sosa ref" in your gwf file, then GeneWeb will keep the gwf
+  file up to date when the user modify the base (and potentially this
   individual).
-* Added the notify_key when changing the name of the children and check if 
+* Added the notify_key when changing the name of the children and check if
   the "sosa ref" has changed.
-* In case of homonyms (creation of individual/family), display the spouses of 
+* In case of homonyms (creation of individual/family), display the spouses of
   the homonyms in the list.
-* When searching for a surname, the more there is answers the more the result 
+* When searching for a surname, the more there is answers the more the result
   will be displayed in many columns.
 * New template : annivmenu.txt. This page contains all the links related to
   an anniversary (birth, marriage, death...)
@@ -118,7 +181,7 @@ GeneWeb version 6.05
 
 Dominique DERAM :
 * Update of template A, B, C, D, F, H :
-** New directory templx for the templates anclist, ancsosa, anctree. 
+** New directory templx for the templates anclist, ancsosa, anctree.
    It will be used by the template a, b, c, d, f, h.
 ** Update copyrigth
 ** Various fix of minors bugs and improvements.
@@ -126,13 +189,13 @@ Dominique DERAM :
 Mickaël Rouesné:
 * Update of template M :
 ** css.txt : refactoring of the css.
-** perso.txt : 
+** perso.txt :
      - Display the number of ascendants and descendant.
-     - If misc=on (in the gwf file) or opt=misc (in the URL), then display the 
-       wiki links, index and ID (reference key) of the individual in the 
+     - If misc=on (in the gwf file) or opt=misc (in the URL), then display the
+       wiki links, index and ID (reference key) of the individual in the
        bottom of the page.
      - Vertical Family Tree with 4 generations.
-     - Open the update individual/family form in a new page and automatic 
+     - Open the update individual/family form in a new page and automatic
        relead after clicking on the [x] at the bottom of the page.
 ** ancmenu, ancsosa, anclist, anctree : fix bug in evar.v.
 ** ancsosa : improve the surname list, add occupations, update style.
@@ -160,7 +223,7 @@ GeneWeb version 6.04
 * Notify_key is now called each time an individual is modified AND his key has
   changed. This is basically in the Modify individual and Merge individual.
 * Added a notify_delete that works just like notify_key
-* Added a nofollow option on the link in the search page (the number of 
+* Added a nofollow option on the link in the search page (the number of
   branches and the 'o' to fold/unfold.
 * Update lex_utf8 and the particules files. The last one is now the same as
   the generated (by GeneWeb) one.
@@ -181,12 +244,12 @@ GeneWeb version 6.04
   %end;
   %i;
   OUTPUT => 42; 0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 42
-* Added an option to *not* try a getHostByName. Could slow down on windows. 
+* Added an option to *not* try a getHostByName. Could slow down on windows.
   One should add -no_host_address to gwd to use this feature.
-* New implementation of the fonction that calculate if a person has a sosa 
+* New implementation of the fonction that calculate if a person has a sosa
   number or not. Much more efficient than the previous one !
 * It is now NOT possible to add or modify a family in which the first
-  name or the surname of a person is not specify. => It can break the 
+  name or the surname of a person is not specify. => It can break the
   generation of the gw file.
 * Added a return button when there had been an error in a modification
   of a person or a family.
@@ -236,7 +299,7 @@ GeneWeb version 6.03
   max defined, then it display the "max first" results instead of "too
   many results"
 * Added a book of places (see a.gwf to specify the maximum number of
-  event that can be corrected in one pass. 
+  event that can be corrected in one pass.
   !!! Beware !!! This functionality is not completely functional when
   using gwc2. You can not edit twice the same place. If you want to
   edit more than one time one place, you have to do a consang between
@@ -254,7 +317,7 @@ GeneWeb version 6.03
 * various source code refactoring
 Ludovic Ledieu :
 * Fix the truncate name and uncaught exception : end of file in the
-  forum 
+  forum
 * Interpretation of the 'is_invisible' variable in the updhist.txt template
 * Better management of the variable 'referer' (link to welcome and
   previous page)
@@ -275,14 +338,14 @@ Mickaël Rouesné :
 GeneWeb version 6.02
 --------------------
 
-* In the population pyramid, display an image instead of &nbsp. The purpose is 
+* In the population pyramid, display an image instead of &nbsp. The purpose is
 that it can be printed now.
 * Added a patch in the calculus of the sosa until the number of person in the
 database is well managed.
 * Some esthetic changes
 * Change "href=#" by "void" because internet explorer does'nt support it (go
 to the top of the page).
-* Fix bug (in the source code, not the template) in updating a death date from 
+* Fix bug (in the source code, not the template) in updating a death date from
 OfCourseDead to Dead if there is actually a date of death.
 * Deleting the documentation (DOC ans WDOC) and the associated request.
 * Added an option to activate/deactivate the forum.
@@ -296,14 +359,14 @@ compiled out of box (I mean after svn co).
 * Add a function to delete bad characters (such as ':') in the first name and
 surname (that compose the key) and broken the links.
 * Added template of Dominique Deram and Mickaël Rouesné.
-* New implementation of the surname search function. There is now no 
+* New implementation of the surname search function. There is now no
 differences between capital letters, accent ...
 
 GeneWeb version 6.01
 --------------------
 
 For this version, you will not find a tag of GeneWeb 6.01 because I forgot it.
-Few changes since 6.00 (which was set up to start a new developpement of 
+Few changes since 6.00 (which was set up to start a new developpement of
 GeneWeb).
 * Add an option to display the day of a date.
 * Add notes/sources in the descendants list.
@@ -1509,7 +1572,7 @@ GeneWeb version 3.08
     the conflicts. Simplifies the databases merging.
   - [27 Aug 00] Fixed bug: date e.g. "between 1300 and 1350 Julian" where
     printed by gwu as 1300..1350J but gwc expected 1300J..1350 and resulted
-    in a syntax error.   
+    in a syntax error.
 
 * GeneWeb databases Transfer Program (gwtp)
   - [08 Sep 00] Added small documentation (a README file) for GeneWeb
@@ -1674,7 +1737,7 @@ GeneWeb version 3.06
   - [18 Jun 00] Fixed little problem: the (new) fast merges of persons did not
     appear in the history.
   - [17 Jun 00] In update family forms, added a button close to the "family
-    source": when selected, the "family source" text is automatically put 
+    source": when selected, the "family source" text is automatically put
     (as default value) in "family source" fields in future other family
     updates. It avoids to have to copy it each time when it is always the
     same one.
@@ -1907,7 +1970,7 @@ GeneWeb version 3.03
     having nobility titles as public ("public" means that their private data
     is displayed even if their dates is less than 150 years). Warning: the
     default of this variable is "no": it is a behavior change in GeneWeb,
-    relatively to previous versions (but don't worry: with this change, 
+    relatively to previous versions (but don't worry: with this change,
     private data is better protected).
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
@@ -1923,7 +1986,7 @@ GeneWeb version 3.03
     year", the displaying "month day year" being specific to the United
     States and not used in other English speaking countries. American
     users are invited to change the lexicon line for (date) if they
-    want an American display.    
+    want an American display.
 
 * Documentation
   - [17..25 Feb 00] Added a new chapter "Keeping data divided inside a
@@ -2220,7 +2283,7 @@ GeneWeb version 2.07
 * Documentation
   - [Sep 10, 99] Updated Swedish files (Lars Gustavsson).
   - [Sep 7, 99] Fixed some typos in the "pcustom.htm" files (English,
-    German and Swedish versions).    
+    German and Swedish versions).
 
 GeneWeb version 2.06
 --------------------
@@ -2686,7 +2749,7 @@ included.
   - [Feb 18, 99] Added deletion of photos.
   - [Feb 13, 99; Feb 20, 99] Added ability to send photos.
   - [Feb 12, 99] Improved displaying in Hebrew language.
-  - [Feb 8, 99] Fixed bug in CGI mode under Windows: images (flags e.g.) 
+  - [Feb 8, 99] Fixed bug in CGI mode under Windows: images (flags e.g.)
     were often truncated.
 
 * Gedcom to GeneWeb (ged2gwb)
@@ -2723,7 +2786,7 @@ included.
   - [Feb 18, 99] Explained how to delete photos (new feature) in file
     "update.htm", (new) section 5.7. Some more changes in "start.htm",
     section "File a.cnf" and "update.htm" section 3 and 5.6.
-  - [Feb 15, 99] Completed info for configuration files in file "start.htm", 
+  - [Feb 15, 99] Completed info for configuration files in file "start.htm",
     section "File a.cnf". Explained how to send photo (new feature) in file
     "update.htm": added section 5.6, completed section 3.
   - [Feb 11, 99..Feb 24, 99] Updated Swedish version and fixed some errors
@@ -2751,7 +2814,7 @@ GeneWeb Version 1.11
       <a href="%sp=john;n=smith">John Smith</a>
   - [Jan 11, 99] Display declined forms (for some languages). E.g.:
       * in German: "x ist ein Sohn von einem Cousin von y"
-	  ("einem" instead of the inkorrect "ein").
+    ("einem" instead of the inkorrect "ein").
       * in Esperanto: "aldoni personon"
           ("personon" instead of the incorrect "persono")
 
@@ -2844,7 +2907,7 @@ GeneWeb Version 1.10
     Stream.Failure").
 
 * GeneWeb compiler (gwc)
-  - [02/01/99] Fixed missing accents displaying for undefined persons.    
+  - [02/01/99] Fixed missing accents displaying for undefined persons.
 
 * Lexicon file (lexicon.txt)
   - [06/01/99] Fixed and completed German version (thanks to Markus Mottl).

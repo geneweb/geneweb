@@ -1,33 +1,4 @@
-# $Id: a.gwf,v 7.00 20/11/2016 06:21:10 ddr $
-#
-# Using body_prop to customize background, color is deprecated !!!
-# Please, use instead css_prop or customize default.css
-# Parameters in "<body>" (background, color, etc.)
-# Here is a palette of possibilities... test and choose one of them
-# if you want by removing the initial "#"
-# body_prop=bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900
-# body_prop=bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000
-# body_prop=bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066
-# body_prop=bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633
-# body_prop=bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300
-# body_prop=bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333
-# body_prop=bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366
-# body_prop=bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066
-# body_prop=bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300
-# body_prop=bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066
-# body_prop=bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066
-# body_prop=bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF
-# body_prop=bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99
-# body_prop=bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00
-# body_prop=bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66
-# body_prop=bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF
-# body_prop=bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66
-# body_prop=bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF
-# body_prop=bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF
-# For a background pattern, e.g. foo.jpg:
-# body_prop=background="geneweb?m=IM;v=/foo.jpg"
-#   the file foo.jpg must be in the directory "images"
-#   on CGI mode, replace 'geneweb' by the name of the CGI
+# This is the default GeneWeb base configuration file
 
 # css_prop
 # The file stylesheet.css must be in the directory "css".
@@ -35,17 +6,19 @@
 # specify it to geneweb by adding this line in your gwf.
 # More about how to customize here :
 # http://geneweb.tuxfamily.org/wiki/CSS
-css_prop=stylesheet
-
+#css_prop=your/file.css
 
 # Highlight color
 highlight_color=#2f6400
 
 # Welcome logo. The designated file should be in bases/src/mybase/images
 # Called with <img src="%prefix;m=IM;v=welcome_logo"
-#   	             style="welcome_logo_style">
+#                  style="welcome_logo_style">
 #welcome_logo=
 #welcome_logo_style=
+
+# Alternate text for the main Notes button on the Welcome page
+#base_notes_title=
 
 # Friend can see all dates
 # Choose a password or leave it empty
@@ -77,6 +50,11 @@ wizard_passwd=
 # but it his wizard page, it is displayed as “Daniel de Rauglaudre” without
 # the slash.
 wizard_passwd_file=
+
+# Alternative to wizard_passwd_file
+# If a global password is provided through wizard_passzd, then this file
+# Allows description of wizards (wizard notes button)
+#wizard_descr_file=
 
 # Manitou is a wizard who can:
 # - delete any forum message
@@ -119,7 +97,7 @@ wizard_just_friend=no
 # Default is yes
 # You may define several messages, each postfixed with the two letters code for a language
 # visitor_access=no
-# visitor_access_msg_en=Access to the base is restricted to friends.
+# visitor_access_msg_en=Access to the base is restricted to wizard and friends.
 
 # Generates pages with DOCTYPE HTML 4.01 (default XHTML 1.1)
 #doctype=html-4.01
@@ -183,10 +161,8 @@ no_note_for_visitor=yes/no
 auth_file=
 
 # Access by key, when set to "yes", generates HTML requests with
-# "n=first+name;p=surname;oc=number" instead of (shorter) "i=integer"
-# in URLs. Useful e.g. when doing a cleanup of the database (where the
-# integer access for persons may change) to let the service continue
-# correctly.
+# "n=first+name;p=surname;oc=number" instead of (shorter) "i=identifier"
+# in URLs.
 access_by_key=no
 
 # Set to no if you don't want that the search by (nobility) titles be
@@ -212,6 +188,12 @@ propose_add_family=yes
 # Set to no if you don't want the request by place/surname to be
 # proposed in the welcome page.
 propose_place_surname=yes
+
+# provide a list of names for the decomposition of places (comma separated)
+# other = ""; town = ""; township = ""; canton = ""; district = "";
+# county = ""; region = ""; country = ""
+#
+#place=autre, ville, agglomération, canton, district, conté, région, pays
 
 # Set to yes if you want that the access to surnames and first names by
 # alphabetic order be fast (interesting for very big databases). Drawback:
@@ -286,6 +268,10 @@ public_if_no_date=no
 # by places/surnames.
 places_inverted=no
 
+# If more that short_place_threshold places, revert to short display mode
+# default 500
+#short_place_threshold=
+
 # Uncomment the following definition to specify that the present database has
 # been renamed:
 #renamed=newname
@@ -329,6 +315,10 @@ places_inverted=no
 # The template to be used can be changed by adding ";templ=foo" in the URL
 #
 #template=a,*
+
+# Keep a trace of authorisations in trace_auth.txt (?? location ?)
+# Not a yes/no, but present/absent!!
+#trace_auth=yes
 
 # Customized variables.
 #
