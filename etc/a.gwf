@@ -43,9 +43,14 @@ highlight_color=#2f6400
 
 # Welcome logo. The designated file should be in bases/src/mybase/images
 # Called with <img src="%prefix;m=IM;v=welcome_logo"
-#   	             style="welcome_logo_style">
+#                  style="welcome_logo_style">
 #welcome_logo=
 #welcome_logo_style=
+
+# Aletrnate text for the main Notes button on the Welcome page
+# adding </div><div class="d-flex justify-content-center mt-2"> at the end
+# will isolate this button above the others
+#base_notes_title=
 
 # Friend can see all dates
 # Choose a password or leave it empty
@@ -77,6 +82,11 @@ wizard_passwd=
 # but it his wizard page, it is displayed as “Daniel de Rauglaudre” without
 # the slash.
 wizard_passwd_file=
+
+# Alternative to wizard_passwd_file
+# If a global password is provided through wizard_passzd, then this file
+# Allows description of wizards (wizard notes button)
+#wizard_descr_file=
 
 # Manitou is a wizard who can:
 # - delete any forum message
@@ -119,17 +129,19 @@ wizard_just_friend=no
 # Default is yes
 # You may define several messages, each postfixed with the two letters code for a language
 # visitor_access=no
-# visitor_access_msg_en=Access to the base is restricted to friends.
+# visitor_access_msg_en=Access to the base is restricted to wizard and friends.
 
 # Generates pages with DOCTYPE HTML 4.01 (default XHTML 1.1)
 #doctype=html-4.01
 
-# File recording a black list for the database forum.
+# File recording a black list for the database forum. (Format?? same as auth files?)
 #forum_exclude_file=
 
 # Number of years for private access. Dates of persons whose age < this value
 # are not displayed (except for wizards, friends and public persons).
 private_years=150
+#private_years_death=1
+#private_years_marriage=80
 
 # Hide the private persons names ("x" is displayed instead of their first
 # name or surname).
@@ -145,6 +157,9 @@ default_lang=fr
 
 # Authorization for wizards to send images (no: cannot; yes: can)
 can_send_image=yes
+
+# If set to yes, dump the content of bas image to the file bad-image (location??)
+dump_bad_images
 
 # Maximum images size in bytes (which can be accepted in "send image").
 # Default: no limit
@@ -176,6 +191,10 @@ no_image_for_visitor=no
 # Don't search notes if normal visitor (i.e. neither "wizard" nor "friend").
 # Notes = individual note or Marriage note.
 no_note_for_visitor=yes/no
+
+# A list of aliases for files containing notes (?? TODO check behaviour ??)
+# default notes.alias
+#notes_alias_file=
 
 # Global authorization file for this database (overriding the value
 # of the option "-auth" of "gwd"). This file must hold lines of the
@@ -213,6 +232,19 @@ propose_add_family=yes
 # proposed in the welcome page.
 propose_place_surname=yes
 
+# provide a list of names for the decomposition of places (comma separated)
+# other = ""; town = ""; township = ""; canton = ""; district = "";
+# county = ""; region = ""; country = ""
+#
+#place=autre, ville, agglomération, canton, district, conté, région, pays
+
+# Spécific à to the API (?? TODO document ??)
+#places_format=
+
+# Allow personnal template files (yes/no)
+# The file name will be provided as an evar argument in the url ;ptempl=filename;
+#ptempl=no
+
 # Set to yes if you want that the access to surnames and first names by
 # alphabetic order be fast (interesting for very big databases). Drawback:
 # the first page does not display the number of surnames or first names
@@ -242,6 +274,12 @@ max_cousins=2000
 
 # Maximum level of displayed cousins
 max_cousins_level=5
+
+# Manage the behaviour of the template command %has_events;
+# never -> returns false
+# always -> returns true 
+# _ -> returns true if there are events beyond birth, baptism, marriage, death, burial
+#has_events
 
 # Number of latest events (birth, death) displayed
 latest_event=20
@@ -280,11 +318,23 @@ public_if_titles=no
 # "yes" = consider; "no" = don't consider
 public_if_no_date=no
 
+# Governs the behaviour of the person_exist function
+# off -> true
+# _ ->
+#       match person_of_key base fn sn oc with
+#         Some ip -> authorized_age conf base (pget conf base ip)
+#       | None -> false
+#red_if_not_exist=off/on
+
 # Tell that in this database the order of places are registered inverted
 # (being more general to less general), e.g. "USA, New York" instead of
 # "New-York, USA". Set it to "yes" if it is the case. Important for display
 # by places/surnames.
 places_inverted=no
+
+# If more that short_place_threshold places, revert to short display mode
+# default 500
+#short_place_threshold=
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:
@@ -297,6 +347,9 @@ places_inverted=no
 # Uncomment the following definition to specify that the present database has
 # been moved to another site:
 #moved=http://new.address.com/and-so-on/
+
+# Allows more that two parents (uncharted)
+#multi_parents=
 
 # Templates.
 #
@@ -329,6 +382,10 @@ places_inverted=no
 # The template to be used can be changed by adding ";templ=foo" in the URL
 #
 #template=a,*
+
+# Keep a trace of authorisations in trace_auth.txt (?? location ?)
+# Not a yes/no, but present/absent!!
+#trace_auth=yes
 
 # Customized variables.
 #
