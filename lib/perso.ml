@@ -3327,7 +3327,12 @@ and eval_date_field_var conf d =
           end
       | _ -> VVstring ""
       end
-  | [] -> VVstring (DateDisplay.string_of_date_sep conf "&#010;  " d)
+  | [] ->
+    let s =
+      let conf = {conf with cancel_links = true} in
+      DateDisplay.string_of_date_aux conf ~sep:"&#010;  " d
+    in
+    VVstring s
   | _ -> raise Not_found
 and _eval_place_field_var conf place =
   function
