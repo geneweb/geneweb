@@ -184,11 +184,6 @@ distrib: exe
 	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp -R hd/* $(DISTRIB_DIR)/gw/
-	$(RM) $(DISTRIB_DIR)/exe-version.txt
-	echo "Commit: `git log  -1 | grep commit | cut -c8-15`, `date`"      > $(DISTRIB_DIR)/commit.txt
-	echo "`ocaml  -version`"      >> $(DISTRIB_DIR)/commit.txt
-	echo "`camlp5 -v 2>&1`"       >> $(DISTRIB_DIR)/commit.txt
-	echo "-----"                  >> $(DISTRIB_DIR)/commit.txt
 
 .PHONY: install uninstall distrib
 

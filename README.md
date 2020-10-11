@@ -60,7 +60,6 @@ drwxr-xr-x  44 Henri  staff    1408 10 jul 16:14 ..
 -rw-r--r--   1 Henri  staff     950 10 jul 08:34 README.txt
 -rw-r--r--   1 Henri  staff   10780 10 jul 08:34 START.htm
 drwxr-xr-x   2 Henri  staff      64 10 jul 08:34 bases
--rw-r--r--   1 Henri  staff     124 10 jul 08:34 commit.txt
 -rwxr-xr-x   1 Henri  staff    1632 10 jul 08:34 geneweb.command
 drwxr-xr-x  21 Henri  staff     672 10 jul 08:34 gw
 -rwxr-xr-x   1 Henri  staff      67 10 jul 08:34 gwd.command

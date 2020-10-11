@@ -60,7 +60,7 @@
 </div>
 </div>
   <div class="btn-group float-right mt-5 mr-5">
-    <span class="align-self-center">%version; %compilation_time;%sp;
+    <span class="align-self-center">GeneWeb v. %version;%sp;
     &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017 %connections; %sq;</span>
     <a href="https://github.com/geneweb/geneweb" class="ml-1" target="_blank" title="GeneWeb sources on GitHub">
     <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
