@@ -10688,6 +10688,7 @@ co: u
 en: on
 et: :i:
 fi: :e:
+fr: le
 oc: lo
 pl: w :a:
 pt: em
