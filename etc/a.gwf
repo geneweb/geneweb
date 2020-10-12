@@ -47,9 +47,7 @@ highlight_color=#2f6400
 #welcome_logo=
 #welcome_logo_style=
 
-# Aletrnate text for the main Notes button on the Welcome page
-# adding </div><div class="d-flex justify-content-center mt-2"> at the end
-# will isolate this button above the others
+# Alternate text for the main Notes button on the Welcome page
 #base_notes_title=
 
 # Friend can see all dates
@@ -140,8 +138,8 @@ wizard_just_friend=no
 # Number of years for private access. Dates of persons whose age < this value
 # are not displayed (except for wizards, friends and public persons).
 private_years=150
-#private_years_death=1
-#private_years_marriage=80
+#private_years_death=1 (not yet implemented)
+#private_years_marriage=80 (not yet implemented)
 
 # Hide the private persons names ("x" is displayed instead of their first
 # name or surname).
@@ -157,9 +155,6 @@ default_lang=fr
 
 # Authorization for wizards to send images (no: cannot; yes: can)
 can_send_image=yes
-
-# If set to yes, dump the content of bas image to the file bad-image (location??)
-dump_bad_images
 
 # Maximum images size in bytes (which can be accepted in "send image").
 # Default: no limit
@@ -238,9 +233,6 @@ propose_place_surname=yes
 #
 #place=autre, ville, agglomération, canton, district, conté, région, pays
 
-# Spécific à to the API (?? TODO document ??)
-#places_format=
-
 # Allow personnal template files (yes/no)
 # The file name will be provided as an evar argument in the url ;ptempl=filename;
 #ptempl=no
@@ -317,14 +309,6 @@ public_if_titles=no
 # public (except if their access is explicitly set to "private");
 # "yes" = consider; "no" = don't consider
 public_if_no_date=no
-
-# Governs the behaviour of the person_exist function
-# off -> true
-# _ ->
-#       match person_of_key base fn sn oc with
-#         Some ip -> authorized_age conf base (pget conf base ip)
-#       | None -> false
-#red_if_not_exist=off/on
 
 # Tell that in this database the order of places are registered inverted
 # (being more general to less general), e.g. "USA, New York" instead of

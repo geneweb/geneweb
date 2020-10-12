@@ -1,4 +1,4 @@
-GeneWeb version 7.00
+GeneWeb version 7.0.0
 --------------------
 
 This changelog note tries to reconstruct changes in GeneWeb since version 6.08.
@@ -21,17 +21,17 @@ It may miss some details which might be added later if relevants.
 - Archival format: the archival (gw) format has been upgraded to gwplus. gwc v7 reads
   old .gw files, and gwu v7 can write old format files when launched with the parameter -old_gw.
 
-- Events are now a first class citizen in GeneWeb (personal events and family events).
+- Events are now first class citizens in GeneWeb (personal events and family events).
   Events attributes are name, date, place, source and note. Witnesses can be attached to events.
   The current implementation results in redundant data in the .gw file as birth, baptism, marriage,
-  death and burial are both reported in the traditional way (part of the peron or family record) 
+  death and burial are both reported in the traditional way (part of the person or family record) 
   and as personal or family events. (to be fixed in a later version).
   A specific .gwf variable (has_events) and a template command (%has_events;) allows to test for
   events beyond birth, baptism, mariage, death and burial (see a.gwf for details).
 
 - History: bug fixes
 
-- GUI: the look ot GeneWeb's interface has been revamped with a modern tool: html 5 and Bootstrap,
+- GUI: the look of GeneWeb's interface has been revamped with a modern tool: html 5 and Bootstrap,
   resulting in a better compatibility between screen formats (PC, tablet, phone).
   Icons are display as font elements rather than images.
 
