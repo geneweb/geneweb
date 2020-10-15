@@ -118,47 +118,19 @@ let specify conf base n pl =
        Perso.print_sosa conf base p true;
        begin match tl with
            [] ->
-           Output.printf conf "\n%s" (referenced_person_title_text conf base p)
+           Output.printf conf "\n%s" (referenced_person_title_text_2
+              ~show_occ:true ~specify_public_name:false conf base p)
          | t :: _ ->
            Output.printf conf "<a href=\"%s%s\">\n" (commd conf)
              (acces conf base p);
-           Output.print_string conf (titled_person_text conf base p t);
+           Output.print_string conf (titled_person_text
+              ~show_occ:true ~specify_public_name:false conf base p t);
            Output.print_string conf "</a>\n";
            List.iter
              (fun t -> Output.print_string conf (one_title_text base t)) tl
        end;
        Output.print_string conf (DateDisplay.short_dates_text conf base p);
-       if authorized_age conf base p then
-         begin match get_first_names_aliases p with
-             [] -> ()
-           | fnal ->
-             Output.print_string conf "\n<em>(";
-             Mutil.list_iter_first
-               (fun first fna ->
-                  if not first then Output.print_string conf ", ";
-                  Output.print_string conf (sou base fna))
-               fnal;
-             Output.print_string conf ")</em>"
-         end;
-       begin let spouses =
-               Array.fold_right
-                 (fun ifam spouses ->
-                    let cpl = foi base ifam in
-                    let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-                    if p_surname base spouse <> "?" then spouse :: spouses
-                    else spouses)
-                 (get_family p) []
-         in
-         match spouses with
-           [] -> ()
-         | h :: hl ->
-           let s =
-             List.fold_left
-               (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
-               (person_title_text conf base h) hl
-           in
-           Output.printf conf ", <em>&amp; %s</em>\n" s
-       end;
+       Util.specify_homonymous conf base p false;
        Output.print_string conf "</li>\n")
     ptll;
   Output.print_string conf "</ul>\n";

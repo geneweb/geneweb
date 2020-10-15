@@ -9225,6 +9225,10 @@ ru: свидетельство о браке
 sv: källa för Giftermål
 tr: Evlilik kaynağı
 
+    marriages with
+en: retations or marriages with
+fr: relations ou mariages avec
+
     marriage with
 co: unione cù
 de: Eheschließung mit

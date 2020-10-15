@@ -142,7 +142,8 @@ val raw_access : p_access
     - his qualifiers
   If person is hiden returns ".....". If person's names are hiden
   or access to them is denied returns "x x" *)
-val gen_person_text : p_access -> config -> base -> person -> string
+val gen_person_text : ?show_occ:bool -> ?specify_public_name:bool ->
+    p_access -> config -> base -> person -> string
 
 (** Same as [gen_person_text] but doesn't encapsulates description in HTML
     tag <em>. *)
@@ -157,8 +158,8 @@ val gen_person_text_without_title :
     of person that describes person's first name surname and main title. [reference]
     is used to either encapsulate structure in the link (or other type
     of maniplations). *)
-val gen_person_title_text :
-  (config -> base -> person -> string -> string) -> p_access -> config ->
+val gen_person_title_text : ?show_occ:bool -> ?specify_public_name:bool ->
+    (config -> base -> person -> string -> string) -> p_access -> config ->
     base -> person -> string
 
 (** Makes call to [gen_person_text] with [std_access] *)
@@ -185,9 +186,9 @@ val main_title : config -> base -> person -> title option
 
 (** Returns person's first name and surname text description depending on
     person's title *)
-val titled_person_text : config -> base -> person -> title -> string
+val titled_person_text : ?show_occ:bool -> ?specify_public_name:bool ->
+    config -> base -> person -> title -> string
 
-(** Returns HTML representation of title's identifier with its place (if exists) *)
 val one_title_text : base -> title -> string
 
 (** Returns HTML structure of person that describes person's first name surname
@@ -216,8 +217,9 @@ val no_reference : config -> base -> person -> string -> string
 (** Retruns HTML link to the person that contains its first name, surname and person's
     nobility title. Calls [gen_person_title_text] with [reference]. *)
 val referenced_person_title_text : config -> base -> person -> string
+val referenced_person_title_text_2 : ?show_occ:bool -> ?specify_public_name:bool ->
+    config -> base -> person -> string
 
-(** Returns HTML link to the person that contains its first name and surname. *)
 val referenced_person_text : config -> base -> person -> string
 
 (** Returns HTML link to the person that contains its first name. *)
