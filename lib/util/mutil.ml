@@ -438,7 +438,10 @@ let rec list_compare cmp l1 l2 =
   | [], _ -> -1
   | _, [] -> 1
 
-let executable_magic = Digest.file Sys.executable_name
+let executable_magic =
+  match Sys.getenv_opt "GW_EXECUTABLE_MAGIC" with
+  | Some x -> x
+  | None -> Digest.file Sys.executable_name
 
 let check_magic magic ic =
   let len = String.length magic in
