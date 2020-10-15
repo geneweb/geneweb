@@ -8677,6 +8677,10 @@ pt: fonte casamento
 ru: свидетельство о браке
 sv: Giftermål
 
+    marriages with
+en: retations or marriages with
+fr: relations ou mariages avec
+
     marriage with
 co: unione cù
 de: Eheschließung mit
