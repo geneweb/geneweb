@@ -15240,6 +15240,10 @@ sk: s :i:
 sl: z
 sv: med
 
+    %twith
+en: %t with
+fr: %t avec
+
     with root, spouses and unknowns
 co: cù l’antenatu di a radica, i cumpagni è i scunnisciuti
 en: with root ancestor, spouses and unknowns

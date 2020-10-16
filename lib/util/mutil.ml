@@ -124,6 +124,42 @@ let initial n =
   in
   loop 0
 
+let is_space = function
+  | ' ' | '\012' | '\n' | '\r' | '\t' -> true
+  | _ -> false
+
+let trim_leading s =
+  let len = String.length s in
+  let i = ref 0 in
+  while !i < len && is_space (String.unsafe_get s !i) do incr i done ;
+  if !i = 0 then s
+  else if !i < len then String.sub s !i (len - !i)
+  else ""
+
+let trim_trailing s =
+  let len = String.length s in
+  let j = ref (len - 1) in
+  while !j >= 0 && is_space (String.unsafe_get s !j) do decr j done ;
+  if !j = len - 1 then s
+  else if !j >= 0 then String.sub s 0 (!j + 1)
+  else ""
+
+let trim_leading_and_trailing s =
+  let len = String.length s in
+  let i = ref 0 in
+  while !i < len && is_space (String.unsafe_get s !i) do incr i done ;
+  let s =
+    if !i = 0 then s
+    else if !i < len then String.sub s !i (len - !i)
+    else ""
+  in
+  let len = String.length s in
+  let j = ref (len - 1) in
+  while !j >= 0 && is_space (String.unsafe_get s !j) do decr j done ;
+  if !j = len - 1 then s
+  else if !j >= 0 then String.sub s 0 (!j + 1)
+  else ""
+
 let name_key s =
   let i = initial s in
   let s =

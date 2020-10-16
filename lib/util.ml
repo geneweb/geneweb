@@ -2003,7 +2003,7 @@ let relation_txt conf sex fam =
   | Residence ->
     ftransl_nth conf "residence%t to" is
   | NoMention ->
-    "%t" ^^ ftransl conf "with"
+    ftransl conf "%twith"
 
 let relation_date conf fam =
   match Adef.od_of_cdate (get_marriage fam) with

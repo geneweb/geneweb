@@ -79,6 +79,27 @@ let mutil_string_of_int_sep _ =
   test "," "100,000" 100000 ;
   test "," "1,000,000" 1000000
 
+let trim_leading _ =
+  let test out str =
+    assert_equal out ~printer:(fun s -> s) (Mutil.trim_leading str)
+  in
+  test "abcd" " abcd"
+; test "abcd" "  abcd"
+
+let trim_trailing _ =
+  let test out str =
+    assert_equal out ~printer:(fun s -> s) (Mutil.trim_trailing str)
+  in
+  test "abce" "abce "
+; test "abce" "abce  "
+
+let trim_leading_and_trailing _ =
+  let test out str =
+    assert_equal out ~printer:(fun s -> s) (Mutil.trim_leading_and_trailing str)
+  in
+  test "abcf" " abcf "
+; test "abcf" "  abcf  "
+
 let utf8_sub _ =
   let test ?pad e s i j =
     let i = Utf8.get s i in
@@ -164,6 +185,9 @@ let suite =
     ; "mutil_arabian_romian" >:: mutil_arabian_romian
     ; "mutil_compare_after_particle" >:: mutil_compare_after_particle
     ; "mutil_string_of_int_sep" >:: mutil_string_of_int_sep
+    ; "trim_leading" >:: trim_leading
+    ; "trim_trailing" >:: trim_trailing
+    ; "trim_leading_and_trailing" >:: trim_leading_and_trailing
     ]
   ; "Utf8" >:::
     [ "utf8_sub" >:: utf8_sub
