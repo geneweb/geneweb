@@ -2082,19 +2082,29 @@ let child_of_parent conf base p =
     [Rem]    : Exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 let husband_wife conf base p all =
-  let relation =
-    let rec loop i =
+  let multiple =
+    let rec loop i kind =
       if i < Array.length (get_family p) then
         let fam = foi base (get_family p).(i) in
+        let cur_type = get_relation fam in
+        if i = 0 then loop (i + 1) cur_type
+        else if cur_type = kind then loop (i + 1) kind
+        else -1
+      else i
+    in
+    loop 0 NoMention
+  in
+  let relation =
+    if Array.length (get_family p) > 0 then
+      if multiple >= 0 then
+        let fam = foi base (get_family p).(0) in
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint
-        then
+        if not @@ is_empty_name conjoint then
           translate_eval (Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> ""))
-        else loop (i + 1)
-      else ""
-    in
-    loop 0
+        else ""
+      else transl conf "marriages with"
+    else ""
   in
   let res =
     let rec loop i res =
