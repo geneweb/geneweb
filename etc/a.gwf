@@ -233,10 +233,6 @@ propose_place_surname=yes
 #
 #place=autre, ville, agglomération, canton, district, conté, région, pays
 
-# Allow personnal template files (yes/no)
-# The file name will be provided as an evar argument in the url ;ptempl=filename;
-#ptempl=no
-
 # Set to yes if you want that the access to surnames and first names by
 # alphabetic order be fast (interesting for very big databases). Drawback:
 # the first page does not display the number of surnames or first names
@@ -266,12 +262,6 @@ max_cousins=2000
 
 # Maximum level of displayed cousins
 max_cousins_level=5
-
-# Manage the behaviour of the template command %has_events;
-# never -> returns false
-# always -> returns true 
-# _ -> returns true if there are events beyond birth, baptism, marriage, death, burial
-#has_events
 
 # Number of latest events (birth, death) displayed
 latest_event=20
@@ -331,9 +321,6 @@ places_inverted=no
 # Uncomment the following definition to specify that the present database has
 # been moved to another site:
 #moved=http://new.address.com/and-so-on/
-
-# Allows more that two parents (uncharted)
-#multi_parents=
 
 # Templates.
 #
