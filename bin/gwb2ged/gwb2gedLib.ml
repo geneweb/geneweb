@@ -609,7 +609,7 @@ let is_primary_fevents =
     true
   | _ -> false
 
-let ged_fevent opts base oc ifam fam_sel evt =
+let ged_fevent opts base oc per_sel evt =
   let typ =
     if is_primary_fevents evt.efam_name
     then
@@ -627,7 +627,7 @@ let ged_fevent opts base oc ifam fam_sel evt =
   let src = sou base evt.efam_src in
   ged_ev_detail opts oc 2 typ date place note src;
   Array.iter begin fun (ip, wk) ->
-    if fam_sel ifam then
+    if per_sel ip then
       begin
         Printf.fprintf oc "2 ASSO @I%d@\n" (int_of_iper ip + 1);
         Printf.fprintf oc "3 TYPE INDI\n";
@@ -681,7 +681,7 @@ let ged_ind_record with_indexes opts base (per_sel, fam_sel as sel) oc i =
 let ged_fam_record opts base (per_sel, fam_sel) oc ifam =
   let fam = foi base ifam in
   Printf.fprintf oc "0 @F%d@ FAM\n" (int_of_ifam ifam + 1);
-  List.iter (ged_fevent opts base oc ifam fam_sel) (get_fevents fam);
+  List.iter (ged_fevent opts base oc per_sel) (get_fevents fam);
   if per_sel (get_father fam)
   && has_personal_infos base (poi base (get_father fam))
   then Printf.fprintf oc "1 HUSB @I%d@\n" (int_of_iper (get_father fam) + 1);
