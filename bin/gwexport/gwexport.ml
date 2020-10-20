@@ -17,6 +17,7 @@ type gwexport_opts =
   ; no_picture : bool
   ; oc : string * out_channel
   ; picture_path : bool
+  ; source : string option
   ; surnames : string list
   ; verbose : bool
   }
@@ -35,6 +36,7 @@ let opts =
       ; no_picture = false
       ; oc = ("", stderr)
       ; picture_path = false
+      ; source = None
       ; surnames = []
       ; verbose = false
       }
@@ -94,6 +96,8 @@ let speclist =
     , " extract pictures path" )
   ; ( "-s", Arg.String (fun x -> c := { !c with surnames = x :: !c.surnames })
     , "<sn> select this surname (option usable several times)" )
+  ; ( "-source", Arg.String (fun x -> c := { !c with source = Some x })
+    , "<src> replace individuals and families sources. Also delete event sources." )
   ; ( "-v", Arg.Unit (fun () -> c := { !c with verbose = true })
     , " verbose" )
   ]
