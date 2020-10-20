@@ -307,8 +307,8 @@ let ged_ev_detail opts oc n typ d pl note src =
   end;
   if pl <> "" then Printf.fprintf oc "%d PLAC %s\n" n (encode opts pl);
   if note <> "" then display_note opts oc n note;
-  if src <> "" then Printf.fprintf oc "%d SOUR %s\n" n (encode opts src)
-
+  if opts.Gwexport.source = None && src <> ""
+  then Printf.fprintf oc "%d SOUR %s\n" n (encode opts src)
 
 let ged_tag_pevent base evt =
   match evt.epers_name with
@@ -529,9 +529,12 @@ let ged_asso base (per_sel, fam_sel) oc per =
     (get_related per)
 
 let ged_psource opts base oc per =
-  match sou base (get_psources per) with
-  | "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" (encode opts s)
+  match opts.Gwexport.source with
+  | Some s -> Printf.fprintf oc "1 SOUR %s\n" (encode opts s)
+  | None ->
+    match sou base (get_psources per) with
+    | "" -> ()
+    | s -> Printf.fprintf oc "1 SOUR %s\n" (encode opts s)
 
 let has_image_file opts base p =
   let s = Util.default_image_name base p in
@@ -642,9 +645,12 @@ let ged_child per_sel oc chil =
   if per_sel chil then Printf.fprintf oc "1 CHIL @I%d@\n" (int_of_iper chil + 1)
 
 let ged_fsource opts base oc fam =
-  match sou base (get_fsources fam) with
-  | "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" (encode opts s)
+  match opts.Gwexport.source with
+  | Some s -> Printf.fprintf oc "1 SOUR %s\n" (encode opts s)
+  | None ->
+    match sou base (get_fsources fam) with
+    | "" -> ()
+    | s -> Printf.fprintf oc "1 SOUR %s\n" (encode opts s)
 
 let ged_comment opts base oc fam =
   match sou base (get_comment fam) with
