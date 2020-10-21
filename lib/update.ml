@@ -817,12 +817,29 @@ let error_digest conf =
 let digest_person p = Iovalue.digest p
 let digest_family (fam, cpl, des) = Iovalue.digest (fam, cpl, des)
 
+let get_event var env =
+  let var2 = match var with
+    | "birth" -> "%23birt"
+    | "bapt" -> "%23bapt"
+    | "death" -> "%23deat"
+    | "burial" -> "%23buri"
+    | "cremated" -> "%23crem"
+    | _ -> ""
+  in
+  if var2 = "" then var
+  else
+    let (e_name, _) = try List.find (fun (_k, v) -> v = var2) env with Not_found -> ("", var2) in
+    if e_name = "" then var
+    else let i = String.sub e_name 6 (String.length e_name - 6) in "e_date" ^ i
+
 let get var key env =
+  let var = get_event var env in
   match p_getenv env (var ^ "_" ^ key) with
     Some v -> v
   | None -> failwith (var ^ "_" ^ key ^ " unbound")
 
 let get_number var key env =
+  let var = get_event var env in
   match p_getint env (var ^ "_" ^ key) with
   | Some x when x <> 0 -> Some x
   | _ -> None
@@ -978,7 +995,8 @@ let reconstitute_date_dmy conf var =
   d, force_f_cal
 
 let check_greg_day conf d =
-  if d.day > Date.nb_days_in_month d.month d.year then bad_date conf d
+  if d.day > Date.nb_days_in_month d.month d.year ||
+    Date.compare_dmy d conf.today > 0 then bad_date conf d
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
