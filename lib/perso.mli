@@ -11,13 +11,14 @@ type generation_person =
   | GP_missing of Sosa.t * iper
 
 val string_of_marriage_text : config -> base -> family -> string
-val interp_templ : string -> config -> base -> person -> unit
+
+val interp_templ : ?no_headers:bool -> string -> config -> base -> person -> unit
 val interp_templ_with_menu :
   (bool -> unit) -> string -> config -> base -> person -> unit
 val interp_notempl_with_menu :
   (bool -> unit) -> string -> config -> base -> person -> unit
 
-val print : config -> base -> person -> unit
+val print : ?no_headers:bool -> config -> base -> person -> unit
 val print_ascend : config -> base -> person -> unit
 val print_what_links : config -> base -> person -> unit
 

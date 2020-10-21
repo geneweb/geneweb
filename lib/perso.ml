@@ -5761,7 +5761,7 @@ let eval_predefined_apply conf env f vl =
         ["<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>"]
   | _ -> raise Not_found
 
-let gen_interp_templ menu title templ_fname conf base p =
+let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = p, authorized_age conf base p in
   let emal =
@@ -5848,7 +5848,16 @@ let gen_interp_templ menu title templ_fname conf base p =
      ("nldb", Vlazy (Lazy.from_fun nldb));
      ("all_gp", Vlazy (Lazy.from_fun all_gp))]
   in
-  if menu then
+  if no_headers
+  then
+      Hutil.interp_no_header conf templ_fname
+        {Templ.eval_var = eval_var conf base;
+         Templ.eval_transl = eval_transl conf base;
+         Templ.eval_predefined_apply = eval_predefined_apply conf;
+         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+         Templ.print_foreach = print_foreach conf base}
+        env ep
+  else if menu then
     let size =
       match Util.open_templ conf templ_fname with
         Some ic ->
@@ -5874,7 +5883,7 @@ let gen_interp_templ menu title templ_fname conf base p =
        Templ.print_foreach = print_foreach conf base}
       env ep
 
-let interp_templ = gen_interp_templ false (fun _ -> ())
+let interp_templ ?no_headers = gen_interp_templ ?no_headers false (fun _ -> ())
 let interp_templ_with_menu = gen_interp_templ true
 let interp_notempl_with_menu title templ_fname conf base p =
   (* On envoie le header car on n'est pas dans un template (exple: merge). *)
@@ -5883,23 +5892,23 @@ let interp_notempl_with_menu title templ_fname conf base p =
 
 (* Main *)
 
-let print conf base p =
+let print ?no_headers conf base p =
   let passwd =
     if conf.wizard || conf.friend then None
     else
       let src =
         match get_parents p with
-          Some ifam -> sou base (get_origin_file (foi base ifam))
+        | Some ifam -> sou base (get_origin_file (foi base ifam))
         | None -> ""
       in
       try Some (src, List.assoc ("passwd_" ^ src) conf.base_env) with
         Not_found -> None
   in
   match passwd with
-    Some (src, passwd)
+  | Some (src, passwd)
     when is_that_user_and_password conf.auth_scheme "" passwd = false ->
-      Util.unauthorized conf src
-  | _ -> interp_templ "perso" conf base p
+    Util.unauthorized conf src
+  | _ -> interp_templ ?no_headers "perso" conf base p
 
 let limit_by_tree conf =
   match p_getint conf.base_env "max_anc_tree" with
