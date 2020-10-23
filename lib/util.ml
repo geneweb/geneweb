@@ -1247,6 +1247,10 @@ let open_etc_file fname =
   try Some (Secure.open_in fname1, fname1) with
     Sys_error _ -> try Some (Secure.open_in fname2, fname2) with Sys_error _ -> None
 
+let open_etc_file_full conf fname =
+  let fname = etc_file_name conf fname in
+  try Some (Secure.open_in fname, fname) with Sys_error _ -> None
+
 let open_hed_trl conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
     Sys_error _ -> None
@@ -1264,7 +1268,10 @@ let open_templ_fname conf fname =
 let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
 let include_template conf env fname failure =
-  match open_etc_file fname with
+  match
+   (if conf.templ_perso then open_etc_file_full conf fname
+   else open_etc_file fname)
+  with
   | Some (ic, fname) ->
     if conf.trace_templ then Wserver.printf "\n<!-- begin include %s -->\n" fname;
     copy_from_templ conf env ic;
