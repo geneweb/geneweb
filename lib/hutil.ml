@@ -57,10 +57,7 @@ let header_without_http conf title =
   Wserver.printf "  <meta name=\"viewport\" content=\"width=device-width, \
                     initial-scale=1, shrink-to-fit=no\">\n";
   Util.include_template conf [] "css" (fun () -> ());
-  begin match Util.open_templ conf "hed" with
-    Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-  end;
+  Templ.include_hed_trl conf "hed";
   Wserver.printf "\n</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
@@ -110,10 +107,7 @@ let rheader conf title =
 
 let gen_trailer with_logo conf =
   let conf = {conf with is_printed_by_template = false} in
-  begin match Util.open_templ conf "trl" with
-    Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-  end;
+  Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
