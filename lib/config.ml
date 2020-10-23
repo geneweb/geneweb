@@ -35,6 +35,7 @@ type config =
     wizard : bool;
     is_printed_by_template : bool;
     trace_templ : bool;
+    templ_perso : bool;
     friend : bool;
     just_friend_wizard : bool;
     user : string;
@@ -107,6 +108,7 @@ let empty =
 #endif
   ; is_printed_by_template = false
   ; trace_templ = false
+  ; templ_perso = false
   ; friend = false
   ; just_friend_wizard = false
   ; user = ""
