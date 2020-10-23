@@ -26,8 +26,6 @@ It may miss some details which might be added later if relevants.
   The current implementation results in redundant data in the .gw file as birth, baptism, marriage,
   death and burial are both reported in the traditional way (part of the person or family record)
   and as personal or family events.
-  A specific .gwf variable (has_events) and a template command (%has_events;) allows to test for
-  events beyond birth, baptism, mariage, death and burial (see a.gwf for details).
 
 - History: bug fixes
 
