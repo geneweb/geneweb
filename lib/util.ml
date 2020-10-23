@@ -1239,13 +1239,11 @@ let etc_file_name conf fname =
   | s -> s
 
 let open_etc_file fname =
-  let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
-  let fname2 =
+  let fname =
     search_in_lang_path
       (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
   in
-  try Some (Secure.open_in fname1, fname1) with
-    Sys_error _ -> try Some (Secure.open_in fname2, fname2) with Sys_error _ -> None
+  try Some (Secure.open_in fname, fname) with Sys_error _ -> None
 
 let open_etc_file_full conf fname =
   let fname = etc_file_name conf fname in
