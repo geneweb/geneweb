@@ -49,6 +49,8 @@ It may miss some details which might be added later if relevants.
 - Advanced search: the advanced search page, and the underlying search mechanisms have
   been updated for generality and efficiency. This is an ongoing effort.
 
+- Notes safety: enhanced mechanism to prevent introduction of malicious code in notes.
+
 - Gwsetup: updated to include more options and more tools (connex, gwdiff, gwfixbase)
 
 - gwd: new launch parameters
