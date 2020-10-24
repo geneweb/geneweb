@@ -333,6 +333,7 @@ let rev_input_line ic pos (rbuff, rpos) =
       else
         match rev_input_char ic (rbuff, rpos) pos with
           '\n' -> buff_get_rev len, pos
+        | '\r' -> buff_get_rev len, (pos - 1)
         | c -> loop (Buff.store len c) (pos - 1)
     in
     loop 0 (pos - 1)
