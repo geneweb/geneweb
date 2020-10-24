@@ -733,10 +733,11 @@ let restricted_txt = "....."
 
 
 (* ************************************************************************** *)
-(*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
+(*  [Fonc] gen_person_text : ?(bool ->) fun -> fun -> config -> base -> person -> string *)
 (** [Description] : Renvoie le prénom et nom d'un individu en fonction
                     de son nom public et sobriquet.
     [Args] :
+      - occ : if true add .occ to first_name 
       - p_first_name : renvoie le prénom d'un individu (string)
       - p_surname    : renvoie le nom d'un individu (string)
       - conf : configuration de la base
@@ -745,14 +746,16 @@ let restricted_txt = "....."
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-let gen_person_text (p_first_name, p_surname) conf base p =
+let gen_person_text ?(occ=false) (p_first_name, p_surname) conf base p =
+  let occ = if occ then "" else "." ^ (string_of_int (get_occ p)) in
+  let occ = if get_occ p < 10 then occ ^ " " else occ in
   if is_hidden p then restricted_txt
   else if is_hide_names conf p && not (authorized_age conf base p) then "x x"
   else
     let beg =
       match sou base (get_public_name p), get_qualifiers p with
-        "", nn :: _ -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-      | "", [] -> p_first_name base p
+        "", nn :: _ -> p_first_name base p ^ occ ^ " <em>" ^ sou base nn ^ "</em>"
+      | "", [] -> p_first_name base p ^ occ
       | n, nn :: _ -> n ^ " <em>" ^ sou base nn ^ "</em>"
       | n, [] -> n
     in
@@ -857,14 +860,15 @@ let main_title conf base p =
 (** [Description] : Renvoie la chaîne de caractère de la personne en
                     fonction de son titre.
     [Args] :
+      - occ  : pass to gen_person_text (add .occ to first_name)
       - conf : configuration de la base
       - base : base de donnée
       - p    : person
       - t    : gen_title
     [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                        *)
+    [Rem] : exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
-let titled_person_text conf base p t =
+let titled_person_text ?(occ=false) conf base p t =
   if p_getenv conf.base_env "print_advanced_title" = Some "yes" then
     let estate = sou base t.t_place in
     let surname = p_surname base p in
@@ -899,7 +903,7 @@ let titled_person_text conf base p t =
           | nn :: _ -> s ^ " <em>" ^ sou base nn ^ "</em>"
           end
       | _ -> person_text conf base p
-  else person_text conf base p
+  else gen_person_text ~occ std_access conf base p
 
 
 (* *********************************************************************** *)

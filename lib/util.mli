@@ -74,7 +74,7 @@ val raw_access : p_access
 (*   - son/ses titre de noblesse                                        *)
 (*   - son/ses nom public                                               *)
 (*   - son/ses sobriquets ...                                           *)
-val gen_person_text : p_access -> config -> base -> person -> string
+val gen_person_text : ?occ:bool -> p_access -> config -> base -> person -> string
 val gen_person_text_no_html : p_access -> config -> base -> person -> string
 val gen_person_text_without_title :
   p_access -> config -> base -> person -> string
@@ -87,7 +87,7 @@ val person_text_without_surname : config -> base -> person -> string
 val person_text_no_surn_no_acc_chk : config -> base -> person -> string
 val person_text_without_title : config -> base -> person -> string
 val main_title : config -> base -> person -> title option
-val titled_person_text : config -> base -> person -> title -> string
+val titled_person_text : ?occ:bool -> config -> base -> person -> title -> string
 val one_title_text : base -> title -> string
 val person_title_text : config -> base -> person -> string
 val person_title : config -> base -> person -> string

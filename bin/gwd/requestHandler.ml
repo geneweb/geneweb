@@ -232,12 +232,11 @@ let specify conf base n pl =
          | t :: _ ->
            Wserver.printf "<a href=\"%s%s\">\n" (commd conf)
              (acces conf base p);
-           Wserver.print_string (titled_person_text conf base p t);
+           Wserver.print_string (titled_person_text ~occ:true conf base p t);
            Wserver.printf "</a>\n";
            List.iter
              (fun t -> Wserver.print_string (one_title_text base t)) tl
        end;
-       Wserver.print_string (Printf.sprintf " [%d]" (get_occ p));
        Wserver.print_string (DateDisplay.short_dates_text conf base p);
        Util.specify_homonymous conf base p true;
        if authorized_age conf base p then
