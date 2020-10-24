@@ -341,6 +341,8 @@ let output base =
     end;
   Mutil.rm (Filename.concat bname "patches");
   Mutil.rm (Filename.concat bname "patches~");
+  Mutil.rm (Filename.concat bname "synchro_patches");
+  Mutil.rm (Filename.concat bname "notes_link");
   Mutil.rm (Filename.concat bname "restrict") ;
   Mutil.rm (Filename.concat bname "tstab_visitor");
   Mutil.rm (Filename.concat bname "nb_persons");
