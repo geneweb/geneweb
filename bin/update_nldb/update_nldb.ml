@@ -82,7 +82,7 @@ let compute base bdir =
       flush stderr
     with Sys_error _ -> ()
   end;
-  let db = ref (read_nldb base) in
+  let db = ref [] in
   Printf.eprintf "--- misc notes\n";
   flush stderr;
   let ndir = Filename.concat bdir (base_notes_dir base) in
