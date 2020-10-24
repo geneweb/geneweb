@@ -746,18 +746,18 @@ let restricted_txt = "....."
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-let gen_person_text ?(occ=false) (p_first_name, p_surname) conf base p =
-  let occ = if occ then "" else "." ^ (string_of_int (get_occ p)) in
-  let occ = if get_occ p < 10 then occ ^ " " else occ in
+let gen_person_text ?(show_occ=false) ?(specify_public_name=false)
+  (p_first_name, p_surname) conf base p =
+  let occ = if show_occ then "." ^ (string_of_int (get_occ p)) else "" in
   if is_hidden p then restricted_txt
   else if is_hide_names conf p && not (authorized_age conf base p) then "x x"
   else
     let beg =
       match sou base (get_public_name p), get_qualifiers p with
-        "", nn :: _ -> p_first_name base p ^ occ ^ " <em>" ^ sou base nn ^ "</em>"
-      | "", [] -> p_first_name base p ^ occ
-      | n, nn :: _ -> n ^ " <em>" ^ sou base nn ^ "</em>"
-      | n, [] -> n
+        "", nn :: _ when specify_public_name -> p_first_name base p ^ occ ^ " <em>" ^ sou base nn ^ "</em>"
+      | n, nn :: _ when specify_public_name -> n ^ " <em>" ^ sou base nn ^ "</em>"
+      | n, [] when specify_public_name -> n
+      | _ , _ -> p_first_name base p ^ occ
     in
     let sn = p_surname base p in if sn = "" then beg else beg ^ " " ^ sn
 
@@ -868,7 +868,7 @@ let main_title conf base p =
     [Retour] : string
     [Rem] : exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
-let titled_person_text ?(occ=false) conf base p t =
+let titled_person_text ?(show_occ=false) ?(specify_public_name=false) conf base p t =
   if p_getenv conf.base_env "print_advanced_title" = Some "yes" then
     let estate = sou base t.t_place in
     let surname = p_surname base p in
@@ -903,7 +903,7 @@ let titled_person_text ?(occ=false) conf base p t =
           | nn :: _ -> s ^ " <em>" ^ sou base nn ^ "</em>"
           end
       | _ -> person_text conf base p
-  else gen_person_text ~occ std_access conf base p
+  else gen_person_text ~show_occ ~specify_public_name std_access conf base p
 
 
 (* *********************************************************************** *)
@@ -982,16 +982,23 @@ let update_family_loop conf base p s =
 
 let no_reference _conf _base _p s = s
 
-let gen_person_title_text reference p_access conf base p =
+let gen_person_title_text ?(show_occ=false) ?(specify_public_name=false)
+  reference p_access conf base p =
   if authorized_age conf base p then
     match main_title conf base p with
       Some t ->
         reference conf base p (titled_person_text conf base p t) ^
           ", " ^ one_title_text base t
-    | None -> reference conf base p (gen_person_text p_access conf base p)
-  else reference conf base p (gen_person_text p_access conf base p)
+    | None -> reference conf base p (gen_person_text ~show_occ ~specify_public_name
+      p_access conf base p)
+  else reference conf base p (gen_person_text ~show_occ ~specify_public_name
+    p_access conf base p)
 
 let referenced_person_title_text = gen_person_title_text reference std_access
+
+let referenced_person_title_text_2 ?(show_occ=false) ?(specify_public_name=true)
+  conf base p = 
+  gen_person_title_text ~show_occ ~specify_public_name reference std_access conf base p
 
 let person_title_text = gen_person_title_text no_reference std_access
 

@@ -228,29 +228,19 @@ let specify conf base n pl =
        Perso.print_sosa conf base p true;
        begin match tl with
            [] ->
-           Wserver.printf "\n%s" (referenced_person_title_text conf base p)
+           Wserver.printf "\n%s" (referenced_person_title_text_2
+             ~show_occ:true ~specify_public_name:false conf base p)
          | t :: _ ->
            Wserver.printf "<a href=\"%s%s\">\n" (commd conf)
              (acces conf base p);
-           Wserver.print_string (titled_person_text ~occ:true conf base p t);
+           Wserver.print_string (titled_person_text
+             ~show_occ:true ~specify_public_name:false conf base p t);
            Wserver.printf "</a>\n";
            List.iter
              (fun t -> Wserver.print_string (one_title_text base t)) tl
        end;
        Wserver.print_string (DateDisplay.short_dates_text conf base p);
-       Util.specify_homonymous conf base p true;
-       if authorized_age conf base p then
-         begin match get_first_names_aliases p with
-             [] -> ()
-           | fnal ->
-             Wserver.printf "\n<em>(";
-             Mutil.list_iter_first
-               (fun first fna ->
-                  if not first then Wserver.printf ", ";
-                  Wserver.print_string (sou base fna))
-               fnal;
-             Wserver.printf ")</em>"
-         end;
+       Util.specify_homonymous conf base p false;
        Wserver.printf "</li>\n")
     ptll;
   Wserver.printf "</ul>\n";
