@@ -729,7 +729,7 @@ let raw_access =
 (*   - son/ses sobriquets                                               *)
 
 
-let restricted_txt = "....."
+let restricted_txt = "x x"
 
 
 (* ************************************************************************** *)
