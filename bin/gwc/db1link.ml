@@ -1222,8 +1222,6 @@ let write_file_contents fname text =
 
 let output_wizard_notes bdir wiznotes =
   let wizdir = Filename.concat bdir "wiznotes" in
-  Mutil.remove_dir wizdir;
-  Unix.mkdir wizdir 0o755 ;
   if wiznotes <> [] then begin
     List.iter begin fun (wizid, text) ->
       let fname = Filename.concat wizdir wizid ^ ".txt" in

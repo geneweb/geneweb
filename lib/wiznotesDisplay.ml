@@ -634,6 +634,7 @@ let connected_wizards conf base =
 
 let do_change_wizard_visibility conf base x set_vis =
   let wddir = dir conf base in
+  if not @@ Sys.file_exists wddir then Unix.mkdir wddir 0o755;
   let denying = wizard_denying wddir in
   let is_visible = not (List.mem conf.user denying) in
   if not set_vis && not is_visible || set_vis && is_visible then ()
