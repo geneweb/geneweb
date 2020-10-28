@@ -8,6 +8,20 @@ open MergeInd
 
 let print_differences conf base branches p1 p2 =
   let gen_string_field chk1 chk2 title name proj =
+    let img p x =
+      if name = "image" then 
+        let v = image_and_size conf base p (limited_image_size 75 100) in
+        match v with
+          Some (true, fname, _) ->
+            let s = Unix.stat fname in
+            let b = acces conf base p in
+            let k = default_image_name base p in
+            Format.sprintf "<img src=\"%sm=IM&d=%d&%s&k=/%s\" \
+              style=\"max-width:75px; max-height:100px\" /> " (commd conf)
+              (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
+        | _ -> "<img src=\"" ^ x ^ "\" style=\"max-width:75px; max-height:100px\"> "
+      else ""
+    in
     let x1 = proj p1 in
     let x2 = proj p2 in
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
@@ -15,11 +29,13 @@ let print_differences conf base branches p1 p2 =
         Wserver.printf "<h4>%s</h4>\n" (Utf8.capitalize title);
         Wserver.printf "<div class=\"custom-control custom-radio ml-3\">\n";
         Wserver.printf "  <input class=\"custom-control-input\" type=\"radio\" id=\"%s1\" name=\"%s\" value=\"1\"%s>\n" name name chk1;
-        Wserver.printf "  <label class=\"custom-control-label\" for=\"%s1\">%s</label>\n" name x1;
+        Wserver.printf "  <label class=\"custom-control-label\" \
+            for=\"%s1\">%s%s</label>\n" name (img p1 x1) x1;
         Wserver.printf "</div>\n";
         Wserver.printf "<div class=\"custom-control custom-radio ml-3 mb-2\">\n";
         Wserver.printf "  <input class=\"custom-control-input\" type=\"radio\" id=\"%s2\" name=\"%s\" value=\"2\"%s>\n" name name chk2;
-        Wserver.printf "  <label class=\"custom-control-label\" for=\"%s2\">%s</label>\n" name x2;
+        Wserver.printf "  <label class=\"custom-control-label\" \
+            for=\"%s2\">%s%s</label>\n" name (img p2 x2) x2;
         Wserver.printf "</div>\n";
       end
   in
@@ -80,12 +96,11 @@ let print_differences conf base branches p1 p2 =
   end;
   string_field (transl_nth conf "image/images" 0) "image"
     (fun p ->
-       let v = image_and_size conf base p (limited_image_size 75 100) in
-       match v with
-         Some (false, link, _) ->
-           "<img src=\"" ^ link ^
-           "\" style=\"max-width:75px; max-height:100px\" />"
-       | _ -> sou base (get_image p));
+      let v = image_and_size conf base p (limited_image_size 75 100) in
+      match v with
+        Some (true, _, _) -> default_image_name base p
+       | _ -> sou base (get_image p)
+    );
   string_field (transl conf "public name") "public_name"
     (fun p -> sou base (get_public_name p));
   string_field (transl_nth conf "occupation/occupations" 0) "occupation"
