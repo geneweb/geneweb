@@ -329,7 +329,18 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     let can_edit = conf.wizard && conf.user = wz || conf.manitou in
     Some (can_edit, "WIZNOTES", Mutil.encode wz)
   in
-  let title = wizard_page_title conf wizname in
+  let (title, s) =
+    try let i = Str.search_forward (Str.regexp "TITLE=") s 0 in
+        try let j = String.index s '\n' in
+          (String.sub s (i + 6) (j - i - 6), (String.sub s 0 i) ^
+          (String.sub s j ((String.length s) - j - 1)))
+         with Not_found -> ("", s)
+    with Not_found -> ("", s)
+  in
+  let title =
+    if title = "" then (wizard_page_title conf wizname)
+    else (wizard_page_title conf title)
+  in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
   Output.print_string conf "<h1>";
