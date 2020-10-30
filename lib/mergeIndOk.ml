@@ -152,6 +152,14 @@ let merge_events l1 l2 p =
   in
   merge_events_aux l1 l2
 
+(*
+Proposition de solution :
+a/ lors du choix dans mergeIndDisplay, marquer le champ image avec "1/" ou "2/"
+b/ dans rename_image_file, tester ce marqueur et ne pas faire le rename si "1/"
+c/ nettoyer le champ image (dans Futil.map_person_ps probablement,
+   mais je ne sais pas faire)
+*)
+
 let reconstitute conf base p1 p2 =
   let field name proj null =
     let x1 = proj p1 in
@@ -159,6 +167,14 @@ let reconstitute conf base p1 p2 =
     match p_getenv conf.env name with
       Some "1" -> x1
     | Some "2" -> x2
+    | _ -> if null x1 then x2 else x1
+  in
+  let field_image name proj null =
+    let x1 = proj p1 in
+    let x2 = proj p2 in
+    match p_getenv conf.env name with
+      Some "1" -> x1 (*"/1" ^ x1*)
+    | Some "2" -> x2 (*"/2" ^ x2*)
     | _ -> if null x1 then x2 else x1
   in
   let list conv proj =
@@ -177,7 +193,7 @@ let reconstitute conf base p1 p2 =
        field "surname" (fun p -> p_surname base p)
          (fun x -> x = "" || x = "?");
      occ = field "number" get_occ ((=) 0);
-     image = field "image" (fun p -> sou base (get_image p)) ((=) "");
+     image = field_image "image" (fun p -> sou base (get_image p)) ((=) "");
      public_name =
        field "public_name" (fun p -> sou base (get_public_name p)) ((=) "");
      qualifiers = list (sou base) get_qualifiers;
