@@ -281,3 +281,30 @@ let eq_titles eq t1 t2 =
   eq_title_names eq t1.t_name t2.t_name && eq t1.t_ident t2.t_ident &&
   eq t1.t_place t2.t_place && t1.t_date_start = t2.t_date_start &&
   t1.t_date_end = t2.t_date_end && t1.t_nth = t2.t_nth
+
+let reconstitute_from_pevents pevents =
+  let aux d e = Some (d, e.epers_place, e.epers_note, e.epers_src) in
+  let rec loop pevents bi bp de bu =
+    match pevents with
+    | [] -> bi, bp, de, bu
+    | evt :: l ->
+      match evt.epers_name with
+      | Epers_Birth when bi = None ->
+        loop l (aux evt.epers_date evt) bp de bu
+      | Epers_Baptism when bp = None ->
+        loop l bi (aux evt.epers_date evt) de bu
+      | Epers_Death when de = None ->
+        let death =
+          match Adef.od_of_cdate evt.epers_date with
+          | Some d ->
+            Death (Def.Unspecified, Adef.cdate_of_date d)
+          | None -> DeadDontKnowWhen (* Inaccurate but can't do better *)
+        in
+        loop l bi bp (aux death evt) bu
+      | Epers_Burial when bu = None ->
+        loop l bi bp de (aux (Buried evt.epers_date) evt)
+      | Epers_Cremation when bu = None ->
+        loop l bi bp de (aux (Cremated evt.epers_date) evt)
+      | _ -> loop l bi bp de bu
+  in
+  loop pevents None None None None

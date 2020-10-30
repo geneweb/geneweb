@@ -267,11 +267,7 @@ let reconstitute_person conf base mod_p : ('a, string * string * int * Update.cr
   in
   (* Mise à jour des évènements principaux. *)
   let (bi, bp, de, bu, pevents) =
-    UpdateIndOk.reconstitute_from_pevents pevents false
-      (Adef.cdate_None, "", "", "")
-      (Adef.cdate_None, "", "", "")
-      (death, "", "", "")
-      (UnknownBurial, "", "", "")
+    UpdateIndOk.reconstitute_from_pevents pevents false death
   in
   let (birth, birth_place, birth_note, birth_src) = bi in
   let (baptism, baptism_place, baptism_note, baptism_src) = bp in
@@ -708,11 +704,7 @@ let reconstitute_person_nobase conf mod_p =
   in
   (* Mise à jour des évènements principaux. *)
   let (bi, bp, de, bu, pevents) =
-    UpdateIndOk.reconstitute_from_pevents pevents false
-      (Adef.cdate_None, "", "", "")
-      (Adef.cdate_None, "", "", "")
-      (death, "", "", "")
-      (UnknownBurial, "", "", "")
+    UpdateIndOk.reconstitute_from_pevents pevents false death
   in
   let (birth, birth_place, birth_note, birth_src) = bi in
   let (baptism, baptism_place, baptism_note, baptism_src) = bp in
