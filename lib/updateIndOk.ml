@@ -885,6 +885,11 @@ let check_sex_married ?prerr conf base sp op =
      end (get_family op)
   then print_cannot_change_sex ?prerr conf base op
 
+(*
+Test "sp.image" for "1/" or "/2"
+if "1/" do nothing
+*)
+
 let rename_image_file conf base op sp =
   match auto_image_file conf base op with
     Some old_f ->
