@@ -9317,36 +9317,6 @@ sk: zmeniť :a:
 sl: spremeni
 sv: ändra
 
-    modify %s
-af: wysig
-bg: да се променят
-br: kemmañ
-ca: modificar
-co: mudificà %s
-cs: změnit :a:
-da: ændre
-de: ändern +before
-en: edit
-eo: modifi :a:
-es: modificar
-et: muuda :g:
-fi: muokkaa
-fr: modifier %s
-he:  לשנות
-is: breyta
-it: modificare
-lv: izmainīt
-nl: wijzigen +before
-no: endre
-oc: modificar %s
-pl: zaktualizuj :a:
-pt: modificar
-ro: modifica
-ru: изменить :a:
-sk: zmeniť :a:
-sl: spremeni
-sv: ändra
-
     modify family %s event order
 co: intervertisce l’avvenimenti di a famiglia %s
 en: permute the events of family %s
@@ -9367,7 +9337,7 @@ ca: modificar imatge
 co: mudificà a fiura
 cs: změnit :a: obrázek
 da: ændre billede
-de: ändern +before Bild
+de: Bild ändern
 en: update Picture
 eo: modifi :a: bildo:a:+n
 es: modificar imagen
@@ -12882,6 +12852,36 @@ ru: Sosa
 sk: Sosa
 sl: številka Sosa
 sv: annummer
+
+    Sosa 1
+af: Sosa 1
+bg: Число на Соса 1
+br: Sosa 1
+ca: número "Sosa" 1
+co: Sosa 1
+cs: "Sosa" 1
+da: Sosa 1
+de: Ahnenkennziffer 1
+en: Sosa 1
+eo: Sosa 1
+es: Sosa 1
+et: Sosa 1
+fi: Sosa 1
+fr: Sosa 1
+he: Sosa 1
+is: Sosa 1
+it: Sosa 1
+lv: SOSA 1
+nl: Sosa 1
+no: Anenummer 1
+oc: numèro de Sosa 1
+pl: "Sosa" 1
+pt: Sosa 1
+ro: Sosa 1
+ru: Sosa 1
+sk: Sosa 1
+sl: številka Sosa 1
+sv: annummer 1
 
     sosa reference: %t
 af: Sosa verwysing: %t

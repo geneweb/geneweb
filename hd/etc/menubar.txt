@@ -166,7 +166,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             <div class="dropdown-menu">
               %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
                 <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(evar.oc!="" and evar.oc!=0)ocz=%occ;;%end;%access;" %laS; title="%apply;nav_with_sosa_ref(self)">%nn;
-                  <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify] [n° Sosa] 1%nn;
+                  <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
                 </a>
               %else;
                 <a class="dropdown-item" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
