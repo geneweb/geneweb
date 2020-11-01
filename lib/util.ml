@@ -85,19 +85,19 @@ let gen_decline_basic wt s =
     let start = String.sub wt 0 (len - 3) in
     start ^ Mutil.decline wt.[len-2] s
   else
-    match String.rindex_opt s '+' with
+    match String.rindex_opt wt '+' with
     | Some i ->
       if i > 0
-      && s.[i-1] = ' '
-      && String.length s - i = 7
-      && String.get s (i + 1) = 'b'
-      && String.get s (i + 2) = 'e'
-      && String.get s (i + 3) = 'f'
-      && String.get s (i + 4) = 'o'
-      && String.get s (i + 5) = 'r'
-      && String.get s (i + 6) = 'e'
+      && wt.[i-1] = ' '
+      && String.length wt - i = 7
+      && String.get wt (i + 1) = 'b'
+      && String.get wt (i + 2) = 'e'
+      && String.get wt (i + 3) = 'f'
+      && String.get wt (i + 4) = 'o'
+      && String.get wt (i + 5) = 'r'
+      && String.get wt (i + 6) = 'e'
       then
-        let start = String.sub s 0 (i - 1) in
+        let start = String.sub wt 0 (i - 1) in
         if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
       else wt ^ Mutil.decline 'n' s1
     | None -> wt ^ Mutil.decline 'n' s1
