@@ -34,6 +34,14 @@
 
 (executable
   (package geneweb-bin)
+  (public_name lex_utils)
+  (modules lex_utils)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%% geneweb)
+)
+
+(executable
+  (package geneweb-bin)
   (public_name gwc)
   (modules gwc db1link)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
