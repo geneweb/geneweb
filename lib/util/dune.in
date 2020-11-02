@@ -10,6 +10,7 @@
    geneweb-lib.def
    geneweb-lib.io
    geneweb-lib.gwdb_driver.mli
+   unix
    uucp
    uunf
    uutf
