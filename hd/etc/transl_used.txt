@@ -1,0 +1,6 @@
+[siblings of the grandparents]
+[siblings of the great-grandparents]
+[the difference of age between %t and %t is quite important]
+[use "link" instead of "create"]
+[click on "%s"]
+[the base has changed; do "back", "reload", and refill the form]

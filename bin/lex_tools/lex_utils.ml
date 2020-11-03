@@ -77,7 +77,8 @@ let cut_all_msg_src s =
 
 let get_msg_src repo =
   let msg = ref [] in
-  let regexp = Str.regexp "transl .* \"" in
+  ($ TODO the current setup misses translations with the string on the next line !! *)
+  let regexp = Str.regexp "transl.* \"" in
   List.iter
     (fun src ->
       match try Some (open_in src) with Sys_error _ -> None with
@@ -203,7 +204,7 @@ let missing_or_unused_msg lexicon repo log =
       Filename.concat (Sys.getcwd ()) repo
     else repo
   in
-  let repo_src = Filename.concat repo "src" in
+  let repo_src = Filename.concat repo "lib" in
   let repo_tpl =
     List.fold_left Filename.concat repo ["hd"; "etc"]
   in

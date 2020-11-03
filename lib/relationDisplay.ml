@@ -244,8 +244,7 @@ let ancestor_label conf base info x sex =
       nth_field txt is
   | 3 ->
       let txt =
-        transl conf
-          "a great-grandfather/a great-grandmother/a great-grandparent"
+        transl conf "a great-grandfather/a great-grandmother/a great-grandparent"
       in
       let is =
         if nb_fields txt = 6 then
@@ -285,8 +284,7 @@ let descendant_label conf base info x p =
       nth_field txt is
   | 3 ->
       let txt =
-        transl conf
-          "a great-grandson/a great-granddaughter/a great-grandchild"
+        transl conf "a great-grandson/a great-granddaughter/a great-grandchild"
       in
       let is =
         if nb_fields txt = 12 then
