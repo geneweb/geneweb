@@ -65,66 +65,6 @@ sl: af=afrikaanščina/bg=bolgarščina/br=bretonščina/ca=katalonščina/co=ko
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/co=korsikanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/oc=occitanska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sk=slovakiska/sl=slovenska/sv=svenska/zh=kinesiska
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/zh=中文
 
-    the first branch
-af: om die eerste staak te sien
-bg: за да видите първия клон
-br: evit gwelout ar skourr kentañ
-ca: per veure la primera branca
-co: a prima ghjemba
-cs: abyste viděli první
-da: for at se den første
-de: Erster Zweig
-en: first line
-eo: por vidi la unuan branĉon
-es: la primera rama
-et: esimese haru vaatamiseks
-fi: ensimmäinen sukuhaara
-fr: la première
-he:  לראות את הענף הראשון
-is: til að sjá fyrstu grein
-it: il primo ramo
-lv: skatīt pirmo zaru
-nl: de eerste tak
-no: den første grenen
-oc: la primièra branca
-pl: aby zobaczyć pierwszą linię (gałąź)
-pt: para ver o primeiro ramo
-ro: pentru a vedea primul
-ru: чтобы увидеть первую ветку
-sk: aby ste videli prvú vetvu
-sl: za prikaz prve veje
-sv: den första grenen
-
-    to try again with this number
-af: om weer te probeer met die nommer
-bg: за опит с този номер
-br: evit esaiñ en-dro gant an niverenn-se
-ca: per tornar a provar aquest número
-co: per pruvà torna cù stu numeru
-cs: zkusit znovu s tímto číslem
-da: for at forsøge igen med dette nummer
-de: , um es mit dieser Nummer nochmals zu versuchen
-en: to try again with this number
-eo: por reprovi kun ĉi tiu numero
-es: para ensayar de nuevo con este número
-et: , proovimaks uuesti selle numbriga
-fi: yrittääksesi uudelleen tällä numerolla
-fr: pour réessayer avec ce numéro
-he: לנסות שוב עם המספר הזה
-is: til að reyna þetta aftur með þessu númeri
-it: per provare di nuovo con questo numero
-lv: mēģiniet vēlreiz ar šo nummuru
-nl: , om dit nummer weer te proberen
-no: for å prøve igjen med dette nummeret
-oc: per tornar ensajar amb aquel numèro
-pl: aby ponowić z tym numerem
-pt: para tentar novamente com este número
-ro: incearca din nou cu acest numar
-ru: для того, чтобы пытаться снова с этим числом
-sk: skúsiť znovu s týmto číslom
-sl: za ponoven poskus s to številko
-sv: för att försöka igen med detta nummer
-
     %1 of %2
 af: %1 van %2
 bg: %1 на :a:%2
@@ -712,10 +652,6 @@ ru: Тишри/Хешван/Кислев/Тевет/Шеват/Адар 1/Ада
 sk: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 sl: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 sv: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
-
-    (short month)
-en: jan/feb/mar/apr/may/jun/jul/aug/sep/oct/nov/dec
-fr: jan/fev/mar/avr/mai/jun/jul/aou/sep/oct/nov/dec
 
     (month)
 af: Januarie/Februarie/Maart/April/Mei/Junie/Julie/Augustus/September/Oktober/November/Desember
@@ -4480,6 +4416,11 @@ pt: data de fim
 ru: дата окончания
 sv: Datum slutar
 
+    date of baptism
+co: data di battesimu
+en: date of baptism
+fr: date du baptême
+
     date of birth
 co: data di nascita
 de: Geburtsdatum
@@ -4495,10 +4436,10 @@ pt: data de nascimento
 ru: дата рождения
 sv: födelsedatum
 
-    date of baptism
-co: data di battesimu
-en: date of baptism
-fr: date du baptême
+    date of burial
+co: data di sepultura
+en: date of burial
+fr: date de la sépulture
 
     date of death
 co: data di trapassu
@@ -4529,11 +4470,6 @@ oc: data de maridatge
 pt: data de casamento
 ru: дата бракосочетания
 sv: vigseldatum
-
-    date of burial
-co: data di sepultura
-en: date of burial
-fr: date de la sépulture
 
     date/dates
 af: datum
@@ -5615,32 +5551,6 @@ ru: в точности
 sk: presne
 sl: točno
 sv: exakt
-
-    search_exact_fn
-co: ricerca esatta
-de: genaue Suche
-en: exact search
-es: búsqueda exacta
-fi: tarkka haku
-fr: recherche exacte
-it: ricerca esatta
-nl: exact zoeken
-no: eksakt søk
-pt: pesquisa exata
-sv: exakt sökning
-
-    search_exact_sn
-co: ricerca esatta
-de: genaue Suche
-en: exact search
-es: búsqueda exacta
-fi: tarkka haku
-fr: recherche exacte
-it: ricerca esatta
-nl: exact zoeken
-no: eksakt søk
-pt: pesquisa exata
-sv: exakt sökning
 
     excommunication
 co: scumunicazione
@@ -8418,6 +8328,18 @@ no: Ektepakt
 pt: contrato de casamento
 sv: Äktenskapförord
 
+    marriage contract%t with
+co: cuntrattu di matrimoniu%t cù
+de: ehevertrag vom%t mit
+en: marriage contract%t with
+es: contrato de matrimonio%t con
+fi: avioliittosopimus%t kanssa
+fr: contrat de mariage%t avec
+it: contratto di matrimonio%t con
+no: ekteskapskontrakt%t med
+pt: contrato de casamento%t com
+sv: giftermål%t med
+
     marriage date
 co: data di l’unione
 de: Hochzeitstag
@@ -8757,18 +8679,6 @@ sk: %t si vzal/%t si vzala
 sl: %t se je poročil z/%t se je poročila z
 sv: gift%t med
 zh: %t配偶是
-
-    marriage contract%t with
-co: cuntrattu di matrimoniu%t cù
-de: ehevertrag vom%t mit
-en: marriage contract%t with
-es: contrato de matrimonio%t con
-fi: avioliittosopimus%t kanssa
-fr: contrat de mariage%t avec
-it: contratto di matrimonio%t con
-no: ekteskapskontrakt%t med
-pt: contrato de casamento%t com
-sv: giftermål%t med
 
     maternal grand-parents
 co: caccari materni
@@ -9672,6 +9582,21 @@ pt: nº pessoas
 ru: люди
 sv: nb individer
 
+    NB: you should try another relationship computing mode
+co: andate puru à pruvà torna impieghendu un altru modu di calculu
+de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
+en: you can try another computing option
+es: puede relanzar un cálculo eligiendo otro modo de cálculo
+fi: valitse toinen laskutapa ja laske uudelleen
+fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
+it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
+nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
+no: velg en annen utregningsmåte og beregn påny
+oc: podètz ensajar amb un autre metòde de calcul de relacion
+pt: pode recomeçar utilizando um novo método de cálculo 
+ru: попытайтесь найти родственную связь другим образом
+sv: välj ett annat uträkningssätt och räkna ut igen
+
     new modification
 co: cliccà quì per fà una nova currezzione
 de: hier klicken um eine neue Korrektion durchzuführen
@@ -10111,235 +10036,6 @@ ru: заметки изменены
 sk: poznámky zmenené
 sl: zaznamek spremenjen
 sv: noteringar modifierade
-
-
-    see ascendants notes/sources
-co: fighjà e note è e fonte
-de: siehe Notizen/Quellen
-en: View notes/sources
-es: ver las notas/fuentes
-fi: Katso merkinnät/lähteet
-fr: voir les notes & les sources
-it: vedere le note/fonti
-nl: notities & bronnen bekijken
-no: Se på merknader/kilder
-oc: veire las nòtas e las fonts
-pt: ver notas & fontes
-ru: смотри заметки/документы
-sv: Se kommande generations noteringar och källor
-
-    see ascendants pictures
-co: fighjà e fotò
-de: siehe Porträts
-en: View pictures
-es: ver los retratos
-fi: Näytä kuvat
-fr: voir les photos
-it: vedere i ritratti
-nl: foto's bekijken
-no: Se på bilder
-oc: veire las fòtos
-pt: ver fotos
-ru: смотри изображения предков
-sv: Se kommande generations bilder
-
-    see descendants notes/sources
-co: fighjà e note è e fonte
-de: siehe Notizen/Quellen
-en: View notes/sources
-es: ver las notas/fuentes
-fi: Näytä merkinnät/lähteet
-fr: voir les notes & les sources
-it: vedere le note/fonti
-nl: notities & bronnen bekijken
-no: Se på merknader/kilder
-oc: veire las nòtas e las fonts
-pt: ver notas & fontes
-ru: смотри заметки/документы потомков
-sv: Se efterföljandes noteringar och källor
-
-    see descendants pictures
-co: fighjà e fotò
-de: siehe Porträts
-en: View pictures
-es: ver los retratos
-fi: Näytä kuvat
-fr: voir les photos
-it: vedere i ritratti
-nl: foto's bekijken
-no: Se på bilder
-oc: veire las fòtos
-pt: ver fotos
-ru: смотри изображения потомков
-sv: Se efterföljandes bilder
-
-    the latest %d celebrated marriages
-bg: последните %d чествувани сватби
-co: e %d ultime unione celebrate
-de: die %d letzten gefeierten Hochzeiten
-en: Last %d marriages (Date of marriage)
-es: los %d últimos matrimonios célebres
-fi: Viimeiset %d avioliittoa (vihkipäivämäärä)
-fr: les %d dernières unions célébrées
-it: i %d ultime unioni celebrate
-nl: de %d laatste uitgevoerde huwelijken
-no: Siste %d ekteskap (Ekteskapsdato)
-oc: las %d darrièras unions celebradas
-pt: as últimas %d uniões celebradas
-ru: последние %d свадеб
-sv: Det senaste %d firade bröllopet
-
-    the latest %d registered marriages
-bg: последните %d регистрирани сватби
-co: e %d ultime unione arregistrate
-de: die %d letzten eingetragenen Hochzeiten
-en: Last %d marriages (Date of entry)
-es: los %d últimos matrimonios registrados
-fi: Viimeiset %d rekisteröityä avioliittoa (syöttämispäivämäärä)
-fr: les %d dernières unions enregistrées
-it: le %d ultime unioni inserite
-nl: de %d laatste uitgevoerde huwelijken
-no: Siste %d ekteskap (Registreringsdato)
-oc: las %d darrièras unions enregistradas
-pt: as últimas %d uniões registadas
-ru: последние %d зарегистрированных браков
-sv: Det senast %d registreade äktenskapet
-
-    the modification impacted %d persons
-co: a mudificazione hè riesciuta : %d scheda(e) curretta(e)
-de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
-en: %d entries have been successfully updated
-es: la modificación ha sido hecha: %d ficha/s corregida/s
-fi: %d tietuetta on onnistuneesti päivitetty
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
-it: la modifica è stata effettuata : %d scheda/e corretta/e
-nl: wijziging goed uitgevoerd : %d fiche(n) verbeterd
-no: %d registreringer er blitt oppdatert
-oc: la modification se faguèt: %s fichas modificadas
-pt: a alteração decorreu com sucesso: %d ficha(s) corrigida(s)
-ru: изменения затронули %d людей
-sv: Modifiering av inklämda %d personer
-
-    statistics and anniversaries
-bg: статистика и годишнини
-co: statistiche è anniversarii
-de: Statistik und Geburtstage
-en: statistics and anniversaries
-es: Estadísticas y aniversarios
-fi: tilastot ja vuosipäivät
-fr: statistiques et anniversaires
-it: statistiche e compleanni
-nl: statistieken en verjaardagen
-no: statistikk og familehendelser
-oc: estatisticas e aniversaris
-pt: estatísticas e aniversários
-ru: статистика и годовщины
-sv: statistik och årsdagar
-
-    to come
-co: hà da vene
-de: in Erwartung
-en: to come
-es: pronto
-fi: tulevat tapahtumat
-fr: à venir
-it: da venire
-nl: te komen
-no: kommende hendelser
-oc: a venir
-pt: brevemente
-ru: ещё будет
-sv: kommande händelser
-
-    to see the first branch
-af: om die eerste staak te sien
-bg: за да видите първия клон
-br: evit gwelout ar skourr kentañ
-ca: per veure la primera branca
-co: per fighjà a prima ghjemba
-cs: abyste viděli první
-da: for at se den første
-de: , um den ersten zu sehen
-en: to see the first one
-eo: por vidi la unuan branĉon
-es: para ver la primera rama
-et: esimese haru vaatamiseks
-fi: nähdäksesi ensimmäisen haaran
-fr: pour voir la première
-he:  לראות את הענף הראשון
-is: til að sjá fyrstu grein
-it: per vedere il primo
-lv: skatīt pirmo zaru
-nl: om de eerste tak te zien
-no: for å se den første
-oc: per veire la primièra branca
-pl: aby zobaczyć pierwszą linię (gałąź)
-pt: para ver o primeiro ramo
-ro: pentru a vedea primul
-ru: чтобы увидеть первую ветку
-sk: aby ste videli prvú vetvu
-sl: za prikaz prve veje
-sv: för att se den första
-
-    to see the first relationship link
-af: om die eerste te sien
-bg: за да видите първата родствена връзка
-br: evit gwelout al liamm kentañ
-ca: per veure el primer vincle de parentesc
-co: per fighjà a prima leia
-cs: zobrazit první
-da: for at se det første
-de: , um die erste zu sehen
-en: to see the first one
-eo: por vidi la unuan ligon de parenceco
-es: para ver el primer vínculo de parentesco
-et: esimese sugulussuhte vaatamiseks
-fi: nähdäksesi ensimmäisen sukulaisuuden
-fr: pour voir le premier
-he:  לראות את הקשר המשפחתי הראשון
-is: til að sjá fyrstu tengsl
-it: per vedere il primo
-lv: skatīt pirmo attiecību saiti
-nl: om de eerste te zien
-no: for å se den første
-oc: per veire lo primièr ligam de parentatge
-pl: aby zobaczyć pierwszą linię pokrewieństwa
-pt: para ver o primeiro link
-ro: pentru a vedea prima relatie
-ru: чтобы увидеть первую связь отношения
-sk: zobraziť prvý vzťah
-sl: za prikaz prve sorodstvene povezave
-sv: för att se den första
-
-    trees & lists
-co: Arburi è Liste
-de: Bäume & Listen
-en: Charts & Lists
-es: Árboles & listas
-fi: Kaaviot & Listat
-fr: Arbres & Listes
-it: Alberi & Elenchi
-nl: Grafieken en lijsten
-no: Tavler & Lister
-oc: Arbres e Listas
-pt: Tabelas & Listas
-ru: Деревья и Списки
-sv: Diagram & Listor
-
-    NB: you should try another relationship computing mode
-co: andate puru à pruvà torna impieghendu un altru modu di calculu
-de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
-en: you can try another computing option
-es: puede relanzar un cálculo eligiendo otro modo de cálculo
-fi: valitse toinen laskutapa ja laske uudelleen
-fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
-it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
-nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
-no: velg en annen utregningsmåte og beregn påny
-oc: podètz ensajar amb un autre metòde de calcul de relacion
-pt: pode recomeçar utilizando um novo método de cálculo 
-ru: попытайтесь найти родственную связь другим образом
-sv: välj ett annat uträkningssätt och räkna ut igen
 
     notes summary
 bg: резюме на бележките
@@ -12240,6 +11936,32 @@ sk: hľadať/citlivý na veľkosť písma
 sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 
+    search_exact_fn
+co: ricerca esatta
+de: genaue Suche
+en: exact search
+es: búsqueda exacta
+fi: tarkka haku
+fr: recherche exacte
+it: ricerca esatta
+nl: exact zoeken
+no: eksakt søk
+pt: pesquisa exata
+sv: exakt sökning
+
+    search_exact_sn
+co: ricerca esatta
+de: genaue Suche
+en: exact search
+es: búsqueda exacta
+fi: tarkka haku
+fr: recherche exacte
+it: ricerca esatta
+nl: exact zoeken
+no: eksakt søk
+pt: pesquisa exata
+sv: exakt sökning
+
     searching all
 co: ricerca tutti i
 de: suche alle
@@ -12331,6 +12053,65 @@ pt: ver também
 ru: смотри также
 sv: visa också
 
+    see ascendants notes/sources
+co: fighjà e note è e fonte
+de: siehe Notizen/Quellen
+en: View notes/sources
+es: ver las notas/fuentes
+fi: Katso merkinnät/lähteet
+fr: voir les notes & les sources
+it: vedere le note/fonti
+nl: notities & bronnen bekijken
+no: Se på merknader/kilder
+oc: veire las nòtas e las fonts
+pt: ver notas & fontes
+ru: смотри заметки/документы
+sv: Se kommande generations noteringar och källor
+
+    see ascendants pictures
+co: fighjà e fotò
+de: siehe Porträts
+en: View pictures
+es: ver los retratos
+fi: Näytä kuvat
+fr: voir les photos
+it: vedere i ritratti
+nl: foto's bekijken
+no: Se på bilder
+oc: veire las fòtos
+pt: ver fotos
+ru: смотри изображения предков
+sv: Se kommande generations bilder
+
+    see descendants notes/sources
+co: fighjà e note è e fonte
+de: siehe Notizen/Quellen
+en: View notes/sources
+es: ver las notas/fuentes
+fi: Näytä merkinnät/lähteet
+fr: voir les notes & les sources
+it: vedere le note/fonti
+nl: notities & bronnen bekijken
+no: Se på merknader/kilder
+oc: veire las nòtas e las fonts
+pt: ver notas & fontes
+ru: смотри заметки/документы потомков
+sv: Se efterföljandes noteringar och källor
+
+    see descendants pictures
+co: fighjà e fotò
+de: siehe Porträts
+en: View pictures
+es: ver los retratos
+fi: Näytä kuvat
+fr: voir les photos
+it: vedere i ritratti
+nl: foto's bekijken
+no: Se på bilder
+oc: veire las fòtos
+pt: ver fotos
+ru: смотри изображения потомков
+sv: Se efterföljandes bilder
 
     see further
 af: kyk verder
@@ -13064,123 +12845,6 @@ sl: določi
 sv: välj
 zh:  从下列选取
 
-    conjoint/conjointe
-en: spouse/spouse
-fr: conjoint/conjointe
-
-    sex required
-en: sex required
-fr: sexe demandé
-
-    sosa reference: %t
-en: sosa reference: %t
-fr: référence Sosa %t
-
-    the base has changed; do "back", "reload", and refill the form
-en: the base has changed; do "back", "reload", and refill the form
-fr: la base a changé; faire "en arrière",  "recharger la page", et remplir à nouveau le formulaire
-
-    witness to events of
-en: witness to events of
-fr: témoin aux évènements de
-
-    next diff
-en: next diff
-fr: différence suivante
-
-    nouveau(x)
-en: new
-fr: nouveau(x)
-
-    previous diff
-en: previous diff
-fr: différence suivante
-
-    list of %s
-en: list of %s
-fr: liste de %s
-
-    lists
-en: lists
-fr: listes
-
-    add the previous first name as a first name alias
-en: add the previous first name as a first name alias
-fr: ajouter le rpénom précédent comme prénom alias
-
-    Arbre 7 gen
-en: seven generations tree
-fr: arbre à sept générations
-
-    Arbre 9 gen
-en: nine generations tree
-fr: arbre à neuf générations
-
-    ascendant tree
-en: ascendant tree
-fr: arbre ascendant
-
-    back to default sosa reference
-en: back to default sosa reference
-fr: retour à la référence Sosa par défaul
-
-    birth date after event
-en: birth date after event
-fr: date de naissance après l'évènement
-
-    children of cousins
-en: children of cousins
-fr: enfants de cousins
-
-    clean history
-en: clean history
-fr: nettoyer l'historique
-
-    click on "%s"
-en: click on "%s"
-fr: cliquer sur "%s"
-
-    click on dates
-en: click on dates
-fr: cliquer sur les dates
-
-    marriage notes
-en: marriage notes
-fr: notes du mariage
-
-    missing
-en: missing
-fr: manquant
-
-    continue
-en: continue
-fr: continuer
-
-    death date before event
-en: death date before event
-fr: date de décès avant l'évènement
-
-    edit family
-en: edit family
-fr: modifier la famille
-
-    edit person
-en: edit person
-fr: modifier la personne
-
-    forbidden char
-en: forbidden char
-fr: caractère interdit
-
-    history cleaned
-en: history cleaned
-fr: historique nettoyé
-
-    index required
-en: index required
-fr: index attendu
-
-
     spouse/spouses
 co: cumpagnu(a)/cumpagni
 de: ehepartner/partner
@@ -13291,6 +12955,22 @@ ru: статистика
 sk: štatistika
 sl: statistike
 sv: statistik
+
+    statistics and anniversaries
+bg: статистика и годишнини
+co: statistiche è anniversarii
+de: Statistik und Geburtstage
+en: statistics and anniversaries
+es: Estadísticas y aniversarios
+fi: tilastot ja vuosipäivät
+fr: statistiques et anniversaires
+it: statistiche e compleanni
+nl: statistieken en verjaardagen
+no: statistikk og familehendelser
+oc: estatisticas e aniversaris
+pt: estatísticas e aniversários
+ru: статистика и годовщины
+sv: statistik och årsdagar
 
     subdivision
 co: paisolu
@@ -14007,6 +13687,36 @@ sk: súbor je uzamknutý, skúste znova.
 sl: ta datoteka je začasno zaklenjena: prosimo poskusite znova. Če še vedno ne deluje, prosimo počakajte trenutek
 sv: filen är temporärt låst: försök igen. Om det ändå inte fungerar, vänta ett tag innan nästa försök
 
+    the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
+de: Erster Zweig
+en: first line
+eo: por vidi la unuan branĉon
+es: la primera rama
+et: esimese haru vaatamiseks
+fi: ensimmäinen sukuhaara
+fr: la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: il primo ramo
+lv: skatīt pirmo zaru
+nl: de eerste tak
+no: den første grenen
+oc: la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: den första grenen
+
     the following children of %t and %t are born very close
 co: e date di nascita di sti zitelli di %t è %t parenu troppu vicine
 de: das Geburtsdatum der Kinder %t und %t liegt sehr nah beieinander
@@ -14215,6 +13925,21 @@ sk: posledných %d narodení
 sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
 
+    the latest %d celebrated marriages
+bg: последните %d чествувани сватби
+co: e %d ultime unione celebrate
+de: die %d letzten gefeierten Hochzeiten
+en: Last %d marriages (Date of marriage)
+es: los %d últimos matrimonios célebres
+fi: Viimeiset %d avioliittoa (vihkipäivämäärä)
+fr: les %d dernières unions célébrées
+it: i %d ultime unioni celebrate
+nl: de %d laatste uitgevoerde huwelijken
+no: Siste %d ekteskap (Ekteskapsdato)
+oc: las %d darrièras unions celebradas
+pt: as últimas %d uniões celebradas
+ru: последние %d свадеб
+sv: Det senaste %d firade bröllopet
 
     the latest %d marriages
 af: die laaste %d huwelike
@@ -14246,6 +13971,21 @@ sk: posledných %d sobášov
 sl: zadnjih %d porok
 sv: de senaste %d äktenskapen
 
+    the latest %d registered marriages
+bg: последните %d регистрирани сватби
+co: e %d ultime unione arregistrate
+de: die %d letzten eingetragenen Hochzeiten
+en: Last %d marriages (Date of entry)
+es: los %d últimos matrimonios registrados
+fi: Viimeiset %d rekisteröityä avioliittoa (syöttämispäivämäärä)
+fr: les %d dernières unions enregistrées
+it: le %d ultime unioni inserite
+nl: de %d laatste uitgevoerde huwelijken
+no: Siste %d ekteskap (Registreringsdato)
+oc: las %d darrièras unions enregistradas
+pt: as últimas %d uniões registadas
+ru: последние %d зарегистрированных браков
+sv: Det senast %d registreade äktenskapet
 
     the latest %t deaths
 af: die laaste %t afsterwes
@@ -14512,6 +14252,66 @@ pt: brevemente
 ru: ещё будет
 sv: kommande händelser
 
+    to see the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: per fighjà a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
+de: , um den ersten zu sehen
+en: to see the first one
+eo: por vidi la unuan branĉon
+es: para ver la primera rama
+et: esimese haru vaatamiseks
+fi: nähdäksesi ensimmäisen haaran
+fr: pour voir la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: per vedere il primo
+lv: skatīt pirmo zaru
+nl: om de eerste tak te zien
+no: for å se den første
+oc: per veire la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: för att se den första
+
+    to see the first relationship link
+af: om die eerste te sien
+bg: за да видите първата родствена връзка
+br: evit gwelout al liamm kentañ
+ca: per veure el primer vincle de parentesc
+co: per fighjà a prima leia
+cs: zobrazit první
+da: for at se det første
+de: , um die erste zu sehen
+en: to see the first one
+eo: por vidi la unuan ligon de parenceco
+es: para ver el primer vínculo de parentesco
+et: esimese sugulussuhte vaatamiseks
+fi: nähdäksesi ensimmäisen sukulaisuuden
+fr: pour voir le premier
+he:  לראות את הקשר המשפחתי הראשון
+is: til að sjá fyrstu tengsl
+it: per vedere il primo
+lv: skatīt pirmo attiecību saiti
+nl: om de eerste te zien
+no: for å se den første
+oc: per veire lo primièr ligam de parentatge
+pl: aby zobaczyć pierwszą linię pokrewieństwa
+pt: para ver o primeiro link
+ro: pentru a vedea prima relatie
+ru: чтобы увидеть первую связь отношения
+sk: zobraziť prvý vzťah
+sl: za prikaz prve sorodstvene povezave
+sv: för att se den första
+
     to the %s generation
 af: tot die %s geslag
 bg: до %s поколение
@@ -14722,6 +14522,36 @@ sk: k rodičom
 sl: do staršev
 sv: till föräldrarna
 
+    to try again with this number
+af: om weer te probeer met die nommer
+bg: за опит с този номер
+br: evit esaiñ en-dro gant an niverenn-se
+ca: per tornar a provar aquest número
+co: per pruvà torna cù stu numeru
+cs: zkusit znovu s tímto číslem
+da: for at forsøge igen med dette nummer
+de: , um es mit dieser Nummer nochmals zu versuchen
+en: to try again with this number
+eo: por reprovi kun ĉi tiu numero
+es: para ensayar de nuevo con este número
+et: , proovimaks uuesti selle numbriga
+fi: yrittääksesi uudelleen tällä numerolla
+fr: pour réessayer avec ce numéro
+he: לנסות שוב עם המספר הזה
+is: til að reyna þetta aftur með þessu númeri
+it: per provare di nuovo con questo numero
+lv: mēģiniet vēlreiz ar šo nummuru
+nl: , om dit nummer weer te proberen
+no: for å prøve igjen med dette nummeret
+oc: per tornar ensajar amb aquel numèro
+pl: aby ponowić z tym numerem
+pt: para tentar novamente com este número
+ro: incearca din nou cu acest numar
+ru: для того, чтобы пытаться снова с этим числом
+sk: skúsiť znovu s týmto číslom
+sl: za ponoven poskus s to številko
+sv: för att försöka igen med detta nummer
+
     today
 af: vandag
 bg: днес
@@ -14877,6 +14707,21 @@ co: arburu di i testimoni
 en: tree of witnesses
 fr: arbre des témoins
 pt: árvore de testemunhas
+
+    trees & lists
+co: Arburi è Liste
+de: Bäume & Listen
+en: Charts & Lists
+es: Árboles & listas
+fi: Kaaviot & Listat
+fr: Arbres & Listes
+it: Alberi & Elenchi
+nl: Grafieken en lijsten
+no: Tavler & Lister
+oc: Arbres e Listas
+pt: Tabelas & Listas
+ru: Деревья и Списки
+sv: Diagram & Listor
 
     try again
 bg: опитайте отново
@@ -15438,21 +15283,6 @@ sk: svedok na svadbe %s a %s
 sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
 
-    witnesses at his events
-co: testimoni à i so avvenimenti
-en: witnesses at his events
-fr: témoins à ses évènements
-
-    witness to events of
-co: testimoni à l’avvenimenti di
-en: witness to events of
-fr: témoin aux évènements de
-
-    witnesses to my events and godparents
-co: testimoni à i mo avvenimenti è cumpare/cummare
-en: witnesses to my events and godparents
-fr: témoins à mes évènements et parrains/marraines
-
     witness tree
 co: arburu di i testimoni
 en: tree of witnesses
@@ -15494,6 +15324,21 @@ co: testimone/testimoni
 en: witness/witnesses
 fr: témoin/témoins
 pt: testemunha/testemunhas
+
+    witnesses at his events
+co: testimoni à i so avvenimenti
+en: witnesses at his events
+fr: témoins à ses évènements
+
+    witnesses to events of
+co: testimoni à l’avvenimenti di
+en: witnesses to events of
+fr: témoins aux évènements de
+
+    witnesses to my events and godparents
+co: testimoni à i mo avvenimenti è cumpare/cummare
+en: witnesses to my events and godparents
+fr: témoins à mes évènements et parrains/marraines
 
     wizard/wizards/friend/friends/exterior
 af: Medewerkers/Medewerkers/vriend/vriend/exterior
@@ -15746,3 +15591,4 @@ ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
+

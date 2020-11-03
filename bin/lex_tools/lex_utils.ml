@@ -316,6 +316,9 @@ module Lex_map = Map.Make
    end)
 ;;
 
+let merge = ref false ;;
+let first = ref false ;;
+
 let sort_lexicon lexicon =
   let lex_sort = ref Lex_map.empty in
   (match try Some (open_in lexicon) with Sys_error _ -> None with
@@ -325,6 +328,23 @@ let sort_lexicon lexicon =
           let msg = skip_to_next_message ic in
           let list = get_all_versions ic in
           let list' = List.sort (fun (x, _) (y, _) -> compare x y) list in
+          let list' = if !merge then match Lex_map.find_opt msg !lex_sort with
+            | Some list ->
+                (* merge list and list' *)
+                let list' =
+                  let rec loop accu list =
+                    match list with
+                    | [] -> accu
+                    | (k, v):: list -> loop ((k, v) :: accu) list
+                  in loop list' list
+                in
+                if !first then
+                  List.sort_uniq (fun (x, _) (y, _) -> compare x y) list'
+                else
+                  List.sort_uniq (fun (x, _) (y, _) -> compare x y) (List.rev list')
+            | None -> list'
+            else list'
+          in
           lex_sort := Lex_map.add msg list' !lex_sort
         done
       with End_of_file -> ());
@@ -351,6 +371,10 @@ let log = ref false ;;
 
 let speclist =
   [("-sort", Arg.Set lex_sort, ": sort the lexicon (both key and content).");
+   ("-merge", Arg.Set merge,
+    ": merge rather than replace new lexicon entries.");
+   ("-first", Arg.Set first,
+    ": if multiple language entries, select first occurence.");
    ("-missing_gw", Arg.Set missing_gw,
     ": print missing translation managed by gw.");
    ("-missing_gnt", Arg.Set missing_gnt,

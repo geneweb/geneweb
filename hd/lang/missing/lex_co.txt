@@ -1,0 +1,13 @@
+    !dir
+co:
+
+    a child-in-law/children-in-law
+en: one child-in-law/children-in-law
+fr: un bel-enfant/beaux-enfants
+co:
+
+    pacsed%t to
+en: Civil solidarity pact%t with
+fr: PACS%t avec
+co:
+
