@@ -513,7 +513,8 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
              (if propose_dag then "&dag=on" else "") image_opt;
            Wserver.print_string (Utf8.capitalize (transl conf "see"));
            if n > 1 && not propose_dag then
-             Wserver.print_string (transl conf " the first branch");
+             Wserver.print_string 
+               (Printf.sprintf " %s" (transl conf "the first branch"));
            Wserver.printf "</a>"
          end;
        Wserver.printf "</li>")

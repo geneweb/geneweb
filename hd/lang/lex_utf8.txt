@@ -9672,21 +9672,6 @@ pt: nº pessoas
 ru: люди
 sv: nb individer
 
-    NB: you should try another relationship computing mode
-co: andate puru à pruvà torna impieghendu un altru modu di calculu
-de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
-en: you can try another computing option
-es: puede relanzar un cálculo eligiendo otro modo de cálculo
-fi: valitse toinen laskutapa ja laske uudelleen
-fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
-it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
-nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
-no: velg en annen utregningsmåte og beregn påny
-oc: podètz ensajar amb un autre metòde de calcul de relacion
-pt: pode recomeçar utilizando um novo método de cálculo 
-ru: попытайтесь найти родственную связь другим образом
-sv: välj ett annat uträkningssätt och räkna ut igen
-
     new modification
 co: cliccà quì per fà una nova currezzione
 de: hier klicken um eine neue Korrektion durchzuführen
@@ -10126,6 +10111,235 @@ ru: заметки изменены
 sk: poznámky zmenené
 sl: zaznamek spremenjen
 sv: noteringar modifierade
+
+
+    see ascendants notes/sources
+co: fighjà e note è e fonte
+de: siehe Notizen/Quellen
+en: View notes/sources
+es: ver las notas/fuentes
+fi: Katso merkinnät/lähteet
+fr: voir les notes & les sources
+it: vedere le note/fonti
+nl: notities & bronnen bekijken
+no: Se på merknader/kilder
+oc: veire las nòtas e las fonts
+pt: ver notas & fontes
+ru: смотри заметки/документы
+sv: Se kommande generations noteringar och källor
+
+    see ascendants pictures
+co: fighjà e fotò
+de: siehe Porträts
+en: View pictures
+es: ver los retratos
+fi: Näytä kuvat
+fr: voir les photos
+it: vedere i ritratti
+nl: foto's bekijken
+no: Se på bilder
+oc: veire las fòtos
+pt: ver fotos
+ru: смотри изображения предков
+sv: Se kommande generations bilder
+
+    see descendants notes/sources
+co: fighjà e note è e fonte
+de: siehe Notizen/Quellen
+en: View notes/sources
+es: ver las notas/fuentes
+fi: Näytä merkinnät/lähteet
+fr: voir les notes & les sources
+it: vedere le note/fonti
+nl: notities & bronnen bekijken
+no: Se på merknader/kilder
+oc: veire las nòtas e las fonts
+pt: ver notas & fontes
+ru: смотри заметки/документы потомков
+sv: Se efterföljandes noteringar och källor
+
+    see descendants pictures
+co: fighjà e fotò
+de: siehe Porträts
+en: View pictures
+es: ver los retratos
+fi: Näytä kuvat
+fr: voir les photos
+it: vedere i ritratti
+nl: foto's bekijken
+no: Se på bilder
+oc: veire las fòtos
+pt: ver fotos
+ru: смотри изображения потомков
+sv: Se efterföljandes bilder
+
+    the latest %d celebrated marriages
+bg: последните %d чествувани сватби
+co: e %d ultime unione celebrate
+de: die %d letzten gefeierten Hochzeiten
+en: Last %d marriages (Date of marriage)
+es: los %d últimos matrimonios célebres
+fi: Viimeiset %d avioliittoa (vihkipäivämäärä)
+fr: les %d dernières unions célébrées
+it: i %d ultime unioni celebrate
+nl: de %d laatste uitgevoerde huwelijken
+no: Siste %d ekteskap (Ekteskapsdato)
+oc: las %d darrièras unions celebradas
+pt: as últimas %d uniões celebradas
+ru: последние %d свадеб
+sv: Det senaste %d firade bröllopet
+
+    the latest %d registered marriages
+bg: последните %d регистрирани сватби
+co: e %d ultime unione arregistrate
+de: die %d letzten eingetragenen Hochzeiten
+en: Last %d marriages (Date of entry)
+es: los %d últimos matrimonios registrados
+fi: Viimeiset %d rekisteröityä avioliittoa (syöttämispäivämäärä)
+fr: les %d dernières unions enregistrées
+it: le %d ultime unioni inserite
+nl: de %d laatste uitgevoerde huwelijken
+no: Siste %d ekteskap (Registreringsdato)
+oc: las %d darrièras unions enregistradas
+pt: as últimas %d uniões registadas
+ru: последние %d зарегистрированных браков
+sv: Det senast %d registreade äktenskapet
+
+    the modification impacted %d persons
+co: a mudificazione hè riesciuta : %d scheda(e) curretta(e)
+de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
+en: %d entries have been successfully updated
+es: la modificación ha sido hecha: %d ficha/s corregida/s
+fi: %d tietuetta on onnistuneesti päivitetty
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+it: la modifica è stata effettuata : %d scheda/e corretta/e
+nl: wijziging goed uitgevoerd : %d fiche(n) verbeterd
+no: %d registreringer er blitt oppdatert
+oc: la modification se faguèt: %s fichas modificadas
+pt: a alteração decorreu com sucesso: %d ficha(s) corrigida(s)
+ru: изменения затронули %d людей
+sv: Modifiering av inklämda %d personer
+
+    statistics and anniversaries
+bg: статистика и годишнини
+co: statistiche è anniversarii
+de: Statistik und Geburtstage
+en: statistics and anniversaries
+es: Estadísticas y aniversarios
+fi: tilastot ja vuosipäivät
+fr: statistiques et anniversaires
+it: statistiche e compleanni
+nl: statistieken en verjaardagen
+no: statistikk og familehendelser
+oc: estatisticas e aniversaris
+pt: estatísticas e aniversários
+ru: статистика и годовщины
+sv: statistik och årsdagar
+
+    to come
+co: hà da vene
+de: in Erwartung
+en: to come
+es: pronto
+fi: tulevat tapahtumat
+fr: à venir
+it: da venire
+nl: te komen
+no: kommende hendelser
+oc: a venir
+pt: brevemente
+ru: ещё будет
+sv: kommande händelser
+
+    to see the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: per fighjà a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
+de: , um den ersten zu sehen
+en: to see the first one
+eo: por vidi la unuan branĉon
+es: para ver la primera rama
+et: esimese haru vaatamiseks
+fi: nähdäksesi ensimmäisen haaran
+fr: pour voir la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: per vedere il primo
+lv: skatīt pirmo zaru
+nl: om de eerste tak te zien
+no: for å se den første
+oc: per veire la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: för att se den första
+
+    to see the first relationship link
+af: om die eerste te sien
+bg: за да видите първата родствена връзка
+br: evit gwelout al liamm kentañ
+ca: per veure el primer vincle de parentesc
+co: per fighjà a prima leia
+cs: zobrazit první
+da: for at se det første
+de: , um die erste zu sehen
+en: to see the first one
+eo: por vidi la unuan ligon de parenceco
+es: para ver el primer vínculo de parentesco
+et: esimese sugulussuhte vaatamiseks
+fi: nähdäksesi ensimmäisen sukulaisuuden
+fr: pour voir le premier
+he:  לראות את הקשר המשפחתי הראשון
+is: til að sjá fyrstu tengsl
+it: per vedere il primo
+lv: skatīt pirmo attiecību saiti
+nl: om de eerste te zien
+no: for å se den første
+oc: per veire lo primièr ligam de parentatge
+pl: aby zobaczyć pierwszą linię pokrewieństwa
+pt: para ver o primeiro link
+ro: pentru a vedea prima relatie
+ru: чтобы увидеть первую связь отношения
+sk: zobraziť prvý vzťah
+sl: za prikaz prve sorodstvene povezave
+sv: för att se den första
+
+    trees & lists
+co: Arburi è Liste
+de: Bäume & Listen
+en: Charts & Lists
+es: Árboles & listas
+fi: Kaaviot & Listat
+fr: Arbres & Listes
+it: Alberi & Elenchi
+nl: Grafieken en lijsten
+no: Tavler & Lister
+oc: Arbres e Listas
+pt: Tabelas & Listas
+ru: Деревья и Списки
+sv: Diagram & Listor
+
+    NB: you should try another relationship computing mode
+co: andate puru à pruvà torna impieghendu un altru modu di calculu
+de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
+en: you can try another computing option
+es: puede relanzar un cálculo eligiendo otro modo de cálculo
+fi: valitse toinen laskutapa ja laske uudelleen
+fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
+it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
+nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
+no: velg en annen utregningsmåte og beregn påny
+oc: podètz ensajar amb un autre metòde de calcul de relacion
+pt: pode recomeçar utilizando um novo método de cálculo 
+ru: попытайтесь найти родственную связь другим образом
+sv: välj ett annat uträkningssätt och räkna ut igen
 
     notes summary
 bg: резюме на бележките
@@ -13077,22 +13291,6 @@ ru: статистика
 sk: štatistika
 sl: statistike
 sv: statistik
-
-    statistics and anniversaries
-bg: статистика и годишнини
-co: statistiche è anniversarii
-de: Statistik und Geburtstage
-en: statistics and anniversaries
-es: Estadísticas y aniversarios
-fi: tilastot ja vuosipäivät
-fr: statistiques et anniversaires
-it: statistiche e compleanni
-nl: statistieken en verjaardagen
-no: statistikk og familehendelser
-oc: estatisticas e aniversaris
-pt: estatísticas e aniversários
-ru: статистика и годовщины
-sv: statistik och årsdagar
 
     subdivision
 co: paisolu

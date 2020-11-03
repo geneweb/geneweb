@@ -77,7 +77,7 @@ let cut_all_msg_src s =
 
 let get_msg_src repo =
   let msg = ref [] in
-  ($ TODO the current setup misses translations with the string on the next line !! *)
+  (* TODO the current setup misses translations with the string on the next line !! *)
   let regexp = Str.regexp "transl.* \"" in
   List.iter
     (fun src ->
