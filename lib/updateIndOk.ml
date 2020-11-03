@@ -708,41 +708,10 @@ let reconstitute_person conf =
   in
   p, ext
 
-let check_event_witnesses conf witnesses =
-  let len = Array.length witnesses in
-  let rec loop i =
-    if i = len then None
-    else begin
-      let ((fn, sn, _, _, _), _) = Array.get witnesses i in
-      if fn = "" && sn = "" then loop (i + 1)
-      else if fn = "" || fn = "?" then
-        Some
-          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-           transl conf "first name missing")
-      else if sn = "" || sn = "?" then
-        Some
-          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-           transl conf "surname missing")
-      else loop (i + 1)
-    end
-  in
-  loop 0
-
 let check_person conf p =
-  if p.first_name = "" || p.first_name = "?" then
-    Some (transl conf "first name missing")
-  else if p.surname = "" || p.surname = "?" then
-    Some (transl conf "surname missing")
-  else
-    let rec loop pevents =
-      match pevents with
-        [] -> None
-      | evt :: l ->
-          match check_event_witnesses conf evt.epers_witnesses with
-            Some err -> Some err
-          | _ -> loop l
-    in
-    loop p.pevents
+  match Update.check_missing_name conf p with
+  | Some _ as err -> err
+  | None -> Update.check_missing_witnesses_names conf (fun e -> e.epers_witnesses) p.pevents
 
 let error_person conf err =
 #ifdef API

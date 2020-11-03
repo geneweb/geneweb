@@ -76,3 +76,13 @@ val update_conf : config -> config
 val bad_date : config -> dmy -> 'a
 val check_greg_day : config -> dmy -> unit
 
+val check_missing_witnesses_names
+  : config
+  -> ('a -> ((string * string * 'b * 'c * 'd) * 'e) array)
+  -> 'a list
+  -> string option
+
+val check_missing_name
+  : config
+  -> ('a, 'b, string) Def.gen_person
+  -> string option

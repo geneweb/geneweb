@@ -104,6 +104,12 @@ val string_of_int_sep : string -> int -> string
 *)
 val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
 
+(** [list_find_map fn list]
+    OCaml Stdlib's [List.find_map] (introduced in 4.10.0)
+    backported into GeneWeb
+  *)
+val list_find_map : ('a -> 'b option) -> 'a list -> 'b option
+
 (** [check_magic magic ic]
     Read (and consume) the [magic] string at the beggining of [ic]
     and return [true].

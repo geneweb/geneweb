@@ -364,29 +364,29 @@ let print_add conf base mod_p =
   | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
-let print_mod_aux conf base mod_p callback =
+let print_mod_aux conf base ncn mod_p callback =
   try
-    let p : ('a, string * string * int * Update.create * string, string) gen_person = reconstitute_person conf base mod_p in
+    let p : ('a, string * string * int * Update.create * string, string) gen_person =
+      reconstitute_person conf base mod_p
+    in
     let p = UpdateIndOk.strip_person p in
     let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
     let digest = Update.digest_person ini_ps in
     if digest = mod_p.Mwrite.Person.digest then
-      match UpdateIndOk.check_person conf p with
-      | Some err ->
-          (* Correspond au cas ou fn/sn = ""/"?" *)
-          (* => ne devrait pas se produire       *)
-          Api_update_util.UpdateError err
+      match match if ncn then None else Update.check_missing_name conf p with
+        | Some _ as err -> err
+        | None -> Update.check_missing_witnesses_names conf (fun e -> e.epers_witnesses) p.pevents
+      with
+      | Some err -> Api_update_util.UpdateError err
       | None -> callback p
     else
-      (* On lance l'exception par Update.error_digest *)
       let _ = Update.error_digest conf in
       Api_update_util.UpdateError "BaseChanged"
   with
   | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
 
-
-let print_mod ?(fexclude = []) conf base mod_p =
+let print_mod ?(no_check_name = false) ?(fexclude = []) conf base mod_p =
   let ip = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
   let o_p =
     Util.string_gen_person base (gen_person_of_person (poi base ip))
@@ -440,7 +440,7 @@ let print_mod ?(fexclude = []) conf base mod_p =
       Api_update_util.UpdateSuccess (wl, [], hr)
     end
   in
-  print_mod_aux conf base mod_p callback
+  print_mod_aux conf base no_check_name mod_p callback
 
 
 (**/**) (* Fonctions pour la première saisie, i.e. on n'a pas de base ! *)

@@ -438,6 +438,14 @@ let rec list_compare cmp l1 l2 =
   | [], _ -> -1
   | _, [] -> 1
 
+let rec list_find_map f = function
+  | [] -> None
+  | x :: l ->
+    begin match f x with
+      | Some _ as result -> result
+      | None -> list_find_map f l
+    end
+
 let executable_magic =
   match Sys.getenv_opt "GW_EXECUTABLE_MAGIC" with
   | Some x -> x

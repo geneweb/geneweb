@@ -1802,54 +1802,32 @@ let print_add_parents_ok conf base =
   *)
     let resp =
       try
-        begin
-          let (all_wl, all_ml, all_hr) =
-            match
-              Api_update_family.print_add
-                conf base mod_family mod_father mod_mother
-            with
-            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
+        let (all_wl, all_ml, all_hr) =
+          match Api_update_family.print_add conf base mod_family mod_father mod_mother with
+          | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErr s)
+          | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
+        in
+        (* Mise à jour des index et digest => fait dans Api_update_family.print_add *)
+        let aux p form (all_wl, all_ml, all_hr) =
+          if p.Mwrite.Person.firstname = "" then p.Mwrite.Person.firstname <- "?" ;
+          if p.Mwrite.Person.lastname = "" then p.Mwrite.Person.lastname <- "?" ;
+            match Api_update_person.print_mod ~no_check_name:true conf base p with
+            | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErr s)
-            | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
-          in
-          (* Mise à jour des index et digest => fait dans Api_update_family.print_add *)
-          let (all_wl, all_ml, all_hr) =
-            match mod_father.Mwrite.Person.firstname, mod_father.Mwrite.Person.lastname with
-            | ("?"|""), ("?"|"") ->
-              (* TODO
-                 raise (Update.ModErr "PersonKey")
-              *)
-              (all_wl, all_ml, all_hr)
-            | _ ->
-              match Api_update_person.print_mod conf base mod_father with
-              | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-              | Api_update_util.UpdateError s -> raise (Update.ModErr s)
-              | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
-          in
-          let (all_wl, all_ml, all_hr) =
-            match mod_mother.Mwrite.Person.firstname, mod_mother.Mwrite.Person.lastname with
-            | ("?"|""), ("?"|"") ->
-              (* TODO
-                 raise (Update.ModErr "PersonKey")
-              *)
-              (all_wl, all_ml, all_hr)
-            | _ ->
-              match Api_update_person.print_mod conf base mod_mother with
-              | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
-              | Api_update_util.UpdateError s -> raise (Update.ModErr s)
-              | Api_update_util.UpdateErrorConflict c ->
-                (* On dit que c'est le formulaire de la femme. *)
-                c.Mwrite.Create_conflict.form <- Some `person_form2;
-                raise (Api_update_util.ModErrApiConflict c)
-          in
-          let all_wl = match existing_fam with
-            | Some ifam ->
-              let ifam' = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
-              Def.PossibleDuplicateFam (ifam, ifam') :: all_wl
-            | _ -> all_wl
-          in
-          Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
-        end
+            | Api_update_util.UpdateErrorConflict c ->
+              c.Mwrite.Create_conflict.form <- Some form ;
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_ml, all_hr) = aux mod_father `person_form1 (all_wl, all_ml, all_hr) in
+        let (all_wl, all_ml, all_hr) = aux mod_mother `person_form2 (all_wl, all_ml, all_hr) in
+        let all_wl = match existing_fam with
+          | Some ifam ->
+            let ifam' = Gwdb.ifam_of_string @@ Int32.to_string mod_family.Mwrite.Family.index in
+            Def.PossibleDuplicateFam (ifam, ifam') :: all_wl
+          | _ -> all_wl
+        in
+        Api_update_util.UpdateSuccess (all_wl, all_ml, all_hr)
       with
       | Update.ModErr s -> Api_update_util.UpdateError s
       | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c

@@ -977,6 +977,43 @@ let reconstitute_date_dmy conf var =
   in
   d, force_f_cal
 
+let check_missing_name conf p =
+  if p.first_name = "" || p.first_name = "?"
+  then Some (transl conf "first name missing")
+  else if p.surname = "" || p.surname = "?"
+  then Some (transl conf "surname missing")
+  else None
+
+let check_missing_witnesses_names conf get list =
+  let aux witnesses =
+    let len = Array.length witnesses in
+    let rec loop i =
+      if i = len then None
+      else begin
+        let ((fn, sn, _, _, _), _) = Array.get witnesses i in
+        if fn = "" && sn = "" then loop (i + 1)
+        else if fn = "" || fn = "?" then
+          Some
+            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
+             transl conf "first name missing")
+        else if sn = "" || sn = "?" then
+          Some
+            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
+             transl conf "surname missing")
+        else loop (i + 1)
+      end
+    in
+    loop 0
+  in
+  let rec loop = function
+    | [] -> None
+    | hd :: tl ->
+      match aux (get hd) with
+      | Some _ as err -> err
+      | None -> loop tl
+  in
+  loop list
+
 let check_greg_day conf d =
   if d.day > Date.nb_days_in_month d.month d.year then bad_date conf d
 

@@ -557,26 +557,6 @@ let error_family conf err =
 #endif
   raise @@ Update.ModErr err'
 
-let check_event_witnesses conf witnesses =
-  let len = Array.length witnesses in
-  let rec loop i =
-    if i < len then begin
-      let ((fn, sn, _, _, _), _) = Array.unsafe_get witnesses i in
-      if fn = "" && sn = "" then loop (i + 1)
-      else if fn = "" || fn = "?" then
-        Some
-          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-           transl conf "first name missing")
-      else if sn = "" || sn = "?" then
-        Some
-          (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-           transl conf "surname missing")
-      else loop (i + 1)
-    end
-    else None
-  in
-  loop 0
-
 let check_parents conf cpl =
   let (fa_fn, fa_sn, _, _, _) = Gutil.father cpl in
   let (mo_fn, mo_sn, _, _, _) = Gutil.mother cpl in
@@ -604,16 +584,7 @@ let check_parents conf cpl =
 let check_family conf fam cpl =
   let err_parents = check_parents conf cpl in
   let err_fevent_witness =
-    (* On regarde si les témoins sont bien renseignés. *)
-    let rec loop fevents =
-      match fevents with
-        [] -> None
-      | evt :: l ->
-          match check_event_witnesses conf evt.efam_witnesses with
-            Some err -> Some err
-          | _ -> loop l
-    in
-    loop fam.fevents
+    Update.check_missing_witnesses_names conf (fun e -> e.efam_witnesses) fam.fevents
   in
   err_fevent_witness, err_parents
 
