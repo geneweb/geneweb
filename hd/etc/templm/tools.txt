@@ -316,7 +316,7 @@
           </legend>
           <label><input type="checkbox" name="nogroup" value="on" %l_on;
                  %if;(evar.nogroup = "on") checked="checked"%end;
-                 %/>[don'T group the common branches together]</label>
+                 %/>[don't group the common branches together]</label>
           <label><input name="dpos" size="5" value="%if;(evar.dpos != "")%evar.dpos;%else;78%end;"
                  %/>[display by slices/slice width/overlap/total width]1</label>
           <label><input name="overlap" size="5" value="%if;(evar.overlap != "")%evar.overlap;%else;10%end;"

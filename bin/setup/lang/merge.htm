@@ -6,13 +6,8 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-de: Datenbanken zusammenführen
-en: Merging databases
-fr: Fusion de bases de données
-it: Fusione di basi di dati
-sv: Sammanslagning av databaser
-]</title>
+  <title>[Merging databases]
+</title>
 %fsetup.css;
 </head>
 
@@ -20,73 +15,24 @@ sv: Sammanslagning av databaser
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[
-de: Datenbanken zusammenführen
-en: Merging databases
-fr: Fusion de généalogies
-it: Fusione di basi di dati
-sv: Sammanslagning av databaser
-]
+[Merging databases]
 </h1>
 </div>
 
 <form method=GET action="merge">
 <input type=hidden name=lang value="%l">
 
-[
-de: Alle Datenbanken, die zusammengeführt werden sollen,
-    müssen unter <b><font color=#2f6400>GeneWeb</font></b>
-    verfügbar sein.
-en: All your databases to be merged must be first under
-    <b><font color=#2f6400>GeneWeb</font></b>.
-fr: Il faut d’abord que toutes vos bases à fusionner soient sous
-    <b><font color=#2f6400>GeneWeb</font></b>.
-it: Prima bisogna che tutte le basi da fondere assieme siano al formato
-    <b><font color=#2f6400>GeneWeb</font></b>.
-sv: Alla databaser som ska slås samman måste finnas under
-    <b><font color=#2f6400>GeneWeb</font></b>.
-]
+[All your databases to be merged must be first under %G.]
 <p>
-[
-de: Falls das nicht der Fall ist, sondern einige von ihnen z.B. nur
-    als GEDCOM-Dateien oder GeneWeb-Quelldateien vorliegen, kehre zum
-    <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmenü</a> zurück,
-    um sie unter <b><font color=#2f6400>GeneWeb</font></b> anzulegen,
-    dann kehre hierher zurück.
-en: If it is not the case, if, for example, some of them are just GEDCOM
-    files or GeneWeb source files, return to the <a
-    href="gwsetup?lang=%l;v=welcome.htm">main menu</a> to create them under
-    <b><font color=#2f6400>GeneWeb</font></b>, then go back to this page.
-fr: Si ce n’est pas le cas, si, par exemple, certaines d’entre elles sont
-    sous forme GEDCOM ou fichiers source GeneWeb, revenez au <a
-    href="gwsetup?lang=%l;v=welcome.htm">menu principal</a> pour les
-    créer sous <b><font color=#2f6400>GeneWeb</font></b>, puis
-    revenez à cette page.
-it: Se non è il caso e certune, ad esempio, sono
-    al formato GEDCOM o file sorgente  GeneWeb, tornate al <a
-    href="gwsetup?lang=%l;v=welcome.htm">menu principale</a> per crearle
-    sotto <b><font color=#2f6400>GeneWeb</font></b>, poi
-    ritornate a questa pagina.
-sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM
-    filer eller GeneWeb källfiler, gå tilbaka till <a
-    href = "gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a> för att skapa dem
-    under <b><font color=#2f6400>GeneWeb</font></b>, gå sedan tillbaka
-    till denna sida.
-]
+[If it is not the case, if, for example, some of them are just GEDCOM files or GeneWeb source files, return to the main menu to create them under %G, then go back to this page.]
+%(
+If it is not the case, if, for example, some of them are just GEDCOM files or Ge
+neWeb source files, return to the main menu to create them under %G, then go 
+back to this page.
+%)
 <p>
 <ul><li>
-[
-de: Wenn das geschehen ist, wähle die Datenbanken, die du
-    zusammenführen möchtest:
-en: Once done, select the databases you want to merge by pushing their
-    associated buttons:
-fr: Une fois fait, sélectionnez les bases que vous voulez fusionner
-    en cliquant sur leur bouton associé:
-it: Una volta fatto ciò, selezionate le basi che volete fondere
-    cliccando sul bottone che è loro associato:
-sv: När du är klar, välj de databaser du vill slå samman genom att klicka
-    i deras knappar:
-]
+[Once done, select the databases you want to merge by pushing their associated buttons:]
 <p>
 <table class="setup">
 %b{
@@ -94,73 +40,27 @@ sv: När du är klar, välj de databaser du vill slå samman genom att klicka
 <td><a href="http://%m:%P/%a">%a</a></td>
 <td><input type=checkbox name="%a" value="on_"></td>
 </tr>|
-<tr align=left><td>- [
-de: keine Datenbank vorhanden
-en: there is no database at present
-fr: il n’y a aucune base de données actuellement
-it: attualmente non esiste nessuna base di dati
-sv: det finns ingen databas för närvarande
-]</tr></td>}
+<tr align=left><td>- [there is no database at present]
+</tr></td>}
 </table>
 <p>
 <li>
-[
-de: Gib den Namen ein, den du deiner resultierenden Datenbank geben
-    willst:
-en: Indicate the name you want to give to your resulting database:
-fr: Indiquez le nom que vous voulez donner à votre base de
-    données résultante:
-it: Indicate il nome che volete dare alla base di
-    dati risultante:
-sv: Skriv namnet du vill ge din databas:
-]
+[Indicate the name you want to give to your resulting database:]
 <p>
 <input name=o size=30>
 <p>
 <li>
-[
-de: Dann drücke diesen Knopf:
-en: Then push this button:
-fr: Puis appuyez sur ce bouton :
-it: Poi cliccate su questo bottone:
-sv: Tryck sedan denna knapp:
-]
+[Then click on this button][:]
 <p>
-<input type=submit value="[
-de: Zusammenführen
-en: Merge
-fr: Fusionner
-it: Fondere
-sv: Slåsamman
-]">
+<input type=submit value="[Merge]
+">
 </ul>
 </form>
 <p>
-[
-de: Bemerkung: Das Zusammenführen geschieht durch simple
-    Konkatenation der Datenbanken. Es wird keine Überprüfung
-    auf identische Personen durchgeführt. Nach dem
-    Zusammenführen musst du deshalb die möglicherweise nun
-    doppelt vorhandenen Personen oder Familien ausfindig machen und
-    sie einzeln zusammenführen.
-    Siehe dazu die <a href="doc/%l/update.htm#MrgP">Documentation</a>.
-en: Remark: merging consists on simple concatenation of the databases. There
-    is no research for identical persons. After merging, you therefore have
-    to research the possible doubled persons or families and merge them.
-    See the <a href="doc/%l/update.htm#MrgP">documentation</a>.
-fr: Remarque : la fusion consiste en la simple concaténation des
-    bases de données. Il n’y a pas de recherche de personnes
-    identiques. Après la fusion, il faudra donc rechercher les
-    éventuelles personnes et familles en double et les fusionner.
-    Voir la <a href="doc/%l/update.htm#MrgP">documentation</a>.
-it: Nota: Una fusione consiste in una semplice concatenazione delle
-    basi di dati. Non viene effettuata nessuna ricerca di persone identiche.
-    Dopo la fusione, bisognerà ricercare le eventuali
-    persone o famiglie doppie e fonderle.
-    Vedi la <a href="doc/%l/update.htm#MrgP">documentazione</a>.
-sv: Obs: sammanslagningen lägger helt enkelt ihop databaserna. Det
-    är ingen kontroll av identiska personer. Efter sammanslagningen, måste
-    du därför undersöka möjligheten att det finns dubbla personer eller
-    familjer och slå ihop dem.
-    Se <a href = "doc/%l/update.htm#MrgP">dokumentationen</a>.
-]
+[Remark: merging consists on simple concatenation of the databases. There is no research for identical persons. After merging, you therefore have to research the possible doubled persons or families and merge them. See the documentation.]
+(%D)
+%(
+Remark: merging consists on simple concatenation of the databases. There is no r
+esearch for identical persons. After merging, you therefore have to research the
+possible doubled persons or families and merge them. See the documentation.
+%)
