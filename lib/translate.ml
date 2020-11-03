@@ -66,12 +66,12 @@ let inline lang macro_char macro s =
   in
   loop None true 0
 
-let language_name lang lang_def =
+let language_name ?(sep='/') lang lang_def =
   let str = lang_def in
   let len = String.length lang in
   let rec loop beg i =
     if i = String.length str && i = beg then lang
-    else if i = String.length str || str.[i] = '/' then
+    else if i = String.length str || str.[i] = sep then
       if i > beg + len + 1 && str.[beg+len] = '=' &&
          String.sub str beg len = lang
       then
