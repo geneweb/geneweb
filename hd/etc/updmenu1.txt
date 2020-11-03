@@ -38,10 +38,10 @@
     %end;
     %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
     %elseif;(not is_male and not is_female)
-      <span><a href="%prefix;m=ADD_FAM;ip=%index;;sex=M" class="button adder hiddeable">[*add mariage(s)] ([M/F]0)</a></span>
-      <span><a href="%prefix;m=ADD_FAM;ip=%index;;sex=F" class="button adder hiddeable">[*add mariage(s)] ([M/F]1)</a></span>
+      <span><a href="%prefix;m=ADD_FAM;ip=%index;;sex=M" class="button adder hiddeable">[*add mariage] ([M/F]0)</a></span>
+      <span><a href="%prefix;m=ADD_FAM;ip=%index;;sex=F" class="button adder hiddeable">[*add mariage] ([M/F]1)</a></span>
     %else;
-      <span><a href="%prefix;m=ADD_FAM;ip=%index;" class="button adder hiddeable">[*add mariage(s)]</a></span>
+      <span><a href="%prefix;m=ADD_FAM;ip=%index;" class="button adder hiddeable">[*add mariage]</a></span>
     %end;
   </div>
 

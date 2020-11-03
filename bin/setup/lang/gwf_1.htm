@@ -7,15 +7,8 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-de: Parameter "%a"
-en: Parameters "%a"
-es: Parámetros "%a"
-fr: Paramètres "%a"
-it: Parametri
-lv: "%a" parametri
-sv: Parametrar "%a"
-]</title>
+  <title>[Parameters "%a"]
+</title>
 %fsetup.css;
 </head>
 
@@ -23,210 +16,58 @@ sv: Parametrar "%a"
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[
-de: Parameter "%a"
-en: Parameters "%a"
-es: Parámetros "%a"
-fr: Paramètres "%a"
-it: Parametri
-lv: "%a" parametri
-sv: Parametrar "%a"
-]
+[Parameters "%a"]
 </h1>
 </div>
-
-<p><p>
-
+<p>
 <form method=POST action="gwf_1">
 <input type=hidden name=lang value="%l">
 <input type=hidden name=anon value="%a">
-
 <p>
 <ul><li>
-[
-de: Hier sind die Parameter der Datenbank <a
-    href="http://%m:%P/%a">%a</a>. 
-    Nimm die geünschten Änderungen vor:
-en: Here are the parameters of the base <a
-    href="http://%m:%P/%a">%a</a>. Change what you estimate
-    necessary:
-es: He aquí los parámetros de la base <a
-    href="http://%m:%P/%a">%a</a>. Cambie aquellos que Ud. estime
-    necesarios:
-fr: Voici les paramètres de la base <a
-    href="http://%m:%P/%a">%a</a>. Effectuez les modifications de
-    votre choix:
-it: Ecco i parametri della base <a
-    href="http://%m:%P/%a">%a</a>. Effettuate le modifiche
-    desiderate:
-lv: Sekojoðie ir datu bâzes <a
-    href="http://%m:%P/%a">%a</a> parametri. Mainiet, ja kas Jums ðíiet
-    nepiecieðams:
-sv: Här är parametrarna för databasen <a
-    href="http://%m:%P/%a">%a</a>. Ändra vad du anser nödvändigt:
-]
-
+[Here are the parameters of the base "%a". Change what you estimate necessary][:]
 <p>
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- body_prop -</strong></td>
 </tr>
-
 <tr align=left>
-<td>[
-de: Erlaubt die Änderung der Hintergrundfarbe oder das Hinzufügen
-    eines Hintergrundmusters, sowie das Ändern der Farbe von Text und
-    Links. Seine Syntax entspricht der, die im HTML im 
-    "&lt;body&gt;"-Tag vor dem ">" erlaubt ist. Details findest du
-    in deiner HTML-Dokumentation. Beispiel:
-en: Allows to change the background color, put a background pattern,
-    or change the color of the text or the links. Its syntax is the one
-    of HTML accepted in the tag "&lt;body&gt;" before the ">". See your
-    HTML documentation. Example:
-es: Permite de configurar los colores de fondo, o de introducir un motivo asi
-    como de cambiar el color del texto y de los enlaces. Su sintaxis es la
-    sintaxis HTML aceptada en el "tag" "&lt;body&gt;" antes de ">". Lea
-    Ud. su documentación HTML. Por ejemplo:
-fr: Permet de configurer les couleurs de fond, ou d’y mettre un motif
-    et de changer la couleur du texte et des liens. Sa syntaxe est la
-    syntaxe HTML acceptée dans le tag "&lt;body&gt;" avant le ">". Voyez
-    votre documentation HTML. Exemple:
-it: Permette di configurare i colori di fondo, o di inserire un motivo
-    e di cambiare il colore dei testi e dei links. La sua sintassi è la
-    sintassi HTML accettata nel tag "&lt;body&gt;" prima di ">". Consultate
-    la vostra documentazione HTML. Esempio:
-lv: Ar ðo Jûs variet mainît fonu, fona krâsu un arî norâþu krâsu. Ðî
-    parametra sintakse atbilst HTML sintaksei pie "&lt;body&gt;" pirms
-    ">". Skatiet HTML dokumentâciju. Piemçram:
-sv: Gör det möjligt att ändra bakgrunds färgen, att sätta in ett bakgrunds
-    mönster eller att ändra färgen för texten eller länkarna. Syntaxen är
-    den samma som HTML accepterar i taggen "&lt;body&gt;" före ">". Se din
-    HTML dokumentation. Exempel:
-]
-
+<td>[Allows to change the background color, put a background pattern, or change the color of the text or the links. Its syntax is the one of HTML accepted in the tag "&lt;body&gt;" before the ">". See your HTML documentation. Example:]
+%(
+Allows to change the background color, put a background pattern, or change the c
+olor of the text or the links. Its syntax is the one of HTML accepted in the tag
+ "&lt;body&gt;" before the ">". See your HTML documentation. Example:
+%)
 <p>
 <pre>
      text=#CC0000 vlink=yellow
 </pre>
 <p>
-
-[
-de: Ein paar interessante Variablen… 
-en: Some interesting variables…
-es: Algunas variable interesantes…
-fr: Quelques variables intéressantes…
-it: Alcune variabili interessanti…
-lv: Daþas nozîmîgâkâs vçrtîbas…
-sv: Några intressanta variabler…
-]
-
+[Some interesting variables…]
 <ul>
 <li>background:
-[
-de: Hintergrundbild (siehe auch diesen <a
-    href="gwsetup?lang=%l;o=%a;v=backg.htm">Hinweis</a>)
-en: background image (see the <a
-    href="gwsetup?lang=%l;o=%a;v=backg.htm">note</a>)
-es: imagen de fondo (vea la <a
-    href="gwsetup?lang=%l;o=%a;v=backg.htm">nota</a>)
-fr: image de fond (voir la <a
-    href="gwsetup?lang=%l;o=%a;v=backg.htm">note</a>)
-it: immagine di fondo (vedi la <a
-    href="gwsetup?lang=%l;o=%a;v=backg.htm">nota</a>)
-lv: fona attçls (skatiet <a
-    href="gwsetup?lang=%l;o=%a;v=backg.htm">piezîmi</a>)
-sv: bakgrundsbild (se <a
-    href="gwsetup?lang=%l;o=%a;v=backg.htm">noteringen</a>)
-]
-
+[background image] (<a href="gwsetup?lang=%l;o=%a;v=backg.htm">[Note]</a>)
 <li>bgcolor:
-[
-de: Hintergrundfarbe
-en: background color
-es: color de fondo
-fr: couleur de fond
-it: colore di fondo
-lv: fona krâsa
-sv: bakgrundsfärg
-]
-
+[background color]
 <li>text:
-[
-de: Textfarbe
-en: text color
-es: color del texto
-fr: couleur du texte
-it: colore del testo
-lv: teksta krâsa
-sv: textfärg
-]
-
+[text color]
 <li>link:
-[
-de: Linkfarbe
-en: links color
-es: color de los enlaces
-fr: couleur des liens
-it: colore dei links
-lv: norâþu krâsa
-sv: länkfärg
-]
-
+[links color]
 <li>vlink:
-[
-de: Farbe für bereits besuchte Links
-en: color of already visited links
-es: color de los enlaces que ya han sido visitados
-fr: couleur des liens déjà visités
-it: colore dei links visitati
-lv: izmantoto norâþu krâsa
-sv: färg för de redan besökta länkarna
-]
-
+[color of already visited links]
 </ul>
-
 <p>
-
-[
-de: Du kannst auch eine der vorgeschlagenen Farbkombinationen wählen.
-en: You can also select one of the proposed colors combinations.
-es: Ud. puede asi mismo seleccionar una de las combinaciones de colores
-    propuestas.
-fr: Vous pouvez aussi sélectionner une des combinaisons de couleurs
-    proposées.
-it: Potete anche selezionare una delle combinazioni di colore
-    proposte.
-lv: Jûs variet arî izvçlçties arî kâdu no sekojoðâm gatavajâm krâsu
-    kombinâcijâm.
-sv: Du kan också välja en av följande föreslagna färg kombinationer.
-]
-
+[You can also select one of the proposed colors combinations.]
 <p>
-
-[
-de: Diese Konfiguration gilt nicht nur für die Willkommensseite,
-    sondern für alle Seiten dieser Datenbank.
-en: This applies not only to the welcome page but to all the displayed pages
-    for this database.
-es: Esto se aplica no solamente a la "Página de Recepción", sino
-    también, a todas las páginas de esta base visualizables en
-    la pantalla.
-fr: Ceci s’applique non seulement à la page d’accueil mais à toutes les pages
-    affichées de cette base.
-it: Ciò sarà applicato non solo alla pagina di benvenuto, ma anche a
-    tutte le altre pagine della base visualizzate.
-lv: Ðâdi tiks attçlota ne tikai sveicinâjuma lappause, bet arî uz visâm
-    pârçjâm datu bâzes lappusçm.
-sv: Detta gäller inte bara för välkomstsidan utan för alla visade sidor
-    för denna databas.
-]
-
+[This applies not only to the welcome page but to all the displayed pages for this database.]
+%(
+This applies not only to the welcome page but to all the displayed pages for this 
+database.
+%)
 </td>
 </tr>
-
 <tr align=left><td align=center>
 <p>
-
 <table style="border:1px solid">
 <tr align=left>
 <td colspan=3>
@@ -234,220 +75,166 @@ sv: Detta gäller inte bara för välkomstsidan utan för alla visade sidor
 <input name=body_prop value="%Vbody_prop;" size=55><br>
 </td>
 </tr>
-
 <tr align=left>
-
 <td bgcolor="#FFFFFF">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900">
-<font color="#333333">[text/link/vlink]0</font>
-<font color="#006699">[text/link/vlink]1</font>
-<font color="#999900">[text/link/vlink]2</font>
+<font color="#333333">[text|link|vlink]0</font>
+<font color="#006699">[text|link|vlink]1</font>
+<font color="#999900">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#FFFFEE">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000">
-<font color="#000000">[text/link/vlink]0</font>
-<font color="#006699">[text/link/vlink]1</font>
-<font color="#990000">[text/link/vlink]2</font>
+<font color="#000000">[text|link|vlink]0</font>
+<font color="#006699">[text|link|vlink]1</font>
+<font color="#990000">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CCCCCC">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066">
-<font color="#000000">[text/link/vlink]0</font>
-<font color="#0000CC">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#000000">[text|link|vlink]0</font>
+<font color="#0000CC">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#FFFF00">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633">
-<font color="#FF6600">[text/link/vlink]0</font>
-<font color="#FF0033">[text/link/vlink]1</font>
-<font color="#336633">[text/link/vlink]2</font>
+<font color="#FF6600">[text|link|vlink]0</font>
+<font color="#FF0033">[text|link|vlink]1</font>
+<font color="#336633">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CCCC66">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300">
-<font color="#330000">[text/link/vlink]0</font>
-<font color="#CC0000">[text/link/vlink]1</font>
-<font color="#003300">[text/link/vlink]2</font>
+<font color="#330000">[text|link|vlink]0</font>
+<font color="#CC0000">[text|link|vlink]1</font>
+<font color="#003300">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#FFFF99">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333">
-<font color="#330000">[text/link/vlink]0</font>
-<font color="#CC0000">[text/link/vlink]1</font>
-<font color="#333333">[text/link/vlink]2</font>
+<font color="#330000">[text|link|vlink]0</font>
+<font color="#CC0000">[text|link|vlink]1</font>
+<font color="#333333">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#99CCCC">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366">
-<font color="#000066">[text/link/vlink]0</font>
-<font color="#0000CC">[text/link/vlink]1</font>
-<font color="#003366">[text/link/vlink]2</font>
+<font color="#000066">[text|link|vlink]0</font>
+<font color="#0000CC">[text|link|vlink]1</font>
+<font color="#003366">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CC99FF">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066">
-<font color="#000000">[text/link/vlink]0</font>
-<font color="#FF0033">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#000000">[text|link|vlink]0</font>
+<font color="#FF0033">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CCFF99">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300">
-<font color="#666600">[text/link/vlink]0</font>
-<font color="#006699">[text/link/vlink]1</font>
-<font color="#003300">[text/link/vlink]2</font>
+<font color="#666600">[text|link|vlink]0</font>
+<font color="#006699">[text|link|vlink]1</font>
+<font color="#003300">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#FFCC00">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066">
-<font color="#330000">[text/link/vlink]0</font>
-<font color="#CC0000">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#330000">[text|link|vlink]0</font>
+<font color="#CC0000">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#00FF33">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066">
-<font color="#0000CC">[text/link/vlink]0</font>
-<font color="#FF0099">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#0000CC">[text|link|vlink]0</font>
+<font color="#FF0099">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#006699">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF">
-<font color="#CCFFCC">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#00FFFF">[text/link/vlink]2</font>
+<font color="#CCFFCC">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#00FFFF">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#330000">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99">
-<font color="#FF6666">[text/link/vlink]0</font>
-<font color="#FFCC00">[text/link/vlink]1</font>
-<font color="#CCFF99">[text/link/vlink]2</font>
+<font color="#FF6666">[text|link|vlink]0</font>
+<font color="#FFCC00">[text|link|vlink]1</font>
+<font color="#CCFF99">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#003300">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00">
-<font color="#CCCC66">[text/link/vlink]0</font>
-<font color="#FFFFFF">[text/link/vlink]1</font>
-<font color="#FFFF00">[text/link/vlink]2</font>
+<font color="#CCCC66">[text|link|vlink]0</font>
+<font color="#FFFFFF">[text|link|vlink]1</font>
+<font color="#FFFF00">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#333333">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66">
-<font color="#CCCCCC">[text/link/vlink]0</font>
-<font color="#FF6666">[text/link/vlink]1</font>
-<font color="#CCCC66">[text/link/vlink]2</font>
+<font color="#CCCCCC">[text|link|vlink]0</font>
+<font color="#FF6666">[text|link|vlink]1</font>
+<font color="#CCCC66">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#666600">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF">
-<font color="#FFFFFF">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#99CCFF">[text/link/vlink]2</font>
+<font color="#FFFFFF">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#99CCFF">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#000000">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66">
-<font color="#99CCFF">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#CCCC66">[text/link/vlink]2</font>
+<font color="#99CCFF">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#CCCC66">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#333333">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF">
-<font color="#FFFFFF">[text/link/vlink]0</font>
-<font color="#99CCFF">[text/link/vlink]1</font>
-<font color="#CC99FF">[text/link/vlink]2</font>
+<font color="#FFFFFF">[text|link|vlink]0</font>
+<font color="#99CCFF">[text|link|vlink]1</font>
+<font color="#CC99FF">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#CC0000">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
-<font color="#FFFFFF">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#00FFFF">[text/link/vlink]2</font>
+<font color="#FFFFFF">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#00FFFF">[text|link|vlink]2</font>
 </td>
-
 </tr>
-
 </table>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- default_lang -</strong></td>
 </tr>
-
 <tr align=left>
-<td>[
-de: Standardsprache.
-en: Default language.
-es: Lenguaje por defecto.
-fr: Langue par défaut.
-it: Lingua per difetto.
-lv: Noklusçtâ valoda.
-sv: Förvalt språk.
-]
-
+<td>[Default language.]
 <p>
-
-[
-de: Wenn dieser Wert "-" ist, wird die Standardsprache des Kommandos "gwd"
-    verwendet.
-en: If it is "-", the default language of the command "gwd" is applied.
-es: Si es "-", es el lenguaje por defecto del comando "gwd"
-    que se tendrá en cuenta.
-fr: Si c’est "-", c’est la langue par défaut de la commande "gwd"
-    qui sera prise.
-it: Se è "-", è la lingua per difetto del comando "gwd"
-    che sarà presa in considerazione.
-lv: Ja atstâsiet vçrtîbu "-", noklusçtâ valoda bûs tâ pati, kas "gwd" komandai.
-sv: Om det är "-", kommer det förvalda språket för kommandot "gwd" att gälla.
-]</td>
-
+[If it is "-", the default language of the command "gwd" is applied.]
+</td>
 </tr>
-
 <tr align=left>
 <td align=center>
 <select name=default_lang>
@@ -485,801 +272,314 @@ sv: Om det är "-", kommer det förvalda språket för kommandot "gwd" att gäll
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_anc_level -</strong></td></tr>
 <tr align=left>
-<td>[
-de: Maximale Stufe bei der Anzeige von Vorfahren.
-en: Maximum level when displaying ancestors.
-fr: Niveau maximum dans l’affichage des ascendants.
-it: Livello massimo di visualizzazione degli antenati.
-]
-
+<td>[Maximum level when displaying ancestors.]
 <p>
-
-[
-de: Wenn Vorfahren angezeigt werden, soll die Anzahl der angezeigten
-    Generationen limitiert werden. Per Default ist die Anzahl acht
-    Generationen, aber du kannst hier eine andere Anzahl einstellen.
-en: When ancestors are displayed, limit the number of displayed
-    generations. By default, it is 8 generations, but you can
-    indicate a different value here.
-fr: Quand on affiche les ascendants, limite le nombre de
-    générations affichables. C’est 8 par défaut,
-    mais vous pouvez indiquer une valeur différente ici.
-it: Quando si visualizzano gli antenati, limita il numero delle
-    parentele visualizzabili. Il numero per difetto è 8, ma potete
-    indicare qui un valore diverso.
-]
+[When ancestors are displayed, limit the number of displayed generations. By default, it is 8 generations, but you can indicate a different value here.]
+%(
+When ancestors are displayed, limit the number of displayed generations. By defa
+ult, it is 8 generations, but you can indicate a different value here.
+%)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_anc_level value="%Vmax_anc_level;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_desc_level -</strong></td></tr>
 <tr align=left>
-<td>[
-de: Maximale Stufe bei der Anzeige von Nachfahren.
-en: Maximum level when displaying descendants.
-fr: Niveau maximum dans l’affichage des descendants.
-it: Livello massimo di visualizzazione dei discendenti.
-]
-
+<td>[Maximum level when displaying descendants.]
 <p>
-
-[
-de: Wenn Nachfahren angezeigt werden, soll die Anzahl der angezeigten
-    Generationen limitiert werden. Per Default ist die Anzahl zwölf
-    Generationen, aber du kannst hier eine andere Anzahl einstellen.
-en: When descendants are displayed, limit the number of displayed
-    generations. By default, it is 12 generations, but you can
-    indicate a different value here.
-fr: Quand on affiche les descendants, limite le nombre de
-    générations affichables. C’est 12 par défaut,
-    mais vous pouvez indiquer une valeur différente ici.
-it: Quando si visualizzano i discendenti, limita il numero delle
-    parentele visualizzabili. Il numero per difetto è 12, ma
-    potete indicare qui un valore diverso.
-]
+[When descendants are displayed, limit the number of displayed generations. By default, it is 12 generations, but you can indicate a different value here.]
+%(
+When descendants are displayed, limit the number of displayed generations. By de
+fault, it is 12 generations, but you can indicate a different value here.
+%)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_desc_level value="%Vmax_desc_level;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_anc_tree -</strong></td></tr>
 <tr align=left>
-<td>[
-de: Maximale Stufe bei der Anzeige von Vorfahren als Baum.
-en: Maximum level when displaying ancestors by tree.
-fr: Niveau maximum dans l’affichage des ascendants par arbre.
-it: Livello massimo di visualizzazione degli antenati per albero.
-]
-
+<td>[Maximum level when displaying ancestors by tree.]
 <p>
-
-[
-de: Wenn Vorfahren in Baumstruktur angezeigt werden, soll die Anzahl der 
-    angezeigten Generationen limitiert werden. Per Default ist die Anzahl 
-    sieben Generationen, aber du kannst hier eine andere Anzahl einstellen.
-en: When ancestors are displayed by tree, limit the number of displayed
-    generations. By default, it is 7 generations, but you can
-    indicate a different value here.
-fr: Quand on affiche les ascendants par arbre, limite le nombre de
-    générations affichables. C’est 7 par défaut,
-    mais vous pouvez indiquer une valeur différente ici.
-it: Quando si visualizzano gli antenati per albero, limita il numero delle
-    parentele visualizzabili. Il numero per difetto è 7, ma potete
-    indicare qui un valore diverso.
-]
+[When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.]
+%(
+When ancestors are displayed by tree, limit the number of displayed generations.
+ By default, it is 7 generations, but you can indicate a different value here.
+%)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_anc_tree value="%Vmax_anc_tree;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_desc_tree -</strong></td></tr>
 <tr align=left>
-<td>[
-de: Maximale Stufe bei der Anzeige von Nachkommen als Baum.
-en: Maximum level when displaying descendants by tree.
-fr: Niveau maximum dans l’affichage des descendants par arbre.
-it: Massimo livello della visualizzazione dei discendenti per albero.
-]
-
+<td>[Maximum level when displaying descendants by tree.]
 <p>
-
-[
-de: Wenn Nachkommen in Baumstruktur angezeigt werden, soll die Anzahl der 
-    angezeigten Generationen limitiert werden. Per Default ist die Anzahl 
-    vier Generationen, aber du kannst hier eine andere Anzahl einstellen.
-en: When descendants are displayed by tree, limit the number of displayed
-    generations. By default, it is 4 generations, but you can
-    indicate a different value here.
-fr: Quand on affiche les descendants par arbre, limite le nombre de
-    générations affichables. C’est 4 par défaut,
-    mais vous pouvez indiquer une valeur différente ici.
-it: Quando si visualizzano i discendenti per albero, limita il numero delle
-    parentele visualizzabili. Il numero per difetto è 4, ma potete
-    indicare qui un valore diverso.
-]
+[When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.]
+%(
+When descendants are displayed by tree, limit the number of displayed generation
+s. By default, it is 4 generations, but you can indicate a different value here.
+%)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_desc_tree value="%Vmax_desc_tree;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- history -</strong></td></tr>
 <tr align=left>
-<td>[
-de: Änderungshistorie
-en: History of updates
-fr: Historique des mises à jour
-it: Riassunto degli aggiornamenti
-]
-
+<td>[History of updates]
 <p>
-
-[
-de: Auf der Startseite auf Änderungen mit einem Link
-    "Änderungshistorie" hinweisen.
-    <p>
-    Technische Bemerkung: Die Update-Protokolle werden in einer Datei
-    "history" im Datenbankverzeichnis (%a.gwb) gespeichert. Diese
-    Datei wächst endlos. Du kannst sie editieren um alte
-    Informationen zu löschen. Oder sie auch einfach löschen,
-    wenn Du mit einer leeren Version neu beginnen willst.
-en: Ask to indicate the updates in the welcome pages as a link
-    "history of updates".
-    <p>
-    Remark (technical): the updates traces are saved in a file named
-    "history" in the directory of the database (%a.gwb). This file
-    grows indefinitively. You can edit it to remove the old information.
-    Or you can also delete this file to restart empty.
-fr: Demande d’indiquer les mises à jour dans la page d’accueil
-    sous le lien "historique des mises à jour".
-    <p>
-    Remarque (technique): les traces des mises à jour sont
-    sauvées dans un fichier de nom "history" dans le répertoire
-    de la base de donnée (%a.gwb). Ce fichier grossit
-    indéfiniment. Si vous voulez effacer les anciennes traces,
-    il faut éditer ce fichier pour les supprimer. Ou vous pouvez
-    aussi supprimer le fichier pour repartir à vide.
-it: Domanda d'indicare gli aggiornamenti nella pagina di benvenuto
-    con il link "Riassunto degli aggiornamenti".
-    <p>
-    Nota (tecnica): le tracce degli aggiornamenti sono
-    salvate in un file chiamato "history" nella directory
-    della base di dati (%a.gwb). Questo file cresce
-    indefinitamente. Se volete cancellare le vecchie tracce,
-    è necessario editare il file e cancellarle. Potete anche
-    cancellare il file e ripartire con uno vuoto.
-]
+[Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.]
+%(
+Ask to indicate the updates in the welcome pages as a link "history of updates".
+ <p> Remark (technical): the updates traces are saved in a file named "history" 
+in the directory of the database (%a.gwb). This file grows indefinitively. You c
+an edit it to remove the old information. Or you can also delete this file to re
+start empty.
+%)
 </tr>
-
 <tr align=left>
 <td align=center>
-<input type=radio name=history value="yes"%Chistory=yes;>[yes/no]0
-<input type=radio name=history value="no"%Chistory=no;>[yes/no]1
+<input type=radio name=history value="yes"%Chistory=yes;>[yes|no]0
+<input type=radio name=history value="no"%Chistory=no;>[yes|no]1
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left><td><strong>- images_path -</strong></td></tr>
 <tr align=left>
-<td>[
-de: Bildpfad
-en: Images path
-fr: Chemin d’accès aux images
-it: Path che porta alle immagini
-]
-
+<td>[Images path]
 <p>
-
-[
-de: Wenn Du NICHT möchtest, dass deine Bilder am Standardort
-    (Datenbankverzeichnis, Unterverzeichnis "images",
-    Unter-Unterverzeichnis "%a") abgelegt werden, gib hier den Pfad zu
-    dem Verzeichnis an, dass Du benutzen möchtest. Dieser Pfad ist ein
-    URL: Wenn es sich um eine Webadresse handelt, muss sie mit
-    <tt>http://</tt> beginnen, falls es ein lokales Verzeichnis ist,
-    mit <tt>file://</tt>.
-    <p>
-    Dies betrifft die Bilder, die im Personenformular im Feld "Bild"
-    eingegeben wurden, nicht aber Bilder, die über den Link "Bild
-    senden" hochgeladen wurden. Letztere werden mit Standardnamen im
-    Standardverzeichnis installiert.
-en: If do NOT want that your images are installed in the standard place
-    (databases directory, sub-directory "images", sub-sub-directory "%a"),
-    indicate here the path to the directory you want to use. This path is
-    an URL: if it is a Web site, it must start with <tt>http://</tt>, if
-    it is a local directory, it must start with <tt>file://</tt>.
-    <p>
-    This concerns the images which are indicated in the person form, field
-    "image". This does not concern the images installed by the link "send
-    image" which are installed as a standard name in a standard place.
-fr: Si vous désirez que vos images ne soient pas installées
-    dans l’endroit standard (répertoire des bases,
-    sous-répertoire "images", sous-sous-répertoire "%a"),
-    indiquez ici le chemin d’accès au répertoire que vous
-    voulez utiliser. Ce chemin d’accès est une URL : si c’est un
-    site Web, il doit commencer par <tt>http://</tt>, si c’est un
-    répertoire local, il doit commencer par <tt>file://</tt>.
-    <p>
-    Cela ne concerne que les images qui sont indiquées dans le
-    formulaire des personnes, champ "image". Cela ne concerne pas les
-    images installées par le lien "envoyer images" qui, elles, sont
-    installées avec un nom standard dans le répertoire
-    standard.
-it: Se volete che le vostre immagini non siano installate nella
-    directory standard (directory della base di dati, sub-directory
-    "images", sub-sub-directory "%a"), indicate ora il path della
-    directory che volete usare. Il path è una URL; se si tratta di
-    un sito web, deve iniziare con <tt>http://</tt>, se è una
-    directory locale, deve iniziare con <tt>file://</tt>.
-    <p>
-    Ciò riguarda solo le immagini che vengono indicate nel
-    formulario delle persone, al record "image". Ciò non riguarda invece
-    le immagini installate con il link "inviare immagine" che sono invece
-    installate con un nome standard nella directory standard.
-]
-
+[If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.]
+%(
+If do NOT want that your images are installed in the standard place (databases d
+irectory, sub-directory "images", sub-sub-directory "%a"), indicate here the pat
+h to the directory you want to use. This path is an URL: if it is a Web site, it
+ must start with <tt>http://</tt>, if it is a local directory, it must start wit
+h <tt>file://</tt>. <p> This concerns the images which are indicated in the pers
+on form, field "image". This does not concern the images installed by the link "
+send image" which are installed as a standard name in a standard place.
+%)
 </tr>
 <tr align=left>
 <td align=center><input name=images_path value="%Vimages_path;"
 size=50></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left><td><strong>- hide_advanced_request -</strong></td></tr>
 <tr align=left>
-<td>[
-de: Erweiterte Suche verbergen.
-en: Hide advanced request.
-fr: Cacher la requête évoluée.
-it: Nascondere la richiesta avanzata.
-]
-
+<td>[Hide advanced request.]
 <p>
-
-[
-de: Die erweiterte Suche erlaubt es, Recherchen gemäß
-    bestimmter Kriterien auf der Datenbank durchzuführen.
-    Da sie sehr unvollständig implementiert it, ist sie per
-    Default verborgen. Wähle "Nein", um sie zu aktivieren.
-en: The advanced request allows to make researches in the data base.
-    As it is very incomplete, it is hidden by default. Select "no"
-    below to set it.
-fr: La requête évoluée permet de faire des recherches avec critères sur
-    la base. Comme elle est très incomplète, elle est cachée par
-    défaut. Sélectionnez "non" ci-dessous pour la remettre.
-it: La richiesta avanzata permette di fare delle ricerche sulla
-    base con dei criteri precisi. Dato che il suo sviluppo è
-    ancora incompleto, è nascosta per difetto. Selezionate "No"
-    qui sopra per renderla visibile.
-]
-
+[The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.]
+%(
+The advanced request allows to make researches in the data base. As it is very i
+ncomplete, it is hidden by default. Select "no" below to set it.
+%)
 <tr align=left>
 <td align=center>
 <input type=radio name=hide_advanced_request
-value="yes"%Chide_advanced_request=yes;>[yes/no]0
+value="yes"%Chide_advanced_request=yes;>[yes|no]0
 <input type=radio name=hide_advanced_request
-value="no"%Chide_advanced_request=no;>[yes/no]1
+value="no"%Chide_advanced_request=no;>[yes|no]1
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- friend_passwd -</strong></td>
-
 </tr>
-
 <tr align=left>
-<td>[
-de: Kennwort für "Freunde".
-en: Password for "friends".
-es: Contraseña "amigo".
-fr: Mot de passe "ami".
-it: Password per "amico".
-lv: "Draugu" parole.
-sv: Passord för "friends".
-]
-
+<td>[Password for "friends".]
 <p>
-
-[
-de: "Freunde" können alle Daten, Notizen und Fotos von Personen sehen, die
-    vor weniger als einem Jahrhundert geboren wurden.
-    Wer dieses Kennwort nicht eingegeben hat, kann diese Informationen nicht
-    abrufen.
-en: "Friends" can see all dates, notes and photos of the persons born
-    since less than one century. The ones who have not entered the below
-    password will not see these informations.
-es: Los "amigos" pueden ver todas las fechas, notas y fotos de las personas
-    nacidas después menos de un siglo. Aquellos que no han entrado
-    la contraseña
-    indicada a continuación no verán estas informaciones.
-fr: Les « amis » peuvent voir toutes les dates, notes et photos des
-    personnes nées depuis moins d’un siècle. Ceux qui n’ont
-    pas entré le mot de passe ci-dessous ne verront pas ces
-    informations.
-it: Gli "amici" possono vedere tutte le date, note e fotografie delle persone
-    nate da meno di un secolo. Gli utilizzatori che non avranno digitato la
-    password non vedranno queste informazioni.
-lv: "Draugi" var apsatît visus datumus, piezîmes un fotogrâfijas par
-    personâm, kuras dzimuðas pçdçjos simts gados. Citiem, kuri nebûs
-    ievadîjuði ðo paroli, ðî informâcija nebûs pieejama.
-sv: "Friends" kan se alla datum, noteringar och bilder för personer födda
-    det senaste århundradet. De som inte anger passordet nedan
-    kommer inte att se denna information.
-]
-
+["Friends" can see all dates, notes and photos of the persons born since less than one century. The ones who have not entered the below password will not see these informations.]
+%(
+"Friends" can see all dates, notes and photos of the persons born since less tha
+n one century. The ones who have not entered the below password will not see the
+se informations.
+%)
 <p>
-
-[
-de: Wenn dieser Eintrag leer bleibt, ist jeder ein "Freund".
-en: If this area is empty, everybody is a "friend". You can leave
-    this area empty if your computer is not accessible from outside.
-es: Si esta zona está vacía todo el mundo es "amigo".
-fr: Si cette zone est vide, tout le monde est "ami". Vous pouvez
-    laisser cette zone vide si votre ordinateur n’est pas accessible
-    de l’extérieur.
-it: Se questa zona è vuota, tutti sono "amici". Potete lasciare
-    questa zona vuota se il vostro computer non è accessibile
-    dall'esterno.
-lv: Ja ðis lodziòð tiks atstâts tukðs, tad ikviens tiks uzskatîts par "draugu".
-sv:  Om den lämnas tom, är alla en "friend".
-]
-
+[If this area is empty, everybody is a "friend". You can leave this area empty if your computer is not accessible from outside.]
+%(
+If this area is empty, everybody is a "friend". You can leave this area empty if
+ your computer is not accessible from outside.
+%)
 </td>
 </tr>
-
 <tr align=left>
 <td align=center><input name=friend_passwd value="%Vfriend_passwd;"
 size=30></td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- wizard_passwd -</strong></td>
 </tr>
-
 <tr align=left>
-<td>[
-de: Kennwort für "Wizards".
-en: Password for "Wizards".
-es: Contraseña "mago".
-fr: Mot de passe "magicien".
-it: Password "Wizard".
-lv: "Burvja" parole.
-sv: Passord för "Wizards".
-]
-
+<td>[Password for "Wizards".]
 <p>
-
-[
-de: "Wizards" können darüberhinaus auch Änderungen an
-    der Datenbank machen.
-en: "Wizards" can moreover make modifications in the database.
-es: Los "magos" pueden además efectuar modificaciones en la base de
-    datos.
-fr: Les "magiciens" peuvent en outre faire des modifications dans la base de
-    données.
-it: I possessori di password "Wizard" possono in più effettuare delle
-    modifiche nella base di dati.
-lv: "Burvji" var veikt arî izmaiòas datu bâzç.
-sv: "Wizards" kan göra modifieringar i databasen.
-]
-
+["Wizards" can moreover make modifications in the database.]
 <p>
-
-[
-de: Wenn dieser Eintrag leer bleibt, ist jeder ein "Wizard".
-en: If this area is empty, everybody is a "wizard". You can leave
-    this area empty if your computer is not accessible from outside.
-es: Si esta zona está vacía todo el mundo es "mago".
-fr: Si cette zone est vide, tout le monde est "magicien". Vous pouvez
-    laisser cette zone vide si votre ordinateur n’est pas accessible
-    de l’extérieur.
-it: Se questa zona è vuota, tutti sono "Wizard". Potete lasciare
-    questa zona vuota se il vostro computer non è accessibile
-    dall'esterno.
-lv: Ja ðis lodziòð tiks atsâts tukðs, tad ikviens tiks uzskatîts par "burvi".
-sv: Om den lämnas tom, är alla en "wizard".
-]</td>
+[If this area is empty, everybody is a "wizard". You can leave this area empty if your computer is not accessible from outside.]
+%(
+If this area is empty, everybody is a "wizard". You can leave this area empty if
+ your computer is not accessible from outside.
+%)
+</td>
 </tr>
-
 <tr align=left>
 <td align=center><input name=wizard_passwd value="%Vwizard_passwd;"
 size=30></td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td valign=top><strong>- wizard_just_friend -</strong></td>
 </tr>
-
 <tr align=left>
-<td>[
-de: "Wizards" werden zu "Freunden".
-en: "Wizards" become simple "friend".
-es: Los "magos" se transforman en simples "amigos".
-fr: Les "magiciens" deviennent de simples "amis".
-it: I "Wizard" diventano semplici "amici"
-lv: "Burvji" kïûst par parastiem "draugiem".
-sv: "Wizards" blir enkla "friend".
-]
-
+<td>["Wizards" become simple "friend".]
 <p>
-
-[
-de: Wenn dieser Wert auf "ja" steht, verlieren "Wizards" die Berechtigung,
-    Änderungen zu machen.
-en: If yes, the "wizards" loose their power to make updates.
-es: Si la opción si es escogida, los "magos" pierden su poder de
-    actualisación.
-fr: Si oui, les "magiciens" perdent leur pouvoir de mise-à-jour.
-it: Se scegliete "Si", i "Wizard" perdono il loro privilegio di aggiornamento.
-lv: Ja "jâ", tad "burvji" zaudç savas iespçjas veikt izmaiòas datu bâzç.
-sv: Om "Yes", förlorar "wizards" deras behörighet att göra uppdateringar.
-]
-
+[If yes, the "wizards" loose their power to make updates.]
 <p>
-
-[
-de: Dies kann sinnvoll sein, um z. B. beim Aufräumen der Datenbank,
-    wenn sie über das Internet zugreifbar ist, temporär zu
-    vermeiden, daß "Wizards" Daten ändern, die durch die
-    Operation verloren gehen
-    würden. (Denke in diesem Fall daran, diese Option nach Beendigung des
-    Aufräumens dann wieder zurückzusetzen.)
-en: This can be useful, temporarilly, when you make a cleanup of your database,
-    if it is accessible to Internet, to avoid that "wizards" make changes which
-    would be lost during the operation (remember to suppress this option after
-    cleanup).
-es: Esto puede ser util, temporalmente, cuando uno realiza una limpieza
-    de la base si esta es accesible por Internet, afin de evitar
-    que los "magos" realizen actualizaciones, que serian perdidas
-    durante esta operación (piense luego a suprimir esta opción
-    después de finalizar la limpieza).
-fr: Cela peut-être utile, temporairement, quand on fait un nettoyage
-    de la base, si elle est accessible sur Internet, pour éviter
-    que des "magiciens" ne fassent des mises-à-jour qui seraient
-    perdues pendant l’opération (penser alors à supprimer cette
-    option après nettoyage).
-it: Ciò può essere utile, temporaneamente, se si fa una
-    pulizia della base, se  la base è accessibile su Internet, per evitare
-    che dei "Wizard" facciano degli aggiornamenti che andrebbero perduti
-    durante l'operazione (pensate a cancellare questa opzione dopo la
-    pulizia).
-lv: Tas var bût noderîgi islaîcîgi, ja Jûs veicat datu bâzes sakopðanu. Ja
-    tâ ir pieejama no Interneta, tad tas novçrð iespçju, ka "burvji" varçtu
-    veikt izmaiòas, kas tiktu pazaudçtas sakopðanas laikâ (atcerieties pçc
-    datu bâzes sakopðanas atcelt ðo aizliegumu).
-sv: Detta kan vara användbart, temporärt, när du gör en upprensning av din
-    databas, om den är åtkomstbar över internet, för att undvika att
-    "wizards" gör ändringar
-    vilka skulle förloras under operationen (kom ihåg att ta bort denna
-    option efter upprensningen).
-]
+[This can be useful, temporarilly, when you make a cleanup of your database, if it is accessible to Internet, to avoid that "wizards" make changes which would be lost during the operation (remember to suppress this option after cleanup).]
+%(
+This can be useful, temporarilly, when you make a cleanup of your database, if i
+t is accessible to Internet, to avoid that "wizards" make changes which would be
+ lost during the operation (remember to suppress this option after cleanup).
+%)
 </td>
 </tr>
-
 <tr align=left>
 <td align=center>
 <input type=radio name=wizard_just_friend
- value="yes"%Cwizard_just_friend=yes;>[yes/no]0
+ value="yes"%Cwizard_just_friend=yes;>[yes|no]0
 <input type=radio name=wizard_just_friend
- value="no"%Cwizard_just_friend=no;>[yes/no]1
-
+ value="no"%Cwizard_just_friend=no;>[yes|no]1
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- hide_private_names -</strong></td>
 </tr>
-
 <tr align=left>
-<td>[
-de: Namen der zeitgenössischen Personen verbergen.
-en: Hide the private person's names.
-fr: Cacher les noms des personnes privées.
-it: Nascondere i nomi delle persone private.
-]
-
+<td>[Hide the private person's names.]
 <p>
-
-[
-de: Verberge die Namen zeitgenössischer Personen, d.h. die Namen
-    der Personen, die noch leben, oder genauer, die Personen, die
-    jüger als ein Jahrhundert sind.
-en: Hide the names of the private persons, i.e. the still living persons
-    or, more exactly, the persons of less than one century.
-fr: Cache les noms des personnes privées, c’est-à-dire les personnes
-    vivantes, ou plus exactement, celles de moins de 100 ans.
-it: Nasconde i nomi delle persone private, ovvero le persone in vita
-    o più esattamente quelle che hanno meno di 100 anni.
-]</td>
+[Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.]
+%(
+Hide the names of the private persons, i.e. the still living persons or, more ex
+actly, the persons of less than one century.
+%)
+</td>
 </tr>
-
 <tr align=left>
 <td align=center>
 <input type=radio name=hide_private_names
- value="yes"%Chide_private_names=yes;>[yes/no]0
+ value="yes"%Chide_private_names=yes;>[yes|no]0
 <input type=radio name=hide_private_names
- value="no"%Chide_private_names=no;>[yes/no]1
-
+ value="no"%Chide_private_names=no;>[yes|no]1
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- can_send_image -</strong></td>
 </tr>
-
 <tr align=left>
-<td>[
-de: Erlaubnis, Bilder zu senden.
-en: Ability to send images.
-es: Posibilidad de enviar imágenes.
-fr: Possibilité d’envoyer des images.
-it: Possibilità d'inviare delle immagini.
-lv: Atïaut sûtît attçlus.
-sv: Möjlighet att sända en bild.
-]
-
+<td>[Ability to send images.]
 <p>
-
-[
-de: Wenn dieser Parameter auf "Ja" gesetzt wird, haben "Wizards" die
-    Berechtigung, Bilder hochzuladen.
-en: If yes, the "wizards" are authorized to upload images.
-es: Si la opción "si" es escogida, los "magos" son autorisados a
-    enviar imágenes por la red.
-fr: Si oui, les "magiciens" ont l’autorisation d’envoyer des images par
-    le réseau.
-it: Se scegliete "Si", tutti i "Wizard" saranno autorizzati a inviare immagini
-    sulla rete.
-lv: Ja jâ, tad "burvjiem" tiek atïauts iesûtît attçlus.
-sv: Om "Yes", har "wizards" behörighet att sända bilder.
-]
-
+[If yes, the "wizards" are authorized to upload images.]
 <p>
-
-[
-de: Dies kann auch bei lokalem Zugiff sinnvoll sein, um Bilder für
-    jemanden
-    zu installieren, da die Funktion das Bild automatisch mit dem richtigen
-    Namen an die richtige Stelle kopiert. 
-en: Can be useful in local, in order to be able to put an image for somebody,
-    because the procedure installs automatically the image at the right place
-    with the appropriate file name.
-es: Esto puede ser util a nivel local para poder así agregar una
-    imagen a las personas, debido a que este proceso instala
-    automáticamente la foto en el lugar adecuado con
-    el nombre apropiado.
-fr: Peut être utile en local pour pouvoir mettre une image à des
-    personnes, car la procédure installe automatiquement la photo au
-    bon endroit avec le nom approprié.
-it: Può essere utile in locale per aggiungere un'immagine a
-    delle persone, dato che la procedura installa automaticamente la foto
-    nel posto giusto e col nome appropriato.
-lv: Tas var bût noderîgi, ja nepiecieðams kâdai personai pievienot attçlu,
-    jo programma to automâtiski pievienos atbilstoðjâ vietâ ar atbilstoðo
-    datnes nosaukumu.
-sv: Det kan vara användbart lokalt, när man vill sätta in en bild av någon,
-    därför att proceduren lägger in bilden automatiskt på rätt plats och
-    med rätt filnamn.
-]</td>
+[Can be useful in local, in order to be able to put an image for somebody, because the procedure installs automatically the image at the right place with the appropriate file name.]
+%(
+Can be useful in local, in order to be able to put an image for somebody, becaus
+e the procedure installs automatically the image at the right place with the app
+ropriate file name.
+%)
+</td>
 </tr>
-
 <tr align=left>
 <td align=center>
 <input type=radio name=can_send_image
- value="yes"%Ccan_send_image=yes;>[yes/no]0
+ value="yes"%Ccan_send_image=yes;>[yes|no]0
 <input type=radio name=can_send_image
- value="no"%Ccan_send_image=no;>[yes/no]1
-
+ value="no"%Ccan_send_image=no;>[yes|no]1
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- renamed -</strong></td>
 </tr>
-
 <tr align=left>
-<td>[
-de: Datenbank wurde umbenannt.
-en: Base has been renamed.
-es: Cambio de nombre de la base.
-fr: Base renommée.
-it: Cambio del nome della base.
-lv: Datu bâzei ir mainîts nosaukums.
-sv: Databasen har blivit omdöpt.
-]
-
+<td>[Base has been renamed.]
 <p>
-
-[
-de: Wenn du den Namen deiner Datenbank geändert hast, diese Datenbank aber
-    schon seit langer Zeit bestand und du glaubst, daß viele Leute
-    Links auf sie gemacht haben, dann behalte die Parameterdatei und trage
-    hier den Namen der neuen Datenbank ein. Leute, die die Datenbank unter
-    dem alten Namen abfragen, erhalten dann automatisch eine Seite mit einem
-    Verweis auf die neue Datenbank, mit einem klickbaren Kommando, das auf der
-    neuen Datenbank sofort den gleichen Befehl ausführt.
-en: If you changed the name of your database, but this database has been
-    existed since a long time and you think that many people made links to
-    it, keep this parameter file for this base and write here the new name
-    of the database. People who consult the database with the old name
-    receive then a page indicating them the new name to use with the same
-    clickable request.
-es: Si Ud. ha cambiado el nombre de su base, pero que esta es una base que
-    existe después de mucho tiempo, y que Ud. piensa que muchas
-    personas han efectuado enlaces en ella, conserve el fichero de
-    parámetros de esta base he indique a continuación el
-    nuevo nombre de la base. Las personas que consultarán la base
-    con el nombre antigüo recibirán una página que les
-    indicará el nuevo nombre a utilizar con la misma demanda clicable.
-fr: Si vous avez changé le nom de votre base, mais que c’est une base
-    qui existe depuis longtemps et que vous pensez que beaucoup de gens ont
-    mis des liens dessus, conservez ce fichier de paramètres pour cette
-    base et indiquez ci-dessous le nouveau nom de la base. Les gens qui
-    consulteront la base avec l’ancien nom recevront une page qui leur
-    indiquera le nouveau nom à utiliser avec leur même
-    requête cliquable.
-it: Se avete cambiato di nome alla vostra base, ma si tratta di una
-    base che esiste da molto tempo e supponete che molte persone vi hanno
-    creato sopra dei bookmarks, conservate il file dei parametri di questa
-    base e indicatevi il nome della nuova base. Le persone che
-    consulteranno la base col suo vecchio nome riceveranno una pagina che
-    indicherà loro il nuovo nome da utilizzare con la stessa
-    richiesta cliccabile.
-lv: Ja Jûs iesiet nomainîjuði datu bâzes nosaukumu, kura jau ir eksistçjusi
-    krietni ilgu laiku, un daudz ïauþu ir izveidojuði norâdes uz to, tad
-    ierakstiet ðet vecâs datu bâzes nosaukumu. Uz pieprasîjumiem, kas tiks
-    veikti ar veco datu bâzes nosaukumu, tiks atbildçts no jaunâs datu bâzes.
-sv: Om du ändrar namnet på din databas, men databasen har funnits
-    ett bra tag och du tror att många personer har lagt upp länkar till
-    den, behåll denna parameter fil för denna databas och skriv här det nya
-    namnet för databasen. Personer som konsulterat databasen med det gamla
-    namnet kommer då att se en sida som hänvisar dem till den nya databasen.
-]
-
+[If you changed the name of your database, but this database has been existed since a long time and you think that many people made links to it, keep this parameter file for this base and write here the new name of the database. People who consult the database with the old name receive then a page indicating them the new name to use with the same clickable request.]
+%(
+If you changed the name of your database, but this database has been existed sin
+ce a long time and you think that many people made links to it, keep this parame
+ter file for this base and write here the new name of the database. People who c
+onsult the database with the old name receive then a page indicating them the ne
+w name to use with the same clickable request.
+%)
 <p>
-
-[
-de: Wenn dieses Feld leer ist, wurde die Datenbank nicht umbenannt.
-en: If this area is empty, the database has not been renamed.
-es: Si esta zona permanece vacia, la base no cambiará de nombre.
-fr: Si cette zone est vide, la base n’est pas renommée.
-it: Se questa zona resta vuota, la base non cambierà di nome.
-lv: Ja datu bâzei nosaukums nav mainîts, tad ðis lodziòð atstâjams tukðs.
-sv: Om den är tom, har databasen inte blivit omdöpt.
-]
-
+[If this area is empty, the database has not been renamed.]
 </td>
 </tr>
-
 <tr align=left>
 <td align=center><input name=renamed value="%Vrenamed;" size=30></td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td>
-[
-de: Wenn Du möchtest, daß ein bestimmter Text am Ende jeder
-    Seite angezeigt wird, gib ihn hier an. Du kannst HTML-Tags benutzen.
-en: If you want that a text appears in the bottom of each page, write it
-    here. You can use HTML tags.
-es: Si Ud desea que un texto aparezca en la parte inferior de cada
-    página, indíquela
-    aquí. Ud. puede agregar allí las balizas HTML.
-fr: Si vous voulez qu’un texte apparaisse au base de chaque page, indiquez-le
-    ici. Vous pouvez y mettre des balises HTML.
-it: Se volete che un testo appaia sul piede di ogni pagina, indicatelo qui.
-    Potrete mettervi dei tags HTML.
-lv: Ðeit Jûs variet ierakstît tekstu, kurð tikts parâdîts katras lappuses
-    beigâs. Jûs variet izmantot HTML sintaksi.
-sv: Om du vill att en text ska synas längst ner på varje sida, skriv den här.
-    Du kan använda HTML taggar.
-]
-
+[If you want that a text appears in the bottom of each page, write it here. You can use HTML tags.]
+%(
+If you want that a text appears in the bottom of each page, write it here. You c
+an use HTML tags.
+%)
 </td>
 </tr>
 <tr align=left>
 <td>
-
 <textarea name=trailer rows=3 cols=60 wrap=virtual>%Ftrailer;</textarea>
 </td>
 </tr>
 </table>
-
 </table></dl>
-
 <p>
 <li>
-[
-de: Dann drücke diesen Knopf:
-en: Then push this button:
-es: Apoye a continuación en este botón:
-fr: Puis appuyez sur ce bouton :
-it: Poi cliccate su questo bottone:
-lv: Beigâs nospiediet ðo podziòu:
-sv: Tryck sedan på denna knapp:
-]
-
-<p>
-
-<input type=submit value="[
-de: Ausführen
-en: Apply
-es: Aplicar
-fr: Appliquer
-it: Applicare
-lv: Darîts
-sv: Sätt
-]">
+[Then push this button][:]
+<input type=submit value="[Apply]">
 </ul>
 </form>
+</body>
+</html>

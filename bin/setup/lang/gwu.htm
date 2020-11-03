@@ -5,120 +5,51 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-de: GeneWeb-Quelldatei extrahieren
-en: <title>Extract a GeneWeb file
-es: Extracción de una fichero GeneWeb
-fr: Extraction d’un fichier GeneWeb
-it: Estrazione di un file GeneWeb
-lv: Izveidot GeneWeb datni
-sv: Exportera en GeneWeb källfil
-]</title>
+  <title>[Extract a GeneWeb file]</title>
 %fsetup.css;
 </head>
 
 <body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
-<h1 style="margin:0;">
-[
-de: GeneWeb-Quelldatei extrahieren
-en: Extract a GeneWeb file
-es: Extracción de un fichero GeneWeb
-fr: Extraction d’un fichier GeneWeb
-it: Estrazione di un file GeneWeb
-lv: Izveidot GeneWeb datni
-sv: Exportera en GeneWeb källfil
-]
-</h1>
+<h1 style="margin:0;">[Extract a GeneWeb file]</h1>
 </div>
-
 <form method=GET action="gwu">
 <input type=hidden name=opt value="check">
 <input type=hidden name=lang value="%l">
-
 <ul><li>
-[
-de: Wähle deine Datenbank:
-en: Select your database:
-es: Seleccione una base de datos:
-fr: Sélectionnez votre base de données :
-it: Selezionate la vostra base di dati:
-lv: Izvçlieties atbilstoðo datu bâzi:
-sv: Välj din databas:
-]
-
+[Select your database by clicking on the associated button][:]
 <p>
-
 <table class="setup" style="cellspacing=0 cellpadding=1">
-
 %b{<tr align=left>
 <td><input type=radio name=anon value="%a">   </td>
 <td>%a</td></tr>|
-<tr align=left><td>- [
-de: keine Datenbank vorhanden
-en: there is no database at present
-es: actualmente ninguna base de datos existe
-fr: il n’y a aucune base de données actuellement
-it: attualmente non esiste nessuna base di dati
-lv: nav nevienas datu bâzes
-sv: det finns ingen databas för tillfället
-]</tr></td>}
-
+<tr align=left><td>- [there is no database at present]
+</tr></td>}
 </table>
-
 <p>
-
 <table class="setup" style="cellspacing=0 cellpadding=1">
 <tr><td>
-[
-de: Gib den Namen ein, den du deiner
-    <font color=#2f6400><b>GeneWeb</b></font>-Quelldatei geben
-    möchtest. Er muß mit "<tt>.gw</tt>" enden. Wenn Du nichts
-    eingibst, wird der Dateiname aus dem Namen deiner
-    <font color=#2f6400><b>GeneWeb</b></font>-Datenbank abgeleitet.
-en: Enter the name you want to give to your
-    <font color=#2f6400><b>GeneWeb</b></font> source
-    file. Its name must end with the suffix "<tt>.gw</tt>". If you write
-    nothing, its name will be deducted from the name of the database.
-es: Entre Ud. el nombre que Ud. desee dar a su fichero fuente
-    <font color=#2f6400><b>GeneWeb</b></font>. El debe terminar
-    en "<tt>.gw</tt>".  Si Ud. no
-    mete nada, este será deducido del nombre de la base.
-fr: Entrez le nom que vous voulez donner à votre fichier source
-    <b><font color=#2f6400>GeneWeb</font></b>.
-    Il doit se terminer par "<tt>.gw</tt>".  Si vous ne
-    mettez rien, ce sera déduit du nom de la base.
-it: Digitate il nome che volete attribuire al vostro file sorgente
-    <b><font color=#2f6400>GeneWeb</font></b>.
-    Deve finire con "<tt>.gw</tt>".  Se non
-    mettete niente, il nome verrà dedotto da quello della base.
-lv: Ierakstiet datnes nosaukumu <font color=#2f6400><b>GeneWeb</b></font>
-    datnei. Nosaukumam jâbeidzas ar paplaðinâjumu "<tt>.gw</tt>". Ja
-    Jûs neko neierakstîsiet, datnes vârds tiks izveidots no datu bâzes
-    nosaukuma.
-sv: Skriv in namnet du vill kalla din
-    <font color=#2f6400><b>GeneWeb</b></font> källfil.
-    Om du inte skriver någonting, kommer det att bli samma namn som databasen 
-    avslutad med "<tt>.gw</tt>".
-]
+[Enter the name you want to give to your %G source file. Its name must end with the suffix "<tt>.gw</tt>". If you write nothing, its name will be deducted from the name of the database.]
+%(
+Enter the name you want to give to your %G source file. Its name must
+end with the suffix "<tt>.gw</tt>". If you write nothing, its name will
+be deducted from the name of the database.
+%)
 </td></tr>
 <p>
 <tr><td>
 <dl><dt><dd><input type="radio" name="od" value="o" checked>&nbsp;<input name=o size=30></dl>
 </td></tr>
 <p>
-
 <tr><td>
 <dl><dt><dd>
-[
-en: or ask for recreation of files in original directory.<br>
-    If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>, 
-    then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
-fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br>
-    Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>,
-    alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
-]
+[or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.]
+%(
+or ask for recreation of files in original directory.<br> If the base was created
+by <span style="font-family: monospace">gwc -f *.gw</span>, then <span style=
+"font-family: monospace">gwu -odir .</span> will recreate the source files.
+%)
 </dl>
 </td></tr>
 <tr><td>
@@ -126,21 +57,10 @@ fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br>
 </td></tr>
 </table>
 </dl>
-
 <p>
 <li>
-[
-de: Wähle die gewünschten Optionen:
-en: Select the options you want:
-es: Seleccione las opciones que Ud. desee:
-fr: Sélectionnez les options que vous désirez :
-it: Selezionate le opzioni desiderate:
-lv: Iezîmçjiet atbilstoðos datnes izveides parametrus:
-sv: Välj de optioner du vill ha:
-]
-
+[Select the options you want][:]
 <p>
-
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=isolated value="on">   </td>
@@ -152,159 +72,49 @@ sv: Välj de optioner du vill ha:
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=mem value="on">   </td>
-<td>[
-de: Während der Operation sparsam mit dem Speicher umgehen
-    (ist aber langsamer).
-en: Save memory space during operation (but it will be slower).
-es: Economizar el espacio memoria durante la operación
-    (pero esta será mas lenta).
-fr: Économiser l’espace mémoire pendant l’opération
-    (mais ce sera plus lent).
-it: Economizzare lo spazio-memoria durante l'operazione
-    (che però sarà più lenta).
-lv: Taupît operatîvo atmiòu (process notiks lçnâk).
-sv: Spara minne under operationen (men det kommer att gå saktare).
-]</td>
+<td>[Save memory space during operation (but it will be slower).]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
-<tr align=left><td> </td><td colspan=3>[
-de: Nur die Vorfahren auswählen von…
-en: Extract only the ancestors of…
-es: No extraer los antepasados de…
-fr: N’extraire que les ancêtres de…
-it: Estrarre solo gli antenati di…
-lv: Atlasît tikai dotâs personas priekðteèus…
-sv: Exportera endast anorna till…
-]</td></tr>
-
-<tr align=left><td>[
-de: Vorname
-en: First name
-es: Nombre
-fr: Prénom
-it: Nome
-lv: Vârds
-sv: Förnamn
-]</td>
+<tr align=left><td> </td><td colspan=3>[Extract only the ancestors of]
+</td></tr>
+<tr align=left><td>[First name]
+</td>
 <td><input name="a1" size=30 maxlength=200></td>
-
-<td>[
-de: Nr
-en: Num
-es: Núm
-fr: Num
-it: Numero
-lv: Num
-sv: Nummer
-]</td>
+<td>[Num]
+</td>
 <td><input name="a2" size=5 maxlength=8></td></tr>
-
-<tr align=left><td>[
-de: Nachname
-en: Surname
-es: Apellido
-fr: Nom
-it: Cognome
-lv: Uzvârds
-sv: Efternamn
-]</td>
+<tr align=left><td>[Surname]
+</td>
 <td colspan=3><input name="a3" size=40 maxlength=200></td></tr>
 </table>
 <p>
 <table class="setup">
-<tr align=left><td> </td><td colspan=3>[
-de: Nur die Nachkommen auswählen von…
-en: Extract only the descendants of…
-es: Extraer solamente los descendientes de…
-fr: N’extraire que les descendants de…
-it: Estrarre solo i discendenti di…
-lv: Atlasît tikai dotâs personas pçcteèus …
-sv: Exportera endast ättlingarna till…
-]</td></tr>
-
-<tr align=left><td>[
-de: Vorname
-en: First name
-es: Nombre
-fr: Prénom
-it: Nome
-lv: Vârds
-sv: Förnamn
-]</td>
+<tr align=left><td> </td><td colspan=3>[Extract only the descendants of]
+</td></tr>
+<tr align=left><td>[First name]
+</td>
 <td><input name="d1" size=30 maxlength=200></td>
-
-<td>[
-de: Nr
-en: Num
-es: Núm
-fr: Num
-it: Num
-lv: Num
-sv: Nummer
-]</td>
+<td>[Num]
+</td>
 <td><input name="d2" size=5 maxlength=8></td></tr>
-
-<tr align=left><td>[
-de: Nachname
-en: Surname
-es: Apellido
-fr: Nom
-it: Cognome
-lv: Uzvârds
-sv: Efternamn
-]</td>
+<tr align=left><td>[Surname]
+</td>
 <td colspan=3><input name="d3" size=40 maxlength=200></td></tr>
 </table>
 <p>
-[
-de: Falls du oben beide Optionen gewählt hast, wird die Schnittmenge
-    extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
-    einen und Nachkommen des anderen sind.
-en: If you use both options above, the intersection is assumed:
-    persons <em>at the same time</em> ancestors of the one and descendants
-    of the other.
-es: Si Ud. utiliza las dos opciones anteriores, es
-    la intersección que contará <em>al mismo tiempo</em>
-    antepasados de uno y descendientes del otro.
-fr: Si vous utilisez les deux options ci-dessus, c’est
-    l’intersection qui comptera: personnes <em>à la fois</em>
-    ancêtres de l’un et descendants de l’autre.
-it: Se utilizzate insieme le due opzioni precedenti, è
-    l'intersezione che serà presa in considerazione: ossia le persone
-    che sono sia gli antenati dell'uno che i discendenti dell'altro.
-lv: Ja Jûs lietosiet abus iepriekðçjos nosacîjumus, tad tiks atlasîti
-    tikai tie, kas atbildîs abiem nosacîjumiem: personas, kuras
-    <em>vienlaicîgi </em>ir gan viena senèi, gan otra pçcteèi.
-sv: Om du väljer de båda valen ovan, kommer överlappning att antas:
-    personer <em>som samtidigt</em> är anor av den ena och ättlingar av
-    den andra.
-]
-
+[If you use both options above, the intersection is assumed: persons <em>at the same time</em> ancestors of the one and descendants of the other.]
+%(
+If you use both options above, the intersection is assumed: persons <em>at the s
+ame time</em> ancestors of the one and descendants of the other.
+%)
 <p>
 <li>
-[
-de: Dann drücke diesen Knopf:
-en: Then push this button:
-es: Apoye luego en este botón:
-fr: Puis appuyez sur ce bouton :
-it: Poi cliccate su questo bottone:
-lv: Beigâs nospiediet ðo podziòu:
-sv: Tryck sedan på denna knapp:
-]
-
-<p>
-
-<input type=submit value="[
-[
-de: Extrahieren
-en: Extract
-es: Extraer
-fr: Extraire
-it: Estrazione
-lv: Izveidot
-sv: Exportera
-]">
+[Then click on this button][:]
+<input type=submit value="[Extract]">
 </ul>
 </form>
+</body>
+</html>
