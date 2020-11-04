@@ -265,7 +265,7 @@ let select opts ips =
       if (opts.asc <> None && opts.ascdesc <> None) || opts.desc <> None then begin
         assert (opts.censor = 0) ;
         let asc = Opt.default max_int opts.asc in
-        let ascdesc = Opt.default 0 opts.ascdesc in
+        let ascdesc = Opt.default max_int opts.ascdesc in
         let desc = - (Opt.default max_int opts.desc) in
         let ht =
           let ips = List.map (fun i -> (i, asc)) ips in
