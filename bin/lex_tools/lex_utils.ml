@@ -183,6 +183,16 @@ let get_msg_tpl repo =
 let msg_setup = ref []
 
 let get_msg_setup repo =
+  let add_key_to_entry entry tpl_name =
+    let entry = List.sort (fun (x, _) (y, _) -> compare x y) entry in
+    let key = 
+      match List.find_opt (fun (k, _) -> k = "en") entry with
+      | Some ("en", s) -> s
+      | Some (_, _) -> "no key"
+      | None -> "no key"
+    in
+    ((tpl_name ^ ":" ^ key), entry)
+  in
   let add_line line acc =
     if String.length line < 4 then acc
     else
@@ -193,7 +203,7 @@ let get_msg_setup repo =
         | (ll, str) :: acc -> (ll, str ^ String.sub line 3 (String.length line - 3)) :: acc
         | [] -> [(String.sub line 0 2, String.sub line 3 (String.length line - 3))]
   in
-  let one_more_entry ic =
+  let one_more_entry ic tpl_name =
     let entry =
       let rec loop acc =
         let line = input_line ic in
@@ -202,10 +212,12 @@ let get_msg_setup repo =
         | None -> loop (add_line line acc)
       in loop []
     in
+    let entry = add_key_to_entry entry tpl_name in
     msg_setup := entry :: !msg_setup
   in
   List.iter
     (fun tpl ->
+      let tpl_name = Filename.basename tpl in
       match try Some (open_in tpl) with Sys_error _ -> None with
       | Some ic ->
           (try
@@ -213,13 +225,14 @@ let get_msg_setup repo =
               let line = input_line ic in
               let j = try String.index line ']' with Not_found -> 0 in
               match String.index_opt line '[' with
-              | Some i when j = 0 -> one_more_entry ic
+              | Some i when j = 0 -> one_more_entry ic tpl_name
               | _ -> ()
             done
           with End_of_file -> ());
           close_in ic;
       | None -> ())
     (get_setup_files repo);
+    
 ;;
 
 let change_msg_setup repo =
@@ -233,7 +246,6 @@ let change_msg_setup repo =
         | (ll, str) :: acc -> (ll, str ^ String.sub line 3 (String.length line - 3)) :: acc
         | [] -> [(String.sub line 0 2, String.sub line 3 (String.length line - 3))]
   in
-
   let one_entry ic =
     let entry =
       let rec loop acc =
@@ -244,7 +256,6 @@ let change_msg_setup repo =
       in loop []
     in entry
   in
-
   List.iter
     (fun tpl ->
       let tplo = (Filename.chop_suffix tpl ".htm") ^ ".new" in
@@ -566,13 +577,12 @@ let main () =
   if !lexicon = "" && not (!change || !sort_setup || !lang_setup <> []) then (Arg.usage speclist usage; exit 2);
   let repo_setup = List.fold_left Filename.concat !repo ["bin"; "setup"] in
   get_msg_setup repo_setup;
-  let msg_setup = add_key_to_msg_setup !msg_setup in
   if !lex_sort then sort_lexicon !lexicon
   else if !missing_gw then missing_translation !lexicon lang_gw
   else if !missing_gnt then missing_translation !lexicon lang_gnt
-  else if !sort_setup then sort_setup_translations msg_setup
+  else if !sort_setup then sort_setup_translations !msg_setup
   else if !lang_cust <> [] then missing_translation !lexicon !lang_cust
-  else if !lang_setup <> [] then missing_setup_translations msg_setup !lang_setup
+  else if !lang_setup <> [] then missing_setup_translations !msg_setup !lang_setup
   else if !repo <> "" then missing_or_unused_msg !lexicon !repo !log
   else if !change then change_msg_setup repo_setup
   else ()
