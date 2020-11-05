@@ -211,13 +211,83 @@ let get_msg_setup repo =
           (try
             while true do
               let line = input_line ic in
+              let j = try String.index line ']' with Not_found -> 0 in
               match String.index_opt line '[' with
-              | Some i -> one_more_entry ic
-              | None -> ()
+              | Some i when j = 0 -> one_more_entry ic
+              | _ -> ()
             done
           with End_of_file -> ());
           close_in ic;
       | None -> ())
+    (get_setup_files repo);
+;;
+
+let change_msg_setup repo =
+  let add_line line acc =
+    if String.length line < 4 then acc
+    else
+      match String.index_opt line ':' with
+      | Some i when i = 2 && String.length line > 4 -> (String.sub line 0 2, String.sub line 3 (String.length line - 3)) :: acc
+      | _ -> 
+        match acc with
+        | (ll, str) :: acc -> (ll, str ^ String.sub line 3 (String.length line - 3)) :: acc
+        | [] -> [(String.sub line 0 2, String.sub line 3 (String.length line - 3))]
+  in
+
+  let one_entry ic =
+    let entry =
+      let rec loop acc =
+        let line = input_line ic in
+        match String.index_opt line ']' with
+        | Some i -> acc
+        | None -> loop (add_line line acc)
+      in loop []
+    in entry
+  in
+
+  List.iter
+    (fun tpl ->
+      let tplo = (Filename.chop_suffix tpl ".htm") ^ ".new" in
+      match (Some (open_in tpl), Some (open_out tplo)) with
+      | (Some ic, Some oc) ->
+          (try
+            while true do
+              let line = input_line ic in
+              output oc (Bytes.of_string line) 0 (String.length line);
+              let j = try String.index line ']' with Not_found -> 0 in
+              match String.index_opt line '[' with
+              | Some i when j = 0 ->
+                  let entry = one_entry ic in
+                  let str =
+                    begin match List.find_opt (fun (k, _) -> k = "en") entry with
+                    | Some ("en", str) -> str
+                    | _ -> Printf.sprintf "Missing en entry in %s]\n" tplo
+                    end
+                  in
+                  let str = if str.[0] = ' '
+                    then String.sub str 1 (String.length str - 1)
+                    else str
+                  in
+                  output oc (Bytes.of_string str) 0 (String.length str);
+                  output oc (Bytes.of_string "]\n") 0 2;
+                  if String.length str > 80 then
+                  begin
+                    let bytes = Bytes.of_string str in
+                    output oc (Bytes.of_string "%(\n") 0 3;
+                    let rec loop i =
+                      let len = if i + 80 < Bytes.length bytes then 80
+                      else (Bytes.length bytes - i) in
+                      output oc bytes i len;output oc (Bytes.of_string "\n") 0 1;
+                      if i + len < (Bytes.length bytes) then loop (i + 80) else ()
+                    in loop 0;
+                    output oc (Bytes.of_string "%)\n") 0 3
+                  end
+              | _ -> output oc (Bytes.of_string "\n") 0 1;
+            done
+          with End_of_file -> ());
+          close_in ic;
+          close_out oc;
+      | (_, _) -> ())
     (get_setup_files repo);
 ;;
 
@@ -456,6 +526,7 @@ let sort_lexicon lexicon =
 
 let lexicon = ref "" ;;
 let lex_sort = ref false ;;
+let change = ref false ;;
 let missing_gw = ref false ;;
 let missing_gnt = ref false ;;
 let missing_setup = ref false ;;
@@ -469,6 +540,8 @@ let speclist =
     ": merge rather than replace new lexicon entries.");
    ("-first", Arg.Set first,
     ": if multiple language entries, select first occurence.");
+   ("-change", Arg.Set change,
+    ": update .htm files in setup/lang.");
    ("-missing_gw", Arg.Set missing_gw,
     ": print missing translation managed by gw.");
    ("-missing_gnt", Arg.Set missing_gnt,
@@ -490,7 +563,7 @@ let usage = "Usage: lex_utils [options] lexicon" ;;
 
 let main () =
   Arg.parse speclist anonfun usage;
-  if !lexicon = "" then (Arg.usage speclist usage; exit 2);
+  if !lexicon = "" && not (!change || !sort_setup || !lang_setup <> []) then (Arg.usage speclist usage; exit 2);
   let repo_setup = List.fold_left Filename.concat !repo ["bin"; "setup"] in
   get_msg_setup repo_setup;
   let msg_setup = add_key_to_msg_setup !msg_setup in
@@ -501,6 +574,7 @@ let main () =
   else if !lang_cust <> [] then missing_translation !lexicon !lang_cust
   else if !lang_setup <> [] then missing_setup_translations msg_setup !lang_setup
   else if !repo <> "" then missing_or_unused_msg !lexicon !repo !log
+  else if !change then change_msg_setup repo_setup
   else ()
 ;;
 
