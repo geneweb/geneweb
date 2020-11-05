@@ -330,6 +330,7 @@ let lang_gw =
 let lang_gnt = [ "de"; "en"; "es"; "fi"; "fr"; "it"; "nl"; "no"; "sv" ] ;;
 
 let lang_cust = ref [] ;;
+let lang_setup = ref [] ;;
 
 let missing_languages list languages =
   List.fold_left
@@ -356,7 +357,7 @@ let sort_setup_translations msg_setup =
 ;;
 
 let missing_setup_translations msg_setup languages =
-  if List.length languages < 1 && List.length languages > 0 then
+  if List.length languages <= 1 && List.length languages > 0 then
     let lg = List.hd languages in (* TODO just one language for the time being *)
     List.iter
       (fun (k, trl) -> 
@@ -370,8 +371,9 @@ let missing_setup_translations msg_setup languages =
       )
     msg_setup
   else
-    print_endline "At least one -missing_one language, but only one";
-    
+    print_endline
+      ("At least one -missing_one language, but only one: " ^
+        (string_of_int (List.length languages)))
 ;;
 
 let missing_translation lexicon languages =
@@ -473,10 +475,10 @@ let speclist =
     ": print missing translation managed by gnt.");
    ("-missing_one", Arg.String (fun x -> lang_cust := x :: !lang_cust),
     ": print missing translation for these languages.");
-   ("-setup", Arg.Set missing_setup,
-    ": print missing translation for these languages in gwsetup.");
+   ("-missing_one_setup", Arg.String (fun x -> lang_setup := x :: !lang_setup),
+    ": print missing translation in gwsetup for this language.");
    ("-sort_setup", Arg.Set sort_setup,
-    ": print missing translation for these languages in gwsetup.");
+    ": sort translations in gwsetup.");
    ("-repo", Arg.String (fun x -> repo := x),
     ": check missing or unused key word.");
    ("-log", Arg.Set log,
@@ -495,9 +497,9 @@ let main () =
   if !lex_sort then sort_lexicon !lexicon
   else if !missing_gw then missing_translation !lexicon lang_gw
   else if !missing_gnt then missing_translation !lexicon lang_gnt
-  else if !missing_setup then missing_setup_translations msg_setup !lang_cust
   else if !sort_setup then sort_setup_translations msg_setup
   else if !lang_cust <> [] then missing_translation !lexicon !lang_cust
+  else if !lang_setup <> [] then missing_setup_translations msg_setup !lang_setup
   else if !repo <> "" then missing_or_unused_msg !lexicon !repo !log
   else ()
 ;;
