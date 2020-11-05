@@ -187,7 +187,7 @@ let get_msg_setup repo =
     if String.length line < 4 then acc
     else
       match String.index_opt line ':' with
-      | Some i when String.length line > i + 1 && line.[i+1] = ' ' -> (String.sub line 0 2, String.sub line 3 (String.length line - 3)) :: acc
+      | Some i when i = 2 && String.length line > 4 -> (String.sub line 0 2, String.sub line 3 (String.length line - 3)) :: acc
       | _ -> 
         match acc with
         | (ll, str) :: acc -> (ll, str ^ String.sub line 3 (String.length line - 3)) :: acc
@@ -356,19 +356,22 @@ let sort_setup_translations msg_setup =
 ;;
 
 let missing_setup_translations msg_setup languages =
-  let lg = List.hd languages in (* TODO just one language for the time being *)
-  List.iter
-    (fun (k, trl) -> 
-      match List.find_opt (fun (k, _) -> k = lg) trl with
-      | Some (_, _) -> ()
-      | None -> begin
-          print_endline ("\n   " ^ k);
-          print_transl_en_fr trl; 
-          print_endline (lg ^ ":")
-        end
-
-    )
-  msg_setup
+  if List.length languages < 1 && List.length languages > 0 then
+    let lg = List.hd languages in (* TODO just one language for the time being *)
+    List.iter
+      (fun (k, trl) -> 
+        match List.find_opt (fun (k, _) -> k = lg) trl with
+        | Some (_, _) -> ()
+        | None -> begin
+            print_endline ("\n   " ^ k);
+            print_transl_en_fr trl; 
+            print_endline (lg ^ ":")
+          end
+      )
+    msg_setup
+  else
+    print_endline "At least one -missing_one language, but only one";
+    
 ;;
 
 let missing_translation lexicon languages =
