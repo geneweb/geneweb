@@ -265,11 +265,16 @@ let select opts ips =
       if (opts.asc <> None && opts.ascdesc <> None) || opts.desc <> None then begin
         assert (opts.censor = 0) ;
         let asc = Opt.default max_int opts.asc in
-        let ascdesc = Opt.default max_int opts.ascdesc in
         let desc = - (Opt.default max_int opts.desc) in
         let ht =
-          let ips = List.map (fun i -> (i, asc)) ips in
-          Util.select_mascdesc conf base ips ascdesc
+          match opts.ascdesc with
+          | Some ascdesc ->
+            let ips = List.map (fun i -> (i, asc)) ips in
+            Util.select_mascdesc conf base ips ascdesc
+          | None ->
+            let ht = Hashtbl.create 0 in
+            IPS.iter (fun i -> Hashtbl.add ht i (poi base i)) (select_asc conf base asc ips) ;
+            ht
         in
         let ht' =
           let ips = List.map (fun i -> (i, 0)) ips in
