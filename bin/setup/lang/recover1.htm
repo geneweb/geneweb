@@ -7,15 +7,7 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-de: Eine bestehende Datenbank übernehmen - Phase 2
-en: Recover a database - Phase 2
-es: Recuperar una base - Fase 2
-fr: Récupérer une base - Phase 2
-it: Recuperare una base - Fase 2
-lv: Datu bâzes atjauninâðana - 2. fâze
-sv: Återskapa en databas - fas 2
-]
+  <title>[Recover a database - Phase 2]
 </title>
 %fsetup.css;</head>
 
@@ -23,43 +15,19 @@ sv: Återskapa en databas - fas 2
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[
-de: Eine bestehende Datenbank übernehmen
-en: Recover a database
-es: Recuperar una base
-fr: Récupérer une base
-it: Recuperare una base
-lv: Datu bâzes atjauninâðana - 2. fâze
-sv: Återskapa en databas
-]
+[Recover a database]
 </h1>
 </div>
 
 <br><p>
 
-[
-de: Verzeichnis
-en: Directory
-es: Carpeta:
-fr: Répertoire :
-it: Directory:
-lv: Katalogs
-sv: Katalog
-]
+[Directory]
 
 <pre>
   %a
 </pre>
 
-[
-de: Wähle die Datenbank, die du übernehmen möchtest:
-en: Select the database you want to recover:
-es: Seleccione Ud. la base que desea recuperar:
-fr: Sélectionnez la base que vous voulez récupérer :
-it: Selezionate la base che volete recuperare:
-lv: Izvçlieties datu bâzi, kuru jûs vçlaties atjauninât:
-sv: Välj den databas du vill återskapa:
-]
+[Select the database you want to recover:]
 
 <p>
 
@@ -70,39 +38,18 @@ sv: Välj den databas du vill återskapa:
 <dl><dt><dd><table style="border:1px solid">
 
 %y{<tr><td><input type=radio name=i value="%a"></td><td> %a </td></tr>|
-<tr><td>- [
-de: keine Datenbanken in diesem Verzeichnis gefunden
-en: there is no databases in this directory
-es: ninguna base de datos existe en esta carpeta
-fr: il n’y a aucune base de données dans ce
-    répertoire
-it: in questa directory non esiste nessuna base di dati
-lv: ðinî katalogâ nav nevienas datu bâzes
-sv: det finns inga databaser i denna katalog
-]
+<tr><td>- [there is no databases in this directory]
 </tr></td>}
 
 </table></dl>
 
 <p>
 
-[
-de: Gib den Namen an, den du deiner Datenbank geben möchtest. 
-    Wenn du nichts angibst, bekommt sie den gleichen Namen wie die
-    alte Datenbank.
-en: Write the name you want to give to your database. By default, it will
-    be the same in the new directory.
-es: Indique Ud. el nombre que Ud. desea dar a su base de datos.
-    Por defecto; será el mismo en la nueva carpeta.
-fr: Indiquez le nom que vous voulez donner à votre base de
-    données. Par défaut, ce sera le même dans le
-    nouveau répertoire.
-it: Indicate il nome che volete dare alla vostra base di dati.
-    Per difetto, sarà lo stesso nella nuova directory.
-lv: Ierakstiet datu bâzes nosaukumu, kâdâ vçlaties to nosaukt. Pçc noklusçjuma tas bûs tâds pats, kâ jaunais katalogs.
-sv: Skriv in namnet du vill kalla din databas. Skriver du ingenting kommer
-    den att heta samma i den nya katalogen.
-]
+[Write the name you want to give to your database. By default, it will be the same in the new directory.]
+%(
+Write the name you want to give to your database. By default, it will be the sam
+e in the new directory.
+%)
 
 <p>
 
@@ -110,41 +57,18 @@ sv: Skriv in namnet du vill kalla din databas. Skriver du ingenting kommer
 
 <p>
 
-[
-de: Wenn gewünscht, wähle die folgende Option:
-en: You can select an option:
-es: Ud. puede seleccionar una opción:
-fr: Vous pouvez sélectionner une option :
-it: Potete selezionare una opzione:
-lv: Jûs variet izvçlçties arî iespçju:
-sv: Du kan välja en option:
-]
+[You can select an option:]
 
 <p>
 
 <dl><dt><dd><table style="border:1px solid">
 
 <tr><td><input type=checkbox name=ged value="on">   </td>
-<td>[
-de: Mittels GEDCOM-Datei übernehmen. A priori wird dies nicht
-    empfohlen, jedoch solltest du diese Variante versuchen, wenn
-    die normale Übernahme nicht funktioniert.
-en: Pass by a GEDCOM file. A priori, it is not recommended, but if it
-    does not work with the normal procedure, try this option.</td>
-es: Pasar por un fichero GEDCOM. A priori, no es aconsejable, pero si esto
-    no funciona con el procedimiento normal, ensaye con esta
-    opción.
-fr: Passer par un fichier GEDCOM. A priori, c’est déconseillé,
-    mais si ça ne fonctionne pas avec la procédure normale, 
-    essayez cette option.
-it: Passare per un file GEDCOM. A priori è un'operazione sconsigliata
-    ma se non ottenete risultati usando la procedura normale,
-    provate questa opzione.
-lv: Atjaunot caur GEDCOM datni. Vispâr tas nav ieteicams, bet ja parastajâ
-    variantâ atjauninâðana neizdodas, tad izmçìiniet ðo iespçju.
-sv: Gå genom en GEDCOM-fil. Det är inte rekommenderat, men om det
-    inte fungerar med den normala proceduren, försök med detta.
-]
+<td>[Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work with the normal procedure, try this option.</td>]
+%(
+Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work 
+with the normal procedure, try this option.</td>
+%)
 </td>
 </tr>
 
@@ -152,26 +76,10 @@ sv: Gå genom en GEDCOM-fil. Det är inte rekommenderat, men om det
 
 <p>
 
-[
-de: Dann drücke diesen Knopf:
-en: Then push this button:
-es: Apoye luego en este botón:
-fr: Puis appuyez sur ce bouton :
-it: Poi cliccate su questo bottone:
-lv: Beigâs nospiediet ðo podziòu:
-sv: Tryck sedan på denna knapp:
-]
+[Then push this button:]
 
 <p>
 
-<input type=submit value="[
-de: Übernehmen
-en: Recover
-es: Recuperar
-fr: Récupérer
-it: Recuperare
-lv: Atjauninât
-sv: Återskapa
-]
+<input type=submit value="[Recover]
 ">
 </form>

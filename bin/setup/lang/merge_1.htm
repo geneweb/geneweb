@@ -7,13 +7,7 @@
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
 
-  <title>[
-de: Datenbanken zusammenführen
-en: Merging databases
-fr: Fusion de bases de données
-it: Fusione di basi di dati
-sv: Sammanslagning av databaser
-]
+  <title>[Merging databases]
 </title>
 %fsetup.css;
 </head>
@@ -22,71 +16,31 @@ sv: Sammanslagning av databaser
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[
-de: Datenbanken zusammenführen
-en: Merging databases
-fr: Fusion de bases  de données
-it: Fusione di basi di dati
-sv: Sammanslagning av databaser
-]
+[Merging databases]
 </h1>
 </div>
 
 <p>
 
-%v{<b>[
-de: Warnung</b>: Es existiert bereits eine Datenbank mit dem Namen "%o" 
-    in deinem <a href="gwsetup?lang=%l;v=list.htm">Verzeichnis</a>. 
-    Wenn Du den "Ok"-Knopf unten drückst, wird diese
-    Datenbank gelöscht!
-en: Warning</b>: there already exists a database with the name "%o" in your
-    <a href="gwsetup?lang=%l;v=list.htm">directory</a>. If you push the button
-    "Ok" below, it will be erased.
-fr: Attention</b> : il existe déjà une base de nom "%o" dans
-    votre <a
-    href="gwsetup?lang=%l;v=list.htm">répertoire</a>. Si vous
-    appuyez sur le bouton "Ok" ci-dessous, cela va l’effacer.
-it: Attenzione</b>: existe già una base chiamata "%o" nella
-    vostra <a href="gwsetup?lang=%l;v=list.htm">directory</a>. Se
-    cliccate sul bottone "Ok" qui sotto, la base sarà cancellata.
-sv: Varning</b>: det finns redan en databas med namnet "%o" i din
-    <a href = "gwsetup?lang=%l;v=list.htm">katalog</a>. Om du trycker knappen
-    "OK" nedan, kommer den att raderas.
-]
+%v{<b>[Warning</b>: there already exists a database with the name "%o" in your <a href="gwsetup?lang=%l;v=list.htm">directory</a>. If you push the button "Ok" below, it will be erased.]
+%(
+Warning</b>: there already exists a database with the name "%o" in your <a href=
+"gwsetup?lang=%l;v=list.htm">directory</a>. If you push the button "Ok" below, i
+t will be erased.
+%)
 <p>
 
-[
-de: Wenn du diese Operation gerade schonmal durchgeführt hat, war das 
-    wahrscheinlich das Ergebnis, und ist dann unwichtig. Andernfalls
-    kehre auf die vorherige Seite zurück und wähle einen
-    anderen Namen für deine Datenbank.
-en: If you just made this, it is probably its result, and therefore it is
-    not important. Else, return to the previous page and choose another
-    name for your database.
-fr: Si vous venez déjà de faire cette manipulation, il
-    s’agit probablement de son résultat, ce n’est donc pas
-    grave. Sinon, revenez en arrière et choisissez un autre nom
-    pour votre base.
-it: Se avete appena effettuato questa operazione, si
-    tratta probabilmente del suo risultato. Non è grave. Altrimenti,
-    tornate indietro e scegliete un altro nome per la vostra base.
-sv: Om du just gjorde detta, är den nu nog raderad och därför är det
-    inte viktigt. Annars, återvänd till föregående sida och välj ett annat
-    namn för din databas.
-]
+[If you just made this, it is probably its result, and therefore it is not important. Else, return to the previous page and choose another name for your database.]
+%(
+If you just made this, it is probably its result, and therefore it is not import
+ant. Else, return to the previous page and choose another name for your database
+.
+%)
 <p>}
 
 <p>
 
-[
-de: Wir legen nun eine Datenbank namens "%o" aus den folgenden
-    Datenbanken an:
-en: We are going to create a database named "%o" from the following databases:
-fr: Nous allonc créer une base de nom "%o" à partir des bases
-    suivantes:
-it: Ora creeremo la base chiamata "%o" a partire dalle seguenti basi:
-sv: Vi ska skapa en databas med namn "%o" från de följande databaser:
-]
+[We are going to create a database named "%o" from the following databases:]
 
 <ul>
 %s{<li>%a</b>|}
@@ -94,40 +48,16 @@ sv: Vi ska skapa en databas med namn "%o" från de följande databaser:
 
 <p>
 
-[
-de: Bemerkung: Diese Operation kann entweder innerhalb eines
-    Augenzwinkerns erledigt sein, oder aber einige Zehntelsekunden oder
-    mehrere Minuten dauern, abhängig vom jeweiligen Fall. Bitte sei
-    geduldig.
-en: Remark: this operation can answer in the twinkling of a eye or take
-    some tenths of seconds or some minutes, depending on the cases. Be
-    patient.
-fr: Remarque : cette opération peut s’effectuer en un clin d’oeil ou
-    prendre quelques dizaines de secondes ou quelques minutes, suivant les
-    cas. Soyez patient.
-it: Nota: questa operazione si può fare in un batter d'occhio,
-    in qualche secondo o qualche minuto, secondo i casi. Siate pazienti.
-sv: Obs: denna operation kan gå blixtsnabbt eller ta tiotalet
-    sekunder eller flera minuter, beroende på fallet. Ha tålamod.
-]
+[Remark: this operation can answer in the twinkling of a eye or take some tenths of seconds or some minutes, depending on the cases. Be patient.]
+%(
+Remark: this operation can answer in the twinkling of a eye or take some tenths 
+of seconds or some minutes, depending on the cases. Be patient.
+%)
 
 <p>
 
-[
-de: Drücke den Knopf unten um deine Datenbank anzulegen
-en: Push the button below to create your database
-fr: Appuyez sur le bouton ci-dessous pour créer votre base de
-    données
-it: Cliccate sul bottone qui sotto per creare la vostra base di dati
-sv: Klicka knappen nedan för att skapa din databas
-]
-%v{<br><blink><font color=red>[
-de:  und die vorige Datenbank "%o" im Zielverzeichnis zu überschreiben
-en: , and overwrite the previous database "%o" of the target directory
-fr:  et écraser la base "%o" du répertoire d’arrivée
-it: e cancellare la base "%o" dalla directory di destinazione
-sv:  och skriva över den tidigare databasen "%o" i mål katalogen
-]
+[Push the button below to create your database]
+%v{<br><blink><font color=red>[, and overwrite the previous database "%o" of the target directory]
 </font></blink>}:
 
 <p>
@@ -143,14 +73,7 @@ sv:  och skriva över den tidigare databasen "%o" i mål katalogen
 
 <p>
 
-[
-de: Zur Information: Diese Operation entspricht folgenden Kommandos:
-en: For information, this operation corresponds to the following commands:
-fr: Pour information, cette opération correspond à la suite
-    des commandes suivantes:
-it: Per informazione, questa operazione corrisponde ai seguenti comandi:
-sv: Denna operation motsvarar de följande kommandona:
-]
+[For information, this operation corresponds to the following commands:]
 
 <pre>
      $ cd "%w"

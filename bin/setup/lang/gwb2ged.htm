@@ -8,32 +8,14 @@
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>
-[
-de: GEDCOM-Datei extrahieren
-en: Extract a GEDCOM file
-es: Extracción de un fichero GEDCOM
-fi: Vie GEDCOM tiedosto
-fr: Extraction d’un fichier GEDCOM
-it: Estrazione di un file GEDCOM
-lv: Izveidot GEDCOM datni
-sv: Exportera en GEDCOM-fil
-]
+[Extract a GEDCOM file]
 </title>
 %fsetup.css;
 </head>
 <body %Vbody_prop;>
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[
-de: GEDCOM-Datei extrahieren
-en: Extract a GEDCOM file
-es: Extracción de un fichero GEDCOM
-fi: Vie GEDCOM tiedosto
-fr: Extraction d’un fichier GEDCOM
-it: Estrazione di un file GEDCOM
-lv: Izveidot GEDCOM datni
-sv: Exportera en GEDCOM-fil
-]
+[Extract a GEDCOM file]
 </h1>
 </div>
 
@@ -41,16 +23,7 @@ sv: Exportera en GEDCOM-fil
 <input type="hidden" name="opt" value="check">
 <input type="hidden" name="lang" value="%l">
 <ul><li>
-[
-de: Wähle deine Datenbank:
-en: Select your database:
-es: Seleccione Ud. su base de datos :
-fi: Valitse tietokanta:
-fr: Sélectionnez votre base de données :
-it: Selezionate la vostra base di dati:
-lv: Izvçlieties datu bâzi:
-sv: Välj din databas:
-]
+[Select your database:]
 
 <p>
 
@@ -59,44 +32,18 @@ sv: Välj din databas:
 %b{<tr align="left">
 <td><input type="radio" name="anon" id="anon%a" value="%a">   
 <label for="anon%a">%a</label></td></tr>|
-<tr align="left"><td>- [
-de: Keine Datenbank vorhanden
-en: here is no database at present
-es: actualmente ninguna base de datos existente
-fi: ei tietokantaa saatavilla
-fr: il n’y a aucune base de données actuellement
-it: attualmente non esiste nessuna base di dati
-lv: nav nevienas datu bâzes
-sv: det finns ingen databas för tillfället
-]
+<tr align="left"><td>- [here is no database at present]
 </tr></td>}
 
 </table>
 
 <p>
 <li>
-[
-de: Gib den Namen ein, den du deiner GEDCOM-Datei geben möchtest.
-    Falls du nichts eingibst, verwenden wir den Namen deiner Datenbank,
-    gefolgt von der Endung 
-en: Enter the name you want to give to your GEDCOM file. If you write
-    nothing, it will be the name of the database ended by the suffix
-es: Entre Ud el nombre que desea dar a su fichero GEDCOM.
-    Si Ud no mete nada, el nombre utilizado será el nombre de la
-    base seguida del sufijo
-fi: Kirjoita nimi jonka haluat antaa GEDCOM tiedostolle. Jos et kirjoita
-    mitään, tiedoston nimi on tyhjä ja päättyy sanaan
-fr: Entrez le nom que vous voulez donner à votre fichier GEDCOM.
-    Si vous ne mettez rien, ce sera le nom de la base suivi du suffixe
-it: Digitate il nome che volete attribuire al vostro file GEDCOM.
-    Se non mettete niente, il nome utilizzato sarà quello della base
-    seguito dal suffisso
-lv: Ierakstiet Jûsu izvçlçto GEDCOM datnes nosaukumu. Ja Jûs to
-    neierakstîsiet datne tiks nosaukta tâdâ paðâ vârdâ, kâ datu bâze ar
-    paplaðinâjumu
-sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver
-    någonting, kommer det att bli samma namn som databasen avslutat med
-]
+[Enter the name you want to give to your GEDCOM file. If you write nothing, it will be the name of the database ended by the suffix]
+%(
+Enter the name you want to give to your GEDCOM file. If you write nothing, it wi
+ll be the name of the database ended by the suffix
+%)
 "<tt>.ged</tt>".
 
 <p>
@@ -108,75 +55,32 @@ sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver
 </table>
 <p>
 <li>
-[
-de: Wähle die gewünschten Optionen:
-en: Select the options you want:
-es: Seleccione Ud. las opciones deseadas:
-fi: Valitse asetukset jotka haluat:
-fr: Sélectionnez les options que vous désirez :
-if: Selezionate le opzioni desiderate:
-lv: Ivçlçties nepiecieðamos izveides parametrus:
-sv: Välj de optioner du vill ha:
-]
+[Select the options you want:]
 
 <p>
 <table class="setup">
 <tr><td>-charset</td></tr>
 <tr align="left"><td>
 <input type="radio" name="charset" value="ASCII" id="ASCII"/>   
-<label for="ASCII">[
-de: Kodiere die Zeichen in ASCII.
-en: Encode the characters in ASCII.
-es: Codificar los carácteres en ASCII.
-fi: Koodaa merkit ASCII muodossa.
-fr: Coder les caractères en ASCII.
-it: Codificare i caratteri in ASCII.
-lv: Burti ASCII kodçjumâ.
-sv: Koda tecknen i ASCII.
-]
+<label for="ASCII">[Encode the characters in ASCII.]
 </label></td>
 </tr>
 
 <tr align="left"><td>
 <input type="radio" name="charset" value="UTF-8" id="UTF-8" checked>   
-<label for="UTF-8">[
-de: Kodiere die Zeichen in UTF-8.
-en: Encode the characters in UTF-8.
-es: Codificar los carácteres en UTF-8.
-fi: Koodaa merkit UTF-8 muodossa.
-fr: Coder les caractères en UTF-8.
-it: Codificare i caratteri in UTF-8.
-lv: Burti UTF-8 kodçjumâ.
-sv: Koda tecknen i UTF-8.
-]
+<label for="UTF-8">[Encode the characters in UTF-8.]
 </label></td>
 </tr>
 
 <tr align="left"><td>
 <input type="radio" name="charset" value="ANSEL" id="ANSEL"/>   
-<label for="ANSEL">[
-de: Kodiere die Zeichen in ANSEL.
-en: Encode the characters in ANSEL.
-es: Codificar los carácteres en ANSEL.
-fr: Coder les caractères en ANSEL.
-it: Codificare i caratteri in ANSEL.
-lv: Burti ANSEL kodçjumâ.
-sv: Koda tecknen i ANSEL.
-]
+<label for="ANSEL">[Encode the characters in ANSEL.]
 </label></td>
 </tr>
 
 <tr align="left"><td>
 <input type="radio" name="charset" value="ANSI" id="ANSI"/>&nbsp;&nbsp;&nbsp;
-<label for="ANSI">[
-de: Kodiere die Zeichen in ANSI (ISO 8859-1).
-en: Encode the characters in ANSI (ISO 8859-1).
-es: Codificar los car&aacute;cteres en ANSI (ISO 8859-1).
-fr: Coder les caract&egrave;res en ANSI (ISO 8859-1).
-it: Codificare i caratteri in ANSI (ISO 8859-1).
-lv: Burti ANSI kodçjumâ (ISO 8859-1).
-sv: Koda tecknen i ANSI (ISO 8859-1).
-]
+<label for="ANSI">[Encode the characters in ANSI (ISO 8859-1).]
 </label></td>
 </tr>
 </table></dl>
@@ -184,19 +88,7 @@ sv: Koda tecknen i ANSI (ISO 8859-1).
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=mem value="on" id=mem>   
-<label for=mem>-mem</label>[
-de: : während der Operation sparsam mit dem Speicher umgehen
-    (ist aber langsamer).
-en: : Save the memory space during the operation (but it will be slower).
-es: : economizar el espacio-memoria durante la operación
-    (pero esta sera mas lenta).
-fr:  : économiser l’espace mémoire pendant l’opération
-    (mais ce sera plus lent).
-it: : economizzare lo spazio-memoria durante l'operazione
-    (che però sarà più lenta)
-lv: : darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).
-sv: : spara minne under operationen (men det kommer att gå saktare).
-]
+<label for=mem>-mem</label>[: Save the memory space during the operation (but it will be slower).]
 </td>
 </tr>
 </table>
@@ -204,10 +96,7 @@ sv: : spara minne under operationen (men det kommer att gå saktare).
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=nn id=nn value="on">   
-<label for=nn>-nn</label>[
-en: : Do not extract notes.
-fr:  : ne pas extraire les notes.
-]
+<label for=nn>-nn</label>[: Do not extract notes.]
 </td>
 </tr>
 </table>
@@ -215,10 +104,7 @@ fr:  : ne pas extraire les notes.
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=nopicture id=nopicture value="on">   
-<label for=nopicture>-nopicture</label>[
-en: : Dont extract individual pictures (portraits).
-fr:  : ne pas extraire les images individuelles (portraits).
-]
+<label for=nopicture>-nopicture</label>[: Dont extract individual pictures (portraits).]
 </td>
 </tr>
 </table>
@@ -226,67 +112,33 @@ fr:  : ne pas extraire les images individuelles (portraits).
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=picture-path id=picture-path value="on">   
-<label for=picture-path>-picture-path</label>[
-en: : Extract individual pictures path (portraits).
-fr:  : extraire le chemin des images individuelles (portraits).
-]
+<label for=picture-path>-picture-path</label>[: Extract individual pictures path (portraits).]
 </td>
 </tr>
 </table>
 <p>
-[
-en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
-fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
-]
+[In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).]
+%(
+In the boxes below, always enter a value in the Num entry (occurence) ("0" possi
+bly).
+%)
 <p>
 <table class="setup">
 <tr align=left><td> </td>
 <td colspan=3>
--a[
-de: : nur die Vorfahren auswählen von…
-en: : Extract only the ancestors of…
-es: : extraer solamente los antepasados de…
-fr:  : n’extraire que les ancêtres de…
-it: : estrarre solamente gli antenati di…
-lv: : izmantot tikai…
-sv: : exportera endast anorna till…
-]
+-a[: Extract only the ancestors of…]
 </td></tr>
 
-<tr align=left><td>[
-de: Vorname
-en: First name
-es: Nombre
-fr: Prénom
-it: Nome
-lv: Vârds
-sv: Förnamn
-]
+<tr align=left><td>[First name]
 </td>
 <td><input name="a1" size=30 maxlength=200></td>
 
-<td>[
-de: Nr
-en: Num
-es: Núm
-fr: Num
-it: Numero
-lv: Nr
-sv: Nummer
-]
+<td>[Num]
 </td>
 <td><input name="a2" size=5 maxlength=8></td>
 </tr>
 
-<tr align=left><td>[
-de: Nachname
-en: Surname
-es: Apellido
-fr: Nom
-it: Cognome
-lv: Uzvârds
-sv: Efternamn
-]
+<tr align=left><td>[Surname]
 </td>
 <td colspan=3><input name="a3" size=40 maxlength=200></td>
 </tr>
@@ -294,117 +146,46 @@ sv: Efternamn
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
--d[
-de: : nur die Nachkommen auswählen von…
-en: : Extract only the descendants of…
-es: : extraer solamente los descendientes de…
-fr:  : n’extraire que les descendants de…
-it: : estrarre solamente i discendenti di…
-lv: : izmantot tikai…
-]
+-d[: Extract only the descendants of…]
 </td>
 </tr>
 
-<tr align=left><td>[
-de: Vorname
-en: First name
-es: Nombre
-fr: Prénom
-it: Nome
-lv: Vârds
-]
+<tr align=left><td>[First name]
 </td>
 <td><input name="d1" size=30 maxlength=200></td>
 
-<td>[
-de: Nr
-en: Num
-es: Núm
-fr: Num
-it: Numero
-lv: Nr
-]
+<td>[Num]
 </td>
 <td><input name="d2" size=5 maxlength=8></td></tr>
 
-<tr align=left><td>[
-de: Nachname
-en: Surname
-es: Apellido
-fr: Nom
-it: Cognome
-lv: Uzvârds
-]
+<tr align=left><td>[Surname]
 </td>
 <td colspan=3><input name="d3" size=40 maxlength=200></td>
 
 </tr>
 </table>
 <p>
-[
-de: Falls du oben beide Optionen gewählt hast, wird die Schnittmenge
-    extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
-    einen und Nachkommen des anderen sind.
-en: If you use both above options, the intersection is assumed:<br>
-    persons <em>at the same time</em> ancestors of the one and descendants
-    of the other.
-es: Si Ud. utiliza las dos opciones indicadas más arriba, la
-    intercepción de estas será la que contará:
-    personas <em>al mismo tiempo</em>
-    antepasados del uno y descendientes del otro.
-fr: Si vous utilisez les deux options ci-dessus, c’est
-    l’intersection qui comptera :<br>personnes <em>à la fois</em>
-    ancêtres de l’un et descendants de l’autre.
-it: Se utilizzate insieme le due opzioni precedenti, è
-    l'intersezione che sarà presa in considerazione; ossia le
-    persone al <em>tempo stesso</em> antenati dell'uno e discendenti dell'altro.
-lv: Ja Jûs lietosiet abus iepriekðçjos parametrus, tiek izmantota
-    pârklâðanâs: t.i. personas, kas <em>vienlaicîgi </em> ir vienam
-    senèi un otram pçcteèi.
-sv: Om du väljer de båda valen ovan, kommer
-    överlappning att antas: personer <em>som samtidigt</em> är
-    anor av den ena och ättlingar av den andra.
-]
+[If you use both above options, the intersection is assumed:<br> persons <em>at the same time</em> ancestors of the one and descendants of the other.]
+%(
+If you use both above options, the intersection is assumed:<br> persons <em>at t
+he same time</em> ancestors of the one and descendants of the other.
+%)
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
--aws[
-en: : Extract ancestors with siblings of…
-fr:  : extraire les ancêtres avec fratries de…
-]
+-aws[: Extract ancestors with siblings of…]
 </td>
 </tr>
 
-<tr align=left><td>[
-de: Vorname
-en: First name
-es: Nombre
-fr: Prénom
-it: Nome
-lv: Vârds
-]
+<tr align=left><td>[First name]
 </td>
 <td><input name="aws1" size=30 maxlength=200></td>
 
-<td>[
-de: Nr
-en: Num
-es: Núm
-fr: Num
-it: Numero
-lv: Nr
-]
+<td>[Num]
 </td>
 <td><input name="aws2" size=5 maxlength=8></td></tr>
 
-<tr align=left><td>[
-de: Nachname
-en: Surname
-es: Apellido
-fr: Nom
-it: Cognome
-lv: Uzvârds
-]
+<tr align=left><td>[Surname]
 </td>
 <td colspan=3><input name="aws3" size=40 maxlength=200></td>
 </tr>
@@ -412,21 +193,11 @@ lv: Uzvârds
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
--s[
-en: : extract surname (usable several times).
-fr:  : extraire un nom de famille (utilisable plusieurs fois).
-]
+-s[: extract surname (usable several times).]
 </td>
 </tr>
 
-<tr align=left><td>[
-de: Nachname
-en: Surname
-es: Apellido
-fr: Nom
-it: Cognome
-lv: Uzvârds
-]
+<tr align=left><td>[Surname]
 </td>
 <td colspan=3><input name="s" size=40 maxlength=200></td>
 </tr>
@@ -434,19 +205,15 @@ lv: Uzvârds
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
--c[
-en: : When a person is born less than <num> years ago, it is not exported unless it is Public.<br> 
-    All the spouses and descendants are also censored.
-fr:  : quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br>
-    si elle est "publique". La censure s’applique aux époux et descendants. 
-]
+-c[: When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.]
+%(
+: When a person is born less than <num> years ago, it is not exported unless it 
+is Public.<br>  All the spouses and descendants are also censored.
+%)
 </td>
 </tr>
 
-<tr align=left><td>[
-en: Years
-fr: Années
-]
+<tr align=left><td>[Years]
 </td>
 <td colspan=3><input name="c" size=10 maxlength=200></td>
 
@@ -456,37 +223,18 @@ fr: Années
 <table class="setup">
 <tr align=left>
 <td><input type=checkbox name=nsp id=nsp value="on">   
-<label for=nsp>-nsp</label>[
-en: : Do not extract spouses' parents (for options -s and -d).
-fr:  : ne pas extraire les parents des époux (pour les options -s et -d).
-]
+<label for=nsp>-nsp</label>[: Do not extract spouses' parents (for options -s and -d).]
 </td>
 </tr>
 </table>
 
 <p>
 <li>
-[
-de: Dann drücke diesen Knopf:
-en: Then push this button:
-es: Finalmente apoye en el botón:
-fr: Puis appuyez sur ce bouton :
-it: Poi cliccate su questo bottone:
-lv: Tad nospiediet ðo podziòu:
-sv: Tryck sedan på denna knapp:
-]
+[Then push this button:]
 
 <p>
 
-<input type=submit value="[
-de: Extrahieren
-en: Extract
-es: Extraer
-fr: Extraire
-it: Estrarre
-lv: Extract
-sv: Exportera
-]
+<input type=submit value="[Extract]
 ">
 </ul>
 </form>

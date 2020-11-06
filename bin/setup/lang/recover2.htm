@@ -7,15 +7,7 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-de: Eine bestehende Datenbank übernehmen - Phase 3
-en: Recover a database - Phase 3
-es: Recuperar una base - Fase 3
-fr: Récupérer une base - Phase 3
-it: Recuperare una base - Fase 3
-lv: Datu bâzes atjauninâðana - 3. fâze
-sv: Återskapa en databas - fas 3
-]
+  <title>[Recover a database - Phase 3]
 </title>
 %fsetup.css;
 </head>
@@ -24,90 +16,30 @@ sv: Återskapa en databas - fas 3
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[
-de: Eine bestehende Datenbank übernehmen
-en: Recover a database
-es: Recuperar una base
-fr: Récupérer une base
-it: Recuperare una base
-lv: Datu bâzes atjauninâðana - 2. fâze
-sv: Återskapa en databas
-]
+[Recover a database]
 </h1>
 </div>
 
 <br><p>
 
-%v{[
-de: <b>Warnung:</b> Im <a href="gwsetup?lang=%l;v=list.htm">Zielverzeichnis</a>
-    existiert bereits eine Datenbank mit dem Namen "%o".
-    Wenn du den "Ok"-Knopf drückst, wird sie gelöscht.<p>
-    Falls du diese Funktion gerade schonmal ausgeführt hattest, dann
-    war diese Datenbank wahrscheinlich das Ergebnis und daher kann dieser
-    Fehler hier ignoriert werden. Andernfalls kehre auf die vorherige Seite
-    zurück und wähle einen anderen Namen für deine Datenbank.
-en: Warning: there already exists a database named "%o" in the
-    <a href="gwsetup?lang=%l;v=list.htm">destination directory</a>. If you
-    push the button below, it will be erased. If you just made this
-    handling, it is probably its result, therefore it is not important.
-    Otherwise, go back and choose another name for your database.
-es: Atención: una base que tiene por nombre "%o" ya existe en
-    la <a href="gwsetup?lang=%l;v=list.htm">carpeta de destinación
-    </a>. Si Ud. apoya en el botón de la parte inferior; el fichero
-    será borrado. Si Ud. viene de realizar esta manipulación,
-    debe tratarse probablemente de su resultado, entonces no hay
-    ningún problema. En caso contrario; regrese a la página
-    anterior y escoja otro nombre para su base.
-fr: <b>Attention</b> : il existe déjà une base de nom "%o" dans
-    le <a href="gwsetup?lang=%l;v=list.htm">répertoire
-    d’arrivée</a>. Si vous appuyez sur le bouton ci-dessous, cela
-    va l’effacer. Si vous venez déjà de faire cette
-    manipulation, il s’agit probablement de son résultat, ce n’est
-    donc pas grave. Sinon, revenez en arrière et choisissez un
-    autre nom pour votre base.
-it: <b>Attenzione</b>: esiste una base chiamata "%o" nella
-    <a href="gwsetup?lang=%l;v=list.htm">directory
-    di destinazione</a>. Se cliccate sul bottone qui sotto
-    la cancellerete. Se avete appena fatto questa manipolazione
-    si tratta probabilmente del suo risultato e non c'è quindi
-    niente di grave. Altrimenti, tornate indietro e sciegliete un
-    altro nome per la vostra base.
-lv: Brîdinâjums: datu bâze ar nosaukumu "%o" jau eksistç
-    <a href="gwsetup?lang=%l;v=list.htm">dotajâ katalogâ</a>. Ja Jûs
-    nospiedîsiet zemâk esoðo podziòu ðî datu bâze tiks izdzçsta. Iespçjams,
-    ka Jûs jau to esiet izveidojuði. Esiet uzmanîgi. Ja nepiecieðams,
-    atgriezieties iepriekðçjâs lapâs un izvçlieties citu datu bâzes nosaukumu.
-sv: Varning: det finns redan en databas benämnd "%o" i
-    <a href="gwsetup?lang=%l;v=list.htm">målkatalogen</a>. Om du
-    trycker på knappen nedan kommer den att raderas.
-    Om du inte vill det, gå tillbaka och välj ett annat namn för din databas.
-]
+%v{[Warning: there already exists a database named "%o" in the <a href="gwsetup?lang=%l;v=list.htm">destination directory</a>. If you push the button below, it will be erased. If you just made this handling, it is probably its result, therefore it is not important. Otherwise, go back and choose another name for your database.]
+%(
+Warning: there already exists a database named "%o" in the <a href="gwsetup?lang
+=%l;v=list.htm">destination directory</a>. If you push the button below, it will
+ be erased. If you just made this handling, it is probably its result, therefore
+ it is not important. Otherwise, go back and choose another name for your databa
+se.
+%)
 <p>}
 
-[
-de: Startverzeichnis und Datenbank:
-en: Starting directory and database:
-es: Carpeta y base inicial:
-fr: Répertoire et base de départ :
-it: Directory e base iniziale:
-lv: Vecâs datu bâzes katalogs un datu bâze:
-sv: Startkatalog och databas:
-]
+[Starting directory and database:]
 
 <pre>
   %a
   %i
 </pre>
 
-[
-de: Zielverzeichnis und Datenbank:
-en: Destination directory and database:
-es: Carpeta y base final:
-fr: Répertoire et base d’arrivée :
-it: Directory e base finale:
-lv: Jaunais datu bâzes katalogs un datu bâze:
-sv: Målkatalog och databas:
-]
+[Destination directory and database:]
 
 <pre>
   %w
@@ -116,43 +48,16 @@ sv: Målkatalog och databas:
 
 <p>
 
-[
-de: Warnung: Je nach Fall kann diese Operation 
-    einige Sekunden oder Minuten benötigen. Bitte habe Geduld.
-en: Warning: the operation can take several seconds or minutes, depending
-    on the case. Be patient.
-es: Atención: la operación puede tomar algunos segundos o
-    algunos minutos, de acuerdo al caso. Sea paciente
-fr: Attention : l’opération peut prendre quelques secondes ou
-    quelques minutes, suivant les cas. Soyez patient.
-it: Attenzione: l'operazione può prendere qualche secondo
-    o qualche minuto, secondo i casi. Siate pazienti.
-lv: Brîdinâjums: Atkarîbâ no apstakïiem atjauninâðana var ilgt no daþâm
-    sekundçm lîdz minûtçm. Esiet pacietîgs.
-sv: Varning: operationen kan ta flera sekunder eller minuter, beroende på fall.
-    Ha tålamod.
-]
+[Warning: the operation can take several seconds or minutes, depending on the case. Be patient.]
+%(
+Warning: the operation can take several seconds or minutes, depending on the cas
+e. Be patient.
+%)
 
 <p>
 
-[
-de: Drücke den Knopf, um die Operation zu starten
-en: Push the below button to launch the operation
-es: Apoye en el botón siguiente para lanzar la operación
-fr: Appuyez sur le bouton ci-dessous pour lancer l’opération
-it: Cliccate sul bottone qui sotto per lanciare l'operazione
-lv: Nospiediet zemâk esoðo podziòu, lai uzsâktu datu bâzes atjauninâðanu
-sv: Tryck på knappen nedan för att starta operationen
-]
-%v{<br><blink><font color=red>[
-de:  und die Datenbank "%o" im Zielverzeichnis zu löschen
-en: , and overwrite the database "%o" of the destination directory
-es:  y destruir la "%o" de la carpeta final
-fr:  et écraser la base "%o" du répertoire d’arrivée
-it:  e cancellate la base "%o" nella directory finale
-lv: , un pârrakstîtu datu bâzi "%o" mçría katalogâ
-sv:  och radera databasen "%o" i målkatalogen
-]
+[Push the below button to launch the operation]
+%v{<br><blink><font color=red>[, and overwrite the database "%o" of the destination directory]
 </font></blink>}:
 
 <p>
@@ -168,19 +73,7 @@ sv:  och radera databasen "%o" i målkatalogen
 
 <p>
 
-[
-de: Zu deiner Information: Diese Funktion entspricht der Ausführung
-    der folgenden Kommandos:
-en: For information, this operation corresponds to the following commands:
-es: Por información esta operación corresponde a la ejecución de los comandos
-    siguientes:
-fr: Pour information, cette opération correspond à la suite
-    des commandes suivantes:
-it: Per informazione, questa operazione corrisponde alla succesione
-    dei seguenti comandi:
-lv: Informâcijai: ðî darbîba atbilst sekojoðâm komandâm:
-sv: Denna operation motsvarar de följande kommandona:
-]
+[For information, this operation corresponds to the following commands:]
 
 <pre>
      $ cd "%a"
