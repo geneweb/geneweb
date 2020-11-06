@@ -454,6 +454,14 @@ let read_base_env bname =
     loop []
   | None -> []
 
+let rec split_string acc s =
+  if String.length s < 80 then s
+  else
+    match String.index_from_opt s 70 ' ' with
+    | Some i when String.length s > i + 3 ->
+        split_string (acc ^ (String.sub s 0 i) ^ "\n") (String.sub s (i + 1) (String.length s - i - 1))
+    | _ -> s
+
 let rec copy_from_stream conf print strm =
   try
     while true do

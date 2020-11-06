@@ -75,14 +75,14 @@ lv: Yes|Nç
 nl: ja|nee
 sv: Yes|No
 
-    Welcome to GeneWeb %q
-de: Willkommen zu GeneWeb %q
-en: Welcome to GeneWeb %q
-es: Bienvenido a GeneWeb %q
-fr: Bienvenue dans GeneWeb %q
-it: Benvenuti su GeneWeb %q
-lv: Sveicinaati GeneWeb %q Ghenealoghijas datu baazee
-sv: Välkommen till GeneWeb %q
+    Welcome to GeneWeb
+de: Willkommen zu GeneWeb
+en: Welcome to GeneWeb
+es: Bienvenido a GeneWeb
+fr: Bienvenue dans GeneWeb
+it: Benvenuti su GeneWeb
+lv: Sveicinaati Ghenealoghijas datu baazee GeneWeb
+sv: Välkommen till GeneWeb
 
     Go to your Web browser and open one of the following addresses:
 de: Nimm deinen Webbrowser und öffne eine der folgenden Adressen:
