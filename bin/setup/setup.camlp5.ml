@@ -345,6 +345,10 @@ let macro conf =
       else outfile1
     in
     outfile
+  | 'L' ->
+      let lang = conf.lang in
+      let lang_def = transl conf "!languages" in
+      (Translate.language_name lang lang_def)
   | 'P' -> string_of_int !gwd_port
   | 'Q' -> parameters_1 conf.env
   | 'R' -> parameters_2 conf.env
@@ -456,10 +460,10 @@ let rec copy_from_stream conf print strm =
       match Stream.next strm with
         '[' ->
           begin match Stream.peek strm with
-            Some '\n' ->
+          | Some '\n' ->
               let s = parse_upto ']' strm in
-              let (s, alt) = Translate.inline conf.lang '%' (macro conf) s in
-              let s = if alt then "[" ^ s ^ "]" else s in print s
+              print "Translations must be on a single line: [string to translate]";
+              print s
           | _ ->
               let s =
                 let rec loop len =
@@ -472,10 +476,18 @@ let rec copy_from_stream conf print strm =
               in
               let n =
                 match strm with parser
-                  [< ''0'..'9' as c >] -> Some (Char.code c - Char.code '0')
-                | [< >] -> None
+                  [< ''0'..'9' as c >] -> (Char.code c - Char.code '0')
+                | [< >] -> 0
               in
-              print (translate_phrase conf.lexicon s n)
+              let s =
+                let rec loop acc s =
+                  if String.length s = 0 then acc
+                  else
+                    if s.[0] = '%' then loop (acc ^ (macro conf s.[1])) (String.sub s 2 (String.length s - 2))
+                    else loop (acc ^ (String.sub s 0 1)) (String.sub s 1 (String.length s - 1))
+                in loop "" (nth_field (transl conf s) n)
+              in
+              print s
           end
       | '%' ->
           let c = Stream.next strm in
@@ -549,7 +561,7 @@ let rec copy_from_stream conf print strm =
               | 'L' ->
                   let lang = get_variable strm in
                   let lang_def = transl conf "!languages" in
-                  print (Translate.language_name lang lang_def)
+                  print ((Translate.language_name lang lang_def) ^ "yyy")
               | 'V' | 'F' ->
                   let k = get_variable strm in
                   begin match p_getenv conf.env k with
