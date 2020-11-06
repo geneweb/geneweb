@@ -402,7 +402,7 @@ let variables bname =
 
 let nth_field s n =
   let rec loop nth i =
-    let j = try String.index_from s i '/' with Not_found -> String.length s in
+    let j = try String.index_from s i '|' with Not_found -> String.length s in
     if nth = n then String.sub s i (j - i)
     else if j = String.length s then s
     else loop (nth + 1) (j + 1)
@@ -480,7 +480,13 @@ let rec copy_from_stream conf print strm =
       | '%' ->
           let c = Stream.next strm in
           begin match c with
-            'b' -> for_all conf print (all_db ".") strm
+          | '(' ->
+                let rec loop more =
+                  let _s = parse_upto '%' strm in
+                  let c = Stream.next strm in
+                  if c = ')' then () else loop true
+                in loop true
+          | 'b' -> for_all conf print (all_db ".") strm
           | 'e' ->
               print "lang=";
               print conf.lang;
