@@ -184,6 +184,7 @@ let msg_setup = ref []
 
 let get_msg_setup repo =
   let add_key_to_entry entry tpl_name =
+    let entry = ("aa", " " ^ tpl_name) :: entry in
     let entry = List.sort (fun (x, _) (y, _) -> compare x y) entry in
     let key = 
       match List.find_opt (fun (k, _) -> k = "en") entry with
@@ -191,7 +192,7 @@ let get_msg_setup repo =
       | Some (_, _) -> "no key"
       | None -> "no key"
     in
-    ((tpl_name ^ ":" ^ key), entry)
+    (key, entry)
   in
   let add_line line acc =
     if String.length line < 4 then acc
@@ -491,6 +492,7 @@ module Lex_map = Map.Make
 
 let merge = ref false ;;
 let first = ref false ;;
+let by_filename = ref false ;;
 
 let sort_lexicon lexicon =
   let lex_sort = ref Lex_map.empty in
@@ -500,7 +502,8 @@ let sort_lexicon lexicon =
         while true do
           let msg = skip_to_next_message ic in
           let list = get_all_versions ic in
-          let list' = List.sort (fun (x, _) (y, _) -> compare x y) list in
+          let list' =
+          List.sort (fun (x, _) (y, _) -> compare x y) list in
           let list' = if !merge then match Lex_map.find_opt msg !lex_sort with
             | Some list ->
                 (* merge list and list' *)
@@ -523,13 +526,32 @@ let sort_lexicon lexicon =
       with End_of_file -> ());
       close_in ic
   | None -> ());
-  Lex_map.iter
-    (fun msg list ->
-       print_endline msg;
-       List.iter
-         (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
-       print_string "\n")
-    !lex_sort
+
+  if !by_filename then
+    let new_list =
+      Lex_map.fold (fun m l acc -> l::acc) !lex_sort []
+    in
+    let new_list =
+      List.sort (fun x y ->
+        let (_, aax) = List.hd x in
+        let (_, aay) = List.hd y in
+        compare aax aay) new_list
+    in
+    List.iter (fun list ->
+      begin
+        let (_, msg) = List.find (fun (k, _) -> k = "en") list in
+        print_endline ("   " ^ msg);
+        List.iter (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
+        print_string "\n"
+      end) new_list
+  else 
+    Lex_map.iter
+      (fun msg list ->
+         print_endline msg;
+         List.iter
+           (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
+         print_string "\n")
+      !lex_sort
 ;;
 
 
@@ -563,6 +585,8 @@ let speclist =
     ": print missing translation in gwsetup for this language.");
    ("-sort_setup", Arg.Set sort_setup,
     ": sort translations in gwsetup.");
+   ("-by_filename", Arg.Set by_filename,
+    ": sort translations in gwsetup by filename (aa: file.htm).");
    ("-repo", Arg.String (fun x -> repo := x),
     ": check missing or unused key word.");
    ("-log", Arg.Set log,
