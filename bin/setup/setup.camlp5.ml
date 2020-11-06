@@ -455,12 +455,12 @@ let read_base_env bname =
   | None -> []
 
 let rec split_string acc s =
-  if String.length s < 80 then s
+  if String.length s < 80 then acc ^ s
   else
     match String.index_from_opt s 70 ' ' with
     | Some i when String.length s > i + 3 ->
         split_string (acc ^ (String.sub s 0 i) ^ "\n") (String.sub s (i + 1) (String.length s - i - 1))
-    | _ -> s
+    | _ -> acc ^ s
 
 let rec copy_from_stream conf print strm =
   try
@@ -495,7 +495,7 @@ let rec copy_from_stream conf print strm =
                     else loop (acc ^ (String.sub s 0 1)) (String.sub s 1 (String.length s - 1))
                 in loop "" (nth_field (transl conf s) n)
               in
-              print s
+              print (split_string "" s)
           end
       | '%' ->
           let c = Stream.next strm in
@@ -1804,9 +1804,10 @@ let copy_text lang fname =
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
+      let lexicon = input_lexicon lang in
       let conf =
         {lang = lang; comm = ""; env = []; request = [];
-         lexicon = Hashtbl.create 1}
+         lexicon = lexicon}
       in
       copy_from_stream conf print_string (Stream.of_channel ic);
       flush stdout;
