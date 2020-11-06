@@ -348,7 +348,7 @@ let macro conf =
   | 'L' ->
       let lang = conf.lang in
       let lang_def = transl conf "!languages" in
-      (Translate.language_name lang lang_def)
+      (Translate.language_name ~sep:'|' lang lang_def)
   | 'P' -> string_of_int !gwd_port
   | 'Q' -> parameters_1 conf.env
   | 'R' -> parameters_2 conf.env
@@ -561,7 +561,7 @@ let rec copy_from_stream conf print strm =
               | 'L' ->
                   let lang = get_variable strm in
                   let lang_def = transl conf "!languages" in
-                  print ((Translate.language_name lang lang_def) ^ "yyy")
+                  print (Translate.language_name ~sep:'|' lang lang_def)
               | 'V' | 'F' ->
                   let k = get_variable strm in
                   begin match p_getenv conf.env k with
