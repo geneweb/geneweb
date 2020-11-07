@@ -314,6 +314,8 @@ let only_file_name () =
   if !only_file = "" then Filename.concat !setup_dir "only.txt"
   else !only_file
 
+(* this set of macros are used within translations, hence the repeat of some *)
+(* like %l, %L, %P, ... *)
 let macro conf =
   function
     '/' -> if Sys.unix then "/" else "\\"
@@ -333,18 +335,6 @@ let macro conf =
   | 'w' -> slashify (Sys.getcwd ())
   | 'y' -> Filename.basename (only_file_name ())
   | 'z' -> string_of_int !port
-  | '%' -> "%"
-  | 'K' -> (* print the name of -o filename, prepend bname or -o1 filename *)
-    let outfile1 = strip_spaces (s_getenv conf.env "o") in
-    let bname = strip_spaces (s_getenv conf.env "anon") in
-    let outfile2 = strip_spaces (s_getenv conf.env "o1") in
-    let outfile =
-      if outfile2 <> "" then outfile2
-      else if bname <> ""
-      then slashify_linux_dos bname ^ ".gwb" ^ outfile1
-      else outfile1
-    in
-    outfile
   | 'L' ->
       let lang = conf.lang in
       let lang_def = transl conf "!languages" in
@@ -352,6 +342,7 @@ let macro conf =
   | 'P' -> string_of_int !gwd_port
   | 'Q' -> parameters_1 conf.env
   | 'R' -> parameters_2 conf.env
+  | '%' -> "%"
   | c -> "BAD MACRO " ^ String.make 1 c
 
 let get_variable strm =
@@ -546,6 +537,7 @@ let rec copy_from_stream conf print strm =
                 conf.env
           | 'j' -> print_selector conf print
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
+          | 'l' -> print conf.lang
           | 'r' ->
               print_specific_file conf print
                 (Filename.concat !setup_dir "gwd.arg") strm
@@ -592,8 +584,20 @@ let rec copy_from_stream conf print strm =
                   let k1 = get_variable strm in
                   let k2 = get_variable strm in
                   print_if_else conf print (p_getenv conf.env k1 = Some k2) strm
+              | 'K' -> (* print the name of -o filename, prepend bname or -o1 filename *)
+                  let outfile1 = strip_spaces (s_getenv conf.env "o") in
+                  let bname = strip_spaces (s_getenv conf.env "anon") in
+                  let outfile2 = strip_spaces (s_getenv conf.env "o1") in
+                  let outfile =
+                    if outfile2 <> "" then outfile2
+                    else if bname <> "" then slashify_linux_dos bname ^ ".gwb" ^ outfile1
+                    else outfile1
+                  in
+                  print outfile
               | 'O' ->
-                  let fname = Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o"))) in
+                  let fname = Filename.remove_extension
+                    (Filename.basename (strip_spaces (s_getenv conf.env "o")))
+                  in
                   let fname = slashify_linux_dos fname in
                   print fname
               | 'P' -> print (string_of_int !gwd_port)
