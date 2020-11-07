@@ -7,7 +7,7 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[Clean up - Phase 2]
+  <title>[Cleanup - Phase 2]
 </title>
 %fsetup.css;
 </head>
@@ -15,46 +15,29 @@
 <body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
-<h1 style="margin:0;">
-[Cleaning up]
-</h1>
+<h1 style="margin:0;">[Cleanup]</h1>
 </div>
-
-<p />
-
+<p>
 [We are going to proceed to the cleaning up of the database "%a".]
-
-<p />
-
+<p>
 [Warning: this operation can take some seconds or minutes, depending on the cases. Be patient.]
-%(
-Warning: this operation can take some seconds or minutes, depending on the cases
-. Be patient.
-%)
-
-<p />
-
+<p>
 [Push the button below to start the operation.]
-
-<p />
-
+<p>
 <form method="post" action="cleanup_1">
 %h
 <dl><dt><dd><input type="submit" value="Ok" /></dl>
 </form>
-
-<p />
-
-[For information, this operation corresponds to the following commands:]
-
+<p>
+[For information, this operation corresponds to the following commands][:]
 <pre>
      $ cd "%w"
      $ %x%/gwu %a -o tmp.gw
      $ mkdir old
-     [Under Unix:]
+     [Under Unix][:]
         $ rm -rf old/%a.gwb
         $ mv %a.gwb old/.
-     [Under MSdos:]
+     [Under MSdos][:]
         $ del old\%a.gwb\*.*
         $ rmdir old\%a.gwb
         $ move %a.gwb old\.

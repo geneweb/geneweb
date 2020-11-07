@@ -255,7 +255,6 @@ let parameters_2 =
   in
   loop ""
 
-
 let rec list_replace k v =
   function
     [] -> [k, v]
@@ -335,6 +334,8 @@ let macro conf =
   | 'w' -> slashify (Sys.getcwd ())
   | 'y' -> Filename.basename (only_file_name ())
   | 'z' -> string_of_int !port
+  | 'D' -> transl conf "!doc"
+  | 'G' -> transl conf "!geneweb"
   | 'L' ->
       let lang = conf.lang in
       let lang_def = transl conf "!languages" in
@@ -478,13 +479,16 @@ let rec copy_from_stream conf print strm =
                   [< ''0'..'9' as c >] -> (Char.code c - Char.code '0')
                 | [< >] -> 0
               in
+              (* translate before macro processing *)
+              let s = (nth_field (transl conf s) n) in
+              (* FIXME must be more efficient way of doing this (with buffers?) *)
               let s =
                 let rec loop acc s =
                   if String.length s = 0 then acc
                   else
                     if s.[0] = '%' then loop (acc ^ (macro conf s.[1])) (String.sub s 2 (String.length s - 2))
                     else loop (acc ^ (String.sub s 0 1)) (String.sub s 1 (String.length s - 1))
-                in loop "" (nth_field (transl conf s) n)
+                in loop "" s
               in
               print (split_string "" s)
           end
@@ -558,16 +562,8 @@ let rec copy_from_stream conf print strm =
                         print (if c = 'C' then " checked" else " selected")
                   | None -> ()
                   end
-              | 'L' ->
-                  let lang = get_variable strm in
-                  let lang_def = transl conf "!languages" in
-                  print (Translate.language_name ~sep:'|' lang lang_def)
-              | 'V' | 'F' ->
-                  let k = get_variable strm in
-                  begin match p_getenv conf.env k with
-                    Some v -> print v
-                  | None -> ()
-                  end
+              | 'D' -> print (transl conf "!doc")
+           (* | 'F' see 'V' *)
               | 'G' -> print_specific_file_tail conf print "gwsetup.log" strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
@@ -594,6 +590,10 @@ let rec copy_from_stream conf print strm =
                     else outfile1
                   in
                   print outfile
+              | 'L' ->
+                  let lang = get_variable strm in
+                  let lang_def = transl conf "!languages" in
+                  print (Translate.language_name ~sep:'|' lang lang_def)
               | 'O' ->
                   let fname = Filename.remove_extension
                     (Filename.basename (strip_spaces (s_getenv conf.env "o")))
@@ -603,6 +603,12 @@ let rec copy_from_stream conf print strm =
               | 'P' -> print (string_of_int !gwd_port)
               | 'Q' -> print (parameters_1 conf.env) (* same as p *)
               | 'R' -> print (parameters_2 conf.env) (* same as p *)
+              | 'V' | 'F' ->
+                  let k = get_variable strm in
+                  begin match p_getenv conf.env k with
+                    Some v -> print v
+                  | None -> ()
+                  end
               | _ ->
                   match p_getenv conf.env (String.make 1 c) with
                     | Some v ->
@@ -620,7 +626,7 @@ let rec copy_from_stream conf print strm =
                           print "\"";
                           if v = s then print " checked"
                       | [< >] -> print (strip_spaces v) end
-                  | None -> print "BAD MACRO 2"
+                  | None -> print ("BAD MACRO 2 " ^ String.make 1 c)
               end
           | c -> print (macro conf c)
           end

@@ -15,42 +15,27 @@
 <body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
-<h1 style="margin:0;">
-[Parameters for "gwd"]
-</h1>
+<h1 style="margin:0;">[Parameters for "gwd"]</h1>
 </div>
-
-<p><p>
-
+<p>
 <form method=POST action="gwd_1">
 <input type=hidden name=lang value="%l">
 <input type=hidden name=setup_link value="">
-
 <p>
 <ul><li>
-[Here are the parameters of the command "gwd". Change the one you estimate necessary:]
-%(
-Here are the parameters of the command "gwd". Change the one you estimate necess
-ary:
-%)
-
+[Here are the parameters of the command "gwd". Change the one you estimate necessary]
 <p>
-
 <table class="setup">
 <tr align=left>
 <td valign=top><strong>-lang</strong></td>
 <td>[Default language.]
-
 <p>
-
 [By default, all the pages of the databases are displayed in this language. Select your prefered language.]
 %(
 By default, all the pages of the databases are displayed in this language. Selec
 t your prefered language.
 %)
-
 <p>
-
 [For a given database, you can still change this choice by configurating the specific parameters of this database. And in the welcome page of the base, you can still click on another flag to select another language. The present choice is therefore like a "default default" language.]
 %(
 For a given database, you can still change this choice by configurating the spec
@@ -58,13 +43,10 @@ ific parameters of this database. And in the welcome page of the base, you can s
 till click on another flag to select another language. The present choice is the
 refore like a "default default" language.
 %)
-
-<p><p>
-
+<p>
 [If "-" is selected, it is French.]
 </td>
 </tr>
-
 <tr align=left>
 <td> </td><td>
 <select name=default_lang>
@@ -105,23 +87,17 @@ refore like a "default default" language.
 <tr align=left>
 <td valign=top><strong>-only</strong></td>
 <td>[Only authorized address.]
-
 <p>
-
 [Only the requests from this Internet address are accepted.]
-
 <p>
-
 [To know which value put for your computer, look at the traces of the command "gwd" which are displayed in the log file (see below) each time  you navigate in your databases. You have to put what you see behind the "From:".]
 %(
 To know which value put for your computer, look at the traces of the command "gw
 d" which are displayed in the log file (see below) each time  you navigate in yo
 ur databases. You have to put what you see behind the "From:".
 %)
-
 </td>
 </tr>
-
 <tr align=left>
 <td> </td>
 <td><input name=only value="%Vonly;" size=40>
@@ -132,18 +108,14 @@ ur databases. You have to put what you see behind the "From:".
 <tr align=left>
 <td valign=top><strong>-log</strong></td>
 <td>[Connection log file.]
-
 <p>
-
 [By default the connection traces appear in the window of "gwd". Each time you navigate, or somebody accesses to one of your databases, 4 or 5 lines are displayed.]
 %(
 By default the connection traces appear in the window of "gwd". Each time you na
 vigate, or somebody accesses to one of your databases, 4 or 5 lines are displaye
 d.
 %)
-
 <p>
-
 [If you want that the traces rather go in a file, write here the name of the file here. This file will be created if it does not exist, in the main directory of <font color=#2f6400><b>GeneWeb</b></font> where you see the commands "gwsetup" and "gwd". It will be extended at each request.]
 %(
 If you want that the traces rather go in a file, write here the name of the file
@@ -153,7 +125,6 @@ nd "gwd". It will be extended at each request.
 %)
 </td>
 </tr>
-
 <tr align=left>
 <td> </td>
 <td><input name=log value="%Vlog;" size=40>
@@ -173,14 +144,11 @@ t color=#2f6400><b>GeneWeb</b></font> simpler, but does not allow to exploit qui
 te all the possibilities. To find the other parameters and their use, you must b
 e a little bit "hacker": some informations can be found in the documentation.
 %)
-
 <p>
 <li>
-[Then push this button:]
-
-<p>
-
-<input type=submit value="[Configure]
-">
+[Then push this button][:]
+<input type=submit value="[Configure]">
 </ul>
 </form>
+</body>
+</html>

@@ -19,27 +19,18 @@
 [Parameters "%a"]
 </h1>
 </div>
-
-<p><p>
-
+<p>
 <form method=POST action="gwf_1">
 <input type=hidden name=lang value="%l">
 <input type=hidden name=anon value="%a">
-
 <p>
 <ul><li>
-[Here are the parameters of the base <a href="http://%m:%P/%a">%a</a>. Change what you estimate necessary:]
-%(
-Here are the parameters of the base <a href="http://%m:%P/%a">%a</a>. Change wha
-t you estimate necessary:
-%)
-
+[Here are the parameters of the base "%a". Change what you estimate necessary][:]
 <p>
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- body_prop -</strong></td>
 </tr>
-
 <tr align=left>
 <td>[Allows to change the background color, put a background pattern, or change the color of the text or the links. Its syntax is the one of HTML accepted in the tag "&lt;body&gt;" before the ">". See your HTML documentation. Example:]
 %(
@@ -47,51 +38,36 @@ Allows to change the background color, put a background pattern, or change the c
 olor of the text or the links. Its syntax is the one of HTML accepted in the tag
  "&lt;body&gt;" before the ">". See your HTML documentation. Example:
 %)
-
 <p>
 <pre>
      text=#CC0000 vlink=yellow
 </pre>
 <p>
-
 [Some interesting variables…]
-
 <ul>
 <li>background:
-[background image (see the <a href="gwsetup?lang=%l;o=%a;v=backg.htm">note</a>)]
-
+[background image] (<a href="gwsetup?lang=%l;o=%a;v=backg.htm">[Note]</a>)
 <li>bgcolor:
 [background color]
-
 <li>text:
 [text color]
-
 <li>link:
 [links color]
-
 <li>vlink:
 [color of already visited links]
-
 </ul>
-
 <p>
-
 [You can also select one of the proposed colors combinations.]
-
 <p>
-
 [This applies not only to the welcome page but to all the displayed pages for this database.]
 %(
-This applies not only to the welcome page but to all the displayed pages for thi
-s database.
+This applies not only to the welcome page but to all the displayed pages for this 
+database.
 %)
-
 </td>
 </tr>
-
 <tr align=left><td align=center>
 <p>
-
 <table style="border:1px solid">
 <tr align=left>
 <td colspan=3>
@@ -99,201 +75,166 @@ s database.
 <input name=body_prop value="%Vbody_prop;" size=55><br>
 </td>
 </tr>
-
 <tr align=left>
-
 <td bgcolor="#FFFFFF">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900">
-<font color="#333333">[text/link/vlink]0</font>
-<font color="#006699">[text/link/vlink]1</font>
-<font color="#999900">[text/link/vlink]2</font>
+<font color="#333333">[text|link|vlink]0</font>
+<font color="#006699">[text|link|vlink]1</font>
+<font color="#999900">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#FFFFEE">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000">
-<font color="#000000">[text/link/vlink]0</font>
-<font color="#006699">[text/link/vlink]1</font>
-<font color="#990000">[text/link/vlink]2</font>
+<font color="#000000">[text|link|vlink]0</font>
+<font color="#006699">[text|link|vlink]1</font>
+<font color="#990000">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CCCCCC">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066">
-<font color="#000000">[text/link/vlink]0</font>
-<font color="#0000CC">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#000000">[text|link|vlink]0</font>
+<font color="#0000CC">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#FFFF00">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633">
-<font color="#FF6600">[text/link/vlink]0</font>
-<font color="#FF0033">[text/link/vlink]1</font>
-<font color="#336633">[text/link/vlink]2</font>
+<font color="#FF6600">[text|link|vlink]0</font>
+<font color="#FF0033">[text|link|vlink]1</font>
+<font color="#336633">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CCCC66">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300">
-<font color="#330000">[text/link/vlink]0</font>
-<font color="#CC0000">[text/link/vlink]1</font>
-<font color="#003300">[text/link/vlink]2</font>
+<font color="#330000">[text|link|vlink]0</font>
+<font color="#CC0000">[text|link|vlink]1</font>
+<font color="#003300">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#FFFF99">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333">
-<font color="#330000">[text/link/vlink]0</font>
-<font color="#CC0000">[text/link/vlink]1</font>
-<font color="#333333">[text/link/vlink]2</font>
+<font color="#330000">[text|link|vlink]0</font>
+<font color="#CC0000">[text|link|vlink]1</font>
+<font color="#333333">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#99CCCC">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366">
-<font color="#000066">[text/link/vlink]0</font>
-<font color="#0000CC">[text/link/vlink]1</font>
-<font color="#003366">[text/link/vlink]2</font>
+<font color="#000066">[text|link|vlink]0</font>
+<font color="#0000CC">[text|link|vlink]1</font>
+<font color="#003366">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CC99FF">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066">
-<font color="#000000">[text/link/vlink]0</font>
-<font color="#FF0033">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#000000">[text|link|vlink]0</font>
+<font color="#FF0033">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#CCFF99">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300">
-<font color="#666600">[text/link/vlink]0</font>
-<font color="#006699">[text/link/vlink]1</font>
-<font color="#003300">[text/link/vlink]2</font>
+<font color="#666600">[text|link|vlink]0</font>
+<font color="#006699">[text|link|vlink]1</font>
+<font color="#003300">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#FFCC00">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066">
-<font color="#330000">[text/link/vlink]0</font>
-<font color="#CC0000">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#330000">[text|link|vlink]0</font>
+<font color="#CC0000">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#00FF33">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066">
-<font color="#0000CC">[text/link/vlink]0</font>
-<font color="#FF0099">[text/link/vlink]1</font>
-<font color="#660066">[text/link/vlink]2</font>
+<font color="#0000CC">[text|link|vlink]0</font>
+<font color="#FF0099">[text|link|vlink]1</font>
+<font color="#660066">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#006699">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF">
-<font color="#CCFFCC">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#00FFFF">[text/link/vlink]2</font>
+<font color="#CCFFCC">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#00FFFF">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#330000">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99">
-<font color="#FF6666">[text/link/vlink]0</font>
-<font color="#FFCC00">[text/link/vlink]1</font>
-<font color="#CCFF99">[text/link/vlink]2</font>
+<font color="#FF6666">[text|link|vlink]0</font>
+<font color="#FFCC00">[text|link|vlink]1</font>
+<font color="#CCFF99">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#003300">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00">
-<font color="#CCCC66">[text/link/vlink]0</font>
-<font color="#FFFFFF">[text/link/vlink]1</font>
-<font color="#FFFF00">[text/link/vlink]2</font>
+<font color="#CCCC66">[text|link|vlink]0</font>
+<font color="#FFFFFF">[text|link|vlink]1</font>
+<font color="#FFFF00">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#333333">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66">
-<font color="#CCCCCC">[text/link/vlink]0</font>
-<font color="#FF6666">[text/link/vlink]1</font>
-<font color="#CCCC66">[text/link/vlink]2</font>
+<font color="#CCCCCC">[text|link|vlink]0</font>
+<font color="#FF6666">[text|link|vlink]1</font>
+<font color="#CCCC66">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#666600">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF">
-<font color="#FFFFFF">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#99CCFF">[text/link/vlink]2</font>
+<font color="#FFFFFF">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#99CCFF">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#000000">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66">
-<font color="#99CCFF">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#CCCC66">[text/link/vlink]2</font>
+<font color="#99CCFF">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#CCCC66">[text|link|vlink]2</font>
 </td>
-
 <td bgcolor="#333333">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF">
-<font color="#FFFFFF">[text/link/vlink]0</font>
-<font color="#99CCFF">[text/link/vlink]1</font>
-<font color="#CC99FF">[text/link/vlink]2</font>
+<font color="#FFFFFF">[text|link|vlink]0</font>
+<font color="#99CCFF">[text|link|vlink]1</font>
+<font color="#CC99FF">[text|link|vlink]2</font>
 </td>
-
 </tr>
 <tr align=left>
-
 <td bgcolor="#CC0000">
 <input type=radio name=proposed_body_prop
 value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
-<font color="#FFFFFF">[text/link/vlink]0</font>
-<font color="#FFFF00">[text/link/vlink]1</font>
-<font color="#00FFFF">[text/link/vlink]2</font>
+<font color="#FFFFFF">[text|link|vlink]0</font>
+<font color="#FFFF00">[text|link|vlink]1</font>
+<font color="#00FFFF">[text|link|vlink]2</font>
 </td>
-
 </tr>
-
 </table>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- default_lang -</strong></td>
 </tr>
-
 <tr align=left>
 <td>[Default language.]
-
 <p>
-
 [If it is "-", the default language of the command "gwd" is applied.]
 </td>
-
 </tr>
-
 <tr align=left>
 <td align=center>
 <select name=default_lang>
@@ -329,112 +270,84 @@ value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_anc_level -</strong></td></tr>
 <tr align=left>
 <td>[Maximum level when displaying ancestors.]
-
 <p>
-
 [When ancestors are displayed, limit the number of displayed generations. By default, it is 8 generations, but you can indicate a different value here.]
 %(
 When ancestors are displayed, limit the number of displayed generations. By defa
 ult, it is 8 generations, but you can indicate a different value here.
 %)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_anc_level value="%Vmax_anc_level;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_desc_level -</strong></td></tr>
 <tr align=left>
 <td>[Maximum level when displaying descendants.]
-
 <p>
-
 [When descendants are displayed, limit the number of displayed generations. By default, it is 12 generations, but you can indicate a different value here.]
 %(
 When descendants are displayed, limit the number of displayed generations. By de
 fault, it is 12 generations, but you can indicate a different value here.
 %)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_desc_level value="%Vmax_desc_level;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_anc_tree -</strong></td></tr>
 <tr align=left>
 <td>[Maximum level when displaying ancestors by tree.]
-
 <p>
-
 [When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.]
 %(
 When ancestors are displayed by tree, limit the number of displayed generations.
  By default, it is 7 generations, but you can indicate a different value here.
 %)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_anc_tree value="%Vmax_anc_tree;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- max_desc_tree -</strong></td></tr>
 <tr align=left>
 <td>[Maximum level when displaying descendants by tree.]
-
 <p>
-
 [When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.]
 %(
 When descendants are displayed by tree, limit the number of displayed generation
 s. By default, it is 4 generations, but you can indicate a different value here.
 %)
 </tr>
-
 </tr>
 <tr align=left>
 <td align=center><input name=max_desc_tree value="%Vmax_desc_tree;"
 size=5></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%" width="90%%">
 <tr align=left><td><strong>- history -</strong></td></tr>
 <tr align=left>
 <td>[History of updates]
-
 <p>
-
 [Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.]
 %(
 Ask to indicate the updates in the welcome pages as a link "history of updates".
@@ -444,23 +357,18 @@ an edit it to remove the old information. Or you can also delete this file to re
 start empty.
 %)
 </tr>
-
 <tr align=left>
 <td align=center>
 <input type=radio name=history value="yes"%Chistory=yes;>[yes|no]0
 <input type=radio name=history value="no"%Chistory=no;>[yes|no]1
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left><td><strong>- images_path -</strong></td></tr>
 <tr align=left>
 <td>[Images path]
-
 <p>
-
 [If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.]
 %(
 If do NOT want that your images are installed in the standard place (databases d
@@ -471,30 +379,23 @@ h <tt>file://</tt>. <p> This concerns the images which are indicated in the pers
 on form, field "image". This does not concern the images installed by the link "
 send image" which are installed as a standard name in a standard place.
 %)
-
 </tr>
 <tr align=left>
 <td align=center><input name=images_path value="%Vimages_path;"
 size=50></td>
 </tr>
-
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left><td><strong>- hide_advanced_request -</strong></td></tr>
 <tr align=left>
 <td>[Hide advanced request.]
-
 <p>
-
 [The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.]
 %(
 The advanced request allows to make researches in the data base. As it is very i
 ncomplete, it is hidden by default. Select "no" below to set it.
 %)
-
 <tr align=left>
 <td align=center>
 <input type=radio name=hide_advanced_request
@@ -503,60 +404,43 @@ value="yes"%Chide_advanced_request=yes;>[yes|no]0
 value="no"%Chide_advanced_request=no;>[yes|no]1
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- friend_passwd -</strong></td>
-
 </tr>
-
 <tr align=left>
 <td>[Password for "friends".]
-
 <p>
-
 ["Friends" can see all dates, notes and photos of the persons born since less than one century. The ones who have not entered the below password will not see these informations.]
 %(
 "Friends" can see all dates, notes and photos of the persons born since less tha
 n one century. The ones who have not entered the below password will not see the
 se informations.
 %)
-
 <p>
-
 [If this area is empty, everybody is a "friend". You can leave this area empty if your computer is not accessible from outside.]
 %(
 If this area is empty, everybody is a "friend". You can leave this area empty if
  your computer is not accessible from outside.
 %)
-
 </td>
 </tr>
-
 <tr align=left>
 <td align=center><input name=friend_passwd value="%Vfriend_passwd;"
 size=30></td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- wizard_passwd -</strong></td>
 </tr>
-
 <tr align=left>
 <td>[Password for "Wizards".]
-
 <p>
-
 ["Wizards" can moreover make modifications in the database.]
-
 <p>
-
 [If this area is empty, everybody is a "wizard". You can leave this area empty if your computer is not accessible from outside.]
 %(
 If this area is empty, everybody is a "wizard". You can leave this area empty if
@@ -564,29 +448,21 @@ If this area is empty, everybody is a "wizard". You can leave this area empty if
 %)
 </td>
 </tr>
-
 <tr align=left>
 <td align=center><input name=wizard_passwd value="%Vwizard_passwd;"
 size=30></td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td valign=top><strong>- wizard_just_friend -</strong></td>
 </tr>
-
 <tr align=left>
 <td>["Wizards" become simple "friend".]
-
 <p>
-
 [If yes, the "wizards" loose their power to make updates.]
-
 <p>
-
 [This can be useful, temporarilly, when you make a cleanup of your database, if it is accessible to Internet, to avoid that "wizards" make changes which would be lost during the operation (remember to suppress this option after cleanup).]
 %(
 This can be useful, temporarilly, when you make a cleanup of your database, if i
@@ -595,30 +471,23 @@ t is accessible to Internet, to avoid that "wizards" make changes which would be
 %)
 </td>
 </tr>
-
 <tr align=left>
 <td align=center>
 <input type=radio name=wizard_just_friend
  value="yes"%Cwizard_just_friend=yes;>[yes|no]0
 <input type=radio name=wizard_just_friend
  value="no"%Cwizard_just_friend=no;>[yes|no]1
-
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- hide_private_names -</strong></td>
 </tr>
-
 <tr align=left>
 <td>[Hide the private person's names.]
-
 <p>
-
 [Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.]
 %(
 Hide the names of the private persons, i.e. the still living persons or, more ex
@@ -626,34 +495,25 @@ actly, the persons of less than one century.
 %)
 </td>
 </tr>
-
 <tr align=left>
 <td align=center>
 <input type=radio name=hide_private_names
  value="yes"%Chide_private_names=yes;>[yes|no]0
 <input type=radio name=hide_private_names
  value="no"%Chide_private_names=no;>[yes|no]1
-
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- can_send_image -</strong></td>
 </tr>
-
 <tr align=left>
 <td>[Ability to send images.]
-
 <p>
-
 [If yes, the "wizards" are authorized to upload images.]
-
 <p>
-
 [Can be useful in local, in order to be able to put an image for somebody, because the procedure installs automatically the image at the right place with the appropriate file name.]
 %(
 Can be useful in local, in order to be able to put an image for somebody, becaus
@@ -662,30 +522,23 @@ ropriate file name.
 %)
 </td>
 </tr>
-
 <tr align=left>
 <td align=center>
 <input type=radio name=can_send_image
  value="yes"%Ccan_send_image=yes;>[yes|no]0
 <input type=radio name=can_send_image
  value="no"%Ccan_send_image=no;>[yes|no]1
-
 </td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td><strong>- renamed -</strong></td>
 </tr>
-
 <tr align=left>
 <td>[Base has been renamed.]
-
 <p>
-
 [If you changed the name of your database, but this database has been existed since a long time and you think that many people made links to it, keep this parameter file for this base and write here the new name of the database. People who consult the database with the old name receive then a page indicating them the new name to use with the same clickable request.]
 %(
 If you changed the name of your database, but this database has been existed sin
@@ -694,21 +547,15 @@ ter file for this base and write here the new name of the database. People who c
 onsult the database with the old name receive then a page indicating them the ne
 w name to use with the same clickable request.
 %)
-
 <p>
-
 [If this area is empty, the database has not been renamed.]
-
 </td>
 </tr>
-
 <tr align=left>
 <td align=center><input name=renamed value="%Vrenamed;" size=30></td>
 </tr>
 </table>
-
 <p>
-
 <table style="border:1px solid" width="100%%">
 <tr align=left>
 <td>
@@ -717,26 +564,20 @@ w name to use with the same clickable request.
 If you want that a text appears in the bottom of each page, write it here. You c
 an use HTML tags.
 %)
-
 </td>
 </tr>
 <tr align=left>
 <td>
-
 <textarea name=trailer rows=3 cols=60 wrap=virtual>%Ftrailer;</textarea>
 </td>
 </tr>
 </table>
-
 </table></dl>
-
 <p>
 <li>
-[Then push this button:]
-
-<p>
-
-<input type=submit value="[Apply]
-">
+[Then push this button][:]
+<input type=submit value="[Apply]">
 </ul>
 </form>
+</body>
+</html>
