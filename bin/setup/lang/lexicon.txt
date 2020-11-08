@@ -1,16 +1,6 @@
 # $Id: lexicon.txt,v 7.0 2020-11-06 01:53:16 Exp $
 # Copyright (c) 1998-2007 INRIA
 
-    !charset
-de: utf-8
-en: utf-8
-es: utf-8
-fr: utf-8
-it: utf-8
-lv: utf-8
-nl: utf-8
-sv: utf-8
-
     !doc
 de: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 en: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
@@ -104,6 +94,22 @@ it: Si|No
 lv: Yes|Nç
 nl: ja|nee
 sv: Yes|No
+
+    initialisation of consanguinities
+en: initialisation of consanguinities
+fr: calcul de la consanguinité 
+
+    Look at the traces, may be you can find an explanation.
+en: Look at the traces, may be you can find an explanation.
+fr: Consultez les traces, vous y trouverez probablement une explication.
+
+    from a GEDCOM source file
+en: from a GEDCOM source file
+fr: à aprtir d'un fichier source GEDCOM
+
+    from a GeneWeb source file
+en: from a GeneWeb source file
+fr: à partir d'un fichier source GeneWeb
 
     Welcome to GeneWeb
 de: Willkommen zu GeneWeb
@@ -246,7 +252,7 @@ aa: gwb2ged.htm
 en: Extract surname (usable several times).
 fr: Extraire un nom de famille (utilisable plusieurs fois).
 
-    Cleaning up
+    cleaning up
 aa: welcome.htm
 co: Nettata
 de: Aufräumen
@@ -473,11 +479,6 @@ aa: bsi_err.htm
 en: And the content of gwsetup.log
 fr: Et le contenu de gwsetup.log
 
-    And the content of gwsetup.log 
-aa: traces.htm
-en: And the content of gwsetup.log 
-fr: Et le contenu de gwsetup.log
-
     Application of "%d"
 aa: bsc.htm
 de: Funktion "%d" ausführen
@@ -651,9 +652,9 @@ aa: gwdiff.htm
 en: Checks descendants (default).
 fr: Vérifier les descendants (par défaut).
 
-    Checks descendants of all ascendants .
+    Checks descendants of all ascendants.
 aa: gwdiff.htm
-en: Checks descendants of all ascendants .
+en: Checks descendants of all ascendants.
 fr: Vérifier tous les descendants des ascendants.
 
     Cleanup
@@ -693,11 +694,6 @@ sv: Upprensning av en databas
 aa: bso_ok.htm
 en: Read the alert messages in the file "comm.log"
 fr: Consulter les messages d’alerte dans le fichier "comm.log"
-
-    Click here for the results in "comm.log":
-aa: gwdiff_ok.htm
-en: Click here for the results in "comm.log":
-fr: Cliquer ici pour les résultats dans "comm.log".
 
     Compare
 aa: gwdiff.htm
@@ -930,15 +926,15 @@ it: Cancellazione di basi di dati
 lv: Datu bâþu dzçðana
 sv: Radering av databaser
 
-    Destination directory and database:
+    Destination directory and database
 aa: recover2.htm
-de: Zielverzeichnis und Datenbank:
-en: Destination directory and database:
-es: Carpeta y base final:
-fr: Répertoire et base d’arrivée :
-it: Directory e base finale:
-lv: Jaunais datu bâzes katalogs un datu bâze:
-sv: Målkatalog och databas:
+de: Zielverzeichnis und Datenbank
+en: Destination directory and database
+es: Carpeta y base final
+fr: Répertoire et base d’arrivée
+it: Directory e base finale
+lv: Jaunais datu bâzes katalogs un datu bâze
+sv: Målkatalog och databas
 
     Details for this length.
 aa: connex.htm
@@ -2013,10 +2009,10 @@ it: Parametri aggiornati
 lv: Mainîti parametri
 sv: Parametrar uppdaterade
 
-    Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work with the normal procedure, try this option.</td>
+    Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work with the normal procedure, try this option.
 aa: recover1.htm
 de: Mittels GEDCOM-Datei übernehmen. A priori wird dies nicht empfohlen, jedoch solltest du diese Variante versuchen, wenn die normale Übernahme nicht funktioniert.
-en: Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work with the normal procedure, try this option.</td>
+en: Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work with the normal procedure, try this option.
 es: Pasar por un fichero GEDCOM. A priori, no es aconsejable, pero si esto no funciona con el procedimiento normal, ensaye con esta opción.
 fr: Passer par un fichier GEDCOM. A priori, c’est déconseillé, mais si ça ne fonctionne pas avec la procédure normale,  essayez cette option.
 it: Passare per un file GEDCOM. A priori è un'operazione sconsigliata ma se non ottenete risultati usando la procedura normale, provate questa opzione.
@@ -2077,27 +2073,16 @@ fr: Appuyez sur le bouton ci-dessous pour créer votre base de données
 it: Cliccate sul bottone qui sotto per creare la vostra base di dati
 sv: Klicka knappen nedan för att skapa din databas
 
-    Push the button below to start the operation.
-aa: cleanup1.htm
-de: Drücke den Knopf, um die Operation zu starten.
-en: Push the button below to start the operation.
-es: Apoye en el botón siguiente para lanzar la operación.
-fi: Paina nappia alla aloittaaksesi toiminnon.
-fr: Appuyez sur le bouton ci-dessous pour lancer l’opération.
-it: Cliccate sul bottone qui sotto per lanciare l'operazione.
-lv: Darbîbas uzsâkðanai nospiediet sekojoðo podziòu.
-sv: Tryck på knappen nedan för att starta operationen.
-
-    Push the button below to start:
+    Push this button to start
 aa: bsc.htm
-de: Drücke diesen Knopf um zu starten:
-en: Push the button below to start:
-es: Apoyar sobre el botón inferior para comenzar:
-fi: Paina alla olevaa nappia aloittaaksesi:
-fr: Appuyez sur le bouton ci-dessous pour démarrer :
-it: Per iniziare, cliccate sul bottone qui sotto:
-lv: Nospiediet podziòu zemâk, lai sâktu:
-sv: Tryck på knappen nedan för att starta:
+de: Drücke diesen Knopf um zu starten
+en: Push the button to start
+es: Apoyar sobre el botón para comenzar
+fi: Paina alla olevaa nappia aloittaaksesi
+fr: Appuyez sur le bouton pour démarrer
+it: Per iniziare, cliccate sul bottone
+lv: Nospiediet podziòu zemâk, lai sâktu
+sv: Tryck på knappen nedan för att starta
 
     Put the image file in the directory (possibly create it before):
 aa: backg.htm
@@ -2251,17 +2236,6 @@ it: Tornate alla videata precedente ed indicate la directory corretta.
 lv: Atgriezieties iepriekðçjâ lapâ un ierakstiet pareizo kataloga nosakumu.
 sv: Återvänd till föregående sida och skriv in den rätta katalogen.
 
-    Return to the previous screen.
-aa: err_ngw.htm
-de: Kehre zur vorherigen Seite zurück.
-en: Return to the previous screen.
-es: Regrese Ud. a la pantalla anterior.
-fi: Palaa edelliselle sivulle.
-fr: Revenez à l’écran précédent.
-it: Tornate alla videata precedente.
-lv: Atgriezties iepriekðçjâ lapâ.
-sv: Återvänd till föregående sida.
-
     Save and Restore
 aa: save.htm
 de: Sichern und restaurieren
@@ -2381,17 +2355,6 @@ it: Selezionate la vostra base di dati cliccando sul bottone associato
 lv: Ieklikðíinot atbilstoðjâ podziòâ, izvçlieties savu datu bâzi
 sv: Välj din databas genom att klicka på motsvarande knapp
 
-    Select your database
-aa: gwb2ged.htm
-de: Wähle deine Datenbank
-en: Select your database
-es: Seleccione Ud. su base de datos
-fi: Valitse tietokanta
-fr: Sélectionnez votre base de données
-it: Selezionate la vostra base di dati
-lv: Izvçlieties datu bâzi
-sv: Välj din databas
-
     Select your first database
 aa: gwdiff.htm
 en: Select your first database
@@ -2457,13 +2420,13 @@ sv: Upprensningen av din databas "%a" är klar.
 
     The operation "%d" on the database "%a" is terminated.
 aa: update_nldb_ok.htm
-de: So. Die Operation "%d" auf der Datenbank "%a" ist beendet.
-en: So. The operation "%d" on the database "%a" is terminated.
-es: Hela aquí. La operación "%d" sobre la base "%a" ha  terminado.
+de: Die Operation "%d" auf der Datenbank "%a" ist beendet.
+en: The operation "%d" on the database "%a" is terminated.
+es: La operación "%d" sobre la base "%a" ha  terminado.
 fi: Toiminto "%d" tietokannassa "%a" on lopetettu.
-fr: Voilà. L’opération "%d" sur la base "%a" est terminée.
+fr: L’opération "%d" sur la base "%a" est terminée.
 it: L'operazione "%d" sulla base "%a" é terminata.
-lv: Kârtîbâ. Darbîba "%d" ar datu bâzi "%a" pabeigta.
+lv: Darbîba "%d" ar datu bâzi "%a" pabeigta.
 sv: Operationen "%d" på databasen "%a" är avslutad.
 
     Some GEDCOM files sometimes write dates with numbered months (from 1 to 12). The GEDCOM standard 5.5 requires that the months be represented by identifiers (e.g. "MAY 1912" and not "05/1912"). The notation "02/05/1912" is ambiguous (means "May 2, 1912" or "February 5, 1912" according to the countries).
@@ -2502,15 +2465,15 @@ aa: connex.htm
 en: Specifiy the number of branches to be deleted.
 fr: Définit le nombre de branches à supprimer.
 
-    Starting directory and database:
+    Starting directory and database
 aa: recover2.htm
-de: Startverzeichnis und Datenbank:
-en: Starting directory and database:
-es: Carpeta y base inicial:
-fr: Répertoire et base de départ :
-it: Directory e base iniziale:
-lv: Vecâs datu bâzes katalogs un datu bâze:
-sv: Startkatalog och databas:
+de: Startverzeichnis und Datenbank
+en: Starting directory and database
+es: Carpeta y base inicial
+fr: Répertoire et base de départ
+it: Directory e base iniziale
+lv: Vecâs datu bâzes katalogs un datu bâze
+sv: Startkatalog och databas
 
     Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 aa: gwdiff.htm
@@ -2927,16 +2890,16 @@ lv: Linux vidç  - ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatka
 lv: Linux vidç  - ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatkatalogâ un ievadiet
 sv: Under Linux, om du installerade %G som ett rpm paket, logga in som root och skriv
 
-    Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type:
+    Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
 aa: gwd_info.htm
-de: Unter <b>Linux</b> wird der Service automatisch gestartet, sofern du %G als RPM-Paket installiert hast. Wenn du den Dienst gestoppt hast und ihn neu starten möchtest, dann gib als root folgendes Kommando ein:
-en: Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type:
-es: A partir de Linux con rpm, escriba en el taclado:
-fr: Sous <b>Linux</b>, si vous avez installé %G à partir un paquetage rpm, le service a été automatiquement lancé.  Si vous l’avez arrêté et voulez le relancer, devenez root et tapez :
-it: Sotto <b>Linux</b>, se avete installato %G partendo da un pacchetto rpm, il service sarà automaticamente lanciato;.  Se lo avete fermato e volete rilanciarlo, digitate, come root:
-lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet:
-lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet:
-sv: Under Linux, om du installerade %G som ett rpm paket, har servicen startat automatiskt. Om du har stoppat den och vill återstarta den, logga in som root och skriv:
+de: Unter <b>Linux</b> wird der Service automatisch gestartet, sofern du %G als RPM-Paket installiert hast. Wenn du den Dienst gestoppt hast und ihn neu starten möchtest, dann gib als root folgendes Kommando ein
+en: Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
+es: A partir de Linux con rpm, escriba en el taclado
+fr: Sous <b>Linux</b>, si vous avez installé %G à partir un paquetage rpm, le service a été automatiquement lancé.  Si vous l’avez arrêté et voulez le relancer, devenez root et tapez
+it: Sotto <b>Linux</b>, se avete installato %G partendo da un pacchetto rpm, il service sarà automaticamente lanciato;.  Se lo avete fermato e volete rilanciarlo, digitate, come root
+lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
+lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
+sv: Under Linux, om du installerade %G som ett rpm paket, har servicen startat automatiskt. Om du har stoppat den och vill återstarta den, logga in som root och skriv
 
     Under MSdos
 aa: cleanup1.htm
@@ -2946,16 +2909,16 @@ fi: MS-DOS:ssa
 fr: Sous MSdos
 it: Sotto MSdos
 
-    Under Unix, launch an xterm and type the following commands:
+    Under Unix, launch an xterm and type the following commands
 aa: gwd_info.htm
-de: Unter <b>Unix</b> starte ein xterm und gib die folgenden Kommandos ein:
-en: Under Unix, launch an xterm and type the following commands:
-es: A partir de Unix, lanzar un xterm y ecribir con el teclado los comandos siguientes:
-fr: Sous <b>Unix</b>, lancez un xterm et tapez les commandes suivantes :
-it: Sotto <b>Unix</b>, lanciate un xterm e digitate i seguenti comandi:
-lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas:
-lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas:
-sv: Under Unix, starta ett xterm och skriv följande kommandon:
+de: Unter <b>Unix</b> starte ein xterm und gib die folgenden Kommandos ein
+en: Under Unix, launch an xterm and type the following commands
+es: A partir de Unix, lanzar un xterm y ecribir con el teclado los comandos siguientes
+fr: Sous <b>Unix</b>, lancez un xterm et tapez les commandes suivantes
+it: Sotto <b>Unix</b>, lanciate un xterm e digitate i seguenti comandi
+lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
+lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
+sv: Under Unix, starta ett xterm och skriv följande kommandon
 
     Under Unix
 aa: cleanup1.htm
@@ -3020,9 +2983,9 @@ it: Update_nldb
 lv: Update_nldb
 sv: Update_nldb
 
-    Using <b>gwd</b> to visualize the  file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
+    Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 aa: connex_ok.htm
-en: Using <b>gwd</b> to visualize the  file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
+en: Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 fr: En utilisant <b>gwd</b> pour visualiser le fichier dans le dossier NOTES où vous avez redirigé les résultats (%a.gwb/notes_d/connex.txt).<br> Vous y verrez la dernière version du fichier connex.txt que vous avez créé à cet endroit (qui n'est pas nécessairement celle que vous venez de calculer - voir l'horodateur en tête de fichier).<br> Cette solution vous permet de suivre les liens vers les personnes désignées.
 
     Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
@@ -3298,27 +3261,27 @@ it: La vostra base è stata completamente ricostruita; la precedente versione si
 lv: Jûsu datu bâze ir pilîbâ pârveidota: vecâ versija glabâjas %G izplatîðanas komplekta kataloga "%w" apakðkatalogâ "old". Problçmu gadîjumâ Jûs to variet to atjaunot.
 sv: Din databas har blivit helt återskapad, den gamla versionen finns i underkatalogen "old" i katalogen "%w". Du kan återskapa den om det blir något problem.
 
-    Your databases have been renamed. Here is the new list:
+    Your databases have been renamed. Here is the new list
 aa: ren_ok.htm
-de: Deine Datenbank wurde umbenannt. Hier ist die neue Übersicht:
-en: Your databases have been renamed. Here is the new list:
-es: Sus bases de datos han cambiado de nombre. He aquí la nueva lista:
-fr: Vos bases de données ont été renommées. Voici la nouvelle liste:
-it: Le vostre basi di dati hanno cambiato nome. Ecco la nuova lista:
-lv: Jûsu datu bâzes ir pârsauktas. Ðeit ir jaunais datu bâzu saraksts:
-sv: Dina databaser har blivit omdöpta. Här är den nya listan:
+de: Deine Datenbank wurde umbenannt. Hier ist die neue Übersicht
+en: Your databases have been renamed. Here is the new list
+es: Sus bases de datos han cambiado de nombre. He aquí la nueva lista
+fr: Vos bases de données ont été renommées. Voici la nouvelle liste
+it: Le vostre basi di dati hanno cambiato nome. Ecco la nuova lista
+lv: Jûsu datu bâzes ir pârsauktas. Ðeit ir jaunais datu bâzu saraksts
+sv: Dina databaser har blivit omdöpta. Här är den nya listan
 
-    a GEDCOM file
+    a GEDCOM source file
 aa: welcome.htm
-co: un schedariu GEDCOM
-de: eine GEDCOM-Datei
-en: a GEDCOM file
-es: un fichero GEDCOM
-fi: GEDCOM tiedosto
-fr: un fichier GEDCOM
-it: un file GEDCOM
+co: un schedariu di fonte GEDCOM
+de: eine GEDCOM-Quelldatei
+en: a GEDCOM source file
+es: un fichero fuente GEDCOM
+fi: GEDCOM lähdetiedosto
+fr: un fichier source GEDCOM
+it: un file sorgente GEDCOM
 lv: GEDCOM datni
-sv: en GEDCOM-fil
+sv: en GEDCOM källfil
 
     a GeneWeb source file
 aa: welcome.htm
@@ -3407,17 +3370,17 @@ it: pippo.jpg
 lv: foo.jpg
 sv: foo.jpg
 
-    from a GEDCOM file
+    from a GEDCOM source file
 aa: welcome.htm
-co: à partesi d'un schedariu GEDCOM
-de: aus einer GEDCOM-Datei
-en: from a GEDCOM file
-es: a partir de un fichero GEDCOM
-fi: GEDCOM tiedostosta
-fr: à partir d’un fichier GEDCOM
-it: partendo da un file GEDCOM
+co: à partesi d'un schedariu di fonte GEDCOM
+de: aus einer GEDCOM-Quelldatei
+en: from a GEDCOM source file
+es: a partir de un fichero fuente GEDCOM
+fi: GEDCOM lähdetiedostosta
+fr: à partir d’un fichier source GEDCOM
+it: partendo da un file sorgente GEDCOM
 lv: no GEDCOM datnes
-sv: från en GEDCOM-fil
+sv: från en GEDCOM källfil
 
     from a GeneWeb source file
 aa: welcome.htm
@@ -3507,17 +3470,6 @@ aa: gwc.htm
 en: or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
 fr: ou donnez directement le nom du ou des fichiers source GeneWeb en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
 
-    or return to the main menu.
-aa: clean_ok.htm
-de: oder zurück zum Hauptmenü springen.
-en: or return to the main menu.
-es: o regresar al menú principal.
-fi: tai palata päävalikkoon.
-fr: ou revenir au menu principal.
-it: o tornare al menu principale.
-lv: vai atgriezties galvenajâ izvçlnç.
-sv: eller återvända till huvudmenyn.
-
     persons' NBDS.
 aa: gwfix.htm
 en: persons' NBDS.
@@ -3561,17 +3513,6 @@ fr: couleur du texte
 it: colore del testo
 lv: teksta krâsa
 sv: textfärg
-
-    cleaning up
-aa: main.htm
-de: Aufräumen
-en: the cleaning up
-es: una limpieza
-fi: puhdistus
-fr: le nettoyage
-it: una pulizia
-lv: sakopðanu
-sv: upprensning
 
     deletion
 aa: main.htm
@@ -3706,18 +3647,7 @@ it: Col metodo semplice
 lv: parastajâ veidâ
 sv: med en enkel metod
 
-     (do not enter the quotes "" in the input zone).
+    (do not enter the quotes "" in the input zone).
 aa: ged2gwb.htm
-en:  (do not enter the quotes "" in the input zone).
-fr:  (ne pas inclure les guilemets "" dans le champ de saisie).
-
-    or consult the complete documentation of %G
-aa: main.htm
-de: oder schaue in die vollständige %G-Dokumentation
-en: or consult the complete documentation of %G
-es: o consultar la documentación completa de %G
-fi: tai konsultoi %G dokumentaatiota
-fr: ou consulter la documentation complète de %G
-it: o consultare la documentazione completa di %G
-lv: vai skatît %G aprakstu
-sv: eller läs dokumentationen för %G
+en: (do not enter the quotes "" in the input zone).
+fr: (ne pas inclure les guilemets "" dans le champ de saisie).
