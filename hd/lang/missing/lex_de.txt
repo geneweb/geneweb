@@ -169,7 +169,7 @@ fr: révisions intermédiaires masquées
 de: I-Tree
 en: I-Tree
 fr: arbre en I
-de: letzte überarbeitung
+de: letzte Überarbeitung
 en: last revision
 fr: dernière révision
 de: letzte sosa-Nummer nicht navigierbar. Ahnenliste verwenden.
