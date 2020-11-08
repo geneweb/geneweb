@@ -1,3 +1,526 @@
+
+    %s and %s have several unions
+de: %s und %s haben mehrere Verbindungen
+en: %s and %s have several unions
+fr: il y a plusieurs unions entre %s et %s
+
+    one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
+de: Schwager/Schwäger/Schwägerin/Schwägerinnen
+en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
+fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
+
+    one child-in-law/children-in-law
+de: Schwiegerkind/Schwiegerkinder
+en: one child-in-law/children-in-law
+fr: un bel-enfant/beaux-enfants
+
+    one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
+de: Halbbruder/Halbbrüder/Halbschwester/Halbschwestern
+en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
+fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
+
+    one half sibling-in-law/half siblings-in-law
+de: Halbgeschwister
+en: one half sibling-in-law/half siblings-in-law
+fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
+
+    one sibling-in-law/siblings-in-law
+de: Geschwister
+en: one sibling-in-law/siblings-in-law
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
+
+de: Stiefkind/Stiefkinder
+en: a stepchild/stepchildren
+fr: un bel-enfant/beaux-enfants
+
+de: Stiefsohn/Stiefsöhne/Stieftochter/Stieftöchter
+en: one stepson/stepsons/one stepdaughter/stepdaughters
+fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
+
+    activate/suppress
+de: einschalten/ausschalten
+en: activate/suppress
+fr: activer/supprimer
+
+de: den vorherigen Namen als ein Vornamen Alias hinzufügen
+en: add the previous name as a first name alias
+fr: ajouter le nom précédent comme un alias de prénom
+
+    add the previous name as a surname alias
+de: den vorherigen Namen als ein Nachnamen Alias hinzufügen
+en: add the previous name as a surname alias
+fr: ajouter le nom précédent comme un alias de nom
+
+    list of available genealogies (use gwsetup)
+de: verfügbare Stammbäume
+en: list of available genealogies (use gwsetup)
+fr: listes des généalogies disponibles (utilise gwsetup)
+
+    base
+de: Basis
+en: base
+fr: base
+
+    books
+de: Bücher
+en: books
+fr: dictionnaires
+
+    both
+de: beide
+en: both
+fr: les deux
+
+    brothers/sisters/siblings
+de: Brüder/Schwestern/Geschwister
+en: brothers/sisters/siblings
+fr: frères/sœurs/frères et sœurs
+
+    by couple
+de: von Ehepaar
+en: by couple
+fr: par couple
+
+    choose a genealogy
+de: einen Stammbaum wählen
+en: choose a genealogy
+fr: choisir une généalogie
+
+    collapse implex
+de: Implex einklappen
+en: collapse implex
+fr: réduire les implexes
+
+    compact tree
+de: Baum einklappen
+en: compact tree
+fr: arbre compact
+
+    compiled on %s from commit %s
+de: kompiliert am %s von commit %s
+en: compiled on %s from commit %s
+fr: compilé le %s à partir du commit %s
+
+    copy the link to the clipboard
+de: link kopieren
+en: copy the link to the clipboard
+fr: copier le lien dans le presse-papier
+
+    couples
+de: Ehepaar
+en: couples
+fr: couples
+
+    custom event
+de: Benutzerdefiniertes Ereignis
+en: custom event
+fr: événement personnalisé
+
+    fusion implexes
+de: implex zusammenführen
+en: fusion implexes
+fr: fusionner les implexes
+
+    show dag/hide dag
+de: dag zeigen/dag verbergen
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
+
+    date of baptism
+de: Datum der Taufe
+en: date of baptism
+fr: date du baptême
+
+    date of burial
+de: Datum der Beerdigung
+en: date of burial
+fr: date de la sépulture
+
+    DD/MM/YYYY
+de: dd/mm/yyyy
+en: DD/MM/YYYY
+fr: JJ/MM/AAAA
+
+    degree of kinship
+de: grad der Verwandtschaft
+en: degree of kinship
+fr: degré de parenté
+
+    descendant tree view
+de: Nachkommen Baumansicht
+en: descendant tree view
+fr: arborescence descendante
+
+    descendants tree
+de: Nachkommen Baum
+en: descendants tree
+fr: arbre de descendance
+
+    display implex
+de: Implex anzeigen
+en: display implex
+fr: afficher les implexes
+
+    do not
+de: nicht
+en: do not
+fr: ne pas
+
+    edit the graph
+de: Baum editieren
+en: edit the graph
+fr: éditer le graphe
+
+    events to which %s was witness
+de: Ereignisse bei denen %s Trauzeuge war
+en: events to which %s was witness
+fr: évènements auxquels %s était témoin
+
+    tree of events
+de: Ereignisbaum
+en: tree of events
+fr: arbre des événements
+
+    time line of the family
+de: Zeitleiste der Familie
+en: time line of the family
+fr: chronologie de la famille
+
+    font size
+de: Schriftgröße
+en: font size
+fr: taille de police
+
+    full tree
+de: vollständiger Baum
+en: full tree
+fr: arbre complet
+
+    full width display/columns display
+de: volle Breite/Spalten
+en: full width display/columns display
+fr: affichage pleine largeur/affichage sur deux colonnes
+
+    godparent
+de: Pate
+en: godparent
+fr: parrain ou marraine
+
+    7 generation H tree
+de: h7-tree
+en: 7 generation H tree
+fr: arbre en H 7 générations
+
+    half-brothers/half-sisters/half-siblings
+de: Halbbrüder/Halbschwestern/Halbgeschwister
+en: half-brothers/half-sisters/half-siblings
+fr: demi-frères/demi-sœurs/demi-frères et sœurs
+
+    hide portraits
+en: hide portraits
+fr: ne pas afficher les portraits
+
+    his/her
+de: sein/ihr
+en: his/her
+fr: son/sa
+
+    home
+de: Wohnsitz
+en: home
+fr: accueil
+
+    horizontal tree
+de: horizontaler Baum
+en: horizontal tree
+fr: arborescence ascendante
+
+    H-Tree
+de: H-Tree
+en: H-Tree
+fr: arbre en H
+
+    ignore implex
+de: Implex ignorieren
+en: ignore implex
+fr: ignorer les implexes
+
+    link implexes
+de: Implex links
+en: link implexes
+fr: relier les implexes
+
+    implex/implexes
+de: Implex
+en: implex/implexes
+fr: implexe/implexes
+
+    simple chronology/detailed chronology
+de: eingebetette zeitliche Abfolge
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
+
+    Please, enter the name of the database you want to use:
+de: eingabe Datenbank
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
+
+    intermediate revisions not shown
+de: Zwischenüberarbeitung nicht gezeigt
+en: intermediate revisions not shown
+fr: révisions intermédiaires masquées
+
+    I-Tree
+de: I-Tree
+en: I-Tree
+fr: arbre en I
+
+    last revision
+de: letzte Überarbeitung
+en: last revision
+fr: dernière révision
+
+    last Sosa level not navigable. Use ancestors list.
+de: letzte sosa-Nummer nicht navigierbar. Ahnenliste verwenden.
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
+
+    link back to parents
+de: link zurück zu Eltern
+en: link back to parents
+fr: lien retour vers les parents
+
+    link to children
+de: link zu Kindern
+en: link to children
+fr: lien vers les enfants
+
+    lists of books
+de: liste der Bücher
+en: lists of books
+fr: liste des dictionnaires
+
+    missing %s
+de: %s fehlend
+en: missing %s
+fr: %s manquant
+
+    no date
+de: fehlendes Datum
+en: no date
+fr: sans date
+
+    missing image
+de: fehlendes Bild
+en: missing image
+fr: image manquante
+
+    permute the events of family %s
+de: ändere Familie %s Ereignis reihenfolge
+en: permute the events of family %s
+fr: permuter les événements de la famille %s
+
+    permute personnal events
+de: ändere Person Ereignis reihenfolge
+en: permute personnal events
+fr: permuter les événéments individuels
+
+    module/modules
+de: Module
+en: module/modules
+fr: module/modules
+
+    move up/move down/move up cursor/move down cursor
+de: nach oben/unten bewegen
+en: move up/move down/move up cursor/move down cursor
+fr: remonter/descendre/remonter le curseur/descendre le curseur
+
+    9 generations H tree
+de: mtree
+en: 9 generations H tree
+fr: arbre en H 9 générations
+
+    multi relations graph
+de: mehrfachbeziehungsdiagramm
+en: multi relations graph
+fr: graphe de relations multiples
+
+de: Name geändert. aktualisiere verlinkte Seiten
+en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
+fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
+
+    navigate on the tree
+de: auf Baum navigieren
+en: navigate on the tree
+fr: naviguer sur l’arbre
+
+    new name
+de: neuer Name
+en: new name
+fr: nouveau nom
+
+    of
+de: von
+en: of
+fr: de
+
+    officer/officer/officers
+de: Beamter/Beamte/Beamten
+en: officer/officer/officers
+fr: officiant/officiante/officiants
+
+    old name
+de: alter Name
+en: old name
+fr: ancien nom
+
+    on
+de: am
+en: on
+fr: le
+
+    one additional generation
+de: eine zusaätzliche Generation
+en: one additional generation
+fr: une génération en plus
+
+    options
+de: Optionen
+en: options
+fr: options
+
+    participant/participant
+de: Teilnehmer/Teilnehmerin
+en: participant/participant
+fr: participant/participante
+
+    previous revision/next revision
+de: vorheriger/nächster Vergleich
+en: previous revision/next revision
+fr: révision précédente/révision suivante
+
+    reduce/increase
+de: reduzieren/erhöhen
+en: reduce/increase
+fr: réduire/augmenter
+
+    relations of
+de: Verbindungen von
+en: relations of
+fr: relations de
+
+    tree of relations
+de: Verbindungsbaum
+en: tree of relations
+fr: arbre des relations
+
+    remove the last added module
+de: letztes Modul entfernen
+en: remove the last added module
+fr: retirer le dernier module ajouté
+
+    reserved to friends or wizards
+de: Reserviert für Freunde oder Zauberer
+en: reserved to friends or wizards
+fr: réservée aux amis et magiciens
+
+    reset to
+de: zurücksetzen zu
+en: reset to
+fr: restaurer
+
+    years by generation
+de: Jahre nach Generation
+en: years by generation
+fr: années par génération
+
+    select personalized modules
+de: auswahl persöhnlicher Module
+en: select personalized modules
+fr: selectionner les modules personnalisés
+
+    keyboard shortcuts
+de: Tastenkürzel
+en: keyboard shortcuts
+fr: raccourcis clavier
+
+    show implex
+de: Implex zeigen
+en: show implex
+fr: identifier les implexes
+
+    great-granduncles and great-grandaunts
+de: Geschwister der Großeltern
+en: great-granduncles and great-grandaunts
+fr: arrières-grands-oncles et arrières-grands-tantes
+
+    scale
+de: Maßstab
+en: scale
+fr: echelle
+
+    sons/daughters/children
+de: Söhne/Töchter/Kinder
+en: sons/daughters/children
+fr: fils/filles/enfants
+
+    spouses informations
+de: Eheleute Informationen
+en: spouses informations
+fr: informations conjoints
+
+    tree of witnesses
+de: Baum von Trauzeugen
+en: tree of witnesses
+fr: arbre des témoins
+
+    uncheck
+de: abwählen
+en: uncheck
+fr: décocher
+
+    width
+de: Breite
+en: width
+fr: largeur
+
+de: mit Vorfahren, Eheleuten und Unbekannten
+en: with root ancestor, spouses and unknowns
+fr: avec l’ancêtre racine, les conjoints et les inconnus
+
+de: Trauzeuge am %s von
+en: with root ancestor, spouses and unknowns
+en: witness at %s of
+fr: témoin au %s de
+
+    tree of witnesses
+de: Trauzeugen Baum
+en: tree of witnesses
+fr: arbre des témoins
+
+    witness/witnesses
+de: Trauzeuge/Trauzeugen
+en: witness/witnesses
+fr: témoin/témoins
+
+    witnesses at his events
+de: Trauzeugen bei seinen Ereignissen
+en: witnesses at his events
+fr: témoins à ses évènements
+
+    witnesses to events of
+de: Trauzeugen der Ereignisse von
+en: witnesses to events of
+fr: témoins aux évènements de
+
+    witnesses to my events and godparents
+de: Trauzeugen von meinen Ereignissen und Paten
+en: witnesses to my events and godparents
+fr: témoins à mes évènements et parrains/marraines
+
+
+
+
     !dates order
 af: yyyymmdd
 ar: ddmmyyyy
