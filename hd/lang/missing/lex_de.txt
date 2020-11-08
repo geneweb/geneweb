@@ -133,7 +133,7 @@ fr: arbre en H 7 générations
 de: Halbbrüder/Halbschwestern/Halbgeschwister
 en: half-brothers/half-sisters/half-siblings
 fr: demi-frères/demi-sœurs/demi-frères et sœurs
-de: Porttrait ausblenden
+de: Portrait ausblenden
 en: hide portraits
 fr: ne pas afficher les portraits
 de: sein/ihr
