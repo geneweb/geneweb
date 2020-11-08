@@ -40,11 +40,6 @@ let get_tpl_files repo =
   |> List.filter (fun x -> Filename.check_suffix x !tpl_ext)
 ;;
 
-let get_setup_files repo =
-  Util.ls_r [repo]
-  |> List.filter (fun x -> Filename.check_suffix x ".htm")
-;;
-
 (* Récupère tous les identifiants de message de lexicon. *)
 let get_lexicon_msg lexicon =
   let lex = ref [] in
@@ -193,146 +188,6 @@ let get_msg_tpl repo =
     [] !msg
 ;;
 
-let msg_setup = ref []
-
-let get_msg_setup repo =
-  let add_key_to_entry entry tpl_name =
-    let entry = ("aa", " " ^ tpl_name) :: entry in
-    let entry = List.sort (fun (x, _) (y, _) -> compare x y) entry in
-    let key = 
-      match List.find_opt (fun (k, _) -> k = "en") entry with
-      | Some ("en", s) -> s
-      | Some (_, _) -> "no key"
-      | None -> "no key"
-    in
-    (key, entry)
-  in
-  let add_line line acc =
-    if String.length line < 4 then acc
-    else
-      match String.index_opt line ':' with
-      | Some i when i = 2 && String.length line > 4 -> (String.sub line 0 2, String.sub line 3 (String.length line - 3)) :: acc
-      | _ -> 
-        match acc with
-        | (ll, str) :: acc -> (ll, str ^ String.sub line 3 (String.length line - 3)) :: acc
-        | [] -> [(String.sub line 0 2, String.sub line 3 (String.length line - 3))]
-  in
-  let one_more_entry ic tpl_name =
-    let entry =
-      let rec loop acc =
-        let line = input_line ic in
-        match String.index_opt line ']' with
-        | Some i -> acc
-        | None -> loop (add_line line acc)
-      in loop []
-    in
-    let entry = add_key_to_entry entry tpl_name in
-    msg_setup := entry :: !msg_setup
-  in
-  List.iter
-    (fun tpl ->
-      let tpl_name = Filename.basename tpl in
-      match try Some (open_in tpl) with Sys_error _ -> None with
-      | Some ic ->
-          (try
-            while true do
-              let line = input_line ic in
-              let j = try String.index line ']' with Not_found -> 0 in
-              match String.index_opt line '[' with
-              | Some i when j = 0 -> one_more_entry ic tpl_name
-              | _ -> ()
-            done
-          with End_of_file -> ());
-          close_in ic;
-      | None -> ())
-    (get_setup_files repo);
-    
-;;
-
-let change_msg_setup repo =
-  let add_line line acc =
-    if String.length line < 4 then acc
-    else
-      match String.index_opt line ':' with
-      | Some i when i = 2 && String.length line > 4 -> (String.sub line 0 2, String.sub line 3 (String.length line - 3)) :: acc
-      | _ -> 
-        match acc with
-        | (ll, str) :: acc -> (ll, str ^ String.sub line 3 (String.length line - 3)) :: acc
-        | [] -> [(String.sub line 0 2, String.sub line 3 (String.length line - 3))]
-  in
-  let one_entry ic =
-    let entry =
-      let rec loop acc =
-        let line = input_line ic in
-        match String.index_opt line ']' with
-        | Some i -> acc
-        | None -> loop (add_line line acc)
-      in loop []
-    in entry
-  in
-  List.iter
-    (fun tpl ->
-      let tplo = (Filename.chop_suffix tpl ".htm") ^ ".new" in
-      match (Some (open_in tpl), Some (open_out tplo)) with
-      | (Some ic, Some oc) ->
-          (try
-            while true do
-              let line = input_line ic in
-              output oc (Bytes.of_string line) 0 (String.length line);
-              let j = try String.index line ']' with Not_found -> 0 in
-              match String.index_opt line '[' with
-              | Some i when j = 0 ->
-                  let entry = one_entry ic in
-                  let str =
-                    begin match List.find_opt (fun (k, _) -> k = "en") entry with
-                    | Some ("en", str) -> str
-                    | _ -> Printf.sprintf "Missing en entry in %s]\n" tplo
-                    end
-                  in
-                  let str = if str.[0] = ' '
-                    then String.sub str 1 (String.length str - 1)
-                    else str
-                  in
-                  output oc (Bytes.of_string str) 0 (String.length str);
-                  output oc (Bytes.of_string "]\n") 0 2;
-                  if String.length str > 80 then
-                  begin
-                    let bytes = Bytes.of_string str in
-                    output oc (Bytes.of_string "%(\n") 0 3;
-                    let rec loop i =
-                      let len = if i + 80 < Bytes.length bytes then 80
-                      else (Bytes.length bytes - i) in
-                      output oc bytes i len;output oc (Bytes.of_string "\n") 0 1;
-                      if i + len < (Bytes.length bytes) then loop (i + 80) else ()
-                    in loop 0;
-                    output oc (Bytes.of_string "%)\n") 0 3
-                  end
-              | _ -> output oc (Bytes.of_string "\n") 0 1;
-            done
-          with End_of_file -> ());
-          close_in ic;
-          close_out oc;
-      | (_, _) -> ())
-    (get_setup_files repo);
-;;
-
-let add_key_to_msg_setup msg_setup =
-  let msg_setup =
-    let rec loop accu list = 
-      match list with
-      | [] -> accu
-      | entry :: list ->
-          let entry = List.sort (fun (x, _) (y, _) -> compare x y) entry in
-          match List.find_opt (fun (k, _) -> k = "en") entry with
-          | Some ("en", s) -> loop ((s, entry) :: accu) list
-          | Some (_, _) -> loop accu list
-          | None -> loop accu list
-      
-    in loop [] msg_setup
-  in
-  msg_setup
-;;
-
 module StringSet = Set.Make
   (struct
     type t = string
@@ -436,7 +291,6 @@ let lang_gw =
 let lang_gnt = [ "de"; "en"; "es"; "fi"; "fr"; "it"; "nl"; "no"; "sv" ] ;;
 
 let lang_cust = ref [] ;;
-let lang_setup = ref [] ;;
 
 let missing_languages list languages =
   List.fold_left
@@ -451,35 +305,6 @@ let print_transl_en_fr list =
   let fr_transl = try List.assoc "fr" list with Not_found -> "" in
   if en_transl <> "" then print_endline ("en:" ^ en_transl);
   if fr_transl <> "" then print_endline ("fr:" ^ fr_transl)
-;;
-
-let sort_setup_translations msg_setup =
-  let list = List.sort_uniq (fun (x, _) (y, _) -> compare x y) msg_setup in
-    List.iter
-      (fun (k, trl) ->
-        print_endline ("\n   " ^ k);
-        List.iter (fun (lg, tr) -> print_endline (lg ^ ":" ^ tr)) trl
-      ) list
-;;
-
-let missing_setup_translations msg_setup languages =
-  if List.length languages <= 1 && List.length languages > 0 then
-    let lg = List.hd languages in (* TODO just one language for the time being *)
-    List.iter
-      (fun (k, trl) -> 
-        match List.find_opt (fun (k, _) -> k = lg) trl with
-        | Some (_, _) -> ()
-        | None -> begin
-            print_endline ("\n   " ^ k);
-            print_transl_en_fr trl; 
-            print_endline (lg ^ ":")
-          end
-      )
-    msg_setup
-  else
-    print_endline
-      ("At least one -missing_one language, but only one: " ^
-        (string_of_int (List.length languages)))
 ;;
 
 let missing_translation lexicon languages =
@@ -583,13 +408,11 @@ let sort_lexicon lexicon =
 
 let lexicon = ref "" ;;
 let lex_sort = ref false ;;
-let change = ref false ;;
 let missing_gw = ref false ;;
 let missing_gnt = ref false ;;
-let missing_setup = ref false ;;
-let sort_setup = ref false ;;
 let repo = ref "" ;;
 let log = ref false ;;
+let gwsetup = ref false ;;
 
 let speclist =
   [("-sort", Arg.Set lex_sort, ": sort the lexicon (both key and content).");
@@ -597,20 +420,14 @@ let speclist =
     ": merge rather than replace new lexicon entries.");
    ("-first", Arg.Set first,
     ": if multiple language entries, select first occurence.");
-   ("-change", Arg.Set change,
-    ": update .htm files in setup/lang.");
    ("-missing_gw", Arg.Set missing_gw,
     ": print missing translation managed by gw.");
    ("-missing_gnt", Arg.Set missing_gnt,
     ": print missing translation managed by gnt.");
    ("-missing_one", Arg.String (fun x -> lang_cust := x :: !lang_cust),
     ": print missing translation for these languages.");
-   ("-missing_one_setup", Arg.String (fun x -> lang_setup := x :: !lang_setup),
-    ": print missing translation in gwsetup for this language.");
-   ("-sort_setup", Arg.Set sort_setup,
-    ": sort translations in gwsetup.");
-   ("-by_filename", Arg.Set by_filename,
-    ": sort translations in gwsetup by filename (aa: file.htm).");
+   ("-gwsetup", Arg.Set by_filename,
+    ": set parameters to gwsetup mode.");
    ("-repo", Arg.String (fun x -> repo := x),
     ": check missing or unused key word.");
    ("-sources", Arg.String (fun x -> sources := x),
@@ -628,17 +445,18 @@ let usage = "Usage: lex_utils [options] lexicon" ;;
 
 let main () =
   Arg.parse speclist anonfun usage;
-  if !lexicon = "" && not (!change || !sort_setup || !lang_setup <> []) then (Arg.usage speclist usage; exit 2);
-  let repo_setup = List.fold_left Filename.concat !repo ["bin"; "setup"] in
-  get_msg_setup repo_setup;
+  if !gwsetup then
+  begin
+    sources := "bin" ^ Filename.dir_sep ^ "setup";
+    templates := !sources ^ Filename.dir_sep ^ "lang";
+    tpl_ext := ".htm";
+  end;
+  if !lexicon = "" then (Arg.usage speclist usage; exit 2);
   if !lex_sort then sort_lexicon !lexicon
   else if !missing_gw then missing_translation !lexicon lang_gw
   else if !missing_gnt then missing_translation !lexicon lang_gnt
-  else if !sort_setup then sort_setup_translations !msg_setup
   else if !lang_cust <> [] then missing_translation !lexicon !lang_cust
-  else if !lang_setup <> [] then missing_setup_translations !msg_setup !lang_setup
   else if !repo <> "" then missing_or_unused_msg !lexicon !repo !log
-  else if !change then change_msg_setup repo_setup
   else ()
 ;;
 
