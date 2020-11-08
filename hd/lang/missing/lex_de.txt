@@ -163,7 +163,7 @@ fr: chronologie simple/chronologie détaillée
 de: eingabe Datenbank
 en: Please, enter the name of the database you want to use:
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
-de: Zwichenüberarbeitung nicht gezeigt
+de: Zwischenüberarbeitung nicht gezeigt
 en: intermediate revisions not shown
 fr: révisions intermédiaires masquées
 de: I-Tree
