@@ -1,3 +1,124 @@
+    sosa reference: %t
+en: sosa reference: %t
+fr: référence Sosa : %t
+
+    sex required
+en: sex required
+fr: sexe demandé
+
+    previous diff
+en: previous difference
+fr: différence précédente
+
+    nouveau(x)
+en: new
+fr: nouveau(x)
+
+    new
+en: new
+fr: nouveau
+
+    next diff
+en: next difference
+fr: différence suivante
+
+    mode H/mode I
+en: mode H/mode I
+fr: mode H/mode I
+
+    missing
+en: missing
+fr: manquant
+
+    marriage notes
+en: marriage notes
+fr: notes du mariage
+
+    lists
+en: lists
+fr: listes
+
+    list of %s
+en: list of %s
+fr: liste de %s
+
+    index required
+en: index required
+fr: index demandé
+
+    history cleaned
+en: history cleaned
+fr: historique nettoyé
+
+    forbidden char
+en: forbidden char
+fr: charactère interdit
+
+    %s forbidden char
+en: forbidden char: %s
+fr: %s : charactère interdit
+
+    edit person
+en: edit person
+fr: modifier la personne
+
+    edit family
+en: edit family
+fr: modifier la famille
+
+    death date before event
+en: death date before event
+fr: décès avant l'événement
+
+    continue
+en: continue
+fr: continuer
+
+    conjoint/conjointe
+en: spouse/spouse
+fr: conjoint/conjointe
+
+    click on dates
+en: click on dates
+fr: clicker sur les dates
+
+    clean history
+en: clean history
+fr: nettoyer l'historique
+
+    children of cousins
+en: children of cousins
+fr: enfants des cousins
+
+    birth date after event
+en: birth date after event
+fr: naissance après l'événement
+
+    back to default sosa reference
+en: back to default sosa reference
+fr: retour à la référence Sosa par défaut
+
+    autofocus
+en: autofocus
+fr: autofocus
+
+    Arbre 9 gen
+en: Arbre 9 generations
+fr: Arvre 9 générations
+
+    Arbre 7 gen
+en: Arbre 7 generations
+fr: Arvre 7 générations
+
+    add the previous first name as a first name alias
+en: add the previous first name as a first name alias
+fr: ajouetr le premier prénom précédent comme prénom alias
+
+    add mariage
+en: add mariage
+fr: ajouter mariage
+
+
     !dates order
 af: yyyymmdd
 ar: ddmmyyyy

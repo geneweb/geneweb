@@ -301,8 +301,7 @@ let print_main conf base auth_file =
         Wserver.printf "<a href=\"%sm=WIZNOTES&o=H\">%s</a>\n" (commd conf)
           (transl conf "here");
         Wserver.print_string
-          (transl conf
-             "for the list ordered by the date of the last modification");
+          (transl conf "for the list ordered by the date of the last modification");
         Wserver.printf ".</em>\n";
         Wserver.printf "</p>\n"
       end;

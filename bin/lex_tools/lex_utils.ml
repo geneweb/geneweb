@@ -156,9 +156,21 @@ let cut_all_msg s =
   with Not_found -> !list
 ;;
 
+let scan_line line =
+  match String.index_opt line '[' with
+  | Some i ->
+      begin match String.index_opt (String.sub line i (String.length line - i)) ']' with
+      |Some j -> true
+      | None -> false
+      end
+  | None -> false
+;;
+
 let get_msg_tpl repo =
   let msg = ref [] in
-  let regexp = Str.regexp "[*?[a-z]+\\.*]" in
+  (* TODO this regexp "[*?[a-z]+]" is ok for regular templates, but not for .htm templates *)
+  (* .htm templates "[.]" may contain just about any characters *)
+  let _regexp = Str.regexp "[*?[a-z]+]" in
   List.iter
     (fun tpl ->
       match try Some (open_in tpl) with Sys_error _ -> None with
@@ -167,10 +179,7 @@ let get_msg_tpl repo =
             while true do
               let line = input_line ic in
               let has_msg =
-                try
-                  ignore (Str.search_forward regexp line 0);
-                  true
-                with Not_found -> false
+                scan_line line
               in
               if has_msg then msg := line :: !msg
               else ()
@@ -366,7 +375,20 @@ let missing_or_unused_msg lexicon repo log =
           (String.lowercase_ascii x) (String.lowercase_ascii y))
       (List.rev_append msg_src msg_tpl)
   in
-
+  (*
+  let msg_tpl =
+    sort_uniq
+      (fun x y ->
+        Stdlib.compare
+          (String.lowercase_ascii x) (String.lowercase_ascii y))
+      msg_tpl
+  in
+  Printf.fprintf stdout "\nNumber of Lexicon entries: %d\n" (List.length lex);
+  List.iter (fun w -> print_endline w) lex;
+  Printf.fprintf stdout "\nNumber of messages in sources: %d\n" (List.length msg_src);
+  Printf.fprintf stdout "\nNumber of messages in templates: %d\n" (List.length msg_tpl);
+  List.iter (fun w -> print_endline w) msg_tpl;
+  *)
   if log then begin
     (match try Some (open_out "log_lex") with Sys_error _ -> None with
     | Some oc ->
@@ -383,7 +405,7 @@ let missing_or_unused_msg lexicon repo log =
   end
   else begin
     Printf.fprintf stdout
-      "\nMessage not used anymore in %s and %s :\n" repo_src repo_tpl;
+      "\nMessage IN lexicon not used anymore in\n%s/*.ml and %s/*%s\n" repo_src repo_tpl !tpl_ext;
     flush stdout;
     List.iter
       (fun w ->
@@ -392,7 +414,7 @@ let missing_or_unused_msg lexicon repo log =
       lex;
 
     Printf.fprintf stdout
-      "\nMessage from %s and %s not in lexicon :\n" repo_src repo_tpl;
+      "\nMessage NOT IN lexicon found in\n%s/*.ml and %s/*%s\n" repo_src repo_tpl !tpl_ext;
     flush stdout;
     List.iter
       (fun w ->
