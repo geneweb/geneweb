@@ -12,7 +12,6 @@ nl: utf-8
 sv: utf-8
 
     !doc
-    <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 de: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 en: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 es: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
@@ -3573,17 +3572,6 @@ fr: le nettoyage
 it: una pulizia
 lv: sakopðanu
 sv: upprensning
-
-    the initialisation of consanguinities
-aa: main.htm
-de: Initialisierung der Blutsverwandtschaften
-en: the initialisation of consanguinities
-es: la inicialización de las consanguinidades
-fi: perheenjäsenten yhdistäminen
-fr: l’initialisation des consanguinités
-it: l'inizializzazione delle consanguineità
-lv: asinsradniecîbas sakârtoðana
-sv: beräkning av blodsband
 
     deletion
 aa: main.htm

@@ -26,6 +26,10 @@ let get_all_versions ic =
 
 (**/**) (* Missing or unused translation. *)
 
+let sources = ref "lib" ;;
+let templates = ref ("hd"  ^ Filename.dir_sep ^ "etc") ;;
+let tpl_ext = ref ".txt" ;;
+
 let get_ml_files repo =
   Util.ls_r [repo]
   |> List.filter (fun x -> Filename.check_suffix x ".ml")
@@ -33,7 +37,7 @@ let get_ml_files repo =
 
 let get_tpl_files repo =
   Util.ls_r [repo]
-  |> List.filter (fun x -> Filename.check_suffix x ".txt")
+  |> List.filter (fun x -> Filename.check_suffix x !tpl_ext)
 ;;
 
 let get_setup_files repo =
@@ -154,7 +158,7 @@ let cut_all_msg s =
 
 let get_msg_tpl repo =
   let msg = ref [] in
-  let regexp = Str.regexp "[*?[a-z]+]" in
+  let regexp = Str.regexp "[*?[a-z]+\\.*]" in
   List.iter
     (fun tpl ->
       match try Some (open_in tpl) with Sys_error _ -> None with
@@ -349,13 +353,11 @@ let missing_or_unused_msg lexicon repo log =
       Filename.concat (Sys.getcwd ()) repo
     else repo
   in
-  let repo_src = Filename.concat repo "lib" in
-  let repo_tpl =
-    List.fold_left Filename.concat repo ["hd"; "etc"]
-  in
+  let repo_src = Filename.concat repo !sources in
+  let repo_tpl = Filename.concat repo !templates in
 
   let lex = get_lexicon_msg lexicon in
-  let msg_src = get_msg_src repo in
+  let msg_src = get_msg_src repo_src in
   let msg_tpl = get_msg_tpl repo_tpl in
   let msg =
     sort_uniq
@@ -589,6 +591,12 @@ let speclist =
     ": sort translations in gwsetup by filename (aa: file.htm).");
    ("-repo", Arg.String (fun x -> repo := x),
     ": check missing or unused key word.");
+   ("-sources", Arg.String (fun x -> sources := x),
+    ": where sources are (\"lib\", \"bin/setup\").");
+   ("-templates", Arg.String (fun x -> templates := x),
+    ": where templates are (\"hd/etc\", \"lang\").");
+   ("-tpl_ext", Arg.String (fun x -> tpl_ext := x),
+    ": templates extension (\".txt\", \".htm\").");
    ("-log", Arg.Set log,
     ": option for repo. Print in log files instead of stdout.")];
 ;;
