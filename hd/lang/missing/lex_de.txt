@@ -1,26 +1,6 @@
     !dir
 de:
 
-    a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
-en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
-fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
-de:
-
-    a child-in-law/children-in-law
-en: one child-in-law/children-in-law
-fr: un bel-enfant/beaux-enfants
-de:
-
-    a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
-en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
-fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
-de:
-
-    a half sibling-in-law/half siblings-in-law
-en: one half sibling-in-law/half siblings-in-law
-fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
-de:
-
     a sibling-in-law/siblings-in-law
 en: one sibling-in-law/siblings-in-law
 fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs

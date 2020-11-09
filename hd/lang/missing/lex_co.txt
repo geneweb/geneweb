@@ -1,13 +1,178 @@
     !dir
 co:
 
+    7 generation H tree
+en: 7 generation H tree
+fr: arbre en H 7 générations
+co:
+
+    9 generations H tree
+en: 9 generations H tree
+fr: arbre en H 9 générations
+co:
+
     a child-in-law/children-in-law
 en: one child-in-law/children-in-law
 fr: un bel-enfant/beaux-enfants
 co:
 
+    copy the link to the clipboard
+en: copy the link to the clipboard
+fr: copier le lien dans le presse-papier
+co:
+
+    edit the graph
+en: edit the graph
+fr: éditer le graphe
+co:
+
+    full width display/columns display
+en: full width display/columns display
+fr: affichage pleine largeur/affichage sur deux colonnes
+co:
+
+    fusion implexes
+en: fusion implexes
+fr: fusionner les implexes
+co:
+
+    great-granduncles and great-grandaunts
+en: great-granduncles and great-grandaunts
+fr: arrières-grands-oncles et arrières-grands-tantes
+co:
+
+    H-Tree
+en: H-Tree
+fr: arbre en H
+co:
+
+    I-Tree
+en: I-Tree
+fr: arbre en I
+co:
+
+    keyboard shortcuts
+en: keyboard shortcuts
+fr: raccourcis clavier
+co:
+
+    last revision
+en: last revision
+fr: dernière révision
+co:
+
+    last Sosa level not navigable. Use ancestors list.
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
+co:
+
+    link implexes
+en: link implexes
+fr: relier les implexes
+co:
+
+    list of available genealogies (use gwsetup)
+en: list of available genealogies (use gwsetup)
+fr: listes des généalogies disponibles (utilise gwsetup)
+co:
+
+    module/modules
+en: module/modules
+fr: module/modules
+co:
+
+    move up/move down/move up cursor/move down cursor
+en: move up/move down/move up cursor/move down cursor
+fr: remonter/descendre/remonter le curseur/descendre le curseur
+co:
+
+    navigate on the tree
+en: navigate on the tree
+fr: naviguer sur l’arbre
+co:
+
+    no date
+en: no date
+fr: sans date
+co:
+
+    on
+en: on
+fr: le
+co:
+
+    one sibling-in-law/siblings-in-law
+en: one sibling-in-law/siblings-in-law
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
+co:
+
     pacsed%t to
 en: Civil solidarity pact%t with
 fr: PACS%t avec
+co:
+
+    permute personnal events
+en: permute personnal events
+fr: permuter les événéments individuels
+co:
+
+    permute the events of family %s
+en: permute the events of family %s
+fr: permuter les événements de la famille %s
+co:
+
+    Please, enter the name of the database you want to use:
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
+co:
+
+    previous revision/next revision
+en: previous revision/next revision
+fr: révision précédente/révision suivante
+co:
+
+    remove the last added module
+en: remove the last added module
+fr: retirer le dernier module ajouté
+co:
+
+    select personalized modules
+en: select personalized modules
+fr: selectionner les modules personnalisés
+co:
+
+    show dag/hide dag
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
+co:
+
+    simple chronology/detailed chronology
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
+co:
+
+    spouses informations
+en: spouses informations
+fr: informations conjoints
+co:
+
+    time line of the family
+en: time line of the family
+fr: chronologie de la famille
+co:
+
+    tree of events
+en: tree of events
+fr: arbre des événements
+co:
+
+    tree of relations
+en: tree of relations
+fr: arbre des relations
+co:
+
+    years by generation
+en: years by generation
+fr: années par génération
 co:
 

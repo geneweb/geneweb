@@ -6,6 +6,16 @@ en: %s and %s have several unions
 fr: il y a plusieurs unions entre %s et %s
 it:
 
+    7 generation H tree
+en: 7 generation H tree
+fr: arbre en H 7 générations
+it:
+
+    9 generations H tree
+en: 9 generations H tree
+fr: arbre en H 9 générations
+it:
+
     a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
 en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
 fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
@@ -111,6 +121,11 @@ en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
 it:
 
+    copy the link to the clipboard
+en: copy the link to the clipboard
+fr: copier le lien dans le presse-papier
+it:
+
     couples
 en: couples
 fr: couples
@@ -171,6 +186,11 @@ en: do not
 fr: ne pas
 it:
 
+    edit the graph
+en: edit the graph
+fr: éditer le graphe
+it:
+
     edit tree
 en: edit the graph
 fr: éditer le graphe
@@ -206,14 +226,34 @@ en: full tree
 fr: arbre complet
 it:
 
+    full width display/columns display
+en: full width display/columns display
+fr: affichage pleine largeur/affichage sur deux colonnes
+it:
+
     full width/columns
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 it:
 
+    fusion implexes
+en: fusion implexes
+fr: fusionner les implexes
+it:
+
     godparent
 en: godparent
 fr: parrain ou marraine
+it:
+
+    great-granduncles and great-grandaunts
+en: great-granduncles and great-grandaunts
+fr: arrières-grands-oncles et arrières-grands-tantes
+it:
+
+    H-Tree
+en: H-Tree
+fr: arbre en H
 it:
 
     h7-tree
@@ -251,6 +291,11 @@ en: H-Tree
 fr: arbre en H
 it:
 
+    I-Tree
+en: I-Tree
+fr: arbre en I
+it:
+
     ignore implex
 en: ignore implex
 fr: ignorer les implexes
@@ -286,7 +331,17 @@ en: I-Tree
 fr: arbre en I
 it:
 
+    keyboard shortcuts
+en: keyboard shortcuts
+fr: raccourcis clavier
+it:
+
     last diff
+en: last revision
+fr: dernière révision
+it:
+
+    last revision
 en: last revision
 fr: dernière révision
 it:
@@ -296,14 +351,29 @@ en: last Sosa level not navigable. Use ancestors list.
 fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 it:
 
+    last Sosa level not navigable. Use ancestors list.
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
+it:
+
     link back to parents
 en: link back to parents
 fr: lien retour vers les parents
 it:
 
+    link implexes
+en: link implexes
+fr: relier les implexes
+it:
+
     link to children
 en: link to children
 fr: lien vers les enfants
+it:
+
+    list of available genealogies (use gwsetup)
+en: list of available genealogies (use gwsetup)
+fr: listes des généalogies disponibles (utilise gwsetup)
 it:
 
     lists of books
@@ -341,7 +411,17 @@ en: module/modules
 fr: module/modules
 it:
 
+    module/modules
+en: module/modules
+fr: module/modules
+it:
+
     move up/down
+en: move up/move down/move up cursor/move down cursor
+fr: remonter/descendre/remonter le curseur/descendre le curseur
+it:
+
+    move up/move down/move up cursor/move down cursor
 en: move up/move down/move up cursor/move down cursor
 fr: remonter/descendre/remonter le curseur/descendre le curseur
 it:
@@ -366,6 +446,11 @@ en: The first name, name or occurrence of this person has changed. Please update
 fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
 it:
 
+    navigate on the tree
+en: navigate on the tree
+fr: naviguer sur l’arbre
+it:
+
     navigate on tree
 en: navigate on the tree
 fr: naviguer sur l’arbre
@@ -374,6 +459,11 @@ it:
     new name
 en: new name
 fr: nouveau nom
+it:
+
+    no date
+en: no date
+fr: sans date
 it:
 
     of
@@ -391,6 +481,11 @@ en: old name
 fr: ancien nom
 it:
 
+    on
+en: on
+fr: le
+it:
+
     on (weekday day month year)
 en: on
 fr: le
@@ -399,6 +494,11 @@ it:
     one additional generation
 en: one additional generation
 fr: une génération en plus
+it:
+
+    one sibling-in-law/siblings-in-law
+en: one sibling-in-law/siblings-in-law
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
 it:
 
     only
@@ -414,6 +514,26 @@ it:
     participant/participant
 en: participant/participant
 fr: participant/participante
+it:
+
+    permute personnal events
+en: permute personnal events
+fr: permuter les événéments individuels
+it:
+
+    permute the events of family %s
+en: permute the events of family %s
+fr: permuter les événements de la famille %s
+it:
+
+    Please, enter the name of the database you want to use:
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
+it:
+
+    previous revision/next revision
+en: previous revision/next revision
+fr: révision précédente/révision suivante
 it:
 
     previous/next diff
@@ -441,6 +561,11 @@ en: remove the last added module
 fr: retirer le dernier module ajouté
 it:
 
+    remove the last added module
+en: remove the last added module
+fr: retirer le dernier module ajouté
+it:
+
     reserved to friends or wizards
 en: reserved to friends or wizards
 fr: réservée aux amis et magiciens
@@ -452,8 +577,8 @@ fr: restaurer
 it:
 
     scale
-en: years by generation
-fr: années par génération
+en: scale
+fr: echelle
 it:
 
     select p_mod
@@ -461,9 +586,19 @@ en: select personalized modules
 fr: selectionner les modules personnalisés
 it:
 
+    select personalized modules
+en: select personalized modules
+fr: selectionner les modules personnalisés
+it:
+
     shortcuts
 en: keyboard shortcuts
 fr: raccourcis clavier
+it:
+
+    show dag/hide dag
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
 it:
 
     show implex
@@ -474,6 +609,11 @@ it:
     siblings of the great-grandparents
 en: great-granduncles and great-grandaunts
 fr: arrières-grands-oncles et arrières-grands-tantes
+it:
+
+    simple chronology/detailed chronology
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
 it:
 
     size
@@ -489,6 +629,26 @@ it:
     spouses info
 en: spouses informations
 fr: informations conjoints
+it:
+
+    spouses informations
+en: spouses informations
+fr: informations conjoints
+it:
+
+    time line of the family
+en: time line of the family
+fr: chronologie de la famille
+it:
+
+    tree of events
+en: tree of events
+fr: arbre des événements
+it:
+
+    tree of relations
+en: tree of relations
+fr: arbre des relations
 it:
 
     tree of witnesses
@@ -539,5 +699,10 @@ it:
     witnesses to my events and godparents
 en: witnesses to my events and godparents
 fr: témoins à mes évènements et parrains/marraines
+it:
+
+    years by generation
+en: years by generation
+fr: années par génération
 it:
 

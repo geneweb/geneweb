@@ -21,6 +21,16 @@ en: %t: %s before their %s
 fr: %t : %s avant son/sa %s
 sv:
 
+    7 generation H tree
+en: 7 generation H tree
+fr: arbre en H 7 générations
+sv:
+
+    9 generations H tree
+en: 9 generations H tree
+fr: arbre en H 9 générations
+sv:
+
     a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
 en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
 fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
@@ -136,6 +146,11 @@ en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
 sv:
 
+    copy the link to the clipboard
+en: copy the link to the clipboard
+fr: copier le lien dans le presse-papier
+sv:
+
     couples
 en: couples
 fr: couples
@@ -206,6 +221,11 @@ en: do not
 fr: ne pas
 sv:
 
+    edit the graph
+en: edit the graph
+fr: éditer le graphe
+sv:
+
     edit tree
 en: edit the graph
 fr: éditer le graphe
@@ -246,14 +266,34 @@ en: full tree
 fr: arbre complet
 sv:
 
+    full width display/columns display
+en: full width display/columns display
+fr: affichage pleine largeur/affichage sur deux colonnes
+sv:
+
     full width/columns
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 sv:
 
+    fusion implexes
+en: fusion implexes
+fr: fusionner les implexes
+sv:
+
     godparent
 en: godparent
 fr: parrain ou marraine
+sv:
+
+    great-granduncles and great-grandaunts
+en: great-granduncles and great-grandaunts
+fr: arrières-grands-oncles et arrières-grands-tantes
+sv:
+
+    H-Tree
+en: H-Tree
+fr: arbre en H
 sv:
 
     h7-tree
@@ -289,6 +329,11 @@ sv:
     htree
 en: H-Tree
 fr: arbre en H
+sv:
+
+    I-Tree
+en: I-Tree
+fr: arbre en I
 sv:
 
     iftitles/public/private
@@ -341,6 +386,11 @@ en: I-Tree
 fr: arbre en I
 sv:
 
+    keyboard shortcuts
+en: keyboard shortcuts
+fr: raccourcis clavier
+sv:
+
     label
 en: label
 fr: étiquette
@@ -351,7 +401,17 @@ en: last revision
 fr: dernière révision
 sv:
 
+    last revision
+en: last revision
+fr: dernière révision
+sv:
+
     last sosa level not navigable
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
+sv:
+
+    last Sosa level not navigable. Use ancestors list.
 en: last Sosa level not navigable. Use ancestors list.
 fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 sv:
@@ -359,6 +419,11 @@ sv:
     link back to parents
 en: link back to parents
 fr: lien retour vers les parents
+sv:
+
+    link implexes
+en: link implexes
+fr: relier les implexes
 sv:
 
     link to children
@@ -369,6 +434,11 @@ sv:
     link to use
 en: link to use
 fr: lien à utiliser
+sv:
+
+    list of available genealogies (use gwsetup)
+en: list of available genealogies (use gwsetup)
+fr: listes des généalogies disponibles (utilise gwsetup)
 sv:
 
     lists of books
@@ -406,7 +476,17 @@ en: module/modules
 fr: module/modules
 sv:
 
+    module/modules
+en: module/modules
+fr: module/modules
+sv:
+
     move up/down
+en: move up/move down/move up cursor/move down cursor
+fr: remonter/descendre/remonter le curseur/descendre le curseur
+sv:
+
+    move up/move down/move up cursor/move down cursor
 en: move up/move down/move up cursor/move down cursor
 fr: remonter/descendre/remonter le curseur/descendre le curseur
 sv:
@@ -436,6 +516,11 @@ en: The first name, name or occurrence of this person has changed. Please update
 fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
 sv:
 
+    navigate on the tree
+en: navigate on the tree
+fr: naviguer sur l’arbre
+sv:
+
     navigate on tree
 en: navigate on the tree
 fr: naviguer sur l’arbre
@@ -449,6 +534,11 @@ sv:
     next relationship path
 en: Next relationship path
 fr: chemin suivant
+sv:
+
+    no date
+en: no date
+fr: sans date
 sv:
 
     of
@@ -466,6 +556,11 @@ en: old name
 fr: ancien nom
 sv:
 
+    on
+en: on
+fr: le
+sv:
+
     on (weekday day month year)
 en: on
 fr: le
@@ -474,6 +569,11 @@ sv:
     one additional generation
 en: one additional generation
 fr: une génération en plus
+sv:
+
+    one sibling-in-law/siblings-in-law
+en: one sibling-in-law/siblings-in-law
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
 sv:
 
     only
@@ -491,9 +591,29 @@ en: participant/participant
 fr: participant/participante
 sv:
 
+    permute personnal events
+en: permute personnal events
+fr: permuter les événéments individuels
+sv:
+
+    permute the events of family %s
+en: permute the events of family %s
+fr: permuter les événements de la famille %s
+sv:
+
+    Please, enter the name of the database you want to use:
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
+sv:
+
     presentation
 en: Presentation
 fr: Présentation
+sv:
+
+    previous revision/next revision
+en: previous revision/next revision
+fr: révision précédente/révision suivante
 sv:
 
     previous/next diff
@@ -526,6 +646,11 @@ en: remove the last added module
 fr: retirer le dernier module ajouté
 sv:
 
+    remove the last added module
+en: remove the last added module
+fr: retirer le dernier module ajouté
+sv:
+
     reserved to friends or wizards
 en: reserved to friends or wizards
 fr: réservée aux amis et magiciens
@@ -537,8 +662,8 @@ fr: restaurer
 sv:
 
     scale
-en: years by generation
-fr: années par génération
+en: scale
+fr: echelle
 sv:
 
     select p_mod
@@ -546,9 +671,19 @@ en: select personalized modules
 fr: selectionner les modules personnalisés
 sv:
 
+    select personalized modules
+en: select personalized modules
+fr: selectionner les modules personnalisés
+sv:
+
     shortcuts
 en: keyboard shortcuts
 fr: raccourcis clavier
+sv:
+
+    show dag/hide dag
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
 sv:
 
     show implex
@@ -564,6 +699,11 @@ sv:
     siblings of the great-grandparents
 en: great-granduncles and great-grandaunts
 fr: arrières-grands-oncles et arrières-grands-tantes
+sv:
+
+    simple chronology/detailed chronology
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
 sv:
 
     size
@@ -584,6 +724,26 @@ sv:
     spouses info
 en: spouses informations
 fr: informations conjoints
+sv:
+
+    spouses informations
+en: spouses informations
+fr: informations conjoints
+sv:
+
+    time line of the family
+en: time line of the family
+fr: chronologie de la famille
+sv:
+
+    tree of events
+en: tree of events
+fr: arbre des événements
+sv:
+
+    tree of relations
+en: tree of relations
+fr: arbre des relations
 sv:
 
     tree of witnesses
@@ -639,5 +799,10 @@ sv:
     witnesses to my events and godparents
 en: witnesses to my events and godparents
 fr: témoins à mes évènements et parrains/marraines
+sv:
+
+    years by generation
+en: years by generation
+fr: années par génération
 sv:
 
