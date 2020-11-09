@@ -1,435 +1,435 @@
     cancel
 en: Cancel
 fr: Annuler
-de:
+de: Abbrechen
 
     text|link|vlink
 en: text|link|vlink
 fr: texte|lien|visité
-de:
+de: Text|Verknüpfung|Besuchte Verknüpfung
 
     initialisation of consanguinities
 en: initialisation of consanguinities
 fr: calcul de la consanguinité 
-de:
+de: Blutsverwandtschaft bereitstellen
 
     Look at the traces, may be you can find an explanation.
 en: Look at the traces, may be you can find an explanation.
 fr: Consultez les traces, vous y trouverez probablement une explication.
-de:
+de: Sehen Sie in die Aufzeichnungen, vielleicht finden Sie eine Erklärung.
 
     from a GEDCOM source file
 en: from a GEDCOM source file
 fr: à aprtir d'un fichier source GEDCOM
-de:
+de: aus einer GEDCOM Quelldatei
 
     from a GeneWeb source file
 en: from a GeneWeb source file
 fr: à partir d'un fichier source GeneWeb
-de:
+de: aus einer GeneWeb Quelldatei
 
     "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
 en: "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
 fr: L’option <i>first names enclosed</i> doit être suivie par une chaîne de deux caractères « be ». À la création d’une personne, si une partie de la chaîne prénom commence par le caractère 'b' et se termine par le caractère 'e', alors cette partie sera considérée comme le prénom usuel.<br> Exemples : <span  style="font-family: monospace">-fne "\\"</span> ou <span style="font-family: monospace"> -fne "()"</span>.
-de:
+de: "Vorname umschlossen": Die -fne Option muss auf zwei Zeichen folgen "be". Wenn eine Person erstellt, der GEDCOM Vornamensteil etwas zwischen 'b' (beliebiges Zeichen) und 'e' (beliebiges Zeichen) enthält, wird dies als Vorname betrachtet. Z.b.: -fne "\\" oder -fne "()"
 
     (no selection is equivalent to select all).
 en: (no selection is equivalent to select all).
 fr: (aucune option est équivalent à les sélectionner toutes). 
-de:
+de: (keine Auswahl ist Äquivalent zu alles Auswählen)
 
     ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
 en: ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
 fr: ../ vous permet de naviguer vers le dossier parent.<br> Dans le monde Windows, ceci ne vous permettra pas de changer la lettre du disque (C: -> D:), mais vous pouvez faire ce changement directement dans l'url dans le navigateur.
-de:
+de: ../ erlaubt Ihnen im Elternverzeichnis zu suchen.<br>In der Windows Welt, ist dies unzulässig für die änderung von Laufwerksbuchstaben (C: -> D:), aber Sie können dies direkt in der URL in Ihrem Browser durchführen.
 
     Do not extract notes.
 en: Do not extract notes.
 fr: Ne pas extraire les notes.
-de:
+de: Notizen nicht extrahieren.
 
     Do not extract spouses' parents (for options -s and -d).
 en: Do not extract spouses' parents (for options -s and -d).
 fr: Ne pas extraire les parents des époux (pour les options -s et -d).
-de:
+de: Eltern der Ehepartner nicht extrahieren
 
     Dont extract individual pictures (portraits).
 en: Dont extract individual pictures (portraits).
 fr: Ne pas extraire les images individuelles (portraits).
-de:
+de: Persönliche Bilder nicht extrahieren (Portraits).
 
     Extract ancestors with siblings of
 en: Extract ancestors with siblings of
 fr: Extraire les ancêtres avec fratries de
-de:
+de: Extrahiere Vorfahren mit Geschwistern von
 
     Extract individual pictures path (portraits).
 en: Extract individual pictures path (portraits).
 fr: Extraire le chemin des images individuelles (portraits).
-de:
+de: Extrahiere Pfad von persönlichen Bildern (Portraits).
 
     When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
 en: When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
 fr: Quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br> si elle est "publique". La censure s’applique aux époux et descendants. 
-de:
+de: Wenn ein Person vor weniger als <num> Jahren geboren wurde, wird es nicht exportiert, sofern es nicht öffentlich ist.<br> Alle Ehepartner und Nachkommen sind auch Zensiert.
 
     extract surname (usable several times).
 en: Extract surname (usable several times).
 fr: Extraire un nom de famille (utilisable plusieurs fois).
-de:
+de: Nachnamen extrahieren (mehrfach verwendbar).
 
     Compute connected componants
 en: Compute connected componants
 fr: Calcule les composantes connexes
-de:
+de: Berechne verbundene Bestandteile
 
     Compute the difference between two bases
 en: Compute the difference between two bases
 fr: Calcule la différence entre deux bases
-de:
+de: Berechne die unterschiede zwischen zwei bases
 
     Fixes problems in a base
 en: Fixes problems in a base
 fr: Corrige les problèmes d'une base
-de:
+de: Löse Probleme in einer base
 
     <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
 en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
 fr: <span style="color:#FF0000;">ATTENTION</span> : Le contenu du fichier %o sera écrasé.
-de:
+de: <span style="color:#FF0000;">ACHTUNG</span>: Der Inhalt der Datei %o wird überschrieben.
 
     <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
 en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
 fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
-de:
+de: <span style="color:#FF0000;">ACHTUNG</span>: Die folgenden drei Optionen führen zu unwiderruflichen Löschungen. Ein Backup Archiv wird empfohlen.
 
     <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
 en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
 fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
-de:
+de: <span style="color:#FF0000;">ACHTUNG</span>: der -del Befehl unterdrückt unwiderruflich einige Familien. Ein Backup Archiv wird empfohlen.
 
     <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
-de:
+de: <span style="color:#FF0000;">ACHTUNG</span>: dieser Befehl verändert die base unwiderruflich. Ein Backup Archiv wird empfohlen.
 
     All connex components.
 en: All connex components.
 fr: Toutes les composantes connexes.
-de:
+de: alle verknüpften Komponenten
 
     And the content of gwsetup.log
 en: And the content of gwsetup.log
 fr: Et le contenu de gwsetup.log
-de:
+de: Und der Inhalt von gwsetup.log
 
     Ask for deleting branches whose size <= that value.
 en: Ask for deleting branches whose size <= that value.
 fr: Demander à détruire les composantes de taille <= à cette valeur.
-de:
+de: Frage nach dem löschen von Zweigen dessen Größe <= diesem Wert sind.
 
     By looking at the terminal window if you have not asked for result redirection.
 en: By looking at the terminal window if you have not asked for result redirection.
 fr: En regardant dans la fenêtre qui s'est ouverte si vous n'avez pas demandé de redirection des résultats.
-de:
+de: durch das einsehen des Terminal Fensters wenn Sie nicht nach Ergebnis umleitung gefragt haben.
 
     By origin file.
 en: By origin file.
 fr: D'après le fichier origine.
-de:
+de: durch Originaldatei
 
     Checks descendants (default).
 en: Checks descendants (default).
 fr: Vérifier les descendants (par défaut).
-de:
+de: Prüft Nachkommen (Standard).
 
     Checks descendants of all ascendants.
 en: Checks descendants of all ascendants.
 fr: Vérifier tous les descendants des ascendants.
-de:
+de: Prüft Nachkommen aller Verwandten.
 
     Read the alert messages in the file "comm.log"
 en: Read the alert messages in the file "comm.log"
 fr: Consulter les messages d’alerte dans le fichier "comm.log"
-de:
+de: Lesen Sie die Warnmeldung in der Datei "comm.log"
 
     Compare
 en: Compare
 fr: Comparer
-de:
+de: Vergleichen
 
     Compute the difference between two bases
 en: Compute the difference between two bases
 fr: Détection des différences entre deux bases
-de:
+de: Vergleiche den Unterschied zwischen zwei bases
 
     Connected components identified
 en: Connected components identified
 fr: Calcul des composantes connexes exécuté
-de:
+de: Verbundene Komponenten identifiziert
 
     Connex
 en: Connex
 fr: Connex
-de:
+de: Connex
 
     Content of result file
 en: Content of result file
 fr: Contenu du fichier résultat
-de:
+de: Inhalt der Ergebnisdatei
 
     Default source
 en: Default source
 fr: Source par défaut
-de:
+de: Standardquelle
 
     Delete database if already existing.
 en: Delete database if already existing.
 fr: Détruire la base pré-existante.
-de:
+de: Lösche Datenbank sofern sie bereits existiert.
 
     Details for this length.
 en: Details for this length.
 fr: Fournir détails pour cette taille.
-de:
+de: Details für diese länge.
 
     Differences computed
 en: Differences computed
 fr: Différence calculée
-de:
+de: Unterschiede berechnet
 
     Display in
 en: Display in
 fr: Afficher en
-de:
+de: Anzeigen in
 
     Don't extract individual picture.
 en: Don't extract individual picture.
 fr: Ne pas extraire d’images individuelles.
-de:
+de: Persönliches Bild nicht extrahieren.
 
     Done. The operation is terminated.
 en: Done. The operation is terminated.
 fr: L’opération est terminée.
-de:
+de: Fertig. Die operation ist abgeschlossen.
 
     Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
 en: Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
 fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br> Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier %o ou vers comm.log. Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
-de:
+de: Dateien wurden wiederhergestellt im Original Quellverzeichnis.<br>erstellte Daten ohne Originaldatei wurden in die Datei %o oder comm.log umgelenkt. Es liegt an Ihnen die neue Quelldatei zu verwalten, oder sie mit existierenden Dateien zusammenzuführen.
 
     Fix base
 en: Fix base
 fr: Fix base
-de:
+de: repariere base
 
     Fix base and recompute index
 en: Fix base and recompute index
 fr: Corrige une base et reclacule l'index
-de:
+de: repariere base und berechne index neu
 
     Force relation status to "NoMention" (default is "Married").
 en: Force relation status to "NoMention" (default is "Married").
 fr: Marquer les relations comme « Sans mention » (par défaut « Mariés »).
-de:
+de: Erzwinge Beziehungsstatus zu "nicht erwähnen" (standard ist "Verheiratet").
 
     Gwfixbase messages
 en: Gwfixbase messages
 fr: Messages gwfixbase
-de:
+de: Gwfixbase Nachrichten
 
     Ignore this file.
 en: Ignore this file.
 fr: Ignorer ce fichier.
-de:
+de: Ignoriere diese Datei.
 
     In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
 en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
 fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
-de:
+de: In den unteren Boxen, immer einen Wert in den "Num" einträgen eingeben (vorkommen) ("0" möglich).
 
     Listing connected components
 en: Listing connected components
 fr: Liste des composantes connexes
-de:
+de: verbundene Komponenten auflisten
 
     No consistency check.
 en: No consistency check.
 fr: Ne pas contrôler la cohérence des données.
-de:
+de: keine Konsistenzprüfung.
 
     No redirection of results.
 en: No redirection of results.
 fr: Pas de redirection des résultats.
-de:
+de: keine Umleitung von Ergebnissen
 
     Not public even if titles (see -epn option).
 en: Not public even if titles (see -epn option).
 fr: Ne pas considérer comme public si un titre a été détecté (voir option -epn).
-de:
+de: nicht öffentlich sogar bei Titeln (siehe -epn Option).
 
     Note
 en: Note
 fr: Note
-de:
+de: Anmerkung
 
     Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
 en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
 fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
-de:
+de: Ausgabe erfolgt in basename/notes_d/connex.txt (-o muss leer bleiben und notes_d muss existieren).
 
     Output results to this file.
 en: Output results to this file.
 fr: Rediriger les résultats vers ce fichier.
-de:
+de: Ausgabe erfolgt in diese Datei.
 
     Produce connected components statistics.
 en: Produce connected components statistics.
 fr: Afficher les statistiques sur les composantes connexes.
-de:
+de: Erzeuge Statistiken über verbundene Komponenten
 
     Put untreated GEDCOM tags in notes.
 en: Put untreated GEDCOM tags in notes.
 fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
-de:
+de: setze unbehandelte GEDCOM tags in Anmerkungen
 
     Restrict deleting branches whose size = -del.
 en: Restrict deleting branches whose size = -del.
 fr: Limite la suppression aux branches de taille = -del.
-de:
+de: Begrenze das löschen von zweigen deren  Größe = -del.
 
-    Select the source file or navigate in your foldres.
-en: Select the source file or navigate in your foldres.
+    Select the source file or navigate in your folders.
+en: Select the source file or navigate in your folders.
 fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
-de:
+de: Wählen Sie die Quelldatei oder navigieren Sie in Ihrem Ordner.
 
     Select your first database
 en: Select your first database
 fr: Sélectionnez la première base de données 
-de:
+de: Wählen Sie Ihre erste Datenbank
 
     Select your second database
 en: Select your second database
 fr: Sélectionnez la seconde base de données
-de:
+de: Wählen Sie Ihre zweite Datenbank
 
     Specifiy the number of branches to be deleted.
 en: Specifiy the number of branches to be deleted.
 fr: Définit le nombre de branches à supprimer.
-de:
+de: Spezifizieren Sie die Anzahl der zu löschenden Zweige.
 
     Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 en: Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la première base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
-de:
+de: Startperson in der ersten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 
     Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 en: Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la seconde base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
-de:
+de: Startperson in der zweiten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 
     Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 en: Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 fr: En utilisant <b>gwd</b> pour visualiser le fichier dans le dossier NOTES où vous avez redirigé les résultats (%a.gwb/notes_d/connex.txt).<br> Vous y verrez la dernière version du fichier connex.txt que vous avez créé à cet endroit (qui n'est pas nécessairement celle que vous venez de calculer - voir l'horodateur en tête de fichier).<br> Cette solution vous permet de suivre les liens vers les personnes désignées.
-de:
+de: Verwende <b>gwd</b> um die Datei im NOTES Ordner Ihrer base, in der Sie die Ausgabe umgeleitet haben (%a.gwb/notes_d/connex.txt), zu visualisieren.<br> Diese Datei enthält den zuletzt gespeicherten Datensatz an dieser Position (welcher nicht notwendigerweise der ist, den Sie zuletzt berechnet haben - Siehe Zeitstempel am Anfang der Datei).<br> Diese Lösung erlaubt Ihnen Links zu markierten Personen zu folgen.
 
     Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
 en: Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
 fr: En utilisant <b>gwsetup</b> pour visualiser le fichier vers lequel ont été envoyés les résultats ("%K").
-de:
+de: Verwende <b>gwsetup</b>  um die Datei in der Ergebnisse umgeleitet wurden zu visualisieren ("%K").
 
     Years
 en: Years
 fr: Années
-de:
+de: Jahre
 
     You may observe results through two means
 en: You may observe results through two means
 fr: Vous pouvez consulter les résultats de deux façons différentes
-de:
+de: Sie können ergebnisse durch zwei Mittel feststellen
 
     do not commit changes (only traces).
 en: do not commit changes (only traces).
 fr: ne pas effectuer les changements (traces seules).
-de:
+de: änderungen nicht festschreiben (nur Abläufe).
 
     families' children.
 en: families' children.
 fr: families' children.
-de:
+de: Familien' Kinder.
 
     families' parents.
 en: families' parents.
 fr: families' parents.
-de:
+de: Familien' Eltern.
 
     fast mode. Needs more memory
 en: fast mode. Needs more memory
 fr: mode rapide. Nécessite plus de mémoire.
-de:
+de: Schneller Modus. Benötigt mehr Arbeitsspeicher
 
     fevents' witnesses.
 en: fevents' witnesses.
 fr: fevents' witnesses.
-de:
+de: fevents' Trauzeugen.
 
     help.
 en: help.
 fr: help.
-de:
+de: hilfe.
 
     index. Automatically enabled by any other option
 en: index. Automatically enabled by any other option
 fr: index. Activé automatiquement par les autres options
-de:
+de: index. Automaisch aktiviert durch irgendeine andere Option.
 
     marriage divorce.
 en: marriage divorce.
 fr: marriage divorce.
-de:
+de: heirat scheidung.
 
     or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
 en: or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
 fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>, alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
-de:
+de: oder fragen Sie nach neuerstellung der Dateien im Originalverzeichnis.<br>Wenn die base von <span style="font-family: monospace">gwc -f *.gw</span> erstell wurde, dann wird <span style="font-family: monospace">gwu -odir</span> die Quelldatei neu erstellen.
 
     or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
 en: or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
 fr: ou donnez directement le nom du ou des fichiers source GeneWeb en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
-de:
+de: oder geben Sie direkt den namen der GeneWeb Quell Datei(en) relativ zum darüberliegenden Pfad an.<br> Wenn dieser Parameter ein '*' enthält, müssen Sie einen eindeutigen Namen für die erstellte Datenbank angeben.
 
     persons' NBDS.
 en: persons' NBDS.
 fr: persons' NBDS.
-de:
+de: Personen' NBDS.
 
     persons' families.
 en: persons' families.
 fr: persons' families.
-de:
+de: Personen' Familien.
 
     persons' parents.
 en: persons' parents.
 fr: persons' parents.
-de:
+de: Personen' Eltern.
 
     pevents' witnesses.
 en: pevents' witnesses.
 fr: pevents' witnesses.
-de:
+de: pevents' Trauzeuge
 
     quiet mode.
 en: quiet mode.
 fr: peu de traces.
-de:
+de: Stiller Modus.
 
     very quiet mode.
 en: very quiet mode.
 fr: pas de traces du tout.
-de:
+de: sehr Stiller Modus.
 
     (do not enter the quotes "" in the input zone).
 en: (do not enter the quotes "" in the input zone).
 fr: (ne pas inclure les guilemets "" dans le champ de saisie).
-de:
+de: (keine Anführungszeichen "" im Eingabefeld angeben).
 
