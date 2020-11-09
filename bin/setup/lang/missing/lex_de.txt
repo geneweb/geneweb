@@ -421,12 +421,12 @@ de: pevents' Trauzeuge
     quiet mode.
 en: quiet mode.
 fr: peu de traces.
-de: Stiller Modus.
+de: stiller Modus.
 
     very quiet mode.
 en: very quiet mode.
 fr: pas de traces du tout.
-de: sehr Stiller Modus.
+de: sehr stiller Modus.
 
     (do not enter the quotes "" in the input zone).
 en: (do not enter the quotes "" in the input zone).
