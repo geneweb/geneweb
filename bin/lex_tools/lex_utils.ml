@@ -341,7 +341,6 @@ module Lex_map = Map.Make
 
 let merge = ref false ;;
 let first = ref false ;;
-let by_filename = ref false ;;
 
 let sort_lexicon lexicon =
   let lex_sort = ref Lex_map.empty in
@@ -352,7 +351,8 @@ let sort_lexicon lexicon =
           let msg = skip_to_next_message ic in
           let list = get_all_versions ic in
           let list' =
-          List.sort (fun (x, _) (y, _) -> compare x y) list in
+            List.sort (fun (x, _) (y, _) -> compare x y) list
+          in
           let list' = if !merge then match Lex_map.find_opt msg !lex_sort with
             | Some list ->
                 (* merge list and list' *)
@@ -376,31 +376,13 @@ let sort_lexicon lexicon =
       close_in ic
   | None -> ());
 
-  if !by_filename then
-    let new_list =
-      Lex_map.fold (fun m l acc -> l::acc) !lex_sort []
-    in
-    let new_list =
-      List.sort (fun x y ->
-        let (_, aax) = List.hd x in
-        let (_, aay) = List.hd y in
-        compare aax aay) new_list
-    in
-    List.iter (fun list ->
-      begin
-        let (_, msg) = List.find (fun (k, _) -> k = "en") list in
-        print_endline ("   " ^ msg);
-        List.iter (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
-        print_string "\n"
-      end) new_list
-  else 
-    Lex_map.iter
-      (fun msg list ->
-         print_endline msg;
-         List.iter
-           (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
-         print_string "\n")
-      !lex_sort
+  Lex_map.iter
+    (fun msg list ->
+       print_endline msg;
+       List.iter
+         (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
+       print_string "\n")
+    !lex_sort
 ;;
 
 
@@ -426,7 +408,7 @@ let speclist =
     ": print missing translation managed by gnt.");
    ("-missing_one", Arg.String (fun x -> lang_cust := x :: !lang_cust),
     ": print missing translation for these languages.");
-   ("-gwsetup", Arg.Set by_filename,
+   ("-gwsetup", Arg.Set gwsetup,
     ": set parameters to gwsetup mode.");
    ("-repo", Arg.String (fun x -> repo := x),
     ": check missing or unused key word.");

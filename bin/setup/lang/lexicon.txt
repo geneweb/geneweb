@@ -1,7 +1,8 @@
-# $Id: lexicon.txt,v 7.0 2020-11-06 01:53:16 Exp $
-# Copyright (c) 1998-2007 INRIA
+# $Id: lexicon.txt,v 7.0 2020-11-09 01:53:16 Exp $
+# Copyright (c) 1998-2020 INRIA
 
     !doc
+co: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 de: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 en: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 es: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
@@ -12,6 +13,7 @@ nl: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 sv: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
 
     !geneweb
+co: <b><font color=#2f6400>GeneWeb</font></b>
 de: <b><font color=#2f6400>GeneWeb</font></b>
 en: <b><font color=#2f6400>GeneWeb</font></b>
 es: <b><font color=#2f6400>GeneWeb</font></b>
@@ -52,97 +54,11 @@ sl: af=afrikaanščina|bg=bolgarščina|br=bretonščina|ca=katalonščina|cs=č
 sv: af=afrikaans|bg=bulgariska|br=bretonska|ca=katalanska|cs=tjeckiska|da=danska|de=tyska|en=engelska|eo=esperanto|es=spanska|et=estniska|fi=finska|fr=franska|he=hebreiska|is=isländska|it=italienska|lv=litauiska|nl=holländska|no=norska|oc=occitanska|pl=polska|pt=portugisiska|pt-br=brasiliansk-portugisiska|ro=rumänska|ru=ryska|sk=slovakiska|sl=slovenska|sv=svenska|zh=kinesiska
 zh: af=南非語|bg=保加利亚语|br=布列塔尼语|ca=加泰罗尼亚语|cs=捷克语|da=丹麦语|de=德语|en=英语|eo=世界语|es=西班牙语|et=爱沙尼亚语|fi=芬兰语|fr=法语|he=希伯来语|is=冰岛语|it=意大利语|lv=拉脱维亚语|nl=荷蘭語|no=挪威语|oc=奥克语|pl=波兰语|pt=葡萄牙語|pt-br= 巴西葡萄牙语|ro=羅馬尼亞語|ru=俄语|sk=斯洛伐克语|sl=斯洛文尼亚语|sv= 瑞典語|zh=中文
 
-    :
-de: :
-en: :
-es: :
-fr:  :
-it: :
-lv: :
-nl: :
-sv: :
-
-    cancel
-en: Cancel
-fr: Annuler
-it: Annullare
-nl: annuleer
-
-    error
-de: Fehler
-en: Error
-es: Error
-fr: Erreur
-it: Errore
-lv: Kïûda
-nl: Fout
-sv: Fel
-
-    text|link|vlink
-en: text|link|vlink
-es: texto|enlace|visitado
-fr: texte|lien|visité
-it: testo|link|visitato
-nl: tekst|connectie|bezocht
-
-    yes|no
-de: Ja|Nein
-en: Yes|No
-es: Si|No
-fr: oui|non
-it: Si|No
-lv: Yes|Nç
-nl: ja|nee
-sv: Yes|No
-
-    initialisation of consanguinities
-en: initialisation of consanguinities
-fr: calcul de la consanguinité 
-
-    Look at the traces, may be you can find an explanation.
-en: Look at the traces, may be you can find an explanation.
-fr: Consultez les traces, vous y trouverez probablement une explication.
-
-    from a GEDCOM source file
-en: from a GEDCOM source file
-fr: à aprtir d'un fichier source GEDCOM
-
-    from a GeneWeb source file
-en: from a %G source file
-fr: à partir d'un fichier source %G
-
-    Welcome to GeneWeb
-de: Willkommen zu %G
-en: Welcome to %G
-es: Bienvenido a %G
-fr: Bienvenue dans %G
-it: Benvenuti su %G
-lv: Sveicinaati Ghenealoghijas datu baazee %G
-sv: Välkommen till %G
-
-    Go to your Web browser and open one of the following addresses:
-de: Nimm deinen Webbrowser und öffne eine der folgenden Adressen:
-en: Go to your Web browser and open one of the following addresses:
-fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
-it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
-
-
-    Warning: for this program to work, you must not close this window!
-de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses  Fenster nicht schließen!
-en: Warning: for this program to work, you must not close this window!
-fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette fenetre!
-it: Attenzione! Per poter navigare nella base, non dovete mai chiudere questa finestra!
-lv: Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
-sv: Varning: för att det här programmet ska fungera, får du inte stänga detta fönster!
-
-    If none of theses addresses work, you may have to configure, in your browser, options like "work off-line" or "do not use the proxy for local addresses" or "do not connect to Internet for the address 'localhost'".
-de: Falls das nicht funktioniert, mußt du eventuell in deinem Webbrowser einige Optionen ändern, wie zum Beispiel "Offline arbeiten" oder "Für lokale Adressen keinen Proxy benutzen" oder "Für die Adresse 'localhost' nicht mit dem Internet verbinden".
-en: If none of theses addresses work, you may have to configure, in your browser, options like "work off-line" or "do not use the proxy for local addresses" or "do not connect to Internet for the address 'localhost'".
-es: Si esto no funciona, es posible que Ud. haya configurado en su explorador algunas opciones de tipo "trabajar fuera de conección" o "no utilizar un proxy con las direcciones locales" o "no conectarse al internet con la dirección 'localhost'".
-fr: Si aucune de ces adresses ne fonctionne, il se peut que vous ayez à configurer dans votre navigateur des options du genre "travailler hors connexion" ou "ne pas utiliser de proxy pour les adresses locales" ou "ne pas se connecter sur internet pour l'adresse 'localhost'".
-it: Se nessuno dei due indirizzi funziona, forse è a causa del fatto che avete configurato nel vostro navigatore un'opzione del genere "lavorare off-line" oppure "non utilizzare il proxy per gli indirizzi locali" o "non collegarsi ad internet per l'indirizzo 'localhost'".
-lv: Ja pie iepriekshmineetajiem nosaciijumiem Juus nevariet pieklhuut pie GeneWeb, Jums iespeejams jaaiestaada savaa Interneta caurluukprogramaa sekojoýi noraadiijumi: "work off-line" vai "do not use the proxy for local addresses" vai "do not connect to Internet for the address 'localhost'". 
-sv: Om det inte fungerar, kanske du måste ställa in din webbläsare med optioner som "arbeta off-line" eller "använd inte en proxyserver för lokala adresser" eller "anslut inte till Internet för adressen 'localhost'".
+    "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
+aa: ged2gwb.htm
+de: "Vorname umschlossen": Die -fne Option muss auf zwei Zeichen folgen "be". Wenn eine Person erstellt, der GEDCOM Vornamensteil etwas zwischen 'b' (beliebiges Zeichen) und 'e' (beliebiges Zeichen) enthält, wird dies als Vorname betrachtet. Z.b.: -fne "\\" oder -fne "()"
+en: "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
+fr: L’option <i>first names enclosed</i> doit être suivie par une chaîne de deux caractères « be ». À la création d’une personne, si une partie de la chaîne prénom commence par le caractère 'b' et se termine par le caractère 'e', alors cette partie sera considérée comme le prénom usuel.<br> Exemples : <span  style="font-family: monospace">-fne "\\"</span> ou <span style="font-family: monospace"> -fne "()"</span>.
 
     "Friends" can see all dates, notes and photos of the persons born since less than one century. The ones who have not entered the below password will not see these informations.
 aa: gwf_1.htm
@@ -174,13 +90,15 @@ it: I possessori di password "Wizard" possono in più effettuare delle modifiche
 lv: "Burvji" var veikt arî izmaiòas datu bâzç.
 sv: "Wizards" kan göra modifieringar i databasen.
 
-    "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
+    (do not enter the quotes "" in the input zone).
 aa: ged2gwb.htm
-en: "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
-fr: L’option <i>first names enclosed</i> doit être suivie par une chaîne de deux caractères « be ». À la création d’une personne, si une partie de la chaîne prénom commence par le caractère 'b' et se termine par le caractère 'e', alors cette partie sera considérée comme le prénom usuel.<br> Exemples : <span  style="font-family: monospace">-fne "\\"</span> ou <span style="font-family: monospace"> -fne "()"</span>.
+de: (keine Anführungszeichen "" im Eingabefeld angeben).
+en: (do not enter the quotes "" in the input zone).
+fr: (ne pas inclure les guilemets "" dans le champ de saisie).
 
     (no selection is equivalent to select all).
 aa: gwfix.htm
+de: (keine Auswahl ist Äquivalent zu alles Auswählen)
 en: (no selection is equivalent to select all).
 fr: (aucune option est équivalent à les sélectionner toutes). 
 
@@ -204,220 +122,68 @@ sv:  och skriva över den tidigare databasen "%o" i mål katalogen
 
     ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
 aa: ged2gwb.htm
+de: ../ erlaubt Ihnen im Elternverzeichnis zu suchen.<br>In der Windows Welt, ist dies unzulässig für die änderung von Laufwerksbuchstaben (C: -> D:), aber Sie können dies direkt in der URL in Ihrem Browser durchführen.
 en: ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
 fr: ../ vous permet de naviguer vers le dossier parent.<br> Dans le monde Windows, ceci ne vous permettra pas de changer la lettre du disque (C: -> D:), mais vous pouvez faire ce changement directement dans l'url dans le navigateur.
 
-    Do not extract notes.
-aa: gwb2ged.htm
-en: Do not extract notes.
-fr: Ne pas extraire les notes.
+    :
+co:  :
+de: :
+en: :
+es: :
+fr:  :
+it: :
+lv: :
+nl: :
+sv: :
 
-    Do not extract spouses' parents (for options -s and -d).
-aa: gwb2ged.htm
-en: Do not extract spouses' parents (for options -s and -d).
-fr: Ne pas extraire les parents des époux (pour les options -s et -d).
-
-    Dont extract individual pictures (portraits).
-aa: gwb2ged.htm
-en: Dont extract individual pictures (portraits).
-fr: Ne pas extraire les images individuelles (portraits).
-
-    Extract ancestors with siblings of
-aa: gwb2ged.htm
-en: Extract ancestors with siblings of
-fr: Extraire les ancêtres avec fratries de
-
-    Extract individual pictures path (portraits).
-aa: gwb2ged.htm
-en: Extract individual pictures path (portraits).
-fr: Extraire le chemin des images individuelles (portraits).
-
-    Save the memory space during the operation (but it will be slower).
-aa: gwb2ged.htm
-de: Während der Operation sparsam mit dem Speicher umgehen (ist aber langsamer).
-en: Save the memory space during the operation (but it will be slower).
-es: Economizar el espacio-memoria durante la operación (pero esta sera mas lenta).
-fr: Économiser l’espace mémoire pendant l’opération (mais ce sera plus lent).
-it: Economizzare lo spazio-memoria durante l'operazione (che però sarà più lenta)
-lv: Darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).
-sv: Spara minne under operationen (men det kommer att gå saktare).
-
-    When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
-aa: gwb2ged.htm
-en: When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
-fr: Quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br> si elle est "publique". La censure s’applique aux époux et descendants. 
-
-    extract surname (usable several times).
-aa: gwb2ged.htm
-en: Extract surname (usable several times).
-fr: Extraire un nom de famille (utilisable plusieurs fois).
-
-    cleaning up
-aa: welcome.htm
-co: Nettata
-de: Aufräumen
-en: Cleaning up
-es: Limpieza
-fi: Puhdistus
-fr: Nettoyage
-it: Pulizia
-lv: Sakopðanu
-sv: Upprensning
-
-    Compute connected componants
-aa: welcome.htm
-co: Calculeghja i cumpunenti cunnessi
-en: Compute connected componants
-fr: Calcule les composantes connexes
-
-    Initialisation of consanguinities
-aa: welcome.htm
-co: Initialisazione di e consanguinità
-de: Initialisierung der Blutsverwandtschaften
-en: Initialisation of consanguinities
-es: Inicialización de las consanguinidades
-fi: Perheenjäsenten yhdistäminen
-fr: Initialisation des consanguinités
-it: Inizializzazione delle consanguineità
-lv: Asinsradniecîbas sakârtoðana
-sv: Beräkning av blodsband
-
-    Deletion
-aa: welcome.htm
-co: Cacciatura
-de: Löschen
-en: Deletion
-es: Supresión
-fi: Poisto
-fr: Suppression
-it: Cancellazione
-lv: Izmeðanu
-sv: Radering
-
-    Compute the difference between two bases
-aa: welcome.htm
-co: Calculeghja a sfarenza trà duie base
-en: Compute the difference between two bases
-fr: Calcule la différence entre deux bases
-
-    Fixes problems in a base
-aa: welcome.htm
-co: Currege una basa è calculeghja torna l’indici
-en: Fixes problems in a base
-fr: Corrige les problèmes d'une base
-
-    family Trees
-aa: welcome.htm
-co: l'arburi chì esistenu
-de: Stammbaum
-en: family Trees
-es: árbol genealógico
-fi: sukupuu
-fr: les généalogie existantes
-it: albero genealogico
-lv: gimenes koks
-sv: family Tree
-
-    Merging with other databases
-aa: welcome.htm
-co: Fusione cù d'altre base genealogiche
-de: Zusammenführen mit anderen Datenbanken
-en: Merging with other databases
-fi: Yhdistyminen muiden tietokantojen kanssa
-fr: Fusion de généalogies
-it: Fusione con altre basi
-sv: Sammanslagning med andra databaser
-
-    Renaming
-aa: welcome.htm
-co: Cambiu di nome
-de: Umbenennen
-en: Renaming
-es: Cambio de nombre
-fi: Uudelleen nimeäminen
-fr: Renommage
-it: Cambio di nome
-lv: Pârsaukðanu
-sv: Oomdöpning
-
-    Saving and restoring
-aa: welcome.htm
-co: Salvaguardia è resturazione
-de: Sichern und Restaurieren
-en: Saving and restoring
-es: Copia de seguridad y una restauración
-fi: Tallentaminen ja palautus
-fr: Sauvegarde et restauration
-it: Backup and restore
-lv: Saglabâðanu un atjaunoðanu
-sv: Spara och återskapa
-
-    empty
-aa: welcome.htm
-co: à partesi d'un schedariu viota
-de: aus einer leer Datei
-en: from an empty file
-es: a partir de un fichero vacío
-fi: tyhjä tiedostosta
-fr: à partir d’un fichier vide
-it: partendo da un file vuoto
-lv: no tukšs datnes
-sv: från en tom fil
-
-    the error history and statistics
-aa: welcome.htm
-co: a cronulugia è e statistiche
-de: der Fehler der Geschichte und Statistik
-en: the error history and statistics
-es: el historial de errores y estadísticas
-fi: virhe historia ja tilastot
-fr: l’historique des erreurs et statistiques
-it: fault Storia e statistiche
-lv: vaina vesture un statistika
-sv: felhistorik och statistik
-
-    Update links page / family chronicle
-aa: welcome.htm
-co: Attualisazione di i ligami scheda/cronaca famigliale
-de: Aktualisieren Sie Links-Seite / Familien-Chronik
-en: Update links page / family chronicle
-es: Actualizar página de enlaces / crónica familiar
-fi: Päivitä linkit sivu / sukukronikka
-fr: Mise à jour des liens fiche/chronique familiale
-it: Aggiornamento pagina dei link / famiglia cronaca
-lv: Atjauninat saites lapu / gimenes hroniku
-sv: Uppdatera länksida / släktkrönika
-
-    update_nldb
-aa: main.htm
-de: update_nldb
-en: update_nldb
-es: update_nldb
-fi: update_nldb
-fr: update_nldb
-it: update_nldb
-lv: update_nldb
-sv: update_nldb>
+    <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+aa: bsi_connex.htm
+de: <span style="color:#FF0000;">ACHTUNG</span>: der -del Befehl unterdrückt unwiderruflich einige Familien. Ein Backup Archiv wird empfohlen.
+en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
 
     <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
 aa: bsi.htm
+de: <span style="color:#FF0000;">ACHTUNG</span>: Der Inhalt der Datei %o wird überschrieben.
 en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
 fr: <span style="color:#FF0000;">ATTENTION</span> : Le contenu du fichier %o sera écrasé.
 
     <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
 aa: connex.htm
+de: <span style="color:#FF0000;">ACHTUNG</span>: Die folgenden drei Optionen führen zu unwiderruflichen Löschungen. Ein Backup Archiv wird empfohlen.
 en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
 fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
 
-    <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
-aa: bsi_connex.htm
-en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
-fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
-
     <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 aa: bsi_fix.htm
+de: <span style="color:#FF0000;">ACHTUNG</span>: dieser Befehl verändert die base unwiderruflich. Ein Backup Archiv wird empfohlen.
 en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+
+    a GEDCOM source file
+aa: welcome.htm
+co: un schedariu di fonte GEDCOM
+de: eine GEDCOM-Quelldatei
+en: a GEDCOM source file
+es: un fichero fuente GEDCOM
+fi: GEDCOM lähdetiedosto
+fr: un fichier source GEDCOM
+it: un file sorgente GEDCOM
+lv: GEDCOM datni
+sv: en GEDCOM källfil
+
+    a GeneWeb source file
+aa: welcome.htm
+co: un schedariu di fonte %G
+de: eine %G-Quelldatei
+en: a %G source file
+es: un fichero fuente %G
+fi: %G lähdetiedosto
+fr: un fichier source %G
+it: un file sorgente %G
+lv: %G datni
+sv: en %G källfil
 
     Ability to send images.
 aa: gwf_1.htm
@@ -443,6 +209,7 @@ sv: Avancerade alternativ
 
     All connex components.
 aa: connex.htm
+de: alle verknüpften Komponenten
 en: All connex components.
 fr: Toutes les composantes connexes.
 
@@ -466,6 +233,7 @@ sv: Gör det möjligt att ändra bakgrunds färgen, att sätta in ett bakgrunds 
 
     And the content of gwsetup.log
 aa: bsi_err.htm
+de: Und der Inhalt von gwsetup.log
 en: And the content of gwsetup.log
 fr: Et le contenu de gwsetup.log
 
@@ -514,6 +282,7 @@ sv: Är du säker att du vill radera dessa databaser?
 
     Ask for deleting branches whose size <= that value.
 aa: connex.htm
+de: Frage nach dem löschen von Zweigen dessen Größe <= diesem Wert sind.
 en: Ask for deleting branches whose size <= that value.
 fr: Demander à détruire les composantes de taille <= à cette valeur.
 
@@ -524,7 +293,17 @@ en: Ask to indicate the updates in the welcome pages as a link "history of updat
 fr: Demande d’indiquer les mises à jour dans la page d’accueil sous le lien "historique des mises à jour". <p> Remarque (technique): les traces des mises à jour sont sauvées dans un fichier de nom "history" dans le répertoire de la base de donnée (%a.gwb). Ce fichier grossit indéfiniment. Si vous voulez effacer les anciennes traces, il faut éditer ce fichier pour les supprimer. Ou vous pouvez aussi supprimer le fichier pour repartir à vide.
 it: Domanda d'indicare gli aggiornamenti nella pagina di benvenuto con il link "Riassunto degli aggiornamenti". <p> Nota (tecnica): le tracce degli aggiornamenti sono salvate in un file chiamato "history" nella directory della base di dati (%a.gwb). Questo file cresce indefinitamente. Se volete cancellare le vecchie tracce, è necessario editare il file e cancellarle. Potete anche cancellare il file e ripartire con uno vuoto.
 
-    Background image
+    background color
+aa: gwf_1.htm
+de: Hintergrundfarbe
+en: background color
+es: color de fondo
+fr: couleur de fond
+it: colore di fondo
+lv: fona krâsa
+sv: bakgrundsfärg
+
+    background image
 aa: backg.htm
 de: Hintergrundbild
 en: Background image
@@ -588,11 +367,13 @@ sv: Denna option är förvald: när man skapar en person, om GEDCOM-filens förn
 
     By looking at the terminal window if you have not asked for result redirection.
 aa: connex_ok.htm
+de: durch das einsehen des Terminal Fensters wenn Sie nicht nach Ergebnis umleitung gefragt haben.
 en: By looking at the terminal window if you have not asked for result redirection.
 fr: En regardant dans la fenêtre qui s'est ouverte si vous n'avez pas demandé de redirection des résultats.
 
     By origin file.
 aa: connex.htm
+de: durch Originaldatei
 en: By origin file.
 fr: D'après le fichier origine.
 
@@ -605,6 +386,13 @@ fr: Peut être utile en local pour pouvoir mettre une image à des personnes, ca
 it: Può essere utile in locale per aggiungere un'immagine a delle persone, dato che la procedura installa automaticamente la foto nel posto giusto e col nome appropriato.
 lv: Tas var bût noderîgi, ja nepiecieðams kâdai personai pievienot attçlu, jo programma to automâtiski pievienos atbilstoðjâ vietâ ar atbilstoðo datnes nosaukumu.
 sv: Det kan vara användbart lokalt, när man vill sätta in en bild av någon, därför att proceduren lägger in bilden automatiskt på rätt plats och med rätt filnamn.
+
+    cancel
+de: Abbrechen
+en: Cancel
+fr: Annuler
+it: Annullare
+nl: annuleer
 
     Cancel this option.
 aa: ged2gwb.htm
@@ -639,13 +427,38 @@ sv: Radera
 
     Checks descendants (default).
 aa: gwdiff.htm
+de: Prüft Nachkommen (Standard).
 en: Checks descendants (default).
 fr: Vérifier les descendants (par défaut).
 
     Checks descendants of all ascendants.
 aa: gwdiff.htm
+de: Prüft Nachkommen aller Verwandten.
 en: Checks descendants of all ascendants.
 fr: Vérifier tous les descendants des ascendants.
+
+    cleaning up
+aa: welcome.htm
+co: Nettata
+de: Aufräumen
+en: Cleaning up
+es: Limpieza
+fi: Puhdistus
+fr: Nettoyage
+it: Pulizia
+lv: Sakopðanu
+sv: Upprensning
+
+    Cleaning up a database
+aa: cleanup.htm
+de: Eine Datenbank aufräumen
+en: Cleaning up a database
+es: Limpieza de una base de datos
+fi: Tietokannan puhdistus
+fr: Nettoyage d’une base de données
+it: Pulizia di una base di dati
+lv: Datu bâzes sakopðana
+sv: Upprensning av en databas
 
     Cleanup
 aa: cleanup.htm
@@ -669,31 +482,35 @@ it: Pulizia - fase 2
 lv: Sakopðana - 2. fâze
 sv: Rensa upp - fas 2
 
-    Cleaning up a database
-aa: cleanup.htm
-de: Eine Datenbank aufräumen
-en: Cleaning up a database
-es: Limpieza de una base de datos
-fi: Tietokannan puhdistus
-fr: Nettoyage d’une base de données
-it: Pulizia di una base di dati
-lv: Datu bâzes sakopðana
-sv: Upprensning av en databas
-
-    Read the alert messages in the file "comm.log"
-aa: bso_ok.htm
-en: Read the alert messages in the file "comm.log"
-fr: Consulter les messages d’alerte dans le fichier "comm.log"
+    color of already visited links
+aa: gwf_1.htm
+de: Farbe für bereits besuchte Links
+en: color of already visited links
+es: color de los enlaces que ya han sido visitados
+fr: couleur des liens déjà visités
+it: colore dei links visitati
+lv: izmantoto norâþu krâsa
+sv: färg för de redan besökta länkarna
 
     Compare
 aa: gwdiff.htm
+de: Vergleichen
 en: Compare
 fr: Comparer
 
+    Compute connected componants
+aa: welcome.htm
+co: Calculeghja i cumpunenti cunnessi
+de: Berechne verbundene Bestandteile
+en: Compute connected componants
+fr: Calcule les composantes connexes
+
     Compute the difference between two bases
-aa: gwdiff.htm
+aa: welcome.htm
+co: Calculeghja a sfarenza trà duie base
+de: Berechne die unterschiede zwischen zwei bases
 en: Compute the difference between two bases
-fr: Détection des différences entre deux bases
+fr: Calcule la différence entre deux bases
 
     Configure
 aa: welcome.htm
@@ -709,6 +526,7 @@ sv: Konfigurera
 
     Connected components identified
 aa: connex_ok.htm
+de: Verbundene Komponenten identifiziert
 en: Connected components identified
 fr: Calcul des composantes connexes exécuté
 
@@ -724,6 +542,7 @@ sv: Åtkomst loggfil.
 
     Connex
 aa: connex.htm
+de: Connex
 en: Connex
 fr: Connex
 
@@ -773,6 +592,7 @@ sv: Innehållet i filen "comm.log"
 
     Content of result file
 aa: bso_log.htm
+de: Inhalt der Ergebnisdatei
 en: Content of result file
 fr: Contenu du fichier résultat
 
@@ -807,6 +627,17 @@ it: Creare
 lv: Izviedot
 sv: Skapa
 
+    Create a database
+aa: main.htm
+de: Lege eine Datenbank an
+en: Create a database
+es: Crear una base de datos
+fi: Luo tietokanta
+fr: Créer une base de données
+it: Creare una base di dati
+lv: Izveidot datu bâzi
+sv: Skapa en databas
+
     Create Family Tree
 aa: welcome.htm
 co: Creà una genealugia
@@ -818,17 +649,6 @@ fr: Créer une généalogie
 it: Crea l'albero genealogico
 lv: Izveidot Family Tree
 sv: Skapa Family Tree
-
-    Create a database
-aa: main.htm
-de: Lege eine Datenbank an
-en: Create a database
-es: Crear una base de datos
-fi: Luo tietokanta
-fr: Créer une base de données
-it: Creare una base di dati
-lv: Izveidot datu bâzi
-sv: Skapa en databas
 
     Creation of a database
 aa: bso.htm
@@ -886,6 +706,7 @@ sv: Förvalt språk.
 
     Default source
 aa: ged2gwb.htm
+de: Standardquelle
 en: Default source
 fr: Source par défaut
 
@@ -902,8 +723,21 @@ sv: Radera
 
     Delete database if already existing.
 aa: gwc.htm
+de: Lösche Datenbank sofern sie bereits existiert.
 en: Delete database if already existing.
 fr: Détruire la base pré-existante.
+
+    Deletion
+aa: welcome.htm
+co: Cacciatura
+de: Löschen
+en: Deletion
+es: Supresión
+fi: Poisto
+fr: Suppression
+it: Cancellazione
+lv: Izmeðanu
+sv: Radering
 
     Deletion of databases
 aa: delete_1.htm
@@ -928,11 +762,13 @@ sv: Målkatalog och databas
 
     Details for this length.
 aa: connex.htm
+de: Details für diese länge.
 en: Details for this length.
 fr: Fournir détails pour cette taille.
 
     Differences computed
 aa: gwdiff_ok.htm
+de: Unterschiede berechnet
 en: Differences computed
 fr: Différence calculée
 
@@ -949,6 +785,7 @@ sv: Katalog
     Display in
 aa: welcome.htm
 co: Affissà in
+de: Anzeigen in
 en: Display in
 fr: Afficher en
 
@@ -972,13 +809,33 @@ it: Non verificare la coerenza dei dati.
 lv: Nepârbaudît datu saskanîbu.
 sv: Kontrollera inte att databasens data är OK.
 
+    do not commit changes (only traces).
+aa: gwfix.htm
+de: änderungen nicht festschreiben (nur Abläufe).
+en: do not commit changes (only traces).
+fr: ne pas effectuer les changements (traces seules).
+
+    Do not extract notes.
+aa: gwb2ged.htm
+de: Notizen nicht extrahieren.
+en: Do not extract notes.
+fr: Ne pas extraire les notes.
+
+    Do not extract spouses' parents (for options -s and -d).
+aa: gwb2ged.htm
+de: Eltern der Ehepartner nicht extrahieren
+en: Do not extract spouses' parents (for options -s and -d).
+fr: Ne pas extraire les parents des époux (pour les options -s et -d).
+
     Don't extract individual picture.
 aa: ged2gwb.htm
+de: Persönliches Bild nicht extrahieren.
 en: Don't extract individual picture.
 fr: Ne pas extraire d’images individuelles.
 
     Done. The operation is terminated.
 aa: gwdiff_ok.htm
+de: Fertig. Die operation ist abgeschlossen.
 en: Done. The operation is terminated.
 fr: L’opération est terminée.
 
@@ -992,6 +849,33 @@ fr: L’opération est terminée : votre généalogie "%o" est créée.
 it: L'operazione è terminata. La vostra base di dati "%o" è stata creata.
 lv: Darîts. Datu bâzes izveidoðana ir pabeigta. Jûsu datu bâze "%o" ir izveidota.
 sv: Operationen är avklarad. Din databas benämnd "%o" är skapad.
+
+    Dont extract individual pictures (portraits).
+aa: gwb2ged.htm
+de: Persönliche Bilder nicht extrahieren (Portraits).
+en: Dont extract individual pictures (portraits).
+fr: Ne pas extraire les images individuelles (portraits).
+
+    empty
+aa: welcome.htm
+co: à partesi d'un schedariu viota
+de: aus einer leer Datei
+en: from an empty file
+es: a partir de un fichero vacío
+fi: tyhjä tiedostosta
+fr: à partir d’un fichier vide
+it: partendo da un file vuoto
+lv: no tukšs datnes
+sv: från en tom fil
+
+    empty file
+aa: gwd_ok.htm
+de: Datei leer
+en: empty file
+es: fichero vacio
+fr: fichier vide
+it: file vuoto
+sv: tom fil
 
     Encode the characters in ANSEL.
 aa: gwb2ged.htm
@@ -1045,16 +929,6 @@ it: Terminare con il pre-calcolo di consanguineità.
 lv: Nobeigt ar asinsradniecîbas pârrçíinu.
 sv: Avsluta med att beräkna blodsbanden.
 
-    Enter The name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
-aa: ged2gwb.htm
-de: Name, den du deiner %G-Datenbank geben möchtest. Wenn du hier nichts eingibst, wird der Datenbankname aus dem Namen der GEDCOM-Datei abgeleitet.
-en: Enter The name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
-es: El nombre que Ud. desea dar a su base de datos %G. Si Ud. no mete ningún nombre, él será deducido del nombre del fichero GEDCOM.
-fr: Entrez le nom que vous voulez donner à votre base de données %G. Si vous ne mettez rien, il sera déduit du nom du fichier GEDCOM.
-it: Digitate il nome che volete dare alla vostra base di dati %G. Se non mettete niente il nome sarà dedotto da quello del file GEDCOM.
-lv: Nosaukumu kurâ Jûs vçlties nosaukt savu %G datu bâzi. Ja neierakstîsiet, tad datu bâzes nosaukums tiks veidos no GEDCOM datnes nosaukuma.
-sv: Namnet du vill kalla din %G databas. Om namnet utelämnas, kommer det att bli härlätt från GEDCOM-filens namn.
-
     Enter the name you want to give to your %G database.
 aa: gwc.htm
 de: Den Namen, den du deiner %G-Datenbank geben möchtest.
@@ -1064,6 +938,16 @@ fr: Entrez le nom que vous voulez donner à votre base de données %G.
 it: Digitate il nome che volete dare alla vostra base di dati%G.
 lv: Ierakstiet nosaukumu, kâdâ Jûs  vçlaties nosaukt savu %G datu bâzi.
 sv: Namnet du vill kalla din %G databas.
+
+    Enter The name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
+aa: ged2gwb.htm
+de: Name, den du deiner %G-Datenbank geben möchtest. Wenn du hier nichts eingibst, wird der Datenbankname aus dem Namen der GEDCOM-Datei abgeleitet.
+en: Enter The name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
+es: El nombre que Ud. desea dar a su base de datos %G. Si Ud. no mete ningún nombre, él será deducido del nombre del fichero GEDCOM.
+fr: Entrez le nom que vous voulez donner à votre base de données %G. Si vous ne mettez rien, il sera déduit du nom du fichier GEDCOM.
+it: Digitate il nome che volete dare alla vostra base di dati %G. Se non mettete niente il nome sarà dedotto da quello del file GEDCOM.
+lv: Nosaukumu kurâ Jûs vçlties nosaukt savu %G datu bâzi. Ja neierakstîsiet, tad datu bâzes nosaukums tiks veidos no GEDCOM datnes nosaukuma.
+sv: Namnet du vill kalla din %G databas. Om namnet utelämnas, kommer det att bli härlätt från GEDCOM-filens namn.
 
     Enter the name you want to give to your %G source file. Its name must end with the suffix "<tt>.gw</tt>". If you write nothing, its name will be deducted from the name of the database.
 aa: gwu.htm
@@ -1085,6 +969,16 @@ fr: Entrez le nom que vous voulez donner à votre fichier GEDCOM. Si vous ne met
 it: Digitate il nome che volete attribuire al vostro file GEDCOM. Se non mettete niente, il nome utilizzato sarà quello della base seguito dal suffisso
 lv: Ierakstiet Jûsu izvçlçto GEDCOM datnes nosaukumu. Ja Jûs to neierakstîsiet datne tiks nosaukta tâdâ paðâ vârdâ, kâ datu bâze ar paplaðinâjumu
 sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver någonting, kommer det att bli samma namn som databasen avslutat med
+
+    error
+de: Fehler
+en: Error
+es: Error
+fr: Erreur
+it: Errore
+lv: Kïûda
+nl: Fout
+sv: Fel
 
     Extract
 aa: gwb2ged.htm
@@ -1117,6 +1011,12 @@ it: Estrazione di un file %G
 lv: Izveidot %G datni
 sv: Exportera en %G källfil
 
+    Extract ancestors with siblings of
+aa: gwb2ged.htm
+de: Extrahiere Vorfahren mit Geschwistern von
+en: Extract ancestors with siblings of
+fr: Extraire les ancêtres avec fratries de
+
     Extract from a database
 aa: main.htm
 de: Extrahiere aus einer Datenbank
@@ -1127,6 +1027,12 @@ fr: Extraire d’une base de données
 it: Estrarre da una base di dati
 lv: Izveidot no datu bâzes
 sv: Exportera från en databas
+
+    Extract individual pictures path (portraits).
+aa: gwb2ged.htm
+de: Extrahiere Pfad von persönlichen Bildern (Portraits).
+en: Extract individual pictures path (portraits).
+fr: Extraire le chemin des images individuelles (portraits).
 
     Extract only the ancestors of
 aa: gwu.htm
@@ -1148,8 +1054,51 @@ it: Estrarre solo i discendenti di
 lv: Atlasît tikai dotâs personas pçcteèus
 sv: Exportera endast ättlingarna till
 
+    extract surname (usable several times).
+aa: gwb2ged.htm
+de: Nachnamen extrahieren (mehrfach verwendbar).
+en: Extract surname (usable several times).
+fr: Extraire un nom de famille (utilisable plusieurs fois).
+
+    families' children.
+aa: gwfix.htm
+de: Familien' Kinder.
+en: families' children.
+fr: families' children.
+
+    families' parents.
+aa: gwfix.htm
+de: Familien' Eltern.
+en: families' parents.
+fr: families' parents.
+
+    family Trees
+aa: welcome.htm
+co: l'arburi chì esistenu
+de: Stammbaum
+en: family Trees
+es: árbol genealógico
+fi: sukupuu
+fr: les généalogie existantes
+it: albero genealogico
+lv: gimenes koks
+sv: family Tree
+
+    fast mode. Needs more memory
+aa: gwfix.htm
+de: Schneller Modus. Benötigt mehr Arbeitsspeicher
+en: fast mode. Needs more memory
+fr: mode rapide. Nécessite plus de mémoire.
+
+    fevents' witnesses.
+aa: gwfix.htm
+de: fevents' Trauzeugen.
+en: fevents' witnesses.
+fr: fevents' witnesses.
+
     Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
 aa: gwu_ok.htm
+de: Dateien wurden wiederhergestellt im Original Quellverzeichnis.<br>erstellte Daten ohne Originaldatei wurden in die Datei %o oder comm.log umgelenkt. Es liegt an Ihnen die neue Quelldatei zu verwalten, oder sie mit existierenden Dateien zusammenzuführen.
 en: Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
 fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br> Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier %o ou vers comm.log. Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
 
@@ -1164,13 +1113,22 @@ lv: Vârds
 
     Fix base
 aa: gwfix.htm
+de: repariere base
 en: Fix base
 fr: Fix base
 
     Fix base and recompute index
 aa: gwfix.htm
+de: repariere base und berechne index neu
 en: Fix base and recompute index
 fr: Corrige une base et reclacule l'index
+
+    Fixes problems in a base
+aa: welcome.htm
+co: Currege una basa è calculeghja torna l’indici
+de: Löse Probleme in einer base
+en: Fixes problems in a base
+fr: Corrige les problèmes d'une base
 
     Follow the indications of the GEDCOM header.
 aa: ged2gwb.htm
@@ -1181,6 +1139,17 @@ fr: Suivre les indications de l’en-tête du GEDCOM.
 it: Seguire le indicazioni dell'intestazione del file GEDCOM.
 lv: Sekot GEDCOM datnes galvgaïa apraksta norâdîjumam
 sv: Följ GEDCOM-huvudets information.
+
+    foo.jpg
+aa: backg.htm
+de: bla.jpg
+en: foo.jpg
+es: toto.jpg
+fi: esimerkki.jpg
+fr: toto.jpg
+it: pippo.jpg
+lv: foo.jpg
+sv: foo.jpg
 
     For a given database, you can still change this choice by configurating the specific parameters of this database. And in the welcome page of the base, you can still click on another flag to select another language. The present choice is therefore like a "default default" language.
 aa: gwd.htm
@@ -1214,6 +1183,16 @@ it: Per una pulizia semplice, applicate il programma d'inizializzazione delle co
 lv: Vienkârðai datu bâzes sakopðanai vieciet asinsradniecîbas pârrçíinâðanu.
 sv: För en enkel upprensning, använd beräkning av blodsband.
 
+    For information
+aa: gwf_ok.htm
+de: Zu deiner Information
+en: For information
+es: Por información
+fr: Pour information
+it: Per informazione
+lv: Informâcijai
+sv: För information
+
     For information, this operation corresponds to the following commands
 aa: cleanup1.htm
 de: Zu deiner Information: Diese Funktion entspricht der Ausführung der folgenden Kommandos
@@ -1224,16 +1203,6 @@ fr: Pour information, cette opération correspond à la suite des opérations su
 it: A titolo d'informazione, questa operazione corrisponde ai seguenti comandi
 lv: Inormâcijai: Ðî darbîba atbilst sekojoðâm komandâm
 sv: Denna operation motsvarar de följande kommandona
-
-    For information
-aa: gwf_ok.htm
-de: Zu deiner Information
-en: For information
-es: Por información
-fr: Pour information
-it: Per informazione
-lv: Informâcijai
-sv: För information
 
     For these dates, extract only the "year" part.
 aa: ged2gwb.htm
@@ -1258,8 +1227,33 @@ sv: Förbjuden åtkomst
 
     Force relation status to "NoMention" (default is "Married").
 aa: ged2gwb.htm
+de: Erzwinge Beziehungsstatus zu "nicht erwähnen" (standard ist "Verheiratet").
 en: Force relation status to "NoMention" (default is "Married").
 fr: Marquer les relations comme « Sans mention » (par défaut « Mariés »).
+
+    from a GEDCOM source file
+aa: welcome.htm
+co: à partesi d'un schedariu di fonte GEDCOM
+de: aus einer GEDCOM Quelldatei
+en: from a GEDCOM source file
+es: a partir de un fichero fuente GEDCOM
+fi: GEDCOM lähdetiedostosta
+fr: à aprtir d'un fichier source GEDCOM
+it: partendo da un file sorgente GEDCOM
+lv: no GEDCOM datnes
+sv: från en GEDCOM källfil
+
+    from a GeneWeb source file
+aa: welcome.htm
+co: à partesi d'un schedariu di fonte %G
+de: aus einer GeneWeb Quelldatei
+en: from a GeneWeb source file
+es: a partir de un fichero fuente %G
+fi: %G lähdetiedostosta
+fr: à partir d'un fichier source GeneWeb
+it: partendo da un file sorgente %G
+lv: no %G datnes
+sv: från en %G källfil
 
     Go back to the previous page.
 aa: err_miss.htm
@@ -1283,10 +1277,23 @@ it: Tornate indietro e selezionate "Ricarica" nel vostro navigatore web.
 lv: Aizejiet atpakaï un pârlâdçjiet lapu ("reload" komada caurlûkprogrammâ).
 sv: Gå tillbaka och välj "reload" i din webbläsare.
 
+    Go to your Web browser and open one of the following addresses:
+de: Nimm deinen Webbrowser und öffne eine der folgenden Adressen:
+en: Go to your Web browser and open one of the following addresses:
+fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
+it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
+
     Gwfixbase messages
 aa: gwfix_ok.htm
+de: Gwfixbase Nachrichten
 en: Gwfixbase messages
 fr: Messages gwfixbase
+
+    help.
+aa: gwfix.htm
+de: hilfe.
+en: help.
+fr: help.
 
     Here are the deleted databases
 aa: del_ok.htm
@@ -1447,6 +1454,15 @@ it: Se gwd è attivo, provate con l'indirizzo qui sotto. La pagina visualizzata 
 lv: Ja tas jau darbojas mçìiniet uzklikðíinât uz saites, kas atrodas zemâk. Parâdîsies jûsu datu bâzes t.s. "sveicinâjuma lapa". Pierakstiet tâs adresi.
 sv: Om den är det, försök med adressen nedan. Den visade sidan kallas "välkomstsidan" för din databas. Lägg till den till dina Favoriter/Bokmärken.
 
+    If none of theses addresses work, you may have to configure, in your browser, options like "work off-line" or "do not use the proxy for local addresses" or "do not connect to Internet for the address 'localhost'".
+de: Falls das nicht funktioniert, mußt du eventuell in deinem Webbrowser einige Optionen ändern, wie zum Beispiel "Offline arbeiten" oder "Für lokale Adressen keinen Proxy benutzen" oder "Für die Adresse 'localhost' nicht mit dem Internet verbinden".
+en: If none of theses addresses work, you may have to configure, in your browser, options like "work off-line" or "do not use the proxy for local addresses" or "do not connect to Internet for the address 'localhost'".
+es: Si esto no funciona, es posible que Ud. haya configurado en su explorador algunas opciones de tipo "trabajar fuera de conección" o "no utilizar un proxy con las direcciones locales" o "no conectarse al internet con la dirección 'localhost'".
+fr: Si aucune de ces adresses ne fonctionne, il se peut que vous ayez à configurer dans votre navigateur des options du genre "travailler hors connexion" ou "ne pas utiliser de proxy pour les adresses locales" ou "ne pas se connecter sur internet pour l'adresse 'localhost'".
+it: Se nessuno dei due indirizzi funziona, forse è a causa del fatto che avete configurato nel vostro navigatore un'opzione del genere "lavorare off-line" oppure "non utilizzare il proxy per gli indirizzi locali" o "non collegarsi ad internet per l'indirizzo 'localhost'".
+lv: Ja pie iepriekshmineetajiem nosaciijumiem Juus nevariet pieklhuut pie GeneWeb, Jums iespeejams jaaiestaada savaa Interneta caurluukprogramaa sekojoýi noraadiijumi: "work off-line" vai "do not use the proxy for local addresses" vai "do not connect to Internet for the address 'localhost'". 
+sv: Om det inte fungerar, kanske du måste ställa in din webbläsare med optioner som "arbeta off-line" eller "använd inte en proxyserver för lokala adresser" eller "anslut inte till Internet för adressen 'localhost'".
+
     If this area is empty, everybody is a "friend". You can leave this area empty if your computer is not accessible from outside.
 aa: gwf_1.htm
 de: Wenn dieser Eintrag leer bleibt, ist jeder ein "Freund".
@@ -1599,6 +1615,7 @@ sv: Om du inte skriver någonting, kommer namnet att bli härlätt från %G käl
 
     Ignore this file.
 aa: connex.htm
+de: Ignoriere diese Datei.
 en: Ignore this file.
 fr: Ignorer ce fichier.
 
@@ -1641,6 +1658,7 @@ sv: För att parametrarna ska kunna börja användas, måste gwd servicen stoppa
 
     In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
 aa: gwb2ged.htm
+de: In den unteren Boxen, immer einen Wert in den "Num" einträgen eingeben (vorkommen) ("0" möglich).
 en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
 fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
 
@@ -1665,6 +1683,12 @@ it: In effetti, la navigazione con "gwsetup" è principalmente destinata a rende
 lv: Patieðâm "gwsetup" programmâ ir galvenokârt veidota, lai padarîtu %G lietoðanu vienkârðâku, bet tâ neïauj izmantot visas tâs iespçjas. Lai atrastu citus parametrus un to pielietojumu, Jums jâkïûst nedaudz par "hakeri": daþa informâcija ir atrodama dokumntâcijâ.
 sv: Faktiskt, navigation med "gwsetup" är huvudsakligen för att göra användandet av %G enklare, men det tillåter inte att utnyttja alla möjligheter. För att finna de andra parametrarna och deras användning, måste du vara lite av en "datahacker": en del av informationen kan hittas i dokumentationen.
 
+    index. Automatically enabled by any other option
+aa: gwfix.htm
+de: index. Automaisch aktiviert durch irgendeine andere Option.
+en: index. Automatically enabled by any other option
+fr: index. Activé automatiquement par les autres options
+
     Indicate the name you want to give to your resulting database:
 aa: merge.htm
 de: Gib den Namen ein, den du deiner resultierenden Datenbank geben willst:
@@ -1682,6 +1706,18 @@ fr: Information : les paramètres sont enregistrés dans le fichier texte "gwd
 it: Informazione: i parametri sono registrati nel file testo "gwd.arg" che si trova nella directory "gw" della vostra distribuzione %G.
 lv: Informâcijai: parametri ir ierakstîti teksta datnç "gwd.arg" katalogâ "gw" Jûsu %G datòu komplektâ.
 sv: Information: parametrarna är lagrade i en textfil benämnd "gwd.arg" i katalogen "gw" för din %G distribution.
+
+    Initialisation of consanguinities
+aa: welcome.htm
+co: Initialisazione di e consanguinità
+de: Blutsverwandtschaft bereitstellen
+en: initialisation of consanguinities
+es: Inicialización de las consanguinidades
+fi: Perheenjäsenten yhdistäminen
+fr: calcul de la consanguinité 
+it: Inizializzazione delle consanguineità
+lv: Asinsradniecîbas sakârtoðana
+sv: Beräkning av blodsband
 
     Interpret these dates as "day/month/year".
 aa: ged2gwb.htm
@@ -1714,10 +1750,26 @@ it: Non è possibile eseguire il vostro comando. Non avete fornito informazioni 
 lv: Nevar izpildît Jûsu doto komadu. Jûs nedevât pietiekamu informâciju.
 sv: Det är inte möjligt att utföra ditt kommando. Du angav inte tillräckligt med information.
 
+    links color
+aa: gwf_1.htm
+de: Linkfarbe
+en: links color
+es: color de los enlaces
+fr: couleur des liens
+it: colore dei links
+lv: norâþu krâsa
+sv: länkfärg
+
     Listing connected components
 aa: connex.htm
+de: verbundene Komponenten auflisten
 en: Listing connected components
 fr: Liste des composantes connexes
+
+    Look at the traces, may be you can find an explanation.
+de: Sehen Sie in die Aufzeichnungen, vielleicht finden Sie eine Erklärung.
+en: Look at the traces, may be you can find an explanation.
+fr: Consultez les traces, vous y trouverez probablement une explication.
 
     Look at the traces, maybe you can find an explanation.
 aa: bso_err.htm
@@ -1751,6 +1803,12 @@ fr: Gestion et création
 it: Gestione e la creazione
 lv: Vadiba un veidosana
 sv: ledning och skapande
+
+    marriage divorce.
+aa: gwfix.htm
+de: heirat scheidung.
+en: marriage divorce.
+fr: marriage divorce.
 
     Maximum level when displaying ancestors by tree.
 aa: gwf_1.htm
@@ -1796,6 +1854,16 @@ fr: Fusion de bases de données
 it: Fusione di basi di dati
 sv: Sammanslagning av databaser
 
+    Merging with other databases
+aa: welcome.htm
+co: Fusione cù d'altre base genealogiche
+de: Zusammenführen mit anderen Datenbanken
+en: Merging with other databases
+fi: Yhdistyminen muiden tietokantojen kanssa
+fr: Fusion de généalogies
+it: Fusione con altre basi
+sv: Sammanslagning med andra databaser
+
     Missing name
 aa: err_miss.htm
 de: Fehlender Name
@@ -1807,8 +1875,17 @@ it: Nome mancante
 lv: Trûkst nosaukuma
 sv: Det fattas namn
 
+    name
+aa: ged2gwb.htm
+de: name
+en: name
+fr: nom
+it: nome
+sv: namnet
+
     No consistency check.
 aa: ged2gwb.htm
+de: keine Konsistenzprüfung.
 en: No consistency check.
 fr: Ne pas contrôler la cohérence des données.
 
@@ -1824,16 +1901,41 @@ sv: Inga negativa datum: tolka inte ett år med minus tecken framför som ett ne
 
     No redirection of results.
 aa: connex.htm
+de: keine Umleitung von Ergebnissen
 en: No redirection of results.
 fr: Pas de redirection des résultats.
 
+    no selection
+aa: delete_1.htm
+de: no selection
+en: no selection
+es: ninguna selección
+fi: ei valintaa
+fr: pas de sélection
+it: nessuna selezione
+lv: nav iezîmçtas
+sv: inga val
+
+    no traces
+aa: traces.htm
+de: no traces
+en: no traces
+es: ningÃºn indicio
+fi: ei jÃ¤lkiÃ¤
+fr: pas de traces
+it: nessuna traccia
+lv: no traces
+sv: ingen utskrift
+
     Not public even if titles (see -epn option).
 aa: ged2gwb.htm
+de: nicht öffentlich sogar bei Titeln (siehe -epn Option).
 en: Not public even if titles (see -epn option).
 fr: Ne pas considérer comme public si un titre a été détecté (voir option -epn).
 
     Note
 aa: ged2gwb.htm
+de: Anmerkung
 en: Note
 fr: Note
 
@@ -1885,6 +1987,12 @@ it: Operazione terminata
 lv: Darbîba pabeigta
 sv: Operationen klar
 
+    or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
+aa: gwu.htm
+de: oder fragen Sie nach neuerstellung der Dateien im Originalverzeichnis.<br>Wenn die base von <span style="font-family: monospace">gwc -f *.gw</span> erstell wurde, dann wird <span style="font-family: monospace">gwu -odir</span> die Quelldatei neu erstellen.
+en: or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
+fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>, alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
+
     Or else, it may be a very old version of %G where the command "gwu" was called "gwb2gw". If it is the case, rename the file "gwb2gw" into "gwu" in this directory and try again.
 aa: err_ngw.htm
 de: Möglicherweise handelt es sich auch um eine sehr alte Version von %G, in der das Kommando "gwu" noch "gwb2gw" hieß. Wenn dies der Fall ist, benenne die Datei "gwb2gw" in diesem Verzeichnis um in "gwu" und versuche es erneut.
@@ -1907,16 +2015,11 @@ it: O tornate al menu principale.
 lv: Vai atgriezieties galvenajâ izvçlnç.
 sv: Eller gå tillbaka till huvudmenyn.
 
-    Return to the main menu.
-aa: delete_1.htm
-de: Zurück zum Hauptmenü.
-en: Return to the main menu.
-es: Regrese Ud. al menú principal.
-fi: Palaa päävalikkoon.
-fr: Revenez au menu principal.
-it: Tornate al menu principale.
-lv: Arî atgriezieties galvenajâ izvçlnç.
-sv: Återvänd till huvudmenyn.
+    or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
+aa: gwc.htm
+de: oder geben Sie direkt den namen der GeneWeb Quell Datei(en) relativ zum darüberliegenden Pfad an.<br> Wenn dieser Parameter ein '*' enthält, müssen Sie einen eindeutigen Namen für die erstellte Datenbank angeben.
+en: or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
+fr: ou donnez directement le nom du ou des fichiers source GeneWeb en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
 
     Other parameters exist for the command "gwd", but are not configurable here because they can perturbate the operation of "gwsetup".
 aa: gwd.htm
@@ -1930,11 +2033,13 @@ sv: Det finns andra parametrar för kommandot "gwd", men de kan inte konfigurera
 
     Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
 aa: connex.htm
+de: Ausgabe erfolgt in basename/notes_d/connex.txt (-o muss leer bleiben und notes_d muss existieren).
 en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
 fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
 
     Output results to this file.
 aa: connex.htm
+de: Ausgabe erfolgt in diese Datei.
 en: Output results to this file.
 fr: Rediriger les résultats vers ce fichier.
 
@@ -1999,16 +2104,6 @@ it: Passare per un file GEDCOM. A priori è un'operazione sconsigliata ma se non
 lv: Atjaunot caur GEDCOM datni. Vispâr tas nav ieteicams, bet ja parastajâ variantâ atjauninâðana neizdodas, tad izmçìiniet ðo iespçju.
 sv: Gå genom en GEDCOM-fil. Det är inte rekommenderat, men om det inte fungerar med den normala proceduren, försök med detta.
 
-    Password for "Wizards".
-aa: gwf_1.htm
-de: Kennwort für "Wizards".
-en: Password for "Wizards".
-es: Contraseña "mago".
-fr: Mot de passe "magicien".
-it: Password "Wizard".
-lv: "Burvja" parole.
-sv: Passord för "Wizards".
-
     Password for "friends".
 aa: gwf_1.htm
 de: Kennwort für "Freunde".
@@ -2019,8 +2114,43 @@ it: Password per "amico".
 lv: "Draugu" parole.
 sv: Passord för "friends".
 
+    Password for "Wizards".
+aa: gwf_1.htm
+de: Kennwort für "Wizards".
+en: Password for "Wizards".
+es: Contraseña "mago".
+fr: Mot de passe "magicien".
+it: Password "Wizard".
+lv: "Burvja" parole.
+sv: Passord för "Wizards".
+
+    persons' families.
+aa: gwfix.htm
+de: Personen' Familien.
+en: persons' families.
+fr: persons' families.
+
+    persons' NBDS.
+aa: gwfix.htm
+de: Personen' NBDS.
+en: persons' NBDS.
+fr: persons' NBDS.
+
+    persons' parents.
+aa: gwfix.htm
+de: Personen' Eltern.
+en: persons' parents.
+fr: persons' parents.
+
+    pevents' witnesses.
+aa: gwfix.htm
+de: pevents' Trauzeuge
+en: pevents' witnesses.
+fr: pevents' witnesses.
+
     Produce connected components statistics.
 aa: connex.htm
+de: Erzeuge Statistiken über verbundene Komponenten
 en: Produce connected components statistics.
 fr: Afficher les statistiques sur les composantes connexes.
 
@@ -2077,9 +2207,22 @@ sv: Lägg bildfilen i katalogen (om den inte finns skapa den först):
 
     Put untreated GEDCOM tags in notes.
 aa: ged2gwb.htm
+de: setze unbehandelte GEDCOM tags in Anmerkungen
 en: Put untreated GEDCOM tags in notes.
 fi: Pistä käsittelemättömät GEDCOM merkit lainausmerkkeihin.
 fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
+
+    quiet mode.
+aa: gwfix.htm
+de: stiller Modus.
+en: quiet mode.
+fr: peu de traces.
+
+    Read the alert messages in the file "comm.log"
+aa: bso_ok.htm
+de: Lesen Sie die Warnmeldung in der Datei "comm.log"
+en: Read the alert messages in the file "comm.log"
+fr: Consulter les messages d’alerte dans le fichier "comm.log"
 
     Recover
 aa: recover1.htm
@@ -2158,14 +2301,25 @@ lv: Pârsaukt
 sv: Döp om
 
     Renaming
-aa: rename.htm
-de: Datenbank umbenennen
+aa: welcome.htm
+co: Cambiu di nome
+de: Umbenennen
 en: Renaming
 es: Cambio de nombre
+fi: Uudelleen nimeäminen
 fr: Renommage
 it: Cambio di nome
-lv: Pârsaukðana
-sv: Döpa om
+lv: Pârsaukðanu
+sv: Oomdöpning
+
+    replacing "<tt>foo.jpg</tt>" by the real name of your image file.
+aa: backg.htm
+de: Ersetze dabei "<tt>bla.jpg</tt>" durch den echten Bildnamen.
+en: replacing "<tt>foo.jpg</tt>" by the real name of your image file.
+es: remplazando para ello "<tt>toto.jpg</tt>" por el   verdadero nombre de la imagen.
+fi: korvaa "<tt>esimerkki.jpg</tt>" oikealla kuvalla.
+fr: en remplaçant "<tt>toto.jpg</tt>" par le vrai nom de votre fichier image.
+it: rimpiazzando "<tt>pippo.jpg</tt>" col vero nome del vostro file immagine.
 
     Restart the computing from scratch.
 aa: consang.htm
@@ -2180,18 +2334,19 @@ sv: Starta beräkning från början.
 
     Restrict deleting branches whose size = -del.
 aa: connex.htm
+de: Begrenze das löschen von zweigen deren  Größe = -del.
 en: Restrict deleting branches whose size = -del.
 fr: Limite la suppression aux branches de taille = -del.
 
     Return to the main menu.
-aa: del_ok.htm
+aa: delete_1.htm
 de: Zurück zum Hauptmenü.
 en: Return to the main menu.
-es: Regrese Ud al menú principal.
+es: Regrese Ud. al menú principal.
 fi: Palaa päävalikkoon.
 fr: Revenez au menu principal.
 it: Tornate al menu principale.
-lv: Atgriezies galvenajâ izvçlnç.
+lv: Arî atgriezieties galvenajâ izvçlnç.
 sv: Återvänd till huvudmenyn.
 
     Return to the previous page and select the correct file.
@@ -2216,6 +2371,18 @@ it: Tornate alla videata precedente ed indicate la directory corretta.
 lv: Atgriezieties iepriekðçjâ lapâ un ierakstiet pareizo kataloga nosakumu.
 sv: Återvänd till föregående sida och skriv in den rätta katalogen.
 
+    Save
+aa: welcome.htm
+co: arregistrà
+de: Sparen
+en: Save
+es: Ahorrar
+fi: säästää
+fr: Sauvegarder
+it: Salvare
+lv: Iznemot
+sv: Spara
+
     Save and Restore
 aa: save.htm
 de: Sichern und restaurieren
@@ -2236,17 +2403,27 @@ it: Economizzare lo spazio-memoria durante l'operazione (che però sarà più le
 lv: Taupît operatîvo atmiòu (process notiks lçnâk).
 sv: Spara minne under operationen (men det kommer att gå saktare).
 
-    Save
+    Save the memory space during the operation (but it will be slower).
+aa: gwb2ged.htm
+de: Während der Operation sparsam mit dem Speicher umgehen (ist aber langsamer).
+en: Save the memory space during the operation (but it will be slower).
+es: Economizar el espacio-memoria durante la operación (pero esta sera mas lenta).
+fr: Économiser l’espace mémoire pendant l’opération (mais ce sera plus lent).
+it: Economizzare lo spazio-memoria durante l'operazione (che però sarà più lenta)
+lv: Darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).
+sv: Spara minne under operationen (men det kommer att gå saktare).
+
+    Saving and restoring
 aa: welcome.htm
-co: arregistrà
-de: Sparen
-en: Save
-es: Ahorrar
-fi: säästää
-fr: Sauvegarder
-it: Salvare
-lv: Iznemot
-sv: Spara
+co: Salvaguardia è resturazione
+de: Sichern und Restaurieren
+en: Saving and restoring
+es: Copia de seguridad y una restauración
+fi: Tallentaminen ja palautus
+fr: Sauvegarde et restauration
+it: Backup and restore
+lv: Saglabâðanu un atjaunoðanu
+sv: Spara och återskapa
 
     Search
 aa: recover.htm
@@ -2309,20 +2486,15 @@ it: Selezionate le opzioni desiderate
 lv: Iezîmçjiet nepiecieðmâs papildus iespçjas
 sv: Välj de optioner du vill ha
 
+    Select the source file or navigate in your folders.
+de: Wählen Sie die Quelldatei oder navigieren Sie in Ihrem Ordner.
+en: Select the source file or navigate in your folders.
+fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
+
     Select the source file or navigate in your foldres.
 aa: gwc.htm
 en: Select the source file or navigate in your foldres.
 fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
-
-    Select your GEDCOM file by clicking on the file or navigating in your folders.
-aa: ged2gwb.htm
-de: Bitte eingeben vollständiger Name deiner GEDCOM-Datei.
-en: Select your GEDCOM file by clicking on the file or navigating in your folders.
-es: Agregue Ud el nombre completo de su fichero GEDCOM.
-fr: Sélectionnez votre fichier GEDCOM en cliquant sur son nom ou en navigant dans les dossiers.
-it: Selezionate il vostro file GEDCOM.
-lv: Ievadiet pilnu GEDCOM datnes nosaukumu.
-sv: Skriv det kompletta namnet på din GEDCOM-fil.
 
     Select your database by clicking on the associated button
 aa: gwf.htm
@@ -2337,11 +2509,23 @@ sv: Välj din databas genom att klicka på motsvarande knapp
 
     Select your first database
 aa: gwdiff.htm
+de: Wählen Sie Ihre erste Datenbank
 en: Select your first database
 fr: Sélectionnez la première base de données 
 
+    Select your GEDCOM file by clicking on the file or navigating in your folders.
+aa: ged2gwb.htm
+de: Bitte eingeben vollständiger Name deiner GEDCOM-Datei.
+en: Select your GEDCOM file by clicking on the file or navigating in your folders.
+es: Agregue Ud el nombre completo de su fichero GEDCOM.
+fr: Sélectionnez votre fichier GEDCOM en cliquant sur son nom ou en navigant dans les dossiers.
+it: Selezionate il vostro file GEDCOM.
+lv: Ievadiet pilnu GEDCOM datnes nosaukumu.
+sv: Skriv det kompletta namnet på din GEDCOM-fil.
+
     Select your second database
 aa: gwdiff.htm
+de: Wählen Sie Ihre zweite Datenbank
 en: Select your second database
 fr: Sélectionnez la seconde base de données
 
@@ -2387,28 +2571,6 @@ it: Metodo semplice
 lv: Vienkârðâ metode
 sv: Enkel metod
 
-    The cleaning up of you database "%a" is completed.
-aa: clean_ok.htm
-de: Deine Datenbank "%a" wurde erfolgreich aufgeräumt.
-en: So. The cleaning up of you database "%a" is completed.
-es: Hela aquí. La limpieza de su base "%a" ha terminado.
-fi: Tietokannan puhdistaminen "%a" on valmis.
-fr: Le nettoyage de votre base "%a" est terminé.
-it: La pulizia della base "%a" è stata portata a termine.
-lv: Darîts. Jûsu datu bâzes "%a" sakopðana ir pabeigta.
-sv: Upprensningen av din databas "%a" är klar.
-
-    The operation "%d" on the database "%a" is terminated.
-aa: update_nldb_ok.htm
-de: Die Operation "%d" auf der Datenbank "%a" ist beendet.
-en: The operation "%d" on the database "%a" is terminated.
-es: La operación "%d" sobre la base "%a" ha  terminado.
-fi: Toiminto "%d" tietokannassa "%a" on lopetettu.
-fr: L’opération "%d" sur la base "%a" est terminée.
-it: L'operazione "%d" sulla base "%a" é terminata.
-lv: Darbîba "%d" ar datu bâzi "%a" pabeigta.
-sv: Operationen "%d" på databasen "%a" är avslutad.
-
     Some GEDCOM files sometimes write dates with numbered months (from 1 to 12). The GEDCOM standard 5.5 requires that the months be represented by identifiers (e.g. "MAY 1912" and not "05/1912"). The notation "02/05/1912" is ambiguous (means "May 2, 1912" or "February 5, 1912" according to the countries).
 aa: ged2gwb.htm
 de: GEDCOM-Dateien enthalten manchmal numerische Monatsangaben (von 1 bis 12). Der GEDCOM-Standard 5.5  schreibt aber vor, daß Monate durch Kürzel dargestellt werden (z. B. "MAY 1912" und nicht "05/1912"). Die Angabe "02/05/1912" ist mehrdeutig (bedeutet je nach Land "2. Mai 1912" oder "5. Februar 1912").
@@ -2442,6 +2604,7 @@ sv: Denna fil är okänd:
 
     Specifiy the number of branches to be deleted.
 aa: connex.htm
+de: Spezifizieren Sie die Anzahl der zu löschenden Zweige.
 en: Specifiy the number of branches to be deleted.
 fr: Définit le nombre de branches à supprimer.
 
@@ -2457,11 +2620,13 @@ sv: Startkatalog och databas
 
     Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 aa: gwdiff.htm
+de: Startperson in der ersten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 en: Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la première base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
 
     Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 aa: gwdiff.htm
+de: Startperson in der zweiten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 en: Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la seconde base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
 
@@ -2473,6 +2638,24 @@ es: Apellido
 fr: Nom
 it: Cognome
 lv: Uzvârds
+
+    text color
+aa: gwf_1.htm
+de: Textfarbe
+en: text color
+es: color del texto
+fr: couleur du texte
+it: colore del testo
+lv: teksta krâsa
+sv: textfärg
+
+    text|link|vlink
+de: Text|Verknüpfung|Besuchte Verknüpfung
+en: text|link|vlink
+es: texto|enlace|visitado
+fr: texte|lien|visité
+it: testo|link|visitato
+nl: tekst|connectie|bezocht
 
     The accentuated characters are in ANSEL encoding.
 aa: ged2gwb.htm
@@ -2531,6 +2714,17 @@ en: The advanced request allows to make researches in the data base. As it is ve
 fr: La requête évoluée permet de faire des recherches avec critères sur la base. Comme elle est très incomplète, elle est cachée par défaut. Sélectionnez "non" ci-dessous pour la remettre.
 it: La richiesta avanzata permette di fare delle ricerche sulla base con dei criteri precisi. Dato che il suo sviluppo è ancora incompleto, è nascosta per difetto. Selezionate "No" qui sopra per renderla visibile.
 
+    The cleaning up of you database "%a" is completed.
+aa: clean_ok.htm
+de: Deine Datenbank "%a" wurde erfolgreich aufgeräumt.
+en: So. The cleaning up of you database "%a" is completed.
+es: Hela aquí. La limpieza de su base "%a" ha terminado.
+fi: Tietokannan puhdistaminen "%a" on valmis.
+fr: Le nettoyage de votre base "%a" est terminé.
+it: La pulizia della base "%a" è stata portata a termine.
+lv: Darîts. Jûsu datu bâzes "%a" sakopðana ir pabeigta.
+sv: Upprensningen av din databas "%a" är klar.
+
     The command "%d" exited with an error code. This operation may have not been done.
 aa: bsi_err.htm
 de: Das Kommando "%d" hat beim Beenden einen Fehler geliefert. Die Operation wurde möglicherweise nicht durchgeführt.
@@ -2541,6 +2735,29 @@ fr: La commande "%d" s’est terminée avec un code d’erreur. Il se peut que c
 it: Il comando "%d"si è terminato con un codice d'errore. Forse l'operazione non è stata portata a termine.
 lv: Komanda "%d" beidza savu adrbu ar kïudas kodue. Iespçjams, ka ðî darbîba nav veikta.
 sv: Kommandot "%d" avslutades med en felkod. Operationen kanske inte har blivit utförd.
+
+    the error history and statistics
+aa: welcome.htm
+co: a cronulugia è e statistiche
+de: der Fehler der Geschichte und Statistik
+en: the error history and statistics
+es: el historial de errores y estadísticas
+fi: virhe historia ja tilastot
+fr: l’historique des erreurs et statistiques
+it: fault Storia e statistiche
+lv: vaina vesture un statistika
+sv: felhistorik och statistik
+
+    the existing databases
+aa: main.htm
+de: die bestehenden Datenbanken
+en: the existing databases
+es: las bases de datos existentes
+fi: luodut tietokannat
+fr: les bases de données existantes
+it: le basi di dati esistenti
+lv: esoðajâm datu bâzçm
+sv: de existerande databaserna
 
     The extraction of the %G source file is terminated.
 aa: gwu_ok.htm
@@ -2596,6 +2813,17 @@ it: Il nome di una base di dati è costituito da lettere non accentuate (maiusco
 lv: Datu bâzes nosaukums drîkst saturçt tikai burtus bez garumzîmçm un mîkstinâjumiem (lielos vai mazos), skaitïus un zîmi "-". Citas rakstu zîmes (ieskaitot atstarpi) ir aizliegtas.
 sv: Namnet för databasen kan bestå av  bokstäver (versaler eller gemena), siffror och tecknet "-". Andra tecken (speciellt mellanslag) är förbjudna.
 
+    The operation "%d" on the database "%a" is terminated.
+aa: update_nldb_ok.htm
+de: Die Operation "%d" auf der Datenbank "%a" ist beendet.
+en: The operation "%d" on the database "%a" is terminated.
+es: La operación "%d" sobre la base "%a" ha  terminado.
+fi: Toiminto "%d" tietokannassa "%a" on lopetettu.
+fr: L’opération "%d" sur la base "%a" est terminée.
+it: L'operazione "%d" sulla base "%a" é terminata.
+lv: Darbîba "%d" ar datu bâzi "%a" pabeigta.
+sv: Operationen "%d" på databasen "%a" är avslutad.
+
     The operation "%d" will be applied on your database "%a". Warning: it can take some seconds or some minutes, depending on the case. Be patient.
 aa: bsc.htm
 de: Die Funktion "%d" wird nun auf deiner Datenbank "%a" ausgeführt. Warnung: Das kann, abhängig vom Einzelfall, zwischen einigen Sekunden  und mehreren Minuten dauern. Bitte habe Geduld.
@@ -2616,6 +2844,30 @@ fr: Les paramètres sont enregistrés dans le fichier texte "%a.gwf" dans le ré
 it: I parametri sono stati registrati nel file testo "%a.gwf" nella directory "%w".
 lv: Ðie parametri ir ierakstîti teksta datnç "%a.gwf" katalogâ "%w".
 sv: Parametrarna har sparats i textfilen "%a.gwf" i katalogen "%w".
+
+    the parameters of a database
+aa: welcome.htm
+co: i parametri d'una basa di dati
+de: die Parameter einer Datenbank
+en: the parameters of a database
+es: los parámetros de una base de datos
+fi: tietokannan parametrit
+fr: les paramètres d’une base de données
+it: i parametri di une base di dati
+lv: datu bâzes parametrus
+sv: parametrarna för en databas
+
+    the parameters of the gwd service
+aa: welcome.htm
+co: i parametri di u serviziu gwd
+de: die Parameter des gwd-Dienstes
+en: the parameters of the gwd service
+es: los parámetros de un servicio gwd
+fi: gwd palvelun parametrit
+fr: les paramètres du service gwd
+it: i parametri del service gwd
+lv: gwd servisa parametrus
+sv: parametrarna för gwd servicen
 
     The previous command exited with an error code. Your database "%o" may have not been created.
 aa: err_reco.htm
@@ -2650,6 +2902,17 @@ it: La pagina precedente non è stata aggiornata.
 lv: Iepriekðçjâ lapa ir novecojusi.
 sv: Den föregående sidan är gammal.
 
+    the traces of the latest command
+aa: main.htm
+de: die Trace-Ausgaben des letzten Kommandos
+en: the traces of the latest command<
+es: las trazas del último commando efectuado
+fi: viimeiset komennot
+fr: les traces de la dernière commande effectuée
+it: le tracce dell' ultimo comando effettuato
+lv: pçdçjâs komandas darbîbas pçdâm
+sv: utskrifterna från det senaste kommandot
+
     Then click on this button
 aa: consang.htm
 de: Dann drücke diesen Knopf
@@ -2668,6 +2931,38 @@ en: Then push this button
 fr: Puis appuyez sur ce bouton
 it: Poi cliccate su questo bottone
 sv: Tryck sedan denna knapp
+
+    there is no database
+aa: del_ok.htm
+de: keine Datenbank vorhanden
+en: there is no database
+es: no queda ninguna base de datos
+fi: tietokantaa ei ole olemassa
+fr: il n’y a aucune base de données
+it: non rimane nessuna base di dati
+lv: nav nevienas datu bâzes
+sv: det finns ingen databas
+
+    there is no database at present
+aa: gwb2ged.htm
+de: Keine Datenbank vorhanden
+en: here is no database at present
+es: actualmente ninguna base de datos existente
+fi: ei tietokantaa saatavilla
+fr: il n’y a aucune base de données actuellement
+it: attualmente non esiste nessuna base di dati
+lv: nav nevienas datu bâzes
+sv: det finns ingen databas för tillfället
+
+    there is no databases in this directory
+aa: recover1.htm
+de: keine Datenbanken in diesem Verzeichnis gefunden
+en: there is no databases in this directory
+es: ninguna base de datos existe en esta carpeta
+fr: il n’y a aucune base de données dans ce répertoire
+it: in questa directory non esiste nessuna base di dati
+lv: ðinî katalogâ nav nevienas datu bâzes
+sv: det finns inga databaser i denna katalog
 
     There is no directory with this name
 aa: err_ndir.htm
@@ -2889,6 +3184,14 @@ fi: MS-DOS:ssa
 fr: Sous MSdos
 it: Sotto MSdos
 
+    Under Unix
+aa: cleanup1.htm
+de: Unter Unix
+en: Under Unix
+fi: Unixissa
+fr: Sous Unix
+it: Sotto Unix
+
     Under Unix, launch an xterm and type the following commands
 aa: gwd_info.htm
 de: Unter <b>Unix</b> starte ein xterm und gib die folgenden Kommandos ein
@@ -2899,14 +3202,6 @@ it: Sotto <b>Unix</b>, lanciate un xterm e digitate i seguenti comandi
 lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
 lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
 sv: Under Unix, starta ett xterm och skriv följande kommandon
-
-    Under Unix
-aa: cleanup1.htm
-de: Unter Unix
-en: Under Unix
-fi: Unixissa
-fr: Sous Unix
-it: Sotto Unix
 
     Under Windows or Unix, type "control C" in the window where it is running.
 aa: gwd_info.htm
@@ -2942,36 +3237,53 @@ lv: Nepazîstama datne
 sv: Okänd fil
 
     Update links page / family chronicle
-aa: update_nldb.htm
+aa: welcome.htm
+co: Attualisazione di i ligami scheda/cronaca famigliale
 de: Aktualisieren Sie Links-Seite / Familien-Chronik
 en: Update links page / family chronicle
 es: Actualizar página de enlaces / crónica familiar
 fi: Päivitä linkit sivu / sukukronikka
 fr: Mise à jour des liens fiche/chronique familiale
 it: Aggiornamento pagina dei link / famiglia cronaca
-lv: Atjaunināt saites lapu / ġimenes hroniku
+lv: Atjauninat saites lapu / gimenes hroniku
 sv: Uppdatera länksida / släktkrönika
 
     Update_nldb
-aa: update_nldb.htm
-de: Update_nldb
-en: Update_nldb
-es: Update_nldb
-fi: Update_nldb
-fr: Update_nldb
-it: Update_nldb
-lv: Update_nldb
-sv: Update_nldb
+aa: main.htm
+de: update_nldb
+en: update_nldb
+es: update_nldb
+fi: update_nldb
+fr: update_nldb
+it: update_nldb
+lv: update_nldb
+sv: update_nldb>
 
     Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 aa: connex_ok.htm
+de: Verwende <b>gwd</b> um die Datei im NOTES Ordner Ihrer base, in der Sie die Ausgabe umgeleitet haben (%a.gwb/notes_d/connex.txt), zu visualisieren.<br> Diese Datei enthält den zuletzt gespeicherten Datensatz an dieser Position (welcher nicht notwendigerweise der ist, den Sie zuletzt berechnet haben - Siehe Zeitstempel am Anfang der Datei).<br> Diese Lösung erlaubt Ihnen Links zu markierten Personen zu folgen.
 en: Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 fr: En utilisant <b>gwd</b> pour visualiser le fichier dans le dossier NOTES où vous avez redirigé les résultats (%a.gwb/notes_d/connex.txt).<br> Vous y verrez la dernière version du fichier connex.txt que vous avez créé à cet endroit (qui n'est pas nécessairement celle que vous venez de calculer - voir l'horodateur en tête de fichier).<br> Cette solution vous permet de suivre les liens vers les personnes désignées.
 
     Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
 aa: connex_ok.htm
+de: Verwende <b>gwsetup</b>  um die Datei in der Ergebnisse umgeleitet wurden zu visualisieren ("%K").
 en: Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
 fr: En utilisant <b>gwsetup</b> pour visualiser le fichier vers lequel ont été envoyés les résultats ("%K").
+
+    very quiet mode.
+aa: gwfix.htm
+de: sehr stiller Modus.
+en: very quiet mode.
+fr: pas de traces du tout.
+
+    Warning: for this program to work, you must not close this window!
+de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses  Fenster nicht schließen!
+en: Warning: for this program to work, you must not close this window!
+fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette fenetre!
+it: Attenzione! Per poter navigare nella base, non dovete mai chiudere questa finestra!
+lv: Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
+sv: Varning: för att det här programmet ska fungera, får du inte stänga detta fönster!
 
     Warning: the operation can take several seconds or minutes, depending on the case. Be patient.
 aa: recover2.htm
@@ -2992,6 +3304,14 @@ fr: <b>Attention</b> : il existe déjà une base de nom "%o" dans le répertoi
 it: <b>Attenzione</b>: esiste una base chiamata "%o" nella directory di destinazione. Se cliccate sul bottone qui sotto la cancellerete. Se avete appena fatto questa manipolazione si tratta probabilmente del suo risultato e non c'è quindi niente di grave. Altrimenti, tornate indietro e sciegliete un altro nome per la vostra base.
 lv: <b>Brîdinâjums</b>: datu bâze ar nosaukumu "%o" jau eksistç dotajâ katalogâ. Ja Jûs nospiedîsiet zemâk esoðo podziòu ðî datu bâze tiks izdzçsta. Iespçjams, ka Jûs jau to esiet izveidojuði. Esiet uzmanîgi. Ja nepiecieðams, atgriezieties iepriekðçjâs lapâs un izvçlieties citu datu bâzes nosaukumu.
 sv: <b>Varning</b>: det finns redan en databas benämnd "%o" i målkatalogen. Om du trycker på knappen nedan kommer den att raderas. Om du inte vill det, gå tillbaka och välj ett annat namn för din databas.
+
+    Warning: there already exists a database with the name "%o" in your directory. If you push the button "Ok" below, it will be erased.
+aa: merge_1.htm
+de: <b>Warnung</b>: Es existiert bereits eine Datenbank mit dem Namen "%o"  in deinem Verzeichnis.  Wenn Du den "Ok"-Knopf unten drückst, wird diese Datenbank gelöscht!
+en: <b>Warning</b>: there already exists a database with the name "%o" in your directory. If you push the button "Ok" below, it will be erased.
+fr: <b>Attention</b> : il existe déjà une base de nom "%o" dans votre répertoire. Si vous appuyez sur le bouton "Ok" ci-dessous, cela va l’effacer.
+it: <b>Attenzione</b>: existe già una base chiamata "%o" nella vostra directory. Se cliccate sul bottone "Ok" qui sotto, la base sarà cancellata.
+sv: <b>Varning</b>: det finns redan en databas med namnet "%o" i din katalog. Om du trycker knappen "OK" nedan, kommer den att raderas.
 
     Warning: this operation can take some seconds or minutes, depending on the cases. Be patient.
 aa: cleanup1.htm
@@ -3014,14 +3334,6 @@ fr: <b>Attention</b> : cette suppression est définitive! Pour confirmer, appuye
 it: <b>Attenzione</b>: questa azione è definitiva! Per confermare, cliccate su questo bottone:
 lv: <b>Uzmanîbu</b>: ðis brîdinâjums ir pçdçjais! Lai to apstiprinâtu, nospiediet ðo podziòu.
 sv: <b>Varning</b>: detta val är definitivt! För att bekräfta, tryck på denna knapp.
-
-    Warning: there already exists a database with the name "%o" in your directory. If you push the button "Ok" below, it will be erased.
-aa: merge_1.htm
-de: <b>Warnung</b>: Es existiert bereits eine Datenbank mit dem Namen "%o"  in deinem Verzeichnis.  Wenn Du den "Ok"-Knopf unten drückst, wird diese Datenbank gelöscht!
-en: <b>Warning</b>: there already exists a database with the name "%o" in your directory. If you push the button "Ok" below, it will be erased.
-fr: <b>Attention</b> : il existe déjà une base de nom "%o" dans votre répertoire. Si vous appuyez sur le bouton "Ok" ci-dessous, cela va l’effacer.
-it: <b>Attenzione</b>: existe già una base chiamata "%o" nella vostra directory. Se cliccate sul bottone "Ok" qui sotto, la base sarà cancellata.
-sv: <b>Varning</b>: det finns redan en databas med namnet "%o" i din katalog. Om du trycker knappen "OK" nedan, kommer den att raderas.
 
     We are going to create a database named "%o" from the following databases:
 aa: merge_1.htm
@@ -3052,6 +3364,21 @@ fr: Nous allons procéder au nettoyage de la base "%a".
 it: Ora procediamo alla pulizia della base "%a".
 lv: Datu bâzes "%a" sakopðanas proces tiks turpinâts.
 sv: Vi ska gå vidare med att rensa upp databasen "%a".
+
+    Welcome to GeneWeb
+de: Willkommen zu %G
+en: Welcome to %G
+es: Bienvenido a %G
+fr: Bienvenue dans %G
+it: Benvenuti su %G
+lv: Sveicinaati Ghenealoghijas datu baazee %G
+sv: Välkommen till %G
+
+    When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
+aa: gwb2ged.htm
+de: Wenn ein Person vor weniger als <num> Jahren geboren wurde, wird es nicht exportiert, sofern es nicht öffentlich ist.<br> Alle Ehepartner und Nachkommen sind auch Zensiert.
+en: When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
+fr: Quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br> si elle est "publique". La censure s’applique aux époux et descendants. 
 
     When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.
 aa: gwf_1.htm
@@ -3091,6 +3418,17 @@ en: When descendants are displayed, limit the number of displayed generations. B
 fr: Quand on affiche les descendants, limite le nombre de générations affichables. C’est 12 par défaut, mais vous pouvez indiquer une valeur différente ici.
 it: Quando si visualizzano i discendenti, limita il numero delle parentele visualizzabili. Il numero per difetto è 12, ma potete indicare qui un valore diverso.
 
+    with the simple method
+aa: main.htm
+de: mit der einfachen Methode
+en: with the simple method
+es: con el método simple
+fi: yksinkertaisella tavalla
+fr: avec la méthode simple
+it: Col metodo semplice
+lv: parastajâ veidâ
+sv: med en enkel metod
+
     Write the name you want for your database
 aa: simple.htm
 de: Gib den Namen ein, den deine Datenbank tragen soll
@@ -3114,8 +3452,19 @@ sv: Skriv in namnet du vill kalla din databas. Skriver du ingenting kommer den a
 
     Years
 aa: gwb2ged.htm
+de: Jahre
 en: Years
 fr: Années
+
+    yes|no
+de: Ja|Nein
+en: Yes|No
+es: Si|No
+fr: oui|non
+it: Si|No
+lv: Yes|Nç
+nl: ja|nee
+sv: Yes|No
 
     You are not allowed to access this service. Only the address "%o" can use it.
 aa: err_acc.htm
@@ -3205,6 +3554,7 @@ sv: Du kanske har gått från en alltför gammal version av %G. I det fallet, f�
 
     You may observe results through two means
 aa: connex_ok.htm
+de: Sie können ergebnisse durch zwei Mittel feststellen
 en: You may observe results through two means
 fr: Vous pouvez consulter les résultats de deux façons différentes
 
@@ -3251,383 +3601,3 @@ it: Le vostre basi di dati hanno cambiato nome. Ecco la nuova lista
 lv: Jûsu datu bâzes ir pârsauktas. Ðeit ir jaunais datu bâzu saraksts
 sv: Dina databaser har blivit omdöpta. Här är den nya listan
 
-    a GEDCOM source file
-aa: welcome.htm
-co: un schedariu di fonte GEDCOM
-de: eine GEDCOM-Quelldatei
-en: a GEDCOM source file
-es: un fichero fuente GEDCOM
-fi: GEDCOM lähdetiedosto
-fr: un fichier source GEDCOM
-it: un file sorgente GEDCOM
-lv: GEDCOM datni
-sv: en GEDCOM källfil
-
-    a GeneWeb source file
-aa: welcome.htm
-co: un schedariu di fonte %G
-de: eine %G-Quelldatei
-en: a %G source file
-es: un fichero fuente %G
-fi: %G lähdetiedosto
-fr: un fichier source %G
-it: un file sorgente %G
-lv: %G datni
-sv: en %G källfil
-
-    background color
-aa: gwf_1.htm
-de: Hintergrundfarbe
-en: background color
-es: color de fondo
-fr: couleur de fond
-it: colore di fondo
-lv: fona krâsa
-sv: bakgrundsfärg
-
-    background image
-aa: gwf_1.htm
-de: Hintergrundbild
-en: background image
-es: imagen de fondo
-fr: image de fond
-it: immagine di fondo 
-lv: fona attçls
-sv: bakgrundsbild
-
-    color of already visited links
-aa: gwf_1.htm
-de: Farbe für bereits besuchte Links
-en: color of already visited links
-es: color de los enlaces que ya han sido visitados
-fr: couleur des liens déjà visités
-it: colore dei links visitati
-lv: izmantoto norâþu krâsa
-sv: färg för de redan besökta länkarna
-
-    do not commit changes (only traces).
-aa: gwfix.htm
-en: do not commit changes (only traces).
-fr: ne pas effectuer les changements (traces seules).
-
-    empty file
-aa: gwd_ok.htm
-de: Datei leer
-en: empty file
-es: fichero vacio
-fr: fichier vide
-it: file vuoto
-sv: tom fil
-
-    families' children.
-aa: gwfix.htm
-en: families' children.
-fr: families' children.
-
-    families' parents.
-aa: gwfix.htm
-en: families' parents.
-fr: families' parents.
-
-    fast mode. Needs more memory
-aa: gwfix.htm
-en: fast mode. Needs more memory
-fr: mode rapide. Nécessite plus de mémoire.
-
-    fevents' witnesses.
-aa: gwfix.htm
-en: fevents' witnesses.
-fr: fevents' witnesses.
-
-    foo.jpg
-aa: backg.htm
-de: bla.jpg
-en: foo.jpg
-es: toto.jpg
-fi: esimerkki.jpg
-fr: toto.jpg
-it: pippo.jpg
-lv: foo.jpg
-sv: foo.jpg
-
-    from a GEDCOM source file
-aa: welcome.htm
-co: à partesi d'un schedariu di fonte GEDCOM
-de: aus einer GEDCOM-Quelldatei
-en: from a GEDCOM source file
-es: a partir de un fichero fuente GEDCOM
-fi: GEDCOM lähdetiedostosta
-fr: à partir d’un fichier source GEDCOM
-it: partendo da un file sorgente GEDCOM
-lv: no GEDCOM datnes
-sv: från en GEDCOM källfil
-
-    from a GeneWeb source file
-aa: welcome.htm
-co: à partesi d'un schedariu di fonte %G
-de: aus einer %G-Quelldatei
-en: from a %G source file
-es: a partir de un fichero fuente %G
-fi: %G lähdetiedostosta
-fr: à partir d’un fichier source %G
-it: partendo da un file sorgente %G
-lv: no %G datnes
-sv: från en %G källfil
-
-    help.
-aa: gwfix.htm
-en: help.
-fr: help.
-
-    there is no database at present
-aa: gwb2ged.htm
-de: Keine Datenbank vorhanden
-en: here is no database at present
-es: actualmente ninguna base de datos existente
-fi: ei tietokantaa saatavilla
-fr: il n’y a aucune base de données actuellement
-it: attualmente non esiste nessuna base di dati
-lv: nav nevienas datu bâzes
-sv: det finns ingen databas för tillfället
-
-    index. Automatically enabled by any other option
-aa: gwfix.htm
-en: index. Automatically enabled by any other option
-fr: index. Activé automatiquement par les autres options
-
-    links color
-aa: gwf_1.htm
-de: Linkfarbe
-en: links color
-es: color de los enlaces
-fr: couleur des liens
-it: colore dei links
-lv: norâþu krâsa
-sv: länkfärg
-
-    marriage divorce.
-aa: gwfix.htm
-en: marriage divorce.
-fr: marriage divorce.
-
-    name
-aa: ged2gwb.htm
-de: name
-en: name
-fr: nom
-it: nome
-sv: namnet
-
-    no selection
-aa: delete_1.htm
-de: no selection
-en: no selection
-es: ninguna selección
-fi: ei valintaa
-fr: pas de sélection
-it: nessuna selezione
-lv: nav iezîmçtas
-sv: inga val
-
-    no traces
-aa: traces.htm
-de: no traces
-en: no traces
-es: ningÃºn indicio
-fi: ei jÃ¤lkiÃ¤
-fr: pas de traces
-it: nessuna traccia
-lv: no traces
-sv: ingen utskrift
-
-    or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
-aa: gwu.htm
-en: or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
-fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>, alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
-
-    or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
-aa: gwc.htm
-en: or provide directly the name of the %G source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
-fr: ou donnez directement le nom du ou des fichiers source %G en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
-
-    persons' NBDS.
-aa: gwfix.htm
-en: persons' NBDS.
-fr: persons' NBDS.
-
-    persons' families.
-aa: gwfix.htm
-en: persons' families.
-fr: persons' families.
-
-    persons' parents.
-aa: gwfix.htm
-en: persons' parents.
-fr: persons' parents.
-
-    pevents' witnesses.
-aa: gwfix.htm
-en: pevents' witnesses.
-fr: pevents' witnesses.
-
-    quiet mode.
-aa: gwfix.htm
-en: quiet mode.
-fr: peu de traces.
-
-    replacing "<tt>foo.jpg</tt>" by the real name of your image file.
-aa: backg.htm
-de: Ersetze dabei "<tt>bla.jpg</tt>" durch den echten Bildnamen.
-en: replacing "<tt>foo.jpg</tt>" by the real name of your image file.
-es: remplazando para ello "<tt>toto.jpg</tt>" por el   verdadero nombre de la imagen.
-fi: korvaa "<tt>esimerkki.jpg</tt>" oikealla kuvalla.
-fr: en remplaçant "<tt>toto.jpg</tt>" par le vrai nom de votre fichier image.
-it: rimpiazzando "<tt>pippo.jpg</tt>" col vero nome del vostro file immagine.
-
-    text color
-aa: gwf_1.htm
-de: Textfarbe
-en: text color
-es: color del texto
-fr: couleur du texte
-it: colore del testo
-lv: teksta krâsa
-sv: textfärg
-
-    deletion
-aa: main.htm
-de: Löschen
-en: the deletion
-es: una supresión
-fi: poisto
-fr: la suppression
-it: una cancellazione
-lv: izmeðanu
-sv: radering
-
-    merging with other databases
-aa: main.htm
-de: Zusammenführen mit anderen Datenbanken
-en: the merging with other databases
-fi: yhdistyminen muiden tietokantojen kanssa
-fr: la fusion avec d’autres bases
-it: la fusione con altre basi
-sv: sammanslagning med andra databaser
-
-    renaming
-aa: main.htm
-de: Umbenennen
-en: the renaming
-es: un cambio de nombre
-fi: uudelleen nimeäminen
-fr: le renommage
-it: un cambio di nome
-lv: pârsaukðanu
-sv: omdöpning
-
-    saving and restoring
-aa: main.htm
-de: Sichern und Restaurieren
-en: the saving and restoring
-es: una copia de seguridad y una restauración
-fi: tallentaminen ja palautus
-fr: la sauvegarde et restauration
-it: un backup and restore
-lv: saglabâðanu un atjaunoðanu
-sv: spara och återskapa
-
-    the traces of the latest command
-aa: main.htm
-de: die Trace-Ausgaben des letzten Kommandos
-en: the traces of the latest command<
-es: las trazas del último commando efectuado
-fi: viimeiset komennot
-fr: les traces de la dernière commande effectuée
-it: le tracce dell' ultimo comando effettuato
-lv: pçdçjâs komandas darbîbas pçdâm
-sv: utskrifterna från det senaste kommandot
-
-    the existing databases
-aa: main.htm
-de: die bestehenden Datenbanken
-en: the existing databases
-es: las bases de datos existentes
-fi: luodut tietokannat
-fr: les bases de données existantes
-it: le basi di dati esistenti
-lv: esoðajâm datu bâzçm
-sv: de existerande databaserna
-
-    the parameters of a database
-aa: welcome.htm
-co: i parametri d'una basa di dati
-de: die Parameter einer Datenbank
-en: the parameters of a database
-es: los parámetros de una base de datos
-fi: tietokannan parametrit
-fr: les paramètres d’une base de données
-it: i parametri di une base di dati
-lv: datu bâzes parametrus
-sv: parametrarna för en databas
-
-    the parameters of the gwd service
-aa: welcome.htm
-co: i parametri di u serviziu gwd
-de: die Parameter des gwd-Dienstes
-en: the parameters of the gwd service
-es: los parámetros de un servicio gwd
-fi: gwd palvelun parametrit
-fr: les paramètres du service gwd
-it: i parametri del service gwd
-lv: gwd servisa parametrus
-sv: parametrarna för gwd servicen
-
-    there is no database
-aa: del_ok.htm
-de: keine Datenbank vorhanden
-en: there is no database
-es: no queda ninguna base de datos
-fi: tietokantaa ei ole olemassa
-fr: il n’y a aucune base de données
-it: non rimane nessuna base di dati
-lv: nav nevienas datu bâzes
-sv: det finns ingen databas
-
-    there is no database at present
-aa: merge.htm
-de: keine Datenbank vorhanden
-en: there is no database at present
-fr: il n’y a aucune base de données actuellement
-it: attualmente non esiste nessuna base di dati
-sv: det finns ingen databas för närvarande
-
-    there is no databases in this directory
-aa: recover1.htm
-de: keine Datenbanken in diesem Verzeichnis gefunden
-en: there is no databases in this directory
-es: ninguna base de datos existe en esta carpeta
-fr: il n’y a aucune base de données dans ce répertoire
-it: in questa directory non esiste nessuna base di dati
-lv: ðinî katalogâ nav nevienas datu bâzes
-sv: det finns inga databaser i denna katalog
-
-    very quiet mode.
-aa: gwfix.htm
-en: very quiet mode.
-fr: pas de traces du tout.
-
-    with the simple method
-aa: main.htm
-de: mit der einfachen Methode
-en: with the simple method
-es: con el método simple
-fi: yksinkertaisella tavalla
-fr: avec la méthode simple
-it: Col metodo semplice
-lv: parastajâ veidâ
-sv: med en enkel metod
-
-    (do not enter the quotes "" in the input zone).
-aa: ged2gwb.htm
-en: (do not enter the quotes "" in the input zone).
-fr: (ne pas inclure les guilemets "" dans le champ de saisie).

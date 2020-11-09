@@ -1,0 +1,545 @@
+    "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
+en: "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
+fr: L’option <i>first names enclosed</i> doit être suivie par une chaîne de deux caractères « be ». À la création d’une personne, si une partie de la chaîne prénom commence par le caractère 'b' et se termine par le caractère 'e', alors cette partie sera considérée comme le prénom usuel.<br> Exemples : <span  style="font-family: monospace">-fne "\\"</span> ou <span style="font-family: monospace"> -fne "()"</span>.
+sv:
+
+    (do not enter the quotes "" in the input zone).
+en: (do not enter the quotes "" in the input zone).
+fr: (ne pas inclure les guilemets "" dans le champ de saisie).
+sv:
+
+    (no selection is equivalent to select all).
+en: (no selection is equivalent to select all).
+fr: (aucune option est équivalent à les sélectionner toutes). 
+sv:
+
+    ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
+en: ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
+fr: ../ vous permet de naviguer vers le dossier parent.<br> Dans le monde Windows, ceci ne vous permettra pas de changer la lettre du disque (C: -> D:), mais vous pouvez faire ce changement directement dans l'url dans le navigateur.
+sv:
+
+    <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+sv:
+
+    <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
+en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
+fr: <span style="color:#FF0000;">ATTENTION</span> : Le contenu du fichier %o sera écrasé.
+sv:
+
+    <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
+en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
+fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
+sv:
+
+    <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
+en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+sv:
+
+    All connex components.
+en: All connex components.
+fr: Toutes les composantes connexes.
+sv:
+
+    And the content of gwsetup.log
+en: And the content of gwsetup.log
+fr: Et le contenu de gwsetup.log
+sv:
+
+    Ask for deleting branches whose size <= that value.
+en: Ask for deleting branches whose size <= that value.
+fr: Demander à détruire les composantes de taille <= à cette valeur.
+sv:
+
+    Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.
+en: Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.
+fr: Demande d’indiquer les mises à jour dans la page d’accueil sous le lien "historique des mises à jour". <p> Remarque (technique): les traces des mises à jour sont sauvées dans un fichier de nom "history" dans le répertoire de la base de donnée (%a.gwb). Ce fichier grossit indéfiniment. Si vous voulez effacer les anciennes traces, il faut éditer ce fichier pour les supprimer. Ou vous pouvez aussi supprimer le fichier pour repartir à vide.
+sv:
+
+    By looking at the terminal window if you have not asked for result redirection.
+en: By looking at the terminal window if you have not asked for result redirection.
+fr: En regardant dans la fenêtre qui s'est ouverte si vous n'avez pas demandé de redirection des résultats.
+sv:
+
+    By origin file.
+en: By origin file.
+fr: D'après le fichier origine.
+sv:
+
+    cancel
+en: Cancel
+fr: Annuler
+sv:
+
+    Checks descendants (default).
+en: Checks descendants (default).
+fr: Vérifier les descendants (par défaut).
+sv:
+
+    Checks descendants of all ascendants.
+en: Checks descendants of all ascendants.
+fr: Vérifier tous les descendants des ascendants.
+sv:
+
+    Compare
+en: Compare
+fr: Comparer
+sv:
+
+    Compute connected componants
+en: Compute connected componants
+fr: Calcule les composantes connexes
+sv:
+
+    Compute the difference between two bases
+en: Compute the difference between two bases
+fr: Calcule la différence entre deux bases
+sv:
+
+    Connected components identified
+en: Connected components identified
+fr: Calcul des composantes connexes exécuté
+sv:
+
+    Connex
+en: Connex
+fr: Connex
+sv:
+
+    Content of result file
+en: Content of result file
+fr: Contenu du fichier résultat
+sv:
+
+    Default source
+en: Default source
+fr: Source par défaut
+sv:
+
+    Delete database if already existing.
+en: Delete database if already existing.
+fr: Détruire la base pré-existante.
+sv:
+
+    Details for this length.
+en: Details for this length.
+fr: Fournir détails pour cette taille.
+sv:
+
+    Differences computed
+en: Differences computed
+fr: Différence calculée
+sv:
+
+    Display in
+en: Display in
+fr: Afficher en
+sv:
+
+    do not commit changes (only traces).
+en: do not commit changes (only traces).
+fr: ne pas effectuer les changements (traces seules).
+sv:
+
+    Do not extract notes.
+en: Do not extract notes.
+fr: Ne pas extraire les notes.
+sv:
+
+    Do not extract spouses' parents (for options -s and -d).
+en: Do not extract spouses' parents (for options -s and -d).
+fr: Ne pas extraire les parents des époux (pour les options -s et -d).
+sv:
+
+    Don't extract individual picture.
+en: Don't extract individual picture.
+fr: Ne pas extraire d’images individuelles.
+sv:
+
+    Done. The operation is terminated.
+en: Done. The operation is terminated.
+fr: L’opération est terminée.
+sv:
+
+    Dont extract individual pictures (portraits).
+en: Dont extract individual pictures (portraits).
+fr: Ne pas extraire les images individuelles (portraits).
+sv:
+
+    Extract ancestors with siblings of
+en: Extract ancestors with siblings of
+fr: Extraire les ancêtres avec fratries de
+sv:
+
+    Extract individual pictures path (portraits).
+en: Extract individual pictures path (portraits).
+fr: Extraire le chemin des images individuelles (portraits).
+sv:
+
+    extract surname (usable several times).
+en: Extract surname (usable several times).
+fr: Extraire un nom de famille (utilisable plusieurs fois).
+sv:
+
+    families' children.
+en: families' children.
+fr: families' children.
+sv:
+
+    families' parents.
+en: families' parents.
+fr: families' parents.
+sv:
+
+    fast mode. Needs more memory
+en: fast mode. Needs more memory
+fr: mode rapide. Nécessite plus de mémoire.
+sv:
+
+    fevents' witnesses.
+en: fevents' witnesses.
+fr: fevents' witnesses.
+sv:
+
+    Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
+en: Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
+fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br> Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier %o ou vers comm.log. Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
+sv:
+
+    First name
+en: First name
+fr: Prénom
+sv:
+
+    Fix base
+en: Fix base
+fr: Fix base
+sv:
+
+    Fix base and recompute index
+en: Fix base and recompute index
+fr: Corrige une base et reclacule l'index
+sv:
+
+    Fixes problems in a base
+en: Fixes problems in a base
+fr: Corrige les problèmes d'une base
+sv:
+
+    Force relation status to "NoMention" (default is "Married").
+en: Force relation status to "NoMention" (default is "Married").
+fr: Marquer les relations comme « Sans mention » (par défaut « Mariés »).
+sv:
+
+    Go to your Web browser and open one of the following addresses:
+en: Go to your Web browser and open one of the following addresses:
+fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
+sv:
+
+    Gwfixbase messages
+en: Gwfixbase messages
+fr: Messages gwfixbase
+sv:
+
+    help.
+en: help.
+fr: help.
+sv:
+
+    Hide advanced request.
+en: Hide advanced request.
+fr: Cacher la requête évoluée.
+sv:
+
+    Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.
+en: Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.
+fr: Cache les noms des personnes privées, c’est-à-dire les personnes vivantes, ou plus exactement, celles de moins de 100 ans.
+sv:
+
+    Hide the private person's names.
+en: Hide the private person's names.
+fr: Cacher les noms des personnes privées.
+sv:
+
+    History of updates
+en: History of updates
+fr: Historique des mises à jour
+sv:
+
+    If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.
+en: If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.
+fr: Si vous désirez que vos images ne soient pas installées dans l’endroit standard (répertoire des bases, sous-répertoire "images", sous-sous-répertoire "%a"), indiquez ici le chemin d’accès au répertoire que vous voulez utiliser. Ce chemin d’accès est une URL : si c’est un site Web, il doit commencer par <tt>http://</tt>, si c’est un répertoire local, il doit commencer par <tt>file://</tt>. <p> Cela ne concerne que les images qui sont indiquées dans le formulaire des personnes, champ "image". Cela ne concerne pas les images installées par le lien "envoyer images" qui, elles, sont installées avec un nom standard dans le répertoire standard.
+sv:
+
+    Ignore this file.
+en: Ignore this file.
+fr: Ignorer ce fichier.
+sv:
+
+    Images path
+en: Images path
+fr: Chemin d’accès aux images
+sv:
+
+    In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
+en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
+fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
+sv:
+
+    index. Automatically enabled by any other option
+en: index. Automatically enabled by any other option
+fr: index. Activé automatiquement par les autres options
+sv:
+
+    Listing connected components
+en: Listing connected components
+fr: Liste des composantes connexes
+sv:
+
+    Look at the traces, may be you can find an explanation.
+en: Look at the traces, may be you can find an explanation.
+fr: Consultez les traces, vous y trouverez probablement une explication.
+sv:
+
+    marriage divorce.
+en: marriage divorce.
+fr: marriage divorce.
+sv:
+
+    Maximum level when displaying ancestors by tree.
+en: Maximum level when displaying ancestors by tree.
+fr: Niveau maximum dans l’affichage des ascendants par arbre.
+sv:
+
+    Maximum level when displaying ancestors.
+en: Maximum level when displaying ancestors.
+fr: Niveau maximum dans l’affichage des ascendants.
+sv:
+
+    Maximum level when displaying descendants by tree.
+en: Maximum level when displaying descendants by tree.
+fr: Niveau maximum dans l’affichage des descendants par arbre.
+sv:
+
+    Maximum level when displaying descendants.
+en: Maximum level when displaying descendants.
+fr: Niveau maximum dans l’affichage des descendants.
+sv:
+
+    No consistency check.
+en: No consistency check.
+fr: Ne pas contrôler la cohérence des données.
+sv:
+
+    No redirection of results.
+en: No redirection of results.
+fr: Pas de redirection des résultats.
+sv:
+
+    Not public even if titles (see -epn option).
+en: Not public even if titles (see -epn option).
+fr: Ne pas considérer comme public si un titre a été détecté (voir option -epn).
+sv:
+
+    Note
+en: Note
+fr: Note
+sv:
+
+    Num
+en: Num
+fr: Num
+sv:
+
+    or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
+en: or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
+fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>, alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
+sv:
+
+    or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
+en: or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
+fr: ou donnez directement le nom du ou des fichiers source GeneWeb en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
+sv:
+
+    Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
+en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
+fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
+sv:
+
+    Output results to this file.
+en: Output results to this file.
+fr: Rediriger les résultats vers ce fichier.
+sv:
+
+    persons' families.
+en: persons' families.
+fr: persons' families.
+sv:
+
+    persons' NBDS.
+en: persons' NBDS.
+fr: persons' NBDS.
+sv:
+
+    persons' parents.
+en: persons' parents.
+fr: persons' parents.
+sv:
+
+    pevents' witnesses.
+en: pevents' witnesses.
+fr: pevents' witnesses.
+sv:
+
+    Produce connected components statistics.
+en: Produce connected components statistics.
+fr: Afficher les statistiques sur les composantes connexes.
+sv:
+
+    Put untreated GEDCOM tags in notes.
+en: Put untreated GEDCOM tags in notes.
+fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
+sv:
+
+    quiet mode.
+en: quiet mode.
+fr: peu de traces.
+sv:
+
+    Read the alert messages in the file "comm.log"
+en: Read the alert messages in the file "comm.log"
+fr: Consulter les messages d’alerte dans le fichier "comm.log"
+sv:
+
+    replacing "<tt>foo.jpg</tt>" by the real name of your image file.
+en: replacing "<tt>foo.jpg</tt>" by the real name of your image file.
+fr: en remplaçant "<tt>toto.jpg</tt>" par le vrai nom de votre fichier image.
+sv:
+
+    Restrict deleting branches whose size = -del.
+en: Restrict deleting branches whose size = -del.
+fr: Limite la suppression aux branches de taille = -del.
+sv:
+
+    Select the source file or navigate in your folders.
+en: Select the source file or navigate in your folders.
+fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
+sv:
+
+    Select the source file or navigate in your foldres.
+en: Select the source file or navigate in your foldres.
+fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
+sv:
+
+    Select your first database
+en: Select your first database
+fr: Sélectionnez la première base de données 
+sv:
+
+    Select your second database
+en: Select your second database
+fr: Sélectionnez la seconde base de données
+sv:
+
+    Specifiy the number of branches to be deleted.
+en: Specifiy the number of branches to be deleted.
+fr: Définit le nombre de branches à supprimer.
+sv:
+
+    Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+en: Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+fr: Personne racine dans la première base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
+sv:
+
+    Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+en: Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+fr: Personne racine dans la seconde base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
+sv:
+
+    Surname
+en: Surname
+fr: Nom
+sv:
+
+    text|link|vlink
+en: text|link|vlink
+fr: texte|lien|visité
+sv:
+
+    The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.
+en: The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.
+fr: La requête évoluée permet de faire des recherches avec critères sur la base. Comme elle est très incomplète, elle est cachée par défaut. Sélectionnez "non" ci-dessous pour la remettre.
+sv:
+
+    This file is in the directory
+en: This file is in the directory
+fr: Ce fichier se trouve dans le répertoire
+sv:
+
+    This file is in the directory "%w".
+en: This file is in the directory "%w".
+fr: Ce fichier se trouve dans le répertoire "%w".
+sv:
+
+    Under MSdos
+en: Under MSdos
+fr: Sous MSdos
+sv:
+
+    Under Unix
+en: Under Unix
+fr: Sous Unix
+sv:
+
+    Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
+en: Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
+fr: En utilisant <b>gwd</b> pour visualiser le fichier dans le dossier NOTES où vous avez redirigé les résultats (%a.gwb/notes_d/connex.txt).<br> Vous y verrez la dernière version du fichier connex.txt que vous avez créé à cet endroit (qui n'est pas nécessairement celle que vous venez de calculer - voir l'horodateur en tête de fichier).<br> Cette solution vous permet de suivre les liens vers les personnes désignées.
+sv:
+
+    Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
+en: Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
+fr: En utilisant <b>gwsetup</b> pour visualiser le fichier vers lequel ont été envoyés les résultats ("%K").
+sv:
+
+    very quiet mode.
+en: very quiet mode.
+fr: pas de traces du tout.
+sv:
+
+    When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
+en: When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
+fr: Quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br> si elle est "publique". La censure s’applique aux époux et descendants. 
+sv:
+
+    When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.
+en: When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.
+fr: Quand on affiche les ascendants par arbre, limite le nombre de générations affichables. C’est 7 par défaut, mais vous pouvez indiquer une valeur différente ici.
+sv:
+
+    When ancestors are displayed, limit the number of displayed generations. By default, it is 8 generations, but you can indicate a different value here.
+en: When ancestors are displayed, limit the number of displayed generations. By default, it is 8 generations, but you can indicate a different value here.
+fr: Quand on affiche les ascendants, limite le nombre de générations affichables. C’est 8 par défaut, mais vous pouvez indiquer une valeur différente ici.
+sv:
+
+    When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.
+en: When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.
+fr: Quand on affiche les descendants par arbre, limite le nombre de générations affichables. C’est 4 par défaut, mais vous pouvez indiquer une valeur différente ici.
+sv:
+
+    When descendants are displayed, limit the number of displayed generations. By default, it is 12 generations, but you can indicate a different value here.
+en: When descendants are displayed, limit the number of displayed generations. By default, it is 12 generations, but you can indicate a different value here.
+fr: Quand on affiche les descendants, limite le nombre de générations affichables. C’est 12 par défaut, mais vous pouvez indiquer une valeur différente ici.
+sv:
+
+    Years
+en: Years
+fr: Années
+sv:
+
+    You may observe results through two means
+en: You may observe results through two means
+fr: Vous pouvez consulter les résultats de deux façons différentes
+sv:
+

@@ -1777,7 +1777,7 @@ let setup (addr, req) comm env_str =
         if comm = "" then !default_lang else String.lowercase_ascii comm
       in
       let lexicon = input_lexicon lang in
-      {lang = lang; comm = comm; env = env; request = req; lexicon = lexicon}
+      {lang = lang; comm = ""; env = env; request = req; lexicon = lexicon}
     else
       let (lang, env) =
         match p_getenv env "lang" with
