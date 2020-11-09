@@ -68,7 +68,7 @@ let trailer _conf =
   Wserver.printf "<em>\n";
   Wserver.printf "<a href=\"https://github.com/geneweb/geneweb/\">\
                   <img src=\"images/logo_bas.png\" style = \"border: 0\" /></a> \
-                  Version %s Copyright &copy 1998-2017\n</em>\n" Version.txt;
+                  Version %s Copyright &copy 1998-2020\n</em>\n" Version.txt;
   Wserver.printf "</div>\n";
   Wserver.printf "</div>\n";
   (* finish the html page *)
@@ -314,7 +314,7 @@ let only_file_name () =
   else !only_file
 
 (* this set of macros are used within translations, hence the repeat of some *)
-(* like %l, %L, %P, ... *)
+(* like %l, %L, %P, ... and they may be different! %G  *)
 let macro conf =
   function
     '/' -> if Sys.unix then "/" else "\\"
@@ -648,6 +648,7 @@ and print_specific_file conf print fname strm =
 and print_specific_file_tail conf print fname strm =
   match Stream.next strm with
     '{' ->
+    (* TODO implement the "tail" part *)
       let s = parse_upto '}' strm in
       if Sys.file_exists fname then begin
         let ic = open_in fname in
@@ -1776,7 +1777,7 @@ let setup (addr, req) comm env_str =
         if comm = "" then !default_lang else String.lowercase_ascii comm
       in
       let lexicon = input_lexicon lang in
-      {lang = lang; comm = ""; env = env; request = req; lexicon = lexicon}
+      {lang = lang; comm = comm; env = env; request = req; lexicon = lexicon}
     else
       let (lang, env) =
         match p_getenv env "lang" with

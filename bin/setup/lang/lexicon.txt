@@ -108,17 +108,17 @@ en: from a GEDCOM source file
 fr: à aprtir d'un fichier source GEDCOM
 
     from a GeneWeb source file
-en: from a GeneWeb source file
-fr: à partir d'un fichier source GeneWeb
+en: from a %G source file
+fr: à partir d'un fichier source %G
 
     Welcome to GeneWeb
-de: Willkommen zu GeneWeb
-en: Welcome to GeneWeb
-es: Bienvenido a GeneWeb
-fr: Bienvenue dans GeneWeb
-it: Benvenuti su GeneWeb
-lv: Sveicinaati Ghenealoghijas datu baazee GeneWeb
-sv: Välkommen till GeneWeb
+de: Willkommen zu %G
+en: Welcome to %G
+es: Bienvenido a %G
+fr: Bienvenue dans %G
+it: Benvenuti su %G
+lv: Sveicinaati Ghenealoghijas datu baazee %G
+sv: Välkommen till %G
 
     Go to your Web browser and open one of the following addresses:
 de: Nimm deinen Webbrowser und öffne eine der folgenden Adressen:
@@ -418,16 +418,6 @@ fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime de
 aa: bsi_fix.htm
 en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
-
-    Extract a GeneWeb file
-aa: gwu.htm
-de: GeneWeb-Quelldatei extrahieren
-en: Extract a GeneWeb file
-es: Extracción de una fichero GeneWeb
-fr: Extraction d’un fichier GeneWeb
-it: Estrazione di un file GeneWeb
-lv: Izveidot GeneWeb datni
-sv: Exportera en GeneWeb källfil
 
     Ability to send images.
 aa: gwf_1.htm
@@ -1119,13 +1109,13 @@ sv: Exportera en GEDCOM-fil
 
     Extract a GeneWeb file
 aa: gwu.htm
-de: GeneWeb-Quelldatei extrahieren
-en: Extract a GeneWeb file
-es: Extracción de un fichero GeneWeb
-fr: Extraction d’un fichier GeneWeb
-it: Estrazione di un file GeneWeb
-lv: Izveidot GeneWeb datni
-sv: Exportera en GeneWeb källfil
+de: %G-Quelldatei extrahieren
+en: Extract a %G file
+es: Extracción de una fichero %G
+fr: Extraction d’un fichier %G
+it: Estrazione di un file %G
+lv: Izveidot %G datni
+sv: Exportera en %G källfil
 
     Extract from a database
 aa: main.htm
@@ -1440,11 +1430,11 @@ sv: Om det är "-", kommer det förvalda språket för kommandot "gwd" att gäll
 
     If it is not the case, if, for example, some of them are just GEDCOM files or GeneWeb source files, return to the main menu to create them under %G, then go back to this page.
 aa: merge.htm
-de: Falls das nicht der Fall ist, sondern einige von ihnen z.B. nur als GEDCOM-Dateien oder GeneWeb-Quelldateien vorliegen, kehre zum Hauptmenü zurück, um sie unter %G anzulegen, dann kehre hierher zurück.
-en: If it is not the case, if, for example, some of them are just GEDCOM files or GeneWeb source files, return to the main menu to create them under %G, then go back to this page.
-fr: Si ce n’est pas le cas, si, par exemple, certaines d’entre elles sont sous forme GEDCOM ou fichiers source GeneWeb, revenez au menu principal pour les créer sous %G, puis revenez à cette page.
-it: Se non è il caso e certune, ad esempio, sono al formato GEDCOM o file sorgente  GeneWeb, tornate al menu principale per crearle sotto %G, poi ritornate a questa pagina.
-sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM filer eller GeneWeb källfiler, gå tilbaka till huvudmenyn för att skapa dem under %G, gå sedan tillbaka till denna sida.
+de: Falls das nicht der Fall ist, sondern einige von ihnen z.B. nur als GEDCOM-Dateien oder %G-Quelldateien vorliegen, kehre zum Hauptmenü zurück, um sie unter %G anzulegen, dann kehre hierher zurück.
+en: If it is not the case, if, for example, some of them are just GEDCOM files or %G source files, return to the main menu to create them under %G, then go back to this page.
+fr: Si ce n’est pas le cas, si, par exemple, certaines d’entre elles sont sous forme GEDCOM ou fichiers source %G, revenez au menu principal pour les créer sous %G, puis revenez à cette page.
+it: Se non è il caso e certune, ad esempio, sono al formato GEDCOM o file sorgente  %G, tornate al menu principale per crearle sotto %G, poi ritornate a questa pagina.
+sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM filer eller %G källfiler, gå tilbaka till huvudmenyn för att skapa dem under %G, gå sedan tillbaka till denna sida.
 
     If it is, try the address below. The displayed page is called "welcome page" of your database. Bookmark it.
 aa: bso_ok.htm
@@ -1600,11 +1590,11 @@ sv: Om du redan har gjort det och det inte fungerade bättre, fråga %Gs upphovs
     If you write nothing, it will be deducted from the GeneWeb source file.
 aa: gwc.htm
 de: Wenn du nichts eingibst, wird der Name aus deiner %G-Quelldatei abgeleitet.
-en: If you write nothing, it will be deducted from the GeneWeb source file.
-es: Si Ud. no escribe nada, el nombre se deducirá a partir del nombre del fichero fuente GeneWeb.
-fr: Si vous ne mettez rien, il sera déduit du nom du fichier source GeneWeb.
-it: Se non mettete niente il nome verrà dedotto da quello del file sorgente GeneWeb.
-lv: Ja nekas netiks ierakstîts, datu bâzes nosaukums tiks izveidots no GeneWeb resursdatnes nosaukuma.
+en: If you write nothing, it will be deducted from the %G source file.
+es: Si Ud. no escribe nada, el nombre se deducirá a partir del nombre del fichero fuente %G.
+fr: Si vous ne mettez rien, il sera déduit du nom du fichier source %G.
+it: Se non mettete niente il nome verrà dedotto da quello del file sorgente %G.
+lv: Ja nekas netiks ierakstîts, datu bâzes nosaukums tiks izveidots no %G resursdatnes nosaukuma.
 sv: Om du inte skriver någonting, kommer namnet att bli härlätt från %G källfilens namn.
 
     Ignore this file.
@@ -1631,23 +1621,13 @@ sv: Importera en GEDCOM-fil
 
     Import a GeneWeb file
 aa: gwc.htm
-de: GeneWeb-Quelldatei importieren
-en: Import a GeneWeb file
-es: Importación d'un fichero GeneWeb
-fr: Importation d’un fichier GeneWeb
-it: Importazione di un file GeneWeb
-lv: GeneWeb resursdatnes imports
-sv: Importera en GeneWeb källfil
-
-    Import of a GeneWeb file
-aa: gwc.htm
-de: GeneWeb-Quelldatei importieren
-en: Import of a GeneWeb file
-es: Importación d'un fichero GeneWeb
-fr: Importation d’un fichier GeneWeb
-it: Importazione di un file GeneWeb
-lv: GeneWeb resursdatnes imports
-sv: Importera en GeneWeb källfil
+de: %G-Quelldatei importieren
+en: Import a %G file
+es: Importación d'un fichero %G
+fr: Importation d’un fichier %G
+it: Importazione di un file %G
+lv: %G resursdatnes imports
+sv: Importera en %G källfil
 
     In order to take the parameters into account, the gwd service must be stopped, if it was running, and restarted.
 aa: gwd_ok.htm
@@ -1681,7 +1661,7 @@ de: In der Tat ist die Navigation mittels des "gwsetup" dazu gedacht, die Benutz
 en: Indeed, the navigation by "gwsetup" is mainly destinated to make the use of %G simpler, but does not allow to exploit quite all the possibilities. To find the other parameters and their use, you must be a little bit "hacker": some informations can be found in the documentation.
 es: En efecto la exploración a partir del "gwsetup" es destinada principalmente a hacer que la utilisación de %G sea más simple, pero no permite de explotar completamente todas las posibilidades del comando. Para encontrar los otros parámetros, así como su utilisación, es necesario de ser un poco "mañoso": Ud. encontrará algunas informaciones buscando bién en la documentación.
 fr: En effet, la navigation par "gwsetup" est principalement destinée à rendre plus simple l’utilisation de %G, mais ne permet pas d’en exploiter tout à fait toutes les possibilités. Pour trouver les autres paramètres et leur usage, il faut être un peu « bricoleur » : quelques informations peuvent être trouvées en cherchant dans la documentation.
-it: In effetti, la navigazione con "gwsetup" è principalmente destinata a rendere più semplice l'utilizzazione di b><font color=#2f6400>GeneWeb</font></b>, ma non permette di sfruttarne pienamente tutte le possibilità. Per trovare altri parametri e conoscerne il loro uso, ci vuole un poco di "fai-da-te"; alcune informazioni possono essere trovate cercando nella documentazione.
+it: In effetti, la navigazione con "gwsetup" è principalmente destinata a rendere più semplice l'utilizzazione di %G, ma non permette di sfruttarne pienamente tutte le possibilità. Per trovare altri parametri e conoscerne il loro uso, ci vuole un poco di "fai-da-te"; alcune informazioni possono essere trovate cercando nella documentazione.
 lv: Patieðâm "gwsetup" programmâ ir galvenokârt veidota, lai padarîtu %G lietoðanu vienkârðâku, bet tâ neïauj izmantot visas tâs iespçjas. Lai atrastu citus parametrus un to pielietojumu, Jums jâkïûst nedaudz par "hakeri": daþa informâcija ir atrodama dokumntâcijâ.
 sv: Faktiskt, navigation med "gwsetup" är huvudsakligen för att göra användandet av %G enklare, men det tillåter inte att utnyttja alla möjligheter. För att finna de andra parametrarna och deras användning, måste du vara lite av en "datahacker": en del av informationen kan hittas i dokumentationen.
 
@@ -2312,11 +2292,11 @@ sv: Skriv in hela namnet för <em>katalogen</em> där din gamla version av %G li
     Select the name of your GeneWeb source file (ending with ".gw");
 aa: gwc.htm
 de: Bitte gib folgende Daten ein kompletter Name deiner %G-Quelldatei (inklusive Endung ".gw");
-en: Select the name of your GeneWeb source file (ending with ".gw");
-es: Entre Ud el nombre completo de su fichero fuente GeneWeb (que termina en ".gw").
+en: Select the name of your %G source file (ending with ".gw");
+es: Entre Ud el nombre completo de su fichero fuente %G (que termina en ".gw").
 fr: Sélectionnnez votre fichier source %G (se terminant par ".gw"):
 it: Selezionate il vostro file sorgente %G (che finisce con ".gw"):
-lv: Ierakstiet pilnu GeneWeb resursdatnes nosaukumu (kas beidzas ar ".gw").
+lv: Ierakstiet pilnu %G resursdatnes nosaukumu (kas beidzas ar ".gw").
 sv: Skriv in det kompletta namnet för din %G källfil (den måste sluta med ".gw"):
 
     Select the options you want
@@ -2764,7 +2744,7 @@ aa: err_acc.htm
 de: Um dies zu ändern, bearbeite die Datei "%y" und ändere die Zeile, in der "<tt>%o</tt>" steht in "<tt>%a</tt>".
 en: To change that, edit the file named "%y" and change the line holding: "<tt>%o</tt>" into "<tt>%a</tt>".
 es: Para sobrepasar esta prohibición, edite Ud el fichero "%y" y remplace la linea que contiene "<tt>%o</tt>" por "<tt>%a</tt>".
-fi: Muuttaaksesi asetukset, muokkaa tiedostoa "%y" GeneWebin asennus- hakemistossa ja muuta rivi "<tt>%o</tt>" seuraavanlaiseksi "<tt>%a</tt>".
+fi: Muuttaaksesi asetukset, muokkaa tiedostoa "%y" in asennus- hakemistossa ja muuta rivi "<tt>%o</tt>" seuraavanlaiseksi "<tt>%a</tt>".
 fr: Pour outrepasser cet interdit, il faut éditer le fichier "%y" et remplacer la ligne contenant "<tt>%o</tt>" en "<tt>%a</tt>".
 it: Per aggirare questo divieto, bisogna editare il file "%y" e sostituire la linea contenente "<tt>%o</tt>" en "<tt>%a</tt>".
 lv: Pieejas iegûðanai jârediìç fails "%y" lînijâ, kas satur: "<tt>%o</tt>" jâieraksta "<tt>%a</tt>".
@@ -2804,23 +2784,23 @@ sv: För att veta vilket värde du ska skriva in för din dator, titta på utskr
 
     To restore a gw database, apply the creation from a GeneWeb source file.
 aa: save.htm
-de: Um eine gw Datenbank zu restaurieren, verwende die Funktion Datenbank aus GeneWeb-Quelldatei  erzeugen.
-en: To restore a gw database, apply the creation from a GeneWeb source file.
-es: Para restaurar una gw base de datos, aplique Ud. la creación a partir de un fichero fuente GeneWeb.
-fr: Pour restaurer une base de donnée au format gw appliquez la création à partir d’un fichier source GeneWeb.
-it: Per ripristinare il contenuto di una gw base di dati effettuate una creazione partendo da un file sorgente GeneWeb.
-lv: Lai atjaunotu datu bâzi, izmantojiet datu bâzes izveidoðanu no GeneWeb datnes.
-sv: För att återskapa en databas, använd importera en GeneWeb källfil.
+de: Um eine gw Datenbank zu restaurieren, verwende die Funktion Datenbank aus %G-Quelldatei  erzeugen.
+en: To restore a gw database, apply the creation from a %G source file.
+es: Para restaurar una gw base de datos, aplique Ud. la creación a partir de un fichero fuente %G.
+fr: Pour restaurer une base de donnée au format gw appliquez la création à partir d’un fichier source %G.
+it: Per ripristinare il contenuto di una gw base di dati effettuate una creazione partendo da un file sorgente %G.
+lv: Lai atjaunotu datu bâzi, izmantojiet datu bâzes izveidoðanu no %G datnes.
+sv: För att återskapa en databas, använd importera en %G källfil.
 
     To save your database, apply the extraction of a GeneWeb source file. Then copy the obtained file elsewhere in the disk, or better, on an external support.
 aa: save.htm
-de: Um deine Datenbank zu sichern, verwende die Extraktion einer  GeneWeb-Quelldatei. Dann kopiere die so erhaltene Datei irgendwo anders auf die Platte, oder, noch besser, auf ein externes Medium.
-en: To save your database, apply the extraction of a GeneWeb source file. Then copy the obtained file elsewhere in the disk, or better, on an external support.
-es: Para efectuar una copia de seguridad de su base de datos, aplique Ud. la extracción de un fichero fuente GeneWeb. Copie luego el fichero asi obtenido en alguna otra parte del disco duro, o mucho mejor en un soporte externo.
-fr: Pour sauvegarder votre base de données, appliquez l’extraction d’un fichier source GeneWeb. Puis copiez le fichier ainsi obtenu autre part sur le disque, ou mieux, sur un support externe.
-it: Per effettuare una copia di sicurezza della vostra base procedete  l'estrazione di un file sorgente GeneWeb. Poi copiate il file così ottenuto altrove sul disco, o meglio, su un supporto esterno.
-lv: Lai saglabâtu datu bâzi, izveidojiet GeneWeb datni. Tad to iekopçjiet droðâ vietâ.
-sv: För att spara din databas, använd exportera en GeneWeb källfil. Kopiera sedan den skapade filen någon annanstans på hårddisken, eller bättre, till en annat media.
+de: Um deine Datenbank zu sichern, verwende die Extraktion einer  %G-Quelldatei. Dann kopiere die so erhaltene Datei irgendwo anders auf die Platte, oder, noch besser, auf ein externes Medium.
+en: To save your database, apply the extraction of a %G source file. Then copy the obtained file elsewhere in the disk, or better, on an external support.
+es: Para efectuar una copia de seguridad de su base de datos, aplique Ud. la extracción de un fichero fuente %G. Copie luego el fichero asi obtenido en alguna otra parte del disco duro, o mucho mejor en un soporte externo.
+fr: Pour sauvegarder votre base de données, appliquez l’extraction d’un fichier source %G. Puis copiez le fichier ainsi obtenu autre part sur le disque, ou mieux, sur un support externe.
+it: Per effettuare una copia di sicurezza della vostra base procedete  l'estrazione di un file sorgente %G. Poi copiate il file così ottenuto altrove sul disco, o meglio, su un supporto esterno.
+lv: Lai saglabâtu datu bâzi, izveidojiet %G datni. Tad to iekopçjiet droðâ vietâ.
+sv: För att spara din databas, använd exportera en %G källfil. Kopiera sedan den skapade filen någon annanstans på hårddisken, eller bättre, till en annat media.
 
     To specify a background image for the database "%o", you have to write it:
 aa: backg.htm
@@ -3285,15 +3265,15 @@ sv: en GEDCOM källfil
 
     a GeneWeb source file
 aa: welcome.htm
-co: un schedariu di fonte GeneWeb
-de: eine GeneWeb-Quelldatei
-en: a GeneWeb source file
-es: un fichero fuente GeneWeb
-fi: GeneWeb lähdetiedosto
-fr: un fichier source GeneWeb
-it: un file sorgente GeneWeb
-lv: GeneWeb datni
-sv: en GeneWeb källfil
+co: un schedariu di fonte %G
+de: eine %G-Quelldatei
+en: a %G source file
+es: un fichero fuente %G
+fi: %G lähdetiedosto
+fr: un fichier source %G
+it: un file sorgente %G
+lv: %G datni
+sv: en %G källfil
 
     background color
 aa: gwf_1.htm
@@ -3384,15 +3364,15 @@ sv: från en GEDCOM källfil
 
     from a GeneWeb source file
 aa: welcome.htm
-co: à partesi d'un schedariu di fonte GeneWeb
-de: aus einer GeneWeb-Quelldatei
-en: from a GeneWeb source file
-es: a partir de un fichero fuente GeneWeb
-fi: GeneWeb lähdetiedostosta
-fr: à partir d’un fichier source GeneWeb
-it: partendo da un file sorgente GeneWeb
-lv: no GeneWeb datnes
-sv: från en GeneWeb källfil
+co: à partesi d'un schedariu di fonte %G
+de: aus einer %G-Quelldatei
+en: from a %G source file
+es: a partir de un fichero fuente %G
+fi: %G lähdetiedostosta
+fr: à partir d’un fichier source %G
+it: partendo da un file sorgente %G
+lv: no %G datnes
+sv: från en %G källfil
 
     help.
 aa: gwfix.htm
@@ -3467,8 +3447,8 @@ fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si l
 
     or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
 aa: gwc.htm
-en: or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
-fr: ou donnez directement le nom du ou des fichiers source GeneWeb en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
+en: or provide directly the name of the %G source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
+fr: ou donnez directement le nom du ou des fichiers source %G en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
 
     persons' NBDS.
 aa: gwfix.htm
