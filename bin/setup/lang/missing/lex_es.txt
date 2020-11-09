@@ -1,0 +1,595 @@
+    "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
+en: "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
+fr: L’option <i>first names enclosed</i> doit être suivie par une chaîne de deux caractères « be ». À la création d’une personne, si une partie de la chaîne prénom commence par le caractère 'b' et se termine par le caractère 'e', alors cette partie sera considérée comme le prénom usuel.<br> Exemples : <span  style="font-family: monospace">-fne "\\"</span> ou <span style="font-family: monospace"> -fne "()"</span>.
+es:
+
+    (do not enter the quotes "" in the input zone).
+en: (do not enter the quotes "" in the input zone).
+fr: (ne pas inclure les guilemets "" dans le champ de saisie).
+es:
+
+    (no selection is equivalent to select all).
+en: (no selection is equivalent to select all).
+fr: (aucune option est équivalent à les sélectionner toutes). 
+es:
+
+    , and overwrite the previous database "%o" of the target directory
+en: , and overwrite the previous database "%o" of the target directory
+fr:  et écraser la base "%o" du répertoire d’arrivée
+es:
+
+    ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
+en: ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
+fr: ../ vous permet de naviguer vers le dossier parent.<br> Dans le monde Windows, ceci ne vous permettra pas de changer la lettre du disque (C: -> D:), mais vous pouvez faire ce changement directement dans l'url dans le navigateur.
+es:
+
+    <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+es:
+
+    <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
+en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
+fr: <span style="color:#FF0000;">ATTENTION</span> : Le contenu du fichier %o sera écrasé.
+es:
+
+    <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
+en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
+fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
+es:
+
+    <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
+en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+es:
+
+    All connex components.
+en: All connex components.
+fr: Toutes les composantes connexes.
+es:
+
+    All your databases to be merged must be first under %G.
+en: All your databases to be merged must be first under %G.
+fr: Il faut d’abord que toutes vos bases à fusionner soient sous %G.
+es:
+
+    And the content of gwsetup.log
+en: And the content of gwsetup.log
+fr: Et le contenu de gwsetup.log
+es:
+
+    Ask for deleting branches whose size <= that value.
+en: Ask for deleting branches whose size <= that value.
+fr: Demander à détruire les composantes de taille <= à cette valeur.
+es:
+
+    Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.
+en: Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.
+fr: Demande d’indiquer les mises à jour dans la page d’accueil sous le lien "historique des mises à jour". <p> Remarque (technique): les traces des mises à jour sont sauvées dans un fichier de nom "history" dans le répertoire de la base de donnée (%a.gwb). Ce fichier grossit indéfiniment. Si vous voulez effacer les anciennes traces, il faut éditer ce fichier pour les supprimer. Ou vous pouvez aussi supprimer le fichier pour repartir à vide.
+es:
+
+    By looking at the terminal window if you have not asked for result redirection.
+en: By looking at the terminal window if you have not asked for result redirection.
+fr: En regardant dans la fenêtre qui s'est ouverte si vous n'avez pas demandé de redirection des résultats.
+es:
+
+    By origin file.
+en: By origin file.
+fr: D'après le fichier origine.
+es:
+
+    cancel
+en: Cancel
+fr: Annuler
+es:
+
+    Checks descendants (default).
+en: Checks descendants (default).
+fr: Vérifier les descendants (par défaut).
+es:
+
+    Checks descendants of all ascendants.
+en: Checks descendants of all ascendants.
+fr: Vérifier tous les descendants des ascendants.
+es:
+
+    Compare
+en: Compare
+fr: Comparer
+es:
+
+    Compute connected componants
+en: Compute connected componants
+fr: Calcule les composantes connexes
+es:
+
+    Compute the difference between two bases
+en: Compute the difference between two bases
+fr: Calcule la différence entre deux bases
+es:
+
+    Connected components identified
+en: Connected components identified
+fr: Calcul des composantes connexes exécuté
+es:
+
+    Connex
+en: Connex
+fr: Connex
+es:
+
+    Content of result file
+en: Content of result file
+fr: Contenu du fichier résultat
+es:
+
+    Default source
+en: Default source
+fr: Source par défaut
+es:
+
+    Delete database if already existing.
+en: Delete database if already existing.
+fr: Détruire la base pré-existante.
+es:
+
+    Details for this length.
+en: Details for this length.
+fr: Fournir détails pour cette taille.
+es:
+
+    Differences computed
+en: Differences computed
+fr: Différence calculée
+es:
+
+    Display in
+en: Display in
+fr: Afficher en
+es:
+
+    do not commit changes (only traces).
+en: do not commit changes (only traces).
+fr: ne pas effectuer les changements (traces seules).
+es:
+
+    Do not extract notes.
+en: Do not extract notes.
+fr: Ne pas extraire les notes.
+es:
+
+    Do not extract spouses' parents (for options -s and -d).
+en: Do not extract spouses' parents (for options -s and -d).
+fr: Ne pas extraire les parents des époux (pour les options -s et -d).
+es:
+
+    Don't extract individual picture.
+en: Don't extract individual picture.
+fr: Ne pas extraire d’images individuelles.
+es:
+
+    Done. The operation is terminated.
+en: Done. The operation is terminated.
+fr: L’opération est terminée.
+es:
+
+    Dont extract individual pictures (portraits).
+en: Dont extract individual pictures (portraits).
+fr: Ne pas extraire les images individuelles (portraits).
+es:
+
+    Extract ancestors with siblings of
+en: Extract ancestors with siblings of
+fr: Extraire les ancêtres avec fratries de
+es:
+
+    Extract individual pictures path (portraits).
+en: Extract individual pictures path (portraits).
+fr: Extraire le chemin des images individuelles (portraits).
+es:
+
+    extract surname (usable several times).
+en: Extract surname (usable several times).
+fr: Extraire un nom de famille (utilisable plusieurs fois).
+es:
+
+    families' children.
+en: families' children.
+fr: families' children.
+es:
+
+    families' parents.
+en: families' parents.
+fr: families' parents.
+es:
+
+    fast mode. Needs more memory
+en: fast mode. Needs more memory
+fr: mode rapide. Nécessite plus de mémoire.
+es:
+
+    fevents' witnesses.
+en: fevents' witnesses.
+fr: fevents' witnesses.
+es:
+
+    Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
+en: Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
+fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br> Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier %o ou vers comm.log. Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
+es:
+
+    Fix base
+en: Fix base
+fr: Fix base
+es:
+
+    Fix base and recompute index
+en: Fix base and recompute index
+fr: Corrige une base et reclacule l'index
+es:
+
+    Fixes problems in a base
+en: Fixes problems in a base
+fr: Corrige les problèmes d'une base
+es:
+
+    Force relation status to "NoMention" (default is "Married").
+en: Force relation status to "NoMention" (default is "Married").
+fr: Marquer les relations comme « Sans mention » (par défaut « Mariés »).
+es:
+
+    Go to your Web browser and open one of the following addresses:
+en: Go to your Web browser and open one of the following addresses:
+fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
+es:
+
+    Gwfixbase messages
+en: Gwfixbase messages
+fr: Messages gwfixbase
+es:
+
+    help.
+en: help.
+fr: help.
+es:
+
+    Hide advanced request.
+en: Hide advanced request.
+fr: Cacher la requête évoluée.
+es:
+
+    Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.
+en: Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.
+fr: Cache les noms des personnes privées, c’est-à-dire les personnes vivantes, ou plus exactement, celles de moins de 100 ans.
+es:
+
+    Hide the private person's names.
+en: Hide the private person's names.
+fr: Cacher les noms des personnes privées.
+es:
+
+    History of updates
+en: History of updates
+fr: Historique des mises à jour
+es:
+
+    If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.
+en: If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.
+fr: Si vous désirez que vos images ne soient pas installées dans l’endroit standard (répertoire des bases, sous-répertoire "images", sous-sous-répertoire "%a"), indiquez ici le chemin d’accès au répertoire que vous voulez utiliser. Ce chemin d’accès est une URL : si c’est un site Web, il doit commencer par <tt>http://</tt>, si c’est un répertoire local, il doit commencer par <tt>file://</tt>. <p> Cela ne concerne que les images qui sont indiquées dans le formulaire des personnes, champ "image". Cela ne concerne pas les images installées par le lien "envoyer images" qui, elles, sont installées avec un nom standard dans le répertoire standard.
+es:
+
+    If it is not the case, if, for example, some of them are just GEDCOM files or GeneWeb source files, return to the main menu to create them under %G, then go back to this page.
+en: If it is not the case, if, for example, some of them are just GEDCOM files or %G source files, return to the main menu to create them under %G, then go back to this page.
+fr: Si ce n’est pas le cas, si, par exemple, certaines d’entre elles sont sous forme GEDCOM ou fichiers source %G, revenez au menu principal pour les créer sous %G, puis revenez à cette page.
+es:
+
+    If you just made this, it is probably its result, and therefore it is not important. Else, return to the previous page and choose another name for your database.
+en: If you just made this, it is probably its result, and therefore it is not important. Else, return to the previous page and choose another name for your database.
+fr: Si vous venez déjà de faire cette manipulation, il s’agit probablement de son résultat, ce n’est donc pas grave. Sinon, revenez en arrière et choisissez un autre nom pour votre base.
+es:
+
+    Ignore this file.
+en: Ignore this file.
+fr: Ignorer ce fichier.
+es:
+
+    Images path
+en: Images path
+fr: Chemin d’accès aux images
+es:
+
+    In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
+en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
+fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
+es:
+
+    index. Automatically enabled by any other option
+en: index. Automatically enabled by any other option
+fr: index. Activé automatiquement par les autres options
+es:
+
+    Indicate the name you want to give to your resulting database:
+en: Indicate the name you want to give to your resulting database:
+fr: Indiquez le nom que vous voulez donner à votre base de données résultante:
+es:
+
+    Listing connected components
+en: Listing connected components
+fr: Liste des composantes connexes
+es:
+
+    Look at the traces, may be you can find an explanation.
+en: Look at the traces, may be you can find an explanation.
+fr: Consultez les traces, vous y trouverez probablement une explication.
+es:
+
+    marriage divorce.
+en: marriage divorce.
+fr: marriage divorce.
+es:
+
+    Maximum level when displaying ancestors by tree.
+en: Maximum level when displaying ancestors by tree.
+fr: Niveau maximum dans l’affichage des ascendants par arbre.
+es:
+
+    Maximum level when displaying ancestors.
+en: Maximum level when displaying ancestors.
+fr: Niveau maximum dans l’affichage des ascendants.
+es:
+
+    Maximum level when displaying descendants by tree.
+en: Maximum level when displaying descendants by tree.
+fr: Niveau maximum dans l’affichage des descendants par arbre.
+es:
+
+    Maximum level when displaying descendants.
+en: Maximum level when displaying descendants.
+fr: Niveau maximum dans l’affichage des descendants.
+es:
+
+    Merge
+en: Merge
+fr: Fusionner
+es:
+
+    Merging databases
+en: Merging databases
+fr: Fusion de bases de données
+es:
+
+    Merging with other databases
+en: Merging with other databases
+fr: Fusion de généalogies
+es:
+
+    name
+en: name
+fr: nom
+es:
+
+    No consistency check.
+en: No consistency check.
+fr: Ne pas contrôler la cohérence des données.
+es:
+
+    No redirection of results.
+en: No redirection of results.
+fr: Pas de redirection des résultats.
+es:
+
+    Not public even if titles (see -epn option).
+en: Not public even if titles (see -epn option).
+fr: Ne pas considérer comme public si un titre a été détecté (voir option -epn).
+es:
+
+    Note
+en: Note
+fr: Note
+es:
+
+    Once done, select the databases you want to merge by pushing their associated buttons:
+en: Once done, select the databases you want to merge by pushing their associated buttons:
+fr: Une fois fait, sélectionnez les bases que vous voulez fusionner en cliquant sur leur bouton associé:
+es:
+
+    or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
+en: or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
+fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>, alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
+es:
+
+    or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
+en: or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.
+fr: ou donnez directement le nom du ou des fichiers source GeneWeb en complément du chemin ci-dessus.<br> Si ce paramètre contient le caractère '*', il sera impératif de fournir un nom unique pour la base qui sera créée.
+es:
+
+    Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
+en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
+fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
+es:
+
+    Output results to this file.
+en: Output results to this file.
+fr: Rediriger les résultats vers ce fichier.
+es:
+
+    persons' families.
+en: persons' families.
+fr: persons' families.
+es:
+
+    persons' NBDS.
+en: persons' NBDS.
+fr: persons' NBDS.
+es:
+
+    persons' parents.
+en: persons' parents.
+fr: persons' parents.
+es:
+
+    pevents' witnesses.
+en: pevents' witnesses.
+fr: pevents' witnesses.
+es:
+
+    Produce connected components statistics.
+en: Produce connected components statistics.
+fr: Afficher les statistiques sur les composantes connexes.
+es:
+
+    Push the button below to create your database
+en: Push the button below to create your database
+fr: Appuyez sur le bouton ci-dessous pour créer votre base de données
+es:
+
+    Put untreated GEDCOM tags in notes.
+en: Put untreated GEDCOM tags in notes.
+fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
+es:
+
+    quiet mode.
+en: quiet mode.
+fr: peu de traces.
+es:
+
+    Read the alert messages in the file "comm.log"
+en: Read the alert messages in the file "comm.log"
+fr: Consulter les messages d’alerte dans le fichier "comm.log"
+es:
+
+    Remark: merging consists on simple concatenation of the databases. There is no research for identical persons. After merging, you therefore have to research the possible doubled persons or families and merge them. See the documentation.
+en: Remark: merging consists on simple concatenation of the databases. There is no research for identical persons. After merging, you therefore have to research the possible doubled persons or families and merge them. See the documentation.
+fr: Remarque : la fusion consiste en la simple concaténation des bases de données. Il n’y a pas de recherche de personnes identiques. Après la fusion, il faudra donc rechercher les éventuelles personnes et familles en double et les fusionner. Voir la documentation.
+es:
+
+    Remark: this operation can answer in the twinkling of a eye or take some tenths of seconds or some minutes, depending on the cases. Be patient.
+en: Remark: this operation can answer in the twinkling of a eye or take some tenths of seconds or some minutes, depending on the cases. Be patient.
+fr: Remarque : cette opération peut s’effectuer en un clin d’oeil ou prendre quelques dizaines de secondes ou quelques minutes, suivant les cas. Soyez patient.
+es:
+
+    Restrict deleting branches whose size = -del.
+en: Restrict deleting branches whose size = -del.
+fr: Limite la suppression aux branches de taille = -del.
+es:
+
+    Select the source file or navigate in your folders.
+en: Select the source file or navigate in your folders.
+fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
+es:
+
+    Select the source file or navigate in your foldres.
+en: Select the source file or navigate in your foldres.
+fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
+es:
+
+    Select your first database
+en: Select your first database
+fr: Sélectionnez la première base de données 
+es:
+
+    Select your second database
+en: Select your second database
+fr: Sélectionnez la seconde base de données
+es:
+
+    Specifiy the number of branches to be deleted.
+en: Specifiy the number of branches to be deleted.
+fr: Définit le nombre de branches à supprimer.
+es:
+
+    Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+en: Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+fr: Personne racine dans la première base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
+es:
+
+    Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+en: Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
+fr: Personne racine dans la seconde base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
+es:
+
+    The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.
+en: The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.
+fr: La requête évoluée permet de faire des recherches avec critères sur la base. Comme elle est très incomplète, elle est cachée par défaut. Sélectionnez "non" ci-dessous pour la remettre.
+es:
+
+    Then push this button
+en: Then push this button
+fr: Puis appuyez sur ce bouton
+es:
+
+    Under MSdos
+en: Under MSdos
+fr: Sous MSdos
+es:
+
+    Under Unix
+en: Under Unix
+fr: Sous Unix
+es:
+
+    Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
+en: Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
+fr: En utilisant <b>gwd</b> pour visualiser le fichier dans le dossier NOTES où vous avez redirigé les résultats (%a.gwb/notes_d/connex.txt).<br> Vous y verrez la dernière version du fichier connex.txt que vous avez créé à cet endroit (qui n'est pas nécessairement celle que vous venez de calculer - voir l'horodateur en tête de fichier).<br> Cette solution vous permet de suivre les liens vers les personnes désignées.
+es:
+
+    Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
+en: Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
+fr: En utilisant <b>gwsetup</b> pour visualiser le fichier vers lequel ont été envoyés les résultats ("%K").
+es:
+
+    very quiet mode.
+en: very quiet mode.
+fr: pas de traces du tout.
+es:
+
+    Warning: for this program to work, you must not close this window!
+en: Warning: for this program to work, you must not close this window!
+fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette fenetre!
+es:
+
+    Warning: there already exists a database with the name "%o" in your directory. If you push the button "Ok" below, it will be erased.
+en: <b>Warning</b>: there already exists a database with the name "%o" in your directory. If you push the button "Ok" below, it will be erased.
+fr: <b>Attention</b> : il existe déjà une base de nom "%o" dans votre répertoire. Si vous appuyez sur le bouton "Ok" ci-dessous, cela va l’effacer.
+es:
+
+    We are going to create a database named "%o" from the following databases:
+en: We are going to create a database named "%o" from the following databases:
+fr: Nous allonc créer une base de nom "%o" à partir des bases suivantes:
+es:
+
+    When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
+en: When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
+fr: Quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br> si elle est "publique". La censure s’applique aux époux et descendants. 
+es:
+
+    When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.
+en: When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.
+fr: Quand on affiche les ascendants par arbre, limite le nombre de générations affichables. C’est 7 par défaut, mais vous pouvez indiquer une valeur différente ici.
+es:
+
+    When ancestors are displayed, limit the number of displayed generations. By default, it is 8 generations, but you can indicate a different value here.
+en: When ancestors are displayed, limit the number of displayed generations. By default, it is 8 generations, but you can indicate a different value here.
+fr: Quand on affiche les ascendants, limite le nombre de générations affichables. C’est 8 par défaut, mais vous pouvez indiquer une valeur différente ici.
+es:
+
+    When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.
+en: When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.
+fr: Quand on affiche les descendants par arbre, limite le nombre de générations affichables. C’est 4 par défaut, mais vous pouvez indiquer une valeur différente ici.
+es:
+
+    When descendants are displayed, limit the number of displayed generations. By default, it is 12 generations, but you can indicate a different value here.
+en: When descendants are displayed, limit the number of displayed generations. By default, it is 12 generations, but you can indicate a different value here.
+fr: Quand on affiche les descendants, limite le nombre de générations affichables. C’est 12 par défaut, mais vous pouvez indiquer une valeur différente ici.
+es:
+
+    Years
+en: Years
+fr: Années
+es:
+
+    You may observe results through two means
+en: You may observe results through two means
+fr: Vous pouvez consulter les résultats de deux façons différentes
+es:
+

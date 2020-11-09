@@ -1,0 +1,1758 @@
+    !dir
+lv:
+
+    %d %s starting with %s
+en: %d %s starting with “%s”
+fr: %d %s commençant par « %s »
+lv:
+
+    %s and %s have several unions
+en: %s and %s have several unions
+fr: il y a plusieurs unions entre %s et %s
+lv:
+
+    %s forbidden char
+en: invalid character (%s) used in surname/first name
+fr: caractères interdits (%s) dans le patronyme/prénom
+lv:
+
+    %s modified
+en: %s modified
+fr: %s modifié
+lv:
+
+    %t was witness after his/her death
+en: %t was a witness after their death
+fr: %t était témoin après sa mort
+lv:
+
+    %t was witness before his/her birth
+en: %t was a witness before their birth
+fr: %t était témoin avant sa naissance
+lv:
+
+    %t witnessed the %s after his/her death
+en: %t was a witness at a %s after their own death
+fr: %t a été témoin de %s après sa mort
+lv:
+
+    %t witnessed the %s before his/her birth
+en: %t was a witness at a %s before their own birth
+fr: %t a été témoin de %s avant sa naissance
+lv:
+
+    %t's %s before his/her %s
+en: %t: %s before their %s
+fr: %t : %s avant son/sa %s
+lv:
+
+    a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
+en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
+fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
+lv:
+
+    a child-in-law/children-in-law
+en: one child-in-law/children-in-law
+fr: un bel-enfant/beaux-enfants
+lv:
+
+    a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
+en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
+fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
+lv:
+
+    a half sibling-in-law/half siblings-in-law
+en: one half sibling-in-law/half siblings-in-law
+fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
+lv:
+
+    a sibling-in-law/siblings-in-law
+en: one sibling-in-law/siblings-in-law
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
+lv:
+
+    a stepchild/stepchildren
+en: a stepchild/stepchildren
+fr: un bel-enfant/beaux-enfants
+lv:
+
+    a stepson/stepsons/a stepdaughter/stepdaughters
+en: one stepson/stepsons/one stepdaughter/stepdaughters
+fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
+lv:
+
+    accomplishment
+en: Accomplishment
+fr: accomplissement
+lv:
+
+    acquisition
+en: Acquisition
+fr: acquisition
+lv:
+
+    activate/suppress
+en: activate/suppress
+fr: activer/supprimer
+lv:
+
+    add the previous name as a first name alias
+en: add the previous name as a first name alias
+fr: ajouter le nom précédent comme un alias de prénom
+lv:
+
+    add the previous name as a surname alias
+en: add the previous name as a surname alias
+fr: ajouter le nom précédent comme un alias de nom
+lv:
+
+    adhesion
+en: Membership
+fr: adhésion
+lv:
+
+    age at %s birth date
+en: age at birth of %s
+fr: âge à la naissance de %s
+lv:
+
+    annulation
+en: Annulment
+fr: annulation
+lv:
+
+    any individual in the base
+en: any individual in the base
+fr: un individu de la base
+lv:
+
+    area code
+en: Code
+fr: Code Ville
+lv:
+
+    ascendants tree
+en: ascending tree
+fr: arbre d’ascendance
+lv:
+
+    available genealogies
+en: list of available genealogies (use gwsetup)
+fr: listes des généalogies disponibles (utilise gwsetup)
+lv:
+
+    baptism place
+en: place of baptism
+fr: lieu de baptême
+lv:
+
+    baptism src
+en: source of baptism
+fr: source de baptême
+lv:
+
+    baptismLDS
+en: baptism (LDS)
+fr: baptême LDS
+lv:
+
+    bar mitzvah
+en: Bar Mitzvah
+fr: bar mitzvah
+lv:
+
+    base
+en: base
+fr: base
+lv:
+
+    bat mitzvah
+en: Bat Mitzvah
+fr: bat mitzvah
+lv:
+
+    benediction
+en: Blessing
+fr: bénédiction
+lv:
+
+    bibliography
+en: bibliography
+fr: bibliographie
+lv:
+
+    birth date and birth place
+en: Date & Place of birth
+fr: date et lieu de naissance
+lv:
+
+    birth place
+en: place of birth
+fr: lieu de naissance
+lv:
+
+    birth src
+en: Source of birth
+fr: source naissance
+lv:
+
+    book of %s
+en: book of %s
+fr: dictionnaire des %s
+lv:
+
+    book of ascendants
+en: Ancestry Book
+fr: livre d’ascendance
+lv:
+
+    books
+en: books
+fr: dictionnaires
+lv:
+
+    both
+en: both
+fr: les deux
+lv:
+
+    brothers/sisters/siblings
+en: brothers/sisters/siblings
+fr: frères/sœurs/frères et sœurs
+lv:
+
+    burial place
+en: place of burial
+fr: lieu d’inhumation
+lv:
+
+    burial src
+en: source of burial
+fr: source inhumation
+lv:
+
+    by
+en: by
+fr: par
+lv:
+
+    by couple
+en: by couple
+fr: par couple
+lv:
+
+    celebrities
+en: Famous people
+fr: Personnes célèbres
+lv:
+
+    change name
+en: Change of Name
+fr: changement de nom
+lv:
+
+    changed order of family's events
+en: change order of family events
+fr: changement de l’ordre des événements familiaux
+lv:
+
+    changed order of marriages
+en: Ordering of marriages has been changed
+fr: changement de l’ordre des unions
+lv:
+
+    changed order of person's events
+en: change order of individual events
+fr: changement de l’ordre des événements individu
+lv:
+
+    choose a genealogy
+en: choose a genealogy
+fr: choisir une généalogie
+lv:
+
+    circumcision
+en: Circumcision
+fr: circoncision
+lv:
+
+    close family
+en: a parent
+fr: un proche
+lv:
+
+    collapse implex
+en: collapse implex
+fr: réduire les implexes
+lv:
+
+    compact tree
+en: compact tree
+fr: arbre compact
+lv:
+
+    compare
+en: Compare
+fr: comparer
+lv:
+
+    compare selected revisions
+en: View revision history
+fr: comparer les révisions sélectionnées
+lv:
+
+    compiled on %s from commit %s
+en: compiled on %s from commit %s
+fr: compilé le %s à partir du commit %s
+lv:
+
+    compute all marriages
+en: Include spouses
+fr: inclure tous les conjoints
+lv:
+
+    compute approximatives dates
+en: Include unsure dates
+fr: prendre en compte les dates approximatives
+lv:
+
+    confirmation
+en: Confirmation
+fr: confirmation
+lv:
+
+    confirmation LDS
+en: Confirmation (LDS)
+fr: confirmation LDS
+lv:
+
+    copy link
+en: copy the link to the clipboard
+fr: copier le lien dans le presse-papier
+lv:
+
+    country
+en: Country
+fr: Pays
+lv:
+
+    county
+en: County
+fr: Sous-Région
+lv:
+
+    couples
+en: couples
+fr: couples
+lv:
+
+    cremation
+en: Cremation
+fr: crémation
+lv:
+
+    custom event
+en: custom event
+fr: événement personnalisé
+lv:
+
+    d'Aboville
+en: d'Aboville
+fr: d’Aboville
+lv:
+
+    dag
+en: fusion implexes
+fr: fusionner les implexes
+lv:
+
+    dag on/dag off
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
+lv:
+
+    date begin
+en: From
+fr: date de début
+lv:
+
+    date end
+en: To
+fr: date de fin
+lv:
+
+    date of baptism
+en: date of baptism
+fr: date du baptême
+lv:
+
+    date of birth
+en: date of birth
+fr: date de naissance
+lv:
+
+    date of burial
+en: date of burial
+fr: date de la sépulture
+lv:
+
+    date of death
+en: date of death
+fr: date de décès
+lv:
+
+    date of marriage
+en: date of marriage
+fr: date de l’union
+lv:
+
+    dd/mm/yyyy
+en: DD/MM/YYYY
+fr: JJ/MM/AAAA
+lv:
+
+    death date and death place
+en: Date & Place of death
+fr: date et lieu de décès
+lv:
+
+    death place
+en: place of death
+fr: lieu de décès
+lv:
+
+    death src
+en: Source of death
+fr: source décès
+lv:
+
+    decoration
+en: Medal
+fr: décoration
+lv:
+
+    degree of kinship
+en: degree of kinship
+fr: degré de parenté
+lv:
+
+    demobilisationMilitaire
+en: Demobilization
+fr: démobilisation militaire
+lv:
+
+    descendant tree view
+en: descendant tree view
+fr: arborescence descendante
+lv:
+
+    descendants at the generation
+en: list by name
+fr: descendants à la génération...
+lv:
+
+    descendants tree
+en: descendants tree
+fr: arbre de descendance
+lv:
+
+    died at an advanced age
+en: Deceased of old age
+fr: est décédé à un âge avancé/est décédée à un âge avancé/est décédé(e) à un âge avancé
+lv:
+
+    difference between the two revisions
+en: difference between the revisions
+fr: différence entre les révisions
+lv:
+
+    diploma
+en: Diploma
+fr: certificat
+lv:
+
+    direct ancestor of %s
+en: direct ancestor of %s
+fr: ancêtre direct de %s
+lv:
+
+    display Aboville number
+en: Display d’Aboville number
+fr: afficher la numérotation d’Aboville
+lv:
+
+    display border tree
+en: display frame
+fr: afficher les bordures
+lv:
+
+    display by/branch/alphabetic order
+en: display by/line/alphabetical order
+fr: affichage par/branches/ordre alphabétique
+lv:
+
+    display empty picture
+en: Display picture
+fr: toujours afficher les images
+lv:
+
+    display generation
+en: display the generations
+fr: afficher les générations
+lv:
+
+    display implex
+en: display implex
+fr: afficher les implexes
+lv:
+
+    display marriage date
+en: display marriage date
+fr: afficher la date de mariage
+lv:
+
+    display notes/sources inline
+en: Add notes & sources
+fr: inclure les notes/sources au contenu
+lv:
+
+    display picture
+en: display family picture
+fr: afficher les images
+lv:
+
+    display smallest sosa number relative to ancestor
+en: display pedigree collapse
+fr: afficher les implexes
+lv:
+
+    display spouse
+en: display spouse
+fr: afficher conjoint
+lv:
+
+    display this marriage in this order
+en: Change order of marriage
+fr: placer cette union en position
+lv:
+
+    distinction
+en: Rank
+fr: distinction
+lv:
+
+    divorce event
+en: Divorce
+fr: divorce
+lv:
+
+    do not
+en: do not
+fr: ne pas
+lv:
+
+    dotation
+en: Endowment
+fr: dotation
+lv:
+
+    dotationLDS
+en: Endowment (LDS)
+fr: dotation LDS
+lv:
+
+    edit tree
+en: edit the graph
+fr: éditer le graphe
+lv:
+
+    education
+en: Education
+fr: éducation
+lv:
+
+    election
+en: Election
+fr: élection
+lv:
+
+    emigration
+en: Emigration
+fr: émigration
+lv:
+
+    engage event
+en: Engagement
+fr: fiançailles
+lv:
+
+    event/events
+en: event/events
+fr: événement/événements
+lv:
+
+    events to which %s was witness
+en: events to which %s was witness
+fr: évènements auxquels %s était témoin
+lv:
+
+    events tree
+en: tree of events
+fr: arbre des événements
+lv:
+
+    excommunication
+en: Excommunication
+fr: excommunication
+lv:
+
+    family birthday
+en: family birthday
+fr: anniversaires des proches
+lv:
+
+    family history
+en: family History
+fr: autour de l’arbre
+lv:
+
+    family source
+en: Source
+fr: source famille
+lv:
+
+    family time line
+en: time line of the family
+fr: chronologie de la famille
+lv:
+
+    familyLinkLDS
+en: Family Link (LDS)
+fr: lien parental LDS
+lv:
+
+    father-in-law/mother-in-law
+en: father-in-law/mother-in-law
+fr: beau-père/belle-mère
+lv:
+
+    field required
+en: Required
+fr: saisie obligatoire
+lv:
+
+    firstCommunion
+en: First Communion
+fr: première communion
+lv:
+
+    font size
+en: font size
+fr: taille de police
+lv:
+
+    full tree
+en: full tree
+fr: arbre complet
+lv:
+
+    full width/columns
+en: full width display/columns display
+fr: affichage pleine largeur/affichage sur deux colonnes
+lv:
+
+    funeral
+en: Funeral
+fr: funérailles
+lv:
+
+    godparent
+en: godparent
+fr: parrain ou marraine
+lv:
+
+    graduate
+en: Graduation
+fr: diplôme
+lv:
+
+    h7-tree
+en: 7 generation H tree
+fr: arbre en H 7 générations
+lv:
+
+    half siblings
+en: half-siblings
+fr: demi-frères et sœurs
+lv:
+
+    half-brothers/half-sisters/half-siblings
+en: half-brothers/half-sisters/half-siblings
+fr: demi-frères/demi-sœurs/demi-frères et sœurs
+lv:
+
+    half-siblings
+en: half-siblings
+fr: demi-fratrie
+lv:
+
+    happy birthday to them!
+en: happy birthday to them!
+fr: bon anniversaire !
+lv:
+
+    having a family
+en: Spouse and children are known
+fr: ayant une famille
+lv:
+
+    having no family
+en: Spouse and children are unknown
+fr: n’ayant pas de famille
+lv:
+
+    help modify data
+en: Be carefull. Modifications that are made in the “book” update the corresponding element in the entire database.
+fr: Attention ! Les corrections dans le dictionnaire modifient l’ensemble des données correspondantes dans la base.
+lv:
+
+    help surname branch
+en: click a number to view family tree
+fr: pour obtenir l’arbre des branches patronymiques, cliquez sur le nombre de branches
+lv:
+
+    hide portraits
+en: hide portraits
+fr: ne pas afficher les portraits
+lv:
+
+    his/her
+en: his/her
+fr: son/sa
+lv:
+
+    history
+en: History
+fr: historique
+lv:
+
+    home
+en: home
+fr: accueil
+lv:
+
+    horizontal tree
+en: horizontal tree
+fr: arborescence ascendante
+lv:
+
+    hospitalisation
+en: Hospitalization
+fr: hospitalisation
+lv:
+
+    htree
+en: H-Tree
+fr: arbre en H
+lv:
+
+    iftitles/public/private
+en: If titles/Public/Private
+fr: si titres/public/privé
+lv:
+
+    ignore implex
+en: ignore implex
+fr: ignorer les implexes
+lv:
+
+    illness
+en: Disease
+fr: maladie
+lv:
+
+    immigration
+en: Immigration
+fr: immigration
+lv:
+
+    implex links
+en: link implexes
+fr: relier les implexes
+lv:
+
+    implex/implexes
+en: implex/implexes
+fr: implexe/implexes
+lv:
+
+    in (place)
+en: in
+fr: à
+lv:
+
+    individual notes
+en: individual note
+fr: notes individuelles
+lv:
+
+    inline chronology
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
+lv:
+
+    input database
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
+lv:
+
+    insufficient revision history for %s
+en: No history found for %s
+fr: l’historique des révisions de %s est insuffisant pour réaliser des comparaisons
+lv:
+
+    intermediate revisions not shown
+en: intermediate revisions not shown
+fr: révisions intermédiaires masquées
+lv:
+
+    is a very old parent
+en: is old
+fr: est vraiment un parent très âgé
+lv:
+
+    itree
+en: I-Tree
+fr: arbre en I
+lv:
+
+    label
+en: label
+fr: étiquette
+lv:
+
+    last diff
+en: last revision
+fr: dernière révision
+lv:
+
+    last sosa level not navigable
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
+lv:
+
+    link back to parents
+en: link back to parents
+fr: lien retour vers les parents
+lv:
+
+    link to children
+en: link to children
+fr: lien vers les enfants
+lv:
+
+    link to use
+en: link to use
+fr: lien à utiliser
+lv:
+
+    list eclair
+en: list by name, place & date
+fr: liste-éclair
+lv:
+
+    listePassenger
+en: Passenger List
+fr: liste des passagers
+lv:
+
+    lists and charts
+en: Charts and Lists
+fr: arbres, listes et états
+lv:
+
+    lists of books
+en: lists of books
+fr: liste des dictionnaires
+lv:
+
+    living after %s
+en: lived after %s
+fr: vivant après %s
+lv:
+
+    living before %s
+en: lived before %s
+fr: vivant avant %s
+lv:
+
+    living between %s and %s
+en: lived from %s to %s
+fr: vivant de %s à %s
+lv:
+
+    living from/to
+en: lived from/to
+fr: vivant de/à
+lv:
+
+    looking for
+en: Check
+fr: éléments à rechercher
+lv:
+
+    male/female/neuter
+en: male/female/neuter&#047;unknown
+fr: homme/femme/neutre&#047;inconnu
+lv:
+
+    marriage bann
+en: marriage bann
+fr: bans de mariage
+lv:
+
+    marriage banns%t to
+en: marriage banns%t with
+fr: bans de mariage%t avec
+lv:
+
+    marriage contract
+en: marriage contract
+fr: contrat de mariage
+lv:
+
+    marriage contract%t with
+en: marriage contract%t with
+fr: contrat de mariage%t avec
+lv:
+
+    marriage date
+en: date of marriage
+fr: date de l’union
+lv:
+
+    marriage event
+en: marriage
+fr: mariage
+lv:
+
+    marriage licence
+en: Marriage License
+fr: licence de mariage
+lv:
+
+    marriage notes/marriages notes
+en: marriage notes/marriages notes
+fr: notes concernant l’union/notes concernant les unions
+lv:
+
+    marriage place
+en: place of marriage
+fr: lieu de l’union
+lv:
+
+    marriage src
+en: Source of marriage
+fr: source mariage
+lv:
+
+    marriage with
+en: marriage with
+fr: union avec
+lv:
+
+    maternal grand-parents
+en: Mother's parents
+fr: grands-parents maternels
+lv:
+
+    militaryDistinction
+en: Military Decoration
+fr: distinction militaire
+lv:
+
+    militaryPromotion
+en: Military Promotion
+fr: promotion militaire
+lv:
+
+    militaryService
+en: Conscription
+fr: service militaire
+lv:
+
+    miscellaneous
+en: Misc
+fr: divers
+lv:
+
+    miscellaneous information
+en: other field
+fr: champs divers
+lv:
+
+    missing %s
+en: missing %s
+fr: %s manquant
+lv:
+
+    missing date
+en: no date
+fr: sans date
+lv:
+
+    missing events
+en: missing events
+fr: événements manquants
+lv:
+
+    missing image
+en: missing image
+fr: image manquante
+lv:
+
+    missing parents
+en: Parents unknown
+fr: parents manquants
+lv:
+
+    missing sosa
+en: missing Sosa numbers
+fr: Sosa manquants
+lv:
+
+    missing sources
+en: missing sources
+fr: sources manquantes
+lv:
+
+    missing spouse
+en: Spouse unknown
+fr: conjoint manquant
+lv:
+
+    mobilisationMilitaire
+en: Mobilization
+fr: mobilisation militaire
+lv:
+
+    modification successful
+en: Successfully updated
+fr: modification effectuée
+lv:
+
+    modification/modifications
+en: update/updates
+fr: modification/modifications
+lv:
+
+    modify family %s event order
+en: permute the events of family %s
+fr: permuter les événements de la famille %s
+lv:
+
+    modify person event order
+en: permute personnal events
+fr: permuter les événéments individuels
+lv:
+
+    module
+en: module/modules
+fr: module/modules
+lv:
+
+    move up/down
+en: move up/move down/move up cursor/move down cursor
+fr: remonter/descendre/remonter le curseur/descendre le curseur
+lv:
+
+    msg error disconnected
+en: sorry, you can add only families connected to the rest.<br />This restriction has been added by this database owner.
+fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br />Cette restriction a été ajoutée par le propriétaire de cette base de données.
+lv:
+
+    mtree
+en: 9 generations H tree
+fr: arbre en H 9 générations
+lv:
+
+    multi relations graph
+en: multi relations graph
+fr: graphe de relations multiples
+lv:
+
+    n (number)
+en: none/one/two/three/four/five/six/seven/eight/nine/ten/eleven/twelve/thirteen/fourteen/fifteen/sixteen/seventeen/eighteen/nineteen/twenty/twenty-one/twenty-two/twenty-two//twenty-three//twenty-four//twenty-five//twenty-six//twenty-seven//twenty-eight//twenty-nine/thirty/thirty-one
+fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/quartorze/quinze/seize/dix-sept/dix-huit/dix-neuf/vingt/vingt-et-un/vingt-deux/vingt-trois/vingt-quatre/vingt-cinq/vingt-six/vingt-sept/vingt-huit/vingt-neuf/trente/trente-un
+lv:
+
+    name changed. update linked pages
+en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
+fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
+lv:
+
+    naturalisation
+en: Naturalization
+fr: naturalisation
+lv:
+
+    navigate on tree
+en: navigate on the tree
+fr: naviguer sur l’arbre
+lv:
+
+    nb branches
+en: Lines
+fr: nombre de branches
+lv:
+
+    nb children
+en: Children
+fr: nombre d’enfants
+lv:
+
+    nb events
+en: nb events
+fr: nombre d’événements
+lv:
+
+    nb individuals
+en: Individuals
+fr: nombre d’individus
+lv:
+
+    NB: you should try another relationship computing mode
+en: you can try another computing option
+fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
+lv:
+
+    new modification
+en: Continue edit
+fr: cliquez ici pour effectuer une nouvelle correction
+lv:
+
+    new name
+en: new name
+fr: nouveau nom
+lv:
+
+    next relationship path
+en: Next relationship path
+fr: chemin suivant
+lv:
+
+    no descendants
+en: Without posterity
+fr: sans descendants
+lv:
+
+    no marriage event
+en: Partners
+fr: non mariés
+lv:
+
+    no modification
+en: No changes
+fr: aucune modification
+lv:
+
+    notes summary
+en: Notes
+fr: Sommaire des notes diverses
+lv:
+
+    number of children
+en: number of children
+fr: nombre d’enfants
+lv:
+
+    number of events
+en: number of events
+fr: nombre d’événements
+lv:
+
+    number of individuals
+en: number of individuals
+fr: nombre d’individus
+lv:
+
+    n° d'Aboville
+en: d'Aboville number
+fr: n° d’Aboville
+lv:
+
+    n° Sosa
+en: Sosa No.
+fr: nᵒ Sosa
+lv:
+
+    of
+en: of
+fr: de
+lv:
+
+    officer/officer/officers
+en: officer/officer/officers
+fr: officiant/officiante/officiants
+lv:
+
+    old name
+en: old name
+fr: ancien nom
+lv:
+
+    on (weekday day month year)
+en: on
+fr: le
+lv:
+
+    one additional generation
+en: one additional generation
+fr: une génération en plus
+lv:
+
+    only
+en: only
+fr: uniquement
+lv:
+
+    options
+en: options
+fr: options
+lv:
+
+    ordination
+en: Ordinance
+fr: ordination
+lv:
+
+    PACS
+en: Civil Marriage
+fr: PACS
+lv:
+
+    pacsed%t to
+en: Civil solidarity pact%t with
+fr: PACS%t avec
+lv:
+
+    participant/participant
+en: participant/participant
+fr: participant/participante
+lv:
+
+    paternal grand-parents
+en: Father's parents
+fr: grands-parents paternels
+lv:
+
+    person source
+en: Source of individual
+fr: source individu
+lv:
+
+    photos & documents
+en: Archive & Pictures
+fr: Photos & Documents
+lv:
+
+    places
+en: places
+fr: lieux
+lv:
+
+    plus
+en: More
+fr: plus
+lv:
+
+    presentation
+en: Presentation
+fr: Présentation
+lv:
+
+    preview family tree
+en: Preview Family Tree
+fr: aperçu de l’arbre
+lv:
+
+    previous/next diff
+en: previous revision/next revision
+fr: révision précédente/révision suivante
+lv:
+
+    property
+en: Property
+fr: propriété
+lv:
+
+    recensement
+en: Census
+fr: recensement
+lv:
+
+    reduce/increase
+en: reduce/increase
+fr: réduire/augmenter
+lv:
+
+    reference key
+en: ID
+fr: référence
+lv:
+
+    region
+en: Region
+fr: Région
+lv:
+
+    relations of
+en: relations of
+fr: relations de
+lv:
+
+    relations tree
+en: tree of relations
+fr: arbre des relations
+lv:
+
+    relationship by ancestors
+en: ancestry
+fr: ascendants directs
+lv:
+
+    relationship computing mode
+en: Mode
+fr: mode de calcul
+lv:
+
+    relationship display options
+en: options:
+fr: options d’affichage des arbres :
+lv:
+
+    relationship link between
+en: family link with...
+fr: lien de parenté avec...
+lv:
+
+    relationship shortcut
+en: shortcuts:
+fr: raccourcis :
+lv:
+
+    remove last module
+en: remove the last added module
+fr: retirer le dernier module ajouté
+lv:
+
+    reserved to friends or wizards
+en: reserved to friends or wizards
+fr: réservée aux amis et magiciens
+lv:
+
+    reset to
+en: reset to
+fr: restaurer
+lv:
+
+    residence
+en: Residence
+fr: résidence
+lv:
+
+    residence%t to
+en: residence%t with
+fr: résidence%t avec
+lv:
+
+    retired
+en: Retirement
+fr: retraite
+lv:
+
+    revision history
+en: revision history
+fr: historique des révisions
+lv:
+
+    revision of
+en: Revision date
+fr: révision du
+lv:
+
+    same ancestor as n° Sosa
+en: Same as Sosa #
+fr: identique au n° Sosa
+lv:
+
+    scale
+en: years by generation
+fr: années par génération
+lv:
+
+    scellentChildLDS
+en: Sealing Child (LDS)
+fr: scellage d’enfant LDS
+lv:
+
+    scellentParentLDS
+en: Sealing Parent (LDS)
+fr: scellement aux parents LDS
+lv:
+
+    scellentSpouseLDS
+en: Sealing Spouse (LDS)
+fr: scellement au conjoint LDS
+lv:
+
+    search_exact_fn
+en: exact search
+fr: recherche exacte
+lv:
+
+    search_exact_sn
+en: exact search
+fr: recherche exacte
+lv:
+
+    searching all
+en: Search
+fr: recherche tous les
+lv:
+
+    see also
+en: see also
+fr: à voir aussi
+lv:
+
+    see ascendants notes/sources
+en: View notes/sources
+fr: voir les notes & les sources
+lv:
+
+    see ascendants pictures
+en: View pictures
+fr: voir les photos
+lv:
+
+    see descendants notes/sources
+en: View notes/sources
+fr: voir les notes & les sources
+lv:
+
+    see descendants pictures
+en: View pictures
+fr: voir les photos
+lv:
+
+    see person
+en: Individual
+fr: état civil
+lv:
+
+    select
+en: select
+fr: choisir
+lv:
+
+    select a letter
+en: Select a character
+fr: choisissez un caractère
+lv:
+
+    select a month to see all the anniversaries
+en: select a month to see all the anniversaries.
+fr: sélectionnez un mois pour voir tous les anniversaires.
+lv:
+
+    select a spouse
+en: Select spouse
+fr: choisissez un conjoint :
+lv:
+
+    select p_mod
+en: select personalized modules
+fr: selectionner les modules personnalisés
+lv:
+
+    select person to compute relationship
+en: click an individual below to calculate the family link.
+fr: cliquez sur la personne avec laquelle vous souhaitez réaliser un calcul de parenté.
+lv:
+
+    select the two revisions you want to compare
+en: Select revisions to view history.
+fr: sélectionnez les deux révisions que vous voulez comparer.
+lv:
+
+    separate event
+en: Separation
+fr: séparation
+lv:
+
+    shortcuts
+en: keyboard shortcuts
+fr: raccourcis clavier
+lv:
+
+    show implex
+en: show implex
+fr: identifier les implexes
+lv:
+
+    siblings of the grandparents
+en: granduncles and grandaunts
+fr: grands-oncles et grands-tantes
+lv:
+
+    siblings of the great-grandparents
+en: great-granduncles and great-grandaunts
+fr: arrières-grands-oncles et arrières-grands-tantes
+lv:
+
+    size
+en: scale
+fr: echelle
+lv:
+
+    sons/daughters/children
+en: sons/daughters/children
+fr: fils/filles/enfants
+lv:
+
+    sort by/branch/alphabetic order
+en: sort by/line/alphabetical order
+fr: trier par/branches/ordre alphabétique
+lv:
+
+    sort by/date begin/alphabetic order/nb individuals/nb events
+en: sort by/date/alphabetical order/number of individuals/number of events
+fr: trier par/date de début/ordre alphabétique/nombre d’individus/nombre d’événements
+lv:
+
+    sort by/generation/alphabetic order
+en: sort by/generation/alphabetical order
+fr: trier par/génération/ordre alphabétique
+lv:
+
+    spouse/spouses
+en: spouse/spouses
+fr: conjoint/conjoints
+lv:
+
+    spouses info
+en: spouses informations
+fr: informations conjoints
+lv:
+
+    statistics and anniversaries
+en: statistics and anniversaries
+fr: statistiques et anniversaires
+lv:
+
+    subdivision
+en: suburb
+fr: lieu-dit
+lv:
+
+    summary book ascendants
+en: list of individuals
+fr: liste des fiches
+lv:
+
+    surnames branch
+en: lines by name
+fr: branches patronymiques
+lv:
+
+    table
+en: table
+fr: tableau
+lv:
+
+    the difference of age between %t and %t is quite important
+en: Date of birth of %t and %t are too far together
+fr: la différence d’âge entre %t et %t est assez importante
+lv:
+
+    the following children of %t and %t are born very close
+en: Date of birth of the children of %t and %t are too close together
+fr: les enfants suivants de %t et de %t sont nés très rapprochés
+lv:
+
+    the following children of %t and %t are born very distant
+en: important age gap between the two children %t et %t
+fr: les enfants suivants de %t et de %t ont des naissances très éloignées
+lv:
+
+    the latest %d celebrated marriages
+en: Last %d marriages (Date of marriage)
+fr: les %d dernières unions célébrées
+lv:
+
+    the latest %d registered marriages
+en: Last %d marriages (Date of entry)
+fr: les %d dernières unions enregistrées
+lv:
+
+    the modification impacted %d persons
+en: %d entries have been successfully updated
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+lv:
+
+    time line
+en: timeline
+fr: chronologie
+lv:
+
+    to change
+en: Edit
+fr: pour changer
+lv:
+
+    to come
+en: to come
+fr: à venir
+lv:
+
+    tools
+en: tools
+fr: outils
+lv:
+
+    town
+en: Town
+fr: Commune
+lv:
+
+    tree of witnesses
+en: tree of witnesses
+fr: arbre des témoins
+lv:
+
+    trees & lists
+en: Charts & Lists
+fr: Arbres & Listes
+lv:
+
+    try again
+en: retry
+fr: réessayer
+lv:
+
+    try another/relationship computing
+en: try another computing option
+fr: Cliquez ici/pour essayer un mode de calcul différent
+lv:
+
+    uncheck
+en: uncheck
+fr: décocher
+lv:
+
+    update family
+en: Edit Family
+fr: gérer les unions
+lv:
+
+    validate/delete
+en: submit/delete
+fr: valider/supprimer
+lv:
+
+    venteBien
+en: Sale of Property
+fr: vente d’un bien
+lv:
+
+    version
+en: Version
+fr: version
+lv:
+
+    view source
+en: view source
+fr: voir source
+lv:
+
+    visualize/show/hide/summary
+en: view/display/hide/summary
+fr: visualiser/afficher/masquer/sommaire
+lv:
+
+    vital record
+en: Individual
+fr: fiche
+lv:
+
+    where born
+en: where born
+fr: lieu de naissance
+lv:
+
+    where dead
+en: where dead
+fr: lieu de décès
+lv:
+
+    where married
+en: Where married
+fr: lieu de l’union
+lv:
+
+    width
+en: width
+fr: largeur
+lv:
+
+    will
+en: Will
+fr: testament
+lv:
+
+    with root, spouses and unknowns
+en: with root ancestor, spouses and unknowns
+fr: avec l’ancêtre racine, les conjoints et les inconnus
+lv:
+
+    witness at %s of
+en: witness at %s of
+fr: témoin au %s de
+lv:
+
+    witness tree
+en: tree of witnesses
+fr: arbre des témoins
+lv:
+
+    witness/witnesses
+en: witness/witnesses
+fr: témoin/témoins
+lv:
+
+    witnesses at his events
+en: witnesses at his events
+fr: témoins à ses évènements
+lv:
+
+    witnesses to events of
+en: witnesses to events of
+fr: témoins aux évènements de
+lv:
+
+    witnesses to my events and godparents
+en: witnesses to my events and godparents
+fr: témoins à mes évènements et parrains/marraines
+lv:
+
+    you are visible/you are not visible
+en: you are visible/you are invisible
+fr: vous êtes visible/vous n’êtes pas visible
+lv:
+
+    your message is waiting for validation
+en: your message is waiting for validation
+fr: votre message est en attente de validation
+lv:
+

@@ -244,8 +244,7 @@ let ancestor_label conf base info x sex =
       nth_field txt is
   | 3 ->
       let txt =
-        transl conf
-          "a great-grandfather/a great-grandmother/a great-grandparent"
+        transl conf "a great-grandfather/a great-grandmother/a great-grandparent"
       in
       let is =
         if nb_fields txt = 6 then
@@ -285,8 +284,7 @@ let descendant_label conf base info x p =
       nth_field txt is
   | 3 ->
       let txt =
-        transl conf
-          "a great-grandson/a great-granddaughter/a great-grandchild"
+        transl conf "a great-grandson/a great-granddaughter/a great-grandchild"
       in
       let is =
         if nb_fields txt = 12 then
@@ -515,7 +513,8 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
              (if propose_dag then "&dag=on" else "") image_opt;
            Wserver.print_string (Utf8.capitalize (transl conf "see"));
            if n > 1 && not propose_dag then
-             Wserver.print_string (transl conf " the first branch");
+             Wserver.print_string 
+               (Printf.sprintf " %s" (transl conf "the first branch"));
            Wserver.printf "</a>"
          end;
        Wserver.printf "</li>")

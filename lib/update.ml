@@ -352,8 +352,7 @@ let print_warning conf base =
       let cpl = foi base ifam in
       Wserver.printf
         (fcapitale
-           (ftransl conf
-              "the following children of %t and %t are not in order"))
+           (ftransl conf "the following children of %t and %t are not in order"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
       Wserver.printf ":\n";
@@ -469,8 +468,7 @@ let print_warning conf base =
       let cpl = foi base ifam in
       Wserver.printf
         (fcapitale
-           (ftransl conf
-              "the following children of %t and %t are born very close"))
+           (ftransl conf "the following children of %t and %t are born very close"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
       Wserver.printf ":\n";
@@ -488,8 +486,7 @@ let print_warning conf base =
       let cpl = foi base ifam in
       Wserver.printf
         (fcapitale
-           (ftransl conf
-              "the following children of %t and %t are born very distant"))
+           (ftransl conf "the following children of %t and %t are born very distant"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
       Wserver.printf ":\n";
