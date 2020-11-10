@@ -17,8 +17,15 @@ val prec_year_text : config -> dmy -> string
 val prec_text : config -> dmy -> string
 val day_text : dmy -> string
 val month_text : dmy -> string
+
+(** [year_text dmy]
+    Return the year of a date.
+    If the precision is OrYear or YearInt, returns yyy1/yyy2 or yyy1..yyy2
+ *)
 val year_text : dmy -> string
+
 val short_dates_text : config -> base -> person -> string
+val short_family_dates_text : config -> base -> family -> string
 val short_marriage_date_text : config -> base -> family -> person -> person -> string
 val print_dates : config -> base -> person -> unit
 

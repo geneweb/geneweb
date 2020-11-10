@@ -493,6 +493,8 @@ let month_text d = if d.month = 0 then "" else string_of_int d.month
 (* ************************************************************************ *)
 (*  [Fonc] year_text : Def.dmy -> string                                    *)
 (** [Description] : Renvoie l'année d'une date.
+    si la précision de la date est OrYear ou YearInt, alors la date est
+    renvoyée sous la forme yyy1/yyy2 ou yyy1..yyy2
     [Args] :
       - d : Def.dmy
     [Retour] : string
@@ -500,10 +502,13 @@ let month_text d = if d.month = 0 then "" else string_of_int d.month
 (* ************************************************************************ *)
 let year_text d =
   match d.prec with
-    OrYear d2 -> string_of_int d.year ^ "/" ^ string_of_int d2.year2
-  | YearInt d2 -> string_of_int d.year ^ ".." ^ string_of_int d2.year2
+    OrYear d2 ->
+        if d.year = d2.year2 then string_of_int d.year
+        else (string_of_int d.year) ^ "/" ^ string_of_int d2.year2
+  | YearInt d2 ->
+        if d.year = d2.year2 then string_of_int d.year
+        else (string_of_int d.year) ^ ".." ^ string_of_int d2.year2
   | _ -> string_of_int d.year
-
 
 (* ************************************************************************ *)
 (*  [Fonc] prec_year_text : config -> Def.dmy -> string                     *)
@@ -576,6 +581,55 @@ let short_dates_text conf base p =
     else s
   else ""
 
+(* ********************************************************************** *)
+(*  [Fonc] short_family_dates_text : config -> base -> fam -> string      *)
+(** [Description] : Renvoie la concatenation de l'année de relation ou
+      mariage et l'année de divorce ou séparation. La précision
+      de la date est ajoutée pour chaque année.
+      L'affichage est le suivant :
+      * 1700      (date relation/mariage - pas de séparation/divorce)
+      * 1700-1780 (date relation/mariage - date séparation/divorce)
+      * 1700-     (date relation/mariage - séparation/divorce sans date)
+      * -1700     (pas date relation/mariage - séparation/divorce)
+      * -         (pas date relation/mariage - séparation/divorce sans date)
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - fam  : famille
+    [Retour] : string
+    [Rem] :                                                               *)
+(* ********************************************************************** *)
+let short_family_dates_text conf _base fam =
+    let marr_dates =
+      match Adef.od_of_cdate (get_marriage fam) with
+      | Some d ->
+        begin match d with
+        | Dgreg (dmy, _) -> Some (prec_year_text conf dmy)
+        | _ -> Some " "
+        end
+      | _ -> Some " "
+    in
+    let sep_dates =
+      match List.find_opt (fun e ->
+            e.efam_name = Efam_Divorce ||
+            e.efam_name = Efam_Annulation ||
+            e.efam_name = Efam_Separated)
+          (get_fevents fam) with
+      | Some e ->
+        begin match Adef.od_of_cdate e.efam_date with
+        | Some d ->
+          begin match d with
+          | Dgreg (dmy, _) -> Some (prec_year_text conf dmy)
+          | _ -> Some " "
+          end
+        | _ -> Some " "
+        end
+      | _ -> None
+    in
+    match marr_dates, sep_dates with
+    | Some m, Some s -> m ^ "-" ^ s
+    | Some m, None -> m
+    | _, _ -> ""
 
 (* ********************************************************************** *)
 (*  [Fonc] short_marriage_date_text :
