@@ -206,11 +206,20 @@ and parse_expr_and =
       a
 and parse_expr_is_substr =
   parser
-    [< e = parse_expr_3;
+    [< e = parse_expr_in;
        a =
          parser
            [< 'Tok (loc, IDENT "is_substr"); s >] ->
              Aop2 (loc, "is_substr", e, (parse_expr_is_substr s))
+         | [< >] -> e >] ->
+      a
+and parse_expr_in =
+  parser
+    [< e = parse_expr_3;
+       a =
+         parser
+           [< 'Tok (loc, IDENT "in"); s >] ->
+             Aop2 (loc, "in", e, (parse_expr_in s))
          | [< >] -> e >] ->
       a
 and parse_expr_3 =
@@ -1048,7 +1057,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       begin match op with
         "and" -> VVbool (if bool e1 then bool e2 else false)
       | "or" -> VVbool (if bool e1 then true else bool e2)
-      | "is_substr" -> VVbool (Mutil.contains (string e1) (string e2))
+      | "is_substr" | "in" -> VVbool (Mutil.contains (string e2) (string e1))
       | "=" -> VVbool (eval_expr ceva e1 = eval_expr ceva e2)
       | "<" -> VVbool (int e1 < int e2)
       | ">" -> VVbool (int e1 > int e2)
