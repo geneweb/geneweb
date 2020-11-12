@@ -247,10 +247,20 @@ let same_person conf =
   Wserver.printf "%s\n" (Utf8.capitalize (transl conf "it is the same person!"));
   Hutil.trailer conf
 
-let different_sexes conf =
+let different_sexes conf base p1 p2 =
   let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s.\n" (Utf8.capitalize (transl conf "incompatible sexes"));
+  Wserver.print_string (Utf8.capitalize (transl conf "incompatible sexes"));
+  Wserver.print_string (transl conf ":");
+  Wserver.print_string "<ul><li>";
+  Wserver.printf
+    {|<a href="%s%s">%s</a>|}
+    (commd conf) (acces conf base p1) (Gutil.designation base p1) ;
+  Wserver.print_string "</li><li>";
+  Wserver.printf
+    {|<a href="%s%s">%s</a>|}
+    (commd conf) (acces conf base p2) (Gutil.designation base p2) ;
+  Wserver.print_string "</li></ul>";
   Hutil.trailer conf
 
 let print_merged conf base wl p =
@@ -321,7 +331,7 @@ let print conf base =
         let (ok, warnings) = merge conf base p1 p2 propose_merge_ind propose_merge_fam in
         if ok then print_merged conf base warnings p1
       with Error_loop p -> error_loop conf base p
-         | Different_sexes -> different_sexes conf
+         | Different_sexes (p1, p2) -> different_sexes conf base p1 p2
          | Same_person -> same_person conf
     end
   | _ -> not_found_or_incorrect conf

@@ -197,13 +197,13 @@ let is_ancestor base p1 p2 =
 
 exception Error_loop of person
 exception Same_person
-exception Different_sexes
+exception Different_sexes of person * person
 
 let check_ind base p1 p2 =
   if get_iper p1 = get_iper p2 then raise Same_person
   else if get_sex p1 <> get_sex p2 && get_sex p1 <> Neuter
           && get_sex p2 <> Neuter
-  then raise Different_sexes
+  then raise @@ Different_sexes (p1, p2)
   else if is_ancestor base p1 p2 then raise (Error_loop p2)
   (* begin error_loop conf base p2; false, false end *)
   else if is_ancestor base p2 p1 then raise (Error_loop p1)
