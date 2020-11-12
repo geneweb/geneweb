@@ -3,28 +3,11 @@
 GeneWeb is an open source genealogy software written in OCaml. It comes
 with a Web interface and can be used off-line or as a Web service.
 
-## Build status
+## Releases build status
 
 |            | Linux             | macOS             | FreeBSD           | Windows (mingw64)
 | ---:       | :---:             | :---:             | :---:             | :---:
-| OCaml 4.05 | [![l405]][travis] | -                 | -                 | -
-| OCaml 4.06 | [![l406]][travis] | -                 | -                 | -
-| OCaml 4.07 | [![l407]][travis] | -                 | -                 | -
-| OCaml 4.08 | [![l408]][travis] | -                 | -                 | -
 | OCaml 4.09 | [![l409]][travis] | [![m409]][appveyor] | [![f409]][travis] | [![win-409]][appveyor]
-| OCaml 4.10 | [![l410]][travis] | -                 | -                 | -
-
-[l405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/1
-[l406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/2
-[l407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/3
-[l408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/4
-[l409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/5
-[l410]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/7
-[m409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
-[f409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/6
-[win-409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
-[travis]:https://travis-ci.org/geneweb/geneweb
-[appveyor]:https://ci.appveyor.com/project/geneweb/geneweb
 
 ## Documentation
 
@@ -43,11 +26,9 @@ until the "release" qualifier is effective.
 Any problem you encounter or issue you want to raise should be entered on the issue page
 of the GitHub repository (https://github.com/geneweb/geneweb/issues)
 
+Download the file corresponding to your environment from
+the [releases page](https://github.com/geneweb/geneweb/releases).
 
-Download the file corresponding to your environment from the releases page:
-```
-https://github.com/geneweb/geneweb/releases
-```
 Extract the distribution folder and place it at the location of your choice. You may alse rename it.
 Its content is as follows (this example is for a Mac distribution.
 Other distributions are very similar):
@@ -96,36 +77,23 @@ documentation at ```http://geneweb.tuxfamily.org/```
 Quite similar to the MacOS solution, without the security check.
 ```xxx.command``` files have an equivalent ```xxx.sh``` variant.
 
-## Installation (for developpers)
-
-Using [opam](https://opam.ocaml.org/):
-
-```
-opam pin add geneweb-bin -k git https://github.com/geneweb/geneweb --no-action
-opam depext geneweb-bin
-opam install geneweb-bin
-```
-
-## Getting involved
-
-We encourage you to participate in this open source project. We love
-pull requests, bugs reports, ideas...
+## Resources
 
 * Documentation: http://geneweb.tuxfamily.org/wiki/GeneWeb
-* Mailing list: https://groups.yahoo.com/neo/groups/GeneWeb/info
+* Mailing list: https://framalistes.org/sympa/subscribe/geneweb
 * IRC: irc://irc.freenode.net/geneweb
 * Git: https://github.com/geneweb/geneweb
 * Forum: http://www.geneanet.org/forum/GeneWeb-85
 * Facebook group: http://www.facebook.com/geneweb
 * Wikipedia: https://en.wikipedia.org/wiki/GeneWeb
 
-## Contributor guidelines
+## Contribute
 
-### Install dependencies
+See [Contributor guidelines](CONTRIBUTING.md).
 
-```
-$ opam install camlp5 cppo dune jingoo markup ounit uucp unidecode
-```
+### Installation (for developpers)
+
+See [AppVeyor](appveyor.yml) or [Travis CI](.travis.yml) scripts.
 
 ### Build instructions
 
@@ -177,3 +145,27 @@ All files marked in this distribution are Copyright (c) 1998-2016 INRIA
 (Institut National de Recherche en Informatique et Automatique) and
 distributed under the GNU GENERAL PUBLIC LICENSE. See [LICENSE](LICENSE) file
 for details.
+
+## Complete builds status
+
+|            | Linux             | macOS             | FreeBSD           | Windows (mingw64)
+| ---:       | :---:             | :---:             | :---:             | :---:
+| OCaml 4.05 | [![l405]][travis] | -                 | -                 | -
+| OCaml 4.06 | [![l406]][travis] | -                 | -                 | -
+| OCaml 4.07 | [![l407]][travis] | -                 | -                 | -
+| OCaml 4.08 | [![l408]][travis] | -                 | -                 | -
+| OCaml 4.09 | [![l409]][travis] | [![m409]][appveyor] | [![f409]][travis] | [![win-409]][appveyor]
+| OCaml 4.10 | [![l410]][travis] | -                 | -                 | -
+
+[l405]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/1
+[l406]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/2
+[l407]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/3
+[l408]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/4
+[l409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/5
+[l410]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/7
+[m409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
+[f409]:https://travis-matrix-badges.herokuapp.com/repos/geneweb/geneweb/branches/master/6
+[win-409]:https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true
+[travis]:https://travis-ci.org/geneweb/geneweb
+[appveyor]:https://ci.appveyor.com/project/geneweb/geneweb
+
