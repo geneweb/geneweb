@@ -228,47 +228,19 @@ let specify conf base n pl =
        Perso.print_sosa conf base p true;
        begin match tl with
            [] ->
-           Wserver.printf "\n%s" (referenced_person_title_text conf base p)
+           Wserver.printf "\n%s" (referenced_person_title_text_2
+             ~show_occ:true ~specify_public_name:false conf base p)
          | t :: _ ->
            Wserver.printf "<a href=\"%s%s\">\n" (commd conf)
              (acces conf base p);
-           Wserver.print_string (titled_person_text conf base p t);
+           Wserver.print_string (titled_person_text
+             ~show_occ:true ~specify_public_name:false conf base p t);
            Wserver.printf "</a>\n";
            List.iter
              (fun t -> Wserver.print_string (one_title_text base t)) tl
        end;
        Wserver.print_string (DateDisplay.short_dates_text conf base p);
-       if authorized_age conf base p then
-         begin match get_first_names_aliases p with
-             [] -> ()
-           | fnal ->
-             Wserver.printf "\n<em>(";
-             Mutil.list_iter_first
-               (fun first fna ->
-                  if not first then Wserver.printf ", ";
-                  Wserver.print_string (sou base fna))
-               fnal;
-             Wserver.printf ")</em>"
-         end;
-       begin let spouses =
-               Array.fold_right
-                 (fun ifam spouses ->
-                    let cpl = foi base ifam in
-                    let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-                    if p_surname base spouse <> "?" then spouse :: spouses
-                    else spouses)
-                 (get_family p) []
-         in
-         match spouses with
-           [] -> ()
-         | h :: hl ->
-           let s =
-             List.fold_left
-               (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
-               (person_title_text conf base h) hl
-           in
-           Wserver.printf ", <em>&amp; %s</em>\n" s
-       end;
+       Util.specify_homonymous conf base p false;
        Wserver.printf "</li>\n")
     ptll;
   Wserver.printf "</ul>\n";
