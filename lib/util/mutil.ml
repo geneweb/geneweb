@@ -1,5 +1,19 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
+let bench name fn =
+  let gc1 = Gc.stat () in
+  let p1 = Sys.time () in
+  let t1 = Unix.gettimeofday () in
+  let res = fn () in
+  let t2 = Unix.gettimeofday () in
+  let p2 = Sys.time () in
+  let gc2 = Gc.stat () in
+  Printf.printf "[%s]: %fs (~%fs CPU). %.0f words allocated\n"
+    name (t2 -. t1) (p2 -. p1)
+    (gc2.minor_words +. gc2.major_words -. gc2.promoted_words
+     -. gc1.minor_words -. gc1.major_words +. gc1.promoted_words) ;
+  res
+
 let int_size = 4
 let verbose = ref true
 

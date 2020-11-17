@@ -194,3 +194,8 @@ val read_or_create
   -> (in_channel -> 'a)
   -> (out_channel -> 'a)
   -> 'a
+
+(** [bench name fn]
+    Execute [fn], print stats about time and memory allocation, return [fn] result.
+ *)
+val bench : string -> (unit -> 'a) -> 'a
