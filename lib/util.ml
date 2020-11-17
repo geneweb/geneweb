@@ -3382,20 +3382,59 @@ module IperSet = Set.Make (struct type t = iper let compare = Stdlib.compare end
 module IfamSet = Set.Make (struct type t = ifam let compare = Stdlib.compare end)
 
 let select_masc conf base ips =
-  let asc = Hashtbl.create 32 in
-  (* Make sure that ref personne is first element of the list (because of implex) *)
-  let rec loop_asc max_gen gen ip =
-    if not @@ Hashtbl.mem asc ip then begin
-      let p = pget conf base ip in
-      match get_parents p with
-      | Some ifam when gen < max_gen ->
-        let cpl = foi base ifam in
-        loop_asc max_gen (gen + 1) (get_father cpl) ;
-        loop_asc max_gen (gen + 1) (get_mother cpl)
-      | _ -> Hashtbl.add asc ip (gen, p)
-    end
+  let poi = if conf.wizard || conf.friend then poi else pget conf in
+  let fam = Hashtbl.create 1024 in
+  let asc = Hashtbl.create 1024 in
+  let add_asc gen i p =
+    match Hashtbl.find_opt asc i with
+    | Some (already, _) when already <= gen -> ()
+    | _ -> Hashtbl.replace asc i (gen, p)
   in
-  List.iter (fun (ip, max_gen) -> loop_asc max_gen 0 ip) ips ;
+  let select_masc max_gen =
+    let rec loop = function
+      | [] -> ()
+      | (gen, ifam) :: tl ->
+        match Hashtbl.find_opt fam ifam with
+        | Some already when already <= gen ->
+          loop tl
+        | _ ->
+          Hashtbl.replace fam ifam gen ;
+          if gen = max_gen then begin
+            let cpl = foi base ifam in
+            let fa = get_father cpl in
+            let mo = get_mother cpl in
+            add_asc gen fa (poi base fa) ;
+            add_asc gen mo (poi base mo) ;
+            loop tl
+          end else begin
+            let pgen = gen + 1 in
+            let aux acc i =
+              let p = poi base i in
+              match get_parents p with
+              | None ->
+                add_asc gen i p ;
+                acc
+              | Some pifam ->
+                match Hashtbl.find_opt fam pifam with
+                | Some already when already <= pgen ->
+                  acc
+                | _ ->
+                  Hashtbl.replace fam pifam (pgen + 1) ;
+                  (pgen, pifam) :: acc
+            in
+            let cpl = foi base ifam in
+            let fa = get_father cpl in
+            let mo = get_mother cpl in
+            loop (aux (aux tl fa) mo)
+          end
+    in
+    loop
+  in
+  List.iter (fun (ip, max_gen) ->
+      match get_parents @@ poi base ip with
+      | Some ifam -> select_masc max_gen [1, ifam]
+      | None -> ()
+    ) ips ;
   asc
 
 let select_desc conf base gen_desc ips =
