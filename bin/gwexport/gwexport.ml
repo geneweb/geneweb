@@ -262,9 +262,13 @@ let select opts ips =
     in
     let conf = { Config.empty with wizard = true } in
     let sel_per, sel_fam =
-      if (opts.asc <> None && opts.ascdesc <> None) || opts.desc <> None then begin
+      if opts.ascdesc <> None || opts.desc <> None then begin
         assert (opts.censor = 0) ;
-        let asc = Opt.default max_int opts.asc in
+        let asc =
+          if opts.ascdesc <> None
+          then Opt.default max_int opts.asc
+          else Opt.default 0 opts.asc
+        in
         let desc = - (Opt.default 0 opts.desc) in
         let ht =
           match opts.ascdesc with
