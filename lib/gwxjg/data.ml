@@ -413,85 +413,8 @@ and mk_title base t =
       | "nth" -> nth
       | _ -> raise Not_found)
 
-and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
-  let iper' = Gwdb.get_iper p in
-  let get wrap fn = try wrap (fn p) with Not_found -> Tnull in
-  let get_str = get box_string in
-  let module E = Ezgw.Person in
-  let parents = match E.parents p with
-    | Some ifam -> Some (lazy (Gwdb.foi base ifam))
-    | None -> None
-  in
-  let mk_parent fn = match parents with
-    | Some f -> Tlazy (lazy (get_n_mk_person conf base (fn @@ Lazy.force f)))
-    | None -> Tnull
-  in
-  let lazy_families = lazy (Array.map (fun ifam -> ifam, Gwdb.foi base ifam) @@ Gwdb.get_family p) in
-  let families =
-    Tlazy (lazy (Tarray (Array.map (fun (ifam, cpl) -> get_n_mk_family conf base ~origin:iper' ifam cpl) @@
-                         Lazy.force lazy_families) ) )
-  in
-  let spouses =
-    Tlazy (lazy (Tarray (Array.map (fun (_, c) ->
-        let f = Gwdb.get_father c in
-        get_n_mk_person conf base (if f = iper' then Gwdb.get_mother c else f) )
-        (Lazy.force lazy_families) ) ) )
-  in
-  let father = mk_parent Gwdb.get_father in
-  let first_name = get_str (E.first_name base) in
-  let first_name_aliases =
-    box_list @@
-    List.map box_string (E.first_name_aliases base p)
-  in
-  let access = get_str (E.access conf base) in
-  let mother = mk_parent Gwdb.get_mother in
-  let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
-  let iper = Tstr (Gwdb.string_of_iper iper') in
-  let related =
-    match E.rparents p with
-    | [] -> Tlist []
-    | r -> box_list @@ List.fold_left (mk_related conf base) [] r
-  in
-  let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
-  let siblings = siblings_aux E.siblings in
-  let half_siblings = siblings_aux E.half_siblings in
-  let surname = get_str (E.surname base) in
-  let surname_aliases = Tlist (List.map box_string (E.surname_aliases base p) ) in
-  let events = Tlist [] in
-  Tpat begin function
-    | "access" -> access
-    | "children" -> children
-    | "events" -> events
-    | "families" -> families
-    | "father" -> father
-    | "first_name" -> first_name
-    | "first_name_aliases" -> first_name_aliases
-    | "half_siblings" -> half_siblings
-    | "iper" -> iper
-    | "mother" -> mother
-    | "related" -> related
-    | "siblings" -> siblings
-    | "spouses" -> spouses
-    | "surname" -> surname
-    | "surname_aliases" -> surname_aliases
-    | _ -> raise Not_found
-  end
-
-and get_sosa_person =
-  let loaded = ref false in
-  fun conf base p ->
-    if not !loaded then (Perso.build_sosa_ht conf base ; loaded := true) ;
-    let sosa = Perso.get_sosa_person p in
-    if sosa = Sosa.zero then Tnull else Tstr (Sosa.to_string sosa)
-
-and unsafe_mk_person conf base (p : Gwdb.person) =
-  let get wrap fn = try wrap (fn p) with Not_found -> Tnull in
-  let get_str = get box_string in
-  let get_bool = get box_bool in
-  let get_int = get box_int in
-  let get_float = get box_float in
-  let module E = Ezgw.Person in
-  let parents = match E.parents p with
+and mk_ancestors conf base (p : Gwdb.person) =
+  let parents = match Ezgw.Person.parents p with
     | Some ifam -> Some (lazy (Gwdb.foi base ifam))
     | None -> None
   in
@@ -516,7 +439,94 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
       end end
     | None -> Tnull
   in
+  let father = mk_parent Gwdb.get_father in
+  let mother = mk_parent Gwdb.get_mother in
+  (parents, father, mother)
+
+and mk_rparents conf base (p : Gwdb.person) =
+  match Ezgw.Person.rparents p with
+  | [] -> Tlist []
+  | r -> box_list @@ List.fold_left (mk_related conf base) [] r
+
+and mk_families_spouses iper conf base (p : Gwdb.person) =
+  let lazy_families =
+    lazy (Array.map (fun ifam -> ifam, Gwdb.foi base ifam) @@ Gwdb.get_family p)
+  in
+  let families =
+    Tlazy ( lazy ( Tarray (
+        Array.map begin fun (ifam, cpl) ->
+          get_n_mk_family conf base ~origin:iper ifam cpl
+        end (Lazy.force lazy_families)
+      ) ) )
+  in
+  let spouses =
+    Tlazy ( lazy ( Tarray (
+        Array.map begin fun (_, c) ->
+          let f = Gwdb.get_father c in
+          get_n_mk_person conf base (if f = iper then Gwdb.get_mother c else f)
+        end (Lazy.force lazy_families)
+      ) ) )
+  in
+  (families, spouses)
+
+and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
+  let get wrap fn = try wrap (fn p) with Not_found -> Tnull in
+  let get_str = get box_string in
+  let module E = Ezgw.Person in
+  let parents, father, mother = mk_ancestors conf base p in
+  let families, spouses = mk_families_spouses iper' conf base p in
+  let first_name = get_str (E.first_name base) in
+  let first_name_aliases =
+    box_list @@ List.map box_string (E.first_name_aliases base p)
+  in
+  let access = get_str (E.access conf base) in
+  let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
+  let iper = Tstr (Gwdb.string_of_iper iper') in
+  let related = mk_rparents conf base p in
+  let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
+  let siblings = siblings_aux E.siblings in
+  let half_siblings = siblings_aux E.half_siblings in
+  let surname = get_str (E.surname base) in
+  let surname_aliases = Tlist (List.map box_string (E.surname_aliases base p) ) in
+  let events = Tlist [] in
+  Tpat begin function
+    | "access" -> access
+    | "children" -> children
+    | "events" -> events
+    | "families" -> families
+    | "father" -> father
+    | "first_name" -> first_name
+    | "first_name_aliases" -> first_name_aliases
+    | "half_siblings" -> half_siblings
+    | "iper" -> iper
+    | "mother" -> mother
+    | "parents" -> parents
+    | "related" -> related
+    | "siblings" -> siblings
+    | "spouses" -> spouses
+    | "surname" -> surname
+    | "surname_aliases" -> surname_aliases
+    | _ -> raise Not_found
+  end
+
+and get_sosa_person =
+  let loaded = ref false in
+  fun conf base p ->
+    if not !loaded then (Perso.build_sosa_ht conf base ; loaded := true) ;
+    let sosa = Perso.get_sosa_person p in
+    if sosa = Sosa.zero then Tnull else Tstr (Sosa.to_string sosa)
+
+and unsafe_mk_person conf base (p : Gwdb.person) =
+  let get wrap fn = try wrap (fn p) with Not_found -> Tnull in
+  let get_str = get box_string in
+  let get_bool = get box_bool in
+  let get_int = get box_int in
+  let get_float = get box_float in
+  let module E = Ezgw.Person in
+  let iper' = Gwdb.get_iper p in
+  let parents, father, mother = mk_ancestors conf base p in
+  let families, spouses = mk_families_spouses iper' conf base p in
   let access = get_str (E.access conf base) in
   let baptism_date = mk_opt mk_date (E.baptism_date p) in
   let baptism_place = get_str (E.baptism_place conf base) in
@@ -532,23 +542,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let death_place = get_str (E.death_place conf base) in
   let digest = Tlazy (lazy (get_str (E.digest base) ) ) in
   let events = lazy_list (mk_event conf base) (E.events conf base p) in
-  let lazy_families = lazy (Array.map (fun ifam -> ifam, Gwdb.foi base ifam) @@ Gwdb.get_family p) in
-  let families =
-    Tlazy (lazy (Tarray (Array.map (fun (ifam, cpl) -> get_n_mk_family conf base ~origin:iper' ifam cpl) @@
-                         Lazy.force lazy_families) ) )
-  in
-  let spouses =
-    Tlazy (lazy (Tarray (Array.map (fun (_, c) ->
-        let f = Gwdb.get_father c in
-        get_n_mk_person conf base (if f = iper' then Gwdb.get_mother c else f) )
-        (Lazy.force lazy_families) ) ) )
-  in
-  let father = mk_parent Gwdb.get_father in
   let first_name = get_str (E.first_name base) in
-  let first_name_aliases =
-    box_list @@
-    List.map box_string (E.first_name_aliases base p)
-  in
+  let first_name_aliases = box_list @@ List.map box_string (E.first_name_aliases base p) in
   let first_name_key = get_str (E.first_name_key base) in
   let first_name_key_val = get_str (E.first_name_key_val base) in
   let iper = Tstr (Gwdb.string_of_iper iper') in
@@ -561,7 +556,6 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     box_lazy @@
     lazy (let fn = E.linked_page conf base p in Tpat (fun s -> Tstr (fn s) ) )
   in
-  let mother = mk_parent Gwdb.get_mother in
   let titles = lazy_list (mk_title base) (E.titles p) in
   let occ = get_int E.occ in
   let occupation = get_str (E.occupation conf base) in
@@ -570,11 +564,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let qualifiers =
     Tlist (List.map box_string @@ E.qualifiers base p)
   in
-  let related =
-    match E.rparents p with
-    | [] -> Tlist []
-    | r -> box_list @@ List.fold_left (mk_related conf base) [] r
-  in
+  let related = mk_rparents conf base p in
   let relations = lazy_list (get_n_mk_person conf base) (E.relations p) in
   let sex = get_int E.sex in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
