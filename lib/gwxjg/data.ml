@@ -457,24 +457,25 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let half_siblings = siblings_aux E.half_siblings in
   let surname = get_str (E.surname base) in
   let surname_aliases = Tlist (List.map box_string (E.surname_aliases base p) ) in
-  Tpat
-    (function
-      | "access" -> access
-      | "children" -> children
-      | "families" -> families
-      | "father" -> father
-      | "first_name" -> first_name
-      | "first_name_aliases" -> first_name_aliases
-      | "half_siblings" -> half_siblings
-      | "iper" -> iper
-      | "mother" -> mother
-      | "related" -> related
-      | "siblings" -> siblings
-      | "spouses" -> spouses
-      | "surname" -> surname
-      | "surname_aliases" -> surname_aliases
-      | _ -> raise Not_found
-    )
+  let events = Tlist [] in
+  Tpat begin function
+    | "access" -> access
+    | "children" -> children
+    | "events" -> events
+    | "families" -> families
+    | "father" -> father
+    | "first_name" -> first_name
+    | "first_name_aliases" -> first_name_aliases
+    | "half_siblings" -> half_siblings
+    | "iper" -> iper
+    | "mother" -> mother
+    | "related" -> related
+    | "siblings" -> siblings
+    | "spouses" -> spouses
+    | "surname" -> surname
+    | "surname_aliases" -> surname_aliases
+    | _ -> raise Not_found
+  end
 
 and get_sosa_person =
   let loaded = ref false in
