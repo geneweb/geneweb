@@ -67,6 +67,10 @@ lib/gwlib.ml:
 
 CPPO_D=$(API_D) $(GWDB_D) $(OS_D)
 
+ifeq ($(DUNE_PROFILE),dev)
+    CPPO_D+= -D DEBUG
+endif
+
 %/dune: %/dune.in Makefile.config
 	@echo -n "Generating $@..." \
 	&& cat $< \

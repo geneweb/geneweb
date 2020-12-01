@@ -61,7 +61,7 @@ let () =
   let exclude_dir s = dune_dirs_exclude := !dune_dirs_exclude ^ " " ^ s in
   let api_d, api_pkg =
     match !api with
-    | true -> " -D API ", "piqirun.ext redis-sync yojson curl"
+    | true -> " -D API", "piqirun.ext redis-sync yojson curl"
     | false -> "", ""
   in
   if !sosa = `None then begin
@@ -91,9 +91,9 @@ let () =
     | `None
     | `Legacy ->
       exclude_dir "gwdb-legacy-x-arangodb" ;
-      (" -D GENEWEB_GWDB_LEGACY ", "geneweb-gwdb-legacy") ;
+      (" -D GENEWEB_GWDB_LEGACY", "geneweb-gwdb-legacy") ;
     | `LegacyArangoDB ->
-      (" -D GENEWEB_GWDB_LEGACY -D GENEWEB_GWDB_ARANGODB "
+      (" -D GENEWEB_GWDB_LEGACY -D GENEWEB_GWDB_ARANGODB"
       , "geneweb-gwdb-legacy-x-arangodb")
   in
   let dune_profile = if !release then "release" else "dev" in

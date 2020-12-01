@@ -70,6 +70,9 @@ let make_senv conf base =
 
 [@@@ocaml.warning "-45"]
 let family_m conf base =
+#ifdef DEBUG
+  Mutil.bench __LOC__ @@ fun () ->
+#endif
   let open RequestHandler in
   let handler = H.handler in
   if conf.wizard || conf.friend ||
