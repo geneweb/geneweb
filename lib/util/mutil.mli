@@ -110,6 +110,12 @@ val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
   *)
 val list_find_map : ('a -> 'b option) -> 'a list -> 'b option
 
+(** [list_last list]
+    Return the last element of the list.
+    Raises [Failure] if the list is empty.
+  *)
+val list_last : 'a list -> 'a
+
 (** [check_magic magic ic]
     Read (and consume) the [magic] string at the beggining of [ic]
     and return [true].
@@ -149,6 +155,11 @@ val list_replace : 'a -> 'a -> 'a list -> 'a list
 
 (** [list_except old_v new_v list] *)
 val list_except : 'a -> 'a list -> 'a list
+
+(** [list_ref_append tl hd]
+    Add [hd] at the beginning of [tl] ref.
+ *)
+val list_ref_append : 'a list ref -> 'a -> unit
 
 (** Read the content of a file.
     Starts from the position where it is when calling [input_file_ic],
