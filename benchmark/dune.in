@@ -4,4 +4,7 @@
   (libraries unix %%%WSERVER_PKG%%% %%%SOSA_PKG%%% %%%GWDB_PKG%%% geneweb benchmark)
 )
 
-(alias (name runbench) (action (run ./bench.exe) ) )
+(rule
+  (action (run ./bench.exe) )
+  (alias runbench)
+)
