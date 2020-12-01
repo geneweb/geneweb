@@ -130,6 +130,11 @@ val check_magic : string -> in_channel -> bool
 *)
 val executable_magic : string
 
+(** Magic string generated from 30 random bits.
+    It should be different each time you launch the program.
+*)
+val random_magic : string
+
 (** [array_except value array]
     Return a new array containing all the elements
     from [array] except the first occurence of [value]
