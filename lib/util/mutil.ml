@@ -1,6 +1,80 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 let bench name fn =
+  let pprint_gc gc =
+    let open Gc in
+    let pint n =
+      let s = string_of_int n in
+      let aux i = String.make 1 @@ String.unsafe_get s i in
+      let rec loop i n acc =
+        if i < 0 then String.concat "" (if n > 0 then "+" :: acc else acc)
+        else
+          let acc =
+            if n > 0
+            && n mod 3 = 0
+            && (n <> 1 && String.unsafe_get s 0 <> '-')
+            then aux i :: "," :: acc
+            else aux i :: acc
+          in
+          loop (i - 1) (n + 1) acc
+      in
+      loop (String.length s - 1) 0 []
+    in
+    Printf.printf
+      "\
+      \tminor_words : %s\n\
+      \tpromoted_words : %s\n\
+      \tmajor_words : %s\n\
+      \tminor_collections : %s\n\
+      \tmajor_collections : %s\n\
+      \theap_words : %s\n\
+      \theap_chunks : %s\n\
+      \tlive_words : %s\n\
+      \tlive_blocks : %s\n\
+      \tfree_words : %s\n\
+      \tfree_blocks : %s\n\
+      \tlargest_free : %s\n\
+      \tfragments : %s\n\
+      \tcompactions : %s\n\
+      \ttop_heap_words : %s\n\
+      \tstack_size : %s\n\
+      "
+      (gc.minor_words |> truncate |> pint)
+      (gc.promoted_words |> truncate |> pint)
+      (gc.major_words |> truncate |> pint)
+      (gc.minor_collections |> pint)
+      (gc.major_collections |> pint)
+      (gc.heap_words |> pint)
+      (gc.heap_chunks |> pint)
+      (gc.live_words |> pint)
+      (gc.live_blocks |> pint)
+      (gc.free_words |> pint)
+      (gc.free_blocks |> pint)
+      (gc.largest_free |> pint)
+      (gc.fragments |> pint)
+      (gc.compactions |> pint)
+      (gc.top_heap_words |> pint)
+      (gc.stack_size |> pint)
+  in
+  let diff gc1 gc2 =
+    Gc.{ minor_words = gc2.minor_words -. gc1.minor_words
+       ; promoted_words = gc2.promoted_words -. gc1.promoted_words
+       ; major_words = gc2.major_words -. gc1.major_words
+       ; minor_collections = gc2.minor_collections - gc1.minor_collections
+       ; major_collections = gc2.major_collections - gc1.major_collections
+       ; heap_words = gc2.heap_words - gc1.heap_words
+       ; heap_chunks = gc2.heap_chunks - gc1.heap_chunks
+       ; live_words = gc2.live_words - gc1.live_words
+       ; live_blocks = gc2.live_blocks - gc1.live_blocks
+       ; free_words = gc2.free_words - gc1.free_words
+       ; free_blocks = gc2.free_blocks - gc1.free_blocks
+       ; largest_free = gc2.largest_free - gc1.largest_free
+       ; fragments = gc2.fragments - gc1.fragments
+       ; compactions = gc2.compactions - gc1.compactions
+       ; top_heap_words = gc2.top_heap_words - gc1.top_heap_words
+       ; stack_size = gc2.stack_size - gc1.stack_size
+       }
+  in
   let gc1 = Gc.stat () in
   let p1 = Sys.time () in
   let t1 = Unix.gettimeofday () in
@@ -8,10 +82,8 @@ let bench name fn =
   let t2 = Unix.gettimeofday () in
   let p2 = Sys.time () in
   let gc2 = Gc.stat () in
-  Printf.printf "[%s]: %fs (~%fs CPU). %.0f words allocated\n"
-    name (t2 -. t1) (p2 -. p1)
-    Gc.(gc2.minor_words +. gc2.major_words -. gc2.promoted_words
-        -. gc1.minor_words -. gc1.major_words +. gc1.promoted_words) ;
+  Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1) ;
+  pprint_gc (diff gc1 gc2) ;
   res
 
 let int_size = 4
