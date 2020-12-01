@@ -532,6 +532,13 @@ let rec list_find_map f = function
       | None -> list_find_map f l
     end
 
+let rec list_last = function
+  | [ ] -> raise (Failure "list_last")
+  | [ x ] -> x
+  | _ :: tl -> list_last tl
+
+let list_ref_append tl hd = tl := hd :: !tl
+
 let executable_magic =
   match Sys.getenv_opt "GW_EXECUTABLE_MAGIC" with
   | Some x -> x
