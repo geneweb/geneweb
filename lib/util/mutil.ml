@@ -544,6 +544,10 @@ let executable_magic =
   | Some x -> x
   | None -> Digest.file Sys.executable_name
 
+let random_magic =
+  Random.self_init () ;
+  Random.bits () |> string_of_int
+
 let check_magic magic ic =
   let len = String.length magic in
   let pos = pos_in ic in
