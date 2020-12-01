@@ -142,8 +142,11 @@ uninstall:
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
-distrib: exe
+distrib:
 	$(RM) -r $(DISTRIB_DIR)
+	$(RM) -r $(BUILD_DIR)/bin
+	$(RM) -r $(BUILD_DIR)/plugins
+	$(MAKE) exe
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
@@ -188,6 +191,9 @@ distrib: exe
 	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp -R hd/* $(DISTRIB_DIR)/gw/
+	mkdir $(DISTRIB_DIR)/gw/plugins
+	mkdir $(DISTRIB_DIR)/gw/plugins/export
+	cp $(BUILD_DIR)/plugins/export/plugin_export.cmxs $(DISTRIB_DIR)/gw/plugins/export/
 
 .PHONY: install uninstall distrib
 
