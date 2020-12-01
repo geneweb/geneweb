@@ -1,6 +1,6 @@
-(* $Id: robot.ml,v 5.17 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+open Geneweb
 open Config
 
 let magic_robot = "GWRB0007"

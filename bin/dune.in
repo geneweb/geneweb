@@ -97,20 +97,37 @@
 )
 
 (library
-  (name gwdlib)
+  (name gwdpluginlib)
   (public_name geneweb-gwd-lib)
-  (wrapped true)
-  (libraries geneweb geneweb-jingoo jingoo unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (modules gwDaemon jgInterp request requestHandler)
+  (wrapped false)
+  (libraries geneweb-lib %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+  (modules gwdPlugin)
 )
 
 (executable
   (package geneweb-bin)
   (public_name gwd)
-  (libraries geneweb geneweb-jingoo geneweb-gwb2ged-lib geneweb-gwd-lib geneweb-gwu-lib unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% %%%WSERVER_PKG%%%)
+  (flags -linkall)
+  (libraries
+    dynlink
+    geneweb
+    gwdpluginlib
+    gwxjg
+    str
+    unix
+    %%%GWDB_PKG%%%
+    %%%SOSA_PKG%%%
+    %%%WSERVER_PKG%%%
+  )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (modules gwd)
+  (modules
+    gwd
+    gwdPluginDep
+    gwdPluginMD5
+    gwdPluginMETA
+    request
+    robot
+  )
 )
 
 (executables

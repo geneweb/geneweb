@@ -1273,34 +1273,6 @@ let include_template conf env fname failure =
 
 let image_prefix conf = conf.image_prefix
 
-(*
-   On cherche le fichier dans cet ordre :
-    - dans la base (bases/etc/name.txt)
-    - dans le répertoire des programmes (gw/etc/name.txt)
-*)
-let find_misc_file name =
-  let base_tpl_dir = Filename.concat (base_path ["etc"] "") name in
-  let etc_tpl_dir = Filename.concat (search_in_lang_path "etc") name in
-  if Sys.file_exists base_tpl_dir then base_tpl_dir
-  else if Sys.file_exists etc_tpl_dir then etc_tpl_dir
-  else ""
-
-(* Code mort. Géré par le css
-value default_background conf =
-  Printf.sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
-;
-
-value default_body_prop conf =
-  let style =
-    match p_getenv conf.env "size" with
-    [ Some v -> "font-size:" ^ v ^ "&"
-    | None -> "" ]
-  in
-  let style = Printf.sprintf "%s%s" style (default_background conf) in
-  " style=\"" ^ style ^ "\""
-;
-   Code mort. Géré par le css *)
-
 let body_prop conf =
   try
     match List.assoc "body_prop" conf.base_env with
