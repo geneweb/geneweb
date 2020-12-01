@@ -12,30 +12,30 @@ module Make
   : (sig val run : ?speclist:(string * Arg.spec * string) list -> unit -> unit end)
 = struct
 
-let green_color = "#2f6400"
-let selected_addr = ref None
-let selected_port = ref 2317
-let redirected_addr = ref None
-let wizard_passwd = ref ""
-let friend_passwd = ref ""
-let wizard_just_friend = ref false
-let only_addresses = ref []
-let default_lang = ref "fr"
-let setup_link = ref false
+let auth_file = ref ""
 let choose_browser_lang = ref false
+let conn_timeout = ref 120
+let daemon = ref false
+let default_lang = ref "fr"
+let friend_passwd = ref ""
+let green_color = "#2f6400"
 let images_dir = ref ""
 let images_url = ref ""
-let max_clients = ref None
-let robot_xcl = ref None
-let auth_file = ref ""
-let daemon = ref false
+let lexicon_list = ref [ Filename.concat "lang" "lex_utf8.txt" ]
 let login_timeout = ref 1800
-let conn_timeout = ref 120
+let max_clients = ref None
+let no_host_address = ref false
+let only_addresses = ref []
+let redirected_addr = ref None
+let robot_xcl = ref None
+let selected_addr = ref None
+let selected_port = ref 2317
+let setup_link = ref false
 let trace_failed_passwd = ref false
 let trace_templates = ref false
 let use_auth_digest_scheme = ref false
-let no_host_address = ref false
-let lexicon_list = ref []
+let wizard_just_friend = ref false
+let wizard_passwd = ref ""
 
 #ifdef API
 let selected_api_host = ref "127.0.0.1"
@@ -197,17 +197,25 @@ let rec extract_assoc key =
       if k = key then v, kvl
       else let (v, kvl) = extract_assoc key kvl in v, kv :: kvl
 
-let input_lexicon lang =
-  let ht = Hashtbl.create 501 in
-  let fname = Filename.concat "lang" "lex_utf8.txt" in
-  Mutil.input_lexicon lang ht
-    (fun () -> Secure.open_in (Util.search_in_lang_path fname));
-  ht
+let tmp = Filename.get_temp_dir_name ()
 
-let add_lexicon fname lang ht =
-  let fname = Filename.concat "lang" fname in
-  Mutil.input_lexicon lang ht
-    (fun () -> Secure.open_in (Util.search_in_lang_path fname))
+let load_lexicon lang =
+  let fname = Filename.concat tmp ("lexicon." ^ lang ^ ".bin") in
+  Mutil.read_or_create ~wait:true ~magic:Mutil.random_magic fname
+    begin fun ch -> (Marshal.from_channel ch : (string, string) Hashtbl.t) end
+    begin fun ch ->
+      let ht = Hashtbl.create 0 in
+      let rec rev_iter fn = function
+        | [] -> ()
+        | hd :: tl -> rev_iter fn tl ; fn hd
+      in
+      rev_iter begin fun fname ->
+        Mutil.input_lexicon lang ht begin fun () ->
+          Secure.open_in (Util.search_in_lang_path fname)
+        end end !lexicon_list ;
+      Marshal.to_channel ch ht [] ;
+      ht
+    end
 
 let alias_lang lang =
   if String.length lang < 2 then lang
@@ -1125,11 +1133,8 @@ let make_conf from_addr request script_name env =
       if x = "" then !default_lang else x
     with Not_found -> !default_lang
   in
-  let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  List.iter
-    (fun fname ->
-       add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
-    !lexicon_list;
+  let lexicon_lang = if lang = "" then default_lang else lang in
+  let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
   let default_sosa_ref = Gwdb.dummy_iper, None in
@@ -1848,7 +1853,7 @@ let main ~speclist () =
      "\n       Force no reverse host by address") ::
     ("-digest", Arg.Set use_auth_digest_scheme,
      "\n       Use Digest authorization scheme (more secure on passwords)") ::
-    ("-add_lexicon", Arg.String (fun x -> lexicon_list := x :: !lexicon_list),
+    ("-add_lexicon", Arg.String (Mutil.list_ref_append lexicon_list),
      "<lexicon>\n       Add file as lexicon.") ::
     ("-log", Arg.Set_string Log.file,
      "<file>\n       Redirect log trace to this file.") ::
