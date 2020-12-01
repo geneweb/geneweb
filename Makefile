@@ -99,6 +99,7 @@ hd/etc/version.txt:
 ###### [End] Generated files section
 
 GENERATED_FILES_DEP = \
+	dune-workspace \
 	hd/etc/version.txt \
 	lib/gwlib.ml \
 	$(CAMLP5_FILES:=.ml) \
@@ -108,7 +109,6 @@ GENERATED_FILES_DEP = \
 	lib/gwdb-legacy-x-arangodb/dune \
 	lib/util/dune \
 	test/dune \
-	dune-workspace \
 
 ifdef API_D
 piqi:
