@@ -2,11 +2,41 @@ open Geneweb
 open Jingoo
 open Jg_types
 
-(* FIXME: remove [try ... with Not_found -> ...] wrapping.  *)
-
 let person_ht = Hashtbl.create 32
 
 let mk_opt fn = function None -> Tnull | Some x -> fn x
+
+let mk_source_rs conf base s  =
+  let s = Util.string_with_macros conf [] s in
+  let lines =
+    match Wiki.html_of_tlsw conf s with
+    | "<p>" :: x :: [ "</p>" ] -> [ x ]
+    | lines -> lines
+  in
+  let wi =
+    { Wiki.wi_mode = "NOTES"
+    ; Wiki.wi_file_path = Notes.file_path conf base
+    ; Wiki.wi_person_exists = Util.person_exists conf base
+    ; Wiki.wi_always_show_link = conf.wizard || conf.friend
+    }
+  in
+  Tstr s, Tstr (Wiki.syntax_links conf wi (String.concat "\n" lines))
+
+let mk_note_rs conf base env s =
+  let s = Util.string_with_macros conf env s in
+  let lines = Wiki.html_of_tlsw conf s in
+  let wi =
+    { Wiki.wi_mode = "NOTES"
+    ; Wiki.wi_file_path = Notes.file_path conf base
+    ; Wiki.wi_person_exists = Util.person_exists conf base
+    ; Wiki.wi_always_show_link = conf.wizard || conf.friend
+    }
+  in
+  Tstr s, Tstr (Wiki.syntax_links conf wi (String.concat "\n" lines))
+
+let mk_person_note_rs conf base p note =
+  let env = ['i', (fun () -> Util.default_image_name base p)] in
+  mk_note_rs conf base env note
 
 let rec date_compare_aux date1 date2 =
   let y1 = field date1 "year" in
@@ -43,71 +73,69 @@ and cmp_prec d1 d2 =
   | _ -> Tint 0
 and field = Jg_runtime.jg_obj_lookup
 
-let rec mk_family (conf : Config.config) base ((_, fam, _, _) as fcd) =
+let rec mk_family (conf : Config.config) base ((_, fam, (ifath, imoth, ispouse), _) as fcd) =
   let module E = Ezgw.Family in
-  let get wrap fn = try wrap (fn fcd) with Not_found -> Tnull in
-  let get_str = get box_string in
   let f = E.father fcd in
   let m = E.mother fcd in
-  let divorce_date = mk_opt mk_date (E.divorce_date fcd) in
   let father = lazy_get_n_mk_person conf base f in
   let mother = lazy_get_n_mk_person conf base m in
   let spouse =
-    let (_, _, (ifath, imoth, ispouse), _) = fcd in
     if ifath = ispouse then father
     else if imoth = ispouse then mother
     else Tnull
   in
   let children = Tarray (Array.map (lazy_get_n_mk_person conf base) (E.children fcd) ) in
-  let events = lazy_list (mk_event conf base) (E.events fcd) in
-  let marriage_date = mk_opt mk_date (E.marriage_date fcd) in
-  let marriage_place = get_str (E.marriage_place base) in
-  let marriage_note = get_str (E.marriage_note conf base) in
-  let marriage_source = get_str (E.marriage_source base) in
-  let relation = mk_fam_relation (Gwdb.get_relation fam) in
-  let separation = mk_fam_separation (Gwdb.get_divorce fam) in
-  let ifam = get_str E.ifam in
-  let witnesses =
-    try lazy_array (get_n_mk_person conf base) (E.witnesses fcd)
-    with Not_found -> Tnull
+  let events' = E.events fcd in
+  let events = lazy_list (mk_event conf base) events' in
+  let relation =
+    match Gwdb.get_relation fam with
+    | Def.Married | NoSexesCheckMarried ->
+      find_event conf base (Perso.Fevent Def.Efam_Marriage) events'
+    | NotMarried | NoSexesCheckNotMarried ->
+      find_event conf base (Perso.Fevent Def.Efam_NoMarriage) events'
+    | Engaged ->
+      find_event conf base (Perso.Fevent Def.Efam_Engage) events'
+    | NoMention ->
+      find_event conf base (Perso.Fevent Def.Efam_NoMention) events'
+    | MarriageBann ->
+      find_event conf base (Perso.Fevent Def.Efam_MarriageBann) events'
+    | MarriageContract ->
+      find_event conf base (Perso.Fevent Def.Efam_MarriageContract) events'
+    | MarriageLicense ->
+      find_event conf base (Perso.Fevent Def.Efam_MarriageLicense) events'
+    | Pacs ->
+      find_event conf base (Perso.Fevent Def.Efam_PACS) events'
+    | Residence ->
+      find_event conf base (Perso.Fevent Def.Efam_Residence) events'
   in
-  let origin_file = Tlazy (lazy (get_str (E.origin_file conf base))) in
+  let separation =
+    match Gwdb.get_divorce fam with
+    | Def.Divorced _ ->
+      find_event conf base (Perso.Fevent Def.Efam_Divorce)events'
+    | Separated ->
+      find_event conf base (Perso.Fevent Def.Efam_Separated) events'
+    | NotDivorced -> Tnull
+  in
+  let ifam = Tstr (E.ifam fcd) in
+  let origin_file = Tstr (E.origin_file conf base fcd) in
+  let note_raw, note = mk_note_rs conf base [] (E.note conf base fcd) in
+  let source_raw, source = mk_source_rs conf base (E.sources base fcd) in
   Tpat begin function
-    | "divorce_date" -> divorce_date
     | "children" -> children
     | "father" -> father
     | "events" -> events
     | "ifam" -> ifam
-    | "marriage_date" -> marriage_date
-    | "marriage_place" -> marriage_place
-    | "marriage_note" -> marriage_note
-    | "marriage_source" -> marriage_source
     | "mother" -> mother
+    | "note" -> note
+    | "note_raw" -> note_raw
     | "origin_file" -> origin_file
     | "relation" -> relation
     | "separation" -> separation
     | "spouse" -> spouse
-    | "witnesses" -> witnesses
+    | "source" -> source
+    | "source_raw" -> source_raw
     | _ -> raise Not_found
   end
-
-and mk_fam_relation = function
-  | Married -> Tstr "MARRIED"
-  | NotMarried -> Tstr "NOT_MARRIED"
-  | Engaged -> Tstr "ENGAGED"
-  | NoSexesCheckNotMarried -> Tstr "NO_SEXES_CHECK_NOT_MARRIED"
-  | NoMention -> Tnull
-  | NoSexesCheckMarried -> Tstr "NO_SEXES_CHECK_MARRIED"
-  | MarriageBann -> Tstr "MARRIAGE_BANN"
-  | MarriageContract -> Tstr "MARRIAGE_CONTRACT"
-  | MarriageLicense -> Tstr "MARRIAGE_LICENSE"
-  | Pacs -> Tstr "PACS"
-  | Residence -> Tstr "RESIDENCE"
-
-and mk_fam_separation = function
-  | Divorced _ -> Tstr "DIVORCED"
-  | Separated -> Tstr "SEPARATED"
-  | NotDivorced -> Tnull
 
 and get_n_mk_family conf base ?(origin = Gwdb.dummy_iper) ifam cpl =
   let ifath = Gwdb.get_father cpl in
@@ -198,8 +226,8 @@ and of_prec d = match Jg_runtime.jg_obj_lookup d "prec" with
   | Tstr "maybe" -> Maybe
   | Tstr "before" -> Before
   | Tstr "after" -> After
-  | Tstr "oryear" -> OrYear (to_dmy2 d)
-  | Tstr "yearint" -> YearInt (to_dmy2 d)
+  | Tstr "oryear" -> OrYear (to_dmy2 @@ Jg_runtime.jg_obj_lookup d "d2")
+  | Tstr "yearint" -> YearInt (to_dmy2 @@ Jg_runtime.jg_obj_lookup d "d2")
   | _ -> assert false
 
 and to_gregorian_aux calendar d =
@@ -218,20 +246,22 @@ and of_calendar d = match Jg_runtime.jg_obj_lookup d "calendar" with
   | Tstr "Dhebrew" -> Def.Dhebrew
   | _ -> assert false
 
-and module_date conf =
+
+and module_DATE conf =
   let now =
-    Tvolatile (fun () ->
-        let now = Unix.gmtime @@ Unix.time () in
-        let day = Tint now.tm_mday in
-        let month = Tint (now.tm_mon + 1) in
-        let year = Tint (now.tm_year + 1900) in
-        Tpat (function
-            | "day" -> day
-            | "month" -> month
-            | "year" -> year
-            | "prec" -> Tstr "sure"
-            | _ -> raise Not_found)
-      )
+    Tvolatile begin fun () ->
+      let now = Unix.gmtime @@ Unix.time () in
+      let day = Tint now.tm_mday in
+      let month = Tint (now.tm_mon + 1) in
+      let year = Tint (now.tm_year + 1900) in
+      Tpat begin function
+        | "day" -> day
+        | "month" -> month
+        | "year" -> year
+        | "prec" -> Tstr "sure"
+        | _ -> raise Not_found
+      end
+    end
   in
   let death_symbol = DateDisplay.death_symbol conf in
   let string_of_ondate =
@@ -244,10 +274,10 @@ and module_date conf =
       else raise e
   in
   let code_french_year =
-    func_arg1_no_kw (fun i -> box_string @@ DateDisplay.code_french_year conf (unbox_int i))
+    func_arg1_no_kw (fun i -> Tstr (DateDisplay.code_french_year conf (unbox_int i)))
   in
   let string_of_age =
-    func_arg1_no_kw (fun d -> box_string @@ DateDisplay.string_of_age conf (to_dmy d) )
+    func_arg1_no_kw (fun d -> Tstr (DateDisplay.string_of_age conf (to_dmy d)) )
   in
   let sub =
     func_arg2_no_kw begin fun d1 d2 ->
@@ -256,8 +286,7 @@ and module_date conf =
   in
   let calendar =
     func_arg2_no_kw begin fun dst d ->
-      (* let src = unbox_string @@ Jg_runtime.jg_obj_lookup d "calendar" in *)
-      let convert fn = mk_dmy @@ fn @@ to_dmy (* @@ to_gregorian_aux src *) d in
+      let convert fn = mk_dmy @@ fn @@ to_dmy d in
       match unbox_string @@ dst with
       | "Dgregorian" -> convert (fun x -> x)
       | "Djulian" -> convert Calendar.julian_of_gregorian
@@ -266,31 +295,27 @@ and module_date conf =
       | s -> failwith @@ "Unknown calendar: " ^ s
     end
   in
-  Tpat (function
-      | "calendar" -> calendar
-      | "compare" -> date_compare
-      | "death_symbol" -> Tstr death_symbol
-      | "code_french_year" -> code_french_year
-      | "eq" -> date_eq
-      | "now" -> now
-      | "string_of_age" -> string_of_age
-      | "string_of_ondate" -> string_of_ondate
-      | "sub" -> sub
-      | _ -> raise Not_found
-    )
-
-and lazy_array : 'a . ('a -> tvalue) -> 'a array -> tvalue = fun fn -> function
-  | [||] -> Tarray [||]
-  | a -> Tlazy (lazy (box_array @@ Array.map fn a))
+  Tpat begin function
+    | "calendar" -> calendar
+    | "compare" -> date_compare
+    | "death_symbol" -> Tstr death_symbol
+    | "code_french_year" -> code_french_year
+    | "eq" -> date_eq
+    | "now" -> now
+    | "string_of_age" -> string_of_age
+    | "string_of_ondate" -> string_of_ondate
+    | "sub" -> sub
+    | _ -> raise Not_found
+  end
 
 and lazy_list : 'a . ('a -> tvalue) -> 'a list -> tvalue = fun fn -> function
   | [] -> Tlist []
-  | l -> Tlazy (lazy (box_list @@ List.map fn l))
+  | l -> Tlazy (lazy (Tlist (List.map fn l)))
 
 and lazy_get_n_mk_person conf base i =
   let lp = lazy (get_n_mk_person conf base i) in
   let iper = Tstr (Gwdb.string_of_iper i) in
-  Tpat (function "iper" -> iper | s -> unbox_pat (Lazy.force lp) @@ s)
+  Tpat (function "iper" -> iper | s -> unbox_pat (Lazy.force lp) s)
 
 and pget conf base ip =
   let open Geneweb in
@@ -335,11 +360,12 @@ and mk_related conf base acc =
     in
     let sources = Tstr (Gwdb.sou base s) in
     let lp = lazy (get_n_mk_person conf base i) in
-    Tpat (function
-        | "sources" -> sources
-        | "kind" -> kind
-        | "iper" -> iper
-        | s -> unbox_pat (Lazy.force lp) @@ s)
+    Tpat begin function
+      | "source" -> sources
+      | "kind" -> kind
+      | "iper" -> iper
+      | s -> unbox_pat (Lazy.force lp) s
+    end
   in
   function
   | { Def.r_fath = None ; r_moth = Some i ; r_type ; r_sources }
@@ -369,27 +395,32 @@ and mk_event conf base d =
     | w ->
       let lw = lazy (Array.map (fun (i, _) -> get_n_mk_person conf base i) w) in
       (* We may want to filter on [ip] or [k] before really accessing the person entity *)
-      Tarray (Array.mapi (fun i (ip, k) ->
+      Tarray begin Array.mapi begin fun i (ip, k) ->
           let kind = mk_witness_kind k in
           let iper = Tstr (Gwdb.string_of_iper ip) in
-          Tpat (function
-              | "kind" -> kind
-              | "iper" -> iper
-              | s -> unbox_pat (Lazy.force lw).(i) @@ s) )
-          w )
+          Tpat begin function
+            | "kind" -> kind
+            | "iper" -> iper
+            | s -> unbox_pat (Lazy.force lw).(i) @@ s
+          end
+        end w end
   in
   let place = Tstr (E.place conf base d) in
-  let src = Tstr (E.src base d) in
-  let note = Tstr (E.note conf base d) in
-  Tpat (function "date" -> date
-               | "kind" -> kind
-               | "name" -> name
-               | "note" -> note
-               | "place" -> place
-               | "spouse" -> spouse
-               | "src" -> src
-               | "witnesses" -> witnesses
-               | _ -> raise Not_found)
+  let source_raw, source = mk_source_rs conf base (E.src base d) in
+  let note_raw, note = mk_note_rs conf base [] (E.note conf base d) in
+  Tpat begin function
+    | "date" -> date
+    | "kind" -> kind
+    | "name" -> name
+    | "note" -> note
+    | "note_raw" -> note_raw
+    | "place" -> place
+    | "spouse" -> spouse
+    | "source" -> source
+    | "source_raw" -> source_raw
+    | "witnesses" -> witnesses
+    | _ -> raise Not_found
+  end
 
 and mk_title base t =
   let ident = Tstr (Gwdb.sou base t.Def.t_ident) in
@@ -412,7 +443,7 @@ and mk_title base t =
       | _ -> raise Not_found)
 
 and mk_ancestors conf base (p : Gwdb.person) =
-  let parents = match Ezgw.Person.parents p with
+  let parents = match Gwdb.get_parents p with
     | Some ifam -> Some (lazy (Gwdb.foi base ifam))
     | None -> None
   in
@@ -442,7 +473,7 @@ and mk_ancestors conf base (p : Gwdb.person) =
   (parents, father, mother)
 
 and mk_rparents conf base (p : Gwdb.person) =
-  match Ezgw.Person.rparents p with
+  match Gwdb.get_rparents p with
   | [] -> Tlist []
   | r -> box_list @@ List.fold_left (mk_related conf base) [] r
 
@@ -467,29 +498,25 @@ and mk_families_spouses iper conf base (p : Gwdb.person) =
   in
   (families, spouses)
 
+and mk_str_lst base istrs = Tlist (List.map (fun i -> Tstr (Gwdb.sou base i)) istrs)
+
 and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
-  let get wrap fn = try wrap (fn p) with Not_found -> Tnull in
-  let get_str = get box_string in
   let module E = Ezgw.Person in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
-  let first_name = get_str (E.first_name base) in
-  let first_name_aliases =
-    box_list @@ List.map box_string (E.first_name_aliases base p)
-  in
-  let access = get_str (E.access conf base) in
+  let first_name = Tstr (E.first_name base p) in
+  let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
   let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
   let iper = Tstr (Gwdb.string_of_iper iper') in
   let related = mk_rparents conf base p in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
   let siblings = siblings_aux E.siblings in
   let half_siblings = siblings_aux E.half_siblings in
-  let surname = get_str (E.surname base) in
-  let surname_aliases = Tlist (List.map box_string (E.surname_aliases base p) ) in
+  let surname = Tstr (E.surname base p) in
+  let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let events = Tlist [] in
   Tpat begin function
-    | "access" -> access
     | "children" -> children
     | "events" -> events
     | "families" -> families
@@ -515,119 +542,94 @@ and get_sosa_person =
     let sosa = Perso.get_sosa_person p in
     if sosa = Sosa.zero then Tnull else Tstr (Sosa.to_string sosa)
 
+and find_event conf base x events =
+  match List.find_opt (fun (x', _, _, _, _, _, _) -> x' = x) events with
+  | Some e -> mk_event conf base e
+  | None -> Tnull
+
+and find_events conf base x events =
+  match List.find_opt (fun (x', _, _, _, _, _, _) -> List.mem x' x) events with
+  | Some e -> mk_event conf base e
+  | None -> Tnull
+
 and unsafe_mk_person conf base (p : Gwdb.person) =
-  let get wrap fn = try wrap (fn p) with Not_found -> Tnull in
-  let get_str = get box_string in
-  let get_bool = get box_bool in
-  let get_int = get box_int in
-  let get_float = get box_float in
   let module E = Ezgw.Person in
   let iper' = Gwdb.get_iper p in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
-  let access = get_str (E.access conf base) in
-  let baptism_date = mk_opt mk_date (E.baptism_date p) in
-  let baptism_place = get_str (E.baptism_place conf base) in
-  let birth_date = mk_opt mk_date (E.birth_date p) in
-  let birth_place = get_str (E.birth_place conf base) in
-  let burial = get mk_burial E.burial in
-  let burial_place = get_str (E.burial_place conf base) in
+  let aliases = mk_str_lst base (Gwdb.get_aliases p) in
   let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
-  let consanguinity = get_float (E.consanguinity) in
-  let cremation_place = get_str (E.cremation_place conf base) in
-  let dates = get_str (E.dates conf base) in
-  let death = get mk_death E.death in
-  let death_place = get_str (E.death_place conf base) in
-  let digest = Tlazy (lazy (get_str (E.digest base) ) ) in
-  let events = lazy_list (mk_event conf base) (E.events conf base p) in
-  let first_name = get_str (E.first_name base) in
-  let first_name_aliases = box_list @@ List.map box_string (E.first_name_aliases base p) in
-  let first_name_key = get_str (E.first_name_key base) in
-  let first_name_key_val = get_str (E.first_name_key_val base) in
-  let iper = Tstr (Gwdb.string_of_iper iper') in
-  let is_birthday = get_bool (E.is_birthday conf) in
-  let is_visible_for_visitors =
-    box_lazy @@
-    lazy (Tbool (Util.authorized_age {conf with wizard = false; friend = false} base p))
+  let consanguinity = Tfloat (E.consanguinity p) in
+  let events' = E.events conf base p in
+  let events = lazy_list (mk_event conf base) events' in
+  let birth = find_event conf base (Perso.Pevent Epers_Birth) events' in
+  let baptism = find_event conf base (Perso.Pevent Epers_Baptism) events' in
+  let death = find_event conf base (Perso.Pevent Epers_Death) events' in
+  let burial =
+    find_events conf base [ Perso.Pevent Epers_Burial ; Perso.Pevent Epers_Cremation ] events'
   in
+  let first_name = Tstr (E.first_name base p) in
+  let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
+  let image = Tstr (Gwdb.sou base @@ Gwdb.get_image p) in
+  let iper = Tstr (Gwdb.string_of_iper iper') in
   let linked_page =
     box_lazy @@
     lazy (let fn = E.linked_page conf base p in Tpat (fun s -> Tstr (fn s) ) )
   in
-  let titles = lazy_list (mk_title base) (E.titles p) in
-  let occ = get_int E.occ in
-  let occupation = get_str (E.occupation conf base) in
-  let public_name = get_str (E.public_name base) in
-  let qualifier = get_str (E.qualifier base) in
-  let qualifiers =
-    Tlist (List.map box_string @@ E.qualifiers base p)
-  in
+  let titles = lazy_list (mk_title base) (Gwdb.get_titles p) in
+  let _, note = mk_person_note_rs conf base p (E.note conf base p) in
+  let occ = Tint (Gwdb.get_occ p) in
+  let occupation_raw, occupation = mk_source_rs conf base (Gwdb.sou base @@ Gwdb.get_occupation p) in
+  let public_name = Tstr (Gwdb.sou base @@ Gwdb.get_public_name p) in
+  let qualifiers = mk_str_lst base (Gwdb.get_qualifiers p) in
   let related = mk_rparents conf base p in
   let relations = lazy_list (get_n_mk_person conf base) (E.relations p) in
-  let sex = get_int E.sex in
+  let sex = Tint (E.sex p) in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
   let siblings = siblings_aux E.siblings in
   let half_siblings = siblings_aux E.half_siblings in
-  let sources = get_str @@ E.psources base in
-  let str__ =
-    box_lazy @@
-    lazy (get_str (Util.person_text conf base)) (* FIXME *)
-  in
-  let surname_key_val = get_str (E.surname_key_val base) in
-  let surname = get_str (E.surname base) in
-  let surname_aliases = Tlist (List.map box_string (E.surname_aliases base p) ) in
-  let surname_key = get_str (E.surname_key base) in
+  let source_raw, source = mk_source_rs conf base (Gwdb.sou base @@ Gwdb.get_psources p) in
+  let surname = Tstr (E.surname base p) in
+  let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let sosa = box_lazy @@ lazy begin get_sosa_person conf base p end in
-  Tpat
-    (function
-      | "access" -> access
-      | "baptism_date" -> baptism_date
-      | "baptism_place" -> baptism_place
-      | "birth_date" -> birth_date
-      | "birth_place" -> birth_place
-      | "burial" -> burial
-      | "burial_place" -> burial_place
-      | "children" -> children
-      | "cremation_place" -> cremation_place
-      | "consanguinity" -> consanguinity
-      | "dates" -> dates
-      | "death" -> death
-      | "death_place" -> death_place
-      | "digest" -> digest
-      | "events" -> events
-      | "families" -> families
-      | "father" -> father
-      | "first_name" -> first_name
-      | "first_name_aliases" -> first_name_aliases
-      | "first_name_key" -> first_name_key
-      | "first_name_key_val" -> first_name_key_val
-      | "half_siblings" -> half_siblings
-      | "iper" -> iper
-      | "is_birthday" -> is_birthday
-      | "is_visible_for_visitors" -> is_visible_for_visitors
-      | "linked_page" -> linked_page
-      | "mother" -> mother
-      | "occ" -> occ
-      | "occupation" -> occupation
-      | "parents" -> parents
-      | "public_name" -> public_name
-      | "qualifier" -> qualifier
-      | "qualifiers" -> qualifiers
-      | "relations" -> relations
-      | "related" -> related
-      | "sex" -> sex
-      | "siblings" -> siblings
-      | "sosa" -> sosa
-      | "sources" -> sources
-      | "spouses" -> spouses
-      | "surname" -> surname
-      | "surname_aliases" -> surname_aliases
-      | "surname_key" -> surname_key
-      | "surname_key_val" -> surname_key_val
-      | "titles" -> titles
-      | "__str__" -> str__
-      | _ -> raise Not_found
-    )
+  Tpat begin function
+    | "aliases" -> aliases
+    | "baptism" -> baptism
+    | "birth" -> birth
+    | "burial" -> burial
+    | "children" -> children
+    | "consanguinity" -> consanguinity
+    | "death" -> death
+    | "events" -> events
+    | "families" -> families
+    | "father" -> father
+    | "first_name" -> first_name
+    | "first_name_aliases" -> first_name_aliases
+    | "half_siblings" -> half_siblings
+    | "image" -> image
+    | "iper" -> iper
+    | "linked_page" -> linked_page
+    | "mother" -> mother
+    | "note" -> note
+    | "occ" -> occ
+    | "occupation" -> occupation
+    | "occupation_raw" -> occupation_raw
+    | "parents" -> parents
+    | "public_name" -> public_name
+    | "qualifiers" -> qualifiers
+    | "relations" -> relations
+    | "related" -> related
+    | "sex" -> sex
+    | "siblings" -> siblings
+    | "sosa" -> sosa
+    | "source" -> source
+    | "source_raw" -> source_raw
+    | "spouses" -> spouses
+    | "surname" -> surname
+    | "surname_aliases" -> surname_aliases
+    | "titles" -> titles
+    | _ -> raise Not_found
+  end
 
 and mk_dmy { Def.day ; month ; year ; delta ; prec } =
   let day = Tint day in
@@ -678,49 +680,6 @@ and mk_gen_title base t =
                    | None -> Tnull
                  end
                | _ -> raise Not_found)
-
-and mk_death_reason = function
-  | Def.Killed -> Tstr "Killed"
-  | Murdered -> Tstr "Murdered"
-  | Executed -> Tstr "Executed"
-  | Disappeared -> Tstr "Disappeared"
-  | Unspecified -> Tstr "Unspecified"
-
-and mk_death =
-  let wrap s = Tpat (function "death_reason" -> Tstr s | _ -> raise Not_found) in
-  function
-  | Def.NotDead -> Tnull
-  | Death (r, cd) ->
-    let death_reason = mk_death_reason r in
-    let date = mk_date (Adef.date_of_cdate cd) in
-    Tpat (function "death_reason" -> death_reason
-                 | "date" -> date
-                 | _ -> raise Not_found)
-  | DeadYoung -> wrap "DeadYoung"
-  | DeadDontKnowWhen -> wrap "DeadDontKnowWhen"
-  | DontKnowIfDead -> wrap "DontKnowIfDead"
-  | OfCourseDead -> wrap "OfCourseDead"
-
-and mk_burial = function
-  | Def.UnknownBurial -> Tnull
-  | Buried d ->
-    let type_ = Tstr "Buried" in
-    let date = match Adef.od_of_cdate d with
-      | Some d -> mk_date d
-      | None -> Tnull
-    in
-    Tpat (function "type" -> type_
-                 | "date" -> date
-                 | _ -> raise Not_found)
-  | Cremated d ->
-    let type_ = Tstr "Cremated" in
-    let date = match Adef.od_of_cdate d with
-      | Some d -> mk_date d
-      | None -> Tnull
-    in
-    Tpat (function "type" -> type_
-                 | "date" -> date
-                 | _ -> raise Not_found)
 
 (* take optionnal p parameter for spouse things? *)
 and mk_warning conf base =
@@ -929,7 +888,14 @@ let module_NAME base =
       | _ -> assert false
     end
   in
+  let lower =
+    func_arg1_no_kw begin function
+      | Tstr s -> Tstr (Name.lower s)
+      | _ -> assert false
+    end
+  in
   Tpat begin function
+    | "lower" -> lower
     | "particle" -> particle
     | "without_particle" -> without_particle
     | _ -> raise Not_found
@@ -1000,13 +966,11 @@ let mk_env conf base =
 
 let decode_varenv =
   func_arg1_no_kw @@ fun str ->
-  try Tstr (Mutil.decode @@ unbox_string str)
-  with _ -> failwith_type_error_1 "decode_varenv" str
+  Tstr (Mutil.decode @@ unbox_string str)
 
 let encode_varenv =
   func_arg1_no_kw @@ fun str ->
-  try Tstr (Mutil.encode @@ unbox_string str)
-  with _ -> failwith_type_error_1 "encode_varenv" str
+  Tstr (Mutil.encode @@ unbox_string str)
 
 let mk_base base =
   Tpat begin function
@@ -1019,55 +983,55 @@ let mk_base base =
 let stringify s =
   Printf.sprintf (if String.contains s '\'' then "\"%s\"" else "'%s'") s
 
-let trans (conf : Config.config) =
-  let trad ~kwargs s i =
-    try
-      let s = Hashtbl.find conf.lexicon s in
-      let t =
-        if Lexicon_parser.need_split s
-        then Array.of_list @@ String.split_on_char '/' s
-        else [| s |]
+let trans_aux lexicon ~kwargs x i =
+  try
+    let s = Hashtbl.find lexicon x in
+    let t =
+      if Lexicon_parser.need_split x
+      then Array.of_list @@ String.split_on_char '/' s
+      else [| s |]
+    in
+    let t =
+      Array.map (fun t -> Lexicon_parser.p_trad (Buffer.create 128) [] @@ Lexing.from_string t) t
+    in
+    let i = if i < 0 || i >= Array.length t then 0 else i in
+    let arg s = List.assoc s kwargs in
+    let t = Array.unsafe_get t i in
+    Tstr begin
+      let conv acc = function
+        | Lexicon_parser.Str s -> s
+        | Arg n -> Jg_runtime.string_of_tvalue (arg n)
+        | Elision (s1, s2) ->
+          let x = try unbox_string @@ arg "elision" with Not_found -> acc in
+          if x <> ""
+          && Unidecode.decode
+               (fun _ _ -> false)
+               (fun _ -> function 'A'|'E'|'I'|'O'|'U'|'a'|'e'|'i'|'o'|'u' -> true
+                                     | _ -> false)
+               (fun _ -> false)
+               x 0 (String.length x)
+          then s2
+          else s1
       in
-      let t =
-        Array.map (fun t -> Lexicon_parser.p_trad (Buffer.create 128) [] @@ Lexing.from_string t) t
+      let rec loop s i =
+        if i < 0
+        then s
+        else loop (conv s (Array.unsafe_get t i) ^ s) (i - 1)
       in
-      let i = if i < 0 || i >= Array.length t then 0 else i in
-      let arg s = List.assoc s kwargs in
-      let t = Array.unsafe_get t i in
-      Tstr begin
-        let conv acc = function
-          | Lexicon_parser.Str s -> s
-          | Arg n -> Jg_runtime.string_of_tvalue (arg n)
-          | Elision (s1, s2) ->
-            let x = try unbox_string @@ arg "elision" with Not_found -> acc in
-            if x <> ""
-            && Unidecode.decode
-                 (fun _ _ -> false)
-                 (fun _ -> function 'A'|'E'|'I'|'O'|'U'|'a'|'e'|'i'|'o'|'u' -> true
-                                       | _ -> false)
-                 (fun _ -> false)
-                 x 0 (String.length x)
-            then s2
-            else s1
-        in
-        let rec loop s i =
-          if i < 0
-          then s
-          else loop (conv s (Array.unsafe_get t i) ^ s) (i - 1)
-        in
-        let len = Array.length t in
-        loop (conv "" @@ Array.unsafe_get t @@ len - 1) (len - 2)
-        |> Util.translate_eval
-      end
-    with Not_found -> Tstr (Printf.sprintf "{{%s|trans}}" @@ stringify @@ s)
-  in
+      let len = Array.length t in
+      loop (conv "" @@ Array.unsafe_get t @@ len - 1) (len - 2)
+      |> Util.translate_eval
+    end
+  with Not_found -> Tstr (Printf.sprintf "{{%s|trans}}" @@ stringify x)
+
+let trans lexicon =
   Tfun begin fun ?(kwargs=[]) -> function
     | Tint i ->
       let kw = kwargs in
       Tfun begin fun ?(kwargs=[]) s ->
         let kwargs = List.rev_append kwargs kw in
-        trad ~kwargs (unbox_string s) i end
-    | Tstr s -> trad ~kwargs s 0
+        trans_aux lexicon ~kwargs (unbox_string s) i end
+    | Tstr s -> trans_aux lexicon ~kwargs s 0
     | x -> Jingoo.Jg_types.failwith_type_error_1 "trans" x
   end
 
@@ -1248,8 +1212,8 @@ end
 let default_env conf base =
   let conf_env = mk_conf conf in
   let module_NAME = module_NAME base in
-  ("trans", trans conf)
-  :: ("DATE", module_date conf)
+  ("trans", trans conf.lexicon)
+  :: ("DATE", module_DATE conf)
   :: ("OPT", module_OPT)
   :: ("NAME", module_NAME)
   :: ("GWDB", module_GWDB conf base)
@@ -1258,7 +1222,7 @@ let default_env conf base =
   :: ("encode_varenv", encode_varenv)
   :: ("alphabetic", alphabetic)
   :: ("json_encode", func_arg1_no_kw (fun x -> Tstr (json_encode x) ))
-  :: ("base", mk_base base)
+  :: ("BASE", mk_base base)
   :: ("conf", conf_env)
   :: ("LOG", log)
   :: ("CAST", module_CAST)
