@@ -3,11 +3,11 @@
 let bench name fn =
   let pprint_gc gc =
     let open Gc in
-    let pint n =
-      let s = string_of_int n in
+    let pint x =
+      let s = string_of_int x in
       let aux i = String.make 1 @@ String.unsafe_get s i in
       let rec loop i n acc =
-        if i < 0 then String.concat "" (if n > 0 then "+" :: acc else acc)
+        if i < 0 then String.concat "" (if x > 0 then "+" :: acc else acc)
         else
           let acc =
             if n > 0
