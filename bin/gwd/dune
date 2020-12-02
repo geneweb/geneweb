@@ -1,7 +1,10 @@
 (rule
   (target gwdPluginMD5.ml)
   (deps
-    %{project_root}/plugins/export/plugin_export.cmxs
+    (:cmxs
+      %{project_root}/plugins/export/plugin_export.cmxs
+    )
+    (:maker mk_gwdPluginMD5.ml)
   )
-  (action (with-stdout-to %{target} (run ocaml ./mk_gwdPluginMD5.ml %{deps})))
+  (action (with-stdout-to %{target} (run ocaml %{maker} %{cmxs})))
 )
