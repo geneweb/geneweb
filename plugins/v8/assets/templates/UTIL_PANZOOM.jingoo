@@ -1,0 +1,46 @@
+{%- macro PANZOOM_controllers (id) -%}
+<div id="panzoom-controllers" class="panzoom-controllers border bg-light px-2">
+    <div class="custom-control custom-switch">
+      <input type="checkbox" class="custom-control-input" id="panzoom-fullscreen-controller-input{{ id }}">
+      <label class="custom-control-label" for="panzoom-fullscreen-controller-input{{ id }}">{{ 'full-screen'|trans|capitalize }}</label>
+    </div>
+    <button class="btn" type="button" id="panzoom-controller-reset{{ id }}"><i class="fa fa-history"></i></button>
+    <button class="btn" type="button" id="panzoom-controller-zoomin{{ id }}"><i class="fa fa-plus-square"></i></button>
+    <button class="btn" type="button" id="panzoom-controller-zoomout{{ id }}"><i class="fa fa-minus-square"></i></button>
+  </div>
+{%- endmacro -%}
+
+{# expected #panzoom{{ id }} to be child of #panzoom-parent{{ id }} #}
+
+{% macro PANZOOM_script (id, controllers=false) %}
+<script>
+  (function () {
+    element = document.getElementById('panzoom{{ id }}') ;
+    parent = document.getElementById('panzoom-parent{{ id }}') ;
+    panzoom = Panzoom(element) ;
+    parent.addEventListener ('wheel', function(event) {
+        if (!event.shiftKey) { return } ;
+        panzoom.zoomWithWheel(event) ;
+    });
+    {%- if controllers -%}
+      document.getElementById('panzoom-controller-reset{{ id }}').addEventListener('click', panzoom.reset)
+      document.getElementById('panzoom-controller-zoomin{{ id }}').addEventListener('click', panzoom.zoomIn)
+      document.getElementById('panzoom-controller-zoomout{{ id }}').addEventListener('click', panzoom.zoomOut)
+      document.getElementById('panzoom-fullscreen-controller-input{{ id }}').addEventListener('click', function () {
+        $('#panzoom-parent{{ id }}, #panzoom-controllers{{ id }}').toggleClass('fullscreen') ;
+      }) ;
+    {%- endif -%}
+  }) ();
+</script>
+{%- endmacro -%}
+
+{%- macro PANZOOM (class = 'panzoom-parent card my-3', controllers = false, id) -%}
+  {%- if controllers -%}{{ PANZOOM_controllers (id) }}{%- endif -%}
+  <div id="panzoom-parent{{ id }}" class="{{ class }}">
+    <div class="panzoom" id="panzoom{{ id }}">
+      {{ caller () }}
+    </div>
+  </div>
+  <script src="{{ asset ('panzoom/panzoom.min.js') }}"></script>
+  {{ PANZOOM_script (id, controllers=controllers) }}
+{%- endmacro -%}

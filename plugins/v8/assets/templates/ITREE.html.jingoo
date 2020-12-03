@@ -1,0 +1,37 @@
+{%- include 'UTIL_TREE.jingoo' -%}
+{%- include 'UTIL_PANZOOM.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- block body -%}
+
+<h1>{{ 'tree'|trans|capitalize }} ({{ 'ancestors'|trans|capitalize }}/{{ 'descendants'|trans|capitalize }})</h1>
+
+  <form class="form-inline my-3" method="get" action="{{ env.prefix }}">
+    <div class="my-2 my-md-0">{{ 'generation/generations'|trans(1)|capitalize }}{{ ':'|trans }}</div>
+    {%- for (k, v) in (list (conf.env) + list (conf.senv) + list (conf.henv)) | unique -%}
+    {%- if k != "an" && k != "dn" %}{{ print_hidden (k, v) }}{% endif -%}
+    {%- endfor -%}
+    <div class="input-group ml-3 my-2 my-md-0">
+      <div class="input-group-prepend">
+        <div class="input-group-text">{{ 'ancestors'|trans|capitalize }}</div>
+      </div>
+      <input type="text" class="form-control" name="an" value="{{ env.an ? env.an : 2 }}" size="1">
+    </div>
+    <div class="input-group ml-3 my-2 my-md-0">
+      <div class="input-group-prepend">
+        <div class="input-group-text">{{ 'descendants'|trans|capitalize }}</div>
+      </div>
+      <input type="text" class="form-control" name="dn" value="{{ env.dn ? env.dn : 2 }}" size="1">
+    </div>
+    <button class="btn btn-outline-success ml-3 my-2 my-md-0" type="submit">
+      {{ 'visualize/show/hide/summary'|trans(0)|capitalize }}
+    </button>
+  </form>
+
+  {%- call PANZOOM (controllers = true) -%}
+  {{ print_itree (M.root, env.an, env.dn) }}
+  {%- endcall -%}
+
+{%- endblock -%}

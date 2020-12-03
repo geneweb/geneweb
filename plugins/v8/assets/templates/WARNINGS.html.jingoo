@@ -1,0 +1,30 @@
+{%- include 'UTIL_WARNING.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- block title -%}
+  {{ 'warnings'|trans|capitalize }}
+{%- endblock -%}
+
+{%- block body -%}
+
+  <h1>{{ 'v8_warnings_page'|trans|capitalize }}</h1>
+
+  {%- set warnings = M.warnings|groupby(nth(0)) -%}
+
+  {%- for (grouper, list) in warnings -%}
+    <div class="card mt-3">
+      <a class="card-header" data-toggle="collapse" href="#{{ grouper }}">
+        {{ warning_kind (grouper) | capitalize }} ({{ length (list) }})
+      </a>
+      <div class="card-body collapse show" id="{{ grouper }}">
+        <ul>
+          {%- for w in list -%}
+            <li>{{ print_warning (w) }}</li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+  {%- endfor -%}
+
+{%- endblock -%}

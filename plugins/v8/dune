@@ -1,0 +1,20 @@
+(alias
+   (name plugin)
+   (deps (source_tree assets) (file META) plugin_v8.cmxs)
+)
+
+(executable
+  (name calendars_js)
+  (modes js)
+  (preprocess (pps js_of_ocaml-ppx))
+  (libraries calendars js_of_ocaml)
+  (modules calendars_js)
+)
+
+(executable
+  (name plugin_v8)
+  (libraries jingoo gwxjg geneweb.gwd_lib)
+  (flags -linkall)
+  (modes (native plugin))
+  (modules plugin_v8)
+)

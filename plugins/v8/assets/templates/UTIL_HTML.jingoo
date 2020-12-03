@@ -1,0 +1,64 @@
+{%- function GET (except) -%}
+  {{ fold ( ((acc, x) => ((x[0] in except) ? acc : acc + x[0] + '=' + x[1] + '&'))
+          , "", list (conf.henv) + list (conf.senv) + list (conf.env)) }}
+{%- endfunction -%}
+
+{%- macro print_GET (env, except=[]) -%}
+  {%- for (k, v) in env -%}
+    {%- if k != except -%}{{ k }}={{ decode_varenv (v)|escape }}&{%- endif -%}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro print_GET_env (except) -%}
+  {%--%}{{ print_GET (conf.henv, except=except) }}{%--%}
+  {%--%}{{ print_GET (conf.senv, except=except) }}{%--%}
+  {%--%}{{ print_GET (conf.env, except=except) }}{%--%}
+{%- endmacro -%}
+
+{%- macro print_URL_prefix () -%}
+  {%--%}{{ conf.command }}?{%--%}
+  {%--%}{{ print_GET_env (conf.henv) }}
+  {%--%}{{ print_GET_env (conf.senv) }}
+{%- endmacro -%}
+
+{%- macro print_POST (env, except = []) -%}
+  {%- for (k, v) in env -%}
+    {%- if not (k in except) -%}
+      <textarea style="display:none;" name="{{ k }}">{{ decode_varenv (v)|escape }}</textarea>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro print_POST_env (except) -%}
+  {%--%}{{ print_POST (conf.env, except=except) }}{%--%}
+  {%--%}{{ print_POST (conf.henv, except=except) }}{%--%}
+  {%--%}{{ print_POST (conf.senv, except=except) }}{%--%}
+{%- endmacro -%}
+
+{%- macro columns (s, m, l, xl) -%}
+  col-sm-{{ s }} col-md-{{ m }} col-lg-{{ l }}
+  {%- if xl != null %} col-xl-{{xl}}{% endif  -%}
+{%- endmacro columns -%}
+
+{%- macro inputCheckbox (class="", checked=false, name, label) -%}
+  <div class="form-check {{ class }}">
+    <input class="form-check-input" id="{{ name }}" name="{{ name }}" type="checkbox" {% if checked %}checked="checked"{% endif %}>
+    <label class="form-check-label" for="{{ name }}">{{ label }}</label>
+  </div>
+{%- endmacro inputCheckbox -%}
+
+{%- macro inputRadio (name, value, label, checked) -%}
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" id="{{ name }}" name="{{ name }}" value="{{ value }}"
+           {% if checked %}checked{% endif %}>
+    <label class="form-check-label" for="{{ name }}">
+      {{ label|capitalize }}
+    </label>
+  </div>
+{%- endmacro inputRadio -%}
+
+{%- macro option (value, cond, label) -%}
+  <option value="{{ value }}"{% if cond %} selected="selected"{% endif %}>
+    {%--%}{{ label }}{%--%}
+  </option>
+{%- endmacro option -%}

@@ -1,0 +1,19 @@
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'UTIL_PANZOOM.jingoo' -%}
+{%- include 'UTIL_DATA.jingoo' -%}
+{%- include 'UTIL_TREE.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- block body -%}
+
+<h1>{{ 'h_tree'|trans|capitalize }}</h1>
+
+<div class="break-out px-3">
+  {%- call PANZOOM (controllers = true) -%}
+    {{ H_TREE_ascends (M.root, 0, int (env.an)) }}
+  {%- endcall -%}
+</div>
+
+{%- endblock -%}

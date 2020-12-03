@@ -1,0 +1,13 @@
+{%- include 'UTIL_DISPLAY.jingoo' -%}
+
+{%- extends 'SKELETON.html.jingoo' -%}
+
+{%- block body %}
+
+<h1>Simple search</h1>
+
+<p>{{ M.result | length }} result(s) matching <strong><em>{{ decode_varenv (env.v) }}</em></strong>.</p>
+
+{{ print_results (M.result) }}
+
+{% endblock -%}

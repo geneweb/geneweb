@@ -1,0 +1,35 @@
+{%- include 'SEARCH_ADVANCED_FORM.html.jingoo' -%}
+{%- extends 'SKELETON.html.jingoo' -%}
+
+{%- block body %}
+
+<h2 class="mt-5 mb-3">{{ 'simple search'|trans(0)|capitalize }}</h2>
+
+<div class="mb-5">
+  <form class="my-auto mx-auto w-50" method="get" action="{{ env.prefix }}">
+    {{ print_hidden_env () }}
+    <input type="hidden" name="m" value="SEARCH_SIMPLE">
+    <div class="input-group">
+      <input class="form-control" type="search"
+             name="v" placeholder="{{ 'simple search'|trans(0)|capitalize }}">
+      <div class="input-group-append" >
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"
+                title="{{ 'search/case sensitive'|trans(0)|capitalize }} {{ 'person/persons'|trans(0) }}">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<h2 class="mt-5 mb-3">{{ 'advanced request'|trans|capitalize }}</h2>
+
+<div class="mb-5">
+  {{ print_SEARCH_ADVANCED_FORM_form () }}
+</div>
+
+{% endblock -%}
+
+{% block script %}
+  {{ print_SEARCH_ADVANCED_FORM_script () }}
+{% endblock %}

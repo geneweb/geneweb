@@ -1,0 +1,215 @@
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'UTIL_DATA.jingoo' -%}
+{%- include 'UTIL_TREE.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- block body -%}
+
+{%- macro PATH_pp (p) -%}
+  <a class="unvisited" href="{{ env.prefix }}i={{ p.iper }}">{{ fso (p) }}</a>
+  {{ print_short_dates_text (p, empty = '') }}
+{%- endmacro -%}
+
+{%- macro PATH_union (p1, parents, p2) -%}
+  &amp;
+  {%- if parents.marriage_date %}
+    {{ short_year (parents.marriage_date) }}
+  {%- endif -%}
+  <br>{{ PATH_pp (p2) }}
+{%- endmacro -%}
+
+{%- macro PATH_hs_parents (p1, p2, p3) -%}
+  <div style="border-bottom: 1px solid #999;padding-bottom: 10px;">
+    {{ PATH_pp (p1) }}
+  </div>
+  <div style="display:flex;margin-top:10px;">
+    <div style="flex: 1 1 1px;padding-right:10px;align-self:center;">
+      {{ PATH_union (p1, get_union (p1, p2), p2) }}
+    </div>
+    <div style="border-left:1px solid #999;align-self:stretch;"></div>
+    <div style="flex: 1 1 0px;padding-left:10px;align-self:center;">
+      {{ PATH_union (p1, get_union (p1, p3), p3) }}
+    </div>
+  </div>
+{%- endmacro -%}
+
+{# currentX, currentY, maxX, maxY, minY #}
+{%- function PATH_compute_max (acc, x) -%}
+{%- switch (x.relation) -%}
+{%- case 'Self' -%}
+  {{ acc }}
+{%- case 'Parent' -%}
+  {{ [ acc[0], acc[1] + 1, acc[2], max ([acc[3], acc[1] + 1]), acc[4] ] }}
+{%- case 'Sibling' -%}
+  {{ [ acc[0] + 1, acc[1], max ([acc[2], acc[0] + 1]), max ([acc[3], acc[1] + 1]), acc[4] ] }}
+{%- case 'HalfSibling' -%}
+  {{ [ acc[0] + 1, acc[1], max ([acc[2], acc[0] + 1]), max ([acc[3], acc[1] + 1]), acc[4] ] }}
+{%- case 'Mate' -%}
+  {{ [ acc[0] + 1, acc[1], max ([acc[2], acc[0] + 1]), acc[3], acc[4] ] }}
+{%- case 'Child' -%}
+  {{ [ acc[0], acc[1] - 1, acc[2], max ([acc[3], acc[1]]), min ([acc[4], acc[1] - 1]) ] }}
+{%- endswitch -%}
+{%- endfunction -%}
+
+{%- set m = fold (PATH_compute_max, [0, 0, 0, 0, 0], M.path) -%}
+{%- set maxX = m[2] -%}
+{%- set maxY = m[3] -%}
+{%- set minY = m[4] -%}
+
+<h1>{{ 'relationship'|trans|capitalize }}</h2>
+
+<table class="PATH_table">
+
+{%- set PATH_ns = namespace (prevX=-1, prevY=-1, currentX=0, currentY=0, latest=-1) -%}
+
+{%- for y in range (maxY, minY) -%}
+   {{ LOG ('') }}
+   {{ LOG ('    FOR y = ' + y) }}
+    <tr data-y="{{ y }}">
+      {%- set PATH_ns.prevY = -1 -%}
+      {%- set PATH_ns.prevX = -1 -%}
+      {%- set PATH_ns.currentY = 0 -%}
+      {%- set PATH_ns.currentX = 0 -%}
+      {%- set PATH_ns.latest = -1 -%}
+      {%- for e in M.path -%}
+        {%- switch (e.relation) -%}
+        {%- case 'Parent' -%}
+        {%- set currentX = PATH_ns.currentX -%}
+        {%- set currentY = PATH_ns.currentY + 1 -%}
+        {%- case 'Sibling' -%}
+        {%- set currentY = PATH_ns.currentY -%}
+        {%- set currentX = PATH_ns.currentX + 1 -%}
+        {%- case 'HalfSibling' -%}
+        {%- set currentY = PATH_ns.currentY -%}
+        {%- set currentX = PATH_ns.currentX + 1 -%}
+        {%- case 'Mate' -%}
+        {%- set currentY = PATH_ns.currentY -%}
+        {%- set currentX = PATH_ns.currentX + 1 -%}
+        {%- case 'Child' -%}
+        {%- set currentY = PATH_ns.currentY - 1 -%}
+        {%- set currentX = PATH_ns.currentX -%}
+        {%- default -%}
+        {%- set currentY = PATH_ns.currentY -%}
+        {%- set currentX = PATH_ns.currentX -%}
+        {%- endswitch -%}
+        {{ LOG ((PATH_ns.currentY == y || (PATH_ns.currentY == y - 1 && (e.relation == 'Sibling' || e.relation == 'HalfSibling')) ? '--> ' : '')  + 'relation:' + e.relation + ' latest:' + PATH_ns.latest + ' currentX:' + PATH_ns.currentX + ' currentY:' + PATH_ns.currentY) }}
+        {%- if PATH_ns.latest == -1 && currentX != 0 -%}
+          {{ LOG ('  PATH_ns.latest == -1 && currentX != 0') }}
+          {%- set fill = currentX -%}
+          {{ LOG ('  ' + fill) }}
+        {%- else if PATH_ns.latest != -1 && currentX - PATH_ns.latest > 1 -%}
+          {{ LOG ('  PATH_ns.latest == -1 && currentX != 0') }}
+          {%- set fill = currentX - PATH_ns.latest -%}
+          {{ LOG ('  ' + fill) }}
+       {%- else -%}
+           {{ LOG ('  else') }}
+          {%- set fill = 0 -%}
+        {%- endif -%}
+        {%- set class = '' -%}
+        {%- if loop.revindex0 -%}
+          {%- switch (M.path[ loop.index ].relation) -%}
+          {%- case 'Sibling' -%}{% set class += ' PATH_tr' -%}
+          {%- case 'HalfSibling' -%}{% set class += ' PATH_tr2' -%}
+          {%- case 'Mate' -%}{% set class += ' PATH_r' -%}
+          {%- case 'Child' -%}{% set class += ' PATH_b' -%}
+          {%- case 'Parent' -%}{% set class += ' PATH_t1' -%}
+          {%- endswitch -%}
+        {%- endif -%}
+        {%- switch (e.relation) -%}
+        {%- case 'Sibling' %}{% set class += ' PATH_tl' -%}
+        {%- case 'HalfSibling' %}{% set class += ' PATH_tl2' -%}
+        {%- case 'Child' %}{% set class += ' PATH_t2' -%}
+        {%- case 'Parent' %}{% set class += ' PATH_b' -%}
+        {%- case 'Mate' -%}{% set class += ' PATH_l' -%}
+        {%- endswitch -%}
+        {%- if currentY == y -%}
+          {{ LOG ('  [PRINT]' + fill) }}
+          {%- if fill -%}<td colspan="{{ fill }}"></td>{%- endif -%}
+          <td class="{{ class }}">
+            <div class="PATH_td-container" {# title="{{ tip }}" #}>
+              <div class="PATH_td-content">
+                {{ PATH_pp (e.person) }}
+                {%- if loop.revindex0 -%}
+                  {%- set tmp = M.path[ loop.index ] -%}
+                  {%- if tmp.relation == 'Child' -%}
+                    {%- if tmp.person.father.iper == e.person.iper -%}
+		      <br>{{ PATH_union (e.person, tmp.parents, tmp.person.mother) }}
+                    {% else %}
+		      <br>{{ PATH_union (e.person, tmp.parents, tmp.person.father) }}
+                    {% endif %}
+                  {%- endif -%}
+                {%- endif -%}
+                {%- if e.relation == 'Parent' -%}
+                  {%- set tmp = M.path[ loop.index0 - 1 ] -%}
+                  {%- if tmp.person.father.iper == e.person.iper -%}
+		    <br>{{ PATH_union (e.person, tmp.parents, tmp.person.mother) }}
+                  {%- else -%}
+		    <br>{{ PATH_union (e.person, tmp.parents, tmp.person.father) }}
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
+            </div>
+          </td>
+          {%- set PATH_ns.latest = currentX -%}
+        {%- else if currentY == y - 1 && (e.relation == "Sibling" || e.relation == "HalfSibling") -%}
+          {{ LOG ('  [PRINT]' + fill) }}
+          {%- if fill >= 2 -%}<td class="PATH_td" colspan="{{ fill - 1 }}"></td>{%- endif -%}
+          <td class="{{ e.relation == 'Sibling' ? 'PATH_b' : 'PATH_b2' }}" colspan="2">
+            <div class="PATH_td-container">
+              <div class="PATH_td-content">
+                {%- if e.relation == "Sibling" -%}
+                  {{ PATH_pp (e.person.father) }}<br>{{ PATH_pp (e.person.mother) }}
+                {%- else if e.person.mother.iper == M.path[ loop.index0 - 1 ].person.mother.iper  -%}
+		  {{ PATH_hs_parents (e.person.mother, M.path[ loop.index0 - 1 ].person.father, e.person.father) }}
+                {%- else  -%}
+		  {{ PATH_hs_parents (e.person.father, M.path[ loop.index0 - 1 ].person.mother, e.person.mother) }}
+                {%- endif -%}
+              </div>
+            </div>
+          </td>
+          {%- set PATH_ns.latest = currentX -%}
+        {%- endif -%}
+        {%- set PATH_ns.prevY = PATH_ns.currentY -%}
+        {%- set PATH_ns.prevX = PATH_ns.currentX -%}
+        {%- set PATH_ns.currentY = currentY -%}
+        {%- set PATH_ns.currentX = currentX -%}
+  {%- endfor -%}
+    </tr>
+{%- endfor -%}
+</table>
+
+<p class="text-right">
+  <a href="{{ conf.command }}?{{ print_GET_env ([]) }}{{next_index_in_env ('ef')}}={{ M.ifam }}">
+    {{'v8_next_relationship_path'|trans|capitalize}}
+  </a>
+</p>
+
+{%- include 'EXPORT.html.jingoo' -%}
+
+{%- if enabled_plugin ('export') -%}
+
+{%- call export_form () -%}
+  {%- for e in M.path -%}
+    {{ export_aux (e.person.iper) }}
+    {%- if e.relation == "Sibling" -%}
+      {{ export_aux (e.person.father.iper) }}
+      {{ export_aux (e.person.mother.iper) }}
+    {%- else if e.relation == "HalfSibling" -%}
+      {%- if e.person.mother.iper == M.path[ loop.index0 - 1 ].person.mother.iper -%}
+        {{ export_aux (e.person.mother.iper) }}
+        {{ export_aux (M.path[ loop.index0 - 1 ].person.father.iper) }}
+        {{ export_aux (e.person.father.iper) }}
+      {%- else -%}
+        {{ export_aux (e.person.father.iper) }}
+        {{ export_aux (M.path[ loop.index0 - 1 ].mother.father.iper) }}
+        {{ export_aux (e.person.mother.iper) }}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcall -%}
+
+{%- endif -%}
+
+{%- endblock -%}

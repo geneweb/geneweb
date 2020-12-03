@@ -1,0 +1,339 @@
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'UTIL_DATA.jingoo' -%}
+{%- include 'UTIL_TREE.jingoo' -%}
+{%- include 'UTIL_PANZOOM.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- block body -%}
+
+{%- function at_the_age_of (d, t0) -%}
+  {%- set a = DATE.sub (d, t0) -%}
+  {%- switch (a.prec) -%}
+  {%- case 'sure' -%}
+  {%- if t0.approx %}{{ "at the age of (about)"|trans + ' ' + DATE.string_of_age (a) }}
+  {%- else %}{{ "at the age of (sure)"|trans + ' ' + DATE.string_of_age (a) }}
+  {%- endif -%}
+  {%- case "maybe" %}{{ "at the age of (maybe)"|trans + ' ' + DATE.string_of_age (a) }}
+  {%- case "before" %}{{ "at the age of (less than)"|trans + ' ' + DATE.string_of_age (a) }}
+  {%- case "after" %}{{ "at the age of (more than)"|trans + ' ' + DATE.string_of_age (a) }}
+{%- endswitch -%}
+{%- endfunction -%}
+
+{%- macro etat_civil (p, place=true) -%}
+{%- set bi = p.birth -%}
+{%- set ba = p.baptism -%}
+{%- set de = p.death -%}
+{%- set bu = p.burial -%}
+{%- set t0 = approx_birth (p) -%}
+<ul>
+  {%- if bi && (bi.date || bi.place) -%}
+  <li>
+    {{ 'born'|trans(p.sex)|capitalize }}
+    {%- if bi.date %}
+      {{ DATE.string_of_ondate (bi.date) }}
+      {%- if de == null %} ({{ DATE.string_of_age (DATE.sub (conf.today, bi.date)) }}){% endif -%}
+    {%- endif -%}
+    {%- if de == null
+        && bi.date
+        && bi.date.prec == 'sure'
+        && conf.today.day == bi.date.day
+        && conf.today.month == bi.date.month
+    %}
+    ({{ 'happy birthday to you!'|trans }})
+    {%- endif -%}
+    {%- if place && bi.place %} - {{ bi.place }}{% endif -%}
+  </li>
+  {%- endif -%}
+  {%- if ba -%}
+  <li>
+    {{ 'baptized'|trans(p.sex)|capitalize }}
+    {%- if ba.date %} {{ DATE.string_of_ondate (ba.date) }}{%- endif -%}
+    {%- if place && ba.place %} - {{ ba.place }}{% endif -%}
+  </li>
+  {%- endif -%}
+  {%- if de -%}
+    <li>
+    {{ 'died'|trans(p.sex)|capitalize }}
+    {%- if de.date %} {{ DATE.string_of_ondate (de.date) }}{%- endif -%}
+    {%- if place && de.place %} - {{ de.place }}{% endif -%}
+    {%- if de.date && t0 %} {{ at_the_age_of (de.date, t0) }}{% endif -%}
+  </li>
+  {%- endif -%}
+  {%- if bu -%}
+  <li>
+    {%- if bu.kind == 'EPERS_BURIAL' -%}
+    {{ 'buried'|trans(p.sex)|capitalize }}
+    {% else %}
+    {{ 'cremated'|trans(p.sex)|capitalize }}
+    {%- endif -%}
+    {%- if bu.date %} {{ DATE.string_of_ondate (bu.date) }}{%- endif -%}
+    {%- if place && bu.place %} - {{ bu.place }}{% endif -%}
+  </li>
+  {%- endif -%}
+  {%- if (conf.friend || conf.wizard) && p.consanguinity >= 0.0001 -%}
+  <li>{{ 'consanguinity'|trans|capitalize }}{{ ':'|trans }} {{ p.consanguinity }}</li>
+  {%- endif -%}
+</ul>
+{%- endmacro -%}
+
+{%- macro fna (list) -%}
+  {%- for x in list -%}
+    <span class="badge badge-secondary mr-1">
+      {%--%}
+      {{ x }} {{ M.root.surname }}
+      {%--%}
+    </span>
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro sna (list) -%}
+  {%- for x in list -%}
+    <span class="badge badge-secondary mr-1">
+      {%--%}
+      {{ M.root.public_name ? M.root.public_name : M.root.first_name }} {{ x }}
+      {%--%}
+    </span>
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro portrait (p, s, m, l) -%}
+  <div class="row">
+    {%- if p.image -%}
+      <div class="{{ columns (s, m, l) }} ind-image">
+        <img src="{{ p.image | escape }}">
+      </div>
+      <div class="{% if m == 12 %}mt-3 mt-sm-0 mt-md-3 mt-lg-0 {% endif -%}
+                  {{ columns ( 12 - s > 0 ? 12 - s : 12
+                             , 12 - m > 0 ? 12 - m : 12
+                             , 12 - l > 0 ? 12 - l : 12) }}">
+        {%--%}{{ caller () }}{%--%}
+      </div>
+    {%- else -%}
+      <div class="{{ columns (12, 12, 12) }}">
+        {%--%}{{ caller () }}{%--%}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endmacro -%}
+
+<div class="mb-4">
+  {% call portrait (M.root, 12, 4, 4) %}
+    <h1 class="text-primary font-weight-bold">
+      {%- if M.root.sex == 0 -%}
+        <i class="text-secondary fas fa-mars"></i>
+      {%- else if M.root.sex == 1 -%}
+        <i class="text-secondary fas fa-venus"></i>
+      {%- else -%}
+        <i class="text-secondary fas fa-neuter"></i>
+      {%- endif -%}
+      &nbsp;
+      {%- if M.root.public_name -%}
+        {%- if M.root.qualifiers -%}{{ M.root.public_name }} <em>{{ M.root.qualifiers[0] }}</em>
+        {%- else -%}
+          {{ M.root.public_name }}
+          <a href="{{ print_URL_prefix () }}&m=N&v={{ NAME.lower (M.root.surname) }}">
+            {%--%}{{ M.root.surname }}{%--%}
+          </a>
+        {%- endif -%}
+      {%- else -%}
+        <a href="{{ print_URL_prefix () }}&m=P&v={{ NAME.lower (M.root.first_name) }}">
+          {%--%}{{ M.root.first_name }}{%--%}
+        </a>
+        <a href="{{ print_URL_prefix () }}&m=N&v={{ NAME.lower (M.root.surname) }}">
+          {%--%}{{ M.root.surname }}{%--%}
+        </a>
+        {%- if M.root.qualifiers %} <em>{{ M.root.qualifiers[0] }}</em>{%- endif -%}
+        {%- endif -%}
+    </h1>
+    {%- if M.root.first_name_aliases
+      || M.root.qualifiers
+      || M.root.surname_aliases
+      || M.root.titles
+      || M.root.public_name -%}
+      <p>
+        {%--%}{{ 'also known as'|trans|capitalize }}{{ ":"|trans }}
+        {% if M.root.public_name -%}{{ fna ([M.root.first_name]) }}{%- endif -%}
+        {%- if length (M.root.qualifiers) > 1 -%}{{ sna (M.root.qualifiers) }}{%- endif -%}
+        {%--%}{{ sna (M.root.surname_aliases) }}
+        {%--%}{{ fna (M.root.first_name_aliases) }}
+      </p>
+    {%- endif -%}
+    {%- if M.root.sosa -%}
+      <p>
+        <em class="sosa">
+          <span title="{{ 'direct ancestor of %s'|trans(s=fso (env.sosa_ref))|capitalize }}, {% -%}
+                       {{ 'Sosa'|trans }} {{ M.root.sosa }}">
+                       {{ 'Sosa'|trans|capitalize }}{{ ':'|trans }}
+                       <a class="sosa-a"
+                          href="{{ env.prefix }}m=RL&i1={{ M.root.iper }}&i2={{ env.sosa_ref.iper }}&b1=1&b2={{ M.root.sosa }}">
+                          {{ M.root.sosa }}
+                       </a>
+          </span>
+        </em>
+        <br>
+      </p>
+    {%- endif -%}
+    {{ etat_civil (M.root) }}
+  {%- endcall -%}
+</div>
+
+{%- if M.root.parents -%}
+<div class="card mb-4">
+  <div class="card-header">{{ 'parents'|trans|capitalize }}</div>
+  <div class="card-body row">
+    <div class="{{ columns (12, 6, 6) }}">
+      {%- call portrait (M.root.father, 4, 12, 4) -%}
+        {{ print_person_short (M.root.father) }}
+        {{ etat_civil (M.root.father, place = false) }}
+      {%- endcall -%}
+    </div>
+    <div class="{{ columns (12, 6, 6) }} border-sm-0 border-left mt-sm-3 mt-md-0">
+      {%- call portrait (M.root.mother, 4, 12, 4) -%}
+        {{ print_person_short (M.root.mother) }}
+        {{ etat_civil (M.root.mother, place = false) }}
+      {%- endcall -%}
+    </div>
+  </div>
+</div>
+{%- endif -%}
+
+{%- macro print_families (p, i, m) -%}
+  {%- for f in p.families -%}
+    {%- if i == 1 || loop.length > 1 -%}
+      <li{% if i == 1 && loop.index0 %} class="mt-3"{% endif %}>
+        {%- if conf.wizard && i == 1 -%}
+          <a href="{{ env.prefix + 'm=MOD_FAM&i=' + f.ifam + '&ip=' + p.iper }}">
+            {%--%}<i class="far fa-edit fa-xs mr-1"></i>{%--%}
+          </a>
+        {%- endif -%}
+        {{ married_to (p.sex, f, marriage_date_place (f))|capitalize }} {%%}
+    {%- else -%}
+      , {{ married_to (p.sex, f, marriage_date_place (f)) }} {%%}
+    {%- endif -%}
+      {{ print_person (f.spouse) }}
+      {%- if f.witnesses %}
+        ({{ 'witness/witnesses'|trans(length(f.witness == 1) ? 0 : 1) }}{{ ':'|trans }}
+        {%- for w in f.witnesses -%}
+          {%- if loop.index0 %}, {% endif %}{{ print_person (w) }}
+	{%- endfor -%})
+      {%- endif -%}
+      {%- if f.separation %}
+        {%- if f.separation == 'SEPARATED' %}
+	  , {{ 'separated'|trans }}
+	{%- else -%}
+	  , {{ 'divorced'|trans }}
+	  {%- if f.separation.date %} {{ DATE.string_of_ondate (f.separation.date) }}{%- endif -%}
+	  {%- endif %}
+        {%- endif -%}
+        {%- if f.children %}
+          {{ 'having as children'|trans }}
+          <ul>
+            {%- for c in f.children -%}
+              <li>
+                {{ print_person (c, parents = false) }}
+                {%- if i < m && c.families -%}
+                {%- if length (c.families) > 1 -%}<ul>{%- endif -%}
+                {{ print_families (c, i + 1, m) }}
+                {%- if length (c.families) > 1 -%}</ul>{%- endif -%}
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+	  </ul>
+        {%- endif -%}
+    {%- if i == 1 || loop.length > 1 -%}</li>{%- endif -%}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- if M.root.families -%}
+<div class="card mb-4">
+  <div class="card-header">
+    {{ 'union(s)'|trans|capitalize }}
+    {%- if exists ((f) => length (f.children) > 0, M.root.families) %}
+      {{ 'and'|trans }} {{ 'child/children'|trans }}
+    {%- endif %}
+  </div>
+  <ul class="card-body m-0">
+    {{ print_families (M.root, 1, conf.benv.ind_d ? int (conf.benv.ind_d) : 1) }}
+  </ul>
+</div>
+{%- endif -%}
+
+{%- if M.root.parents && length (M.root.parents.children) > 1 -%}
+<div class="card mb-4">
+  <div class="card-header">
+    {{ conf.benv['full_fratrie'] == "yes" ? 'full siblings'|trans|capitalize : 'siblings'|trans|capitalize }}
+  </div>
+  <ul class="card-body m-0">
+    {%- for c in M.root.parents.children -%}
+    {%- if c.iper == M.root.iper %}<li><em>{{ fso (M.root) }}</em></li>
+    {%- else %}<li>{{ print_person (c, parents = false) }}</li>
+    {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</div>
+{%- endif -%}
+
+{%- macro hsiblings (p, class) -%}
+<div class="{{ columns (12, 6, 6) }}{{ class }}">
+  <div>{{ "on %s's side"|trans(s=fso(p))|capitalize }}</div>
+  <ul>
+    {%- for f in p.families -%}
+      {%- if f.ifam != M.root.parents.ifam -%}
+        {%- for c in f.children -%}
+        <li>{{ print_person (c, parents = false) }}</li>
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</div>
+{%- endmacro -%}
+
+{%- set hhsiblings = exists ((f) => f.ifam != M.root.parents.ifam && f.children) -%}
+{%- if (M.root.father && hhsiblings (M.root.father.families))
+    || (M.root.mother && hhsiblings (M.root.mother.families)) -%}
+<div class="card mb-4">
+  <div class="card-header">
+    {{ 'half siblings'|trans|capitalize }}
+  </div>
+  <div class="card-body row">
+    {%- if M.root.father && hhsiblings (M.root.father.families) -%}
+    {{ hsiblings (M.root.father) }}
+    {%- endif -%}
+    {%- if M.root.mother && hhsiblings (M.root.mother.families) -%}
+    {{ hsiblings (M.root.mother, hhsiblings (M.root.father.families) ? ' border-left' : '') }}
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+{%- if M.root.related || M.root.relations -%}
+<div class="card mb-4">
+  <div class="card-header">{{ 'relation/relations'|trans|capitalize }}</div>
+  <div class="card-body">
+    <ul>
+      {%- for r in M.root.related -%}
+      <li>
+	<strong>{{ lex_related_kind (r)|capitalize }}{{ ':'|trans }}</strong>
+	{{ print_person (r) }}
+      </li>
+      {%- endfor -%}
+      {%- for r in M.root.relations -%}
+      <li>
+	<strong>{{ lex_witness_kind (M.root, r)|capitalize }}{{ ':'|trans }}</strong>
+	{{ print_person (r) }}
+      </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+{%- endif -%}
+
+{%- if M.root.parents || M.root.children -%}
+  {%- call PANZOOM () -%}
+  {{ print_adtree (M.root, 1, 1) }}
+  {%- endcall -%}
+ {%- endif -%}
+
+{%- endblock -%}

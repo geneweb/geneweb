@@ -1,0 +1,19 @@
+<div class="navbar navbar-expand-md navbar-light bg-light border-top">
+  <ul class="navbar-nav w-100">
+    <li class="nav-item pr-2 mr-2">
+      <strong>{{ 'powered_by'|trans|capitalize }}{{ ':'|trans }}</strong>
+    </li>
+    <li class="nav-item pr-2 mr-2 border-right">
+      <a href="https://getbootstrap.com/">Bootstrap</a>
+    </li>
+    <li class="nav-item pr-2 mr-2 border-right">
+      <a href="https://bootswatch.com/">Bootswatch</a>
+    </li>
+    <li class="nav-item pr-2 mr-2">
+      <a href="https://fontawesome.com/">Font Awesome</a>
+    </li>
+    <li class="nav-item pr-2 ml-auto">
+      <a href="https://github.com/geneweb/geneweb/">GeneWeb</a>
+    </li>
+  </ul>
+</div>

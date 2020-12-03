@@ -1,0 +1,395 @@
+    %s has a younger ancestor %s
+de: %s ist viel älter als sein Vorfahre %s
+en: %s is older than his/her ancestor %s
+es: %s es más viejo que su antepasado %s
+fi: %s on vanhempi kuin hänen esi-isänsä %s
+fr: %s est plus vieux que son ancêtre %s
+it: %s è più vecchio del suo avo - %s
+nl: %s is ouder dan zijn voorouder %s
+no: %s er eldre enn hans/hennes stamfar %s
+pt: %s é mais velho/a do que o seu antepassado/a sua antepassada %s
+sv: %s är äldra hans hennes/hans förfader %s
+
+    %t's %s before his/her %s
+de: %t : %s vor seinem/seiner %s
+en: %t : %s before his/her %s
+es: %t : %s antes que su %s
+fi: %t : %s ennen hänen %s
+fr: %t : %s avant son/sa %s
+it: %t : %s prima del suo(a) %s
+nl: %t : %s voor zijn/haar %s
+no: %t : %s før hans/hennes %s
+pt: %t : %s antes do seu/da sua %s
+sv: %t : %s innan hennes/hans %s
+
+    access_rigths_selector
+de: zugang
+en: access rights
+es: acceso
+fi: pääsyoikeudet
+fr: droits d'accès
+it: accesso
+nl: toegangsrechten
+no: tilgangsrettigheter
+pt: direitos de acesso
+sv: Rättigheter
+
+    ad_tree
+en: anscendants and descendants tree
+fr: arbre d'ascendance et descendance
+
+    advanced_search_sosa_checkbox
+de: Begrenzt auf die direkten Vorfahren der Ausgangsperson (Sosa)
+en: limit to the direct ancestry of the root person (Sosa/Ahnentafel)
+es: limitar a los antepasados directos de la persona tronco (Sosa)
+fi: rajaa suoraan juurihenkilön esivanhempaan (Sosa/Ahnentafel)
+fr: limiter aux ancêtres directs de la souche (sosas)
+it: limitare agli avi diretti della persona stipite (Sosa)
+nl: beperken tot de rechtstreekse voorouders van de bronpersoon (Sosa)
+no: begrens til direkte stamfar til rotpersonen (Sosa/Ahnentafel)
+pt: limitar aos antepassados directos da pessoa raiz da árvore (Sosa/Ahnentafel)
+sv: begränsa till direkta förfäder till rotpersonen (Sosa/Ahnentafel)
+
+    also known as
+en: also known as
+fr: aussi connu sous le nom de
+
+    apply modifications
+en: apply modifications
+fr: appliquer les modifications
+
+    at the age of (about)
+en: aged about
+fr: à environ
+
+    at the age of (sure)
+en: aged
+fr: à
+
+    at the age of (maybe)
+en: maybe aged
+fr: peut-être à
+
+    at the age of (less than)
+en: aged less than
+fr: à de moins de
+
+    at the age of (more than)
+en: aged more than
+fr: à de plus de
+
+    convert_calendar
+de: datum konvertieren
+en: calendar converter
+es: convertidor de fechas
+fi: kalenterimuunnin
+fr: convertir une date
+it: convertitore di date
+nl: datum omrekenen
+no: kalender omformer
+pt: conversor de calendário
+sv: kalenderomvandlare
+
+    default_theme
+en: default theme
+fr: thème par défaut
+
+    etat civil
+de: personenstand
+en: individual
+es: datos básicos
+fi: Perhetietokortti
+fr: état civil
+it: Individuo
+nl: Persoon
+no: individ
+pt: estado civil
+sv: Ansedel
+
+    excluded_from_computation/f/mp/fp
+en: excluded from computation/excluded from computation/excluded from computation/excluded from computation
+fr: exclu du calcul/exclue du calcul/exclus du calcul/exclues du calcul
+
+    full-screen
+en: full-screen
+fr: plein écran
+
+    h_advanced_or
+de: Einzelpersonen, passend zu mindestens einem der Ereignisse
+en: individuals related to at least one event
+es: Individuos correspondientes a menos de uno de ese eventos
+fi: henkilöt, jotka liittyvät ainakin yhteen tapahtumaan
+fr: individus correspondant à au moins un des événements
+it: individui corrispondenti a almeno uno di questi eventi
+nl: personen die minstens met één van de evenementen overeenkomen
+no: personer relatert til minst en hendelse
+pt: pessoas relacionadas com pelo menos um evento
+sv: individer relaterade till åtminstone en händelse
+
+    h_advanced_and
+de: Einzelpersonen, passend zu allen Ereignissen
+en: individuals related to all the events
+es: individuos correspondientes a todos los eventos
+fi: kaikkiin tapahtumiin liittyvät henkilöt
+fr: individus correspondant à tous les événements
+it: individui corrispondenti a tutti questi eventi
+nl: personen die overeenkomen met alle evenementen
+no: personer relatert til alle hendelsene
+pt: pessoas relacionadas com todos os eventos
+sv: individer relaterade till alla händelser
+
+    h_tree
+en: H-tree
+fr: arbre en H
+
+    indifferent
+de: gleichgültig
+en: all
+es: indiferente
+fi: yhdentekevä
+fr: indifférent
+it: indifferente
+nl: onverschillig
+no: uviktig
+pt: indiferente
+sv: oviktigt
+
+    individual_tree_preview
+de: überblick vom Stammbaum
+en: Family Tree Preview
+es: Ver árbol
+fi: Yleiskatsaus sukutauluun
+fr: aperçu de l'arbre
+it: anteprima dell’albero
+nl: overzicht van de stamboom
+no: oversikt over anetavlen
+pt: ver árvore
+sv: översikt över antavlan
+
+    language_selector
+de: sprachen
+es: idiomas
+en: language
+fr: langue
+fi: kieli
+li: lingue
+nl: taal
+no: språk
+pt: idioma
+sv: språk
+
+    list
+af: lys
+bg: списък
+br: roll
+ca: llistat
+co: lista
+cs: seznam
+da: liste
+de: Liste
+en: list
+eo: tabelo
+es: lista
+et: nimekiri
+fi: lista
+fr: liste
+he:  רשימה
+is: listi
+it: lista
+lv: saraksts
+nl: lijst
+no: liste
+oc: lista
+pl: lista
+pt: lista
+
+    powered_by
+en: powered by
+fr: propulsé par
+
+    relationship%t to
+af: verwantskap%t met
+bg: има връзка%t с
+br: kerentiezh %t gant
+ca: parentesc%t amb
+co: %t cù
+cs: %t vztah s
+da: forbindelse%t med
+de: in einer Beziehung%t mit
+en: relationship%t to
+eo: rilato%t kun
+es: parentesco%t con
+et: kooselu%t
+fi: suhde%t ja
+fr: relation%t avec
+he:  קירבה
+is: sambúð%t með
+it: legame%t con
+lv: %t attiecības ar
+nl: verbonden%t met
+no: familie%t med
+oc: parentat%t avec
+pl: związek%t z:
+pt: relacionado%t com/relacionada%t com
+pt-br: junto%t com
+ro: relatia%t cu
+ru: приходится%t
+sk: vzťah %t s
+sl: zveza z %t
+sv: förhållande%t med
+
+    settings
+en: settings
+fr: réglages
+
+    simple search
+en: simple search
+fr: recherche simple
+
+    theme_selector
+en: theme selector
+fr: sélecteur de thème
+
+    union(s)
+de: eheschließungen
+en: spouses
+es: casamiento(s)
+fi: aviopuoliso(t)
+fr: union(s)
+it: matrimoni
+nl: relaties
+no: giftermål
+pt: casamento(s)
+sv: vigslar
+
+    v8_warnings_page
+en: check family tree
+fr: vérifier les erreurs
+
+    warning_BigAgeBetweenSpouses
+en: big age between spouses
+fr: âge avancé entre deux époux
+
+    warning_BirthAfterDeath
+en: death befor birth
+fr: mort avant la naissance
+
+    warning_IncoherentSex
+en: incoherent sex
+fr: sexe incohérent
+
+    warning_ChangedOrderOfChildren
+en: changed order of children
+fr: ordre des enfant modifiés
+
+    warning_ChangedOrderOfMarriages
+en: changed order of families
+fr: ordre des familles modifiés
+
+    warning_ChangedOrderOfFamilyEvents
+en: changed order of family events
+fr: ordre des évènements familliaux modifiés
+
+    warning_ChangedOrderOfPersonEvents
+en: changed order of personal events
+fr: ordre des évènements personnels modifiés
+
+    warning_ChildrenNotInOrder
+en: children not in order
+fr: enfant dans le mauvais ordre
+
+    warning_CloseChildren
+en: close children
+fr: enfant proches
+
+    warning_DistantChildren
+en: distant children
+fr: enfants éloignés
+
+    warning_DeadOld
+en: dead old
+fr: mort à un âge avancé
+
+    warning_DeadTooEarlyToBeFather
+en: dead to oearly to be father
+fr: décédé avant avant la conception d'un enfant
+
+    warning_FEventOrder
+en: wrong family events order
+fr: mauvais ordre des évènements familiaux
+
+    warning_FWitnessEventAfterDeath
+en: witness event after death
+fr: témoin après sa mort
+
+    warning_FWitnessEventBeforeBirth
+en: witness event before birth
+fr: témoin avant sa naissance
+
+    warning_IncoherentAncestorDate
+en: incoherent ancestor date
+fr: date d'un(e) ancêtre incohérente
+
+    warning_MarriageDateAfterDeath
+en: marriage date after death
+fr: date de marriage après mort
+
+    warning_MarriageDateBeforeBirth
+en: marriage date defore birth
+fr: date de marriage avant naissance
+
+    warning_MotherDeadAfterChildBirth
+en: mother dead before child is born
+fr: mère morte avant la naissance d'un enfant
+
+    warning_ParentBornAfterChild
+en: parent bord after child
+fr: parent né après son enfant
+
+    warning_ParentTooOld
+en: parent too old
+fr: parent trop âgé
+
+    warning_ParentTooYoung
+en: parent too young
+fr: parent trop jeune
+
+    warning_PEventOrder
+en: personal events order
+fr: ordre des évènements personnels
+
+    warning_PossibleDuplicateFam
+en: possible duplicate family
+fr: possible famille dupliquée
+
+    warning_PWitnessEventAfterDeath
+en: witness after death
+fr: témoin après sa mort
+
+    warning_PWitnessEventBeforeBirth
+en: witness before birth
+fr: témoin avant sa naissance
+
+    warning_TitleDatesError
+en: error in title dates
+fr: erreur de dates de titres
+
+    warning_UndefinedSex
+en: undefined sex
+fr: sexe non défini
+
+    warning_WitnessDateAfterDeath
+en: witness after death
+fr: témoin après sa mort
+
+    warning_WitnessDateBeforeBirth
+en: witness before birth
+fr: témoin avant sa naissance
+
+    warning_YoungForMarriage
+en: young for marriage
+fr: trop jeune pour se marier
+
+    warning_OldForMarriage
+en: old for marriage
+fr: trop vieux pour se marier

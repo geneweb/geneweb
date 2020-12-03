@@ -1,0 +1,5 @@
+{%- include "UTIL_HTML.jingoo" -%}
+<head>
+  <meta http-equiv="refresh"
+        content="0; URL={{ conf.command }}?{{ M.redirect }}&{{ print_GET (conf.senv) }}{{ print_GET (conf.henv) }}" />
+</head>

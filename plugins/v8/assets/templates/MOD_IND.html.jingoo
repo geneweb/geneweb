@@ -1,0 +1,226 @@
+{%- include 'UTIL_DATA.jingoo' -%}
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'UTIL_FORM.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- macro one_pevent (xcnt, event) -%}
+  {{ one_event (xcnt, event,
+      [ [ "#acco", "EPERS_ACCOMPLISHMENT", "accomplishment"|trans|capitalize ]
+      , [ "#acqu", "EPERS_ACQUISITION", "acquisition"|trans|capitalize ]
+      , [ "#adhe", "EPERS_ADHESION", "adhesion"|trans|capitalize ]
+      {# , [ "#adop", "", "adoption"|trans|capitalize ] #}
+      {# , [ "#anec", "", "anecdote"|trans|capitalize ] #}
+      {# , [ "#anul", "", "annulation"|trans|capitalize ] #}
+      , [ "#bapt", "EPERS_BAPTISM", "baptism"|trans|capitalize ]
+      , [ "#barm", "EPERS_BARMITZVAH", "bar mitzvah"|trans|capitalize ]
+      , [ "#basm", "EPERS_BATMITZVAH", "bat mitzvah"|trans|capitalize ]
+      , [ "#bles", "EPERS_BENEDICTION", "benediction"|trans|capitalize ]
+      , [ "#birt", "EPERS_BIRTH", "birth"|trans|capitalize ]
+      , [ "#buri", "EPERS_BURIAL", "burial"|trans|capitalize ]
+      {# , [ "#cast", "", "caste"|trans|capitalize ] #}
+      , [ "#chgn", "EPERS_CHANGENAME", "change name"|trans|capitalize ]
+      , [ "#circ", "EPERS_CIRCUMCISION", "circumcision"|trans|capitalize ]
+      , [ "#conf", "EPERS_CONFIRMATION", "confirmation"|trans|capitalize ]
+      , [ "#crem", "EPERS_CREMATION", "cremation"|trans|capitalize ]
+      {# , [ "#caus", "", "death cause"|trans|capitalize ] #}
+      , [ "#deat", "EPERS_DEATH", "death"|trans|capitalize ]
+      , [ "#awar", "EPERS_DECORATION", "decoration"|trans|capitalize ]
+      , [ "#demm", "EPERS_DEMOBILISATIONMILITAIRE", "demobilisationMilitaire"|trans|capitalize ]
+      , [ "#degr", "EPERS_DIPLOMA", "diploma"|trans|capitalize ]
+      , [ "#dist", "EPERS_DISTINCTION", "distinction"|trans|capitalize ]
+      {# , [ "#domi", "", "domicile"|trans|capitalize ] #}
+      , [ "#endl", "EPERS_DOTATION", "dotation"|trans|capitalize ]
+      , [ "#educ", "EPERS_EDUCATION", "education"|trans|capitalize ]
+      , [ "#elec", "EPERS_ELECTION", "election"|trans|capitalize ]
+      {# , [ "#emai", "", "email"|trans|capitalize ] #}
+      , [ "#emig", "EPERS_EMIGRATION", "emigration"|trans|capitalize ]
+      {# , [ "#eafd", "", "eventAfterDeath"|trans|capitalize ] #}
+      , [ "#exco", "EPERS_EXCOMMUNICATION", "excommunication"|trans|capitalize ]
+      , [ "#fcom", "EPERS_FIRSTCOMMUNION", "firstCommunion"|trans|capitalize ]
+      , [ "#fune", "EPERS_FUNERAL", "funeral"|trans|capitalize ]
+      , [ "#grad", "EPERS_GRADUATE", "graduate"|trans|capitalize ]
+      {# , [ "#prob", "", "homologationWill"|trans|capitalize ] #}
+      , [ "#hosp", "EPERS_HOSPITALISATION", "hospitalisation"|trans|capitalize ]
+      {# , [ "#ille", "", "illegitime"|trans|capitalize ] #}
+      , [ "#illn", "EPERS_ILLNESS", "illness"|trans|capitalize ]
+      , [ "#immi", "EPERS_IMMIGRATION", "immigration"|trans|capitalize ]
+      , [ "#lpas", "EPERS_LISTEPASSENGER", "listePassenger"|trans|capitalize ]
+      , [ "#mdis", "EPERS_MILITARYDISTINCTION", "militaryDistinction"|trans|capitalize ]
+      , [ "#mpro", "EPERS_MILITARYPROMOTION", "militaryPromotion"|trans|capitalize ]
+      , [ "#mser", "EPERS_MILITARYSERVICE", "militaryService"|trans|capitalize ]
+      {# , [ "#miss", "", "mission"|trans|capitalize ] #}
+      , [ "#mobm", "EPERS_MOBILISATIONMILITAIRE", "mobilisationMilitaire"|trans|capitalize ]
+      , [ "#natu", "EPERS_NATURALISATION", "naturalisation"|trans|capitalize ]
+      {# , [ "#idno", "", "numeroIdentification"|trans|capitalize ] #}
+      , [ "#occu", "EPERS_OCCUPATION", "occupation/occupations"|trans(0)|capitalize ]
+      , [ "#ordn", "EPERS_ORDINATION", "ordination"|trans|capitalize ]
+      {# , [ "#orig", "", "origin"|trans|capitalize ] #}
+      , [ "#prop", "EPERS_PROPERTY", "property"|trans|capitalize ]
+      , [ "#cens", "EPERS_RECENSEMENT", "recensement"|trans|capitalize ]
+      {# , [ "#reli", "", "religion"|trans|capitalize ] #}
+      , [ "#resi", "EPERS_RESIDENCE", "residence"|trans|capitalize ]
+      , [ "#reti", "EPERS_RETIRED", "retired"|trans|capitalize ]
+      {# , [ "#trip", "", "trip"|trans|capitalize ] #}
+      , [ "#vteb", "EPERS_VENTEBIEN", "venteBien"|trans|capitalize ]
+      , [ "#will", "EPERS_WILL", "will"|trans|capitalize ]
+      , [ "#bapl", "EPERS_BAPTISMLDS", "baptismLDS"|trans|capitalize ]
+      , [ "#conl", "EPERS_CONFIRMATIONLDS", "confirmation LDS"|trans|capitalize ]
+      , [ "#dotl", "EPERS_DOTATIONLDS", "dotationLDS"|trans|capitalize ]
+      , [ "#flkl", "EPERS_FAMILYLINKLDS", "familyLinkLDS"|trans|capitalize ]
+      , [ "#slgc", "EPERS_SCELLENTCHILDLDS", "scellentChildLDS"|trans|capitalize ]
+      , [ "#slgp", "EPERS_SCELLENTPARENTLDS", "scellentParentLDS"|trans|capitalize ]
+      , [ "#slgs", "EPERS_SCELLENTSPOUSELDS", "scellentSpouseLDS"|trans|capitalize ]
+      ]) }}
+{%- endmacro one_pevent -%}
+
+{%- macro one_row (name, value, label, kind) -%}
+  <div class="{{ form_row }}">
+    {{ line_label (name, label) }}
+    <div class="{{ line_control }}">
+      {{ print_autocomplete_input (name, value, kind) }}
+    </div>
+  </div>
+{%- endmacro -%}
+
+{%- macro deletable_input (name, idx, value) -%}
+  <div class="{{ name }}_wrapper mb-3 row" id="{{ name }}_wrapper{{ idx }}">
+    <div class="col-sm-11">
+      {{ print_autocomplete_input (name + idx, value, '') }}
+    </div>
+    <div class="col-sm-1">
+      {{ print_delete_button (name + "_wrapper" + idx) }}
+    </div>
+  </div>
+{%- endmacro -%}
+
+{%- macro multiple_rows (list, name, label) -%}
+  <div class="{{ form_row }}">
+    {{ line_label ('', label) }}
+    <div class="{{ line_control }}">
+      {%- for x in list -%}
+        {{ deletable_input (name, loop.index, x) }}
+      {%- endfor -%}
+      <div style="display:none;" id="new_{{ name }}_anchor"></div>
+      <div class="{{ columns (12,12,12) }}">
+        {{ print_add_button ("add_input ('" + name + "')", "insert"|trans|capitalize + " " + label) }}
+      </div>
+    </div>
+  </div>
+  <div id="ghost_{{ name }}" class="ghost" style="display:none">
+    {%--%}{{ deletable_input (name + '0', '', '') }}{%--%}
+  </div>
+{%- endmacro -%}
+
+{%- block body -%}
+
+<div class="form-edition container">
+
+  <form method="post" action="{{ conf.command }}" name="form_fam">
+    {{ print_hidden_env () }}
+    <input type="hidden" name="digest" value="{{ M.digest }}">
+    <input type="hidden" name="death" value="Auto">
+    {%- if conf.env.i %}<input type="hidden" name="i" value="{{ conf.env.i }}">{% endif -%}
+    {%- if conf.env.m == "MRG_IND_OK" or conf.env.m == "MRG_MOD_IND_OK" -%}
+      {%- if conf.env.i2 != "" -%}
+        <input type="hidden" name="i2" value="{{ conf.env.i2 }}">
+      {%- endif -%}
+      {%- if conf.env.ini1 != "" and conf.env.ini2 != "" -%}
+        <input type="hidden" name="ini1" value="{{ conf.env.ini1 }}">
+        <input type="hidden" name="ini2" value="{{ conf.env.ini2 }}">
+      {%- endif -%}
+      {%- if conf.env.iexcl != "" or conf.env.fexcl != "" -%}
+        <input type="hidden" name="ip" value="{{ conf.env.ip }}">
+        {%- if conf.env.iexcl != "" -%}
+          <input type="hidden" name="iexcl" value="{{ conf.env.iexcl }}">
+        {%- endif -%}
+        {%- if conf.env.fexcl != "" -%}
+          <input type="hidden" name="fexcl" value="{{ conf.env.fexcl }}">
+        {%- endif -%}
+      {%- endif -%}
+      <input type="hidden" name="m" value="MRG_MOD_IND_OK">
+    {%- else if conf.env.m == "MOD_IND" or conf.env.m == "MOD_IND_OK" -%}
+      <input type="hidden" name="m" value="MOD_IND_OK">
+    {%- else -%}
+      <input type="hidden" name="m" value="ADD_IND_OK">
+    {%- endif -%}
+
+  <h1 class="text-center">
+    {{ 'modify'|trans|capitalize }} {{ 'person/persons'|trans(0) }}{{ ':'|trans }} {{ fso (M.root) }}
+  </h1>
+
+    <div class="row">
+      <div class="{{ columns (12,12,12) }}">
+	<div class="card">
+          <div class="card-header {{ columns (12, 12, 12) }}">
+            {{ 'etat civil'|trans|capitalize }}
+          </div>
+	  <div class="card-body">
+            {{ one_row ("first_name", M.root.first_name, "first name/first names"|trans(0)) }}
+            {{ one_row ("occ", M.root.occ, "number"|trans) }}
+            {{ print_sex_field ("sex", M.root) }}
+            {{ one_row ("surname", M.root.surname, "surname/surnames"|trans(0)) }}
+            {{ one_row ("public_name", M.root.public_name, "public name"|trans) }}
+            {{ one_row ("image", M.root.image, "image/images"|trans(0)) }}
+            {{ one_row ("occu", M.root.occupation_raw, "occupation/occupations"|trans(0)) }}
+            {{ multiple_rows (M.root.qualifiers, "qualifier", "qualifier"|trans) }}
+            {{ multiple_rows (M.root.aliases, "alias", "alias"|trans) }}
+            {{ multiple_rows (M.root.first_name_aliases, "first_name_alias", "first name alias"|trans) }}
+            {{ multiple_rows (M.root.surname_aliases, "surname_alias", "surname alias"|trans) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{ section_title("event/events"|trans(1)|capitalize) }}
+
+    <div class="person-events" style="width:auto;">
+      <div id="events" class="row">
+        {%- for e in M.root.events|select((e) => substring (0, 4, e.kind) == "EPER") -%}
+          {{ one_pevent (loop.index, e) }}
+        {%- endfor -%}
+        <div style="display:none" id="new_event_anchor"></div>
+      </div>
+      {{ print_add_button ("add_event()", "add"|trans + " " + "event/events"|trans(0)) }}
+    </div>
+
+    {{ section_title("note/notes"|trans(1)|capitalize + ' ' + "and"|trans + ' ' + "source/sources"|trans(1)) }}
+
+    <div class="{{ form_row }}">
+      {{ line_label ('', "note/notes"|trans(1)) }}
+      <div class="{{ columns (12, 9, 9) }}">
+        <textarea name="notes" rows="12" id="comment" class="w-100">
+          {%--%}{{ M.root.note_raw|escape }}{%--%}
+        </textarea>
+      </div>
+    </div>
+
+    <div class="{{ form_row }}">
+      {{ line_label ("src", "source/sources"|trans(0)) }}
+      <div class="{{ line_control }}">
+        {{ print_autocomplete_input ("src", M.root.source_raw|escape, 'source') }}
+      </div>
+    </div>
+
+    <hr class="my-3">
+
+    <div class="text-right">
+      <button type="submit" class="btn btn-outline-success">
+        {{ "apply modifications"|trans(0)|capitalize }}
+      </button>
+    </div>
+
+
+
+</div>
+
+<script type="text/javascript">
+  {{ edit_form_calendar_javascript () }}
+  {{ edit_form_javascript () }}
+</script>
+
+<div id="ghost_event" style="display:none">{{ one_pevent (0, null) }}</div>
+<div id="ghost_witness" style="display:none">{{ print_witness_form (0, 0, null) }}</div>
+
+{%- endblock -%}

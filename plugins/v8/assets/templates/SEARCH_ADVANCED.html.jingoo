@@ -1,0 +1,17 @@
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'SEARCH_ADVANCED_FORM.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{% block title %}{{ 'advanced request'|trans|capitalize }}{% endblock %}
+
+{%- block body -%}
+
+  <h1 class="my-3">{{ 'advanced request'|trans|capitalize }}</h1>
+  {{ print_SEARCH_ADVANCED_FORM_form () }}
+  
+{%- endblock -%}
+
+{% block script %}
+  {{ print_SEARCH_ADVANCED_FORM_script () }}
+{% endblock %}

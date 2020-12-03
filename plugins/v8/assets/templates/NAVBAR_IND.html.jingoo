@@ -1,0 +1,73 @@
+{% include 'UTIL_NAVBAR.jingoo' %}
+{% include 'UTIL_DISPLAY.jingoo' %}
+
+{% macro pagebar () %}
+  {% if M.root %}
+  <strong>{{ fso (M.root) }}</strong>
+  <i class="fa fa-chevron-right mx-3"></i>
+  <ul class="nav nav-tabs" role="tablist">
+    {{ navItem ('fa-user-alt', 'vital record'|trans|capitalize, env.prefix + 'i=' + M.root.iper, not env.m) }}
+    {%- if conf.wizard -%}
+    <li class="nav-item dropdown">
+      {{ dropdownToggle ('modify'|trans|capitalize, 'fa-edit', env.m == "MOD_IND" || env.m == "MOD_FAM") }}
+      <div class="dropdown-menu pre-scrollable">
+        {{ dropdownItem ('fa-edit', 'modify'|trans + ' ' + fso (M.root), env.prefix + 'm=MOD_IND&i=' + M.root.iper) }}
+        {{ dropdownItem ('fa-compress', 'merge'|trans + ' ' + 'person/persons'|trans(1), env.prefix + 'm=MRG&i=' + M.root.iper) }}
+        {{ dropdownItem ('fa-trash-alt', 'delete'|trans + ' ' + 'person/persons'|trans(0), env.prefix + 'm=MRG&i=' + M.root.iper, 'danger') }}
+        <div class="dropdown-divider"></div>
+        {{ dropdownItem ('fa-plus', 'add'|trans + ' ' + 'family/families'|trans(0), env.prefix + 'm=ADD_FAM&ip=' + M.root.iper) }}
+        {{ dropdownItem ('fa-child', "change children's names"|trans, env.prefix + 'm=CHG_CHN&ip=' + M.root.iper) }}
+        {%- for f in M.root.families -%}
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-header">
+          {{ f.spouse.surname }} {{ f.spouse.first_name }}
+        </div>
+        {{ dropdownItem ('fa-edit', 'modify'|trans + ' ' + 'family/families'|trans(0), env.prefix + 'm=MOD_FAM&i=' + f.ifam + '&ip=' + M.root.iper) }}
+        {{ dropdownItem ('fa-trash-alt', 'delete'|trans + ' ' + 'family/families'|trans(0), env.prefix + 'm=DEL_FAM&i=' + f.ifam + '&ip=' + M.root.iper, 'danger') }}
+        {%- endfor -%}
+      </div>
+    </li>
+    {% endif %}
+    <li class="nav-item dropdown">
+      {{ dropdownToggle ('tree'|trans|capitalize, 'fa-sitemap', env.m == "AD_TREE" || env.m == "H_TREE") }}
+      <div class="dropdown-menu dropdown-form">
+        <form class="form-inline mx-3" method="GET" action="{{ conf.command }}">
+          <input type="hidden" name="m" value="AD_TREE">
+          {{ print_POST_env (["an","dn","m"]) }}
+          {%--%}
+          <label>{{ 'ad_tree'|trans|capitalize }}</label>
+          {%--%}
+          <div class="input-group w-100">
+            <input type="text" class="form-control" name="an"
+                   value="{{ env.an ? env.an : 4 }}" size="1">
+            <input type="text" class="form-control" name="dn"
+                   value="{{ env.dn ? env.dn : 3 }}" size="1">
+            <div class="input-group-append">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                <i class="fa fa-fw fa-chevron-circle-right"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+        <div class="dropdown-divider"></div>
+        <form class="form-inline mx-3" method="GET" action="{{ conf.command }}">
+          <input type="hidden" name="m" value="H_TREE">
+          {{ print_POST_env (["an","dn","m"]) }}
+          {%--%}
+          <label>{{ 'h_tree'|trans|capitalize }}</label>
+          {%--%}
+          <div class="input-group w-100">
+            <input type="text" class="form-control" name="an"
+                   value="{{ env.an ? env.an : 4 }}" size="1">
+            <div class="input-group-append">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                <i class="fa fa-fw fa-chevron-circle-right"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </li>
+  </ul>
+  {% endif %}
+{% endmacro %}

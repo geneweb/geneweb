@@ -1,0 +1,23 @@
+{%- set EXPORT_NS = namespace (cnt = 0) -%}
+
+{%- macro export_aux (i) -%}
+  <input type="hidden" name="i{{EXPORT_NS.cnt}}" value="{{i}}">
+  {%- set EXPORT_NS.cnt += 1 -%}
+{%- endmacro -%}
+
+{%- macro export_form () -%}
+  <form>
+    <input type="hidden" name="m" value="EXPORT">
+    {{ caller () }}
+    <p>
+      <label class="btn">
+        <input type="radio" name="output" value="GED" onchange='this.form.submit();'  hidden>
+        GED
+      </label>
+      <label class="btn">
+        <input type="radio" name="output" value="GW" onchange='this.form.submit();' hidden>
+        GW
+      </label>
+    </p>
+  </form>
+{%- endmacro -%}

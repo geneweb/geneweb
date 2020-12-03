@@ -1,0 +1,32 @@
+{%- include 'UTIL_DISPLAY.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- block body -%}
+
+<h1>{{ 'relationship'|trans|capitalize }}</h1>
+
+<p>
+{{ 'no known relationship link between %s and %s'
+   | trans (s1 = person_displayed_name (M.root), s2 = person_displayed_name (M.target))
+   | capitalize }}
+</p>
+{%- if M.excluded -%}
+<p>
+{{ 'excluded_from_computation/f/mp/fp'|trans(length (M.excluded) > 1 ? 3 : 2)|capitalize }}{{ ':'|trans }}
+</p>
+<ul>
+  {%- for f in M.excluded -%}
+  <li>{{ print_couple (f) }}</li>
+  {%- endfor -%}
+</ul>
+{%- endif -%}
+
+<p>
+  <a href="{{ conf.command }}?&m=R&i={{ M.root.iper }}">
+    {{ 'try another/relationship computing'|trans(0)|capitalize }}
+  </a>
+</p>
+
+{%- endblock -%}

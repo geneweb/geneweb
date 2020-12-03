@@ -1,0 +1,52 @@
+{%- function print_env (env) -%}
+  {% set print_env_ns = namespace (result = '') %}
+  {%- for (k, v) in env -%}
+    {%- if k != 'lang' && v != '' && ((k != 'oc' && k != 'ocz') || v != '0') -%}
+      {% set print_env_ns.result += '&' + k + '=' + decode_varenv (v) -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ print_env_ns.result }}
+{%- endfunction -%}
+
+{%- macro dropdownItem (icn, label, href, color) -%}
+  <a class="dropdown-item{% if color %} text-{{ color }}{% endif %}" href="{{ href }}">
+    {%- if icn %}<i class="fa fa-fw {{ icn }} mr-2"></i>{%- endif -%}
+    {{ label|capitalize }}
+  </a>
+{%- endmacro -%}
+
+{%- macro dropdownToggle (content, icn, active) -%}
+  <a class="nav-link dropdown-toggle{% if active %} active{% endif %}" href="#" role="button" data-toggle="dropdown">
+    {%- if icn %}<i class="fa fa-fw {{ icn }} mr-2"></i>{%- endif -%}
+    {{ content }}
+  </a>
+{%- endmacro -%}
+
+{%- macro subDropdownToggle (content, icn) -%}
+  <a class="dropdown-item dropdown-toggle d-flex align-items-center" href="#" role="button" data-toggle="dropdown">
+    {%- if icn %}<i class="fa fa-fw {{ icn }} mr-2"></i>{%- endif -%}
+    <span class="mr-2">{{ content }}</span>
+    <i class="fa fa-chevron-right ml-auto"></i>
+  </a>
+{%- endmacro -%}
+
+{%- macro book_link (icn, data, label) -%}
+  {{ dropdownItem (icn, 'book of %s'|trans(s=label), env.prefix + 'm=MOD_DATA&data=' + data) }}
+{%- endmacro -%}
+
+{%- macro navBarLink (href, icon) -%}
+  <li class="nav-item">
+    <a class="nav-link" href="{{ href }}">
+      <i class="fa fa-lg {{ icon }}"></i>
+    </a>
+  </li>
+{%- endmacro -%}
+
+{% macro navItem (icn, txt, href, active) %}
+  <li class="nav-item">
+    <a class="nav-link{% if active %} active{% endif %}" href="{{ href }}">
+      <i class="fa {{ icn }} fa-fw"></i>
+      {{ txt }}
+    </a>
+  </li>
+{% endmacro %}

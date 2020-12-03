@@ -399,11 +399,10 @@ let rec reconstitute_relations conf ext cnt =
       r :: rl, ext
   | _ -> [], ext
 
-let reconstitute_death conf birth baptism death_place burial burial_place =
-  let d = Update.reconstitute_date conf "death" in
+let reconstitute_death conf birth baptism death_date death_place burial burial_place =
   let dr =
     match p_getenv conf.env "death_reason" with
-      Some "Killed" -> Killed
+    | Some "Killed" -> Killed
     | Some "Murdered" -> Murdered
     | Some "Executed" -> Executed
     | Some "Disappeared" -> Disappeared
@@ -411,31 +410,29 @@ let reconstitute_death conf birth baptism death_place burial burial_place =
     | Some x -> failwith ("bad death reason type " ^ x)
   in
   match get conf "death" with
-    "Auto" when d = None ->
-      if death_place <> "" || burial <> UnknownBurial || burial_place <> "" ||
-         dr <> Unspecified
-      then
-        DeadDontKnowWhen
-      else Update.infer_death_bb conf birth baptism
-  | "DeadYoung" when d = None -> DeadYoung
-  | "DontKnowIfDead" when d = None -> DontKnowIfDead
+  | "Auto" when death_date = None ->
+    if death_place <> ""
+    || burial <> UnknownBurial
+    || burial_place <> ""
+    || dr <> Unspecified
+    then DeadDontKnowWhen
+    else Update.infer_death_bb conf birth baptism
+  | "DeadYoung" when death_date = None -> DeadYoung
+  | "DontKnowIfDead" when death_date = None -> DontKnowIfDead
   | "NotDead" -> NotDead
-  | "OfCourseDead" when d = None -> OfCourseDead
+  | "OfCourseDead" when death_date = None -> OfCourseDead
   | _ ->
-      match d with
-        Some d -> Death (dr, Adef.cdate_of_date d)
-      | _ -> DeadDontKnowWhen
+    match death_date with
+    | Some d -> Death (dr, Adef.cdate_of_date d)
+    | _ -> DeadDontKnowWhen
 
-let reconstitute_burial conf burial_place =
-  let d = Update.reconstitute_date conf "burial" in
+let reconstitute_burial conf burial_date burial_place =
   match p_getenv conf.env "burial" with
-    Some "UnknownBurial" | None ->
-      begin match d, burial_place with
-        None, "" -> UnknownBurial
-      | _ -> Buried (Adef.cdate_of_od d)
-      end
-  | Some "Buried" -> Buried (Adef.cdate_of_od d)
-  | Some "Cremated" -> Cremated (Adef.cdate_of_od d)
+  | Some "UnknownBurial" | None ->
+    if burial_date = None && burial_place = "" then UnknownBurial
+    else Buried (Adef.cdate_of_od burial_date)
+  | Some "Buried" -> Buried (Adef.cdate_of_od burial_date)
+  | Some "Cremated" -> Cremated (Adef.cdate_of_od burial_date)
   | Some x -> failwith ("bad burial type " ^ x)
 
 let reconstitute_from_pevents pevents ext bi bp de bu =
@@ -598,6 +595,7 @@ let reconstitute_person conf =
     try int_of_string (String.trim (get conf "occ")) with Failure _ -> 0
   in
   let image = only_printable (get conf "image") in
+  print_endline image ;
   let (first_names_aliases, ext) =
     reconstitute_string_list conf "first_name_alias" ext 0
   in
@@ -624,42 +622,36 @@ let reconstitute_person conf =
     | Some "F" -> Female
     | _ -> Neuter
   in
-  let birth = Update.reconstitute_date conf "birth" in
-  let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
-  let birth_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "birth_note"))
+  let aux n =
+    let event =
+      try Update.reconstitute_date conf n with _ -> None
+    in
+    let place =
+      try n ^ "_place" |> get conf |> only_printable |> no_html_tags with _ -> ""
+    in
+    let note =
+      try n ^ "_note" |> get conf |> Mutil.strip_all_trailing_spaces |> only_printable_or_nl
+      with _ -> ""
+    in
+    let src =
+      try n ^ "_src" |> get conf |> only_printable with _ -> ""
+    in
+    (event, place, note, src)
   in
-  let birth_src = only_printable (get conf "birth_src") in
-  let bapt = Update.reconstitute_date conf "bapt" in
-  let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
-  let bapt_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "bapt_note"))
-  in
-  let bapt_src = only_printable (get conf "bapt_src") in
-  let burial_place =
-    no_html_tags (only_printable (get conf "burial_place"))
-  in
-  let burial_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "burial_note"))
-  in
-  let burial_src = only_printable (get conf "burial_src") in
-  let burial = reconstitute_burial conf burial_place in
-  let death_place = no_html_tags (only_printable (get conf "death_place")) in
-  let death_note =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "death_note"))
-  in
-  let death_src = only_printable (get conf "death_src") in
-  let death =
-    reconstitute_death conf birth bapt death_place burial burial_place
-  in
-  let death_place =
-    match death with
-      Death (_, _) | DeadYoung | DeadDontKnowWhen -> death_place
-    | _ -> ""
-  in
+  let birth, birth_place, birth_note, birth_src = aux "birth" in
+  let bapt, bapt_place, bapt_note, bapt_src = aux "bapt" in
+  let burial_date, burial_place, burial_note, burial_src = aux "burial" in
+  let burial = reconstitute_burial conf burial_date burial_place in
+  let death_date, death_place, death_note, death_src = aux "death" in
+  let death = reconstitute_death conf birth bapt death_date death_place burial burial_place in
+  (* let death_place =
+   *   match death with
+   *   | Death (_, _) | DeadYoung | DeadDontKnowWhen -> death_place
+   *   | _ -> ""
+   * in *)
   let death =
     match death, burial with
-      (NotDead | DontKnowIfDead), (Buried _ | Cremated _) -> DeadDontKnowWhen
+    | (NotDead | DontKnowIfDead), (Buried _ | Cremated _) -> DeadDontKnowWhen
     | _ -> death
   in
   let (pevents, ext) = reconstitute_pevents conf ext 1 in
@@ -1028,26 +1020,24 @@ let effective_del conf base p =
   let changed = U_Delete_person op in
   History.record conf base changed "dp"
 
-let print_mod_ok conf base wl pgl p ofn osn oocc =
+let print_mod_ok conf base wl pgl p ofn osn oocc deleted_relation removed_string =
   let title _ =
     Output.print_string conf (Utf8.capitalize (transl conf "person modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
-  if List.length !removed_string > 0 then
+  if List.length removed_string > 0 then
     begin
       Output.printf conf "<h3 class=\"error\">";
       Output.printf conf (fcapitale (ftransl conf "%s forbidden char"))
         (List.fold_left (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") " "
            Name.forbidden_char);
       Output.printf conf "</h3>\n";
-      List.iter (Output.printf conf "<p>%s</p>") !removed_string
+      List.iter (Output.printf conf "<p>%s</p>") removed_string
     end;
   (* Si on a supprimé des relations, on les mentionne *)
-  begin match !deleted_relation with
-    [] -> ()
-  | _ ->
+  if deleted_relation <> [] then begin
       Output.printf conf "<p>\n";
       Output.printf conf "%s, %s %s %s :"
         (Utf8.capitalize (transl_nth conf "relation/relations" 0))
@@ -1059,7 +1049,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
            Output.printf conf "<li>";
            Output.print_string conf s;
            Output.printf conf "</li>")
-        !deleted_relation;
+        deleted_relation;
       Output.printf conf "</ul>\n";
       Output.printf conf "</p>\n"
   end;
@@ -1091,13 +1081,6 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
       NotesDisplay.print_linked_list conf base pgl
     end;
   Hutil.trailer conf
-
-(*
-value print_mod_ok conf base wl p =
-  if wl = [] then Perso.print conf base p
-  else print_mod_ok_aux conf base wl p
-;
-*)
 
 let relation_sex_is_coherent base warning p =
   List.iter
@@ -1233,7 +1216,7 @@ let print_mod_aux conf base callback =
       | None -> callback p
   else Update.error_digest conf
 
-let print_mod ?prerr o_conf base =
+let print_mod ?prerr ?(prok = print_mod_ok) o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
@@ -1287,7 +1270,7 @@ let print_mod ?prerr o_conf base =
     let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
     History.record conf base changed "mp";
     Update.delete_topological_sort_v conf base;
-    print_mod_ok conf base wl pgl p ofn osn oocc
+    prok conf base wl pgl p ofn osn oocc !deleted_relation !removed_string
   in
   print_mod_aux conf base callback
 

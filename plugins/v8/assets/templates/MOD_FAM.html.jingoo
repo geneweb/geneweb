@@ -1,0 +1,163 @@
+{%- include 'UTIL_DATA.jingoo' -%}
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'UTIL_FORM.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- extends "SKELETON.html.jingoo" -%}
+
+{%- block body -%}
+
+{%- set form_row = "row form-group " -%}
+
+{%- set line_control = "col-sm-12 col-md-9 col-lg-9" -%}
+
+{%- macro print_parent_form (xcnt, xx, txt) -%}
+  <div class="{{ columns (12, 12, 6) }}">
+    {{ print_person_form ("pa", xcnt, xx,
+                          xx.sex == 0
+                          ? "father/mother"|trans(0)
+                          : xx.sex == 1
+                            ? "father/mother"|trans(1)
+                            : "father/mother"|trans(0) + ' / ' + "father/mother"|trans(1)|capitalize
+                          , null) }}
+  </div>
+{%- endmacro print_parent_form -%}
+
+{%- macro print_child_form (xcnt, child) -%}
+  <div class="child_wrapper deletable {{ columns (12, 12, 12) }} my-3" id="child_wrapper{{ xcnt }}">
+    {{ print_person_form ("ch", xcnt, child, "", "child_wrapper" + xcnt) }}
+  </div>
+{%- endmacro print_child_form -%}
+
+{%- macro one_fevent (xcnt, event) -%}
+  {{ one_event (xcnt, event,
+      [ [ "#marr", "EFAM_MARRIAGE", "marriage event"|trans|capitalize ]
+      , [ "#nmar", "EFAM_NO_MARRIAGE", "no marriage event"|trans|capitalize ]
+      , [ "#enga", "EFAM_ENGAGE", "engage event"|trans|capitalize ]
+      , [ "#nmen", "EFAM_NO_MENTION", "no mention"|trans|capitalize ]
+      , [ "#marb", "EFAM_MARRIAGE_BANN", "marriage bann"|trans|capitalize ]
+      , [ "#marc", "EFAM_MARRIAGE_CONTRACT", "marriage contract"|trans|capitalize ]
+      , [ "#marl", "EFAM_MARRIAGE_LICENSE", "marriage licence"|trans|capitalize ]
+      , [ "#pacs", "EFAM_PACS", "PACS"|trans|capitalize ]
+      , [ "#div" , "EFAM_DIVORCE", "divorce event"|trans|capitalize ]
+      , [ "#sep" , "EFAM_SEPARATED", "separate event"|trans|capitalize ]
+      , [ "#anul", "EFAM_ANNULATION", "annulation"|trans|capitalize ]
+      , [ "#resi", "EFAM_RESIDENCE", "residence"|trans|capitalize ]
+      ]) }}
+{%- endmacro one_fevent -%}
+
+<div class="form-edition container">
+
+  <h1 class="text-center">
+    {%- switch conf.env.m -%}
+      {%- case "ADD_FAM" || "ADD_FAM_OK" -%}
+      {{ 'add'|trans|capitalize }} {{ 'family/families'|trans(0) }}
+      {%- case "ADD_PAR" -%}
+      {{ 'add'|trans|capitalize }} {{ 'parents' }}
+      {%- case "MOD_FAM" || "MOD_FAM_OK" -%}
+      {{ "modify"|trans|capitalize }} {{ "family/families"|trans(0) }}
+      {%- case "MRG_DUP_FAM_Y_N" || "MRG_FAM" || "MRG_FAM_OK" || "MRG_MOD_FAM_OK" -%}
+      {{ 'merge'|trans|capitalize }} {{ 'family/families'|trans(1) }} # {{ env.i }}
+    {%- endswitch -%}
+  </h1>
+
+  <form method="post" action="{{ conf.command }}" name="form_fam">
+    {{ print_hidden_env () }}
+    <input type="hidden" name="digest" value="{{ M.digest }}">
+    {% if conf.env.ip %}<input type="hidden" name="ip" value="{{ conf.env.ip }}">{% endif %}
+    {% if conf.env.i %}<input type="hidden" name="i" value="{{ conf.env.i }}">{% endif %}
+    {%- switch conf.env.m -%}
+      {%- case "ADD_FAM" || "ADD_FAM_OK" -%}
+      <input type="hidden" name="m" value="ADD_FAM_OK">
+      {%- case "ADD_PAR" -%}
+      <input type="hidden" name="m" value="ADD_FAM_OK">
+      <input type="hidden" name="m_action" value="ADD_PAR_OK">
+      {%- case "MOD_FAM" || "MOD_FAM_OK" -%}
+      <input type="hidden" name="m" value="MOD_FAM_OK">
+      {%- case "MRG_DUP_FAM_Y_N" || "MRG_FAM" || "MRG_FAM_OK" || "MRG_MOD_FAM_OK" -%}
+      <input type="hidden" name="i2" value="{{ conf.env.i2 }}">
+      {%- if conf.env.ini1 and conf.env.ini2 -%}
+        <input type="hidden" name="ini1" value="{{ conf.env.ini1 }}">
+        <input type="hidden" name="ini2" value="{{ conf.env.ini2 }}">
+      {%- endif -%}
+      {%- if conf.env.iexcl -%}
+        <input type="hidden" name="iexcl" value="{{ conf.env.iexcl }}">
+      {%- endif -%}
+      {%- if conf.env.fexcl -%}
+        <input type="hidden" name="fexcl" value="{{ conf.env.fexcl }}">
+      {%- endif -%}
+      <input type="hidden" name="m" value="MRG_MOD_FAM_OK">
+    {%- endswitch -%}
+
+    {{ section_title('parents'|trans|capitalize) }}
+
+    <div class="row">
+      {{ print_parent_form (1, M.family.father) }}
+      {{ print_parent_form (2, M.family.mother) }}
+    </div>
+    <div class="row mt-2">
+      <div class="{{ columns (12,12,12) }}">
+	<div class="card">
+	  <div class="card-body">
+	    {{ inputCheckbox ("nsck", 'no sexes check'|trans|capitalize,
+                              checked = M.family.father && M.family.mother
+                                        && M.family.father.sex == M.family.mother.sex) }}
+	  </div>
+	</div>
+      </div>
+    </div>
+
+    {{ section_title("event/events"|trans(1)|capitalize) }}
+
+    <div id="events" class="row">
+      {% for e in M.family.events %}{{ one_fevent (loop.index, e) }}{% endfor %}
+      <div style="display:none" id="new_event_anchor"></div>
+    </div>
+    {{ print_add_button ("add_event()", "add"|trans + " " + "event/events"|trans(0)) }}
+
+    {{ section_title("child/children"|trans(1)|capitalize) }}
+
+    <div id="children" class="row">
+      {%- for c in M.family.children -%}{{ print_child_form (loop.index, c) }}{%- endfor -%}
+      <div style="display:none" id="new_child_anchor"></div>
+    </div>
+    {{ print_add_button ("add_child()", "add"|trans + " " + "child/children"|trans(0)) }}
+
+    {{ section_title("note/notes"|trans(1)|capitalize + ' ' + "and"|trans + ' ' + "source/sources"|trans(1)) }}
+
+    <div class="{{ form_row }}">
+      {{ line_label ('', "note/notes"|trans(1)) }}
+      <div class="{{ columns (12, 9, 9) }}">
+        <textarea name="comment" rows="12" id="comment" class="w-100">
+          {%--%}{{ M.family.note_raw|escape }}{%--%}
+        </textarea>
+      </div>
+    </div>
+
+    <div class="{{ form_row }}">
+      {{ line_label ("src", "source/sources"|trans(0)) }}
+      <div class="{{ line_control }}">
+        {{ print_autocomplete_input ("src", M.family.source_raw|escape, 'source') }}
+      </div>
+    </div>
+
+    <hr class="my-3">
+
+    <div class="text-right">
+      <button type="submit" class="btn btn-outline-success">{{ "apply modifications"|trans(0)|capitalize }}</button>
+    </div>
+
+  </form></div>
+
+</div>
+
+<script type="text/javascript">
+  {{ edit_form_calendar_javascript () }}
+  {{ edit_form_javascript () }}
+</script>
+
+<div id="ghost_event" style="display:none">{{ one_fevent (0, null) }}</div>
+<div id="ghost_witness" style="display:none">{{ print_witness_form (0, 0, null) }}</div>
+<div id="ghost_child" style="display:none">{{ print_child_form (0, null) }}</div>
+
+{%- endblock -%}

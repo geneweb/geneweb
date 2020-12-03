@@ -4,7 +4,25 @@ open Gwdb
 
 val effective_del : config -> base -> person -> unit
 
-(** [effective_mod prerr ?skip_conflict conf base sp] *)
+val print_mod_ok
+  : config
+  -> base
+  -> CheckItem.base_warning list
+  -> (iper, ifam) Def.NLDB.page list
+  -> (iper, iper, istr) Def.gen_person
+  -> string
+  -> string
+  -> int
+  -> string list
+  -> string list
+  -> unit
+
+(** [effective_mod ?prerr ?prok ?skip_conflict conf base sp]
+
+    On error, [prerr] is called.
+
+    On success, [prok conf base wl pgl p ofn osn oocc deleted_relation deleted_string] is called.
+*)
 val effective_mod
   : ?prerr:(config -> base -> person error -> unit)
   -> ?skip_conflict:iper
@@ -13,8 +31,28 @@ val effective_mod
   -> (iper, Update.key, string) gen_person
   -> (iper, iper, istr) gen_person
 
+(** [print_mod ?prerr ?prok ?skip_conflict conf base sp]
+
+    On error, [prerr] is called.
+
+    On success, [prok conf base wl pgl p ofn osn oocc deleted_relation deleted_string] is called.
+*)
 val print_mod
-  : ?prerr:(config -> base -> person error -> unit) -> config -> base -> unit
+  : ?prerr:(config -> base -> person error -> unit)
+  -> ?prok:(config
+            -> base
+            -> CheckItem.base_warning list
+            -> (iper, ifam) Def.NLDB.page list
+            -> (iper, iper, istr) Def.gen_person
+            -> string
+            -> string
+            -> int
+            -> string list
+            -> string list
+            -> unit)
+  -> config
+  -> base
+  -> unit
 
 val all_checks_person :
   base -> (iper, iper, istr) gen_person -> ifam gen_ascend ->
@@ -43,9 +81,7 @@ val check_person :
     string option
 val error_person : config -> string -> unit
 val update_relations_of_related : base -> iper -> iper list -> unit
-val reconstitute_death :
-  config -> Def.date option -> Def.date option -> string -> Def.burial ->
-    string -> Def.death
+
 val reconstitute_from_pevents :
   ('a, string) Def.gen_pers_event list -> bool ->
     Def.cdate * string * string * string ->

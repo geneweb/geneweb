@@ -1,0 +1,84 @@
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'UTIL_DATA.jingoo' -%}
+{%- include 'UTIL_TREE.jingoo' -%}
+{%- include 'UTIL_PANZOOM.jingoo' -%}
+{%- include 'NAVBAR_IND.html.jingoo' -%}
+
+{%- macro inputMonth (s, r, txt) -%}
+  <select class="custom-select" id="m{{s}}" oninput="dokeydown('{{s}}');">
+   {%- for i in range (1, r) -%}
+    <option value="{{i}}">{{ txt|trans(i - 1)|capitalize }}</option>
+   {%- endfor -%}
+  </select>
+{%- endmacro -%}
+
+{%- macro inputLine (label, s, r, months) -%}
+<div class="row">
+  <div class="d-none d-md-block col-md-3">
+    {{ label }}
+  </div>
+  <div class="col-sm-1 d-md-none">
+    {{ label[0] }}
+  </div>
+  <div class="{{ columns (11, 9, 9) }} input-group mb-3">
+    <div class="input-group-prepend">
+      <button type="button" class="input-group-text" id="prev" onclick="doclick(-1);">&lt;</button>
+    </div>
+    {% if '!dates order'|trans == 'mmddyyy' %}
+      {{ inputMonth (s, r, months) }}
+      <input class="text-center form-control" type="text" style="max-width:3.5rem;" id="d{{s}}" size="2" value="" onkeydown="dokeydown('{{s}}');">
+    {% else %}
+      <input class="text-center form-control" type="text" style="max-width:3.5rem;" id="d{{s}}" size="2" value="" onkeydown="dokeydown('{{s}}');">
+      {{ inputMonth (s, r, months) }}
+  {% endif %}
+    <input class="text-center form-control" style="max-width:5.5rem;" type="text" id="y{{s}}" size="4" value="" onkeydown="dokeydown('{{s}}');">
+    <div class="input-group-append">
+      <button type="button" class="input-group-text" id="next" onclick="doclick(+1);">&gt;</button>
+    </div>
+  </div>
+</div>
+{%- endmacro -%}
+
+{{ inputLine ('gregorian/julian/french/hebrew'|trans(0)|capitalize, 'g', 12, '(month)' ) }}
+{{ inputLine ('gregorian/julian/french/hebrew'|trans(1)|capitalize, 'j', 12, '(month)' ) }}
+{{ inputLine ('gregorian/julian/french/hebrew'|trans(2)|capitalize, 'r', 13, '(french revolution month)' ) }}
+{{ inputLine ('gregorian/julian/french/hebrew'|trans(3)|capitalize, 'h', 13, '(hebrew month)' ) }}
+
+<script>
+ var timeout, sdn ;
+ function update_inputs () {
+     {%- for s in ['g','j','r','h'] -%}
+     {%- switch (s) -%}
+     {%- case 'g' -%}{%- set fn = 'gregorianOfSdn' -%}
+     {%- case 'j' -%}{%- set fn = 'julianOfSdn' -%}
+     {%- case 'r' -%}{%- set fn = 'frenchOfSdn' -%}
+     {%- case 'h' -%}{%- set fn = 'hebrewOfSdn' -%}
+     {%- endswitch -%}
+     var dmy = Calendars.{{fn}}(sdn);
+     document.getElementById("d{{s}}").value = Calendars.day (dmy) ;
+     document.getElementById("m{{s}}").value = Calendars.month (dmy) ;
+     document.getElementById("y{{s}}").value = Calendars.year (dmy) ;
+     {%- endfor -%}
+ }
+ function dokeydown (s) {
+     clearTimeout(timeout) ;
+     timeout = setTimeout(function () {
+         {%- for i in ['d','m','y'] -%}
+         var {{ i }} = parseInt(document.getElementById('{{i}}' + s).value) ;
+         {%- endfor -%}
+         var dmy = Calendars.make (d, m, y) ;
+         switch (s) {
+             case 'g': sdn = Calendars.sdnOfGregorian (dmy) ; break ;
+             case 'j': sdn = Calendars.sdnOfJulian (dmy) ; break ;
+             case 'r': sdn = Calendars.sdnOfFrench (dmy) ; break ;
+             case 'h': sdn = Calendars.sdnOfHebrew (dmy) ; break ;
+         }
+         update_inputs () ;
+     }, 500);
+ }
+ function doclick (x) {
+     sdn = sdn + x ;
+     update_inputs () ;
+ }
+</script>
+

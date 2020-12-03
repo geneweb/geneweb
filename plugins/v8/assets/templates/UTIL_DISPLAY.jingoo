@@ -1,0 +1,176 @@
+{%- include 'UTIL_DATE.jingoo' -%}
+{%- include 'UTIL_DATA.jingoo' -%}
+
+{%- function short_dates_text (p, empty = '?') -%}
+  {%- set birth = approx_birth (p) -%}
+  {%- set death = approx_death (p) -%}
+  {%- if birth -%}
+    {%- if death -%}{{ short_year (birth) + '-' + short_year (death) }}
+    {%- elif p.death and p.death.death_reason != "DontKnowIfDead" %}{{ short_year (birth) + '-' }}
+    {%- else -%}{{ short_year (birth) }}
+    {%- endif -%}
+  {% elif death -%}{{ DATE.death_symbol + short_year (death) }}
+  {%- elif p.death and p.death.death_reason != "DontKnowIfDead" %}{{ DATE.death_symbol }}
+  {%- elif not birth -%}{{ empty }}
+  {%- endif -%}
+{%- endfunction -%}
+
+{% function fso (x) -%}
+  {{ x.first_name + (x.occ ? '.' + x.occ + ' ' : ' ') + x.surname }}
+{%- endfunction -%}
+
+{% function married_to (sex, f, date_n_place) -%}
+  {%- if sex == 0 or sex == 2 %}{% set n = 0 %}{% else %}{% set n = 1 %}{% endif -%}
+  {%- switch f.relation.kind -%}
+    {%- case "EFAM_MARRIAGE" || "EFAM_MARRIAGE_LICENSE" -%}
+      {{ 'married%t to'|trans(n, t=date_n_place) }}
+    {%- case "EFAM_NO_MARRIAGE" -%}
+      {{ 'relationship%t to'|trans(n, t=date_n_place) }}
+    {%- case "EFAM_ENGAGE" %}
+      {{ 'engaged%t to'|trans(n, t=date_n_place) }}
+    {%- case "EFAM_PACS" -%}
+      {{ 'pacsed%t to'|trans(n, t=date_n_place) }}
+    {%- case "EFAM_MARRIAGE_BANN" -%}
+      {{ 'marriage banns%t to'|trans(n, t=date_n_place) }}
+    {%- case "EFAM_MARRIAGE_CONTRACT" -%}
+      {{ 'marriage contract%t with'|trans(n, t=date_n_place) }}
+    {%- case "EFAM_RESIDENCE" -%}
+      {{ 'relationship%t to'|trans(t='') }}
+    {%- default -%}
+      {{ 'with'|trans }}
+  {%- endswitch -%}
+{%- endfunction -%}
+
+{%- function marriage_date_place (f) -%}
+  {%- if not f.relation.place -%}
+    {%- if f.relation.date -%}
+      {{ ' <em><strong>' + DATE.string_of_ondate (f.relation.date) + '</strong></em>' }}
+    {%- else -%}
+      {{ '' }}
+    {%- endif -%}
+  {%- else -%}
+    {%- if not f.relation.date -%}
+      {{ ' <em>, ' + f.relation.place + ', </em>' }}
+    {%- else -%}
+      {{ ' <em><strong>' + DATE.string_of_ondate (f.relation.date) + '</strong>, ' + f.relation.place +', </em>' }}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfunction -%}
+
+{%- function person_href (param=null, p) -%}
+  {{ env.prefix + 'i=' + p.iper + (param ? '&' + param|map (join('='))|join ('&') : '') }}
+{%- endfunction -%}
+
+{%- function person_displayed_name (p) -%}
+  {%- if p.public_name -%}
+    {%- if p.qualifiers %}{{ p.public_name + ' <em>' + p.qualifiers[0] + '</em> ' + p.surname }}
+    {%- else %}{{ p.public_name + ' ' + p.surname }}
+    {%- endif -%}
+  {%- elif p.qualifiers %}{{ p.first_name + ' <em>' + p.qualifiers[0] + '</em> ' + p.surname }}
+  {%- else -%}{{ p.first_name + ' ' + p.surname }}
+  {%- endif -%}
+{%- endfunction -%}
+
+{%- macro print_person (p, link=true, image=true, parents=true) -%}
+  {% set popover = (image && p.image) || (parents && p.parents) %}
+  {%- set dates = short_dates_text (p, empty="") -%}
+  {%- if link %}<a href="{{ person_href (p) }}"
+  {%- else if popover %}<span class="btn btn-link"
+  {%- else %}<span {%%}
+  {%- endif -%}
+  {%- if popover -%}
+    data-toggle="popover" data-trigger="hover" data-html="true"
+    data-content=
+    {%--%}"
+    {%- if image && p.image -%}<img src='{{ p.image | escape }}'>{% endif -%}
+    {%- if parents && p.parents -%}<p>{{ child_of (p) | capitalize | escape }}</p>{% endif -%}
+    {%- if dates %}<p>{{ dates }}</p>{% endif -%}
+    {%--%}"
+  {%- endif -%}
+  >{{ person_displayed_name (p) }}
+  {%- if popover -%}<i class="far fa-xs fa-question-circle ml-1"></i>{%- endif -%}
+  {%- if link %}</a>{% else %}</span>{% endif -%}
+  {%- if dates %} ({{ dates }}){% endif -%}
+{%- endmacro -%}
+
+{%- function child_of (p, verbose=false) -%}
+  {%- if p.father and p.mother -%}
+    {{ "%1 of %2"
+    | trans(_1=( 'son/daughter/child' | trans (p.sex) )
+           ,_2=( person_displayed_name (p.father)
+	       + ' '
+	       + (verbose ? ('and'|trans) : '&amp;' )
+	       + ' '
+	       + person_displayed_name (p.mother) ) ) }}
+  {%- else -%}{{ "" }}
+  {%- endif -%}
+{%- endfunction -%}
+
+{%- function parents_and_spouses (p, verbose=false) -%}
+  {%- set parents_and_spouses_ns = namespace (r = child_of (p)) -%}
+  {%- if verbose %}
+    {%- for f in p.families -%}
+      {%- if loop.index0 or (p.father and p.mother) -%}{% set parents_and_spouses_ns.r += ', ' %}{% endif -%}
+      {%- set parents_and_spouses_ns.r +=
+      married_to (p.sex, f, (f.relation.date ? ' ' + long_year (f.relation.date) : ''))
+      + ' ' + f.spouse.first_name + ' ' + f.spouse.surname
+      -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- for f in p.families %}
+      {%- if loop.index0 or (p.father and p.mother) -%}{% set parents_and_spouses_ns.r += ', ' %}{% endif -%}
+      {%- set parents_and_spouses_ns.r += '&amp;' -%}
+      {%- if loop.length > 1 %}{% set parents_and_spouses_ns.r += loop.index %}{% endif -%}
+      {%- set parents_and_spouses_ns.r += ' ' -%}
+      {%- set parents_and_spouses_ns.r += f.spouse.first_name + '.' + f.spouse.occ + ' ' + f.spouse.surname + f.spouse.dates -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {{ parents_and_spouses_ns.r }}
+{%- endfunction -%}
+
+{%- macro print_results (r) -%}
+  <ul>
+    {%- for p in r -%}
+      <li style="margin-bottom:14px;">
+        {%--%}<a href="{{ person_href (p) }}">{{ p.surname }} {{ p.first_name }}</a>
+        {%- set sdt = short_dates_text (p) -%}
+        {%- if sdt != "?" %} {{ sdt }}{%- endif -%} 
+        {%- set pas = parents_and_spouses (p, verbose=true) -%}
+        {%- if pas != "" -%}<br><em>{{ pas }}</em>{%- endif -%}
+        {%--%}.
+      </li>
+      {%- endfor -%}
+  </ul>
+{%- endmacro -%}
+
+{%- macro print_person_short (p) -%}
+  <a href="{{ person_href (p) }}">{{ person_displayed_name (p) }}</a>
+{%- endmacro -%}
+
+{%- macro print_couple (f) -%}
+  {{ print_person_short (f.father) }} &amp; {{ print_person_short (f.mother) }}
+{%- endmacro -%}
+
+{%- function lex_related_kind (r) -%}
+{%- switch (r.kind) -%}
+{%- case "ADOPTION" -%}
+  {{ "adoptive father/adoptive mother/adoptive parents"|trans(r.sex) }}
+{%- case "RECOGNITION" -%}
+  {{ "recognizing father/recognizing mother/recognizing parents"|trans(r.sex) }}
+{%- case "CANDIDATEPARENT" -%}
+  {{ "candidate father/candidate mother/candidate parents"|trans(r.sex) }}
+{%- case "GODPARENT" -%}
+  {{ "godfather/godmother/godparents"|trans(r.sex) }}
+{%- case "FOSTERPARENT" -%}
+  {{ "foster father/foster mother/foster parents"|trans(r.sex) }}
+{%- endswitch -%}
+{%- endfunction -%}
+
+{%- function lex_witness_kind (p, r) -%}
+{%- set res = fold (((acc, e) => fold (((acc, w) => w.iper == p.iper ? [w] + acc : acc), acc, e.witnesses)), [], r.events) -%}
+{%- if exists (w => w.kind == 'WITNESS_GODPARENT', res) -%}{{ "godfather/godmother/godparents"|trans(p.sex) }}
+{%- else if exists (w => w.kind == 'WITNESS_OFFICER', res) -%}{{ 'officer/officer/officers'|trans(p.sex) }}
+{%- else -%}{{ 'witness/witness/witnesses'|trans(p.sex) }}
+{%- endif -%}
+{%- endfunction -%}
+

@@ -1,0 +1,186 @@
+{%- include 'UTIL_HTML.jingoo' -%}
+{%- include 'UTIL_NAVBAR.jingoo' -%}
+
+{%- macro tree_print_p_dropdown (class, p) -%}
+<div class="tree-dropdown {{ class }}">
+  {% if p.sosa %}<div class="tree-sosa">{{ display_sosa (p) }}</div>{% endif %}
+  <div class="dropdown">
+    <a class="dropdown-toggle itm-link" data-toggle="dropdown" href="#">
+      {{ caller () }}
+    </a>
+    <div class="dropdown-menu">
+      <div class="dropdown-header">
+        {{ fso (p) }}
+      </div>
+      <div class="dropdown-divider"></div>
+      {{ dropdownItem ( 'fa-user', 'vital record'|trans
+                      , conf.command + '?' + GET (['n','p','oc','i', 'm']) + 'i=' + p.iper) }}
+      {{ dropdownItem ( 'fa-edit', 'modify'|trans
+                      , conf.command + '?' + GET (['n','p','oc','i','m']) + 'm=MOD_IND&i=' + p.iper) }}
+      {{ dropdownItem ( 'fa-sitemap', 'tree'|trans
+                      , conf.command + '?' + GET (['n','p','oc','i']) + 'i=' + p.iper) }}
+    </div>
+  </div>
+</div>
+{%- endmacro -%}
+
+{%- macro adtree_print_p (p) -%}
+  {%- call tree_print_p_dropdown ("adtree-person", p) -%}
+    <strong>{{ p.surname }}</strong>
+    <strong>{{ p.first_name }}</strong>
+    <em>{{ short_dates_text (p) }}</em>
+  {%- endcall -%}
+{%- endmacro -%}
+
+{%- macro htree_print_p (p) -%}
+  {%- call tree_print_p_dropdown ("", p) -%}
+    <span style="color:red;font-family:monospace;" title="{{ fso (p) }}">
+      {%--%}{{ p.first_name[0] }}{{ p.surname[0] }}{%--%}
+    </span>
+  {%- endcall -%}
+{%- endmacro -%}
+
+{%- macro adtree_print_u_dropdown (u) -%}
+  <div class="dropdown-menu">
+    <div class="dropdown-header">
+      {%- if u.spouse -%}
+        {{ 'with'|trans|capitalize }} {{ u.spouse.surname }} {{ u.spouse.first_name }}
+      {%- else -%}
+        <div class="d-flex align-items-center">
+          <i class="mr-2 fa fa-link"></i>
+          <div>
+            <div>{{ fso (u.father) }}</div>
+            <div>{{ fso (u.mother) }}</div>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="dropdown-divider"></div>
+    <p class="px-4 text-muted">
+      {{ length (u.children) }} {{ 'child/children'|trans (length (u.children) > 1 ? 1 : 0) }}
+    </p>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item"
+       href="{{ env.prefix }}m=MOD_FAM&i={{ u.ifam }}">
+       <i class="fa fa-edit"></i>
+       {{ 'modify'|trans|capitalize }} {{ 'family/families'|trans(0) }}
+    </a>
+  </div>
+{%- endmacro -%}
+
+{%- macro adtree_print_u (u) -%}
+  <div class="dropdown itm-union">
+    <a class="dropdown-toggle dropdown-toggle-union" data-toggle="dropdown"
+       {%- if u.spouse -%}
+         title="{{ 'with'|trans|capitalize }} {{ u.spouse.surname }} {{ u.spouse.first_name }}"
+       {% endif %}>
+    </a>
+    {{ adtree_print_u_dropdown (u) }}
+  </div>
+{%- endmacro -%}
+
+{% macro adtree_a_ascend (x, n, root) %}
+  {% if not root %}{{ adtree_print_p(x) }}{% endif %}
+  {% if n > 0 && x.father %}
+  <ul>
+    <li class="li-union">
+      {{ adtree_print_u (x.parents) }}
+      <ul>
+        <li>{{ adtree_a_ascend (x.father, n - 1, false) }}</li>
+        <li>{{ adtree_a_ascend (x.mother, n - 1, false) }}</li>
+    </li>
+    </ul>
+  </ul>
+  {% endif %}
+{% endmacro %}
+
+{% macro adtree_a_descend (x, n, root) %}
+  {% if not root %}{{ adtree_print_p(x) }}{% endif %}
+  {% if n > 0 && x.families && exists (((f) => (length (f.children) > 0)), x.families) %}
+  <ul>
+    {%- for f in x.families -%}
+    {% if f.children %}
+    <li class="li-union">
+      {{ adtree_print_u (f) }}
+      <ul>
+        {% for x in f.children %}
+        <li>{{ adtree_a_descend (x, n - 1, false) }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endmacro %}
+
+{%- macro print_adtree (root, an, dn, id = '') -%}
+  {%- if an -%}
+    <div class="ascend">
+      <div class="adtree"><ul><li>{{ adtree_a_ascend (root, int (an), true) }}</li></ul></div>
+    </div>
+   {%- endif -%}
+    <div class="adtree-root">
+      <div class="border p-3 text-center">
+        {{ root.surname }} {{ root.first_name }} <em>{{ root.dates }}</em>
+      </div>
+    </div>
+  {%- if dn -%}
+    <div class="descend">
+      <div class="adtree"><ul><li>{{ adtree_a_descend (root, (dn ? int (dn) : 2), true) }}</li></ul></div>
+    </div>
+  {%- endif -%}
+{% endmacro print_adtree %}
+
+{%- macro print_ftree (family, noroot = false, id = '') -%}
+    <div class="ascend">
+      <div class="adtree">
+        <ul>
+          <li class="li-union">
+            <ul>
+              <li>{{ adtree_a_ascend (family.father, 1, false) }}</li>
+              <li>{{ adtree_a_ascend (family.mother, 1, false) }}</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+    {%- if not noroot -%}
+    <div class="adtree-root">
+      <div class="p-1 rounded-circle" style="border: 2px solid black;">
+        <i class="fa fa-link"></i>
+      </div>
+    </div>
+    {%- endif -%}
+    <div class="descend">
+      <div class="adtree">
+        <ul>
+          <li class="li-union">
+            <ul>
+              {% for x in family.children %}
+              <li>{{ adtree_a_descend (x, 1, false) }}</li>
+              {% endfor %}
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+{% endmacro print_ftree %}
+
+{%- macro H_TREE_ascends (p, n, max) -%}
+  {%- if n <= max -%}
+    {%- if p -%}
+      <div class="h-group h-gen-{{ n }} {{ n % 2 == 0 ? 'h-group-even' : 'h-group-odd' }}">
+        <div class="h-group-father{{ p.father && n < max ? '' : ' h-ghost' }}">{{ H_TREE_ascends (p.father, n + 1, max) }}</div>
+        <div class="h-group-child">{{ htree_print_p (p) }}</div>
+        <div class="h-group-mother{{ p.mother && n < max ? '' : ' h-ghost' }}">{{ H_TREE_ascends (p.mother, n + 1, max) }}</div>
+      </div>
+    {%- else -%}
+      <div class="h-group h-gen-{{ n }} h-ghost {{ n % 2 == 0 ? 'h-group-even' : 'h-group-odd' }}">
+        <div class="h-group-father h-ghost">{{ H_TREE_ascends (null, n + 1, max) }}</div>
+        <div class="h-group-child h-ghost"></div>
+        <div class="h-group-mother h-ghost">{{ H_TREE_ascends (null, n + 1, max) }}</div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}

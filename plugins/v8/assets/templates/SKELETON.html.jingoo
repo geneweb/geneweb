@@ -1,0 +1,67 @@
+{%- set theme = conf.henv.theme ? conf.henv.theme : conf.benv.theme ? conf.benv.theme : null -%}
+{%- set favicon = conf.benv.favicon ? escape (conf.benv.favicon) : asset ('img/geneweb.png') -%}
+
+<!doctype html>
+<html lang="{{ conf.lang }}">
+
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ favicon }}">
+    <link rel="apple-touch-icon" href="{{ favicon }}">
+    <link id="bootstrap-css"
+          rel="stylesheet"
+          href="{{ asset ('bootstrap/css/bootstrap'
+                         + (theme ? '_' + theme : '')
+                         + '.min.css') }}">
+    <link rel="stylesheet" href="{{ asset ('fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset ('css/v8.css') }}">
+    <title>{{ BASE.name }} - {% block title %}GeneWeb{% endblock %}</title>
+  </head>
+
+  <body {% if theme %}class="theme-{{ theme }}"{% endif %}>
+
+    <script src="{{ asset ('jquery/jquery-3.5.1.min.js') }}"></script>
+    <script src="{{ asset ('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    {%- block navbar -%}
+      {%- include 'NAVBAR.html.jingoo' -%}
+    {%- endblock -%}
+
+    <div id="container" class="container pb-5 pt-4">
+      {# {%- if M.alert -%} #}
+      {# <div class="m-4 alert alert-{{ M.alert.kind ? M.alert.kind : 'info' }} alert-dismissible fade show" #}
+      {#      role="alert"> #}
+      {#   {%- if M.alert.header %}<strong>{{ M.alert.header }}</strong>{% endif -%} #}
+      {#   {%- if M.alert.header && M.alert.body %}<hr>{% endif -%} #}
+      {#   {%- if M.alert.body %}{{ M.alert.body }}{% endif -%} #}
+      {#   <button type="button" class="close" data-dismiss="alert" aria-label="Close"> #}
+      {#     <span aria-hidden="true">&times;</span> #}
+      {#   </button> #}
+      {# </div> #}
+      {# {%- endif -%} #}
+      {%- block body %}{% endblock -%}
+    </div>
+
+    {%- block footer -%}
+      {%- include 'FOOTER.html.jingoo' -%}
+    {%- endblock -%}
+
+    <script>{% block script %}{% endblock %}</script>
+    <script>
+      $('.dropdown-menu a.dropdown-toggle').on('click', function(e) {
+          if (!$(this).next().hasClass('show')) {
+              $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+          }
+          var $subMenu = $(this).next(".dropdown-menu");
+          $subMenu.toggleClass('show');
+          $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function(e) {
+              $('.dropdown-submenu .show').removeClass("show");
+          });
+          return false;
+      });
+      $(function () { $('[data-toggle="popover"]').popover() })
+    </script>
+
+  </body>
+
+</html>

@@ -11,7 +11,7 @@
 
   environment:
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-    OPAM_PACKAGES: 'calendars camlp5.7.12 cppo dune.2.7.1 jingoo markup ocaml stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
+    OPAM_PACKAGES: 'calendars camlp5.7.12 cppo dune.2.7.1 jingoo js_of_ocaml js_of_ocaml-ppx markup ocaml stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
     matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CYG_ROOT: C:/cygwin64

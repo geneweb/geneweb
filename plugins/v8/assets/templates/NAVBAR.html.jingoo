@@ -1,0 +1,155 @@
+{%- include "UTIL_NAVBAR.jingoo" -%}
+{%- include "UTIL_HTML.jingoo" -%}
+
+<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top border-bottom">
+  <ul class="navbar-nav">
+    <li class="nav-item dropdown pr-2 mr-2 border-right">
+      {{ dropdownToggle ('<strong>' + BASE.name + '</strong>') }}
+      <ul class="dropdown-menu">
+      {%- if conf.wizard -%}
+        <li class="dropdown-submenu">
+          {{ subDropdownToggle ('modify'|trans|capitalize, 'fa-edit') }}
+          <div class="dropdown-menu">
+            {{ dropdownItem (null, 'add'|trans|capitalize + ' ' + 'family/families'|trans(0), env.prefix + 'm=ADD_FAM') }}
+            <div class="dropdown-divider"></div>
+            {{ book_link ('fa-globe', 'place', 'places'|trans) }}
+            {{ book_link ('fa-id-card ', 'sn', 'surname/surnames'|trans(1)) }}
+            {{ book_link ('fa-id-card ', 'fn', 'first name/first names'|trans(1)) }}
+            {{ book_link ('fa-briefcase', 'occu', 'occupation/occupations'|trans(1)) }}
+            {{ book_link ('fa-quote-left ', 'src', 'source/sources'|trans(1)) }}
+          </div>
+        </li>
+      {%- endif -%}
+      <li class="dropdown-submenu">
+        {{ subDropdownToggle ('search/case sensitive'|trans(0)|capitalize, 'fa-search') }}
+        <div class="dropdown-menu dropdown-form">
+          <form class="form-inline mx-3" method="get" action="{{ env.prefix }}">
+            {{ print_hidden_env () }}
+            <input type="hidden" name="m" value="SEARCH_SIMPLE">
+            <div class="input-group">
+              <input class="form-control" type="search"
+                     name="v" placeholder="{{ 'simple search'|trans(0)|capitalize }}">
+              <div class="input-group-append" >
+                <button class="btn btn-outline-success" type="submit"
+                        title="{{ 'search/case sensitive'|trans(0)|capitalize }} {{ 'person/persons'|trans(0) }}">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+          <div class="dropdown-divider"></div>
+          {{ dropdownItem ('fa-search-plus', 'advanced request'|trans(0), env.prefix + 'm=SEARCH_ADVANCED') }}
+          {{ dropdownItem ('fa-globe', 'places'|trans + ' ' + 'by'|trans + ' ' + 'surname/surnames'|trans(0), env.prefix + 'm=PS&bi=on&bp=on&de=on&bu=on&ma=on') }}
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-header">
+            {{ 'first name/first names'|trans(1)|capitalize }}{{ ':'|trans }}
+          </div>
+          {{ dropdownItem ('fa-sort-alpha-down', 'display by/branch/alphabetic order'|trans(2), env.prefix + 'm=P&tri=A') }}
+          {{ dropdownItem ('fa-sort-amount-down', 'frequency'|trans, env.prefix + 'm=P&tri=F') }}
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-header">
+            {{ 'surname/surnames'|trans(1)|capitalize }}{{ ':'|trans }}
+          </div>
+          {{ dropdownItem ('fa-sort-alpha-down', 'display by/branch/alphabetic order'|trans(2), env.prefix + 'm=N&tri=A') }}
+          {{ dropdownItem ('fa-sort-amount-down', 'frequency'|trans, env.prefix + 'm=N&tri=F') }}
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-header">
+            {{ 'title/titles'|trans(1)|capitalize }} / {{ 'estate'|trans(1) }}{{ ':'|trans }}
+          </div>
+          {{ dropdownItem ('fa-list', 'all the titles'|trans, env.prefix + 'm=TT&t=*') }}
+          {{ dropdownItem ('fa-list', 'all the estates'|trans, env.prefix + 'm=TT&p=*') }}
+        </div>
+      </li>
+      <li class="dropdown-submenu">
+        {{ subDropdownToggle ('tools'|trans|capitalize, 'fa-calculator') }}
+        <div class="dropdown-menu">
+          {% if conf.wizard %}
+            {{ dropdownItem ('fa-file-alt', 'base wizard notes'|trans, env.prefix + 'm=WIZNOTES') }}
+          {% endif %}
+          {{ dropdownItem ('fa-chart-bar', 'statistics'|trans, env.prefix + 'm=STAT') }}
+          {{ dropdownItem ('fa-history', 'history'|trans, env.prefix + "m=HIST&k=20") }}
+          <a data-toggle="modal" class="dropdown-item" data-target="#calendarsModal" href="#"
+             onclick="loadCalendars()">
+            <i class="fa fa-fw fa-calendar-alt mr-2"></i>
+            {{ 'convert_calendar'|trans|capitalize }}
+          </a>
+          {{ dropdownItem ('fa-birthday-cake', 'anniversaries'|trans, env.prefix + "m=ANM") }}
+          {{ dropdownItem ('fa-exclamation-triangle', 'warnings'|trans, env.prefix + 'm=WARNINGS') }}
+        </div>
+      </li>
+      <li class="dropdown-submenu">
+        {{ subDropdownToggle ('settings'|trans|capitalize, 'fa-cogs') }}
+        <ul class="dropdown-menu">
+          <li class="dropdown-submenu">
+            {{ subDropdownToggle ('language_selector'|trans|capitalize) }}
+            <div class="dropdown-menu pre-scrollable">
+              {%- for lang in range (0,29)|map((i) => ('!languages'|trans(i)|split('='))) | sort(compare=(a,b)=>compare(a[1],b[1])) -%}
+                <a class="dropdown-item"
+                   href="{{ conf.command }}?{{ print_GET_env (['lang']) }}lang={{ lang[0] }}">
+                  {{ lang[1]|capitalize }}
+                </a>
+              {%- endfor -%}
+            </div>
+          </li>
+          <li class="dropdown-submenu">
+            {{ subDropdownToggle ('access_rigths_selector'|trans|capitalize) }}
+            <div class="dropdown-menu pre-scrollable">
+              {{ dropdownItem ('fa-hat-wizard', 'wizard/wizards/friend/friends/exterior'|trans(0)|capitalize, conf.command + '?w=w') }}
+              {{ dropdownItem ('fa-user-friends', 'wizard/wizards/friend/friends/exterior'|trans(2)|capitalize, conf.command + '?w=f') }}
+              {{ dropdownItem ('fa-sign-out-alt', 'wizard/wizards/friend/friends/exterior'|trans(4)|capitalize, conf.command + '?w=' + print_env (conf.env)) }}
+	    </div>
+          </li>
+          <li class="dropdown-submenu">
+            {{ subDropdownToggle ('theme_selector'|trans|capitalize) }}
+            <div class="dropdown-menu pre-scrollable">
+              {%- set NAVBAR_theme = list (conf.env) + list (conf.henv) + list (conf.senv) -%}
+              {%- set NAVBAR_theme = reject ((x) => x[0] == "theme", NAVBAR_theme) -%}
+              {%- set NAVBAR_theme = fold (((acc,x) => (acc+x[0]+'='+x[1]+'&')), '?', NAVBAR_theme)  -%}
+              {{ dropdownItem ('', 'default_theme'|trans|capitalize, conf.command + NAVBAR_theme) }}
+              {%- for t in ['cerulean','cosmo','cyborg','darkly','flatly','journal','litera','lumen','lux','materia','minty','pulse','sandstone','simplex','sketchy','slate','solar','spacelab','superhero','united','yeti'] -%}
+              {{ dropdownItem ('', t|capitalize, conf.command + NAVBAR_theme + 'theme=' + t) }}
+              {%- endfor -%}
+            </div>
+          </li>
+        </ul>
+      </li>
+      </ul>
+    </li>
+  </ul>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sub-topbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div id="sub-topbar" class="collapse navbar-collapse">{{ pagebar () }}</div>
+</nav>
+
+<div class="modal fade" id="calendarsModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ 'convert_calendar'|trans|capitalize }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {%- include 'CAL.html.jingoo' -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function loadCalendars () {
+      if (typeof window.Calendars == 'undefined') {
+          $.ajax( { url : '{{ asset ('js/calendars_js.js') }}'
+                    , dataType : 'script'
+                    , success : function () {
+                        var today = new Date() ;
+                        var dmy = Calendars.make ( today.getDate(), today.getMonth() + 1, today.getFullYear() ) ;
+                        sdn = Calendars.sdnOfGregorian (dmy) ;
+                        update_inputs () ;
+                    }
+                  } );
+      } ;
+  } ;
+</script>
