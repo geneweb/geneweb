@@ -46,18 +46,21 @@ foo/
 
 #### Allowing gwd to run your plugin
 
-Also, you will need to update `bin/dune.in` in order to add your plugin
+Also, you will need to update `bin/gwd/dune` in order to add your plugin
 to plugins whitelist.
 
 ```diff
- (rule
-   (target gwdPluginMD5.ml)
-   (deps
-     %{project_root}/plugins/export/plugin_export.cmxs
-+    %{project_root}/plugins/foo/plugin_foo.cmxs
-   )
-   (action (with-stdout-to %{target} (run ocaml ./mk_gwdPluginMD5.ml %{deps})))
- )
+(rule
+  (target gwdPluginMD5.ml)
+  (deps
+    (:cmxs
+      %{project_root}/plugins/export/plugin_export.cmxs
++     %{project_root}/plugins/foo/plugin_foo.cmxs
+    )
+    (:maker mk_gwdPluginMD5.ml)
+  )
+  (action (with-stdout-to %{target} (run ocaml %{maker} %{cmxs})))
+)
 ```
 
 You can still execute an untrusted plugin with `-unsafe-plugin` and `-unsafe-plugins`.
