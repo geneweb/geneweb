@@ -16,6 +16,10 @@ type gwexport_opts =
   ; no_notes : bool
   ; no_picture : bool
   ; oc : string * (string -> unit) * (unit -> unit)
+  ; path : bool
+  ; path_max : int
+  ; path_w_sibling : bool
+  ; path_w_mate : bool
   ; picture_path : bool
   ; source : string option
   ; surnames : string list
@@ -35,6 +39,10 @@ let opts =
       ; no_notes = false
       ; no_picture = false
       ; oc = ("", prerr_string, fun () -> close_out stderr)
+      ; path = false
+      ; path_max = max_int
+      ; path_w_sibling = false
+      ; path_w_mate = false
       ; picture_path = false
       ; source = None
       ; surnames = []
@@ -64,13 +72,15 @@ let anonfun s =
 let speclist =
   let c = opts in
   [ ( "-a", Arg.Int (fun s -> c := { !c with asc = Some s })
-    , "<n> maximum generation of the root's ascendants" )
+    , "<N> maximum generation of the root's ascendants" )
   ; ( "-ad", Arg.Int (fun s -> c := { !c with ascdesc = Some s })
-    , "<n> maximum generation of the root's ascendants descendants" )
+    , "<N> maximum generation of the root's ascendants descendants" )
   ; ( "-key", Arg.String (fun s -> c := { !c with keys = s :: !c.keys })
-    , " key reference of root person. Used for -a/-d options. Can be used multiple times." )
+    , "<KEY> key reference of root person. Used for -a/-d options. \
+       Can be used multiple times. \
+       Key format is \"First Name.occ SURNAME\"")
   ; ( "-c", Arg.Int (fun s -> c := { !c with censor = s }),
-      "<num>: when a person is born less than <num> years ago, it is not exported \
+      "<NUM>: when a person is born less than <num> years ago, it is not exported \
        unless it is Public. All the spouses and descendants are also censored." )
   ; ( "-charset"
     , Arg.String begin fun s -> c := { !c with charset = match s with
@@ -83,27 +93,34 @@ let speclist =
       end
     , "[ASCII|ANSEL|ANSI|UTF-8] set charset; default is UTF-8" )
   ; ( "-d", Arg.Int (fun s -> c := { !c with desc = Some s })
-    , "<n> maximum generation of the root's descendants" )
+    , "<N> maximum generation of the root's descendants." )
   ; ( "-mem", Arg.Unit (fun () -> c := { !c with mem = true })
-    , " save memory space, but slower" )
+    , " save memory space, but slower." )
   ; ( "-nn", Arg.Unit (fun () -> c := { !c with no_notes = true })
-    , " no (database) notes" )
+    , " no (database) notes." )
   ; ( "-nopicture", Arg.Unit (fun () -> c := { !c with no_picture = true })
-    , " don't extract individual picture" )
+    , " don't extract individual picture." )
   ; ( "-o", Arg.String (fun s ->
           let oc = open_out s in
           c := { !c with oc = (s, output_string oc, fun () -> close_out oc) })
-    , "<ged> output file name (default: stdout)" )
+    , "<GED> output file name (default: stdout)" )
+  ; ( "-path", Arg.Unit (fun () -> c := { !c with path = true })
+    , " select individuals and families involved in relationship computation between two keys.")
+  ; ( "-path-max", Arg.Int (fun s -> c := { !c with path_max = s })
+    , " limit the number of path used.")
+  ; ( "-path-w-sibling", Arg.Unit (fun () -> c := { !c with path_w_sibling = true })
+    , " include path using 'sibling' and 'half-sibling' relation type.")
+  ; ( "-path-w-mate", Arg.Unit (fun () -> c := { !c with path_w_mate = true })
+    , " include path using 'mate' relation type.")
   ; ( "-picture-path", Arg.Unit (fun () -> c := { !c with picture_path = true })
-    , " extract pictures path" )
+    , " extract pictures path." )
   ; ( "-s", Arg.String (fun x -> c := { !c with surnames = x :: !c.surnames })
-    , "<sn> select this surname (option usable several times)" )
+    , "<SN> select this surname (option usable several times)." )
   ; ( "-source", Arg.String (fun x -> c := { !c with source = Some x })
-    , "<src> replace individuals and families sources. Also delete event sources." )
+    , "<SRC> replace individuals and families sources. Also delete event sources." )
   ; ( "-v", Arg.Unit (fun () -> c := { !c with verbose = true })
     , " verbose" )
   ]
-
 
 module IPS = Util.IperSet
 module IFS = Util.IfamSet
@@ -236,7 +253,78 @@ let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
   , (fun i -> Gwdb.Marker.get fmark i) )
 (**/**)
 
-(** [select ?asc ?ascdesc ?desc ?censor ?surnames ?keys base]
+let select_relations ~mate ~sibling base ip1 ip2 max =
+  let add_parents ip acc =
+    match get_parents (poi base ip) with
+    | Some ifam ->
+      let f = foi base ifam in
+      IPS.add (get_mother f) @@ IPS.add (get_father f) acc
+    | None -> assert false
+  in
+  let add_spouse ip child acc =
+    let unions = get_family (poi base ip) in
+    let rec loop i =
+      let f = foi base unions.(i) in
+      if Array.mem child (get_children f)
+      then IPS.add (Gutil.spouse ip f) acc
+      else loop (i + 1)
+    in loop 0
+  in
+  let conf = { Config.empty with wizard = true ; bname = Gwdb.bname base } in
+  let rec loop i acc excl =
+    if i < max then
+      match Relation.get_shortest_path_relation conf base ip1 ip2 excl with
+      | None -> acc
+      | Some (path, ifam) ->
+        if not sibling && List.exists begin function
+            | _, (Relation.HalfSibling | Relation.Sibling) -> true
+            | _ -> false
+          end path
+        then loop i acc (ifam :: excl)
+        else if not mate && List.exists begin function
+            | _, Relation.Mate -> true
+            | _ -> false
+          end path
+        then loop i acc (ifam :: excl)
+        else
+          let acc =
+            let rec loop acc = function
+              | (iper, Relation.Child) :: tl ->
+                loop (IPS.add iper acc |> add_parents iper) tl
+              | (iper, Relation.Sibling) :: tl when sibling ->
+                loop (IPS.add iper acc |> add_parents iper) tl
+              | (iper, Relation.HalfSibling) :: ((iper', _ ) :: _ as tl) when sibling ->
+                loop (IPS.add iper acc |> add_parents iper |> add_parents iper') tl
+              | (iper, Relation.Parent) :: ((iper', _ ) :: _ as tl) ->
+                loop (IPS.add iper acc |> add_spouse iper iper') tl
+              | (iper, Relation.Self) :: tl ->
+                loop (IPS.add iper acc) tl
+              | (iper, Relation.Mate) :: tl ->
+                loop (IPS.add iper acc) tl
+              | _ :: tl -> loop acc tl
+              | [] -> acc
+            in
+            loop acc path
+          in
+          loop (i + 1) acc (ifam :: excl)
+    else acc
+  in
+  let ipers = loop 0 IPS.empty [] in
+  let ifams =
+    IPS.fold begin fun iper acc ->
+      Array.fold_left begin fun acc ifam ->
+        if IFS.mem ifam acc
+        || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+        then acc
+        else IFS.add ifam acc
+      end acc (get_family (poi base iper))
+    end ipers IFS.empty
+  in
+  let sel_per i = IPS.mem i ipers in
+  let sel_fam i = IFS.mem i ifams in
+  (sel_per, sel_fam)
+
+(** [select opts ips]
     Return filters for [iper] and [ifam] to be used when exporting
     a (portion of a) base.
 *)
@@ -313,8 +401,15 @@ let select opts ips =
           in
           (per_sel, fam_sel)
         | None ->
-          if opts.surnames = [] then (fun _ -> true), (fun _ -> true)
-          else select_surnames base opts.surnames
+          if opts.surnames <> [] then select_surnames base opts.surnames
+          else if opts.path then match ips with
+            | [ k1 ; k2 ] ->
+              select_relations
+                ~mate:opts.path_w_mate
+                ~sibling:opts.path_w_sibling
+                base k1 k2 opts.path_max
+            | _ -> assert false
+          else (fun _ -> true), (fun _ -> true)
     in
     ( (fun i -> not_censor_p i && sel_per i)
     , (fun i -> not_censor_f i && sel_fam i)
