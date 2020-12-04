@@ -1918,9 +1918,9 @@ let main () =
     ; ("-trace_templ", Arg.Set trace_templates, " Print the full path to template files as html comment ")
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; ("-plugin", arg_plugin ~check:true, "<PLUGIN>.cmxs load a safe plugin." )
-    ; ("-unsafe-plugin", arg_plugin ~check:false, "<PLUGIN>.cmxs DO NOT USE UNLESS YOU TRUST THE ORIGIN OF <PLUGIN>.")
+    ; ("-unsafe_plugin", arg_plugin ~check:false, "<PLUGIN>.cmxs DO NOT USE UNLESS YOU TRUST THE ORIGIN OF <PLUGIN>.")
     ; ("-plugins", arg_plugins ~check:true, "<DIR> load all plugins in <DIR>.")
-    ; ("-unsafe-plugins", arg_plugins ~check:false, "<DIR> DO NOT USE UNLESS YOU TRUST THE ORIGIN OF EVERY PLUGIN IN <DIR>.")
+    ; ("-unsafe_plugins", arg_plugins ~check:false, "<DIR> DO NOT USE UNLESS YOU TRUST THE ORIGIN OF EVERY PLUGIN IN <DIR>.")
 #ifdef UNIX
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
@@ -1930,8 +1930,6 @@ let main () =
     ; ("-noproc", Arg.Set Wserver.noproc ," Do not launch a process at each request.")
 #endif
 #ifdef API
-
-
     ; ("-api_h", Arg.String (fun x -> selected_api_host := x), "<HOST> Host for GeneWeb API (default = " ^ !selected_api_host ^ ").")
     ; ("-api_p", Arg.Int (fun x -> selected_api_port := x), "<NUMBER> Port number for GeneWeb API (default = " ^ string_of_int !selected_api_port ^ ").")
     ; ("-redis", Arg.String (fun x -> Api_link.redis_host := try string_of_inet_aux x with _ -> x), " Host redis for links tree.")
