@@ -10,6 +10,7 @@ module IperSet = Set.Make (struct
 
 let () =
   GwdPlugin.register ~ns [ "EXPORT", fun _assets conf base ->
+      let base = match base with Some b -> b | None -> assert false in
       let ipers =
         let rec loop acc i =
           match Util.p_getenv conf.env ("i" ^ string_of_int i) with
