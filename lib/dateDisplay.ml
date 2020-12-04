@@ -260,20 +260,13 @@ let translate_dmy conf (fst, snd, trd) cal short =
   | "mmddyyyy" -> translate_month fst, snd, translate_year trd
   | _ -> fst, translate_month snd, translate_year trd
 
-
-(* ************************************************************************ *)
-(*  [Fonc] decode_dmy : config -> Def.date -> (string * string * string)    *)
-(** [Description] : En fonction du format de la date (donnée par le fichier
-                    lex_utf8), on renvoit le triplet correspondant.
-                    Si le format est inconnu, alors on renvoit ddmmyyyy.
-                    Le triplet est renvoyé dans l'ordre adéquat d'affichage,
-                    i.e. (fst, snd, trd).
-    [Args] :
-      - conf : configuration de la base
-      - d    : date
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
+(** [decode_dmy conf dmy]
+    Returns a triplet corresponding to day/month/year, arranged in
+    the order defined by [!dates order] keyword in the lexicon.
+    Supported formats are: "dmyyyy" / "mmddyyyy" / "yyyymmdd" / "ddmmyyyy" and "ddmmyy".
+    NB: "yy" and "yyyy" variants will produce the same output ([string_of_int] without padding)
+    If the format is not supported "ddmmyyyy" is used.
+*)
 let decode_dmy conf d =
   match transl conf "!dates order" with
     "dmyyyy" ->
