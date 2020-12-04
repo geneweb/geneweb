@@ -10,7 +10,7 @@ for any requests.
 It means that you could run **harmful** code if you do not control the source
 of compiled.
 
-i.e you should not run plugins using the `-unsafe-*` options unless
+i.e you should not run plugins using the `-unsafe_*` options unless
 you are developping your own plugin.
 
 *Reliable* plugins are the ones accepted by `-plugin` and `-plugins` option.
@@ -63,7 +63,21 @@ to plugins whitelist.
 )
 ```
 
-You can still execute an untrusted plugin with `-unsafe-plugin` and `-unsafe-plugins`.
+You can still execute an untrusted plugin with `-unsafe_plugin` and `-unsafe_plugins`.
+
+#### Editing Makefile in order to copy you plugin and assets in the distrib
+
+Edit the `distrib` rule in `Makefile`. E.g.:
+
+```
+        mkdir $(DISTRIB_DIR)/gw/plugins
+        mkdir $(DISTRIB_DIR)/gw/plugins/export
+        cp $(BUILD_DIR)/plugins/export/plugin_export.cmxs $(DISTRIB_DIR)/gw/plugins/export/
++       mkdir $(DISTRIB_DIR)/gw/plugins/foo
++       cp $(BUILD_DIR)/plugins/foo/plugin_foo.cmxs $(DISTRIB_DIR)/gw/plugins/foo/
++       cp $(BUILD_DIR)/plugins/foo/META $(DISTRIB_DIR)/gw/plugins/foo/
++       cp -R $(BUILD_DIR)/plugins/foo/assets/ $(DISTRIB_DIR)/gw/plugins/foo/
+```
 
 #### META file
 
