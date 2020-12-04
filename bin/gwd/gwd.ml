@@ -195,8 +195,12 @@ let rec extract_assoc key =
 
 let tmp = Filename.get_temp_dir_name ()
 
+let lexicon_fname = ref (Filename.concat tmp "lexicon.bin.")
+
+(* NB: Lexicon will be impacted by plugins even if the base
+   does not activate this plugin in .gwf file. *)
 let load_lexicon lang =
-  let fname = Filename.concat tmp ("lexicon." ^ lang ^ ".bin") in
+  let fname = !lexicon_fname ^ lang in
   Mutil.read_or_create ~wait:true ~magic:Mutil.random_magic fname
     begin fun ch -> (Marshal.from_channel ch : (string, string) Hashtbl.t) end
     begin fun ch ->
@@ -215,6 +219,15 @@ let load_lexicon lang =
 
 let register_plugin plugin =
   let dir = Filename.dirname plugin in
+  lexicon_fname := !lexicon_fname ^ Filename.basename dir ^ "." ;
+  let lex_dir = Filename.concat (Filename.concat dir "assets") "lex" in
+  if Sys.file_exists lex_dir then begin
+    let lex = Sys.readdir lex_dir in
+    Array.sort compare lex ;
+    Array.iter begin fun f ->
+      let f = Filename.concat lex_dir f in
+      if not (Sys.is_directory f) then lexicon_list := f :: !lexicon_list
+    end lex end ;
   let assets = Filename.concat dir "assets" in
   GwdPlugin.assets := assets ;
   if Sys.file_exists dir then Secure.add_lang_path assets ;
@@ -1138,17 +1151,6 @@ let make_conf from_addr request script_name env =
     with Not_found -> !default_lang
   in
   let lexicon_lang = if lang = "" then default_lang else lang in
-  List.iter begin fun plugin ->
-    let dir = (Filename.dirname plugin) in
-    let lex_dir = Filename.concat (Filename.concat dir "assets") "lex" in
-    if Sys.file_exists lex_dir then
-      let lex = Sys.readdir lex_dir in
-      Array.sort compare lex ;
-      Array.iter begin fun f ->
-        let f = Filename.concat lex_dir f in
-        if not (Sys.is_directory f) then lexicon_list := f :: !lexicon_list
-      end lex
-  end !plugins ;
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
