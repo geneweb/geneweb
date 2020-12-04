@@ -346,23 +346,6 @@ let print_redirected conf from request new_addr =
       Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf)
 
-let propose_base conf =
-  let title _ = Wserver.printf "Base" in
-  Hutil.header conf title;
-  Wserver.printf "<ul><li>";
-  Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
-  Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
-  Wserver.printf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</li></ul>";
-  Hutil.trailer conf
-
-let general_welcome conf =
-  include_template conf [] "index"
-    (fun () -> propose_base conf)
-
 let nonce_private_key =
   Lazy.from_fun
     (fun () ->
@@ -1422,20 +1405,7 @@ let conf_and_connection from request script_name contents env =
                       log_passwd_failed ar oc tm from request conf.bname)) ;
             unauth_server conf ar
       | _ ->
-#ifdef API
-          if mode = Some "API_ADD_FIRST_FAM" then
-            begin
-              Request.treat_request_on_nobase conf;
-              if conf.manitou && sleep > 0 then Unix.sleep sleep
-            end
-          else
-#endif
-          if conf.bname = "" then general_welcome conf
-          else
-            match List.assoc_opt "renamed" conf.base_env with
-              Some n when n <> "" -> print_renamed conf n
-            | _ ->
-                Request.treat_request_on_base conf;
+        Request.treat_request conf;
                 if conf.manitou && sleep > 0 then Unix.sleep sleep
 
 let chop_extension name =

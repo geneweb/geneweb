@@ -1,4 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-val treat_request_on_base : Geneweb.Config.config -> unit
-val treat_request_on_nobase : Geneweb.Config.config -> unit
+open Geneweb
+
+val special_vars : string list
+
+val treat_request : Config.config -> unit
+
+val make_senv : Config.config -> Gwdb.base -> unit
+
+val make_henv : Config.config -> Gwdb.base -> unit

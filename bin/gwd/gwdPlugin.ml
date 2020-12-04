@@ -3,7 +3,7 @@ open Geneweb
 let registered = ref []
 
 let ht
-  : (string, (string * (Config.config -> Gwdb.base -> bool))) Hashtbl.t
+  : (string, (string * (Config.config -> Gwdb.base option -> bool))) Hashtbl.t
   = Hashtbl.create 0
 
 let assets = ref ""
