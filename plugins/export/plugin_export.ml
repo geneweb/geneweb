@@ -9,7 +9,7 @@ module IperSet = Set.Make (struct
   end)
 
 let () =
-  GwdPlugin.register ~ns [ "EXPORT", fun _assets conf base ->
+  Gwd_lib.GwdPlugin.register ~ns [ "EXPORT", fun _assets conf base ->
       let base = match base with Some b -> b | None -> assert false in
       let ipers =
         let rec loop acc i =
