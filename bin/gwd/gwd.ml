@@ -5,6 +5,8 @@ open Config
 open Def
 open Util
 
+open Gwd_lib
+
 module StrSet = Mutil.StrSet
 
 let auth_file = ref ""

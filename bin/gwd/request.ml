@@ -421,16 +421,16 @@ let try_plugin conf base m =
     let list = String.split_on_char ',' list in
     List.exists (fun (ns, fn) -> List.mem ns list && fn conf base) (GwdPlugin.get m)
 
-let w_lock fn conf base =
+let w_lock ~onerror fn conf base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   Lock.control
     (Mutil.lock_file bfile) false
-    ~onerror:(fun () -> Update.error_locked conf)
+    ~onerror:(fun () -> onerror conf base)
     (fun () -> fn conf base)
 
-let w_base fn conf base =
+let w_base ~none fn conf base =
   match base with
-  | None -> incorrect_request conf
+  | None -> none conf
   | Some base ->
     make_henv conf base;
     make_senv conf base;
@@ -441,10 +441,10 @@ let w_base fn conf base =
     in
     fn conf base
 
-let w_person fn conf base =
+let w_person ~none fn conf base =
   match find_person_in_env conf base "" with
   | Some p -> fn conf base p
-  | _ -> very_unknown conf base
+  | _ -> none conf base
 
 let log_count =
   let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
@@ -473,6 +473,9 @@ let print_no_index conf base =
   Hutil.trailer conf
 
 let treat_request conf =
+  let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
+  let w_base = w_base ~none:incorrect_request in
+  let w_person = w_person ~none:very_unknown in
   let bfile =
     if conf.bname = "" then None
     else Some (Util.base_path [] (conf.bname ^ ".gwb"))
