@@ -1,0 +1,18 @@
+(rule
+  (target plugin_forum.ml)
+  (deps
+    (:included
+      %{project_root}/plugins/forum/forum.ml
+      %{project_root}/plugins/forum/forumDisplay.ml
+    )
+    (:src plugin_forum.cppo.ml)
+  )
+  (action (run %{bin:cppo} %{src} -o %{target}))
+)
+
+(executable
+  (name plugin_forum)
+  (libraries geneweb-lib geneweb-gwd-lib geneweb-wserver)
+  (modes (native plugin))
+  (modules plugin_forum)
+)

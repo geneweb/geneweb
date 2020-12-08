@@ -194,6 +194,8 @@ distrib:
 	mkdir $(DISTRIB_DIR)/gw/plugins
 	mkdir $(DISTRIB_DIR)/gw/plugins/export
 	cp $(BUILD_DIR)/plugins/export/plugin_export.cmxs $(DISTRIB_DIR)/gw/plugins/export/
+	mkdir $(DISTRIB_DIR)/gw/plugins/forum
+	cp $(BUILD_DIR)/plugins/forum/plugin_forum.cmxs $(DISTRIB_DIR)/gw/plugins/forum/
 
 .PHONY: install uninstall distrib
 

@@ -291,8 +291,6 @@ let person_selected_with_redirect conf base p =
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
-let enabled_forum conf = p_getenv conf.base_env "disable_forum" <> Some "yes"
-
 let very_unknown conf base =
   match p_getenv conf.env "n", p_getenv conf.env "p" with
   | Some sname, Some fname ->
@@ -596,22 +594,6 @@ let treat_request conf =
           w_base @@ w_lock @@ UpdateIndOk.print_del
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
-        | "FORUM" when enabled_forum conf ->
-          w_base @@ ForumDisplay.print
-        | "FORUM_ADD" when enabled_forum conf ->
-          w_base @@ ForumDisplay.print_add
-        | "FORUM_ADD_OK" when enabled_forum conf ->
-          w_base @@ w_lock @@ ForumDisplay.print_add_ok
-        | "FORUM_DEL" when enabled_forum conf ->
-          w_base @@ w_lock @@ ForumDisplay.print_del
-        | "FORUM_P_P" when enabled_forum conf ->
-          w_base @@ ForumDisplay.print_access_switch
-        | "FORUM_SEARCH" when enabled_forum conf ->
-          w_base @@ ForumDisplay.print_search
-        | "FORUM_VAL" when enabled_forum conf ->
-          w_base @@ w_lock @@ ForumDisplay.print_valid
-        | "FORUM_VIEW" when enabled_forum conf ->
-          w_base @@ ForumDisplay.print
         | "H" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f

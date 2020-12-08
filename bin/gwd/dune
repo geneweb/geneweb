@@ -3,6 +3,7 @@
   (deps
     (:cmxs
       %{project_root}/plugins/export/plugin_export.cmxs
+      %{project_root}/plugins/forum/plugin_forum.cmxs
     )
     (:maker mk_gwdPluginMD5.ml)
   )
