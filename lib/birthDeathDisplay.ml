@@ -11,11 +11,11 @@ let print_birth conf base =
     select conf base (fun p -> Adef.od_of_cdate (get_birth p)) false
   in
   let title _ =
-    Wserver.printf (fcapitale (ftransl conf "the latest %d births")) len
+    Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   let _ =
     List.fold_left
       (fun (last_month_txt, was_future) (p, d, cal) ->
@@ -26,47 +26,47 @@ let print_birth conf base =
          let future = Date.compare_dmy d conf.today = 1 in
          if not future && was_future then
            begin
-             Wserver.printf "</li>\n</ul>\n</li>\n</ul>\n<p>\n<ul>\n";
-             Wserver.printf "<li>%s\n" month_txt;
-             Wserver.printf "<ul>\n"
+             Output.printf conf "</li>\n</ul>\n</li>\n</ul>\n<p>\n<ul>\n";
+             Output.printf conf "<li>%s\n" month_txt;
+             Output.printf conf "<ul>\n"
            end
          else if month_txt <> last_month_txt then
            begin
              if last_month_txt = "" then ()
-             else Wserver.printf "</ul>\n</li>\n";
-             Wserver.printf "<li>%s\n" month_txt;
-             Wserver.printf "<ul>\n"
+             else Output.printf conf "</ul>\n</li>\n";
+             Output.printf conf "<li>%s\n" month_txt;
+             Output.printf conf "<ul>\n"
            end;
-         Wserver.printf "<li>";
-         Wserver.printf "<b>";
-         Wserver.print_string (referenced_person_text conf base p);
-         Wserver.printf "</b>";
-         Wserver.printf ",\n";
+         Output.printf conf "<li>";
+         Output.printf conf "<b>";
+         Output.print_string conf (referenced_person_text conf base p);
+         Output.printf conf "</b>";
+         Output.printf conf ",\n";
          if future then
-           Wserver.printf "<em>%s</em>.\n"
+           Output.printf conf "<em>%s</em>.\n"
              (DateDisplay.string_of_date conf (Dgreg (d, cal)))
          else
-           Wserver.printf "%s <em>%s</em>.\n"
+           Output.printf conf "%s <em>%s</em>.\n"
              (transl_nth conf "born" (index_of_sex (get_sex p)))
              (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-         Wserver.printf "</li>\n";
+         Output.printf conf "</li>\n";
          month_txt, future)
       ("", false) list
   in
-  Wserver.printf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
+  Output.printf conf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
 
 
 let print_death conf base =
   let (list, len) = select conf base death_date false in
   let title _ =
-    Wserver.printf (fcapitale (ftransl conf "the latest %t deaths"))
+    Output.printf conf (fcapitale (ftransl conf "the latest %t deaths"))
       (fun _ -> string_of_int len)
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   if list <> [] then
     begin
-      Wserver.printf "<ul>\n";
+      Output.printf conf "<ul>\n";
       let (_, ages_sum, ages_nb) =
         List.fold_left
           (fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
@@ -77,9 +77,9 @@ let print_death conf base =
              if month_txt <> last_month_txt then
                begin
                  if last_month_txt = "" then ()
-                 else Wserver.printf "</ul>\n</li>\n";
-                 Wserver.printf "<li>%s\n" month_txt;
-                 Wserver.printf "<ul>\n"
+                 else Output.printf conf "</ul>\n</li>\n";
+                 Output.printf conf "<li>%s\n" month_txt;
+                 Output.printf conf "<ul>\n"
                end;
              let (age, ages_sum, ages_nb) =
                let sure d = d.prec = Sure in
@@ -103,25 +103,25 @@ let print_death conf base =
                  else None, ages_sum, ages_nb
                | _ -> None, ages_sum, ages_nb
              in
-             Wserver.printf "<li>";
-             Wserver.printf "<b>";
-             Wserver.print_string (referenced_person_text conf base p);
-             Wserver.printf "</b>";
-             Wserver.printf ", %s <em>%s</em>"
+             Output.printf conf "<li>";
+             Output.printf conf "<b>";
+             Output.print_string conf (referenced_person_text conf base p);
+             Output.printf conf "</b>";
+             Output.printf conf ", %s <em>%s</em>"
                (transl_nth conf "died" (index_of_sex (get_sex p)))
                (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
              begin match age with
                  Some a ->
-                 Wserver.printf " <em>(%s)</em>" (DateDisplay.string_of_age conf a)
+                 Output.printf conf " <em>(%s)</em>" (DateDisplay.string_of_age conf a)
                | None -> ()
              end;
-             Wserver.printf "</li>\n";
+             Output.printf conf "</li>\n";
              month_txt, ages_sum, ages_nb)
           ("", (0, 0), (0, 0)) list
       in
-      Wserver.printf "</ul>\n</li>\n</ul>\n";
+      Output.printf conf "</ul>\n</li>\n</ul>\n";
       if fst ages_nb >= 3 then
-        Wserver.printf "%s (%s) : %s<br%s>\n"
+        Output.printf conf "%s (%s) : %s<br%s>\n"
           (Utf8.capitalize (transl conf "average age at death"))
           (transl_nth conf "M/F" 0)
           (DateDisplay.string_of_age conf
@@ -129,18 +129,18 @@ let print_death conf base =
               delta = 0; prec = Sure})
           conf.xhs;
       if snd ages_nb >= 3 then
-        Wserver.printf "%s (%s) : %s<br%s>\n"
+        Output.printf conf "%s (%s) : %s<br%s>\n"
           (Utf8.capitalize (transl conf "average age at death"))
           (transl_nth conf "M/F" 1)
           (DateDisplay.string_of_age conf
              {day = 0; month = 0; year = snd ages_sum / snd ages_nb;
               delta = 0; prec = Sure})
           conf.xhs;
-      Wserver.printf "<br%s>\n" conf.xhs;
-      Wserver.printf "<div align=\"center\">\n";
-      Wserver.printf "<hr width=\"50%%\"%s>\n" conf.xhs;
-      Wserver.printf "</div>\n";
-      Wserver.printf "<br%s>\n" conf.xhs;
+      Output.printf conf "<br%s>\n" conf.xhs;
+      Output.printf conf "<div align=\"center\">\n";
+      Output.printf conf "<hr width=\"50%%\"%s>\n" conf.xhs;
+      Output.printf conf "</div>\n";
+      Output.printf conf "<br%s>\n" conf.xhs;
       let by =
         match p_getenv conf.env "by" with
           Some s -> s
@@ -156,36 +156,36 @@ let print_death conf base =
           Some s -> s
         | None -> string_of_int conf.today.day
       in
-      Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.command;
-      Wserver.printf "<p>\n";
+      Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+      Output.printf conf "<p>\n";
       Util.hidden_env conf;
-      Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"LD\"%s>\n"
+      Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"LD\"%s>\n"
         conf.xhs;
       begin let ds =
               Printf.sprintf
                 "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"%s>" len
                 conf.xhs
         in
-        Wserver.printf (fcapitale (ftransl conf "the latest %t deaths"))
+        Output.printf conf (fcapitale (ftransl conf "the latest %t deaths"))
           (fun _ -> ds)
       end;
-      Wserver.printf "\n... (%s...\n" (transl conf "before");
-      Wserver.printf
+      Output.printf conf "\n... (%s...\n" (transl conf "before");
+      Output.printf conf
         "<input name=\"by\" value=\"%s\" size=\"4\" maxlength=\"4\"%s>\n" by
         conf.xhs;
-      Wserver.printf
+      Output.printf conf
         "<input name=\"bm\" value=\"%s\" size=\"2\" maxlength=\"2\"%s>\n" bm
         conf.xhs;
-      Wserver.printf
+      Output.printf conf
         "<input name=\"bd\" value=\"%s\" size=\"2\" maxlength=\"2\"%s>\n" bd
         conf.xhs;
-      Wserver.printf ")\n";
-      Wserver.printf
+      Output.printf conf ")\n";
+      Output.printf conf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-      Wserver.printf "</button>\n";
-      Wserver.printf "</p>\n";
-      Wserver.printf "</form>\n"
+      Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+      Output.printf conf "</button>\n";
+      Output.printf conf "</p>\n";
+      Output.printf conf "</form>\n"
     end;
   Hutil.trailer conf
 
@@ -207,27 +207,27 @@ let print_oldest_alive conf base =
   in
   let (list, len) = select conf base get_oldest_alive true in
   let title _ =
-    Wserver.printf
+    Output.printf conf
       (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   List.iter
     (fun (p, d, cal) ->
-       Wserver.printf "<li>\n";
-       Wserver.printf "<b>%s</b>,\n" (referenced_person_text conf base p);
-       Wserver.printf "%s <em>%s</em>"
+       Output.printf conf "<li>\n";
+       Output.printf conf "<b>%s</b>,\n" (referenced_person_text conf base p);
+       Output.printf conf "%s <em>%s</em>"
          (transl_nth conf "born" (index_of_sex (get_sex p)))
          (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
        if get_death p = NotDead && d.prec = Sure then
          begin let a = Date.time_elapsed d conf.today in
-           Wserver.printf " <em>(%s)</em>" (DateDisplay.string_of_age conf a)
+           Output.printf conf " <em>(%s)</em>" (DateDisplay.string_of_age conf a)
          end;
-       Wserver.printf ".";
-       Wserver.printf "</li>\n")
+       Output.printf conf ".";
+       Output.printf conf "</li>\n")
     list;
-  Wserver.printf "</ul>\n";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf
 
 let print_longest_lived conf base =
@@ -245,29 +245,29 @@ let print_longest_lived conf base =
   in
   let (list, len) = select conf base get_longest false in
   let title _ =
-    Wserver.printf (fcapitale (ftransl conf "the %d who lived the longest"))
+    Output.printf conf (fcapitale (ftransl conf "the %d who lived the longest"))
       len
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   List.iter
     (fun (p, d, _) ->
-       Wserver.printf "<li>\n";
-       Wserver.printf "<strong>\n";
-       Wserver.print_string (referenced_person_text conf base p);
-       Wserver.printf "</strong>%s" (DateDisplay.short_dates_text conf base p);
-       Wserver.printf "\n(%d %s)" d.year (transl conf "years old");
-       Wserver.printf ".";
-       Wserver.printf "</li>\n")
+       Output.printf conf "<li>\n";
+       Output.printf conf "<strong>\n";
+       Output.print_string conf (referenced_person_text conf base p);
+       Output.printf conf "</strong>%s" (DateDisplay.short_dates_text conf base p);
+       Output.printf conf "\n(%d %s)" d.year (transl conf "years old");
+       Output.printf conf ".";
+       Output.printf conf "</li>\n")
     list;
-  Wserver.printf "</ul>\n\n";
+  Output.printf conf "</ul>\n\n";
   Hutil.trailer conf
 
 let print_marr_or_eng conf base title list =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   let _ =
     List.fold_left
       (fun (last_month_txt, was_future) (ifam, fam, d, cal) ->
@@ -279,35 +279,35 @@ let print_marr_or_eng conf base title list =
          let future = Date.compare_dmy d conf.today > 0 in
          if not future && was_future then
            begin
-             Wserver.printf "</ul>\n</li>\n</ul>\n<ul>\n";
-             Wserver.printf "<li>%s\n" month_txt;
-             Wserver.printf "<ul>\n"
+             Output.printf conf "</ul>\n</li>\n</ul>\n<ul>\n";
+             Output.printf conf "<li>%s\n" month_txt;
+             Output.printf conf "<ul>\n"
            end
          else if month_txt <> last_month_txt then
            begin
              if last_month_txt = "" then ()
-             else Wserver.printf "</ul>\n</li>\n";
-             Wserver.printf "<li>%s\n" month_txt;
-             Wserver.printf "<ul>\n"
+             else Output.printf conf "</ul>\n</li>\n";
+             Output.printf conf "<li>%s\n" month_txt;
+             Output.printf conf "<ul>\n"
            end;
-         Wserver.printf "<li>";
-         Wserver.printf "<b>";
-         Wserver.print_string
+         Output.printf conf "<li>";
+         Output.printf conf "<b>";
+         Output.print_string conf
            (referenced_person_text conf base
               (pget conf base (get_father cpl)));
-         Wserver.printf "</b>\n";
-         Wserver.printf "%s\n" (transl_nth conf "and" 0);
-         Wserver.printf "<b>";
-         Wserver.print_string
+         Output.printf conf "</b>\n";
+         Output.printf conf "%s\n" (transl_nth conf "and" 0);
+         Output.printf conf "<b>";
+         Output.print_string conf
            (referenced_person_text conf base
               (pget conf base (get_mother cpl)));
-         Wserver.printf "</b>";
-         Wserver.printf ",\n";
+         Output.printf conf "</b>";
+         Output.printf conf ",\n";
          if future then
-           Wserver.printf "<em>%s</em>."
+           Output.printf conf "<em>%s</em>."
              (DateDisplay.string_of_date conf (Dgreg (d, cal)))
          else
-           Wserver.printf "%s <em>%s</em>."
+           Output.printf conf "%s <em>%s</em>."
              (match get_relation fam with
                 NotMarried | NoSexesCheckNotMarried ->
                 transl_nth conf "relation/relations" 0
@@ -320,11 +320,11 @@ let print_marr_or_eng conf base title list =
               | Residence
               | NoMention -> "")
              (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-         Wserver.printf "</li>\n";
+         Output.printf conf "</li>\n";
          month_txt, future)
       ("", false) list
   in
-  Wserver.printf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
+  Output.printf conf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
 
 let print_marriage conf base =
   let (list, len) =
@@ -337,7 +337,7 @@ let print_marriage conf base =
       false
   in
   let title _ =
-    Wserver.printf (fcapitale (ftransl conf "the latest %d marriages")) len
+    Output.printf conf (fcapitale (ftransl conf "the latest %d marriages")) len
   in
   print_marr_or_eng conf base title list
 
@@ -356,7 +356,7 @@ let print_oldest_engagements conf base =
       true
   in
   let title _ =
-    Wserver.printf
+    Output.printf conf
       (fcapitale
          (ftransl conf
             "the %d oldest couples perhaps still alive and engaged"))
@@ -365,62 +365,62 @@ let print_oldest_engagements conf base =
   print_marr_or_eng conf base title list
 
 let old_print_statistics conf =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "statistics")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "statistics")) in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env) with
       Not_found | Failure _ -> 20
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   if conf.wizard || conf.friend then
     begin
       begin
-        Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=LB&k=%d\">" (commd conf) n;
-        Wserver.printf (ftransl conf "the latest %d births") n;
-        Wserver.printf "</a>";
-        Wserver.printf "</li>\n"
+        Output.printf conf "<li>";
+        Output.printf conf "<a href=\"%sm=LB&k=%d\">" (commd conf) n;
+        Output.printf conf (ftransl conf "the latest %d births") n;
+        Output.printf conf "</a>";
+        Output.printf conf "</li>\n"
       end;
       begin
-        Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=LD&k=%d\">" (commd conf) n;
-        Wserver.printf (ftransl conf "the latest %t deaths")
+        Output.printf conf "<li>";
+        Output.printf conf "<a href=\"%sm=LD&k=%d\">" (commd conf) n;
+        Output.printf conf (ftransl conf "the latest %t deaths")
           (fun _ -> string_of_int n);
-        Wserver.printf "</a>";
-        Wserver.printf "</li>\n"
+        Output.printf conf "</a>";
+        Output.printf conf "</li>\n"
       end;
       begin
-        Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=LM&k=%d\">" (commd conf) n;
-        Wserver.printf (ftransl conf "the latest %d marriages") n;
-        Wserver.printf "</a>";
-        Wserver.printf "</li>\n"
+        Output.printf conf "<li>";
+        Output.printf conf "<a href=\"%sm=LM&k=%d\">" (commd conf) n;
+        Output.printf conf (ftransl conf "the latest %d marriages") n;
+        Output.printf conf "</a>";
+        Output.printf conf "</li>\n"
       end;
       begin
-        Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=OE&k=%d\">" (commd conf) n;
-        Wserver.printf
+        Output.printf conf "<li>";
+        Output.printf conf "<a href=\"%sm=OE&k=%d\">" (commd conf) n;
+        Output.printf conf
           (ftransl conf
              "the %d oldest couples perhaps still alive and engaged")
           n;
-        Wserver.printf "</a>";
-        Wserver.printf "</li>\n"
+        Output.printf conf "</a>";
+        Output.printf conf "</li>\n"
       end;
       begin
-        Wserver.printf "<li>";
-        Wserver.printf "<a href=\"%sm=OA&k=%d&lim=0\">" (commd conf) n;
-        Wserver.printf (ftransl conf "the %d oldest perhaps still alive") n;
-        Wserver.printf "</a>";
-        Wserver.printf "</li>\n"
+        Output.printf conf "<li>";
+        Output.printf conf "<a href=\"%sm=OA&k=%d&lim=0\">" (commd conf) n;
+        Output.printf conf (ftransl conf "the %d oldest perhaps still alive") n;
+        Output.printf conf "</a>";
+        Output.printf conf "</li>\n"
       end
     end;
-  Wserver.printf "<li>";
-  Wserver.printf "<a href=\"%sm=LL&k=%d\">" (commd conf) n;
-  Wserver.printf (ftransl conf "the %d who lived the longest") n;
-  Wserver.printf "</a>";
-  Wserver.printf "</li>\n";
-  Wserver.printf "</ul>\n";
+  Output.printf conf "<li>";
+  Output.printf conf "<a href=\"%sm=LL&k=%d\">" (commd conf) n;
+  Output.printf conf (ftransl conf "the %d who lived the longest") n;
+  Output.printf conf "</a>";
+  Output.printf conf "</li>\n";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf
 
 (* *)
@@ -469,17 +469,17 @@ let print_population_pyramid conf base =
     Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   in
   let title _ =
-    Wserver.printf "%s (%d)" (Utf8.capitalize (transl conf "population pyramid"))
+    Output.printf conf "%s (%d)" (Utf8.capitalize (transl conf "population pyramid"))
       at_year
   in
   let print_image doit sex iname =
-    Wserver.printf "<td>";
+    Output.printf conf "<td>";
     if doit then
-      Wserver.printf "<img src=\"%s/%s\" alt=\"%s\" title=\"%s\"%s>\n"
+      Output.printf conf "<img src=\"%s/%s\" alt=\"%s\" title=\"%s\"%s>\n"
         (Util.image_prefix conf) iname (transl_nth conf "M/F" sex)
         (transl_nth conf "M/F" sex) conf.xhs
-    else Wserver.printf "&nbsp;";
-    Wserver.printf "</td>\n"
+    else Output.printf conf "&nbsp;";
+    Output.printf conf "</td>\n"
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -497,104 +497,104 @@ let print_population_pyramid conf base =
     in
     loop nb_intervals
   in
-  Wserver.printf "<div>\n";
+  Output.printf conf "<div>\n";
   begin let c = " cellspacing=\"0\" cellpadding=\"0\"" in
-    Wserver.printf
+    Output.printf conf
       "<table id=\"table_pop_pyr\" border=\"%d\"%s style=\"margin: auto\">\n"
       conf.border c;
     for i = first_interv downto 0 do
       let nb_men = men.(i) in
       let nb_wom = wom.(i) in
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td class=\"pyramid_year\">";
-      Wserver.printf "%d" (at_year - i * interval);
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>";
-      Wserver.printf "&nbsp;";
-      Wserver.printf "</td>\n";
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td class=\"pyramid_year\">";
+      Output.printf conf "%d" (at_year - i * interval);
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>";
+      Output.printf conf "&nbsp;";
+      Output.printf conf "</td>\n";
       print_image (i = 0) 0 "male.png";
-      Wserver.printf "<td>";
-      Wserver.printf "&nbsp;";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td align=\"right\">\n";
-      Wserver.printf "<table %s>\n" c;
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td class=\"pyramid_nb\">";
-      if nb_men <> 0 then Wserver.printf "%d" nb_men;
-      Wserver.printf "&nbsp;";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>";
+      Output.printf conf "<td>";
+      Output.printf conf "&nbsp;";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td align=\"right\">\n";
+      Output.printf conf "<table %s>\n" c;
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td class=\"pyramid_nb\">";
+      if nb_men <> 0 then Output.printf conf "%d" nb_men;
+      Output.printf conf "&nbsp;";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>";
       if nb_men = 0 then ()
       else
         begin let n = max 1 (band_size nb_men) in
           (* On multiplie par 3 parce que c'est *)
           (* la largeur de l'image : 3 x 14     *)
-          Wserver.printf
+          Output.printf conf
             "<img src=\"images/pyr_male.png\" width=%d height=%d />" (n * 3)
             14
         end;
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n";
-      Wserver.printf "</table>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td align=\"center\">";
-      if i = nb_intervals then Wserver.printf "&nbsp;"
-      else Wserver.printf "%d" ((i + 1) * interval);
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td align=\"left\">\n";
-      Wserver.printf "<table %s>\n" c;
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td>";
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n";
+      Output.printf conf "</table>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td align=\"center\">";
+      if i = nb_intervals then Output.printf conf "&nbsp;"
+      else Output.printf conf "%d" ((i + 1) * interval);
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td align=\"left\">\n";
+      Output.printf conf "<table %s>\n" c;
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td>";
       if nb_wom = 0 then ()
       else
         begin let n = max 1 (band_size nb_wom) in
           (* On multiplie par 3 parce que c'est *)
           (* la largeur de l'image : 3 x 14     *)
-          Wserver.printf
+          Output.printf conf
             "<img src=\"images/pyr_female.png\" width=%d height=%d />" (n * 3)
             14
         end;
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td class=\"pyramid_nb\">";
-      Wserver.printf "&nbsp;";
-      if nb_wom <> 0 then Wserver.printf "%d" nb_wom;
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n";
-      Wserver.printf "</table>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>";
-      Wserver.printf "&nbsp;";
-      Wserver.printf "</td>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td class=\"pyramid_nb\">";
+      Output.printf conf "&nbsp;";
+      if nb_wom <> 0 then Output.printf conf "%d" nb_wom;
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n";
+      Output.printf conf "</table>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>";
+      Output.printf conf "&nbsp;";
+      Output.printf conf "</td>\n";
       print_image (i = 0) 1 "female.png";
-      Wserver.printf "<td>";
-      Wserver.printf "&nbsp;";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td class=\"pyramid_year\">";
-      Wserver.printf "%d" (at_year - i * interval);
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n"
+      Output.printf conf "<td>";
+      Output.printf conf "&nbsp;";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td class=\"pyramid_year\">";
+      Output.printf conf "%d" (at_year - i * interval);
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n"
     done;
-    Wserver.printf "</table id=\"table_pop_pyr\">\n"
+    Output.printf conf "</table id=\"table_pop_pyr\">\n"
   end;
-  Wserver.printf "</div>\n";
+  Output.printf conf "</div>\n";
   let sum_men = Array.fold_left (+) 0 men in
   let sum_wom = Array.fold_left (+) 0 wom in
-  Wserver.printf "<p>\n";
-  Wserver.printf "%s %s" (Utf8.capitalize (transl conf "number of living persons:"))
+  Output.printf conf "<p>\n";
+  Output.printf conf "%s %s" (Utf8.capitalize (transl conf "number of living persons:"))
     (string_of_nb (sum_men + sum_wom));
-  Wserver.printf "</p>\n";
-  Wserver.printf "<p>\n";
-  Wserver.printf "<form method=\"get\" action=\"%s\">\n" (commd conf);
+  Output.printf conf "</p>\n";
+  Output.printf conf "<p>\n";
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" (commd conf);
   hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"POP_PYR\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"POP_PYR\"%s>\n"
     conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"int\" value=\"%d\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"int\" value=\"%d\"%s>\n"
     interval conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"lim\" value=\"%d\"%s>\n" limit
+  Output.printf conf "<input type=\"hidden\" name=\"lim\" value=\"%d\"%s>\n" limit
     conf.xhs;
-  Wserver.printf "%s\n" (transl_nth conf "year/month/day" 0);
-  Wserver.printf "<input name=\"y\" value=\"%d\" size=\"5\"%s>\n" at_year
+  Output.printf conf "%s\n" (transl_nth conf "year/month/day" 0);
+  Output.printf conf "<input name=\"y\" value=\"%d\" size=\"5\"%s>\n" at_year
     conf.xhs;
-  Wserver.printf "</form>\n";
-  Wserver.printf "</p>\n";
+  Output.printf conf "</form>\n";
+  Output.printf conf "</p>\n";
   Hutil.trailer conf

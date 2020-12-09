@@ -15,7 +15,7 @@ type gwexport_opts =
   ; mem : bool
   ; no_notes : bool
   ; no_picture : bool
-  ; oc : string * out_channel
+  ; oc : string * (string -> unit) * (unit -> unit)
   ; picture_path : bool
   ; source : string option
   ; surnames : string list
@@ -34,7 +34,7 @@ let opts =
       ; mem = false
       ; no_notes = false
       ; no_picture = false
-      ; oc = ("", stderr)
+      ; oc = ("", prerr_string, fun () -> close_out stderr)
       ; picture_path = false
       ; source = None
       ; surnames = []
@@ -90,7 +90,9 @@ let speclist =
     , " no (database) notes" )
   ; ( "-nopicture", Arg.Unit (fun () -> c := { !c with no_picture = true })
     , " don't extract individual picture" )
-  ; ( "-o", Arg.String (fun s -> c := { !c with oc = (s, open_out s) })
+  ; ( "-o", Arg.String (fun s ->
+          let oc = open_out s in
+          c := { !c with oc = (s, output_string oc, fun () -> close_out oc) })
     , "<ged> output file name (default: stdout)" )
   ; ( "-picture-path", Arg.Unit (fun () -> c := { !c with picture_path = true })
     , " extract pictures path" )

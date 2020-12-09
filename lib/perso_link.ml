@@ -701,7 +701,7 @@ let can_merge_child base_prefix children c_link =
 (* ************************************************************************** *)
 let init_cache conf base ip nb_asc from_gen_desc nb_desc =
   (* Option pour activer/desactiver totalement le cache. *)
-  let init = Wserver.extract_param "links-tree: " '\n' conf.request in
+  let init = Mutil.extract_param "links-tree: " '\n' conf.request in
   if init = "1" then
     Link.init_cache conf base conf.request conf.bname ip nb_asc from_gen_desc
       nb_desc

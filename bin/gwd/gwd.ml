@@ -9,6 +9,15 @@ open Gwd_lib
 
 module StrSet = Mutil.StrSet
 
+let output_conf =
+  { status = Wserver.http
+  ; header = (fun s -> Wserver.header "%s" s)
+  ; body = Wserver.print_string
+  ; flush = Wserver.wflush
+  }
+
+let printer_conf = { Config.empty with output_conf }
+
 let auth_file = ref ""
 let choose_browser_lang = ref false
 let conn_timeout = ref 120
@@ -70,8 +79,8 @@ let print_and_cut_if_too_big oc str =
   loop 0
 
 let log oc tm conf from gauth request script_name contents =
-  let referer = Wserver.extract_param "referer: " '\n' request in
-  let user_agent = Wserver.extract_param "user-agent: " '\n' request in
+  let referer = Mutil.extract_param "referer: " '\n' request in
+  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Util.fprintf_date oc tm;
   Printf.fprintf oc " (%d)" (Unix.getpid ());
@@ -107,8 +116,8 @@ type auth_report =
     ar_can_stale : bool }
 
 let log_passwd_failed ar oc tm from request base_file =
-  let referer = Wserver.extract_param "referer: " '\n' request in
-  let user_agent = Wserver.extract_param "user-agent: " '\n' request in
+  let referer = Mutil.extract_param "referer: " '\n' request in
+  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Util.fprintf_date oc tm;
   Printf.fprintf oc " (%d)" (Unix.getpid ());
@@ -121,40 +130,40 @@ let log_passwd_failed ar oc tm from request base_file =
   Printf.fprintf oc "  Agent: %s\n" user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
-let copy_file fname =
+let copy_file conf fname =
   match Util.open_etc_file fname with
     Some (ic, _fname) ->
       begin try
-        while true do let c = input_char ic in Wserver.printf "%c" c done
+        while true do let c = input_char ic in Output.printf conf "%c" c done
       with _ -> ()
       end;
       close_in ic;
       true
   | None -> false
 
-let http status =
-  Wserver.http status;
-  Wserver.header "Content-type: text/html; charset=iso-8859-1"
+let http conf status =
+  Output.status conf status;
+  Output.header conf "Content-type: text/html; charset=iso-8859-1"
 
-let robots_txt () =
+let robots_txt conf =
   Log.with_log (fun oc -> Printf.fprintf oc "Robot request\n");
-  Wserver.http Wserver.OK;
-  Wserver.header "Content-type: text/plain";
-  if copy_file "robots" then ()
+  Output.status conf Def.OK;
+  Output.header conf "Content-type: text/plain";
+  if copy_file conf "robots" then ()
   else
-    begin Wserver.printf "User-Agent: *\n"; Wserver.printf "Disallow: /\n" end
+    begin Output.printf conf "User-Agent: *\n"; Output.printf conf "Disallow: /\n" end
 
-let refuse_log from =
+let refuse_log conf from =
   Log.with_file ~file:"refuse_log"
     (fun oc ->
        let tm = Unix.localtime (Unix.time ()) in
        Util.fprintf_date oc tm; Printf.fprintf oc " excluded: %s\n" from);
-  http Wserver.Forbidden;
-  Wserver.header "Content-type: text/html";
-  Wserver.printf "Your access has been disconnected by administrator.\n";
-  let _ = (copy_file "refuse" : bool) in ()
+  http conf Def.Forbidden;
+  Output.header conf "Content-type: text/html";
+  Output.printf conf "Your access has been disconnected by administrator.\n";
+  let _ = (copy_file conf "refuse" : bool) in ()
 
-let only_log from =
+let only_log conf from =
   Log.with_log
     (fun oc ->
        let tm = Unix.localtime (Unix.time ()) in
@@ -165,10 +174,10 @@ let only_log from =
          (fun first s -> Printf.fprintf oc "%s%s" (if not first then "," else "") s)
          !only_addresses;
        Printf.fprintf oc ")\n");
-  http Wserver.OK;
-  Wserver.header "Content-type: text/html; charset=iso-8859-1";
-  Wserver.printf "<head><title>Invalid access</title></head>\n";
-  Wserver.printf "<body><h1>Invalid access</h1></body>\n"
+  http conf Def.OK;
+  Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Output.printf conf "<head><title>Invalid access</title></head>\n";
+  Output.printf conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
   Log.with_log
@@ -300,7 +309,7 @@ let read_base_env bname =
 
 let print_renamed conf new_n =
   let link =
-    let req = Util.get_request_string conf.request in
+    let req = Util.get_request_string conf in
     let new_req =
       let len = String.length conf.bname in
       let rec loop i =
@@ -312,14 +321,14 @@ let print_renamed conf new_n =
       in
       loop 0
     in
-    "http://" ^ Util.get_server_string conf.request ^ new_req
+    "http://" ^ Util.get_server_string conf ^ new_req
   in
   let env = ["old", conf.bname; "new", new_n; "link", link] in
   include_template conf env "renamed"
     (fun () ->
-      let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
+      let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
       Hutil.header conf title;
-      Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
+      Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf)
 
 let log_redirect from request req =
@@ -328,7 +337,7 @@ let log_redirect from request req =
     (fun () ->
        Log.with_log
          (fun oc ->
-            let referer = Wserver.extract_param "referer: " '\n' request in
+            let referer = Mutil.extract_param "referer: " '\n' request in
             let tm = Unix.localtime (Unix.time ()) in
             Util.fprintf_date oc tm;
             Printf.fprintf oc " %s\n" req;
@@ -336,16 +345,16 @@ let log_redirect from request req =
             Printf.fprintf oc "  Referer: %s\n" referer))
 
 let print_redirected conf from request new_addr =
-  let req = Util.get_request_string conf.request in
+  let req = Util.get_request_string conf in
   let link = "http://" ^ new_addr ^ req in
   let env = ["link", link] in
   log_redirect from request req;
   include_template conf env "redirect"
     (fun () ->
-      let title _ = Wserver.printf "Address changed" in
+      let title _ = Output.printf conf "Address changed" in
       Hutil.header conf title;
-      Wserver.printf "Use the following address:\n<p>\n";
-      Wserver.printf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
+      Output.printf conf "Use the following address:\n<p>\n";
+      Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf)
 
 let nonce_private_key =
@@ -395,7 +404,7 @@ let trace_auth base_env f =
 
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Wserver.http Wserver.Unauthorized;
+  Output.status conf Def.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
     let _ =
@@ -409,12 +418,12 @@ let unauth_server conf ar =
                 List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) conf.request)
              ar.ar_passwd nonce ar.ar_can_stale)
     in
-    Wserver.header "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\""
+    Output.header conf "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\""
       typ conf.bname
       (if nonce = "" then "" else Printf.sprintf ",nonce=\"%s\"" nonce)
       (if ar.ar_can_stale then ",stale=true" else "")
   else
-    Wserver.header "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
+    Output.header conf "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
   let url =
     conf.bname ^ "?" ^
     List.fold_left
@@ -424,32 +433,32 @@ let unauth_server conf ar =
   let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
   let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
   let title h =
-    Wserver.printf
+    Output.printf conf
       (fcapitale (ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
   Hutil.header_without_http conf title;
-  Wserver.printf "<h1>\n";
+  Output.printf conf "<h1>\n";
   title false;
-  Wserver.printf "</h1>\n";
-  Wserver.printf "<dl>\n";
+  Output.printf conf "</h1>\n";
+  Output.printf conf "<dl>\n";
   begin let (alt_bind, alt_access) =
     if ar.ar_passwd = "w" then "&w=f", txt 2 else "&w=w", txt 0
   in
-    Wserver.printf "<dd>\n";
-    Wserver.printf "<ul>\n";
-    Wserver.printf "<li>\n";
-    Wserver.printf "%s : <a href=\"%s%s\">%s</a>" (transl conf "access") url
+    Output.printf conf "<dd>\n";
+    Output.printf conf "<ul>\n";
+    Output.printf conf "<li>\n";
+    Output.printf conf "%s : <a href=\"%s%s\">%s</a>" (transl conf "access") url
       alt_bind alt_access;
-    Wserver.printf "</li>\n";
-    Wserver.printf "<li>\n";
-    Wserver.printf "%s : <a href=\"%s\">%s</a>" (transl conf "access") url
+    Output.printf conf "</li>\n";
+    Output.printf conf "<li>\n";
+    Output.printf conf "%s : <a href=\"%s\">%s</a>" (transl conf "access") url
       (txt 4);
-    Wserver.printf "</li>\n";
-    Wserver.printf "</ul>\n";
-    Wserver.printf "</dd>\n"
+    Output.printf conf "</li>\n";
+    Output.printf conf "</ul>\n";
+    Output.printf conf "</dd>\n"
   end;
-  Wserver.printf "</dl>\n";
+  Output.printf conf "</dl>\n";
   Hutil.trailer conf
 
 let gen_match_auth_file test_user_and_password auth_file =
@@ -621,34 +630,34 @@ let index_not_name s =
   in
   loop 0
 
-let print_request_failure msg =
-  http Wserver.OK;
-  Wserver.header "Content-type: text/html";
-  Wserver.printf "<head><title>Request failure</title></head>\n";
-  Wserver.printf
+let print_request_failure conf msg =
+  http conf Def.OK;
+  Output.header conf "Content-type: text/html";
+  Output.printf conf "<head><title>Request failure</title></head>\n";
+  Output.printf conf
  "<body bgcolor=\"white\">\n\
   <h1 style=\"text-align: center; color: red;\">Request failure</h1>\n\
   <p>The request could not be completed.</p>\n";
-  Wserver.printf
+  Output.printf conf
     "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
     msg;
-  Wserver.printf "</body>\n"
+  Output.printf conf "</body>\n"
 
-let refresh_url request b_arg_for_basename bname =
+let refresh_url conf bname =
   let url =
-    let serv = "http://" ^ Util.get_server_string request in
+    let serv = "http://" ^ Util.get_server_string conf in
     let req =
-      if b_arg_for_basename then
-        let str = Util.get_request_string request in
+      if conf.cgi then
+        let str = Util.get_request_string conf in
         let scriptname = String.sub str 0 (String.index str '?') in
         scriptname ^ "?b=" ^ bname
       else "/" ^ bname ^ "?"
     in
     serv ^ req
   in
-  http Wserver.OK;
-  Wserver.header "Content-type: text/html";
-  Wserver.printf "<head>\n\
+  http conf Def.OK;
+  Output.header conf "Content-type: text/html";
+  Output.printf conf "<head>\n\
                   <meta http-equiv=\"REFRESH\"\n\
                   content=\"1;URL=%s\">\n\
                   </head>\n\
@@ -659,7 +668,7 @@ let refresh_url request b_arg_for_basename bname =
   raise Exit
 
 let http_preferred_language request =
-  let v = Wserver.extract_param "accept-language: " '\n' request in
+  let v = Mutil.extract_param "accept-language: " '\n' request in
   if v = "" then ""
   else
     let s = String.lowercase_ascii v in
@@ -840,7 +849,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
   let passwd1 =
-    let auth = Wserver.extract_param "authorization: " '\r' request in
+    let auth = Mutil.extract_param "authorization: " '\r' request in
     if auth = "" then ""
     else
       let s = "Basic " in
@@ -850,7 +859,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
       else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
-  let auto = Wserver.extract_param "gw-connection-type: " '\r' request in
+  let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
   let (ok, wizard, friend, username) =
     if not !(Wserver.cgi) && (passwd = "w" || passwd = "f") then
@@ -982,10 +991,10 @@ let digest_authorization request base_env passwd utm base_file command =
      ar_user = ""; ar_name = ""; ar_wizard = true;
      ar_friend = friend_passwd = ""; ar_uauth = ""; ar_can_stale = false}
   else if passwd = "w" || passwd = "f" then
-    let auth = Wserver.extract_param "authorization: " '\r' request in
+    let auth = Mutil.extract_param "authorization: " '\r' request in
     if Mutil.start_with "Digest " 0 auth then
       let meth =
-        match Wserver.extract_param "GET " ' ' request with
+        match Mutil.extract_param "GET " ' ' request with
           "" -> "POST"
         | _ -> "GET"
       in
@@ -1070,11 +1079,11 @@ let authorization from_addr request base_env passwd access_type utm base_file
 let make_conf from_addr request script_name env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
-  let b_arg_for_basename = !(Wserver.cgi) in
+  let cgi = !Wserver.cgi in
   let (command, base_file, passwd, env, access_type) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
-      if x <> "" || b_arg_for_basename then x, env else script_name, env
+      if x <> "" || cgi then x, env else script_name, env
     in
     let ip = index base_passwd '_' in
     let base_file =
@@ -1085,7 +1094,9 @@ let make_conf from_addr request script_name env =
       in
       let i = index_not_name s in
       if i = String.length s then s
-      else refresh_url request b_arg_for_basename (String.sub s 0 i)
+      else
+        let conf = { printer_conf with request } in
+        refresh_url conf (String.sub s 0 i)
     in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
@@ -1183,8 +1194,6 @@ let make_conf from_addr request script_name env =
      command = ar.ar_command;
      indep_command =
        (if !(Wserver.cgi) then ar.ar_command else "geneweb") ^ "?";
-     pure_xhtml =
-       (try List.assoc "pure_xhtml" env = "on" with Not_found -> false);
      highlight =
        begin try List.assoc "highlight_color" base_env with
          Not_found -> green_color
@@ -1210,11 +1219,6 @@ let make_conf from_addr request script_name env =
      public_if_no_date =
        begin try List.assoc "public_if_no_date" base_env = "yes" with
          Not_found -> false
-       end;
-     cancel_links =
-       begin match Util.p_getenv env "cgl" with
-         Some "on" -> true
-       | _ -> false
        end;
      setup_link = !setup_link;
      access_by_key =
@@ -1290,7 +1294,9 @@ let make_conf from_addr request script_name env =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then ar.ar_command ^ "?m=IM&v="
        else "images";
-     b_arg_for_basename = b_arg_for_basename}
+     cgi
+    ; output_conf
+    }
   in
   conf, sleep, ar
 
@@ -1330,7 +1336,7 @@ let is_robot from =
 let auth_err request auth_file =
   if auth_file = "" then false, ""
   else
-    let auth = Wserver.extract_param "authorization: " '\r' request in
+    let auth = Mutil.extract_param "authorization: " '\r' request in
     if auth <> "" then
       match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
         Some ic ->
@@ -1359,9 +1365,9 @@ let auth_err request auth_file =
     else true, "(authorization not provided)"
 
 let no_access conf =
-  let title _ = Wserver.printf "Error" in
+  let title _ = Output.printf conf "Error" in
   Hutil.rheader conf title;
-  Wserver.printf "No access to this database in CGI mode\n";
+  Output.printf conf "No access to this database in CGI mode\n";
   Hutil.trailer conf
 
 let conf_and_connection from request script_name contents env =
@@ -1447,7 +1453,7 @@ let excluded from =
     loop ()
   with Sys_error _ -> false
 
-let image_request script_name env =
+let image_request conf script_name env =
   match Util.p_getenv env "m", Util.p_getenv env "v" with
     Some "IM", Some fname ->
       let fname =
@@ -1456,7 +1462,7 @@ let image_request script_name env =
       in
       let fname = Filename.basename fname in
       let fname = Util.image_file_name fname in
-      let _ = ImageDisplay.print_image_file fname in true
+      let _ = ImageDisplay.print_image_file conf fname in true
   | _ ->
       let s = script_name in
       if Mutil.start_with "images/" 0 s then
@@ -1467,7 +1473,7 @@ let image_request script_name env =
         (* image. Si on ne fait pas de basename, alors ça marche.       *)
         (* let fname = Filename.basename fname in *)
         let fname = Util.image_file_name fname in
-        let _ = ImageDisplay.print_image_file fname in true
+        let _ = ImageDisplay.print_image_file conf fname in true
       else false
 
 
@@ -1486,8 +1492,8 @@ type misc_fname =
   | Woff of string
   | Woff2 of string
 
-let content_misc len misc_fname =
-  Wserver.http Wserver.OK;
+let content_misc conf len misc_fname =
+  Output.status conf Def.OK;
   let (fname, t) =
     match misc_fname with
     | Css fname -> fname, "text/css"
@@ -1502,12 +1508,12 @@ let content_misc len misc_fname =
     | Woff2 fname -> fname, "application/font-woff2"
 
   in
-  Wserver.header "Content-type: %s" t;
-  Wserver.header "Content-length: %d" len;
-  Wserver.header "Content-disposition: inline; filename=%s"
+  Output.header conf "Content-type: %s" t;
+  Output.header conf "Content-length: %d" len;
+  Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
-  Wserver.header "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
-  Wserver.wflush ()
+  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
+  Output.flush conf
 
 let find_misc_file name =
   if Sys.file_exists name
@@ -1521,7 +1527,7 @@ let find_misc_file name =
       if Sys.file_exists name' then name'
       else ""
 
-let print_misc_file misc_fname =
+let print_misc_file conf misc_fname =
   match misc_fname with
   | Other _ -> false
   | Css fname
@@ -1537,20 +1543,20 @@ let print_misc_file misc_fname =
     let ic = Secure.open_in_bin fname in
     let buf = Bytes.create 1024 in
     let len = in_channel_length ic in
-    content_misc len misc_fname;
+    content_misc conf len misc_fname;
     let rec loop len =
       if len = 0 then ()
       else
         let olen = min (Bytes.length buf) len in
         really_input ic buf 0 olen;
-        Wserver.print_string (Bytes.sub_string buf 0 olen);
+        Output.print_string conf (Bytes.sub_string buf 0 olen);
         loop (len - olen)
     in
     loop len;
     close_in ic;
     true
 
-let misc_request fname =
+let misc_request conf fname =
   let fname = find_misc_file fname in
   if fname <> "" then
     let misc_fname =
@@ -1565,7 +1571,7 @@ let misc_request fname =
       else if Filename.check_suffix fname ".png" then Png fname
       else Other fname
     in
-    print_misc_file misc_fname
+    print_misc_file conf misc_fname
   else false
 
 let strip_quotes s =
@@ -1640,7 +1646,7 @@ let extract_multipart boundary str =
   str, env
 
 let build_env request contents =
-  let content_type = Wserver.extract_param "content-type: " '\n' request in
+  let content_type = Mutil.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
     let boundary = extract_boundary content_type in
     let (str, env) = extract_multipart boundary contents in str, env
@@ -1656,25 +1662,23 @@ let connection (addr, request) script_name contents =
           try (Unix.gethostbyaddr iaddr).Unix.h_name with
             _ -> Unix.string_of_inet_addr iaddr
   in
-  if script_name = "robots.txt" then robots_txt ()
-  else if excluded from then refuse_log from
+  if script_name = "robots.txt" then robots_txt printer_conf
+  else if excluded from then refuse_log printer_conf from
   else
     begin let accept =
       if !only_addresses = [] then true else List.mem from !only_addresses
     in
-      if not accept then only_log from
+      if not accept then only_log printer_conf from
       else
         try
           let (contents, env) = build_env request contents in
-          if image_request script_name env then ()
-          else if misc_request script_name then ()
-          else
-            conf_and_connection from request script_name contents env
+          if not (image_request printer_conf script_name env)
+          && not (misc_request printer_conf script_name)
+          then conf_and_connection from request script_name contents env
         with
-          Adef.Request_failure msg -> print_request_failure msg
+          Adef.Request_failure msg -> print_request_failure printer_conf msg
         | Exit -> ()
-    end;
-  Wserver.wflush ()
+    end
 
 let null_reopen flags fd =
   if Sys.unix then
@@ -1718,18 +1722,18 @@ let geneweb_server () =
   Wserver.f !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection
 
-let cgi_timeout tmout _ =
-  Wserver.header "Content-type: text/html; charset=iso-8859-1";
-  Wserver.printf "<head><title>Time out</title></head>\n";
-  Wserver.printf "<body><h1>Time out</h1>\n";
-  Wserver.printf "Computation time > %d second(s)\n" tmout;
-  Wserver.printf "</body>\n";
-  Wserver.wflush ();
+let cgi_timeout conf tmout _ =
+  Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Output.printf conf "<head><title>Time out</title></head>\n";
+  Output.printf conf "<body><h1>Time out</h1>\n";
+  Output.printf conf "Computation time > %d second(s)\n" tmout;
+  Output.printf conf "</body>\n";
+  Output.flush conf;
   exit 0
 
 let manage_cgi_timeout tmout =
   if tmout > 0 then
-    let _ = Sys.signal Sys.sigalrm (Sys.Signal_handle (cgi_timeout tmout)) in
+    let _ = Sys.signal Sys.sigalrm (Sys.Signal_handle (cgi_timeout printer_conf tmout)) in
     let _ = Unix.alarm tmout in ()
 
 let geneweb_cgi addr script_name contents =
@@ -1854,8 +1858,10 @@ let string_of_inet_aux x = Unix.string_of_inet_addr (Unix.gethostbyname x).Unix.
 #endif
 
 let main () =
-  if Sys.unix then ()
-  else begin Wserver.sock_in := "gwd.sin"; Wserver.sock_out := "gwd.sou" end;
+#ifdef WINDOWS
+  Wserver.sock_in := "gwd.sin";
+  Wserver.sock_out := "gwd.sou";
+#endif
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"

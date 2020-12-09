@@ -4,7 +4,7 @@
 open Gwdb
 open Config
 
-val print_someone : base -> person -> unit
+val print_someone : config -> base -> person -> unit
 val print : config -> base -> person -> unit
 
 val print_possible_continue_merging : config -> base -> unit

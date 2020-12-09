@@ -1,6 +1,0 @@
-(library
- (name wserver_gw)
- (public_name geneweb-wserver)
- (libraries unix)
- (implements geneweb-lib.wserver.mli)
-)

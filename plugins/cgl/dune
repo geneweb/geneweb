@@ -1,0 +1,5 @@
+(executable
+  (name plugin_cgl)
+  (libraries geneweb-lib geneweb-gwd-lib geneweb-wserver)
+  (modes (native plugin))
+)

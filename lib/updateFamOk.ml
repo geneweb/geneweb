@@ -547,9 +547,9 @@ let error_family conf err =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s\n" (Utf8.capitalize err);
+  Output.printf conf "%s\n" (Utf8.capitalize err);
   Update.print_return conf;
   Hutil.trailer conf;
 #ifdef API
@@ -603,9 +603,9 @@ let print_err_parents conf base p =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "\n%s<p><ul><li>%s%s %d</li></ul>"
+  Output.printf conf "\n%s<p><ul><li>%s%s %d</li></ul>"
     err
     (Utf8.capitalize (transl conf "first free number"))
     (Util.transl conf ":")
@@ -624,9 +624,9 @@ let print_err_sex conf base p err =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.print_string err ;
+  Output.print_string conf err ;
   Update.print_return conf;
   Hutil.trailer conf;
 #ifdef API
@@ -645,7 +645,7 @@ let print_err conf =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string err in
+  let title _ = Output.print_string conf err in
   Hutil.rheader conf title;
   Update.print_return conf;
   Hutil.trailer conf;
@@ -659,10 +659,10 @@ let print_error_disconnected conf =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.print_string err;
+  Output.print_string conf err;
   Hutil.trailer conf;
 #ifdef API
   end ;
@@ -1163,53 +1163,53 @@ let print_family conf base (wl, ml) cpl des =
       if x <> "" then conf.henv <- ("dsrc", code_varenv x) :: conf.henv
   | None -> ()
   end;
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>";
-  Wserver.print_string
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>";
+  Output.print_string conf
     (referenced_person_text conf base (poi base (Adef.father cpl)));
-  Wserver.printf "</li>";
-  Wserver.printf "\n";
-  Wserver.printf "<li>";
-  Wserver.print_string
+  Output.printf conf "</li>";
+  Output.printf conf "\n";
+  Output.printf conf "<li>";
+  Output.print_string conf
     (referenced_person_text conf base (poi base (Adef.mother cpl)));
-  Wserver.printf "</li>";
-  Wserver.printf "</ul>\n";
+  Output.printf conf "</li>";
+  Output.printf conf "</ul>\n";
   if des.children <> [| |] then
     begin
-      Wserver.printf "<ul>\n";
+      Output.printf conf "<ul>\n";
       Array.iter
         (fun ip ->
-           Wserver.printf "<li>";
-           Wserver.print_string
+           Output.printf conf "<li>";
+           Output.print_string conf
              (referenced_person_text conf base (poi base ip));
-           Wserver.printf "</li>")
+           Output.printf conf "</li>")
         des.children;
-      Wserver.printf "</ul>\n"
+      Output.printf conf "</ul>\n"
     end;
   Update.print_warnings_and_miscs conf base wl ml
 
 let print_mod_ok conf base (wl, ml) cpl des =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl conf "family modified"))
+    Output.print_string conf (Utf8.capitalize (transl conf "family modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
-      Wserver.printf "<h3 class=\"error\">";
-      Wserver.printf (fcapitale (ftransl conf "%s forbidden char"))
+      Output.printf conf "<h3 class=\"error\">";
+      Output.printf conf (fcapitale (ftransl conf "%s forbidden char"))
         (List.fold_left (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") " "
            Name.forbidden_char);
-      Wserver.printf "</h3>\n";
-      List.iter (Wserver.printf "<p>%s</p>") !removed_string
+      Output.printf conf "</h3>\n";
+      List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
 let print_change_event_order_ok conf base (wl, ml) cpl des =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl conf "family modified"))
+    Output.print_string conf (Utf8.capitalize (transl conf "family modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1217,32 +1217,32 @@ let print_change_event_order_ok conf base (wl, ml) cpl des =
   Hutil.trailer conf
 
 let print_add_ok conf base (wl, ml) cpl des =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "family added")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "family added")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
-      Wserver.printf "<h2 class=\"error\">%s</h2>\n"
+      Output.printf conf "<h2 class=\"error\">%s</h2>\n"
         (Utf8.capitalize (transl conf "forbidden char"));
-      List.iter (Wserver.printf "<p>%s</p>") !removed_string
+      List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
 let print_del_ok conf base wl =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl conf "family deleted"))
+    Output.print_string conf (Utf8.capitalize (transl conf "family deleted"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   begin match p_getenv conf.env "ip" with
     Some i ->
       let p = poi base (iper_of_string i) in
-      Wserver.printf "<ul>\n";
-      Wserver.printf "<li>\n";
-      Wserver.printf "%s\n" (reference conf base p (person_text conf base p));
-      Wserver.printf "</ul>\n"
+      Output.printf conf "<ul>\n";
+      Output.printf conf "<li>\n";
+      Output.printf conf "%s\n" (reference conf base p (person_text conf base p));
+      Output.printf conf "</ul>\n"
   | _ -> ()
   end;
   Update.print_warnings conf base wl;
@@ -1265,12 +1265,12 @@ let print_del conf base =
 
 let print_inv_ok conf base p =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl conf "inversion done"))
+    Output.print_string conf (Utf8.capitalize (transl conf "inversion done"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "\n%s" (referenced_person_text conf base p);
-  Wserver.printf "\n";
+  Output.printf conf "\n%s" (referenced_person_text conf base p);
+  Output.printf conf "\n";
   Hutil.trailer conf
 
 let get_create (_, _, _, create, _) = create

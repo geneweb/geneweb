@@ -1,5 +1,12 @@
-(* $Id: def.mli,v 5.22 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
+
+type httpStatus =
+  | OK (* 200 *)
+  | Moved_Temporarily (* 302 *)
+  | Bad_Request (* 400 *)
+  | Unauthorized (* 401 *)
+  | Forbidden (* 403 *)
+  | Not_Found (* 404 *)
 
 type ('a, 'b) choice =
     Left of 'a

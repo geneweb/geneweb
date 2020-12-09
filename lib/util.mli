@@ -116,10 +116,7 @@ val allowed_tags_file : string ref
 val body_prop : config -> string
 val url_no_index : config -> base -> string
 val message_to_wizard : config -> unit
-val check_xhtml : string -> string
 
-val print_alphab_list :
-  ('a -> string) -> ('a -> unit) -> 'a list -> unit
 val of_course_died : config -> person -> bool
 val hexa_string : string -> string
 
@@ -200,8 +197,8 @@ val default_sosa_ref : config -> base -> person option
 val find_sosa_ref : config -> base -> person option
 val update_gwf_sosa : config -> base -> iper * (string * string * int) -> unit
 
-val get_server_string : string list -> string
-val get_request_string : string list -> string
+val get_server_string : config -> string
+val get_request_string : config -> string
 
 val create_topological_sort : config -> base -> (iper, int) Gwdb.Marker.t
 
@@ -259,12 +256,15 @@ val doctype : config -> string
 val begin_centered : config -> unit
 val end_centered : config -> unit
 
+val print_alphab_list
+  : config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
+
 (* Printing for browsers without tables *)
 
 val pre_text_size : string -> int
-val print_pre_center : int -> string -> unit
-val print_pre_left : int -> string -> unit
-val print_pre_right : int -> string -> unit
+val print_pre_center : config -> int -> string -> unit
+val print_pre_left : config -> int -> string -> unit
+val print_pre_right : config -> int -> string -> unit
 
 val short_f_month : int -> string
 

@@ -317,7 +317,7 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = " ") conf =
   function
     Dgreg (d, Dgregorian) ->
       let s = dmy conf d in
-      if d.day > 0 && not conf.cancel_links then
+      if d.day > 0 then
         Printf.sprintf
           "<a href=\"%sm=CAL&yg=%d&mg=%d&dg=%d&tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
@@ -338,7 +338,7 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = " ") conf =
         dmy conf d1 ^ year_prec ^ sep ^
         transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
       in
-      if d1.day > 0 && not conf.cancel_links then
+      if d1.day > 0 then
         Printf.sprintf
           "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
@@ -347,7 +347,7 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = " ") conf =
       let d1 = Calendar.french_of_gregorian d in
       let s = string_of_on_french_dmy conf d1 in
       let s =
-        if d1.day > 0 && not conf.cancel_links then
+        if d1.day > 0 then
           Printf.sprintf
             "<a href=\"%sm=CAL&yf=%d&mf=%d&df=%d&tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
@@ -606,28 +606,28 @@ let print_dates conf base p =
   let birth_place = sou base (get_birth_place p) in
   begin match Adef.od_of_cdate (get_birth p) with
     Some d ->
-      Wserver.printf "%s " (cap (transl_nth conf "born" is));
-      Wserver.print_string (string_of_ondate conf d);
-      if birth_place <> "" then Wserver.printf ",\n"
+      Output.printf conf "%s " (cap (transl_nth conf "born" is));
+      Output.print_string conf (string_of_ondate conf d);
+      if birth_place <> "" then Output.printf conf ",\n"
   | None ->
       if birth_place <> "" then
-        Wserver.printf "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
+        Output.printf conf "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
   end;
   if birth_place <> "" then
-    Wserver.print_string (string_of_place conf birth_place);
+    Output.print_string conf (string_of_place conf birth_place);
   let baptism = Adef.od_of_cdate (get_baptism p) in
   let baptism_place = sou base (get_baptism_place p) in
   begin match baptism with
     Some d ->
-      Wserver.printf "%s " (cap (transl_nth conf "baptized" is));
-      Wserver.print_string (string_of_ondate conf d);
-      if baptism_place <> "" then Wserver.printf ",\n"
+      Output.printf conf "%s " (cap (transl_nth conf "baptized" is));
+      Output.print_string conf (string_of_ondate conf d);
+      if baptism_place <> "" then Output.printf conf ",\n"
   | None ->
       if baptism_place <> "" then
-        Wserver.printf "%s\n-&nbsp;" (cap (transl_nth conf "baptized" is))
+        Output.printf conf "%s\n-&nbsp;" (cap (transl_nth conf "baptized" is))
   end;
   if baptism_place <> "" then
-    Wserver.print_string (string_of_place conf baptism_place);
+    Output.print_string conf (string_of_place conf baptism_place);
   let death_place = sou base (get_death_place p) in
   begin match get_death p with
     Death (dr, d) ->
@@ -640,42 +640,42 @@ let print_dates conf base p =
         | Disappeared -> transl_nth conf "disappeared" is
       in
       let d = Adef.date_of_cdate d in
-      Wserver.printf "%s " (cap dr_w);
-      Wserver.print_string (string_of_ondate conf d);
-      if death_place <> "" then Wserver.printf ",\n"
+      Output.printf conf "%s " (cap dr_w);
+      Output.print_string conf (string_of_ondate conf d);
+      if death_place <> "" then Output.printf conf ",\n"
   | DeadYoung ->
-      Wserver.print_string (cap (transl_nth conf "died young" is));
-      if death_place <> "" then Wserver.printf "\n-&nbsp;"
+      Output.print_string conf (cap (transl_nth conf "died young" is));
+      if death_place <> "" then Output.printf conf "\n-&nbsp;"
   | DeadDontKnowWhen ->
       begin match death_place, get_burial p with
         "", (Buried _ | Cremated _) -> ()
       | _ ->
           if death_place <> "" || not (of_course_died conf p) then
             begin
-              Wserver.print_string (cap (transl_nth conf "died" is));
-              if death_place <> "" then Wserver.printf "\n-&nbsp;"
+              Output.print_string conf (cap (transl_nth conf "died" is));
+              if death_place <> "" then Output.printf conf "\n-&nbsp;"
             end
       end
   | DontKnowIfDead | NotDead | OfCourseDead -> ()
   end;
   if death_place <> "" then
-    Wserver.print_string (string_of_place conf death_place);
+    Output.print_string conf (string_of_place conf death_place);
   let burial_date_place cod =
     let place = sou base (get_burial_place p) in
     begin match Adef.od_of_cdate cod with
       Some d ->
-        Wserver.printf " %s" (string_of_ondate conf d);
-        if place <> "" then Wserver.printf ",\n"
-    | None -> if place <> "" then Wserver.printf " -&nbsp;"
+        Output.printf conf " %s" (string_of_ondate conf d);
+        if place <> "" then Output.printf conf ",\n"
+    | None -> if place <> "" then Output.printf conf " -&nbsp;"
     end;
-    if place <> "" then Wserver.print_string (string_of_place conf place)
+    if place <> "" then Output.print_string conf (string_of_place conf place)
   in
   begin match get_burial p with
     Buried cod ->
-      Wserver.print_string (cap (transl_nth conf "buried" is));
+      Output.print_string conf (cap (transl_nth conf "buried" is));
       burial_date_place cod
   | Cremated cod ->
-      Wserver.print_string (cap (transl_nth conf "cremated" is));
+      Output.print_string conf (cap (transl_nth conf "cremated" is));
       burial_date_place cod
   | UnknownBurial -> ()
   end;
@@ -688,11 +688,11 @@ let print_dates conf base p =
       if a.year < 0 || a.year = 0 && a.month = 0 then ()
       else
         begin
-          Wserver.printf "\n(";
-          Wserver.printf "%s " (transl conf "age at death:");
+          Output.printf conf "\n(";
+          Output.printf conf "%s " (transl conf "age at death:");
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
           else
-            Wserver.printf "%s " (transl_decline conf "possibly (date)" "");
-          Wserver.printf "%s)" (string_of_age conf a)
+            Output.printf conf "%s " (transl_decline conf "possibly (date)" "");
+          Output.printf conf "%s)" (string_of_age conf a)
         end
   | _ -> ()

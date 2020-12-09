@@ -515,7 +515,7 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
   let url =
     Printf.sprintf
       "http://%s/%s?m=API_LINK_TREE&input=pb&output=pb&sig=azerty&data=%s"
-      host bname (Wserver.encode data)
+      host bname (Mutil.encode data)
   in
   let res = ref "" in
   Curl.global_init Curl.CURLINIT_GLOBALALL;
@@ -526,14 +526,14 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
       let connection = Curl.init () in
       let headers = [] in
       let headers =
-        let auth = Wserver.extract_param "authorization: " '\r' request in
+        let auth = Mutil.extract_param "authorization: " '\r' request in
         if auth <> "" then
           ("Authorization: " ^ auth) :: ("Gw-Connection-Type: auto") ::headers
         else headers
       in
       let headers =
         let include_not_validated =
-          Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' request
+          Mutil.extract_param "inter-tree-links-include-not-validated: " '\r' request
         in
         if include_not_validated <> "" then
           ("Inter-Tree-Links-Include-Not-Validated: " ^ include_not_validated) :: headers
@@ -580,7 +580,7 @@ let print_link_tree conf base =
 
   (* Gestion de l'inclusion des not validated. *)
   let include_not_validated =
-    let h_include_not_validated = Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' conf.request in
+    let h_include_not_validated = Mutil.extract_param "inter-tree-links-include-not-validated: " '\r' conf.request in
     if h_include_not_validated = "1" then true else false
   in
 

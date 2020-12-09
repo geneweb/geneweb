@@ -834,25 +834,25 @@ let print_update_ind conf base p digest =
 let print_del1 conf base p =
   let title _ =
     let s = transl_nth conf "person/persons" 0 in
-    Wserver.print_string (Utf8.capitalize (transl_decline conf "delete" s))
+    Output.print_string conf (Utf8.capitalize (transl_decline conf "delete" s))
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "<h2>\n";
+  Output.printf conf "<h2>\n";
   title false;
-  Wserver.printf "</h2>\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Wserver.printf "<p>\n";
+  Output.printf conf "</h2>\n";
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"%s>\n"
     conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
     (string_of_iper (get_iper p)) conf.xhs;
-  Wserver.printf
+  Output.printf conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</p>\n";
-  Wserver.printf "</form>\n";
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.printf conf "</button>\n";
+  Output.printf conf "</p>\n";
+  Output.printf conf "</form>\n";
   Hutil.trailer conf
 
 let print_add conf base =

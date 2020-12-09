@@ -767,7 +767,7 @@ let pers_to_piqi_person_search_info conf base p =
     let s = sou base (get_occupation p) in
     let s =
       let wi =
-        {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+        {Wiki.wi_mode = "NOTES";
          Wiki.wi_file_path = Notes.file_path conf base;
          Wiki.wi_person_exists = person_exists conf base;
          Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -796,13 +796,12 @@ let pers_to_piqi_person_search_info conf base p =
           let s = string_with_macros conf env s in
           let lines = Wiki.html_of_tlsw conf s in
           let wi =
-            {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+            {Wiki.wi_mode = "NOTES";
              Wiki.wi_file_path = Notes.file_path conf base;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
-          let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
-          if conf.pure_xhtml then Util.check_xhtml s else s
+          Wiki.syntax_links conf wi (String.concat "\n" lines)
         in
         let src =
           let s = sou base src in
@@ -810,7 +809,6 @@ let pers_to_piqi_person_search_info conf base p =
           let s =
             let wi =
               {Wiki.wi_mode = "NOTES";
-               Wiki.wi_cancel_links = conf.cancel_links;
                Wiki.wi_file_path = Notes.file_path conf base;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -859,13 +857,12 @@ let pers_to_piqi_person_search_info conf base p =
     let s = string_with_macros conf env s in
     let lines = Wiki.html_of_tlsw conf s in
     let wi =
-      {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+      {Wiki.wi_mode = "NOTES";
        Wiki.wi_file_path = Notes.file_path conf base;
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
-    let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
-    if conf.pure_xhtml then Util.check_xhtml s else s
+    Wiki.syntax_links conf wi (String.concat "\n" lines)
   in
   let psources =
     let s = sou base (get_psources p) in
@@ -873,7 +870,6 @@ let pers_to_piqi_person_search_info conf base p =
     let s =
       let wi =
         {Wiki.wi_mode = "NOTES";
-         Wiki.wi_cancel_links = conf.cancel_links;
          Wiki.wi_file_path = Notes.file_path conf base;
          Wiki.wi_person_exists = person_exists conf base;
          Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -885,8 +881,9 @@ let pers_to_piqi_person_search_info conf base p =
   let has_sources = psources <> "" in
   let titles = Perso.nobility_titles_list conf base p in
   let titles =
-    let tmp_conf = {(conf) with cancel_links = true} in
-    List.map (Perso.string_of_title tmp_conf base "" p) titles
+    (* FIXME *)
+    (* let tmp_conf = {(conf) with cancel_links = true} in *)
+    List.map (Perso.string_of_title conf base "" p) titles
   in
   let related =
     let list =

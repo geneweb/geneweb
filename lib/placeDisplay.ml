@@ -13,30 +13,30 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
   in
   let print_sn (sn, ips) =
     let len = List.length ips in
-    Wserver.printf "<a href=\"%s" (commd conf);
+    Output.printf conf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
-    then Wserver.print_string (acces conf base @@ pget conf base @@ List.hd ips)
-    else Wserver.printf "m=N&v=%s" (code_varenv sn);
-    Wserver.printf "\">%s</a> (%d)" sn len
+    then Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
+    else Output.printf conf "m=N&v=%s" (code_varenv sn);
+    Output.printf conf "\">%s</a> (%d)" sn len
   in
   let print_sn_list (snl : (string * iper list) list) =
     let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
-    Wserver.printf "<li>\n";
-    Mutil.list_iter_first (fun first x -> if not first then Wserver.printf ",\n" ; print_sn x) snl ;
-    Wserver.printf "\n";
-    Wserver.printf "</li>\n"
+    Output.printf conf "<li>\n";
+    Mutil.list_iter_first (fun first x -> if not first then Output.printf conf ",\n" ; print_sn x) snl ;
+    Output.printf conf "\n";
+    Output.printf conf "</li>\n"
   in
   let rec loop prev =
     function
       (pl, snl) :: list ->
         let rec loop1 prev pl =
           match prev, pl with
-            [], l2 -> List.iter (fun x -> Wserver.printf "<li>%s<ul>\n" x) l2
+            [], l2 -> List.iter (fun x -> Output.printf conf "<li>%s<ul>\n" x) l2
           | x1 :: l1, x2 :: l2 ->
               if x1 = x2 then loop1 l1 l2
               else
                 begin
-                  List.iter (fun _ -> Wserver.printf "</ul></li>\n")
+                  List.iter (fun _ -> Output.printf conf "</ul></li>\n")
                     (x1 :: l1);
                   loop1 [] (x2 :: l2)
                 end
@@ -45,11 +45,11 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
         loop1 prev pl;
         print_sn_list snl;
         loop pl list
-    | [] -> List.iter (fun _ -> Wserver.printf "</ul></li>\n") prev
+    | [] -> List.iter (fun _ -> Output.printf conf "</ul></li>\n") prev
   in
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   loop [] (Array.to_list array) ;
-  Wserver.printf "</ul>\n"
+  Output.printf conf "</ul>\n"
 
 let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
     (if add_birth then "&bi=on" else "") ^
@@ -80,19 +80,19 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       max_int
   in
   Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) array ;
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "place")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "place")) in
   print_aux conf title begin fun () ->
     let opt = print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage in
-    Wserver.printf
+    Output.printf conf
       "<p><a href=\"%sm=PS%s&display=long\">%s</a></p><p>"
       (commd conf) opt (transl conf "long display") ;
     let last = Array.length array - 1 in
     Array.iteri
       (fun i (s, x) ->
-         Wserver.printf "<a href=\"%sm=PS%s&k=%s\">%s</a> (%d)%s"
+         Output.printf conf "<a href=\"%sm=PS%s&k=%s\">%s</a> (%d)%s"
            (commd conf) opt (Util.code_varenv s) s x (if i = last then "" else ",\n"))
       array ;
-    Wserver.printf "</p>\n"
+    Output.printf conf "</p>\n"
   end
 
 let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage max_length =
@@ -130,13 +130,13 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_de
   in
   Array.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) array ;
   let title _ =
-    Wserver.printf "%s / %s" (Utf8.capitalize (transl conf "place"))
+    Output.printf conf "%s / %s" (Utf8.capitalize (transl conf "place"))
       (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   in
   print_aux conf title begin fun () ->
     if ini = ""
     then
-      Wserver.printf "<p><a href=\"%sm=PS%s&display=short\">%s</a></p><p>"
+      Output.printf conf "<p><a href=\"%sm=PS%s&display=short\">%s</a></p><p>"
         (commd conf)
         (print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage)
         (transl conf "short display") ;

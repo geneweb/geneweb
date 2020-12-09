@@ -1,13 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-type httpStatus =
-  | OK (* 200 *)
-  | Moved_Temporarily (* 302 *)
-  | Bad_Request (* 400 *)
-  | Unauthorized (* 401 *)
-  | Forbidden (* 403 *)
-  | Not_Found (* 404 *)
-
 (* module [Wserver]: elementary web service *)
 
 val f :
@@ -40,36 +32,13 @@ val header : ('a, unit, string, unit) format4 -> 'a
 val wflush : unit -> unit
     (* To flush page contents print. *)
 
-val http : httpStatus -> unit
-    (* [Wserver.http answer] sends the http header where [answer]
+val http : Def.httpStatus -> unit
+    (* [Output.status conf answer] sends the http header where [answer]
        represents the answer status. If empty string, "200 OK" is assumed. *)
 
 val http_redirect_temporarily : string -> unit
-    (* [Wserver.http_redirect url] sends the http header where [url]
+    (* [Output.status conf_redirect url] sends the http header where [url]
        represents the Location where the request needs to be redirected. *)
-
-val encode : string -> string
-    (* [Wserver.encode s] encodes the string [s] in another string
-       where spaces and special characters are coded. This allows
-       to put such strings in html links <a href=...>. This is
-       the same encoding done by Web browsers in forms. *)
-
-val decode : string -> string
-    (* [Wserver.decode s] does the inverse job than [Wserver.code],
-       restoring the initial string. The heading and trailing spaces
-       are stripped. *)
-
-val gen_decode : bool -> string -> string
-    (* Like above but heading and trailing spaces are stripped
-       only if bool parameter is True. [decode] = [gen_decode True]. *)
-
-val extract_param : string -> char -> string list -> string
-    (* [extract_param name stopc request] can be used to extract some
-       parameter from a browser [request] (list of strings); [name]
-       is a string which should match the beginning of a request line,
-       [stopc] is a character ending the request line. For example, the
-       string request has been obtained by: [extract_param "GET /" ' '].
-       Answers the empty string if the parameter is not found. *)
 
 val get_request_and_content : char Stream.t -> string list * string
 
@@ -94,8 +63,8 @@ val cgi : bool ref
    - Source program "foo.ml":
         Wserver.f None 2371 60 None
            (fun _ s _ ->
-              Wserver.http Wserver.OK;
-              Wserver.printf "You said: %s...\n" s);;
+              Output.status conf Wserver.OK;
+              Output.printf conf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
    - Run:

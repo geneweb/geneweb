@@ -146,10 +146,10 @@ let nobility_titles_list conf base p =
     titles []
 
 let print_base_loop conf base p =
-  Wserver.printf
+  Output.printf conf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
     (Util.update_family_loop conf base p (Gutil.designation base p));
-  Wserver.printf ".\n";
+  Output.printf conf ".\n";
   Hutil.trailer conf;
   exit 2
 
@@ -169,7 +169,7 @@ let init_sosa_t conf base sosa_ref =
   let tstab =
     try Util.create_topological_sort conf base with
       Consang.TopologicalSortError p ->
-        let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+        let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
         Hutil.rheader conf title; print_base_loop conf base p
   in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -467,7 +467,7 @@ let print_sosa conf base p link =
   if Sosa.gt sosa_num Sosa.zero then
     match Util.find_sosa_ref conf base with
       Some ref ->
-        if conf.cancel_links || not link then ()
+        if not link then ()
         else
           begin let sosa_link =
             let i1 = string_of_iper (get_iper p) in
@@ -475,7 +475,7 @@ let print_sosa conf base p link =
             let b2 = Sosa.to_string sosa_num in
             "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
           in
-            Wserver.printf "<a href=\"%s%s\" style=\"text-decoration:none\">"
+            Output.printf conf "<a href=\"%s%s\" style=\"text-decoration:none\">"
               (commd conf) sosa_link
           end;
         let title =
@@ -491,9 +491,9 @@ let print_sosa conf base p link =
             Printf.sprintf ", Sosa: %s"
               (Sosa.to_string_sep (transl conf "(thousand separator)") sosa_num)
         in
-        Wserver.printf "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
+        Output.printf conf "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
           (image_prefix conf) title;
-        if conf.cancel_links || not link then () else Wserver.printf "</a> "
+        if not link then () else Output.printf conf "</a> "
     | None -> ()
 
 (* ************************************************************************ *)
@@ -526,14 +526,15 @@ let get_death_text conf p p_auth =
     else ""
   in
   let on_death_date =
-    let tmp_conf = {conf with cancel_links = true} in
+    (* FIXME *)
+    (* let tmp_conf = {conf with cancel_links = true} in *)
     match p_auth, get_death p with
       true, Death (_, d) ->
         let d = Adef.date_of_cdate d in
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
-        | _ -> DateDisplay.string_of_ondate tmp_conf d
+            DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+        | _ -> DateDisplay.string_of_ondate conf d
         end
     | _ -> ""
   in
@@ -557,13 +558,13 @@ let get_baptism_text conf p p_auth =
     else ""
   in
   let on_baptism_date =
-    let tmp_conf = {conf with cancel_links = true} in
+    (* let tmp_conf = {conf with cancel_links = true} in *)
     match p_auth, Adef.od_of_cdate (get_baptism p) with
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
-        | _ -> DateDisplay.string_of_ondate tmp_conf d
+            DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+        | _ -> DateDisplay.string_of_ondate conf d
         end
     | _ -> ""
   in
@@ -587,13 +588,13 @@ let get_birth_text conf p p_auth =
     else ""
   in
   let on_birth_date =
-    let tmp_conf = {conf with cancel_links = true} in
+    (* let tmp_conf = {conf with cancel_links = true} in *)
     match p_auth, Adef.od_of_cdate (get_birth p) with
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
-        | _ -> DateDisplay.string_of_ondate tmp_conf d
+            DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+        | _ -> DateDisplay.string_of_ondate conf d
         end
     | _ -> ""
   in
@@ -611,13 +612,14 @@ let get_birth_text conf p p_auth =
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let get_marriage_date_text conf fam p_auth =
-  let tmp_conf = {conf with cancel_links = true} in
+  (* FIXME *)
+  (* let tmp_conf = {conf with cancel_links = true} in *)
   match p_auth, Adef.od_of_cdate (get_marriage fam) with
     true, Some d ->
       begin match p_getenv conf.base_env "long_date" with
         Some "yes" ->
-          DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
-      | _ -> DateDisplay.string_of_ondate tmp_conf d
+          DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+      | _ -> DateDisplay.string_of_ondate conf d
       end
   | _ -> ""
 
@@ -639,15 +641,16 @@ let get_burial_text conf p p_auth =
     else ""
   in
   let on_burial_date =
-    let tmp_conf = {conf with cancel_links = true} in
+    (* FIXME *)
+    (* let tmp_conf = {conf with cancel_links = true} in *)
     match get_burial p with
       Buried cod ->
         begin match p_auth, Adef.od_of_cdate cod with
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
-                DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
-            | _ -> DateDisplay.string_of_ondate tmp_conf d
+                DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+            | _ -> DateDisplay.string_of_ondate conf d
             end
         | _ -> ""
         end
@@ -673,15 +676,16 @@ let get_cremation_text conf p p_auth =
     else ""
   in
   let on_cremation_date =
-    let tmp_conf = {conf with cancel_links = true} in
+    (* FIXME *)
+    (* let tmp_conf = {conf with cancel_links = true} in *)
     match get_burial p with
       Cremated cod ->
         begin match p_auth, Adef.od_of_cdate cod with
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
-                DateDisplay.string_of_ondate tmp_conf d ^ DateDisplay.get_wday tmp_conf d
-            | _ -> DateDisplay.string_of_ondate tmp_conf d
+                DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
+            | _ -> DateDisplay.string_of_ondate conf d
             end
         | _ -> ""
         end
@@ -1595,11 +1599,9 @@ let linked_page_text conf base p s key str (pg, (_, il)) =
                        a, b, c
                      with Not_found -> "", v, ""
                    in
-                   if conf.cancel_links then Printf.sprintf "%s" b
-                   else
-                     Printf.sprintf
-                       "%s<a href=\"%sm=NOTES&f=%s#p_%d\">%s</a>%s" a
-                       (commd conf) pg text.Def.NLDB.lnPos b c
+                   Printf.sprintf
+                     "%s<a href=\"%sm=NOTES&f=%s#p_%d\">%s</a>%s" a
+                     (commd conf) pg text.Def.NLDB.lnPos b c
                  in
                  if str = "" then str1 else str ^ ", " ^ str1
            with Not_found -> str)
@@ -1889,13 +1891,13 @@ let get_note_source conf base env auth no_note note_source =
       else lines
     in
     let wi =
-      {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+      {Wiki.wi_mode = "NOTES";
        Wiki.wi_file_path = Notes.file_path conf base;
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
-    Util.safe_html @@ if conf.pure_xhtml then Util.check_xhtml s else s
+    Util.safe_html s
   else ""
 
 let rec eval_var conf base env ep loc sl =
@@ -3329,7 +3331,8 @@ and eval_date_field_var conf d =
       end
   | [] ->
     let s =
-      let conf = {conf with cancel_links = true} in
+      (* FIXME *)
+      (* let conf = {conf with cancel_links = true} in *)
       DateDisplay.string_of_date_aux conf ~sep:"&#010;  " d
     in
     VVstring s
@@ -4391,7 +4394,6 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           let s =
             let wi =
               {Wiki.wi_mode = "NOTES";
-               Wiki.wi_cancel_links = conf.cancel_links;
                Wiki.wi_file_path = Notes.file_path conf base;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -5967,11 +5969,11 @@ let print_what_links conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h =
-      Wserver.printf "%s%s " (Utf8.capitalize (transl conf "linked pages"))
+      Output.printf conf "%s%s " (Utf8.capitalize (transl conf "linked pages"))
         (Util.transl conf ":");
-      if h then Wserver.print_string (simple_person_text conf base p true)
+      if h then Output.print_string conf (simple_person_text conf base p true)
       else
-        Wserver.printf "<a href=\"%s%s\">%s</a>" (commd conf)
+        Output.printf conf "<a href=\"%s%s\">%s</a>" (commd conf)
           (acces conf base p) (simple_person_text conf base p true)
     in
     Hutil.header conf title;

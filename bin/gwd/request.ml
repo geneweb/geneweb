@@ -173,7 +173,7 @@ let relation_print conf base p =
   RelationDisplay.print conf base p p1
 
 let specify conf base n pl =
-  let title _ = Wserver.printf "%s : %s" n (transl conf "specify") in
+  let title _ = Output.printf conf "%s : %s" n (transl conf "specify") in
   let n = Name.crush_lower n in
   let ptll =
     List.map
@@ -214,41 +214,40 @@ let specify conf base n pl =
       pl
   in
   Hutil.header conf title;
-  conf.cancel_links <- false;
   Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in
   List.iter
     (fun (p, tl) ->
-       Wserver.printf "<li>\n";
+       Output.printf conf "<li>\n";
        Perso.print_sosa conf base p true;
        begin match tl with
            [] ->
-           Wserver.printf "\n%s" (referenced_person_title_text conf base p)
+           Output.printf conf "\n%s" (referenced_person_title_text conf base p)
          | t :: _ ->
-           Wserver.printf "<a href=\"%s%s\">\n" (commd conf)
+           Output.printf conf "<a href=\"%s%s\">\n" (commd conf)
              (acces conf base p);
-           Wserver.print_string (titled_person_text conf base p t);
-           Wserver.printf "</a>\n";
+           Output.print_string conf (titled_person_text conf base p t);
+           Output.printf conf "</a>\n";
            List.iter
-             (fun t -> Wserver.print_string (one_title_text base t)) tl
+             (fun t -> Output.print_string conf (one_title_text base t)) tl
        end;
-       Wserver.print_string (DateDisplay.short_dates_text conf base p);
+       Output.print_string conf (DateDisplay.short_dates_text conf base p);
        if authorized_age conf base p then
          begin match get_first_names_aliases p with
              [] -> ()
            | fnal ->
-             Wserver.printf "\n<em>(";
+             Output.printf conf "\n<em>(";
              Mutil.list_iter_first
                (fun first fna ->
-                  if not first then Wserver.printf ", ";
-                  Wserver.print_string (sou base fna))
+                  if not first then Output.printf conf ", ";
+                  Output.print_string conf (sou base fna))
                fnal;
-             Wserver.printf ")</em>"
+             Output.printf conf ")</em>"
          end;
        begin let spouses =
                Array.fold_right
@@ -267,11 +266,11 @@ let specify conf base n pl =
                (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
                (person_title_text conf base h) hl
            in
-           Wserver.printf ", <em>&amp; %s</em>\n" s
+           Output.printf conf ", <em>&amp; %s</em>\n" s
        end;
-       Wserver.printf "</li>\n")
+       Output.printf conf "</li>\n")
     ptll;
-  Wserver.printf "</ul>\n";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf
 
 let incorrect_request conf = Hutil.incorrect_request conf
@@ -295,10 +294,10 @@ let very_unknown conf base =
   match p_getenv conf.env "n", p_getenv conf.env "p" with
   | Some sname, Some fname ->
     let title _ =
-      Wserver.printf "%s: \"%s %s\"" (Utf8.capitalize (transl conf "not found"))
+      Output.printf conf "%s: \"%s %s\"" (Utf8.capitalize (transl conf "not found"))
         (Util.escape_html fname) (Util.escape_html sname)
     in
-    Wserver.http Wserver.Not_Found;
+    Output.status conf Def.Not_Found;
     Hutil.rheader conf title;
     Hutil.print_link_to_welcome conf false;
     Hutil.trailer conf
@@ -306,10 +305,10 @@ let very_unknown conf base =
 
 let unknown = begin fun conf n ->
       let title _ =
-        Wserver.printf "%s: \"%s\"" (Utf8.capitalize (transl conf "not found"))
+        Output.printf conf "%s: \"%s\"" (Utf8.capitalize (transl conf "not found"))
           (Util.escape_html n)
       in
-      Wserver.http Wserver.Not_Found;
+      Output.status conf Def.Not_Found;
       Hutil.rheader conf title;
       Hutil.print_link_to_welcome conf false;
       Hutil.trailer conf
@@ -400,24 +399,22 @@ let make_senv conf base =
   | _ -> ()
 
 let propose_base conf =
-  let title _ = Wserver.printf "Base" in
+  let title _ = Output.printf conf "Base" in
   Hutil.header conf title;
-  Wserver.printf "<ul><li>";
-  Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
-  Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
-  Wserver.printf
+  Output.printf conf "<ul><li>";
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
+  Output.printf conf "<input name=\"b\" size=\"40\"> =&gt;\n";
+  Output.printf conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</li></ul>";
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.printf conf "</button>\n";
+  Output.printf conf "</li></ul>";
   Hutil.trailer conf
 
-let try_plugin conf base m =
-  match List.assoc_opt "plugins" conf.Config.base_env with
-  | None -> false
-  | Some list ->
-    let list = String.split_on_char ',' list in
-    List.exists (fun (ns, fn) -> List.mem ns list && fn conf base) (GwdPlugin.get m)
+let try_plugin list conf base m =
+  List.exists
+    (fun (ns, fn) -> List.mem ns list && fn conf base)
+    (Hashtbl.find_all GwdPlugin.ht m)
 
 let w_lock ~onerror fn conf base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
@@ -457,16 +454,16 @@ let log_count =
 
 let print_no_index conf base =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl conf "link to use"))
+    Output.print_string conf (Utf8.capitalize (transl conf "link to use"))
   in
   let link = url_no_index conf base in
   Hutil.header conf title;
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>" ;
-  Wserver.printf "<a href=\"http://%s\">\n" link;
-  Wserver.print_string link;
-  Wserver.printf "</a>\n";
-  Wserver.printf "</ul>\n";
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>" ;
+  Output.printf conf "<a href=\"http://%s\">\n" link;
+  Output.print_string conf link;
+  Output.printf conf "</a>\n";
+  Output.printf conf "</ul>\n";
   Hutil.print_link_to_welcome conf false;
   Hutil.trailer conf
 
@@ -499,8 +496,14 @@ let treat_request conf =
         Unix.setuid stat.Unix.st_uid ;
     end ;
 #endif
+    let plugins =
+      match List.assoc_opt "plugins" conf.Config.base_env with
+      | None -> []
+      | Some list -> String.split_on_char ',' list
+    in
+    List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf base) !GwdPlugin.se ;
     let m = Opt.default "" @@ p_getenv conf.env "m" in
-    if not @@ try_plugin conf base m
+    if not @@ try_plugin plugins conf base m
     then begin
       if p_getenv conf.env "opt" = Some "no_index"
       then w_base print_no_index
@@ -705,7 +708,6 @@ let treat_request conf =
                 let (pl, sosa_acc) = find_all conf base n in
                 match pl with
                 | [] ->
-                  conf.cancel_links <- false ;
                   Some.surname_print conf base unknown n
                 | [p] ->
                   if sosa_acc
@@ -721,10 +723,8 @@ let treat_request conf =
                   match real_input "fn", real_input "sn" with
                     Some fn, Some sn -> search (fn ^ " " ^ sn)
                   | Some fn, None ->
-                    conf.cancel_links <- false ;
                     Some.first_name_print conf base fn
                   | None, Some sn ->
-                    conf.cancel_links <- false ;
                     Some.surname_print conf base unknown sn
                   | None, None -> incorrect_request conf base
               end
@@ -751,9 +751,9 @@ let treat_request conf =
           w_base @@ w_person @@ relation_print
         | "REQUEST" when conf.wizard ->
           fun _ _ ->
-            Wserver.http Wserver.OK;
-            Wserver.header "Content-type: text";
-            List.iter (fun s -> Wserver.print_string @@ s ^ "\n") conf.Config.request ;
+            Output.status conf Def.OK;
+            Output.header conf "Content-type: text";
+            List.iter (fun s -> Output.print_string conf @@ s ^ "\n") conf.Config.request ;
         | "RL" ->
           w_base @@ RelationLink.print
         | "RLM" ->
@@ -914,12 +914,12 @@ let treat_request conf =
 #endif
         | _ -> incorrect_request
       end end conf base ;
-    Wserver.wflush () ;
+    Output.flush conf ;
   end else
     begin
-      let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+      let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
       Hutil.rheader conf title;
-      Wserver.printf "<ul>\n<li>\n%s \"%s\" %s.</li>\n</ul>"
+      Output.printf conf "<ul>\n<li>\n%s \"%s\" %s.</li>\n</ul>"
         (Utf8.capitalize (transl conf "base")) conf.bname
         (Utf8.capitalize (transl conf "reserved to friends or wizards"));
       Hutil.trailer conf

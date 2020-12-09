@@ -1,3 +1,4 @@
+open Geneweb
 open Config
 open Def
 open Gwdb
@@ -16,37 +17,37 @@ let extension_of_type =
 let incorrect conf = Hutil.incorrect_request conf; raise @@ Update.ModErr __LOC__
 
 let incorrect_content_type conf base p s =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<p>\n";
-  Wserver.printf "<em style=\"font-size:smaller\">";
-  Wserver.printf "Error: incorrect image content type: %s" s;
-  Wserver.printf "</em>\n";
-  Wserver.printf "</p>\n";
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>\n";
-  Wserver.print_string (referenced_person_title_text conf base p);
-  Wserver.printf "</li>\n";
-  Wserver.printf "</ul>\n";
+  Output.printf conf "<p>\n";
+  Output.printf conf "<em style=\"font-size:smaller\">";
+  Output.printf conf "Error: incorrect image content type: %s" s;
+  Output.printf conf "</em>\n";
+  Output.printf conf "</p>\n";
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>\n";
+  Output.print_string conf (referenced_person_title_text conf base p);
+  Output.printf conf "</li>\n";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
 
 let error_too_big_image conf base p len max_len =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<p><em style=\"font-size:smaller\">";
-  Wserver.printf "Error: this image is too big: %d bytes<br%s>\n" len
+  Output.printf conf "<p><em style=\"font-size:smaller\">";
+  Output.printf conf "Error: this image is too big: %d bytes<br%s>\n" len
     conf.xhs;
-  Wserver.printf "Maximum authorized in this database: %d bytes<br%s>\n"
+  Output.printf conf "Maximum authorized in this database: %d bytes<br%s>\n"
     max_len conf.xhs;
-  Wserver.printf "</em></p>\n";
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>\n";
-  Wserver.print_string (referenced_person_title_text conf base p);
-  Wserver.printf "</li>\n";
-  Wserver.printf "</ul>\n";
+  Output.printf conf "</em></p>\n";
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>\n";
+  Output.print_string conf (referenced_person_title_text conf base p);
+  Output.printf conf "</li>\n";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
 
@@ -57,15 +58,15 @@ let raw_get conf key =
 let print_link_delete_image conf base p =
   if Util.has_image conf base p then
     begin
-      Wserver.printf "<p>\n";
+      Output.printf conf "<p>\n";
       begin
-        Wserver.printf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
+        Output.printf conf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
           (string_of_iper (get_iper p));
-        Wserver.printf "%s %s" (Utf8.capitalize (transl conf "delete"))
+        Output.printf conf "%s %s" (Utf8.capitalize (transl conf "delete"))
           (transl_nth conf "image/images" 0);
-        Wserver.printf "</a>"
+        Output.printf conf "</a>"
       end;
-      Wserver.printf "</p>\n"
+      Output.printf conf "</p>\n"
     end
 
 (* Send image form *)
@@ -73,54 +74,54 @@ let print_link_delete_image conf base p =
 let print_send_image conf base p =
   let title h =
     if Util.has_image conf base p then
-      Wserver.print_string
+      Output.print_string conf
         (Utf8.capitalize
            (transl_decline conf "modify" (transl_nth conf "image/images" 0)))
     else
-      Wserver.print_string
+      Output.print_string conf
         (Utf8.capitalize
            (transl_decline conf "add" (transl_nth conf "image/images" 0)));
     if h then ()
     else
       let fn = p_first_name base p in
       let sn = p_surname base p in
-      Wserver.printf ": ";
-      Wserver.printf "%s %s" fn sn;
+      Output.printf conf ": ";
+      Output.printf conf "%s %s" fn sn;
       Util.print_reference conf fn (get_occ p) sn
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "<h2>\n";
+  Output.printf conf "<h2>\n";
   title false;
-  Wserver.printf "</h2>\n";
-  Wserver.printf
+  Output.printf conf "</h2>\n";
+  Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
-  Wserver.printf "<p>\n";
+  Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Wserver.printf
+  Output.printf conf
     "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"%s>\n" conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
     (string_of_iper (get_iper p)) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n"
     digest conf.xhs;
-  Wserver.printf "%s%s\n" (Utf8.capitalize (transl conf "file")) (Util.transl conf ":");
-  Wserver.printf "<input \
+  Output.printf conf "%s%s\n" (Utf8.capitalize (transl conf "file")) (Util.transl conf ":");
+  Output.printf conf "<input \
 type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"%s>\n"
     conf.xhs;
-  Wserver.printf "</p>\n";
+  Output.printf conf "</p>\n";
   begin match p_getint conf.base_env "max_images_size" with
     Some len ->
-      Wserver.printf "<p>\n";
-      Wserver.printf "(maximum authorized size = %d bytes)\n" len;
-      Wserver.printf "</p>\n"
+      Output.printf conf "<p>\n";
+      Output.printf conf "(maximum authorized size = %d bytes)\n" len;
+      Output.printf conf "</p>\n"
   | None -> ()
   end;
-  Wserver.printf
+  Output.printf conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg mt-2\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</form>\n";
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.printf conf "</button>\n";
+  Output.printf conf "</form>\n";
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
@@ -139,7 +140,7 @@ let print conf base =
 
 let print_delete_image conf base p =
   let title h =
-    Wserver.print_string
+    Output.print_string conf
       (Utf8.capitalize
          (transl_decline conf "delete" (transl_nth conf "image/images" 0)));
     if h then ()
@@ -150,12 +151,12 @@ let print_delete_image conf base p =
         (* if fn = "?" || sn = "?" then Adef.int_of_iper (get_iper p)
          * else  *)get_occ p
       in
-      Wserver.printf ": "; Wserver.printf "%s.%d %s" fn occ sn
+      Output.printf conf ": "; Output.printf conf "%s.%d %s" fn occ sn
   in
   Hutil.header conf title;
-  Wserver.printf "<form method=\"post\" action=\"%s\">" conf.command;
+  Output.printf conf "<form method=\"post\" action=\"%s\">" conf.command;
   Util.hidden_env conf;
-  Wserver.printf
+  Output.printf conf
     "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\
      <input type=\"hidden\" name=\"i\" value=\"%s\">\
      <p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>\
@@ -180,14 +181,14 @@ let print_del conf base =
 
 let print_sent conf base p =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl conf "image received"))
+    Output.print_string conf (Utf8.capitalize (transl conf "image received"))
   in
   Hutil.header conf title;
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>";
-  Wserver.print_string (referenced_person_text conf base p);
-  Wserver.printf "</li>";
-  Wserver.printf "</ul>\n";
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>";
+  Output.print_string conf (referenced_person_text conf base p);
+  Output.printf conf "</li>";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf
 
 let write_file fname content =
@@ -280,7 +281,7 @@ let effective_send_ok conf base p file =
   let (typ, content) =
     match image_type content with
       None ->
-        let ct = Wserver.extract_param "content-type: " '\n' request in
+        let ct = Mutil.extract_param "content-type: " '\n' request in
         dump_bad_image conf content; incorrect_content_type conf base p ct
     | Some (typ, content) ->
         match p_getint conf.base_env "max_images_size" with
@@ -322,10 +323,10 @@ let print_send_ok conf base =
 
 let print_deleted conf base p =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl conf "image deleted"))
+    Output.print_string conf (Utf8.capitalize (transl conf "image deleted"))
   in
   Hutil.header conf title;
-  Wserver.printf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
+  Output.printf conf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =

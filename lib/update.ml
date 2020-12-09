@@ -139,34 +139,34 @@ let rec infer_death conf base p =
     [Rem] : Not visible.                                                      *)
 (* ************************************************************************** *)
 let print_person_parents_and_spouse conf base p =
-  Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base p);
-  Wserver.printf "%s.%d %s" (p_first_name base p) (get_occ p)
+  Output.printf conf "<a href=\"%s%s\">" (commd conf) (acces conf base p);
+  Output.printf conf "%s.%d %s" (p_first_name base p) (get_occ p)
     (p_surname base p);
-  Wserver.printf "</a>";
-  Wserver.print_string (DateDisplay.short_dates_text conf base p);
+  Output.printf conf "</a>";
+  Output.print_string conf (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
-  if (String.length cop) > 0 then Wserver.printf ", %s" cop;
+  if (String.length cop) > 0 then Output.printf conf ", %s" cop;
   let hbw = Util.husband_wife conf base p true in
-  if (String.length hbw) > 0 then Wserver.printf ", %s" hbw;
-  Wserver.printf ".\n"
+  if (String.length hbw) > 0 then Output.printf conf ", %s" hbw;
+  Output.printf conf ".\n"
 
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
     [_] -> ()
   | pl ->
-      Wserver.printf "<p>\n";
-      Wserver.printf "%s%s\n"
+      Output.printf conf "<p>\n";
+      Output.printf conf "%s%s\n"
         (Utf8.capitalize (transl conf "persons having the same name"))
         (transl conf ":");
-      Wserver.printf "<ul>\n";
+      Output.printf conf "<ul>\n";
       List.iter
         (fun p ->
-           Wserver.printf "<li>";
+           Output.printf conf "<li>";
            print_person_parents_and_spouse conf base p;
-           Wserver.printf "</li>")
+           Output.printf conf "</li>")
         pl;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</p>\n"
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</p>\n"
 
 
 (* ************************************************************************* *)
@@ -194,16 +194,16 @@ let is_label_note lbl =
   loop 0
 
 let print_aux conf param value submit =
-  Wserver.printf {|<p><form method="post" action="%s">|} conf.command;
+  Output.printf conf {|<p><form method="post" action="%s">|} conf.command;
   List.iter begin fun (x, v) ->
     (* Only textarea can contain newline. *)
-    Wserver.printf {|<textarea style="display:none;" name="%s">|} x ;
-    Wserver.print_string (Util.escape_html (decode_varenv v)) ;
-    Wserver.print_string "</textarea>"
+    Output.printf conf {|<textarea style="display:none;" name="%s">|} x ;
+    Output.print_string conf (Util.escape_html (decode_varenv v)) ;
+    Output.print_string conf "</textarea>"
   end (conf.henv @ conf.env) ;
-  Wserver.printf {|<input type="hidden" name="%s" value="%s">|} param value ;
-  Wserver.printf {|<input type="submit" value="%s">|} submit ;
-  Wserver.printf {|</form></p>|}
+  Output.printf conf {|<input type="hidden" name="%s" value="%s">|} param value ;
+  Output.printf conf {|<input type="submit" value="%s">|} submit ;
+  Output.printf conf {|</form></p>|}
 
 let print_return conf =
   print_aux conf "return" "ok" (Utf8.capitalize (transl conf "back"))
@@ -216,9 +216,9 @@ let print_err_unknown conf _base (f, s, o) =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
+  Output.printf conf "%s%s <strong>%s.%d %s</strong>\n"
     (Utf8.capitalize (transl conf "unknown person")) (transl conf ":") f o s;
   print_return conf;
   Hutil.trailer conf;
@@ -244,13 +244,13 @@ let delete_topological_sort conf base =
   let tstab_file = Filename.concat bfile "tstab" in
   Mutil.rm tstab_file
 
-let print_someone _conf base p =
-  Wserver.printf "%s%s %s" (p_first_name base p)
+let print_someone conf base p =
+  Output.printf conf "%s%s %s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 
-let print_first_name _conf base p =
-  Wserver.printf "%s%s" (p_first_name base p)
+let print_first_name conf base p =
+  Output.printf conf "%s%s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
 let print_someone_strong _conf base p =
@@ -258,8 +258,8 @@ let print_someone_strong _conf base p =
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 
-let print_first_name_strong _conf base p =
-  Wserver.printf "<strong>%s%s</strong>" (p_first_name base p)
+let print_first_name_strong conf base p =
+  Output.printf conf "<strong>%s%s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
 let string_of_error conf base = function
@@ -279,7 +279,7 @@ let string_of_error conf base = function
       (Utf8.capitalize (transl conf "cannot change sex of a married person"))
 
 let print_error conf base e =
-  Wserver.print_string @@ string_of_error conf base e
+  Output.print_string conf @@ string_of_error conf base e
 
 let someone_ref_text conf base p =
   "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
@@ -289,23 +289,23 @@ let someone_ref_text conf base p =
 
 let print_list_aux conf base title list printer =
   if list <> [] then begin
-    Wserver.printf "%s\n<ul>" (Utf8.capitalize (transl conf title)) ;
+    Output.printf conf "%s\n<ul>" (Utf8.capitalize (transl conf title)) ;
     printer conf base list ;
-    Wserver.printf "</ul>";
+    Output.printf conf "</ul>";
   end
 
 let print_warning conf base =
   function
   | BigAgeBetweenSpouses (p1, p2, a) ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale
            (ftransl conf
               "the difference of age between %t and %t is quite important"))
         (fun _ -> print_someone_strong conf base p1)
         (fun _ -> print_someone_strong conf base p2);
-      Wserver.printf ": %s" (DateDisplay.string_of_age conf a)
+      Output.printf conf ": %s" (DateDisplay.string_of_age conf a)
   | BirthAfterDeath p ->
-      Wserver.printf (ftransl conf "%t died before his/her birth")
+      Output.printf conf (ftransl conf "%t died before his/her birth")
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
@@ -313,203 +313,203 @@ let print_warning conf base =
       let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
-      Wserver.printf "%s\n"
+      Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of children"));
-      Wserver.printf "-&gt;\n";
-      Wserver.print_string
+      Output.printf conf "-&gt;\n";
+      Output.print_string conf
         (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
          " " ^ someone_ref_text conf base moth ^ "\n");
       let print_list arr diff_arr =
         Array.iteri
           (fun i (* i *)p ->
              let p = poi base p in
-             Wserver.printf "<li %s>\n"
+             Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
              if eq_istr (get_surname p) (get_surname fath) then
                print_first_name conf base p
              else print_someone conf base p;
-             Wserver.print_string (DateDisplay.short_dates_text conf base p);
-             Wserver.printf "\n";
-             Wserver.printf "</li>\n")
+             Output.print_string conf (DateDisplay.short_dates_text conf base p);
+             Output.printf conf "\n";
+             Output.printf conf "</li>\n")
           arr
       in
       let (bef_d, aft_d) = Difference.f before after in
-      Wserver.printf "<table style=\"margin:1em\">\n";
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "<table style=\"margin:1em\">\n";
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n";
-      Wserver.printf "</table>\n"
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n";
+      Output.printf conf "</table>\n"
   | ChildrenNotInOrder (ifam, _, elder, x) ->
       let cpl = foi base ifam in
-      Wserver.printf
+      Output.printf conf
         (fcapitale
            (ftransl conf
               "the following children of %t and %t are not in order"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Wserver.printf ":\n";
-      Wserver.printf "<ul>\n";
-      Wserver.printf "<li>";
+      Output.printf conf ":\n";
+      Output.printf conf "<ul>\n";
+      Output.printf conf "<li>";
       print_first_name_strong conf base elder;
-      Wserver.print_string (DateDisplay.short_dates_text conf base elder);
-      Wserver.printf "</li>";
-      Wserver.printf "<li>";
+      Output.print_string conf (DateDisplay.short_dates_text conf base elder);
+      Output.printf conf "</li>";
+      Output.printf conf "<li>";
       print_first_name_strong conf base x;
-      Wserver.print_string (DateDisplay.short_dates_text conf base x);
-      Wserver.printf "</li>";
-      Wserver.printf "</ul>\n"
+      Output.print_string conf (DateDisplay.short_dates_text conf base x);
+      Output.printf conf "</li>";
+      Output.printf conf "</ul>\n"
   | ChangedOrderOfMarriages (p, before, after) ->
-      Wserver.printf "%s\n"
+      Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of marriages"));
-      Wserver.printf "-&gt;\n";
+      Output.printf conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i ifam ->
              let fam = foi base ifam in
              let sp = Gutil.spouse (get_iper p) fam in
              let sp = poi base sp in
-             Wserver.printf "<li %s>\n"
+             Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
              print_first_name conf base p;
-             Wserver.printf "  &amp;";
-             Wserver.printf "%s\n"
+             Output.printf conf "  &amp;";
+             Output.printf conf "%s\n"
                (DateDisplay.short_marriage_date_text conf base fam p sp);
              print_someone conf base sp;
-             Wserver.printf "\n";
-             Wserver.printf "</li>\n")
+             Output.printf conf "\n";
+             Output.printf conf "</li>\n")
           arr
       in
       let (bef_d, aft_d) = Difference.f before after in
-      Wserver.printf "<table style=\"margin:1em\">\n";
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "<table style=\"margin:1em\">\n";
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n";
-      Wserver.printf "</table>\n"
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n";
+      Output.printf conf "</table>\n"
   | ChangedOrderOfFamilyEvents (_, before, after) ->
-      Wserver.printf "%s\n"
+      Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of family's events"));
-      Wserver.printf "-&gt;\n";
+      Output.printf conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
              let name = Util.string_of_fevent_name conf base evt.efam_name in
-             Wserver.printf "<li %s>\n"
+             Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             Wserver.printf "%s\n" name;
-             Wserver.printf "</li>\n")
+             Output.printf conf "%s\n" name;
+             Output.printf conf "</li>\n")
           arr
       in
       let before = Array.of_list before in
       let after = Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
-      Wserver.printf "<table style=\"margin:1em\">\n";
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "<table style=\"margin:1em\">\n";
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n";
-      Wserver.printf "</table>\n"
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n";
+      Output.printf conf "</table>\n"
   | ChangedOrderOfPersonEvents (_, before, after) ->
-      Wserver.printf "%s\n"
+      Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of person's events"));
-      Wserver.printf "-&gt;\n";
+      Output.printf conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
              let name = Util.string_of_pevent_name conf base evt.epers_name in
-             Wserver.printf "<li %s>\n"
+             Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             Wserver.printf "%s\n" name;
-             Wserver.printf "</li>\n")
+             Output.printf conf "%s\n" name;
+             Output.printf conf "</li>\n")
           arr
       in
       let before = Array.of_list before in
       let after = Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
-      Wserver.printf "<table style=\"margin:1em\">\n";
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "<table style=\"margin:1em\">\n";
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n";
-      Wserver.printf "</table>\n"
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n";
+      Output.printf conf "</table>\n"
   | CloseChildren (ifam, c1, c2) ->
       let cpl = foi base ifam in
-      Wserver.printf
+      Output.printf conf
         (fcapitale
            (ftransl conf
               "the following children of %t and %t are born very close"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Wserver.printf ":\n";
-      Wserver.printf "<ul>\n";
-      Wserver.printf "<li>";
+      Output.printf conf ":\n";
+      Output.printf conf "<ul>\n";
+      Output.printf conf "<li>";
       print_first_name_strong conf base c1;
-      Wserver.print_string (DateDisplay.short_dates_text conf base c1);
-      Wserver.printf "</li>";
-      Wserver.printf "<li>";
+      Output.print_string conf (DateDisplay.short_dates_text conf base c1);
+      Output.printf conf "</li>";
+      Output.printf conf "<li>";
       print_first_name_strong conf base c2;
-      Wserver.print_string (DateDisplay.short_dates_text conf base c2);
-      Wserver.printf "</li>";
-      Wserver.printf "</ul>\n"
+      Output.print_string conf (DateDisplay.short_dates_text conf base c2);
+      Output.printf conf "</li>";
+      Output.printf conf "</ul>\n"
   | DistantChildren (ifam, p1, p2) ->
       let cpl = foi base ifam in
-      Wserver.printf
+      Output.printf conf
         (fcapitale
            (ftransl conf
               "the following children of %t and %t are born very distant"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Wserver.printf ":\n";
-      Wserver.printf "<ul>\n";
-      Wserver.printf "<li>";
+      Output.printf conf ":\n";
+      Output.printf conf "<ul>\n";
+      Output.printf conf "<li>";
       print_first_name_strong conf base p1;
-      Wserver.print_string (DateDisplay.short_dates_text conf base p1);
-      Wserver.printf "</li>";
-      Wserver.printf "<li>";
+      Output.print_string conf (DateDisplay.short_dates_text conf base p1);
+      Output.printf conf "</li>";
+      Output.printf conf "<li>";
       print_first_name_strong conf base p2;
-      Wserver.print_string (DateDisplay.short_dates_text conf base p2);
-      Wserver.printf "</li>";
-      Wserver.printf "</ul>\n"
+      Output.print_string conf (DateDisplay.short_dates_text conf base p2);
+      Output.printf conf "</li>";
+      Output.printf conf "</ul>\n"
   | DeadOld (p, a) ->
-      Wserver.printf "%s\n%s\n" (print_someone_strong conf base p)
+      Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
         (transl_nth conf "died at an advanced age"
            (index_of_sex (get_sex p)));
-      Wserver.printf "(%s)" (DateDisplay.string_of_age conf a)
+      Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)
   | DeadTooEarlyToBeFather (father, child) ->
-      Wserver.printf
+      Output.printf conf
         (ftransl conf "%t is born more than 2 years after the death of his/her father %t")
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base child)
@@ -518,49 +518,49 @@ let print_warning conf base =
            Printf.sprintf "%s%s" (print_someone_strong conf base father)
              (DateDisplay.short_dates_text conf base father))
   | FEventOrder (p, e1, e2) ->
-      Wserver.printf (fcapitale (ftransl conf "%t's %s before his/her %s"))
+      Output.printf conf (fcapitale (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> print_someone_strong conf base p)
         (Util.string_of_fevent_name conf base e1.efam_name)
         (Util.string_of_fevent_name conf base e2.efam_name)
   | FWitnessEventAfterDeath (p, e) ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_fevent_name conf base e.efam_name)
   | FWitnessEventBeforeBirth (p, e) ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_fevent_name conf base e.efam_name)
   | IncoherentSex (p, _, _) ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale
            (ftransl conf "%t's sex is not coherent with his/her relations"))
         (fun _ -> print_someone_strong conf base p)
   | IncoherentAncestorDate (anc, p) ->
-      Wserver.printf "%s has a younger ancestor %s"
+      Output.printf conf "%s has a younger ancestor %s"
         (print_someone_strong conf base p)
         (print_someone_strong conf base anc)
   | MarriageDateAfterDeath p ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale
            (ftransl conf "marriage had occurred after the death of %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | MarriageDateBeforeBirth p ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale
            (ftransl conf "marriage had occurred before the birth of %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | MotherDeadAfterChildBirth (mother, child) ->
-      Wserver.printf
+      Output.printf conf
         (ftransl conf "%t is born after the death of his/her mother %t")
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base child)
@@ -569,44 +569,44 @@ let print_warning conf base =
            Printf.sprintf "%s%s" (print_someone_strong conf base mother)
              (DateDisplay.short_dates_text conf base mother))
   | ParentBornAfterChild (p, c) ->
-      Wserver.printf "%s\n%s\n%s" (print_someone_strong conf base p)
+      Output.printf conf "%s\n%s\n%s" (print_someone_strong conf base p)
         (transl conf "is born after his/her child")
         (print_someone_strong conf base c)
   | ParentTooYoung (p, a) ->
-      Wserver.printf "%s\n%s\n" (print_someone_strong conf base p)
+      Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
         (transl conf "is a very young parent");
-      Wserver.printf "(%s)" (DateDisplay.string_of_age conf a)
+      Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)
   | ParentTooOld (p, a) ->
-      Wserver.printf "%s\n%s\n" (print_someone_strong conf base p)
+      Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
         (transl conf "is a very old parent");
-      Wserver.printf "(%s)" (DateDisplay.string_of_age conf a)
+      Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)
   | PossibleDuplicateFam (f1, _) ->
     let f = foi base f1 in
-    Wserver.printf
+    Output.printf conf
       (fcapitale (ftransl conf "%s and %s have several unions"))
       (print_someone_strong conf base @@ poi base @@ get_father f)
       (print_someone_strong conf base @@ poi base @@ get_mother f)
   | PEventOrder (p, e1, e2) ->
-      Wserver.printf (fcapitale (ftransl conf "%t's %s before his/her %s"))
+      Output.printf conf (fcapitale (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> print_someone_strong conf base p)
         (Util.string_of_pevent_name conf base e1.epers_name)
         (Util.string_of_pevent_name conf base e2.epers_name)
   | PWitnessEventAfterDeath (p, e) ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_pevent_name conf base e.epers_name)
   | PWitnessEventBeforeBirth (p, e) ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_pevent_name conf base e.epers_name)
   | TitleDatesError (p, t) ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
@@ -621,24 +621,24 @@ let print_warning conf base =
                 Some d -> DateDisplay.string_of_date conf d
               | _ -> ""))
   | UndefinedSex p ->
-      Wserver.printf (fcapitale (ftransl conf "undefined sex for %t"))
+      Output.printf conf (fcapitale (ftransl conf "undefined sex for %t"))
         (fun _ -> print_someone_strong conf base p)
   | WitnessDateAfterDeath p ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale (ftransl conf "%t was witness after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | WitnessDateBeforeBirth p ->
-      Wserver.printf
+      Output.printf conf
         (fcapitale (ftransl conf "%t was witness before his/her birth"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
   | YoungForMarriage (p, a)
   | OldForMarriage (p, a) ->
-      Wserver.printf "%s\n" (print_someone_strong conf base p);
-      Wserver.printf (ftransl conf "married at age %t")
+      Output.printf conf "%s\n" (print_someone_strong conf base p);
+      Output.printf conf (ftransl conf "married at age %t")
         (fun _ -> DateDisplay.string_of_age conf a)
 
 let print_warnings conf base wl =
@@ -648,9 +648,9 @@ let print_warnings conf base wl =
   let wl = List.sort_uniq compare wl in
   List.iter
     (fun w ->
-       Wserver.printf "<li>" ;
+       Output.printf conf "<li>" ;
        print_warning conf base w ;
-       Wserver.printf "</li>" )
+       Output.printf conf "</li>" )
     wl
 
 (* ************************************************************************* *)
@@ -667,9 +667,9 @@ let print_warnings conf base wl =
 let print_misc conf _base =
   function
     MissingSources ->
-      Wserver.printf "<em>";
-      Wserver.printf "%s\n" (Utf8.capitalize (transl conf "missing sources"));
-      Wserver.printf "</em>"
+      Output.printf conf "<em>";
+      Output.printf conf "%s\n" (Utf8.capitalize (transl conf "missing sources"));
+      Output.printf conf "</em>"
 
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs : config -> base -> Def.misc list -> unit             *)
@@ -685,7 +685,7 @@ let print_misc conf _base =
 let print_miscs conf base ml =
   print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
   List.iter
-    (fun m -> Wserver.printf "<li>" ; print_misc conf base m ; Wserver.printf "</li>")
+    (fun m -> Output.printf conf "<li>" ; print_misc conf base m ; Output.printf conf "</li>")
 
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs :
@@ -703,21 +703,21 @@ let print_miscs conf base ml =
 (* ************************************************************************* *)
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then begin
-    Wserver.printf "%s\n" (Utf8.capitalize (transl conf "warnings"));
-    Wserver.printf "<ul>\n";
+    Output.printf conf "%s\n" (Utf8.capitalize (transl conf "warnings"));
+    Output.printf conf "<ul>\n";
     List.iter
       (fun w ->
-         Wserver.printf "<li>" ;
+         Output.printf conf "<li>" ;
          print_warning conf base w ;
-         Wserver.printf "</li>")
+         Output.printf conf "</li>")
       wl ;
     List.iter
       (fun m ->
-         Wserver.printf "<li>" ;
+         Output.printf conf "<li>" ;
          print_misc conf base m ;
-         Wserver.printf "</li>")
+         Output.printf conf "</li>")
       ml;
-    Wserver.printf "</ul>\n"
+    Output.printf conf "</ul>\n"
   end
 
 let error conf base x =
@@ -725,10 +725,10 @@ let error conf base x =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.print_string err;
-  Wserver.printf "\n";
+  Output.print_string conf err;
+  Output.printf conf "\n";
   print_return conf;
   Hutil.trailer conf;
 #ifdef API
@@ -737,44 +737,44 @@ let error conf base x =
   raise @@ ModErr err
 
 let error_locked conf =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "<p>\n";
-  Wserver.printf
+  Output.printf conf "<p>\n";
+  Output.printf conf
     (fcapitale
        (ftransl conf "the file is temporarily locked: please try again"));
-  Wserver.printf ".\n";
-  Wserver.printf "</p>\n";
-  Wserver.printf "<table>\n";
-  Wserver.printf "<tr>\n";
-  Wserver.printf "<td>\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf ".\n";
+  Output.printf conf "</p>\n";
+  Output.printf conf "<table>\n";
+  Output.printf conf "<tr>\n";
+  Output.printf conf "<td>\n";
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
        if x = "retry" then ()
        else if x = "notes" || is_label_note x then
          begin
-           Wserver.printf "<textarea style=\"display:none;\" name=\"%s\">\n"
+           Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
-           Wserver.print_string (Util.escape_html (decode_varenv v));
-           Wserver.printf "</textarea>\n"
+           Output.print_string conf (Util.escape_html (decode_varenv v));
+           Output.printf conf "</textarea>\n"
          end
        else
-         Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
+         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
            x (Util.escape_html (decode_varenv v)) conf.xhs)
     (conf.henv @ conf.env);
   (* just to see in the traces... *)
-  Wserver.printf "<input type=\"hidden\" name=\"retry\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"retry\" value=\"%s\"%s>\n"
     (Util.escape_html conf.user) conf.xhs;
-  Wserver.printf "<input type=\"submit\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"submit\" value=\"%s\"%s>\n"
     (Utf8.capitalize (transl conf "try again")) conf.xhs;
-  Wserver.printf "</form>\n";
-  Wserver.printf "</td>\n";
-  Wserver.printf "<td>\n";
-  Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  Output.printf conf "</form>\n";
+  Output.printf conf "</td>\n";
+  Output.printf conf "<td>\n";
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
-       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
+       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
          (Util.escape_html (decode_varenv v)) conf.xhs)
     conf.henv;
   begin let ip =
@@ -784,16 +784,16 @@ let error_locked conf =
   in
     match ip with
       Some n ->
-        Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n" n
+        Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n" n
           conf.xhs
     | None -> ()
   end;
-  Wserver.printf "<input type=\"submit\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"submit\" value=\"%s\"%s>\n"
     (Utf8.capitalize (transl_nth conf "user/password/cancel" 2)) conf.xhs;
-  Wserver.printf "</form>\n";
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "</table>\n";
+  Output.printf conf "</form>\n";
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "</table>\n";
   Hutil.trailer conf
 
 let error_digest conf =
@@ -804,10 +804,10 @@ let error_digest conf =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "<p>%s.\n</p>\n" err ;
+  Output.printf conf "<p>%s.\n</p>\n" err ;
   Hutil.trailer conf;
 #ifdef API
   end;
@@ -842,9 +842,9 @@ let bad_date conf d =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title ;
-  Wserver.print_string err ;
+  Output.print_string conf err ;
   Hutil.trailer conf ;
 #ifdef API
     end;
@@ -1090,58 +1090,58 @@ let print_create_conflict conf base p var =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.print_string err ;
+  Output.print_string conf err ;
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
        (* Seul un textarea peut contenir des sauts de ligne. *)
        (* On remplace donc l'input par un textarea.          *)
        if x = "notes" || is_label_note x then
          begin
-           Wserver.printf "<textarea style=\"display:none;\" name=\"%s\">\n"
+           Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
-           Wserver.print_string (Util.escape_html (decode_varenv v));
-           Wserver.printf "</textarea>\n"
+           Output.print_string conf (Util.escape_html (decode_varenv v));
+           Output.printf conf "</textarea>\n"
          end
        else
-         Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
+         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
            x (Util.escape_html (decode_varenv v)) conf.xhs)
     (conf.henv @ conf.env);
-  Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\"%s>\n" var
+  Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\"%s>\n" var
     conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
     free_n conf.xhs;
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>";
-  Wserver.printf "%s%s %d. \n" (Utf8.capitalize (transl conf "first free number"))
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>";
+  Output.printf conf "%s%s %d. \n" (Utf8.capitalize (transl conf "first free number"))
     (transl conf ":") free_n;
-  Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
+  Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
-  Wserver.printf " %s." (transl conf "to try again with this number");
-  Wserver.printf "</li>";
-  Wserver.printf "<li>";
-  Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
-  Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Wserver.printf " %s %s." (transl_nth conf "and" 0)
+  Output.printf conf " %s." (transl conf "to try again with this number");
+  Output.printf conf "</li>";
+  Output.printf conf "<li>";
+  Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
+  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
+  Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
-  Wserver.printf "</li>";
-  Wserver.printf "<li>";
-  Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
-  Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Wserver.printf " %s %s." (transl_nth conf "and" 0)
+  Output.printf conf "</li>";
+  Output.printf conf "<li>";
+  Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
+  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
+  Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "use \"link\" instead of \"create\"");
-  Wserver.printf "</li>";
-  Wserver.printf "</ul>\n";
-  Wserver.printf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"
+  Output.printf conf "</li>";
+  Output.printf conf "</ul>\n";
+  Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"
     (Utf8.capitalize (transl conf "create")) conf.xhs;
-  Wserver.printf "<input type=\"submit\" name=\"return\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\"%s>\n"
     (Utf8.capitalize (transl conf "back")) conf.xhs;
-  Wserver.printf "</form>\n";
+  Output.printf conf "</form>\n";
   print_same_name conf base p;
   Hutil.trailer conf;
 #ifdef API

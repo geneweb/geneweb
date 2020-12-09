@@ -24,6 +24,13 @@ and digest_auth_scheme =
     ds_cnonce : string;
     ds_response : string }
 
+type output_conf =
+  { status : Def.httpStatus -> unit
+  ; header : string -> unit
+  ; body : string -> unit
+  ; flush : unit -> unit
+  }
+
 type config =
   { from : string;
 #ifdef API
@@ -40,7 +47,6 @@ type config =
     user : string;
     username : string;
     auth_scheme : auth_scheme_kind;
-    pure_xhtml : bool;
     command : string;
     indep_command : string;
     highlight : string;
@@ -52,7 +58,6 @@ type config =
     authorized_wizards_notes : bool;
     public_if_titles : bool;
     public_if_no_date : bool;
-    mutable cancel_links : bool;
     mutable setup_link : bool;
     access_by_key : bool;
     private_years : int;
@@ -82,7 +87,7 @@ type config =
     today_wd : int;
     time : int * int * int;
     ctime : float;
-
+    mutable output_conf : output_conf ;
     (* prefix for image urls:
        the value of argument -images_url if specified, otherwise
        command ^ "?m=IM&v=" in CGI mode
@@ -91,7 +96,7 @@ type config =
 
     (* if true, the base name is in the b argument of the query string: ?b=BASE&...
        if false, the base name is the last element of the uri path: .../base?... *)
-    b_arg_for_basename : bool }
+    cgi : bool }
 
 (**/**)
 (**  A dummy {!type:config} value, with uninitialized fields.
@@ -112,7 +117,6 @@ let empty =
   ; user = ""
   ; username = ""
   ; auth_scheme = NoAuth
-  ; pure_xhtml = false
   ; command = ""
   ; indep_command = ""
   ; highlight = ""
@@ -124,7 +128,6 @@ let empty =
   ; authorized_wizards_notes = false
   ; public_if_titles = false
   ; public_if_no_date = false
-  ; cancel_links = false
   ; setup_link = false
   ; access_by_key = false
   ; private_years = 0
@@ -155,6 +158,12 @@ let empty =
   ; time = 0,0,0
   ; ctime = 0.
   ; image_prefix=""
-  ; b_arg_for_basename = false
+  ; cgi = false
+  ; output_conf =
+      { status = ignore
+      ; header = ignore
+      ; body = ignore
+      ; flush = ignore
+      }
   }
 (**/**)

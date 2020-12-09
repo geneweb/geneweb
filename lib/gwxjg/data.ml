@@ -235,11 +235,9 @@ and module_date conf =
   in
   let death_symbol = DateDisplay.death_symbol conf in
   let string_of_ondate =
-    func_arg1 @@ fun ?(kwargs=[]) d ->
+    func_arg1_no_kw @@ fun d ->
     try
-      let link = Opt.map_default false unbox_bool (List.assoc_opt "link" kwargs) in
-      Tstr (DateDisplay.string_of_ondate { conf with cancel_links = not link } @@
-            Def.Dgreg (to_dmy d, of_calendar d) )
+      Tstr (DateDisplay.string_of_ondate conf @@ Def.Dgreg (to_dmy d, of_calendar d) )
     with e ->
       if Jg_runtime.jg_obj_lookup d "__Dtext__" = Tbool true
       then Jg_runtime.jg_obj_lookup d "__str__"
@@ -997,17 +995,17 @@ let mk_env conf base =
       | "prefix" -> prefix
       | "prefix_base" -> prefix_base
       | "sosa_ref" -> sosa_ref
-      | x -> Tstr (Wserver.decode @@ List.assoc x conf.env)
+      | x -> Tstr (Mutil.decode @@ List.assoc x conf.env)
   end
 
 let decode_varenv =
   func_arg1_no_kw @@ fun str ->
-  try Tstr (Wserver.decode @@ unbox_string str)
+  try Tstr (Mutil.decode @@ unbox_string str)
   with _ -> failwith_type_error_1 "decode_varenv" str
 
 let encode_varenv =
   func_arg1_no_kw @@ fun str ->
-  try Tstr (Wserver.encode @@ unbox_string str)
+  try Tstr (Mutil.encode @@ unbox_string str)
   with _ -> failwith_type_error_1 "encode_varenv" str
 
 let mk_base base =

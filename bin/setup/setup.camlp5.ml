@@ -11,6 +11,15 @@ let only_file = ref ""
 let bname = ref ""
 let commnd = ref ""
 
+let printer_conf =
+  { Config.empty with output_conf =
+                        { status = Wserver.http
+                        ; header = Wserver.header "%s"
+                        ; body = Wserver.print_string
+                        ; flush = Wserver.wflush
+                        }
+  }
+
 let slashify s =
   String.map (function '\\' -> '/' | c -> c) s
 
@@ -42,18 +51,18 @@ let charset conf =
   try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
 
 let header_no_page_title conf title =
-  Wserver.http Wserver.OK;
-  Wserver.header "Content-type: text/html; charset=%s" (charset conf);
-  Wserver.printf
+  Output.status printer_conf Def.OK;
+  Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+  Output.print_string printer_conf
     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
      \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
-  Wserver.printf "<head>\n";
-  Wserver.printf "  <meta name=\"robots\" content=\"none\">\n";
-  Wserver.printf "  <title>";
+  Output.print_string printer_conf "<head>\n";
+  Output.print_string printer_conf "  <meta name=\"robots\" content=\"none\">\n";
+  Output.print_string printer_conf "  <title>";
   title true;
-  Wserver.printf "</title>\n";
-  Wserver.printf "</head>\n";
-  Wserver.printf "<body>\n"
+  Output.print_string printer_conf "</title>\n";
+  Output.print_string printer_conf "</head>\n";
+  Output.print_string printer_conf "<body>\n"
 
 let abs_setup_dir () =
   if Filename.is_relative !setup_dir then
@@ -61,25 +70,27 @@ let abs_setup_dir () =
   else !setup_dir
 
 let trailer _conf =
-  Wserver.printf "\n<br />\n";
-  Wserver.printf "<div id=\"footer\">\n";
-  Wserver.printf "<hr />\n";
-  Wserver.printf "<div>\n";
-  Wserver.printf "<em>\n";
-  Wserver.printf "<a href=\"https://github.com/geneweb/geneweb/\">\
-                  <img src=\"images/logo_bas.png\" style = \"border: 0\" /></a> \
-                  Version %s Copyright &copy 1998-2017\n</em>\n" Version.txt;
-  Wserver.printf "</div>\n";
-  Wserver.printf "</div>\n";
+  Output.print_string printer_conf "\n<br />\n";
+  Output.print_string printer_conf "<div id=\"footer\">\n";
+  Output.print_string printer_conf "<hr />\n";
+  Output.print_string printer_conf "<div>\n";
+  Output.print_string printer_conf "<em>\n";
+  Output.printf printer_conf
+    "<a href=\"https://github.com/geneweb/geneweb/\">\
+     <img src=\"images/logo_bas.png\" style = \"border: 0\" /></a> \
+     Version %s Copyright &copy 1998-2017\n</em>\n"
+    Version.txt;
+  Output.print_string printer_conf "</div>\n";
+  Output.print_string printer_conf "</div>\n";
   (* finish the html page *)
-  Wserver.printf "</body>\n";
-  Wserver.printf "</html>\n"
+  Output.print_string printer_conf "</body>\n";
+  Output.print_string printer_conf "</html>\n"
 
 let header conf title =
   header_no_page_title conf title;
-  Wserver.printf "<h1>";
+  Output.print_string printer_conf "<h1>";
   title false;
-  Wserver.printf "</h1>\n"
+  Output.print_string printer_conf "</h1>\n"
 
 let strip_control_m s =
   let rec loop i len =
@@ -114,8 +125,8 @@ let strip_spaces str =
   else if start > stop then ""
   else String.sub str start (stop - start)
 
-let code_varenv = Wserver.encode
-let decode_varenv = Wserver.decode
+let code_varenv = Mutil.encode
+let decode_varenv = Mutil.decode
 
 let getenv env label = decode_varenv (List.assoc (decode_varenv label) env)
 
@@ -304,11 +315,11 @@ let is_directory x =
     Unix.Unix_error (_, _, _) -> false
 
 let server_string conf =
-  let s = Wserver.extract_param "host: " '\r' conf.request in
+  let s = Mutil.extract_param "host: " '\r' conf.request in
   try let i = String.rindex s ':' in String.sub s 0 i with
     Not_found -> "127.0.0.1"
 
-let referer conf = Wserver.extract_param "referer: " '\r' conf.request
+let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 
 let only_file_name () =
   if !only_file = "" then Filename.concat !setup_dir "only.txt"
@@ -752,25 +763,24 @@ let print_file conf bname =
   let fname = Filename.concat (Filename.concat dir "lang") bname in
   let ic_opt = try Some (open_in fname) with Sys_error _ -> None in
   match ic_opt with
-    Some ic ->
-      Wserver.http Wserver.OK;
-      Wserver.header "Content-type: text/html; charset=%s" (charset conf);
-      copy_from_stream conf (fun x -> Wserver.print_string x)
-        (Stream.of_channel ic);
-      close_in ic;
-      trailer conf
+  | Some ic ->
+    Output.status printer_conf Def.OK;
+    Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+    copy_from_stream conf (Output.print_string printer_conf) (Stream.of_channel ic);
+    close_in ic;
+    trailer conf
   | None ->
-      let title _ = Wserver.printf "Error" in
-      header conf title;
-      Wserver.printf "<ul><li>\n";
-      Wserver.printf "Cannot access file \"%s\".\n" fname;
-      Wserver.printf "</ul>\n";
-      trailer conf;
-      raise Exit
+    let title _ = Output.print_string printer_conf "Error" in
+    header conf title;
+    Output.print_string printer_conf "<ul><li>\n";
+    Output.printf printer_conf "Cannot access file \"%s\".\n" fname;
+    Output.print_string printer_conf "</ul>\n";
+    trailer conf;
+    raise Exit
 
 let error conf str =
-  header conf (fun _ -> Wserver.printf "Incorrect request");
-  Wserver.printf "<em>%s</em>\n" (String.capitalize_ascii str);
+  header conf (fun _ -> Output.print_string printer_conf "Incorrect request");
+  Output.printf printer_conf "<em>%s</em>\n" (String.capitalize_ascii str);
   trailer conf
 
 let exec_f comm =
@@ -1542,20 +1552,20 @@ let print_typed_file conf typ fname =
   let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
   match ic_opt with
     Some ic ->
-      Wserver.http Wserver.OK;
-      Wserver.header "Content-type: %s" typ;
-      Wserver.header "Content-length: %d" (in_channel_length ic);
+      Output.status printer_conf Def.OK;
+      Output.header printer_conf "Content-type: %s" typ;
+      Output.header printer_conf "Content-length: %d" (in_channel_length ic);
       begin try
-        while true do let c = input_char ic in Wserver.printf "%c" c done
+        while true do let c = input_char ic in Output.printf printer_conf "%c" c done
       with End_of_file -> ()
       end;
       close_in ic
   | None ->
-      let title _ = Wserver.printf "Error" in
+      let title _ = Output.print_string printer_conf "Error" in
       header conf title;
-      Wserver.printf "<ul><li>\n";
-      Wserver.printf "Cannot access file \"%s\".\n" fname;
-      Wserver.printf "</ul>\n";
+      Output.print_string printer_conf "<ul><li>\n";
+      Output.printf printer_conf "Cannot access file \"%s\".\n" fname;
+      Output.print_string printer_conf "</ul>\n";
       trailer conf;
       raise Exit
 

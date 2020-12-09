@@ -673,7 +673,7 @@ let not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 
 let setup_link conf =
-  let s = Wserver.extract_param "host: " '\r' conf.request in
+  let s = Mutil.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
     let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
@@ -686,7 +686,7 @@ let rec eval_variable conf =
   | ["evar"; v; "ns"] ->
       begin try
         let vv = List.assoc v (conf.env @ conf.henv) in
-        Util.escape_html (Wserver.gen_decode false vv)
+        Util.escape_html (Mutil.gen_decode false vv)
       with Not_found -> ""
       end
   | ["evar"; v] ->
@@ -955,12 +955,12 @@ let templ_eval_var conf =
         Some _ -> VVbool true
       | _ -> VVbool false
       end
-  | ["cancel_links"] -> VVbool conf.cancel_links
-  | ["cgi"] -> VVbool !(Wserver.cgi)
+  | ["cancel_links"] -> VVbool (Util.p_getenv conf.env "cgl" = Some "on" )
+  | ["cgi"] -> VVbool conf.cgi
   | ["false"] -> VVbool false
   | ["has_referer"] ->
       (* deprecated since version 5.00 *)
-      VVbool (Wserver.extract_param "referer: " '\n' conf.request <> "")
+      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
   | ["manitou"] -> VVbool conf.manitou
@@ -1129,7 +1129,7 @@ let print_body_prop conf =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
       Not_found -> ""
   in
-  Wserver.print_string (s ^ Util.body_prop conf)
+  Output.print_string conf (s ^ Util.body_prop conf)
 
 type 'a vother =
     Vdef of string list * ast list
@@ -1297,21 +1297,21 @@ let print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
     Not_found ->
       templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl el al
 
-let print_wid_hei fname =
+let print_wid_hei conf fname =
   match Util.image_size (Util.image_file_name fname) with
-    Some (wid, hei) -> Wserver.printf " width=\"%d\" height=\"%d\"" wid hei
+    Some (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
   | None -> ()
 
 let print_copyright conf =
   Util.include_template conf [] "copyr"
     (fun () ->
-      Wserver.printf "<hr style=\"margin:0\"%s>\n" conf.xhs;
-      Wserver.printf "<div style=\"font-size: 80%%\">\n";
-      Wserver.printf "<em>";
-      Wserver.printf "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
-      Wserver.printf "</em>";
-      Wserver.printf "</div>\n";
-      Wserver.printf "<br%s>\n" conf.xhs)
+      Output.printf conf "<hr style=\"margin:0\"%s>\n" conf.xhs;
+      Output.printf conf "<div style=\"font-size: 80%%\">\n";
+      Output.printf conf "<em>";
+      Output.printf conf "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
+      Output.printf conf "</em>";
+      Output.printf conf "</div>\n";
+      Output.printf conf "<br%s>\n" conf.xhs)
 
 let print_copyright_with_logo conf =
   let conf =
@@ -1441,19 +1441,19 @@ let rec interp_ast conf ifun env =
     function
       Avar (loc, s, sl) ->
         print_var print_ast_list conf ifun env ep loc (s :: sl)
-    | Awid_hei s -> print_wid_hei s
+    | Awid_hei s -> print_wid_hei conf s
     | Aif (e, alt, ale) -> print_if env ep e alt ale
     | Aforeach ((loc, s, sl), el, al) ->
         begin try
           print_foreach conf ifun print_ast eval_expr env ep loc s sl el al
         with Not_found ->
-          Wserver.printf " %%foreach;%s?" (String.concat "." (s :: sl))
+          Output.printf conf " %%foreach;%s?" (String.concat "." (s :: sl))
         end
     | Adefine (f, xl, al, alk) -> print_define env ep f xl al alk
     | Aapply (loc, f, ell) -> print_apply env ep loc f ell
     | Alet (k, v, al) -> print_let env ep k v al
     | Afor (i, min, max, al) -> print_for env ep i min max al
-    | x -> Wserver.print_string (eval_ast env ep x)
+    | x -> Output.print_string conf (eval_ast env ep x)
   and print_ast_list env ep =
     function
       [] -> m_env := env
@@ -1471,7 +1471,7 @@ let rec interp_ast conf ifun env =
     match get_def ifun.get_vother f env with
       Some (xl, al) ->
         templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
-    | None -> Wserver.print_string (eval_apply env ep loc f vl)
+    | None -> Output.print_string conf (eval_apply env ep loc f vl)
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
     let env = set_val ifun.set_vother k v env in print_ast_list env ep al
@@ -1506,9 +1506,9 @@ and print_var print_ast_list conf ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try
       match eval_var sl with
-        VVstring s -> Wserver.print_string s
-      | VVbool true -> Wserver.printf "1"
-      | VVbool false -> Wserver.printf "0"
+        VVstring s -> Output.print_string conf s
+      | VVbool true -> Output.printf conf "1"
+      | VVbool false -> Output.printf conf "0"
       | VVother f -> print_var1 f []
     with Not_found ->
       match sl with
@@ -1519,9 +1519,9 @@ and print_var print_ast_list conf ifun env ep loc sl =
                 Some astl ->
                     let () = included_files := (templ, astl) :: !included_files in
                     print_ast_list env ep (begin_end_include conf fname astl)
-              | None -> Wserver.printf " %%%s?" (String.concat "." sl)
+              | None -> Output.printf conf " %%%s?" (String.concat "." sl)
               end
-            | None -> Wserver.printf " %%%s?" (String.concat "." sl)
+            | None -> Output.printf conf " %%%s?" (String.concat "." sl)
           end
       | sl -> print_variable conf sl
   in
@@ -1537,13 +1537,13 @@ and print_simple_variable conf =
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found
 and print_variable conf sl =
-  try Wserver.print_string (eval_variable conf sl) with
+  try Output.print_string conf (eval_variable conf sl) with
     Not_found ->
       try
         match sl with
           [s] -> print_simple_variable conf s
         | _ -> raise Not_found
-      with Not_found -> Wserver.printf " %%%s?" (String.concat "." sl)
+      with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl)
 
 let copy_from_templ conf env ic =
   let astl = parse_templ conf (Stream.of_channel ic) in

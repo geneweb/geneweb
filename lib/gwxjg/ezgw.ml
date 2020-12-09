@@ -55,7 +55,6 @@ let mk_note conf base env note =
   let lines = Wiki.html_of_tlsw conf s in
   let wi =
     { Wiki.wi_mode = "NOTES"
-    ; Wiki.wi_cancel_links = conf.cancel_links
     ; Wiki.wi_file_path = Notes.file_path conf base
     ; Wiki.wi_person_exists = person_exists conf base
     ; Wiki.wi_always_show_link = conf.wizard || conf.friend

@@ -86,6 +86,9 @@ let bench name fn =
   pprint_gc (diff gc1 gc2) ;
   res
 
+let print_callstack ?(max = 5) () =
+  Printexc.(print_raw_backtrace stderr @@ get_callstack max)
+
 let int_size = 4
 let verbose = ref true
 
@@ -827,3 +830,128 @@ let read_or_create ?wait:(_ = true) ?magic fname read write =
   writelock Unix.F_ULOCK ;
 #endif
   rd wr
+
+let encode s =
+  let special = function
+    | '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' | '{'
+    | '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' | ':'
+    | '@' | '=' | '&' | '+' -> true
+    | _ -> false
+  in
+  let hexa_digit x =
+    if x >= 10 then Char.chr (Char.code 'A' + x - 10)
+    else Char.chr (Char.code '0' + x)
+  in
+  let rec need_code i =
+    if i < String.length s then
+      match s.[i] with
+        ' ' -> true
+      | x -> if special x then true else need_code (succ i)
+    else false
+  in
+  let rec compute_len i i1 =
+    if i < String.length s then
+      let i1 = if special s.[i] then i1 + 3 else succ i1 in
+      compute_len (succ i) i1
+    else i1
+  in
+  let rec copy_code_in s1 i i1 =
+    if i < String.length s then
+      let i1 =
+        match s.[i] with
+          ' ' -> Bytes.set s1 i1 '+'; succ i1
+        | c ->
+            if special c then
+              begin
+                Bytes.set s1 i1 '%';
+                Bytes.set s1 (i1 + 1) (hexa_digit (Char.code c / 16));
+                Bytes.set s1 (i1 + 2) (hexa_digit (Char.code c mod 16));
+                i1 + 3
+              end
+            else begin Bytes.set s1 i1 c; succ i1 end
+      in
+      copy_code_in s1 (succ i) i1
+    else Bytes.unsafe_to_string s1
+  in
+  if need_code 0 then
+    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
+  else s
+
+let gen_decode strip_spaces s =
+  let hexa_val conf =
+    match conf with
+    | '0'..'9' -> Char.code conf - Char.code '0'
+    | 'a'..'f' -> Char.code conf - Char.code 'a' + 10
+    | 'A'..'F' -> Char.code conf - Char.code 'A' + 10
+    | _ -> 0
+  in
+  let rec need_decode i =
+    if i < String.length s then
+      match s.[i] with
+      '%' | '+' -> true
+          | _ -> need_decode (succ i)
+    else false
+  in
+  let rec compute_len i i1 =
+    if i < String.length s then
+      let i =
+        match s.[i] with
+        '%' when i + 2 < String.length s -> i + 3
+        | _ -> succ i
+      in
+      compute_len i (succ i1)
+    else i1
+  in
+  let rec copy_decode_in s1 i i1 =
+    if i < String.length s then
+      let i =
+        match s.[i] with
+        '%' when i + 2 < String.length s ->
+          let v = hexa_val s.[i+1] * 16 + hexa_val s.[i+2] in
+          Bytes.set s1 i1 (Char.chr v); i + 3
+        | '+' -> Bytes.set s1 i1 ' '; succ i
+        | x -> Bytes.set s1 i1 x; succ i
+      in
+      copy_decode_in s1 i (succ i1)
+    else Bytes.unsafe_to_string s1
+  in
+  let rec strip_heading_and_trailing_spaces s =
+    if String.length s > 0 then
+      if s.[0] = ' ' then
+        strip_heading_and_trailing_spaces
+          (String.sub s 1 (String.length s - 1))
+      else if s.[String.length s - 1] = ' ' then
+        strip_heading_and_trailing_spaces
+          (String.sub s 0 (String.length s - 1))
+      else s
+    else s
+  in
+  if need_decode 0 then
+    let len = compute_len 0 0 in
+    let s1 = Bytes.create len in
+    let s = copy_decode_in s1 0 0 in
+    if strip_spaces then strip_heading_and_trailing_spaces s else s
+  else s
+
+let decode = gen_decode true
+
+let rec extract_param name stop_char =
+  let case_unsensitive_eq s1 s2 =
+    String.lowercase_ascii s1 = String.lowercase_ascii s2
+  in
+  function
+  | x :: l ->
+    if String.length x >= String.length name &&
+       case_unsensitive_eq (String.sub x 0 (String.length name)) name
+    then
+      let i =
+        let rec loop i =
+          if i = String.length x then i
+          else if x.[i] = stop_char then i
+          else loop (i + 1)
+        in
+        loop (String.length name)
+      in
+      String.sub x (String.length name) (i - String.length name)
+    else extract_param name stop_char l
+  | [] -> ""

@@ -6,16 +6,16 @@ open Util
 open Notes
 
 let print_search_form conf from_note =
-  Wserver.printf "<table>\n";
-  Wserver.printf "<tr>\n";
-  Wserver.printf "<td align=\"%s\">\n" conf.right;
-  Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Wserver.printf "<p>\n";
+  Output.printf conf "<table>\n";
+  Output.printf conf "<tr>\n";
+  Output.printf conf "<td align=\"%s\">\n" conf.right;
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<p>\n";
   hidden_env conf;
-  Wserver.printf
+  Output.printf conf
     "<input type=\"hidden\" name=\"m\" value=\"MISC_NOTES_SEARCH\"%s>\n"
     conf.xhs;
-  Wserver.printf
+  Output.printf conf
     "<input name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\"%s>\n"
     (match p_getenv conf.env "s" with
        Some s -> Util.escape_html s
@@ -23,53 +23,53 @@ let print_search_form conf from_note =
     conf.xhs;
   begin match from_note with
     Some n ->
-      Wserver.printf "<input type=\"hidden\" name=\"z\" value=\"%s\"%s>\n" n
+      Output.printf conf "<input type=\"hidden\" name=\"z\" value=\"%s\"%s>\n" n
         conf.xhs
   | None -> ()
   end;
-  Wserver.printf "<br%s>\n" conf.xhs;
-  Wserver.printf "<label>\n";
-  Wserver.printf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s%s>\n"
+  Output.printf conf "<br%s>\n" conf.xhs;
+  Output.printf conf "<label>\n";
+  Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s%s>\n"
     (match p_getenv conf.env "c" with
        Some "on" -> " checked=\"checked\""
      | Some _ | None -> "")
     conf.xhs;
-  Wserver.printf "%s\n" (transl_nth conf "search/case sensitive" 1);
-  Wserver.printf "</label>\n";
-  Wserver.printf
+  Output.printf conf "%s\n" (transl_nth conf "search/case sensitive" 1);
+  Output.printf conf "</label>\n";
+  Output.printf conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "search/case sensitive" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</p>\n";
-  Wserver.printf "</form>\n";
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "</table>\n"
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "search/case sensitive" 0));
+  Output.printf conf "</button>\n";
+  Output.printf conf "</p>\n";
+  Output.printf conf "</form>\n";
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "</table>\n"
 
 let print_whole_notes conf base fnotes title s ho =
   let title = Util.safe_html title in
   Hutil.header_no_page_title conf
-    (fun _ -> Wserver.print_string (if title = "" then fnotes else title));
+    (fun _ -> Output.print_string conf (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
       begin
-        Wserver.printf "<a href=\"%sm=NOTES&f=%s&ref=on\" class=\"mx-2\">"
+        Output.printf conf "<a href=\"%sm=NOTES&f=%s&ref=on\" class=\"mx-2\">"
           (commd conf) fnotes;
-        Wserver.printf "(%s)" (transl conf "linked pages");
-        Wserver.printf "</a>\n"
+        Output.printf conf "(%s)" (transl conf "linked pages");
+        Output.printf conf "</a>\n"
       end
   in
   Hutil.gen_print_link_to_welcome what_links_page conf true;
-  Wserver.printf "<div class=\"d-flex justify-content-between\">\n";
+  Output.printf conf "<div class=\"d-flex justify-content-between\">\n";
   if title <> "" then
     begin let title =
       match ho with
         Some (case_sens, h) -> html_highlight case_sens h title
       | None -> title
     in
-      Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
+      Output.printf conf "<h1 class=\"my-3\">%s</h1>\n" title
     end;
-  Wserver.printf "</div>\n";
+  Output.printf conf "</div>\n";
   Util.include_template conf [] "summary" (fun () -> ());
   let file_path = file_path conf base in
   let s = string_with_macros conf [] s in
@@ -77,7 +77,6 @@ let print_whole_notes conf base fnotes title s ho =
   let s =
     let wi =
       {Wiki.wi_mode = "NOTES"; Wiki.wi_file_path = file_path;
-       Wiki.wi_cancel_links = conf.cancel_links;
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
@@ -89,7 +88,7 @@ let print_whole_notes conf base fnotes title s ho =
       Some (case_sens, h) -> html_highlight case_sens h s
     | None -> s
   in
-  Wserver.printf "%s\n" s;
+  Output.printf conf "%s\n" s;
   begin match ho with
     Some _ -> print_search_form conf (Some fnotes)
   | None -> ()
@@ -99,20 +98,20 @@ let print_whole_notes conf base fnotes title s ho =
 let print_notes_part conf base fnotes title s cnt0 =
   let title = Util.safe_html title in
   Hutil.header_no_page_title conf
-    (fun _ -> Wserver.print_string (if title = "" then fnotes else title));
+    (fun _ -> Output.print_string conf (if title = "" then fnotes else title));
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf [] "summary" (fun () -> ());
   if cnt0 = 0 && title <> "" then
     begin
-      Wserver.printf "<br%s>\n" conf.xhs;
-      Wserver.printf "<br%s>\n" conf.xhs;
-      Wserver.printf "<h1>%s</h1>\n" title
+      Output.printf conf "<br%s>\n" conf.xhs;
+      Output.printf conf "<br%s>\n" conf.xhs;
+      Output.printf conf "<h1>%s</h1>\n" title
     end;
   let s = string_with_macros conf [] s in
   let lines = Wiki.extract_sub_part s cnt0 in
   let mode = "NOTES" in
   let wi =
-    {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+    {Wiki.wi_mode = mode;
      Wiki.wi_file_path = file_path conf base;
      Wiki.wi_person_exists = person_exists conf base;
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -120,123 +119,123 @@ let print_notes_part conf base fnotes title s cnt0 =
   Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines; Hutil.trailer conf
 
 let print_linked_list conf base pgl =
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   List.iter
     (fun pg ->
-       Wserver.printf "<li>";
+       Output.printf conf "<li>";
        begin match pg with
          | Def.NLDB.PgInd ip ->
-           Wserver.printf "<tt>";
+           Output.printf conf "<tt>";
            if conf.wizard then
              begin
-               Wserver.printf "<a class=\"mx-2\" href=\"%s&i=%s&\">"
+               Output.printf conf "<a class=\"mx-2\" href=\"%s&i=%s&\">"
                  (commd conf) (Gwdb.string_of_iper ip);
-               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
-               Wserver.printf "</a>"
+               Output.printf conf "<sup><i class=\"fa fa-cog\"></i></sup>";
+               Output.printf conf "</a>"
              end;
            begin
              let p = pget conf base ip in
-             Wserver.printf "<span class=\"mx-2\">";
-             Wserver.printf "%s%s"
+             Output.printf conf "<span class=\"mx-2\">";
+             Output.printf conf "%s%s"
                (Util.referenced_person_title_text conf base p)
                (DateDisplay.short_dates_text conf base p);
-             Wserver.printf "</span>"
+             Output.printf conf "</span>"
            end;
-           Wserver.printf "</tt>\n"
+           Output.printf conf "</tt>\n"
        | Def.NLDB.PgFam ifam ->
            let fam = foi base ifam in
            let fath = pget conf base (get_father fam) in
            let moth = pget conf base (get_mother fam) in
-           Wserver.printf "<tt>";
+           Output.printf conf "<tt>";
            if conf.wizard then
              begin
-               Wserver.printf
+               Output.printf conf
                  "<a class=\"mx-2\" href=\"%sm=MOD_FAM&i=%s&ip=%s&\">"
                  (commd conf) (Gwdb.string_of_ifam ifam)
                  (Gwdb.string_of_iper (Gwdb.get_iper fath));
-               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
-               Wserver.printf "</a>"
+               Output.printf conf "<sup><i class=\"fa fa-cog\"></i></sup>";
+               Output.printf conf "</a>"
              end;
-           Wserver.printf "<span class=\"mx-2\">";
-           Wserver.printf "%s%s &amp; %s %s"
+           Output.printf conf "<span class=\"mx-2\">";
+           Output.printf conf "%s%s &amp; %s %s"
              (Util.referenced_person_title_text conf base fath)
              (DateDisplay.short_dates_text conf base fath)
              (Util.referenced_person_title_text conf base moth)
              (DateDisplay.short_dates_text conf base moth);
-           Wserver.printf "</span>";
-           Wserver.printf "</tt>\n"
+           Output.printf conf "</span>";
+           Output.printf conf "</tt>\n"
        | Def.NLDB.PgNotes ->
-           Wserver.printf "<tt>";
+           Output.printf conf "<tt>";
            if conf.wizard then
              begin
-               Wserver.printf "<a class=\"mx-2\" href=\"%sm=MOD_NOTES&\">"
+               Output.printf conf "<a class=\"mx-2\" href=\"%sm=MOD_NOTES&\">"
                  (commd conf);
-               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
-               Wserver.printf "</a>"
+               Output.printf conf "<sup><i class=\"fa fa-cog\"></i></sup>";
+               Output.printf conf "</a>"
              end;
-           Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES\">"
+           Output.printf conf "<a class=\"mx-2\" href=\"%sm=NOTES\">"
              (commd conf);
-           Wserver.print_string (transl_nth conf "note/notes" 1);
-           Wserver.printf "</a>\n";
-           Wserver.printf "</tt>\n"
+           Output.print_string conf (transl_nth conf "note/notes" 1);
+           Output.printf conf "</a>\n";
+           Output.printf conf "</tt>\n"
        | Def.NLDB.PgMisc fnotes ->
            let (nenv, _) = read_notes base fnotes in
            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
            let title = Util.safe_html title in
-           Wserver.printf "<tt>";
+           Output.printf conf "<tt>";
            if conf.wizard then
              begin
-               Wserver.printf
+               Output.printf conf
                  "<a class=\"mx-2\" href=\"%sm=MOD_NOTES&f=%s&\">"
                  (commd conf) fnotes;
-               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
-               Wserver.printf "</a>"
+               Output.printf conf "<sup><i class=\"fa fa-cog\"></i></sup>";
+               Output.printf conf "</a>"
              end;
-           Wserver.printf "<a class=\"mx-2\" href=\"%sm=NOTES&f=%s&\">"
+           Output.printf conf "<a class=\"mx-2\" href=\"%sm=NOTES&f=%s&\">"
              (commd conf) fnotes;
-           Wserver.print_string fnotes;
-           Wserver.printf "</a>";
-           if title <> "" then Wserver.printf "(%s)" title;
-           Wserver.printf "</tt>\n"
+           Output.print_string conf fnotes;
+           Output.printf conf "</a>";
+           if title <> "" then Output.printf conf "(%s)" title;
+           Output.printf conf "</tt>\n"
        | Def.NLDB.PgWizard wizname ->
-           Wserver.printf "<tt>";
+           Output.printf conf "<tt>";
            if conf.wizard then
              begin
-               Wserver.printf
+               Output.printf conf
                  "<a class=\"mx-2\" href=\"%sm=MOD_WIZNOTES&f=%s&\">"
                  (commd conf) (code_varenv wizname);
-               Wserver.printf "<sup><i class=\"fa fa-cog\"></i></sup>";
-               Wserver.printf "</a>"
+               Output.printf conf "<sup><i class=\"fa fa-cog\"></i></sup>";
+               Output.printf conf "</a>"
              end;
-           Wserver.printf "<a class=\"mx-2\" href=\"%sm=WIZNOTES&f=%s\">"
+           Output.printf conf "<a class=\"mx-2\" href=\"%sm=WIZNOTES&f=%s\">"
              (commd conf) (code_varenv wizname);
-           Wserver.print_string wizname;
-           Wserver.printf "</a>";
-           Wserver.printf "<i>";
-           Wserver.printf "(%s)"
+           Output.print_string conf wizname;
+           Output.printf conf "</a>";
+           Output.printf conf "<i>";
+           Output.printf conf "(%s)"
              (transl_nth conf "wizard/wizards/friend/friends/exterior" 0);
-           Wserver.printf "</i>";
-           Wserver.printf "</tt>\n"
+           Output.printf conf "</i>";
+           Output.printf conf "</tt>\n"
        end;
-       Wserver.printf "</li>\n")
+       Output.printf conf "</li>\n")
     pgl;
-  Wserver.printf "</ul>\n"
+  Output.printf conf "</ul>\n"
 
 let print_what_links conf base fnotes =
   let title h =
-    Wserver.printf "%s " (Utf8.capitalize (transl conf "linked pages"));
-    if h then Wserver.printf "[%s]" fnotes
+    Output.printf conf "%s " (Utf8.capitalize (transl conf "linked pages"));
+    if h then Output.printf conf "[%s]" fnotes
     else
       begin
-        Wserver.printf "<tt>";
-        Wserver.printf "[";
+        Output.printf conf "<tt>";
+        Output.printf conf "[";
         begin
-          Wserver.printf "<a href=\"%sm=NOTES&f=%s\">" (commd conf) fnotes;
-          Wserver.print_string fnotes;
-          Wserver.printf "</a>"
+          Output.printf conf "<a href=\"%sm=NOTES&f=%s\">" (commd conf) fnotes;
+          Output.print_string conf fnotes;
+          Output.printf conf "</a>"
         end;
-        Wserver.printf "]";
-        Wserver.printf "</tt>"
+        Output.printf conf "]";
+        Output.printf conf "</tt>"
       end
   in
   let db = notes_links_db conf base false in
@@ -271,7 +270,7 @@ let print_mod conf base =
     | None -> ""
   in
   let title _ =
-    Wserver.printf "%s - %s%s" (Utf8.capitalize (transl conf "base notes"))
+    Output.printf conf "%s - %s%s" (Utf8.capitalize (transl conf "base notes"))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let (env, s) = read_notes base fnotes in
@@ -290,7 +289,7 @@ let print_mod_ok conf base =
   let string_filter = string_with_macros conf [] in
   let file_path = file_path conf base in
   let wi =
-    {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+    {Wiki.wi_mode = mode;
      Wiki.wi_file_path = file_path;
      Wiki.wi_person_exists = person_exists conf base;
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -326,7 +325,7 @@ let print_misc_notes conf base =
     | None -> ""
   in
   let title h =
-    Wserver.print_string
+    Output.print_string conf
       (if d = "" then
          Utf8.capitalize (Util.translate_eval (transl conf "miscellaneous notes"))
        else if h then "- " ^ d ^ " -"
@@ -361,20 +360,20 @@ let print_misc_notes conf base =
   Hutil.header_link_welcome conf title;
   if db <> [] then
     begin
-      Wserver.printf "<ul>\n";
+      Output.printf conf "<ul>\n";
       if d <> "" then
         begin
-          Wserver.printf "<li class=\"parent\">\n";
+          Output.printf conf "<li class=\"parent\">\n";
           begin
-            Wserver.printf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf)
+            Output.printf conf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf)
               (try
                  let i = String.rindex d NotesLinks.char_dir_sep in
                  let d = String.sub d 0 i in "&d=" ^ d
                with Not_found -> "");
-            Wserver.printf "<tt>&lt;--</tt>";
-            Wserver.printf "</a>"
+            Output.printf conf "<tt>&lt;--</tt>";
+            Output.printf conf "</a>"
           end;
-          Wserver.printf "</li>\n"
+          Output.printf conf "</li>\n"
         end;
       List.iter
         (fun (r, f) ->
@@ -391,28 +390,28 @@ let print_misc_notes conf base =
                  let f = file_path conf base (path_of_fnotes f) in
                  if Sys.file_exists f then "" else " style=\"color:red\""
                in
-               Wserver.printf "<li class=\"file\">\n";
-               Wserver.printf "<tt>[";
-               Wserver.printf "<a href=\"%sm=NOTES&f=%s\"%s>" (commd conf) f
+               Output.printf conf "<li class=\"file\">\n";
+               Output.printf conf "<tt>[";
+               Output.printf conf "<a href=\"%sm=NOTES&f=%s\"%s>" (commd conf) f
                  c;
-               Wserver.print_string r;
-               Wserver.printf "</a>";
-               Wserver.printf "]</tt>%s\n"
+               Output.print_string conf r;
+               Output.printf conf "</a>";
+               Output.printf conf "]</tt>%s\n"
                  (if txt = "" then "" else " : " ^ txt);
-               Wserver.printf "</li>\n"
+               Output.printf conf "</li>\n"
            | None ->
-               Wserver.printf "<li class=\"folder\">\n";
-               Wserver.printf "<tt>";
-               Wserver.printf "<a href=\"%sm=MISC_NOTES&d=%s\">" (commd conf)
+               Output.printf conf "<li class=\"folder\">\n";
+               Output.printf conf "<tt>";
+               Output.printf conf "<a href=\"%sm=MISC_NOTES&d=%s\">" (commd conf)
                  (if d = "" then r
                   else d ^ String.make 1 NotesLinks.char_dir_sep ^ r);
-               Wserver.printf "%s " r;
-               Wserver.printf "--&gt;";
-               Wserver.printf "</a>";
-               Wserver.printf "</tt>";
-               Wserver.printf "</li>\n")
+               Output.printf conf "%s " r;
+               Output.printf conf "--&gt;";
+               Output.printf conf "</a>";
+               Output.printf conf "</tt>";
+               Output.printf conf "</li>\n")
         db;
-      Wserver.printf "</ul>\n"
+      Output.printf conf "</ul>\n"
     end;
   if d = "" then print_search_form conf None;
   Hutil.trailer conf
@@ -455,5 +454,5 @@ let search_text conf base s =
 
 let print_misc_notes_search conf base =
   match try Some (List.assoc "s" conf.env) with Not_found -> None with
-    Some s -> search_text conf base (Wserver.gen_decode false s)
+    Some s -> search_text conf base (Mutil.gen_decode false s)
   | None -> print_misc_notes conf base

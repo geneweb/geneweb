@@ -23,87 +23,87 @@ let print_child_person conf base p =
       Some i -> i
     | None -> get_occ p
   in
-  Wserver.printf "<table class=\"m1-2\">\n";
-  Wserver.printf "<tbody>\n";
-  Wserver.printf "<tr align=\"%s\">\n" conf.left;
-  Wserver.printf "<td>";
-  Wserver.printf "<label for=\"%s_fn\" class=\"mx-2 mb-0\">%s</label>"
+  Output.printf conf "<table class=\"m1-2\">\n";
+  Output.printf conf "<tbody>\n";
+  Output.printf conf "<tr align=\"%s\">\n" conf.left;
+  Output.printf conf "<td>";
+  Output.printf conf "<label for=\"%s_fn\" class=\"mx-2 mb-0\">%s</label>"
     var (Utf8.capitalize (transl_nth conf "first name/first names" 0));
-  Wserver.printf "</td>\n";
-  Wserver.printf "<td colspan=\"3\">\n";
-  Wserver.printf "<input name=\"%s_first_name\" class=\"form-control\" \
+  Output.printf conf "</td>\n";
+  Output.printf conf "<td colspan=\"3\">\n";
+  Output.printf conf "<input name=\"%s_first_name\" class=\"form-control\" \
 size=\"23\" maxlength=\"200\" id=\"%s_fn\" value=\"%s\">\n" var var
 (Util.escape_html first_name);
-  Wserver.printf "</td>\n";
-  Wserver.printf "<td align=\"%s\">" conf.right;
-  Wserver.printf "<label for=\"%s_occ\" class=\"mx-2 mb-0\">%s</label>"
+  Output.printf conf "</td>\n";
+  Output.printf conf "<td align=\"%s\">" conf.right;
+  Output.printf conf "<label for=\"%s_occ\" class=\"mx-2 mb-0\">%s</label>"
     var (Utf8.capitalize (transl conf "number"));
-  Wserver.printf "</td>\n";
-  Wserver.printf "<td>\n";
-  Wserver.printf "<input class=\"form-control\" id=\"%s_occ\" name=\"%s_occ\" \
+  Output.printf conf "</td>\n";
+  Output.printf conf "<td>\n";
+  Output.printf conf "<input class=\"form-control\" id=\"%s_occ\" name=\"%s_occ\" \
 size=\"5\" maxlength=\"8\"%s>\n" var var
 (if occ = 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "<tr align=\"%s\">\n" conf.left;
-  Wserver.printf "<td>";
-  Wserver.printf "<label for=\"%s_sn\" class=\"mx-2 mb-0\">%s</label>"
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "<tr align=\"%s\">\n" conf.left;
+  Output.printf conf "<td>";
+  Output.printf conf "<label for=\"%s_sn\" class=\"mx-2 mb-0\">%s</label>"
     var (Utf8.capitalize (transl_nth conf "surname/surnames" 0));
-  Wserver.printf "</td>\n";
-  Wserver.printf "<td colspan=\"5\">\n";
-  Wserver.printf "<input name=\"%s_surname\" class=\"form-control\" \
+  Output.printf conf "</td>\n";
+  Output.printf conf "<td colspan=\"5\">\n";
+  Output.printf conf "<input name=\"%s_surname\" class=\"form-control\" \
 size=\"40\" maxlength=\"200\" id=\"%s_sn\" value=\"%s\">\n" var var surname;
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "</tbody>\n";
-  Wserver.printf "</table>\n"
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "</tbody>\n";
+  Output.printf conf "</table>\n"
 
 
 let print_children conf base ipl =
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   List.iter
     (fun ip ->
        let p = poi base ip in
-       Wserver.printf "<li class=\"mt-3\">\n";
-       Wserver.printf "<span class=\"ml-2\">%s"
+       Output.printf conf "<li class=\"mt-3\">\n";
+       Output.printf conf "<span class=\"ml-2\">%s"
          (reference conf base p (person_text conf base p));
-       Wserver.printf "%s</span>\n" (DateDisplay.short_dates_text conf base p);
+       Output.printf conf "%s</span>\n" (DateDisplay.short_dates_text conf base p);
        print_child_person conf base p;
-       Wserver.printf "</li>\n")
+       Output.printf conf "</li>\n")
     ipl;
-  Wserver.printf "</ul>\n"
+  Output.printf conf "</ul>\n"
 
 let print_change conf base p =
   let title _ =
     let s = transl conf "change children's names" in
-    Wserver.print_string (Utf8.capitalize s)
+    Output.print_string conf (Utf8.capitalize s)
   in
   let children = children_of_p base p in
   let digest = digest_children base children in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "<h2>";
+  Output.printf conf "<h2>";
     title false;
   begin
     let s = person_text conf base p in
-    Wserver.print_string (Util.transl_a_of_b conf "" (reference conf base p s) s)
+    Output.print_string conf (Util.transl_a_of_b conf "" (reference conf base p s) s)
   end ;
-  Wserver.printf " %s" (DateDisplay.short_dates_text conf base p);
-  Wserver.printf "</h2>\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf " %s" (DateDisplay.short_dates_text conf base p);
+  Output.printf conf "</h2>\n";
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
+  Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
-  Wserver.printf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
+  Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
     digest;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
   print_children conf base children;
-  Wserver.printf "\n";
-  Wserver.printf
+  Output.printf conf "\n";
+  Output.printf conf
     "<button type=\"submit\" class=\"btn btn-primary btn-lg ml-5 mb-2\">";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</form>\n";
-  Wserver.printf "\n";
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.printf conf "</button>\n";
+  Output.printf conf "</form>\n";
+  Output.printf conf "\n";
   Hutil.trailer conf
 
 let print conf base =
@@ -113,82 +113,82 @@ let print conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
-  Wserver.printf "<h4>";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "child/children" 1));
-  Wserver.printf "</h4>";
-  Wserver.printf "\n<p>\n";
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<h4>";
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "child/children" 1));
+  Output.printf conf "</h4>";
+  Output.printf conf "\n<p>\n";
+  Output.printf conf "<ul>\n";
   Array.iter
     (fun ifam ->
        let des = foi base ifam in
        Array.iter
          (fun ip ->
             let p = poi base ip in
-            Wserver.printf "<li>" ;
-            Wserver.printf "\n%s"
+            Output.printf conf "<li>" ;
+            Output.printf conf "\n%s"
               (reference conf base p (person_text conf base p));
-            Wserver.printf "%s\n" (DateDisplay.short_dates_text conf base p))
+            Output.printf conf "%s\n" (DateDisplay.short_dates_text conf base p))
          (get_children des))
     (get_family u);
-  Wserver.printf "</ul>\n"
+  Output.printf conf "</ul>\n"
 
 let print_change_done conf base p =
   let title _ =
     let s = transl conf "children's names changed" in
-    Wserver.print_string (Utf8.capitalize s)
+    Output.print_string conf (Utf8.capitalize s)
   in
   Hutil.header conf title;
-  Wserver.printf "\n%s" (reference conf base p (person_text conf base p));
-  Wserver.printf "%s\n" (DateDisplay.short_dates_text conf base p);
+  Output.printf conf "\n%s" (reference conf base p (person_text conf base p));
+  Output.printf conf "%s\n" (DateDisplay.short_dates_text conf base p);
   print_children_list conf base p;
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>";
-  Wserver.printf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>";
+  Output.printf conf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
     (Util.transl conf ":") free_n;
-  Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
+  Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
-  Wserver.printf " %s.\n" (transl conf "to try again with this number");
-  Wserver.printf "</li>";
-  Wserver.printf "<li>";
-  Wserver.printf "%s " (Utf8.capitalize (transl conf "or"));
-  Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Wserver.printf " %s %s." (transl_nth conf "and" 0)
+  Output.printf conf " %s.\n" (transl conf "to try again with this number");
+  Output.printf conf "</li>";
+  Output.printf conf "<li>";
+  Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
+  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
+  Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
-  Wserver.printf "</li>";
-  Wserver.printf "</ul>\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "</li>";
+  Output.printf conf "</ul>\n";
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
-       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
+       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
          (Util.escape_html (decode_varenv v)))
     (conf.henv @ conf.env);
   begin let var = "c" ^ string_of_iper ip_var in
-    Wserver.printf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var
+    Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var
   end;
-  Wserver.printf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
+  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
     free_n;
-  Wserver.printf  "<button type=\"submit\" name=\"create\" \
+  Output.printf conf  "<button type=\"submit\" name=\"create\" \
 class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "create"));
-  Wserver.printf "<button type=\"submit\" name=\"return\" \
+  Output.printf conf "<button type=\"submit\" name=\"return\" \
 class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "back"));
-  Wserver.printf "</form>\n";
+  Output.printf conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
 
 let error_person conf err =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Wserver.printf "%s\n" (Utf8.capitalize err);
+  Output.printf conf "%s\n" (Utf8.capitalize err);
   Hutil.trailer conf;
   raise @@ Update.ModErr __LOC__
 

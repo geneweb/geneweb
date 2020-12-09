@@ -18,10 +18,10 @@ let print_merge conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 =
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "merge done")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Wserver.printf "\n%s\n"
+  Output.printf conf "\n%s\n"
     (referenced_person_text conf base (poi base p.key_index));
   Update.print_warnings conf base wl;
   let pi = p.key_index in
@@ -32,26 +32,26 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 
   if ((ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) && pgl1 <> [] ||
       (ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc) && pgl2 <> []) then
     begin
-      Wserver.printf
+      Output.printf conf
         "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
-      Wserver.printf (ftransl conf "name changed. update linked pages");
-      Wserver.printf "</div>\n";
+      Output.printf conf (ftransl conf "name changed. update linked pages");
+      Output.printf conf "</div>\n";
       let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
-      Wserver.printf "<span class=\"unselectable float-left\">%s%s</span>\n\
+      Output.printf conf "<span class=\"unselectable float-left\">%s%s</span>\n\
                       <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
         (Utf8.capitalize (transl conf "new name")) (transl conf ":") nfn nsn snocc;
       let soocc1 = if oocc1 <> 0 then Printf.sprintf "/%d" oocc1 else "" in
-      Wserver.printf "<span class=\"unselectable float-left\">%s 1%s</span>\n\
+      Output.printf conf "<span class=\"unselectable float-left\">%s 1%s</span>\n\
                       <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
         (Utf8.capitalize (transl conf "old name")) (transl conf ":") ofn1 osn1 soocc1;
-      Wserver.printf "<span>%s%s</span>"
+      Output.printf conf "<span>%s%s</span>"
         (Utf8.capitalize (transl conf "linked pages")) (transl conf ":");
       NotesDisplay.print_linked_list conf base pgl1;
       let soocc2 = if oocc2 <> 0 then Printf.sprintf "/%d" oocc2 else "" in
-      Wserver.printf "<span class=\"unselectable float-left\">%s 2%s</span>\n\
+      Output.printf conf "<span class=\"unselectable float-left\">%s 2%s</span>\n\
                       <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
         (Utf8.capitalize (transl conf "old name")) (transl conf ":") ofn2 osn2 soocc2;
-      Wserver.printf "<span>%s%s</span>"
+      Output.printf conf "<span>%s%s</span>"
         (Utf8.capitalize (transl conf "linked pages")) (transl conf ":");
       NotesDisplay.print_linked_list conf base pgl2
     end;
