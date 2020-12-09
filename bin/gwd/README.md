@@ -86,3 +86,8 @@ version: version of your plugin
 maintainers: comma-seperated list of plugin maintainers
 depends: comma-seperated list of other plugins needed
 ```
+
+### Stability
+
+Plugin system is new and still under heavy test and development.
+API should not be considered stable yet.
