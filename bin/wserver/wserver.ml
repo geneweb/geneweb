@@ -1,13 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-type httpStatus =
-  | OK (* 200 *)
-  | Moved_Temporarily (* 302 *)
-  | Bad_Request (* 400 *)
-  | Unauthorized (* 401 *)
-  | Forbidden (* 403 *)
-  | Not_Found (* 404 *)
-
 let connection_closed = ref false
 
 let eprintf = Printf.eprintf
@@ -62,27 +54,27 @@ let printing_state = ref Nothing
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
-  if status <> OK || not !cgi then
+  if status <> Def.OK || not !cgi then
     let answer = match status with
-      | OK -> "200 OK"
-      | Moved_Temporarily -> "302 Moved Temporarily"
-      | Bad_Request -> "400 Bad Request"
-      | Unauthorized -> "401 Unauthorized"
-      | Forbidden -> "403 Forbidden"
-      | Not_Found -> "404 Not Found"
+      | Def.OK -> "200 OK"
+      | Def.Moved_Temporarily -> "302 Moved Temporarily"
+      | Def.Bad_Request -> "400 Bad Request"
+      | Def.Unauthorized -> "401 Unauthorized"
+      | Def.Forbidden -> "403 Forbidden"
+      | Def.Not_Found -> "404 Not Found"
     in
     if !cgi then printnl "Status: %s" answer else printnl "HTTP/1.0 %s" answer
 
 let header fmt =
   if !printing_state <> Status then
-    if !printing_state = Nothing then http OK
+    if !printing_state = Nothing then http Def.OK
     else failwith "Cannot write HTTP headers: page contents already started";
   printnl fmt
 
 let printf fmt =
   if !printing_state <> Contents then
     begin
-      if !printing_state = Nothing then http OK;
+      if !printing_state = Nothing then http Def.OK;
       printnl "";
       printing_state := Contents
     end;
@@ -91,120 +83,14 @@ let printf fmt =
 let print_string s =
   if !printing_state <> Contents then
     begin
-      if !printing_state = Nothing then http OK;
+      if !printing_state = Nothing then http Def.OK;
       printnl "";
       printing_state := Contents
     end ;
   output_string !wserver_oc s
 
-let hexa_digit x =
-  if x >= 10 then Char.chr (Char.code 'A' + x - 10)
-  else Char.chr (Char.code '0' + x)
-
-let hexa_val conf =
-  match conf with
-    '0'..'9' -> Char.code conf - Char.code '0'
-  | 'a'..'f' -> Char.code conf - Char.code 'a' + 10
-  | 'A'..'F' -> Char.code conf - Char.code 'A' + 10
-  | _ -> 0
-
-let gen_decode strip_spaces s =
-  let rec need_decode i =
-    if i < String.length s then
-      match s.[i] with
-        '%' | '+' -> true
-      | _ -> need_decode (succ i)
-    else false
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i =
-        match s.[i] with
-          '%' when i + 2 < String.length s -> i + 3
-        | _ -> succ i
-      in
-      compute_len i (succ i1)
-    else i1
-  in
-  let rec copy_decode_in s1 i i1 =
-    if i < String.length s then
-      let i =
-        match s.[i] with
-          '%' when i + 2 < String.length s ->
-            let v = hexa_val s.[i+1] * 16 + hexa_val s.[i+2] in
-            Bytes.set s1 i1 (Char.chr v); i + 3
-        | '+' -> Bytes.set s1 i1 ' '; succ i
-        | x -> Bytes.set s1 i1 x; succ i
-      in
-      copy_decode_in s1 i (succ i1)
-    else Bytes.unsafe_to_string s1
-  in
-  let rec strip_heading_and_trailing_spaces s =
-    if String.length s > 0 then
-      if s.[0] = ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 1 (String.length s - 1))
-      else if s.[String.length s - 1] = ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 0 (String.length s - 1))
-      else s
-    else s
-  in
-  if need_decode 0 then
-    let len = compute_len 0 0 in
-    let s1 = Bytes.create len in
-    let s = copy_decode_in s1 0 0 in
-    if strip_spaces then strip_heading_and_trailing_spaces s else s
-  else s
-
-let decode = gen_decode true
-
-let special =
-  function
-    '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' | '{' |
-    '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' | ':' |
-    '@' | '=' | '&' | '+' ->
-      true
-  | _ -> false
-
-let encode s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-        ' ' -> true
-      | x -> if special x then true else need_code (succ i)
-    else false
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i1 = if special s.[i] then i1 + 3 else succ i1 in
-      compute_len (succ i) i1
-    else i1
-  in
-  let rec copy_code_in s1 i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          ' ' -> Bytes.set s1 i1 '+'; succ i1
-        | c ->
-            if special c then
-              begin
-                Bytes.set s1 i1 '%';
-                Bytes.set s1 (i1 + 1) (hexa_digit (Char.code c / 16));
-                Bytes.set s1 (i1 + 2) (hexa_digit (Char.code c mod 16));
-                i1 + 3
-              end
-            else begin Bytes.set s1 i1 c; succ i1 end
-      in
-      copy_code_in s1 (succ i) i1
-    else Bytes.unsafe_to_string s1
-  in
-  if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
-  else s
-
 let http_redirect_temporarily url =
-  http Moved_Temporarily; printnl "Location: %s" url
+  http Def.Moved_Temporarily; printnl "Location: %s" url
 
 let print_exc exc =
   let () =
@@ -268,27 +154,6 @@ let print_exc exc =
 
 let print_err_exc exc = print_exc exc; flush stderr
 
-let case_unsensitive_eq s1 s2 =
-  String.lowercase_ascii s1 = String.lowercase_ascii s2
-
-let rec extract_param name stop_char =
-  function
-    x :: l ->
-      if String.length x >= String.length name &&
-         case_unsensitive_eq (String.sub x 0 (String.length name)) name
-      then
-        let i =
-          let rec loop i =
-            if i = String.length x then i
-            else if x.[i] = stop_char then i
-            else loop (i + 1)
-          in
-          loop (String.length name)
-        in
-        String.sub x (String.length name) (i - String.length name)
-      else extract_param name stop_char l
-  | [] -> ""
-
 let buff = ref (Bytes.create 80)
 let store len x =
   if len >= Bytes.length !buff then
@@ -317,7 +182,7 @@ let timeout tmout spid _ =
   if pid = 0 then
     if Unix.fork () = 0 then
       begin
-        http OK;
+        http Def.OK;
         printnl "Content-type: text/html; charset=iso-8859-1";
         printnl "";
         printf "<head><title>Time out</title></head>\n";
@@ -333,7 +198,7 @@ let timeout tmout spid _ =
 let get_request_and_content strm =
   let request = get_request strm in
   let content =
-    match extract_param "content-length: " ' ' request with
+    match Mutil.extract_param "content-length: " ' ' request with
       "" -> ""
     | x ->
         let get_next_char _ =
@@ -376,8 +241,8 @@ let treat_connection tmout callback addr fd =
       get_request_and_content strm
     in
     let (script_name, contents) =
-      match extract_param "GET /" ' ' request with
-        "" -> extract_param "POST /" ' ' request, contents
+      match Mutil.extract_param "GET /" ' ' request with
+        "" -> Mutil.extract_param "POST /" ' ' request, contents
       | str ->
           try
             let i = String.index str '?' in

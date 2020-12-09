@@ -42,13 +42,12 @@ let main () =
       let () = Gwdb.load_unions_array base in
       let () = Gwdb.load_descends_array base in ()
     end ;
-    let ofile, oc = opts.oc in
-    if not !GwuLib.raw_output then Printf.fprintf oc "encoding: utf-8\n";
-    if !GwuLib.old_gw then Printf.fprintf oc "\n" else Printf.fprintf oc "gwplus\n\n";
+    let ofile, oc, close = opts.oc in
+    if not !GwuLib.raw_output then oc "encoding: utf-8\n";
+    if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
     GwuLib.prepare_free_occ base ;
     GwuLib.gwu opts base in_dir !out_dir src_oc_ht select ;
-    Hashtbl.iter (fun _ (oc, _) -> flush oc; close_out oc) src_oc_ht ;
-    flush oc ;
-    if ofile <> "" then close_out oc
+    Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht ;
+    close ()
 
 let _ = Printexc.catch main ()

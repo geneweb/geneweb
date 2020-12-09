@@ -99,30 +99,30 @@ let soy y = if y = 0 then "-0" else string_of_int y
 
 let print_date_dmy oc d =
   begin match d.prec with
-      About -> Printf.fprintf oc "~"
-    | Maybe -> Printf.fprintf oc "?"
-    | Before -> Printf.fprintf oc "<"
-    | After -> Printf.fprintf oc ">"
+      About -> Printf.ksprintf oc "~"
+    | Maybe -> Printf.ksprintf oc "?"
+    | Before -> Printf.ksprintf oc "<"
+    | After -> Printf.ksprintf oc ">"
     | _ -> ()
   end;
-  if d.month = 0 then Printf.fprintf oc "%s" (soy d.year)
-  else if d.day = 0 then Printf.fprintf oc "%d/%s" d.month (soy d.year)
-  else Printf.fprintf oc "%d/%d/%s" d.day d.month (soy d.year);
+  if d.month = 0 then Printf.ksprintf oc "%s" (soy d.year)
+  else if d.day = 0 then Printf.ksprintf oc "%d/%s" d.month (soy d.year)
+  else Printf.ksprintf oc "%d/%d/%s" d.day d.month (soy d.year);
   match d.prec with
     OrYear d2 ->
     if not !old_gw then
-      if d2.month2 = 0 then Printf.fprintf oc "|%s" (soy d2.year2)
+      if d2.month2 = 0 then Printf.ksprintf oc "|%s" (soy d2.year2)
       else if d2.day2 = 0 then
-        Printf.fprintf oc "|%d/%s" d2.month2 (soy d2.year2)
-      else Printf.fprintf oc "|%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
-    else Printf.fprintf oc "|%s" (soy d2.year2)
+        Printf.ksprintf oc "|%d/%s" d2.month2 (soy d2.year2)
+      else Printf.ksprintf oc "|%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
+    else Printf.ksprintf oc "|%s" (soy d2.year2)
   | YearInt d2 ->
     if not !old_gw then
-      if d2.month2 = 0 then Printf.fprintf oc "..%s" (soy d2.year2)
+      if d2.month2 = 0 then Printf.ksprintf oc "..%s" (soy d2.year2)
       else if d2.day2 = 0 then
-        Printf.fprintf oc "..%d/%s" d2.month2 (soy d2.year2)
-      else Printf.fprintf oc "..%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
-    else Printf.fprintf oc "..%s" (soy d2.year2)
+        Printf.ksprintf oc "..%d/%s" d2.month2 (soy d2.year2)
+      else Printf.ksprintf oc "..%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
+    else Printf.ksprintf oc "..%s" (soy d2.year2)
   | _ -> ()
 
 let is_printable =
@@ -183,14 +183,14 @@ let gen_print_date no_colon oc =
   function
     Dgreg (d, Dgregorian) -> print_date_dmy oc d
   | Dgreg (d, Djulian) ->
-    print_date_dmy oc (Calendar.julian_of_gregorian d); Printf.fprintf oc "J"
+    print_date_dmy oc (Calendar.julian_of_gregorian d); Printf.ksprintf oc "J"
   | Dgreg (d, Dfrench) ->
-    print_date_dmy oc (Calendar.french_of_gregorian d); Printf.fprintf oc "F"
+    print_date_dmy oc (Calendar.french_of_gregorian d); Printf.ksprintf oc "F"
   | Dgreg (d, Dhebrew) ->
-    print_date_dmy oc (Calendar.hebrew_of_gregorian d); Printf.fprintf oc "H"
+    print_date_dmy oc (Calendar.hebrew_of_gregorian d); Printf.ksprintf oc "H"
   | Dtext t ->
     (* Dans le cas d'une date texte pour un titre, on échappe les ':' *)
-    let t = gen_correct_string false no_colon t in Printf.fprintf oc "0(%s)" t
+    let t = gen_correct_string false no_colon t in Printf.ksprintf oc "0(%s)" t
 
 let gen_print_date_option no_colon oc =
   function
@@ -244,12 +244,12 @@ let has_infos base p =
 
 let print_if_not_equal_to x oc base lab is =
   if sou base is = x then ()
-  else Printf.fprintf oc " %s %s" lab (correct_string base is)
+  else Printf.ksprintf oc " %s %s" lab (correct_string base is)
 
 let print_src_if_not_equal_to x oc base lab is =
   match !Gwexport.opts.source with
   | None -> if sou base is <> "" then print_if_not_equal_to x oc base lab is
-  | Some x -> Printf.fprintf oc " %s %s" lab (s_correct_string x)
+  | Some x -> Printf.ksprintf oc " %s %s" lab (s_correct_string x)
 
 let print_if_no_empty = print_if_not_equal_to ""
 
@@ -259,36 +259,36 @@ let print_src_if_no_empty oc base lab is =
 
 let print_if_no_empty_endline oc base lab is =
   if sou base is = "" then ()
-  else Printf.fprintf oc " %s %s\n" lab (correct_string base is)
+  else Printf.ksprintf oc " %s %s\n" lab (correct_string base is)
 
 let print_if_no_empty_no_newline oc base lab is =
   if sou base is = "" then ()
-  else Printf.fprintf oc " %s %s" lab (no_newlines (correct_string base is))
+  else Printf.ksprintf oc " %s %s" lab (no_newlines (correct_string base is))
 
 let print_first_name_alias oc base is =
-  Printf.fprintf oc " {%s}" (correct_string base is)
+  Printf.ksprintf oc " {%s}" (correct_string base is)
 
 let print_surname_alias oc base is =
-  Printf.fprintf oc " #salias %s" (correct_string base is)
+  Printf.ksprintf oc " #salias %s" (correct_string base is)
 
 let print_qualifier oc base is =
-  Printf.fprintf oc " #nick %s" (correct_string base is)
+  Printf.ksprintf oc " #nick %s" (correct_string base is)
 
 let print_alias oc base is =
-  Printf.fprintf oc " #alias %s" (correct_string base is)
+  Printf.ksprintf oc " #alias %s" (correct_string base is)
 
 let print_burial oc b =
   match b with
     Buried cod ->
-    Printf.fprintf oc " #buri";
+    Printf.ksprintf oc " #buri";
     begin match Adef.od_of_cdate cod with
-        Some d -> Printf.fprintf oc " "; print_date oc d; ()
+        Some d -> Printf.ksprintf oc " "; print_date oc d; ()
       | _ -> ()
     end
   | Cremated cod ->
-    Printf.fprintf oc " #crem";
+    Printf.ksprintf oc " #crem";
     begin match Adef.od_of_cdate cod with
-        Some d -> Printf.fprintf oc " "; print_date oc d; ()
+        Some d -> Printf.ksprintf oc " "; print_date oc d; ()
       | _ -> ()
     end
   | UnknownBurial -> ()
@@ -296,32 +296,32 @@ let print_burial oc b =
 let print_title oc base t =
   let t_date_start = Adef.od_of_cdate t.t_date_start in
   let t_date_end = Adef.od_of_cdate t.t_date_end in
-  Printf.fprintf oc " [";
+  Printf.ksprintf oc " [";
   begin match t.t_name with
-      Tmain -> Printf.fprintf oc "*"
-    | Tname s -> Printf.fprintf oc "%s" (correct_string_no_colon base s)
+      Tmain -> Printf.ksprintf oc "*"
+    | Tname s -> Printf.ksprintf oc "%s" (correct_string_no_colon base s)
     | Tnone -> ()
   end;
-  Printf.fprintf oc ":";
-  Printf.fprintf oc "%s" (correct_string_no_colon base t.t_ident);
-  Printf.fprintf oc ":";
-  Printf.fprintf oc "%s" (correct_string_no_colon base t.t_place);
-  if t.t_nth <> 0 then Printf.fprintf oc ":"
+  Printf.ksprintf oc ":";
+  Printf.ksprintf oc "%s" (correct_string_no_colon base t.t_ident);
+  Printf.ksprintf oc ":";
+  Printf.ksprintf oc "%s" (correct_string_no_colon base t.t_place);
+  if t.t_nth <> 0 then Printf.ksprintf oc ":"
   else
     begin match t_date_start, t_date_end with
-        Some _, _ | _, Some _ -> Printf.fprintf oc ":"
+        Some _, _ | _, Some _ -> Printf.ksprintf oc ":"
       | _ -> ()
     end;
   print_title_date_option oc t_date_start;
-  if t.t_nth <> 0 then Printf.fprintf oc ":"
+  if t.t_nth <> 0 then Printf.ksprintf oc ":"
   else
     begin match t_date_end with
-        Some _ -> Printf.fprintf oc ":"
+        Some _ -> Printf.ksprintf oc ":"
       | _ -> ()
     end;
   print_title_date_option oc t_date_end;
-  if t.t_nth <> 0 then Printf.fprintf oc ":%d" t.t_nth;
-  Printf.fprintf oc "]"
+  if t.t_nth <> 0 then Printf.ksprintf oc ":%d" t.t_nth;
+  Printf.ksprintf oc "]"
 
 let zero_birth_is_required base is_child p =
   if get_baptism p <> Adef.cdate_None then false
@@ -341,7 +341,7 @@ let print_infos oc base is_child csrc cbp p =
   List.iter (print_first_name_alias oc base) (get_first_names_aliases p);
   List.iter (print_surname_alias oc base) (get_surnames_aliases p);
   begin match get_public_name p with
-      s when sou base s <> "" -> Printf.fprintf oc " (%s)" (correct_string base s)
+      s when sou base s <> "" -> Printf.ksprintf oc " (%s)" (correct_string base s)
     | _ -> ()
   end;
   if not !Gwexport.opts.no_picture then
@@ -351,21 +351,21 @@ let print_infos oc base is_child csrc cbp p =
   List.iter (print_title oc base) (get_titles p);
   begin match get_access p with
       IfTitles -> ()
-    | Public -> Printf.fprintf oc " #apubl"
-    | Private -> Printf.fprintf oc " #apriv"
+    | Public -> Printf.ksprintf oc " #apubl"
+    | Private -> Printf.ksprintf oc " #apriv"
   end;
   print_if_no_empty oc base "#occu" (get_occupation p);
   print_src_if_not_equal_to csrc oc base "#src" (get_psources p);
   begin match Adef.od_of_cdate (get_birth p) with
-      Some d -> Printf.fprintf oc " "; print_date oc d
-    | _ when zero_birth_is_required base is_child p -> Printf.fprintf oc " 0"
+      Some d -> Printf.ksprintf oc " "; print_date oc d
+    | _ when zero_birth_is_required base is_child p -> Printf.ksprintf oc " 0"
     | _ -> ()
   end;
   print_if_not_equal_to cbp oc base "#bp" (get_birth_place p);
   if !Gwexport.opts.source = None then
     print_if_no_empty oc base "#bs" (get_birth_src p);
   begin match Adef.od_of_cdate (get_baptism p) with
-      Some d -> Printf.fprintf oc " !"; print_date oc d
+      Some d -> Printf.ksprintf oc " !"; print_date oc d
     | _ -> ()
   end;
   print_if_no_empty oc base "#pp" (get_baptism_place p);
@@ -373,25 +373,25 @@ let print_infos oc base is_child csrc cbp p =
     print_if_no_empty oc base "#ps" (get_baptism_src p);
   begin match get_death p with
       Death (dr, d) ->
-      Printf.fprintf oc " ";
+      Printf.ksprintf oc " ";
       begin match dr with
-          Killed -> Printf.fprintf oc "k"
-        | Murdered -> Printf.fprintf oc "m"
-        | Executed -> Printf.fprintf oc "e"
-        | Disappeared -> Printf.fprintf oc "s"
+          Killed -> Printf.ksprintf oc "k"
+        | Murdered -> Printf.ksprintf oc "m"
+        | Executed -> Printf.ksprintf oc "e"
+        | Disappeared -> Printf.ksprintf oc "s"
         | _ -> ()
       end;
       print_date oc (Adef.date_of_cdate d)
-    | DeadYoung -> Printf.fprintf oc " mj"
-    | DeadDontKnowWhen -> Printf.fprintf oc " 0"
+    | DeadYoung -> Printf.ksprintf oc " mj"
+    | DeadDontKnowWhen -> Printf.ksprintf oc " 0"
     | DontKnowIfDead ->
       begin match
           Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p)
         with
-          Some _, _ | _, Some _ -> Printf.fprintf oc " ?"
+          Some _, _ | _, Some _ -> Printf.ksprintf oc " ?"
         | _ -> ()
       end
-    | OfCourseDead -> Printf.fprintf oc " od"
+    | OfCourseDead -> Printf.ksprintf oc " od"
     | NotDead -> ()
   end;
   print_if_no_empty oc base "#dp" (get_death_place p);
@@ -500,30 +500,30 @@ let print_parent oc base gen p =
   let has_infos = if pr then has_infos base p else false in
   let first_name = sou base (get_first_name p) in
   let surname = sou base (get_surname p) in
-  Printf.fprintf oc "%s %s%s" (s_correct_string surname)
+  Printf.ksprintf oc "%s %s%s" (s_correct_string surname)
     (s_correct_string first_name)
     (if first_name = "?" && surname = "?" then ""
      else if get_new_occ p = 0 then ""
      else "." ^ string_of_int (get_new_occ p));
   if pr then
     if has_infos then print_infos oc base false "" "" p
-    else if first_name <> "?" && surname <> "?" then Printf.fprintf oc " 0"
+    else if first_name <> "?" && surname <> "?" then Printf.ksprintf oc " 0"
 
 let print_child oc base fam_surname csrc cbp p =
-  Printf.fprintf oc "-";
+  Printf.ksprintf oc "-";
   begin match get_sex p with
-      Male -> Printf.fprintf oc " h"
-    | Female -> Printf.fprintf oc " f"
+      Male -> Printf.ksprintf oc " h"
+    | Female -> Printf.ksprintf oc " f"
     | _ -> ()
   end;
-  Printf.fprintf oc " %s" (s_correct_string (sou base (get_first_name p)));
+  Printf.ksprintf oc " %s" (s_correct_string (sou base (get_first_name p)));
   if p_first_name base p = "?" && p_surname base p = "?" then ()
   else if get_new_occ p = 0 then ()
-  else Printf.fprintf oc ".%d" (get_new_occ p);
+  else Printf.ksprintf oc ".%d" (get_new_occ p);
   if not (eq_istr (get_surname p) fam_surname) then
-    Printf.fprintf oc " %s" (s_correct_string_nonum (sou base (get_surname p)));
+    Printf.ksprintf oc " %s" (s_correct_string_nonum (sou base (get_surname p)));
   print_infos oc base true csrc cbp p;
-  Printf.fprintf oc "\n"
+  Printf.ksprintf oc "\n"
 
 let bogus_person base p =
   p_first_name base p = "?" && p_surname base p = "?"
@@ -558,7 +558,7 @@ let empty_family base m =
   Array.for_all (bogus_person base) m.m_chil
 
 let print_witness oc base gen p =
-  Printf.fprintf oc "%s %s%s" (correct_string base (get_surname p))
+  Printf.ksprintf oc "%s %s%s" (correct_string base (get_surname p))
     (correct_string base (get_first_name p))
     (if get_new_occ p = 0 then ""
      else "." ^ string_of_int (get_new_occ p));
@@ -568,7 +568,7 @@ let print_witness oc base gen p =
     begin
       Gwdb.Marker.set gen.mark (get_iper p) true;
       if has_infos base p then print_infos oc base false "" "" p
-      else Printf.fprintf oc " 0";
+      else Printf.ksprintf oc " 0";
       begin match sou base (get_notes p) with
           "" ->
           if put_events_in_notes base p then
@@ -581,59 +581,59 @@ let print_witness oc base gen p =
 
 let print_pevent oc base gen e =
   begin match e.epers_name with
-      Epers_Birth -> Printf.fprintf oc "#birt"
-    | Epers_Baptism -> Printf.fprintf oc "#bapt"
-    | Epers_Death -> Printf.fprintf oc "#deat"
-    | Epers_Burial -> Printf.fprintf oc "#buri"
-    | Epers_Cremation -> Printf.fprintf oc "#crem"
-    | Epers_Accomplishment -> Printf.fprintf oc "#acco"
-    | Epers_Acquisition -> Printf.fprintf oc "#acqu"
-    | Epers_Adhesion -> Printf.fprintf oc "#adhe"
-    | Epers_BaptismLDS -> Printf.fprintf oc "#bapl"
-    | Epers_BarMitzvah -> Printf.fprintf oc "#barm"
-    | Epers_BatMitzvah -> Printf.fprintf oc "#basm"
-    | Epers_Benediction -> Printf.fprintf oc "#bles"
-    | Epers_ChangeName -> Printf.fprintf oc "#chgn"
-    | Epers_Circumcision -> Printf.fprintf oc "#circ"
-    | Epers_Confirmation -> Printf.fprintf oc "#conf"
-    | Epers_ConfirmationLDS -> Printf.fprintf oc "#conl"
-    | Epers_Decoration -> Printf.fprintf oc "#awar"
-    | Epers_DemobilisationMilitaire -> Printf.fprintf oc "#demm"
-    | Epers_Diploma -> Printf.fprintf oc "#degr"
-    | Epers_Distinction -> Printf.fprintf oc "#dist"
-    | Epers_Dotation -> Printf.fprintf oc "#endl"
-    | Epers_DotationLDS -> Printf.fprintf oc "#dotl"
-    | Epers_Education -> Printf.fprintf oc "#educ"
-    | Epers_Election -> Printf.fprintf oc "#elec"
-    | Epers_Emigration -> Printf.fprintf oc "#emig"
-    | Epers_Excommunication -> Printf.fprintf oc "#exco"
-    | Epers_FamilyLinkLDS -> Printf.fprintf oc "#flkl"
-    | Epers_FirstCommunion -> Printf.fprintf oc "#fcom"
-    | Epers_Funeral -> Printf.fprintf oc "#fune"
-    | Epers_Graduate -> Printf.fprintf oc "#grad"
-    | Epers_Hospitalisation -> Printf.fprintf oc "#hosp"
-    | Epers_Illness -> Printf.fprintf oc "#illn"
-    | Epers_Immigration -> Printf.fprintf oc "#immi"
-    | Epers_ListePassenger -> Printf.fprintf oc "#lpas"
-    | Epers_MilitaryDistinction -> Printf.fprintf oc "#mdis"
-    | Epers_MilitaryPromotion -> Printf.fprintf oc "#mpro"
-    | Epers_MilitaryService -> Printf.fprintf oc "#mser"
-    | Epers_MobilisationMilitaire -> Printf.fprintf oc "#mobm"
-    | Epers_Naturalisation -> Printf.fprintf oc "#natu"
-    | Epers_Occupation -> Printf.fprintf oc "#occu"
-    | Epers_Ordination -> Printf.fprintf oc "#ordn"
-    | Epers_Property -> Printf.fprintf oc "#prop"
-    | Epers_Recensement -> Printf.fprintf oc "#cens"
-    | Epers_Residence -> Printf.fprintf oc "#resi"
-    | Epers_Retired -> Printf.fprintf oc "#reti"
-    | Epers_ScellentChildLDS -> Printf.fprintf oc "#slgc"
-    | Epers_ScellentParentLDS -> Printf.fprintf oc "#slgp"
-    | Epers_ScellentSpouseLDS -> Printf.fprintf oc "#slgs"
-    | Epers_VenteBien -> Printf.fprintf oc "#vteb"
-    | Epers_Will -> Printf.fprintf oc "#will"
-    | Epers_Name s -> Printf.fprintf oc "#%s" (correct_string base s)
+      Epers_Birth -> Printf.ksprintf oc "#birt"
+    | Epers_Baptism -> Printf.ksprintf oc "#bapt"
+    | Epers_Death -> Printf.ksprintf oc "#deat"
+    | Epers_Burial -> Printf.ksprintf oc "#buri"
+    | Epers_Cremation -> Printf.ksprintf oc "#crem"
+    | Epers_Accomplishment -> Printf.ksprintf oc "#acco"
+    | Epers_Acquisition -> Printf.ksprintf oc "#acqu"
+    | Epers_Adhesion -> Printf.ksprintf oc "#adhe"
+    | Epers_BaptismLDS -> Printf.ksprintf oc "#bapl"
+    | Epers_BarMitzvah -> Printf.ksprintf oc "#barm"
+    | Epers_BatMitzvah -> Printf.ksprintf oc "#basm"
+    | Epers_Benediction -> Printf.ksprintf oc "#bles"
+    | Epers_ChangeName -> Printf.ksprintf oc "#chgn"
+    | Epers_Circumcision -> Printf.ksprintf oc "#circ"
+    | Epers_Confirmation -> Printf.ksprintf oc "#conf"
+    | Epers_ConfirmationLDS -> Printf.ksprintf oc "#conl"
+    | Epers_Decoration -> Printf.ksprintf oc "#awar"
+    | Epers_DemobilisationMilitaire -> Printf.ksprintf oc "#demm"
+    | Epers_Diploma -> Printf.ksprintf oc "#degr"
+    | Epers_Distinction -> Printf.ksprintf oc "#dist"
+    | Epers_Dotation -> Printf.ksprintf oc "#endl"
+    | Epers_DotationLDS -> Printf.ksprintf oc "#dotl"
+    | Epers_Education -> Printf.ksprintf oc "#educ"
+    | Epers_Election -> Printf.ksprintf oc "#elec"
+    | Epers_Emigration -> Printf.ksprintf oc "#emig"
+    | Epers_Excommunication -> Printf.ksprintf oc "#exco"
+    | Epers_FamilyLinkLDS -> Printf.ksprintf oc "#flkl"
+    | Epers_FirstCommunion -> Printf.ksprintf oc "#fcom"
+    | Epers_Funeral -> Printf.ksprintf oc "#fune"
+    | Epers_Graduate -> Printf.ksprintf oc "#grad"
+    | Epers_Hospitalisation -> Printf.ksprintf oc "#hosp"
+    | Epers_Illness -> Printf.ksprintf oc "#illn"
+    | Epers_Immigration -> Printf.ksprintf oc "#immi"
+    | Epers_ListePassenger -> Printf.ksprintf oc "#lpas"
+    | Epers_MilitaryDistinction -> Printf.ksprintf oc "#mdis"
+    | Epers_MilitaryPromotion -> Printf.ksprintf oc "#mpro"
+    | Epers_MilitaryService -> Printf.ksprintf oc "#mser"
+    | Epers_MobilisationMilitaire -> Printf.ksprintf oc "#mobm"
+    | Epers_Naturalisation -> Printf.ksprintf oc "#natu"
+    | Epers_Occupation -> Printf.ksprintf oc "#occu"
+    | Epers_Ordination -> Printf.ksprintf oc "#ordn"
+    | Epers_Property -> Printf.ksprintf oc "#prop"
+    | Epers_Recensement -> Printf.ksprintf oc "#cens"
+    | Epers_Residence -> Printf.ksprintf oc "#resi"
+    | Epers_Retired -> Printf.ksprintf oc "#reti"
+    | Epers_ScellentChildLDS -> Printf.ksprintf oc "#slgc"
+    | Epers_ScellentParentLDS -> Printf.ksprintf oc "#slgp"
+    | Epers_ScellentSpouseLDS -> Printf.ksprintf oc "#slgs"
+    | Epers_VenteBien -> Printf.ksprintf oc "#vteb"
+    | Epers_Will -> Printf.ksprintf oc "#will"
+    | Epers_Name s -> Printf.ksprintf oc "#%s" (correct_string base s)
   end;
-  Printf.fprintf oc " ";
+  Printf.ksprintf oc " ";
   let epers_date = Adef.od_of_cdate e.epers_date in
   print_date_option oc epers_date;
   print_if_no_empty oc base "#p" e.epers_place;
@@ -641,28 +641,28 @@ let print_pevent oc base gen e =
   (*print_if_no_empty oc base "#c" e.epers_cause;*)
   if !Gwexport.opts.source = None then
     print_if_no_empty oc base "#s" e.epers_src;
-  Printf.fprintf oc "\n";
+  Printf.ksprintf oc "\n";
   Array.iter
     (fun (ip, wk) ->
        if gen.per_sel ip then
          let p = poi base ip in
-         Printf.fprintf oc "wit";
+         Printf.ksprintf oc "wit";
          begin match get_sex p with
-             Male -> Printf.fprintf oc " m"
-           | Female -> Printf.fprintf oc " f"
+             Male -> Printf.ksprintf oc " m"
+           | Female -> Printf.ksprintf oc " f"
            | _ -> ()
          end;
-         Printf.fprintf oc ": ";
+         Printf.ksprintf oc ": ";
          begin match wk with
-             Witness_GodParent -> Printf.fprintf oc "#godp "
+             Witness_GodParent -> Printf.ksprintf oc "#godp "
            | _ -> ()
          end;
          print_witness oc base gen p;
-         Printf.fprintf oc "\n")
+         Printf.ksprintf oc "\n")
     e.epers_witnesses;
   let note = sou base e.epers_note in
   if note <> "" then
-    List.iter (fun line -> Printf.fprintf oc "note %s\n" line)
+    List.iter (fun line -> Printf.ksprintf oc "note %s\n" line)
       (lines_list_of_string note)
 
 let get_persons_with_pevents m list =
@@ -688,12 +688,12 @@ let print_pevents_for_person oc base gen p =
   let fnam = s_correct_string (p_first_name base p) in
   if pevents <> [] && surn <> "?" && fnam <> "?" then
     begin
-      Printf.fprintf oc "\n";
-      Printf.fprintf oc "pevt %s %s%s\n" surn fnam
+      Printf.ksprintf oc "\n";
+      Printf.ksprintf oc "pevt %s %s%s\n" surn fnam
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
       List.iter (print_pevent oc base gen) pevents;
-      Printf.fprintf oc "end pevt\n"
+      Printf.ksprintf oc "end pevt\n"
     end
 
 let rec list_memf f x =
@@ -721,24 +721,24 @@ let print_pevents oc base gen ml =
 
 let print_fevent oc base gen in_comment e =
   let print_sep () =
-    if not in_comment then Printf.fprintf oc "\n" else Printf.fprintf oc " "
+    if not in_comment then Printf.ksprintf oc "\n" else Printf.ksprintf oc " "
   in
   begin match e.efam_name with
-      Efam_Marriage -> Printf.fprintf oc "#marr"
-    | Efam_NoMarriage -> Printf.fprintf oc "#nmar"
-    | Efam_NoMention -> Printf.fprintf oc "#nmen"
-    | Efam_Engage -> Printf.fprintf oc "#enga"
-    | Efam_Divorce -> Printf.fprintf oc "#div"
-    | Efam_Separated -> Printf.fprintf oc "#sep"
-    | Efam_Annulation -> Printf.fprintf oc "#anul"
-    | Efam_MarriageBann -> Printf.fprintf oc "#marb"
-    | Efam_MarriageContract -> Printf.fprintf oc "#marc"
-    | Efam_MarriageLicense -> Printf.fprintf oc "#marl"
-    | Efam_PACS -> Printf.fprintf oc "#pacs"
-    | Efam_Residence -> Printf.fprintf oc "#resi"
-    | Efam_Name n -> Printf.fprintf oc "#%s" (correct_string base n)
+      Efam_Marriage -> Printf.ksprintf oc "#marr"
+    | Efam_NoMarriage -> Printf.ksprintf oc "#nmar"
+    | Efam_NoMention -> Printf.ksprintf oc "#nmen"
+    | Efam_Engage -> Printf.ksprintf oc "#enga"
+    | Efam_Divorce -> Printf.ksprintf oc "#div"
+    | Efam_Separated -> Printf.ksprintf oc "#sep"
+    | Efam_Annulation -> Printf.ksprintf oc "#anul"
+    | Efam_MarriageBann -> Printf.ksprintf oc "#marb"
+    | Efam_MarriageContract -> Printf.ksprintf oc "#marc"
+    | Efam_MarriageLicense -> Printf.ksprintf oc "#marl"
+    | Efam_PACS -> Printf.ksprintf oc "#pacs"
+    | Efam_Residence -> Printf.ksprintf oc "#resi"
+    | Efam_Name n -> Printf.ksprintf oc "#%s" (correct_string base n)
   end;
-  Printf.fprintf oc " ";
+  Printf.ksprintf oc " ";
   let efam_date = Adef.od_of_cdate e.efam_date in
   print_date_option oc efam_date;
   print_if_no_empty oc base "#p" e.efam_place;
@@ -750,15 +750,15 @@ let print_fevent oc base gen in_comment e =
     (fun (ip, wk) ->
        if gen.per_sel ip then
          let p = poi base ip in
-         Printf.fprintf oc "wit";
+         Printf.ksprintf oc "wit";
          begin match get_sex p with
-             Male -> Printf.fprintf oc " m"
-           | Female -> Printf.fprintf oc " f"
+             Male -> Printf.ksprintf oc " m"
+           | Female -> Printf.ksprintf oc " f"
            | _ -> ()
          end;
-         Printf.fprintf oc ": ";
+         Printf.ksprintf oc ": ";
          begin match wk with
-             Witness_GodParent -> Printf.fprintf oc "#godp "
+             Witness_GodParent -> Printf.ksprintf oc "#godp "
            | _ -> ()
          end;
          print_witness oc base gen p;
@@ -766,7 +766,7 @@ let print_fevent oc base gen in_comment e =
     e.efam_witnesses;
   let note = sou base e.efam_note in
   if note <> "" then
-    List.iter (fun line -> Printf.fprintf oc "note %s" line; print_sep ())
+    List.iter (fun line -> Printf.ksprintf oc "note %s" line; print_sep ())
       (lines_list_of_string note)
 
 let print_comment_for_family oc base gen fam =
@@ -788,32 +788,32 @@ let print_comment_for_family oc base gen fam =
   in
   if comm <> "" || has_evt then
     begin
-      Printf.fprintf oc "comm";
-      if comm <> "" then Printf.fprintf oc " %s" (no_newlines comm);
+      Printf.ksprintf oc "comm";
+      if comm <> "" then Printf.ksprintf oc " %s" (no_newlines comm);
       if !old_gw then
         begin
           if sou base (get_marriage_note fam) <> "" then
-            Printf.fprintf oc " marriage: %s"
+            Printf.ksprintf oc " marriage: %s"
               (no_newlines (sou base (get_marriage_note fam)));
           List.iter
-            (fun e -> Printf.fprintf oc " "; print_fevent oc base gen true e)
+            (fun e -> Printf.ksprintf oc " "; print_fevent oc base gen true e)
             fevents
         end;
-      Printf.fprintf oc "\n"
+      Printf.ksprintf oc "\n"
     end
 
 let print_empty_family oc base p =
   let string_quest = Gwdb.insert_string base "?" in
-  Printf.fprintf oc "fam ? ?.0 + #noment ? ?.0\n";
-  Printf.fprintf oc "beg\n";
+  Printf.ksprintf oc "fam ? ?.0 + #noment ? ?.0\n";
+  Printf.ksprintf oc "beg\n";
   print_child oc base string_quest "" "" p;
-  Printf.fprintf oc "end\n"
+  Printf.ksprintf oc "end\n"
 
 let print_family oc base gen m =
   let fam = m.m_fam in
-  Printf.fprintf oc "fam ";
+  Printf.ksprintf oc "fam ";
   print_parent oc base gen m.m_fath;
-  Printf.fprintf oc " +";
+  Printf.ksprintf oc " +";
   print_date_option oc (Adef.od_of_cdate (get_marriage fam));
   let print_sexes s =
     let c x =
@@ -822,12 +822,12 @@ let print_family oc base gen m =
       | Female -> 'f'
       | Neuter -> '?'
     in
-    Printf.fprintf oc " %s %c%c" s (c m.m_fath) (c m.m_moth)
+    Printf.ksprintf oc " %s %c%c" s (c m.m_fath) (c m.m_moth)
   in
   begin match get_relation fam with
     | Married -> ()
-    | NotMarried -> Printf.fprintf oc " #nm"
-    | Engaged -> Printf.fprintf oc " #eng"
+    | NotMarried -> Printf.ksprintf oc " #nm"
+    | Engaged -> Printf.ksprintf oc " #eng"
     | NoSexesCheckNotMarried -> print_sexes "#nsck" ;
     | NoSexesCheckMarried -> print_sexes "#nsckm" ;
     | NoMention -> print_sexes "#noment"
@@ -842,61 +842,61 @@ let print_family oc base gen m =
     print_if_no_empty oc base "#ms" (get_marriage_src fam);
   begin match get_divorce fam with
       NotDivorced -> ()
-    | Separated -> Printf.fprintf oc " #sep"
+    | Separated -> Printf.ksprintf oc " #sep"
     | Divorced d ->
       let d = Adef.od_of_cdate d in
-      Printf.fprintf oc " -"; print_date_option oc d
+      Printf.ksprintf oc " -"; print_date_option oc d
   end;
-  Printf.fprintf oc " ";
+  Printf.ksprintf oc " ";
   print_parent oc base gen m.m_moth;
-  Printf.fprintf oc "\n";
+  Printf.ksprintf oc "\n";
   Array.iter
     (fun ip ->
        if gen.per_sel ip then
          let p = poi base ip in
-         Printf.fprintf oc "wit";
+         Printf.ksprintf oc "wit";
          begin match get_sex p with
-             Male -> Printf.fprintf oc " m"
-           | Female -> Printf.fprintf oc " f"
+             Male -> Printf.ksprintf oc " m"
+           | Female -> Printf.ksprintf oc " f"
            | _ -> ()
          end;
-         Printf.fprintf oc ": ";
+         Printf.ksprintf oc ": ";
          print_witness oc base gen p;
-         Printf.fprintf oc "\n")
+         Printf.ksprintf oc "\n")
     (get_witnesses fam);
   (match !Gwexport.opts.source with
    | None ->
      if sou base (get_fsources fam) <> ""
-     then Printf.fprintf oc "src %s\n" (correct_string base (get_fsources fam));
-   | Some x -> Printf.fprintf oc "src %s\n" (s_correct_string x) ) ;
+     then Printf.ksprintf oc "src %s\n" (correct_string base (get_fsources fam));
+   | Some x -> Printf.ksprintf oc "src %s\n" (s_correct_string x) ) ;
   let csrc =
     match common_children_sources base m.m_chil with
-      Some s -> Printf.fprintf oc "csrc %s\n" (s_correct_string s); s
+      Some s -> Printf.ksprintf oc "csrc %s\n" (s_correct_string s); s
     | _ -> ""
   in
   let cbp =
     match common_children_birth_place base m.m_chil with
-      Some s -> Printf.fprintf oc "cbp %s\n" (s_correct_string s); s
+      Some s -> Printf.ksprintf oc "cbp %s\n" (s_correct_string s); s
     | _ -> ""
   in
   print_comment_for_family oc base gen fam;
   if not !old_gw && get_fevents fam <> [] then
     begin
-      Printf.fprintf oc "fevt\n";
+      Printf.ksprintf oc "fevt\n";
       List.iter (print_fevent oc base gen false) (get_fevents fam);
-      Printf.fprintf oc "end fevt\n"
+      Printf.ksprintf oc "end fevt\n"
     end;
   begin match Array.length m.m_chil with
       0 -> ()
     | _ ->
       let fam_surname = get_surname m.m_fath in
-      Printf.fprintf oc "beg\n";
+      Printf.ksprintf oc "beg\n";
       Array.iter
         (fun p ->
            if gen.per_sel (get_iper p) then
              print_child oc base fam_surname csrc cbp p)
         m.m_chil;
-      Printf.fprintf oc "end\n"
+      Printf.ksprintf oc "end\n"
   end;
   Gwdb.Marker.set gen.fam_done m.m_ifam true ;
   let f _ =
@@ -975,19 +975,19 @@ let print_notes_for_person oc base gen p =
     Array.iter
       (fun (ip, wk) ->
          let p = poi base ip in
-         Printf.fprintf oc "wit";
+         Printf.ksprintf oc "wit";
          begin match get_sex p with
-             Male -> Printf.fprintf oc " m"
-           | Female -> Printf.fprintf oc " f"
+             Male -> Printf.ksprintf oc " m"
+           | Female -> Printf.ksprintf oc " f"
            | _ -> ()
          end;
-         Printf.fprintf oc ": ";
+         Printf.ksprintf oc ": ";
          begin match wk with
-             Witness_GodParent -> Printf.fprintf oc "#godp "
+             Witness_GodParent -> Printf.ksprintf oc "#godp "
            | _ -> ()
          end;
          print_witness oc base gen p;
-         Printf.fprintf oc "\n")
+         Printf.ksprintf oc "\n")
       witnesses
   in
   let notes = sou base (get_notes p) in
@@ -998,12 +998,12 @@ let print_notes_for_person oc base gen p =
      fnam <> "?"
   then
     begin
-      Printf.fprintf oc "\n";
-      Printf.fprintf oc "notes %s %s%s\n" surn fnam
+      Printf.ksprintf oc "\n";
+      Printf.ksprintf oc "notes %s %s%s\n" surn fnam
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
-      Printf.fprintf oc "beg\n";
-      if notes <> "" then Printf.fprintf oc "%s\n" notes;
+      Printf.ksprintf oc "beg\n";
+      if notes <> "" then Printf.ksprintf oc "%s\n" notes;
       if put_events_in_notes base p then
         begin let rec loop pevents =
                 match pevents with
@@ -1022,14 +1022,14 @@ let print_notes_for_person oc base gen p =
                       | _ -> ""
                     in
                     let notes = sou base evt.epers_note in
-                    if notes <> "" then Printf.fprintf oc "%s: %s\n" name notes;
+                    if notes <> "" then Printf.ksprintf oc "%s: %s\n" name notes;
                     print_witness_in_notes evt.epers_witnesses;
                     loop events
                   | _ -> print_pevent oc base gen evt; loop events
           in
           loop (get_pevents p)
         end;
-      Printf.fprintf oc "end notes\n"
+      Printf.ksprintf oc "end notes\n"
     end;
   let f _ =
     Printf.sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
@@ -1143,7 +1143,7 @@ let get_persons_with_relations base m list =
     m.m_chil list
 
 let print_relation_parent oc base mark defined_p p =
-  Printf.fprintf oc "%s %s%s" (correct_string base (get_surname p))
+  Printf.ksprintf oc "%s %s%s" (correct_string base (get_surname p))
     (correct_string base (get_first_name p))
     (if get_new_occ p = 0 then ""
      else "." ^ string_of_int (get_new_occ p));
@@ -1153,7 +1153,7 @@ let print_relation_parent oc base mark defined_p p =
     begin
       Gwdb.Marker.set mark (get_iper p) true ;
       if has_infos base p then print_infos oc base false "" "" p
-      else Printf.fprintf oc " 0";
+      else Printf.ksprintf oc " 0";
       defined_p := p :: !defined_p
     end
 
@@ -1190,18 +1190,18 @@ let print_relation_for_person oc base gen def_p r =
     | _ -> false
   in
   let print_err_one_relation p =
-    Printf.fprintf oc "- ";
+    Printf.ksprintf oc "- ";
     begin match r.r_type with
-        Adoption -> Printf.fprintf oc "adop"
-      | Recognition -> Printf.fprintf oc "reco"
-      | CandidateParent -> Printf.fprintf oc "cand"
-      | GodParent -> Printf.fprintf oc "godp"
-      | FosterParent -> Printf.fprintf oc "fost"
+        Adoption -> Printf.ksprintf oc "adop"
+      | Recognition -> Printf.ksprintf oc "reco"
+      | CandidateParent -> Printf.ksprintf oc "cand"
+      | GodParent -> Printf.ksprintf oc "godp"
+      | FosterParent -> Printf.ksprintf oc "fost"
     end;
-    if get_sex p = Male then Printf.fprintf oc " fath" else Printf.fprintf oc " moth";
-    Printf.fprintf oc ": ";
+    if get_sex p = Male then Printf.ksprintf oc " fath" else Printf.ksprintf oc " moth";
+    Printf.ksprintf oc ": ";
     print_relation_parent oc base gen.mark def_p p;
-    Printf.fprintf oc "\n"
+    Printf.ksprintf oc "\n"
   in
   match fath, moth with
     None, None -> ()
@@ -1213,24 +1213,24 @@ let print_relation_for_person oc base gen def_p r =
       | _ -> ()
     else
       begin
-        Printf.fprintf oc "- ";
+        Printf.ksprintf oc "- ";
         begin match r.r_type with
-            Adoption -> Printf.fprintf oc "adop"
-          | Recognition -> Printf.fprintf oc "reco"
-          | CandidateParent -> Printf.fprintf oc "cand"
-          | GodParent -> Printf.fprintf oc "godp"
-          | FosterParent -> Printf.fprintf oc "fost"
+            Adoption -> Printf.ksprintf oc "adop"
+          | Recognition -> Printf.ksprintf oc "reco"
+          | CandidateParent -> Printf.ksprintf oc "cand"
+          | GodParent -> Printf.ksprintf oc "godp"
+          | FosterParent -> Printf.ksprintf oc "fost"
         end;
         begin match fath, moth with
             Some fath, None ->
-            if get_sex fath = Male then Printf.fprintf oc " fath"
-            else Printf.fprintf oc " moth"
+            if get_sex fath = Male then Printf.ksprintf oc " fath"
+            else Printf.ksprintf oc " moth"
           | None, Some moth ->
-            if get_sex moth = Female then Printf.fprintf oc " moth"
-            else Printf.fprintf oc " fath"
+            if get_sex moth = Female then Printf.ksprintf oc " moth"
+            else Printf.ksprintf oc " fath"
           | _ -> ()
         end;
-        Printf.fprintf oc ": ";
+        Printf.ksprintf oc ": ";
         begin match fath, moth with
             Some fath, None ->
             print_relation_parent oc base gen.mark def_p fath
@@ -1240,18 +1240,18 @@ let print_relation_for_person oc base gen def_p r =
             if get_sex fath = Male && get_sex moth = Female then
               begin
                 print_relation_parent oc base gen.mark def_p fath;
-                Printf.fprintf oc " + ";
+                Printf.ksprintf oc " + ";
                 print_relation_parent oc base gen.mark def_p moth
               end
             else
               begin
                 print_relation_parent oc base gen.mark def_p moth;
-                Printf.fprintf oc " + ";
+                Printf.ksprintf oc " + ";
                 print_relation_parent oc base gen.mark def_p fath
               end
           | _ -> ()
         end;
-        Printf.fprintf oc "\n"
+        Printf.ksprintf oc "\n"
       end
 
 let print_relations_for_person oc base gen def_p is_definition p =
@@ -1272,8 +1272,8 @@ let print_relations_for_person oc base gen def_p is_definition p =
   then
     begin
       Gwdb.Marker.set gen.mark_rel (get_iper p) true;
-      Printf.fprintf oc "\n";
-      Printf.fprintf oc "rel %s %s%s" surn fnam
+      Printf.ksprintf oc "\n";
+      Printf.ksprintf oc "rel %s %s%s" surn fnam
         (if get_new_occ p = 0 then ""
          else "." ^ string_of_int (get_new_occ p));
       if is_definition then
@@ -1281,17 +1281,17 @@ let print_relations_for_person oc base gen def_p is_definition p =
           Gwdb.Marker.set gen.mark (get_iper p) true;
           def_p := p :: !def_p;
           if has_infos base p then print_infos oc base false "" "" p
-          else Printf.fprintf oc " 0";
+          else Printf.ksprintf oc " 0";
           match get_sex p with
-            Male -> Printf.fprintf oc " #h"
-          | Female -> Printf.fprintf oc " #f"
+            Male -> Printf.ksprintf oc " #h"
+          | Female -> Printf.ksprintf oc " #f"
           | Neuter -> ()
         end;
-      Printf.fprintf oc "\n";
-      Printf.fprintf oc "beg\n";
+      Printf.ksprintf oc "\n";
+      Printf.ksprintf oc "beg\n";
       List.iter (print_relation_for_person oc base gen def_p)
         (get_rparents p);
-      Printf.fprintf oc "end\n"
+      Printf.ksprintf oc "end\n"
     end
 
 let print_relations oc base gen ml =
@@ -1613,11 +1613,11 @@ let separate base =
 let rs_printf oc s =
   let rec loop bol i =
     if i = String.length s then ()
-    else if s.[i] = '\n' then begin Printf.fprintf oc "\n"; loop true (i + 1) end
+    else if s.[i] = '\n' then begin Printf.ksprintf oc "\n"; loop true (i + 1) end
     else
       begin
-        if bol then Printf.fprintf oc "  ";
-        Printf.fprintf oc "%c" s.[i];
+        if bol then Printf.ksprintf oc "  ";
+        Printf.ksprintf oc "%c" s.[i];
         loop false (i + 1)
       end
   in
@@ -1626,17 +1626,17 @@ let rs_printf oc s =
 let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   let to_separate = separate base in
   let out_oc_first = ref true in
-  let ofile, oc = opts.Gwexport.oc in
+  let ofile, oc, close = opts.Gwexport.oc in
   let origin_file fname =
-    if out_dir = "" then oc, out_oc_first
-    else if fname = "" then oc, out_oc_first
+    if out_dir = "" then oc, out_oc_first, close
+    else if fname = "" then oc, out_oc_first, close
     else
       try Hashtbl.find src_oc_ht fname with
         Not_found ->
         let oc = open_out (Filename.concat out_dir fname) in
-        let x = oc, ref true in
-        if !raw_output then () else Printf.fprintf oc "encoding: utf-8\n";
-        if !old_gw then Printf.fprintf oc "\n" else Printf.fprintf oc "gwplus\n\n";
+        let out, _, _ as x = output_string oc, ref true, fun () -> close_out oc in
+        if not !raw_output then out "encoding: utf-8\n";
+        if !old_gw then out "\n" else out "gwplus\n\n";
         Hashtbl.add src_oc_ht fname x;
         x
   in
@@ -1656,8 +1656,8 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     if not (Gwdb.Marker.get gen.fam_done ifam) then
       let fam = foi base ifam in
       let ifaml = connected_families base gen.fam_sel ifam fam in
-      let (oc, first) =
-        if to_separate ifam then oc, out_oc_first
+      let (oc, first, close) =
+        if to_separate ifam then oc, out_oc_first, close
         else origin_file (sou base (get_origin_file fam))
       in
       let ml =
@@ -1682,7 +1682,7 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         begin
           gen.notes_pl_p <- [];
           gen.pevents_pl_p <- [];
-          if not !first then Printf.fprintf oc "\n";
+          if not !first then Printf.ksprintf oc "\n";
           first := false;
           List.iter (print_family oc base gen) ml;
           print_notes oc base gen ml;
@@ -1730,10 +1730,10 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           then
             ()
           else
-            let (oc, _first) =
+            let (oc, _first, _) =
               origin_file (base_notes_origin_file base)
             in
-            Printf.fprintf oc "\n";
+            Printf.ksprintf oc "\n";
             print_empty_family oc base p;
             print_notes_for_person oc base gen p;
             Gwdb.Marker.set gen.mark i true;
@@ -1742,14 +1742,14 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   if !(Mutil.verbose) then ProgrBar.finish ();
   if not !Gwexport.opts.no_notes then
     let s = base_notes_read base "" in
-    let (oc, first) = origin_file (base_notes_origin_file base) in
+    let (oc, first, _) = origin_file (base_notes_origin_file base) in
     if s <> "" then
       begin
-        if not !first then Printf.fprintf oc "\n";
+        if not !first then Printf.ksprintf oc "\n";
         first := false;
-        Printf.fprintf oc "notes-db\n";
+        Printf.ksprintf oc "notes-db\n";
         rs_printf oc s;
-        Printf.fprintf oc "\nend notes-db\n";
+        Printf.ksprintf oc "\nend notes-db\n";
         ignore
           (add_linked_files gen (fun _ -> "database notes") s [] : _ list)
       end;
@@ -1800,14 +1800,14 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
          let s = String.trim (base_notes_read base fn) in
          if s <> "" then
            begin
-             if not !first then Printf.fprintf oc "\n";
+             if not !first then Printf.ksprintf oc "\n";
              first := false;
-             Printf.fprintf oc "# extended page \"%s\" used by:\n" f;
-             List.iter (fun f -> Printf.fprintf oc "#  - %s\n" f)
+             Printf.ksprintf oc "# extended page \"%s\" used by:\n" f;
+             List.iter (fun f -> Printf.ksprintf oc "#  - %s\n" f)
                (List.sort compare !r);
-             Printf.fprintf oc "page-ext %s\n" f;
+             Printf.ksprintf oc "page-ext %s\n" f;
              rs_printf oc s;
-             Printf.fprintf oc "\nend page-ext\n"
+             Printf.ksprintf oc "\nend page-ext\n"
            end)
       (List.sort compare gen.ext_files);
     try
@@ -1824,8 +1824,9 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
               [base_wiznotes_dir base; file]
           in
           let s = String.trim (read_file_contents wfile) in
-          Printf.fprintf oc "\nwizard-note %s\n" wizid;
+          Printf.ksprintf oc "\nwizard-note %s\n" wizid;
           rs_printf oc s;
-          Printf.fprintf oc "\nend wizard-note\n"
-      done
-    with Sys_error _ -> ()
+          Printf.ksprintf oc "\nend wizard-note\n"
+      done ;
+      close ()
+    with Sys_error _ -> close ()

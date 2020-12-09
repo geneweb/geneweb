@@ -89,7 +89,7 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
   let url =
     Printf.sprintf
       "http://%s:%d/%s?m=API_LINK_TREE&input=pb&output=pb&sig=azerty&data=%s"
-      conf.api_host conf.api_port base_prefix (Wserver.encode data)
+      conf.api_host conf.api_port base_prefix (Mutil.encode data)
   in
   let res = ref "" in
   Curl.global_init Curl.CURLINIT_GLOBALALL;
@@ -102,7 +102,7 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
       let headers =
         (* On ajoute dans les headers les informations pour l'auto-connection. *)
         (* Les droits wizard/friend suivront automatiquement.                  *)
-        let auth = Wserver.extract_param "authorization: " '\r' request in
+        let auth = Mutil.extract_param "authorization: " '\r' request in
         if auth <> "" then
           ("Authorization: " ^ auth) :: ("Gw-Connection-Type: auto") :: headers
         else headers
@@ -110,7 +110,7 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
       let headers =
         (* On ajoute dans les headers l'inclusion des not validated. *)
         let include_not_validated =
-          Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' request
+          Mutil.extract_param "inter-tree-links-include-not-validated: " '\r' request
         in
         if include_not_validated <> "" then
           ("Inter-Tree-Links-Include-Not-Validated: " ^ include_not_validated) :: headers

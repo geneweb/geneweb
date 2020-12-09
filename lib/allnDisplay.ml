@@ -41,17 +41,17 @@ let groupby_count = function
 let print_title conf base is_surnames ini len =
   if len >= 2 then
     if is_surnames then
-      Wserver.printf (fcapitale (ftransl conf "the %d surnames")) len
-    else Wserver.printf (fcapitale (ftransl conf "the %d first names")) len
+      Output.printf conf (fcapitale (ftransl conf "the %d surnames")) len
+    else Output.printf conf (fcapitale (ftransl conf "the %d first names")) len
   else if is_surnames then
-    Wserver.print_string (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
+    Output.print_string conf (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   else
-    Wserver.print_string
+    Output.print_string conf
       (Utf8.capitalize (transl_nth conf "first name/first names" 0));
   if ini <> "" then
-    Wserver.printf " %s %s" (transl conf "starting with") ini
+    Output.printf conf " %s %s" (transl conf "starting with") ini
   else
-    Wserver.printf " (%d %s)" (Gwdb.nb_of_real_persons base)
+    Output.printf conf " (%d %s)" (Gwdb.nb_of_real_persons base)
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
 
 let displayify s = s
@@ -77,40 +77,40 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   Hutil.header conf title;
-  Wserver.printf "<p class=\"search_name\">\n";
+  Output.printf conf "<p class=\"search_name\">\n";
   List.iter begin fun ini_k ->
     if ini_k = ini
     then
-      Wserver.printf "<a href=\"%sm=%s&tri=A&v=%s\">" (commd conf) mode
+      Output.printf conf "<a href=\"%sm=%s&tri=A&v=%s\">" (commd conf) mode
         (Util.code_varenv ini_k)
     else
-      Wserver.printf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
+      Output.printf conf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
         (Util.code_varenv ini_k);
-    Wserver.print_string (tr '_' "&nbsp;" (displayify ini_k));
-    Wserver.printf "</a>\n"
+    Output.print_string conf (tr '_' "&nbsp;" (displayify ini_k));
+    Output.printf conf "</a>\n"
   end list ;
   if not too_big then begin
-    Wserver.printf "</p>\n";
-    Wserver.printf "<p>";
-    Wserver.printf "%s:" (Utf8.capitalize (transl conf "the whole list"));
-    Wserver.printf "</p>\n" ;
-    Wserver.printf "<ul>\n";
-    Wserver.printf "<li>";
-    Wserver.printf "<a href=\"%sm=%s&tri=A&o=A&k=%s\">" (commd conf) mode ini;
-    Wserver.print_string (transl conf "long display");
-    Wserver.printf "</a>";
-    Wserver.printf "</li>\n";
-    Wserver.printf "<li>";
-    Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s\">" (commd conf) mode ini;
-    Wserver.print_string (transl conf "short display");
-    Wserver.printf "</a>";
-    Wserver.printf "</li>\n";
-    Wserver.printf "<li>";
-    Wserver.printf "<a href=\"%sm=%s&tri=S&o=A&k=%s&cgl=on\">" (commd conf) mode ini;
-    Wserver.printf "%s + %s" (transl conf "short display") (transl conf "cancel GeneWeb links");
-    Wserver.printf "</a>";
-    Wserver.printf "</li>\n";
-    Wserver.printf "</ul>\n" ;
+    Output.printf conf "</p>\n";
+    Output.printf conf "<p>";
+    Output.printf conf "%s:" (Utf8.capitalize (transl conf "the whole list"));
+    Output.printf conf "</p>\n" ;
+    Output.printf conf "<ul>\n";
+    Output.printf conf "<li>";
+    Output.printf conf "<a href=\"%sm=%s&tri=A&o=A&k=%s\">" (commd conf) mode ini;
+    Output.print_string conf (transl conf "long display");
+    Output.printf conf "</a>";
+    Output.printf conf "</li>\n";
+    Output.printf conf "<li>";
+    Output.printf conf "<a href=\"%sm=%s&tri=S&o=A&k=%s\">" (commd conf) mode ini;
+    Output.print_string conf (transl conf "short display");
+    Output.printf conf "</a>";
+    Output.printf conf "</li>\n";
+    Output.printf conf "<li>";
+    Output.printf conf "<a href=\"%sm=%s&tri=S&o=A&k=%s&cgl=on\">" (commd conf) mode ini;
+    Output.printf conf "%s + %s" (transl conf "short display") (transl conf "cancel GeneWeb links");
+    Output.printf conf "</a>";
+    Output.printf conf "</li>\n";
+    Output.printf conf "</ul>\n" ;
   end ;
   Hutil.trailer conf
 
@@ -118,40 +118,40 @@ let print_alphabetic_all conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   Hutil.header conf title;
-  Wserver.printf "<p class=\"search_name\">\n";
+  Output.printf conf "<p class=\"search_name\">\n";
   List.iter
     (fun (ini_k, _) ->
        let ini = ini_k in
-       Wserver.printf "<a href=\"#a%s\">" ini;
-       Wserver.print_string (Mutil.tr '_' ' ' ini);
-       Wserver.printf "</a>\n")
+       Output.printf conf "<a href=\"#a%s\">" ini;
+       Output.print_string conf (Mutil.tr '_' ' ' ini);
+       Output.printf conf "</a>\n")
     list;
-  Wserver.printf "</p>\n";
-  Wserver.printf "<ul>\n";
+  Output.printf conf "</p>\n";
+  Output.printf conf "<ul>\n";
   List.iter
     (fun (ini_k, l) ->
        let ini = ini_k in
-       Wserver.printf "<li>\n";
-       Wserver.printf "<a id=\"a%s\">" ini_k;
-       Wserver.print_string (Mutil.tr '_' ' ' ini);
-       Wserver.printf "</a>\n";
-       Wserver.printf "<ul>\n";
+       Output.printf conf "<li>\n";
+       Output.printf conf "<a id=\"a%s\">" ini_k;
+       Output.print_string conf (Mutil.tr '_' ' ' ini);
+       Output.printf conf "</a>\n";
+       Output.printf conf "<ul>\n";
        List.iter
          (fun (s, cnt) ->
-            Wserver.printf "<li>";
+            Output.printf conf "<li>";
             begin let href =
                     "m=" ^ mode ^ "&v=" ^ code_varenv s ^ "&t=A"
               in
               wprint_geneweb_link conf href
                 (particle_at_the_end base is_surnames s)
             end;
-            Wserver.printf " (%d)" cnt;
-            Wserver.printf "</li>\n")
+            Output.printf conf " (%d)" cnt;
+            Output.printf conf "</li>\n")
          (List.sort (fun (a, _) (b, _) -> compare_particle_at_the_end base is_surnames a b) l);
-       Wserver.printf "</ul>\n";
-       Wserver.printf "</li>\n")
+       Output.printf conf "</ul>\n";
+       Output.printf conf "</li>\n")
     list;
-  Wserver.printf "</ul>\n";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf
 
 let print_alphabetic_small conf base is_surnames ini list len =
@@ -161,19 +161,19 @@ let print_alphabetic_small conf base is_surnames ini list len =
   if list = [] then ()
   else
     begin
-      Wserver.printf "<ul>\n";
+      Output.printf conf "<ul>\n";
       List.iter
         (fun (_, s, cnt) ->
-           Wserver.printf "<li>";
-           Wserver.printf "<a href=\"%sm=%s&v=%s&t=A\">" (commd conf) mode
+           Output.printf conf "<li>";
+           Output.printf conf "<a href=\"%sm=%s&v=%s&t=A\">" (commd conf) mode
              (code_varenv s);
-           Wserver.print_string (particle_at_the_end base is_surnames s);
-           Wserver.printf "</a>";
-           Wserver.printf " (%d)" cnt;
-           Wserver.printf "</li>\n")
+           Output.print_string conf (particle_at_the_end base is_surnames s);
+           Output.printf conf "</a>";
+           Output.printf conf " (%d)" cnt;
+           Output.printf conf "</li>\n")
         (List.sort (fun (_, a, _) (_, b, _) ->
              compare_particle_at_the_end base is_surnames a b) list);
-      Wserver.printf "</ul>\n"
+      Output.printf conf "</ul>\n"
     end;
   Hutil.trailer conf
 
@@ -182,32 +182,32 @@ let print_frequency_any conf base is_surnames list len =
   let mode = if is_surnames then "N" else "P" in
   let n = ref 0 in
   Hutil.header conf title;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   List.iter
     (fun (cnt, l) ->
        if !n > default_max_cnt then ()
        else
          begin
-           Wserver.printf "<li>\n";
-           Wserver.printf "%d\n" cnt;
+           Output.printf conf "<li>\n";
+           Output.printf conf "%d\n" cnt;
            begin
-             Wserver.printf "<ul>\n";
+             Output.printf conf "<ul>\n";
              List.iter
                (fun s ->
-                  Wserver.printf "<li>";
-                  Wserver.printf "<a href=\"%sm=%s&v=%s\">" (commd conf) mode
+                  Output.printf conf "<li>";
+                  Output.printf conf "<a href=\"%sm=%s&v=%s\">" (commd conf) mode
                     (code_varenv (Name.lower s));
-                  Wserver.print_string (particle_at_the_end base is_surnames s);
-                  Wserver.printf "</a>";
+                  Output.print_string conf (particle_at_the_end base is_surnames s);
+                  Output.printf conf "</a>";
                   incr n;
-                  Wserver.printf "</li>\n")
+                  Output.printf conf "</li>\n")
                l;
-             Wserver.printf "</ul>\n"
+             Output.printf conf "</ul>\n"
            end;
-           Wserver.printf "</li>\n"
+           Output.printf conf "</li>\n"
          end)
     list;
-  Wserver.printf "</ul>\n";
+  Output.printf conf "</ul>\n";
   Hutil.trailer conf
 
 
@@ -260,40 +260,37 @@ let print_alphabetic_short conf base is_surnames ini list len =
   Hutil.header conf title;
   if need_ref then
     begin
-      Wserver.printf "<p>\n";
+      Output.printf conf "<p>\n";
       List.iter
         (fun (ini_k, _) ->
            let ini = ini_k in
-           Wserver.printf "<a href=\"#a%s\">" ini;
-           Wserver.print_string (Mutil.tr '_' ' ' ini);
-           Wserver.printf "</a>\n")
+           Output.printf conf "<a href=\"#a%s\">" ini;
+           Output.print_string conf (Mutil.tr '_' ' ' ini);
+           Output.printf conf "</a>\n")
         list;
-      Wserver.printf "</p>\n"
+      Output.printf conf "</p>\n"
     end;
   List.iter
     (fun (ini_k, l) ->
        let ini = ini_k in
-       Wserver.printf "<p>\n";
+       Output.printf conf "<p>\n";
        Mutil.list_iter_first
          (fun first (s, cnt) ->
             let href =
-              if not conf.cancel_links then
-                " href=\"" ^ commd conf ^ "m=" ^ mode ^ "&v=" ^
-                code_varenv s ^ "&t=A\""
-              else ""
+              " href=\"" ^ commd conf ^ "m=" ^ mode ^ "&v=" ^ code_varenv s ^ "&t=A\""
             in
             let name =
               if first && need_ref then " id=\"a" ^ ini ^ "\"" else ""
             in
-            if not first then Wserver.printf ",\n";
+            if not first then Output.printf conf ",\n";
             if href <> "" || name <> "" then
-              Wserver.printf "<a%s%s>" href name;
-            Wserver.print_string (particle_at_the_end base is_surnames s);
-            if href <> "" || name <> "" then Wserver.printf "</a>";
-            Wserver.printf " (%d)" cnt)
+              Output.printf conf "<a%s%s>" href name;
+            Output.print_string conf (particle_at_the_end base is_surnames s);
+            if href <> "" || name <> "" then Output.printf conf "</a>";
+            Output.printf conf " (%d)" cnt)
          (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);
-       Wserver.printf "\n";
-       Wserver.printf "</p>\n")
+       Output.printf conf "\n";
+       Output.printf conf "</p>\n")
     list;
   Hutil.trailer conf
 

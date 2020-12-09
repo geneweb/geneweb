@@ -215,3 +215,33 @@ val read_or_create
     Execute [fn], print stats about time and memory allocation, return [fn] result.
  *)
 val bench : string -> (unit -> 'a) -> 'a
+
+val print_callstack : ?max:int -> unit -> unit
+
+(** [encode s]
+    Encodes the string [s] in another string
+    where spaces and special characters are coded. This allows
+    to put such strings in html links <a href=...>. This is
+    the same encoding done by Web browsers in forms.
+*)
+val encode : string -> string
+
+(** [decode s]
+    Does the inverse job than [code],
+    restoring the initial string. The heading and trailing spaces
+    are stripped.
+*)
+val decode : string -> string
+
+(** Like above but heading and trailing spaces are stripped
+    only if bool parameter is [true]. [decode] = [gen_decode true].
+*)
+val gen_decode : bool -> string -> string
+
+(** [extract_param name stopc request] can be used to extract some
+    parameter from a browser [request] (list of strings); [name]
+    is a string which should match the beginning of a request line,
+    [stopc] is a character ending the request line. For example, the
+    string request has been obtained by: [extract_param "GET /" ' '].
+    Answers the empty string if the parameter is not found. *)
+val extract_param : string -> char -> string list -> string

@@ -49,52 +49,52 @@ let print_mod_ok conf base =
     begin
       update_person_list conf base new_input list nb_pers max_updates;
       let title _ =
-        Wserver.print_string (Utf8.capitalize (transl conf "modification successful"))
+        Output.print_string conf (Utf8.capitalize (transl conf "modification successful"))
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
-      Wserver.printf "<p>\n";
+      Output.printf conf "<p>\n";
       (* En attendant mieux ... *)
-      Wserver.printf "%s%s %d "
+      Output.printf conf "%s%s %d "
         (Utf8.capitalize (transl conf "modification successful"))
         (Util.transl conf ":")
         (min nb_pers max_updates);
       if p_getenv conf.base_env "history" = Some "yes" then
         begin
-          Wserver.printf "<a href=\"%sm=HIST&k=20\">" (commd conf);
-          Wserver.printf "%s."
+          Output.printf conf "<a href=\"%sm=HIST&k=20\">" (commd conf);
+          Output.printf conf "%s."
             (transl_nth conf "modification/modifications"
                (if nb_pers > 1 then 1 else 0));
-          Wserver.printf "</a>"
+          Output.printf conf "</a>"
         end
       else
-        Wserver.printf "%s."
+        Output.printf conf "%s."
           (transl_nth conf "modification/modifications"
              (if nb_pers > 1 then 1 else 0));
-      Wserver.printf "</p>\n";
+      Output.printf conf "</p>\n";
       if nb_pers > max_updates then begin
-        Wserver.printf {|<form method="post" action="%s"><p>|} conf.command ;
+        Output.printf conf {|<form method="post" action="%s"><p>|} conf.command ;
         Util.hidden_env conf;
-        Wserver.printf {|<input type="hidden" name="key" value="%s">|} (List.assoc "key" conf.env) ;
-        Wserver.printf {|<input type="hidden" name="m" value="MOD_DATA_OK">|} ;
-        Wserver.printf {|<input type="hidden" name="data" value="%s">|} data ;
-        Wserver.printf {|<input type="hidden" name="s" value="%s">|} ini ;
-        Wserver.printf {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="%s" id="data">|}
+        Output.printf conf {|<input type="hidden" name="key" value="%s">|} (List.assoc "key" conf.env) ;
+        Output.printf conf {|<input type="hidden" name="m" value="MOD_DATA_OK">|} ;
+        Output.printf conf {|<input type="hidden" name="data" value="%s">|} data ;
+        Output.printf conf {|<input type="hidden" name="s" value="%s">|} ini ;
+        Output.printf conf {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="%s" id="data">|}
           (Util.escape_html (only_printable new_input)) ;
-        Wserver.print_string (Utf8.capitalize (transl conf "continue correcting"));
-        Wserver.printf {|<button type="submit" class="btn btn-secondary btn-lg">|};
-        Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-        Wserver.printf "</button></p></form>" ;
+        Output.print_string conf (Utf8.capitalize (transl conf "continue correcting"));
+        Output.printf conf {|<button type="submit" class="btn btn-secondary btn-lg">|};
+        Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+        Output.printf conf "</button></p></form>" ;
       end ;
-      Wserver.printf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
+      Output.printf conf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
         (commd conf) data ini  (Utf8.capitalize (transl conf "new modification")) ;
       Hutil.trailer conf
     end
   else
-    let title _ = Wserver.print_string (Utf8.capitalize (transl conf "no modification")) in
+    let title _ = Output.print_string conf (Utf8.capitalize (transl conf "no modification")) in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
-    Wserver.printf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
+    Output.printf conf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
       (commd conf) data ini (Utf8.capitalize (transl conf "new modification")) ;
     Hutil.trailer conf
 

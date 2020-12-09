@@ -11,7 +11,7 @@ let render ~conf ~file ~models =
     ; strict_mode = true
     }
   in
-  let output x = Wserver.print_string @@ Jg_runtime.string_of_tvalue x in
+  let output x = Output.print_string conf @@ Jg_runtime.string_of_tvalue x in
   let ctx =
     let models = fun x -> List.assoc x models in
     Jg_interp.init_context ~env ~models ~output ()

@@ -24,7 +24,7 @@ let print_error conf code =
     let piqi_error = Mread.default_error() in
         piqi_error.Mread.Error.code <- code;
     let data = Mext_read.gen_error piqi_error in
-    Wserver.http Wserver.Bad_Request ;
+    Output.status conf Def.Bad_Request ;
     print_result conf data
 
 (**/**) (* Conversion de dates *)
@@ -294,13 +294,12 @@ let convert_wiki_notes_to_html_notes conf base env wiki_notes separator_string =
     let lines = Wiki.html_of_tlsw conf html_notes in
     let wi =
         {Wiki.wi_mode = "NOTES";
-        Wiki.wi_cancel_links = conf.cancel_links;
         Wiki.wi_file_path = Notes.file_path conf base;
         Wiki.wi_person_exists = person_exists conf base;
         Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     let html_notes = Wiki.syntax_links conf wi (String.concat separator_string lines) in
-    if conf.pure_xhtml then Util.check_xhtml html_notes else html_notes
+    html_notes
 
 (* ************************************************************************** *)
 (*  [Fonc] event_to_piqi_event : string -> event_type                         *)
@@ -689,7 +688,6 @@ let fam_to_piqi_family_link conf base (ifath : Gwdb.iper) imoth sp ifam fam fam_
       let s =
         let wi =
           {Wiki.wi_mode = "NOTES";
-           Wiki.wi_cancel_links = conf.cancel_links;
            Wiki.wi_file_path = Notes.file_path conf base;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -761,7 +759,6 @@ let fill_events conf base p base_prefix p_auth pers_to_piqi_callback witness_con
           let s =
             let wi =
               {Wiki.wi_mode = "NOTES";
-               Wiki.wi_cancel_links = conf.cancel_links;
                Wiki.wi_file_path = Notes.file_path conf base;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -957,7 +954,6 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
       let s =
         let wi =
           {Wiki.wi_mode = "NOTES";
-           Wiki.wi_cancel_links = conf.cancel_links;
            Wiki.wi_file_path = Notes.file_path conf base;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -1333,7 +1329,7 @@ let fill_occupation conf base p_auth gen_p =
         let s = gen_p.occupation in
         let s =
           let wi =
-            {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+            {Wiki.wi_mode = "NOTES";
              Wiki.wi_file_path = Notes.file_path conf base;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -1357,7 +1353,6 @@ let fill_sources conf base p p_auth gen_p is_main_person =
     let s =
       let wi =
         {Wiki.wi_mode = "NOTES";
-         Wiki.wi_cancel_links = conf.cancel_links;
          Wiki.wi_file_path = Notes.file_path conf base;
          Wiki.wi_person_exists = person_exists conf base;
          Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -1680,8 +1675,9 @@ let has_sources p_auth psources birth_src baptism_src death_src burial_src =
   else false
 
 let fill_titles conf base p =
-  let tmp_conf = {(conf) with cancel_links = true} in
-  List.map (Perso.string_of_title tmp_conf base "" p) (Perso.nobility_titles_list conf base p)
+  (* FIXME! *)
+  (* let tmp_conf = {(conf) with cancel_links = true} in *)
+  List.map (Perso.string_of_title conf base "" p) (Perso.nobility_titles_list conf base p)
 
 let transform_empty_string_to_None string =
   if string = "" then None else Some string
@@ -1743,8 +1739,9 @@ let fill_burial_type p_auth gen_p =
   else `dont_know
 
 let fill_titles_with_links conf base p =
-  let tmp_conf = {(conf) with cancel_links = false} in
-  List.map (Perso.string_of_title tmp_conf base "" p) (Perso.nobility_titles_list conf base p)
+  (* FIXME *)
+  (* let tmp_conf = {(conf) with cancel_links = false} in *)
+  List.map (Perso.string_of_title conf base "" p) (Perso.nobility_titles_list conf base p)
 
 let has_history_if_is_main_person conf base p p_auth is_main_person =
   if is_main_person then

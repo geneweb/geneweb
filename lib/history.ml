@@ -682,6 +682,6 @@ let search_text conf base s =
 let print_search conf base =
   if conf.wizard || conf.friend then
     match try Some (List.assoc "s" conf.env) with Not_found -> None with
-      Some s -> search_text conf base (Wserver.gen_decode false s)
+      Some s -> search_text conf base (Mutil.gen_decode false s)
     | None -> print conf base
   else print conf base

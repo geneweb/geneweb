@@ -257,7 +257,7 @@ let rec lexicon_translate conf base nomin strm first_c =
   if upp then Utf8.capitalize r else r
 
 let browser_cannot_handle_passwords conf =
-  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
   String.lowercase_ascii user_agent = "konqueror"
 
 let get_variable strm =
@@ -291,7 +291,7 @@ let rec copy_from_stream conf base strm mode =
     function
       'N' -> not (if_expr (Stream.next strm))
     | 'a' -> conf.auth_file <> ""
-    | 'c' -> !(Wserver.cgi) || browser_cannot_handle_passwords conf
+    | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
@@ -313,7 +313,7 @@ let rec copy_from_stream conf base strm mode =
     | '&' ->
         let a = if_expr (Stream.next strm) in
         let b = if_expr (Stream.next strm) in a && b
-    | c -> Wserver.printf "!!!!!%c!!!!!" c; true
+    | c -> Output.printf conf "!!!!!%c!!!!!" c; true
   in
   try
     while true do
@@ -338,7 +338,7 @@ let rec copy_from_stream conf base strm mode =
                 | _ -> loop (Stream.next strm)
               in
               loop c
-          | _ -> Wserver.printf "<%s%s%c" slash atag c
+          | _ -> Output.printf conf "<%s%s%c" slash atag c
           end
       | '%' ->
           let c = Stream.next strm in
@@ -346,8 +346,8 @@ let rec copy_from_stream conf base strm mode =
             'I' -> push_echo (!echo && if_expr (Stream.next strm))
           | 'E' -> pop_echo ()
           | _ when not !echo -> ()
-          | '%' -> Wserver.printf "%%"
-          | '[' | ']' -> Wserver.printf "%c" c
+          | '%' -> Output.printf conf "%%"
+          | '[' | ']' -> Output.printf conf "%c" c
           | 'h' -> hidden_env conf
           | 'j' -> Templ.include_hed_trl conf "hed"
           | 'P' -> let _ = Stream.next strm in ()
@@ -361,16 +361,16 @@ let rec copy_from_stream conf base strm mode =
                 loop 0
               in
               let lang_def = transl conf "!languages" in
-              Wserver.print_string (Translate.language_name lang lang_def)
+              Output.print_string conf (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =
                 try List.assoc (get_variable strm) conf.base_env with
                   Not_found -> ""
               in
               copy_from_string conf base txt mode
-          | c -> Wserver.print_string (macro conf base c)
+          | c -> Output.print_string conf (macro conf base c)
           end
-      | c -> if !echo then Wserver.printf "%c" c
+      | c -> if !echo then Output.printf conf "%c" c
     done
   with Stream.Failure -> ()
 and src_translate conf base nomin strm echo mode =
@@ -392,7 +392,7 @@ and src_translate conf base nomin strm echo mode =
     else copy_from_stream conf base (Stream.of_string s) mode
   else
     let s = lexicon_translate conf base nomin strm c in
-    if not !echo then () else Wserver.print_string s
+    if not !echo then () else Output.print_string conf s
 and copy_from_file conf base name mode =
   let fname =
     match mode with
@@ -401,7 +401,7 @@ and copy_from_file conf base name mode =
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic -> copy_from_channel conf base ic mode
-  | None -> Wserver.printf "<em>... file not found: \"%s.txt\"</em><br>" name
+  | None -> Output.printf conf "<em>... file not found: \"%s.txt\"</em><br>" name
 and copy_from_channel conf base ic mode =
   copy_from_stream conf base (Stream.of_channel ic) mode; close_in ic
 and copy_from_string conf base str mode =
@@ -423,14 +423,14 @@ let gen_print with_logo mode conf base fname =
   in
   match channel with
     Some ic ->
-      let title _ = Wserver.print_string fname in
+      let title _ = Output.print_string conf fname in
       Hutil.header_without_page_title conf title;
       copy_from_channel conf base ic mode;
       Hutil.gen_trailer with_logo conf
   | _ ->
-      let title _ = Wserver.printf "Error" in
+      let title _ = Output.printf conf "Error" in
       Hutil.header conf title;
-      Wserver.printf "<ul><li>Cannot access file \"%s.txt\"</ul>" fname;
+      Output.printf conf "<ul><li>Cannot access file \"%s.txt\"</ul>" fname;
       Hutil.gen_trailer with_logo conf;
       raise Exit
 

@@ -4,7 +4,7 @@
     [Args] :
       - fname : le nom du fichier image
     [Retour] : True si l'image a pu être affichée                           *)
-val print_image_file : string -> bool
+val print_image_file : Config.config -> string -> bool
 
 (** [Description] : Traite une requête image.
     [Args] :

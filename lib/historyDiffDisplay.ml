@@ -19,7 +19,7 @@ let print_clean conf =
   match p_getenv conf.env "f" with
     Some f when f <> "" ->
       let title _ =
-        Wserver.print_string (Utf8.capitalize (transl conf "clean history"))
+        Output.print_string conf (Utf8.capitalize (transl conf "clean history"))
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
@@ -28,35 +28,35 @@ let print_clean conf =
            (transl conf
               "select the input you want to erase from the history"));
       let history = load_person_history conf f in
-      Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-      Wserver.printf
+      Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+      Output.printf conf
         "<input type=\"hidden\" name=\"m\" value=\"HIST_CLEAN_OK\"%s>\n"
         conf.xhs;
-      Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n" f
+      Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n" f
         conf.xhs;
-      Wserver.printf "<ul>\n";
+      Output.printf conf "<ul>\n";
       begin let rec loop i =
         function
           [] -> ()
         | gr :: l ->
-            Wserver.printf "<li>\n";
-            Wserver.printf "<label>\n";
-            Wserver.printf
+            Output.printf conf "<li>\n";
+            Output.printf conf "<label>\n";
+            Output.printf conf
               "<input type=\"checkbox\" name=\"i%d\" value=\"on\"%s>\n" i
               conf.xhs;
-            Wserver.printf "%s %s" gr.date gr.HistoryDiff.wizard;
-            Wserver.printf "</label>\n";
-            Wserver.printf "</li>\n";
+            Output.printf conf "%s %s" gr.date gr.HistoryDiff.wizard;
+            Output.printf conf "</label>\n";
+            Output.printf conf "</li>\n";
             loop (i + 1) l
       in
         loop 0 history
       end;
-      Wserver.printf "</ul>\n";
-      Wserver.printf
+      Output.printf conf "</ul>\n";
+      Output.printf conf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-      Wserver.printf "</button>\n";
-      Wserver.printf "</form>\n";
+      Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+      Output.printf conf "</button>\n";
+      Output.printf conf "</form>\n";
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
@@ -82,7 +82,7 @@ let print_clean_ok conf =
   match p_getenv conf.env "f" with
     Some f when f <> "" ->
       let title _ =
-        Wserver.print_string (Utf8.capitalize (transl conf "history cleaned"))
+        Output.print_string conf (Utf8.capitalize (transl conf "history cleaned"))
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;

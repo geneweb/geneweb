@@ -34,16 +34,16 @@ let () =
         )
       in
       let opts =
-        Gwexport.{ !opts with oc = fname, Wserver.woc ()
+        Gwexport.{ !opts with oc = fname, Output.print_string conf, conf.Config.output_conf.flush
                             ; no_notes = true
                             ; base = Some (Gwdb.bname base, base)
                  }
       in
       (* no_notes not working *)
-      Wserver.http Wserver.OK ;
-      Wserver.header "Content-type: text/plain" ;
-      Wserver.header "Content-disposition: attachment; filename=\"%s\"" fname ;
-      Wserver.print_string "" ; (* Close headers section *)
+      Output.status conf Def.OK ;
+      Output.header conf "Content-type: text/plain" ;
+      Output.header conf "Content-disposition: attachment; filename=\"%s\"" fname ;
+      Output.print_string conf "" ; (* Close headers section *)
       begin match output with
         | `ged ->
           Gwb2gedLib.gwb2ged false opts select
@@ -51,6 +51,6 @@ let () =
           GwuLib.prepare_free_occ ~select:(fst select) base ;
           GwuLib.gwu opts base "" "" (Hashtbl.create 0) select ;
       end ;
-      Wserver.wflush () ;
+      conf.Config.output_conf.flush () ;
       true
     ]

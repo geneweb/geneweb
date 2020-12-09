@@ -689,7 +689,7 @@ let print_update_fam conf base fcd digest =
 let print_del1 conf base ifam =
   let title _ =
     let s = transl_nth conf "family/families" 0 in
-    Wserver.print_string (Utf8.capitalize (transl_decline conf "delete" s))
+    Output.print_string conf (Utf8.capitalize (transl_decline conf "delete" s))
   in
   let p =
     match p_getenv conf.env "ip" with
@@ -697,75 +697,75 @@ let print_del1 conf base ifam =
     | None -> Gwdb.empty_person base dummy_iper
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "<h2>\n";
+  Output.printf conf "<h2>\n";
   title false;
-  Wserver.printf "</h2>\n";
-  Wserver.printf "\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Wserver.printf "<p>\n";
+  Output.printf conf "</h2>\n";
+  Output.printf conf "\n";
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
     (string_of_ifam ifam) conf.xhs;
   begin match p_getenv conf.env "ip" with
     Some ip ->
-      Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n" ip
+      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n" ip
         conf.xhs
   | None -> ()
   end;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\"%s>\n"
     conf.xhs;
-  Wserver.printf "</p>\n";
-  Wserver.printf "<p>\n";
-  Wserver.printf
+  Output.printf conf "</p>\n";
+  Output.printf conf "<p>\n";
+  Output.printf conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</p>\n";
-  Wserver.printf "</form>\n";
-  Wserver.printf "\n";
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.printf conf "</button>\n";
+  Output.printf conf "</p>\n";
+  Output.printf conf "</form>\n";
+  Output.printf conf "\n";
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl_decline conf "invert" ""))
+    Output.print_string conf (Utf8.capitalize (transl_decline conf "invert" ""))
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Wserver.printf "%s%s"
+  Output.printf conf "%s%s"
     (Utf8.capitalize (transl conf "invert the order of the following families"))
     (Util.transl conf ":");
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>\n";
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>\n";
   Update.print_someone conf base (poi base (get_father cpl1));
-  Wserver.printf " %s " (transl_nth conf "and" 0);
+  Output.printf conf " %s " (transl_nth conf "and" 0);
   Update.print_someone conf base (poi base (get_mother cpl1));
-  Wserver.printf "</li>\n";
-  Wserver.printf "<li>\n";
+  Output.printf conf "</li>\n";
+  Output.printf conf "<li>\n";
   Update.print_someone conf base (poi base (get_father cpl2));
-  Wserver.printf " %s " (transl_nth conf "and" 0);
+  Output.printf conf " %s " (transl_nth conf "and" 0);
   Update.print_someone conf base (poi base (get_mother cpl2));
-  Wserver.printf "</li>\n";
-  Wserver.printf "</ul>\n";
-  Wserver.printf "\n";
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Wserver.printf "<p>\n";
+  Output.printf conf "</li>\n";
+  Output.printf conf "</ul>\n";
+  Output.printf conf "\n";
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
     (string_of_iper (get_iper p)) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
     (string_of_ifam ifam2) conf.xhs;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"%s>\n"
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"%s>\n"
     conf.xhs;
-  Wserver.printf "</p>\n";
-  Wserver.printf "<p>\n";
-  Wserver.printf
+  Output.printf conf "</p>\n";
+  Output.printf conf "<p>\n";
+  Output.printf conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</button>\n";
-  Wserver.printf "</p>\n";
-  Wserver.printf "</form>\n";
-  Wserver.printf "\n";
+  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.printf conf "</button>\n";
+  Output.printf conf "</p>\n";
+  Output.printf conf "</form>\n";
+  Output.printf conf "\n";
   Hutil.trailer conf
 
 let print_add conf base =
@@ -883,71 +883,71 @@ let print_change_order conf base =
              let fam = foi base ifam in
              let sp = Gutil.spouse (get_iper p) fam in
              let sp = poi base sp in
-             Wserver.printf "<li %s>\n"
+             Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             Wserver.printf "%s%s" (p_first_name base p)
+             Output.printf conf "%s%s" (p_first_name base p)
                (if get_occ p = 0 then ""
                 else "." ^ string_of_int (get_occ p));
-             Wserver.printf "  &amp;";
-             Wserver.printf "%s\n"
+             Output.printf conf "  &amp;";
+             Output.printf conf "%s\n"
                (DateDisplay.short_marriage_date_text conf base fam p sp);
-             Wserver.printf "%s%s %s" (p_first_name base sp)
+             Output.printf conf "%s%s %s" (p_first_name base sp)
                (if get_occ sp = 0 then ""
                 else "." ^ string_of_int (get_occ sp))
                (p_surname base sp);
-             Wserver.printf "\n";
-             Wserver.printf "</li>\n")
+             Output.printf conf "\n";
+             Output.printf conf "</li>\n")
           arr
       in
       let after = change_order p ifam n in
       let (before, after) = get_family p, Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
       let title _ =
-        Wserver.print_string (Utf8.capitalize (transl_decline conf "invert" ""))
+        Output.print_string conf (Utf8.capitalize (transl_decline conf "invert" ""))
       in
       Perso.interp_templ_with_menu title "perso_header" conf base p;
-      Wserver.printf "<h2>\n";
+      Output.printf conf "<h2>\n";
       title false;
-      Wserver.printf "</h2>\n";
-      Wserver.printf "%s%s"
+      Output.printf conf "</h2>\n";
+      Output.printf conf "%s%s"
         (Utf8.capitalize (transl conf "invert the order of the following families"))
         (Util.transl conf ":");
-      Wserver.printf "<table style=\"margin:1em\">\n";
-      Wserver.printf "<tr>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "<table style=\"margin:1em\">\n";
+      Output.printf conf "<tr>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "<td>\n";
-      Wserver.printf "<ul style=\"list-style-type:none\">\n";
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "<td>\n";
+      Output.printf conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Wserver.printf "</ul>\n";
-      Wserver.printf "</td>\n";
-      Wserver.printf "</tr>\n";
-      Wserver.printf "</table>\n";
-      Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
-      Wserver.printf "<p>\n";
+      Output.printf conf "</ul>\n";
+      Output.printf conf "</td>\n";
+      Output.printf conf "</tr>\n";
+      Output.printf conf "</table>\n";
+      Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+      Output.printf conf "<p>\n";
       Util.hidden_env conf;
-      Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
+      Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
         (string_of_iper ip)
         conf.xhs;
-      Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
+      Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
         (string_of_ifam ifam) conf.xhs;
-      Wserver.printf "<input type=\"hidden\" name=\"n\" value=\"%d\"%s>\n" n
+      Output.printf conf "<input type=\"hidden\" name=\"n\" value=\"%d\"%s>\n" n
         conf.xhs;
-      Wserver.printf
+      Output.printf conf
         "<input type=\"hidden\" name=\"m\" value=\"CHG_FAM_ORD_OK\"%s>\n"
         conf.xhs;
-      Wserver.printf "</p>\n";
-      Wserver.printf "<p>\n";
-      Wserver.printf
+      Output.printf conf "</p>\n";
+      Output.printf conf "<p>\n";
+      Output.printf conf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-      Wserver.printf "</button>\n";
-      Wserver.printf "</p>\n";
-      Wserver.printf "</form>\n";
-      Wserver.printf "\n";
+      Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+      Output.printf conf "</button>\n";
+      Output.printf conf "</p>\n";
+      Output.printf conf "</form>\n";
+      Output.printf conf "\n";
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 

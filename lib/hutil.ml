@@ -21,92 +21,88 @@ let link_to_referer conf =
   else ""
 
 let gen_print_link_to_welcome f conf right_aligned =
-  if conf.cancel_links then ()
-  else
-    begin
-      if right_aligned then
-        Wserver.printf "<div class=\"btn-group float-%s mt-2\">\n" conf.right
-      else Wserver.printf "<p>\n";
-      f ();
-      let str = link_to_referer conf in
-      if str = "" then () else Wserver.print_string str;
-      Wserver.printf "<a href=\"%s\">\
-         <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
-       </a>\n"
-        (commd_no_params conf) (Utf8.capitalize (Util.transl conf "home"));
-      if right_aligned then Wserver.printf "</div>\n"
-      else Wserver.printf "</p>\n"
-    end
+  if right_aligned then
+    Output.printf conf "<div class=\"btn-group float-%s mt-2\">\n" conf.right
+  else Output.printf conf "<p>\n";
+  f ();
+  let str = link_to_referer conf in
+  if str = "" then () else Output.print_string conf str;
+  Output.printf conf "<a href=\"%s\">\
+                  <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
+                  </a>\n"
+    (commd_no_params conf) (Utf8.capitalize (Util.transl conf "home"));
+  if right_aligned then Output.printf conf "</div>\n"
+  else Output.printf conf "</p>\n"
 
 let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
 let header_without_http conf title =
-  Wserver.printf "<!DOCTYPE html>\n";
-  Wserver.printf "<head>\n";
-  Wserver.printf "  <title>";
+  Output.printf conf "<!DOCTYPE html>\n";
+  Output.printf conf "<head>\n";
+  Output.printf conf "  <title>";
   title true;
-  Wserver.printf "</title>\n";
-  Wserver.printf "  <meta name=\"robots\" content=\"none\">\n";
-  Wserver.printf "  <meta charset=\"%s\">\n" conf.charset;
-  Wserver.printf
+  Output.printf conf "</title>\n";
+  Output.printf conf "  <meta name=\"robots\" content=\"none\">\n";
+  Output.printf conf "  <meta charset=\"%s\">\n" conf.charset;
+  Output.printf conf
     "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\">\n"
     (Util.image_prefix conf);
-  Wserver.printf
+  Output.printf conf
     "  <link rel=\"apple-touch-icon\" href=\"%s/favicon_gwd.png\">\n"
     (Util.image_prefix conf);
-  Wserver.printf "  <meta name=\"viewport\" content=\"width=device-width, \
+  Output.printf conf "  <meta name=\"viewport\" content=\"width=device-width, \
                     initial-scale=1, shrink-to-fit=no\">\n";
   Util.include_template conf [] "css" (fun () -> ());
   begin match Util.open_templ conf "hed" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
-  Wserver.printf "\n</head>\n";
+  Output.printf conf "\n</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
       Not_found -> ""
   in
   let s = s ^ Util.body_prop conf in
-  Wserver.printf "<body%s>\n" s; Util.message_to_wizard conf
+  Output.printf conf "<body%s>\n" s; Util.message_to_wizard conf
 
 let header_without_page_title conf title =
   Util.html conf;
   header_without_http conf title;
   (* balancing </div> in gen_trailer *)
-  Wserver.printf "<div class=\"container\">"
+  Output.printf conf "<div class=\"container\">"
 
 let header_link_welcome conf title =
   header_without_page_title conf title;
   print_link_to_welcome conf true;
-  Wserver.printf "<h1>";
+  Output.printf conf "<h1>";
   title false;
-  Wserver.printf "</h1>\n"
+  Output.printf conf "</h1>\n"
 
 let header_no_page_title conf title =
   header_without_page_title conf title;
   match Util.p_getenv conf.env "title" with
     None | Some "" -> ()
-  | Some x -> Wserver.printf "<h1>%s</h1>\n" x
+  | Some x -> Output.printf conf "<h1>%s</h1>\n" x
 
 let header conf title =
   header_without_page_title conf title;
-  Wserver.printf "\n<h1>";
+  Output.printf conf "\n<h1>";
   title false;
-  Wserver.printf "</h1>\n"
+  Output.printf conf "</h1>\n"
 
 let header_fluid conf title =
   header_without_http conf title;
   (* balancing </div> in gen_trailer *)
-  Wserver.printf "<div class=\"container-fluid\">";
-  Wserver.printf "\n<h1>";
+  Output.printf conf "<div class=\"container-fluid\">";
+  Output.printf conf "\n<h1>";
   title false;
-  Wserver.printf "</h1>\n"
+  Output.printf conf "</h1>\n"
 
 let rheader conf title =
   header_without_page_title conf title;
-  Wserver.printf "<h1 class=\"error\">";
+  Output.printf conf "<h1 class=\"error\">";
   title false;
-  Wserver.printf "</h1>\n"
+  Output.printf conf "</h1>\n"
 
 let gen_trailer with_logo conf =
   let conf = {conf with is_printed_by_template = false} in
@@ -117,29 +113,29 @@ let gen_trailer with_logo conf =
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
-  Wserver.printf "</body>\n</html>\n"
+  Output.printf conf "</body>\n</html>\n"
 
 let trailer = gen_trailer true
 
 let incorrect_request conf =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (Util.transl conf "incorrect request"))
+    Output.print_string conf (Utf8.capitalize (Util.transl conf "incorrect request"))
   in
-  Wserver.http Wserver.Bad_Request;
+  Output.status conf Def.Bad_Request;
   header conf title;
-  Wserver.printf "<p>\n";
+  Output.printf conf "<p>\n";
   print_link_to_welcome conf false;
-  Wserver.printf "</p>\n";
+  Output.printf conf "</p>\n";
   trailer conf
 
 let error_cannot_access conf fname =
-  let title _ = Wserver.printf "Error" in
+  let title _ = Output.printf conf "Error" in
   header conf title;
-  Wserver.printf "<ul>\n";
-  Wserver.printf "<li>\n";
-  Wserver.printf "Cannot access file \"%s.txt\".\n" fname;
-  Wserver.printf "</li>\n";
-  Wserver.printf "</ul>\n";
+  Output.printf conf "<ul>\n";
+  Output.printf conf "<li>\n";
+  Output.printf conf "Cannot access file \"%s.txt\".\n" fname;
+  Output.printf conf "</li>\n";
+  Output.printf conf "</ul>\n";
   trailer conf
 
 let gen_interp header conf fname ifun env ep =

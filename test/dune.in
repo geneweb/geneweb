@@ -1,13 +1,13 @@
 (library
  (name dummy_gwdb)
  (libraries geneweb-lib.def stdlib-shims)
- (implements geneweb-lib.gwdb_driver.mli)
+  (implements geneweb-lib.gwdb_driver.mli)
  (modules gwdb_driver)
 )
 
 (executable
   (name test)
-  (libraries %%%WSERVER_PKG%%% %%%SOSA_PKG%%% dummy_gwdb geneweb oUnit stdlib-shims)
+  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb oUnit stdlib-shims)
   (preprocess (pps ppx_deriving.show))
   (modules
     test

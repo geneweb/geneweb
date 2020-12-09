@@ -38,7 +38,7 @@ let is_empty_or_quest_name p =
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 let p_getenvbin env label =
-  let decode_varenv = Wserver.gen_decode false in
+  let decode_varenv = Mutil.gen_decode false in
   try Some (decode_varenv (List.assoc (decode_varenv label) env))
   with Not_found -> None
 
@@ -681,7 +681,7 @@ let print_result conf data =
   in
   let data = data output in
   Util.html ~content_type conf ;
-  Wserver.print_string data
+  Output.print_string conf data
 
 let person_to_reference_person base p =
   { M.Reference_person.n = Name.lower @@ sou base @@ get_surname p

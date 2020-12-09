@@ -4,6 +4,8 @@
     (:cmxs
       %{project_root}/plugins/export/plugin_export.cmxs
       %{project_root}/plugins/forum/plugin_forum.cmxs
+      %{project_root}/plugins/cgl/plugin_cgl.cmxs
+      %{project_root}/plugins/xhtml/plugin_xhtml.cmxs
     )
     (:maker mk_gwdPluginMD5.ml)
   )

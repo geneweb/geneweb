@@ -23,8 +23,7 @@ let image_normal_txt conf base p fname width height =
       (if height = 0 then ""
        else " max-height:" ^ string_of_int height ^ "px;")
   in
-  if conf.cancel_links then r
-  else Printf.sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
+  Printf.sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
 
 let image_url_txt conf url_p url height =
   let image_txt = Utf8.capitalize (transl_nth conf "image/images" 0) in
@@ -95,45 +94,45 @@ let string_of_item conf base =
 
 let print_table conf hts =
   begin_centered conf;
-  Wserver.printf "<table border=\"%d\"" conf.border;
-  Wserver.printf " cellspacing=\"0\" cellpadding=\"0\">\n";
+  Output.printf conf "<table border=\"%d\"" conf.border;
+  Output.printf conf " cellspacing=\"0\" cellpadding=\"0\">\n";
   for i = 0 to Array.length hts - 1 do
     begin
-      Wserver.printf "<tr align=\"left\">\n";
+      Output.printf conf "<tr align=\"left\">\n";
       for j = 0 to Array.length hts.(i) - 1 do
         let (colspan, align, td) = hts.(i).(j) in
-        Wserver.printf "<td";
+        Output.printf conf "<td";
         if colspan = 1 && (td = TDnothing || td = TDhr CenterA) then ()
-        else Wserver.printf " colspan=\"%d\"" colspan;
+        else Output.printf conf " colspan=\"%d\"" colspan;
         begin match align, td with
-          LeftA, TDhr LeftA -> Wserver.printf " align=\"%s\"" conf.left
+          LeftA, TDhr LeftA -> Output.printf conf " align=\"%s\"" conf.left
         | LeftA, _ -> ()
-        | CenterA, _ -> Wserver.printf " align=\"center\""
-        | RightA, _ -> Wserver.printf " align=\"%s\"" conf.right
+        | CenterA, _ -> Output.printf conf " align=\"center\""
+        | RightA, _ -> Output.printf conf " align=\"%s\"" conf.right
         end;
-        Wserver.printf ">";
+        Output.printf conf ">";
         begin match td with
-          TDitem s -> Wserver.print_string s
-        | TDtext s -> Wserver.print_string s
-        | TDnothing -> Wserver.printf "&nbsp;"
-        | TDbar None -> Wserver.printf "|"
+          TDitem s -> Output.print_string conf s
+        | TDtext s -> Output.print_string conf s
+        | TDnothing -> Output.printf conf "&nbsp;"
+        | TDbar None -> Output.printf conf "|"
         | TDbar (Some s) ->
-            Wserver.printf
+            Output.printf conf
               "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
         | TDhr align ->
             match align with
               LeftA ->
-                Wserver.printf "<hr class=\"%s\"%s>\n" conf.left conf.xhs
+                Output.printf conf "<hr class=\"%s\"%s>\n" conf.left conf.xhs
             | RightA ->
-                Wserver.printf "<hr class=\"%s\"%s>\n" conf.right conf.xhs
-            | _ -> Wserver.printf "<hr class=\"full\"%s>\n" conf.xhs
+                Output.printf conf "<hr class=\"%s\"%s>\n" conf.right conf.xhs
+            | _ -> Output.printf conf "<hr class=\"full\"%s>\n" conf.xhs
         end;
-        Wserver.printf "</td>\n"
+        Output.printf conf "</td>\n"
       done;
-      Wserver.printf "</tr>\n"
+      Output.printf conf "</tr>\n"
     end
   done;
-  Wserver.printf "</table>\n";
+  Output.printf conf "</table>\n";
   end_centered conf
 
 (*
@@ -490,26 +489,26 @@ let print_next_pos conf pos1 pos2 tcol =
            | _ -> (k, v) :: env)
         conf.env []
     in
-    Wserver.printf "<div style=\"text-align:right\">\n";
-    if pos1 = 0 then Wserver.printf "&nbsp;"
+    Output.printf conf "<div style=\"text-align:right\">\n";
+    if pos1 = 0 then Output.printf conf "&nbsp;"
     else
       begin
-        Wserver.printf "<a href=\"%s" (commd conf);
-        List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) env;
-        Wserver.printf "pos1=%d&pos2=%d" (pos1 + overlap - dpos)
+        Output.printf conf "<a href=\"%s" (commd conf);
+        List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) env;
+        Output.printf conf "pos1=%d&pos2=%d" (pos1 + overlap - dpos)
           (pos1 + overlap);
-        Wserver.printf "\">&lt;&lt;</a>\n"
+        Output.printf conf "\">&lt;&lt;</a>\n"
       end;
-    if pos2 >= tcol then Wserver.printf "&nbsp;"
+    if pos2 >= tcol then Output.printf conf "&nbsp;"
     else
       begin
-        Wserver.printf "<a href=\"%s" (commd conf);
-        List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) env;
-        Wserver.printf "pos1=%d&pos2=%d" (pos2 - overlap)
+        Output.printf conf "<a href=\"%s" (commd conf);
+        List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) env;
+        Output.printf conf "pos1=%d&pos2=%d" (pos2 - overlap)
           (pos2 - overlap + dpos);
-        Wserver.printf "\">&gt;&gt;</a>\n"
+        Output.printf conf "\">&gt;&gt;</a>\n"
       end;
-    Wserver.printf "</div>\n"
+    Output.printf conf "</div>\n"
 
 (* Main print table algorithm with <pre> *)
 
@@ -536,7 +535,7 @@ let print_table_pre conf hts =
     | x -> x
   in
   print_next_pos conf pos1 pos2 (Array.fold_left (+) 0 colsz);
-  Wserver.printf "<pre>\n";
+  Output.printf conf "<pre>\n";
   for i = 0 to Array.length hts - 1 do
     let (stra, max_row) =
       let (stral, max_row) =
@@ -566,7 +565,7 @@ let print_table_pre conf hts =
     in
     for row = 0 to max_row - 1 do
       let rec loop pos col j =
-        if j = Array.length hts.(i) then Wserver.printf "\n"
+        if j = Array.length hts.(i) then Output.printf conf "\n"
         else
           let (colspan, _, td) = hts.(i).(j) in
           let sz =
@@ -632,26 +631,26 @@ let print_table_pre conf hts =
               else if pos1 < pos then displayed_sub outs 0 (pos2 - pos)
               else displayed_sub outs (pos1 - pos) (pos2 - pos1)
           in
-          Wserver.print_string clipped_outs;
+          Output.print_string conf clipped_outs;
           loop (pos + sz) (col + colspan) (j + 1)
       in
       loop 0 0 0
     done
   done;
-  Wserver.printf "</pre>\n"
+  Output.printf conf "</pre>\n"
 
 (* main *)
 
 let print_html_table conf hts =
   if Util.p_getenv conf.env "notab" <> Some "on" then
     begin
-      Wserver.printf "<p>\n";
-      Wserver.printf "<div style=\"text-align:%s\"><a href=\"%s" conf.right
+      Output.printf conf "<p>\n";
+      Output.printf conf "<div style=\"text-align:%s\"><a href=\"%s" conf.right
         (commd conf);
-      List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) conf.env;
-      Wserver.printf "notab=on&slices=on";
-      Wserver.printf "\"><tt>//</tt></a></div>\n";
-      Wserver.printf "</p>\n"
+      List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) conf.env;
+      Output.printf conf "notab=on&slices=on";
+      Output.printf conf "\"><tt>//</tt></a></div>\n";
+      Output.printf conf "</p>\n"
     end;
   if Util.p_getenv conf.env "notab" = Some "on" ||
      Util.p_getenv conf.env "pos2" <> None || browser_doesnt_have_tables conf
@@ -759,58 +758,58 @@ let print_slices_menu conf hts =
     Utf8.capitalize
       (transl_nth conf "display by slices/slice width/overlap/total width" n)
   in
-  let title _ = Wserver.print_string (txt 0) in
+  let title _ = Output.print_string conf (txt 0) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
-  Wserver.printf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Wserver.printf "<p>" ;
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<p>" ;
   hidden_env conf;
   List.iter
     (fun (k, v) ->
        if k = "slices" then ()
        else
-         Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
+         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
            (decode_varenv k) (decode_varenv v))
     conf.env;
-  Wserver.printf "</p>" ;
-  Wserver.printf "<table>\n";
-  Wserver.printf "<tr align=\"left\">\n";
-  Wserver.printf "<td align=\"right\">\n";
-  Wserver.printf "%s\n"
+  Output.printf conf "</p>" ;
+  Output.printf conf "<table>\n";
+  Output.printf conf "<tr align=\"left\">\n";
+  Output.printf conf "<td align=\"right\">\n";
+  Output.printf conf "%s\n"
     (Utf8.capitalize (transl conf "don't group the common branches together"));
-  Wserver.printf "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "<tr align=\"left\">\n";
-  Wserver.printf "<td align=\"right\">\n";
-  Wserver.printf "%s\n" (txt 1);
-  Wserver.printf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "<tr align=\"left\">\n";
-  Wserver.printf "<td align=\"right\">\n";
-  Wserver.printf "%s\n" (txt 2);
-  Wserver.printf "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "<tr align=\"left\">\n";
-  Wserver.printf "<td align=\"right\">\n";
-  Wserver.printf "%s\n" (txt 3);
+  Output.printf conf "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "<tr align=\"left\">\n";
+  Output.printf conf "<td align=\"right\">\n";
+  Output.printf conf "%s\n" (txt 1);
+  Output.printf conf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "<tr align=\"left\">\n";
+  Output.printf conf "<td align=\"right\">\n";
+  Output.printf conf "%s\n" (txt 2);
+  Output.printf conf "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "<tr align=\"left\">\n";
+  Output.printf conf "<td align=\"right\">\n";
+  Output.printf conf "%s\n" (txt 3);
   begin let wid =
     let (min_wid, max_wid, _, _, _) = table_pre_dim hts in
-    Wserver.printf "(%d-%d)\n" min_wid max_wid; max min_wid (min max_wid 78)
+    Output.printf conf "(%d-%d)\n" min_wid max_wid; max min_wid (min max_wid 78)
   in
-    Wserver.printf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid
+    Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid
   end;
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "</table>\n";
-  Wserver.printf "<p>" ;
-  Wserver.printf
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "</table>\n";
+  Output.printf conf "<p>" ;
+  Output.printf conf
     "<p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>"
     (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Wserver.printf "</form>\n";
+  Output.printf conf "</form>\n";
   Hutil.trailer conf
 
 let print_dag_page conf page_title hts next_txt =
@@ -824,15 +823,15 @@ let print_dag_page conf page_title hts next_txt =
     in
     {conf with base_env = ("doctype", doctype) :: conf.base_env}
   in
-  let title _ = Wserver.print_string page_title in
+  let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   print_html_table conf hts;
   if next_txt <> "" then
     begin
-      Wserver.printf "<p>\n";
-      Wserver.printf "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
-      Wserver.printf "</p>\n"
+      Output.printf conf "<p>\n";
+      Output.printf conf "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
+      Output.printf conf "</p>\n"
     end;
   Hutil.trailer conf
 
@@ -934,11 +933,11 @@ and eval_dag_cell_var conf (colspan, align, td) =
 let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
   match s :: sl with
     ["dag_cell"] -> print_foreach_dag_cell hts print_ast env al
-  | ["dag_cell_pre"] -> print_foreach_dag_cell_pre conf hts print_ast env al
+  | ["dag_cell_pre"] -> print_foreach_dag_cell_pre hts print_ast env al
   | ["dag_line"] -> print_foreach_dag_line print_ast env hts al
   | ["dag_line_pre"] -> print_foreach_dag_line_pre conf hts print_ast env al
   | _ -> raise Not_found
-and print_foreach_dag_cell_pre conf hts print_ast env al =
+and print_foreach_dag_cell_pre hts print_ast env al =
   let i =
     match get_env "dag_line" env with
       Vdline i -> i
@@ -982,12 +981,10 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
         | TDbar s ->
             let s =
               match s with
-                None | Some "" -> "|"
+              | None | Some "" -> "|"
               | Some s ->
-                  if conf.cancel_links then "|"
-                  else
-                    Printf.sprintf
-                      "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
+                Printf.sprintf
+                  "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
             in
             let len = displayed_length s in
             String.make ((sz - len) / 2) ' ' ^ s ^

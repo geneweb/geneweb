@@ -48,7 +48,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
     if x1 <> "" && x2 <> "" && x1 <> x2 then
-      Wserver.printf
+      Output.printf conf
         "<h4>%s</h4>\
          <ul>\
          <li><input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"1\" checked>%s</li>\
@@ -56,31 +56,31 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
          </ul>"
         (Utf8.capitalize title) name x1 name x2;
   in
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
-  Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
-  Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_ifam ifam1);
-  Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
+  Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
     (string_of_ifam ifam2);
   begin match p_getenv conf.env "ip" with
     Some ip ->
-      Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
+      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
   | None -> ()
   end;
   begin let rec loop =
     function
       [ip1, ip2] ->
-        Wserver.printf "<input type=\"hidden\" name=\"ini1\" value=\"%s\">\n"
+        Output.printf conf "<input type=\"hidden\" name=\"ini1\" value=\"%s\">\n"
           (string_of_iper ip1);
-        Wserver.printf "<input type=\"hidden\" name=\"ini2\" value=\"%s\">\n"
+        Output.printf conf "<input type=\"hidden\" name=\"ini2\" value=\"%s\">\n"
           (string_of_iper ip2)
     | _ :: branches -> loop branches
     | _ -> ()
   in
     loop branches
   end;
-  Wserver.printf "<p>" ;
+  Output.printf conf "<p>" ;
   string_field (transl_nth conf "relation/relations" 0) "relation"
     (fun fam ->
        match get_relation fam with
@@ -117,14 +117,14 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
              | None -> ""
            in
            transl conf "divorced" ^ ds);
-  Wserver.printf
+  Output.printf conf
     "</p><p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></form>"
     (Utf8.capitalize (transl_nth conf "validate/delete" 0))
 
 let merge_fam1 conf base fam1 fam2 =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
-    Wserver.print_string (Utf8.capitalize (transl_decline conf "merge" s))
+    Output.print_string conf (Utf8.capitalize (transl_decline conf "merge" s))
   in
   Hutil.header conf title; print_differences conf base [] fam1 fam2; Hutil.trailer conf
 

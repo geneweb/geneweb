@@ -91,7 +91,6 @@ let str_start_with str i x =
 type wiki_info =
   { wi_mode : string;
     wi_file_path : string -> string;
-    wi_cancel_links : bool;
     wi_person_exists : string * string * int -> bool;
     wi_always_show_link : bool }
 
@@ -164,16 +163,13 @@ let syntax_links conf wi s =
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
-            if wi.wi_cancel_links then text
-            else
-              Printf.sprintf "<a href=\"%sm=%s&f=%s%s\"%s>%s</a>" (commd conf)
-                wi.wi_mode fname anchor c text
+            Printf.sprintf "<a href=\"%sm=%s&f=%s%s\"%s>%s</a>" (commd conf)
+              wi.wi_mode fname anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
           let t =
-            if wi.wi_cancel_links then name
-            else if wi.wi_person_exists (fn, sn, oc) then
+            if wi.wi_person_exists (fn, sn, oc) then
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
                 (commd conf) (code_varenv fn) (code_varenv sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc) name
@@ -190,10 +186,7 @@ let syntax_links conf wi s =
       | NotesLinks.WLwizard (j, wiz, name) ->
           let t =
             let s = if name <> "" then name else wiz in
-            if wi.wi_cancel_links then s
-            else
-              Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>" (commd conf) wiz
-                s
+            Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>" (commd conf) wiz s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLnone -> loop quot_lev pos (i + 1) (Buff.store len s.[i])
@@ -595,27 +588,27 @@ let rev_extract_sub_part s v =
 let extract_sub_part s v = List.rev (rev_extract_sub_part s v)
 
 let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
-  Wserver.printf "<p>\n";
+  Output.printf conf "<p>\n";
   if cnt0 >= first_cnt then
     begin
-      Wserver.printf "<a href=\"%sm=%s%s&v=%d\">" (commd conf) edit_mode sfn
+      Output.printf conf "<a href=\"%sm=%s%s&v=%d\">" (commd conf) edit_mode sfn
         (cnt0 - 1);
-      Wserver.printf
+      Output.printf conf
         "<span class=\"fa fa-arrow-left fa-lg\" title=\"<<\"></span>";
-      Wserver.printf "</a>\n"
+      Output.printf conf "</a>\n"
     end;
-  Wserver.printf "<a href=\"%sm=%s%s\">" (commd conf) edit_mode sfn;
-  Wserver.printf "<span class=\"fa fa-arrow-up fa-lg\" title=\"^^\"></span>";
-  Wserver.printf "</a>\n";
+  Output.printf conf "<a href=\"%sm=%s%s\">" (commd conf) edit_mode sfn;
+  Output.printf conf "<span class=\"fa fa-arrow-up fa-lg\" title=\"^^\"></span>";
+  Output.printf conf "</a>\n";
   if not is_empty then
     begin
-      Wserver.printf "<a href=\"%sm=%s%s&v=%d\">" (commd conf) edit_mode sfn
+      Output.printf conf "<a href=\"%sm=%s%s&v=%d\">" (commd conf) edit_mode sfn
         (cnt0 + 1);
-      Wserver.printf
+      Output.printf conf
         "<span class=\"fa fa-arrow-right fa-lg\" title=\">>\"></span>";
-      Wserver.printf "</a>\n"
+      Output.printf conf "</a>\n"
     end;
-  Wserver.printf "</p>\n"
+  Output.printf conf "</p>\n"
 
 let print_sub_part_text conf wi edit_opt cnt0 lines =
   let lines =
@@ -635,7 +628,7 @@ let print_sub_part_text conf wi edit_opt cnt0 lines =
       let s2 = string_of_modify_link conf 0 (s = "") edit_opt in s2 ^ s
     else s
   in
-  Wserver.printf "%s\n" s
+  Output.printf conf "%s\n" s
 
 let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
   let edit_opt = Some (can_edit, edit_mode, sub_fname) in
@@ -661,63 +654,63 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Hutil.header conf title;
   if can_edit then
     begin
-      Wserver.printf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">\n"
+      Output.printf conf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">\n"
         conf.right conf.left;
-      Wserver.printf "(";
+      Output.printf conf "(";
       begin
-        Wserver.printf "<a href=\"%sm=%s%s%s\">" (commd conf) mode
+        Output.printf conf "<a href=\"%sm=%s%s%s\">" (commd conf) mode
           (if has_v then "&v=" ^ string_of_int v else "") sfn;
-        Wserver.print_string (message_txt conf 0);
-        Wserver.printf "</a>"
+        Output.print_string conf (message_txt conf 0);
+        Output.printf conf "</a>"
       end;
-      Wserver.printf ")\n";
-      Wserver.printf "</div>\n"
+      Output.printf conf ")\n";
+      Output.printf conf "</div>\n"
     end;
   Hutil.print_link_to_welcome conf true;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty;
-  Wserver.printf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   if can_edit then
-    Wserver.printf
+    Output.printf conf
       "<input type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"%s>\n" mode
       conf.xhs;
   if has_v then
-    Wserver.printf "<input type=\"hidden\" name=\"v\" value=\"%d\"%s>\n" v
+    Output.printf conf "<input type=\"hidden\" name=\"v\" value=\"%d\"%s>\n" v
       conf.xhs;
   if fname <> "" then
-    Wserver.printf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n" fname
+    Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n" fname
       conf.xhs;
   if can_edit then
     begin let digest = Iovalue.digest s in
-      Wserver.printf
+      Output.printf conf
         "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n" digest
         conf.xhs
     end;
-  Wserver.printf "<div class=\"row ml-3\">\n";
-  Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
+  Output.printf conf "<div class=\"row ml-3\">\n";
+  Output.printf conf "<div class=\"d-inline col-9 py-1\">\n";
   Util.include_template conf ["name", "notes"] "toolbar" ignore;
-  Wserver.printf "</div>\n";
-  Wserver.printf "<textarea name=\"notes\" id=\"notes_comments\"";
-  Wserver.printf " class=\"col-9 form-control\" rows=\"25\" cols=\"110\"%s>"
+  Output.printf conf "</div>\n";
+  Output.printf conf "<textarea name=\"notes\" id=\"notes_comments\"";
+  Output.printf conf " class=\"col-9 form-control\" rows=\"25\" cols=\"110\"%s>"
     (if can_edit then "" else " readonly=\"readonly\"");
-  Wserver.print_string (Util.escape_html sub_part);
-  Wserver.printf "</textarea>";
+  Output.print_string conf (Util.escape_html sub_part);
+  Output.printf conf "</textarea>";
   if can_edit then
     begin
       begin
-        Wserver.printf
+        Output.printf conf
           "<button type=\"submit\" class=\"btn btn-outline-primary btn-lg";
-        Wserver.printf " col-4 py-3 mt-2 mb-3 mx-auto order-3\">";
-        Wserver.print_string (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-        Wserver.printf "</button>\n"
+        Output.printf conf " col-4 py-3 mt-2 mb-3 mx-auto order-3\">";
+        Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+        Output.printf conf "</button>\n"
       end
     end;
-  Wserver.printf "<div class=\"d-inline col-9 py-1\">\n";
+  Output.printf conf "<div class=\"d-inline col-9 py-1\">\n";
   Util.include_template conf ["name", "notes"] "accent" ignore;
-  Wserver.printf "</div>\n";
-  Wserver.printf "</div>\n";
-  Wserver.printf "</form>\n";
+  Output.printf conf "</div>\n";
+  Output.printf conf "</div>\n";
+  Output.printf conf "</form>\n";
   Hutil.trailer conf
 
 let insert_sub_part s v sub_part =
@@ -803,14 +796,14 @@ let split_title_and_text s =
 
 let print_ok conf wi edit_mode fname title_is_1st s =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (Util.transl conf "notes modified"))
+    Output.print_string conf (Utf8.capitalize (Util.transl conf "notes modified"))
   in
   Hutil.header_no_page_title conf title;
-  Wserver.printf "<div style=\"text-align:center\">\n";
-  Wserver.printf "--- ";
+  Output.printf conf "<div style=\"text-align:center\">\n";
+  Output.printf conf "--- ";
   title ();
-  Wserver.printf " ---\n";
-  Wserver.printf "</div>\n";
+  Output.printf conf " ---\n";
+  Output.printf conf "</div>\n";
   Hutil.print_link_to_welcome conf true;
   let get_v = Util.p_getint conf.env "v" in
   let v =

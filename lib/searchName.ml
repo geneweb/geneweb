@@ -233,7 +233,6 @@ let search conf base an search_order specify unknown =
         begin match pl with
           [] -> loop l
         | _ ->
-            conf.cancel_links <- false;
             Some.search_surname_print conf base unknown an
         end
     | FirstName :: l ->
@@ -241,7 +240,6 @@ let search conf base an search_order specify unknown =
         begin match pl with
           [] -> loop l
         | _ ->
-            conf.cancel_links <- false;
             Some.search_first_name_print conf base an
         end
     | ApproxKey :: l ->
@@ -261,7 +259,6 @@ let search conf base an search_order specify unknown =
         | pl -> specify conf base an pl
         end
     | DefaultSurname :: _ ->
-        conf.cancel_links <- false;
         Some.search_surname_print conf base unknown an
   in
   loop search_order

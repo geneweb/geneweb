@@ -85,7 +85,6 @@ let () =
       "geneweb-sosa-zarith"
     | `None -> assert false
   in
-  let wserver_pkg = "geneweb-wserver" in
   let gwdb_d, gwdb_pkg =
     match !gwdb with
     | `None
@@ -122,7 +121,6 @@ let () =
   var "API_PKG" api_pkg ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
-  var "WSERVER_PKG" wserver_pkg ;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude ;
   var "DUNE_PROFILE" dune_profile ;
   close_out ch

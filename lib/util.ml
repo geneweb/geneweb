@@ -219,14 +219,14 @@ let escape_char src dst str =
 let escape_amp = escape_char '&' "&#38;"
 
 let get_referer conf =
-  let referer = Wserver.extract_param "referer: " '\n' conf.request in
+  let referer = Mutil.extract_param "referer: " '\n' conf.request in
   escape_amp referer
 
 let begin_centered conf =
-  Wserver.printf
+  Output.printf conf
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
     conf.border
-let end_centered _conf = Wserver.printf "</td></tr></table>\n"
+let end_centered conf = Output.printf conf "</td></tr></table>\n"
 
 let week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
@@ -244,27 +244,22 @@ let string_of_ctime conf =
     lt.Unix.tm_mday (month_txt lt.Unix.tm_mon) (1900 + lt.Unix.tm_year)
     lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 
-let html ?content_type conf =
-  let content_type =
-    match content_type with
-      Some x -> x
-    | None -> if conf.pure_xhtml then "application/xhtml+xml" else "text/html"
-  in
+let html ?(content_type = "text/html") conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
-  if not !(Wserver.cgi) then Wserver.header "Server: GeneWeb/%s" Version.txt;
-  Wserver.header "Date: %s" (string_of_ctime conf);
-  Wserver.header "Connection: close";
-  Wserver.header "Content-type: %s; charset=%s" content_type charset
+  if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.txt;
+  Output.header conf "Date: %s" (string_of_ctime conf);
+  Output.header conf "Connection: close";
+  Output.header conf "Content-type: %s; charset=%s" content_type charset
 
 let unauthorized conf auth_type =
-  Wserver.http Wserver.Unauthorized;
-  if not !(Wserver.cgi) then
-    Wserver.header "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
-  Wserver.header "Content-type: text/html; charset=%s" conf.charset;
-  Wserver.printf "<head><title>Access failed</title></head>\n";
-  Wserver.printf "<body><h1>Access failed</h1>\n";
-  Wserver.printf "<ul><li>%s</ul>\n" auth_type;
-  Wserver.printf "</body>\n"
+  Output.status conf Def.Unauthorized;
+  if not conf.cgi then
+    Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
+  Output.header conf "Content-type: text/html; charset=%s" conf.charset;
+  Output.printf conf "<head><title>Access failed</title></head>\n";
+  Output.printf conf "<body><h1>Access failed</h1>\n";
+  Output.printf conf "<ul><li>%s</ul>\n" auth_type;
+  Output.printf conf "</body>\n"
 
 let commd conf =
   let c = conf.command ^ "?" in
@@ -280,17 +275,17 @@ let commd_2 conf =
 
 
 let prefix_base conf =
-  if conf.b_arg_for_basename then conf.command ^ "?b=" ^ conf.bname ^ "&"
+  if conf.cgi then conf.command ^ "?b=" ^ conf.bname ^ "&"
   else conf.command ^ "?"
 
 let prefix_base_2 conf =
-  if conf.b_arg_for_basename then
+  if conf.cgi then
     conf.command ^ "?b=" ^ conf.bname
   else
     conf.command ^ "?"
 
 let prefix_base_password conf =
-  if conf.b_arg_for_basename then
+  if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname ^ "&"
     else
@@ -300,7 +295,7 @@ let prefix_base_password conf =
 
 
 let prefix_base_password_2 conf =
-  if conf.b_arg_for_basename then
+  if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname
     else
@@ -309,8 +304,8 @@ let prefix_base_password_2 conf =
     conf.command ^ "?"
 
 
-let code_varenv = Wserver.encode
-let decode_varenv = Wserver.decode
+let code_varenv = Mutil.encode
+let decode_varenv = Mutil.decode
 
 let allowed_tags_file = ref ""
 
@@ -512,7 +507,7 @@ let clean_html_tags s l =
 let hidden_env conf =
   List.iter
     (fun (k, v) ->
-       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
+       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
          (escape_html (decode_varenv v)) conf.xhs)
     (conf.henv @ conf.senv)
 
@@ -918,15 +913,14 @@ let one_title_text base t =
   let s = if place = "" then s else s ^ " " ^ place in " <em>" ^ s ^ "</em>"
 
 let geneweb_link conf href s =
-  if conf.cancel_links then s
-  else "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
+  "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
 
 let wprint_geneweb_link conf href s =
-  Wserver.print_string (geneweb_link conf href s)
+  Output.print_string conf (geneweb_link conf href s)
 
 let reference_flags with_id conf base p s =
   let iper = get_iper p in
-  if conf.cancel_links || is_hidden p then s
+  if is_hidden p then s
   else
     String.concat ""
       ["<a href=\""; commd conf; acces conf base p;
@@ -955,7 +949,7 @@ let reference_noid = reference_flags false
     [Rem] : Exporté en clair hors de ce module.                              *)
 (* ************************************************************************* *)
 let update_family_loop conf base p s =
-  if conf.cancel_links || is_hidden p then s
+  if is_hidden p then s
   else
     let iper = get_iper p in
     let list = get_family p in
@@ -1266,9 +1260,9 @@ let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 let include_template conf env fname failure =
   match open_etc_file fname with
   | Some (ic, fname) ->
-    if conf.trace_templ then Wserver.printf "\n<!-- begin include %s -->\n" fname;
+    if conf.trace_templ then Output.printf conf "\n<!-- begin include %s -->\n" fname;
     copy_from_templ conf env ic;
-    if conf.trace_templ then Wserver.printf "<!-- end include %s -->\n" fname;
+    if conf.trace_templ then Output.printf conf "<!-- end include %s -->\n" fname;
   | None -> failure ()
 
 let image_prefix conf = conf.image_prefix
@@ -1280,8 +1274,8 @@ let body_prop conf =
     | s -> " " ^ s
   with Not_found -> ""
 
-let get_server_string request =
-  if not !(Wserver.cgi) then Wserver.extract_param "host: " '\r' request
+let get_server_string conf =
+  if not conf.cgi then Mutil.extract_param "host: " '\r' conf.request
   else
     let server_name = try Sys.getenv "SERVER_NAME" with Not_found -> "" in
     let server_port =
@@ -1290,8 +1284,8 @@ let get_server_string request =
     if server_port = "80" then server_name
     else server_name ^ ":" ^ server_port
 
-let get_request_string request =
-  if not !(Wserver.cgi) then Wserver.extract_param "GET " ' ' request
+let get_request_string conf =
+  if not conf.cgi then Mutil.extract_param "GET " ' ' conf.request
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
@@ -1369,12 +1363,12 @@ let url_no_index conf base =
   in
   let addr =
     let pref =
-      let s = get_request_string conf.request in
+      let s = get_request_string conf in
       match String.rindex_opt s '?' with
         Some i -> String.sub s 0 i
       | None -> s
     in
-    get_server_string conf.request ^ pref
+    get_server_string conf ^ pref
   in
   let suff =
     List.fold_right
@@ -1384,7 +1378,7 @@ let url_no_index conf base =
         else s )
       (("lang", conf.lang) :: env) ""
   in
-  if conf.b_arg_for_basename then addr ^ "?b=" ^ conf.bname ^ "&" ^ suff
+  if conf.cgi then addr ^ "?b=" ^ conf.bname ^ "&" ^ suff
   else addr ^ "?" ^ suff
 
 let message_to_wizard conf =
@@ -1393,7 +1387,7 @@ let message_to_wizard conf =
       let fname = base_path ["etc"; conf.bname] (fname ^ ".txt") in
       try
         let ic = Secure.open_in fname in
-        try while true do Wserver.printf "%c" (input_char ic) done
+        try while true do Output.printf conf "%c" (input_char ic) done
         with End_of_file -> close_in ic
       with Sys_error _ -> ()
     in
@@ -1710,176 +1704,6 @@ let string_of_place conf place =
   List.fold_left (fun s c -> Name.strip_c s c)
     (string_with_macros conf [] place) ['['; ']']
 
-
-type xhtml_tag =
-    Btag of string * string
-  | Etag of string
-  | Atag of string
-
-let tag_params_ok s =
-  let rec loop i =
-    if i = String.length s then true
-    else
-      match s.[i] with
-        ' ' | '\n' -> loop (i + 1)
-      | 'a'..'z' ->
-          let rec loop_id i =
-            if i = String.length s then false
-            else
-              match s.[i] with
-                'a'..'z' -> loop_id (i + 1)
-              | '=' ->
-                  let i = i + 1 in
-                  if i = String.length s then false
-                  else if s.[i] = '"' then
-                    let rec loop_str i =
-                      if i = String.length s then false
-                      else if s.[i] = '"' then loop (i + 1)
-                      else loop_str (i + 1)
-                    in
-                    loop_str (i + 1)
-                  else false
-              | _ -> false
-          in
-          loop_id (i + 1)
-      | _ -> false
-  in
-  loop 0
-
-let xhtml_tag s i =
-  if s.[i] = '<' then
-    if i = String.length s - 1 then None
-    else if s.[i+1] = '!' then None
-    else
-      let k =
-        try String.index_from s i '>' with Not_found -> String.length s
-      in
-      let j =
-        let rec loop i =
-          if i = k then k
-          else
-            match s.[i] with
-              ' ' | '\n' -> i
-            | _ -> loop (i + 1)
-        in
-        loop i
-      in
-      if i + 1 = String.length s then None
-      else
-        let next_i = min (k + 1) (String.length s) in
-        if s.[i+1] = '/' then
-          let t = String.sub s (i + 2) (k - i - 2) in
-          if j = k then Some (Etag t, next_i) else None
-        else if s.[k-1] = '/' then
-          let t = String.sub s (i + 1) (k - i - 2) in Some (Atag t, next_i)
-        else
-          let t = String.sub s (i + 1) (j - i - 1) in
-          let a = String.sub s j (k - j) in
-          if tag_params_ok a then Some (Btag (t, a), next_i) else None
-  else None
-
-let check_ampersand s i =
-  if i = String.length s then Some ("&amp;", i)
-  else
-    match s.[i] with
-      'a'..'z' ->
-        let rec loop_id j =
-          if j = String.length s then
-            let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in Some (a, j)
-          else
-            match s.[j] with
-              'a'..'z' -> loop_id (j + 1)
-            | ';' -> None
-            | _ ->
-                let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
-                Some (a, j)
-        in
-        loop_id i
-    | _ -> Some ("&amp;", i)
-
-let bad col s = Printf.sprintf "<span style=\"color:%s\">%s</span>" col s
-
-let check_ampersands s =
-  let b = Buffer.create (String.length s) in
-  let rec loop error i =
-    if i = String.length s then
-      if error then Some (Buffer.contents b) else None
-    else
-      match s.[i] with
-        '&' ->
-          begin match check_ampersand s (i + 1) with
-            Some (txt, j) -> Buffer.add_string b (bad "red" txt); loop true j
-          | None -> Buffer.add_char b '&'; loop error (i + 1)
-          end
-      | c -> Buffer.add_char b c; loop error (i + 1)
-  in
-  loop false 0
-
-let check_xhtml s =
-  let b = Buffer.create (String.length s) in
-  let rec loop tag_stack i =
-    if i = String.length s then
-      begin
-        List.iter
-          (fun (pos, txt, _t) ->
-             let s = Buffer.contents b in
-             let s_bef = String.sub s 0 pos in
-             let pos_aft = pos + String.length txt + 2 in
-             let s_aft = String.sub s pos_aft (String.length s - pos_aft) in
-             Buffer.clear b;
-             Buffer.add_string b s_bef;
-             Buffer.add_string b (bad "red" (Printf.sprintf "&lt;%s&gt;" txt));
-             Buffer.add_string b s_aft)
-          tag_stack;
-        Buffer.contents b
-      end
-    else
-      match xhtml_tag s i with
-        Some (Btag (t, a), i) ->
-          if t = "br" && a = "" then
-            begin
-              (* frequent error *)
-              Buffer.add_string b (Printf.sprintf "<%s/>" t);
-              loop tag_stack i
-            end
-          else
-            begin match check_ampersands a with
-              Some a ->
-                Buffer.add_string b (Printf.sprintf "&lt;%s%s&gt;" t a);
-                loop tag_stack i
-            | None ->
-                let pos = Buffer.length b in
-                let txt = Printf.sprintf "%s%s" t a in
-                Buffer.add_string b (Printf.sprintf "<%s>" txt);
-                loop ((pos, txt, t) :: tag_stack) i
-            end
-      | Some (Etag t, i) ->
-          begin match tag_stack with
-            (_, _, bt) :: rest when t = bt ->
-              Buffer.add_string b (Printf.sprintf "</%s>" t); loop rest i
-          | _ ->
-              Buffer.add_string b (bad "red" (Printf.sprintf "&lt;/%s&gt;" t));
-              loop tag_stack i
-          end
-      | Some (Atag t, i) ->
-          Buffer.add_string b (Printf.sprintf "<%s/>" t); loop tag_stack i
-      | None ->
-          if s.[i] = '&' then
-            match check_ampersand s (i + 1) with
-              Some (txt, j) ->
-                Buffer.add_string b (bad "red" txt); loop tag_stack j
-            | None -> Buffer.add_char b '&'; loop tag_stack (i + 1)
-          else
-            begin
-              if s.[i] = '<' && (i + 1 = String.length s || s.[i+1] <> '!')
-              then
-                Buffer.add_string b (bad "red" "&lt;")
-              else Buffer.add_char b s.[i];
-              loop tag_stack (i + 1)
-            end
-  in
-  loop [] 0
-
 let menu_threshold = 20
 
 let is_number t =
@@ -1895,11 +1719,11 @@ let hexa_string s =
   done;
   Bytes.unsafe_to_string s'
 
-let print_alphab_list crit print_elem liste =
+let print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
   if len > menu_threshold then
     begin
-      Wserver.printf "<p>\n";
+      Output.printf conf "<p>\n";
       begin let _ =
         List.fold_left
           (fun last e ->
@@ -1910,15 +1734,15 @@ let print_alphab_list crit print_elem liste =
                | _ -> false
              in
              if not same_than_last then
-               Wserver.printf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
+               Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
              Some t)
           None liste
       in
         ()
       end;
-      Wserver.printf "</p>\n"
+      Output.printf conf "</p>\n"
     end;
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   begin let _ =
     List.fold_left
       (fun last e ->
@@ -1932,26 +1756,26 @@ let print_alphab_list crit print_elem liste =
            begin
              begin match last with
                Some _ ->
-                 if not same_than_last then Wserver.printf "</ul>\n</li>\n"
+                 if not same_than_last then Output.printf conf "</ul>\n</li>\n"
              | _ -> ()
              end;
              if not same_than_last then
                begin
-                 Wserver.printf "<li>\n";
-                 Wserver.printf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
-                 Wserver.printf "<ul>\n"
+                 Output.printf conf "<li>\n";
+                 Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
+                 Output.printf conf "<ul>\n"
                end
            end;
-         Wserver.printf "<li>\n  ";
+         Output.printf conf "<li>\n  ";
          print_elem e;
-         Wserver.printf "</li>\n";
+         Output.printf conf "</li>\n";
          Some t)
       None liste
   in
     ()
   end;
-  if len > menu_threshold then Wserver.printf "</ul>\n</li>\n";
-  Wserver.printf "</ul>\n"
+  if len > menu_threshold then Output.printf conf "</ul>\n</li>\n";
+  Output.printf conf "</ul>\n"
 
 
 let relation_txt conf sex fam =
@@ -2155,11 +1979,11 @@ let first_child conf base p =
 let specify_homonymous conf base p specify_public_name =
   match get_public_name p, get_qualifiers p with
     n, nn :: _ when sou base n <> "" && specify_public_name ->
-      Wserver.printf " %s <em>%s</em>" (sou base n) (sou base nn)
+      Output.printf conf " %s <em>%s</em>" (sou base n) (sou base nn)
   | _, nn :: _ when specify_public_name ->
-      Wserver.printf " %s <em>%s</em>" (p_first_name base p) (sou base nn)
+      Output.printf conf " %s <em>%s</em>" (p_first_name base p) (sou base nn)
   | n, [] when sou base n <> "" && specify_public_name ->
-      Wserver.printf " %s" (sou base n)
+      Output.printf conf " %s" (sou base n)
   | _, _ ->
       (* Le nom public et le qualificatif ne permettent pas de distinguer *)
       (* la personne, donc on affiche les informations sur les parents,   *)
@@ -2171,7 +1995,7 @@ let specify_homonymous conf base p specify_public_name =
         (if cop = "" then "" else ", " ^ cop) ^
         (if hw = "" then if fc = "" then "" else ", " ^ fc else ", " ^ hw) ^ "."
       in
-      Wserver.print_string s
+      Output.print_string conf s
 
 
 (* ************************************************************************** *)
@@ -2676,7 +2500,7 @@ let rchild_type_text conf t n =
       transl_nth conf "foster son/foster daughter/foster child" n
 
 let wprint_hidden conf pref name valu =
-  Wserver.printf "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n" pref
+  Output.printf conf "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n" pref
     name (escape_html valu) conf.xhs
 
 let wprint_hidden_person conf base pref p =
@@ -2737,7 +2561,7 @@ let is_that_user_and_password auth_scheme user passwd =
         that_response_would_be = ds.ds_response
 
 let browser_doesnt_have_tables conf =
-  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
   String.lowercase_ascii user_agent = "lynx"
 
 (* Printing for browsers without tables *)
@@ -2759,26 +2583,26 @@ let pre_text_size txt =
   in
   normal 0 0
 
-let print_pre_center sz txt =
-  for i = 1 to (sz - pre_text_size txt) / 2 do Wserver.printf " " done;
-  Wserver.printf "%s\n" txt
+let print_pre_center conf sz txt =
+  for i = 1 to (sz - pre_text_size txt) / 2 do Output.printf conf " " done;
+  Output.printf conf "%s\n" txt
 
-let print_pre_left sz txt =
+let print_pre_left conf sz txt =
   let tsz = pre_text_size txt in
   if tsz < sz / 2 - 1 then
-    for i = 2 to (sz / 2 - 1 - tsz) / 2 do Wserver.printf " " done;
-  Wserver.printf " %s\n" txt
+    for i = 2 to (sz / 2 - 1 - tsz) / 2 do Output.printf conf " " done;
+  Output.printf conf " %s\n" txt
 
-let print_pre_right sz txt =
+let print_pre_right conf sz txt =
   let tsz = pre_text_size txt in
   if tsz < sz / 2 - 1 then
     begin
-      for i = 1 to sz / 2 do Wserver.printf " " done;
-      for i = 1 to (sz / 2 - 1 - tsz) / 2 do Wserver.printf " " done;
+      for i = 1 to sz / 2 do Output.printf conf " " done;
+      for i = 1 to (sz / 2 - 1 - tsz) / 2 do Output.printf conf " " done;
       ()
     end
-  else for i = 1 to sz - pre_text_size txt - 1 do Wserver.printf " " done;
-  Wserver.printf " %s\n" txt
+  else for i = 1 to sz - pre_text_size txt - 1 do Output.printf conf " " done;
+  Output.printf conf " %s\n" txt
 
 let of_course_died conf p =
   match Adef.od_of_cdate (get_birth p) with
@@ -3007,31 +2831,31 @@ let dispatch_in_columns ncol list order =
 
 let print_in_columns conf ncols len_list list wprint_elem =
   begin_centered conf;
-  Wserver.printf "<table width=\"95%%\" border=\"%d\">\n" conf.border;
-  Wserver.printf "<tr align=\"%s\" valign=\"top\">\n" conf.left;
+  Output.printf conf "<table width=\"95%%\" border=\"%d\">\n" conf.border;
+  Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.left;
   begin let _ =
     List.fold_left
       (fun (list, _first) len ->
          let rec loop n list =
            if n = 0 then
-             begin Wserver.printf "</ul>\n</td>\n"; list, false end
+             begin Output.printf conf "</ul>\n</td>\n"; list, false end
            else
              match list with
                (kind, ord, elem) :: list ->
                  if n = len then
-                   Wserver.printf "<td width=\"%d\">\n" (100 / ncols)
-                 else if !kind <> Elem then Wserver.printf "</ul>\n";
+                   Output.printf conf "<td width=\"%d\">\n" (100 / ncols)
+                 else if !kind <> Elem then Output.printf conf "</ul>\n";
                  if !kind <> Elem then
                    begin
-                     Wserver.printf "<h3 class=\"subtitle\">%s%s</h3>\n"
+                     Output.printf conf "<h3 class=\"subtitle\">%s%s</h3>\n"
                        (if ord = "" then "..." else String.make 1 ord.[0])
                        (if !kind = HeadElem then ""
                         else " (" ^ transl conf "continued" ^ ")");
-                     Wserver.printf "<ul>\n"
+                     Output.printf conf "<ul>\n"
                    end;
-                 Wserver.printf "<li>";
+                 Output.printf conf "<li>";
                  wprint_elem elem;
-                 Wserver.printf "</li>\n";
+                 Output.printf conf "</li>\n";
                  loop (n - 1) list
              | [] -> [], false
          in
@@ -3040,9 +2864,9 @@ let print_in_columns conf ncols len_list list wprint_elem =
   in
     ()
   end;
-  Wserver.printf "</tr>\n";
-  Wserver.printf "</table>\n";
-  end_centered ()
+  Output.printf conf "</tr>\n";
+  Output.printf conf "</table>\n";
+  end_centered conf
 
 let wprint_in_columns conf order wprint_elem list =
   let ncols =
@@ -3094,10 +2918,10 @@ let reduce_list size list =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 let print_reference conf fn occ sn =
-  Wserver.printf "<span class=\"reference\">";
-  Wserver.printf " (%s %s.%d %s)" (transl conf "reference key")
+  Output.printf conf "<span class=\"reference\">";
+  Output.printf conf " (%s %s.%d %s)" (transl conf "reference key")
     (Name.lower fn) occ (Name.lower sn);
-  Wserver.printf "</span>"
+  Output.printf conf "</span>"
 
 
 (* ********************************************************************** *)
@@ -3110,16 +2934,16 @@ let print_reference conf fn occ sn =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
 let gen_print_tips conf s =
-  Wserver.printf "<div class=\"tips\">\n";
-  Wserver.printf "<table>\n";
-  Wserver.printf "<tr>\n";
-  Wserver.printf "<td>\n";
-  Wserver.print_string s;
-  Wserver.printf "</td>\n";
-  Wserver.printf "</tr>\n";
-  Wserver.printf "</table>\n";
-  Wserver.printf "</div>\n";
-  Wserver.printf "<br%s>\n" conf.xhs
+  Output.printf conf "<div class=\"tips\">\n";
+  Output.printf conf "<table>\n";
+  Output.printf conf "<tr>\n";
+  Output.printf conf "<td>\n";
+  Output.print_string conf s;
+  Output.printf conf "</td>\n";
+  Output.printf conf "</tr>\n";
+  Output.printf conf "</table>\n";
+  Output.printf conf "</div>\n";
+  Output.printf conf "<br%s>\n" conf.xhs
 
 (* ********************************************************************** *)
 (*  [Fonc] print_tips_relationship : conf -> unit                         *)
@@ -3157,7 +2981,7 @@ let print_image_sex conf p size =
     | Female -> "female.png", "F"
     | Neuter -> "sexunknown.png", "?"
   in
-  Wserver.printf
+  Output.printf conf
     "<img src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\"%s>\n"
     (image_prefix conf) image alt size size conf.xhs
 

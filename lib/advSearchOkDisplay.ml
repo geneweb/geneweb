@@ -7,27 +7,27 @@ let print_result conf base max_answers (list, len) =
   let list =
     if len > max_answers then Util.reduce_list max_answers list else list
   in
-  if len = 0 then Wserver.printf "%s\n" (Utf8.capitalize (transl conf "no match"))
+  if len = 0 then Output.printf conf "%s\n" (Utf8.capitalize (transl conf "no match"))
   else
     let () = Perso.build_sosa_ht conf base in
-    Wserver.printf "<ul>\n";
+    Output.printf conf "<ul>\n";
     List.iter
       (fun p ->
-         Wserver.printf "<li>" ;
+         Output.printf conf "<li>" ;
          Perso.print_sosa conf base p true;
-         Wserver.printf "\n%s%s<em>"
+         Output.printf conf "\n%s%s<em>"
            (referenced_person_text conf base p)
            (DateDisplay.short_dates_text conf base p) ;
          specify_homonymous conf base p false;
-         Wserver.printf "</em>")
+         Output.printf conf "</em>")
       list;
-    if len > max_answers then Wserver.printf "<li>...</li>";
-    Wserver.printf "</ul>\n"
+    if len > max_answers then Output.printf conf "<li>...</li>";
+    Output.printf conf "</ul>\n"
 
 
 let print conf base =
   let title _ =
-    Wserver.print_string (Utf8.capitalize (transl_nth conf "advanced request" 0))
+    Output.print_string conf (Utf8.capitalize (transl_nth conf "advanced request" 0))
   in
   let max_answers =
     match p_getint conf.env "max" with
@@ -35,9 +35,9 @@ let print conf base =
     | None -> 100
   in
   Hutil.header conf title;
-  Wserver.printf "<p>\n";
-  Wserver.printf "%s %s." (Utf8.capitalize (transl conf "searching all"))
+  Output.printf conf "<p>\n";
+  Output.printf conf "%s %s." (Utf8.capitalize (transl conf "searching all"))
     (AdvSearchOk.searching_fields conf base);
-  Wserver.printf "</p>\n";
+  Output.printf conf "</p>\n";
   let list = AdvSearchOk.advanced_search conf base max_answers in
   print_result conf base max_answers list; Hutil.trailer conf

@@ -80,7 +80,6 @@ endif
 	-e "s/%%%API_PKG%%%/$(API_PKG)/g" \
 	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
-	-e "s/%%%WSERVER_PKG%%%/$(WSERVER_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
 	> $@ \
 	&& echo " Done!"
@@ -193,6 +192,10 @@ distrib: exe
 	cp $(BUILD_DIR)/plugins/export/plugin_export.cmxs $(DISTRIB_DIR)/gw/plugins/export/
 	mkdir $(DISTRIB_DIR)/gw/plugins/forum
 	cp $(BUILD_DIR)/plugins/forum/plugin_forum.cmxs $(DISTRIB_DIR)/gw/plugins/forum/
+	mkdir $(DISTRIB_DIR)/gw/plugins/cgl
+	cp $(BUILD_DIR)/plugins/cgl/plugin_cgl.cmxs $(DISTRIB_DIR)/gw/plugins/cgl/
+	mkdir $(DISTRIB_DIR)/gw/plugins/xhtml
+	cp $(BUILD_DIR)/plugins/xhtml/plugin_xhtml.cmxs $(DISTRIB_DIR)/gw/plugins/xhtml/
 
 .PHONY: install uninstall distrib
 
