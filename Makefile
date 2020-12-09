@@ -142,11 +142,8 @@ uninstall:
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
-distrib:
+distrib: exe
 	$(RM) -r $(DISTRIB_DIR)
-	$(RM) -r $(BUILD_DIR)/bin
-	$(RM) -r $(BUILD_DIR)/plugins
-	$(MAKE) exe
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
