@@ -75,7 +75,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml =
   let color =
     match p_getenv conf.env "color" with
       None -> ""
-    | Some x -> "&color=" ^ code_varenv x
+    | Some x -> "&color=" ^ Mutil.encode x
   in
   let (sl, _) =
     List.fold_left
@@ -881,7 +881,7 @@ let print_main_relationship conf base long p1 p2 rel =
   end;
   begin match p_getenv conf.env "color" with
     None | Some "" -> ()
-  | Some x -> conf.senv <- conf.senv @ ["color", code_varenv x]
+  | Some x -> conf.senv <- conf.senv @ ["color", Mutil.encode x]
   end;
   begin match rel with
     None ->

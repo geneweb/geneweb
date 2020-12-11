@@ -303,10 +303,6 @@ let prefix_base_password_2 conf =
   else
     conf.command ^ "?"
 
-
-let code_varenv = Mutil.encode
-let decode_varenv = Mutil.decode
-
 let allowed_tags_file = ref ""
 
 let default_safe_html_allowed_tags =
@@ -508,11 +504,11 @@ let hidden_env conf =
   List.iter
     (fun (k, v) ->
        Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
-         (escape_html (decode_varenv v)) conf.xhs)
+         (escape_html (Mutil.decode v)) conf.xhs)
     (conf.henv @ conf.senv)
 
 let p_getenv env label =
-  Opt.map decode_varenv (List.assoc_opt (decode_varenv label) env)
+  Opt.map Mutil.decode (List.assoc_opt (Mutil.decode label) env)
 
 let p_getint env label =
   try Opt.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
@@ -687,8 +683,8 @@ let acces_n conf base n x =
   let surname = p_surname base x in
   if surname = "" then ""
   else if accessible_by_key conf base x first_name surname then
-    "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ "&n" ^ n ^ "=" ^
-    code_varenv (Name.lower surname) ^
+    "p" ^ n ^ "=" ^ Mutil.encode (Name.lower first_name) ^ "&n" ^ n ^ "=" ^
+    Mutil.encode (Name.lower surname) ^
     (if get_occ x <> 0 then "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
   else
@@ -1292,7 +1288,7 @@ let get_request_string conf =
     script_name ^ "?" ^ query_string
 
 let url_no_index conf base =
-  let scratch s = code_varenv (Name.lower (sou base s)) in
+  let scratch s = Mutil.encode (Name.lower (sou base s)) in
   let get_a_person v =
     try
       let i = iper_of_string v in

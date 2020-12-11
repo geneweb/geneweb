@@ -166,7 +166,7 @@ and eval_compound_var conf base env xx sl =
     function
       [s] -> eval_simple_str_var conf base env xx s
     | ["evar"; s] -> Opt.default "" (p_getenv conf.env s)
-    | "encode" :: sl -> code_varenv (loop sl)
+    | "encode" :: sl -> Mutil.encode (loop sl)
     | "escape" :: sl -> Util.escape_html (loop sl)
     | "html_encode" :: sl -> no_html_tags (loop sl)
     | "printable" :: sl -> only_printable (loop sl)

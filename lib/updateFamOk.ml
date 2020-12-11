@@ -1160,7 +1160,7 @@ let print_family conf base (wl, ml) cpl des =
   begin match rdsrc with
     Some x ->
       conf.henv <- List.remove_assoc "dsrc" conf.henv;
-      if x <> "" then conf.henv <- ("dsrc", code_varenv x) :: conf.henv
+      if x <> "" then conf.henv <- ("dsrc", Mutil.encode x) :: conf.henv
   | None -> ()
   end;
   Output.printf conf "<ul>\n";

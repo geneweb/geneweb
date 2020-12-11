@@ -16,7 +16,7 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
     Output.printf conf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
     then Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
-    else Output.printf conf "m=N&v=%s" (code_varenv sn);
+    else Output.printf conf "m=N&v=%s" (Mutil.encode sn);
     Output.printf conf "\">%s</a> (%d)" sn len
   in
   let print_sn_list (snl : (string * iper list) list) =
@@ -90,7 +90,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
     Array.iteri
       (fun i (s, x) ->
          Output.printf conf "<a href=\"%sm=PS%s&k=%s\">%s</a> (%d)%s"
-           (commd conf) opt (Util.code_varenv s) s x (if i = last then "" else ",\n"))
+           (commd conf) opt (Mutil.encode s) s x (if i = last then "" else ",\n"))
       array ;
     Output.printf conf "</p>\n"
   end

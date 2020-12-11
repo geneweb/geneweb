@@ -58,7 +58,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   if p_getenv conf.env "t" = Some "A" then
     begin
       Output.printf conf "<a href=\"%sm=N&o=i&v=%s\" rel=\"nofollow\">"
-        (commd conf) (code_varenv x ^ "&t=A");
+        (commd conf) (Mutil.encode x ^ "&t=A");
       Output.print_string conf
         (transl_nth conf "display by/branch/alphabetic order" 2);
       Output.printf conf "</a>"
@@ -66,7 +66,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   else
     begin
       Output.printf conf "<a href=\"%sm=N&o=i&v=%s\" rel=\"nofollow\">"
-        (commd conf) (code_varenv x ^ "&t=N");
+        (commd conf) (Mutil.encode x ^ "&t=N");
       Output.print_string conf
         (transl_nth conf "display by/branch/alphabetic order" 2);
       Output.printf conf "</a>"
@@ -108,7 +108,7 @@ let print_alphabetic_to_branch conf x =
   if p_getenv conf.env "t" = Some "A" then
     begin
       Output.printf conf "<a href=\"%sm=N&v=%s\" rel=\"nofollow\">" (commd conf)
-        (code_varenv x ^ "&t=A");
+        (Mutil.encode x ^ "&t=A");
       Output.print_string conf
         (transl_nth conf "display by/branch/alphabetic order" 1);
       Output.printf conf "</a>"
@@ -116,7 +116,7 @@ let print_alphabetic_to_branch conf x =
   else
     begin
       Output.printf conf "<a href=\"%sm=NG&sn=%s\" rel=\"nofollow\">" (commd conf)
-        (code_varenv x);
+        (Mutil.encode x);
       Output.print_string conf
         (transl_nth conf "display by/branch/alphabetic order" 1);
       Output.printf conf "</a>"
@@ -252,7 +252,7 @@ let first_name_print_list conf base x1 xl liste =
       Mutil.list_iter_first
         (fun first x ->
            Output.printf conf "%s<a href=\"%sm=P&v=%s&t=A\">%s</a>"
-             (if first then "" else ", ") (commd conf) (code_varenv x) x)
+             (if first then "" else ", ") (commd conf) (Mutil.encode x) x)
         (StrSet.elements xl)
   in
   Hutil.header conf title;
@@ -285,7 +285,7 @@ let select_first_name conf n list =
        Output.printf conf "\n";
        Output.printf conf "<li>" ;
        Output.printf conf "<a href=\"%sm=P&v=%s\">" (commd conf)
-         (code_varenv sstr);
+         (Mutil.encode sstr);
        Mutil.list_iter_first
          (fun first str ->
             Output.printf conf "%s%s" (if first then "" else ", ") str)
@@ -552,7 +552,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
       Mutil.list_iter_first
         (fun first x ->
            Output.printf conf "%s<a href=\"%sm=N&v=%s&t=A\">%s</a>"
-             (if first then "" else ", ") (commd conf) (code_varenv x) x)
+             (if first then "" else ", ") (commd conf) (Mutil.encode x) x)
         (StrSet.elements xl)
   in
   let br = p_getint conf.env "br" in
@@ -573,7 +573,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
              Output.printf conf "<dt>";
              Output.printf conf
                "<a href=\"%sm=N&v=%s&br=%d\" rel=\"nofollow\">"
-               (commd conf) (Util.code_varenv str) n;
+               (commd conf) (Mutil.encode str) n;
              Output.printf conf "%d." n;
              Output.printf conf "</a>";
              Output.printf conf "</dt>\n";
@@ -624,7 +624,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   in
   let list = List.sort compare list in
   let access txt sn =
-    geneweb_link conf ("m=N&v=" ^ code_varenv sn ^ "&t=N") txt
+    geneweb_link conf ("m=N&v=" ^ Mutil.encode sn ^ "&t=N") txt
   in
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
     (fun (_, txt, sn) -> Output.print_string conf (access txt sn)) list;
@@ -632,8 +632,8 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   Output.printf conf "<em style=\"font-size:80%%\">\n";
   Output.printf conf "%s " (Utf8.capitalize (transl conf "click"));
   Output.printf conf "<a href=\"%sm=N&o=i&v=%s\">%s</a>\n" (commd conf)
-    (if List.length homonymes = 1 then code_varenv x ^ "&t=A"
-     else code_varenv fx)
+    (if List.length homonymes = 1 then Mutil.encode x ^ "&t=A"
+     else Mutil.encode fx)
     (transl conf "here");
   Output.print_string conf (transl conf "for the first names by alphabetic order");
   Output.printf conf ".</em>\n";
@@ -680,7 +680,7 @@ let print_family_alphabetic x conf base liste =
       let title h =
         let access x =
           if h || List.length homonymes = 1 then x
-          else geneweb_link conf ("m=N&o=i&v=" ^ code_varenv x ^ "&t=A") x
+          else geneweb_link conf ("m=N&o=i&v=" ^ Mutil.encode x ^ "&t=A") x
         in
         Mutil.list_iter_first
           (fun first x ->

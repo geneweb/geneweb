@@ -138,7 +138,7 @@ module Person = struct
     List.map (sou base) (get_first_names_aliases p)
 
   let first_name_key base p =
-    code_varenv (Name.lower (p_first_name base p))
+    Mutil.encode (Name.lower (p_first_name base p))
 
   let first_name_key_val base p =
     Name.lower (p_first_name base p)
@@ -270,7 +270,7 @@ module Person = struct
     List.map (sou base) (get_surnames_aliases p)
 
   let surname_key base p =
-    code_varenv (Name.lower (p_surname base p))
+    Mutil.encode (Name.lower (p_surname base p))
 
   let surname_key_val base p =
     Name.lower (p_surname base p)

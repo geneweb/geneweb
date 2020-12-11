@@ -1278,7 +1278,7 @@ let eval_var conf ifun env ep loc sl =
         end
     | ["env"; "val"; "decoded"] ->
         begin match ifun.get_vother (List.assoc "binding" env) with
-          Some (Vbind (_, v)) -> VVstring (Util.decode_varenv v)
+          Some (Vbind (_, v)) -> VVstring (Mutil.decode v)
         | _ -> raise Not_found
         end
     | "today" :: sl ->

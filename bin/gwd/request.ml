@@ -320,8 +320,8 @@ let make_henv conf base =
       let first_name = p_first_name base p in
       let surname = p_surname base p in
       if Util.accessible_by_key conf base p first_name surname then
-        [ "pz", code_varenv (Name.lower first_name)
-        ; "nz", code_varenv (Name.lower surname)
+        [ "pz", Mutil.encode (Name.lower first_name)
+        ; "nz", Mutil.encode (Name.lower surname)
         ; "ocz", string_of_int (get_occ p) ]
       else [ "iz", string_of_iper (get_iper p) ]
     in
@@ -329,11 +329,11 @@ let make_henv conf base =
   end (Util.find_sosa_ref conf base) ;
   begin match p_getenv conf.env "dsrc" with
     Some "" | None -> ()
-  | Some s -> conf.henv <- conf.henv @ ["dsrc", code_varenv s]
+  | Some s -> conf.henv <- conf.henv @ ["dsrc", Mutil.encode s]
   end;
   begin match p_getenv conf.env "templ" with
     None -> ()
-  | Some s -> conf.henv <- conf.henv @ ["templ", code_varenv s]
+  | Some s -> conf.henv <- conf.henv @ ["templ", Mutil.encode s]
   end;
   Opt.iter
     (fun _ -> conf.henv <- conf.henv @ ["escache", escache_value base])
@@ -378,7 +378,7 @@ let make_senv conf base =
       | Some x -> conf.senv <- conf.senv @ ["bd", x]
     end;
     match p_getenv conf.env "color" with
-    | Some x -> conf.senv <- conf.senv @ ["color", code_varenv x]
+    | Some x -> conf.senv <- conf.senv @ ["color", Mutil.encode x]
     | _ -> ()
   in
   let get x = Util.p_getenv conf.env x in

@@ -125,10 +125,7 @@ let strip_spaces str =
   else if start > stop then ""
   else String.sub str start (stop - start)
 
-let code_varenv = Mutil.encode
-let decode_varenv = Mutil.decode
-
-let getenv env label = decode_varenv (List.assoc (decode_varenv label) env)
+let getenv env label = Mutil.decode (List.assoc (Mutil.decode label) env)
 
 let p_getenv env label = try Some (getenv env label) with Not_found -> None
 
@@ -168,8 +165,8 @@ let parameters =
   let rec loop comm =
     function
       (k, s) :: env ->
-        let k = strip_spaces (decode_varenv k) in
-        let s = strip_spaces (decode_varenv s) in
+        let k = strip_spaces (Mutil.decode k) in
+        let s = strip_spaces (Mutil.decode s) in
         if k = "" || s = "" then loop comm env
         else if k = "opt" then loop comm env
         else if k = "anon" then loop (comm ^ " " ^ stringify s) env
@@ -182,7 +179,7 @@ let parameters =
                     (k1, s1) :: env as genv ->
                       begin match numbered_key k1 with
                         Some (k1, _) when k1 = k ->
-                          let s1 = strip_spaces (decode_varenv s1) in
+                          let s1 = strip_spaces (Mutil.decode s1) in
                           let s =
                             if s1 = "" then s else s ^ " \"" ^ s1 ^ "\""
                           in
@@ -212,8 +209,8 @@ let parameters_1 =
   let rec loop comm bname =
     function
     | (k, s) :: env ->
-        let k = strip_spaces (decode_varenv k) in
-        let s = strip_spaces (decode_varenv s) in
+        let k = strip_spaces (Mutil.decode k) in
+        let s = strip_spaces (Mutil.decode s) in
         if k = "" || s = "" then loop comm bname env
         else if k = "opt" then loop comm bname env
         else if k = "gwd_p" && s <> "" then loop (comm ^ " -gwd_p " ^ stringify s ) bname env
@@ -245,8 +242,8 @@ let parameters_2 =
   let rec loop comm =
     function
     | (k, s) :: env ->
-        let k = strip_spaces (decode_varenv k) in
-        let s = strip_spaces (decode_varenv s) in
+        let k = strip_spaces (Mutil.decode k) in
+        let s = strip_spaces (Mutil.decode s) in
         if k = "" || s = "" then loop comm env
         else if k = "opt" then loop comm env
         else if k = "anon1" then loop (comm ^ " " ^ stringify s) env
@@ -525,7 +522,7 @@ let rec copy_from_stream conf print strm =
                        print "<input type=hidden name=";
                        print k;
                        print " value=\"";
-                       print (decode_varenv s);
+                       print (Mutil.decode s);
                        print "\">\n"
                      end)
                 conf.env
@@ -704,7 +701,7 @@ and print_selector conf print =
              then begin print k; print "="; print v; print ";" end)
           conf.env;
         print "sel=";
-        print (code_varenv d);
+        print (Mutil.encode d);
         print "\">";
         print x;
         print "</a>";
@@ -1316,7 +1313,7 @@ let rec check_rename_conflict conf =
 
 let rename conf =
   let rename_list =
-    List.map (fun (k, v) -> k, strip_spaces (decode_varenv v)) conf.env
+    List.map (fun (k, v) -> k, strip_spaces (Mutil.decode v)) conf.env
   in
   try
     check_new_names conf rename_list (all_db ".");

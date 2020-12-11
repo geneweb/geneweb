@@ -86,7 +86,7 @@ let print_wizards_by_alphabetic_order conf list =
     in
     if with_link then
       Output.printf conf "<a href=\"%sm=WIZNOTES&f=%s%t\">" (commd conf)
-        (Util.code_varenv wz)
+        (Mutil.encode wz)
         (fun _ ->
            Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
              (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
@@ -161,7 +161,7 @@ let print_wizards_by_date conf list =
            (fun _ ->
               if conf.wizard && conf.user = wz || wfile <> "" then
                 Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s%t\">%s</a>"
-                  (commd conf) (Util.code_varenv wz)
+                  (commd conf) (Mutil.encode wz)
                   (fun _ ->
                      Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
@@ -190,7 +190,7 @@ let print_old_wizards conf list =
               (fun first wz ->
                  if not first then Output.printf conf ",\n";
                  Output.printf conf "<a href=\"%sm=WIZNOTES&f=%s\">" (commd conf)
-                   (Util.code_varenv wz);
+                   (Mutil.encode wz);
                  for i = 0 to String.length wz - 1 do
                    if wz.[i] = ' ' then Output.printf conf "&nbsp;"
                    else Output.printf conf "%c" wz.[i]
@@ -330,7 +330,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   in
   let edit_opt =
     let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-    Some (can_edit, "WIZNOTES", code_varenv wz)
+    Some (can_edit, "WIZNOTES", Mutil.encode wz)
   in
   let title = wizard_page_title conf wizname in
   Hutil.header_no_page_title conf title;
@@ -395,7 +395,7 @@ let print_part_wiznote conf base wz s cnt0 =
      Wiki.wi_person_exists = person_exists conf base;
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
-  Wiki.print_sub_part conf wi can_edit "WIZNOTES" (code_varenv wz) cnt0 lines;
+  Wiki.print_sub_part conf wi can_edit "WIZNOTES" (Mutil.encode wz) cnt0 lines;
   Hutil.trailer conf
 
 let wizard_auth_file_name conf =
@@ -537,7 +537,7 @@ let print_connected_wizard conf first wddir wz tm_user =
   if wfile <> "" then
     begin
       Output.printf conf "<a href=\"%sm=WIZNOTES&f=%s%t\">" (commd conf)
-        (Util.code_varenv wz)
+        (Mutil.encode wz)
         (fun _ ->
            Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
              (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
@@ -549,7 +549,7 @@ let print_connected_wizard conf first wddir wz tm_user =
   Output.printf conf " ";
   Output.printf conf
     "<a href=\"%sm=HIST&k=20&wiz=%s\" style=\"text-decoration:none\">"
-    (commd conf) (Util.code_varenv wz);
+    (commd conf) (Mutil.encode wz);
   Output.printf conf "(*)";
   Output.printf conf "</a>";
   let d = conf.ctime -. tm_user in

@@ -82,10 +82,10 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     if ini_k = ini
     then
       Output.printf conf "<a href=\"%sm=%s&tri=A&v=%s\">" (commd conf) mode
-        (Util.code_varenv ini_k)
+        (Mutil.encode ini_k)
     else
       Output.printf conf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
-        (Util.code_varenv ini_k);
+        (Mutil.encode ini_k);
     Output.print_string conf (tr '_' "&nbsp;" (displayify ini_k));
     Output.printf conf "</a>\n"
   end list ;
@@ -140,7 +140,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
          (fun (s, cnt) ->
             Output.printf conf "<li>";
             begin let href =
-                    "m=" ^ mode ^ "&v=" ^ code_varenv s ^ "&t=A"
+                    "m=" ^ mode ^ "&v=" ^ Mutil.encode s ^ "&t=A"
               in
               wprint_geneweb_link conf href
                 (particle_at_the_end base is_surnames s)
@@ -166,7 +166,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
         (fun (_, s, cnt) ->
            Output.printf conf "<li>";
            Output.printf conf "<a href=\"%sm=%s&v=%s&t=A\">" (commd conf) mode
-             (code_varenv s);
+             (Mutil.encode s);
            Output.print_string conf (particle_at_the_end base is_surnames s);
            Output.printf conf "</a>";
            Output.printf conf " (%d)" cnt;
@@ -196,7 +196,7 @@ let print_frequency_any conf base is_surnames list len =
                (fun s ->
                   Output.printf conf "<li>";
                   Output.printf conf "<a href=\"%sm=%s&v=%s\">" (commd conf) mode
-                    (code_varenv (Name.lower s));
+                    (Mutil.encode (Name.lower s));
                   Output.print_string conf (particle_at_the_end base is_surnames s);
                   Output.printf conf "</a>";
                   incr n;
@@ -277,7 +277,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
        Mutil.list_iter_first
          (fun first (s, cnt) ->
             let href =
-              " href=\"" ^ commd conf ^ "m=" ^ mode ^ "&v=" ^ code_varenv s ^ "&t=A\""
+              " href=\"" ^ commd conf ^ "m=" ^ mode ^ "&v=" ^ Mutil.encode s ^ "&t=A\""
             in
             let name =
               if first && need_ref then " id=\"a" ^ ini ^ "\"" else ""

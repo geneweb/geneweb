@@ -198,7 +198,7 @@ let print_aux conf param value submit =
   List.iter begin fun (x, v) ->
     (* Only textarea can contain newline. *)
     Output.printf conf {|<textarea style="display:none;" name="%s">|} x ;
-    Output.print_string conf (Util.escape_html (decode_varenv v)) ;
+    Output.print_string conf (Util.escape_html (Mutil.decode v)) ;
     Output.print_string conf "</textarea>"
   end (conf.henv @ conf.env) ;
   Output.printf conf {|<input type="hidden" name="%s" value="%s">|} param value ;
@@ -756,12 +756,12 @@ let error_locked conf =
          begin
            Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
-           Output.print_string conf (Util.escape_html (decode_varenv v));
+           Output.print_string conf (Util.escape_html (Mutil.decode v));
            Output.printf conf "</textarea>\n"
          end
        else
          Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-           x (Util.escape_html (decode_varenv v)) conf.xhs)
+           x (Util.escape_html (Mutil.decode v)) conf.xhs)
     (conf.henv @ conf.env);
   (* just to see in the traces... *)
   Output.printf conf "<input type=\"hidden\" name=\"retry\" value=\"%s\"%s>\n"
@@ -775,7 +775,7 @@ let error_locked conf =
   List.iter
     (fun (x, v) ->
        Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
-         (Util.escape_html (decode_varenv v)) conf.xhs)
+         (Util.escape_html (Mutil.decode v)) conf.xhs)
     conf.henv;
   begin let ip =
     match p_getenv conf.env "ip" with
@@ -1105,12 +1105,12 @@ let print_create_conflict conf base p var =
          begin
            Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
-           Output.print_string conf (Util.escape_html (decode_varenv v));
+           Output.print_string conf (Util.escape_html (Mutil.decode v));
            Output.printf conf "</textarea>\n"
          end
        else
          Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-           x (Util.escape_html (decode_varenv v)) conf.xhs)
+           x (Util.escape_html (Mutil.decode v)) conf.xhs)
     (conf.henv @ conf.env);
   Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\"%s>\n" var
     conf.xhs;

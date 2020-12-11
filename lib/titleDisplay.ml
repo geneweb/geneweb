@@ -66,18 +66,18 @@ let give_access_someone conf base (x, t) list =
 
 let give_access_title conf t p =
   Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s&p=%s\">" (commd conf)
-    (code_varenv t) (code_varenv p);
+    (Mutil.encode t) (Mutil.encode p);
   Output.print_string conf (Utf8.capitalize t);
   Output.printf conf "</a>\n"
 
 let give_access_all_titles conf t absolute =
   Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s%s\">" (commd conf)
-    (code_varenv t) (if absolute then "&a=A" else "");
+    (Mutil.encode t) (if absolute then "&a=A" else "");
   Output.print_string conf (if absolute then t else Utf8.capitalize t);
   Output.printf conf "</a>"
 
 let give_access_all_places conf t =
-  Output.printf conf "<a href=\"%sm=TT&sm=S&p=%s\">" (commd conf) (code_varenv t);
+  Output.printf conf "<a href=\"%sm=TT&sm=S&p=%s\">" (commd conf) (Mutil.encode t);
   Output.printf conf "... %s" t;
   Output.printf conf "</a>\n"
 
@@ -117,12 +117,12 @@ let print_title_place_list conf base t p t_equiv list =
         (fun first t ->
            if not first then Output.printf conf ",\n";
            Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s&a=A\">" (commd conf)
-             (code_varenv t);
+             (Mutil.encode t);
            Output.printf conf "%s</a>" t;
            if p <> "" then
              begin
                Output.printf conf "\n<a href=\"%sm=TT&sm=S&p=%s&a=A\">"
-                 (commd conf) (code_varenv p);
+                 (commd conf) (Mutil.encode p);
                Output.printf conf "%s</a>" p
              end)
         t_equiv
@@ -189,7 +189,7 @@ let print_places_list conf base t t_equiv list =
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
     Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s&p=%s%s\">" (commd conf)
-      (code_varenv t) (code_varenv p) (if absolute then "&a=A" else "");
+      (Mutil.encode t) (Mutil.encode p) (if absolute then "&a=A" else "");
     if p = "" then Output.printf conf "..."
     else Output.printf conf "%s%s" (surname_without_particle base p) (surname_particle base p);
     Output.printf conf "</a>"
@@ -221,7 +221,7 @@ let print_titles conf base p =
   if List.length list > 1 then
     begin
       Output.printf conf "<a href=\"%sm=TT&sm=A&p=%s\">" (commd conf)
-        (code_varenv p);
+        (Mutil.encode p);
       Output.print_string conf (Utf8.capitalize (transl conf "the whole list"));
       Output.printf conf "</a>\n"
     end;

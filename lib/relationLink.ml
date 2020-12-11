@@ -329,7 +329,7 @@ let sign_text conf base sign info b1 b2 c1 c2 =
    | Some x -> "&td=" ^ x) ^
   (match p_getenv conf.env "color" with
      None | Some "" -> ""
-   | Some x -> "&color=" ^ code_varenv x) ^
+   | Some x -> "&color=" ^ Mutil.encode x) ^
   include_marr conf base "3" ^ include_marr conf base "4" ^ "\">" ^ sign ^
   "</a>"
 

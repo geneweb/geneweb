@@ -203,12 +203,12 @@ let print_linked_list conf base pgl =
              begin
                Output.printf conf
                  "<a class=\"mx-2\" href=\"%sm=MOD_WIZNOTES&f=%s&\">"
-                 (commd conf) (code_varenv wizname);
+                 (commd conf) (Mutil.encode wizname);
                Output.printf conf "<sup><i class=\"fa fa-cog\"></i></sup>";
                Output.printf conf "</a>"
              end;
            Output.printf conf "<a class=\"mx-2\" href=\"%sm=WIZNOTES&f=%s\">"
-             (commd conf) (code_varenv wizname);
+             (commd conf) (Mutil.encode wizname);
            Output.print_string conf wizname;
            Output.printf conf "</a>";
            Output.printf conf "<i>";
