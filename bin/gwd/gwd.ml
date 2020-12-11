@@ -1117,7 +1117,7 @@ let make_conf from_addr request script_name env =
         in
         passwd, env, access_type
     in
-    let passwd = Util.decode_varenv passwd in
+    let passwd = Mutil.decode passwd in
     let command = script_name in command, base_file, passwd, env, access_type
   in
   let (lang, env) = extract_assoc "lang" env in

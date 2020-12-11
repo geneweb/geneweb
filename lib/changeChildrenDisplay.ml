@@ -169,7 +169,7 @@ let print_conflict conf base ip_var p =
   List.iter
     (fun (x, v) ->
        Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
-         (Util.escape_html (decode_varenv v)))
+         (Util.escape_html (Mutil.decode v)))
     (conf.henv @ conf.env);
   begin let var = "c" ^ string_of_iper ip_var in
     Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var

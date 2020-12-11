@@ -33,8 +33,8 @@ let string_of_marriage_text conf base fam =
 
 let string_of_title conf base and_txt p (nth, name, title, places, dates) =
   let href =
-    "m=TT&sm=S&t=" ^ code_varenv (sou base title) ^ "&p=" ^
-    code_varenv (sou base (List.hd places))
+    "m=TT&sm=S&t=" ^ Mutil.encode (sou base title) ^ "&p=" ^
+    Mutil.encode (sou base (List.hd places))
   in
   let (tit, est) = sou base title, sou base (List.hd places) in
   let s = tit ^ " " ^ est in
@@ -49,8 +49,8 @@ let string_of_title conf base and_txt p (nth, name, title, places, dates) =
     match places with
       place :: places ->
         let href =
-          "m=TT&sm=S&t=" ^ code_varenv (sou base title) ^ "&p=" ^
-          code_varenv (sou base place)
+          "m=TT&sm=S&t=" ^ Mutil.encode (sou base title) ^ "&p=" ^
+          Mutil.encode (sou base place)
         in
         let est = sou base place in
         Buffer.add_string b (geneweb_link conf href est); loop places
@@ -2037,7 +2037,7 @@ and eval_simple_bool_var conf base env =
   | s ->
       let v = extract_var "file_exists_" s in
       if v <> "" then
-        let v = code_varenv v in
+        let v = Mutil.encode v in
         let s = SrcfileDisplay.source_file_name conf v in Sys.file_exists s
       else raise Not_found
 and eval_simple_str_var conf base env (_, p_auth) =
@@ -3385,8 +3385,8 @@ and _eval_place_field_var conf place =
   | _ -> raise Not_found
 and eval_nobility_title_field_var (id, pl) =
   function
-    ["ident_key"] -> VVstring (code_varenv id)
-  | ["place_key"] -> VVstring (code_varenv pl)
+    ["ident_key"] -> VVstring (Mutil.encode id)
+  | ["place_key"] -> VVstring (Mutil.encode pl)
   | [] -> VVstring (if pl = "" then id else id ^ " " ^ pl)
   | _ -> raise Not_found
 and eval_bool_event_field base (p, p_auth)
@@ -4074,7 +4074,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       if not p_auth && is_hide_names conf p then "x" else p_first_name base p
   | "first_name_key" ->
       if is_hide_names conf p && not p_auth then ""
-      else code_varenv (Name.lower (p_first_name base p))
+      else Mutil.encode (Name.lower (p_first_name base p))
   | "first_name_key_val" ->
       if is_hide_names conf p && not p_auth then ""
       else Name.lower (p_first_name base p)
@@ -4413,7 +4413,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else surname_without_particle base (p_surname base p)
   | "surname_key" ->
       if is_hide_names conf p && not p_auth then ""
-      else code_varenv (Name.lower (p_surname base p))
+      else Mutil.encode (Name.lower (p_surname base p))
   | "surname_key_val" ->
       if is_hide_names conf p && not p_auth then ""
       else Name.lower (p_surname base p)

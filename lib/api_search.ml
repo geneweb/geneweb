@@ -182,7 +182,7 @@ let select_both_all base ini_n ini_p maiden_name =
   let find_fn p x = kmp x (sou base (get_first_name p)) in
   let find_str s x = kmp x s in
   let ini_n = Util.name_key base ini_n in
-  let ini_n = code_varenv ini_n in
+  let ini_n = Mutil.encode ini_n in
   let ini_n =
     let rec loop s acc =
       if String.contains s '+' then
@@ -190,14 +190,14 @@ let select_both_all base ini_n ini_p maiden_name =
         let start = index + 1 in
         let len = String.length s - start in
         let ns = String.sub s start len in
-        loop ns (decode_varenv (String.sub s 0 index) :: acc)
-      else (decode_varenv s :: acc)
+        loop ns (Mutil.decode (String.sub s 0 index) :: acc)
+      else (Mutil.decode s :: acc)
     in
     loop ini_n []
   in
   let ini_n = List.filter (fun s -> s <> "") ini_n in
   (* choper dans code varenv la variable qui dit que c'est + *)
-  let ini_p = code_varenv ini_p in
+  let ini_p = Mutil.encode ini_p in
   let ini_p =
     let rec loop s acc =
       if String.contains s '+' then
@@ -205,8 +205,8 @@ let select_both_all base ini_n ini_p maiden_name =
         let start = index + 1 in
         let len = String.length s - start in
         let ns = String.sub s start len in
-        loop ns (decode_varenv (String.sub s 0 index) :: acc)
-      else (decode_varenv s :: acc)
+        loop ns (Mutil.decode (String.sub s 0 index) :: acc)
+      else (Mutil.decode s :: acc)
     in
     loop ini_p []
   in
@@ -266,7 +266,7 @@ let select_all base is_surnames ini =
     if is_surnames then Util.name_key base ini
     else ini
   in
-  let ini = code_varenv ini in
+  let ini = Mutil.encode ini in
   let ini =
     let rec loop s acc =
       if String.contains s '+' then
@@ -274,8 +274,8 @@ let select_all base is_surnames ini =
         let start = index + 1 in
         let len = String.length s - start in
         let ns = String.sub s start len in
-        loop ns (decode_varenv (String.sub s 0 index) :: acc)
-      else (decode_varenv s :: acc)
+        loop ns (Mutil.decode (String.sub s 0 index) :: acc)
+      else (Mutil.decode s :: acc)
     in
     loop ini []
   in
@@ -416,18 +416,18 @@ let select_both_start_with_person base ini_n ini_p =
       let start = index + 1 in
       let len = String.length s - start in
       let ns = String.sub s start len in
-      cut_at_space ns (decode_varenv (String.sub s 0 index) :: acc)
-    else (decode_varenv s :: acc)
+      cut_at_space ns (Mutil.decode (String.sub s 0 index) :: acc)
+    else (Mutil.decode s :: acc)
   in
-  let ini_n = cut_at_space (code_varenv (Name.lower ini_n)) [] in
-  let ini_p = cut_at_space (code_varenv (Name.lower ini_p)) [] in
+  let ini_n = cut_at_space (Mutil.encode (Name.lower ini_n)) [] in
+  let ini_p = cut_at_space (Mutil.encode (Name.lower ini_p)) [] in
   Gwdb.Collection.fold begin fun list p ->
       let surnames =
-        cut_at_space (code_varenv (Name.lower (sou base (get_surname p)))) []
+        cut_at_space (Mutil.encode (Name.lower (sou base (get_surname p)))) []
       in
       let first_names =
         cut_at_space
-          (code_varenv (Name.lower (sou base (get_first_name p)))) []
+          (Mutil.encode (Name.lower (sou base (get_first_name p)))) []
       in
       let start_surname =
         List.for_all
@@ -451,13 +451,13 @@ let select_start_with_person base get_field ini =
       let start = index + 1 in
       let len = String.length s - start in
       let ns = String.sub s start len in
-      cut_at_space ns (decode_varenv (String.sub s 0 index) :: acc)
-    else (decode_varenv s :: acc)
+      cut_at_space ns (Mutil.decode (String.sub s 0 index) :: acc)
+    else (Mutil.decode s :: acc)
   in
-  let ini = cut_at_space (code_varenv (Name.lower ini)) [] in
+  let ini = cut_at_space (Mutil.encode (Name.lower ini)) [] in
   Gwdb.Collection.fold begin fun list p ->
       let names =
-        cut_at_space (code_varenv (Name.lower (sou base (get_field p)))) []
+        cut_at_space (Mutil.encode (Name.lower (sou base (get_field p)))) []
       in
       let start_name =
         List.for_all
@@ -577,7 +577,7 @@ let select_start_with_auto_complete base mode max_res ini =
 
 let select_all_auto_complete _ base get_field max_res ini =
   let find p x = kmp x (sou base (get_field p)) in
-  let ini = code_varenv ini in
+  let ini = Mutil.encode ini in
   let ini =
     let rec loop s acc =
       if String.contains s '+' then
@@ -585,8 +585,8 @@ let select_all_auto_complete _ base get_field max_res ini =
         let start = index + 1 in
         let len = String.length s - start in
         let ns = String.sub s start len in
-        loop ns (decode_varenv (String.sub s 0 index) :: acc)
-      else (decode_varenv s :: acc)
+        loop ns (Mutil.decode (String.sub s 0 index) :: acc)
+      else (Mutil.decode s :: acc)
     in
     loop ini []
   in
@@ -747,7 +747,7 @@ let select_both_link_person base ini_n ini_p max_res =
   let find_sn p x = kmp x (sou base (get_surname p)) in
   let find_fn p x = kmp x (sou base (get_first_name p)) in
   let ini_n = Util.name_key base ini_n in
-  let ini_n = code_varenv ini_n in
+  let ini_n = Mutil.encode ini_n in
   let ini_n =
     let rec loop s acc =
       if String.contains s '+' then
@@ -755,14 +755,14 @@ let select_both_link_person base ini_n ini_p max_res =
         let start = index + 1 in
         let len = String.length s - start in
         let ns = String.sub s start len in
-        loop ns (decode_varenv (String.sub s 0 index) :: acc)
-      else (decode_varenv s :: acc)
+        loop ns (Mutil.decode (String.sub s 0 index) :: acc)
+      else (Mutil.decode s :: acc)
     in
     loop ini_n []
   in
   let ini_n = List.filter (fun s -> s <> "") ini_n in
   (* choper dans code varenv la variable qui dit que c'est + *)
-  let ini_p = code_varenv ini_p in
+  let ini_p = Mutil.encode ini_p in
   let ini_p =
     let rec loop s acc =
       if String.contains s '+' then
@@ -770,8 +770,8 @@ let select_both_link_person base ini_n ini_p max_res =
         let start = index + 1 in
         let len = String.length s - start in
         let ns = String.sub s start len in
-        loop ns (decode_varenv (String.sub s 0 index) :: acc)
-      else (decode_varenv s :: acc)
+        loop ns (Mutil.decode (String.sub s 0 index) :: acc)
+      else (Mutil.decode s :: acc)
     in
     loop ini_p []
   in
@@ -785,7 +785,7 @@ let select_both_link_person base ini_n ini_p max_res =
 
 let select_link_person base get_field max_res ini =
   let find p x = kmp x (sou base (get_field p)) in
-  let ini = code_varenv ini in
+  let ini = Mutil.encode ini in
   let ini =
     let rec loop s acc =
       if String.contains s '+' then
@@ -793,8 +793,8 @@ let select_link_person base get_field max_res ini =
         let start = index + 1 in
         let len = String.length s - start in
         let ns = String.sub s start len in
-        loop ns (decode_varenv (String.sub s 0 index) :: acc)
-      else (decode_varenv s :: acc)
+        loop ns (Mutil.decode (String.sub s 0 index) :: acc)
+      else (Mutil.decode s :: acc)
     in
     loop ini []
   in

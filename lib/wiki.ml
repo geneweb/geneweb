@@ -171,12 +171,12 @@ let syntax_links conf wi s =
           let t =
             if wi.wi_person_exists (fn, sn, oc) then
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
-                (commd conf) (code_varenv fn) (code_varenv sn)
+                (commd conf) (Mutil.encode fn) (Mutil.encode sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc) name
             else if wi.wi_always_show_link then
               let s = " style=\"color:red\"" in
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\"%s>%s</a>" pos
-                (commd conf) (code_varenv fn) (code_varenv sn)
+                (commd conf) (Mutil.encode fn) (Mutil.encode sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc) s name
             else
               Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
@@ -650,7 +650,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
   let is_empty = sub_part = "" in
-  let sfn = if fname = "" then "" else "&f=" ^ code_varenv fname in
+  let sfn = if fname = "" then "" else "&f=" ^ Mutil.encode fname in
   Hutil.header conf title;
   if can_edit then
     begin

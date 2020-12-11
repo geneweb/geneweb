@@ -798,7 +798,7 @@ let print_conflict conf base p =
   List.iter
     (fun (x, v) ->
        Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
-         (Util.escape_html (decode_varenv v)) conf.xhs)
+         (Util.escape_html (Mutil.decode v)) conf.xhs)
     (conf.henv @ conf.env);
   Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
     free_n conf.xhs;

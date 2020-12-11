@@ -770,7 +770,7 @@ let print_slices_menu conf hts =
        if k = "slices" then ()
        else
          Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
-           (decode_varenv k) (decode_varenv v))
+           (Mutil.decode k) (Mutil.decode v))
     conf.env;
   Output.printf conf "</p>" ;
   Output.printf conf "<table>\n";

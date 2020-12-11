@@ -1,4 +1,3 @@
-(* $Id: util.mli,v 5.36 2007-07-26 01:57:42 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -34,8 +33,6 @@ val prefix_base : config -> string
 val prefix_base_password : config -> string
 val prefix_base_2 : config -> string
 val prefix_base_password_2 : config -> string
-val code_varenv : string -> string
-val decode_varenv : string -> string
 val hidden_env : config -> unit
 
 val nobtit : config -> base -> person -> title list
