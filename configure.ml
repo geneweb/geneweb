@@ -74,15 +74,15 @@ let () =
     | `Legacy ->
       exclude_dir "sosa.num" ;
       exclude_dir "sosa.zarith" ;
-      "geneweb-sosa"
+      "geneweb.sosa"
     | `Num ->
       exclude_dir "sosa.array" ;
       exclude_dir "sosa.zarith" ;
-      "geneweb-sosa-num"
+      "geneweb.sosa-num"
     | `Zarith ->
       exclude_dir "sosa.array" ;
       exclude_dir "sosa.num" ;
-      "geneweb-sosa-zarith"
+      "geneweb.sosa-zarith"
     | `None -> assert false
   in
   let gwdb_d, gwdb_pkg =
@@ -90,10 +90,10 @@ let () =
     | `None
     | `Legacy ->
       exclude_dir "gwdb-legacy-x-arangodb" ;
-      (" -D GENEWEB_GWDB_LEGACY", "geneweb-gwdb-legacy") ;
+      (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy") ;
     | `LegacyArangoDB ->
       (" -D GENEWEB_GWDB_LEGACY -D GENEWEB_GWDB_ARANGODB"
-      , "geneweb-gwdb-legacy-x-arangodb")
+      , "geneweb.gwdb-legacy-x-arangodb")
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =

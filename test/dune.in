@@ -1,8 +1,8 @@
 (library
- (name dummy_gwdb)
- (libraries geneweb-lib.def stdlib-shims)
-  (implements geneweb-lib.gwdb_driver.mli)
- (modules gwdb_driver)
+  (name dummy_gwdb)
+  (libraries geneweb.def stdlib-shims)
+  (implements geneweb.gwdb_driver)
+  (modules gwdb_driver)
 )
 
 (executable

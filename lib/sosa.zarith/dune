@@ -1,6 +1,6 @@
 (library
  (name sosa_zarith)
- (public_name geneweb-sosa-zarith)
+ (public_name geneweb.sosa-zarith)
  (libraries zarith)
- (implements geneweb-lib.sosa.mli)
+ (implements geneweb.sosa.mli)
 )

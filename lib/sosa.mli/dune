@@ -1,6 +1,6 @@
 (library
  (name sosa)
- (public_name geneweb-lib.sosa.mli)
+ (public_name geneweb.sosa.mli)
  (wrapped false)
  (virtual_modules sosa)
 )

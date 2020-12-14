@@ -2,7 +2,7 @@
 
 (library
  (name geneweb)
- (public_name geneweb-lib)
+ (public_name geneweb)
  (synopsis "GeneWeb library")
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
@@ -11,10 +11,10 @@
             stdlib-shims
             camlp5
             camlp5.gramlib
-            geneweb-lib.gwdb_driver.mli
-            geneweb-lib.def
-            geneweb-lib.sosa.mli
-            geneweb-lib.util
+            geneweb.gwdb_driver
+            geneweb.def
+            geneweb.sosa.mli
+            geneweb.util
             markup)
  (modules_without_implementation templAst)
 )
