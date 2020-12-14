@@ -89,7 +89,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml =
     commd conf :: "em=R&ei=" :: string_of_iper ip1 ::
     "&i=" :: string_of_iper ip2 ::
     (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "") ::
-    (* FIXME *)(* (if conf.cancel_links then "&cgl=on" else "") ::  *)bd :: color :: "&et=S" ::
+    bd :: color :: "&et=S" ::
     sl
   in
   String.concat "" sl

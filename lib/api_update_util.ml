@@ -881,9 +881,7 @@ let pers_to_piqi_person_search_info conf base p =
   let has_sources = psources <> "" in
   let titles = Perso.nobility_titles_list conf base p in
   let titles =
-    (* FIXME *)
-    (* let tmp_conf = {(conf) with cancel_links = true} in *)
-    List.map (Perso.string_of_title conf base "" p) titles
+    List.map (Perso.string_of_title ~link:false conf base "" p) titles
   in
   let related =
     let list =

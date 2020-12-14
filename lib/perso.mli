@@ -105,11 +105,15 @@ val nobility_titles_list :
 val has_history : config -> base -> person -> bool -> bool
 val has_possible_duplications : config -> base -> person -> bool
 
-val string_of_title :
-  config -> base -> string -> person ->
-    int * istr Def.gen_title_name * istr * istr list *
-      (Def.date option * Def.date option) list ->
-    string
+(** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)
+val string_of_title
+  : ?link:bool
+  -> config
+  -> base
+  -> string
+  -> person
+  -> int * istr Def.gen_title_name * istr * istr list * (Def.date option * Def.date option) list
+  -> string
 
 type event_name =
     Pevent of istr Def.gen_pers_event_name

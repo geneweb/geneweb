@@ -9,7 +9,7 @@ open Gwdb
 val get_wday : config -> date -> string
 
 val code_dmy : config -> dmy -> string
-val string_of_ondate : config -> date -> string
+val string_of_ondate : ?link:bool -> config -> date -> string
 val string_of_date : config -> date -> string
 val string_slash_of_date : config -> date -> string
 val string_of_age : config -> dmy -> string
@@ -39,7 +39,8 @@ val code_hebrew_date : config -> int -> int -> int -> string
 
 (** [string_of_date_aux ~dmy:string_of_dmy ~sep:" " conf d] *)
 val string_of_date_aux
-  : ?dmy:(Config.config -> Def.dmy -> string)
+  : ?link:bool
+  -> ?dmy:(Config.config -> Def.dmy -> string)
   -> ?sep:string
   -> Config.config
   -> Def.date

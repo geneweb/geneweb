@@ -1675,9 +1675,7 @@ let has_sources p_auth psources birth_src baptism_src death_src burial_src =
   else false
 
 let fill_titles conf base p =
-  (* FIXME! *)
-  (* let tmp_conf = {(conf) with cancel_links = true} in *)
-  List.map (Perso.string_of_title conf base "" p) (Perso.nobility_titles_list conf base p)
+  List.map (Perso.string_of_title ~link:false conf base "" p) (Perso.nobility_titles_list conf base p)
 
 let transform_empty_string_to_None string =
   if string = "" then None else Some string
@@ -1739,9 +1737,7 @@ let fill_burial_type p_auth gen_p =
   else `dont_know
 
 let fill_titles_with_links conf base p =
-  (* FIXME *)
-  (* let tmp_conf = {(conf) with cancel_links = false} in *)
-  List.map (Perso.string_of_title conf base "" p) (Perso.nobility_titles_list conf base p)
+  List.map (Perso.string_of_title ~link:true conf base "" p) (Perso.nobility_titles_list conf base p)
 
 let has_history_if_is_main_person conf base p p_auth is_main_person =
   if is_main_person then
