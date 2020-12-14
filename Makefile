@@ -16,19 +16,6 @@ DISTRIB_DIR=distribution
 
 BUILD_DIR=_build/default
 
-EXE = \
-	bin/connex.exe \
-	bin/consang.exe \
-	bin/ged2gwb.exe \
-	bin/gwb2ged.exe \
-	bin/gwc.exe \
-	bin/gwd.exe \
-	bin/gwdiff.exe \
-	bin/gwfixbase.exe \
-	bin/gwu.exe \
-	bin/setup.exe \
-	bin/update_nldb.exe \
-
 ###### [BEGIN] Generated files section
 
 CAMLP5_PA_EXTEND_FILES = \
@@ -109,6 +96,8 @@ GENERATED_FILES_DEP = \
 	lib/util/dune \
 	test/dune \
 
+generated: $(GENERATED_FILES_DEP)
+
 ifdef API_D
 piqi:
 	$(foreach p, $(wildcard lib/*.proto), \
@@ -121,15 +110,13 @@ piqi:
 endif
 .PHONY: piqi
 
-%.exe: | piqi $(GENERATED_FILES_DEP)
-	dune build $@
-exe:
-	dune build $(ALL_EXE:=.exe)
-.DEFAULT_GOAL = exe
-
-install uninstall exe: $(GENERATED_FILES_DEP) piqi
+install uninstall build: $(GENERATED_FILES_DEP) piqi
 
 ###### [BEGIN] Installation / Distribution section
+
+build:
+	dune build
+.DEFAULT_GOAL = build
 
 install:
 	dune build @install
@@ -141,7 +128,7 @@ uninstall:
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
-distrib: exe
+distrib: build
 	$(RM) -r $(DISTRIB_DIR)
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases

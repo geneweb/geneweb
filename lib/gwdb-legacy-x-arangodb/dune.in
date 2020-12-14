@@ -3,12 +3,12 @@
 
 (library
   (name gwdb_legacy_x_arangodb)
-  (public_name geneweb-gwdb-legacy-x-arangodb)
-  (implements geneweb-lib.gwdb_driver.mli)
+  (public_name geneweb.gwdb-legacy-x-arangodb)
+  (implements geneweb.gwdb_driver.mli)
   (libraries
     curl
-    geneweb-lib.def
-    geneweb-lib.util
+    geneweb.def
+    geneweb.util
     jsonaf
     syslog
     yojson

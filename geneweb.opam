@@ -22,14 +22,24 @@ depends: [
   "camlp5" { build }
   "cppo" { build }
   "dune" { >= "1.10" }
+  "jingoo" { >= "1.4.0" }
   "markup"
   "ocaml" { >= "4.05" }
   "ounit" { with-test }
   "stdlib-shims"
   "unidecode" { = "0.2.0" }
+  "unix"
   "uucp"
   "uunf"
   "uutf"
+#ifdef API
+  "ocurl"
+  "piqi"
+  "piqilib"
+  "redis"
+  "redis-sync"
+  "yojson"
+#endif
 ]
 
 conflict-class: [ "geneweb" ]

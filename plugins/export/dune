@@ -1,7 +1,18 @@
 (executable
   (name plugin_export)
-  (libraries gwexport gwulib gwb2gedlib geneweb-lib geneweb-gwd-lib geneweb-wserver)
-  (embed_in_plugin_libraries gwexport gwulib gwb2gedlib)
+  (libraries
+    geneweb
+    geneweb.gwb2ged_lib
+    geneweb.gwd_lib
+    geneweb.gwexport_lib
+    geneweb.gwu_lib
+    geneweb.wserver
+  )
+  (embed_in_plugin_libraries
+    geneweb.gwexport_lib
+    geneweb.gwu_lib
+    geneweb.gwb2ged_lib
+  )
   (flags (:standard -w -40-27))
   (modes (native plugin))
 )

@@ -1,15 +1,15 @@
 (library
  (name util)
- (public_name geneweb-lib.util)
+ (public_name geneweb.util)
  (wrapped false)
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries
    calendars
    stdlib-shims
    unidecode
-   geneweb-lib.def
-   geneweb-lib.io
-   geneweb-lib.gwdb_driver.mli
+   geneweb.def
+   geneweb.io
+   geneweb.gwdb_driver
    unix
    uucp
    uunf
