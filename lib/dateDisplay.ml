@@ -313,11 +313,11 @@ let gregorian_precision conf d =
     transl conf "between (date)" ^ " " ^ string_of_on_dmy conf d ^ " " ^
     transl_nth conf "and" 0 ^ " " ^ string_of_on_dmy conf d2
 
-let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = " ") conf =
+let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy) ?(sep = " ") conf =
   function
     Dgreg (d, Dgregorian) ->
       let s = dmy conf d in
-      if d.day > 0 then
+      if link && d.day > 0 then
         Printf.sprintf
           "<a href=\"%sm=CAL&yg=%d&mg=%d&dg=%d&tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
@@ -338,7 +338,7 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = " ") conf =
         dmy conf d1 ^ year_prec ^ sep ^
         transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
       in
-      if d1.day > 0 then
+      if link && d1.day > 0 then
         Printf.sprintf
           "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
@@ -347,7 +347,7 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = " ") conf =
       let d1 = Calendar.french_of_gregorian d in
       let s = string_of_on_french_dmy conf d1 in
       let s =
-        if d1.day > 0 then
+        if link && d1.day > 0 then
           Printf.sprintf
             "<a href=\"%sm=CAL&yf=%d&mf=%d&df=%d&tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
@@ -366,8 +366,8 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = " ") conf =
       end
   | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")"
 
-let string_of_ondate conf d =
-  string_of_date_aux ~dmy:string_of_on_dmy conf d
+let string_of_ondate ?link conf d =
+  string_of_date_aux ?link ~dmy:string_of_on_dmy conf d
   |> Util.translate_eval
 
 let string_of_date conf =

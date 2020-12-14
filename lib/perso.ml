@@ -31,29 +31,38 @@ let string_of_marriage_text conf base fam =
     "" -> s
   | _ -> s ^ ", " ^ Util.safe_html (string_with_macros conf [] marriage_place) ^ ","
 
-let string_of_title conf base and_txt p (nth, name, title, places, dates) =
-  let href =
-    "m=TT&sm=S&t=" ^ Mutil.encode (sou base title) ^ "&p=" ^
-    Mutil.encode (sou base (List.hd places))
-  in
+let string_of_title ?(link = true) conf base and_txt p (nth, name, title, places, dates) =
   let (tit, est) = sou base title, sou base (List.hd places) in
   let s = tit ^ " " ^ est in
   let b = Buffer.create 50 in
-  Buffer.add_string b (geneweb_link conf href s);
+  if link then
+    let href =
+      "m=TT&sm=S&t="
+      ^ Mutil.encode (sou base title)
+      ^ "&p="
+      ^ Mutil.encode (sou base (List.hd places))
+    in
+    Buffer.add_string b (geneweb_link conf href s)
+  else Buffer.add_string b s ;
   let rec loop places =
     begin match places with
-      [] -> ()
-    | [_] -> Printf.bprintf b "\n%s " and_txt
-    | _ -> Buffer.add_string b ",\n"
+        [] -> ()
+      | [_] -> Printf.bprintf b "\n%s " and_txt
+      | _ -> Buffer.add_string b ",\n"
     end;
     match places with
-      place :: places ->
+    | place :: places ->
+      let est = sou base place in
+      if link then
         let href =
-          "m=TT&sm=S&t=" ^ Mutil.encode (sou base title) ^ "&p=" ^
-          Mutil.encode (sou base place)
+          "m=TT&sm=S&t="
+          ^ Mutil.encode (sou base title)
+          ^ "&p="
+          ^ Mutil.encode (sou base place)
         in
-        let est = sou base place in
-        Buffer.add_string b (geneweb_link conf href est); loop places
+        Buffer.add_string b (geneweb_link conf href est)
+      else Buffer.add_string b est ;
+      loop places
     | _ -> ()
   in
   loop (List.tl places);
@@ -78,36 +87,30 @@ let string_of_title conf base and_txt p (nth, name, title, places, dates) =
   let first =
     match name with
       Tname n ->
-        if not first then Buffer.add_string b " ,";
-        Buffer.add_string b (sou base n);
-        false
+      if not first then Buffer.add_string b " ,";
+      Buffer.add_string b (sou base n);
+      false
     | _ -> first
   in
   if authorized_age conf base p && dates <> [None, None] then
-    begin let _ =
-      List.fold_left
-        (fun first (date_start, date_end) ->
-           if not first then Buffer.add_string b ",\n";
-           begin match date_start with
-             Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
-           | None -> ()
-           end;
-           begin match date_end with
-             Some (Dgreg (d, _)) ->
-               if d.month <> 0 then Buffer.add_string b " - "
-               else Buffer.add_string b "-"
-           | Some (Dtext _) -> Buffer.add_string b " - "
-           | _ -> ()
-           end;
-           begin match date_end with
-             Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
-           | None -> ()
-           end;
-           false)
-        first dates
-    in
-      ()
-    end;
+    ignore @@ List.fold_left begin fun first (date_start, date_end) ->
+      if not first then Buffer.add_string b ",\n";
+      begin match date_start with
+        | Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
+        | None -> ()
+      end;
+      begin match date_end with
+        | Some (Dgreg (d, _)) ->
+          if d.month <> 0 then Buffer.add_string b " - "
+          else Buffer.add_string b "-"
+        | Some (Dtext _) -> Buffer.add_string b " - "
+        | _ -> ()
+      end;
+      begin match date_end with
+          Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
+        | None -> ()
+      end;
+      false end first dates ;
   if paren then Buffer.add_string b ")";
   Buffer.contents b
 
@@ -526,15 +529,13 @@ let get_death_text conf p p_auth =
     else ""
   in
   let on_death_date =
-    (* FIXME *)
-    (* let tmp_conf = {conf with cancel_links = true} in *)
     match p_auth, get_death p with
       true, Death (_, d) ->
         let d = Adef.date_of_cdate d in
         begin match p_getenv conf.base_env "long_date" with
-          Some "yes" ->
-            DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-        | _ -> DateDisplay.string_of_ondate conf d
+          | Some "yes" ->
+            DateDisplay.string_of_ondate ~link:false conf d ^ DateDisplay.get_wday conf d
+          | _ -> DateDisplay.string_of_ondate ~link:false conf d
         end
     | _ -> ""
   in
@@ -558,13 +559,13 @@ let get_baptism_text conf p p_auth =
     else ""
   in
   let on_baptism_date =
-    (* let tmp_conf = {conf with cancel_links = true} in *)
     match p_auth, Adef.od_of_cdate (get_baptism p) with
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-        | _ -> DateDisplay.string_of_ondate conf d
+            DateDisplay.string_of_ondate ~link:false conf d
+            ^ DateDisplay.get_wday conf d
+        | _ -> DateDisplay.string_of_ondate ~link:false conf d
         end
     | _ -> ""
   in
@@ -588,13 +589,13 @@ let get_birth_text conf p p_auth =
     else ""
   in
   let on_birth_date =
-    (* let tmp_conf = {conf with cancel_links = true} in *)
     match p_auth, Adef.od_of_cdate (get_birth p) with
       true, Some d ->
         begin match p_getenv conf.base_env "long_date" with
           Some "yes" ->
-            DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-        | _ -> DateDisplay.string_of_ondate conf d
+            DateDisplay.string_of_ondate ~link:false conf d
+            ^ DateDisplay.get_wday conf d
+        | _ -> DateDisplay.string_of_ondate ~link:false conf d
         end
     | _ -> ""
   in
@@ -612,14 +613,13 @@ let get_birth_text conf p p_auth =
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let get_marriage_date_text conf fam p_auth =
-  (* FIXME *)
-  (* let tmp_conf = {conf with cancel_links = true} in *)
   match p_auth, Adef.od_of_cdate (get_marriage fam) with
     true, Some d ->
       begin match p_getenv conf.base_env "long_date" with
         Some "yes" ->
-          DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-      | _ -> DateDisplay.string_of_ondate conf d
+          DateDisplay.string_of_ondate ~link:false conf d
+          ^ DateDisplay.get_wday conf d
+      | _ -> DateDisplay.string_of_ondate ~link:false conf d
       end
   | _ -> ""
 
@@ -641,16 +641,15 @@ let get_burial_text conf p p_auth =
     else ""
   in
   let on_burial_date =
-    (* FIXME *)
-    (* let tmp_conf = {conf with cancel_links = true} in *)
     match get_burial p with
       Buried cod ->
         begin match p_auth, Adef.od_of_cdate cod with
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
-                DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-            | _ -> DateDisplay.string_of_ondate conf d
+                DateDisplay.string_of_ondate ~link:false conf d
+                ^ DateDisplay.get_wday conf d
+            | _ -> DateDisplay.string_of_ondate ~link:false conf d
             end
         | _ -> ""
         end
@@ -676,16 +675,15 @@ let get_cremation_text conf p p_auth =
     else ""
   in
   let on_cremation_date =
-    (* FIXME *)
-    (* let tmp_conf = {conf with cancel_links = true} in *)
     match get_burial p with
       Cremated cod ->
         begin match p_auth, Adef.od_of_cdate cod with
           true, Some d ->
             begin match p_getenv conf.base_env "long_date" with
               Some "yes" ->
-                DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-            | _ -> DateDisplay.string_of_ondate conf d
+                DateDisplay.string_of_ondate ~link:false conf d
+                ^ DateDisplay.get_wday conf d
+            | _ -> DateDisplay.string_of_ondate ~link:false conf d
             end
         | _ -> ""
         end
@@ -3330,12 +3328,7 @@ and eval_date_field_var conf d =
       | _ -> VVstring ""
       end
   | [] ->
-    let s =
-      (* FIXME *)
-      (* let conf = {conf with cancel_links = true} in *)
-      DateDisplay.string_of_date_aux conf ~sep:"&#010;  " d
-    in
-    VVstring s
+    VVstring (DateDisplay.string_of_date_aux ~link:false conf ~sep:"&#010;  " d)
   | _ -> raise Not_found
 and _eval_place_field_var conf place =
   function
