@@ -18,28 +18,26 @@ build: [
 ]
 
 depends: [
-  "benchmark" { with-test }
-  "camlp5" { build }
-  "cppo" { build }
-  "dune" { >= "1.10" }
-  "jingoo" { >= "1.4.0" }
+  "benchmark"
+  "calendars"
+  "camlp5" { = "7.12" }
+  "cppo"
+  "dune" { = "2.7.1" }
+  "jingoo"
   "markup"
-  "ocaml" { >= "4.05" }
-  "ounit" { with-test }
-  "stdlib-shims"
-  "unidecode" { = "0.2.0" }
-  "unix"
-  "uucp"
-  "uunf"
-  "uutf"
-#ifdef API
+  "num"
+  "ocaml"
+  "ounit"
   "ocurl"
   "piqi"
   "piqilib"
   "redis"
   "redis-sync"
+  "stdlib-shims"
+  "unidecode" { = "0.2.0" }
+  "uucp"
+  "uunf"
+  "uutf"
   "yojson"
-#endif
+  "zarith"
 ]
-
-conflict-class: [ "geneweb" ]
