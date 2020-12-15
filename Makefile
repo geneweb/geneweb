@@ -202,16 +202,16 @@ bench: | piqi $(GENERATED_FILES_DEP)
 
 BENCH_FILE ?= /tmp/geneweb-bench.bin
 
-bench-marshal: | piqi $(GENERATED_FILES_DEP) benchmark/bench.exe
+bench-marshal: | piqi $(GENERATED_FILES_DEP)
 ifdef BENCH_NAME
-	_build/default/benchmark/bench.exe --marshal --name ${BENCH_NAME} ${BENCH_FILE}
+	dune exec benchmark/bench.exe -- --marshal --name ${BENCH_NAME} ${BENCH_FILE}
 else
 	 $(error BENCH_NAME variable is empty)
 endif
 .PHONY: bench-marshal
 
-bench-tabulate: | piqi $(GENERATED_FILES_DEP) benchmark/bench.exe
-	_build/default/benchmark/bench.exe --tabulate ${BENCH_FILE}
+bench-tabulate: | piqi $(GENERATED_FILES_DEP)
+	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
 .PHONY: bench-tabulate
 
 clean:
@@ -222,13 +222,12 @@ clean:
 	@echo " Done!"
 .PHONY: clean
 
-
 ci:
 	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
 	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
 	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
 ifndef OS
-	@ocaml ./configure.ml --api && BENCH_NAME=api $(MAKE) -s clean bench-marshal test clean
+	@ocaml ./configure.ml --api && BENCH_NAME=api $(MAKE) -s clean test bench-marshal clean
 endif
 	@$(MAKE) -s bench-tabulate
 .PHONY: ci
