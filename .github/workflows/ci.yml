@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+
+  build:
+
+    strategy:
+
+      fail-fast: true
+
+      matrix:
+
+        ocaml-version:
+          - 4.09.1
+          - 4.08.1
+          - 4.07.1
+          - 4.06.1
+          - 4.05.0
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - run: sudo apt-get update
+
+      - run: opam pin add geneweb.dev . --no-action
+
+      - run: opam depext geneweb --yes
+
+      - run: opam install geneweb --deps-only
+
+      - run: opam exec -- make ci
