@@ -115,7 +115,7 @@ install uninstall build: $(GENERATED_FILES_DEP) piqi
 ###### [BEGIN] Installation / Distribution section
 
 build:
-	dune build
+	dune build -p geneweb
 .DEFAULT_GOAL = build
 
 install:
