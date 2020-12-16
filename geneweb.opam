@@ -42,3 +42,8 @@ depends: [
   "yojson"
   "zarith"
 ]
+
+depexts: [
+  ["protobuf-compiler"] {os-family = "debian"}
+  ["protobuf"] {os = "macos"}
+]
