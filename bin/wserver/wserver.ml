@@ -199,15 +199,8 @@ let get_request_and_content strm =
   let request = get_request strm in
   let content =
     match Mutil.extract_param "content-length: " ' ' request with
-      "" -> ""
-    | x ->
-        let get_next_char _ =
-          let (strm__ : _ Stream.t) = strm in
-          match Stream.peek strm__ with
-            Some x -> Stream.junk strm__; x
-          | _ -> ' '
-        in
-        String.init (int_of_string x) get_next_char
+    | "" -> ""
+    | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
   request, content
 
@@ -232,12 +225,7 @@ let treat_connection tmout callback addr fd =
       end;
   let (request, script_name, contents) =
     let (request, contents) =
-      let strm =
-        let c = Bytes.create 1 in
-        Stream.from
-          (fun _ ->
-             if Unix.read fd c 0 1 = 1 then Some (Bytes.get c 0) else None)
-      in
+      let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
       get_request_and_content strm
     in
     let (script_name, contents) =
