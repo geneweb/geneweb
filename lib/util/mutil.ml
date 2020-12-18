@@ -945,12 +945,9 @@ let rec extract_param name stop_char =
        case_unsensitive_eq (String.sub x 0 (String.length name)) name
     then
       let i =
-        let rec loop i =
-          if i = String.length x then i
-          else if x.[i] = stop_char then i
-          else loop (i + 1)
-        in
-        loop (String.length name)
+        match String.index_from_opt x (String.length name) stop_char with
+        | Some i -> i
+        | None -> String.length x
       in
       String.sub x (String.length name) (i - String.length name)
     else extract_param name stop_char l
