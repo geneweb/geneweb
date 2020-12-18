@@ -19,6 +19,7 @@ let output_conf =
 let printer_conf = { Config.empty with output_conf }
 
 let auth_file = ref ""
+let cache_langs = ref []
 let choose_browser_lang = ref false
 let conn_timeout = ref 120
 let daemon = ref false
@@ -210,23 +211,35 @@ let lexicon_fname = ref (Filename.concat tmp "lexicon.bin.")
 
 (* NB: Lexicon will be impacted by plugins even if the base
    does not activate this plugin in .gwf file. *)
-let load_lexicon lang =
-  let fname = !lexicon_fname ^ lang in
-  Mutil.read_or_create ~wait:true ~magic:Mutil.random_magic fname
-    begin fun ch -> (Marshal.from_channel ch : (string, string) Hashtbl.t) end
-    begin fun ch ->
-      let ht = Hashtbl.create 0 in
-      let rec rev_iter fn = function
-        | [] -> ()
-        | hd :: tl -> rev_iter fn tl ; fn hd
+let load_lexicon =
+  let lexicon_cache = Hashtbl.create 0 in
+  fun lang ->
+    let fname = !lexicon_fname ^ lang in
+    match Hashtbl.find_opt lexicon_cache fname with
+    | Some lex -> lex
+    | None ->
+      let lex =
+        Mutil.read_or_create ~wait:true ~magic:Mutil.random_magic fname
+          begin fun ch -> (Marshal.from_channel ch : (string, string) Hashtbl.t) end
+          begin fun ch ->
+            let ht = Hashtbl.create 0 in
+            let rec rev_iter fn = function
+              | [] -> ()
+              | hd :: tl -> rev_iter fn tl ; fn hd
+            in
+            rev_iter begin fun fname ->
+              Mutil.input_lexicon lang ht begin fun () ->
+                Secure.open_in (Util.search_in_lang_path fname)
+              end end !lexicon_list ;
+            Marshal.to_channel ch ht [] ;
+            ht
+          end
       in
-      rev_iter begin fun fname ->
-        Mutil.input_lexicon lang ht begin fun () ->
-          Secure.open_in (Util.search_in_lang_path fname)
-        end end !lexicon_list ;
-      Marshal.to_channel ch ht [] ;
-      ht
-    end
+      Hashtbl.add lexicon_cache fname lex ;
+      lex
+
+let cache_lexicon () =
+  List.iter (fun x -> ignore @@ load_lexicon x) !cache_langs
 
 let register_plugin plugin =
   let dir = Filename.dirname plugin in
@@ -1872,6 +1885,7 @@ let main () =
       ("-hd", Arg.String Util.add_lang_path, "<DIR> Directory where the directory lang is installed.")
     ; ("-bd", Arg.String Util.set_base_dir, "<DIR> Directory where the databases are installed.")
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
+    ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
     ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
@@ -1947,6 +1961,7 @@ let main () =
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   List.iter register_plugin !plugins ;
+  cache_lexicon () ;
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
