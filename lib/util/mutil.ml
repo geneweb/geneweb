@@ -771,10 +771,10 @@ let list_rev_map_append f l1 l2 =
 
    i.e. Do not close channels before releasing the lock.
 *)
-#ifndef WINDOWS 
-let read_or_create ?(wait = true) ?magic fname read write =
+#ifndef WINDOWS
+let rec read_or_create ?(wait = true) ?magic fname read write =
 #else
-let read_or_create ?wait:(_ = true) ?magic fname read write =
+let rec read_or_create ?wait:(_ = true) ?magic fname read write =
 #endif
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
@@ -790,46 +790,48 @@ let read_or_create ?wait:(_ = true) ?magic fname read write =
     Unix.lockf fd lock 1 ;
     assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
   in
+#else
+  let writelock _ = () in
+  let readlock _ = () in
 #endif
-  let rec rd k =
-    seek_in ic 0 ;
+  let aux () =
     if match magic with None -> true | Some m -> check_magic m ic
     then
       try
         let res = read ic in
+        writelock Unix.F_ULOCK ;
+        close_in ic ;
+        Some res
+      with e -> None
+    else None
+  in
+  match try writelock Unix.F_TLOCK ; None with e -> Some e with
+  | None ->
+    begin
+      match aux () with
+      | Some res -> res
+      | None ->
+        readlock Unix.F_LOCK ;
+        let oc = open_out_bin fname in
+        begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
+        let res = write oc in
+        begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
+        flush oc ;
+        readlock Unix.F_ULOCK ;
+        writelock Unix.F_ULOCK ;
+        close_out oc ;
         close_in ic ;
         res
-      with _ -> k ()
-    else k ()
-  and wr () =
-#ifndef WINDOWS
-    (* remove all present locks *)
-    Unix.lockf fd Unix.F_ULOCK 0 ;
-    (* prevent readers from acquiring cache file *)
-    writelock Unix.F_LOCK ;
-    (* wait for current readers to finish reading
-       and prevent other writer from acquiring cache file.*)
-    readlock Unix.F_LOCK ;
-#endif
-    (* check if another writer has already updated the cache file
-       and update it if not *)
-    rd begin fun () ->
-      let oc = open_out_bin fname in
-      begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
-      let res = write oc in
-      begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
-      flush oc ;
-      close_out oc ;
-      close_in ic ;
-      res
     end
-  in
-#ifndef WINDOWS
-  writelock (if wait then Unix.F_LOCK else Unix.F_TRLOCK) ;
-  readlock Unix.F_RLOCK ;
-  writelock Unix.F_ULOCK ;
-#endif
-  rd wr
+  | Some e ->
+    if wait then begin
+      writelock Unix.F_LOCK ;
+      writelock Unix.F_ULOCK ;
+      readlock Unix.F_RLOCK ;
+      match aux () with
+      | Some res -> res
+      | None -> read_or_create ~wait ?magic fname read write
+    end else raise e
 
 let encode s =
   let special = function
