@@ -802,7 +802,7 @@ let rec read_or_create ?wait:(_ = true) ?magic fname read write =
         writelock Unix.F_ULOCK ;
         close_in ic ;
         Some res
-      with e -> None
+      with _ -> None
     else None
   in
   match try writelock Unix.F_TLOCK ; None with e -> Some e with
