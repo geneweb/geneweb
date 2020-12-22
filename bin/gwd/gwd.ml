@@ -79,31 +79,6 @@ let print_and_cut_if_too_big oc str =
   in
   loop 0
 
-let log oc tm conf from gauth request script_name contents =
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
-  let tm = Unix.localtime tm in
-  Util.fprintf_date oc tm;
-  Printf.fprintf oc " (%d)" (Unix.getpid ());
-  Printf.fprintf oc " %s?" script_name;
-  print_and_cut_if_too_big oc contents;
-  output_char oc '\n';
-  Printf.fprintf oc "  From: %s\n" from;
-  if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth;
-  if conf.wizard && not conf.friend then
-    Printf.fprintf oc "  User: %s%s(wizard)\n" conf.user
-      (if conf.user = "" then "" else " ")
-  else if conf.friend && not conf.wizard then
-    Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
-      (if conf.user = "" then "" else " ");
-  if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent;
-  if referer <> "" then
-    begin
-      Printf.fprintf oc "  Referer: ";
-      print_and_cut_if_too_big oc referer;
-      Printf.fprintf oc "\n"
-    end
-
 type auth_report =
   { ar_ok : bool;
     ar_command : string;
@@ -116,19 +91,16 @@ type auth_report =
     ar_uauth : string;
     ar_can_stale : bool }
 
-let log_passwd_failed ar oc tm from request base_file =
+let log_passwd_failed ar tm from request base_file =
+  GwdLog.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
-  Util.fprintf_date oc tm;
-  Printf.fprintf oc " (%d)" (Unix.getpid ());
-  Printf.fprintf oc " %s_%s" base_file ar.ar_passwd;
-  Printf.fprintf oc " => failed (%s)" ar.ar_user;
-  if !trace_failed_passwd then
-    Printf.fprintf oc " (%s)" (String.escaped ar.ar_uauth);
-  Printf.fprintf oc "\n";
-  Printf.fprintf oc "  From: %s\n" from;
-  Printf.fprintf oc "  Agent: %s\n" user_agent;
+  Printf.fprintf oc
+    "%s (%d) %s_%s => failed (%s)"
+    (Mutil.sprintf_date tm) (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user;
+  if !trace_failed_passwd then Printf.fprintf oc " (%s)" (String.escaped ar.ar_uauth);
+  Printf.fprintf oc "\n  From: %s\n  Agent: %s\n" from user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
 let copy_file conf fname =
@@ -147,7 +119,7 @@ let http conf status =
   Output.header conf "Content-type: text/html; charset=iso-8859-1"
 
 let robots_txt conf =
-  Log.with_log (fun oc -> Printf.fprintf oc "Robot request\n");
+  GwdLog.syslog `LOG_NOTICE "Robot request";
   Output.status conf Def.OK;
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
@@ -155,40 +127,24 @@ let robots_txt conf =
     begin Output.printf conf "User-Agent: *\n"; Output.printf conf "Disallow: /\n" end
 
 let refuse_log conf from =
-  Log.with_file ~file:"refuse_log"
-    (fun oc ->
-       let tm = Unix.localtime (Unix.time ()) in
-       Util.fprintf_date oc tm; Printf.fprintf oc " excluded: %s\n" from);
+  GwdLog.syslog `LOG_NOTICE @@ "Excluded: " ^ from ;
   http conf Def.Forbidden;
   Output.header conf "Content-type: text/html";
   Output.printf conf "Your access has been disconnected by administrator.\n";
   let _ = (copy_file conf "refuse" : bool) in ()
 
 let only_log conf from =
-  Log.with_log
-    (fun oc ->
-       let tm = Unix.localtime (Unix.time ()) in
-       Util.fprintf_date oc tm;
-       Printf.fprintf oc " Connection refused from %s " from;
-       Printf.fprintf oc "(only ";
-       Mutil.list_iter_first
-         (fun first s -> Printf.fprintf oc "%s%s" (if not first then "," else "") s)
-         !only_addresses;
-       Printf.fprintf oc ")\n");
+  GwdLog.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
   http conf Def.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.printf conf "<head><title>Invalid access</title></head>\n";
   Output.printf conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
-  Log.with_log
-    (fun oc ->
-       let tm = Unix.localtime (Unix.time ()) in
-       Util.fprintf_date oc tm;
-       Printf.fprintf oc " Access failed\n";
-       Printf.fprintf oc "  From: %s\n" from;
-       Printf.fprintf oc "  Basic realm: %s\n" auth_type;
-       Printf.fprintf oc "  Response: %s\n" auth);
+  GwdLog.syslog `LOG_NOTICE @@
+  Printf.sprintf
+    "Access failed --- From: %s --- Basic realm: %s --- Response: %s"
+    from auth_type auth;
   Util.unauthorized conf auth_type
 
 let index_from s o c =
@@ -346,16 +302,11 @@ let print_renamed conf new_n =
 
 let log_redirect from request req =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
-    ~onerror:(fun () -> ())
-    (fun () ->
-       Log.with_log
-         (fun oc ->
-            let referer = Mutil.extract_param "referer: " '\n' request in
-            let tm = Unix.localtime (Unix.time ()) in
-            Util.fprintf_date oc tm;
-            Printf.fprintf oc " %s\n" req;
-            Printf.fprintf oc "  From: %s\n" from;
-            Printf.fprintf oc "  Referer: %s\n" referer))
+    ~onerror:(fun () -> ()) begin fun () ->
+    let referer = Mutil.extract_param "referer: " '\n' request in
+    GwdLog.syslog `LOG_NOTICE @@
+    Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer
+  end
 
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
@@ -425,8 +376,8 @@ let unauth_server conf ar =
       trace_auth conf.base_env
         (fun oc ->
            Printf.fprintf oc
-             "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n"
-             Util.fprintf_date tm
+             "\n401 unauthorized\n- date: %s\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n"
+             (Mutil.sprintf_date tm)
              (fun oc ->
                 List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) conf.request)
              ar.ar_passwd nonce ar.ar_can_stale)
@@ -1028,8 +979,8 @@ let digest_authorization request base_env passwd utm base_file command =
         trace_auth base_env
           (fun oc ->
              Printf.fprintf oc
-               "\nanswer\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n"
-               Util.fprintf_date (Unix.localtime utm)
+               "\nanswer\n- date: %s\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n"
+               (Mutil.sprintf_date @@ Unix.localtime utm)
                (fun oc ->
                   List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) request)
                passwd nonce ds.ds_meth ds.ds_uri)
@@ -1313,31 +1264,47 @@ let make_conf from_addr request script_name env =
   in
   conf, sleep, ar
 
+let log tm conf from gauth request script_name contents =
+  GwdLog.log @@ fun oc ->
+  let referer = Mutil.extract_param "referer: " '\n' request in
+  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
+  let tm = Unix.localtime tm in
+  Printf.fprintf oc
+    "%s (%d) %s?" (Mutil.sprintf_date tm) (Unix.getpid ()) script_name ;
+  print_and_cut_if_too_big oc contents;
+  output_char oc '\n';
+  Printf.fprintf oc "  From: %s\n" from;
+  if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth;
+  if conf.wizard && not conf.friend then
+    Printf.fprintf oc "  User: %s%s(wizard)\n" conf.user
+      (if conf.user = "" then "" else " ")
+  else if conf.friend && not conf.wizard then
+    Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
+      (if conf.user = "" then "" else " ");
+  if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent;
+  if referer <> "" then
+    begin
+      Printf.fprintf oc "  Referer: ";
+      print_and_cut_if_too_big oc referer;
+      Printf.fprintf oc "\n"
+    end
+
 let log_and_robot_check conf auth from request script_name contents =
-  if !robot_xcl = None then
-    Log.with_log
-      (fun oc ->
-         let tm = Unix.time () in
-         log oc tm conf from auth request script_name contents)
+  if !robot_xcl = None
+  then log (Unix.time ()) conf from auth request script_name contents
   else
-    Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
-      ~onerror:ignore
-      (fun () ->
-         Log.with_log_opt
-           (fun oc_opt ->
-              let tm = Unix.time () in
-              begin match !robot_xcl with
-                  Some (cnt, sec) ->
-                  let s = "suicide" in
-                  let suicide = Util.p_getenv conf.env s <> None in
-                  conf.n_connect <-
-                    Some (Robot.check oc_opt tm from cnt sec conf suicide)
-                | _ -> ()
-              end;
-              match oc_opt with
-                Some oc ->
-                log oc tm conf from auth request script_name contents
-              | None -> ()))
+    Lock.control (SrcfileDisplay.adm_file "gwd.lck") true ~onerror:ignore
+      begin fun () ->
+        let tm = Unix.time () in
+        begin match !robot_xcl with
+          | Some (cnt, sec) ->
+            let s = "suicide" in
+            let suicide = Util.p_getenv conf.env s <> None in
+            conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide)
+          | _ -> ()
+        end;
+        log tm conf from auth request script_name contents
+      end
 
 let is_robot from =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
@@ -1420,14 +1387,11 @@ let conf_and_connection from request script_name contents env =
             let tm = Unix.time () in
             Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
               ~onerror:(fun () -> ())
-              (fun () ->
-                 Log.with_log
-                   (fun oc ->
-                      log_passwd_failed ar oc tm from request conf.bname)) ;
+              (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
       | _ ->
         Request.treat_request conf;
-                if conf.manitou && sleep > 0 then Unix.sleep sleep
+        if conf.manitou && sleep > 0 then Unix.sleep sleep
 
 let chop_extension name =
   let rec loop i =
@@ -1750,7 +1714,6 @@ let manage_cgi_timeout tmout =
     let _ = Unix.alarm tmout in ()
 
 let geneweb_cgi addr script_name contents =
-  Log.fallback_to_stderr := false;
   if Sys.unix then manage_cgi_timeout !conn_timeout;
   begin try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o755 with
     Unix.Unix_error (_, _, _) -> ()
@@ -1903,7 +1866,8 @@ let main () =
     ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
     ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
     ; ("-add_lexicon", Arg.String (Mutil.list_ref_append lexicon_list), "<FILE> Add file as lexicon.")
-    ; ("-log", Arg.Set_string Log.file, "<FILE> Redirect log trace to this file.")
+    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Llog trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
+    ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity >= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
     ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")
     ; ("-login_tmout", Arg.Int (fun x -> login_timeout := x), "<SEC> Login timeout for entries with passwords in CGI mode (default " ^ string_of_int !login_timeout ^ "s).")
@@ -2024,18 +1988,4 @@ let () =
       !selected_port;
     flush stderr;
 #endif
-  | Unix.Unix_error (err, fun_name, arg) ->
-    prerr_string "\"";
-    prerr_string fun_name;
-    prerr_string "\" failed";
-    if String.length arg > 0 then begin
-      prerr_string " on \"";
-      prerr_string arg;
-      prerr_string "\"";
-    end;
-    prerr_string ": ";
-    prerr_endline (Unix.error_message err);
-    flush stderr
-  | e ->
-    Printf.eprintf "%s\n" (Printexc.to_string e);
-    flush stderr
+  | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)

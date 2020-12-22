@@ -381,9 +381,7 @@ let forum_add conf _base moderated mess =
   if mess.m_ident <> "" && mess.m_text <> "" then
     MF.extend (forum_file conf)
       (fun oc ->
-         let (hh, mm, ss) = conf.time in
-         Printf.fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n" conf.today.year
-           conf.today.month conf.today.day hh mm ss;
+         Printf.fprintf oc "Time: %s\n" (Util.sprintf_today conf) ;
          if moderated then Printf.fprintf oc "Moderator: ....................\n";
          Printf.fprintf oc "From: %s\n" conf.from;
          Printf.fprintf oc "Ident: %s\n" mess.m_ident;

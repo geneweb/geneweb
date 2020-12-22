@@ -369,11 +369,7 @@ let print conf base =
 
 let print_add_ok conf base =
   let mess =
-    let time =
-      let (hh, mm, ss) = conf.time in
-      Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year conf.today.month
-        conf.today.day hh mm ss
-    in
+    let time = Util.sprintf_today conf in
     let ident = String.trim (get conf "Ident") in
     let email = String.trim (get conf "Email") in
     let subject = String.trim (get conf "Subject") in

@@ -94,15 +94,16 @@ let write_history_file conf person_file fname gr =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let make_gen_record conf base first gen_p =
-  let (hh, mm, ss) = conf.time in
-  let (hh, mm, ss) =
-    (* On évite les calculs savant pour la date (ss - 1 avec une date *)
-    (* autour de minuit ...). C'est simplement une indication.        *)
-    if first then hh, mm, min 0 ss else hh, mm, ss
-  in
   let date =
-    Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
-      conf.today.month conf.today.day hh mm ss
+    let conf =
+      (* On évite les calculs savant pour la date (ss - 1 avec une date *)
+      (* autour de minuit ...). C'est simplement une indication.        *)
+      if first then
+        let (hh, mm, ss) = conf.time in
+        { conf with time = hh, mm, min 0 ss }
+      else conf
+    in
+    Util.sprintf_today conf
   in
   let p = poi base gen_p.key_index in
   let fam = get_family p in

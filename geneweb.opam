@@ -35,6 +35,7 @@ depends: [
   "redis"
   "redis-sync"
   "stdlib-shims"
+  "syslog"
   "unidecode" { = "0.2.0" }
   "uucp"
   "uunf"
