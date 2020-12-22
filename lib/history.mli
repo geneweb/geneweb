@@ -15,6 +15,4 @@ val print_search : config -> base -> unit
 
 
 (* Ajout pour l'API *)
-exception Begin_of_file
 val line_fields : string -> (string * string * string * string option) option
-val rev_input_line : in_channel -> int -> bytes ref * int ref -> string * int

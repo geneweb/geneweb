@@ -248,3 +248,17 @@ val extract_param : string -> char -> string list -> string
 
 (** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format. *)
 val sprintf_date : Unix.tm -> string
+
+(** [rev_input_line ic pos (rbytes, rpos)]
+    Read characters in reverse order from the given input channel,
+    until a newline character is encountered.
+    Return the string of all characters read, without the newline
+    character at the end, and the position of the first character
+    of the returned line (to be used with next [rev_input_line] call).
+
+    [rpos] and [rbytes] must be the same in each subsequents calls
+
+    Raises [End_of_file] if the beginning of the file is reached
+    at the beginning of line.
+*)
+val rev_input_line : in_channel -> int -> (bytes ref * int ref) -> string * int

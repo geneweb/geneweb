@@ -35,7 +35,7 @@ let print_info_base conf base =
       let (_, pos, wiz) = (1, in_channel_length ic, "") in
       let vv = (ref (Bytes.create 0), ref 0) in
       let last_modified_person =
-        let (line, _) = History.rev_input_line ic pos vv in
+        let (line, _) = Mutil.rev_input_line ic pos vv in
         match History.line_fields line with
         | Some (_, user, action, keyo) ->
           if wiz = "" || user = wiz then
@@ -361,8 +361,8 @@ let print_last_modified_persons conf base =
           if res = 0 then list
           else
             match
-              try Some (History.rev_input_line ic pos vv)
-              with History.Begin_of_file -> None
+              try Some (Mutil.rev_input_line ic pos vv)
+              with End_of_file -> None
             with
             | Some (line, pos) ->
                 (match History.line_fields line with
