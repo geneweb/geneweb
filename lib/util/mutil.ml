@@ -771,11 +771,7 @@ let list_rev_map_append f l1 l2 =
 
    i.e. Do not close channels before releasing the lock.
 *)
-#ifndef WINDOWS
 let rec read_or_create ?(wait = true) ?magic fname read write =
-#else
-let rec read_or_create ?wait:(_ = true) ?magic fname read write =
-#endif
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
   let ic = Unix.in_channel_of_descr fd in
