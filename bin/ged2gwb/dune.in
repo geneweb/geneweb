@@ -1,0 +1,6 @@
+(executable
+  (name ged2gwb)
+  (public_name geneweb.ged2gwb)
+  (modules ged2gwb)
+  (libraries unix str camlp5.gramlib %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+)

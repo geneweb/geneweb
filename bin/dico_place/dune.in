@@ -1,0 +1,10 @@
+#ifdef API
+(executable
+  (name marshal_dico_place)
+  (public_name geneweb.marshal_dico_place)
+  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (modules marshal_dico_place)
+)
+#else
+(dirs :standard \ dico_place)
+#endif

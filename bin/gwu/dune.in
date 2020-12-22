@@ -1,0 +1,14 @@
+(library
+  (name gwu_lib)
+  (public_name geneweb.gwu_lib)
+  (wrapped false)
+  (libraries geneweb gwexport_lib)
+  (modules gwuLib)
+)
+
+(executable
+  (name gwu)
+  (public_name geneweb.gwu)
+  (modules gwu)
+  (libraries geneweb gwexport_lib gwu_lib str unix %%%GWDB_PKG%%% %%%SOSA_PKG%%%)
+)

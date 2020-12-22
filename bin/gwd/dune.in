@@ -1,0 +1,49 @@
+(rule
+  (target gwdPluginMD5.ml)
+  (deps
+    (:cmxs
+      %{project_root}/plugins/cgl/plugin_cgl.cmxs
+      %{project_root}/plugins/export/plugin_export.cmxs
+      %{project_root}/plugins/forum/plugin_forum.cmxs
+      %{project_root}/plugins/no_index/plugin_no_index.cmxs
+      %{project_root}/plugins/xhtml/plugin_xhtml.cmxs
+    )
+    (:maker mk_gwdPluginMD5.ml)
+  )
+  (action (with-stdout-to %{target} (run ocaml %{maker} %{cmxs})))
+)
+
+(library
+  (name gwd_lib)
+  (public_name geneweb.gwd_lib)
+  (wrapped true)
+  (libraries geneweb wserver %%%GWDB_PKG%%% %%%SOSA_PKG%%%)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (modules gwdLog gwdPlugin request sendImage)
+)
+
+(executable
+  (name gwd)
+  (public_name geneweb.gwd)
+  (flags -linkall)
+  (libraries
+    dynlink
+    geneweb
+    gwd_lib
+    gwxjg
+    str
+    syslog
+    unix
+    wserver
+    %%%GWDB_PKG%%%
+    %%%SOSA_PKG%%%
+  )
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (modules
+    gwd
+    gwdPluginDep
+    gwdPluginMD5
+    gwdPluginMETA
+    robot
+  )
+)

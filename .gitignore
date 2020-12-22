@@ -7,7 +7,19 @@ Makefile.local
 
 # Generated from dune.in files
 benchmark/dune
-bin/dune
+bin/connex/dune
+bin/consang/dune
+bin/dico_place/dune
+bin/fixbase/dune
+bin/ged2gwb/dune
+bin/gwb2ged/dune
+bin/gwc/dune
+bin/gwd/dune
+bin/gwdiff/dune
+bin/gwgc/dune
+bin/gwu/dune
+bin/setup/dune
+bin/update_nldb/dune
 lib/dune
 lib/gwdb-legacy-x-arangodb/dune
 lib/util/dune
