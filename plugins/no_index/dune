@@ -1,0 +1,5 @@
+(executable
+  (name plugin_no_index)
+  (libraries geneweb geneweb.gwd_lib geneweb.wserver)
+  (modes (native plugin))
+)

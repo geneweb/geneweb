@@ -111,7 +111,6 @@ val string_of_place : config -> string -> string
 val place_of_string : config -> string -> place option
 val allowed_tags_file : string ref
 val body_prop : config -> string
-val url_no_index : config -> base -> string
 val message_to_wizard : config -> unit
 
 val of_course_died : config -> person -> bool

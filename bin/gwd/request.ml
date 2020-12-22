@@ -441,21 +441,6 @@ let w_person ~none fn conf base =
   | Some p -> fn conf base p
   | _ -> none conf base
 
-let print_no_index conf base =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "link to use"))
-  in
-  let link = url_no_index conf base in
-  Hutil.header conf title;
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>" ;
-  Output.printf conf "<a href=\"http://%s\">\n" link;
-  Output.print_string conf link;
-  Output.printf conf "</a>\n";
-  Output.printf conf "</ul>\n";
-  Hutil.print_link_to_welcome conf false;
-  Hutil.trailer conf
-
 let treat_request conf =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base = w_base ~none:incorrect_request in
@@ -494,9 +479,6 @@ let treat_request conf =
     let m = Opt.default "" @@ p_getenv conf.env "m" in
     if not @@ try_plugin plugins conf base m
     then begin
-      if p_getenv conf.env "opt" = Some "no_index"
-      then w_base print_no_index
-      else begin
         if p_getenv conf.base_env "counter" <> Some "no"
         then begin
           match SrcfileDisplay.incr_welcome_counter conf with
@@ -912,7 +894,7 @@ let treat_request conf =
           end
 #endif
         | _ -> incorrect_request
-      end end conf base ;
+      end conf base ;
     Output.flush conf ;
   end else
     begin
