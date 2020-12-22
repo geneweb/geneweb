@@ -960,3 +960,47 @@ let sprintf_date tm =
     tm.Unix.tm_hour
     tm.Unix.tm_min
     tm.Unix.tm_sec
+
+let rev_input_line ic pos (rbuff, rpos) =
+  let rev = Buffer.create 256 in
+  let rev_input_char pos =
+    if !rpos = 0 then begin
+      if Bytes.length !rbuff < 65536
+      then rbuff := Bytes.create @@ if Bytes.length !rbuff = 0 then 1024 else 2 * Bytes.length !rbuff ;
+
+      let ppos = max (pos - Bytes.length !rbuff) 0 in
+      seek_in ic ppos;
+      let len = pos - ppos in
+      really_input ic !rbuff 0 len;
+      rpos := len
+    end;
+    decr rpos;
+    Bytes.unsafe_get !rbuff !rpos
+  in
+  let get_n_reset () =
+    let s = Buffer.to_bytes rev in
+    let n = Bytes.length s in
+    for i = 0 to (n - 1) / 2 do
+      let c = Bytes.unsafe_get s i in
+      Bytes.unsafe_set s i @@ Bytes.unsafe_get s (n - i - 1) ;
+      Bytes.unsafe_set s (n - i - 1) c;
+    done ;
+    Bytes.unsafe_to_string s
+  in
+  let rev_input_line pos =
+    seek_in ic pos;
+    if pos <= 0 then raise End_of_file
+    else
+      let rec loop pos =
+        if pos <= 0 then get_n_reset (), pos
+        else
+          match rev_input_char pos with
+          | '\n' -> get_n_reset (), pos
+          | '\r' -> get_n_reset (), (pos - 1)
+          | c ->
+            Buffer.add_char rev c ;
+            loop (pos - 1)
+      in
+      loop pos
+  in
+  rev_input_line (pos - 1)

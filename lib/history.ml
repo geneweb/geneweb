@@ -301,41 +301,6 @@ let notify conf base action =
 
 (* Request for history printing *)
 
-exception Begin_of_file
-
-let buff_get_rev len =
-  let get i = Bytes.get !(Buff.buff) (len - 1 - i) in String.init len get
-
-let rev_input_char ic (rbuff, rpos) pos =
-  if !rpos = 0 then
-    begin
-      if Bytes.length !rbuff < 65536 then
-        begin let len =
-          if Bytes.length !rbuff = 0 then 1024 else 2 * Bytes.length !rbuff
-        in
-          rbuff := Bytes.create len
-        end;
-      let ppos = max (pos - Bytes.length !rbuff) 0 in
-      seek_in ic ppos;
-      really_input ic !rbuff 0 (pos - ppos);
-      rpos := pos - ppos
-    end;
-  decr rpos;
-  Bytes.get !rbuff !rpos
-
-let rev_input_line ic pos (rbuff, rpos) =
-  if pos <= 0 then raise Begin_of_file
-  else
-    let rec loop len pos =
-      if pos <= 0 then buff_get_rev len, pos
-      else
-        match rev_input_char ic (rbuff, rpos) pos with
-          '\n' -> buff_get_rev len, pos
-        | '\r' -> buff_get_rev len, (pos - 1)
-        | c -> loop (Buff.store len c) (pos - 1)
-    in
-    loop 0 (pos - 1)
-
 let line_tpl = "0000-00-00 00:00:00 xx ."
 
 let line_fields line =
@@ -547,8 +512,8 @@ let print_foreach conf base print_ast eval_expr =
               if i >= k then pos
               else
                 match
-                  try Some (rev_input_line ic pos vv) with
-                    Begin_of_file -> None
+                  try Some (Mutil.rev_input_line ic pos vv) with
+                    End_of_file -> None
                 with
                   Some (line, pos) ->
                     let i = print_history_line2 env xx line wiz i al in
@@ -648,7 +613,7 @@ let search_text conf base s =
         let vv = ref (Bytes.create 0), ref 0 in
         let rec loop pos =
           match
-            try Some (rev_input_line ic pos vv) with Begin_of_file -> None
+            try Some (Mutil.rev_input_line ic pos vv) with End_of_file -> None
           with
             Some (line, pos2) ->
               begin match line_fields line with
