@@ -92,67 +92,10 @@ let print_string s =
 let http_redirect_temporarily url =
   http Def.Moved_Temporarily; printnl "Location: %s" url
 
-let print_exc exc =
-  let () =
-    match exc with
-      Unix.Unix_error (err, fun_name, arg) ->
-        prerr_string "\"";
-        prerr_string fun_name;
-        prerr_string "\" failed";
-        if String.length arg > 0 then
-          begin
-            prerr_string " on \"";
-            prerr_string arg;
-            prerr_string "\""
-          end;
-        prerr_string ": ";
-        prerr_endline (Unix.error_message err)
-    | Out_of_memory -> prerr_string "Out of memory\n"
-    | Match_failure (file, first_char, last_char) ->
-        prerr_string "Pattern matching failed, file ";
-        prerr_string file;
-        prerr_string ", chars ";
-        prerr_int first_char;
-        prerr_char '-';
-        prerr_int last_char;
-        prerr_char '\n'
-    | Assert_failure (file, first_char, last_char) ->
-        prerr_string "Assertion failed, file ";
-        prerr_string file;
-        prerr_string ", chars ";
-        prerr_int first_char;
-        prerr_char '-';
-        prerr_int last_char;
-        prerr_char '\n'
-    | x ->
-        prerr_string "Wserver: uncaught exception: ";
-        prerr_string (Obj.magic (Obj.field (Obj.field (Obj.repr x) 0) 0));
-        if Obj.size (Obj.repr x) > 1 then
-          begin
-            prerr_char '(';
-            for i = 1 to Obj.size (Obj.repr x) - 1 do
-              if i > 1 then prerr_string ", ";
-              let arg = Obj.field (Obj.repr x) i in
-              if not (Obj.is_block arg) then prerr_int (Obj.magic arg : int)
-              else if Obj.tag arg = 252 then
-                begin
-                  prerr_char '"';
-                  prerr_string (Obj.magic arg : string);
-                  prerr_char '"'
-                end
-              else prerr_char '_'
-            done;
-            prerr_char ')'
-          end;
-        prerr_char '\n'
-  in
-  let () =
-    if Printexc.backtrace_status () then
-      begin prerr_string "Backtrace:\n"; Printexc.print_backtrace stderr end
-  in
-  ()
-
-let print_err_exc exc = print_exc exc; flush stderr
+let syslog level msg =
+  let log = Syslog.openlog Filename.(dirname @@ basename @@ Sys.executable_name) in
+  Syslog.syslog log level msg ;
+  Syslog.closelog log
 
 let buff = ref (Bytes.create 80)
 let store len x =
@@ -240,13 +183,7 @@ let treat_connection tmout callback addr fd =
     in
     request, script_name, contents
   in
-  begin try callback (addr, request) script_name contents with
-    Unix.Unix_error (Unix.EPIPE, "write", _) -> ()
-  | Sys_error msg when msg = "Broken pipe" -> ()
-  | exc -> print_err_exc exc
-  end;
-  (try wflush () with _ -> ());
-  try flush stderr with _ -> ()
+  callback (addr, request) script_name contents
 
 let buff = Bytes.create 1024
 
@@ -274,29 +211,16 @@ let rec list_remove x =
 
 let pids = ref []
 
-let cleanup_verbose = ref true
-
 let cleanup_sons () =
-  List.iter
-    (fun p ->
-       let pid =
-         try fst (Unix.waitpid [Unix.WNOHANG] p) with
-           Unix.Unix_error (_, _, _) as exc ->
-             if !cleanup_verbose then
-               begin
-                 eprintf "*** Why error on waitpid %d?\n" p;
-                 flush stderr;
-                 print_exc exc;
-                 eprintf "[";
-                 List.iter (fun p -> eprintf " %d" p) !pids;
-                 eprintf "]\n";
-                 flush stderr;
-                 cleanup_verbose := false
-               end;
-             p
-       in
-       if pid = 0 then () else pids := list_remove pid !pids)
-    !pids
+  List.iter begin fun p ->
+    let pid =
+      try fst (Unix.waitpid [Unix.WNOHANG] p)
+      with e ->
+        syslog `LOG_ERR (__LOC__ ^ ": " ^ Printexc.to_string e) ;
+        raise e
+    in
+    if pid <> 0 then pids := list_remove pid !pids
+  end !pids
 
 let wait_available max_clients s =
   match max_clients with
@@ -352,19 +276,20 @@ let accept_connection tmout max_clients callback s =
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
   if Sys.unix then
     match try Some (Unix.fork ()) with _ -> None with
-      Some 0 ->
-        begin try
+    | Some 0 ->
+      begin
+        try
           if max_clients = None && Unix.fork () <> 0 then exit 0;
           Unix.close s;
           wserver_sock := t;
           wserver_oc := Unix.out_channel_of_descr t;
           treat_connection tmout callback addr t ;
-          close_connection ()
+          close_connection () ;
+          exit 0
         with
-          Unix.Unix_error (Unix.ECONNRESET, "read", _) -> ()
-        | exc -> try print_err_exc exc; flush stderr with _ -> ()
-        end;
-        exit 0
+        | Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0
+        | e -> raise e
+      end
     | Some id ->
         Unix.close t;
         if max_clients = None then let _ = Unix.waitpid [] id in ()
@@ -469,14 +394,11 @@ let f addr_opt port tmout max_clients g =
         port ;
       flush stderr;
       while true do
-        begin try accept_connection tmout max_clients g s with
-          Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> ()
-        | Unix.Unix_error ((Unix.EBADF | Unix.ENOTSOCK), "accept", _) as x ->
-            (* oops! *)            raise x
-        | Sys_error msg when msg = "Broken pipe" -> ()
-        | exc -> print_err_exc exc
-        end;
-        (try wflush () with Sys_error _ -> ());
-        (try flush stdout with Sys_error _ -> ());
-        flush stderr
+        begin
+          try accept_connection tmout max_clients g s with
+          | Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> ()
+          | Sys_error msg when msg = "Broken pipe" -> ()
+          | e -> syslog `LOG_CRIT (__LOC__ ^ ": " ^ Printexc.to_string e)
+        end ;
+        flush_all () ;
       done

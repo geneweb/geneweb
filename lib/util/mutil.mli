@@ -245,3 +245,6 @@ val gen_decode : bool -> string -> string
     string request has been obtained by: [extract_param "GET /" ' '].
     Answers the empty string if the parameter is not found. *)
 val extract_param : string -> char -> string list -> string
+
+(** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format. *)
+val sprintf_date : Unix.tm -> string

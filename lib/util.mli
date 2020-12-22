@@ -312,9 +312,6 @@ val array_mem_witn
  -> (iper * Def.witness_kind) array
  -> bool * string
 
-(** Print a date using "%4d-%02d-%02d %02d:%02d:%02d" format. *)
-val fprintf_date : out_channel -> Unix.tm -> unit
-
 (** [name_key base name] is [name],
     with particles put at the end of the string instead of the beginning.
 *)
@@ -421,3 +418,7 @@ val select_desc : config -> base -> int -> (iper * int) list -> (iper, person) H
     {!val:select_desc}
  *)
 val select_mascdesc : config -> base -> (iper * int) list -> int -> (iper, person) Hashtbl.t
+
+(** [sprintf_today confo]
+    Uses {!val:Mutil.sprintf_date} in order to print datetime defined in [conf]. *)
+val sprintf_today : Config.config -> string

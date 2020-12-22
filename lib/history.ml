@@ -221,10 +221,8 @@ let gen_record conf base changed action =
         end
       with
         Some oc ->
-          let (hh, mm, ss) = conf.time in
-          Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s\n"
-            conf.today.year conf.today.month conf.today.day hh mm ss conf.user
-            action item;
+          Printf.fprintf oc "%s [%s] %s %s\n"
+            (Util.sprintf_today conf) conf.user action item;
           close_out oc
       | None -> ()
       end

@@ -2611,10 +2611,21 @@ let escache_value base =
 
 let adm_file f = List.fold_right Filename.concat [!cnt_dir; "cnt"] f
 
-let std_date conf =
-  let (hour, min, sec) = conf.time in
-  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year conf.today.month
-    conf.today.day hour min sec
+let sprintf_today conf =
+  let (hh, mm, ss) = conf.time in
+  let tm =
+    Unix.{ tm_year = conf.today.year - 1900
+         ; tm_mon = conf.today.month - 1
+         ; tm_mday = conf.today.day
+         ; tm_hour = hh
+         ; tm_min = mm
+         ; tm_sec = ss
+         ; tm_wday = -1
+         ; tm_yday = -1
+         ; tm_isdst = false
+         }
+  in
+  Mutil.sprintf_date tm
 
 let read_wf_trace fname =
   try
@@ -2631,7 +2642,7 @@ let write_wf_trace fname wt =
   List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt; close_out oc
 
 let update_wf_trace conf fname =
-  let dt = std_date conf in
+  let dt = sprintf_today conf in
   let wt =
     let r = read_wf_trace fname in
     let dtlen = String.length dt in
@@ -3065,7 +3076,6 @@ let write_visited conf ht =
     close_out oc
   with Sys_error _ -> ()
 
-
 (* ************************************************************************ *)
 (*  [Fonc] record_visited : config -> iper -> unit                          *)
 (** [Description] : Vérifie si le user est ami ou magicien et met à jour
@@ -3079,11 +3089,7 @@ let write_visited conf ht =
 let record_visited conf ip =
   if conf.friend || conf.wizard then
     let ht = read_visited conf in
-    let (hh, mm, ss) = conf.time in
-    let time =
-      Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
-        conf.today.month conf.today.day hh mm ss
-    in
+    let time = sprintf_today conf in
     let () =
       try
         let vl = Hashtbl.find ht conf.user in
@@ -3118,11 +3124,6 @@ let array_mem_witn conf base x a =
     else loop (i + 1)
   in
   loop 0
-
-let fprintf_date oc tm =
-  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
-    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-    tm.Unix.tm_sec
 
 let nb_char_occ c s =
   let cnt = ref 0 in

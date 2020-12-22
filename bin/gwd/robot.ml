@@ -73,7 +73,7 @@ let robot_excl () =
 
 let min_disp_req = ref 6
 
-let check oc_opt tm from max_call sec conf suicide =
+let check tm from max_call sec conf suicide =
   let nfw =
     if conf.wizard then Wizard conf.user
     else if conf.friend then Friend conf.user
@@ -82,18 +82,15 @@ let check oc_opt tm from max_call sec conf suicide =
   let (xcl, fname) = robot_excl () in
   let refused =
     match try Some (List.assoc from xcl.excl) with Not_found -> None with
-      Some att ->
-        incr att;
-        begin match !att mod max_call, oc_opt with
-          0, Some oc ->
-            Util.fprintf_date oc (Unix.localtime tm);
-            Printf.fprintf oc "\n";
-            Printf.fprintf oc "  From: %s\n" from;
-            Printf.fprintf oc "  %d refused attempts;" !att;
-            Printf.fprintf oc " to restore access, delete file \"%s\"\n" fname
-        | _ -> ()
-        end;
-        true
+    | Some att ->
+      incr att;
+      if !att mod max_call = 0
+      then
+        Gwd_lib.GwdLog.syslog `LOG_NOTICE @@
+          Printf.sprintf
+            {|From: %s --- %d refused attempts --- to restore access, delete file "%s"|}
+            from !att fname ;
+      true
     | None ->
         purge_who tm xcl sec;
         let r = try (W.find from xcl.who).acc_times with Not_found -> [] in
@@ -120,15 +117,14 @@ let check oc_opt tm from max_call sec conf suicide =
         let refused =
           if suicide || cnt > max_call then
             begin
-              begin match oc_opt with
-                Some oc ->
-                  Printf.fprintf oc "--- %s is a robot" from;
-                  if suicide then
-                    Printf.fprintf oc " (called the \"suicide\" request)\n"
-                  else
-                    Printf.fprintf oc " (%d > %d connections in %g <= %d seconds)\n"
-                      cnt max_call (tm -. tm0) sec
-              | None -> ()
+              Gwd_lib.GwdLog.log begin fun oc ->
+                Printf.fprintf oc "--- %s is a robot" from;
+                if suicide
+                then
+                  Printf.fprintf oc " (called the \"suicide\" request)\n"
+                else
+                  Printf.fprintf oc " (%d > %d connections in %g <= %d seconds)\n"
+                    cnt max_call (tm -. tm0) sec
               end;
               xcl.excl <- (from, ref 1) :: xcl.excl;
               xcl.who <- W.remove from xcl.who;
@@ -137,15 +133,15 @@ let check oc_opt tm from max_call sec conf suicide =
             end
           else false
         in
-        begin match xcl.excl, oc_opt with
-          [_; _], Some oc ->
-            List.iter
-              (fun (s, att) ->
-                 Printf.fprintf oc "--- excluded:";
-                 Printf.fprintf oc " %s (%d refused attempts)\n" s !att;
-                 ())
-              xcl.excl;
-            Printf.fprintf oc "--- to restore access, delete file \"%s\"\n" fname
+        begin match xcl.excl with
+          | [_ ; _] ->
+            Gwd_lib.GwdLog.log begin fun oc ->
+              List.iter begin fun (s, att) ->
+                Printf.fprintf oc "--- excluded:";
+                Printf.fprintf oc " %s (%d refused attempts)\n" s !att
+              end xcl.excl;
+              Printf.fprintf oc "--- to restore access, delete file \"%s\"\n" fname
+            end
         | _ -> ()
         end;
         let (list, nconn) =
@@ -166,15 +162,12 @@ let check oc_opt tm from max_call sec conf suicide =
                | x -> x)
             list
         in
-        begin match oc_opt with
-          Some oc ->
-            List.iter
-              (fun (k, tm0, nb) ->
-                 Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb (tm -. tm0) k)
-              list;
-            Printf.fprintf oc "--- max %d req by %s / conn %d\n" (fst xcl.max_conn)
-              (snd xcl.max_conn) nconn
-        | None -> ()
+        Gwd_lib.GwdLog.log begin fun oc ->
+          List.iter begin fun (k, tm0, nb) ->
+            Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb (tm -. tm0) k
+          end list;
+          Printf.fprintf oc "--- max %d req by %s / conn %d\n"
+            (fst xcl.max_conn) (snd xcl.max_conn) nconn
         end;
         refused
   in

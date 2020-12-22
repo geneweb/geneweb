@@ -27,7 +27,7 @@
  (name wserver)
  (public_name geneweb.wserver)
  (wrapped false)
- (libraries geneweb.util unix)
+ (libraries geneweb.util syslog unix)
  (modules wserver)
 )
 
@@ -110,7 +110,7 @@
   (wrapped true)
   (libraries geneweb wserver %%%GWDB_PKG%%% %%%SOSA_PKG%%%)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (modules gwdPlugin request sendImage)
+  (modules gwdLog gwdPlugin request sendImage)
 )
 
 (executable
@@ -123,6 +123,7 @@
     gwd_lib
     gwxjg
     str
+    syslog
     unix
     wserver
     %%%GWDB_PKG%%%

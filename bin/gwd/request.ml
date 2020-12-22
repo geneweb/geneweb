@@ -441,17 +441,6 @@ let w_person ~none fn conf base =
   | Some p -> fn conf base p
   | _ -> none conf base
 
-let log_count =
-  let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
-  function
-  | Some (welcome_cnt, request_cnt, start_date) ->
-    Log.with_log
-      (fun oc ->
-         Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
-           thousand (welcome_cnt + request_cnt) thousand welcome_cnt
-           start_date)
-  | None -> ()
-
 let print_no_index conf base =
   let title _ =
     Output.print_string conf (Utf8.capitalize (transl conf "link to use"))
@@ -509,7 +498,17 @@ let treat_request conf =
       then w_base print_no_index
       else begin
         if p_getenv conf.base_env "counter" <> Some "no"
-        then log_count (SrcfileDisplay.incr_welcome_counter conf) ;
+        then begin
+          match SrcfileDisplay.incr_welcome_counter conf with
+          | Some (welcome_cnt, request_cnt, start_date) ->
+            GwdLog.log begin fun oc ->
+              let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
+              Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
+                thousand (welcome_cnt + request_cnt) thousand welcome_cnt
+                start_date
+            end ;
+          | None -> ()
+        end ;
         let incorrect_request conf _ = incorrect_request conf in
         match m with
         | "" ->
