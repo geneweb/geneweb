@@ -43,18 +43,7 @@ let opts =
       ; verbose = false
       }
 
-let errmsg =
-  "Usage: "
-  ^ Sys.argv.(0)
-  ^ " <base> [options]\n\
-     If both options -a and -d are used, intersection is assumed.\n\
-     If several options -s are used, union is assumed.\n\
-     Options are:"
-
-let print_error s =
-  print_endline s ;
-  flush stdout ;
-  exit 2
+let errmsg = "Usage: " ^ Sys.argv.(0) ^ " <BASE> [OPT]"
 
 let anonfun s =
   if !opts.base = None
@@ -99,11 +88,14 @@ let speclist =
           c := { !c with oc = (s, output_string oc, fun () -> close_out oc) })
     , "<GED> output file name (default: stdout)." )
   ; ( "-parentship", Arg.Unit (fun () -> c := { !c with parentship = true })
-    , " select individuals involved in parentship computation between pairs of keys.")
+    , " select individuals involved in parentship computation between pairs of keys. \
+       Pairs must be defined with -key option, descendant first: e.g. \
+       -key \"Descendant.0 SURNAME\" -key \"Ancestor.0 SURNAME\". \
+       If multiple pair are provided, union of persons are returned.")
   ; ( "-picture-path", Arg.Unit (fun () -> c := { !c with picture_path = true })
     , " extract pictures path." )
   ; ( "-s", Arg.String (fun x -> c := { !c with surnames = x :: !c.surnames })
-    , "<SN> select this surname (option usable several times)." )
+    , "<SN> select this surname (option usable several times, union of surnames will be used)." )
   ; ( "-source", Arg.String (fun x -> c := { !c with source = Some x })
     , "<SRC> replace individuals and families sources. Also delete event sources." )
   ; ( "-v", Arg.Unit (fun () -> c := { !c with verbose = true })
@@ -279,7 +271,7 @@ let select_from_set ipers ifams =
 *)
 let select opts ips =
   match opts.base with
-  | None -> print_error "Missing base name\nUse option -help for usage\n";
+  | None -> raise (Arg.Bad "Missing base name. Use option -help for usage")
   | Some (_, base) ->
     let ips = List.rev_append ips @@ Util.filter_map (Gutil.person_of_string_key base) opts.keys in
     let not_censor_p, not_censor_f =
