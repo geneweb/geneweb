@@ -16,10 +16,7 @@ type gwexport_opts =
   ; no_notes : bool
   ; no_picture : bool
   ; oc : string * (string -> unit) * (unit -> unit)
-  ; path : bool
-  ; path_max : int
-  ; path_w_sibling : bool
-  ; path_w_mate : bool
+  ; parentship : bool
   ; picture_path : bool
   ; source : string option
   ; surnames : string list
@@ -39,10 +36,7 @@ let opts =
       ; no_notes = false
       ; no_picture = false
       ; oc = ("", prerr_string, fun () -> close_out stderr)
-      ; path = false
-      ; path_max = max_int
-      ; path_w_sibling = false
-      ; path_w_mate = false
+      ; parentship = false
       ; picture_path = false
       ; source = None
       ; surnames = []
@@ -103,15 +97,9 @@ let speclist =
   ; ( "-o", Arg.String (fun s ->
           let oc = open_out s in
           c := { !c with oc = (s, output_string oc, fun () -> close_out oc) })
-    , "<GED> output file name (default: stdout)" )
-  ; ( "-path", Arg.Unit (fun () -> c := { !c with path = true })
-    , " select individuals and families involved in relationship computation between two keys.")
-  ; ( "-path-max", Arg.Int (fun s -> c := { !c with path_max = s })
-    , " limit the number of path used.")
-  ; ( "-path-w-sibling", Arg.Unit (fun () -> c := { !c with path_w_sibling = true })
-    , " include path using 'sibling' and 'half-sibling' relation type.")
-  ; ( "-path-w-mate", Arg.Unit (fun () -> c := { !c with path_w_mate = true })
-    , " include path using 'mate' relation type.")
+    , "<GED> output file name (default: stdout)." )
+  ; ( "-parentship", Arg.Unit (fun () -> c := { !c with parentship = true })
+    , " select individuals involved in parentship computation between pairs of keys.")
   ; ( "-picture-path", Arg.Unit (fun () -> c := { !c with picture_path = true })
     , " extract pictures path." )
   ; ( "-s", Arg.String (fun x -> c := { !c with surnames = x :: !c.surnames })
@@ -253,63 +241,21 @@ let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
   , (fun i -> Gwdb.Marker.get fmark i) )
 (**/**)
 
-let select_relations ~mate ~sibling base ip1 ip2 max =
-  let add_parents ip acc =
-    match get_parents (poi base ip) with
-    | Some ifam ->
-      let f = foi base ifam in
-      IPS.add (get_mother f) @@ IPS.add (get_father f) acc
-    | None -> assert false
-  in
-  let add_spouse ip child acc =
-    let unions = get_family (poi base ip) in
-    let rec loop i =
-      let f = foi base unions.(i) in
-      if Array.mem child (get_children f)
-      then IPS.add (Gutil.spouse ip f) acc
-      else loop (i + 1)
-    in loop 0
-  in
+let select_parentship base ip1 ip2 =
   let conf = { Config.empty with wizard = true ; bname = Gwdb.bname base } in
-  let rec loop i acc excl =
-    if i < max then
-      match Relation.get_shortest_path_relation conf base ip1 ip2 excl with
-      | None -> acc
-      | Some (path, ifam) ->
-        if not sibling && List.exists begin function
-            | _, (Relation.HalfSibling | Relation.Sibling) -> true
-            | _ -> false
-          end path
-        then loop i acc (ifam :: excl)
-        else if not mate && List.exists begin function
-            | _, Relation.Mate -> true
-            | _ -> false
-          end path
-        then loop i acc (ifam :: excl)
-        else
-          let acc =
-            let rec loop acc = function
-              | (iper, Relation.Child) :: tl ->
-                loop (IPS.add iper acc |> add_parents iper) tl
-              | (iper, Relation.Sibling) :: tl when sibling ->
-                loop (IPS.add iper acc |> add_parents iper) tl
-              | (iper, Relation.HalfSibling) :: ((iper', _ ) :: _ as tl) when sibling ->
-                loop (IPS.add iper acc |> add_parents iper |> add_parents iper') tl
-              | (iper, Relation.Parent) :: ((iper', _ ) :: _ as tl) ->
-                loop (IPS.add iper acc |> add_spouse iper iper') tl
-              | (iper, Relation.Self) :: tl ->
-                loop (IPS.add iper acc) tl
-              | (iper, Relation.Mate) :: tl ->
-                loop (IPS.add iper acc) tl
-              | _ :: tl -> loop acc tl
-              | [] -> acc
-            in
-            loop acc path
-          in
-          loop (i + 1) acc (ifam :: excl)
-    else acc
+  let asc = select_asc conf base max_int [ ip1 ] in
+  let desc = Util.select_desc conf base (-max_int) [ ip2, 0 ] in
+  let ipers =
+    if IPS.cardinal asc > Hashtbl.length desc
+    then
+      Hashtbl.fold
+        (fun k _ acc -> if IPS.mem k asc then IPS.add k acc else acc)
+        desc IPS.empty
+    else
+      IPS.fold
+        (fun k acc -> if Hashtbl.mem desc k then IPS.add k acc else acc)
+        asc IPS.empty
   in
-  let ipers = loop 0 IPS.empty [] in
   let ifams =
     IPS.fold begin fun iper acc ->
       Array.fold_left begin fun acc ifam ->
@@ -320,6 +266,9 @@ let select_relations ~mate ~sibling base ip1 ip2 max =
       end acc (get_family (poi base iper))
     end ipers IFS.empty
   in
+  ipers, ifams
+
+let select_from_set ipers ifams =
   let sel_per i = IPS.mem i ipers in
   let sel_fam i = IFS.mem i ifams in
   (sel_per, sel_fam)
@@ -402,13 +351,16 @@ let select opts ips =
           (per_sel, fam_sel)
         | None ->
           if opts.surnames <> [] then select_surnames base opts.surnames
-          else if opts.path then match ips with
-            | [ k1 ; k2 ] ->
-              select_relations
-                ~mate:opts.path_w_mate
-                ~sibling:opts.path_w_sibling
-                base k1 k2 opts.path_max
-            | _ -> assert false
+          else if opts.parentship then
+            let rec loop ipers ifams = function
+              | [] -> select_from_set ipers ifams
+              | k2 :: k1 :: tl ->
+                let ipers', ifams' = select_parentship base k1 k2 in
+                let ipers = IPS.fold IPS.add ipers ipers' in
+                let ifams = IFS.fold IFS.add ifams ifams' in
+                loop ipers ifams tl
+              | _ -> assert false
+            in loop IPS.empty IFS.empty ips
           else (fun _ -> true), (fun _ -> true)
     in
     ( (fun i -> not_censor_p i && sel_per i)
