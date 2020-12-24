@@ -9,11 +9,13 @@ let md5 plugin =
         |> loop result
       | f :: fs ->
         if Sys.file_exists f
-        then loop (f :: result) fs
-        else loop result fs
+        then (loop (f :: result) fs)
+        else (loop result fs)
       | [] -> result
     in
-    loop [] [ plugin ; Filename.(concat (dirname plugin)) "assets" ]
+    loop [] [ Filename.concat plugin @@ "plugin_" ^ Filename.basename plugin ^ ".cmxs"
+            ; Filename.concat plugin "assets"
+            ]
   in
   let files = List.sort compare files in
   let b = Buffer.create 1024 in
@@ -27,7 +29,8 @@ let md5 plugin =
   |> Digest.to_hex
 
 let () =
-print_endline {|let md5 plugin =
+  print_endline
+{|let md5 plugin =
   let files =
     let rec loop result = function
       | f :: fs when Sys.file_exists f && Sys.is_directory f ->
@@ -38,11 +41,13 @@ print_endline {|let md5 plugin =
         |> loop result
       | f :: fs ->
         if Sys.file_exists f
-        then loop (f :: result) fs
-        else loop result fs
+        then (loop (f :: result) fs)
+        else (loop result fs)
       | [] -> result
     in
-    loop [] [ plugin ; Filename.(concat (dirname plugin)) "assets" ]
+    loop [] [ Filename.concat plugin @@ "plugin_" ^ Filename.basename plugin ^ ".cmxs"
+            ; Filename.concat plugin "assets"
+            ]
   in
   let files = List.sort compare files in
   let b = Buffer.create 1024 in
@@ -53,13 +58,11 @@ print_endline {|let md5 plugin =
   end files ;
   Buffer.contents b
   |> Digest.string
-  |> Digest.to_hex|};
+  |> Digest.to_hex
+|};
   print_endline {|let allowed p = match Filename.basename p with|} ;
-  Array.iteri begin fun i p ->
-    if i > 0 then begin
-      print_endline @@
-      Printf.sprintf {||"%s" -> md5 p = "%s"|}
-        (Filename.basename p) (md5 p)
-    end
-  end Sys.argv ;
+  Array.iter begin fun p ->
+    print_endline @@
+    Printf.sprintf {||"%s" -> md5 p = "%s"|} p (md5 @@ Filename.concat Sys.argv.(1) p)
+  end (Sys.readdir Sys.argv.(1)) ;
   print_endline {||_ -> false|}

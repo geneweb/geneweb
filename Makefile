@@ -187,14 +187,15 @@ distrib: build
 	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	mkdir $(DISTRIB_DIR)/gw/plugins
-	mkdir $(DISTRIB_DIR)/gw/plugins/export
-	cp $(BUILD_DIR)/plugins/export/plugin_export.cmxs $(DISTRIB_DIR)/gw/plugins/export/
-	mkdir $(DISTRIB_DIR)/gw/plugins/forum
-	cp $(BUILD_DIR)/plugins/forum/plugin_forum.cmxs $(DISTRIB_DIR)/gw/plugins/forum/
-	mkdir $(DISTRIB_DIR)/gw/plugins/cgl
-	cp $(BUILD_DIR)/plugins/cgl/plugin_cgl.cmxs $(DISTRIB_DIR)/gw/plugins/cgl/
-	mkdir $(DISTRIB_DIR)/gw/plugins/xhtml
-	cp $(BUILD_DIR)/plugins/xhtml/plugin_xhtml.cmxs $(DISTRIB_DIR)/gw/plugins/xhtml/
+	for P in $(shell ls plugins); do \
+		if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
+			mkdir $(DISTRIB_DIR)/gw/plugins/$$P; \
+			cp $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs $(DISTRIB_DIR)/gw/plugins/$$P/; \
+			if [ -d plugins/$$P/assets ] ; then \
+				cp -R plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/; \
+			fi; \
+		fi; \
+	done
 
 .PHONY: install uninstall distrib
 
