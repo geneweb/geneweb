@@ -215,7 +215,7 @@ let lines_list_of_string s =
 
 let has_infos_not_dates base p =
   let has_picture_to_export =
-    sou base (get_image p) <> "" && not !Gwexport.opts.no_picture
+    sou base (get_image p) <> "" && not Gwexport.(!opts.no_picture)
   in
   get_first_names_aliases p <> []
   || get_surnames_aliases p <> []
@@ -226,15 +226,15 @@ let has_infos_not_dates base p =
   || get_titles p <> []
   || get_access p <> IfTitles
   || sou base (get_occupation p) <> ""
-  || (!Gwexport.opts.source <> None || sou base @@ get_psources p <> "")
+  || (Gwexport.(!opts.source) <> None || sou base @@ get_psources p <> "")
   || sou base (get_birth_place p) <> ""
-  || (!Gwexport.opts.source = None && sou base (get_birth_src p) <> "")
+  || (Gwexport.(!opts.source) = None && sou base (get_birth_src p) <> "")
   || sou base (get_baptism_place p) <> ""
-  || (!Gwexport.opts.source = None && sou base (get_baptism_src p) <> "")
+  || (Gwexport.(!opts.source) = None && sou base (get_baptism_src p) <> "")
   || sou base (get_death_place p) <> ""
-  || (!Gwexport.opts.source = None && sou base (get_death_src p) <> "")
+  || (Gwexport.(!opts.source) = None && sou base (get_death_src p) <> "")
   || sou base (get_burial_place p) <> ""
-  || (!Gwexport.opts.source = None && sou base (get_burial_src p) <> "")
+  || (Gwexport.(!opts.source) = None && sou base (get_burial_src p) <> "")
 
 let has_infos base p =
   has_infos_not_dates base p
@@ -247,14 +247,14 @@ let print_if_not_equal_to x oc base lab is =
   else Printf.ksprintf oc " %s %s" lab (correct_string base is)
 
 let print_src_if_not_equal_to x oc base lab is =
-  match !Gwexport.opts.source with
+  match Gwexport.(!opts.source) with
   | None -> if sou base is <> "" then print_if_not_equal_to x oc base lab is
   | Some x -> Printf.ksprintf oc " %s %s" lab (s_correct_string x)
 
 let print_if_no_empty = print_if_not_equal_to ""
 
 let print_src_if_no_empty oc base lab is =
-  if !Gwexport.opts.source = None
+  if Gwexport.(!opts.source) = None
   then print_if_not_equal_to "" oc base lab is
 
 let print_if_no_empty_endline oc base lab is =
@@ -344,7 +344,7 @@ let print_infos oc base is_child csrc cbp p =
       s when sou base s <> "" -> Printf.ksprintf oc " (%s)" (correct_string base s)
     | _ -> ()
   end;
-  if not !Gwexport.opts.no_picture then
+  if not Gwexport.(!opts.no_picture) then
     print_if_no_empty oc base "#image" (get_image p);
   List.iter (print_qualifier oc base) (get_qualifiers p);
   List.iter (print_alias oc base) (get_aliases p);
@@ -362,14 +362,14 @@ let print_infos oc base is_child csrc cbp p =
     | _ -> ()
   end;
   print_if_not_equal_to cbp oc base "#bp" (get_birth_place p);
-  if !Gwexport.opts.source = None then
+  if Gwexport.(!opts.source) = None then
     print_if_no_empty oc base "#bs" (get_birth_src p);
   begin match Adef.od_of_cdate (get_baptism p) with
       Some d -> Printf.ksprintf oc " !"; print_date oc d
     | _ -> ()
   end;
   print_if_no_empty oc base "#pp" (get_baptism_place p);
-  if !Gwexport.opts.source = None then
+  if Gwexport.(!opts.source) = None then
     print_if_no_empty oc base "#ps" (get_baptism_src p);
   begin match get_death p with
       Death (dr, d) ->
@@ -395,11 +395,11 @@ let print_infos oc base is_child csrc cbp p =
     | NotDead -> ()
   end;
   print_if_no_empty oc base "#dp" (get_death_place p);
-  if !Gwexport.opts.source = None then
+  if Gwexport.(!opts.source) = None then
     print_if_no_empty oc base "#ds" (get_death_src p);
   print_burial oc (get_burial p);
   print_if_no_empty oc base "#rp" (get_burial_place p);
-  if !Gwexport.opts.source = None then
+  if Gwexport.(!opts.source) = None then
     print_if_no_empty oc base "#rs" (get_burial_src p)
 
 type gen =
@@ -639,7 +639,7 @@ let print_pevent oc base gen e =
   print_if_no_empty oc base "#p" e.epers_place;
   (* TODO *)
   (*print_if_no_empty oc base "#c" e.epers_cause;*)
-  if !Gwexport.opts.source = None then
+  if Gwexport.(!opts.source) = None then
     print_if_no_empty oc base "#s" e.epers_src;
   Printf.ksprintf oc "\n";
   Array.iter
@@ -743,7 +743,7 @@ let print_fevent oc base gen in_comment e =
   print_date_option oc efam_date;
   print_if_no_empty oc base "#p" e.efam_place;
   (*print_if_no_empty oc base "#c" e.efam_cause;*)
-  if !Gwexport.opts.source = None then
+  if Gwexport.(!opts.source) = None then
     print_if_no_empty oc base "#s" e.efam_src;
   print_sep ();
   Array.iter
@@ -838,7 +838,7 @@ let print_family oc base gen m =
     | Residence -> print_sexes "#residence"
   end;
   print_if_no_empty oc base "#mp" (get_marriage_place fam);
-  if !Gwexport.opts.source = None then
+  if Gwexport.(!opts.source) = None then
     print_if_no_empty oc base "#ms" (get_marriage_src fam);
   begin match get_divorce fam with
       NotDivorced -> ()
@@ -864,7 +864,7 @@ let print_family oc base gen m =
          print_witness oc base gen p;
          Printf.ksprintf oc "\n")
     (get_witnesses fam);
-  (match !Gwexport.opts.source with
+  (match Gwexport.(!opts.source) with
    | None ->
      if sou base (get_fsources fam) <> ""
      then Printf.ksprintf oc "src %s\n" (correct_string base (get_fsources fam));
@@ -913,7 +913,7 @@ let print_family oc base gen m =
         ; get_marriage_src fam
         ]
       in
-      if !Gwexport.opts.source = None then get_fsources fam :: acc else acc
+      if Gwexport.(!opts.source) = None then get_fsources fam :: acc else acc
     in
     let sl =
       if not !old_gw then
@@ -923,7 +923,7 @@ let print_family oc base gen m =
           | evt :: l ->
             let acc =
               evt.efam_note
-              :: (if !Gwexport.opts.source = None then evt.efam_src :: accu else accu)
+              :: (if Gwexport.(!opts.source) = None then evt.efam_src :: accu else accu)
             in
             loop l acc
         in
@@ -1626,7 +1626,7 @@ let rs_printf oc s =
 let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   let to_separate = separate base in
   let out_oc_first = ref true in
-  let ofile, oc, close = opts.Gwexport.oc in
+  let _ofile, oc, close = opts.Gwexport.oc in
   let origin_file fname =
     if out_dir = "" then oc, out_oc_first, close
     else if fname = "" then oc, out_oc_first, close
@@ -1656,7 +1656,7 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     if not (Gwdb.Marker.get gen.fam_done ifam) then
       let fam = foi base ifam in
       let ifaml = connected_families base gen.fam_sel ifam fam in
-      let (oc, first, close) =
+      let (oc, first, _close) =
         if to_separate ifam then oc, out_oc_first, close
         else origin_file (sou base (get_origin_file fam))
       in
@@ -1690,7 +1690,6 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           if not !old_gw then print_pevents oc base gen ml
         end
   end (Gwdb.ifams ~select:gen.fam_sel base) ;
-  flush_all () ;
   (* Ajout des personnes isolée à l'export. On leur ajoute des    *)
   (* parents pour pouvoir utiliser les autres fonctions normales. *)
   (* Export que si c'est toute la base.                           *)
@@ -1740,7 +1739,7 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             print_isolated_relations oc base gen p
     end (Gwdb.ipers base) ;
   if !(Mutil.verbose) then ProgrBar.finish ();
-  if not !Gwexport.opts.no_notes then
+  if not Gwexport.(!opts.no_notes) then
     let s = base_notes_read base "" in
     let (oc, first, _) = origin_file (base_notes_origin_file base) in
     if s <> "" then
@@ -1810,6 +1809,7 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
              Printf.ksprintf oc "\nend page-ext\n"
            end)
       (List.sort compare gen.ext_files);
+    let close () = flush_all () ; close () ; Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht in
     try
       let files =
         Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
