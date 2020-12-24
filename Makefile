@@ -192,7 +192,10 @@ distrib: build
 			mkdir $(DISTRIB_DIR)/gw/plugins/$$P; \
 			cp $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs $(DISTRIB_DIR)/gw/plugins/$$P/; \
 			if [ -d plugins/$$P/assets ] ; then \
-				cp -R plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/; \
+				cp -R $(BUILD_DIR)/plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/; \
+			fi; \
+			if [ -f $(BUILD_DIR)/plugins/$$P/META ] ; then \
+				cp $(BUILD_DIR)/plugins/$$P/META $(DISTRIB_DIR)/gw/plugins/$$P/; \
 			fi; \
 		fi; \
 	done
