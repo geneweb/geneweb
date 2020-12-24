@@ -1495,7 +1495,7 @@ let content_misc conf len misc_fname =
 
 let find_misc_file name =
   if Sys.file_exists name
-  && List.exists (fun p -> Mutil.start_with (Filename.concat (Filename.dirname p) "assets") 0 name) !plugins
+  && List.exists (fun p -> Mutil.start_with (Filename.concat p "assets") 0 name) !plugins
   then name
   else
     let name' = Filename.concat (base_path ["etc"] "") name in
