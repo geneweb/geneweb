@@ -22,7 +22,8 @@ know what is actually running on your machine by reading the source code.
 ### How to load a plugin in gwd
 
 If you want to control what plugins `gwd` loads, and control the order,
-use the `-plugin path/to/plugin_foo.cmxs` option.
+use the `-plugin path/to/foo` option, and it will load
+`path/to/foo/plugin_foo.cmxs` file.
 
 A simpler solution is to use `-plugins path/to/plugins/` and let
 `gwd` load all available plugins in the directory, using `META` files
@@ -37,6 +38,7 @@ plugin for `gwd`.
 foo/
     META
     assets/
+    dune
     plugin_foo.cmxs
 ```
 
@@ -44,40 +46,24 @@ foo/
 - `assets/`: every static assets needed by you plugin (css, js, images, etc...)
 - `plugin_foo.cmxs`: the which will load handlers.
 
+The `dune` file must define the `plugin` `alias`.
+
+```
+(executable
+  (name plugin_foo)
+  (modes (native plugin))
+)
+
+(alias (name plugin) (deps plugin_foo.cmxs))
+```
+
 #### Allowing gwd to run your plugin
 
-Also, you will need to update `bin/gwd/dune` in order to add your plugin
-to plugins whitelist.
+Anything in GeneWeb distribution will be registered in whitelist, and
+gwd will check file integrity before loading the plugin.
 
-```diff
-(rule
-  (target gwdPluginMD5.ml)
-  (deps
-    (:cmxs
-      %{project_root}/plugins/export/plugin_export.cmxs
-+     %{project_root}/plugins/foo/plugin_foo.cmxs
-    )
-    (:maker mk_gwdPluginMD5.ml)
-  )
-  (action (with-stdout-to %{target} (run ocaml %{maker} %{cmxs})))
-)
-```
-
-You can still execute an untrusted plugin with `-unsafe_plugin` and `-unsafe_plugins`.
-
-#### Editing Makefile in order to copy you plugin and assets in the distrib
-
-Edit the `distrib` rule in `Makefile`. E.g.:
-
-```
-        mkdir $(DISTRIB_DIR)/gw/plugins
-        mkdir $(DISTRIB_DIR)/gw/plugins/export
-        cp $(BUILD_DIR)/plugins/export/plugin_export.cmxs $(DISTRIB_DIR)/gw/plugins/export/
-+       mkdir $(DISTRIB_DIR)/gw/plugins/foo
-+       cp $(BUILD_DIR)/plugins/foo/plugin_foo.cmxs $(DISTRIB_DIR)/gw/plugins/foo/
-+       cp $(BUILD_DIR)/plugins/foo/META $(DISTRIB_DIR)/gw/plugins/foo/
-+       cp -R $(BUILD_DIR)/plugins/foo/assets/ $(DISTRIB_DIR)/gw/plugins/foo/
-```
+You can still execute an untrusted plugin with `-unsafe_plugin`
+and `-unsafe_plugins` options.
 
 #### META file
 

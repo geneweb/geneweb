@@ -3,3 +3,5 @@
   (libraries geneweb geneweb.gwd_lib geneweb.wserver)
   (modes (native plugin))
 )
+
+(alias (name plugin) (deps plugin_xhtml.cmxs))

@@ -197,9 +197,10 @@ let load_lexicon =
 let cache_lexicon () =
   List.iter (fun x -> ignore @@ load_lexicon x) !cache_langs
 
-let register_plugin plugin =
-  let dir = Filename.dirname plugin in
-  lexicon_fname := !lexicon_fname ^ Filename.basename dir ^ "." ;
+let register_plugin dir =
+  let pname = Filename.basename dir in
+  let plugin = Filename.concat dir @@ "plugin_" ^ pname ^ ".cmxs" in
+  lexicon_fname := !lexicon_fname ^ pname ^ "." ;
   let lex_dir = Filename.concat (Filename.concat dir "assets") "lex" in
   if Sys.file_exists lex_dir then begin
     let lex = Sys.readdir lex_dir in
@@ -1792,30 +1793,19 @@ let make_cnt_dir x =
 
 let arg_plugin ~check =
   Arg.String begin fun s ->
-    if check then assert (GwdPluginMD5.allowed s) ;
+    if check && not (GwdPluginMD5.allowed s) then failwith s ;
     plugins := !plugins @ [s]
   end
 
 let arg_plugins ~check =
   Arg.String begin fun s ->
-    let ps =
-      Array.fold_left begin fun acc s' ->
-        let dir = Filename.concat s s' in
-        if Sys.is_directory dir
-        then Filename.concat dir ("plugin_" ^ s' ^ ".cmxs") :: acc
-        else acc
-      end [] (Sys.readdir s)
-    in
+    let ps = Array.to_list (Sys.readdir s) in
     let deps_ht = Hashtbl.create 0 in
     let deps =
-      List.map begin fun p ->
-        if check then assert (GwdPluginMD5.allowed p) ;
-        let pname =
-          let p = Filename.basename p in
-          String.sub p 7 (String.length p - 12)
-        in
-        Hashtbl.add deps_ht pname p ;
-        let dir = Filename.dirname p in
+      List.map begin fun pname ->
+        let dir = Filename.concat s pname in
+        if check && not (GwdPluginMD5.allowed dir) then failwith s ;
+        Hashtbl.add deps_ht pname dir ;
         let f = Filename.concat dir "META" in
         if Sys.file_exists f
         then (pname, GwdPluginMETA.((parse f).depends))
