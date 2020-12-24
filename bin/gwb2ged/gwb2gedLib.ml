@@ -48,9 +48,9 @@ let ged_month cal m =
 
 let encode opts s =
   match opts.Gwexport.charset with
-  | Ansel -> Ansel.of_iso_8859_1 @@ Mutil.iso_8859_1_of_utf_8 s
-  | Ascii | Ansi -> Mutil.iso_8859_1_of_utf_8 s
-  | Utf8 -> s
+  | Gwexport.Ansel -> Ansel.of_iso_8859_1 @@ Mutil.iso_8859_1_of_utf_8 s
+  | Gwexport.Ascii | Gwexport.Ansi -> Mutil.iso_8859_1_of_utf_8 s
+  | Gwexport.Utf8 -> s
 
 let max_len = 78
 
@@ -136,7 +136,7 @@ let rec display_note_aux opts oc tagn s len i =
         let rec output_onechar () =
           if !j = String.length s then decr j
           (* non wide char / UTF-8 char *)
-          else if opts.Gwexport.charset <> Utf8
+          else if opts.Gwexport.charset <> Gwexport.Utf8
           then Buffer.add_char b s.[i]
           (* 1 to 4 bytes UTF-8 wide char *)
           else if i = !j || nbc s.[!j] = -1 then begin
@@ -178,15 +178,15 @@ let ged_header opts base oc ifile ofile =
   if ofile <> "" then Printf.ksprintf oc "1 FILE %s\n" (Filename.basename ofile);
   Printf.ksprintf oc "1 GEDC\n";
   begin match opts.Gwexport.charset with
-    Ansel | Ansi | Ascii -> Printf.ksprintf oc "2 VERS 5.5\n"
-  | Utf8 -> Printf.ksprintf oc "2 VERS 5.5.1\n"
+    | Gwexport.Ansel | Gwexport.Ansi | Gwexport.Ascii -> Printf.ksprintf oc "2 VERS 5.5\n"
+    | Gwexport.Utf8 -> Printf.ksprintf oc "2 VERS 5.5.1\n"
   end;
   Printf.ksprintf oc "2 FORM LINEAGE-LINKED\n";
   begin match opts.Gwexport.charset with
-    Ansel -> Printf.ksprintf oc "1 CHAR ANSEL\n"
-  | Ansi -> Printf.ksprintf oc "1 CHAR ANSI\n"
-  | Ascii -> Printf.ksprintf oc "1 CHAR ASCII\n"
-  | Utf8 -> Printf.ksprintf oc "1 CHAR UTF-8\n"
+    | Gwexport.Ansel -> Printf.ksprintf oc "1 CHAR ANSEL\n"
+    | Gwexport.Ansi -> Printf.ksprintf oc "1 CHAR ANSI\n"
+    | Gwexport.Ascii -> Printf.ksprintf oc "1 CHAR ASCII\n"
+    | Gwexport.Utf8 -> Printf.ksprintf oc "1 CHAR UTF-8\n"
   end;
   if not opts.Gwexport.no_notes then
     match base_notes_read base "" with
@@ -688,7 +688,7 @@ let ged_ind_record with_indexes opts base (per_sel, fam_sel as sel) oc i =
     ged_note opts base oc per
   end
 
-let ged_fam_record opts base (per_sel, fam_sel) oc ifam =
+let ged_fam_record opts base (per_sel, _fam_sel) oc ifam =
   let fam = foi base ifam in
   Printf.ksprintf oc "0 @F%d@ FAM\n" (int_of_ifam ifam + 1);
   List.iter (ged_fevent opts base oc per_sel) (get_fevents fam);
