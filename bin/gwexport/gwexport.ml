@@ -111,7 +111,7 @@ let is_censored_person threshold p =
   | None -> false
   | Some date ->
     match date with
-    | Dgreg (dmy, _) -> dmy.year >= threshold && get_access p != Public
+    | Adef.Dgreg (dmy, _) -> dmy.Adef.year >= threshold && get_access p != Def.Public
     | _ -> false
 
 let is_censored_couple base threshold cpl =
@@ -190,7 +190,7 @@ let select_asc conf base max_gen ips =
   let rec loop_asc (gen : int) set ip =
     if not @@ IPS.mem ip set then begin
       let set = IPS.add ip set in
-      let p = poi base ip in
+      let p = Util.pget conf base ip in
       if gen < max_gen then match get_parents p with
         | Some ifam ->
           let cpl = foi base ifam in
@@ -234,7 +234,7 @@ let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
 (**/**)
 
 let select_parentship base ip1 ip2 =
-  let conf = { Config.empty with wizard = true ; bname = Gwdb.bname base } in
+  let conf = Config.{ empty with wizard = true ; bname = Gwdb.bname base } in
   let asc = select_asc conf base max_int [ ip1 ] in
   let desc = Util.select_desc conf base (-max_int) [ ip2, 0 ] in
   let ipers =
@@ -291,7 +291,7 @@ let select opts ips =
       end
       else (fun _ -> true), (fun _ -> true)
     in
-    let conf = { Config.empty with wizard = true } in
+    let conf = Config.{ empty with wizard = true } in
     let sel_per, sel_fam =
       if opts.ascdesc <> None || opts.desc <> None then begin
         assert (opts.censor = 0) ;
