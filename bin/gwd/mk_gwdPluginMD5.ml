@@ -1,17 +1,21 @@
 let md5 plugin =
   let files =
     let rec loop result = function
-      | f :: fs when Sys.file_exists f && Sys.is_directory f ->
-        Sys.readdir f
-        |> Array.to_list
-        |> List.rev_map (Filename.concat f)
-        |> List.rev_append fs
-        |> loop result
+      | [] -> result
       | f :: fs ->
         if Sys.file_exists f
-        then (loop (f :: result) fs)
+        then
+          if String.get f (String.length f - 1) = '~'
+          then loop result fs
+          else if Sys.is_directory f
+          then
+            Sys.readdir f
+            |> Array.to_list
+            |> List.rev_map (Filename.concat f)
+            |> List.rev_append fs
+            |> loop result
+          else (loop (f :: result) fs)
         else (loop result fs)
-      | [] -> result
     in
     loop [] [ Filename.concat plugin @@ "plugin_" ^ Filename.basename plugin ^ ".cmxs"
             ; Filename.concat plugin "assets"
@@ -33,17 +37,21 @@ let () =
 {|let md5 plugin =
   let files =
     let rec loop result = function
-      | f :: fs when Sys.file_exists f && Sys.is_directory f ->
-        Sys.readdir f
-        |> Array.to_list
-        |> List.rev_map (Filename.concat f)
-        |> List.rev_append fs
-        |> loop result
+      | [] -> result
       | f :: fs ->
         if Sys.file_exists f
-        then (loop (f :: result) fs)
+        then
+          if String.get f (String.length f - 1) = '~'
+          then loop result fs
+          else if Sys.is_directory f
+          then
+            Sys.readdir f
+            |> Array.to_list
+            |> List.rev_map (Filename.concat f)
+            |> List.rev_append fs
+            |> loop result
+          else (loop (f :: result) fs)
         else (loop result fs)
-      | [] -> result
     in
     loop [] [ Filename.concat plugin @@ "plugin_" ^ Filename.basename plugin ^ ".cmxs"
             ; Filename.concat plugin "assets"
