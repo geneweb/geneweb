@@ -282,13 +282,14 @@ pt: acesso %s cancelado para aquela página
 ro: %s acces anulat la această pagină
 ru: доступ %s к этой странице запрещён
 sl: %s nima dostopa do te strani
-sv: du har inte längre tillträde till denna sida %s
+sv: du har inte längre åtkomst till denna sida %s
 
     %s and %s have several unions
 co: ci hè parechje unioni trà %s è %s
 en: %s and %s have several unions
 fr: il y a plusieurs unions entre %s et %s
 pt: existem várias uniões entre %s e %s
+sv: %s och %s har flera partnerskap
 
     %s cousins
 af: neefs en niggies %s geslagte verwyder
@@ -590,7 +591,7 @@ no: %t var vitne før deres fødsel
 oc: %t foguèt testimòni abans la naissença
 pt: %t foi testemunha antes do seu nascimento
 ru: %t был(а) свидетелем до своего рождения
-sv: %t var vittne innan hennes/hans död
+sv: %t var vittne innan dennes födsel
 
     %t witnessed the %s after his/her death
 co: %t hè statu testimone di %s dopu a so morta
@@ -601,6 +602,7 @@ fr: %t a été témoin de %s après sa mort
 it: %t è stato testimone del %s dopo la sua morte
 pt: %t foi testemunha de %s depois da sua morte
 ru: %t был(а) свидетелем %s после его/её смерти
+sv: %t var vittne åt %s efter dennes död
 
     %t witnessed the %s before his/her birth
 co: %t hè statu testimone di %s nanzu a so nascita
@@ -611,6 +613,7 @@ fr: %t a été témoin de %s avant sa naissance
 it: %t è stato testimone del %s prima della sua nascita
 pt: %t foi testemunha de %s antes do seu nascimento
 ru: %t был(а) свидетелем %s до его/её рождения
+sv: %t var vittne till %s före sin födsel
 
     %t's %s before his/her %s
 co: %t: %s nanzu a/u so %s
@@ -621,6 +624,7 @@ fr: %t : %s avant son/sa %s
 it: %t : %s prima della suo/sua %s
 pt: %t: %s antes de seu/sua %s
 ru: %t: %s до их %s
+sv: %t: %s före dennes %s
 
     %t's sex is not coherent with his/her relations
 af: %t se geslag stem nie ooreen met sy/haar verwantskap nie
@@ -1114,6 +1118,7 @@ co: un cugnatu/cugnati/una cugnata/cugnate
 en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
 fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
 pt: um cunhado/cunhados/uma cunhada/cunhadas
+sv: en svåger/svågrar/en svägerska/svägerskor
 
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
@@ -1149,6 +1154,7 @@ sv: en bror/en syster/ett syskon
 en: one child-in-law/children-in-law
 fr: un bel-enfant/beaux-enfants
 pt: enteado/enteados
+sv: ett syskonbarn/syskonbarn
 
     a cousin
 af: 'n neef/'n niggie
@@ -1238,7 +1244,7 @@ ro: un bunic/o bunica/bunici
 ru: дедушка/бабушка/прародитель
 sk: dedo/babka/prarodič
 sl: dedka/babice/starega starša
-sv: farfar/farmor/en farförälder/morfar/mormor/en morförälder
+sv: en farförälder/en morförälder/en far- eller morförälder
 
     a grandson/a granddaughter/a grandchild
 af: 'n kleinseun/'n kleindogter/'n kleinkind
@@ -1268,7 +1274,7 @@ ro: nepot/nepoata/nepoti
 ru: внук/внучка/ребенок детей
 sk: vnuk/vnučka/vnúča
 sl: vnuk/vnukinja/pravnuk ali pravnukinja
-sv: en sonson/en sondotter/ett barnbarn/en dotterson/en dotterdotter/ett barnbarn
+sv: barnbarn/barnbarn/barnbarn
 
     a great-grandfather/a great-grandmother/a great-grandparent
 af: 'n oupagrootjie/'n oumagrootjie/'n grootjie
@@ -1298,7 +1304,7 @@ ro: un strabunic/o strabunica/strabunici
 ru: прапрадед/прапрабабка/прапрапрародитель
 sk: pradedo/prababka/praprarodič
 sl: pradedek/prababica/prastari starš
-sv: en gammel-farfar/en gammel-farmor/en gammel-farförälder/en gammel-morfar/en gammel-mormor/en gammel-morförälder
+sv: en gammel-farfar eller gammel-farmor/en gammel-morfar eller gammel-mormor/en gammel-far- eller -mor-förälder
 
     a great-grandson/a great-granddaughter/a great-grandchild
 af: 'n agterkleinseun/'n agterkleindogter/'n agterkleinkind
@@ -1328,7 +1334,7 @@ ro: stranepot/stranepoata/stranepoti
 ru: праправнук/праправнучка/праправнук
 sk: pravnuk/pravnučka/pravnúča
 sl: pravnuk/pravnukinja/pravnuk ali pravnukinja
-sv: en sonsons son/en sonsons dotter/ett barnbarns barn/en sondotters son/en sondotters dotter/ett barnbarns barn/en dottersons son/en dottersons dotter/ett barnbarns barn/en dotterdotters son/en dotterdotters dotter/ett barnbarns barn
+sv: ett barnbarns barn/ett barnbarns barn/ett barnbarns barn
 
     a great-nephew/a great-niece
 af: 'n agterneef/'n agterniggie
@@ -1388,19 +1394,21 @@ ro: frate de bunici/sara de bunici
 ru: дядя родителя/тетя родителя
 sk: prastrýko/prateta
 sl: prastric/prateta
-sv: en gammel-farbror/en gammel-faster/en gammel-morbror/en gammel-moster
+sv: en gammel-farbror/en gammel-moster
 
     a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
 co: un mezu cugnatu/mezu cugnati/una meza cugnata/meza cugnate
 en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
 fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
 pt: um meio cunhado/meios cunhados/uma meia cunhada/meias cunhadas
+sv: en halvsvåger/halvsvågrar/en halvsvägerska/halvsvägerskor
 
     a half sibling-in-law/half siblings-in-law
 co: un mezu cugnatu o una meza cugnata/mezu cugnati è meze cugnate
 en: one half sibling-in-law/half siblings-in-law
 fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
 pt: um meio cunhado ou cunhada/meios cunhados
+sv: ett halvsyskonbarn/halvsyskonbarn
 
     a half-brother/a half-sister/a half-sibling
 af: 'n stiefbroer/'n stiefsuster/'n stiefbroer of -suster
@@ -1467,6 +1475,7 @@ co: un cugnatu o una cugnata/cugnati è cugnate
 en: one sibling-in-law/siblings-in-law
 fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
 pt: um cunhado ou cunhada/cunhados
+sv: en svåger eller svägerska/svågrar och svägerskor
 
     a son-in-law/a daughter-in-law
 af: 'n skoonseun/'n skoondogter
@@ -1533,12 +1542,14 @@ co: un(a) figliastru(a)/figliastri
 en: a stepchild/stepchildren
 fr: un bel-enfant/beaux-enfants
 pt: um enteado/enteados
+sv: ett svärbarn/svärbarn
 
     a stepson/stepsons/a stepdaughter/stepdaughters
 co: un figliastru/figliastri/una figliastra/figliastre
 en: one stepson/stepsons/one stepdaughter/stepdaughters
 fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
 pt: um enteado/enteados/uma enteada/enteadas
+sv: en svärson/svärsöner/svärdotter/svärdöttrar
 
     about (date)
 af: ongeveer
@@ -1630,7 +1641,7 @@ ro: acces
 ru: доступ
 sk: prístup
 sl: dostop
-sv: tillträde
+sv: åtkomst
 
     accomplishment
 co: cumpiimentu
@@ -1665,6 +1676,7 @@ co: attivà/squassà
 en: activate/suppress
 fr: activer/supprimer
 pt: activar/suprimir
+sv: aktivera/undertrycka
 
     add
 af: byvoeg
@@ -1760,12 +1772,14 @@ co: aghjunghje u nome precedente cum’è cugnome di nome
 en: add the previous name as a first name alias
 fr: ajouter le nom précédent comme un alias de prénom
 pt: adicionar o nome anterior como primeiro nome alternativo
+sv: lägg till det förra namnet som förnamnsalias
 
     add the previous name as a surname alias
 co: aghjunghje u nome precedente cum’è cugnome di casata
 en: add the previous name as a surname alias
 fr: ajouter le nom précédent comme un alias de nom
 pt: adicionar o nome anterior como apelido alternativo
+sv: lägg till det förra namnet som efternamnsalias
 
     adhesion
 co: adesione
@@ -1979,7 +1993,7 @@ no: Alder ved fødsel til %s
 oc: atge a la naissença de %s
 pt: idade aquando do nascimento de %s
 ru: возраст на момент рождения %s
-sv: ålder vid %s födelsedatum
+sv: ålder vid %s födelse
 
     age at death
 af: ouderdom by afsterwe
@@ -2132,7 +2146,7 @@ ro: toate localitatile
 ru: все места
 sk: všetky miesta
 sl: vsa posestva
-sv: alla platser
+sv: alla orter
 
     all the titles
 af: al die titels
@@ -2624,6 +2638,7 @@ co: lista di e genealugie dispunibule (impiegheghja gwsetup)
 en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 pt: lista das genealogias disponíveis (utilize gwsetup)
+sv: lista över tillgängliga släktdatabaser (använd gwsetup)
 
     average age at death
 bg: средна продължителност на живота
@@ -2803,6 +2818,7 @@ sv: Bar Mitzvah
 co: basa
 en: base
 fr: base
+sv: bas
 
     base index notes
 af: notas
@@ -2896,7 +2912,7 @@ ro: magician note
 ru: wizard заметки
 sk: wizards poznámky
 sl: čarovnik zapiski
-sv: administratörer noteringar
+sv: administratörsnoteringar
 
     bat mitzvah
 co: bat mitzvah
@@ -3120,7 +3136,7 @@ no: Fødselssted
 oc: lòc de naissença
 pt: local de nascimento
 ru: место рождения
-sv: Födelseplats
+sv: Födelsedatum och plats
 
     birth src
 co: fonte di nascita
@@ -3135,7 +3151,7 @@ no: Fødselskilde
 oc: font de la naissença
 pt: fonte nascimento
 ru: свидетельство о рождении
-sv: Födelse
+sv: källa för födelse 
 
     birthdays
 af: verjaarsdae
@@ -3182,7 +3198,7 @@ no: liste over %s
 oc: lista dels %s
 pt: lista de %s
 ru: список - %s
-sv: %s seznam
+sv: förteckning över %s 
 
     book of ascendants
 co: libru d’ascendenza
@@ -3197,7 +3213,7 @@ no: forfedre-bok
 oc: libre d'ascendéncia
 pt: livro de ascendência
 ru: список предков
-sv: Förfädersbok
+sv: förteckning över förfäder
 
     books
 co: dizziunarii
@@ -3205,6 +3221,7 @@ en: books
 fr: dictionnaires
 oc: diccionaris
 pt: dicionários
+sv: förteckningar
 
     border
 af: rand
@@ -3273,6 +3290,7 @@ co: i dui
 en: both
 fr: les deux
 pt: ambos
+sv: både
 
     branch/branches
 af: tak/takke
@@ -3309,6 +3327,7 @@ co: fratelli/surelle/fratelli o surelle
 en: brothers/sisters/siblings
 fr: frères/sœurs/frères et sœurs
 pt: irmãos/irmãs/irmãos e irmãs
+sv: bröder/systrar/syskon
 
     burial
 af: begrawe
@@ -3368,7 +3387,7 @@ no: Begravelseskilde
 oc: font de la sepultura
 pt: fonte de sepultamento
 ru: свидетельство о смерти
-sv: Begravning
+sv: källa för begravning
 
     buried
 af: begrawe
@@ -3433,6 +3452,7 @@ co: da coppiu
 en: by couple
 fr: par couple
 pt: por casal
+sv: per par
 
     calendar/calendars
 af: kalender/kalenders
@@ -3463,7 +3483,7 @@ ro: calendar/calendare
 ru: календарь/календари
 sk: kalendár/kalendáre
 sl: koledar/koledarji
-sv: kalender
+sv: kalender/kalendrar
 
     cancel GeneWeb links
 af: stop GeneWeb-skakels
@@ -3493,7 +3513,7 @@ ro: anuleaza conexiuni GeneWeb
 ru: без GeneWeb ссылок
 sk: zrušiť GeneWeb spojenia
 sl: brez GeneWeb povezav
-sv: inga GeneWeb länkar
+sv: utan GeneWeb länkar
 
     candidate father/candidate mother/candidate parents
 af: moontlike vader/moontlike moeder/moontlike ouers
@@ -3748,6 +3768,7 @@ it: modifica dell'ordine degli eventi di famiglia
 oc: cambiament de l'òrdre dels eveniments familials
 pt: modificar a ordem dos eventos familiares
 ru: порядок семейных событий был изменён
+sv: ändrade ordningen för familjehändelser
 
     changed order of marriages
 co: cambiu di l’ordine di l’unioni
@@ -3762,7 +3783,7 @@ no: Rekkefølge av ekteskap er endret
 oc: cambiament de l'òrdre de las unions
 pt: modificar ordem das uniões
 ru: порядок браков был изменён
-sv: Utbytt ordning för bröllop
+sv: Ändrade ordningen för giftermål
 
     changed order of person's events
 co: cambiu di l’ordine di l’avvenimenti di l’individuu
@@ -3774,6 +3795,7 @@ it: modifica dell'ordine degli eventi individuo
 oc: cambiament de l'òrdre dels eveniments d'un individú
 pt: modificar ordem dos eventos da pessoa
 ru: порядок личных событий был изменён
+sv: ändrade ordningen för personhändelser
 
     child/children
 af: kind/kinders
@@ -3842,6 +3864,7 @@ co: sceglie una genealugia
 en: choose a genealogy
 fr: choisir une généalogie
 pt: seleccionar uma genealogia
+sv: välj en släktdatabas
 
     circumcision
 co: circuncisione
@@ -3936,6 +3959,7 @@ co: ripiegà l’implessi
 en: collapse implex
 fr: réduire les implexes
 pt: reduzir os implexos
+sv: slå ihop implex
 
     color
 af: kleur
@@ -4003,6 +4027,7 @@ co: arburu cumpattu
 en: compact tree
 fr: arbre compact
 pt: árvore compacta
+sv: kompakt träd
 
     compare
 co: paragunà
@@ -4039,6 +4064,7 @@ co: cumpilatu u %s à partesi di u commit %s
 en: compiled on %s from commit %s
 fr: compilé le %s à partir du commit %s
 pt: compilou os %s a partir da versão %s
+sv: skapad av %s fån commit %s
 
     compute all marriages
 co: include tutti i cumpagni
@@ -4053,7 +4079,7 @@ no: Inkluder ektefeller
 oc: inclusir totes los conjunts
 pt: incluir todos os cônjuges
 ru: включить все браки
-sv: Jämför alla giftermål
+sv: ta med alla giftermål
 
     compute approximatives dates
 co: include e date micca esatte
@@ -4068,7 +4094,7 @@ no: Inkluder usikre datoer
 oc: inclusir totes los conjunts
 pt: ter em conta as datas aproximadas
 ru: включить приблизительные даты
-sv: Jämför approxamativa datum
+sv: ta med approxamativa datum
 
     confirmation
 co: cresima
@@ -4095,7 +4121,7 @@ it: cresima LDS (mormonismo)
 nl: Belijdenis (LDS)
 no: Konfirmasjon (LDS)
 pt: confirmação LDS
-sv: Konfirmation (RDS)
+sv: Konfirmation (LDS)
 
     connections
 bg: потребителски връзки
@@ -4243,6 +4269,7 @@ co: cupià a leia in u preme’papei
 en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
 pt: copiar o link para a área de transferência
+sv: kopiera länken
 
     country
 co: statu
@@ -4279,6 +4306,7 @@ co: coppii
 en: couples
 fr: couples
 pt: casais
+sv: par
 
     cousins
 af: neefs/niggies
@@ -4419,6 +4447,7 @@ co: avvenimentu persunalizatu
 en: custom event
 fr: événement personnalisé
 pt: evento personalizado
+sv: anpassad händelse
 
     d'Aboville
 co: d’Aboville
@@ -4439,12 +4468,14 @@ co: fusione d’implessi
 en: fusion implexes
 fr: fusionner les implexes
 pt: combinar os implexes
+sv: sammanslagning av implex
 
     dag on/dag off
 co: affissà un graficu orientatu aciclicu (dag)/piattà u graficu orientatu aciclicu (dag)
 en: show dag/hide dag
 fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
 pt: exibir gráfico acíclico orientado (DAG)/ocultar gráfico acíclico orientado (DAG)
+sv: visa implex/dölj implex
 
     database
 af: stamboom
@@ -4473,7 +4504,7 @@ pt: árvore genealógica
 ro: arbore genealogic
 ru: генеалогическое дерево
 sl: družinsko drevo
-sv: family Tree
+sv: stamträd
 zh: 家譜
 
     database forum
@@ -4504,7 +4535,7 @@ ro: forumul basei de date
 ru: форум базы данных
 sk: databázové fórum
 sl: forum baze podatkov
-sv: databas forum
+sv: databasforum
 
     date begin
 co: data di principiu
@@ -4519,7 +4550,7 @@ no: Fra
 oc: data de començament
 pt: data de início
 ru: дата начала
-sv: Datum från
+sv: startdatum
 
     date end
 co: data di fine
@@ -4534,7 +4565,7 @@ no: Til
 oc: data de fin
 pt: data de fim
 ru: дата окончания
-sv: Datum slutar
+sv: slutdatum 
 
     date of birth
 co: data di nascita
@@ -4555,6 +4586,7 @@ sv: födelsedatum
 co: data di battesimu
 en: date of baptism
 fr: date du baptême
+sv: dopdag
 
     date of death
 co: data di trapassu
@@ -4590,6 +4622,7 @@ sv: vigseldatum
 co: data di sepultura
 en: date of burial
 fr: date de la sépulture
+sv: begravningsdatum
 
     date/dates
 af: datum
@@ -4656,6 +4689,7 @@ co: GG/MM/AAAA
 en: DD/MM/YYYY
 fr: JJ/MM/AAAA
 pt: DD/MM/AAAA
+sv: DD/MM/ÅÅÅÅ
 
     death
 af: oorlede
@@ -4730,7 +4764,7 @@ no: Dødskilde
 oc: font del decès
 pt: fonte do óbito
 ru: свидетельство о смерти
-sv: Död
+sv: källa för död
 
     decoration
 co: dicurazione
@@ -4744,13 +4778,14 @@ nl: Medaille
 no: Medalje
 pt: condecoração
 ru: награда
-sv: Dekoration
+sv: Medaljer
 
     degree of kinship
 co: gradu di parentia
 en: degree of kinship
 fr: degré de parenté
 pt: grau de parentesco
+sv: släktskapsgrad
 
     delete
 af: verwyder
@@ -4853,6 +4888,7 @@ co: arburu di discendenza
 en: descendants tree
 fr: arbre de descendance
 pt: árvore de descendentes
+sv: träd av ättlingar
 
     died
 af: oorlede
@@ -4944,7 +4980,7 @@ no: Revisjonshistorikk
 oc: diferéncia entre las revisions
 pt: diferença entre as revisões
 ru: расхождение двух версий
-sv: skillnad mellan två uppdateringar
+sv: skillnad mellan de två revisionerna
 
     diploma
 co: certificatu
@@ -5134,13 +5170,14 @@ no: vis generasjonsnummer
 oc: afichar los numèros de generacion
 pt: exibir as gerações
 ru: показать поколение
-sv: visa generations nummer
+sv: visa generationsnummer
 
     display implex
 co: affissà l’implessi
 en: display implex
 fr: afficher les implexes
 pt: exibir os implexos
+sv: visa implex
 
     display marriage date
 co: affissà a data di matrimoniu
@@ -5152,6 +5189,7 @@ it: visualizzare la data del matrimonio
 oc: afichar la data de maridatge
 pt: exibir a data de casamento
 ru: показать дату брака
+sv: visa vigseldatum
 
     display notes/sources inline
 co: include e note/fonte à u cuntenutu
@@ -5163,6 +5201,7 @@ it: includere le note/fonti al contenuto
 oc: apondre las nòtas dins lo contengut
 pt: incluir as notas/fontes no conteúdo
 ru: показать заметки/документы
+sv: visa noteringar och källor infogat
 
     display picture
 co: affissà e fotò
@@ -5316,6 +5355,7 @@ co: ùn micca
 en: do not
 fr: ne pas
 pt: não
+sv: gör inte
 
     don't group the common branches together
 af: moet nie takke van ooreenstemende oorsprong saamvoeg nie
@@ -5408,6 +5448,7 @@ co: mudificà u graficu
 en: edit the graph
 fr: éditer le graphe
 pt: editar o gráfico
+sv: redigera trädet
 
     education
 co: educazione
@@ -5613,7 +5654,7 @@ ro: localitate
 ru: место
 sk: miesto
 sl: posestvo
-sv: plats
+sv: ort
 zh:  地点
 
     event/events
@@ -5640,6 +5681,7 @@ co: arburu di l’avvenimenti
 en: tree of events
 fr: arbre des événements
 pt: árvore de eventos
+sv: träd av händelser
 
     exact
 af: presies
@@ -5965,6 +6007,7 @@ en: father-in-law/mother-in-law
 es: suegro/suegra
 fr: beau-père/belle-mère
 pt: sogro/sogra
+sv: svärfar/svärmor
 
     father/mother
 af: vader/moeder
@@ -6006,6 +6049,7 @@ it: inserimento obbligatorio
 oc: sasida obligatòria
 pt: campo obrigatório
 ru: обязательное значение
+sv: obligatoriskt fält
 
     file
 af: lêer
@@ -6212,6 +6256,7 @@ co: dimensione di grafia
 en: font size
 fr: taille de police
 pt: tamanho da fonte
+sv: textstorlek
 
     for the first names by alphabetic order
 af: om die voorname in alfabetiese volgorde te kry
@@ -6426,12 +6471,14 @@ co: arburu sanu
 en: full tree
 fr: arbre complet
 pt: árvore completa
+sv: helt träd
 
     full width/columns
 co: affissera larghezza sana/affissera nant’à duie culonne
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 pt: exibir na largura total/exibir em duas colunas
+sv: full bredd/kolumner
 
     funeral
 co: murtoriu
@@ -6512,6 +6559,7 @@ co: cumpare o cummare
 en: godparent
 fr: parrain ou marraine
 pt: padrinho ou madrinha
+sv: gudförälder
 
     godson/goddaughter/godchild
 af: peetseun/peetdogter/peetkind
@@ -6682,6 +6730,7 @@ co: arburu in H di 7 generazioni
 en: 7 generation H tree
 fr: arbre en H 7 générations
 pt: árvore em H 7 gerações
+sv: 7 generationers H träd
 
     half siblings
 co: fratellastri è surellastre
@@ -6696,13 +6745,14 @@ no: halvbrødre/halvsøstre/halvsøsken
 oc: frairastres e sorrastras
 pt: meios irmãos e meias irmãs
 ru: сводные братья или сёстры
-sv: halvbröder och halvsystrar
+sv: halvsyskon
 
     half-brothers/half-sisters/half-siblings
 co: fratellastri/surellastre/mezu-fratelli è surelle
 en: half-brothers/half-sisters/half-siblings
 fr: demi-frères/demi-sœurs/demi-frères et sœurs
 pt: meios-irmãos/meias-irmãs/meios-irmãos
+sv: halvbröder/halvsystrar/halvsyskon
 
     half-siblings
 co: fratellastri è surellastre
@@ -6807,7 +6857,7 @@ ro: cu copii
 ru: имели детей
 sk: mali spolu deti
 sl: otroci
-sv: barn
+sv: med
 zh:  生有子女
 
     having no family
@@ -6852,7 +6902,7 @@ nl: om het aantal familietakken te bekomen, klikken op het aantal takken
 no: klikk på et nummer for å se slektstre
 pt: para obter a árvore dos ramos patronímicos, clique no número dos ramos
 ru: выберите номер для просмотра фамильного дерева
-sv: Hjälp att hitta förnamn
+sv: klicka på ett nummer för att se släktträdet
 
     here
 af: hier
@@ -6889,6 +6939,7 @@ co: piattà i ritratti
 en: hide portraits
 fr: ne pas afficher les portraits
 pt: não mostrar os retratos
+sv: dölj personbilder
 
     him/her
 af: sy/haar
@@ -6926,6 +6977,7 @@ en: his/her
 fr: son/sa
 no: hans/hennes
 pt: seu/sua
+sv: hans/hennes
 
     history
 co: cronulugia
@@ -6978,12 +7030,14 @@ co: accolta
 en: home
 fr: accueil
 pt: início
+sv: hem
 
     horizontal tree
 co: arburiscenza ascendente
 en: horizontal tree
 fr: arborescence ascendante
 pt: árvore compacta de ascendentes
+sv: horisontellt träd
 
     horizontally
 af: horisontaal
@@ -7034,6 +7088,7 @@ co: arburu in H
 en: H-Tree
 fr: arbre en H
 pt: árvore em H
+sv: H-träd
 
     husband/wife
 af: man/vrou
@@ -7093,7 +7148,7 @@ ro: identitate/email/subiect
 ru: идентификатор/email/тема
 sk: ident/email/predmet
 sl: ime/e-pošta/vsebina
-sv: ident/email/ämne
+sv: identitet/email/ämne
 
     if titles
 af: as titels
@@ -7134,12 +7189,14 @@ fr: si titres/public/privé
 it: se titoli/pubblico/privato
 oc: si i a de títols/public/privat
 pt: se títulos/público/privado
+sv: om titlar/publik/privat
 
     ignore implex
 co: ignurà l’implessi
 en: ignore implex
 fr: ignorer les implexes
 pt: ignorar os implexos
+sv: ignorera implex
 
     illness
 co: maladia
@@ -7262,12 +7319,14 @@ co: ligà l’implessi
 en: link implexes
 fr: relier les implexes
 pt: ligar os implexes
+sv: implex-länkar
 
     implex/implexes
 co: implessu/implessi
 en: implex/implexes
 fr: implexe/implexes
 pt: implex/implexes
+sv: implex/implexer
 
     in (month year)
 af: in
@@ -7340,6 +7399,7 @@ ru: в
 sk: v
 sl: v letu
 zh:  于
+sv: i
 
     include missing spouses
 af: ontbrekende ouers ingesluit
@@ -7603,12 +7663,14 @@ co: cronulugia simplice/cronulugia detagliata
 en: simple chronology/detailed chronology
 fr: chronologie simple/chronologie détaillée
 pt: cronologia simples/cronologia detalhada
+sv: förenklad kronologi/detaljerad kronologi
 
     input database
 co: Scrivite quì u nome sanu di a basa di dati à impiegà :
 en: Please, enter the name of the database you want to use:
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
 pt: Introduza o nome da base de dados que quer utilizar:
+sv: Skriv namnet på databasen du vill använda:
 
     insert
 af: invoeg
@@ -7653,12 +7715,14 @@ no: Ingen revisjonshistorikk funnet for %s
 oc: l'istoric de las revisions de %s es pas pro per realizar de comparasons
 pt: o histórico das revisões de %s é insuficiente para realizar comparações
 ru: нет истории изменений для %s
+sv: ingen revisionshistorik funnen för %s
 
     intermediate revisions not shown
 co: revisioni intermediarie piattate
 en: intermediate revisions not shown
 fr: révisions intermédiaires masquées
 pt: revisões intermédias ocultas
+sv: mellanrevisioner visas inte
 
     inversion done
 af: omgeruil
@@ -7890,6 +7954,7 @@ co: arburu in I
 en: I-Tree
 fr: arbre en I
 pt: árvore em I
+sv: I-träd
 
     julian day
 af: juliaanse dag
@@ -7919,7 +7984,7 @@ ro: zi juliana
 ru: юлианский день
 sk: juliánsky deň
 sl: julijanski dan
-sv: julianskdag
+sv: juliansk dag
 
     killed (in action)
 af: gesneuwel
@@ -7960,18 +8025,21 @@ fr: étiquette
 it: etichetta
 nl: etiketje
 pt: etiqueta
+sv: etikett
 
     last diff
 co: ultima revisione
 en: last revision
 fr: dernière révision
 pt: última revisão
+sv: senaste version
 
     last sosa level not navigable
 co: l’ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l’antenati.
 en: last Sosa level not navigable. Use ancestors list.
 fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 pt: o último nível de sosa não é navegável. Utilize a lista de antepassados.
+sv: senaste sosa-nivån kan inte användas. Använd förteckningen över släktingar
 
     less than one month old
 af: minder as 'n maand oud
@@ -8039,6 +8107,7 @@ en: link back to parents
 fr: lien retour vers les parents
 no: lenke til foreldre
 pt: link de regresso aos pais
+sv: länk tillbaka till föräldrarna
 
     link between
 af: mense tussen
@@ -8076,6 +8145,7 @@ en: link to children
 fr: lien vers les enfants
 no: lenke til barn
 pt: link para as crianças
+sv: länk till barnen
 
     link to use
 co: leia à impiegà
@@ -8086,6 +8156,7 @@ it: link da usare
 oc: ligam d'utilizar
 pt: link a utilizar
 ru: использовать ссылку
+sv: länk att använda
 
     linked pages
 bg: свързани страници
@@ -8185,7 +8256,7 @@ no: Tavler og lister
 oc: listas, arbres e estats
 pt: listas e gráficos
 ru: списки и диаграммы
-sv: Tavlor och listor
+sv: Släkttavlor och listor
 
     lists of books
 co: liste di dizziunarii
@@ -8194,6 +8265,7 @@ fr: liste des dictionnaires
 oc: lista dels diccionaris
 pt: lista de dicionários
 ru: список словарей
+sv: lista öve förteckningar
 
     living after %s
 co: vivu(a) dopu %s
@@ -8528,7 +8600,7 @@ ro: căsătoria a avut loc după moartea %t
 ru: свадьба состоялась после смерти %t
 sk: Manželstvo sa konalo po smrti %t
 sl: poroka je potekala po smrti %t
-sv: äktenskapet ägde rum efter %t döden
+sv: äktenskapet ägde rum efter att %t var död
 zh: 結婚後%t死亡的地方
 
     marriage had occurred before the birth of %t
@@ -8557,7 +8629,7 @@ ro: căsătoria a avut loc înainte de naştere %t
 ru: Свадьба состоялась до рождения %t
 sk: manželstvo bolo uzavreté pred narodením %t
 sl: sklenjena zakonska zveza pred rojstvom %t
-sv: äktenskapet ägde rum före %t födseln
+sv: äktenskapet ägde rum före %t födsel
 zh: 結婚前%t出生的地方
 
     marriage licence
@@ -8675,7 +8747,7 @@ no: Ekteskapskilde
 oc: font sul maridatge
 pt: fonte casamento
 ru: свидетельство о браке
-sv: Giftermål
+sv: källa för Giftermål
 
     marriage with
 co: unione cù
@@ -9019,7 +9091,7 @@ ro: mesaj/mesajul anterior/mesajele anterioare/mesajele urmatoara
 ru: сообщение/предыдущее сообщение/предыдущие сообщения/следующее сообщение
 sk: správa:a:-u/predchádzajúca správa/predchádzajúce správy/nasledujúca správa
 sl: sporočilo/prejšnje sporočilo/prejšnja sporočila/naslednje sporočilo
-sv: meddelande/föregående meddelande/föregående meddelande/nästa meddelande
+sv: meddelande/föregående meddelande/föregående meddelanden/nästa meddelande
 
     militaryDistinction
 co: distenzione militare
@@ -9047,7 +9119,7 @@ nl: Promotie
 no: Militær forfremmelse
 pt: promoção militar
 ru: продвижение по службе
-sv: Militär avancemang
+sv: Militärt avancemang
 
     militaryService
 co: serviziu militare
@@ -9061,7 +9133,7 @@ nl: Dienstplicht
 no: Verneplikt
 pt: serviço militar
 ru: военная служба
-sv: Värnplikt
+sv: Militärtjänst
 
     miscellaneous
 co: diversu
@@ -9125,6 +9197,7 @@ co: %s manchendu
 en: missing %s
 fr: %s manquant
 pt: %s em falta
+sv: %s saknas
 
     missing ancestors
 af: ontbrekende voorsate
@@ -9161,6 +9234,7 @@ co: senza data
 en: no date
 fr: sans date
 pt: sem data
+sv: datum saknas
 
     missing events
 co: avvenimenti chì mancanu
@@ -9183,6 +9257,7 @@ en: missing image
 fr: image manquante
 no: bilde mangler
 pt: imagem em falta
+sv: bild saknas
 
     missing parents
 co: genitori chì mancanu
@@ -9322,12 +9397,14 @@ co: intervertisce l’avvenimenti di a famiglia %s
 en: permute the events of family %s
 fr: permuter les événements de la famille %s
 pt: permutar os eventos da família %s
+sv: ändra ordningen för %s familjehändelser
 
     modify person event order
 co: intervertisce l’avvenimenti individuali
 en: permute personnal events
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
+sv: ändra ordningen för personliga händelser
 
     modify picture
 af: wysig prent
@@ -9364,6 +9441,7 @@ en: module/modules
 fr: module/modules
 no: modul/moduler
 pt: módulo/módulos
+sv: modul/moduler
 
     months old
 af: maande oud
@@ -9460,6 +9538,7 @@ co: ricullà/falà/ricullà u cursore/falà u cursore
 en: move up/move down/move up cursor/move down cursor
 fr: remonter/descendre/remonter le curseur/descendre le curseur
 pt: subir/descer/subir o cursor/descer o cursor
+sv: flytta upp/flytta ner/flytta pekaren uppåt/flytta pekaren nedåt
 
     msg error disconnected
 co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnettate à l’altre.<br />Sta restrizione hè stata aghjunta da u pruprietariu di a basa di dati.
@@ -9471,18 +9550,21 @@ no: beklager, du kan bare legge til familier som er koblet til andre.<br />Denne
 oc: o planhi, mas podètz pas apondre que de familhas ligadas.<br />Aquela restriccion foguèt aponduda pel proprietari d'aquela basa.
 pt: lamentamos mas só pode adicionar famílias ligadas às restantes.<br />Esta restrição foi colocada pelo proprietário da base de dados.
 ru: К сожалению, добавить можно только ветви, связанные с основным деревом.<br />Ограничение введено владельцем базы.
+sv: du kan bara lägga till familjer som är kopplade till övriga.<br />Denna begränsning är tillagd av databasägaren.
 
     mtree
 co: arburu in H di 9 generazioni
 en: 9 generations H tree
 fr: arbre en H 9 générations
 pt: árvore em H 9 gerações
+sv: 9 generationer H-träd
 
     multi relations graph
 co: graficu di rilazioni multiple
 en: multi relations graph
 fr: graphe de relations multiples
 pt: gráfico de relações múltiplas
+sv: graf med flera relationer
 
     murdered
 af: vermoor
@@ -9521,6 +9603,7 @@ en: none/one/two/three/four/five/six/seven/eight/nine/ten/eleven/twelve/thirteen
 fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/quartorze/quinze/seize/dix-sept/dix-huit/dix-neuf/vingt/vingt-et-un/vingt-deux/vingt-trois/vingt-quatre/vingt-cinq/vingt-six/vingt-sept/vingt-huit/vingt-neuf/trente/trente-un
 no: ingen/en/to/tre/fire/fem/seks/sju/åtte/ni/ti/elleve/tolv/tretten/fjorten/femten/seksten/sytten/atten/nitten/tjue/tjueen/tjueto/tjuetre/tjuefire/tjuefem/tjueseks/tjuesju/tjueåtte/tjueni/tretti/trettien
 pt: nenhum/um/dois/três/quatro/cinco/seis/sete/oito/nove/dez/onze/doze/treze/catorze/quinze/dezasseis/dezassete/dezoito/dezanove/vinte/winte e um/vinte e dois/vinte e três/vinte quatro/vinte e cinco/vinte e seis/vinte e sete/vinte oito/vinte e e nove/trinta/trinta e um
+sv: ingen/en/två/tre/fyra/fem/sex/sju/åtta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/tjugoen/tjugotvå/tjugotre/tjugofyra/tjugofem/tjugosex/tjugosju/tjugoåtta/tjugonio/trettio/trettioen
 
     name
 af: naam
@@ -9589,6 +9672,7 @@ co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à ri
 en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
 fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
 pt: O primeiro nome, apelido ou ocorrência desta pessoa foi alterada. Por favor actualize as páginas ligadas à chave antiga abaixo.
+sv: Förnamn, efternamn eller förekomst av denna person har ändrats. Uppdatera sidorna som länkar till den gamla nyckeln som visas nedan. 
 
     naturalisation
 co: naturalizazione
@@ -9608,6 +9692,7 @@ co: navigà nant’à l’arburu
 en: navigate on the tree
 fr: naviguer sur l’arbre
 pt: navegar na árvore
+sv: navigering i trädet
 
     navigation
 af: stap met
@@ -9681,7 +9766,7 @@ no: Grener
 oc: nbre brancas
 pt: nº ramos
 ru: ветви
-sv: nb grenar
+sv: antal grenar
 
     nb children
 co: num. zitelli
@@ -9696,7 +9781,7 @@ no: Barn
 oc: nbre enfants
 pt: nº filhos
 ru: дети
-sv: nb barn
+sv: antal barn
 
     nb events
 co: num. avvenimenti
@@ -9711,7 +9796,7 @@ no: Hendelser
 oc: nbre eveniments
 pt: nº eventos
 ru: события
-sv: nb händelser
+sv: antal händelser
 
     nb individuals
 co: numeru d’individuu
@@ -9726,7 +9811,7 @@ no: Individer
 oc: nbre individús
 pt: nº pessoas
 ru: люди
-sv: nb individer
+sv: antal individer
 
     NB: you should try another relationship computing mode
 co: andate puru à pruvà torna impieghendu un altru modu di calculu
@@ -9764,6 +9849,7 @@ en: new name
 fr: nouveau nom
 no: nytt navn
 pt: nome novo
+sv: nytt namn
 
     next relationship path
 co: chjassu seguente
@@ -9775,6 +9861,7 @@ it: percorso seguente
 oc: camin seguent
 pt: próximo nível de relação
 ru: следующая родственная связь
+sv: nästa släktskapsväg
 
     next sibling
 af: volgende broer/volgende suster/volgende broer of suster
@@ -9924,7 +10011,7 @@ no: Foreldre
 oc: pas maridats
 pt: não casados
 ru: без браков
-sv: Sambo
+sv: Partners
 
     no match
 af: geen passing
@@ -10197,7 +10284,7 @@ no: Merknader
 oc: Ensenhador de las nòtas divèrsas
 pt: sumário de notas diversas
 ru: изменения вкратце
-sv: Summerade noteringar
+sv: Summering av noteringar
 
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
@@ -10511,13 +10598,14 @@ ro: ocupatie
 ru: занятие/занятия
 sk: povolanie
 sl: poklic
-sv: yrke/yrke
+sv: yrke/yrken
 
     of
 co: di
 en: of
 fr: de
 pt: de
+sv: av
 
     of course dead
 af: oorlede
@@ -10584,6 +10672,7 @@ co: uffiziante/uffiziante/uffizianti
 en: officer/officer/officers
 fr: officiant/officiante/officiants
 pt: oficial/oficial/oficiais
+sv: officer/officer/officerer
 
     old name
 co: vechju nome
@@ -10591,6 +10680,7 @@ en: old name
 fr: ancien nom
 no: gammelt navn
 pt: nome antigo
+sv: tidigare namn
 
     on %s's side
 af: aan die kant van %s
@@ -10662,12 +10752,14 @@ fr: le
 oc: lo
 pl: w :a:
 pt: em
+sv: på
 
     one additional generation
 co: una generazione di più
 en: one additional generation
 fr: une génération en plus
 pt: uma geração adicional
+sv: en tidigare generation
 
     one day old
 af: een dag oud
@@ -10766,6 +10858,7 @@ en: only
 fr: uniquement
 no: bare
 pt: só
+sv:bara
 
     only the generation selected
 af: net die gekose geslag
@@ -10832,6 +10925,7 @@ co: ozzioni
 en: options
 fr: options
 pt: opções
+sv: valbart
 
     or
 af: of
@@ -10966,6 +11060,7 @@ zh:  父母
 co: participante/participante
 en: participant/participant
 fr: participant/participante
+sv: deltagare/deltagare
 
     paternal grand-parents
 co: caccari paterni
@@ -11146,7 +11241,7 @@ ro: persoane cu acelas nume
 ru: человек с тем же именем
 sk: osoby majúce to isté meno
 sl: osebe z istim imenom
-sv: personer som har samma namn
+sv: personer med samma namn
 
     photos & documents
 co: Fiure è Ducumenti
@@ -11206,7 +11301,7 @@ no: steder
 oc: lòcs
 pt: locais
 ru: места
-sv: orternas
+sv: orter
 
     plus
 co: più
@@ -11345,6 +11440,7 @@ no: prensentasjon
 pl: Prezentacja
 pt: Apresentação
 ru: представление
+sv: presentation
 
     preview family tree
 co: avvistu di l’arburu
@@ -11396,6 +11492,7 @@ co: revisione precedente/revisione seguente
 en: previous revision/next revision
 fr: révision précédente/révision suivante
 pt: revisão anterior/revisão seguinte
+sv: föregående version/nästa version
 
     private
 af: privaat
@@ -11608,6 +11705,7 @@ co: reduce/aumentà
 en: reduce/increase
 fr: réduire/augmenter
 pt: reduzir/aumentar
+sv: minska/öka
 
     reference key
 co: referenza
@@ -11637,7 +11735,7 @@ no: Fylke
 oc: Region
 pt: Região
 ru: регион
-sv: Län
+sv: Län/Region
 
     relation/relations
 af: verwant/verwante
@@ -11673,12 +11771,14 @@ sv: relation/relationer
 co: rilazioni di
 en: relations of
 fr: relations de
+sv: relation med
 
     relations tree
 co: arburu di e rilazioni
 en: tree of relations
 fr: arbre des relations
 pt: árvore de familiares
+sv: relationsträd
 
     relationship
 af: verwantskap
@@ -11874,6 +11974,7 @@ no: snarvei:
 oc: acorchas:
 pt: atalhos:
 ru: Ссылки:
+sv: genväg:
 
     relationship%t to
 af: verwantskap%t met
@@ -11911,17 +12012,20 @@ co: caccià l’ultimu modulu aghjuntu
 en: remove the last added module
 fr: retirer le dernier module ajouté
 pt: remover o último módulo adicionado
+sv: tag bort senast tillagda modul
 
     reserved to friends or wizards
 co: riservatu à l’amichi è à i maghi
 en: reserved to friends or wizards
 fr: réservée aux amis et magiciens
+sv: reserverat för vänner och administratörer
 
     reset to
 co: risturà
 en: reset to
 fr: restaurer
 pt: restaurar
+sv: återställ till
 
     residence
 co: residenza
@@ -11962,7 +12066,7 @@ no: Pensjonering
 oc: retirat
 pt: reforma
 ru: пенсионер
-sv: Pesnionering
+sv: Pensionerad
 
     revision history
 co: cronulugia di i revisioni
@@ -12171,7 +12275,7 @@ no: vis også
 oc: tanben veire
 pt: ver também
 ru: смотри также
-sv: visa också
+sv: se också
 
     see ascendants notes/sources
 co: fighjà e note è e fonte
@@ -12186,7 +12290,7 @@ no: Se på merknader/kilder
 oc: veire las nòtas e las fonts
 pt: ver notas & fontes
 ru: смотри заметки/документы
-sv: Se kommande generations noteringar och källor
+sv: Se noteringar och källor
 
     see ascendants pictures
 co: fighjà e fotò
@@ -12201,7 +12305,7 @@ no: Se på bilder
 oc: veire las fòtos
 pt: ver fotos
 ru: смотри изображения предков
-sv: Se kommande generations bilder
+sv: Se bilder
 
     see descendants notes/sources
 co: fighjà e note è e fonte
@@ -12370,6 +12474,7 @@ co: selezziunà i mudulli persunalizati
 en: select personalized modules
 fr: selectionner les modules personnalisés
 pt: seleccionar os módulos personalizados (por defeito zz)
+sv: välj anpassad modul
 
     select person to compute relationship
 co: cliccà nant’à a persona cù quella ci vole à fà un calculu di parentia
@@ -12569,6 +12674,7 @@ co: accurtatoghji di tastera
 en: keyboard shortcuts
 fr: raccourcis clavier
 pt: atalhos do teclado
+sv: genvägar på tangentbordet
 
     shortest path
 af: kortste pad
@@ -12703,12 +12809,14 @@ en: granduncles and grandaunts
 fr: grands-oncles et grands-tantes
 it: prozii e prozie
 pt: tios-avôs e tias-avós
+sv: syskon till far- och morföräldrar
 
     siblings of the great-grandparents
 co: fratelli è surelle di l’arcicaccari
 en: great-granduncles and great-grandaunts
 fr: arrières-grands-oncles et arrières-grands-tantes
 pt: tios-bisavôs e tias-bisavós
+sv: syskon till föräldrar tre generationer bakåt
 
     since the last click
 bg: от последното щракване
@@ -12734,13 +12842,14 @@ ro: de la ultimul click
 ru: с момента последнего щелчка
 sk: od posledného poklepania
 sl: od zadnjega klika
-sv: från senaste klick
+sv: sedan senaste klick
 
     size
 co: scala
 en: scale
 fr: echelle
 pt: escala
+sv: skala
 
     son/daughter/child
 af: seun/dogter/kind
@@ -12777,6 +12886,7 @@ co: figlioli/figliole/zitelli
 en: sons/daughters/children
 fr: fils/filles/enfants
 pt: filhos/filhas/filhos
+sv: söner/döttrar/barn
 
     sort by/branch/alphabetic order
 co: urganizà da :/ghjemba/ordine alfabeticu
@@ -12806,7 +12916,7 @@ no: Sorter etter:/Dato/alfabetisk rekkefølge/antall individer/antall hendelser
 oc: triar per:/date de debuta/òrdre alfabetic/nombre de personas/nombre d'eveniments
 pt: ordenar por:/data de início/ordem alfabética/número de pessoas/número de eventos
 ru: сортировать по:/дате/алфавиту/людям/событиям
-sv: Sortera efter datum börja alfabetisk ordning/nb individer/nb haändelser
+sv: Sortera efter datum/bokstavsordning/antal individer/antal händelser
 
     sort by/generation/alphabetic order
 co: urganizà da :/generazione/ordine alfabeticu
@@ -12821,7 +12931,7 @@ no: vises etter:/grener/alfabetisk orden
 oc: triar per:/generacion/òrdre alfabetic
 pt: ordenar por:/geração/ordem alfabética
 ru: сортировать по:/поколению/алфавиту
-sv: visas efter:/grenar/alfabetisk ordning
+sv: visas efter:/grenar/bokstavsordning
 
     Sosa
 af: Sosa
@@ -12903,6 +13013,7 @@ pt: referência Sosa: %t
 ro: referinta Sosa: %t
 ru: ссылка Sosa: %t
 sk: referenciou "Sosa": %t
+sv: annummer: %t
 
     source/sources
 af: bron/bronne
@@ -12985,6 +13096,7 @@ co: infurmazione di i cumpagni
 en: spouses informations
 fr: informations conjoints
 pt: informação do cônjuge
+sv: information om partner
 
     spouses not included
 af: eggenote weggelaat
@@ -13151,7 +13263,7 @@ ro: alias de nume
 ru: новая:a:---ую фамилия:a:--ю
 sk: alias priezviska
 sl: drug priimek
-sv: efternamns alias
+sv: efternamnalias
 
     surname missing
 af: van ontbreek
@@ -13261,7 +13373,7 @@ no: grener
 oc: brancas patronimicas
 pt: ramos patronímicos
 ru: ветвь фамилии
-sv: grenar
+sv: efternamnsgrenar
 
     surnames list
 af: vanne lys
@@ -13292,7 +13404,7 @@ ro: lista de nume de familie
 ru: список фамилий
 sk: zoznam priezvísk
 sl: seznam priimkov
-sv: efternamns lista
+sv: efternamnslista
 
     table
 co: tavula
@@ -13714,7 +13826,7 @@ no: Fødselsdato til %t og %t er for langt fra hverandre
 oc: la diferéncia d’atge entre %t e %t es pro importanta
 pt: a diferença de idade entre %t e %t é bastante importante
 ru: значительная разница в возрасте между %t и %t
-sv: Skillnaden i ålder mellan %t och %t är mycket viktig
+sv: Skillnaden i ålder mellan %t och %t är mycket stor
 
     the father-in-law/the mother-in-law
 af: die skoonpa/die skoonma
@@ -13833,7 +13945,7 @@ it: differenza di età molto importante tra i due figli %t e %t
 nl: belangrijk leeftijdsverschil tussen de twee kinderen %t en %t
 no: viktig aldersgap mellom de to barna %t et %t
 pt: diferença de idades importante entre os filhos %t e %t
-sv: viktigt åldersskillnad mellan de två barnen %t och %t
+sv: stor åldersskillnad mellan de två barnen %t och %t
 
     the following children of %t and %t are not in order
 af: die volgende kinders van %t and %t is nie in die regte volgorde nie
@@ -13863,7 +13975,7 @@ ro: urmatori copii a lui %t si %t nu sint in ordine cronologica
 ru: следующие дети %t и %t - идут не по порядку
 sk: nasledujúce deti rodičov %t a %t nie sú chronologicky
 sl: naslednji otroci od %t in %t niso po vrstnem redu
-sv: de följande barnen till %t och %t är inte i kronologiskordning
+sv: de följande barnen till %t och %t är inte i kronologisk ordning
 
     the grandchildren
 af: die kleinkinders
@@ -14120,7 +14232,7 @@ no: %d registreringer er blitt oppdatert
 oc: la modification se faguèt: %s fichas modificadas
 pt: a alteração decorreu com sucesso: %d ficha(s) corrigida(s)
 ru: изменения затронули %d людей
-sv: Modifiering av inklämda %d personer
+sv: Modifiering av %d personer
 
     the parents
 af: die ouers
@@ -14236,7 +14348,7 @@ pt: este fórum é moderado
 ro: acest forum este moderat
 ru: этот форум модерируется
 sl: forum moderira
-sv: detta forum är ändrat
+sv: detta forum har moderator
 
     time line
 co: cronulugia
@@ -14670,7 +14782,7 @@ no: Sogn
 oc: Comuna
 pt: Localidade
 ru: Город
-sv: Socken
+sv: Socken/kommun
 
     tree
 af: boom
@@ -14707,6 +14819,7 @@ co: arburu di i testimoni
 en: tree of witnesses
 fr: arbre des témoins
 pt: árvore de testemunhas
+sv: vittnesträd
 
     trees & lists
 co: Arburi è Liste
@@ -14740,7 +14853,7 @@ oc: tornar ensajar
 pt: tente novamente
 ru: повторите попытку
 sk: skús znovu
-sv: försöka igen
+sv: försök igen
 
     try another/relationship computing
 co: Cliccà quì/per pruvà un modu di calculu sfarente
@@ -14755,13 +14868,14 @@ no: forsøk en annen kalkuleringsmulighet
 oc: Clicatz aicí/per ensajar un autre mòde de calcul
 pt: Clique aqui/para tentar um modo de cálculo diferente
 ru: попытайтесь изменить тип связи
-sv: Försök ett annat programmeringssätt
+sv: Försök ett annat beräkningssätt
 
     uncheck
 co: diselezziunà
 en: uncheck
 fr: décocher
 pt: desseleccionar
+sv: avmarkera
 
     uncles and aunts
 af: ooms en tantes
@@ -14958,7 +15072,7 @@ no: Redigere familie
 oc: gerir las unions
 pt: atualizar família
 ru: изменить семью
-sv: Redigera familje
+sv: Redigera familj
 
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"
@@ -15012,7 +15126,7 @@ pt: utilizador/palavra passe/anular
 ro: utilizator/parola/anulare
 ru: пользователь/пароль/отмена
 sl: uporabnik/geslo/prekliči
-sv: användare/passord/avbryt
+sv: användare/lösenord/avbryt
 
     validate/delete
 bg: да се потвърди/да се изтрие
@@ -15035,7 +15149,7 @@ pt: validar/eliminar
 ro: valideaza/sterge
 ru: проверить/удалить
 sk: potvrdiť/zmazať
-sv: giltligt/tas bort
+sv: utför/tag bort
 
     venteBien
 co: vendita d’un bè
@@ -15061,6 +15175,7 @@ nl: versie
 oc: version
 pt: versão
 ru: версия
+sv: version
 
     view source
 co: fighjà a fonte
@@ -15100,7 +15215,7 @@ pt: visualizar/mostrar/esconder/sumário
 ro: vizualizeaza/arata/ascunde/sumar
 ru: построить/показать/скрыть/общая
 sk: vizualizovať/ukázať/schovať/sumarizovať
-sv: visualisera/visa/göm/summering
+sv: visualisera/visa/dölj/summering
 
     vital record
 co: scheda
@@ -15197,6 +15312,7 @@ co: larghezza
 en: width
 fr: largeur
 pt:  largura
+sv: bredd
 
     will
 co: testamentu
@@ -15209,7 +15325,7 @@ it: testamento
 nl: Testament
 no: Testamente
 pt: testamento
-sv: Testament
+sv: Testamente
 
     with
 af: met
@@ -15246,12 +15362,14 @@ co: cù l’antenatu di a radica, i cumpagni è i scunnisciuti
 en: with root ancestor, spouses and unknowns
 fr: avec l’ancêtre racine, les conjoints et les inconnus
 pt: com o antepassado raiz, cônjuges e desconhecidos 
+sv: med rot, partners och okända
 
     witness at %s of
 co: testimone à u %s di
 en: witness at %s of
 fr: témoin au %s de
 pt: testemunha de %s de
+sv: vittne vid %s av
 
     witness at marriage of %s and %s
 af: getuie by die troue van %s met %s
@@ -15287,22 +15405,26 @@ sv: vittne vid äktenskap mellan %s och %s
 co: testimoni à i so avvenimenti
 en: witnesses at his events
 fr: témoins à ses évènements
+sv: vittnen vid hans händelser
 
     witnesses to events of
 co: testimoni à l’avvenimenti di
 en: witnesses to events of
 fr: témoins aux évènements de
+sv: vittnen vid händelser för
 
     witnesses to my events and godparents
 co: testimoni à i mo avvenimenti è cumpare/cummare
 en: witnesses to my events and godparents
 fr: témoins à mes évènements et parrains/marraines
+sv: vittnen vid mina händelser och gudföräldrar
 
     witness tree
 co: arburu di i testimoni
 en: tree of witnesses
 fr: arbre des témoins
 pt: árvore de testemunhas
+sv: vittnesträd
 
     witness/witness/witnesses
 af: getuie/getuie/getuies
@@ -15339,6 +15461,7 @@ co: testimone/testimoni
 en: witness/witnesses
 fr: témoin/témoins
 pt: testemunha/testemunhas
+sv: vittne/vittnen
 
     wizard/wizards/friend/friends/exterior
 af: Medewerkers/Medewerkers/vriend/vriend/exterior
@@ -15368,7 +15491,7 @@ ro: magician/magician/amic/amic/exterior
 ru: wizard/wizard/друг/друг/exterior
 sk: wizard/wizards/friend/friends/exterior
 sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
-sv: administratör/administratörer/vän/vän/exterior
+sv: administratör/administratörer/vän/vän/extern
 
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees
@@ -15590,4 +15713,4 @@ pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
-sv: ditt meddelande väntar på giltighet
+sv: ditt meddelande väntar på godkännande
