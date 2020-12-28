@@ -41,7 +41,9 @@ let () =
       | f :: fs ->
         if Sys.file_exists f
         then
-          if Sys.is_directory f
+          if String.get f (String.length f - 1) = '~'
+          then loop result fs
+          else if Sys.is_directory f
           then
             Sys.readdir f
             |> Array.to_list
