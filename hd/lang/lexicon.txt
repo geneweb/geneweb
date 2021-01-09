@@ -4504,7 +4504,7 @@ pt: árvore genealógica
 ro: arbore genealogic
 ru: генеалогическое дерево
 sl: družinsko drevo
-sv: stamträd
+sv: släktträd
 zh: 家譜
 
     database forum
@@ -4836,6 +4836,7 @@ co: arburiscenza discendente
 en: descendant tree view
 fr: arborescence descendante
 pt: árvore compacta de descendentes
+sv: trädvy med ättlingar
 
     descendants
 af: Afstammelinge
@@ -7399,7 +7400,7 @@ ru: в
 sk: v
 sl: v letu
 zh:  于
-sv: i
+sv: 
 
     include missing spouses
 af: ontbrekende ouers ingesluit
@@ -8572,7 +8573,7 @@ it: matrimonio
 nl: Huwelijk
 no: Ekteskap
 pt: casamento
-sv: Bröllop
+sv: Äktenskap
 
     marriage had occurred after the death of %t
 af: huwelik plaasgevind het nadat %t dood
@@ -9781,7 +9782,7 @@ no: Barn
 oc: nbre enfants
 pt: nº filhos
 ru: дети
-sv: antal barn
+sv: barn
 
     nb events
 co: num. avvenimenti
@@ -12320,7 +12321,7 @@ no: Se på merknader/kilder
 oc: veire las nòtas e las fonts
 pt: ver notas & fontes
 ru: смотри заметки/документы потомков
-sv: Se efterföljandes noteringar och källor
+sv: Se noteringar och källor
 
     see descendants pictures
 co: fighjà e fotò
@@ -12916,7 +12917,7 @@ no: Sorter etter:/Dato/alfabetisk rekkefølge/antall individer/antall hendelser
 oc: triar per:/date de debuta/òrdre alfabetic/nombre de personas/nombre d'eveniments
 pt: ordenar por:/data de início/ordem alfabética/número de pessoas/número de eventos
 ru: сортировать по:/дате/алфавиту/людям/событиям
-sv: Sortera efter datum/bokstavsordning/antal individer/antal händelser
+sv: Sortera efter:/datum/bokstavsordning/antal individer/antal händelser
 
     sort by/generation/alphabetic order
 co: urganizà da :/generazione/ordine alfabeticu
