@@ -14,7 +14,7 @@ let commnd = ref ""
 let printer_conf =
   { Config.empty with output_conf =
                         { status = Wserver.http
-                        ; header = Wserver.header "%s"
+                        ; header = (fun s -> Wserver.header "%s" s)
                         ; body = Wserver.print_string
                         ; flush = Wserver.wflush
                         }
