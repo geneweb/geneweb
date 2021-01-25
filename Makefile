@@ -20,7 +20,6 @@ BUILD_DIR=_build/default
 
 CAMLP5_PA_EXTEND_FILES = \
 	lib/templ \
-	bin/setup/setup
 
 CAMLP5_Q_MLAST_FILES = \
 	lib/templ

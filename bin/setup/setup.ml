@@ -292,18 +292,30 @@ let selected env =
     []
 
 let parse_upto lim =
-  let rec loop len =
-    parser
-      [< 'c when c = lim >] -> Buff.get len
-    | [< 'c; a = loop (Buff.store len c) >] -> a
+  let rec loop len (strm__ : _ Stream.t) =
+    match Stream.peek strm__ with
+    | Some c when c = lim -> Stream.junk strm__; Buff.get len
+    | Some c ->
+      Stream.junk strm__;
+      begin
+        try loop (Buff.store len c) strm__
+        with Stream.Failure -> raise (Stream.Error "")
+      end
+    | _ -> raise Stream.Failure
   in
   loop 0
 
 let parse_upto_void lim =
-  let rec loop len =
-    parser
-      [< 'c when c = lim >] -> ()
-    | [< 'c; a = loop (Buff.store len c) >] -> a
+  let rec loop len (strm__ : _ Stream.t) =
+    match Stream.peek strm__ with
+    | Some c when c = lim -> Stream.junk strm__; ()
+    | Some c ->
+      Stream.junk strm__;
+      begin
+        try loop (Buff.store len c) strm__
+        with Stream.Failure -> raise (Stream.Error "")
+      end
+    | _ -> raise Stream.Failure
   in
   loop 0
 
@@ -358,19 +370,22 @@ let macro conf =
   | 'R' -> parameters_2 conf.env
   | c -> "BAD MACRO " ^ String.make 1 c
 
-let get_variable strm =
+let get_variable (strm : _ Stream.t) =
   let rec loop len =
-    match strm with parser
-      [< '';' >] -> Buff.get len
-    | [< 'c >] -> loop (Buff.store len c)
+     match Stream.peek strm with
+     | Some ';' -> Stream.junk strm; Buff.get len
+     | Some c -> Stream.junk strm; loop (Buff.store len c)
+     | _ -> raise Stream.Failure
   in
   loop 0
 
 let get_binding strm =
   let rec loop len =
-    match strm with parser
-      [< ''=' >] -> let k = Buff.get len in k, get_variable strm
-    | [< 'c >] -> loop (Buff.store len c)
+    match Stream.peek strm with
+    | Some '=' ->
+      Stream.junk strm; let k = Buff.get len in k, get_variable strm
+    | Some c -> Stream.junk strm; loop (Buff.store len c)
+    | _ -> raise Stream.Failure
   in
   loop 0
 
@@ -381,28 +396,32 @@ let variables bname =
   let strm = Stream.of_channel ic in
   let (vlist, flist) =
     let rec loop (vlist, flist) =
-      match strm with parser
-        [< ''%';
-           vlist, flist =
-             parser
-               [< >] ->
-                 match strm with parser
-                   [< ''E' | 'C' >] ->
-                     let (v, _) = get_binding strm in
-                     if not (List.mem v vlist) then v :: vlist, flist
-                     else vlist, flist
-                 | [< ''V' >] ->
-                     let v = get_variable strm in
-                     if not (List.mem v vlist) then v :: vlist, flist
-                     else vlist, flist
-                 | [< ''F' >] ->
-                     let v = get_variable strm in
-                     if not (List.mem v flist) then vlist, v :: flist
-                     else vlist, flist
-                 | [< >] -> vlist, flist ?! >] ->
-          loop (vlist, flist)
-      | [< '_ >] -> loop (vlist, flist)
-      | [< >] -> vlist, flist
+      match Stream.peek strm with
+      | Some '%' ->
+        Stream.junk strm;
+        let (vlist, flist) =
+          let (strm : _ Stream.t) = strm in
+          match Stream.peek strm with
+            Some ('E' | 'C') ->
+            Stream.junk strm;
+            let (v, _) = get_binding strm in
+            if not (List.mem v vlist) then v :: vlist, flist
+            else vlist, flist
+          | Some 'V' ->
+            Stream.junk strm;
+            let v = get_variable strm in
+            if not (List.mem v vlist) then v :: vlist, flist
+            else vlist, flist
+          | Some 'F' ->
+            Stream.junk strm;
+            let v = get_variable strm in
+            if not (List.mem v flist) then vlist, v :: flist
+            else vlist, flist
+          | _ -> vlist, flist
+        in
+        loop (vlist, flist)
+      | Some _ -> Stream.junk strm; loop (vlist, flist)
+      | _ -> vlist, flist
     in
     loop ([], [])
   in
@@ -471,17 +490,18 @@ let rec copy_from_stream conf print strm =
           | _ ->
               let s =
                 let rec loop len =
-                  match strm with parser
-                    [< '']' >] -> Buff.get len
-                  | [< 'c >] -> loop (Buff.store len c)
-                  | [< >] -> Buff.get len
+                  match Stream.peek strm with
+                  | Some ']' -> Stream.junk strm; Buff.get len
+                  | Some c -> Stream.junk strm; loop (Buff.store len c)
+                  | _ -> Buff.get len
                 in
                 loop 0
               in
               let n =
-                match strm with parser
-                  [< ''0'..'9' as c >] -> Some (Char.code c - Char.code '0')
-                | [< >] -> None
+                match Stream.peek strm with
+                | Some ('0'..'9' as c) ->
+                  Stream.junk strm; Some (Char.code c - Char.code '0')
+                | _ -> None
               in
               print (translate_phrase conf.lexicon s n)
           end
@@ -582,23 +602,26 @@ let rec copy_from_stream conf print strm =
               | 'Q' -> print (parameters_1 conf.env) (* same as p *)
               | 'R' -> print (parameters_2 conf.env) (* same as p *)
               | _ ->
-                  match p_getenv conf.env (String.make 1 c) with
-                    | Some v ->
-                      begin match strm with parser
-                        [< ''{' >] ->
-                          let s = parse_upto '}' strm in
-                          print "\"";
-                          print s;
-                          print "\"";
-                          if v = s then print " selected"
-                      | [< ''[' >] ->
-                          let s = parse_upto ']' strm in
-                          print "\"";
-                          print s;
-                          print "\"";
-                          if v = s then print " checked"
-                      | [< >] -> print (strip_spaces v) end
-                  | None -> print "BAD MACRO 2"
+                match p_getenv conf.env (String.make 1 c) with
+                | Some v ->
+                  begin match Stream.peek strm with
+                    | Some '{' ->
+                      Stream.junk strm;
+                      let s = parse_upto '}' strm in
+                      print "\"";
+                      print s;
+                      print "\"";
+                      if v = s then print " selected"
+                    | Some '[' ->
+                      Stream.junk strm;
+                      let s = parse_upto ']' strm in
+                      print "\"";
+                      print s;
+                      print "\"";
+                      if v = s then print " checked"
+                    | _ -> print (strip_spaces v)
+                  end
+                | None -> print "BAD MACRO 2"
               end
           | c -> print (macro conf c)
           end
@@ -737,9 +760,9 @@ and for_all conf print list strm =
       let s_exist = parse_upto '|' strm in
       let s_empty = parse_upto '}' strm in
       let eol =
-        match strm with parser
-          [< ''\\' >] -> false
-        | [< >] -> true
+        match Stream.peek strm with
+        | Some '\\' -> Stream.junk strm ; false
+        | _ -> true
       in
       if list <> [] then
         List.iter
