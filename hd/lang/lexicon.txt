@@ -28,6 +28,7 @@ ru: ddmmyyyy
 sk: ddmmyyyy
 sl: ddmmyyyy
 sv: ddmmyyyy
+tr: ddmmyyyy
 
     !dir
 ar: rtl
@@ -63,6 +64,7 @@ ru: af=африканский/bg=болгарский/br=Бретонский/ca
 sk: af=afrikánčina/bg=bulharčina/br=bretónčina/ca=katalánčina/co=korzikánčina/cs=čeština/da=dánčina/de=nemčina/en=angličtina/eo=esperanto/es=španielčina/et=estónčina/fi=fínština/fr=francúzština/he=hebrejčina/is=islandčina/it=taliančina/lv=lotyština/nl=holandčina/no=nórčina/oc=okcitánčina/pl=poľština/pt=portugalčina/pt-br=brazílčina/ro=rumunčina/ru=ruština/sk=slovenčina/sl=slovinčina/sv=švédčina/zh=čínština
 sl: af=afrikaanščina/bg=bolgarščina/br=bretonščina/ca=katalonščina/co=korziščina/cs=češčina/da=danščina/de=nemščina/en=angleščina/eo=esperanto/es=španščina/et=estonščina/fi=finščina/fr=francoščina/he=hebrejščina/is=islandščina/it=italijanščina/lv=litvanščina/nl=nizozemščina/no=norveščina/oc=okcitanščina/pl=poljščina/pt=portugalščina/pt-br=brazilska-portugalščina/ro=romunščina/ru=ruščina/sk=slovaščina/sl=slovenščina/sv=švedščina/zh=kitajščina
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/co=korsikanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/oc=occitanska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sk=slovakiska/sl=slovenska/sv=svenska/zh=kinesiska
+tr: af=Afrikaans/bg=Bulgarian/br=Breton/ca=Catalan/co=Corsican/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/oc=Occitan/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sk=Slovak/sl=Slovenian/sv=Swedish/tr=Turkish/zh=Chinese
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/zh=中文
 
     the first branch
@@ -94,6 +96,7 @@ ru: чтобы увидеть первую ветку
 sk: aby ste videli prvú vetvu
 sl: za prikaz prve veje
 sv: den första grenen
+tr: İlk satır
 
     to see the first branch
 af: om die eerste staak te sien
@@ -124,6 +127,7 @@ ru: чтобы увидеть первую ветку
 sk: aby ste videli prvú vetvu
 sl: za prikaz prve veje
 sv: för att se den första
+tr: İlkini görmek için
 
     to see the first relationship link
 af: om die eerste te sien
@@ -154,6 +158,7 @@ ru: чтобы увидеть первую связь отношения
 sk: zobraziť prvý vzťah
 sl: za prikaz prve sorodstvene povezave
 sv: för att se den första
+tr: İlkini görmek için
 
     to try again with this number
 af: om weer te probeer met die nommer
@@ -184,6 +189,7 @@ ru: для того, чтобы пытаться снова с этим числ
 sk: skúsiť znovu s týmto číslom
 sl: za ponoven poskus s to številko
 sv: för att försöka igen med detta nummer
+tr: Bu numara ile tekrar denemek için
 
     %1 of %2
 af: %1 van %2
@@ -214,6 +220,7 @@ ru: %1 :g:%2
 sk: %1 :g:%2
 sl: %1 od :g:%2
 sv: %1 till %2
+tr: %1 / %2
 
     %d %s starting with %s
 co: %d %s principiendu da « %s »
@@ -229,6 +236,7 @@ oc: %d %s que comença amb "%s"
 pt: %d %s começados por '%s'
 ru: %d %s начиная с "%s"
 sv: %d %s som börjar med "%s"
+tr: "%s" ile başlayan %d %s
 
     %d years ago
 af: %d jaar gelede
@@ -259,6 +267,7 @@ ru: %d лет назад
 sk: pred %d rokmi
 sl: pred %d leti
 sv: %d år sedan
+tr: %d yıl önce
 
     %s access cancelled for that page
 bg: отменен достъп като %s за тази страница
@@ -283,6 +292,7 @@ ro: %s acces anulat la această pagină
 ru: доступ %s к этой странице запрещён
 sl: %s nima dostopa do te strani
 sv: du har inte längre åtkomst till denna sida %s
+tr: Bu sayfa için %s erişimi iptal edildi
 
     %s and %s have several unions
 co: ci hè parechje unioni trà %s è %s
@@ -290,6 +300,7 @@ en: %s and %s have several unions
 fr: il y a plusieurs unions entre %s et %s
 pt: existem várias uniões entre %s e %s
 sv: %s och %s har flera partnerskap
+tr: %s ve %s'nin birden fazla sendikası var
 
     %s cousins
 af: neefs en niggies %s geslagte verwyder
@@ -320,6 +331,7 @@ ru: %s кузены
 sk: %s bratranci/sesternice
 sl: %s bratranci/sestrične
 sv: %smänningar
+tr: %s kuzenler
 
     %s forbidden char
 co: caratteri difesi (%s) impiegati in casata/nome
@@ -336,6 +348,7 @@ oc: caractèrs enebits (%s) dins lo nom o lo prenom
 pt: carácter inválidos (%s) no nome/apelido
 ru: недопустимый символ (%s) использован в имени или фамилии
 sv: Ogiltigt tecken (%s) i efternamn/förnamn
+tr: Soyadda/adda kullanılan geçersiz karakter (%s)
 
     %s modified
 co: %s mudificatu
@@ -351,6 +364,7 @@ oc: %s modificat/da
 pt: %s modificado
 ru: %s изменён
 sv: %s ändrad
+tr: %s değiştirildi
 
     %s, it is %s of
 af: %s, dit is %s van
@@ -381,6 +395,7 @@ ru: %s, это %s
 sk: %s, je %s
 sl: %s, je %s od
 sv: %s, är det %s till
+tr: %s, %s
 
     %s, it will be %s of
 af: %s, dit sal wees %s van
@@ -411,6 +426,7 @@ ru: %s, это будет %s
 sk: %s, bude %s
 sl: %s, bo %s od
 sv: %s, är det %s till
+tr: %s, %s olacak
 
     %t already has parents
 af: %t het reeds ouers
@@ -441,6 +457,7 @@ ru: %t уже имеет родителей
 sk: %t už má rodičov
 sl: %t že ima starše
 sv: %t har redan föräldrar
+tr: %t zaten ebeveynlere sahip
 
     %t died before his/her birth
 af: %t is dood voor sy/haar geboorte
@@ -471,6 +488,7 @@ ru: %t умер перед его/ее рождением
 sk: %t zomrel pred svojim narodením/zomrela pred svojim narodením
 sl: %t je umrl pred svojim rojstvom/umrla pred svojim rojstvom
 sv: %t dog före sin egen födelse
+tr: %t doğumundan önce öldü
 
     %t has incorrect title dates: %t
 af: %t die datum voor sy titel is verkeerd: %t
@@ -502,6 +520,7 @@ ru: %t имеет неправильное название даты: %t
 sk: %t má nesprávne údaje o tituloch: %t
 sl: %t ima napačne datume naslova
 sv: %t har felaktiga titeldatum: %t
+tr: %t yanlış başlık tarihlerine sahip: %t
 
     %t is born after the death of his/her mother %t
 af: %t is gebore na die afsterwe van sy/haar moeder %t
@@ -532,6 +551,7 @@ ru: %t родился после смерти его/ее матери %t
 sk: %t narodený/narodená po smrti svojej matky %t
 sl: %t je rojen(a) po smrti svoje matere
 sv: %t är född efter att sin egen mor dog %t
+tr: %t, annesinin %t ölümünden sonra doğmuş 
 
     %t is born more than 2 years after the death of his/her father %t
 af: %t is gebore meer as 2 jaar na die afsterwe van sy/haar vader %t
@@ -562,6 +582,7 @@ ru: %t родился более, чем через 2 года после сме
 sk: %t narodený/narodená viac ako dva roky po smrti svojho otca: %t
 sl: %t je rojen(a) več kot 2 leti po smrti svojega očeta
 sv: %t är född mer än 2 år efter att sin egen far dog %t
+tr: %t, babasının %t ölümünden 2 yıl sonra doğmuş 
 
     %t was witness after his/her death
 co: %t era testimone dopu a so morta
@@ -577,6 +598,7 @@ oc: %t foguèt testimòni après la mòrt
 pt: %t foi testemunha após a sua morte
 ru: %t был(а) свидетелем после своей смерти
 sv: %t var vittne vid hennes/hans död
+tr: %t, ölümlerinden sonra tanıktı
 
     %t was witness before his/her birth
 co: %t era testimone nanzu a so nascita
@@ -592,6 +614,7 @@ oc: %t foguèt testimòni abans la naissença
 pt: %t foi testemunha antes do seu nascimento
 ru: %t был(а) свидетелем до своего рождения
 sv: %t var vittne innan dennes födsel
+tr: %t, doğumlarından önce bir tanıktı
 
     %t witnessed the %s after his/her death
 co: %t hè statu testimone di %s dopu a so morta
@@ -603,6 +626,7 @@ it: %t è stato testimone del %s dopo la sua morte
 pt: %t foi testemunha de %s depois da sua morte
 ru: %t был(а) свидетелем %s после его/её смерти
 sv: %t var vittne åt %s efter dennes död
+tr: %t, kendi %s ölümünden sonra tanıktı
 
     %t witnessed the %s before his/her birth
 co: %t hè statu testimone di %s nanzu a so nascita
@@ -614,6 +638,7 @@ it: %t è stato testimone del %s prima della sua nascita
 pt: %t foi testemunha de %s antes do seu nascimento
 ru: %t был(а) свидетелем %s до его/её рождения
 sv: %t var vittne till %s före sin födsel
+tr: %t, kendi %s doğumundan önce tanıktı
 
     %t's %s before his/her %s
 co: %t: %s nanzu a/u so %s
@@ -625,6 +650,7 @@ it: %t : %s prima della suo/sua %s
 pt: %t: %s antes de seu/sua %s
 ru: %t: %s до их %s
 sv: %t: %s före dennes %s
+tr: %t: %s önce %s
 
     %t's sex is not coherent with his/her relations
 af: %t se geslag stem nie ooreen met sy/haar verwantskap nie
@@ -655,6 +681,7 @@ ru: пол %t не стыкуется с его/ее взаимоотношен�
 sk: pohlavie %t sa nezhodnuje s jeho/jej vzťahmi
 sl: spol %t ni usklajen z zvezami
 sv: %ts kön stämmer inte överens med sina relationer
+tr: %t'in cinsiyeti ilişkileriyle tutarlı değil
 
     (date)
 af: 1 %m %y/%d %m %y/%m %y/%y
@@ -686,6 +713,7 @@ ru: 1 %m %y/%d %m %y/%m %y/%y
 sk: 1. %m %y/%d. %m %y/%m %y/%y
 sl: 1. %m %y/%d. %m %y/%m %y/%y
 sv: 1 %m %y/%d %m %y/%m %y/%y
+tr: 1 %m %y/%d %m %y/%m %y/%y
 zh: %y年%m1日/%y年%m%d日/%y年%m/%y年
 
     (decimal separator)
@@ -717,6 +745,7 @@ ru: .
 sk: ,
 sl: ,
 sv: ,
+tr: .
 
     (french revolution month)
 bg: вандемиер/брюмер/фример/нивоз/плювиоз/вантоз/жерминал/флореал/прериал/месидор/термидор/фруктидор/добавка
@@ -746,6 +775,7 @@ ru: Вандемиер/Брюмэр/Фримэр/Нивоз/Плювиоз/Ва�
 sk: Vendémiaire/Brumaire/Frimaire/Nivôse/Pluviôse/Ventôse/Germinal/Floréal/Prairial/Messidor/Thermidor/Fructidor/Complémentaire
 sl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 sv: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
+tr: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 
     (hebrew month)
 af: Tisjri/Hesjvan/Kislev/Tevet/Sjevat/Adar I/Adar II/Nisan/Ijjar/Sivan/Tammus/Av/Elul
@@ -776,6 +806,7 @@ ru: Тишри/Хешван/Кислев/Тевет/Шеват/Адар 1/Ада
 sk: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 sl: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 sv: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
+tr: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 
     (month)
 af: Januarie/Februarie/Maart/April/Mei/Junie/Julie/Augustus/September/Oktober/November/Desember
@@ -807,6 +838,7 @@ ru: января/февраля/марта/апреля/мая/июня/июля
 sk: január/február/marec/apríl/máj/jún/júl/august/september/október/november/december
 sl: januarja/februarja/marca/aprila/maja/junija/julija/avgusta/septembra/oktobra/novembra/decembra
 sv: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november/december
+tr: Ocak/Şubat/Mart/Nisan/Mayıs/Haziran/Temmuz/Ağustos/Eylül/Ekim/Kasım/Aralık
 zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
 
     (thousand separator)
@@ -839,6 +871,7 @@ ru: '
 sk:  
 sl: .
 sv: .
+tr: ,
 zh: .
 
     (week day)
@@ -871,6 +904,7 @@ ru: воскресенье/понедельник/вторник/среда/че
 sk: nedeľa/pondelok/utorok/streda/štvrtok/piatok/sobota
 sl: nedelja/ponedeljek/torek/sreda/četrtek/petek/sobota
 sv: söndag/måndag/tisdag/onsdag/torsdag/fredag/lördag
+tr: Pazar/Pazartesi/Salı/Çarşamba/Perşembe/Cuma/Cumartesi
 
     2nd cousins
 af: kleinneef/kleinniggie
@@ -901,6 +935,7 @@ ru: троюродные братья/троюродные сестры
 sk: bratranci/sesternice z druhého kolena
 sl: bratranec/sestrična v drugem kolenu
 sv: sysslingar
+tr: 2. kuzenler
 
     3rd cousins
 af: agterkleinneef/agterkleinniggie
@@ -931,6 +966,7 @@ ru: троюродные кузены/троюродные кузины
 sk: bratranci/sesternice z tretieho kolena
 sl: bratranec/sestrična v tretjem kolenu
 sv: bryllingar
+tr: 3. kuzenler
 
     :
 af: :
@@ -962,6 +998,7 @@ ru: :
 sk: :
 sl: :
 sv: :
+tr: :
 
     <em>Sosa number</em> relative to %t
 af: <em>Sosa nommer</em> relatief tot %t
@@ -992,6 +1029,7 @@ ru: <em>Sosa номер</em> относительно %t
 sk: <em>"Sosa" číslo</em> vo vzťahu k %t
 sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
+tr: <em>Sosa sayısı</em> %t'e göre
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
@@ -1022,6 +1060,7 @@ ru: %s-ий кузен/%s-я кузина
 sk: bratranec/sesternica z %s kolena
 sl: bratranec v %s kolenu/sestrična v %s kolenu
 sv: %smänning
+tr: bir %s kuzeni
 
     a 2nd cousin
 af: 'n kleinneef/'n kleinniggie
@@ -1052,6 +1091,7 @@ ru: троюродный брат/троюродная сестра
 sk: bratranec/sesternica z druhého kolena
 sl: bratranec iz drugega kolena/sestrična iz drugega kolena
 sv: en syssling
+tr: bir 2. kuzen
 
     a 3rd cousin
 af: 'n agterkleinneef/'n agterkleinniggie
@@ -1082,6 +1122,7 @@ ru: троюродный кузен/троюродная кузина
 sk: bratranec/sesternica z tretieho kolena
 sl: bratranec v tretjem kolenu/sestrična v tretjem kolenu
 sv: en brylling
+tr: bir 3. kuzen
 
     a brother-in-law/a sister-in-law
 af: 'n swaer/'n skoonsuster
@@ -1112,6 +1153,7 @@ ru: деверь-шурин/заловка-свояченица
 sk: švagor/švagriná
 sl: svak/svakinja
 sv: en svåger/en svägerska
+tr: bir kayınbiraderi/kayınbiraderi
 
     a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
 co: un cugnatu/cugnati/una cugnata/cugnate
@@ -1119,6 +1161,7 @@ en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
 fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
 pt: um cunhado/cunhados/uma cunhada/cunhadas
 sv: en svåger/svågrar/en svägerska/svägerskor
+tr: bir kayınbiraderi/kayınbiraderleri/bir kayınbiraderi/kayınbiraderleri
 
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
@@ -1149,12 +1192,14 @@ ru: брат/сестра/брат или сестра
 sk: brat/sestra/súrodenec
 sl: brat/sestra/brat ali sestra
 sv: en bror/en syster/ett syskon
+tr: bir erkek kardeş/bir kız kardeş/bir kardeş
 
     a child-in-law/children-in-law
 en: one child-in-law/children-in-law
 fr: un bel-enfant/beaux-enfants
 pt: enteado/enteados
 sv: ett syskonbarn/syskonbarn
+tr: bir kayınvalidesi/kayınvalideleri
 
     a cousin
 af: 'n neef/'n niggie
@@ -1185,6 +1230,7 @@ ru: кузен/кузина
 sk: bratranec/sesternica
 sl: bratranec/sestrična
 sv: en kusin
+tr: bir kuzeni
 
     a descendant
 af: 'n afstammeling
@@ -1215,6 +1261,7 @@ ru: потомок
 sk: potomok
 sl: potomec
 sv: en ättling
+tr: bir nesli
 
     a grandfather/a grandmother/a grandparent
 af: 'n oupa/'n ouma/'n grootouer
@@ -1245,6 +1292,7 @@ ru: дедушка/бабушка/прародитель
 sk: dedo/babka/prarodič
 sl: dedka/babice/starega starša
 sv: en farförälder/en morförälder/en far- eller morförälder
+tr: bir büyükbaba/bir büyükanne/bir büyükbaba veya büyükanne
 
     a grandson/a granddaughter/a grandchild
 af: 'n kleinseun/'n kleindogter/'n kleinkind
@@ -1275,6 +1323,7 @@ ru: внук/внучка/ребенок детей
 sk: vnuk/vnučka/vnúča
 sl: vnuk/vnukinja/pravnuk ali pravnukinja
 sv: barnbarn/barnbarn/barnbarn
+tr: bir torun/bir torun/bir torun
 
     a great-grandfather/a great-grandmother/a great-grandparent
 af: 'n oupagrootjie/'n oumagrootjie/'n grootjie
@@ -1305,6 +1354,7 @@ ru: прапрадед/прапрабабка/прапрапрародитель
 sk: pradedo/prababka/praprarodič
 sl: pradedek/prababica/prastari starš
 sv: en gammel-farfar eller gammel-farmor/en gammel-morfar eller gammel-mormor/en gammel-far- eller -mor-förälder
+tr: bir büyük büyükbaba/bir büyük büyükanne/bir büyük büyükbaba veya büyükanne
 
     a great-grandson/a great-granddaughter/a great-grandchild
 af: 'n agterkleinseun/'n agterkleindogter/'n agterkleinkind
@@ -1335,6 +1385,7 @@ ru: праправнук/праправнучка/праправнук
 sk: pravnuk/pravnučka/pravnúča
 sl: pravnuk/pravnukinja/pravnuk ali pravnukinja
 sv: ett barnbarns barn/ett barnbarns barn/ett barnbarns barn
+tr: bir büyük torun/bir büyük torun/bir büyük torun
 
     a great-nephew/a great-niece
 af: 'n agterneef/'n agterniggie
@@ -1365,6 +1416,7 @@ ru: внучатый племянник/внучатая племянница
 sk: prasynovec/praneter
 sl: pranečak/pranečakinja
 sv: en gammel-nevö/en gammel-niece
+tr: bir büyük yeğen/bir büyük yeğen/büyük yeğen/büyük yeğen/büyük yeğenler ve büyük yeğenler
 
     a great-uncle/a great-aunt
 af: 'n grootoom/'n groottante
@@ -1395,6 +1447,7 @@ ru: дядя родителя/тетя родителя
 sk: prastrýko/prateta
 sl: prastric/prateta
 sv: en gammel-farbror/en gammel-moster
+tr: bir büyük amca/bir büyük teyze
 
     a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
 co: un mezu cugnatu/mezu cugnati/una meza cugnata/meza cugnate
@@ -1402,6 +1455,7 @@ en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sis
 fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
 pt: um meio cunhado/meios cunhados/uma meia cunhada/meias cunhadas
 sv: en halvsvåger/halvsvågrar/en halvsvägerska/halvsvägerskor
+tr: bir üvey kayınbirader/üvey kayınbiraderler/bir üvey baldız/üvey baldızlar
 
     a half sibling-in-law/half siblings-in-law
 co: un mezu cugnatu o una meza cugnata/mezu cugnati è meze cugnate
@@ -1409,6 +1463,7 @@ en: one half sibling-in-law/half siblings-in-law
 fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
 pt: um meio cunhado ou cunhada/meios cunhados
 sv: ett halvsyskonbarn/halvsyskonbarn
+tr: bir üvey kayınbirader/kayınbiraderler
 
     a half-brother/a half-sister/a half-sibling
 af: 'n stiefbroer/'n stiefsuster/'n stiefbroer of -suster
@@ -1439,6 +1494,7 @@ ru: сводный брат/сводная сестра/сводный брат 
 sk: nevlastný brat/nevlastná sestra/ nevlastný súrodenec
 sl: polbrata/polsestra/polbrat ali polsestra
 sv: en halvbror/en halvsyster/ett halvsyskon
+tr: bir üvey erkek kardeş/bir üvey kız kardeş/bir üvey kardeş
 
     a nephew/a niece
 af: 'n broerskind/'n susterskind///broers- en susterskinders
@@ -1469,6 +1525,7 @@ ru: племянник/племянница/племянники/племянн�
 sk: synovec/neter/synovci/netere/synovci a netere
 sl: nečak/nečakinja/nečaki/nečakinje/nečak in nečakinja
 sv: en nevö/en niece/nevöer/niecer/nevöer och niecer
+tr: bir yeğen/bir yeğen/yeğenler/yeğenler/yeğenler ve yeğenler
 
     a sibling-in-law/siblings-in-law
 co: un cugnatu o una cugnata/cugnati è cugnate
