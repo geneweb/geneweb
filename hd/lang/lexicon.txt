@@ -1533,6 +1533,7 @@ en: one sibling-in-law/siblings-in-law
 fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
 pt: um cunhado ou cunhada/cunhados
 sv: en svåger eller svägerska/svågrar och svägerskor
+tr: bir kayınbiraderi/kayınbiraderleri
 
     a son-in-law/a daughter-in-law
 af: 'n skoonseun/'n skoondogter
@@ -1563,6 +1564,7 @@ ru: зять/невестка
 sk: zať/nevesta
 sl: zet/snaha
 sv: en måg/en svärdotter
+tr: bir damadı/bir gelini
 
     a son/a daughter/a child
 af: 'n seun/'n dogter/'n kind
@@ -1593,6 +1595,7 @@ ru: сын/дочь/ребенок
 sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: en son/en dotter/ett barn
+tr: bir oğul/bir kız/bir çocuk
 
     a stepchild/stepchildren
 co: un(a) figliastru(a)/figliastri
@@ -1600,6 +1603,7 @@ en: a stepchild/stepchildren
 fr: un bel-enfant/beaux-enfants
 pt: um enteado/enteados
 sv: ett svärbarn/svärbarn
+tr: bir üvey çocuk/üvey çocuklar
 
     a stepson/stepsons/a stepdaughter/stepdaughters
 co: un figliastru/figliastri/una figliastra/figliastre
@@ -1607,6 +1611,7 @@ en: one stepson/stepsons/one stepdaughter/stepdaughters
 fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
 pt: um enteado/enteados/uma enteada/enteadas
 sv: en svärson/svärsöner/svärdotter/svärdöttrar
+tr: bir üvey oğul/üvey oğulları/bir üvey kız/üvey kızları
 
     about (date)
 af: ongeveer
@@ -1637,6 +1642,7 @@ ru: около
 sk: okolo
 sl: približno
 sv: omkring
+tr: hakkında
 
     about (short date)
 af: ca
@@ -1669,6 +1675,7 @@ sk: ca
 sl: ca
 sv: ca
 zh: ca
+tr: yak.
 
     access
 af: toegang
@@ -1699,6 +1706,7 @@ ru: доступ
 sk: prístup
 sl: dostop
 sv: åtkomst
+tr: erişim
 
     accomplishment
 co: cumpiimentu
@@ -1713,6 +1721,7 @@ no: Utførelse
 pt: concretização
 ru: достижение
 sv: Prestation
+tr: Başarı
 
     acquisition
 co: acchjappu
@@ -1727,6 +1736,7 @@ no: Anskaffelse
 pt: aquisição
 ru: приобретение
 sv: Förvärvande
+tr: Edinme
 
     activate/suppress
 co: attivà/squassà
@@ -1734,6 +1744,7 @@ en: activate/suppress
 fr: activer/supprimer
 pt: activar/suprimir
 sv: aktivera/undertrycka
+tr: etkinleştir/kaldır
 
     add
 af: byvoeg
@@ -1764,6 +1775,7 @@ ru: добавить :a:
 sk: pridať :a:
 sl: dodaj
 sv: lägg till
+tr: ekle
 
     add base notes
 af: byvoeg notas
@@ -1794,6 +1806,7 @@ ru: добавить :a: заметки
 sk: pridať :a: poznámky
 sl: dodaj zapiski
 sv: lägg till noteringar
+tr: not ekle
 
     add picture
 af: byvoeg prent
@@ -1823,6 +1836,7 @@ ro: adauga imagine
 ru: добавить :a: картинку
 sl: dodaj slika
 sv: lägg till bild
+tr: resim ekle
 
     add the previous name as a first name alias
 co: aghjunghje u nome precedente cum’è cugnome di nome
@@ -1830,6 +1844,7 @@ en: add the previous name as a first name alias
 fr: ajouter le nom précédent comme un alias de prénom
 pt: adicionar o nome anterior como primeiro nome alternativo
 sv: lägg till det förra namnet som förnamnsalias
+tr: önceki adı, ilk takma adı olarak ekleyin
 
     add the previous name as a surname alias
 co: aghjunghje u nome precedente cum’è cugnome di casata
@@ -1837,6 +1852,7 @@ en: add the previous name as a surname alias
 fr: ajouter le nom précédent comme un alias de nom
 pt: adicionar o nome anterior como apelido alternativo
 sv: lägg till det förra namnet som efternamnsalias
+tr: önceki adı, takma soyadı olarak ekleyin
 
     adhesion
 co: adesione
@@ -1851,6 +1867,7 @@ no: Medlemskap
 pt: adesão
 ru: участие
 sv: Medlemskap
+tr: Üyelik
 
     adoptive father/adoptive mother/adoptive parents
 af: aangenome vader/angenome moeder/aangenome ouers
@@ -1882,6 +1899,7 @@ ru: приемный отец/приемная мать/приемные род�
 sk: adoptívny otec/adoptnívna matka/adoptívny rodičia
 sl: posvojitveni oče/posvojitvena mati/posvojitveni starši
 sv: adoptivfar/adoptivmor/adoptivföräldrar
+tr: evlat edinen baba/evlat edinen anne/evlat edinen ebeveynler
 
     adoptive son/adoptive daughter/adoptive child
 af: aangenome seun/aangenome dogter/aangenome kind
@@ -1913,6 +1931,7 @@ ru: приемный сын/приемная дочь/приемный ребе�
 sk: adoptívny syn/adoptívna dcéra/adoptívne dieťa
 sl: posvojenec/posvojenka/posvojeni otrok
 sv: adoptivson/adoptivdotter/adoptivbarn
+tr: evlat edinilen oğul/evlat edinilen kız/evlat edinilen çocuk
 
     advanced request
 af: gevorderde versoek/gevorderde<br>versoek
@@ -1943,6 +1962,7 @@ ru: расширенный запрос/расширенный<br>запрос
 sk: rozšírená požiadavka/rozšírená<br>požiadavka
 sl: napredno iskanje/napredno<br>iskanje
 sv: avancerad sökning/avancerad<br>sökning
+tr: gelişmiş istek/gelişmiş<br>istek
 zh: 高级访问请求/高级访问请求
 
     after
@@ -1974,6 +1994,7 @@ ru: после
 sk: po
 sl: po
 sv: efter
+tr: sonra
 
     after (date)
 af: na
@@ -2004,6 +2025,7 @@ ru: после
 sk: po
 sl: po
 sv: efter
+tr: sonra
 
     age
 af: ouderdom
@@ -2035,6 +2057,7 @@ ru: возраст
 sk: vek
 sl: starost
 sv: ålder
+tr: yaş
 zh:  年龄
 
     age at %s birth date
@@ -2051,6 +2074,7 @@ oc: atge a la naissença de %s
 pt: idade aquando do nascimento de %s
 ru: возраст на момент рождения %s
 sv: ålder vid %s födelse
+tr: %s doğum yaşı
 
     age at death
 af: ouderdom by afsterwe
@@ -2081,6 +2105,7 @@ ru: в возрасте
 sk: vek v dobe úmrtia
 sl: Livslängd
 sv: livslängd
+tr: ölüm yaşı
 zh:  享年
 
     age at death:
@@ -2112,6 +2137,7 @@ ru: в возрасте
 sk: vek v dobe úmrtia
 sl: živel(a)
 sv: livslängd:
+tr: ölüm yaşı
 zh:  享年
 
     alias
@@ -2144,6 +2170,7 @@ ru: псевдоним
 sk: alias
 sl: alias
 sv: alias
+tr: takma ad
 
     alive
 af: in die lewe
@@ -2174,6 +2201,7 @@ ru: живой
 sk: žijúci
 sl: živi
 sv: lever
+tr: canlı
 
     all the estates
 af: alle plase
@@ -2204,6 +2232,7 @@ ru: все места
 sk: všetky miesta
 sl: vsa posestva
 sv: alla orter
+tr: tüm alanlar
 
     all the titles
 af: al die titels
@@ -2234,6 +2263,7 @@ ru: все титулы
 sk: všetky tituly
 sl: vsi nazivi
 sv: alla titlar
+tr: tüm başlıklar
 
     alphabetic order
 af: alfabetiese volgorde
@@ -2264,6 +2294,7 @@ ru: алфавитный порядок
 sk: v abecednom poradí
 sl: abecedni red
 sv: bokstavsordning
+tr: alfabetik sıra
 
     also
 af: ook
@@ -2294,6 +2325,7 @@ ru: также
 sk: tiež
 sl: tudi
 sv: också
+tr: ayrıca
 
     an ancestor
 af: 'n voorsaat
@@ -2324,6 +2356,7 @@ ru: предок
 sk: predok
 sl: prednik
 sv: en ana
+tr: bir ata
 
     an uncle/an aunt
 af: 'n oom/'n tante
@@ -2354,6 +2387,7 @@ ru: дядя/тетя
 sk: strýc/teta
 sl: stric/teta
 sv: en farbror/en faster/en morbror/en moster
+tr: bir amca/bir teyze/amcalar/teyzeler/amcalar ve teyzeler
 
     ancestors
 af: voorouers
@@ -2384,6 +2418,7 @@ ru: предки
 sk: predkovia
 sl: predniki
 sv: anor
+tr: atalar
 zh:  祖先
 
     ancestors (some)
@@ -2415,6 +2450,7 @@ ru: возможные предки
 sk: predkovia
 sl: predniki
 sv: anor
+tr: atalar
 
     and
 af: en
@@ -2446,6 +2482,7 @@ ru: и
 sk: a
 sl: in
 sv: och
+tr: ve
 zh:  和
 
     anniversaries
