@@ -2514,6 +2514,7 @@ ru: годовщины
 sk: výročia
 sl: obletnice
 sv: årsdagar
+tr: Yıldönümleri
 
     anniversaries of birth
 af: verjaarsdae
@@ -2545,6 +2546,7 @@ ru: дни рождения
 sk: narodeniny
 sl: rojstni dnevi
 sv: födelsedagar
+tr: Doğum günleri
 zh:  出生于今日的记录
 
     anniversaries of dead people
@@ -2576,6 +2578,7 @@ ru: годовщины смерти
 sk: výročia zomretých osôb
 sl: obletnice umrlih oseb
 sv: årsdagar för avlidna personer
+tr: Ölülerin yıldönümleri
 zh:  死亡于今日的记录
 
     anniversaries of marriage
@@ -2607,6 +2610,7 @@ ru: годовщины брака
 sk: výročia svadieb
 sl: obletnice porok
 sv: bröllopsdagar
+tr: Evlilik yıldönümleri
 zh:  结婚于今日的记录
 
     annulation
@@ -2621,6 +2625,7 @@ nl: Nietigverklaring
 no: Annullering
 pt: anulação
 sv: Upphävande
+tr: İptal
 
     any individual in the base
 co: una persona di a basa
@@ -2636,6 +2641,7 @@ oc: quin individú que siá dins l'arbre
 pt: qualquer pessoa da árvore
 ru: любой человек в генеалогическом дереве
 sv: en person i ditt träd
+tr: Tabandaki herhangi bir kişi
 
     are
 af: is
@@ -2666,6 +2672,7 @@ ru: есть
 sk: sú
 sl: so
 sv: är
+tr: vardır
 
     area code
 co: codice di cumuna
@@ -2681,6 +2688,7 @@ oc: còde de comuna
 pt: Código postal
 ru: почтовый индекс
 sv: Postnummer
+tr: Kod
 
     ascendants tree
 co: arburu d’ascendenza
@@ -2696,6 +2704,7 @@ oc: arbre d’ascendéncia
 pt: árvore de ascendência
 ru: Фамильное дерево
 sv: Antavla
+tr: Soyağacı
 
     at the same time
 af: ter selfdertyd
@@ -2726,6 +2735,7 @@ ru: в то же самое время
 sk: v tom istom čase
 sl: sočasno
 sv: samtidigt
+tr: aynı zamanda
 
     available genealogies
 co: lista di e genealugie dispunibule (impiegheghja gwsetup)
@@ -2733,6 +2743,7 @@ en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 pt: lista das genealogias disponíveis (utilize gwsetup)
 sv: lista över tillgängliga släktdatabaser (använd gwsetup)
+tr: Mevcut şecere listesi (gwsetup kullanın)
 
     average age at death
 bg: средна продължителност на живота
@@ -2759,6 +2770,7 @@ ru: средняя продолжительность жизни
 sk: priemerný vek v čase úmrtia
 sl: povprečna starost ob smrti
 sv: medelålder vid dödstillfället
+tr: Ortalama ölüm yaşı
 
     back
 af: terug
@@ -2789,6 +2801,7 @@ ru: назад
 sk: späť
 sl: nazaj
 sv: tillbaka
+tr: Geri
 
     baptism
 af: doop
@@ -2819,6 +2832,7 @@ ro: botez
 ru: крещение
 sl: krst
 sv: dop
+tr: Vaftiz
 
     baptism place
 co: locu di battesimu
@@ -2834,6 +2848,7 @@ oc: lòc de baptisme
 pt: local de batismo
 ru: место крещения
 sv: dopplats
+tr: Vaftiz yeri
 
     baptism src
 co: fonte di battesimu
@@ -2849,6 +2864,7 @@ oc: font de baptisme
 pt: fonte de batismo
 ru: свидетельство о крещении
 sv: dop
+tr: Vaftiz kaynağı
 
     baptismLDS
 co: battesimu LDS
@@ -2862,6 +2878,7 @@ nl: Doop (LDS)
 no: Dåp (LDS)
 pt: batismo LDS
 sv: Dop (LDS)
+tr: Vaftiz (LDS)
 
     baptized
 af: gedoop
@@ -2893,6 +2910,7 @@ ru: крещеный
 sk: pokrstený/pokrstená
 sl: krščen/krščena
 sv: döpt
+tr: Vaftiz edilmiş
 
     bar mitzvah
 co: bar mitzvah
@@ -2907,12 +2925,14 @@ no: Bar Mitzvah
 pt: bar mitzvah
 ru: бар-мицва
 sv: Bar Mitzvah
+tr: Bar Mitzvah
 
     base
 co: basa
 en: base
 fr: base
 sv: bas
+tr: Temel
 
     base index notes
 af: notas
@@ -2944,6 +2964,7 @@ ru: заметки
 sk: poznámky
 sl: zapiski
 sv: noteringar
+tr: Notlar dizini
 zh:  备注
 
     base notes
@@ -2976,6 +2997,7 @@ ru: заметки
 sk: poznámky
 sl: zapiski
 sv: noteringar
+tr: Notlar
 zh:  备注
 
     base wizard notes
@@ -3007,6 +3029,7 @@ ru: wizard заметки
 sk: wizards poznámky
 sl: čarovnik zapiski
 sv: administratörsnoteringar
+tr: Not sihirbazı
 
     bat mitzvah
 co: bat mitzvah
@@ -3022,6 +3045,7 @@ oc: bar mitzvah
 pt: bar mitzvah
 ru: бат-мицва
 sv: Bat Mitzvah
+tr: Bat Mitzvah
 
     before
 af: voor
@@ -3052,6 +3076,7 @@ ru: перед
 sk: pred
 sl: pred
 sv: före
+tr: Önce
 
     before (date)
 af: voor
@@ -3082,6 +3107,7 @@ ru: до
 sk: pred
 sl: pred
 sv: före
+tr: Önce
 
     begin
 af: begin
@@ -3112,6 +3138,7 @@ ru: начиная с
 sk: začiatok
 sl: začetek
 sv: börjar
+tr: Başla
 
     benediction
 co: benedizzione
@@ -3125,6 +3152,7 @@ nl: Zegening
 no: Velsignelse
 pt: benção
 sv: Välsignelse
+tr: Kutsama
 
     between (date)
 af: tussen
@@ -3155,6 +3183,7 @@ ru: между
 sk: medzi
 sl: med
 sv: mellan
+tr: Arasında
 
     bibliography
 bg: библиография
@@ -3171,6 +3200,7 @@ oc: bibliografia
 pt: bibliografia
 ru: библиография
 sv: Bibliografi
+tr: Kaynakça
 
     birth
 af: geboorte
@@ -3201,6 +3231,7 @@ ru: рождение
 sk: narodenie
 sl: rojstva
 sv: födelse
+tr: Doğum
 
     birth date and birth place
 co: data è locu di nascita
@@ -3216,6 +3247,7 @@ oc: data e lòc de naissença
 pt: data e local de nascimento
 ru: дата и место рождения
 sv: Födelsedatum och -plats
+tr: Doğum tarihi ve yeri
 
     birth place
 co: locu di nascita
@@ -3231,6 +3263,7 @@ oc: lòc de naissença
 pt: local de nascimento
 ru: место рождения
 sv: Födelsedatum och plats
+tr: Doğum yeri
 
     birth src
 co: fonte di nascita
@@ -3245,7 +3278,8 @@ no: Fødselskilde
 oc: font de la naissença
 pt: fonte nascimento
 ru: свидетельство о рождении
-sv: källa för födelse 
+sv: källa för födelse
+tr: Doğum kaynağı
 
     birthdays
 af: verjaarsdae
@@ -3277,6 +3311,7 @@ ru: дни рождения
 sk: narodeniny
 sl: rojstni dnevi
 sv: födelsedagar
+tr: Doğum günleri
 zh:  出生于今日的记录
 
     book of %s
@@ -3292,7 +3327,8 @@ no: liste over %s
 oc: lista dels %s
 pt: lista de %s
 ru: список - %s
-sv: förteckning över %s 
+sv: förteckning över %s
+tr:  %s kitabı
 
     book of ascendants
 co: libru d’ascendenza
@@ -3308,6 +3344,7 @@ oc: libre d'ascendéncia
 pt: livro de ascendência
 ru: список предков
 sv: förteckning över förfäder
+tr: Soy kitabı
 
     books
 co: dizziunarii
@@ -3316,6 +3353,7 @@ fr: dictionnaires
 oc: diccionaris
 pt: dicionários
 sv: förteckningar
+tr: Kitaplar
 
     border
 af: rand
@@ -3346,6 +3384,7 @@ ru: рамка
 sk: okraj
 sl: okvir
 sv: kantlinje
+tr: Kenarlık
 
     born
 af: gebore
@@ -3377,6 +3416,7 @@ ru: родился/родилась
 sk: narodený/narodená
 sl: rojen/rojena
 sv: född
+tr: Doğuş
 zh:  出生
 
     both
@@ -3385,6 +3425,7 @@ en: both
 fr: les deux
 pt: ambos
 sv: både
+tr: Her ikisi de
 
     branch/branches
 af: tak/takke
@@ -3415,6 +3456,7 @@ ru: ветвь/ветви
 sk: vetva/vetvy
 sl: veja/veje
 sv: anlinje/anlinjer
+tr: Satır/çizgiler
 
     brothers/sisters/siblings
 co: fratelli/surelle/fratelli o surelle
@@ -3422,6 +3464,7 @@ en: brothers/sisters/siblings
 fr: frères/sœurs/frères et sœurs
 pt: irmãos/irmãs/irmãos e irmãs
 sv: bröder/systrar/syskon
+tr: erkek kardeşler/kız kardeşler/kardeşler
 
     burial
 af: begrawe
@@ -3452,6 +3495,7 @@ ru: похороны
 sk: pohreb
 sl: pogreb
 sv: begravning
+tr: Defin
 
     burial place
 co: locu di sepultura
@@ -3467,6 +3511,7 @@ oc: lòc de sepultura
 pt: local de sepultamento
 ru: место погребения
 sv: Begravningsplats
+tr: Defin yeri
 
     burial src
 co: fonte di sepultura
@@ -3482,6 +3527,7 @@ oc: font de la sepultura
 pt: fonte de sepultamento
 ru: свидетельство о смерти
 sv: källa för begravning
+tr: Defin kaynağı
 
     buried
 af: begrawe
@@ -3512,6 +3558,7 @@ ru: похоронен/похоронена
 sk: pochovaný/pochovaná
 sl: pokopan/pokopana/pokopani
 sv: begravd
+tr: Defnedildi
 
     by
 af: volgens
@@ -3539,6 +3586,7 @@ ro: in
 ru: упорядоченных
 sl: po
 sv: sorterade i
+tr: tarafından
 zh: 根据
 
     by couple
@@ -3547,6 +3595,7 @@ en: by couple
 fr: par couple
 pt: por casal
 sv: per par
+tr: çift tarafından
 
     calendar/calendars
 af: kalender/kalenders
@@ -3578,6 +3627,7 @@ ru: календарь/календари
 sk: kalendár/kalendáre
 sl: koledar/koledarji
 sv: kalender/kalendrar
+tr: takvim/takvimler
 
     cancel GeneWeb links
 af: stop GeneWeb-skakels
@@ -3608,6 +3658,7 @@ ru: без GeneWeb ссылок
 sk: zrušiť GeneWeb spojenia
 sl: brez GeneWeb povezav
 sv: utan GeneWeb länkar
+tr: GeneWeb bağlantıları olmadan
 
     candidate father/candidate mother/candidate parents
 af: moontlike vader/moontlike moeder/moontlike ouers
@@ -3638,6 +3689,7 @@ ru: возможный отец/возможная мать/возможные �
 sk: pravdepodobný otec/pravdepodobná matka/pravdepodobní rodičia
 sl: možen oče/možna mati/možni starši
 sv: möjlig far/möjlig mor/möjliga föräldrar
+tr: baba olabilir/anne olabilir/ebeveyn olabilir
 
     candidate son/candidate daughter/candidate child
 af: moontlike seun/moontlike dogter/moontlike kind
@@ -3668,6 +3720,7 @@ ru: возможный сын/возможная дочь/возможный р�
 sk: pravdepodobný syn/pravdepodobná dcéra/pravdepodobné dieťa
 sl: možen sine/možna hčerka/možni otroci
 sv: möjlig son/möjlig dotter/möjliga barn
+tr: oğul olabilir/kız olabilir/çocuk olabilir
 
     cannot access base
 af: databasis ontoeganklik
@@ -3699,6 +3752,7 @@ ru: нет доступа к базе
 sk: databáza je neprístupná
 sl: baza podatkov ni dostopna
 sv: kan inte nå databasen
+tr: tabana erişilemiyor
 
     cannot change sex of a married person
 af: kan die geslag van 'n getroude persoon nie verander nie
@@ -3729,6 +3783,7 @@ ru: нелья изменить пол супруга
 sk: nemožno zmeniť pohlavie zosobášenej osoby
 sl: ne da se spremeniti spol poročene osebe
 sv: kan inte ändra kön på en gift person
+tr: evli bir kişinin cinsiyetini değiştiremezsin
 
     celebrities
 bg: знаменити хора
@@ -3746,6 +3801,7 @@ oc: Celebritats
 pt: pessoas célebres
 ru: знаменитости
 sv: Celebriteter
+tr: Ünlü insanlar
 
     change children's names
 af: verander kinders se name
@@ -3776,6 +3832,7 @@ ru: изменение имени ребенка
 sk: zmeniť mená detí
 sl: spremeni imena otrok
 sv: ändra barnens namn
+tr: çocuklaın adını güncelle
 
     change it (the number) yourself
 af: verander dit self
@@ -3806,6 +3863,7 @@ ru: измените его сами
 sk: zmeniť číslo
 sl: spremenite sami
 sv: ändra det själv
+tr: kendin değiştir
 
     change name
 co: cambiu di nome
@@ -3821,6 +3879,7 @@ oc: cambiament de nom
 pt: modificar nome
 ru: смена имени или фамилии
 sv: Namnbyte
+tr: Ad değişikliği
 
     changed order of children
 af: verander die volgorde van kinders
@@ -3851,6 +3910,7 @@ ru: изменяющий порядок детей
 sk: zmeniť poradie detí
 sl: zamenjan vrstni red otrok
 sv: ändrade ordningen för barnen
+tr: çocukların sırasını değiştirme
 
     changed order of family's events
 co: cambiu di l’ordine di l’avvenimenti famigliale
@@ -3863,6 +3923,7 @@ oc: cambiament de l'òrdre dels eveniments familials
 pt: modificar a ordem dos eventos familiares
 ru: порядок семейных событий был изменён
 sv: ändrade ordningen för familjehändelser
+tr: aile etkinliklerinin sırasını değiştir
 
     changed order of marriages
 co: cambiu di l’ordine di l’unioni
@@ -3878,6 +3939,7 @@ oc: cambiament de l'òrdre de las unions
 pt: modificar ordem das uniões
 ru: порядок браков был изменён
 sv: Ändrade ordningen för giftermål
+tr: Evlilik düzeni değiştirildi
 
     changed order of person's events
 co: cambiu di l’ordine di l’avvenimenti di l’individuu
@@ -3890,6 +3952,7 @@ oc: cambiament de l'òrdre dels eveniments d'un individú
 pt: modificar ordem dos eventos da pessoa
 ru: порядок личных событий был изменён
 sv: ändrade ordningen för personhändelser
+tr: bireysel etkinliklerin sırasını değiştir
 
     child/children
 af: kind/kinders
@@ -3921,6 +3984,7 @@ ru: ребенок:g:---ка:a:---ка/дети
 sk: dieťa/deti
 sl: otrok/otroci
 sv: barn/barn
+tr: çocuk/çocuklar
 zh:  子女
 
     children's names changed
