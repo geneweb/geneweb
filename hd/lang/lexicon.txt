@@ -300,7 +300,7 @@ en: %s and %s have several unions
 fr: il y a plusieurs unions entre %s et %s
 pt: existem várias uniões entre %s e %s
 sv: %s och %s har flera partnerskap
-tr: %s ve %s'nin birden fazla sendikası var
+tr: %s ve %s'nin birden fazla birlikteliği var
 
     %s cousins
 af: neefs en niggies %s geslagte verwyder
@@ -2578,7 +2578,7 @@ ru: годовщины смерти
 sk: výročia zomretých osôb
 sl: obletnice umrlih oseb
 sv: årsdagar för avlidna personer
-tr: Ölülerin yıldönümleri
+tr: Merhumun yıldönümleri
 zh:  死亡于今日的记录
 
     anniversaries of marriage
@@ -2932,7 +2932,7 @@ co: basa
 en: base
 fr: base
 sv: bas
-tr: Temel
+tr: Taban
 
     base index notes
 af: notas
@@ -3029,7 +3029,7 @@ ru: wizard заметки
 sk: wizards poznámky
 sl: čarovnik zapiski
 sv: administratörsnoteringar
-tr: Not sihirbazı
+tr: Yönetici notları
 
     bat mitzvah
 co: bat mitzvah
@@ -3328,7 +3328,7 @@ oc: lista dels %s
 pt: lista de %s
 ru: список - %s
 sv: förteckning över %s
-tr:  %s kitabı
+tr: %s kitabı
 
     book of ascendants
 co: libru d’ascendenza
@@ -4016,6 +4016,7 @@ ru: имя ребенка изменено
 sk: mená detí zmenené
 sl: spremenjena imena otrok
 sv: barnens namn ändrade
+tr: çocukların isimleri değişti
 
     choose a genealogy
 co: sceglie una genealugia
@@ -4023,6 +4024,7 @@ en: choose a genealogy
 fr: choisir une généalogie
 pt: seleccionar uma genealogia
 sv: välj en släktdatabas
+tr: bir şecere seçin
 
     circumcision
 co: circuncisione
@@ -4037,6 +4039,7 @@ no: Omskjæring
 pt: circuncisão
 ru: обрезание
 sv: Omskärellse
+tr: Sünnet
 
     click
 af: druk
@@ -4067,6 +4070,7 @@ ru: нажмите
 sk: klik
 sl: kliknite
 sv: klicka
+tr: tıklayın
 
     click on "%s"
 af: druk "%s"
@@ -4097,6 +4101,7 @@ ru: нажмите "%s"
 sk: poklepte na "%s"
 sl: kliknite na "%s"
 sv: klicka "%s"
+tr: "%s" i tıklayın
 
     close family
 co: un parente
@@ -4111,6 +4116,7 @@ no: en slektning
 oc: un tanhent
 pt: familiar próximo
 sv: en släkting
+tr: bir ebeveyn
 
     collapse implex
 co: ripiegà l’implessi
@@ -4118,6 +4124,7 @@ en: collapse implex
 fr: réduire les implexes
 pt: reduzir os implexos
 sv: slå ihop implex
+tr: implex daraltma
 
     color
 af: kleur
@@ -4149,6 +4156,7 @@ ru: цвет
 sk: farba
 sl: barva
 sv: färg
+tr: renk
 
     comment
 af: kommentaar
@@ -4179,6 +4187,7 @@ ru: комментарий
 sk: komentár
 sl: komentar
 sv: kommentar
+tr: yorum
 
     compact tree
 co: arburu cumpattu
@@ -4186,6 +4195,7 @@ en: compact tree
 fr: arbre compact
 pt: árvore compacta
 sv: kompakt träd
+tr: kompakt ağaç
 
     compare
 co: paragunà
@@ -4201,6 +4211,7 @@ oc: comparar
 pt: comparar
 ru: сравнить
 sv: Jämför
+tr: Karşılaştırmak
 
     compare selected revisions
 co: paragunà e revisioni selezziunate
@@ -4216,6 +4227,7 @@ oc: comparar las revisions seleccionadas
 pt: comparar as revisões selecionadas
 ru: сравнить выбранные варианты
 sv: Jämför utvalda revisioner
+tr: Revizyon geçmişini görüntüle
 
     compiled on %s from commit %s
 co: cumpilatu u %s à partesi di u commit %s
@@ -4223,6 +4235,7 @@ en: compiled on %s from commit %s
 fr: compilé le %s à partir du commit %s
 pt: compilou os %s a partir da versão %s
 sv: skapad av %s fån commit %s
+tr: %s üzerinde %s kaydetmeden derlendi
 
     compute all marriages
 co: include tutti i cumpagni
@@ -4238,6 +4251,7 @@ oc: inclusir totes los conjunts
 pt: incluir todos os cônjuges
 ru: включить все браки
 sv: ta med alla giftermål
+tr: Eşleri dahil et
 
     compute approximatives dates
 co: include e date micca esatte
@@ -4253,6 +4267,7 @@ oc: inclusir totes los conjunts
 pt: ter em conta as datas aproximadas
 ru: включить приблизительные даты
 sv: ta med approxamativa datum
+tr: Kesin olmayan tarihleri dahil et
 
     confirmation
 co: cresima
@@ -4267,6 +4282,7 @@ no: Konfirmasjon
 pt: confirmação
 ru: подтверждение
 sv: Konfirmation
+tr: Onay
 
     confirmation LDS
 co: cresima LDS
@@ -4280,6 +4296,7 @@ nl: Belijdenis (LDS)
 no: Konfirmasjon (LDS)
 pt: confirmação LDS
 sv: Konfirmation (LDS)
+tr: Onay (LDS)
 
     connections
 bg: потребителски връзки
@@ -4306,6 +4323,7 @@ ru: связи
 sk: spojenia
 sl: povprečna starost ob smrti
 sv: kopplingar
+tr: bağlantılar
 
     consanguinity
 af: bloedverwantskap
@@ -4336,6 +4354,7 @@ ru: родство
 sk: pokrvenstvo
 sl: krvno sorodstvo
 sv: blodsband
+tr: akrabalık
 
     continue correcting
 af: gaan voort met die samevoeging
@@ -4365,6 +4384,7 @@ ro: continua unificarea
 ru: продолжить объединение
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
+tr: birleştirmeye devam et
 
     continue merging
 af: gaan voort met die samevoeging
@@ -4395,6 +4415,7 @@ ru: продолжить объединение
 sk: pokračovať v spájaní
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
+tr: birleştirmeye devam et
 
     continued
 bg: следва
@@ -4421,6 +4442,7 @@ ru: продолжено
 sk: pokračovať
 sl: nadaljevano
 sv: forts
+tr: devam eden
 
     copy link
 co: cupià a leia in u preme’papei
@@ -4428,6 +4450,7 @@ en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
 pt: copiar o link para a área de transferência
 sv: kopiera länken
+tr: bağlantıyı panoya kopyala
 
     country
 co: statu
@@ -4443,6 +4466,7 @@ oc: País
 pt: País
 ru: Страна
 sv: Land
+tr: Ülke
 
     county
 co: dipartimentu
@@ -4458,6 +4482,7 @@ oc: Departament
 pt: Distrito
 ru: Регион
 sv: Kommun
+tr: İlçe
 
     couples
 co: coppii
@@ -4465,6 +4490,7 @@ en: couples
 fr: couples
 pt: casais
 sv: par
+tr: çiftler
 
     cousins
 af: neefs/niggies
@@ -4495,6 +4521,7 @@ ru: кузены
 sk: bratranci/sesternice
 sl: bratranci/sestrične
 sv: kusiner
+tr: kuzenler
 
     cousins (general term)
 af: neefs en niggies
@@ -4525,6 +4552,7 @@ ru: кузены
 sk: pokrvní príbuzní
 sl: bratranci/sestrične
 sv: kusiner och flermänningar
+tr: kuzenler
 
     create
 af: skep
@@ -4555,6 +4583,7 @@ ru: создать
 sk: vytvor
 sl: ustvari
 sv: skapa
+tr: oluştur
 
     cremated
 af: veras
@@ -4585,6 +4614,7 @@ ru: кремирован/кремирована
 sk: spopolnený/spopolnená
 sl: ustvarjeno
 sv: kremerad
+tr: Ölü yakılmış
 
     cremation
 co: cremazione
@@ -4599,6 +4629,7 @@ no: Kremasjon
 pt: cremação
 ru: кремация
 sv: Kremering
+tr: Ölü yakma
 
     custom event
 co: avvenimentu persunalizatu
@@ -4606,6 +4637,7 @@ en: custom event
 fr: événement personnalisé
 pt: evento personalizado
 sv: anpassad händelse
+tr: özel etkinlik
 
     d'Aboville
 co: d’Aboville
@@ -4620,6 +4652,7 @@ no: nummer
 oc: d'Aboville
 pt: de Aboville
 sv: nummer
+tr: d'Aboville
 
     dag
 co: fusione d’implessi
@@ -4627,6 +4660,7 @@ en: fusion implexes
 fr: fusionner les implexes
 pt: combinar os implexes
 sv: sammanslagning av implex
+tr: implexleri birleştirmek
 
     dag on/dag off
 co: affissà un graficu orientatu aciclicu (dag)/piattà u graficu orientatu aciclicu (dag)
@@ -4634,6 +4668,7 @@ en: show dag/hide dag
 fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
 pt: exibir gráfico acíclico orientado (DAG)/ocultar gráfico acíclico orientado (DAG)
 sv: visa implex/dölj implex
+tr: dag (grafik) göster/dag (grafik) gizle
 
     database
 af: stamboom
@@ -4663,6 +4698,7 @@ ro: arbore genealogic
 ru: генеалогическое дерево
 sl: družinsko drevo
 sv: släktträd
+tr: Soyağacı
 zh: 家譜
 
     database forum
@@ -4694,6 +4730,7 @@ ru: форум базы данных
 sk: databázové fórum
 sl: forum baze podatkov
 sv: databasforum
+tr: veritabanı forumu
 
     date begin
 co: data di principiu
@@ -4709,6 +4746,7 @@ oc: data de començament
 pt: data de início
 ru: дата начала
 sv: startdatum
+tr: itibaren
 
     date end
 co: data di fine
@@ -4723,7 +4761,8 @@ no: Til
 oc: data de fin
 pt: data de fim
 ru: дата окончания
-sv: slutdatum 
+sv: slutdatum
+tr: için
 
     date of birth
 co: data di nascita
@@ -4739,12 +4778,14 @@ oc: data de naissença
 pt: data de nascimento
 ru: дата рождения
 sv: födelsedatum
+tr: doğum tarihi
 
     date of baptism
 co: data di battesimu
 en: date of baptism
 fr: date du baptême
 sv: dopdag
+tr: vaftiz tarihi
 
     date of death
 co: data di trapassu
@@ -4760,6 +4801,7 @@ oc: data de decès
 pt: data de óbito
 ru: дата смерти
 sv: dödsdatum
+tr: ölüm tarihi
 
     date of marriage
 co: data di matrimoniu
@@ -4775,12 +4817,14 @@ oc: data de maridatge
 pt: data de casamento
 ru: дата бракосочетания
 sv: vigseldatum
+tr: evlilik tarihi
 
     date of burial
 co: data di sepultura
 en: date of burial
 fr: date de la sépulture
 sv: begravningsdatum
+tr: defin tarihi
 
     date/dates
 af: datum
@@ -4811,6 +4855,7 @@ ru: дата
 sk: dátum/dáta
 sl: datum
 sv: datum
+tr: tarih/tarihler
 
     days old
 af: dae oud
@@ -4841,6 +4886,7 @@ ru: лет
 sk: dňov starý/dňov stará
 sl: dni star/dni stara
 sv: dagar
+tr: eski günler
 
     dd/mm/yyyy
 co: GG/MM/AAAA
@@ -4848,6 +4894,7 @@ en: DD/MM/YYYY
 fr: JJ/MM/AAAA
 pt: DD/MM/AAAA
 sv: DD/MM/ÅÅÅÅ
+tr: GG/AA/YYYY
 
     death
 af: oorlede
@@ -4878,6 +4925,7 @@ ru: смерть
 sk: úmrtie
 sl: smrti
 sv: död
+tr: ölüm
 
     death date and death place
 co: data è locu di trapassu
@@ -4893,6 +4941,7 @@ oc: data e lòc de decès
 pt: data e local do óbito
 ru: дата и место смерти
 sv: Dödsdatum och dödsplats
+tr: Ölüm tarihi ve yeri
 
     death place
 co: locu di trapassu
@@ -4908,6 +4957,7 @@ oc: lòc de decès
 pt: local do óbito
 ru: место смерти
 sv: Dödsplats
+tr: Ölüm yeri
 
     death src
 co: fonte di trapassu
@@ -4923,6 +4973,7 @@ oc: font del decès
 pt: fonte do óbito
 ru: свидетельство о смерти
 sv: källa för död
+tr: Ölüm kaynağı
 
     decoration
 co: dicurazione
@@ -4937,6 +4988,7 @@ no: Medalje
 pt: condecoração
 ru: награда
 sv: Medaljer
+tr: Madalya
 
     degree of kinship
 co: gradu di parentia
@@ -4944,6 +4996,7 @@ en: degree of kinship
 fr: degré de parenté
 pt: grau de parentesco
 sv: släktskapsgrad
+tr: akrabalık derecesi
 
     delete
 af: verwyder
@@ -4974,6 +5027,7 @@ ru: удалить :a:
 sk: zmazať
 sl: izbriši
 sv: ta bort
+tr: sil
 
     demobilisationMilitaire
 co: smubilizazione
@@ -4988,6 +5042,7 @@ no: Demobilisering
 pt: desmobilização militar
 ru: демобилизация
 sv: Demobilisering
+tr: Terhis
 
     descendant tree view
 co: arburiscenza discendente
@@ -4995,6 +5050,7 @@ en: descendant tree view
 fr: arborescence descendante
 pt: árvore compacta de descendentes
 sv: trädvy med ättlingar
+tr: Nesil ağacı görünümü
 
     descendants
 af: Afstammelinge
@@ -5025,6 +5081,7 @@ ru: потомки
 sk: potomkovia
 sl: potomci
 sv: ättlingar
+tr: Nesil
 zh:  后代
 
     descendants at the generation
@@ -5041,6 +5098,7 @@ oc: descendents a la ... generacion
 pt: descendentes na geração...
 ru: потомки в поколении...
 sv: Ättlingar från denna generation
+tr: Adına göre liste
 
     descendants tree
 co: arburu di discendenza
@@ -5048,6 +5106,7 @@ en: descendants tree
 fr: arbre de descendance
 pt: árvore de descendentes
 sv: träd av ättlingar
+tr: Nesil ağacı
 
     died
 af: oorlede
@@ -5079,6 +5138,7 @@ ru: умер/умерла
 sk: zomrel/zomrela
 sl: umrl/umrla
 sv: död
+tr: ölü
 zh:  死
 
     died at an advanced age
@@ -5095,6 +5155,7 @@ oc: es mòrt plan vièlh/es mòrta plan vièlha/es mòrt(a) plan vièlh(a)
 pt: faleceu com uma idade avançada
 ru: умер в пожилом возрасте/умерла в пожилом возрасте/умер(ла) в пожилом возрасте
 sv: Dog vid en hög ålder
+tr: Yaşlılıkta ölen
 
     died young
 af: jonk oorlede
@@ -5125,6 +5186,7 @@ ru: умер во младенчестве/умерла во младенчес�
 sk: zomrel mladý/zomrela mladá
 sl: umrl mlad/umrla mlada/umrl(a) mlad(a)
 sv: dog ung
+tr: Bebeklikte ölen
 
     difference between the two revisions
 co: sfarenza trà e duie revisioni
@@ -5140,6 +5202,7 @@ oc: diferéncia entre las revisions
 pt: diferença entre as revisões
 ru: расхождение двух версий
 sv: skillnad mellan de två revisionerna
+tr: revizyonlar arasındaki fark
 
     diploma
 co: certificatu
@@ -5154,6 +5217,7 @@ no: Diplom
 pt: diploma
 ru: диплом
 sv: Diplom
+tr: Diploma
 
     direct ancestor of %s
 co: antenatu direttu di %s
