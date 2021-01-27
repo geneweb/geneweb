@@ -9060,6 +9060,7 @@ no: notater om ekteskapet
 oc: nòtas sul maridatge
 pt: notas de casamento
 sv: anteckningar om vigseln
+tr: evlilik notları/evlilik notları
 
     marriage of %t after his/her death
 af: huwelik van %t na sy/haar afsterwe
@@ -9090,6 +9091,7 @@ ru: брак %t после его/ее смерти
 sk: svadba s t% po svojej smrti
 sl: %t se je poročil(a) po svoji smrti
 sv: äktenskap med %t före makens/makans död
+tr: evliliği, %t'in ölümünden sonra
 
     marriage of %t before his/her birth
 af: huwelik van %t voor sy/haar geboorte
@@ -9120,6 +9122,7 @@ ru: брак %t перед его/ее рождением
 sk: sobáš s %t pred svojim narodením
 sl: %t se je poročil(a) pred svojim rojstvom
 sv: äktenskap med %t före makens/makans födelse
+tr: evliliği, % t'in doğumundan önce
 
     marriage place
 co: locu di l’unione
@@ -9135,6 +9138,7 @@ oc: lòc de maridatge
 pt: local de casamento
 ru: место бракосочетания
 sv: Plats för giftermål
+tr: evlilik yeri
 
     marriage src
 co: fonte di matrimoniu
@@ -9150,6 +9154,7 @@ oc: font sul maridatge
 pt: fonte casamento
 ru: свидетельство о браке
 sv: källa för Giftermål
+tr: Evlilik kaynağı
 
     marriage with
 co: unione cù
@@ -9165,6 +9170,7 @@ oc: maridatge amb
 pt: casamento com
 ru: брак с
 sv: vigslar
+tr: ile evlilik
 
     marriage/marriages
 af: huwelik/huwelike
@@ -9196,6 +9202,7 @@ ru: брак/браки
 sk: manželstvo/manželstvá
 sl: poroke/poroke
 sv: äktenskap/äktenskap
+tr: eş/eşler
 
     married
 af: getroud
@@ -9226,6 +9233,7 @@ ru: в браке
 sk: manželia
 sl: poroka
 sv: gift
+tr: evli
 
     married at age %t
 af: getroud op ouderdom %t
@@ -9256,6 +9264,7 @@ ru: в браке с %t лет
 sk: oženil sa vo veku %t/vydala sa vo veku %t
 sl: se je poročil ko je imel %t/se je poročila ko je imela %t
 sv: gift vid %t ålder
+tr: %t yaşında evlendi
 
     married%t to
 af: getroud met %t
@@ -9286,6 +9295,7 @@ ru: в браке с%t
 sk: %t si vzal/%t si vzala
 sl: %t se je poročil z/%t se je poročila z
 sv: gift%t med
+tr: %t ile evlendi
 zh: %t配偶是
 
     marriage contract%t with
@@ -9299,6 +9309,7 @@ it: contratto di matrimonio%t con
 no: ekteskapskontrakt%t med
 pt: contrato de casamento%t com
 sv: giftermål%t med
+tr: evlilik sözleşmesi %t ile
 
     maternal grand-parents
 co: caccari materni
@@ -9314,6 +9325,7 @@ oc: parents de la maire
 pt: avós maternos
 ru: бабушка и дедушка по материнской линии
 sv: mormor och morfar
+tr: Annenin ebeveynleri
 
     maximum
 af: maksimum
@@ -9344,6 +9356,7 @@ ru: максимально
 sk: maximum
 sl: največ
 sv: maximalt
+tr: maksimum
 
     merge
 af: saamvoeg
@@ -9374,6 +9387,7 @@ ru: объединить
 sk: spojiť
 sl: združi
 sv: slå samman
+tr: birleştirmek
 
     merge done
 af: saamgevoeg
@@ -9404,6 +9418,7 @@ ru: объединение завершено
 sk: spojenie dokončené
 sl: združitev končana
 sv: sammanslagning klar
+tr: birleştirme tamamlandı
 
     message added
 af: boodskap bygevoeg
@@ -9434,6 +9449,7 @@ ru: сообщение добавлено
 sk: správa pridaná
 sl: sporočilo dodano
 sv: meddelande inlagt
+tr: mesaj eklendi
 
     message deleted
 af: boodskap gedeleer
@@ -9464,6 +9480,7 @@ ru: уппвэеойе хдбмеоп
 sk: správa vymazaná
 sl: sporočilo izbrisano
 sv: meddelandet borttaget
+tr: mesaj silindi
 
     message/previous message/previous messages/next message
 af: boodskap/vorige boodskap/vorige boodskappe/volgende boodskap
@@ -9494,6 +9511,7 @@ ru: сообщение/предыдущее сообщение/предыдущ�
 sk: správa:a:-u/predchádzajúca správa/predchádzajúce správy/nasledujúca správa
 sl: sporočilo/prejšnje sporočilo/prejšnja sporočila/naslednje sporočilo
 sv: meddelande/föregående meddelande/föregående meddelanden/nästa meddelande
+tr: mesaj/önceki mesaj/önceki mesajlar/sonraki mesaj
 
     militaryDistinction
 co: distenzione militare
@@ -9508,6 +9526,7 @@ no: Militær utmerkelse
 pt: distinção militar
 ru: боевая награда
 sv: Militär utmärkelse
+tr: Askeri Dekorasyon
 
     militaryPromotion
 co: prumuzione militare
@@ -9522,6 +9541,7 @@ no: Militær forfremmelse
 pt: promoção militar
 ru: продвижение по службе
 sv: Militärt avancemang
+tr: Askeri Tanıtım
 
     militaryService
 co: serviziu militare
@@ -9536,6 +9556,7 @@ no: Verneplikt
 pt: serviço militar
 ru: военная служба
 sv: Militärtjänst
+tr: Zorunlu askerlik
 
     miscellaneous
 co: diversu
@@ -9551,6 +9572,7 @@ oc: divèrs
 pt: diversos
 ru: прочее
 sv: Övrigt
+tr: Çeşitli
 
     miscellaneous information
 co: campi diversi
@@ -9566,6 +9588,7 @@ oc: informacions divèrsas
 pt: campos diversos
 ru: прочие сведения
 sv: övriga fält
+tr: diğer alan
 
     miscellaneous notes
 bg: разни бележки
@@ -9593,6 +9616,7 @@ ru: дополнительные заметки
 sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
+tr: çeşitli notlar
 
     missing %s
 co: %s manchendu
@@ -9600,6 +9624,7 @@ en: missing %s
 fr: %s manquant
 pt: %s em falta
 sv: %s saknas
+tr: %s eksik
 
     missing ancestors
 af: ontbrekende voorsate
@@ -9630,6 +9655,7 @@ ru: потерянные предки
 sk: chýbajúci predkovia
 sl: manjkajoči predniki
 sv: anor som saknas
+tr: bilinmeyen atalar
 
     missing date
 co: senza data
@@ -9637,6 +9663,7 @@ en: no date
 fr: sans date
 pt: sem data
 sv: datum saknas
+tr: tarih yok
 
     missing events
 co: avvenimenti chì mancanu
@@ -9652,6 +9679,7 @@ oc: eveniments que mancan
 pt: eventos em falta
 ru: события неизвестны
 sv: Saknade händelser
+tr: eksik etkinlikler
 
     missing image
 co: fiura chì manca
@@ -9660,6 +9688,7 @@ fr: image manquante
 no: bilde mangler
 pt: imagem em falta
 sv: bild saknas
+tr: eksik görüntü
 
     missing parents
 co: genitori chì mancanu
@@ -9675,6 +9704,7 @@ oc: parents que mancan
 pt: pais em falta
 ru: родители неизвестны
 sv: Saknade föräldrar
+tr: Ebeveynler bilinmiyor
 
     missing sosa
 co: Sosa chì manca
@@ -9689,6 +9719,7 @@ no: Sosa-nummer
 oc: Sosa que mancan
 pt: Sosa em falta
 sv: Saknade Sosa
+tr: eksik Sosa numaraları
 
     missing sources
 co: fonti chì mancanu
@@ -9704,6 +9735,7 @@ oc: fonts que mancan
 pt: fontes em falta
 ru: неизвестные источники
 sv: saknade källor
+tr: eksik kaynaklar
 
     missing spouse
 co: cumpagnu(a) chì manca
@@ -9719,6 +9751,7 @@ oc: conjunt que manca
 pt: cônjuge em falta
 ru: неизвестный супруг/супруга
 sv: saknade maka/make
+tr: Eş bilinmiyor
 
     mobilisationMilitaire
 co: mubilizazione militare
@@ -9733,6 +9766,7 @@ no: Mobilisering
 pt: mobilização militar
 ru: мобилизация
 sv: Mobilisering
+tr: Seferberlik
 
     modification successful
 co: mudificazione fatta
@@ -9748,6 +9782,7 @@ oc: modification acabada
 pt: modificação bem sucedida
 ru: изменено успешно
 sv: ändring slutförd
+tr: Başarıyla güncellendi
 
     modification/modifications
 co: mudificazione/mudificazioni
@@ -9763,6 +9798,7 @@ oc: modificacion/modificacions
 pt: modificação/modificações
 ru: изменение/изменения
 sv: ändring/ändringar
+tr: güncelleme/güncellemeler
 
     modify
 af: wysig
@@ -9793,6 +9829,7 @@ ru: изменить :a:
 sk: zmeniť :a:
 sl: spremeni
 sv: ändra
+tr: Güncelleme
 
     modify family %s event order
 co: intervertisce l’avvenimenti di a famiglia %s
@@ -9800,6 +9837,7 @@ en: permute the events of family %s
 fr: permuter les événements de la famille %s
 pt: permutar os eventos da família %s
 sv: ändra ordningen för %s familjehändelser
+tr: %s ailesinin etkinliklerini değiştir
 
     modify person event order
 co: intervertisce l’avvenimenti individuali
@@ -9807,6 +9845,7 @@ en: permute personnal events
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
 sv: ändra ordningen för personliga händelser
+tr: kişisel etkinlikleri değiştir
 
     modify picture
 af: wysig prent
@@ -9836,6 +9875,7 @@ ro: modifica imagine
 ru: изменить :a: картинку
 sl: spremeni slika
 sv: ändra bild
+tr: Resmi güncelle
 
     module
 co: modulu/moduli
@@ -9844,6 +9884,7 @@ fr: module/modules
 no: modul/moduler
 pt: módulo/módulos
 sv: modul/moduler
+tr: modül/modüller
 
     months old
 af: maande oud
@@ -9874,6 +9915,7 @@ ru: месяцы
 sk: mesiacov starý/mesiacov stará
 sl: mesecev star/mesecev stara
 sv: månader
+tr: aylık
 
     moon age/new moon/first quarter/full moon/last quarter
 af: maanfase/nuwemaan/eerste kwartier/volmaan/laaste kwartier
@@ -9904,6 +9946,7 @@ ru: фаза луны/новолуние/первая четверть/полн�
 sk: mesačná fáza/nov/prvá štvrť/spln/posledná štvrť
 sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
 sv: månålder/nymåne/första kvarter/fullmåne/sista kvarter
+tr: yeni aydan sonraki gün sayısı/yeni ay/ilk çeyrek/dolunay/son çeyrek
 
     more than %d answers
 af: meer as %d antwoorde
@@ -9934,6 +9977,7 @@ ru: более, чем %d ответы
 sk: viac ako %d odpovedí
 sl: več kot %d zadetkov
 sv: fler än %d svar
+tr: %d cevaptan daha fazla
 
     move up/down
 co: ricullà/falà/ricullà u cursore/falà u cursore
@@ -9941,6 +9985,7 @@ en: move up/move down/move up cursor/move down cursor
 fr: remonter/descendre/remonter le curseur/descendre le curseur
 pt: subir/descer/subir o cursor/descer o cursor
 sv: flytta upp/flytta ner/flytta pekaren uppåt/flytta pekaren nedåt
+tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı
 
     msg error disconnected
 co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnettate à l’altre.<br />Sta restrizione hè stata aghjunta da u pruprietariu di a basa di dati.
@@ -9953,6 +9998,7 @@ oc: o planhi, mas podètz pas apondre que de familhas ligadas.<br />Aquela restr
 pt: lamentamos mas só pode adicionar famílias ligadas às restantes.<br />Esta restrição foi colocada pelo proprietário da base de dados.
 ru: К сожалению, добавить можно только ветви, связанные с основным деревом.<br />Ограничение введено владельцем базы.
 sv: du kan bara lägga till familjer som är kopplade till övriga.<br />Denna begränsning är tillagd av databasägaren.
+tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br/>Bu kısıtlama, bu veritabanı sahibi tarafından eklenmiştir.
 
     mtree
 co: arburu in H di 9 generazioni
@@ -9960,6 +10006,7 @@ en: 9 generations H tree
 fr: arbre en H 9 générations
 pt: árvore em H 9 gerações
 sv: 9 generationer H-träd
+tr: 9 kuşak H ağacı
 
     multi relations graph
 co: graficu di rilazioni multiple
@@ -9967,6 +10014,7 @@ en: multi relations graph
 fr: graphe de relations multiples
 pt: gráfico de relações múltiplas
 sv: graf med flera relationer
+tr: çoklu ilişkiler grafiği
 
     murdered
 af: vermoor
@@ -9997,6 +10045,7 @@ ru: убит/убита/убит(а)
 sk: zavraždený/zavraždená
 sl: umorjen/umorjena
 sv: mördad
+tr: öldürülmüş
 
     n (number)
 co: nisunu/unu/dui/trè/quattru/cinque/sei/sette/ottu/nove/dece/ondeci/dodeci/tredeci/quattordeci/quindeci/seideci/dicesette/diciottu/dicennove/vinti/vintunu/vintidui/vintitrè/vintiquattru/vinticinque/vintisei/vintisette/vintottu/vintinove/trenta/trentunu
@@ -10006,6 +10055,7 @@ fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/qua
 no: ingen/en/to/tre/fire/fem/seks/sju/åtte/ni/ti/elleve/tolv/tretten/fjorten/femten/seksten/sytten/atten/nitten/tjue/tjueen/tjueto/tjuetre/tjuefire/tjuefem/tjueseks/tjuesju/tjueåtte/tjueni/tretti/trettien
 pt: nenhum/um/dois/três/quatro/cinco/seis/sete/oito/nove/dez/onze/doze/treze/catorze/quinze/dezasseis/dezassete/dezoito/dezanove/vinte/winte e um/vinte e dois/vinte e três/vinte quatro/vinte e cinco/vinte e seis/vinte e sete/vinte oito/vinte e e nove/trinta/trinta e um
 sv: ingen/en/två/tre/fyra/fem/sex/sju/åtta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/tjugoen/tjugotvå/tjugotre/tjugofyra/tjugofem/tjugosex/tjugosju/tjugoåtta/tjugonio/trettio/trettioen
+tr: yok/bir/iki/üç/dört/beş/altı/yedi/sekiz/dokuz/on/onbir/oniki/onüç/ondört/onbeş/onaltı/onyedi/onsekiz/ondokuz/yirmi/yirmibir/yirmiiki/yirmiüç/yirmidört/yirmibeş/yirmialtı/yirmiyedi/yirmisekiz/yirmidokuz/otuz/otuzbir
 
     name
 af: naam
@@ -10037,6 +10087,7 @@ ru: название
 sk: meno
 sl: ime
 sv: namn
+tr: ad
 
     name %s already used by %tthis person%t
 af: %s is reeds gebruik deur %t
@@ -10068,13 +10119,15 @@ ru: имя %s уже использовано %tэтим человеком%t
 sk: meno %s už má táto %tosoba%t
 sl: ime %s že uporablja %tta oseba%t
 sv: namn %s används redan av %tdenna person%t
+tr: %s adı zaten %tbu kişi%t tarafından kullanılıyor
 
     name changed. update linked pages
 co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l’anziana chjave inghjò.
 en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
 fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
 pt: O primeiro nome, apelido ou ocorrência desta pessoa foi alterada. Por favor actualize as páginas ligadas à chave antiga abaixo.
-sv: Förnamn, efternamn eller förekomst av denna person har ändrats. Uppdatera sidorna som länkar till den gamla nyckeln som visas nedan. 
+sv: Förnamn, efternamn eller förekomst av denna person har ändrats. Uppdatera sidorna som länkar till den gamla nyckeln som visas nedan.
+tr: Bu kişinin ilk adı, adı veya oluşumları değişmiştir. Lütfen aşağıda listelenen eski anahtara bağlı sayfaları güncelleyin.
 
     naturalisation
 co: naturalizazione
@@ -10088,6 +10141,7 @@ nl: Naturalisatie
 no: Statsborgerskap
 pt: naturalização
 sv: Naturalisation
+tr: Vatandaşlık
 
     navigate on tree
 co: navigà nant’à l’arburu
@@ -10095,6 +10149,7 @@ en: navigate on the tree
 fr: naviguer sur l’arbre
 pt: navegar na árvore
 sv: navigering i trädet
+tr: ağaçta gezin
 
     navigation
 af: stap met
@@ -10124,6 +10179,7 @@ ro: navigatie
 ru: навигация
 sl: pregled
 sv: navigering
+tr: navigasyon
 
     navigation with %t as Sosa reference
 af: stap met %t as Sosa verwysing
@@ -10154,6 +10210,7 @@ ru: навигация с %t как ссылка Sosa
 sk: prezeranie s %t ako referenciou "Sosa"
 sl: pregled z %t kot Sosa
 sv: navigering med %t som proband (Kekules system)
+tr: Sosa referansı olarak %t kullanarak göz atın
 
     nb branches
 co: num. ghjembe
@@ -10169,6 +10226,7 @@ oc: nbre brancas
 pt: nº ramos
 ru: ветви
 sv: antal grenar
+tr: Çizgiler
 
     nb children
 co: num. zitelli
@@ -10184,6 +10242,7 @@ oc: nbre enfants
 pt: nº filhos
 ru: дети
 sv: barn
+tr: Çocuklar
 
     nb events
 co: num. avvenimenti
@@ -10199,6 +10258,7 @@ oc: nbre eveniments
 pt: nº eventos
 ru: события
 sv: antal händelser
+tr: etkinliklerin sayısı
 
     nb individuals
 co: numeru d’individuu
@@ -10214,6 +10274,7 @@ oc: nbre individús
 pt: nº pessoas
 ru: люди
 sv: antal individer
+tr: Bireyler
 
     NB: you should try another relationship computing mode
 co: andate puru à pruvà torna impieghendu un altru modu di calculu
@@ -10229,6 +10290,7 @@ oc: podètz ensajar amb un autre metòde de calcul de relacion
 pt: pode recomeçar utilizando um novo método de cálculo 
 ru: попытайтесь найти родственную связь другим образом
 sv: välj ett annat uträkningssätt och räkna ut igen
+tr: başka bir hesaplama seçeneği deneyebilirsiniz
 
     new modification
 co: cliccà quì per fà una nova currezzione
@@ -10244,6 +10306,7 @@ oc: persegre la modificacion
 pt: continuar a edição
 ru: продолжить редактирование
 sv: Ny uppdatering
+tr: Düzenlemeye devam et
 
     new name
 co: novu nome
@@ -10252,6 +10315,7 @@ fr: nouveau nom
 no: nytt navn
 pt: nome novo
 sv: nytt namn
+tr: yeni ad
 
     next relationship path
 co: chjassu seguente
@@ -10264,6 +10328,7 @@ oc: camin seguent
 pt: próximo nível de relação
 ru: следующая родственная связь
 sv: nästa släktskapsväg
+tr: Sonraki ilişki yolu
 
     next sibling
 af: volgende broer/volgende suster/volgende broer of suster
@@ -10294,6 +10359,7 @@ ru: следующий брат/следующая сестра
 sk: mladší brat/mladšia sestra/mladší súrodenec
 sl: mlajši brat/mlajša sestra
 sv: nästa bror/nästa syster/nästa syskon
+tr: sonraki kardeş
 
     no anniversary
 af: geen herdenking
@@ -10324,6 +10390,7 @@ ru: нет годовщин
 sk: žiadne výročie
 sl: nobene obletnice
 sv: ingen årsdag
+tr: yıldönümü yok
 
     no birthday
 af: geen verjaarsdag
@@ -10354,6 +10421,7 @@ ru: нет дней рождений
 sk: žiadne narodeniny
 sl: nobenega rojstnega dneva
 sv: ingen födelsedag
+tr: doğum günü yok
 
     no descendants
 co: senza discendente
@@ -10369,6 +10437,7 @@ oc: pas cap de descendent
 pt: sem descendentes
 ru: без потомков
 sv: utan ättlingar
+tr: Nesiller olmadan
 
     no known relationship link between %s and %s
 af: geen bekende verwantskap tussen %s en %s
@@ -10399,6 +10468,7 @@ ru: неизвестно о родственных связях между %s и
 sk: žiadny známy vzťah medzi %s a %s
 sl: Brez znane zveze med %s in %s
 sv: ingen känd släktskap emellan %s och %s
+tr: %s ve %s arasında bilinen bir ilişki bağlantısı yok
 
     no marriage event
 co: micca maritati
@@ -10414,6 +10484,7 @@ oc: pas maridats
 pt: não casados
 ru: без браков
 sv: Partners
+tr: Eşler
 
     no match
 af: geen passing
@@ -10444,6 +10515,7 @@ ru: нет совпадений
 sk: nenájdená zhoda
 sl: brez
 sv: inga träffar
+tr: Sonuç bulunamadı
 
     no mention
 af: geen vermelding
@@ -10474,6 +10546,7 @@ ru: нет упоминаний
 sk: žiadna zmienka
 sl: ni omembe
 sv: inte nämnd
+tr: söz yok
 
     no modification
 co: nisuna mudificazione
@@ -10489,6 +10562,7 @@ oc: pas de modificacion
 pt: nenhuma modificação
 ru: изменений нет
 sv: Ingen uppdatering
+tr: Değişiklik yok
 
     no sexes check
 af: geslag word nie aangedui nie
@@ -10519,6 +10593,7 @@ ru: не проверять пол
 sk: bez kontroly pohlavia
 sl: ne glede na spol
 sv: enkönig vigsel (ingen könskontroll)
+tr: aynı cinsiyetten çift
 
     not divorced
 af: nie geskei nie
@@ -10549,6 +10624,7 @@ ru: не разведены
 sk: nerozvedení
 sl: brez ločitve
 sv: inte skilda
+tr: boşanmamış
 
     not found
 af: niks gekry nie
@@ -10579,6 +10655,7 @@ ru: не найден
 sk: nenájdený
 sl: ni najdeno
 sv: hittar inte
+tr: bulunamadı
 
     not married
 af: Ongetroud
@@ -10609,6 +10686,7 @@ ru: не в браке
 sk: slobodný
 sl: brez poroke
 sv: ogifta
+tr: evli değil
 
     note/notes
 af: nota/notas
@@ -10640,6 +10718,7 @@ ru: заметка/заметки
 sk: poznámka/poznámky
 sl: zapisek/zapiski
 sv: notering/noteringar
+tr: not/notlar
 zh:  备注
 
     notes modified
@@ -10671,6 +10750,7 @@ ru: заметки изменены
 sk: poznámky zmenené
 sl: zaznamek spremenjen
 sv: noteringar modifierade
+tr: notlar değiştirildi
 
     notes summary
 bg: резюме на бележките
@@ -10687,6 +10767,7 @@ oc: Ensenhador de las nòtas divèrsas
 pt: sumário de notas diversas
 ru: изменения вкратце
 sv: Summering av noteringar
+tr: Notlar
 
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
@@ -10718,6 +10799,7 @@ ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl:  št./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
+tr: sıra/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 
     nth (cousin)
 af: n/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
@@ -10749,6 +10831,7 @@ ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n/två/tre/fyra/fem/sex/sju/åtta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
+tr: sıra/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 
     nth (generation)
 af: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
@@ -10780,6 +10863,7 @@ ru: энного/1-го/2-го/3-го/4-го/5-го/6-го/7-го/8-го/9-го/
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
+tr: sıra/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 
     number
 af: nommer
@@ -10810,6 +10894,7 @@ ru: число
 sk: číslo
 sl: številka
 sv: nummer
+tr: sayı
 
     number of branches
 af: aantal stake
@@ -10840,6 +10925,7 @@ ru: число ветвей
 sk: počet vetví
 sl: število vej
 sv: antal grenar
+tr: satır sayısı
 
     number of children
 co: numeru di zitelli(e)
@@ -10855,6 +10941,7 @@ oc: nombre d'enfants
 pt: número de filhos
 ru: количество детей
 sv: antal barn
+tr: çocuk sayısı
 
     number of events
 co: numeru d’avvenimenti
@@ -10870,6 +10957,7 @@ oc: nombre d'eveniments
 pt: número de eventos
 ru: количество событий
 sv: Antal händelser
+tr: etkinliklerin sayısı
 
     number of individuals
 co: numeru d’individu
@@ -10885,6 +10973,7 @@ oc: nombre d'individus
 pt: número de pessoas
 ru: количество людей
 sv: Antal individer
+tr: bireylerin sayısı
 
     number of living persons:
 bg: брой на живите лица:
@@ -10911,6 +11000,7 @@ ru: количество живых персон
 sk: počet žijúcich osôb
 sl: število živih oseb
 sv: antal levande personer:
+tr: yaşayan bireylerin sayısı
 
     n° d'Aboville
 co: n° d’Aboville
@@ -10926,6 +11016,7 @@ oc: n° d'Aboville
 pt: n° de Aboville
 ru: номер в системе d'Aboville
 sv: nummer
+tr: d'Aboville numarası
 
     n° Sosa
 co: n° Sosa
@@ -10941,6 +11032,7 @@ oc: nᵒ de Sosa
 pt: nº Sosa
 ru: номер в системе Sosa
 sv: Annummer
+tr: Sosa No.
 
     n° Sosa relative to
 af: Sosa nommer relatief tot
@@ -10971,6 +11063,7 @@ ru: Sosa номер относительно
 sk: "Sosa" číslo vo vzťahu k
 sl: številka"Sosa", v odnosu z
 sv: annummer med som proband (Kekules system)
+tr: Sosa'ya göre
 
     occupation/occupations
 af: beroep
@@ -11001,6 +11094,7 @@ ru: занятие/занятия
 sk: povolanie
 sl: poklic
 sv: yrke/yrken
+tr: meslek/meslekler
 
     of
 co: di
@@ -11008,6 +11102,7 @@ en: of
 fr: de
 pt: de
 sv: av
+tr: /
 
     of course dead
 af: oorlede
@@ -11038,6 +11133,7 @@ ro: a decedat
 ru: умер
 sl: umrl
 sv: helt säkert avliden
+tr: ölmüş olabilir
 zh:  死
 
     of the %s generation
@@ -11068,6 +11164,7 @@ ru: %s поколения
 sk: zo %s generácie
 sl: %s generacije
 sv: av den %s generationen
+tr: %s kuşağının
 
     officer/officer/officers
 co: uffiziante/uffiziante/uffizianti
@@ -11075,6 +11172,7 @@ en: officer/officer/officers
 fr: officiant/officiante/officiants
 pt: oficial/oficial/oficiais
 sv: officer/officer/officerer
+tr: memur/memur/memurlar
 
     old name
 co: vechju nome
@@ -11083,6 +11181,7 @@ fr: ancien nom
 no: gammelt navn
 pt: nome antigo
 sv: tidigare namn
+tr: eski adı
 
     on %s's side
 af: aan die kant van %s
@@ -11113,6 +11212,7 @@ ru: со стороны %s
 sk: zo strany :g:%s
 sl: po strani %s
 sv: från %ss släktsida
+tr: %s tarafında
 
     on (day month year)
 af: op
@@ -11142,6 +11242,7 @@ pt: a
 ro: la
 sk: dňa
 sv: den
+tr: -da,-de
 zh:  于
 
     on (weekday day month year)
@@ -11155,6 +11256,7 @@ oc: lo
 pl: w :a:
 pt: em
 sv: på
+tr: -da,-de
 
     one additional generation
 co: una generazione di più
@@ -11162,6 +11264,7 @@ en: one additional generation
 fr: une génération en plus
 pt: uma geração adicional
 sv: en tidigare generation
+tr: ek bir kuşak
 
     one day old
 af: een dag oud
@@ -11192,6 +11295,7 @@ ru: однодневный
 sk: starý jeden deň/stará jeden deň
 sl: star en dan
 sv: en dag
+tr: bir günlük
 
     one month old
 af: een maand oud
@@ -11222,6 +11326,7 @@ ru: месячный
 sk: starý jeden mesiac/stará jeden mesiac
 sl: star en mesec
 sv: en månad
+tr: bir aylık
 
     one year old
 af: een jaar oud
@@ -11252,6 +11357,7 @@ ru: до года
 sk: starý jeden rok/stará jeden rok
 sl: star eno leto
 sv: ett år
+tr: bir yaşında
 
     only
 co: solu
@@ -11261,6 +11367,7 @@ fr: uniquement
 no: bare
 pt: só
 sv:bara
+tr: sadece
 
     only the generation selected
 af: net die gekose geslag
@@ -11291,6 +11398,7 @@ ru: только выбранное поколение
 sk: iba zvolená generácia
 sl: samo izbrana generacija
 sv: endast den valda generationen
+tr: sadece seçilen nesil
 
     optional
 af: opsioneel
@@ -11321,6 +11429,7 @@ ru: дополнительно
 sk: voľba
 sl: po želji
 sv: valfritt
+tr: isteğe bağlı
 
     options
 co: ozzioni
@@ -11328,6 +11437,7 @@ en: options
 fr: options
 pt: opções
 sv: valbart
+tr: seçenekler
 
     or
 af: of
@@ -11359,6 +11469,7 @@ ru: или
 sk: alebo
 sl: ali
 sv: eller
+tr: veya
 
     ordination
 co: ordinazione
@@ -11372,6 +11483,7 @@ nl: Inwijding
 no: Forordning
 pt: ordenação
 sv: Förordning
+tr: Yönetmelik
 
     other action
 af: ander stappe
