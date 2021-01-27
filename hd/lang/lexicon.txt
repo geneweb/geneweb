@@ -5233,6 +5233,7 @@ oc: aujòl dirèct de %s
 pt: antepassado direto de %s
 ru: прямой предок %s
 sv: direkt förfader till %s
+tr: %s'in doğrudan atası
 
     disappeared
 af: verdwyn
@@ -5263,6 +5264,7 @@ ru: пропал без вести/пропала без вести/пропал
 sk: zmiznutý/zmiznutá
 sl: izginil/izginila/izginil(a)
 sv: försvunnen
+tr: kayboldu
 
     disconnect
 bg: да се прекъсне връзката
@@ -5289,6 +5291,7 @@ ru: отключить
 sk: odpojené
 sl: prekinjeno
 sv: logga ut
+tr: çıkış yap
 
     display Aboville number
 co: affissà a numerotazione d’Aboville
@@ -5304,6 +5307,7 @@ oc: afichar la numerotacion d'Aboville
 pt: exibir a numeração de Aboville
 ru: показать номер Aboville
 sv: Visa Aboville nummer
+tr: D’Aboville numarasını görüntüle
 
     display border tree
 co: affissà i bordi
@@ -5319,6 +5323,7 @@ oc: afichar las bordadura dels arbres
 pt: exibir as molduras
 ru: включая рамку
 sv: visa kantlinje
+tr: ekran çerçevesi
 
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
@@ -5349,6 +5354,7 @@ ru: отображать частами/ширина части/перекрыт
 sk: zobraz po segmentoch/šírka segmentu/prekrytie/celková šírka
 sl: prikaži s pomočjo izsekov/širina izseka/prekrivanje/skupna širina
 sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
+tr: dilimler/dilim genişliği/örtüşme/toplam genişliğe göre görüntüleme
 
     display by/branch/alphabetic order
 co: affissà da :/ghjemba/ordine alfabeticu
@@ -5364,6 +5370,7 @@ oc: afichatge per:/brancas/òrdre alfabetic
 pt: exibir por:/ramos/ordem alfabética
 ru: порядок отображения: /по ветвям/алфавитный
 sv: visas efter:/grenar/alfabetisk ordning
+tr: /satır/alfabetik sıraya göre görüntüleme
 
     display empty picture
 co: affissà sempre e fiure
@@ -5379,6 +5386,7 @@ oc: sempre afichar los images
 pt: exibir sempre as imagens
 ru: оставить место под изображение
 sv: Visa tom bild
+tr: Resmi göster
 
     display generation
 co: affissà e generazioni
@@ -5394,6 +5402,7 @@ oc: afichar los numèros de generacion
 pt: exibir as gerações
 ru: показать поколение
 sv: visa generationsnummer
+tr: nesilleri göster
 
     display implex
 co: affissà l’implessi
@@ -5401,6 +5410,7 @@ en: display implex
 fr: afficher les implexes
 pt: exibir os implexos
 sv: visa implex
+tr: implexi göster
 
     display marriage date
 co: affissà a data di matrimoniu
@@ -5413,6 +5423,7 @@ oc: afichar la data de maridatge
 pt: exibir a data de casamento
 ru: показать дату брака
 sv: visa vigseldatum
+tr: evlilik tarihini göster
 
     display notes/sources inline
 co: include e note/fonte à u cuntenutu
@@ -5425,6 +5436,7 @@ oc: apondre las nòtas dins lo contengut
 pt: incluir as notas/fontes no conteúdo
 ru: показать заметки/документы
 sv: visa noteringar och källor infogat
+tr: Notlar ve kaynaklar ekleyin
 
     display picture
 co: affissà e fotò
@@ -5440,6 +5452,7 @@ oc: afichar las fòtos
 pt: exibir as fotos
 ru: включая изображения
 sv: visa bilder
+tr: aile resmini göster
 
     display smallest sosa number relative to ancestor
 co: affissà l’implessi
@@ -5455,6 +5468,7 @@ oc: afichar los implèxes
 pt: exibir os implexos
 ru: редуцировать предков
 sv: visa anförlusten
+tr: soyağacı daralmasını göster
 
     display spouse
 co: affissà u(a) cumpagnu(a)
@@ -5470,6 +5484,7 @@ oc: afichar lo conjunt
 pt: exibir cônjuge
 ru: влючая супругов
 sv: visa makar
+tr: eşini göster
 
     display this marriage in this order
 co: piazzà st’unione à a so pusizione
@@ -5485,6 +5500,7 @@ oc: plaçar aquela union en posicion
 pt: colocar esta união em posição
 ru: изменить сортировку браков
 sv: Byt ordning på vigsel
+tr: Evlilik sırasını değiştir
 
     distinction
 co: distenzione
@@ -5499,6 +5515,7 @@ no: Grad
 pt: distinção
 ru: звание
 sv: Grad
+tr: Rütbe
 
     divorce
 af: geskei
@@ -5529,6 +5546,7 @@ ru: развод
 sk: rozvod
 sl: ločitev
 sv: skilsmässa
+tr: boşanma
 
     divorce event
 co: divorziu
@@ -5542,6 +5560,7 @@ nl: Echtscheiding
 no: Skilsmisse
 pt: divórcio
 sv: Skilsmässa
+tr: Boşanma
 
     divorced
 af: geskei
@@ -5572,6 +5591,7 @@ ru: в разводе
 sk: rozvedení
 sl: ločena
 sv: skilda
+tr: boşanmış
 
     do not
 co: ùn micca
@@ -5579,6 +5599,7 @@ en: do not
 fr: ne pas
 pt: não
 sv: gör inte
+tr: yapmayın
 
     don't group the common branches together
 af: moet nie takke van ooreenstemende oorsprong saamvoeg nie
@@ -5609,6 +5630,7 @@ ru: не группировать основные ветви вместе
 sk: nespájať spoločné vetvy
 sl: ne zbiraj skupnih vej
 sv: gruppera inte ihop de gemensamma anlinjerna
+tr: ortak dalları bir araya getirmeyin
 
     don't know
 af: onbekend
@@ -5639,6 +5661,7 @@ ru: не известен
 sk: nie je známe
 sl: ni znano
 sv: vet ej
+tr: bilinmeyen
 
     dotation
 co: dutazione
@@ -5652,6 +5675,7 @@ nl: Schenking
 no: Stiftelse av legat
 pt: dotação
 sv: Donation
+tr: Bağış
 
     dotationLDS
 co: dutazione LDS
@@ -5665,6 +5689,7 @@ nl: Schenking (LDS)
 no: Stiftelse av legat (LDS)
 pt: dotação LDS
 sv: Donation (LDS)
+tr: Bağış (LDS)
 
     edit tree
 co: mudificà u graficu
@@ -5672,6 +5697,7 @@ en: edit the graph
 fr: éditer le graphe
 pt: editar o gráfico
 sv: redigera trädet
+tr: grafiği düzenle
 
     education
 co: educazione
@@ -5686,6 +5712,7 @@ no: Utdannelse
 pt: educação
 ru: образование
 sv: Utbildning
+tr: Eğitim
 
     election
 co: elezzione
@@ -5700,6 +5727,7 @@ no: Valg
 pt: eleição
 ru: избрание
 sv: Val
+tr: Seçim
 
     emigration
 co: emigrazione
@@ -5714,6 +5742,7 @@ no: Utvandring
 pt: emigração
 ru: эмиграция
 sv: Utvandring
+tr: Göç
 
     end
 af: einde
@@ -5744,6 +5773,7 @@ ru: кончая
 sk: koniec
 sl: konec
 sv: slutar
+tr: son
 
     engage event
 co: spusaticciu
@@ -5757,6 +5787,7 @@ nl: Verloving
 no: Forlovelse
 pt: noivado
 sv: Förlovning
+tr: Nişan
 
     engaged
 af: verloof
@@ -5787,6 +5818,7 @@ ru: помолвлены
 sk: snúbenci
 sl: zaroka
 sv: förlovad
+tr: Nişanlı
 
     engaged%t to
 af: verloof%t aan
@@ -5817,6 +5849,7 @@ ru: %t помолвлен с
 sk: zasnúbený %t s/zasnúbená %t s
 sl: zaročen z %/zaročena z
 sv: förlovad%t med
+tr: nişanlı %t için
 
     error
 af: fout
@@ -5847,6 +5880,7 @@ ru: ошибка
 sk: chyba
 sl: napaka
 sv: fel
+tr: hata
 
     estate
 af: landgoed
@@ -5878,6 +5912,7 @@ ru: место
 sk: miesto
 sl: posestvo
 sv: ort
+tr: alan
 zh:  地点
 
     event/events
@@ -5893,11 +5928,13 @@ no: hendelse/hendelse
 pt: evento/eventos
 ru: событие/события
 sv: Händelse/Händelse
+tr: etkinlik/etkinlikler
 
     events to which %s was witness
 co: avvenimenti induve %s era testimoniu
 en: events to which %s was witness
 fr: évènements auxquels %s était témoin
+tr: %s'in tanık olduğu etkinlikler
 
     events tree
 co: arburu di l’avvenimenti
@@ -5905,6 +5942,7 @@ en: tree of events
 fr: arbre des événements
 pt: árvore de eventos
 sv: träd av händelser
+tr: etkinlikler ağacı
 
     exact
 af: presies
@@ -5936,6 +5974,7 @@ ru: в точности
 sk: presne
 sl: točno
 sv: exakt
+tr: tam
 
     search_exact_fn
 co: ricerca esatta
@@ -5949,6 +5988,7 @@ nl: exact zoeken
 no: eksakt søk
 pt: pesquisa exata
 sv: exakt sökning
+tr: tam arama
 
     search_exact_sn
 co: ricerca esatta
@@ -5962,6 +6002,7 @@ nl: exact zoeken
 no: eksakt søk
 pt: pesquisa exata
 sv: exakt sökning
+tr: tam arama
 
     excommunication
 co: scumunicazione
@@ -5976,6 +6017,7 @@ no: Bannlysing
 pt: excomunhão
 ru: отлучение от церкви
 sv: Bannlysning
+tr: Aforoz
 
     executed (legally killed)
 af: teregsgestel
@@ -6006,6 +6048,7 @@ ru: казнен/казнена
 sk: popravený/popravená/popravený(á)
 sl: usmrčen/usmrčena/usmrčen(a)
 sv: avrättad
+tr: idam
 
     families with encoding
 af: gekodeerde families
@@ -6036,6 +6079,7 @@ ru: семейные коды
 sk: rodiny s kódmi
 sl: družine s kodami
 sv: familjer med kod
+tr: kodlamalı aileler
 
     family added
 af: familie bygevoeg
@@ -6066,6 +6110,7 @@ ru: cемья добавленна
 sk: rodina pridaná
 sl: družina dodana
 sv: ny familj tillagd
+tr: aile eklendi
 
     family birthday
 co: natalizii di i parenti
@@ -6080,6 +6125,7 @@ no: fødselsdager
 oc: aniversaris dins la familha
 pt: aniversários na família
 sv: födelsedagar
+tr: aile doğum günü
 
     family deleted
 af: familie uitgevee
@@ -6110,6 +6156,7 @@ ru: cемья удалена
 sk: rodina zmazaná
 sl: družina izbrisana
 sv: familj borttagen
+tr: aile silindi
 
     family history
 co: accant’à l’arburu
@@ -6125,6 +6172,7 @@ oc: subre l'arbre
 pt: autor da árvore
 ru: семейная история
 sv: utöver släktträdet
+tr: aile öyküsü
 
     family modified
 af: familie verander
@@ -6155,6 +6203,7 @@ ru: cемья изменена
 sk: rodina zmazaná
 sl: družina spremenjena
 sv: familj ändrad
+tr: aile değiştirildi
 
     family source
 co: fonte di famiglia
@@ -6170,12 +6219,14 @@ oc: font de la familha
 pt: fonte familiar
 ru: семейные документы
 sv: Familjekällor
+tr: Kaynak
 
     family time line
 co: cronulugia di a famiglia
 en: time line of the family
 fr: chronologie de la famille
 pt: cronologia da família
+tr: ailenin zaman çizelgesi
 
     family/families
 af: familie/families
@@ -6206,6 +6257,7 @@ ru: семья:a:--ю:g:--и/семьи
 sk: rodina:a:-u/rodiny
 sl: družina/družine
 sv: familj/familjer
+tr: aile/aileler
 
     familyLinkLDS
 co: leia di parentia LDS
@@ -6219,6 +6271,7 @@ nl: Familierelatie (LDS)
 no: Famile-lenke (LDS)
 pt: ligação familiar LDS
 sv: Familjeband (RDS)
+tr: Aile bağlantısı (LDS)
 
     father-in-law/mother-in-law
 af: skoonpa/skoonma
@@ -6231,6 +6284,7 @@ es: suegro/suegra
 fr: beau-père/belle-mère
 pt: sogro/sogra
 sv: svärfar/svärmor
+tr: kayınpederi/kayınvalidesi
 
     father/mother
 af: vader/moeder
@@ -6261,6 +6315,7 @@ ru: отец/мать
 sk: otec/matka
 sl: oče/mati
 sv: far/mor
+tr: baba/anne
 
     field required
 co: campu richiestu
@@ -6273,6 +6328,7 @@ oc: sasida obligatòria
 pt: campo obrigatório
 ru: обязательное значение
 sv: obligatoriskt fält
+tr: Gerekli
 
     file
 af: lêer
@@ -6304,6 +6360,7 @@ ru: файл
 sk: súbor
 sl: datoteka
 sv: fil
+tr: dosya
 
     first free number
 af: eerste beskikbare nommer
@@ -6334,6 +6391,7 @@ ru: первый свободный номер
 sk: prvé voľné číslo
 sl: prva prosta številka
 sv: första lediga nummer
+tr: ilk serbest numara
 
     first name alias
 af: bynaam
@@ -6365,6 +6423,7 @@ ru: имя отчество
 sk: alias mena
 sl: drugo osebno ime
 sv: förnamns alias
+tr: alternatif ad
 
     first name missing
 af: voornaam ontbreek
@@ -6396,6 +6455,7 @@ ru: имя пропущено
 sk: chýba meno
 sl: manjka osebno ime
 sv: förnamn saknas
+tr: ilk ad eksik
 
     first name not found
 af: voornaam nie gevind nie
@@ -6427,6 +6487,7 @@ ru: имя не найденно
 sk: meno nenájdené
 sl: osebno ime ni najdeno
 sv: hittar inte förnamn
+tr: ilk ad bulunamadı
 
     first name/first names
 af: voornaam/voorname
@@ -6459,6 +6520,7 @@ ru: имя/имена
 sk: meno/mená
 sl: osebno ime/osebna imena
 sv: förnamn/förnamn
+tr: ilk ad/ilk adlar/ilk ad(lar)
 zh:  名
 
     firstCommunion
@@ -6473,6 +6535,7 @@ nl: Eerste Communie
 no: Første forbindelse
 pt: primeira comunhão
 sv: Första nattvard
+tr: İlk Komünyon
 
     font size
 co: dimensione di grafia
@@ -6480,6 +6543,7 @@ en: font size
 fr: taille de police
 pt: tamanho da fonte
 sv: textstorlek
+tr: yazı boyutu
 
     for the first names by alphabetic order
 af: om die voorname in alfabetiese volgorde te kry
@@ -6511,6 +6575,7 @@ ru: чтобы упорядочить имена по алфавиту
 sk: podľa mena v abecednom poradí
 sl: za lastna imena po abecednem redu
 sv: för förnamnen i bokstavsordning
+tr: sonuçlar listesini adların alfabetik sırasına göre görüntülemek için
 
     for the list ordered by the date of the last modification
 bg: за списъка по дати на последно изменение
@@ -6537,6 +6602,7 @@ ru: для списка отсортированного по дате посл�
 sk: pre zoznam podľa dátumu poslednej zmeny
 sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
+tr: son değişiklik tarihine göre sıralanmış liste için
 
     forum
 af: forum
@@ -6567,6 +6633,7 @@ ru: форум базы данных
 sk: fórum
 sl: forum
 sv: forum
+tr: forum
 
     foster father/foster mother/foster parents
 af: pleegvader/pleegmoeder/pleegouers
@@ -6598,6 +6665,7 @@ ru: приемный отец/приемная мать/приемный род�
 sk: pestún/pestúnka/pestúni
 sl: rejnik/rejnica/rejniki
 sv: fosterfar/fostermor/fosterföräldrar
+tr: koruyucu baba/koruyucu anne/koruyucu ebeveynler
 
     foster son/foster daughter/foster child
 af: pleegseun/pleegdogter/pleegkind
@@ -6629,6 +6697,7 @@ ru: приемный сын/приемная дочь/приемный ребе�
 sk: opatrovanec/opatrovankyňa/opatrovanec
 sl: rejenec/rejenka/rejenec
 sv: fosterson/fosterdotter/fosterbarn
+tr: evlatlık oğul/evlatlık kızı/evlatlık çocuk
 
     frequency
 af: frekwensie
@@ -6657,6 +6726,7 @@ ro: dupa frecventa
 ru: по частоте
 sl: pogostosti
 sv: frekvensordning
+tr: frekans
 zh: 访问次数
 
     full siblings
@@ -6688,6 +6758,7 @@ ru: братья или сесты
 sk: súrodenci
 sl: bratje in sestre
 sv: syskon
+tr: kardeşler
 
     full tree
 co: arburu sanu
@@ -6695,6 +6766,7 @@ en: full tree
 fr: arbre complet
 pt: árvore completa
 sv: helt träd
+tr: tam ağaç
 
     full width/columns
 co: affissera larghezza sana/affissera nant’à duie culonne
@@ -6702,6 +6774,7 @@ en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 pt: exibir na largura total/exibir em duas colunas
 sv: full bredd/kolumner
+tr: tam genişlikte ekran/sütun ekranı
 
     funeral
 co: murtoriu
@@ -6716,6 +6789,7 @@ no: Begravelse
 pt: funeral
 ru: похороны
 sv: Begravning
+tr: Cenaze
 
     generation/generations
 af: geslag/geslagte
@@ -6746,6 +6820,7 @@ ru: поколение/поколений
 sk: generácia:a:-u/generácie
 sl: generacija/generacije
 sv: generation/generationer
+tr: nesil/nesiller
 
     godfather/godmother/godparents
 af: peetpa/peetma/peetouers
@@ -6776,6 +6851,7 @@ ru: крестный отец/крестная мать/крестный
 sk: krstný otec/krstná matka/krstní rodičia
 sl: boter/botra/botri
 sv: gudfar/gudmor/gudföräldrar
+tr: vaftiz babası/vaftiz annesi/vaftiz ebeveynleri/vaftiz ebeveyni
 
     godparent
 co: cumpare o cummare
@@ -6783,6 +6859,7 @@ en: godparent
 fr: parrain ou marraine
 pt: padrinho ou madrinha
 sv: gudförälder
+tr: vaftiz ebveyni
 
     godson/goddaughter/godchild
 af: peetseun/peetdogter/peetkind
@@ -6813,6 +6890,7 @@ ru: крестник/крестница/крестник
 sk: krstný syn/krstná dcéra/krstné deti
 sl: krščenec/krščenka/krščenci
 sv: gudson/guddotter/gudbarn
+tr: vaftiz oğlu/vaftiz kızı/vaftiz çocuğu
 
     graduate
 co: diploma
@@ -6827,6 +6905,7 @@ no: Utdannelse
 pt: formatura
 ru: выпуск
 sv: Examen
+tr: Mezuniyet
 
     grand-parents
 af: grootouers
