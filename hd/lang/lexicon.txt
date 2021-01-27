@@ -6936,6 +6936,7 @@ ru: прародители
 sk: prarodičia
 sl: stari starši
 sv: farföräldrar/morföräldrar
+tr: büyük ebeveynler
 
     great-grand-parents
 af: oorgrootouers
@@ -6966,6 +6967,7 @@ ru: прапрародители
 sk: praprastarí rodičia
 sl: prastari starši
 sv: gammel-farföräldrar/gammel-morföräldrar
+tr: büyük-büyük-ebeveynler
 
     gregorian/julian/french/hebrew
 af: gregoriaans/juliaans/frans/hebreeus
@@ -6996,6 +6998,7 @@ ru: грегорианский/юлианский/французский/евр�
 sk: gregoránsky/juliánsky/francúzsky/židovský
 sl: gregorijanski/julijanski/francoski/hebrejski
 sv: gregoriansk/juliansk/franska rep./hebreisk
+tr: Miladi/Julian/Fransız Cumhuriyetçi/İbranice
 
     groom/bride
 af: man/vrou
@@ -7026,6 +7029,7 @@ ru: муж/жена
 sk: manžel/manželka
 sl: mož/žena
 sv: partner/partner
+tr: damat/gelin
 
     h7-tree
 co: arburu in H di 7 generazioni
@@ -7033,6 +7037,7 @@ en: 7 generation H tree
 fr: arbre en H 7 générations
 pt: árvore em H 7 gerações
 sv: 7 generationers H träd
+tr: 7 nesil H ağacı
 
     half siblings
 co: fratellastri è surellastre
@@ -7048,6 +7053,7 @@ oc: frairastres e sorrastras
 pt: meios irmãos e meias irmãs
 ru: сводные братья или сёстры
 sv: halvsyskon
+tr: üvey kardeşler
 
     half-brothers/half-sisters/half-siblings
 co: fratellastri/surellastre/mezu-fratelli è surelle
@@ -7055,6 +7061,7 @@ en: half-brothers/half-sisters/half-siblings
 fr: demi-frères/demi-sœurs/demi-frères et sœurs
 pt: meios-irmãos/meias-irmãs/meios-irmãos
 sv: halvbröder/halvsystrar/halvsyskon
+tr: üvey erkek kardeşler/üvey kız kardeşler/üvey kardeşler
 
     half-siblings
 co: fratellastri è surellastre
@@ -7070,6 +7077,7 @@ oc: frairastres e sorrastras
 pt: meios irmãos e irmãs
 ru: сводные братья или сёстры
 sv: Halvsyskon
+tr: üvey kardeşler
 
     happy birthday to them!
 co: felice nataliziu !
@@ -7085,6 +7093,7 @@ oc: lo bon aniversari!
 pt: feliz aniversário!
 ru: С Днём Рождения!
 sv: gratulerar på födelsedagen!
+tr: Onların doğum günü kutlu olsun!
 
     happy birthday to you!
 af: Geluk met jou verjaarsdag!
@@ -7115,6 +7124,7 @@ ru: с днем рождения тебя!
 sk: všetko najlepšie k narodeninám!
 sl: srečen rojstni dan!
 sv: gratulerar på födelsedagen!
+tr: Doğum günün kutlu olsun!
 
     having a family
 co: avendu una famiglia
@@ -7130,6 +7140,7 @@ oc: amb una familha
 pt: tem um cônjuge e/ou filhos
 ru: в браке
 sv: Har en familj
+tr: Eş ve çocuklar biliniyor
 
     having as children
 af: met as kinders
@@ -7160,6 +7171,7 @@ ru: имели детей
 sk: mali spolu deti
 sl: otroci
 sv: med
+tr: ile
 zh:  生有子女
 
     having no family
@@ -7176,6 +7188,7 @@ oc: sens familha
 pt: não tem cônjuge nem filhos
 ru: супруг(а) и дети не известы
 sv: Har ingen familj
+tr: Eş ve çocuklar bilinmiyor
 
     help modify data
 co: Fate casu ! E currezzioni fatte in u dizziunariu mudificheghjanu l’inseme di i dati chì currispondenu in a basa.
@@ -7191,6 +7204,7 @@ oc: CLicatz sus l'element de modificar e totas las fichas del seu arbre seràn c
 pt: Clique sobre o elemento da lista que pretende corrigir: a totalidade das fichas da sua árvore serão instantaneamente corrigidas.
 ru: Нажмите 'Изменить' для редактирования и всё фамильное дерево будет обновлено
 sv: Hjälp att modifiera data.
+tr: Dikkatli ol. "Kitapta" yapılan değişiklikler, tüm veritabanındaki ilgili öğeyi günceller.
 
     help surname branch
 co: per ottene l’alburu di e ghjembe patronimiche, ci vole à cliccà nant’à u numeru di ghjembe
@@ -7205,6 +7219,7 @@ no: klikk på et nummer for å se slektstre
 pt: para obter a árvore dos ramos patronímicos, clique no número dos ramos
 ru: выберите номер для просмотра фамильного дерева
 sv: klicka på ett nummer för att se släktträdet
+tr: soy ağacını görüntülemek için bir numaraya tıklayın
 
     here
 af: hier
@@ -7235,6 +7250,7 @@ ru: здесь
 sk: tu
 sl: tukaj
 sv: här
+tr: burada
 
     hide portraits
 co: piattà i ritratti
@@ -7242,6 +7258,7 @@ en: hide portraits
 fr: ne pas afficher les portraits
 pt: não mostrar os retratos
 sv: dölj personbilder
+tr: portreleri gizle
 
     him/her
 af: sy/haar
@@ -7272,6 +7289,7 @@ ru: он/она
 sk: on/ona
 sl: on/ona
 sv: honom/henne
+tr: onu/onu
 
     his/her
 co: u so/a so
@@ -7280,6 +7298,7 @@ fr: son/sa
 no: hans/hennes
 pt: seu/sua
 sv: hans/hennes
+tr: onun/onun
 
     history
 co: cronulugia
@@ -7295,6 +7314,7 @@ oc: istoric
 pt: histórico
 ru: история
 sv: Historia
+tr: Geçmiş
 
     history of updates
 af: bywerkingsgeskiedenis
@@ -7326,6 +7346,7 @@ ru: история обновлений
 sk: história zmien
 sl: zgodovina sprememb
 sv: lista över uppdateringarna
+tr: güncelleme geçmişi
 
     home
 co: accolta
@@ -7333,6 +7354,7 @@ en: home
 fr: accueil
 pt: início
 sv: hem
+tr: ev
 
     horizontal tree
 co: arburiscenza ascendente
@@ -7340,6 +7362,7 @@ en: horizontal tree
 fr: arborescence ascendante
 pt: árvore compacta de ascendentes
 sv: horisontellt träd
+tr: yatay ağaç
 
     horizontally
 af: horisontaal
@@ -7370,6 +7393,7 @@ ru: горизонтально
 sk: horizontálne
 sl: vodoravno
 sv: horisontellt
+tr: yatay olarak
 
     hospitalisation
 co: ospitalizazione
@@ -7384,6 +7408,7 @@ no: Hospitalisering
 pt: hospitalização
 ru: госпитализация
 sv: Sjukhusvistelse
+tr: Hastanede yatış
 
     htree
 co: arburu in H
@@ -7391,6 +7416,7 @@ en: H-Tree
 fr: arbre en H
 pt: árvore em H
 sv: H-träd
+tr: H-Ağacı
 
     husband/wife
 af: man/vrou
@@ -7421,6 +7447,7 @@ ru: муж/жена
 sk: manžel/manželka
 sl: mož/žena
 sv: make/maka
+tr: karı/koca
 
     ident/email/subject
 af: ident/e-pos/onderwerp
@@ -7451,6 +7478,7 @@ ru: идентификатор/email/тема
 sk: ident/email/predmet
 sl: ime/e-pošta/vsebina
 sv: identitet/email/ämne
+tr: kimlik/e-posta/konu
 
     if titles
 af: as titels
@@ -7481,6 +7509,7 @@ ru: если титул
 sk: ak sú tituly
 sl: če so nazivi
 sv: om titlar
+tr: eğer başlıklar
 
     iftitles/public/private
 co: s’è tituli/publicu/privatu
@@ -7492,6 +7521,7 @@ it: se titoli/pubblico/privato
 oc: si i a de títols/public/privat
 pt: se títulos/público/privado
 sv: om titlar/publik/privat
+tr: Başlıklar/Herkese Açık/Özel ise
 
     ignore implex
 co: ignurà l’implessi
@@ -7499,6 +7529,7 @@ en: ignore implex
 fr: ignorer les implexes
 pt: ignorar os implexos
 sv: ignorera implex
+tr: implexi yoksay
 
     illness
 co: maladia
@@ -7512,6 +7543,7 @@ nl: Ziekte
 no: Sykdom
 pt: doença
 sv: Sjukdom
+tr: Hastalık
 
     image deleted
 af: prent ontbreek
@@ -7542,6 +7574,7 @@ ru: картинка удалена
 sk: obrázok zmazaný
 sl: slika izbrisana
 sv: bilden borttagen
+tr: resim silindi
 
     image received
 af: prent ontvang
@@ -7572,6 +7605,7 @@ ru: картинка получена
 sk: obrázok prijatý
 sl: slika sprejeta
 sv: bilden mottagen
+tr: resim yüklendi
 
     image/images
 af: prent/prente
@@ -7602,6 +7636,7 @@ ru: картинку
 sk: obrázok/obrázky
 sl: slika/slike
 sv: bild/bilder
+tr: resim / resimler
 
     immigration
 co: immigrazione
@@ -7615,6 +7650,7 @@ nl: Immigratie
 no: Innvandring
 pt: imigração
 sv: Invandring
+tr: Göçmenlik
 
     implex links
 co: ligà l’implessi
@@ -7622,6 +7658,7 @@ en: link implexes
 fr: relier les implexes
 pt: ligar os implexes
 sv: implex-länkar
+tr: implexlere bağlantı
 
     implex/implexes
 co: implessu/implessi
@@ -7629,6 +7666,7 @@ en: implex/implexes
 fr: implexe/implexes
 pt: implex/implexes
 sv: implex/implexer
+tr: implex/implexler
 
     in (month year)
 af: in
@@ -7658,6 +7696,7 @@ ru: в
 sk: v
 sl: v
 sv: i
+tr: içinde
 zh:  于
 
     in (place)
@@ -7673,6 +7712,7 @@ oc: a
 pt: em
 ru: в
 sv: i
+tr: içinde
 
     in (year)
 af: in
@@ -7700,6 +7740,7 @@ ro: in anul
 ru: в
 sk: v
 sl: v letu
+tr: içinde
 zh:  于
 sv: 
 
@@ -7732,6 +7773,7 @@ ru: включая потерянных супругов
 sk: vrátane chýbajúcich manželov/manželiek
 sl: vključi manjkajoče može/žene
 sv: inkludera makar som saknas
+tr: bilinmeyen eşleri dahil et
 
     include spouses
 af: eggenote ingesluit
@@ -7762,6 +7804,7 @@ ru: включая супругов
 sk: vrátane manželov/manželiek
 sl: pokaži može/žene
 sv: inkludera makar
+tr: eşleri dahil et
 
     incompatible sexes
 af: botsende geslagte
@@ -7792,6 +7835,7 @@ ru: несовместимый пол
 sk: nesprávne pohlavie
 sl: napačna spola
 sv: oförenliga kön
+tr: uyumsuz cinsiyetler
 
     incorrect date
 af: verkeerde datum
@@ -7823,6 +7867,7 @@ ru: неправильная дата
 sk: nesprávny dátum
 sl: napačen datum
 sv: fel datum
+tr: yanlış tarih
 
     incorrect request
 af: verkeerde navraag
@@ -7854,6 +7899,7 @@ ru: некорректный запрос
 sk: nesprávna požiadavka
 sl: napačna zahteva
 sv: fel förfrågan
+tr: yanlış istek
 
     indeed,
 af: inderdaad,
@@ -7884,6 +7930,7 @@ ru: на самом деле,
 sk: v skutočnosti
 sl: torej
 sv: faktiskt,
+tr: aslında,
 
     index of the descendants
 af: nasaatindeks
@@ -7914,6 +7961,7 @@ ru: индекс потомков
 sk: zoznam potomkov
 sl: seznam potomcev
 sv: förteckning över ättlingarna
+tr: neslin dizini
 
     index of the spouses (non descendants)
 af: eggenootindeks (na verwant)
@@ -7944,6 +7992,7 @@ ru: индекс супругов (не потомков)
 sk: zoznam manželov/manželiek (bez potomkov)
 sl: seznam mož/žena (brez potomcev)
 sv: förteckning över makarna (icke ättlingar)
+tr: eşler dizini (nesil yok)
 
     individual notes
 co: note individuale
@@ -7959,6 +8008,7 @@ oc: nòtas individualas
 pt: notas individuais
 ru: личные заметки
 sv: anteckningar om personen
+tr: bireysel not
 
     inline chronology
 co: cronulugia simplice/cronulugia detagliata
@@ -7966,6 +8016,7 @@ en: simple chronology/detailed chronology
 fr: chronologie simple/chronologie détaillée
 pt: cronologia simples/cronologia detalhada
 sv: förenklad kronologi/detaljerad kronologi
+tr: basit kronoloji/ayrıntılı kronoloji
 
     input database
 co: Scrivite quì u nome sanu di a basa di dati à impiegà :
@@ -7973,6 +8024,7 @@ en: Please, enter the name of the database you want to use:
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
 pt: Introduza o nome da base de dados que quer utilizar:
 sv: Skriv namnet på databasen du vill använda:
+tr: Lütfen kullanmak istediğiniz veritabanının adını girin
 
     insert
 af: invoeg
@@ -8003,6 +8055,7 @@ ru: вставить :a:
 sk: vložiť
 sl: vstavi
 sv: infoga
+tr: Ekle
 
     insufficient revision history for %s
 co: a cronulugia di e revisioni di %s hè insufficiente per effettuà i paragoni
@@ -8018,6 +8071,7 @@ oc: l'istoric de las revisions de %s es pas pro per realizar de comparasons
 pt: o histórico das revisões de %s é insuficiente para realizar comparações
 ru: нет истории изменений для %s
 sv: ingen revisionshistorik funnen för %s
+tr: %s için geçmiş bulunamadı
 
     intermediate revisions not shown
 co: revisioni intermediarie piattate
@@ -8025,6 +8079,7 @@ en: intermediate revisions not shown
 fr: révisions intermédiaires masquées
 pt: revisões intermédias ocultas
 sv: mellanrevisioner visas inte
+tr: ara revizyonlar gösterilmiyor
 
     inversion done
 af: omgeruil
@@ -8056,6 +8111,7 @@ ru: переключение завершено
 sk: výmena dokončená
 sl: zamenjano
 sv: omflyttning klar
+tr: ters çevrilmiş
 
     invert
 af: omruil
@@ -8086,6 +8142,7 @@ ru: переключить
 sk: vymeniť
 sl: zamenjaj
 sv: byt ordning
+tr: ters çevir
 
     invert the order of the following families
 af: ruil die orde van die families om
@@ -8116,6 +8173,7 @@ ru: изменить порядок следующих семей
 sk: zmeň poradie nasledujúcich rodín
 sl: zamenjaj vrstni red naslednjih družin
 sv: ändra ordningen på de följande familjerna
+tr: aşağıdaki ailelerin sırasını tersine çevirin
 
     is
 af: is
@@ -8144,6 +8202,7 @@ ro: este
 sk: je
 sl: je
 sv: är
+tr: olur
 
     is a very old parent
 co: hè un parente vechju vechju
@@ -8159,6 +8218,7 @@ oc: es un parent plan tròp vièlh
 pt: é um pai muito velho
 ru: очень старый родитель
 sv: Är en mycket gammal förälder
+tr: yaşlı
 
     is a very young parent
 af: is 'n baie jong ouer
@@ -8190,6 +8250,7 @@ ru: очень молодые родители
 sk: je veľmi mladý rodič
 sl: je zelo mlad oče/je zelo mlada mamica
 sv: är en väldigt ung förälder
+tr: çok genç bir ebeveyn
 
     is born after his/her child
 af: is gebore voor sy/haar kind
@@ -8220,6 +8281,7 @@ ru: рожден после его/ее ребенка
 sk: narodila/narodila sa po svojom dieťati
 sl: je rojen po tem, ko je imel otroka/je rojena po tem, ko je imela otroka
 sv: är född efter sitt barn
+tr: çocuğundan sonra doğmuş
 
     it is the same person!
 af: is dieselfde persoon!
@@ -8250,6 +8312,7 @@ ru: это тот же человек!
 sk: je to tá istá osoba!
 sl: je ena in ista oseba!
 sv: det är samma person!
+tr: aynı kişi!
 
     itree
 co: arburu in I
@@ -8257,6 +8320,7 @@ en: I-Tree
 fr: arbre en I
 pt: árvore em I
 sv: I-träd
+tr: I-Ağaç
 
     julian day
 af: juliaanse dag
@@ -8287,6 +8351,7 @@ ru: юлианский день
 sk: juliánsky deň
 sl: julijanski dan
 sv: juliansk dag
+tr: Jülyen günü
 
     killed (in action)
 af: gesneuwel
@@ -8317,6 +8382,7 @@ ru: убит в /убита в
 sk: zabitý/zabitá
 sl: ubit/ubita/ubit(a)
 sv: stupat
+tr: öldürüldü
 
     label
 co: etichetta
@@ -8328,6 +8394,7 @@ it: etichetta
 nl: etiketje
 pt: etiqueta
 sv: etikett
+tr: etiket
 
     last diff
 co: ultima revisione
@@ -8335,6 +8402,7 @@ en: last revision
 fr: dernière révision
 pt: última revisão
 sv: senaste version
+tr: son revizyon
 
     last sosa level not navigable
 co: l’ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l’antenati.
@@ -8342,6 +8410,7 @@ en: last Sosa level not navigable. Use ancestors list.
 fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 pt: o último nível de sosa não é navegável. Utilize a lista de antepassados.
 sv: senaste sosa-nivån kan inte användas. Använd förteckningen över släktingar
+tr: son Sosa seviyesi gezilebilir değil. Atalar listesini kullanın.
 
     less than one month old
 af: minder as 'n maand oud
@@ -8372,6 +8441,7 @@ ru: менее чем месячный/менее чем месячная
 sk: mladší ako jeden mesiac
 sl: star manj kot en mesec/stara manj kot en mesec
 sv: mindre än en månad
+tr: bir aydan kısa bir süre eski
 
     link
 af: koppel
@@ -8402,6 +8472,7 @@ ru: связать
 sk: spojenie
 sl: poveži
 sv: länk
+tr: bağlantı
 
     link back to parents
 co: leia di ritornu ver di i genitori
@@ -8410,6 +8481,7 @@ fr: lien retour vers les parents
 no: lenke til foreldre
 pt: link de regresso aos pais
 sv: länk tillbaka till föräldrarna
+tr: ebeveynlere geri bağlantı
 
     link between
 af: mense tussen
@@ -8440,6 +8512,7 @@ ru: связь между
 sk: vzťah medzi
 sl: sorodstvo med
 sv: släktskap emellan
+tr: arasındaki ilişki
 
     link to children
 co: leia ver di i zitelli
@@ -8448,6 +8521,7 @@ fr: lien vers les enfants
 no: lenke til barn
 pt: link para as crianças
 sv: länk till barnen
+tr: çocuklara bağlantı
 
     link to use
 co: leia à impiegà
@@ -8459,6 +8533,7 @@ oc: ligam d'utilizar
 pt: link a utilizar
 ru: использовать ссылку
 sv: länk att använda
+tr: kullanılacak bağlantı
 
     linked pages
 bg: свързани страници
@@ -8487,6 +8562,7 @@ ru: связанные страницы
 sk: spojené stránky
 sl: povezane strani
 sv: länkade sidor
+tr: bağlantılı sayfalar
 
     list eclair
 co: lista rapida
@@ -8501,6 +8577,7 @@ no: Index
 oc: lista rapida
 pt: listar por nome, local e data
 sv: Index
+tr: Ad, yer ve tarihe göre listele
 
     list/list (ancestors)
 af: lys
@@ -8531,6 +8608,7 @@ ru: список
 sk: zoznam
 sl: seznam
 sv: lista/trädlista
+tr: liste
 
     listePassenger
 co: lista di i passageri
@@ -8544,6 +8622,7 @@ nl: Passagierslijst
 no: Passasjerliste
 pt: lista de passageiros
 sv: Passagerarlista
+tr: Yolcu Listesi
 
     lists and charts
 co: arburi, liste è stati
@@ -8559,6 +8638,7 @@ oc: listas, arbres e estats
 pt: listas e gráficos
 ru: списки и диаграммы
 sv: Släkttavlor och listor
+tr: Grafikler ve Listeler
 
     lists of books
 co: liste di dizziunarii
@@ -8568,6 +8648,7 @@ oc: lista dels diccionaris
 pt: lista de dicionários
 ru: список словарей
 sv: lista öve förteckningar
+tr: Kitap listeleri
 
     living after %s
 co: vivu(a) dopu %s
@@ -8583,6 +8664,7 @@ oc: viu(va) après %s
 pt: vivo/a após %s
 ru: жил(а) после %s
 sv: Lever efter %s
+tr: %s'den sonra yaşadı
 
     living before %s
 co: vivu(a) nanzu %s
@@ -8598,6 +8680,7 @@ oc: viu(va) abans %s
 pt: vivo/a antes de %s
 ru: жил(а) до %s
 sv: Lever innan %s
+tr: %s'den önce yaşadı
 
     living between %s and %s
 co: vivu(a) trà %s è %s
@@ -8613,6 +8696,7 @@ oc: viu(va) entre %s e %s
 pt: vivo/a entre %s e %s
 ru: жил(а) между %s и %s
 sv: Lever mellan %s och %s
+tr: %s ile %s arasında yaşadı
 
     living from/to
 co: vivu(a) da/à
@@ -8628,6 +8712,7 @@ oc: viu(va) de/entrò
 pt: vivo/a de/até
 ru: жил(а) с %s по %s
 sv: Lever från/till
+tr: yaşamış/için
 
     long display
 af: uitgebreide weergawe
@@ -8658,6 +8743,7 @@ ru: подробно
 sk: dlhý zoznam
 sl: dolg seznam
 sv: utökad rapport
+tr: tam ekran
 
     looking for
 co: elementi à ricercà
@@ -8673,6 +8759,7 @@ oc: elements de recercar
 pt: elementos a pesquisar
 ru: параметры поиска
 sv: Leta efter
+tr: Kontrol
 
     loop in database: %s is his/her own ancestor
 af: fout in die databasis: %s sy/haar eie voorvader
@@ -8703,6 +8790,7 @@ ru: петля в базе данных: %s его/ее совственный �
 sk: slučka v databáze: %s je svoj predok
 sl: krog v bazi podatkov: %s je svoj(a) prednik
 sv: loop i databasen: %s är sin egen ana
+tr: veritabanında döngü: %s kendi atası
 
     M/F
 af: M/V
@@ -8733,6 +8821,7 @@ ru: М/Ж
 sk: M/Ž
 sl: M/Ž
 sv: M/K
+tr: E/K
 
     main title
 af: hooftitel
@@ -8763,6 +8852,7 @@ ru: главный заголовок
 sk: hlavný titul
 sl: glavni naziv
 sv: huvudtitel
+tr: ana başlık
 
     male line/female line
 af: manlike lyn/vroulike lyn
@@ -8793,6 +8883,7 @@ ru: мужская линия/женская линия
 sk: mužská línia/ženská línia
 sl: moška linija/ženska linija
 sv: manliga linjen/kvinnliga linjen
+tr: erkek hattı/kadın hattı
 
     male/female/neuter
 co: omu/donna/micca specificatu
@@ -8808,6 +8899,7 @@ oc: òme/femna/neutra&#047;se sap pas
 pt: masculino/feminino/neutro&#047;não especificado
 ru: мужчина/женщина/неизвестно
 sv: manling/kvinnlig/neutral&#047;okänt
+tr: erkek/kadın/nötr&#047;bilinmeyen
 
     marriage bann
 co: ammunimi di matrimoniu
@@ -8821,6 +8913,7 @@ nl: Ondertrouw
 no: Ta ut lysning
 pt: proibição de casamento
 sv: Förbjudet äktenskap
+tr: evlilik yasağı
 
     marriage banns%t to
 co: ammunimi di matrimoniu%t cù
@@ -8834,6 +8927,7 @@ nl: huwelijksafkondiging%t met
 no: lysning%t med
 pt: editais de casamento%t com
 sv: lysning%t med
+tr: evlilik yasakları%t ile
 
     marriage contract
 co: cuntrattu di matrimoniu
@@ -8847,6 +8941,7 @@ nl: Huwelijkse Voorwaarden
 no: Ektepakt
 pt: contrato de casamento
 sv: Äktenskapförord
+tr: evlilik sözleşmesi (nikah)
 
     marriage date
 co: data di l’unione
@@ -8862,6 +8957,7 @@ oc: data del maridatge
 pt: data de casamento
 ru: дата бракосочетания
 sv: Datum för giftermål
+tr: evlilik tarihi
 
     marriage event
 co: matrimoniu
@@ -8875,6 +8971,7 @@ nl: Huwelijk
 no: Ekteskap
 pt: casamento
 sv: Äktenskap
+tr: evlilik
 
     marriage had occurred after the death of %t
 af: huwelik plaasgevind het nadat %t dood
@@ -8903,6 +9000,7 @@ ru: свадьба состоялась после смерти %t
 sk: Manželstvo sa konalo po smrti %t
 sl: poroka je potekala po smrti %t
 sv: äktenskapet ägde rum efter att %t var död
+tr: evlilik %t'in ölümünden sonra gerçekleşti
 zh: 結婚後%t死亡的地方
 
     marriage had occurred before the birth of %t
@@ -8932,6 +9030,7 @@ ru: Свадьба состоялась до рождения %t
 sk: manželstvo bolo uzavreté pred narodením %t
 sl: sklenjena zakonska zveza pred rojstvom %t
 sv: äktenskapet ägde rum före %t födsel
+tr: evlilik %t'in doğumundan önce gerçekleşmişti
 zh: 結婚前%t出生的地方
 
     marriage licence
@@ -8946,6 +9045,7 @@ nl: Huwelijkstoestemming
 no: Vielsesattest
 pt: licença de casamento
 sv: Äktenskapslicens
+tr: Evlilik Cüzdanı
 
     marriage notes/marriages notes
 co: note apprupositu di l’unione/note apprupositu di l'unioni
