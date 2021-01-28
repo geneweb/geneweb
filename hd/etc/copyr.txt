@@ -1,7 +1,7 @@
 <!-- copyr.txt v7.00 28/04/2017 04:05:59 -->
 %define;language(x)
   %apply;nth%with;
-    /af/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
+    /af/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
   %and;x%end;
 %end;
 %define;language_link()
@@ -63,6 +63,7 @@
               <a class="dropdown-item" href="%prefix_no_lang;lang=sk;%if;(evar.digest="")%suffix;%end;">sk</a>
               <a class="dropdown-item" href="%prefix_no_lang;lang=sl;%if;(evar.digest="")%suffix;%end;">sl</a>
               <a class="dropdown-item" href="%prefix_no_lang;lang=sv;%if;(evar.digest="")%suffix;%end;">sv</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=tr;%if;(evar.digest="")%suffix;%end;">tr</a>
               <a class="dropdown-item" href="%prefix_no_lang;lang=zh;%if;(evar.digest="")%suffix;%end;">zh</a>
             </div>
           %else;

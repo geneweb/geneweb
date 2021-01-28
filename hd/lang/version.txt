@@ -240,6 +240,13 @@ sv: Du kan välja ett annat språk bland de följande:
            id="isv" style="border: 0"%/><span>%usv;</span></a>
         </li>
         <li>
+          <a title="%utr;" href="%glang=tr"
+           onmouseover="if (WorkOnBrowser()) itr.src='%o/t-tr.png'"
+           onmouseout="itr.src='%o/l-tr.jpg'"><img
+           src="%o/l-tr.jpg" width="36" height="22" alt=""
+           id="itr" style="border: 0"%/><span>%utr;</span></a>
+        </li>
+        <li>
           <a title="%uzh;" href="%glang=zh"
            onmouseover="if (WorkOnBrowser()) izh.src='%o/t-zh.png'"
            onmouseout="izh.src='%o/l-zh.jpg'"><img

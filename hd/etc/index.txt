@@ -56,6 +56,7 @@
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=sk%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sk">slovenčina</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=sl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sl">slovenščina</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=sv%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sv">svenska</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=tr%if;(evar.templ!="");templ=%evar.templ;;%end;" title="tr">turkish</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=zh%if;(evar.templ!="");templ=%evar.templ;;%end;" title="zh">中文</a>
 </div>
 </div>
