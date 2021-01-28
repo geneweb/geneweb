@@ -15374,6 +15374,7 @@ ru: сегодня
 sk: dnes
 sl: danes
 sv: i dag
+tr: bugün
 
     tomorrow
 af: môre
@@ -15404,6 +15405,7 @@ ru: завтра
 sk: zajtra
 sl: jutri
 sv: i morgon
+tr: yarın
 
     tools
 co: attrezzi
@@ -15419,6 +15421,7 @@ oc: aisinas
 pt: ferramentas
 ru: инструменты
 sv: verktyg
+tr: araçlar
 
     total
 af: totaal
@@ -15449,6 +15452,7 @@ ru: всего
 sk: spolu
 sl: skupaj
 sv: totalt
+tr: toplam
 
     town
 co: cumuna
@@ -15464,6 +15468,7 @@ oc: Comuna
 pt: Localidade
 ru: Город
 sv: Socken/kommun
+tr: Kasaba
 
     tree
 af: boom
@@ -15494,6 +15499,7 @@ ru: дерево
 sk: strom
 sl: drevo
 sv: träd
+tr: ağaç
 
     tree of witnesses
 co: arburu di i testimoni
@@ -15501,6 +15507,7 @@ en: tree of witnesses
 fr: arbre des témoins
 pt: árvore de testemunhas
 sv: vittnesträd
+tr: tanıklar ağacı
 
     trees & lists
 co: Arburi è Liste
@@ -15516,6 +15523,7 @@ oc: Arbres e Listas
 pt: Tabelas & Listas
 ru: Деревья и Списки
 sv: Diagram & Listor
+tr: Grafikler ve Listeler
 
     try again
 bg: опитайте отново
@@ -15535,6 +15543,7 @@ pt: tente novamente
 ru: повторите попытку
 sk: skús znovu
 sv: försök igen
+tr: yeniden dene
 
     try another/relationship computing
 co: Cliccà quì/per pruvà un modu di calculu sfarente
@@ -15550,6 +15559,7 @@ oc: Clicatz aicí/per ensajar un autre mòde de calcul
 pt: Clique aqui/para tentar um modo de cálculo diferente
 ru: попытайтесь изменить тип связи
 sv: Försök ett annat beräkningssätt
+tr: başka bir hesaplama seçeneği deneyin
 
     uncheck
 co: diselezziunà
@@ -15557,6 +15567,7 @@ en: uncheck
 fr: décocher
 pt: desseleccionar
 sv: avmarkera
+tr: işaretini kaldırın
 
     uncles and aunts
 af: ooms en tantes
@@ -15587,6 +15598,7 @@ ru: дяди и тети
 sk: strýkovia a tety
 sl: strici in tete
 sv: farbröder-morbröder och fastrar-mostrar
+tr: amcalar ve teyzeler
 
     undefined sex for %t
 af: geslag onbekend vir %t
@@ -15617,6 +15629,7 @@ ru: неизвестный пол у %t
 sk: nedefinované pohlavie pre %t
 sl: %t nima določenega spola
 sv: odefinierat kön för %t
+tr: %t için cinsiyet tanımlanmamış
 
     unknown person
 af: onbekende persoon
@@ -15647,6 +15660,7 @@ ru: неизвестный человек
 sk: neznáma osoba
 sl: neznana oseba
 sv: okänd person
+tr: bilinmeyen kişi
 
     unspecified
 af: nie gemeld nie
@@ -15677,6 +15691,7 @@ ru: неопределенный
 sk: neurčené
 sl: nedoločeno
 sv: ospecificerad
+tr: belirtilmemiş
 
     up to
 af: tot by
@@ -15707,6 +15722,7 @@ ru: вплоть до
 sk: až po :a:
 sl: do
 sv: upp till
+tr: kadar
 
     update
 af: bywerk
@@ -15738,6 +15754,7 @@ ru: изменить
 sk: upraviť
 sl: spremeni
 sv: uppdatera
+tr: Güncelleme
 zh:  更新
 
     update family
@@ -15754,6 +15771,7 @@ oc: gerir las unions
 pt: atualizar família
 ru: изменить семью
 sv: Redigera familj
+tr: Aileyi Düzenle
 
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"
@@ -15784,6 +15802,7 @@ ru: используйте "связать" вместо "создать"
 sk: použi "spojenie" namiesto "vytvorenia"
 sl: uporabite "povezava" namesto "ustvari"
 sv: använd "länk" istället för "skapa"
+tr: "oluştur" yerine "bağlantı" kullanın
 
     user/password/cancel
 bg: ползвател/парола/отказване
@@ -15808,6 +15827,7 @@ ro: utilizator/parola/anulare
 ru: пользователь/пароль/отмена
 sl: uporabnik/geslo/prekliči
 sv: användare/lösenord/avbryt
+tr: kullanıcı/şifre/iptal
 
     validate/delete
 bg: да се потвърди/да се изтрие
@@ -15831,6 +15851,7 @@ ro: valideaza/sterge
 ru: проверить/удалить
 sk: potvrdiť/zmazať
 sv: utför/tag bort
+tr: gönder/sil
 
     venteBien
 co: vendita d’un bè
@@ -15844,6 +15865,7 @@ nl: Verkoop van eigendom
 no: Salg av eiendom
 pt: venda de um bem
 sv: Försäljning av egendom
+tr: Mülk satışı
 
     version
 co: versione
@@ -15857,6 +15879,7 @@ oc: version
 pt: versão
 ru: версия
 sv: version
+tr: Sürüm
 
     view source
 co: fighjà a fonte
@@ -15874,6 +15897,7 @@ pt: ver a fonte
 ru: просмотр первоисточника
 sk: pozri zdroj
 sv: se källa
+tr: kaynağı görüntüle
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
@@ -15897,6 +15921,7 @@ ro: vizualizeaza/arata/ascunde/sumar
 ru: построить/показать/скрыть/общая
 sk: vizualizovať/ukázať/schovať/sumarizovať
 sv: visualisera/visa/dölj/summering
+tr: görüntüle/göster/gizle/özet
 
     vital record
 co: scheda
@@ -15912,6 +15937,7 @@ oc: Persona
 pt: Pessoa
 ru: личность
 sv: Individ
+tr: Bireysel
 
     warnings
 af: waarskuwings
@@ -15942,6 +15968,7 @@ ru: внимание
 sk: varovanie
 sl: opozorila
 sv: varningar
+tr: uyarılar
 
     where born
 co: locu di nascita
@@ -15957,6 +15984,7 @@ oc: lòc de naissença
 pt: local de nascimento
 ru: были рождены
 sv: födelseort
+tr: nerede doğdu
 
     where dead
 co: locu di trapassu
@@ -15972,6 +16000,7 @@ oc: lòc de decès
 pt: local do óbito
 ru: были мертвы
 sv: dödsort
+tr: nerede öldü
 
     where married
 co: locu di l’unione
@@ -15987,6 +16016,7 @@ oc: lòc de l'union
 pt: local da união
 ru: были в браке
 sv: vigselort
+tr: Nerede evlendi
 
     width
 co: larghezza
@@ -15994,6 +16024,7 @@ en: width
 fr: largeur
 pt:  largura
 sv: bredd
+tr: Genişlik
 
     will
 co: testamentu
@@ -16007,6 +16038,7 @@ nl: Testament
 no: Testamente
 pt: testamento
 sv: Testamente
+tr: Vasiyet
 
     with
 af: met
@@ -16037,6 +16069,7 @@ ru: с
 sk: s :i:
 sl: z
 sv: med
+tr: ile
 
     with root, spouses and unknowns
 co: cù l’antenatu di a radica, i cumpagni è i scunnisciuti
@@ -16044,6 +16077,7 @@ en: with root ancestor, spouses and unknowns
 fr: avec l’ancêtre racine, les conjoints et les inconnus
 pt: com o antepassado raiz, cônjuges e desconhecidos 
 sv: med rot, partners och okända
+tr: kök atası, eşler ve bilinmeyenler ile
 
     witness at %s of
 co: testimone à u %s di
@@ -16051,6 +16085,7 @@ en: witness at %s of
 fr: témoin au %s de
 pt: testemunha de %s de
 sv: vittne vid %s av
+tr: %s tanık
 
     witness at marriage of %s and %s
 af: getuie by die troue van %s met %s
@@ -16081,24 +16116,28 @@ ru: свидетель в браке %s и %s
 sk: svedok na svadbe %s a %s
 sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
+tr: %s ve %s evliliğinde tanık
 
     witnesses at his events
 co: testimoni à i so avvenimenti
 en: witnesses at his events
 fr: témoins à ses évènements
 sv: vittnen vid hans händelser
+tr: etkinliklerinde tanıklar
 
     witnesses to events of
 co: testimoni à l’avvenimenti di
 en: witnesses to events of
 fr: témoins aux évènements de
 sv: vittnen vid händelser för
+tr: etkinliklerinin tanıkları
 
     witnesses to my events and godparents
 co: testimoni à i mo avvenimenti è cumpare/cummare
 en: witnesses to my events and godparents
 fr: témoins à mes évènements et parrains/marraines
 sv: vittnen vid mina händelser och gudföräldrar
+tr: etkinliklerime ve vaftiz babalarıma tanıklar
 
     witness tree
 co: arburu di i testimoni
@@ -16106,6 +16145,7 @@ en: tree of witnesses
 fr: arbre des témoins
 pt: árvore de testemunhas
 sv: vittnesträd
+tr: tanıklar ağacı
 
     witness/witness/witnesses
 af: getuie/getuie/getuies
@@ -16136,6 +16176,7 @@ ru: свидетель:g:--я:a:--я/свидетель:g:--я:a:--я/свиде
 sk: svedok:g:--ka/svedok:g:--ka/svedkovia
 sl: priča/priča/priče
 sv: vittne/vittne/vittnen
+tr: tanık/tanık/tanıklar
 
     witness/witnesses
 co: testimone/testimoni
@@ -16143,6 +16184,7 @@ en: witness/witnesses
 fr: témoin/témoins
 pt: testemunha/testemunhas
 sv: vittne/vittnen
+tr: tanık/tanıklar
 
     wizard/wizards/friend/friends/exterior
 af: Medewerkers/Medewerkers/vriend/vriend/exterior
@@ -16173,6 +16215,7 @@ ru: wizard/wizard/друг/друг/exterior
 sk: wizard/wizards/friend/friends/exterior
 sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
 sv: administratör/administratörer/vän/vän/extern
+tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
 
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees
@@ -16203,6 +16246,7 @@ ru: было бы его/ее собственным предком
 sk: bol/bola by svoj vlastný predok
 sl: bi bil svoj lasten prednik
 sv: skulle vara sin egen ana
+tr: kendi atası olurdu
 
     Y/N
 af: J/N
@@ -16232,6 +16276,7 @@ ru: Д/Н
 sk: áno/nie
 sl: da/ne
 sv: J/N
+tr: Y/N
 
     year/month/day
 af: jaar/maand/dag
@@ -16263,6 +16308,7 @@ ru: год/месяц/день
 sk: rok/mesiac/deň
 sl: leto/mesec/dan
 sv: år/månad/dag
+tr: yıl/ay/gün
 
     years old
 af: jaar.
@@ -16294,6 +16340,7 @@ ru: лет
 sk: rokov
 sl: let
 sv: år
+tr: yaşında
 zh:  岁
 
     you are visible/you are not visible
@@ -16312,6 +16359,7 @@ pt: você é visível/você não é visível
 ro: tu esti vizibil/tu nu esti vizibil
 ru: вы видны/вы скрыты
 sv: du är synlig/du är ej synlig
+tr: görünürsünüz/görünmezsiniz
 
     you must first merge
 af: jy moet eers saamvoeg
@@ -16342,6 +16390,7 @@ ru: вы должны сначала объединить
 sk: najprv musíš spojiť
 sl: naprej morate združiti
 sv: du måste först slå samman
+tr: önce birleştirmelisin
 
     you must first merge the 2 families
 af: jy moet eers die twee families saamvoeg
@@ -16372,6 +16421,7 @@ ru: вы должны сначала объединить 2 семьи
 sk: najprv musíš spojiť tieto dbe rodiny
 sl: najprej morate združiti obe družini
 sv: du måste först slå samman de 2 familjerna
+tr: önce 2 aileyi birleştirmelisiniz
 
     your message is waiting for validation
 bg: съобщението Ви очаква потвърждение
@@ -16395,3 +16445,4 @@ ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på godkännande
+tr: mesajınız doğrulama için bekliyor
