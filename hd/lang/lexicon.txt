@@ -11511,6 +11511,7 @@ ru: другие действия
 sk: ďalšie akcie
 sl: druge dejavnosti
 sv: andra åtgärder
+tr: diğer eylem
 zh: 其他行動
 
     PACS
@@ -11525,6 +11526,7 @@ nl: Burgerlijk Huwelijk
 no: Borgelig vielse
 pt: PACS
 sv: Borgerligt äktenskap
+tr: Sivil Evlilik
 
     pacsed%t to
 de: Eheähnliches Verhältnis%t mit
@@ -11537,6 +11539,7 @@ nl: Samenlevingscontract%t met
 no: Samboeravtale%t med
 pt: Pacto civil de solidariedade%t com
 sv: Sambo%t med
+tr: Sivil dayanışma paktı%t ile
 
     parents
 af: ouers
@@ -11568,6 +11571,7 @@ ru: родители
 sk: rodičia
 sl: starši
 sv: föräldrar
+tr: ebeveynler
 zh:  父母
 
     participant/participant
@@ -11575,6 +11579,7 @@ co: participante/participante
 en: participant/participant
 fr: participant/participante
 sv: deltagare/deltagare
+tr: katılımcı/katılımcı
 
     paternal grand-parents
 co: caccari paterni
@@ -11590,6 +11595,7 @@ oc: grands paternals
 pt: avós paternos
 ru: бабушка и дедушка со стороны отца
 sv: farmor och farfar
+tr: Babanın ailesi
 
     person added
 af: persoon bygevoeg
@@ -11620,6 +11626,7 @@ ru: человек добавлен
 sk: osoba pridaná
 sl: oseba dodana
 sv: person tillagd
+tr: kişi eklendi
 
     person deleted
 af: persoon verwyder
@@ -11650,6 +11657,7 @@ ru: человек удален
 sk: osoba zmazaná
 sl: oseba izbrisana
 sv: person borttagen
+tr: kişi silindi
 
     person modified
 af: persoon verander
@@ -11680,6 +11688,7 @@ ru: человек изменен
 sk: osoba zmenená
 sl: oseba spremenjena
 sv: person ändrad
+tr: kişi değiştirildi
 
     person source
 co: fonte di l’individuu
@@ -11695,6 +11704,7 @@ oc: font de la persona
 pt: fonte pessoa
 ru: документ, удостоверяющий личность
 sv: Personkälla
+tr: Bireyin kaynağı
 
     person/persons
 af: persoon/persone
@@ -11725,6 +11735,7 @@ ru: Человека/Человек
 sk: osoba/osoby
 sl: oseba/oseb
 sv: person/personer
+tr: birey/bireyler
 
     persons having the same name
 af: persone met dieselfde nommer
@@ -11756,6 +11767,7 @@ ru: человек с тем же именем
 sk: osoby majúce to isté meno
 sl: osebe z istim imenom
 sv: personer med samma namn
+tr: aynı adı taşıyan kişiler
 
     photos & documents
 co: Fiure è Ducumenti
@@ -11771,6 +11783,7 @@ oc: fotos e documents
 pt: Arquivo & Imagens
 ru: фотографии и документы
 sv: Arkiv & Bilder
+tr: Arşiv ve Resimler
 
     place
 af: plek
@@ -11801,6 +11814,7 @@ ru: место
 sk: miesto
 sl: kraj
 sv: plats
+tr: yer
 
     places
 co: lochi
@@ -11816,6 +11830,7 @@ oc: lòcs
 pt: locais
 ru: места
 sv: orter
+tr: yerler
 
     plus
 co: più
@@ -11831,6 +11846,7 @@ oc: Mai
 pt: Mais
 ru: Ещё
 sv: Mer
+tr: Daha
 
     population pyramid
 bg: възрастова пирамида
@@ -11857,6 +11873,7 @@ ru: пирамида популяции
 sk: populačná pyramída
 sl: populacijska piramida
 sv: befolkningspyramid
+tr: nüfus piramidi
 
     possible duplications
 bg: възможни дублирания
@@ -11882,6 +11899,7 @@ ru: возможные дубликаты
 sk: možné duplikácie
 sl: možno podvajanje
 sv: möjliga dubbletter
+tr: Olası çoğaltmalar
 
     possibly (date)
 af: miskien
@@ -11912,6 +11930,7 @@ ru: возможно
 sk: možno
 sl: verjetno
 sv: kanske
+tr: muhtemelen
 
     precision
 af: akkuraatheid
@@ -11942,6 +11961,7 @@ ru: точно
 sk: presne
 sl: natančnost
 sv: precision
+tr: hassaslık
 
     presentation
 co: Prisentazione
@@ -11955,6 +11975,7 @@ pl: Prezentacja
 pt: Apresentação
 ru: представление
 sv: presentation
+tr: Sunum
 
     preview family tree
 co: avvistu di l’arburu
@@ -11970,6 +11991,7 @@ oc: vista de l'arbre
 pt: ver árvore
 ru: ветвь фамильного дерева
 sv: översikt över
+tr: Soy Ağacının Önizlemesi
 
     previous sibling
 af: vorige broer/vorige suster/vorige broer of suster
@@ -12000,6 +12022,7 @@ ru: предшествующий брат/предшествующая сест�
 sk: starší brat/staršia sestra/starší súrodenec
 sl: starejši brat/starejša sestra
 sv: föregående bror/föregående syster/föregående syskon
+tr: önceki kardeş
 
     previous/next diff
 co: revisione precedente/revisione seguente
@@ -12007,6 +12030,7 @@ en: previous revision/next revision
 fr: révision précédente/révision suivante
 pt: revisão anterior/revisão seguinte
 sv: föregående version/nästa version
+tr: önceki revizyon/sonraki revizyon
 
     private
 af: privaat
@@ -12037,6 +12061,7 @@ ru: Частный
 sk: súkromé
 sl: zasebno
 sv: privat
+tr: özel
 
     property
 co: pruprietà
@@ -12050,6 +12075,7 @@ nl: Eigendom
 no: Eiendom
 pt: propriedade
 sv: Egendom
+tr: Mülk
 
     public
 af: openbare
@@ -12080,6 +12106,7 @@ ru: общий
 sk: verejné
 sl: javno
 sv: offentligt
+tr: kamu
 
     public name
 af: Noemnaam
@@ -12110,6 +12137,7 @@ ru: известен как
 sk: verejné meno
 sl: uradno ime
 sv: officiellt namn
+tr: genel adı
 
     qualifier
 af: bynaam
@@ -12140,6 +12168,7 @@ ru: прозвище
 sk: prívlastok
 sl: oznaka
 sv: smeknamn
+tr: takma ad
 
     recensement
 co: censimentu
@@ -12153,6 +12182,7 @@ nl: Volkstelling
 no: Folketelling
 pt: recenseamento
 sv: Folkräkning
+tr: Nüfus sayımı
 
     recognized son/recognized daughter/recognized child
 af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
@@ -12183,6 +12213,7 @@ ru: усыновлен/удочерена/признанный ребенок
 sk: uznaný syn/uznaná dcéra/uznaný potomok
 sl: znan sin/znana hčerka/znani otroci
 sv: erkänd son/erkänd dotter/erkänt barn
+tr: tanınan oğul/tanınan kız/tanınan çocuk
 
     recognizing father/recognizing mother/recognizing parents
 af: erkennende vader/erkennende moeder/erkennende ouders
@@ -12213,6 +12244,7 @@ ru: признанный отец/признанная мать/признаны
 sk: uznaný otec/uznaná matka/uznaný rodič
 sl: znani oče/znana mati/znani starši
 sv: erkännande far/erkännande mor/erkännande föräldrar
+tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
 
     reduce/increase
 co: reduce/aumentà
@@ -12220,6 +12252,7 @@ en: reduce/increase
 fr: réduire/augmenter
 pt: reduzir/aumentar
 sv: minska/öka
+tr: azalt/arttır
 
     reference key
 co: referenza
@@ -12235,6 +12268,7 @@ oc: referéncia
 pt: referência
 ru: ID
 sv: referens
+tr: Kimlik (ID)
 
     region
 co: Rughjone
@@ -12250,6 +12284,7 @@ oc: Region
 pt: Região
 ru: регион
 sv: Län/Region
+tr: Bölge
 
     relation/relations
 af: verwant/verwante
@@ -12280,12 +12315,14 @@ ru: отношения/отношения
 sk: vzťah/vzťahy
 sl: razmerje/razmerja
 sv: relation/relationer
+tr: ilişki/ilişkiler
 
     relations of
 co: rilazioni di
 en: relations of
 fr: relations de
 sv: relation med
+tr: ilişkileri
 
     relations tree
 co: arburu di e rilazioni
@@ -12293,6 +12330,7 @@ en: tree of relations
 fr: arbre des relations
 pt: árvore de familiares
 sv: relationsträd
+tr: ilişkiler ağacı
 
     relationship
 af: verwantskap
@@ -12323,6 +12361,7 @@ ru: родство
 sk: vzťah
 sl: zveza
 sv: släktskap
+tr: ilişki
 
     relationship by ancestors
 co: ascendenti diretti
@@ -12338,6 +12377,7 @@ oc: ascendents dirèctes
 pt: ascendentes diretos
 ru: прямые потомки
 sv: anor
+tr: soy
 
     relationship by marriage
 af: aangetroude verwantskappe
@@ -12368,6 +12408,7 @@ ru: связь браком
 sk: príbuzenské vzťahy cez svadby
 sl: sorodstvo preko poroke
 sv: släktskap genom äktenskap
+tr: evliliğe yoluyla akrabalar
 
     relationship computing
 af: bereken verwantskappe
@@ -12398,6 +12439,7 @@ ru: кому приходится
 sk: nájdenie vzťahov
 sl: pregled sorodstva
 sv: släktskapsberäkning
+tr: ilişki hesaplama
 zh:  相关查询
 
     relationship computing mode
@@ -12414,6 +12456,7 @@ oc: mòde de calcul
 pt: modo de cálculo
 ru: искать связь
 sv: uträkningssätt
+tr: Mod
 
     relationship display options
 co: ozzioni per affissà l’arburi di parentia :
@@ -12429,6 +12472,7 @@ oc: opcions d’afichatge dels arbres de parentat:
 pt: opções de edição das árvores de parentesco:
 ru: настройки отображения
 sv: sätt att visa
+tr: seçenekler:
 
     relationship link between
 co: leia di parentia cù...
@@ -12444,6 +12488,7 @@ oc: ligam de parentat amb...
 pt: parentesco com...
 ru: родственные связи между...
 sv: släktskap med...
+tr: ile aile bağı...
 
     relationship link/relationship links
 af: verwantskap/verwantskappe
@@ -12474,6 +12519,7 @@ ru: родственная связь/родственные связи
 sk: príbuzenský vzťah/príbuzenské vzťahy
 sl: sorodnik/sorodnikov
 sv: anlinje/anlinjer
+tr: ilişki/ilişkiler
 
     relationship shortcut
 co: accurtatoghji :
@@ -12489,6 +12535,7 @@ oc: acorchas:
 pt: atalhos:
 ru: Ссылки:
 sv: genväg:
+tr: kısayollar:
 
     relationship%t to
 af: verwantskap%t met
@@ -12520,6 +12567,7 @@ ru: приходится%t
 sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
+tr: ile ilişki%t
 
     remove last module
 co: caccià l’ultimu modulu aghjuntu
@@ -12527,12 +12575,14 @@ en: remove the last added module
 fr: retirer le dernier module ajouté
 pt: remover o último módulo adicionado
 sv: tag bort senast tillagda modul
+tr: son eklenen modülü kaldır
 
     reserved to friends or wizards
 co: riservatu à l’amichi è à i maghi
 en: reserved to friends or wizards
 fr: réservée aux amis et magiciens
 sv: reserverat för vänner och administratörer
+tr: arkadaşlar veya sihirbazlar için ayrılmış
 
     reset to
 co: risturà
@@ -12540,6 +12590,7 @@ en: reset to
 fr: restaurer
 pt: restaurar
 sv: återställ till
+tr: sıfırla
 
     residence
 co: residenza
@@ -12553,6 +12604,7 @@ nl: Woonplaats
 no: Bopel
 pt: residência
 sv: Bostad
+tr: İkamet
 
     residence%t to
 co: residenza%t cù
@@ -12566,6 +12618,7 @@ nl: woonplaats%t met
 no: bopel%t med
 pt: residência%t com
 sv: sammanboende%t med
+tr: ikamet%t ile
 
     retired
 co: ritirata
@@ -12581,6 +12634,7 @@ oc: retirat
 pt: reforma
 ru: пенсионер
 sv: Pensionerad
+tr: Emeklilik
 
     revision history
 co: cronulugia di i revisioni
@@ -12596,6 +12650,7 @@ oc: istoric de las revisions
 pt: histórico das revisões
 ru: история изменений
 sv: Uppdateringshistoria
+tr: Revizyon Geçmişi
 
     revision of
 co: revisione di u
@@ -12611,6 +12666,7 @@ oc: revision del
 pt: revisão de
 ru: дата изменения
 sv: Uppdatering gjord
+tr: Revizyon Tarihi
 
     same ancestor as n° Sosa
 co: uguale à u n° Sosa
@@ -12626,12 +12682,14 @@ oc: identic(a) al n° Sosa #
 pt: idêntico ao nº Sosa
 ru: тот же предок, что и у Sosa
 sv: Samma ättling som n° Sosa
+tr: Sosa ile aynı #
 
     scale
 co: anni à a generazione
 en: years by generation
 fr: années par génération
 pt: anos por geração
+tr: nesile göre yıllar
 
     scellentChildLDS
 co: leia eterna di zitelli LDS
@@ -12645,6 +12703,7 @@ nl: Kindverbinding (LDS)
 no: Besegling med barn (LDS)
 pt: selamento de criança LDS
 sv: Besegling med barn (LDS)
+tr: Mühürlü Çocuk (LDS)
 
     scellentParentLDS
 co: leia eterna cù i genitori LDS
@@ -12658,6 +12717,7 @@ nl: Ouderverbinding (LDS)
 no: Besegling med forelder (LDS)
 pt: selamento aos pais LDS
 sv: Besegling med föräldrar (LDS)
+tr: Mühürlü Ebeveyn (LDS)
 
     scellentSpouseLDS
 co: leia eterna cù a sposa LDS
@@ -12671,6 +12731,7 @@ nl: Echtverbinding (LDS)
 no: Besegling med ektefelle (LDS)
 pt: selamento ao cônjuge LDS
 sv: Besegling med syskon (LDS)
+tr: Mühürlü Eş (LDS)
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
@@ -12699,6 +12760,7 @@ ru: поиск/регистрозависимый
 sk: hľadať/citlivý na veľkosť písma
 sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
+tr: arama/büyük küçük harfe duyarlı
 
     searching all
 co: ricerca tutti i
@@ -12714,6 +12776,7 @@ oc: recercar totes los
 pt: pesquisar todos os
 ru: поиск
 sv: Sök alla
+tr: Arama
 
     see
 af: sien
@@ -12744,6 +12807,7 @@ ru: смотри
 sk: pozri
 sl: glej
 sv: se
+tr: görmek
 
     see above
 af: kyk hierbo
@@ -12775,6 +12839,7 @@ ru: смотри выше
 sk: pozri vyššie
 sl: glej zgoraj
 sv: se ovan
+tr: yukarıya bakın
 
     see also
 co: fighjà dinù
@@ -12790,6 +12855,7 @@ oc: tanben veire
 pt: ver também
 ru: смотри также
 sv: se också
+tr: Ayrıca bakınız
 
     see ascendants notes/sources
 co: fighjà e note è e fonte
@@ -12805,6 +12871,7 @@ oc: veire las nòtas e las fonts
 pt: ver notas & fontes
 ru: смотри заметки/документы
 sv: Se noteringar och källor
+tr: Notları/kaynakları görüntüle
 
     see ascendants pictures
 co: fighjà e fotò
@@ -12820,6 +12887,7 @@ oc: veire las fòtos
 pt: ver fotos
 ru: смотри изображения предков
 sv: Se bilder
+tr: Resimleri görüntüle
 
     see descendants notes/sources
 co: fighjà e note è e fonte
@@ -12835,6 +12903,7 @@ oc: veire las nòtas e las fonts
 pt: ver notas & fontes
 ru: смотри заметки/документы потомков
 sv: Se noteringar och källor
+tr: Notları/kaynakları görüntüle
 
     see descendants pictures
 co: fighjà e fotò
@@ -12850,6 +12919,7 @@ oc: veire las fòtos
 pt: ver fotos
 ru: смотри изображения потомков
 sv: Se efterföljandes bilder
+tr: Resimleri görüntüle
 
     see further
 af: kyk verder
@@ -12880,6 +12950,7 @@ ru: смотри дальше
 sk: pozri ďalej
 sl: nadalje glej
 sv: se vidare
+tr: daha fazlasını gör
 
     see person
 co: statu civile
@@ -12895,6 +12966,7 @@ oc: estat civil
 pt: ver pessoa
 ru: смотри человека
 sv: Individ
+tr: Bireysel
 
     select
 co: sceglie
@@ -12910,6 +12982,7 @@ oc: causir
 pt: selecionar
 ru: выберите:
 sv: välj
+tr: seç
 
     select a letter
 co: sceglie una lettera
@@ -12925,6 +12998,7 @@ oc: causissètz-vos un caractèr
 pt: selecione um carácter
 ru: выберите букву
 sv: välj en bokstav
+tr: Bir karakter seçin
 
     select a month to see all the anniversaries
 co: selezziunà un mese per fighjà tutti l’anniversarii.
@@ -12940,6 +13014,7 @@ oc: causissètz-vos un mes per veire los aniversaris.
 pt: selecione um mês para ver todos os aniversários.
 ru: выберите месяц
 sv: välj en månad för att visa alla födelsedagar.
+tr: tüm yıldönümlerini görmek için bir ay seçin.
 
     select a spouse
 co: selezziunà un(a) cumpagnu(a) :
@@ -12955,6 +13030,7 @@ oc: causissètz-vos un conjunt:
 pt: selecione um cônjuge:
 ru: выберите супруга/супругу
 sv: Välj maka/make
+tr: Eş seçin
 
     select lang
 af: Taalvoorkeur/Language preference:
@@ -12982,6 +13058,7 @@ pt: Ver em:
 ro: poti sa alegi una din urmatoarele limbi pentru afisaj
 sl: Lahko izberete drug jezik:
 sv: Du kan välja ett annat språk bland de följande:
+tr: içinde görüntüle:
 
     select p_mod
 co: selezziunà i mudulli persunalizati
@@ -12989,6 +13066,7 @@ en: select personalized modules
 fr: selectionner les modules personnalisés
 pt: seleccionar os módulos personalizados (por defeito zz)
 sv: välj anpassad modul
+tr: kişiselleştirilmiş modülleri seçin
 
     select person to compute relationship
 co: cliccà nant’à a persona cù quella ci vole à fà un calculu di parentia
@@ -13004,6 +13082,7 @@ oc: causissètz-vos la persona de calcular la parentat.
 pt: selecione a pessoa sobre a qual pretende realizar um cálculo de parentesco.
 ru: выберите человека для поиска родственной связи
 sv: klicka på personen som du vill räkna ut släktskapsgraden med.
+tr: Aile bağlantısını hesaplamak için aşağıda bir kişiyi tıklayın.
 
     select the two revisions you want to compare
 co: selezziunà e duie revisioni ch’ellu ci vole à paragunà
@@ -13019,6 +13098,7 @@ oc: causissètz-vos las doás revisions de comparar.
 pt: selecione as duas revisões que pretende comparar.
 ru: выберите две версии для сравнения
 sv: Välj de två uppdateringar Du vill jämföra.
+tr: Geçmişi görüntülemek için düzeltmeleri seçin.
 
     send
 af: stuur
@@ -13049,6 +13129,7 @@ ru: послать
 sk: pošli
 sl: pošlji
 sv: skicka
+tr: yükle
 
     separate event
 co: staccanza
@@ -13062,6 +13143,7 @@ nl: Scheiding van tafel en bed
 no: Separasjon
 pt: separação
 sv: Separation
+tr: Ayrılık
 
     separated
 af: separated
@@ -13092,6 +13174,7 @@ ru: разделены
 sk: odlúčení
 sl: živela narazen
 sv: separerat
+tr: ayrılmış
 
     several answers
 af: verskeie antwoorde
@@ -13122,6 +13205,7 @@ ru: несколько ответов
 sk: viac odpovedí
 sl: več rešitev
 sv: flera svar
+tr: birkaç cevap
 
     sex
 af: geslag
@@ -13152,6 +13236,7 @@ ru: пол
 sk: pohlavie
 sl: spol
 sv: kön
+tr: cinsiyet
 
     short display
 af: beknopte weergawe
@@ -13182,6 +13267,7 @@ ru: кратко
 sk: krátky výpis
 sl: kratek seznam
 sv: kort rapport
+tr: kısa ekran
 
     shortcuts
 co: accurtatoghji di tastera
@@ -13189,6 +13275,7 @@ en: keyboard shortcuts
 fr: raccourcis clavier
 pt: atalhos do teclado
 sv: genvägar på tangentbordet
+tr: klavye kısayolları
 
     shortest path
 af: kortste pad
@@ -13219,6 +13306,7 @@ ru: кратчайший путь
 sk: najkratšia cesta
 sl: najkrajša vez
 sv: kortaste vägen
+tr: en kısa yol
 
     should be female
 af: behoort vroulik te wees
@@ -13249,6 +13337,7 @@ ru: должна быть женщиной
 sk: mala by byť žena
 sl: bi moral biti ženska
 sv: borde vara kvinna
+tr: kadın olmalı
 
     should be male
 af: behoort manlik te wees
@@ -13279,12 +13368,14 @@ ru: должен быть мужчиной
 sk: mal by byť muž
 sl: bi morala biti moški
 sv: borde vara man
+tr: erkek olmalı
 
     show implex
 co: identificà l’implessi
 en: show implex
 fr: identifier les implexes
 pt: identificar os implexos
+tr: implex göster
 
     siblings
 af: broers en susters
@@ -13315,6 +13406,7 @@ ru: братья или сесты
 sk: súrodenci
 sl: bratje in sestre
 sv: syskon
+tr: kardeşler
 
     siblings of the grandparents
 co: arcizii è arcizie
@@ -13324,6 +13416,7 @@ fr: grands-oncles et grands-tantes
 it: prozii e prozie
 pt: tios-avôs e tias-avós
 sv: syskon till far- och morföräldrar
+tr: büyük amcalar ve büyük teyzeler
 
     siblings of the great-grandparents
 co: fratelli è surelle di l’arcicaccari
@@ -13331,6 +13424,7 @@ en: great-granduncles and great-grandaunts
 fr: arrières-grands-oncles et arrières-grands-tantes
 pt: tios-bisavôs e tias-bisavós
 sv: syskon till föräldrar tre generationer bakåt
+tr: büyük büyük amcalar ve büyük büyük teyzeler
 
     since the last click
 bg: от последното щракване
@@ -13357,6 +13451,7 @@ ru: с момента последнего щелчка
 sk: od posledného poklepania
 sl: od zadnjega klika
 sv: sedan senaste klick
+tr: son tıklamadan bu yana
 
     size
 co: scala
@@ -13364,6 +13459,7 @@ en: scale
 fr: echelle
 pt: escala
 sv: skala
+tr: ölçek
 
     son/daughter/child
 af: seun/dogter/kind
@@ -13394,6 +13490,7 @@ ru: сын/дочь/дети
 sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: son/dotter/barn
+tr: oğul/kız/çocuk
 
     sons/daughters/children
 co: figlioli/figliole/zitelli
@@ -13401,6 +13498,7 @@ en: sons/daughters/children
 fr: fils/filles/enfants
 pt: filhos/filhas/filhos
 sv: söner/döttrar/barn
+tr: oğulları/kızları/çocukları
 
     sort by/branch/alphabetic order
 co: urganizà da :/ghjemba/ordine alfabeticu
@@ -13416,6 +13514,7 @@ oc: triar per:/branca/òrdre alfabetic
 pt: ordenar por:/ramo/ordem alfabética
 ru: сортировать по:/ветви/алфавиту
 sv: visas efter:/grenar/alfabetisk ordning
+tr: satır/alfabetik sıraya göre sırala
 
     sort by/date begin/alphabetic order/nb individuals/nb events
 co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’avvenimenti
@@ -13431,6 +13530,7 @@ oc: triar per:/date de debuta/òrdre alfabetic/nombre de personas/nombre d'eveni
 pt: ordenar por:/data de início/ordem alfabética/número de pessoas/número de eventos
 ru: сортировать по:/дате/алфавиту/людям/событиям
 sv: Sortera efter:/datum/bokstavsordning/antal individer/antal händelser
+tr: tarih/alfabetik sıra/kişi sayısı/etkinlik sayısına göre sırala
 
     sort by/generation/alphabetic order
 co: urganizà da :/generazione/ordine alfabeticu
@@ -13446,6 +13546,7 @@ oc: triar per:/generacion/òrdre alfabetic
 pt: ordenar por:/geração/ordem alfabética
 ru: сортировать по:/поколению/алфавиту
 sv: visas efter:/grenar/bokstavsordning
+tr: kuşak/alfabetik sıraya göre sırala
 
     Sosa
 af: Sosa
@@ -13476,6 +13577,7 @@ ru: Sosa
 sk: Sosa
 sl: številka Sosa
 sv: annummer
+tr: Sosa
 
     Sosa 1
 af: Sosa 1
@@ -13506,6 +13608,7 @@ ru: Sosa 1
 sk: Sosa 1
 sl: številka Sosa 1
 sv: annummer 1
+tr: Sosa 1
 
     sosa reference: %t
 af: Sosa verwysing: %t
@@ -13528,6 +13631,7 @@ ro: referinta Sosa: %t
 ru: ссылка Sosa: %t
 sk: referenciou "Sosa": %t
 sv: annummer: %t
+tr: Aile Ağacı Kökü: %t
 
     source/sources
 af: bron/bronne
@@ -13558,6 +13662,7 @@ ru: источник/источники
 sk: zdroj/zdroje
 sl: vir/viri
 sv: källa/källor
+tr: kaynak/kaynaklar
 
     specify
 af: dui aan
@@ -13588,6 +13693,7 @@ ru: укажите
 sk: upresni
 sl: določi
 sv: välj
+tr: seç
 zh:  从下列选取
 
     spouse/spouses
@@ -13604,6 +13710,7 @@ oc: conjunt/conjunts
 pt: cônjuge/cônjuges
 ru: супруг/супруги
 sv: partner/partners
+tr: eş/eşler
 
     spouses info
 co: infurmazione di i cumpagni
@@ -13611,6 +13718,7 @@ en: spouses informations
 fr: informations conjoints
 pt: informação do cônjuge
 sv: information om partner
+tr: eşler hakkında bilgi
 
     spouses not included
 af: eggenote weggelaat
@@ -13641,6 +13749,7 @@ ru: супругов не включать
 sk: manželia/manželky nie sú zahrnuté
 sl: brez mož/žena
 sv: exklusive makar
+tr: eşler dahil değil
 
     starting with
 af: beginnende met
@@ -13671,6 +13780,7 @@ ru: начинаются с
 sk: začať s
 sl: začenši z
 sv: som börjar med
+tr: ile başlar
 
     statistics
 af: statistiek
@@ -13701,6 +13811,7 @@ ru: статистика
 sk: štatistika
 sl: statistike
 sv: statistik
+tr: İstatistik
 
     statistics and anniversaries
 bg: статистика и годишнини
@@ -13717,6 +13828,7 @@ oc: estatisticas e aniversaris
 pt: estatísticas e aniversários
 ru: статистика и годовщины
 sv: statistik och årsdagar
+tr: istatistikler ve yıldönümleri
 
     subdivision
 co: paisolu
@@ -13732,6 +13844,7 @@ oc: lòc
 pt: localidade
 ru: раздел
 sv: ort
+tr: banliyö
 
     summary book ascendants
 co: lista d’individu
@@ -13747,6 +13860,7 @@ oc: lista de las personas
 pt: lista de fichas
 ru: список предков
 sv: lista över ansedlar
+tr: bireylerin listesi
 
     surname alias
 af: van alias
@@ -13778,6 +13892,7 @@ ru: новая:a:---ую фамилия:a:--ю
 sk: alias priezviska
 sl: drug priimek
 sv: efternamnalias
+tr: alternatif soyadı
 
     surname missing
 af: van ontbreek
@@ -13809,6 +13924,7 @@ ru: фамилия утрачена
 sk: priezvisko chýba
 sl: manjka priimek
 sv: efternamn saknas
+tr: soyadı eksik
 
     surname not found
 af: van nie gevind nie
@@ -13840,6 +13956,7 @@ ru: фамилия не найдена
 sk: priezvisko nenájdené
 sl: priimek ni najden
 sv: hittar inte efternamn
+tr: soyadı bulunamadı
 
     surname/surnames
 af: van/vanne
@@ -13872,6 +13989,7 @@ ru: фамилия/фамилии
 sk: priezvisko/priezviská
 sl: priimek/priimki
 sv: efternamn/efternamn
+tr: soyadı/soyadları
 zh:  姓
 
     surnames branch
@@ -13888,6 +14006,7 @@ oc: brancas patronimicas
 pt: ramos patronímicos
 ru: ветвь фамилии
 sv: efternamnsgrenar
+tr: isme göre satırlar
 
     surnames list
 af: vanne lys
@@ -13919,6 +14038,7 @@ ru: список фамилий
 sk: zoznam priezvísk
 sl: seznam priimkov
 sv: efternamnslista
+tr: soyadı listesi
 
     table
 co: tavula
@@ -13934,6 +14054,7 @@ oc: taula
 pt: tabela
 ru: таблица
 sv: tabell
+tr: Tablo
 
     text
 af: teks
@@ -13964,6 +14085,7 @@ ru: текст
 sk: text
 sl: tekst
 sv: text
+tr: Metin
 
     the %d first names
 af: die %d voorname
@@ -13995,6 +14117,7 @@ ru: %d имён
 sk: %d mien
 sl: %d lastnih imen
 sv: de %d förnamnen
+tr: %d ilk ad
 
     the %d oldest couples perhaps still alive and engaged
 af: die %d oudste pare moontlik nog in lewe en verloof
@@ -14025,6 +14148,7 @@ ru: старейшие %d возможно живых супругов или п
 sk: %d najstarších párov pravdepodobne žijúcich a zadaných
 sl: %d najstarejših morda še živih in zaročenih parov
 sv: de %d äldsta nu levande paren som kanske fortfarande är förlovade
+tr: %d en yaşlı çift belki hala hayatta ve nişanlı
 
     the %d oldest perhaps still alive
 af: die %d oudstes wat nog leef
@@ -14055,6 +14179,7 @@ ru: %d самых старых еще живущих
 sk: %d najstaších, snáď ešte žijúcich osôb
 sl: %d najstarejših, morda še živečih
 sv: de %d äldsta personerna som kanske lever
+tr: %d en yaşlı, belki hala yaşıyor
 
     the %d surnames
 af: die %d vanne
@@ -14086,6 +14211,7 @@ ru: %d фамилий
 sk: %d priezvísk
 sl: %d priimkov
 sv: de %d efternamnen
+tr: %d soyadı
 
     the %d who lived the longest
 af: die %d wat die langste gelewe het
@@ -14116,6 +14242,7 @@ ru: %d проживших дольше всех
 sk: %d osôb, ktoré žili najdlhšie
 sl: %d oseb, ki so živele najdlje
 sv: de %d personerna som har levt längst
+tr: %d en uzun yaşayan
 
     the %s generation
 af: die %s geslag
@@ -14146,6 +14273,7 @@ ru: %s-е поколение
 sk: %s. generácia
 sl: %s. generacija
 sv: den %s generationen
+tr: %s kuşak
 
     the anniversary
 af: die herdenking
@@ -14176,6 +14304,7 @@ ru: годовщина
 sk: výročie
 sl: obletnica
 sv: årsdagen
+tr: yıldönümü
 
     the anniversary of marriage
 af: die huweliksherdenking
@@ -14206,6 +14335,7 @@ ru: годовщина брака
 sk: výročie svadby
 sl: obletnica poroke
 sv: bröllopsdagen
+tr: evlilik yıldönümü
 
     the base has changed; do "back", "reload", and refill the form
 af: die databasis het verander; gaan "terug", "herlaai" en vul die vorm weer in
@@ -14236,6 +14366,7 @@ ru: база изменилась; нажмите "назад", "перечит�
 sk: databáza sa zmenila; vráťte se späť (back), znovu načítajte stránku (reload) a vyplňte formulár
 sl: baza podatkov se je spremenila: kliknite "back" in "reload" ter ponovno vpišite podatke
 sv: databasen har ändrats; gå tillbaka, klicka uppdatera och fyll i formuläret igen
+tr: taban değişti; “geri” yapın, “yeniden yükleyin” ve formu yeniden doldurun
 
     the birthday
 af: die verjaarsdag
@@ -14266,6 +14397,7 @@ ru: день рождения
 sk: narodeniny
 sl: rojstni dan
 sv: födelsedagen
+tr: doğum günü
 
     the children
 af: die kinders
@@ -14296,6 +14428,7 @@ ru: ребенок
 sk: deti
 sl: otroci
 sv: barnen
+tr: çocuklar
 
     the day after tomorrow
 af: oormôre
@@ -14326,6 +14459,7 @@ ru: послезавтра
 sk: pozajtra
 sl: pojutrišnem
 sv: i övermorgon
+tr: ertesi gün
 
     the difference of age between %t and %t is quite important
 co: a sfarenza d’età trà %t è %t pare assai impurtante
@@ -14341,6 +14475,7 @@ oc: la diferéncia d’atge entre %t e %t es pro importanta
 pt: a diferença de idade entre %t e %t é bastante importante
 ru: значительная разница в возрасте между %t и %t
 sv: Skillnaden i ålder mellan %t och %t är mycket stor
+tr: %t ve %t doğum tarihi, birbirine çok uzak
 
     the father-in-law/the mother-in-law
 af: die skoonpa/die skoonma
@@ -14371,6 +14506,7 @@ ru: свекор-тесть/свекровь-теща
 sk: svokor/svokra
 sl: tast/tašča
 sv: svärfadern/svärmodern
+tr: kayınpederi/kayınvalidesi
 
     the father/the mother/a parent
 af: die pa/die ma/'n ouer
@@ -14401,6 +14537,7 @@ ru: мать/отец/родители
 sk: otec/matka/rodič
 sl: oče/mati/starš
 sv: fadern/modern/en förälder
+tr: baba/anne/ebeveyn
 zh:  父/ 母/a parent
 
     the file is temporarily locked: please try again
@@ -14432,6 +14569,7 @@ ru: файл временно заблокирован: пожалуйста п�
 sk: súbor je uzamknutý, skúste znova.
 sl: ta datoteka je začasno zaklenjena: prosimo poskusite znova. Če še vedno ne deluje, prosimo počakajte trenutek
 sv: filen är temporärt låst: försök igen. Om det ändå inte fungerar, vänta ett tag innan nästa försök
+tr: dosya geçici olarak kilitlendi: lütfen tekrar deneyin. Hala çalışmıyorsa, tekrar denemeden önce bir süre bekleyin
 
     the following children of %t and %t are born very close
 co: e date di nascita di sti zitelli di %t è %t parenu troppu vicine
@@ -14447,6 +14585,7 @@ oc: aqueles enfants de %t e %t son nascuts plan trop apressats
 pt: os seguintes filhos de %t e de %t nasceram muito próximos
 ru: даты рождения детей %t и %t очень близки
 sv: Följande barn till %t och %t är födda mycket tätt
+tr: %t ve %t çocuklarının doğum tarihi birbirine çok yakın
 
     the following children of %t and %t are born very distant
 co: e date di nascita di sti zitelli di %t è %t parenu troppu alluntanate
@@ -14460,6 +14599,7 @@ nl: belangrijk leeftijdsverschil tussen de twee kinderen %t en %t
 no: viktig aldersgap mellom de to barna %t et %t
 pt: diferença de idades importante entre os filhos %t e %t
 sv: stor åldersskillnad mellan de två barnen %t och %t
+tr: %t ve %t çocuklarının doğum tarihi birbirine çok uzak
 
     the following children of %t and %t are not in order
 af: die volgende kinders van %t and %t is nie in die regte volgorde nie
@@ -14490,6 +14630,7 @@ ru: следующие дети %t и %t - идут не по порядку
 sk: nasledujúce deti rodičov %t a %t nie sú chronologicky
 sl: naslednji otroci od %t in %t niso po vrstnem redu
 sv: de följande barnen till %t och %t är inte i kronologisk ordning
+tr: aşağıdaki %t ve %t çocukları kronolojik sırada değil
 
     the grandchildren
 af: die kleinkinders
@@ -14520,6 +14661,7 @@ ru: внуки
 sk: vnúčatá
 sl: vnuki
 sv: barnbarnen
+tr: torunlar
 
     the grandparents
 af: die grootouers
@@ -14550,6 +14692,7 @@ ru: прародитель
 sk: prarodičia
 sl: stari starši
 sv: den 3:e generationen
+tr: büyükanne ve büyükbabalar
 
     the great-grandchildren
 af: die agterkleinkinders
@@ -14580,6 +14723,7 @@ ru: праправнук
 sk: pravnúčatá
 sl: pravnuki
 sv: barnbarns barnen
+tr: torun çocukları
 
     the great-grandparents
 af: die oorgrootouers
@@ -14610,6 +14754,7 @@ ru: прапрародитель
 sk: praprarodičia
 sl: prastari starši
 sv: den 4:e generationen
+tr: büyük büyükanne ve büyük büyükbabalar
 
     the latest %d births
 af: die laaste %d geboortes
@@ -14640,6 +14785,7 @@ ru: %d последних рождений
 sk: posledných %d narodení
 sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
+tr: son %d doğum
 
     the latest %d celebrated marriages
 bg: последните %d чествувани сватби
@@ -14656,6 +14802,7 @@ oc: las %d darrièras unions celebradas
 pt: as últimas %d uniões celebradas
 ru: последние %d свадеб
 sv: Det senaste %d firade bröllopet
+tr: Son %d evlilik (Evlilik tarihi)
 
     the latest %d marriages
 af: die laaste %d huwelike
@@ -14686,6 +14833,7 @@ ru: последние %d браков
 sk: posledných %d sobášov
 sl: zadnjih %d porok
 sv: de senaste %d äktenskapen
+tr: son %d evlilik
 
     the latest %d registered marriages
 bg: последните %d регистрирани сватби
@@ -14702,6 +14850,7 @@ oc: las %d darrièras unions enregistradas
 pt: as últimas %d uniões registadas
 ru: последние %d зарегистрированных браков
 sv: Det senast %d registreade äktenskapet
+tr: Son %d evlilik (Giriş tarihi)
 
     the latest %t deaths
 af: die laaste %t afsterwes
@@ -14732,6 +14881,7 @@ ru: %t последних смертей
 sk: posledných %t úmrtí
 sl: zadnjih %t smrti
 sv: de senaste %t avlidna
+tr: son %t ölüm
 
     the modification impacted %d persons
 co: a mudificazione hè riesciuta : %d scheda(e) curretta(e)
@@ -14747,6 +14897,7 @@ oc: la modification se faguèt: %s fichas modificadas
 pt: a alteração decorreu com sucesso: %d ficha(s) corrigida(s)
 ru: изменения затронули %d людей
 sv: Modifiering av %d personer
+tr: %d giriş başarıyla güncellendi
 
     the parents
 af: die ouers
@@ -14777,6 +14928,7 @@ ru: родители
 sk: rodičia
 sl: starši
 sv: föräldrarna
+tr: ebeveynler
 
     the spouse
 af: die eggenoot/die eggenote
@@ -14807,6 +14959,7 @@ ru: муж/жена
 sk: manžel/manželka
 sl: mož/žena
 sv: maken/makan
+tr: eş
 
     the whole list
 af: die hele lys
@@ -14837,6 +14990,7 @@ ru: целый список
 sk: celý zoznam
 sl: celoten seznam
 sv: hela listan
+tr: tam liste
 
     this forum is moderated
 bg: този форум се модерира
@@ -14863,6 +15017,7 @@ ro: acest forum este moderat
 ru: этот форум модерируется
 sl: forum moderira
 sv: detta forum har moderator
+tr: bu forum yönetilmektedir
 
     time line
 co: cronulugia
@@ -14876,6 +15031,7 @@ nl: tijdlijn
 no: kronologi
 pt: cronologia
 sv: kronologi
+tr: zaman çizelgesi
 
     title/titles
 af: titel/titels
@@ -14906,6 +15062,7 @@ ru: титул/титулы
 sk: titul/tituly
 sl: naziv/nazivi
 sv: titel/titlar
+tr: konu başlığı/başlıkları
 
     to add a child to a family, use "%s"
 af: om 'n kind by te voeg by 'n familie, gebruik "%s"
@@ -14936,6 +15093,7 @@ ru: чтобы добавить ребенка к семье, используй
 sk: pre pridanie dieťaťa do rodiny použi "%s"
 sl: da bi dodal otroka k družini, uporabite "%s"
 sv: för att lägga till ett barn i en familj, använd "%s"
+tr: bir aileye çocuk eklemek için "%s" kullanın
 
     to change
 co: per cambià
@@ -14952,6 +15110,7 @@ oc: per cambiar
 pt: para modificar
 ru: к изменению
 sv: för att ändra
+tr: Düzenle
 
     to come
 co: hà da vene
@@ -14967,6 +15126,7 @@ oc: a venir
 pt: brevemente
 ru: ещё будет
 sv: kommande händelser
+tr: gelmek
 
     to the %s generation
 af: tot die %s geslag
@@ -14997,6 +15157,7 @@ ru: до %s поколения
 sk: do %s generácie
 sl: do %s generacije
 sv: till den %s generationen
+tr: %s kuşağına kadar
 
     to the children
 af: tot die kinders
@@ -15027,6 +15188,7 @@ ru: до детей
 sk: k deťom
 sl: do otrok
 sv: till barnen
+tr: çocuklara kadar
 
     to the grandchildren
 af: tot die kleinkinders
@@ -15057,6 +15219,7 @@ ru: до внуков
 sk: k vnúčatám
 sl: do vnukov
 sv: till barnbarnen
+tr: torunlara kadar
 
     to the grandparents
 af: tot die grootouers
@@ -15087,6 +15250,7 @@ ru: до прадедов
 sk: k prarodičom
 sl: do starih staršev
 sv: till den 3:e generationen
+tr: büyükanne ve büyükbabalara kadar
 
     to the great-grandchildren
 af: tot die agterkleinkinders
@@ -15117,6 +15281,7 @@ ru: до праправнуков
 sk: k pravnúčatám
 sl: do pravnukov
 sv: till barnbarns barnen
+tr: torun çocuklarına kadar
 
     to the great-grandparents
 af: tot die oorgrootouers
@@ -15147,6 +15312,7 @@ ru: до прапрародителей
 sk: k praprarodičom
 sl: do prastarih staršev
 sv: till den 4:e generationen
+tr: büyük büyükanne ve büyükbabalara kadar
 
     to the parents
 af: tot die ouers
@@ -15177,6 +15343,7 @@ ru: до родителей
 sk: k rodičom
 sl: do staršev
 sv: till föräldrarna
+tr: ebeveynlere kadar
 
     today
 af: vandag
