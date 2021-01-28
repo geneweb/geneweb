@@ -28,7 +28,7 @@ ru: ddmmyyyy
 sk: ddmmyyyy
 sl: ddmmyyyy
 sv: ddmmyyyy
-tr: ddmmyyyy
+tr: ggaayyyy
 
     !dir
 ar: rtl
