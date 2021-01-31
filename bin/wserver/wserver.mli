@@ -57,6 +57,7 @@ val stop_server : string ref
        or absolute path. *)
 val noproc : bool ref
 val cgi : bool ref
+val ipv6 : bool ref
 
 (* Example:
 

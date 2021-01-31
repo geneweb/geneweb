@@ -1702,9 +1702,8 @@ let string_of_sockaddr =
     Unix.ADDR_UNIX s -> s
   | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
 
-let local_addr = "127.0.0.1"
-
 let only_addr () =
+  let local_addr = if !Wserver.ipv6 then "::1" else "127.0.0.1" in
   let fname = only_file_name () in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
@@ -1856,6 +1855,7 @@ let speclist =
       string_of_int !gwd_port ^ "); > 1024 for normal users.");
    ("-lang", Arg.String (fun x -> lang_param := x), "<string>: default lang");
    ("-daemon", Arg.Set daemon, ": Unix daemon mode.");
+   ("-ipv6", Arg.Set Wserver.ipv6, ": Set ipv6 mode.");
    ("-p", Arg.Int (fun x -> port := x),
     "<number>: Select a port number (default = " ^ string_of_int !port ^
     "); > 1024 for normal users.");

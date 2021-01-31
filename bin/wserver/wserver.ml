@@ -9,6 +9,7 @@ let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
 let noproc = ref false
 let cgi = ref false
+let ipv6 = ref false
 
 let wserver_sock = ref Unix.stdout
 let wsocket () = !wserver_sock
@@ -380,9 +381,13 @@ let f addr_opt port tmout max_clients g =
             begin try Unix.inet_addr_of_string addr with
               Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0)
             end
-        | None -> Unix.inet_addr_any
+        | None -> if !ipv6 then Unix.inet6_addr_any
+                  else Unix.inet_addr_any
       in
-      let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
+      let s =
+        if !ipv6 then Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0
+        else Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0
+      in
       Unix.setsockopt s Unix.SO_REUSEADDR true;
       Unix.bind s (Unix.ADDR_INET (addr, port));
       Unix.listen s 4;
