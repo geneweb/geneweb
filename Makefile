@@ -136,7 +136,6 @@ distrib: build
 	fi
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
-	echo "127.0.0.1" > $(DISTRIB_DIR)/gw/only.txt
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
