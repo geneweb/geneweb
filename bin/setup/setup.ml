@@ -333,9 +333,11 @@ let server_string conf =
 
 let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 
-let only_file_name () =
-  if !only_file = "" then Filename.concat !setup_dir "only.txt"
-  else !only_file
+let only_file_name =
+  lazy begin
+    if !only_file = "" then Filename.concat !setup_dir "only.txt"
+    else !only_file
+  end
 
 (* this set of macros are used within translations, hence the repeat of some *)
 (* like %l, %L, %P, ... and they may be different! %G  *)
@@ -360,7 +362,7 @@ let macro conf =
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> stringify !bin_dir
   | 'w' -> slashify (Sys.getcwd ())
-  | 'y' -> Filename.basename (only_file_name ())
+  | 'y' -> Filename.basename (Lazy.force only_file_name)
   | 'z' -> string_of_int !port
   | 'D' -> transl conf "!doc"
   | 'G' -> transl conf "!geneweb"
@@ -1734,15 +1736,19 @@ let setup_comm conf comm =
     Some _ -> setup_gen {conf with env = ["lang", conf.lang; "v", "main.htm"]}
   | None -> setup_comm_ok conf comm
 
-let string_of_sockaddr =
-  function
-    Unix.ADDR_UNIX s -> s
-  | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
-
-let local_addr = "127.0.0.1"
+let string_of_sockaddr = function
+  | Unix.ADDR_UNIX s -> s
+  | Unix.ADDR_INET (a, _) ->
+    let str = Unix.string_of_inet_addr a in
+    if str = "::ffff:127.0.0.1"
+    then "::1"
+    else if String.length str > 7 && String.sub str 0 7 = "::ffff:"
+    then String.sub str 7 (String.length str - 7)
+    else str
 
 let only_addr () =
-  let fname = only_file_name () in
+  let local_addr = Unix.string_of_inet_addr Unix.inet6_addr_loopback in
+  let fname = Lazy.force only_file_name in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
       let v = try input_line ic with End_of_file -> local_addr in
