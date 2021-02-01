@@ -1700,10 +1700,15 @@ let setup_comm conf comm =
 let string_of_sockaddr =
   function
     Unix.ADDR_UNIX s -> s
-  | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
+  | Unix.ADDR_INET (a, _) ->
+      let str_a = Unix.string_of_inet_addr a in
+      if str_a = "::ffff:127.0.0.1" then "::1"
+      else if String.length str_a > 7 && String.sub str_a 0 7 = "::ffff:"
+      then String.sub str_a 7 (String.length str_a - 7)
+      else str_a
 
 let only_addr () =
-  let local_addr = if !Wserver.ipv6 then "::1" else "127.0.0.1" in
+  let local_addr = Unix.string_of_inet_addr @@ Unix.inet6_addr_loopback in
   let fname = only_file_name () in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
@@ -1788,7 +1793,10 @@ let setup (addr, req) comm env_str =
       let lexicon = input_lexicon lang in
       {lang = lang; comm = comm; env = env; request = req; lexicon = lexicon}
   in
+  let _ = Printf.eprintf "Addr 1:\n" in
   let saddr = string_of_sockaddr addr in
+  let _ = Printf.eprintf "Addr 2:\n" in
+  let _ = flush stderr in
   let s = only_addr () in
   if s <> saddr then
     let conf = {conf with env = ["anon", saddr; "o", s]} in
@@ -1855,7 +1863,6 @@ let speclist =
       string_of_int !gwd_port ^ "); > 1024 for normal users.");
    ("-lang", Arg.String (fun x -> lang_param := x), "<string>: default lang");
    ("-daemon", Arg.Set daemon, ": Unix daemon mode.");
-   ("-ipv6", Arg.Set Wserver.ipv6, ": Set ipv6 mode.");
    ("-p", Arg.Int (fun x -> port := x),
     "<number>: Select a port number (default = " ^ string_of_int !port ^
     "); > 1024 for normal users.");
