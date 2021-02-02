@@ -846,7 +846,7 @@ let rec read_or_create_value ?magic fname create =
   | Some v -> v
   | None ->
     let v = create () in
-    let oc = Unix.out_channel_of_descr fd in
+    let oc = Unix.out_channel_of_descr (Unix.dup fd) in
     try
 #ifndef WINDOWS
       Unix.lockf fd Unix.F_TLOCK 0 ;
