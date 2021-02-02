@@ -20,7 +20,7 @@ let syslog level msg =
      | `LOG_INFO -> 6
      | `LOG_DEBUG -> 7
   then begin
-    let log = Syslog.openlog Filename.(dirname @@ basename @@ Sys.executable_name) in
+    let log = Syslog.openlog @@ Filename.basename @@ Sys.executable_name in
     Syslog.syslog log level msg ;
     Syslog.closelog log
   end
