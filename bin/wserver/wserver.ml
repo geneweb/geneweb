@@ -93,7 +93,7 @@ let http_redirect_temporarily url =
   http Def.Moved_Temporarily; printnl "Location: %s" url
 
 let syslog level msg =
-  let log = Syslog.openlog Filename.(dirname @@ basename @@ Sys.executable_name) in
+  let log = Syslog.openlog @@ Filename.basename @@ Sys.executable_name in
   Syslog.syslog log level msg ;
   Syslog.closelog log
 
