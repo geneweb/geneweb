@@ -213,13 +213,10 @@ let pids = ref []
 
 let cleanup_sons () =
   List.iter begin fun p ->
-    let pid =
-      try fst (Unix.waitpid [Unix.WNOHANG] p)
-      with e ->
-        syslog `LOG_ERR (__LOC__ ^ ": " ^ Printexc.to_string e) ;
-        raise e
-    in
-    if pid <> 0 then pids := list_remove pid !pids
+    match fst (Unix.waitpid [ Unix.WNOHANG ] p) with
+    | 0 -> ()
+    | exception Unix.Unix_error (Unix.ECHILD, "waitpid", _) (* why? *)
+    | _ -> pids := list_remove p !pids
   end !pids
 
 let wait_available max_clients s =
