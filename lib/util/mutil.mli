@@ -189,7 +189,7 @@ val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
 
 val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 
-(** [read_or_create ?magic fname read write]
+(** [read_or_create_channel ?magic fname read write]
 
     If [fname] exists (and starts with [magic] if this one is provided),
     [read] function is used on the file.
@@ -203,13 +203,29 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 
     On Windows, file is not locked.
 *)
-val read_or_create
+val read_or_create_channel
   : ?wait:bool
   -> ?magic:string
   -> string
   -> (in_channel -> 'a)
   -> (out_channel -> 'a)
   -> 'a
+
+(** [read_or_create_value ?magic fname create]
+
+    If [fname] exists (and starts with [magic] if this one is provided),
+    return the unmarshalled value.
+    If it does not, or does not start with [magic], or if unmarshalling raise an exception,
+    [create] function is used to produce the value to be marshalled.
+
+    On Windows, file is not locked.
+*)
+val read_or_create_value
+  : ?magic:string
+  -> string
+  -> (unit -> 'a)
+  -> 'a
+
 
 (** [bench name fn]
     Execute [fn], print stats about time and memory allocation, return [fn] result.

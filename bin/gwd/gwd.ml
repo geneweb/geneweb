@@ -175,21 +175,17 @@ let load_lexicon =
     | Some lex -> lex
     | None ->
       let lex =
-        Mutil.read_or_create ~wait:true ~magic:Mutil.random_magic fname
-          begin fun ch -> (Marshal.from_channel ch : (string, string) Hashtbl.t) end
-          begin fun ch ->
-            let ht = Hashtbl.create 0 in
-            let rec rev_iter fn = function
-              | [] -> ()
-              | hd :: tl -> rev_iter fn tl ; fn hd
-            in
-            rev_iter begin fun fname ->
-              Mutil.input_lexicon lang ht begin fun () ->
-                Secure.open_in (Util.search_in_lang_path fname)
-              end end !lexicon_list ;
-            Marshal.to_channel ch ht [] ;
-            ht
-          end
+        Mutil.read_or_create_value ~magic:Mutil.random_magic fname @@ fun () ->
+        let ht = Hashtbl.create 0 in
+        let rec rev_iter fn = function
+          | [] -> ()
+          | hd :: tl -> rev_iter fn tl ; fn hd
+        in
+        rev_iter begin fun fname ->
+          Mutil.input_lexicon lang ht begin fun () ->
+            Secure.open_in (Util.search_in_lang_path fname)
+          end end !lexicon_list ;
+        ht
       in
       Hashtbl.add lexicon_cache fname lex ;
       lex

@@ -771,7 +771,7 @@ let list_rev_map_append f l1 l2 =
 
    i.e. Do not close channels before releasing the lock.
 *)
-let rec read_or_create ?(wait = true) ?magic fname read write =
+let rec read_or_create_channel ?(wait = true) ?magic fname read write =
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
   let ic = Unix.in_channel_of_descr fd in
@@ -826,8 +826,45 @@ let rec read_or_create ?(wait = true) ?magic fname read write =
       readlock Unix.F_RLOCK ;
       match aux () with
       | Some res -> res
-      | None -> read_or_create ~wait ?magic fname read write
+      | None -> read_or_create_channel ~wait ?magic fname read write
     end else raise e
+
+let rec read_or_create_value ?magic fname create =
+  assert (Secure.check fname) ;
+  let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
+  let ic = Unix.in_channel_of_descr fd in
+  match
+    if match magic with None -> true | Some m -> check_magic m ic
+    then
+      try
+        let res = Marshal.from_channel ic in
+        close_in ic ;
+        Some res
+      with _ -> None
+    else None
+  with
+  | Some v -> v
+  | None ->
+    let v = create () in
+    let oc = Unix.out_channel_of_descr fd in
+    try
+#ifndef WINDOWS
+      Unix.lockf fd Unix.F_TLOCK 0 ;
+#endif
+      begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
+      Marshal.to_channel oc v [ Marshal.No_sharing ; Marshal.Closures ] ;
+      begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
+#ifndef WINDOWS
+      Unix.lockf fd Unix.F_ULOCK 0 ;
+#endif
+      close_in ic ;
+      close_out oc ;
+      v
+    with
+    | _ ->
+      close_in ic ;
+      close_out oc ;
+      v
 
 let encode s =
   let special = function
