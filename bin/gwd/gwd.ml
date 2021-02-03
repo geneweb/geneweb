@@ -1693,7 +1693,7 @@ let geneweb_server () =
       try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o777 with
         Unix.Unix_error (_, _, _) -> ()
     end;
-  Wserver.f !selected_addr !selected_port !conn_timeout
+  Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection
 
 let cgi_timeout conf tmout _ =

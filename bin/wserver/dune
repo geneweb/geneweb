@@ -2,6 +2,6 @@
  (name wserver)
  (public_name geneweb.wserver)
  (wrapped false)
- (libraries geneweb.util syslog unix)
+ (libraries geneweb.util unix)
  (modules wserver)
 )

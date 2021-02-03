@@ -2,21 +2,33 @@
 
 (* module [Wserver]: elementary web service *)
 
-val f :
-  string option -> int -> int -> int option ->
-    (Unix.sockaddr * string list -> string -> string -> unit) -> unit
-   (* [Wserver.f addr port tmout maxc g] starts an elementary
-       httpd server at port [port] in the current machine. The variable
-       [addr] is [Some the-address-to-use] or [None] for any of the
-       available addresses of the present machine. The port number is
-       any number greater than 1024 (to create a client < 1024, you must be
-       root). At each connection, the function [g] is called:
-       [g (addr, request) scr cont] where [addr] is the client identification
-       socket, [request] the browser request, [scr] the script name (extracted
-       from [request]) and [cont] the stdin contents . The function
-       [g] has [tmout] seconds to answer some text on standard output.
-       If [maxc] is [Some n], maximum [n] clients can be treated at the
-       same time; [None] means no limit. See the example below. *)
+(** [Wserver.f syslog addr port tmout maxc g]
+    Starts an elementary httpd server at port [port] in the current
+    machine. The variable [addr] is [Some the-address-to-use] or
+    [None] for any of the available addresses of the present machine.
+    The port number is any number greater than 1024 (to create a
+    client < 1024, you must be root). At each connection, the function
+    [g] is called: [g (addr, request) scr cont] where [addr] is the
+    client identification socket, [request] the browser request, [scr]
+    the script name (extracted from [request]) and [cont] the stdin
+    contents . The function [g] has [tmout] seconds to answer some
+    text on standard output. If [maxc] is [Some n], maximum [n]
+    clients can be treated at the same time; [None] means no limit.
+    [syslog] is the function used to log errors or debug info. It is
+    called syslog because it is used with the same gravity levels, but
+    it can be anything.
+
+    See the example below.
+*)
+val f
+  : ([ `LOG_EMERG | `LOG_ALERT | `LOG_CRIT | `LOG_ERR | `LOG_WARNING
+     | `LOG_NOTICE | `LOG_INFO | `LOG_DEBUG ] -> string -> unit)
+  -> string option
+  -> int
+  -> int
+  -> int option
+  -> (Unix.sockaddr * string list -> string -> string -> unit)
+  -> unit
 
 val close_connection : unit -> unit
 
@@ -61,10 +73,12 @@ val cgi : bool ref
 (* Example:
 
    - Source program "foo.ml":
-        Wserver.f None 2371 60 None
-           (fun _ s _ ->
-              Output.status conf Wserver.OK;
-              Output.printf conf "You said: %s...\n" s);;
+        Wserver.f
+          (fun _ -> prerr_endline)
+          None 2371 60 None
+          (fun _ s _ ->
+             Output.status conf Wserver.OK;
+             Output.printf conf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
    - Run:

@@ -1944,4 +1944,4 @@ let () =
 #else
   if Sys.getenv_opt "WSERVER" = None then intro () ;
 #endif
-  Wserver.f None !port 0 None wrap_setup
+  Wserver.f (fun _ -> prerr_endline) None !port 0 None wrap_setup

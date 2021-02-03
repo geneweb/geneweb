@@ -11,7 +11,7 @@
   (name gwd_lib)
   (public_name geneweb.gwd_lib)
   (wrapped true)
-  (libraries geneweb wserver %%%GWDB_PKG%%% %%%SOSA_PKG%%%)
+  (libraries geneweb syslog wserver %%%GWDB_PKG%%% %%%SOSA_PKG%%%)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwdLog gwdPlugin request sendImage)
 )

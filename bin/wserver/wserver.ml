@@ -92,11 +92,6 @@ let print_string s =
 let http_redirect_temporarily url =
   http Def.Moved_Temporarily; printnl "Location: %s" url
 
-let syslog level msg =
-  let log = Syslog.openlog @@ Filename.basename @@ Sys.executable_name in
-  Syslog.syslog log level msg ;
-  Syslog.closelog log
-
 let buff = ref (Bytes.create 80)
 let store len x =
   if len >= Bytes.length !buff then
@@ -359,7 +354,7 @@ let accept_connection tmout max_clients callback s =
     end;
     cleanup ()
 
-let f addr_opt port tmout max_clients g =
+let f syslog addr_opt port tmout max_clients g =
   match
     if Sys.unix then None
     else try Some (Sys.getenv "WSERVER") with Not_found -> None
