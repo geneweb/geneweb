@@ -183,14 +183,14 @@ class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "b
   Output.printf conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
-  raise @@ Update.ModErr __LOC__
+  raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let error_person conf err =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Output.printf conf "%s\n" (Utf8.capitalize err);
   Hutil.trailer conf;
-  raise @@ Update.ModErr __LOC__
+  raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 
 let print_update_child conf base =

@@ -393,7 +393,7 @@ let f syslog addr_opt port tmout max_clients g =
           try accept_connection tmout max_clients g s ; 0 with
           | Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> -1
           | Sys_error msg when msg = "Broken pipe" -> -1
-          | e -> syslog `LOG_CRIT (__LOC__ ^ ": " ^ Printexc.to_string e) ; -1
+          | e -> syslog `LOG_CRIT (__FILE__ ^ " " ^ string_of_int __LINE__ ^ ": " ^ Printexc.to_string e) ; -1
         in
         flush_all () ;
         if Unix.getpid () <> ppid then exit code

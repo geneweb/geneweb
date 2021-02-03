@@ -894,7 +894,7 @@ let reconstitute_date_dmy2 conf var =
           end
       | None -> {day2 = 0; month2 = 0; year2 = y; delta2 = 0}
       end
-  | None -> raise @@ ModErr __LOC__
+  | None -> raise @@ ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let reconstitute_date_dmy conf var =
   let (prec, y) =

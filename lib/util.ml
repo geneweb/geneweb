@@ -481,7 +481,7 @@ let safe_html_aux escape_text s =
       begin match !stack with
         | `KO :: tl -> stack := tl ; `Comment ""
         | `OK :: tl -> stack := tl ; `End_element
-        | _ -> failwith __LOC__
+        | _ -> failwith (__FILE__ ^ " " ^ string_of_int __LINE__)
       end
     | e -> e
   in

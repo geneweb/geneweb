@@ -1052,7 +1052,7 @@ let effective_inv conf base ip u ifam =
       ifam1 :: ifam2 :: ifaml ->
         if ifam2 = ifam then ifam2 :: ifam1 :: ifaml
         else ifam1 :: loop (ifam2 :: ifaml)
-    | _ -> Hutil.incorrect_request conf; raise @@ Update.ModErr __LOC__
+    | _ -> Hutil.incorrect_request conf; raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
   in
   let u = {family = Array.of_list (loop (Array.to_list (get_family u)))} in
   patch_union base ip u

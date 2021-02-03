@@ -14,7 +14,7 @@ let extension_of_type =
   | GIF -> ".gif"
   | PNG -> ".png"
 
-let incorrect conf = Hutil.incorrect_request conf; raise @@ Update.ModErr __LOC__
+let incorrect conf = Hutil.incorrect_request conf; raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let incorrect_content_type conf base p s =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
@@ -31,7 +31,7 @@ let incorrect_content_type conf base p s =
   Output.printf conf "</li>\n";
   Output.printf conf "</ul>\n";
   Hutil.trailer conf;
-  raise @@ Update.ModErr __LOC__
+  raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let error_too_big_image conf base p len max_len =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
@@ -49,7 +49,7 @@ let error_too_big_image conf base p len max_len =
   Output.printf conf "</li>\n";
   Output.printf conf "</ul>\n";
   Hutil.trailer conf;
-  raise @@ Update.ModErr __LOC__
+  raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let raw_get conf key =
   try List.assoc key conf.env with Not_found -> incorrect conf

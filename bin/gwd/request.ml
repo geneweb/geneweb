@@ -455,7 +455,7 @@ let treat_request conf =
     | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
   in
 #ifdef DEBUG
-  Mutil.bench __LOC__ @@ fun () ->
+  Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) @@ fun () ->
 #endif
   if conf.wizard
   || conf.friend
