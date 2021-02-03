@@ -210,7 +210,8 @@ let cleanup_sons () =
   List.iter begin fun p ->
     match fst (Unix.waitpid [ Unix.WNOHANG ] p) with
     | 0 -> ()
-    | exception Unix.Unix_error (Unix.ECHILD, "waitpid", _) (* why? *)
+    | exception Unix.Unix_error (Unix.ECHILD, "waitpid", _)
+    (* should not be needed anymore since [Unix.getpid () <> ppid] loop security *)
     | _ -> pids := list_remove p !pids
   end !pids
 
@@ -385,12 +386,15 @@ let f syslog addr_opt port tmout max_clients g =
         (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
         port ;
       flush stderr;
+      (* [accept_connection] may fork and raise an error, bypassing the [exit] instuction.  *)
+      let ppid = Unix.getpid () in
       while true do
-        begin
-          try accept_connection tmout max_clients g s with
-          | Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> ()
-          | Sys_error msg when msg = "Broken pipe" -> ()
-          | e -> syslog `LOG_CRIT (__LOC__ ^ ": " ^ Printexc.to_string e)
-        end ;
+        let code =
+          try accept_connection tmout max_clients g s ; 0 with
+          | Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> -1
+          | Sys_error msg when msg = "Broken pipe" -> -1
+          | e -> syslog `LOG_CRIT (__LOC__ ^ ": " ^ Printexc.to_string e) ; -1
+        in
         flush_all () ;
+        if Unix.getpid () <> ppid then exit code
       done
