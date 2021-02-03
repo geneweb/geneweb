@@ -829,7 +829,7 @@ let rec read_or_create_channel ?(wait = true) ?magic fname read write =
       | None -> read_or_create_channel ~wait ?magic fname read write
     end else raise e
 
-let rec read_or_create_value ?magic fname create =
+let read_or_create_value ?magic fname create =
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
   let ic = Unix.in_channel_of_descr fd in
