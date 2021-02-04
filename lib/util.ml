@@ -2169,21 +2169,24 @@ let create_topological_sort conf base =
       then Filename.concat bfile "tstab_visitor"
       else Filename.concat bfile "tstab"
     in
-    Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file @@
-    fun () ->
-    Lock.control (Mutil.lock_file bfile) false
-      ~onerror:begin fun () ->
-        let () = load_ascends_array base in
-        let () = load_couples_array base in
-        Consang.topological_sort base (pget conf)
-      end
-      begin fun () ->
-        let () = load_ascends_array base in
-        let () = load_couples_array base in
-        let tstab = Consang.topological_sort base (pget conf) in
-        if conf.use_restrict && not conf.wizard && not conf.friend
-        then base_visible_write base ;
-        tstab
+    Mutil.read_or_create_channel ~magic:Mutil.executable_magic tstab_file
+      begin fun ic -> (Marshal.from_channel ic : (iper, int) Gwdb.Marker.t) end
+      begin fun oc ->
+        Lock.control (Mutil.lock_file bfile) false
+          ~onerror:begin fun () ->
+            let () = load_ascends_array base in
+            let () = load_couples_array base in
+            Consang.topological_sort base (pget conf)
+          end
+          begin fun () ->
+            let () = load_ascends_array base in
+            let () = load_couples_array base in
+            let tstab = Consang.topological_sort base (pget conf) in
+            if conf.use_restrict && not conf.wizard && not conf.friend
+            then base_visible_write base ;
+            Marshal.to_channel oc tstab [ Marshal.No_sharing ; Marshal.Closures ] ;
+            tstab
+          end
       end
 
 let p_of_sosa conf base sosa p0 =
