@@ -430,7 +430,7 @@ let gen_print with_logo mode conf base fname =
   | _ ->
       let title _ = Output.printf conf "Error" in
       Hutil.header conf title;
-      Output.printf conf "<ul><li>Cannot access file \"%s.txt\"</ul>" fname;
+      Output.printf conf "<ul><li>Cannot access file \"%s.txt\"</ul>" @@ Util.escape_html fname;
       Hutil.gen_trailer with_logo conf;
       raise Exit
 
