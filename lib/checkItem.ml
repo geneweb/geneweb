@@ -526,7 +526,7 @@ let possible_father warning x father =
 let child_has_sex warning child =
   if get_sex child = Neuter then warning (UndefinedSex child)
 
-let check_order_pfevents get_name get_date warning p events =
+let check_order_pfevents get_name get_date warning events =
   let events = sort_events get_name get_date events in
   let rec loop = function
     | e1 :: e2 :: events ->
@@ -539,7 +539,7 @@ let check_order_pfevents get_name get_date warning p events =
             loop (e1 :: events)
           | n2 ->
             if compare_event_name n1 n2 = 1
-            then warning p e1 e2 ;
+            then warning e1 e2 ;
             loop (e2 :: events)
       end
     | _ -> ()
@@ -550,8 +550,7 @@ let check_order_pevents warning p =
   check_order_pfevents
     (fun evt -> Psort evt.epers_name)
     (fun evt -> evt.epers_date)
-    (fun p e1 e2 -> warning (PEventOrder (p, e1, e2)))
-    (p)
+    (fun e1 e2 -> warning (PEventOrder (p, e1, e2)))
     (get_pevents p)
 
 let check_witness_pevents_aux warning evt date b d p =
@@ -740,8 +739,7 @@ let check_order_fevents base warning fam =
   check_order_pfevents
     (fun evt -> Fsort evt.efam_name)
     (fun evt -> evt.efam_date)
-    (fun p e1 e2 -> warning (FEventOrder (p, e1, e2)))
-    (p)
+    (fun e1 e2 -> warning (FEventOrder (p, e1, e2)))
     (get_fevents fam)
 
 let check_witness_fevents_aux warning evt date b d p =
