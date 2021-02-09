@@ -417,7 +417,7 @@ let try_plugin list conf base m =
     (Hashtbl.find_all GwdPlugin.ht m)
 
 let w_lock ~onerror fn conf base =
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bfile = Util.bpath (conf.bname ^ ".gwb") in
   Lock.control
     (Mutil.lock_file bfile) false
     ~onerror:(fun () -> onerror conf base)
@@ -441,13 +441,14 @@ let w_person ~none fn conf base =
   | Some p -> fn conf base p
   | _ -> none conf base
 
-let treat_request conf =
+let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base = w_base ~none:incorrect_request in
   let w_person = w_person ~none:very_unknown in
+  fun conf ->
   let bfile =
     if conf.bname = "" then None
-    else Some (Util.base_path [] (conf.bname ^ ".gwb"))
+    else Some (Util.bpath (conf.bname ^ ".gwb"))
   in
   let base =
     match bfile with

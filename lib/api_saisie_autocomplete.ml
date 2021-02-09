@@ -61,7 +61,7 @@ let create_cache base mode cache_file =
   close_out oc
 
 let rec get_list_from_cache ?(retry = true) conf base mode max_res s =
-  let bfile = base_path [] (conf.bname ^ ".gwb") in
+  let bfile = bpath (conf.bname ^ ".gwb") in
   let cache_file =
     match mode with
     | `lastname -> Filename.concat bfile "cache_surname"

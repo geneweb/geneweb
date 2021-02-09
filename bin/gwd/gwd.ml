@@ -260,7 +260,7 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env bname =
-  let fname = Util.base_path [] (bname ^ ".gwf") in
+  let fname = Util.bpath (bname ^ ".gwf") in
   try
     let ic = Secure.open_in fname in
     let env =
@@ -1241,7 +1241,7 @@ let make_conf from_addr request script_name env =
      auth_file =
        begin try
          let x = List.assoc "auth_file" base_env in
-         if x = "" then !auth_file else Util.base_path [] x
+         if x = "" then !auth_file else Util.bpath x
        with Not_found -> !auth_file
        end;
      border =

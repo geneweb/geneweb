@@ -7,7 +7,7 @@ open Util
 module StrSet = Mutil.StrSet
 
 let file_path conf base fname =
-  Util.base_path []
+  Util.bpath
     (List.fold_left Filename.concat (conf.bname ^ ".gwb")
        [base_notes_dir base; fname ^ ".txt"])
 
@@ -161,7 +161,7 @@ let commit_notes conf base fnotes s =
   in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    List.fold_left Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
+    List.fold_left Filename.concat (Util.bpath (conf.bname ^ ".gwb"))
       [base_notes_dir base; fname]
   in
   Mutil.mkdir_p (Filename.dirname fpath);

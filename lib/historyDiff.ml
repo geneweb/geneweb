@@ -32,7 +32,7 @@ let history_d conf =
       let bname =
         if Filename.check_suffix conf.bname ".gwb" then conf.bname else conf.bname ^ ".gwb"
       in
-      Filename.concat (Util.base_path [] bname) path
+      Filename.concat (Util.bpath bname) path
     end
   else
     path
