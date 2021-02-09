@@ -1148,6 +1148,20 @@ let base_path pref bname =
     else bfile
   else bfile
 
+let bpath bname =
+  let fname = Filename.concat (Secure.base_dir ()) bname in
+  if Sys.file_exists fname then fname
+  else
+    Filename.concat
+      (Secure.base_dir ())
+      (Filename.concat
+         (String.make 1 bname.[0])
+         (Filename.concat
+            (String.make 1 bname.[1])
+            bname
+         )
+      )
+
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 
@@ -2130,7 +2144,7 @@ let find_sosa_ref conf base =
 let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
-  let fname = base_path [] (conf.bname ^ ".gwf") in
+  let fname = bpath (conf.bname ^ ".gwf") in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Stdlib.open_out tmp_fname with
@@ -2163,7 +2177,7 @@ let create_topological_sort conf base =
     Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Gwdb.iper_marker (Gwdb.ipers base) 0
   | _ ->
-    let bfile = base_path [] (conf.bname ^ ".gwb") in
+    let bfile = bpath (conf.bname ^ ".gwb") in
     let tstab_file =
       if conf.use_restrict && not conf.wizard && not conf.friend
       then Filename.concat bfile "tstab_visitor"
@@ -2606,7 +2620,7 @@ let short_f_month m =
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
 let read_gen_auth_file fname =
-  let fname = base_path [] fname in
+  let fname = bpath fname in
   try
     let ic = Secure.open_in fname in
     let rec loop data =
@@ -2948,7 +2962,7 @@ let cache_visited conf =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
     else conf.bname ^ ".gwb"
   in
-  Filename.concat (base_path [] bname) "cache_visited"
+  Filename.concat (bpath bname) "cache_visited"
 
 
 (* ************************************************************************ *)

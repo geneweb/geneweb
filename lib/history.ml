@@ -12,7 +12,7 @@ let file_name conf =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
     else conf.bname ^ ".gwb"
   in
-  Filename.concat (Util.base_path [] bname) "history"
+  Filename.concat (Util.bpath bname) "history"
 
 (* Record history when committing updates *)
 
