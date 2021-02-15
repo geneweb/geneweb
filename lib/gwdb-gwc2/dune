@@ -1,0 +1,16 @@
+(library
+  (name gwdb_gwc2)
+  (public_name geneweb.gwdb-gwc2)
+  (implements geneweb.gwdb_driver)
+  (libraries
+    geneweb.def
+    geneweb.util
+    unix
+  )
+  (modules
+    db2
+    db2disk
+    db2out
+    gwdb_driver
+  )
+)

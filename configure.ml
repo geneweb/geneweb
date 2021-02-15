@@ -29,6 +29,8 @@ let set_gwdb_gwc1 () = assert (!gwdb = `None) ; gwdb := `gwc1
 
 let set_gwdb_gwc1_x_arangodb () = assert (!gwdb = `None) ; gwdb := `gwc1ArangoDB
 
+let set_gwdb_gwc2 () = assert (!gwdb = `None) ; gwdb := `gwc2
+
 let release = ref false
 
 let speclist =
@@ -41,6 +43,9 @@ let speclist =
   ; ( "--gwdb-gwc1-x-arangodb"
     , Arg.Unit set_gwdb_gwc1_x_arangodb
     , "Use hybrid gwc1-ArangoDB backend" )
+  ; ( "--gwdb-gwc2"
+    , Arg.Unit set_gwdb_gwc2
+    , "Use gwc2 backend" )
   ; ( "--release"
     , Arg.Set release
     , "Use release profile (no debug informations)" )
@@ -94,6 +99,10 @@ let () =
     | `gwc1ArangoDB ->
       (" -D GENEWEB_GWDB_GWC1 -D GENEWEB_GWDB_ARANGODB"
       , "geneweb.gwdb-gwc1-x-arangodb")
+    | `gwc2 ->
+      exclude_dir "gwdb-gwc1-x-arangodb" ;
+      exclude_dir "gwdb-gwc1" ;
+      (" -D GENEWEB_GWDB_GWC2", "geneweb.gwdb-gwc2") ;
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =
