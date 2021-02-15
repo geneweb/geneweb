@@ -25,9 +25,9 @@ let set_sosa_zarith () = assert (!sosa = `None) ; sosa := `Zarith
 
 let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
 
-let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
+let set_gwdb_gwc1 () = assert (!gwdb = `None) ; gwdb := `gwc1
 
-let set_gwdb_legacy_x_arangodb () = assert (!gwdb = `None) ; gwdb := `LegacyArangoDB
+let set_gwdb_gwc1_x_arangodb () = assert (!gwdb = `None) ; gwdb := `gwc1ArangoDB
 
 let release = ref false
 
@@ -35,12 +35,12 @@ let speclist =
   [ ( "--api"
     , Arg.Unit set_api
     , "Enable API support" )
-  ; ( "--gwdb-legacy"
-    , Arg.Unit set_gwdb_legacy
-    , "Use legacy backend" )
-  ; ( "--gwdb-legacy-x-arangodb"
-    , Arg.Unit set_gwdb_legacy_x_arangodb
-    , "Use hybrid legacy-ArangoDB backend" )
+  ; ( "--gwdb-gwc1"
+    , Arg.Unit set_gwdb_gwc1
+    , "Use gwc1 backend" )
+  ; ( "--gwdb-gwc1-x-arangodb"
+    , Arg.Unit set_gwdb_gwc1_x_arangodb
+    , "Use hybrid gwc1-ArangoDB backend" )
   ; ( "--release"
     , Arg.Set release
     , "Use release profile (no debug informations)" )
@@ -88,12 +88,12 @@ let () =
   let gwdb_d, gwdb_pkg =
     match !gwdb with
     | `None
-    | `Legacy ->
-      exclude_dir "gwdb-legacy-x-arangodb" ;
-      (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy") ;
-    | `LegacyArangoDB ->
-      (" -D GENEWEB_GWDB_LEGACY -D GENEWEB_GWDB_ARANGODB"
-      , "geneweb.gwdb-legacy-x-arangodb")
+    | `gwc1 ->
+      exclude_dir "gwdb-gwc1-x-arangodb" ;
+      (" -D GENEWEB_GWDB_GWC1", "geneweb.gwdb-gwc1") ;
+    | `gwc1ArangoDB ->
+      (" -D GENEWEB_GWDB_GWC1 -D GENEWEB_GWDB_ARANGODB"
+      , "geneweb.gwdb-gwc1-x-arangodb")
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =

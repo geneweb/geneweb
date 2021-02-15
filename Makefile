@@ -103,7 +103,7 @@ GENERATED_FILES_DEP = \
 	bin/setup/dune \
 	bin/update_nldb/dune \
 	lib/dune \
-	lib/gwdb-legacy-x-arangodb/dune \
+	lib/gwdb-gwc1-x-arangodb/dune \
 	lib/util/dune \
 	test/dune \
 

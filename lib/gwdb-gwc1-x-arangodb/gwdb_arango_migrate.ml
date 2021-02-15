@@ -1,4 +1,4 @@
-open Gwdb_driver_legacy
+open Gwdb_driver_gwc1
 open Dbdisk
 
 module J = Json

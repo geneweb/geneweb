@@ -1,4 +1,4 @@
-#ifdef GENEWEB_GWDB_LEGACY
+#ifdef GENEWEB_GWDB_GWC1
 (executable
   (name gwgc)
   (public_name geneweb.gwgc)
