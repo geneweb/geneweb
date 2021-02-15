@@ -13,8 +13,6 @@ let speclist =
    ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
    ("-fast", Arg.Set fast, " faster, but use more memory");
    "-scratch", Arg.Set scratch, ": from scratch";
-   "-mem", Arg.Set Outbase.save_mem,
-   ": Save memory, but slower when rewritting database";
    "-nolock", Arg.Set Lock.no_lock_flag, ": do not lock database."]
 let anonfun s =
   if !fname = "" then fname := s
