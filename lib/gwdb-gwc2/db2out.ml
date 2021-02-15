@@ -284,14 +284,14 @@ let make_name_index base_d nbper =
       seek_in ic_dat pos;
       let sex : Def.sex = Iovalue.input ic_dat in
       if sex = Def.Female then
-        List.map
+        Array.map
           (fun ifam ->
              let husb = get_father ifam in
              let husb_surname = get_surname husb in
              let husb_surn_ali = get_surnames_aliases husb in
              husb_surname, husb_surn_ali)
-          (Array.to_list (get_family i))
-      else []
+          (get_family i)
+      else [||]
   in
   let get_parents =
     let (ic_acc, ic_dat) = List.assoc "parents" ic2_list in
@@ -303,9 +303,7 @@ let make_name_index base_d nbper =
   in
   let get_father_titles_places i =
     match get_parents i with
-      Some ifam ->
-        let ifath = get_father ifam in
-        List.map (fun t -> t.Def.t_place) (get_titles ifath)
+    | Some ifam -> get_titles (get_father ifam)
     | None -> []
   in
   let ht = Hashtbl.create 1 in
@@ -316,7 +314,7 @@ let make_name_index base_d nbper =
     let surname = get_surname i in
     let names =
       let names =
-        Futil.gen_person_misc_names first_name surname (get_public_name i)
+        Futil.gen_person_misc_names (fun s -> s) "" "?" first_name surname (get_public_name i)
           (get_qualifiers i) (get_aliases i) (get_first_names_aliases i)
           (get_surnames_aliases i) (get_titles i) (get_husbands i)
           (get_father_titles_places i)
@@ -386,8 +384,8 @@ let make_index bdir particles f2 =
                 if s = "" && i <> 0 then rev_iofc
                 else if prev_s = "" then (s, i) :: rev_iofc
                 else
-                  let prev_nbc = Name.nbc prev_s.[0] in
-                  let nbc = Name.nbc s.[0] in
+                  let prev_nbc = Utf8.nbc prev_s.[0] in
+                  let nbc = Utf8.nbc s.[0] in
                   if prev_nbc = nbc && nbc > 0 &&
                      nbc <= String.length prev_s && nbc <= String.length s &&
                      String.sub prev_s 0 nbc = String.sub s 0 nbc

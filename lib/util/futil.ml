@@ -184,14 +184,14 @@ let map_couple_p multi_parents fp cpl =
 let map_descend_p fp des = {children = Array.map fp des.children}
 
 let gen_person_misc_names
-    sou empty_string quest_string
+    sou is_empty_string is_quest_string
     first_name surname public_name qualifiers
     aliases first_names_aliases surnames_aliases
     titles
     husbands
     father_titles_places
   =
-  if first_name = quest_string || surname = quest_string then []
+  if is_quest_string first_name || is_quest_string surname then []
   else
     let s_first_name = Mutil.nominative @@ sou first_name in
     let s_surname = Mutil.nominative @@ sou surname in
@@ -203,7 +203,7 @@ let gen_person_misc_names
       end [] titles
     in
     let s_public_names =
-      if public_name = empty_string then s_titles_names
+      if is_empty_string public_name then s_titles_names
       else sou public_name :: s_titles_names
     in
     let s_first_names = s_first_name :: (* List.rev_append *) List.rev_map sou first_names_aliases (* public_names *) in
@@ -214,7 +214,7 @@ let gen_person_misc_names
     in
     let s_surnames =
       Array.fold_left begin fun s_list (husband_surname, husband_surnames_aliases) ->
-        if husband_surname = quest_string
+        if is_quest_string husband_surname
         then Mutil.list_rev_map_append sou husband_surnames_aliases s_list
         else
           let s_husband_surname = Mutil.nominative @@ sou husband_surname in
@@ -236,14 +236,14 @@ let gen_person_misc_names
       (* let first_names = first_name :: first_names_aliases in *)
       List.fold_left begin fun list t ->
         let s = t.t_place in
-        if s = empty_string then list
+        if is_empty_string s then list
         else
           let s = sou s in
           let s_first_names =
             match t.t_name with
             | Tname f -> sou f :: s_first_names
             | Tmain | Tnone ->
-              if public_name = empty_string
+              if is_empty_string public_name
               then s_first_names
               else sou public_name :: s_first_names
           in
@@ -256,7 +256,7 @@ let gen_person_misc_names
       else
         List.fold_left begin fun list t ->
           let s = t.t_place in
-          if s = empty_string then list
+          if is_empty_string s then list
           else
             let s = sou s in
             List.fold_left (fun list f -> Name.concat f s :: list) list s_first_names

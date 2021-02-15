@@ -472,7 +472,7 @@ let commit_patches2 db2 =
   output_string oc magic_patch;
   Marshal.to_channel oc db2.patches [Marshal.No_sharing] ;
   close_out oc;
-  remove_file (fname ^ "~");
+  Mutil.rm (fname ^ "~");
   (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
   Sys.rename (fname ^ "1") fname
 

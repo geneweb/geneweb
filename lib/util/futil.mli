@@ -59,8 +59,8 @@ val parent : bool -> 'a array -> 'a gen_couple
  *)
 val gen_person_misc_names :
   ('a -> string) ->
-  'a ->
-  'a ->
+  ('a -> bool) ->               (* is empty string *)
+  ('a -> bool) ->               (* is quest string *)
   'a ->
   'a ->
   'a ->
