@@ -425,23 +425,29 @@ let w_lock ~onerror fn conf base =
 
 let w_base ~none fn conf base =
   match base with
-  | None -> none conf
+  | None -> print_endline __LOC__ ; none conf
   | Some base ->
+    print_endline __LOC__ ;
     make_henv conf base;
     make_senv conf base;
+    print_endline __LOC__ ;
     let conf =
       match Util.default_sosa_ref conf base with
       | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
       | None -> conf
     in
+    print_endline __LOC__ ;
     fn conf base
 
 let w_person ~none fn conf base =
+  print_endline __LOC__ ;
   match find_person_in_env conf base "" with
-  | Some p -> fn conf base p
-  | _ -> none conf base
+  | Some p -> print_endline __LOC__ ; fn conf base p
+  | _ -> print_endline __LOC__ ; none conf base
 
 let treat_request conf =
+Printexc.record_backtrace true ;
+try
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base = w_base ~none:incorrect_request in
   let w_person = w_person ~none:very_unknown in
@@ -492,7 +498,24 @@ let treat_request conf =
           | None -> ()
         end ;
         let incorrect_request conf _ = incorrect_request conf in
+        print_endline @@ __LOC__ ^ ": " ^ m ;
         match m with
+        | "TEST" ->
+          print_endline __LOC__ ; flush_all () ;
+          begin fun conf base ->
+            print_endline __LOC__ ;
+            let i = Gwdb.iper_of_string @@ List.assoc "i" conf.env in
+            print_endline __LOC__ ;
+            let p = Gwdb.poi base i in
+            print_endline __LOC__ ;
+            Output.print_string conf "<h1>TEST</h1>" ;
+            print_endline __LOC__ ;
+            (get_first_name p |> sou base |> print_endline) ;
+            (get_surname p |> sou base |> print_endline) ;
+            Output.printf conf "%s, %s"
+              (get_first_name p |> sou base)
+              (get_surname p |> sou base)
+          end |> w_base
         | "" ->
           if base <> None then
             w_base @@
@@ -905,3 +928,7 @@ let treat_request conf =
         (Utf8.capitalize (transl conf "reserved to friends or wizards"));
       Hutil.trailer conf
     end
+with e ->
+  Printexc.print_backtrace stderr ;
+  print_endline __LOC__ ;
+  exit 0

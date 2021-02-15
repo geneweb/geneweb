@@ -224,7 +224,7 @@ let father_titles_places base p nobtit =
 
 let gen_gen_person_misc_names base p nobtit nobtit_fun =
   Futil.gen_person_misc_names
-    (sou base) empty_string quest_string
+    (sou base) is_empty_string is_quest_string
     p.first_name p.surname p.public_name p.qualifiers p.aliases
     p.first_names_aliases p.surnames_aliases
     nobtit

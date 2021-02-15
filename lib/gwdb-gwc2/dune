@@ -7,10 +7,8 @@
     geneweb.util
     unix
   )
+  (preprocess (action (run %{bin:cppo} %{input-file})))
   (modules
-    db2
-    db2disk
-    db2out
     gwdb_driver
   )
 )

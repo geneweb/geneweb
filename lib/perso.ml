@@ -3260,6 +3260,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
   | [s] ->
       begin try bool_val (eval_bool_person_field conf base env ep s) with
         Not_found ->
+        print_endline s ;
           begin try str_val (eval_str_person_field conf base env ep s) with
             Not_found -> obsolete_eval conf base env ep loc s
           end
