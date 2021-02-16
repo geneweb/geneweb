@@ -31,6 +31,7 @@
 #define FN_f_deleted "T"
 
 #define FN_idx_npoc "U"
+#define FN_particles "V"
 
 type ifam = int
 type iper = int
@@ -108,6 +109,8 @@ type base =
   ; open_in_bin : string -> in_channel
   ; out_bin : (string, out_channel) Hashtbl.t
   ; open_out_bin : string -> out_channel
+  ; cache_sou : (int, string) Hashtbl.t
+  ; particles : string list Lazy.t
   }
 
 (* TODO: create an array header so we can read all as array *)
@@ -158,7 +161,6 @@ let open_base bname =
     fun s -> match Hashtbl.find_opt ht s with
       | Some c -> c
       | None ->
-        prerr_endline @@ __LOC__ ^ ": " ^ Filename.concat bdir s ;
         let c = fn @@ Filename.concat bdir s in
         Hashtbl.add ht s c ;
         c
@@ -168,7 +170,15 @@ let open_base bname =
   let open_in_bin = aux in_bin open_in_bin in
   let open_out_bin = aux out_bin open_out_bin in
   let out_bin = Hashtbl.create 0 in
-  { bdir ; in_bin ; open_in_bin ; out_bin ; open_out_bin }
+  let cache_sou = Hashtbl.create 0 in
+  let particles =
+    lazy (let ic = open_in_bin @@ Filename.concat bdir FN_particles in
+          let r = Marshal.from_channel ic in
+          close_in ic ;
+          r
+         )
+  in
+  { bdir ; in_bin ; open_in_bin ; out_bin ; open_out_bin ; cache_sou ; particles }
 
 let nb_of_persons b =
   in_channel_length (b.open_in_bin @@ FN_p_firstname ^ ".dat") / 4
@@ -224,6 +234,10 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   output_array_dat_inx bdir FN_f_fevents (fun x -> x.Def.fevents) f ;
   output_array_dat_inx bdir FN_f_couple (fun x -> [| Adef.father x ; Adef.mother x |]) c ;
   output_array_dat_inx bdir FN_f_children (fun x -> x.Def.children) d ;
+  (* particles *)
+  (let oc = open_out_bin @@ Filename.concat bdir FN_particles in
+   Marshal.to_channel oc particles [ Marshal.No_sharing ] ;
+   close_out oc) ;
   (* indexes *)
   output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_key_index p strings) ;
   open_base bname
@@ -241,7 +255,12 @@ let istr_of_option = function None -> -1 | Some x -> x
 
 let istr_to_option = function -1 -> None | x -> Some x
 
-let sou b i = read_dat_inx b FN_strings i
+let sou b i =
+  try Hashtbl.find b.cache_sou i
+  with _ ->
+    let x = read_dat_inx b FN_strings i in
+    Hashtbl.add b.cache_sou i x ;
+    x
 
 let poi b i =
   let pevents = lazy (read_dat_inx b FN_p_pevents i) in
@@ -384,26 +403,28 @@ let get_relation f =
   | Some { Def.efam_name = Def.Efam_Residence } -> Def.Residence
   | _ -> assert false
 
+let load_ascends_array _ = ()
+let load_couples_array _ = ()
+let load_descends_array _ = ()
+let load_families_array _ = ()
+let load_persons_array _ = ()
+let load_strings_array _ = ()
+let load_unions_array _ = ()
+let clear_ascends_array _ = ()
+let clear_couples_array _ = ()
+let clear_descends_array _ = ()
+let clear_families_array _ = ()
+let clear_persons_array _ = ()
+let clear_strings_array _ = ()
+let clear_unions_array _ = ()
+let base_particles b = Lazy.force b.particles
 
-let base_notes_are_empty _ = assert false
-let base_notes_dir _ = assert false
-let base_notes_origin_file _ = assert false
-let base_notes_read _ = assert false
-let base_notes_read_first_line _ = assert false
-let base_particles _ = assert false
 let base_strings_of_first_name _ = assert false
 let base_strings_of_surname _ = assert false
 let base_visible_get _ = assert false
 let base_visible_write _ = assert false
 let base_wiznotes_dir _ = assert false
 let bname _ = assert false
-let clear_ascends_array _ = assert false
-let clear_couples_array _ = assert false
-let clear_descends_array _ = assert false
-let clear_families_array _ = assert false
-let clear_persons_array _ = assert false
-let clear_strings_array _ = assert false
-let clear_unions_array _ = assert false
 let close_base _ = assert false
 let commit_notes _ = assert false
 let commit_patches _ = assert false
@@ -431,13 +452,7 @@ let insert_family _ = assert false
 let insert_person _ = assert false
 let insert_string _ = assert false
 let insert_union _ = assert false
-let load_ascends_array _ = assert false
-let load_couples_array _ = assert false
-let load_descends_array _ = assert false
-let load_families_array _ = assert false
-let load_persons_array _ = assert false
-let load_strings_array _ = assert false
-let load_unions_array _ = assert false
+
 let nb_of_real_persons _ = assert false
 let new_ifam _ = assert false
 let new_iper _ = assert false
@@ -502,17 +517,82 @@ let patch_descend _ = assert false
 let patch_family _ = assert false
 let patch_person _ = assert false
 let patch_union _ = assert false
-let person_of_gen_person _ = assert false
+let person_of_gen_person _ =   assert false
 let persons _ = assert false
 let persons_of_first_name _ = assert false
 let persons_of_name _ = assert false
 let persons_of_surname _ = assert false
 
-let read_nldb _ = assert false
 let spi_find _ = assert false
 let spi_first _ = assert false
 let spi_next _ = assert false
-let write_nldb _ = assert false
+
+module IDX = struct
+
+  (* Return the index of an element using cmp *)
+  let binary_search cmp get len =
+    let rec aux low high =
+      if high <= low then
+        if cmp (get low) = 0 then low
+        else raise Not_found
+      else
+        let mid = (low + high) / 2 in
+        let c = cmp (get mid) in
+        if c < 0 then
+          aux low (mid - 1)
+        else if c > 0 then
+          aux (mid + 1) high
+        else
+          mid
+    in aux 0 len
+
+  (* Return the index of the first element matching, or the which would come after if unbound *)
+  let binary_search_or_next cmp get len =
+    let rec aux acc low high =
+      if high <= low then
+        if cmp (get low) <= 0 then low
+        else match acc with Some x -> x | None -> raise Not_found
+      else
+        let mid = (low + high) / 2 in
+        let c = cmp (get mid) in
+        if c < 0 then
+          aux (Some mid) low (mid - 1)
+        else if c > 0 then
+          aux acc (mid + 1) high
+        else
+          mid
+    in aux None 0 len
+
+  (* Return the index of the element comming after, using cmp *)
+  let binary_search_next cmp get len =
+    let rec aux acc low high =
+      if high <= low then
+        if cmp (get low) < 0 then low
+        else match acc with Some x -> x | None -> raise Not_found
+      else
+        let mid = (low + high) / 2 in
+        let c = cmp (cmp mid) in
+        if c < 0 then
+          aux (Some mid) low (mid - 1)
+        else
+          aux acc (mid + 1) high
+    in aux None 0 len
+
+
+end
+
+let search_npoc b key =
+  let ic_dat = b.open_in_bin @@ FN_idx_npoc ^ ".dat" in
+  let ic_inx = b.open_in_bin @@ FN_idx_npoc ^ ".inx" in
+  let get = read_dat_inx_aux ic_dat ic_inx in
+  IDX.binary_search (fun (key', _) -> compare key key') get (in_channel_length ic_inx / 4)
+  |> get
+  |> snd
+
+let person_of_key b p n o =
+  try Some (search_npoc b (Name.crush_lower p, Name.crush_lower n, o))
+  with e -> None
+
 
 (* Copied from gwc1 *)
 
@@ -663,79 +743,27 @@ end
 let read_nldb = NLDB.read
 let write_nldb = NLDB.write
 
-module IDX = struct
+let base_notes_origin_file _ = "" (* FIXME *)
+let base_notes_dir b = Filename.concat b.bdir "notes_d"
+let base_wiznotes_dir b = Filename.concat b.bdir "wiznotes"
 
-  (* Return the index of an element using cmp *)
-  let binary_search cmp get len =
-    let rec aux low high =
-      if high <= low then
-        if cmp (get low) = 0 then low
-        else raise Not_found
-      else
-        let mid = (low + high) / 2 in
-        let c = cmp (get mid) in
-        if c < 0 then
-          aux low (mid - 1)
-        else if c > 0 then
-          aux (mid + 1) high
-        else
-          mid
-    in aux 0 len
-
-  (* Return the index of the first element matching, or the which would come after if unbound *)
-  let binary_search_or_next cmp get len =
-    let rec aux acc low high =
-      if high <= low then
-        if cmp (get low) <= 0 then low
-        else match acc with Some x -> x | None -> raise Not_found
-      else
-        let mid = (low + high) / 2 in
-        let c = cmp (get mid) in
-        if c < 0 then
-          aux (Some mid) low (mid - 1)
-        else if c > 0 then
-          aux acc (mid + 1) high
-        else
-          mid
-    in aux None 0 len
-
-  (* Return the index of the element comming after, using cmp *)
-  let binary_search_next cmp get len =
-    let rec aux acc low high =
-      if high <= low then
-        if cmp (get low) < 0 then low
-        else match acc with Some x -> x | None -> raise Not_found
-      else
-        let mid = (low + high) / 2 in
-        let c = cmp (cmp mid) in
-        if c < 0 then
-          aux (Some mid) low (mid - 1)
-        else
-          aux acc (mid + 1) high
-    in aux None 0 len
-
-
-end
-
-let search_npoc b ((p,n,_) as key) =
-  let ic_dat = b.open_in_bin @@ FN_idx_npoc ^ ".dat" in
-  let ic_inx = b.open_in_bin @@ FN_idx_npoc ^ ".inx" in
-  print_endline @@ "searching: " ^ n ^ " --- " ^ p ;
-  print_endline @@ "number of elements: " ^ string_of_int @@ in_channel_length ic_inx / 4 ;
-  let get i =
-    prerr_endline @@ "i=" ^ string_of_int i ;
-    let (((p, n, _), _) as r) = read_dat_inx_aux ic_dat ic_inx i in
-    prerr_endline @@ __LOC__ ^ ": " ^ n ^ " --- "  ^ p ;
-    r
+let base_notes_read_aux base fnotes mode =
+  let fname =
+    if fnotes = "" then "notes"
+    else Filename.concat "notes_d" (fnotes ^ ".txt")
   in
-  IDX.binary_search (fun (key', _) -> compare key key') get (in_channel_length ic_inx / 4)
-  |> get
-  |> snd
+  try
+    let ic = Secure.open_in @@ Filename.concat base.bdir fname in
+    let str =
+      match mode with
+      | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
+      | Def.Rn1Ln -> (try input_line ic with End_of_file -> "")
+      | Def.RnAll -> Mutil.input_file_ic ic
+    in
+    close_in ic ;
+    str
+  with Sys_error _ -> ""
 
-let person_of_key b p n o =
-  Printexc.record_backtrace true ;
-  try Some (search_npoc b (Name.crush_lower p, Name.crush_lower n, o))
-  with e ->
-    prerr_endline (Printexc.to_string e) ;
-    Printexc.print_backtrace stderr ;
-    None
+let base_notes_read base fnotes = base_notes_read_aux base fnotes Def.RnAll
+let base_notes_read_first_line base fnotes = base_notes_read_aux base fnotes Def.Rn1Ln
+let base_notes_are_empty base fnotes = base_notes_read_aux base fnotes Def.RnDeg = ""

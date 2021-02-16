@@ -85,7 +85,7 @@ let compute base bdir =
   end;
   Printf.eprintf "--- misc notes\n";
   flush stderr;
-  let ndir = Filename.concat bdir (base_notes_dir base) in
+  let ndir = base_notes_dir base in
   let rec loop dir name =
     try
       let cdir = Filename.concat ndir dir in

@@ -244,8 +244,8 @@ let read_nldb = NLDB.read
 let write_nldb = NLDB.write
 
 let base_notes_origin_file base = base.data.bnotes.Def.norigin_file
-let base_notes_dir _base = "notes_d"
-let base_wiznotes_dir _base = "wiznotes"
+let base_notes_dir base = Filename.concat base.bdir "notes_d"
+let base_wiznotes_dir base = Filename.concat base.bdir "wiznotes"
 
 let base_notes_read_aux base fnotes mode =
   let fname =

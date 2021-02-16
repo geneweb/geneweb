@@ -1,13 +1,8 @@
-(* $Id: wiznotes.ml,v 5.54 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
 open Def
 open Util
-
-let dir conf base =
-  Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
-    (Gwdb.base_wiznotes_dir base)
 
 let wzfile wddir wz = Filename.concat wddir (wz ^ ".txt")
 
@@ -208,7 +203,10 @@ let print_old_wizards conf list =
     end
 
 let wizard_list_from_dir conf base =
-  match try Some (Sys.readdir (dir conf base)) with Sys_error _ -> None with
+  match
+    try Some (Sys.readdir @@ Gwdb.base_wiznotes_dir base)
+    with Sys_error _ -> None
+  with
     Some arr ->
       List.fold_left
         (fun list fname ->
@@ -273,7 +271,7 @@ let print_main conf base auth_file =
         list
     else list
   in
-  let wddir = dir conf base in
+  let wddir = Gwdb.base_wiznotes_dir base in
   Hutil.header_no_page_title conf title;
   (* mouais... *)
   Hutil.print_link_to_welcome conf true;
@@ -420,7 +418,7 @@ let print conf base =
     match f with
       Some wz ->
         let wz = Filename.basename wz in
-        let wfile = wzfile (dir conf base) wz in
+        let wfile = wzfile (Gwdb.base_wiznotes_dir base) wz in
         let (s, date) = read_wizard_notes wfile in
         begin match p_getint conf.env "v" with
           Some cnt0 -> print_part_wiznote conf base wz s cnt0
@@ -447,7 +445,7 @@ let print_mod conf base =
         let can_edit = conf.wizard && conf.user = wz || conf.manitou in
         if can_edit then
           let title = wizard_page_title conf wz in
-          let wfile = wzfile (dir conf base) wz in
+          let wfile = wzfile (Gwdb.base_wiznotes_dir base) wz in
           let (s, _) = read_wizard_notes wfile in
           Wiki.print_mod_view_page conf true "WIZNOTES" wz title [] s
         else Hutil.incorrect_request conf
@@ -469,13 +467,13 @@ let print_view conf base =
       Some wz ->
         let wz = Filename.basename wz in
         let title = wizard_page_title conf wz in
-        let wfile = wzfile (dir conf base) wz in
+        let wfile = wzfile (Gwdb.base_wiznotes_dir base) wz in
         let (s, _) = read_wizard_notes wfile in
         Wiki.print_mod_view_page conf false "WIZNOTES" wz title [] s
     | None -> Hutil.incorrect_request conf
 
 let commit_wiznotes conf base wz s =
-  let wddir = dir conf base in
+  let wddir = Gwdb.base_wiznotes_dir base in
   let fname = wzfile wddir wz in
   (try Unix.mkdir wddir 0o755 with Unix.Unix_error (_, _, _) -> ());
   write_wizard_notes fname s;
@@ -505,7 +503,7 @@ let print_mod_ok conf base =
     in
     let mode = "NOTES" in
     let read_string wz =
-      [], fst (read_wizard_notes (wzfile (dir conf base) wz))
+      [], fst (read_wizard_notes (wzfile (Gwdb.base_wiznotes_dir base) wz))
     in
     let commit = commit_wiznotes conf base in
     let string_filter s = Util.safe_html @@ string_with_macros conf [] s in
@@ -575,7 +573,7 @@ let do_connected_wizards conf base (_, _, _, wl) =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  let wddir = dir conf base in
+  let wddir = Gwdb.base_wiznotes_dir base in
   let denying = wizard_denying wddir in
   let wl =
     if not (List.mem_assoc conf.user wl) then (conf.user, conf.ctime) :: wl
@@ -633,7 +631,7 @@ let connected_wizards conf base =
   | None -> Hutil.incorrect_request conf
 
 let do_change_wizard_visibility conf base x set_vis =
-  let wddir = dir conf base in
+  let wddir = Gwdb.base_wiznotes_dir base in
   if not @@ Sys.file_exists wddir then Unix.mkdir wddir 0o755;
   let denying = wizard_denying wddir in
   let is_visible = not (List.mem conf.user denying) in
@@ -685,7 +683,7 @@ let search_text conf base s =
         [] -> None
       | wz :: list ->
           let wz = Filename.basename wz in
-          let wfile = wzfile (dir conf base) wz in
+          let wfile = wzfile (Gwdb.base_wiznotes_dir base) wz in
           let (nt, dt) = read_wizard_notes wfile in
           if in_text case_sens s nt then Some (wz, wfile, nt, dt)
           else loop list
