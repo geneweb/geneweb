@@ -147,6 +147,7 @@ val delete_family : base -> ifam -> unit
 val delete_descend : base -> ifam -> unit
 val delete_couple : base -> ifam -> unit
 
+(* [person_of_key fn sn occ] *)
 val person_of_key : base -> string -> string -> int -> iper option
 val persons_of_name : base -> string -> iper list
 val persons_of_first_name : base -> string_person_index

@@ -27,6 +27,11 @@
 #define FN_f_couple "Q"
 #define FN_f_children "R"
 
+#define FN_p_deleted "S"
+#define FN_f_deleted "T"
+
+#define FN_idx_npoc "U"
+
 type ifam = int
 type iper = int
 type istr = int
@@ -42,6 +47,8 @@ let is_quest_string = (=) 1
 let empty_string = 0
 let quest_string = 1
 let eq_istr = Int.equal
+let dummy_ifam = -1
+let dummy_iper = -1
 
 type fam_event = (iper, istr) Def.gen_fam_event
 type pers_event = (iper, istr) Def.gen_pers_event
@@ -82,7 +89,7 @@ type family =
   { comment : istr Lazy.t
   ; fevents : fam_event list Lazy.t
   ; fsources : istr Lazy.t
-  ; ifam : ifam
+  ; ifam : ifam Lazy.t
   ; origin_file : istr Lazy.t
   ; couple : iper array Lazy.t
   ; children : iper array Lazy.t
@@ -107,7 +114,7 @@ type base =
 let output_array_dat_inx bdir name get arr =
   let oc_dat = open_out_bin @@ Filename.concat bdir @@ name ^ ".dat" in
   let oc_inx = open_out_bin @@ Filename.concat bdir @@ name ^ ".inx" in
-  print_endline @@ Filename.concat bdir @@ name ^ ".dat" ;
+  prerr_endline @@ Filename.concat bdir @@ name ^ ".dat" ;
   Array.iteri begin fun i x ->
     assert (pos_out oc_inx = i * 4) ;
     output_binary_int oc_inx (pos_out oc_dat) ;
@@ -119,19 +126,22 @@ let output_array_dat_inx bdir name get arr =
 (* TODO: create an array header so we can read all as array *)
 let output_array_dat bdir name get arr =
   let oc_dat = open_out_bin @@ Filename.concat bdir @@ name ^ ".dat" in
-  print_endline @@ Filename.concat bdir @@ name ^ ".dat" ;
+  prerr_endline @@ Filename.concat bdir @@ name ^ ".dat" ;
   Array.iteri begin fun i x ->
     assert (pos_out oc_dat = i * 4) ;
     output_binary_int oc_dat (get x) ;
   end arr ;
   close_out oc_dat
 
-let read_dat_inx base name i =
-  let ic_dat = base.open_in_bin @@ name ^ ".dat" in
-  let ic_inx = base.open_in_bin @@ name ^ ".inx" in
+let read_dat_inx_aux ic_dat ic_inx i =
   seek_in ic_inx (i * 4) ;
   seek_in ic_dat (input_binary_int ic_inx) ;
   Marshal.from_channel ic_dat
+
+let read_dat_inx base name =
+  read_dat_inx_aux
+    (base.open_in_bin @@ name ^ ".dat")
+    (base.open_in_bin @@ name ^ ".inx")
 
 let read_dat base name i =
   let ic_dat = base.open_in_bin @@ name ^ ".dat" in
@@ -148,7 +158,7 @@ let open_base bname =
     fun s -> match Hashtbl.find_opt ht s with
       | Some c -> c
       | None ->
-        print_endline @@ __LOC__ ^ ": " ^ Filename.concat bdir s ;
+        prerr_endline @@ __LOC__ ^ ": " ^ Filename.concat bdir s ;
         let c = fn @@ Filename.concat bdir s in
         Hashtbl.add ht s c ;
         c
@@ -166,6 +176,16 @@ let nb_of_persons b =
 let nb_of_families b =
   in_channel_length (b.open_in_bin @@ FN_f_comment ^ ".dat") / 4
 
+let make_key_index p strings =
+  let a =
+    Array.mapi
+      (fun i p -> ( Name.crush_lower strings.(p.Def.first_name)
+                  , Name.crush_lower strings.(p.Def.surname)
+                  , p.occ), i)
+      p
+  in
+  Array.sort compare a ;
+  a
 
 let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   let bdir =
@@ -204,6 +224,8 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   output_array_dat_inx bdir FN_f_fevents (fun x -> x.Def.fevents) f ;
   output_array_dat_inx bdir FN_f_couple (fun x -> [| Adef.father x ; Adef.mother x |]) c ;
   output_array_dat_inx bdir FN_f_children (fun x -> x.Def.children) d ;
+  (* indexes *)
+  output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_key_index p strings) ;
   open_base bname
 
 let sync ?scratch:_ b =
@@ -260,7 +282,7 @@ let foi b i =
   { comment = lazy (read_dat b FN_f_comment i)
   ; fevents
   ; fsources = lazy (read_dat b FN_f_fsources i)
-  ; ifam = i
+  ; ifam = lazy (if Obj.magic @@ read_dat b FN_f_deleted i then dummy_ifam else i)
   ; origin_file = lazy (read_dat b FN_f_origin_file i)
   ; couple = lazy (read_dat_inx b FN_f_couple i)
   ; children = lazy (read_dat_inx b FN_f_children i)
@@ -302,7 +324,7 @@ let get_burial_src p = map_default empty_string (fun e -> e.Def.epers_src) (Lazy
 let get_death p = (* FIXME *)
   match Lazy.force p.death with
   | Some { Def.epers_date ; _ } ->
-    if epers_date = Adef.cdate_None then Def.Death (Def.Unspecified, epers_date)
+    if epers_date <> Adef.cdate_None then Def.Death (Def.Unspecified, epers_date)
     else Def.OfCourseDead
   | _ -> Def.NotDead
 let get_death_note p = map_default empty_string (fun e -> e.Def.epers_note) (Lazy.force p.death)
@@ -338,7 +360,7 @@ let get_divorce f =
 let get_father f = Array.unsafe_get (Lazy.force f.couple) 0
 let get_fevents f = Lazy.force f.fevents
 let get_fsources f = Lazy.force f.fsources
-let get_ifam f = f.ifam
+let get_ifam f = Lazy.force f.ifam
 let get_marriage f = map_default Adef.cdate_None (fun e -> e.Def.efam_date) (Lazy.force f.relation)
 let get_marriage_note f = map_default empty_string (fun e -> e.Def.efam_note) (Lazy.force f.relation)
 let get_marriage_place f = map_default empty_string (fun e -> e.Def.efam_place) (Lazy.force f.relation)
@@ -392,8 +414,6 @@ let delete_descend _ = assert false
 let delete_family _ = assert false
 let delete_person _ = assert false
 let delete_union _ = assert false
-let dummy_ifam = -1
-let dummy_iper = -1
 let empty_family _ = assert false
 let empty_person _ = assert false
 let families ?select:_ _ = assert false
@@ -483,7 +503,6 @@ let patch_family _ = assert false
 let patch_person _ = assert false
 let patch_union _ = assert false
 let person_of_gen_person _ = assert false
-let person_of_key _ = assert false
 let persons _ = assert false
 let persons_of_first_name _ = assert false
 let persons_of_name _ = assert false
@@ -643,3 +662,80 @@ end
 
 let read_nldb = NLDB.read
 let write_nldb = NLDB.write
+
+module IDX = struct
+
+  (* Return the index of an element using cmp *)
+  let binary_search cmp get len =
+    let rec aux low high =
+      if high <= low then
+        if cmp (get low) = 0 then low
+        else raise Not_found
+      else
+        let mid = (low + high) / 2 in
+        let c = cmp (get mid) in
+        if c < 0 then
+          aux low (mid - 1)
+        else if c > 0 then
+          aux (mid + 1) high
+        else
+          mid
+    in aux 0 len
+
+  (* Return the index of the first element matching, or the which would come after if unbound *)
+  let binary_search_or_next cmp get len =
+    let rec aux acc low high =
+      if high <= low then
+        if cmp (get low) <= 0 then low
+        else match acc with Some x -> x | None -> raise Not_found
+      else
+        let mid = (low + high) / 2 in
+        let c = cmp (get mid) in
+        if c < 0 then
+          aux (Some mid) low (mid - 1)
+        else if c > 0 then
+          aux acc (mid + 1) high
+        else
+          mid
+    in aux None 0 len
+
+  (* Return the index of the element comming after, using cmp *)
+  let binary_search_next cmp get len =
+    let rec aux acc low high =
+      if high <= low then
+        if cmp (get low) < 0 then low
+        else match acc with Some x -> x | None -> raise Not_found
+      else
+        let mid = (low + high) / 2 in
+        let c = cmp (cmp mid) in
+        if c < 0 then
+          aux (Some mid) low (mid - 1)
+        else
+          aux acc (mid + 1) high
+    in aux None 0 len
+
+
+end
+
+let search_npoc b ((p,n,_) as key) =
+  let ic_dat = b.open_in_bin @@ FN_idx_npoc ^ ".dat" in
+  let ic_inx = b.open_in_bin @@ FN_idx_npoc ^ ".inx" in
+  print_endline @@ "searching: " ^ n ^ " --- " ^ p ;
+  print_endline @@ "number of elements: " ^ string_of_int @@ in_channel_length ic_inx / 4 ;
+  let get i =
+    prerr_endline @@ "i=" ^ string_of_int i ;
+    let (((p, n, _), _) as r) = read_dat_inx_aux ic_dat ic_inx i in
+    prerr_endline @@ __LOC__ ^ ": " ^ n ^ " --- "  ^ p ;
+    r
+  in
+  IDX.binary_search (fun (key', _) -> compare key key') get (in_channel_length ic_inx / 4)
+  |> get
+  |> snd
+
+let person_of_key b p n o =
+  Printexc.record_backtrace true ;
+  try Some (search_npoc b (Name.crush_lower p, Name.crush_lower n, o))
+  with e ->
+    prerr_endline (Printexc.to_string e) ;
+    Printexc.print_backtrace stderr ;
+    None

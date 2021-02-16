@@ -4,11 +4,10 @@
   (implements geneweb.gwdb_driver)
   (libraries
     geneweb.def
+    geneweb.io
     geneweb.util
     unix
   )
   (preprocess (action (run %{bin:cppo} %{input-file})))
-  (modules
-    gwdb_driver
-  )
+  (modules gwdb_driver)
 )

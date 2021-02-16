@@ -4310,7 +4310,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "on_death_date" ->
       begin match p_auth, get_death p with
         true, Death (_, d) ->
+          prerr_endline __LOC__ ;
           let d = Adef.date_of_cdate d in
+          prerr_endline __LOC__ ;
           begin match p_getenv conf.base_env "long_date" with
             Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
           | _ -> DateDisplay.string_of_ondate conf d

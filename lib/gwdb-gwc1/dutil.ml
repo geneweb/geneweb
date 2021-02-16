@@ -40,7 +40,7 @@ let father_titles_places base p nobtit =
 
 let dsk_person_misc_names base p nobtit =
   Futil.gen_person_misc_names
-    (sou base) 0 1
+    (sou base) ((=) 0) ((=) 1)
     p.first_name p.surname p.public_name p.qualifiers p.aliases
     p.first_names_aliases p.surnames_aliases
     (nobtit p)
