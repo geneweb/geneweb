@@ -218,6 +218,7 @@ let print_frequency conf base is_surnames =
   print_frequency_any conf base is_surnames list len
 
 let print_alphabetic conf base is_surnames =
+  print_endline __LOC__ ;
   let ini =
     match p_getenv conf.env "k" with
     | Some k -> k

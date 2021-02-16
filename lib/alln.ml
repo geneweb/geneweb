@@ -40,6 +40,7 @@ let first_letters base is_surnames =
     Otherwise, return the list of values as (key * text * person count).
   *)
 let select_names conf base is_surnames ini limit =
+  print_endline __LOC__ ;
   let inilen = Utf8.length ini + 1 in
   let cut k = Utf8.sub k 0 (min (Utf8.length k) inilen) in
   let iii =

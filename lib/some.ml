@@ -307,8 +307,11 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
   let istrl = base_strings_of base x in
   List.fold_right begin fun istr l ->
     let str = sou base istr in
+    print_endline str ;
+    print_endline x ;
     if str = x then
       let iperl = spi_find (persons_of base) istr in
+      print_endline __LOC__ ;
       let iperl =
         List.fold_left begin fun iperl iper ->
           let p = pget conf base iper in

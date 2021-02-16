@@ -31,6 +31,12 @@
 #define FN_f_deleted "T"
 
 #define FN_idx_npoc "U"
+#define FN_idx_iof "W"
+#define FN_idx_ios "X"
+
+#define FN_spi_f "Y"
+#define FN_spi_s "Z"
+
 #define FN_particles "V"
 
 type ifam = int
@@ -43,10 +49,10 @@ let istr_of_string = int_of_string
 let string_of_ifam = string_of_int
 let string_of_iper = string_of_int
 let string_of_istr = string_of_int
-let is_empty_string = (=) 0
-let is_quest_string = (=) 1
 let empty_string = 0
+let is_empty_string = (=) empty_string
 let quest_string = 1
+let is_quest_string = (=) quest_string
 let eq_istr = Int.equal
 let dummy_ifam = -1
 let dummy_iper = -1
@@ -99,8 +105,6 @@ type family =
   ; separation : fam_event option Lazy.t
   }
 
-type string_person_index
-
 type base_version = GnWbLazy0000
 
 type base =
@@ -117,7 +121,6 @@ type base =
 let output_array_dat_inx bdir name get arr =
   let oc_dat = open_out_bin @@ Filename.concat bdir @@ name ^ ".dat" in
   let oc_inx = open_out_bin @@ Filename.concat bdir @@ name ^ ".inx" in
-  prerr_endline @@ Filename.concat bdir @@ name ^ ".dat" ;
   Array.iteri begin fun i x ->
     assert (pos_out oc_inx = i * 4) ;
     output_binary_int oc_inx (pos_out oc_dat) ;
@@ -129,7 +132,6 @@ let output_array_dat_inx bdir name get arr =
 (* TODO: create an array header so we can read all as array *)
 let output_array_dat bdir name get arr =
   let oc_dat = open_out_bin @@ Filename.concat bdir @@ name ^ ".dat" in
-  prerr_endline @@ Filename.concat bdir @@ name ^ ".dat" ;
   Array.iteri begin fun i x ->
     assert (pos_out oc_dat = i * 4) ;
     output_binary_int oc_dat (get x) ;
@@ -172,7 +174,7 @@ let open_base bname =
   let out_bin = Hashtbl.create 0 in
   let cache_sou = Hashtbl.create 0 in
   let particles =
-    lazy (let ic = open_in_bin @@ Filename.concat bdir FN_particles in
+    lazy (let ic = open_in_bin FN_particles in
           let r = Marshal.from_channel ic in
           close_in ic ;
           r
@@ -186,7 +188,7 @@ let nb_of_persons b =
 let nb_of_families b =
   in_channel_length (b.open_in_bin @@ FN_f_comment ^ ".dat") / 4
 
-let make_key_index p strings =
+let make_idx_npoc p strings =
   let a =
     Array.mapi
       (fun i p -> ( Name.crush_lower strings.(p.Def.first_name)
@@ -194,8 +196,37 @@ let make_key_index p strings =
                   , p.occ), i)
       p
   in
-  Array.sort compare a ;
+  Array.fast_sort compare a ;
   a
+
+let ht_add ht k v =
+  match Hashtbl.find_opt ht k with
+  | Some acc ->
+    if not @@ List.mem v acc then Hashtbl.replace ht k (v :: acc)
+  | None -> Hashtbl.add ht k [v]
+
+let make_idx_iofs_aux g crush p =
+  let ht = Hashtbl.create 0 in
+  Array.iter (fun p -> ht_add ht (crush (g p)) (g p)) p ;
+  let a = Array.make (Hashtbl.length ht) ("", []) in
+  assert (Array.length a = Hashtbl.fold begin fun k v i -> Array.set a i (k, v) ; i + 1 end ht 0) ;
+  Array.fast_sort compare a ;
+  a
+
+let make_idx_iof = make_idx_iofs_aux (fun p -> p.Def.first_name)
+let make_idx_ios = make_idx_iofs_aux (fun p -> p.Def.surname)
+
+let make_spi_aux g part p strings =
+  let cmp (k, _) (k', _) = Mutil.compare_after_particle part strings.(k) strings.(k') in
+  let ht = Hashtbl.create 0 in
+  Array.iteri (fun i p -> ht_add ht (g p) i) p ;
+  let a = Array.make (Hashtbl.length ht) (-1, []) in
+  assert (Array.length a = Hashtbl.fold begin fun k v i -> Array.set a i (k, v) ; i + 1 end ht 0) ;
+  Array.fast_sort cmp a ;
+  a
+
+let make_spi_f = make_spi_aux (fun p -> p.Def.first_name)
+let make_spi_s = make_spi_aux (fun p -> p.Def.surname)
 
 let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   let bdir =
@@ -239,7 +270,20 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
    Marshal.to_channel oc particles [ Marshal.No_sharing ] ;
    close_out oc) ;
   (* indexes *)
-  output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_key_index p strings) ;
+  let crush =
+    let ht = Hashtbl.create 0 in
+    fun i ->
+      try Hashtbl.find ht i
+      with _ ->
+        let s = Name.crush_lower strings.(i) in
+        Hashtbl.add ht i s ;
+        s
+  in
+  output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_idx_npoc p strings) ;
+  output_array_dat_inx bdir FN_idx_iof (fun x -> x) (make_idx_iof crush p) ;
+  output_array_dat_inx bdir FN_idx_ios (fun x -> x) (make_idx_ios crush p) ;
+  output_array_dat_inx bdir FN_spi_f (fun x -> x) (make_spi_f particles p strings) ;
+  output_array_dat_inx bdir FN_spi_s (fun x -> x) (make_spi_s particles p strings) ;
   open_base bname
 
 let sync ?scratch:_ b =
@@ -419,8 +463,21 @@ let clear_strings_array _ = ()
 let clear_unions_array _ = ()
 let base_particles b = Lazy.force b.particles
 
-let base_strings_of_first_name _ = assert false
-let base_strings_of_surname _ = assert false
+module HT = struct
+type ('a, 'b) t =
+  { mutable size: int;
+    mutable data: ('a, 'b) bucketlist array;  (* the buckets *)
+    mutable seed: int;                        (* for randomization *)
+    mutable initial_size: int;                (* initial array size *)
+  }
+
+and ('a, 'b) bucketlist =
+  | Empty
+  | Cons of { mutable key: 'a;
+              mutable data: 'b;
+              mutable next: ('a, 'b) bucketlist }
+end
+
 let base_visible_get _ = assert false
 let base_visible_write _ = assert false
 let base_wiznotes_dir _ = assert false
@@ -519,13 +576,7 @@ let patch_person _ = assert false
 let patch_union _ = assert false
 let person_of_gen_person _ =   assert false
 let persons _ = assert false
-let persons_of_first_name _ = assert false
 let persons_of_name _ = assert false
-let persons_of_surname _ = assert false
-
-let spi_find _ = assert false
-let spi_first _ = assert false
-let spi_next _ = assert false
 
 module IDX = struct
 
@@ -571,28 +622,61 @@ module IDX = struct
         else match acc with Some x -> x | None -> raise Not_found
       else
         let mid = (low + high) / 2 in
-        let c = cmp (cmp mid) in
+        let c = cmp (get mid) in
         if c < 0 then
           aux (Some mid) low (mid - 1)
         else
           aux acc (mid + 1) high
     in aux None 0 len
 
-
 end
 
-let search_npoc b key =
-  let ic_dat = b.open_in_bin @@ FN_idx_npoc ^ ".dat" in
-  let ic_inx = b.open_in_bin @@ FN_idx_npoc ^ ".inx" in
+let search_aux search fn compare b key =
+  let ic_dat = b.open_in_bin @@ fn ^ ".dat" in
+  let ic_inx = b.open_in_bin @@ fn ^ ".inx" in
   let get = read_dat_inx_aux ic_dat ic_inx in
-  IDX.binary_search (fun (key', _) -> compare key key') get (in_channel_length ic_inx / 4)
+  search (fun (key', _) -> compare key key') get (in_channel_length ic_inx / 4)
   |> get
   |> snd
+
+let binary_search fn compare b key = search_aux IDX.binary_search fn compare b key
+
+let search_npoc b k = binary_search FN_idx_npoc compare b k
 
 let person_of_key b p n o =
   try Some (search_npoc b (Name.crush_lower p, Name.crush_lower n, o))
   with e -> None
 
+let search_iof b k = binary_search FN_idx_iof String.compare b k
+let search_ios b k = binary_search FN_idx_ios String.compare b k
+
+let base_strings_of_first_name b s =
+  try search_iof b (Name.crush_lower s)
+  with e -> []
+
+let base_strings_of_surname b s =
+  try search_ios b (Name.crush_lower s)
+  with e -> []
+
+type string_person_index =
+  { first : string -> istr
+  ; next : istr -> istr
+  ; find : istr -> iper list
+  }
+let spi_find s = s.find
+let spi_first s = s.first
+let spi_next s = s.next
+
+let spi fn b =
+  let cmp k k' = Mutil.compare_after_particle (Lazy.force b.particles) (sou b k) (sou b k') in
+  print_endline @@ "SPI: " ^ fn ;
+  { first = (fun k -> search_aux IDX.binary_search_or_next fn String.compare b k : string -> istr)
+  ; next = (fun k -> search_aux IDX.binary_search_next fn cmp b k : istr -> istr)
+  ; find = (fun k -> search_aux IDX.binary_search fn cmp b k : istr -> iper list)
+  }
+
+let persons_of_first_name = spi FN_spi_f
+let persons_of_surname = spi FN_spi_s
 
 (* Copied from gwc1 *)
 
