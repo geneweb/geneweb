@@ -292,7 +292,8 @@ val dummy_marker : 'a -> 'b -> ('a, 'b) Marker.t
 
 (** {2 Database creation} *)
 
-(** [make bname particles arrays] create a base with [bname] name and [arrays] as content. *)
+(** [make bname particles arrays strings notes]
+    creates a base with [bname] name and [arrays] as content. *)
 val make
   : string
   -> string list
@@ -303,7 +304,8 @@ val make
            * int Def.gen_couple array
            * int Def.gen_descend array )
        * string array
-       * Def.base_notes )
+       * (string * string) list
+     )
   -> base
 
 val read_nldb : base -> (iper, ifam) Def.NLDB.t

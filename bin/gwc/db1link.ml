@@ -36,7 +36,7 @@ type cbase =
   ; mutable c_couples : couple array
   ; mutable c_descends : descend array
   ; mutable c_strings : string array
-  ; mutable c_bnotes : Def.base_notes
+  ; mutable c_bnotes : (string * string) list
   }
 
 type file_info =
@@ -836,24 +836,14 @@ let insert_notes fname gen key str =
     flush stdout
 
 let insert_bnotes fname gen nfname str =
-  let old_nread = gen.g_base.c_bnotes.nread in
   let nfname =
     if nfname = "" then ""
     else
-      match NotesLinks.check_file_name nfname with
+      match NotesLinks.check_file_name nfname with (* kill? *)
         Some (dl, f) -> List.fold_right Filename.concat dl f
       | None -> "bad"
   in
-  let bnotes =
-    {nread = (fun f n -> if f = nfname then str else old_nread f n);
-     norigin_file = fname;
-     efiles =
-       if nfname <> "" then
-         let efiles = gen.g_base.c_bnotes.efiles () in
-         fun () -> nfname :: efiles
-       else gen.g_base.c_bnotes.efiles}
-  in
-  gen.g_base.c_bnotes <- bnotes
+  gen.g_base.c_bnotes <- (nfname, str) :: gen.g_base.c_bnotes
 
 let insert_wiznote gen wizid str =
   gen.g_wiznotes <- (wizid, str) :: gen.g_wiznotes
@@ -1164,9 +1154,8 @@ let empty_base : cbase =
   ; c_couples = [| |]
   ; c_descends = [| |]
   ; c_strings = [| |]
-  ; c_bnotes = { nread = (fun _ _ -> "")
-               ; norigin_file = ""
-               ; efiles = fun _ -> [] } }
+  ; c_bnotes = []
+  }
 
 let make_base bname gen per_index_ic per_ic fam_index_ic fam_ic bdir =
   let _ =

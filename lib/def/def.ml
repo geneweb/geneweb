@@ -295,9 +295,9 @@ type ('person, 'descend, 'title) misc = MissingSources
 type rn_mode = RnAll | Rn1Ln | RnDeg
 
 type base_notes =
-  { nread : string -> rn_mode -> string
+  { nread : string -> rn_mode -> string (* nread fname mode = content *)
   ; norigin_file : string
-  ; efiles : unit -> string list
+  (* ; efiles : unit -> string list        (\* other note files (page-ext) *\) *)
   }
 
 (* Historique des modifications *)

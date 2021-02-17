@@ -3553,10 +3553,7 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
     fa, ca, da
   in
   let strings = Array.sub g_str.arr 0 g_str.tlen in
-  let bnotes =
-    {nread = (fun s _ -> if s = "" then g_bnot else ""); norigin_file = "";
-     efiles = fun _ -> []}
-  in
+  let bnotes = [] in
   persons, families, strings, bnotes
 
 let designation strings p =

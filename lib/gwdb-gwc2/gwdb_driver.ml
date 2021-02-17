@@ -39,6 +39,10 @@
 
 #define FN_particles "V"
 
+#define FN_notes "00"
+#define FN_notes_d "notes_d"
+
+
 type ifam = int
 type iper = int
 type istr = int
@@ -228,12 +232,32 @@ let make_spi_aux g part p strings =
 let make_spi_f = make_spi_aux (fun p -> p.Def.first_name)
 let make_spi_s = make_spi_aux (fun p -> p.Def.surname)
 
+(* FIXME: write to tmp, then move *)
 let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
   in
   Mutil.mkdir_p bdir ;
+  (* particles *)
+  (let oc = open_out_bin @@ Filename.concat bdir FN_particles in
+   Marshal.to_channel oc particles [ Marshal.No_sharing ] ;
+   close_out oc) ;
+  (* notes *)
+  (let output_note s fn =
+     let oc = Secure.open_out fn in
+     output_string oc s ;
+     close_out oc
+   in
+   let ndir = Filename.concat bdir FN_notes_d in
+   List.iter begin function
+     | ("", s) -> output_note s FN_notes
+     | (fn, s) ->
+       let fn = Filename.concat ndir (fn ^ ".txt") in
+       Mutil.mkdir_p (Filename.dirname fn) ;
+       output_note s fn
+   end bnotes
+  );
   (* strings *)
   output_array_dat_inx bdir FN_strings (fun x -> x) strings ;
   (* persons *)
@@ -265,10 +289,6 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   output_array_dat_inx bdir FN_f_fevents (fun x -> x.Def.fevents) f ;
   output_array_dat_inx bdir FN_f_couple (fun x -> [| Adef.father x ; Adef.mother x |]) c ;
   output_array_dat_inx bdir FN_f_children (fun x -> x.Def.children) d ;
-  (* particles *)
-  (let oc = open_out_bin @@ Filename.concat bdir FN_particles in
-   Marshal.to_channel oc particles [ Marshal.No_sharing ] ;
-   close_out oc) ;
   (* indexes *)
   let crush =
     let ht = Hashtbl.create 0 in
@@ -345,7 +365,7 @@ let foi b i =
   { comment = lazy (read_dat b FN_f_comment i)
   ; fevents
   ; fsources = lazy (read_dat b FN_f_fsources i)
-  ; ifam = lazy (if Obj.magic @@ read_dat b FN_f_deleted i then dummy_ifam else i)
+  ; ifam = lazy ((* if Obj.magic @@ read_dat b FN_f_deleted i then dummy_ifam else *) i) (* FIXME *)
   ; origin_file = lazy (read_dat b FN_f_origin_file i)
   ; couple = lazy (read_dat_inx b FN_f_couple i)
   ; children = lazy (read_dat_inx b FN_f_children i)
@@ -828,13 +848,13 @@ let read_nldb = NLDB.read
 let write_nldb = NLDB.write
 
 let base_notes_origin_file _ = "" (* FIXME *)
-let base_notes_dir b = Filename.concat b.bdir "notes_d"
+let base_notes_dir b = Filename.concat b.bdir FN_notes_d
 let base_wiznotes_dir b = Filename.concat b.bdir "wiznotes"
 
 let base_notes_read_aux base fnotes mode =
   let fname =
-    if fnotes = "" then "notes"
-    else Filename.concat "notes_d" (fnotes ^ ".txt")
+    if fnotes = "" then FN_notes
+    else Filename.concat FN_notes_d (fnotes ^ ".txt")
   in
   try
     let ic = Secure.open_in @@ Filename.concat base.bdir fname in
