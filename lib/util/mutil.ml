@@ -1,6 +1,8 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 let bench name fn =
+  prerr_endline @@ __LOC__ ^ ": " ^ name ;
+  flush stderr ;
   let pprint_gc gc =
     let open Gc in
     let pint x =
