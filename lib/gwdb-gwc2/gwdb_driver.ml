@@ -45,29 +45,14 @@
 
 (* TODO: Use position in FN_strings.dat as iter instead of Fn_strings.inx *)
 
+(* TODO:
+   Use (G)ADT for idx so we can have the same functions for indexes:
+   - loaded in memory
+   - using fd and 'raw' reads
+   - using simple in_channel
+*)
 (* TODO: try this for idx reading *)
-(* let read_binary_int =
- *   let b = Bytes.create 4 in
- *   fun fd ->
- *     let aux res c = (res lsl 8) + Char.code c in
- *     assert (4 = Unix.read fd b 0 4) ;
- *     (aux (aux (aux (aux 0 (Bytes.unsafe_get b 0)) (Bytes.unsafe_get b 1)) (Bytes.unsafe_get b 2)) (Bytes.unsafe_get b 3))
- *     (\* lsl 32) asr 32 *\)
- * 
- * let () =
- *   print_endline "BENCH" ;
- *   let fn = "/tmp/bench" in
- *   let n = 10000000 in
- *   let oc = open_out_bin fn in
- *   for i = 0 to n do output_binary_int oc i done ;
- *   close_out oc ;
- *   Gc.compact () ;
- *   Mutil.bench __LOC__ (fun () -> let ic = Unix.openfile fn [Unix.O_RDONLY] 0o400 in for i = n - 1 downto 0 do ignore (Unix.lseek ic (i * 4) Unix.SEEK_SET) ; assert (i = read_binary_int ic) done ; Unix.close ic) ;
- *   Gc.compact () ;
- *   Mutil.bench __LOC__ (fun () -> let ic = Unix.openfile fn [Unix.O_RDONLY] 0o400 in for i = 0 to n do ignore (Unix.lseek ic (i * 4) Unix.SEEK_SET) ; assert (i = read_binary_int ic) done ; Unix.close ic) ;
- *   Gc.compact () ;
- *   Mutil.bench __LOC__ (fun () -> let ic = open_in_bin fn in for i = 0 to n do seek_in ic (i * 4) ; assert (i = input_binary_int ic) done ; close_in ic) ;
- *   print_endline "DONE" *)
+(* TODO: try the same approach for value reading (need to parse size in header, read string, unmarshal) *)
 
 type ifam = int
 type iper = int
@@ -144,22 +129,91 @@ let map_max m =
   | Some (i, _) -> i
   | None -> 0
 
+type idx =
+  | Loaded of int ref * bytes
+  | File_descr of Unix.file_descr * bytes
+  | In_channel of in_channel
+
+let _seek_in idx i = match idx with
+  | Loaded (p, _) -> p := i
+  | File_descr (fd, _) -> ignore (Unix.lseek fd i Unix.SEEK_SET)
+  | In_channel ic -> seek_in ic i
+
+(* TODO: _read_binary_uint *)
+let _read_binary_int =
+  let aux b off =
+    let r =
+      let aux c res = (res lsl 8) + Char.code c in
+      0
+      |> aux (Bytes.unsafe_get b off)
+      |> aux (Bytes.unsafe_get b @@ off + 1)
+      |> aux (Bytes.unsafe_get b @@ off + 2)
+      |> aux (Bytes.unsafe_get b @@ off + 3)
+    in (r lsl 32) asr 32
+  in
+  function
+  | Loaded (p, b) ->
+    aux b !p
+  | File_descr (fd, b) ->
+    assert (4 = Unix.read fd b 0 4) ;
+    aux b 0
+  | In_channel ic ->
+    input_binary_int ic
+
+let () =
+  print_endline "BENCH" ;
+  let fn = "/tmp/bench" in
+  let n = 25000 in
+  (*  sur mon PC : File_descr plus rapide que In_channel pour n >= 25000 *)
+  let oc = open_out_bin fn in
+  for i = 0 to n do output_binary_int oc i done ;
+  close_out oc ;
+  Random.self_init () ;
+  let r = Array.init 50 (fun _ -> Random.int n) in
+  let bench name ic =
+    Gc.compact () ;
+    Mutil.bench name begin fun () ->
+      Array.iter begin fun i ->
+        _seek_in ic (i * 4) ;
+        assert (_read_binary_int ic = i) ;
+      end r
+    end
+  in
+  bench __LOC__ begin
+    let ic = open_in_bin fn in
+    let r = really_input_string ic (in_channel_length ic) in
+    close_in ic ;
+    Loaded (ref 0, Bytes.unsafe_of_string r)
+  end ;
+  bench __LOC__ begin
+    let fd = Unix.openfile fn [Unix.O_RDONLY] 0o400 in
+    let b = Bytes.create 4 in
+    File_descr (fd, b)
+  end ;
+  bench __LOC__ begin
+    In_channel (open_in_bin fn)
+  end ;
+  print_endline "DONE"
+
 type base =
   { bdir : string
-  ; in_bin : (string, in_channel) Hashtbl.t
-  ; open_in_bin : string -> in_channel
-  ; out_bin : (string, out_channel) Hashtbl.t
-  ; open_out_bin : string -> out_channel
+  ; channels : (string, idx) Hashtbl.t
   ; cache_sou : (int, string) Hashtbl.t
   ; particles : string list Lazy.t
   ; mutable patch_string : (string * int) list
   ; mutable patch_person : (iper, iper, istr) Def.gen_person IntMap.t
   ; mutable patch_ascend : ifam Def.gen_ascend IntMap.t
-  ; mutable patch_unions : ifam Def.gen_union IntMap.t
+  ; mutable patch_union : ifam Def.gen_union IntMap.t
   ; mutable patch_family : (iper, ifam, istr) Def.gen_family IntMap.t
   ; mutable patch_descend : iper Def.gen_descend IntMap.t
   ; mutable patch_couple : iper Def.gen_couple IntMap.t
   }
+
+let base_open_dat b s =
+  match Hashtb.find b.channels
+
+ : string -> in_channel
+
 
 (* TODO: create an array header so we can read all as array *)
 let output_array_dat_inx bdir fn get arr =
@@ -256,7 +310,7 @@ let open_base bname =
   ; patch_string = []
   ; patch_person = IntMap.empty
   ; patch_ascend = IntMap.empty
-  ; patch_unions = IntMap.empty
+  ; patch_union = IntMap.empty
   ; patch_family = IntMap.empty
   ; patch_descend = IntMap.empty
   ; patch_couple =  IntMap.empty
@@ -271,7 +325,7 @@ let nb_of_families b =
 let new_iper b =
   map_max b.patch_person
   |> max (map_max b.patch_ascend)
-  |> max (map_max b.patch_unions)
+  |> max (map_max b.patch_union)
   |> (+) 1
   |> max (nb_of_persons b)
 
@@ -285,9 +339,10 @@ let new_ifam b =
 let make_idx_npoc p strings =
   let a =
     Array.mapi
-      (fun i p -> ( Name.crush_lower strings.(p.Def.first_name)
-                  , Name.crush_lower strings.(p.Def.surname)
-                  , p.occ), i)
+      (fun i p -> ( ( Name.crush_lower strings.(p.Def.first_name)
+                    , Name.crush_lower strings.(p.Def.surname)
+                    , p.occ)
+                  , i ) )
       p
   in
   Array.fast_sort compare a ;
@@ -669,13 +724,15 @@ let no_person ip =
   ; key_index = ip }
 let no_union = { Def.family = [||] }
 
-let patch_ascend _ = assert false
-let patch_couple _ = assert false
-let patch_descend _ = assert false
-let patch_family _ = assert false
-let patch_person _ = assert false
-let patch_union _ = assert false
-let person_of_gen_person _ =   assert false
+#define macropatch(arg) let arg b i x = b.arg <- IntMap.update i (function _ -> Some x) b.arg
+macropatch(patch_person)
+macropatch(patch_ascend)
+macropatch(patch_union)
+macropatch(patch_couple)
+macropatch(patch_family)
+macropatch(patch_descend)
+
+let person_of_gen_person _ = assert false
 let persons _ = assert false
 let persons_of_name _ = assert false
 
