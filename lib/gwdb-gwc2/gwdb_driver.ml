@@ -43,16 +43,12 @@
 #define FN_notes "01"
 #define FN_notes_d "notes_d"
 
-(* TODO: Use position in FN_strings.dat as iter instead of Fn_strings.inx *)
-
 (* TODO:
    Use (G)ADT for idx so we can have the same functions for indexes:
    - loaded in memory
    - using fd and 'raw' reads
    - using simple in_channel
 *)
-(* TODO: try this for idx reading *)
-(* TODO: try the same approach for value reading (need to parse size in header, read string, unmarshal) *)
 
 type ifam = int
 type iper = int
@@ -140,7 +136,6 @@ let _seek_in idx i = match idx with
   | In_channel ic -> seek_in ic i
 
 (* TODO: _read_binary_uint *)
-(* TODO: seek_in after reading Loaded or File_descr? *)
 let _read_binary_int =
   let aux b off =
     let r =
@@ -457,6 +452,13 @@ let make_spi_aux g part p strings : (int * int list) array =
 let make_spi_f = make_spi_aux (fun p -> p.Def.first_name)
 let make_spi_s = make_spi_aux (fun p -> p.Def.surname)
 
+let idx_of_istr bdir  =
+  let ic = lazy (print_endline __LOC__ ; open_in_bin @@ Filename.concat bdir @@ FN_strings ^ ".inx") in
+  fun i ->
+    let ic = Lazy.force ic in
+    seek_in ic (i * 4) ;
+    input_binary_int ic
+
 (* FIXME: write to tmp, then move *)
 let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   let strings = Array.map Mutil.normalize_utf_8 strings in
@@ -464,6 +466,7 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
   in
+  let idx_of_istr = idx_of_istr bdir in
   Mutil.mkdir_p bdir ;
   (* particles *)
   (let oc = open_out_bin @@ Filename.concat bdir FN_particles in
@@ -489,15 +492,15 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   (* persons *)
   output_array_dat bdir FN_p_access (fun x -> Obj.magic x.Def.access) p ;
   output_array_dat bdir FN_p_consang (fun x -> Obj.magic x.Def.consang) a ;
-  output_array_dat bdir FN_p_firstname (fun x -> x.Def.first_name) p ;
-  output_array_dat bdir FN_p_image (fun x -> x.Def.image) p ;
-  output_array_dat bdir FN_p_lastname (fun x -> x.Def.surname) p ;
-  output_array_dat bdir FN_p_notes (fun x -> x.Def.notes) p ;
+  output_array_dat bdir FN_p_firstname (fun x -> idx_of_istr x.Def.first_name) p ;
+  output_array_dat bdir FN_p_image (fun x -> idx_of_istr x.Def.image) p ;
+  output_array_dat bdir FN_p_lastname (fun x -> idx_of_istr x.Def.surname) p ;
+  output_array_dat bdir FN_p_notes (fun x -> idx_of_istr x.Def.notes) p ;
   output_array_dat bdir FN_p_occ (fun x -> x.Def.occ) p ;
-  output_array_dat bdir FN_p_occupation (fun x -> x.Def.occupation) p ;
+  output_array_dat bdir FN_p_occupation (fun x -> idx_of_istr x.Def.occupation) p ;
   output_array_dat bdir FN_p_parents (fun x -> match x.Def.parents with Some x -> x | _ -> -1) a ;
-  output_array_dat bdir FN_p_public_name (fun x -> x.Def.public_name) p ;
-  output_array_dat bdir FN_p_psources (fun x -> x.Def.psources) p ;
+  output_array_dat bdir FN_p_public_name (fun x -> idx_of_istr x.Def.public_name) p ;
+  output_array_dat bdir FN_p_psources (fun x -> idx_of_istr x.Def.psources) p ;
   output_array_dat bdir FN_p_sex (fun x -> Obj.magic x.Def.sex) p ;
   output_array_dat_inx bdir FN_p_aliases (fun x -> x.Def.aliases) p ;
   output_array_dat_inx bdir FN_p_first_name_aliases (fun x -> x.Def.first_names_aliases) p ;
@@ -509,9 +512,9 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   output_array_dat_inx bdir FN_p_titles (fun x -> x.Def.titles) p ;
   output_array_dat_inx bdir FN_p_unions (fun x -> x.Def.family) u ;
   (* families *)
-  output_array_dat bdir FN_f_comment (fun x -> x.Def.comment) f ;
-  output_array_dat bdir FN_f_fsources (fun x -> x.Def.fsources) f ;
-  output_array_dat bdir FN_f_origin_file (fun x -> x.Def.origin_file) f ;
+  output_array_dat bdir FN_f_comment (fun x -> idx_of_istr x.Def.comment) f ;
+  output_array_dat bdir FN_f_fsources (fun x -> idx_of_istr x.Def.fsources) f ;
+  output_array_dat bdir FN_f_origin_file (fun x -> idx_of_istr x.Def.origin_file) f ;
   output_array_dat_inx bdir FN_f_fevents (fun x -> x.Def.fevents) f ;
   output_array_dat_inx bdir FN_f_couple (fun x -> [| Adef.father x ; Adef.mother x |]) c ;
   output_array_dat_inx bdir FN_f_children (fun x -> x.Def.children) d ;
@@ -550,7 +553,9 @@ let istr_to_option = function -1 -> None | x -> Some x
 let sou b i =
   try Hashtbl.find b.cache_sou i
   with _ ->
-    let x = read_dat_inx b FN_strings i in
+    let ic_dat = base_open_dat b @@ FN_strings ^ ".dat" in
+    _seek_in ic_dat i ;
+    let x = _unmarshal ic_dat in
     Hashtbl.add b.cache_sou i x ;
     x
 
