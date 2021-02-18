@@ -140,6 +140,7 @@ let _seek_in idx i = match idx with
   | In_channel ic -> seek_in ic i
 
 (* TODO: _read_binary_uint *)
+(* TODO: seek_in after reading Loaded or File_descr? *)
 let _read_binary_int =
   let aux b off =
     let r =
@@ -153,7 +154,10 @@ let _read_binary_int =
   in
   function
   | Loaded (p, b) ->
-    aux b !p
+    let off = !p in
+    let r = aux b off in
+    p := off + 4 ;
+    r
   | File_descr (fd, b) ->
     assert (4 = Unix.read fd b 0 4) ;
     aux b 0
@@ -187,13 +191,69 @@ let () =
   end ;
   bench __LOC__ begin
     let fd = Unix.openfile fn [Unix.O_RDONLY] 0o400 in
-    let b = Bytes.create 4 in
+    let b = Bytes.create (max 4 Marshal.header_size) in
     File_descr (fd, b)
   end ;
   bench __LOC__ begin
     In_channel (open_in_bin fn)
   end ;
   print_endline "DONE"
+
+let _unmarshal : 'a . idx -> 'a = function
+  | Loaded (p, b) ->
+    Marshal.from_bytes b !p
+  | File_descr (fd, b) ->
+    (* Does not seem to work *)
+    assert (Marshal.header_size = Unix.read fd b 0 Marshal.header_size) ;
+    let len = Marshal.data_size b 0 in
+    let b' = Bytes.create (len + Marshal.header_size) in
+    Bytes.blit b 0 b' 0 Marshal.header_size ;
+    assert (len = Unix.read fd b' Marshal.header_size len) ;
+    Marshal.from_bytes b' 0
+  | In_channel ic ->
+    Marshal.from_channel ic
+
+let _unmarshal idx =
+  print_endline __LOC__ ;
+  let r = _unmarshal idx in
+  print_endline __LOC__ ;
+  r
+
+let () =
+  let fn = "/tmp/assert" in
+  let t = ("a", "b", [12], [|1;2;3;4;5;6;7|]) in
+  let oc = open_out_bin fn in
+  Marshal.to_channel oc t [ Marshal.No_sharing ] ;
+  close_out oc ;
+  let test name ic =
+    print_string name ;
+    print_string "... " ;
+    assert (t = _unmarshal ic) ;
+    print_endline "OK!"
+  in
+  test __LOC__ begin
+    let ic = open_in_bin fn in
+    let r = really_input_string ic (in_channel_length ic) in
+    close_in ic ;
+    Loaded (ref 0, Bytes.unsafe_of_string r)
+  end ;
+  test __LOC__ begin
+    let fd = Unix.openfile fn [Unix.O_RDONLY] 0o400 in
+    let b = Bytes.create (max 4 Marshal.header_size) in
+    File_descr (fd, b)
+  end ;
+  test __LOC__ begin
+    In_channel (open_in_bin fn)
+  end
+
+let _in_channel_length = function
+  | Loaded (_, b) -> Bytes.length b
+  | File_descr (fd, _) ->
+    let pos = Unix.lseek fd 0 Unix.SEEK_CUR in
+    let len = Unix.lseek fd 0 Unix.SEEK_END in
+    assert (pos = Unix.lseek fd pos Unix.SEEK_SET) ;
+    len
+  | In_channel ic -> in_channel_length ic
 
 type base =
   { bdir : string
@@ -209,11 +269,29 @@ type base =
   ; mutable patch_couple : iper Def.gen_couple IntMap.t
   }
 
-let base_open_dat b s =
-  match Hashtb.find b.channels
+let _open_file_descr fn =
+  let fd = Unix.openfile fn [Unix.O_RDONLY] 0o400 in
+  let b = Bytes.create (max 4 Marshal.header_size) in
+  File_descr (fd, b)
 
- : string -> in_channel
+let _open_in_channel fn =
+  In_channel (open_in_bin fn)
 
+let base_open_dat base fn =
+  try Hashtbl.find base.channels fn
+  with Not_found ->
+    let fn' = Filename.concat base.bdir fn in
+    let idx = _open_in_channel fn' in
+    Hashtbl.add base.channels fn idx ;
+    idx
+
+let base_open_inx base fn =
+  try Hashtbl.find base.channels fn
+  with Not_found ->
+    let fn' = Filename.concat base.bdir fn in
+    let idx = _open_in_channel fn' in
+    Hashtbl.add base.channels fn idx ;
+    idx
 
 (* TODO: create an array header so we can read all as array *)
 let output_array_dat_inx bdir fn get arr =
@@ -264,20 +342,21 @@ let update_dat bdir fn p v =
   seek_out oc p ;
   output_binary_int oc p
 
-let read_dat_inx_aux ic_dat ic_inx i =
-  seek_in ic_inx (i * 4) ;
-  seek_in ic_dat (input_binary_int ic_inx) ;
-  Marshal.from_channel ic_dat
+let read_dat_inx_aux : 'a . idx -> idx -> int -> 'a =
+  fun ic_dat ic_inx i ->
+  _seek_in ic_inx (i * 4) ;
+  _seek_in ic_dat (_read_binary_int ic_inx) ;
+  _unmarshal ic_dat
 
-let read_dat_inx base name =
+let read_dat_inx base name : int -> 'a =
   read_dat_inx_aux
-    (base.open_in_bin @@ name ^ ".dat")
-    (base.open_in_bin @@ name ^ ".inx")
+    (base_open_dat base @@ name ^ ".dat")
+    (base_open_inx base @@ name ^ ".inx")
 
 let read_dat base name i =
-  let ic_dat = base.open_in_bin @@ name ^ ".dat" in
-  seek_in ic_dat (i * 4) ;
-  let r = input_binary_int ic_dat in
+  let ic_dat = base_open_dat base @@ name ^ ".dat" in
+  _seek_in ic_dat (i * 4) ;
+  let r = _read_binary_int ic_dat in
   r
 
 let open_base bname =
@@ -285,19 +364,7 @@ let open_base bname =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
   in
-  let aux ht fn =
-    fun s -> match Hashtbl.find_opt ht s with
-      | Some c -> c
-      | None ->
-        let c = fn @@ Filename.concat bdir s in
-        Hashtbl.add ht s c ;
-        c
-  in
-  let in_bin = Hashtbl.create 0 in
-  let out_bin = Hashtbl.create 0 in
-  let open_in_bin = aux in_bin open_in_bin in
-  let open_out_bin = aux out_bin open_out_bin in
-  let out_bin = Hashtbl.create 0 in
+  let channels = Hashtbl.create 0 in
   let cache_sou = Hashtbl.create 0 in
   let particles =
     lazy (let ic = open_in_bin FN_particles in
@@ -306,7 +373,7 @@ let open_base bname =
           r
          )
   in
-  { bdir ; in_bin ; open_in_bin ; out_bin ; open_out_bin ; cache_sou ; particles
+  { bdir ; channels ; cache_sou ; particles
   ; patch_string = []
   ; patch_person = IntMap.empty
   ; patch_ascend = IntMap.empty
@@ -317,10 +384,10 @@ let open_base bname =
   }
 
 let nb_of_persons b =
-  in_channel_length (b.open_in_bin @@ FN_p_firstname ^ ".dat") / 4
+  _in_channel_length (base_open_dat b @@ FN_p_firstname ^ ".dat") / 4
 
 let nb_of_families b =
-  in_channel_length (b.open_in_bin @@ FN_f_comment ^ ".dat") / 4
+  _in_channel_length (base_open_dat b @@ FN_f_comment ^ ".dat") / 4
 
 let new_iper b =
   map_max b.patch_person
@@ -460,8 +527,7 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   end ;
   open_base bname
 
-let sync ?scratch:_ b =
-  Hashtbl.iter (fun _ -> flush) b.out_bin
+let sync ?scratch:_ _ = ()
 
 let find_events g b x e =
   List.find_opt (fun x' -> List.mem (g x') x) e
@@ -741,17 +807,24 @@ module IDX = struct
   (* Return the index of an element using cmp *)
   let binary_search cmp get len =
     let rec aux low high =
+      print_endline @@ "bin search: " ^ string_of_int low ^ "," ^ string_of_int high ;
       if high <= low then
+        let () = print_endline __LOC__ in
         if cmp (get low) = 0 then low
         else raise Not_found
       else
+        let () = print_endline __LOC__ in
         let mid = (low + high) / 2 in
+        let () = print_endline @@ string_of_int mid in
         let c = cmp (get mid) in
         if c < 0 then
+          let () = print_endline __LOC__ in
           aux low (mid - 1)
         else if c > 0 then
+          let () = print_endline __LOC__ in
           aux (mid + 1) high
         else
+          let () = print_endline __LOC__ in
           mid
     in aux 0 len
 
@@ -790,10 +863,11 @@ module IDX = struct
 end
 
 let search_aux search fn compare b key =
-  let ic_dat = b.open_in_bin @@ fn ^ ".dat" in
-  let ic_inx = b.open_in_bin @@ fn ^ ".inx" in
+  let ic_dat = base_open_dat b @@ fn ^ ".dat" in
+  let ic_inx = base_open_inx b @@ fn ^ ".inx" in
   let get = read_dat_inx_aux ic_dat ic_inx in
-  search (fun (key', _) -> compare key key') get (in_channel_length ic_inx / 4)
+  print_endline (fn ^ ".inx: " ^ string_of_int (_in_channel_length ic_inx) ) ;
+  search (fun (key', _) -> compare key key') get (_in_channel_length ic_inx / 4)
   |> get
   |> snd
 
@@ -803,6 +877,45 @@ let insert_aux write ic oc p v =
   output_string oc (really_input_string ic p) ;
   write oc v ;
   output_string oc (really_input_string ic (in_channel_length ic - p))
+
+let search_npoc b k = binary_search FN_idx_npoc compare b k
+
+let person_of_key b p n o =
+  try Some (search_npoc b (Name.crush_lower p, Name.crush_lower n, o))
+  with e -> None
+
+let search_iof b k = binary_search FN_idx_iof (fun k k' -> print_endline (k ^ " ??? " ^ k') ; String.compare k k') b k
+let search_ios b k = binary_search FN_idx_ios (fun k k' -> print_endline (k ^ " ??? " ^ k') ; String.compare k k') b k
+
+let base_strings_of_first_name b s =
+  try search_iof b (Name.crush_lower s)
+  with e -> []
+
+let base_strings_of_surname b s =
+  try search_ios b (Name.crush_lower s)
+  with e -> []
+
+type string_person_index =
+  { first : string -> istr
+  ; next : istr -> istr
+  ; find : istr -> iper list
+  }
+let spi_find s = s.find
+let spi_first s = s.first
+let spi_next s = s.next
+
+let spi fn b =
+  let cmp k k' = Mutil.compare_after_particle (Lazy.force b.particles) (sou b k) (sou b k') in
+  print_endline @@ "SPI: " ^ fn ;
+  { first = (fun k ->
+        search_aux IDX.binary_search_or_next fn
+          (fun k k' -> Mutil.compare_after_particle (Lazy.force b.particles) k (sou b k')) b k)
+  ; next = (fun k -> search_aux IDX.binary_search_next fn cmp b k : istr -> istr)
+  ; find = (fun k -> search_aux IDX.binary_search fn cmp b k : istr -> iper list)
+  }
+
+let persons_of_first_name = spi FN_spi_f
+let persons_of_surname = spi FN_spi_s
 
 let insert write bdir fn p v =
   Mutil.bench_times fn @@ fun () ->
@@ -857,47 +970,10 @@ let insert_string b s =
     let istr =
       match b.patch_string with
       | (_, i) :: _ -> i + 1
-      | [] -> in_channel_length (b.open_in_bin (FN_strings ^ ".inx")) / 4
+      | [] -> _in_channel_length (base_open_inx b (FN_strings ^ ".inx")) / 4
     in
     b.patch_string <- (s, istr) :: b.patch_string ;
     istr
-
-let search_npoc b k = binary_search FN_idx_npoc compare b k
-
-let person_of_key b p n o =
-  try Some (search_npoc b (Name.crush_lower p, Name.crush_lower n, o))
-  with e -> None
-
-let search_iof b k = binary_search FN_idx_iof String.compare b k
-let search_ios b k = binary_search FN_idx_ios String.compare b k
-
-let base_strings_of_first_name b s =
-  try search_iof b (Name.crush_lower s)
-  with e -> []
-
-let base_strings_of_surname b s =
-  try search_ios b (Name.crush_lower s)
-  with e -> []
-
-type string_person_index =
-  { first : string -> istr
-  ; next : istr -> istr
-  ; find : istr -> iper list
-  }
-let spi_find s = s.find
-let spi_first s = s.first
-let spi_next s = s.next
-
-let spi fn b =
-  let cmp k k' = Mutil.compare_after_particle (Lazy.force b.particles) (sou b k) (sou b k') in
-  print_endline @@ "SPI: " ^ fn ;
-  { first = (fun k -> search_aux IDX.binary_search_or_next fn String.compare b k : string -> istr)
-  ; next = (fun k -> search_aux IDX.binary_search_next fn cmp b k : istr -> istr)
-  ; find = (fun k -> search_aux IDX.binary_search fn cmp b k : istr -> iper list)
-  }
-
-let persons_of_first_name = spi FN_spi_f
-let persons_of_surname = spi FN_spi_s
 
 (* Copied from gwc1 *)
 
