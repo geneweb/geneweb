@@ -1,7 +1,6 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
 let bench name fn =
-  prerr_endline @@ __LOC__ ^ ": " ^ name ;
   flush stderr ;
   let pprint_gc gc =
     let open Gc in
@@ -86,6 +85,16 @@ let bench name fn =
   let gc2 = Gc.stat () in
   Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1) ;
   pprint_gc (diff gc1 gc2) ;
+  res
+
+let bench_times name fn =
+  flush stderr ;
+  let p1 = Sys.time () in
+  let t1 = Unix.gettimeofday () in
+  let res = fn () in
+  let t2 = Unix.gettimeofday () in
+  let p2 = Sys.time () in
+  Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1) ;
   res
 
 let print_callstack ?(max = 5) () =

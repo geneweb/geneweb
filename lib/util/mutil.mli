@@ -232,6 +232,12 @@ val read_or_create_value
  *)
 val bench : string -> (unit -> 'a) -> 'a
 
+(** [bench_times name fn]
+    Same as {!val:bench} but only print times information.
+ *)
+val bench_times : string -> (unit -> 'a) -> 'a
+
+
 val print_callstack : ?max:int -> unit -> unit
 
 (** [encode s]

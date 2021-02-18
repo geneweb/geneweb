@@ -1,4 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
+#define IO_BUFFER_SIZE (try int_of_string @@ Sys.getenv "IO_BUFFER_SIZE" with _ -> 65536)
 
 let connection_closed = ref false
 

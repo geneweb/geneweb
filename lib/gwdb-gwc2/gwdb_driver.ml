@@ -1,4 +1,5 @@
 #define FN_strings "0"
+#define FN_idx_strings "00"
 #define FN_p_access "1"
 #define FN_p_aliases "2"
 #define FN_p_consang "3"
@@ -39,9 +40,34 @@
 
 #define FN_particles "V"
 
-#define FN_notes "00"
+#define FN_notes "01"
 #define FN_notes_d "notes_d"
 
+(* TODO: Use position in FN_strings.dat as iter instead of Fn_strings.inx *)
+
+(* TODO: try this for idx reading *)
+(* let read_binary_int =
+ *   let b = Bytes.create 4 in
+ *   fun fd ->
+ *     let aux res c = (res lsl 8) + Char.code c in
+ *     assert (4 = Unix.read fd b 0 4) ;
+ *     (aux (aux (aux (aux 0 (Bytes.unsafe_get b 0)) (Bytes.unsafe_get b 1)) (Bytes.unsafe_get b 2)) (Bytes.unsafe_get b 3))
+ *     (\* lsl 32) asr 32 *\)
+ * 
+ * let () =
+ *   print_endline "BENCH" ;
+ *   let fn = "/tmp/bench" in
+ *   let n = 10000000 in
+ *   let oc = open_out_bin fn in
+ *   for i = 0 to n do output_binary_int oc i done ;
+ *   close_out oc ;
+ *   Gc.compact () ;
+ *   Mutil.bench __LOC__ (fun () -> let ic = Unix.openfile fn [Unix.O_RDONLY] 0o400 in for i = n - 1 downto 0 do ignore (Unix.lseek ic (i * 4) Unix.SEEK_SET) ; assert (i = read_binary_int ic) done ; Unix.close ic) ;
+ *   Gc.compact () ;
+ *   Mutil.bench __LOC__ (fun () -> let ic = Unix.openfile fn [Unix.O_RDONLY] 0o400 in for i = 0 to n do ignore (Unix.lseek ic (i * 4) Unix.SEEK_SET) ; assert (i = read_binary_int ic) done ; Unix.close ic) ;
+ *   Gc.compact () ;
+ *   Mutil.bench __LOC__ (fun () -> let ic = open_in_bin fn in for i = 0 to n do seek_in ic (i * 4) ; assert (i = input_binary_int ic) done ; close_in ic) ;
+ *   print_endline "DONE" *)
 
 type ifam = int
 type iper = int
@@ -111,6 +137,13 @@ type family =
 
 type base_version = GnWbLazy0000
 
+module IntMap = Map.Make (Int)
+
+let map_max m =
+  match IntMap.max_binding_opt m with
+  | Some (i, _) -> i
+  | None -> 0
+
 type base =
   { bdir : string
   ; in_bin : (string, in_channel) Hashtbl.t
@@ -119,12 +152,20 @@ type base =
   ; open_out_bin : string -> out_channel
   ; cache_sou : (int, string) Hashtbl.t
   ; particles : string list Lazy.t
+  ; mutable patch_string : (string * int) list
+  ; mutable patch_person : (iper, iper, istr) Def.gen_person IntMap.t
+  ; mutable patch_ascend : ifam Def.gen_ascend IntMap.t
+  ; mutable patch_unions : ifam Def.gen_union IntMap.t
+  ; mutable patch_family : (iper, ifam, istr) Def.gen_family IntMap.t
+  ; mutable patch_descend : iper Def.gen_descend IntMap.t
+  ; mutable patch_couple : iper Def.gen_couple IntMap.t
   }
 
 (* TODO: create an array header so we can read all as array *)
-let output_array_dat_inx bdir name get arr =
-  let oc_dat = open_out_bin @@ Filename.concat bdir @@ name ^ ".dat" in
-  let oc_inx = open_out_bin @@ Filename.concat bdir @@ name ^ ".inx" in
+let output_array_dat_inx bdir fn get arr =
+  Mutil.bench_times fn @@ fun () ->
+  let oc_dat = open_out_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
+  let oc_inx = open_out_bin @@ Filename.concat bdir @@ fn ^ ".inx" in
   Array.iteri begin fun i x ->
     assert (pos_out oc_inx = i * 4) ;
     output_binary_int oc_inx (pos_out oc_dat) ;
@@ -134,13 +175,40 @@ let output_array_dat_inx bdir name get arr =
   close_out oc_inx
 
 (* TODO: create an array header so we can read all as array *)
-let output_array_dat bdir name get arr =
-  let oc_dat = open_out_bin @@ Filename.concat bdir @@ name ^ ".dat" in
+let output_array_dat bdir fn get arr =
+  Mutil.bench_times fn @@ fun () ->
+  let oc_dat = open_out_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
   Array.iteri begin fun i x ->
     assert (pos_out oc_dat = i * 4) ;
     output_binary_int oc_dat (get x) ;
   end arr ;
   close_out oc_dat
+
+let insert_dat bdir fn p v =
+  Mutil.bench_times fn @@ fun () ->
+  let fn = Filename.concat bdir @@ fn ^ ".dat" in
+  let ic = open_in_bin fn in
+  let oc = open_out_bin @@ fn ^ ".tmp" in
+  output_string oc (really_input_string ic (p * 4)) ;
+  output_binary_int oc v ;
+  output_string oc (really_input_string ic (in_channel_length ic - p * 4)) ;
+  Sys.rename (fn ^ ".tmp") fn
+
+let remove_dat bdir fn p =
+  Mutil.bench_times fn @@ fun () ->
+  let fn = Filename.concat bdir @@ fn ^ ".dat" in
+  let ic = open_in_bin fn in
+  let oc = open_out_bin @@ fn ^ ".tmp" in
+  output_string oc (really_input_string ic (p * 4)) ;
+  ignore (input_binary_int ic) ;
+  output_string oc (really_input_string ic (in_channel_length ic - p * 4 - 1)) ;
+  Sys.rename (fn ^ ".tmp") fn
+
+let update_dat bdir fn p v =
+  Mutil.bench_times fn @@ fun () ->
+  let oc = open_out_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
+  seek_out oc p ;
+  output_binary_int oc p
 
 let read_dat_inx_aux ic_dat ic_inx i =
   seek_in ic_inx (i * 4) ;
@@ -184,13 +252,35 @@ let open_base bname =
           r
          )
   in
-  { bdir ; in_bin ; open_in_bin ; out_bin ; open_out_bin ; cache_sou ; particles }
+  { bdir ; in_bin ; open_in_bin ; out_bin ; open_out_bin ; cache_sou ; particles
+  ; patch_string = []
+  ; patch_person = IntMap.empty
+  ; patch_ascend = IntMap.empty
+  ; patch_unions = IntMap.empty
+  ; patch_family = IntMap.empty
+  ; patch_descend = IntMap.empty
+  ; patch_couple =  IntMap.empty
+  }
 
 let nb_of_persons b =
   in_channel_length (b.open_in_bin @@ FN_p_firstname ^ ".dat") / 4
 
 let nb_of_families b =
   in_channel_length (b.open_in_bin @@ FN_f_comment ^ ".dat") / 4
+
+let new_iper b =
+  map_max b.patch_person
+  |> max (map_max b.patch_ascend)
+  |> max (map_max b.patch_unions)
+  |> (+) 1
+  |> max (nb_of_persons b)
+
+let new_ifam b =
+  map_max b.patch_family
+  |> max (map_max b.patch_couple)
+  |> max (map_max b.patch_descend)
+  |> (+) 1
+  |> max (nb_of_families b)
 
 let make_idx_npoc p strings =
   let a =
@@ -217,6 +307,11 @@ let make_idx_iofs_aux g crush p =
   Array.fast_sort compare a ;
   a
 
+let make_idx_strings strings =
+  let idx = Array.mapi (fun i s -> s, i) strings in
+  Array.fast_sort compare idx ;
+  idx
+
 let make_idx_iof = make_idx_iofs_aux (fun p -> p.Def.first_name)
 let make_idx_ios = make_idx_iofs_aux (fun p -> p.Def.surname)
 
@@ -234,6 +329,7 @@ let make_spi_s = make_spi_aux (fun p -> p.Def.surname)
 
 (* FIXME: write to tmp, then move *)
 let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
+  let strings = Array.map Mutil.normalize_utf_8 strings in
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
@@ -299,11 +395,14 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
         Hashtbl.add ht i s ;
         s
   in
-  output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_idx_npoc p strings) ;
-  output_array_dat_inx bdir FN_idx_iof (fun x -> x) (make_idx_iof crush p) ;
-  output_array_dat_inx bdir FN_idx_ios (fun x -> x) (make_idx_ios crush p) ;
-  output_array_dat_inx bdir FN_spi_f (fun x -> x) (make_spi_f particles p strings) ;
-  output_array_dat_inx bdir FN_spi_s (fun x -> x) (make_spi_s particles p strings) ;
+  Mutil.bench_times __LOC__ begin fun () ->
+    output_array_dat_inx bdir FN_idx_strings (fun x -> x) (make_idx_strings strings) ;
+    output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_idx_npoc p strings) ;
+    output_array_dat_inx bdir FN_idx_iof (fun x -> x) (make_idx_iof crush p) ;
+    output_array_dat_inx bdir FN_idx_ios (fun x -> x) (make_idx_ios crush p) ;
+    output_array_dat_inx bdir FN_spi_f (fun x -> x) (make_spi_f particles p strings) ;
+    output_array_dat_inx bdir FN_spi_s (fun x -> x) (make_spi_s particles p strings) ;
+  end ;
   open_base bname
 
 let sync ?scratch:_ b =
@@ -483,21 +582,6 @@ let clear_strings_array _ = ()
 let clear_unions_array _ = ()
 let base_particles b = Lazy.force b.particles
 
-module HT = struct
-type ('a, 'b) t =
-  { mutable size: int;
-    mutable data: ('a, 'b) bucketlist array;  (* the buckets *)
-    mutable seed: int;                        (* for randomization *)
-    mutable initial_size: int;                (* initial array size *)
-  }
-
-and ('a, 'b) bucketlist =
-  | Empty
-  | Cons of { mutable key: 'a;
-              mutable data: 'b;
-              mutable next: ('a, 'b) bucketlist }
-end
-
 let base_visible_get _ = assert false
 let base_visible_write _ = assert false
 let base_wiznotes_dir _ = assert false
@@ -527,12 +611,9 @@ let insert_couple _ = assert false
 let insert_descend _ = assert false
 let insert_family _ = assert false
 let insert_person _ = assert false
-let insert_string _ = assert false
 let insert_union _ = assert false
 
 let nb_of_real_persons _ = assert false
-let new_ifam _ = assert false
-let new_iper _ = assert false
 let no_ascend = { Def.parents = None ; consang = Adef.no_consang }
 let no_couple = Adef.couple dummy_iper dummy_iper
 let no_descend = { Def.children = [||] }
@@ -660,6 +741,69 @@ let search_aux search fn compare b key =
   |> snd
 
 let binary_search fn compare b key = search_aux IDX.binary_search fn compare b key
+
+let insert_aux write ic oc p v =
+  output_string oc (really_input_string ic p) ;
+  write oc v ;
+  output_string oc (really_input_string ic (in_channel_length ic - p))
+
+let insert write bdir fn p v =
+  Mutil.bench_times fn @@ fun () ->
+  let fn = Filename.concat bdir fn in
+  let ic = open_in_bin fn in
+  let oc = open_out_bin @@ fn ^ ".tmp" in
+  insert_aux write ic oc p v ;
+  Sys.rename (fn ^ ".tmp") fn
+
+let append_inx bdir fn i =
+  Mutil.bench_times fn @@ fun () ->
+  let fn = Filename.concat bdir fn in
+  let ic = open_in_bin fn in
+  let oc = open_out_bin @@ fn ^ ".tmp" in
+  let p = in_channel_length ic in
+  insert_aux output_binary_int ic oc p i ;
+  Sys.rename (fn ^ ".tmp") fn
+
+let insert_dat_inx_aux p_inx p_dat bdir fn x =
+  Mutil.bench_times fn @@ fun () ->
+  let fn = Filename.concat bdir fn in
+  let ic_inx = open_in_bin @@ fn ^ ".inx" in
+  let oc_inx = open_out_bin @@ fn ^ ".inx.tmp" in
+  let ic_dat = open_in_bin @@ fn ^ ".dat" in
+  let oc_dat = open_out_bin @@ fn ^ ".dat.tmp" in
+  let p_inx = p_inx ic_inx in
+  let p_dat = p_dat ic_dat in
+  insert_aux output_binary_int ic_inx oc_inx p_inx p_dat ;
+  insert_aux (fun oc x -> Marshal.to_channel oc x [ Marshal.No_sharing ]) ic_dat oc_dat p_dat x ;
+  close_out oc_inx ;
+  close_out oc_dat ;
+  close_in ic_inx ;
+  close_in ic_dat ;
+  Sys.rename (fn ^ ".inx.tmp") (fn ^ ".inx") ;
+  Sys.rename (fn ^ ".dat.tmp") (fn ^ ".dat") ;
+  (p_inx, p_dat)
+
+let append_dat_inx = insert_dat_inx_aux in_channel_length in_channel_length
+
+let do_insert_string b istr s =
+  let (p_inx, _p_dat) = append_dat_inx b.bdir FN_strings s in
+  assert (istr = p_inx / 4) ;
+  let pos = search_aux IDX.binary_search_or_next FN_idx_strings String.compare b s in
+  let pos = if pos = 0 then 0 else pos - 1 in (* useless? *)
+  insert_dat_inx_aux (fun _ -> pos * 4) in_channel_length b.bdir FN_idx_strings (s, istr)
+
+let insert_string b s =
+  try List.assoc s b.patch_string
+  with Not_found ->
+  try binary_search FN_idx_strings String.compare b s
+  with _ ->
+    let istr =
+      match b.patch_string with
+      | (_, i) :: _ -> i + 1
+      | [] -> in_channel_length (b.open_in_bin (FN_strings ^ ".inx")) / 4
+    in
+    b.patch_string <- (s, istr) :: b.patch_string ;
+    istr
 
 let search_npoc b k = binary_search FN_idx_npoc compare b k
 
