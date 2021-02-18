@@ -269,6 +269,14 @@ type base =
   ; mutable patch_couple : iper Def.gen_couple IntMap.t
   }
 
+let _open_loaded fn =
+  let fd = Unix.openfile fn [Unix.O_RDONLY] 0o400 in
+  let len = Unix.lseek fd 0 Unix.SEEK_END in
+  let bytes = Bytes.create len in
+  assert (len = Unix.read fd bytes 0 len) ;
+  Unix.close fd ;
+  Loaded (ref 0, bytes)
+
 let _open_file_descr fn =
   let fd = Unix.openfile fn [Unix.O_RDONLY] 0o400 in
   let b = Bytes.create (max 4 Marshal.header_size) in
