@@ -424,7 +424,6 @@ let get_particle list s =
   loop list
 
 let compare_after_particle particles s1 s2 =
-  print_endline ("compare_after_particle " ^ s1 ^ " " ^ s2) ;
   let p1 = get_particle particles s1 in
   let p2 = get_particle particles s2 in
   let rec loop i1 i2 =

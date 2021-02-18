@@ -166,7 +166,6 @@ let _read_binary_int =
     input_binary_int ic
 
 let () =
-  print_endline "BENCH" ;
   let fn = "/tmp/bench" in
   let n = 25000 in
   (*  sur mon PC : File_descr plus rapide que In_channel pour n >= 25000 *)
@@ -197,8 +196,7 @@ let () =
   end ;
   bench __LOC__ begin
     In_channel (open_in_bin fn)
-  end ;
-  print_endline "DONE"
+  end
 
 let _unmarshal : 'a . idx -> 'a = function
   | Loaded (p, b) ->
@@ -412,6 +410,7 @@ let new_ifam b =
   |> (+) 1
   |> max (nb_of_families b)
 
+(* TODO: filter out empty people *)
 let make_idx_npoc p strings : ((string * string * int) * int) array =
   let a =
     Array.mapi
@@ -816,24 +815,17 @@ module IDX = struct
   (* Return the index of an element using cmp *)
   let binary_search cmp get len =
     let rec aux low high =
-      print_endline @@ "bin search: " ^ string_of_int low ^ "," ^ string_of_int high ;
       if high <= low then
-        let () = print_endline __LOC__ in
         if cmp (get low) = 0 then low
         else raise Not_found
       else
-        let () = print_endline __LOC__ in
         let mid = (low + high) / 2 in
-        let () = print_endline @@ string_of_int mid in
         let c = cmp (get mid) in
         if c < 0 then
-          let () = print_endline __LOC__ in
           aux low (mid - 1)
         else if c > 0 then
-          let () = print_endline __LOC__ in
           aux (mid + 1) high
         else
-          let () = print_endline __LOC__ in
           mid
     in aux 0 len
 
@@ -875,7 +867,6 @@ let search_aux ?pp search fn compare b convert =
   let ic_dat = base_open_dat b @@ fn ^ ".dat" in
   let ic_inx = base_open_inx b @@ fn ^ ".inx" in
   let get = read_dat_inx_aux ?pp ic_dat ic_inx in
-  print_endline (fn ^ ".inx: " ^ string_of_int (_in_channel_length ic_inx) ) ;
   search compare get (_in_channel_length ic_inx / 4)
   |> get
   |> convert
@@ -887,14 +878,15 @@ let insert_aux write ic oc p v =
   write oc v ;
   output_string oc (really_input_string ic (in_channel_length ic - p))
 
-let search_npoc b k = binary_search FN_idx_npoc (fun (k', _) -> compare k k) b (snd : ((string * string * int) * int) -> int)
+let search_npoc b (k : string * string * int) =
+  binary_search FN_idx_npoc (fun (k', _) -> compare k k') b (snd : ((string * string * int) * int) -> int)
 
 let person_of_key b p n o =
   try Some (search_npoc b (Name.crush_lower p, Name.crush_lower n, o))
   with e -> None
 
-let search_iof b k = binary_search FN_idx_iof (fun (k', _) -> print_endline (k ^ " ??? " ^ k') ; String.compare k k') b (snd : (string * istr list) -> istr list)
-let search_ios b k = binary_search FN_idx_ios (fun (k', _) -> print_endline (k ^ " ??? " ^ k') ; String.compare k k') b (snd : (string * istr list) -> istr list)
+let search_iof b k = binary_search FN_idx_iof (fun (k', _) -> String.compare k k') b (snd : (string * istr list) -> istr list)
+let search_ios b k = binary_search FN_idx_ios (fun (k', _) -> String.compare k k') b (snd : (string * istr list) -> istr list)
 
 let base_strings_of_first_name b s =
   try search_iof b (Name.crush_lower s)
@@ -914,20 +906,11 @@ let spi_first s = s.first
 let spi_next s = s.next
 
 let spi fn b =
-  let cmp k (k', _) =
-    print_endline (k ^ " ??? " ^ sou b k' ^ " (" ^ string_of_int k' ^ ") -> ") ;
-    List.iter print_endline (Lazy.force b.particles) ;
-    let r = Mutil.compare_after_particle (Lazy.force b.particles) k (sou b k') in
-    print_endline (k ^ " ??? " ^ sou b k' ^ " (" ^ string_of_int k' ^ ") -> " ^ string_of_int r) ;
-    r
-  in
+  let cmp k (k', _) = Mutil.compare_after_particle (Lazy.force b.particles) k (sou b k') in
   let pp (k, v) = string_of_int k ^ " -> " ^ String.concat " " (List.map string_of_int v) in
-  print_endline @@ "SPI: " ^ fn ;
-  { first = (fun k -> search_aux ~pp IDX.binary_search_or_next fn (cmp k) b ((fun x -> print_endline (pp x) ; fst x) : (int * int list) -> istr))
-        (* search_aux IDX.binary_search_or_next fn
-         *   (fun k k' -> Mutil.compare_after_particle (Lazy.force b.particles) k (sou b k')) b k) *)
-  ; next = (fun k -> print_endline __LOC__ ; let k = sou b k in search_aux ~pp IDX.binary_search_next fn (cmp k) b (fst : (int * int list) -> istr) : istr -> istr)
-  ; find = (fun k -> print_endline __LOC__ ; let k = sou b k in search_aux ~pp IDX.binary_search fn (cmp k) b (snd : (int * int list) -> int list) : istr -> iper list)
+  { first = (fun k -> search_aux ~pp IDX.binary_search_or_next fn (cmp k) b (fst : (int * int list) -> istr))
+  ; next = (fun k -> let k = sou b k in search_aux ~pp IDX.binary_search_next fn (cmp k) b (fst : (int * int list) -> istr) : istr -> istr)
+  ; find = (fun k -> let k = sou b k in search_aux ~pp IDX.binary_search fn (cmp k) b (snd : (int * int list) -> int list) : istr -> iper list)
   }
 
 let persons_of_first_name = spi FN_spi_f
