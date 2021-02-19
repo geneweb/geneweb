@@ -343,12 +343,6 @@ let remove_dat bdir fn p =
   output_string oc (really_input_string ic (in_channel_length ic - p * 4 - 1)) ;
   Sys.rename (fn ^ ".tmp") fn
 
-let update_dat bdir fn p v =
-  Mutil.bench_times fn @@ fun () ->
-  let oc = open_out_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
-  seek_out oc p ;
-  output_binary_int oc p
-
 let read_dat_inx_aux : 'a . ?pp:('a -> string) -> idx -> idx -> int -> 'a =
   fun ?pp ic_dat ic_inx i ->
   _seek_in ic_inx (i * 4) ;
@@ -365,6 +359,43 @@ let read_dat base name i =
   _seek_in ic_dat (i * 4) ;
   let r = _read_binary_int ic_dat in
   r
+
+let update_dat bdir fn i v =
+  Mutil.bench_times fn @@ fun () ->
+  let oc = open_out_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
+  seek_out oc i ;
+  output_binary_int oc v ;
+  close_out oc
+
+let update_dat_inx base fn i v =
+  let ic_dat = base_open_dat base @@ fn ^ ".dat" in
+  let ic_inx = base_open_inx base @@ fn ^ ".inx" in
+  let oi =
+    _seek_in ic_inx (i * 4) ;
+    _read_binary_int ic_inx ;
+  in
+  let ov =
+    _seek_in ic_dat oi ;
+    _unmarshal ic_dat
+  in
+  let len = String.length (Marshal.to_string ov [ Marshal.No_sharing ]) in
+  let str = Marshal.to_string v [ Marshal.No_sharing ] in
+  if String.length str <= len then begin
+    let oc_dat = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".dat" in
+    seek_out oc_dat oi ;
+    output_string oc_dat str ;
+    close_out oc_dat
+  end else begin
+    let oc_dat = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".dat" in
+    let oc_inx = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".inx" in
+    seek_out oc_dat (out_channel_length oc_dat) ;
+    let ni = pos_out oc_dat in
+    output_string oc_dat str ;
+    seek_out oc_inx (i * 4) ;
+    output_binary_int oc_inx ni ;
+    close_out oc_dat ;
+    close_out oc_inx ;
+  end
 
 let open_base bname =
   let bdir =
@@ -695,6 +726,9 @@ let get_relation f =
   | Some { Def.efam_name = Def.Efam_Residence } -> Def.Residence
   | _ -> assert false
 
+let bname b = Filename.(remove_extension @@ basename b.bdir)
+
+
 let load_ascends_array _ = ()
 let load_couples_array _ = ()
 let load_descends_array _ = ()
@@ -714,10 +748,8 @@ let base_particles b = Lazy.force b.particles
 let base_visible_get _ = assert false
 let base_visible_write _ = assert false
 let base_wiznotes_dir _ = assert false
-let bname _ = assert false
 let close_base _ = assert false
 let commit_notes _ = assert false
-let commit_patches _ = assert false
 let date_of_last_change _ = assert false
 let delete_ascend _ = assert false
 let delete_couple _ = assert false
@@ -960,6 +992,60 @@ let do_insert_string b istr s =
   let pos = search_aux IDX.binary_search_or_next FN_idx_strings (fun (s', _) -> String.compare s s') b snd in
   let pos = if pos = 0 then 0 else pos - 1 in (* useless? *)
   insert_dat_inx_aux (fun _ -> pos * 4) in_channel_length b.bdir FN_idx_strings (s, istr)
+
+let commit_patches b =
+  let aux_dat i fn ov nv =
+    if ov <> nv then update_dat b.bdir fn i (Obj.magic nv)
+  in
+  let aux_dat_inx i fn ov nv =
+    if ov <> nv then update_dat_inx b fn i nv
+  in
+  List.iter (fun (s, i) -> ignore @@ do_insert_string b i s) b.patch_string ;
+  IntMap.iter begin fun i p ->
+    let o = poi b i in
+    aux_dat i FN_p_access (get_access o) p.Def.access ;
+    aux_dat i FN_p_firstname (get_first_name o) p.Def.first_name ;
+    aux_dat i FN_p_image (get_image o) p.Def.image ;
+    aux_dat i FN_p_lastname (get_surname o) p.Def.surname ;
+    aux_dat i FN_p_notes (get_notes o) p.Def.notes ;
+    aux_dat i FN_p_occ (get_occ o) p.Def.occ ;
+    aux_dat i FN_p_occupation (get_occupation o) p.Def.occupation ;
+    aux_dat i FN_p_public_name (get_public_name o) p.Def.public_name ;
+    aux_dat i FN_p_psources (get_psources o) p.Def.psources ;
+    aux_dat i FN_p_sex (get_sex o) p.Def.sex ;
+    aux_dat_inx i FN_p_aliases (get_aliases o) p.Def.aliases ;
+    aux_dat_inx i FN_p_first_name_aliases (get_first_names_aliases o) p.Def.first_names_aliases ;
+    aux_dat_inx i FN_p_pevents (get_pevents o) p.Def.pevents ;
+    aux_dat_inx i FN_p_qualifiers (get_qualifiers o) p.Def.qualifiers ;
+    aux_dat_inx i FN_p_related (get_related o) p.Def.related ;
+    aux_dat_inx i FN_p_rparents (get_rparents o) p.Def.rparents ;
+    aux_dat_inx i FN_p_surnames_aliases (get_surnames_aliases o) p.Def.surnames_aliases ;
+    aux_dat_inx i FN_p_titles (get_titles o) p.Def.titles ;
+  end b.patch_person ;
+  IntMap.iter begin fun i a ->
+    let o = poi b i in
+    aux_dat i FN_p_consang (get_consang o) a.Def.consang ;
+    aux_dat i FN_p_parents (get_parents o) a.Def.parents ;
+  end b.patch_ascend ;
+  IntMap.iter begin fun i u ->
+    let o = poi b i in
+    aux_dat_inx i FN_p_unions (get_family o) u.Def.family ;
+  end b.patch_union ;
+  IntMap.iter begin fun i f ->
+    let o = foi b i in
+    aux_dat i FN_f_comment (get_comment o) f.Def.comment ;
+    aux_dat i FN_f_fsources (get_fsources o) f.Def.fsources ;
+    aux_dat i FN_f_origin_file (get_origin_file o) f.Def.origin_file ;
+    aux_dat_inx i FN_f_fevents (get_fevents o) f.Def.fevents ;
+  end b.patch_family ;
+  IntMap.iter begin fun i c ->
+    let o = foi b i in
+    aux_dat_inx i FN_f_couple (get_parent_array o) [| Adef.father c ; Adef.mother c |] ;
+  end b.patch_couple ;
+  IntMap.iter begin fun i d ->
+    let o = foi b i in
+    aux_dat_inx i FN_f_children (get_children o) d.Def.children ;
+  end b.patch_descend
 
 let insert_string b s =
   try List.assoc s b.patch_string
