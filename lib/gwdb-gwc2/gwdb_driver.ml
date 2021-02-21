@@ -883,6 +883,39 @@ let gen_person_of_person p =
   ; key_index = get_iper p
   }
 
+
+let person_of_gen_person b (p, a, u) =
+  let find_event = find_event b (fun e -> e.Def.epers_name) in
+  let find_events = find_events b (fun e -> e.Def.epers_name) in
+  { access = lazy p.Def.access
+  ; aliases = lazy p.Def.aliases
+  ; first_names_aliases = lazy p.Def.first_names_aliases
+  ; firstname = lazy p.Def.first_name
+  ; image = lazy p.Def.image
+  ; iper = p.Def.key_index
+  ; lastname = lazy p.Def.surname
+  ; note = lazy p.Def.notes
+  ; occ = lazy p.Def.occ
+  ; occupation = lazy p.Def.occupation
+  ; parents = lazy a.Def.parents
+  ; consang = lazy a.Def.consang
+  ; pevents = lazy p.Def.pevents
+  ; psources = lazy p.Def.psources
+  ; public_name = lazy p.Def.public_name
+  ; qualifiers = lazy p.Def.qualifiers
+  ; related = lazy p.Def.related
+  ; rparents = lazy p.Def.rparents
+  ; sex = lazy p.Def.sex
+  ; surnames_aliases = lazy p.Def.surnames_aliases
+  ; titles = lazy p.Def.titles
+  ; unions = lazy u.Def.family
+
+  ; birth = lazy (find_event Def.Epers_Birth p.Def.pevents)
+  ; baptism = lazy (find_event Def.Epers_Baptism p.Def.pevents)
+  ; death = lazy (find_event Def.Epers_Death p.Def.pevents)
+  ; burial = lazy (find_events [ Def.Epers_Burial ; Def.Epers_Cremation ] p.Def.pevents)
+  }
+
 #define macropatch(arg) let arg b i x = b.arg <- IntMap.update i (function _ -> Some x) b.arg
 macropatch(patch_person)
 macropatch(patch_ascend)
@@ -891,7 +924,6 @@ macropatch(patch_couple)
 macropatch(patch_family)
 macropatch(patch_descend)
 
-let person_of_gen_person _ = assert false
 let persons _ = assert false
 let persons_of_name _ = assert false
 
