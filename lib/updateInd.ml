@@ -875,7 +875,9 @@ let print_mod conf base =
   match p_getenv conf.env "i" with
     Some i ->
       let p = poi base (iper_of_string i) in
+      print_endline __LOC__ ;
       let sp = string_person_of base p in
+      print_endline __LOC__ ;
       let digest = Update.digest_person sp in
       print_update_ind conf base sp digest
   | _ -> Hutil.incorrect_request conf

@@ -427,6 +427,7 @@ let w_base ~none fn conf base =
   match base with
   | None -> none conf
   | Some base ->
+    print_endline __LOC__ ;
     make_henv conf base;
     make_senv conf base;
     let conf =
@@ -437,8 +438,12 @@ let w_base ~none fn conf base =
     fn conf base
 
 let w_person ~none fn conf base =
+                 print_endline __LOC__ ;
+                 flush_all () ;
   match find_person_in_env conf base "" with
-  | Some p -> fn conf base p
+  | Some p ->                 print_endline __LOC__ ;
+                 flush_all () ;
+fn conf base p
   | _ -> none conf base
 
 let treat_request conf =
@@ -492,6 +497,8 @@ let treat_request conf =
           | None -> ()
         end ;
         let incorrect_request conf _ = incorrect_request conf in
+        print_endline __LOC__ ;
+        flush_all () ;
         match m with
         | "TEST" ->
           begin fun conf base ->
@@ -509,8 +516,11 @@ let treat_request conf =
             w_base @@
             if only_special_env conf.env then SrcfileDisplay.print_start
             else w_person @@ fun conf base p ->
+              print_endline __LOC__ ;
+              flush_all () ;
               match p_getenv conf.env "ptempl" with
               | Some t when p_getenv conf.base_env "ptempl" = Some "yes" ->
+                print_endline __LOC__ ;
                 Perso.interp_templ t conf base p
               | _ -> person_selected conf base p
           else if conf.bname = ""

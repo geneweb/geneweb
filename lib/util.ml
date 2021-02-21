@@ -2076,7 +2076,9 @@ let find_person_in_env conf base suff =
   match p_getenv conf.env ("i" ^ suff) with
     Some i when i <> "" ->
       (* if i >= 0 && i < nb_of_persons base then *)
+    print_endline __LOC__ ;
         let p = pget conf base (Gwdb.iper_of_string i) in
+    print_endline __LOC__ ;
         if is_hidden p then None else Some p
       (* else None *)
   | _(* None *) ->

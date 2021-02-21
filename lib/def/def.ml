@@ -226,7 +226,6 @@ type ('iper, 'person, 'string) gen_person =
     psources : 'string;
     key_index : 'iper }
 
-
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
 
 type 'family gen_union = { family : 'family array }

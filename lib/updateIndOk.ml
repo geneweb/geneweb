@@ -1236,16 +1236,20 @@ let print_mod_aux conf base callback =
 let print_mod ?prerr o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
+  print_endline __LOC__ ;
   let () = removed_string := [] in
   let o_p =
     match p_getenv o_conf.env "i" with
       Some ip ->
+      print_endline __LOC__ ;
         Util.string_gen_person base
           (gen_person_of_person (poi base (iper_of_string ip)))
     | None ->
+      print_endline __LOC__ ;
         Util.string_gen_person base
           (gen_person_of_person (poi base dummy_iper))
   in
+  print_endline __LOC__ ;
   let ofn = o_p.first_name in
   let osn = o_p.surname in
   let oocc = o_p.occ in
@@ -1253,20 +1257,29 @@ let print_mod ?prerr o_conf base =
   let conf = Update.update_conf o_conf in
   let pgl =
     let db = Gwdb.read_nldb base in
+    print_endline __LOC__ ;
     let db = Notes.merge_possible_aliases conf db in
+    print_endline __LOC__ ;
     Perso.links_to_ind conf base db key
   in
+  print_endline __LOC__ ;
   let callback sp =
+  print_endline __LOC__ ;
     let p = effective_mod ?prerr conf base sp in
+  print_endline __LOC__ ;
     let op = poi base p.key_index in
+  print_endline __LOC__ ;
     let u = {family = get_family op} in
+  print_endline __LOC__ ;
     patch_person base p.key_index p;
+  print_endline __LOC__ ;
     let s =
       let sl =
         [p.notes; p.occupation; p.birth_note; p.birth_src; p.baptism_note;
          p.baptism_src; p.death_note; p.death_src; p.burial_note;
          p.burial_src; p.psources]
       in
+  print_endline __LOC__ ;
       let sl =
         let rec loop l accu =
           match l with
@@ -1277,16 +1290,26 @@ let print_mod ?prerr o_conf base =
       in
       String.concat " " (List.map (sou base) sl)
     in
+  print_endline __LOC__ ;
     Notes.update_notes_links_db base (Def.NLDB.PgInd p.key_index) s;
+  print_endline __LOC__ ;
     let wl =
+  print_endline __LOC__ ;
       let a = poi base p.key_index in
+  print_endline __LOC__ ;
       let a = {parents = get_parents a; consang = get_consang a} in
+  print_endline __LOC__ ;
       all_checks_person base p a u
     in
+  print_endline __LOC__ ;
     Util.commit_patches conf base;
+  print_endline __LOC__ ;
     let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
+  print_endline __LOC__ ;
     History.record conf base changed "mp";
+  print_endline __LOC__ ;
     Update.delete_topological_sort_v conf base;
+  print_endline __LOC__ ;
     print_mod_ok conf base wl pgl p ofn osn oocc
   in
   print_mod_aux conf base callback
