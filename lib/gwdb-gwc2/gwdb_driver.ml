@@ -574,6 +574,7 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   in
   Mutil.bench_times __LOC__ begin fun () ->
     output_array_dat_inx bdir FN_idx_strings (fun x -> x) (make_idx_strings strings) ;
+    dump_dat_inx bdir FN_idx_strings "/tmp/FN_idx_strings.creation" (fun (s, i) -> s ^ " --- " ^ string_of_int i) ;
     output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_idx_npoc p strings) ;
     output_array_dat_inx bdir FN_idx_iof (fun x -> x) (make_idx_iof crush p) ;
     output_array_dat_inx bdir FN_idx_ios (fun x -> x) (make_idx_ios crush p) ;
@@ -883,7 +884,6 @@ let gen_person_of_person p =
   ; key_index = get_iper p
   }
 
-
 let person_of_gen_person b (p, a, u) =
   let find_event = find_event (fun e -> e.Def.epers_name) b in
   let find_events = find_events (fun e -> e.Def.epers_name) b in
@@ -1107,6 +1107,7 @@ let commit_patches b =
   List.iter (fun (s, i) -> ignore @@ do_insert_string b i s) @@ List.rev b.patch_string ;
   flush_all () ;
   dump_dat_inx b.bdir FN_strings "/tmp/FN_strings.updated" (fun x -> x) ;
+  dump_dat_inx b.bdir FN_idx_strings "/tmp/FN_idx_strings.updated" (fun (s, i) -> s ^ " --- " ^ string_of_int i) ;
   IntMap.iter begin fun i p ->
     let o = poi b i in
     aux_dat __LOC__ i FN_p_access (get_access o) p.Def.access ;
