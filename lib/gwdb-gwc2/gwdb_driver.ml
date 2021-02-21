@@ -523,7 +523,7 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
    in
    let ndir = Filename.concat bdir FN_notes_d in
    List.iter begin function
-     | ("", s) -> output_note s FN_notes
+     | ("", s) -> output_note s (Filename.concat ndir FN_notes)
      | (fn, s) ->
        let fn = Filename.concat ndir (fn ^ ".txt") in
        Mutil.mkdir_p (Filename.dirname fn) ;
