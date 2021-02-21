@@ -122,7 +122,7 @@ let map_person_ps ?(fd = identity) fp fs p =
   ; rparents = List.map (map_relation_ps fp fs) p.rparents
   ; related = List.map fp p.related
   ; aliases = List.map fs p.aliases
-  ;  occupation = fs p.occupation
+  ; occupation = fs p.occupation
   ; sex = p.sex
   ; access = p.access
   ; birth = map_cdate fd p.birth

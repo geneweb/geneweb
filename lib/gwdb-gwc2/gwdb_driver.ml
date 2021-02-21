@@ -781,7 +781,6 @@ let gen_ascend_of_person _ = assert false
 let gen_couple_of_family _ = assert false
 let gen_descend_of_family _ = assert false
 let gen_family_of_family _ = assert false
-let gen_person_of_person _ = assert false
 let gen_union_of_person _ = assert false
 let insert_ascend _ = assert false
 let insert_couple _ = assert false
@@ -845,6 +844,44 @@ let no_person ip =
   ; psources = empty_string
   ; key_index = ip }
 let no_union = { Def.family = [||] }
+
+let gen_person_of_person p =
+  { Def.first_name = get_first_name p
+  ; surname = get_surname p
+  ; occ = get_occ p
+  ; image = get_image p
+  ; public_name = get_public_name p
+  ; qualifiers = get_qualifiers p
+  ; aliases = get_aliases p
+  ; first_names_aliases = get_first_names_aliases p
+  ; surnames_aliases = get_surnames_aliases p
+  ; titles = get_titles p
+  ; rparents = get_rparents p
+  ; related = get_related p
+  ; occupation = get_occupation p
+  ; sex = get_sex p
+  ; access = get_access p
+  ; birth = get_birth p
+  ; birth_place = get_birth_place p
+  ; birth_note = get_birth_note p
+  ; birth_src = get_birth_src p
+  ; baptism = get_baptism p
+  ; baptism_place = get_baptism_place p
+  ; baptism_note = get_baptism_note p
+  ; baptism_src = get_baptism_src p
+  ; death = get_death p
+  ; death_place = get_death_place p
+  ; death_note = get_death_note p
+  ; death_src = get_death_src p
+  ; burial = get_burial p
+  ; burial_place = get_burial_place p
+  ; burial_note = get_burial_note p
+  ; burial_src = get_burial_src p
+  ; pevents = get_pevents p
+  ; notes = get_notes p
+  ; psources = get_psources p
+  ; key_index = get_iper p
+  }
 
 #define macropatch(arg) let arg b i x = b.arg <- IntMap.update i (function _ -> Some x) b.arg
 macropatch(patch_person)
@@ -911,20 +948,21 @@ module IDX = struct
 
 end
 
-let search_aux ?pp search fn compare b convert =
+let search_pos_aux ?pp search fn compare b : _index =
   let ic_dat = base_open_dat b @@ fn ^ ".dat" in
   let ic_inx = base_open_inx b @@ fn ^ ".inx" in
   let get = read_dat_inx_aux ?pp ic_dat ic_inx in
   search compare get (_in_channel_length ic_inx / 4)
+
+let search_aux ?pp search fn compare b convert =
+  let ic_dat = base_open_dat b @@ fn ^ ".dat" in
+  let ic_inx = base_open_inx b @@ fn ^ ".inx" in
+  let get = read_dat_inx_aux ?pp ic_dat ic_inx in
+  (search compare get (_in_channel_length ic_inx / 4) : _index)
   |> get
   |> convert
 
 let binary_search ?pp fn compare b = search_aux IDX.binary_search fn compare b
-
-let insert_aux write ic oc p v =
-  output_string oc (really_input_string ic p) ;
-  write oc v ;
-  output_string oc (really_input_string ic (in_channel_length ic - p))
 
 let search_npoc b (k : string * string * int) =
   binary_search FN_idx_npoc (fun (k', _) -> compare k k') b (snd : ((string * string * int) * int) -> int)
@@ -964,7 +1002,16 @@ let spi fn b =
 let persons_of_first_name = spi FN_spi_f
 let persons_of_surname = spi FN_spi_s
 
-let insert write bdir fn p v =
+let insert_aux write ic oc (p : _offset) v =
+  assert (pos_in ic = 0) ;
+  assert (pos_out oc = 0) ;
+  let s = really_input_string ic (Obj.magic p) in
+  output_string oc s ;
+  write oc v ;
+  output_string oc (really_input_string ic (in_channel_length ic - Obj.magic p)) ;
+  flush oc
+
+let insert write bdir fn (p : _offset) v =
   Mutil.bench_times fn @@ fun () ->
   let fn = Filename.concat bdir fn in
   let ic = open_in_bin fn in
@@ -972,25 +1019,17 @@ let insert write bdir fn p v =
   insert_aux write ic oc p v ;
   Sys.rename (fn ^ ".tmp") fn
 
-let append_inx bdir fn i =
-  Mutil.bench_times fn @@ fun () ->
-  let fn = Filename.concat bdir fn in
-  let ic = open_in_bin fn in
-  let oc = open_out_bin @@ fn ^ ".tmp" in
-  let p = in_channel_length ic in
-  insert_aux output_binary_int ic oc p i ;
-  Sys.rename (fn ^ ".tmp") fn
-
 let insert_dat_inx_aux p_inx p_dat bdir fn x =
   Mutil.bench_times fn @@ fun () ->
   let fn = Filename.concat bdir fn in
   let ic_inx = open_in_bin @@ fn ^ ".inx" in
-  let oc_inx = open_out_bin @@ fn ^ ".inx.tmp" in
   let ic_dat = open_in_bin @@ fn ^ ".dat" in
+  let oc_inx = open_out_bin @@ fn ^ ".inx.tmp" in
   let oc_dat = open_out_bin @@ fn ^ ".dat.tmp" in
-  let p_inx = p_inx ic_inx in
-  let p_dat = p_dat ic_dat in
-  insert_aux output_binary_int ic_inx oc_inx p_inx p_dat ;
+  let p_inx : _offset = p_inx ic_inx in
+  let p_dat : _offset = p_dat ic_dat in
+  (* Printf.printf "%s: %d: %d\n%!" __LOC__ p_inx p_dat ; *)
+  insert_aux output_binary_int ic_inx oc_inx p_inx (Obj.magic p_dat) ;
   insert_aux (fun oc x -> Marshal.to_channel oc x [ Marshal.No_sharing ]) ic_dat oc_dat p_dat x ;
   close_out oc_inx ;
   close_out oc_dat ;
@@ -1000,70 +1039,9 @@ let insert_dat_inx_aux p_inx p_dat bdir fn x =
   Sys.rename (fn ^ ".dat.tmp") (fn ^ ".dat") ;
   (p_inx, p_dat)
 
-let append_dat_inx = insert_dat_inx_aux in_channel_length in_channel_length
+let in_channel_length_off : in_channel -> _offset = Obj.magic in_channel_length
 
-let do_insert_string b istr s =
-  let (p_inx, _p_dat) = append_dat_inx b.bdir FN_strings s in
-  assert (istr = p_inx / 4) ;
-  let pos = search_aux IDX.binary_search_or_next FN_idx_strings (fun (s', _) -> String.compare s s') b snd in
-  let pos = if pos = 0 then 0 else pos - 1 in (* useless? *)
-  insert_dat_inx_aux (fun _ -> pos * 4) in_channel_length b.bdir FN_idx_strings (s, istr)
-
-let commit_patches b =
-  let aux_dat i fn ov nv =
-    if ov <> nv then update_dat b.bdir fn i (Obj.magic nv)
-  in
-  let aux_dat_inx i fn ov nv =
-    if ov <> nv then update_dat_inx b fn i nv
-  in
-  List.iter (fun (s, i) -> ignore @@ do_insert_string b i s) b.patch_string ;
-  flush_all () ;
-  dump_dat_inx b.bdir FN_strings "/tmp/FN_strings.updated" (fun x -> x) ;
-  IntMap.iter begin fun i p ->
-    let o = poi b i in
-    aux_dat i FN_p_access (get_access o) p.Def.access ;
-    aux_dat i FN_p_firstname (get_first_name o) p.Def.first_name ;
-    aux_dat i FN_p_image (get_image o) p.Def.image ;
-    aux_dat i FN_p_lastname (get_surname o) p.Def.surname ;
-    aux_dat i FN_p_notes (get_notes o) p.Def.notes ;
-    aux_dat i FN_p_occ (get_occ o) p.Def.occ ;
-    aux_dat i FN_p_occupation (get_occupation o) p.Def.occupation ;
-    aux_dat i FN_p_public_name (get_public_name o) p.Def.public_name ;
-    aux_dat i FN_p_psources (get_psources o) p.Def.psources ;
-    aux_dat i FN_p_sex (get_sex o) p.Def.sex ;
-    aux_dat_inx i FN_p_aliases (get_aliases o) p.Def.aliases ;
-    aux_dat_inx i FN_p_first_name_aliases (get_first_names_aliases o) p.Def.first_names_aliases ;
-    aux_dat_inx i FN_p_pevents (get_pevents o) p.Def.pevents ;
-    aux_dat_inx i FN_p_qualifiers (get_qualifiers o) p.Def.qualifiers ;
-    aux_dat_inx i FN_p_related (get_related o) p.Def.related ;
-    aux_dat_inx i FN_p_rparents (get_rparents o) p.Def.rparents ;
-    aux_dat_inx i FN_p_surnames_aliases (get_surnames_aliases o) p.Def.surnames_aliases ;
-    aux_dat_inx i FN_p_titles (get_titles o) p.Def.titles ;
-  end b.patch_person ;
-  IntMap.iter begin fun i a ->
-    let o = poi b i in
-    aux_dat i FN_p_consang (get_consang o) a.Def.consang ;
-    aux_dat i FN_p_parents (get_parents o) a.Def.parents ;
-  end b.patch_ascend ;
-  IntMap.iter begin fun i u ->
-    let o = poi b i in
-    aux_dat_inx i FN_p_unions (get_family o) u.Def.family ;
-  end b.patch_union ;
-  IntMap.iter begin fun i f ->
-    let o = foi b i in
-    aux_dat i FN_f_comment (get_comment o) f.Def.comment ;
-    aux_dat i FN_f_fsources (get_fsources o) f.Def.fsources ;
-    aux_dat i FN_f_origin_file (get_origin_file o) f.Def.origin_file ;
-    aux_dat_inx i FN_f_fevents (get_fevents o) f.Def.fevents ;
-  end b.patch_family ;
-  IntMap.iter begin fun i c ->
-    let o = foi b i in
-    aux_dat_inx i FN_f_couple (get_parent_array o) [| Adef.father c ; Adef.mother c |] ;
-  end b.patch_couple ;
-  IntMap.iter begin fun i d ->
-    let o = foi b i in
-    aux_dat_inx i FN_f_children (get_children o) d.Def.children ;
-  end b.patch_descend
+let append_dat_inx = insert_dat_inx_aux in_channel_length_off in_channel_length_off
 
 let insert_string b s =
   try List.assoc s b.patch_string
@@ -1077,6 +1055,73 @@ let insert_string b s =
     in
     b.patch_string <- (s, istr) :: b.patch_string ;
     istr
+
+let do_insert_string b (istr : _index) s =
+  Printf.printf "%s: %d -> %s\n%!" __LOC__ (Obj.magic istr) s ;
+  let (p_inx, _p_dat) = append_dat_inx b.bdir FN_strings s in
+  assert (Obj.magic istr = Obj.magic p_inx / 4) ;
+  let pos =
+    search_pos_aux IDX.binary_search_or_next FN_idx_strings (fun (s', _) -> String.compare s s') b
+  in
+  let pos = if pos = 0 then 0 else pos - 1 in (* useless? *)
+  insert_dat_inx_aux (fun _ -> pos * 4) in_channel_length b.bdir FN_idx_strings (s, istr)
+
+let commit_patches b =
+  let aux_dat s i fn ov nv =
+    if ov <> nv then (Printf.printf "%s: %d %d -> %d\n%!" s i (Obj.magic ov) (Obj.magic nv) ;
+                      update_dat b.bdir fn i (Obj.magic nv))
+  in
+  let aux_dat_inx s i fn ov nv =
+    if ov <> nv then (print_endline s ; update_dat_inx b fn i nv)
+  in
+  List.iter (fun (s, i) -> ignore @@ do_insert_string b i s) @@ List.rev b.patch_string ;
+  flush_all () ;
+  dump_dat_inx b.bdir FN_strings "/tmp/FN_strings.updated" (fun x -> x) ;
+  IntMap.iter begin fun i p ->
+    let o = poi b i in
+    aux_dat __LOC__ i FN_p_access (get_access o) p.Def.access ;
+    aux_dat __LOC__ i FN_p_firstname (get_first_name o) p.Def.first_name ;
+    aux_dat __LOC__ i FN_p_image (get_image o) p.Def.image ;
+    aux_dat __LOC__ i FN_p_lastname (get_surname o) p.Def.surname ;
+    aux_dat __LOC__ i FN_p_notes (get_notes o) p.Def.notes ;
+    aux_dat __LOC__ i FN_p_occ (get_occ o) p.Def.occ ;
+    aux_dat __LOC__ i FN_p_occupation (get_occupation o) p.Def.occupation ;
+    aux_dat __LOC__ i FN_p_public_name (get_public_name o) p.Def.public_name ;
+    aux_dat __LOC__ i FN_p_psources (get_psources o) p.Def.psources ;
+    aux_dat __LOC__ i FN_p_sex (get_sex o) p.Def.sex ;
+    aux_dat_inx __LOC__ i FN_p_aliases (get_aliases o) p.Def.aliases ;
+    aux_dat_inx __LOC__ i FN_p_first_name_aliases (get_first_names_aliases o) p.Def.first_names_aliases ;
+    aux_dat_inx __LOC__ i FN_p_pevents (get_pevents o) p.Def.pevents ;
+    aux_dat_inx __LOC__ i FN_p_qualifiers (get_qualifiers o) p.Def.qualifiers ;
+    aux_dat_inx __LOC__ i FN_p_related (get_related o) p.Def.related ;
+    aux_dat_inx __LOC__ i FN_p_rparents (get_rparents o) p.Def.rparents ;
+    aux_dat_inx __LOC__ i FN_p_surnames_aliases (get_surnames_aliases o) p.Def.surnames_aliases ;
+    aux_dat_inx __LOC__ i FN_p_titles (get_titles o) p.Def.titles ;
+  end b.patch_person ;
+  IntMap.iter begin fun i a ->
+    let o = poi b i in
+    aux_dat __LOC__ i FN_p_consang (get_consang o) a.Def.consang ;
+    aux_dat __LOC__ i FN_p_parents (get_parents o) a.Def.parents ;
+  end b.patch_ascend ;
+  IntMap.iter begin fun i u ->
+    let o = poi b i in
+    aux_dat_inx __LOC__ i FN_p_unions (get_family o) u.Def.family ;
+  end b.patch_union ;
+  IntMap.iter begin fun i f ->
+    let o = foi b  i in
+    aux_dat __LOC__ i FN_f_comment (get_comment o) f.Def.comment ;
+    aux_dat __LOC__ i FN_f_fsources (get_fsources o) f.Def.fsources ;
+    aux_dat __LOC__ i FN_f_origin_file (get_origin_file o) f.Def.origin_file ;
+    aux_dat_inx __LOC__ i FN_f_fevents (get_fevents o) f.Def.fevents ;
+  end b.patch_family ;
+  IntMap.iter begin fun i c ->
+    let o = foi b i in
+    aux_dat_inx __LOC__ i FN_f_couple (get_parent_array o) [| Adef.father c ; Adef.mother c |] ;
+  end b.patch_couple ;
+  IntMap.iter begin fun i d ->
+    let o = foi b i in
+    aux_dat_inx __LOC__ i FN_f_children (get_children o) d.Def.children ;
+  end b.patch_descend
 
 (* Copied from gwc1 *)
 
