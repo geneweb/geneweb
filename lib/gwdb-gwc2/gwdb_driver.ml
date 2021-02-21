@@ -885,8 +885,8 @@ let gen_person_of_person p =
 
 
 let person_of_gen_person b (p, a, u) =
-  let find_event = find_event b (fun e -> e.Def.epers_name) in
-  let find_events = find_events b (fun e -> e.Def.epers_name) in
+  let find_event = find_event (fun e -> e.Def.epers_name) b in
+  let find_events = find_events (fun e -> e.Def.epers_name) b in
   { access = lazy p.Def.access
   ; aliases = lazy p.Def.aliases
   ; first_names_aliases = lazy p.Def.first_names_aliases
