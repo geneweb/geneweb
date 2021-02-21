@@ -948,7 +948,7 @@ module IDX = struct
 
 end
 
-let search_pos_aux ?pp search fn compare b : _index =
+let search_pos_aux ?pp search fn compare b =
   let ic_dat = base_open_dat b @@ fn ^ ".dat" in
   let ic_inx = base_open_inx b @@ fn ^ ".inx" in
   let get = read_dat_inx_aux ?pp ic_dat ic_inx in
@@ -958,7 +958,7 @@ let search_aux ?pp search fn compare b convert =
   let ic_dat = base_open_dat b @@ fn ^ ".dat" in
   let ic_inx = base_open_inx b @@ fn ^ ".inx" in
   let get = read_dat_inx_aux ?pp ic_dat ic_inx in
-  (search compare get (_in_channel_length ic_inx / 4) : _index)
+  search compare get (_in_channel_length ic_inx / 4)
   |> get
   |> convert
 
@@ -1002,7 +1002,7 @@ let spi fn b =
 let persons_of_first_name = spi FN_spi_f
 let persons_of_surname = spi FN_spi_s
 
-let insert_aux write ic oc (p : _offset) v =
+let insert_aux write ic oc p v =
   assert (pos_in ic = 0) ;
   assert (pos_out oc = 0) ;
   let s = really_input_string ic (Obj.magic p) in
@@ -1011,7 +1011,7 @@ let insert_aux write ic oc (p : _offset) v =
   output_string oc (really_input_string ic (in_channel_length ic - Obj.magic p)) ;
   flush oc
 
-let insert write bdir fn (p : _offset) v =
+let insert write bdir fn p v =
   Mutil.bench_times fn @@ fun () ->
   let fn = Filename.concat bdir fn in
   let ic = open_in_bin fn in
@@ -1026,8 +1026,8 @@ let insert_dat_inx_aux p_inx p_dat bdir fn x =
   let ic_dat = open_in_bin @@ fn ^ ".dat" in
   let oc_inx = open_out_bin @@ fn ^ ".inx.tmp" in
   let oc_dat = open_out_bin @@ fn ^ ".dat.tmp" in
-  let p_inx : _offset = p_inx ic_inx in
-  let p_dat : _offset = p_dat ic_dat in
+  let p_inx = p_inx ic_inx in
+  let p_dat = p_dat ic_dat in
   (* Printf.printf "%s: %d: %d\n%!" __LOC__ p_inx p_dat ; *)
   insert_aux output_binary_int ic_inx oc_inx p_inx (Obj.magic p_dat) ;
   insert_aux (fun oc x -> Marshal.to_channel oc x [ Marshal.No_sharing ]) ic_dat oc_dat p_dat x ;
@@ -1039,9 +1039,7 @@ let insert_dat_inx_aux p_inx p_dat bdir fn x =
   Sys.rename (fn ^ ".dat.tmp") (fn ^ ".dat") ;
   (p_inx, p_dat)
 
-let in_channel_length_off : in_channel -> _offset = Obj.magic in_channel_length
-
-let append_dat_inx = insert_dat_inx_aux in_channel_length_off in_channel_length_off
+let append_dat_inx = insert_dat_inx_aux in_channel_length in_channel_length
 
 let insert_string b s =
   try List.assoc s b.patch_string
@@ -1056,7 +1054,7 @@ let insert_string b s =
     b.patch_string <- (s, istr) :: b.patch_string ;
     istr
 
-let do_insert_string b (istr : _index) s =
+let do_insert_string b istr s =
   Printf.printf "%s: %d -> %s\n%!" __LOC__ (Obj.magic istr) s ;
   let (p_inx, _p_dat) = append_dat_inx b.bdir FN_strings s in
   assert (Obj.magic istr = Obj.magic p_inx / 4) ;
