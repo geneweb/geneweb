@@ -360,6 +360,21 @@ let read_dat base name i =
   let r = _read_binary_int ic_dat in
   r
 
+let dump_dat_inx bdir fn out pp =
+  let ic_inx = open_in_bin @@ Filename.concat bdir @@ fn ^ ".inx" in
+  let ic_dat = open_in_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
+  let out = open_out out in
+  let len = in_channel_length ic_inx / 4 in
+  for i = 0 to len - 1 do
+    seek_in ic_inx (i * 4) ;
+    seek_in ic_dat (input_binary_int ic_inx) ;
+    let v = Marshal.from_channel ic_dat in
+    Printf.fprintf out "%d -> %s\n%!" i (pp v)
+  done ;
+  close_in ic_inx ;
+  close_in ic_dat ;
+  close_out out
+
 let update_dat bdir fn i v =
   Mutil.bench_times fn @@ fun () ->
   let oc = open_out_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
@@ -517,6 +532,7 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   );
   (* strings *)
   output_array_dat_inx bdir FN_strings (fun x -> x) strings ;
+  dump_dat_inx bdir FN_strings "/tmp/FN_strings.creation" (fun x -> x) ;
   (* persons *)
   output_array_dat bdir FN_p_access (fun x -> Obj.magic x.Def.access) p ;
   output_array_dat bdir FN_p_consang (fun x -> Obj.magic x.Def.consang) a ;
@@ -1001,6 +1017,8 @@ let commit_patches b =
     if ov <> nv then update_dat_inx b fn i nv
   in
   List.iter (fun (s, i) -> ignore @@ do_insert_string b i s) b.patch_string ;
+  flush_all () ;
+  dump_dat_inx b.bdir FN_strings "/tmp/FN_strings.updated" (fun x -> x) ;
   IntMap.iter begin fun i p ->
     let o = poi b i in
     aux_dat i FN_p_access (get_access o) p.Def.access ;
