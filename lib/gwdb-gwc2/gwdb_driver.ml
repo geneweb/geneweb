@@ -360,10 +360,10 @@ let read_dat base name i =
   let r = _read_binary_int ic_dat in
   r
 
-let dump_dat_inx bdir fn out pp =
+let dump_dat_inx bdir fn pp =
   let ic_inx = open_in_bin @@ Filename.concat bdir @@ fn ^ ".inx" in
   let ic_dat = open_in_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
-  let out = open_out out in
+  let out = open_out @@ Filename.concat "/tmp" @@ (Filename.basename bdir) ^ "." ^ fn ^ "." ^ Printf.sprintf "%.0f" (Unix.gettimeofday ()) ^ ".dump" in
   let len = in_channel_length ic_inx / 4 in
   for i = 0 to len - 1 do
     seek_in ic_inx (i * 4) ;
@@ -375,12 +375,32 @@ let dump_dat_inx bdir fn out pp =
   close_in ic_dat ;
   close_out out
 
+let dump_dat bdir fn =
+  let ic_dat = open_in_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
+  let out = open_out @@ Filename.concat "/tmp" @@ (Filename.basename bdir) ^ "." ^ fn ^ "." ^ Printf.sprintf "%.0f" (Unix.gettimeofday ()) ^ ".dump" in
+  let len = in_channel_length ic_dat / 4 in
+  for i = 0 to len - 1 do
+    seek_in ic_dat (i * 4) ;
+    let v = input_binary_int ic_dat in
+    Printf.fprintf out "%d -> %d\n%!" i v
+  done ;
+  close_in ic_dat ;
+  close_out out
+
 let update_dat bdir fn i v =
   Mutil.bench_times fn @@ fun () ->
-  let oc = open_out_bin @@ Filename.concat bdir @@ fn ^ ".dat" in
-  seek_out oc i ;
+  let fn = Filename.concat bdir @@ fn ^ ".dat" in
+  let ic = open_in_bin fn in
+  let len = in_channel_length ic in
+  let oc = open_out_bin @@ fn ^ ".dat.tmp" in
+  output_string oc (really_input_string ic (i * 4)) ;
   output_binary_int oc v ;
-  close_out oc
+  ignore (input_binary_int ic) ;
+  output_string oc (really_input_string ic @@ len - 4  - i * 4) ;
+  close_in ic ;
+  close_out oc ;
+  print_endline @@ Printf.sprintf "%s -> %s" (fn ^ ".tmp") fn ;
+  Sys.rename (fn ^ ".tmp") fn
 
 let update_dat_inx base fn i v =
   let ic_dat = base_open_dat base @@ fn ^ ".dat" in
@@ -532,13 +552,14 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   );
   (* strings *)
   output_array_dat_inx bdir FN_strings (fun x -> x) strings ;
-  dump_dat_inx bdir FN_strings "/tmp/FN_strings.creation" (fun x -> x) ;
+  dump_dat_inx bdir FN_strings (fun x -> x) ;
   (* persons *)
   output_array_dat bdir FN_p_access (fun x -> Obj.magic x.Def.access) p ;
   output_array_dat bdir FN_p_consang (fun x -> Obj.magic x.Def.consang) a ;
   output_array_dat bdir FN_p_firstname (fun x -> x.Def.first_name) p ;
   output_array_dat bdir FN_p_image (fun x -> x.Def.image) p ;
   output_array_dat bdir FN_p_lastname (fun x -> x.Def.surname) p ;
+  dump_dat bdir FN_p_lastname ;
   output_array_dat bdir FN_p_notes (fun x -> x.Def.notes) p ;
   output_array_dat bdir FN_p_occ (fun x -> x.Def.occ) p ;
   output_array_dat bdir FN_p_occupation (fun x -> x.Def.occupation) p ;
@@ -574,7 +595,7 @@ let make bname particles ((p, a, u), (f, c, d), strings, bnotes) =
   in
   Mutil.bench_times __LOC__ begin fun () ->
     output_array_dat_inx bdir FN_idx_strings (fun x -> x) (make_idx_strings strings) ;
-    dump_dat_inx bdir FN_idx_strings "/tmp/FN_idx_strings.creation" (fun (s, i) -> s ^ " --- " ^ string_of_int i) ;
+    dump_dat_inx bdir FN_idx_strings (fun (s, i) -> s ^ " --- " ^ string_of_int i) ;
     output_array_dat_inx bdir FN_idx_npoc (fun x -> x) (make_idx_npoc p strings) ;
     output_array_dat_inx bdir FN_idx_iof (fun x -> x) (make_idx_iof crush p) ;
     output_array_dat_inx bdir FN_idx_ios (fun x -> x) (make_idx_ios crush p) ;
@@ -1093,7 +1114,7 @@ let do_insert_string b istr s =
   let pos =
     search_pos_aux IDX.binary_search_or_next FN_idx_strings (fun (s', _) -> String.compare s s') b
   in
-  let pos = if pos = 0 then 0 else pos - 1 in (* useless? *)
+  (* let pos = if pos = 0 then 0 else pos - 1 in (\* useless? *\) *)
   insert_dat_inx_aux (fun _ -> pos * 4) in_channel_length b.bdir FN_idx_strings (s, istr)
 
 let commit_patches b =
@@ -1106,8 +1127,8 @@ let commit_patches b =
   in
   List.iter (fun (s, i) -> ignore @@ do_insert_string b i s) @@ List.rev b.patch_string ;
   flush_all () ;
-  dump_dat_inx b.bdir FN_strings "/tmp/FN_strings.updated" (fun x -> x) ;
-  dump_dat_inx b.bdir FN_idx_strings "/tmp/FN_idx_strings.updated" (fun (s, i) -> s ^ " --- " ^ string_of_int i) ;
+  dump_dat_inx b.bdir FN_strings (fun x -> x) ;
+  dump_dat_inx b.bdir FN_idx_strings (fun (s, i) -> s ^ " --- " ^ string_of_int i) ;
   IntMap.iter begin fun i p ->
     let o = poi b i in
     aux_dat __LOC__ i FN_p_access (get_access o) p.Def.access ;
@@ -1152,7 +1173,8 @@ let commit_patches b =
   IntMap.iter begin fun i d ->
     let o = foi b i in
     aux_dat_inx __LOC__ i FN_f_children (get_children o) d.Def.children ;
-  end b.patch_descend
+  end b.patch_descend ;
+  dump_dat b.bdir FN_p_lastname
 
 (* Copied from gwc1 *)
 
