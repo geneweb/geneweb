@@ -323,6 +323,10 @@ let output_array_dat bdir fn get arr =
   end arr ;
   close_out oc_dat
 
+let mv_tmp fn =
+  print_endline @@ Printf.sprintf "%s -> %s" (fn ^ ".tmp") fn ;
+  Sys.rename (fn ^ ".tmp") fn
+
 let insert_dat bdir fn p v =
   Mutil.bench_times fn @@ fun () ->
   let fn = Filename.concat bdir @@ fn ^ ".dat" in
@@ -331,7 +335,7 @@ let insert_dat bdir fn p v =
   output_string oc (really_input_string ic (p * 4)) ;
   output_binary_int oc v ;
   output_string oc (really_input_string ic (in_channel_length ic - p * 4)) ;
-  Sys.rename (fn ^ ".tmp") fn
+  mv_tmp fn
 
 let remove_dat bdir fn p =
   Mutil.bench_times fn @@ fun () ->
@@ -341,7 +345,7 @@ let remove_dat bdir fn p =
   output_string oc (really_input_string ic (p * 4)) ;
   ignore (input_binary_int ic) ;
   output_string oc (really_input_string ic (in_channel_length ic - p * 4 - 1)) ;
-  Sys.rename (fn ^ ".tmp") fn
+  mv_tmp fn
 
 let read_dat_inx_aux : 'a . ?pp:('a -> string) -> idx -> idx -> int -> 'a =
   fun ?pp ic_dat ic_inx i ->
@@ -392,44 +396,64 @@ let update_dat bdir fn i v =
   let fn = Filename.concat bdir @@ fn ^ ".dat" in
   let ic = open_in_bin fn in
   let len = in_channel_length ic in
-  let oc = open_out_bin @@ fn ^ ".dat.tmp" in
+  let oc = open_out_bin @@ fn ^ ".tmp" in
   output_string oc (really_input_string ic (i * 4)) ;
+  assert (pos_in ic = pos_out oc) ;
   output_binary_int oc v ;
   ignore (input_binary_int ic) ;
+  assert (pos_in ic = pos_out oc) ;
   output_string oc (really_input_string ic @@ len - 4  - i * 4) ;
-  close_in ic ;
+  assert (pos_in ic = pos_out oc) ;
   close_out oc ;
-  print_endline @@ Printf.sprintf "%s -> %s" (fn ^ ".tmp") fn ;
-  Sys.rename (fn ^ ".tmp") fn
+  close_in ic ;
+  mv_tmp fn
 
 let update_dat_inx base fn i v =
-  let ic_dat = base_open_dat base @@ fn ^ ".dat" in
-  let ic_inx = base_open_inx base @@ fn ^ ".inx" in
+  let ic_dat = open_in_bin @@ Filename.concat base.bdir @@ fn ^ ".dat" in
+  let ic_inx = open_in_bin @@ Filename.concat base.bdir @@ fn ^ ".inx" in
+  let ic_dat_len = in_channel_length ic_dat in
   let oi =
-    _seek_in ic_inx (i * 4) ;
-    _read_binary_int ic_inx ;
+    seek_in ic_inx (i * 4) ;
+    input_binary_int ic_inx ;
   in
   let ov =
-    _seek_in ic_dat oi ;
-    _unmarshal ic_dat
+    seek_in ic_dat oi ;
+    Marshal.from_channel ic_dat
   in
-  let len = String.length (Marshal.to_string ov [ Marshal.No_sharing ]) in
+  let ostr = Marshal.to_string ov [ Marshal.No_sharing ] in
+  let len = String.length ostr in
   let str = Marshal.to_string v [ Marshal.No_sharing ] in
   if String.length str <= len then begin
-    let oc_dat = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".dat" in
+    let oc_dat = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".dat.tmp" in
+    seek_in ic_dat 0 ;
+    output_string oc_dat (really_input_string ic_dat oi) ;
+    output_string oc_dat ostr ;
     seek_out oc_dat oi ;
     output_string oc_dat str ;
-    close_out oc_dat
+    seek_out oc_dat (oi + len) ;
+    seek_in ic_dat (oi + len) ;
+    output_string oc_dat (really_input_string ic_dat @@ ic_dat_len - oi - len) ;
+    close_in ic_dat ;
+    close_in ic_inx ;
+    close_out oc_dat ;
+    mv_tmp (Filename.concat base.bdir @@ fn ^ ".dat") ;
   end else begin
-    let oc_dat = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".dat" in
-    let oc_inx = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".inx" in
-    seek_out oc_dat (out_channel_length oc_dat) ;
+    let oc_dat = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".dat.tmp" in
+    let oc_inx = open_out_bin @@ Filename.concat base.bdir @@ fn ^ ".inx.tmp" in
+    seek_in ic_dat 0 ;
+    output_string oc_dat (really_input_string ic_dat ic_dat_len) ;
     let ni = pos_out oc_dat in
     output_string oc_dat str ;
-    seek_out oc_inx (i * 4) ;
+    seek_in ic_inx 0 ;
+    output_string oc_inx (really_input_string ic_inx oi) ;
     output_binary_int oc_inx ni ;
+    output_string oc_inx (really_input_string ic_inx @@ in_channel_length ic_inx - oi - 4) ;
     close_out oc_dat ;
     close_out oc_inx ;
+    close_in ic_dat ;
+    close_in ic_inx ;
+    mv_tmp (Filename.concat base.bdir @@ fn ^ ".inx") ;
+    mv_tmp (Filename.concat base.bdir @@ fn ^ ".dat") ;
   end
 
 let open_base bname =
@@ -1070,7 +1094,7 @@ let insert write bdir fn p v =
   let ic = open_in_bin fn in
   let oc = open_out_bin @@ fn ^ ".tmp" in
   insert_aux write ic oc p v ;
-  Sys.rename (fn ^ ".tmp") fn
+  mv_tmp fn
 
 let insert_dat_inx_aux p_inx p_dat bdir fn x =
   Mutil.bench_times fn @@ fun () ->
@@ -1088,8 +1112,8 @@ let insert_dat_inx_aux p_inx p_dat bdir fn x =
   close_out oc_dat ;
   close_in ic_inx ;
   close_in ic_dat ;
-  Sys.rename (fn ^ ".inx.tmp") (fn ^ ".inx") ;
-  Sys.rename (fn ^ ".dat.tmp") (fn ^ ".dat") ;
+  mv_tmp (fn ^ ".inx") ;
+  mv_tmp (fn ^ ".dat") ;
   (p_inx, p_dat)
 
 let append_dat_inx = insert_dat_inx_aux in_channel_length in_channel_length
@@ -1174,7 +1198,9 @@ let commit_patches b =
     let o = foi b i in
     aux_dat_inx __LOC__ i FN_f_children (get_children o) d.Def.children ;
   end b.patch_descend ;
-  dump_dat b.bdir FN_p_lastname
+  print_endline __LOC__ ;
+  dump_dat b.bdir FN_p_lastname ;
+  print_endline __LOC__ ;
 
 (* Copied from gwc1 *)
 
