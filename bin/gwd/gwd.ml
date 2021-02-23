@@ -11,7 +11,7 @@ module StrSet = Mutil.StrSet
 
 let output_conf =
   { status = Wserver.http
-  ; header = (fun s -> Wserver.header "%s" s)
+  ; header = Wserver.header
   ; body = Wserver.print_string
   ; flush = Wserver.wflush
   }
