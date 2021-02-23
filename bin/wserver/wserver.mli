@@ -32,13 +32,13 @@ val f
 
 val close_connection : unit -> unit
 
-val printf : ('a, unit, string, unit) format4 -> 'a
+val printf : ('a, out_channel, unit) format -> 'a
     (* To be called to print page contents. *)
 
 val print_string : string -> unit
 (* To be called to print page contents. *)
 
-val header : ('a, unit, string, unit) format4 -> 'a
+val header : string -> unit
     (* To print an http header line *)
 
 val wflush : unit -> unit

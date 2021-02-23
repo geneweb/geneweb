@@ -41,11 +41,8 @@ let close_connection () =
     connection_closed := true
   end
 
-let printnl fmt =
-  Printf.ksprintf
-    (fun s ->
-       output_string !wserver_oc s; output_string !wserver_oc "\013\010")
-    fmt
+let printnl () =
+  output_string !wserver_oc "\013\010"
 
 type printing_state = Nothing | Status | Contents
 
@@ -63,34 +60,41 @@ let http status =
       | Def.Forbidden -> "403 Forbidden"
       | Def.Not_Found -> "404 Not Found"
     in
-    if !cgi then printnl "Status: %s" answer else printnl "HTTP/1.0 %s" answer
+    if !cgi
+    then (output_string !wserver_oc "Status: " ; output_string !wserver_oc answer)
+    else (output_string !wserver_oc "HTTP/1.0 " ; output_string !wserver_oc answer) ;
+    printnl ()
 
-let header fmt =
+let header s =
   if !printing_state <> Status then
     if !printing_state = Nothing then http Def.OK
     else failwith "Cannot write HTTP headers: page contents already started";
-  printnl fmt
+  output_string !wserver_oc s ;
+  printnl ()
 
 let printf fmt =
   if !printing_state <> Contents then
     begin
       if !printing_state = Nothing then http Def.OK;
-      printnl "";
+      printnl ();
       printing_state := Contents
     end;
-  Printf.ksprintf (fun s -> output_string !wserver_oc s) fmt
+  Printf.fprintf !wserver_oc fmt
 
 let print_string s =
   if !printing_state <> Contents then
     begin
       if !printing_state = Nothing then http Def.OK;
-      printnl "";
+      printnl ();
       printing_state := Contents
     end ;
   output_string !wserver_oc s
 
 let http_redirect_temporarily url =
-  http Def.Moved_Temporarily; printnl "Location: %s" url
+  http Def.Moved_Temporarily ;
+  output_string !wserver_oc "Location: " ;
+  output_string !wserver_oc url ;
+  printnl ()
 
 let buff = ref (Bytes.create 80)
 let store len x =
@@ -121,8 +125,9 @@ let timeout tmout spid _ =
     if Unix.fork () = 0 then
       begin
         http Def.OK;
-        printnl "Content-type: text/html; charset=iso-8859-1";
-        printnl "";
+        output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
+        printnl ();
+        printnl ();
         printf "<head><title>Time out</title></head>\n";
         printf "<body><h1>Time out</h1>\n";
         printf "Computation time > %d second(s)\n" tmout;
