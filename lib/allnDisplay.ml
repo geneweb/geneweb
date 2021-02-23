@@ -118,38 +118,39 @@ let print_alphabetic_all conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   Hutil.header conf title;
-  Output.printf conf "<p class=\"search_name\">\n";
+  Output.print_string conf {|<p class="search_name">|};
   List.iter
     (fun (ini_k, _) ->
        let ini = ini_k in
-       Output.printf conf "<a href=\"#a%s\">" ini;
+       Output.print_string conf "<a href=\"#a" ;
+       Output.print_string conf ini ;
+       Output.print_string conf "\">" ;
        Output.print_string conf (Mutil.tr '_' ' ' ini);
-       Output.printf conf "</a>\n")
+       Output.print_string conf "</a>\n")
     list;
-  Output.printf conf "</p>\n";
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "</p><ul>";
   List.iter
     (fun (ini_k, l) ->
        let ini = ini_k in
-       Output.printf conf "<li>\n";
-       Output.printf conf "<a id=\"a%s\">" ini_k;
+       Output.print_string conf "<li><a id=\"a" ;
+       Output.print_string conf ini_k;
+       Output.print_string conf "\">" ;
        Output.print_string conf (Mutil.tr '_' ' ' ini);
-       Output.printf conf "</a>\n";
-       Output.printf conf "<ul>\n";
+       Output.print_string conf "</a><ul>\n";
        List.iter
          (fun (s, cnt) ->
-            Output.printf conf "<li>";
+            Output.print_string conf "<li>";
             begin let href =
                     "m=" ^ mode ^ "&v=" ^ Mutil.encode s ^ "&t=A"
               in
               wprint_geneweb_link conf href
                 (particle_at_the_end base is_surnames s)
             end;
-            Output.printf conf " (%d)" cnt;
-            Output.printf conf "</li>\n")
+            Output.print_string conf " (" ;
+            Output.print_string conf (string_of_int cnt) ;
+            Output.print_string conf ")</li>")
          (List.sort (fun (a, _) (b, _) -> compare_particle_at_the_end base is_surnames a b) l);
-       Output.printf conf "</ul>\n";
-       Output.printf conf "</li>\n")
+       Output.print_string conf "</ul></li>\n")
     list;
   Output.printf conf "</ul>\n";
   Hutil.trailer conf
@@ -182,32 +183,36 @@ let print_frequency_any conf base is_surnames list len =
   let mode = if is_surnames then "N" else "P" in
   let n = ref 0 in
   Hutil.header conf title;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>";
   List.iter
     (fun (cnt, l) ->
        if !n > default_max_cnt then ()
        else
          begin
-           Output.printf conf "<li>\n";
-           Output.printf conf "%d\n" cnt;
+           Output.print_string conf "<li>";
+           Output.print_string conf (string_of_int cnt);
            begin
-             Output.printf conf "<ul>\n";
+             Output.print_string conf "<ul>";
              List.iter
                (fun s ->
-                  Output.printf conf "<li>";
-                  Output.printf conf "<a href=\"%sm=%s&v=%s\">" (commd conf) mode
-                    (Mutil.encode (Name.lower s));
+                  Output.print_string conf "<li><a href=\"" ;
+                  Output.print_string conf (commd conf) ;
+                  Output.print_string conf "m=" ;
+                  Output.print_string conf mode ;
+                  Output.print_string conf "&v=" ;
+                  Output.print_string conf (Mutil.encode (Name.lower s));
+                  Output.print_string conf "\">" ;
                   Output.print_string conf (particle_at_the_end base is_surnames s);
-                  Output.printf conf "</a>";
+                  Output.print_string conf "</a></li>";
                   incr n;
-                  Output.printf conf "</li>\n")
+               )
                l;
-             Output.printf conf "</ul>\n"
+             Output.print_string conf "</ul>"
            end;
-           Output.printf conf "</li>\n"
+           Output.print_string conf "</li>"
          end)
     list;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>";
   Hutil.trailer conf
 
 
