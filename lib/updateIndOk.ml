@@ -797,15 +797,15 @@ let print_conflict conf base p =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
-       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
-         (Util.escape_html (Mutil.decode v)) conf.xhs)
+       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
+         (Util.escape_html (Mutil.decode v)))
     (conf.henv @ conf.env);
-  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
-    free_n conf.xhs;
-  Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "create")) conf.xhs;
-  Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "back")) conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
+    free_n;
+  Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
+    (Utf8.capitalize (transl conf "create"));
+  Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
+    (Utf8.capitalize (transl conf "back"));
   Output.printf conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;

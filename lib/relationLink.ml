@@ -216,7 +216,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
   Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip));
   if s <> "" then
     begin
-      Output.printf conf "<br%s>\n" conf.xhs;
+      Output.printf conf "<br>\n";
       Output.printf conf "&amp;%s" d;
       Output.printf conf " %s\n" s;
       match spo with
@@ -423,7 +423,7 @@ let print_someone_and_other_parent_if_same conf base info =
   Output.print_string conf (DagDisplay.image_txt conf base (pget conf base info.ip));
   begin match other_parent_text_if_same conf base info with
     Some (s, ip) ->
-      Output.printf conf "<br%s>\n" conf.xhs;
+      Output.printf conf "<br>\n";
       Output.print_string conf s;
       Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip))
   | None -> ()
@@ -441,13 +441,13 @@ let print_one_branch_no_table conf base info =
   let sp = if info.b1 = [] then info.sp2 else info.sp1 in
   Output.printf conf "<div style=\"text-align:center\">\n";
   print_someone_and_spouse conf base info false info.ip sp b;
-  Output.printf conf "<br%s>\n" conf.xhs;
+  Output.printf conf "<br>\n";
   list_iter_hd_tl
     (fun (ip1, _) ipl1 ->
        Output.printf conf "|";
-       Output.printf conf "<br%s>\n" conf.xhs;
+       Output.printf conf "<br>\n";
        print_someone_and_spouse conf base info false ip1 sp ipl1;
-       Output.printf conf "<br%s>\n" conf.xhs)
+       Output.printf conf "<br>\n")
     b;
   Output.printf conf "</div>\n"
 
@@ -519,13 +519,13 @@ let print_two_branches_with_table conf base info =
   Output.printf conf "</tr>\n";
   Output.printf conf "<tr align=\"%s\">\n" "left";
   Output.printf conf "<td align=\"%s\">" conf.right;
-  Output.printf conf "<hr class=\"%s\"%s>\n" conf.right conf.xhs;
+  Output.printf conf "<hr class=\"%s\">\n" conf.right;
   Output.printf conf "</td>\n";
   Output.printf conf "<td>";
-  Output.printf conf "<hr class=\"full\"%s>\n" conf.xhs;
+  Output.printf conf "<hr class=\"full\">\n";
   Output.printf conf "</td>\n";
   Output.printf conf "<td align=\"%s\">" conf.left;
-  Output.printf conf "<hr class=\"%s\"%s>\n" conf.left conf.xhs;
+  Output.printf conf "<hr class=\"%s\">\n" conf.left;
   Output.printf conf "</td>\n";
   Output.printf conf "</tr>\n";
   print_both_branches conf base info info.b1 info.b2;
@@ -540,7 +540,7 @@ let print_two_branches_with_table conf base info =
         Output.printf conf "<td>\n";
         if info.pb1 <> None || info.nb1 <> None then
           begin
-            Output.printf conf "<br%s>\n" conf.xhs;
+            Output.printf conf "<br>\n";
             print_prev_next_1 conf base info info.pb1 info.nb1
           end
         else Output.printf conf "&nbsp;";
@@ -555,7 +555,7 @@ let print_two_branches_with_table conf base info =
         Output.printf conf "<td>\n";
         if info.pb2 <> None || info.nb2 <> None then
           begin
-            Output.printf conf "<br%s>\n" conf.xhs;
+            Output.printf conf "<br>\n";
             print_prev_next_2 conf base info info.pb2 info.nb2
           end
         else Output.printf conf "&nbsp;";
@@ -609,7 +609,7 @@ let print_relation_ok conf base info =
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
-  Output.printf conf "<p style=\"clear:both\"%s>\n" conf.xhs;
+  Output.printf conf "<p style=\"clear:both\">\n";
   print_relation_path conf base info;
   Hutil.trailer conf
 

@@ -30,10 +30,8 @@ let print_clean conf =
       let history = load_person_history conf f in
       Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
       Output.printf conf
-        "<input type=\"hidden\" name=\"m\" value=\"HIST_CLEAN_OK\"%s>\n"
-        conf.xhs;
-      Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n" f
-        conf.xhs;
+        "<input type=\"hidden\" name=\"m\" value=\"HIST_CLEAN_OK\">\n";
+      Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n" f;
       Output.printf conf "<ul>\n";
       begin let rec loop i =
         function
@@ -42,8 +40,7 @@ let print_clean conf =
             Output.printf conf "<li>\n";
             Output.printf conf "<label>\n";
             Output.printf conf
-              "<input type=\"checkbox\" name=\"i%d\" value=\"on\"%s>\n" i
-              conf.xhs;
+              "<input type=\"checkbox\" name=\"i%d\" value=\"on\">\n" i;
             Output.printf conf "%s %s" gr.date gr.HistoryDiff.wizard;
             Output.printf conf "</label>\n";
             Output.printf conf "</li>\n";

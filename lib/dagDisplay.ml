@@ -52,25 +52,25 @@ let image_txt conf base p =
       if has_image conf base p then
         match image_and_size conf base p (limited_image_size 100 75) with
           Some (true, f, Some (wid, hei)) ->
-            "<br" ^ conf.xhs ^
+            "<br" ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f wid hei ^
             "</td></tr></table></center>\n"
         | Some (true, f, None) ->
-            "<br" ^ conf.xhs ^
+            "<br" ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f 0 75 ^
             "</td></tr></table></center>\n"
         | Some (false, url, Some (wid, hei)) ->
             let url_p = commd conf ^ acces conf base p in
-            "<br" ^ conf.xhs ^
+            "<br" ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt_with_size conf url_p url wid hei ^
             "</td></tr></table></center>\n"
         | Some (false, url, None) ->
             let url_p = commd conf ^ acces conf base p in
             let height = 75 in
-            "<br" ^ conf.xhs ^
+            "<br" ^
             (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
             ">\n<center><table border=\"0\" style=\"height: " ^ string_of_int height ^
             "px\"><tr align=\"left\"><td>\n" ^
@@ -122,10 +122,10 @@ let print_table conf hts =
         | TDhr align ->
             match align with
               LeftA ->
-                Output.printf conf "<hr class=\"%s\"%s>\n" conf.left conf.xhs
+                Output.printf conf "<hr class=\"%s\">\n" conf.left
             | RightA ->
-                Output.printf conf "<hr class=\"%s\"%s>\n" conf.right conf.xhs
-            | _ -> Output.printf conf "<hr class=\"full\"%s>\n" conf.xhs
+                Output.printf conf "<hr class=\"%s\">\n" conf.right
+            | _ -> Output.printf conf "<hr class=\"full\">\n"
         end;
         Output.printf conf "</td>\n"
       done;
@@ -721,7 +721,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                      p ps
                  | None -> ""
                in
-               txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^
+               txt ^ "<br" ^ ">\n&amp;" ^ d ^ " " ^
                string_of_item conf base (elem_txt ps) ^
                image_txt conf base ps)
           txt spouses

@@ -704,16 +704,14 @@ let print_del1 conf base ifam =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_ifam ifam) conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_ifam ifam);
   begin match p_getenv conf.env "ip" with
     Some ip ->
-      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n" ip
-        conf.xhs
+      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
   | None -> ()
   end;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\"%s>\n"
-    conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\">\n";
   Output.printf conf "</p>\n";
   Output.printf conf "<p>\n";
   Output.printf conf
@@ -751,12 +749,11 @@ let print_inv1 conf base p ifam1 ifam2 =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper (get_iper p)) conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
-    (string_of_ifam ifam2) conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"%s>\n"
-    conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_iper (get_iper p));
+  Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n"
+    (string_of_ifam ifam2);
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\">\n";
   Output.printf conf "</p>\n";
   Output.printf conf "<p>\n";
   Output.printf conf
@@ -929,16 +926,13 @@ let print_change_order conf base =
       Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
       Output.printf conf "<p>\n";
       Util.hidden_env conf;
-      Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-        (string_of_iper ip)
-        conf.xhs;
-      Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n"
-        (string_of_ifam ifam) conf.xhs;
-      Output.printf conf "<input type=\"hidden\" name=\"n\" value=\"%d\"%s>\n" n
-        conf.xhs;
+      Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+        (string_of_iper ip);
+      Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n"
+        (string_of_ifam ifam);
+      Output.printf conf "<input type=\"hidden\" name=\"n\" value=\"%d\">\n" n;
       Output.printf conf
-        "<input type=\"hidden\" name=\"m\" value=\"CHG_FAM_ORD_OK\"%s>\n"
-        conf.xhs;
+        "<input type=\"hidden\" name=\"m\" value=\"CHG_FAM_ORD_OK\">\n";
       Output.printf conf "</p>\n";
       Output.printf conf "<p>\n";
       Output.printf conf

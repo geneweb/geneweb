@@ -843,10 +843,9 @@ let print_del1 conf base p =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"%s>\n"
-    conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper (get_iper p)) conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_iper (get_iper p));
   Output.printf conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));

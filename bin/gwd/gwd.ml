@@ -1230,11 +1230,6 @@ let make_conf from_addr request script_name env =
      allowed_titles = Lazy.from_fun (allowed_titles env base_env);
      denied_titles = Lazy.from_fun (denied_titles env base_env);
      request = request; lexicon = lexicon;
-     xhs =
-       begin match p_getenv base_env "doctype" with
-         Some "html-4.01" -> ""
-       | _ -> " /"
-       end;
      charset = "UTF-8"; is_rtl = is_rtl;
      left = if is_rtl then "right" else "left";
      right = if is_rtl then "left" else "right";

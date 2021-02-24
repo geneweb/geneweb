@@ -13,27 +13,23 @@ let print_search_form conf from_note =
   Output.printf conf "<p>\n";
   hidden_env conf;
   Output.printf conf
-    "<input type=\"hidden\" name=\"m\" value=\"MISC_NOTES_SEARCH\"%s>\n"
-    conf.xhs;
+    "<input type=\"hidden\" name=\"m\" value=\"MISC_NOTES_SEARCH\">\n";
   Output.printf conf
-    "<input name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\"%s>\n"
+    "<input name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\">\n"
     (match p_getenv conf.env "s" with
        Some s -> Util.escape_html s
-     | None -> "")
-    conf.xhs;
+     | None -> "");
   begin match from_note with
     Some n ->
-      Output.printf conf "<input type=\"hidden\" name=\"z\" value=\"%s\"%s>\n" n
-        conf.xhs
+      Output.printf conf "<input type=\"hidden\" name=\"z\" value=\"%s\">\n" n
   | None -> ()
   end;
-  Output.printf conf "<br%s>\n" conf.xhs;
+  Output.printf conf "<br>\n";
   Output.printf conf "<label>\n";
-  Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s%s>\n"
+  Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s>\n"
     (match p_getenv conf.env "c" with
        Some "on" -> " checked=\"checked\""
-     | Some _ | None -> "")
-    conf.xhs;
+     | Some _ | None -> "");
   Output.printf conf "%s\n" (transl_nth conf "search/case sensitive" 1);
   Output.printf conf "</label>\n";
   Output.printf conf
@@ -103,8 +99,8 @@ let print_notes_part conf base fnotes title s cnt0 =
   Util.include_template conf [] "summary" (fun () -> ());
   if cnt0 = 0 && title <> "" then
     begin
-      Output.printf conf "<br%s>\n" conf.xhs;
-      Output.printf conf "<br%s>\n" conf.xhs;
+      Output.printf conf "<br>\n";
+      Output.printf conf "<br>\n";
       Output.printf conf "<h1>%s</h1>\n" title
     end;
   let s = string_with_macros conf [] s in

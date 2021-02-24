@@ -67,7 +67,7 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
         Output.print_string conf
           (gen_person_title_text reference std_access conf base p2)
       end
-    else Output.printf conf "<br%s>%s" conf.xhs (person_title_text conf base p2);
+    else Output.printf conf "<br>%s" (person_title_text conf base p2);
     Output.printf conf "%s &amp; " (DateDisplay.short_dates_text conf base p2);
     Perso.print_sosa conf base sp true;
     Output.printf conf "%s%s"
@@ -374,12 +374,11 @@ let print_anniv conf base p dead_people level =
       | [] -> raise Not_found
   in
   let mode () =
-    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"C\"%s>\n"
-      conf.xhs;
-    Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-      (string_of_iper (get_iper p)) conf.xhs;
-    Output.printf conf "<input type=\"hidden\" name=\"t\" value=\"%s\"%s>\n"
-      (if dead_people then "AD" else "AN") conf.xhs
+    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"C\">\n";
+    Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+      (string_of_iper (get_iper p));
+    Output.printf conf "<input type=\"hidden\" name=\"t\" value=\"%s\">\n"
+      (if dead_people then "AD" else "AN")
   in
   match p_getint conf.env "v" with
     Some i -> BirthdayDisplay.gen_print conf base i f_scan dead_people

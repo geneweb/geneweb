@@ -760,22 +760,22 @@ let error_locked conf =
            Output.printf conf "</textarea>\n"
          end
        else
-         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-           x (Util.escape_html (Mutil.decode v)) conf.xhs)
+         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
+           x (Util.escape_html (Mutil.decode v)))
     (conf.henv @ conf.env);
   (* just to see in the traces... *)
-  Output.printf conf "<input type=\"hidden\" name=\"retry\" value=\"%s\"%s>\n"
-    (Util.escape_html conf.user) conf.xhs;
-  Output.printf conf "<input type=\"submit\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "try again")) conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"retry\" value=\"%s\">\n"
+    (Util.escape_html conf.user);
+  Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
+    (Utf8.capitalize (transl conf "try again"));
   Output.printf conf "</form>\n";
   Output.printf conf "</td>\n";
   Output.printf conf "<td>\n";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
-       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" x
-         (Util.escape_html (Mutil.decode v)) conf.xhs)
+       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
+         (Util.escape_html (Mutil.decode v)))
     conf.henv;
   begin let ip =
     match p_getenv conf.env "ip" with
@@ -784,12 +784,11 @@ let error_locked conf =
   in
     match ip with
       Some n ->
-        Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n" n
-          conf.xhs
+        Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n" n
     | None -> ()
   end;
-  Output.printf conf "<input type=\"submit\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl_nth conf "user/password/cancel" 2)) conf.xhs;
+  Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
+    (Utf8.capitalize (transl_nth conf "user/password/cancel" 2));
   Output.printf conf "</form>\n";
   Output.printf conf "</td>\n";
   Output.printf conf "</tr>\n";
@@ -1109,13 +1108,12 @@ let print_create_conflict conf base p var =
            Output.printf conf "</textarea>\n"
          end
        else
-         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-           x (Util.escape_html (Mutil.decode v)) conf.xhs)
+         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
+           x (Util.escape_html (Mutil.decode v)))
     (conf.henv @ conf.env);
-  Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\"%s>\n" var
-    conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\"%s>\n"
-    free_n conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var;
+  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
+    free_n;
   Output.printf conf "<ul>\n";
   Output.printf conf "<li>";
   Output.printf conf "%s%s %d. \n" (Utf8.capitalize (transl conf "first free number"))
@@ -1137,10 +1135,10 @@ let print_create_conflict conf base p var =
     (transl conf "use \"link\" instead of \"create\"");
   Output.printf conf "</li>";
   Output.printf conf "</ul>\n";
-  Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "create")) conf.xhs;
-  Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl conf "back")) conf.xhs;
+  Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
+    (Utf8.capitalize (transl conf "create"));
+  Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
+    (Utf8.capitalize (transl conf "back"));
   Output.printf conf "</form>\n";
   print_same_name conf base p;
   Hutil.trailer conf;

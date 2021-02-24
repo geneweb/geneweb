@@ -38,10 +38,9 @@ let error_too_big_image conf base p len max_len =
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Output.printf conf "<p><em style=\"font-size:smaller\">";
-  Output.printf conf "Error: this image is too big: %d bytes<br%s>\n" len
-    conf.xhs;
-  Output.printf conf "Maximum authorized in this database: %d bytes<br%s>\n"
-    max_len conf.xhs;
+  Output.printf conf "Error: this image is too big: %d bytes<br>\n" len;
+  Output.printf conf "Maximum authorized in this database: %d bytes<br>\n"
+    max_len;
   Output.printf conf "</em></p>\n";
   Output.printf conf "<ul>\n";
   Output.printf conf "<li>\n";
@@ -100,15 +99,14 @@ let print_send_image conf base p =
   Output.printf conf "<p>\n";
   Util.hidden_env conf;
   Output.printf conf
-    "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"%s>\n" conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper (get_iper p)) conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n"
-    digest conf.xhs;
+    "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_iper (get_iper p));
+  Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
+    digest;
   Output.printf conf "%s%s\n" (Utf8.capitalize (transl conf "file")) (Util.transl conf ":");
   Output.printf conf "<input \
-type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"%s>\n"
-    conf.xhs;
+type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\">\n";
   Output.printf conf "</p>\n";
   begin match p_getint conf.base_env "max_images_size" with
     Some len ->

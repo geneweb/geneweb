@@ -116,7 +116,7 @@ let syntax_links conf wi s =
     then
       loop quot_lev pos (i + 2) (Buff.store len s.[i+1])
     else if s.[i] = '%' && i < slen - 1 && s.[i+1] = '/' then
-      loop quot_lev pos (i + 2) (Buff.mstore len conf.xhs)
+      loop quot_lev pos (i + 2) (Buff.mstore len "")
     else if s.[i] = '{' then
       let (b, j) =
         let rec loop len j =
@@ -510,7 +510,7 @@ and select_list_lines conf prompt list =
             function
               "" :: s :: sl
               when String.length s > 1 && s.[0] = prompt && s.[1] = prompt ->
-                let br = "<br" ^ conf.xhs ^ ">" in
+                let br = "<br" ^ ">" in
                 loop (s1 ^ br ^ br) (s :: sl)
             | s :: sl ->
                 if String.length s > 0 && s.[0] = '=' then s1, s :: sl
@@ -673,19 +673,15 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Util.hidden_env conf;
   if can_edit then
     Output.printf conf
-      "<input type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"%s>\n" mode
-      conf.xhs;
+      "<input type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\">\n" mode;
   if has_v then
-    Output.printf conf "<input type=\"hidden\" name=\"v\" value=\"%d\"%s>\n" v
-      conf.xhs;
+    Output.printf conf "<input type=\"hidden\" name=\"v\" value=\"%d\">\n" v;
   if fname <> "" then
-    Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\"%s>\n" fname
-      conf.xhs;
+    Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n" fname;
   if can_edit then
     begin let digest = Iovalue.digest s in
       Output.printf conf
-        "<input type=\"hidden\" name=\"digest\" value=\"%s\"%s>\n" digest
-        conf.xhs
+        "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n" digest
     end;
   Output.printf conf "<div class=\"row ml-3\">\n";
   Output.printf conf "<div class=\"d-inline col-9 py-1\">\n";
