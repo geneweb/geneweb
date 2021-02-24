@@ -32,10 +32,10 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 
   if ((ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) && pgl1 <> [] ||
       (ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc) && pgl2 <> []) then
     begin
-      Output.printf conf
+      Output.print_string conf
         "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
       Output.printf conf (ftransl conf "name changed. update linked pages");
-      Output.printf conf "</div>\n";
+      Output.print_string conf "</div>\n";
       let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
       Output.printf conf "<span class=\"unselectable float-left\">%s%s</span>\n\
                       <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"

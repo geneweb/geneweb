@@ -29,31 +29,31 @@ let print_clean conf =
               "select the input you want to erase from the history"));
       let history = load_person_history conf f in
       Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-      Output.printf conf
+      Output.print_string conf
         "<input type=\"hidden\" name=\"m\" value=\"HIST_CLEAN_OK\">\n";
       Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n" f;
-      Output.printf conf "<ul>\n";
+      Output.print_string conf "<ul>\n";
       begin let rec loop i =
         function
           [] -> ()
         | gr :: l ->
-            Output.printf conf "<li>\n";
-            Output.printf conf "<label>\n";
+            Output.print_string conf "<li>\n";
+            Output.print_string conf "<label>\n";
             Output.printf conf
               "<input type=\"checkbox\" name=\"i%d\" value=\"on\">\n" i;
             Output.printf conf "%s %s" gr.date gr.HistoryDiff.wizard;
-            Output.printf conf "</label>\n";
-            Output.printf conf "</li>\n";
+            Output.print_string conf "</label>\n";
+            Output.print_string conf "</li>\n";
             loop (i + 1) l
       in
         loop 0 history
       end;
-      Output.printf conf "</ul>\n";
-      Output.printf conf
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
       Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-      Output.printf conf "</button>\n";
-      Output.printf conf "</form>\n";
+      Output.print_string conf "</button>\n";
+      Output.print_string conf "</form>\n";
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 

@@ -9,7 +9,7 @@ let print_link conf base p =
   Output.printf conf "<a href=\"%s%s\">" (commd conf) (acces conf base p);
   Output.printf conf "%s.%d %s" (sou base (get_first_name p)) (get_occ p)
     (sou base (get_surname p));
-  Output.printf conf "</a>";
+  Output.print_string conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   match main_title conf base p with
     Some t -> Output.print_string conf (one_title_text base t)
@@ -24,11 +24,11 @@ let print_no_candidate conf base p =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Output.printf conf "%s\n" (Utf8.capitalize (transl conf "not found"));
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   print_link conf base p;
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf
 
 let input_excl string_of_i excl =
@@ -48,23 +48,23 @@ let print_input_excl conf string_of_i excl excl_name =
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   let title _ = Output.printf conf "%s\n" (Utf8.capitalize (transl conf "merge")) in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<h2>\n";
+  Output.print_string conf "<h2>\n";
   title false;
-  Output.printf conf "</h2>\n";
+  Output.print_string conf "</h2>\n";
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   print_link conf base (poi base ip1);
-  Output.printf conf "</li>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "<li>\n";
   print_link conf base (poi base ip2);
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
-  Output.printf conf "<p>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
+  Output.print_string conf "<p>\n";
   Output.printf conf "%s ?\n" (Utf8.capitalize (transl conf "merge"));
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
-  Output.printf conf
+  Output.print_string conf
     "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_IND_Y_N\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
     (string_of_iper ip);
@@ -78,8 +78,8 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
     (transl_nth conf "Y/N" 0);
   Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\">\n"
     (transl_nth conf "Y/N" 1);
-  Output.printf conf "</form>\n";
-  Output.printf conf "</p>\n";
+  Output.print_string conf "</form>\n";
+  Output.print_string conf "</p>\n";
   Hutil.trailer conf
 
 let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
@@ -89,30 +89,30 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
          (transl_decline conf "merge" (transl_nth conf "family/families" 1)))
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<h2>\n";
+  Output.print_string conf "<h2>\n";
   title false;
-  Output.printf conf "</h2>\n";
+  Output.print_string conf "</h2>\n";
   Hutil.print_link_to_welcome conf true;
   let (ip1, ip2) =
     let cpl = foi base ifam1 in Gwdb.get_father cpl, Gwdb.get_mother cpl
   in
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   print_link conf base (poi base ip1);
-  Output.printf conf "\n&amp;\n";
+  Output.print_string conf "\n&amp;\n";
   print_link conf base (poi base ip2);
-  Output.printf conf "</li>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "<li>\n";
   print_link conf base (poi base ip1);
-  Output.printf conf "\n&amp;\n";
+  Output.print_string conf "\n&amp;\n";
   print_link conf base (poi base ip2);
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
-  Output.printf conf "<p>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
+  Output.print_string conf "<p>\n";
   Output.printf conf "%s ?\n" (Utf8.capitalize (transl conf "merge"));
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
-  Output.printf conf
+  Output.print_string conf
     "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_FAM_Y_N\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
     (string_of_iper ip);
@@ -126,8 +126,8 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
     (transl_nth conf "Y/N" 0);
   Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\">\n"
     (transl_nth conf "Y/N" 1);
-  Output.printf conf "</form>\n";
-  Output.printf conf "</p>\n";
+  Output.print_string conf "</form>\n";
+  Output.print_string conf "</p>\n";
   Hutil.trailer conf
 
 let main_page conf base =

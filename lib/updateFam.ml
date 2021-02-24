@@ -697,12 +697,12 @@ let print_del1 conf base ifam =
     | None -> Gwdb.empty_person base dummy_iper
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<h2>\n";
+  Output.print_string conf "<h2>\n";
   title false;
-  Output.printf conf "</h2>\n";
-  Output.printf conf "\n";
+  Output.print_string conf "</h2>\n";
+  Output.print_string conf "\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Util.hidden_env conf;
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_ifam ifam);
@@ -711,16 +711,16 @@ let print_del1 conf base ifam =
       Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
   | None -> ()
   end;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\">\n";
-  Output.printf conf "</p>\n";
-  Output.printf conf "<p>\n";
-  Output.printf conf
+  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\">\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "<p>\n";
+  Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</button>\n";
-  Output.printf conf "</p>\n";
-  Output.printf conf "</form>\n";
-  Output.printf conf "\n";
+  Output.print_string conf "</button>\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "</form>\n";
+  Output.print_string conf "\n";
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
@@ -733,36 +733,36 @@ let print_inv1 conf base p ifam1 ifam2 =
   Output.printf conf "%s%s"
     (Utf8.capitalize (transl conf "invert the order of the following families"))
     (Util.transl conf ":");
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   Update.print_someone conf base (poi base (get_father cpl1));
   Output.printf conf " %s " (transl_nth conf "and" 0);
   Update.print_someone conf base (poi base (get_mother cpl1));
-  Output.printf conf "</li>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "<li>\n";
   Update.print_someone conf base (poi base (get_father cpl2));
   Output.printf conf " %s " (transl_nth conf "and" 0);
   Update.print_someone conf base (poi base (get_mother cpl2));
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
-  Output.printf conf "\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
+  Output.print_string conf "\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Util.hidden_env conf;
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
   Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n"
     (string_of_ifam ifam2);
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\">\n";
-  Output.printf conf "</p>\n";
-  Output.printf conf "<p>\n";
-  Output.printf conf
+  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\">\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "<p>\n";
+  Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</button>\n";
-  Output.printf conf "</p>\n";
-  Output.printf conf "</form>\n";
-  Output.printf conf "\n";
+  Output.print_string conf "</button>\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "</form>\n";
+  Output.print_string conf "\n";
   Hutil.trailer conf
 
 let print_add conf base =
@@ -885,15 +885,15 @@ let print_change_order conf base =
              Output.printf conf "%s%s" (p_first_name base p)
                (if get_occ p = 0 then ""
                 else "." ^ string_of_int (get_occ p));
-             Output.printf conf "  &amp;";
+             Output.print_string conf "  &amp;";
              Output.printf conf "%s\n"
                (DateDisplay.short_marriage_date_text conf base fam p sp);
              Output.printf conf "%s%s %s" (p_first_name base sp)
                (if get_occ sp = 0 then ""
                 else "." ^ string_of_int (get_occ sp))
                (p_surname base sp);
-             Output.printf conf "\n";
-             Output.printf conf "</li>\n")
+             Output.print_string conf "\n";
+             Output.print_string conf "</li>\n")
           arr
       in
       let after = change_order p ifam n in
@@ -903,45 +903,45 @@ let print_change_order conf base =
         Output.print_string conf (Utf8.capitalize (transl_decline conf "invert" ""))
       in
       Perso.interp_templ_with_menu title "perso_header" conf base p;
-      Output.printf conf "<h2>\n";
+      Output.print_string conf "<h2>\n";
       title false;
-      Output.printf conf "</h2>\n";
+      Output.print_string conf "</h2>\n";
       Output.printf conf "%s%s"
         (Utf8.capitalize (transl conf "invert the order of the following families"))
         (Util.transl conf ":");
-      Output.printf conf "<table style=\"margin:1em\">\n";
-      Output.printf conf "<tr>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "<table style=\"margin:1em\">\n";
+      Output.print_string conf "<tr>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "</tr>\n";
-      Output.printf conf "</table>\n";
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "</tr>\n";
+      Output.print_string conf "</table>\n";
       Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Util.hidden_env conf;
       Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
         (string_of_iper ip);
       Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n"
         (string_of_ifam ifam);
       Output.printf conf "<input type=\"hidden\" name=\"n\" value=\"%d\">\n" n;
-      Output.printf conf
+      Output.print_string conf
         "<input type=\"hidden\" name=\"m\" value=\"CHG_FAM_ORD_OK\">\n";
-      Output.printf conf "</p>\n";
-      Output.printf conf "<p>\n";
-      Output.printf conf
+      Output.print_string conf "</p>\n";
+      Output.print_string conf "<p>\n";
+      Output.print_string conf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
       Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-      Output.printf conf "</button>\n";
-      Output.printf conf "</p>\n";
-      Output.printf conf "</form>\n";
-      Output.printf conf "\n";
+      Output.print_string conf "</button>\n";
+      Output.print_string conf "</p>\n";
+      Output.print_string conf "</form>\n";
+      Output.print_string conf "\n";
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 

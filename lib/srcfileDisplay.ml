@@ -346,7 +346,7 @@ let rec copy_from_stream conf base strm mode =
             'I' -> push_echo (!echo && if_expr (Stream.next strm))
           | 'E' -> pop_echo ()
           | _ when not !echo -> ()
-          | '%' -> Output.printf conf "%%"
+          | '%' -> Output.print_string conf "%"
           | '[' | ']' -> Output.printf conf "%c" c
           | 'h' -> hidden_env conf
           | 'j' -> Templ.include_hed_trl conf "hed"
@@ -428,7 +428,7 @@ let gen_print with_logo mode conf base fname =
       copy_from_channel conf base ic mode;
       Hutil.gen_trailer with_logo conf
   | _ ->
-      let title _ = Output.printf conf "Error" in
+      let title _ = Output.print_string conf "Error" in
       Hutil.header conf title;
       Output.printf conf "<ul><li>Cannot access file \"%s.txt\"</ul>" @@ Util.escape_html fname;
       Hutil.gen_trailer with_logo conf;

@@ -549,7 +549,8 @@ let error_family conf err =
 #endif
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.printf conf "%s\n" (Utf8.capitalize err);
+  Output.print_string conf (Utf8.capitalize err); 
+  Output.print_string conf "\n";
   Update.print_return conf;
   Hutil.trailer conf;
 #ifdef API
@@ -1163,28 +1164,28 @@ let print_family conf base (wl, ml) cpl des =
       if x <> "" then conf.henv <- ("dsrc", Mutil.encode x) :: conf.henv
   | None -> ()
   end;
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>";
   Output.print_string conf
     (referenced_person_text conf base (poi base (Adef.father cpl)));
-  Output.printf conf "</li>";
-  Output.printf conf "\n";
-  Output.printf conf "<li>";
+  Output.print_string conf "</li>";
+  Output.print_string conf "\n";
+  Output.print_string conf "<li>";
   Output.print_string conf
     (referenced_person_text conf base (poi base (Adef.mother cpl)));
-  Output.printf conf "</li>";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>";
+  Output.print_string conf "</ul>\n";
   if des.children <> [| |] then
     begin
-      Output.printf conf "<ul>\n";
+      Output.print_string conf "<ul>\n";
       Array.iter
         (fun ip ->
-           Output.printf conf "<li>";
+           Output.print_string conf "<li>";
            Output.print_string conf
              (referenced_person_text conf base (poi base ip));
-           Output.printf conf "</li>")
+           Output.print_string conf "</li>")
         des.children;
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</ul>\n"
     end;
   Update.print_warnings_and_miscs conf base wl ml
 
@@ -1197,11 +1198,11 @@ let print_mod_ok conf base (wl, ml) cpl des =
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
-      Output.printf conf "<h3 class=\"error\">";
+      Output.print_string conf "<h3 class=\"error\">";
       Output.printf conf (fcapitale (ftransl conf "%s forbidden char"))
         (List.fold_left (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") " "
            Name.forbidden_char);
-      Output.printf conf "</h3>\n";
+      Output.print_string conf "</h3>\n";
       List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   print_family conf base (wl, ml) cpl des;
@@ -1239,10 +1240,10 @@ let print_del_ok conf base wl =
   begin match p_getenv conf.env "ip" with
     Some i ->
       let p = poi base (iper_of_string i) in
-      Output.printf conf "<ul>\n";
-      Output.printf conf "<li>\n";
+      Output.print_string conf "<ul>\n";
+      Output.print_string conf "<li>\n";
       Output.printf conf "%s\n" (reference conf base p (person_text conf base p));
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</ul>\n"
   | _ -> ()
   end;
   Update.print_warnings conf base wl;
@@ -1270,7 +1271,7 @@ let print_inv_ok conf base p =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Output.printf conf "\n%s" (referenced_person_text conf base p);
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   Hutil.trailer conf
 
 let get_create (_, _, _, create, _) = create

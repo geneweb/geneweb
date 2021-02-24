@@ -121,14 +121,14 @@ let print conf base =
 (* ************************************************************************** *)
 let print_html conf =
   Util.html conf;
-  Output.printf conf "<head>\n";
+  Output.print_string conf "<head>\n";
   Output.printf conf "  <title>%s</title>\n"
     (Util.transl_nth conf "image/images" 0);
-  Output.printf conf "</head>\n<body>\n";
+  Output.print_string conf "</head>\n<body>\n";
   Output.printf conf "<img src=\"%s" (Util.commd conf);
   Mutil.list_iter_first
     (fun first (k, v) ->
        let v = if k = "m" then "IM" else v in
        Output.printf conf "%s%s=%s" (if first then "" else "&") k v)
     conf.env;
-  Output.printf conf "\">\n</body>\n</html>"
+  Output.print_string conf "\">\n</body>\n</html>"

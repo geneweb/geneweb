@@ -23,7 +23,7 @@ let link_to_referer conf =
 let gen_print_link_to_welcome f conf right_aligned =
   if right_aligned then
     Output.printf conf "<div class=\"btn-group float-%s mt-2\">\n" conf.right
-  else Output.printf conf "<p>\n";
+  else Output.print_string conf "<p>\n";
   f ();
   let str = link_to_referer conf in
   if str = "" then () else Output.print_string conf str;
@@ -31,18 +31,18 @@ let gen_print_link_to_welcome f conf right_aligned =
                   <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
                   </a>\n"
     (commd_no_params conf) (Utf8.capitalize (Util.transl conf "home"));
-  if right_aligned then Output.printf conf "</div>\n"
-  else Output.printf conf "</p>\n"
+  if right_aligned then Output.print_string conf "</div>\n"
+  else Output.print_string conf "</p>\n"
 
 let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
 let header_without_http conf title =
-  Output.printf conf "<!DOCTYPE html>\n";
-  Output.printf conf "<head>\n";
-  Output.printf conf "  <title>";
+  Output.print_string conf "<!DOCTYPE html>\n";
+  Output.print_string conf "<head>\n";
+  Output.print_string conf "  <title>";
   title true;
-  Output.printf conf "</title>\n";
-  Output.printf conf "  <meta name=\"robots\" content=\"none\">\n";
+  Output.print_string conf "</title>\n";
+  Output.print_string conf "  <meta name=\"robots\" content=\"none\">\n";
   Output.printf conf "  <meta charset=\"%s\">\n" conf.charset;
   Output.printf conf
     "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\">\n"
@@ -50,14 +50,14 @@ let header_without_http conf title =
   Output.printf conf
     "  <link rel=\"apple-touch-icon\" href=\"%s/favicon_gwd.png\">\n"
     (Util.image_prefix conf);
-  Output.printf conf "  <meta name=\"viewport\" content=\"width=device-width, \
+  Output.print_string conf "  <meta name=\"viewport\" content=\"width=device-width, \
                     initial-scale=1, shrink-to-fit=no\">\n";
   Util.include_template conf [] "css" (fun () -> ());
   begin match Util.open_templ conf "hed" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
-  Output.printf conf "\n</head>\n";
+  Output.print_string conf "\n</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
       Not_found -> ""
@@ -74,9 +74,9 @@ let header_without_page_title conf title =
 let header_link_welcome conf title =
   header_without_page_title conf title;
   print_link_to_welcome conf true;
-  Output.printf conf "<h1>";
+  Output.print_string conf "<h1>";
   title false;
-  Output.printf conf "</h1>\n"
+  Output.print_string conf "</h1>\n"
 
 let header_no_page_title conf title =
   header_without_page_title conf title;
@@ -86,23 +86,23 @@ let header_no_page_title conf title =
 
 let header conf title =
   header_without_page_title conf title;
-  Output.printf conf "\n<h1>";
+  Output.print_string conf "\n<h1>";
   title false;
-  Output.printf conf "</h1>\n"
+  Output.print_string conf "</h1>\n"
 
 let header_fluid conf title =
   header_without_http conf title;
   (* balancing </div> in gen_trailer *)
-  Output.printf conf "<div class=\"container-fluid\">";
-  Output.printf conf "\n<h1>";
+  Output.print_string conf "<div class=\"container-fluid\">";
+  Output.print_string conf "\n<h1>";
   title false;
-  Output.printf conf "</h1>\n"
+  Output.print_string conf "</h1>\n"
 
 let rheader conf title =
   header_without_page_title conf title;
-  Output.printf conf "<h1 class=\"error\">";
+  Output.print_string conf "<h1 class=\"error\">";
   title false;
-  Output.printf conf "</h1>\n"
+  Output.print_string conf "</h1>\n"
 
 let gen_trailer with_logo conf =
   let conf = {conf with is_printed_by_template = false} in
@@ -113,7 +113,7 @@ let gen_trailer with_logo conf =
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
-  Output.printf conf "</body>\n</html>\n"
+  Output.print_string conf "</body>\n</html>\n"
 
 let trailer = gen_trailer true
 
@@ -123,19 +123,19 @@ let incorrect_request conf =
   in
   Output.status conf Def.Bad_Request;
   header conf title;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   print_link_to_welcome conf false;
-  Output.printf conf "</p>\n";
+  Output.print_string conf "</p>\n";
   trailer conf
 
 let error_cannot_access conf fname =
-  let title _ = Output.printf conf "Error" in
+  let title _ = Output.print_string conf "Error" in
   header conf title;
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   Output.printf conf "Cannot access file \"%s.txt\".\n" fname;
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
   trailer conf
 
 let gen_interp header conf fname ifun env ep =

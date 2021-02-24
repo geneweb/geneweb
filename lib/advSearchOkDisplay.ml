@@ -10,19 +10,19 @@ let print_result conf base max_answers (list, len) =
   if len = 0 then Output.printf conf "%s\n" (Utf8.capitalize (transl conf "no match"))
   else
     let () = Perso.build_sosa_ht conf base in
-    Output.printf conf "<ul>\n";
+    Output.print_string conf "<ul>\n";
     List.iter
       (fun p ->
-         Output.printf conf "<li>" ;
+         Output.print_string conf "<li>" ;
          Perso.print_sosa conf base p true;
          Output.printf conf "\n%s%s<em>"
            (referenced_person_text conf base p)
            (DateDisplay.short_dates_text conf base p) ;
          specify_homonymous conf base p false;
-         Output.printf conf "</em>")
+         Output.print_string conf "</em>")
       list;
-    if len > max_answers then Output.printf conf "<li>...</li>";
-    Output.printf conf "</ul>\n"
+    if len > max_answers then Output.print_string conf "<li>...</li>";
+    Output.print_string conf "</ul>\n"
 
 
 let print conf base =
@@ -35,9 +35,9 @@ let print conf base =
     | None -> 100
   in
   Hutil.header conf title;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Output.printf conf "%s %s." (Utf8.capitalize (transl conf "searching all"))
     (AdvSearchOk.searching_fields conf base);
-  Output.printf conf "</p>\n";
+  Output.print_string conf "</p>\n";
   let list = AdvSearchOk.advanced_search conf base max_answers in
   print_result conf base max_answers list; Hutil.trailer conf

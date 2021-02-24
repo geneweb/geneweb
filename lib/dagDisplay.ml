@@ -95,27 +95,27 @@ let string_of_item conf base =
 let print_table conf hts =
   begin_centered conf;
   Output.printf conf "<table border=\"%d\"" conf.border;
-  Output.printf conf " cellspacing=\"0\" cellpadding=\"0\">\n";
+  Output.print_string conf " cellspacing=\"0\" cellpadding=\"0\">\n";
   for i = 0 to Array.length hts - 1 do
     begin
-      Output.printf conf "<tr align=\"left\">\n";
+      Output.print_string conf "<tr align=\"left\">\n";
       for j = 0 to Array.length hts.(i) - 1 do
         let (colspan, align, td) = hts.(i).(j) in
-        Output.printf conf "<td";
+        Output.print_string conf "<td";
         if colspan = 1 && (td = TDnothing || td = TDhr CenterA) then ()
         else Output.printf conf " colspan=\"%d\"" colspan;
         begin match align, td with
           LeftA, TDhr LeftA -> Output.printf conf " align=\"%s\"" conf.left
         | LeftA, _ -> ()
-        | CenterA, _ -> Output.printf conf " align=\"center\""
+        | CenterA, _ -> Output.print_string conf " align=\"center\""
         | RightA, _ -> Output.printf conf " align=\"%s\"" conf.right
         end;
-        Output.printf conf ">";
+        Output.print_string conf ">";
         begin match td with
           TDitem s -> Output.print_string conf s
         | TDtext s -> Output.print_string conf s
-        | TDnothing -> Output.printf conf "&nbsp;"
-        | TDbar None -> Output.printf conf "|"
+        | TDnothing -> Output.print_string conf "&nbsp;"
+        | TDbar None -> Output.print_string conf "|"
         | TDbar (Some s) ->
             Output.printf conf
               "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
@@ -125,14 +125,14 @@ let print_table conf hts =
                 Output.printf conf "<hr class=\"%s\">\n" conf.left
             | RightA ->
                 Output.printf conf "<hr class=\"%s\">\n" conf.right
-            | _ -> Output.printf conf "<hr class=\"full\">\n"
+            | _ -> Output.print_string conf "<hr class=\"full\">\n"
         end;
-        Output.printf conf "</td>\n"
+        Output.print_string conf "</td>\n"
       done;
-      Output.printf conf "</tr>\n"
+      Output.print_string conf "</tr>\n"
     end
   done;
-  Output.printf conf "</table>\n";
+  Output.print_string conf "</table>\n";
   end_centered conf
 
 (*
@@ -489,26 +489,26 @@ let print_next_pos conf pos1 pos2 tcol =
            | _ -> (k, v) :: env)
         conf.env []
     in
-    Output.printf conf "<div style=\"text-align:right\">\n";
-    if pos1 = 0 then Output.printf conf "&nbsp;"
+    Output.print_string conf "<div style=\"text-align:right\">\n";
+    if pos1 = 0 then Output.print_string conf "&nbsp;"
     else
       begin
         Output.printf conf "<a href=\"%s" (commd conf);
         List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) env;
         Output.printf conf "pos1=%d&pos2=%d" (pos1 + overlap - dpos)
           (pos1 + overlap);
-        Output.printf conf "\">&lt;&lt;</a>\n"
+        Output.print_string conf "\">&lt;&lt;</a>\n"
       end;
-    if pos2 >= tcol then Output.printf conf "&nbsp;"
+    if pos2 >= tcol then Output.print_string conf "&nbsp;"
     else
       begin
         Output.printf conf "<a href=\"%s" (commd conf);
         List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) env;
         Output.printf conf "pos1=%d&pos2=%d" (pos2 - overlap)
           (pos2 - overlap + dpos);
-        Output.printf conf "\">&gt;&gt;</a>\n"
+        Output.print_string conf "\">&gt;&gt;</a>\n"
       end;
-    Output.printf conf "</div>\n"
+    Output.print_string conf "</div>\n"
 
 (* Main print table algorithm with <pre> *)
 
@@ -535,7 +535,7 @@ let print_table_pre conf hts =
     | x -> x
   in
   print_next_pos conf pos1 pos2 (Array.fold_left (+) 0 colsz);
-  Output.printf conf "<pre>\n";
+  Output.print_string conf "<pre>\n";
   for i = 0 to Array.length hts - 1 do
     let (stra, max_row) =
       let (stral, max_row) =
@@ -565,7 +565,7 @@ let print_table_pre conf hts =
     in
     for row = 0 to max_row - 1 do
       let rec loop pos col j =
-        if j = Array.length hts.(i) then Output.printf conf "\n"
+        if j = Array.length hts.(i) then Output.print_string conf "\n"
         else
           let (colspan, _, td) = hts.(i).(j) in
           let sz =
@@ -637,20 +637,20 @@ let print_table_pre conf hts =
       loop 0 0 0
     done
   done;
-  Output.printf conf "</pre>\n"
+  Output.print_string conf "</pre>\n"
 
 (* main *)
 
 let print_html_table conf hts =
   if Util.p_getenv conf.env "notab" <> Some "on" then
     begin
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "<div style=\"text-align:%s\"><a href=\"%s" conf.right
         (commd conf);
       List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) conf.env;
-      Output.printf conf "notab=on&slices=on";
-      Output.printf conf "\"><tt>//</tt></a></div>\n";
-      Output.printf conf "</p>\n"
+      Output.print_string conf "notab=on&slices=on";
+      Output.print_string conf "\"><tt>//</tt></a></div>\n";
+      Output.print_string conf "</p>\n"
     end;
   if Util.p_getenv conf.env "notab" = Some "on" ||
      Util.p_getenv conf.env "pos2" <> None || browser_doesnt_have_tables conf
@@ -763,7 +763,7 @@ let print_slices_menu conf hts =
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Output.printf conf "<p>" ;
+  Output.print_string conf "<p>" ;
   hidden_env conf;
   List.iter
     (fun (k, v) ->
@@ -772,29 +772,29 @@ let print_slices_menu conf hts =
          Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
            (Mutil.decode k) (Mutil.decode v))
     conf.env;
-  Output.printf conf "</p>" ;
-  Output.printf conf "<table>\n";
-  Output.printf conf "<tr align=\"left\">\n";
-  Output.printf conf "<td align=\"right\">\n";
+  Output.print_string conf "</p>" ;
+  Output.print_string conf "<table>\n";
+  Output.print_string conf "<tr align=\"left\">\n";
+  Output.print_string conf "<td align=\"right\">\n";
   Output.printf conf "%s\n"
     (Utf8.capitalize (transl conf "don't group the common branches together"));
-  Output.printf conf "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
-  Output.printf conf "<tr align=\"left\">\n";
-  Output.printf conf "<td align=\"right\">\n";
+  Output.print_string conf "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "<tr align=\"left\">\n";
+  Output.print_string conf "<td align=\"right\">\n";
   Output.printf conf "%s\n" (txt 1);
-  Output.printf conf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
-  Output.printf conf "<tr align=\"left\">\n";
-  Output.printf conf "<td align=\"right\">\n";
+  Output.print_string conf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "<tr align=\"left\">\n";
+  Output.print_string conf "<td align=\"right\">\n";
   Output.printf conf "%s\n" (txt 2);
-  Output.printf conf "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
-  Output.printf conf "<tr align=\"left\">\n";
-  Output.printf conf "<td align=\"right\">\n";
+  Output.print_string conf "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "<tr align=\"left\">\n";
+  Output.print_string conf "<td align=\"right\">\n";
   Output.printf conf "%s\n" (txt 3);
   begin let wid =
     let (min_wid, max_wid, _, _, _) = table_pre_dim hts in
@@ -802,14 +802,14 @@ let print_slices_menu conf hts =
   in
     Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid
   end;
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
-  Output.printf conf "</table>\n";
-  Output.printf conf "<p>" ;
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "</table>\n";
+  Output.print_string conf "<p>" ;
   Output.printf conf
     "<p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>"
     (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</form>\n";
   Hutil.trailer conf
 
 let print_dag_page conf page_title hts next_txt =
@@ -829,9 +829,9 @@ let print_dag_page conf page_title hts next_txt =
   print_html_table conf hts;
   if next_txt <> "" then
     begin
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</p>\n"
     end;
   Hutil.trailer conf
 

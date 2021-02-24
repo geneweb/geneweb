@@ -13,21 +13,21 @@ let print_differences conf base branches p1 p2 =
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
       begin
         Output.printf conf "<h4>%s</h4>\n" (Utf8.capitalize title);
-        Output.printf conf "<div class=\"custom-control custom-radio ml-3\">\n";
+        Output.print_string conf "<div class=\"custom-control custom-radio ml-3\">\n";
         Output.printf conf "  <input class=\"custom-control-input\" type=\"radio\" id=\"%s1\" name=\"%s\" value=\"1\"%s>\n" name name chk1;
         Output.printf conf "  <label class=\"custom-control-label\" for=\"%s1\">%s</label>\n" name x1;
-        Output.printf conf "</div>\n";
-        Output.printf conf "<div class=\"custom-control custom-radio ml-3 mb-2\">\n";
+        Output.print_string conf "</div>\n";
+        Output.print_string conf "<div class=\"custom-control custom-radio ml-3 mb-2\">\n";
         Output.printf conf "  <input class=\"custom-control-input\" type=\"radio\" id=\"%s2\" name=\"%s\" value=\"2\"%s>\n" name name chk2;
         Output.printf conf "  <label class=\"custom-control-label\" for=\"%s2\">%s</label>\n" name x2;
-        Output.printf conf "</div>\n";
+        Output.print_string conf "</div>\n";
       end
   in
   let string_field = gen_string_field " checked" "" in
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\">\n";
+  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i1\" value=\"%s\">\n"
     (string_of_iper (get_iper p1));
   Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
@@ -60,7 +60,7 @@ let print_differences conf base branches p1 p2 =
         ["iexcl"; "fexcl"]
   | _ -> ()
   end;
-  Output.printf conf "</p><p>";
+  Output.print_string conf "</p><p>";
   string_field (transl_nth conf "first name/first names" 0) "first_name"
     (fun p -> p_first_name base p);
   string_field (transl_nth conf "surname/surnames" 0) "surname"
@@ -177,7 +177,7 @@ let propose_merge_ind conf base branches p1 p2 =
       (commd conf)
       (acces conf base p2);
     MergeDisplay.print_someone conf base p2;
-    Output.printf conf "</a></li></ul><p></p>\n"
+    Output.print_string conf "</a></li></ul><p></p>\n"
   end;
   print_differences conf base branches p1 p2;
   if branches <> [] then
@@ -197,7 +197,7 @@ let propose_merge_ind conf base branches p1 p2 =
              (referenced_person_text conf base p2)
              (DateDisplay.short_dates_text conf base p2))
         ((get_iper p1, get_iper p2) :: branches);
-      Output.printf conf "</table>\n"
+      Output.print_string conf "</table>\n"
     end ;
   Hutil.trailer conf
 
@@ -209,7 +209,7 @@ let error_loop conf base p =
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p);
   Output.printf conf "\n%s\n" (transl conf "would be his/her own ancestor");
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   Hutil.trailer conf
 
 let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
@@ -227,7 +227,7 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   Output.printf conf "</a> %s <a href=\"%s%s\">"
     (transl conf "with") (commd conf) (acces conf base p2);
   MergeDisplay.print_someone conf base p2;
-  Output.printf conf "</a></li></ul><p>";
+  Output.print_string conf "</a></li></ul><p>";
   MergeFamDisplay.print_differences conf base branches fam1 fam2;
   Hutil.trailer conf
 
@@ -265,11 +265,11 @@ let print_merged conf base wl p =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   Output.printf conf "%s\n" (referenced_person_text conf base p);
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
   begin match p_getenv conf.env "m", p_getenv conf.env "ip" with
     Some "MRG_DUP_IND_Y_N", Some ip ->
       let ip = iper_of_string ip in
@@ -283,10 +283,10 @@ let print_merged conf base wl p =
           Some "" | None -> ""
         | Some s -> "&fexcl=" ^ s
       in
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "<a href=%sm=MRG_DUP&ip=%s%s%s>" (commd conf) (string_of_iper ip) s1 s2;
       Output.print_string conf (Utf8.capitalize (transl conf "continue merging"));
-      Output.printf conf "</a>";
+      Output.print_string conf "</a>";
       begin
         let p =  poi base ip in
         let s = person_text conf base p in
@@ -295,7 +295,7 @@ let print_merged conf base wl p =
              (transl conf "possible duplications")
              (reference conf base p s) s)
       end ;
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</p>\n"
   | _ -> ()
   end;
   Update.print_warnings conf base wl;
@@ -337,7 +337,7 @@ let print conf base =
 (* Undocumented feature... Kill someone's ancestors *)
 
 let print_killed conf base p nb_ind nb_fam =
-  let title _ = Output.printf conf "Ancestors killed" in
+  let title _ = Output.print_string conf "Ancestors killed" in
   Hutil.header conf title;
   Output.printf conf "%s's ancestors killed.<br>\n"
     (referenced_person_title_text conf base p);

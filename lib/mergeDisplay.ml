@@ -16,7 +16,7 @@ let print conf base p =
     if h then ()
     else
       begin
-        Output.printf conf " ";
+        Output.print_string conf " ";
         print_someone conf base p;
         Output.printf conf " %s%s" (transl_decline conf "with" "")
           (transl conf ":");
@@ -30,24 +30,24 @@ let print conf base p =
       list []
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<h2>";
+  Output.print_string conf "<h2>";
   title false;
-  Output.printf conf "</h2>\n";
+  Output.print_string conf "</h2>\n";
   Output.printf conf "<form method=\"get\" action=\"%s\" \
 class=\"mx-3 mb-3\">\n" conf.command;
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND\">\n";
+  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
-  Output.printf conf "<span class=\"form-row align-items-center\">\n";
-  Output.printf conf "<span class=\"col-auto\">\n";
-  Output.printf conf "<span class=\"custom-control custom-radio\">\n";
-  Output.printf conf "  <input type=\"radio\" class=\"custom-control-input\" \
+  Output.print_string conf "<span class=\"form-row align-items-center\">\n";
+  Output.print_string conf "<span class=\"col-auto\">\n";
+  Output.print_string conf "<span class=\"custom-control custom-radio\">\n";
+  Output.print_string conf "  <input type=\"radio\" class=\"custom-control-input\" \
 name=\"select\" id=\"input\" value=\"input\" checked>\n";
   Output.printf conf "  <label class=\"custom-control-label\" \
 for=\"input\">%s</label>\n" (transl conf "any individual in the base");
-  Output.printf conf "</span>\n</span>\n";
-  Output.printf conf "<span class=\"col-auto\">\n";
+  Output.print_string conf "</span>\n</span>\n";
+  Output.print_string conf "<span class=\"col-auto\">\n";
   Output.printf conf "<input type=\"text\" class=\"form-control\" \
 name=\"n\" placeholder=\"%s.%s %s\" title=\"%s.%s %s\" \
 size=\"50\" id=\"inlineinput\" autofocus>\n</span>\n"
@@ -55,11 +55,11 @@ size=\"50\" id=\"inlineinput\" autofocus>\n</span>\n"
     (transl conf "number") (transl_nth conf "surname/surnames" 0)
     (transl_nth conf "first name/first names" 0)
     (transl conf "number") (transl_nth conf "surname/surnames" 0);
-  Output.printf conf "</span>\n";
+  Output.print_string conf "</span>\n";
   if list <> [] then
     List.iter
       (fun p ->
-         Output.printf conf "<div class=\"custom-control custom-radio\">\n";
+         Output.print_string conf "<div class=\"custom-control custom-radio\">\n";
          Output.printf conf
            "  <input type=\"radio\" class=\"custom-control-input\" \
 name=\"select\" id=\"%s\" value=\"%s\">\n" (string_of_iper (get_iper p))
@@ -67,13 +67,13 @@ name=\"select\" id=\"%s\" value=\"%s\">\n" (string_of_iper (get_iper p))
          Output.printf conf "  <label class=\"custom-control-label\" \
 for=\"%s\">" (string_of_iper (get_iper p));
          Update.print_person_parents_and_spouse conf base p;
-         Output.printf conf "  </label>\n</div>\n";)
+         Output.print_string conf "  </label>\n</div>\n";)
     list;
-  Output.printf conf "<button type=\"submit\" \
+  Output.print_string conf "<button type=\"submit\" \
  class=\"btn btn-primary btn-lg mt-2\">";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</button>\n";
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</button>\n";
+  Output.print_string conf "</form>\n";
   Hutil.trailer conf
 
 let print_possible_continue_merging conf base =
@@ -91,7 +91,7 @@ let print_possible_continue_merging conf base =
       print_someone conf base p1;
       Output.printf conf "\n%s\n" (transl_nth conf "and" 0);
       print_someone conf base p2;
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</p>\n"
   | _ ->
       match p_getenv conf.env "ip" with
         Some ip ->

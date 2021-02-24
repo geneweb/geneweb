@@ -1305,13 +1305,14 @@ let print_wid_hei conf fname =
 let print_copyright conf =
   Util.include_template conf [] "copyr"
     (fun () ->
-      Output.printf conf "<hr style=\"margin:0\">\n";
-      Output.printf conf "<div style=\"font-size: 80%%\">\n";
-      Output.printf conf "<em>";
-      Output.printf conf "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
-      Output.printf conf "</em>";
-      Output.printf conf "</div>\n";
-      Output.printf conf "<br>\n")
+      Output.print_string conf "<hr style=\"margin:0\">\n";
+      Output.print_string conf "<div style=\"font-size: 80%\">\n";
+      Output.print_string conf "<em>";
+      Output.print_string conf "Copyright (c) 1998-2007 INRIA - GeneWeb " ;
+      Output.print_string conf Version.txt;
+      Output.print_string conf "</em>";
+      Output.print_string conf "</div>\n";
+      Output.print_string conf "<br>\n")
 
 let print_copyright_with_logo conf =
   let conf =
@@ -1507,8 +1508,8 @@ and print_var print_ast_list conf ifun env ep loc sl =
     try
       match eval_var sl with
         VVstring s -> Output.print_string conf s
-      | VVbool true -> Output.printf conf "1"
-      | VVbool false -> Output.printf conf "0"
+      | VVbool true -> Output.print_string conf "1"
+      | VVbool false -> Output.print_string conf "0"
       | VVother f -> print_var1 f []
     with Not_found ->
       match sl with

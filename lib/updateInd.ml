@@ -837,21 +837,21 @@ let print_del1 conf base p =
     Output.print_string conf (Utf8.capitalize (transl_decline conf "delete" s))
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<h2>\n";
+  Output.print_string conf "<h2>\n";
   title false;
-  Output.printf conf "</h2>\n";
+  Output.print_string conf "</h2>\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
+  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
-  Output.printf conf
+  Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</button>\n";
-  Output.printf conf "</p>\n";
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</button>\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "</form>\n";
   Hutil.trailer conf
 
 let print_add conf base =

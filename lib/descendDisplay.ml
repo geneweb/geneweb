@@ -97,8 +97,8 @@ let display_descendants_level conf base max_level ancestor =
   if !len > 1 then
     Output.printf conf " (%d %s)" !len
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
-  Output.printf conf ".\n";
-  Output.printf conf "<p>" ;
+  Output.print_string conf ".\n";
+  Output.print_string conf "<p>" ;
   print_alphab_list conf
     (fun (p, _) ->
        if is_hidden p then "?"
@@ -107,7 +107,7 @@ let display_descendants_level conf base max_level ancestor =
        Output.printf conf "\n%s" (referenced_person_title_text conf base p);
        Output.print_string conf (DateDisplay.short_dates_text conf base p);
        if not (is_hidden p) && c > 1 then Output.printf conf " <em>(%d)</em>" c;
-       Output.printf conf "\n")
+       Output.print_string conf "\n")
     list;
   Hutil.trailer conf
 
@@ -194,31 +194,31 @@ let label_of_path paths p =
   loop @@ Gwdb.Marker.get paths (get_iper p)
 
 let print_child conf base p1 p2 e =
-  Output.printf conf "<strong>";
+  Output.print_string conf "<strong>";
   if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
      get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
   then
     Output.print_string conf (referenced_person_text_without_surname conf base e)
   else Output.printf conf "\n%s" (referenced_person_text conf base e);
-  Output.printf conf "</strong>";
+  Output.print_string conf "</strong>";
   Output.print_string conf (DateDisplay.short_dates_text conf base e)
 
 let print_repeat_child conf base p1 p2 e =
-  Output.printf conf "<em>";
+  Output.print_string conf "<em>";
   if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
      get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
   then
     Output.print_string conf (person_text_without_surname conf base e)
   else Output.print_string conf (person_text conf base e);
-  Output.printf conf "</em>"
+  Output.print_string conf "</em>"
 
 let display_spouse conf base marks paths fam p c =
-  Output.printf conf "\n&amp;";
+  Output.print_string conf "\n&amp;";
   Output.print_string conf (DateDisplay.short_marriage_date_text conf base fam p c);
-  Output.printf conf " ";
-  Output.printf conf "<strong>";
+  Output.print_string conf " ";
+  Output.print_string conf "<strong>";
   Output.printf conf "\n%s" (referenced_person_text conf base c);
-  Output.printf conf "</strong>";
+  Output.print_string conf "</strong>";
   if Gwdb.Marker.get marks (get_iper c)
   then Output.printf conf " (<tt><b>%s</b></tt>)" (label_of_path paths c)
   else Output.print_string conf (DateDisplay.short_dates_text conf base c)
@@ -235,10 +235,10 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
           let c = Gutil.spouse (get_iper p) fam in
           let el = get_children fam in
           let c = pget conf base c in
-          if need_br then Output.printf conf "<br>" ;
+          if need_br then Output.print_string conf "<br>" ;
           if not first then print_repeat_child conf base p1 c1 p;
           display_spouse conf base marks paths fam p c;
-          Output.printf conf "\n";
+          Output.print_string conf "\n";
           let print_children =
             get_sex p = Male || not (Gwdb.Marker.get marks (get_iper c))
           in
@@ -249,9 +249,9 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
                 let e = pget conf base ie in
                 if print_children then
                   begin
-                    Output.printf conf "<li type=\"A\"> ";
+                    Output.print_string conf "<li type=\"A\"> ";
                     print_child conf base p c e;
-                    Output.printf conf "\n";
+                    Output.print_string conf "\n";
                     incr total;
                     if succ lev = max_lev then
                       Array.iteri
@@ -262,12 +262,12 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
                           let c1 = pget conf base c1 in
                           if i <> 0 then
                             begin
-                              Output.printf conf "<br>" ;
+                              Output.print_string conf "<br>" ;
                               print_repeat_child conf base p c e
                             end ;
                           display_spouse conf base marks paths fam e c1;
-                          if Array.length el <> 0 then Output.printf conf ".....";
-                          Output.printf conf "\n"
+                          if Array.length el <> 0 then Output.print_string conf ".....";
+                          Output.print_string conf "\n"
                         end
                         (get_family (pget conf base ie))
                     else loop (succ lev) e
@@ -276,7 +276,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
               end
               cnt el
           in
-          if print_children then Output.printf conf "</ol>\n";
+          if print_children then Output.print_string conf "</ol>\n";
           cnt, false, not print_children
         end
         (0, true, false) (get_family p)
@@ -296,9 +296,9 @@ let print_family conf base marks paths max_lev lev p =
        let c = Gutil.spouse (get_iper p) fam in
        let el = get_children fam in
        let c = pget conf base c in
-       Output.printf conf "<strong>";
+       Output.print_string conf "<strong>";
        Output.printf conf "\n%s" (referenced_person_text conf base p);
-       Output.printf conf "</strong>";
+       Output.print_string conf "</strong>";
        display_spouse conf base marks paths fam p c;
        Output.printf conf "<ol start=\"%d\">\n" (succ cnt);
        let cnt =
@@ -309,10 +309,10 @@ let print_family conf base marks paths max_lev lev p =
               || not (Gwdb.Marker.get marks (get_iper c))
               then
                 begin
-                  Output.printf conf "<li type=\"A\">";
+                  Output.print_string conf "<li type=\"A\">";
                   print_child conf base p c e;
                   incr total;
-                  Output.printf conf "\n";
+                  Output.print_string conf "\n";
                   if labelled conf base marks max_lev lev ie then
                     Output.printf conf " => <tt><b>%s</b></tt>\n"
                       (label_of_path paths e)
@@ -325,8 +325,8 @@ let print_family conf base marks paths max_lev lev p =
                          let c = pget conf base c in
                          display_spouse conf base marks paths fam e c;
                          if Array.length el <> 0 then
-                           Output.printf conf ".....";
-                         Output.printf conf "\n")
+                           Output.print_string conf ".....";
+                         Output.print_string conf "\n")
                       (get_family (pget conf base ie))
                   else
                     print_family_locally conf base marks paths max_lev
@@ -335,7 +335,7 @@ let print_family conf base marks paths max_lev lev p =
               succ cnt)
            cnt el
        in
-       Output.printf conf "</ol>\n"; cnt)
+       Output.print_string conf "</ol>\n"; cnt)
     0 (get_family p)
 
 let print_families conf base marks paths max_lev =
@@ -383,23 +383,23 @@ let display_descendants_with_numbers conf base max_level ancestor =
   let p = ancestor in
   if authorized_age conf base p then
     begin match Adef.od_of_cdate (get_birth p), get_death p with
-      Some _, _ | _, Death (_, _) -> Output.printf conf "<br>"
+      Some _, _ | _, Death (_, _) -> Output.print_string conf "<br>"
     | _ -> ()
     end;
   Output.printf conf "%s." (Utf8.capitalize (text_to conf max_level));
-  Output.printf conf "<p>" ;
+  Output.print_string conf "<p>" ;
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   print_families conf base marks paths max_level ancestor;
   if !total > 1 then
     begin
-      Output.printf conf "<p>" ;
+      Output.print_string conf "<p>" ;
       Output.printf conf "%s%s %d %s" (Utf8.capitalize (transl conf "total"))
         (Util.transl conf ":") !total
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
       if max_level > 1 then
         Output.printf conf " (%s)" (transl conf "spouses not included");
-      Output.printf conf ".\n"
+      Output.print_string conf ".\n"
     end;
   Hutil.trailer conf
 
@@ -417,7 +417,7 @@ let print_ref conf base paths p =
       (get_family p)
 
 let print_elem conf base paths precision (n, pll) =
-  Output.printf conf "<li>" ;
+  Output.print_string conf "<li>" ;
   match List.rev pll with
     [[p]] ->
       Output.printf conf "<strong>%s %s %s</strong>" (surname_without_particle base n)
@@ -425,11 +425,11 @@ let print_elem conf base paths precision (n, pll) =
         (surname_particle base n);
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       print_ref conf base paths p;
-      Output.printf conf "\n"
+      Output.print_string conf "\n"
   | pll ->
       Output.printf conf "<strong>%s%s</strong>\n" (surname_without_particle base n)
         (surname_particle base n);
-      Output.printf conf "<ul>\n";
+      Output.print_string conf "<ul>\n";
       List.iter
         (fun pl ->
            let several =
@@ -439,23 +439,23 @@ let print_elem conf base paths precision (n, pll) =
            in
            List.iter
              (fun p ->
-                Output.printf conf "<li>" ;
-                Output.printf conf "<strong>";
+                Output.print_string conf "<li>" ;
+                Output.print_string conf "<strong>";
                 wprint_geneweb_link conf (acces conf base p)
                   (p_first_name base p);
-                Output.printf conf "</strong>";
+                Output.print_string conf "</strong>";
                 if several && precision then
                   begin
-                    Output.printf conf "<em>";
+                    Output.print_string conf "<em>";
                     specify_homonymous conf base p true;
-                    Output.printf conf "</em>"
+                    Output.print_string conf "</em>"
                   end;
                 Output.print_string conf (DateDisplay.short_dates_text conf base p);
                 print_ref conf base paths p;
-                Output.printf conf "\n")
+                Output.print_string conf "\n")
              pl)
         pll;
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</ul>\n"
 
 let sort_and_display conf base paths precision list =
   let list = List.map (pget conf base) list in
@@ -494,9 +494,9 @@ let sort_and_display conf base paths precision list =
   in
   if list <> [] then
     begin
-      Output.printf conf "<ul>\n";
+      Output.print_string conf "<ul>\n";
       List.iter (print_elem conf base paths precision) list;
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</ul>\n"
     end
 
 let display_descendant_index conf base max_level ancestor =
@@ -581,85 +581,85 @@ let display_spouse_index conf base max_level ancestor =
 (* *********************************************************************** *)
 let print_desc_table_header conf =
   let nb_col = ref 2 in
-  Output.printf conf "<tr class=\"descends_table_header\">\n";
-  Output.printf conf "<th>\n";
+  Output.print_string conf "<tr class=\"descends_table_header\">\n";
+  Output.print_string conf "<th>\n";
   Output.print_string conf (Utf8.capitalize (transl conf "n° d'Aboville"));
-  Output.printf conf "</th>\n";
-  Output.printf conf "<th>\n";
+  Output.print_string conf "</th>\n";
+  Output.print_string conf "<th>\n";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "person/persons" 0));
-  Output.printf conf "</th>\n";
+  Output.print_string conf "</th>\n";
   if p_getenv conf.env "birth" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf (Utf8.capitalize (transl conf "date of birth"));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "birth_place" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf (Utf8.capitalize (transl conf "where born"));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "marr" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf (Utf8.capitalize (transl_nth conf "spouse/spouses" 1));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "marr_date" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       Output.print_string conf (Utf8.capitalize (transl conf "date of marriage"));
       incr nb_col;
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "marr_place" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf (Utf8.capitalize (transl conf "where married"));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "child" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf (Utf8.capitalize (transl conf "nb children"));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "death" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       Output.print_string conf (Utf8.capitalize (transl conf "date of death"));
       incr nb_col;
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "death_place" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf (Utf8.capitalize (transl conf "where dead"));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "death_age" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf (Utf8.capitalize (transl conf "age at death"));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "occu" = Some "on" then
     begin
-      Output.printf conf "<th>\n";
+      Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf
         (Utf8.capitalize (transl_nth conf "occupation/occupations" 1));
-      Output.printf conf "</th>\n"
+      Output.print_string conf "</th>\n"
     end;
-  Output.printf conf "</tr>\n";
+  Output.print_string conf "</tr>\n";
   !nb_col
 
 
@@ -719,25 +719,25 @@ let print_person_table conf base p lab =
   in
   (* On met partout un &nbsp; dans le cas où ce que l'on souhaite *)
   (* afficher est vide, comme ça, on ne casse pas le rowspan.     *)
-  Output.printf conf "<tr>\n";
+  Output.print_string conf "<tr>\n";
   Output.printf conf "<td %s>\n" rowspan;
   Output.print_string conf lab;
-  Output.printf conf "</td>\n";
+  Output.print_string conf "</td>\n";
   Output.printf conf "<td %s>\n" rowspan;
   Util.print_image_sex conf p 11;
   Output.printf conf " %s &nbsp;" (referenced_person_title_text conf base p);
-  Output.printf conf "</td>\n";
+  Output.print_string conf "</td>\n";
   if p_getenv conf.env "birth" = Some "on" then
     begin
       Output.printf conf "<td %s>\n" rowspan;
       Output.print_string conf birth;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   if p_getenv conf.env "birth_place" = Some "on" then
     begin
       Output.printf conf "<td %s>\n" rowspan;
       Output.printf conf "%s &nbsp;" birth_place;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   (* On affiche que la première famille (get_family u).(0). *)
   (* Les autres familles seront affichées après qu'on ait   *)
@@ -753,9 +753,9 @@ let print_person_table conf base p lab =
           Util.print_image_sex conf spouse 11;
           Output.printf conf " %s &nbsp;"
             (referenced_person_text conf base spouse)
-        else Output.printf conf "&nbsp;"
+        else Output.print_string conf "&nbsp;"
       end;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   (* On affiche que la première famille (get_family u).(0). *)
   (* Les autres familles seront affichées après qu'on ait   *)
@@ -778,9 +778,9 @@ let print_person_table conf base p lab =
             else "&nbsp;"
           in
           Output.print_string conf mdate
-        else Output.printf conf "&nbsp;"
+        else Output.print_string conf "&nbsp;"
       end;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   (* On affiche que la première famille (get_family u).(0). *)
   (* Les autres familles seront affichées après qu'on ait   *)
@@ -800,9 +800,9 @@ let print_person_table conf base p lab =
             else ""
           in
           Output.printf conf "%s &nbsp;" mplace
-        else Output.printf conf "&nbsp;"
+        else Output.print_string conf "&nbsp;"
       end;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   (* On affiche que la première famille (get_family u).(0). *)
   (* Les autres familles seront affichées après qu'on ait   *)
@@ -819,9 +819,9 @@ let print_person_table conf base p lab =
           if nb_families > 0 then
             let fam = foi base (get_family u).(0) in
             Output.printf conf "%d &nbsp;" (Array.length (get_children fam))
-          else Output.printf conf "&nbsp;"
+          else Output.print_string conf "&nbsp;"
         end;
-        Output.printf conf "</td>\n"
+        Output.print_string conf "</td>\n"
       end
     else
       begin
@@ -830,21 +830,21 @@ let print_person_table conf base p lab =
             (fun n ifam -> n + Array.length (get_children (foi base ifam))) 0
             (get_family p)
         in
-        Output.printf conf "<td>\n";
+        Output.print_string conf "<td>\n";
         Output.printf conf "%d &nbsp;" n;
-        Output.printf conf "</td>\n"
+        Output.print_string conf "</td>\n"
       end;
   if p_getenv conf.env "death" = Some "on" then
     begin
       Output.printf conf "<td %s>\n" rowspan;
       Output.print_string conf death;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   if p_getenv conf.env "death_place" = Some "on" then
     begin
       Output.printf conf "<td %s>\n" rowspan;
       Output.printf conf "%s &nbsp;" death_place;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   if p_getenv conf.env "death_age" = Some "on" then
     begin
@@ -866,18 +866,18 @@ let print_person_table conf base p lab =
       in
         Output.printf conf "%s &nbsp;" d
       end;
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   if p_getenv conf.env "occu" = Some "on" then
     begin
       Output.printf conf "<td %s>\n" rowspan;
       Output.printf conf "%s &nbsp;"
         (if p_auth then sou base (get_occupation p) else "");
-      Output.printf conf "</td>\n"
+      Output.print_string conf "</td>\n"
     end;
   (* On met partout un &nbsp; dans le cas où ce que l'on souhaite *)
   (* afficher est vide, comme ça, on ne casse pas le rowspan.     *)
-  Output.printf conf "</tr>\n";
+  Output.print_string conf "</tr>\n";
   (* Maintenant qu'on a fini d'afficher le <tr> complet, si il y a  *)
   (* plusieurs familles, il faut alors afficher chacune d'elle dans *)
   (* un <tr> afin d'avoir une mise en page utilisant des rowspan.   *)
@@ -891,7 +891,7 @@ let print_person_table conf base p lab =
         let cpl = foi base (get_family u).(i) in
         let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
         let fam = foi base (get_family u).(i) in
-        Output.printf conf "<tr>\n";
+        Output.print_string conf "<tr>\n";
         if p_getenv conf.env "marr" = Some "on" then
           begin
             Output.printf conf "<td style=\"border-top:none; %s\">\n"
@@ -899,7 +899,7 @@ let print_person_table conf base p lab =
             Util.print_image_sex conf spouse 11;
             Output.printf conf " %s &nbsp;"
               (referenced_person_text conf base spouse);
-            Output.printf conf "</td>\n"
+            Output.print_string conf "</td>\n"
           end;
         if p_getenv conf.env "marr_date" = Some "on" then
           begin
@@ -916,7 +916,7 @@ let print_person_table conf base p lab =
             in
               Output.print_string conf mdate
             end;
-            Output.printf conf "</td>\n"
+            Output.print_string conf "</td>\n"
           end;
         if p_getenv conf.env "marr_place" = Some "on" then
           begin
@@ -930,7 +930,7 @@ let print_person_table conf base p lab =
             in
               Output.printf conf "%s &nbsp;" mplace
             end;
-            Output.printf conf "</td>\n"
+            Output.print_string conf "</td>\n"
           end;
         if p_getenv conf.env "child" = Some "on" then
           begin
@@ -938,9 +938,9 @@ let print_person_table conf base p lab =
               "<td align=\"center\" style=\"border-top:none; %s\">\n"
               (if nb_families - 1 <> i then "border-bottom:none;" else "");
             Output.printf conf "%d &nbsp;" (Array.length (get_children fam));
-            Output.printf conf "</td>\n"
+            Output.print_string conf "</td>\n"
           end;
-        Output.printf conf "</tr>\n"
+        Output.print_string conf "</tr>\n"
       done
 
 
@@ -1014,36 +1014,36 @@ let display_descendant_with_table conf base max_lev p =
     | (p, lab) :: q ->
         if first && lev > 0 && p_getenv conf.env "gen" = Some "on" then
           begin
-            Output.printf conf "<tr>\n";
+            Output.print_string conf "<tr>\n";
             begin
               Output.printf conf "<th align=\"left\" colspan=\"%d\">\n" nb_col;
               Output.printf conf "%s %d"
                 (Utf8.capitalize (transl_nth conf "generation/generations" 0)) lev;
-              Output.printf conf "</th>\n"
+              Output.print_string conf "</th>\n"
             end;
-            Output.printf conf "</tr>\n"
+            Output.print_string conf "</tr>\n"
           end;
         print_person_table conf base p lab;
         incr nb_pers;
         loop lev nb_col false refl q
   in
   Hutil.header_fluid conf (descendants_title conf base p);
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Output.printf conf "%s." (Utf8.capitalize (text_to conf max_lev));
-  Output.printf conf "</p>\n";
-  Output.printf conf "<table class=descends_table>\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "<table class=descends_table>\n";
   (* On affiche l'entête et on en profite pour récupèrer *)
   (* le nombre de colonnes à afficher pour les colspans. *)
   begin let nb_col = print_desc_table_header conf in
     loop 0 nb_col true [p, ""] [p, ""]
   end;
-  Output.printf conf "</table>\n";
-  Output.printf conf "<p>\n";
+  Output.print_string conf "</table>\n";
+  Output.print_string conf "<p>\n";
   Output.printf conf "%s%s %d %s" (Utf8.capitalize (transl conf "total"))
     (Util.transl conf ":")
     !nb_pers
     (transl_nth conf "person/persons" 1);
-  Output.printf conf "</p>\n";
+  Output.print_string conf "</p>\n";
   Hutil.trailer conf
 
 let make_tree_hts conf base gv p =
@@ -1329,7 +1329,7 @@ let print_aboville conf base max_level p =
           (referenced_person_title_text conf base spouse)
           (DateDisplay.short_dates_text conf base spouse)
       done;
-    Output.printf conf "<br>\n";
+    Output.print_string conf "<br>\n";
     if lev < max_level then
       let rec loop_fam cnt_chil i =
         if i = Array.length (get_family u) then ()

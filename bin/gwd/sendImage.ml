@@ -20,16 +20,16 @@ let incorrect_content_type conf base p s =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "<p>\n";
-  Output.printf conf "<em style=\"font-size:smaller\">";
+  Output.print_string conf "<p>\n";
+  Output.print_string conf "<em style=\"font-size:smaller\">";
   Output.printf conf "Error: incorrect image content type: %s" s;
-  Output.printf conf "</em>\n";
-  Output.printf conf "</p>\n";
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "</em>\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   Output.print_string conf (referenced_person_title_text conf base p);
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf;
   raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
@@ -37,16 +37,16 @@ let error_too_big_image conf base p len max_len =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "<p><em style=\"font-size:smaller\">";
+  Output.print_string conf "<p><em style=\"font-size:smaller\">";
   Output.printf conf "Error: this image is too big: %d bytes<br>\n" len;
   Output.printf conf "Maximum authorized in this database: %d bytes<br>\n"
     max_len;
-  Output.printf conf "</em></p>\n";
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "</em></p>\n";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>\n";
   Output.print_string conf (referenced_person_title_text conf base p);
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf;
   raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
@@ -57,15 +57,15 @@ let raw_get conf key =
 let print_link_delete_image conf base p =
   if Util.has_image conf base p then
     begin
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       begin
         Output.printf conf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
           (string_of_iper (get_iper p));
         Output.printf conf "%s %s" (Utf8.capitalize (transl conf "delete"))
           (transl_nth conf "image/images" 0);
-        Output.printf conf "</a>"
+        Output.print_string conf "</a>"
       end;
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</p>\n"
     end
 
 (* Send image form *)
@@ -84,42 +84,42 @@ let print_send_image conf base p =
     else
       let fn = p_first_name base p in
       let sn = p_surname base p in
-      Output.printf conf ": ";
+      Output.print_string conf ": ";
       Output.printf conf "%s %s" fn sn;
       Util.print_reference conf fn (get_occ p) sn
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<h2>\n";
+  Output.print_string conf "<h2>\n";
   title false;
-  Output.printf conf "</h2>\n";
+  Output.print_string conf "</h2>\n";
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Util.hidden_env conf;
-  Output.printf conf
+  Output.print_string conf
     "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
   Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
     digest;
   Output.printf conf "%s%s\n" (Utf8.capitalize (transl conf "file")) (Util.transl conf ":");
-  Output.printf conf "<input \
+  Output.print_string conf "<input \
 type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\">\n";
-  Output.printf conf "</p>\n";
+  Output.print_string conf "</p>\n";
   begin match p_getint conf.base_env "max_images_size" with
     Some len ->
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "(maximum authorized size = %d bytes)\n" len;
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</p>\n"
   | None -> ()
   end;
-  Output.printf conf
+  Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg mt-2\">\n";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</button>\n";
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</button>\n";
+  Output.print_string conf "</form>\n";
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
@@ -149,7 +149,7 @@ let print_delete_image conf base p =
         (* if fn = "?" || sn = "?" then Adef.int_of_iper (get_iper p)
          * else  *)get_occ p
       in
-      Output.printf conf ": "; Output.printf conf "%s.%d %s" fn occ sn
+      Output.print_string conf ": "; Output.printf conf "%s.%d %s" fn occ sn
   in
   Hutil.header conf title;
   Output.printf conf "<form method=\"post\" action=\"%s\">" conf.command;
@@ -182,11 +182,11 @@ let print_sent conf base p =
     Output.print_string conf (Utf8.capitalize (transl conf "image received"))
   in
   Hutil.header conf title;
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>";
   Output.print_string conf (referenced_person_text conf base p);
-  Output.printf conf "</li>";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>";
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf
 
 let write_file fname content =
