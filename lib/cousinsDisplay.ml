@@ -93,7 +93,7 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
 let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
   if lev > 0 && !cnt < max_cnt then
     begin
-      Output.printf conf "<ul>\n";
+      Output.print_string conf "<ul>\n";
       List.iter
         (fun (ip, ia_asex, rev_br) ->
            let p = pget conf base ip in
@@ -118,7 +118,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
              begin
                if lev <= 2 then
                  begin
-                   Output.printf conf "<li>";
+                   Output.print_string conf "<li>";
                    if lev = 1 then
                      begin
                        give_access conf base ia_asex ini_p ini_br p br;
@@ -152,10 +152,10 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                     print_descend_upto conf base max_cnt ini_p ini_br (lev - 1) children;
                  )
                  (get_family p) ;
-               if lev <= 2 then Output.printf conf "</li>\n"
+               if lev <= 2 then Output.print_string conf "</li>\n"
              end)
         children;
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</ul>\n"
     end
 
 
@@ -165,7 +165,7 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
     begin
       if lev1 > 1 then
         begin
-          Output.printf conf "<li>\n";
+          Output.print_string conf "<li>\n";
           Output.printf conf "%s%s\n"
             (Utf8.capitalize
                (cftransl conf "on %s's side"
@@ -175,7 +175,7 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
         end;
       let sib = List.map (fun (ip, ia_asex) -> ip, ia_asex, []) sib in
       print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
-      if lev1 > 1 then Output.printf conf "</li>\n";
+      if lev1 > 1 then Output.print_string conf "</li>\n";
       true
     end
   else false
@@ -188,9 +188,9 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     loop Sosa.one lev1
   in
   let last_sosa = Sosa.twice first_sosa in
-  Output.printf conf "<div>\n";
+  Output.print_string conf "<div>\n";
   Util.print_tips_relationship conf;
-  Output.printf conf "</div>\n";
+  Output.print_string conf "</div>\n";
   if lev1 > 1 then Output.printf conf "<ul>\n";
   let some =
     let rec loop sosa some =
@@ -210,7 +210,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
   in
   if some then ()
   else Output.printf conf "%s.\n" (Utf8.capitalize (transl conf "no match"));
-  if lev1 > 1 then Output.printf conf "</ul>\n"
+  if lev1 > 1 then Output.print_string conf "</ul>\n"
 
 let include_templ conf name =
   Util.include_template conf [] name
@@ -250,19 +250,19 @@ let print_cousins conf base p lev1 lev2 =
       Not_found | Failure _ -> default_max_cnt
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<div>\n";
+  Output.print_string conf "<div>\n";
   (*include_templ conf "cousins_tools";*)
-  Output.printf conf "<h3>\n";
+  Output.print_string conf "<h3>\n";
   title false;
-  Output.printf conf "</h3>\n";
-  Output.printf conf "</div>\n";
+  Output.print_string conf "</h3>\n";
+  Output.print_string conf "</div>\n";
   cnt := 0;
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in
   print_cousins_lev conf base max_cnt p lev1 lev2;
-  Output.printf conf "<div>\n";
-  Output.printf conf "<p>\n";
-  if !cnt >= max_cnt then Output.printf conf "etc...\n"
+  Output.print_string conf "<div>\n";
+  Output.print_string conf "<p>\n";
+  if !cnt >= max_cnt then Output.print_string conf "etc...\n"
   else if !cnt > 1 then
     Output.printf conf "%s%s %d %s" (Utf8.capitalize (transl conf "total"))
       (Util.transl conf ":") !cnt
@@ -271,10 +271,9 @@ let print_cousins conf base p lev1 lev2 =
     Output.printf conf " %s %d %s.\n" (transl conf "and") !cnt_sp
       (Util.translate_eval ("@(c)" ^ transl_nth conf "spouse/spouses" 1))
   else Output.printf conf ".\n" ;
-  Output.printf conf "</p>\n";
-  Output.printf conf "</div>\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "</div>\n";
   Hutil.trailer conf
-
 
 let print_anniv conf base p dead_people level =
   let module S = Map.Make (struct type t = iper let compare = compare end) in
@@ -374,7 +373,7 @@ let print_anniv conf base p dead_people level =
       | [] -> raise Not_found
   in
   let mode () =
-    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"C\">\n";
+    Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"C\">\n";
     Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
       (string_of_iper (get_iper p));
     Output.printf conf "<input type=\"hidden\" name=\"t\" value=\"%s\">\n"

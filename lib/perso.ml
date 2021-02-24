@@ -152,7 +152,7 @@ let print_base_loop conf base p =
   Output.printf conf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
     (Util.update_family_loop conf base p (Gutil.designation base p));
-  Output.printf conf ".\n";
+  Output.print_string conf ".\n";
   Hutil.trailer conf;
   exit 2
 
@@ -496,7 +496,7 @@ let print_sosa conf base p link =
         in
         Output.printf conf "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
           (image_prefix conf) title;
-        if not link then () else Output.printf conf "</a> "
+        if not link then () else Output.print_string conf "</a> "
     | None -> ()
 
 (* ************************************************************************ *)

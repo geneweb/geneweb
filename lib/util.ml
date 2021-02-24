@@ -226,7 +226,7 @@ let begin_centered conf =
   Output.printf conf
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
     conf.border
-let end_centered conf = Output.printf conf "</td></tr></table>\n"
+let end_centered conf = Output.print_string conf "</td></tr></table>\n"
 
 let week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
@@ -256,10 +256,10 @@ let unauthorized conf auth_type =
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
   Output.header conf "Content-type: text/html; charset=%s" conf.charset;
-  Output.printf conf "<head><title>Access failed</title></head>\n";
-  Output.printf conf "<body><h1>Access failed</h1>\n";
+  Output.print_string conf "<head><title>Access failed</title></head>\n";
+  Output.print_string conf "<body><h1>Access failed</h1>\n";
   Output.printf conf "<ul><li>%s</ul>\n" auth_type;
-  Output.printf conf "</body>\n"
+  Output.print_string conf "</body>\n"
 
 let commd conf =
   let c = conf.command ^ "?" in
@@ -1643,7 +1643,7 @@ let print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
   if len > menu_threshold then
     begin
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       begin let _ =
         List.fold_left
           (fun last e ->
@@ -1660,9 +1660,9 @@ let print_alphab_list conf crit print_elem liste =
       in
         ()
       end;
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</p>\n"
     end;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   begin let _ =
     List.fold_left
       (fun last e ->
@@ -1676,26 +1676,26 @@ let print_alphab_list conf crit print_elem liste =
            begin
              begin match last with
                Some _ ->
-                 if not same_than_last then Output.printf conf "</ul>\n</li>\n"
+                 if not same_than_last then Output.print_string conf "</ul>\n</li>\n"
              | _ -> ()
              end;
              if not same_than_last then
                begin
-                 Output.printf conf "<li>\n";
+                 Output.print_string conf "<li>\n";
                  Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
-                 Output.printf conf "<ul>\n"
+                 Output.print_string conf "<ul>\n"
                end
            end;
-         Output.printf conf "<li>\n  ";
+         Output.print_string conf "<li>\n  ";
          print_elem e;
-         Output.printf conf "</li>\n";
+         Output.print_string conf "</li>\n";
          Some t)
       None liste
   in
     ()
   end;
-  if len > menu_threshold then Output.printf conf "</ul>\n</li>\n";
-  Output.printf conf "</ul>\n"
+  if len > menu_threshold then Output.print_string conf "</ul>\n</li>\n";
+  Output.print_string conf "</ul>\n"
 
 
 let relation_txt conf sex fam =
@@ -2504,24 +2504,24 @@ let pre_text_size txt =
   normal 0 0
 
 let print_pre_center conf sz txt =
-  for i = 1 to (sz - pre_text_size txt) / 2 do Output.printf conf " " done;
+  for i = 1 to (sz - pre_text_size txt) / 2 do Output.print_string conf " " done;
   Output.printf conf "%s\n" txt
 
 let print_pre_left conf sz txt =
   let tsz = pre_text_size txt in
   if tsz < sz / 2 - 1 then
-    for i = 2 to (sz / 2 - 1 - tsz) / 2 do Output.printf conf " " done;
+    for i = 2 to (sz / 2 - 1 - tsz) / 2 do Output.print_string conf " " done;
   Output.printf conf " %s\n" txt
 
 let print_pre_right conf sz txt =
   let tsz = pre_text_size txt in
   if tsz < sz / 2 - 1 then
     begin
-      for i = 1 to sz / 2 do Output.printf conf " " done;
-      for i = 1 to (sz / 2 - 1 - tsz) / 2 do Output.printf conf " " done;
+      for i = 1 to sz / 2 do Output.print_string conf " " done;
+      for i = 1 to (sz / 2 - 1 - tsz) / 2 do Output.print_string conf " " done;
       ()
     end
-  else for i = 1 to sz - pre_text_size txt - 1 do Output.printf conf " " done;
+  else for i = 1 to sz - pre_text_size txt - 1 do Output.print_string conf " " done;
   Output.printf conf " %s\n" txt
 
 let of_course_died conf p =
@@ -2769,24 +2769,24 @@ let print_in_columns conf ncols len_list list wprint_elem =
       (fun (list, _first) len ->
          let rec loop n list =
            if n = 0 then
-             begin Output.printf conf "</ul>\n</td>\n"; list, false end
+             begin Output.print_string conf "</ul>\n</td>\n"; list, false end
            else
              match list with
                (kind, ord, elem) :: list ->
                  if n = len then
                    Output.printf conf "<td width=\"%d\">\n" (100 / ncols)
-                 else if !kind <> Elem then Output.printf conf "</ul>\n";
+                 else if !kind <> Elem then Output.print_string conf "</ul>\n";
                  if !kind <> Elem then
                    begin
                      Output.printf conf "<h3 class=\"subtitle\">%s%s</h3>\n"
                        (if ord = "" then "..." else String.make 1 ord.[0])
                        (if !kind = HeadElem then ""
                         else " (" ^ transl conf "continued" ^ ")");
-                     Output.printf conf "<ul>\n"
+                     Output.print_string conf "<ul>\n"
                    end;
-                 Output.printf conf "<li>";
+                 Output.print_string conf "<li>";
                  wprint_elem elem;
-                 Output.printf conf "</li>\n";
+                 Output.print_string conf "</li>\n";
                  loop (n - 1) list
              | [] -> [], false
          in
@@ -2795,8 +2795,8 @@ let print_in_columns conf ncols len_list list wprint_elem =
   in
     ()
   end;
-  Output.printf conf "</tr>\n";
-  Output.printf conf "</table>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "</table>\n";
   end_centered conf
 
 let wprint_in_columns conf order wprint_elem list =
@@ -2849,10 +2849,10 @@ let reduce_list size list =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 let print_reference conf fn occ sn =
-  Output.printf conf "<span class=\"reference\">";
+  Output.print_string conf "<span class=\"reference\">";
   Output.printf conf " (%s %s.%d %s)" (transl conf "reference key")
     (Name.lower fn) occ (Name.lower sn);
-  Output.printf conf "</span>"
+  Output.print_string conf "</span>"
 
 
 (* ********************************************************************** *)
@@ -2865,16 +2865,16 @@ let print_reference conf fn occ sn =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
 let gen_print_tips conf s =
-  Output.printf conf "<div class=\"tips\">\n";
-  Output.printf conf "<table>\n";
-  Output.printf conf "<tr>\n";
-  Output.printf conf "<td>\n";
+  Output.print_string conf "<div class=\"tips\">\n";
+  Output.print_string conf "<table>\n";
+  Output.print_string conf "<tr>\n";
+  Output.print_string conf "<td>\n";
   Output.print_string conf s;
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
-  Output.printf conf "</table>\n";
-  Output.printf conf "</div>\n";
-  Output.printf conf "<br>\n"
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "</table>\n";
+  Output.print_string conf "</div>\n";
+  Output.print_string conf "<br>\n"
 
 (* ********************************************************************** *)
 (*  [Fonc] print_tips_relationship : conf -> unit                         *)

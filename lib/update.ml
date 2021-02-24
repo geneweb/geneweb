@@ -142,31 +142,31 @@ let print_person_parents_and_spouse conf base p =
   Output.printf conf "<a href=\"%s%s\">" (commd conf) (acces conf base p);
   Output.printf conf "%s.%d %s" (p_first_name base p) (get_occ p)
     (p_surname base p);
-  Output.printf conf "</a>";
+  Output.print_string conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
   if (String.length cop) > 0 then Output.printf conf ", %s" cop;
   let hbw = Util.husband_wife conf base p true in
   if (String.length hbw) > 0 then Output.printf conf ", %s" hbw;
-  Output.printf conf ".\n"
+  Output.print_string conf ".\n"
 
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
     [_] -> ()
   | pl ->
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "%s%s\n"
         (Utf8.capitalize (transl conf "persons having the same name"))
         (transl conf ":");
-      Output.printf conf "<ul>\n";
+      Output.print_string conf "<ul>\n";
       List.iter
         (fun p ->
-           Output.printf conf "<li>";
+           Output.print_string conf "<li>";
            print_person_parents_and_spouse conf base p;
-           Output.printf conf "</li>")
+           Output.print_string conf "</li>")
         pl;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</p>\n"
 
 
 (* ************************************************************************* *)
@@ -203,7 +203,7 @@ let print_aux conf param value submit =
   end (conf.henv @ conf.env) ;
   Output.printf conf {|<input type="hidden" name="%s" value="%s">|} param value ;
   Output.printf conf {|<input type="submit" value="%s">|} submit ;
-  Output.printf conf {|</form></p>|}
+  Output.print_string conf {|</form></p>|}
 
 let print_return conf =
   print_aux conf "return" "ok" (Utf8.capitalize (transl conf "back"))
@@ -291,7 +291,7 @@ let print_list_aux conf base title list printer =
   if list <> [] then begin
     Output.printf conf "%s\n<ul>" (Utf8.capitalize (transl conf title)) ;
     printer conf base list ;
-    Output.printf conf "</ul>";
+    Output.print_string conf "</ul>";
   end
 
 let print_warning conf base =
@@ -315,7 +315,7 @@ let print_warning conf base =
       let moth = poi base (get_mother cpl) in
       Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of children"));
-      Output.printf conf "-&gt;\n";
+      Output.print_string conf "-&gt;\n";
       Output.print_string conf
         (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
          " " ^ someone_ref_text conf base moth ^ "\n");
@@ -329,25 +329,25 @@ let print_warning conf base =
                print_first_name conf base p
              else print_someone conf base p;
              Output.print_string conf (DateDisplay.short_dates_text conf base p);
-             Output.printf conf "\n";
-             Output.printf conf "</li>\n")
+             Output.print_string conf "\n";
+             Output.print_string conf "</li>\n")
           arr
       in
       let (bef_d, aft_d) = Difference.f before after in
-      Output.printf conf "<table style=\"margin:1em\">\n";
-      Output.printf conf "<tr>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "<table style=\"margin:1em\">\n";
+      Output.print_string conf "<tr>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "</tr>\n";
-      Output.printf conf "</table>\n"
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "</tr>\n";
+      Output.print_string conf "</table>\n"
   | ChildrenNotInOrder (ifam, _, elder, x) ->
       let cpl = foi base ifam in
       Output.printf conf
@@ -356,21 +356,21 @@ let print_warning conf base =
               "the following children of %t and %t are not in order"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Output.printf conf ":\n";
-      Output.printf conf "<ul>\n";
-      Output.printf conf "<li>";
+      Output.print_string conf ":\n";
+      Output.print_string conf "<ul>\n";
+      Output.print_string conf "<li>";
       print_first_name_strong conf base elder;
       Output.print_string conf (DateDisplay.short_dates_text conf base elder);
-      Output.printf conf "</li>";
-      Output.printf conf "<li>";
+      Output.print_string conf "</li>";
+      Output.print_string conf "<li>";
       print_first_name_strong conf base x;
       Output.print_string conf (DateDisplay.short_dates_text conf base x);
-      Output.printf conf "</li>";
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</li>";
+      Output.print_string conf "</ul>\n"
   | ChangedOrderOfMarriages (p, before, after) ->
       Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of marriages"));
-      Output.printf conf "-&gt;\n";
+      Output.print_string conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i ifam ->
@@ -380,33 +380,33 @@ let print_warning conf base =
              Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
              print_first_name conf base p;
-             Output.printf conf "  &amp;";
+             Output.print_string conf "  &amp;";
              Output.printf conf "%s\n"
                (DateDisplay.short_marriage_date_text conf base fam p sp);
              print_someone conf base sp;
-             Output.printf conf "\n";
-             Output.printf conf "</li>\n")
+             Output.print_string conf "\n";
+             Output.print_string conf "</li>\n")
           arr
       in
       let (bef_d, aft_d) = Difference.f before after in
-      Output.printf conf "<table style=\"margin:1em\">\n";
-      Output.printf conf "<tr>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "<table style=\"margin:1em\">\n";
+      Output.print_string conf "<tr>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "</tr>\n";
-      Output.printf conf "</table>\n"
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "</tr>\n";
+      Output.print_string conf "</table>\n"
   | ChangedOrderOfFamilyEvents (_, before, after) ->
       Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of family's events"));
-      Output.printf conf "-&gt;\n";
+      Output.print_string conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
@@ -414,30 +414,30 @@ let print_warning conf base =
              Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
              Output.printf conf "%s\n" name;
-             Output.printf conf "</li>\n")
+             Output.print_string conf "</li>\n")
           arr
       in
       let before = Array.of_list before in
       let after = Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
-      Output.printf conf "<table style=\"margin:1em\">\n";
-      Output.printf conf "<tr>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "<table style=\"margin:1em\">\n";
+      Output.print_string conf "<tr>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "</tr>\n";
-      Output.printf conf "</table>\n"
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "</tr>\n";
+      Output.print_string conf "</table>\n"
   | ChangedOrderOfPersonEvents (_, before, after) ->
       Output.printf conf "%s\n"
         (Utf8.capitalize (transl conf "changed order of person's events"));
-      Output.printf conf "-&gt;\n";
+      Output.print_string conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
@@ -445,26 +445,26 @@ let print_warning conf base =
              Output.printf conf "<li %s>\n"
                (if diff_arr.(i) then "style=\"background:pink\"" else "");
              Output.printf conf "%s\n" name;
-             Output.printf conf "</li>\n")
+             Output.print_string conf "</li>\n")
           arr
       in
       let before = Array.of_list before in
       let after = Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
-      Output.printf conf "<table style=\"margin:1em\">\n";
-      Output.printf conf "<tr>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "<table style=\"margin:1em\">\n";
+      Output.print_string conf "<tr>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list before bef_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "<td>\n";
-      Output.printf conf "<ul style=\"list-style-type:none\">\n";
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "<td>\n";
+      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
       print_list after aft_d;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</td>\n";
-      Output.printf conf "</tr>\n";
-      Output.printf conf "</table>\n"
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</td>\n";
+      Output.print_string conf "</tr>\n";
+      Output.print_string conf "</table>\n"
   | CloseChildren (ifam, c1, c2) ->
       let cpl = foi base ifam in
       Output.printf conf
@@ -473,17 +473,17 @@ let print_warning conf base =
               "the following children of %t and %t are born very close"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Output.printf conf ":\n";
-      Output.printf conf "<ul>\n";
-      Output.printf conf "<li>";
+      Output.print_string conf ":\n";
+      Output.print_string conf "<ul>\n";
+      Output.print_string conf "<li>";
       print_first_name_strong conf base c1;
       Output.print_string conf (DateDisplay.short_dates_text conf base c1);
-      Output.printf conf "</li>";
-      Output.printf conf "<li>";
+      Output.print_string conf "</li>";
+      Output.print_string conf "<li>";
       print_first_name_strong conf base c2;
       Output.print_string conf (DateDisplay.short_dates_text conf base c2);
-      Output.printf conf "</li>";
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</li>";
+      Output.print_string conf "</ul>\n"
   | DistantChildren (ifam, p1, p2) ->
       let cpl = foi base ifam in
       Output.printf conf
@@ -492,17 +492,17 @@ let print_warning conf base =
               "the following children of %t and %t are born very distant"))
         (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
         (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Output.printf conf ":\n";
-      Output.printf conf "<ul>\n";
-      Output.printf conf "<li>";
+      Output.print_string conf ":\n";
+      Output.print_string conf "<ul>\n";
+      Output.print_string conf "<li>";
       print_first_name_strong conf base p1;
       Output.print_string conf (DateDisplay.short_dates_text conf base p1);
-      Output.printf conf "</li>";
-      Output.printf conf "<li>";
+      Output.print_string conf "</li>";
+      Output.print_string conf "<li>";
       print_first_name_strong conf base p2;
       Output.print_string conf (DateDisplay.short_dates_text conf base p2);
-      Output.printf conf "</li>";
-      Output.printf conf "</ul>\n"
+      Output.print_string conf "</li>";
+      Output.print_string conf "</ul>\n"
   | DeadOld (p, a) ->
       Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
         (transl_nth conf "died at an advanced age"
@@ -648,9 +648,9 @@ let print_warnings conf base wl =
   let wl = List.sort_uniq compare wl in
   List.iter
     (fun w ->
-       Output.printf conf "<li>" ;
+       Output.print_string conf "<li>" ;
        print_warning conf base w ;
-       Output.printf conf "</li>" )
+       Output.print_string conf "</li>" )
     wl
 
 (* ************************************************************************* *)
@@ -667,9 +667,9 @@ let print_warnings conf base wl =
 let print_misc conf _base =
   function
     MissingSources ->
-      Output.printf conf "<em>";
+      Output.print_string conf "<em>";
       Output.printf conf "%s\n" (Utf8.capitalize (transl conf "missing sources"));
-      Output.printf conf "</em>"
+      Output.print_string conf "</em>"
 
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs : config -> base -> Def.misc list -> unit             *)
@@ -685,7 +685,7 @@ let print_misc conf _base =
 let print_miscs conf base ml =
   print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
   List.iter
-    (fun m -> Output.printf conf "<li>" ; print_misc conf base m ; Output.printf conf "</li>")
+    (fun m -> Output.print_string conf "<li>" ; print_misc conf base m ; Output.print_string conf "</li>")
 
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs :
@@ -704,20 +704,20 @@ let print_miscs conf base ml =
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then begin
     Output.printf conf "%s\n" (Utf8.capitalize (transl conf "warnings"));
-    Output.printf conf "<ul>\n";
+    Output.print_string conf "<ul>\n";
     List.iter
       (fun w ->
-         Output.printf conf "<li>" ;
+         Output.print_string conf "<li>" ;
          print_warning conf base w ;
-         Output.printf conf "</li>")
+         Output.print_string conf "</li>")
       wl ;
     List.iter
       (fun m ->
-         Output.printf conf "<li>" ;
+         Output.print_string conf "<li>" ;
          print_misc conf base m ;
-         Output.printf conf "</li>")
+         Output.print_string conf "</li>")
       ml;
-    Output.printf conf "</ul>\n"
+    Output.print_string conf "</ul>\n"
   end
 
 let error conf base x =
@@ -728,7 +728,7 @@ let error conf base x =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
   Output.print_string conf err;
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   print_return conf;
   Hutil.trailer conf;
 #ifdef API
@@ -739,15 +739,15 @@ let error conf base x =
 let error_locked conf =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Output.printf conf
     (fcapitale
        (ftransl conf "the file is temporarily locked: please try again"));
-  Output.printf conf ".\n";
-  Output.printf conf "</p>\n";
-  Output.printf conf "<table>\n";
-  Output.printf conf "<tr>\n";
-  Output.printf conf "<td>\n";
+  Output.print_string conf ".\n";
+  Output.print_string conf "</p>\n";
+  Output.print_string conf "<table>\n";
+  Output.print_string conf "<tr>\n";
+  Output.print_string conf "<td>\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
@@ -757,7 +757,7 @@ let error_locked conf =
            Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
            Output.print_string conf (Util.escape_html (Mutil.decode v));
-           Output.printf conf "</textarea>\n"
+           Output.print_string conf "</textarea>\n"
          end
        else
          Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
@@ -768,9 +768,9 @@ let error_locked conf =
     (Util.escape_html conf.user);
   Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
     (Utf8.capitalize (transl conf "try again"));
-  Output.printf conf "</form>\n";
-  Output.printf conf "</td>\n";
-  Output.printf conf "<td>\n";
+  Output.print_string conf "</form>\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "<td>\n";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
@@ -789,10 +789,10 @@ let error_locked conf =
   end;
   Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
     (Utf8.capitalize (transl_nth conf "user/password/cancel" 2));
-  Output.printf conf "</form>\n";
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
-  Output.printf conf "</table>\n";
+  Output.print_string conf "</form>\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "</table>\n";
   Hutil.trailer conf
 
 let error_digest conf =
@@ -1105,7 +1105,7 @@ let print_create_conflict conf base p var =
            Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
              x;
            Output.print_string conf (Util.escape_html (Mutil.decode v));
-           Output.printf conf "</textarea>\n"
+           Output.print_string conf "</textarea>\n"
          end
        else
          Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
@@ -1114,32 +1114,32 @@ let print_create_conflict conf base p var =
   Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var;
   Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
     free_n;
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>";
   Output.printf conf "%s%s %d. \n" (Utf8.capitalize (transl conf "first free number"))
     (transl conf ":") free_n;
   Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
   Output.printf conf " %s." (transl conf "to try again with this number");
-  Output.printf conf "</li>";
-  Output.printf conf "<li>";
+  Output.print_string conf "</li>";
+  Output.print_string conf "<li>";
   Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
   Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
   Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
-  Output.printf conf "</li>";
-  Output.printf conf "<li>";
+  Output.print_string conf "</li>";
+  Output.print_string conf "<li>";
   Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
   Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
   Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "use \"link\" instead of \"create\"");
-  Output.printf conf "</li>";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>";
+  Output.print_string conf "</ul>\n";
   Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
     (Utf8.capitalize (transl conf "create"));
   Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
     (Utf8.capitalize (transl conf "back"));
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</form>\n";
   print_same_name conf base p;
   Hutil.trailer conf;
 #ifdef API

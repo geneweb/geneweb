@@ -124,21 +124,21 @@ let robots_txt conf =
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
   else
-    begin Output.printf conf "User-Agent: *\n"; Output.printf conf "Disallow: /\n" end
+    begin Output.print_string conf "User-Agent: *\n"; Output.print_string conf "Disallow: /\n" end
 
 let refuse_log conf from =
   GwdLog.syslog `LOG_NOTICE @@ "Excluded: " ^ from ;
   http conf Def.Forbidden;
   Output.header conf "Content-type: text/html";
-  Output.printf conf "Your access has been disconnected by administrator.\n";
+  Output.print_string conf "Your access has been disconnected by administrator.\n";
   let _ = (copy_file conf "refuse" : bool) in ()
 
 let only_log conf from =
   GwdLog.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
   http conf Def.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
-  Output.printf conf "<head><title>Invalid access</title></head>\n";
-  Output.printf conf "<body><h1>Invalid access</h1></body>\n"
+  Output.print_string conf "<head><title>Invalid access</title></head>\n";
+  Output.print_string conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
   GwdLog.syslog `LOG_NOTICE @@
@@ -316,9 +316,9 @@ let print_redirected conf from request new_addr =
   log_redirect from request req;
   include_template conf env "redirect"
     (fun () ->
-      let title _ = Output.printf conf "Address changed" in
+      let title _ = Output.print_string conf "Address changed" in
       Hutil.header conf title;
-      Output.printf conf "Use the following address:\n<p>\n";
+      Output.print_string conf "Use the following address:\n<p>\n";
       Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf)
 
@@ -403,27 +403,27 @@ let unauth_server conf ar =
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
   Hutil.header_without_http conf title;
-  Output.printf conf "<h1>\n";
+  Output.print_string conf "<h1>\n";
   title false;
-  Output.printf conf "</h1>\n";
-  Output.printf conf "<dl>\n";
+  Output.print_string conf "</h1>\n";
+  Output.print_string conf "<dl>\n";
   begin let (alt_bind, alt_access) =
     if ar.ar_passwd = "w" then "&w=f", txt 2 else "&w=w", txt 0
   in
-    Output.printf conf "<dd>\n";
-    Output.printf conf "<ul>\n";
-    Output.printf conf "<li>\n";
+    Output.print_string conf "<dd>\n";
+    Output.print_string conf "<ul>\n";
+    Output.print_string conf "<li>\n";
     Output.printf conf "%s : <a href=\"%s%s\">%s</a>" (transl conf "access") url
       alt_bind alt_access;
-    Output.printf conf "</li>\n";
-    Output.printf conf "<li>\n";
+    Output.print_string conf "</li>\n";
+    Output.print_string conf "<li>\n";
     Output.printf conf "%s : <a href=\"%s\">%s</a>" (transl conf "access") url
       (txt 4);
-    Output.printf conf "</li>\n";
-    Output.printf conf "</ul>\n";
-    Output.printf conf "</dd>\n"
+    Output.print_string conf "</li>\n";
+    Output.print_string conf "</ul>\n";
+    Output.print_string conf "</dd>\n"
   end;
-  Output.printf conf "</dl>\n";
+  Output.print_string conf "</dl>\n";
   Hutil.trailer conf
 
 let gen_match_auth_file test_user_and_password auth_file =
@@ -598,15 +598,15 @@ let index_not_name s =
 let print_request_failure conf msg =
   http conf Def.OK;
   Output.header conf "Content-type: text/html";
-  Output.printf conf "<head><title>Request failure</title></head>\n";
-  Output.printf conf
+  Output.print_string conf "<head><title>Request failure</title></head>\n";
+  Output.print_string conf
  "<body bgcolor=\"white\">\n\
   <h1 style=\"text-align: center; color: red;\">Request failure</h1>\n\
   <p>The request could not be completed.</p>\n";
   Output.printf conf
     "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
     msg;
-  Output.printf conf "</body>\n"
+  Output.print_string conf "</body>\n"
 
 let refresh_url conf bname =
   let url =
@@ -1341,9 +1341,9 @@ let auth_err request auth_file =
     else true, "(authorization not provided)"
 
 let no_access conf =
-  let title _ = Output.printf conf "Error" in
+  let title _ = Output.print_string conf "Error" in
   Hutil.rheader conf title;
-  Output.printf conf "No access to this database in CGI mode\n";
+  Output.print_string conf "No access to this database in CGI mode\n";
   Hutil.trailer conf
 
 let conf_and_connection from request script_name contents env =
@@ -1697,10 +1697,10 @@ let geneweb_server () =
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
-  Output.printf conf "<head><title>Time out</title></head>\n";
-  Output.printf conf "<body><h1>Time out</h1>\n";
+  Output.print_string conf "<head><title>Time out</title></head>\n";
+  Output.print_string conf "<body><h1>Time out</h1>\n";
   Output.printf conf "Computation time > %d second(s)\n" tmout;
-  Output.printf conf "</body>\n";
+  Output.print_string conf "</body>\n";
   Output.flush conf;
   exit 0
 

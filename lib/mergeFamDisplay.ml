@@ -58,7 +58,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   in
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
+  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_ifam ifam1);
   Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
@@ -80,7 +80,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   in
     loop branches
   end;
-  Output.printf conf "<p>" ;
+  Output.print_string conf "<p>" ;
   string_field (transl_nth conf "relation/relations" 0) "relation"
     (fun fam ->
        match get_relation fam with

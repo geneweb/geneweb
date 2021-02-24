@@ -32,17 +32,19 @@ let give_access_someone conf base (x, t) list =
       Some (Dgreg (_, _)), _ | _, Some (Dgreg (_, _)) -> true
     | _ -> false
   in
-  if has_dates then Output.printf conf "<em>";
+  if has_dates then Output.print_string conf "<em>";
   begin match t_date_start with
-    Some (Dgreg (d, _)) -> Output.printf conf "%d" d.year
+    Some (Dgreg (d, _)) -> Output.print_string conf (string_of_int d.year)
   | _ -> ()
   end;
   begin match t_date_end with
-    Some (Dgreg (d, _)) -> Output.printf conf "-%d" d.year
+    Some (Dgreg (d, _)) ->
+    Output.print_string conf "-" ;
+    Output.print_string conf (string_of_int d.year) ;
   | _ -> ()
   end;
-  if has_dates then Output.printf conf "</em>: ";
-  if List.mem x list then Output.printf conf "<em>"
+  if has_dates then Output.print_string conf "</em>: ";
+  if List.mem x list then Output.print_string conf "<em>"
   else Output.printf conf "<a href=\"%s%s\">" (commd conf) (acces conf base x);
   begin match t.t_name, get_public_name x, get_qualifiers x with
     Tmain, pn, nn :: _ when sou base pn <> "" ->
@@ -56,30 +58,30 @@ let give_access_someone conf base (x, t) list =
   | Tname n, _, [] -> Output.printf conf "%s %s" (sou base n) (p_surname base x)
   | _ -> Output.print_string conf (person_text conf base x)
   end;
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   Output.print_string conf (DateDisplay.short_dates_text conf base x);
   if t.t_nth <> 0 then
     Output.printf conf " (%s)"
       (if t.t_nth >= 100 then string_of_int t.t_nth
        else transl_nth conf "nth" t.t_nth);
-  if List.mem x list then Output.printf conf "</em>" else Output.printf conf "</a>"
+  if List.mem x list then Output.print_string conf "</em>" else Output.print_string conf "</a>"
 
 let give_access_title conf t p =
   Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s&p=%s\">" (commd conf)
     (Mutil.encode t) (Mutil.encode p);
   Output.print_string conf (Utf8.capitalize t);
-  Output.printf conf "</a>\n"
+  Output.print_string conf "</a>\n"
 
 let give_access_all_titles conf t absolute =
   Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s%s\">" (commd conf)
     (Mutil.encode t) (if absolute then "&a=A" else "");
   Output.print_string conf (if absolute then t else Utf8.capitalize t);
-  Output.printf conf "</a>"
+  Output.print_string conf "</a>"
 
 let give_access_all_places conf t =
   Output.printf conf "<a href=\"%sm=TT&sm=S&p=%s\">" (commd conf) (Mutil.encode t);
   Output.printf conf "... %s" t;
-  Output.printf conf "</a>\n"
+  Output.print_string conf "</a>\n"
 
 let propose_tree_for_list list conf =
   let (list, _) =
@@ -91,7 +93,7 @@ let propose_tree_for_list list conf =
   in
   begin match List.rev list with
     _ :: _ :: _ as list ->
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "<a href=\"%sm=RLM" (commd conf);
       begin let _ =
         List.fold_left
@@ -103,7 +105,7 @@ let propose_tree_for_list list conf =
       in
         Output.printf conf "&lim=6\">%s</a>\n" (Utf8.capitalize (transl conf "tree"))
       end;
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</p>\n"
   | _ -> ()
   end
 
@@ -115,7 +117,7 @@ let print_title_place_list conf base t p t_equiv list =
     else
       Mutil.list_iter_first
         (fun first t ->
-           if not first then Output.printf conf ",\n";
+           if not first then Output.print_string conf ",\n";
            Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s&a=A\">" (commd conf)
              (Mutil.encode t);
            Output.printf conf "%s</a>" t;
@@ -128,33 +130,33 @@ let print_title_place_list conf base t p t_equiv list =
         t_equiv
   in
   Hutil.header conf title;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   begin let _ =
     List.fold_left
       (fun list x ->
-         Output.printf conf "<li>";
+         Output.print_string conf "<li>";
          give_access_someone conf base x list;
-         Output.printf conf "</li>\n";
+         Output.print_string conf "</li>\n";
          fst x :: list)
       [] list
   in
     ()
   end;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>\n";
   propose_tree_for_list list conf;
   Hutil.trailer conf
 
 let print_all_with_place_list conf base p list =
   let title _ = Output.printf conf "... %s\n" p in
   Hutil.header conf title;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   List.iter
     (fun ((_, t) as x) ->
-       Output.printf conf "<li>" ;
+       Output.print_string conf "<li>" ;
        give_access_someone conf base x [];
        Output.printf conf ", %s<li>" (sou base t.t_ident) )
     list ;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>\n";
   propose_tree_for_list list conf;
   Hutil.trailer conf
 
@@ -190,9 +192,9 @@ let print_places_list conf base t t_equiv list =
   let wprint_elem p =
     Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s&p=%s%s\">" (commd conf)
       (Mutil.encode t) (Mutil.encode p) (if absolute then "&a=A" else "");
-    if p = "" then Output.printf conf "..."
+    if p = "" then Output.print_string conf "..."
     else Output.printf conf "%s%s" (surname_without_particle base p) (surname_particle base p);
-    Output.printf conf "</a>"
+    Output.print_string conf "</a>"
   in
   Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
@@ -210,20 +212,20 @@ let print_titles conf base p =
   let list = List.sort_uniq my_alphabetic l in
   let title _ = Output.printf conf "... %s" p in
   Hutil.header conf title;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   List.iter
     (fun t ->
-       Output.printf conf "<li>";
+       Output.print_string conf "<li>";
        give_access_title conf t p;
-       Output.printf conf "</li>\n")
+       Output.print_string conf "</li>\n")
     list;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>\n";
   if List.length list > 1 then
     begin
       Output.printf conf "<a href=\"%sm=TT&sm=A&p=%s\">" (commd conf)
         (Mutil.encode p);
       Output.print_string conf (Utf8.capitalize (transl conf "the whole list"));
-      Output.printf conf "</a>\n"
+      Output.print_string conf "</a>\n"
     end;
   Hutil.trailer conf
 
@@ -252,14 +254,14 @@ let print_all_places conf base =
     List.sort_uniq my_alphabetic l
   in
   Hutil.header conf title;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   List.iter
     (fun t ->
-       Output.printf conf "<li>";
+       Output.print_string conf "<li>";
        give_access_all_places conf t;
-       Output.printf conf "</li>\n")
+       Output.print_string conf "</li>\n")
     list;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf
 
 let print conf base =

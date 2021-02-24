@@ -588,27 +588,27 @@ let rev_extract_sub_part s v =
 let extract_sub_part s v = List.rev (rev_extract_sub_part s v)
 
 let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   if cnt0 >= first_cnt then
     begin
       Output.printf conf "<a href=\"%sm=%s%s&v=%d\">" (commd conf) edit_mode sfn
         (cnt0 - 1);
-      Output.printf conf
+      Output.print_string conf
         "<span class=\"fa fa-arrow-left fa-lg\" title=\"<<\"></span>";
-      Output.printf conf "</a>\n"
+      Output.print_string conf "</a>\n"
     end;
   Output.printf conf "<a href=\"%sm=%s%s\">" (commd conf) edit_mode sfn;
-  Output.printf conf "<span class=\"fa fa-arrow-up fa-lg\" title=\"^^\"></span>";
+  Output.print_string conf "<span class=\"fa fa-arrow-up fa-lg\" title=\"^^\"></span>";
   Output.printf conf "</a>\n";
   if not is_empty then
     begin
       Output.printf conf "<a href=\"%sm=%s%s&v=%d\">" (commd conf) edit_mode sfn
         (cnt0 + 1);
-      Output.printf conf
+      Output.print_string conf
         "<span class=\"fa fa-arrow-right fa-lg\" title=\">>\"></span>";
       Output.printf conf "</a>\n"
     end;
-  Output.printf conf "</p>\n"
+  Output.print_string conf "</p>\n"
 
 let print_sub_part_text conf wi edit_opt cnt0 lines =
   let lines =
@@ -656,15 +656,15 @@ let print_mod_view_page conf can_edit mode fname title env s =
     begin
       Output.printf conf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">\n"
         conf.right conf.left;
-      Output.printf conf "(";
+      Output.print_string conf "(";
       begin
         Output.printf conf "<a href=\"%sm=%s%s%s\">" (commd conf) mode
           (if has_v then "&v=" ^ string_of_int v else "") sfn;
         Output.print_string conf (message_txt conf 0);
-        Output.printf conf "</a>"
+        Output.print_string conf "</a>"
       end;
-      Output.printf conf ")\n";
-      Output.printf conf "</div>\n"
+      Output.print_string conf ")\n";
+      Output.print_string conf "</div>\n"
     end;
   Hutil.print_link_to_welcome conf true;
   if can_edit && has_v then
@@ -683,30 +683,30 @@ let print_mod_view_page conf can_edit mode fname title env s =
       Output.printf conf
         "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n" digest
     end;
-  Output.printf conf "<div class=\"row ml-3\">\n";
-  Output.printf conf "<div class=\"d-inline col-9 py-1\">\n";
+  Output.print_string conf "<div class=\"row ml-3\">\n";
+  Output.print_string conf "<div class=\"d-inline col-9 py-1\">\n";
   Util.include_template conf ["name", "notes"] "toolbar" ignore;
-  Output.printf conf "</div>\n";
-  Output.printf conf "<textarea name=\"notes\" id=\"notes_comments\"";
+  Output.print_string conf "</div>\n";
+  Output.print_string conf "<textarea name=\"notes\" id=\"notes_comments\"";
   Output.printf conf " class=\"col-9 form-control\" rows=\"25\" cols=\"110\"%s>"
     (if can_edit then "" else " readonly=\"readonly\"");
   Output.print_string conf (Util.escape_html sub_part);
-  Output.printf conf "</textarea>";
+  Output.print_string conf "</textarea>";
   if can_edit then
     begin
       begin
-        Output.printf conf
+        Output.print_string conf
           "<button type=\"submit\" class=\"btn btn-outline-primary btn-lg";
-        Output.printf conf " col-4 py-3 mt-2 mb-3 mx-auto order-3\">";
+        Output.print_string conf " col-4 py-3 mt-2 mb-3 mx-auto order-3\">";
         Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-        Output.printf conf "</button>\n"
+        Output.print_string conf "</button>\n"
       end
     end;
-  Output.printf conf "<div class=\"d-inline col-9 py-1\">\n";
+  Output.print_string conf "<div class=\"d-inline col-9 py-1\">\n";
   Util.include_template conf ["name", "notes"] "accent" ignore;
-  Output.printf conf "</div>\n";
-  Output.printf conf "</div>\n";
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</div>\n";
+  Output.print_string conf "</div>\n";
+  Output.print_string conf "</form>\n";
   Hutil.trailer conf
 
 let insert_sub_part s v sub_part =
@@ -795,11 +795,11 @@ let print_ok conf wi edit_mode fname title_is_1st s =
     Output.print_string conf (Utf8.capitalize (Util.transl conf "notes modified"))
   in
   Hutil.header_no_page_title conf title;
-  Output.printf conf "<div style=\"text-align:center\">\n";
-  Output.printf conf "--- ";
+  Output.print_string conf "<div style=\"text-align:center\">\n";
+  Output.print_string conf "--- ";
   title ();
-  Output.printf conf " ---\n";
-  Output.printf conf "</div>\n";
+  Output.print_string conf " ---\n";
+  Output.print_string conf "</div>\n";
   Hutil.print_link_to_welcome conf true;
   let get_v = Util.p_getint conf.env "v" in
   let v =

@@ -719,7 +719,8 @@ let error_person conf err =
 #endif
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.printf conf "%s\n" (Utf8.capitalize err);
+  Output.print_string conf (Utf8.capitalize err);
+  Output.print_string conf "\n";
   Update.print_return conf;
   Hutil.trailer conf;
 #ifdef API
@@ -779,21 +780,21 @@ let print_conflict conf base p =
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>";
   Output.printf conf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
     (Util.transl conf ":") free_n;
   Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
   Output.printf conf " %s.\n" (transl conf "to try again with this number");
-  Output.printf conf "</li>";
-  Output.printf conf "<li>";
+  Output.print_string conf "</li>";
+  Output.print_string conf "<li>";
   Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
   Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
   Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
-  Output.printf conf "</li>";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>";
+  Output.print_string conf "</ul>\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
@@ -806,7 +807,7 @@ let print_conflict conf base p =
     (Utf8.capitalize (transl conf "create"));
   Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
     (Utf8.capitalize (transl conf "back"));
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
 #ifdef API
@@ -1037,35 +1038,35 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
-      Output.printf conf "<h3 class=\"error\">";
+      Output.print_string conf "<h3 class=\"error\">";
       Output.printf conf (fcapitale (ftransl conf "%s forbidden char"))
         (List.fold_left (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") " "
            Name.forbidden_char);
-      Output.printf conf "</h3>\n";
+      Output.print_string conf "</h3>\n";
       List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   (* Si on a supprimé des relations, on les mentionne *)
   begin match !deleted_relation with
     [] -> ()
   | _ ->
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "%s, %s %s %s :"
         (Utf8.capitalize (transl_nth conf "relation/relations" 0))
         (transl conf "first name missing") (transl conf "or")
         (transl conf "surname missing");
-      Output.printf conf "<ul>\n";
+      Output.print_string conf "<ul>\n";
       List.iter
         (fun s ->
-           Output.printf conf "<li>";
+           Output.print_string conf "<li>";
            Output.print_string conf s;
-           Output.printf conf "</li>")
+           Output.print_string conf "</li>")
         !deleted_relation;
-      Output.printf conf "</ul>\n";
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</ul>\n";
+      Output.print_string conf "</p>\n"
   end;
   Output.printf conf "\n<p>%s</p>"
     (referenced_person_text conf base (poi base p.key_index));
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   Update.print_warnings conf base wl;
   let pi = p.key_index in
   let np = poi base pi in
@@ -1074,10 +1075,10 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   let nocc = get_occ np in
   if pgl <> [] && (ofn <> nfn || osn <> nsn || oocc <> nocc) then
     begin
-      Output.printf conf
+      Output.print_string conf
         "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
       Output.printf conf (ftransl conf "name changed. update linked pages");
-      Output.printf conf "</div>\n";
+      Output.print_string conf "</div>\n";
       let soocc = if oocc <> 0 then Printf.sprintf "/%d" oocc else "" in
       let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
       Output.printf conf "<span class=\"unselectable float-left\">%s%s</span>\n\
@@ -1150,7 +1151,7 @@ let print_add_ok conf base wl p =
     !deleted_relation;
   Output.printf conf "\n%s"
     (referenced_person_text conf base (poi base p.key_index));
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   Update.print_warnings conf base wl;
   Hutil.trailer conf
 
@@ -1178,7 +1179,7 @@ let print_change_event_order_ok conf base wl p =
   Update.print_warnings conf base wl;
   Output.printf conf "\n%s"
     (referenced_person_text conf base (poi base p.key_index));
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   Hutil.trailer conf
 
 

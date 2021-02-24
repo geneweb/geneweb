@@ -606,12 +606,15 @@ let print_dates conf base p =
   let birth_place = sou base (get_birth_place p) in
   begin match Adef.od_of_cdate (get_birth p) with
     Some d ->
-      Output.printf conf "%s " (cap (transl_nth conf "born" is));
+      Output.print_string conf (cap (transl_nth conf "born" is));
+      Output.print_string conf " ";
       Output.print_string conf (string_of_ondate conf d);
-      if birth_place <> "" then Output.printf conf ",\n"
+      if birth_place <> "" then Output.print_string conf ",\n"
   | None ->
-      if birth_place <> "" then
-        Output.printf conf "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
+      if birth_place <> "" then begin
+        Output.print_string conf (cap (transl_nth conf "born" is)) ;
+        Output.print_string conf "\n-&nbsp;"
+      end
   end;
   if birth_place <> "" then
     Output.print_string conf (string_of_place conf birth_place);
@@ -619,12 +622,15 @@ let print_dates conf base p =
   let baptism_place = sou base (get_baptism_place p) in
   begin match baptism with
     Some d ->
-      Output.printf conf "%s " (cap (transl_nth conf "baptized" is));
+      Output.print_string conf (cap (transl_nth conf "baptized" is));
+      Output.print_string conf " ";
       Output.print_string conf (string_of_ondate conf d);
-      if baptism_place <> "" then Output.printf conf ",\n"
+      if baptism_place <> "" then Output.print_string conf ",\n"
   | None ->
-      if baptism_place <> "" then
-        Output.printf conf "%s\n-&nbsp;" (cap (transl_nth conf "baptized" is))
+      if baptism_place <> "" then begin
+        Output.print_string conf (cap (transl_nth conf "baptized" is)) ;
+        Output.print_string conf "\n-&nbsp;"
+      end
   end;
   if baptism_place <> "" then
     Output.print_string conf (string_of_place conf baptism_place);
@@ -640,12 +646,13 @@ let print_dates conf base p =
         | Disappeared -> transl_nth conf "disappeared" is
       in
       let d = Adef.date_of_cdate d in
-      Output.printf conf "%s " (cap dr_w);
+      Output.print_string conf (cap dr_w);
+      Output.print_string conf " ";
       Output.print_string conf (string_of_ondate conf d);
-      if death_place <> "" then Output.printf conf ",\n"
+      if death_place <> "" then Output.print_string conf ",\n"
   | DeadYoung ->
       Output.print_string conf (cap (transl_nth conf "died young" is));
-      if death_place <> "" then Output.printf conf "\n-&nbsp;"
+      if death_place <> "" then Output.print_string conf "\n-&nbsp;"
   | DeadDontKnowWhen ->
       begin match death_place, get_burial p with
         "", (Buried _ | Cremated _) -> ()
@@ -653,7 +660,7 @@ let print_dates conf base p =
           if death_place <> "" || not (of_course_died conf p) then
             begin
               Output.print_string conf (cap (transl_nth conf "died" is));
-              if death_place <> "" then Output.printf conf "\n-&nbsp;"
+              if death_place <> "" then Output.print_string conf "\n-&nbsp;"
             end
       end
   | DontKnowIfDead | NotDead | OfCourseDead -> ()
@@ -664,9 +671,10 @@ let print_dates conf base p =
     let place = sou base (get_burial_place p) in
     begin match Adef.od_of_cdate cod with
       Some d ->
-        Output.printf conf " %s" (string_of_ondate conf d);
-        if place <> "" then Output.printf conf ",\n"
-    | None -> if place <> "" then Output.printf conf " -&nbsp;"
+        Output.print_string conf " ";
+        Output.print_string conf (string_of_ondate conf d);
+        if place <> "" then Output.print_string conf ",\n"
+    | None -> if place <> "" then Output.print_string conf " -&nbsp;"
     end;
     if place <> "" then Output.print_string conf (string_of_place conf place)
   in
@@ -688,11 +696,15 @@ let print_dates conf base p =
       if a.year < 0 || a.year = 0 && a.month = 0 then ()
       else
         begin
-          Output.printf conf "\n(";
-          Output.printf conf "%s " (transl conf "age at death:");
+          Output.print_string conf "\n(";
+          Output.print_string conf (transl conf "age at death:");
+          Output.print_string conf " ";
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
-          else
-            Output.printf conf "%s " (transl_decline conf "possibly (date)" "");
-          Output.printf conf "%s)" (string_of_age conf a)
+          else begin
+            Output.print_string conf (transl_decline conf "possibly (date)" "");
+            Output.print_string conf " ";
+          end ;
+          Output.print_string conf (string_of_age conf a) ;
+          Output.print_string conf ")"
         end
   | _ -> ()

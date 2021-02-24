@@ -218,12 +218,12 @@ let specify conf base n pl =
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in
   List.iter
     (fun (p, tl) ->
-       Output.printf conf "<li>\n";
+       Output.print_string conf "<li>\n";
        Perso.print_sosa conf base p true;
        begin match tl with
            [] ->
@@ -232,7 +232,7 @@ let specify conf base n pl =
            Output.printf conf "<a href=\"%s%s\">\n" (commd conf)
              (acces conf base p);
            Output.print_string conf (titled_person_text conf base p t);
-           Output.printf conf "</a>\n";
+           Output.print_string conf "</a>\n";
            List.iter
              (fun t -> Output.print_string conf (one_title_text base t)) tl
        end;
@@ -241,13 +241,13 @@ let specify conf base n pl =
          begin match get_first_names_aliases p with
              [] -> ()
            | fnal ->
-             Output.printf conf "\n<em>(";
+             Output.print_string conf "\n<em>(";
              Mutil.list_iter_first
                (fun first fna ->
-                  if not first then Output.printf conf ", ";
+                  if not first then Output.print_string conf ", ";
                   Output.print_string conf (sou base fna))
                fnal;
-             Output.printf conf ")</em>"
+             Output.print_string conf ")</em>"
          end;
        begin let spouses =
                Array.fold_right
@@ -268,9 +268,9 @@ let specify conf base n pl =
            in
            Output.printf conf ", <em>&amp; %s</em>\n" s
        end;
-       Output.printf conf "</li>\n")
+       Output.print_string conf "</li>\n")
     ptll;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf
 
 let incorrect_request conf = Hutil.incorrect_request conf
@@ -399,16 +399,16 @@ let make_senv conf base =
   | _ -> ()
 
 let propose_base conf =
-  let title _ = Output.printf conf "Base" in
+  let title _ = Output.print_string conf "Base" in
   Hutil.header conf title;
-  Output.printf conf "<ul><li>";
+  Output.print_string conf "<ul><li>";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
-  Output.printf conf "<input name=\"b\" size=\"40\"> =&gt;\n";
-  Output.printf conf
+  Output.print_string conf "<input name=\"b\" size=\"40\"> =&gt;\n";
+  Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</button>\n";
-  Output.printf conf "</li></ul>";
+  Output.print_string conf "</button>\n";
+  Output.print_string conf "</li></ul>";
   Hutil.trailer conf
 
 let try_plugin list conf base m =

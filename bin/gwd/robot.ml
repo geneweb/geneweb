@@ -30,12 +30,12 @@ let robot_error conf cnt sec =
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
   Util.include_template conf env "robot"
     (fun () ->
-      let title _ = Output.printf conf "Access refused" in
-      Output.printf conf "<head><title>";
+      let title _ = Output.print_string conf "Access refused" in
+      Output.print_string conf "<head><title>";
       title true;
-      Output.printf conf "</title>\n<body>\n<h1>";
+      Output.print_string conf "</title>\n<body>\n<h1>";
       title false;
-      Output.printf conf "</body>\n");
+      Output.print_string conf "</body>\n");
   raise Exit
 
 let purge_who tm xcl sec =

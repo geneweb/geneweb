@@ -53,7 +53,7 @@ let print_mod_ok conf base =
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       (* En attendant mieux ... *)
       Output.printf conf "%s%s %d "
         (Utf8.capitalize (transl conf "modification successful"))
@@ -65,13 +65,13 @@ let print_mod_ok conf base =
           Output.printf conf "%s."
             (transl_nth conf "modification/modifications"
                (if nb_pers > 1 then 1 else 0));
-          Output.printf conf "</a>"
+          Output.print_string conf "</a>"
         end
       else
         Output.printf conf "%s."
           (transl_nth conf "modification/modifications"
              (if nb_pers > 1 then 1 else 0));
-      Output.printf conf "</p>\n";
+      Output.print_string conf "</p>\n";
       if nb_pers > max_updates then begin
         Output.printf conf {|<form method="post" action="%s"><p>|} conf.command ;
         Util.hidden_env conf;
@@ -82,9 +82,9 @@ let print_mod_ok conf base =
         Output.printf conf {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="%s" id="data">|}
           (Util.escape_html (only_printable new_input)) ;
         Output.print_string conf (Utf8.capitalize (transl conf "continue correcting"));
-        Output.printf conf {|<button type="submit" class="btn btn-secondary btn-lg">|};
+        Output.print_string conf {|<button type="submit" class="btn btn-secondary btn-lg">|};
         Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-        Output.printf conf "</button></p></form>" ;
+        Output.print_string conf "</button></p></form>" ;
       end ;
       Output.printf conf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
         (commd conf) data ini  (Utf8.capitalize (transl conf "new modification")) ;

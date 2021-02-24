@@ -23,55 +23,55 @@ let print_child_person conf base p =
       Some i -> i
     | None -> get_occ p
   in
-  Output.printf conf "<table class=\"m1-2\">\n";
-  Output.printf conf "<tbody>\n";
+  Output.print_string conf "<table class=\"m1-2\">\n";
+  Output.print_string conf "<tbody>\n";
   Output.printf conf "<tr align=\"%s\">\n" conf.left;
-  Output.printf conf "<td>";
+  Output.print_string conf "<td>";
   Output.printf conf "<label for=\"%s_fn\" class=\"mx-2 mb-0\">%s</label>"
     var (Utf8.capitalize (transl_nth conf "first name/first names" 0));
-  Output.printf conf "</td>\n";
-  Output.printf conf "<td colspan=\"3\">\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "<td colspan=\"3\">\n";
   Output.printf conf "<input name=\"%s_first_name\" class=\"form-control\" \
 size=\"23\" maxlength=\"200\" id=\"%s_fn\" value=\"%s\">\n" var var
 (Util.escape_html first_name);
-  Output.printf conf "</td>\n";
+  Output.print_string conf "</td>\n";
   Output.printf conf "<td align=\"%s\">" conf.right;
   Output.printf conf "<label for=\"%s_occ\" class=\"mx-2 mb-0\">%s</label>"
     var (Utf8.capitalize (transl conf "number"));
-  Output.printf conf "</td>\n";
-  Output.printf conf "<td>\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "<td>\n";
   Output.printf conf "<input class=\"form-control\" id=\"%s_occ\" name=\"%s_occ\" \
 size=\"5\" maxlength=\"8\"%s>\n" var var
 (if occ = 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
   Output.printf conf "<tr align=\"%s\">\n" conf.left;
-  Output.printf conf "<td>";
+  Output.print_string conf "<td>";
   Output.printf conf "<label for=\"%s_sn\" class=\"mx-2 mb-0\">%s</label>"
     var (Utf8.capitalize (transl_nth conf "surname/surnames" 0));
-  Output.printf conf "</td>\n";
-  Output.printf conf "<td colspan=\"5\">\n";
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "<td colspan=\"5\">\n";
   Output.printf conf "<input name=\"%s_surname\" class=\"form-control\" \
 size=\"40\" maxlength=\"200\" id=\"%s_sn\" value=\"%s\">\n" var var surname;
-  Output.printf conf "</td>\n";
-  Output.printf conf "</tr>\n";
-  Output.printf conf "</tbody>\n";
-  Output.printf conf "</table>\n"
+  Output.print_string conf "</td>\n";
+  Output.print_string conf "</tr>\n";
+  Output.print_string conf "</tbody>\n";
+  Output.print_string conf "</table>\n"
 
 
 let print_children conf base ipl =
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   List.iter
     (fun ip ->
        let p = poi base ip in
-       Output.printf conf "<li class=\"mt-3\">\n";
+       Output.print_string conf "<li class=\"mt-3\">\n";
        Output.printf conf "<span class=\"ml-2\">%s"
          (reference conf base p (person_text conf base p));
        Output.printf conf "%s</span>\n" (DateDisplay.short_dates_text conf base p);
        print_child_person conf base p;
-       Output.printf conf "</li>\n")
+       Output.print_string conf "</li>\n")
     ipl;
-  Output.printf conf "</ul>\n"
+  Output.print_string conf "</ul>\n"
 
 let print_change conf base p =
   let title _ =
@@ -81,29 +81,29 @@ let print_change conf base p =
   let children = children_of_p base p in
   let digest = digest_children base children in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "<h2>";
+  Output.print_string conf "<h2>";
     title false;
   begin
     let s = person_text conf base p in
     Output.print_string conf (Util.transl_a_of_b conf "" (reference conf base p s) s)
   end ;
   Output.printf conf " %s" (DateDisplay.short_dates_text conf base p);
-  Output.printf conf "</h2>\n";
+  Output.print_string conf "</h2>\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
   Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
     digest;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
+  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
   print_children conf base children;
-  Output.printf conf "\n";
-  Output.printf conf
+  Output.print_string conf "\n";
+  Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-primary btn-lg ml-5 mb-2\">";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
-  Output.printf conf "</button>\n";
-  Output.printf conf "</form>\n";
-  Output.printf conf "\n";
+  Output.print_string conf "</button>\n";
+  Output.print_string conf "</form>\n";
+  Output.print_string conf "\n";
   Hutil.trailer conf
 
 let print conf base =
@@ -113,24 +113,24 @@ let print conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
-  Output.printf conf "<h4>";
+  Output.print_string conf "<h4>";
   Output.print_string conf (Utf8.capitalize (transl_nth conf "child/children" 1));
-  Output.printf conf "</h4>";
-  Output.printf conf "\n<p>\n";
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "</h4>";
+  Output.print_string conf "\n<p>\n";
+  Output.print_string conf "<ul>\n";
   Array.iter
     (fun ifam ->
        let des = foi base ifam in
        Array.iter
          (fun ip ->
             let p = poi base ip in
-            Output.printf conf "<li>" ;
+            Output.print_string conf "<li>" ;
             Output.printf conf "\n%s"
               (reference conf base p (person_text conf base p));
             Output.printf conf "%s\n" (DateDisplay.short_dates_text conf base p))
          (get_children des))
     (get_family u);
-  Output.printf conf "</ul>\n"
+  Output.print_string conf "</ul>\n"
 
 let print_change_done conf base p =
   let title _ =
@@ -150,21 +150,21 @@ let print_conflict conf base ip_var p =
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
-  Output.printf conf "<ul>\n";
-  Output.printf conf "<li>";
+  Output.print_string conf "<ul>\n";
+  Output.print_string conf "<li>";
   Output.printf conf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
     (Util.transl conf ":") free_n;
   Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
   Output.printf conf " %s.\n" (transl conf "to try again with this number");
-  Output.printf conf "</li>";
-  Output.printf conf "<li>";
+  Output.print_string conf "</li>";
+  Output.print_string conf "<li>";
   Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
   Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
   Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
-  Output.printf conf "</li>";
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</li>";
+  Output.print_string conf "</ul>\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter
     (fun (x, v) ->
@@ -180,7 +180,7 @@ let print_conflict conf base ip_var p =
 class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "create"));
   Output.printf conf "<button type=\"submit\" name=\"return\" \
 class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "back"));
-  Output.printf conf "</form>\n";
+  Output.print_string conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
   raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)

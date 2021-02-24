@@ -118,7 +118,8 @@ let print_shortest_path conf base p1 p2 =
       Output.print_string conf (Utf8.capitalize (transl conf "relationship"))
     in
     Hutil.header conf title;
-    Output.printf conf "%s\n" (Utf8.capitalize (transl conf "it is the same person!"));
+    Output.print_string conf (Utf8.capitalize (transl conf "it is the same person!"));
+    Output.print_string conf "\n";
     Hutil.trailer conf
   else
     let excl_faml =
@@ -156,19 +157,19 @@ let print_shortest_path conf base p1 p2 =
         Hutil.header_no_page_title conf title;
         if excl_faml = [] then
           begin
-            Output.printf conf "<h1>";
+            Output.print_string conf "<h1>";
             title false;
-            Output.printf conf "</h1>\n";
+            Output.print_string conf "</h1>\n";
             Hutil.print_link_to_welcome conf true;
             Output.printf conf "%s.\n"
               (Utf8.capitalize
                  (cftransl conf "no known relationship link between %s and %s"
                     [s1; s2]));
-            Output.printf conf "<br>\n";
+            Output.print_string conf "<br>\n";
             begin
-              Output.printf conf "<p>\n";
+              Output.print_string conf "<p>\n";
               begin
-                Output.printf conf "<span>";
+                Output.print_string conf "<span>";
                 begin
                   Output.printf conf "<a href=\"%s&m=R&%s\">" (commd conf)
                     (acces conf base p1);
@@ -176,21 +177,21 @@ let print_shortest_path conf base p1 p2 =
                     (Utf8.capitalize
                        (transl_nth conf "try another/relationship computing"
                           0));
-                  Output.printf conf "</a>"
+                  Output.print_string conf "</a>"
                 end;
                 Output.printf conf " %s.\n"
                   (transl_nth conf "try another/relationship computing" 1);
-                Output.printf conf "</span>"
+                Output.print_string conf "</span>"
               end;
-              Output.printf conf "</p>\n"
+              Output.print_string conf "</p>\n"
             end
           end
         else
           begin
-            Output.printf conf "<ul>\n";
+            Output.print_string conf "<ul>\n";
             Output.printf conf "<li>%s</li>\n" s1;
             Output.printf conf "<li>%s</li>\n" s2;
-            Output.printf conf "</ul>\n"
+            Output.print_string conf "</ul>\n"
           end;
         Hutil.trailer conf
 let parents_label conf base info =
@@ -381,7 +382,7 @@ let print_link_name conf base n p1 p2 sol =
      else person_title_text conf base p2);
   Output.printf conf " %s" (transl conf "is");
   if n > 1 then Output.printf conf " %s" (transl conf "also");
-  Output.printf conf "\n";
+  Output.print_string conf "\n";
   let (s, sp1, sp2) =
     let ini_p1 = p1
     and ini_p2 = p2 in
@@ -484,17 +485,17 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
       Some "off" -> "&image=off"
     | _ -> ""
   in
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   List.iter
     (fun (a, n) ->
-       Output.printf conf "<li>";
+       Output.print_string conf "<li>";
        Output.printf conf "<em>%s %s"
          (if n < 0 then "***" else string_of_big_int conf n)
          (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
-       Output.printf conf "</em>\n";
+       Output.print_string conf "</em>\n";
        if not long then
          begin let propose_dag = n > 1 && n <= 10 in
-           Output.printf conf ":\n ";
+           Output.print_string conf ":\n ";
            let dp1 =
              match pp1 with
                Some p -> p
@@ -516,11 +517,11 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            Output.print_string conf (Utf8.capitalize (transl conf "see"));
            if n > 1 && not propose_dag then
              Output.print_string conf (transl conf " the first branch");
-           Output.printf conf "</a>"
+           Output.print_string conf "</a>"
          end;
-       Output.printf conf "</li>")
+       Output.print_string conf "</li>")
     list;
-  Output.printf conf "</ul>\n"
+  Output.print_string conf "</ul>\n"
 
 let print_solution_not_ancestor conf base long p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
@@ -529,19 +530,19 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
       Some "off" -> "&image=off"
     | _ -> ""
   in
-  Output.printf conf "<ul class=li_relationship>\n";
-  Output.printf conf "<li>\n";
+  Output.print_string conf "<ul class=li_relationship>\n";
+  Output.print_string conf "<li>\n";
   Output.printf conf "%s\n" (Utf8.capitalize (transl conf "indeed,"));
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   List.iter
     (fun (a, n) ->
-       Output.printf conf "<li>\n";
+       Output.print_string conf "<li>\n";
        Output.print_string conf (person_title_text conf base a);
-       Output.printf conf "\n<em>(";
+       Output.print_string conf "\n<em>(";
        Output.printf conf "%d %s" n
          (transl_nth conf "relationship link/relationship links"
             (if n = 1 then 0 else 1));
-       Output.printf conf ")</em>\n&nbsp;";
+       Output.print_string conf ")</em>\n&nbsp;";
        if not long then
          begin let propose_dag = n > 1 && n <= 10 in
            let dp1 =
@@ -563,11 +564,11 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
              (if pp2 = None then "" else "&" ^ acces_n conf base "4" p2)
              (if propose_dag then "&dag=on" else "") image_opt;
            Output.print_string conf (Utf8.capitalize (transl conf "see"));
-           Output.printf conf "</a>"
+           Output.print_string conf "</a>"
          end;
-       Output.printf conf "</li>\n")
+       Output.print_string conf "</li>\n")
     list;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>\n";
   begin let is_are =
     match list with
       [_] -> transl conf "is"
@@ -594,29 +595,29 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
       in
       Output.printf conf "%s\n" (Util.translate_eval s)
     in
-    Output.printf conf "<ul>\n";
-    Output.printf conf "<li>\n";
+    Output.print_string conf "<ul>\n";
+    Output.print_string conf "<li>\n";
     print pp1 p1 (lab (fun r -> r.Consang.lens1) x1);
-    Output.printf conf "</li>\n";
-    Output.printf conf "<li>\n";
+    Output.print_string conf "</li>\n";
+    Output.print_string conf "<li>\n";
     print pp2 p2 (lab (fun r -> r.Consang.lens2) x2);
-    Output.printf conf "</li>\n";
-    Output.printf conf "</ul>\n"
+    Output.print_string conf "</li>\n";
+    Output.print_string conf "</ul>\n"
   end;
-  Output.printf conf "</li>\n";
-  Output.printf conf "</ul>\n"
+  Output.print_string conf "</li>\n";
+  Output.print_string conf "</ul>\n"
 
 let print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), _) = sol in
-  Output.printf conf "<p>\n";
+  Output.print_string conf "<p>\n";
   Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n" (Util.image_prefix conf)
     "picto_fleche_bleu.png";
   print_link_name conf base n p1 p2 sol;
-  Output.printf conf "</p>\n";
+  Output.print_string conf "</p>\n";
   if x1 = 0 || x2 = 0 then
     print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
   else print_solution_not_ancestor conf base long p1 p2 sol;
-  Output.printf conf "\n"
+  Output.print_string conf "\n"
 
 let max_br = 33
 
@@ -655,7 +656,7 @@ let print_dag_links conf base p1 p2 rl =
     if is_anc then
       Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
         (Util.image_prefix conf) "picto_fleche_bleu.png"
-    else Output.printf conf "<ul>\n";
+    else Output.print_string conf "<ul>\n";
     M.iter
       (fun ip (pp1, pp2, nn, nt, _) ->
          let dp1 =
@@ -670,7 +671,7 @@ let print_dag_links conf base p1 p2 rl =
          in
          if nt > 1 && nn > 1 && nn < max_br then
            let a = pget conf base ip in
-           if is_anc then () else Output.printf conf "<li>\n";
+           if is_anc then () else Output.print_string conf "<li>\n";
            if not is_anc then
              Output.printf conf "%s%s\n" (person_title_text conf base a) (Util.transl conf ":");
            Output.printf conf "<a href=\"%sm=RL" (commd conf);
@@ -694,12 +695,12 @@ let print_dag_links conf base p1 p2 rl =
                     (l1, l2) list)
                ([], []) rl
            in
-           Output.printf conf "&l1=";
+           Output.print_string conf "&l1=";
            begin let _ =
              List.fold_right (fun x sep -> Output.printf conf "%s%d" sep x; ",")
                l1 ""
            in
-             Output.printf conf "&l2=";
+             Output.print_string conf "&l2=";
              let _ =
                List.fold_right (fun x sep -> Output.printf conf "%s%d" sep x; ",")
                  l2 ""
@@ -721,17 +722,17 @@ let print_dag_links conf base p1 p2 rl =
            else
              Output.printf conf "%d %s" nn
                (transl_nth conf "relationship link/relationship links" 1);
-           Output.printf conf "</a>";
-           if is_anc then () else Output.printf conf "\n</li>\n"
+           Output.print_string conf "</a>";
+           if is_anc then () else Output.print_string conf "\n</li>\n"
          else rest := true)
       anc_map;
     if !rest then
       begin
-        Output.printf conf "<li>";
-        Output.printf conf "...";
-        Output.printf conf "</li>\n"
+        Output.print_string conf "<li>";
+        Output.print_string conf "...";
+        Output.print_string conf "</li>\n"
       end;
-    if is_anc then Output.printf conf "\n" else Output.printf conf "</ul>\n"
+    if is_anc then Output.print_string conf "\n" else Output.print_string conf "</ul>\n"
 
 let print_propose_upto conf base p1 p2 rl =
   match rl with
@@ -741,10 +742,10 @@ let print_propose_upto conf base p1 p2 rl =
           (fun (_, _, (x1, x2, _), _) maxlen -> max maxlen (max x1 x2)) rl 0
       in
       let (p, a) = if x1 = 0 then p2, p1 else p1, p2 in
-      Output.printf conf "<p>\n";
+      Output.print_string conf "<p>\n";
       Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
         (Util.image_prefix conf) "picto_fleche_bleu.png";
-      Output.printf conf "<span class=\"smaller\">";
+      Output.print_string conf "<span class=\"smaller\">";
       Output.print_string conf
         (let s = person_title_text conf base p in
          Utf8.capitalize
@@ -752,15 +753,15 @@ let print_propose_upto conf base p1 p2 rl =
               (transl_a_of_b conf (transl conf "ancestors") s s)));
       Output.printf conf " %s"
         (transl_decline conf "up to" (person_title_text conf base a));
-      Output.printf conf "\n&nbsp;";
+      Output.print_string conf "\n&nbsp;";
       Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
         (Util.image_prefix conf) "picto_rel_asc.png";
       Output.printf conf "<a href=\"%sm=A&t=D&%s&%s&l=%d\">" (commd conf)
         (acces conf base p) (acces_n conf base "1" a) maxlen;
       Output.print_string conf (Utf8.capitalize (transl conf "see"));
-      Output.printf conf "</a>";
-      Output.printf conf "</span>\n";
-      Output.printf conf "</p>\n"
+      Output.print_string conf "</a>";
+      Output.print_string conf "</span>\n";
+      Output.print_string conf "</p>\n"
   | _ -> ()
 
 let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
@@ -813,21 +814,21 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       if List.mem (b1, b2) !found then ()
       else
         begin
-          Output.printf conf "<table width=\"100%%\"><tr><td align=\"center\">\n";
+          Output.print_string conf "<table width=\"100%%\"><tr><td align=\"center\">\n";
           begin
-            Output.printf conf "<table>\n";
+            Output.print_string conf "<table>\n";
             begin
-              Output.printf conf "<tr>\n";
+              Output.print_string conf "<tr>\n";
               begin
-                Output.printf conf "<td>\n";
+                Output.print_string conf "<td>\n";
                 RelationLink.print_relation_path conf base info;
-                Output.printf conf "</td>\n"
+                Output.print_string conf "</td>\n"
               end;
-              Output.printf conf "</tr>\n"
+              Output.print_string conf "</tr>\n"
             end;
-            Output.printf conf "</table>\n"
+            Output.print_string conf "</table>\n"
           end;
-          Output.printf conf "</td></tr></table>\n";
+          Output.print_string conf "</td></tr></table>\n";
           found := (b1, b2) :: !found
         end
   | _ -> ()
@@ -835,7 +836,7 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
 let print_path conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
   let found = ref [] in
   List.iter (fun (a, _) -> print_one_path conf base found a p1 p2 pp1 pp2 l1 l2) list;
-  Output.printf conf "\n"
+  Output.print_string conf "\n"
 
 let print_main_relationship conf base long p1 p2 rel =
   let total =
@@ -895,11 +896,11 @@ let print_main_relationship conf base long p1 p2 rel =
                (cftransl conf "no known relationship link between %s and %s"
                   [gen_person_title_text reference raw_access conf base p1;
                    gen_person_title_text reference raw_access conf base p2]));
-          Output.printf conf "<br>\n";
+          Output.print_string conf "<br>\n";
           begin
-            Output.printf conf "<p>\n";
+            Output.print_string conf "<p>\n";
             begin
-              Output.printf conf "<span>";
+              Output.print_string conf "<span>";
               begin
                 Output.printf conf "<a href=\"%s&m=R&%s\">" (commd conf)
                   (acces conf base p1);
@@ -907,13 +908,13 @@ let print_main_relationship conf base long p1 p2 rel =
                   (Utf8.capitalize
                      (transl_nth conf "try another/relationship computing"
                         0));
-                Output.printf conf "</a>"
+                Output.print_string conf "</a>"
               end;
               Output.printf conf " %s.\n"
                 (transl_nth conf "try another/relationship computing" 1);
-              Output.printf conf "</span>"
+              Output.print_string conf "</span>"
             end;
-            Output.printf conf "</p>\n"
+            Output.print_string conf "</p>\n"
           end
         end
   | Some (rl, _, relationship) ->
@@ -934,14 +935,14 @@ let print_main_relationship conf base long p1 p2 rel =
              succ i)
           1 rl
       in
-      Output.printf conf "\n";
+      Output.print_string conf "\n";
       if long then () else print_dag_links conf base p1 p2 rl;
       if not all_by_marr && authorized_age conf base p1 &&
          authorized_age conf base p2 && get_consang a1 != Adef.fix (-1) &&
          get_consang a2 != Adef.fix (-1)
       then
         begin
-          Output.printf conf "<p>\n";
+          Output.print_string conf "<p>\n";
           Output.printf conf "<em>%s%s %s%%</em>"
             (Utf8.capitalize (transl conf "relationship"))
             (Util.transl conf ":")
@@ -949,7 +950,7 @@ let print_main_relationship conf base long p1 p2 rel =
                (round_2_dec
                   (Adef.float_of_fix (Adef.fix_of_float relationship) *.
                    100.0)));
-          Output.printf conf "</p>\n"
+          Output.print_string conf "</p>\n"
         end;
       print_propose_upto conf base p1 p2 rl
   end;
@@ -981,12 +982,12 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
 let print_no_relationship conf base pl =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "tree")) in
   Hutil.header conf title;
-  Output.printf conf "<ul>\n";
+  Output.print_string conf "<ul>\n";
   List.iter
     (fun p ->
        Output.printf conf "<li>%s\n" (referenced_person_title_text conf base p))
     pl;
-  Output.printf conf "</ul>\n";
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf
 
 let print_multi_relation conf base pl lim assoc_txt =
@@ -1048,7 +1049,7 @@ let print_base_loop conf base p =
   Output.printf conf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
     (Util.update_family_loop conf base p (Gutil.designation base p));
-  Output.printf conf ".\n";
+  Output.print_string conf ".\n";
   Hutil.trailer conf
 
 let relmenu_print = Perso.interp_templ "relmenu"

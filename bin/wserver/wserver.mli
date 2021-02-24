@@ -78,7 +78,7 @@ val cgi : bool ref
           None 2371 60 None
           (fun _ s _ ->
              Output.status conf Wserver.OK;
-             Output.printf conf "You said: %s...\n" s);;
+             Output.print_string conf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
    - Run:
