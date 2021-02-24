@@ -226,28 +226,25 @@ let print_search_form conf from_wiz =
   Output.printf conf "<p>\n";
   hidden_env conf;
   Output.printf conf
-    "<input type=\"hidden\" name=\"m\" value=\"WIZNOTES_SEARCH\"%s>\n"
-    conf.xhs;
+    "<input type=\"hidden\" name=\"m\" value=\"WIZNOTES_SEARCH\">\n";
   Output.printf conf
-    "<input name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\"%s>\n"
+    "<input name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\">\n"
     (match p_getenv conf.env "s" with
        Some s -> Util.escape_html s
-     | None -> "")
-    conf.xhs;
+     | None -> "");
   if from_wiz <> "" then
-    Output.printf conf "<input type=\"hidden\" name=\"z\" value=\"%s\"%s>\n"
-      from_wiz conf.xhs;
-  Output.printf conf "<br%s>\n" conf.xhs;
+    Output.printf conf "<input type=\"hidden\" name=\"z\" value=\"%s\">\n"
+      from_wiz;
+  Output.printf conf "<br>\n";
   Output.printf conf "<label>\n";
-  Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s%s>\n"
+  Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s>\n"
     (match p_getenv conf.env "c" with
        Some "on" -> " checked=\"checked\""
-     | Some _ | None -> "")
-    conf.xhs;
+     | Some _ | None -> "");
   Output.printf conf "%s\n" (transl_nth conf "search/case sensitive" 1);
   Output.printf conf "</label>\n";
-  Output.printf conf "<input type=\"submit\" value=\"%s\"%s>\n"
-    (Utf8.capitalize (transl_nth conf "search/case sensitive" 0)) conf.xhs;
+  Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
+    (Utf8.capitalize (transl_nth conf "search/case sensitive" 0));
   Output.printf conf "</p>\n";
   Output.printf conf "</form>\n";
   Output.printf conf "</td>\n";
@@ -295,7 +292,7 @@ let print_main conf base auth_file =
     begin
       begin
         Output.printf conf "<p>\n";
-        Output.printf conf "%d %s<br%s>\n" (List.length wizdata) wiztxt conf.xhs;
+        Output.printf conf "%d %s<br>\n" (List.length wizdata) wiztxt;
         Output.printf conf "<em style=\"font-size:80%%\">\n";
         Output.printf conf "%s " (Utf8.capitalize (transl conf "click"));
         Output.printf conf "<a href=\"%sm=WIZNOTES&o=H\">%s</a>\n" (commd conf)

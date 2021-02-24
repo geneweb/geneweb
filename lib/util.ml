@@ -503,8 +503,8 @@ let clean_html_tags s l =
 let hidden_env conf =
   List.iter
     (fun (k, v) ->
-       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
-         (escape_html (Mutil.decode v)) conf.xhs)
+       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" k
+         (escape_html (Mutil.decode v)))
     (conf.henv @ conf.senv)
 
 let p_getenv env label =
@@ -2420,8 +2420,8 @@ let rchild_type_text conf t n =
       transl_nth conf "foster son/foster daughter/foster child" n
 
 let wprint_hidden conf pref name valu =
-  Output.printf conf "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n" pref
-    name (escape_html valu) conf.xhs
+  Output.printf conf "<input type=\"hidden\" name=\"%s%s\" value=\"%s\">\n" pref
+    name (escape_html valu)
 
 let wprint_hidden_person conf base pref p =
   let first_name = p_first_name base p in
@@ -2874,7 +2874,7 @@ let gen_print_tips conf s =
   Output.printf conf "</tr>\n";
   Output.printf conf "</table>\n";
   Output.printf conf "</div>\n";
-  Output.printf conf "<br%s>\n" conf.xhs
+  Output.printf conf "<br>\n"
 
 (* ********************************************************************** *)
 (*  [Fonc] print_tips_relationship : conf -> unit                         *)
@@ -2913,8 +2913,8 @@ let print_image_sex conf p size =
     | Neuter -> "sexunknown.png", "?"
   in
   Output.printf conf
-    "<img src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\"%s>\n"
-    (image_prefix conf) image alt size size conf.xhs
+    "<img src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\">\n"
+    (image_prefix conf) image alt size size
 
 
 (* ********************************************************************** *)

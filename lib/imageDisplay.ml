@@ -131,4 +131,4 @@ let print_html conf =
        let v = if k = "m" then "IM" else v in
        Output.printf conf "%s%s=%s" (if first then "" else "&") k v)
     conf.env;
-  Output.printf conf "\"%s>\n</body>\n</html>" conf.xhs
+  Output.printf conf "\">\n</body>\n</html>"

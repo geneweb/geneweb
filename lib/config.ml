@@ -73,7 +73,6 @@ type config =
     base_env : (string * string) list;
     allowed_titles : string list Lazy.t;
     denied_titles : string list Lazy.t;
-    xhs : string;
     request : string list;
     lexicon : (string, string) Hashtbl.t;
     mutable charset : string;
@@ -143,7 +142,6 @@ let empty =
   ; base_env = []
   ; allowed_titles = lazy []
   ; denied_titles = lazy []
-  ; xhs = ""
   ; request = []
   ; lexicon = Hashtbl.create 16
   ; charset = ""

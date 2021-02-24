@@ -41,8 +41,8 @@ let print_branch_to_alphabetic conf x nb_branch =
   Output.printf conf "</td>";
   Output.printf conf "<td>";
   Output.printf conf
-    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
-    (Util.image_prefix conf) "picto_branch.png" conf.xhs;
+    "<img src=\"%s/%s\" alt=\"\" title=\"\">\n"
+    (Util.image_prefix conf) "picto_branch.png";
   Output.printf conf "</td>";
   Output.printf conf "<td>";
   Output.printf conf "%s (%d)"
@@ -50,8 +50,8 @@ let print_branch_to_alphabetic conf x nb_branch =
   Output.printf conf "</td>";
   Output.printf conf "<td>";
   Output.printf conf
-    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
-    (Util.image_prefix conf) "picto_alphabetic_order.png" conf.xhs;
+    "<img src=\"%s/%s\" alt=\"\" title=\"\">\n"
+    (Util.image_prefix conf) "picto_alphabetic_order.png";
   Output.printf conf "</td>";
   (* Ne pas oublier l'attribut nofollow pour les robots *)
   Output.printf conf "<td>";
@@ -75,7 +75,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   Output.printf conf "</td>";
   Output.printf conf "</tr>";
   Output.printf conf "</table>\n";
-  Output.printf conf "<br%s>\n" conf.xhs
+  Output.printf conf "<br>\n"
 
 
 (* **********************************************************************)
@@ -100,8 +100,8 @@ let print_alphabetic_to_branch conf x =
   Output.printf conf "</td>";
   Output.printf conf "<td>";
   Output.printf conf
-    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
-    (Util.image_prefix conf) "picto_branch.png" conf.xhs;
+    "<img src=\"%s/%s\" alt=\"\" title=\"\">\n"
+    (Util.image_prefix conf) "picto_branch.png";
   Output.printf conf "</td>";
   (* Ne pas oublier l'attribut nofollow pour les robots *)
   Output.printf conf "<td>";
@@ -125,8 +125,8 @@ let print_alphabetic_to_branch conf x =
   Output.printf conf "</td>";
   Output.printf conf "<td>";
   Output.printf conf
-    "<img src=\"%s/%s\" alt=\"\" title=\"\"%s>\n"
-    (Util.image_prefix conf) "picto_alphabetic_order.png" conf.xhs;
+    "<img src=\"%s/%s\" alt=\"\" title=\"\">\n"
+    (Util.image_prefix conf) "picto_alphabetic_order.png";
   Output.printf conf "</td>";
   Output.printf conf "<td>";
   Output.print_string conf
@@ -134,7 +134,7 @@ let print_alphabetic_to_branch conf x =
   Output.printf conf "</td>";
   Output.printf conf "</tr>";
   Output.printf conf "</table>";
-  Output.printf conf "<br%s>\n" conf.xhs
+  Output.printf conf "<br>\n"
 
 let persons_of_fsname conf base base_strings_of_fsname find proj x =
   (* list of strings index corresponding to the crushed lower first name

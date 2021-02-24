@@ -414,8 +414,7 @@ let print_menu_birth conf base =
       | None -> raise Not_found
   in
   let mode () =
-    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"AN\"%s>\n"
-      conf.xhs
+    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"AN\">\n"
   in
   gen_print_menu_birth conf base f_scan mode
 
@@ -491,8 +490,7 @@ let print_menu_dead conf base =
       | None -> raise Not_found
   in
   let mode () =
-    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"AD\"%s>\n"
-      conf.xhs
+    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"AD\">\n"
   in
   gen_print_menu_dead conf base f_scan mode
 
@@ -553,8 +551,7 @@ let print_menu_marriage conf base =
     !list_aft;
   Output.printf conf "\n";
   let mode () =
-    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"AM\"%s>\n"
-      conf.xhs
+    Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"AM\">\n"
   in
   propose_months conf mode; Output.printf conf "\n"; Hutil.trailer conf
 

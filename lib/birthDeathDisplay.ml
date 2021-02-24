@@ -121,26 +121,24 @@ let print_death conf base =
       in
       Output.printf conf "</ul>\n</li>\n</ul>\n";
       if fst ages_nb >= 3 then
-        Output.printf conf "%s (%s) : %s<br%s>\n"
+        Output.printf conf "%s (%s) : %s<br>\n"
           (Utf8.capitalize (transl conf "average age at death"))
           (transl_nth conf "M/F" 0)
           (DateDisplay.string_of_age conf
              {day = 0; month = 0; year = fst ages_sum / fst ages_nb;
-              delta = 0; prec = Sure})
-          conf.xhs;
+              delta = 0; prec = Sure}) ;
       if snd ages_nb >= 3 then
-        Output.printf conf "%s (%s) : %s<br%s>\n"
+        Output.printf conf "%s (%s) : %s<br>\n"
           (Utf8.capitalize (transl conf "average age at death"))
           (transl_nth conf "M/F" 1)
           (DateDisplay.string_of_age conf
              {day = 0; month = 0; year = snd ages_sum / snd ages_nb;
-              delta = 0; prec = Sure})
-          conf.xhs;
-      Output.printf conf "<br%s>\n" conf.xhs;
+              delta = 0; prec = Sure});
+      Output.printf conf "<br>\n";
       Output.printf conf "<div align=\"center\">\n";
-      Output.printf conf "<hr width=\"50%%\"%s>\n" conf.xhs;
+      Output.printf conf "<hr width=\"50%%\">\n";
       Output.printf conf "</div>\n";
-      Output.printf conf "<br%s>\n" conf.xhs;
+      Output.printf conf "<br>\n";
       let by =
         match p_getenv conf.env "by" with
           Some s -> s
@@ -159,26 +157,22 @@ let print_death conf base =
       Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
       Output.printf conf "<p>\n";
       Util.hidden_env conf;
-      Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"LD\"%s>\n"
-        conf.xhs;
-      begin let ds =
-              Printf.sprintf
-                "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"%s>" len
-                conf.xhs
+      Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"LD\">\n";
+      begin
+        let ds =
+          Printf.sprintf
+            "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\">" len
         in
         Output.printf conf (fcapitale (ftransl conf "the latest %t deaths"))
           (fun _ -> ds)
       end;
       Output.printf conf "\n... (%s...\n" (transl conf "before");
       Output.printf conf
-        "<input name=\"by\" value=\"%s\" size=\"4\" maxlength=\"4\"%s>\n" by
-        conf.xhs;
+        "<input name=\"by\" value=\"%s\" size=\"4\" maxlength=\"4\">\n" by;
       Output.printf conf
-        "<input name=\"bm\" value=\"%s\" size=\"2\" maxlength=\"2\"%s>\n" bm
-        conf.xhs;
+        "<input name=\"bm\" value=\"%s\" size=\"2\" maxlength=\"2\">\n" bm;
       Output.printf conf
-        "<input name=\"bd\" value=\"%s\" size=\"2\" maxlength=\"2\"%s>\n" bd
-        conf.xhs;
+        "<input name=\"bd\" value=\"%s\" size=\"2\" maxlength=\"2\">\n" bd;
       Output.printf conf ")\n";
       Output.printf conf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
@@ -475,9 +469,9 @@ let print_population_pyramid conf base =
   let print_image doit sex iname =
     Output.printf conf "<td>";
     if doit then
-      Output.printf conf "<img src=\"%s/%s\" alt=\"%s\" title=\"%s\"%s>\n"
+      Output.printf conf "<img src=\"%s/%s\" alt=\"%s\" title=\"%s\">\n"
         (Util.image_prefix conf) iname (transl_nth conf "M/F" sex)
-        (transl_nth conf "M/F" sex) conf.xhs
+        (transl_nth conf "M/F" sex)
     else Output.printf conf "&nbsp;";
     Output.printf conf "</td>\n"
   in
@@ -586,15 +580,12 @@ let print_population_pyramid conf base =
   Output.printf conf "<p>\n";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" (commd conf);
   hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"POP_PYR\"%s>\n"
-    conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"int\" value=\"%d\"%s>\n"
-    interval conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"lim\" value=\"%d\"%s>\n" limit
-    conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"POP_PYR\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"int\" value=\"%d\">\n"
+    interval;
+  Output.printf conf "<input type=\"hidden\" name=\"lim\" value=\"%d\">\n" limit;
   Output.printf conf "%s\n" (transl_nth conf "year/month/day" 0);
-  Output.printf conf "<input name=\"y\" value=\"%d\" size=\"5\"%s>\n" at_year
-    conf.xhs;
+  Output.printf conf "<input name=\"y\" value=\"%d\" size=\"5\">\n" at_year;
   Output.printf conf "</form>\n";
   Output.printf conf "</p>\n";
   Hutil.trailer conf

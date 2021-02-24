@@ -42,8 +42,8 @@ let print_input_excl conf string_of_i excl excl_name =
   let s = input_excl string_of_i excl in
   if s = "" then ()
   else
-    Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-      excl_name s conf.xhs
+    Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
+      excl_name s
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   let title _ = Output.printf conf "%s\n" (Utf8.capitalize (transl conf "merge")) in
@@ -65,20 +65,19 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Output.printf conf
-    "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_IND_Y_N\"%s>\n"
-    conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n"
-    (string_of_iper ip) conf.xhs;
+    "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_IND_Y_N\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
+    (string_of_iper ip);
   print_input_excl conf string_of_iper ((ip1, ip2) :: iexcl) "iexcl";
   print_input_excl conf string_of_ifam fexcl "fexcl";
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_iper ip1) conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"select\" value=\"%s\"%s>\n"
-    (string_of_iper ip2) conf.xhs;
-  Output.printf conf "<input type=\"submit\" name=\"answer_y\" value=\"%s\"%s>\n"
-    (transl_nth conf "Y/N" 0) conf.xhs;
-  Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\"%s>\n"
-    (transl_nth conf "Y/N" 1) conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_iper ip1);
+  Output.printf conf "<input type=\"hidden\" name=\"select\" value=\"%s\">\n"
+    (string_of_iper ip2);
+  Output.printf conf "<input type=\"submit\" name=\"answer_y\" value=\"%s\">\n"
+    (transl_nth conf "Y/N" 0);
+  Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\">\n"
+    (transl_nth conf "Y/N" 1);
   Output.printf conf "</form>\n";
   Output.printf conf "</p>\n";
   Hutil.trailer conf
@@ -114,20 +113,19 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Output.printf conf
-    "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_FAM_Y_N\"%s>\n"
-    conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\"%s>\n"
-    (string_of_iper ip) conf.xhs;
+    "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_FAM_Y_N\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
+    (string_of_iper ip);
   print_input_excl conf string_of_iper iexcl "iexcl";
   print_input_excl conf string_of_ifam ((ifam1, ifam2) :: fexcl) "fexcl";
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\"%s>\n"
-    (string_of_ifam ifam1) conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\"%s>\n"
-    (string_of_ifam ifam2) conf.xhs;
-  Output.printf conf "<input type=\"submit\" name=\"answer_y\" value=\"%s\"%s>\n"
-    (transl_nth conf "Y/N" 0) conf.xhs;
-  Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\"%s>\n"
-    (transl_nth conf "Y/N" 1) conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
+    (string_of_ifam ifam1);
+  Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
+    (string_of_ifam ifam2);
+  Output.printf conf "<input type=\"submit\" name=\"answer_y\" value=\"%s\">\n"
+    (transl_nth conf "Y/N" 0);
+  Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\">\n"
+    (transl_nth conf "Y/N" 1);
   Output.printf conf "</form>\n";
   Output.printf conf "</p>\n";
   Hutil.trailer conf

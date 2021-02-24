@@ -27,21 +27,20 @@ let print_differences conf base branches p1 p2 =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Output.printf conf "<p>\n";
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\"%s>\n"
-    conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"i1\" value=\"%s\"%s>\n"
-    (string_of_iper (get_iper p1)) conf.xhs;
-  Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\"%s>\n"
-    (string_of_iper (get_iper p2)) conf.xhs;
+  Output.printf conf "<input type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\">\n";
+  Output.printf conf "<input type=\"hidden\" name=\"i1\" value=\"%s\">\n"
+    (string_of_iper (get_iper p1));
+  Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
+    (string_of_iper (get_iper p2));
   begin let rec loop =
     function
       [ip1, ip2] ->
         Output.printf conf
-          "<input type=\"hidden\" name=\"ini1\" value=\"%s\"%s>\n"
-          (string_of_iper ip1) conf.xhs;
+          "<input type=\"hidden\" name=\"ini1\" value=\"%s\">\n"
+          (string_of_iper ip1);
         Output.printf conf
-          "<input type=\"hidden\" name=\"ini2\" value=\"%s\"%s>\n"
-          (string_of_iper ip2) conf.xhs
+          "<input type=\"hidden\" name=\"ini2\" value=\"%s\">\n"
+          (string_of_iper ip2)
     | _ :: branches -> loop branches
     | _ -> ()
   in
@@ -49,16 +48,15 @@ let print_differences conf base branches p1 p2 =
   end;
   begin match p_getenv conf.env "m", p_getint conf.env "ip" with
     Some "MRG_DUP_IND_Y_N", Some ip ->
-      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%d\"%s>\n" ip
-        conf.xhs;
+      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%d\">\n" ip;
       List.iter
         (fun excl_name ->
            match p_getenv conf.env excl_name with
              Some "" | None -> ()
            | Some s ->
                Output.printf conf
-                 "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n"
-                 excl_name s conf.xhs)
+                 "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
+                 excl_name s)
         ["iexcl"; "fexcl"]
   | _ -> ()
   end;

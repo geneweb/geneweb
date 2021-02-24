@@ -206,7 +206,7 @@ let macro conf base =
   | 'w' ->
       let s = Hutil.link_to_referer conf in if s = "" then "&nbsp;" else s
   | 'W' -> Util.get_referer conf
-  | '/' -> conf.xhs
+  | '/' -> ""
   | c -> "%" ^ String.make 1 c
 
 module Lbuff = Buff.Make (struct  end)

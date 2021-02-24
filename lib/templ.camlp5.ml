@@ -835,7 +835,7 @@ and eval_simple_variable conf =
       in
       List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ "&") c l
   | "version" -> Version.txt
-  | "/" -> conf.xhs
+  | "/" -> ""
   | _ -> raise Not_found
 
 let rec string_of_expr_val =
@@ -1305,13 +1305,13 @@ let print_wid_hei conf fname =
 let print_copyright conf =
   Util.include_template conf [] "copyr"
     (fun () ->
-      Output.printf conf "<hr style=\"margin:0\"%s>\n" conf.xhs;
+      Output.printf conf "<hr style=\"margin:0\">\n";
       Output.printf conf "<div style=\"font-size: 80%%\">\n";
       Output.printf conf "<em>";
       Output.printf conf "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
       Output.printf conf "</em>";
       Output.printf conf "</div>\n";
-      Output.printf conf "<br%s>\n" conf.xhs)
+      Output.printf conf "<br>\n")
 
 let print_copyright_with_logo conf =
   let conf =

@@ -164,7 +164,7 @@ let print_shortest_path conf base p1 p2 =
               (Utf8.capitalize
                  (cftransl conf "no known relationship link between %s and %s"
                     [s1; s2]));
-            Output.printf conf "<br%s>\n" conf.xhs;
+            Output.printf conf "<br>\n";
             begin
               Output.printf conf "<p>\n";
               begin
@@ -505,8 +505,8 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                Some p -> p
              | _ -> p2
            in
-           Output.printf conf "<img src=\"%s/%s\" alt=\"\"%s>\n"
-             (Util.image_prefix conf) "picto_rel_small.png" conf.xhs;
+           Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
+             (Util.image_prefix conf) "picto_rel_small.png";
            Output.printf conf "<a href=\"%sm=RL&%s&l1=%d&%s&l2=%d&%s%s%s%s%s\">"
              (commd conf) (acces conf base a) x1 (acces_n conf base "1" dp1)
              x2 (acces_n conf base "2" dp2)
@@ -554,8 +554,8 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
                Some p -> p
              | _ -> p2
            in
-           Output.printf conf "<img src=\"%s/%s\" alt=\"\"%s>\n"
-             (Util.image_prefix conf) "picto_rel_small.png" conf.xhs;
+           Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
+             (Util.image_prefix conf) "picto_rel_small.png";
            Output.printf conf "<a href=\"%sm=RL&%s&l1=%d&%s&l2=%d&%s%s%s%s%s\">"
              (commd conf) (acces conf base a) x1 (acces_n conf base "1" dp1)
              x2 (acces_n conf base "2" dp2)
@@ -609,8 +609,8 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
 let print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), _) = sol in
   Output.printf conf "<p>\n";
-  Output.printf conf "<img src=\"%s/%s\" alt=\"\"%s>\n" (Util.image_prefix conf)
-    "picto_fleche_bleu.png" conf.xhs;
+  Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n" (Util.image_prefix conf)
+    "picto_fleche_bleu.png";
   print_link_name conf base n p1 p2 sol;
   Output.printf conf "</p>\n";
   if x1 = 0 || x2 = 0 then
@@ -653,8 +653,8 @@ let print_dag_links conf base p1 p2 rl =
   if something then
     let rest = ref false in
     if is_anc then
-      Output.printf conf "<img src=\"%s/%s\" alt=\"\"%s>\n"
-        (Util.image_prefix conf) "picto_fleche_bleu.png" conf.xhs
+      Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
+        (Util.image_prefix conf) "picto_fleche_bleu.png"
     else Output.printf conf "<ul>\n";
     M.iter
       (fun ip (pp1, pp2, nn, nt, _) ->
@@ -742,8 +742,8 @@ let print_propose_upto conf base p1 p2 rl =
       in
       let (p, a) = if x1 = 0 then p2, p1 else p1, p2 in
       Output.printf conf "<p>\n";
-      Output.printf conf "<img src=\"%s/%s\" alt=\"\"%s>\n"
-        (Util.image_prefix conf) "picto_fleche_bleu.png" conf.xhs;
+      Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
+        (Util.image_prefix conf) "picto_fleche_bleu.png";
       Output.printf conf "<span class=\"smaller\">";
       Output.print_string conf
         (let s = person_title_text conf base p in
@@ -753,8 +753,8 @@ let print_propose_upto conf base p1 p2 rl =
       Output.printf conf " %s"
         (transl_decline conf "up to" (person_title_text conf base a));
       Output.printf conf "\n&nbsp;";
-      Output.printf conf "<img src=\"%s/%s\" alt=\"\"%s>\n"
-        (Util.image_prefix conf) "picto_rel_asc.png" conf.xhs;
+      Output.printf conf "<img src=\"%s/%s\" alt=\"\">\n"
+        (Util.image_prefix conf) "picto_rel_asc.png";
       Output.printf conf "<a href=\"%sm=A&t=D&%s&%s&l=%d\">" (commd conf)
         (acces conf base p) (acces_n conf base "1" a) maxlen;
       Output.print_string conf (Utf8.capitalize (transl conf "see"));
@@ -895,7 +895,7 @@ let print_main_relationship conf base long p1 p2 rel =
                (cftransl conf "no known relationship link between %s and %s"
                   [gen_person_title_text reference raw_access conf base p1;
                    gen_person_title_text reference raw_access conf base p2]));
-          Output.printf conf "<br%s>\n" conf.xhs;
+          Output.printf conf "<br>\n";
           begin
             Output.printf conf "<p>\n";
             begin
