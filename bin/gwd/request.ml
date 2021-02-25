@@ -906,3 +906,8 @@ let treat_request =
         (Utf8.capitalize (transl conf "reserved to friends or wizards"));
       Hutil.trailer conf
     end
+
+let treat_request conf =
+  try treat_request conf with
+  | Update.ModErr _ -> Output.flush conf ; ()
+  | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)

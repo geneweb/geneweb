@@ -212,24 +212,28 @@ let print_continue
     conf ?(continue = Utf8.capitalize (transl conf "continue")) param value =
   print_aux conf param value continue
 
-let print_err_unknown conf _base (f, s, o) =
+let prerr conf _err fn =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
-  Output.printf conf "%s%s <strong>%s.%d %s</strong>\n"
-    (Utf8.capitalize (transl conf "unknown person")) (transl conf ":") f o s;
-  print_return conf;
+  Hutil.rheader conf title ;
+  fn () ;
   Hutil.trailer conf;
+  Output.flush conf ;
 #ifdef API
-    end;
+  end ;
 #endif
+  raise @@ ModErr _err
+
+let print_err_unknown conf _base (f, s, o) =
   let err =
     Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
       (Utf8.capitalize (transl conf "unknown person")) (transl conf ":") f o s
   in
-  raise @@ ModErr err
+  prerr conf err @@ fun () ->
+  Output.print_string conf err;
+  print_return conf
 
 let delete_topological_sort_v conf _base =
   let bfile = Util.bpath (conf.bname ^ ".gwb") in
@@ -722,19 +726,10 @@ let print_warnings_and_miscs conf base wl ml =
 
 let error conf base x =
   let err = string_of_error conf base x in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
+  prerr conf err @@ fun () ->
   Output.print_string conf err;
   Output.print_string conf "\n";
-  print_return conf;
-  Hutil.trailer conf;
-#ifdef API
-  end ;
-#endif
-  raise @@ ModErr err
+  print_return conf
 
 let error_locked conf =
   let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
@@ -800,18 +795,9 @@ let error_digest conf =
     Printf.sprintf @@
     fcapitale (ftransl conf "the base has changed; do \"back\", \"reload\", and refill the form")
   in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
+  prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "<p>%s.\n</p>\n" err ;
-  Hutil.trailer conf;
-#ifdef API
-  end;
-#endif
-  raise @@ ModErr err
+  Output.printf conf "<p>%s.\n</p>\n" err
 
 let digest_person p = Iovalue.digest p
 let digest_family (fam, cpl, des) = Iovalue.digest (fam, cpl, des)
@@ -838,17 +824,8 @@ let bad_date conf d =
          | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a)
       d
   in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title ;
-  Output.print_string conf err ;
-  Hutil.trailer conf ;
-#ifdef API
-    end;
-#endif
-  raise @@ ModErr err
+  prerr conf err @@ fun () ->
+  Output.print_string conf err
 
 let int_of_field s =
   match int_of_string (String.trim s) with
@@ -1086,11 +1063,7 @@ let print_create_conflict conf base p var =
          Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
       (fun _ -> "</a>.");
   in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
+  prerr conf err @@ fun () ->
   Output.print_string conf err ;
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
@@ -1140,12 +1113,7 @@ let print_create_conflict conf base p var =
   Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
     (Utf8.capitalize (transl conf "back"));
   Output.print_string conf "</form>\n";
-  print_same_name conf base p;
-  Hutil.trailer conf;
-#ifdef API
-  end ;
-#endif
-  raise @@ ModErr err
+  print_same_name conf base p
 
 let insert_person conf base src new_persons (f, s, o, create, var) =
   let f = if f = "" then "?" else f in

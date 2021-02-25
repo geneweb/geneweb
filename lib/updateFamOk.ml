@@ -544,19 +544,10 @@ let error_family conf err =
       (transl conf ":")
       err
   in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
-  Output.print_string conf (Utf8.capitalize err); 
+  Update.prerr conf err' @@ fun () ->
+  Output.print_string conf (Utf8.capitalize err);
   Output.print_string conf "\n";
-  Update.print_return conf;
-  Hutil.trailer conf;
-#ifdef API
-    end;
-#endif
-  raise @@ Update.ModErr err'
+  Update.print_return conf
 
 let check_parents conf cpl =
   let (fa_fn, fa_sn, _, _, _) = Gutil.father cpl in
@@ -601,39 +592,21 @@ let print_err_parents conf base p =
     Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
       (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p))
   in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
+  Update.prerr conf err @@ fun () ->
   Output.printf conf "\n%s<p><ul><li>%s%s %d</li></ul>"
     err
     (Utf8.capitalize (transl conf "first free number"))
     (Util.transl conf ":")
     (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
-  Update.print_return conf;
-  Hutil.trailer conf;
-#ifdef API
-    end;
-#endif
-  raise @@ Update.ModErr err
+  Update.print_return conf
 
 let print_err_sex conf base p err =
   let err =
     Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p) err
   in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
+  Update.prerr conf err @@ fun () ->
   Output.print_string conf err ;
-  Update.print_return conf;
-  Hutil.trailer conf;
-#ifdef API
-  end ;
-#endif
-  raise @@ Update.ModErr err
+  Update.print_return conf
 
 let print_err_father_sex conf base p =
   print_err_sex conf base p (transl conf "should be male")
@@ -643,32 +616,14 @@ let print_err_mother_sex conf base p =
 
 let print_err conf =
   let err = Printf.sprintf "%s" (Utf8.capitalize (transl conf "error")) in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf err in
-  Hutil.rheader conf title;
-  Update.print_return conf;
-  Hutil.trailer conf;
-#ifdef API
-  end;
-#endif
-  raise @@ Update.ModErr err
+  Update.prerr conf err @@ fun () ->
+  Update.print_return conf
 
 let print_error_disconnected conf =
   let err = Printf.sprintf "%s" (Utf8.capitalize (transl conf "msg error disconnected")) in
-#ifdef API
-  if not !Api_conf.mode_api then begin
-#endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
-  Hutil.rheader conf title;
+  Update.prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf err;
-  Hutil.trailer conf;
-#ifdef API
-  end ;
-#endif
-  raise @@ Update.ModErr err
+  Output.print_string conf err
 
 let family_exclude pfams efam =
   let pfaml =
