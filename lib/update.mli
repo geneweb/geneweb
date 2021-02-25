@@ -51,6 +51,13 @@ val print_return : config -> unit
 *)
 val print_continue : config -> ?continue:string -> string -> string -> unit
 
+(** [prerr conf msg callback]
+    Regular mode: print error page using [callback] (wrapped in header/trailer)
+    and and raise [ModErr msg]
+    API mode: only raise [ModErr msg]
+*)
+val prerr : config -> string -> (unit -> unit) -> 'a
+
 val string_of_error : config -> base -> CheckItem.base_error -> string
 val print_error : config -> base -> CheckItem.base_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit

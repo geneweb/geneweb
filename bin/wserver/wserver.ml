@@ -391,15 +391,11 @@ let f syslog addr_opt port tmout max_clients g =
         (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
         port ;
       flush stderr;
-      (* [accept_connection] may fork and raise an error, bypassing the [exit] instuction.  *)
-      let ppid = Unix.getpid () in
       while true do
-        let code =
-          try accept_connection tmout max_clients g s ; 0 with
-          | Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> -1
-          | Sys_error msg when msg = "Broken pipe" -> -1
-          | e -> syslog `LOG_CRIT (__FILE__ ^ " " ^ string_of_int __LINE__ ^ ": " ^ Printexc.to_string e) ; -1
-        in
-        flush_all () ;
-        if Unix.getpid () <> ppid then exit code
+        try accept_connection tmout max_clients g s with
+        | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
+          syslog `LOG_INFO (Printexc.to_string e)
+        | Sys_error msg as e when msg = "Broken pipe" ->
+          syslog `LOG_INFO (Printexc.to_string e)
+        | e -> raise e
       done
