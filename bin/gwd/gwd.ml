@@ -1973,4 +1973,5 @@ let () =
       !selected_port;
     flush stderr;
 #endif
+  | Dynlink.Error e -> GwdLog.syslog `LOG_CRIT (Dynlink.error_message e)
   | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)
