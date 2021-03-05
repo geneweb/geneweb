@@ -347,7 +347,7 @@ type base_func =
   ; nb_of_real_persons : unit -> int
   }
 
-type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023
+type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
 
 type dsk_base = { data : base_data
                 ; func : base_func

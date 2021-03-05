@@ -10,6 +10,7 @@ let magic_GnWb0020 = "GnWb0020"
 let magic_GnWb0021 = "GnWb0021"
 let magic_GnWb0022 = "GnWb0022"
 let magic_GnWb0023 = "GnWb0023"
+let magic_GnWb0024 = "GnWb0024"
 let table_size = 0x3fff
 
 let poi base i = base.data.persons.get i
@@ -47,13 +48,22 @@ let dsk_person_misc_names base p nobtit =
     (if p.sex = Female then husbands base p else [||])
     (father_titles_places base p nobtit)
 
-let compare_names base_data s1 s2 =
+let compare_snames base_data s1 s2 =
   Mutil.compare_after_particle (Lazy.force base_data.particles) s1 s2
 
-let compare_istr_fun base_data is1 is2 =
+let compare_snames_i base_data is1 is2 =
   if is1 = is2 then 0
   else
-    compare_names base_data
+    compare_snames base_data
+      (base_data.strings.get is1)
+      (base_data.strings.get is2)
+
+let compare_fnames = String.compare
+
+let compare_fnames_i base_data is1 is2 =
+  if is1 = is2 then 0
+  else
+    compare_fnames
       (base_data.strings.get is1)
       (base_data.strings.get is2)
 

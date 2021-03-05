@@ -118,7 +118,7 @@ let output_strings_hash tmp_strings_inx base =
 (* Associate istr to persons.
    A person is associated with its first name/surname and aliases
 *)
-let output_name_index_aux get base names_inx names_dat =
+let output_name_index_aux cmp get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
@@ -129,7 +129,7 @@ let output_name_index_aux get base names_inx names_dat =
   done ;
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
   ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
-  Array.sort (fun (k, _) (k', _) -> Dutil.compare_istr_fun base.data k k') a ;
+  Array.sort (fun (k, _) (k', _) -> cmp k k') a ;
   let oc_n_dat = Secure.open_out_bin names_dat in
   let bt2 =
     Array.map begin fun (i, ipl) ->
@@ -145,10 +145,18 @@ let output_name_index_aux get base names_inx names_dat =
   close_out oc_n_inx
 
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
-  output_name_index_aux (fun p -> p.surname) base tmp_snames_inx tmp_snames_dat
+  output_name_index_aux
+    (Dutil.compare_snames_i base.data)
+    (fun p -> p.surname)
+    base
+    tmp_snames_inx
+    tmp_snames_dat
 
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
-  output_name_index_aux (fun p -> p.first_name) base tmp_fnames_inx tmp_fnames_dat
+  output_name_index_aux
+    (Dutil.compare_fnames_i base.data)
+    (fun p -> p.first_name)
+    base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =
   let oc = open_out fname in
@@ -188,7 +196,7 @@ let output base =
     if epos <> pos_out oc then count_error epos (pos_out oc)
   in
   begin try
-      output_string oc Dutil.magic_GnWb0023;
+      output_string oc Dutil.magic_GnWb0024;
       output_binary_int oc base.data.persons.len;
       output_binary_int oc base.data.families.len;
       output_binary_int oc base.data.strings.len;

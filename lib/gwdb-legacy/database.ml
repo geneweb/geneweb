@@ -146,7 +146,7 @@ let old_persons_of_first_name_or_surname base_data params =
     Btree.Make
       (struct
         type t = int
-        let compare = Dutil.compare_istr_fun base_data
+        let compare = Dutil.compare_snames_i base_data
       end)
   in
   let fname_dat = Filename.concat bname names_dat in
@@ -217,7 +217,7 @@ let old_persons_of_first_name_or_surname base_data params =
   let cursor str =
     IstrTree.key_after
       (fun key ->
-         Dutil.compare_names base_data str (base_data.strings.get key))
+         Dutil.compare_snames base_data str (base_data.strings.get key))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -272,7 +272,7 @@ let binary_search_next arr cmp =
         aux acc (mid + 1) high
   in aux None 0 (Array.length arr - 1)
 
-let new_persons_of_first_name_or_surname base_data params =
+let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   let (proj, person_patches, names_inx, names_dat, bname) = params in
   let fname_dat = Filename.concat bname names_dat in
   let bt =
@@ -295,7 +295,7 @@ let new_persons_of_first_name_or_surname base_data params =
       end person_patches ;
       let a = Array.make (Dutil.IntHT.length ht) (0, []) in
       ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
-      Array.sort (fun (k, _) (k', _) -> Dutil.compare_istr_fun base_data k k') a ;
+      Array.sort (fun (k, _) (k', _) -> cmp_istr base_data k k') a ;
       a
     end
   in
@@ -306,7 +306,7 @@ let new_persons_of_first_name_or_surname base_data params =
         let s = base_data.strings.get istr in
         let cmp (k, _) =
           if k = istr then 0
-          else Dutil.compare_names base_data s (base_data.strings.get k)
+          else cmp_str base_data s (base_data.strings.get k)
         in
         let pos = snd @@ bt.(binary_search bt cmp) in
         let ic_dat = Secure.open_in_bin fname_dat in
@@ -332,7 +332,7 @@ let new_persons_of_first_name_or_surname base_data params =
   let cursor str =
     let bt = Lazy.force bt in
     let patched = Lazy.force patched in
-    let cmp (k, _) = Dutil.compare_names base_data str (base_data.strings.get k) in
+    let cmp (k, _) = cmp_str base_data str (base_data.strings.get k) in
     let istr1 = try fst bt.(binary_search_key_after bt cmp) with Not_found -> -1 in
     let istr2 = try fst patched.(binary_search_key_after patched cmp) with Not_found -> -1 in
     if istr2 = -1 then
@@ -345,9 +345,7 @@ let new_persons_of_first_name_or_surname base_data params =
     else if istr1 = istr2 then
       istr1
     else
-      let c =
-        Dutil.compare_names base_data (base_data.strings.get istr1) (base_data.strings.get istr2)
-      in
+      let c = cmp_str base_data (base_data.strings.get istr1) (base_data.strings.get istr2) in
     if c < 0 then istr1 else istr2
   in
   let next istr =
@@ -356,7 +354,7 @@ let new_persons_of_first_name_or_surname base_data params =
     let s = base_data.strings.get istr in
     let cmp (k, _) =
       if k = istr then 0
-      else Dutil.compare_names base_data s (base_data.strings.get k)
+      else cmp_str base_data s (base_data.strings.get k)
     in
     let istr1 = try fst bt.(binary_search_next bt cmp) with Not_found -> -1 in
     let istr2 = try fst patched.(binary_search_next patched cmp) with Not_found -> -1 in
@@ -371,14 +369,22 @@ let new_persons_of_first_name_or_surname base_data params =
       istr1
     else
       let c =
-        Dutil.compare_names base_data (base_data.strings.get istr1) (base_data.strings.get istr2)
+        cmp_str base_data (base_data.strings.get istr1) (base_data.strings.get istr2)
       in
       if c < 0 then istr1 else istr2
   in
   { find ; cursor ; next }
 
-let persons_of_first_name_or_surname = function
-  | GnWb0023 | GnWb0022 | GnWb0021 -> new_persons_of_first_name_or_surname
+let persons_of_first_name = function
+  | GnWb0024 ->
+    new_persons_of_first_name_or_surname (fun _ -> Dutil.compare_fnames) Dutil.compare_fnames_i
+  | GnWb0023 | GnWb0022 | GnWb0021 ->
+    new_persons_of_first_name_or_surname Dutil.compare_snames Dutil.compare_snames_i
+  | GnWb0020 -> old_persons_of_first_name_or_surname
+
+let persons_of_surname = function
+  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
+    new_persons_of_first_name_or_surname Dutil.compare_snames Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
 (* Search index for a given name in file names.inx *)
@@ -519,11 +525,11 @@ let new_strings_of_fname =
   new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
 
 let strings_of_sname = function
-  | GnWb0023 -> new_strings_of_sname
+  | GnWb0024 | GnWb0023 -> new_strings_of_sname
   | _ -> old_strings_of_fsname
 
 let strings_of_fname = function
-  | GnWb0023 -> new_strings_of_fname
+  | GnWb0024 | GnWb0023 -> new_strings_of_fname
   | _ -> old_strings_of_fsname
 
 (* Restrict file *)
@@ -784,7 +790,8 @@ let opendb bname =
   let particles = Mutil.input_particles (Filename.concat bname "particles.txt") in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
   let version =
-    if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
+    if Mutil.check_magic Dutil.magic_GnWb0024 ic then GnWb0024
+    else if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
     else if Mutil.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
     else if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
     else if Mutil.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
@@ -819,7 +826,7 @@ let opendb bname =
   in
   let ic2_string_start_pos =
     match version with
-    | GnWb0023 | GnWb0022 -> Dutil.int_size
+    | GnWb0024 | GnWb0023 | GnWb0022 -> Dutil.int_size
     | GnWb0021 | GnWb0020 -> 3 * Dutil.int_size
   in
   let ic2_string_hash_len =
@@ -1117,12 +1124,12 @@ let opendb bname =
     ; strings_of_sname = strings_of_sname version bname strings patches.h_person
     ; strings_of_fname = strings_of_fname version bname strings patches.h_person
     ; persons_of_surname =
-        persons_of_first_name_or_surname version
+        persons_of_surname version
           base_data
           ((fun p -> p.surname),
            snd patches.h_person, "snames.inx", "snames.dat", bname)
     ; persons_of_first_name =
-        persons_of_first_name_or_surname version
+        persons_of_first_name version
           base_data
           ((fun p -> p.first_name),
            snd patches.h_person, "fnames.inx", "fnames.dat", bname)
@@ -1202,4 +1209,4 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; nb_of_real_persons = (fun _ -> assert false)
     }
   in
-  { data ; func ; version = GnWb0023 }
+  { data ; func ; version = GnWb0024 }
