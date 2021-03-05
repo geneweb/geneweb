@@ -9,10 +9,14 @@ val magic_GnWb0020 : string
 val magic_GnWb0021 : string
 val magic_GnWb0022 : string
 val magic_GnWb0023 : string
+val magic_GnWb0024 : string
 val table_size : int
 
-val compare_istr_fun : Dbdisk.base_data -> int -> int -> int
-val compare_names : Dbdisk.base_data -> string -> string -> int
+val compare_fnames_i : Dbdisk.base_data -> int -> int -> int
+val compare_fnames : string -> string -> int
+
+val compare_snames_i : Dbdisk.base_data -> int -> int -> int
+val compare_snames : Dbdisk.base_data -> string -> string -> int
 
 val dsk_person_misc_names :
   dsk_base -> dsk_person -> (dsk_person -> dsk_title list) -> string list
