@@ -320,7 +320,8 @@ type base_data =
   ; couples : dsk_couple record_access
   ; descends : dsk_descend record_access
   ; strings : string record_access
-  ; particles : string list
+  ; particles_txt : string list
+  ; particles : Re.re Lazy.t
   ; bnotes : Def.base_notes
   ; bdir : string
   }

@@ -55,7 +55,7 @@ let persons_of_name base = base.func.Dbdisk.persons_of_name
 let persons_of_first_name base = base.func.Dbdisk.persons_of_first_name
 let persons_of_surname base = base.func.Dbdisk.persons_of_surname
 
-let base_particles base = base.data.particles
+let base_particles base = Lazy.force base.data.particles
 let base_strings_of_first_name base s = base.func.strings_of_fname s
 let base_strings_of_surname base s = base.func.strings_of_sname s
 

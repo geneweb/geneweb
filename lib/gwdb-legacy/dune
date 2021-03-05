@@ -5,6 +5,7 @@
   (libraries
     geneweb.def
     geneweb.util
+    re
     unix
   )
   (modules_without_implementation dbdisk)

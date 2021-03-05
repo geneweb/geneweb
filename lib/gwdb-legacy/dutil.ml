@@ -48,7 +48,7 @@ let dsk_person_misc_names base p nobtit =
     (father_titles_places base p nobtit)
 
 let compare_names base_data s1 s2 =
-  Mutil.compare_after_particle base_data.particles s1 s2
+  Mutil.compare_after_particle (Lazy.force base_data.particles) s1 s2
 
 let compare_istr_fun base_data is1 is2 =
   if is1 = is2 then 0

@@ -24,8 +24,6 @@ val iso_8859_1_of_utf_8 : string -> string
 val roman_of_arabian : int -> string
 val arabian_of_roman : string -> int
 
-val compare_after_particle : string list -> string -> string -> int
-
 val input_lexicon :
   string -> (string, string) Hashtbl.t -> (unit -> in_channel) -> unit
 
@@ -80,10 +78,18 @@ val start_with : ?wildcard:bool -> string -> int -> string -> bool
 *)
 val contains : ?wildcard:bool -> string -> string -> bool
 
+(** [compile_particles list]
+    Compile [list] so it can be used with [get_particle]
+    or [compare_after_particle] function. *)
+val compile_particles : string list -> Re.re
+
 (** [get_particle particles name]
     Return [p] where [p] is in [particles] and is prefix of [name].
     If no such [p] exists, empty string [""] is returned. *)
-val get_particle : string list -> string -> string
+val get_particle : Re.re -> string -> string
+
+(** [compare_after_particle particles s1 s2] *)
+val compare_after_particle : Re.re -> string -> string -> int
 
 (** [rm fname]
     Remove [fname]. If [fname] does not exists, do nothing.
