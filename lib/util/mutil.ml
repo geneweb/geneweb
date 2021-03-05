@@ -404,13 +404,20 @@ let contains ?(wildcard = false) str sub =
       i <= strlen && (start_with ~wildcard sub i str || loop (i + 1))
     in loop 0
 
-let get_particle list s =
-  let rec loop = function
-    | hd :: _ when start_with hd 0 s -> hd
-    | _ :: tl -> loop tl
-    | [] -> ""
+let compile_particles list =
+  let parts =
+    list
+    |> List.map (fun s -> Re.str (tr '_' ' ' s))
+    |> Re.alt
+    |> Re.group
   in
-  loop list
+  Re.(seq [ bos ; parts ; greedy (rep notnl) ])
+  |> Re.compile
+
+let get_particle re s =
+  match Re.exec_opt re s with
+  | Some g -> Re.Group.get g 1
+  | None -> ""
 
 let compare_after_particle particles s1 s2 =
   let p1 = get_particle particles s1 in

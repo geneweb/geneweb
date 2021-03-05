@@ -781,9 +781,7 @@ let opendb bname =
   fst pending.h_descend := !(fst patches.h_descend) ;
   fst pending.h_string := !(fst patches.h_string) ;
   let synchro = input_synchro bname in
-  let particles =
-    Mutil.input_particles (Filename.concat bname "particles.txt")
-  in
+  let particles = Mutil.input_particles (Filename.concat bname "particles.txt") in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
   let version =
     if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
@@ -1106,7 +1104,8 @@ let opendb bname =
     ; couples
     ; descends
     ; strings
-    ; particles
+    ; particles_txt = particles
+    ; particles = lazy (Mutil.compile_particles particles)
     ; bnotes
     ; bdir = bname
     }
@@ -1169,7 +1168,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; couples = record_access_of couples
     ; descends = record_access_of descends
     ; strings = record_access_of strings
-    ; particles
+    ; particles_txt = particles
+    ; particles = lazy (Mutil.compile_particles particles)
     ; bnotes = bnotes
     ; bdir = bdir }
   in

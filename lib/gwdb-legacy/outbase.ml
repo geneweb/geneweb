@@ -274,7 +274,7 @@ let output base =
                Mutil.mkdir_p (Filename.dirname fname);
                let oc = open_out fname in output_string oc s; close_out oc)
             (List.rev (base.data.bnotes.Def.efiles ()));
-          output_particles_file base.data.particles tmp_particles
+          output_particles_file base.data.particles_txt tmp_particles
         with e ->
           (try close_out oc_inx with _ -> ());
           (try close_out oc_inx_acc with _ -> ());

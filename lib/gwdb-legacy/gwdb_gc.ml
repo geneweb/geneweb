@@ -167,7 +167,7 @@ let gc ?(dry_run = true) base =
       Array.init lens begin fun i -> base.data.strings.get @@ src_istr i end
     in
     let bnotes = base.data.bnotes in
-    let particles = base.data.particles in
+    let particles = base.data.particles_txt in
     let bname = base.data.bdir in
     base.data.persons.clear_array () ;
     base.data.ascends.clear_array () ;

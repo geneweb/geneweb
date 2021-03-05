@@ -2,6 +2,6 @@
  (name gwdb_driver_mli)
  (public_name geneweb.gwdb_driver)
  (wrapped false)
- (libraries geneweb.def)
+ (libraries geneweb.def re)
  (virtual_modules gwdb_driver)
 )

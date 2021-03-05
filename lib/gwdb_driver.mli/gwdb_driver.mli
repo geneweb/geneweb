@@ -163,7 +163,7 @@ val spi_find : string_person_index -> istr -> iper list
 
 val base_visible_get : base -> (person -> bool) -> iper -> bool
 val base_visible_write : base -> unit
-val base_particles : base -> string list
+val base_particles : base -> Re.re
 
 (** [base_strings_of_first_name base x]
     Return the list of first names (as [istr]) being equal to [x]
