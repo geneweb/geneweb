@@ -389,20 +389,20 @@ let start_with ?(wildcard = false) ini i s =
   in
   loop 0 i
 
-let contains ?(wildcard = false) str sub =
+let contains str sub =
   let strlen = String.length str in
   let sublen = String.length sub in
-  if not wildcard
-  then
-    let rec loop i =
-      if i + sublen <= strlen
-      then start_with ~wildcard sub i str || loop (i + 1)
-      else false
-    in loop 0
-  else
-    let rec loop i =
-      i <= strlen && (start_with ~wildcard sub i str || loop (i + 1))
-    in loop 0
+  let rec aux i1 i2 =
+    if i1 = sublen then true
+    else if i2 = strlen then false
+    else if String.unsafe_get str i2 = String.unsafe_get sub i1
+    then aux (i1 + 1) (i2 + 1)
+    else false
+  in
+  let rec loop i =
+    if i + sublen <= strlen then aux 0 i || loop (i + 1)
+    else false
+  in loop 0
 
 let compile_particles list =
   let parts =

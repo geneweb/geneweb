@@ -5,18 +5,15 @@ open Def
 
 let mutil_contains _ =
   let str = "foo bar" in
-  let test t b1 b2 =
-    assert_equal b1 (Mutil.contains ~wildcard:false str t)
-  ; assert_equal b2 (Mutil.contains ~wildcard:true str t)
-  in
-  test "foo" true true
-; test "baz" false false
-; test "foo_b" false true
-; test "foo b" true true
-; test "foo__b" false false
-; test "bar__" false true
-; test "r" true true
-; test "" true true
+  let test t b1 = assert_equal b1 (Mutil.contains str t) in
+  test "foo" true
+; test "baz" false
+; test "foo_b" false
+; test "foo b" true
+; test "foo__b" false
+; test "bar__" false
+; test "r" true
+; test "" true
 
 let mutil_start_with _ =
   assert_raises (Invalid_argument "start_with")
