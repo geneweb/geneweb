@@ -39,11 +39,12 @@ let mutil_arabian_romian _ =
   test 207 "CCVII" ;
   test 1066 "MLXVI"
 
+let test_particles =
+  [ "da_" ; "dal_" ; "de_la_" ; "de_" ; "del_" ; "della_" ; "des_" ; "du_"
+  ; "d'" ; "van_" ; "von_" ]
+
 let mutil_compare_after_particle _ =
-  let particles =
-    [ "da " ; "dal " ; "de la " ; "de " ; "del " ; "della " ; "des " ; "du "
-    ; "d'" ; "van " ; "von " ]
-  in
+  let particles = Mutil.compile_particles test_particles in
   let test a b =
     let test exp a b =
       let cmp = Mutil.compare_after_particle particles in
@@ -58,6 +59,7 @@ let mutil_compare_after_particle _ =
     test 0 b b
   in
   test "de la fontaine" "de musset" ;
+  test "de montaine" "de la nusset"  ;
   test "de sade" "de sévigné" ;
   test "de lattre de tassigny" "de montgolfier" ;
   test "des cars" "du guesclin" ;
