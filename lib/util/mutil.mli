@@ -72,11 +72,9 @@ val array_assoc : 'k -> ('k * 'v) array -> 'v
 *)
 val start_with : ?wildcard:bool -> string -> int -> string -> bool
 
-(** [contains ?wildcard str sub] Test [sub] is contained in [str].
-    See {!val:start_with} for details about [wildcard]
-    (with [sub] in the role of [prefix]).
+(** [contains str sub] Test [sub] is contained in [str].
 *)
-val contains : ?wildcard:bool -> string -> string -> bool
+val contains : string -> string -> bool
 
 (** [compile_particles list]
     Compile [list] so it can be used with [get_particle]
