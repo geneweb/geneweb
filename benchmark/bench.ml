@@ -2,10 +2,18 @@ open Geneweb
 
 let style = ref Benchmark.Auto
 
+let test_fn =
+  try
+    let l = String.split_on_char ',' @@ Sys.getenv "BENCH_FN" in
+    fun s -> List.mem s l
+  with Not_found -> fun _ -> true
+
 let bench ?(t=1) name fn arg =
-  if match Sys.getenv_opt "BENCH_FN" with None -> true | Some x -> x = name
-  then Benchmark.throughput1 ~style:!style ~name t (List.map fn) arg
-  else []
+  if test_fn name
+  then begin
+    Gc.compact () ;
+    Benchmark.throughput1 ~style:!style ~name t (List.map fn) arg
+  end else []
 
 let list =
   [1;2;10;100;1000;10000;100000;1000000;10000000;100000000;1000000000]
