@@ -12,7 +12,7 @@ open Api_util
 
 module StrSet = Mutil.StrSet
 
-let string_start_with ini s = Mutil.start_with ~wildcard:true ini 0 s
+let string_start_with ini s = Mutil.start_with_wildcard ini 0 s
 
 (* Algo de Knuth-Morris-Pratt *)
 let init_next p =
@@ -710,7 +710,7 @@ let search_auto_complete conf base mode place_mode max n =
             else hd
           in
           let acc =
-            if Mutil.start_with ~wildcard:true ini 0 @@ Name.lower @@ Mutil.tr '_' ' ' hd'
+            if Mutil.start_with_wildcard ini 0 @@ Name.lower @@ Mutil.tr '_' ' ' hd'
             then (incr nb ; hd :: acc)
             else acc
           in

@@ -85,7 +85,7 @@ let rec get_list_from_cache ?(retry = true) conf base mode max_res s =
         | name :: l ->
           let k = Mutil.tr '_' ' ' name in
           let (accu, nb_res) =
-            if Mutil.start_with ~wildcard:true ini 0 (Name.lower k)
+            if Mutil.start_with_wildcard ini 0 (Name.lower k)
             then name :: accu, nb_res + 1
             else accu, nb_res
           in

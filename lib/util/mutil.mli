@@ -62,15 +62,22 @@ val array_to_list_rev_map : ('a -> 'b) -> 'a array -> 'b list
     Raise [Not_found] if there is no value associated with [k] in [arr]. *)
 val array_assoc : 'k -> ('k * 'v) array -> 'v
 
-(** [start_with ?wildcard prefix off str]
+(** [start_with prefix off str]
     Test if [str] starts with [prefix] (at offset [off]).
-    If [wildcard] is set to [true], occurences of ['_'] in [prefix]
-    will match both ['_'] and [' '] in [str] and trailing ['_'] of [prefix]
+
+    Raise [Invalid_argument] if [off] is not a valid index in [str].
+*)
+val start_with : string -> int -> string -> bool
+
+(** [start_with_wildcard prefix off str]
+    Test if [str] starts with [prefix] (at offset [off]).
+    Occurences of ['_'] in [prefix] will match both ['_']
+    and [' '] in [str] and trailing ['_'] of [prefix]
     is treated as an optional ['_'] [' '].
 
     Raise [Invalid_argument] if [off] is not a valid index in [str].
 *)
-val start_with : ?wildcard:bool -> string -> int -> string -> bool
+val start_with_wildcard : string -> int -> string -> bool
 
 (** [contains str sub] Test [sub] is contained in [str].
 *)
