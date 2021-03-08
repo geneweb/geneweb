@@ -237,7 +237,7 @@ and module_date conf =
   let string_of_ondate =
     func_arg1_no_kw @@ fun d ->
     try
-      Tstr (DateDisplay.string_of_ondate conf @@ Def.Dgreg (to_dmy d, of_calendar d) )
+      Tstr (DateDisplay.string_of_ondate ~link:false conf @@ Def.Dgreg (to_dmy d, of_calendar d) )
     with e ->
       if Jg_runtime.jg_obj_lookup d "__Dtext__" = Tbool true
       then Jg_runtime.jg_obj_lookup d "__str__"
