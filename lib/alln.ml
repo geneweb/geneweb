@@ -53,7 +53,7 @@ let select_names conf base is_surnames ini limit =
         let rec loop istr len list =
           let s = Translate.eval (Mutil.nominative (sou base istr)) in
           let k = Util.name_key base s in
-          if Mutil.start_with ~wildcard:true ini 0 k then
+          if Mutil.start_with_wildcard ini 0 k then
             let (list, len) =
               if s <> "?" then
                 let ips = spi_find iii istr in

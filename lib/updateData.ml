@@ -425,7 +425,7 @@ let build_list conf base =
   if ini <> "" then
     Util.filter_map begin fun istr ->
       let str = sou base istr in
-      if Mutil.start_with ~wildcard:true ini 0 @@ Place.without_suburb str
+      if Mutil.start_with ini 0 @@ Place.without_suburb str
       then Some (istr, str)
       else None
     end list
