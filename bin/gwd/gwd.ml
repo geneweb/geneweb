@@ -1087,10 +1087,6 @@ let make_conf from_addr request script_name env =
   let (threshold_test, env) = extract_assoc "threshold" env in
   if threshold_test <> "" then
     RelationLink.threshold := int_of_string threshold_test;
-  let (sleep, env) =
-    let (x, env) = extract_assoc "sleep" env in
-    (if x = "" then 0 else int_of_string x), env
-  in
   let base_env = read_base_env base_file in
   let default_lang =
     try
@@ -1245,7 +1241,7 @@ let make_conf from_addr request script_name env =
     ; output_conf
     }
   in
-  conf, sleep, ar
+  conf, ar
 
 let log tm conf from gauth request script_name contents =
   GwdLog.log @@ fun oc ->
@@ -1334,7 +1330,7 @@ let no_access conf =
   Hutil.trailer conf
 
 let conf_and_connection from request script_name contents env =
-  let (conf, sleep, passwd_err) = make_conf from request script_name env in
+  let (conf, passwd_err) = make_conf from request script_name env in
   match !redirected_addr with
     Some addr -> print_redirected conf from request addr
   | None ->
@@ -1373,18 +1369,15 @@ let conf_and_connection from request script_name contents env =
               (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
       | _ ->
-        begin
-          try Request.treat_request conf
-          with e ->
-            let err = Printexc.to_string e in
-            let context =
-              conf.bname
-              ^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
-              ^ contents
-            in
-            GwdLog.syslog `LOG_CRIT (context ^ " " ^ err)
-        end ;
-        if conf.manitou && sleep > 0 then Unix.sleep sleep
+        try Request.treat_request conf
+        with e ->
+          let err = Printexc.to_string e in
+          let context =
+            conf.bname
+            ^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
+            ^ contents
+          in
+          GwdLog.syslog `LOG_CRIT (context ^ " " ^ err)
 
 let chop_extension name =
   let rec loop i =
