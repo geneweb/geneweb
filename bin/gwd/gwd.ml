@@ -1329,7 +1329,18 @@ let no_access conf =
   Output.print_string conf "No access to this database in CGI mode\n";
   Hutil.trailer conf
 
-let conf_and_connection from request script_name contents env =
+let conf_and_connection =
+  let slow_query_threshold =
+    match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
+    | Some x -> float_of_string x
+    | None -> infinity
+  in
+  let context conf contents =
+    conf.bname
+    ^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
+    ^ contents
+  in
+  fun from request script_name contents env ->
   let (conf, passwd_err) = make_conf from request script_name env in
   match !redirected_addr with
     Some addr -> print_redirected conf from request addr
@@ -1369,15 +1380,17 @@ let conf_and_connection from request script_name contents env =
               (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
       | _ ->
-        try Request.treat_request conf
+        try
+          let t1 = Unix.gettimeofday () in
+          Request.treat_request conf ;
+          let t2 = Unix.gettimeofday () in
+          if t2 -. t1 > slow_query_threshold
+          then
+            GwdLog.syslog
+              `LOG_WARNING
+              (Printf.sprintf "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
         with e ->
-          let err = Printexc.to_string e in
-          let context =
-            conf.bname
-            ^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
-            ^ contents
-          in
-          GwdLog.syslog `LOG_CRIT (context ^ " " ^ err)
+          GwdLog.syslog `LOG_CRIT (context conf contents ^ " " ^ Printexc.to_string e)
 
 let chop_extension name =
   let rec loop i =
