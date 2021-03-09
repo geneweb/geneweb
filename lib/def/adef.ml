@@ -106,8 +106,6 @@ let od_of_cdate od =
 
 let cdate_None = cdate_of_od None
 
-exception Request_failure of string
-
 type 'person gen_couple = { father : 'person; mother : 'person }
 and 'person gen_parents = { parent : 'person array }
 

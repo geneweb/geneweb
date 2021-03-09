@@ -896,9 +896,8 @@ let opendb bname =
     let tmp_fname = Filename.concat bname "1synchro_patches" in
     let fname = Filename.concat bname "synchro_patches" in
     let oc9 =
-      try Secure.open_out_bin tmp_fname with
-        Sys_error _ ->
-          raise (Adef.Request_failure "the database is not writable")
+      try Secure.open_out_bin tmp_fname
+      with Sys_error _ -> raise (Failure "the database is not writable")
     in
     let synchro =
       let timestamp = string_of_float (Unix.time ()) in

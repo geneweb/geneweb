@@ -35,8 +35,6 @@ val cdate_None : cdate
 val od_of_cdate : cdate -> date option
 val cdate_of_od : date option -> cdate
 
-exception Request_failure of string
-
 val father : 'a gen_couple -> 'a
 val mother : 'a gen_couple -> 'a
 val couple : 'a -> 'a -> 'a gen_couple

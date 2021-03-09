@@ -595,19 +595,6 @@ let index_not_name s =
   in
   loop 0
 
-let print_request_failure conf msg =
-  http conf Def.OK;
-  Output.header conf "Content-type: text/html";
-  Output.print_string conf "<head><title>Request failure</title></head>\n";
-  Output.print_string conf
- "<body bgcolor=\"white\">\n\
-  <h1 style=\"text-align: center; color: red;\">Request failure</h1>\n\
-  <p>The request could not be completed.</p>\n";
-  Output.printf conf
-    "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
-    msg;
-  Output.print_string conf "</body>\n"
-
 let refresh_url conf bname =
   let url =
     let serv = "http://" ^ Util.get_server_string conf in
@@ -1386,7 +1373,17 @@ let conf_and_connection from request script_name contents env =
               (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
       | _ ->
-        Request.treat_request conf;
+        begin
+          try Request.treat_request conf
+          with e ->
+            let err = Printexc.to_string e in
+            let context =
+              conf.bname
+              ^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
+              ^ contents
+            in
+            GwdLog.syslog `LOG_CRIT (context ^ " " ^ err)
+        end ;
         if conf.manitou && sleep > 0 then Unix.sleep sleep
 
 let chop_extension name =
@@ -1625,7 +1622,7 @@ let build_env request contents =
     let (str, env) = extract_multipart boundary contents in str, env
   else contents, Util.create_env contents
 
-let connection (addr, request) script_name contents =
+let connection (addr, request) script_name contents' =
   let from =
     match addr with
       Unix.ADDR_UNIX x -> x
@@ -1644,13 +1641,11 @@ let connection (addr, request) script_name contents =
       if not accept then only_log printer_conf from
       else
         try
-          let (contents, env) = build_env request contents in
+          let (contents, env) = build_env request contents' in
           if not (image_request printer_conf script_name env)
           && not (misc_request printer_conf script_name)
           then conf_and_connection from request script_name contents env
-        with
-          Adef.Request_failure msg -> print_request_failure printer_conf msg
-        | Exit -> ()
+        with Exit -> ()
     end
 
 let null_reopen flags fd =
