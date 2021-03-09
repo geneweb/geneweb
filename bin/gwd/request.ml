@@ -776,7 +776,7 @@ let treat_request =
           let () = Api_conf.set_mode_api () in
           begin match mode with
             | "API_ADD_FIRST_FAM" ->
-              w_base @@ fun conf _ -> Api_saisie_write.print_add_first_fam conf
+              fun conf _ -> Api_saisie_write.print_add_first_fam conf
             | "API_ALL_PERSONS" ->
               w_base @@ Api.print_all_persons
             | "API_ALL_FAMILIES" ->
