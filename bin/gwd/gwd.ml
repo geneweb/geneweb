@@ -1389,7 +1389,9 @@ let conf_and_connection =
             GwdLog.syslog
               `LOG_WARNING
               (Printf.sprintf "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
-        with e ->
+        with
+        | Exit -> ()
+        | e ->
 #ifdef DEBUG
           Printexc.print_backtrace stderr ;
 #endif
