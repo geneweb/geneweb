@@ -47,7 +47,6 @@ let witness_date_after_death = ref []
 let witness_date_before_birth = ref []
 let young_for_marriage = ref []
 let old_for_marriage = ref []
-let old_individual = ref []
 let distant_children = ref []
 
 (** [add_error_to_piqi_warning_list base error]
@@ -294,7 +293,6 @@ let create_piqi_warnings () =
     warning_changed_order_of_marriages = !changed_order_of_marriages;
     warning_big_age_between_spouses = !big_age_between_spouses;
     warning_dead_old = !dead_old;
-    warning_old_individual = !old_individual;
     warning_witness_date_after_death = !witness_date_after_death;
     warning_witness_date_before_birth = !witness_date_before_birth;
     warning_distant_children = !distant_children;
