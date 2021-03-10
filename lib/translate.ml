@@ -273,6 +273,14 @@ and eval_rec str =
       in
       if j = String.length str then str
       else
+        let j =
+          if j > String.length str
+          then
+            Opt.default
+              (String.length str - 1)
+              (String.rindex_opt str ')')
+          else j
+        in
         let sstr = eval (String.sub str (i + 2) (j - i - 2)) in
         let k = i + String.length sstr in
         let str =
