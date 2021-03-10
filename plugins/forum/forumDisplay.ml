@@ -275,17 +275,17 @@ let message_txt conf n =
 
 let print_del_ok conf next_pos =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "message deleted"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "message deleted"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   begin match next_pos with
       Some pos ->
       Output.printf conf "<a href=\"%sm=FORUM&p=%s\">%s</a>\n" (commd conf)
-        (MF.string_of_pos pos) (Utf8.capitalize (message_txt conf 3))
+        (MF.string_of_pos pos) (Utf8.capitalize_fst (message_txt conf 3))
     | None ->
       Output.printf conf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-        (Utf8.capitalize (transl conf "database forum"))
+        (Utf8.capitalize_fst (transl conf "database forum"))
   end;
   Hutil.trailer conf
 
@@ -294,17 +294,17 @@ let print_valid_ok conf pos del =
   let mess =
     if del then transl conf "message deleted" else transl conf "message added"
   in
-  let title _ = Output.print_string conf (Utf8.capitalize mess) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst mess) in
   let next_pos = find_next_pos conf pos in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   begin match next_pos with
       Some pos ->
       Output.printf conf "<a href=\"%sm=FORUM&p=%s\">%s</a>\n" (commd conf)
-        (MF.string_of_pos pos) (Utf8.capitalize (message_txt conf 3))
+        (MF.string_of_pos pos) (Utf8.capitalize_fst (message_txt conf 3))
     | None ->
       Output.printf conf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-        (Utf8.capitalize (transl conf "database forum"))
+        (Utf8.capitalize_fst (transl conf "database forum"))
   end;
   Hutil.trailer conf
 
@@ -389,7 +389,7 @@ let print_add_ok conf base =
   else if mess.m_ident = "" || mess.m_text = "" then print conf base
   else begin
     let title _ =
-      Output.print_string conf (Utf8.capitalize (transl conf "message added"))
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "message added"))
     in
     let mods = moderators conf in
     forum_add conf base (mods <> []) mess;
@@ -397,10 +397,10 @@ let print_add_ok conf base =
     Hutil.print_link_to_welcome conf true;
     if mods <> [] then
       Output.printf conf "<p>%s. %s.</p>"
-        (Utf8.capitalize (transl conf "this forum is moderated"))
-        (Utf8.capitalize (transl conf "your message is waiting for validation"));
+        (Utf8.capitalize_fst (transl conf "this forum is moderated"))
+        (Utf8.capitalize_fst (transl conf "your message is waiting for validation"));
     Output.printf conf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-      (Utf8.capitalize (transl conf "database forum"));
+      (Utf8.capitalize_fst (transl conf "database forum"));
     Hutil.trailer conf
   end
 

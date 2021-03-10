@@ -141,7 +141,7 @@ and eval_simple_var conf base env p =
             let p = poi base p.key_index in
             let e = List.nth (get_pevents p) (i - 1) in
             let name =
-              Utf8.capitalize
+              Utf8.capitalize_fst
                 (Util.string_of_pevent_name conf base e.epers_name)
             in
             let date =
@@ -834,7 +834,7 @@ let print_update_ind conf base p digest =
 let print_del1 conf base p =
   let title _ =
     let s = transl_nth conf "person/persons" 0 in
-    Output.print_string conf (Utf8.capitalize (transl_decline conf "delete" s))
+    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "delete" s))
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_string conf "<h2>\n";
@@ -848,7 +848,7 @@ let print_del1 conf base p =
     (string_of_iper (get_iper p));
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</p>\n";
   Output.print_string conf "</form>\n";

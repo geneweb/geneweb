@@ -113,7 +113,7 @@ let print_wizards_by_date conf list =
            prec = Sure; delta = 0}
         in
         Output.print_string conf
-          (Utf8.capitalize (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian)))));
+          (Utf8.capitalize_fst (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian)))));
      (fun tm -> tm.Unix.tm_year),
      (fun tm -> Output.printf conf "%d" (tm.Unix.tm_year + 1900))]
   in
@@ -244,7 +244,7 @@ let print_search_form conf from_wiz =
   Output.printf conf "%s\n" (transl_nth conf "search/case sensitive" 1);
   Output.print_string conf "</label>\n";
   Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
-    (Utf8.capitalize (transl_nth conf "search/case sensitive" 0));
+    (Utf8.capitalize_fst (transl_nth conf "search/case sensitive" 0));
   Output.print_string conf "</p>\n";
   Output.print_string conf "</form>\n";
   Output.print_string conf "</td>\n";
@@ -257,7 +257,7 @@ let print_main conf base auth_file =
       (transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
   in
   let title _ =
-    Output.printf conf "%s - %s" (Utf8.capitalize wiztxt)
+    Output.printf conf "%s - %s" (Utf8.capitalize_fst wiztxt)
       (Util.translate_eval (transl_nth conf "note/notes" 1))
   in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
@@ -294,7 +294,7 @@ let print_main conf base auth_file =
         Output.print_string conf "<p>\n";
         Output.printf conf "%d %s<br>\n" (List.length wizdata) wiztxt;
         Output.print_string conf "<em style=\"font-size:80%%\">\n";
-        Output.printf conf "%s " (Utf8.capitalize (transl conf "click"));
+        Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "click"));
         Output.printf conf "<a href=\"%sm=WIZNOTES&o=H\">%s</a>\n" (commd conf)
           (transl conf "here");
         Output.print_string conf
@@ -568,7 +568,7 @@ let print_connected_wizard conf first wddir wz tm_user =
 let do_connected_wizards conf base (_, _, _, wl) =
   let title _ =
     Output.print_string conf
-      (Utf8.capitalize (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
+      (Utf8.capitalize_fst (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;

@@ -44,10 +44,10 @@ let print_title conf base is_surnames ini len =
       Output.printf conf (fcapitale (ftransl conf "the %d surnames")) len
     else Output.printf conf (fcapitale (ftransl conf "the %d first names")) len
   else if is_surnames then
-    Output.print_string conf (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
+    Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0))
   else
     Output.print_string conf
-      (Utf8.capitalize (transl_nth conf "first name/first names" 0));
+      (Utf8.capitalize_fst (transl_nth conf "first name/first names" 0));
   if ini <> "" then
     Output.printf conf " %s %s" (transl conf "starting with") ini
   else
@@ -92,7 +92,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
   if not too_big then begin
     Output.print_string conf "</p>\n";
     Output.print_string conf "<p>";
-    Output.printf conf "%s:" (Utf8.capitalize (transl conf "the whole list"));
+    Output.printf conf "%s:" (Utf8.capitalize_fst (transl conf "the whole list"));
     Output.print_string conf "</p>\n" ;
     Output.print_string conf "<ul>\n";
     Output.print_string conf "<li>";

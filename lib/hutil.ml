@@ -12,7 +12,7 @@ let commd_no_params conf =
 
 let link_to_referer conf =
   let referer = Util.get_referer conf in
-  let back = Utf8.capitalize (Util.transl conf "back") in
+  let back = Utf8.capitalize_fst (Util.transl conf "back") in
   if referer <> "" then
     Printf.sprintf "<a href=\"%s\">\
          <span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span>\
@@ -119,7 +119,7 @@ let trailer = gen_trailer true
 
 let incorrect_request conf =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (Util.transl conf "incorrect request"))
+    Output.print_string conf (Utf8.capitalize_fst (Util.transl conf "incorrect request"))
   in
   Output.status conf Def.Bad_Request;
   header conf title;

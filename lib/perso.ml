@@ -172,7 +172,7 @@ let init_sosa_t conf base sosa_ref =
   let tstab =
     try Util.create_topological_sort conf base with
       Consang.TopologicalSortError p ->
-        let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+        let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
         Hutil.rheader conf title; print_base_loop conf base p
   in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -4592,7 +4592,7 @@ let eval_transl conf base env upp s c =
         | _ -> assert false
       in
       let r = Util.translate_eval (Util.transl_nth conf s n) in
-      if upp then Utf8.capitalize r else r
+      if upp then Utf8.capitalize_fst r else r
   | _ -> Templ.eval_transl conf upp s c
 
 let print_foreach conf base print_ast eval_expr =
@@ -5934,7 +5934,7 @@ let print_ancestors_dag conf base v p =
     Printf.sprintf "%sm=A&t=T&v=%d&%s&dag=on&%s" (commd conf) v options
       (acces conf base p)
   in
-  let page_title = Utf8.capitalize (Util.transl conf "tree") in
+  let page_title = Utf8.capitalize_fst (Util.transl conf "tree") in
   DagDisplay.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title ""
 
 let print_ascend conf base p =
@@ -5962,7 +5962,7 @@ let print_what_links conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h =
-      Output.printf conf "%s%s " (Utf8.capitalize (transl conf "linked pages"))
+      Output.printf conf "%s%s " (Utf8.capitalize_fst (transl conf "linked pages"))
         (Util.transl conf ":");
       if h then Output.print_string conf (simple_person_text conf base p true)
       else

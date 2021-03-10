@@ -12,7 +12,7 @@ let print_differences conf base branches p1 p2 =
     let x2 = proj p2 in
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
       begin
-        Output.printf conf "<h4>%s</h4>\n" (Utf8.capitalize title);
+        Output.printf conf "<h4>%s</h4>\n" (Utf8.capitalize_fst title);
         Output.print_string conf "<div class=\"custom-control custom-radio ml-3\">\n";
         Output.printf conf "  <input class=\"custom-control-input\" type=\"radio\" id=\"%s1\" name=\"%s\" value=\"1\"%s>\n" name name chk1;
         Output.printf conf "  <label class=\"custom-control-label\" for=\"%s1\">%s</label>\n" name x1;
@@ -155,19 +155,19 @@ let print_differences conf base branches p1 p2 =
     "burial_place" (fun p -> sou base (get_burial_place p));
   Output.printf conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">%s</button></form>|}
-    (Utf8.capitalize (transl_nth conf "validate/delete" 0))
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
 
 
 let propose_merge_ind conf base branches p1 p2 =
   let title _ =
     let s = transl_nth conf "person/persons" 1 in
-    Output.print_string conf (Utf8.capitalize (transl_decline conf "merge" s))
+    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "merge" s))
   in
   Hutil.header conf title;
   if branches <> [] then begin
     Output.printf conf
       "%s%s<ul><li><a href=\"%s%s\">"
-      (Utf8.capitalize (transl conf "you must first merge"))
+      (Utf8.capitalize_fst (transl conf "you must first merge"))
       (transl conf ":")
       (commd conf)
       (acces conf base p1);
@@ -184,7 +184,7 @@ let propose_merge_ind conf base branches p1 p2 =
     begin
       Output.printf conf
         "<p><hr></p><p>%s%s</p><table>"
-        (Utf8.capitalize (transl_nth conf "branch/branches" 1)) (transl conf ":") ;
+        (Utf8.capitalize_fst (transl_nth conf "branch/branches" 1)) (transl conf ":") ;
       List.iter
         (fun (ip1, ip2) ->
            let p1 = poi base ip1 in
@@ -202,7 +202,7 @@ let propose_merge_ind conf base branches p1 p2 =
   Hutil.trailer conf
 
 let error_loop conf base p =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Output.printf conf "<strong>%s%s %s</strong>" (p_first_name base p)
@@ -215,11 +215,11 @@ let error_loop conf base p =
 let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
-    Output.print_string conf (Utf8.capitalize (transl_decline conf "merge" s))
+    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "merge" s))
   in
   Hutil.header conf title;
   Output.printf conf "%s%s\n"
-    (Utf8.capitalize (transl conf "you must first merge the 2 families"))
+    (Utf8.capitalize_fst (transl conf "you must first merge the 2 families"))
     (transl conf ":");
   Output.printf conf "<ul><li><a href=\"%s%s\">"
     (commd conf) (acces conf base p1);
@@ -232,23 +232,23 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   Hutil.trailer conf
 
 let not_found_or_incorrect conf =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.printf conf "%s %s %s %s %s\n" (Utf8.capitalize (transl conf "not found"))
+  Output.printf conf "%s %s %s %s %s\n" (Utf8.capitalize_fst (transl conf "not found"))
     (transl conf "or") (transl conf "several answers") (transl conf "or")
     (transl conf "incorrect request");
   Hutil.trailer conf
 
 let same_person conf =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.printf conf "%s\n" (Utf8.capitalize (transl conf "it is the same person!"));
+  Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "it is the same person!"));
   Hutil.trailer conf
 
 let different_sexes conf base p1 p2 =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.print_string conf (Utf8.capitalize (transl conf "incompatible sexes"));
+  Output.print_string conf (Utf8.capitalize_fst (transl conf "incompatible sexes"));
   Output.print_string conf (transl conf ":");
   Output.print_string conf "<ul><li>";
   Output.printf conf
@@ -262,7 +262,7 @@ let different_sexes conf base p1 p2 =
   Hutil.trailer conf
 
 let print_merged conf base wl p =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "merge done")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Output.print_string conf "<ul>\n";
@@ -285,7 +285,7 @@ let print_merged conf base wl p =
       in
       Output.print_string conf "<p>\n";
       Output.printf conf "<a href=%sm=MRG_DUP&ip=%s%s%s>" (commd conf) (string_of_iper ip) s1 s2;
-      Output.print_string conf (Utf8.capitalize (transl conf "continue merging"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "continue merging"));
       Output.print_string conf "</a>";
       begin
         let p =  poi base ip in

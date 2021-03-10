@@ -69,13 +69,13 @@ let give_access_someone conf base (x, t) list =
 let give_access_title conf t p =
   Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s&p=%s\">" (commd conf)
     (Mutil.encode t) (Mutil.encode p);
-  Output.print_string conf (Utf8.capitalize t);
+  Output.print_string conf (Utf8.capitalize_fst t);
   Output.print_string conf "</a>\n"
 
 let give_access_all_titles conf t absolute =
   Output.printf conf "<a href=\"%sm=TT&sm=S&t=%s%s\">" (commd conf)
     (Mutil.encode t) (if absolute then "&a=A" else "");
-  Output.print_string conf (if absolute then t else Utf8.capitalize t);
+  Output.print_string conf (if absolute then t else Utf8.capitalize_fst t);
   Output.print_string conf "</a>"
 
 let give_access_all_places conf t =
@@ -103,7 +103,7 @@ let propose_tree_for_list list conf =
              i + 1)
           1 list
       in
-        Output.printf conf "&lim=6\">%s</a>\n" (Utf8.capitalize (transl conf "tree"))
+        Output.printf conf "&lim=6\">%s</a>\n" (Utf8.capitalize_fst (transl conf "tree"))
       end;
       Output.print_string conf "</p>\n"
   | _ -> ()
@@ -186,7 +186,7 @@ let print_places_list conf base t t_equiv list =
            give_access_all_titles conf t true)
         t_equiv
   in
-  let order s = Utf8.capitalize (Name.lower (surname_without_particle base s)) in
+  let order s = Utf8.capitalize_fst (Name.lower (surname_without_particle base s)) in
   let list = List.sort (fun s1 s2 -> compare (order s1) (order s2)) list in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
@@ -224,20 +224,20 @@ let print_titles conf base p =
     begin
       Output.printf conf "<a href=\"%sm=TT&sm=A&p=%s\">" (commd conf)
         (Mutil.encode p);
-      Output.print_string conf (Utf8.capitalize (transl conf "the whole list"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "the whole list"));
       Output.print_string conf "</a>\n"
     end;
   Hutil.trailer conf
 
 let print_all_titles conf base =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "all the titles"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "all the titles"))
   in
   let list =
     let l = select_all_titles conf base in
     string_cnt_list_uniq (List.sort compare_titles2 l)
   in
-  let order (s, _) = Utf8.capitalize (Name.lower s) in
+  let order (s, _) = Utf8.capitalize_fst (Name.lower s) in
   let wprint_elem (t, cnt) =
     give_access_all_titles conf t false; Output.printf conf " (%d)" cnt
   in
@@ -247,7 +247,7 @@ let print_all_titles conf base =
 
 let print_all_places conf base =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "all the estates"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "all the estates"))
   in
   let list =
     let l = select_all_places conf base in

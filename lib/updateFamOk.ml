@@ -540,12 +540,12 @@ let strip_array_persons pl =
 let error_family conf err =
   let err' =
     Printf.sprintf "%s%s%s"
-      (Utf8.capitalize (transl conf "error"))
+      (Utf8.capitalize_fst (transl conf "error"))
       (transl conf ":")
       err
   in
   Update.prerr conf err' @@ fun () ->
-  Output.print_string conf (Utf8.capitalize err);
+  Output.print_string conf (Utf8.capitalize_fst err);
   Output.print_string conf "\n";
   Update.print_return conf
 
@@ -595,7 +595,7 @@ let print_err_parents conf base p =
   Update.prerr conf err @@ fun () ->
   Output.printf conf "\n%s<p><ul><li>%s%s %d</li></ul>"
     err
-    (Utf8.capitalize (transl conf "first free number"))
+    (Utf8.capitalize_fst (transl conf "first free number"))
     (Util.transl conf ":")
     (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
   Update.print_return conf
@@ -615,12 +615,12 @@ let print_err_mother_sex conf base p =
   print_err_sex conf base p (transl conf "should be female")
 
 let print_err conf =
-  let err = Printf.sprintf "%s" (Utf8.capitalize (transl conf "error")) in
+  let err = Printf.sprintf "%s" (Utf8.capitalize_fst (transl conf "error")) in
   Update.prerr conf err @@ fun () ->
   Update.print_return conf
 
 let print_error_disconnected conf =
-  let err = Printf.sprintf "%s" (Utf8.capitalize (transl conf "msg error disconnected")) in
+  let err = Printf.sprintf "%s" (Utf8.capitalize_fst (transl conf "msg error disconnected")) in
   Update.prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
   Output.print_string conf err
@@ -1146,7 +1146,7 @@ let print_family conf base (wl, ml) cpl des =
 
 let print_mod_ok conf base (wl, ml) cpl des =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "family modified"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "family modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1165,7 +1165,7 @@ let print_mod_ok conf base (wl, ml) cpl des =
 
 let print_change_event_order_ok conf base (wl, ml) cpl des =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "family modified"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "family modified"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1173,14 +1173,14 @@ let print_change_event_order_ok conf base (wl, ml) cpl des =
   Hutil.trailer conf
 
 let print_add_ok conf base (wl, ml) cpl des =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "family added")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "family added")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
       Output.printf conf "<h2 class=\"error\">%s</h2>\n"
-        (Utf8.capitalize (transl conf "forbidden char"));
+        (Utf8.capitalize_fst (transl conf "forbidden char"));
       List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   print_family conf base (wl, ml) cpl des;
@@ -1188,7 +1188,7 @@ let print_add_ok conf base (wl, ml) cpl des =
 
 let print_del_ok conf base wl =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "family deleted"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "family deleted"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1221,7 +1221,7 @@ let print_del conf base =
 
 let print_inv_ok conf base p =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "inversion done"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "inversion done"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;

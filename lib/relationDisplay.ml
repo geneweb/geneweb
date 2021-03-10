@@ -48,7 +48,7 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
     | _ -> false
   in
   let (set, d) = dag_of_relation_path conf base path in
-  let page_title = Utf8.capitalize (transl conf "relationship") in
+  let page_title = Utf8.capitalize_fst (transl conf "relationship") in
   let hts = DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
   DagDisplay.print_slices_menu_or_dag_page conf page_title hts next_txt
 
@@ -62,7 +62,7 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
       | _ -> false
     in
     let set = ind_set_of_relation_path base path in
-    let page_title = Utf8.capitalize (transl conf "relationship") in
+    let page_title = Utf8.capitalize_fst (transl conf "relationship") in
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set []
       page_title next_txt
 
@@ -97,7 +97,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml =
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then
     let title _ =
-      Output.print_string conf (Utf8.capitalize (transl conf "relationship"))
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship"))
     in
     Hutil.header_no_page_title conf title; Hutil.trailer conf
   else
@@ -115,10 +115,10 @@ let print_shortest_path conf base p1 p2 =
   let ip2 = get_iper p2 in
   if ip1 = ip2 then
     let title _ =
-      Output.print_string conf (Utf8.capitalize (transl conf "relationship"))
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship"))
     in
     Hutil.header conf title;
-    Output.print_string conf (Utf8.capitalize (transl conf "it is the same person!"));
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "it is the same person!"));
     Output.print_string conf "\n";
     Hutil.trailer conf
   else
@@ -146,7 +146,7 @@ let print_shortest_path conf base p1 p2 =
       loop [] 0
     in
     let title _ =
-      Output.print_string conf (Utf8.capitalize (transl conf "relationship"))
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship"))
     in
     match get_shortest_path_relation conf base ip1 ip2 excl_faml with
       Some (path, ifam) ->
@@ -162,7 +162,7 @@ let print_shortest_path conf base p1 p2 =
             Output.print_string conf "</h1>\n";
             Hutil.print_link_to_welcome conf true;
             Output.printf conf "%s.\n"
-              (Utf8.capitalize
+              (Utf8.capitalize_fst
                  (cftransl conf "no known relationship link between %s and %s"
                     [s1; s2]));
             Output.print_string conf "<br>\n";
@@ -174,7 +174,7 @@ let print_shortest_path conf base p1 p2 =
                   Output.printf conf "<a href=\"%s&m=R&%s\">" (commd conf)
                     (acces conf base p1);
                   Output.print_string conf
-                    (Utf8.capitalize
+                    (Utf8.capitalize_fst
                        (transl_nth conf "try another/relationship computing"
                           0));
                   Output.print_string conf "</a>"
@@ -514,7 +514,7 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
              (if pp1 = None then "" else "&" ^ acces_n conf base "3" p1)
              (if pp2 = None then "" else "&" ^ acces_n conf base "4" p2)
              (if propose_dag then "&dag=on" else "") image_opt;
-           Output.print_string conf (Utf8.capitalize (transl conf "see"));
+           Output.print_string conf (Utf8.capitalize_fst (transl conf "see"));
            if n > 1 && not propose_dag then
              Output.print_string conf (transl conf " the first branch");
            Output.print_string conf "</a>"
@@ -532,7 +532,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   in
   Output.print_string conf "<ul class=li_relationship>\n";
   Output.print_string conf "<li>\n";
-  Output.printf conf "%s\n" (Utf8.capitalize (transl conf "indeed,"));
+  Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "indeed,"));
   Output.print_string conf "<ul>\n";
   List.iter
     (fun (a, n) ->
@@ -563,7 +563,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
              (if pp1 = None then "" else "&" ^ acces_n conf base "3" p1)
              (if pp2 = None then "" else "&" ^ acces_n conf base "4" p2)
              (if propose_dag then "&dag=on" else "") image_opt;
-           Output.print_string conf (Utf8.capitalize (transl conf "see"));
+           Output.print_string conf (Utf8.capitalize_fst (transl conf "see"));
            Output.print_string conf "</a>"
          end;
        Output.print_string conf "</li>\n")
@@ -748,7 +748,7 @@ let print_propose_upto conf base p1 p2 rl =
       Output.print_string conf "<span class=\"smaller\">";
       Output.print_string conf
         (let s = person_title_text conf base p in
-         Utf8.capitalize
+         Utf8.capitalize_fst
            (translate_eval
               (transl_a_of_b conf (transl conf "ancestors") s s)));
       Output.printf conf " %s"
@@ -758,7 +758,7 @@ let print_propose_upto conf base p1 p2 rl =
         (Util.image_prefix conf) "picto_rel_asc.png";
       Output.printf conf "<a href=\"%sm=A&t=D&%s&%s&l=%d\">" (commd conf)
         (acces conf base p) (acces_n conf base "1" a) maxlen;
-      Output.print_string conf (Utf8.capitalize (transl conf "see"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "see"));
       Output.print_string conf "</a>";
       Output.print_string conf "</span>\n";
       Output.print_string conf "</p>\n"
@@ -845,7 +845,7 @@ let print_main_relationship conf base long p1 p2 rel =
     | Some (_, total, _) -> total
   in
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "relationship"));
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship"));
     if Sosa.eq total Sosa.zero then ()
     else
       begin
@@ -888,11 +888,11 @@ let print_main_relationship conf base long p1 p2 rel =
     None ->
       if get_iper p1 = get_iper p2 then
         Output.printf conf "%s\n"
-          (Utf8.capitalize (transl conf "it is the same person!"))
+          (Utf8.capitalize_fst (transl conf "it is the same person!"))
       else
         begin
           Output.printf conf "%s.\n"
-            (Utf8.capitalize
+            (Utf8.capitalize_fst
                (cftransl conf "no known relationship link between %s and %s"
                   [gen_person_title_text reference raw_access conf base p1;
                    gen_person_title_text reference raw_access conf base p2]));
@@ -905,7 +905,7 @@ let print_main_relationship conf base long p1 p2 rel =
                 Output.printf conf "<a href=\"%s&m=R&%s\">" (commd conf)
                   (acces conf base p1);
                 Output.print_string conf
-                  (Utf8.capitalize
+                  (Utf8.capitalize_fst
                      (transl_nth conf "try another/relationship computing"
                         0));
                 Output.print_string conf "</a>"
@@ -944,7 +944,7 @@ let print_main_relationship conf base long p1 p2 rel =
         begin
           Output.print_string conf "<p>\n";
           Output.printf conf "<em>%s%s %s%%</em>"
-            (Utf8.capitalize (transl conf "relationship"))
+            (Utf8.capitalize_fst (transl conf "relationship"))
             (Util.transl conf ":")
             (string_of_decimal_num conf
                (round_2_dec
@@ -980,7 +980,7 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
       let sl = commd conf :: "m=RLM" :: sl in String.concat "" sl
 
 let print_no_relationship conf base pl =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "tree")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "tree")) in
   Hutil.header conf title;
   Output.print_string conf "<ul>\n";
   List.iter
@@ -1044,7 +1044,7 @@ let print_multi_relation conf base pl lim assoc_txt =
     print_relationship_dag conf base elem_txt vbar_txt path next_txt
 
 let print_base_loop conf base p =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Output.printf conf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))

@@ -88,7 +88,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       max_int
   in
   Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) array ;
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "place")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "place")) in
   print_aux conf title begin fun () ->
     let opt = print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage in
     Output.printf conf
@@ -142,8 +142,8 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_de
   in
   Array.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) array ;
   let title _ =
-    Output.printf conf "%s / %s" (Utf8.capitalize (transl conf "place"))
-      (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
+    Output.printf conf "%s / %s" (Utf8.capitalize_fst (transl conf "place"))
+      (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0))
   in
   print_aux conf title begin fun () ->
     if ini = ""

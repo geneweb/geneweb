@@ -17,7 +17,7 @@ let extension_of_type =
 let incorrect conf = Hutil.incorrect_request conf; raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let incorrect_content_type conf base p s =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Output.print_string conf "<p>\n";
@@ -34,7 +34,7 @@ let incorrect_content_type conf base p s =
   raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let error_too_big_image conf base p len max_len =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
   Output.print_string conf "<p><em style=\"font-size:smaller\">";
@@ -61,7 +61,7 @@ let print_link_delete_image conf base p =
       begin
         Output.printf conf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
           (string_of_iper (get_iper p));
-        Output.printf conf "%s %s" (Utf8.capitalize (transl conf "delete"))
+        Output.printf conf "%s %s" (Utf8.capitalize_fst (transl conf "delete"))
           (transl_nth conf "image/images" 0);
         Output.print_string conf "</a>"
       end;
@@ -74,11 +74,11 @@ let print_send_image conf base p =
   let title h =
     if Util.has_image conf base p then
       Output.print_string conf
-        (Utf8.capitalize
+        (Utf8.capitalize_fst
            (transl_decline conf "modify" (transl_nth conf "image/images" 0)))
     else
       Output.print_string conf
-        (Utf8.capitalize
+        (Utf8.capitalize_fst
            (transl_decline conf "add" (transl_nth conf "image/images" 0)));
     if h then ()
     else
@@ -104,7 +104,7 @@ let print_send_image conf base p =
     (string_of_iper (get_iper p));
   Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
     digest;
-  Output.printf conf "%s%s\n" (Utf8.capitalize (transl conf "file")) (Util.transl conf ":");
+  Output.printf conf "%s%s\n" (Utf8.capitalize_fst (transl conf "file")) (Util.transl conf ":");
   Output.print_string conf "<input \
 type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\">\n";
   Output.print_string conf "</p>\n";
@@ -117,7 +117,7 @@ type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\"
   end;
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg mt-2\">\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</form>\n";
   print_link_delete_image conf base p;
@@ -139,7 +139,7 @@ let print conf base =
 let print_delete_image conf base p =
   let title h =
     Output.print_string conf
-      (Utf8.capitalize
+      (Utf8.capitalize_fst
          (transl_decline conf "delete" (transl_nth conf "image/images" 0)));
     if h then ()
     else
@@ -160,7 +160,7 @@ let print_delete_image conf base p =
      <p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>\
      </form>"
     (string_of_iper (get_iper p))
-    (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Hutil.trailer conf
 
 let print_del conf base =
@@ -179,7 +179,7 @@ let print_del conf base =
 
 let print_sent conf base p =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "image received"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "image received"))
   in
   Hutil.header conf title;
   Output.print_string conf "<ul>\n";
@@ -321,7 +321,7 @@ let print_send_ok conf base =
 
 let print_deleted conf base p =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "image deleted"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "image deleted"))
   in
   Hutil.header conf title;
   Output.printf conf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);

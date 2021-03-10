@@ -77,7 +77,7 @@ let lowercase s = cmap_utf_8 Uucp.Case.Map.to_lower s
 
 let uppercase s = cmap_utf_8 Uucp.Case.Map.to_upper s
 
-let capitalize s =
+let capitalize_fst s =
   let first = ref true in
   let cmap u =
     if !first then (first := false ; Uucp.Case.Map.to_upper u)

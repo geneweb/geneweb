@@ -42,7 +42,7 @@ let gen_print conf base mois f_scan dead_people =
       if dead_people then transl conf "anniversaries"
       else transl conf "birthdays"
     in
-    Output.printf conf "%s %s" (Utf8.capitalize lab)
+    Output.printf conf "%s %s" (Utf8.capitalize_fst lab)
       (Util.translate_eval (transl_nth conf "(month)" (mois - 1)))
   in
   begin try
@@ -96,7 +96,7 @@ let gen_print conf base mois f_scan dead_people =
   if Array.for_all ((=) []) tab then
     begin
       Output.print_string conf "<p>\n";
-      Output.printf conf "%s.\n" (Utf8.capitalize (transl conf "no anniversary"));
+      Output.printf conf "%s.\n" (Utf8.capitalize_fst (transl conf "no anniversary"));
       Output.print_string conf "</p>\n"
     end;
   Output.print_string conf "<ul>\n";
@@ -171,7 +171,7 @@ let print_birth_day conf base day_name fphrase wd dt list =
   match list with
     [] ->
       Output.print_string conf "<p>\n";
-      Output.printf conf "%s %s.\n" (Utf8.capitalize (transl conf "no birthday"))
+      Output.printf conf "%s %s.\n" (Utf8.capitalize_fst (transl conf "no birthday"))
         day_name;
       Output.print_string conf "</p>\n"
   | _ ->
@@ -181,7 +181,7 @@ let print_birth_day conf base day_name fphrase wd dt list =
           (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
       in
         Output.printf conf fphrase
-          (Utf8.capitalize day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
+          (Utf8.capitalize_fst day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
           (transl conf "the birthday")
       end;
       Output.print_string conf "...\n";
@@ -192,7 +192,7 @@ let propose_months conf mode =
   begin_centered conf;
   Output.print_string conf "<span>";
   Output.print_string conf
-    (Utf8.capitalize (transl conf "select a month to see all the anniversaries"));
+    (Utf8.capitalize_fst (transl conf "select a month to see all the anniversaries"));
   Output.print_string conf "</span>";
   Output.printf conf "<table border=\"%d\">\n" conf.border;
   Output.print_string conf "<tr>\n";
@@ -209,14 +209,14 @@ let propose_months conf mode =
       Output.printf conf "<option value=\"%d\"%s>" i
         (if i = conf.today.month then " selected=\"selected\"" else "");
       Output.print_string conf
-        (Utf8.capitalize (Util.translate_eval (transl_nth conf "(month)" (i - 1))));
+        (Utf8.capitalize_fst (Util.translate_eval (transl_nth conf "(month)" (i - 1))));
       Output.print_string conf "</option>\n"
     end
   done;
   Output.print_string conf "</select>\n";
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</p>\n";
   Output.print_string conf "</form>\n";
@@ -238,7 +238,7 @@ let print_anniv conf base day_name fphrase wd dt list =
   match list with
     [] ->
       Output.print_string conf "<p>\n";
-      Output.printf conf "%s %s.\n" (Utf8.capitalize (transl conf "no anniversary"))
+      Output.printf conf "%s %s.\n" (Utf8.capitalize_fst (transl conf "no anniversary"))
         day_name;
       Output.print_string conf "</p>\n"
   | _ ->
@@ -248,7 +248,7 @@ let print_anniv conf base day_name fphrase wd dt list =
           (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
       in
         Output.printf conf fphrase
-          (Utf8.capitalize day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
+          (Utf8.capitalize_fst day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
           (transl conf "the anniversary")
       end;
       Output.print_string conf "...\n";
@@ -258,7 +258,7 @@ let print_anniv conf base day_name fphrase wd dt list =
 let print_marriage conf base month =
   let title _ =
     let lab = transl conf "anniversaries of marriage" in
-    Output.printf conf "%s %s" (Utf8.capitalize lab)
+    Output.printf conf "%s %s" (Utf8.capitalize_fst lab)
       (transl_decline conf "in (month year)"
          (transl_nth conf "(month)" (month - 1)))
   in
@@ -329,13 +329,13 @@ let print_marriage_day conf base day_name fphrase wd dt list =
   match list with
     [] ->
       Output.print_string conf "<p>\n";
-      Output.printf conf "%s %s.\n" (Utf8.capitalize (transl conf "no anniversary"))
+      Output.printf conf "%s %s.\n" (Utf8.capitalize_fst (transl conf "no anniversary"))
         day_name;
       Output.print_string conf "</p>\n"
   | _ ->
       Output.print_string conf "<p>\n";
       Output.printf conf fphrase
-        (Utf8.capitalize day_name ^ ",\n" ^
+        (Utf8.capitalize_fst day_name ^ ",\n" ^
          std_color conf
            ("<b>" ^
             transl_decline conf "on (weekday day month year)"
@@ -357,7 +357,7 @@ let match_dates conf base p d1 d2 =
   else false
 
 let gen_print_menu_birth conf base f_scan mode =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "birthdays")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "birthdays")) in
   let tom = day_after conf.today in
   let aft = day_after tom in
   let list_tod = ref [] in
@@ -421,7 +421,7 @@ let print_menu_birth conf base =
 let gen_print_menu_dead conf base f_scan mode =
   let title _ =
     Output.print_string conf
-      (Utf8.capitalize (transl conf "anniversaries of dead people"))
+      (Utf8.capitalize_fst (transl conf "anniversaries of dead people"))
   in
   let tom = day_after conf.today in
   let aft = day_after tom in
@@ -508,7 +508,7 @@ let match_mar_dates conf base cpl d1 d2 =
 
 let print_menu_marriage conf base =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl conf "anniversaries of marriage"))
+    Output.print_string conf (Utf8.capitalize_fst (transl conf "anniversaries of marriage"))
   in
   let tom = day_after conf.today in
   let aft = day_after tom in

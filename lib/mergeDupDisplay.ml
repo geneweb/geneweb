@@ -18,12 +18,12 @@ let print_link conf base p =
 let print_no_candidate conf base p =
   let title _ =
     Output.printf conf "%s\n"
-      (Utf8.capitalize
+      (Utf8.capitalize_fst
          (transl_decline conf "merge" (transl conf "possible duplications")))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "%s\n" (Utf8.capitalize (transl conf "not found"));
+  Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "not found"));
   Output.print_string conf "<ul>\n";
   Output.print_string conf "<li>\n";
   print_link conf base p;
@@ -46,7 +46,7 @@ let print_input_excl conf string_of_i excl excl_name =
       excl_name s
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
-  let title _ = Output.printf conf "%s\n" (Utf8.capitalize (transl conf "merge")) in
+  let title _ = Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "merge")) in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_string conf "<h2>\n";
   title false;
@@ -61,7 +61,7 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_string conf "</li>\n";
   Output.print_string conf "</ul>\n";
   Output.print_string conf "<p>\n";
-  Output.printf conf "%s ?\n" (Utf8.capitalize (transl conf "merge"));
+  Output.printf conf "%s ?\n" (Utf8.capitalize_fst (transl conf "merge"));
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Output.print_string conf
@@ -85,7 +85,7 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
 let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   let title _ =
     Output.printf conf "%s\n"
-      (Utf8.capitalize
+      (Utf8.capitalize_fst
          (transl_decline conf "merge" (transl_nth conf "family/families" 1)))
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
@@ -109,7 +109,7 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_string conf "</li>\n";
   Output.print_string conf "</ul>\n";
   Output.print_string conf "<p>\n";
-  Output.printf conf "%s ?\n" (Utf8.capitalize (transl conf "merge"));
+  Output.printf conf "%s ?\n" (Utf8.capitalize_fst (transl conf "merge"));
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Output.print_string conf

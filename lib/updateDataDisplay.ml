@@ -49,14 +49,14 @@ let print_mod_ok conf base =
     begin
       update_person_list conf base new_input list nb_pers max_updates;
       let title _ =
-        Output.print_string conf (Utf8.capitalize (transl conf "modification successful"))
+        Output.print_string conf (Utf8.capitalize_fst (transl conf "modification successful"))
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
       Output.print_string conf "<p>\n";
       (* En attendant mieux ... *)
       Output.printf conf "%s%s %d "
-        (Utf8.capitalize (transl conf "modification successful"))
+        (Utf8.capitalize_fst (transl conf "modification successful"))
         (Util.transl conf ":")
         (min nb_pers max_updates);
       if p_getenv conf.base_env "history" = Some "yes" then
@@ -81,21 +81,21 @@ let print_mod_ok conf base =
         Output.printf conf {|<input type="hidden" name="s" value="%s">|} ini ;
         Output.printf conf {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="%s" id="data">|}
           (Util.escape_html (only_printable new_input)) ;
-        Output.print_string conf (Utf8.capitalize (transl conf "continue correcting"));
+        Output.print_string conf (Utf8.capitalize_fst (transl conf "continue correcting"));
         Output.print_string conf {|<button type="submit" class="btn btn-secondary btn-lg">|};
-        Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+        Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
         Output.print_string conf "</button></p></form>" ;
       end ;
       Output.printf conf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
-        (commd conf) data ini  (Utf8.capitalize (transl conf "new modification")) ;
+        (commd conf) data ini  (Utf8.capitalize_fst (transl conf "new modification")) ;
       Hutil.trailer conf
     end
   else
-    let title _ = Output.print_string conf (Utf8.capitalize (transl conf "no modification")) in
+    let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "no modification")) in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Output.printf conf {|<p><a href="%sm=MOD_DATA&data=%s&s=%s" id="reference">%s</a></p>|}
-      (commd conf) data ini (Utf8.capitalize (transl conf "new modification")) ;
+      (commd conf) data ini (Utf8.capitalize_fst (transl conf "new modification")) ;
     Hutil.trailer conf
 
 
@@ -159,7 +159,7 @@ and eval_simple_str_var conf _base env _xx =
         " - " ^
         Printf.sprintf (ftransl conf "%d %s starting with %s") len title ini
     in
-    Utf8.capitalize book_of ^ result
+    Utf8.capitalize_fst book_of ^ result
   | _ -> raise Not_found
 and eval_compound_var conf base env xx sl =
   let rec loop =

@@ -7,7 +7,7 @@ open Util
 open Dag
 
 let image_normal_txt conf base p fname width height =
-  let image_txt = Utf8.capitalize (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
   let b = acces conf base p in
   let k = default_image_name base p in
@@ -26,7 +26,7 @@ let image_normal_txt conf base p fname width height =
   Printf.sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
 
 let image_url_txt conf url_p url height =
-  let image_txt = Utf8.capitalize (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   Printf.sprintf "<a href=\"%s\">" url_p ^
   Printf.sprintf "<img src=\"%s\"\n alt=\"%s\" title=\"%s\" style=\"%s\" />" url
     image_txt image_txt
@@ -35,7 +35,7 @@ let image_url_txt conf url_p url height =
   "</a>\n"
 
 let image_url_txt_with_size conf url_p url width height =
-  let image_txt = Utf8.capitalize (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   Printf.sprintf "<a href=\"%s\">" url_p ^
   Printf.sprintf
     "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
@@ -755,7 +755,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
 
 let print_slices_menu conf hts =
   let txt n =
-    Utf8.capitalize
+    Utf8.capitalize_fst
       (transl_nth conf "display by slices/slice width/overlap/total width" n)
   in
   let title _ = Output.print_string conf (txt 0) in
@@ -777,7 +777,7 @@ let print_slices_menu conf hts =
   Output.print_string conf "<tr align=\"left\">\n";
   Output.print_string conf "<td align=\"right\">\n";
   Output.printf conf "%s\n"
-    (Utf8.capitalize (transl conf "don't group the common branches together"));
+    (Utf8.capitalize_fst (transl conf "don't group the common branches together"));
   Output.print_string conf "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
   Output.print_string conf "</td>\n";
   Output.print_string conf "</tr>\n";
@@ -808,7 +808,7 @@ let print_slices_menu conf hts =
   Output.print_string conf "<p>" ;
   Output.printf conf
     "<p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>"
-    (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</form>\n";
   Hutil.trailer conf
 
@@ -1140,5 +1140,5 @@ let print conf base =
       Some "on" -> true
     | _ -> false
   in
-  let page_title = Utf8.capitalize (Util.transl conf "tree") in
+  let page_title = Utf8.capitalize_fst (Util.transl conf "tree") in
   make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title ""

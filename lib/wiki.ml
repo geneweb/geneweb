@@ -318,7 +318,7 @@ let summary_of_tlsw_lines conf short lines =
       "<dl><dd>" :: "<table id=\"summary\" cellpadding=\"10\">" ::
       ("<tr><td align=\"" ^ conf.left ^ "\">") ::
       ("<div style=\"text-align:center\" id=\"toctoggleanchor\"><b>" ^
-       Utf8.capitalize (message_txt conf 3) ^ "</b>") :: "</div>" ::
+       Utf8.capitalize_fst (message_txt conf 3) ^ "</b>") :: "</div>" ::
       "<div class=\"summary\" id=\"tocinside\">" ::
       List.rev_append rev_summary
         ["</div>"; "</td></tr></table>"; "</dd></dl>"]
@@ -698,7 +698,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
         Output.print_string conf
           "<button type=\"submit\" class=\"btn btn-outline-primary btn-lg";
         Output.print_string conf " col-4 py-3 mt-2 mb-3 mx-auto order-3\">";
-        Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+        Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
         Output.print_string conf "</button>\n"
       end
     end;
@@ -792,7 +792,7 @@ let split_title_and_text s =
 
 let print_ok conf wi edit_mode fname title_is_1st s =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (Util.transl conf "notes modified"))
+    Output.print_string conf (Utf8.capitalize_fst (Util.transl conf "notes modified"))
   in
   Hutil.header_no_page_title conf title;
   Output.print_string conf "<div style=\"text-align:center\">\n";

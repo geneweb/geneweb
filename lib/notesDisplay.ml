@@ -34,7 +34,7 @@ let print_search_form conf from_note =
   Output.print_string conf "</label>\n";
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "search/case sensitive" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "search/case sensitive" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</p>\n";
   Output.print_string conf "</form>\n";
@@ -219,7 +219,7 @@ let print_linked_list conf base pgl =
 
 let print_what_links conf base fnotes =
   let title h =
-    Output.printf conf "%s " (Utf8.capitalize (transl conf "linked pages"));
+    Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "linked pages"));
     if h then Output.printf conf "[%s]" fnotes
     else
       begin
@@ -266,7 +266,7 @@ let print_mod conf base =
     | None -> ""
   in
   let title _ =
-    Output.printf conf "%s - %s%s" (Utf8.capitalize (transl conf "base notes"))
+    Output.printf conf "%s - %s%s" (Utf8.capitalize_fst (transl conf "base notes"))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let (env, s) = read_notes base fnotes in
@@ -323,7 +323,7 @@ let print_misc_notes conf base =
   let title h =
     Output.print_string conf
       (if d = "" then
-         Utf8.capitalize (Util.translate_eval (transl conf "miscellaneous notes"))
+         Utf8.capitalize_fst (Util.translate_eval (transl conf "miscellaneous notes"))
        else if h then "- " ^ d ^ " -"
        else "<tt>- " ^ d ^ " -</tt>")
   in

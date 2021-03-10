@@ -876,7 +876,7 @@ let compute_warnings conf base resp =
           (fun m ml ->
             match m with
             | MissingSources ->
-                let m = Utf8.capitalize (transl conf "missing sources") in
+                let m = Utf8.capitalize_fst (transl conf "missing sources") in
                 m :: ml)
           ml []
       in

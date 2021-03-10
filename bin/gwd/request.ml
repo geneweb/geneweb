@@ -294,7 +294,7 @@ let very_unknown conf base =
   match p_getenv conf.env "n", p_getenv conf.env "p" with
   | Some sname, Some fname ->
     let title _ =
-      Output.printf conf "%s: \"%s %s\"" (Utf8.capitalize (transl conf "not found"))
+      Output.printf conf "%s: \"%s %s\"" (Utf8.capitalize_fst (transl conf "not found"))
         (Util.escape_html fname) (Util.escape_html sname)
     in
     Output.status conf Def.Not_Found;
@@ -305,7 +305,7 @@ let very_unknown conf base =
 
 let unknown = begin fun conf n ->
       let title _ =
-        Output.printf conf "%s: \"%s\"" (Utf8.capitalize (transl conf "not found"))
+        Output.printf conf "%s: \"%s\"" (Utf8.capitalize_fst (transl conf "not found"))
           (Util.escape_html n)
       in
       Output.status conf Def.Not_Found;
@@ -406,7 +406,7 @@ let propose_base conf =
   Output.print_string conf "<input name=\"b\" size=\"40\"> =&gt;\n";
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</li></ul>";
   Hutil.trailer conf
@@ -899,11 +899,11 @@ let treat_request =
     Output.flush conf ;
   end else
     begin
-      let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+      let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
       Hutil.rheader conf title;
       Output.printf conf "<ul>\n<li>\n%s \"%s\" %s.</li>\n</ul>"
-        (Utf8.capitalize (transl conf "base")) conf.bname
-        (Utf8.capitalize (transl conf "reserved to friends or wizards"));
+        (Utf8.capitalize_fst (transl conf "base")) conf.bname
+        (Utf8.capitalize_fst (transl conf "reserved to friends or wizards"));
       Hutil.trailer conf
     end
 

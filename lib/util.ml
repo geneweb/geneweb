@@ -43,7 +43,7 @@ let start_with_vowel s =
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
 let fcapitale (a : ('a, 'b, 'c, 'd) format4) : ('a, 'b, 'c, 'd) format4 =
-  Scanf.format_from_string (Utf8.capitalize (string_of_format a)) a
+  Scanf.format_from_string (Utf8.capitalize_fst (string_of_format a)) a
 
 let nth_field_abs w n =
   let rec start i n =
@@ -2890,7 +2890,7 @@ let gen_print_tips conf s =
 let print_tips_relationship conf =
   if p_getenv conf.env "em" = Some "R" || p_getenv conf.env "m" = Some "C"
   then
-    let s = Utf8.capitalize (transl conf "select person to compute relationship") in
+    let s = Utf8.capitalize_fst (transl conf "select person to compute relationship") in
     gen_print_tips conf s
 
 

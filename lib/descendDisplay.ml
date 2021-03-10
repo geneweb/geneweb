@@ -42,7 +42,7 @@ let descendants_title conf base p h =
     translate_eval
       (transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s1 s2)
   in
-  Output.print_string conf (Utf8.capitalize s)
+  Output.print_string conf (Utf8.capitalize_fst s)
 
 let display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -93,7 +93,7 @@ let display_descendants_level conf base max_level ancestor =
       [] list
   in
   Hutil.header conf (descendants_title conf base ancestor);
-  Output.print_string conf (Utf8.capitalize (text_level conf max_level));
+  Output.print_string conf (Utf8.capitalize_fst (text_level conf max_level));
   if !len > 1 then
     Output.printf conf " (%d %s)" !len
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
@@ -370,7 +370,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
         ("m=D&i=" ^
          string_of_iper (get_iper ancestor) ^ "&v=" ^
          string_of_int max_level ^ "&t=G")
-        (Utf8.capitalize
+        (Utf8.capitalize_fst
            (let s1 = person_text conf base ancestor in
             let s2 = person_text_no_html conf base ancestor in
             transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s1 s2))
@@ -386,7 +386,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
       Some _, _ | _, Death (_, _) -> Output.print_string conf "<br>"
     | _ -> ()
     end;
-  Output.printf conf "%s." (Utf8.capitalize (text_to conf max_level));
+  Output.printf conf "%s." (Utf8.capitalize_fst (text_to conf max_level));
   Output.print_string conf "<p>" ;
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
@@ -394,7 +394,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   if !total > 1 then
     begin
       Output.print_string conf "<p>" ;
-      Output.printf conf "%s%s %d %s" (Utf8.capitalize (transl conf "total"))
+      Output.printf conf "%s%s %d %s" (Utf8.capitalize_fst (transl conf "total"))
         (Util.transl conf ":") !total
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
       if max_level > 1 then
@@ -502,7 +502,7 @@ let sort_and_display conf base paths precision list =
 let display_descendant_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
-    let txt = Utf8.capitalize (transl conf "index of the descendants") in
+    let txt = Utf8.capitalize_fst (transl conf "index of the descendants") in
     if not h then
       wprint_geneweb_link conf
         ("m=D&i=" ^
@@ -534,7 +534,7 @@ let display_spouse_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title _ =
     Output.print_string conf
-      (Utf8.capitalize (transl conf "index of the spouses (non descendants)"))
+      (Utf8.capitalize_fst (transl conf "index of the spouses (non descendants)"))
   in
   Hutil.header conf title;
   let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -583,36 +583,36 @@ let print_desc_table_header conf =
   let nb_col = ref 2 in
   Output.print_string conf "<tr class=\"descends_table_header\">\n";
   Output.print_string conf "<th>\n";
-  Output.print_string conf (Utf8.capitalize (transl conf "n° d'Aboville"));
+  Output.print_string conf (Utf8.capitalize_fst (transl conf "n° d'Aboville"));
   Output.print_string conf "</th>\n";
   Output.print_string conf "<th>\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "person/persons" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "person/persons" 0));
   Output.print_string conf "</th>\n";
   if p_getenv conf.env "birth" = Some "on" then
     begin
       Output.print_string conf "<th>\n";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize (transl conf "date of birth"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "date of birth"));
       Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "birth_place" = Some "on" then
     begin
       Output.print_string conf "<th>\n";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize (transl conf "where born"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "where born"));
       Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "marr" = Some "on" then
     begin
       Output.print_string conf "<th>\n";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize (transl_nth conf "spouse/spouses" 1));
+      Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "spouse/spouses" 1));
       Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "marr_date" = Some "on" then
     begin
       Output.print_string conf "<th>\n";
-      Output.print_string conf (Utf8.capitalize (transl conf "date of marriage"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "date of marriage"));
       incr nb_col;
       Output.print_string conf "</th>\n"
     end;
@@ -620,20 +620,20 @@ let print_desc_table_header conf =
     begin
       Output.print_string conf "<th>\n";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize (transl conf "where married"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "where married"));
       Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "child" = Some "on" then
     begin
       Output.print_string conf "<th>\n";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize (transl conf "nb children"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "nb children"));
       Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "death" = Some "on" then
     begin
       Output.print_string conf "<th>\n";
-      Output.print_string conf (Utf8.capitalize (transl conf "date of death"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "date of death"));
       incr nb_col;
       Output.print_string conf "</th>\n"
     end;
@@ -641,14 +641,14 @@ let print_desc_table_header conf =
     begin
       Output.print_string conf "<th>\n";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize (transl conf "where dead"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "where dead"));
       Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "death_age" = Some "on" then
     begin
       Output.print_string conf "<th>\n";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize (transl conf "age at death"));
+      Output.print_string conf (Utf8.capitalize_fst (transl conf "age at death"));
       Output.print_string conf "</th>\n"
     end;
   if p_getenv conf.env "occu" = Some "on" then
@@ -656,7 +656,7 @@ let print_desc_table_header conf =
       Output.print_string conf "<th>\n";
       incr nb_col;
       Output.print_string conf
-        (Utf8.capitalize (transl_nth conf "occupation/occupations" 1));
+        (Utf8.capitalize_fst (transl_nth conf "occupation/occupations" 1));
       Output.print_string conf "</th>\n"
     end;
   Output.print_string conf "</tr>\n";
@@ -1018,7 +1018,7 @@ let display_descendant_with_table conf base max_lev p =
             begin
               Output.printf conf "<th align=\"left\" colspan=\"%d\">\n" nb_col;
               Output.printf conf "%s %d"
-                (Utf8.capitalize (transl_nth conf "generation/generations" 0)) lev;
+                (Utf8.capitalize_fst (transl_nth conf "generation/generations" 0)) lev;
               Output.print_string conf "</th>\n"
             end;
             Output.print_string conf "</tr>\n"
@@ -1029,7 +1029,7 @@ let display_descendant_with_table conf base max_lev p =
   in
   Hutil.header_fluid conf (descendants_title conf base p);
   Output.print_string conf "<p>\n";
-  Output.printf conf "%s." (Utf8.capitalize (text_to conf max_lev));
+  Output.printf conf "%s." (Utf8.capitalize_fst (text_to conf max_lev));
   Output.print_string conf "</p>\n";
   Output.print_string conf "<table class=descends_table>\n";
   (* On affiche l'entête et on en profite pour récupèrer *)
@@ -1039,7 +1039,7 @@ let display_descendant_with_table conf base max_lev p =
   end;
   Output.print_string conf "</table>\n";
   Output.print_string conf "<p>\n";
-  Output.printf conf "%s%s %d %s" (Utf8.capitalize (transl conf "total"))
+  Output.printf conf "%s%s %d %s" (Utf8.capitalize_fst (transl conf "total"))
     (Util.transl conf ":")
     !nb_pers
     (transl_nth conf "person/persons" 1);
@@ -1303,7 +1303,7 @@ let print_aboville conf base max_level p =
   let num_aboville = p_getenv conf.env "num" = Some "on" in
   Hutil.header conf (descendants_title conf base p);
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "%s.<br><p>" (Utf8.capitalize (text_to conf max_level));
+  Output.printf conf "%s.<br><p>" (Utf8.capitalize_fst (text_to conf max_level));
   let rec loop_ind lev lab p =
     if num_aboville then Output.printf conf "<tt>%s</tt>\n" lab
     else Output.printf conf "%s\n" lab;

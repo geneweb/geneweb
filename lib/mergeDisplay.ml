@@ -12,7 +12,7 @@ let print_someone conf base p =
 
 let print conf base p =
   let title h =
-    Output.print_string conf (Utf8.capitalize (transl_decline conf "merge" ""));
+    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "merge" ""));
     if h then ()
     else
       begin
@@ -71,7 +71,7 @@ for=\"%s\">" (string_of_iper (get_iper p));
     list;
   Output.print_string conf "<button type=\"submit\" \
  class=\"btn btn-primary btn-lg mt-2\">";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</form>\n";
   Hutil.trailer conf
@@ -87,7 +87,7 @@ let print_possible_continue_merging conf base =
         (commd conf)
         (string_of_iper ini1)
         (string_of_iper ini2)
-        (Utf8.capitalize (transl conf "continue merging"));
+        (Utf8.capitalize_fst (transl conf "continue merging"));
       print_someone conf base p1;
       Output.printf conf "\n%s\n" (transl_nth conf "and" 0);
       print_someone conf base p2;
@@ -112,7 +112,7 @@ let print_possible_continue_merging conf base =
               let s = person_text conf base p in
               Output.printf conf {|<p><a href="%sm=MRG_DUP&ip=%s%s%s">%s</a> (%s)</p>|}
                 (commd conf) (string_of_iper ip) s1 s2
-                (Utf8.capitalize (transl conf "continue merging"))
+                (Utf8.capitalize_fst (transl conf "continue merging"))
                 (transl_a_of_b conf
                    (transl conf "possible duplications")
                    (reference conf base p s) s)

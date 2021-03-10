@@ -156,7 +156,7 @@ let print_same_name conf base p =
   | pl ->
       Output.print_string conf "<p>\n";
       Output.printf conf "%s%s\n"
-        (Utf8.capitalize (transl conf "persons having the same name"))
+        (Utf8.capitalize_fst (transl conf "persons having the same name"))
         (transl conf ":");
       Output.print_string conf "<ul>\n";
       List.iter
@@ -206,17 +206,17 @@ let print_aux conf param value submit =
   Output.print_string conf {|</form></p>|}
 
 let print_return conf =
-  print_aux conf "return" "ok" (Utf8.capitalize (transl conf "back"))
+  print_aux conf "return" "ok" (Utf8.capitalize_fst (transl conf "back"))
 
 let print_continue
-    conf ?(continue = Utf8.capitalize (transl conf "continue")) param value =
+    conf ?(continue = Utf8.capitalize_fst (transl conf "continue")) param value =
   print_aux conf param value continue
 
 let prerr conf _err fn =
 #ifdef API
   if not !Api_conf.mode_api then begin
 #endif
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title ;
   fn () ;
   Hutil.trailer conf;
@@ -229,7 +229,7 @@ let prerr conf _err fn =
 let print_err_unknown conf _base (f, s, o) =
   let err =
     Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
-      (Utf8.capitalize (transl conf "unknown person")) (transl conf ":") f o s
+      (Utf8.capitalize_fst (transl conf "unknown person")) (transl conf ":") f o s
   in
   prerr conf err @@ fun () ->
   Output.print_string conf err;
@@ -280,7 +280,7 @@ let string_of_error conf base = function
       (transl conf "would be his/her own ancestor")
   | BadSexOfMarriedPerson _ ->
     Printf.sprintf "%s."
-      (Utf8.capitalize (transl conf "cannot change sex of a married person"))
+      (Utf8.capitalize_fst (transl conf "cannot change sex of a married person"))
 
 let print_error conf base e =
   Output.print_string conf @@ string_of_error conf base e
@@ -293,7 +293,7 @@ let someone_ref_text conf base p =
 
 let print_list_aux conf base title list printer =
   if list <> [] then begin
-    Output.printf conf "%s\n<ul>" (Utf8.capitalize (transl conf title)) ;
+    Output.printf conf "%s\n<ul>" (Utf8.capitalize_fst (transl conf title)) ;
     printer conf base list ;
     Output.print_string conf "</ul>";
   end
@@ -318,7 +318,7 @@ let print_warning conf base =
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
       Output.printf conf "%s\n"
-        (Utf8.capitalize (transl conf "changed order of children"));
+        (Utf8.capitalize_fst (transl conf "changed order of children"));
       Output.print_string conf "-&gt;\n";
       Output.print_string conf
         (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
@@ -373,7 +373,7 @@ let print_warning conf base =
       Output.print_string conf "</ul>\n"
   | ChangedOrderOfMarriages (p, before, after) ->
       Output.printf conf "%s\n"
-        (Utf8.capitalize (transl conf "changed order of marriages"));
+        (Utf8.capitalize_fst (transl conf "changed order of marriages"));
       Output.print_string conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
@@ -409,7 +409,7 @@ let print_warning conf base =
       Output.print_string conf "</table>\n"
   | ChangedOrderOfFamilyEvents (_, before, after) ->
       Output.printf conf "%s\n"
-        (Utf8.capitalize (transl conf "changed order of family's events"));
+        (Utf8.capitalize_fst (transl conf "changed order of family's events"));
       Output.print_string conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
@@ -440,7 +440,7 @@ let print_warning conf base =
       Output.print_string conf "</table>\n"
   | ChangedOrderOfPersonEvents (_, before, after) ->
       Output.printf conf "%s\n"
-        (Utf8.capitalize (transl conf "changed order of person's events"));
+        (Utf8.capitalize_fst (transl conf "changed order of person's events"));
       Output.print_string conf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
@@ -672,7 +672,7 @@ let print_misc conf _base =
   function
     MissingSources ->
       Output.print_string conf "<em>";
-      Output.printf conf "%s\n" (Utf8.capitalize (transl conf "missing sources"));
+      Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "missing sources"));
       Output.print_string conf "</em>"
 
 (* ************************************************************************* *)
@@ -707,7 +707,7 @@ let print_miscs conf base ml =
 (* ************************************************************************* *)
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then begin
-    Output.printf conf "%s\n" (Utf8.capitalize (transl conf "warnings"));
+    Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "warnings"));
     Output.print_string conf "<ul>\n";
     List.iter
       (fun w ->
@@ -732,7 +732,7 @@ let error conf base x =
   print_return conf
 
 let error_locked conf =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Output.print_string conf "<p>\n";
   Output.printf conf
@@ -762,7 +762,7 @@ let error_locked conf =
   Output.printf conf "<input type=\"hidden\" name=\"retry\" value=\"%s\">\n"
     (Util.escape_html conf.user);
   Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
-    (Utf8.capitalize (transl conf "try again"));
+    (Utf8.capitalize_fst (transl conf "try again"));
   Output.print_string conf "</form>\n";
   Output.print_string conf "</td>\n";
   Output.print_string conf "<td>\n";
@@ -783,7 +783,7 @@ let error_locked conf =
     | None -> ()
   end;
   Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
-    (Utf8.capitalize (transl_nth conf "user/password/cancel" 2));
+    (Utf8.capitalize_fst (transl_nth conf "user/password/cancel" 2));
   Output.print_string conf "</form>\n";
   Output.print_string conf "</td>\n";
   Output.print_string conf "</tr>\n";
@@ -816,7 +816,7 @@ let bad_date conf d =
   let err =
     Printf.sprintf
       "%s%s%a\n"
-      (Utf8.capitalize (transl conf "incorrect date"))
+      (Utf8.capitalize_fst (transl conf "incorrect date"))
       (transl conf ":")
       (fun _ -> function
          | {day = 0; month = 0; year = a} -> Printf.sprintf "%d" a
@@ -1089,29 +1089,29 @@ let print_create_conflict conf base p var =
     free_n;
   Output.print_string conf "<ul>\n";
   Output.print_string conf "<li>";
-  Output.printf conf "%s%s %d. \n" (Utf8.capitalize (transl conf "first free number"))
+  Output.printf conf "%s%s %d. \n" (Utf8.capitalize_fst (transl conf "first free number"))
     (transl conf ":") free_n;
   Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
   Output.printf conf " %s." (transl conf "to try again with this number");
   Output.print_string conf "</li>";
   Output.print_string conf "<li>";
-  Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
+  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "or"));
   Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
   Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
   Output.print_string conf "</li>";
   Output.print_string conf "<li>";
-  Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
+  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "or"));
   Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
   Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "use \"link\" instead of \"create\"");
   Output.print_string conf "</li>";
   Output.print_string conf "</ul>\n";
   Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
-    (Utf8.capitalize (transl conf "create"));
+    (Utf8.capitalize_fst (transl conf "create"));
   Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
-    (Utf8.capitalize (transl conf "back"));
+    (Utf8.capitalize_fst (transl conf "back"));
   Output.print_string conf "</form>\n";
   print_same_name conf base p
 

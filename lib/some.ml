@@ -8,7 +8,7 @@ open Util
 module StrSet = Mutil.StrSet
 
 let not_found conf txt x =
-  let title _ = Output.printf conf "%s: \"%s\"" (Utf8.capitalize txt) (Util.escape_html x) in
+  let title _ = Output.printf conf "%s: \"%s\"" (Utf8.capitalize_fst txt) (Util.escape_html x) in
   Hutil.rheader conf title; Hutil.print_link_to_welcome conf false; Hutil.trailer conf
 
 let first_name_not_found conf =
@@ -36,7 +36,7 @@ let print_branch_to_alphabetic conf x nb_branch =
   Output.print_string conf "<td>";
   Output.print_string conf "<b>";
   Output.print_string conf
-    (Utf8.capitalize (transl_nth conf "display by/branch/alphabetic order" 0));
+    (Utf8.capitalize_fst (transl_nth conf "display by/branch/alphabetic order" 0));
   Output.print_string conf "</b>";
   Output.print_string conf "</td>";
   Output.print_string conf "<td>";
@@ -95,7 +95,7 @@ let print_alphabetic_to_branch conf x =
   Output.print_string conf "<td>";
   Output.print_string conf "<b>";
   Output.print_string conf
-    (Utf8.capitalize (transl_nth conf "display by/branch/alphabetic order" 0));
+    (Utf8.capitalize_fst (transl_nth conf "display by/branch/alphabetic order" 0));
   Output.print_string conf "</b>";
   Output.print_string conf "</td>";
   Output.print_string conf "<td>";
@@ -275,7 +275,7 @@ let first_name_print_list conf base x1 xl liste =
 let select_first_name conf n list =
   let title _ =
     Output.printf conf "%s \"%s\" : %s"
-      (Utf8.capitalize (transl_nth conf "first name/first names" 0)) n
+      (Utf8.capitalize_fst (transl_nth conf "first name/first names" 0)) n
       (transl conf "specify")
   in
   Hutil.header conf title;
@@ -610,7 +610,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   in
   let title _ =
     Output.printf conf "%s \"%s\" : %s"
-      (Utf8.capitalize (transl_nth conf "surname/surnames" 0)) fx
+      (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0)) fx
       (transl conf "specify")
   in
   Hutil.header conf title;
@@ -630,7 +630,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
     (fun (_, txt, sn) -> Output.print_string conf (access txt sn)) list;
   Output.print_string conf "<p>\n";
   Output.print_string conf "<em style=\"font-size:80%%\">\n";
-  Output.printf conf "%s " (Utf8.capitalize (transl conf "click"));
+  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "click"));
   Output.printf conf "<a href=\"%sm=N&o=i&v=%s\">%s</a>\n" (commd conf)
     (if List.length homonymes = 1 then Mutil.encode x ^ "&t=A"
      else Mutil.encode fx)

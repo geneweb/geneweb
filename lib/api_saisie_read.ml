@@ -1182,7 +1182,7 @@ let get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers
                 else  ""
           in
           let event_witness_type =
-            Utf8.capitalize wk ^ witness_date ^ ": " ^ witnesses_name
+            Utf8.capitalize_fst wk ^ witness_date ^ ": " ^ witnesses_name
           in
           let husband = pers_to_piqi_callback conf base p base_prefix in
           let wife =

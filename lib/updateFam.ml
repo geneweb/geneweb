@@ -198,7 +198,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
             let fam = foi base fam.fam_index in
             let e = List.nth (get_fevents fam) (i - 1) in
             let name =
-              Utf8.capitalize (Util.string_of_fevent_name conf base e.efam_name)
+              Utf8.capitalize_fst (Util.string_of_fevent_name conf base e.efam_name)
             in
             let date =
               match Adef.od_of_cdate e.efam_date with
@@ -438,8 +438,8 @@ and eval_parent conf env k =
     ["himher"] ->
       let s =
         match get_env "cnt" env with
-          Vint 1 -> Utf8.capitalize (transl_nth conf "him/her" 0)
-        | Vint 2 -> Utf8.capitalize (transl_nth conf "him/her" 1)
+          Vint 1 -> Utf8.capitalize_fst (transl_nth conf "him/her" 0)
+        | Vint 2 -> Utf8.capitalize_fst (transl_nth conf "him/her" 1)
         | Vint _ -> transl conf "him/her"
         | _ -> "???"
       in
@@ -689,7 +689,7 @@ let print_update_fam conf base fcd digest =
 let print_del1 conf base ifam =
   let title _ =
     let s = transl_nth conf "family/families" 0 in
-    Output.print_string conf (Utf8.capitalize (transl_decline conf "delete" s))
+    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "delete" s))
   in
   let p =
     match p_getenv conf.env "ip" with
@@ -716,7 +716,7 @@ let print_del1 conf base ifam =
   Output.print_string conf "<p>\n";
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</p>\n";
   Output.print_string conf "</form>\n";
@@ -725,13 +725,13 @@ let print_del1 conf base ifam =
 
 let print_inv1 conf base p ifam1 ifam2 =
   let title _ =
-    Output.print_string conf (Utf8.capitalize (transl_decline conf "invert" ""))
+    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "invert" ""))
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.printf conf "%s%s"
-    (Utf8.capitalize (transl conf "invert the order of the following families"))
+    (Utf8.capitalize_fst (transl conf "invert the order of the following families"))
     (Util.transl conf ":");
   Output.print_string conf "<ul>\n";
   Output.print_string conf "<li>\n";
@@ -758,7 +758,7 @@ let print_inv1 conf base p ifam1 ifam2 =
   Output.print_string conf "<p>\n";
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</p>\n";
   Output.print_string conf "</form>\n";
@@ -900,14 +900,14 @@ let print_change_order conf base =
       let (before, after) = get_family p, Array.of_list after in
       let (bef_d, aft_d) = Difference.f before after in
       let title _ =
-        Output.print_string conf (Utf8.capitalize (transl_decline conf "invert" ""))
+        Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "invert" ""))
       in
       Perso.interp_templ_with_menu title "perso_header" conf base p;
       Output.print_string conf "<h2>\n";
       title false;
       Output.print_string conf "</h2>\n";
       Output.printf conf "%s%s"
-        (Utf8.capitalize (transl conf "invert the order of the following families"))
+        (Utf8.capitalize_fst (transl conf "invert the order of the following families"))
         (Util.transl conf ":");
       Output.print_string conf "<table style=\"margin:1em\">\n";
       Output.print_string conf "<tr>\n";
@@ -937,7 +937,7 @@ let print_change_order conf base =
       Output.print_string conf "<p>\n";
       Output.print_string conf
         "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+      Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_string conf "</button>\n";
       Output.print_string conf "</p>\n";
       Output.print_string conf "</form>\n";

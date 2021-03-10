@@ -28,7 +28,7 @@ let print_child_person conf base p =
   Output.printf conf "<tr align=\"%s\">\n" conf.left;
   Output.print_string conf "<td>";
   Output.printf conf "<label for=\"%s_fn\" class=\"mx-2 mb-0\">%s</label>"
-    var (Utf8.capitalize (transl_nth conf "first name/first names" 0));
+    var (Utf8.capitalize_fst (transl_nth conf "first name/first names" 0));
   Output.print_string conf "</td>\n";
   Output.print_string conf "<td colspan=\"3\">\n";
   Output.printf conf "<input name=\"%s_first_name\" class=\"form-control\" \
@@ -37,7 +37,7 @@ size=\"23\" maxlength=\"200\" id=\"%s_fn\" value=\"%s\">\n" var var
   Output.print_string conf "</td>\n";
   Output.printf conf "<td align=\"%s\">" conf.right;
   Output.printf conf "<label for=\"%s_occ\" class=\"mx-2 mb-0\">%s</label>"
-    var (Utf8.capitalize (transl conf "number"));
+    var (Utf8.capitalize_fst (transl conf "number"));
   Output.print_string conf "</td>\n";
   Output.print_string conf "<td>\n";
   Output.printf conf "<input class=\"form-control\" id=\"%s_occ\" name=\"%s_occ\" \
@@ -48,7 +48,7 @@ size=\"5\" maxlength=\"8\"%s>\n" var var
   Output.printf conf "<tr align=\"%s\">\n" conf.left;
   Output.print_string conf "<td>";
   Output.printf conf "<label for=\"%s_sn\" class=\"mx-2 mb-0\">%s</label>"
-    var (Utf8.capitalize (transl_nth conf "surname/surnames" 0));
+    var (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0));
   Output.print_string conf "</td>\n";
   Output.print_string conf "<td colspan=\"5\">\n";
   Output.printf conf "<input name=\"%s_surname\" class=\"form-control\" \
@@ -76,7 +76,7 @@ let print_children conf base ipl =
 let print_change conf base p =
   let title _ =
     let s = transl conf "change children's names" in
-    Output.print_string conf (Utf8.capitalize s)
+    Output.print_string conf (Utf8.capitalize_fst s)
   in
   let children = children_of_p base p in
   let digest = digest_children base children in
@@ -100,7 +100,7 @@ let print_change conf base p =
   Output.print_string conf "\n";
   Output.print_string conf
     "<button type=\"submit\" class=\"btn btn-primary btn-lg ml-5 mb-2\">";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "validate/delete" 0));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_string conf "</button>\n";
   Output.print_string conf "</form>\n";
   Output.print_string conf "\n";
@@ -114,7 +114,7 @@ let print conf base =
 
 let print_children_list conf base u =
   Output.print_string conf "<h4>";
-  Output.print_string conf (Utf8.capitalize (transl_nth conf "child/children" 1));
+  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "child/children" 1));
   Output.print_string conf "</h4>";
   Output.print_string conf "\n<p>\n";
   Output.print_string conf "<ul>\n";
@@ -135,7 +135,7 @@ let print_children_list conf base u =
 let print_change_done conf base p =
   let title _ =
     let s = transl conf "children's names changed" in
-    Output.print_string conf (Utf8.capitalize s)
+    Output.print_string conf (Utf8.capitalize_fst s)
   in
   Hutil.header conf title;
   Output.printf conf "\n%s" (reference conf base p (person_text conf base p));
@@ -144,7 +144,7 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
@@ -152,14 +152,14 @@ let print_conflict conf base ip_var p =
   in
   Output.print_string conf "<ul>\n";
   Output.print_string conf "<li>";
-  Output.printf conf "%s%s %d.\n" (Utf8.capitalize (transl conf "first free number"))
+  Output.printf conf "%s%s %d.\n" (Utf8.capitalize_fst (transl conf "first free number"))
     (Util.transl conf ":") free_n;
   Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
     (transl conf "create");
   Output.printf conf " %s.\n" (transl conf "to try again with this number");
   Output.print_string conf "</li>";
   Output.print_string conf "<li>";
-  Output.printf conf "%s " (Utf8.capitalize (transl conf "or"));
+  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "or"));
   Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
   Output.printf conf " %s %s." (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
@@ -177,18 +177,18 @@ let print_conflict conf base ip_var p =
   Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
     free_n;
   Output.printf conf  "<button type=\"submit\" name=\"create\" \
-class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "create"));
+class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize_fst (transl conf "create"));
   Output.printf conf "<button type=\"submit\" name=\"return\" \
-class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize (transl conf "back"));
+class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize_fst (transl conf "back"));
   Output.print_string conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
   raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 
 let error_person conf err =
-  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "error")) in
+  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.printf conf "%s\n" (Utf8.capitalize err);
+  Output.printf conf "%s\n" (Utf8.capitalize_fst err);
   Hutil.trailer conf;
   raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
 

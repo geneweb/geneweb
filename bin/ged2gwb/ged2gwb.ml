@@ -1577,7 +1577,7 @@ let aux fn s =
   in
   loop 0 0
 
-let capitalize_name = aux Utf8.capitalize
+let capitalize_name = aux Utf8.capitalize_fst
 
 let uppercase_name = aux Utf8.uppercase
 
