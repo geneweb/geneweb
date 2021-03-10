@@ -4,6 +4,7 @@ type i18n_expr =
   | Arg of string
   | Str of string
   | Elision of string * string
+  | Declension of char * string
 
 let flush buffer acc =
   let acc = match Buffer.contents buffer with
@@ -98,13 +99,21 @@ and p_lang split acc = parse
   | "" { acc }
 
 and p_trad buffer acc = parse
-  | '%' (num+ as n) {
+  | '%' (num as n) {
       let acc = flush buffer acc in
-      p_trad buffer (Arg ("_" ^ n) :: acc) lexbuf
+      p_trad buffer (Arg ("_" ^ String.make 1 n) :: acc) lexbuf
     }
-  | '%' (lower+ as n) {
+  | '%' (lower as n) {
       let acc = flush buffer acc in
-      p_trad buffer (Arg n :: acc) lexbuf
+      p_trad buffer (Arg (String.make 1 n) :: acc) lexbuf
+    }
+  | ':' (lower as c) ':' '%' (num as n) {
+      let acc = flush buffer acc in
+      p_trad buffer (Declension (c, "_" ^ String.make 1 n) :: acc) lexbuf
+    }
+  | ':' (lower as c) ':' '%' (lower as n) {
+      let acc = flush buffer acc in
+      p_trad buffer (Declension (c, String.make 1 n) :: acc) lexbuf
     }
   | '[' ([^'|']* as s1) '|' ([^']']* as s2) ']' {
       let acc = flush buffer acc in

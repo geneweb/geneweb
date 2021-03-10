@@ -1038,6 +1038,7 @@ let trans (conf : Config.config) =
         let conv acc = function
           | Lexicon_parser.Str s -> s
           | Arg n -> Jg_runtime.string_of_tvalue (arg n)
+          | Declension (c, n) -> arg n |> Jg_runtime.string_of_tvalue |> Mutil.decline c
           | Elision (s1, s2) ->
             let x = try unbox_string @@ arg "elision" with Not_found -> acc in
             if x <> ""
