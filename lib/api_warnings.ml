@@ -27,8 +27,6 @@ let close_children = ref []
 let dead_old = ref []
 let dead_too_early_to_be_father = ref []
 let fevent_order = ref []
-let fevent_witness_after_death = ref []
-let fevent_witness_before_birth = ref []
 let incoherent_ancestor_date = ref []
 let marriage_date_after_death = ref []
 let marriage_date_before_birth = ref []
@@ -39,8 +37,6 @@ let parent_too_old = ref []
 let parent_too_young = ref []
 let possible_duplicate_fam = ref []
 let pevent_order = ref []
-let pevent_witness_after_death = ref []
-let pevent_witness_before_birth = ref []
 let title_dates_error = ref []
 let undefined_sex = ref []
 let witness_date_after_death = ref []
@@ -147,17 +143,15 @@ let add_warning_to_piqi_warning_list conf base =
         ; event1 = Util.string_of_fevent_name conf base e1.efam_name
         ; event2 = Util.string_of_fevent_name conf base e2.efam_name ;
       }
-  | FWitnessEventAfterDeath (p, e) ->
-    set_list fevent_witness_after_death
-      M.Warning_fwitness_event_after_death.{
+  | FWitnessEventAfterDeath (p, _) ->
+    set_list witness_date_after_death
+      M.Warning_witness_date_after_death.{
         person = p2wp base p
-        ; event = Util.string_of_fevent_name conf base e.efam_name ;
       }
-  | FWitnessEventBeforeBirth (p, e) ->
-    set_list fevent_witness_before_birth
-      M.Warning_fwitness_event_before_birth.{
+  | FWitnessEventBeforeBirth (p, _) ->
+    set_list witness_date_before_birth
+      M.Warning_witness_date_before_birth.{
         person = p2wp base p
-      ; event = Util.string_of_fevent_name conf base e.efam_name
     }
   | IncoherentAncestorDate (a, p) ->
       let ancestor =
@@ -228,17 +222,15 @@ let add_warning_to_piqi_warning_list conf base =
       ; event1 = pn2s e1.epers_name
       ; event2 = pn2s e2.epers_name
       }
-  | PWitnessEventAfterDeath (p, e) ->
-    set_list pevent_witness_after_death
-      M.Warning_pwitness_event_after_death.{
+  | PWitnessEventAfterDeath (p, _e) ->
+    set_list witness_date_after_death
+      M.Warning_witness_date_after_death.{
         person = p2wp base p
-      ; event = pn2s e.epers_name
       }
-  | PWitnessEventBeforeBirth (p, e) ->
-    set_list pevent_witness_before_birth
-      M.Warning_pwitness_event_before_birth.{
+  | PWitnessEventBeforeBirth (p, _e) ->
+    set_list witness_date_before_birth
+      M.Warning_witness_date_before_birth.{
         person = p2wp base p
-      ; event = pn2s e.epers_name
       }
   | TitleDatesError (p, _) ->
     set_list title_dates_error
@@ -266,8 +258,6 @@ let add_warning_to_piqi_warning_list conf base =
       }
 
 let create_piqi_warnings () =
-  (* Ajouter une limite. Pour pierfit, on peut
-     exploser la taille des données à envoyer. *)
   M.Base_warnings.{
     warning_already_defined = !already_defined;
     warning_own_ancestor = !own_ancestor;
@@ -293,8 +283,8 @@ let create_piqi_warnings () =
     warning_changed_order_of_marriages = !changed_order_of_marriages;
     warning_big_age_between_spouses = !big_age_between_spouses;
     warning_dead_old = !dead_old;
-    warning_witness_date_after_death = !witness_date_after_death;
-    warning_witness_date_before_birth = !witness_date_before_birth;
+    warning_witness_date_after_death = List.sort_uniq compare !witness_date_after_death;
+    warning_witness_date_before_birth = List.sort_uniq compare !witness_date_before_birth;
     warning_distant_children = !distant_children;
   }
 

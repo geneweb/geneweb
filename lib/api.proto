@@ -475,30 +475,10 @@ message WarningFeventOrder {
   required string event2 = 3;
 }
 
-message WarningFwitnessEventAfterDeath {
-  required WarningPerson person = 1;
-  required string event = 2;
-}
-
-message WarningFwitnessEventBeforeBirth {
-  required WarningPerson person = 1;
-  required string event = 2;
-}
-
 message WarningPeventOrder {
   required WarningPerson person = 1;
   required string event1 = 2;
   required string event2 = 3;
-}
-
-message WarningPwitnessEventAfterDeath {
-  required WarningPerson person = 1;
-  required string event = 2;
-}
-
-message WarningPwitnessEventBeforeBirth {
-  required WarningPerson person = 1;
-  required string event = 2;
 }
 
 message BaseWarnings {
