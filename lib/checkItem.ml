@@ -129,26 +129,21 @@ let changed_fevents_order warning (ifam, fam) =
   let b = get_fevents fam in
   if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
 
-let titles_after_birth warning p t =
+let title_dates warning p t =
   let t_date_start = Adef.od_of_cdate t.t_date_start in
   let t_date_end = Adef.od_of_cdate t.t_date_end in
-  begin match t_date_start, t_date_end with
-    Some d1, Some d2 ->
-      if strictly_after d1 d2 then warning (TitleDatesError (p, t))
-  | _ -> ()
-  end;
-  match Adef.od_of_cdate (get_birth p) with
-    Some d1 ->
-      begin match t_date_start with
-        Some d -> if strictly_after d1 d then warning (TitleDatesError (p, t))
-      | None -> ()
-      end;
-      begin match t_date_end with
-        Some d -> if strictly_after d1 d then warning (TitleDatesError (p, t))
-      | None -> ()
-      end;
-      ()
-  | _ -> ()
+  match t_date_start, t_date_end with
+  | None, None -> ()
+  | Some d1, Some d2 when strictly_after d1 d2 -> warning (TitleDatesError (p, t))
+  | _ ->
+    match Adef.od_of_cdate (get_birth p) with
+    | None -> ()
+    | Some d1 ->
+      match t_date_start with
+      | Some d -> if strictly_after d1 d then warning (TitleDatesError (p, t))
+      | None -> match t_date_end with
+        | Some d -> if strictly_after d1 d then warning (TitleDatesError (p, t))
+        | None -> ()
 
 let check_person_age warning p =
   let aux d1 d2 =
@@ -806,7 +801,7 @@ let check_parents warning fam fath moth =
 let person ?(onchange = true) base warning p =
   check_pevents base warning p;
   check_person_age warning p;
-  List.iter (titles_after_birth warning p) (get_titles p);
+  List.iter (title_dates warning p) (get_titles p);
   if onchange then changed_pevents_order warning p ;
   related_sex_is_coherent base warning p
 
