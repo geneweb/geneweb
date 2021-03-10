@@ -1390,6 +1390,9 @@ let conf_and_connection =
               `LOG_WARNING
               (Printf.sprintf "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
         with e ->
+#ifdef DEBUG
+          Printexc.print_backtrace stderr ;
+#endif
           GwdLog.syslog `LOG_CRIT (context conf contents ^ " " ^ Printexc.to_string e)
 
 let chop_extension name =
