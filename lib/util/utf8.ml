@@ -85,6 +85,14 @@ let capitalize_fst s =
   in
   cmap_utf_8 cmap s
 
+let capitalize s =
+  let first = ref true in
+  let cmap u =
+    if !first then (first := false ; Uucp.Case.Map.to_upper u)
+    else Uucp.Case.Map.to_lower u
+  in
+  cmap_utf_8 cmap s
+
 module C = struct
 
   type t = Str of string | Chr of char | Empty
