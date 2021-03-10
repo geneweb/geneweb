@@ -11,21 +11,16 @@ open Gwdb
 open Util
 open Api_util
 
-(* ********************************************************************* *)
-(*  [Fonc] print_error : conf -> code -> unit                            *)
-(** [Description] : Retourne une erreur compréhensible par l'appelant.
-    [Args] :
-      - conf  : configuration de la base
-      - code  : code d'erreur
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
+(** [print_error conf code]
+    Print error code and [raise Exit]
+*)
 let print_error conf code =
-    let piqi_error = Mread.default_error() in
-        piqi_error.Mread.Error.code <- code;
-    let data = Mext_read.gen_error piqi_error in
-    Output.status conf Def.Bad_Request ;
-    print_result conf data
+  let piqi_error = Mread.default_error() in
+  piqi_error.Mread.Error.code <- code;
+  let data = Mext_read.gen_error piqi_error in
+  Output.status conf Def.Bad_Request ;
+  print_result conf data ;
+  raise Exit
 
 (**/**) (* Conversion de dates *)
 
@@ -2144,7 +2139,6 @@ let is_private_person conf base ip =
 (* ********************************************************************* *)
 let print_from_identifier_person conf base print_result_from_ip identifier_person =
   match identifier_person.Mread.Identifier_person.index with
-  | exception _ -> print_error conf `not_found
   | Some index ->
     (* Traite l'index *)
     let ip = Gwdb.iper_of_string @@ Int32.to_string index in
@@ -2183,7 +2177,7 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
         | (Some fn, Some sn) -> (fn, sn)
         | (None, Some sn) -> ("", sn)
         | (Some fn, None) -> (fn, "")
-        | _ -> print_error conf `bad_request; ("", "")
+        | _ -> print_error conf `bad_request
       in
       let (an, order) =
         if fn = "" then
