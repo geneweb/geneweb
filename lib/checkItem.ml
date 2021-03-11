@@ -496,7 +496,7 @@ let child_born_before_mother_death warning x mother =
       match Date.date_of_death @@ get_death mother with
       | Some (Dgreg (d2, _)) ->
         if strictly_after_dmy d1 d2
-        then warning (MotherDeadAfterChildBirth (mother, x))
+        then warning (MotherDeadBeforeChildBirth (mother, x))
       | _ -> ()
     end
   | _ -> ()

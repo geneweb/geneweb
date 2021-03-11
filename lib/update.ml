@@ -563,7 +563,7 @@ let print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
-  | MotherDeadAfterChildBirth (mother, child) ->
+  | MotherDeadBeforeChildBirth (mother, child) ->
       Output.printf conf
         (ftransl conf "%t is born after the death of his/her mother %t")
         (fun _ ->

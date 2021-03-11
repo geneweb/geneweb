@@ -841,8 +841,8 @@ and mk_warning conf base =
   | MarriageDateBeforeBirth p ->
     Tset [ Tstr "MarriageDateBeforeBirth"
          ; unsafe_mk_person conf base p ]
-  | MotherDeadAfterChildBirth (p1, p2) ->
-    Tset [ Tstr "MotherDeadAfterChildBirth"
+  | MotherDeadBeforeChildBirth (p1, p2) ->
+    Tset [ Tstr "MotherDeadBeforeChildBirth"
          ; unsafe_mk_person conf base p1
          ; unsafe_mk_person conf base p2 ]
   | OldForMarriage (p, a) ->

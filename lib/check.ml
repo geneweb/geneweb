@@ -178,7 +178,7 @@ let print_base_warning oc base =
   | MarriageDateBeforeBirth p ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "marriage before his/her birth\n"
-  | MotherDeadAfterChildBirth (mother, child) ->
+  | MotherDeadBeforeChildBirth (mother, child) ->
       Printf.fprintf oc "%s is born after the death of his/her mother %s\n"
         (designation base child) (designation base mother)
   | ParentBornAfterChild (parent, child) ->

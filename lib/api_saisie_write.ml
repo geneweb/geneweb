@@ -760,7 +760,7 @@ let compute_warnings conf base resp =
                   (fun _ -> print_someone_dates p)
                 in
                 w :: wl
-            | MotherDeadAfterChildBirth (mother, child) ->
+            | MotherDeadBeforeChildBirth (mother, child) ->
                 let w =
                 Printf.sprintf
                   (ftransl conf "%t is born after the death of his/her mother %t")

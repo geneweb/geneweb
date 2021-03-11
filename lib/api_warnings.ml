@@ -144,9 +144,7 @@ let add_warning_to_piqi_warning_list conf base =
       { w with warning_marriage_date_before_birth =
                  M.Warning_marriage_date_before_birth.{person = p2wp base p}
                  :: w.warning_marriage_date_before_birth }
-    | MotherDeadAfterChildBirth (m, c) ->
-      (* Étrangement c'est le seul message qui se lit de droite à gauche *)
-      (* Naissance de l'enfant après la mort de sa mère => on le renomme *)
+    | MotherDeadBeforeChildBirth (m, c) ->
       { w with warning_mother_dead_before_child_birth =
                  M.Warning_mother_dead_before_child_birth.{
                    mother = p2wp base m

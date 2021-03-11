@@ -266,7 +266,7 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | IncoherentAncestorDate of 'person * 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
-  | MotherDeadAfterChildBirth of 'person * 'person
+  | MotherDeadBeforeChildBirth of 'person * 'person
   | ParentBornAfterChild of 'person * 'person
   | ParentTooOld of 'person * dmy
   | ParentTooYoung of 'person * dmy
