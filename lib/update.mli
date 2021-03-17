@@ -5,7 +5,7 @@ open Def
 open Gwdb
 
 type update_error =
-  | UERR of string
+  | UERR of Adef.safe_string
   | UERR_sex_married of person
   | UERR_sex_incoherent of base * person
   | UERR_sex_undefined of string * string * int
@@ -14,10 +14,10 @@ type update_error =
   | UERR_own_ancestor of base * person
   | UERR_digest
   | UERR_bad_date of Def.dmy
-  | UERR_missing_field of string
+  | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of base * person
-  | UERR_missing_surname of string
-  | UERR_missing_first_name of string
+  | UERR_missing_surname of Adef.safe_string
+  | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
 
 exception ModErr of update_error
@@ -65,7 +65,12 @@ val print_return : config -> unit
     with a submit button "continue", plus a hidden field [param=value].
     Optionnal [continue] parameter is the label used for the submit button.
 *)
-val print_continue : config -> ?continue:string -> string -> string -> unit
+val print_continue
+  : config
+  -> ?continue:Adef.encoded_string
+  -> string
+  -> Adef.encoded_string
+  -> unit
 
 (** [prerr conf err callback]
     Regular mode: print error page using [callback] (wrapped in header/trailer)
@@ -74,7 +79,7 @@ val print_continue : config -> ?continue:string -> string -> string -> unit
 *)
 val prerr : config -> update_error -> (unit -> unit) -> 'a
 
-val string_of_error : config -> update_error -> string
+val string_of_error : config -> update_error -> Adef.safe_string
 val print_error : config -> update_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit
 val print_miscs : config -> base -> CheckItem.base_misc list -> unit
@@ -127,3 +132,6 @@ val print_create_conflict
   -> person
   -> string
   -> 'exn
+
+(** [print_order_changed conf print_list before after] *)
+val print_order_changed : config -> ('a array -> bool array -> unit) -> 'a array -> 'a array -> unit

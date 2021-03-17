@@ -30,6 +30,9 @@ let slashify_linux_dos s =
   String.map (function '/' -> '\\' | c -> c) s
 #endif
 
+let decode s = Mutil.decode (Adef.encoded s)
+let encode s = (Mutil.encode s :> string)
+
 let rec list_remove_assoc x =
   function
     (x1, y1) :: l -> if x = x1 then l else (x1, y1) :: list_remove_assoc x l
@@ -57,16 +60,14 @@ let charset conf =
 let header_no_page_title conf title =
   Output.status printer_conf Def.OK;
   Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
-  Output.print_string printer_conf
+  Output.print_sstring printer_conf
     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
-     \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
-  Output.print_string printer_conf "<head>\n";
-  Output.print_string printer_conf "  <meta name=\"robots\" content=\"none\">\n";
-  Output.print_string printer_conf "  <title>";
+     \"http://www.w3.org/TR/REC-html40/loose.dtd\">\
+     <head>\
+     <meta name=\"robots\" content=\"none\">\
+     <title>";
   title true;
-  Output.print_string printer_conf "</title>\n";
-  Output.print_string printer_conf "</head>\n";
-  Output.print_string printer_conf "<body>\n"
+  Output.print_sstring printer_conf "</title></head><body>"
 
 let abs_setup_dir () =
   if Filename.is_relative !setup_dir then
@@ -74,27 +75,18 @@ let abs_setup_dir () =
   else !setup_dir
 
 let trailer _conf =
-  Output.print_string printer_conf "\n<br />\n";
-  Output.print_string printer_conf "<div id=\"footer\">\n";
-  Output.print_string printer_conf "<hr />\n";
-  Output.print_string printer_conf "<div>\n";
-  Output.print_string printer_conf "<em>\n";
-  Output.printf printer_conf
-    "<a href=\"https://github.com/geneweb/geneweb/\">\
-     <img src=\"images/logo_bas.png\" style = \"border: 0\" /></a> \
-     Version %s Copyright &copy 1998-2021\n</em>\n"
-    Version.txt;
-  Output.print_string printer_conf "</div>\n";
-  Output.print_string printer_conf "</div>\n";
-  (* finish the html page *)
-  Output.print_string printer_conf "</body>\n";
-  Output.print_string printer_conf "</html>\n"
+  Output.print_sstring printer_conf {|<br><div id="footer"><hr><div><em>|} ;
+  Output.print_sstring printer_conf {|<a href="https://github.com/geneweb/geneweb/">|} ;
+  Output.print_sstring printer_conf {|<img src="images/logo_bas.png" style="border:0"></a>|} ;
+  Output.print_sstring printer_conf {| Version |} ;
+  Output.print_sstring printer_conf Version.txt ;
+  Output.print_sstring printer_conf " Copyright &copy; 1998-2021</em></div></div></body></html>"
 
 let header conf title =
   header_no_page_title conf title;
-  Output.print_string printer_conf "<h1>";
+  Output.print_sstring printer_conf "<h1>";
   title false;
-  Output.print_string printer_conf "</h1>\n"
+  Output.print_sstring printer_conf "</h1>"
 
 let strip_control_m s =
   let rec loop i len =
@@ -129,7 +121,7 @@ let strip_spaces str =
   else if start > stop then ""
   else String.sub str start (stop - start)
 
-let getenv env label = Mutil.decode (List.assoc (Mutil.decode label) env)
+let getenv env label = decode (List.assoc (decode label) env)
 
 let p_getenv env label = try Some (getenv env label) with Not_found -> None
 
@@ -139,6 +131,7 @@ let rec skip_spaces s i =
   if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 
 let create_env s =
+  let s = (s : Adef.encoded_string :> string) in
   let rec get_assoc beg i =
     if i = String.length s then
       if i = beg then [] else [String.sub s beg (i - beg)]
@@ -150,7 +143,9 @@ let create_env s =
   let rec separate i s =
     if i = String.length s then s, ""
     else if s.[i] = '=' then
-      String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
+      ( String.sub s 0 i
+      , String.sub s (succ i) (String.length s - succ i)
+      )
     else separate (succ i) s
   in
   List.map (separate 0) (get_assoc 0 0)
@@ -169,8 +164,8 @@ let parameters =
   let rec loop comm =
     function
       (k, s) :: env ->
-        let k = strip_spaces (Mutil.decode k) in
-        let s = strip_spaces (Mutil.decode s) in
+        let k = strip_spaces (decode k) in
+        let s = strip_spaces (decode s) in
         if k = "" || s = "" then loop comm env
         else if k = "opt" then loop comm env
         else if k = "anon" then loop (comm ^ " " ^ stringify s) env
@@ -183,7 +178,7 @@ let parameters =
                     (k1, s1) :: env as genv ->
                       begin match numbered_key k1 with
                         Some (k1, _) when k1 = k ->
-                          let s1 = strip_spaces (Mutil.decode s1) in
+                          let s1 = strip_spaces (decode s1) in
                           let s =
                             if s1 = "" then s else s ^ " \"" ^ s1 ^ "\""
                           in
@@ -213,8 +208,8 @@ let parameters_1 =
   let rec loop comm bname =
     function
     | (k, s) :: env ->
-        let k = strip_spaces (Mutil.decode k) in
-        let s = strip_spaces (Mutil.decode s) in
+        let k = strip_spaces (decode k) in
+        let s = strip_spaces (decode s) in
         if k = "" || s = "" then loop comm bname env
         else if k = "opt" then loop comm bname env
         else if k = "gwd_p" && s <> "" then loop (comm ^ " -gwd_p " ^ stringify s ) bname env
@@ -246,8 +241,8 @@ let parameters_2 =
   let rec loop comm =
     function
     | (k, s) :: env ->
-        let k = strip_spaces (Mutil.decode k) in
-        let s = strip_spaces (Mutil.decode s) in
+        let k = strip_spaces (decode k) in
+        let s = strip_spaces (decode s) in
         if k = "" || s = "" then loop comm env
         else if k = "opt" then loop comm env
         else if k = "anon1" then loop (comm ^ " " ^ stringify s) env
@@ -573,7 +568,7 @@ let rec copy_from_stream conf print strm =
                        print "<input type=hidden name=";
                        print k;
                        print " value=\"";
-                       print (Mutil.decode s);
+                       print (decode s);
                        print "\">\n"
                      end)
                 conf.env
@@ -776,7 +771,7 @@ and print_selector conf print =
              then begin print k; print "="; print v; print ";" end)
           conf.env;
         print "sel=";
-        print (Mutil.encode d);
+        print (encode d);
         print "\">";
         print x;
         print "</a>";
@@ -838,20 +833,20 @@ let print_file conf bname =
   | Some ic ->
     Output.status printer_conf Def.OK;
     Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
-    copy_from_stream conf (Output.print_string printer_conf) (Stream.of_channel ic);
+    copy_from_stream conf (Output.print_sstring printer_conf) (Stream.of_channel ic);
     close_in ic;
     trailer conf
   | None ->
-    let title _ = Output.print_string printer_conf "Error" in
+    let title _ = Output.print_sstring printer_conf "Error" in
     header conf title;
-    Output.print_string printer_conf "<ul><li>\n";
+    Output.print_sstring printer_conf "<ul><li>\n";
     Output.printf printer_conf "Cannot access file \"%s\".\n" fname;
-    Output.print_string printer_conf "</ul>\n";
+    Output.print_sstring printer_conf "</ul>\n";
     trailer conf;
     raise Exit
 
 let error conf str =
-  header conf (fun _ -> Output.print_string printer_conf "Incorrect request");
+  header conf (fun _ -> Output.print_sstring printer_conf "Incorrect request");
   Output.printf printer_conf "<em>%s</em>\n" (String.capitalize_ascii str);
   trailer conf
 
@@ -1382,7 +1377,7 @@ let rec check_rename_conflict conf =
 
 let rename conf =
   let rename_list =
-    List.map (fun (k, v) -> k, strip_spaces (Mutil.decode v)) conf.env
+    List.map (fun (k, v) -> k, strip_spaces (decode v)) conf.env
   in
   try
     check_new_names conf rename_list (all_db ".");
@@ -1496,8 +1491,11 @@ let gwf conf =
   else
     let benv = read_base_env in_base in
     let trailer =
-      Util.escape_html
-        (file_contents (Filename.concat "lang" (in_base ^ ".trl")))
+      (in_base ^ ".trl")
+      |> Filename.concat "lang"
+      |> file_contents
+      |> Util.escape_html
+      |> fun s -> (s :> string)
     in
     let conf = { conf with env = benv @ ("trailer", trailer) :: conf.env } in
     print_file conf "gwf_1.htm"
@@ -1629,11 +1627,12 @@ let print_typed_file conf typ fname =
       end;
       close_in ic
   | None ->
-      let title _ = Output.print_string printer_conf "Error" in
+      let title _ = Output.print_sstring printer_conf "Error" in
       header conf title;
-      Output.print_string printer_conf "<ul><li>\n";
-      Output.printf printer_conf "Cannot access file \"%s\".\n" fname;
-      Output.print_string printer_conf "</ul>\n";
+      Output.print_sstring printer_conf "<ul><li>";
+      Output.print_sstring printer_conf "Cannot access file \"";
+      Output.print_string printer_conf (Util.escape_html fname);
+      Output.print_sstring printer_conf "\".</ul>";
       trailer conf;
       raise Exit
 
@@ -1767,9 +1766,8 @@ let input_lexicon lang =
   let t = Hashtbl.create 501 in
   try
     let ic =
-      open_in
-        (List.fold_right Filename.concat [!setup_dir; "setup"; "lang"]
-           "lexicon.txt")
+      List.fold_right Filename.concat [!setup_dir; "setup"; "lang"] "lexicon.txt"
+      |> open_in
     in
     let derived_lang =
       match lindex lang '-' with
@@ -1814,7 +1812,7 @@ let input_lexicon lang =
     with e -> close_in ic; raise e
   with Sys_error _ -> t
 
-let setup (addr, req) comm env_str =
+let setup (addr, req) comm (env_str : Adef.encoded_string) =
   let conf =
     let env = create_env env_str in
     if env = [] && (comm = "" || String.length comm = 2) then
@@ -1842,7 +1840,7 @@ let setup (addr, req) comm env_str =
   else if conf.comm = "" then print_file conf "welcome.htm"
   else setup_comm conf comm
 
-let wrap_setup a b c =
+let wrap_setup a b (c : Adef.encoded_string) =
 #ifdef WINDOWS
   (* another process have been launched, therefore we lost variables;
      and we cannot parse the arg list again, because of possible spaces

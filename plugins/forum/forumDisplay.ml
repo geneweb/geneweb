@@ -65,6 +65,10 @@ let print_foreach conf _base print_ast eval_expr =
   in
   print_foreach
 
+let str_val x = VVstring x
+let safe_val (x : [< `encoded | `escaped | `safe] Adef.astring) =
+  VVstring ((x :> Adef.safe_string) :> string)
+
 let rec eval_var conf base env _xx _loc =
   function
     ["can_post"] -> VVbool (can_post conf)
@@ -73,7 +77,7 @@ let rec eval_var conf base env _xx _loc =
   | "message" :: sl -> eval_message_var conf base env sl
   | ["pos"] ->
     begin match get_env "pos" env with
-        Vpos r -> VVstring (MF.string_of_pos !r)
+        Vpos r -> safe_val (MF.string_of_pos !r)
       | _ -> raise Not_found
     end
   | _ -> raise Not_found
@@ -81,7 +85,7 @@ and eval_message_var conf base env =
   function
     ["access"] ->
     begin match get_env "mess" env with
-        Vmess (mess, _, _, _, _) -> VVstring mess.m_access
+        Vmess (mess, _, _, _, _) -> str_val mess.m_access
       | _ -> raise Not_found
     end
   | "date" :: sl ->
@@ -98,17 +102,17 @@ and eval_message_var conf base env =
   | ["friend"] ->
     if passwd_in_file conf "friend" then
       match get_env "mess" env with
-        Vmess (mess, _, _, _, _) -> VVstring mess.m_friend
+        Vmess (mess, _, _, _, _) -> str_val mess.m_friend
       | _ -> raise Not_found
-    else VVstring ""
+    else str_val ""
   | ["from"] ->
     begin match get_env "mess" env with
-        Vmess (mess, _, _, _, _) -> VVstring mess.m_from
+        Vmess (mess, _, _, _, _) -> str_val mess.m_from
       | _ -> raise Not_found
     end
   | ["hour"] ->
     begin match get_env "mess" env with
-        Vmess (mess, _, _, _, _) -> VVstring mess.m_hour
+        Vmess (mess, _, _, _, _) -> str_val mess.m_hour
       | _ -> raise Not_found
     end
   | "ident" :: sl ->
@@ -129,18 +133,18 @@ and eval_message_var conf base env =
           let back_pos = backward_pos conf pos in
           match get_message conf back_pos with
             Some (acc, mess, _, _) ->
-            if back_pos = pos then VVstring ""
+            if back_pos = pos then str_val ""
             else if acc && is_visible conf mess then
-              VVstring (MF.string_of_pos back_pos)
+              safe_val (MF.string_of_pos back_pos)
             else loop back_pos
-          | None -> VVstring ""
+          | None -> str_val ""
         in
         loop pos
       | _ -> raise Not_found
     end
   | ["pos"] ->
     begin match get_env "mess" env with
-        Vmess (_, _, pos, _, _) -> VVstring (MF.string_of_pos pos)
+        Vmess (_, _, pos, _, _) -> safe_val (MF.string_of_pos pos)
       | _ -> raise Not_found
     end
   | "prev_date" :: sl ->
@@ -148,7 +152,7 @@ and eval_message_var conf base env =
         Vmess (_, prev_mess, _, _, _) ->
         begin match prev_mess with
             Some mess -> eval_date_var conf mess.m_date sl
-          | None -> VVstring ""
+          | None -> str_val ""
         end
       | _ -> raise Not_found
     end
@@ -159,9 +163,9 @@ and eval_message_var conf base env =
           match get_message conf next_pos with
             Some (acc, mess, next_pos, next_next_pos) ->
             if acc && is_visible conf mess then
-              VVstring (MF.string_of_pos next_pos)
+              safe_val (MF.string_of_pos next_pos)
             else loop next_next_pos
-          | None -> VVstring ""
+          | None -> str_val ""
         in
         loop next_pos
       | _ -> raise Not_found
@@ -186,24 +190,24 @@ and eval_message_var conf base env =
     end
   | ["wiki"] ->
     begin match get_env "mess" env with
-        Vmess (mess, _, _, _, _) -> VVstring mess.m_wiki
+        Vmess (mess, _, _, _, _) -> str_val mess.m_wiki
       | _ -> raise Not_found
     end
   | ["wizard"] ->
     if passwd_in_file conf "wizard" then
       match get_env "mess" env with
-        Vmess (mess, _, _, _, _) -> VVstring mess.m_wizard
+        Vmess (mess, _, _, _, _) -> str_val mess.m_wizard
       | _ -> raise Not_found
-    else VVstring ""
+    else str_val ""
   | _ -> raise Not_found
 and eval_date_var conf date =
   function
     ["month"] ->
     begin match date with
-        Dgreg (d, _) -> VVstring (string_of_int d.month)
-      | _ -> VVstring ""
+        Dgreg (d, _) -> str_val (string_of_int d.month)
+      | _ -> str_val ""
     end
-  | [] -> VVstring (Util.translate_eval (DateDisplay.string_of_date conf date))
+  | [] -> str_val (Util.translate_eval (DateDisplay.string_of_date conf date :> string))
   | _ -> raise Not_found
 and eval_message_text_var conf base str so =
   function
@@ -227,7 +231,7 @@ and eval_message_text_var conf base str so =
         html_highlight case_sens h s
       | None -> s
     in
-    VVstring s
+    str_val s
   | ["nowiki"] ->
     let s = string_with_macros conf [] str in
     let s =
@@ -237,26 +241,26 @@ and eval_message_text_var conf base str so =
         html_highlight case_sens h s
       | None -> s
     in
-    VVstring s
-  | ["raw"] -> VVstring (Util.escape_html str)
+    str_val s
+  | ["raw"] -> str_val str
   | sl -> eval_message_string_var conf str so sl
 and eval_message_string_var conf str so =
   function
     ["cut"; s] ->
-    begin try VVstring (no_html_tags (sp2nbsp (int_of_string s) str)) with
+    begin try str_val (sp2nbsp (int_of_string s) str) with
         Failure _ -> raise Not_found
     end
-  | ["v"] -> VVstring (Util.escape_html str)
+  | ["v"] -> safe_val (Util.escape_html str)
   | [] ->
     let s = Util.escape_html str in
     let s =
       match so with
         Some h ->
         let case_sens = p_getenv conf.env "c" = Some "on" in
-        html_highlight case_sens h s
+        html_highlight case_sens h (s : Adef.escaped_string :> string) |> Adef.escaped
       | None -> s
     in
-    VVstring s
+    safe_val s
   | _ -> raise Not_found
 
 let visualize conf base mess =
@@ -273,40 +277,47 @@ let visualize conf base mess =
 let message_txt conf n =
   transl_nth conf "message/previous message/previous messages/next message" n
 
-let print_del_ok conf next_pos =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "message deleted"))
-  in
+let print_aux conf pos title =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  begin match next_pos with
-      Some pos ->
-      Output.printf conf "<a href=\"%sm=FORUM&p=%s\">%s</a>\n" (commd conf)
-        (MF.string_of_pos pos) (Utf8.capitalize_fst (message_txt conf 3))
+  begin match pos with
+    | Some pos ->
+      Output.print_sstring conf {|<a href="|} ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf {|m=FORUM&p=|} ;
+      Output.print_string conf (MF.string_of_pos pos) ;
+      Output.print_sstring conf {|">|} ;
+      message_txt conf 3        (* FIXME: safe_string? *)
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+      Output.print_sstring conf {|</a>|} ;
     | None ->
-      Output.printf conf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-        (Utf8.capitalize_fst (transl conf "database forum"))
-  end;
+      Output.print_sstring conf {|<a href="|} ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf {|m=FORUM">|} ;
+      transl conf "database forum"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+      Output.print_sstring conf {|</a>|}
+  end ;
   Hutil.trailer conf
 
+let print_del_ok conf next_pos =
+  print_aux conf next_pos @@ fun _ ->
+  transl conf "message deleted"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf
 
 let print_valid_ok conf pos del =
-  let mess =
-    if del then transl conf "message deleted" else transl conf "message added"
-  in
-  let title _ = Output.print_string conf (Utf8.capitalize_fst mess) in
-  let next_pos = find_next_pos conf pos in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
-  begin match next_pos with
-      Some pos ->
-      Output.printf conf "<a href=\"%sm=FORUM&p=%s\">%s</a>\n" (commd conf)
-        (MF.string_of_pos pos) (Utf8.capitalize_fst (message_txt conf 3))
-    | None ->
-      Output.printf conf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-        (Utf8.capitalize_fst (transl conf "database forum"))
-  end;
-  Hutil.trailer conf
+  print_aux conf pos @@ fun _ ->
+  if del then
+    transl conf "message deleted"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
+  else
+    transl conf "message added"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
 
 let print_forum_message conf base r so =
   let env =
@@ -348,7 +359,7 @@ let valid_forum_message conf base pos =
       if set_validator conf pos then
         begin
           if del then forum_del conf pos;
-          print_valid_ok conf pos del
+          print_valid_ok conf (Some pos) del
         end
       else print_forum_headers conf base
     else print_forum_headers conf base
@@ -374,7 +385,7 @@ let print_add_ok conf base =
     let email = String.trim (get conf "Email") in
     let subject = String.trim (get conf "Subject") in
     let text = Gutil.trim_trailing_spaces (get1 conf "Text") in
-    {m_time = time; m_date = Dtext ""; m_hour = ""; m_waiting = false;
+    {m_time = (time :> string); m_date = Dtext ""; m_hour = ""; m_waiting = false;
      m_from = ""; m_ident = ident; m_wizard = ""; m_friend = "";
      m_email = email; m_access = ""; m_subject = subject; m_wiki = "";
      m_text = text}
@@ -389,18 +400,32 @@ let print_add_ok conf base =
   else if mess.m_ident = "" || mess.m_text = "" then print conf base
   else begin
     let title _ =
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "message added"))
+      transl conf "message added"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf
     in
     let mods = moderators conf in
     forum_add conf base (mods <> []) mess;
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
-    if mods <> [] then
-      Output.printf conf "<p>%s. %s.</p>"
-        (Utf8.capitalize_fst (transl conf "this forum is moderated"))
-        (Utf8.capitalize_fst (transl conf "your message is waiting for validation"));
-    Output.printf conf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-      (Utf8.capitalize_fst (transl conf "database forum"));
+    if mods <> [] then begin
+      Output.print_sstring conf "<p>" ;
+      transl conf "this forum is moderated"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+      Output.print_sstring conf ". " ;
+      transl conf "your message is waiting for validation"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+      Output.print_sstring conf ".</p>"
+    end ;
+    Output.print_sstring conf {|<a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf {|m=FORUM">|} ;
+    transl conf "database forum"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf {|</a> |} ;
     Hutil.trailer conf
   end
 

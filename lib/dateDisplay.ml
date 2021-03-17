@@ -170,6 +170,7 @@ let replace_spaces_by_nbsp s =
   loop 0 0
 
 let string_of_on_prec_dmy conf sy sy2 d =
+  Adef.safe @@
   let r = string_of_on_prec_dmy_aux conf sy sy2 d in
   replace_spaces_by_nbsp r
 
@@ -194,6 +195,7 @@ let string_of_on_hebrew_dmy conf d =
   string_of_on_prec_dmy conf sy sy2 d
 
 let string_of_prec_dmy conf s s2 d =
+  Adef.safe @@
   match d.prec with
     Sure -> Mutil.nominative s
   | About -> transl_decline conf "about (date)" s
@@ -310,21 +312,24 @@ let gregorian_precision conf d =
     let d2 =
       Calendar.gregorian_of_sdn d.prec (Calendar.sdn_of_gregorian d + d.delta)
     in
-    transl conf "between (date)" ^ " " ^ string_of_on_dmy conf d ^ " " ^
-    transl_nth conf "and" 0 ^ " " ^ string_of_on_dmy conf d2
+    Adef.safe @@
+    transl conf "between (date)" ^ " " ^ (string_of_on_dmy conf d :> string) ^ " " ^
+    transl_nth conf "and" 0 ^ " " ^ (string_of_on_dmy conf d2 :> string)
 
-let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy) ?(sep = " ") conf =
+let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy) ?(sep = Adef.safe " ") conf =
+  let mk_link c d (s : Adef.safe_string) =
+    Adef.safe @@
+    Printf.sprintf
+      {|<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
+          (commd conf :> string) c d.year c d.month c d.day c (s :> string)
+  in
   function
     Dgreg (d, Dgregorian) ->
       let s = dmy conf d in
-      if link && d.day > 0 then
-        Printf.sprintf
-          "<a href=\"%sm=CAL&yg=%d&mg=%d&dg=%d&tg=1\" class=\"date\">%s</a>"
-          (commd conf) d.year d.month d.day s
-      else s
+      if link && d.day > 0 then mk_link 'g' d s else s
   | Dgreg (d, Djulian) ->
       let cal_prec =
-        if d.year < 1582 then "" else " (" ^ gregorian_precision conf d ^ ")"
+        if d.year < 1582 then Adef.safe "" else " (" ^<^ gregorian_precision conf d ^>^ ")"
       in
       let d1 = Calendar.julian_of_gregorian d in
       let year_prec =
@@ -335,58 +340,37 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy) ?(sep = " ") conf =
         else ""
       in
       let s =
-        dmy conf d1 ^ year_prec ^ sep ^
-        transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
+        dmy conf d1 ^^^ year_prec ^<^ sep ^^^
+        transl_nth conf "gregorian/julian/french/hebrew" 1 ^<^ cal_prec
       in
-      if link && d1.day > 0 then
-        Printf.sprintf
-          "<a href=\"%sm=CAL&yj=%d&mj=%d&dj=%d&tj=1\" class=\"date\">%s</a>"
-          (commd conf) d1.year d1.month d1.day s
-      else s
+      if link && d1.day > 0 then mk_link 'j' d1 s else s
   | Dgreg (d, Dfrench) ->
       let d1 = Calendar.french_of_gregorian d in
       let s = string_of_on_french_dmy conf d1 in
-      let s =
-        if link && d1.day > 0 then
-          Printf.sprintf
-            "<a href=\"%sm=CAL&yf=%d&mf=%d&df=%d&tf=1\" class=\"date\">%s</a>"
-            (commd conf) d1.year d1.month d1.day s
-        else s
+      let s = if link && d1.day > 0 then mk_link 'f' d1 s else s
       in
       begin match d.prec with
-        | Sure | About | Before | After | Maybe ->
-          s ^ " (" ^ gregorian_precision conf d ^ ")"
+        | Sure | About | Before | After | Maybe -> s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
         | OrYear _ | YearInt _ -> s
       end
   | Dgreg (d, Dhebrew) ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let s = string_of_on_hebrew_dmy conf d1 in
       begin match d.prec with
-        | Sure | About | Before | After | Maybe ->
-          s ^ " (" ^ gregorian_precision conf d ^ ")"
+        | Sure | About | Before | After | Maybe -> s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
         | OrYear _ | YearInt _ -> s
       end
-  | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")"
+  | Dtext t -> "(" ^<^ (Util.escape_html t :> Adef.safe_string) ^>^ ")"
 
 let string_of_ondate ?link conf d =
-  string_of_date_aux ?link ~dmy:string_of_on_dmy conf d
+  (string_of_date_aux ?link ~dmy:string_of_on_dmy conf d :> string)
   |> Util.translate_eval
+  |> Adef.safe
 
-let string_of_date conf =
-  function
-    Dgreg (d, _) -> string_of_dmy conf d
-  | Dtext t -> t
+let string_of_date conf = function
+  | Dgreg (d, _) -> string_of_dmy conf d
+  | Dtext t -> (Util.escape_html t :> Adef.safe_string)
 
-(* ********************************************************************** *)
-(*  [Fonc] string_slash_of_date : config -> Def.date -> string            *)
-(** [Description] : Renvoie une date sous la forme jj/mm/aaaa (en
-                    fonction du 'date order').
-    [Args] :
-      - conf : configuration de la base
-      - d  : Def.date
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
 let string_slash_of_date conf date =
   let rec slashify_dmy (fst, snd, trd) d =
     let code fst snd trd =
@@ -395,34 +379,39 @@ let string_slash_of_date conf date =
     in
     match d.prec with
       OrYear d2 ->
-        let sy = code fst snd trd in
-        let d2 = Date.dmy_of_dmy2 d2 in
-        let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
-        sy ^ " " ^ transl conf "or" ^ " " ^ sy2
+      let sy = code fst snd trd in
+      let d2 = Date.dmy_of_dmy2 d2 in
+      let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
+      sy ^ " " ^ transl conf "or" ^ " " ^ sy2
     | YearInt d2 ->
-        let sy = code fst snd trd in
-        let d2 = Date.dmy_of_dmy2 d2 in
-        let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
-        transl conf "between (date)" ^ " " ^ sy ^ " " ^
-        transl_nth conf "and" 0 ^ " " ^ sy2
-    | _ -> let sy = code fst snd trd in string_of_prec_dmy conf sy "" d
+      let sy = code fst snd trd in
+      let d2 = Date.dmy_of_dmy2 d2 in
+      let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
+      transl conf "between (date)" ^ " " ^ sy ^ " " ^
+      transl_nth conf "and" 0 ^ " " ^ sy2
+    | _ ->
+      let sy = code fst snd trd in
+      (string_of_prec_dmy conf sy "" d :> string)
   in
   match date with
-    Dgreg (d, Dgregorian) -> slashify_dmy (decode_dmy conf d) d
-  | Dgreg (d, Djulian) ->
+  | Dtext t -> (Util.escape_html t :> Adef.safe_string)
+  | Dgreg (d, cal) ->
+    Adef.safe @@ match cal with
+    | Dgregorian -> slashify_dmy (decode_dmy conf d) d
+    | Djulian ->
       let d1 = Calendar.julian_of_gregorian d in
       slashify_dmy (translate_dmy conf (decode_dmy conf d1) Djulian true) d1 ^
       " (" ^ transl_nth conf "gregorian/julian/french/hebrew" 1 ^ ")"
-  | Dgreg (d, Dfrench) ->
+    | Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
       slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench true) d1
-  | Dgreg (d, Dhebrew) ->
+    | Dhebrew ->
       let d1 = Calendar.french_of_gregorian d in
       slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew true) d1 ^
       " (" ^ transl_nth conf "gregorian/julian/french/hebrew" 3 ^ ")"
-  | Dtext t -> t
 
 let string_of_age conf a =
+  Adef.safe @@
   match a with
     {day = 0; month = 0; year = y} ->
       if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
@@ -556,6 +545,7 @@ let prec_year_text conf d =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 let short_dates_text conf base p =
+  Adef.safe @@
   if authorized_age conf base p then
     let (birth_date, death_date, _) = Gutil.get_birth_death_date p in
     let s =
@@ -595,6 +585,7 @@ let short_dates_text conf base p =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 let short_marriage_date_text conf base fam p1 p2 =
+  Adef.safe @@
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_cdate (get_marriage fam) with
       Some (Dgreg (d, _)) ->
@@ -602,7 +593,9 @@ let short_marriage_date_text conf base fam p1 p2 =
     | _ -> ""
   else ""
 
-let string_of_place conf pl = Util.string_with_macros conf [] pl
+let string_of_place conf pl =
+  Util.string_with_macros conf [] pl
+  |> Util.safe_html
 
 let print_dates conf base p =
   let cap s = ", " ^ s in
@@ -610,14 +603,14 @@ let print_dates conf base p =
   let birth_place = sou base (get_birth_place p) in
   begin match Adef.od_of_cdate (get_birth p) with
     Some d ->
-      Output.print_string conf (cap (transl_nth conf "born" is));
-      Output.print_string conf " ";
+      Output.print_sstring conf (cap (transl_nth conf "born" is));
+      Output.print_sstring conf " ";
       Output.print_string conf (string_of_ondate conf d);
-      if birth_place <> "" then Output.print_string conf ",\n"
+      if birth_place <> "" then Output.print_sstring conf ",\n"
   | None ->
       if birth_place <> "" then begin
-        Output.print_string conf (cap (transl_nth conf "born" is)) ;
-        Output.print_string conf "\n-&nbsp;"
+        Output.print_sstring conf (cap (transl_nth conf "born" is)) ;
+        Output.print_sstring conf "\n-&nbsp;"
       end
   end;
   if birth_place <> "" then
@@ -626,14 +619,14 @@ let print_dates conf base p =
   let baptism_place = sou base (get_baptism_place p) in
   begin match baptism with
     Some d ->
-      Output.print_string conf (cap (transl_nth conf "baptized" is));
-      Output.print_string conf " ";
+      Output.print_sstring conf (cap (transl_nth conf "baptized" is));
+      Output.print_sstring conf " ";
       Output.print_string conf (string_of_ondate conf d);
-      if baptism_place <> "" then Output.print_string conf ",\n"
+      if baptism_place <> "" then Output.print_sstring conf ",\n"
   | None ->
       if baptism_place <> "" then begin
-        Output.print_string conf (cap (transl_nth conf "baptized" is)) ;
-        Output.print_string conf "\n-&nbsp;"
+        Output.print_sstring conf (cap (transl_nth conf "baptized" is)) ;
+        Output.print_sstring conf "\n-&nbsp;"
       end
   end;
   if baptism_place <> "" then
@@ -650,21 +643,21 @@ let print_dates conf base p =
         | Disappeared -> transl_nth conf "disappeared" is
       in
       let d = Adef.date_of_cdate d in
-      Output.print_string conf (cap dr_w);
-      Output.print_string conf " ";
+      Output.print_sstring conf (cap dr_w);
+      Output.print_sstring conf " ";
       Output.print_string conf (string_of_ondate conf d);
-      if death_place <> "" then Output.print_string conf ",\n"
+      if death_place <> "" then Output.print_sstring conf ",\n"
   | DeadYoung ->
-      Output.print_string conf (cap (transl_nth conf "died young" is));
-      if death_place <> "" then Output.print_string conf "\n-&nbsp;"
+      Output.print_sstring conf (cap (transl_nth conf "died young" is));
+      if death_place <> "" then Output.print_sstring conf "\n-&nbsp;"
   | DeadDontKnowWhen ->
       begin match death_place, get_burial p with
         "", (Buried _ | Cremated _) -> ()
       | _ ->
           if death_place <> "" || not (of_course_died conf p) then
             begin
-              Output.print_string conf (cap (transl_nth conf "died" is));
-              if death_place <> "" then Output.print_string conf "\n-&nbsp;"
+              Output.print_sstring conf (cap (transl_nth conf "died" is));
+              if death_place <> "" then Output.print_sstring conf "\n-&nbsp;"
             end
       end
   | DontKnowIfDead | NotDead | OfCourseDead -> ()
@@ -675,19 +668,19 @@ let print_dates conf base p =
     let place = sou base (get_burial_place p) in
     begin match Adef.od_of_cdate cod with
       Some d ->
-        Output.print_string conf " ";
+        Output.print_sstring conf " ";
         Output.print_string conf (string_of_ondate conf d);
-        if place <> "" then Output.print_string conf ",\n"
-    | None -> if place <> "" then Output.print_string conf " -&nbsp;"
+        if place <> "" then Output.print_sstring conf ",\n"
+    | None -> if place <> "" then Output.print_sstring conf " -&nbsp;"
     end;
     if place <> "" then Output.print_string conf (string_of_place conf place)
   in
   begin match get_burial p with
     Buried cod ->
-      Output.print_string conf (cap (transl_nth conf "buried" is));
+      Output.print_sstring conf (cap (transl_nth conf "buried" is));
       burial_date_place cod
   | Cremated cod ->
-      Output.print_string conf (cap (transl_nth conf "cremated" is));
+      Output.print_sstring conf (cap (transl_nth conf "cremated" is));
       burial_date_place cod
   | UnknownBurial -> ()
   end;
@@ -700,15 +693,21 @@ let print_dates conf base p =
       if a.year < 0 || a.year = 0 && a.month = 0 then ()
       else
         begin
-          Output.print_string conf "\n(";
-          Output.print_string conf (transl conf "age at death:");
-          Output.print_string conf " ";
+          Output.print_sstring conf "\n(";
+          Output.print_sstring conf (transl conf "age at death:");
+          Output.print_sstring conf " ";
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
           else begin
-            Output.print_string conf (transl_decline conf "possibly (date)" "");
-            Output.print_string conf " ";
+            Output.print_sstring conf (transl_decline conf "possibly (date)" "");
+            Output.print_sstring conf " ";
           end ;
           Output.print_string conf (string_of_age conf a) ;
-          Output.print_string conf ")"
+          Output.print_sstring conf ")"
         end
   | _ -> ()
+
+(* For public interfce, force [string_of_prec_dmy] args to be safe strings *)
+let string_of_prec_dmy conf s s2 d =
+  let s = (s : Adef.safe_string :> string) in
+  let s2 = (s2 : Adef.safe_string :> string) in
+  string_of_prec_dmy conf s s2 d

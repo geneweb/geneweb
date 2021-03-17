@@ -27,15 +27,16 @@ type excl =
 let robot_error conf cnt sec =
   Output.status conf Def.Forbidden;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
-  let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
-  Util.include_template conf env "robot"
-    (fun () ->
-      let title _ = Output.print_string conf "Access refused" in
-      Output.print_string conf "<head><title>";
-      title true;
-      Output.print_string conf "</title>\n<body>\n<h1>";
-      title false;
-      Output.print_string conf "</body>\n");
+  let env = [ "cnt", Adef.encoded (string_of_int cnt)
+            ; "sec", Adef.encoded (string_of_int sec) ] in
+  Util.include_template conf env "robot" begin fun () ->
+    let title _ = Output.print_sstring conf "Access refused" in
+    Output.print_sstring conf "<head><title>";
+    title true;
+    Output.print_sstring conf "</title>\n<body>\n<h1>";
+    title false;
+    Output.print_sstring conf "</body>\n"
+  end ;
   raise Exit
 
 let purge_who tm xcl sec =

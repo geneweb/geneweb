@@ -12,127 +12,157 @@ let image_normal_txt conf base p fname width height =
   let b = acces conf base p in
   let k = default_image_name base p in
   let r =
-    Printf.sprintf "\
-<img src=\"%sm=IM&d=%d&%s&k=/%s\"%s%s alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
-      (commd conf)
-      (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
-      (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
-      (if height = 0 then "" else " height=\"" ^ string_of_int height ^ "\"")
-      image_txt image_txt
-      (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
-      (if height = 0 then ""
-       else " max-height:" ^ string_of_int height ^ "px;")
+    "<img src=\""
+    ^<^ commd conf
+    ^^^ "m=IM&d="
+    ^<^ (string_of_int @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+    ^<^ "&"
+    ^<^ b
+    ^^^ "&k=/"
+    ^<^ Util.escape_html k
+    ^>^ "\""
+    ^ (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
+    ^ (if height = 0 then "" else " height=\"" ^ string_of_int height ^ "\"")
+    ^ " alt=\""
+    ^ image_txt
+    ^ "\" title=\""
+    ^ image_txt
+    ^ "\" style=\""
+    ^ (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
+    ^ " "
+    ^ (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
+    ^ "\">"
   in
-  Printf.sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
+  {|<a href="|}
+  ^ (commd conf : Adef.escaped_string :> string)
+  ^ {|m=IM&|} ^ (b : Adef.escaped_string :> string) ^ {|&k=/|} ^ k ^ {|">|}
+  ^ (r : Adef.escaped_string :> string) ^ "</a>"
+  |> Adef.safe
 
-let image_url_txt conf url_p url height =
+let image_url_txt conf url_p url height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  Printf.sprintf "<a href=\"%s\">" url_p ^
-  Printf.sprintf "<img src=\"%s\"\n alt=\"%s\" title=\"%s\" style=\"%s\" />" url
-    image_txt image_txt
-    (if height = 0 then ""
-     else " max-height:" ^ string_of_int height ^ "px;") ^
-  "</a>\n"
+  Adef.safe @@
+  {|<a href="|} ^ (url_p : Adef.escaped_string :> string) ^ {|"><img src="|} ^ (url : Adef.escaped_string :> string)
+  ^ {|" alt="|} ^ image_txt ^ {|" title="|} ^ image_txt ^ {|" style="|}
+  ^ (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
+  ^ {|">|} ^ image_txt ^ {|</a>|}
 
-let image_url_txt_with_size conf url_p url width height =
+let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  Printf.sprintf "<a href=\"%s\">" url_p ^
-  Printf.sprintf
-    "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
-    url width height image_txt image_txt
-    (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
-    (if height = 0 then ""
-     else " max-height:" ^ string_of_int height ^ "px;") ^
-  "</a>\n"
+  Adef.safe @@
+  {|<a href="|} ^ (url_p : Adef.escaped_string :> string) ^ {|">|} ^
+  {|<img src="|} ^ (url : Adef.escaped_string :> string) ^ {|" width="|}
+  ^ string_of_int width ^ {|" height="|} ^ string_of_int height ^ {|" alt="|}
+  ^ image_txt ^ {|" title="|} ^ image_txt ^ {|" style="|}
+  ^ (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
+  ^ {| |} ^ (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^ {|">|}
+  ^ image_txt
+  ^ "</a>"
 
 let image_txt conf base p =
+  Adef.safe @@
   match p_getenv conf.env "image" with
-    Some "off" -> ""
+  | Some "off" -> ""
   | _ ->
-      if has_image conf base p then
-        match image_and_size conf base p (limited_image_size 100 75) with
-          Some (true, f, Some (wid, hei)) ->
-            "<br" ^
-            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f wid hei ^
-            "</td></tr></table></center>\n"
-        | Some (true, f, None) ->
-            "<br" ^
-            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f 0 75 ^
-            "</td></tr></table></center>\n"
-        | Some (false, url, Some (wid, hei)) ->
-            let url_p = commd conf ^ acces conf base p in
-            "<br" ^
-            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt_with_size conf url_p url wid hei ^
-            "</td></tr></table></center>\n"
-        | Some (false, url, None) ->
-            let url_p = commd conf ^ acces conf base p in
-            let height = 75 in
-            "<br" ^
-            (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
-            ">\n<center><table border=\"0\" style=\"height: " ^ string_of_int height ^
-            "px\"><tr align=\"left\"><td>\n" ^
-              image_url_txt conf url_p url height ^ "</td></tr></table></center>\n"
-        | _ -> ""
-      else
-        ""
+    if has_image conf base p then
+      match image_and_size conf base p (limited_image_size 100 75) with
+      | Some (true, f, Some (wid, hei)) ->
+        {|<br><center><table border="0"><tr align="left"><td>|}
+        ^ (image_normal_txt conf base p f wid hei : Adef.safe_string :> string)
+        ^ "</td></tr></table></center>"
+      | Some (true, f, None) ->
+        {|<br><center><table border="0"><tr align="left"><td>|} ^
+        (image_normal_txt conf base p f 0 75 : Adef.safe_string :> string) ^
+        "</td></tr></table></center>"
+      | Some (false, url, Some (wid, hei)) ->
+        let url_p = commd conf ^^^ acces conf base p in
+        {|<br><center><table border="0"><tr align="left"><td>|} ^
+        (image_url_txt_with_size conf url_p (Util.escape_html url) wid hei : Adef.safe_string :> string) ^
+        {|</td></tr></table></center>|}
+      | Some (false, url, None) ->
+        let url_p = commd conf ^^^ acces conf base p in
+        let height = 75 in
+        (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
+        {|<br><center><table border="0" style="height:|}
+        ^ string_of_int height
+        ^ {|px"><tr align="left"><td>|}
+        ^ (image_url_txt conf url_p (Util.escape_html url) height : Adef.safe_string :> string)
+        ^ "</td></tr></table></center>\n"
+      | _ -> ""
+    else
+      ""
 
 (* *)
 
-type item =
-    Item of person * string
+type item = Item of person * Adef.safe_string
 
-let string_of_item conf base =
-  function
-    Item (p, s) ->
-      Util.referenced_person_title_text conf base p ^
-      DateDisplay.short_dates_text conf base p ^ (if s = "" then "" else " " ^ s)
+let string_of_item conf base = function
+  | Item (p, s) ->
+    Util.referenced_person_title_text conf base p
+    ^^^ DateDisplay.short_dates_text conf base p
+    ^^^ (if (s :> string) = "" then Adef.safe "" else " " ^<^ s)
 
 (* Print with HTML table tags: <table> <tr> <td> *)
 
-let print_table conf hts =
+let print_table conf (hts : (int * Dag2html.align * Adef.safe_string Dag2html.table_data) array array) =
   begin_centered conf;
-  Output.printf conf "<table border=\"%d\"" conf.border;
-  Output.print_string conf " cellspacing=\"0\" cellpadding=\"0\">\n";
+  Output.print_sstring conf {|<table border="|};
+  Output.print_sstring conf (string_of_int conf.border);
+  Output.print_sstring conf {|" cellspacing="0" cellpadding="0">|};
   for i = 0 to Array.length hts - 1 do
     begin
-      Output.print_string conf "<tr align=\"left\">\n";
+      Output.print_sstring conf "<tr align=\"left\">\n";
       for j = 0 to Array.length hts.(i) - 1 do
         let (colspan, align, td) = hts.(i).(j) in
-        Output.print_string conf "<td";
+        Output.print_sstring conf "<td";
         if colspan = 1 && (td = TDnothing || td = TDhr CenterA) then ()
-        else Output.printf conf " colspan=\"%d\"" colspan;
+        else begin
+          Output.print_sstring conf " colspan=\"";
+          Output.print_sstring conf (string_of_int colspan);
+          Output.print_sstring conf "\""
+        end;
         begin match align, td with
-          LeftA, TDhr LeftA -> Output.printf conf " align=\"%s\"" conf.left
-        | LeftA, _ -> ()
-        | CenterA, _ -> Output.print_string conf " align=\"center\""
-        | RightA, _ -> Output.printf conf " align=\"%s\"" conf.right
+          | LeftA, TDhr LeftA ->
+            Output.print_sstring conf " align=\"";
+            Output.print_sstring conf conf.left;
+            Output.print_sstring conf "\""
+          | LeftA, _ -> ()
+          | CenterA, _ ->
+            Output.print_sstring conf " align=\"center\""
+          | RightA, _ ->
+            Output.print_sstring conf " align=\"";
+            Output.print_sstring conf conf.right;
+            Output.print_sstring conf "\""
         end;
-        Output.print_string conf ">";
+        Output.print_sstring conf ">";
         begin match td with
-          TDitem s -> Output.print_string conf s
+        | TDitem s -> Output.print_string conf s
         | TDtext s -> Output.print_string conf s
-        | TDnothing -> Output.print_string conf "&nbsp;"
-        | TDbar None -> Output.print_string conf "|"
-        | TDbar (Some s) ->
-            Output.printf conf
-              "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
+        | TDnothing -> Output.print_sstring conf "&nbsp;"
+        | TDbar None -> Output.print_sstring conf "|"
+        | TDbar (Some (s : Adef.escaped_string)) ->
+          Output.print_sstring conf {|<a style="text-decoration:none" href="|} ;
+          Output.print_string conf s ;
+          Output.print_sstring conf {|">|</a>|}
         | TDhr align ->
-            match align with
-              LeftA ->
-                Output.printf conf "<hr class=\"%s\">\n" conf.left
-            | RightA ->
-                Output.printf conf "<hr class=\"%s\">\n" conf.right
-            | _ -> Output.print_string conf "<hr class=\"full\">\n"
+          match align with
+          | LeftA ->
+            Output.print_sstring conf "<hr class=\"";
+            Output.print_sstring conf conf.left;
+            Output.print_sstring conf "\">"
+          | RightA ->
+            Output.print_sstring conf "<hr class=\"";
+            Output.print_sstring conf conf.right;
+            Output.print_sstring conf "\">"
+          | _ ->
+            Output.print_sstring conf {|<hr class="full">|}
         end;
-        Output.print_string conf "</td>\n"
+        Output.print_sstring conf "</td>"
       done;
-      Output.print_string conf "</tr>\n"
+      Output.print_sstring conf "</tr>"
     end
   done;
-  Output.print_string conf "</table>\n";
+  Output.print_sstring conf "</table>";
   end_centered conf
 
 (*
@@ -225,6 +255,7 @@ let strip_empty_tags s =
   loop 0 None 0
 
 let displayed_length s =
+  let s = (s : Adef.safe_string :> string) in
   let rec loop len i =
     match displayed_next_char s i with
       Some (_i, j) -> loop (len + 1) j
@@ -250,6 +281,7 @@ let displayed_sub s ibeg ilen =
   loop 0 0 0 0
 
 let longuest_word_length s =
+  let s = (s : Adef.safe_string :> string) in
   let rec loop maxlen len i =
     match displayed_next_char s i with
       Some (j, k) ->
@@ -270,6 +302,8 @@ let displayed_end_word s di i =
 (* Strip 'displayed text' s by subtexts of limited size sz *)
 
 let displayed_strip s sz =
+  let s = (s : Adef.safe_string :> string) in
+  let displayed_sub s b e = displayed_sub s b e |> Adef.safe in
   let rec loop strl dibeg di i =
     let i =
       let rec loop i =
@@ -289,7 +323,8 @@ let displayed_strip s sz =
           if dj - dibeg > sz then
             let str2 = displayed_sub s dibeg (di - dibeg - 1) in
             let str1 = displayed_sub s di (dj - di) in str1 :: str2 :: strl
-          else let str = displayed_sub s dibeg (dj - dibeg) in str :: strl
+          else
+            let str = displayed_sub s dibeg (dj - dibeg) in str :: strl
         in
         List.rev strl
   in
@@ -297,7 +332,7 @@ let displayed_strip s sz =
 
 (* Determine columns sizes; scan all table by increasing colspans *)
 
-let gen_compute_columns_sizes size_fun hts ncol =
+let gen_compute_columns_sizes size_fun (hts : (int * 'a * 'b Dag2html.table_data) array array) ncol =
   let colsz = Array.make ncol 0 in
   let rec loop curr_colspan =
     let next_colspan = ref (ncol + 1) in
@@ -353,13 +388,13 @@ let gen_compute_columns_sizes size_fun hts ncol =
   loop 1; colsz
 
 let compute_columns_sizes = gen_compute_columns_sizes displayed_length
-let compute_columns_minimum_sizes =
-  gen_compute_columns_sizes longuest_word_length
+let compute_columns_minimum_sizes = gen_compute_columns_sizes longuest_word_length
 
 (* Gadget to add a | to fill upper/lower part of a table data when
    preceded/followed by a |; not obligatory but nicer *)
 
 let try_add_vbar stra_row stra_row_max hts i col =
+  Adef.safe @@
   if stra_row < 0 then
     if i = 0 then ""
     else
@@ -391,8 +426,9 @@ let try_add_vbar stra_row stra_row_max hts i col =
   else ""
 
 let strip_troublemakers s =
+  let s = (s : Adef.safe_string :> string) in
   let rec loop last_space len i =
-    if i = String.length s then Buff.get len
+    if i = String.length s then Adef.safe (Buff.get len)
     else
       match s.[i] with
         '<' ->
@@ -439,13 +475,15 @@ let table_strip_troublemakers hts =
     done
   done
 
-let table_pre_dim hts =
+let table_pre_dim (hts : (int * 'a * 'c Dag2html.table_data) array array) =
   table_strip_troublemakers hts;
   let ncol =
     let hts0 = hts.(0) in
     let rec loop ncol j =
       if j = Array.length hts0 then ncol
-      else let (colspan, _, _) = hts0.(j) in loop (ncol + colspan) (j + 1)
+      else
+        let (colspan, _, _) = hts0.(j) in
+        loop (ncol + colspan) (j + 1)
     in
     loop 0 0
   in
@@ -489,30 +527,46 @@ let print_next_pos conf pos1 pos2 tcol =
            | _ -> (k, v) :: env)
         conf.env []
     in
-    Output.print_string conf "<div style=\"text-align:right\">\n";
-    if pos1 = 0 then Output.print_string conf "&nbsp;"
+    let aux env =
+      List.iter begin fun (k, v) ->
+        Output.print_sstring conf k ;
+        Output.print_sstring conf "=" ;
+        Output.print_string conf v ;
+        Output.print_sstring conf ";"
+      end env;
+    in
+    Output.print_sstring conf {|<div style="text-align:right">|};
+    if pos1 = 0 then Output.print_sstring conf "&nbsp;"
     else
       begin
-        Output.printf conf "<a href=\"%s" (commd conf);
-        List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) env;
-        Output.printf conf "pos1=%d&pos2=%d" (pos1 + overlap - dpos)
-          (pos1 + overlap);
-        Output.print_string conf "\">&lt;&lt;</a>\n"
+        Output.print_sstring conf "<a href=\"";
+        Output.print_string conf (commd conf);
+        Output.print_sstring conf "\"";
+        aux env;
+        Output.print_sstring conf "pos1=" ;
+        Output.print_sstring conf (string_of_int @@ pos1 + overlap - dpos) ;
+        Output.print_sstring conf "&pos2=" ;
+        Output.print_sstring conf (string_of_int @@ pos1 + overlap) ;
+        Output.print_sstring conf "\">&lt;&lt;</a>"
       end;
-    if pos2 >= tcol then Output.print_string conf "&nbsp;"
+    if pos2 >= tcol then Output.print_sstring conf "&nbsp;"
     else
       begin
-        Output.printf conf "<a href=\"%s" (commd conf);
-        List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) env;
-        Output.printf conf "pos1=%d&pos2=%d" (pos2 - overlap)
-          (pos2 - overlap + dpos);
-        Output.print_string conf "\">&gt;&gt;</a>\n"
+        Output.print_sstring conf "<a href=\"" ;
+        Output.print_string conf (commd conf);
+        aux env;
+        Output.print_sstring conf "pos1=";
+        Output.print_sstring conf (string_of_int @@ pos2 - overlap);
+        Output.print_sstring conf "&pos2=";
+        Output.print_sstring conf (string_of_int @@ pos2 - overlap + dpos);
+        Output.print_sstring conf "\">&gt;&gt;</a>"
       end;
-    Output.print_string conf "</div>\n"
+    Output.print_sstring conf "</div>"
 
 (* Main print table algorithm with <pre> *)
 
 let print_table_pre conf hts =
+  let displayed_sub s b e = displayed_sub (s : Adef.safe_string :> string)  b e |> Adef.safe in
   let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim hts in
   let dcol =
     let dcol =
@@ -535,7 +589,7 @@ let print_table_pre conf hts =
     | x -> x
   in
   print_next_pos conf pos1 pos2 (Array.fold_left (+) 0 colsz);
-  Output.print_string conf "<pre>\n";
+  Output.print_sstring conf "<pre>\n";
   for i = 0 to Array.length hts - 1 do
     let (stra, max_row) =
       let (stral, max_row) =
@@ -544,16 +598,18 @@ let print_table_pre conf hts =
           else
             let (colspan, _, td) = hts.(i).(j) in
             let stra =
+              let aux s =
+                let rec loop sz k =
+                  if k = 0 then sz
+                  else loop (sz + colsz.(col+k-1)) (k - 1)
+                in
+                loop 0 colspan
+                |> displayed_strip s
+                |> Array.of_list
+              in
               match td with
-                TDitem s | TDtext s ->
-                  let sz =
-                    let rec loop sz k =
-                      if k = 0 then sz
-                      else loop (sz + colsz.(col+k-1)) (k - 1)
-                    in
-                    loop 0 colspan
-                  in
-                  Array.of_list (displayed_strip s sz)
+              | TDitem s -> aux s
+              | TDtext s -> aux s
               | _ -> [| |]
             in
             loop (stra :: stral) (max max_row (Array.length stra))
@@ -565,7 +621,7 @@ let print_table_pre conf hts =
     in
     for row = 0 to max_row - 1 do
       let rec loop pos col j =
-        if j = Array.length hts.(i) then Output.print_string conf "\n"
+        if j = Array.length hts.(i) then Output.print_sstring conf "\n"
         else
           let (colspan, _, td) = hts.(i).(j) in
           let sz =
@@ -577,39 +633,48 @@ let print_table_pre conf hts =
           let outs =
             match td with
             | TDitem _ | TDtext _ ->
-                let s =
-                  let k =
-                    let dk = (max_row - Array.length stra.(j)) / 2 in row - dk
-                  in
-                  if k >= 0 && k < Array.length stra.(j) then
-                    let s = stra.(j).(k) in if s = "&nbsp;" then " " else s
-                  else try_add_vbar k (Array.length stra.(j)) hts i col
+              let s =
+                let k =
+                  let dk = (max_row - Array.length stra.(j)) / 2 in row - dk
                 in
-                let len = displayed_length s in
-                String.make ((sz - len) / 2) ' ' ^ s ^
-                String.make (sz - (sz + len) / 2) ' '
+                if k >= 0 && k < Array.length stra.(j) then
+                  let s = stra.(j).(k) in
+                  if (s :> string) = "&nbsp;"
+                  then Adef.safe " "
+                  else s
+                else try_add_vbar k (Array.length stra.(j)) hts i col
+              in
+              let len = displayed_length s in
+              String.make ((sz - len) / 2) ' '
+              ^<^ (s : Adef.safe_string)
+              ^>^ String.make (sz - (sz + len) / 2) ' '
             | TDnothing ->
-                String.make ((sz - 1) / 2) ' ' ^ "&nbsp;" ^
-                String.make (sz - (sz + 1) / 2) ' '
+              Adef.safe @@
+              String.make ((sz - 1) / 2) ' '
+              ^ "&nbsp;"
+              ^ String.make (sz - (sz + 1) / 2) ' '
             | TDbar s ->
-                let s =
-                  match s with
-                    None | Some "" -> "|"
-                  | Some s ->
-                      Printf.sprintf
-                        "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
-                        s
-                in
-                let len = displayed_length s in
-                String.make ((sz - len) / 2) ' ' ^ s ^
-                String.make (sz - (sz + len) / 2) ' '
+              let s =
+                match s with
+                | None -> Adef.safe "|"
+                | Some s ->
+                  let s = (s : Adef.escaped_string :> string) in
+                  if s = "" then Adef.safe "|"
+                  else
+                    Adef.safe @@
+                    Printf.sprintf "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
+              in
+              let len = displayed_length s in
+              String.make ((sz - len) / 2) ' '
+              ^<^ s
+              ^>^ String.make (sz - (sz + len) / 2) ' '
             | TDhr LeftA ->
-                let len = (sz + 1) / 2 in
-                String.make len '-' ^ String.make (sz - len) ' '
+              let len = (sz + 1) / 2 in
+              Adef.safe (String.make len '-' ^ String.make (sz - len) ' ')
             | TDhr RightA ->
-                let len = sz / 2 in
-                String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
-            | TDhr CenterA -> String.make sz '-'
+              let len = sz / 2 in
+              Adef.safe (String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-')
+            | TDhr CenterA -> Adef.safe (String.make sz '-')
           in
           let clipped_outs =
             if pos1 = None && pos2 = None then outs
@@ -624,12 +689,16 @@ let print_table_pre conf hts =
                   Some pos2 -> pos2
                 | None -> pos + sz
               in
-              if pos + sz <= pos1 then ""
-              else if pos > pos2 then ""
+              if pos + sz <= pos1 then
+                Adef.safe ""
+              else if pos > pos2 then
+                Adef.safe ""
               else if pos2 >= pos + sz then
                 displayed_sub outs (pos1 - pos) (pos + sz - pos1)
-              else if pos1 < pos then displayed_sub outs 0 (pos2 - pos)
-              else displayed_sub outs (pos1 - pos) (pos2 - pos1)
+              else if pos1 < pos then
+                displayed_sub outs 0 (pos2 - pos)
+              else
+                displayed_sub outs (pos1 - pos) (pos2 - pos1)
           in
           Output.print_string conf clipped_outs;
           loop (pos + sz) (col + colspan) (j + 1)
@@ -637,25 +706,29 @@ let print_table_pre conf hts =
       loop 0 0 0
     done
   done;
-  Output.print_string conf "</pre>\n"
+  Output.print_sstring conf "</pre>\n"
 
 (* main *)
 
 let print_html_table conf hts =
   if Util.p_getenv conf.env "notab" <> Some "on" then
     begin
-      Output.print_string conf "<p>\n";
-      Output.printf conf "<div style=\"text-align:%s\"><a href=\"%s" conf.right
-        (commd conf);
-      List.iter (fun (k, v) -> Output.printf conf "%s=%s;" k v) conf.env;
-      Output.print_string conf "notab=on&slices=on";
-      Output.print_string conf "\"><tt>//</tt></a></div>\n";
-      Output.print_string conf "</p>\n"
+      Output.print_sstring conf {|<p><div style="text-align:|};
+      Output.print_sstring conf conf.right;
+      Output.print_sstring conf {|"><a href="|};
+      Output.print_string conf (commd conf);
+      List.iter begin fun (k, v) ->
+        Output.print_sstring conf k ;
+        Output.print_sstring conf "=" ;
+        Output.print_string conf v ;
+        Output.print_sstring conf ";" ;
+      end conf.env;
+      Output.print_sstring conf {|notab=on&slices=on"><tt>//</tt></a></div></p>|}
     end;
-  if Util.p_getenv conf.env "notab" = Some "on" ||
-     Util.p_getenv conf.env "pos2" <> None || browser_doesnt_have_tables conf
-  then
-    print_table_pre conf hts
+  if Util.p_getenv conf.env "notab" = Some "on"
+  || Util.p_getenv conf.env "pos2" <> None
+  || browser_doesnt_have_tables conf
+  then print_table_pre conf hts
   else print_table conf hts
 
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
@@ -670,20 +743,12 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
       Some x -> x
     | None -> 0
   in
-  let td_prop =
-    match Util.p_getenv conf.env "td" with
-      Some x -> " " ^ x
-    | _ ->
-        match Util.p_getenv conf.env "color" with
-          None | Some "" -> ""
-        | Some x -> " class=\"" ^ x ^ "\""
-  in
   let indi_txt n =
     match n.valu with
       Left ip ->
         let p = pget conf base ip in
         let txt =
-          (image_txt conf base p) ^ string_of_item conf base (elem_txt p)
+          (image_txt conf base p) ^^^ string_of_item conf base (elem_txt p)
         in
         let spouses =
           if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
@@ -709,143 +774,101 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
             try [List.assq ip spl] with Not_found -> []
           else []
         in
-        List.fold_left
-          (fun txt (ips, ifamo) ->
-             if Pset.mem ips set then txt
-             else
-               let ps = pget conf base ips in
-               let d =
-                 match ifamo with
-                   Some ifam ->
-                   DateDisplay.short_marriage_date_text conf base (foi base ifam)
-                     p ps
-                 | None -> ""
-               in
-               txt ^ "<br" ^ ">\n&amp;" ^ d ^ " " ^
-               string_of_item conf base (elem_txt ps) ^
-               image_txt conf base ps)
-          txt spouses
-    | Right _ -> "&nbsp;"
+        List.fold_left begin fun txt (ips, ifamo) ->
+          if Pset.mem ips set then txt
+          else
+            let ps = pget conf base ips in
+            let d = match ifamo with
+              | Some ifam ->
+                DateDisplay.short_marriage_date_text conf base (foi base ifam) p ps
+              | None -> Adef.safe ""
+            in
+            txt ^^^ "<br>&amp;" ^<^ d ^^^ " "
+            ^<^ string_of_item conf base (elem_txt ps)
+            ^^^ image_txt conf base ps
+        end txt spouses
+    | Right _ -> Adef.safe "&nbsp;"
   in
-  let indi_txt n =
-    let (bd, td) =
-      match n.valu with
-        Left _ -> bd, td_prop
-      | _ -> 0, ""
-    in
-    if bd > 0 || td <> "" then
-      Printf.sprintf "\
-<table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s</td></tr></table>"
-        bd td (indi_txt n)
+  let indi_txt n : Adef.safe_string =
+    let bd = match n.valu with Left _ -> bd | _ -> 0 in
+    if bd > 0
+    then
+      {|<table border="|}
+      ^<^ string_of_int bd
+      ^<^ {|"><tr align="left"><td align="center">|}
+      ^<^ indi_txt n
+      ^>^ {|</td></tr></table>|}
     else indi_txt n
   in
-  let vbar_txt n =
-    match n.valu with
-      Left ip -> vbar_txt ip
-    | _ -> ""
-  in
-  let phony n =
-    match n.valu with
-      Left _ -> false
-    | Right _ -> true
-  in
+  let vbar_txt n = match n.valu with Left ip -> vbar_txt ip | _ -> Adef.escaped "" in
+  let phony n = match n.valu with Left _ -> false | Right _ -> true in
   let t = Dag2html.table_of_dag phony false invert no_group d in
   if Array.length t.table = 0 then [| |]
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 
 let print_slices_menu conf hts =
-  let txt n =
-    Utf8.capitalize_fst
-      (transl_nth conf "display by slices/slice width/overlap/total width" n)
+  let header n =
+    transl_nth conf "display by slices/slice width/overlap/total width" n
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
-  let title _ = Output.print_string conf (txt 0) in
+  let title _ = header 0 in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Output.print_string conf "<p>" ;
+  Output.print_sstring conf {|<form method="get" action="|};
+  Output.print_sstring conf conf.command ;
+  Output.print_sstring conf {|"><p>|} ;
   hidden_env conf;
-  List.iter
-    (fun (k, v) ->
-       if k = "slices" then ()
-       else
-         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
-           (Mutil.decode k) (Mutil.decode v))
-    conf.env;
-  Output.print_string conf "</p>" ;
-  Output.print_string conf "<table>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
-  Output.printf conf "%s\n"
-    (Utf8.capitalize_fst (transl conf "don't group the common branches together"));
-  Output.print_string conf "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
-  Output.printf conf "%s\n" (txt 1);
-  Output.print_string conf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
-  Output.printf conf "%s\n" (txt 2);
-  Output.print_string conf "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
-  Output.printf conf "%s\n" (txt 3);
-  begin let wid =
+  List.iter (fun (k, v) -> if k <> "slices" then Util.hidden_input conf k v) conf.env;
+  Output.print_sstring conf {|</p><table><tr align="left"><td align="right">|} ;
+  transl conf "don't group the common branches together"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf
+    {|<input type="checkbox" name="nogroup" value="on"></td></tr><tr align="left"><td align="right">|} ;
+  header 1 ;
+  Output.print_sstring conf
+    {|<input name="dpos" size="5" value="78"></td></tr><tr align="left"><td align="right">|} ;
+  header 2 ;
+  Output.print_sstring conf
+    {|<input name="overlap" size="5" value="10"></td></tr><tr align="left"><td align="right">|} ;
+  header 3 ;
+  let wid =
     let (min_wid, max_wid, _, _, _) = table_pre_dim hts in
-    Output.printf conf "(%d-%d)\n" min_wid max_wid; max min_wid (min max_wid 78)
+    Output.printf conf "(%d-%d)\n" min_wid max_wid;
+    max min_wid (min max_wid 78)
   in
-    Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid
-  end;
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n";
-  Output.print_string conf "<p>" ;
-  Output.printf conf
-    "<p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>"
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</form>\n";
+  Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid ;
+  Output.print_sstring conf {|</td></tr></table><p>|} ;
+  Output.print_sstring conf {|<p><button type="submit" class="btn btn-secondary btn-lg">|} ;
+  transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf {|</button></p></form>|} ;
   Hutil.trailer conf
 
 let print_dag_page conf page_title hts next_txt =
-  let conf =
-    let doctype =
-      (* changing doctype to transitional because use of
-         <hr width=... align=...> *)
-      match p_getenv conf.base_env "doctype" with
-        Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
-      | _ -> "xhtml-1.0-trans"
-    in
-    {conf with base_env = ("doctype", doctype) :: conf.base_env}
-  in
   let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   print_html_table conf hts;
-  if next_txt <> "" then
-    begin
-      Output.print_string conf "<p>\n";
-      Output.printf conf "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
-      Output.print_string conf "</p>\n"
-    end;
+  if (next_txt : Adef.escaped_string :> string) <> "" then begin
+    Output.print_sstring conf {|<p><a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_string conf next_txt ;
+    Output.print_sstring conf {|">&gt;&gt;</a></p>|} ;
+  end;
   Hutil.trailer conf
 
 (* *)
 
-type dag_item = string
-type dag_bar = string
-
 type 'a env =
-    Vdag of (int * int * int array * int array * int)
-  | Vdcell of (int * Dag2html.align * (dag_item, dag_bar) Dag2html.table_data)
+  | Vdag of (int * int * int array * int array * int)
+  | Vdcell of (int * Dag2html.align * Adef.safe_string Dag2html.table_data)
   | Vdcellp of string
   | Vdline of int
-  | Vdlinep of (int * string array array * int * int option * int option)
+  | Vdlinep of (int * Adef.safe_string array array * int * int option * int option)
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
@@ -862,7 +885,7 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 
-let rec eval_var conf page_title next_txt env _xx _loc =
+let rec eval_var conf (page_title : Adef.safe_string) (next_txt : Adef.escaped_string) env _xx _loc =
   function
     "dag" :: sl ->
       begin match get_env "dag" env with
@@ -879,8 +902,8 @@ let rec eval_var conf page_title next_txt env _xx _loc =
         Vdcellp s -> VVstring s
       | _ -> raise Not_found
       end
-  | ["head_title"] -> VVstring page_title
-  | ["link_next"] -> VVstring next_txt
+  | ["head_title"] -> VVstring (page_title :> string)
+  | ["link_next"] -> VVstring (next_txt :> string)
   | _ -> raise Not_found
 and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) =
   function
@@ -899,7 +922,7 @@ and eval_dag_cell_var conf (colspan, align, td) =
   | ["bar_link"] ->
       VVstring
         (match td with
-           TDbar (Some s) -> s
+         | TDbar (Some s) -> (s : Adef.escaped_string :> string)
          | _ -> "")
   | ["colspan"] -> VVstring (string_of_int colspan)
   | ["is_bar"] ->
@@ -920,12 +943,12 @@ and eval_dag_cell_var conf (colspan, align, td) =
   | ["is_nothing"] -> VVbool (td = TDnothing)
   | ["item"] ->
       begin match td with
-        TDitem s -> VVstring s
+        TDitem s -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring ""
       end
   | ["text"] ->
       begin match td with
-        TDtext s -> VVstring s
+        TDtext s -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring ""
       end
   | _ -> raise Not_found
@@ -966,50 +989,44 @@ and print_foreach_dag_cell_pre hts print_ast env al =
       let outs =
         match td with
           TDitem _ | TDtext _ ->
-            let s =
-              let k =
-                let dk = (max_row - Array.length stra.(j)) / 2 in row - dk
-              in
-              if k >= 0 && k < Array.length stra.(j) then
-                let s = stra.(j).(k) in if s = "&nbsp;" then " " else s
-              else try_add_vbar k (Array.length stra.(j)) hts i col
+          let s =
+            let k =
+              let dk = (max_row - Array.length stra.(j)) / 2 in row - dk
             in
-            let len = displayed_length s in
-            String.make ((sz - len) / 2) ' ' ^ s ^
-            String.make (sz - (sz + len) / 2) ' '
+            if k >= 0 && k < Array.length stra.(j) then
+              let s = stra.(j).(k) in
+              if (s : Adef.safe_string :> string) = "&nbsp;"
+              then Adef.safe " " else s
+            else try_add_vbar k (Array.length stra.(j)) hts i col
+          in
+          let len = displayed_length s in
+          String.make ((sz - len) / 2) ' '
+          ^ (s :> string)
+          ^ String.make (sz - (sz + len) / 2) ' '
         | TDnothing -> String.make sz ' '
         | TDbar s ->
-            let s =
-              match s with
-              | None | Some "" -> "|"
-              | Some s ->
-                Printf.sprintf
-                  "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
-            in
-            let len = displayed_length s in
-            String.make ((sz - len) / 2) ' ' ^ s ^
-            String.make (sz - (sz + len) / 2) ' '
+          let s =
+            match (s : Adef.escaped_string option :> string option) with
+            | None | Some "" -> "|"
+            | Some s -> {|<a style="text-decoration:none" href="|} ^ s ^ {|">|</a>|}
+          in
+          let len = displayed_length (Adef.safe s) in
+          String.make ((sz - len) / 2) ' '
+          ^ s
+          ^ String.make (sz - (sz + len) / 2) ' '
         | TDhr LeftA ->
-            let len = (sz + 1) / 2 in
-            String.make len '-' ^ String.make (sz - len) ' '
+          let len = (sz + 1) / 2 in
+          String.make len '-' ^ String.make (sz - len) ' '
         | TDhr RightA ->
-            let len = sz / 2 in
-            String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
+          let len = sz / 2 in
+          String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
         | TDhr CenterA -> String.make sz '-'
       in
       let clipped_outs =
         if pos1 = None && pos2 = None then outs
         else
-          let pos1 =
-            match pos1 with
-              Some pos1 -> pos1
-            | None -> pos
-          in
-          let pos2 =
-            match pos2 with
-              Some pos2 -> pos2
-            | None -> pos + sz
-          in
+          let pos1 = Opt.default pos pos1 in
+          let pos2 = Opt.default (pos + sz) pos2 in
           if pos + sz <= pos1 then ""
           else if pos > pos2 then ""
           else if pos2 >= pos + sz then
@@ -1046,11 +1063,7 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
       Vdline i -> i
     | _ -> raise Not_found
   in
-  let (_, _, _, colsz, _) =
-    match get_env "dag" env with
-      Vdag d -> d
-    | _ -> raise Not_found
-  in
+  let (_, _, _, colsz, _) = match get_env "dag" env with Vdag d -> d | _ -> raise Not_found in
   let (stra, max_row) =
     let (stral, max_row) =
       let rec loop stral max_row col j =
@@ -1058,19 +1071,21 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
         else
           let (colspan, _, td) = hts.(i).(j) in
           let stra =
-            match td with
-              TDitem s | TDtext s ->
-                let sz =
-                  let rec loop sz k =
-                    if k = 0 then sz else loop (sz + colsz.(col+k-1)) (k - 1)
-                  in
-                  loop 0 colspan
+            let aux s =
+              let sz =
+                let rec loop sz k =
+                  if k = 0 then sz else loop (sz + colsz.(col+k-1)) (k - 1)
                 in
-                Array.of_list (displayed_strip s sz)
+                loop 0 colspan
+              in
+              Array.of_list (displayed_strip s sz)
+            in
+            match td with
+            | TDitem s -> aux (s :> Adef.safe_string)
+            | TDtext s -> aux s
             | _ -> [| |]
           in
-          loop (stra :: stral) (max max_row (Array.length stra))
-            (col + colspan) (j + 1)
+          loop (stra :: stral) (max max_row (Array.length stra)) (col + colspan) (j + 1)
       in
       loop [] 1 0 0
     in
@@ -1090,7 +1105,7 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
 
 let old_print_slices_menu_or_dag_page conf page_title hts next_txt =
   if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
-  else print_dag_page conf  page_title hts next_txt
+  else print_dag_page conf page_title hts next_txt
 
 let print_slices_menu_or_dag_page conf page_title hts next_txt =
   if p_getenv conf.env "old" = Some "on" then
@@ -1118,27 +1133,24 @@ let print_slices_menu_or_dag_page conf page_title hts next_txt =
       ["dag", Vlazy (Lazy.from_fun table_pre_dim)]
     in
     Hutil.interp conf "dag"
-      {Templ.eval_var = eval_var conf page_title next_txt;
-       Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-       Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-       Templ.print_foreach = print_foreach conf hts}
+      { Templ.eval_var = eval_var conf page_title next_txt
+      ; Templ.eval_transl = (fun _ -> Templ.eval_transl conf)
+      ; Templ.eval_predefined_apply = (fun _ -> raise Not_found)
+      ; Templ.get_vother = get_vother
+      ; Templ.set_vother = set_vother
+      ; Templ.print_foreach = print_foreach conf hts
+      }
       env ()
 
-let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
-    next_txt =
+let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title next_txt =
   let d = make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
   print_slices_menu_or_dag_page conf page_title hts next_txt
 
 let print conf base =
   let set = get_dag_elems conf base in
-  let elem_txt p = Item (p, "") in
-  let vbar_txt _ = "" in
-  let invert =
-    match Util.p_getenv conf.env "invert" with
-      Some "on" -> true
-    | _ -> false
-  in
-  let page_title = Utf8.capitalize_fst (Util.transl conf "tree") in
-  make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title ""
+  let elem_txt p = Item (p, Adef.safe "") in
+  let vbar_txt _ = Adef.escaped "" in
+  let invert = Util.p_getenv conf.env "invert" = Some "on" in
+  let page_title = Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe in
+  make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title (Adef.escaped "")

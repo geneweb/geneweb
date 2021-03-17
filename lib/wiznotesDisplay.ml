@@ -1,4 +1,3 @@
-(* $Id: wiznotes.ml,v 5.54 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -81,131 +80,122 @@ let wiznote_date wfile =
 let print_wizards_by_alphabetic_order conf list =
   let wprint_elem (wz, (wname, (_, islash)), wfile, stm) =
     let tm = Unix.localtime stm in
-    let with_link =
-      conf.wizard && conf.user = wz || wfile <> "" || conf.manitou
-    in
-    if with_link then
-      Output.printf conf "<a href=\"%sm=WIZNOTES&f=%s%t\">" (commd conf)
-        (Mutil.encode wz)
-        (fun _ ->
-           Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
-             (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
-             tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec);
+    let wlink = conf.wizard && conf.user = wz || wfile <> "" || conf.manitou in
+    if wlink then begin
+      Output.print_sstring conf {|<a href="|};
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf "m=WIZNOTES&f=";
+      Output.print_string conf (Mutil.encode wz);
+      Output.printf conf "&d=%d-%02d-%02d,%02d:%02d:%02d"
+        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
+        tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
+      Output.print_sstring conf {|">|}
+    end ;
     if islash > 0 then
       let s1 =
         let islash = if wname.[islash-1] = ' ' then islash - 1 else islash in
         String.sub wname 0 islash
       in
       let s2 = String.sub wname islash (String.length wname - islash) in
-      Output.printf conf "%s (%s)" s2 s1
-    else Output.print_string conf wname;
-    if with_link then Output.print_string conf "</a>"
+      Output.print_string conf (Util.escape_html s2) ;
+      Output.print_sstring conf " (" ;
+      Output.print_string conf (Util.escape_html s1) ;
+      Output.print_sstring conf ")" ;
+    else Output.print_string conf (Util.escape_html wname) ;
+    if wlink then Output.print_sstring conf "</a>"
   in
   let order (_, (_, (ord, _)), _, _) = ord in
   wprint_in_columns conf order wprint_elem list
 
 let print_wizards_by_date conf list =
   let sep_period_list =
-    [(fun tm -> tm.Unix.tm_mon),
-     (fun tm ->
-        let dmy =
-          {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1; day = 0;
-           prec = Sure; delta = 0}
-        in
-        Output.print_string conf
-          (Utf8.capitalize_fst (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian)))));
-     (fun tm -> tm.Unix.tm_year),
-     (fun tm -> Output.printf conf "%d" (tm.Unix.tm_year + 1900))]
+    [ ( (fun tm -> tm.Unix.tm_mon)
+      , (fun tm ->
+           let dmy =
+             { year = tm.Unix.tm_year + 1900
+             ; month = tm.Unix.tm_mon + 1
+             ; day = 0
+             ; prec = Sure
+             ; delta = 0 }
+           in
+           Dgreg (dmy, Dgregorian)
+           |> (DateDisplay.string_of_ondate conf :> Def.date -> string)
+           |> Utf8.capitalize_fst
+           |> Output.print_sstring conf) )
+      ; ( (fun tm -> tm.Unix.tm_year)
+        , (fun tm -> Output.print_sstring conf (string_of_int @@ tm.Unix.tm_year + 1900) ) )
+    ]
   in
-  let list =
-    List.sort (fun (_, _, _, mtm1) (_, _, _, mtm2) -> compare mtm2 mtm1) list
-  in
-  Output.print_string conf "<dl>\n<dt>";
-  let _ =
-    List.fold_left
-      (fun (spl, prev) (wz, (wname, _), wfile, stm) ->
-         let tm = Unix.localtime stm in
-         let (new_item, spl) =
-           match prev with
-             Some prev_tm ->
-               let (sep_period, _) =
-                 match spl with
-                   sp :: _ -> sp
-                 | [] -> assert false
-               in
-               if sep_period tm <> sep_period prev_tm then
-                 begin
-                   Output.print_string conf "</dd>\n<dt>";
-                   let spl =
-                     match spl with
-                       _ :: (next_sp, _) :: _ ->
-                         if next_sp tm <> next_sp prev_tm then List.tl spl
-                         else spl
-                     | _ -> spl
-                   in
-                   true, spl
-                 end
-               else false, spl
-           | None -> true, spl
-         in
-         if new_item then
-           if stm = 0.0 then Output.print_string conf "....."
-           else
-             begin match spl with
-               (_, disp_sep_period) :: _ -> disp_sep_period tm
-             | [] -> ()
-             end;
-         if new_item then Output.print_string conf "</dt>\n<dd>\n";
-         let wname = if wname = "" then wz else wname in
-         Output.printf conf "%s%t" (if prev = None || new_item then "" else ",\n")
-           (fun _ ->
-              if conf.wizard && conf.user = wz || wfile <> "" then
-                Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s%t\">%s</a>"
-                  (commd conf) (Mutil.encode wz)
-                  (fun _ ->
-                     Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
-                       (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
-                       tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-                       tm.Unix.tm_sec)
-                  wname
-              else wname);
-         spl, Some tm)
-      (sep_period_list, None) list
-  in
-  (); Output.print_string conf "</dd></dl>\n"
+  let list = List.sort (fun (_, _, _, mtm1) (_, _, _, mtm2) -> compare mtm2 mtm1) list in
+  Output.print_sstring conf "<dl><dt>";
+  ignore @@ List.fold_left begin fun (spl, prev) (wz, (wname, _), wfile, stm) ->
+    let tm = Unix.localtime stm in
+    let (new_item, spl) =
+      match prev with
+      | Some prev_tm ->
+        let (sep_period, _) = List.hd spl in
+        if sep_period tm <> sep_period prev_tm then begin
+          Output.print_sstring conf "</dd><dt>" ;
+          let spl =
+            match spl with
+            | _ :: (next_sp, _) :: _ ->
+              if next_sp tm <> next_sp prev_tm then List.tl spl
+              else spl
+            | _ -> spl
+          in
+          true, spl
+        end
+        else false, spl
+      | None -> true, spl
+    in
+    if new_item then
+      if stm = 0.0 then Output.print_sstring conf "....."
+      else begin match spl with
+        | (_, disp_sep_period) :: _ -> disp_sep_period tm
+        | [] -> ()
+      end ;
+    if new_item then Output.print_sstring conf "</dt><dd>" ;
+    let wname = if wname = "" then wz else wname in
+    if not (prev = None || new_item) then Output.print_sstring conf ", " ;
+    if conf.wizard && conf.user = wz || wfile <> "" then begin
+      Output.print_sstring conf {|<a href="|} ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf {|m=WIZNOTES&f=|} ;
+      Output.print_string conf (Mutil.encode wz) ;
+      Output.print_sstring conf
+        (Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
+           (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+           tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+           tm.Unix.tm_sec) ;
+      Output.print_sstring conf {|">|} ;
+      Output.print_string conf (Util.escape_html wname) ;
+      Output.print_sstring conf {|</a>|} ;
+    end else Output.print_string conf (Util.escape_html wname);
+    spl, Some tm
+  end (sep_period_list, None) list ;
+  Output.print_sstring conf "</dd></dl>"
 
 let print_old_wizards conf list =
-  if list = [] then ()
-  else
-    begin
-      Output.print_string conf "<dl>\n";
-      begin
-        Output.print_string conf "<dd style=\"list-style-type:circle\">\n";
-        Output.printf conf "%s..." (transl_nth conf "and" 0);
-        begin
-          Output.print_string conf "<dl>\n";
-          begin
-            Output.print_string conf "<dd>\n";
-            Mutil.list_iter_first
-              (fun first wz ->
-                 if not first then Output.print_string conf ",\n";
-                 Output.printf conf "<a href=\"%sm=WIZNOTES&f=%s\">" (commd conf)
-                   (Mutil.encode wz);
-                 for i = 0 to String.length wz - 1 do
-                   if wz.[i] = ' ' then Output.print_string conf "&nbsp;"
-                   else Output.printf conf "%c" wz.[i]
-                 done;
-                 Output.print_string conf "</a>")
-              list;
-            Output.print_string conf "\n";
-            Output.print_string conf "</dd>\n"
-          end;
-          Output.print_string conf "</dl>\n"
-        end;
-        Output.print_string conf "</dd>\n"
-      end;
-      Output.print_string conf "</dl>\n"
-    end
+  if list <> [] then begin
+    Output.print_sstring conf {|<dl><dd style="list-style-type:circle">|} ;
+    Output.print_sstring conf (transl_nth conf "and" 0) ;
+    Output.print_sstring conf "..." ;
+    Output.print_sstring conf "<dl><dd>";
+    Mutil.list_iter_first begin fun first wz ->
+      if not first then Output.print_sstring conf ", " ;
+      Output.print_sstring conf {|<a href="|} ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf {|m=WIZNOTES&f=|} ;
+      Output.print_string conf (Mutil.encode wz) ;
+      Output.print_sstring conf {|">|} ;
+      for i = 0 to String.length wz - 1 do
+        if wz.[i] = ' ' then Output.print_sstring conf "&nbsp;"
+        else Output.print_sstring conf (String.make 1 wz.[i])
+      done;
+      Output.print_sstring conf "</a>"
+    end list;
+    Output.print_sstring conf " </dd></dl></dd></dl>"
+  end
 
 let wizard_list_from_dir conf base =
   match try Some (Sys.readdir (dir conf base)) with Sys_error _ -> None with
@@ -219,103 +209,95 @@ let wizard_list_from_dir conf base =
   | None -> []
 
 let print_search_form conf from_wiz =
-  Output.print_string conf "<table>\n";
-  Output.print_string conf "<tr>\n";
-  Output.printf conf "<td align=\"%s\">\n" conf.right;
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Output.print_string conf "<p>\n";
-  hidden_env conf;
-  Output.print_string conf
-    "<input type=\"hidden\" name=\"m\" value=\"WIZNOTES_SEARCH\">\n";
-  Output.printf conf
-    "<input name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\">\n"
-    (match p_getenv conf.env "s" with
-       Some s -> Util.escape_html s
-     | None -> "");
-  if from_wiz <> "" then
-    Output.printf conf "<input type=\"hidden\" name=\"z\" value=\"%s\">\n"
-      from_wiz;
-  Output.print_string conf "<br>\n";
-  Output.print_string conf "<label>\n";
-  Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s>\n"
-    (match p_getenv conf.env "c" with
-       Some "on" -> " checked=\"checked\""
-     | Some _ | None -> "");
-  Output.printf conf "%s\n" (transl_nth conf "search/case sensitive" 1);
-  Output.print_string conf "</label>\n";
-  Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
-    (Utf8.capitalize_fst (transl_nth conf "search/case sensitive" 0));
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n"
+  Output.print_sstring conf {|<table><tr><td align="|} ;
+  Output.print_sstring conf conf.right ;
+  Output.print_sstring conf {|"><form method="GET" action="|} ;
+  Output.print_sstring conf conf.command ;
+  Output.print_sstring conf {|"><p>|};
+  hidden_env conf ;
+  Util.hidden_input conf "m" (Adef.encoded "WIZNOTES_SEARCH") ;
+  Output.print_sstring conf {|<input name="s" size="30" maxlength="40" value="|} ;
+  (match p_getenv conf.env "s" with
+   | Some s -> Output.print_string conf (Util.escape_html s)
+   | None -> () );
+  Output.print_sstring conf {|">|} ;
+  if from_wiz <> "" then Util.hidden_input conf "z" (Mutil.encode from_wiz);
+  Output.print_sstring conf {|<br><label><input type="checkbox" name="c" value="on"|} ;
+  (match p_getenv conf.env "c" with
+   | Some "on" -> Output.print_sstring conf " checked=\"checked\""
+   | Some _ | None -> ()) ;
+  Output.print_sstring conf {|>|} ;
+  Output.print_sstring conf (transl_nth conf "search/case sensitive" 1) ;
+  Output.print_sstring conf {| |} ;
+  Output.print_sstring conf {|</label><input type="submit" value="|} ;
+  transl_nth conf "search/case sensitive" 0 |> Utf8.capitalize_fst |> Output.print_sstring conf ;
+  Output.print_sstring conf {|"></p></form></td></tr></table>|}
 
 let print_main conf base auth_file =
   let wiztxt =
-    Util.translate_eval
-      (transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
+    Util.translate_eval (transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
   in
   let title _ =
-    Output.printf conf "%s - %s" (Utf8.capitalize_fst wiztxt)
-      (Util.translate_eval (transl_nth conf "note/notes" 1))
+    Output.print_sstring conf (Utf8.capitalize_fst wiztxt) ;
+    Output.print_sstring conf " - " ;
+    Output.print_sstring conf (Util.translate_eval (transl_nth conf "note/notes" 1)) ;
   in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
   let wizdata =
     let list = read_auth_file auth_file in
     if by_alphab_order then
-      List.sort
-        (fun (_, (_, (o1, _))) (_, (_, (o2, _))) ->
-           Gutil.alphabetic_order o1 o2)
-        list
+      List.sort begin fun (_, (_, (o1, _))) (_, (_, (o2, _))) ->
+        Gutil.alphabetic_order o1 o2
+      end list
     else list
   in
   let wddir = dir conf base in
   Hutil.header_no_page_title conf title;
   (* mouais... *)
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<h1>";
+  Output.print_sstring conf "<h1>";
   title false;
-  Output.print_string conf "</h1>\n";
+  Output.print_sstring conf "</h1>";
   let list =
-    List.map
-      (fun (wz, wname) ->
-         let (wfile, wnote) = wiznote_date (wzfile wddir wz) in
-         wz, wname, wfile, wnote)
-      wizdata
+    List.map begin fun (wz, wname) ->
+      let (wfile, wnote) = wiznote_date (wzfile wddir wz) in
+      wz, wname, wfile, wnote
+    end wizdata
   in
   let old_list =
     let list = wizard_list_from_dir conf base in
     List.filter (fun n -> not (List.mem_assoc n wizdata)) list
   in
-  if by_alphab_order then
-    begin
-      begin
-        Output.print_string conf "<p>\n";
-        Output.printf conf "%d %s<br>\n" (List.length wizdata) wiztxt;
-        Output.print_string conf "<em style=\"font-size:80%%\">\n";
-        Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "click"));
-        Output.printf conf "<a href=\"%sm=WIZNOTES&o=H\">%s</a>\n" (commd conf)
-          (transl conf "here");
-        Output.print_string conf
-          (transl conf
-             "for the list ordered by the date of the last modification");
-        Output.print_string conf ".</em>\n";
-        Output.print_string conf "</p>\n"
-      end;
-      print_wizards_by_alphabetic_order conf list
-    end
-  else
-    begin
-      begin
-        Output.print_string conf "<p>\n";
-        Output.printf conf "%d %s\n" (List.length wizdata) wiztxt;
-        Output.print_string conf "</p>\n"
-      end;
-      print_wizards_by_date conf list
-    end;
-  if by_alphab_order then
-    begin print_old_wizards conf old_list; print_search_form conf "" end;
+  if by_alphab_order then begin
+    Output.print_sstring conf "<p>";
+    Output.print_sstring conf (string_of_int @@ List.length wizdata) ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf (Util.safe_html wiztxt) ;
+    Output.print_sstring conf "<br>" ;
+    Output.print_sstring conf {|<em style="font-size:80%">|} ;
+    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "click")) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf {|<a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf {|m=WIZNOTES&o=H">|} ;
+    Output.print_sstring conf (transl conf "here") ;
+    Output.print_sstring conf "</a>" ;
+    Output.print_sstring conf
+      (transl conf "for the list ordered by the date of the last modification") ;
+    Output.print_sstring conf ".</em></p>" ;
+    print_wizards_by_alphabetic_order conf list
+  end else begin
+    Output.print_sstring conf "<p>";
+    Output.print_sstring conf (string_of_int @@ List.length wizdata) ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf (Util.safe_html wiztxt) ;
+    Output.print_sstring conf "</p>" ;
+    print_wizards_by_date conf list
+  end ;
+  if by_alphab_order then begin
+    print_old_wizards conf old_list;
+    print_search_form conf ""
+  end ;
   Hutil.trailer conf
 
 let wizard_page_title conf wizname _ = Output.print_string conf wizname
@@ -326,8 +308,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     try fst (List.assoc wz wizdata) with Not_found -> wz
   in
   let edit_opt =
-    let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-    Some (can_edit, "WIZNOTES", Mutil.encode wz)
+    Some (conf.wizard && conf.user = wz || conf.manitou, "WIZNOTES", wz)
   in
   let (title, s) =
     try let i = Str.search_forward (Str.regexp "TITLE=") s 0 in
@@ -338,82 +319,82 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     with Not_found -> ("", s)
   in
   let title =
-    if title = "" then (wizard_page_title conf wizname)
-    else (wizard_page_title conf title)
+    if title = "" then (wizard_page_title conf @@ Util.escape_html wizname)
+    else (wizard_page_title conf @@ Util.escape_html title)
   in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<h1>";
+  Output.print_sstring conf "<h1>";
   title false;
-  Output.print_string conf "</h1>\n";
-  Util.include_template conf [] "summary"
-    (fun () -> ());
-  Output.print_string conf "<table border=\"0\" width=\"100%%\">\n";
-  Output.print_string conf "<tr>\n";
-  Output.print_string conf "<td>\n";
-  begin let s = Util.safe_html @@ string_with_macros conf [] s in
-    let s =
-      let wi =
-        {Wiki.wi_mode = "NOTES";
-         Wiki.wi_file_path = Notes.file_path conf base;
-         Wiki.wi_person_exists = person_exists conf base;
-         Wiki.wi_always_show_link = conf.wizard || conf.friend}
-      in
-      Wiki.html_with_summary_of_tlsw conf wi edit_opt s
+  Output.print_sstring conf "</h1>";
+  Util.include_template conf [] "summary" (fun () -> ());
+  Output.print_sstring conf {|<table border="0" width="100%"><tr><td>|} ;
+  let s = string_with_macros conf [] s in
+  let s =
+    let wi =
+      { Wiki.wi_mode = "NOTES"
+      ; Wiki.wi_file_path = Notes.file_path conf base
+      ; Wiki.wi_person_exists = person_exists conf base
+      ; Wiki.wi_always_show_link = conf.wizard || conf.friend
+      }
     in
-    let s =
-      match ho with
-        Some (case_sens, h) -> html_highlight case_sens h s
-      | None -> s
+    Wiki.html_with_summary_of_tlsw conf wi edit_opt s
+  in
+  let s =
+    match ho with
+    | Some (case_sens, h) -> html_highlight case_sens h s
+    | None -> s
+  in
+  Output.print_string conf (Util.safe_html s) ;
+  Output.print_sstring conf "</td></tr></table>";
+  if Sys.file_exists wfile then begin
+    let tm = Unix.localtime date in
+    let dmy =
+      { day = tm.Unix.tm_mday
+      ; month = tm.Unix.tm_mon + 1
+      ; year = 1900 + tm.Unix.tm_year
+      ; prec = Sure
+      ; delta = 0
+      }
     in
-    Output.printf conf "%s\n" (Util.safe_html s)
-  end;
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n";
-  if Sys.file_exists wfile then
-    begin let tm = Unix.localtime date in
-      let dmy =
-        {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
-         year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
-      in
-      Output.print_string conf "<p>\n";
-      Output.printf conf "<tt>(%s %02d:%02d)</tt>\n"
-        (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian))) tm.Unix.tm_hour
-        tm.Unix.tm_min;
-      Output.print_string conf "</p>\n"
-    end;
+    Output.print_sstring conf "<p><tt>(" ;
+    Output.print_string conf (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian))) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (Printf.sprintf "%02d" tm.Unix.tm_hour) ;
+    Output.print_sstring conf ":" ;
+    Output.print_sstring conf (Printf.sprintf "%02d" tm.Unix.tm_min) ;
+    Output.print_sstring conf ")</tt></p>"
+  end ;
   begin match p_getenv conf.env "m" with
-    Some "WIZNOTES_SEARCH" -> print_search_form conf wz
-  | Some _ | None -> ()
-  end;
+    | Some "WIZNOTES_SEARCH" -> print_search_form conf wz
+    | Some _ | None -> ()
+  end ;
   Hutil.trailer conf
 
 let print_part_wiznote conf base wz s cnt0 =
-  let title = wz in
+  let title = Util.escape_html wz in
   Hutil.header_no_page_title conf (fun _ -> Output.print_string conf title);
   let s = Util.safe_html @@ string_with_macros conf [] s in
-  let lines = Wiki.extract_sub_part s cnt0 in
-  let lines = if cnt0 = 0 then title :: "<br /><br />" :: lines else lines in
+  let lines = Wiki.extract_sub_part (s : Adef.safe_string :> string) cnt0 in
+  let lines = if cnt0 = 0 then (title :> string) :: "<br><br>" :: lines else lines in
   let file_path = Notes.file_path conf base in
   let can_edit = conf.wizard && conf.user = wz || conf.manitou in
   let wi =
-    {Wiki.wi_mode = "NOTES";
-     Wiki.wi_file_path = file_path;
-     Wiki.wi_person_exists = person_exists conf base;
-     Wiki.wi_always_show_link = conf.wizard || conf.friend}
+    { Wiki.wi_mode = "NOTES"
+    ; Wiki.wi_file_path = file_path
+    ; Wiki.wi_person_exists = person_exists conf base
+    ; Wiki.wi_always_show_link = conf.wizard || conf.friend
+    }
   in
-  Wiki.print_sub_part conf wi can_edit "WIZNOTES" (Mutil.encode wz) cnt0 lines;
+  Wiki.print_sub_part conf wi can_edit "WIZNOTES" wz cnt0 lines;
   Hutil.trailer conf
 
 let wizard_auth_file_name conf =
-  match
-    p_getenv conf.base_env "wizard_descr_file",
-    p_getenv conf.base_env "wizard_passwd_file"
+  match List.assoc_opt "wizard_descr_file" conf.base_env
+      , List.assoc_opt "wizard_passwd_file" conf.base_env
   with
-    (Some "" | None), (Some "" | None) -> ""
-  | Some auth_file, _ -> auth_file
-  | _, Some auth_file -> auth_file
+  | (Some "" | None), (Some "" | None) -> ""
+  | (Some auth_file, _) | (_, Some auth_file) -> auth_file
 
 let print conf base =
   let auth_file = wizard_auth_file_name conf in
@@ -437,51 +418,33 @@ let print conf base =
         end
     | None -> print_main conf base auth_file
 
-let print_mod conf base =
-  let auth_file =
-    match
-      p_getenv conf.base_env "wizard_descr_file",
-      p_getenv conf.base_env "wizard_passwd_file"
-    with
-      (Some "" | None), (Some "" | None) -> ""
-    | Some auth_file, _ -> auth_file
-    | _, Some auth_file -> auth_file
-  in
+let print_aux conf fn =
+  let auth_file = wizard_auth_file_name conf in
   if auth_file = "" then Hutil.incorrect_request conf
-  else
-    match p_getenv conf.env "f" with
-      Some wz ->
-        let wz = Filename.basename wz in
-        let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-        if can_edit then
-          let title = wizard_page_title conf wz in
-          let wfile = wzfile (dir conf base) wz in
-          let (s, _) = read_wizard_notes wfile in
-          Wiki.print_mod_view_page conf true "WIZNOTES" wz title [] s
-        else Hutil.incorrect_request conf
+  else match p_getenv conf.env "f" with
+    | Some wz -> fn wz
     | None -> Hutil.incorrect_request conf
 
-(* S: merge with print_mod *)
+let print_mod conf base =
+  print_aux conf begin fun wz ->
+    let wz = Filename.basename wz in
+    let can_edit = conf.wizard && conf.user = wz || conf.manitou in
+    if can_edit then
+      let title = wizard_page_title conf (Util.escape_html wz) in
+      let wfile = wzfile (dir conf base) wz in
+      let (s, _) = read_wizard_notes wfile in
+      Wiki.print_mod_view_page conf true (Adef.encoded "WIZNOTES") wz title [] s
+    else Hutil.incorrect_request conf
+  end
+
 let print_view conf base =
-  let auth_file =
-    match
-      p_getenv conf.base_env "wizard_descr_file",
-      p_getenv conf.base_env "wizard_passwd_file"
-    with
-      (Some "" | None), (Some "" | None) -> ""
-    | Some auth_file, _ -> auth_file
-    | _, Some auth_file -> auth_file
-  in
-  if auth_file = "" then Hutil.incorrect_request conf
-  else
-    match p_getenv conf.env "f" with
-      Some wz ->
-        let wz = Filename.basename wz in
-        let title = wizard_page_title conf wz in
-        let wfile = wzfile (dir conf base) wz in
-        let (s, _) = read_wizard_notes wfile in
-        Wiki.print_mod_view_page conf false "WIZNOTES" wz title [] s
-    | None -> Hutil.incorrect_request conf
+  print_aux conf begin fun wz ->
+    let wz = Filename.basename wz in
+    let title = wizard_page_title conf (Util.escape_html wz) in
+    let wfile = wzfile (dir conf base) wz in
+    let (s, _) = read_wizard_notes wfile in
+    Wiki.print_mod_view_page conf false (Adef.encoded "WIZNOTES") wz title [] s
+  end
 
 let commit_wiznotes conf base wz s =
   let wddir = dir conf base in
@@ -492,20 +455,11 @@ let commit_wiznotes conf base wz s =
   Notes.update_notes_links_db base pg s
 
 let print_mod_ok conf base =
-  let auth_file =
-    match
-      p_getenv conf.base_env "wizard_descr_file",
-      p_getenv conf.base_env "wizard_passwd_file"
-    with
-      (Some "" | None), (Some "" | None) -> ""
-    | Some auth_file, _ -> auth_file
-    | _, Some auth_file -> auth_file
-  in
+  let auth_file = wizard_auth_file_name conf in
   if auth_file = "" then Hutil.incorrect_request conf
   else
-    let fname =
-      function
-        Some f -> f
+    let fname = function
+      | Some f -> f
       | None -> "nobody"
     in
     let edit_mode wz =
@@ -517,16 +471,16 @@ let print_mod_ok conf base =
       [], fst (read_wizard_notes (wzfile (dir conf base) wz))
     in
     let commit = commit_wiznotes conf base in
-    let string_filter s = Util.safe_html @@ string_with_macros conf [] s in
+    let string_filter s = string_with_macros conf [] s in
     let file_path = Notes.file_path conf base in
     let wi =
-      {Wiki.wi_mode = mode;
-       Wiki.wi_file_path = file_path;
-       Wiki.wi_person_exists = person_exists conf base;
-       Wiki.wi_always_show_link = conf.wizard || conf.friend}
+      { Wiki.wi_mode = mode
+      ; Wiki.wi_file_path = file_path
+      ; Wiki.wi_person_exists = person_exists conf base
+      ; Wiki.wi_always_show_link = conf.wizard || conf.friend
+      }
     in
-    Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
-      false
+    Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter false
 
 let wizard_denying wddir =
   let fname = Filename.concat wddir "connected.deny" in
@@ -543,44 +497,38 @@ let wizard_denying wddir =
 let print_connected_wizard conf first wddir wz tm_user =
   let (wfile, stm) = wiznote_date (wzfile wddir wz) in
   let tm = Unix.localtime stm in
-  if wfile <> "" then
-    begin
-      Output.printf conf "<a href=\"%sm=WIZNOTES&f=%s%t\">" (commd conf)
-        (Mutil.encode wz)
-        (fun _ ->
-           Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
-             (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
-             tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec);
-      Output.print_string conf wz;
-      Output.print_string conf "</a>"
-    end
-  else Output.print_string conf wz;
-  Output.print_string conf " ";
-  Output.printf conf
-    "<a href=\"%sm=HIST&k=20&wiz=%s\" style=\"text-decoration:none\">"
-    (commd conf) (Mutil.encode wz);
-  Output.print_string conf "(*)";
-  Output.print_string conf "</a>";
+  if wfile <> "" then begin
+    Output.print_sstring conf "<a href=\"" ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf "m=WIZNOTES&f=" ;
+    Output.print_string conf (Mutil.encode wz) ;
+    Output.print_sstring conf
+      (Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
+         (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
+         tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec) ;
+    Output.print_string conf (Util.escape_html wz) ;
+    Output.print_sstring conf "</a>"
+  end else Output.print_string conf (Util.escape_html wz) ;
+  Output.print_sstring conf " <a href=\"" ;
+  Output.print_string conf (commd conf) ;
+  Output.print_sstring conf "m=HIST&k=20&wiz=" ;
+  Output.print_string conf (Mutil.encode wz) ;
+  Output.print_sstring conf {|" style="text-decoration:none">(*)</a>|} ;
   let d = conf.ctime -. tm_user in
-  if d = 0.0 then ()
-  else
-    begin
-      Output.printf conf " - %.0f s" d;
-      if first then
-        begin
-          Output.print_string conf " ";
-          begin
-            Output.print_string conf "<span style=\"font-size:80%%\">";
-            Output.printf conf "(%s)" (transl conf "since the last click");
-            Output.print_string conf "</span>"
-          end
-        end
+  if d <> 0.0 then begin
+    Output.printf conf " - %.0f s" d;
+    if first then begin
+      Output.print_sstring conf {| <span style="font-size:80%">(|} ;
+      Output.print_sstring conf (transl conf "since the last click") ;
+      Output.print_sstring conf ")</span>"
     end
+  end
 
 let do_connected_wizards conf base (_, _, _, wl) =
   let title _ =
-    Output.print_string conf
-      (Utf8.capitalize_fst (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
+    transl_nth conf "wizard/wizards/friend/friends/exterior" 1
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -592,53 +540,48 @@ let do_connected_wizards conf base (_, _, _, wl) =
   in
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
   let is_visible = not (List.mem conf.user denying) in
-  Output.print_string conf "<ul>\n";
-  begin let (not_everybody, _) =
-    List.fold_left
-      (fun (not_everybody, first) (wz, tm_user) ->
-         if wz <> conf.user && List.mem wz denying && not conf.manitou then
-           true, first
-         else
-           begin
-             begin
-               Output.printf conf "<li style=\"list-style-type:%s\">\n"
-                 (if wz = conf.user && not is_visible ||
-                     conf.manitou && List.mem wz denying
-                  then
-                    "circle"
-                  else "disc");
-               print_connected_wizard conf first wddir wz tm_user;
-               if wz = conf.user then
-                 begin
-                   Output.printf conf " :\n%s;"
-                     (transl_nth conf "you are visible/you are not visible"
-                        (if is_visible then 0 else 1));
-                   Output.printf conf " %s %s%s%s %s" (transl conf "click")
-                     (Printf.sprintf "<a href=\"%sm=CHANGE_WIZ_VIS&v=%d\">"
-                        (commd conf) (if is_visible then 0 else 1))
-                     (transl conf "here") "</a>" (transl conf "to change");
-                   Output.print_string conf "."
-                 end;
-               Output.print_string conf "\n";
-               Output.print_string conf "</li>\n"
-             end;
-             not_everybody, false
-           end)
-      (false, true) wl
-  in
-    if not_everybody then
-      begin
-        Output.print_string conf "<li>\n";
-        Output.print_string conf "...";
-        Output.print_string conf "</li>\n"
+  Output.print_sstring conf "<ul>";
+  let (not_everybody, _) =
+    List.fold_left begin fun (not_everybody, first) (wz, tm_user) ->
+      if wz <> conf.user && List.mem wz denying && not conf.manitou
+      then true, first
+      else begin
+        Output.print_sstring conf {|<li style="list-style-type:|} ;
+        if wz = conf.user && not is_visible || conf.manitou && List.mem wz denying
+        then Output.print_sstring conf "circle"
+        else Output.print_sstring conf "disc" ;
+        Output.print_sstring conf {|">|} ;
+        print_connected_wizard conf first wddir wz tm_user;
+        if wz = conf.user then begin
+          Output.print_sstring conf (transl conf ":") ;
+          Output.print_sstring conf " :" ;
+          Output.print_sstring conf
+            (transl_nth conf "you are visible/you are not visible"
+               (if is_visible then 0 else 1)) ;
+          Output.print_sstring conf " ; " ;
+          Output.print_sstring conf (transl conf "click") ;
+          Output.print_sstring conf " <a href=\"" ;
+          Output.print_string conf (commd conf) ;
+          Output.print_sstring conf "m=CHANGE_WIZ_VIS&v=" ;
+          Output.print_sstring conf (string_of_int @@ if is_visible then 0 else 1) ;
+          Output.print_sstring conf "\">" ;
+          Output.print_sstring conf (transl conf "here") ;
+          Output.print_sstring conf "</a> " ;
+          Output.print_sstring conf (transl conf "to change") ;
+          Output.print_sstring conf "."
+        end;
+        Output.print_sstring conf "</li>" ;
+        not_everybody, false
       end
-  end;
-  Output.print_string conf "</ul>\n";
+    end (false, true) wl
+  in
+  if not_everybody then Output.print_sstring conf "<li>...</li>"  ;
+  Output.print_sstring conf "</ul>" ;
   Hutil.trailer conf
 
 let connected_wizards conf base =
   match conf.n_connect with
-    Some x -> do_connected_wizards conf base x
+  | Some x -> do_connected_wizards conf base x
   | None -> Hutil.incorrect_request conf
 
 let do_change_wizard_visibility conf base x set_vis =
@@ -647,22 +590,22 @@ let do_change_wizard_visibility conf base x set_vis =
   let denying = wizard_denying wddir in
   let is_visible = not (List.mem conf.user denying) in
   if not set_vis && not is_visible || set_vis && is_visible then ()
-  else
-    begin let tmp_file = Filename.concat wddir "1connected.deny" in
-      let oc = Secure.open_out tmp_file in
-      let found =
-        List.fold_left
-          (fun found wz ->
-             if wz = conf.user && set_vis then true
-             else begin Printf.fprintf oc "%s\n" wz; found end)
-          false denying
-      in
-      if not found && not set_vis then Printf.fprintf oc "%s\n" conf.user;
-      close_out oc;
-      let file = Filename.concat wddir "connected.deny" in
-      Mutil.rm file ;
-      Sys.rename tmp_file file
-    end;
+  else begin
+    let tmp_file = Filename.concat wddir "1connected.deny" in
+    let oc = Secure.open_out tmp_file in
+    let found =
+      List.fold_left
+        (fun found wz ->
+           if wz = conf.user && set_vis then true
+           else begin Printf.fprintf oc "%s\n" wz; found end)
+        false denying
+    in
+    if not found && not set_vis then Printf.fprintf oc "%s\n" conf.user;
+    close_out oc;
+    let file = Filename.concat wddir "connected.deny" in
+    Mutil.rm file ;
+    Sys.rename tmp_file file
+  end ;
   do_connected_wizards conf base x
 
 let change_wizard_visibility conf base =

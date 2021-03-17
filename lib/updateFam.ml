@@ -70,6 +70,7 @@ let extract_var sini s =
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
+let safe_val (x : Adef.safe_string) = VVstring (x :> string)
 
 module ExtOption = struct
   let bind o f = match o with
@@ -189,26 +190,28 @@ and eval_event_str conf base env fam = match get_env "cnt" env with
          let fam = foi base fam.fam_index in
          let e = List.nth (get_fevents fam) (i - 1) in
          let name =
-           Utf8.capitalize_fst (Util.string_of_fevent_name conf base e.efam_name)
+           Util.string_of_fevent_name conf base e.efam_name
+           |> Adef.safe_fn Utf8.capitalize_fst
          in
          let date =
            match Adef.od_of_cdate e.efam_date with
              Some d -> DateDisplay.string_of_date conf d
-           | None -> ""
+           | None -> Adef.safe ""
          in
          let place = Util.string_of_place conf (sou base e.efam_place) in
-         let note = sou base e.efam_note in
-         let src = sou base e.efam_src in
+         let note = Util.safe_html (sou base e.efam_note) in
+         let src = Util.safe_html (sou base e.efam_src) in
          let wit =
-           List.fold_right
+           Array.fold_right
              (fun (w, _) accu ->
-               (transl_nth conf "witness/witnesses" 0 ^ ": " ^
-                  Util.person_text conf base (poi base w)) ::
+               (transl_nth conf "witness/witnesses" 0 ^<^ (transl conf ":") ^<^
+                  Util.gen_person_text conf base (poi base w)) ::
                  accu)
-             (Array.to_list e.efam_witnesses) []
+             e.efam_witnesses []
          in
-         let s = String.concat ", " [name; date; place; note; src] in
-         let sw = String.concat ", " wit in str_val (s ^ ", " ^ sw)
+         let s = String.concat ", " ([ name ; date ; (place :> Adef.safe_string) ; note ; src ] :> string list) in
+         let sw = String.concat ", " (wit :> string list) in
+         safe_val (Adef.safe (s ^ ", " ^ sw))
        with Failure _ -> str_val ""
      end
   | _ -> str_val ""
@@ -250,7 +253,7 @@ and eval_default_var conf s =
   let v = extract_var "evar_" s in
   if v <> "" then
     match p_getenv (conf.env @ conf.henv) v with
-    | Some vv -> str_val (Util.escape_html vv)
+    | Some vv -> safe_val (Util.escape_html vv :> Adef.safe_string)
     | None -> str_val ""
   else
     let v = extract_var "bvar_" s in
@@ -269,21 +272,21 @@ and eval_simple_var conf base env (fam, cpl, des) =
   | ["bvar"; v]        -> eval_bvar conf v
   | "child" :: sl      -> eval_child env des sl
   | ["cnt"]            -> eval_int_env "cnt" env
-  | ["comment"]        -> str_val (Util.escape_html fam.comment)
+  | ["comment"]        -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
   | ["digest"]         -> eval_string_env "digest" env
   | ["divorce"]        -> eval_divorce fam
   | ["divorce"; s]     -> eval_divorce' fam s
   | "father" :: sl     -> eval_key (Gutil.father cpl) sl
-  | ["fsources"]       -> str_val (Util.escape_html fam.fsources)
+  | ["fsources"]       -> safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | ["is_first"]       -> eval_is_first env
   | ["is_last"]        -> eval_is_last env
   | ["marriage"; s]    -> eval_date_var (Adef.od_of_cdate fam.marriage) s
-  | ["marriage_place"] -> str_val (Util.escape_html fam.marriage_place)
-  | ["marriage_note"]  -> str_val (Util.escape_html fam.marriage_note)
-  | ["marriage_src"]   -> str_val (Util.escape_html fam.marriage_src)
+  | ["marriage_place"] -> safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
+  | ["marriage_note"]  -> safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
+  | ["marriage_src"]   -> safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
   | ["mrel"]           -> str_val (eval_relation_kind fam.relation)
   | ["nb_fevents"]     -> str_val (string_of_int (List.length fam.fevents))
-  | ["origin_file"]    -> str_val (Util.escape_html fam.origin_file)
+  | ["origin_file"]    -> safe_val (Util.escape_html fam.origin_file :> Adef.safe_string)
   | "parent" :: sl     -> eval_parent conf env cpl sl
   | ["wcnt"]           -> eval_int_env "wcnt" env
   | "witness" :: sl    -> eval_witness env fam sl
@@ -299,38 +302,40 @@ and eval_simple_var conf base env (fam, cpl, des) =
   | [s]                -> eval_default_var conf s
   | _ -> raise Not_found
 
-and eval_date_var od s = str_val (eval_date_var_aux od s)
-
 (* TODO : rewrite, looks bad *)
-and eval_date_var_aux od =
+and eval_date_var od =
   function
     "calendar" ->
-      begin match od with
-        Some (Dgreg (_, Dgregorian)) -> "gregorian"
-      | Some (Dgreg (_, Djulian)) -> "julian"
-      | Some (Dgreg (_, Dfrench)) -> "french"
-      | Some (Dgreg (_, Dhebrew)) -> "hebrew"
-      | _ -> ""
-      end
+     str_val @@
+       begin match od with
+         Some (Dgreg (_, Dgregorian)) -> "gregorian"
+       | Some (Dgreg (_, Djulian)) -> "julian"
+       | Some (Dgreg (_, Dfrench)) -> "french"
+       | Some (Dgreg (_, Dhebrew)) -> "hebrew"
+       | _ -> ""
+       end
   | "day" ->
-      begin match eval_date_field od with
-        Some d -> if d.day = 0 then "" else string_of_int d.day
-      | None -> ""
-      end
+     str_val @@
+       begin match eval_date_field od with
+         Some d -> if d.day = 0 then "" else string_of_int d.day
+       | None -> ""
+       end
   | "month" ->
-      begin match eval_date_field od with
-        Some d ->
+     str_val @@
+       begin match eval_date_field od with
+         Some d ->
           if d.month = 0 then ""
           else
             begin match od with
               Some (Dgreg (_, Dfrench)) -> short_f_month d.month
             | _ -> string_of_int d.month
             end
-      | None -> ""
-      end
+       | None -> ""
+       end
   | "orday" ->
-      begin match eval_date_field od with
-        Some d ->
+     str_val @@
+       begin match eval_date_field od with
+         Some d ->
           begin match d.prec with
             OrYear d2 | YearInt d2 ->
               if d2.day2 = 0 then "" else string_of_int d2.day2
@@ -339,6 +344,7 @@ and eval_date_var_aux od =
       | None -> ""
       end
   | "ormonth" ->
+     str_val @@
       begin match eval_date_field od with
         Some d ->
           begin match d.prec with
@@ -354,6 +360,7 @@ and eval_date_var_aux od =
       | None -> ""
       end
   | "oryear" ->
+     str_val @@
       begin match eval_date_field od with
         Some d ->
           begin match d.prec with
@@ -363,6 +370,7 @@ and eval_date_var_aux od =
       | None -> ""
       end
   | "prec" ->
+     str_val @@
       begin match od with
         Some (Dgreg ({prec = Sure}, _)) -> "sure"
       | Some (Dgreg ({prec = About}, _)) -> "about"
@@ -375,10 +383,11 @@ and eval_date_var_aux od =
       end
   | "text" ->
       begin match od with
-        Some (Dtext s) -> Util.safe_html s
-      | _ -> ""
+        Some (Dtext s) -> safe_val (Util.safe_html s :> Adef.safe_string)
+      | _ -> str_val ""
       end
   | "year" ->
+    str_val @@
       begin match eval_date_field od with
         Some d -> string_of_int d.year
       | None -> ""
@@ -413,23 +422,23 @@ and eval_event_var e =
           | Efam_MarriageLicense -> str_val "#marl"
           | Efam_PACS -> str_val "#pacs"
           | Efam_Residence -> str_val "#resi"
-          | Efam_Name x -> str_val (Util.escape_html x)
+          | Efam_Name x -> safe_val (Util.escape_html x :> Adef.safe_string)
           end
       | _ -> str_val ""
       end
   | ["e_place"] ->
       begin match e with
-        Some {efam_place = x} -> str_val (Util.escape_html x)
+        Some {efam_place = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | ["e_note"] ->
       begin match e with
-        Some {efam_note = x} -> str_val (Util.escape_html x)
+        Some {efam_note = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | ["e_src"] ->
       begin match e with
-        Some {efam_src = x} -> str_val (Util.escape_html x)
+        Some {efam_src = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | _ -> raise Not_found
@@ -450,10 +459,11 @@ and eval_parent' conf env k =
 and eval_key (fn, sn, oc, create, _) =
   function
     ["create"] -> str_val (if create <> Update.Link then "create" else "link")
-  | ["create"; s] -> str_val (eval_create create s)
-  | ["first_name"] -> str_val (Util.escape_html fn)
+  | ["create"; s] -> eval_create create s
+  | ["first_name"] -> safe_val (Util.escape_html fn :> Adef.safe_string)
   | ["occ"] -> str_val (if oc = 0 then "" else string_of_int oc)
-  | ["surname"] -> str_val (Util.escape_html sn)
+  | ["surname"] -> safe_val (Util.escape_html sn :> Adef.safe_string)
+  | ["sex"] -> (eval_create create "sex")
   | _ -> raise Not_found
 
 and eval_key_opt p sl = Some (eval_key p sl)
@@ -462,6 +472,7 @@ and eval_key_opt p sl = Some (eval_key p sl)
 and eval_create c =
   function
     "birth_day" ->
+    str_val @@
       begin match c with
         Update.Create
           (_, Some {ci_birth_date = Some (Dgreg (dmy, Dfrench))}) ->
@@ -473,6 +484,7 @@ and eval_create c =
       | _ -> ""
       end
   | "birth_month" ->
+    str_val @@
       begin match c with
         Update.Create
           (_, Some {ci_birth_date = Some (Dgreg (dmy, Dfrench))}) ->
@@ -486,10 +498,11 @@ and eval_create c =
       end
   | "birth_place" ->
       begin match c with
-        Update.Create (_, Some {ci_birth_place = pl}) -> Util.escape_html pl
-      | _ -> ""
+        Update.Create (_, Some {ci_birth_place = pl}) -> safe_val (Util.escape_html pl :> Adef.safe_string)
+      | _ -> str_val ""
       end
   | "birth_year" ->
+    str_val @@
       begin match c with
         Update.Create (_, Some ci) ->
           begin match ci.ci_birth_date with
@@ -504,6 +517,7 @@ and eval_create c =
       | _ -> ""
       end
   | "death_day" ->
+    str_val @@
       begin match c with
         Update.Create
           (_, Some {ci_death_date = Some (Dgreg (dmy, Dfrench))}) ->
@@ -515,6 +529,7 @@ and eval_create c =
       | _ -> ""
       end
   | "death_month" ->
+    str_val @@
       begin match c with
         Update.Create
           (_, Some {ci_death_date = Some (Dgreg (dmy, Dfrench))}) ->
@@ -528,10 +543,11 @@ and eval_create c =
       end
   | "death_place" ->
       begin match c with
-        Update.Create (_, Some {ci_death_place = pl}) -> Util.escape_html pl
-      | _ -> ""
+        Update.Create (_, Some {ci_death_place = pl}) -> safe_val (Util.escape_html pl :> Adef.safe_string)
+      | _ -> str_val ""
       end
   | "death_year" ->
+    str_val @@
       begin match c with
         Update.Create
           (_, Some {ci_death_date = Some (Dgreg (dmy, Dfrench))}) ->
@@ -552,10 +568,11 @@ and eval_create c =
   | "occupation" ->
       begin match c with
         Update.Create (_, Some {ci_occupation = occupation}) ->
-          Util.escape_html occupation
-      | _ -> ""
+          safe_val (Util.escape_html occupation :> Adef.safe_string)
+      | _ -> str_val ""
       end
   | "sex" ->
+    str_val @@
       begin match c with
         Update.Create (Male, _) -> "male"
       | Update.Create (Female, _) -> "female"
@@ -608,7 +625,7 @@ and eval_int_env var env =
   | _ -> raise Not_found
 and eval_string_env var env =
   match get_env var env with
-    Vstring x -> str_val (Util.escape_html x)
+    Vstring x -> safe_val (Util.escape_html x :> Adef.safe_string)
   | _ -> str_val ""
 
 (* print *)
@@ -690,8 +707,10 @@ let print_update_fam conf base fcd digest =
 
 let print_del1 conf base ifam =
   let title _ =
-    let s = transl_nth conf "family/families" 0 in
-    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "delete" s))
+    transl_nth conf "family/families" 0
+    |> transl_decline conf "delete"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   let p =
     match p_getenv conf.env "ip" with
@@ -699,72 +718,62 @@ let print_del1 conf base ifam =
     | None -> Gwdb.empty_person base dummy_iper
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_string conf "<h2>\n";
+  Output.print_sstring conf "<h2>\n";
   title false;
-  Output.print_string conf "</h2>\n";
-  Output.print_string conf "\n";
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Output.print_string conf "<p>\n";
+  Output.print_sstring conf {|</h2><form method="post" action="|};
+  Output.print_sstring conf conf.command;
+  Output.print_sstring conf {|"><p>|} ;
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_ifam ifam);
+  Util.hidden_input conf "i" (Adef.encoded @@ string_of_ifam ifam);
   begin match p_getenv conf.env "ip" with
-    Some ip ->
-      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
-  | None -> ()
+    | Some ip ->
+      Util.hidden_input conf "ip" (Adef.encoded ip);
+    | None -> ()
   end;
-  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\">\n";
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "<p>\n";
-  Output.print_string conf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</button>\n";
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "\n";
+  Util.hidden_input conf "m" (Adef.encoded "DEL_FAM_OK");
+  Output.print_sstring conf
+    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+  Output.print_sstring conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+  Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
   let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "invert" ""))
+    transl_decline conf "invert" ""
+    |> Utf8.capitalize_fst
+    |> Adef.safe
+    |> Output.print_string conf
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.printf conf "%s%s"
-    (Utf8.capitalize_fst (transl conf "invert the order of the following families"))
-    (Util.transl conf ":");
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf
+    (Utf8.capitalize_fst (transl conf "invert the order of the following families")) ;
+  Output.print_sstring conf (Util.transl conf ":");
+  Output.print_sstring conf "<ul><li>";
   Update.print_someone conf base (poi base (get_father cpl1));
-  Output.printf conf " %s " (transl_nth conf "and" 0);
+  Output.print_sstring conf " ";
+  Output.print_sstring conf (transl_nth conf "and" 0);
+  Output.print_sstring conf " ";
   Update.print_someone conf base (poi base (get_mother cpl1));
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf "</li><li>";
   Update.print_someone conf base (poi base (get_father cpl2));
-  Output.printf conf " %s " (transl_nth conf "and" 0);
+  Output.print_sstring conf " ";
+  Output.print_sstring conf (transl_nth conf "and" 0);
+  Output.print_sstring conf " ";
   Update.print_someone conf base (poi base (get_mother cpl2));
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "</ul>\n";
-  Output.print_string conf "\n";
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Output.print_string conf "<p>\n";
+  Output.print_sstring conf "</li></ul>";
+  Output.print_sstring conf {|<form method="post" action="|};
+  Output.print_sstring conf conf.command;
+  Output.print_sstring conf {|"><p>|};
   Util.hidden_env conf;
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_iper (get_iper p));
-  Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n"
-    (string_of_ifam ifam2);
-  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\">\n";
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "<p>\n";
-  Output.print_string conf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</button>\n";
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "\n";
+  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Adef.encoded) ;
+  Util.hidden_input conf "f" (string_of_ifam ifam2 |> Adef.encoded) ;
+  Util.hidden_input conf "m" (Adef.encoded "INV_FAM_OK") ;
+  Output.print_sstring conf
+    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+  Output.print_sstring conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+  Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
 let print_add conf base =
@@ -875,82 +884,64 @@ let change_order u ifam n =
   loop 1 (Array.to_list (get_family u))
 
 let print_change_order conf base =
-  match
-    p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n"
-  with
-    Some ip, Some ifam, Some n ->
-      let ip = iper_of_string ip in
-      let ifam = ifam_of_string ifam in
-      let p = poi base ip in
-      let print_list arr diff_arr =
-        Array.iteri
-          (fun i ifam ->
-             let fam = foi base ifam in
-             let sp = Gutil.spouse (get_iper p) fam in
-             let sp = poi base sp in
-             Output.printf conf "<li %s>\n"
-               (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             Output.printf conf "%s%s" (p_first_name base p)
-               (if get_occ p = 0 then ""
-                else "." ^ string_of_int (get_occ p));
-             Output.print_string conf "  &amp;";
-             Output.printf conf "%s\n"
-               (DateDisplay.short_marriage_date_text conf base fam p sp);
-             Output.printf conf "%s%s %s" (p_first_name base sp)
-               (if get_occ sp = 0 then ""
-                else "." ^ string_of_int (get_occ sp))
-               (p_surname base sp);
-             Output.print_string conf "\n";
-             Output.print_string conf "</li>\n")
-          arr
-      in
-      let after = change_order p ifam n in
-      let (before, after) = get_family p, Array.of_list after in
-      let (bef_d, aft_d) = Difference.f before after in
-      let title _ =
-        Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "invert" ""))
-      in
-      Perso.interp_templ_with_menu title "perso_header" conf base p;
-      Output.print_string conf "<h2>\n";
-      title false;
-      Output.print_string conf "</h2>\n";
-      Output.printf conf "%s%s"
-        (Utf8.capitalize_fst (transl conf "invert the order of the following families"))
-        (Util.transl conf ":");
-      Output.print_string conf "<table style=\"margin:1em\">\n";
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list before bef_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list after aft_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n";
-      Output.print_string conf "</table>\n";
-      Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-      Output.print_string conf "<p>\n";
-      Util.hidden_env conf;
-      Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-        (string_of_iper ip);
-      Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n"
-        (string_of_ifam ifam);
-      Output.printf conf "<input type=\"hidden\" name=\"n\" value=\"%d\">\n" n;
-      Output.print_string conf
-        "<input type=\"hidden\" name=\"m\" value=\"CHG_FAM_ORD_OK\">\n";
-      Output.print_string conf "</p>\n";
-      Output.print_string conf "<p>\n";
-      Output.print_string conf
-        "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-      Output.print_string conf "</button>\n";
-      Output.print_string conf "</p>\n";
-      Output.print_string conf "</form>\n";
-      Output.print_string conf "\n";
-      Hutil.trailer conf
+  match p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n" with
+  | Some ip, Some ifam, Some n ->
+    let ip = iper_of_string ip in
+    let ifam = ifam_of_string ifam in
+    let p = poi base ip in
+    let print_person p sn =
+      Output.print_string conf (escape_html @@ p_first_name base p) ;
+      if get_occ p <> 0 then begin
+        Output.print_sstring conf "." ;
+        get_occ p |> string_of_int |> Output.print_sstring conf
+      end ;
+      if sn then begin
+        Output.print_sstring conf " " ;
+        Output.print_string conf (escape_html @@ p_surname base p) ;
+      end
+    in
+    let print_list arr diff_arr =
+      Array.iteri begin fun i ifam ->
+        let fam = foi base ifam in
+        let sp = Gutil.spouse (get_iper p) fam in
+        let sp = poi base sp in
+        Output.print_sstring conf "<li";
+        if diff_arr.(i) then Output.print_sstring conf {| style="background:pink"|} ;
+        Output.print_sstring conf ">" ;
+        print_person p false ;
+        Output.print_sstring conf " &amp;";
+        Output.print_string conf (DateDisplay.short_marriage_date_text conf base fam p sp);
+        Output.print_sstring conf " ";
+        print_person sp true ;
+        Output.print_sstring conf "</li>"
+      end arr
+    in
+    let after = change_order p ifam n in
+    let (before, after) = get_family p, Array.of_list after in
+    let title _ =
+      transl_decline conf "invert" ""
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf
+    in
+    Perso.interp_templ_with_menu title "perso_header" conf base p;
+    Output.print_sstring conf "<h2>";
+    title false;
+    Output.print_sstring conf "</h2>";
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "invert the order of the following families")) ;
+    Update.print_order_changed conf print_list before after ;
+    Output.print_sstring conf {|<form method="post" action="|};
+    Output.print_sstring conf conf.command;
+    Output.print_sstring conf {|"><p>|};
+    Util.hidden_env conf;
+    Util.hidden_input conf "i" (Adef.encoded @@ string_of_iper ip);
+    Util.hidden_input conf "f" (Adef.encoded @@ string_of_ifam ifam);
+    Util.hidden_input conf "n" (Adef.encoded @@ string_of_int n);
+    Util.hidden_input conf "m" (Adef.encoded "CHG_FAM_ORD_OK");
+    Output.print_sstring conf {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+    Output.print_sstring conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    Output.print_sstring conf "</button></p></form>";
+    Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =

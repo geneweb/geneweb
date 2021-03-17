@@ -1,7 +1,7 @@
 (** Type that represents one update record stored in the history file for concerned person. *)
 type gen_record = {
-  date : string;
-  wizard : string;
+  date : Adef.safe_string;
+  wizard : Adef.safe_string;
   gen_p : (Gwdb.iper, Gwdb.iper, string) Def.gen_person;
   gen_f : (Gwdb.iper, Gwdb.ifam, string) Def.gen_family list;
   gen_c : Gwdb.iper array list;

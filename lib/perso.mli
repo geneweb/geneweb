@@ -10,7 +10,7 @@ type generation_person =
   | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
   | GP_missing of Sosa.t * iper
 
-val string_of_marriage_text : config -> base -> family -> string
+val string_of_marriage_text : config -> base -> family -> Adef.safe_string
 
 val interp_templ : ?no_headers:bool -> string -> config -> base -> person -> unit
 val interp_templ_with_menu :
@@ -48,13 +48,13 @@ val get_sosa_person : person -> Sosa.t
 val get_single_sosa : config -> base -> person -> Sosa.t
 val print_sosa : config -> base -> person -> bool -> unit
 
-val get_linked_page : config -> base -> person -> string -> string
-val get_birth_text : config -> person -> bool -> string
-val get_baptism_text : config -> person -> bool -> string
-val get_death_text : config -> person -> bool -> string
-val get_burial_text : config -> person -> bool -> string
-val get_cremation_text : config -> person -> bool -> string
-val get_marriage_date_text : config -> family -> bool -> string
+val get_linked_page : config -> base -> person -> string -> Adef.safe_string
+val get_birth_text : config -> person -> bool -> Adef.safe_string
+val get_baptism_text : config -> person -> bool -> Adef.safe_string
+val get_death_text : config -> person -> bool -> Adef.safe_string
+val get_burial_text : config -> person -> bool -> Adef.safe_string
+val get_cremation_text : config -> person -> bool -> Adef.safe_string
+val get_marriage_date_text : config -> family -> bool -> Adef.safe_string
 
 val linked_page_text
   : Config.config
@@ -62,17 +62,17 @@ val linked_page_text
   -> Gwdb.person
   -> string
   -> 'a
-  -> string
+  -> Adef.safe_string
   -> (iper, ifam) Def.NLDB.page * ('b * ('a * Def.NLDB.ind) list)
-  -> string
+  -> Adef.safe_string
 
 val max_ancestor_level : config -> base -> iper -> int -> int
 
-val string_of_died : config -> person -> bool -> string
+val string_of_died : config -> person -> bool -> Adef.safe_string
 
-val string_of_parent_age : config -> base -> person * bool -> (family -> iper) -> string
+val string_of_parent_age : config -> base -> person * bool -> (family -> iper) -> Adef.safe_string
 
-val string_of_image_url : config -> base -> person * bool -> bool -> string
+val string_of_image_url : config -> base -> person * bool -> bool -> Adef.escaped_string
 
 val round_2_dec : float -> float
 
@@ -123,10 +123,10 @@ val string_of_title
   : ?link:bool
   -> config
   -> base
-  -> string
+  -> Adef.safe_string
   -> person
   -> int * istr Def.gen_title_name * istr * istr list * (Def.date option * Def.date option) list
-  -> string
+  -> Adef.safe_string
 
 type event_name =
     Pevent of istr Def.gen_pers_event_name
