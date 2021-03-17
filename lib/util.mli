@@ -8,7 +8,7 @@ open Gwdb
 val cnt_dir : string ref
 
 (** Returns the image prefix (conf.image_prefix)  *)
-val image_prefix : config -> string
+val image_prefix : config -> Adef.escaped_string
 
 (** Alias for !GWPARAM.base_path *)
 val base_path : string list -> string -> string
@@ -20,14 +20,14 @@ val bpath : string -> string
     (defined in the Secure module) *)
 val search_in_assets : string -> string
 
-val include_begin : config -> string -> unit
-val include_end : config -> string -> unit
+val include_begin : config -> Adef.safe_string -> unit
+val include_end : config -> Adef.safe_string -> unit
 
 (** Returns the path to the template file in parameter *)
 val etc_file_name : config -> string -> string
 
 (** Returns the date of the base directory last update *)
-val escache_value : base -> string
+val escache_value : base -> Adef.encoded_string
 
 (** Commits the patches and logs the modification *)
 val commit_patches : config -> base -> unit
@@ -35,9 +35,8 @@ val commit_patches : config -> base -> unit
 val update_wf_trace : config -> string -> unit
 
 (** Get referer (the page you came from to the current page) page from HTTP request *)
-val get_referer : config -> string
+val get_referer : config -> Adef.escaped_string
 
-val no_html_tags : string -> string
 val clean_html_tags : string -> string list -> string
 
 (** Prints HTTP response headers with giving content type (default : {i text/html}) on the socket. *)
@@ -51,18 +50,28 @@ val string_of_ctime : config -> string
     that containts bindings from [conf.henv] and [conf.senv]. Doesn't add binding [(k,v)] when:
     - k = "oc" or "ocz" and v = "0"
     - v = "" *)
-val commd : config -> string
+val commd
+  : ?excl:string list
+  -> ?trim:bool
+  -> ?henv:bool
+  -> ?senv:bool
+  -> config
+  -> Adef.escaped_string
 
-(** Same as [commd] but returns without separator '&' at the end. *)
-val commd_2 : config -> string
-val prefix_base : config -> string
+val prefix_base : config -> Adef.encoded_string
 val prefix_base_password : config -> string
-val prefix_base_2 : config -> string
 val prefix_base_password_2 : config -> string
 
 (** Creates a hidden HTML input for every key and value in [conf.henv] and [conf.senv].
     Used to include immutable environement bindings in the HTML form. *)
 val hidden_env : config -> unit
+val hidden_textarea : config -> string -> Adef.encoded_string -> unit
+val hidden_input : config -> string -> Adef.encoded_string -> unit
+
+(** [hidden_env_aux env]
+    Print [env] in <input type="hidden">, escaping html of values (not keys)
+*)
+val hidden_env_aux : config -> (string * Adef.encoded_string) list -> unit
 
 (** [nobtit conf base p] returns list of titles of [p] from the [base]
     that respects constraints imposed by [conf.allowed_titles] and
@@ -79,9 +88,9 @@ val start_with_vowel : string -> bool
 
 (** Returns URL query string to access nth person
     (e.g. for person 2 in url: p2=foo&n2=bar&oc2=1 *)
-val acces_n : config -> base -> string -> person -> string
-val acces : config -> base -> person -> string
-val wprint_hidden_person : config -> base -> string -> person -> unit
+val acces_n : config -> base -> Adef.escaped_string -> person -> Adef.escaped_string
+val acces : config -> base -> person -> Adef.escaped_string
+val wprint_hidden_person : config -> base -> Adef.safe_string -> person -> unit
 
 (** [accessible_by_key conf base p fn sn]
     Tells if person could be accessed by his first name and surname
@@ -93,10 +102,10 @@ val accessible_by_key : config -> base -> person -> string -> string -> bool
 
 (** [geneweb_link conf href s] Returns HTML link to actual geneweb's command (database name) with additional (to those defind by [commd])
     argument [href] and [s] as textual content of the link. *)
-val geneweb_link : config -> string -> string -> string
+val geneweb_link : config -> Adef.escaped_string -> Adef.safe_string -> Adef.safe_string
 
 (** Prints on the socket link created by [geneweb_link]. *)
-val wprint_geneweb_link : config -> string -> string -> unit
+val wprint_geneweb_link : config -> Adef.escaped_string -> Adef.safe_string -> unit
 
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
     disabled returns always [false]. *)
@@ -124,60 +133,37 @@ val string_gen_person :
 val string_gen_family :
   base -> (iper, ifam, istr) gen_family -> (iper, ifam, string) gen_family
 
-(** Type that defines couple of functions
-    returning someone's first name and surname.
-    Typical use is to add some markup to a field, or systematically replace
-    one by `""`.
-*)
-type p_access = (base -> person -> string) * (base -> person -> string)
-
-(** Standard access (p_first_name, p_surname). *)
-val std_access : p_access
-
-(** Raw access: same as `std_access` without the `Mutil.nominative` call. *)
-val raw_access : p_access
-
 (** Returns person's first name and surname HTML description depending on :
     - his public name
     - his qualifiers
   If person is hiden returns ".....". If person's names are hiden
-  or access to them is denied returns "x x" *)
-val gen_person_text : p_access -> config -> base -> person -> string
-
-(** Same as [gen_person_text] but doesn't encapsulates description in HTML
-    tag <em>. *)
-val gen_person_text_no_html : p_access -> config -> base -> person -> string
-
-(** Returns either person's first name and surname either title and qualifiers
-    HTML description *)
-val gen_person_text_without_title :
-  p_access -> config -> base -> person -> string
+  or access to them is denied returns "x x"
+  - if [html=false], doesn't encapsulates description in HTML tag <em>.
+  - if [sn=false], doesn't display surname
+  - if [chk=false], returns HTML description even if person's names are hiden
+    or access to them is denied (don't print "x x")
+*)
+val gen_person_text
+  : ?html:bool
+  -> ?sn:bool
+  -> ?chk:bool
+  -> ?p_first_name:(base -> person -> string)
+  -> ?p_surname:(base -> person -> string)
+  -> config -> base -> person -> Adef.safe_string
 
 (** [gen_person_title_text reference paccess conf base p] returns HTML structure
     of person that describes person's first name surname and main title. [reference]
     is used to either encapsulate structure in the link (or other type
     of maniplations). *)
-val gen_person_title_text :
-  (config -> base -> person -> string -> string) -> p_access -> config ->
-    base -> person -> string
-
-(** Makes call to [gen_person_text] with [std_access] *)
-val person_text : config -> base -> person -> string
-
-(** Makes call to [gen_person_text_no_html] with [std_access] *)
-val person_text_no_html : config -> base -> person -> string
-
-(** Same as [gen_person_text] but doesn't display surname *)
-val person_text_without_surname : config -> base -> person -> string
-
-(** Same as [gen_person_text] but :
-    - doesn't display surname
-    - returns HTML description even if person's names are hiden
-      or access to them is denied (don't print "x x") *)
-val person_text_no_surn_no_acc_chk : config -> base -> person -> string
+val gen_person_title_text
+  : (config -> base -> person -> Adef.safe_string -> Adef.safe_string)
+  -> config
+  -> base
+  -> person
+  -> Adef.safe_string
 
 (** Makes call to [gen_person_text_without_title] with [std_access] *)
-val person_text_without_title : config -> base -> person -> string
+val person_text_without_title : config -> base -> person -> Adef.safe_string
 
 (** Returns main person's title. If person doesn't have it, then returns first title
     from the list. *)
@@ -185,57 +171,56 @@ val main_title : config -> base -> person -> title option
 
 (** Returns person's first name and surname text description depending on
     person's title *)
-val titled_person_text : config -> base -> person -> title -> string
+val titled_person_text : config -> base -> person -> title -> Adef.safe_string
 
 (** Returns HTML representation of title's identifier with its place (if exists) *)
-val one_title_text : base -> title -> string
+val one_title_text : base -> title -> Adef.safe_string
 
 (** Returns HTML structure of person that describes person's first name surname
     and main title. Calls [gen_person_title_text] with [no_reference]. *)
-val person_title_text : config -> base -> person -> string
+val person_title_text : config -> base -> person -> Adef.safe_string
 
 (** Returns HTML representation of person's main title (or first title if
     main doesn't exists). If person doesn't have a title or if access to
     person isn't granted returns empty string *)
-val person_title : config -> base -> person -> string
+val person_title : config -> base -> person -> Adef.safe_string
 
-val child_of_parent : config -> base -> person -> string
+val child_of_parent : config -> base -> person -> Adef.safe_string
 
 (** [reference conf base p desc] returns HTML link to the person
     where [desc] is content of the link (generaly his first name and
     surname description). If person is hidden returns [desc] (do not
     create link). *)
-val reference : config -> base -> person -> string -> string
+val reference : config -> base -> person -> Adef.safe_string -> Adef.safe_string
 
 (** Same as [reference] but link doesn't has "id" field *)
-val reference_noid : config -> base -> person -> string -> string
+val reference_noid : config -> base -> person -> Adef.safe_string -> Adef.safe_string
 
 (** [reference conf base p desc] returns [desc] without creating a link *)
-val no_reference : config -> base -> person -> string -> string
+val no_reference : config -> base -> person -> Adef.safe_string -> Adef.safe_string
 
 (** Retruns HTML link to the person that contains its first name, surname and person's
     nobility title. Calls [gen_person_title_text] with [reference]. *)
-val referenced_person_title_text : config -> base -> person -> string
+val referenced_person_title_text : config -> base -> person -> Adef.safe_string
 
 (** Returns HTML link to the person that contains its first name and surname. *)
-val referenced_person_text : config -> base -> person -> string
+val referenced_person_text : config -> base -> person -> Adef.safe_string
 
 (** Returns HTML link to the person that contains its first name. *)
-val referenced_person_text_without_surname :
-  config -> base -> person -> string
+val referenced_person_text_without_surname : config -> base -> person -> Adef.safe_string
 
-val update_family_loop : config -> base -> person -> string -> string
+val update_family_loop : config -> base -> person -> Adef.safe_string -> Adef.safe_string
 
 (** Returns value associated to the label in environnement *)
-val p_getenv : (string * string) list -> string -> string option
+val p_getenv : Config.env -> string -> string option
 
 (** Returns integer value associated to the label in environnement *)
-val p_getint : (string * string) list -> string -> int option
+val p_getint : Config.env -> string -> int option
 
 (** Create association list from the query part of a URL.
     (i.e. a list of key-value separated by `&` or `;`)
 *)
-val create_env : string -> (string * string) list
+val create_env : Adef.encoded_string -> Config.env
 
 (** [open_etc_file fname] search for template {i etc/fname.txt}
     inside the base directory or inside one of assets directories.
@@ -250,7 +235,8 @@ val open_templ_fname : config -> string -> (in_channel * string) option
 
 (** Same as [open_templ_fname] but returns only input channel of the giving template file *)
 val open_templ : config -> string -> in_channel option
-val string_of_place : config -> string -> string
+
+val string_of_place : config -> string -> Adef.escaped_string
 val place_of_string : config -> string -> place option
 val allowed_tags_file : string ref
 
@@ -278,9 +264,9 @@ val surname_without_particle : base -> string -> string
 val specify_homonymous : config -> base -> person -> bool -> unit
 
 val get_approx_birth_date_place :
-  config -> base -> person -> date option * string
+  config -> base -> person -> date option * Adef.safe_string
 val get_approx_death_date_place :
-  config -> base -> person -> date option * string
+  config -> base -> person -> date option * Adef.safe_string
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
@@ -319,28 +305,23 @@ val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string -> string
 
 (** Colorise HTML element with [conf.highlight] color
     (wrap text in <span> with inline style). *)
-val std_color : config -> string -> string
+val std_color : config -> Adef.safe_string -> Adef.safe_string
 
 (** Sex index used in translations (0 for male, 1 for female, 2 for neuter) *)
 val index_of_sex : sex -> int
 
 val string_of_pevent_name :
-  config -> base -> istr gen_pers_event_name -> string
+  config -> base -> istr gen_pers_event_name -> Adef.safe_string
 
 (** [string_of_fevent_name conf base fevent_name]
 *)
 val string_of_fevent_name
-  : config -> base -> istr gen_fam_event_name -> string
-
-(** [string_of_fevent conf base fevent_name]
-*)
-val string_of_fevent
-  : config -> base -> istr gen_fam_event_name -> string
+  : config -> base -> istr gen_fam_event_name -> Adef.safe_string
 
 (** [string_of_witness_kind conf sex wk]
     Return the string corresponding to wk according to [sex] and [conf].
 *)
-val string_of_witness_kind : config -> sex -> witness_kind -> string
+val string_of_witness_kind : config -> sex -> witness_kind -> Adef.safe_string
 
 val relation_txt :
   config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format
@@ -348,7 +329,7 @@ val relation_txt :
 val string_of_decimal_num : config -> float -> string
 
 val person_exists : config -> base -> string * string * int -> bool
-val husband_wife : config -> base -> person -> bool -> string
+val husband_wife : config -> base -> person -> bool -> Adef.safe_string
 
 (** [find_person_in_env conf base suff]
     Reconstitutes the key of a person from [conf.env],
@@ -441,14 +422,14 @@ val only_printable : string -> string
 (** Same as [only_printable] but also accepts '\n'. *)
 val only_printable_or_nl : string -> string
 
-val relation_type_text : config -> relation_type -> int -> string
-val rchild_type_text : config -> relation_type -> int -> string
+val relation_type_text : config -> relation_type -> int -> Adef.safe_string
+val rchild_type_text : config -> relation_type -> int -> Adef.safe_string
 
 val has_nephews_or_nieces : config -> base -> person -> bool
 
 val browser_doesnt_have_tables : config -> bool
 
-val doctype : config -> string
+val doctype : Adef.safe_string
 
 (** Prints on the socket beginning of the <table> tag untill first opened <td> where the text is centred *)
 val begin_centered : config -> unit
@@ -458,13 +439,6 @@ val end_centered : config -> unit
 
 val print_alphab_list
   : config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
-
-(* Printing for browsers without tables *)
-
-val pre_text_size : string -> int
-val print_pre_center : config -> int -> string -> unit
-val print_pre_left : config -> int -> string -> unit
-val print_pre_right : config -> int -> string -> unit
 
 val short_f_month : int -> string
 
@@ -498,14 +472,14 @@ val reduce_list : int -> 'a list -> 'a list
 val print_reference : config -> string -> int -> string -> unit
 
 (** Print a tip with the specified text *)
-val gen_print_tips : config -> string -> unit
+val gen_print_tips : config -> Adef.safe_string -> unit
 
 (** Print a tip that tells to {i Click an individual below to calculate the family link.} *)
 val print_tips_relationship : config -> unit
 
 val print_image_sex : config -> person -> int -> unit
 
-val display_options : config -> string
+val display_options : config -> Adef.escaped_string
 
 type cache_visited_t = (string, (iper * string) list) Hashtbl.t
 val cache_visited : config -> string
@@ -520,7 +494,7 @@ val array_mem_witn
  -> Gwdb.base
  -> iper
  -> (iper * Def.witness_kind) array
- -> bool * string
+ -> bool * Adef.safe_string
 
 (** [name_key base name] is [name],
     with particles put at the end of the string instead of the beginning.
@@ -532,7 +506,7 @@ val nb_char_occ : char -> string -> int
 
 (** [escape_html str] replaces '&', '"', '\'', '<' and '>'
     with their corresponding character entities (using entity number) *)
-val escape_html : string -> string
+val escape_html : string -> Adef.escaped_string
 
 (**
    [safe_html s] sanitizes [s] element in order to fix ill-formed
@@ -543,11 +517,10 @@ val escape_html : string -> string
    It removes any attribute when the value starts with ["javascript"].
    Text is escaped using [escape_html].
  *)
-val safe_html : string -> string
+val safe_html : string -> Adef.safe_string
 
 (** [string_with_macros conf env s]
     Return a string with "%xxx" macro replaced by their value.
-    Also filter unsafe html tags.
 *)
 val string_with_macros
   : config -> (char * (unit -> string)) list -> string -> string
@@ -563,8 +536,7 @@ module IfamSet : sig include Set.S with type elt = ifam end
 (**/**)
 
 (** Reference by default [Templ.copy_from_templ] *)
-val copy_from_templ_ref :
-  (config -> (string * string) list -> in_channel -> unit) ref
+val copy_from_templ_ref : (config -> (string * Adef.encoded_string) list -> in_channel -> unit) ref
   (* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
 
 (**/**)
@@ -576,7 +548,7 @@ val copy_from_templ_ref :
 *)
 val include_template
   : config
-  -> (string * string) list
+  -> (string * Adef.encoded_string) list
   -> string
   -> (unit -> unit)
   -> unit
@@ -607,7 +579,7 @@ val select_mascdesc : config -> base -> (iper * int) list -> int -> (iper, perso
 
 (** [sprintf_today confo]
     Uses {!val:Mutil.sprintf_date} in order to print datetime defined in [conf]. *)
-val sprintf_today : Config.config -> string
+val sprintf_today : Config.config -> Adef.safe_string
 
 (** [auth_warning conf base w]
     Check if current user has enough right in order to see [w] *)

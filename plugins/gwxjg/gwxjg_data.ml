@@ -40,6 +40,9 @@ let mk_person_note_rs conf base p note =
   let env = ['i', (fun () -> Util.default_image_name base p)] in
   mk_note_rs conf base env note
 
+let mk_place conf base str =
+  Tstr str, Tstr (Util.string_of_place conf str :> string)
+
 let rec date_compare_aux date1 date2 =
   let y1 = field date1 "year" in
   let y2 = field date2 "year" in
@@ -283,7 +286,7 @@ and module_DATE conf =
   let death_symbol = DateDisplay.death_symbol conf in
   let string_of_date_aux fn =
     func_arg1_no_kw @@ fun d ->
-    try Tstr (fn conf @@ Def.Dgreg (to_dmy d, of_calendar d) )
+    try Tstr (Def.Dgreg (to_dmy d, of_calendar d) |> fn conf : Adef.safe_string :> string)
     with e ->
       if Jg_runtime.jg_obj_lookup d "__Dtext__" = Tbool true
       then Jg_runtime.jg_obj_lookup d "__str__"
@@ -295,7 +298,7 @@ and module_DATE conf =
     func_arg1_no_kw (fun i -> Tstr (DateDisplay.code_french_year conf (unbox_int i)))
   in
   let string_of_age =
-    func_arg1_no_kw (fun d -> Tstr (DateDisplay.string_of_age conf (to_dmy d)) )
+    func_arg1_no_kw (fun d -> Tstr (DateDisplay.string_of_age conf (to_dmy d) :> string) )
   in
   let sub =
     func_arg2_no_kw begin fun d1 d2 ->
@@ -417,7 +420,7 @@ and mk_witness_kind = function
 and mk_event conf base d =
   let module E = Ezgw.Event in
   let date = match E.date d with Some d -> mk_date d | None -> Tnull in
-  let name = Tstr (E.name conf base d) in
+  let name = Tstr (E.name conf base d :> string) in
   let spouse = match E.spouse_opt d with
     | None -> Tnull
     | Some i -> lazy_get_n_mk_person conf base i
@@ -439,7 +442,7 @@ and mk_event conf base d =
           end
         end w end
   in
-  let place = Tstr (E.place conf base d) in
+  let place_raw, place = mk_place conf base (E.place conf base d) in
   let source_raw, source = mk_source_rs conf base (E.src base d) in
   let note_raw, note = mk_note_rs conf base [] (E.note conf base d) in
   Tpat begin function
@@ -553,7 +556,7 @@ and mk_str_lst base istrs = Tlist (List.map (fun i -> Tstr (Gwdb.sou base i)) is
 and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
   let module E = Ezgw.Person in
-  let access = Tstr (Util.acces conf base p) in
+  let access = Tstr (Util.acces conf base p :> string) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let first_name = Tstr (E.first_name base p) in
@@ -609,7 +612,7 @@ and find_events conf base x events =
 and unsafe_mk_person conf base (p : Gwdb.person) =
   let module E = Ezgw.Person in
   let iper' = Gwdb.get_iper p in
-  let access = Tstr (Util.acces conf base p) in
+  let access = Tstr (Util.acces conf base p :> string) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let aliases = mk_str_lst base (Gwdb.get_aliases p) in
@@ -670,7 +673,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         end db
       then
         Tpat begin fun s ->
-          Tstr (List.fold_left (Perso.linked_page_text conf base p s key) "" db)
+          Tstr (List.fold_left (Perso.linked_page_text conf base p s key) (Adef.safe "") db :> string)
         end
       else
         Tnull
@@ -990,14 +993,14 @@ let module_NAME base =
   end
 
 let mk_conf conf =
-  let lazy_env e = Tlazy (lazy (Tobj (List.map (fun (k, v) -> (k, Tstr v)) e))) in
+  let lazy_env fn e = Tlazy (lazy (Tobj (List.map (fun (k, v) -> (k, fn v)) e))) in
   let wizard = Tbool conf.Config.wizard in
   let friend = Tbool conf.friend in
   let command = Tstr conf.command in
-  let env = lazy_env conf.env in
-  let senv = lazy_env conf.senv in
-  let henv = lazy_env conf.henv in
-  let benv = lazy_env conf.base_env in
+  let env = lazy_env (fun s -> Tstr (s : Adef.encoded_string :> string)) conf.env in
+  let senv = lazy_env (fun s -> Tstr (s : Adef.encoded_string :> string))  conf.senv in
+  let henv = lazy_env (fun s -> Tstr (s : Adef.encoded_string :> string))  conf.henv in
+  let benv = lazy_env (fun s -> Tstr s) conf.base_env in
   let today = mk_dmy conf.today in
   let image_prefix = Tstr conf.image_prefix in
   let user = Tstr conf.user in
@@ -1018,8 +1021,8 @@ let mk_conf conf =
   end
 
 let mk_env_no_base conf =
-  let prefix = Tstr (Util.commd conf) in
-  let prefix_base = Tstr (Util.prefix_base conf) in
+  let prefix = Tstr (Util.commd conf :> string) in
+  let prefix_base = Tstr (Util.prefix_base conf :> string) in
   Tpat begin function
     | "prefix" -> prefix
     | "prefix_base" -> prefix_base
@@ -1027,8 +1030,8 @@ let mk_env_no_base conf =
   end
 
 let mk_env conf base =
-  let prefix = Tstr (Util.commd conf) in
-  let prefix_base = Tstr (Util.prefix_base conf) in
+  let prefix = Tstr (Util.commd conf :> string) in
+  let prefix_base = Tstr (Util.prefix_base conf :> string) in
   let sosa_ref =
     box_lazy @@ lazy begin
       match Util.p_getenv conf.Config.env "iz" with
@@ -1036,7 +1039,7 @@ let mk_env conf base =
       | None ->
         match Util.p_getenv conf.env "pz" with
         | None ->
-          begin match Util.p_getenv conf.base_env "default_sosa_ref" with
+          begin match List.assoc_opt "default_sosa_ref" conf.base_env with
             | Some n when n <> "" ->
               begin match Gutil.person_ht_find_all base n with
                 | [ ip ] -> get_n_mk_person conf base ip
@@ -1062,12 +1065,14 @@ let mk_env conf base =
   end
 
 let decode_varenv =
-  func_arg1_no_kw @@ fun str ->
-  Tstr (Mutil.decode @@ unbox_string str)
+  func_arg1_no_kw @@ function
+  | Tstr str -> Tstr (Mutil.decode (Adef.encoded str))
+  | x -> Jg_types.failwith_type_error_1 "decode_varenv" x
 
 let encode_varenv =
-  func_arg1_no_kw @@ fun str ->
-  Tstr (Mutil.encode @@ unbox_string str)
+  func_arg1_no_kw @@ function
+  | Tstr str -> Tstr (Mutil.encode str :> string)
+  | x -> Jg_types.failwith_type_error_1 "encode_varenv" x
 
 let mk_base base =
   Tpat begin function

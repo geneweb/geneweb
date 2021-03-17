@@ -1,64 +1,58 @@
 (* Copyright (c) 2007 INRIA *)
 
 open Config
-
-let commd_no_params conf =
-  conf.command ^ "?" ^
-  List.fold_left
-    (fun c (k, v) ->
-       c ^ (if c = "" then "" else "&") ^ k ^
-       (if v = "" then "" else "=" ^ v))
-    "" conf.henv
+open Def
 
 let link_to_referer conf =
   let referer = Util.get_referer conf in
   let back = Utf8.capitalize_fst (Util.transl conf "back") in
-  if referer <> "" then
-    Printf.sprintf "<a href=\"%s\">\
-         <span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span>\
-       </a>\n"
-      referer back
-  else ""
+  if (referer :> string) <> "" then
+    ({|<a href="|}
+     ^<^ referer ^>^
+     {|"><span class="fa fa-arrow-left fa-lg" title="|} ^ back ^ {|"></span></a>|}
+     :> Adef.safe_string)
+  else Adef.safe ""
 
 let gen_print_link_to_welcome f conf right_aligned =
   if right_aligned then
     Output.printf conf "<div class=\"btn-group float-%s mt-2\">\n" conf.right
-  else Output.print_string conf "<p>\n";
+  else Output.print_sstring conf "<p>\n";
   f ();
   let str = link_to_referer conf in
-  if str = "" then () else Output.print_string conf str;
-  Output.printf conf "<a href=\"%s\">\
-                  <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
-                  </a>\n"
-    (commd_no_params conf) (Utf8.capitalize (Util.transl conf "home"));
-  if right_aligned then Output.print_string conf "</div>\n"
-  else Output.print_string conf "</p>\n"
+  if (str :> string) <> "" then Output.print_string conf str;
+  Output.print_sstring conf {|<a href="|};
+  Output.print_string conf (Util.commd ~senv:false conf) ;
+  Output.print_sstring conf {|"><span class="fa fa-home fa-lg ml-1 px-0" title="|};
+  Output.print_sstring conf (Utf8.capitalize (Util.transl conf "home"));
+  Output.print_sstring conf {|"></span></a>|} ;
+  if right_aligned then Output.print_sstring conf "</div>"
+  else Output.print_sstring conf "</p>"
 
 let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
 (* S: use Util.include_template for "hed"? *)
 let header_without_http conf title =
-  Output.print_string conf "<!DOCTYPE html>\n";
-  Output.print_string conf "<head>\n";
-  Output.print_string conf "  <title>";
+  Output.print_sstring conf "<!DOCTYPE html><head><title>";
   title true;
-  Output.print_string conf "</title>\n";
-  Output.print_string conf "  <meta name=\"robots\" content=\"none\">\n";
-  Output.printf conf "  <meta charset=\"%s\">\n" conf.charset;
-  Output.printf conf
-    "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\">\n"
-    (Util.image_prefix conf);
-  Output.printf conf
-    "  <link rel=\"apple-touch-icon\" href=\"%s/favicon_gwd.png\">\n"
-    (Util.image_prefix conf);
-  Output.print_string conf "  <meta name=\"viewport\" content=\"width=device-width, \
-                    initial-scale=1, shrink-to-fit=no\">\n";
+  Output.print_sstring conf
+    "</title><meta name=\"robots\" content=\"none\">";
+  Output.print_sstring conf "<meta charset=\"" ;
+  Output.print_sstring conf conf.charset ;
+  Output.print_sstring conf "\">" ;
+  Output.print_sstring conf {|<link rel="shortcut icon" href="|};
+  Output.print_string conf (Util.image_prefix conf);
+  Output.print_sstring conf {|/favicon_gwd.png">|};
+  Output.print_sstring conf {|<link rel="apple-touch-icon" href="|};
+  Output.print_string conf (Util.image_prefix conf);
+  Output.print_sstring conf {|/favicon_gwd.png">|};
+  Output.print_sstring conf
+    {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
   Util.include_template conf [] "css" (fun () -> ());
   begin match Util.open_templ conf "hed" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
-  Output.print_string conf "\n</head>\n";
+  Output.print_sstring conf "\n</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
       Not_found -> ""
@@ -75,9 +69,9 @@ let header_without_page_title conf title =
 let header_link_welcome conf title =
   header_without_page_title conf title;
   print_link_to_welcome conf true;
-  Output.print_string conf "<h1>";
+  Output.print_sstring conf "<h1>";
   title false;
-  Output.print_string conf "</h1>\n"
+  Output.print_sstring conf "</h1>\n"
 
 let header_no_page_title conf title =
   header_without_page_title conf title;
@@ -87,36 +81,33 @@ let header_no_page_title conf title =
 
 let header conf title =
   header_without_page_title conf title;
-  Output.print_string conf "\n<h1>";
+  Output.print_sstring conf "\n<h1>";
   title false;
-  Output.print_string conf "</h1>\n"
+  Output.print_sstring conf "</h1>\n"
 
 let header_fluid conf title =
   header_without_http conf title;
   (* balancing </div> in gen_trailer *)
-  Output.print_string conf "<div class=\"container-fluid\">";
-  Output.print_string conf "\n<h1>";
+  Output.print_sstring conf "<div class=\"container-fluid\">";
+  Output.print_sstring conf "\n<h1>";
   title false;
-  Output.print_string conf "</h1>\n"
+  Output.print_sstring conf "</h1>\n"
 
 let rheader conf title =
   header_without_page_title conf title;
-  Output.print_string conf "<h1 class=\"error\">";
+  Output.print_sstring conf "<h1 class=\"error\">";
   title false;
-  Output.print_string conf "</h1>\n"
+  Output.print_sstring conf "</h1>\n"
 
-let gen_trailer with_logo conf =
+let trailer conf =
   let conf = {conf with is_printed_by_template = false} in
   begin match Util.open_templ conf "trl" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
-  if with_logo then Templ.print_copyright_with_logo conf
-  else Templ.print_copyright conf;
+  Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
-  Output.print_string conf "</body>\n</html>\n"
-
-let trailer = gen_trailer true
+  Output.print_sstring conf "</body>\n</html>\n"
 
 let () = GWPARAM.wrap_output := begin fun conf title content ->
     header conf (fun _ -> Output.print_string conf title) ;
@@ -129,7 +120,9 @@ let incorrect_request conf =
 
 let error_cannot_access conf fname =
   !GWPARAM.output_error conf Def.Not_Found
-    ~content:(Printf.sprintf "Cannot access file \"%s.txt\".\n" fname)
+    ~content:("Cannot access file \""
+              ^<^ (Util.escape_html fname : Adef.escaped_string :> Adef.safe_string)
+              ^>^ ".txt\".")
 
 let gen_interp header conf fname ifun env ep =
   Templ_parser.wrap fname begin fun () ->
@@ -227,7 +220,7 @@ let set_vother x = Vother x
 let eval_var conf env jd _loc =
   let open TemplAst in
   function
-    ["integer"] ->
+  | ["integer"] ->
       begin match get_env "integer" env with
         Vint i -> VVstring (string_of_int i)
       | _ -> raise Not_found
@@ -260,9 +253,11 @@ let print_foreach print_ast eval_expr =
 
 let print_calendar conf =
   interp conf "calendar"
-    {Templ.eval_var = eval_var conf;
-     Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-     Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-     Templ.print_foreach = print_foreach }
+    { Templ.eval_var = eval_var conf
+    ; Templ.eval_transl = (fun _ -> Templ.eval_transl conf)
+    ; Templ.eval_predefined_apply = (fun _ -> raise Not_found)
+    ; Templ.get_vother = get_vother
+    ; Templ.set_vother = set_vother
+    ; Templ.print_foreach = print_foreach
+    }
     [] (eval_julian_day conf)

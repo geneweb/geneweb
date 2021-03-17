@@ -55,5 +55,5 @@ val treat_request : Config.config -> unit
 (* Used by v7 plugin *)
 val incorrect_request : Config.config -> unit
 val very_unknown : Config.config -> Gwdb.base -> unit
-val only_special_env : (string * string) list -> bool
+val only_special_env : (string * _) list -> bool
 (**/**)

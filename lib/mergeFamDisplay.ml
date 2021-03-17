@@ -31,7 +31,7 @@ let need_differences_selection conf base fam1 fam2 =
     (fun fam ->
        match Adef.od_of_cdate (get_marriage fam) with
          None -> ""
-       | Some d -> DateDisplay.string_of_ondate conf d) ||
+       | Some d -> (DateDisplay.string_of_ondate conf d :> string)) ||
   need_selection (fun fam -> sou base (get_marriage_place fam)) ||
   need_selection
     (fun fam ->
@@ -40,33 +40,39 @@ let need_differences_selection conf base fam1 fam2 =
        | Separated -> "separated"
        | Divorced cod ->
            match Adef.od_of_cdate cod with
-             Some d -> DateDisplay.string_of_ondate conf d
+             Some d -> (DateDisplay.string_of_ondate conf d :> string)
            | None -> "divorced")
 
 let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
-  let string_field title name proj =
-    let x1 = proj fam1 in
-    let x2 = proj fam2 in
-    if x1 <> "" && x2 <> "" && x1 <> x2 then
-      Output.printf conf
-        "<h4>%s</h4>\
-         <ul>\
-         <li><input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"1\" checked>%s</li>\
-         <li><input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"2\">%s</li>\
-         </ul>"
-        (Utf8.capitalize_fst title) name x1 name x2;
+  let string_field (title : Adef.safe_string) (name : Adef.encoded_string) proj =
+    let x1 : Adef.safe_string = proj fam1 in
+    let x2 : Adef.safe_string = proj fam2 in
+    if (x1 :> string) <> "" && (x2 :> string) <> "" && x1 <> x2 then begin
+      Output.print_sstring conf "<h4>" ;
+      Output.print_string conf (Adef.safe_fn Utf8.capitalize_fst title) ;
+      Output.print_sstring conf
+        "</h4><ul><li><input type=\"radio\" class=\"form-control\" name=\"";
+      Output.print_string conf name ;
+      Output.print_sstring conf "\" value=\"1\" checked>" ;
+      Output.print_string conf x1 ;
+      Output.print_sstring conf
+        "</li><li><input type=\"radio\" class=\"form-control\" name=\"" ;
+      Output.print_string conf name ;
+      Output.print_sstring conf "\" value=\"2\">" ;
+      Output.print_string conf x2 ;
+      Output.print_sstring conf "</li></ul>"
+    end
   in
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.print_sstring conf "<form method=\"post\" action=\"" ;
+  Output.print_sstring conf conf.command;
+  Output.print_sstring conf "\">" ;
   Util.hidden_env conf;
-  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_ifam ifam1);
-  Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
-    (string_of_ifam ifam2);
+  Util.hidden_input conf "m" (Adef.encoded "MRG_FAM_OK") ;
+  Util.hidden_input conf "i" (string_of_ifam ifam1 |> Mutil.encode) ;
+  Util.hidden_input conf "i2" (string_of_ifam ifam2 |> Mutil.encode) ;
   begin match p_getenv conf.env "ip" with
-    Some ip ->
-      Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
-  | None -> ()
+    | Some ip -> Util.hidden_input conf "ip" (Mutil.encode ip) ;
+    | None -> ()
   end;
   begin let rec loop =
     function
@@ -80,51 +86,58 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   in
     loop branches
   end;
-  Output.print_string conf "<p>" ;
-  string_field (transl_nth conf "relation/relations" 0) "relation"
+  Output.print_sstring conf "<p>" ;
+  string_field
+    (transl_nth conf "relation/relations" 0 |> Adef.safe)
+    (Adef.encoded "relation")
     (fun fam ->
+       Adef.safe @@
+       transl conf @@
        match get_relation fam with
-         Married -> transl conf "married"
-       | NotMarried -> transl conf "not married"
-       | Engaged -> transl conf "engaged"
-       | NoSexesCheckNotMarried -> transl conf "no sexes check"
-       | NoSexesCheckMarried -> transl conf "married"
-       | NoMention -> transl conf "no mention"
-       | MarriageBann -> "marriage banns"
+       | Married -> "married"
+       | NotMarried -> "not married"
+       | Engaged -> "engaged"
+       | NoSexesCheckNotMarried -> "no sexes check"
+       | NoSexesCheckMarried -> "married"
+       | NoMention -> "no mention"
+       | MarriageBann -> "marriage bann"
        | MarriageContract -> "marriage contract"
-       | MarriageLicense -> "marriage license"
-       | Pacs -> "pacs"
+       | MarriageLicense -> "marriage licence"
+       | Pacs -> "PACS"
        | Residence -> "residence");
-  string_field (Util.translate_eval (transl_nth conf "marriage/marriages" 0))
-    "marriage"
+  string_field
+    (Util.translate_eval (transl_nth conf "marriage/marriages" 0) |> Adef.safe)
+    (Adef.encoded "marriage")
     (fun fam ->
        match Adef.od_of_cdate (get_marriage fam) with
-         None -> ""
+       | None -> Adef.safe ""
        | Some d -> DateDisplay.string_of_ondate conf d);
   string_field
-    (Util.translate_eval (transl_nth conf "marriage/marriages" 0) ^ " / " ^
-     transl conf "place")
-    "marriage_place" (fun fam -> sou base (get_marriage_place fam));
-  string_field (transl conf "divorce") "divorce"
+    ((Util.translate_eval (transl_nth conf "marriage/marriages" 0)
+      ^ " / " ^ transl conf "place") |> Adef.safe)
+    (Adef.encoded "marriage_place")
+    (fun fam -> (get_marriage_place fam |> sou base |> escape_html :> Adef.safe_string));
+  string_field
+    (transl conf "divorce" |> Adef.safe)
+    (Adef.encoded "divorce")
     (fun fam ->
        match get_divorce fam with
-         NotDivorced -> transl conf "not divorced"
-       | Separated -> transl conf "separated"
+       | NotDivorced -> transl conf "not divorced" |> Adef.safe
+       | Separated -> transl conf "separated" |> Adef.safe
        | Divorced cod ->
-           let ds =
-             match Adef.od_of_cdate cod with
-               Some d -> " " ^ DateDisplay.string_of_ondate conf d
-             | None -> ""
-           in
-           transl conf "divorced" ^ ds);
-  Output.printf conf
-    "</p><p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></form>"
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
+         match Adef.od_of_cdate cod with
+         | Some d -> transl conf "divorced" ^<^ " " ^<^ DateDisplay.string_of_ondate conf d
+         | None -> transl conf "divorced" |> Adef.safe
+    );
+  Output.print_sstring conf
+    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+  Output.print_sstring conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0)) ;
+  Output.print_sstring conf "</button></form>"
 
 let merge_fam1 conf base fam1 fam2 =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
-    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "merge" s))
+    Output.print_sstring conf (Utf8.capitalize_fst (transl_decline conf "merge" s))
   in
   Hutil.header conf title; print_differences conf base [] fam1 fam2; Hutil.trailer conf
 

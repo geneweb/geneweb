@@ -1,4 +1,3 @@
-(* $Id: hutil.mli,v 5.4 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config
@@ -18,14 +17,6 @@ open Config
     - If user is a wizard or a friend, then includes all messages send to him. *)
 val header_without_http : config -> (bool -> unit) -> unit
 
-(** [gen_trailer with_logo] prints HTML page trailer in the body of the current response on the socket.
-    HTML page trailer consists of :
-
-    - Copyright message from template {i copyr.txt} with inserted logo if [with_logo] is true
-    - Scripts JS from template {i js.txt}
-    - Closing <body> and <html> tags *)
-val gen_trailer : bool -> config -> unit
-
 (** Calls for [Util.html] to print HTTP header and for [header_without_http] to print HTML page header.
     Additionaly prints opening container <div> tag on the socket. *)
 val header_without_page_title : config -> (bool -> unit) -> unit
@@ -44,14 +35,19 @@ val header_fluid : config -> (bool -> unit) -> unit
     before page title. *)
 val header_link_welcome : config -> (bool -> unit) -> unit
 
-(** Same as [gen_trailer true]. *)
+(** [trailer conf] prints HTML page trailer in the body of the current response on the socket.
+    HTML page trailer consists of :
+
+    - Copyright message from template {i copyr.txt} with inserted logo
+    - Scripts JS from template {i js.txt}
+    - Closing <body> and <html> tags *)
 val trailer : config -> unit
 
 (** Same as [header] except page's title informs about an occured error (red title). *)
 val rheader : config -> (bool -> unit) -> unit
 
 (** Returns the HTML link to the previous (referer) page *)
-val link_to_referer : config -> string
+val link_to_referer : config -> Adef.safe_string
 
 (** [gen_print_link_to_welcome f conf right_alined] prints links to previous and to home pages.
     [f] is used to print additional content before links. *)

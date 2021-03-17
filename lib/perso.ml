@@ -20,95 +20,84 @@ let string_of_marriage_text conf base fam =
   let marriage_place = sou base (get_marriage_place fam) in
   let s =
     match marriage with
-      Some d -> " " ^ DateDisplay.string_of_ondate conf d
-    | _ -> ""
+    | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d
+    | _ -> Adef.safe ""
   in
   match marriage_place with
-    "" -> s
-  | _ -> s ^ ", " ^ Util.safe_html (string_with_macros conf [] marriage_place) ^ ","
+  | "" -> s
+  | _ -> s ^^^ ", " ^<^ Util.safe_html (string_with_macros conf [] marriage_place) ^>^ ","
 
-let string_of_title ?(link = true) conf base and_txt p (nth, name, title, places, dates) =
+let string_of_title ?(link = true) conf base (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
   let (tit, est) = sou base title, sou base (List.hd places) in
-  let s = tit ^ " " ^ est in
-  let b = Buffer.create 50 in
-  if link then
-    let href =
-      "m=TT&sm=S&t="
-      ^ Mutil.encode (sou base title)
-      ^ "&p="
-      ^ Mutil.encode (sou base (List.hd places))
+  let acc = Util.safe_html (tit ^ " " ^ est) in
+  let href place s =
+    if link then
+      let href =
+        "m=TT&sm=S&t="
+        ^<^ Mutil.encode (sou base title)
+        ^^^ "&p="
+        ^<^ Mutil.encode (sou base place)
+      in
+      geneweb_link conf (href : Adef.encoded_string :> Adef.escaped_string) s
+    else s
+  in
+  let acc = href (List.hd places) acc in
+  let rec loop acc places =
+    let acc = match places with
+      | [] -> acc
+      | [_] -> acc ^^^ " " ^<^ and_txt
+      | _ -> acc ^>^ ", "
     in
-    Buffer.add_string b (geneweb_link conf href s)
-  else Buffer.add_string b s ;
-  let rec loop places =
-    begin match places with
-        [] -> ()
-      | [_] -> Printf.bprintf b "\n%s " and_txt
-      | _ -> Buffer.add_string b ",\n"
-    end;
     match places with
     | place :: places ->
-      let est = sou base place in
-      if link then
-        let href =
-          "m=TT&sm=S&t="
-          ^ Mutil.encode (sou base title)
-          ^ "&p="
-          ^ Mutil.encode (sou base place)
-        in
-        Buffer.add_string b (geneweb_link conf href est)
-      else Buffer.add_string b est ;
-      loop places
-    | _ -> ()
+      let est = Util.safe_html (sou base place) in
+      let acc = acc ^^^ href place est in
+      loop acc places
+    | _ -> acc
   in
-  loop (List.tl places);
+  let acc = loop acc (List.tl places) in
   let paren =
     match nth, dates, name with
-      n, _, _ when n > 0 -> true
+    | n, _, _ when n > 0 -> true
     | _, _, Tname _ -> true
     | _, (Some _, _) :: _, _ -> authorized_age conf base p
     | _ -> false
   in
-  if paren then Buffer.add_string b "\n(";
-  let first =
-    if nth > 0 then
-      begin
-        Buffer.add_string b
-          (if nth >= 100 then string_of_int nth
-           else transl_nth conf "nth" nth);
-        false
-      end
-    else true
+  let acc = if paren then acc ^>^ " (" else acc in
+  let first = nth <= 0 in
+  let acc =
+    if first then acc ^>^ (if nth >= 100 then string_of_int nth else transl_nth conf "nth" nth)
+    else acc
   in
-  let first =
+  let acc, first =
     match name with
-      Tname n ->
-      if not first then Buffer.add_string b " ,";
-      Buffer.add_string b (sou base n);
-      false
-    | _ -> first
+    | Tname n ->
+      let acc = if not first then acc ^>^ " ," else acc in
+      ( acc ^^^ (sou base n |> Util.escape_html :> Adef.safe_string)
+      , false )
+    | _ -> acc, first
   in
   if authorized_age conf base p && dates <> [None, None] then
-    ignore @@ List.fold_left begin fun first (date_start, date_end) ->
-      if not first then Buffer.add_string b ",\n";
-      begin match date_start with
-        | Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
-        | None -> ()
-      end;
-      begin match date_end with
+    ignore @@ List.fold_left begin fun (acc, first) (date_start, date_end) ->
+      let acc = if not first then acc ^>^ ", " else acc in
+      let acc = match date_start with
+        | Some d -> acc ^^^ DateDisplay.string_of_date conf d
+        | None -> acc
+      in
+      let acc = match date_end with
         | Some (Dgreg (d, _)) ->
-          if d.month <> 0 then Buffer.add_string b " - "
-          else Buffer.add_string b "-"
-        | Some (Dtext _) -> Buffer.add_string b " - "
-        | _ -> ()
-      end;
-      begin match date_end with
-          Some d -> Buffer.add_string b (DateDisplay.string_of_date conf d)
-        | None -> ()
-      end;
-      false end first dates ;
-  if paren then Buffer.add_string b ")";
-  Buffer.contents b
+          if d.month <> 0 then acc ^>^ " - "
+          else acc ^>^ "-"
+        | Some (Dtext _) -> acc ^>^ " - "
+        | _ -> acc
+      in
+      let acc = match date_end with
+        | Some d -> acc ^^^ DateDisplay.string_of_date conf d
+        | None -> acc
+      in
+      (acc, false)
+    end (acc, first) dates ;
+  if paren then acc ^>^ ")" else acc
 
 let name_equiv n1 n2 =
   Futil.eq_title_names eq_istr n1 n2 || n1 = Tmain && n2 = Tnone ||
@@ -450,227 +439,189 @@ let print_sosa conf base p link =
   let sosa_num = get_sosa_person p in
   if Sosa.gt sosa_num Sosa.zero then
     match Util.find_sosa_ref conf base with
-      Some ref ->
-        if not link then ()
-        else
-          begin let sosa_link =
-            let i1 = string_of_iper (get_iper p) in
-            let i2 = string_of_iper (get_iper ref) in
-            let b2 = Sosa.to_string sosa_num in
-            "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
-          in
-            Output.printf conf "<a href=\"%s%s\" style=\"text-decoration:none\">"
-              (commd conf) sosa_link
-          end;
-        let title =
-          if is_hide_names conf ref && not (authorized_age conf base ref) then
-            ""
-          else
-            let direct_ancestor =
-              Name.strip_c (p_first_name base ref) '"' ^ " " ^
-              Name.strip_c (p_surname base ref) '"'
-            in
-            Printf.sprintf (fcapitale (ftransl conf "direct ancestor of %s"))
-              direct_ancestor ^
-            Printf.sprintf ", Sosa: %s"
-              (Sosa.to_string_sep (transl conf "(thousand separator)") sosa_num)
+    | Some r ->
+      if link then begin
+        let sosa_link =
+          let i1 = string_of_iper (get_iper p) in
+          let i2 = string_of_iper (get_iper r) in
+          let b2 = Sosa.to_string sosa_num in
+          "m=RL&i1="
+          ^<^ Mutil.encode i1
+          ^^^ "&i2="
+          ^<^ Mutil.encode i2
+          ^^^ "&b1=1&b2="
+          ^<^ Mutil.encode b2
         in
-        Output.printf conf "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
-          (image_prefix conf) title;
-        if not link then () else Output.print_string conf "</a> "
+        Output.print_sstring conf {|<a href="|} ;
+        Output.print_string conf (commd conf) ;
+        Output.print_string conf sosa_link ;
+        Output.print_sstring conf {|" style="text-decoration:none">|}
+      end ;
+      let title =
+        if is_hide_names conf r && not (authorized_age conf base r)
+        then Adef.safe ""
+        else
+          let direct_ancestor =
+            Util.escape_html (p_first_name base r)
+            ^^^ " " ^<^ Util.escape_html (p_surname base r)
+          in
+          ( Printf.sprintf
+              (fcapitale (ftransl conf "direct ancestor of %s"))
+              (direct_ancestor : Adef.escaped_string :> string)
+            |> Adef.safe )
+          ^>^
+          ( ", Sosa"
+            ^ transl conf ":"
+            ^ " "
+            ^ Sosa.to_string_sep (transl conf "(thousand separator)") sosa_num
+          )
+      in
+      Output.print_sstring conf {|<img src="|} ;
+      Output.print_string conf (image_prefix conf) ;
+      Output.print_sstring conf {|/sosa.png" alt="sosa" title="|} ;
+      Output.print_string conf title ;
+      Output.print_sstring conf {|"> |} ;
+      if link then Output.print_sstring conf "</a> "
     | None -> ()
 
 (* ************************************************************************ *)
 (*  [Fonc] get_death_text : config -> person -> bool -> string      *)
 (** [Description] : Retourne une description de la mort de la personne
     [Args] :
-      - conf : configuration de la base
-      - p    : la personne que l'on veut afficher
-      - p_auth : authentifié ou non
-    [Retour] :
-      - string
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    - conf : configuration de la base
+    - p    : la personne que l'on veut afficher
+    - p_auth : authentifié ou non
+      [Retour] :
+    - string
+      [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let get_death_text conf p p_auth =
   let died =
     if p_auth then
       let is = index_of_sex (get_sex p) in
       match get_death p with
-        Death (dr, _) ->
-          begin match dr with
-            Unspecified -> transl_nth conf "died" is
-          | Murdered -> transl_nth conf "murdered" is
-          | Killed -> transl_nth conf "killed (in action)" is
-          | Executed -> transl_nth conf "executed (legally killed)" is
-          | Disappeared -> transl_nth conf "disappeared" is
-          end
-      | DeadYoung -> transl_nth conf "died young" is
-      | DeadDontKnowWhen -> transl_nth conf "died" is
-      | _ -> ""
-    else ""
+      | Death (dr, _) ->
+        begin match dr with
+          | Unspecified -> transl_nth conf "died" is |> Adef.safe
+          | Murdered -> transl_nth conf "murdered" is |> Adef.safe
+          | Killed -> transl_nth conf "killed (in action)" is |> Adef.safe
+          | Executed -> transl_nth conf "executed (legally killed)" is |> Adef.safe
+          | Disappeared -> transl_nth conf "disappeared" is |> Adef.safe
+        end
+      | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
+      | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
+      | _ -> "" |> Adef.safe
+    else "" |> Adef.safe
   in
   let on_death_date =
     match p_auth, get_death p with
-      true, Death (_, d) ->
-        let d = Adef.date_of_cdate d in
-        begin match p_getenv conf.base_env "long_date" with
-          | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d ^ DateDisplay.get_wday conf d
-          | _ -> DateDisplay.string_of_ondate ~link:false conf d
-        end
-    | _ -> ""
+    | true, Death (_, d) ->
+      let d = Adef.date_of_cdate d in
+      begin match List.assoc_opt "long_date" conf.base_env with
+        | Some "yes" ->
+          DateDisplay.string_of_ondate ~link:false conf d
+          ^>^ DateDisplay.get_wday conf d
+        | _ -> DateDisplay.string_of_ondate ~link:false conf d
+      end
+    | _ -> "" |> Adef.safe
   in
-  died ^ " " ^ on_death_date
+  died ^^^ " " ^<^ on_death_date
 
-(* ************************************************************************ *)
-(*  [Fonc] get_baptism_text : config -> base -> person -> bool -> string    *)
-(** [Description] : Retourne le texte sur le baptême de la personne
-    [Args] :
-      - conf : configuration de la base
-      - p    : la personne que l'on veut afficher
-      - p_auth : authentifié ou non
-    [Retour] :
-      - string
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
+
 let get_baptism_text conf p p_auth =
   let baptized =
-    if p_auth then
-      let is = index_of_sex (get_sex p) in transl_nth conf "baptized" is
-    else ""
+    if p_auth
+    then get_sex p |> index_of_sex |> transl_nth conf "baptized" |> Adef.safe
+    else "" |> Adef.safe
   in
   let on_baptism_date =
     match p_auth, Adef.od_of_cdate (get_baptism p) with
-      true, Some d ->
-        begin match p_getenv conf.base_env "long_date" with
-          Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^ DateDisplay.get_wday conf d
+    | true, Some d ->
+      begin match List.assoc_opt "long_date" conf.base_env with
+        | Some "yes" ->
+          DateDisplay.string_of_ondate ~link:false conf d
+          ^>^ DateDisplay.get_wday conf d
         | _ -> DateDisplay.string_of_ondate ~link:false conf d
-        end
-    | _ -> ""
+      end
+    | _ -> "" |> Adef.safe
   in
-  baptized ^ " " ^ on_baptism_date
+  baptized ^^^ " " ^<^ on_baptism_date
 
-(* ************************************************************************ *)
-(*  [Fonc] get_birth_text : config -> person -> bool -> string    *)
-(** [Description] : Retourne le texte sur la naissance de la personne
-    [Args] :
-      - conf : configuration de la base
-      - p    : la personne que l'on veut afficher
-      - p_auth : authentifié ou non
-    [Retour] :
-      - string
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let get_birth_text conf p p_auth =
   let born =
-    if p_auth then
-      let is = index_of_sex (get_sex p) in transl_nth conf "born" is
-    else ""
+    if p_auth
+    then get_sex p |> index_of_sex |> transl_nth conf "born" |> Adef.safe
+    else "" |> Adef.safe
   in
   let on_birth_date =
     match p_auth, Adef.od_of_cdate (get_birth p) with
-      true, Some d ->
-        begin match p_getenv conf.base_env "long_date" with
-          Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^ DateDisplay.get_wday conf d
+    | true, Some d ->
+      begin match List.assoc_opt "long_date" conf.base_env with
+        | Some "yes" ->
+          DateDisplay.string_of_ondate ~link:false conf d
+          ^>^ DateDisplay.get_wday conf d
         | _ -> DateDisplay.string_of_ondate ~link:false conf d
-        end
-    | _ -> ""
+      end
+    | _ -> "" |> Adef.safe
   in
-  born ^ " " ^ on_birth_date
+  born ^^^ " " ^<^ on_birth_date
 
-(* ************************************************************************ *)
-(*  [Fonc] get_marriage_text : config -> fam -> bool -> string      *)
-(** [Description] : Retourne le texte sur la date de l'union.
-    [Args] :
-      - conf   : configuration de la base
-      - family : la famille concernée
-      - p_auth : authentifié ou non
-    [Retour] :
-      - string
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let get_marriage_date_text conf fam p_auth =
   match p_auth, Adef.od_of_cdate (get_marriage fam) with
-    true, Some d ->
-      begin match p_getenv conf.base_env "long_date" with
-        Some "yes" ->
-          DateDisplay.string_of_ondate ~link:false conf d
-          ^ DateDisplay.get_wday conf d
+  | true, Some d ->
+    begin match List.assoc_opt "long_date" conf.base_env with
+      | Some "yes" ->
+        DateDisplay.string_of_ondate ~link:false conf d
+        ^>^ DateDisplay.get_wday conf d
       | _ -> DateDisplay.string_of_ondate ~link:false conf d
-      end
-  | _ -> ""
+    end
+  | _ -> "" |> Adef.safe
 
-(* ************************************************************************ *)
-(*  [Fonc] get_burial_text : config -> person -> bool -> string     *)
-(** [Description] : Retourne le texte sur l'incinération de la personne
-    [Args] :
-      - conf : configuration de la base
-      - p    : la personne que l'on veut afficher
-      - p_auth : authentifié ou non
-    [Retour] :
-      - string
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let get_burial_text conf p p_auth =
   let buried =
-    if p_auth then
-      let is = index_of_sex (get_sex p) in transl_nth conf "buried" is
-    else ""
+    if p_auth
+    then get_sex p |> index_of_sex |> transl_nth conf "buried" |> Adef.safe
+    else "" |> Adef.safe
   in
   let on_burial_date =
     match get_burial p with
-      Buried cod ->
-        begin match p_auth, Adef.od_of_cdate cod with
-          true, Some d ->
-            begin match p_getenv conf.base_env "long_date" with
-              Some "yes" ->
-                DateDisplay.string_of_ondate ~link:false conf d
-                ^ DateDisplay.get_wday conf d
+    | Buried cod ->
+      begin match p_auth, Adef.od_of_cdate cod with
+        | true, Some d ->
+          begin match List.assoc_opt "long_date" conf.base_env with
+            | Some "yes" ->
+              DateDisplay.string_of_ondate ~link:false conf d
+              ^>^ DateDisplay.get_wday conf d
             | _ -> DateDisplay.string_of_ondate ~link:false conf d
-            end
-        | _ -> ""
-        end
-    | _ -> ""
+          end
+        | _ -> "" |> Adef.safe
+      end
+    | _ -> "" |> Adef.safe
   in
-  buried ^ " " ^ on_burial_date
+  buried ^^^ " " ^<^ on_burial_date
 
-(* ************************************************************************ *)
-(*  [Fonc] get_burial_text : config -> person -> bool -> string     *)
-(** [Description] : Retourne le texte sur l'incinération de la personne
-    [Args] :
-      - conf : configuration de la base
-      - p    : la personne que l'on veut afficher
-      - p_auth : authentifié ou non
-    [Retour] :
-      - string
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let get_cremation_text conf p p_auth =
   let cremated =
-    if p_auth then
-      let is = index_of_sex (get_sex p) in transl_nth conf "cremated" is
-    else ""
+    if p_auth
+    then get_sex p |> index_of_sex |> transl_nth conf "cremated" |> Adef.safe
+    else "" |> Adef.safe
   in
   let on_cremation_date =
     match get_burial p with
-      Cremated cod ->
-        begin match p_auth, Adef.od_of_cdate cod with
-          true, Some d ->
-            begin match p_getenv conf.base_env "long_date" with
-              Some "yes" ->
-                DateDisplay.string_of_ondate ~link:false conf d
-                ^ DateDisplay.get_wday conf d
+    | Cremated cod ->
+      begin match p_auth, Adef.od_of_cdate cod with
+        | true, Some d ->
+          begin match List.assoc_opt "long_date" conf.base_env with
+            | Some "yes" ->
+              DateDisplay.string_of_ondate ~link:false conf d
+              ^>^ DateDisplay.get_wday conf d
             | _ -> DateDisplay.string_of_ondate ~link:false conf d
-            end
-        | _ -> ""
-        end
-    | _ -> ""
+          end
+        | _ -> "" |> Adef.safe
+      end
+    | _ -> "" |> Adef.safe
   in
-  cremated ^ " " ^ on_cremation_date
+  cremated ^^^ " " ^<^ on_cremation_date
 
 let max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
@@ -706,8 +657,8 @@ let max_cousin_level conf base p =
   max_ancestor_level conf base (get_iper p) max_lev + 1
 
 let limit_desc conf =
-  match p_getint conf.base_env "max_desc_level" with
-    Some x -> max 1 x
+  match Opt.map int_of_string @@ List.assoc_opt "max_desc_level" conf.base_env with
+  | Some x -> max 1 x
   | None -> 12
 
 let infinite = 10000
@@ -1425,71 +1376,75 @@ let build_list_eclair conf base v p =
          list := (surn, place, db, de, p, pl) :: !list)
     ht;
   (* On trie la liste par nom, puis lieu. *)
-  List.sort
-    (fun (s1, pl1, _, _, _, _) (s2, pl2, _, _, _, _) ->
-       match
-         Gutil.alphabetic_order (surname_without_particle base s1) (surname_without_particle base s2)
-       with
-         0 ->
-           begin match
-             Gutil.alphabetic_order (surname_particle base s1)
-               (surname_particle base s2)
-           with
-             0 -> Gutil.alphabetic_order pl1 pl2
-           | x -> x
-           end
-       | x -> x)
-    !list
+  List.sort begin fun (s1, pl1, _, _, _, _) (s2, pl2, _, _, _, _) ->
+    match
+      Gutil.alphabetic_order (surname_without_particle base s1) (surname_without_particle base s2)
+    with
+    | 0 ->
+      begin
+        match
+          Gutil.alphabetic_order (surname_particle base s1) (surname_particle base s2)
+        with
+        | 0 -> Gutil.alphabetic_order (pl1 : Adef.escaped_string :> string) (pl2 : Adef.escaped_string :> string)
+        | x -> x
+      end
+    | x -> x
+  end !list
 
-let linked_page_text conf base p s key str (pg, (_, il)) =
+let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) : Adef.safe_string =
   match pg with
-    Def.NLDB.PgMisc pg ->
-      let list = List.map snd (List.filter (fun (k, _) -> k = key) il) in
-      List.fold_right
-        (fun text str ->
-           try
-             let (nenv, _) = Notes.read_notes base pg in
-             let v =
-               let v = List.assoc s nenv in
-               if v = "" then raise Not_found
-               else Util.nth_field v (Util.index_of_sex (get_sex p))
-             in
-             match text.Def.NLDB.lnTxt with
-               Some "" -> str
-             | _ ->
-                 let str1 =
-                   let v =
-                     let text = text.Def.NLDB.lnTxt in
-                     match text with
-                       Some text ->
-                         let rec loop i len =
-                           if i = String.length text then Buff.get len
-                           else if text.[i] = '*' then
-                             loop (i + 1) (Buff.mstore len v)
-                           else loop (i + 1) (Buff.store len text.[i])
-                         in
-                         loop 0 0
-                     | None -> v
-                   in
-                   let (a, b, c) =
-                     try
-                       let i = String.index v '{' in
-                       let j = String.index v '}' in
-                       let a = String.sub v 0 i in
-                       let b = String.sub v (i + 1) (j - i - 1) in
-                       let c =
-                         String.sub v (j + 1) (String.length v - j - 1)
-                       in
-                       a, b, c
-                     with Not_found -> "", v, ""
-                   in
-                   Printf.sprintf
-                     "%s<a href=\"%sm=NOTES&f=%s#p_%d\">%s</a>%s" a
-                     (commd conf) pg text.Def.NLDB.lnPos b c
-                 in
-                 if str = "" then str1 else str ^ ", " ^ str1
-           with Not_found -> str)
-        list str
+  | Def.NLDB.PgMisc pg ->
+    let list = List.map snd (List.filter (fun (k, _) -> k = key) il) in
+    List.fold_right begin fun text (str : Adef.safe_string) ->
+      try
+        let (nenv, _) = Notes.read_notes base pg in
+        let v =
+          let v = List.assoc s nenv in
+          if v = "" then raise Not_found
+          else Util.nth_field v (Util.index_of_sex (get_sex p))
+        in
+        match text.Def.NLDB.lnTxt with
+        | Some "" -> str
+        | _ ->
+          let str1 =
+            let v =
+              let text = text.Def.NLDB.lnTxt in
+              match text with
+                Some text ->
+                let rec loop i len =
+                  if i = String.length text then Buff.get len
+                  else if text.[i] = '*' then
+                    loop (i + 1) (Buff.mstore len v)
+                  else loop (i + 1) (Buff.store len text.[i])
+                in
+                loop 0 0
+              | None -> v
+            in
+            let (a, b, c) =
+              try
+                let i = String.index v '{' in
+                let j = String.index v '}' in
+                let a = String.sub v 0 i in
+                let b = String.sub v (i + 1) (j - i - 1) in
+                let c = String.sub v (j + 1) (String.length v - j - 1) in
+                a |> Util.safe_html, b |> Util.safe_html, c |> Util.safe_html
+              with Not_found -> Adef.safe "", Util.safe_html v, Adef.safe ""
+            in
+            (a : Adef.safe_string)
+            ^^^ {|<a href="|}
+            ^<^ ( (commd conf)
+                  ^^^ {|m=NOTES&f=|}
+                  ^<^ (Mutil.encode pg :> Adef.escaped_string)
+                  ^>^ {|#p_|} ^ (string_of_int text.Def.NLDB.lnPos)
+                  : Adef.escaped_string :> Adef.safe_string)
+            ^^^ {|">|}
+            ^<^ b
+            ^^^ {|</a>|}
+            ^<^ c
+          in
+          if (str :> string) = "" then str1 else str ^^^ ", " ^<^ str1
+      with Not_found -> str
+    end list str
   | _ -> str
 
 let links_to_ind conf base db key =
@@ -1543,11 +1498,10 @@ module SortedList =
        (surname * place * date begin * date end * person * list iper * loc)
 *)
 type ancestor_surname_info =
-    Branch of
-      (string * date option * date option * string * person * Sosa.t list *
-         loc)
+  | Branch of
+      (string * date option * date option * string * person * Sosa.t list * loc)
   | Eclair of
-      (string * string * date option * date option * person * iper list * loc)
+      (string * Adef.safe_string * date option * date option * person * iper list * loc)
 
 type 'a env =
     Vallgp of generation_person list
@@ -1616,6 +1570,9 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
+let null_val = VVstring ""
+let safe_val (x : [< `encoded | `escaped | `safe] Adef.astring) =
+  VVstring ((x :> Adef.safe_string) :> string)
 
 let gen_string_of_img_sz max_wid max_hei conf base (p, p_auth) =
   if p_auth then
@@ -1662,7 +1619,7 @@ let get_linked_page conf base p s =
     let fn = Name.lower (sou base (get_first_name p)) in
     let sn = Name.lower (sou base (get_surname p)) in fn, sn, get_occ p
   in
-  List.fold_left (linked_page_text conf base p s key) "" db
+  List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
 
 let events_list conf base p =
   let pevents =
@@ -1760,17 +1717,26 @@ let get_note_source conf base env auth no_note note_source =
     in
     let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
     Util.safe_html s
-  else ""
+  else Adef.safe ""
+
+let date_aux conf p_auth date =
+  match p_auth, Adef.od_of_cdate date with
+  | true, Some d ->
+    if List.assoc_opt "long_date" conf.base_env = Some "yes"
+    then DateDisplay.string_of_ondate conf d ^>^ DateDisplay.get_wday conf d
+         |> safe_val
+    else DateDisplay.string_of_ondate conf d |> safe_val
+  | _ -> null_val
 
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl with
     Not_found -> eval_compound_var conf base env ep loc sl
-and eval_simple_var conf base env ep =
-  function
-    [s] ->
-      begin try bool_val (eval_simple_bool_var conf base env s) with
-        Not_found -> str_val (eval_simple_str_var conf base env ep s)
-      end
+and eval_simple_var conf base env ep = function
+  | [s] ->
+    begin
+      try bool_val (eval_simple_bool_var conf base env s)
+      with Not_found -> eval_simple_str_var conf base env ep s
+    end
   | _ -> raise Not_found
 and eval_simple_bool_var conf base env =
   let fam_check_aux fn =
@@ -1806,569 +1772,544 @@ and eval_simple_bool_var conf base env =
   | "are_separated" ->
     fam_check_aux (fun fam -> get_divorce fam = Separated)
   | "browsing_with_sosa_ref" ->
-      begin match get_env "sosa_ref" env with
-        Vsosa_ref v -> v <> None
+    begin match get_env "sosa_ref" env with
+      | Vsosa_ref v -> v <> None
       | _ -> raise Not_found
-      end
+    end
   | "has_comment" | "has_fnotes" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) when mode_local env ->
-          m_auth && not conf.no_note && sou base (get_comment fam) <> ""
+        m_auth && not conf.no_note && sou base (get_comment fam) <> ""
       | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, _, _, _) -> false
-          | _ -> raise Not_found
-      end
+        match get_env "fam_link" env with
+          Vfam (_, _, _, _) -> false
+        | _ -> raise Not_found
+    end
   | "has_fsources" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          m_auth && sou base (get_fsources fam) <> ""
+        m_auth && sou base (get_fsources fam) <> ""
       | _ -> false
-      end
+    end
   | "has_marriage_note" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          m_auth && not conf.no_note && sou base (get_marriage_note fam) <> ""
+        m_auth && not conf.no_note && sou base (get_marriage_note fam) <> ""
       | _ -> raise Not_found
-      end
+    end
   | "has_marriage_source" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          m_auth && sou base (get_marriage_src fam) <> ""
+        m_auth && sou base (get_marriage_src fam) <> ""
       | _ -> raise Not_found
-      end
+    end
   | "has_relation_her" ->
-      begin match get_env "rel" env with
+    begin match get_env "rel" env with
         Vrel ({r_moth = Some _}, None) -> true
       | _ -> false
-      end
+    end
   | "has_relation_him" ->
-      begin match get_env "rel" env with
+    begin match get_env "rel" env with
         Vrel ({r_fath = Some _}, None) -> true
       | _ -> false
-      end
+    end
   | "has_witnesses" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) when mode_local env ->
-          m_auth && Array.length (get_witnesses fam) > 0
+        m_auth && Array.length (get_witnesses fam) > 0
       | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, _, _, _) -> false
-          | _ -> raise Not_found
-      end
-
-
+        match get_env "fam_link" env with
+          Vfam (_, _, _, _) -> false
+        | _ -> raise Not_found
+    end
   | "is_first" ->
-      begin match get_env "first" env with
+    begin match get_env "first" env with
         Vbool x -> x
       | _ -> raise Not_found
-      end
+    end
   | "is_last" ->
-      begin match get_env "last" env with
+    begin match get_env "last" env with
         Vbool x -> x
       | _ -> raise Not_found
-      end
+    end
   | "is_no_mention" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, _) when mode_local env -> get_relation fam = NoMention
       | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, _) -> get_relation fam = NoMention
-          | _ -> raise Not_found
-      end
+        match get_env "fam_link" env with
+          Vfam (_, fam, _, _) -> get_relation fam = NoMention
+        | _ -> raise Not_found
+    end
   | "is_no_sexes_check" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, _) when mode_local env ->
+        get_relation fam = NoSexesCheckNotMarried ||
+        get_relation fam = NoSexesCheckMarried
+      | _ ->
+        match get_env "fam_link" env with
+          Vfam (_, fam, _, _) ->
           get_relation fam = NoSexesCheckNotMarried ||
           get_relation fam = NoSexesCheckMarried
-      | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, _) ->
-              get_relation fam = NoSexesCheckNotMarried ||
-              get_relation fam = NoSexesCheckMarried
-          | _ -> raise Not_found
-      end
+        | _ -> raise Not_found
+    end
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "is_sibling_after" -> get_env "pos" env = Vstring "next"
   | "is_sibling_before" -> get_env "pos" env = Vstring "prev"
   | "lazy_printed" ->
-      begin match get_env "lazy_print" env with
+    begin match get_env "lazy_print" env with
         Vlazyp r -> !r = None
       | _ -> raise Not_found
-      end
+    end
   | s ->
-      let v = extract_var "file_exists_" s in
-      if v <> "" then
-        let v = Mutil.encode v in
-        let s = SrcfileDisplay.source_file_name conf v in Sys.file_exists s
-      else raise Not_found
+    let v = extract_var "file_exists_" s in
+    if v <> "" then
+      SrcfileDisplay.source_file_name conf v
+      |> Sys.file_exists
+    else raise Not_found
 and eval_simple_str_var conf base env (_, p_auth) =
   function
-    "alias" ->
-      begin match get_env "alias" env with
-        Vstring s -> s
+  | "alias" ->
+    begin match get_env "alias" env with
+        Vstring s -> s |> Util.escape_html |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "child_cnt" -> string_of_int_env "child_cnt" env
   | "comment" | "fnotes" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth conf.no_note
-            (sou base (get_comment fam))
+        get_comment fam
+        |> sou base
+        |> get_note_source conf base [] m_auth conf.no_note
+        |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "count" ->
-      begin match get_env "count" env with
-        Vcnt c -> string_of_int !c
-      | _ -> ""
-      end
+    begin match get_env "count" env with
+        Vcnt c -> str_val (string_of_int !c)
+      | _ -> null_val
+    end
   | "count1" ->
-      begin match get_env "count1" env with
-        Vcnt c -> string_of_int !c
-      | _ -> ""
-      end
+    begin match get_env "count1" env with
+        Vcnt c -> str_val (string_of_int !c)
+      | _ -> null_val
+    end
   | "count2" ->
-      begin match get_env "count2" env with
-        Vcnt c -> string_of_int !c
-      | _ -> ""
-      end
+    begin match get_env "count2" env with
+        Vcnt c -> str_val (string_of_int !c)
+      | _ -> null_val
+    end
   | "divorce_date" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, m_auth) when mode_local env ->
-          begin match get_divorce fam with
-            Divorced d ->
-              let d = Adef.od_of_cdate d in
-              begin match d with
-                Some d when m_auth ->
-                  begin match p_getenv conf.base_env "long_date" with
-                    Some "yes" ->
-                      " <em>" ^ DateDisplay.string_of_ondate conf d ^
-                      DateDisplay.get_wday conf d ^ "</em>"
-                  | _ -> " <em>" ^ DateDisplay.string_of_ondate conf d ^ "</em>"
-                  end
-              | _ -> ""
-              end
+    begin match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when mode_local env ->
+        begin match get_divorce fam with
+          | Divorced d ->
+            begin match date_aux conf m_auth d with
+              | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
+              | x -> x
+            end
           | _ -> raise Not_found
-          end
+        end
       | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, m_auth) ->
-              begin match get_divorce fam with
-                Divorced d ->
-                  let d = Adef.od_of_cdate d in
-                  begin match d with
-                    Some d when m_auth ->
-                      begin match p_getenv conf.base_env "long_date" with
-                        Some "yes" ->
-                          " <em>" ^ DateDisplay.string_of_ondate conf d ^
-                          DateDisplay.get_wday conf d ^ "</em>"
-                      | _ -> " <em>" ^ DateDisplay.string_of_ondate conf d ^ "</em>"
-                      end
-                  | _ -> ""
-                  end
-              | _ -> raise Not_found
-              end
-          | _ -> raise Not_found
-      end
-  | "slash_divorce_date" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, m_auth) ->
+        match get_env "fam_link" env with
+        | Vfam (_, fam, _, m_auth) ->
           begin match get_divorce fam with
-            Divorced d ->
-              let d = Adef.od_of_cdate d in
-              begin match d with
-                Some d when m_auth -> DateDisplay.string_slash_of_date conf d
-              | _ -> ""
+            | Divorced d ->
+              begin match date_aux conf m_auth d with
+                | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
+                | x -> x
               end
-          | _ -> raise Not_found
+            | _ -> raise Not_found
           end
-      | _ -> raise Not_found
-      end
-  | "empty_sorted_list" ->
-      begin match get_env "list" env with
-        | Vslist l -> l := SortedList.empty; ""
         | _ -> raise Not_found
-      end
+    end
+  | "slash_divorce_date" ->
+    begin match get_env "fam" env with
+        Vfam (_, fam, _, m_auth) ->
+        begin match get_divorce fam with
+            Divorced d ->
+            let d = Adef.od_of_cdate d in
+            begin match d with
+                Some d when m_auth ->
+                DateDisplay.string_slash_of_date conf d |> safe_val
+              | _ -> null_val
+            end
+          | _ -> raise Not_found
+        end
+      | _ -> raise Not_found
+    end
+  | "empty_sorted_list" ->
+    begin match get_env "list" env with
+      | Vslist l -> l := SortedList.empty ; null_val
+      | _ -> raise Not_found
+    end
   | "empty_sorted_listb" ->
     begin match get_env "listb" env with
-      | Vslist l -> l := SortedList.empty; ""
+      | Vslist l -> l := SortedList.empty ; null_val
       | _ -> raise Not_found
     end
   | "empty_sorted_listc" ->
-      begin match get_env "listc" env with
-        | Vslist l -> l := SortedList.empty; ""
+    begin match get_env "listc" env with
+      | Vslist l -> l := SortedList.empty ; null_val
       | _ -> raise Not_found
-      end
+    end
   | "family_cnt" -> string_of_int_env "family_cnt" env
   | "first_name_alias" ->
-      begin match get_env "first_name_alias" env with
-        Vstring s -> s
-      | _ -> ""
-      end
+    begin match get_env "first_name_alias" env with
+        Vstring s -> s |> Util.escape_html |> safe_val
+      | _ -> null_val
+    end
   | "fsources" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, _) -> sou base (get_fsources fam)
-      | _ -> ""
-      end
+    begin match get_env "fam" env with
+        Vfam (_, fam, _, _) ->
+        get_fsources fam
+        |> sou base
+        |> Util.safe_html
+        |> safe_val
+      | _ -> null_val
+    end
   | "incr_count" ->
-      begin match get_env "count" env with
-        Vcnt c -> incr c; ""
-      | _ -> ""
-      end
+    begin match get_env "count" env with
+        Vcnt c -> incr c; null_val
+      | _ -> null_val
+    end
   | "incr_count1" ->
-      begin match get_env "count1" env with
-        Vcnt c -> incr c; ""
-      | _ -> ""
-      end
+    begin match get_env "count1" env with
+        Vcnt c -> incr c; null_val
+      | _ -> null_val
+    end
   | "incr_count2" ->
-      begin match get_env "count2" env with
-        Vcnt c -> incr c; ""
-      | _ -> ""
-      end
+    begin match get_env "count2" env with
+        Vcnt c -> incr c; null_val
+      | _ -> null_val
+    end
   | "lazy_force" ->
-      begin match get_env "lazy_print" env with
+    begin match get_env "lazy_print" env with
         Vlazyp r ->
-          begin match !r with
-            Some s -> r := None; s
-          | None -> ""
-          end
+        begin match !r with
+            Some s -> r := None; Util.safe_html s |> safe_val
+          | None -> null_val
+        end
       | _ -> raise Not_found
-      end
+    end
   | "level" ->
-      begin match get_env "level" env with
-        Vint i -> string_of_int i
-      | _ -> ""
-      end
+    begin match get_env "level" env with
+        Vint i -> str_val (string_of_int i)
+      | _ -> null_val
+    end
   | "marriage_place" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) when mode_local env ->
-          if m_auth then
-            Util.string_of_place conf (sou base (get_marriage_place fam))
-          else ""
+        if m_auth
+        then
+          get_marriage_place fam
+          |> sou base
+          |> Util.string_of_place conf
+          |> safe_val
+        else null_val
       | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, m_auth) ->
-              if m_auth then
-                Util.string_of_place conf (sou base (get_marriage_place fam))
-              else ""
-          | _ -> raise Not_found
-      end
+        match get_env "fam_link" env with
+          Vfam (_, fam, _, m_auth) ->
+          if m_auth then
+            get_marriage_place fam
+            |> sou base
+            |> Util.string_of_place conf
+            |> safe_val
+          else null_val
+        | _ -> raise Not_found
+    end
   | "marriage_note" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth conf.no_note
-            (sou base (get_marriage_note fam))
+        get_marriage_note fam
+        |> sou base
+        |> get_note_source conf base [] m_auth conf.no_note
+        |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "marriage_source" ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
-          get_note_source conf base [] m_auth false
-            (sou base (get_marriage_src fam))
+        get_marriage_src fam
+        |> sou base
+        |> get_note_source conf base [] m_auth false
+        |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "max_anc_level" ->
-      begin match get_env "max_anc_level" env with
-        Vint i -> string_of_int i
-      | _ -> ""
-      end
+    begin match get_env "max_anc_level" env with
+        Vint i -> str_val (string_of_int i)
+      | _ -> null_val
+    end
   | "static_max_anc_level" ->
-      begin match get_env "static_max_anc_level" env with
-        Vint i -> string_of_int i
-      | _ -> ""
-      end
+    begin match get_env "static_max_anc_level" env with
+        Vint i -> str_val (string_of_int i)
+      | _ -> null_val
+    end
   | "sosa_ref_max_anc_level" ->
-      begin match get_env "sosa_ref_max_anc_level" env with
-      | Vint i -> string_of_int i
-      | _ -> ""
+    begin match get_env "sosa_ref_max_anc_level" env with
+      | Vint i -> str_val (string_of_int i)
+      | _ -> null_val
     end
   | "max_cous_level" ->
-      begin match get_env "max_cous_level" env with
-        Vint i -> string_of_int i
-      | _ -> ""
-      end
+    begin match get_env "max_cous_level" env with
+        Vint i -> str_val (string_of_int i)
+      | _ -> null_val
+    end
   | "max_desc_level" ->
-      begin match get_env "max_desc_level" env with
-        Vint i -> string_of_int i
-      | _ -> ""
-      end
+    begin match get_env "max_desc_level" env with
+        Vint i -> str_val (string_of_int i)
+      | _ -> null_val
+    end
   | "static_max_desc_level" ->
     begin match get_env "static_max_desc_level" env with
-      | Vint i -> string_of_int i
-      | _ -> ""
+      | Vint i -> str_val (string_of_int i)
+      | _ -> null_val
     end
   | "nobility_title" ->
-      begin match get_env "nobility_title" env with
+    begin match get_env "nobility_title" env with
         Vtitle (p, t) ->
-          if p_auth then
-            string_of_title conf base (transl_nth conf "and" 0) p t
-          else ""
+        if p_auth then
+          string_of_title conf base (transl_nth conf "and" 0 |> Adef.safe) p t
+          |> safe_val
+        else null_val
       | _ -> raise Not_found
-      end
+    end
   | "number_of_subitems" ->
-      begin match get_env "item" env with
+    begin match get_env "item" env with
         Vslistlm ((s :: _) :: sll) ->
-          let n =
-            let rec loop n =
-              function
-                (s1 :: _) :: sll -> if s = s1 then loop (n + 1) sll else n
-              | _ -> n
-            in
-            loop 1 sll
+        let n =
+          let rec loop n =
+            function
+              (s1 :: _) :: sll -> if s = s1 then loop (n + 1) sll else n
+            | _ -> n
           in
-          string_of_int n
+          loop 1 sll
+        in
+        str_val (string_of_int n)
       | _ -> raise Not_found
-      end
+    end
   | "on_marriage_date" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, m_auth) when mode_local env ->
-          begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
-            true, Some s ->
-              begin match p_getenv conf.base_env "long_date" with
-                Some "yes" ->
-                  DateDisplay.string_of_ondate conf s ^ DateDisplay.get_wday conf s
-              | _ -> DateDisplay.string_of_ondate conf s
-              end
-          | _ -> ""
-          end
+    begin match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when mode_local env ->
+        date_aux conf m_auth (get_marriage fam)
       | _ ->
-          match get_env "fam_link" env with
-            Vfam (_, fam, _, m_auth) ->
-              begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
-                true, Some s ->
-                  begin match p_getenv conf.base_env "long_date" with
-                    Some "yes" ->
-                      DateDisplay.string_of_ondate conf s ^ DateDisplay.get_wday conf s
-                  | _ -> DateDisplay.string_of_ondate conf s
-                  end
-              | _ -> ""
-              end
-          | _ -> raise Not_found
-      end
-  | "slash_marriage_date" ->
-      begin match get_env "fam" env with
-        Vfam (_, fam, _, m_auth) ->
-          begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
-            true, Some s -> DateDisplay.string_slash_of_date conf s
-          | _ -> ""
-          end
-      | _ -> raise Not_found
-      end
-  | "origin_file" ->
-      if conf.wizard then
-        match get_env "fam" env with
-          Vfam (_, fam, _, _) -> sou base (get_origin_file fam)
-        | _ -> ""
-      else raise Not_found
-  | "qualifier" ->
-      begin match get_env "qualifier" env with
-        Vstring nn -> nn
-      | _ -> raise Not_found
-      end
-  | "related_type" ->
-      begin match get_env "rel" env with
-        Vrel (r, Some c) ->
-          rchild_type_text conf r.r_type (index_of_sex (get_sex c))
-      | _ -> raise Not_found
-      end
-  | "relation_type" ->
-      begin match get_env "rel" env with
-        Vrel (r, None) ->
-          begin match r.r_fath, r.r_moth with
-            Some _, None -> relation_type_text conf r.r_type 0
-          | None, Some _ -> relation_type_text conf r.r_type 1
-          | Some _, Some _ -> relation_type_text conf r.r_type 2
-          | _ -> raise Not_found
-          end
-      | _ -> raise Not_found
-      end
-  | "reset_count" ->
-      begin match get_env "count" env with
-        Vcnt c -> c := 0; ""
-      | _ -> ""
-      end
-  | "reset_count1" ->
-      begin match get_env "count1" env with
-        Vcnt c -> c := 0; ""
-      | _ -> ""
-      end
-  | "reset_count2" ->
-      begin match get_env "count2" env with
-        Vcnt c -> c := 0; ""
-      | _ -> ""
-      end
-  | "reset_desc_level" ->
-      let flevt_save =
-        match get_env "desc_level_table_save" env with
-          Vdesclevtab levt -> let (_, flevt) = Lazy.force levt in flevt
+        match get_env "fam_link" env with
+        | Vfam (_, fam, _, m_auth) ->
+          date_aux conf m_auth (get_marriage fam)
         | _ -> raise Not_found
-      in
-      begin match get_env "desc_level_table" env with
+    end
+  | "slash_marriage_date" ->
+    begin match get_env "fam" env with
+        Vfam (_, fam, _, m_auth) ->
+        begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
+            true, Some s -> DateDisplay.string_slash_of_date conf s |> safe_val
+          | _ -> null_val
+        end
+      | _ -> raise Not_found
+    end
+  | "origin_file" ->
+    if conf.wizard then
+      match get_env "fam" env with
+        Vfam (_, fam, _, _) -> get_origin_file fam |> sou base |> Util.escape_html |> safe_val
+      | _ -> null_val
+    else raise Not_found
+  | "qualifier" ->
+    begin match get_env "qualifier" env with
+        Vstring nn -> nn |> Util.escape_html |> safe_val
+      | _ -> raise Not_found
+    end
+  | "related_type" ->
+    begin match get_env "rel" env with
+        Vrel (r, Some c) ->
+        rchild_type_text conf r.r_type (index_of_sex (get_sex c))
+        |> safe_val
+      | _ -> raise Not_found
+    end
+  | "relation_type" ->
+    begin match get_env "rel" env with
+        Vrel (r, None) ->
+        begin match r.r_fath, r.r_moth with
+            Some _, None -> relation_type_text conf r.r_type 0 |> safe_val
+          | None, Some _ -> relation_type_text conf r.r_type 1 |> safe_val
+          | Some _, Some _ -> relation_type_text conf r.r_type 2 |> safe_val
+          | _ -> raise Not_found
+        end
+      | _ -> raise Not_found
+    end
+  | "reset_count" ->
+    begin match get_env "count" env with
+        Vcnt c -> c := 0; null_val
+      | _ -> null_val
+    end
+  | "reset_count1" ->
+    begin match get_env "count1" env with
+        Vcnt c -> c := 0; null_val
+      | _ -> null_val
+    end
+  | "reset_count2" ->
+    begin match get_env "count2" env with
+        Vcnt c -> c := 0; null_val
+      | _ -> null_val
+    end
+  | "reset_desc_level" ->
+    let flevt_save =
+      match get_env "desc_level_table_save" env with
+        Vdesclevtab levt -> let (_, flevt) = Lazy.force levt in flevt
+      | _ -> raise Not_found
+    in
+    begin match get_env "desc_level_table" env with
         Vdesclevtab levt ->
-          let (_, flevt) = Lazy.force levt in
-          Gwdb.Collection.iter (fun i ->
-              Gwdb.Marker.set flevt i (Gwdb.Marker.get flevt_save i)
-            ) (Gwdb.ifams base) ;
-          ""
+        let (_, flevt) = Lazy.force levt in
+        Gwdb.Collection.iter (fun i ->
+            Gwdb.Marker.set flevt i (Gwdb.Marker.get flevt_save i)
+          ) (Gwdb.ifams base) ;
+        null_val
       | _ -> raise Not_found
-      end
+    end
   | "source_type" ->
-      begin match get_env "src_typ" env with
-        Vstring s -> s
+    begin match get_env "src_typ" env with
+        Vstring s -> s |> Util.safe_html |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "surname_alias" ->
-      begin match get_env "surname_alias" env with
-        Vstring s -> s
+    begin match get_env "surname_alias" env with
+        Vstring s -> s |> Util.safe_html |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | s ->
-      let rec loop =
-        function
-          (pfx, f) :: pfx_list ->
-            let v = extract_var pfx s in
-            if v <> "" then f v else loop pfx_list
-        | [] -> raise Not_found
-      in
-      loop
-        ["evar_",
-         (fun v ->
-            match p_getenv (conf.env @ conf.henv) v with
-              Some vv -> Util.escape_html vv
-            | None -> "");
-         (* warning: "cvar_" deprecated since 5.00; use "bvar." *)
-         "cvar_",
-         (fun v -> try List.assoc v conf.base_env with Not_found -> "")]
+    let v = extract_var "evar_" s in
+    if v <> "" then Util.escape_html v |> safe_val
+    else raise Not_found
 and eval_compound_var conf base env (a, _ as ep) loc =
   function
     "ancestor" :: sl ->
-      begin match get_env "ancestor" env with
+    begin match get_env "ancestor" env with
         Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
       | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
       | _ -> raise Not_found
-      end
+    end
   | "baptism_witness" :: sl ->
-      begin match get_env "baptism_witness" env with
+    begin match get_env "baptism_witness" env with
         Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+        let ep = p, authorized_age conf base p in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | ["base"; "name"] -> VVstring conf.bname
   | ["base"; "nb_persons"] ->
-      VVstring
-        (Mutil.string_of_int_sep
-           (Util.transl conf "(thousand separator)")
-           (nb_of_persons base))
+    VVstring
+      (Mutil.string_of_int_sep
+         (Util.transl conf "(thousand separator)")
+         (nb_of_persons base))
   | ["base"; "real_nb_persons"] ->
-      VVstring
-        (Mutil.string_of_int_sep
-           (Util.transl conf "(thousand separator)")
-           (Gwdb.nb_of_real_persons base))
+    VVstring
+      (Mutil.string_of_int_sep
+         (Util.transl conf "(thousand separator)")
+         (Gwdb.nb_of_real_persons base))
   | "birth_witness" :: sl ->
-      begin match get_env "birth_witness" env with
+    begin match get_env "birth_witness" env with
         Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+        let ep = p, authorized_age conf base p in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | "burial_witness" :: sl ->
-      begin match get_env "burial_witness" env with
+    begin match get_env "burial_witness" env with
         Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+        let ep = p, authorized_age conf base p in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | "cell" :: sl ->
-      begin match get_env "cell" env with
+    begin match get_env "cell" env with
         Vcell cell -> eval_cell_field_var conf base env cell loc sl
       | _ -> raise Not_found
-      end
+    end
   | "child" :: sl ->
-      begin match get_env "child" env with
+    begin match get_env "child" env with
         Vind p when mode_local env ->
-          let auth = authorized_age conf base p in
-          let ep = p, auth in eval_person_field_var conf base env ep loc sl
+        let auth = authorized_age conf base p in
+        let ep = p, auth in eval_person_field_var conf base env ep loc sl
       | _ ->
-          match get_env "child_link" env with
-            Vind p ->
-              let ep = p, true in
-              let baseprefix =
-                match get_env "baseprefix" env with
-                  Vstring b -> b
-                | _ -> conf.command
-              in
-              let conf = {conf with command = baseprefix} in
-              eval_person_field_var conf base env ep loc sl
-          | _ -> raise Not_found
-      end
+        match get_env "child_link" env with
+          Vind p ->
+          let ep = p, true in
+          let baseprefix =
+            match get_env "baseprefix" env with
+              Vstring b -> b
+            | _ -> conf.command
+          in
+          let conf = {conf with command = baseprefix} in
+          eval_person_field_var conf base env ep loc sl
+        | _ -> raise Not_found
+    end
   | "cremation_witness" :: sl ->
-      begin match get_env "cremation_witness" env with
+    begin match get_env "cremation_witness" env with
         Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+        let ep = p, authorized_age conf base p in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | "death_witness" :: sl ->
-      begin match get_env "death_witness" env with
+    begin match get_env "death_witness" env with
         Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+        let ep = p, authorized_age conf base p in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | "enclosing" :: sl ->
-      let rec loop =
-        function
-          ("#loop", _) :: env -> eval_person_field_var conf base env ep loc sl
-        | _ :: env -> loop env
-        | [] -> raise Not_found
-      in
-      loop env
+    let rec loop =
+      function
+        ("#loop", _) :: env -> eval_person_field_var conf base env ep loc sl
+      | _ :: env -> loop env
+      | [] -> raise Not_found
+    in
+    loop env
   | "event_witness" :: sl ->
-      begin match get_env "event_witness" env with
+    begin match get_env "event_witness" env with
         Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+        let ep = p, authorized_age conf base p in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | "event_witness_relation" :: sl ->
-      begin match get_env "event_witness_relation" env with
+    begin match get_env "event_witness_relation" env with
         Vevent (p, e) ->
-          eval_event_witness_relation_var conf base env (p, e) loc sl
+        eval_event_witness_relation_var conf base env (p, e) loc sl
       | _ -> raise Not_found
-      end
+    end
   | "event_witness_relation_kind" :: _ ->
-      begin match get_env "event_witness_relation_kind" env with
+    begin match get_env "event_witness_relation_kind" env with
         Vstring wk -> VVstring wk
       | _ -> raise Not_found
-      end
+    end
   | "event_witness_kind" :: _ ->
-      begin match get_env "event_witness_kind" env with
+    begin match get_env "event_witness_kind" env with
         Vstring s -> VVstring s
       | _ -> raise Not_found
-      end
+    end
   | "family" :: sl ->
-      (* TODO ???
-      let mode_local =
-        match get_env "fam_link" env with
-        [ Vfam ifam _ (_, _, ip) _ -> False
-        | _ -> True ]
-      in *)
-      begin match get_env "fam" env with
+    (* TODO ???
+       let mode_local =
+       match get_env "fam_link" env with
+       [ Vfam ifam _ (_, _, ip) _ -> False
+       | _ -> True ]
+       in *)
+    begin match get_env "fam" env with
         Vfam (i, f, c, m) ->
-          eval_family_field_var conf base env (i, f, c, m) loc sl
+        eval_family_field_var conf base env (i, f, c, m) loc sl
       | _ ->
-          match get_env "fam_link" env with
-            Vfam (i, f, c, m) ->
-              eval_family_field_var conf base env (i, f, c, m) loc sl
-          | _ -> raise Not_found
-      end
+        match get_env "fam_link" env with
+          Vfam (i, f, c, m) ->
+          eval_family_field_var conf base env (i, f, c, m) loc sl
+        | _ -> raise Not_found
+    end
   | "father" :: sl ->
-      begin match get_parents a with
+    begin match get_parents a with
         Some ifam ->
-          let cpl = foi base ifam in
-          let ep = make_ep conf base (get_father cpl) in
-          eval_person_field_var conf base env ep loc sl
+        let cpl = foi base ifam in
+        let ep = make_ep conf base (get_father cpl) in
+        eval_person_field_var conf base env ep loc sl
       | None ->
         match !GWPARAM_ITL.get_father conf base conf.command (get_iper a) with
         | Some (ep, base_prefix) ->
@@ -2376,19 +2317,19 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           let env = ("p_link", Vbool true) :: env in
           eval_person_field_var conf base env ep loc sl
         | None ->
-          warning_use_has_parents_before_parent loc "father" (str_val "")
-      end
+          warning_use_has_parents_before_parent loc "father" null_val
+    end
   | "item" :: sl ->
-      begin match get_env "item" env with
+    begin match get_env "item" env with
         Vslistlm ell -> eval_item_field_var ell sl
       | _ -> raise Not_found
-      end
+    end
   | "mother" :: sl ->
-      begin match get_parents a with
+    begin match get_parents a with
         Some ifam ->
-          let cpl = foi base ifam in
-          let ep = make_ep conf base (get_mother cpl) in
-          eval_person_field_var conf base env ep loc sl
+        let cpl = foi base ifam in
+        let ep = make_ep conf base (get_mother cpl) in
+        eval_person_field_var conf base env ep loc sl
       | None ->
         match !GWPARAM_ITL.get_mother conf base conf.command (get_iper a) with
         | Some (ep, base_prefix) ->
@@ -2396,241 +2337,240 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           let env = ("p_link", Vbool true) :: env in
           eval_person_field_var conf base env ep loc sl
         | None ->
-          warning_use_has_parents_before_parent loc "mother" (str_val "")
-      end
+          warning_use_has_parents_before_parent loc "mother" null_val
+    end
   | "next_item" :: sl ->
-      begin match get_env "item" env with
+    begin match get_env "item" env with
         Vslistlm (_ :: ell) -> eval_item_field_var ell sl
       | _ -> raise Not_found
-      end
+    end
   | "number_of_ancestors" :: sl ->
-      begin match get_env "n" env with
+    begin match get_env "n" env with
         Vint n -> VVstring (eval_num conf (Sosa.of_int (n - 1)) sl)
       | _ -> raise Not_found
-      end
+    end
   | "number_of_descendants" :: sl ->
-      (* FIXME: what is the difference with number_of_descendants_at_level??? *)
-      begin match get_env "level" env with
+    (* FIXME: what is the difference with number_of_descendants_at_level??? *)
+    begin match get_env "level" env with
         Vint i ->
-          begin match get_env "desc_level_table" env with
+        begin match get_env "desc_level_table" env with
             Vdesclevtab t ->
             let m = fst (Lazy.force t) in
             let cnt =
               Gwdb.Collection.fold (fun cnt ip ->
                   if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
                 ) 0 (Gwdb.ipers base)
-              in
-              VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
+            in
+            VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found
-          end
+        end
       | _ -> raise Not_found
-      end
+    end
   | "number_of_descendants_at_level" :: sl ->
-      begin match get_env "level" env with
+    begin match get_env "level" env with
         Vint i ->
-          begin match get_env "desc_level_table" env with
+        begin match get_env "desc_level_table" env with
             Vdesclevtab t ->
             let m = fst (Lazy.force t) in
             let cnt =
               Gwdb.Collection.fold (fun cnt ip ->
-                  if Gwdb.Marker.get m ip = i then cnt + 1 else cnt
+                  if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
                 ) 0 (Gwdb.ipers base)
-              in
-              VVstring (eval_num conf (Sosa.of_int cnt) sl)
+            in
+            VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found
-          end
+        end
       | _ -> raise Not_found
-      end
+    end
   | "parent" :: sl ->
-      begin match get_env "parent" env with
+    begin match get_env "parent" env with
         Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+        let ep = p, authorized_age conf base p in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | "prev_item" :: sl ->
-      begin match get_env "prev_item" env with
+    begin match get_env "prev_item" env with
         Vslistlm ell -> eval_item_field_var ell sl
       | _ -> raise Not_found
-      end
+    end
   | "prev_family" :: sl ->
-      begin match get_env "prev_fam" env with
+    begin match get_env "prev_fam" env with
         Vfam (i, f, c, m) ->
-          eval_family_field_var conf base env (i, f, c, m) loc sl
+        eval_family_field_var conf base env (i, f, c, m) loc sl
       | _ -> raise Not_found
-      end
+    end
   | "pvar" :: v :: sl ->
-      begin match find_person_in_env conf base v with
+    begin match find_person_in_env conf base v with
       | Some p ->
-          let ep = make_ep conf base (get_iper p) in
-          eval_person_field_var conf base env ep loc sl
+        let ep = make_ep conf base (get_iper p) in
+        eval_person_field_var conf base env ep loc sl
       | None -> raise Not_found
-      end
+    end
   | "qvar" :: v :: sl ->
-      (* %qvar.index_v.surname;
-         direct access to a person whose index value is v
-      *)
-      let v0 = iper_of_string v in
-      (* if v0 >= 0 && v0 < nb_of_persons base then *)
-        let ep = make_ep conf base v0 in
-        if is_hidden (fst ep) then raise Not_found
-        else eval_person_field_var conf base env ep loc sl
-      (* else raise Not_found *)
+    (* %qvar.index_v.surname;
+       direct access to a person whose index value is v
+    *)
+    let v0 = iper_of_string v in
+    (* if v0 >= 0 && v0 < nb_of_persons base then *)
+    let ep = make_ep conf base v0 in
+    if is_hidden (fst ep) then raise Not_found
+    else eval_person_field_var conf base env ep loc sl
+  (* else raise Not_found *)
   | "svar" :: i :: sl ->
-      (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
-         access to sosa si=n of a person pi ni
-         find_base_p will scan down starting from i such that multiple sosa of
-         the same person can be listed
-      *)
-      let rec find_base_p j =
-        let s = string_of_int j in
-        let po = Util.find_person_in_env conf base s in
-        begin match po with
+    (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
+       access to sosa si=n of a person pi ni
+       find_base_p will scan down starting from i such that multiple sosa of
+       the same person can be listed
+    *)
+    let rec find_base_p j =
+      let s = string_of_int j in
+      let po = Util.find_person_in_env conf base s in
+      begin match po with
         | Some p -> p
         | None -> if j = 0 then raise Not_found else find_base_p (j-1)
-        end
-      in
-      let p0 = find_base_p (int_of_string i) in
-      (* find sosa identified by si= of that person *)
-      begin match p_getint conf.env ("s" ^ i) with
+      end
+    in
+    let p0 = find_base_p (int_of_string i) in
+    (* find sosa identified by si= of that person *)
+    begin match p_getint conf.env ("s" ^ i) with
       | Some s ->
-            let s0 = Sosa.of_int s in
-            let ip0 = get_iper p0 in
-            begin match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
-            | Some (p :: _) ->
-                let p_auth = authorized_age conf base p in
-                eval_person_field_var conf base env (p, p_auth) loc sl
-            | _ -> raise Not_found
-            end
-      | None -> raise Not_found
-      end
-  | "sosa_anc" :: s :: sl ->
-      (* %sosa_anc.sosa.first_name;
-         direct access to a person whose sosa relative to sosa_ref is s
-      *)
-      begin match get_env "sosa_ref" env with
-      | Vsosa_ref v ->
-          begin match v with
-          | Some p ->
-              let ip = get_iper p in
-              let s0 = Sosa.of_string s in
-              begin match Util.branch_of_sosa conf base s0 (pget conf base ip) with
-              | Some (p :: _) ->
-                  let p_auth = authorized_age conf base p in
-                  eval_person_field_var conf base env (p, p_auth) loc sl
-              | _ -> raise Not_found
-              end
+        let s0 = Sosa.of_int s in
+        let ip0 = get_iper p0 in
+        begin match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
+          | Some (p :: _) ->
+            let p_auth = authorized_age conf base p in
+            eval_person_field_var conf base env (p, p_auth) loc sl
           | _ -> raise Not_found
-          end
+        end
+      | None -> raise Not_found
+    end
+  | "sosa_anc" :: s :: sl ->
+    (* %sosa_anc.sosa.first_name;
+       direct access to a person whose sosa relative to sosa_ref is s
+    *)
+    begin match get_env "sosa_ref" env with
+      | Vsosa_ref (Some p) ->
+        let ip = get_iper p in
+        let s0 = Sosa.of_string s in
+        begin match Util.branch_of_sosa conf base s0 (pget conf base ip) with
+          | Some (p :: _) ->
+            let p_auth = authorized_age conf base p in
+            eval_person_field_var conf base env (p, p_auth) loc sl
+          | _ -> raise Not_found
+        end
       | _ -> raise Not_found
-      end
+    end
   | "sosa_anc_p" :: s :: sl ->
-      (* %sosa_anc_p.sosa.first_name;
-         direct access to a person whose sosa relative to current person
-      *)
-      begin match Util.p_of_sosa conf base (Sosa.of_string s) a with
+    (* %sosa_anc_p.sosa.first_name;
+       direct access to a person whose sosa relative to current person
+    *)
+    begin match Util.p_of_sosa conf base (Sosa.of_string s) a with
       | Some np ->
         let np_auth = authorized_age conf base np in
         eval_person_field_var conf base env (np, np_auth) loc sl
       | _ -> raise Not_found
-      end
+    end
   | "related" :: sl ->
-      begin match get_env "rel" env with
+    begin match get_env "rel" env with
         Vrel ({r_type = rt}, Some p) ->
-          eval_relation_field_var conf base env
-            (index_of_sex (get_sex p), rt, get_iper p, false) loc sl
+        eval_relation_field_var conf base env
+          (index_of_sex (get_sex p), rt, get_iper p, false) loc sl
       | _ -> raise Not_found
-      end
+    end
   | "relation_her" :: sl ->
-      begin match get_env "rel" env with
+    begin match get_env "rel" env with
         Vrel ({r_moth = Some ip; r_type = rt}, None) ->
-          eval_relation_field_var conf base env (1, rt, ip, true) loc sl
+        eval_relation_field_var conf base env (1, rt, ip, true) loc sl
       | _ -> raise Not_found
-      end
+    end
   | "relation_him" :: sl ->
-      begin match get_env "rel" env with
+    begin match get_env "rel" env with
         Vrel ({r_fath = Some ip; r_type = rt}, None) ->
-          eval_relation_field_var conf base env (0, rt, ip, true) loc sl
+        eval_relation_field_var conf base env (0, rt, ip, true) loc sl
       | _ -> raise Not_found
-      end
+    end
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa_ref" :: sl ->
-      begin match get_env "sosa_ref" env with
-        Vsosa_ref v ->
-          begin match v with
-            Some p ->
-              let ep = make_ep conf base (get_iper p) in
-              eval_person_field_var conf base env ep loc sl
-          | None -> raise Not_found
-          end
+    begin match get_env "sosa_ref" env with
+      | Vsosa_ref (Some p) ->
+        let ep = make_ep conf base (get_iper p) in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
-      end
+    end
   | "spouse" :: sl ->
-      begin match get_env "fam" env with
+    begin match get_env "fam" env with
         Vfam (_, _, (_, _, ip), _) when mode_local env ->
-          let ep = make_ep conf base ip in
-          eval_person_field_var conf base env ep loc sl
+        let ep = make_ep conf base ip in
+        eval_person_field_var conf base env ep loc sl
       | _ ->
+        #ifdef API
           match get_env "fam_link" env with
             Vfam (_, _, (_, _, ip), _) ->
-              let baseprefix =
-                match get_env "baseprefix" env with
-                  Vstring baseprefix -> baseprefix
-                | _ -> conf.command
-              in
-              begin match !GWPARAM_ITL.get_person conf base baseprefix ip with
-                | Some (ep, baseprefix) ->
-                  let conf = { conf with command = baseprefix } in
-                  let env = ("p_link", Vbool true) :: env in
-                  eval_person_field_var conf base env ep loc sl
-                | None -> raise Not_found
-              end
+            let baseprefix =
+              match get_env "baseprefix" env with
+                Vstring baseprefix -> baseprefix
+              | _ -> conf.command
+            in
+            begin match Perso_link.get_person_link baseprefix ip with
+                Some spouse ->
+                let ep = Perso_link.make_ep_link base spouse in
+                let conf =
+                  {conf with command = spouse.MLink.Person.baseprefix}
+                in
+                let env = ("p_link", Vbool true) :: env in
+                eval_person_field_var conf base env ep loc sl
+              | None -> raise Not_found
+            end
           | _ -> raise Not_found
-      end
-  | "witness" :: sl ->
-      begin match get_env "witness" env with
-        Vind p ->
-          let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
-      end
-  | "witness_relation" :: sl ->
-      begin match get_env "fam" env with
-        Vfam (i, f, c, m) ->
-          eval_witness_relation_var conf base env (i, f, c, m) loc sl
-      | _ -> raise Not_found
-      end
-  | sl -> eval_person_field_var conf base env ep loc sl
+                       #else
+  raise Not_found
+        #endif
+end
+| "witness" :: sl ->
+  begin match get_env "witness" env with
+      Vind p ->
+      let ep = p, authorized_age conf base p in
+      eval_person_field_var conf base env ep loc sl
+    | _ -> raise Not_found
+  end
+| "witness_relation" :: sl ->
+  begin match get_env "fam" env with
+      Vfam (i, f, c, m) ->
+      eval_witness_relation_var conf base env (i, f, c, m) loc sl
+    | _ -> raise Not_found
+  end
+| sl -> eval_person_field_var conf base env ep loc sl
 and eval_item_field_var ell =
-  function
-    [s] ->
+    function
+      [s] ->
       begin try
-        match ell with
-          el :: _ ->
+          match ell with
+            el :: _ ->
             let v = int_of_string s in
             let r = try List.nth el (v - 1) with Failure _ -> "" in VVstring r
-        | [] -> VVstring ""
-      with Failure _ -> raise Not_found
+          | [] -> null_val
+        with Failure _ -> raise Not_found
       end
-  | _ -> raise Not_found
+    | _ -> raise Not_found
 and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
-  function
-    ["type"] ->
-      if is_relation then VVstring (relation_type_text conf rt i)
-      else VVstring (rchild_type_text conf rt i)
-  | sl ->
+    function
+      ["type"] ->
+      if is_relation then safe_val (relation_type_text conf rt i)
+      else safe_val (rchild_type_text conf rt i)
+    | sl ->
       let ep = make_ep conf base ip in
       eval_person_field_var conf base env ep loc sl
 and eval_cell_field_var conf base env cell loc =
-  function
-    ["colspan"] ->
+    function
+      ["colspan"] ->
       begin match cell with
-        Empty -> VVstring "1"
-      | Cell (_, _, _, _, s, _) -> VVstring (string_of_int s)
+          Empty -> VVstring "1"
+        | Cell (_, _, _, _, s, _) -> VVstring (string_of_int s)
       end
-  | "family" :: sl ->
+    | "family" :: sl ->
       begin match cell with
-        Cell (p, Some ifam, _, _, _, base_prefix) ->
+          Cell (p, Some ifam, _, _, _, base_prefix) ->
           if conf.bname = base_prefix then
             let (f, c, a) = make_efam conf base (get_iper p) ifam in
             eval_family_field_var conf base env (ifam, f, c, a) loc sl
@@ -2643,48 +2583,48 @@ and eval_cell_field_var conf base env cell loc =
           end
       | _ -> VVstring ""
       end
-  | ["is_center"] ->
+    | ["is_center"] ->
       begin match cell with
-        Cell (_, _, Center, _, _, _) -> VVbool true
-      | _ -> VVbool false
+          Cell (_, _, Center, _, _, _) -> VVbool true
+        | _ -> VVbool false
       end
-  | ["is_empty"] ->
+    | ["is_empty"] ->
       begin match cell with
-        Empty -> VVbool true
-      | _ -> VVbool false
+          Empty -> VVbool true
+        | _ -> VVbool false
       end
-  | ["is_left"] ->
+    | ["is_left"] ->
       begin match cell with
-        Cell (_, _, Left, _, _, _) -> VVbool true
-      | _ -> VVbool false
+          Cell (_, _, Left, _, _, _) -> VVbool true
+        | _ -> VVbool false
       end
-  | ["is_right"] ->
+    | ["is_right"] ->
       begin match cell with
-        Cell (_, _, Right, _, _, _) -> VVbool true
-      | _ -> VVbool false
+          Cell (_, _, Right, _, _, _) -> VVbool true
+        | _ -> VVbool false
       end
-  | ["is_top"] ->
+    | ["is_top"] ->
       begin match cell with
-        Cell (_, _, _, false, _, _) -> VVbool true
-      | _ -> VVbool false
+          Cell (_, _, _, false, _, _) -> VVbool true
+        | _ -> VVbool false
       end
-  | "person" :: sl ->
+    | "person" :: sl ->
       begin match cell with
-        Cell (p, _, _, _, _, base_prefix) ->
+          Cell (p, _, _, _, _, base_prefix) ->
           if conf.bname = base_prefix then
             let ep = make_ep conf base (get_iper p) in
             eval_person_field_var conf base env ep loc sl
           else
             let conf = {conf with command = base_prefix} in
             let ep = p, true in eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
+        | _ -> raise Not_found
       end
-  | _ -> raise Not_found
+    | _ -> raise Not_found
 and eval_ancestor_field_var conf base env gp loc =
-  function
-    "family" :: sl ->
+    function
+      "family" :: sl ->
       begin match gp with
-        GP_person (_, ip, Some ifam) ->
+          GP_person (_, ip, Some ifam) ->
           let f = foi base ifam in
           let ifath = get_father f in
           let imoth = get_mother f in
@@ -2695,142 +2635,142 @@ and eval_ancestor_field_var conf base env gp loc =
             authorized_age conf base (pget conf base imoth)
           in
           eval_family_field_var conf base env (ifam, f, c, m_auth) loc sl
-      | _ -> raise Not_found
+        | _ -> raise Not_found
       end
-  | "father" :: sl ->
+    | "father" :: sl ->
       begin match gp with
-        GP_person (_, ip, _) ->
+          GP_person (_, ip, _) ->
           begin match
-            get_parents (pget conf base ip), get_env "all_gp" env
-          with
-            Some ifam, Vallgp all_gp ->
+              get_parents (pget conf base ip), get_env "all_gp" env
+            with
+              Some ifam, Vallgp all_gp ->
               let cpl = foi base ifam in
               begin match get_link all_gp (get_father cpl) with
-                Some gp -> eval_ancestor_field_var conf base env gp loc sl
-              | None ->
+                  Some gp -> eval_ancestor_field_var conf base env gp loc sl
+                | None ->
                   let ep = make_ep conf base (get_father cpl) in
                   eval_person_field_var conf base env ep loc sl
               end
-          | _, _ -> raise Not_found
+            | _, _ -> raise Not_found
           end
-      | GP_same (_, _, ip) ->
+        | GP_same (_, _, ip) ->
           begin match get_parents (pget conf base ip) with
-            Some ifam ->
+              Some ifam ->
               let cpl = foi base ifam in
               let ep = make_ep conf base (get_father cpl) in
               eval_person_field_var conf base env ep loc sl
-          | _ -> raise Not_found
+            | _ -> raise Not_found
           end
-      | _ -> raise Not_found
+        | _ -> raise Not_found
       end
-  | ["father_sosa"] ->
+    | ["father_sosa"] ->
       begin match gp, get_env "all_gp" env with
-        (GP_person (n, ip, _) | GP_same (n, _, ip)), Vallgp all_gp ->
+          (GP_person (n, ip, _) | GP_same (n, _, ip)), Vallgp all_gp ->
           let n = Sosa.twice n in
           VVstring (parent_sosa conf base ip all_gp n get_father)
-      | _ -> VVstring ""
+        | _ -> null_val
       end
-  | ["interval"] ->
-    let to_string x =
-      Mutil.string_of_int_sep
-        (transl conf "(thousand separator)")
-        (int_of_string @@ Sosa.to_string x)
-    in
+    | ["interval"] ->
+      let to_string x =
+        Mutil.string_of_int_sep
+          (transl conf "(thousand separator)")
+          (int_of_string @@ Sosa.to_string x)
+      in
       begin match gp with
-        GP_interv (Some (n1, n2, Some (n3, n4))) ->
+          GP_interv (Some (n1, n2, Some (n3, n4))) ->
           let n2 = Sosa.sub n2 Sosa.one in
           let n4 = Sosa.sub n4 Sosa.one in
           VVstring (to_string n1 ^ "-" ^ to_string n2 ^ " = " ^ to_string n3 ^ "-" ^ to_string n4)
-      | GP_interv (Some (n1, n2, None)) ->
+        | GP_interv (Some (n1, n2, None)) ->
           let n2 = Sosa.sub n2 Sosa.one in
           VVstring (to_string n1 ^ "-" ^ to_string n2 ^ " = ...")
-      | GP_interv None -> VVstring "..."
-      | _ -> VVstring ""
+        | GP_interv None -> VVstring "..."
+        | _ -> null_val
       end
-  | ["mother_sosa"] ->
+    | ["mother_sosa"] ->
       begin match gp, get_env "all_gp" env with
-        (GP_person (n, ip, _) | GP_same (n, _, ip)), Vallgp all_gp ->
+          (GP_person (n, ip, _) | GP_same (n, _, ip)), Vallgp all_gp ->
           let n = Sosa.inc (Sosa.twice n) 1 in
           VVstring (parent_sosa conf base ip all_gp n get_mother)
-      | _ -> VVstring ""
+        | _ -> null_val
       end
-  | "same" :: sl ->
+    | "same" :: sl ->
       begin match gp with
-        GP_same (_, n, _) -> VVstring (eval_num conf n sl)
-      | _ -> VVstring ""
+          GP_same (_, n, _) -> VVstring (eval_num conf n sl)
+        | _ -> null_val
       end
-  | "anc_sosa" :: sl ->
+    | "anc_sosa" :: sl ->
       begin match gp with
-        GP_person (n, _, _) | GP_same (n, _, _) ->
+          GP_person (n, _, _) | GP_same (n, _, _) ->
           VVstring (eval_num conf n sl)
-      | _ -> VVstring ""
+        | _ -> null_val
       end
-  | "spouse" :: sl ->
+    | "spouse" :: sl ->
       begin match gp with
-        GP_person (_, ip, Some ifam) ->
+          GP_person (_, ip, Some ifam) ->
           let ip = Gutil.spouse ip (foi base ifam) in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
+        | _ -> raise Not_found
       end
-  | sl ->
+    | sl ->
       match gp with
         GP_person (_, ip, _) | GP_same (_, _, ip) ->
-          let ep = make_ep conf base ip in
-          eval_person_field_var conf base env ep loc sl
+        let ep = make_ep conf base ip in
+        eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
 and eval_anc_by_surnl_field_var conf base env ep info =
-  match info with
-    Branch (_, db, de, place, p, sosa_list, loc) ->
+    match info with
+      Branch (_, db, de, place, p, sosa_list, loc) ->
       (function
-         "date_begin" :: sl ->
-           begin match db with
-             Some d -> eval_date_field_var conf d sl
-           | None -> VVstring ""
-           end
-       | "date_end" :: sl ->
-           begin match de with
-             Some d -> eval_date_field_var conf d sl
-           | None -> VVstring ""
-           end
-       | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
-       | ["place"] -> VVstring (Util.string_of_place conf place)
-       | ["sosa_access"] ->
-           let (str, _) =
-             List.fold_right
-               (fun sosa (str, n) ->
-                  let str =
-                    str ^ "&s" ^ string_of_int n ^ "=" ^ Sosa.to_string sosa
-                  in
-                  str, n + 1)
-               sosa_list ("", 1)
-           in
-           let (p, _) = ep in VVstring (acces_n conf base "1" p ^ str)
-       | sl ->
-           let ep = make_ep conf base (get_iper p) in
-           eval_person_field_var conf base env ep loc sl)
-  | Eclair (_, place, db, de, p, persl, loc) ->
+          "date_begin" :: sl ->
+          begin match db with
+              Some d -> eval_date_field_var conf d sl
+            | None -> null_val
+          end
+        | "date_end" :: sl ->
+          begin match de with
+              Some d -> eval_date_field_var conf d sl
+            | None -> null_val
+          end
+        | ["nb_times"] -> str_val (string_of_int (List.length sosa_list))
+        | ["place"] -> safe_val (Util.string_of_place conf place)
+        | ["sosa_access"] ->
+          let (str, _) =
+            List.fold_right begin fun sosa (str, n) ->
+              str ^^^ "&s" ^<^ string_of_int n ^<^ "=" ^<^ (Sosa.to_string sosa |> Mutil.encode)
+            , n + 1
+            end sosa_list (Adef.encoded "", 1)
+          in
+          let (p, _) = ep in
+          safe_val
+            ( (acces_n conf base (Adef.escaped "1") p : Adef.escaped_string :> Adef.safe_string)
+              ^^^ (str : Adef.encoded_string :> Adef.safe_string) )
+        | sl ->
+          let ep = make_ep conf base (get_iper p) in
+          eval_person_field_var conf base env ep loc sl)
+    | Eclair (_, place, db, de, p, persl, loc) ->
       function
         "date_begin" :: sl ->
-          begin match db with
+        begin match db with
             Some d -> eval_date_field_var conf d sl
-          | None -> VVstring ""
-          end
+          | None -> null_val
+        end
       | "date_end" :: sl ->
-          begin match de with
+        begin match de with
             Some d -> eval_date_field_var conf d sl
-          | None -> VVstring ""
-          end
+          | None -> null_val
+        end
       | ["nb_events"] -> VVstring (string_of_int (List.length persl))
       | ["nb_ind"] ->
-          let list =
-            IperSet.elements (List.fold_right IperSet.add persl IperSet.empty)
-          in
-          VVstring (string_of_int (List.length list))
-      | ["place"] -> VVstring place
+        IperSet.elements (List.fold_right IperSet.add persl IperSet.empty)
+        |> List.length
+        |> string_of_int
+        |> str_val
+      | ["place"] -> safe_val place
       | sl ->
-          let ep = make_ep conf base (get_iper p) in
-          eval_person_field_var conf base env ep loc sl
+        let ep = make_ep conf base (get_iper p) in
+        eval_person_field_var conf base env ep loc sl
 and eval_num conf n =
   function
     ["hexa"] -> Printf.sprintf "0x%X" @@ int_of_string (Sosa.to_string n)
@@ -2844,36 +2784,36 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
     "baptism_date" :: sl ->
       begin match Adef.od_of_cdate (get_baptism p) with
         Some d when p_auth -> eval_date_field_var conf d sl
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "birth_date" :: sl ->
       begin match Adef.od_of_cdate (get_birth p) with
         Some d when p_auth -> eval_date_field_var conf d sl
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "burial_date" :: sl ->
       begin match get_burial p with
         Buried cod when p_auth ->
           begin match Adef.od_of_cdate cod with
             Some d -> eval_date_field_var conf d sl
-          | None -> VVstring ""
+          | None -> null_val
           end
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "cremated_date" :: sl ->
       begin match get_burial p with
         Cremated cod when p_auth ->
           begin match Adef.od_of_cdate cod with
             Some d -> eval_date_field_var conf d sl
-          | None -> VVstring ""
+          | None -> null_val
           end
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "death_date" :: sl ->
       begin match get_death p with
         Death (_, cd) when p_auth ->
           eval_date_field_var conf (Adef.date_of_cdate cd) sl
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "event" :: sl ->
       begin match get_env "event" env with
@@ -2893,7 +2833,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
             let env = ("p_link", Vbool true) :: env in
             eval_person_field_var conf base env ep loc sl
           | None ->
-            warning_use_has_parents_before_parent loc "father" (str_val "")
+            warning_use_has_parents_before_parent loc "father" null_val
       end
   | ["has_linked_page"; s] ->
       begin match get_env "nldb" env with
@@ -2948,7 +2888,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
         let from_gen_desc = int_of_string from_gen_desc in
         let nb_desc = int_of_string nb_desc in
         let () =  !GWPARAM_ITL.init_cache conf base (get_iper p) nb_asc from_gen_desc nb_desc in
-        VVstring ""
+        null_val
       with _ -> raise Not_found
       end
   | ["linked_page"; s] ->
@@ -2959,8 +2899,8 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
             let sn = Name.lower (sou base (get_surname p)) in
             fn, sn, get_occ p
           in
-          let s = List.fold_left (linked_page_text conf base p s key) "" db in
-          VVstring s
+          List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
+          |> safe_val
       | _ -> raise Not_found
       end
   | "marriage_date" :: sl ->
@@ -2968,7 +2908,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
         Vfam (_, fam, _, true) ->
           begin match Adef.od_of_cdate (get_marriage fam) with
             Some d -> eval_date_field_var conf d sl
-          | None -> VVstring ""
+          | None -> null_val
           end
       | _ -> raise Not_found
       end
@@ -2985,7 +2925,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           let env = ("p_link", Vbool true) :: env in
           eval_person_field_var conf base env ep loc sl
         | None ->
-          warning_use_has_parents_before_parent loc "mother" (str_val "")
+          warning_use_has_parents_before_parent loc "mother" null_val
       end
   | "nobility_title" :: sl ->
       begin match Util.main_title conf base p with
@@ -2993,7 +2933,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           let id = sou base t.t_ident in
           let pl = sou base t.t_place in
           eval_nobility_title_field_var (id, pl) sl
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa" :: sl ->
@@ -3001,7 +2941,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
         Vsosa x ->
           begin match get_sosa conf base env x p with
             Some (n, _) -> VVstring (eval_num conf n sl)
-          | None -> VVstring ""
+          | None -> null_val
           end
       | _ -> raise Not_found
       end
@@ -3012,13 +2952,13 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           | Some (n, _) ->
               begin match next_sosa n with
               | (so, ip) ->
-                if so = Sosa.zero then VVstring ""
+                if so = Sosa.zero then null_val
                 else
                   let p = poi base ip in
                   let p_auth = authorized_age conf base p in
                   eval_person_field_var conf base env (p, p_auth) loc sl
               end
-          | None -> VVstring ""
+          | None -> null_val
           end
       | _ -> raise Not_found
       end
@@ -3029,13 +2969,13 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           | Some (n, _) ->
               begin match prev_sosa n with
               | (so, ip) ->
-                if Sosa.eq so Sosa.zero then VVstring ""
+                if Sosa.eq so Sosa.zero then null_val
                 else
                   let p = poi base ip in
                   let p_auth = authorized_age conf base p in
                   eval_person_field_var conf base env (p, p_auth) loc sl
               end
-          | None -> VVstring ""
+          | None -> null_val
           end
       | _ -> raise Not_found
       end
@@ -3052,74 +2992,74 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
   | [s] ->
       begin
         try bool_val (eval_bool_person_field conf base env ep s)
-        with Not_found ->
-          str_val (eval_str_person_field conf base env ep s)
+        with Not_found -> eval_str_person_field conf base env ep s
       end
-  | [] -> str_val (simple_person_text conf base p p_auth)
+  | [] -> simple_person_text conf base p p_auth |> safe_val
   | _ -> raise Not_found
 and eval_date_field_var conf d =
   function
     ["prec"] ->
       begin match d with
-        Dgreg (dmy, _) -> VVstring (Util.escape_html (DateDisplay.prec_text conf dmy))
-      | _ -> VVstring ""
+        Dgreg (dmy, _) -> DateDisplay.prec_text conf dmy |> Util.escape_html |> safe_val
+      | _ -> null_val
       end
   | ["day"] ->
       begin match d with
         Dgreg (dmy, _) ->
-          if dmy.day = 0 then VVstring ""
+          if dmy.day = 0 then null_val
           else VVstring (string_of_int dmy.day)
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | ["day2"] ->
       begin match d with
         Dgreg (dmy, _) ->
           begin match dmy.prec with
             OrYear dmy2 | YearInt dmy2 ->
-              if dmy2.day2 = 0 then VVstring ""
+              if dmy2.day2 = 0 then null_val
               else VVstring (string_of_int dmy2.day2)
-          | _ -> VVstring ""
+          | _ -> null_val
           end
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | ["julian_day"] ->
       begin match d with
         Dgreg (dmy, _) ->
           VVstring (string_of_int (Calendar.sdn_of_julian dmy))
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | ["month"] ->
       begin match d with
         Dgreg (dmy, _) -> VVstring (DateDisplay.month_text dmy)
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | ["month2"] ->
       begin match d with
         Dgreg (dmy, _) ->
           begin match dmy.prec with
             OrYear dmy2 | YearInt dmy2 ->
-              if dmy2.month2 = 0 then VVstring ""
+              if dmy2.month2 = 0 then null_val
               else VVstring (string_of_int dmy2.month2)
-          | _ -> VVstring ""
+          | _ -> null_val
           end
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | ["year"] ->
       begin match d with
         Dgreg (dmy, _) -> VVstring (string_of_int dmy.year)
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | ["year2"] ->
       begin match d with
         Dgreg (dmy, _) ->
           begin match dmy.prec with
             OrYear dmy2 | YearInt dmy2 -> VVstring (string_of_int dmy2.year2)
-          | _ -> VVstring ""
+          | _ -> null_val
           end
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | [] ->
-    VVstring (DateDisplay.string_of_date_aux ~link:false conf ~sep:"&#010;  " d)
+    DateDisplay.string_of_date_aux ~link:false conf ~sep:(Adef.safe "&#010;  ") d
+    |> safe_val
   | _ -> raise Not_found
 and _eval_place_field_var conf place =
   function
@@ -3129,48 +3069,48 @@ and _eval_place_field_var conf place =
   | ["other"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.other
-      | None -> VVstring ""
+      | None -> null_val
       end
   | ["town"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.town
-      | None -> VVstring ""
+      | None -> null_val
       end
   | ["township"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.township
-      | None -> VVstring ""
+      | None -> null_val
       end
   | ["canton"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.canton
-      | None -> VVstring ""
+      | None -> null_val
       end
   | ["district"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.district
-      | None -> VVstring ""
+      | None -> null_val
       end
   | ["county"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.county
-      | None -> VVstring ""
+      | None -> null_val
       end
   | ["region"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.region
-      | None -> VVstring ""
+      | None -> null_val
       end
   | ["country"] ->
       begin match place_of_string conf place with
         Some p -> VVstring p.country
-      | None -> VVstring ""
+      | None -> null_val
       end
   | _ -> raise Not_found
 and eval_nobility_title_field_var (id, pl) =
   function
-    ["ident_key"] -> VVstring (Mutil.encode id)
-  | ["place_key"] -> VVstring (Mutil.encode pl)
+    ["ident_key"] -> safe_val (Mutil.encode id)
+  | ["place_key"] -> safe_val (Mutil.encode pl)
   | [] -> VVstring (if pl = "" then id else id ^ " " ^ pl)
   | _ -> raise Not_found
 and eval_bool_event_field base (p, p_auth)
@@ -3213,37 +3153,39 @@ and eval_str_event_field conf base (p, p_auth)
               if not approx && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
             in
-            s ^ DateDisplay.string_of_age conf a
-        | _ -> ""
-      else ""
+            safe_val (s ^<^ DateDisplay.string_of_age conf a)
+        | _ -> null_val
+      else null_val
   | "name" ->
       begin match p_auth, name with
-        true, Pevent name -> Util.string_of_pevent_name conf base name
-      | true, Fevent name -> Util.string_of_fevent_name conf base name
-      | _ -> ""
+        true, Pevent name -> Util.string_of_pevent_name conf base name |> safe_val
+      | true, Fevent name -> Util.string_of_fevent_name conf base name |> safe_val
+      | _ -> null_val
       end
   | "date" ->
       begin match p_auth, Adef.od_of_cdate date with
-        true, Some d -> DateDisplay.string_of_date conf d
-      | _ -> ""
+        true, Some d -> DateDisplay.string_of_date conf d |> safe_val
+      | _ -> null_val
       end
   | "on_date" ->
-      begin match p_auth, Adef.od_of_cdate date with
-        true, Some d ->
-          begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-          | _ -> DateDisplay.string_of_ondate conf d
-          end
-      | _ -> ""
-      end
+    date_aux conf p_auth date
   | "place" ->
-      if p_auth then Util.string_of_place conf (sou base place) else ""
+      if p_auth
+      then
+        sou base place
+        |> Util.string_of_place conf
+        |> safe_val
+      else null_val
   | "note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note (sou base note)
+      sou base note
+      |> get_note_source conf base env p_auth conf.no_note
+      |> safe_val
   | "src" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false (sou base src)
+      sou base src
+      |> get_note_source conf base env p_auth false
+      |> safe_val
   | _ -> raise Not_found
 and eval_event_field_var conf base env (p, p_auth)
     (name, date, place, note, src, w, isp) loc =
@@ -3251,7 +3193,7 @@ and eval_event_field_var conf base env (p, p_auth)
     "date" :: sl ->
       begin match p_auth, Adef.od_of_cdate date with
         true, Some d -> eval_date_field_var conf d sl
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "spouse" :: sl ->
       begin match isp with
@@ -3259,7 +3201,7 @@ and eval_event_field_var conf base env (p, p_auth)
           let sp = poi base isp in
           let ep = sp, authorized_age conf base sp in
           eval_person_field_var conf base env ep loc sl
-      | None -> VVstring ""
+      | None -> null_val
       end
   | [s] ->
       begin try
@@ -3267,9 +3209,7 @@ and eval_event_field_var conf base env (p, p_auth)
           (eval_bool_event_field base (p, p_auth)
              (name, date, place, note, src, w, isp) s)
       with Not_found ->
-        str_val
-          (eval_str_event_field conf base (p, p_auth)
-             (name, date, place, note, src, w, isp) s)
+        eval_str_event_field conf base (p, p_auth) (name, date, place, note, src, w, isp) s
       end
   | _ -> raise Not_found
 and eval_event_witness_relation_var conf base env (p, e) loc =
@@ -3361,11 +3301,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_approx_birth_date" ->
       p_auth && fst (Util.get_approx_birth_date_place conf base p) <> None
   | "has_approx_birth_place" ->
-      p_auth && snd (Util.get_approx_birth_date_place conf base p) <> ""
+      p_auth && (snd (Util.get_approx_birth_date_place conf base p) :> string) <> ""
   | "has_approx_death_date" ->
       p_auth && fst (Util.get_approx_death_date_place conf base p) <> None
   | "has_approx_death_place" ->
-      p_auth && snd (Util.get_approx_death_date_place conf base p) <> ""
+      p_auth && (snd (Util.get_approx_death_date_place conf base p) :> string) <> ""
   | "has_aliases" ->
       if not p_auth && is_hide_names conf p then false
       else get_aliases p <> []
@@ -3475,7 +3415,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       if p_auth then
         let events = events_list conf base p in
         let nb_fam = Array.length (get_family p) in
-        match p_getenv conf.base_env "has_events" with
+        match List.assoc_opt "has_events" conf.base_env with
         | Some "never" -> false
         | Some "always" ->
           if nb_fam > 0 || (List.length events) > 0 then true else false
@@ -3644,95 +3584,120 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | _ -> raise Not_found
 and eval_str_person_field conf base env (p, p_auth as ep) =
   function
-    "access" -> acces conf base p
+  | "access" -> acces conf base p |> safe_val
   | "age" ->
       begin match p_auth, Adef.od_of_cdate (get_birth p), get_death p with
         true, Some (Dgreg (d, _)), NotDead ->
-          let a = Date.time_elapsed d conf.today in
-          DateDisplay.string_of_age conf a
-      | _ -> ""
+          Date.time_elapsed d conf.today
+          |> DateDisplay.string_of_age conf
+          |> safe_val
+      | _ -> null_val
       end
   | "alias" ->
       begin match get_aliases p with
         nn :: _ ->
-          if not p_auth && is_hide_names conf p then "" else sou base nn
-      | _ -> ""
+          if not p_auth && is_hide_names conf p
+          then null_val
+          else sou base nn |> Util.escape_html |> safe_val
+      | _ -> null_val
       end
   | "approx_birth_place" ->
-      begin match
-        p_auth, snd (Util.get_approx_birth_date_place conf base p)
-      with
-        true, place -> place
-      | _ -> ""
-      end
+    if p_auth then Util.get_approx_birth_date_place conf base p |> snd |> safe_val
+    else null_val
   | "approx_death_place" ->
-      begin match
-        p_auth, snd (Util.get_approx_death_date_place conf base p)
-      with
-        true, place -> place
-      | _ -> ""
-      end
+      if p_auth then Util.get_approx_death_date_place conf base p |> snd |> safe_val
+      else null_val
   | "auto_image_file_name" ->
-      begin match auto_image_file conf base p with
-        Some s when p_auth -> s
-      | _ -> ""
-      end
-  | "bname_prefix" -> Util.commd conf
+      if p_auth then match auto_image_file conf base p with
+        | Some x -> str_val x
+        | None -> null_val
+      else null_val
+  | "bname_prefix" -> Util.commd conf |> safe_val
   | "birth_place" ->
-      if p_auth then Util.string_of_place conf (sou base (get_birth_place p))
-      else ""
+      if p_auth
+      then get_birth_place p |> sou base |> Util.string_of_place conf |> safe_val
+      else null_val
   | "birth_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_birth_note p))
+      get_birth_note p
+      |> sou base
+      |> get_note_source conf base env p_auth conf.no_note
+      |> safe_val
   | "birth_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_birth_src p))
+      get_birth_src p
+      |> sou base
+      |> get_note_source conf base env p_auth false
+      |> safe_val
   | "baptism_place" ->
       if p_auth then
-        Util.string_of_place conf (sou base (get_baptism_place p))
-      else ""
+        get_baptism_place p
+        |> sou base
+        |> Util.string_of_place conf
+        |> safe_val
+      else null_val
   | "baptism_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_baptism_note p))
+      get_baptism_note p
+      |> sou base
+      |> get_note_source conf base env p_auth conf.no_note
+      |> safe_val
   | "baptism_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_baptism_src p))
+      get_baptism_src p
+      |> sou base
+      |> get_note_source conf base env p_auth false
+      |> safe_val
   | "burial_place" ->
-      if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
-      else ""
+      if p_auth
+      then
+        get_burial_place p
+        |> sou base
+        |> Util.string_of_place conf
+        |> safe_val
+      else null_val
   | "burial_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_burial_note p))
+      get_burial_note p
+      |> sou base
+      |> get_note_source conf base env p_auth conf.no_note
+      |> safe_val
   | "burial_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_burial_src p))
+      get_burial_src p
+      |> sou base
+      |> get_note_source conf base env p_auth false
+      |> safe_val
   | "child_name" ->
       let force_surname =
         match get_parents p with
           None -> false
         | Some ifam ->
-            p_surname base (pget conf base (get_father (foi base ifam))) <>
-              p_surname base p
+          foi base ifam
+          |> get_father
+          |> pget conf base
+          |> p_surname base
+          |> (<>) (p_surname base p)
       in
-      if not p_auth && is_hide_names conf p then "x x"
-      else if force_surname then person_text conf base p
-      else person_text_no_surn_no_acc_chk conf base p
+      if not p_auth && is_hide_names conf p then str_val "x x"
+      else if force_surname then gen_person_text conf base p |> safe_val
+      else gen_person_text ~sn:false ~chk:false conf base p |> safe_val
   | "consanguinity" ->
       if p_auth then
-        string_of_decimal_num conf
-          (round_2_dec (Adef.float_of_fix (get_consang p) *. 100.0)) ^
-        " %"
-      else ""
+        string_of_decimal_num conf (round_2_dec (Adef.float_of_fix (get_consang p) *. 100.0))
+        ^ " %"
+        |> str_val
+      else null_val
   | "cremation_place" ->
-      if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
-      else ""
-  | "dates" -> if p_auth then DateDisplay.short_dates_text conf base p else ""
+      if p_auth then
+        get_burial_place p
+        |> sou base
+        |> Util.string_of_place conf
+        |> safe_val
+      else null_val
+  | "dates" ->
+    if p_auth then DateDisplay.short_dates_text conf base p |> safe_val
+    else null_val
   | "death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
@@ -3744,60 +3709,63 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
               if not approx && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
             in
-            s ^ DateDisplay.string_of_age conf a
-        | _ -> ""
-      else ""
+            s ^<^ DateDisplay.string_of_age conf a
+            |> safe_val
+        | _ -> null_val
+      else null_val
   | "death_place" ->
-      if p_auth then Util.string_of_place conf (sou base (get_death_place p))
-      else ""
+      if p_auth then
+        get_death_place p
+        |> sou base
+        |> Util.string_of_place conf
+        |> safe_val
+      else null_val
   | "death_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_death_note p))
+      get_death_note p
+      |> sou base
+      |> get_note_source conf base env p_auth conf.no_note
+      |> safe_val
   | "death_source" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_death_src p))
-  | "died" -> string_of_died conf p p_auth
-  | "fam_access" ->
-      (* deprecated since 5.00: rather use "i=%family.index;&ip=%index;" *)
-      begin match get_env "fam" env with
-        Vfam (ifam, _, _, _) ->
-          Printf.sprintf "i=%s&ip=%s" (string_of_ifam ifam)
-            (string_of_iper (get_iper p))
-      | _ -> raise Not_found
-      end
-  | "father_age_at_birth" -> string_of_parent_age conf base ep get_father
+      get_death_src p
+      |> sou base
+      |> get_note_source conf base env p_auth false
+      |> safe_val
+  | "died" -> string_of_died conf p p_auth |> safe_val
+  | "father_age_at_birth" -> string_of_parent_age conf base ep get_father |> safe_val
   | "first_name" ->
-      if not p_auth && is_hide_names conf p then "x" else p_first_name base p
+      if not p_auth && is_hide_names conf p
+      then str_val "x"
+      else p_first_name base p |> Util.escape_html |> safe_val
   | "first_name_key" ->
-      if is_hide_names conf p && not p_auth then ""
-      else Mutil.encode (Name.lower (p_first_name base p))
+      if is_hide_names conf p && not p_auth
+      then null_val
+      else p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
   | "first_name_key_val" ->
-      if is_hide_names conf p && not p_auth then ""
-      else Name.lower (p_first_name base p)
+      if is_hide_names conf p && not p_auth then null_val
+      else p_first_name base p |> Name.lower |> str_val
   | "first_name_key_strip" ->
-      if is_hide_names conf p && not p_auth then ""
-      else Name.strip_c (p_first_name base p) '"'
+      if is_hide_names conf p && not p_auth then null_val
+      else Name.strip_c (p_first_name base p) '"' |> str_val
   | "history_file" ->
-      if not p_auth then ""
+      if not p_auth then null_val
       else
         let fn = sou base (get_first_name p) in
         let sn = sou base (get_surname p) in
-        let occ = get_occ p in HistoryDiff.history_file fn sn occ
-  | "image" -> if not p_auth then "" else sou base (get_image p)
-  | "image_html_url" -> string_of_image_url conf base ep true
-  | "image_size" -> string_of_image_size conf base ep
-  | "image_medium_size" -> string_of_image_medium_size conf base ep
-  | "image_small_size" -> string_of_image_small_size conf base ep
-  | "image_url" -> string_of_image_url conf base ep false
-  | "ind_access" ->
-      (* deprecated since 5.00: rather use "i=%index;" *)
-      "i=" ^ string_of_iper (get_iper p)
+        let occ = get_occ p in
+        HistoryDiff.history_file fn sn occ
+        |> str_val
+  | "image" -> if not p_auth then null_val else get_image p |> sou base |> str_val
+  | "image_html_url" -> string_of_image_url conf base ep true |> safe_val
+  | "image_size" -> string_of_image_size conf base ep |> str_val
+  | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
+  | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
+  | "image_url" -> string_of_image_url conf base ep false |> safe_val
   | "index" ->
       begin match get_env "p_link" env with
-        Vbool _ -> ""
-      | _ -> string_of_iper (get_iper p)
+        Vbool _ -> null_val
+      | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val
       end
   | "mark_descendants" ->
       begin match get_env "desc_mark" env with
@@ -3819,7 +3787,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
                 done
               end
           in
-          mark_descendants 0 p; r := tab; ""
+          mark_descendants 0 p; r := tab; null_val
       | _ -> raise Not_found
       end
   | "marriage_age" ->
@@ -3832,45 +3800,52 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
             with
               Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
               Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)) ->
-                let a = Date.time_elapsed d1 d2 in
-                DateDisplay.string_of_age conf a
-            | _ -> ""
-          else ""
+                Date.time_elapsed d1 d2
+                |> DateDisplay.string_of_age conf
+                |> safe_val
+            | _ -> null_val
+          else null_val
       | _ -> raise Not_found
       end
-  | "mother_age_at_birth" -> string_of_parent_age conf base ep get_mother
+  | "mother_age_at_birth" -> string_of_parent_age conf base ep get_mother |> safe_val
   | "misc_names" ->
       if p_auth then
-        let list = Gwdb.person_misc_names base p (Util.nobtit conf base) in
+        let list =
+          Util.nobtit conf base
+          |> Gwdb.person_misc_names base p
+          |> List.map Util.escape_html
+        in
         let list =
           let first_name = p_first_name base p in
           let surname = p_surname base p in
-          if first_name <> "?" && surname <> "?" then
-            Name.lower (first_name ^ " " ^ surname) :: list
+          if first_name <> "?" && surname <> "?"
+          then (first_name ^ " " ^ surname |> Name.lower |> Util.escape_html) :: list
           else list
         in
         if list <> [] then
-          "<ul>\n" ^
-          List.fold_left (fun s n -> s ^ "<li>" ^ n ^ "</li>\n") "" list ^
-          "</ul>\n"
-        else ""
-      else ""
+          "<ul>"
+          ^<^
+          List.fold_left
+            (fun s n -> s ^^^ "<li>" ^<^ n ^>^ "</li>")
+            (Adef.safe "") (list : Adef.escaped_string list :> Adef.safe_string list)
+          ^>^
+          "</ul>"
+          |> safe_val
+        else null_val
+      else null_val
   | "nb_children_total" ->
-      let n =
-        Array.fold_left
-          (fun n ifam -> n + Array.length (get_children (foi base ifam))) 0
-          (get_family p)
-      in
-      string_of_int n
+    Array.fold_left
+      (fun n ifam -> n + Array.length (get_children (foi base ifam))) 0
+      (get_family p)
+    |> string_of_int
+    |> str_val
   | "nb_children" ->
-      (* TODO ???
-      let mode_local =
-        match get_env "fam_link" env with
-        [ Vfam ifam _ (_, _, ip) _ -> False
-        | _ -> True ]
-      in*)
       begin match get_env "fam" env with
-        Vfam (_, fam, _, _) -> string_of_int (Array.length (get_children fam))
+        Vfam (_, fam, _, _) ->
+        get_children fam
+        |> Array.length
+        |> string_of_int
+        |> str_val
       | _ ->
           match get_env "fam_link" env with
             Vfam (ifam, _, _, _) ->
@@ -3879,241 +3854,241 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
               | Vstring baseprefix -> baseprefix
               | _ -> conf.command
             in string_of_int (!GWPARAM_ITL.nb_children baseprefix ifam)
+               |> str_val
           | _ ->
-              let n =
-                Array.fold_left
-                  (fun n ifam ->
-                     n + Array.length (get_children (foi base ifam)))
-                  0 (get_family p)
-              in
-              string_of_int n
+            Array.fold_left
+              (fun n ifam -> n + Array.length (get_children (foi base ifam)))
+              0 (get_family p)
+            |> string_of_int
+            |> str_val
       end
   | "nb_families" ->
       begin match get_env "p_link" env with
-        | Vbool _ -> string_of_int (!GWPARAM_ITL.nb_families conf.command (get_iper p))
-        | _ -> string_of_int (Array.length (get_family p))
+        | Vbool _ ->
+          get_iper p
+          |> !GWPARAM_ITL.nb_families conf.command
+          |> string_of_int
+          |> str_val
+        | _ ->
+          get_family p
+          |> Array.length
+          |> string_of_int
+          |> str_val
       end
   | "notes" | "pnotes" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth conf.no_note
-        (sou base (get_notes p))
+      get_notes p
+      |> sou base
+      |> get_note_source conf base env p_auth conf.no_note
+      |> safe_val
   | "occ" ->
-      if is_hide_names conf p && not p_auth then ""
-      else string_of_int (get_occ p)
+      if is_hide_names conf p && not p_auth then null_val
+      else get_occ p |> string_of_int |> str_val
   | "occupation" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_occupation p))
+      get_occupation p
+      |> sou base
+      |> get_note_source conf base env p_auth false
+      |> safe_val
   | "on_baptism_date" ->
-      begin match p_auth, Adef.od_of_cdate (get_baptism p) with
-        true, Some d ->
-          begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-          | _ -> DateDisplay.string_of_ondate conf d
-          end
-      | _ -> ""
-      end
+    date_aux conf p_auth (get_baptism p)
   | "slash_baptism_date" ->
-      begin match p_auth, Adef.od_of_cdate (get_baptism p) with
-        true, Some d -> DateDisplay.string_slash_of_date conf d
-      | _ -> ""
-      end
+    if p_auth
+    then match Adef.od_of_cdate (get_baptism p) with
+      | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
+      | None -> null_val
+    else null_val
   | "on_birth_date" ->
-      begin match p_auth, Adef.od_of_cdate (get_birth p) with
-        true, Some d ->
-          begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-          | _ -> DateDisplay.string_of_ondate conf d
-          end
-      | _ -> ""
-      end
+    date_aux conf p_auth (get_birth p)
   | "slash_birth_date" ->
-      begin match p_auth, Adef.od_of_cdate (get_birth p) with
-        true, Some d -> DateDisplay.string_slash_of_date conf d
-      | _ -> ""
-      end
+      if p_auth then match Adef.od_of_cdate (get_birth p) with
+        | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
+        | _ -> null_val
+      else null_val
   | "slash_approx_birth_date" ->
-      begin match
-        p_auth, fst (Util.get_approx_birth_date_place conf base p)
-      with
-        true, Some d -> DateDisplay.string_slash_of_date conf d
-      | _ -> ""
-      end
+      if p_auth then match fst (Util.get_approx_birth_date_place conf base p) with
+        | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
+        | None -> null_val
+      else null_val
   | "on_burial_date" ->
-      begin match get_burial p with
-        Buried cod ->
-          begin match p_auth, Adef.od_of_cdate cod with
-            true, Some d ->
-              begin match p_getenv conf.base_env "long_date" with
-                Some "yes" ->
-                  DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-              | _ -> DateDisplay.string_of_ondate conf d
-              end
-          | _ -> ""
-          end
+    begin match get_burial p with
+      | Buried cod -> date_aux conf p_auth cod
       | _ -> raise Not_found
-      end
+    end
   | "psources" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
-      get_note_source conf base env p_auth false
-        (sou base (get_psources p))
+      get_psources p
+      |> sou base
+      |> get_note_source conf base env p_auth false
+      |> safe_val
   | "slash_burial_date" ->
-      begin match get_burial p with
-        Buried cod ->
-          begin match p_auth, Adef.od_of_cdate cod with
-            true, Some d -> DateDisplay.string_slash_of_date conf d
-          | _ -> ""
-          end
+    if p_auth then match get_burial p with
+      | Buried cod ->
+        begin match Adef.od_of_cdate cod with
+          | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
+          | _ -> null_val
+        end
       | _ -> raise Not_found
-      end
+    else null_val
   | "on_cremation_date" ->
-      begin match get_burial p with
-        Cremated cod ->
-          begin match p_auth, Adef.od_of_cdate cod with
-            true, Some d ->
-              begin match p_getenv conf.base_env "long_date" with
-                Some "yes" ->
-                  DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-              | _ -> DateDisplay.string_of_ondate conf d
-              end
-          | _ -> ""
-          end
+    begin match get_burial p with
+      | Cremated cod -> date_aux conf p_auth cod
       | _ -> raise Not_found
-      end
+    end
   | "slash_cremation_date" ->
       begin match get_burial p with
         Cremated cod ->
           begin match p_auth, Adef.od_of_cdate cod with
-            true, Some d -> DateDisplay.string_slash_of_date conf d
-          | _ -> ""
+            true, Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
+          | _ -> null_val
           end
       | _ -> raise Not_found
       end
   | "on_death_date" ->
-      begin match p_auth, get_death p with
-        true, Death (_, d) ->
-          let d = Adef.date_of_cdate d in
-          begin match p_getenv conf.base_env "long_date" with
-            Some "yes" -> DateDisplay.string_of_ondate conf d ^ DateDisplay.get_wday conf d
-          | _ -> DateDisplay.string_of_ondate conf d
-          end
-      | _ -> ""
-      end
+    begin match get_death p with
+      | Death (_, d) -> date_aux conf p_auth d
+      | _ -> raise Not_found
+    end
   | "slash_death_date" ->
-      begin match p_auth, get_death p with
-        true, Death (_, d) ->
-          let d = Adef.date_of_cdate d in DateDisplay.string_slash_of_date conf d
-      | _ -> ""
-      end
+    begin match p_auth, get_death p with
+      | true, Death (_, d) ->
+        Adef.date_of_cdate d
+        |> DateDisplay.string_slash_of_date conf
+        |> safe_val
+      | _ -> null_val
+    end
   | "slash_approx_death_date" ->
-      begin match
-        p_auth, fst (Util.get_approx_death_date_place conf base p)
-      with
-        true, Some d -> DateDisplay.string_slash_of_date conf d
-      | _ -> ""
-      end
+    begin match p_auth, fst (Util.get_approx_death_date_place conf base p) with
+      | true, Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
+      | _ -> null_val
+    end
   | "prev_fam_father" ->
-      begin match get_env "prev_fam" env with
-        Vfam (_, _, (ifath, _, _), _) ->
-          string_of_iper ifath
+    begin match get_env "prev_fam" env with
+      | Vfam (_, _, (ifath, _, _), _) -> string_of_iper ifath |> Mutil.encode |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "prev_fam_index" ->
-      begin match get_env "prev_fam" env with
-        Vfam (ifam, _, _, _) -> string_of_ifam ifam
+    begin match get_env "prev_fam" env with
+      | Vfam (ifam, _, _, _) -> string_of_ifam ifam |> Mutil.encode |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "prev_fam_mother" ->
-      begin match get_env "prev_fam" env with
-        Vfam (_, _, (_, imoth, _), _) ->
-          string_of_iper imoth
+    begin match get_env "prev_fam" env with
+      | Vfam (_, _, (_, imoth, _), _) -> string_of_iper imoth |> Mutil.encode |> safe_val
       | _ -> raise Not_found
-      end
+    end
   | "public_name" ->
-      if not p_auth && is_hide_names conf p then ""
-      else sou base (get_public_name p)
+    if not p_auth && is_hide_names conf p then null_val
+    else get_public_name p |> sou base |> Util.escape_html |> safe_val
   | "qualifier" ->
-      begin match get_qualifiers p with
-        nn :: _ ->
-          if not p_auth && is_hide_names conf p then "" else sou base nn
-      | _ -> ""
-      end
+    begin match get_qualifiers p with
+      | nn :: _ when p_auth && not (is_hide_names conf p) ->
+        sou base nn
+        |> Util.escape_html
+        |> safe_val
+      | _ -> null_val
+    end
   | "sex" ->
-      (* Pour éviter les traductions bizarre, on ne teste pas p_auth. *)
-      string_of_int (index_of_sex (get_sex p))
+    (* Pour éviter les traductions bizarre, on ne teste pas p_auth. *)
+    get_sex p |> index_of_sex |> string_of_int |> str_val
   | "sosa_in_list" ->
-      begin match get_env "all_gp" env with
-        Vallgp all_gp ->
-          begin match get_link all_gp (get_iper p) with
-            Some (GP_person (s, _, _)) -> Sosa.to_string s
-          | _ -> ""
-          end
+    begin match get_env "all_gp" env with
+      | Vallgp all_gp ->
+        begin match get_link all_gp (get_iper p) with
+          | Some (GP_person (s, _, _)) -> str_val (Sosa.to_string s)
+          | _ -> null_val
+        end
       | _ -> raise Not_found
-      end
+    end
   | "sosa_link" ->
-      begin match get_env "sosa" env with
-        Vsosa x ->
-          begin match get_sosa conf base env x p with
-            Some (n, q) ->
-              Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
-                (string_of_iper (get_iper p))
-                (string_of_iper (get_iper q))
-                (Sosa.to_string n)
-          | None -> ""
-          end
+    begin match get_env "sosa" env with
+      | Vsosa x ->
+        begin match get_sosa conf base env x p with
+          | Some (n, q) ->
+            Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
+              (string_of_iper (get_iper p))
+              (string_of_iper (get_iper q))
+              (Sosa.to_string n)
+            |> str_val
+          | None -> null_val
+        end
       | _ -> raise Not_found
-      end
+    end
   | "source" ->
-      begin match get_env "src" env with
-        Vstring s ->
-          let env = ['i', (fun () -> Util.default_image_name base p)] in
-          let s =
-            let wi =
-              {Wiki.wi_mode = "NOTES";
-               Wiki.wi_file_path = Notes.file_path conf base;
-               Wiki.wi_person_exists = person_exists conf base;
-               Wiki.wi_always_show_link = conf.wizard || conf.friend}
-            in
-            Wiki.syntax_links conf wi s
-          in
-          Util.safe_html @@ string_with_macros conf env s
-      | _ -> raise Not_found
-      end
-  | "surname" ->
-      if not p_auth && is_hide_names conf p then "x" else p_surname base p
-  | "surname_begin" ->
-      if not p_auth && is_hide_names conf p then ""
-      else surname_particle base (p_surname base p)
-  | "surname_end" ->
-      if not p_auth && is_hide_names conf p then "x"
-      else surname_without_particle base (p_surname base p)
-  | "surname_key" ->
-      if is_hide_names conf p && not p_auth then ""
-      else Mutil.encode (Name.lower (p_surname base p))
-  | "surname_key_val" ->
-      if is_hide_names conf p && not p_auth then ""
-      else Name.lower (p_surname base p)
-  | "surname_key_strip" ->
-      if is_hide_names conf p && not p_auth then ""
-      else Name.strip_c (p_surname base p) '"'
-  | "title" -> person_title conf base p
-  | _ -> raise Not_found
-and eval_witness_relation_var conf base env
-    (_, _, (ip1, ip2, _), m_auth as fcd) loc =
-  function
-    [] ->
-      if not m_auth then VVstring ""
-      else
+    begin match get_env "src" env with
+      | Vstring s ->
+        let env = ['i', (fun () -> Util.default_image_name base p)] in
         let s =
-          Printf.sprintf (ftransl conf "witness at marriage of %s and %s")
-            (referenced_person_title_text conf base (pget conf base ip1))
-            (referenced_person_title_text conf base (pget conf base ip2))
+          let wi =
+            { Wiki.wi_mode = "NOTES"
+            ; Wiki.wi_file_path = Notes.file_path conf base
+            ; Wiki.wi_person_exists = person_exists conf base
+            ; Wiki.wi_always_show_link = conf.wizard || conf.friend
+            }
+          in
+          Wiki.syntax_links conf wi s
         in
-        VVstring s
-  | sl -> eval_family_field_var conf base env fcd loc sl
-and eval_family_field_var conf base env
-    (_, fam, (ifath, imoth, _), m_auth as fcd) loc =
-  function
+        string_with_macros conf env s
+        |> Util.safe_html
+        |> safe_val
+      | _ -> raise Not_found
+    end
+  | "surname" ->
+    if not p_auth && is_hide_names conf p
+    then str_val "x"
+    else
+      p_surname base p
+      |> Util.escape_html
+      |> safe_val
+  | "surname_begin" ->
+    if not p_auth && is_hide_names conf p
+    then null_val
+    else
+      p_surname base p
+      |> surname_particle base
+      |> Util.escape_html
+      |> safe_val
+  | "surname_end" ->
+    if not p_auth && is_hide_names conf p
+    then str_val "x"
+    else
+      p_surname base p
+      |> surname_without_particle base
+      |> Util.escape_html
+      |> safe_val
+  | "surname_key" ->
+    if is_hide_names conf p && not p_auth then null_val
+    else
+      p_surname base p
+      |> Name.lower
+      |> Mutil.encode
+      |> safe_val
+  | "surname_key_val" ->
+    if is_hide_names conf p && not p_auth then null_val
+    else
+      p_surname base p
+      |> Name.lower
+      |> str_val
+  | "surname_key_strip" ->
+    if is_hide_names conf p && not p_auth then null_val
+    else
+      Name.strip_c (p_surname base p) '"'
+      |> str_val
+  | "title" ->
+    person_title conf base p |> safe_val
+  | _ -> raise Not_found
+and eval_witness_relation_var conf base env (_, _, (ip1, ip2, _), m_auth as fcd) loc =
+    function
+    | [] ->
+      if not m_auth then null_val
+      else
+        Printf.sprintf (ftransl conf "witness at marriage of %s and %s")
+          (pget conf base ip1 |> referenced_person_title_text conf base :> string)
+          (pget conf base ip2 |> referenced_person_title_text conf base :> string)
+        |> str_val
+    | sl -> eval_family_field_var conf base env fcd loc sl
+and eval_family_field_var conf base env (_, fam, (ifath, imoth, _), m_auth as fcd) loc =
+    function
     "father" :: sl ->
       begin match get_env "f_link" env with
         Vbool _ -> raise Not_found
@@ -4124,7 +4099,7 @@ and eval_family_field_var conf base env
   | "marriage_date" :: sl ->
       begin match Adef.od_of_cdate (get_marriage fam) with
         Some d when m_auth -> eval_date_field_var conf d sl
-      | _ -> VVstring ""
+      | _ -> null_val
       end
   | "mother" :: sl ->
       begin match get_env "f_link" env with
@@ -4153,63 +4128,61 @@ and eval_str_family_field env (ifam, _, _, _) =
       | _ -> raise Not_found
       end
   | _ -> raise Not_found
-and simple_person_text conf base p p_auth =
+and simple_person_text conf base p p_auth : Adef.safe_string =
   if p_auth then
     match main_title conf base p with
       Some t -> titled_person_text conf base p t
-    | None -> person_text conf base p
-  else if is_hide_names conf p then "x x"
-  else person_text conf base p
+    | None -> gen_person_text conf base p
+  else if is_hide_names conf p then Adef.safe "x x"
+  else gen_person_text conf base p
 and string_of_died conf p p_auth =
   if p_auth then
     let is = index_of_sex (get_sex p) in
     match get_death p with
       Death (dr, _) ->
         begin match dr with
-          Unspecified -> transl_nth conf "died" is
-        | Murdered -> transl_nth conf "murdered" is
-        | Killed -> transl_nth conf "killed (in action)" is
-        | Executed -> transl_nth conf "executed (legally killed)" is
-        | Disappeared -> transl_nth conf "disappeared" is
+          Unspecified -> transl_nth conf "died" is |> Adef.safe
+        | Murdered -> transl_nth conf "murdered" is |> Adef.safe
+        | Killed -> transl_nth conf "killed (in action)" is |> Adef.safe
+        | Executed -> transl_nth conf "executed (legally killed)" is |> Adef.safe
+        | Disappeared -> transl_nth conf "disappeared" is |> Adef.safe
         end
-    | DeadYoung -> transl_nth conf "died young" is
-    | DeadDontKnowWhen -> transl_nth conf "died" is
-    | _ -> ""
-  else ""
-and string_of_image_url conf base (p, p_auth) html =
+    | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
+    | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
+    | _ -> Adef.safe ""
+  else Adef.safe ""
+and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
   if p_auth then
-    let v =
-      image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
-    in
-    match v with
-      Some (true, fname, _) ->
-        let s = Unix.stat fname in
-        let b = acces conf base p in
-        let k = default_image_name base p in
-        Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s" (commd conf)
-          (if html then "H" else "")
-          (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b
-          k
-    | Some (false, link, _) -> link
-    | None -> ""
-  else ""
-and string_of_parent_age conf base (p, p_auth) parent =
+    match image_and_size conf base p (limited_image_size max_im_wid max_im_wid) with
+    | Some (true, fname, _) ->
+      let s = Unix.stat fname in
+      let b = acces conf base p in
+      let k = default_image_name base p in
+      Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
+        (commd conf :> string)
+        (if html then "H" else "")
+        (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+        (b :> string)
+        k
+      |> Adef.escaped
+    | Some (false, link, _) -> Adef.escaped link (* FIXME *)
+    | None -> Adef.escaped ""
+  else Adef.escaped ""
+and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
   match get_parents p with
     Some ifam ->
       let cpl = foi base ifam in
       let pp = pget conf base (parent cpl) in
       if p_auth && authorized_age conf base pp then
-        match
-          Adef.od_of_cdate (get_birth pp), Adef.od_of_cdate (get_birth p)
-        with
-          Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
-            DateDisplay.string_of_age conf (Date.time_elapsed d1 d2)
-        | _ -> ""
-      else ""
+        match Adef.od_of_cdate (get_birth pp), Adef.od_of_cdate (get_birth p) with
+        | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
+          Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
+        | _ -> Adef.safe ""
+      else Adef.safe ""
   | None -> raise Not_found
 and string_of_int_env var env =
   match get_env var env with
-    Vint x -> string_of_int x
+  | Vint x -> string_of_int x |> str_val
   | _ -> raise Not_found
 
 let eval_transl conf base env upp s c =
@@ -4517,6 +4490,7 @@ let print_foreach conf base print_ast eval_expr =
         let list = build_list_eclair conf base max_level p in
         List.iter
           (fun (a, b, c, d, e, f) ->
+             let b = (b : Adef.escaped_string :> Adef.safe_string) in
              let env =
                ("ancestor", Vanc_surn (Eclair (a, b, c, d, e, f, loc))) :: env
              in
@@ -4770,7 +4744,7 @@ let print_foreach conf base print_ast eval_expr =
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
               let env =
                 ("event_witness", Vind p)
-                :: ("event_witness_kind", Vstring wk)
+                :: ("event_witness_kind", Vstring (wk :> string))
                 :: ("first", Vbool (i = 0))
                 :: env
               in
@@ -4816,7 +4790,11 @@ let print_foreach conf base print_ast eval_expr =
       (fun (p, wk, evt) ->
          if p_auth then
            let env = ("event_witness_relation", Vevent (p, evt)) :: env in
-           let env = ("event_witness_relation_kind", Vstring wk) :: env in
+           let env =
+             ( "event_witness_relation_kind"
+             , Vstring (wk : Adef.safe_string :> string) )
+             :: env
+           in
            List.iter (print_ast env ep) al)
       events_witnesses
   and print_foreach_family env al ini_ep (p, _) =
@@ -5390,8 +5368,8 @@ let print ?no_headers conf base p =
   | _ -> interp_templ ?no_headers "perso" conf base p
 
 let limit_by_tree conf =
-  match p_getint conf.base_env "max_anc_tree" with
-    Some x -> max 1 x
+  match Opt.map int_of_string (List.assoc_opt "max_anc_tree" conf.base_env) with
+  | Some x -> max 1 x
   | None -> 7
 
 let print_ancestors_dag conf base v p =
@@ -5410,16 +5388,25 @@ let print_ancestors_dag conf base v p =
     in
     loop Dag.Pset.empty v (get_iper p)
   in
-  let elem_txt p = DagDisplay.Item (p, "") in
+  let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
   (* Récupère les options d'affichage. *)
   let options = Util.display_options conf in
   let vbar_txt ip =
     let p = pget conf base ip in
-    Printf.sprintf "%sm=A&t=T&v=%d&%s&dag=on&%s" (commd conf) v options
-      (acces conf base p)
+    commd conf
+    ^^^ "m=A&t=T&dag=on&v="
+    ^<^ string_of_int v
+    ^<^ "&"
+    ^<^ options
+    ^^^ "&"
+    ^<^ acces conf base p
   in
-  let page_title = Utf8.capitalize_fst (Util.transl conf "tree") in
-  DagDisplay.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title ""
+  let page_title =
+    Util.transl conf "tree"
+    |> Utf8.capitalize_fst
+    |> Adef.safe
+  in
+  DagDisplay.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title (Adef.escaped "")
 
 let print_ascend conf base p =
   match
@@ -5446,12 +5433,21 @@ let print_what_links conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h =
-      Output.printf conf "%s%s " (Utf8.capitalize_fst (transl conf "linked pages"))
-        (Util.transl conf ":");
-      if h then Output.print_string conf (simple_person_text conf base p true)
-      else
-        Output.printf conf "<a href=\"%s%s\">%s</a>" (commd conf)
-          (acces conf base p) (simple_person_text conf base p true)
+      transl conf "linked pages"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+      Util.transl conf ":"
+      |> Output.print_sstring conf ;
+      if h
+      then Output.print_string conf (simple_person_text conf base p true)
+      else begin
+        Output.print_sstring conf {|<a href="|} ;
+        Output.print_string conf (commd conf) ;
+        Output.print_string conf (acces conf base p) ;
+        Output.print_sstring conf {|">|} ;
+        Output.print_string conf (simple_person_text conf base p true) ;
+        Output.print_sstring conf {|</a>|}
+      end
     in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;

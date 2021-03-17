@@ -12,7 +12,7 @@ let ns = "forum"
 
 let wrapper fn _ conf base =
   match base with
-  | Some b when Util.p_getenv conf.base_env "disable_forum" <> Some "yes" ->
+  | Some b when List.assoc_opt "disable_forum" conf.base_env <> Some "yes" ->
     fn conf b ;
     true
   | _ ->

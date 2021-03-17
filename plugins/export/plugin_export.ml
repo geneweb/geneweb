@@ -10,9 +10,15 @@ module IFS = Set.Make (struct type t = Gwdb.ifam let compare = compare end)
 let w_lock = Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf ; true)
 let w_base = Gwd_lib.Request.w_base ~none:(fun conf -> Hutil.incorrect_request conf ; true)
 
+let getenv var env =
+  List.assoc var env |> Mutil.decode
+
+let getenv_opt var env =
+  List.assoc_opt var env |> Opt.map Mutil.decode
+
 let export conf base =
   assert conf.wizard ;
-  match match List.assoc_opt "output" conf.env with
+  match match getenv_opt "output" conf.env with
     | Some "GED" -> Some `ged
     | Some "GW" -> Some `gw
     | _ -> None
@@ -21,13 +27,13 @@ let export conf base =
   | Some output ->
     Mutil.verbose := false ;
     let find_iper i =
-      List.assoc ("i" ^ string_of_int i) conf.env |> Gwdb.iper_of_string
+      getenv ("i" ^ string_of_int i) conf.env |> Gwdb.iper_of_string
     in
     let find_npoc i =
-      let n = List.assoc ("n" ^ string_of_int i) conf.env |> Mutil.decode in
-      let p = List.assoc ("p" ^ string_of_int i) conf.env |> Mutil.decode in
+      let n = getenv ("n" ^ string_of_int i) conf.env in
+      let p = getenv ("p" ^ string_of_int i) conf.env in
       let oc =
-        match List.assoc_opt ("oc" ^ string_of_int i) conf.env with
+        match getenv_opt ("oc" ^ string_of_int i) conf.env with
         | None -> 0
         | Some i -> int_of_string i
       in
@@ -43,7 +49,7 @@ let export conf base =
     let ini = loop IPS.empty 1 in
     let fname = Gwdb.bname base ^ (match output with `ged -> ".ged" | `gw -> ".gw") in
     let ipers =
-      if List.assoc_opt "spouses" conf.env = Some "on"
+      if getenv_opt "spouses" conf.env = Some "on"
       then
         IPS.fold begin fun iper acc ->
           Array.fold_left begin fun acc ifam ->
@@ -53,7 +59,7 @@ let export conf base =
       else ini
     in
     let ipers =
-      if List.assoc_opt "parents" conf.env = Some "on"
+      if getenv_opt "parents" conf.env = Some "on"
       then
         IPS.fold begin fun iper acc ->
           match get_parents (poi base iper) with
@@ -65,7 +71,7 @@ let export conf base =
       else ipers
     in
     let ipers =
-      if List.assoc_opt "children" conf.env = Some "on"
+      if getenv_opt "children" conf.env = Some "on"
       then
         IPS.fold begin fun iper acc ->
           Array.fold_left begin fun acc ifam ->
@@ -86,19 +92,19 @@ let export conf base =
       end ipers IFS.empty
     in
     let no_notes =
-      match List.assoc_opt "notes" conf.env  with
+      match getenv_opt "notes" conf.env  with
       | None -> `none
       | Some "nn" -> `nn
       | Some "nnn" -> `nnn
       | Some _ -> `none
     in
-    let source = Opt.map Mutil.decode (List.assoc_opt "source" conf.env) in
-    let isolated = List.assoc_opt "isolated" conf.env <> Some "off" in
+    let source = getenv_opt "source" conf.env in
+    let isolated = getenv_opt "isolated" conf.env <> Some "off" in
     let opts =
       { Gwexport.default_opts with
-        oc = fname, Output.print_string conf, Wserver.close_connection
+        oc = fname, Output.print_sstring conf, Wserver.close_connection
       ; no_notes
-      ; no_picture = List.assoc_opt "pictures" conf.env = Some "off"
+      ; no_picture = getenv_opt "pictures" conf.env = Some "off"
       ; source
       ; base = Some (Gwdb.bname base, base)
       }
@@ -112,8 +118,8 @@ let export conf base =
         Gwb2gedLib.gwb2ged false opts select
       | `gw ->
         GwuLib.prepare_free_occ ~select:(fst select) base ;
-        Output.print_string conf "encoding: utf-8\n" ;
-        Output.print_string conf "gwplus\n\n" ;
+        Output.print_sstring conf "encoding: utf-8\n" ;
+        Output.print_sstring conf "gwplus\n\n" ;
         GwuLib.gwu opts isolated base "" "" (Hashtbl.create 0) select ;
     end ;
     Wserver.wflush () ;

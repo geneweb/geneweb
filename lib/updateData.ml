@@ -78,7 +78,7 @@ let get_all_data conf base =
 
 let get_person_from_data conf base =
   let (get_p, get_pe, get_f, get_fe) = get_data conf in
-  let istr = Gwdb.istr_of_string @@ List.assoc "key" conf.env in
+  let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : istr) p =
     try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
     with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
@@ -170,7 +170,7 @@ let update_person conf base old new_input p =
       {(gen_person_of_person p) with occupation = occupation}
   | Some "place" ->
       let new_istr =
-        Gwdb.insert_string base (no_html_tags (only_printable new_input))
+        Gwdb.insert_string base (only_printable new_input)
       in
       let pl_bi = get_birth_place p in
       let s_bi = sou base pl_bi in
@@ -307,7 +307,7 @@ let update_family conf base old new_istr fam =
   match p_getenv conf.env "data" with
     Some "place" ->
       let new_istr =
-        Gwdb.insert_string base (no_html_tags (only_printable new_istr))
+        Gwdb.insert_string base (only_printable new_istr)
       in
       let p_ma = get_marriage_place fam in
       let s_ma = sou base p_ma in

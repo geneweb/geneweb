@@ -63,6 +63,7 @@ val check_person
   -> (iper, string * string * 'b * 'c * 'd, string) Def.gen_person
   -> Update.update_error option
 val error_person : config -> Update.update_error -> unit
+
 val update_relations_of_related : base -> iper -> iper list -> unit
 val reconstitute_death :
   config -> Def.date option -> Def.date option -> string -> Def.burial ->

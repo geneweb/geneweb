@@ -402,3 +402,7 @@ module NLDB = struct
   type ('a, 'b) t = ( ('a, 'b) page
                       * (string list * (key * ind) list) ) list
 end
+
+let (^^^) = Adef.(^^^)
+let (^>^) = Adef.(^>^)
+let (^<^) = Adef.(^<^)
