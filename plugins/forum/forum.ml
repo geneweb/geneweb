@@ -31,7 +31,7 @@ module type MF =
     val not_a_pos : pos
     val prev_pos : pos -> pos
     val next_pos : pos -> pos
-    val string_of_pos : pos -> string
+    val string_of_pos : pos -> Adef.safe_string
     val pos_of_string : string -> pos
     val input_char : in_chan -> char
     val input_line : in_chan -> string
@@ -58,9 +58,9 @@ module MF : MF =
     let prev_pos pos = {pos with p_pos = pos.p_pos - 1}
     let next_pos pos = {pos with p_pos = pos.p_pos + 1}
     let string_of_pos pos =
-      if pos = not_a_pos then ""
-      else if pos.p_ext = 0 then string_of_int pos.p_pos
-      else string_of_int pos.p_ext ^ "-" ^ string_of_int pos.p_pos
+      if pos = not_a_pos then Adef.safe ""
+      else if pos.p_ext = 0 then Adef.safe (string_of_int pos.p_pos)
+      else Adef.safe (string_of_int pos.p_ext ^ "-" ^ string_of_int pos.p_pos)
     let pos_of_string s =
       try
         let pos = int_of_string s in
@@ -332,12 +332,12 @@ let backward_pos conf pos =
   | None -> pos
 
 let passwd_in_file conf kind =
-  match p_getenv conf.base_env (kind ^ "_passwd_file") with
+  match List.assoc_opt (kind ^ "_passwd_file") conf.base_env with
     Some "" | None -> false
   | Some _ -> true
 
 let moderators conf =
-  match p_getenv conf.base_env "moderator_file" with
+  match List.assoc_opt "moderator_file" conf.base_env with
     None | Some "" -> []
   | Some fname ->
       let fname = Util.bpath fname in
@@ -381,7 +381,7 @@ let forum_add conf _base moderated mess =
   if mess.m_ident <> "" && mess.m_text <> "" then
     MF.extend (forum_file conf)
       (fun oc ->
-         Printf.fprintf oc "Time: %s\n" (Util.sprintf_today conf) ;
+         Printf.fprintf oc "Time: %s\n" (Util.sprintf_today conf :> string) ;
          if moderated then Printf.fprintf oc "Moderator: ....................\n";
          Printf.fprintf oc "From: %s\n" conf.from;
          Printf.fprintf oc "Ident: %s\n" mess.m_ident;

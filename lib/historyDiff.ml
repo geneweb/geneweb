@@ -3,15 +3,14 @@
 open Config
 open Def
 open Gwdb
-open Util
 
 type gen_record =
-  { date : string;
-    wizard : string;
-    gen_p : (iper, iper, string) gen_person;
-    gen_f : (iper, ifam, string) gen_family list;
-    gen_c : iper array list }
-
+  { date : Adef.safe_string
+  ; wizard : Adef.safe_string
+  ; gen_p : (iper, iper, string) gen_person
+  ; gen_f : (iper, ifam, string) gen_family list
+  ; gen_c : iper array list
+  }
 
 (* Le nom du fichier historique (à partir de la clé personne). *)
 let history_file fn sn occ =
@@ -23,7 +22,7 @@ let history_file fn sn occ =
 (* history directory path *)
 let history_d conf =
   let path =
-    match p_getenv conf.base_env "history_path" with
+    match List.assoc_opt "history_path" conf.base_env with
     | Some path when path <> "" -> path
     | _ -> "history_d"
   in
@@ -119,8 +118,12 @@ let make_gen_record conf base first gen_p =
          children :: accu_child)
       fam ([], [])
   in
-  {date = date; wizard = conf.user; gen_p = gen_p; gen_f = gen_f;
-   gen_c = gen_c}
+  { date
+  ; wizard = (Util.escape_html conf.user :> Adef.safe_string)
+  ; gen_p
+  ; gen_f
+  ; gen_c
+  }
 
 
 (* ************************************************************************ *)
@@ -134,7 +137,7 @@ let make_gen_record conf base first gen_p =
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 let record_diff conf base changed =
-  match p_getenv conf.base_env "history_diff" with
+  match List.assoc_opt "history_diff" conf.base_env with
     Some "yes" when not conf.manitou ->
       let print_ind_add p =
         let person_file = history_file p.first_name p.surname p.occ in

@@ -126,3 +126,22 @@ let parent_array cpl =
 let multi_couple father mother : 'person gen_couple =
   Obj.magic {parent = [| father; mother |]}
 let multi_parent parent : 'person gen_couple = Obj.magic {parent = parent}
+
+#ifdef SAFE_USER_INPUT
+type +'a astring = private string
+#else
+type +'a astring = string
+#endif
+type safe_string = [`encoded|`escaped|`safe] astring
+type escaped_string = [`encoded|`escaped] astring
+type encoded_string = [`encoded] astring
+let ( ^^^ ) : 'a astring -> 'a astring -> 'a astring =
+  fun (a : 'a astring) (b : 'a astring) -> (Obj.magic (Obj.magic a ^ Obj.magic b) : 'a astring)
+let ( ^>^ ) : 'a astring -> string -> 'a astring =
+  fun (a : 'a astring) (b : string) -> (Obj.magic (Obj.magic a ^ b) : 'a astring)
+let ( ^<^ ) : string -> 'a astring -> 'a astring =
+  fun (a : string) (b : 'a astring) -> (Obj.magic (a ^ Obj.magic b) : 'a astring)
+external safe : string -> safe_string = "%identity"
+external escaped : string -> escaped_string = "%identity"
+external encoded : string -> encoded_string = "%identity"
+let safe_fn : (string -> string) -> 'a astring -> 'a astring = Obj.magic

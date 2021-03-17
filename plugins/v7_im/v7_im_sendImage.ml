@@ -19,112 +19,124 @@ let raise_modErr s =
 
 let incorrect conf =
   Hutil.incorrect_request conf;
-  raise_modErr (__FILE__ ^ " " ^ string_of_int __LINE__)
+  raise_modErr (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe)
 
 let incorrect_content_type conf base p s =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
+  let title _ =
+    transl conf "error"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
+  in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<p>\n";
-  Output.print_string conf "<em style=\"font-size:smaller\">";
+  Output.print_sstring conf "<p>\n";
+  Output.print_sstring conf "<em style=\"font-size:smaller\">";
   Output.printf conf "Error: incorrect image content type: %s" s;
-  Output.print_string conf "</em>\n";
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf "</em>\n";
+  Output.print_sstring conf "</p>\n";
+  Output.print_sstring conf "<ul>\n";
+  Output.print_sstring conf "<li>\n";
   Output.print_string conf (referenced_person_title_text conf base p);
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</li>\n";
+  Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf;
-  raise_modErr (__FILE__ ^ " " ^ string_of_int __LINE__)
+  raise_modErr (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe)
 
 let error_too_big_image conf base p len max_len =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
+  let title _ =
+    transl conf "error"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
+  in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<p><em style=\"font-size:smaller\">";
+  Output.print_sstring conf "<p><em style=\"font-size:smaller\">";
   Output.printf conf "Error: this image is too big: %d bytes<br>\n" len;
   Output.printf conf "Maximum authorized in this database: %d bytes<br>\n"
     max_len;
-  Output.print_string conf "</em></p>\n";
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf "</em></p>\n";
+  Output.print_sstring conf "<ul>\n";
+  Output.print_sstring conf "<li>\n";
   Output.print_string conf (referenced_person_title_text conf base p);
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</li>\n";
+  Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf;
-  raise_modErr (__FILE__ ^ " " ^ string_of_int __LINE__)
+  raise_modErr (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe)
 
 let raw_get conf key =
   try List.assoc key conf.env with Not_found -> incorrect conf
 
 (* print delete image link *)
 let print_link_delete_image conf base p =
-  if Util.has_image conf base p then
-    begin
-      Output.print_string conf "<p>\n";
-      begin
-        Output.printf conf "<a href=\"%sm=DEL_IMAGE&i=%s\">" (commd conf)
-          (string_of_iper (get_iper p));
-        Output.printf conf "%s %s" (Utf8.capitalize_fst (transl conf "delete"))
-          (transl_nth conf "image/images" 0);
-        Output.print_string conf "</a>"
-      end;
-      Output.print_string conf "</p>\n"
-    end
+  if Util.has_image conf base p then begin
+    Output.print_sstring conf {|<p><a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf "m=DEL_IMAGE&i=" ;
+    Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode) ;
+    Output.print_sstring conf {|">|} ;
+    transl conf "delete"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf {| |} ;
+    transl_nth conf "image/images" 0
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf "</a></p>"
+  end
 
 (* Send image form *)
 
 let print_send_image conf base p =
   let title h =
     if Util.has_image conf base p then
-      Output.print_string conf
-        (Utf8.capitalize_fst
-           (transl_decline conf "modify" (transl_nth conf "image/images" 0)))
+      transl_nth conf "image/images" 0
+      |> transl_decline conf "modify"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf
     else
-      Output.print_string conf
-        (Utf8.capitalize_fst
-           (transl_decline conf "add" (transl_nth conf "image/images" 0)));
-    if h then ()
-    else
+      transl_nth conf "image/images" 0
+      |> transl_decline conf "add"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+    if not h then
       let fn = p_first_name base p in
       let sn = p_surname base p in
-      Output.print_string conf ": ";
-      Output.printf conf "%s %s" fn sn;
+      Output.print_sstring conf (transl conf ":") ;
+      Output.print_sstring conf " ";
+      Output.print_string conf (Util.escape_html fn) ;
+      Output.print_sstring conf " ";
+      Output.print_string conf (Util.escape_html sn) ;
       Util.print_reference conf fn (get_occ p) sn
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_string conf "<h2>\n";
+  Output.print_sstring conf "<h2>\n";
   title false;
-  Output.print_string conf "</h2>\n";
+  Output.print_sstring conf "</h2>\n";
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
-  Output.print_string conf "<p>\n";
+  Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
-  Output.print_string conf
-    "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\">\n";
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_iper (get_iper p));
-  Output.printf conf "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
-    digest;
-  Output.printf conf "%s%s\n" (Utf8.capitalize_fst (transl conf "file")) (Util.transl conf ":");
-  Output.print_string conf "<input \
-type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\">\n";
-  Output.print_string conf "</p>\n";
-  begin match p_getint conf.base_env "max_images_size" with
-    Some len ->
-      Output.print_string conf "<p>\n";
-      Output.printf conf "(maximum authorized size = %d bytes)\n" len;
-      Output.print_string conf "</p>\n"
-  | None -> ()
-  end;
-  Output.print_string conf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg mt-2\">\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</button>\n";
-  Output.print_string conf "</form>\n";
+  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_OK") ;
+  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
+  Util.hidden_input conf "digest" (Mutil.encode digest) ;
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file")) ;
+  Output.print_sstring conf (Util.transl conf ":");
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf
+    {| <input type="file" class="form-control" name="file" size="50" maxlength="250" accept="image/*"></p>|} ;
+  begin match Opt.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env with
+    | Some len ->
+      Output.print_sstring conf "<p>(maximum authorized size = " ;
+      Output.print_sstring conf (string_of_int len) ;
+      Output.print_sstring conf " bytes)</p>"
+    | None -> ()
+  end ;
+  Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg mt-2">|} ;
+  transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf "</button></form>";
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
@@ -143,29 +155,30 @@ let print conf base =
 
 let print_delete_image conf base p =
   let title h =
-    Output.print_string conf
-      (Utf8.capitalize_fst
-         (transl_decline conf "delete" (transl_nth conf "image/images" 0)));
-    if h then ()
-    else
+    transl_nth conf "image/images" 0
+    |> transl_decline conf "delete"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    if not h then
       let fn = p_first_name base p in
       let sn = p_surname base p in
-      let occ =
-        (* if fn = "?" || sn = "?" then Adef.int_of_iper (get_iper p)
-         * else  *)get_occ p
-      in
-      Output.print_string conf ": "; Output.printf conf "%s.%d %s" fn occ sn
+      let occ = get_occ p in
+      Output.print_sstring conf (Util.transl conf ":");
+      Output.print_sstring conf " " ;
+      Output.print_string conf (Util.escape_html fn) ;
+      Output.print_sstring conf "." ;
+      Output.print_sstring conf (string_of_int occ) ;
+      Output.print_sstring conf " " ;
+      Output.print_string conf (Util.escape_html sn) ;
   in
   Hutil.header conf title;
   Output.printf conf "<form method=\"post\" action=\"%s\">" conf.command;
   Util.hidden_env conf;
-  Output.printf conf
-    "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\
-     <input type=\"hidden\" name=\"i\" value=\"%s\">\
-     <p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>\
-     </form>"
-    (string_of_iper (get_iper p))
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+  Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK") ;
+  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode) ;
+  Output.print_sstring conf {|<p><button type="submit" class="btn btn-secondary btn-lg">|} ;
+  transl_nth conf "validate/delete" 0 |> Utf8.capitalize_fst |> Output.print_sstring conf ;
+  Output.print_sstring conf {|</button></p></form>|} ;
   Hutil.trailer conf
 
 let print_del conf base =
@@ -184,14 +197,14 @@ let print_del conf base =
 
 let print_sent conf base p =
   let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "image received"))
+    transl conf "image received"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>";
+  Output.print_sstring conf "<ul><li>";
   Output.print_string conf (referenced_person_text conf base p);
-  Output.print_string conf "</li>";
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</li></ul>";
   Hutil.trailer conf
 
 let write_file fname content =
@@ -258,14 +271,14 @@ let image_type s =
               | None -> None
 
 let dump_bad_image conf s =
-  match p_getenv conf.base_env "dump_bad_images" with
-    Some "yes" ->
-      begin try
-        let oc = Secure.open_out_bin "bad-image" in
-        output_string oc s; flush oc; close_out oc
-      with Sys_error _ -> ()
-      end
-  | _ -> ()
+  if List.assoc_opt "dump_bad_images" conf.base_env = Some "yes"
+  then
+    try
+      let oc = Secure.open_out_bin "bad-image" in
+      output_string oc s;
+      flush oc;
+      close_out oc
+    with Sys_error _ -> ()
 
 let effective_send_ok conf base p file =
   let strm = Stream.of_string file in
@@ -279,18 +292,19 @@ let effective_send_ok conf base p file =
       in
       loop 0 strm
     in
-    content ^ s
+    (content :> string) ^ s
   in
   let (typ, content) =
     match image_type content with
-      None ->
-        let ct = Mutil.extract_param "content-type: " '\n' request in
-        dump_bad_image conf content; incorrect_content_type conf base p ct
+    | None ->
+      dump_bad_image conf content ;
+      Mutil.extract_param "content-type: " '\n' request
+      |> incorrect_content_type conf base p
     | Some (typ, content) ->
-        match p_getint conf.base_env "max_images_size" with
-          Some len when String.length content > len ->
-            error_too_big_image conf base p (String.length content) len
-        | _ -> typ, content
+      match Opt.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env with
+      | Some len when String.length content > len ->
+        error_too_big_image conf base p (String.length content) len
+      | _ -> typ, content
   in
   let bfname = default_image_name base p in
   let bfdir =
@@ -313,23 +327,32 @@ let effective_send_ok conf base p file =
 
 let print_send_ok conf base =
   let ip =
-    let s = raw_get conf "i" in
-    try iper_of_string s with Failure _ -> incorrect conf
+    try raw_get conf "i"
+        |> Mutil.decode
+        |> iper_of_string
+    with Failure _ -> incorrect conf
   in
   let p = poi base ip in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
-  if digest = raw_get conf "digest" then
-    let file = raw_get conf "file" in effective_send_ok conf base p file
+  if (digest :> string) = Mutil.decode (raw_get conf "digest")
+  then
+    raw_get conf "file"
+    |> Mutil.decode
+    |> effective_send_ok conf base p
   else Update.error_digest conf
 
 (* Delete image form validated *)
 
 let print_deleted conf base p =
   let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "image deleted"))
+    transl conf "image deleted"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
-  Output.printf conf "<ul><li>%s</li></ul>" (referenced_person_text conf base p);
+  Output.print_sstring conf "<ul><li>" ;
+  Output.print_string conf (referenced_person_text conf base p) ;
+  Output.print_sstring conf "</li></ul>" ;
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =

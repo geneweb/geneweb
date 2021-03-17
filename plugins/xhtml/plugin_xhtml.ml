@@ -42,7 +42,7 @@ let () =
       |> signals
       |> write_xml
       |> to_string
-      |> Output.print_string conf ;
+      |> Output.print_sstring conf ;
       Output.flush conf ;
       Buffer.reset buffer_body ;
     in

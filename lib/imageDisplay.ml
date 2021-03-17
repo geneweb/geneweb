@@ -48,7 +48,7 @@ let print_image_type conf fname ctype =
         else
           let olen = min (Bytes.length buf) len in
           really_input ic buf 0 olen;
-          Output.print_string conf (Bytes.sub_string buf 0 olen);
+          Output.print_sstring conf (Bytes.sub_string buf 0 olen);
           loop (len - olen)
       in
       loop len; close_in ic; true
@@ -127,14 +127,15 @@ let print conf base =
 (* ************************************************************************** *)
 let print_html conf =
   Util.html conf;
-  Output.print_string conf "<head>\n";
-  Output.printf conf "  <title>%s</title>\n"
-    (Util.transl_nth conf "image/images" 0);
-  Output.print_string conf "</head>\n<body>\n";
-  Output.printf conf "<img src=\"%s" (Util.commd conf);
-  Mutil.list_iter_first
-    (fun first (k, v) ->
-       let v = if k = "m" then "IM" else v in
-       Output.printf conf "%s%s=%s" (if first then "" else "&") k v)
-    conf.env;
-  Output.print_string conf "\">\n</body>\n</html>"
+  Output.print_sstring conf "<head><title>" ;
+  Output.print_sstring conf (Util.transl_nth conf "image/images" 0) ;
+  Output.print_sstring conf "</title></head><body><img src=\"";
+  Output.print_string conf (Util.commd conf);
+  Mutil.list_iter_first begin fun first (k, v) ->
+    let v = if k = "m" then Adef.encoded "IM" else v in
+    if not first then Output.print_sstring conf "&" ;
+    Output.print_sstring conf k ;
+    Output.print_sstring conf "=" ;
+    Output.print_string conf v
+  end conf.env ;
+  Output.print_sstring conf "\"></body></html>"

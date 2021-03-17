@@ -18,49 +18,50 @@ let arg_password = "password"
 
 module UI = struct
 
-  let enabled conf s = List.assoc_opt s conf.env = Some "on"
+  let enabled conf s = (List.assoc_opt s conf.env :> string option) = Some "on"
 
-  let print_arg conf (name, kind, doc) =
+  let print_arg conf ( (name, kind, doc)
+                       : Adef.encoded_string * [> `Arg_Set | `Arg_String ] * Adef.safe_string ) =
     match kind with
     | `Arg_Set ->
-      Output.print_string conf {|<p><label><input type="checkbox" name="|} ;
+      Output.print_sstring conf {|<p><label><input type="checkbox" name="|} ;
       Output.print_string conf name ;
-      Output.print_string conf {|" value="on"> |} ;
+      Output.print_sstring conf {|" value="on"> |} ;
       Output.print_string conf doc ;
-      Output.print_string conf {|</label></p>|} ;
+      Output.print_sstring conf {|</label></p>|} ;
     | `Arg_String ->
-      Output.print_string conf {|<p><label><input type="type" name="|} ;
+      Output.print_sstring conf {|<p><label><input type="type" name="|} ;
       Output.print_string conf name ;
-      Output.print_string conf {|"> |} ;
+      Output.print_sstring conf {|"> |} ;
       Output.print_string conf doc ;
-      Output.print_string conf {|</label></p>|}
+      Output.print_sstring conf {|</label></p>|}
 
-  let form conf m submit args =
-    Output.print_string conf {|<form action="|} ;
+  let form conf (m : Adef.encoded_string) (submit : Adef.safe_string) args =
+    Output.print_sstring conf {|<form action="|} ;
     Output.print_string conf (Util.commd conf) ;
-    Output.print_string conf {|" method="GET">|} ;
-    Output.print_string conf {|<input type="hidden" name="m" value="|} ;
+    Output.print_sstring conf {|" method="GET">|} ;
+    Output.print_sstring conf {|<input type="hidden" name="m" value="|} ;
     Output.print_string conf m ;
-    Output.print_string conf {|">|} ;
-    begin match Util.p_getenv conf.env arg_password with
+    Output.print_sstring conf {|">|} ;
+    begin match List.assoc_opt arg_password conf.env with
       | Some x ->
-        Output.print_string conf {|<input type="hidden" name="password" value="|} ;
-        Output.print_string conf (Mutil.encode x) ;
-        Output.print_string conf {|">|} ;
+        Output.print_sstring conf {|<input type="hidden" name="password" value="|} ;
+        Output.print_string conf x ;
+        Output.print_sstring conf {|">|} ;
       | None -> ()
     end ;
     List.iter (print_arg conf) args ;
-    Output.print_string conf {|<input type="submit" value="|} ;
+    Output.print_sstring conf {|<input type="submit" value="|} ;
     Output.print_string conf submit ;
-    Output.print_string conf {|">|} ;
-    Output.print_string conf {|</form>|}
+    Output.print_sstring conf {|">|} ;
+    Output.print_sstring conf {|</form>|}
 
 end
 
 let opt_password =
   match Sys.getenv_opt "GW_PLUGIN_FIXBASE_PASSWORD" with
   | Some "" | None -> None
-  | x -> x
+  | Some x -> Some (Mutil.encode x)
 
 let opt_manitou =
   match Sys.getenv_opt "GW_PLUGIN_FIXBASE_ONLY_MANITOU" with
@@ -68,8 +69,10 @@ let opt_manitou =
   | _ -> false
 
 let missing_password conf =
-  let args = [ (arg_password, `Arg_String, Util.transl conf "plugin_fixbase_password_missing") ] in
-  UI.form conf (List.assoc "m" conf.env) (Util.transl conf "plugin_fixbase_password_submit") args
+  let args = [ ( Mutil.encode arg_password
+               , `Arg_String
+               , Util.transl conf "plugin_fixbase_password_missing" |> Adef.safe) ] in
+  UI.form conf (List.assoc "m" conf.env) (Util.transl conf "plugin_fixbase_password_submit" |> Adef.safe) args
 
 let wrap conf title fn =
   !GWPARAM.wrap_output conf title @@ fun () ->
@@ -78,12 +81,12 @@ let wrap conf title fn =
   else missing_password conf
 
 let fixbase conf _base =
-  wrap conf (Util.transl conf "plugin_fixbase_FIXBASE") @@ fun () ->
-  Output.print_string conf {|<p>|} ;
-  Output.print_string conf (Util.transl conf "plugin_fixbase_description") ;
-  Output.print_string conf {|</p>|} ;
+  wrap conf (Util.transl conf "plugin_fixbase_FIXBASE" |> Adef.safe) @@ fun () ->
+  Output.print_sstring conf {|<p>|} ;
+  Output.print_sstring conf (Util.transl conf "plugin_fixbase_description") ;
+  Output.print_sstring conf {|</p>|} ;
   let args =
-    let input name txt = (name, `Arg_Set, Util.transl conf txt) in
+    let input name txt = (Mutil.encode name, `Arg_Set, Util.transl conf txt |> Adef.safe) in
     [ input arg_f_parents "plugin_fixbase_f_parents"
     ; input arg_f_children "plugin_fixbase_f_children"
     ; input arg_p_parents "plugin_fixbase_p_parents"
@@ -98,7 +101,7 @@ let fixbase conf _base =
     ; input arg_tstab "plugin_fixbase_tstab"
     ]
   in
-  UI.form conf "FIXBASE_OK" (Util.transl conf "plugin_fixbase_submit") args
+  UI.form conf (Adef.encoded "FIXBASE_OK") (Util.transl conf "plugin_fixbase_submit" |> Adef.safe) args
 
 let fixbase_ok conf base =
   let dry_run = Util.p_getenv conf.env "dry_run" <> Some "off" in
@@ -141,7 +144,7 @@ let fixbase_ok conf base =
     end ;
     load_persons_array base ;
     let opt s (fn : ?report:_ -> _ -> _ -> _) = if UI.enabled conf s then fn ~report progress base in
-    wrap conf (Util.transl conf "plugin_fixbase_FIXBASE_OK") @@ fun () ->
+    wrap conf (Util.transl conf "plugin_fixbase_FIXBASE_OK" |> Adef.safe) @@ fun () ->
     opt "f_parents" Fixbase.check_families_parents ;
     opt "f_children" Fixbase.check_families_children ;
     opt "p_parents" Fixbase.check_persons_parents ;
@@ -162,13 +165,13 @@ let fixbase_ok conf base =
     clear_ascends_array base ;
     let ifneq x1 x2 label s =
       if x1 <> x2 then begin
-        Output.print_string conf {|<tr><td><b>|} ;
+        Output.print_sstring conf {|<tr><td><b>|} ;
         Output.print_string conf label ;
-        Output.print_string conf {|</b></td><td>|} ;
-        Output.print_string conf (s x1) ;
-        Output.print_string conf {|</td><td>|} ;
-        Output.print_string conf (s x2) ;
-        Output.print_string conf {|</td></tr>|}
+        Output.print_sstring conf {|</b></td><td>|} ;
+        Output.print_string conf (s x1 |> Util.escape_html) ;
+        Output.print_sstring conf {|</td><td>|} ;
+        Output.print_string conf (s x2 |> Util.escape_html) ;
+        Output.print_sstring conf {|</td></tr>|}
       end
     in
     let dump_p p p' =
@@ -190,6 +193,7 @@ let fixbase_ok conf base =
       let a2 = mka p' in
       let u2 = mku p' in
       let p2 = mkp p' in
+      let ifneq x1 x2 label s = ifneq x1 x2 (Util.escape_html label) s in
       ifneq p1.first_name p2.first_name "first_name" (fun s -> s) ;
       ifneq p1.surname p2.surname "surname" (fun s -> s) ;
       ifneq p1.occ p2.occ "occ" string_of_int ;
@@ -245,6 +249,7 @@ let fixbase_ok conf base =
       let f2 = mkf f' in
       let c2 = mkc f' in
       let d2 = mkd f' in
+      let ifneq x1 x2 label s = ifneq x1 x2 (Util.escape_html label) s in
       ifneq f1.marriage f2.marriage "marriage"  [%show: Def_show.cdate] ;
       ifneq f1.marriage_place f2.marriage_place "marriage_place" (fun s -> s) ;
       ifneq f1.marriage_note f2.marriage_note "marriage_note" (fun s -> s) ;
@@ -263,24 +268,26 @@ let fixbase_ok conf base =
     in
     let string_of_p i =
       Printf.sprintf {|<a href="%s&i=%s">%s</a>|}
-        (Util.commd conf)
-        (string_of_iper i)
-        (Gutil.designation base (poi base i))
+        (Util.commd conf :> string)
+        (string_of_iper i |> Mutil.encode :> string)
+        (Gutil.designation base (poi base i) |> Util.safe_html :> string)
+      |> Adef.safe
     in
     let string_of_f i =
       let fam = foi base i in
       Printf.sprintf "[%s & %s]"
-        (string_of_p @@ get_father fam)
-        (string_of_p @@ get_mother fam);
+        (string_of_p @@ get_father fam : Adef.safe_string :> string)
+        (string_of_p @@ get_mother fam : Adef.safe_string :> string)
+      |> Adef.safe
     in
     let dump string_of dump get data =
       List.iter begin fun i ->
-        Output.print_string conf "<b>" ;
+        Output.print_sstring conf "<b>" ;
         Output.print_string conf (string_of i) ;
-        Output.print_string conf "</b>" ;
-        Output.print_string conf "<table>" ;
+        Output.print_sstring conf "</b>" ;
+        Output.print_sstring conf "<table>" ;
         dump (get base' i) (get base i) ;
-        Output.print_string conf "</table>" ;
+        Output.print_sstring conf "</table>" ;
       end data
     in
     dump string_of_p dump_p poi !ipers ;
@@ -291,7 +298,7 @@ let fixbase_ok conf base =
         | Some (i, i') -> ifneq i i', sou base
         | None -> ifneq empty_string quest_string, fun _ -> "Dtext"
       in
-      Output.print_string conf "<table>" ;
+      Output.print_sstring conf "<table>" ;
       aux
         (match ifam_opt with
          | Some i -> string_of_f i
@@ -299,23 +306,23 @@ let fixbase_ok conf base =
            | Some i -> string_of_p i
            | None -> assert false)
         sou ;
-      Output.print_string conf "</table>" ;
+      Output.print_sstring conf "</table>" ;
     end !istrs ;
     let repost dry txt =
-      Output.print_string conf {|<form action="|} ;
+      Output.print_sstring conf {|<form action="|} ;
       Output.print_string conf (Util.commd conf) ;
-      Output.print_string conf {|" method="GET">|} ;
-      Output.print_string conf {|<input type="hidden" name="m" value="FIXBASE_OK">|} ;
-      if not dry then Output.print_string conf {|<input type="hidden" name="dry_run" value="off">|} ;
-      Output.print_string conf {|<input type="hidden" name="date_of_last_change" value="|} ;
-      Output.print_string conf (Gwdb.date_of_last_change base |> string_of_float) ;
-      Output.print_string conf {|">|} ;
+      Output.print_sstring conf {|" method="GET">|} ;
+      Output.print_sstring conf {|<input type="hidden" name="m" value="FIXBASE_OK">|} ;
+      if not dry then Output.print_sstring conf {|<input type="hidden" name="dry_run" value="off">|} ;
+      Output.print_sstring conf {|<input type="hidden" name="date_of_last_change" value="|} ;
+      Output.print_sstring conf (Gwdb.date_of_last_change base |> string_of_float) ;
+      Output.print_sstring conf {|">|} ;
       let opt s =
         if UI.enabled conf s
         then begin
-          Output.print_string conf {|<input type="hidden" name="|} ;
-          Output.print_string conf s ;
-          Output.print_string conf {|" value="on">|}
+          Output.print_sstring conf {|<input type="hidden" name="|} ;
+          Output.print_string conf (Mutil.encode s) ;
+          Output.print_sstring conf {|" value="on">|}
         end
       in
       opt "f_parents" ;
@@ -330,21 +337,21 @@ let fixbase_ok conf base =
       opt "invalid_utf8" ;
       opt "p_key" ;
       opt "tstab" ;
-      Output.print_string conf {|<p>|} ;
-      Output.print_string conf {|<input type="submit" value="|} ;
+      Output.print_sstring conf {|<p>|} ;
+      Output.print_sstring conf {|<input type="submit" value="|} ;
       Output.print_string conf txt ;
-      Output.print_string conf {|">|} ;
-      Output.print_string conf {|</p>|} ;
-      Output.print_string conf {|</form>|} ;
+      Output.print_sstring conf {|">|} ;
+      Output.print_sstring conf {|</p>|} ;
+      Output.print_sstring conf {|</form>|} ;
     in
     let tstab () =
       if UI.enabled conf "tstab" then begin
         let bname = Util.base_path [] (bname base ^ ".gwb") in
         Mutil.rm (Filename.concat bname "tstab_visitor") ;
         Mutil.rm (Filename.concat bname "tstab") ;
-        Output.print_string conf {|<p>|} ;
-        Output.print_string conf (Util.transl conf "plugin_fixbase_ok_tstab") ;
-        Output.print_string conf {|</p>|} ;
+        Output.print_sstring conf {|<p>|} ;
+        Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_tstab") ;
+        Output.print_sstring conf {|</p>|} ;
       end
     in
     if not dry_run then begin
@@ -352,28 +359,28 @@ let fixbase_ok conf base =
          = Some (Gwdb.date_of_last_change base |> string_of_float)
       then begin
         Gwdb.commit_patches base ;
-        Output.print_string conf {|<p>|} ;
-        Output.print_string conf (Util.transl conf "plugin_fixbase_ok_commit_patches") ;
-        Output.print_string conf {|</p>|} ;
+        Output.print_sstring conf {|<p>|} ;
+        Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_commit_patches") ;
+        Output.print_sstring conf {|</p>|} ;
         tstab ()
       end else if !ipers <> [] || !ifams <> [] || !istrs <> [] then begin
-        Output.print_string conf {|<p>|} ;
-        Output.print_string conf (Util.transl conf "plugin_fixbase_ok_base_changed") ;
-        Output.print_string conf {|</p>|} ;
-        repost true (Util.transl conf "plugin_fixbase_ok_refresh")
+        Output.print_sstring conf {|<p>|} ;
+        Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_base_changed") ;
+        Output.print_sstring conf {|</p>|} ;
+        repost true (Util.transl conf "plugin_fixbase_ok_refresh" |> Adef.safe)
       end else tstab ()
     end else if !ipers <> [] || !ifams <> [] || !istrs <> [] then begin
-      repost false (Util.transl conf "plugin_fixbase_ok_apply")
+      repost false (Util.transl conf "plugin_fixbase_ok_apply" |> Adef.safe)
     end else begin
-      Output.print_string conf {|<p>|} ;
-      Output.print_string conf (Util.transl conf "plugin_fixbase_ok_nothing") ;
-      Output.print_string conf {|</p>|}
+      Output.print_sstring conf {|<p>|} ;
+      Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_nothing") ;
+      Output.print_sstring conf {|</p>|}
     end ;
-    Output.print_string conf {|<p><a href="|} ;
-    Output.print_string conf (Util.commd conf) ;
-    Output.print_string conf {|&m=FIXBASE">|} ;
-    Output.print_string conf (Util.transl conf "plugin_fixbase_ok_return") ;
-    Output.print_string conf {|</a></p>|} ;
+    Output.print_sstring conf {|<p><a href="|} ;
+    Output.print_string conf (Util.commd conf : Adef.escaped_string) ;
+    Output.print_sstring conf {|&m=FIXBASE">|} ;
+    Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_return") ;
+    Output.print_sstring conf {|</a></p>|} ;
   in
   if dry_run then process ()
   else

@@ -1,3 +1,4 @@
+open Def
 open Config
 open Gwdb
 open Util
@@ -20,30 +21,33 @@ let compare_particle_at_the_end base is_surnames a b =
 
 let print_title conf base is_surnames ini len =
   if len >= 2 then
-    if is_surnames then
-      Output.printf conf (fcapitale (ftransl conf "the %d surnames")) len
-    else Output.printf conf (fcapitale (ftransl conf "the %d first names")) len
+    if is_surnames
+    then
+      Printf.sprintf (fcapitale (ftransl conf "the %d surnames")) len
+      |> Output.print_sstring conf
+    else
+      Printf.sprintf (fcapitale (ftransl conf "the %d first names")) len
+      |> Output.print_sstring conf
   else if is_surnames then
-    Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0))
+    transl_nth conf "surname/surnames" 0
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   else
-    Output.print_string conf
-      (Utf8.capitalize_fst (transl_nth conf "first name/first names" 0));
-  if ini <> "" then
-    Output.printf conf " %s %s" (transl conf "starting with") ini
-  else
-    Output.printf conf " (%d %s)" (Gwdb.nb_of_real_persons base)
-      (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
-
-let displayify s = s
-(* let rec loop i len =
- *   if i = String.length s then Buff.get len
- *   else
- *     let nbc = Name.nbc s.[i] in
- *     if nbc < 0 || i + nbc > String.length s then
- *       Buff.get (Buff.mstore len "...")
- *     else loop (i + nbc) (Buff.gstore len s i nbc)
- * in
- * loop 0 0 *)
+    transl_nth conf "first name/first names" 0
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+  if ini <> "" then begin
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (transl conf "starting with") ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf (Util.escape_html ini)
+  end else begin
+    Output.print_sstring conf " (" ;
+    Output.print_sstring conf (string_of_int @@ Gwdb.nb_of_real_persons base) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1)) ;
+    Output.print_sstring conf ")" ;
+  end
 
 let tr c1 s2 s =
   let rec loop i len =
@@ -55,146 +59,160 @@ let tr c1 s2 s =
 
 let print_alphabetic_big conf base is_surnames ini list len too_big =
   let title _ = print_title conf base is_surnames ini len in
-  let mode = if is_surnames then "N" else "P" in
+  let mode = if is_surnames then Adef.encoded "N" else Adef.encoded "P" in
   Hutil.header conf title;
-  Output.print_string conf "<p class=\"search_name\">\n";
+  Output.print_sstring conf {|<p class="search_name">|};
   List.iter begin fun ini_k ->
     if ini_k = ini
-    then
-      Output.printf conf "<a href=\"%sm=%s&tri=A&v=%s\">" (commd conf) mode
-        (Mutil.encode ini_k)
-    else
-      Output.printf conf "<a href=\"%sm=%s&tri=A&k=%s\">" (commd conf) mode
-        (Mutil.encode ini_k);
-    Output.print_string conf (tr '_' "&nbsp;" (displayify ini_k));
-    Output.print_string conf "</a>\n"
+    then begin
+      Output.print_sstring conf {|<a href="|} ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf "m=" ;
+      Output.print_string conf mode ;
+      Output.print_sstring conf "&tri=A&v=" ;
+      Output.print_string conf (Mutil.encode ini_k) ;
+      Output.print_sstring conf {|">|} ;
+    end else begin
+      Output.print_sstring conf {|<a href="|} ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf "m=" ;
+      Output.print_string conf mode ;
+      Output.print_sstring conf "&tri=A&k=" ;
+      Output.print_string conf (Mutil.encode ini_k) ;
+      Output.print_sstring conf {|">|} ;
+    end ;
+    Output.print_string conf (tr '_' "&nbsp;" ini_k |> Util.escape_html);
+    Output.print_sstring conf "</a>\n"
   end list ;
   if not too_big then begin
-    Output.print_string conf "</p>\n";
-    Output.print_string conf "<p>";
-    Output.printf conf "%s:" (Utf8.capitalize_fst (transl conf "the whole list"));
-    Output.print_string conf "</p>\n" ;
-    Output.print_string conf "<ul>\n";
-    Output.print_string conf "<li>";
-    Output.printf conf "<a href=\"%sm=%s&tri=A&o=A&k=%s\">" (commd conf) mode ini;
-    Output.print_string conf (transl conf "long display");
-    Output.print_string conf "</a>";
-    Output.print_string conf "</li>\n";
-    Output.print_string conf "<li>";
-    Output.printf conf "<a href=\"%sm=%s&tri=S&o=A&k=%s\">" (commd conf) mode ini;
-    Output.print_string conf (transl conf "short display");
-    Output.print_string conf "</a>";
-    Output.print_string conf "</li>\n";
-    Output.print_string conf "<li>";
-    Output.printf conf "<a href=\"%sm=%s&tri=S&o=A&k=%s&cgl=on\">" (commd conf) mode ini;
-    Output.printf conf "%s + %s" (transl conf "short display") (transl conf "cancel GeneWeb links");
-    Output.print_string conf "</a>";
-    Output.print_string conf "</li>\n";
-    Output.print_string conf "</ul>\n" ;
+    Output.print_sstring conf "</p><p>";
+    (transl conf "the whole list")
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf (transl conf ":");
+    Output.print_sstring conf "</p><ul><li>";
+    Output.print_sstring conf {|<a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf "m=" ;
+    Output.print_string conf mode ;
+    Output.print_sstring conf "&tri=A&o=A&k=" ;
+    Output.print_string conf (Mutil.encode ini) ;
+    Output.print_sstring conf {|">|} ;
+    Output.print_sstring conf (transl conf "long display");
+    Output.print_sstring conf "</a></li><li>";
+    Output.print_sstring conf {|<a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf "m=" ;
+    Output.print_string conf mode ;
+    Output.print_sstring conf "&tri=S&o=A&k=" ;
+    Output.print_string conf (Mutil.encode ini) ;
+    Output.print_sstring conf {|">|} ;
+    Output.print_sstring conf (transl conf "short display");
+    Output.print_sstring conf "</a></li><li>";
+    Output.print_sstring conf {|<a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf "m=" ;
+    Output.print_string conf mode ;
+    Output.print_sstring conf "&tri=S&o=A&cgl=on&k=" ;
+    Output.print_string conf (Mutil.encode ini) ;
+    Output.print_sstring conf {|">|} ;
+    Output.print_sstring conf (transl conf "short display") ;
+    Output.print_sstring conf " + " ;
+    Output.print_sstring conf (transl conf "cancel GeneWeb links") ;
+    Output.print_sstring conf "</a></li></ul>" ;
   end ;
   Hutil.trailer conf
 
 let print_alphabetic_all conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
-  let mode = if is_surnames then "N" else "P" in
+  let mode = Adef.encoded (if is_surnames then "N" else "P") in
   Hutil.header conf title;
-  Output.print_string conf {|<p class="search_name">|};
-  List.iter
-    (fun (ini_k, _) ->
-       let ini = ini_k in
-       Output.print_string conf "<a href=\"#a" ;
-       Output.print_string conf ini ;
-       Output.print_string conf "\">" ;
-       Output.print_string conf (Mutil.tr '_' ' ' ini);
-       Output.print_string conf "</a>\n")
-    list;
-  Output.print_string conf "</p><ul>";
-  List.iter
-    (fun (ini_k, l) ->
-       let ini = ini_k in
-       Output.print_string conf "<li><a id=\"a" ;
-       Output.print_string conf ini_k;
-       Output.print_string conf "\">" ;
-       Output.print_string conf (Mutil.tr '_' ' ' ini);
-       Output.print_string conf "</a><ul>\n";
-       List.iter
-         (fun (s, cnt) ->
-            Output.print_string conf "<li>";
-            begin let href =
-                    "m=" ^ mode ^ "&v=" ^ Mutil.encode s ^ "&t=A"
-              in
-              wprint_geneweb_link conf href
-                (particle_at_the_end base is_surnames s)
-            end;
-            Output.print_string conf " (" ;
-            Output.print_string conf (string_of_int cnt) ;
-            Output.print_string conf ")</li>")
-         (List.sort (fun (a, _) (b, _) -> compare_particle_at_the_end base is_surnames a b) l);
-       Output.print_string conf "</ul></li>\n")
-    list;
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf {|<p class="search_name">|};
+  List.iter begin fun (ini_k, _) ->
+    Output.print_sstring conf "<a href=\"#a" ;
+    Output.print_string conf (Mutil.encode ini_k) ;
+    Output.print_sstring conf "\">" ;
+    Output.print_string conf (Mutil.tr '_' ' ' ini_k |> Adef.safe);
+    Output.print_sstring conf "</a>\n"
+  end list;
+  Output.print_sstring conf "</p><ul>";
+  List.iter begin fun (ini_k, l) ->
+    Output.print_sstring conf "<li><a id=\"a" ;
+    Output.print_string conf (Mutil.encode ini_k) ;
+    Output.print_sstring conf "\">" ;
+    Output.print_string conf (Mutil.tr '_' ' ' ini_k |> Adef.safe);
+    Output.print_sstring conf "</a><ul>";
+    List.iter begin fun (s, cnt) ->
+      Output.print_sstring conf "<li>";
+      let href = "m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A" in
+      wprint_geneweb_link conf
+        (href :> Adef.escaped_string)
+        ((particle_at_the_end base is_surnames s |> Util.escape_html) :> Adef.safe_string) ;
+      Output.print_sstring conf " (" ;
+      Output.print_sstring conf (string_of_int cnt) ;
+      Output.print_sstring conf ")</li>"
+    end (List.sort (fun (a, _) (b, _) -> compare_particle_at_the_end base is_surnames a b) l) ;
+    Output.print_sstring conf "</ul></li>"
+  end list;
+  Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
 let print_alphabetic_small conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
-  let mode = if is_surnames then "N" else "P" in
+  let mode = Adef.encoded (if is_surnames then "N" else "P") in
   Hutil.header conf title;
-  if list = [] then ()
-  else
-    begin
-      Output.print_string conf "<ul>\n";
-      List.iter
-        (fun (_, s, cnt) ->
-           Output.print_string conf "<li>";
-           Output.printf conf "<a href=\"%sm=%s&v=%s&t=A\">" (commd conf) mode
-             (Mutil.encode s);
-           Output.print_string conf (particle_at_the_end base is_surnames s);
-           Output.print_string conf "</a>";
-           Output.printf conf " (%d)" cnt;
-           Output.print_string conf "</li>\n")
-        (List.sort (fun (_, a, _) (_, b, _) ->
-             compare_particle_at_the_end base is_surnames a b) list);
-      Output.print_string conf "</ul>\n"
+  if list <> [] then begin
+    Output.print_sstring conf "<ul>";
+    List.iter begin fun (_, s, cnt) ->
+      Output.print_sstring conf "<li>";
+      Output.print_sstring conf "<a href=\"" ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf "m=" ;
+      Output.print_string conf mode ;
+      Output.print_sstring conf "&v=" ;
+      Output.print_string conf (Mutil.encode s);
+      Output.print_sstring conf "&t=A\">" ;
+      Output.print_string conf (particle_at_the_end base is_surnames s |> Util.escape_html);
+      Output.print_sstring conf "</a> (";
+      Output.print_sstring conf (string_of_int cnt);
+      Output.print_sstring conf ")</li>"
+    end
+      (List.sort begin fun (_, a, _) (_, b, _) ->
+          compare_particle_at_the_end base is_surnames a b
+        end list);
+      Output.print_sstring conf "</ul>"
     end;
   Hutil.trailer conf
 
 let print_frequency_any conf base is_surnames list len =
   let title _ = print_title conf base is_surnames "" len in
-  let mode = if is_surnames then "N" else "P" in
+  let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let n = ref 0 in
   Hutil.header conf title;
-  Output.print_string conf "<ul>";
-  List.iter
-    (fun (cnt, l) ->
-       if !n > default_max_cnt then ()
-       else
-         begin
-           Output.print_string conf "<li>";
-           Output.print_string conf (string_of_int cnt);
-           begin
-             Output.print_string conf "<ul>";
-             List.iter
-               (fun s ->
-                  Output.print_string conf "<li><a href=\"" ;
-                  Output.print_string conf (commd conf) ;
-                  Output.print_string conf "m=" ;
-                  Output.print_string conf mode ;
-                  Output.print_string conf "&v=" ;
-                  Output.print_string conf (Mutil.encode (Name.lower s));
-                  Output.print_string conf "\">" ;
-                  Output.print_string conf (particle_at_the_end base is_surnames s);
-                  Output.print_string conf "</a></li>";
-                  incr n;
-               )
-               l;
-             Output.print_string conf "</ul>"
-           end;
-           Output.print_string conf "</li>"
-         end)
-    list;
-  Output.print_string conf "</ul>";
+  Output.print_sstring conf "<ul>";
+  List.iter begin fun (cnt, l) ->
+    if !n <= default_max_cnt then begin
+      Output.print_sstring conf "<li>";
+      Output.print_sstring conf (string_of_int cnt);
+      Output.print_sstring conf "<ul>";
+      List.iter begin fun s ->
+        Output.print_sstring conf "<li><a href=\"" ;
+        Output.print_string conf (commd conf) ;
+        Output.print_sstring conf "m=" ;
+        Output.print_string conf mode ;
+        Output.print_sstring conf "&v=" ;
+        Output.print_string conf (Mutil.encode (Name.lower s));
+        Output.print_sstring conf "\">" ;
+        Output.print_string conf (particle_at_the_end base is_surnames s |> Util.escape_html);
+        Output.print_sstring conf "</a></li>";
+        incr n ;
+      end l ;
+      Output.print_sstring conf "</ul>" ;
+      Output.print_sstring conf "</li>"
+    end
+  end list ;
+  Output.print_sstring conf "</ul>" ;
   Hutil.trailer conf
-
 
 let print_frequency conf base is_surnames =
   let () = load_strings_array base in
@@ -208,7 +226,7 @@ let print_alphabetic conf base is_surnames =
     | Some k -> k
     | _ -> ""
   in
-  if p_getenv conf.base_env "fast_alphabetic" = Some "yes" && ini = ""
+  if List.assoc_opt "fast_alphabetic" conf.base_env = Some "yes" && ini = ""
   then begin
     load_strings_array base ;
     let list = Alln.first_letters base is_surnames in
@@ -240,43 +258,41 @@ let print_alphabetic conf base is_surnames =
 
 let print_alphabetic_short conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
-  let mode = if is_surnames then "N" else "P" in
+  let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let need_ref = len >= 250 in
   Hutil.header conf title;
-  if need_ref then
-    begin
-      Output.print_string conf "<p>\n";
-      List.iter
-        (fun (ini_k, _) ->
-           let ini = ini_k in
-           Output.printf conf "<a href=\"#a%s\">" ini;
-           Output.print_string conf (Mutil.tr '_' ' ' ini);
-           Output.print_string conf "</a>\n")
-        list;
-      Output.print_string conf "</p>\n"
-    end;
-  List.iter
-    (fun (ini_k, l) ->
-       let ini = ini_k in
-       Output.print_string conf "<p>\n";
-       Mutil.list_iter_first
-         (fun first (s, cnt) ->
-            let href =
-              " href=\"" ^ commd conf ^ "m=" ^ mode ^ "&v=" ^ Mutil.encode s ^ "&t=A\""
-            in
-            let name =
-              if first && need_ref then " id=\"a" ^ ini ^ "\"" else ""
-            in
-            if not first then Output.print_string conf ",\n";
-            if href <> "" || name <> "" then
-              Output.printf conf "<a%s%s>" href name;
-            Output.print_string conf (particle_at_the_end base is_surnames s);
-            if href <> "" || name <> "" then Output.print_string conf "</a>";
-            Output.printf conf " (%d)" cnt)
-         (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);
-       Output.print_string conf "\n";
-       Output.print_string conf "</p>\n")
-    list;
+  if need_ref then begin
+    Output.print_sstring conf "<p>";
+    List.iter begin fun (ini_k, _) ->
+      Output.print_sstring conf "<a href=\"#a" ;
+      Output.print_string conf (Mutil.encode ini_k);
+      Output.print_sstring conf "\">" ;
+      Output.print_string conf (Mutil.tr '_' ' ' ini_k |> Util.escape_html);
+      Output.print_sstring conf "</a>\n"
+    end list;
+    Output.print_sstring conf "</p>"
+  end ;
+  List.iter begin fun (ini_k, l) ->
+    Output.print_sstring conf "<p>";
+    Mutil.list_iter_first begin fun first (s, cnt) ->
+      let href =
+        " href=\"" ^<^ commd conf
+        ^^^ ("m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A\"" :> Adef.escaped_string)
+      in
+      let name = Adef.encoded (if first && need_ref then " id=\"a" ^ ini_k ^ "\"" else "") in
+      if not first then Output.print_sstring conf ",";
+      Output.print_sstring conf "\n<a" ;
+      Output.print_string conf href ;
+      Output.print_string conf name ;
+      Output.print_sstring conf ">" ;
+      Output.print_string conf (particle_at_the_end base is_surnames s |> Util.escape_html);
+      Output.print_sstring conf "</a>";
+      Output.print_sstring conf " (" ;
+      Output.print_sstring conf (string_of_int cnt) ;
+      Output.print_sstring conf ")"
+    end (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);
+    Output.print_sstring conf "</p>"
+  end list ;
   Hutil.trailer conf
 
 let print_short conf base is_surnames =

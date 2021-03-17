@@ -32,73 +32,75 @@ type output_conf =
   ; flush : unit -> unit
   }
 
+type env = (string * Adef.encoded_string) list
+
 type config =
-  { from : string;
-    api_mode : bool;
-    manitou : bool;
-    supervisor : bool;
-    wizard : bool;
-    is_printed_by_template : bool;
-    debug : bool;
-    friend : bool;
-    just_friend_wizard : bool;
-    user : string;
-    username : string;
-    auth_scheme : auth_scheme_kind;
-    command : string;
-    indep_command : string;
-    highlight : string;
-    lang : string;
-    default_lang : string;
-    default_sosa_ref : iper * Gwdb.person option;
-    multi_parents : bool;
-    authorized_wizards_notes : bool;
-    public_if_titles : bool;
-    public_if_no_date : bool;
-    mutable setup_link : bool;
-    access_by_key : bool;
-    private_years : int;
-    hide_names : bool;
-    use_restrict : bool;
-    no_image : bool;
-    no_note : bool;
-    bname : string;
-    cgi_passwd : string;
-    env : (string * string) list;
-    mutable senv : (string * string) list;
-    mutable henv : (string * string) list;
-    (* content of .gwf file *)
-    base_env : (string * string) list;
-    allowed_titles : string list Lazy.t;
-    denied_titles : string list Lazy.t;
-    request : string list;
-    lexicon : (string, string) Hashtbl.t;
-    mutable charset : string;
-    is_rtl : bool;
-    left : string;
-    right : string;
-    auth_file : string;
-    border : int;
-    mutable n_connect : (int * int * int * (string * float) list) option;
-    today : dmy;
-    today_wd : int;
-    time : int * int * int;
-    ctime : float;
-    (* HTTP printer *)
-    mutable output_conf : output_conf ;
-    (* prefix for image urls:
-       the value of argument -images_url if specified, otherwise
-       command ^ "?m=IM&v=" in CGI mode
-       "images" otherwise *)
-    image_prefix : string;
-    (* if true, the base name is in the b argument of the query string: ?b=BASE&...
-       if false, the base name is the last element of the uri path: .../base?... *)
-    static_path : string
+  { from : string
+  ; api_mode : bool
+  ; manitou : bool
+  ; supervisor : bool
+  ; wizard : bool
+  ; is_printed_by_template : bool
+  ; debug : bool
+  ; friend : bool
+  ; just_friend_wizard : bool
+  ; user : string
+  ; username : string
+  ; auth_scheme : auth_scheme_kind
+  ; command : string
+  ; indep_command : string
+  ; highlight : string
+  ; lang : string
+  ; default_lang : string
+  ; default_sosa_ref : iper * Gwdb.person option
+  ; multi_parents : bool
+  ; authorized_wizards_notes : bool
+  ; public_if_titles : bool
+  ; public_if_no_date : bool
+  ; mutable setup_link : bool
+  ; access_by_key : bool
+  ; private_years : int
+  ; hide_names : bool
+  ; use_restrict : bool
+  ; no_image : bool
+  ; no_note : bool
+  ; bname : string
+  ; cgi_passwd : string
+  ; env : env
+  ; mutable senv : env
+  ; mutable henv : env
+  ; base_env : (string * string) list (* content of .gwf file *)
+  ; allowed_titles : string list Lazy.t
+  ; denied_titles : string list Lazy.t
+  ; request : string list
+  ; lexicon : (string, string) Hashtbl.t
+  ; mutable charset : string
+  ; is_rtl : bool
+  ; left : string
+  ; right : string
+  ; auth_file : string
+  ; border : int
+  ; mutable n_connect : (int * int * int * (string * float) list) option
+  ; today : dmy
+  ; today_wd : int
+  ; time : int * int * int
+  ; ctime : float
+  ; mutable output_conf : output_conf    (* HTTP printer *)
+  (* prefix for image urls:
+     the value of argument -images_url if specified, otherwise
+     command ^ "?m=IM&v=" in CGI mode
+     "images" otherwise *)
+  ; image_prefix : string
+
+  ; static_path : string
     (* in CGI mode, provides location of etc files to Apache for direct loading *)
+
+  (* if true, the base name is in the b argument of the query string: ?b=BASE&...
+     if false, the base name is the last element of the uri path: .../base?... *)
   ; cgi : bool
   ; forced_plugins : string list
   ; plugins : string list
- }
+  }
 
 (**/**)
 (** A dummy {!type:config} value, with uninitialized fields.

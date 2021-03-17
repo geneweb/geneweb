@@ -16,7 +16,11 @@ val status : Config.config -> Def.httpStatus -> unit
 val header : Config.config -> ('a, unit, string, unit) format4 -> 'a
 
 (** Printing the part of HTTP response body on the output channel. *)
-val print_string : Config.config -> string -> unit
+val print_string : Config.config -> [< `encoded | `escaped | `safe] Adef.astring -> unit
+
+(** Printing the part of HTTP response body on the output channel.
+    Use it to print strings considered safe. *)
+val print_sstring : Config.config -> string -> unit
 
 (** Formatter printing of the part of HTTP response body on the output channel. *)
 val printf : Config.config -> ('a, unit, string, unit) format4 -> 'a
