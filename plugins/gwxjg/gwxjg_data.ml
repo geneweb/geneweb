@@ -8,6 +8,12 @@ let person_ht = Hashtbl.create 32
 
 let mk_opt fn = function None -> Tnull | Some x -> fn x
 
+let safe (x : Adef.safe_string) = Tsafe (x :> string)
+let encoded (x : Adef.encoded_string) = Tsafe (x :> string)
+let escaped (x : Adef.escaped_string) = Tsafe (x :> string)
+
+let unbox_string = function Tsafe s | Tstr s -> s | x -> Jg_types.failwith_type_error_1 "unbox_string" x
+
 let mk_source_rs conf base str  =
   let s = Util.string_with_macros conf [] str in
   let lines =
@@ -22,7 +28,9 @@ let mk_source_rs conf base str  =
     ; Wiki.wi_always_show_link = conf.wizard || conf.friend
     }
   in
-  Tstr str, Tstr (Wiki.syntax_links conf wi (String.concat "\n" lines))
+  ( Tstr str
+  , Tsafe (Wiki.syntax_links conf wi (String.concat "\n" lines))
+  )
 
 let mk_note_rs conf base env str =
   let s = Util.string_with_macros conf env str in
@@ -34,11 +42,16 @@ let mk_note_rs conf base env str =
     ; Wiki.wi_always_show_link = conf.wizard || conf.friend
     }
   in
-  Tstr str, Tstr (Wiki.syntax_links conf wi (String.concat "\n" lines))
+  ( Tstr str
+  , Tsafe (Wiki.syntax_links conf wi (String.concat "\n" lines))
+  )
 
 let mk_person_note_rs conf base p note =
   let env = ['i', (fun () -> Util.default_image_name base p)] in
   mk_note_rs conf base env note
+
+let mk_place conf base str =
+  Tstr str, escaped (Util.string_of_place conf str)
 
 let rec date_compare_aux date1 date2 =
   let y1 = field date1 "year" in
@@ -49,29 +62,29 @@ let rec date_compare_aux date1 date2 =
 and compare_month date1 date2 = match field date1 "month", field date2 "month" with
   | Tint 0, Tint 0 -> cmp_prec date1 date2
   | Tint 0, Tint _ ->
-    if field date1 "prec" = Tstr "after" then Tint 1 else cmp_prec date1 date2
+    if field date1 "prec" = Tsafe "after" then Tint 1 else cmp_prec date1 date2
   | Tint _, Tint 0 ->
-    if field date2 "prec" = Tstr "after" then Tint (-1) else cmp_prec date1 date2
+    if field date2 "prec" = Tsafe "after" then Tint (-1) else cmp_prec date1 date2
   | m1, m2 -> match Jg_runtime.jg_compare m1 m2 with
     | Tint 0 -> compare_day date1 date2
     | x -> x
 and compare_day date1 date2 = match field date1 "day", field date2 "day" with
   | Tint 0, Tint 0 -> cmp_prec date1 date2
   | Tint 0, Tint _ ->
-    if field date1 "prec" = Tstr "after" then Tint 1 else cmp_prec date1 date2
+    if field date1 "prec" = Tsafe "after" then Tint 1 else cmp_prec date1 date2
   | Tint _, Tint 0 ->
-    if field date2 "prec" = Tstr "after" then Tint (-1) else cmp_prec date1 date2
+    if field date2 "prec" = Tsafe "after" then Tint (-1) else cmp_prec date1 date2
   | d1, d2 -> match Jg_runtime.jg_compare d1 d2 with
     | Tint 0 -> cmp_prec date1 date2
     | x -> x
 and cmp_prec d1 d2 =
   match field d1 "prec", field d2 "prec" with
-  | Tstr ("sure"|"about"|"maybe"), Tstr ("sure"|"about"|"maybe") -> Tint 0
-  | Tstr "after", Tstr "after" | Tstr "before", Tstr "before" -> Tint 0
-  | Tstr "oryear", Tstr "oryear" | Tstr "yearint", Tstr "yearint" ->
+  | Tsafe ("sure"|"about"|"maybe"), Tsafe ("sure"|"about"|"maybe") -> Tint 0
+  | Tsafe "after", Tsafe "after" | Tsafe "before", Tsafe "before" -> Tint 0
+  | Tsafe "oryear", Tsafe "oryear" | Tsafe "yearint", Tsafe "yearint" ->
     date_compare_aux (field d1 "d2") (field d2 "d2")
-  | _, Tstr "after" | Tstr "before", _ -> Tint (-1)
-  | Tstr "after", _ | _, Tstr "before" -> Tint 1
+  | _, Tsafe "after" | Tsafe "before", _ -> Tint (-1)
+  | Tsafe "after", _ | _, Tsafe "before" -> Tint 1
   | _ -> Tint 0
 and field = Jg_runtime.jg_obj_lookup
 
@@ -200,10 +213,10 @@ and mk_date = function
       | _ -> Tnull
     in
     let calendar = match c with
-      | Dgregorian -> Tstr "Dgregorian"
-      | Djulian -> Tstr "Djulian"
-      | Dfrench -> Tstr "Dfrench"
-      | Dhebrew -> Tstr "Dhebrew"
+      | Dgregorian -> Tsafe "Dgregorian"
+      | Djulian -> Tsafe "Djulian"
+      | Dfrench -> Tsafe "Dfrench"
+      | Dhebrew -> Tsafe "Dhebrew"
     in
     Tpat begin function
       | "calendar" -> calendar
@@ -229,22 +242,22 @@ and to_dmy2 d =
   ; delta2 = 0 }
 
 and to_prec = function
-  | Def.Sure -> Tstr "sure"
-  | About -> Tstr "about"
-  | Maybe -> Tstr "maybe"
-  | Before -> Tstr "before"
-  | After -> Tstr "after"
-  | OrYear _ -> Tstr "oryear"
-  | YearInt _ -> Tstr "yearint"
+  | Def.Sure -> Tsafe "sure"
+  | About -> Tsafe "about"
+  | Maybe -> Tsafe "maybe"
+  | Before -> Tsafe "before"
+  | After -> Tsafe "after"
+  | OrYear _ -> Tsafe "oryear"
+  | YearInt _ -> Tsafe "yearint"
 
 and of_prec d = match Jg_runtime.jg_obj_lookup d "prec" with
-  | Tstr "sure" -> Def.Sure
-  | Tstr "about" -> About
-  | Tstr "maybe" -> Maybe
-  | Tstr "before" -> Before
-  | Tstr "after" -> After
-  | Tstr "oryear" -> OrYear (to_dmy2 @@ Jg_runtime.jg_obj_lookup d "d2")
-  | Tstr "yearint" -> YearInt (to_dmy2 @@ Jg_runtime.jg_obj_lookup d "d2")
+  | Tsafe "sure" -> Def.Sure
+  | Tsafe "about" -> About
+  | Tsafe "maybe" -> Maybe
+  | Tsafe "before" -> Before
+  | Tsafe "after" -> After
+  | Tsafe "oryear" -> OrYear (to_dmy2 @@ Jg_runtime.jg_obj_lookup d "d2")
+  | Tsafe "yearint" -> YearInt (to_dmy2 @@ Jg_runtime.jg_obj_lookup d "d2")
   | _ -> assert false
 
 and to_gregorian_aux calendar d =
@@ -257,10 +270,10 @@ and to_gregorian_aux calendar d =
   | _ -> assert false
 
 and of_calendar d = match Jg_runtime.jg_obj_lookup d "calendar" with
-  | Tstr "Dgregorian" -> Def.Dgregorian
-  | Tstr "Djulian" -> Def.Djulian
-  | Tstr "Dfrench" -> Def.Dfrench
-  | Tstr "Dhebrew" -> Def.Dhebrew
+  | Tsafe "Dgregorian" -> Def.Dgregorian
+  | Tsafe "Djulian" -> Def.Djulian
+  | Tsafe "Dfrench" -> Def.Dfrench
+  | Tsafe "Dhebrew" -> Def.Dhebrew
   | _ -> assert false
 
 
@@ -275,15 +288,15 @@ and module_DATE conf =
         | "day" -> day
         | "month" -> month
         | "year" -> year
-        | "prec" -> Tstr "sure"
+        | "prec" -> Tsafe "sure"
         | _ -> raise Not_found
       end
     end
   in
-  let death_symbol = DateDisplay.death_symbol conf in
+  let death_symbol = Tsafe (DateDisplay.death_symbol conf) in
   let string_of_date_aux fn =
     func_arg1_no_kw @@ fun d ->
-    try Tstr (fn conf @@ Def.Dgreg (to_dmy d, of_calendar d) )
+    try safe (Def.Dgreg (to_dmy d, of_calendar d) |> fn conf)
     with e ->
       if Jg_runtime.jg_obj_lookup d "__Dtext__" = Tbool true
       then Jg_runtime.jg_obj_lookup d "__str__"
@@ -295,7 +308,7 @@ and module_DATE conf =
     func_arg1_no_kw (fun i -> Tstr (DateDisplay.code_french_year conf (unbox_int i)))
   in
   let string_of_age =
-    func_arg1_no_kw (fun d -> Tstr (DateDisplay.string_of_age conf (to_dmy d)) )
+    func_arg1_no_kw (fun d -> safe (DateDisplay.string_of_age conf (to_dmy d)) )
   in
   let sub =
     func_arg2_no_kw begin fun d1 d2 ->
@@ -316,7 +329,7 @@ and module_DATE conf =
   Tpat begin function
     | "calendar" -> calendar
     | "compare" -> date_compare
-    | "death_symbol" -> Tstr death_symbol
+    | "death_symbol" -> death_symbol
     | "code_french_year" -> code_french_year
     | "eq" -> date_eq
     | "now" -> now
@@ -349,7 +362,7 @@ and ppget conf base p =
     then
       let lazy_p = lazy (unbox_pat @@ unsafe_mk_semi_public_person conf base p) in
       Tpat begin function
-        | "first_name" | "surname" -> Tstr "x"
+        | "first_name" | "surname" -> Tsafe "x"
         | "first_name_aliases" | "surname_aliases" -> Tlist []
         | x -> (Lazy.force lazy_p) x
       end
@@ -394,40 +407,40 @@ and mk_rparent_aux kind conf base acc =
   | _ -> Tnull :: acc
 
 and mk_rparent conf base acc = mk_rparent_aux begin function
-    | Def.Adoption -> Tstr "ADOPTIVE_PARENT"
-    | Def.CandidateParent -> Tstr "CANDIDATE_PARENT"
-    | Def.FosterParent -> Tstr "FOSTER_PARENT"
-    | Def.GodParent -> Tstr "GODPARENT"
-    | Def.Recognition -> Tstr "RECOGNIZING_PARENT"
+    | Def.Adoption -> Tsafe "ADOPTIVE_PARENT"
+    | Def.CandidateParent -> Tsafe "CANDIDATE_PARENT"
+    | Def.FosterParent -> Tsafe "FOSTER_PARENT"
+    | Def.GodParent -> Tsafe "GODPARENT"
+    | Def.Recognition -> Tsafe "RECOGNIZING_PARENT"
   end conf base acc
 
 and mk_rchild conf base acc = mk_rparent_aux begin function
-    | Def.Adoption -> Tstr "ADOPTIVE_CHILD"
-    | Def.CandidateParent -> Tstr "CANDIDATE_CHILD"
-    | Def.FosterParent -> Tstr "FOSTER_CHILD"
-    | Def.GodParent -> Tstr "GODCHILD"
-    | Def.Recognition -> Tstr "RECOGNIZED_CHILD"
+    | Def.Adoption -> Tsafe "ADOPTIVE_CHILD"
+    | Def.CandidateParent -> Tsafe "CANDIDATE_CHILD"
+    | Def.FosterParent -> Tsafe "FOSTER_CHILD"
+    | Def.GodParent -> Tsafe "GODCHILD"
+    | Def.Recognition -> Tsafe "RECOGNIZED_CHILD"
   end conf base acc
 
 and mk_witness_kind = function
-  | Def.Witness                  -> Tstr "WITNESS"
-  | Def.Witness_GodParent        -> Tstr "WITNESS_GODPARENT"
-  | Def.Witness_CivilOfficer     -> Tstr "WITNESS_CIVILOFFICER"
-  | Def.Witness_ReligiousOfficer -> Tstr "WITNESS_RELIGIOUSOFFICER"
-  | Def.Witness_Informant        -> Tstr "WITNESS_INFORMANT"
-  | Def.Witness_Attending        -> Tstr "WITNESS_ATTENDING"
-  | Def.Witness_Mentioned        -> Tstr "WITNESS_MENTIONED"
-  | Def.Witness_Other            -> Tstr "WITNESS_OTHER"
-                           
+  | Def.Witness                  -> Tsafe "WITNESS"
+  | Def.Witness_GodParent        -> Tsafe "WITNESS_GODPARENT"
+  | Def.Witness_CivilOfficer     -> Tsafe "WITNESS_CIVILOFFICER"
+  | Def.Witness_ReligiousOfficer -> Tsafe "WITNESS_RELIGIOUSOFFICER"
+  | Def.Witness_Informant        -> Tsafe "WITNESS_INFORMANT"
+  | Def.Witness_Attending        -> Tsafe "WITNESS_ATTENDING"
+  | Def.Witness_Mentioned        -> Tsafe "WITNESS_MENTIONED"
+  | Def.Witness_Other            -> Tsafe "WITNESS_OTHER"
+
 and mk_event conf base d =
   let module E = Ezgw.Event in
   let date = match E.date d with Some d -> mk_date d | None -> Tnull in
-  let name = Tstr (E.name conf base d) in
+  let name = safe (E.name conf base d) in
   let spouse = match E.spouse_opt d with
     | None -> Tnull
     | Some i -> lazy_get_n_mk_person conf base i
   in
-  let kind = Tstr (E.kind d) in
+  let kind = Tsafe (E.kind d) in
   let witnesses =
     match E.witnesses d with
     | [||] -> Tarray [||]
@@ -444,7 +457,7 @@ and mk_event conf base d =
           end
         end w end
   in
-  let place = Tstr (E.place conf base d) in
+  let place_raw, place = mk_place conf base (E.place conf base d) in
   let source_raw, source = mk_source_rs conf base (E.src base d) in
   let note_raw, note = mk_note_rs conf base [] (E.note conf base d) in
   Tpat begin function
@@ -558,7 +571,7 @@ and mk_str_lst base istrs = Tlist (List.map (fun i -> Tstr (Gwdb.sou base i)) is
 and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
   let module E = Ezgw.Person in
-  let access = Tstr (Util.acces conf base p) in
+  let access = escaped (Util.acces conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let first_name = Tstr (E.first_name base p) in
@@ -614,7 +627,7 @@ and find_events conf base x events =
 and unsafe_mk_person conf base (p : Gwdb.person) =
   let module E = Ezgw.Person in
   let iper' = Gwdb.get_iper p in
-  let access = Tstr (Util.acces conf base p) in
+  let access = escaped (Util.acces conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let aliases = mk_str_lst base (Gwdb.get_aliases p) in
@@ -625,16 +638,16 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let birth = find_event conf base (Perso.Pevent Epers_Birth) events' in
   let baptism = find_event conf base (Perso.Pevent Epers_Baptism) events' in
   let death =
-    let wrap s = Tpat (function "reason" -> Tstr s | _ -> raise Not_found) in
+    let wrap s = Tpat (function "reason" -> Tsafe s | _ -> raise Not_found) in
     match Gwdb.get_death p with
     | Def.NotDead -> Tnull
     | Death (r, cd) ->
       let reason = match r with
-        | Def.Killed -> Tstr "Killed"
-        | Murdered -> Tstr "Murdered"
-        | Executed -> Tstr "Executed"
-        | Disappeared -> Tstr "Disappeared"
-        | Unspecified -> Tstr "Unspecified"
+        | Def.Killed -> Tsafe "Killed"
+        | Murdered -> Tsafe "Murdered"
+        | Executed -> Tsafe "Executed"
+        | Disappeared -> Tsafe "Disappeared"
+        | Unspecified -> Tsafe "Unspecified"
       in
       let e = find_event conf base (Perso.Pevent Epers_Death) events' in
       Tpat (function "reason" -> reason | s -> Jg_runtime.jg_obj_lookup e s)
@@ -675,7 +688,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         end db
       then
         Tpat begin fun s ->
-          Tstr (List.fold_left (Perso.linked_page_text conf base p s key) "" db)
+          safe (List.fold_left (Perso.linked_page_text conf base p s key) (Adef.safe "") db)
         end
       else
         Tnull
@@ -791,20 +804,20 @@ and mk_warning conf base =
   in
   function
   | Def.BigAgeBetweenSpouses (f, m, a) ->
-    Tset [ Tstr "BigAgeBetweenSpouses"
+    Tset [ Tsafe "BigAgeBetweenSpouses"
          ; unsafe_mk_person conf base f
          ; unsafe_mk_person conf base m
          ; mk_date (Dgreg (a, Dgregorian) ) ]
   | BirthAfterDeath p ->
-    Tset [ Tstr "BirthAfterDeath" ; unsafe_mk_person conf base p]
+    Tset [ Tsafe "BirthAfterDeath" ; unsafe_mk_person conf base p]
   | IncoherentSex (p, i1, i2) ->
-    Tset [ Tstr "BirthAfterDeath"
+    Tset [ Tsafe "BirthAfterDeath"
          ; unsafe_mk_person conf base p
          ; Tint i1
          ; Tint i2 ]
   | ChangedOrderOfChildren (ifam, _descend, before, after) ->
     let (bef_d, aft_d) = Difference.f before after in
-    Tset [ Tstr "ChangedOrderOfChildren"
+    Tset [ Tsafe "ChangedOrderOfChildren"
          ; get_fam ifam
          ; Tarray (Array.map (get_n_mk_person conf base) before)
          ; Tarray (Array.map (get_n_mk_person conf base) after)
@@ -813,7 +826,7 @@ and mk_warning conf base =
          ]
   | ChangedOrderOfMarriages (p, before, after) ->
     let (bef_d, aft_d) = Difference.f before after in
-    Tset [ Tstr "ChangedOrderOfMarriages"
+    Tset [ Tsafe "ChangedOrderOfMarriages"
          ; unsafe_mk_person conf base p
          ; Tarray (Array.map get_fam before)
          ; Tarray (Array.map get_fam after)
@@ -824,7 +837,7 @@ and mk_warning conf base =
     let before = array_of_list_map (mk_fevent conf base) before in
     let after = array_of_list_map (mk_fevent conf base) after in
     let (bef_d, aft_d) = Difference.f before after in
-    Tset [ Tstr "ChangedOrderOfFamilyEvents"
+    Tset [ Tsafe "ChangedOrderOfFamilyEvents"
          ; Tarray before
          ; Tarray after
          ; Tarray (Array.map box_bool bef_d)
@@ -834,115 +847,115 @@ and mk_warning conf base =
     let before = array_of_list_map (mk_pevent conf base) before in
     let after = array_of_list_map (mk_pevent conf base) after in
     let (bef_d, aft_d) = Difference.f before after in
-    Tset [ Tstr "ChangedOrderOfPersonEvents"
+    Tset [ Tsafe "ChangedOrderOfPersonEvents"
          ; Tarray before
          ; Tarray after
          ; Tarray (Array.map box_bool bef_d)
          ; Tarray (Array.map box_bool aft_d)
          ]
   | ChildrenNotInOrder (ifam, _descend, elder, x) ->
-    Tset [ Tstr "ChildrenNotInOrder"
+    Tset [ Tsafe "ChildrenNotInOrder"
          ; get_fam ifam
          ; unsafe_mk_person conf base elder
          ; unsafe_mk_person conf base x
          ]
   | CloseChildren (ifam, c1, c2) ->
-    Tset [ Tstr "CloseChildren"
+    Tset [ Tsafe "CloseChildren"
          ; get_fam ifam
          ; unsafe_mk_person conf base c1
          ; unsafe_mk_person conf base c2
          ]
   | DistantChildren (ifam, c1, c2) ->
-    Tset [ Tstr "DistantChildren"
+    Tset [ Tsafe "DistantChildren"
          ; get_fam ifam
          ; unsafe_mk_person conf base c1
          ; unsafe_mk_person conf base c2
          ]
   | DeadOld (p, a) ->
-    Tset [ Tstr "DeadOld"
+    Tset [ Tsafe "DeadOld"
          ; unsafe_mk_person conf base p
          ; mk_date (Dgreg (a, Dgregorian) ) ]
   | DeadTooEarlyToBeFather (father, child) ->
-    Tset [ Tstr "DeadTooEarlyToBeFather"
+    Tset [ Tsafe "DeadTooEarlyToBeFather"
          ; unsafe_mk_person conf base father
          ; unsafe_mk_person conf base child ]
   | FEventOrder (p, e1, e2) ->
-    Tset [ Tstr "FEventOrder"
+    Tset [ Tsafe "FEventOrder"
          ; unsafe_mk_person conf base p
          ; mk_fevent conf base e1
          ; mk_fevent conf base e2 ]
   | FWitnessEventAfterDeath (p, e, ifam) ->
-    Tset [ Tstr "FWitnessEventAfterDeath"
+    Tset [ Tsafe "FWitnessEventAfterDeath"
          ; unsafe_mk_person conf base p
          ; mk_fevent conf base e
          ; get_fam ifam ]
   | FWitnessEventBeforeBirth (p, e, ifam) ->
-    Tset [ Tstr "FWitnessEventBeforeBirth"
+    Tset [ Tsafe "FWitnessEventBeforeBirth"
          ; unsafe_mk_person conf base p
          ; mk_fevent conf base e
          ; get_fam ifam ]
   | IncoherentAncestorDate (p1, p2) ->
-    Tset [ Tstr "IncoherentAncestorDate"
+    Tset [ Tsafe "IncoherentAncestorDate"
          ; unsafe_mk_person conf base p1
          ; unsafe_mk_person conf base p2 ]
   | MarriageDateAfterDeath p ->
-    Tset [ Tstr "MarriageDateAfterDeath"
+    Tset [ Tsafe "MarriageDateAfterDeath"
          ; unsafe_mk_person conf base p ]
   | MarriageDateBeforeBirth p ->
-    Tset [ Tstr "MarriageDateBeforeBirth"
+    Tset [ Tsafe "MarriageDateBeforeBirth"
          ; unsafe_mk_person conf base p ]
   | MotherDeadBeforeChildBirth (p1, p2) ->
-    Tset [ Tstr "MotherDeadBeforeChildBirth"
+    Tset [ Tsafe "MotherDeadBeforeChildBirth"
          ; unsafe_mk_person conf base p1
          ; unsafe_mk_person conf base p2 ]
   | OldForMarriage (p, a, i) ->
-    Tset [ Tstr "OldForMarriage"
+    Tset [ Tsafe "OldForMarriage"
          ; unsafe_mk_person conf base p
          ; mk_date (Dgreg (a, Dgregorian) )
          ; get_n_mk_family conf base i (Gwdb.foi base i) ]
   | ParentBornAfterChild (p1, p2) ->
-    Tset [ Tstr "ParentBornAfterChild"
+    Tset [ Tsafe "ParentBornAfterChild"
          ; unsafe_mk_person conf base p1
          ; unsafe_mk_person conf base p2 ]
   | ParentTooOld (p, a, c) ->
-    Tset [ Tstr "ParentTooOld"
+    Tset [ Tsafe "ParentTooOld"
          ; unsafe_mk_person conf base p
          ; mk_date (Dgreg (a, Dgregorian) )
          ; unsafe_mk_person conf base c ]
   | ParentTooYoung (p, a, c) ->
-    Tset [ Tstr "ParentTooYoung"
+    Tset [ Tsafe "ParentTooYoung"
          ; unsafe_mk_person conf base p
          ; mk_date (Dgreg (a, Dgregorian) )
          ; unsafe_mk_person conf base c ]
   | PEventOrder (p, e1, e2) ->
-    Tset [ Tstr "PEventOrder"
+    Tset [ Tsafe "PEventOrder"
          ; unsafe_mk_person conf base p
          ; mk_pevent conf base e1
          ; mk_pevent conf base e2 ]
   | PWitnessEventAfterDeath (p, e, origin) ->
-    Tset [ Tstr "PWitnessEventAfterDeath"
+    Tset [ Tsafe "PWitnessEventAfterDeath"
          ; unsafe_mk_person conf base p
          ; mk_pevent conf base e
          ; unsafe_mk_person conf base origin ]
   | PWitnessEventBeforeBirth (p, e, origin) ->
-    Tset [ Tstr "PWitnessEventBeforeBirth"
+    Tset [ Tsafe "PWitnessEventBeforeBirth"
          ; unsafe_mk_person conf base p
          ; mk_pevent conf base e
          ; unsafe_mk_person conf base origin ]
   | TitleDatesError (p, t) ->
-    Tset [ Tstr "TitleDatesError"
+    Tset [ Tsafe "TitleDatesError"
          ; unsafe_mk_person conf base p
          ; mk_gen_title base t ]
   | UndefinedSex p ->
-    Tset [ Tstr "UndefinedSex"
+    Tset [ Tsafe "UndefinedSex"
          ; unsafe_mk_person conf base p ]
   | YoungForMarriage (p, a, i) ->
-    Tset [ Tstr "YoungForMarriage"
+    Tset [ Tsafe "YoungForMarriage"
          ; unsafe_mk_person conf base p
          ; mk_date (Dgreg (a, Dgregorian) )
          ; get_fam i ]
   | PossibleDuplicateFam (ifam1, ifam2) ->
-    Tset [ Tstr "PossibleDuplicateFam"
+    Tset [ Tsafe "PossibleDuplicateFam"
          ; get_fam ifam1
          ; get_fam ifam2
          ]
@@ -959,31 +972,32 @@ let module_OPT =
   end
 
 let module_NAME base =
+  let str_or_safe s = function Tstr _ -> Tstr s | Tsafe _ -> Tsafe s | _ -> assert false in
   let get_particle s = Mutil.get_particle (Gwdb.base_particles base) s in
   let particle =
     func_arg1_no_kw begin function
-      | Tstr s -> begin match get_particle s with
+      | Tstr s | Tsafe s as x -> begin match get_particle s with
           | "" -> Tnull
-          | s -> Tstr (String.trim s)
+          | s -> str_or_safe (String.trim s) x
         end
       | _ -> assert false
     end
   in
   let without_particle =
     func_arg1_no_kw begin function
-      | Tstr s -> begin match get_particle s with
+      | Tstr s | Tsafe s as x -> begin match get_particle s with
           | "" -> Tstr s
           | part ->
             let l = String.length part in
             let s = String.sub s l (String.length s - l) in
-            Tstr s
+            str_or_safe s x
         end
       | _ -> assert false
     end
   in
   let lower =
     func_arg1_no_kw begin function
-      | Tstr s -> Tstr (Name.lower s)
+      | Tstr s | Tsafe s as x -> str_or_safe (Name.lower s) x
       | _ -> assert false
     end
   in
@@ -995,16 +1009,16 @@ let module_NAME base =
   end
 
 let mk_conf conf =
-  let lazy_env e = Tlazy (lazy (Tobj (List.map (fun (k, v) -> (k, Tstr v)) e))) in
+  let lazy_env fn e = Tlazy (lazy (Tobj (List.map (fun (k, v) -> (k, fn v)) e))) in
   let wizard = Tbool conf.Config.wizard in
   let friend = Tbool conf.friend in
-  let command = Tstr conf.command in
-  let env = lazy_env conf.env in
-  let senv = lazy_env conf.senv in
-  let henv = lazy_env conf.henv in
-  let benv = lazy_env conf.base_env in
+  let command = Tsafe conf.command in
+  let env = lazy_env (fun s -> encoded s) conf.env in
+  let senv = lazy_env (fun s -> encoded s) conf.senv in
+  let henv = lazy_env (fun s -> encoded s) conf.henv in
+  let benv = lazy_env (fun s -> Tstr s) conf.base_env in
   let today = mk_dmy conf.today in
-  let image_prefix = Tstr conf.image_prefix in
+  let image_prefix = Tsafe conf.image_prefix in
   let user = Tstr conf.user in
   let lang = Tstr conf.lang in
   Tpat begin function
@@ -1023,8 +1037,8 @@ let mk_conf conf =
   end
 
 let mk_env_no_base conf =
-  let prefix = Tstr (Util.commd conf) in
-  let prefix_base = Tstr (Util.prefix_base conf) in
+  let prefix = escaped (Util.commd conf) in
+  let prefix_base = encoded (Util.prefix_base conf) in
   Tpat begin function
     | "prefix" -> prefix
     | "prefix_base" -> prefix_base
@@ -1032,8 +1046,8 @@ let mk_env_no_base conf =
   end
 
 let mk_env conf base =
-  let prefix = Tstr (Util.commd conf) in
-  let prefix_base = Tstr (Util.prefix_base conf) in
+  let prefix = escaped (Util.commd conf) in
+  let prefix_base = encoded (Util.prefix_base conf) in
   let sosa_ref =
     box_lazy @@ lazy begin
       match Util.p_getenv conf.Config.env "iz" with
@@ -1041,7 +1055,7 @@ let mk_env conf base =
       | None ->
         match Util.p_getenv conf.env "pz" with
         | None ->
-          begin match Util.p_getenv conf.base_env "default_sosa_ref" with
+          begin match List.assoc_opt "default_sosa_ref" conf.base_env with
             | Some n when n <> "" ->
               begin match Gutil.person_ht_find_all base n with
                 | [ ip ] -> get_n_mk_person conf base ip
@@ -1067,12 +1081,14 @@ let mk_env conf base =
   end
 
 let decode_varenv =
-  func_arg1_no_kw @@ fun str ->
-  Tstr (Mutil.decode @@ unbox_string str)
+  func_arg1_no_kw @@ function
+  | Tstr str | Tsafe str -> Tstr (Mutil.decode (Adef.encoded str))
+  | x -> Jg_types.failwith_type_error_1 "decode_varenv" x
 
 let encode_varenv =
-  func_arg1_no_kw @@ fun str ->
-  Tstr (Mutil.encode @@ unbox_string str)
+  func_arg1_no_kw @@ function
+  | Tstr str -> encoded (Mutil.encode str)
+  | x -> Jg_types.failwith_type_error_1 "encode_varenv" x
 
 let mk_base base =
   Tpat begin function
@@ -1085,8 +1101,9 @@ let mk_base base =
 let stringify s =
   Printf.sprintf (if String.contains s '\'' then "\"%s\"" else "'%s'") s
 
-let trans (conf : Config.config) =
+let trans ?(autoescape = true) (conf : Config.config) =
   let trad ~kwargs s i =
+    let esc = if autoescape then Jg_utils.escape_html else fun s -> s in
     try
       let s = Hashtbl.find conf.lexicon s in
       let t =
@@ -1100,11 +1117,17 @@ let trans (conf : Config.config) =
       let i = if i < 0 || i >= Array.length t then 0 else i in
       let arg s = List.assoc s kwargs in
       let t = Array.unsafe_get t i in
-      Tstr begin
+      Tsafe begin
         let conv acc = function
           | Lexicon_parser.Str s -> s
-          | Arg n -> Jg_runtime.string_of_tvalue (arg n)
-          | Declension (c, n) -> arg n |> Jg_runtime.string_of_tvalue |> Mutil.decline c
+          | Arg n ->
+            if autoescape then
+              match arg n with
+              | Tsafe s -> s
+              | x -> esc (Jg_runtime.string_of_tvalue x)
+            else
+              Jg_runtime.string_of_tvalue (arg n)
+          | Declension (c, n) -> arg n |> Jg_runtime.string_of_tvalue |> Mutil.decline c |> esc
           | Elision (s1, s2) ->
             let x = try unbox_string @@ arg "elision" with Not_found -> acc in
             if x <> ""
@@ -1134,7 +1157,7 @@ let trans (conf : Config.config) =
       Tfun begin fun ?(kwargs=[]) s ->
         let kwargs = List.rev_append kwargs kw in
         trad ~kwargs (unbox_string s) i end
-    | Tstr s -> trad ~kwargs s 0
+    | Tsafe s | Tstr s -> trad ~kwargs s 0
     | x -> Jingoo.Jg_types.failwith_type_error_1 "trans" x
   end
 
@@ -1144,7 +1167,7 @@ let log = func_arg1_no_kw @@ fun x -> print_endline @@ Jg_runtime.string_of_tval
 let alphabetic =
   func_arg2_no_kw @@ fun a b ->
   let str = function
-    | Tstr b -> b
+    | Tsafe b | Tstr b -> b
     | Tnull -> ""
     | _ -> failwith_type_error_2 "alphabetic" a b
   in
@@ -1154,6 +1177,7 @@ let module_CAST =
   let string =
     func_arg1_no_kw @@ function
     | Tstr _ as s -> s
+    | Tsafe s -> Tstr s
     | Tnull -> Tstr ""
     | Tint i -> Tstr (string_of_int i)
     | Tfloat f -> Tstr (string_of_float f)
@@ -1164,7 +1188,7 @@ let module_CAST =
     func_arg1_no_kw @@ function
     | Tint _ as i -> i
     | Tnull -> Tint 0
-    | Tstr i -> Tint (int_of_string i)
+    | Tstr i | Tsafe i -> Tint (int_of_string i)
     | Tfloat f -> Tint (int_of_float f)
     | Tbool true -> Tint 1
     | Tbool false -> Tint 0
@@ -1178,11 +1202,11 @@ let module_CAST =
 
 let module_GWDB conf base = begin
   let poi = func_arg1_no_kw @@ function
-    | Tstr i -> get_n_mk_person conf base (Gwdb.iper_of_string i)
+    | Tstr i | Tsafe i -> get_n_mk_person conf base (Gwdb.iper_of_string i)
     | x -> failwith_type_error_1 "GWDB.poi" x
   in
   let foi = func_arg1_no_kw @@ function
-    | Tstr i ->
+    | Tstr i | Tsafe i ->
       let i = Gwdb.ifam_of_string i in
       get_n_mk_family conf base i (Gwdb.foi base i)
     | x -> failwith_type_error_1 "GWDB.foi" x

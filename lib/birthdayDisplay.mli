@@ -1,16 +1,17 @@
 
-(** [gen_print conf base month (next,txt_of) dead_people] displays anniversaries for a given month separated by day.
-    If [dead_people] is true then displays birth/death anniversaries for dead people with death reason.
-    Otherwise displays birthdays for alive people. [next] is function that returns next person from iterator and [txt_of]
-    text/link that describes person's information *)
-val gen_print :
-  Config.config ->
-  Gwdb.base ->
-  int ->
-  (unit ->
-   Gwdb.person *
-   (Config.config -> Gwdb.base -> Gwdb.person -> string)) ->
-  bool -> unit
+(** [gen_print conf base month (next,txt_of) dead_people] displays anniversaries
+    for a given month separated by day.
+    If [dead_people] is true then displays birth/death anniversaries for dead people with death reason.
+    Otherwise displays birthdays for alive people.
+    [next] is function that returns next person from iterator
+    and [txt_of] text/link that describes person's information *)
+val gen_print
+  :  Config.config
+  -> Gwdb.base
+  -> int
+  -> (unit -> Gwdb.person * (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string))
+  -> bool
+  -> unit
 
 (** Displays birthdays for alive people for a given month *)
 val print_birth : Config.config -> Gwdb.base -> int -> unit
@@ -29,13 +30,12 @@ val print_marriage : Config.config -> Gwdb.base -> int -> unit
     - Form to select the month of birthdays we want to see.
     [next] is function that returns next person from iterator, [txt_of] text/link that
     describes person's information and [mode] that add some additional hidden inputs in the month form *)
-val gen_print_menu_birth :
-  Config.config ->
-  Gwdb.base ->
-  (unit ->
-   Gwdb.person *
-   (Config.config -> Gwdb.base -> Gwdb.person -> string)) ->
-  (unit -> 'a) -> unit
+val gen_print_menu_birth
+  :  Config.config
+  -> Gwdb.base
+  -> (unit -> Gwdb.person * (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string))
+  -> (unit -> 'a)
+  -> unit
 
 (** Displays the main birthdays menu considering all alive people *)
 val print_menu_birth : Config.config -> Gwdb.base -> unit
@@ -48,13 +48,12 @@ val print_menu_birth : Config.config -> Gwdb.base -> unit
     - Form to select the month of anniversaries we want to see.
     [next] is function that returns next person from iterator, [txt_of] text/link that
     describes person's information and [mode] that add some additional hidden inputs in the month form *)
-val gen_print_menu_dead :
-  Config.config ->
-  Gwdb.base ->
-  (unit ->
-   Gwdb.person *
-   (Config.config -> Gwdb.base -> Gwdb.person -> string)) ->
-  (unit -> 'a) -> unit
+val gen_print_menu_dead
+  :  Config.config
+  -> Gwdb.base
+  -> (unit -> Gwdb.person * (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string))
+  -> (unit -> 'a)
+  -> unit
 
 (** Displays the main anniversaries menu considering all dead people *)
 val print_menu_dead : Config.config -> Gwdb.base -> unit

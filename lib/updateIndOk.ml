@@ -29,7 +29,7 @@ let getn conf var key =
 let rec reconstitute_string_list conf var ext cnt =
   match get_nth conf var cnt with
     Some s ->
-      let s = no_html_tags (only_printable s) in
+      let s = only_printable s in
       let (sl, ext) = reconstitute_string_list conf var ext (cnt + 1) in
       begin match get_nth conf ("add_" ^ var) cnt with
         Some "on" -> s :: "" :: sl, true
@@ -72,7 +72,7 @@ let rec reconstitute_titles conf ext cnt =
         match get_nth conf "t_main_title" cnt, t_name with
           Some "on", _ -> Tmain
         | _, "" -> Tnone
-        | _, _ -> Tname (no_html_tags (only_printable t_name))
+        | _, _ -> Tname (only_printable t_name)
       in
       let t_date_start =
         Update.reconstitute_date conf ("t_date_start" ^ string_of_int cnt)
@@ -86,8 +86,8 @@ let rec reconstitute_titles conf ext cnt =
         | _ -> 0
       in
       let t =
-        {t_name = t_name; t_ident = no_html_tags (only_printable t_ident);
-         t_place = no_html_tags (only_printable t_place);
+        {t_name = t_name; t_ident = only_printable t_ident;
+         t_place = only_printable t_place;
          t_date_start = Adef.cdate_of_od t_date_start;
          t_date_end = Adef.cdate_of_od t_date_end; t_nth = t_nth}
       in
@@ -97,8 +97,8 @@ let rec reconstitute_titles conf ext cnt =
   | _ -> [], ext
 
 let reconstitute_somebody conf var =
-  let first_name = no_html_tags (only_printable (getn conf var "fn")) in
-  let surname = no_html_tags (only_printable (getn conf var "sn")) in
+  let first_name = only_printable (getn conf var "fn") in
+  let surname = only_printable (getn conf var "sn") in
   (* S'il y a des caractères interdits, on les supprime *)
   let (first_name, surname) =
     let contain_fn = String.contains first_name in
@@ -208,14 +208,14 @@ let rec reconstitute_pevents conf ext cnt =
         | "#slgs" -> Epers_ScellentSpouseLDS
         | "#vteb" -> Epers_VenteBien
         | "#will" -> Epers_Will
-        | n -> Epers_Name (no_html_tags (only_printable n))
+        | n -> Epers_Name (only_printable n)
       in
       let epers_date =
         Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
       in
       let epers_place =
         match get_nth conf "e_place" cnt with
-          Some place -> no_html_tags (only_printable place)
+          Some place -> only_printable place
         | _ -> ""
       in
       let epers_note =
@@ -583,8 +583,8 @@ let reconstitute_person conf =
     | Some s -> (try iper_of_string (String.trim s) with Failure _ -> dummy_iper)
     | _ -> dummy_iper
   in
-  let first_name = no_html_tags (only_printable (get conf "first_name")) in
-  let surname = no_html_tags (only_printable (get conf "surname")) in
+  let first_name = only_printable (get conf "first_name") in
+  let surname = only_printable (get conf "surname") in
   (* S'il y a des caractères interdits, on les supprime *)
   let (first_name, surname) =
     let contain_fn = String.contains first_name in
@@ -610,7 +610,7 @@ let reconstitute_person conf =
   let (surnames_aliases, ext) =
     reconstitute_string_list conf "surname_alias" ext 0
   in
-  let public_name = no_html_tags (only_printable (get conf "public_name")) in
+  let public_name = only_printable (get conf "public_name") in
   let (qualifiers, ext) = reconstitute_string_list conf "qualifier" ext 0 in
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
@@ -631,26 +631,26 @@ let reconstitute_person conf =
     | _ -> Neuter
   in
   let birth = Update.reconstitute_date conf "birth" in
-  let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
+  let birth_place = only_printable (get conf "birth_place") in
   let birth_note =
     only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "birth_note"))
   in
   let birth_src = only_printable (get conf "birth_src") in
   let bapt = Update.reconstitute_date conf "bapt" in
-  let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
+  let bapt_place = only_printable (get conf "bapt_place") in
   let bapt_note =
     only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "bapt_note"))
   in
   let bapt_src = only_printable (get conf "bapt_src") in
   let burial_place =
-    no_html_tags (only_printable (get conf "burial_place"))
+    only_printable (get conf "burial_place")
   in
   let burial_note =
     only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "burial_note"))
   in
   let burial_src = only_printable (get conf "burial_src") in
   let burial = reconstitute_burial conf burial_place in
-  let death_place = no_html_tags (only_printable (get conf "death_place")) in
+  let death_place = only_printable (get conf "death_place") in
   let death_note =
     only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "death_note"))
   in
@@ -721,10 +721,11 @@ let check_person conf base p =
 
 let error_person conf err =
   if not conf.api_mode then begin
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
+  let title _ = Output.print_sstring conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.print_string conf (Utf8.capitalize_fst @@ Update.string_of_error conf err);
-  Output.print_string conf "\n";
+  Output.print_sstring conf
+    (Utf8.capitalize_fst (Update.string_of_error conf err : Adef.safe_string :> string));
+  Output.print_sstring conf "\n";
   Update.print_return conf;
   Hutil.trailer conf;
   end ;
@@ -770,11 +771,11 @@ let default_prerr conf base = function
   | Update.UERR_sex_married p as err ->
     Update.prerr conf err @@ fun () ->
     Update.print_error conf err ;
-    Output.print_string conf "<ul><li>" ;
+    Output.print_sstring conf "<ul><li>" ;
     Output.print_string conf (Util.referenced_person_text conf base p) ;
-    Output.print_string conf "</li></ul>" ;
+    Output.print_sstring conf "</li></ul>" ;
     Update.print_return conf ;
-    Update.print_continue conf "nsck" "on"
+    Update.print_continue conf "nsck" (Adef.encoded "on")
   | _ -> assert false
 
 let check_sex_married ?(prerr = default_prerr) conf base sp op =
@@ -828,7 +829,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
     | _ ->
       rename_image_file conf base op sp
   end ;
-  if List.assoc_opt "nsck" conf.env <> Some "on"
+  if (List.assoc_opt "nsck" conf.env :> string option) <> Some "on"
   then check_sex_married ?prerr conf base sp op ;
   let created_p = ref [] in
   let np =
@@ -962,44 +963,44 @@ let effective_del conf base p =
   effective_del_no_commit base op;
   effective_del_commit conf base op
 
+let print_title conf fmt _ =
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
+
 let print_mod_ok conf base wl pgl p ofn osn oocc =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "person modified"))
-  in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "person modified";
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
-      Output.print_string conf "<h3 class=\"error\">";
+      Output.print_sstring conf "<h3 class=\"error\">";
       Output.printf conf (fcapitale (ftransl conf "%s forbidden char"))
         (List.fold_left (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") " "
            Name.forbidden_char);
-      Output.print_string conf "</h3>\n";
+      Output.print_sstring conf "</h3>\n";
       List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   (* Si on a supprimé des relations, on les mentionne *)
   begin match !deleted_relation with
     [] -> ()
   | _ ->
-      Output.print_string conf "<p>\n";
+      Output.print_sstring conf "<p>\n";
       Output.printf conf "%s, %s %s %s :"
         (Utf8.capitalize_fst (transl_nth conf "relation/relations" 0))
         (transl conf "first name missing") (transl conf "or")
         (transl conf "surname missing");
-      Output.print_string conf "<ul>\n";
+      Output.print_sstring conf "<ul>\n";
       List.iter
         (fun s ->
-           Output.print_string conf "<li>";
-           Output.print_string conf s;
-           Output.print_string conf "</li>")
+           Output.print_sstring conf "<li>";
+           Output.print_string conf (Util.escape_html s);
+           Output.print_sstring conf "</li>")
         !deleted_relation;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</p>\n"
+      Output.print_sstring conf "</ul>\n";
+      Output.print_sstring conf "</p>\n"
   end;
-  Output.printf conf "\n<p>%s</p>"
-    (referenced_person_text conf base (poi base p.key_index));
-  Output.print_string conf "\n";
+  Output.print_sstring conf "<p>" ;
+  Output.print_string conf (referenced_person_text conf base (poi base p.key_index));
+  Output.print_sstring conf "</p>" ;
   Update.print_warnings conf base wl;
   let pi = p.key_index in
   let np = poi base pi in
@@ -1008,10 +1009,10 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   let nocc = get_occ np in
   if pgl <> [] && (ofn <> nfn || osn <> nsn || oocc <> nocc) then
     begin
-      Output.print_string conf
-        "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
-      Output.printf conf (ftransl conf "name changed. update linked pages");
-      Output.print_string conf "</div>\n";
+      Output.print_sstring conf
+        {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
+      Output.print_sstring conf (transl conf "name changed. update linked pages");
+      Output.print_sstring conf "</div>\n";
       let soocc = if oocc <> 0 then Printf.sprintf "/%d" oocc else "" in
       let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
       Output.printf conf "<span class=\"unselectable float-left\">%s%s</span>\n\
@@ -1025,13 +1026,6 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
       NotesDisplay.print_linked_list conf base pgl
     end;
   Hutil.trailer conf
-
-(*
-value print_mod_ok conf base wl p =
-  if wl = [] then Perso.print conf base p
-  else print_mod_ok_aux conf base wl p
-;
-*)
 
 let relation_sex_is_coherent base warning p =
   List.iter
@@ -1068,8 +1062,7 @@ let all_checks_person base p a u =
   wl
 
 let print_add_ok conf base wl p =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "person added")) in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "person added" ;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
@@ -1079,40 +1072,30 @@ let print_add_ok conf base wl p =
       List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   (* Si on a supprimé des relations, on les mentionne *)
-  List.iter
-    (fun s -> Output.printf conf "%s -> %s\n" s (transl conf "forbidden char"))
-    !deleted_relation;
-  Output.printf conf "\n%s"
-    (referenced_person_text conf base (poi base p.key_index));
-  Output.print_string conf "\n";
+  List.iter begin fun s ->
+    Output.print_string conf (Util.escape_html s) ;
+    Output.print_sstring conf " -> " ;
+    Output.print_sstring conf (transl conf "forbidden char") ;
+    Output.print_sstring conf "\n"
+  end !deleted_relation;
+  Output.print_sstring conf "\n" ;
+  Output.print_string conf (referenced_person_text conf base (poi base p.key_index));
+  Output.print_sstring conf "\n";
   Update.print_warnings conf base wl;
   Hutil.trailer conf
 
-(*
-value print_add_ok conf base wl p =
-  if wl = [] then Perso.print conf base p
-  else print_add_ok_aux conf base wl p
-;
-*)
-
 let print_del_ok conf =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "person deleted"))
-  in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "person deleted";
   Hutil.print_link_to_welcome conf false;
   Hutil.trailer conf
 
 let print_change_event_order_ok conf base wl p =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "person modified"))
-  in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "person modified";
   Hutil.print_link_to_welcome conf true;
   Update.print_warnings conf base wl;
-  Output.printf conf "\n%s"
-    (referenced_person_text conf base (poi base p.key_index));
-  Output.print_string conf "\n";
+  Output.print_sstring conf "\n" ;
+  Output.print_string conf (referenced_person_text conf base (poi base p.key_index));
+  Output.print_sstring conf "\n";
   Hutil.trailer conf
 
 let print_add o_conf base =

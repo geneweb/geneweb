@@ -878,7 +878,7 @@ let read_or_create_value ?magic ?wait fname create =
   try read_or_create_channel ?magic ?wait fname read write
   with _ -> create ()
 
-let encode s =
+let encode s : Adef.encoded_string =
   let special = function
     | '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' | '{'
     | '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' | ':'
@@ -921,10 +921,12 @@ let encode s =
     else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
-  else s
+    let len = compute_len 0 0 in
+    Adef.encoded (copy_code_in (Bytes.create len) 0 0)
+  else Adef.encoded s
 
-let gen_decode strip_spaces s =
+let gen_decode strip_spaces (s : Adef.encoded_string) : string =
+  let s = (s :> string) in
   let hexa_val conf =
     match conf with
     | '0'..'9' -> Char.code conf - Char.code '0'
@@ -980,7 +982,7 @@ let gen_decode strip_spaces s =
     if strip_spaces then strip_heading_and_trailing_spaces s else s
   else s
 
-let decode = gen_decode true
+let decode : Adef.encoded_string -> string = gen_decode true
 
 let rec extract_param name stop_char =
   let case_unsensitive_eq s1 s2 =
@@ -1001,6 +1003,7 @@ let rec extract_param name stop_char =
   | [] -> ""
 
 let sprintf_date tm =
+  Adef.safe @@
   Printf.sprintf
     "%04d-%02d-%02d %02d:%02d:%02d"
     (1900 + tm.Unix.tm_year)

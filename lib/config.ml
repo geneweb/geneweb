@@ -32,6 +32,8 @@ type output_conf =
   ; flush : unit -> unit
   }
 
+type env = (string * Adef.encoded_string) list
+
 type config =
   { from : string;
     api_mode : bool;
@@ -98,7 +100,7 @@ type config =
   ; cgi : bool
   ; forced_plugins : string list
   ; plugins : string list
- }
+  }
 
 (**/**)
 (** A dummy {!type:config} value, with uninitialized fields.

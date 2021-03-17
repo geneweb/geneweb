@@ -17,6 +17,7 @@ let api = ref false
 let sosa = ref `None
 let gwdb = ref `None
 let syslog = ref false
+let safe_user_input = ref false
 
 let set_api () = api := true
 
@@ -28,6 +29,8 @@ let set_sosa_zarith () = assert (!sosa = `None) ; sosa := `Zarith
 
 let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
 
+let set_safe_user_input () = safe_user_input := true
+
 let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
 
 let release = ref true
@@ -35,28 +38,33 @@ let release = ref true
 let speclist =
   [ ( "--gwdb-legacy"
     , Arg.Unit set_gwdb_legacy
-    , "Use legacy backend" )
+    , " Use legacy backend" )
   ; ( "--release"
     , Arg.Set release
-    , "Use release profile: no debug informations \
+    , " Use release profile: no debug informations \
       (defaut: " ^ string_of_bool !release ^ ")" )
   ; ( "--debug"
     , Arg.Clear release
-    , "Use dev profile: no optimization, debug informations \
+    , " Use dev profile: no optimization, debug informations \
        (default: " ^ string_of_bool (not !release) ^ ")" )
   ; ( "--sosa-legacy"
     , Arg.Unit set_sosa_legacy
-    , "Use legacy Sosa module implementation" )
+    , " Use legacy Sosa module implementation" )
   ; ( "--sosa-num"
     , Arg.Unit set_sosa_num
-    , "Use Sosa module implementation based on `num` library" )
+    , " Use Sosa module implementation based on `num` library" )
   ; ( "--sosa-zarith"
     , Arg.Unit set_sosa_zarith
-    , "Use Sosa module implementation based on `zarith` library" )
+    , " Use Sosa module implementation based on `zarith` library" )
   ; ( "--syslog"
     , Arg.Unit set_syslog
-    , "Log gwd errors using syslog" )
+    , " Log gwd errors using syslog" )
+  ; ( "--safe-user-input"
+    , Arg.Unit set_safe_user_input
+    , " Check string escaping at compilation time" )
   ]
+  |> List.sort compare
+  |> Arg.align
 
 let () =
   Arg.parse speclist failwith errmsg ;
@@ -66,6 +74,11 @@ let () =
     match !syslog with
     | true -> " -D SYSLOG", "syslog"
     | false -> "", ""
+  in
+  let safe_user_input_d =
+    match !safe_user_input with
+    | true -> " -D SAFE_USER_INPUT"
+    | false -> ""
   in
   if !sosa = `None then begin
     if installed "zarith" then set_sosa_zarith ()
@@ -118,6 +131,7 @@ let () =
   var "OS_D" os_d ;
   var "SOSA_D" sosa_d ;
   var "SYSLOG_D" syslog_d ;
+  var "SAFE_USER_INPUT_D" safe_user_input_d ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
   var "SYSLOG_PKG" syslog_pkg ;

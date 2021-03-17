@@ -16,7 +16,6 @@
 been automatically disconnected.</p>
 <p>Contact the site administrator to restore it.</p>
 
-%copyright_nologo;
 </div>
 </body>
 </html>

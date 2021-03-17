@@ -44,8 +44,12 @@ val syntax_links : config -> wiki_info -> string -> string
 val html_of_tlsw : config -> string -> string list
 
 (** HTML displaying a table of content for a TLSW file *)
-val html_with_summary_of_tlsw :
-  config -> wiki_info -> (bool * string * string) option -> string -> string
+val html_with_summary_of_tlsw
+  : config
+  -> wiki_info
+  -> (bool * string * string) option
+  -> string
+  -> string
 
 (** [extract_sub_part tlsw i]
     Extracts the `i`th first TLSW sections of `tlsw` *)
@@ -62,21 +66,40 @@ val extract_sub_part : string -> int -> string list
 val split_title_and_text : string -> (string * string) list * string
 
 (** Prints an exctracted sub part *)
-val print_sub_part :
-  config -> wiki_info -> bool -> string -> string -> int -> string list ->
-  unit
+val print_sub_part
+  : config
+  -> wiki_info
+  -> bool
+  -> string
+  -> string
+  -> int
+  -> string list
+  -> unit
 
-(** Prints an editable part *)
-val print_mod_view_page :
-  config -> bool -> string -> string -> (bool -> unit) ->
-    (string * string) list -> string -> unit
+(** [print_mod_view_page conf can_edit mode fname title env s]
+    Prints an editable part *)
+val print_mod_view_page
+  : config                      (* conf *)
+  -> bool                       (* can_edit *)
+  -> Adef.encoded_string        (* mode *)
+  -> string                     (* fname *)
+  -> (bool -> unit)             (* title *)
+  -> (string * string) list     (* env *)
+  -> string                     (* s *)
+  -> unit
 
-(** Commits the changes of a page *)
-val print_mod_ok :
-  config -> wiki_info -> (string -> string option) ->
-    (string option -> string) ->
-    (string -> (string * string) list * string) ->
-    (string -> string -> unit) -> (string -> string) -> bool -> unit
+(** [print_mod_ok conf wi edit_mode fname read_string commit string_filter title_is_1st]
+    Commits the changes of a page *)
+val print_mod_ok
+  : config                                       (* conf *)
+  -> wiki_info                                   (* wi *)
+  -> (string -> string option)                   (* edit_mode *)
+  -> (string option -> string)                   (* fname *)
+  -> (string -> (string * string) list * string) (* read_string *)
+  -> (string -> string -> unit)                  (* commit *)
+  -> (string -> string)                          (* string_filter *)
+  -> bool                                        (* title_is_1st *)
+  -> unit
 
 (*S: shouldn't the following functions be defined elsewhere? *)
 
