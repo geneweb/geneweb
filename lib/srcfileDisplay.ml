@@ -144,70 +144,71 @@ let extract_date s =
 let string_of_start_date conf =
   let r = count conf in
   match extract_date r.start_date with
-    Some (d, m, y) ->
-      let d =
-        Dgreg
-          ({day = d; month = m; year = y; prec = Sure; delta = 0}, Dgregorian)
-      in
-      Util.translate_eval (DateDisplay.string_of_date conf d)
-  | _ -> r.start_date
+  | Some (d, m, y) ->
+    Dgreg ({day = d; month = m; year = y; prec = Sure; delta = 0}, Dgregorian)
+    |> DateDisplay.string_of_date conf
+  | _ -> Util.safe_html r.start_date
 
-let macro conf base =
-  function
-    'a' ->
-      begin match Util.find_sosa_ref conf base with
+let string_of_int_sep_aux conf n =
+  Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
+  |> Adef.safe
+
+let macro conf base = function
+  | 'a' ->
+    begin match Util.find_sosa_ref conf base with
         Some p -> referenced_person_title_text conf base p
-      | None -> ""
-      end
+      | None -> Adef.safe ""
+    end
   | 'b' ->
-      let s =
-        try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\"" with
-          Not_found -> ""
-      in
-      s ^ body_prop conf
-  | 'c' ->
-      let r = count conf in
-      Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") r.welcome_cnt
+    let s =
+      try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
+      with Not_found -> ""
+    in
+    Adef.safe (s ^ body_prop conf)
+  | 'c' -> string_of_int_sep_aux conf (count conf).welcome_cnt
   | 'd' -> string_of_start_date conf
-  | 'D' -> (count conf).start_date
-  | 'e' -> conf.charset
-  | 'f' -> conf.command
-  | 'g' -> Util.prefix_base conf
-  | 'i' -> conf.highlight
-  | 'k' -> conf.indep_command
-  | 'l' -> conf.lang
-  | 'L' -> conf.left
+  | 'D' -> Adef.safe (count conf).start_date
+  | 'e' -> Adef.safe conf.charset
+  | 'f' -> Adef.safe conf.command
+  | 'g' -> (Util.prefix_base conf :> Adef.safe_string)
+  | 'i' -> Adef.safe conf.highlight
+  | 'k' -> Adef.safe conf.indep_command
+  | 'l' -> Adef.safe conf.lang
+  | 'L' -> Adef.safe conf.left
   | 'm' ->
-      begin try
+    begin try
         let s = List.assoc "latest_event" conf.base_env in
-        if s = "" then "20" else s
-      with Not_found -> "20"
-      end
-  | 'n' ->
-      Mutil.string_of_int_sep
-        (Util.transl conf "(thousand separator)")
-        (nb_of_persons base)
-  | 'N' -> (try List.assoc "base_notes_title" conf.base_env with Not_found -> "")
-  | 'o' -> image_prefix conf
+        if s = "" then Adef.safe "20"
+        else (Util.escape_html s :> Adef.safe_string)
+      with Not_found -> Adef.safe "20"
+    end
+  | 'n' -> string_of_int_sep_aux conf (nb_of_persons base)
+  | 'N' ->
+    begin
+      try ( List.assoc "base_notes_title" conf.base_env
+            |> Util.escape_html
+            :> Adef.safe_string )
+      with Not_found -> Adef.safe ""
+    end
+  | 'o' -> (image_prefix conf :> Adef.safe_string)
   | 'q' ->
-      let r = count conf in
-      Mutil.string_of_int_sep
-        (Util.transl conf "(thousand separator)")
-        (r.welcome_cnt + r.request_cnt)
-  | 'R' -> conf.right
-  | 's' -> commd conf
-  | 't' -> conf.bname
-  | 'T' -> Util.doctype conf
+    let r = count conf in
+    string_of_int_sep_aux conf (r.welcome_cnt + r.request_cnt)
+  | 'R' -> Adef.safe conf.right
+  | 's' -> (commd conf :> Adef.safe_string)
+  | 't' -> (Adef.safe conf.bname)
+  | 'T' -> Util.doctype
   | 'U' ->
-      if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
-        ": " ^ conf.user
-      else ""
-  | 'v' -> Version.txt
+    if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
+    then Adef.safe (": " ^ conf.user)
+    else Adef.safe ""
+  | 'v' -> Adef.safe Version.txt
   | 'w' ->
-      let s = Hutil.link_to_referer conf in if s = "" then "&nbsp;" else s
-  | 'W' -> Util.get_referer conf
-  | '/' -> ""
-  | c -> "%" ^ String.make 1 c
+    let s = Hutil.link_to_referer conf in
+    if (s :> string) = "" then Adef.safe "&nbsp;" else s
+  | 'W' -> (Util.get_referer conf :> Adef.safe_string)
+  | '/' -> Adef.safe ""
+  | c -> Adef.safe ("%" ^ String.make 1 c)
 
 module Lbuff = Buff.Make (struct  end)
 
@@ -243,7 +244,7 @@ let rec lexicon_translate conf base nomin strm first_c =
                 let len =
                   if c = '%' then
                     let c = Stream.next strm in
-                    Lbuff.mstore len (macro conf base c)
+                    Lbuff.mstore len (macro conf base c : Adef.safe_string :> string)
                   else Lbuff.store len c
                 in
                 loop len
@@ -300,11 +301,11 @@ let rec copy_from_stream conf base strm mode =
     | 'n' -> not (base_notes_are_empty base "")
     | 'o' -> Sys.file_exists (WiznotesDisplay.dir conf base)
     | 'p' ->
-        begin match p_getenv conf.base_env (get_variable strm) with
+        begin match List.assoc_opt (get_variable strm) conf.base_env with
           Some "" | None -> false
         | Some _ -> true
         end
-    | 's' -> p_getenv conf.base_env (get_variable strm) <> Some "no"
+    | 's' -> List.assoc_opt (get_variable strm) conf.base_env <> Some "no"
     | 'w' -> conf.wizard
     | 'z' -> Util.find_sosa_ref conf base <> None
     | '|' ->
@@ -346,7 +347,7 @@ let rec copy_from_stream conf base strm mode =
             'I' -> push_echo (!echo && if_expr (Stream.next strm))
           | 'E' -> pop_echo ()
           | _ when not !echo -> ()
-          | '%' -> Output.print_string conf "%"
+          | '%' -> Output.print_sstring conf "%"
           | '[' | ']' -> Output.printf conf "%c" c
           | 'h' -> hidden_env conf
           | 'j' -> Templ.include_hed_trl conf "hed"
@@ -361,7 +362,7 @@ let rec copy_from_stream conf base strm mode =
                 loop 0
               in
               let lang_def = transl conf "!languages" in
-              Output.print_string conf (Translate.language_name lang lang_def)
+              Output.print_sstring conf (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =
                 try List.assoc (get_variable strm) conf.base_env with
@@ -387,12 +388,12 @@ and src_translate conf base nomin strm echo mode =
       in
       loop 0 0 (Stream.next strm)
     in
-    let (s, _) = Translate.inline conf.lang '%' (macro conf base) s in
+    let (s, _) = Translate.inline conf.lang '%' (macro conf base : char -> Adef.safe_string :> char -> string) s in
     if not !echo then ()
     else copy_from_stream conf base (Stream.of_string s) mode
   else
     let s = lexicon_translate conf base nomin strm c in
-    if not !echo then () else Output.print_string conf s
+    if !echo then Output.print_sstring conf s
 and copy_from_file conf base name mode =
   let fname =
     match mode with
@@ -407,34 +408,35 @@ and copy_from_channel conf base ic mode =
 and copy_from_string conf base str mode =
   copy_from_stream conf base (Stream.of_string str) mode
 
-let gen_print with_logo mode conf base fname =
+let gen_print mode conf base fname =
   let channel =
     match mode with
-      Lang ->
-        begin try Some (Secure.open_in (lang_file_name conf fname)) with
+    | Lang ->
+      begin try Some (Secure.open_in (lang_file_name conf fname)) with
           Sys_error _ ->
-            begin try Some (Secure.open_in (any_lang_file_name fname)) with
+          begin try Some (Secure.open_in (any_lang_file_name fname)) with
               Sys_error _ -> None
-            end
-        end
+          end
+      end
     | Source ->
-        try Some (Secure.open_in (source_file_name conf fname)) with
-          Sys_error _ -> None
+      try Some (Secure.open_in (source_file_name conf fname)) with
+        Sys_error _ -> None
   in
   match channel with
     Some ic ->
-      let title _ = Output.print_string conf fname in
-      Hutil.header_without_page_title conf title;
-      copy_from_channel conf base ic mode;
-      Hutil.gen_trailer with_logo conf
+    let title _ = Output.print_string conf (Util.escape_html fname) in
+    Hutil.header_without_page_title conf title;
+    copy_from_channel conf base ic mode;
+    Hutil.trailer conf
   | _ ->
-      let title _ = Output.print_string conf "Error" in
-      Hutil.header conf title;
-      Output.printf conf "<ul><li>Cannot access file \"%s.txt\"</ul>" @@ Util.escape_html fname;
-      Hutil.gen_trailer with_logo conf;
-      raise Exit
+    let title _ = Output.print_sstring conf "Error" in
+    Hutil.header conf title;
+    Output.print_sstring conf "<ul><li>Cannot access file \"" ;
+    Output.print_string conf (Util.escape_html fname) ;
+    Output.print_sstring conf ".txt\"</ul>" ;
+    Hutil.trailer conf
 
-let print_source = gen_print true Source
+let print_source = gen_print Source
 
 (* welcome page *)
 
@@ -496,12 +498,12 @@ let eval_var conf base env () _loc =
       begin match get_env "sosa_ref" env with
         Vsosa_ref v ->
           begin match Lazy.force v with
-            Some p -> VVstring (referenced_person_title_text conf base p)
+            Some p -> VVstring (referenced_person_title_text conf base p : Adef.safe_string :> string)
           | None -> raise Not_found
           end
       | _ -> raise Not_found
       end
-  | ["start_date"] -> VVstring (string_of_start_date conf)
+  | ["start_date"] -> VVstring (string_of_start_date conf : Adef.safe_string :> string)
   | ["wiznotes_dir_exists"] ->
       VVbool (Sys.file_exists (WiznotesDisplay.dir conf base))
   | _ -> raise Not_found
@@ -529,10 +531,12 @@ let print_start conf base =
 let print conf base fname =
   if Sys.file_exists (Util.etc_file_name conf fname) then
     Hutil.interp conf fname
-      {Templ.eval_var = eval_var conf base;
-       Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
-       Templ.eval_predefined_apply = eval_predefined_apply conf;
-       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-       Templ.print_foreach = print_foreach conf}
+      { Templ.eval_var = eval_var conf base
+      ; Templ.eval_transl = (fun _env -> Templ.eval_transl conf)
+      ; Templ.eval_predefined_apply = eval_predefined_apply conf
+      ; Templ.get_vother = get_vother
+      ; Templ.set_vother = set_vother
+      ; Templ.print_foreach = print_foreach conf
+      }
       [] ()
-  else gen_print true Lang conf base fname
+  else gen_print Lang conf base fname

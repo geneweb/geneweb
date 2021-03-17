@@ -32,8 +32,11 @@ val bpath : (string -> string) ref
     Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
 *)
 val output_error :
-  (?headers:string list ->
-   ?content:string -> Config.config -> Def.httpStatus -> unit)
+  (?headers:string list
+   -> ?content:Adef.safe_string
+   -> Config.config
+   -> Def.httpStatus
+   -> unit)
   ref
 
 (** Check if a person should be displayed or not *)
@@ -45,7 +48,11 @@ val syslog : (syslog_level -> string -> unit) ref
 (** [wrap_output conf title content]
     Wrap the display of [title] and [content] in a defined template.
 *)
-val wrap_output : (Config.config -> string -> (unit -> unit) -> unit) ref
+val wrap_output :
+  (Config.config
+   -> Adef.safe_string
+   -> (unit -> unit)
+   -> unit) ref
 
 module Default : sig
 
@@ -63,8 +70,11 @@ module Default : sig
   (** If [?content] is not set, sends page content from {/etc/<status-code>-<lang>.html}.
       If the current lang is not available, use `en` *)
   val output_error :
-    (?headers:string list ->
-     ?content:string -> Config.config -> Def.httpStatus -> unit)
+    (?headers:string list
+     -> ?content:Adef.safe_string
+     -> Config.config
+     -> Def.httpStatus
+     -> unit)
 
   (** Calculate the access rights to the person's information in
       according to his age.
@@ -90,6 +100,10 @@ module Default : sig
   val syslog : (syslog_level -> string -> unit)
 
   (** Display in a very basic HTML doc, with no CSS or JavaScript. *)
-  val wrap_output : (Config.config -> string -> (unit -> unit) -> unit)
+  val wrap_output :
+    (Config.config
+     -> Adef.safe_string
+     -> (unit -> unit)
+     -> unit)
 
 end

@@ -6,6 +6,12 @@ open Gwdb
 open Util
 open BirthDeath
 
+let month_txt conf d cal =
+  let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
+  (d : Adef.safe_string :> string)
+  |> Utf8.capitalize_fst
+  |> Adef.safe
+
 let print_birth conf base =
   let (list, len) =
     select_person conf base (fun p -> Adef.od_of_cdate (get_birth p)) false
@@ -15,172 +21,161 @@ let print_birth conf base =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<ul>\n";
-  let _ =
-    List.fold_left
-      (fun (last_month_txt, was_future) (p, d, cal) ->
-         let month_txt =
-           let d = {d with day = 0} in
-           Utf8.capitalize_fst (DateDisplay.string_of_date conf (Dgreg (d, cal)))
-         in
-         let future = Date.compare_dmy d conf.today = 1 in
-         if not future && was_future then
-           begin
-             Output.print_string conf "</li>\n</ul>\n</li>\n</ul>\n<p>\n<ul>\n";
-             Output.printf conf "<li>%s\n" month_txt;
-             Output.print_string conf "<ul>\n"
-           end
-         else if month_txt <> last_month_txt then
-           begin
-             if last_month_txt = "" then ()
-             else Output.print_string conf "</ul>\n</li>\n";
-             Output.printf conf "<li>%s\n" month_txt;
-             Output.print_string conf "<ul>\n"
-           end;
-         Output.print_string conf "<li>";
-         Output.print_string conf "<b>";
-         Output.print_string conf (referenced_person_text conf base p);
-         Output.print_string conf "</b>";
-         Output.print_string conf ",\n";
-         if future then
-           Output.printf conf "<em>%s</em>.\n"
-             (DateDisplay.string_of_date conf (Dgreg (d, cal)))
-         else
-           Output.printf conf "%s <em>%s</em>.\n"
-             (transl_nth conf "born" (index_of_sex (get_sex p)))
-             (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-         Output.print_string conf "</li>\n";
-         month_txt, future)
-      ("", false) list
-  in
-  Output.print_string conf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
-
+  Output.print_sstring conf "<ul>\n";
+  ignore @@ List.fold_left begin fun (last_month_txt, was_future) (p, d, cal) ->
+    let month_txt = month_txt conf d cal in
+    let future = Date.compare_dmy d conf.today = 1 in
+    if not future && was_future then
+      begin
+        Output.print_sstring conf "</li></ul></li></ul><p><ul><li>";
+        Output.print_string conf month_txt;
+        Output.print_sstring conf "<ul>"
+      end
+    else if month_txt <> last_month_txt then
+      begin
+        if (last_month_txt :> string) <> "" then  Output.print_sstring conf "</ul></li>";
+        Output.print_sstring conf "<li>" ;
+        Output.print_string conf month_txt;
+        Output.print_sstring conf "<ul>"
+      end;
+    Output.print_sstring conf "<li><b>";
+    Output.print_string conf (referenced_person_text conf base p);
+    Output.print_sstring conf "</b>, ";
+    if future then begin
+      Output.print_sstring conf "<em>" ;
+      Output.print_string conf (DateDisplay.string_of_date conf (Dgreg (d, cal))) ;
+      Output.print_sstring conf "</em>."
+    end else begin
+      Output.print_sstring conf (transl_nth conf "born" (index_of_sex (get_sex p))) ;
+      Output.print_sstring conf " <em>" ;
+      Output.print_string conf (DateDisplay.string_of_ondate conf (Dgreg (d, cal))) ;
+      Output.print_sstring conf "</em>."
+    end ;
+    Output.print_sstring conf "</li>";
+    month_txt, future
+  end (Adef.safe "", false) list ;
+  Output.print_sstring conf "</ul></li></ul>";
+  Hutil.trailer conf
 
 let print_death conf base =
   let (list, len) = select_person conf base death_date false in
   let title _ =
-    Output.printf conf (fcapitale (ftransl conf "the latest %t deaths"))
+    Printf.sprintf
+      (fcapitale (ftransl conf "the latest %t deaths"))
       (fun _ -> string_of_int len)
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  if list <> [] then
-    begin
-      Output.print_string conf "<ul>\n";
-      let (_, ages_sum, ages_nb) =
-        List.fold_left
-          (fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
-             let month_txt =
-               let d = {d with day = 0} in
-               Utf8.capitalize_fst (DateDisplay.string_of_date conf (Dgreg (d, cal)))
-             in
-             if month_txt <> last_month_txt then
-               begin
-                 if last_month_txt = "" then ()
-                 else Output.print_string conf "</ul>\n</li>\n";
-                 Output.printf conf "<li>%s\n" month_txt;
-                 Output.print_string conf "<ul>\n"
-               end;
-             let (age, ages_sum, ages_nb) =
-               let sure d = d.prec = Sure in
-               match Adef.od_of_cdate (get_birth p) with
-                 Some (Dgreg (d1, _)) ->
-                 if sure d1 && sure d && d1 <> d then
-                   let a = Date.time_elapsed d1 d in
-                   let ages_sum =
-                     match get_sex p with
-                       Male -> fst ages_sum + a.year, snd ages_sum
-                     | Female -> fst ages_sum, snd ages_sum + a.year
-                     | Neuter -> ages_sum
-                   in
-                   let ages_nb =
-                     match get_sex p with
-                       Male -> fst ages_nb + 1, snd ages_nb
-                     | Female -> fst ages_nb, snd ages_nb + 1
-                     | Neuter -> ages_nb
-                   in
-                   Some a, ages_sum, ages_nb
-                 else None, ages_sum, ages_nb
-               | _ -> None, ages_sum, ages_nb
-             in
-             Output.print_string conf "<li>";
-             Output.print_string conf "<b>";
-             Output.print_string conf (referenced_person_text conf base p);
-             Output.print_string conf "</b>";
-             Output.printf conf ", %s <em>%s</em>"
-               (transl_nth conf "died" (index_of_sex (get_sex p)))
-               (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-             begin match age with
-                 Some a ->
-                 Output.printf conf " <em>(%s)</em>" (DateDisplay.string_of_age conf a)
-               | None -> ()
-             end;
-             Output.print_string conf "</li>\n";
-             month_txt, ages_sum, ages_nb)
-          ("", (0, 0), (0, 0)) list
-      in
-      Output.print_string conf "</ul>\n</li>\n</ul>\n";
-      if fst ages_nb >= 3 then
-        Output.printf conf "%s (%s) : %s<br>\n"
-          (Utf8.capitalize_fst (transl conf "average age at death"))
-          (transl_nth conf "M/F" 0)
-          (DateDisplay.string_of_age conf
-             {day = 0; month = 0; year = fst ages_sum / fst ages_nb;
-              delta = 0; prec = Sure}) ;
-      if snd ages_nb >= 3 then
-        Output.printf conf "%s (%s) : %s<br>\n"
-          (Utf8.capitalize_fst (transl conf "average age at death"))
-          (transl_nth conf "M/F" 1)
-          (DateDisplay.string_of_age conf
-             {day = 0; month = 0; year = snd ages_sum / snd ages_nb;
-              delta = 0; prec = Sure});
-      Output.print_string conf "<br>\n";
-      Output.print_string conf "<div align=\"center\">\n";
-      Output.print_string conf "<hr width=\"50%%\">\n";
-      Output.print_string conf "</div>\n";
-      Output.print_string conf "<br>\n";
-      let by =
-        match p_getenv conf.env "by" with
-          Some s -> s
-        | None -> string_of_int conf.today.year
-      in
-      let bm =
-        match p_getenv conf.env "bm" with
-          Some s -> s
-        | None -> string_of_int conf.today.month
-      in
-      let bd =
-        match p_getenv conf.env "bd" with
-          Some s -> s
-        | None -> string_of_int conf.today.day
-      in
-      Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
-      Output.print_string conf "<p>\n";
-      Util.hidden_env conf;
-      Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"LD\">\n";
-      begin
-        let ds =
-          Printf.sprintf
-            "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\">" len
+  if list <> [] then begin
+    Output.print_sstring conf "<ul>";
+    let (_, ages_sum, ages_nb) =
+      List.fold_left begin fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
+        let month_txt = month_txt conf d cal in
+        if month_txt <> last_month_txt then begin
+          if (last_month_txt :> string) <> "" then Output.print_sstring conf "</ul>\n</li>\n";
+          Output.print_sstring conf "<li>" ;
+          Output.print_string conf month_txt;
+          Output.print_sstring conf "<ul>"
+        end ;
+        let (age, ages_sum, ages_nb) =
+          let sure d = d.prec = Sure in
+          match Adef.od_of_cdate (get_birth p) with
+          | Some (Dgreg (d1, _)) ->
+            if sure d1 && sure d && d1 <> d then
+              let a = Date.time_elapsed d1 d in
+              let ages_sum =
+                match get_sex p with
+                | Male -> fst ages_sum + a.year, snd ages_sum
+                | Female -> fst ages_sum, snd ages_sum + a.year
+                | Neuter -> ages_sum
+              in
+              let ages_nb =
+                match get_sex p with
+                | Male -> fst ages_nb + 1, snd ages_nb
+                | Female -> fst ages_nb, snd ages_nb + 1
+                | Neuter -> ages_nb
+              in
+              Some a, ages_sum, ages_nb
+            else None, ages_sum, ages_nb
+          | _ -> None, ages_sum, ages_nb
         in
-        Output.printf conf (fcapitale (ftransl conf "the latest %t deaths"))
-          (fun _ -> ds)
-      end;
-      Output.printf conf "\n... (%s...\n" (transl conf "before");
-      Output.printf conf
-        "<input name=\"by\" value=\"%s\" size=\"4\" maxlength=\"4\">\n" by;
-      Output.printf conf
-        "<input name=\"bm\" value=\"%s\" size=\"2\" maxlength=\"2\">\n" bm;
-      Output.printf conf
-        "<input name=\"bd\" value=\"%s\" size=\"2\" maxlength=\"2\">\n" bd;
-      Output.print_string conf ")\n";
-      Output.print_string conf
-        "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-      Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-      Output.print_string conf "</button>\n";
-      Output.print_string conf "</p>\n";
-      Output.print_string conf "</form>\n"
-    end;
+        Output.print_sstring conf "<li><b>";
+        Output.print_string conf (referenced_person_text conf base p);
+        Output.print_sstring conf "</b>, " ;
+        Output.print_sstring conf (transl_nth conf "died" (index_of_sex (get_sex p))) ;
+        Output.print_sstring conf " <em>" ;
+        Output.print_string conf (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
+        Output.print_sstring conf "</em>" ;
+        Opt.iter begin fun a ->
+          Output.print_sstring conf " <em>(" ;
+          Output.print_string conf (DateDisplay.string_of_age conf a) ;
+          Output.print_sstring conf ")</em>"
+        end age ;
+        Output.print_sstring conf "</li>";
+        month_txt, ages_sum, ages_nb
+      end (Adef.safe "", (0, 0), (0, 0)) list
+    in
+    Output.print_sstring conf "</ul></li></ul>";
+    let aux sex nb sum =
+      if nb >= 3 then begin
+        transl conf "average age at death"
+        |> Utf8.capitalize_fst
+        |> Output.print_sstring conf;
+        Output.print_sstring conf " (" ;
+        Output.print_sstring conf (transl_nth conf "M/F" sex) ;
+        Output.print_sstring conf ") : " ;
+        Output.print_string conf
+          (DateDisplay.string_of_age conf
+             {day = 0; month = 0; year = sum / nb; delta = 0; prec = Sure}) ;
+        Output.print_sstring conf "<br>"
+      end ;
+    in
+    aux 0 (fst ages_nb) (fst ages_sum) ;
+    aux 1 (snd ages_nb) (snd ages_sum) ;
+    Output.print_sstring conf {|<br><div align="center"><hr width="50%"></div><br>|};
+    let aux name def =
+      string_of_int @@
+      match p_getenv conf.env name with
+      | Some s -> int_of_string s
+      | None -> def
+    in
+    let by = aux "by" conf.today.year in
+    let bm = aux "bm" conf.today.month in
+    let bd = aux "bd" conf.today.day in
+    Output.print_sstring conf {|<form method="get" action="|} ;
+    Output.print_sstring conf conf.command ;
+    Output.print_sstring conf {|"><p>|};
+    Util.hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded "LD") ;
+    Output.print_sstring conf @@
+    Printf.sprintf
+      (fcapitale (ftransl conf "the latest %t deaths"))
+      (fun _ -> {|<input name="k" value="|} ^ string_of_int len ^ {|" size="4" maxlength="4">|}) ;
+    Output.print_sstring conf "\n... (" ;
+    Output.print_sstring conf (transl conf "before") ;
+    Output.print_sstring conf "...\n";
+    let aux name value size =
+      Output.print_sstring conf {|<input name="|} ;
+      Output.print_sstring conf name ;
+      Output.print_sstring conf {|" value="|} ;
+      Output.print_sstring conf value ;
+      Output.print_sstring conf {|" size="|} ;
+      Output.print_sstring conf size ;
+      Output.print_sstring conf {|" maxlength="|} ;
+      Output.print_sstring conf size ;
+      Output.print_sstring conf {|">|} ;
+    in
+    aux "by" by "4" ;
+    aux "bm" bm "2" ;
+    aux "bd" bd "2" ;
+    Output.print_sstring conf ")";
+    Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg">|} ;
+    transl_nth conf "validate/delete" 0
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf "</button></p></form>"
+  end;
   Hutil.trailer conf
 
 let print_oldest_alive conf base =
@@ -201,27 +196,29 @@ let print_oldest_alive conf base =
   in
   let (list, len) = select_person conf base get_oldest_alive true in
   let title _ =
-    Output.printf conf
-      (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
+    Printf.sprintf (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<ul>\n";
-  List.iter
-    (fun (p, d, cal) ->
-       Output.print_string conf "<li>\n";
-       Output.printf conf "<b>%s</b>,\n" (referenced_person_text conf base p);
-       Output.printf conf "%s <em>%s</em>"
-         (transl_nth conf "born" (index_of_sex (get_sex p)))
-         (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-       if get_death p = NotDead && d.prec = Sure then
-         begin let a = Date.time_elapsed d conf.today in
-           Output.printf conf " <em>(%s)</em>" (DateDisplay.string_of_age conf a)
-         end;
-       Output.print_string conf ".";
-       Output.print_string conf "</li>\n")
-    list;
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "<ul>\n";
+  List.iter begin fun (p, d, cal) ->
+    Output.print_sstring conf "<li><b>" ;
+    Output.print_string conf (referenced_person_text conf base p) ;
+    Output.print_sstring conf "</b>, " ;
+    Output.print_sstring conf (transl_nth conf "born" (index_of_sex (get_sex p))) ;
+    Output.print_sstring conf " <em>" ;
+    Output.print_string conf (DateDisplay.string_of_ondate conf (Dgreg (d, cal))) ;
+    Output.print_sstring conf "</em>" ;
+    if get_death p = NotDead && d.prec = Sure then begin
+      let a = Date.time_elapsed d conf.today in
+      Output.print_sstring conf " <em>(" ;
+      Output.print_string conf (DateDisplay.string_of_age conf a) ;
+      Output.print_sstring conf ")</em>" ;
+    end ;
+    Output.print_sstring conf ".</li>"
+  end list;
+  Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
 let print_longest_lived conf base =
@@ -239,181 +236,148 @@ let print_longest_lived conf base =
   in
   let (list, len) = select_person conf base get_longest false in
   let title _ =
-    Output.printf conf (fcapitale (ftransl conf "the %d who lived the longest"))
-      len
+    Printf.sprintf (fcapitale (ftransl conf "the %d who lived the longest")) len
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<ul>\n";
-  List.iter
-    (fun (p, d, _) ->
-       Output.print_string conf "<li>\n";
-       Output.print_string conf "<strong>\n";
-       Output.print_string conf (referenced_person_text conf base p);
-       Output.printf conf "</strong>%s" (DateDisplay.short_dates_text conf base p);
-       Output.printf conf "\n(%d %s)" d.year (transl conf "years old");
-       Output.print_string conf ".";
-       Output.print_string conf "</li>\n")
-    list;
-  Output.print_string conf "</ul>\n\n";
+  Output.print_sstring conf "<ul>";
+  List.iter begin fun (p, d, _) ->
+    Output.print_sstring conf "<li><strong>";
+    Output.print_string conf (referenced_person_text conf base p);
+    Output.print_sstring conf "</strong>";
+    Output.print_string conf (DateDisplay.short_dates_text conf base p);
+    Output.print_sstring conf " (" ;
+    Output.print_sstring conf (string_of_int d.year) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (transl conf "years old") ;
+    Output.print_sstring conf ")"  ;
+    Output.print_sstring conf ".";
+    Output.print_sstring conf "</li>"
+  end list;
+  Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
 let print_marr_or_eng conf base title list =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<ul>\n";
-  let _ =
-    List.fold_left
-      (fun (last_month_txt, was_future) (fam, d, cal) ->
-         let month_txt =
-           let d = {d with day = 0} in
-           Utf8.capitalize_fst (DateDisplay.string_of_date conf (Dgreg (d, cal)))
-         in
-         let future = Date.compare_dmy d conf.today > 0 in
-         if not future && was_future then
-           begin
-             Output.print_string conf "</ul>\n</li>\n</ul>\n<ul>\n";
-             Output.printf conf "<li>%s\n" month_txt;
-             Output.print_string conf "<ul>\n"
-           end
-         else if month_txt <> last_month_txt then
-           begin
-             if last_month_txt = "" then ()
-             else Output.print_string conf "</ul>\n</li>\n";
-             Output.printf conf "<li>%s\n" month_txt;
-             Output.print_string conf "<ul>\n"
-           end;
-         Output.print_string conf "<li>";
-         Output.print_string conf "<b>";
-         Output.print_string conf
-           (referenced_person_text conf base
-              (pget conf base (get_father fam)));
-         Output.print_string conf "</b>\n";
-         Output.printf conf "%s\n" (transl_nth conf "and" 0);
-         Output.print_string conf "<b>";
-         Output.print_string conf
-           (referenced_person_text conf base
-              (pget conf base (get_mother fam)));
-         Output.print_string conf "</b>";
-         Output.print_string conf ",\n";
-         if future then
-           Output.printf conf "<em>%s</em>."
-             (DateDisplay.string_of_date conf (Dgreg (d, cal)))
-         else
-           Output.printf conf "%s <em>%s</em>."
-             (match get_relation fam with
-                NotMarried | NoSexesCheckNotMarried ->
-                transl_nth conf "relation/relations" 0
-              | Married | NoSexesCheckMarried -> transl conf "married"
-              | Engaged -> transl conf "engaged"
-              | MarriageBann
-              | MarriageContract
-              | MarriageLicense
-              | Pacs
-              | Residence
-              | NoMention -> "")
-             (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-         Output.print_string conf "</li>\n";
-         month_txt, future)
-      ("", false) list
-  in
-  Output.print_string conf "</ul>\n</li>\n</ul>\n"; Hutil.trailer conf
+  Output.print_sstring conf "<ul>\n";
+  ignore @@ List.fold_left begin fun (last_month_txt, was_future) (fam, d, cal) ->
+    let month_txt = month_txt conf d cal in
+    let future = Date.compare_dmy d conf.today > 0 in
+    if not future && was_future then begin
+      Output.print_sstring conf "</ul></li></ul><ul><li>" ;
+      Output.print_string conf month_txt;
+      Output.print_sstring conf "<ul>"
+    end else if month_txt <> last_month_txt then
+      begin
+        if (last_month_txt :> string) = "" then Output.print_sstring conf "</ul></li>";
+        Output.print_sstring conf "<li>" ;
+        Output.print_string conf month_txt;
+        Output.print_sstring conf "<ul>"
+      end;
+    Output.print_sstring conf "<li><b>";
+    Output.print_string conf
+      (referenced_person_text conf base (pget conf base (get_father fam)));
+    Output.print_sstring conf "</b> ";
+    Output.print_sstring conf (transl_nth conf "and" 0);
+    Output.print_sstring conf " <b>";
+    Output.print_string conf
+      (referenced_person_text conf base (pget conf base (get_mother fam)));
+    Output.print_sstring conf "</b>, ";
+    if future then begin
+      Output.print_sstring conf "<em>";
+      Output.print_string conf (DateDisplay.string_of_date conf (Dgreg (d, cal))) ;
+      Output.print_sstring conf "</em>";
+    end else begin
+        begin match get_relation fam with
+        | NotMarried | NoSexesCheckNotMarried ->
+          Output.print_sstring conf @@ transl_nth conf "relation/relations" 0
+        | Married | NoSexesCheckMarried ->
+          Output.print_sstring conf @@ transl conf "married"
+        | Engaged ->
+          Output.print_sstring conf @@ transl conf "engaged"
+        | MarriageBann
+        | MarriageContract
+        | MarriageLicense
+        | Pacs
+        | Residence
+        | NoMention -> ()
+      end ;
+      Output.print_sstring conf " <em>" ;
+      Output.print_string conf (DateDisplay.string_of_ondate conf (Dgreg (d, cal))) ;
+      Output.print_sstring conf "</em>."
+    end ;
+    Output.print_sstring conf "</li>";
+    month_txt, future
+  end (Adef.safe "", false) list ;
+  Output.print_sstring conf "</ul></li></ul>";
+  Hutil.trailer conf
 
 let print_marriage conf base =
   let (list, len) =
-    select_family conf base
-      (fun fam ->
-         let rel = get_relation fam in
-         if rel = Married || rel = NoSexesCheckMarried then
-           Adef.od_of_cdate (get_marriage fam)
-         else None)
-      false
+    select_family conf base begin fun fam ->
+      let rel = get_relation fam in
+      if rel = Married || rel = NoSexesCheckMarried then
+        Adef.od_of_cdate (get_marriage fam)
+      else None end false
   in
   let title _ =
-    Output.printf conf (fcapitale (ftransl conf "the latest %d marriages")) len
+    Printf.sprintf (fcapitale (ftransl conf "the latest %d marriages")) len
+    |> Output.print_sstring conf
   in
   print_marr_or_eng conf base title list
 
 let print_oldest_engagements conf base =
   let (list, len) =
-    select_family conf base
-      (fun fam ->
-         if get_relation fam = Engaged then
-           let husb = pget conf base (get_father fam) in
-           let wife = pget conf base (get_mother fam) in
-           match get_death husb, get_death wife with
-             (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-             Adef.od_of_cdate (get_marriage fam)
-           | _ -> None
-         else None)
-      true
+    select_family conf base begin fun fam ->
+      if get_relation fam = Engaged then
+        let husb = pget conf base (get_father fam) in
+        let wife = pget conf base (get_mother fam) in
+        match get_death husb, get_death wife with
+        | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
+          Adef.od_of_cdate (get_marriage fam)
+        | _ -> None
+      else None
+    end true
   in
   let title _ =
-    Output.printf conf
-      (fcapitale
-         (ftransl conf
-            "the %d oldest couples perhaps still alive and engaged"))
+    Printf.sprintf
+      (fcapitale (ftransl conf "the %d oldest couples perhaps still alive and engaged"))
       len
+    |> Output.print_sstring conf
   in
   print_marr_or_eng conf base title list
 
 let old_print_statistics conf =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "statistics")) in
+  let title _ = transl conf "statistics" |> Utf8.capitalize_fst |> Output.print_sstring conf in
   let n =
-    try int_of_string (List.assoc "latest_event" conf.base_env) with
-      Not_found | Failure _ -> 20
+    try int_of_string (List.assoc "latest_event" conf.base_env)
+    with Not_found | Failure _ -> 20
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<ul>\n";
-  if conf.wizard || conf.friend then
-    begin
-      begin
-        Output.print_string conf "<li>";
-        Output.printf conf "<a href=\"%sm=LB&k=%d\">" (commd conf) n;
-        Output.printf conf (ftransl conf "the latest %d births") n;
-        Output.print_string conf "</a>";
-        Output.print_string conf "</li>\n"
-      end;
-      begin
-        Output.print_string conf "<li>";
-        Output.printf conf "<a href=\"%sm=LD&k=%d\">" (commd conf) n;
-        Output.printf conf (ftransl conf "the latest %t deaths")
-          (fun _ -> string_of_int n);
-        Output.print_string conf "</a>";
-        Output.print_string conf "</li>\n"
-      end;
-      begin
-        Output.print_string conf "<li>";
-        Output.printf conf "<a href=\"%sm=LM&k=%d\">" (commd conf) n;
-        Output.printf conf (ftransl conf "the latest %d marriages") n;
-        Output.print_string conf "</a>";
-        Output.print_string conf "</li>\n"
-      end;
-      begin
-        Output.print_string conf "<li>";
-        Output.printf conf "<a href=\"%sm=OE&k=%d\">" (commd conf) n;
-        Output.printf conf
-          (ftransl conf
-             "the %d oldest couples perhaps still alive and engaged")
-          n;
-        Output.print_string conf "</a>";
-        Output.print_string conf "</li>\n"
-      end;
-      begin
-        Output.print_string conf "<li>";
-        Output.printf conf "<a href=\"%sm=OA&k=%d&lim=0\">" (commd conf) n;
-        Output.printf conf (ftransl conf "the %d oldest perhaps still alive") n;
-        Output.print_string conf "</a>";
-        Output.print_string conf "</li>\n"
-      end
-    end;
-  Output.print_string conf "<li>";
-  Output.printf conf "<a href=\"%sm=LL&k=%d\">" (commd conf) n;
-  Output.printf conf (ftransl conf "the %d who lived the longest") n;
-  Output.print_string conf "</a>";
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "<ul>";
+  let aux m label =
+    Output.print_sstring conf {|<li><a href="|} ;
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf {|m=|} ;
+    Output.print_sstring conf m ;
+    Output.print_sstring conf {|&k=|} ;
+    Output.print_sstring conf (string_of_int n) ;
+    Output.print_sstring conf {|">|} ;
+    Output.print_sstring conf (Printf.sprintf (ftransl conf label) n) ;
+    Output.print_sstring conf {|</a></li>|} ;
+  in
+  if conf.wizard || conf.friend then begin
+    aux "LB" "the latest %d births" ;
+    aux "LD" "the latest %d deaths" ; (* FIXME *)
+    aux "LM" "the latest %d marriages" ;
+    aux "OE" "the %d oldest couples perhaps still alive and engaged" ;
+    aux "OA" "the %d oldest perhaps still alive" ;
+  end ;
+  aux "LL" "the %d who lived the longest" ;
+  Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf
 
 (* *)
@@ -462,23 +426,34 @@ let print_population_pyramid conf base =
     Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   in
   let title _ =
-    Output.printf conf "%s (%d)" (Utf8.capitalize_fst (transl conf "population pyramid"))
-      at_year
+    transl conf "population pyramid"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf " (" ;
+    Output.print_sstring conf (string_of_int at_year) ;
+    Output.print_sstring conf ")"
   in
   let print_image doit sex iname =
-    Output.print_string conf "<td>";
-    if doit then
-      Output.printf conf "<img src=\"%s/%s\" alt=\"%s\" title=\"%s\">\n"
-        (Util.image_prefix conf) iname (transl_nth conf "M/F" sex)
-        (transl_nth conf "M/F" sex)
-    else Output.print_string conf "&nbsp;";
-    Output.print_string conf "</td>\n"
+    Output.print_sstring conf "<td>";
+    if doit then begin
+      Output.print_sstring conf {|<img src="|} ;
+      Output.print_string conf (Util.image_prefix conf) ;
+      Output.print_sstring conf "/" ;
+      Output.print_string conf iname ;
+      Output.print_sstring conf {|" alt="|} ;
+      Output.print_sstring conf (transl_nth conf "M/F" sex) ;
+      Output.print_sstring conf {|" title="|} ;
+      Output.print_sstring conf (transl_nth conf "M/F" sex) ;
+      Output.print_sstring conf {|">|}
+    end else Output.print_sstring conf "&nbsp;";
+    Output.print_sstring conf "</td>"
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
-    let max_wom = Array.fold_left max 0 wom in max 1 (max max_men max_wom)
+    let max_wom = Array.fold_left max 0 wom in
+    max 1 (max max_men max_wom)
   in
   let max_size = 70 in
   let band_size n = (2 * max_size * n + max_hum) / (2 * max_hum) in
@@ -490,101 +465,68 @@ let print_population_pyramid conf base =
     in
     loop nb_intervals
   in
-  Output.print_string conf "<div>\n";
-  begin let c = " cellspacing=\"0\" cellpadding=\"0\"" in
-    Output.printf conf
-      "<table id=\"table_pop_pyr\" border=\"%d\"%s style=\"margin: auto\">\n"
-      conf.border c;
+  Output.print_sstring conf "<div>\n";
+  begin
+    Output.print_sstring conf {|<table id="table_pop_pyr" border="|} ;
+    Output.print_sstring conf (string_of_int conf.border) ;
+    Output.print_sstring conf {|" cellspacing="0" cellpadding="0" style="margin:auto">|} ;
     for i = first_interv downto 0 do
       let nb_men = men.(i) in
       let nb_wom = wom.(i) in
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td class=\"pyramid_year\">";
-      Output.printf conf "%d" (at_year - i * interval);
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>";
-      Output.print_string conf "&nbsp;";
-      Output.print_string conf "</td>\n";
-      print_image (i = 0) 0 "male.png";
-      Output.print_string conf "<td>";
-      Output.print_string conf "&nbsp;";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td align=\"right\">\n";
-      Output.printf conf "<table %s>\n" c;
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td class=\"pyramid_nb\">";
-      if nb_men <> 0 then Output.printf conf "%d" nb_men;
-      Output.print_string conf "&nbsp;";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>";
-      if nb_men = 0 then ()
-      else
-        begin let n = max 1 (band_size nb_men) in
-          (* On multiplie par 3 parce que c'est *)
-          (* la largeur de l'image : 3 x 14     *)
-          Output.printf conf
-            "<img src=\"images/pyr_male.png\" width=%d height=%d />" (n * 3)
-            14
-        end;
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n";
-      Output.print_string conf "</table>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td align=\"center\">";
-      if i = nb_intervals then Output.print_string conf "&nbsp;"
-      else Output.printf conf "%d" ((i + 1) * interval);
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td align=\"left\">\n";
-      Output.printf conf "<table %s>\n" c;
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td>";
-      if nb_wom = 0 then ()
-      else
-        begin let n = max 1 (band_size nb_wom) in
-          (* On multiplie par 3 parce que c'est *)
-          (* la largeur de l'image : 3 x 14     *)
-          Output.printf conf
-            "<img src=\"images/pyr_female.png\" width=%d height=%d />" (n * 3)
-            14
-        end;
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td class=\"pyramid_nb\">";
-      Output.print_string conf "&nbsp;";
-      if nb_wom <> 0 then Output.printf conf "%d" nb_wom;
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n";
-      Output.print_string conf "</table>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>";
-      Output.print_string conf "&nbsp;";
-      Output.print_string conf "</td>\n";
-      print_image (i = 0) 1 "female.png";
-      Output.print_string conf "<td>";
-      Output.print_string conf "&nbsp;";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td class=\"pyramid_year\">";
-      Output.printf conf "%d" (at_year - i * interval);
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n"
+      Output.print_sstring conf "<tr><td class=\"pyramid_year\">";
+      Output.print_sstring conf (string_of_int @@ at_year - i * interval);
+      Output.print_sstring conf "</td><td>&nbsp;</td>";
+      print_image (i = 0) 0 (Adef.safe "male.png");
+      Output.print_sstring conf "<td>&nbsp;</td><td align=\"right\">\n";
+      Output.printf conf {|<table cellspacing="0" cellpadding="0"><tr><td class="pyramid_nb">|};
+      if nb_men <> 0 then Output.print_sstring conf (string_of_int nb_men);
+      Output.print_sstring conf "&nbsp;</td><td>";
+      let aux_img nb img =
+        if nb <> 0 then begin
+          let n = max 1 (band_size nb) in
+          Output.print_sstring conf {|<img src="images/|} ;
+          Output.print_string conf img ;
+          Output.print_sstring conf {|" width="|} ;
+          Output.print_sstring conf (string_of_int @@ n * 3) ;
+          Output.print_sstring conf {|" height="14">|}
+        end
+      in
+      aux_img nb_men (Adef.encoded "pyr_male.png") ;
+      Output.print_sstring conf {|</td></tr></table></td><td align="center">|};
+      if i = nb_intervals then Output.print_sstring conf "&nbsp;"
+      else Output.print_sstring conf (string_of_int @@ (i + 1) * interval);
+      Output.print_sstring conf
+        {|</td><td align="left"><table cellspacing="0" cellpadding="0"><tr><td>|};
+      aux_img nb_wom (Adef.encoded "pyr_female.png") ;
+      Output.print_sstring conf {|</td><td class="pyramid_nb">&nbsp;|};
+      if nb_wom <> 0 then Output.print_sstring conf (string_of_int nb_wom);
+      Output.print_sstring conf "</td></tr></table></td><td>&nbsp;</td>\n";
+      print_image (i = 0) 1 (Adef.safe "female.png");
+      Output.print_sstring conf {|<td>&nbsp;</td><td class="pyramid_year">|};
+      Output.print_sstring conf (string_of_int @@ at_year - i * interval);
+      Output.print_sstring conf "</td></tr>"
     done;
-    Output.print_string conf "</table id=\"table_pop_pyr\">\n"
+    Output.print_sstring conf "</table>"
   end;
-  Output.print_string conf "</div>\n";
+  Output.print_sstring conf "</div>";
   let sum_men = Array.fold_left (+) 0 men in
   let sum_wom = Array.fold_left (+) 0 wom in
-  Output.print_string conf "<p>\n";
-  Output.printf conf "%s %s" (Utf8.capitalize_fst (transl conf "number of living persons:"))
-    (string_of_nb (sum_men + sum_wom));
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "<p>\n";
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" (commd conf);
+  Output.print_sstring conf "<p>";
+  transl conf "number of living persons:"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
+  Output.print_sstring conf {|</p><p><form method="get" action="|};
+  Output.print_string conf (commd conf);
+  Output.print_sstring conf {|">|} ;
   hidden_env conf;
-  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"POP_PYR\">\n";
-  Output.printf conf "<input type=\"hidden\" name=\"int\" value=\"%d\">\n"
-    interval;
-  Output.printf conf "<input type=\"hidden\" name=\"lim\" value=\"%d\">\n" limit;
-  Output.printf conf "%s\n" (transl_nth conf "year/month/day" 0);
-  Output.printf conf "<input name=\"y\" value=\"%d\" size=\"5\">\n" at_year;
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "</p>\n";
+  Util.hidden_input conf "m" (Adef.encoded "POP_PYR") ;
+  Util.hidden_input conf "int" (Adef.encoded @@ string_of_int interval) ;
+  Util.hidden_input conf "lim" (Adef.encoded @@ string_of_int limit) ;
+  Output.print_sstring conf (transl_nth conf "year/month/day" 0) ;
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf {|<input name="y" value="|} ;
+  Output.print_sstring conf (string_of_int at_year) ;
+  Output.print_sstring conf {|" size="5"></form></p>|};
   Hutil.trailer conf

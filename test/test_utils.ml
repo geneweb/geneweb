@@ -109,19 +109,23 @@ let util_name_with_roman_number _ =
   test (Some "bar CLX baz CCVII") "bar 160 baz 207" ;
   test None "foo bar baz"
 
+let printer_safe x = (x : Adef.safe_string :> string)
+let printer_encoded x = (x : Adef.encoded_string :> string)
+let printer_escaped x = (x : Adef.escaped_string :> string)
+
 let util_safe_html _ =
   assert_equal
-    ~printer:(fun x -> x)
-    {|<a href="localhost:2318/foo_w?lang=fr&#38;acte=123">foo</a>|}
+    ~printer:printer_safe
+    (Adef.safe {|<a href="localhost:2318/foo_w?lang=fr&#38;acte=123">foo</a>|})
     (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&acte=123">foo</a>|}) ;
   assert_equal
-    ~printer:(fun x -> x)
-    {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
+    ~printer:printer_safe
+    (Adef.safe {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|})
     (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|})
 
 let util_transl_a_of_b _ =
   let conf = Config.empty in
-  let conf = {conf with env = ("lang", "fr") :: conf.env} in
+  let conf = {conf with env = ("lang", Adef.encoded "fr") :: conf.env} in
   let _ = Hashtbl.add conf.lexicon "%1 of %2" "%1 d[e |']%2" in
   let test aaa (s1, s2, s2_raw) =
     let bbb = Util.transl_a_of_b conf s1 s2 s2_raw in
@@ -137,15 +141,15 @@ let util_string_with_macros _ =
     {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
     (Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
 
-let util_no_html_tags _ =
+let util_escape_html _ =
   assert_equal
-    ~printer:(fun s -> s)
-    {|&lt;a href="mailto:jean@dupond.net"&gt;jean@dupond.net&lt;/a&gt; - le 1 &amp; 2|}
-    (Util.no_html_tags {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|})
+    ~printer:printer_escaped
+    (Adef.escaped {|&#60;a href=&#34;mailto:jean@dupond.net&#34;&#62;jean@dupond.net&#60;/a&#62; - le 1 &#38;amp; 2|})
+    (Util.escape_html {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|})
 
 let datedisplay_string_of_date _ =
   let conf = Config.empty in
-  let conf = {conf with env = ("lang", "co") :: conf.env} in
+  let conf = {conf with env = ("lang", Adef.encoded "co") :: conf.env} in
   let _ = Hashtbl.add conf.lexicon "(date)"
     "1<sup>u</sup> d[i |']%m %y/%d d[i |']%m %y/d[i |']%m %y/in u %y"
   in
@@ -155,21 +159,20 @@ let datedisplay_string_of_date _ =
  let test aaa cal (d, m, y) =
     let date = Dgreg ({day = d; month = m; year = y; prec = Sure; delta = 0}, cal) in
     let bbb = DateDisplay.string_of_date conf date in
-    let _ = if not (aaa = bbb) then Printf.eprintf "\n%s\n" bbb else () in
     assert_equal aaa bbb
   in
-    test "4 d'aostu 1974" Dgregorian (4, 8, 1974)
-  ; test "4 di sittembre 1974" Dgregorian (4, 9, 1974)
-  ; test "1<sup>u</sup> di ferraghju 1974" Dgregorian (1, 2, 1974)
-  ; test "di marzu 1974" Dgregorian (0, 3, 1974)
-  ; test "d'aprile 1974" Dgregorian (0, 4, 1974)
-  ; test "in u 1974" Dgregorian (0, 0, 1974)
+    test (Adef.safe "4 d'aostu 1974") Dgregorian (4, 8, 1974)
+  ; test (Adef.safe "4 di sittembre 1974") Dgregorian (4, 9, 1974)
+  ; test (Adef.safe "1<sup>u</sup> di ferraghju 1974") Dgregorian (1, 2, 1974)
+  ; test (Adef.safe "di marzu 1974") Dgregorian (0, 3, 1974)
+  ; test (Adef.safe "d'aprile 1974") Dgregorian (0, 4, 1974)
+  ; test (Adef.safe "in u 1974") Dgregorian (0, 0, 1974)
   ; let _ = Hashtbl.add conf.lexicon "(date)"
     "1<sup>u</sup> d[i']%m %y/%d d[i %m %y/d[i |'%m %y/in u %y"
   in
-    test "1<sup>u</sup> d[i']ferraghju 1974" Dgregorian (1, 2, 1974)
-  ; test "d[i |'marzu 1975" Dgregorian (0, 3, 1975)
-  ; test "4 d[i sittembre 1974" Dgregorian (4, 9, 1974)
+    test (Adef.safe "1<sup>u</sup> d[i']ferraghju 1974") Dgregorian (1, 2, 1974)
+  ; test (Adef.safe "d[i |'marzu 1975") Dgregorian (0, 3, 1975)
+  ; test (Adef.safe "4 d[i sittembre 1974") Dgregorian (4, 9, 1974)
 
 let suite =
   [ "Mutil" >:::
@@ -188,7 +191,7 @@ let suite =
   ; "Util" >:::
     [ "datedisplay_string_of_date" >:: datedisplay_string_of_date
     ; "util_name_with_roman_number" >:: util_name_with_roman_number
-    ; "util_no_html_tags" >:: util_no_html_tags
+    ; "util_escape_html" >:: util_escape_html
     ; "util_safe_html" >:: util_safe_html
     ; "util_string_with_macros" >:: util_string_with_macros
     ; "util_transl_a_of_b" >:: util_transl_a_of_b

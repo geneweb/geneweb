@@ -326,19 +326,19 @@ val print_callstack : ?max:int -> unit -> unit
     to put such strings in html links <a href=...>. This is
     the same encoding done by Web browsers in forms.
 *)
-val encode : string -> string
+val encode : string -> Adef.encoded_string
 
 (** [decode s]
     Does the inverse job than [code],
     restoring the initial string. The heading and trailing spaces
     are stripped.
 *)
-val decode : string -> string
+val decode : Adef.encoded_string -> string
 
 (** Like above but heading and trailing spaces are stripped
     only if bool parameter is [true]. [decode] = [gen_decode true].
 *)
-val gen_decode : bool -> string -> string
+val gen_decode : bool -> Adef.encoded_string -> string
 
 (** [extract_param name stopc request] can be used to extract some
     parameter from a browser [request] (list of strings); [name]
@@ -350,7 +350,7 @@ val extract_param : string -> char -> string list -> string
 
 (** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format
     Example : 2021-12-13 22:35:08. *)
-val sprintf_date : Unix.tm -> string
+val sprintf_date : Unix.tm -> Adef.safe_string
 
 (** [rev_input_line ic pos (rbytes, rpos)]
     Read characters in reverse order from the given input channel,

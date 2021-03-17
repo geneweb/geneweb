@@ -7,32 +7,30 @@ open Place
 
 let print_html_places_surnames conf base (array : (string list * (string * iper list) list) array) =
   let link_to_ind =
-    match p_getenv conf.base_env "place_surname_link_to_ind" with
-      Some "yes" -> true
-    | _ -> false
+    List.assoc_opt "place_surname_link_to_ind" conf.base_env = Some "yes"
   in
   let print_sn (sn, ips) =
     let len = List.length ips in
-    Output.print_string conf "<a href=\"" ;
+    Output.print_sstring conf "<a href=\"" ;
     Output.print_string conf (commd conf);
     if link_to_ind && len = 1
     then Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
     else begin
-      Output.print_string conf "m=N&v=";
+      Output.print_sstring conf "m=N&v=";
       Output.print_string conf (Mutil.encode sn);
     end ;
-    Output.print_string conf "\">";
-    Output.print_string conf sn ;
-    Output.print_string conf "</a> (" ;
-    Output.print_string conf (string_of_int len) ;
-    Output.print_string conf ")"
+    Output.print_sstring conf "\">";
+    Output.print_string conf (escape_html sn) ;
+    Output.print_sstring conf "</a> (" ;
+    Output.print_sstring conf (string_of_int len) ;
+    Output.print_sstring conf ")"
   in
   let print_sn_list (snl : (string * iper list) list) =
     let snl = List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl in
-    Output.print_string conf "<li>\n";
-    Mutil.list_iter_first (fun first x -> if not first then Output.print_string conf ",\n" ; print_sn x) snl ;
-    Output.print_string conf "\n";
-    Output.print_string conf "</li>\n"
+    Output.print_sstring conf "<li>\n";
+    Mutil.list_iter_first (fun first x -> if not first then Output.print_sstring conf ",\n" ; print_sn x) snl ;
+    Output.print_sstring conf "\n";
+    Output.print_sstring conf "</li>\n"
   in
   let rec loop prev =
     function
@@ -44,7 +42,7 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
               if x1 = x2 then loop1 l1 l2
               else
                 begin
-                  List.iter (fun _ -> Output.print_string conf "</ul></li>\n")
+                  List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n")
                     (x1 :: l1);
                   loop1 [] (x2 :: l2)
                 end
@@ -53,18 +51,19 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
         loop1 prev pl;
         print_sn_list snl;
         loop pl list
-    | [] -> List.iter (fun _ -> Output.print_string conf "</ul></li>\n") prev
+    | [] -> List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n") prev
   in
-  Output.print_string conf "<ul>\n";
+  Output.print_sstring conf "<ul>\n";
   loop [] (Array.to_list array) ;
-  Output.print_string conf "</ul>\n"
+  Output.print_sstring conf "</ul>\n"
 
 let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
-    (if add_birth then "&bi=on" else "") ^
-    (if add_baptism then "&bp=on" else "") ^
-    (if add_death then "&de=on" else "") ^
-    (if add_burial then "&bu=on" else "") ^
-    (if add_marriage then "&ma=on" else "")
+  Adef.encoded @@
+  (if add_birth then "&bi=on" else "") ^
+  (if add_baptism then "&bp=on" else "") ^
+  (if add_death then "&de=on" else "") ^
+  (if add_burial then "&bu=on" else "") ^
+  (if add_marriage then "&ma=on" else "")
 
 let print_aux conf title fn =
   Hutil.header conf title;
@@ -88,19 +87,32 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       max_int
   in
   Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) array ;
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "place")) in
+  let title _ = Output.print_sstring conf (Utf8.capitalize_fst (transl conf "place")) in
   print_aux conf title begin fun () ->
     let opt = print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage in
-    Output.printf conf
-      "<p><a href=\"%sm=PS%s&display=long\">%s</a></p><p>"
-      (commd conf) opt (transl conf "long display") ;
+    Output.print_sstring conf "<p><a href=\"";
+    Output.print_string conf (commd conf) ;
+    Output.print_sstring conf "m=PS" ;
+    Output.print_string conf opt ;
+    Output.print_sstring conf "&display=long\">" ;
+    Output.print_sstring conf (transl conf "long display") ;
+    Output.print_sstring conf "</a></p><p>" ;
     let last = Array.length array - 1 in
-    Array.iteri
-      (fun i (s, x) ->
-         Output.printf conf "<a href=\"%sm=PS%s&k=%s\">%s</a> (%d)%s"
-           (commd conf) opt (Mutil.encode s) s x (if i = last then "" else ",\n"))
-      array ;
-    Output.print_string conf "</p>\n"
+    Array.iteri begin fun i (s, x) ->
+      Output.print_sstring conf "<a href=\"" ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf "m=PS" ;
+      Output.print_string conf opt ;
+      Output.print_sstring conf "&k=" ;
+      Output.print_string conf (Mutil.encode s) ;
+      Output.print_sstring conf "\">";
+      Output.print_string conf (escape_html s) ;
+      Output.print_sstring conf "</a> (" ;
+      Output.print_sstring conf (string_of_int x) ;
+      Output.print_sstring conf ")" ;
+      if i <> last then Output.print_sstring conf ", "
+    end array ;
+    Output.print_sstring conf "</p>\n"
   end
 
 let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage max_length =
@@ -142,16 +154,22 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_de
   in
   Array.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) array ;
   let title _ =
-    Output.printf conf "%s / %s" (Utf8.capitalize_fst (transl conf "place"))
-      (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0))
+    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "place"));
+    Output.print_sstring conf " / ";
+    Output.print_sstring conf (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0))
   in
   print_aux conf title begin fun () ->
     if ini = ""
-    then
-      Output.printf conf "<p><a href=\"%sm=PS%s&display=short\">%s</a></p><p>"
-        (commd conf)
-        (print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage)
-        (transl conf "short display") ;
+    then begin
+      Output.print_sstring conf "<p><a href=\"" ;
+      Output.print_string conf (commd conf) ;
+      Output.print_sstring conf "m=PS" ;
+      Output.print_string conf
+        (print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage) ;
+      Output.print_sstring conf "&display=short\">" ;
+      Output.print_sstring conf (transl conf "short display") ;
+      Output.print_sstring conf "</a></p><p>"
+    end ;
     if array <> [||] then print_html_places_surnames conf base array;
   end
 

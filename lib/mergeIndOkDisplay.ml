@@ -18,44 +18,55 @@ let print_merge conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "merge done")) in
-  Hutil.header conf title;
+  Hutil.header conf begin fun _ ->
+    transl conf "merge done"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
+  end ;
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "\n%s\n"
-    (referenced_person_text conf base (poi base p.key_index));
-  Update.print_warnings conf base wl;
+  Output.print_sstring conf " " ;
+  Output.print_string conf (referenced_person_text conf base (poi base p.key_index)) ;
+  Output.print_sstring conf " " ;
+  Update.print_warnings conf base wl ;
   let pi = p.key_index in
   let np = poi base pi in
   let nfn = p_first_name base np in
   let nsn = p_surname base np in
   let nocc = get_occ np in
-  if ((ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) && pgl1 <> [] ||
-      (ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc) && pgl2 <> []) then
-    begin
-      Output.print_string conf
-        "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
-      Output.printf conf (ftransl conf "name changed. update linked pages");
-      Output.print_string conf "</div>\n";
-      let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
-      Output.printf conf "<span class=\"unselectable float-left\">%s%s</span>\n\
-                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
-        (Utf8.capitalize_fst (transl conf "new name")) (transl conf ":") nfn nsn snocc;
-      let soocc1 = if oocc1 <> 0 then Printf.sprintf "/%d" oocc1 else "" in
-      Output.printf conf "<span class=\"unselectable float-left\">%s 1%s</span>\n\
-                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
-        (Utf8.capitalize_fst (transl conf "old name")) (transl conf ":") ofn1 osn1 soocc1;
-      Output.printf conf "<span>%s%s</span>"
-        (Utf8.capitalize_fst (transl conf "linked pages")) (transl conf ":");
-      NotesDisplay.print_linked_list conf base pgl1;
-      let soocc2 = if oocc2 <> 0 then Printf.sprintf "/%d" oocc2 else "" in
-      Output.printf conf "<span class=\"unselectable float-left\">%s 2%s</span>\n\
-                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
-        (Utf8.capitalize_fst (transl conf "old name")) (transl conf ":") ofn2 osn2 soocc2;
-      Output.printf conf "<span>%s%s</span>"
-        (Utf8.capitalize_fst (transl conf "linked pages")) (transl conf ":");
-      NotesDisplay.print_linked_list conf base pgl2
+  if (ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) && pgl1 <> [] || (ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc) && pgl2 <> []
+  then begin
+    Output.print_sstring conf {|<div class="alert alert-danger mx-auto mt-1" role="alert">|} ;
+    Output.printf conf (ftransl conf "name changed. update linked pages");
+    Output.print_sstring conf "</div>";
+    let aux n txt ofn osn oocc =
+      Output.print_sstring conf {|<span class="unselectable float-left">|} ;
+      transl conf txt |> Utf8.capitalize_fst |> Output.print_sstring conf  ;
+      if n = "" then begin
+        Output.print_sstring conf " " ;
+        Output.print_sstring conf n
+      end;
+      Output.print_sstring conf (transl conf ":") ;
+      Output.print_sstring conf {|</span> <span class="float-left ml-1">|} ;
+      Output.print_string conf (Util.escape_html ofn) ;
+      Output.print_sstring conf {|/|} ;
+      Output.print_string conf (Util.escape_html osn) ;
+      if oocc <> 0 then begin
+        Output.print_sstring conf "/" ;
+        Output.print_sstring conf (string_of_int oocc)
+      end ;
+      Output.print_sstring conf {|</span>|} ;
+      Output.print_sstring conf "<span>" ;
+      Output.print_sstring conf (Utf8.capitalize_fst (transl conf "linked pages")) ;
+      Output.print_sstring conf (transl conf ":") ;
+      Output.print_sstring conf "</span>" ;
+    in
+    aux "" "new name" nfn nsn nocc ;
+    Output.print_sstring conf {|<br>|} ;
+    aux "1" "old name" ofn1 osn1 oocc1 ;
+    NotesDisplay.print_linked_list conf base pgl1 ;
+    aux "2" "old name" ofn2 osn2 oocc2 ;
+    NotesDisplay.print_linked_list conf base pgl2
     end;
-
   MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 

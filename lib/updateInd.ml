@@ -39,6 +39,7 @@ let extract_var sini s =
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
+let safe_val (x : Adef.safe_string) = VVstring (x :> string)
 
 let rec eval_var conf base env p _loc sl =
   try eval_special_var conf base sl with
@@ -49,13 +50,13 @@ and eval_simple_var conf base env p =
   | ["acc_if_titles"] -> bool_val (p.access = IfTitles)
   | ["acc_private"] -> bool_val (p.access = Private)
   | ["acc_public"] -> bool_val (p.access = Public)
-  | ["bapt_place"] -> str_val (Util.escape_html p.baptism_place)
-  | ["bapt_note"] -> str_val (Util.escape_html p.baptism_note)
-  | ["bapt_src"] -> str_val (Util.escape_html p.baptism_src)
+  | ["bapt_place"] -> safe_val (Util.escape_html p.baptism_place :> Adef.safe_string)
+  | ["bapt_note"] -> safe_val (Util.escape_html p.baptism_note :> Adef.safe_string)
+  | ["bapt_src"] -> safe_val (Util.escape_html p.baptism_src :> Adef.safe_string)
   | ["birth"; s] -> eval_date_var (Adef.od_of_cdate p.birth) s
-  | ["birth_place"] -> str_val (Util.escape_html p.birth_place)
-  | ["birth_note"] -> str_val (Util.escape_html p.birth_note)
-  | ["birth_src"] -> str_val (Util.escape_html p.birth_src)
+  | ["birth_place"] -> safe_val (Util.escape_html p.birth_place :> Adef.safe_string)
+  | ["birth_note"] -> safe_val (Util.escape_html p.birth_note :> Adef.safe_string)
+  | ["birth_src"] -> safe_val (Util.escape_html p.birth_src :> Adef.safe_string)
   | ["bapt"; s] -> eval_date_var (Adef.od_of_cdate p.baptism) s
   | ["bt_buried"] ->
       bool_val
@@ -76,9 +77,9 @@ and eval_simple_var conf base env p =
         | _ -> None
       in
       eval_date_var od s
-  | ["burial_place"] -> str_val (Util.escape_html p.burial_place)
-  | ["burial_note"] -> str_val (Util.escape_html p.burial_note)
-  | ["burial_src"] -> str_val (Util.escape_html p.burial_src)
+  | ["burial_place"] -> safe_val (Util.escape_html p.burial_place :> Adef.safe_string)
+  | ["burial_note"] -> safe_val (Util.escape_html p.burial_note :> Adef.safe_string)
+  | ["burial_src"] -> safe_val (Util.escape_html p.burial_src :> Adef.safe_string)
   | ["cnt"] -> eval_int_env "cnt" env
   | ["dead_dont_know_when"] -> bool_val (p.death = DeadDontKnowWhen)
   | ["death"; s] ->
@@ -88,9 +89,9 @@ and eval_simple_var conf base env p =
         | _ -> None
       in
       eval_date_var od s
-  | ["death_place"] -> str_val (Util.escape_html p.death_place)
-  | ["death_note"] -> str_val (Util.escape_html p.death_note)
-  | ["death_src"] -> str_val (Util.escape_html p.death_src)
+  | ["death_place"] -> safe_val (Util.escape_html p.death_place :> Adef.safe_string)
+  | ["death_note"] -> safe_val (Util.escape_html p.death_note :> Adef.safe_string)
+  | ["death_src"] -> safe_val (Util.escape_html p.death_src :> Adef.safe_string)
   | ["died_young"] -> bool_val (p.death = DeadYoung)
   | ["digest"] -> eval_string_env "digest" env
   | ["dont_know_if_dead"] -> bool_val (p.death = DontKnowIfDead)
@@ -126,32 +127,24 @@ and eval_simple_var conf base env p =
             let p = poi base p.key_index in
             let e = List.nth (get_pevents p) (i - 1) in
             let name =
-              Utf8.capitalize_fst
-                (Util.string_of_pevent_name conf base e.epers_name)
+              Util.string_of_pevent_name conf base e.epers_name
+              |> Adef.safe_fn Utf8.capitalize_fst
             in
             let date =
               match Adef.od_of_cdate e.epers_date with
                 Some d -> DateDisplay.string_of_date conf d
-              | None -> ""
+              | None -> Adef.safe ""
             in
             let place = Util.string_of_place conf (sou base e.epers_place) in
-            let note = sou base e.epers_note in
-            let src = sou base e.epers_src in
-            let wit =
-              Array.fold_right
-                (fun (w, wk) accu ->
-                   (Util.string_of_witness_kind conf (get_sex p) wk ^ ": " ^
-                    Util.person_text conf base (poi base w)) ::
-                   accu)
-                e.epers_witnesses []
-            in
-            let s = String.concat ", " [name; date; place; note; src] in
-            let sw = String.concat ", " wit in str_val (s ^ ", " ^ sw)
+            ([ name ; date ; (place :> Adef.safe_string) ] : Adef.safe_string list :> string list)
+            |> (String.concat ", ")
+            |> Adef.safe
+            |> safe_val
           with Failure _ -> str_val ""
           end
       | _ -> str_val ""
       end
-  | ["first_name"] -> str_val (Util.escape_html p.first_name)
+  | ["first_name"] -> safe_val (Util.escape_html p.first_name :> Adef.safe_string)
   | ["first_name_alias"] -> eval_string_env "first_name_alias" env
   | ["has_aliases"] -> bool_val (p.aliases <> [])
   | ["has_birth_date"] -> bool_val (Adef.od_of_cdate p.birth <> None)
@@ -225,7 +218,7 @@ and eval_simple_var conf base env p =
   | ["has_relations"] -> bool_val (p.rparents <> [])
   | ["has_surnames_aliases"] -> bool_val (p.surnames_aliases <> [])
   | ["has_titles"] -> bool_val (p.titles <> [])
-  | ["image"] -> str_val (Util.escape_html p.image)
+  | ["image"] -> safe_val (Util.escape_html p.image :> Adef.safe_string)
   | ["index"] -> str_val (string_of_iper p.key_index)
   | ["is_female"] -> bool_val (p.sex = Female)
   | ["is_male"] -> bool_val (p.sex = Male)
@@ -241,7 +234,7 @@ and eval_simple_var conf base env p =
       end
   | ["nb_pevents"] -> str_val (string_of_int (List.length p.pevents))
   | ["not_dead"] -> bool_val (p.death = NotDead)
-  | ["notes"] -> str_val (Util.escape_html p.notes)
+  | ["notes"] -> safe_val (Util.escape_html p.notes :> Adef.safe_string)
   | ["next_pevent"] ->
       begin match get_env "next_pevent" env with
         Vcnt c -> str_val (string_of_int !c)
@@ -253,9 +246,9 @@ and eval_simple_var conf base env p =
       | _ -> str_val ""
       end
   | ["occ"] -> str_val (if p.occ <> 0 then string_of_int p.occ else "")
-  | ["occupation"] -> str_val (Util.escape_html p.occupation)
+  | ["occupation"] -> safe_val (Util.escape_html p.occupation :> Adef.safe_string)
   | ["of_course_dead"] -> bool_val (p.death = OfCourseDead)
-  | ["public_name"] -> str_val (Util.escape_html p.public_name)
+  | ["public_name"] -> safe_val (Util.escape_html p.public_name :> Adef.safe_string)
   | ["qualifier"] -> eval_string_env "qualifier" env
   | "relation" :: sl ->
       let r =
@@ -265,8 +258,8 @@ and eval_simple_var conf base env p =
         | _ -> None
       in
       eval_relation_var r sl
-  | ["sources"] -> str_val (Util.escape_html p.psources)
-  | ["surname"] -> str_val (Util.escape_html p.surname)
+  | ["sources"] -> safe_val (Util.escape_html p.psources :> Adef.safe_string)
+  | ["surname"] -> safe_val (Util.escape_html p.surname :> Adef.safe_string)
   | ["surname_alias"] -> eval_string_env "surname_alias" env
   | "title" :: sl ->
       let t =
@@ -371,7 +364,7 @@ and eval_simple_var conf base env p =
       let v = extract_var "evar_" s in
       if v <> "" then
         match p_getenv (conf.env @ conf.henv) v with
-          Some vv -> str_val (Util.escape_html vv)
+          Some vv -> safe_val (Util.escape_html vv :> Adef.safe_string)
         | None -> str_val ""
       else
         let v = extract_var "bvar_" s in
@@ -380,10 +373,11 @@ and eval_simple_var conf base env p =
           str_val (try List.assoc v conf.base_env with Not_found -> "")
         else raise Not_found
   | _ -> raise Not_found
-and eval_date_var od s = str_val (eval_date_var_aux od s)
+and eval_date_var od s = safe_val (eval_date_var_aux od s)
 and eval_date_var_aux od =
   function
     "calendar" ->
+    Adef.safe @@
       begin match od with
         Some (Dgreg (_, Dgregorian)) -> "gregorian"
       | Some (Dgreg (_, Djulian)) -> "julian"
@@ -392,11 +386,13 @@ and eval_date_var_aux od =
       | _ -> ""
       end
   | "day" ->
+    Adef.safe @@
       begin match eval_date_field od with
         Some d -> if d.day = 0 then "" else string_of_int d.day
       | None -> ""
       end
   | "month" ->
+    Adef.safe @@
       begin match eval_date_field od with
         Some d ->
           if d.month = 0 then ""
@@ -408,6 +404,7 @@ and eval_date_var_aux od =
       | None -> ""
       end
   | "orday" ->
+    Adef.safe @@
       begin match eval_date_field od with
         Some d ->
           begin match d.prec with
@@ -418,6 +415,7 @@ and eval_date_var_aux od =
       | None -> ""
       end
   | "ormonth" ->
+    Adef.safe @@
       begin match eval_date_field od with
         Some d ->
           begin match d.prec with
@@ -433,6 +431,7 @@ and eval_date_var_aux od =
       | None -> ""
       end
   | "oryear" ->
+    Adef.safe @@
       begin match eval_date_field od with
         Some d ->
           begin match d.prec with
@@ -442,6 +441,7 @@ and eval_date_var_aux od =
       | None -> ""
       end
   | "prec" ->
+    Adef.safe @@
       begin match od with
         Some (Dgreg ({prec = Sure}, _)) -> "sure"
       | Some (Dgreg ({prec = About}, _)) -> "about"
@@ -455,9 +455,10 @@ and eval_date_var_aux od =
   | "text" ->
       begin match od with
         Some (Dtext s) -> Util.safe_html s
-      | _ -> ""
+      | _ -> Adef.safe @@ ""
       end
   | "year" ->
+    Adef.safe @@
       begin match eval_date_field od with
         Some d -> string_of_int d.year
       | None -> ""
@@ -466,7 +467,7 @@ and eval_date_var_aux od =
   | "cal_gregorian" -> eval_is_cal Dgregorian od
   | "cal_hebrew" -> eval_is_cal Dhebrew od
   | "cal_julian" -> eval_is_cal Djulian od
-  | "prec_no" -> if od = None then "1" else ""
+  | "prec_no" -> if od = None then Adef.safe "1" else Adef.safe ""
   | "prec_sure" -> eval_is_prec (function Sure -> true | _ -> false) od
   | "prec_about" -> eval_is_prec (function About -> true | _ -> false) od
   | "prec_maybe" -> eval_is_prec (function Maybe -> true | _ -> false) od
@@ -542,23 +543,23 @@ and eval_event_var e =
           | Epers_ScellentSpouseLDS -> str_val "#slgs"
           | Epers_VenteBien -> str_val "#vteb"
           | Epers_Will -> str_val "#will"
-          | Epers_Name x -> str_val (Util.escape_html x)
+          | Epers_Name x -> safe_val (Util.escape_html x :> Adef.safe_string)
           end
       | _ -> str_val ""
       end
   | ["e_place"] ->
       begin match e with
-        Some {epers_place = x} -> str_val (Util.escape_html x)
+        Some {epers_place = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | ["e_note"] ->
       begin match e with
-        Some {epers_note = x} -> str_val (Util.escape_html x)
+        Some {epers_note = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | ["e_src"] ->
       begin match e with
-        Some {epers_src = x} -> str_val (Util.escape_html x)
+        Some {epers_src = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | _ -> raise Not_found
@@ -566,12 +567,12 @@ and eval_title_var t =
   function
     ["t_estate"] ->
       begin match t with
-        Some {t_place = x} -> str_val (Util.escape_html x)
+        Some {t_place = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | ["t_ident"] ->
       begin match t with
-        Some {t_ident = x} -> str_val (Util.escape_html x)
+        Some {t_ident = x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | ["t_main"] ->
@@ -581,7 +582,7 @@ and eval_title_var t =
       end
   | ["t_name"] ->
       begin match t with
-        Some {t_name = Tname x} -> str_val (Util.escape_html x)
+        Some {t_name = Tname x} -> safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val ""
       end
   | ["t_nth"] ->
@@ -631,19 +632,19 @@ and eval_person_var (fn, sn, oc, create, _) =
       | Update.Create (Neuter, _) -> str_val "neuter"
       | _ -> str_val ""
       end
-  | ["first_name"] -> str_val (Util.escape_html fn)
+  | ["first_name"] -> safe_val (Util.escape_html fn :> Adef.safe_string)
   | ["link"] -> bool_val (create = Update.Link)
   | ["occ"] -> str_val (if oc = 0 then "" else string_of_int oc)
-  | ["surname"] -> str_val (Util.escape_html sn)
+  | ["surname"] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | _ -> raise Not_found
 and eval_is_cal cal =
   function
-    Some (Dgreg (_, x)) -> if x = cal then "1" else ""
-  | _ -> ""
+    Some (Dgreg (_, x)) -> if x = cal then Adef.safe "1" else Adef.safe ""
+  | _ -> Adef.safe ""
 and eval_is_prec cond =
   function
-    Some (Dgreg ({prec = x}, _)) -> if cond x then "1" else ""
-  | _ -> ""
+    Some (Dgreg ({prec = x}, _)) -> if cond x then Adef.safe "1" else Adef.safe ""
+  | _ -> Adef.safe ""
 and eval_is_death_reason dr =
   function
     Death (dr1, _) -> bool_val (dr = dr1)
@@ -677,7 +678,7 @@ and eval_int_env var env =
   | _ -> raise Not_found
 and eval_string_env var env =
   match get_env var env with
-    Vstring x -> str_val (Util.escape_html x)
+    Vstring x -> safe_val (Util.escape_html x :> Adef.safe_string)
   | _ -> str_val ""
 
 (* print *)
@@ -780,24 +781,24 @@ let print_update_ind conf base p digest =
 let print_del1 conf base p =
   let title _ =
     let s = transl_nth conf "person/persons" 0 in
-    Output.print_string conf (Utf8.capitalize_fst (transl_decline conf "delete" s))
+    Output.print_sstring conf (Utf8.capitalize_fst (transl_decline conf "delete" s))
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_string conf "<h2>\n";
+  Output.print_sstring conf "<h2>\n";
   title false;
-  Output.print_string conf "</h2>\n";
+  Output.print_sstring conf "</h2>\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Output.print_string conf "<p>\n";
+  Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
-  Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
+  Output.print_sstring conf "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
-  Output.print_string conf
+  Output.print_sstring conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</button>\n";
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "</form>\n";
+  Output.print_sstring conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+  Output.print_sstring conf "</button>\n";
+  Output.print_sstring conf "</p>\n";
+  Output.print_sstring conf "</form>\n";
   Hutil.trailer conf
 
 let print_add conf base =
