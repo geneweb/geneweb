@@ -32,7 +32,7 @@ let main () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) (Gwexport.anonfun opts) Gwexport.errmsg ;
   let opts = !opts in
-  match opts.base with
+  match opts.Gwexport.base with
   | None -> assert false
   | Some (ifile, base) ->
     let select = Gwexport.select opts [] in
@@ -40,12 +40,12 @@ let main () =
     let src_oc_ht = Hashtbl.create 1009 in
     let () = Gwdb.load_ascends_array base in
     let () = Gwdb.load_strings_array base in
-    if not opts.mem then begin
+    if not opts.Gwexport.mem then begin
       let () = Gwdb.load_couples_array base in
       let () = Gwdb.load_unions_array base in
       let () = Gwdb.load_descends_array base in ()
     end ;
-    let _ofile, oc, close = opts.oc in
+    let _ofile, oc, close = opts.Gwexport.oc in
     if not !GwuLib.raw_output then oc "encoding: utf-8\n";
     if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
     GwuLib.prepare_free_occ base ;

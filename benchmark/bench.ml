@@ -98,21 +98,21 @@ let bench () =
     bench_w_base
       "UpdateData.get_all_data"
       begin fun base conf -> UpdateData.get_all_data conf base end
-      [ { conf with Config.env = ["data","place"] } ]
+      [ { conf with Config.env = ["data",Adef.encoded"place"] } ]
     ::
     bench_w_base
       "UpdateData.build_list"
       begin fun base conf -> UpdateData.build_list conf base end
-      [ { conf with Config.env = ["data","src"] ; wizard = true }
-      ; { conf with Config.env = ["data","place"] ; wizard = true } ]
+      [ { conf with Config.env = ["data",Adef.encoded"src"] ; wizard = true }
+      ; { conf with Config.env = ["data",Adef.encoded"place"] ; wizard = true } ]
     ::
     bench_w_base
       "UpdateData.build_list_short"
       begin fun base conf ->
         UpdateData.build_list_short conf @@ UpdateData.build_list conf base
       end
-      [ { conf with Config.env = ["data","src"] ; wizard = true }
-      ; { conf with Config.env = ["data","place"] ; wizard = true } ]
+      [ { conf with Config.env = ["data",Adef.encoded"src"] ; wizard = true }
+      ; { conf with Config.env = ["data",Adef.encoded"place"] ; wizard = true } ]
     ::
     bench_w_base ~load:[ Gwdb.load_persons_array ]
       "Util.authorized_age"

@@ -27,14 +27,14 @@ let new_ghost_id = let i = ref 0 in fun () -> incr i; ghost_id_of_int !i
 (* creating the html table structure *)
 
 type align = LeftA | CenterA | RightA
-type ('a, 'b) table_data =
-    TDitem of 'a
-  | TDtext of string
+type 'a table_data =
+  | TDitem of 'a
+  | TDtext of Adef.safe_string
   | TDhr of align
-  | TDbar of 'b option
+  | TDbar of Adef.escaped_string option
   | TDnothing
-type ('a, 'b) html_table_line = (int * align * ('a, 'b) table_data) array
-type ('a, 'b) html_table = ('a, 'b) html_table_line array
+type 'a html_table_line = (int * align * 'a table_data) array
+type 'a html_table = 'a html_table_line array
 
 let html_table_struct indi_txt vbar_txt phony d t =
   let phony =

@@ -37,11 +37,11 @@ module Default = struct
       try
         in_channel_length ic
         |> really_input_string ic
-        |> Output.print_string conf ;
+        |> Output.print_sstring conf ;
         close_in ic
       with _ -> try close_in ic with _ -> ()
     in
-    fun ?(headers = []) ?content conf code ->
+    fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
       Output.status conf code ;
       List.iter (Output.header conf "%s") headers ;
       match content with
@@ -67,7 +67,7 @@ module Default = struct
         | None ->
           match fname "en" with
           | Some fn -> output_file conf fn
-          | None -> Output.print_string conf ""
+          | None -> Output.print_sstring conf ""
 
   (** Calcul les droits de visualisation d'une personne en
       fonction de son age.
@@ -138,22 +138,23 @@ module Default = struct
       | `LOG_INFO -> "INFO"
       | `LOG_DEBUG -> "DEBUG"
     in
-    Printf.eprintf "[%s]: %s %s\n" (Mutil.sprintf_date tm) level msg
+    Printf.eprintf "[%s]: %s %s\n"
+      (Mutil.sprintf_date tm : Adef.safe_string :> string) level msg
 
-  let wrap_output (conf : Config.config) (title : string) (content : unit -> unit) =
-    Output.print_string conf {|<!DOCTYPE html><head><title>|};
+  let wrap_output (conf : Config.config) (title : Adef.safe_string) (content : unit -> unit) =
+    Output.print_sstring conf {|<!DOCTYPE html><head><title>|};
     Output.print_string conf title ;
-    Output.print_string conf {|</title>|} ;
-    Output.print_string conf {|<meta name="robots" content="none">|} ;
-    Output.print_string conf {|<meta charset="|} ;
-    Output.print_string conf conf.charset ;
-    Output.print_string conf {|">|} ;
-    Output.print_string conf
+    Output.print_sstring conf {|</title>|} ;
+    Output.print_sstring conf {|<meta name="robots" content="none">|} ;
+    Output.print_sstring conf {|<meta charset="|} ;
+    Output.print_sstring conf conf.charset ;
+    Output.print_sstring conf {|">|} ;
+    Output.print_sstring conf
       {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|} ;
-    Output.print_string conf {|</head>|} ;
-    Output.print_string conf "<body>" ;
+    Output.print_sstring conf {|</head>|} ;
+    Output.print_sstring conf "<body>" ;
     content () ;
-    Output.print_string conf {|</body></html>|}
+    Output.print_sstring conf {|</body></html>|}
 
 end
 

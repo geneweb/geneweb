@@ -153,7 +153,7 @@ let diff_person conf base changed =
 (* ************************************************************************ *)
 let notify_change conf base changed action =
   if Sys.unix then
-    match p_getenv conf.base_env "notify_change" with
+    match List.assoc_opt "notify_change" conf.base_env with
       Some comm ->
         let base_args =
           match changed with
@@ -198,7 +198,7 @@ let notify_change conf base changed action =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let gen_record conf base changed action =
-  begin match p_getenv conf.base_env "history" with
+  begin match List.assoc_opt "history" conf.base_env with
     Some "yes" when not conf.manitou ->
       let item =
         match changed with
@@ -223,7 +223,7 @@ let gen_record conf base changed action =
       with
         Some oc ->
           Printf.fprintf oc "%s [%s] %s %s\n"
-            (Util.sprintf_today conf) conf.user action item;
+            (Util.sprintf_today conf :> string) conf.user action item;
           close_out oc
       | None -> ()
       end
@@ -344,8 +344,12 @@ let set_vother x = Vother x
 let possibly_highlight env s =
   match get_env "search" env with
     Vsearch (Some (case_sens, h, _)) ->
-      if in_text case_sens h s then html_highlight case_sens h s else s
+      if in_text case_sens h s
+      then html_highlight case_sens h s
+      else s
   | _ -> s
+
+let safe_val (s : Adef.safe_string) = VVstring (s :> string)
 
 let rec eval_var conf base env _ _ =
   function
@@ -453,8 +457,8 @@ and eval_string s =
   | _ -> raise Not_found
 and eval_person_field_var conf base env p =
   function
-    ["access"] -> VVstring (Util.acces conf base p)
-  | ["dates"] -> VVstring (DateDisplay.short_dates_text conf base p)
+    ["access"] -> safe_val (Util.acces conf base p :> Adef.safe_string)
+  | ["dates"] -> safe_val (DateDisplay.short_dates_text conf base p)
   | ["has_history"] ->
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
@@ -468,13 +472,14 @@ and eval_person_field_var conf base env p =
   | ["is_invisible"] ->
       let conf = {conf with wizard = false; friend = false} in
       VVbool (not (Util.authorized_age conf base p))
-  | ["title"] -> VVstring (person_title conf base p)
-  | [] -> VVstring (possibly_highlight env (simple_person_text conf base p))
+  | ["title"] -> safe_val (person_title conf base p)
+  | [] -> VVstring (possibly_highlight env
+                      (simple_person_text conf base p : Adef.safe_string :> string))
   | _ -> VVstring "person..."
 and simple_person_text conf base p =
   match main_title conf base p with
     Some t -> titled_person_text conf base p t
-  | None -> person_text conf base p
+  | None -> gen_person_text conf base p
 
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
