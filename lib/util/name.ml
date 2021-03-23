@@ -1,4 +1,3 @@
-(* $Id: name.ml,v 5.12 2018-09-27 10:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 (* La liste des caractères interdits *)
@@ -43,6 +42,18 @@ let lower s =
       let (t, j) = unaccent_utf_8 true s i in copy false j (Buff.mstore len t)
   in
   copy false 0 0
+
+let title s =
+  let t = ref true in
+  let cmap u =
+    let r =
+      if !t then Uucp.Case.Map.to_upper u
+      else Uucp.Case.Map.to_lower u
+    in
+    t := not (Uucp.Alpha.is_alphabetic u) ;
+    r
+  in
+  Utf8.cmap_utf_8 cmap s
 
 (* Name.abbrev *)
 
