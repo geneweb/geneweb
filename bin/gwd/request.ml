@@ -315,41 +315,51 @@ let unknown = begin fun conf n ->
     end
 
 let make_henv conf base =
-  Opt.iter begin fun p ->
-    let x =
-      let first_name = p_first_name base p in
-      let surname = p_surname base p in
-      if Util.accessible_by_key conf base p first_name surname then
-        [ "pz", Mutil.encode (Name.lower first_name)
-        ; "nz", Mutil.encode (Name.lower surname)
-        ; "ocz", string_of_int (get_occ p) ]
-      else [ "iz", string_of_iper (get_iper p) ]
-    in
-    conf.henv <- conf.henv @ x
-  end (Util.find_sosa_ref conf base) ;
-  begin match p_getenv conf.env "dsrc" with
-    Some "" | None -> ()
-  | Some s -> conf.henv <- conf.henv @ ["dsrc", Mutil.encode s]
-  end;
-  begin match p_getenv conf.env "templ" with
-    None -> ()
-  | Some s -> conf.henv <- conf.henv @ ["templ", Mutil.encode s]
-  end;
-  Opt.iter
-    (fun _ -> conf.henv <- conf.henv @ ["escache", escache_value base])
-    (Util.p_getenv conf.env "escache") ;
-  if Util.p_getenv conf.env "manitou" = Some "off"
-  then conf.henv <- conf.henv @ ["manitou", "off"] ;
-  let aux param =
-    Opt.iter
-      (fun s -> conf.henv <- conf.henv @ [ param, s ])
-      (Util.p_getenv conf.env param)
+  let conf =
+    match Util.find_sosa_ref conf base with
+    | Some p ->
+      let x =
+        let first_name = p_first_name base p in
+        let surname = p_surname base p in
+        if Util.accessible_by_key conf base p first_name surname then
+          [ "pz", Mutil.encode (Name.lower first_name)
+          ; "nz", Mutil.encode (Name.lower surname)
+          ; "ocz", string_of_int (get_occ p) ]
+        else [ "iz", string_of_iper (get_iper p) ]
+      in
+      { conf with henv = conf.henv @ x }
+    | None -> conf
   in
-  aux "alwsurn";
-  aux "pure_xhtml";
-  aux "size";
-  aux "p_mod";
-  aux "wide"
+  let conf =
+    match p_getenv conf.env "dsrc" with
+    | Some "" | None -> conf
+    | Some s -> { conf with henv = conf.henv @ ["dsrc", Mutil.encode s] }
+  in
+  let conf =
+    match p_getenv conf.env "templ" with
+    | None -> conf
+    | Some s -> { conf with henv = conf.henv @ ["templ", Mutil.encode s] }
+  in
+  let conf =
+    match Util.p_getenv conf.env "escache" with
+    | Some _ -> { conf with henv = conf.henv @ ["escache", escache_value base] }
+    | None -> conf
+  in
+  let conf =
+    if Util.p_getenv conf.env "manitou" = Some "off"
+    then { conf with henv = conf.henv @ ["manitou", "off"] }
+    else conf
+  in
+  let aux param conf =
+    match Util.p_getenv conf.env param with
+    | Some s -> { conf with henv = conf.henv @ [ param, s ] }
+    | None -> conf
+  in
+  aux "alwsurn" conf
+  |> aux "pure_xhtml"
+  |> aux "size"
+  |> aux "p_mod"
+  |> aux "wide"
 
 let special_vars =
   [ "alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
@@ -360,26 +370,31 @@ let only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars)
 
 let make_senv conf base =
   let set_senv conf vm vi =
-    let aux k v =
+    let aux k v conf =
       if p_getenv conf.env k = Some v
-      then conf.senv <- conf.senv @ [k,v]
+      then { conf with senv = conf.senv @ [k,v] }
+      else conf
     in
-    conf.senv <- ["em", vm; "ei", vi];
-    aux "image" "off";
-    aux "long" "on";
-    aux "spouse" "on";
-    begin match p_getenv conf.env "et" with
-      | Some x -> conf.senv <- conf.senv @ ["et", x]
-      | _ -> ()
-    end;
-    aux "cgl" "on";
-    begin match p_getenv conf.env "bd" with
-      | None | Some ("0" | "") -> ()
-      | Some x -> conf.senv <- conf.senv @ ["bd", x]
-    end;
+    let conf =
+      { conf with senv = ["em", vm; "ei", vi] }
+      |> aux "image" "off"
+      |> aux "long" "on"
+      |> aux "spouse" "on"
+    in
+    let conf =
+      match p_getenv conf.env "et" with
+      | Some x -> { conf with senv = conf.senv @ ["et", x] }
+      | _ -> conf
+    in
+    let conf = aux "cgl" "on" conf in
+    let conf =
+      match p_getenv conf.env "bd" with
+      | None | Some ("0" | "") -> conf
+      | Some x -> { conf with senv = conf.senv @ ["bd", x] }
+    in
     match p_getenv conf.env "color" with
-    | Some x -> conf.senv <- conf.senv @ ["color", Mutil.encode x]
-    | _ -> ()
+    | Some x -> { conf with senv = conf.senv @ ["color", Mutil.encode x] }
+    | _ -> conf
   in
   let get x = Util.p_getenv conf.env x in
   match get "em", get "ei", get "ep", get "en", get "eoc" with
@@ -395,8 +410,9 @@ let make_senv conf base =
       | Some ip -> ip
       | None -> incorrect_request conf; raise Exit
     in
-    let vi = string_of_iper ip in set_senv conf vm vi
-  | _ -> ()
+    let vi = string_of_iper ip in
+    set_senv conf vm vi
+  | _ -> conf
 
 let propose_base conf =
   let title _ = Output.print_string conf "Base" in
@@ -427,8 +443,8 @@ let w_base ~none fn conf base =
   match base with
   | None -> none conf
   | Some base ->
-    make_henv conf base;
-    make_senv conf base;
+    let conf = make_henv conf base in
+    let conf = make_senv conf base in
     let conf =
       match Util.default_sosa_ref conf base with
       | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
