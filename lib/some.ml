@@ -313,7 +313,7 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
         List.fold_left begin fun iperl iper ->
           let p = pget conf base iper in
           if eq_istr (get_field p) istr
-          && Util.authorized_age conf base p
+          && (not (is_hide_names conf p) || Util.authorized_age conf base p)
           then iper :: iperl
           else iperl
         end [] iperl
