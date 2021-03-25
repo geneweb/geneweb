@@ -62,12 +62,9 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2 
 let print_mod_merge o_conf base =
   let get_gen_person i =
     match p_getenv o_conf.env i with
-      Some i ->
-        Util.string_gen_person base
-          (gen_person_of_person (poi base (iper_of_string i)))
-    | None ->
-        Util.string_gen_person base
-          (gen_person_of_person (poi base dummy_iper))
+    | Some i ->
+      Util.string_gen_person base (gen_person_of_person (poi base (iper_of_string i)))
+    | None -> assert false
   in
   let o_p1 = get_gen_person "i" in
   let o_p2 = get_gen_person "i2" in

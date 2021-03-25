@@ -1013,21 +1013,22 @@ let update_relations_of_related base ip old_related =
        done)
     old_related
 
-let effective_del conf base p =
-  let ip = get_iper p in
-  let old_related = get_related p in
-  let op = Util.string_gen_person base (gen_person_of_person p) in
-  update_relations_of_related base ip old_related;
-  let ip = get_iper p in
-  let old_rparents = rparents_of (get_rparents p) in
-  let old_pevents = pwitnesses_of (get_pevents p) in
-  let old = List.append old_rparents old_pevents in
-  Update.update_related_pointers base ip old [];
-  Gwdb.delete_person base ip ;
-  Notes.update_notes_links_db base (Def.NLDB.PgInd (get_iper p)) "";
+let effective_del_no_commit conf base op =
+  update_relations_of_related base op.key_index op.related;
+  Update.update_related_pointers base op.key_index
+    (rparents_of op.rparents @ pwitnesses_of op.pevents) [];
+  Gwdb.delete_person base op.key_index
+
+let effective_del_commit conf base op =
+  Notes.update_notes_links_db base (Def.NLDB.PgInd op.key_index) "";
   Util.commit_patches conf base;
   let changed = U_Delete_person op in
   History.record conf base changed "dp"
+
+let effective_del conf base p =
+  let op = Util.string_gen_person base (gen_person_of_person p) in
+  effective_del_no_commit conf base op;
+  effective_del_commit conf base op
 
 let print_mod_ok conf base wl pgl p ofn osn oocc =
   let title _ =
