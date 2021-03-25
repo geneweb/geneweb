@@ -541,13 +541,6 @@ let is_old_person conf p =
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
-let fast_auth_age conf p =
-  if conf.friend || conf.wizard || get_access p = Public then true
-  else if
-    conf.public_if_titles && get_access p = IfTitles && get_titles p <> []
-  then
-    true
-  else is_old_person conf (gen_person_of_person p)
 
 (* ********************************************************************** *)
 (*  [Fonc] authorized_age : config -> base -> person -> bool              *)
