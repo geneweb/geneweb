@@ -2,7 +2,7 @@ open Config
 open Def
 open Gwdb
 
-val effective_del_no_commit : config -> base -> (iper, iper, string) gen_person -> unit
+val effective_del_no_commit : base -> (iper, iper, string) gen_person -> unit
 
 val effective_del_commit : config -> base -> (iper, iper, string) gen_person -> unit
 

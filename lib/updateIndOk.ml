@@ -1013,7 +1013,7 @@ let update_relations_of_related base ip old_related =
        done)
     old_related
 
-let effective_del_no_commit conf base op =
+let effective_del_no_commit base op =
   update_relations_of_related base op.key_index op.related;
   Update.update_related_pointers base op.key_index
     (rparents_of op.rparents @ pwitnesses_of op.pevents) [];
@@ -1027,7 +1027,7 @@ let effective_del_commit conf base op =
 
 let effective_del conf base p =
   let op = Util.string_gen_person base (gen_person_of_person p) in
-  effective_del_no_commit conf base op;
+  effective_del_no_commit base op;
   effective_del_commit conf base op
 
 let print_mod_ok conf base wl pgl p ofn osn oocc =

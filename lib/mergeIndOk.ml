@@ -418,7 +418,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let p = UpdateIndOk.effective_mod ~skip_conflict:o_p2.key_index conf base sp in
   let p = redirect_relations_of_added_related base p o_p2.key_index o_p2.related in
   redirect_added_families base p o_p2.key_index p2_family;
-  UpdateIndOk.effective_del_no_commit conf base o_p2 ;
+  UpdateIndOk.effective_del_no_commit base o_p2 ;
   patch_person base p.key_index p;
   let u = {family = Array.append p_family p2_family} in
   if p2_family <> [||] then patch_union base p.key_index u;
