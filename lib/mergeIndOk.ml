@@ -430,7 +430,6 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   in
   Util.commit_patches conf base;
   History.record conf base (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p)) "fp";
-  History.record conf base (U_Delete_person o_p2) "dp";
   Notes.update_notes_links_db base (Def.NLDB.PgInd o_p2.key_index) "";
   Update.delete_topological_sort conf base;
   let db = Gwdb.read_nldb base in
