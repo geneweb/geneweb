@@ -66,6 +66,7 @@ let rec mk_family (conf : Config.config) base ((_, fam, _, _) as fcd) =
   let marriage_source = get_str (E.marriage_source base) in
   let relation = mk_fam_relation (Gwdb.get_relation fam) in
   let separation = mk_fam_separation (Gwdb.get_divorce fam) in
+  let sources = Tstr Gwdb.(get_fsources fam |> sou base) in
   let ifam = get_str E.ifam in
   let witnesses =
     try lazy_array (get_n_mk_person conf base) (E.witnesses fcd)
@@ -87,6 +88,7 @@ let rec mk_family (conf : Config.config) base ((_, fam, _, _) as fcd) =
     | "relation" -> relation
     | "separation" -> separation
     | "spouse" -> spouse
+    | "sources" -> sources
     | "witnesses" -> witnesses
     | _ -> raise Not_found
   end

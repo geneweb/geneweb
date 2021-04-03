@@ -410,43 +410,36 @@ let redirect_added_families base p ip2 p2_family =
   done
 
 let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
-  match p_getenv o_conf.env "i2" with
-    Some i2 ->
-      let conf = Update.update_conf o_conf in
-      let db = Gwdb.read_nldb base in
-      let (ofn1, osn1, oocc1) = (o_p1.first_name, o_p1.surname, o_p1.occ) in
-      let key1 = Name.lower ofn1, Name.lower osn1, oocc1 in
-      let pgl1 = Perso.links_to_ind conf base db key1 in
-      let (ofn2, osn2, oocc2) = (o_p2.first_name, o_p2.surname, o_p2.occ) in
-      let key2 = Name.lower ofn2, Name.lower osn2, oocc2 in
-      let pgl2 = Perso.links_to_ind conf base db key2 in
-      let ip2 = iper_of_string i2 in
-      let p2 = poi base ip2 in
-      let rel_chil = get_related p2 in
-      let p_family = get_family (poi base sp.key_index) in
-      let p2_family = get_family p2 in
-      let warning _ = () in
-      MergeInd.reparent_ind base warning sp.key_index ip2;
-      let p = UpdateIndOk.effective_mod ~skip_conflict:ip2 conf base sp in
-      let p = redirect_relations_of_added_related base p ip2 rel_chil in
-      redirect_added_families base p ip2 p2_family;
-      UpdateIndOk.effective_del conf base p2 ;
-      patch_person base p.key_index p;
-      let u = {family = Array.append p_family p2_family} in
-      if p2_family <> [| |] then patch_union base p.key_index u;
-      Consang.check_noloop_for_person_list base (Update.error conf base)
-        [p.key_index];
-      let wl =
-        let a = poi base p.key_index in
-        let a = {parents = get_parents a; consang = get_consang a} in
-        UpdateIndOk.all_checks_person base p a u
-      in
-      Util.commit_patches conf base;
-      let changed =
-        U_Merge_person (o_p1, o_p2, Util.string_gen_person base p)
-      in
-      History.record conf base changed "fp";
-      Update.delete_topological_sort conf base;
-      print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
-  | _ -> Hutil.incorrect_request o_conf
+  let conf = Update.update_conf o_conf in
+  let p_family = get_family (poi base sp.key_index) in
+  let p2_family = get_family (poi base o_p2.key_index) in
+  let warning _ = () in
+  MergeInd.reparent_ind base warning sp.key_index o_p2.key_index;
+  let p = UpdateIndOk.effective_mod ~skip_conflict:o_p2.key_index conf base sp in
+  let p = redirect_relations_of_added_related base p o_p2.key_index o_p2.related in
+  redirect_added_families base p o_p2.key_index p2_family;
+  UpdateIndOk.effective_del_no_commit base o_p2 ;
+  patch_person base p.key_index p;
+  let u = {family = Array.append p_family p2_family} in
+  if p2_family <> [||] then patch_union base p.key_index u;
+  Consang.check_noloop_for_person_list base (Update.error conf base) [p.key_index];
+  let wl =
+    let a = poi base p.key_index in
+    let a = {parents = get_parents a; consang = get_consang a} in
+    UpdateIndOk.all_checks_person base p a u
+  in
+  Util.commit_patches conf base;
+  History.record conf base (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p)) "fp";
+  Notes.update_notes_links_db base (Def.NLDB.PgInd o_p2.key_index) "";
+  Update.delete_topological_sort conf base;
+  let db = Gwdb.read_nldb base in
+  let ofn1 = o_p1.first_name in
+  let osn1 = o_p1.surname in
+  let oocc1 = o_p1.occ in
+  let pgl1 = Perso.links_to_ind conf base db (Name.lower ofn1, Name.lower osn1, oocc1) in
+  let ofn2 = o_p2.first_name in
+  let osn2 = o_p2.surname in
+  let oocc2 = o_p2.occ in
+  let pgl2 = Perso.links_to_ind conf base db (Name.lower ofn2, Name.lower osn2, oocc2) in
+  print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
 

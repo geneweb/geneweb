@@ -1,5 +1,8 @@
-(* $Id: name.mli,v 5.2 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
+
+(** Apply uppercasing to the first letter of each name part,
+    and lowercasing to the rest of the text. *)
+val title : string -> string
 
 val lower : string -> string
   (* Name.lower:

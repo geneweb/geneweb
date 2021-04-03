@@ -452,11 +452,6 @@ message WarningDeadOld {
   required string date = 3;
 }
 
-message WarningOldIndividual {
-  required WarningPerson person = 1;
-  required string date = 3;
-}
-
 message WarningWitnessDateAfterDeath {
   required WarningPerson person = 1;
 }
@@ -480,30 +475,10 @@ message WarningFeventOrder {
   required string event2 = 3;
 }
 
-message WarningFwitnessEventAfterDeath {
-  required WarningPerson person = 1;
-  required string event = 2;
-}
-
-message WarningFwitnessEventBeforeBirth {
-  required WarningPerson person = 1;
-  required string event = 2;
-}
-
 message WarningPeventOrder {
   required WarningPerson person = 1;
   required string event1 = 2;
   required string event2 = 3;
-}
-
-message WarningPwitnessEventAfterDeath {
-  required WarningPerson person = 1;
-  required string event = 2;
-}
-
-message WarningPwitnessEventBeforeBirth {
-  required WarningPerson person = 1;
-  required string event = 2;
 }
 
 message BaseWarnings {
@@ -530,7 +505,7 @@ message BaseWarnings {
   repeated WarningChangedOrderOfMarriages warning_changed_order_of_marriages = 20;
   repeated WarningBigAgeBetweenSpouses warning_big_age_between_spouses = 21;
   repeated WarningDeadOld warning_dead_old = 22;
-  repeated WarningOldIndividual warning_old_individual = 23;
+  // repeated WarningOldIndividual warning_old_individual = 23;
   repeated WarningWitnessDateAfterDeath warning_witness_date_after_death = 24;
   repeated WarningWitnessDateBeforeBirth warning_witness_date_before_birth = 25;
   repeated WarningOldForMarriage warning_old_for_marriage = 27;

@@ -2,6 +2,11 @@ open Config
 open Def
 open Gwdb
 
+val effective_del_no_commit : base -> (iper, iper, string) gen_person -> unit
+
+val effective_del_commit : config -> base -> (iper, iper, string) gen_person -> unit
+
+(** [effective_del] applies [effective_del_no_commit] and [effective_del_commit] *)
 val effective_del : config -> base -> person -> unit
 
 (** [effective_mod prerr ?skip_conflict conf base sp] *)

@@ -78,6 +78,10 @@ let mutil_string_of_int_sep _ =
   test "," "100,000" 100000 ;
   test "," "1,000,000" 1000000
 
+let name_title _ =
+  let test exp = List.iter (fun s -> assert_equal ~printer:(fun s -> s) exp (Name.title s)) in
+  test "Jean-Baptiste" [ "jean-baptiste" ; "JEAN-baptiste" ; "Jean-Baptiste" ; "jeaN-baptistE" ]
+
 let utf8_sub _ =
   let test ?pad e s i j =
     let i = Utf8.get s i in
@@ -163,6 +167,9 @@ let suite =
     ; "mutil_arabian_romian" >:: mutil_arabian_romian
     ; "mutil_compare_after_particle" >:: mutil_compare_after_particle
     ; "mutil_string_of_int_sep" >:: mutil_string_of_int_sep
+    ]
+  ; "Name" >:::
+    [ "name_title" >:: name_title
     ]
   ; "Utf8" >:::
     [ "utf8_sub" >:: utf8_sub

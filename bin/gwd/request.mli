@@ -2,9 +2,9 @@
 
 open Geneweb
 
-val make_senv : Config.config -> Gwdb.base -> unit
+val make_senv : Config.config -> Gwdb.base -> Config.config
 
-val make_henv : Config.config -> Gwdb.base -> unit
+val make_henv : Config.config -> Gwdb.base -> Config.config
 
 (** [w_lock ~none callback conf base]
     Acquire a write lock on the base and call [callback], or fail with [none].
