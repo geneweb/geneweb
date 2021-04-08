@@ -3231,3 +3231,38 @@ let person_warnings conf base p =
     CheckItem.check_siblings ~onchange:false base filter (ifam, foi base ifam) ignore
   end (get_family p) ;
   !w
+
+let name_with_roman_number str =
+  let rec loop found len i =
+    if i = String.length str then if found then Some (Buff.get len) else None
+    else
+      match str.[i] with
+      |  '0'..'9' as c ->
+        let (n, i) =
+          let rec loop n i =
+            if i = String.length str then n, i
+            else
+              match str.[i] with
+              | '0'..'9' as c ->
+                loop (10 * n + Char.code c - Char.code '0') (i + 1)
+              | _ -> n, i
+          in
+          loop (Char.code c - Char.code '0') (i + 1)
+        in
+        loop true (Buff.mstore len (Mutil.roman_of_arabian n)) i
+      | c -> loop found (Buff.store len c) (i + 1)
+  in
+  loop false 0 0
+
+let cut_words str =
+  let rec loop beg i =
+    if i < String.length str then
+      match str.[i] with
+      | ' ' ->
+        if beg = i then loop (succ beg) (succ i)
+        else String.sub str beg (i - beg) :: loop (succ i) (succ i)
+      | _ -> loop beg (succ i)
+    else if beg = i then []
+    else [String.sub str beg (i - beg)]
+  in
+  loop 0 0

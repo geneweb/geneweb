@@ -4,7 +4,7 @@ open Config
 open Gwdb
 open Util
 
-let empty_surname_or_firsntame base p =
+let empty_sn_or_fn base p =
   is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
   is_empty_string (get_first_name p) || is_quest_string (get_first_name p) ||
   Name.lower (sou base (get_surname p)) = "" ||
@@ -32,73 +32,6 @@ let select_approx_key conf base pl k =
        else pl)
     pl []
 
-let cut_words str =
-  let rec loop beg i =
-    if i < String.length str then
-      match str.[i] with
-        ' ' ->
-          if beg = i then loop (succ beg) (succ i)
-          else String.sub str beg (i - beg) :: loop (succ i) (succ i)
-      | _ -> loop beg (succ i)
-    else if beg = i then []
-    else [String.sub str beg (i - beg)]
-  in
-  loop 0 0
-
-let try_find_with_one_first_name conf base n =
-  let n1 = Name.abbrev (Name.lower n) in
-  match String.index_opt n1 ' ' with
-    Some i ->
-      let fn = String.sub n1 0 i in
-      let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
-      let (list, _) =
-        Some.persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base)) get_surname sn
-      in
-      List.fold_left
-        (fun pl (_, _, ipl) ->
-           List.fold_left
-             (fun pl ip ->
-                let p = pget conf base ip in
-                let fn1 =
-                  Name.abbrev (Name.lower (sou base (get_first_name p)))
-                in
-                if List.mem fn (cut_words fn1) then p :: pl else pl)
-             pl ipl)
-        [] list
-  | None -> []
-
-let compact_list base xl =
-  let pl = Gutil.sort_person_list base xl in
-  List.fold_right
-    (fun p pl ->
-       match pl with
-         p1 :: _ when get_iper p = get_iper p1 -> pl
-       | _ -> p :: pl)
-    pl []
-
-let name_with_roman_number str =
-  let rec loop found len i =
-    if i = String.length str then if found then Some (Buff.get len) else None
-    else
-      match str.[i] with
-        '0'..'9' as c ->
-          let (n, i) =
-            let rec loop n i =
-              if i = String.length str then n, i
-              else
-                match str.[i] with
-                  '0'..'9' as c ->
-                    loop (10 * n + Char.code c - Char.code '0') (i + 1)
-                | _ -> n, i
-            in
-            loop (Char.code c - Char.code '0') (i + 1)
-          in
-          loop true (Buff.mstore len (Mutil.roman_of_arabian n)) i
-      | c -> loop found (Buff.store len c) (i + 1)
-  in
-  loop false 0 0
-
 (* search functions *)
 
 let search_by_sosa conf base an =
@@ -113,89 +46,66 @@ let search_by_sosa conf base an =
       else []
   | _ -> []
 
-let search_partial_key conf base an =
-  let ipl = Gutil.person_not_a_key_find_all base an in
-  let (an, ipl) =
-    if ipl = [] then
-      match name_with_roman_number an with
-        Some an1 ->
-          let ipl = Gutil.person_ht_find_all base an1 in
-          if ipl = [] then an, [] else an1, ipl
-      | None -> an, ipl
-    else an, ipl
-  in
-  let pl =
-    List.fold_left
-      (fun l ip ->
-         let p = pget conf base ip in if is_hidden p then l else p :: l)
-      [] ipl
-  in
-  let pl =
-    if pl = [] then try_find_with_one_first_name conf base an else pl
-  in
-  let pl =
-    if not conf.wizard && not conf.friend then
-      List.fold_right
-        (fun p pl ->
-           if not (is_hide_names conf p) || Util.authorized_age conf base p
-           then
-             p :: pl
-           else pl)
-        pl []
-    else pl
-  in
-  compact_list base pl
+let search_reject_p conf base p =
+  empty_sn_or_fn base p
+  || (not (conf.wizard || conf.friend) && Util.is_hide_names conf p)
+  || not (Util.authorized_age conf base p)
 
-let search_approx_key conf base an =
-  let ipl = Gutil.person_not_a_key_find_all base an in
-  let (an, ipl) =
-    if ipl = [] then
-      match name_with_roman_number an with
-        Some an1 ->
-          let ipl = Gutil.person_ht_find_all base an1 in
-          if ipl = [] then an, [] else an1, ipl
-      | None -> an, ipl
-    else an, ipl
+let search_by_name conf base n =
+  let n1 = Name.abbrev (Name.lower n) in
+  match String.index_opt n1 ' ' with
+  | Some i ->
+    let fn = String.sub n1 0 i in
+    let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
+    let (list, _) =
+      Some.persons_of_fsname conf base base_strings_of_surname
+        (spi_find (persons_of_surname base)) get_surname sn
+    in
+    List.fold_left begin fun pl (_, _, ipl) ->
+      List.fold_left begin fun pl ip ->
+        let p = pget conf base ip in
+        if search_reject_p conf base p then pl
+        else
+          let fn1 = Name.abbrev (Name.lower (sou base (get_first_name p))) in
+          if List.mem fn (cut_words fn1) then p :: pl else pl
+      end pl ipl
+    end [] list
+  | None -> []
+
+let search_key_aux aux conf base an =
+  let acc = Gutil.person_not_a_key_find_all base an in
+  let (an, acc) =
+    if acc = [] then
+      match Util.name_with_roman_number an with
+      | Some an1 ->
+        let acc = Gutil.person_ht_find_all base an1 in
+        if acc = [] then an, [] else an1, acc
+      | None -> an, acc
+    else an, acc
   in
-  let pl =
-    List.fold_left
-      (fun l ip ->
-         let p = pget conf base ip in if is_hidden p then l else p :: l)
-      [] ipl
+  let acc =
+    List.filter_map begin fun i ->
+      let p = Util.pget conf base i in
+      if search_reject_p conf base p then None else Some p
+    end acc
   in
-  let pl = select_approx_key conf base pl an in
-  let pl =
-    if not conf.wizard && not conf.friend then
-      List.fold_right
-        (fun p pl ->
-           if not (is_hide_names conf p) || Util.authorized_age conf base p
-           then
-             p :: pl
-           else pl)
-        pl []
-    else pl
-  in
-  let pl =
-    List.fold_right
-      (fun p pl -> if empty_surname_or_firsntame base p then pl else p :: pl)
-      pl []
-  in
-  compact_list base pl
+  let acc = aux conf base acc an in
+  Gutil.sort_uniq_person_list base acc
+
+let search_partial_key =
+  search_key_aux begin fun conf base acc an ->
+    if acc = [] then search_by_name conf base an else acc
+  end
+
+let search_approx_key =
+  search_key_aux select_approx_key
 
 (* recherche par clé, i.e. prenom.occ nom *)
 let search_by_key conf base an =
   match Gutil.person_of_string_key base an with
-    Some ip ->
-      let pl = let p = pget conf base ip in if is_hidden p then [] else [p] in
-      if not conf.wizard && not conf.friend then
-        List.fold_right
-          (fun p pl ->
-             if not (is_hide_names conf p) || Util.authorized_age conf base p
-             then
-               p :: pl
-             else pl)
-          pl []
-      else pl
+  | Some ip ->
+    let p = Util.pget conf base ip in
+    if search_reject_p conf base p then [] else [p]
   | None -> []
 
 (* main *)

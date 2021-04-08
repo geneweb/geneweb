@@ -122,34 +122,12 @@ let print_shortest_path conf base p1 p2 =
     Output.print_string conf "\n";
     Hutil.trailer conf
   else
-    let excl_faml =
-      let rec loop list i =
-        match p_getenv conf.env ("ef" ^ string_of_int i) with
-          Some k -> loop (ifam_of_string k :: list) (i + 1)
-        | None ->
-            match find_person_in_env conf base ("ef" ^ string_of_int i) with
-              Some p ->
-                let n =
-                  match p_getint conf.env ("fef" ^ string_of_int i) with
-                    Some n -> n
-                  | None -> 0
-                in
-                let u = p in
-                let list =
-                  if n < Array.length (get_family u) then
-                    (get_family u).(n) :: list
-                  else list
-                in
-                loop list (i + 1)
-            | None -> list
-      in
-      loop [] 0
-    in
+    let excl_faml = excl_faml conf base in
     let title _ =
       Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship"))
     in
     match get_shortest_path_relation conf base ip1 ip2 excl_faml with
-      Some (path, ifam) ->
+    | Some (path, ifam) ->
         print_relation_path conf base ip1 ip2 path ifam excl_faml
     | None ->
         let s1 = gen_person_title_text reference raw_access conf base p1 in
