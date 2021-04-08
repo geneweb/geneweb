@@ -148,8 +148,26 @@ let ind_set_of_relation_path base path =
   set
 
 type node =
-    NotVisited
+  | NotVisited
   | Visited of (bool * iper * famlink)
+
+let excl_faml conf base =
+  let rec loop list i =
+    match p_getenv conf.Config.env ("ef" ^ string_of_int i) with
+    | Some k -> loop (ifam_of_string k :: list) (i + 1)
+    | None ->
+      match find_person_in_env conf base ("ef" ^ string_of_int i) with
+      | Some p ->
+        let n = p_getint conf.env ("fef" ^ string_of_int i) |> Opt.default 0 in
+        let list =
+          if n < Array.length (get_family p)
+          then (get_family p).(n) :: list
+          else list
+        in
+        loop list (i + 1)
+      | None -> list
+  in
+  loop [] 0
 
 (* FIXME: remove all these Aray.to_list *)
 let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =

@@ -98,6 +98,17 @@ let utf8_sub _ =
   test "švédčina" "švédčina" 0 8 ;
   test "a" "švédčina" 7 1
 
+let util_name_with_roman_number _ =
+  let test r a =
+    let printer = function Some x -> "Some \"" ^ String.escaped x ^ "\"" | None -> "None" in
+    assert_equal ~printer r (Util.name_with_roman_number a) in
+  test (Some "XXXIX XXXIX") "39 39" ;
+  test (Some "XXXIX x XXXIX") "39 x 39" ;
+  test (Some "foo CCXLVI") "foo 246" ;
+  test (Some "bar CDXXI baz") "bar 421 baz" ;
+  test (Some "bar CLX baz CCVII") "bar 160 baz 207" ;
+  test None "foo bar baz"
+
 let util_safe_html _ =
   assert_equal
     ~printer:(fun x -> x)
@@ -175,10 +186,11 @@ let suite =
     [ "utf8_sub" >:: utf8_sub
     ]
   ; "Util" >:::
-    [ "util_safe_html" >:: util_safe_html
-    ; "util_transl_a_of_b" >:: util_transl_a_of_b
-    ; "util_string_with_macros" >:: util_string_with_macros
-    ; "datedisplay_string_of_date" >:: datedisplay_string_of_date
+    [ "datedisplay_string_of_date" >:: datedisplay_string_of_date
+    ; "util_name_with_roman_number" >:: util_name_with_roman_number
     ; "util_no_html_tags" >:: util_no_html_tags
+    ; "util_safe_html" >:: util_safe_html
+    ; "util_string_with_macros" >:: util_string_with_macros
+    ; "util_transl_a_of_b" >:: util_transl_a_of_b
     ]
   ]

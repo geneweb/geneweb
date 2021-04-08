@@ -218,34 +218,40 @@ let arg_list_of_string line =
   in
   loop [] 0 0 None
 
-let sort_person_list base pl =
-  List.sort
-    (fun p1 p2 ->
-       match
-         Adef.od_of_cdate (get_birth p1), get_death p1,
-         Adef.od_of_cdate (get_birth p2), get_death p2
-       with
-       | Some d1, _, Some d2, _ ->
-         Date.compare_date d1 d2
-       | Some d1, _, _, Death (_, d2) ->
-         Date.compare_date d1 (Adef.date_of_cdate d2)
-       | _, Death (_, d1), Some d2, _ ->
-         Date.compare_date (Adef.date_of_cdate d1) d2
-       | _, Death (_, d1), _, Death (_, d2) ->
-         Date.compare_date (Adef.date_of_cdate d1) (Adef.date_of_cdate d2)
-       | Some _, _, _, _ -> 1
-       | _, Death (_, _), _, _ -> 1
-       | _, _, Some _, _ -> -1
-       | _, _, _, Death (_, _) -> -1
-       | _ ->
-           let c = alphabetic (p_surname base p1) (p_surname base p2) in
-           if c = 0 then
-             let c =
-               alphabetic (p_first_name base p1) (p_first_name base p2)
-             in
-             if c = 0 then compare (get_occ p1) (get_occ p2) else c
-           else c)
-    pl
+let sort_person_list_aux sort base =
+  sort begin fun p1 p2 ->
+    if get_iper p1 = get_iper p2
+    then 0
+    else
+      match
+        Adef.od_of_cdate (get_birth p1), get_death p1,
+        Adef.od_of_cdate (get_birth p2), get_death p2
+      with
+      | Some d1, _, Some d2, _ ->
+        Date.compare_date d1 d2
+      | Some d1, _, _, Death (_, d2) ->
+        Date.compare_date d1 (Adef.date_of_cdate d2)
+      | _, Death (_, d1), Some d2, _ ->
+        Date.compare_date (Adef.date_of_cdate d1) d2
+      | _, Death (_, d1), _, Death (_, d2) ->
+        Date.compare_date (Adef.date_of_cdate d1) (Adef.date_of_cdate d2)
+      | Some _, _, _, _ -> 1
+      | _, Death (_, _), _, _ -> 1
+      | _, _, Some _, _ -> -1
+      | _, _, _, Death (_, _) -> -1
+      | _ ->
+        let c = alphabetic (p_surname base p1) (p_surname base p2) in
+        if c = 0 then
+          let c =
+            alphabetic (p_first_name base p1) (p_first_name base p2)
+          in
+          if c = 0 then compare (get_occ p1) (get_occ p2) else c
+        else c
+  end
+
+let sort_person_list = sort_person_list_aux List.sort
+
+let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
 
 let find_free_occ base f s _i =
   let ipl = persons_of_name base (f ^ " " ^ s) in

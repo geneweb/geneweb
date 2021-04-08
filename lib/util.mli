@@ -432,3 +432,14 @@ val auth_warning : config -> base -> ('a, person, ifam, 'b, 'c, 'd, 'e) warning 
     using [auth_warning] for filtering.
 *)
 val person_warnings : config -> base -> person -> CheckItem.base_warning list
+
+(** Convert arabic numerals to roman numerals.
+    [Some result] is returned if there are numerals, [None] if not.
+*)
+val name_with_roman_number : string -> string option
+
+(** [cut_words str]
+    Same output as
+    [String.split_on_char ' ' s |> List.map String.trim |> List.filter ((<>) "")]
+*)
+val cut_words : string -> string list

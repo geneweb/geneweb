@@ -45,6 +45,13 @@ let bench () =
         ; "[foo-bar] - baz, boobar, barboo"
         ; "baz, boobar"
         ]
+    ; bench "Util.name_with_roman_number" Util.name_with_roman_number
+        [ "39 39"
+        ; "39 x 39"
+        ; "foo 246"
+        ; "bar 421 baz"
+        ; "bar 160 baz 207"
+        ; "foo bar baz" ]
     ; bench "Name.lower" Name.lower
         [ "étienne" ; "Étienne" ; "ÿvette" ; "Ÿvette" ; "Ĕtienne" ]
     ; bench "Name.split_fname" Name.split_fname
