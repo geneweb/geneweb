@@ -34,6 +34,12 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
     %end;
   %end;
 %end;
+%define;get_plugin(file)
+  %include.file
+%end;
+%define;get_plugin_cmd(kind, iii)
+  %apply;get_plugin(bvar.kind_iii)
+%end;
 
 <body%body_prop;>
 <div class="container">
@@ -248,6 +254,18 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <i class="far fa-calendar-alt fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
       </div>
     </div>
+    %if;(bvar.btn_welcome!="")
+      <div class="d-flex flex-column justify-items-lg-center mt-3 mt-lg-4">
+        <div class="h4 text-lg-center"><i class="fas fa-plug fa-sm fa-fw text-secondary mr-1"></i>[*plugins]</div>
+          <div class="d-inline-flex justify-content-lg-center">
+              %for;i;0;bvar.btn_welcome;
+                %apply;get_plugin_cmd("btn_welcome", i+1)
+              %end;
+          </div>
+        </div>
+      </div>
+    %end;
+
     %if;wizard;
       <div class="d-flex flex-column flex-lg-row justify-content-lg-center mt-2 mt-lg-4">
         <div class="h4 align-self-lg-center mr-lg-2">
