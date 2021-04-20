@@ -40,7 +40,7 @@ let give_access conf base ia_asex p1 b1 p2 b2 print_sosa =
   in
   let print_nospouse _ =
     print_sosa conf base p2 true;
-    Wserver.printf "%s%s"
+    Output.printf conf "%s%s"
       (gen_person_title_text reference std_access conf base p2)
       (DateDisplay.short_dates_text conf base p2)
   in
@@ -49,13 +49,13 @@ let give_access conf base ia_asex p1 b1 p2 b2 print_sosa =
     if first then
       begin
         print_sosa conf base p2 true;
-        Wserver.printf "%s"
+        Output.printf conf "%s"
           (gen_person_title_text reference std_access conf base p2)
       end
-    else Wserver.printf "<br%s>%s" conf.xhs (person_title_text conf base p2);
-    Wserver.printf "%s &amp; " (DateDisplay.short_dates_text conf base p2);
+    else Output.printf conf "<br>%s" (person_title_text conf base p2);
+    Output.printf conf "%s &amp; " (DateDisplay.short_dates_text conf base p2);
     print_sosa conf base sp true;
-    Wserver.printf "%s%s"
+    Output.printf conf "%s%s"
       (gen_person_title_text (reference_sp sp) std_access conf base sp)
       (DateDisplay.short_dates_text conf base sp)
   in
@@ -78,7 +78,7 @@ let give_access conf base ia_asex p1 b1 p2 b2 print_sosa =
 let rec print_descend_upto conf base max_cnt ini_p ini_br lev children display print_sosa =
   if lev > 0 && !cnt < max_cnt then
     begin
-      if display then Wserver.printf "<ul>\n";
+      if display then Output.print_string conf "<ul>\n";
       List.iter
         (fun (ip, ia_asex, rev_br) ->
            let p = pget conf base ip in
@@ -104,7 +104,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children display p
                if display && lev = 1 then incr cnt
                else if lev <= 2 then
                  begin
-                   Wserver.printf "<li>";
+                   Output.print_string conf "<li>";
                    if lev = 1 then
                      begin
                        give_access conf base ia_asex ini_p ini_br p br print_sosa;
@@ -117,7 +117,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children display p
                          (transl_nth conf "child/children" 1)
                          s s
                      in
-                     Wserver.printf "%s%s%s%s\n" (Utf8.capitalize (Util.translate_eval s)) with_sp
+                     Output.printf conf "%s%s%s%s\n" (Utf8.capitalize (Util.translate_eval s)) with_sp
                        (Util.transl conf ":") (if with_sp = "" then "<br>" else "")
                  end;
                (* the function children_of returns *all* the children of ip *)
@@ -133,15 +133,15 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children display p
                     if (Array.length (get_family p)) > 1 && lev >= 2 &&
                        ((List.length children) > 0) && (Cousins.has_desc_lev conf base lev sp)
                     then
-                      if display then Wserver.printf "%s %s%s\n" (Util.transl conf "with")
+                      if display then Output.printf conf "%s %s%s\n" (Util.transl conf "with")
                         (person_title_text conf base sp) (Util.transl conf ":") ;
                     print_descend_upto conf base max_cnt ini_p ini_br (lev - 1) children display print_sosa;
                  )
                  (get_family p) ;
-               if lev <= 2 && display then Wserver.printf "</li>\n"
+               if lev <= 2 && display then Output.print_string conf "</li>\n"
              end)
         children;
-      if display then Wserver.printf "</ul>\n"
+      if display then Output.print_string conf "</ul>\n"
     end
 
 let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 display print_sosa =
@@ -150,8 +150,8 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 display pri
     begin
       if lev1 > 1 && display then
         begin
-          Wserver.printf "<li>\n";
-          Wserver.printf "%s%s\n"
+          Output.print_string conf "<li>\n";
+          Output.printf conf"%s%s\n"
             (Utf8.capitalize
                (cftransl conf "on %s's side"
                   [gen_person_title_text no_reference raw_access conf base
@@ -160,7 +160,7 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 display pri
         end;
       let sib = List.map (fun (ip, ia_asex) -> ip, ia_asex, []) sib in
       print_descend_upto conf base max_cnt ini_p ini_br lev2 sib display print_sosa;
-      if lev1 > 1 && display then Wserver.printf "</li>\n";
+      if lev1 > 1 && display then Output.print_string conf "</li>\n";
       true
     end
   else false
@@ -175,10 +175,10 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 display print_sosa =
   let last_sosa = Sosa.twice first_sosa in
   if display then
   begin
-  	Wserver.printf "<div>\n";
+  	Output.print_string conf "<div>\n";
   	Util.print_tips_relationship conf;
-  	Wserver.printf "</div>\n";
-  	if lev1 > 1 then Wserver.printf "<ul>\n";
+  	Output.print_string conf "</div>\n";
+  	if lev1 > 1 then Output.print_string conf "<ul>\n";
   end;
   let some =
     let rec loop sosa some =
@@ -197,5 +197,5 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 display print_sosa =
     loop first_sosa false
   in
   if some then ()
-  else Wserver.printf "%s.\n" (Utf8.capitalize (transl conf "no match"));
-  if lev1 > 1 then Wserver.printf "</ul>\n"
+  else Output.printf conf "%s.\n" (Utf8.capitalize (transl conf "no match"));
+  if lev1 > 1 then Output.print_string conf "</ul>\n"
