@@ -715,7 +715,7 @@ let check_person conf p =
 
 let error_person conf err =
 #ifdef API
-  if not !Api_conf.mode_api then begin
+  if not conf.api_mode then begin
 #endif
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
@@ -772,7 +772,7 @@ let strip_person p =
 
 let print_conflict conf base p =
 #ifdef API
-  if not !Api_conf.mode_api then begin
+  if not conf.api_mode then begin
 #endif
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
@@ -838,7 +838,7 @@ let default_prerr conf base = function
 
 let print_cannot_change_sex ?(prerr = default_prerr) conf base p =
 #ifdef API
-  if not !Api_conf.mode_api then
+  if not conf.api_mode then
 #endif
   prerr conf base (BadSexOfMarriedPerson p) ;
   let err =

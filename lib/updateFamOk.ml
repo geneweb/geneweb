@@ -860,7 +860,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
 #ifdef API
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
-    if !(Api_conf.mode_api) then {nfam with relation = sfam.relation}
+    if conf.api_mode then {nfam with relation = sfam.relation}
     else nfam
   in
 #endif

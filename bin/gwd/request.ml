@@ -793,7 +793,7 @@ let treat_request =
               String.get mode 2 = 'I' && String.get mode 3 = '_'
             with _ -> false ->
           (* On passe en mode API, i.e. que les exceptions API sont levées. *)
-          let () = Api_conf.set_mode_api () in
+          let conf = { conf with api_mode = true } in
           begin match mode with
             | "API_ADD_FIRST_FAM" ->
               fun conf _ -> Api_saisie_write.print_add_first_fam conf
