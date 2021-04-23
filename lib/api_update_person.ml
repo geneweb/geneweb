@@ -16,13 +16,9 @@ let reconstitute_person conf base mod_p : ('a, string * string * int * Update.cr
   let (first_name, surname) =
     let contain_fn = String.contains first_name in
     let contain_sn = String.contains surname in
-    if (List.exists contain_fn Name.forbidden_char) ||
-       (List.exists contain_sn Name.forbidden_char) then
-      begin
-        removed_string :=
-          (Name.purge first_name ^ " " ^ Name.purge surname) :: !removed_string;
-        (Name.purge first_name, Name.purge surname)
-      end
+    if (List.exists contain_fn Name.forbidden_char)
+    || (List.exists contain_sn Name.forbidden_char)
+    then (Name.purge first_name, Name.purge surname)
     else (first_name, surname)
   in
   (* Attention, dans le cas où l'on fait modifier personne, *)
@@ -471,13 +467,9 @@ let reconstitute_person_nobase conf mod_p =
   let (first_name, surname) =
     let contain_fn = String.contains first_name in
     let contain_sn = String.contains surname in
-    if (List.exists contain_fn Name.forbidden_char) ||
-       (List.exists contain_sn Name.forbidden_char) then
-      begin
-        removed_string :=
-          (Name.purge first_name ^ " " ^ Name.purge surname) :: !removed_string;
-        (Name.purge first_name, Name.purge surname)
-      end
+    if (List.exists contain_fn Name.forbidden_char)
+    || (List.exists contain_sn Name.forbidden_char)
+    then (Name.purge first_name, Name.purge surname)
     else (first_name, surname)
   in
   (* Attention, dans le cas où l'on fait modifier personne, *)
