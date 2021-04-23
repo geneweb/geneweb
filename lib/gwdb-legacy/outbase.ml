@@ -9,7 +9,6 @@ let load_descends_array base = base.data.descends.load_array ()
 let load_strings_array base = base.data.strings.load_array ()
 let close_base base = base.func.cleanup ()
 
-let save_mem = ref false
 let verbose = Mutil.verbose
 
 let trace s =
@@ -165,7 +164,7 @@ let output_particles_file particles fname =
   end particles ;
   close_out oc
 
-let output base =
+let output ?(save_mem = false) base =
   let bname = base.data.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755 ;
   let tmp_particles = Filename.concat bname "1particles.txt" in
@@ -246,7 +245,7 @@ let output base =
           base.data.ascends.clear_array ();
           base.data.unions.clear_array ();
           base.data.couples.clear_array ();
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           let surname_pos = pos_out oc_inx in
           trace "create strings of sname";
           create_strings_of_sname oc_inx oc_inx_acc base;
@@ -259,14 +258,14 @@ let output base =
           output_binary_int oc_inx first_name_pos;
           close_out oc_inx;
           close_out oc_inx_acc;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           Gc.compact () ;
           trace "create string index";
           output_strings_hash tmp_strings_inx base;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           trace "create surname index";
           output_surname_index base tmp_snames_inx tmp_snames_dat;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           trace "create first name index";
           output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
           let s = base.data.bnotes.Def.nread "" Def.RnAll in

@@ -200,8 +200,8 @@ let new_iper base = base.data.persons.len
 let new_ifam base = base.data.families.len
 
 (* FIXME: lock *)
-let sync ?scratch:_ base =
-  Outbase.output base
+let sync ?scratch:_ ?save_mem base =
+  Outbase.output ?save_mem base
 
 let make bname particles arrays : Dbdisk.dsk_base =
   sync ~scratch:true (Database.make bname particles arrays) ;
