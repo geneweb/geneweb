@@ -595,15 +595,11 @@ let make_visible_record_access bname persons =
 
 (*
    Synchro:
-     - synchro_person contient la liste des ip des personnes patchées.
-     - synchro_family contient la liste des ifam des familles patchées.
      - synchro_patch contient :
          * le timestamp de la modification
          * la liste des personnes modifiées
          * la liste des familles modifiées
 *)
-let synchro_person = ref []
-let synchro_family = ref []
 type synchro_patch =
   { mutable synch_list : (string * int list * int list) list }
 
@@ -902,7 +898,22 @@ let opendb bname =
     let synchro =
       let timestamp = string_of_float (Unix.time ()) in
       let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
-      let v = timestamp, !synchro_person, !synchro_family in
+      let aux ht acc =
+        Hashtbl.fold begin fun k _ acc ->
+          if List.mem k acc then acc else k :: acc
+        end ht acc
+      in
+      let persons =
+        aux (snd pending.h_person) []
+        |> aux (snd pending.h_ascend)
+        |> aux (snd pending.h_union)
+      in
+      let families =
+        aux (snd pending.h_family) []
+        |> aux (snd pending.h_couple)
+        |> aux (snd pending.h_descend)
+      in
+      let v = timestamp, persons, families in
       {synch_list = v :: synchro.synch_list}
     in
     Dutil.output_value_no_sharing oc9 (synchro : synchro_patch);
@@ -981,42 +992,36 @@ let opendb bname =
     persons.len <- max persons.len (i + 1);
     fst pending.h_person := persons.len;
     Hashtbl.replace (snd pending.h_person) i p;
-    synchro_person := i :: !synchro_person
   in
   let patch_ascend i a =
     assert (i <> -1) ;
     ascends.len <- max ascends.len (i + 1);
     fst pending.h_ascend := ascends.len;
     Hashtbl.replace (snd pending.h_ascend) i a;
-    synchro_person := i :: !synchro_person
   in
   let patch_union i a =
     assert (i <> -1) ;
     unions.len <- max unions.len (i + 1);
     fst pending.h_union := ascends.len;
     Hashtbl.replace (snd pending.h_union) i a;
-    synchro_person := i :: !synchro_person
   in
   let patch_family i f =
     assert (i <> -1) ;
     families.len <- max families.len (i + 1);
     fst pending.h_family := families.len;
     Hashtbl.replace (snd pending.h_family) i f;
-    synchro_family := i :: !synchro_family
   in
   let patch_couple i c =
     assert (i <> -1) ;
     couples.len <- max couples.len (i + 1);
     fst pending.h_couple := couples.len;
     Hashtbl.replace (snd pending.h_couple) i c;
-    synchro_family := i :: !synchro_family
   in
   let patch_descend i c =
     assert (i <> -1) ;
     descends.len <- max descends.len (i + 1);
     fst pending.h_descend := descends.len;
     Hashtbl.replace (snd pending.h_descend) i c;
-    synchro_family := i :: !synchro_family
   in
   let index_of_string =
     index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
