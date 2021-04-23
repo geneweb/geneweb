@@ -9,13 +9,6 @@ val digest : 'a -> string
 val sizeof_long : int
 val sign_extend : int -> int
 
-(* making a header for input_value like output_value does *)
-
-type header_pos
-
-val create_output_value_header : out_channel -> header_pos
-val patch_output_value_header : out_channel -> header_pos -> int
-
 (* generic functions *)
 
 type 'a in_funs =
