@@ -191,51 +191,59 @@ let size_funs =
    output_binary_int = (fun r _ -> r := !r + 4);
    output = fun r _ beg len -> r := !r + len - beg}
 
-let size = ref 0
-
-let size v = size := 0; gen_output size_funs size v; !size
+let size v =
+  let size = ref 0 in
+  gen_output size_funs size v;
+  !size
 
 (* Digest *)
 
-let dbuf = ref (Bytes.create 256)
-let dlen = ref 0
-let dput_char c =
+let dput_char dbuf dlen c =
   if !dlen = Bytes.length !dbuf then dbuf := Bytes.extend !dbuf 0 !dlen;
   Bytes.set !dbuf !dlen c;
   incr dlen
-let rec dput_int i =
+let rec dput_int dbuf dlen i =
   if i = 0 then ()
   else
     begin
-      dput_char (Char.chr (Char.code '0' + i mod 10));
-      dput_int (i / 10)
+      dput_char dbuf dlen (Char.chr (Char.code '0' + i mod 10));
+      dput_int dbuf dlen (i / 10)
     end
-let dput_string s = for i = 0 to String.length s - 1 do dput_char s.[i] done
+let dput_string dbuf dlen s = for i = 0 to String.length s - 1 do dput_char dbuf dlen s.[i] done
 
-let rec digest_loop v =
+let rec digest_loop dbuf dlen v =
   if not (Obj.is_block v) then
-    let n : int = Obj.magic v in dput_char 'I'; dput_int n
+    let n : int = Obj.magic v in
+    dput_char dbuf dlen 'I';
+    dput_int dbuf dlen n
   else if Obj.tag v = Obj.closure_tag then
     invalid_arg "Iovalue.digest: closure"
-  else if Obj.size v = 0 then begin dput_char 'T'; dput_int (Obj.tag v) end
-  else if Obj.tag v = Obj.string_tag then
+  else if Obj.size v = 0 then begin
+    dput_char dbuf dlen 'T';
+    dput_int dbuf dlen (Obj.tag v)
+  end else if Obj.tag v = Obj.string_tag then
     let s : string = Obj.magic v in
-    dput_char 'S'; dput_int (String.length s); dput_char '/'; dput_string s
-  else
-    begin
-      dput_char 'O';
-      dput_int (Obj.tag v);
-      dput_char '/';
-      dput_int (Obj.size v);
-      digest_fields v 0
-    end
-and digest_fields v i =
-  if i = Obj.size v then ()
-  else begin digest_loop (Obj.field v i); digest_fields v (i + 1) end
+    dput_char dbuf dlen 'S';
+    dput_int dbuf dlen (String.length s);
+    dput_char dbuf dlen '/';
+    dput_string dbuf dlen s
+  else begin
+    dput_char dbuf dlen 'O';
+    dput_int dbuf dlen (Obj.tag v);
+    dput_char dbuf dlen '/';
+    dput_int dbuf dlen (Obj.size v);
+    digest_fields dbuf dlen v 0
+  end
+and digest_fields dbuf dlen v i =
+  if i <> Obj.size v then begin
+    digest_loop dbuf dlen (Obj.field v i);
+    digest_fields dbuf dlen v (i + 1)
+  end
 
 let digest v =
-  dlen := 0;
-  digest_loop (Obj.repr v);
+  let dbuf = ref (Bytes.create 256) in
+  let dlen = ref 0 in
+  digest_loop dbuf dlen (Obj.repr v);
   Digest.to_hex (Digest.subbytes !dbuf 0 !dlen)
 
 let output_value_header_size = 20
