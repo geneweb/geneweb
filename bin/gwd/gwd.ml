@@ -1882,20 +1882,6 @@ let main () =
 #ifdef API
     ; ("-api_h", Arg.String (fun x -> selected_api_host := x), "<HOST> Host for GeneWeb API (default = " ^ !selected_api_host ^ ").")
     ; ("-api_p", Arg.Int (fun x -> selected_api_port := x), "<NUMBER> Port number for GeneWeb API (default = " ^ string_of_int !selected_api_port ^ ").")
-    ; ("-redis", Arg.String (fun x -> Api_link.redis_host := try string_of_inet_aux x with _ -> x), " Host redis for links tree.")
-    ; ("-redis_p", Arg.Int (fun x -> Api_link.redis_port := x), "<PORT> Redis port for links tree.")
-    ; ("-links_tree_url", Arg.String begin fun x ->
-        (* ^[a-z]:gwx:2322 *)
-        let i = index x ':' in
-        let j = index_from x (i + 1) ':' in
-        let base_regexp = String.sub x 0 i in
-        let host_name = String.sub x (i + 1) (j - i - 1) in
-        let port = String.sub x (j + 1) (String.length x - j - 1) in
-        Api_link.api_servers :=
-          ( base_regexp
-          , try string_of_inet_aux host_name ^ ":" ^ port with _ -> host_name ^ ":" ^ port
-          ) :: !Api_link.api_servers
-      end, "<REGEX:HOST:PORT> API url for links tree.")
 #endif
     ]
   in
