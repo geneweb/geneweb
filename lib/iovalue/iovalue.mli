@@ -24,7 +24,5 @@ type 'a out_funs =
 val gen_output : 'a out_funs -> 'a -> 'b -> unit
 
 val output_block_header : out_channel -> int -> int -> unit
-val size_32 : int ref
-val size_64 : int ref
 
 val output_array_access : out_channel -> (int -> 'a) -> int -> int -> int

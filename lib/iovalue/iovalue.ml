@@ -93,9 +93,6 @@ type 'a out_funs =
     output_binary_int : 'a -> int -> unit;
     output : 'a -> string -> int -> int -> unit }
 
-let size_32 = ref 0
-let size_64 = ref 0
-
 let output_binary_int64 ofuns oc x =
   for i = 1 to 8 do
     ofuns.output_byte oc (x lsr (64 - 8 * i) land 0xFF)
@@ -118,10 +115,7 @@ let gen_output_block_header ofuns oc tag size =
       ofuns.output_byte oc (size lsr 6 land 0xFF);
       ofuns.output_byte oc (size lsl 2 land 0xFF);
       ofuns.output_byte oc (size lsl 10 land 0xFF + tag)
-    end;
-  if size = 0 then ()
-  else
-    begin size_32 := !size_32 + 1 + size; size_64 := !size_64 + 1 + size end
+    end
 
 let rec output_loop ofuns oc x =
   if Obj.is_int x then
@@ -159,8 +153,6 @@ let rec output_loop ofuns oc x =
         ofuns.output_binary_int oc len
       end;
     ofuns.output oc (Obj.magic x) 0 len;
-    size_32 := !size_32 + 1 + (len + 4) / 4;
-    size_64 := !size_64 + 1 + (len + 8) / 8
   else if Obj.tag x = Obj.double_tag || Obj.tag x = Obj.double_array_tag then
     failwith "Iovalue.output: floats not implemented"
   else if Obj.tag x = Obj.closure_tag then failwith "Iovalue.output <fun>"
