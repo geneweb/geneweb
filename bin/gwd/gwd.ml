@@ -1131,6 +1131,7 @@ let make_conf from_addr request script_name env =
 #ifdef API
      api_host = !selected_api_host;
      api_port = !selected_api_port;
+     api_mode = false;
 #endif
      manitou = manitou;
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
