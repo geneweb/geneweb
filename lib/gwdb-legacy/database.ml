@@ -1114,6 +1114,7 @@ let opendb bname =
     ; particles = lazy (Mutil.compile_particles particles)
     ; bnotes
     ; bdir = bname
+    ; visible_ht = None
     }
   in
   let persons_of_name = persons_of_name bname patches.h_name in
@@ -1177,7 +1178,9 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; particles_txt = particles
     ; particles = lazy (Mutil.compile_particles particles)
     ; bnotes = bnotes
-    ; bdir = bdir }
+    ; bdir = bdir
+    ; visible_ht = None
+    }
   in
   let func : Dbdisk.base_func =
     { person_of_key = (fun _ -> assert false)

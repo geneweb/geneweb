@@ -590,9 +590,6 @@ let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
 
 (* Restrict file *)
 
-(* FIXME: these values should not be global *)
-let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
-
 let read_or_create_visible base =
   let fname = Filename.concat base.data.bdir "restrict" in
   let visible =
@@ -607,12 +604,12 @@ let read_or_create_visible base =
       visible
     else Hashtbl.create (nb_of_persons base)
   in
-  visible_ref := Some visible ;
+  base.data.visible_ht <- Some visible ;
   visible
 
 let base_visible_write base =
   let fname = Filename.concat base.data.bdir "restrict" in
-  match !visible_ref with
+  match base.data.visible_ht with
   | Some visible ->
     let oc = Secure.open_out fname in
     output_string oc Mutil.executable_magic ;
@@ -622,7 +619,7 @@ let base_visible_write base =
 
 let base_visible_get base fct i =
   let visible =
-    match !visible_ref with
+    match base.data.visible_ht with
     | Some visible -> visible
     | None -> read_or_create_visible base
   in
@@ -630,6 +627,6 @@ let base_visible_get base fct i =
   | None ->
     let status = fct (poi base i) in
     Hashtbl.add visible i status ;
-    visible_ref := Some visible;
+    base.data.visible_ht <- Some visible;
     status
   | Some b -> b
