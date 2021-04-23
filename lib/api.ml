@@ -707,48 +707,41 @@ let print_remove_image_ext_all base =
 (*  [Fonc] print_base_warnings : config -> base -> unit                  *)
 (** [Description] : Renvoie les listes des erreurs et warnings d'une base.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - base_warning : Les listes de tous les warnings de la base.
-    [Rem] : Non exporté en clair hors de ce module.                      *)
+    - conf : configuration de la base
+    - base : base de donnée
+      [Retour] :
+    - base_warning : Les listes de tous les warnings de la base.
+      [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let print_base_warnings conf base =
   let filters = get_filters conf in
   let errors = ref [] in
-  let warnings = ref [] in
+  let warnings = Hashtbl.create 0 in
   Check.check_base base
-    (Api_warnings.set_list errors) (Api_warnings.set_list warnings) ignore ;
-  (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
-  (* levé par plusieurs fonctions différents selon le context.       *)
-  let warnings =
-    let ht = Hashtbl.create 1 in
-    let rec loop wl accu =
-      match wl with
-      | [] -> accu
-      | x :: wl ->
-          if Hashtbl.mem ht (Hashtbl.hash x) then loop wl accu
-          else begin
-            Hashtbl.add ht (Hashtbl.hash x) true;
-            loop wl (x :: accu)
-          end
-    in
-    loop !warnings []
-  in
-  List.iter
-    (Api_warnings.add_error_to_piqi_warning_list base)
-    !errors ;
-  List.iter
-    (Api_warnings.add_warning_to_piqi_warning_list conf base)
-    warnings ;
+    (fun e -> errors := e :: !errors)
+    (fun w ->
+       if not @@ Hashtbl.mem warnings w
+       then Hashtbl.add warnings w true)
+    ignore ;
   let data =
     if filters.nb_results then
-      let len = List.length !errors + List.length warnings in
+      let len = List.length !errors + Hashtbl.length warnings in
       let len = M.Internal_int32.({value = Int32.of_int len}) in
       Mext.gen_internal_int32 len
     else
-      let base_warnings = Api_warnings.create_piqi_warnings () in
-      Mext.gen_base_warnings base_warnings
+      let result =
+        List.fold_left
+          (Api_warnings.add_error_to_piqi_warning_list base)
+          Api_warnings.empty
+          !errors
+      in
+      let result =
+        (* Make the warning list uniq *)
+        Hashtbl.fold begin fun x _ acc ->
+          Api_warnings.add_warning_to_piqi_warning_list conf base acc x
+        end warnings result
+      in
+      Mext.gen_base_warnings result
   in
   print_result conf data
 

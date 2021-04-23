@@ -460,27 +460,6 @@ message WarningWitnessDateBeforeBirth {
   required WarningPerson person = 1;
 }
 
-message WarningChangedOrderOfFamilyEvents {
-  required WarningPerson father = 1;
-  required WarningPerson mother = 2;
-}
-
-message WarningChangedOrderOfPersonEvents {
-  required WarningPerson person = 1;
-}
-
-message WarningFeventOrder {
-  required WarningPerson person = 1;
-  required string event1 = 2;
-  required string event2 = 3;
-}
-
-message WarningPeventOrder {
-  required WarningPerson person = 1;
-  required string event1 = 2;
-  required string event2 = 3;
-}
-
 message BaseWarnings {
   repeated WarningAlreadyDefined warning_already_defined = 1;
   repeated WarningOwnAncestor warning_own_ancestor = 2;
