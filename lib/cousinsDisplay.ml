@@ -18,10 +18,7 @@ let brother_label conf x =
     Printf.sprintf (ftransl conf "%s cousins")
       (transl_nth conf "nth (cousin)" (n - 1))
 
-let cnt = ref 0
-let cnt_sp = ref 0
-
-let give_access conf base ia_asex p1 b1 p2 b2 =
+let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
   let reference _ _ p s =
     if is_hidden p then s
     else
@@ -90,7 +87,7 @@ let give_access conf base ia_asex p1 b1 p2 b2 =
   end
   else print_nospouse ()
 
-let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
+let rec print_descend_upto conf base ~cnt_sp ~cnt max_cnt ini_p ini_br lev children =
   if lev > 0 && !cnt < max_cnt then
     begin
       Output.print_string conf "<ul>\n";
@@ -121,7 +118,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    Output.print_string conf "<li>";
                    if lev = 1 then
                      begin
-                       give_access conf base ia_asex ini_p ini_br p br;
+                       give_access conf base ~cnt_sp ia_asex ini_p ini_br p br;
                        incr cnt
                      end
                    else
@@ -149,7 +146,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                     then
                       Output.printf conf "%s %s%s\n" (Util.transl conf "with")
                         (person_title_text conf base sp) (Util.transl conf ":") ;
-                    print_descend_upto conf base max_cnt ini_p ini_br (lev - 1) children;
+                    print_descend_upto conf base ~cnt_sp ~cnt max_cnt ini_p ini_br (lev - 1) children;
                  )
                  (get_family p) ;
                if lev <= 2 then Output.print_string conf "</li>\n"
@@ -159,7 +156,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
     end
 
 
-let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
+let print_cousins_side_of conf base ~cnt_sp ~cnt max_cnt a ini_p ini_br lev1 lev2 =
   let sib = siblings conf base (get_iper a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then
     begin
@@ -174,13 +171,13 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
             (Util.transl conf ":")
         end;
       let sib = List.map (fun (ip, ia_asex) -> ip, ia_asex, []) sib in
-      print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
+      print_descend_upto conf base ~cnt_sp ~cnt max_cnt ini_p ini_br lev2 sib;
       if lev1 > 1 then Output.print_string conf "</li>\n";
       true
     end
   else false
 
-let print_cousins_lev conf base max_cnt p lev1 lev2 =
+let print_cousins_lev conf base ~cnt_sp ~cnt max_cnt p lev1 lev2 =
   let first_sosa =
     let rec loop sosa lev =
       if lev <= 1 then sosa else loop (Sosa.twice sosa) (lev - 1)
@@ -198,7 +195,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
         let some =
           match Util.old_branch_of_sosa conf base (get_iper p) sosa with
             Some ((ia, _) :: _ as br) ->
-            print_cousins_side_of conf base max_cnt (pget conf base ia) p br
+            print_cousins_side_of conf base ~cnt_sp ~cnt max_cnt (pget conf base ia) p br
               lev1 lev2 ||
             some
           | _ -> some
@@ -218,7 +215,7 @@ let include_templ conf name =
 
 (* HTML main *)
 
-let print_cousins conf base p lev1 lev2 =
+let print_cousins conf base ~cnt_sp ~cnt p lev1 lev2 =
   let title h =
     let txt_fun a =
       let txt = gen_person_text raw_access conf base p in
@@ -259,7 +256,7 @@ let print_cousins conf base p lev1 lev2 =
   cnt := 0;
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in
-  print_cousins_lev conf base max_cnt p lev1 lev2;
+  print_cousins_lev conf base ~cnt_sp ~cnt max_cnt p lev1 lev2;
   Output.print_string conf "<div>\n";
   Output.print_string conf "<p>\n";
   if !cnt >= max_cnt then Output.print_string conf "etc...\n"
@@ -402,7 +399,7 @@ let print conf base p =
         Some lev2 -> min (max 1 lev2) max_lev
       | None -> lev1
     in
-    print_cousins conf base p lev1 lev2
+    print_cousins conf base ~cnt_sp:(ref 0) ~cnt:(ref 0) p lev1 lev2
   | (_, _, Some (("AN" | "AD") as t)) when conf.wizard || conf.friend ->
     print_anniv conf base p (t = "AD") max_lev
   | _ ->
