@@ -95,7 +95,7 @@ let is_prime a =
 let rec prime_after n = if is_prime n then n else prime_after (n + 1)
 
 let output_strings_hash tmp_strings_inx base =
-  let oc = Secure.open_out_bin tmp_strings_inx in
+  let oc = open_out_bin tmp_strings_inx in
   let () = base.data.strings.load_array () in
   let strings_array = base.data.strings in
   let taba =
@@ -129,7 +129,7 @@ let output_name_index_aux cmp get base names_inx names_dat =
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
   ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
   Array.sort (fun (k, _) (k', _) -> cmp k k') a ;
-  let oc_n_dat = Secure.open_out_bin names_dat in
+  let oc_n_dat = open_out_bin names_dat in
   let bt2 =
     Array.map begin fun (i, ipl) ->
       let off = pos_out oc_n_dat in
@@ -139,7 +139,7 @@ let output_name_index_aux cmp get base names_inx names_dat =
     end a
   in
   close_out oc_n_dat ;
-  let oc_n_inx = Secure.open_out_bin names_inx in
+  let oc_n_inx = open_out_bin names_inx in
   Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array) ;
   close_out oc_n_inx
 
@@ -184,8 +184,8 @@ let output ?(save_mem = false) base =
   load_couples_array base;
   load_descends_array base;
   load_strings_array base;
-  let oc = Secure.open_out_bin tmp_base in
-  let oc_acc = Secure.open_out_bin tmp_base_acc in
+  let oc = open_out_bin tmp_base in
+  let oc_acc = open_out_bin tmp_base_acc in
   let output_array arrname arr =
     let bpos = pos_out oc in
     if !verbose then Printf.eprintf "*** saving %s array\n" arrname;
@@ -235,8 +235,8 @@ let output ?(save_mem = false) base =
       close_out oc;
       close_out oc_acc;
       begin
-        let oc_inx = Secure.open_out_bin tmp_names_inx in
-        let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
+        let oc_inx = open_out_bin tmp_names_inx in
+        let oc_inx_acc = open_out_bin tmp_names_acc in
         try
           trace "create name index";
           output_binary_int oc_inx 0; (* room for sname index *)
@@ -271,7 +271,7 @@ let output ?(save_mem = false) base =
           let s = base.data.bnotes.Def.nread "" Def.RnAll in
           if s = "" then ()
           else
-            begin let oc_not = Secure.open_out tmp_notes in
+            begin let oc_not = open_out tmp_notes in
               output_string oc_not s; close_out oc_not
             end;
           List.iter
@@ -303,7 +303,7 @@ let output ?(save_mem = false) base =
             loop (i + 1) acc
         in loop 0 0
       in
-      let oc = Secure.open_out_bin @@ Filename.concat bname "nb_persons" in
+      let oc = open_out_bin @@ Filename.concat bname "nb_persons" in
       output_value oc nbp ;
       close_out oc ;
     with e ->
