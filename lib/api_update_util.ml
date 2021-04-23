@@ -1667,9 +1667,6 @@ let piqi_empty_family conf base ifam =
     old_witnesses = [];
   }
 
-(* List of strings in which some characters were removed. *)
-let removed_string = ref [] ;;
-
 let reconstitute_somebody base person =
   let create_link = person.Mwrite.Person_link.create_link in
   let (fn, sn, occ, create, var, force_create) = match create_link with
@@ -1711,12 +1708,8 @@ let reconstitute_somebody base person =
     let contain_fn = String.contains fn in
     let contain_sn = String.contains sn in
     if (List.exists contain_fn Name.forbidden_char)
-      || (List.exists contain_sn Name.forbidden_char) then
-      begin
-        removed_string :=
-          (Name.purge fn ^ " " ^ Name.purge sn) :: !removed_string;
-        (Name.purge fn, Name.purge sn)
-      end
+    || (List.exists contain_sn Name.forbidden_char)
+    then (Name.purge fn, Name.purge sn)
     else (fn, sn)
   in
   (fn, sn, occ, create, var, force_create)
