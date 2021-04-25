@@ -1675,6 +1675,13 @@ let geneweb_server () =
       | None -> try Unix.gethostname () with _ -> "computer"
     in
       Printf.eprintf "GeneWeb %s - " Version.txt;
+      GwdLog.syslog `LOG_INFO 
+        ( Printf.sprintf 
+          "Starting Geneweb server %s binded with %s:%d"
+          Version.txt
+          hostn
+          !selected_port
+        );
       if not !daemon then
         begin
           Printf.eprintf "Possible addresses:\n\
@@ -1961,6 +1968,10 @@ let main () =
   else geneweb_server ()
 
 let () =
+#ifdef DEBUG
+  Printexc.record_backtrace true;
+  Sys.enable_runtime_warnings false;
+#endif
   try main ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
@@ -1979,5 +1990,20 @@ let () =
       !selected_port;
     flush stderr;
 #endif
-  | Dynlink.Error e -> GwdLog.syslog `LOG_CRIT (Dynlink.error_message e)
-  | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)
+  | Dynlink.Error e -> GwdLog.syslog `LOG_EMERG (Dynlink.error_message e)
+  | e -> GwdLog.syslog `LOG_EMERG (Printexc.to_string e)
+#ifdef DEBUG
+  ;
+    if not !daemon then
+      begin
+        flush stderr; flush stdout;
+        Printf.eprintf "----- Unexpected exception : %s\n%!" (Printexc.to_string e); 
+        Printexc.print_backtrace stderr;
+        begin match !GwdLog.oc with
+        | Some oc -> if oc <> stdout && oc <> stderr then Printexc.print_backtrace oc
+        | None -> ()
+        end;
+        Printf.eprintf "-----\nGeneweb server terminated, Press <return> to exit\n%!";
+        let _ = read_line () in ()
+      end
+#endif
