@@ -9,9 +9,27 @@ open Gwd_lib
 
 module StrSet = Mutil.StrSet
 
+let httpStatusString status = 
+  match status with
+  | Def.OK -> "200 OK"
+  | Def.Moved_Temporarily -> "302 Moved Temporarily"
+  | Def.Bad_Request -> "400 Bad Request"
+  | Def.Unauthorized -> "401 Unauthorized"
+  | Def.Forbidden -> "403 Forbidden"
+  | Def.Not_Found -> "404 Not Found"
+(*| Def.Method_Not_Allowed -> "405 Method Not Allowed"*)
+  
+let out_httpStatus status = 
+  GwdLog.syslog `LOG_DEBUG ("Output HTTP/1.0 status : " ^ (httpStatusString status) );
+  Wserver.http status
+
+let out_httpHeader s = 
+  GwdLog.syslog `LOG_DEBUG ("HTTP response header : " ^ s);
+  Wserver.header s
+  
 let output_conf =
-  { status = Wserver.http
-  ; header = Wserver.header
+  { status = out_httpStatus
+  ; header = out_httpHeader
   ; body = Wserver.print_string
   ; flush = Wserver.wflush
   }
@@ -322,6 +340,30 @@ let print_redirected conf from request new_addr =
       Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf)
 
+let print_refresh_and_exit conf bname =
+  let url =
+    let serv = "http://" ^ Util.get_server_string conf in
+    let req =
+      if conf.cgi then
+        let str = Util.get_request_string conf in
+        let scriptname = String.sub str 0 (String.index str '?') in
+        scriptname ^ "?b=" ^ bname
+      else "/" ^ bname ^ "?"
+    in
+    serv ^ req
+  in
+  http conf Def.OK;
+  Output.header conf "Connection: close";
+  Output.printf conf "<head>\n\
+                  <meta http-equiv=\"REFRESH\"\n\
+                  content=\"0;URL=%s\">\n\
+                  </head>\n\
+                  <body>\n\
+                  <a href=\"%s\">%s</a>\n\
+                  </body>"
+    url url url;
+  raise Exit
+
 let nonce_private_key =
   Lazy.from_fun
     (fun () ->
@@ -594,30 +636,6 @@ let index_not_name s =
       | _ -> i
   in
   loop 0
-
-let refresh_url conf bname =
-  let url =
-    let serv = "http://" ^ Util.get_server_string conf in
-    let req =
-      if conf.cgi then
-        let str = Util.get_request_string conf in
-        let scriptname = String.sub str 0 (String.index str '?') in
-        scriptname ^ "?b=" ^ bname
-      else "/" ^ bname ^ "?"
-    in
-    serv ^ req
-  in
-  http conf Def.OK;
-  Output.header conf "Content-type: text/html";
-  Output.printf conf "<head>\n\
-                  <meta http-equiv=\"REFRESH\"\n\
-                  content=\"1;URL=%s\">\n\
-                  </head>\n\
-                  <body>\n\
-                  <a href=\"%s\">%s</a>\n\
-                  </body>"
-    url url url;
-  raise Exit
 
 let http_preferred_language request =
   let v = Mutil.extract_param "accept-language: " '\n' request in
@@ -1048,7 +1066,7 @@ let make_conf from_addr request script_name env =
       if i = String.length s then s
       else
         let conf = { printer_conf with request } in
-        refresh_url conf (String.sub s 0 i)
+        print_refresh_and_exit conf (String.sub s 0 i)
     in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
@@ -1330,6 +1348,7 @@ let no_access conf =
   Hutil.trailer conf
 
 let conf_and_connection =
+  GwdLog.syslog `LOG_INFO (Printf.sprintf "- conf_and_connection" );
   let slow_query_threshold =
     match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
     | Some x -> float_of_string x
@@ -1395,7 +1414,7 @@ let conf_and_connection =
 #ifdef DEBUG
           Printexc.print_backtrace stderr ;
 #endif
-          GwdLog.syslog `LOG_CRIT (context conf contents ^ " " ^ Printexc.to_string e)
+          GwdLog.syslog `LOG_EMERG (context conf contents ^ " " ^ Printexc.to_string e)
 
 let chop_extension name =
   let rec loop i =
@@ -1435,6 +1454,8 @@ let excluded from =
   with Sys_error _ -> false
 
 let image_request conf script_name env =
+  GwdLog.syslog `LOG_DEBUG (Printf.sprintf "- image_request, enter : %s" script_name); (*debug*)
+  let result =
   match Util.p_getenv env "m", Util.p_getenv env "v" with
     Some "IM", Some fname ->
       let fname =
@@ -1456,6 +1477,9 @@ let image_request conf script_name env =
         let fname = Util.image_file_name fname in
         let _ = ImageDisplay.print_image_file conf fname in true
       else false
+  in 
+  GwdLog.syslog `LOG_DEBUG (Printf.sprintf " - image_request, exit with %B" result); (*debug*)
+  result
 
 
 (* Une version un peu à cheval entre avant et maintenant afin de   *)
@@ -1538,6 +1562,8 @@ let print_misc_file conf misc_fname =
     true
 
 let misc_request conf fname =
+  GwdLog.syslog `LOG_DEBUG (Printf.sprintf "- misc_request, enter : %s" fname); (*debug*)
+  let result = 
   let fname = find_misc_file fname in
   if fname <> "" then
     let misc_fname =
@@ -1554,6 +1580,9 @@ let misc_request conf fname =
     in
     print_misc_file conf misc_fname
   else false
+  in
+  GwdLog.syslog `LOG_DEBUG (Printf.sprintf " - misc_request exit with %B" result); (*debug*)
+  result
 
 let strip_quotes s =
   let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
@@ -1643,7 +1672,7 @@ let connection (addr, request) script_name contents' =
           try (Unix.gethostbyaddr iaddr).Unix.h_name, port with
             _ -> Unix.string_of_inet_addr iaddr, port
   in
-  GwdLog.syslog `LOG_INFO (Printf.sprintf "Incomming request from %s:%d : %s" from port script_name);
+  GwdLog.syslog `LOG_INFO (Printf.sprintf "Incoming request from %s:%d : %s (%s)" from port script_name contents');
   if script_name = "robots.txt" then robots_txt printer_conf
   else if excluded from then refuse_log printer_conf from
   else
@@ -1657,7 +1686,7 @@ let connection (addr, request) script_name contents' =
           if not (image_request printer_conf script_name env)
           && not (misc_request printer_conf script_name)
           then conf_and_connection from request script_name contents env
-        with Exit -> ()
+        with Exit -> () (* Exit raised by print_refresh_and_exit *)
     end
 
 let null_reopen flags fd =

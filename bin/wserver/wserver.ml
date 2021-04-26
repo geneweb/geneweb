@@ -1,5 +1,4 @@
 (* Copyright (c) 1998-2007 INRIA *)
-
 let connection_closed = ref false
 
 let eprintf = Printf.eprintf
@@ -69,7 +68,7 @@ let header s =
   if !printing_state <> Status then
     if !printing_state = Nothing then http Def.OK
     else failwith "Cannot write HTTP headers: page contents already started";
-  output_string !wserver_oc s ;
+    output_string !wserver_oc s ;
   printnl ()
 
 let printf fmt =
@@ -166,16 +165,14 @@ let systime () =
   let tm = Unix.localtime (now) in
   let sd = Float.to_int @@ 1000000.0 *. (mod_float now 1.0)  in 
   Printf.sprintf "%02d:%02d:%02d.%06d" tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec sd
+
+let sending_state () = match !printing_state with
+  | Status -> "Status"
+  | Contents -> "Contents"
+  | Nothing -> "Nothing"
 (* ==== debug *)    
 
 let treat_connection tmout callback addr fd =
-  (* ====== debug *)
-  let client_ip, client_port = match addr with 
-  | Unix.ADDR_UNIX s -> (s, -1)
-  | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
-  in 
-  eprintf "[%s] Treat request from %s:%d\n%!" (systime()) client_ip client_port;
-  (* ====== debug *)
   if Sys.unix then
     if tmout > 0 then
       begin let spid = Unix.fork () in
@@ -205,7 +202,9 @@ let treat_connection tmout callback addr fd =
     in
     request, script_name, contents
   in
-  callback (addr, request) script_name contents
+  callback (addr, request) script_name contents;
+  if !printing_state <> Contents then failwith "Unexcepted HTTP printing state";
+  printing_state := Nothing
 
 let buff = Bytes.create 1024
 
@@ -401,7 +400,7 @@ let wserver_unix syslog tmout max_clients g s =
   done
 
 (* elementary HTTP server, basic mode for windows *)
-let wserver_basic syslog tmout max_clients g s =
+(*let wserver_basic syslog tmout max_clients g s =
   while true do
     try accept_connection tmout max_clients g s with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
@@ -410,15 +409,14 @@ let wserver_basic syslog tmout max_clients g s =
       syslog `LOG_INFO (Printexc.to_string e)
     | e -> raise e
   done
-
-let wserver_basic_new syslog tmout max_clients g s =
+*)
+let wserver_basic syslog tmout max_clients g s =
   let fdl = ref [s] in
-  try while true do
+  while true do
     match Unix.select !fdl [] [] 5.0 with 
     | ([], _, _) ->
       let n = List.length !fdl in
-      if n > 1 then
-      (eprintf "[%s] polling with %d descriptors\n" (systime()) n;  flush stderr;)
+      if n > 1 then eprintf "[%s] polling with %d descriptors\n%!" (systime()) n
     | ( l, _, _) -> 
       let rec loop l i = 
         match l with
@@ -433,7 +431,7 @@ let wserver_basic_new syslog tmout max_clients g s =
               | Unix.ADDR_UNIX s -> (s, -1)
               | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
               in 
-              eprintf "[%s] Data accepted from %s:%d\n%!" (systime()) client_ip client_port;
+              (* eprintf "[%s] Data accepted from %s:%d\n%!" (systime()) client_ip client_port;*)
               syslog `LOG_DEBUG (Printf.sprintf "%d - Data accepted from %s:%d" i client_ip client_port);
               Unix.setsockopt client_fd Unix.SO_KEEPALIVE true;
               (* ajoute à liste pour lecture au polling suivant   *)
@@ -442,12 +440,9 @@ let wserver_basic_new syslog tmout max_clients g s =
           else
             begin
               (* lecture d'une connexion client entrante          *)
-              let client_addr = try Some (Unix.getpeername fd) with exc -> 
-                eprintf("%s\n") (Printexc.to_string exc) ; flush stderr;
-                None
+              let client_addr = try Unix.getpeername fd with exc -> 
+                failwith (Printf.sprintf "Error reading peer connection : %s\n" (Printexc.to_string exc));
               in
-              match client_addr with
-              | Some client_addr ->
                 begin
                   wserver_sock := fd;
                   wserver_oc := Unix.out_channel_of_descr fd;
@@ -456,23 +451,20 @@ let wserver_basic_new syslog tmout max_clients g s =
                   (* retire du polling suivant la connexion                         *)
                   (* TODO : time out à prendre en compte pour gérer un keepalive    *)
                   fdl:=List.filter (fun t -> t<>fd ) !fdl;
-                  Unix.shutdown fd Unix.SHUTDOWN_ALL;
+                  begin try Unix.shutdown fd Unix.SHUTDOWN_ALL with
+                  | Unix.Unix_error(Unix.ECONNRESET, "shutdown", "") -> ()
+                  | exc -> raise exc
+                  end;
                   close_out_noerr !wserver_oc;
                   Unix.close fd;
                 end
-              | None ->
-                eprintf "Not a connected socket\n"; flush stderr;
-                raise Exit (* anormal *)
-              ;
             end
           ;
           (* suivants *)
           loop lfd (i+1)
       in
       loop l 0
-  done with exc -> 
-    syslog `LOG_NOTICE ("Wserver polling error, exit : " ^ (Printexc.to_string exc) );
-    raise exc
+  done
     
 let f syslog addr_opt port tmout max_clients g =
   match
@@ -499,16 +491,12 @@ let f syslog addr_opt port tmout max_clients g =
       Unix.listen s 4;
 
       let tm = Unix.localtime (Unix.time ()) in
-      eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
+      eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n%!"
         (1900 + tm.Unix.tm_year)
         (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
         port ;
-      flush stderr;
-
-      let poll = false in
-      if poll then
-        wserver_basic_new syslog tmout max_clients g s
-      else if Sys.unix then
-        wserver_unix syslog tmout max_clients g s
-      else
-        wserver_basic syslog tmout max_clients g s
+#ifdef WINDOWS
+      wserver_basic syslog tmout max_clients g s
+#else
+      wserver_unix syslog tmout max_clients g s
+#endif
