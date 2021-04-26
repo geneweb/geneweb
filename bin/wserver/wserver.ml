@@ -150,10 +150,32 @@ let get_request_and_content strm =
 let string_of_sockaddr =
   function
     Unix.ADDR_UNIX s -> s
-  | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
-let sockaddr_of_string s = Unix.ADDR_UNIX s
+  | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a) ^ ":" ^ (string_of_int p)
+let sockaddr_of_string str =
+  try
+    let i = String.index str ':' in
+    Unix.ADDR_INET (
+      Unix.inet_addr_of_string (String.sub str 0 i), 
+      int_of_string (String.sub str (i + 1) (String.length str - i - 1) )
+    )
+  with _ ->  Unix.ADDR_UNIX str
+
+(* ==== debug *)    
+let systime () =
+  let now = Unix.gettimeofday () in
+  let tm = Unix.localtime (now) in
+  let sd = Float.to_int @@ 1000000.0 *. (mod_float now 1.0)  in 
+  Printf.sprintf "%02d:%02d:%02d.%06d" tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec sd
+(* ==== debug *)    
 
 let treat_connection tmout callback addr fd =
+  (* ====== debug *)
+  let client_ip, client_port = match addr with 
+  | Unix.ADDR_UNIX s -> (s, -1)
+  | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
+  in 
+  eprintf "[%s] Treat request from %s:%d\n%!" (systime()) client_ip client_port;
+  (* ====== debug *)
   if Sys.unix then
     if tmout > 0 then
       begin let spid = Unix.fork () in
@@ -270,6 +292,13 @@ let check_stopping () =
 let accept_connection tmout max_clients callback s =
   if !noproc then wait_and_compact s else wait_available max_clients s;
   let (t, addr) = Unix.accept s in
+  (* ====== debug *)
+  let client_ip, client_port = match addr with 
+  | Unix.ADDR_UNIX s -> (s, -1)
+  | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
+  in 
+  eprintf "[%s] Data accepted from %s:%d\n%!" (systime()) client_ip client_port;
+  (* ====== debug *)
   check_stopping ();
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
   if Sys.unix then
@@ -316,8 +345,7 @@ let accept_connection tmout max_clients callback s =
             [| "WSERVER=" ^ string_of_sockaddr addr |]
         in
         let args = Sys.argv in
-        Unix.create_process_env Sys.argv.(0) args env Unix.stdin Unix.stdout
-          Unix.stderr
+        Unix.create_process_env Sys.argv.(0) args env Unix.stdin Unix.stdout Unix.stderr
       in
         let _ = Unix.waitpid [] pid in
         let ic = open_in_bin !sock_in in close_in ic
@@ -360,6 +388,92 @@ let accept_connection tmout max_clients callback s =
     end;
     cleanup ()
 
+(* elementary HTTP server, unix mode with fork   *)
+let wserver_unix syslog tmout max_clients g s =
+  let _ = Unix.nice 1 in
+  while true do
+    try accept_connection tmout max_clients g s with
+    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
+      syslog `LOG_INFO (Printexc.to_string e)
+    | Sys_error msg as e when msg = "Broken pipe" ->
+      syslog `LOG_INFO (Printexc.to_string e)
+    | e -> raise e
+  done
+
+(* elementary HTTP server, basic mode for windows *)
+let wserver_basic syslog tmout max_clients g s =
+  while true do
+    try accept_connection tmout max_clients g s with
+    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
+      syslog `LOG_INFO (Printexc.to_string e)
+    | Sys_error msg as e when msg = "Broken pipe" ->
+      syslog `LOG_INFO (Printexc.to_string e)
+    | e -> raise e
+  done
+
+let wserver_basic_new syslog tmout max_clients g s =
+  let fdl = ref [s] in
+  try while true do
+    match Unix.select !fdl [] [] 5.0 with 
+    | ([], _, _) ->
+      let n = List.length !fdl in
+      if n > 1 then
+      (eprintf "[%s] polling with %d descriptors\n" (systime()) n;  flush stderr;)
+    | ( l, _, _) -> 
+      let rec loop l i = 
+        match l with
+        | [] ->
+          ()
+        | fd :: lfd -> 
+          if fd=s then
+            begin
+              (* Nouvelle connexion cliente entrante              *)
+              let (client_fd, client_addr) = Unix.accept fd in 
+              let client_ip, client_port = match client_addr with 
+              | Unix.ADDR_UNIX s -> (s, -1)
+              | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
+              in 
+              eprintf "[%s] Data accepted from %s:%d\n%!" (systime()) client_ip client_port;
+              syslog `LOG_DEBUG (Printf.sprintf "%d - Data accepted from %s:%d" i client_ip client_port);
+              Unix.setsockopt client_fd Unix.SO_KEEPALIVE true;
+              (* ajoute à liste pour lecture au polling suivant   *)
+              fdl := client_fd :: !fdl
+            end
+          else
+            begin
+              (* lecture d'une connexion client entrante          *)
+              let client_addr = try Some (Unix.getpeername fd) with exc -> 
+                eprintf("%s\n") (Printexc.to_string exc) ; flush stderr;
+                None
+              in
+              match client_addr with
+              | Some client_addr ->
+                begin
+                  wserver_sock := fd;
+                  wserver_oc := Unix.out_channel_of_descr fd;
+                  treat_connection tmout g client_addr fd;
+                  flush(!wserver_oc);
+                  (* retire du polling suivant la connexion                         *)
+                  (* TODO : time out à prendre en compte pour gérer un keepalive    *)
+                  fdl:=List.filter (fun t -> t<>fd ) !fdl;
+                  Unix.shutdown fd Unix.SHUTDOWN_ALL;
+                  close_out_noerr !wserver_oc;
+                  Unix.close fd;
+                end
+              | None ->
+                eprintf "Not a connected socket\n"; flush stderr;
+                raise Exit (* anormal *)
+              ;
+            end
+          ;
+          (* suivants *)
+          loop lfd (i+1)
+      in
+      loop l 0
+  done with exc -> 
+    syslog `LOG_NOTICE ("Wserver polling error, exit : " ^ (Printexc.to_string exc) );
+    raise exc
+    
 let f syslog addr_opt port tmout max_clients g =
   match
     if Sys.unix then None
@@ -381,21 +495,20 @@ let f syslog addr_opt port tmout max_clients g =
         | None -> Unix.inet_addr_any
       in
       let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
-      Unix.setsockopt s Unix.SO_REUSEADDR true;
       Unix.bind s (Unix.ADDR_INET (addr, port));
       Unix.listen s 4;
-      if Sys.unix then (let _ = Unix.nice 1 in ());
+
       let tm = Unix.localtime (Unix.time ()) in
       eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
         (1900 + tm.Unix.tm_year)
         (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
         port ;
       flush stderr;
-      while true do
-        try accept_connection tmout max_clients g s with
-        | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-          syslog `LOG_INFO (Printexc.to_string e)
-        | Sys_error msg as e when msg = "Broken pipe" ->
-          syslog `LOG_INFO (Printexc.to_string e)
-        | e -> raise e
-      done
+
+      let poll = false in
+      if poll then
+        wserver_basic_new syslog tmout max_clients g s
+      else if Sys.unix then
+        wserver_unix syslog tmout max_clients g s
+      else
+        wserver_basic syslog tmout max_clients g s

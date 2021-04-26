@@ -1634,15 +1634,16 @@ let build_env request contents =
   else contents, Util.create_env contents
 
 let connection (addr, request) script_name contents' =
-  let from =
+  let from, port =
     match addr with
-      Unix.ADDR_UNIX x -> x
-    | Unix.ADDR_INET (iaddr, _) ->
-        if !no_host_address then Unix.string_of_inet_addr iaddr
+      Unix.ADDR_UNIX x -> x, -1
+    | Unix.ADDR_INET (iaddr, port) ->
+        if !no_host_address then Unix.string_of_inet_addr iaddr, port
         else
-          try (Unix.gethostbyaddr iaddr).Unix.h_name with
-            _ -> Unix.string_of_inet_addr iaddr
+          try (Unix.gethostbyaddr iaddr).Unix.h_name, port with
+            _ -> Unix.string_of_inet_addr iaddr, port
   in
+  GwdLog.syslog `LOG_INFO (Printf.sprintf "Incomming request from %s:%d : %s" from port script_name);
   if script_name = "robots.txt" then robots_txt printer_conf
   else if excluded from then refuse_log printer_conf from
   else
@@ -1675,7 +1676,7 @@ let geneweb_server () =
       | None -> try Unix.gethostname () with _ -> "computer"
     in
       Printf.eprintf "GeneWeb %s - " Version.txt;
-      GwdLog.syslog `LOG_INFO 
+      GwdLog.syslog `LOG_NOTICE
         ( Printf.sprintf 
           "Starting Geneweb server %s binded with %s:%d"
           Version.txt
@@ -1864,6 +1865,7 @@ let main () =
     ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
     ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
     ; ("-add_lexicon", Arg.String (Mutil.list_ref_append lexicon_list), "<FILE> Add file as lexicon.")
+    (* - log en mode windows (sans -noproc) : le fichier ne contient que les derniers log du fait que open_out remet à zero le log à chaque process *)
     ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Llog trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
     ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
@@ -1971,39 +1973,51 @@ let () =
 #ifdef DEBUG
   Printexc.record_backtrace true;
   Sys.enable_runtime_warnings false;
+  GwdLog.verbosity := 7; (* default is Debug verbosity *)
 #endif
   try main ()
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
-    Printf.eprintf "\nError: ";
-    Printf.eprintf "the port %d" !selected_port;
-    Printf.eprintf " is already used by another GeneWeb daemon \
-                    or by another program. Solution: kill the other program \
-                    or launch GeneWeb with another port number (option -p)";
-    flush stderr
+    Printf.eprintf 
+      "Error: the port %d is already used by another GeneWeb daemon\n\
+       or by another program. Solution: kill the other program\n\
+       or launch GeneWeb with another port number (-p option)\n"
+      !selected_port;
+    flush stderr;
+    exit 1
 #ifdef UNIX
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \
        than 1024 are reserved to the system. Solution: do it as root \
-       or choose another port number greater than 1024."
+       or choose another port number greater than 1024.\n"
       !selected_port;
     flush stderr;
+    exit 1
 #endif
-  | Dynlink.Error e -> GwdLog.syslog `LOG_EMERG (Dynlink.error_message e)
-  | e -> GwdLog.syslog `LOG_EMERG (Printexc.to_string e)
+  | Dynlink.Error e -> 
+    GwdLog.syslog `LOG_EMERG (Dynlink.error_message e);
+    exit 1
+  | e -> 
+    GwdLog.syslog `LOG_EMERG (Printexc.to_string e);
 #ifdef DEBUG
-  ;
-    if not !daemon then
-      begin
-        flush stderr; flush stdout;
-        Printf.eprintf "----- Unexpected exception : %s\n%!" (Printexc.to_string e); 
-        Printexc.print_backtrace stderr;
-        begin match !GwdLog.oc with
-        | Some oc -> if oc <> stdout && oc <> stderr then Printexc.print_backtrace oc
-        | None -> ()
-        end;
-        Printf.eprintf "-----\nGeneweb server terminated, Press <return> to exit\n%!";
-        let _ = read_line () in ()
-      end
+    begin match !GwdLog.oc with
+    | Some oc -> 
+      if oc <> stdout && oc <> stderr then 
+        begin 
+          Printf.fprintf oc  "----- Unexpected exception : %s\n%!" (Printexc.to_string e);         
+          Printexc.print_backtrace oc;
+          flush oc
+        end
+    | None -> ()
+    end;
+    if not !daemon && not !Wserver.cgi then
+    begin
+      flush stderr; flush stdout;
+      Printf.eprintf "----- Unexpected exception : %s\n%!" (Printexc.to_string e); 
+      Printexc.print_backtrace stderr;
+      Printf.eprintf "-----\nGeneweb server terminated, press <Enter> to exit\n%!";
+      let _ = read_line () in ()
+    end;
 #endif
+    exit 1

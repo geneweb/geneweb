@@ -1,6 +1,6 @@
 open Geneweb
 
-let verbosity = ref 7 (* default is DEBUG verbosity *)
+let verbosity = ref 5 (* default is Emergency to Notice level*)
 
 let oc : out_channel option ref = ref None
 
@@ -23,13 +23,19 @@ let syslog level msg =
      | `LOG_INFO -> 6
      | `LOG_DEBUG -> 7
   then begin
-    let log = openlog @@ Filename.basename @@ Sys.executable_name in
-    outlog log level msg ;
-    closelog log
+    let log = Syslog.openlog @@ Filename.basename @@ Sys.executable_name in
+    Syslog.syslog log level msg ;
+    Syslog.closelog log
   end
 #endif
 
 #ifdef WINDOWS
+let systime () =
+  let now = Unix.gettimeofday () in
+  let tm = Unix.localtime (now) in
+  let sd = Float.to_int @@ 1000000.0 *. (mod_float now 1.0)  in 
+  Printf.sprintf "%02d:%02d:%02d.%06d" tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec sd
+
 let syslog level msg =
   let severityLevel, severity = 
   match level with
@@ -45,12 +51,8 @@ let syslog level msg =
   if !verbosity >= severityLevel then
     let tag = Filename.basename Sys.executable_name in
     let logfn =  Filename.concat !(Util.cnt_dir) "syslog.txt" in
-    let now = Unix.gettimeofday () in
-    let tm = Unix.localtime (now) in
-    let sd = Float.to_int @@ 1000000.0 *. (mod_float now 1.0)  in 
-    let systime = Printf.sprintf "%02d:%02d:%02d.%06d" tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec sd in
     let oc = open_out_gen [Open_wronly; Open_append; Open_creat] 0o777 logfn in
-    Printf.fprintf oc "%s\t%s[%s]\t%d\t%s\n" systime tag severity severityLevel msg;
+    Printf.fprintf oc "%s\t%s[%s]\t%d\t%s\n" (systime ()) tag severity severityLevel msg;
     let logsize = out_channel_length oc in
     close_out_noerr oc;
     if logsize > 16000 then
@@ -58,7 +60,7 @@ let syslog level msg =
         let bakfn = Filename.concat !(Util.cnt_dir) "syslog-bak.txt" in
         Unix.rename logfn bakfn;
         let oc = open_out_gen [Open_wronly; Open_trunc; Open_creat] 0o777 logfn in
-        Printf.fprintf oc "%s\t%s[Info]\t6\tThis log file was backup to syslog-bak.txt\n" systime tag;
+        Printf.fprintf oc "%s\t%s[Info]\t6\tThis log file was backup to syslog-bak.txt\n" (systime ()) tag;
         close_out_noerr oc
       end
 #endif
