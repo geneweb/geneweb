@@ -6,7 +6,7 @@ let oc : out_channel option ref = ref None
 
 let log fn =
   match !oc with
-  | Some oc -> fn oc
+  | Some oc -> fn oc; flush oc
   | None -> ()
 
 #ifdef UNIX  

@@ -67,6 +67,7 @@ val stop_server : string ref
        one request is necessary to unfreeze the server to make it check
        that this file exits. Default "STOP_SERVER". Can have relative
        or absolute path. *)
+val proc : bool ref
 val noproc : bool ref
 val cgi : bool ref
 

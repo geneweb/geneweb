@@ -6,7 +6,8 @@ let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
-let noproc = ref false
+let proc = ref false    (* obsolete Windows mode : one process with .sin/.sou files *)
+let noproc = ref false  (* obsolete Windows mode : no process with .sin/.sou files *)
 let cgi = ref false
 
 let wserver_sock = ref Unix.stdout
@@ -68,7 +69,7 @@ let header s =
   if !printing_state <> Status then
     if !printing_state = Nothing then http Def.OK
     else failwith "Cannot write HTTP headers: page contents already started";
-    output_string !wserver_oc s ;
+  output_string !wserver_oc s ;
   printnl ()
 
 let printf fmt =
@@ -399,8 +400,8 @@ let wserver_unix syslog tmout max_clients g s =
     | e -> raise e
   done
 
-(* elementary HTTP server, basic mode for windows *)
-(*let wserver_basic syslog tmout max_clients g s =
+(* osbolete elementary HTTP server, basic mode for windows - with .sin/.sou files *)
+let wserver_basic_legacy syslog tmout max_clients g s =
   while true do
     try accept_connection tmout max_clients g s with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
@@ -409,7 +410,8 @@ let wserver_unix syslog tmout max_clients g s =
       syslog `LOG_INFO (Printexc.to_string e)
     | e -> raise e
   done
-*)
+
+(* elementary HTTP server, basic mode for windows *)
 let wserver_basic syslog tmout max_clients g s =
   let fdl = ref [s] in
   while true do
@@ -472,12 +474,11 @@ let f syslog addr_opt port tmout max_clients g =
     else try Some (Sys.getenv "WSERVER") with Not_found -> None
   with
   | Some s ->
-    let addr = sockaddr_of_string s in
-    let fd = Unix.openfile !sock_in [Unix.O_RDONLY] 0 in
-    let oc = open_out_bin !sock_out in
-    wserver_oc := oc; ignore (treat_connection tmout g addr fd); exit 0
+      let addr = sockaddr_of_string s in
+      let fd = Unix.openfile !sock_in [Unix.O_RDONLY] 0 in
+      let oc = open_out_bin !sock_out in
+      wserver_oc := oc; ignore (treat_connection tmout g addr fd); exit 0
   | None ->
-      check_stopping ();
       let addr =
         match addr_opt with
           Some addr ->
@@ -496,7 +497,10 @@ let f syslog addr_opt port tmout max_clients g =
         (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
         port ;
 #ifdef WINDOWS
-      wserver_basic syslog tmout max_clients g s
+      if !proc || !noproc then     
+        wserver_basic_legacy syslog tmout max_clients g s
+      else
+        wserver_basic syslog tmout max_clients g s
 #else
       wserver_unix syslog tmout max_clients g s
 #endif

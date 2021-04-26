@@ -134,7 +134,7 @@ let copy_file conf fname =
 
 let http conf status =
   Output.status conf status;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1"
+  Output.header conf "Content-type: text/html; charset=UTF-8"
 
 let robots_txt conf =
   GwdLog.syslog `LOG_NOTICE "Robot request";
@@ -154,7 +154,7 @@ let refuse_log conf from =
 let only_log conf from =
   GwdLog.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
   http conf Def.OK;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Output.header conf "Content-type: text/html; charset=UTF-8";
   Output.print_string conf "<head><title>Invalid access</title></head>\n";
   Output.print_string conf "<body><h1>Invalid access</h1></body>\n"
 
@@ -1739,7 +1739,7 @@ let geneweb_server () =
     (if Sys.unix then !max_clients else None) connection
 
 let cgi_timeout conf tmout _ =
-  Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Output.header conf "Content-type: text/html; charset=UTF-8";
   Output.print_string conf "<head><title>Time out</title></head>\n";
   Output.print_string conf "<body><h1>Time out</h1>\n";
   Output.printf conf "Computation time > %d second(s)\n" tmout;
@@ -1880,7 +1880,7 @@ let main () =
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
     ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
-    ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
+    ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any IP V4 address of this computer).")
     ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")
     ; ("-setup_link", Arg.Set setup_link, " Display a link to local gwsetup in bottom of pages.")
     ; ("-allowed_tags", Arg.String (fun x -> Util.allowed_tags_file := x), "<FILE> HTML tags which are allowed to be displayed. One tag per line in file.")
@@ -1894,8 +1894,11 @@ let main () =
     ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
     ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
     ; ("-add_lexicon", Arg.String (Mutil.list_ref_append lexicon_list), "<FILE> Add file as lexicon.")
-    (* - log en mode windows (sans -noproc) : le fichier ne contient que les derniers log du fait que open_out remet à zero le log à chaque process *)
-    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Llog trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
+    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "1" | "stdout" -> stdout | "2" | "stderr" -> stderr | _ -> open_out x)), 
+                      "<FILE> Log traces to this file (default is no log)\n" ^ 
+                      {|                         - use "1" or "stdout" to redirect to standard output.|} ^ "\n" ^
+                      {|                         - use "2" or "stderr" to redirect to standard error.|})
+    (* - Nota : -log en mode -proc Windows : le fichier ne contient que les derniers log du fait que open_out remet à zero le log à chaque process *)
     ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
     ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")
@@ -1914,7 +1917,8 @@ let main () =
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
 #endif
 #ifdef WINDOWS
-    ; ("-noproc", Arg.Set Wserver.noproc ," Do not launch a process at each request.")
+    ; ("-oneproc", Arg.Set Wserver.proc ," Launch a process at each request (older defaultmode with .sin/.sou files).")
+    ; ("-noproc", Arg.Set Wserver.noproc ," Do not launch a process at each request (older mode with .sin/.sou files).")
 #endif
 #ifdef API
     ; ("-api_h", Arg.String (fun x -> selected_api_host := x), "<HOST> Host for GeneWeb API (default = " ^ !selected_api_host ^ ").")
@@ -1937,7 +1941,7 @@ let main () =
     ]
   in
   let speclist = List.sort compare speclist in
-  let speclist = Arg.align speclist in
+  let speclist = Arg.align ~limit:22 speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
 #ifdef UNIX
   default_lang := begin
@@ -1953,8 +1957,15 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
-  List.iter register_plugin !plugins ;
-  cache_lexicon () ;
+  List.iter register_plugin !plugins;
+  cache_lexicon ();
+  begin 
+    match !GwdLog.oc with
+    | None -> Printf.eprintf "No log\n%!"
+    | Some oc when oc = stdout -> Printf.eprintf "log to stdout\n%!"
+    | Some oc when oc = stderr -> Printf.eprintf "log to stderr\n%!"
+    | Some _ -> Printf.eprintf "log to file\n%!"
+  end;
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
