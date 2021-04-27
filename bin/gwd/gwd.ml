@@ -20,7 +20,7 @@ let httpStatusString status =
 (*| Def.Method_Not_Allowed -> "405 Method Not Allowed"*)
   
 let out_httpStatus status = 
-  GwdLog.syslog `LOG_INFO ("HTTP/1.0 response : " ^ (httpStatusString status) );
+  GwdLog.syslog `LOG_INFO ("HTTP/1.1 response : " ^ (httpStatusString status) );
   Wserver.http status
 
 let out_httpHeader s = 
@@ -340,7 +340,7 @@ let print_redirected conf from request new_addr =
       Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
       Hutil.trailer conf)
 
-let print_refresh_and_exit conf bname =
+let print_refresh conf bname delay =
   let url =
     let serv = "http://" ^ Util.get_server_string conf in
     let req =
@@ -356,13 +356,13 @@ let print_refresh_and_exit conf bname =
   Output.header conf "Connection: close";
   Output.printf conf "<head>\n\
                   <meta http-equiv=\"REFRESH\"\n\
-                  content=\"0;URL=%s\">\n\
+                  content=\"%d;URL=%s\">\n\
                   </head>\n\
                   <body>\n\
                   <a href=\"%s\">%s</a>\n\
                   </body>"
-    url url url;
-  raise Exit
+    delay url url url;
+  Output.flush conf
 
 let nonce_private_key =
   Lazy.from_fun
@@ -1065,9 +1065,12 @@ let make_conf from_addr request script_name env =
       let i = index_not_name s in
       if i = String.length s then s
       else
-        let conf = { printer_conf with request } in
-        print_refresh_and_exit conf (String.sub s 0 i)
-    in
+        let bname = (String.sub s 0 i) in 
+        let conf = { printer_conf with request} in
+        GwdLog.syslog `LOG_INFO (Printf.sprintf "Redirect pages \"%s\" to page \"%s\"" script_name bname);
+        print_refresh conf bname 1;
+        raise Exit
+  in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
       let (x, env) = extract_assoc "w" env in
@@ -1348,7 +1351,6 @@ let no_access conf =
   Hutil.trailer conf
 
 let conf_and_connection =
-  GwdLog.syslog `LOG_INFO (Printf.sprintf "- conf_and_connection" );
   let slow_query_threshold =
     match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
     | Some x -> float_of_string x
@@ -1361,6 +1363,16 @@ let conf_and_connection =
   in
   fun from request script_name contents env ->
   let (conf, passwd_err) = make_conf from request script_name env in
+  if script_name <> "" then 
+    begin
+      let bname = Util.bpath (script_name ^ ".gwb") in
+      if not @@ Sys.file_exists bname then
+        begin 
+          GwdLog.syslog `LOG_INFO (Printf.sprintf "basename \"%s\" or \"%s\" not found" script_name bname);
+          Hutil.error_404 conf script_name;
+          raise Exit
+        end;
+    end;
   match !redirected_addr with
     Some addr -> print_redirected conf from request addr
   | None ->
@@ -1410,11 +1422,7 @@ let conf_and_connection =
               (Printf.sprintf "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
         with
         | Exit -> ()
-        | e ->
-#ifdef DEBUG
-          Printexc.print_backtrace stderr ;
-#endif
-          GwdLog.syslog `LOG_EMERG (context conf contents ^ " " ^ Printexc.to_string e)
+        | e -> raise e
 
 let chop_extension name =
   let rec loop i =
@@ -1454,7 +1462,6 @@ let excluded from =
   with Sys_error _ -> false
 
 let image_request conf script_name env =
-  let result =
   match Util.p_getenv env "m", Util.p_getenv env "v" with
     Some "IM", Some fname ->
       let fname =
@@ -1463,48 +1470,36 @@ let image_request conf script_name env =
       in
       let fname = Filename.basename fname in
       let fname = Util.image_file_name fname in
-      let _ = ImageDisplay.print_image_file conf fname in true
-  | _ ->
-      let s = script_name in
-      if Mutil.start_with "images/" 0 s then
-        let i = String.length "images/" in
-        let fname = String.sub s i (String.length s - i) in
-        (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)
-        (* empeche d'avoir des images qui se trouvent dans le dossier   *)
-        (* image. Si on ne fait pas de basename, alors ça marche.       *)
-        (* let fname = Filename.basename fname in *)
-        let fname = Util.image_file_name fname in
-        let _ = ImageDisplay.print_image_file conf fname in true
-      else false
-  in 
-  GwdLog.syslog `LOG_DEBUG (Printf.sprintf " - image_request %s, exit with %B" script_name result); (*debug*)
-  result
+      let _ = ImageDisplay.print_image_file conf fname in 
+      true
+  | _ -> false
 
 let print_header_misc conf len fname =
   let ext = String.lowercase_ascii @@ Filename.extension fname in 
-  let mime =
+  let content_type =
+    (* refer to https://www.iana.org/assignments/media-types/media-types.xhtml *)
     match ext with
-    | ".css" ->  "text/css"
-    | ".eot" -> "application/font-eot"
+    | ".css" ->  "text/css; charset=UTF-8"
+    | ".eot" -> "application/vnd.ms-fontobject"
     | ".ico" -> "image/x-icon"
-    | ".js" -> "text/javascript"
+    | ".js" -> "application/javascript; charset=UTF-8"
     | ".jpeg"
     | ".pjpeg"
     | ".jpg" -> "image/jpeg"
     | ".gif" -> "image/gif"
     | ".html"
-    | ".htm" -> "text/html"
-    | ".otf" -> "application/font-otf"
+    | ".htm" -> "text/html; charset=UTF-8"
+    | ".otf" -> "font/otf"
     | ".png" -> "image/png"
     | ".pdf" -> "application/pdf"
-    | ".svg" -> "application/font-svg"
-    | ".ttf" -> "application/font-ttf"
-    | ".woff" -> "application/font-woff"
-    | ".woff2" -> "application/font-woff2"
+    | ".svg" -> "image/svg+xml"
+    | ".ttf" -> "font/ttf"
+    | ".woff" -> "font/woff"
+    | ".woff2" -> "font/woff2"
     | _ -> "application/octet-stream"
   in
   Output.status conf Def.OK;
-  Output.header conf "Content-type: %s" mime;
+  Output.header conf "Content-type: %s" content_type;
   Output.header conf "Content-length: %d" len;
   Output.header conf "Content-disposition: inline; filename=%s" (Filename.basename fname);
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365)
@@ -1524,14 +1519,6 @@ let print_misc_file conf fname =
   in
   loop len;
   close_in ic;
-  Output.flush conf
-
-let print_filenotfound conf fname =
-  Output.status conf Def.Not_Found;
-  Output.header conf "Content-type: text/html; charset=UTF-8";
-  Output.header conf "Connection: close";
-  Output.print_string conf "<head><title>Not found</title></head>\n";
-  Output.printf conf "<body><h1>Error 404 :</h1><hr><h2>File \"%s\" not found</h2></body>\n" fname;
   Output.flush conf
 
 let find_misc_file name =
@@ -1559,8 +1546,8 @@ let misc_request conf fname =
     match status with
     | Def.Not_Found -> 
         GwdLog.syslog `LOG_WARNING (Printf.sprintf "File %s not found : %s" fname pname);
-        Printf.eprintf "File %s not found\n%!" fname;
-        print_filenotfound conf fname
+        Printf.eprintf "- File %s not found\n%!" fname;
+        Hutil.error_404 conf fname
     | Def.OK ->
         print_misc_file conf pname
     | _ -> 
@@ -1670,7 +1657,7 @@ let connection (addr, request) script_name contents' =
           let (contents, env) = build_env request contents' in
           if not (image_request printer_conf script_name env)
           then conf_and_connection from request script_name contents env
-        with Exit -> () (* Exit raised by print_refresh_and_exit *)
+        with Exit -> () (* Exit raised by print_refresh_and_exit dans make_conf *)
     end
 
 let null_reopen flags fd =
@@ -1996,20 +1983,18 @@ let () =
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
     Printf.eprintf 
-      "Error: the port %d is already used by another GeneWeb daemon\n\
-       or by another program. Solution: kill the other program\n\
-       or launch GeneWeb with another port number (-p option)\n"
+      "Error: the port %d is already used by another server\n\
+       Solution: kill the other program or launch GeneWeb with another\n\
+       port number (-p option)\n%!"
       !selected_port;
-    flush stderr;
     exit 1
 #ifdef UNIX
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \
        than 1024 are reserved to the system. Solution: do it as root \
-       or choose another port number greater than 1024.\n"
+       or choose another port number greater than 1024.\n%!"
       !selected_port;
-    flush stderr;
     exit 1
 #endif
   | Dynlink.Error e -> 

@@ -62,7 +62,7 @@ let http status =
     in
     if !cgi
     then (output_string !wserver_oc "Status: " ; output_string !wserver_oc answer)
-    else (output_string !wserver_oc "HTTP/1.0 " ; output_string !wserver_oc answer) ;
+    else (output_string !wserver_oc "HTTP/1.1 " ; output_string !wserver_oc answer) ;
     printnl ()
 
 let header s =
@@ -125,7 +125,7 @@ let timeout tmout spid _ =
     if Unix.fork () = 0 then
       begin
         http Def.OK;
-        output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
+        output_string !wserver_oc "Content-type: text/html; charset=UTF-8";
         printnl ();
         printnl ();
         printf "<head><title>Time out</title></head>\n";
@@ -429,7 +429,7 @@ let wserver_basic syslog tmout max_clients g s addr_server =
   | exc -> raise exc
   in
   let mem_limit = ref (used_mem ()) in 
-  syslog `LOG_DEBUG (Printf.sprintf "%d ko of memory used" !mem_limit);
+  syslog `LOG_DEBUG (Printf.sprintf "%d ko of memory used   " !mem_limit);
   while true do
     check_stopping ();
     match Unix.select !fdl [] [] 5.0 with 
@@ -454,18 +454,15 @@ let wserver_basic syslog tmout max_clients g s addr_server =
                 flush conn.oc;
                 (*Printf.eprintf "- connection %s alive since %.0f/%.0f sec.\n%!" (string_of_sockaddr conn.addr) lifetime conn_tmout*)
               end
-            else (* need garbage collector ?? *)
+            else 
               let mem = used_mem () in 
                 if mem > !mem_limit then
                   begin 
-                    Printf.eprintf "- %d ko of memory used, compact done ( >%d).\n%!" mem !mem_limit; 
-                    syslog `LOG_DEBUG (Printf.sprintf "%d ko of memory used" mem);
+                    syslog `LOG_INFO (Printf.sprintf "%d ko of memory used, invoke heap compaction" mem);
                     Gc.compact (); 
                     mem_limit := used_mem() * 2;
-                    (*Gc.print_stat stderr*)
-                  end
-                else
-                  Printf.eprintf "- memory used %d/%d ko\r%!" mem !mem_limit
+                  end;
+                Printf.eprintf "- %d..%d ko used   \r%!" mem !mem_limit
           ) !cl;
           cl:=List.filter (fun t -> t.kind <> Closed_client ) !cl
         end

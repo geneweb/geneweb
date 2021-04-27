@@ -58,9 +58,13 @@ let syslog level msg =
     if logsize > 16000 then
       begin
         let bakfn = Filename.concat !(Util.cnt_dir) "syslog-bak.txt" in
-        Unix.rename logfn bakfn;
-        let oc = open_out_gen [Open_wronly; Open_trunc; Open_creat] 0o777 logfn in
-        Printf.fprintf oc "%s\t%s[Info]\t6\tClear log et save previous log to syslog-bak.txt\n" (systime ()) tag;
-        close_out_noerr oc
+        try 
+          Unix.rename logfn bakfn; 
+          let oc = open_out_gen [Open_wronly; Open_trunc; Open_creat] 0o777 logfn in
+          Printf.fprintf oc "%s\t%s[Info]\t6\tClear log and save previous log to syslog-bak.txt\n" (systime ()) tag;
+          close_out_noerr oc
+        with _ -> 
+          Printf.eprintf "Error saving %s file to %s; not saved !\n!" logfn bakfn;
+          close_out_noerr oc
       end
 #endif
