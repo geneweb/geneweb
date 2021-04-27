@@ -20,7 +20,7 @@ let httpStatusString status =
 (*| Def.Method_Not_Allowed -> "405 Method Not Allowed"*)
   
 let out_httpStatus status = 
-  GwdLog.syslog `LOG_DEBUG ("Output HTTP/1.0 status : " ^ (httpStatusString status) );
+  GwdLog.syslog `LOG_INFO ("HTTP/1.0 response : " ^ (httpStatusString status) );
   Wserver.http status
 
 let out_httpHeader s = 
@@ -1454,7 +1454,6 @@ let excluded from =
   with Sys_error _ -> false
 
 let image_request conf script_name env =
-  GwdLog.syslog `LOG_DEBUG (Printf.sprintf "- image_request, enter : %s" script_name); (*debug*)
   let result =
   match Util.p_getenv env "m", Util.p_getenv env "v" with
     Some "IM", Some fname ->
@@ -1478,111 +1477,94 @@ let image_request conf script_name env =
         let _ = ImageDisplay.print_image_file conf fname in true
       else false
   in 
-  GwdLog.syslog `LOG_DEBUG (Printf.sprintf " - image_request, exit with %B" result); (*debug*)
+  GwdLog.syslog `LOG_DEBUG (Printf.sprintf " - image_request %s, exit with %B" script_name result); (*debug*)
   result
 
-
-(* Une version un peu à cheval entre avant et maintenant afin de   *)
-(* pouvoir inclure une css, un fichier javascript (etc) facilement *)
-(* et que le cache du navigateur puisse prendre le relais.         *)
-type misc_fname =
-  | Css of string
-  | Eot of string
-  | Js of string
-  | Otf of string
-  | Other of string
-  | Png of string
-  | Svg of string
-  | Ttf of string
-  | Woff of string
-  | Woff2 of string
-
-let content_misc conf len misc_fname =
-  Output.status conf Def.OK;
-  let (fname, t) =
-    match misc_fname with
-    | Css fname -> fname, "text/css"
-    | Eot fname -> fname, "application/font-eot"
-    | Js fname -> fname, "text/javascript"
-    | Otf fname -> fname, "application/font-otf"
-    | Other fname -> fname, "text/plain"
-    | Png fname -> fname, "image/png"
-    | Svg fname -> fname, "application/font-svg"
-    | Ttf fname -> fname, "application/font-ttf"
-    | Woff fname -> fname, "application/font-woff"
-    | Woff2 fname -> fname, "application/font-woff2"
-
+let print_header_misc conf len fname =
+  let ext = String.lowercase_ascii @@ Filename.extension fname in 
+  let mime =
+    match ext with
+    | ".css" ->  "text/css"
+    | ".eot" -> "application/font-eot"
+    | ".ico" -> "image/x-icon"
+    | ".js" -> "text/javascript"
+    | ".jpeg"
+    | ".pjpeg"
+    | ".jpg" -> "image/jpeg"
+    | ".gif" -> "image/gif"
+    | ".html"
+    | ".htm" -> "text/html"
+    | ".otf" -> "application/font-otf"
+    | ".png" -> "image/png"
+    | ".pdf" -> "application/pdf"
+    | ".svg" -> "application/font-svg"
+    | ".ttf" -> "application/font-ttf"
+    | ".woff" -> "application/font-woff"
+    | ".woff2" -> "application/font-woff2"
+    | _ -> "application/octet-stream"
   in
-  Output.header conf "Content-type: %s" t;
+  Output.status conf Def.OK;
+  Output.header conf "Content-type: %s" mime;
   Output.header conf "Content-length: %d" len;
-  Output.header conf "Content-disposition: inline; filename=%s"
-    (Filename.basename fname);
-  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
+  Output.header conf "Content-disposition: inline; filename=%s" (Filename.basename fname);
+  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365)
+
+let print_misc_file conf fname =
+  let ic = Secure.open_in_bin fname in
+  let buf = Bytes.create 1024 in
+  let len = in_channel_length ic in
+  print_header_misc conf len fname;
+  let rec loop len =
+    if len = 0 then ()
+    else
+      let olen = min (Bytes.length buf) len in
+      really_input ic buf 0 olen;
+      Output.print_string conf (Bytes.sub_string buf 0 olen);
+      loop (len - olen)
+  in
+  loop len;
+  close_in ic;
+  Output.flush conf
+
+let print_filenotfound conf fname =
+  Output.status conf Def.Not_Found;
+  Output.header conf "Content-type: text/html; charset=UTF-8";
+  Output.header conf "Connection: close";
+  Output.print_string conf "<head><title>Not found</title></head>\n";
+  Output.printf conf "<body><h1>Error 404 :</h1><hr><h2>File \"%s\" not found</h2></body>\n" fname;
   Output.flush conf
 
 let find_misc_file name =
   if Sys.file_exists name
   && List.exists (fun p -> Mutil.start_with (Filename.concat p "assets") 0 name) !plugins
-  then name
+  then name, Def.OK
   else
-    let name' = Filename.concat (base_path ["etc"] "") name in
-    if Sys.file_exists name' then name'
-    else
-      let name' = search_in_lang_path @@ Filename.concat "etc" name in
-      if Sys.file_exists name' then name'
-      else ""
-
-let print_misc_file conf misc_fname =
-  match misc_fname with
-  | Other _ -> false
-  | Css fname
-  | Eot fname
-  | Js fname
-  | Otf fname
-  | Png fname
-  | Svg fname
-  | Ttf fname
-  | Woff fname
-  | Woff2 fname
-    ->
-    let ic = Secure.open_in_bin fname in
-    let buf = Bytes.create 1024 in
-    let len = in_channel_length ic in
-    content_misc conf len misc_fname;
-    let rec loop len =
-      if len = 0 then ()
-      else
-        let olen = min (Bytes.length buf) len in
-        really_input ic buf 0 olen;
-        Output.print_string conf (Bytes.sub_string buf 0 olen);
-        loop (len - olen)
+    let search refdir name = 
+      let name' = base_path [refdir] name in
+      if Sys.file_exists name' then name', Def.OK
+      else 
+        let name' = search_in_lang_path @@ Filename.concat refdir name in
+        if Sys.file_exists name' then name', Def.OK else name', Def.Not_Found
     in
-    loop len;
-    close_in ic;
-    true
+    let (subdir, sname) = try let i = String.index name '/' in
+      String.sub name 0 i,
+      String.sub name (i + 1) (String.length name - i - 1)
+    with Not_found -> ("", name) in
+    match subdir with
+    | "images" -> (search "" name)
+    | _ -> (search "etc" name)
 
 let misc_request conf fname =
-  GwdLog.syslog `LOG_DEBUG (Printf.sprintf "- misc_request, enter : %s" fname); (*debug*)
-  let result = 
-  let fname = find_misc_file fname in
-  if fname <> "" then
-    let misc_fname =
-      if Filename.check_suffix fname ".css" then Css fname
-      else if Filename.check_suffix fname ".js" then Js fname
-      else if Filename.check_suffix fname ".otf" then Otf fname
-      else if Filename.check_suffix fname ".svg" then Svg fname
-      else if Filename.check_suffix fname ".woff" then Woff fname
-      else if Filename.check_suffix fname ".eot" then Eot fname
-      else if Filename.check_suffix fname ".ttf" then Ttf fname
-      else if Filename.check_suffix fname ".woff2" then Woff2 fname
-      else if Filename.check_suffix fname ".png" then Png fname
-      else Other fname
-    in
-    print_misc_file conf misc_fname
-  else false
-  in
-  GwdLog.syslog `LOG_DEBUG (Printf.sprintf " - misc_request exit with %B" result); (*debug*)
-  result
+  let (pname, status) = find_misc_file fname in
+    match status with
+    | Def.Not_Found -> 
+        GwdLog.syslog `LOG_WARNING (Printf.sprintf "File %s not found : %s" fname pname);
+        Printf.eprintf "File %s not found\n%!" fname;
+        print_filenotfound conf fname
+    | Def.OK ->
+        print_misc_file conf pname
+    | _ -> 
+        failwith "Misc_request error : unknown status"
 
 let strip_quotes s =
   let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
@@ -1679,12 +1661,14 @@ let connection (addr, request) script_name contents' =
     begin let accept =
       if !only_addresses = [] then true else List.mem from !only_addresses
     in
-      if not accept then only_log printer_conf from
+      if not accept then 
+        only_log printer_conf from
+      else if (Filename.extension script_name) <> "" then 
+        misc_request printer_conf script_name
       else
         try
           let (contents, env) = build_env request contents' in
           if not (image_request printer_conf script_name env)
-          && not (misc_request printer_conf script_name)
           then conf_and_connection from request script_name contents env
         with Exit -> () (* Exit raised by print_refresh_and_exit *)
     end
@@ -1959,13 +1943,6 @@ let main () =
   Arg.parse speclist anonfun usage;
   List.iter register_plugin !plugins;
   cache_lexicon ();
-  begin 
-    match !GwdLog.oc with
-    | None -> Printf.eprintf "No log\n%!"
-    | Some oc when oc = stdout -> Printf.eprintf "log to stdout\n%!"
-    | Some oc when oc = stderr -> Printf.eprintf "log to stderr\n%!"
-    | Some _ -> Printf.eprintf "log to file\n%!"
-  end;
   if !images_dir <> "" then
     begin let abs_dir =
       let f =

@@ -6,8 +6,8 @@ let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
-let proc = ref false    (* obsolete Windows mode : one process with .sin/.sou files *)
-let noproc = ref false  (* obsolete Windows mode : no process with .sin/.sou files *)
+let proc = ref false    (* older Windows mode : one process with .sin/.sou files *)
+let noproc = ref false  (* older Windows mode : no process with .sin/.sou files  *)
 let cgi = ref false
 
 let wserver_sock = ref Unix.stdout
@@ -151,6 +151,7 @@ let string_of_sockaddr =
   function
     Unix.ADDR_UNIX s -> s
   | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a) ^ ":" ^ (string_of_int p)
+
 let sockaddr_of_string str =
   try
     let i = String.index str ':' in
@@ -159,19 +160,6 @@ let sockaddr_of_string str =
       int_of_string (String.sub str (i + 1) (String.length str - i - 1) )
     )
   with _ ->  Unix.ADDR_UNIX str
-
-(* ==== debug *)    
-let systime () =
-  let now = Unix.gettimeofday () in
-  let tm = Unix.localtime (now) in
-  let sd = Float.to_int @@ 1000000.0 *. (mod_float now 1.0)  in 
-  Printf.sprintf "%02d:%02d:%02d.%06d" tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec sd
-
-let sending_state () = match !printing_state with
-  | Status -> "Status"
-  | Contents -> "Contents"
-  | Nothing -> "Nothing"
-(* ==== debug *)    
 
 let treat_connection tmout callback addr fd =
   if Sys.unix then
@@ -297,9 +285,8 @@ let accept_connection tmout max_clients callback s =
   | Unix.ADDR_UNIX s -> (s, -1)
   | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
   in 
-  eprintf "[%s] Data accepted from %s:%d\n%!" (systime()) client_ip client_port;
+  eprintf "Data accepted from %s:%d\n%!" client_ip client_port;
   (* ====== debug *)
-  check_stopping ();
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
   if Sys.unix then
     match try Some (Unix.fork ()) with _ -> None with
@@ -392,6 +379,7 @@ let accept_connection tmout max_clients callback s =
 let wserver_unix syslog tmout max_clients g s =
   let _ = Unix.nice 1 in
   while true do
+    check_stopping ();
     try accept_connection tmout max_clients g s with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
       syslog `LOG_INFO (Printexc.to_string e)
@@ -403,6 +391,7 @@ let wserver_unix syslog tmout max_clients g s =
 (* osbolete elementary HTTP server, basic mode for windows - with .sin/.sou files *)
 let wserver_basic_legacy syslog tmout max_clients g s =
   while true do
+    check_stopping ();
     try accept_connection tmout max_clients g s with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
       syslog `LOG_INFO (Printexc.to_string e)
@@ -412,13 +401,74 @@ let wserver_basic_legacy syslog tmout max_clients g s =
   done
 
 (* elementary HTTP server, basic mode for windows *)
-let wserver_basic syslog tmout max_clients g s =
+type conn_kind = Server | Connected_client | Closed_client 
+type conn_info = {
+    addr : Unix.sockaddr;
+    fd : Unix.file_descr;
+    oc : out_channel;
+    start_time : float;
+    mutable kind : conn_kind }
+
+let wserver_basic syslog tmout max_clients g s addr_server =
+  let server = {
+    addr = addr_server;
+    start_time = Unix.time ();
+    fd = s;
+    oc = stdout;
+    kind = Server } 
+  in
+  let cl = ref [server] in
   let fdl = ref [s] in
+  let conn_tmout = Float.of_int tmout in
+  let used_mem () = 
+    let st = Gc.stat () in 
+    (st.live_blocks * Sys.word_size) / 8 / 1024
+  in 
+  let shutdown fd = try Unix.shutdown fd Unix.SHUTDOWN_ALL with
+  | Unix.Unix_error(Unix.ECONNRESET, "shutdown", "") -> ()
+  | exc -> raise exc
+  in
+  let mem_limit = ref (used_mem ()) in 
+  syslog `LOG_DEBUG (Printf.sprintf "%d ko of memory used" !mem_limit);
   while true do
+    check_stopping ();
     match Unix.select !fdl [] [] 5.0 with 
     | ([], _, _) ->
       let n = List.length !fdl in
-      if n > 1 then eprintf "[%s] polling with %d descriptors\n%!" (systime()) n
+      if n > 0 then
+        begin 
+          List.iter (fun conn -> 
+            let lifetime =  Unix.time() -. conn.start_time in
+            if (lifetime >= conn_tmout) && (conn.kind = Connected_client) then 
+              begin
+                shutdown conn.fd;
+                close_out_noerr conn.oc;
+                Unix.close conn.fd;
+                fdl:=List.filter (fun fd -> fd<>conn.fd ) !fdl;
+                conn.kind <- Closed_client;
+                syslog `LOG_DEBUG (Printf.sprintf "%s connection closed" (string_of_sockaddr conn.addr) );
+                Printf.eprintf "- connection %s closed\n%!" (string_of_sockaddr conn.addr)
+              end
+            else if conn.kind = Connected_client then 
+               begin
+                flush conn.oc;
+                (*Printf.eprintf "- connection %s alive since %.0f/%.0f sec.\n%!" (string_of_sockaddr conn.addr) lifetime conn_tmout*)
+              end
+            else (* need garbage collector ?? *)
+              let mem = used_mem () in 
+                if mem > !mem_limit then
+                  begin 
+                    Printf.eprintf "- %d ko of memory used, compact done ( >%d).\n%!" mem !mem_limit; 
+                    syslog `LOG_DEBUG (Printf.sprintf "%d ko of memory used" mem);
+                    Gc.compact (); 
+                    mem_limit := used_mem() * 2;
+                    (*Gc.print_stat stderr*)
+                  end
+                else
+                  Printf.eprintf "- memory used %d/%d ko\r%!" mem !mem_limit
+          ) !cl;
+          cl:=List.filter (fun t -> t.kind <> Closed_client ) !cl
+        end
     | ( l, _, _) -> 
       let rec loop l i = 
         match l with
@@ -426,43 +476,34 @@ let wserver_basic syslog tmout max_clients g s =
           ()
         | fd :: lfd -> 
           if fd=s then
-            begin
-              (* Nouvelle connexion cliente entrante              *)
+            begin (* accept new incoming connection *)
               let (client_fd, client_addr) = Unix.accept fd in 
-              let client_ip, client_port = match client_addr with 
-              | Unix.ADDR_UNIX s -> (s, -1)
-              | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
-              in 
-              (* eprintf "[%s] Data accepted from %s:%d\n%!" (systime()) client_ip client_port;*)
-              syslog `LOG_DEBUG (Printf.sprintf "%d - Data accepted from %s:%d" i client_ip client_port);
+              syslog `LOG_DEBUG (Printf.sprintf "%d - Data accepted from %s" i (string_of_sockaddr client_addr) );
               Unix.setsockopt client_fd Unix.SO_KEEPALIVE true;
-              (* ajoute à liste pour lecture au polling suivant   *)
+              cl :=  { 
+                addr = client_addr;
+                fd = client_fd;
+                oc = Unix.out_channel_of_descr client_fd;
+                start_time = Unix.time ();
+                kind = Connected_client } :: !cl;
               fdl := client_fd :: !fdl
             end
           else
-            begin
-              (* lecture d'une connexion client entrante          *)
-              let client_addr = try Unix.getpeername fd with exc -> 
-                failwith (Printf.sprintf "Error reading peer connection : %s\n" (Printexc.to_string exc));
-              in
-                begin
-                  wserver_sock := fd;
-                  wserver_oc := Unix.out_channel_of_descr fd;
-                  treat_connection tmout g client_addr fd;
-                  flush(!wserver_oc);
-                  (* retire du polling suivant la connexion                         *)
-                  (* TODO : time out à prendre en compte pour gérer un keepalive    *)
-                  fdl:=List.filter (fun t -> t<>fd ) !fdl;
-                  begin try Unix.shutdown fd Unix.SHUTDOWN_ALL with
-                  | Unix.Unix_error(Unix.ECONNRESET, "shutdown", "") -> ()
-                  | exc -> raise exc
-                  end;
-                  close_out_noerr !wserver_oc;
-                  Unix.close fd;
-                end
+            begin (* treat incoming connection *)
+              let conn = List.find ( fun t -> t.fd = fd ) !cl in
+              let remove_from_poll fd =
+                fdl:=List.filter (fun t -> t <> fd ) !fdl;
+                cl:=List.filter (fun t -> t.fd <> fd ) !cl
+              in 
+              wserver_sock := conn.fd;
+              wserver_oc := conn.oc;
+              treat_connection tmout g conn.addr fd;
+              remove_from_poll conn.fd;
+              shutdown conn.fd;
+              close_out_noerr conn.oc;
+              Unix.close conn.fd;
             end
           ;
-          (* suivants *)
           loop lfd (i+1)
       in
       loop l 0
@@ -488,7 +529,8 @@ let f syslog addr_opt port tmout max_clients g =
         | None -> Unix.inet_addr_any
       in
       let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
-      Unix.bind s (Unix.ADDR_INET (addr, port));
+      let a =  (Unix.ADDR_INET (addr, port)) in 
+      Unix.bind s a;
       Unix.listen s 4;
 
       let tm = Unix.localtime (Unix.time ()) in
@@ -500,7 +542,7 @@ let f syslog addr_opt port tmout max_clients g =
       if !proc || !noproc then     
         wserver_basic_legacy syslog tmout max_clients g s
       else
-        wserver_basic syslog tmout max_clients g s
+        wserver_basic syslog tmout max_clients g s a
 #else
       wserver_unix syslog tmout max_clients g s
 #endif
