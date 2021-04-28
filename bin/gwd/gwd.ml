@@ -1368,7 +1368,7 @@ let conf_and_connection =
       let bname = Util.bpath (conf.bname ^ ".gwb") in
       if not @@ Sys.file_exists bname then
         begin 
-          GwdLog.syslog `LOG_INFO (Printf.sprintf "basename \"%s\" not found" conf.bname );
+          GwdLog.syslog `LOG_INFO (Printf.sprintf "Geneweb base \"%s\" not found" conf.bname );
           Hutil.error_404 conf script_name;
           raise Exit
         end;

@@ -22,11 +22,16 @@ let syslog level msg =
      | `LOG_NOTICE -> 5
      | `LOG_INFO -> 6
      | `LOG_DEBUG -> 7
-  then begin
-    let log = Syslog.openlog @@ Filename.basename @@ Sys.executable_name in
-    Syslog.syslog log level msg ;
-    Syslog.closelog log
-  end
+  then 
+    try 
+      let log = Syslog.openlog @@ Filename.basename @@ Sys.executable_name in
+      Syslog.syslog log level msg ;
+      Syslog.closelog log
+    with e -> 
+      Printf.fprintf stderr  "----- Syslog writing, exception ignored : %s\n%!" (Printexc.to_string e);         
+      Printexc.print_backtrace stderr;
+      Prinf.stderr "- syslog is %s - %s\n%!" (Filename.basename @@ Sys.executable_name) msg;
+      flush stderr
 #endif
 
 #ifdef WINDOWS
@@ -49,7 +54,8 @@ let syslog level msg =
       | `LOG_DEBUG -> 7, "Debug"
   in 
   if !verbosity >= severityLevel then
-    let tag = Filename.basename Sys.executable_name in
+    let ident = Filename.basename @@ Sys.executable_name in
+    let tag = (if String.length ident > 32 then String.sub ident 0 32 else ident) in
     let logfn =  Filename.concat !(Util.cnt_dir) "syslog.txt" in
     let oc = open_out_gen [Open_wronly; Open_append; Open_creat] 0o777 logfn in
     Printf.fprintf oc "%s\t%s[%s]\t%d\t%s\n" (systime ()) tag severity severityLevel msg;
