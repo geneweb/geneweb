@@ -84,6 +84,7 @@ let bench name fn =
   let gc2 = Gc.stat () in
   Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1) ;
   pprint_gc (diff gc1 gc2) ;
+  flush stdout;
   res
 
 let print_callstack ?(max = 5) () =

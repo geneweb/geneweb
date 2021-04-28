@@ -1363,12 +1363,12 @@ let conf_and_connection =
   in
   fun from request script_name contents env ->
   let (conf, passwd_err) = make_conf from request script_name env in
-  if script_name <> "" then 
+  if conf.bname <> "" then 
     begin
-      let bname = Util.bpath (script_name ^ ".gwb") in
+      let bname = Util.bpath (conf.bname ^ ".gwb") in
       if not @@ Sys.file_exists bname then
         begin 
-          GwdLog.syslog `LOG_INFO (Printf.sprintf "basename \"%s\" or \"%s\" not found" script_name bname);
+          GwdLog.syslog `LOG_INFO (Printf.sprintf "basename \"%s\" not found" conf.bname );
           Hutil.error_404 conf script_name;
           raise Exit
         end;
@@ -1413,7 +1413,7 @@ let conf_and_connection =
       | _ ->
         try
           let t1 = Unix.gettimeofday () in
-          Request.treat_request conf ;
+          Request.treat_request conf;
           let t2 = Unix.gettimeofday () in
           if t2 -. t1 > slow_query_threshold
           then
@@ -1657,7 +1657,7 @@ let connection (addr, request) script_name contents' =
           let (contents, env) = build_env request contents' in
           if not (image_request printer_conf script_name env)
           then conf_and_connection from request script_name contents env
-        with Exit -> () (* Exit raised by print_refresh_and_exit dans make_conf *)
+        with Exit -> () (* Exit raised when basename with extra subdir, see make_conf *)
     end
 
 let null_reopen flags fd =

@@ -455,14 +455,15 @@ let wserver_basic syslog tmout max_clients g s addr_server =
                 (*Printf.eprintf "- connection %s alive since %.0f/%.0f sec.\n%!" (string_of_sockaddr conn.addr) lifetime conn_tmout*)
               end
             else 
-              let mem = used_mem () in 
-                if mem > !mem_limit then
+              let mem = ref (used_mem ()) in 
+                if !mem > !mem_limit then
                   begin 
-                    syslog `LOG_INFO (Printf.sprintf "%d ko of memory used, invoke heap compaction" mem);
+                    syslog `LOG_INFO (Printf.sprintf "%d ko of memory used, invoke heap compaction" !mem);
                     Gc.compact (); 
-                    mem_limit := used_mem() * 2;
+                    mem := used_mem ();
+                    mem_limit := !mem * 2;
                   end;
-                Printf.eprintf "- %d..%d ko used   \r%!" mem !mem_limit
+                Printf.eprintf "- %d..%d ko used   \r%!" !mem !mem_limit
           ) !cl;
           cl:=List.filter (fun t -> t.kind <> Closed_client ) !cl
         end
