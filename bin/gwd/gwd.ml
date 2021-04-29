@@ -1084,9 +1084,6 @@ let make_conf from_addr request script_name env =
     | "", env -> "", env
     | x, env -> "", ("opt", x) :: env
   in
-  let (threshold_test, env) = extract_assoc "threshold" env in
-  if threshold_test <> "" then
-    RelationLink.threshold := int_of_string threshold_test;
   let base_env = read_base_env base_file in
   let default_lang =
     try

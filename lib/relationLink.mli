@@ -23,9 +23,8 @@ type info =
     bd : int;
     td_prop : string }
 
-val threshold : int ref
-val make_dist_tab :
-  config -> base -> iper -> int -> (iper -> int) * (iper -> int)
+val make_dist_tab
+  : ?threshold:int -> config -> base -> iper -> int -> (iper -> int) * (iper -> int)
 val find_first_branch :
   config -> base -> (iper -> int) * (iper -> int) -> iper -> int -> iper ->
     sex -> (iper * sex) list option
