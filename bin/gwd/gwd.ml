@@ -1844,7 +1844,6 @@ let main () =
     ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
     ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")
     ; ("-setup_link", Arg.Set setup_link, " Display a link to local gwsetup in bottom of pages.")
-    ; ("-allowed_tags", Arg.String (fun x -> Util.allowed_tags_file := x), "<FILE> HTML tags which are allowed to be displayed. One tag per line in file.")
     ; ("-wizard", Arg.String (fun x -> wizard_passwd := x), "<PASSWD> Set a wizard password.")
     ; ("-friend", Arg.String (fun x -> friend_passwd := x), "<PASSWD> Set a friend password.")
     ; ("-wjf", Arg.Set wizard_just_friend, " Wizard just friend (permanently).")
