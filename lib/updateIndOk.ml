@@ -335,14 +335,11 @@ let reconstitute_add_relation conf ext cnt rl =
       r :: rl, true
   | _ -> rl, ext
 
-let deleted_relation = ref []
-
-let reconstitute_relation_parent conf var key sex =
+let reconstitute_relation_parent conf deleted_relation var key sex =
   match getn conf var (key ^ "_fn"), getn conf var (key ^ "_sn") with
     "", _ | _, "" | "?", _ | _, "?" as n ->
       let p = only_printable (fst n) ^ only_printable (snd n) in
-      if p = "" || p = "??" then ()
-      else deleted_relation := p :: !deleted_relation;
+      if p <> "" && p <> "??" then deleted_relation := p :: !deleted_relation;
       None
   | fn, sn ->
       let fn = only_printable fn in
@@ -371,10 +368,10 @@ let reconstitute_relation_parent conf var key sex =
       in
       Some (fn, sn, occ, create, var ^ "_" ^ key)
 
-let reconstitute_relation conf var =
+let reconstitute_relation conf deleted_relation var =
   try
-    let r_fath = reconstitute_relation_parent conf var "fath" Male in
-    let r_moth = reconstitute_relation_parent conf var "moth" Female in
+    let r_fath = reconstitute_relation_parent conf deleted_relation var "fath" Male in
+    let r_moth = reconstitute_relation_parent conf deleted_relation var "moth" Female in
     let r_type =
       match getn conf var "type" with
         "Adoption" -> Adoption
@@ -387,10 +384,10 @@ let reconstitute_relation conf var =
     Some {r_type = r_type; r_fath = r_fath; r_moth = r_moth; r_sources = ""}
   with Failure _ -> None
 
-let rec reconstitute_relations conf ext cnt =
-  match reconstitute_relation conf ("r" ^ string_of_int cnt) with
+let rec reconstitute_relations conf deleted_relation ext cnt =
+  match reconstitute_relation conf deleted_relation ("r" ^ string_of_int cnt) with
     Some r ->
-      let (rl, ext) = reconstitute_relations conf ext (cnt + 1) in
+      let (rl, ext) = reconstitute_relations conf deleted_relation ext (cnt + 1) in
       let (rl, ext) = reconstitute_add_relation conf ext cnt rl in
       r :: rl, ext
   | _ -> [], ext
@@ -566,7 +563,7 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
   let bu = if not !found_burial then UnknownBurial, "", "", "" else bu in
   bi, bp, de, bu, pevents
 
-let reconstitute_person conf removed_string =
+let reconstitute_person conf deleted_relation removed_string =
   let ext = false in
   let key_index =
     match p_getenv conf.env "i" with
@@ -605,7 +602,7 @@ let reconstitute_person conf removed_string =
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
   let (titles, ext) = reconstitute_insert_title conf ext 0 titles in
-  let (rparents, ext) = reconstitute_relations conf ext 1 in
+  let (rparents, ext) = reconstitute_relations conf deleted_relation ext 1 in
   let (rparents, ext) = reconstitute_add_relation conf ext 0 rparents in
   let access =
     match p_getenv conf.env "access" with
@@ -1026,7 +1023,7 @@ let effective_del conf base p =
   effective_del_no_commit base op;
   effective_del_commit conf base op
 
-let print_mod_ok conf base removed_string wl pgl p ofn osn oocc =
+let print_mod_ok conf base removed_string deleted_relation wl pgl p ofn osn oocc =
   let title _ =
     Output.print_string conf (Utf8.capitalize_fst (transl conf "person modified"))
   in
@@ -1131,7 +1128,7 @@ let all_checks_person base p a u =
     wl;
   wl
 
-let print_add_ok conf base removed_string wl p =
+let print_add_ok conf base deleted_relation removed_string wl p =
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "person added")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1145,7 +1142,7 @@ let print_add_ok conf base removed_string wl p =
   (* Si on a supprimé des relations, on les mentionne *)
   List.iter
     (fun s -> Output.printf conf "%s -> %s\n" s (transl conf "forbidden char"))
-    !deleted_relation;
+     !deleted_relation;
   Output.printf conf "\n%s"
     (referenced_person_text conf base (poi base p.key_index));
   Output.print_string conf "\n";
@@ -1184,8 +1181,9 @@ let print_add o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let removed_string = ref [] in
+  let deleted_relation = ref [] in
   let conf = Update.update_conf o_conf in
-  let (sp, ext) = reconstitute_person conf removed_string in
+  let (sp, ext) = reconstitute_person conf deleted_relation removed_string in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true
@@ -1203,7 +1201,7 @@ let print_add o_conf base =
       Util.commit_patches conf base;
       let changed = U_Add_person (Util.string_gen_person base p) in
       History.record conf base changed "ap";
-      print_add_ok conf base removed_string wl p
+      print_add_ok conf base deleted_relation removed_string wl p
 
 let print_del conf base =
   match p_getenv conf.env "i" with
@@ -1214,8 +1212,8 @@ let print_del conf base =
     print_del_ok conf
   | _ -> Hutil.incorrect_request conf
 
-let print_mod_aux conf base removed_string callback =
-  let (p, ext) = reconstitute_person conf removed_string in
+let print_mod_aux conf base deleted_relation removed_string callback =
+  let (p, ext) = reconstitute_person conf deleted_relation removed_string in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true
@@ -1236,6 +1234,7 @@ let print_mod ?prerr o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let removed_string = ref [] in
+  let deleted_relation = ref [] in
   let o_p =
     match p_getenv o_conf.env "i" with
       Some ip ->
@@ -1286,9 +1285,9 @@ let print_mod ?prerr o_conf base =
     let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
     History.record conf base changed "mp";
     Update.delete_topological_sort_v conf base;
-    print_mod_ok conf base removed_string wl pgl p ofn osn oocc
+    print_mod_ok conf base deleted_relation removed_string wl pgl p ofn osn oocc
   in
-  print_mod_aux conf base removed_string callback
+  print_mod_aux conf base deleted_relation removed_string callback
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
