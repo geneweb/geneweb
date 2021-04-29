@@ -69,5 +69,5 @@ let print_mod_merge o_conf base =
   let o_p1 = get_gen_person "i" in
   let o_p2 = get_gen_person "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateIndOk.print_mod_aux conf base
+  UpdateIndOk.print_mod_aux conf base (ref [])
     (fun p -> effective_mod_merge conf base o_p1 o_p2 p print_mod_merge_ok)

@@ -5,10 +5,6 @@ open Def
 open Gwdb
 open Util
 
-(* Liste des string dont on a supprimé un caractère.       *)
-(* Utilisé pour le message d'erreur lors de la validation. *)
-let removed_string = ref []
-
 let raw_get conf key =
   match p_getenv conf.env key with
     Some v -> v
@@ -96,7 +92,7 @@ let rec reconstitute_titles conf ext cnt =
       t :: tl, ext
   | _ -> [], ext
 
-let reconstitute_somebody conf var =
+let reconstitute_somebody conf removed_string var =
   let first_name = no_html_tags (only_printable (getn conf var "fn")) in
   let surname = no_html_tags (only_printable (getn conf var "sn")) in
   (* S'il y a des caractères interdits, on les supprime *)
@@ -153,7 +149,7 @@ let reconstitute_insert_pevent conf ext cnt el =
     el, true
   else el, ext
 
-let rec reconstitute_pevents conf ext cnt =
+let rec reconstitute_pevents conf removed_string ext cnt =
   match get_nth conf "e_name" cnt with
     Some epers_name ->
       let epers_name =
@@ -238,7 +234,7 @@ let rec reconstitute_pevents conf ext cnt =
           match
             try
               let var = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
-              Some (reconstitute_somebody conf var)
+              Some (reconstitute_somebody conf removed_string var)
             with Failure _ -> None
           with
             Some c ->
@@ -316,7 +312,7 @@ let rec reconstitute_pevents conf ext cnt =
          epers_note = epers_note; epers_src = epers_src;
          epers_witnesses = Array.of_list witnesses}
       in
-      let (el, ext) = reconstitute_pevents conf ext (cnt + 1) in
+      let (el, ext) = reconstitute_pevents conf removed_string ext (cnt + 1) in
       let (el, ext) = reconstitute_insert_pevent conf ext (cnt + 1) el in
       e :: el, ext
   | _ -> [], ext
@@ -359,8 +355,8 @@ let reconstitute_relation_parent conf var key sex =
            List.exists contain_sn Name.forbidden_char
         then
           begin
-            removed_string :=
-              (Name.purge fn ^ " " ^ Name.purge sn) :: !removed_string;
+            (* removed_string :=
+             *   (Name.purge fn ^ " " ^ Name.purge sn) :: !removed_string; *)
             Name.purge fn, Name.purge sn
           end
         else fn, sn
@@ -570,7 +566,7 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
   let bu = if not !found_burial then UnknownBurial, "", "", "" else bu in
   bi, bp, de, bu, pevents
 
-let reconstitute_person conf =
+let reconstitute_person conf removed_string =
   let ext = false in
   let key_index =
     match p_getenv conf.env "i" with
@@ -587,9 +583,9 @@ let reconstitute_person conf =
        List.exists contain_sn Name.forbidden_char
     then
       begin
-        removed_string :=
-          (Name.purge first_name ^ " " ^ Name.purge surname) ::
-          !removed_string;
+        (* removed_string :=
+         *   (Name.purge first_name ^ " " ^ Name.purge surname) ::
+         *   !removed_string; *)
         Name.purge first_name, Name.purge surname
       end
     else first_name, surname
@@ -662,7 +658,7 @@ let reconstitute_person conf =
       (NotDead | DontKnowIfDead), (Buried _ | Cremated _) -> DeadDontKnowWhen
     | _ -> death
   in
-  let (pevents, ext) = reconstitute_pevents conf ext 1 in
+  let (pevents, ext) = reconstitute_pevents conf removed_string ext 1 in
   let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
   let notes =
     if first_name = "?" || surname = "?" then ""
@@ -1030,7 +1026,7 @@ let effective_del conf base p =
   effective_del_no_commit base op;
   effective_del_commit conf base op
 
-let print_mod_ok conf base wl pgl p ofn osn oocc =
+let print_mod_ok conf base removed_string wl pgl p ofn osn oocc =
   let title _ =
     Output.print_string conf (Utf8.capitalize_fst (transl conf "person modified"))
   in
@@ -1135,7 +1131,7 @@ let all_checks_person base p a u =
     wl;
   wl
 
-let print_add_ok conf base wl p =
+let print_add_ok conf base removed_string wl p =
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "person added")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1187,9 +1183,9 @@ let print_change_event_order_ok conf base wl p =
 let print_add o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
+  let removed_string = ref [] in
   let conf = Update.update_conf o_conf in
-  let (sp, ext) = reconstitute_person conf in
+  let (sp, ext) = reconstitute_person conf removed_string in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true
@@ -1206,7 +1202,8 @@ let print_add o_conf base =
       let wl = all_checks_person base p a u in
       Util.commit_patches conf base;
       let changed = U_Add_person (Util.string_gen_person base p) in
-      History.record conf base changed "ap"; print_add_ok conf base wl p
+      History.record conf base changed "ap";
+      print_add_ok conf base removed_string wl p
 
 let print_del conf base =
   match p_getenv conf.env "i" with
@@ -1217,8 +1214,8 @@ let print_del conf base =
     print_del_ok conf
   | _ -> Hutil.incorrect_request conf
 
-let print_mod_aux conf base callback =
-  let (p, ext) = reconstitute_person conf in
+let print_mod_aux conf base removed_string callback =
+  let (p, ext) = reconstitute_person conf removed_string in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true
@@ -1238,7 +1235,7 @@ let print_mod_aux conf base callback =
 let print_mod ?prerr o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
+  let removed_string = ref [] in
   let o_p =
     match p_getenv o_conf.env "i" with
       Some ip ->
@@ -1289,9 +1286,9 @@ let print_mod ?prerr o_conf base =
     let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
     History.record conf base changed "mp";
     Update.delete_topological_sort_v conf base;
-    print_mod_ok conf base wl pgl p ofn osn oocc
+    print_mod_ok conf base removed_string wl pgl p ofn osn oocc
   in
-  print_mod_aux conf base callback
+  print_mod_aux conf base removed_string callback
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
