@@ -120,7 +120,6 @@ let compute base bdir =
     Buffer.add_string buffer @@ sou base istr ;
     Buffer.add_char buffer ' '
   in
-  ProgrBar.full := '*' ;
   Printf.eprintf "--- individual notes\n"; flush stderr ;
   ProgrBar.start () ;
   Gwdb.Collection.iteri (fun i p ->

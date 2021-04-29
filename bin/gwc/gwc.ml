@@ -21,8 +21,8 @@ let next_family_fun_templ gwo_list fi =
     else if ngwo < 60 then fun () -> Printf.eprintf "."; flush stderr
     else
       let bar_cnt = ref 0 in
-      let run () = ProgrBar.run !bar_cnt ngwo; incr bar_cnt in
-      ProgrBar.empty := 'o'; ProgrBar.full := '*'; ProgrBar.start (); run
+      ProgrBar.start ();
+      (fun () -> ProgrBar.run !bar_cnt ngwo ; incr bar_cnt)
   in
   let ic_opt = ref None in
   let gwo_list = ref gwo_list in
