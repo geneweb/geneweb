@@ -370,16 +370,20 @@ let advanced_search conf base max_answers =
   if "on" = gets "sosa_filter"
   then match Util.find_sosa_ref conf base with
     | Some sosa_ref ->
-      let rec loop p acc =
-        let acc = match_person acc p search_type in
-        match get_parents p with
-        | Some ifam ->
-          let fam = foi base ifam in
-          loop
-            (pget conf base @@ get_father fam)
-            (loop (pget conf base @@ get_mother fam) acc)
-        | None -> acc
-      in loop (pget conf base @@ get_iper sosa_ref) ([], 0)
+      let rec loop p (set, acc) =
+        if not (IperSet.mem (get_iper p) set) then begin
+          let set = IperSet.add (get_iper p) set in
+          let acc = match_person acc p search_type in
+          match get_parents p with
+          | Some ifam ->
+            let fam = foi base ifam in
+            let set, acc = loop (pget conf base @@ get_mother fam) (set, acc) in
+            loop (pget conf base @@ get_father fam) (set, acc)
+          | None -> set, acc
+        end else (set, acc)
+      in
+      loop (pget conf base @@ get_iper sosa_ref) (IperSet.empty, ([], 0))
+      |> snd
     | None -> [], 0
   else if fn_list <> [] || sn_list <> [] then
     let list_aux strings_of persons_of split n_list exact =
