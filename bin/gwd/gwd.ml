@@ -17,7 +17,7 @@ let httpStatusString status =
   | Def.Unauthorized -> "401 Unauthorized"
   | Def.Forbidden -> "403 Forbidden"
   | Def.Not_Found -> "404 Not Found"
-(*| Def.Method_Not_Allowed -> "405 Method Not Allowed"*)
+  | Def.Method_Not_Allowed -> "405 Method Not Allowed"
   
 let out_httpStatus status = 
   GwdLog.syslog `LOG_INFO ("HTTP/1.1 response : " ^ (httpStatusString status) );

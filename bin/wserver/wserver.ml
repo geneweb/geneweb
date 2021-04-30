@@ -44,7 +44,7 @@ let close_connection () =
 let printnl () =
   output_string !wserver_oc "\013\010"
 
-type printing_state = Nothing | Status | Contents
+type printing_status = Nothing | Status | Contents
 
 let printing_state = ref Nothing
 
@@ -59,6 +59,7 @@ let http status =
       | Def.Unauthorized -> "401 Unauthorized"
       | Def.Forbidden -> "403 Forbidden"
       | Def.Not_Found -> "404 Not Found"
+      | Def.Method_Not_Allowed -> "405 Method Not Allowed"
     in
     if !cgi
     then (output_string !wserver_oc "Status: " ; output_string !wserver_oc answer)
@@ -104,6 +105,10 @@ let store len x =
   succ len
 let get_buff len = Bytes.sub_string !buff 0 len
 
+(* HTTP/1.1 method see  https://tools.ietf.org/html/rfc7231 , §4.3 *)
+type http_method =  Http_get | Http_head | Http_post | Http_put | Http_delete 
+                  | Http_connect  | Http_options | Http_trace | Unknown_method | No_method
+
 let get_request strm =
   let rec loop len (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
@@ -115,7 +120,31 @@ let get_request strm =
     | Some c -> Stream.junk strm__; loop (store len c) strm__
     | _ -> if len = 0 then [] else [get_buff len]
   in
-  loop 0 strm
+  let request = loop 0 strm in
+  let http_request = try List.hd request with _ -> "" in
+  let meth, s, m = 
+    try let i = String.index http_request ' ' in
+      (match (String.uppercase_ascii @@ String.sub http_request 0 i) with
+        | "GET" -> Http_get
+        | "HEAD" -> Http_head
+        | "POST" -> Http_post
+        | "PUT" -> Http_put
+        | "DELETE" -> Http_delete
+        | "CONNECT" -> Http_connect
+        | "OPTIONS" -> Http_options
+        | "TRACE" -> Http_trace
+        | _ -> Unknown_method)
+      , (String.sub http_request (i + 2) (String.length http_request - i - 2) )
+      , (String.uppercase_ascii @@ String.sub http_request 0 i)
+    with Not_found -> No_method, "",""
+  in
+  let (path_and_query, http_ver) = try let i = String.rindex s ' ' in
+    String.sub s 0 i,
+    String.sub s (i + 1) (String.length s - i - 1)
+  with Not_found -> (s, "")
+  in 
+  (* note : in HTTP, the / is mandatory for the path. it is intentionally omitted for further processing  *)
+  meth, path_and_query, http_ver, request
 
 let timeout tmout spid _ =
   Unix.kill spid Sys.sigkill;
@@ -139,13 +168,13 @@ let timeout tmout spid _ =
   let _ = Unix.waitpid [] pid in (); exit 2
 
 let get_request_and_content strm =
-  let request = get_request strm in
+  let meth, path_and_query, _, request = get_request strm in
   let content =
     match Mutil.extract_param "content-length: " ' ' request with
     | "" -> ""
     | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
-  request, content
+  meth, path_and_query, request, content
 
 let string_of_sockaddr =
   function
@@ -174,25 +203,37 @@ let treat_connection tmout callback addr fd =
             exit 0
           end
       end;
-  let (request, script_name, contents) =
-    let (request, contents) =
-      let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
-      get_request_and_content strm
-    in
-    let (script_name, contents) =
-      match Mutil.extract_param "GET /" ' ' request with
-        "" -> Mutil.extract_param "POST /" ' ' request, contents
-      | str ->
-          try
-            let i = String.index str '?' in
-            String.sub str 0 i,
-            String.sub str (i + 1) (String.length str - i - 1)
-          with Not_found -> str, ""
-    in
-    request, script_name, contents
-  in
-  callback (addr, request) script_name contents;
-  if !printing_state <> Contents then failwith "Unexcepted HTTP printing state";
+  let (meth, path_and_query, request, contents) =
+    let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
+    get_request_and_content strm
+  in 
+  match meth with
+  | No_method -> (* unlikely but possible if no data sent ; do nothing/ignore *)
+      ()
+  | Http_post -> 
+      callback (addr, request) path_and_query contents
+  | Http_get ->
+      let path, query =
+        try
+          let i = String.index path_and_query '?' in
+          String.sub path_and_query 0 i,
+          String.sub path_and_query (i + 1) (String.length path_and_query - i - 1)
+        with Not_found -> path_and_query, ""
+      in
+      callback (addr, request) path query;
+  | _ -> 
+      http Def.Method_Not_Allowed;
+      header "Content-type: text/html; charset=UTF-8";
+      header "Connection: close";
+      printnl ();
+      print_string "<html>\n\
+                    <title>Not allowed HTTP method</title>\n\
+                    <body>Not allowed HTTP method</body>\n\
+                    </html>\n";
+      wflush ();
+  ;
+  if !printing_state = Status then 
+    failwith ("Unexcepted HTTP printing state, connection from " ^ (string_of_sockaddr addr) ^ " without content sent :" );
   printing_state := Nothing
 
 let buff = Bytes.create 1024
@@ -280,13 +321,6 @@ let check_stopping () =
 let accept_connection tmout max_clients callback s =
   if !noproc then wait_and_compact s else wait_available max_clients s;
   let (t, addr) = Unix.accept s in
-  (* ====== debug *)
-  let client_ip, client_port = match addr with 
-  | Unix.ADDR_UNIX s -> (s, -1)
-  | Unix.ADDR_INET (a, p) -> (Unix.string_of_inet_addr a, p)
-  in 
-  eprintf "Data accepted from %s:%d\n%!" client_ip client_port;
-  (* ====== debug *)
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
   if Sys.unix then
     match try Some (Unix.fork ()) with _ -> None with
@@ -438,8 +472,8 @@ let wserver_basic syslog tmout max_clients g s addr_server =
       if n > 0 then
         begin 
           List.iter (fun conn -> 
-            let lifetime =  Unix.time() -. conn.start_time in
-            if (lifetime >= conn_tmout) && (conn.kind = Connected_client) then 
+            let ttl =  Unix.time() -. conn.start_time in
+            if (ttl >= conn_tmout) && (conn.kind = Connected_client) then 
               begin
                 shutdown conn.fd;
                 close_out_noerr conn.oc;
@@ -447,13 +481,9 @@ let wserver_basic syslog tmout max_clients g s addr_server =
                 fdl:=List.filter (fun fd -> fd<>conn.fd ) !fdl;
                 conn.kind <- Closed_client;
                 syslog `LOG_DEBUG (Printf.sprintf "%s connection closed" (string_of_sockaddr conn.addr) );
-                Printf.eprintf "- connection %s closed\n%!" (string_of_sockaddr conn.addr)
               end
             else if conn.kind = Connected_client then 
-               begin
-                flush conn.oc;
-                (*Printf.eprintf "- connection %s alive since %.0f/%.0f sec.\n%!" (string_of_sockaddr conn.addr) lifetime conn_tmout*)
-              end
+                flush conn.oc
             else 
               let mem = ref (used_mem ()) in 
                 if !mem > !mem_limit then
@@ -496,6 +526,7 @@ let wserver_basic syslog tmout max_clients g s addr_server =
               wserver_sock := conn.fd;
               wserver_oc := conn.oc;
               treat_connection tmout g conn.addr fd;
+              flush conn.oc;
               remove_from_poll conn.fd;
               shutdown conn.fd;
               close_out_noerr conn.oc;

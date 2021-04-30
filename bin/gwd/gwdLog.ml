@@ -28,9 +28,11 @@ let syslog level msg =
       Syslog.syslog log level msg ;
       Syslog.closelog log
     with e -> 
-      Printf.fprintf stderr  "----- Syslog writing, exception ignored : %s\n%!" (Printexc.to_string e);         
+      Printf.eprintf "----- Syslog writing, exception ignored : %s\n%!" (Printexc.to_string e);
+#ifdef DEBUG    
       Printexc.print_backtrace stderr;
-      Prinf.stderr "- syslog is %s - %s\n%!" (Filename.basename @@ Sys.executable_name) msg;
+#endif
+      Printf.eprintf "- syslog is %s - %s\n%!" (Filename.basename @@ Sys.executable_name) msg;
       flush stderr
 #endif
 

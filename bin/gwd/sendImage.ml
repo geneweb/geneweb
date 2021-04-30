@@ -264,7 +264,7 @@ let dump_bad_image conf s =
 
 let effective_send_ok conf base p file =
   let strm = Stream.of_string file in
-  let (request, content) = Wserver.get_request_and_content strm in
+  let (_, _, request, content) = Wserver.get_request_and_content strm in
   let content =
     let s =
       let rec loop len (strm__ : _ Stream.t) =

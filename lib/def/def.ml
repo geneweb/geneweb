@@ -7,6 +7,7 @@ type httpStatus =
   | Unauthorized (* 401 *)
   | Forbidden (* 403 *)
   | Not_Found (* 404 *)
+  | Method_Not_Allowed (* 405 *)
 
 type ('a, 'b) choice =
     Left of 'a
