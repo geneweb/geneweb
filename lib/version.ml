@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let txt = "7.1.0.TitiFix_fixwserver_20210429" (* from TitiFix_fixwserver commit 216a1045 Apr_28_20:04:55_2021 *)
+let txt = "7.1.0.TitiFix_fixwserver_20210430" (* from TitiFix_fixwserver commit b16a4eb0 Apr_30_09:24:45_2021 *)
 
 let available_languages =
   ["af"; "bg"; "br"; "ca"; "cs"; "da"; "de"; "en"; "es"; "eo"; "et"; "fi";

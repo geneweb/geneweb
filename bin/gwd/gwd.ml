@@ -1983,15 +1983,15 @@ let () =
   with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
     Printf.eprintf 
-      "Error: the port %d is already used by another server\n\
-       Solution: kill the other program or launch GeneWeb with another\n\
-       port number (-p option)\n%!"
+      "\nError: the port %d is already used by another server or geneweb program.\n\
+       Solution: kill the other program or launch GeneWeb with another port number\n\
+       (see -p option)\n%!"
       !selected_port;
     exit 1
 #ifdef UNIX
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
     Printf.eprintf
-      "Error: invalid access to the port %d: users port number less \
+      "\nError: invalid access to the port %d: users port number less \
        than 1024 are reserved to the system. Solution: do it as root \
        or choose another port number greater than 1024.\n%!"
       !selected_port;

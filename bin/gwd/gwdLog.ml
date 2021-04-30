@@ -41,6 +41,8 @@ let systime () =
   let sd = Float.to_int @@ 1000000.0 *. (mod_float now 1.0)  in 
   Printf.sprintf "%02d:%02d:%02d.%06d" tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec sd
 
+let syslog_block = ref false
+
 let syslog level msg =
   let severityLevel, severity = 
   match level with
@@ -57,20 +59,31 @@ let syslog level msg =
     let ident = Filename.basename @@ Sys.executable_name in
     let tag = (if String.length ident > 32 then String.sub ident 0 32 else ident) in
     let logfn =  Filename.concat !(Util.cnt_dir) "syslog.txt" in
-    let oc = open_out_gen [Open_wronly; Open_append; Open_creat] 0o777 logfn in
+    let log fname flag = try open_out_gen (flag::[Open_wronly; Open_creat]) 0o777 fname with e -> 
+      if not !syslog_block then
+        begin
+          Printf.eprintf "Error : Syslog disabled, messages redirected to stderr !\n%s\n%!"  (Printexc.to_string e);
+          syslog_block:=true
+        end; 
+      stderr;
+    in
+    let oc = log logfn Open_append in
     Printf.fprintf oc "%s\t%s[%s]\t%d\t%s\n" (systime ()) tag severity severityLevel msg;
-    let logsize = out_channel_length oc in
-    close_out_noerr oc;
-    if logsize > 16000 then
-      begin
-        let bakfn = Filename.concat !(Util.cnt_dir) "syslog-bak.txt" in
-        try 
-          Unix.rename logfn bakfn; 
-          let oc = open_out_gen [Open_wronly; Open_trunc; Open_creat] 0o777 logfn in
-          Printf.fprintf oc "%s\t%s[Info]\t6\tClear log and save previous log to syslog-bak.txt\n" (systime ()) tag;
+    if oc <> stderr then
+      let logsize = out_channel_length oc in
+      if !syslog_block then
+        begin
+          Printf.fprintf oc "%s\t%s[Notice]\t5\tSome syslog messages were lost; error writing file\n%!" (systime ()) tag;
+          Printf.eprintf "Syslog enabled; Writing successfull\n%!";
+          syslog_block:=false;
+        end;
+      close_out oc;
+      if logsize > 16000 then
+        begin
+          let bakfn = Filename.concat !(Util.cnt_dir) "syslog-bak.txt" in
+          try Unix.rename logfn bakfn with _ -> ();
+          let oc = log logfn Open_trunc in
+          Printf.fprintf oc "%s\t%s[Info]\t6\tClear log and save previous log to %s\n" (systime ()) tag bakfn;
           close_out_noerr oc
-        with _ -> 
-          Printf.eprintf "Error saving %s file to %s; not saved !\n!" logfn bakfn;
-          close_out_noerr oc
-      end
+        end
 #endif
