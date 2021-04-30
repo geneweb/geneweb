@@ -1739,7 +1739,7 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             print_isolated_relations oc base gen p
     end (Gwdb.ipers base) ;
   if !(Mutil.verbose) then ProgrBar.finish ();
-  if not Gwexport.(!opts.no_notes) then
+  if not opts.no_notes then
     let s = base_notes_read base "" in
     let (oc, first, _) = origin_file (base_notes_origin_file base) in
     if s <> "" then
