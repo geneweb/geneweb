@@ -239,13 +239,13 @@ let month_txt =
   fun i -> let i = if i < 0 || i >= Array.length txt then 0 else i in txt.(i)
 
 let string_of_ctime conf =
-  let lt = Unix.gmtime conf.ctime in
+  let lt = Unix.gmtime (if conf.ctime = 0.0 then Unix.gettimeofday () else conf.ctime) in
   Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT" (week_day_txt lt.Unix.tm_wday)
     lt.Unix.tm_mday (month_txt lt.Unix.tm_mon) (1900 + lt.Unix.tm_year)
     lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 
 let html ?(content_type = "text/html") conf =
-  let charset = if conf.charset = "" then "utf-8" else conf.charset in
+  let charset = if conf.charset = "" then "UTF-8" else conf.charset in
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.txt;
   Output.header conf "Date: %s" (string_of_ctime conf);
   Output.header conf "Connection: close";

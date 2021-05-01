@@ -1281,12 +1281,17 @@ let log tm conf from gauth request script_name contents =
   else if conf.friend && not conf.wizard then
     Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
       (if conf.user = "" then "" else " ");
-  if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent;
+  if user_agent <> "" then 
+    begin
+      Printf.fprintf oc "  Agent: %s\n" user_agent;
+      GwdLog.syslog `LOG_DEBUG (Printf.sprintf "HTTP User-agent : %s" user_agent)
+    end;
   if referer <> "" then
     begin
       Printf.fprintf oc "  Referer: ";
       print_and_cut_if_too_big oc referer;
-      Printf.fprintf oc "\n"
+      Printf.fprintf oc "\n";
+      GwdLog.syslog `LOG_INFO (Printf.sprintf "HTTP Referer : %s" referer)
     end
 
 let log_and_robot_check conf auth from request script_name contents =

@@ -207,19 +207,19 @@ let treat_connection tmout callback addr fd =
     let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
     get_request_and_content strm
   in 
+  let path, query = try
+    let i = String.index path_and_query '?' in
+    String.sub path_and_query 0 i,
+    String.sub path_and_query (i + 1) (String.length path_and_query - i - 1)
+  with Not_found -> path_and_query, ""
+  in
   match meth with
   | No_method -> (* unlikely but possible if no data sent ; do nothing/ignore *)
       ()
-  | Http_post -> 
-      callback (addr, request) path_and_query contents
+  | Http_post -> (* application/x-www-form-urlencoded *)
+      let query = if query = "" then contents else (query ^ "&" ^ contents) in
+      callback (addr, request) path query
   | Http_get ->
-      let path, query =
-        try
-          let i = String.index path_and_query '?' in
-          String.sub path_and_query 0 i,
-          String.sub path_and_query (i + 1) (String.length path_and_query - i - 1)
-        with Not_found -> path_and_query, ""
-      in
       callback (addr, request) path query;
   | _ -> 
       http Def.Method_Not_Allowed;
@@ -463,7 +463,7 @@ let wserver_basic syslog tmout max_clients g s addr_server =
   | exc -> raise exc
   in
   let mem_limit = ref (used_mem ()) in 
-  syslog `LOG_DEBUG (Printf.sprintf "%d ko of memory used   " !mem_limit);
+  syslog `LOG_DEBUG (Printf.sprintf "Starting with %d ko of memory used" !mem_limit);
   while true do
     check_stopping ();
     match Unix.select !fdl [] [] 5.0 with 
