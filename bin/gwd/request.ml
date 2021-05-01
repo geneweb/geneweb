@@ -498,7 +498,7 @@ let treat_request =
     then begin
         if p_getenv conf.base_env "counter" <> Some "no"
         then begin
-          match SrcfileDisplay.incr_welcome_counter conf with (* $$$ *)
+          match SrcfileDisplay.incr_welcome_counter conf with
           | Some (welcome_cnt, request_cnt, start_date) ->
             GwdLog.log begin fun oc ->
               let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
@@ -509,6 +509,7 @@ let treat_request =
           | None -> ()
         end ;
         let incorrect_request conf _ = incorrect_request conf in
+        let notfound_request conf file _ _ = Hutil.error_404 conf file in
         match m with
         | "" ->
           if base <> None then
@@ -519,9 +520,12 @@ let treat_request =
               | Some t when p_getenv conf.base_env "ptempl" = Some "yes" ->
                 Perso.interp_templ t conf base p
               | _ -> person_selected conf base p
-          else if conf.bname = ""
-          then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
-          else incorrect_request
+          else if conf.bname = "" then 
+              fun conf _ ->  (* default index page *)
+              Util.html conf;
+              include_template conf [] "index" (fun () -> propose_base conf)
+          else 
+              notfound_request conf conf.bname
         | "A" ->
           Perso.print_ascend |> w_person |> w_base
         | "ADD_FAM" when conf.wizard ->

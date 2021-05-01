@@ -1368,16 +1368,6 @@ let conf_and_connection =
   in
   fun from request script_name contents env ->
   let (conf, passwd_err) = make_conf from request script_name env in
-  if conf.bname <> "" then 
-    begin
-      let bname = Util.bpath (conf.bname ^ ".gwb") in
-      if not @@ Sys.file_exists bname then
-        begin 
-          GwdLog.syslog `LOG_INFO (Printf.sprintf "Geneweb base \"%s\" not found" conf.bname );
-          Hutil.error_404 conf script_name;
-          raise Exit
-        end;
-    end;
   match !redirected_addr with
     Some addr -> print_redirected conf from request addr
   | None ->
@@ -1427,7 +1417,14 @@ let conf_and_connection =
               (Printf.sprintf "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
         with
         | Exit -> ()
-        | e -> raise e
+        | e ->
+#ifdef DEBUG
+          let bt = Printexc.get_backtrace () in
+          Printf.printf "Error %s :\n%s\n%!" (Printexc.to_string e) bt;
+          (* work only if not data sent before; otherwise Failure("HTTP Status already sent") *)
+          Hutil.error_internal conf e bt;
+#endif
+          GwdLog.syslog `LOG_CRIT ((context conf contents) ^ " : " ^ (Printexc.to_string e))
 
 let chop_extension name =
   let rec loop i =
@@ -1482,7 +1479,7 @@ let image_request conf script_name env =
 let print_header_misc conf len fname =
   let ext = String.lowercase_ascii @@ Filename.extension fname in 
   let content_type =
-    (* refer to https://www.iana.org/assignments/media-types/media-types.xhtml *)
+    (* for  Internet media type refer to https://www.iana.org/assignments/media-types/media-types.xhtml *)
     match ext with
     | ".css" ->  "text/css; charset=UTF-8"
     | ".eot" -> "application/vnd.ms-fontobject"
@@ -1494,6 +1491,7 @@ let print_header_misc conf len fname =
     | ".gif" -> "image/gif"
     | ".html"
     | ".htm" -> "text/html; charset=UTF-8"
+    | ".map" -> "application/json"
     | ".otf" -> "font/otf"
     | ".png" -> "image/png"
     | ".pdf" -> "application/pdf"
@@ -1662,7 +1660,7 @@ let connection (addr, request) script_name contents' =
           let (contents, env) = build_env request contents' in
           if not (image_request printer_conf script_name env)
           then conf_and_connection from request script_name contents env
-        with Exit -> () (* Exit raised when basename with extra subdir, see make_conf *)
+        with Exit -> ()
     end
 
 let null_reopen flags fd =

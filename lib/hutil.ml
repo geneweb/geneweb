@@ -144,6 +144,22 @@ let error_404 conf fname =
   Output.print_string conf "</div>\n";
   trailer conf
 
+let error_internal conf exc backtrace =
+  let title _ =
+    Output.print_string conf ("Internal error : " ^ (Printexc.to_string exc))
+  in
+  Output.status conf Def.OK;
+  header conf title;
+  Output.printf conf "<div class=\"btn-group float-%s mt-2\">\n" conf.left;
+  let str = link_to_referer conf in
+  if str = "" then () else Output.print_string conf str;
+  Output.printf conf "<a href=\"\\\">\
+                      <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
+                      </a>\n" (Utf8.capitalize (Util.transl conf "home"));
+  Output.print_string conf "</div>\n";
+  Output.printf conf "<hr><pre>\n%s\n</pre>\n" backtrace;
+  trailer conf
+
 let error_cannot_access conf fname =
   let title _ = Output.print_string conf "Error" in
   header conf title;

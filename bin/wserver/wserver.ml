@@ -1,4 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
+
 let connection_closed = ref false
 
 let eprintf = Printf.eprintf
@@ -79,8 +80,8 @@ let store len x =
 let get_buff len = Bytes.sub_string !buff 0 len
 
 (* HTTP/1.1 method see  https://tools.ietf.org/html/rfc7231 , §4.3 *)
-type http_method =  Http_get | Http_head | Http_post | Http_put | Http_delete 
-                  | Http_connect  | Http_options | Http_trace | Unknown_method | No_method
+type http_method = Http_get | Http_head | Http_post | Http_put | Http_delete 
+                 | Http_connect | Http_options | Http_trace | Unknown_method | No_method
 
 let get_request strm =
   let rec loop len (strm__ : _ Stream.t) =
@@ -116,7 +117,7 @@ let get_request strm =
     String.sub s (i + 1) (String.length s - i - 1)
   with Not_found -> (s, "")
   in 
-  (* note : in HTTP, the / is mandatory for the path. 
+  (* note : in HTTP, the first / is mandatory for the path. 
   It is intentionally omitted in path_and_query for further processing  *)
   meth, path_and_query, http_ver, request
 
