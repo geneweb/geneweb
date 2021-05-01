@@ -1797,12 +1797,6 @@ let slashify s =
 
 let make_cnt_dir x =
   Mutil.mkdir_p x;
-  if Sys.unix then ()
-  else
-    begin
-      Wserver.sock_in := Filename.concat x "gwd.sin";
-      Wserver.sock_out := Filename.concat x "gwd.sou"
-    end;
   Util.cnt_dir := x
 
 let arg_plugin ~check =
@@ -1838,10 +1832,6 @@ let string_of_inet_aux x = Unix.string_of_inet_addr (Unix.gethostbyname x).Unix.
 #endif
 
 let main () =
-#ifdef WINDOWS
-  Wserver.sock_in := "gwd.sin";
-  Wserver.sock_out := "gwd.sou";
-#endif
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"
@@ -1891,10 +1881,6 @@ let main () =
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
-#endif
-#ifdef WINDOWS
-    ; ("-oneproc", Arg.Set Wserver.proc ," Launch a process at each request (older defaultmode with .sin/.sou files).")
-    ; ("-noproc", Arg.Set Wserver.noproc ," Do not launch a process at each request (older mode with .sin/.sou files).")
 #endif
 #ifdef API
     ; ("-api_h", Arg.String (fun x -> selected_api_host := x), "<HOST> Host for GeneWeb API (default = " ^ !selected_api_host ^ ").")

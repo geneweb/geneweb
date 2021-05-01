@@ -30,8 +30,6 @@ val f
   -> (Unix.sockaddr * string list -> string -> string -> unit)
   -> unit
 
-val close_connection : unit -> unit
-
 val printf : ('a, out_channel, unit) format -> 'a
     (* To be called to print page contents. *)
 
@@ -59,18 +57,11 @@ val get_request_and_content : char Stream.t -> http_method * string * string lis
 val wsocket : unit -> Unix.file_descr
 val woc : unit -> out_channel
 
-val sock_in : string ref
-val sock_out : string ref
-    (* Names of the files used in windows implementation to communicate
-       http requests and html answers. Default "wserver.sin" and
-       "wserver.sou". Can have relative or absolute paths. *)
 val stop_server : string ref
     (* Name of the file whose presence tells the server to stop (at least
        one request is necessary to unfreeze the server to make it check
        that this file exits. Default "STOP_SERVER". Can have relative
        or absolute path. *)
-val proc : bool ref
-val noproc : bool ref
 val cgi : bool ref
 
 (* Example:

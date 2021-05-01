@@ -3,11 +3,7 @@ let connection_closed = ref false
 
 let eprintf = Printf.eprintf
 
-let sock_in = ref "wserver.sin"
-let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
-let proc = ref false    (* older Windows mode : one process with .sin/.sou files *)
-let noproc = ref false  (* older Windows mode : no process with .sin/.sou files  *)
 let cgi = ref false
 
 let wserver_sock = ref Unix.stdout
@@ -17,29 +13,6 @@ let wserver_oc = ref stdout
 let woc () = !wserver_oc
 
 let wflush () = flush !wserver_oc
-
-let skip_possible_remaining_chars fd =
-  let b = Bytes.create 3 in
-  try
-    let rec loop () =
-      match Unix.select [fd] [] [] 5.0 with
-      | [_], [], [] ->
-        let len = Unix.read fd b 0 (Bytes.length b) in
-        if len = Bytes.length b then loop ()
-      | _ -> ()
-    in
-    loop ()
-  with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
-
-let close_connection () =
-  if not !connection_closed then begin
-    wflush () ;
-    Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND ;
-    skip_possible_remaining_chars !wserver_sock ;
-    (* Closing the channel flushes the data and closes the underlying file descriptor *)
-    close_out !wserver_oc ;
-    connection_closed := true
-  end
 
 let printnl () =
   output_string !wserver_oc "\013\010"
@@ -143,7 +116,8 @@ let get_request strm =
     String.sub s (i + 1) (String.length s - i - 1)
   with Not_found -> (s, "")
   in 
-  (* note : in HTTP, the / is mandatory for the path. it is intentionally omitted for further processing  *)
+  (* note : in HTTP, the / is mandatory for the path. 
+  It is intentionally omitted in path_and_query for further processing  *)
   meth, path_and_query, http_ver, request
 
 let timeout tmout spid _ =
@@ -189,6 +163,16 @@ let sockaddr_of_string str =
       int_of_string (String.sub str (i + 1) (String.length str - i - 1) )
     )
   with _ ->  Unix.ADDR_UNIX str
+
+let check_stopping () =
+  if Sys.file_exists !stop_server then
+    begin
+      flush stdout;
+      eprintf "\nServer stopped by presence of file %s.\n" !stop_server;
+      eprintf "Remove that file to allow servers to run again.\n";
+      flush stderr;
+      exit 0
+    end
 
 let treat_connection tmout callback addr fd =
   if Sys.unix then
@@ -236,25 +220,8 @@ let treat_connection tmout callback addr fd =
     failwith ("Unexcepted HTTP printing state, connection from " ^ (string_of_sockaddr addr) ^ " without content sent :" );
   printing_state := Nothing
 
-let buff = Bytes.create 1024
-
-let copy_what_necessary t oc =
-  let strm =
-    let len = ref 0 in
-    let i = ref 0 in
-    Stream.from
-      (fun _ ->
-         if !i >= !len then
-           begin
-             len := Unix.read t buff 0 (Bytes.length buff);
-             i := 0;
-             if !len > 0 then output oc buff 0 !len
-           end;
-         if !len = 0 then None
-         else begin incr i; Some (Bytes.get buff (!i - 1)) end)
-  in
-  let _ = get_request_and_content strm in ()
-
+(* elementary HTTP server, unix mode with fork   *)
+#ifdef UNIX
 let rec list_remove x =
   function
     [] -> failwith "list_remove"
@@ -295,146 +262,59 @@ let wait_available max_clients s =
       done
   | None -> ()
 
-let wait_and_compact s =
-  if Unix.select [s] [] [] 15.0 = ([], [], []) then
-    begin
-      eprintf "Compacting... ";
-      flush stderr;
-      Gc.compact ();
-      eprintf "Ok\n";
-      flush stderr
-    end
-
 let skip_possible_remaining_chars fd =
-  if not !connection_closed then skip_possible_remaining_chars fd
-
-let check_stopping () =
-  if Sys.file_exists !stop_server then
-    begin
-      flush stdout;
-      eprintf "\nServer stopped by presence of file %s.\n" !stop_server;
-      eprintf "Remove that file to allow servers to run again.\n";
-      flush stderr;
-      exit 0
-    end
+  if not !connection_closed then
+    let b = Bytes.create 3 in
+    try
+      let rec loop () =
+        match Unix.select [fd] [] [] 5.0 with
+        | [_], [], [] ->
+          let len = Unix.read fd b 0 (Bytes.length b) in
+          if len = Bytes.length b then loop ()
+        | _ -> ()
+      in
+      loop ()
+    with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
+  
+ let close_connection () =
+  if not !connection_closed then begin
+    wflush () ;
+    Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND ;
+    skip_possible_remaining_chars !wserver_sock ;
+    (* Closing the channel flushes the data and closes the underlying file descriptor *)
+    close_out !wserver_oc ;
+    connection_closed := true
+  end
 
 let accept_connection tmout max_clients callback s =
-  if !noproc then wait_and_compact s else wait_available max_clients s;
+  wait_available max_clients s;
   let (t, addr) = Unix.accept s in
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
-  if Sys.unix then
-    match try Some (Unix.fork ()) with _ -> None with
-    | Some 0 ->
-      begin
-        try
-          if max_clients = None && Unix.fork () <> 0 then exit 0;
-          Unix.close s;
-          wserver_sock := t;
-          wserver_oc := Unix.out_channel_of_descr t;
-          treat_connection tmout callback addr t ;
-          close_connection () ;
-          exit 0
-        with
-        | Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0
-        | e -> raise e
-      end
-    | Some id ->
-        Unix.close t;
-        if max_clients = None then let _ = Unix.waitpid [] id in ()
-        else pids := id :: !pids
-    | None -> Unix.close t; eprintf "Fork failed\n"; flush stderr
-  else
-    let oc = open_out_bin !sock_in in
-    let cleanup () = try close_out oc with _ -> () in
-    begin try copy_what_necessary t oc with
-      Unix.Unix_error (_, _, _) -> ()
-    | exc -> cleanup (); raise exc
-    end;
-    cleanup ();
-    if !noproc then
-      let fd = Unix.openfile !sock_in [Unix.O_RDONLY] 0 in
-      let oc = open_out_bin !sock_out in
-      wserver_oc := oc;
-      treat_connection tmout callback addr fd;
-      flush oc;
-      close_out oc;
-      Unix.close fd
-    else
-      begin let pid =
-        let env =
-          Array.append (Unix.environment ())
-            [| "WSERVER=" ^ string_of_sockaddr addr |]
-        in
-        let args = Sys.argv in
-        Unix.create_process_env Sys.argv.(0) args env Unix.stdin Unix.stdout Unix.stderr
-      in
-        let _ = Unix.waitpid [] pid in
-        let ic = open_in_bin !sock_in in close_in ic
-      end;
-    let cleanup () =
-      (try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ());
-      skip_possible_remaining_chars t;
-      (try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ());
-      try Unix.close t with _ -> ()
-    in
-    begin try
-      begin let ic = open_in_bin !sock_out in
-        let cleanup () = try close_in ic with _ -> () in
-        begin try
-          begin let rec loop () =
-            let len = input ic buff 0 (Bytes.length buff) in
-            if len = 0 then ()
-            else
-              begin
-                begin let rec loop_write i =
-                  let olen = Unix.write t buff i (len - i) in
-                  if i + olen < len then loop_write (i + olen)
-                in
-                  loop_write 0
-                end;
-                loop ()
-              end
-          in
-            loop ()
-          end
-        with
-          Unix.Unix_error (_, _, _) -> ()
-        | exc -> cleanup (); raise exc
-        end;
-        cleanup ()
-      end
-    with
-      Unix.Unix_error (_, _, _) -> ()
-    | exc -> cleanup (); raise exc
-    end;
-    cleanup ()
-
-(* elementary HTTP server, unix mode with fork   *)
-let wserver_unix syslog tmout max_clients g s =
-  let _ = Unix.nice 1 in
-  while true do
-    check_stopping ();
-    try accept_connection tmout max_clients g s with
-    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-      syslog `LOG_INFO (Printexc.to_string e)
-    | Sys_error msg as e when msg = "Broken pipe" ->
-      syslog `LOG_INFO (Printexc.to_string e)
-    | e -> raise e
-  done
-
-(* osbolete elementary HTTP server, basic mode for windows - with .sin/.sou files *)
-let wserver_basic_legacy syslog tmout max_clients g s =
-  while true do
-    check_stopping ();
-    try accept_connection tmout max_clients g s with
-    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-      syslog `LOG_INFO (Printexc.to_string e)
-    | Sys_error msg as e when msg = "Broken pipe" ->
-      syslog `LOG_INFO (Printexc.to_string e)
-    | e -> raise e
-  done
+  match try Some (Unix.fork ()) with _ -> None with
+  | Some 0 ->
+    begin
+      try
+        if max_clients = None && Unix.fork () <> 0 then exit 0;
+        Unix.close s;
+        wserver_sock := t;
+        wserver_oc := Unix.out_channel_of_descr t;
+        treat_connection tmout callback addr t ;
+        close_connection () ;
+        exit 0
+      with
+      | Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0
+      | e -> raise e
+    end
+  | Some id ->
+      Unix.close t;
+      if max_clients = None then let _ = Unix.waitpid [] id in ()
+      else pids := id :: !pids
+  | None -> 
+      Unix.close t; eprintf "Fork failed\n"; flush stderr
+#endif
 
 (* elementary HTTP server, basic mode for windows *)
+#ifdef WINDOWS
 type conn_kind = Server | Connected_client | Closed_client 
 type conn_info = {
     addr : Unix.sockaddr;
@@ -537,41 +417,38 @@ let wserver_basic syslog tmout max_clients g s addr_server =
       in
       loop l 0
   done
-    
+#endif
+  
 let f syslog addr_opt port tmout max_clients g =
-  match
-    if Sys.unix then None
-    else try Some (Sys.getenv "WSERVER") with Not_found -> None
-  with
-  | Some s ->
-      let addr = sockaddr_of_string s in
-      let fd = Unix.openfile !sock_in [Unix.O_RDONLY] 0 in
-      let oc = open_out_bin !sock_out in
-      wserver_oc := oc; ignore (treat_connection tmout g addr fd); exit 0
-  | None ->
-      let addr =
-        match addr_opt with
-          Some addr ->
-            begin try Unix.inet_addr_of_string addr with
-              Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0)
-            end
-        | None -> Unix.inet_addr_any
-      in
-      let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
-      let a =  (Unix.ADDR_INET (addr, port)) in 
-      Unix.bind s a;
-      Unix.listen s 4;
+  let addr =
+    match addr_opt with
+      Some addr ->
+        begin try Unix.inet_addr_of_string addr with
+          Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0)
+        end
+    | None -> Unix.inet_addr_any
+  in
+  let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
+  let a =  (Unix.ADDR_INET (addr, port)) in 
+  Unix.bind s a;
+  Unix.listen s 4;
 
-      let tm = Unix.localtime (Unix.time ()) in
-      eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n%!"
-        (1900 + tm.Unix.tm_year)
-        (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-        port ;
+  let tm = Unix.localtime (Unix.time ()) in
+  eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n%!"
+    (1900 + tm.Unix.tm_year)
+    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+    port ;
 #ifdef WINDOWS
-      if !proc || !noproc then     
-        wserver_basic_legacy syslog tmout max_clients g s
-      else
-        wserver_basic syslog tmout max_clients g s a
+  wserver_basic syslog tmout max_clients g s a
 #else
-      wserver_unix syslog tmout max_clients g s
+  let _ = Unix.nice 1 in
+  while true do
+    check_stopping ();
+    try accept_connection tmout max_clients g s with
+    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
+      syslog `LOG_INFO (Printexc.to_string e)
+    | Sys_error msg as e when msg = "Broken pipe" ->
+      syslog `LOG_INFO (Printexc.to_string e)
+    | e -> raise e
+  done
 #endif
