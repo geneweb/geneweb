@@ -711,7 +711,10 @@ let treat_request =
                   if sosa_acc
                   || Gutil.person_of_string_key base n <> None
                   || person_is_std_key conf base p n
-                  then person_selected_with_redirect conf base p
+                  then
+                  begin
+                    record_visited conf (get_iper p); Perso.print conf base p
+                  end
                   else specify conf base n pl
                 | pl -> specify conf base n pl
               in
