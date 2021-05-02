@@ -437,10 +437,18 @@ let wserver_basic syslog tmout g s addr_server =
               in 
               wserver_sock := conn.fd;
               wserver_oc := conn.oc;
-              treat_connection tmout g conn.addr fd;
-              flush conn.oc;
-              remove_from_poll conn.fd;
-              shutdown conn.fd;
+              (* If a Windows computer goes to sleep, it can put the TCP / IP connections
+               in use to sleep without sending all data.
+               The remote host will therefore cut the TCP / IP connection on timeout. 
+               When waking up the server can then try to send data to a closed connection. 
+               This can generate a many normal exception (to be ignored) like :
+               - Sys_error("An existing connection was forcibly closed by the remote host") *)
+              try
+                treat_connection tmout g conn.addr fd;
+                flush conn.oc;
+                remove_from_poll conn.fd;
+                shutdown conn.fd;
+              with -> ();
               close_out_noerr conn.oc;
               Unix.close conn.fd;
             end
