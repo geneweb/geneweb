@@ -448,7 +448,7 @@ let wserver_basic syslog tmout g s addr_server =
                 flush conn.oc;
                 remove_from_poll conn.fd;
                 shutdown conn.fd;
-              with -> ();
+              with _ -> ();
               close_out_noerr conn.oc;
               Unix.close conn.fd;
             end
