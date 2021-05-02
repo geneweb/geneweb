@@ -16,7 +16,7 @@ let woc () = !wserver_oc
 let wflush () = flush !wserver_oc
 
 let printnl () =
-  output_string !wserver_oc "\013\010"
+  if !cgi then output_byte !wserver_oc 10 else output_string !wserver_oc "\013\010"
 
 type printing_status = Nothing | Status | Contents
 
@@ -36,14 +36,17 @@ let status_string status =
   | Service_Unavailable -> "503 Service Unavailable"
   | HTTP_Version_Not_Supported -> "505 HTTP Version Not Supported"
 
-let http status =
-  if !printing_state <> Nothing then failwith "HTTP Status already sent";
-  printing_state := Status;
-  if status <> Def.OK || not !cgi then
+  let http status =
+    if !printing_state <> Nothing then failwith "HTTP Status already sent";
+    printing_state := Status;
+    (* printing header cgi mode : see https://www.ietf.org/rfc/rfc3875.txt :
+                                 "Status:" status-code SP reason-phrase NL
+       otherwise http mode      : see https://tools.ietf.org/html/rfc7231    
+                                 "HTTP/1.1" SP status-code SP reason-phrase NL
+    *)
     if !cgi
-    then (output_string !wserver_oc "Status: " ; output_string !wserver_oc (status_string status))
-    else (output_string !wserver_oc "HTTP/1.1 " ; output_string !wserver_oc (status_string status)) ;
-    printnl ()
+    then Printf.fprintf !wserver_oc "Status: %s\010" (status_string status)
+    else Printf.fprintf !wserver_oc "HTTP/1.1 %s\013\010" (status_string status)
 
 let header s =
   if !printing_state <> Status then
