@@ -75,7 +75,7 @@ let syslog level msg =
       let logsize = out_channel_length oc in
       if !syslog_block then
         begin
-          Printf.fprintf oc "%s\t%s[Notice]\t5\tSome syslog messages were lost; error writing file\n%!" (systime ()) tag;
+          Printf.fprintf oc "%s\t%s[Notice]\t5\tSome syslog messages were lost (error writing file)\n%!" (systime ()) tag;
           Printf.eprintf "Syslog enabled; Writing successfull\n%!";
           syslog_block:=false;
         end;

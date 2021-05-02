@@ -19,7 +19,6 @@ val gen_trailer : bool -> config -> unit
 
 val incorrect_request : config -> unit
 val error_404 : config -> string -> unit
-val error_internal : config -> exn -> string -> unit
 
 val interp :
   config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit

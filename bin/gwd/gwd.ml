@@ -9,18 +9,8 @@ open Gwd_lib
 
 module StrSet = Mutil.StrSet
 
-let httpStatusString status = 
-  match status with
-  | Def.OK -> "200 OK"
-  | Def.Moved_Temporarily -> "302 Moved Temporarily"
-  | Def.Bad_Request -> "400 Bad Request"
-  | Def.Unauthorized -> "401 Unauthorized"
-  | Def.Forbidden -> "403 Forbidden"
-  | Def.Not_Found -> "404 Not Found"
-  | Def.Method_Not_Allowed -> "405 Method Not Allowed"
-  
 let out_httpStatus status = 
-  GwdLog.syslog `LOG_INFO ("HTTP/1.1 response : " ^ (httpStatusString status) );
+  GwdLog.syslog `LOG_INFO ("HTTP response : " ^ (Wserver.status_string status) );
   Wserver.http status
 
 let out_httpHeader s = 
@@ -1418,13 +1408,8 @@ let conf_and_connection =
         with
         | Exit -> ()
         | e ->
-#ifdef DEBUG
-          let bt = Printexc.get_backtrace () in
-          Printf.printf "Error %s :\n%s\n%!" (Printexc.to_string e) bt;
-          (* work only if not data sent before; otherwise Failure("HTTP Status already sent") *)
-          Hutil.error_internal conf e bt;
-#endif
-          GwdLog.syslog `LOG_CRIT ((context conf contents) ^ " : " ^ (Printexc.to_string e))
+          GwdLog.syslog `LOG_CRIT ((context conf contents) ^ " : " ^ (Printexc.to_string e));
+          raise e
 
 let chop_extension name =
   let rec loop i =
@@ -1669,48 +1654,39 @@ let null_reopen flags fd =
     Unix.dup2 fd2 fd; Unix.close fd2
 
 let geneweb_server () =
-  let auto_call =
-    try let _ = Sys.getenv "WSERVER" in true with Not_found -> false
+  let hostn =
+    match !selected_addr with
+      Some addr -> addr
+    | None -> try Unix.gethostname () with _ -> "computer"
   in
-  if not auto_call then
-    begin let hostn =
-      match !selected_addr with
-        Some addr -> addr
-      | None -> try Unix.gethostname () with _ -> "computer"
-    in
-      Printf.eprintf "GeneWeb %s - " Version.txt;
-      GwdLog.syslog `LOG_NOTICE
-        ( Printf.sprintf 
-          "Starting Geneweb server %s binded with %s:%d"
-          Version.txt
-          hostn
-          !selected_port
-        );
-      if not !daemon then
+    GwdLog.syslog `LOG_NOTICE
+      ( Printf.sprintf "Starting Geneweb server %s binded with %s:%d"
+                  Version.txt hostn !selected_port );
+    Printf.eprintf "GeneWeb %s - " Version.txt;
+    if not !daemon then
+      begin
+        Printf.eprintf "Possible addresses:\n\
+                  http://localhost:%d/base\n\
+                  http://127.0.0.1:%d/base\n\
+                  http://%s:%d/base\n"
+          !selected_port !selected_port hostn !selected_port;
+        Printf.eprintf "where \"base\" is the name of the database\n\
+                  Type %s to stop the service\n"
+          "control C"
+      end;
+    flush stderr;
+    if !daemon then
+      if Unix.fork () = 0 then
         begin
-          Printf.eprintf "Possible addresses:\n\
-                   http://localhost:%d/base\n\
-                   http://127.0.0.1:%d/base\n\
-                   http://%s:%d/base\n"
-            !selected_port !selected_port hostn !selected_port;
-          Printf.eprintf "where \"base\" is the name of the database\n\
-                   Type %s to stop the service\n"
-            "control C"
-        end;
-      flush stderr;
-      if !daemon then
-        if Unix.fork () = 0 then
-          begin
-            Unix.close Unix.stdin;
-            null_reopen [Unix.O_WRONLY] Unix.stdout;
-            null_reopen [Unix.O_WRONLY] Unix.stderr
-          end
-        else exit 0;
-      try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o777 with
-        Unix.Unix_error (_, _, _) -> ()
-    end;
-  Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
-    (if Sys.unix then !max_clients else None) connection
+          Unix.close Unix.stdin;
+          null_reopen [Unix.O_WRONLY] Unix.stdout;
+          null_reopen [Unix.O_WRONLY] Unix.stderr
+        end
+      else exit 0;
+    try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o777 with
+      Unix.Unix_error (_, _, _) -> ();
+
+  Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout !max_clients connection
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=UTF-8";
@@ -1839,7 +1815,7 @@ let main () =
     [
       ("-hd", Arg.String Util.add_lang_path, "<DIR> Directory where the directory lang is installed.")
     ; ("-bd", Arg.String Util.set_base_dir, "<DIR> Directory where the databases are installed.")
-    ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
+    ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
     ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")

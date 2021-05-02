@@ -50,8 +50,9 @@ val http_redirect_temporarily : string -> unit
     (* [Output.status conf_redirect url] sends the http header where [url]
        represents the Location where the request needs to be redirected. *)
 
-type http_method
+val status_string : Def.httpStatus -> string
 
+type http_method
 val get_request_and_content : char Stream.t -> http_method * string * string list * string
 
 val wsocket : unit -> Unix.file_descr

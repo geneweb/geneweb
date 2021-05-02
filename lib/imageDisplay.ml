@@ -21,9 +21,8 @@ let content conf ct len fname =
   Output.header conf "Content-length: %d" len;
   Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
-  (* TODO: Utiliser un cache public pour les images non personelles. *)
-  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
-  Output.flush conf
+  (* TODO: Utiliser un cache public pour les images non personnelles. *)
+  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365)
 
 (* ************************************************************************** *)
 (*  [Fonc] print_image_type : string -> string -> bool                        *)
@@ -51,7 +50,9 @@ let print_image_type conf fname ctype =
           Output.print_string conf (Bytes.sub_string buf 0 olen);
           loop (len - olen)
       in
-      loop len; close_in ic; true
+      loop len; close_in ic;
+      Output.flush conf;
+      true
   | None -> false
 
 (* ************************************************************************** *)

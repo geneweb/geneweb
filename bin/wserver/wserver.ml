@@ -22,22 +22,27 @@ type printing_status = Nothing | Status | Contents
 
 let printing_state = ref Nothing
 
+let status_string status = 
+  match status with
+  | Def.OK -> "200 OK"
+  | Def.Moved_Permanently -> "301 Moved Permanently"
+  | Def.Found -> "302 Found"
+  | Def.Bad_Request -> "400 Bad Request"
+  | Def.Unauthorized -> "401 Unauthorized"
+  | Def.Forbidden -> "403 Forbidden"
+  | Def.Not_Found -> "404 Not Found"
+  | Def.Method_Not_Allowed -> "405 Method Not Allowed"
+  | Internal_Server_Error -> "500 Internal Server Error"
+  | Service_Unavailable -> "503 Service Unavailable"
+  | HTTP_Version_Not_Supported -> "505 HTTP Version Not Supported"
+
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
   printing_state := Status;
   if status <> Def.OK || not !cgi then
-    let answer = match status with
-      | Def.OK -> "200 OK"
-      | Def.Moved_Temporarily -> "302 Moved Temporarily"
-      | Def.Bad_Request -> "400 Bad Request"
-      | Def.Unauthorized -> "401 Unauthorized"
-      | Def.Forbidden -> "403 Forbidden"
-      | Def.Not_Found -> "404 Not Found"
-      | Def.Method_Not_Allowed -> "405 Method Not Allowed"
-    in
     if !cgi
-    then (output_string !wserver_oc "Status: " ; output_string !wserver_oc answer)
-    else (output_string !wserver_oc "HTTP/1.1 " ; output_string !wserver_oc answer) ;
+    then (output_string !wserver_oc "Status: " ; output_string !wserver_oc (status_string status))
+    else (output_string !wserver_oc "HTTP/1.1 " ; output_string !wserver_oc (status_string status)) ;
     printnl ()
 
 let header s =
@@ -66,9 +71,9 @@ let print_string s =
   output_string !wserver_oc s
 
 let http_redirect_temporarily url =
-  http Def.Moved_Temporarily ;
-  output_string !wserver_oc "Location: " ;
-  output_string !wserver_oc url ;
+  http Def.Found;
+  output_string !wserver_oc "Location: ";
+  output_string !wserver_oc url;
   printnl ()
 
 let buff = ref (Bytes.create 80)
@@ -198,14 +203,41 @@ let treat_connection tmout callback addr fd =
     String.sub path_and_query (i + 1) (String.length path_and_query - i - 1)
   with Not_found -> path_and_query, ""
   in
+  let query = 
+    if meth = Http_post then
+      if query = "" then contents else (query ^ "&" ^ contents) 
+    else query
+  in
   match meth with
-  | No_method -> (* unlikely but possible if no data sent ; do nothing/ignore *)
+  | No_method ->  (* unlikely but possible if no data sent ; do nothing/ignore *)
       ()
-  | Http_post -> (* application/x-www-form-urlencoded *)
-      let query = if query = "" then contents else (query ^ "&" ^ contents) in
-      callback (addr, request) path query
+  | Http_post     (* application/x-www-form-urlencoded *)
   | Http_get ->
-      callback (addr, request) path query;
+    begin
+      try callback (addr, request) path query with e -> 
+        begin
+          if !printing_state = Nothing then http Def.Internal_Server_Error;
+          if !printing_state = Status then 
+            begin
+              header "Content-type: text/html; charset=UTF-8";
+              printnl ()
+            end;
+          printf "<html>\n<title>Geneweb server error</title>\n<body>\
+                  <h1>Unexpected Geneweb error, request not complete :</h1>\
+                  <pre>- Raised with request %s?%s from %s\n\
+                  - Mode : %s\n\
+                  - Exception : %s\n\
+                  - Backtrace :<hr>\n%s\n</pre><hr>\
+                  <a href=\\>Geneweb Home page</a\
+                  </body>\n</html>\n"
+                  path query (string_of_sockaddr addr)
+                  (if !cgi then "Cgi" else "Server")
+                  (Printexc.to_string e) 
+                  (Printexc.get_backtrace ())
+                  ;
+          wflush ()
+        end
+    end
   | _ -> 
       http Def.Method_Not_Allowed;
       header "Content-type: text/html; charset=UTF-8";
@@ -324,7 +356,7 @@ type conn_info = {
     start_time : float;
     mutable kind : conn_kind }
 
-let wserver_basic syslog tmout max_clients g s addr_server =
+let wserver_basic syslog tmout g s addr_server =
   let server = {
     addr = addr_server;
     start_time = Unix.time ();
@@ -387,7 +419,6 @@ let wserver_basic syslog tmout max_clients g s addr_server =
           if fd=s then
             begin (* accept new incoming connection *)
               let (client_fd, client_addr) = Unix.accept fd in 
-              syslog `LOG_DEBUG (Printf.sprintf "%d - Data accepted from %s" i (string_of_sockaddr client_addr) );
               Unix.setsockopt client_fd Unix.SO_KEEPALIVE true;
               cl :=  { 
                 addr = client_addr;
@@ -440,7 +471,7 @@ let f syslog addr_opt port tmout max_clients g =
     (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
     port ;
 #ifdef WINDOWS
-  wserver_basic syslog tmout max_clients g s a
+  wserver_basic syslog tmout g s a
 #else
   let _ = Unix.nice 1 in
   while true do

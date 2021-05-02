@@ -1799,6 +1799,7 @@ let setup (addr, req) comm env_str =
   else if conf.comm = "" then print_file conf "welcome.htm"
   else setup_comm conf comm
 
+(* let g  (addr, request) script_name contents' *)
 let wrap_setup a b c =
 #ifdef WINDOWS
   (* another process have been launched, therefore we lost variables;
@@ -1899,19 +1900,19 @@ let intro () =
   let (gwd_lang, setup_lang) =
     if !daemon then
 #ifdef UNIX
-        let setup_lang =
-          if String.length !lang_param < 2 then default_setup_lang
-          else !lang_param
-        in
-        Printf.printf "To start, open location http://localhost:%d/\n" !port;
-        flush stdout;
-        if Unix.fork () = 0 then
-          begin
-            Unix.close Unix.stdin;
-            null_reopen [Unix.O_WRONLY] Unix.stdout
-          end
-        else exit 0;
-        default_gwd_lang, setup_lang
+      let setup_lang =
+        if String.length !lang_param < 2 then default_setup_lang
+        else !lang_param
+      in
+      Printf.printf "To start, open location http://localhost:%d/\n" !port;
+      flush stdout;
+      if Unix.fork () = 0 then
+        begin
+          Unix.close Unix.stdin;
+          null_reopen [Unix.O_WRONLY] Unix.stdout
+        end
+      else exit 0;
+      default_gwd_lang, setup_lang
 #else
       default_gwd_lang, default_setup_lang
 #endif
@@ -1939,9 +1940,5 @@ let intro () =
   flush stdout
 
 let () =
-#ifdef UNIX
-  intro () ;
-#else
-  if Sys.getenv_opt "WSERVER" = None then intro () ;
-#endif
+  intro ();
   Wserver.f (fun _ -> prerr_endline) None !port 0 None wrap_setup
