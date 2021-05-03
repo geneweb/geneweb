@@ -159,7 +159,6 @@ let timeout tmout spid _ =
       begin
         http Def.OK;
         header "Content-type: text/html; charset=UTF-8";
-        printnl ();
         printf "<head><title>Time out</title></head>\n";
         printf "<body><h1>Time out</h1>\n";
         printf "Computation time > %d second(s)\n" tmout;
@@ -203,6 +202,29 @@ let check_stopping () =
       exit 0
     end
 
+let print_internal_error e addr path query =
+  if !printing_state = Nothing then 
+    http (if !cgi then Def.OK else Def.Internal_Server_Error);
+  if !printing_state = Status then 
+    begin
+      header "Content-type: text/html; charset=UTF-8";
+    end;
+  printf "<html>\n<title>Geneweb server error</title>\n<body>\
+          <h1>Unexpected Geneweb error, request not complete :</h1>\
+          <pre>- Raised with request %s?%s from %s\n\
+          - Mode : %s\n\
+          - Exception : %s\n\
+          - Backtrace :<hr>\n%s\n</pre><hr>\
+          <a href=\\>Geneweb Home page</a\
+          </body>\n</html>\n"
+          path query 
+          (if addr = "" then "not significant" else addr)
+          (if !cgi then "CGI" else "Server")
+          (Printexc.to_string e) 
+          (Printexc.get_backtrace ())
+          ;
+  wflush ()
+
 let treat_connection tmout callback addr fd =
   if Sys.unix then
     if tmout > 0 then
@@ -236,37 +258,15 @@ let treat_connection tmout callback addr fd =
       ()
   | Http_post     (* application/x-www-form-urlencoded *)
   | Http_get ->
-    begin
-      try callback (addr, request) path query with e -> 
-        begin
-          if !printing_state = Nothing then 
-            http (if !cgi then Def.OK else Def.Internal_Server_Error);
-          if !printing_state = Status then 
-            begin
-              header "Content-type: text/html; charset=UTF-8";
-              printnl ()
-            end;
-          printf "<html>\n<title>Geneweb server error</title>\n<body>\
-                  <h1>Unexpected Geneweb error, request not complete :</h1>\
-                  <pre>- Raised with request %s?%s from %s\n\
-                  - Mode : %s\n\
-                  - Exception : %s\n\
-                  - Backtrace :<hr>\n%s\n</pre><hr>\
-                  <a href=\\>Geneweb Home page</a\
-                  </body>\n</html>\n"
-                  path query (string_of_sockaddr addr)
-                  (if !cgi then "Cgi" else "Server")
-                  (Printexc.to_string e) 
-                  (Printexc.get_backtrace ())
-                  ;
-          wflush ()
-        end
-    end
+      begin 
+        try callback (addr, request) path query 
+        with e -> 
+          print_internal_error e (string_of_sockaddr addr) path query
+      end
   | _ -> 
       http Def.Method_Not_Allowed;
       header "Content-type: text/html; charset=UTF-8";
       header "Connection: close";
-      printnl ();
       printf "<html>\n\
               <title>Not allowed HTTP method</title>\n\
               <body>Not allowed HTTP method</body>\n\

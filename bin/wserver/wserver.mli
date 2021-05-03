@@ -52,6 +52,8 @@ val http_redirect_temporarily : string -> unit
 
 val status_string : Def.httpStatus -> string
 
+val print_internal_error : exn -> string -> string -> string -> unit
+
 type http_method
 val get_request_and_content : char Stream.t -> http_method * string * string list * string
 

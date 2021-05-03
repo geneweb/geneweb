@@ -1810,14 +1810,13 @@ let main () =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"
   in
-  let force_cgi = ref false in
   let speclist =
     [
       ("-hd", Arg.String Util.add_lang_path, "<DIR> Directory where the directory lang is installed.")
     ; ("-bd", Arg.String Util.set_base_dir, "<DIR> Directory where the databases are installed.")
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
-    ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
+    ; ("-cgi", Arg.Set Wserver.cgi, " Force CGI mode.")
     ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
     ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any IP V4 address of this computer).")
@@ -1910,11 +1909,10 @@ let main () =
   Wserver.stop_server :=
     List.fold_left Filename.concat !(Util.cnt_dir) ["cnt"; "STOP_SERVER"];
   let (query, cgi) =
-    try Sys.getenv "QUERY_STRING", true with Not_found -> "", !force_cgi
+    try Sys.getenv "QUERY_STRING", true with Not_found -> "", !Wserver.cgi
   in
   if cgi then
     begin
-      Wserver.cgi := true;
       let is_post =
         try Sys.getenv "REQUEST_METHOD" = "POST" with Not_found -> false
       in
@@ -1992,4 +1990,9 @@ let () =
       try ignore @@ read_line () with _ -> ()
     end;
 #endif
+    if !Wserver.cgi then
+       Wserver.print_internal_error e 
+          (try Sys.getenv "REMOTE_ADDR" with Not_found -> "")
+          (try Sys.getenv "SCRIPT_NAME" with Not_found -> "")
+          (try Sys.getenv "QUERY_STRING" with Not_found -> "");
     exit 1
