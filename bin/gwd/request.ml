@@ -754,7 +754,7 @@ let treat_request =
         | "REQUEST" when conf.wizard ->
           fun _ _ ->
             Output.status conf Def.OK;
-            Output.header conf "Content-type: text";
+            Output.header conf "Content-Type: text";
             List.iter (fun s -> Output.print_string conf @@ s ^ "\n") conf.Config.request ;
         | "RL" ->
           w_base @@ RelationLink.print

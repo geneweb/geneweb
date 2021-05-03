@@ -16,7 +16,8 @@ let woc () = !wserver_oc
 let wflush () = flush !wserver_oc
 
 let printnl () =
-  if !cgi then output_byte !wserver_oc 10 else output_string !wserver_oc "\013\010"
+  if not !cgi then output_byte !wserver_oc 13;
+  output_byte !wserver_oc 10
 
 type printing_status = Nothing | Status | Contents
 
@@ -38,22 +39,44 @@ let status_string status =
 
   let http status =
     if !printing_state <> Nothing then failwith "HTTP Status already sent";
+    (* ignore translation \n to \r\n under Windows *)
+    set_binary_mode_out !wserver_oc true; 
     printing_state := Status;
-    (* printing header cgi mode : see https://www.ietf.org/rfc/rfc3875.txt :
+    (* printing header cgi mode : see https://www.ietf.org/rfc/rfc3875.txt (CGI/1.1) :
                                  "Status:" status-code SP reason-phrase NL
-       otherwise http mode      : see https://tools.ietf.org/html/rfc7231    
+       otherwise http mode      : see https://tools.ietf.org/html/rfc7231 (HTTP/1.1 )
                                  "HTTP/1.1" SP status-code SP reason-phrase NL
     *)
-    if !cgi
-    then Printf.fprintf !wserver_oc "Status: %s\010" (status_string status)
-    else Printf.fprintf !wserver_oc "HTTP/1.1 %s\013\010" (status_string status)
+    if !cgi then Printf.fprintf !wserver_oc "Status:%s" (status_string status)
+    else Printf.fprintf !wserver_oc "HTTP/1.1 %s" (status_string status);
+    printnl ()
 
 let header s =
   if !printing_state <> Status then
     if !printing_state = Nothing then http Def.OK
     else failwith "Cannot write HTTP headers: page contents already started";
-  output_string !wserver_oc s ;
-  printnl ()
+    if !cgi then
+      (* In CGI mode, it MUST NOT return any header fields that relate to client-side communication issues 
+      and could affect the server's ability to send the response to the client.*)
+      let f, v = try let i = String.rindex s ':' in
+        (String.sub s 0 i),
+        (String.sub s (i + 2) (String.length s - i - 2))
+      with Not_found -> (s, "")
+      in
+      match String.lowercase_ascii f with
+      | "cache-control"
+      | "content-encoding"
+      | "content-length"
+      | "content-type" 
+      | "content-disposition"
+      | "location" ->  
+          (*no space need in CGI mode *)
+          output_string !wserver_oc (f ^ ":" ^ v);
+          printnl ()
+      | _ ->
+          () (* ignore other HTTP field*)
+    else
+      (output_string !wserver_oc s; printnl ())
 
 let printf fmt =
   if !printing_state <> Contents then
@@ -75,9 +98,7 @@ let print_string s =
 
 let http_redirect_temporarily url =
   http Def.Found;
-  output_string !wserver_oc "Location: ";
-  output_string !wserver_oc url;
-  printnl ()
+  header ("Location: " ^ url)
 
 let buff = ref (Bytes.create 80)
 let store len x =
@@ -116,6 +137,8 @@ let get_request strm =
         | "OPTIONS" -> Http_options
         | "TRACE" -> Http_trace
         | _ -> Unknown_method)
+        (* note : in HTTP, the first / is mandatory for the path. 
+        It is intentionally omitted in path_and_query for further processing  *)
       , (String.sub http_request (i + 2) (String.length http_request - i - 2) )
       , (String.uppercase_ascii @@ String.sub http_request 0 i)
     with Not_found -> No_method, "",""
@@ -125,8 +148,6 @@ let get_request strm =
     String.sub s (i + 1) (String.length s - i - 1)
   with Not_found -> (s, "")
   in 
-  (* note : in HTTP, the first / is mandatory for the path. 
-  It is intentionally omitted in path_and_query for further processing  *)
   meth, path_and_query, http_ver, request
 
 let timeout tmout spid _ =
@@ -137,8 +158,7 @@ let timeout tmout spid _ =
     if Unix.fork () = 0 then
       begin
         http Def.OK;
-        output_string !wserver_oc "Content-type: text/html; charset=UTF-8";
-        printnl ();
+        header "Content-type: text/html; charset=UTF-8";
         printnl ();
         printf "<head><title>Time out</title></head>\n";
         printf "<body><h1>Time out</h1>\n";
@@ -219,7 +239,8 @@ let treat_connection tmout callback addr fd =
     begin
       try callback (addr, request) path query with e -> 
         begin
-          if !printing_state = Nothing then http Def.Internal_Server_Error;
+          if !printing_state = Nothing then 
+            http (if !cgi then Def.OK else Def.Internal_Server_Error);
           if !printing_state = Status then 
             begin
               header "Content-type: text/html; charset=UTF-8";
@@ -246,10 +267,10 @@ let treat_connection tmout callback addr fd =
       header "Content-type: text/html; charset=UTF-8";
       header "Connection: close";
       printnl ();
-      print_string "<html>\n\
-                    <title>Not allowed HTTP method</title>\n\
-                    <body>Not allowed HTTP method</body>\n\
-                    </html>\n";
+      printf "<html>\n\
+              <title>Not allowed HTTP method</title>\n\
+              <body>Not allowed HTTP method</body>\n\
+              </html>\n";
       wflush ();
   ;
   if !printing_state = Status then 
@@ -374,15 +395,31 @@ let wserver_basic syslog tmout g s addr_server =
     let st = Gc.stat () in 
     (st.live_blocks * Sys.word_size) / 8 / 1024
   in 
+  let systime () =
+    let now = Unix.gettimeofday () in
+    let tm = Unix.localtime (now) in
+    let sd = Float.to_int @@ 1000000.0 *. (mod_float now 1.0)  in 
+    Printf.sprintf "%02d:%02d:%02d.%06d" tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec sd
+  in
   let shutdown fd = try Unix.shutdown fd Unix.SHUTDOWN_ALL with
   | Unix.Unix_error(Unix.ECONNRESET, "shutdown", "") -> ()
+  | exc -> raise exc
+  in
+  let select () = try Unix.select !fdl [] [] 5.0 with 
+  | Unix.Unix_error(Unix.ECONNRESET, "select", "") -> ([], [], []) 
+(* debug ------------- to be remove after tracking *)
+  | Unix.Unix_error( _ , "select", "") as e -> 
+      eprintf "%s - wserver_basic.select exception %s (waitng 5 sec)\n%!" (systime()) (Printexc.to_string e);
+      Unix.sleep 1; 
+      ([], [], []) 
+(* debug ----------------------------------------- *)
   | exc -> raise exc
   in
   let mem_limit = ref (used_mem ()) in 
   syslog `LOG_DEBUG (Printf.sprintf "Starting with %d ko of memory used" !mem_limit);
   while true do
     check_stopping ();
-    match Unix.select !fdl [] [] 5.0 with 
+    match select() with 
     | ([], _, _) ->
       let n = List.length !fdl in
       if n > 0 then
@@ -411,7 +448,9 @@ let wserver_basic syslog tmout g s addr_server =
                   end;
                 Printf.eprintf "- %d..%d ko used   \r%!" !mem !mem_limit
           ) !cl;
-          cl:=List.filter (fun t -> t.kind <> Closed_client ) !cl
+          cl:=List.filter (fun t -> t.kind <> Closed_client ) !cl;
+          let n = List.length !cl in
+          if n > 10 then failwith ("Too many connection remain : " ^ (string_of_int n))
         end
     | ( l, _, _) -> 
       let rec loop l i = 

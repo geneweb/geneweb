@@ -17,12 +17,12 @@ open Config
 (* ************************************************************************** *)
 let content conf ct len fname =
   Output.status conf Def.OK;
-  Output.header conf "Content-type: %s" ct;
-  Output.header conf "Content-length: %d" len;
-  Output.header conf "Content-disposition: inline; filename=%s"
+  Output.header conf "Content-Type: %s" ct;
+  Output.header conf "Content-Length: %d" len;
+  Output.header conf "Content-Disposition: inline; filename=%s"
     (Filename.basename fname);
   (* TODO: Utiliser un cache public pour les images non personnelles. *)
-  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365)
+  Output.header conf "Cache-Control: private, max-age=%d" (60 * 60 * 24 * 365)
 
 (* ************************************************************************** *)
 (*  [Fonc] print_image_type : string -> string -> bool                        *)

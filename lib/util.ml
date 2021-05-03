@@ -249,13 +249,13 @@ let html ?(content_type = "text/html") conf =
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.txt;
   Output.header conf "Date: %s" (string_of_ctime conf);
   Output.header conf "Connection: close";
-  Output.header conf "Content-type: %s; charset=%s" content_type charset
+  Output.header conf "Content-Type: %s; charset=%s" content_type charset
 
 let unauthorized conf auth_type =
   Output.status conf Def.Unauthorized;
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
-  Output.header conf "Content-type: text/html; charset=%s" conf.charset;
+  Output.header conf "Content-Type: text/html; charset=%s" conf.charset;
   Output.print_string conf "<head><title>Access failed</title></head>\n";
   Output.print_string conf "<body><h1>Access failed</h1>\n";
   Output.printf conf "<ul><li>%s</ul>\n" auth_type;

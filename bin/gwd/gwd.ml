@@ -124,12 +124,12 @@ let copy_file conf fname =
 
 let http conf status =
   Output.status conf status;
-  Output.header conf "Content-type: text/html; charset=UTF-8"
+  Output.header conf "Content-Type: text/html; charset=UTF-8"
 
 let robots_txt conf =
   GwdLog.syslog `LOG_NOTICE "Robot request";
   Output.status conf Def.OK;
-  Output.header conf "Content-type: text/plain";
+  Output.header conf "Content-Type: text/plain";
   if copy_file conf "robots" then ()
   else
     begin Output.print_string conf "User-Agent: *\n"; Output.print_string conf "Disallow: /\n" end
@@ -137,14 +137,14 @@ let robots_txt conf =
 let refuse_log conf from =
   GwdLog.syslog `LOG_NOTICE @@ "Excluded: " ^ from ;
   http conf Def.Forbidden;
-  Output.header conf "Content-type: text/html";
+  Output.header conf "Content-Type: text/html";
   Output.print_string conf "Your access has been disconnected by administrator.\n";
   let _ = (copy_file conf "refuse" : bool) in ()
 
 let only_log conf from =
   GwdLog.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
   http conf Def.OK;
-  Output.header conf "Content-type: text/html; charset=UTF-8";
+  Output.header conf "Content-Type: text/html; charset=UTF-8";
   Output.print_string conf "<head><title>Invalid access</title></head>\n";
   Output.print_string conf "<body><h1>Invalid access</h1></body>\n"
 
@@ -1487,10 +1487,10 @@ let print_header_misc conf len fname =
     | _ -> "application/octet-stream"
   in
   Output.status conf Def.OK;
-  Output.header conf "Content-type: %s" content_type;
-  Output.header conf "Content-length: %d" len;
-  Output.header conf "Content-disposition: inline; filename=%s" (Filename.basename fname);
-  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365)
+  Output.header conf "Content-Type: %s" content_type;
+  Output.header conf "Content-Length: %d" len;
+  Output.header conf "Content-Disposition: inline; filename=%s" (Filename.basename fname);
+  Output.header conf "Cache-Control: private, max-age=%d" (60 * 60 * 24 * 365)
 
 let print_misc_file conf fname =
   let ic = Secure.open_in_bin fname in
@@ -1613,7 +1613,7 @@ let extract_multipart boundary str =
   str, env
 
 let build_env request contents =
-  let content_type = Mutil.extract_param "content-type: " '\n' request in
+  let content_type = Mutil.extract_param "Content-Type: " '\n' request in
   if is_multipart_form content_type then
     let boundary = extract_boundary content_type in
     let (str, env) = extract_multipart boundary contents in str, env
@@ -1714,11 +1714,11 @@ let geneweb_cgi addr script_name contents =
     with Not_found -> request
   in
   let request = [] in
-  let request = add "cookie" "HTTP_COOKIE" request in
-  let request = add "content-type" "CONTENT_TYPE" request in
-  let request = add "accept-language" "HTTP_ACCEPT_LANGUAGE" request in
-  let request = add "referer" "HTTP_REFERER" request in
-  let request = add "user-agent" "HTTP_USER_AGENT" request in
+  let request = add "Cookie" "HTTP_COOKIE" request in
+  let request = add "Content-Type" "CONTENT_TYPE" request in
+  let request = add "Accept-Language" "HTTP_ACCEPT_LANGUAGE" request in
+  let request = add "Referer" "HTTP_REFERER" request in
+  let request = add "User-Agent" "HTTP_USER_AGENT" request in
   connection (Unix.ADDR_UNIX addr, request) script_name contents
 
 let read_input len =
@@ -1968,11 +1968,14 @@ let () =
   | e -> 
     GwdLog.syslog `LOG_EMERG (Printexc.to_string e);
 #ifdef DEBUG
+    let tm = Unix.localtime (Unix.time ()) in
     begin match !GwdLog.oc with
     | Some oc -> 
       if oc <> stdout && oc <> stderr then 
         begin 
-          Printf.fprintf oc  "----- Unexpected exception : %s\n%!" (Printexc.to_string e);         
+          Printf.fprintf oc 
+            "----- %02d:%02d:%02d - Unexpected error (fatal) : %s\n%!" 
+            tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (Printexc.to_string e);
           Printexc.print_backtrace oc;
           flush oc
         end
@@ -1981,10 +1984,12 @@ let () =
     if not !daemon && not !Wserver.cgi then
     begin
       flush stderr; flush stdout;
-      Printf.eprintf "----- Unexpected exception : %s\n%!" (Printexc.to_string e); 
+      Printf.eprintf
+        "----- %02d:%02d:%02d - Unexpected error (fatal) : %s\n%!" 
+        tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (Printexc.to_string e);
       Printexc.print_backtrace stderr;
-      Printf.eprintf "-----\nGeneweb server terminated, press <Enter> to exit\n%!";
-      let _ = read_line () in ()
+      Printf.eprintf "----- Geneweb server terminated, press <Enter> to exit\n%!";
+      try ignore @@ read_line () with _ -> ()
     end;
 #endif
     exit 1

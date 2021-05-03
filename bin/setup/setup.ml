@@ -56,7 +56,7 @@ let charset conf =
 
 let header_no_page_title conf title =
   Output.status printer_conf Def.OK;
-  Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+  Output.header printer_conf "Content-Type: text/html; charset=%s" (charset conf);
   Output.print_string printer_conf
     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
      \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
@@ -798,7 +798,7 @@ let print_file conf bname =
   match ic_opt with
   | Some ic ->
     Output.status printer_conf Def.OK;
-    Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+    Output.header printer_conf "Content-Type: text/html; charset=%s" (charset conf);
     copy_from_stream conf (Output.print_string printer_conf) (Stream.of_channel ic);
     close_in ic;
     trailer conf
@@ -1582,8 +1582,8 @@ let print_typed_file conf typ fname =
   match ic_opt with
     Some ic ->
       Output.status printer_conf Def.OK;
-      Output.header printer_conf "Content-type: %s" typ;
-      Output.header printer_conf "Content-length: %d" (in_channel_length ic);
+      Output.header printer_conf "Content-Type: %s" typ;
+      Output.header printer_conf "Content-Length: %d" (in_channel_length ic);
       begin try
         while true do let c = input_char ic in Output.printf printer_conf "%c" c done
       with End_of_file -> ()
