@@ -65,10 +65,8 @@ let header s =
       | "connection"
       | "date"
       | "server" ->  
-        Printf.eprintf "exclude '%s':'%s'\n%!" f v;
         () (* ignore HTTP field, not need in CGI mode*)
       | _ ->
-        Printf.eprintf "CGI out '%s':'%s'\n%!" f v;
         output_string !wserver_oc (f ^ ":" ^ v);
         printnl ()
     else
