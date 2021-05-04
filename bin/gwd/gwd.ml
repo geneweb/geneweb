@@ -1409,6 +1409,9 @@ let conf_and_connection =
         | Exit -> ()
         | e ->
           GwdLog.syslog `LOG_CRIT ((context conf contents) ^ " : " ^ (Printexc.to_string e));
+          GwdLog.log @@ (fun oc ->
+             Printf.fprintf oc "Unexcepted exception : %s\n%s\n"
+               (Printexc.to_string e)  (Printexc.get_backtrace ()) );
           raise e
 
 let chop_extension name =
@@ -1837,7 +1840,6 @@ let main () =
                       "<FILE> Log traces to this file (default is no log)\n" ^ 
                       {|                         - use "1" or "stdout" to redirect to standard output.|} ^ "\n" ^
                       {|                         - use "2" or "stderr" to redirect to standard error.|})
-    (* - Nota : -log en mode -proc Windows : le fichier ne contient que les derniers log du fait que open_out remet à zero le log à chaque process *)
     ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
     ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")

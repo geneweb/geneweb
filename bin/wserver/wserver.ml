@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let connection_closed = ref false
-
 let eprintf = Printf.eprintf
 
 let stop_server = ref "STOP_SERVER"
@@ -56,25 +54,23 @@ let header s =
     if !printing_state = Nothing then http Def.OK
     else failwith "Cannot write HTTP headers: page contents already started";
     if !cgi then
-      (* In CGI mode, it MUST NOT return any header fields that relate to client-side communication issues 
-      and could affect the server's ability to send the response to the client.*)
-      let f, v = try let i = String.rindex s ':' in
+      (* In CGI mode, it MUST NOT return any header fields that relate to client-side 
+      communication issues and could affect the server's ability to send the response to the client.*)
+      let f, v = try let i = String.index s ':' in
         (String.sub s 0 i),
         (String.sub s (i + 2) (String.length s - i - 2))
       with Not_found -> (s, "")
       in
       match String.lowercase_ascii f with
-      | "cache-control"
-      | "content-encoding"
-      | "content-length"
-      | "content-type" 
-      | "content-disposition"
-      | "location" ->  
-          (*no space need in CGI mode *)
-          output_string !wserver_oc (f ^ ":" ^ v);
-          printnl ()
+      | "connection"
+      | "date"
+      | "server" ->  
+        Printf.eprintf "exclude '%s':'%s'\n%!" f v;
+        () (* ignore HTTP field, not need in CGI mode*)
       | _ ->
-          () (* ignore other HTTP field*)
+        Printf.eprintf "CGI out '%s':'%s'\n%!" f v;
+        output_string !wserver_oc (f ^ ":" ^ v);
+        printnl ()
     else
       (output_string !wserver_oc s; printnl ())
 
@@ -98,7 +94,8 @@ let print_string s =
 
 let http_redirect_temporarily url =
   http Def.Found;
-  header ("Location: " ^ url)
+  header ("Location: " ^ url);
+  printf ""
 
 let buff = ref (Bytes.create 80)
 let store len x =
@@ -212,14 +209,15 @@ let print_internal_error e addr path query =
   printf "<html>\n<title>Geneweb server error</title>\n<body>\
           <h1>Unexpected Geneweb error, request not complete :</h1>\
           <pre>- Raised with request %s?%s from %s\n\
-          - Mode : %s\n\
+          - Mode : %s, process id = %d\n\
           - Exception : %s\n\
           - Backtrace :<hr>\n%s\n</pre><hr>\
-          <a href=\\>Geneweb Home page</a\
+          <a href=\\>[Geneweb Home page]</a>  \
+          <a href=\"javascript:window.history.go(-1)\">[Previous page]</a>\n\
           </body>\n</html>\n"
           path query 
           (if addr = "" then "not significant" else addr)
-          (if !cgi then "CGI" else "Server")
+          (if !cgi then "CGI" else "Server") (Unix.getpid ())
           (Printexc.to_string e) 
           (Printexc.get_backtrace ())
           ;
@@ -279,6 +277,9 @@ let treat_connection tmout callback addr fd =
 
 (* elementary HTTP server, unix mode with fork   *)
 #ifdef UNIX
+
+let connection_closed = ref false
+
 let rec list_remove x =
   function
     [] -> failwith "list_remove"
@@ -409,7 +410,7 @@ let wserver_basic syslog tmout g s addr_server =
   | Unix.Unix_error(Unix.ECONNRESET, "select", "") -> ([], [], []) 
 (* debug ------------- to be remove after tracking *)
   | Unix.Unix_error( _ , "select", "") as e -> 
-      eprintf "%s - wserver_basic.select exception %s (waitng 5 sec)\n%!" (systime()) (Printexc.to_string e);
+      eprintf "%s - wait for connection - %s\n%!" (systime()) (Printexc.to_string e);
       Unix.sleep 1; 
       ([], [], []) 
 (* debug ----------------------------------------- *)
@@ -445,8 +446,10 @@ let wserver_basic syslog tmout g s addr_server =
                     Gc.compact (); 
                     mem := used_mem ();
                     mem_limit := !mem * 2;
-                  end;
-                Printf.eprintf "- %d..%d ko used   \r%!" !mem !mem_limit
+                  end
+#ifdef DEBUG
+           ;Printf.eprintf "- %d..%d ko used   \r%!" !mem !mem_limit
+#endif
           ) !cl;
           cl:=List.filter (fun t -> t.kind <> Closed_client ) !cl;
           let n = List.length !cl in
