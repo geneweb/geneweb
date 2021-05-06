@@ -1,7 +1,7 @@
 open Geneweb
 open GwuLib
 
-let speclist =
+let speclist opts =
   ( "-odir", Arg.String (fun s -> GwuLib.out_dir := s)
   , "<dir>  create files from original name in directory (else on -o file)" )
   :: ( "-isolated", Arg.Set GwuLib.isolated
@@ -23,12 +23,13 @@ let speclist =
         in the files. Gwu reconnects them to the separated families (i.e. \
         displays them to standard output) if the size of these groups is less \
         than " ^ string_of_int !GwuLib.sep_limit ^ ". The present option changes this limit.")
-  :: Gwexport.speclist
+  :: Gwexport.speclist opts
   |> Arg.align
 
 let main () =
-  Arg.parse speclist Gwexport.anonfun Gwexport.errmsg ;
-  let opts = !Gwexport.opts in
+  let opts = ref Gwexport.default_opts in
+  Arg.parse (speclist opts) (Gwexport.anonfun opts) Gwexport.errmsg ;
+  let opts = !opts in
   match opts.base with
   | None -> assert false
   | Some (ifile, base) ->
