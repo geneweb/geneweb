@@ -188,7 +188,7 @@ let ged_header opts base oc ifile ofile =
     | Gwexport.Ascii -> Printf.ksprintf oc "1 CHAR ASCII\n"
     | Gwexport.Utf8 -> Printf.ksprintf oc "1 CHAR UTF-8\n"
   end;
-  if not opts.Gwexport.no_notes then
+  if opts.Gwexport.no_notes = `none then
     match base_notes_read base "" with
     | "" -> () | s -> display_note opts oc 1 s
 
@@ -310,7 +310,7 @@ let ged_ev_detail opts oc n typ d pl note src =
     | None -> ()
   end;
   if pl <> "" then Printf.ksprintf oc "%d PLAC %s\n" n (encode opts pl);
-  if note <> "" then display_note opts oc n note;
+  if opts.Gwexport.no_notes <> `nnn && note <> "" then display_note opts oc n note;
   if opts.Gwexport.source = None && src <> ""
   then Printf.ksprintf oc "%d SOUR %s\n" n (encode opts src)
 
@@ -561,9 +561,10 @@ let ged_multimedia_link opts base oc per =
       begin Printf.ksprintf oc "1 OBJE\n"; Printf.ksprintf oc "2 FILE %s\n" s end
 
 let ged_note opts base oc per =
-  match sou base (get_notes per) with
-    "" -> ()
-  | s -> display_note opts oc 1 s
+  if opts.Gwexport.no_notes <> `nnn then
+    match sou base (get_notes per) with
+    | "" -> ()
+    | s -> display_note opts oc 1 s
 
 let ged_marriage opts base oc fam =
   match
@@ -657,9 +658,10 @@ let ged_fsource opts base oc fam =
     | s -> Printf.ksprintf oc "1 SOUR %s\n" (encode opts s)
 
 let ged_comment opts base oc fam =
-  match sou base (get_comment fam) with
-  | "" -> ()
-  | s -> display_note opts oc 1 s
+  if opts.Gwexport.no_notes <> `nnn then
+    match sou base (get_comment fam) with
+    | "" -> ()
+    | s -> display_note opts oc 1 s
 
 let has_personal_infos base per =
   get_parents per <> None
