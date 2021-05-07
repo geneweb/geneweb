@@ -1898,17 +1898,90 @@ let get_note_source conf base env auth no_note note_source =
     Util.safe_html s
   else ""
 
-let rec eval_var conf base env ep loc sl =
-  try eval_simple_var conf base env ep sl with
-    Not_found -> eval_compound_var conf base env ep loc sl
-and eval_simple_var conf base env ep =
-  function
+(* : config
+ *   -> base
+ *   -> 'a Templ.env
+ *   -> Gwdb.person * bool
+ *   -> TemplAst.loc
+ *   -> string list
+ *   -> (Gwdb.person * bool) TemplAst.expr_val *)
+
+type p_pauth = (person * bool)
+type event_field = (event_name * Adef.cdate * istr * istr * istr * (iper * witness_kind) array * iper option)
+type fcd = (ifam * family * (iper * iper * iper) * bool)
+
+type 'a eval_var = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_simple_var = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_simple_bool_var = 'a eval -> config -> base -> 'a Templ.env -> string -> bool
+and 'a eval_simple_str_var = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> string -> string
+and 'a eval_compound_var = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_item_field_var = 'a eval -> string list list -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_relation_field_var = 'a eval -> config -> base -> 'a Templ.env -> (int * Def.relation_type * iper * bool) -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_cell_field_var = 'a eval -> config -> base -> 'a Templ.env -> cell -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_ancestor_field_var = 'a eval -> config -> base -> 'a Templ.env -> generation_person -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_anc_by_surnl_field_var = 'a eval -> config -> base -> 'a Templ.env -> person * bool -> ancestor_surname_info -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_num = 'a eval -> config -> Sosa.t -> string list -> string
+and 'a eval_person_field_var = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_date_field_var = 'a eval -> config -> date -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_nobility_title_field_var = 'a eval -> (string * string) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_bool_event_field = 'a eval -> base -> p_pauth -> event_field -> string -> bool
+and 'a eval_str_event_field = 'a eval -> config -> base -> p_pauth -> event_field -> string -> string
+and 'a eval_event_field_var = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> event_field -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_event_witness_relation_var = 'a eval -> config -> base -> 'a Templ.env -> (person * event_field) -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_bool_person_field = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> string -> bool
+and 'a eval_str_person_field = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> string -> string
+and 'a eval_witness_relation_var = 'a eval -> config -> base -> 'a Templ.env -> fcd -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_family_field_var = 'a eval -> config -> base -> 'a Templ.env -> fcd -> (int * int) -> string list -> p_pauth TemplAst.expr_val
+and 'a eval_str_family_field = 'a eval -> 'a Templ.env -> fcd -> string -> string
+and 'a obsolete_eval = 'a eval -> config -> base -> 'a Templ.env -> p_pauth -> (int * int) -> string -> p_pauth TemplAst.expr_val
+
+and simple_person_text = config -> base -> person -> bool -> string
+and string_of_died = config -> person -> bool -> string
+and string_of_image_url = config -> base -> p_pauth -> bool -> string
+and string_of_parent_age = config -> base -> p_pauth -> (family -> iper) -> string
+and 'a string_of_int_env = 'a eval -> string -> 'a Templ.env -> string
+and 'a eval =
+  { eval_var : 'a eval_var
+  ; eval_simple_var : 'a eval_simple_var
+  ; eval_simple_bool_var : 'a eval_simple_bool_var
+  ; eval_simple_str_var : 'a eval_simple_str_var
+  ; eval_compound_var : 'a eval_compound_var
+  ; eval_item_field_var : 'a eval_item_field_var
+  ; eval_relation_field_var : 'a eval_relation_field_var
+  ; eval_cell_field_var : 'a eval_cell_field_var
+  ; eval_ancestor_field_var : 'a eval_ancestor_field_var
+  ; eval_anc_by_surnl_field_var : 'a eval_anc_by_surnl_field_var
+  ; eval_num : 'a eval_num
+  ; eval_person_field_var : 'a eval_person_field_var
+  ; eval_date_field_var : 'a eval_date_field_var
+  ; eval_nobility_title_field_var : 'a eval_nobility_title_field_var
+  ; eval_bool_event_field : 'a eval_bool_event_field
+  ; eval_str_event_field : 'a eval_str_event_field
+  ; eval_event_field_var : 'a eval_event_field_var
+  ; eval_event_witness_relation_var : 'a eval_event_witness_relation_var
+  ; eval_bool_person_field : 'a eval_bool_person_field
+  ; eval_str_person_field : 'a eval_str_person_field
+  ; eval_witness_relation_var : 'a eval_witness_relation_var
+  ; eval_family_field_var : 'a eval_family_field_var
+  ; eval_str_family_field : 'a eval_str_family_field
+  ; simple_person_text : simple_person_text
+  ; string_of_died : string_of_died
+  ; string_of_image_url : string_of_image_url
+  ; string_of_parent_age : string_of_parent_age
+  ; string_of_int_env : 'a string_of_int_env
+  ; obsolete_eval : 'a obsolete_eval
+  }
+
+let rec eval_var : 'a eval_var = fun self conf base env ep loc sl ->
+  try self.eval_simple_var self conf base env ep sl
+  with Not_found -> self.eval_compound_var self conf base env ep loc sl
+and eval_simple_var : 'a eval_simple_var = fun self conf base env ep -> function
     [s] ->
-      begin try bool_val (eval_simple_bool_var conf base env s) with
-        Not_found -> str_val (eval_simple_str_var conf base env ep s)
+      begin try bool_val (self.eval_simple_bool_var self conf base env s) with
+        Not_found -> str_val (self.eval_simple_str_var self conf base env ep s)
       end
   | _ -> raise Not_found
-and eval_simple_bool_var conf base env =
+and eval_simple_bool_var : 'a eval_simple_bool_var = fun self conf base env ->
   let fam_check_aux fn =
     match get_env "fam" env with
     | Vfam (_, fam, _, _) when mode_local env -> fn fam
@@ -1992,8 +2065,6 @@ and eval_simple_bool_var conf base env =
             Vfam (_, _, _, _) -> false
           | _ -> raise Not_found
       end
-
-
   | "is_first" ->
       begin match get_env "first" env with
         Vbool x -> x
@@ -2038,14 +2109,14 @@ and eval_simple_bool_var conf base env =
         let v = Mutil.encode v in
         let s = SrcfileDisplay.source_file_name conf v in Sys.file_exists s
       else raise Not_found
-and eval_simple_str_var conf base env (_, p_auth) =
+and eval_simple_str_var : 'a eval_simple_str_var = fun self conf base env (_, p_auth) ->
   function
     "alias" ->
       begin match get_env "alias" env with
         Vstring s -> s
       | _ -> raise Not_found
       end
-  | "child_cnt" -> string_of_int_env "child_cnt" env
+  | "child_cnt" -> string_of_int_env self "child_cnt" env
   | "comment" | "fnotes" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
@@ -2135,7 +2206,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
         | Vslist l -> l := SortedList.empty; ""
       | _ -> raise Not_found
       end
-  | "family_cnt" -> string_of_int_env "family_cnt" env
+  | "family_cnt" -> string_of_int_env self "family_cnt" env
   | "first_name_alias" ->
       begin match get_env "first_name_alias" env with
         Vstring s -> s
@@ -2375,19 +2446,19 @@ and eval_simple_str_var conf base env (_, p_auth) =
          (* warning: "cvar_" deprecated since 5.00; use "bvar." *)
          "cvar_",
          (fun v -> try List.assoc v conf.base_env with Not_found -> "")]
-and eval_compound_var conf base env (a, _ as ep) loc =
+and eval_compound_var : 'a eval_compound_var = fun self conf base env (a, _ as ep) loc ->
   function
     "ancestor" :: sl ->
       begin match get_env "ancestor" env with
-        Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
-      | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
+        Vanc gp -> self.eval_ancestor_field_var self conf base env gp loc sl
+      | Vanc_surn info -> self.eval_anc_by_surnl_field_var self conf base env ep info sl
       | _ -> raise Not_found
       end
   | "baptism_witness" :: sl ->
       begin match get_env "baptism_witness" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | ["base"; "name"] -> VVstring conf.bname
@@ -2405,26 +2476,27 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match get_env "birth_witness" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | "burial_witness" :: sl ->
       begin match get_env "burial_witness" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | "cell" :: sl ->
       begin match get_env "cell" env with
-        Vcell cell -> eval_cell_field_var conf base env cell loc sl
+        Vcell cell -> self.eval_cell_field_var self conf base env cell loc sl
       | _ -> raise Not_found
       end
   | "child" :: sl ->
       begin match get_env "child" env with
         Vind p when mode_local env ->
           let auth = authorized_age conf base p in
-          let ep = p, auth in eval_person_field_var conf base env ep loc sl
+          let ep = p, auth in
+          self.eval_person_field_var self conf base env ep loc sl
       | _ ->
           match get_env "child_link" env with
             Vind p ->
@@ -2435,27 +2507,27 @@ and eval_compound_var conf base env (a, _ as ep) loc =
                 | _ -> conf.command
               in
               let conf = {conf with command = baseprefix} in
-              eval_person_field_var conf base env ep loc sl
+              self.eval_person_field_var self conf base env ep loc sl
           | _ -> raise Not_found
       end
   | "cremation_witness" :: sl ->
       begin match get_env "cremation_witness" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | "death_witness" :: sl ->
       begin match get_env "death_witness" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | "enclosing" :: sl ->
       let rec loop =
         function
-          ("#loop", _) :: env -> eval_person_field_var conf base env ep loc sl
+          ("#loop", _) :: env -> self.eval_person_field_var self conf base env ep loc sl
         | _ :: env -> loop env
         | [] -> raise Not_found
       in
@@ -2464,13 +2536,13 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match get_env "event_witness" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | "event_witness_relation" :: sl ->
       begin match get_env "event_witness_relation" env with
         Vevent (p, e) ->
-          eval_event_witness_relation_var conf base env (p, e) loc sl
+          self.eval_event_witness_relation_var self conf base env (p, e) loc sl
       | _ -> raise Not_found
       end
   | "event_witness_relation_kind" :: _ ->
@@ -2492,11 +2564,11 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       in *)
       begin match get_env "fam" env with
         Vfam (i, f, c, m) ->
-          eval_family_field_var conf base env (i, f, c, m) loc sl
+          self.eval_family_field_var self conf base env (i, f, c, m) loc sl
       | _ ->
           match get_env "fam_link" env with
             Vfam (i, f, c, m) ->
-              eval_family_field_var conf base env (i, f, c, m) loc sl
+              self.eval_family_field_var self conf base env (i, f, c, m) loc sl
           | _ -> raise Not_found
       end
   | "father" :: sl ->
@@ -2504,7 +2576,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         Some ifam ->
           let cpl = foi base ifam in
           let ep = make_ep conf base (get_father cpl) in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | None ->
 #ifdef API
           match Perso_link.get_father_link conf.command (get_iper a) with
@@ -2512,7 +2584,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
               let ep = Perso_link.make_ep_link base fath in
               let conf = {conf with command = fath.MLink.Person.baseprefix} in
               let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
+              self.eval_person_field_var self conf base env ep loc sl
           | None ->
               warning_use_has_parents_before_parent loc "father" (str_val "")
 #else
@@ -2521,7 +2593,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       end
   | "item" :: sl ->
       begin match get_env "item" env with
-        Vslistlm ell -> eval_item_field_var ell sl
+        Vslistlm ell -> self.eval_item_field_var self ell sl
       | _ -> raise Not_found
       end
   | "mother" :: sl ->
@@ -2529,7 +2601,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         Some ifam ->
           let cpl = foi base ifam in
           let ep = make_ep conf base (get_mother cpl) in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | None ->
 #ifdef API
           match Perso_link.get_mother_link conf.command (get_iper a) with
@@ -2537,7 +2609,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
               let ep = Perso_link.make_ep_link base moth in
               let conf = {conf with command = moth.MLink.Person.baseprefix} in
               let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
+              self.eval_person_field_var self conf base env ep loc sl
           | None ->
               warning_use_has_parents_before_parent loc "mother" (str_val "")
 #else
@@ -2546,12 +2618,12 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       end
   | "next_item" :: sl ->
       begin match get_env "item" env with
-        Vslistlm (_ :: ell) -> eval_item_field_var ell sl
+        Vslistlm (_ :: ell) -> self.eval_item_field_var self ell sl
       | _ -> raise Not_found
       end
   | "number_of_ancestors" :: sl ->
       begin match get_env "n" env with
-        Vint n -> VVstring (eval_num conf (Sosa.of_int (n - 1)) sl)
+        Vint n -> VVstring (self.eval_num self conf (Sosa.of_int (n - 1)) sl)
       | _ -> raise Not_found
       end
   | "number_of_descendants" :: sl ->
@@ -2566,7 +2638,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
                   if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
                 ) 0 (Gwdb.ipers base)
               in
-              VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
+              VVstring (self.eval_num self conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found
           end
       | _ -> raise Not_found
@@ -2582,7 +2654,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
                   if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
                 ) 0 (Gwdb.ipers base)
               in
-              VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
+              VVstring (self.eval_num self conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found
           end
       | _ -> raise Not_found
@@ -2591,25 +2663,25 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match get_env "parent" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | "prev_item" :: sl ->
       begin match get_env "prev_item" env with
-        Vslistlm ell -> eval_item_field_var ell sl
+        Vslistlm ell -> self.eval_item_field_var self ell sl
       | _ -> raise Not_found
       end
   | "prev_family" :: sl ->
       begin match get_env "prev_fam" env with
         Vfam (i, f, c, m) ->
-          eval_family_field_var conf base env (i, f, c, m) loc sl
+          self.eval_family_field_var self conf base env (i, f, c, m) loc sl
       | _ -> raise Not_found
       end
   | "pvar" :: v :: sl ->
       begin match find_person_in_env conf base v with
       | Some p ->
           let ep = make_ep conf base (get_iper p) in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | None -> raise Not_found
       end
   | "qvar" :: v :: sl ->
@@ -2620,7 +2692,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       (* if v0 >= 0 && v0 < nb_of_persons base then *)
         let ep = make_ep conf base v0 in
         if is_hidden (fst ep) then raise Not_found
-        else eval_person_field_var conf base env ep loc sl
+        else self.eval_person_field_var self conf base env ep loc sl
       (* else raise Not_found *)
   | "svar" :: i :: sl ->
       (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
@@ -2645,7 +2717,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
             begin match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
             | Some (p :: _) ->
                 let p_auth = authorized_age conf base p in
-                eval_person_field_var conf base env (p, p_auth) loc sl
+                self.eval_person_field_var self conf base env (p, p_auth) loc sl
             | _ -> raise Not_found
             end
       | None -> raise Not_found
@@ -2663,7 +2735,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
               begin match Util.branch_of_sosa conf base s0 (pget conf base ip) with
               | Some (p :: _) ->
                   let p_auth = authorized_age conf base p in
-                  eval_person_field_var conf base env (p, p_auth) loc sl
+                  self.eval_person_field_var self conf base env (p, p_auth) loc sl
               | _ -> raise Not_found
               end
           | _ -> raise Not_found
@@ -2677,36 +2749,36 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match Util.p_of_sosa conf base (Sosa.of_string s) a with
       | Some np ->
         let np_auth = authorized_age conf base np in
-        eval_person_field_var conf base env (np, np_auth) loc sl
+        self.eval_person_field_var self conf base env (np, np_auth) loc sl
       | _ -> raise Not_found
       end
   | "related" :: sl ->
       begin match get_env "rel" env with
         Vrel ({r_type = rt}, Some p) ->
-          eval_relation_field_var conf base env
+          self.eval_relation_field_var self conf base env
             (index_of_sex (get_sex p), rt, get_iper p, false) loc sl
       | _ -> raise Not_found
       end
   | "relation_her" :: sl ->
       begin match get_env "rel" env with
         Vrel ({r_moth = Some ip; r_type = rt}, None) ->
-          eval_relation_field_var conf base env (1, rt, ip, true) loc sl
+          self.eval_relation_field_var self conf base env (1, rt, ip, true) loc sl
       | _ -> raise Not_found
       end
   | "relation_him" :: sl ->
       begin match get_env "rel" env with
         Vrel ({r_fath = Some ip; r_type = rt}, None) ->
-          eval_relation_field_var conf base env (0, rt, ip, true) loc sl
+          self.eval_relation_field_var self conf base env (0, rt, ip, true) loc sl
       | _ -> raise Not_found
       end
-  | "self" :: sl -> eval_person_field_var conf base env ep loc sl
+  | "self" :: sl -> self.eval_person_field_var self conf base env ep loc sl
   | "sosa_ref" :: sl ->
       begin match get_env "sosa_ref" env with
         Vsosa_ref v ->
           begin match Lazy.force v with
             Some p ->
               let ep = make_ep conf base (get_iper p) in
-              eval_person_field_var conf base env ep loc sl
+              self.eval_person_field_var self conf base env ep loc sl
           | None -> raise Not_found
           end
       | _ -> raise Not_found
@@ -2715,7 +2787,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match get_env "fam" env with
         Vfam (_, _, (_, _, ip), _) when mode_local env ->
           let ep = make_ep conf base ip in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ ->
 #ifdef API
           match get_env "fam_link" env with
@@ -2732,7 +2804,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
                     {conf with command = spouse.MLink.Person.baseprefix}
                   in
                   let env = ("p_link", Vbool true) :: env in
-                  eval_person_field_var conf base env ep loc sl
+                  self.eval_person_field_var self conf base env ep loc sl
               | None -> raise Not_found
               end
           | _ -> raise Not_found
@@ -2744,18 +2816,17 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       begin match get_env "witness" env with
         Vind p ->
           let ep = p, authorized_age conf base p in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | "witness_relation" :: sl ->
       begin match get_env "fam" env with
         Vfam (i, f, c, m) ->
-          eval_witness_relation_var conf base env (i, f, c, m) loc sl
+          self.eval_witness_relation_var self conf base env (i, f, c, m) loc sl
       | _ -> raise Not_found
       end
-  | sl -> eval_person_field_var conf base env ep loc sl
-and eval_item_field_var ell =
-  function
+  | sl -> self.eval_person_field_var self conf base env ep loc sl
+and eval_item_field_var : 'a eval_item_field_var = fun self ell -> function
     [s] ->
       begin try
         match ell with
@@ -2766,15 +2837,15 @@ and eval_item_field_var ell =
       with Failure _ -> raise Not_found
       end
   | _ -> raise Not_found
-and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
+and eval_relation_field_var : 'a eval_relation_field_var = fun self conf base env (i, rt, ip, is_relation) loc ->
   function
     ["type"] ->
       if is_relation then VVstring (relation_type_text conf rt i)
       else VVstring (rchild_type_text conf rt i)
   | sl ->
       let ep = make_ep conf base ip in
-      eval_person_field_var conf base env ep loc sl
-and eval_cell_field_var conf base env cell loc =
+      self.eval_person_field_var self conf base env ep loc sl
+and eval_cell_field_var : 'a eval_cell_field_var = fun self conf base env cell loc ->
   function
     ["colspan"] ->
       begin match cell with
@@ -2786,7 +2857,7 @@ and eval_cell_field_var conf base env cell loc =
         Cell (p, Some ifam, _, _, _, base_prefix) ->
           if conf.bname = base_prefix then
             let (f, c, a) = make_efam conf base (get_iper p) ifam in
-            eval_family_field_var conf base env (ifam, f, c, a) loc sl
+            self.eval_family_field_var self conf base env (ifam, f, c, a) loc sl
           else
 #ifdef API
             let conf = {conf with command = base_prefix} in
@@ -2827,7 +2898,7 @@ and eval_cell_field_var conf base env cell loc =
               in
               loop faml
             in
-            eval_family_field_var conf base env (ifam, f, c, a) loc sl
+            self.eval_family_field_var self conf base env (ifam, f, c, a) loc sl
 #else
             VVstring ""
 #endif
@@ -2863,14 +2934,14 @@ and eval_cell_field_var conf base env cell loc =
         Cell (p, _, _, _, _, base_prefix) ->
           if conf.bname = base_prefix then
             let ep = make_ep conf base (get_iper p) in
-            eval_person_field_var conf base env ep loc sl
+            self.eval_person_field_var self conf base env ep loc sl
           else
             let conf = {conf with command = base_prefix} in
-            let ep = p, true in eval_person_field_var conf base env ep loc sl
+            let ep = p, true in self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | _ -> raise Not_found
-and eval_ancestor_field_var conf base env gp loc =
+and eval_ancestor_field_var : 'a eval_ancestor_field_var = fun self conf base env gp loc ->
   function
     "family" :: sl ->
       begin match gp with
@@ -2884,7 +2955,7 @@ and eval_ancestor_field_var conf base env gp loc =
             authorized_age conf base (pget conf base ifath) &&
             authorized_age conf base (pget conf base imoth)
           in
-          eval_family_field_var conf base env (ifam, f, c, m_auth) loc sl
+          self.eval_family_field_var self conf base env (ifam, f, c, m_auth) loc sl
       | _ -> raise Not_found
       end
   | "father" :: sl ->
@@ -2896,10 +2967,10 @@ and eval_ancestor_field_var conf base env gp loc =
             Some ifam, Vallgp all_gp ->
               let cpl = foi base ifam in
               begin match get_link all_gp (get_father cpl) with
-                Some gp -> eval_ancestor_field_var conf base env gp loc sl
+                Some gp -> self.eval_ancestor_field_var self conf base env gp loc sl
               | None ->
                   let ep = make_ep conf base (get_father cpl) in
-                  eval_person_field_var conf base env ep loc sl
+                  self.eval_person_field_var self conf base env ep loc sl
               end
           | _, _ -> raise Not_found
           end
@@ -2908,7 +2979,7 @@ and eval_ancestor_field_var conf base env gp loc =
             Some ifam ->
               let cpl = foi base ifam in
               let ep = make_ep conf base (get_father cpl) in
-              eval_person_field_var conf base env ep loc sl
+              self.eval_person_field_var self conf base env ep loc sl
           | _ -> raise Not_found
           end
       | _ -> raise Not_found
@@ -2946,13 +3017,13 @@ and eval_ancestor_field_var conf base env gp loc =
       end
   | "same" :: sl ->
       begin match gp with
-        GP_same (_, n, _) -> VVstring (eval_num conf n sl)
+        GP_same (_, n, _) -> VVstring (self.eval_num self conf n sl)
       | _ -> VVstring ""
       end
   | "anc_sosa" :: sl ->
       begin match gp with
         GP_person (n, _, _) | GP_same (n, _, _) ->
-          VVstring (eval_num conf n sl)
+          VVstring (self.eval_num self conf n sl)
       | _ -> VVstring ""
       end
   | "spouse" :: sl ->
@@ -2960,27 +3031,27 @@ and eval_ancestor_field_var conf base env gp loc =
         GP_person (_, ip, Some ifam) ->
           let ip = Gutil.spouse ip (foi base ifam) in
           let ep = make_ep conf base ip in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
   | sl ->
       match gp with
         GP_person (_, ip, _) | GP_same (_, _, ip) ->
           let ep = make_ep conf base ip in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
-and eval_anc_by_surnl_field_var conf base env ep info =
+and eval_anc_by_surnl_field_var : 'a eval_anc_by_surnl_field_var = fun self conf base env ep info ->
   match info with
     Branch (_, db, de, place, p, sosa_list, loc) ->
       (function
          "date_begin" :: sl ->
            begin match db with
-             Some d -> eval_date_field_var conf d sl
+             Some d -> self.eval_date_field_var self conf d sl
            | None -> VVstring ""
            end
        | "date_end" :: sl ->
            begin match de with
-             Some d -> eval_date_field_var conf d sl
+             Some d -> self.eval_date_field_var self conf d sl
            | None -> VVstring ""
            end
        | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
@@ -2998,17 +3069,17 @@ and eval_anc_by_surnl_field_var conf base env ep info =
            let (p, _) = ep in VVstring (acces_n conf base "1" p ^ str)
        | sl ->
            let ep = make_ep conf base (get_iper p) in
-           eval_person_field_var conf base env ep loc sl)
+           self.eval_person_field_var self conf base env ep loc sl)
   | Eclair (_, place, db, de, p, persl, loc) ->
       function
         "date_begin" :: sl ->
           begin match db with
-            Some d -> eval_date_field_var conf d sl
+            Some d -> self.eval_date_field_var self conf d sl
           | None -> VVstring ""
           end
       | "date_end" :: sl ->
           begin match de with
-            Some d -> eval_date_field_var conf d sl
+            Some d -> self.eval_date_field_var self conf d sl
           | None -> VVstring ""
           end
       | ["nb_events"] -> VVstring (string_of_int (List.length persl))
@@ -3020,8 +3091,8 @@ and eval_anc_by_surnl_field_var conf base env ep info =
       | ["place"] -> VVstring place
       | sl ->
           let ep = make_ep conf base (get_iper p) in
-          eval_person_field_var conf base env ep loc sl
-and eval_num conf n =
+          self.eval_person_field_var self conf base env ep loc sl
+and eval_num : 'a eval_num = fun self conf n ->
   function
     ["hexa"] -> Printf.sprintf "0x%X" @@ int_of_string (Sosa.to_string n)
   | ["octal"] -> Printf.sprintf "0x%o" @@ int_of_string (Sosa.to_string n)
@@ -3029,23 +3100,23 @@ and eval_num conf n =
   | ["v"] -> Sosa.to_string n
   | [] -> Sosa.to_string_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found
-and eval_person_field_var conf base env (p, p_auth as ep) loc =
+and eval_person_field_var : 'a eval_person_field_var = fun self conf base env (p, p_auth as ep) loc ->
   function
     "baptism_date" :: sl ->
       begin match Adef.od_of_cdate (get_baptism p) with
-        Some d when p_auth -> eval_date_field_var conf d sl
+        Some d when p_auth -> self.eval_date_field_var self conf d sl
       | _ -> VVstring ""
       end
   | "birth_date" :: sl ->
       begin match Adef.od_of_cdate (get_birth p) with
-        Some d when p_auth -> eval_date_field_var conf d sl
+        Some d when p_auth -> self.eval_date_field_var self conf d sl
       | _ -> VVstring ""
       end
   | "burial_date" :: sl ->
       begin match get_burial p with
         Buried cod when p_auth ->
           begin match Adef.od_of_cdate cod with
-            Some d -> eval_date_field_var conf d sl
+            Some d -> self.eval_date_field_var self conf d sl
           | None -> VVstring ""
           end
       | _ -> VVstring ""
@@ -3054,7 +3125,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
       begin match get_burial p with
         Cremated cod when p_auth ->
           begin match Adef.od_of_cdate cod with
-            Some d -> eval_date_field_var conf d sl
+            Some d -> self.eval_date_field_var self conf d sl
           | None -> VVstring ""
           end
       | _ -> VVstring ""
@@ -3062,12 +3133,12 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
   | "death_date" :: sl ->
       begin match get_death p with
         Death (_, cd) when p_auth ->
-          eval_date_field_var conf (Adef.date_of_cdate cd) sl
+          self.eval_date_field_var self conf (Adef.date_of_cdate cd) sl
       | _ -> VVstring ""
       end
   | "event" :: sl ->
       begin match get_env "event" env with
-        Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl
+        Vevent (_, e) -> self.eval_event_field_var self conf base env ep e loc sl
       | _ -> raise Not_found
       end
   | "father" :: sl ->
@@ -3075,7 +3146,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
         Some ifam ->
           let cpl = foi base ifam in
           let ep = make_ep conf base (get_father cpl) in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | None ->
 #ifdef API
           match Perso_link.get_father_link conf.command (get_iper p) with
@@ -3083,7 +3154,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
               let ep = Perso_link.make_ep_link base fath in
               let conf = {conf with command = fath.MLink.Person.baseprefix} in
               let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
+              self.eval_person_field_var self conf base env ep loc sl
           | None ->
               warning_use_has_parents_before_parent loc "father" (str_val "")
 #else
@@ -3170,7 +3241,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
       begin match get_env "fam" env with
         Vfam (_, fam, _, true) ->
           begin match Adef.od_of_cdate (get_marriage fam) with
-            Some d -> eval_date_field_var conf d sl
+            Some d -> self.eval_date_field_var self conf d sl
           | None -> VVstring ""
           end
       | _ -> raise Not_found
@@ -3180,7 +3251,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
         Some ifam ->
           let cpl = foi base ifam in
           let ep = make_ep conf base (get_mother cpl) in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | None ->
 #ifdef API
           match Perso_link.get_mother_link conf.command (get_iper p) with
@@ -3188,7 +3259,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
               let ep = Perso_link.make_ep_link base moth in
               let conf = {conf with command = moth.MLink.Person.baseprefix} in
               let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
+              self.eval_person_field_var self conf base env ep loc sl
           | None ->
               warning_use_has_parents_before_parent loc "mother" (str_val "")
 #else
@@ -3200,15 +3271,15 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
         Some t when p_auth ->
           let id = sou base t.t_ident in
           let pl = sou base t.t_place in
-          eval_nobility_title_field_var (id, pl) sl
+          self.eval_nobility_title_field_var self (id, pl) sl
       | _ -> VVstring ""
       end
-  | "self" :: sl -> eval_person_field_var conf base env ep loc sl
+  | "self" :: sl -> self.eval_person_field_var self conf base env ep loc sl
   | "sosa" :: sl ->
       begin match get_env "sosa" env with
         Vsosa x ->
           begin match get_sosa conf base env x p with
-            Some (n, _) -> VVstring (eval_num conf n sl)
+            Some (n, _) -> VVstring (self.eval_num self conf n sl)
           | None -> VVstring ""
           end
       | _ -> raise Not_found
@@ -3224,7 +3295,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
                 else
                   let p = poi base ip in
                   let p_auth = authorized_age conf base p in
-                  eval_person_field_var conf base env (p, p_auth) loc sl
+                  self.eval_person_field_var self conf base env (p, p_auth) loc sl
               end
           | None -> VVstring ""
           end
@@ -3241,7 +3312,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
                 else
                   let p = poi base ip in
                   let p_auth = authorized_age conf base p in
-                  eval_person_field_var conf base env (p, p_auth) loc sl
+                  self.eval_person_field_var self conf base env (p, p_auth) loc sl
               end
           | None -> VVstring ""
           end
@@ -3253,20 +3324,20 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           let cpl = foi base ifam in
           let ip = Gutil.spouse (get_iper p) cpl in
           let ep = make_ep conf base ip in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | _ -> raise Not_found
       end
-  | ["var"] -> VVother (eval_person_field_var conf base env ep loc)
+  | ["var"] -> VVother (self.eval_person_field_var self conf base env ep loc)
   | [s] ->
-      begin try bool_val (eval_bool_person_field conf base env ep s) with
+      begin try bool_val (self.eval_bool_person_field self conf base env ep s) with
         Not_found ->
-          begin try str_val (eval_str_person_field conf base env ep s) with
-            Not_found -> obsolete_eval conf base env ep loc s
+          begin try str_val (self.eval_str_person_field self conf base env ep s) with
+            Not_found -> obsolete_eval self conf base env ep loc s
           end
       end
   | [] -> str_val (simple_person_text conf base p p_auth)
   | _ -> raise Not_found
-and eval_date_field_var conf d =
+and eval_date_field_var : 'a eval_date_field_var = fun self conf d ->
   function
     ["prec"] ->
       begin match d with
@@ -3330,61 +3401,15 @@ and eval_date_field_var conf d =
   | [] ->
     VVstring (DateDisplay.string_of_date_aux ~link:false conf ~sep:"&#010;  " d)
   | _ -> raise Not_found
-and _eval_place_field_var conf place =
-  function
-    [] ->
-      (* Compatibility before eval_place_field_var *)
-      VVstring place
-  | ["other"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.other
-      | None -> VVstring ""
-      end
-  | ["town"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.town
-      | None -> VVstring ""
-      end
-  | ["township"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.township
-      | None -> VVstring ""
-      end
-  | ["canton"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.canton
-      | None -> VVstring ""
-      end
-  | ["district"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.district
-      | None -> VVstring ""
-      end
-  | ["county"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.county
-      | None -> VVstring ""
-      end
-  | ["region"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.region
-      | None -> VVstring ""
-      end
-  | ["country"] ->
-      begin match place_of_string conf place with
-        Some p -> VVstring p.country
-      | None -> VVstring ""
-      end
-  | _ -> raise Not_found
-and eval_nobility_title_field_var (id, pl) =
+and eval_nobility_title_field_var : 'a eval_nobility_title_field_var = fun self (id, pl) ->
   function
     ["ident_key"] -> VVstring (Mutil.encode id)
   | ["place_key"] -> VVstring (Mutil.encode pl)
   | [] -> VVstring (if pl = "" then id else id ^ " " ^ pl)
   | _ -> raise Not_found
-and eval_bool_event_field base (p, p_auth)
-    (_, date, place, note, src, w, isp) =
-  function
+and eval_bool_event_field
+    : 'a eval_bool_event_field =
+      fun self base (p, p_auth) (_, date, place, note, src, w, isp) -> function
     "has_date" -> p_auth && date <> Adef.cdate_None
   | "has_place" -> p_auth && sou base place <> ""
   | "has_note" -> p_auth && sou base note <> ""
@@ -3403,8 +3428,8 @@ and eval_bool_event_field base (p, p_auth)
             | _ -> false
       else false
   | _ -> raise Not_found
-and eval_str_event_field conf base (p, p_auth)
-    (name, date, place, note, src, _, _) =
+and eval_str_event_field
+: 'a eval_str_event_field = fun self conf base (p, p_auth) (name, date, place, note, src, _, _) ->
   function
     "age" ->
       if p_auth then
@@ -3454,12 +3479,13 @@ and eval_str_event_field conf base (p, p_auth)
       let env = ['i', (fun () -> Util.default_image_name base p)] in
       get_note_source conf base env p_auth false (sou base src)
   | _ -> raise Not_found
-and eval_event_field_var conf base env (p, p_auth)
-    (name, date, place, note, src, w, isp) loc =
+and eval_event_field_var
+    : 'a eval_event_field_var
+      = fun self conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc ->
   function
     "date" :: sl ->
       begin match p_auth, Adef.od_of_cdate date with
-        true, Some d -> eval_date_field_var conf d sl
+        true, Some d -> self.eval_date_field_var self conf d sl
       | _ -> VVstring ""
       end
   | "spouse" :: sl ->
@@ -3467,31 +3493,32 @@ and eval_event_field_var conf base env (p, p_auth)
         Some isp ->
           let sp = poi base isp in
           let ep = sp, authorized_age conf base sp in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       | None -> VVstring ""
       end
   | [s] ->
       begin try
         bool_val
-          (eval_bool_event_field base (p, p_auth)
+          (self.eval_bool_event_field self base (p, p_auth)
              (name, date, place, note, src, w, isp) s)
       with Not_found ->
         str_val
-          (eval_str_event_field conf base (p, p_auth)
+          (self.eval_str_event_field self conf base (p, p_auth)
              (name, date, place, note, src, w, isp) s)
       end
   | _ -> raise Not_found
-and eval_event_witness_relation_var conf base env (p, e) loc =
-  function
+and eval_event_witness_relation_var
+    : 'a eval_event_witness_relation_var
+      = fun self conf base env (p, e) loc -> function
     "event" :: sl ->
       let ep = p, authorized_age conf base p in
-      eval_event_field_var conf base env ep e loc sl
+      self.eval_event_field_var self conf base env ep e loc sl
   | "person" :: sl ->
       let ep = p, authorized_age conf base p in
-      eval_person_field_var conf base env ep loc sl
+      self.eval_person_field_var self conf base env ep loc sl
   | _ -> raise Not_found
-and eval_bool_person_field conf base env (p, p_auth) =
-  function
+and eval_bool_person_field
+: 'a eval_bool_person_field = fun self conf base env (p, p_auth) -> function
     "access_by_key" ->
       Util.accessible_by_key conf base p (p_first_name base p)
         (p_surname base p)
@@ -3937,7 +3964,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "is_public" -> get_access p = Public
   | "is_restricted" -> is_hidden p
   | _ -> raise Not_found
-and eval_str_person_field conf base env (p, p_auth as ep) =
+and eval_str_person_field : 'a eval_str_person_field = fun self conf base env (p, p_auth as ep) ->
   function
     "access" -> acces conf base p
   | "age" ->
@@ -4415,8 +4442,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else Name.strip_c (p_surname base p) '"'
   | "title" -> person_title conf base p
   | _ -> raise Not_found
-and eval_witness_relation_var conf base env
-    (_, _, (ip1, ip2, _), m_auth as fcd) loc =
+and eval_witness_relation_var
+: 'a eval_witness_relation_var = fun self conf base env (_, _, (ip1, ip2, _), m_auth as fcd) loc ->
   function
     [] ->
       if not m_auth then VVstring ""
@@ -4427,20 +4454,21 @@ and eval_witness_relation_var conf base env
             (referenced_person_title_text conf base (pget conf base ip2))
         in
         VVstring s
-  | sl -> eval_family_field_var conf base env fcd loc sl
-and eval_family_field_var conf base env
-    (_, fam, (ifath, imoth, _), m_auth as fcd) loc =
+  | sl -> self.eval_family_field_var self conf base env fcd loc sl
+and eval_family_field_var
+    : 'a eval_family_field_var
+    = fun self conf base env (_, fam, (ifath, imoth, _), m_auth as fcd) loc ->
   function
     "father" :: sl ->
       begin match get_env "f_link" env with
         Vbool _ -> raise Not_found
       | _ ->
           let ep = make_ep conf base ifath in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       end
   | "marriage_date" :: sl ->
       begin match Adef.od_of_cdate (get_marriage fam) with
-        Some d when m_auth -> eval_date_field_var conf d sl
+        Some d when m_auth -> self.eval_date_field_var self conf d sl
       | _ -> VVstring ""
       end
   | "mother" :: sl ->
@@ -4448,11 +4476,11 @@ and eval_family_field_var conf base env
         Vbool _ -> raise Not_found
       | _ ->
           let ep = make_ep conf base imoth in
-          eval_person_field_var conf base env ep loc sl
+          self.eval_person_field_var self conf base env ep loc sl
       end
-  | [s] -> str_val (eval_str_family_field env fcd s)
+  | [s] -> str_val (self.eval_str_family_field self env fcd s)
   | _ -> raise Not_found
-and eval_str_family_field env (ifam, _, _, _) =
+and eval_str_family_field : 'a eval_str_family_field = fun self env (ifam, _, _, _) ->
   function
     "desc_level" ->
       begin match get_env "desc_level_table" env with
@@ -4470,14 +4498,14 @@ and eval_str_family_field env (ifam, _, _, _) =
       | _ -> raise Not_found
       end
   | _ -> raise Not_found
-and simple_person_text conf base p p_auth =
+and simple_person_text : simple_person_text = fun conf base p p_auth ->
   if p_auth then
     match main_title conf base p with
       Some t -> titled_person_text conf base p t
     | None -> person_text conf base p
   else if is_hide_names conf p then "x x"
   else person_text conf base p
-and string_of_died conf p p_auth =
+and string_of_died : string_of_died = fun conf p p_auth ->
   if p_auth then
     let is = index_of_sex (get_sex p) in
     match get_death p with
@@ -4493,7 +4521,7 @@ and string_of_died conf p p_auth =
     | DeadDontKnowWhen -> transl_nth conf "died" is
     | _ -> ""
   else ""
-and string_of_image_url conf base (p, p_auth) html =
+and string_of_image_url : string_of_image_url = fun conf base (p, p_auth) html ->
   if p_auth then
     let v =
       image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
@@ -4510,7 +4538,7 @@ and string_of_image_url conf base (p, p_auth) html =
     | Some (false, link, _) -> link
     | None -> ""
   else ""
-and string_of_parent_age conf base (p, p_auth) parent =
+and string_of_parent_age : string_of_parent_age = fun conf base (p, p_auth) parent ->
   match get_parents p with
     Some ifam ->
       let cpl = foi base ifam in
@@ -4524,11 +4552,11 @@ and string_of_parent_age conf base (p, p_auth) parent =
         | _ -> ""
       else ""
   | None -> raise Not_found
-and string_of_int_env var env =
+and string_of_int_env : 'a string_of_int_env = fun self var env ->
   match get_env var env with
     Vint x -> string_of_int x
   | _ -> raise Not_found
-and obsolete_eval conf base env (p, _) loc =
+and obsolete_eval : 'a obsolete_eval = fun self conf base env (p, _) loc ->
   function
     "married_to" ->
       let s =
@@ -4543,7 +4571,8 @@ and obsolete_eval conf base env (p, _) loc =
       obsolete loc "4.08" "married_to" "" (str_val s)
   | _ -> raise Not_found
 
-let eval_transl conf base env upp s c =
+let eval_transl
+  = fun conf base env upp s c ->
   match c with
     "n" | "s" | "w" | "f" | "c" ->
       let n =
@@ -5756,6 +5785,7 @@ let eval_predefined_apply conf env f vl =
         ["<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>"]
   | _ -> raise Not_found
 
+
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = p, authorized_age conf base p in
@@ -5843,15 +5873,50 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
      ("nldb", Vlazy (Lazy.from_fun nldb));
      ("all_gp", Vlazy (Lazy.from_fun all_gp))]
   in
+  let self =
+    { eval_var
+    ; eval_simple_var
+    ; eval_simple_bool_var
+    ; eval_simple_str_var
+    ; eval_compound_var
+    ; eval_item_field_var
+    ; eval_relation_field_var
+    ; eval_cell_field_var
+    ; eval_ancestor_field_var
+    ; eval_anc_by_surnl_field_var
+    ; eval_num
+    ; eval_person_field_var
+    ; eval_date_field_var
+    ; eval_nobility_title_field_var
+    ; eval_bool_event_field
+    ; eval_str_event_field
+    ; eval_event_field_var
+    ; eval_event_witness_relation_var
+    ; eval_bool_person_field
+    ; eval_str_person_field
+    ; eval_witness_relation_var
+    ; eval_family_field_var
+    ; eval_str_family_field
+    ; simple_person_text
+    ; string_of_died
+    ; string_of_image_url
+    ; string_of_parent_age
+    ; string_of_int_env
+    ; obsolete_eval
+    }
+  in
+  let interp_fun : ('a, p_pauth) Templ.interp_fun =
+    { Templ.eval_var = eval_var self conf base
+    ; Templ.eval_transl = eval_transl conf base
+    ; Templ.eval_predefined_apply = eval_predefined_apply conf
+    ; Templ.get_vother = get_vother
+    ; Templ.set_vother = set_vother
+    ; Templ.print_foreach = print_foreach conf base
+    }
+  in
   if no_headers
   then
-      Hutil.interp_no_header conf templ_fname
-        {Templ.eval_var = eval_var conf base;
-         Templ.eval_transl = eval_transl conf base;
-         Templ.eval_predefined_apply = eval_predefined_apply conf;
-         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-         Templ.print_foreach = print_foreach conf base}
-        env ep
+    Hutil.interp_no_header conf templ_fname interp_fun env ep
   else if menu then
     let size =
       match Util.open_templ conf templ_fname with
@@ -5862,21 +5927,9 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     in
     if size = 0 then Hutil.header conf title
     else
-      Hutil.interp_no_header conf templ_fname
-        {Templ.eval_var = eval_var conf base;
-         Templ.eval_transl = eval_transl conf base;
-         Templ.eval_predefined_apply = eval_predefined_apply conf;
-         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-         Templ.print_foreach = print_foreach conf base}
-        env ep
+      Hutil.interp_no_header conf templ_fname interp_fun env ep
   else
-    Hutil.interp conf templ_fname
-      {Templ.eval_var = eval_var conf base;
-       Templ.eval_transl = eval_transl conf base;
-       Templ.eval_predefined_apply = eval_predefined_apply conf;
-       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-       Templ.print_foreach = print_foreach conf base}
-      env ep
+    Hutil.interp conf templ_fname interp_fun env ep
 
 let interp_templ ?no_headers = gen_interp_templ ?no_headers false (fun _ -> ())
 let interp_templ_with_menu = gen_interp_templ true
