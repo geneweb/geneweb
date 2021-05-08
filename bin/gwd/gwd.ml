@@ -212,7 +212,11 @@ let register_plugin dir =
   let assets = Filename.concat dir "assets" in
   GwdPlugin.assets := assets ;
   if Sys.file_exists dir then Secure.add_lang_path assets ;
-  Dynlink.loadfile plugin ;
+  try Dynlink.loadfile plugin
+  with  Dynlink.Error err ->
+		GwdLog.syslog `LOG_ERR @@
+		Printf.sprintf
+			"Error loading plugin %s : %s\n" plugin (Dynlink.error_message err);
   GwdPlugin.assets := ""
 
 let alias_lang lang =
