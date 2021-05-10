@@ -74,14 +74,14 @@ let find_br s ini_i =
 
 let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
 
-(** [display_note_aux oc tagn s len i] outputs text [s] with CONT/CONC
+(** [display_note_aux opts tagn s len i] outputs text [s] with CONT/CONC
     tag. GEDCOM lines are limited to 255 characters. However, the
     CONCatenation or CONTinuation tags can be used to expand a field
     beyond this limit. Lines are cut and align with [max_len]
     characters for easy display/printing.
     @see <https://www.familysearch.org/developers/docs/gedcom/> GEDCOM
     STANDARD 5.5, Appendix A CONC and CONT tag
-    @param oc specifies output channel
+    @param opts carries output channel
     @param tagn specifies the current gedcom tag level (0, 1, ...)
     @param s specifies text to print to the output channel (already
     encode with gedcom charset)
