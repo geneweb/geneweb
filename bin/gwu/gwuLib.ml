@@ -661,7 +661,7 @@ let print_pevent opts base gen e =
          print_witness opts base gen p;
          Printf.ksprintf (oc opts) "\n")
     e.epers_witnesses;
-  let note = sou base e.epers_note in
+  let note = if opts.no_notes <> `nnn then sou base e.epers_note else "" in
   if note <> "" then
     List.iter (fun line -> Printf.ksprintf (oc opts) "note %s\n" line)
       (lines_list_of_string note)
@@ -870,6 +870,7 @@ let print_family opts base gen m =
    | None ->
      if sou base (get_fsources fam) <> ""
      then Printf.ksprintf (oc opts) "src %s\n" (correct_string base (get_fsources fam));
+   | Some "" -> ()
    | Some x -> Printf.ksprintf (oc opts) "src %s\n" (s_correct_string x) ) ;
   let csrc =
     match common_children_sources base m.m_chil with
