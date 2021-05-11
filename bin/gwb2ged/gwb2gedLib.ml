@@ -299,6 +299,9 @@ let ged_date opts =
       ged_date_dmy opts (Calendar.hebrew_of_gregorian d) Dhebrew
   | Dtext t -> Printf.ksprintf (oc opts) "(%s)" t
 
+let print_sour opts n s =
+  Printf.ksprintf (oc opts) "%d SOUR %s\n" n s
+
 let ged_ev_detail opts n typ d pl note src =
   begin match typ, d, pl, note, src with
     | "", None, "", "", "" -> Printf.ksprintf (oc opts) " Y"
@@ -316,7 +319,7 @@ let ged_ev_detail opts n typ d pl note src =
   if pl <> "" then Printf.ksprintf (oc opts) "%d PLAC %s\n" n (encode opts pl);
   if opts.Gwexport.no_notes <> `nnn && note <> "" then display_note opts n note;
   if opts.Gwexport.source = None && src <> ""
-  then Printf.ksprintf (oc opts) "%d SOUR %s\n" n (encode opts src)
+  then print_sour opts n (encode opts src)
 
 let ged_tag_pevent base evt =
   match evt.epers_name with
@@ -543,11 +546,12 @@ let ged_asso opts base (per_sel, fam_sel) per =
 
 let ged_psource opts base per =
   match opts.Gwexport.source with
-  | Some s -> Printf.ksprintf (oc opts) "1 SOUR %s\n" (encode opts s)
+  | Some "" -> ()
+  | Some s -> print_sour opts 1 (encode opts s)
   | None ->
     match sou base (get_psources per) with
     | "" -> ()
-    | s -> Printf.ksprintf (oc opts) "1 SOUR %s\n" (encode opts s)
+    | s -> print_sour opts 1 (encode opts s)
 
 let has_image_file opts base p =
   let s = Util.default_image_name base p in
@@ -660,11 +664,12 @@ let ged_child opts per_sel chil =
 
 let ged_fsource opts base fam =
   match opts.Gwexport.source with
-  | Some s -> Printf.ksprintf (oc opts) "1 SOUR %s\n" (encode opts s)
+  | Some "" -> ()
+  | Some s -> print_sour opts 1 (encode opts s)
   | None ->
     match sou base (get_fsources fam) with
     | "" -> ()
-    | s -> Printf.ksprintf (oc opts) "1 SOUR %s\n" (encode opts s)
+    | s -> print_sour opts 1 (encode opts s)
 
 let ged_comment opts base fam =
   if opts.Gwexport.no_notes <> `nnn then
