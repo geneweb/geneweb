@@ -72,18 +72,19 @@ let export conf base =
       end ipers IFS.empty
     in
     let no_notes =
-      match List.assoc_opt "notes" conf.env with
+      match List.assoc_opt "notes" conf.env  with
       | None -> `none
       | Some "nn" -> `nn
       | Some "nnn" -> `nnn
-      | _ -> assert false
+      | Some _ -> `none
     in
+    let source = Opt.map Mutil.decode (List.assoc_opt "source" conf.env) in
     let opts =
       { Gwexport.default_opts with
         oc = fname, Wserver.print_string, Wserver.close_connection
       ; no_notes
       ; no_picture = List.assoc_opt "pictures" conf.env = Some "off"
-      ; source = List.assoc_opt "source" conf.env
+      ; source
       ; base = Some (Gwdb.bname base, base)
       }
     in
