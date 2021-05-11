@@ -5,7 +5,6 @@ open Def
 open Gwdb
 open Gwexport
 
-let isolated = ref false
 let old_gw = ref false
 let only_file = ref ""
 let out_dir = ref ""
@@ -1643,7 +1642,7 @@ let rs_printf opts s =
   in
   loop true 0
 
-let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
+let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   let to_separate = separate base in
   let out_oc_first = ref true in
   let _ofile, oc, close = opts.oc in
@@ -1713,7 +1712,7 @@ let gwu opts base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   (* Ajout des personnes isolée à l'export. On leur ajoute des    *)
   (* parents pour pouvoir utiliser les autres fonctions normales. *)
   (* Export que si c'est toute la base.                           *)
-  if !isolated
+  if isolated
   && opts.asc = None
   && opts.desc = None
   && opts.ascdesc = None

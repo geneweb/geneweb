@@ -1,10 +1,12 @@
 open Geneweb
 open GwuLib
 
+let isolated = ref false
+
 let speclist opts =
   ( "-odir", Arg.String (fun s -> GwuLib.out_dir := s)
   , "<dir>  create files from original name in directory (else on -o file)" )
-  :: ( "-isolated", Arg.Set GwuLib.isolated
+  :: ( "-isolated", Arg.Set isolated
      , " export isolated persons (work only if export all database)." )
   :: ("-old_gw", Arg.Set GwuLib.old_gw
      , " do not export additional fields (for backward compatibility: < 7.00)" )
@@ -47,7 +49,7 @@ let main () =
     if not !GwuLib.raw_output then oc "encoding: utf-8\n";
     if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
     GwuLib.prepare_free_occ base ;
-    GwuLib.gwu opts base in_dir !out_dir src_oc_ht select ;
+    GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select ;
     Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht ;
     close ()
 

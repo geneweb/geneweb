@@ -92,6 +92,7 @@ let export conf base =
       | Some _ -> `none
     in
     let source = Opt.map Mutil.decode (List.assoc_opt "source" conf.env) in
+    let isolated = List.assoc_opt "isolated" conf.env <> Some "off" in
     let opts =
       { Gwexport.default_opts with
         oc = fname, Wserver.print_string, Wserver.close_connection
@@ -112,7 +113,7 @@ let export conf base =
         GwuLib.prepare_free_occ ~select:(fst select) base ;
         Wserver.print_string "encoding: utf-8\n" ;
         Wserver.print_string "gwplus\n\n" ;
-        GwuLib.gwu opts base "" "" (Hashtbl.create 0) select ;
+        GwuLib.gwu opts isolated base "" "" (Hashtbl.create 0) select ;
     end ;
     Wserver.wflush () ;
     true
