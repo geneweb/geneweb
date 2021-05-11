@@ -26,7 +26,7 @@ let export conf base =
       let n = List.assoc ("n" ^ string_of_int i) conf.env |> Mutil.decode in
       let p = List.assoc ("p" ^ string_of_int i) conf.env |> Mutil.decode in
       let oc =
-        match List.assoc_opt ("p" ^ string_of_int i) conf.env with
+        match List.assoc_opt ("oc" ^ string_of_int i) conf.env with
         | None -> 0
         | Some i -> int_of_string i
       in
