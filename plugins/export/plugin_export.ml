@@ -19,11 +19,24 @@ let export conf base =
   | None -> false
   | Some output ->
     Mutil.verbose := false ;
+    let find_iper i =
+      List.assoc ("i" ^ string_of_int i) conf.env |> Gwdb.iper_of_string
+    in
+    let find_npoc i =
+      let n = List.assoc ("n" ^ string_of_int i) conf.env |> Mutil.decode in
+      let p = List.assoc ("p" ^ string_of_int i) conf.env |> Mutil.decode in
+      let oc =
+        match List.assoc_opt ("p" ^ string_of_int i) conf.env with
+        | None -> 0
+        | Some i -> int_of_string i
+      in
+      match Gwdb.person_of_key base p n oc with
+      | None -> raise Not_found
+      | Some i -> i
+    in
+    let find_p i = try find_iper i with Not_found -> find_npoc i in
     let rec loop acc cnt =
-      try
-        loop
-          (IPS.add (List.assoc ("i" ^ string_of_int cnt) conf.env |> Gwdb.iper_of_string) acc)
-          (cnt + 1)
+      try loop (IPS.add (find_p cnt) acc) (cnt + 1)
       with Not_found -> acc
     in
     let ini = loop IPS.empty 1 in
