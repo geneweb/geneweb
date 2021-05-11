@@ -246,27 +246,24 @@ let has_infos opts base p =
   || get_death p <> NotDead
 
 let print_if_not_equal_to opts x base lab is =
-  if sou base is = x then ()
-  else Printf.ksprintf (oc opts) " %s %s" lab (correct_string base is)
+  if sou base is <> x
+  then Printf.ksprintf (oc opts) " %s %s" lab (correct_string base is)
 
 let print_src_if_not_equal_to opts x base lab is =
   match opts.source with
   | None -> if sou base is <> "" then print_if_not_equal_to opts x base lab is
+  | Some "" -> ()
   | Some x -> Printf.ksprintf (oc opts) " %s %s" lab (s_correct_string x)
 
 let print_if_no_empty opts = print_if_not_equal_to opts ""
 
-let print_src_if_no_empty opts base lab is =
-  if opts.source = None
-  then print_if_not_equal_to opts "" base lab is
-
 let print_if_no_empty_endline opts base lab is =
-  if sou base is = "" then ()
-  else Printf.ksprintf (oc opts) " %s %s\n" lab (correct_string base is)
+  if sou base is <> ""
+  then Printf.ksprintf (oc opts) " %s %s\n" lab (correct_string base is)
 
 let print_if_no_empty_no_newline opts base lab is =
-  if sou base is = "" then ()
-  else Printf.ksprintf (oc opts) " %s %s" lab (no_newlines (correct_string base is))
+  if sou base is <> ""
+  then Printf.ksprintf (oc opts) " %s %s" lab (no_newlines (correct_string base is))
 
 let print_first_name_alias opts base is =
   Printf.ksprintf (oc opts) " {%s}" (correct_string base is)
@@ -765,7 +762,7 @@ let print_fevent opts base gen in_comment e =
          print_witness opts base gen p;
          print_sep ())
     e.efam_witnesses;
-  let note = sou base e.efam_note in
+  let note = if opts.no_notes <> `nnn then sou base e.efam_note else "" in
   if note <> "" then
     List.iter (fun line -> Printf.ksprintf (oc opts) "note %s" line; print_sep ())
       (lines_list_of_string note)
