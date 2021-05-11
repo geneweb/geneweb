@@ -110,6 +110,8 @@ let export conf base =
         Gwb2gedLib.gwb2ged false opts select
       | `gw ->
         GwuLib.prepare_free_occ ~select:(fst select) base ;
+        Wserver.print_string "encoding: utf-8\n" ;
+        Wserver.print_string "gwplus\n\n" ;
         GwuLib.gwu opts base "" "" (Hashtbl.create 0) select ;
     end ;
     Wserver.wflush () ;
