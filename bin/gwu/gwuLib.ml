@@ -1718,8 +1718,10 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   && opts.ascdesc = None
   then
     Gwdb.Collection.iter begin fun i ->
-      if Gwdb.Marker.get gen.mark i || Gwdb.Marker.get gen.mark_rel i then ()
-      else
+      if (not @@ Gwdb.Marker.get gen.mark i)
+      && (not @@ Gwdb.Marker.get gen.mark_rel i)
+      && (per_sel i)
+      then
         let p = poi base i in
         match get_parents p with
           Some _ -> ()
