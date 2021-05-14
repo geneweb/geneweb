@@ -8,6 +8,9 @@ end
 module Perso = struct
   #include "perso.ml"
 end
+module Some = struct
+  #include "some.ml"
+end
 module Request = Gwd_lib.Request
 
 let w_base =
@@ -36,6 +39,11 @@ let home conf base : bool =
     end conf base
   else false
 
+let p =
+  w_base begin fun conf base -> match p_getenv conf.env "v" with
+    | Some v -> Some.first_name_print conf base v ; true
+    | None -> false
+  end
 
 let ns = "v7"
 
@@ -44,4 +52,7 @@ let _ =
     Util.add_lang_path assets ;
     fn conf base
   in
-  Gwd_lib.GwdPlugin.register ~ns [ "", aux home ]
+  Gwd_lib.GwdPlugin.register ~ns
+    [ "", aux home
+    ; "P", aux p
+    ]

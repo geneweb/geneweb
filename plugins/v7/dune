@@ -9,6 +9,7 @@
     (:included
       %{project_root}/plugins/v7/cousins.ml
       %{project_root}/plugins/v7/perso.ml
+      %{project_root}/plugins/v7/some.ml
     )
     (:src plugin_v7.cppo.ml)
   )
