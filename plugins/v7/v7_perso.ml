@@ -16,7 +16,7 @@ module Hutil = Geneweb.Hutil
 module Notes = Geneweb.Notes
 module Output = Geneweb.Output
 module SrcfileDisplay = Geneweb.SrcfileDisplay
-module Templ = Geneweb.Templ
+module Templ = V7_templ
 module Util = Geneweb.Util
 module Wiki = Geneweb.Wiki
 
@@ -5019,7 +5019,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   in
   if no_headers
   then
-      Hutil.interp_no_header conf templ_fname
+      V7_interp.gen_interp false conf templ_fname
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl = eval_transl conf base;
          Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -5036,7 +5036,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     in
     if size = 0 then Hutil.header conf title
     else
-      Hutil.interp_no_header conf templ_fname
+      V7_interp.gen_interp false conf templ_fname
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl = eval_transl conf base;
          Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -5044,7 +5044,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
          Templ.print_foreach = print_foreach conf base}
         env ep
   else
-    Hutil.interp conf templ_fname
+    V7_interp.gen_interp true conf templ_fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = eval_transl conf base;
        Templ.eval_predefined_apply = eval_predefined_apply conf;

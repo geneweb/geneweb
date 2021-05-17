@@ -7,7 +7,7 @@ open Geneweb.Util
 module Gutil = Geneweb.Gutil
 module Gwdb = Geneweb.Gwdb
 module Hutil = Geneweb.Hutil
-module Templ = Geneweb.Templ
+module Templ = V7_templ
 
 let rec alphabetic_order_list l1 l2 =
   if l1 = [] || l2 = [] then
@@ -597,7 +597,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
   end
 
 let print_buttons conf _base =
-  Hutil.interp_no_header conf "buttons_places"
+  V7_interp.gen_interp false conf "buttons_places"
     {Templ.eval_var = (fun _ -> raise Not_found);
      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
      Templ.eval_predefined_apply = (fun _ -> raise Not_found);

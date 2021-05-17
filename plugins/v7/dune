@@ -5,7 +5,11 @@
 
 (library
   (name plugin_v7_lib)
-  (libraries geneweb geneweb.gwd_lib)
+  (libraries geneweb geneweb.gwd_lib geneweb.util)
+  (preprocess
+    (per_module
+      ((action (run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %{input-file}))
+       v7_templ)))
   (modules
     v7_cousins
     v7_date
@@ -14,6 +18,7 @@
     v7_place
     v7_some
     v7_sosa
+    v7_templ
   )
   (wrapped true)
 )
