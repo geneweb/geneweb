@@ -1,5 +1,11 @@
 (dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
 
+(rule
+  (target templ.ml)
+  (deps templ.camlp5.ml)
+  (action (run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo -impl %{deps} -o %{target}))
+)
+
 (library
  (name geneweb)
  (public_name geneweb)

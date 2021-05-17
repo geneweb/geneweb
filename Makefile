@@ -18,32 +18,6 @@ BUILD_DIR=_build/default
 
 ###### [BEGIN] Generated files section
 
-CAMLP5_PA_EXTEND_FILES = \
-	lib/templ \
-
-CAMLP5_Q_MLAST_FILES = \
-	lib/templ
-
-CAMLP5_FILES = $(sort $(CAMLP5_Q_MLAST_FILES) $(CAMLP5_PA_EXTEND_FILES))
-
-$(CAMLP5_PA_EXTEND_FILES:=.ml): CAMLP5_OPT += pa_extend.cmo
-$(CAMLP5_Q_MLAST_FILES:=.ml): CAMLP5_OPT += q_MLast.cmo
-
-%.ml: CAMLP5_OPT=
-
-%.ml: %.camlp5.ml
-	@([ -z "$(CAMLP5_OPT)" ] \
-	|| false \
-	&& echo "ERROR generating $@: CAMLP5_OPT variable must be defined") \
-	|| (echo -n "Generating $@..." \
-	    && echo "(* DO NOT EDIT *)" > $@ \
-	    && echo "(* This file was generated from $< *)" >> $@ \
-	    && camlp5o pr_o.cmo $(CAMLP5_OPT) -impl $< >> $@ \
-	    && sed -i.bak -E 's/[(]\* (\[@.+\]) \*[)]/\1/g' $@ \
-	    && sed -i.bak -E 's/[(]\* (#[^\*]+) \*[)]/\1/g' $@ \
-	    && rm $@.bak \
-	    && echo " Done!")
-
 lib/gwlib.ml:
 	@echo -n "Generating $@..."
 	@echo "let prefix =" > $@
@@ -87,7 +61,6 @@ GENERATED_FILES_DEP = \
 	dune-workspace \
 	hd/etc/version.txt \
 	lib/gwlib.ml \
-	$(CAMLP5_FILES:=.ml) \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/consang/dune \
