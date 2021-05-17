@@ -11,6 +11,7 @@ let w_lock = Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked 
 let w_base = Gwd_lib.Request.w_base ~none:(fun conf -> Hutil.incorrect_request conf ; true)
 
 let export conf base =
+  assert conf.wizard ;
   match match List.assoc_opt "output" conf.env with
     | Some "GED" -> Some `ged
     | Some "GW" -> Some `gw
