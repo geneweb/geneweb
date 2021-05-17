@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<head>
+  <!-- $Id: list.txt, v7 21/01/2019 02:58:13 hg Exp $ -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
+  <title>%nn;
+    [*list/list (ancestors)] [of] [person/persons]0%if;(evar.surn!="") [by] [surname/surnames]0%end; [by] [place]%nn;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+%include;css
+%include;hed
+</head>
+<body%body_prop;>
+%message_to_wizard;
+<div class="container%if;(evar.wide="on")-fluid%end;">
+%include;perso_utils
+%define;get_ip(n)
+  %evar.in;
+%end;
+%define;get_var(vv, i)
+  %evar_cur.vv.i;
+%end;
+%define;get_pl(i)
+  %evar.pi;
+%end;
+%define;get_sub(nn,ss)
+  %substr_start.nn.ss;
+%end;
+
+%( %qvar.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)
+%define;get_marriage(index)
+  %qvar.index.marriage_places;
+%end;
+
+%define;get_value(index,param)
+  %qvar.index.param;
+%end;
+%let;nb;%evar.nb;%in;
+
+<div class="d-flex justify-content-between">
+  <h1>[*list/list (ancestors)] [of] [person/persons]1%if;(evar.surn!="") [by] [surname/surnames]0%end; [by] [place]</h1>
+  <div class="btn-toolbar mt-2" role="toolbar" aria-label="Toolbar for list of individuals">
+    <div class="btn-group" role="group">
+      <a href="%prefix_base_password;%nn;
+          %foreach;env_binding;%if;(env.key!="dates" and env.key!="")%env.key;=%env.val;&%end;%end;%nn;
+          %if;(evar.dates!="on")dates=on;"%else;" class="text-muted"%end;
+        title="%if;(evar.dates="on")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date/dates]1">
+        <i class="fa fa-calendar-alt"></i>
+      </a>
+    </div>
+    <div class="btn-group ml-2" role="group">
+      <a href="%prefix_base_password;%nn;
+        %foreach;env_binding;%if;(env.key!="parents")%env.key;=%env.val;&%end;%end;%nn;
+        %if;(evar.parents!="on")parents=on;%end;"
+        title="%if;(evar.parents="on")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [parents]">
+        <i class="fa fa-user %if;(evar.parents="on")text-muted%else;male%end;"></i>%nn;
+        <i class="fa fa-user %if;(evar.parents="on")text-muted%else;female%end;"></i>%nn;
+      </a>
+    </div>
+    %if;(nb!=1)
+      <div class="btn-group ml-2" role="group">
+        <a href="%prefix_base_password;%nn;
+          %foreach;env_binding;%if;(env.key!="date_sort")%env.key;=%env.val;&%end;%end;%nn;
+          %if;(evar.date_sort!="on")date_sort=on;%end;"
+          title="[*sort by/branch/alphabetic order]0 %if;(evar.date_sort="on")[date/dates]2%else;[sort by/branch/alphabetic order]2%end;">
+          <i class="fa fa-sort-%if;(evar.date_sort="on")numeric%else;amount%end;-down fa-fw"></i>%nn;
+        </a>
+      </div>
+    %end;
+  </div>
+</div>
+%let;opt;%nn;
+  %if;(evar.bi="on")&bi=on%end;%nn;
+  %if;(evar.bp="on")&bp=on%end;%nn;
+  %if;(evar.ma="on")&ma=on%end;%nn;
+  %if;(evar.de="on")&de=on%end;%nn;
+  %if;(evar.bu="on")&bu=on%end;%nn;
+  %if;(evar.long="on")&long=on%end;%nn;
+  %if;(evar.f_sort="on")&f_sort=on%end;%in;
+%let;k;%if;(evar.k!="")%evar.k;%end;%in;
+%let;nbs;%if;(evar.nbs!="")&nbs=%evar.nbs;%else;nbs=3%end;%in;
+%define;book_of(xx)[*book of %s:::xx]%end;
+
+<div>
+%if;(evar.surn!="")[*surname/surnames]0[:] <span class="text-primary">%evar.surn;</span>.%end;
+<br>[*event/events]1%if;(evar.date_sort="on")
+  %sp;[sorted by]%sp;
+  %if;(evar.date_sort="on")[date/dates]1%nn;
+  %else;[sort by/branch/alphabetic order]2 ([first name/first names]1)%nn;
+  %end;
+%end;[:]%sp;
+%define;evt(vv,tt,ii)
+  %if;("vv"!="bi"), %end;<span class="text-%if;(evar.vv="on")primary%else;secondary%end;">tt ii</span>%nn;
+%end;
+%apply;evt("bi",[birth],"N")
+%apply;evt("bp",[baptism],"B")
+%apply;evt("ma",[marriage event],"M")
+%apply;evt("de",[death],"D")
+%apply;evt("bu",[burial],"S").
+</div>
+
+%define;nbmds(xx,yy,tt,kk)
+  %if;(xx is_substr "kk" or xx="kk")yy%nn;
+  %else;%if;("tt"=1)&nbsp;%end;
+  %end;
+%end;
+
+%define;tags(xx,tt,ss)
+  %let;index;xx%in;
+  %let;birthplace;%apply;get_value(index, "birth_place")%in;
+  %let;baptismplace;%apply;get_value(index, "baptism_place")%in;
+  %let;marriageplace;%apply;get_marriage(index)%in;
+  %let;deathplace;%apply;get_value(index, "death_place")%in;
+  %let;burialplace;%apply;get_value(index, "burial_place")%in;
+  %apply;nbmds("birthplace","N","tt","ss")%nn;
+  %apply;nbmds("baptismplace","B","tt","ss")%nn;
+  %apply;nbmds("marriageplace","M","tt","ss")%nn;
+  %apply;nbmds("deathplace","D","tt","ss")%nn;
+  %apply;nbmds("burialplace","S","tt","ss")%nn;
+%end;
+
+%let;max_rlm_nbr;%if;(evar.max_rlm_nbr!="")%evar.max_rlm_nbr;%elseif;(bvar.max_rlm_nbr!="")%bvar.max_rlm_nbr;%else;80%end;%in;
+
+%( RLM commence a i1 et non i0 on décale i(0) en i(nb), à défaut on pourrait aussi tout décaller à i+1 %)
+%if;(nb < max_rlm_nbr)
+  %if;(nb!=1)
+    <a role="button" class="ml-5" href="%prefix&m=RLM&%nn;
+      %foreach;env_binding;%nn;
+        %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
+         and env.key!="k"
+         and env.key!="bi" and env.key!="bd" and env.key!="ma" and env.key!="de" and env.key!="bu"
+         and env.key!="surn" and env.key!="date_sort" and env.key!="i0")%env.key;=%env.val;&%nn;
+        %elseif(env.key="i0")i%nb;=%env.val;&%end;%nn;
+        %end;%nn;
+        %for;i;0;nb;%if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%and;%apply;get_var("p",i)%end;
+                    %else;&t%expr(nb)=%apply;tags%with;%apply;get_ip(0)%and;%and;%apply;get_var("p",i)%end;%end;%end;">%nn;
+      <i class="fa fa-bezier-curve mr-2 mt-3"></i>[*multi relations graph] (%nb;)%nn;
+    </a>
+  %end;
+%else;
+  <i class="fa fa-bezier-curve mr-2 mt-3"></i>[*multi relations graph] (%nb;)<br>
+  [*rlm_nbr too large]
+%end;
+
+%empty_sorted_list
+%for;i;0;nb;
+  %let;index;%apply;get_ip(i)%in;
+  %let;first_name;%apply;get_value(index, "first_name")%in;
+  %let;surname;%apply;get_value(index, "surname")%in;
+  %let;occ;%apply;get_value(index, "occ")%in;
+  %let;dates;%apply;get_value(index, "dates_sort")%in;
+  %let;s;%apply;get_var("p", i)%in;
+  %let;so;%if;(s="")%k;%else;%s;%end;%in;
+  %if;(evar.date_sort="on")
+    %apply;add_in_sorted_list%with;
+      %so;%and;
+      %dates;%and;
+      %index;%and;
+      %i;%and;
+    %end;
+  %else;
+    %apply;add_in_sorted_list%with;
+      %so;%and;
+      %if;(evar.surn="")%surname;%end;%first_name;%occ;%and;
+      %index;%and;
+      %i;%and;
+    %end;
+  %end;
+%end;
+
+<div class="mt-2">
+  %foreach;sorted_list_item;
+  %let;sub;%apply;get_sub(3,item.1)%in;
+  %if;(item.1!=prev_item.1 or prev_item.1="")<li>
+    %if;(k!="")<a href="%prefix;m=PS&k=%item.1;%opt;">%item.1;</a>%end;
+    %if;wizard;
+      <a href="%prefix;m=MOD_DATA&%nbs;&data=place&s=%sub;#%item.1;" 
+        title="%apply;book_of([places]) [modify] #%item.1;…">
+        <i class="fa fa-magic fa-xs ml-1"></i>
+      </a>
+    %end;
+  %end;
+    <div class="ml-3">
+      %let;index;%item.3;%in;
+      %let;so;%item.1;%in;
+      %let;access;%apply;get_value(index, "access")%in;
+      %let;sex;%apply;get_value(index, "sex")%in;
+      <span class="text-monospace mr-2">%apply;tags(index,"1",item.1)</span>%nn;
+      <a href="%prefix;%access;">%nn;
+      %apply;get_value(index, "first_name")%sp;
+      %apply;get_value(index, "surname")%nn;
+      %( Occurence number is hidden of those lists for the moment
+      %let;occ;%apply;get_value(index, "occ")%in;%nn;
+      %if;(occ!="0")%sp;%[%occ;%]%end;%)</a>%nn;
+      %if;(evar.dates="on")
+        <a href="%prefix;m=MOD_IND&i=%index;">%apply;get_value(index, "dates")</a>%nn;
+      %end;
+      %if;(evar.parents="on")
+        %let;fa;%apply;get_value(index, "father")%in;
+        %let;mo;%apply;get_value(index, "mother")%in;
+        %if;(fa!="" or mo!=""), %sp;
+          %let;fa;%if;(fa="")?%else;%fa;%end;%in;
+          %let;mo;%if;(mo="")?%else;%mo;%end;%in;
+          %apply;a_of_b%with;
+            %if;(sex=0)[son/daughter/child]0
+            %elseif;(sex=1)[son/daughter/child]1
+            %else;[son/daughter/child]2%end;
+          %and;%fa; [and] %mo;
+          %end;
+        %end;
+      %end;
+    </div>
+  %end;
+</div>
+
+%include;trl
+%include;copyr
+</div>
+%include;js
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+</html>
