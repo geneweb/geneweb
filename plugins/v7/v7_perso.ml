@@ -3304,22 +3304,17 @@ and eval_bool_person_field conf base env (p, p_auth) =
           false
       end
   | "has_sources" ->
-      p_auth &&
-      (sou base (get_psources p) <> "" || sou base (get_birth_src p) <> "" ||
-       sou base (get_baptism_src p) <> "" ||
-       sou base (get_death_src p) <> "" ||
-       sou base (get_burial_src p) <> "" ||
-       Array.exists
-         (fun ifam ->
-            let fam = foi base ifam in
-            let isp = Gutil.spouse (get_iper p) fam in
-            let sp = poi base isp in
-            (* On sait que p_auth vaut vrai. *)
-            let m_auth = authorized_age conf base sp in
-            m_auth &&
-            (sou base (get_marriage_src fam) <> "" ||
-             sou base (get_fsources fam) <> ""))
-         (get_family p))
+    let events = events_list conf base p in
+    let nb_sources =
+      let rec loop events nb_src =
+        match events with
+        | [] -> nb_src
+        | (_name, _, _p, _n, s, _wl, _) :: events ->
+          if (sou base s) <> "" then loop events (nb_src + 1)
+          else loop events nb_src
+      in loop events 0
+    in
+    p_auth && (sou base (get_psources p) <> "") && (nb_sources > 0)
   | "has_surnames_aliases" ->
       if not p_auth && is_hide_names conf p then false
       else get_surnames_aliases p <> []
