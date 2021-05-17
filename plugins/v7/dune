@@ -8,6 +8,7 @@
   (libraries geneweb geneweb.gwd_lib)
   (modules
     v7_cousins
+    v7_date
     v7_interp
     v7_perso
     v7_place
