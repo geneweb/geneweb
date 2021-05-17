@@ -1,0 +1,27 @@
+(alias
+   (name plugin)
+   (deps (source_tree assets) plugin_v7.cmxs)
+)
+
+(rule
+  (target plugin_v7.ml)
+  (deps
+    (:included
+      %{project_root}/plugins/v7/cousins.ml
+      %{project_root}/plugins/v7/perso.ml
+    )
+    (:src plugin_v7.cppo.ml)
+  )
+  (action (run %{bin:cppo} %{src} -o %{target}))
+)
+
+
+(executable
+  (name plugin_v7)
+  (libraries geneweb.gwd_lib)
+  (flags -linkall)
+  (modes (native plugin))
+  (modules plugin_v7)
+)
+
+(alias (name plugin) (deps plugin_v7.cmxs))

@@ -211,7 +211,6 @@ let register_plugin dir =
     end lex end ;
   let assets = Filename.concat dir "assets" in
   GwdPlugin.assets := assets ;
-  if Sys.file_exists dir then Secure.add_lang_path assets ;
   Dynlink.loadfile plugin ;
   GwdPlugin.assets := ""
 
