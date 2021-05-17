@@ -706,6 +706,28 @@ let rec eval_variable conf =
         Some vv -> Util.escape_html vv
       | None -> ""
       end
+  (* look for evar.vi scanning i down to 0 *)
+  | ["evar_cur"; v; i] ->
+    let n = int_of_string i in
+    let rec loop n =
+      match Util.p_getenv (conf.env @ conf.henv) (v ^ string_of_int n) with
+      | Some vv -> vv
+      | None -> if n > 0 then loop (n - 1) else ""
+    in loop n
+  | ["substr_start"; n; v] ->
+    let n = int_of_string n in
+    (* Attention aux caractères utf-8 !! *)
+    let sub =
+      let len = String.length v in
+      let rec loop i n str =
+        if n = 0 || i >= len then str
+        else
+          let nbc = Utf8.nbc v.[i] in
+          let car = String.sub v i nbc in
+          loop (i+nbc) (n-1) (str ^ car)
+      in
+      loop 0 n ""
+    in sub
   | "time" :: sl -> eval_time_var conf sl
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
