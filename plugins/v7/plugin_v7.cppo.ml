@@ -11,6 +11,10 @@ end
 module Some = struct
   #include "some.ml"
 end
+module Place = struct
+  #include "place.ml"
+end
+
 module Request = Gwd_lib.Request
 
 let w_base =
@@ -39,10 +43,24 @@ let home conf base : bool =
     end conf base
   else false
 
+let l =
+  w_base begin fun conf base ->
+    Gwdb.dummy_iper
+    |> Gwdb.empty_person base
+    |> Perso.interp_templ "list" conf base
+    |> fun () -> true
+    end
+
 let p =
   w_base begin fun conf base -> match p_getenv conf.env "v" with
     | Some v -> Some.first_name_print conf base v ; true
     | None -> false
+  end
+
+let ps =
+  w_base begin fun conf base ->
+    Place.print_all_places_surnames conf base ;
+    true
   end
 
 let ns = "v7"
@@ -54,5 +72,7 @@ let _ =
   in
   Gwd_lib.GwdPlugin.register ~ns
     [ "", aux home
+    ; "L", aux l
     ; "P", aux p
+    ; "PS", aux ps
     ]

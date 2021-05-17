@@ -3866,6 +3866,10 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           else ""
       | _ -> raise Not_found
       end
+  | "marriage_places" ->
+    List.fold_left
+      (fun acc ifam -> acc ^ (sou base (get_marriage_place (foi base ifam))) ^ "|")
+    "|" (Array.to_list (get_family p))
   | "mother_age_at_birth" -> string_of_parent_age conf base ep get_mother
   | "misc_names" ->
       if p_auth then
