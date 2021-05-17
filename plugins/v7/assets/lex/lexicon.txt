@@ -1,27 +1,67 @@
-    v7 hide others
-en: hide other first mames
-fr: cacher les autres prénoms
+    v7 all
+en: all
+fr: tous
 
-    v7 show others
-en: show other first names
-fr: afficher les autres prénoms
+    v7 any place
+en: sub-places
+fr: sous-lieux
 
-    v7 exact match
-en: exact match (upper/lower and accents)
-fr: correspondance exacte (majuscules/minuscules et accents)
+    v7 any place title
+en: search in the list of sub-places
+fr: rechercher dans la liste des sous-lieux
+
+    v7 anywhere
+en: match anywhere
+fr: correspondance sans contrainte
 
     v7 approxim match
 en: match with no capitale nor accents
 fr: correspondance sans capitales ni accents
 
+    v7 case sensitive
+en: case sensitive
+fr: capitales et accents
+
+    v7 case sensitive title
+en: dont ignore case and accents
+fr: tenir compte des majuscules et accents
+
+    v7 exact match
+en: exact match (upper/lower and accents)
+fr: correspondance exacte (majuscules/minuscules et accents)
+
+    v7 hide others
+en: hide other first mames
+fr: cacher les autres prénoms
+
+    v7 matching
+en: matching
+fr: correspondance
+
+    v7 max nbr
+en: max rel nbr
+fr: max rel nbr
+
+    v7 max nbr title
+en: max number for relation list
+fr: nombre maximum pour les listes de relations
+
     v7 refresh fnames cache
 en: refresh fnames cache
 fr: reconstruire le cache des prénoms
+
+    v7 show others
+en: show other first names
+fr: afficher les autres prénoms
 
     v7 word boundaries
 en: match full words
 fr: correspondance de mots entiers
 
-    v7 anywhere
-en: match anywhere
-fr: correspondance sans contrainte
+    v7 word match
+en: word match
+fr: mot complet
+
+    v7 word match title
+en: match full location name
+fr: comparer avec le nom complet d'un lieu

@@ -57,38 +57,38 @@
           (evar.de!="" and evar.de="on") and
           (evar.bu!="" and evar.bu="on")) checked%end;>
         <label class="custom-control-label" title="[*all]"
-          for="all">[*all]</label>
+          for="all">[*v7 all]</label>
       </div>
     </div>
     <div class="form-group">
-      <span>[*matching][:]</span>
+      <span>[*v7 matching][:]</span>
       <div class="custom-control custom-checkbox ml-4">
         <input type="checkbox" class="custom-control-input" name="word"
           id="word" value="on"
           %if;(evar.word!="" and evar.word="on") checked%end;>
-        <label class="custom-control-label" title="[*word match title]"
-          for="word">[*word match]</label>
+        <label class="custom-control-label" title="[*v7 word match title]"
+          for="word">[*v7 word match]</label>
       </div>
       <div class="custom-control custom-checkbox ml-4">
         <input type="checkbox" class="custom-control-input" name="lower"
           id="lower" value="on"
           %if;(evar.lower!="" and evar.lower="on") checked%end;>
-        <label class="custom-control-label" title="[*case sensitive title]"
-          for="lower">[*case sensitive]</label>
+        <label class="custom-control-label" title="[*v7 case sensitive title]"
+          for="lower">[*v7 case sensitive]</label>
       </div>
       <div class="custom-control custom-checkbox ml-4">
         <input type="checkbox" class="custom-control-input" name="any"
           id="any" value="on"
           %if;(evar.any!="" and evar.any="on") checked%end;>
-        <label class="custom-control-label" title="[*any place title]"
-          for="any">[*any place]</label>
+        <label class="custom-control-label" title="[*v7 any place title]"
+          for="any">[*v7 any place]</label>
       </div>
       <input type="text" class=" ml-4" size="2"
         name="max_rlm_nbr" id="max_rlm_nbr" 
         placeholder=%if;(evar.max_rlm_nbr!="")"%evar.max_rlm_nbr;"
           %elseif;(bvar.max_rlm_nbr!="")"%bvar.max_rlm_nbr;"
           %else;"80"%end;>
-      <label class="label ml-1" title="[*max nbr title]">[*max nbr]</label>
+      <label class="label ml-1" title="[*v7 max nbr title]">[*v7 max nbr]</label>
       %if;(evar.display="long")<input type="hidden" name="display" id="display" value="long">%end;
       <button type="submit" class="btn btn-primary btn-sm ml-4"
         title="[*search/case sensitive]0 [surname/surnames]1 /
