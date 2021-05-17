@@ -3,24 +3,24 @@
    (deps (source_tree assets) plugin_v7.cmxs)
 )
 
-(rule
-  (target plugin_v7.ml)
-  (deps
-    (:included
-      %{project_root}/plugins/v7/cousins.ml
-      %{project_root}/plugins/v7/perso.ml
-      %{project_root}/plugins/v7/some.ml
-      %{project_root}/plugins/v7/place.ml
-    )
-    (:src plugin_v7.cppo.ml)
+(library
+  (name plugin_v7_lib)
+  (libraries geneweb geneweb.gwd_lib)
+  (modules
+    v7_cousins
+    v7_interp
+    v7_perso
+    v7_place
+    v7_some
+    v7_sosa
   )
-  (action (run %{bin:cppo} %{src} -o %{target}))
+  (wrapped true)
 )
-
 
 (executable
   (name plugin_v7)
-  (libraries geneweb.gwd_lib)
+  (libraries geneweb.gwd_lib plugin_v7_lib)
+  (embed_in_plugin_libraries plugin_v7_lib)
   (flags -linkall)
   (modes (native plugin))
   (modules plugin_v7)
