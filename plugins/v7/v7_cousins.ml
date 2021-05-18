@@ -419,8 +419,6 @@ let print_anniv conf base p dead_people level =
     if dead_people then BirthdayDisplay.gen_print_menu_dead conf base f_scan mode
     else BirthdayDisplay.gen_print_menu_birth conf base f_scan mode
 
-let cousmenu_print = !V7_interp.templ "cousmenu"
-
 let print conf base p =
   let max_lev =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
@@ -440,4 +438,4 @@ let print conf base p =
   | (_, _, Some (("AN" | "AD") as t)) when conf.wizard || conf.friend ->
     print_anniv conf base p (t = "AD") max_lev
   | _ ->
-    cousmenu_print conf base p
+    !V7_interp.templ "cousmenu" conf base p
