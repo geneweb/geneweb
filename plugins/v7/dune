@@ -18,6 +18,7 @@
     v7_place
     v7_some
     v7_sosa
+    v7_srcfile
     v7_templ
   )
   (wrapped true)

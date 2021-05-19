@@ -4,6 +4,8 @@
 open Gwdb
 open Config
 
+type src_mode = Lang | Source
+
 val print : config -> base -> string -> unit
 val print_source : config -> base -> string -> unit
 val print_start : config -> base -> unit
@@ -12,3 +14,5 @@ val incr_request_counter : config -> (int * int * string) option
 
 val adm_file : string -> string
 val source_file_name : config -> string -> string
+
+val copy_from_stream : config -> base -> char Stream.t -> src_mode -> unit
