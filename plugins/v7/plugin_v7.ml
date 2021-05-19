@@ -58,6 +58,22 @@ let c =
   | _ -> false
   end
 
+let doc =
+  w_base begin fun conf base ->
+    let _ = Printf.eprintf "m=DOC\n" in
+    match Util.p_getenv conf.env "s" with
+    | Some f ->
+        begin
+          let _ = Printf.eprintf "m=DOC;f=%s\n" f in
+          if Filename.check_suffix f ".txt" then
+            let f = Filename.chop_suffix f ".txt" in
+            V7_srcfile.new_print_source conf base f
+          else V7_srcfile.new_print_source_image conf f;
+          true
+        end
+    | None -> false
+  end
+
 let ns = "v7"
 
 let _ =
@@ -71,4 +87,5 @@ let _ =
     ; "P", aux p
     ; "PS", aux ps
     ; "C", aux c
+    ; "DOC", aux doc
     ]
