@@ -50,6 +50,13 @@ let ps =
     V7_place.print_all_places_surnames conf base ;
     true
   end
+ 
+let c =
+  w_base begin fun conf base ->
+   match Util.find_person_in_env conf base "" with
+  | Some p -> V7_cousins.print conf base p ; true
+  | _ -> false
+  end
 
 let ns = "v7"
 
@@ -63,4 +70,5 @@ let _ =
     ; "L", aux l
     ; "P", aux p
     ; "PS", aux ps
+    ; "C", aux c
     ]
