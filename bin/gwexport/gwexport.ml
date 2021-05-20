@@ -13,7 +13,7 @@ type gwexport_opts =
   ; img_base_path : string
   ; keys : string list
   ; mem : bool
-  ; no_notes : bool
+  ; no_notes : [ `none | `nn | `nnn ]
   ; no_picture : bool
   ; oc : string * (string -> unit) * (unit -> unit)
   ; parentship : bool
@@ -23,37 +23,36 @@ type gwexport_opts =
   ; verbose : bool
   }
 
-let opts =
-  ref { asc = None
-      ; ascdesc = None
-      ; base = None
-      ; censor = 0
-      ; charset = Utf8
-      ; desc = None
-      ; img_base_path = ""
-      ; keys = []
-      ; mem = false
-      ; no_notes = false
-      ; no_picture = false
-      ; oc = ("", prerr_string, fun () -> close_out stderr)
-      ; parentship = false
-      ; picture_path = false
-      ; source = None
-      ; surnames = []
-      ; verbose = false
-      }
+let default_opts =
+  { asc = None
+  ; ascdesc = None
+  ; base = None
+  ; censor = 0
+  ; charset = Utf8
+  ; desc = None
+  ; img_base_path = ""
+  ; keys = []
+  ; mem = false
+  ; no_notes = `none
+  ; no_picture = false
+  ; oc = ("", prerr_string, fun () -> close_out stderr)
+  ; parentship = false
+  ; picture_path = false
+  ; source = None
+  ; surnames = []
+  ; verbose = false
+  }
 
 let errmsg = "Usage: " ^ Sys.argv.(0) ^ " <BASE> [OPT]"
 
-let anonfun s =
-  if !opts.base = None
+let anonfun c s =
+  if !c.base = None
   then begin
     Secure.set_base_dir (Filename.dirname s) ;
-    opts := { !opts with base = Some (s, Gwdb.open_base s) }
+    c := { !c with base = Some (s, Gwdb.open_base s) }
   end else raise (Arg.Bad "Cannot treat several databases")
 
-let speclist =
-  let c = opts in
+let speclist c =
   [ ( "-a", Arg.Int (fun s -> c := { !c with asc = Some s })
     , "<N> maximum generation of the root's ascendants" )
   ; ( "-ad", Arg.Int (fun s -> c := { !c with ascdesc = Some s })
@@ -79,8 +78,10 @@ let speclist =
     , "<N> maximum generation of the root's descendants." )
   ; ( "-mem", Arg.Unit (fun () -> c := { !c with mem = true })
     , " save memory space, but slower." )
-  ; ( "-nn", Arg.Unit (fun () -> c := { !c with no_notes = true })
+  ; ( "-nn", Arg.Unit (fun () -> if !c.no_notes = `none then c := { !c with no_notes = `nn })
     , " no (database) notes." )
+  ; ( "-nnn", Arg.Unit (fun () -> c := { !c with no_notes = `nnn })
+    , " no notes (implies -nn)." )
   ; ( "-nopicture", Arg.Unit (fun () -> c := { !c with no_picture = true })
     , " don't extract individual picture." )
   ; ( "-o", Arg.String (fun s ->

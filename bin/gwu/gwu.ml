@@ -1,10 +1,12 @@
 open Geneweb
 open GwuLib
 
-let speclist =
+let isolated = ref false
+
+let speclist opts =
   ( "-odir", Arg.String (fun s -> GwuLib.out_dir := s)
   , "<dir>  create files from original name in directory (else on -o file)" )
-  :: ( "-isolated", Arg.Set GwuLib.isolated
+  :: ( "-isolated", Arg.Set isolated
      , " export isolated persons (work only if export all database)." )
   :: ("-old_gw", Arg.Set GwuLib.old_gw
      , " do not export additional fields (for backward compatibility: < 7.00)" )
@@ -23,12 +25,13 @@ let speclist =
         in the files. Gwu reconnects them to the separated families (i.e. \
         displays them to standard output) if the size of these groups is less \
         than " ^ string_of_int !GwuLib.sep_limit ^ ". The present option changes this limit.")
-  :: Gwexport.speclist
+  :: Gwexport.speclist opts
   |> Arg.align
 
 let main () =
-  Arg.parse speclist Gwexport.anonfun Gwexport.errmsg ;
-  let opts = !Gwexport.opts in
+  let opts = ref Gwexport.default_opts in
+  Arg.parse (speclist opts) (Gwexport.anonfun opts) Gwexport.errmsg ;
+  let opts = !opts in
   match opts.base with
   | None -> assert false
   | Some (ifile, base) ->
@@ -46,7 +49,7 @@ let main () =
     if not !GwuLib.raw_output then oc "encoding: utf-8\n";
     if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
     GwuLib.prepare_free_occ base ;
-    GwuLib.gwu opts base in_dir !out_dir src_oc_ht select ;
+    GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select ;
     Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht ;
     close ()
 

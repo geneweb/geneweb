@@ -1,14 +1,16 @@
 open Geneweb
 let with_indexes = ref false
 
-let speclist =
+let speclist opts =
   ( "-indexes", Arg.Set with_indexes, " export indexes in gedcom" )
-  :: Gwexport.speclist
+  :: Gwexport.speclist opts
   |> Arg.align
 
 let main () =
-  Arg.parse speclist Gwexport.anonfun Gwexport.errmsg ;
-  let select = Gwexport.select !Gwexport.opts [] in
-  Gwb2gedLib.gwb2ged !with_indexes !Gwexport.opts select
+  let opts = ref Gwexport.default_opts in
+  Arg.parse (speclist opts) (Gwexport.anonfun opts) Gwexport.errmsg ;
+  let opts = !opts in
+  let select = Gwexport.select opts [] in
+  Gwb2gedLib.gwb2ged !with_indexes opts select
 
 let _ = Printexc.catch main ()
