@@ -3,10 +3,12 @@
 open Geneweb.Config
 open Geneweb.Gwdb
 open Geneweb.Util
+open Geneweb.Output
 
 module Gutil = Geneweb.Gutil
 module Gwdb = Geneweb.Gwdb
 module Hutil = Geneweb.Hutil
+module Output = Geneweb.Output
 module Templ = V7_templ
 
 let rec alphabetic_order_list l1 l2 =
@@ -373,35 +375,35 @@ let print_place_list conf opt long link_to_ind max_rlm_nbr pl_l =
           | _ -> (cnt, so, p)
           in loop2 0 "" [] pl;
         in
-        if not first then Wserver.printf ", " ;
+        if not first then Output.printf conf ", " ;
         let p1 =  List.hd p in
         let p2 = p1 ^
           (if List.length p > 1 then (", " ^ (List.hd (List.tl p))) else "")
         in
-        Wserver.printf
+        Output.printf conf
           "<a href=\"%sm=PS%s%s%s\" title=\"%s\">%s</a>"
             (commd conf) opt ("&k=" ^ (Mutil.encode p2))
             (if not long then "&display=long" else "&display=short") title (p1) ;
         if link_to_ind && cnt < max_rlm_nbr then
           begin
-          Wserver.printf " (<a href=\"%sm=L%s%s&nb=%d%s" (commd conf)
+          Output.printf conf " (<a href=\"%sm=L%s%s&nb=%d%s" (commd conf)
             ("&k=" ^ (Mutil.encode so)) opt cnt
             (if max_rlm <> "" then "&max_rlm_nbr=" ^ max_rlm else "") ;
           let rec loop3 cnt =
             function
             | (so, _, ipl) :: t_pl ->
-                Wserver.printf "&p%d=%s" cnt so ;
+                Output.printf conf "&p%d=%s" cnt so ;
                 List.iteri (fun i ip ->
-                  Wserver.printf "&i%d=%s" (i + cnt) (Gwdb.string_of_iper ip))
+                  Output.printf conf "&i%d=%s" (i + cnt) (Gwdb.string_of_iper ip))
                 ipl ;
                 loop3 (cnt + List.length ipl) t_pl
             | _ -> ()
           in loop3 0 pl ;
-          Wserver.printf "\" title=\" %s\">%d</a>)"
+          Output.printf conf "\" title=\" %s\">%d</a>)"
             (Utf8.capitalize (transl conf "summary book ascendants")) cnt
           end
         else
-          Wserver.printf " (%d)" cnt ;
+          Output.printf conf " (%d)" cnt ;
         loop1 false t_pl_l
     | _ -> ()
     in
@@ -447,7 +449,7 @@ let print_html_places_surnames_short conf _base max_rlm_nbr link_to_ind
       function
       | ((so, _), p1 :: t_pl, _, ipl) :: t_list when p1 <> prev ->
         if acc <> [] then
-          Wserver.printf "<li>%s<br>" prev;
+          Output.printf conf "<li>%s<br>" prev;
           print_place_list conf opt long link_to_ind max_rlm_nbr acc ;
         let p2 = if List.length t_pl > 0 then [(List.hd t_pl); p1] else [p1] in
         let ipl = List.flatten ipl in
@@ -458,12 +460,12 @@ let print_html_places_surnames_short conf _base max_rlm_nbr link_to_ind
         loop2 ([(so, p2, ipl)] :: acc) p1 t_list
       | _ ->
         if acc <> [] then
-          Wserver.printf "<li>%s<br>" prev;
+          Output.printf conf "<li>%s<br>" prev;
           print_place_list conf opt long link_to_ind max_rlm_nbr acc
     in
-    Wserver.printf "<ul>\n";
+    Output.printf conf "<ul>\n";
     loop2 [] "" new_list;
-    Wserver.printf "</ul>\n"
+    Output.printf conf "</ul>\n"
 
 let print_html_places_surnames conf base max_rlm_nbr link_to_ind
   (array : ((string * string list) * (string * iper list) list) array) =
@@ -482,25 +484,25 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
     (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
     let len = List.length ips in
-    Wserver.printf "<a href=\"%s" (commd conf);
+    Output.printf conf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
-    then Wserver.print_string (acces conf base @@ pget conf base @@ List.hd ips)
-    else Wserver.printf "m=N&v=%s" (Mutil.encode sn);
-    Wserver.printf "\">%s</a>" sn;
+    then Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
+    else Output.printf conf "m=N&v=%s" (Mutil.encode sn);
+    Output.printf conf "\">%s</a>" sn;
     if link_to_ind && List.length ips < max_rlm_nbr then
       begin
-        Wserver.printf " (<a href=\"%sm=L%s%s&nb=%d" (commd conf)
+        Output.printf conf " (<a href=\"%sm=L%s%s&nb=%d" (commd conf)
           ("&k=" ^ (Mutil.encode so))
           opt len ;
-        Wserver.printf "&p0=%s" so ;
+        Output.printf conf "&p0=%s" so ;
         List.iteri (fun i ip ->
-          Wserver.printf "&i%d=%s" i (Gwdb.string_of_iper ip))
+          Output.printf conf "&i%d=%s" i (Gwdb.string_of_iper ip))
         ips ;
-        Wserver.printf "\" title=\"%s\">%d</a>)"
+        Output.printf conf "\" title=\"%s\">%d</a>)"
           (Utf8.capitalize (transl conf "summary book ascendants")) (List.length ips)
       end
     else
-      Wserver.printf " (%d)" len
+      Output.printf conf " (%d)" len
   in
   let print_sn_list (snl : (string * iper list) list) so =
     let snl = if f_sort then
@@ -514,11 +516,11 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
             if a_sort then Gutil.alphabetic_order p2 p1
             else Gutil.alphabetic_order p1 p2) snl
     in
-    Wserver.printf "<li>\n";
+    Output.printf conf "<li>\n";
     Mutil.list_iter_first (fun first x ->
-      if not first then Wserver.printf ",\n" ; print_sn x so) snl ;
-    Wserver.printf "\n";
-    Wserver.printf "</li>\n"
+      if not first then Output.printf conf ",\n" ; print_sn x so) snl ;
+    Output.printf conf "\n";
+    Output.printf conf "</li>\n"
   in
   let r = Str.regexp "\"" in
   let rec loop prev =
@@ -530,27 +532,27 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
           | [], l2 -> List.iter (fun x ->
               let str = Printf.sprintf "<a href=\"%sm=PS%s%s\">%s</a>\n"
                 (commd conf) ("&k=" ^ k) opt x in
-              Wserver.printf "<li>%s<ul>\n" str) l2
+              Output.printf conf "<li>%s<ul>\n" str) l2
           | x1 :: l1, x2 :: l2 ->
               if x1 = x2 then loop1 l1 l2
               else
                 begin
-                  List.iter (fun _ -> Wserver.printf "</ul></li>\n")
+                  List.iter (fun _ -> Output.printf conf "</ul></li>\n")
                     (x1 :: l1);
                   loop1 [] (x2 :: l2)
                 end
           | _ -> () (* FIXME was assert false!! *)
         in
         loop1 prev pl;
-        if List.length pl = 1 then Wserver.printf "<ul>\n";
+        if List.length pl = 1 then Output.printf conf "<ul>\n";
         print_sn_list snl so;
-        if List.length pl = 1 then Wserver.printf "</ul>\n";
+        if List.length pl = 1 then Output.printf conf "</ul>\n";
         loop pl list
-    | [] -> List.iter (fun _ -> Wserver.printf "</ul></li>\n") prev
+    | [] -> List.iter (fun _ -> Output.printf conf "</ul></li>\n") prev
   in
-  Wserver.printf "<ul>\n";
+  Output.printf conf "<ul>\n";
   loop [] list ;
-  Wserver.printf "</ul>\n"
+  Output.printf conf "</ul>\n"
 
 let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
     (if add_birth then "&bi=on" else "") ^
@@ -581,19 +583,19 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       max_int
   in
   Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) array ;
-  let title _ = Wserver.print_string (Utf8.capitalize (transl conf "place")) in
+  let title _ = Output.print_string conf (Utf8.capitalize (transl conf "place")) in
   print_aux conf title begin fun () ->
     let opt = print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage in
-    Wserver.printf
+    Output.printf conf
       "<p><a href=\"%sm=PS%s&display=long\">%s</a></p><p>"
       (commd conf) opt (transl conf "long display") ;
     let last = Array.length array - 1 in
     Array.iteri
       (fun i (s, x) ->
-         Wserver.printf "<a href=\"%sm=PS%s&k=%s\">%s</a> (%d)%s"
+         Output.printf conf "<a href=\"%sm=PS%s&k=%s\">%s</a> (%d)%s"
            (commd conf) opt (Mutil.encode s) s x (if i = last then "" else ",\n"))
       array ;
-    Wserver.printf "</p>\n"
+    Output.printf conf "</p>\n"
   end
 
 let print_buttons conf _base =
@@ -634,7 +636,7 @@ let print_all_places_surnames_long conf base _ini ~add_birth ~add_baptism
   Array.sort (fun ((_, pl1), _) ((_, pl2), _) ->
     sort_place_utf8 pl1 pl2) array ;
   let title _ =
-    Wserver.printf "%s / %s" (Utf8.capitalize (transl conf "place"))
+    Output.printf conf "%s / %s" (Utf8.capitalize (transl conf "place"))
       (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   in
   let opt = get_opt conf in
@@ -674,11 +676,11 @@ let print_all_places_surnames_long conf base _ini ~add_birth ~add_baptism
         | None -> ""
       ) t
   in
-  Wserver.printf "<p>\n<a %s>%s</a>" href
+  Output.printf conf "<p>\n<a %s>%s</a>" href
     (Utf8.capitalize (transl conf
       (if long then "short display" else "long display"))) ;
-  if short then Wserver.printf " (%s)\n" t;
-  Wserver.printf "<p>\n";
+  if short then Output.printf conf " (%s)\n" t;
+  Output.printf conf "<p>\n";
   if array <> [||] then
     if long then
       print_html_places_surnames conf base max_rlm_nbr link_to_ind array
