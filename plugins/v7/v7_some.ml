@@ -265,9 +265,9 @@ let buttons_fnames conf =
 let print_other_list conf _base list =
   let s_title = Printf.sprintf "%s" (Utf8.capitalize (transl conf "see also")) in
   let s_colon = Printf.sprintf "%s" (transl conf ":") in
-  Wserver.printf "<span>%s%s</span>\n" s_title s_colon;
+  Output.printf conf "<span>%s%s</span>\n" s_title s_colon;
   Mutil.list_iter_first (fun first (fn, c) ->
-      Wserver.printf "%s<a href=\"%sm=P&v=%s&other=on\">%s</a> (%d)"
+      Output.printf conf "%s<a href=\"%sm=P&v=%s&other=on\">%s</a> (%d)"
         (if first then "" else ", ") (commd conf) (Mutil.encode fn) fn c)
     list
 
