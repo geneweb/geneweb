@@ -24,8 +24,14 @@ val print_mod
 val all_checks_person :
   base -> (iper, iper, istr) gen_person -> ifam gen_ascend ->
     ifam gen_union -> CheckItem.base_warning list
-val print_mod_aux :
-  config -> base -> ((iper, Update.key, string) gen_person -> unit) -> unit
+
+val print_mod_aux
+  : config
+  -> base
+  -> string list ref
+  -> string list ref
+  -> ((iper, Update.key, string) gen_person -> unit)
+  -> unit
 
 val rename_image_file :
   config -> base -> person -> (iper, iper, string) gen_person -> unit

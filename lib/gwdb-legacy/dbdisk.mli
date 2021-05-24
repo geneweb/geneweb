@@ -324,6 +324,7 @@ type base_data =
   ; particles : Re.re Lazy.t
   ; bnotes : Def.base_notes
   ; bdir : string
+  ; mutable visible_ht : (int, bool) Hashtbl.t option
   }
 
 type base_func =

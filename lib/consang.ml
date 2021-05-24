@@ -158,10 +158,8 @@ let consang_of p =
   if get_consang p = Adef.no_consang then 0.0
   else Adef.float_of_fix (get_consang p)
 
-let mark = ref 0
-let new_mark () = incr mark; !mark
-
 let relationship_and_links base ri b ip1 ip2 =
+  let new_mark = let i = ref 0 in fun () -> incr i; !i in
   let i1 = ip1 in
   let i2 = ip2 in
   if i1 = i2 then 1.0, []

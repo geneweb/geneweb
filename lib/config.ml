@@ -36,6 +36,7 @@ type config =
 #ifdef API
     api_host : string;
     api_port : int;
+    api_mode : bool;
 #endif
     manitou : bool;
     supervisor : bool;
@@ -108,6 +109,7 @@ let empty =
 #ifdef API
   ; api_host = ""
   ; api_port = 0
+  ; api_mode = false
 #endif
   ; is_printed_by_template = false
   ; trace_templ = false

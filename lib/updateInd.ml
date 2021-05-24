@@ -37,17 +37,13 @@ let extract_var sini s =
     String.sub s len (String.length s - len)
   else ""
 
-let obsolete_list = ref []
-
 let obsolete version var new_var r =
-  if List.mem var !obsolete_list then r
-  else if Sys.unix then
+  if Sys.unix then
     begin
       Printf.eprintf "*** <W> updind.txt: \"%s\" obsolete since v%s%s\n" var
         version
         (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
       flush stderr;
-      obsolete_list := var :: !obsolete_list;
       r
     end
   else r

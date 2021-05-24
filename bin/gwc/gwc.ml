@@ -21,8 +21,8 @@ let next_family_fun_templ gwo_list fi =
     else if ngwo < 60 then fun () -> Printf.eprintf "."; flush stderr
     else
       let bar_cnt = ref 0 in
-      let run () = ProgrBar.run !bar_cnt ngwo; incr bar_cnt in
-      ProgrBar.empty := 'o'; ProgrBar.full := '*'; ProgrBar.start (); run
+      ProgrBar.start ();
+      (fun () -> ProgrBar.run !bar_cnt ngwo ; incr bar_cnt)
   in
   let ic_opt = ref None in
   let gwo_list = ref gwo_list in
@@ -71,6 +71,7 @@ let force = ref false
 let separate = ref false
 let shift = ref 0
 let files = ref []
+let save_mem = ref false
 
 let speclist =
   ["-c", Arg.Set just_comp, "Only compiling";
@@ -87,7 +88,7 @@ let speclist =
      <str> Set the source field for persons and families without source data";
    "-part", Arg.String (fun s -> Db1link.particules_file := s), "\
      <file> Particles file (default = predefined particles)";
-   "-mem", Arg.Set Outbase.save_mem, " Save memory, but slower";
+   "-mem", Arg.Set save_mem, " Save memory, but slower";
    "-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.";
    "-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.";
    "-nopicture", Arg.Set Gwcomp.no_picture,
@@ -151,7 +152,7 @@ let main () =
            else !out_file ^ ".gwb"
          in
          let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-         if Db1link.link next_family_fun bdir then ()
+         if Db1link.link !save_mem next_family_fun bdir then ()
          else
            begin
              Printf.eprintf "*** database not created\n";

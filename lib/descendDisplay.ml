@@ -223,9 +223,7 @@ let display_spouse conf base marks paths fam p c =
   then Output.printf conf " (<tt><b>%s</b></tt>)" (label_of_path paths c)
   else Output.print_string conf (DateDisplay.short_dates_text conf base c)
 
-let total = ref 0
-
-let print_family_locally conf base marks paths max_lev lev p1 c1 e =
+let print_family_locally conf base ~total marks paths max_lev lev p1 c1 e =
   let rec loop lev p =
     if lev < max_lev then
       ignore @@
@@ -283,9 +281,7 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
   in
   loop lev e
 
-let last_label = ref ""
-
-let print_family conf base marks paths max_lev lev p =
+let print_family conf base ~total ~last_label marks paths max_lev lev p =
   if lev <> 0 then Output.printf conf "<tt><b>%s</b></tt>.<br>" (label_of_path paths p);
   let lab = label_of_path paths p in
   if lab < !last_label then failwith "print_family" else last_label := lab;
@@ -329,7 +325,7 @@ let print_family conf base marks paths max_lev lev p =
                          Output.print_string conf "\n")
                       (get_family (pget conf base ie))
                   else
-                    print_family_locally conf base marks paths max_lev
+                    print_family_locally conf base ~total marks paths max_lev
                       (succ lev) p c e
                 end;
               succ cnt)
@@ -338,10 +334,10 @@ let print_family conf base marks paths max_lev lev p =
        Output.print_string conf "</ol>\n"; cnt)
     0 (get_family p)
 
-let print_families conf base marks paths max_lev =
+let print_families conf base ~total ~last_label marks paths max_lev =
   let rec loop lev p =
     if lev < max_lev then begin
-      print_family conf base marks paths max_lev lev p;
+      print_family conf base ~total ~last_label marks paths max_lev lev p;
       Array.iter
         (fun ifam ->
            let fam = foi base ifam in
@@ -361,7 +357,7 @@ let print_families conf base marks paths max_lev =
   in
   loop 0
 
-let display_descendants_with_numbers conf base max_level ancestor =
+let display_descendants_with_numbers conf base ~total ~last_label max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
     if h then descendants_title conf base ancestor h
@@ -390,7 +386,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Output.print_string conf "<p>" ;
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
-  print_families conf base marks paths max_level ancestor;
+  print_families conf base ~total ~last_label marks paths max_level ancestor;
   if !total > 1 then
     begin
       Output.print_string conf "<p>" ;
@@ -1373,7 +1369,7 @@ let print conf base p =
       Some "B", Some v -> print_aboville conf base v p
     | Some "S", Some v -> display_descendants_level conf base v p
     | Some "K", Some v -> display_descendant_with_table conf base v p
-    | Some "N", Some v -> display_descendants_with_numbers conf base v p
+    | Some "N", Some v -> display_descendants_with_numbers ~total:(ref 0) ~last_label:(ref "") conf base v p
     | Some "G", Some v -> display_descendant_index conf base v p
     | Some "C", Some v -> display_spouse_index conf base v p
     | Some "T", Some v -> print_tree conf base v p

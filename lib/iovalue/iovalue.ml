@@ -93,9 +93,6 @@ type 'a out_funs =
     output_binary_int : 'a -> int -> unit;
     output : 'a -> string -> int -> int -> unit }
 
-let size_32 = ref 0
-let size_64 = ref 0
-
 let output_binary_int64 ofuns oc x =
   for i = 1 to 8 do
     ofuns.output_byte oc (x lsr (64 - 8 * i) land 0xFF)
@@ -118,10 +115,7 @@ let gen_output_block_header ofuns oc tag size =
       ofuns.output_byte oc (size lsr 6 land 0xFF);
       ofuns.output_byte oc (size lsl 2 land 0xFF);
       ofuns.output_byte oc (size lsl 10 land 0xFF + tag)
-    end;
-  if size = 0 then ()
-  else
-    begin size_32 := !size_32 + 1 + size; size_64 := !size_64 + 1 + size end
+    end
 
 let rec output_loop ofuns oc x =
   if Obj.is_int x then
@@ -159,8 +153,6 @@ let rec output_loop ofuns oc x =
         ofuns.output_binary_int oc len
       end;
     ofuns.output oc (Obj.magic x) 0 len;
-    size_32 := !size_32 + 1 + (len + 4) / 4;
-    size_64 := !size_64 + 1 + (len + 8) / 8
   else if Obj.tag x = Obj.double_tag || Obj.tag x = Obj.double_array_tag then
     failwith "Iovalue.output: floats not implemented"
   else if Obj.tag x = Obj.closure_tag then failwith "Iovalue.output <fun>"
@@ -199,51 +191,59 @@ let size_funs =
    output_binary_int = (fun r _ -> r := !r + 4);
    output = fun r _ beg len -> r := !r + len - beg}
 
-let size = ref 0
-
-let size v = size := 0; gen_output size_funs size v; !size
+let size v =
+  let size = ref 0 in
+  gen_output size_funs size v;
+  !size
 
 (* Digest *)
 
-let dbuf = ref (Bytes.create 256)
-let dlen = ref 0
-let dput_char c =
+let dput_char dbuf dlen c =
   if !dlen = Bytes.length !dbuf then dbuf := Bytes.extend !dbuf 0 !dlen;
   Bytes.set !dbuf !dlen c;
   incr dlen
-let rec dput_int i =
+let rec dput_int dbuf dlen i =
   if i = 0 then ()
   else
     begin
-      dput_char (Char.chr (Char.code '0' + i mod 10));
-      dput_int (i / 10)
+      dput_char dbuf dlen (Char.chr (Char.code '0' + i mod 10));
+      dput_int dbuf dlen (i / 10)
     end
-let dput_string s = for i = 0 to String.length s - 1 do dput_char s.[i] done
+let dput_string dbuf dlen s = for i = 0 to String.length s - 1 do dput_char dbuf dlen s.[i] done
 
-let rec digest_loop v =
+let rec digest_loop dbuf dlen v =
   if not (Obj.is_block v) then
-    let n : int = Obj.magic v in dput_char 'I'; dput_int n
+    let n : int = Obj.magic v in
+    dput_char dbuf dlen 'I';
+    dput_int dbuf dlen n
   else if Obj.tag v = Obj.closure_tag then
     invalid_arg "Iovalue.digest: closure"
-  else if Obj.size v = 0 then begin dput_char 'T'; dput_int (Obj.tag v) end
-  else if Obj.tag v = Obj.string_tag then
+  else if Obj.size v = 0 then begin
+    dput_char dbuf dlen 'T';
+    dput_int dbuf dlen (Obj.tag v)
+  end else if Obj.tag v = Obj.string_tag then
     let s : string = Obj.magic v in
-    dput_char 'S'; dput_int (String.length s); dput_char '/'; dput_string s
-  else
-    begin
-      dput_char 'O';
-      dput_int (Obj.tag v);
-      dput_char '/';
-      dput_int (Obj.size v);
-      digest_fields v 0
-    end
-and digest_fields v i =
-  if i = Obj.size v then ()
-  else begin digest_loop (Obj.field v i); digest_fields v (i + 1) end
+    dput_char dbuf dlen 'S';
+    dput_int dbuf dlen (String.length s);
+    dput_char dbuf dlen '/';
+    dput_string dbuf dlen s
+  else begin
+    dput_char dbuf dlen 'O';
+    dput_int dbuf dlen (Obj.tag v);
+    dput_char dbuf dlen '/';
+    dput_int dbuf dlen (Obj.size v);
+    digest_fields dbuf dlen v 0
+  end
+and digest_fields dbuf dlen v i =
+  if i <> Obj.size v then begin
+    digest_loop dbuf dlen (Obj.field v i);
+    digest_fields dbuf dlen v (i + 1)
+  end
 
 let digest v =
-  dlen := 0;
-  digest_loop (Obj.repr v);
+  let dbuf = ref (Bytes.create 256) in
+  let dlen = ref 0 in
+  digest_loop dbuf dlen (Obj.repr v);
   Digest.to_hex (Digest.subbytes !dbuf 0 !dlen)
 
 let output_value_header_size = 20
@@ -262,42 +262,3 @@ let output_array_access oc arr_get arr_len pos =
       end
   in
   loop (pos + output_value_header_size + array_header_size arr_len) 0
-
-(* *)
-
-type header_pos = int * int
-
-let intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |]
-
-let create_output_value_header oc =
-  (* magic number *)
-  for i = 0 to 3 do output_byte oc intext_magic_number.(i) done;
-  let pos_header = pos_out oc in
-  (* room for block length *)
-  output_binary_int oc 0;
-  (* room for obj counter *)
-  output_binary_int oc 0;
-  (* room for size_32 *)
-  output_binary_int oc 0;
-  (* room for size_64 *)
-  output_binary_int oc 0;
-  size_32 := 0;
-  size_64 := 0;
-  pos_header, pos_out oc
-
-let patch_output_value_header oc (pos_header, pos_start) =
-  let pos_end = pos_out oc in
-  if Sys.word_size = 64 &&
-     (pos_end >= 1 lsl 32 || !size_32 >= 1 lsl 32 || !size_64 >= 1 lsl 32)
-  then
-    failwith "Iovalue.output: object too big";
-  (* block_length *)
-  seek_out oc pos_header;
-  output_binary_int oc (pos_end - pos_start);
-  (* obj counter is zero because no_sharing *)
-  output_binary_int oc 0;
-  (* size_32 *)
-  output_binary_int oc !size_32;
-  (* size_64 *)
-  output_binary_int oc !size_64;
-  pos_end

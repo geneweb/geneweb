@@ -29,16 +29,14 @@ type dist = { mutable dmin : int; mutable dmax : int; mark : bool }
 
 let infinity = 1000
 
-let threshold = ref 10
-
 let phony_dist_tab = (fun _ -> 0), (fun _ -> infinity)
 
 let tsort_leq tstab x y =
   if Gwdb.Marker.get tstab x = Gwdb.Marker.get tstab y then x >= y
   else Gwdb.Marker.get tstab x < Gwdb.Marker.get tstab y
 
-let make_dist_tab conf base ia maxlev =
-  if maxlev <= !threshold then phony_dist_tab
+let make_dist_tab ?(threshold = 10) conf base ia maxlev =
+  if maxlev <= threshold then phony_dist_tab
   else
     let tstab = Util.create_topological_sort conf base in
     let module Pq =

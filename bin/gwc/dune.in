@@ -1,7 +1,7 @@
 (executable
   (name gwc)
   (public_name geneweb.gwc)
-  (modules gwc db1link)
+  (modules gwc gwcomp db1link)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
 )

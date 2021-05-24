@@ -200,8 +200,8 @@ let new_iper base = base.data.persons.len
 let new_ifam base = base.data.families.len
 
 (* FIXME: lock *)
-let sync ?scratch:_ base =
-  Outbase.output base
+let sync ?scratch:_ ?save_mem base =
+  Outbase.output ?save_mem base
 
 let make bname particles arrays : Dbdisk.dsk_base =
   sync ~scratch:true (Database.make bname particles arrays) ;
@@ -253,7 +253,7 @@ let base_notes_read_aux base fnotes mode =
     else Filename.concat "notes_d" (fnotes ^ ".txt")
   in
   try
-    let ic = Secure.open_in @@ Filename.concat base.data.bdir fname in
+    let ic = open_in @@ Filename.concat base.data.bdir fname in
     let str =
       match mode with
       | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
@@ -590,14 +590,11 @@ let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
 
 (* Restrict file *)
 
-(* FIXME: these values should not be global *)
-let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
-
 let read_or_create_visible base =
   let fname = Filename.concat base.data.bdir "restrict" in
   let visible =
     if Sys.file_exists fname then
-      let ic = Secure.open_in fname in
+      let ic = open_in fname in
       let visible =
         if Mutil.check_magic Mutil.executable_magic ic
         then input_value ic
@@ -607,14 +604,14 @@ let read_or_create_visible base =
       visible
     else Hashtbl.create (nb_of_persons base)
   in
-  visible_ref := Some visible ;
+  base.data.visible_ht <- Some visible ;
   visible
 
 let base_visible_write base =
   let fname = Filename.concat base.data.bdir "restrict" in
-  match !visible_ref with
+  match base.data.visible_ht with
   | Some visible ->
-    let oc = Secure.open_out fname in
+    let oc = open_out fname in
     output_string oc Mutil.executable_magic ;
     output_value oc visible;
     close_out oc
@@ -622,7 +619,7 @@ let base_visible_write base =
 
 let base_visible_get base fct i =
   let visible =
-    match !visible_ref with
+    match base.data.visible_ht with
     | Some visible -> visible
     | None -> read_or_create_visible base
   in
@@ -630,6 +627,6 @@ let base_visible_get base fct i =
   | None ->
     let status = fct (poi base i) in
     Hashtbl.add visible i status ;
-    visible_ref := Some visible;
+    base.data.visible_ht <- Some visible;
     status
   | Some b -> b

@@ -274,7 +274,7 @@ let rec check_ancestors base warning year year_tab ip ini_p =
       f @@ get_mother fam
     | None -> ()
 
-let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
+let check_base ?(mem = false) base error warning changed_p =
   if not mem then begin
     Gwdb.load_persons_array base ;
     Gwdb.load_ascends_array base ;
@@ -282,51 +282,24 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
     Gwdb.load_couples_array base ;
   end ;
   let persons = Gwdb.ipers base in
-  let len = Gwdb.Collection.length persons in
   let year_tab = Gwdb.iper_marker (Gwdb.ipers base) dummy_date in
-  if verbose then begin
-    Printf.eprintf "check persons\n" ;
-    ProgrBar.start () ;
-    Gwdb.Collection.iteri begin fun i ip ->
-      ProgrBar.run i len ;
-      let p = poi base ip in
-      if Gwdb.Marker.get year_tab ip = dummy_date
-      then check_ancestors base warning dummy_date year_tab ip p ;
-      match CheckItem.person ~onchange:false base warning p with
-      | Some ippl -> List.iter changed_p ippl
-      | None -> ()
-    end persons ;
-    ProgrBar.finish ()
-  end else begin
-    Gwdb.Collection.iter begin fun ip ->
-      let p = poi base ip in
-      if Gwdb.Marker.get year_tab ip = dummy_date
-      then check_ancestors base warning dummy_date year_tab ip p ;
-      match CheckItem.person ~onchange:false base warning p with
-      | Some ippl -> List.iter changed_p ippl
-      | None -> ()
-    end persons ;
-  end ;
+  Gwdb.Collection.iter begin fun ip ->
+    let p = poi base ip in
+    if Gwdb.Marker.get year_tab ip = dummy_date
+    then check_ancestors base warning dummy_date year_tab ip p ;
+    match CheckItem.person ~onchange:false base warning p with
+    | Some ippl -> List.iter changed_p ippl
+    | None -> ()
+  end persons ;
   if not mem then begin
     Gwdb.clear_unions_array base ;
     Gwdb.load_families_array base ;
     Gwdb.load_descends_array base ;
   end ;
   let families = Gwdb.ifams base in
-  let len = Gwdb.Collection.length families in
-  if verbose then begin
-    Printf.eprintf "check families\n" ;
-    ProgrBar.start ();
-    Gwdb.Collection.iteri begin fun i ifam ->
-      ProgrBar.run i len ;
-      CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
-    end families ;
-    ProgrBar.finish ();
-  end else begin
-    Gwdb.Collection.iter begin fun ifam ->
-      CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
-    end families ;
-  end ;
+  Gwdb.Collection.iter begin fun ifam ->
+    CheckItem.family ~onchange:false base warning ifam @@ foi base ifam
+  end families ;
   if not mem then begin
     Gwdb.clear_persons_array base ;
     Gwdb.clear_families_array base ;

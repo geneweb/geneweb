@@ -193,10 +193,6 @@ let string_of_date_option date =
   | Some d -> string_of_date2 d
   | None -> ""
 
-
-let date_of_string s = Gwcomp.date_of_string s 0
-
-
 (**/**) (* Convertion d'une date. *)
 
 module Date_converter

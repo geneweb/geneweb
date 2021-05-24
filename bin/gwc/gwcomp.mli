@@ -1,6 +1,6 @@
-(* $Id: gwcomp.mli,v 5.1 2008-01-12 08:41:18 ddr Exp $ *)
 (* Copyright (c) 2007-2008 INRIA *)
 
+open Geneweb
 open Def
 open Gwdb
 

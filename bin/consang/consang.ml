@@ -6,6 +6,7 @@ let fname = ref ""
 let scratch = ref false
 let verbosity = ref 2
 let fast = ref false
+let save_mem = ref false
 
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
 let speclist =
@@ -13,7 +14,7 @@ let speclist =
    ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
    ("-fast", Arg.Set fast, " faster, but use more memory");
    "-scratch", Arg.Set scratch, ": from scratch";
-   "-mem", Arg.Set Outbase.save_mem,
+   "-mem", Arg.Set save_mem,
    ": Save memory, but slower when rewritting database";
    "-nolock", Arg.Set Lock.no_lock_flag, ": do not lock database."]
 let anonfun s =
@@ -54,7 +55,7 @@ let main () =
        try
          Sys.catch_break true;
          if ConsangAll.compute ~verbosity:!verbosity base !scratch
-         then Gwdb.sync base ;
+         then Gwdb.sync ~save_mem:!save_mem base ;
        with Consang.TopologicalSortError p ->
          Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
            (Gutil.designation base p);

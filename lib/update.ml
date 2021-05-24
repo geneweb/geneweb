@@ -214,7 +214,7 @@ let print_continue
 
 let prerr conf _err fn =
 #ifdef API
-  if not !Api_conf.mode_api then begin
+  if not conf.api_mode then begin
 #endif
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title ;

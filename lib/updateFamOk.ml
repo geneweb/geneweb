@@ -5,10 +5,6 @@ open Def
 open Gwdb
 open Util
 
-(* Liste des string dont on a supprimé un caractère.       *)
-(* Utilisé pour le message d'erreur lors de la validation. *)
-let removed_string = ref []
-
 type create_info =
   Update.create_info =
     { ci_birth_date : date option;
@@ -36,7 +32,7 @@ let getn conf var key =
     Some v -> v
   | None -> failwith (var ^ "_" ^ key ^ " unbound")
 
-let reconstitute_somebody conf var =
+let reconstitute_somebody removed_string conf var =
   let first_name = no_html_tags (only_printable (getn conf var "fn")) in
   let surname = no_html_tags (only_printable (getn conf var "sn")) in
   (* S'il y a des caractères interdits, on les supprime *)
@@ -68,7 +64,7 @@ let reconstitute_somebody conf var =
   in
   first_name, surname, occ, create, var
 
-let reconstitute_parent_or_child conf var default_surname =
+let reconstitute_parent_or_child removed_string conf var default_surname =
   let first_name = no_html_tags (only_printable (getn conf var "fn")) in
   let surname =
     let surname = no_html_tags (only_printable (getn conf var "sn")) in
@@ -189,7 +185,7 @@ let reconstitute_insert_event conf ext cnt el =
     el, true
   else el, ext
 
-let rec reconstitute_events conf ext cnt =
+let rec reconstitute_events removed_string conf ext cnt =
   match get_nth conf "e_name" cnt with
     Some efam_name ->
       let efam_name =
@@ -231,7 +227,7 @@ let rec reconstitute_events conf ext cnt =
           match
             try
               Some
-                (reconstitute_somebody conf
+                (reconstitute_somebody removed_string conf
                    ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i))
             with Failure _ -> None
           with
@@ -311,7 +307,7 @@ let rec reconstitute_events conf ext cnt =
          efam_place = efam_place; efam_reason = ""; efam_note = efam_note;
          efam_src = efam_src; efam_witnesses = Array.of_list witnesses}
       in
-      let (el, ext) = reconstitute_events conf ext (cnt + 1) in
+      let (el, ext) = reconstitute_events removed_string conf ext (cnt + 1) in
       let (el, ext) = reconstitute_insert_event conf ext cnt el in
       e :: el, ext
   | _ -> [], ext
@@ -391,8 +387,8 @@ let reconstitute_from_fevents nsck empty_string fevents =
   let div = Opt.default NotDivorced !found_divorce in
   marr, div, wit
 
-let reconstitute_family conf base nsck =
-  let (events, ext) = reconstitute_events conf false 1 in
+let reconstitute_family conf base removed_string nsck =
+  let (events, ext) = reconstitute_events removed_string conf false 1 in
   let (events, ext) = reconstitute_insert_event conf ext 0 events in
   let surname = getn conf "pa1" "sn" in
   let (children, ext) =
@@ -400,7 +396,7 @@ let reconstitute_family conf base nsck =
       match
         try
           Some
-            (reconstitute_parent_or_child conf ("ch" ^ string_of_int i)
+            (reconstitute_parent_or_child removed_string conf ("ch" ^ string_of_int i)
                surname)
         with Failure _ -> None
       with
@@ -420,7 +416,7 @@ let reconstitute_family conf base nsck =
     let rec loop i ext =
       match
         try
-          Some (reconstitute_parent_or_child conf ("pa" ^ string_of_int i) "")
+          Some (reconstitute_parent_or_child removed_string conf ("pa" ^ string_of_int i) "")
         with Failure _ -> None
       with
         Some c ->
@@ -860,7 +856,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
 #ifdef API
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
-    if !(Api_conf.mode_api) then {nfam with relation = sfam.relation}
+    if conf.api_mode then {nfam with relation = sfam.relation}
     else nfam
   in
 #endif
@@ -1144,7 +1140,7 @@ let print_family conf base (wl, ml) cpl des =
     end;
   Update.print_warnings_and_miscs conf base wl ml
 
-let print_mod_ok conf base (wl, ml) cpl des =
+let print_mod_ok conf base removed_string (wl, ml) cpl des =
   let title _ =
     Output.print_string conf (Utf8.capitalize_fst (transl conf "family modified"))
   in
@@ -1172,7 +1168,7 @@ let print_change_event_order_ok conf base (wl, ml) cpl des =
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
-let print_add_ok conf base (wl, ml) cpl des =
+let print_add_ok conf base removed_string (wl, ml) cpl des =
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "family added")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -1248,12 +1244,10 @@ let forbidden_disconnected conf scpl sdes =
   else false
 
 let print_add o_conf base =
-  (* Attention ! On pense à remettre les compteurs à *)
-  (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
+  let removed_string = ref [] in
   let conf = Update.update_conf o_conf in
   let nsck = p_getenv conf.env "nsck" = Some "on" in
-  let (sfam, scpl, sdes, ext) = reconstitute_family conf base nsck in
+  let (sfam, scpl, sdes, ext) = reconstitute_family conf base removed_string nsck in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true
@@ -1318,7 +1312,7 @@ let print_add o_conf base =
       Util.commit_patches conf base;
       History.record conf base changed act;
       Update.delete_topological_sort conf base;
-      print_add_ok conf base (wl, ml) cpl des
+      print_add_ok conf base removed_string (wl, ml) cpl des
 
 (* If we only have two linked parents,
    with one linked child and not other informations,
@@ -1328,7 +1322,8 @@ let print_add o_conf base =
 let print_add_parents o_conf base =
   let conf = Update.update_conf o_conf in
   let nsck = p_getenv conf.env "nsck" = Some "on" in
-  let (sfam, scpl, sdes, _) = reconstitute_family conf base nsck in
+  let removed_string = ref [] in
+  let (sfam, scpl, sdes, _) = reconstitute_family conf base removed_string nsck in
   if sfam.marriage = Adef.cdate_None
   && sfam.marriage_place = ""
   && sfam.marriage_note = ""
@@ -1388,7 +1383,7 @@ let print_add_parents o_conf base =
                 in
                 History.record conf base hr "mf" ;
                 Update.delete_topological_sort conf base ;
-                print_mod_ok conf base (!wl, []) scpl sdes
+                print_mod_ok conf base removed_string (!wl, []) scpl sdes
               else loop (i - 1)
           in loop (Array.length ffam)
         | _ -> print_add o_conf base
@@ -1396,9 +1391,9 @@ let print_add_parents o_conf base =
     | _ -> print_add o_conf base
   else print_add o_conf base
 
-let print_mod_aux conf base callback =
+let print_mod_aux conf base removed_string callback =
   let nsck = p_getenv conf.env "nsck" = Some "on" in
-  let (sfam, scpl, sdes, ext) = reconstitute_family conf base nsck in
+  let (sfam, scpl, sdes, ext) = reconstitute_family conf base removed_string nsck in
   let redisp =
     match p_getenv conf.env "return" with
       Some _ -> true
@@ -1423,9 +1418,7 @@ let family_structure base ifam =
   let fam = foi base ifam in get_parent_array fam, get_children fam
 
 let print_mod o_conf base =
-  (* Attention ! On pense à remettre les compteurs à *)
-  (* zéro pour la détection des caractères interdits *)
-  let () = removed_string := [] in
+  let removed_string = ref [] in
   let o_f =
     let ifam =
       match p_getenv o_conf.env "i" with
@@ -1476,9 +1469,9 @@ let print_mod o_conf base =
     in
     History.record conf base changed "mf";
     Update.delete_topological_sort conf base;
-    print_mod_ok conf base (wl, ml) cpl des
+    print_mod_ok conf base removed_string (wl, ml) cpl des
   in
-  print_mod_aux conf base callback
+  print_mod_aux conf base removed_string callback
 
 let print_inv conf base =
   match p_getenv conf.env "i", p_getenv conf.env "f" with

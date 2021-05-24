@@ -27,7 +27,6 @@ val p_first_name : dsk_base -> dsk_person -> string
 val p_surname : dsk_base -> dsk_person -> string
 
 val output_value_no_sharing : out_channel -> _ -> unit
-val output_array_no_sharing : out_channel -> (int -> _) -> int -> unit
 val int_size : int
 
 module IntHT : sig

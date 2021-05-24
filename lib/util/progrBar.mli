@@ -6,6 +6,3 @@ val finish : unit -> unit
 
 val suspend : unit -> unit
 val restart : int -> int -> unit
-
-val empty : char ref
-val full : char ref

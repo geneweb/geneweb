@@ -8,14 +8,23 @@ open Config
 open Def
 open Gwdb
 
-let redis_host = ref "127.0.0.1"
-let redis_port = ref 6379
-let api_servers = ref []
+let redis_host =
+  try Sys.getenv "GW_REDIS_HOST"
+  with Not_found -> "127.0.0.1"
+let redis_port =
+  try int_of_string (Sys.getenv "GW_REDIS_PORT")
+  with Not_found -> 6379
+let lia_host =
+  try Sys.getenv "GW_LIA_HOST"
+  with Not_found -> "127.0.0.1"
+let lia_port =
+  try int_of_string (Sys.getenv "GW_LIA_PORT")
+  with Not_found -> 2323
 
 (**/**) (* Redis. *)
 
 let create_redis_connection () =
-  let connection_spec = {RC.host = !redis_host; RC.port = !redis_port} in
+  let connection_spec = { RC.host = redis_host ; RC.port = redis_port } in
   RC.IO.run (RC.connect connection_spec)
 
 let redis_p_key base ip =
@@ -487,18 +496,9 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
 
 (**/**)
 
-let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc nb_desc =
-  let host =
-    let rec loop api_servers =
-      match api_servers with
-      | [] -> ("")
-      | (reg, host) :: l ->
-          let regexp = Str.regexp reg in
-          if Str.string_match regexp bname 0 then host
-          else loop l
-    in
-    loop !api_servers
-  in
+let get_link_tree_curl =
+  let host = lia_host ^ ":" ^ string_of_int lia_port in
+  fun conf request basename bname ip s s2 nb_asc from_gen_desc nb_desc ->
   let index = Some (Int32.of_string @@ Gwdb.string_of_iper ip) in
   let data =
     MLink.Link_tree_params.({

@@ -270,5 +270,6 @@ let print_mod_merge o_conf base =
   let o_f1 = get_gen_family "i" in
   let o_f2 = get_gen_family "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateFamOk.print_mod_aux conf base
+  let removed_strings = ref [] in
+  UpdateFamOk.print_mod_aux conf base removed_strings
     (effective_mod_merge conf base o_f1 o_f2)

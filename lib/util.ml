@@ -303,84 +303,78 @@ let prefix_base_password_2 conf =
   else
     conf.command ^ "?"
 
-let allowed_tags_file = ref ""
-
-let default_safe_html_allowed_tags =
-  [ ("http://www.w3.org/1999/xhtml", "a")
-  ; ("http://www.w3.org/1999/xhtml", "area")
-  ; ("http://www.w3.org/1999/xhtml", "b")
-  ; ("http://www.w3.org/1999/xhtml", "blockquote")
-  ; ("http://www.w3.org/1999/xhtml", "br")
-  ; ("http://www.w3.org/1999/xhtml", "center")
-  ; ("http://www.w3.org/1999/xhtml", "cite")
-  ; ("http://www.w3.org/1999/xhtml", "dd")
-  ; ("http://www.w3.org/1999/xhtml", "dir")
-  ; ("http://www.w3.org/1999/xhtml", "div")
-  ; ("http://www.w3.org/1999/xhtml", "dl")
-  ; ("http://www.w3.org/1999/xhtml", "dt")
-  ; ("http://www.w3.org/1999/xhtml", "em")
-  ; ("http://www.w3.org/1999/xhtml", "embed")
-  ; ("http://www.w3.org/1999/xhtml", "font")
-  ; ("http://www.w3.org/1999/xhtml", "h1")
-  ; ("http://www.w3.org/1999/xhtml", "h2")
-  ; ("http://www.w3.org/1999/xhtml", "h3")
-  ; ("http://www.w3.org/1999/xhtml", "h4")
-  ; ("http://www.w3.org/1999/xhtml", "h5")
-  ; ("http://www.w3.org/1999/xhtml", "h6")
-  ; ("http://www.w3.org/1999/xhtml", "hr")
-  ; ("http://www.w3.org/1999/xhtml", "i")
-  ; ("http://www.w3.org/1999/xhtml", "img")
-  ; ("http://www.w3.org/1999/xhtml", "li")
-  ; ("http://www.w3.org/1999/xhtml", "map")
-  ; ("http://www.w3.org/1999/xhtml", "object")
-  ; ("http://www.w3.org/1999/xhtml", "ol")
-  ; ("http://www.w3.org/1999/xhtml", "ol")
-  ; ("http://www.w3.org/1999/xhtml", "p")
-  ; ("http://www.w3.org/1999/xhtml", "param")
-  ; ("http://www.w3.org/1999/xhtml", "pre")
-  ; ("http://www.w3.org/1999/xhtml", "s")
-  ; ("http://www.w3.org/1999/xhtml", "small")
-  ; ("http://www.w3.org/1999/xhtml", "span")
-  ; ("http://www.w3.org/1999/xhtml", "strike")
-  ; ("http://www.w3.org/1999/xhtml", "strong")
-  ; ("http://www.w3.org/1999/xhtml", "sub")
-  ; ("http://www.w3.org/1999/xhtml", "sup")
-  ; ("http://www.w3.org/1999/xhtml", "table")
-  ; ("http://www.w3.org/1999/xhtml", "tbody")
-  ; ("http://www.w3.org/1999/xhtml", "td")
-  ; ("http://www.w3.org/1999/xhtml", "tfoot")
-  ; ("http://www.w3.org/1999/xhtml", "th")
-  ; ("http://www.w3.org/1999/xhtml", "thead")
-  ; ("http://www.w3.org/1999/xhtml", "tr")
-  ; ("http://www.w3.org/1999/xhtml", "tt")
-  ; ("http://www.w3.org/1999/xhtml", "u")
-  ; ("http://www.w3.org/1999/xhtml", "ul")
-  ; ("http://www.w3.org/1999/xhtml", "nav")
-  ; ("http://www.w3.org/1999/xhtml", "section")
-  ]
-
 let safe_html_allowed_tags =
-  lazy begin
-    if !allowed_tags_file = "" then default_safe_html_allowed_tags
-    else begin
-      let ic = open_in !allowed_tags_file in
-      let rec loop tags =
-        match input_line ic with
-        | tag ->
-          let ns, tag =
-            match String.split_on_char ' ' tag with
-            | [ ns ; tag ] -> (ns, tag)
-            | [ tag ] -> "http://www.w3.org/1999/xhtml", tag
-            | _ -> assert false
-          in
-          loop ((ns, String.lowercase_ascii tag) :: tags)
-        | exception End_of_file ->
-          close_in ic ;
-          tags
-      in
-      loop []
-    end
-  end
+  match Sys.getenv_opt "GW_ALLOWED_TAGS" with
+  | None ->
+    [ ("http://www.w3.org/1999/xhtml", "a")
+    ; ("http://www.w3.org/1999/xhtml", "area")
+    ; ("http://www.w3.org/1999/xhtml", "b")
+    ; ("http://www.w3.org/1999/xhtml", "blockquote")
+    ; ("http://www.w3.org/1999/xhtml", "br")
+    ; ("http://www.w3.org/1999/xhtml", "center")
+    ; ("http://www.w3.org/1999/xhtml", "cite")
+    ; ("http://www.w3.org/1999/xhtml", "dd")
+    ; ("http://www.w3.org/1999/xhtml", "dir")
+    ; ("http://www.w3.org/1999/xhtml", "div")
+    ; ("http://www.w3.org/1999/xhtml", "dl")
+    ; ("http://www.w3.org/1999/xhtml", "dt")
+    ; ("http://www.w3.org/1999/xhtml", "em")
+    ; ("http://www.w3.org/1999/xhtml", "embed")
+    ; ("http://www.w3.org/1999/xhtml", "font")
+    ; ("http://www.w3.org/1999/xhtml", "h1")
+    ; ("http://www.w3.org/1999/xhtml", "h2")
+    ; ("http://www.w3.org/1999/xhtml", "h3")
+    ; ("http://www.w3.org/1999/xhtml", "h4")
+    ; ("http://www.w3.org/1999/xhtml", "h5")
+    ; ("http://www.w3.org/1999/xhtml", "h6")
+    ; ("http://www.w3.org/1999/xhtml", "hr")
+    ; ("http://www.w3.org/1999/xhtml", "i")
+    ; ("http://www.w3.org/1999/xhtml", "img")
+    ; ("http://www.w3.org/1999/xhtml", "li")
+    ; ("http://www.w3.org/1999/xhtml", "map")
+    ; ("http://www.w3.org/1999/xhtml", "object")
+    ; ("http://www.w3.org/1999/xhtml", "ol")
+    ; ("http://www.w3.org/1999/xhtml", "ol")
+    ; ("http://www.w3.org/1999/xhtml", "p")
+    ; ("http://www.w3.org/1999/xhtml", "param")
+    ; ("http://www.w3.org/1999/xhtml", "pre")
+    ; ("http://www.w3.org/1999/xhtml", "s")
+    ; ("http://www.w3.org/1999/xhtml", "small")
+    ; ("http://www.w3.org/1999/xhtml", "span")
+    ; ("http://www.w3.org/1999/xhtml", "strike")
+    ; ("http://www.w3.org/1999/xhtml", "strong")
+    ; ("http://www.w3.org/1999/xhtml", "sub")
+    ; ("http://www.w3.org/1999/xhtml", "sup")
+    ; ("http://www.w3.org/1999/xhtml", "table")
+    ; ("http://www.w3.org/1999/xhtml", "tbody")
+    ; ("http://www.w3.org/1999/xhtml", "td")
+    ; ("http://www.w3.org/1999/xhtml", "tfoot")
+    ; ("http://www.w3.org/1999/xhtml", "th")
+    ; ("http://www.w3.org/1999/xhtml", "thead")
+    ; ("http://www.w3.org/1999/xhtml", "tr")
+    ; ("http://www.w3.org/1999/xhtml", "tt")
+    ; ("http://www.w3.org/1999/xhtml", "u")
+    ; ("http://www.w3.org/1999/xhtml", "ul")
+    ; ("http://www.w3.org/1999/xhtml", "nav")
+    ; ("http://www.w3.org/1999/xhtml", "section")
+    ]
+  | Some fname ->
+    let ic = open_in fname in
+    let rec loop tags =
+      match input_line ic with
+      | tag ->
+        let ns, tag =
+          match String.split_on_char ' ' tag with
+          | [ ns ; tag ] -> (ns, tag)
+          | [ tag ] -> "http://www.w3.org/1999/xhtml", tag
+          | _ -> assert false
+        in
+        loop ((ns, String.lowercase_ascii tag) :: tags)
+      | exception End_of_file ->
+        close_in ic ;
+        tags
+    in
+    loop []
 
 let escape_aux count blit str =
   let strlen = String.length str in
@@ -463,7 +457,7 @@ let safe_html_aux escape_text s =
   let stack = ref [] in
   let make_safe = function
     | `Start_element (name, attrs) ->
-      if not @@ List.mem name @@ Lazy.force safe_html_allowed_tags then begin
+      if not @@ List.mem name safe_html_allowed_tags then begin
         stack := `KO :: !stack ;
         `Comment ""
       end else begin
