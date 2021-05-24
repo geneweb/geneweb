@@ -1,0 +1,8 @@
+(library
+ (name wserver)
+ (public_name geneweb.wserver)
+ (wrapped false)
+ (libraries geneweb.util unix)
+ (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+ (modules wserver)
+)

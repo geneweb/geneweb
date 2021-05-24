@@ -509,6 +509,7 @@ let treat_request =
           | None -> ()
         end ;
         let incorrect_request conf _ = incorrect_request conf in
+        let notfound_request conf file _ _ = Hutil.error_404 conf file in
         match m with
         | "" ->
           if base <> None then
@@ -519,9 +520,12 @@ let treat_request =
               | Some t when p_getenv conf.base_env "ptempl" = Some "yes" ->
                 Perso.interp_templ t conf base p
               | _ -> person_selected conf base p
-          else if conf.bname = ""
-          then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
-          else incorrect_request
+          else if conf.bname = "" then 
+              fun conf _ ->  
+                Util.html conf;
+                include_template conf [] "index" (fun () -> propose_base conf)
+          else 
+              notfound_request conf conf.bname
         | "A" ->
           Perso.print_ascend |> w_person |> w_base
         | "ADD_FAM" when conf.wizard ->
@@ -750,7 +754,7 @@ let treat_request =
         | "REQUEST" when conf.wizard ->
           fun _ _ ->
             Output.status conf Def.OK;
-            Output.header conf "Content-type: text";
+            Output.header conf "Content-Type: text";
             List.iter (fun s -> Output.print_string conf @@ s ^ "\n") conf.Config.request ;
         | "RL" ->
           w_base @@ RelationLink.print
@@ -912,7 +916,6 @@ let treat_request =
 #endif
         | _ -> incorrect_request
       end conf base ;
-    Output.flush conf ;
   end else
     begin
       let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in

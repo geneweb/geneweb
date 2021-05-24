@@ -1,12 +1,18 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+(* HTTP/1.1 status codes see  https://tools.ietf.org/html/rfc7231 , §6.1 *)
 type httpStatus =
   | OK (* 200 *)
-  | Moved_Temporarily (* 302 *)
+  | Moved_Permanently (* 301 *)
+  | Found (* 302 *)
   | Bad_Request (* 400 *)
   | Unauthorized (* 401 *)
   | Forbidden (* 403 *)
   | Not_Found (* 404 *)
+  | Method_Not_Allowed (* 405 *)
+  | Internal_Server_Error (* 500 *)
+  | Service_Unavailable (* 503 *)
+  | HTTP_Version_Not_Supported (* 505 *)
 
 type ('a, 'b) choice =
     Left of 'a

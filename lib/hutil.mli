@@ -18,6 +18,7 @@ val gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit
 val gen_trailer : bool -> config -> unit
 
 val incorrect_request : config -> unit
+val error_404 : config -> string -> unit
 
 val interp :
   config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit

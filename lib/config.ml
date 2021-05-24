@@ -28,6 +28,7 @@ type output_conf =
   { status : Def.httpStatus -> unit
   ; header : string -> unit
   ; body : string -> unit
+  ; file : string -> string -> bool -> bool
   ; flush : unit -> unit
   }
 
@@ -161,6 +162,7 @@ let empty =
       { status = ignore
       ; header = ignore
       ; body = ignore
+      ; file = (fun _ _ _ -> true)
       ; flush = ignore
       }
   }

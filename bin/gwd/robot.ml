@@ -26,7 +26,7 @@ type excl =
 
 let robot_error conf cnt sec =
   Output.status conf Def.Forbidden;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Output.header conf "Content-Type: text/html; charset=UTF-8";
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
   Util.include_template conf env "robot"
     (fun () ->

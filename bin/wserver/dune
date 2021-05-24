@@ -3,5 +3,6 @@
  (public_name geneweb.wserver)
  (wrapped false)
  (libraries geneweb.util unix)
+ (preprocess (action (run %{bin:cppo}  -D GENEWEB_GWDB_LEGACY -D WINDOWS -D DEBUG %{input-file})))
  (modules wserver)
 )

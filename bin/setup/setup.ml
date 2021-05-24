@@ -2,7 +2,7 @@ open Geneweb
 
 let port = ref 2316
 let gwd_port = ref 2317
-let default_lang = ref "en"
+let default_lang = ref "fr"
 let setup_dir = ref "."
 let bin_dir = ref ""
 let base_dir = ref ""
@@ -16,7 +16,8 @@ let printer_conf =
                         { status = Wserver.http
                         ; header = Wserver.header
                         ; body = Wserver.print_string
-                        ; flush = Wserver.wflush
+                        ; file = Wserver.print_filename
+                        ; flush = ignore
                         }
   }
 
@@ -56,7 +57,7 @@ let charset conf =
 
 let header_no_page_title conf title =
   Output.status printer_conf Def.OK;
-  Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+  Output.header printer_conf "Content-Type: text/html; charset=%s" (charset conf);
   Output.print_string printer_conf
     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
      \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
@@ -798,7 +799,7 @@ let print_file conf bname =
   match ic_opt with
   | Some ic ->
     Output.status printer_conf Def.OK;
-    Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+    Output.header printer_conf "Content-Type: text/html; charset=%s" (charset conf);
     copy_from_stream conf (Output.print_string printer_conf) (Stream.of_channel ic);
     close_in ic;
     trailer conf
@@ -1582,8 +1583,8 @@ let print_typed_file conf typ fname =
   match ic_opt with
     Some ic ->
       Output.status printer_conf Def.OK;
-      Output.header printer_conf "Content-type: %s" typ;
-      Output.header printer_conf "Content-length: %d" (in_channel_length ic);
+      Output.header printer_conf "Content-Type: %s" typ;
+      Output.header printer_conf "Content-Length: %d" (in_channel_length ic);
       begin try
         while true do let c = input_char ic in Output.printf printer_conf "%c" c done
       with End_of_file -> ()
@@ -1849,21 +1850,18 @@ let daemon = ref false
 let usage =
   "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
 let speclist =
-  [("-bd", Arg.String (fun x -> base_dir := x),
-    "<dir>: Directory where the databases are installed.");
-   ("-gwd_p", Arg.Int (fun x -> gwd_port := x),
-    "<number>: Specify the port number of gwd (default = " ^
-      string_of_int !gwd_port ^ "); > 1024 for normal users.");
-   ("-lang", Arg.String (fun x -> lang_param := x), "<string>: default lang");
-   ("-daemon", Arg.Set daemon, ": Unix daemon mode.");
-   ("-p", Arg.Int (fun x -> port := x),
-    "<number>: Select a port number (default = " ^ string_of_int !port ^
-    "); > 1024 for normal users.");
-   ("-only", Arg.String (fun s -> only_file := s),
-    "<file>: File containing the only authorized address");
-   ("-gd", Arg.String (fun x -> setup_dir := x), "<string>: gwsetup directory");
-   ("-bindir", Arg.String (fun x -> bin_dir := x),
-    "<string>: binary directory (default = value of option -gd)")]
+  [
+    ("-bd", Arg.String (fun x -> base_dir := x),"<DIR>: Directory where the databases are installed.")
+  ; ("-gd", Arg.String (fun x -> setup_dir := x), "<DIR>: gwsetup directory")
+  ; ("-gwd_p", Arg.Int (fun x -> gwd_port := x), "<NUMBER>: Specify the port number of gwd (default = " ^ string_of_int !gwd_port ^ "); > 1024 for normal users.")
+  ; ("-lang", Arg.String (fun x -> lang_param := x), "<LANG>: default lang")
+#ifdef UNIX
+  ; ("-daemon", Arg.Set daemon, ": Unix daemon mode.")
+#endif
+  ; ("-p", Arg.Int (fun x -> port := x), "<NUMBER>: Select a port number (default = " ^ string_of_int !port ^ "); > 1024 for normal users.")
+  ; ("-only", Arg.String (fun s -> only_file := s), "<FILE>: File containing the only authorized address")
+  ; ("-bindir", Arg.String (fun x -> bin_dir := x), "<DIR>: binary directory (default = value of option -gd)")
+  ]
 let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s))
 
 #ifdef UNIX
@@ -1899,19 +1897,19 @@ let intro () =
   let (gwd_lang, setup_lang) =
     if !daemon then
 #ifdef UNIX
-        let setup_lang =
-          if String.length !lang_param < 2 then default_setup_lang
-          else !lang_param
-        in
-        Printf.printf "To start, open location http://localhost:%d/\n" !port;
-        flush stdout;
-        if Unix.fork () = 0 then
-          begin
-            Unix.close Unix.stdin;
-            null_reopen [Unix.O_WRONLY] Unix.stdout
-          end
-        else exit 0;
-        default_gwd_lang, setup_lang
+      let setup_lang =
+        if String.length !lang_param < 2 then default_setup_lang
+        else !lang_param
+      in
+      Printf.printf "To start, open location http://localhost:%d/\n" !port;
+      flush stdout;
+      if Unix.fork () = 0 then
+        begin
+          Unix.close Unix.stdin;
+          null_reopen [Unix.O_WRONLY] Unix.stdout
+        end
+      else exit 0;
+      default_gwd_lang, setup_lang
 #else
       default_gwd_lang, default_setup_lang
 #endif
@@ -1939,9 +1937,41 @@ let intro () =
   flush stdout
 
 let () =
-#ifdef UNIX
-  intro () ;
-#else
-  if Sys.getenv_opt "WSERVER" = None then intro () ;
+#ifdef DEBUG
+  Printexc.record_backtrace true;
 #endif
-  Wserver.f (fun _ -> prerr_endline) None !port 0 None wrap_setup
+  try
+    if Sys.getenv_opt "GATEWAY_INTERFACE" = None then begin
+      intro ();
+#ifdef WINDOWS
+      Wserver.noproc := true;
+#endif
+      Wserver.create "." (fun _ -> prerr_endline) None !port 0 None wrap_setup
+    end
+  with 
+  | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
+    Printf.eprintf 
+      "\nError: the port %d is already used by another server or gwsetup program.\n\
+       Solution: kill the other program or launch gwsetup with another port number\n\
+       (see -p option)\n%!"
+      !port;
+    exit 2
+  | e->
+    Printf.eprintf "%s\n%!" (Printexc.to_string e);
+    #ifdef DEBUG
+    let tm = Unix.localtime (Unix.time ()) in
+    let msg = match e with 
+        | Sys_error msg -> "Sys_error - " ^ msg
+        | _ -> Printexc.to_string e
+    in
+    if Unix.isatty Unix.stdout then begin
+      flush stderr; flush stdout;
+      Printf.eprintf
+        "----- %02d:%02d:%02d - Unexpected error (fatal) : %s\n%!" 
+        tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec msg;
+      Printf.eprintf "%s\n%!" (Printexc.get_backtrace ());
+      Printf.eprintf "----- Geneweb server terminated, press <Enter> to exit\n%!";
+      try ignore @@ read_line () with _ -> ()
+    end;
+  #endif
+    exit 1

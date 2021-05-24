@@ -20,7 +20,7 @@ let bench name fn =
       in
       loop (String.length s - 1) 0 []
     in
-    Printf.printf
+    Printf.eprintf
       "\
       \tminor_words : %s\n\
       \tpromoted_words : %s\n\
@@ -82,8 +82,9 @@ let bench name fn =
   let t2 = Unix.gettimeofday () in
   let p2 = Sys.time () in
   let gc2 = Gc.stat () in
-  Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1) ;
+  Printf.eprintf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1) ;
   pprint_gc (diff gc1 gc2) ;
+  flush stderr;
   res
 
 let print_callstack ?(max = 5) () =

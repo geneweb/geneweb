@@ -2,7 +2,7 @@
 
 (* module [Wserver]: elementary web service *)
 
-(** [Wserver.f syslog addr port tmout maxc g]
+(** [Wserver.create syslog addr port tmout maxc g]
     Starts an elementary httpd server at port [port] in the current
     machine. The variable [addr] is [Some the-address-to-use] or
     [None] for any of the available addresses of the present machine.
@@ -20,8 +20,9 @@
 
     See the example below.
 *)
-val f
-  : ([ `LOG_EMERG | `LOG_ALERT | `LOG_CRIT | `LOG_ERR | `LOG_WARNING
+val create
+  : string
+  -> ([ `LOG_EMERG | `LOG_ALERT | `LOG_CRIT | `LOG_ERR | `LOG_WARNING
      | `LOG_NOTICE | `LOG_INFO | `LOG_DEBUG ] -> string -> unit)
   -> string option
   -> int
@@ -30,19 +31,20 @@ val f
   -> (Unix.sockaddr * string list -> string -> string -> unit)
   -> unit
 
-val close_connection : unit -> unit
-
-val printf : ('a, out_channel, unit) format -> 'a
-    (* To be called to print page contents. *)
+val printf : ('a, unit, string, unit) format4 -> 'a
+  (* To be called to print page contents with format. *)
 
 val print_string : string -> unit
-(* To be called to print page contents. *)
+    (* To be called to print page contents. *)
+
+val print_filename : string -> string -> bool -> bool
+    (* To be called to print filename headers and contents. *)
 
 val header : string -> unit
     (* To print an http header line *)
 
 val wflush : unit -> unit
-    (* To flush page contents print. *)
+    (* To flush content to output *)
 
 val http : Def.httpStatus -> unit
     (* [Output.status conf answer] sends the http header where [answer]
@@ -52,16 +54,15 @@ val http_redirect_temporarily : string -> unit
     (* [Output.status conf_redirect url] sends the http header where [url]
        represents the Location where the request needs to be redirected. *)
 
-val get_request_and_content : char Stream.t -> string list * string
+val status_string : Def.httpStatus -> string
 
-val wsocket : unit -> Unix.file_descr
-val woc : unit -> out_channel
+val print_internal_error : exn -> string -> string -> string -> string -> unit
 
-val sock_in : string ref
-val sock_out : string ref
-    (* Names of the files used in windows implementation to communicate
-       http requests and html answers. Default "wserver.sin" and
-       "wserver.sou". Can have relative or absolute paths. *)
+val max_http : int ref
+
+type http_method
+val get_request_and_content : char Stream.t -> http_method * string * string * string list * string
+
 val stop_server : string ref
     (* Name of the file whose presence tells the server to stop (at least
        one request is necessary to unfreeze the server to make it check

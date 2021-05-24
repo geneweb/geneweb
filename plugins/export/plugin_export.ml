@@ -96,7 +96,7 @@ let export conf base =
     let isolated = List.assoc_opt "isolated" conf.env <> Some "off" in
     let opts =
       { Gwexport.default_opts with
-        oc = fname, Wserver.print_string, Wserver.close_connection
+        oc = fname, Wserver.print_string, ignore
       ; no_notes
       ; no_picture = List.assoc_opt "pictures" conf.env = Some "off"
       ; source
@@ -105,8 +105,8 @@ let export conf base =
     in
     let select = ( (fun i -> IPS.mem i ipers), (fun i -> IFS.mem i ifams) ) in
     Wserver.http Def.OK ;
-    Wserver.header "Content-type: text/plain" ;
-    Wserver.header (Printf.sprintf "Content-disposition: attachment; filename=\"%s\"" fname) ;
+    Wserver.header "Content-Type: application/octet-stream" ;
+    Wserver.header (Printf.sprintf "Content-Disposition: attachment; filename=\"%s\"" fname) ;
     begin match output with
       | `ged ->
         Gwb2gedLib.gwb2ged false opts select

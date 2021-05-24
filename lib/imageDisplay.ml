@@ -4,57 +4,6 @@
 open Config
 
 (* ************************************************************************** *)
-(*  [Fonc] content : string -> int -> string -> unit                          *)
-(** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
-                    image, pdf ou html sur le flux HTTP sortant de Wserver.
-    [Args] :
-      - ct : le content_type MIME du fichier, par exemple "image/png",
-             "image/jpeg" ou "application/pdf"
-      - len : la taille en octet du fichier
-      - fname : le nom du fichier
-    [Retour] : aucun
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
-(* ************************************************************************** *)
-let content conf ct len fname =
-  Output.status conf Def.OK;
-  Output.header conf "Content-type: %s" ct;
-  Output.header conf "Content-length: %d" len;
-  Output.header conf "Content-disposition: inline; filename=%s"
-    (Filename.basename fname);
-  (* TODO: Utiliser un cache public pour les images non personelles. *)
-  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
-  Output.flush conf
-
-(* ************************************************************************** *)
-(*  [Fonc] print_image_type : string -> string -> bool                        *)
-(** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
-                    utilisant Wserver.
-    [Args] :
-      - fname : le chemin vers le fichier image
-      - ctype : le content_type MIME du fichier, par exemple "image/png",
-                "image/jpeg" ou "application/pdf"
-    [Retour] : True si le fichier image existe et qu'il a été servi en réponse
-               HTTP.
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
-(* ************************************************************************** *)
-let print_image_type conf fname ctype =
-  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-    Some ic ->
-      let buf = Bytes.create 1024 in
-      let len = in_channel_length ic in
-      content conf ctype len fname;
-      let rec loop len =
-        if len = 0 then ()
-        else
-          let olen = min (Bytes.length buf) len in
-          really_input ic buf 0 olen;
-          Output.print_string conf (Bytes.sub_string buf 0 olen);
-          loop (len - olen)
-      in
-      loop len; close_in ic; true
-  | None -> false
-
-(* ************************************************************************** *)
 (*  [Fonc] print_image_file : string -> bool                                  *)
 (* ************************************************************************** *)
 let print_image_file conf fname =
@@ -63,7 +12,7 @@ let print_image_file conf fname =
        if Filename.check_suffix fname suff ||
           Filename.check_suffix fname (String.uppercase_ascii suff)
        then
-         print_image_type conf fname ctype
+        Output.print_file conf fname ctype true
        else false)
     [(".png", "image/png"); (".jpg", "image/jpeg");
      (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");

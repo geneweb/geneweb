@@ -128,6 +128,21 @@ let incorrect_request conf =
   Output.print_string conf "</p>\n";
   trailer conf
 
+let error_404 conf fname =
+  let title _ =
+    Output.print_string conf ((Utf8.capitalize_fst (Util.transl conf "not found")) ^ " : " ^ fname)
+  in
+  Output.status conf Def.Not_Found;
+  header conf title;
+  Output.printf conf "<div class=\"btn-group float-%s mt-2\">\n" conf.right;
+  let str = link_to_referer conf in
+  if str = "" then () else Output.print_string conf str;
+  Output.printf conf "<a href=\"\\\">\
+                      <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
+                      </a>\n" (Utf8.capitalize (Util.transl conf "home"));
+  Output.print_string conf "</div>\n";
+  trailer conf
+
 let error_cannot_access conf fname =
   let title _ = Output.print_string conf "Error" in
   header conf title;
