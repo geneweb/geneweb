@@ -763,7 +763,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 
 %define;desc_count_l(xxx)
   %foreach;descendant_level;
-    %if;(level=xxx)%number_of_persons_at_level;/%apply;cousins_l(xxx)%end;
+    %if;(level=xxx)%number_of_descendants_at_level;/%apply;cousins_l(xxx)%end;
   %end;
 %end;
 
