@@ -1,6 +1,7 @@
 open Geneweb.Config
 module Gwdb = Geneweb.Gwdb
 module Util = Geneweb.Util
+module DescendDisplay = Geneweb.DescendDisplay
 module Request = Gwd_lib.Request
 
 open Plugin_v7_lib
@@ -72,6 +73,9 @@ let doc =
     | None -> false
   end
 
+let d = 
+  w_base @@ w_person @@ fun conf base p -> V7_descend.print conf base p; true
+
 let ns = "v7"
 
 let _ =
@@ -81,9 +85,10 @@ let _ =
   in
   Gwd_lib.GwdPlugin.register ~ns
     [ "", aux home
+    ; "C", aux c
+    ; "D", aux d
+    ; "DOC", aux doc
     ; "L", aux l
     ; "P", aux p
     ; "PS", aux ps
-    ; "C", aux c
-    ; "DOC", aux doc
     ]

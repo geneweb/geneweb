@@ -12,6 +12,7 @@
        v7_templ)))
   (modules
     v7_cousins
+    v7_descend
     v7_date
     v7_interp
     v7_perso
