@@ -1,5 +1,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+#ifdef DEBUG
+let () = Printexc.record_backtrace true
+let () = Sys.enable_runtime_warnings true
+#endif
+
 open Geneweb
 open Config
 open Def
