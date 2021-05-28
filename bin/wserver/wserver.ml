@@ -15,7 +15,7 @@ let wserver_sock = ref Unix.stdout
 let shutdown_noerr fd = 
   try Unix.shutdown fd Unix.SHUTDOWN_ALL with _ -> ()
 
-type printing_status = Nothing | Status | Contents
+type printing_state = Nothing | Status | Contents
 
 let printing_state = ref Nothing
 

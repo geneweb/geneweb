@@ -2,9 +2,11 @@
 
 (* module [Wserver]: elementary web service *)
 
-(** [Wserver.create syslog addr port tmout maxc g]
+(** [Wserver.create working_dir syslog addr port tmout maxc g]
     Starts an elementary httpd server at port [port] in the current
-    machine. The variable [addr] is [Some the-address-to-use] or
+    machine. working_dir specifies the working directory for 
+    the interprocess exchange on Windows. 
+    The variable [addr] is [Some the-address-to-use] or
     [None] for any of the available addresses of the present machine.
     The port number is any number greater than 1024 (to create a
     client < 1024, you must be root). At each connection, the function

@@ -1395,7 +1395,7 @@ let conf_and_connection =
         | Exit -> ()
         | Unix.Unix_error (_, "write", _) as e -> raise e
         | e ->
-          GwdLog.syslog `LOG_CRIT ((context conf contents) ^ " : " ^ (Printexc.to_string e));
+          GwdLog.syslog `LOG_CRIT ((context conf contents) ^ " : " ^ (Printexc.to_string e));         
           GwdLog.log @@ (fun oc ->
              Printf.fprintf oc "Unexcepted exception : %s\n%s\n"
                (Printexc.to_string e)  (Printexc.get_backtrace ()) );
@@ -1897,6 +1897,7 @@ let main () =
         try Sys.getenv "REMOTE_HOST" with
           Not_found -> try Sys.getenv "REMOTE_ADDR" with Not_found -> ""
       in
+      Wserver.noproc:= true;
       match gtw with
         | "RELAY/HTTP" -> 
           Wserver.cgi:= false;

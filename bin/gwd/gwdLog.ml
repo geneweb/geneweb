@@ -5,15 +5,15 @@ let verbosity = ref 5 (* default is Emergency to Notice level*)
 let oc : out_channel option ref = ref None
 
 let open_log fname =
-  let fname = 
-    if String.index_opt fname '\\' = None && String.index_opt fname '/' = None
-    then Filename.concat !(Util.cnt_dir) fname 
-    else fname 
-  in
-  let gtw_mode = try let _ = Sys.getenv "GATEWAY_INTERFACE" in true with Not_found -> false in
+  let gtw_mode = Sys.getenv_opt "GATEWAY_INTERFACE" <> None in
   match fname with 
   | "2" | "stderr" -> oc:= Some stderr 
   | _ -> 
+    let fname = 
+      if String.index_opt fname '\\' = None && String.index_opt fname '/' = None
+      then Filename.concat !(Util.cnt_dir) fname 
+      else fname 
+    in
     oc := 
       Some (
         if gtw_mode then open_out_gen [Open_wronly; Open_creat; Open_append] 0o644 fname
