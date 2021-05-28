@@ -21,6 +21,13 @@
     <input type="hidden" name="nnn" value="%xxx;">
   %end;
 %end;
+%define;get_plugin(file)
+  %include.file
+%end;
+%define;get_plugin_cmd(kind, iii)
+  %apply;get_plugin(bvar.kind_iii)
+%end;
+
 %let;p_mod;%if;(bvar.p_mod!="" and evar.p_mod="")%bvar.p_mod;%elseif;(evar.p_mod!="")%evar.p_mod;%end;%in;
 %if;(not cancel_links)
   <div class="d-flex justify-content-between">
@@ -205,6 +212,12 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 %define;copylink(xx)
                   [*copy link %s:::xx]
                 %end;
+                %if;(bvar.btn_ind!="")
+                  <div class="dropdown-divider"></div>
+                  %for;i;0;bvar.btn_ind;
+                    %apply;get_plugin_cmd("btn_ind", i+1)
+                  %end;
+                %end;
                 <div class="dropdown-divider"></div>
                 <div class="btn-group pr-4" role="group">
                   <button class="dropdown-item permalink-copy mr-1 pr-0" type="button"
@@ -311,6 +324,12 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="%prefix;m=CHG_CHN;ip=%index;"><span class="fa fa-child fa-fw mr-1"></span> [*change children's names]</a>
                   %end;
+                  %if;(bvar.btn_fam!="")
+                    <div class="dropdown-divider"></div>
+                    %for;i;0;bvar.btn_fam;
+                      %apply;get_plugin_cmd("btn_fam", i+1)
+                    %end;
+                  %end;
                 </div>
               </li>
             %end;
@@ -330,6 +349,12 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=CT;hi=H;v=5;scale=100;fs=17;sosa=on;" title="[*compact tree] [with] %self;"><span class="fa fa-th fa-fw mr-2"></span>[*compact tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=h7;wide=on;" title="[Arbre 7 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>7 [generation/generations]1</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=m;" title="[Arbre 9 gen]">9 [generation/generations]1</a>
+                %if;(bvar.btn_anc!="")
+                  <div class="dropdown-divider"></div>
+                  %for;i;0;bvar.btn_anc;
+                    %apply;get_plugin_cmd("btn_anc", i+1)
+                  %end;
+                %end;
               </div>
             </li>
           %end;
@@ -347,6 +372,12 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 %(WIP%)
                 <a class="dropdown-item" href="%prefix;%access;;m=D;t=V;%if;(evar.v!="")v=%evar.v;%else;v=3%end;;spouse=on;marriage=on;"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree] (new)</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=D;t=A;num=on;v=%max_desc_level;;"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
+                %if;(bvar.btn_dsc!="")
+                  <div class="dropdown-divider"></div>
+                  %for;i;0;bvar.btn_dsc;
+                    %apply;get_plugin_cmd("btn_dsc", i+1)
+                  %end;
+                %end;
               </div>
             </li>
           %end;
@@ -368,8 +399,22 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;;m=C;t=AN"><span class="fa fa-birthday-cake fa-fw"></span> [*family birthday]</a>
               %end;
+              %if;(bvar.btn_lnk!="")
+                <div class="dropdown-divider"></div>
+                %for;i;0;bvar.btn_lnk;
+                  %apply;get_plugin_cmd("btn_lnk", i+1)
+                %end;
+              %end;
             </div>
           </li>
+          %if;(bvar.btn_new!="")
+            %for;i;0;bvar.btn_new;
+              %apply;get_plugin_cmd("btn_new", i+1)
+            %end;
+          %end;
+          %if;(bvar.btn_other!="")
+            %apply;get_plugin("btn_other_menu")
+          %end;
         </ul>
       </div>
     </nav>

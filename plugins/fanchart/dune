@@ -1,0 +1,11 @@
+(executable
+  (name plugin_fanchart)
+  (libraries geneweb geneweb.gwd_lib geneweb.wserver)
+  (flags -linkall)
+  (modes (native plugin))
+)
+
+(alias 
+   (name plugin)
+   (deps (source_tree assets) (file META) plugin_fanchart.cmxs)
+)

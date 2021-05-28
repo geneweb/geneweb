@@ -79,8 +79,8 @@ let d =
 let ns = "v7"
 
 let _ =
+  Util.add_lang_path !Gwd_lib.GwdPlugin.assets ;
   let aux fn assets conf base =
-    Util.add_lang_path assets ;
     fn conf base
   in
   Gwd_lib.GwdPlugin.register ~ns
