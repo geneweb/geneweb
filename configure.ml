@@ -16,8 +16,11 @@ let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let sosa = ref `None
 let gwdb = ref `None
+let syslog = ref false
 
 let set_api () = api := true
+
+let set_syslog () = syslog := true
 
 let set_sosa_legacy () = assert (!sosa = `None) ; sosa := `Legacy
 
@@ -53,6 +56,9 @@ let speclist =
   ; ( "--sosa-zarith"
     , Arg.Unit set_sosa_zarith
     , "Use Sosa module implementation based on `zarith` library" )
+  ; ( "--syslog"
+    , Arg.Unit set_syslog
+    , "Log gwd errors using syslog" )
   ]
 
 let () =
@@ -62,6 +68,11 @@ let () =
   let api_d, api_pkg =
     match !api with
     | true -> " -D API", "piqirun.ext redis-sync yojson curl"
+    | false -> "", ""
+  in
+  let syslog_d, syslog_pkg =
+    match !syslog with
+    | true -> " -D SYSLOG", "syslog"
     | false -> "", ""
   in
   if !sosa = `None then begin
@@ -118,9 +129,11 @@ let () =
   var "API_D" api_d ;
   var "GWDB_D" gwdb_d ;
   var "OS_D" os_d ;
+  var "SYSLOG_D" syslog_d ;
   var "API_PKG" api_pkg ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
+  var "SYSLOG_PKG" syslog_pkg ;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude ;
   var "DUNE_PROFILE" dune_profile ;
   close_out ch
