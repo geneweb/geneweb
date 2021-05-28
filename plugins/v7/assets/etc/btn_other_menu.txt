@@ -1,0 +1,13 @@
+%if;(bvar.btn_other!="")
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle text-secondary"
+       data-toggle="dropdown" role="button" href="#" aria-haspopup="true"
+       aria-expanded="false" title="[*v7 plugins]">
+       <span class="fa fa-plug"></span></a>
+    <div class="dropdown-menu">
+      %for;i;0;bvar.btn_other;
+        %apply;get_plugin_cmd("btn_other", i+1)
+      %end;
+    </div>
+  </li>
+%end;
