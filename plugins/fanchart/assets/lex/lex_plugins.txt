@@ -1,8 +1,0 @@
-
-    fanchart
-en: fanchart
-fr: arbre en éventail
-
-    plugins
-en: plugins
-fr: plugins

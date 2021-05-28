@@ -1,2 +1,2 @@
 <a class="dropdown-item" href="%prefix;m=A;t=FC;%access;;v=5;">
-<span class="fa fa-chart-pie fa-fw"></span> [*fanchart]</a>
+<span class="fa fa-chart-pie fa-fw"></span> [*v7 fanchart]</a>
