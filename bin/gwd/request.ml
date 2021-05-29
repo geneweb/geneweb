@@ -496,7 +496,8 @@ let treat_request =
     let m = Opt.default "" @@ p_getenv conf.env "m" in
     if not @@ try_plugin plugins conf base m
     then begin
-        if p_getenv conf.base_env "counter" <> Some "no"
+        if Util.p_getenv conf.env "m" <> Some "IM" &&
+           p_getenv conf.base_env "counter" <> Some "no"
         then begin
           match
             if only_special_env conf.env
