@@ -29,7 +29,11 @@ let skip_possible_remaining_chars fd =
       | _ -> ()
     in
     loop ()
-  with Unix.Unix_error (Unix.ECONNRESET, _, _) -> ()
+  (* Read on https://utcc.utoronto.ca/~cks/space/blog/unix/AcceptErrnoProblem:
+     These days accept() is standardized to return ECONNABORTED instead of
+     ECONNRESET in these circumstances, although this may not be universal.
+  *)
+  with Unix.Unix_error (Unix.(ECONNRESET|ECONNABORTED), _, _) -> ()
 
 let close_connection () =
   if not !connection_closed then begin

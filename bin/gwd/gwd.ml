@@ -1,5 +1,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+#ifdef DEBUG
+let () = Printexc.record_backtrace true
+let () = Sys.enable_runtime_warnings true
+#endif
+
 open Geneweb
 open Config
 open Def
@@ -197,6 +202,8 @@ let load_lexicon =
 let cache_lexicon () =
   List.iter (fun x -> ignore @@ load_lexicon x) !cache_langs
 
+exception Register_plugin_failure of string * Dynlink.error
+
 let register_plugin dir =
   let pname = Filename.basename dir in
   let plugin = Filename.concat dir @@ "plugin_" ^ pname ^ ".cmxs" in
@@ -211,7 +218,10 @@ let register_plugin dir =
     end lex end ;
   let assets = Filename.concat dir "assets" in
   GwdPlugin.assets := assets ;
-  Dynlink.loadfile plugin ;
+  begin
+    try Dynlink.loadfile plugin
+    with Dynlink.Error e -> raise (Register_plugin_failure (plugin, e))
+  end ;
   GwdPlugin.assets := ""
 
 let alias_lang lang =
@@ -1978,5 +1988,6 @@ let () =
       !selected_port;
     flush stderr;
 #endif
-  | Dynlink.Error e -> GwdLog.syslog `LOG_CRIT (Dynlink.error_message e)
+  | Register_plugin_failure (p, e) ->
+    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)

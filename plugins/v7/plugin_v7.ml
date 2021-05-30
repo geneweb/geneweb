@@ -1,6 +1,7 @@
 open Geneweb.Config
 module Gwdb = Geneweb.Gwdb
 module Util = Geneweb.Util
+module DescendDisplay = Geneweb.DescendDisplay
 module Request = Gwd_lib.Request
 
 open Plugin_v7_lib
@@ -60,11 +61,9 @@ let c =
 
 let doc =
   w_base begin fun conf base ->
-    let _ = Printf.eprintf "m=DOC\n" in
     match Util.p_getenv conf.env "s" with
     | Some f ->
         begin
-          let _ = Printf.eprintf "m=DOC;f=%s\n" f in
           if Filename.check_suffix f ".txt" then
             let f = Filename.chop_suffix f ".txt" in
             V7_srcfile.new_print_source conf base f
@@ -73,6 +72,9 @@ let doc =
         end
     | None -> false
   end
+
+let d = 
+  w_base @@ w_person @@ fun conf base p -> V7_descend.print conf base p; true
 
 let ns = "v7"
 
@@ -83,9 +85,10 @@ let _ =
   in
   Gwd_lib.GwdPlugin.register ~ns
     [ "", aux home
+    ; "C", aux c
+    ; "D", aux d
+    ; "DOC", aux doc
     ; "L", aux l
     ; "P", aux p
     ; "PS", aux ps
-    ; "C", aux c
-    ; "DOC", aux doc
     ]

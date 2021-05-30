@@ -1,0 +1,10 @@
+(alias 
+   (name plugin) 
+   (deps (source_tree assets) (file META) plugin_welcome.cmxs)
+)
+(executable
+  (name plugin_welcome)
+  (libraries geneweb geneweb.gwd_lib geneweb.wserver plugin_v7_lib)
+  (flags -linkall)
+  (modes (native plugin))
+)

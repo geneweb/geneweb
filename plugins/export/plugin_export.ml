@@ -96,7 +96,7 @@ let export conf base =
     let isolated = List.assoc_opt "isolated" conf.env <> Some "off" in
     let opts =
       { Gwexport.default_opts with
-        oc = fname, Wserver.print_string, Wserver.close_connection
+        oc = fname, Output.print_string conf, Wserver.close_connection
       ; no_notes
       ; no_picture = List.assoc_opt "pictures" conf.env = Some "off"
       ; source
@@ -112,8 +112,8 @@ let export conf base =
         Gwb2gedLib.gwb2ged false opts select
       | `gw ->
         GwuLib.prepare_free_occ ~select:(fst select) base ;
-        Wserver.print_string "encoding: utf-8\n" ;
-        Wserver.print_string "gwplus\n\n" ;
+        Output.print_string conf "encoding: utf-8\n" ;
+        Output.print_string conf "gwplus\n\n" ;
         GwuLib.gwu opts isolated base "" "" (Hashtbl.create 0) select ;
     end ;
     Wserver.wflush () ;
