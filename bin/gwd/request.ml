@@ -498,7 +498,11 @@ let treat_request =
     then begin
         if p_getenv conf.base_env "counter" <> Some "no"
         then begin
-          match SrcfileDisplay.incr_welcome_counter conf with
+          match
+            if only_special_env conf.env
+            then SrcfileDisplay.incr_welcome_counter conf
+            else SrcfileDisplay.incr_request_counter conf
+          with
           | Some (welcome_cnt, request_cnt, start_date) ->
             GwdLog.log begin fun oc ->
               let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
