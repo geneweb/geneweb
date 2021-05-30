@@ -1449,7 +1449,6 @@ let image_request conf script_name env =
         if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
         else fname
       in
-      let fname = Filename.basename fname in
       let fname = Util.image_file_name fname in
       let _ = ImageDisplay.print_image_file conf fname in true
   | _ ->
