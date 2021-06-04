@@ -35,8 +35,6 @@ PrivilegesRequired=admin
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-WizardImageFile=compiler:WizModernImage-IS.bmp
-WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 
 [Files]
 Source: "{#MyDistribution}*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
