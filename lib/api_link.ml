@@ -9,10 +9,10 @@ open Def
 open Gwdb
 
 let redis_host =
-  try Sys.getenv "GW_REDIS_HOST"
+  try Sys.getenv "GW_LIA_REDIS_HOST"
   with Not_found -> "127.0.0.1"
 let redis_port =
-  try int_of_string (Sys.getenv "GW_REDIS_PORT")
+  try int_of_string (Sys.getenv "GW_LIA_REDIS_PORT")
   with Not_found -> 6379
 let lia_host =
   try Sys.getenv "GW_LIA_HOST"
