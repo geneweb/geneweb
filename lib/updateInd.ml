@@ -37,21 +37,6 @@ let extract_var sini s =
     String.sub s len (String.length s - len)
   else ""
 
-let obsolete_list = ref []
-
-let obsolete version var new_var r =
-  if List.mem var !obsolete_list then r
-  else if Sys.unix then
-    begin
-      Printf.eprintf "*** <W> updind.txt: \"%s\" obsolete since v%s%s\n" var
-        version
-        (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
-      flush stderr;
-      obsolete_list := var :: !obsolete_list;
-      r
-    end
-  else r
-
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
@@ -477,59 +462,19 @@ and eval_date_var_aux od =
         Some d -> string_of_int d.year
       | None -> ""
       end
-  | x ->
-      let r =
-        match x with
-          "cal_french" -> eval_is_cal Dfrench od
-        | "cal_gregorian" -> eval_is_cal Dgregorian od
-        | "cal_hebrew" -> eval_is_cal Dhebrew od
-        | "cal_julian" -> eval_is_cal Djulian od
-        | "prec_no" -> if od = None then "1" else ""
-        | "prec_sure" ->
-            eval_is_prec
-              (function
-                 Sure -> true
-               | _ -> false)
-              od
-        | "prec_about" ->
-            eval_is_prec
-              (function
-                 About -> true
-               | _ -> false)
-              od
-        | "prec_maybe" ->
-            eval_is_prec
-              (function
-                 Maybe -> true
-               | _ -> false)
-              od
-        | "prec_before" ->
-            eval_is_prec
-              (function
-                 Before -> true
-               | _ -> false)
-              od
-        | "prec_after" ->
-            eval_is_prec
-              (function
-                 After -> true
-               | _ -> false)
-              od
-        | "prec_oryear" ->
-            eval_is_prec
-              (function
-                 OrYear _ -> true
-               | _ -> false)
-              od
-        | "prec_yearint" ->
-            eval_is_prec
-              (function
-                 YearInt _ -> true
-               | _ -> false)
-              od
-        | _ -> raise Not_found
-      in
-      obsolete "5.00" x (if x.[0] = 'c' then "calendar" else "prec") r
+  | "cal_french" -> eval_is_cal Dfrench od
+  | "cal_gregorian" -> eval_is_cal Dgregorian od
+  | "cal_hebrew" -> eval_is_cal Dhebrew od
+  | "cal_julian" -> eval_is_cal Djulian od
+  | "prec_no" -> if od = None then "1" else ""
+  | "prec_sure" -> eval_is_prec (function Sure -> true | _ -> false) od
+  | "prec_about" -> eval_is_prec (function About -> true | _ -> false) od
+  | "prec_maybe" -> eval_is_prec (function Maybe -> true | _ -> false) od
+  | "prec_before" -> eval_is_prec (function Before -> true | _ -> false) od
+  | "prec_after" -> eval_is_prec (function After -> true | _ -> false) od
+  | "prec_oryear" -> eval_is_prec (function OrYear _ -> true | _ -> false) od
+  | "prec_yearint" -> eval_is_prec (function YearInt _ -> true | _ -> false) od
+  | _ -> raise Not_found
 and eval_date_field =
   function
     Some d ->

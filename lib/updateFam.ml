@@ -68,21 +68,6 @@ let extract_var sini s =
     String.sub s len (String.length s - len)
   else ""
 
-let obsolete_list = ref []
-
-let obsolete version var new_var r =
-  if List.mem var !obsolete_list then r
-  else if Sys.unix then
-    begin
-      Printf.eprintf "*** <W> updfam.txt: \"%s\" obsolete since v%s%s\n" var
-        version
-        (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
-      flush stderr;
-      obsolete_list := var :: !obsolete_list;
-      r
-    end
-  else r
-
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
@@ -452,12 +437,7 @@ and eval_key (fn, sn, oc, create, _) =
   | ["first_name"] -> str_val (Util.escape_html fn)
   | ["occ"] -> str_val (if oc = 0 then "" else string_of_int oc)
   | ["surname"] -> str_val (Util.escape_html sn)
-  | x ->
-      match x with
-        ["sex"] ->
-          obsolete "5.00" "sex" "create.sex"
-            (str_val (eval_create create "sex"))
-      | _ -> raise Not_found
+  | _ -> raise Not_found
 and eval_create c =
   function
     "birth_day" ->

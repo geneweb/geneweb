@@ -1734,22 +1734,6 @@ let warning_use_has_parents_before_parent (bp, ep) var r =
     end
   else r
 
-let obsolete_list = ref []
-
-let obsolete (bp, ep) version var new_var r =
-  if List.mem var !obsolete_list then r
-  else if Sys.unix then
-    begin
-      Printf.eprintf "*** <W> %s, chars %d-%d:" !template_file bp ep;
-      Printf.eprintf " \"%s\" obsolete since v%s%s\n" var version
-        (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
-      flush stderr;
-      obsolete_list := var :: !obsolete_list;
-      r
-    end
-  else r
-
-
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
@@ -3258,11 +3242,10 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
       end
   | ["var"] -> VVother (eval_person_field_var conf base env ep loc)
   | [s] ->
-      begin try bool_val (eval_bool_person_field conf base env ep s) with
-        Not_found ->
-          begin try str_val (eval_str_person_field conf base env ep s) with
-            Not_found -> obsolete_eval conf base env ep loc s
-          end
+      begin
+        try bool_val (eval_bool_person_field conf base env ep s)
+        with Not_found ->
+          str_val (eval_str_person_field conf base env ep s)
       end
   | [] -> str_val (simple_person_text conf base p p_auth)
   | _ -> raise Not_found
@@ -4527,20 +4510,6 @@ and string_of_parent_age conf base (p, p_auth) parent =
 and string_of_int_env var env =
   match get_env var env with
     Vint x -> string_of_int x
-  | _ -> raise Not_found
-and obsolete_eval conf base env (p, _) loc =
-  function
-    "married_to" ->
-      let s =
-        match get_env "fam" env with
-          Vfam (_, fam, _, m_auth) ->
-            let format = relation_txt conf (get_sex p) fam in
-            Printf.sprintf (fcapitale format)
-              (fun _ ->
-                 if m_auth then string_of_marriage_text conf base fam else "")
-        | _ -> raise Not_found
-      in
-      obsolete loc "4.08" "married_to" "" (str_val s)
   | _ -> raise Not_found
 
 let eval_transl conf base env upp s c =
