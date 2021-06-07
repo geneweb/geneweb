@@ -54,24 +54,6 @@ let encode opts s =
 
 let max_len = 78
 
-let br = "<br>"
-let find_br s ini_i =
-  let ini = "<br" in
-  let rec loop i j =
-    if i = String.length ini then
-      let rec loop2 j =
-        if j = String.length s then br
-        else if s.[j] = '>' then String.sub s ini_i (j - ini_i + 1)
-        else loop2 (j + 1)
-      in
-      loop2 j
-    else if j = String.length s then br
-    else if String.unsafe_get ini i = String.unsafe_get s j then
-      loop (i + 1) (j + 1)
-    else br
-  in
-  loop 0 ini_i
-
 let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
 
 (** [display_note_aux opts tagn s len i] outputs text [s] with CONT/CONC
@@ -94,31 +76,17 @@ let rec display_note_aux opts tagn s len i =
   (* read wide char (case charset UTF-8) or char (other charset) in s string*)
   if !j = String.length s then Printf.ksprintf (oc opts) "\n"
   else
-    (* \n, <br>, <br \> : cut text for CONTinuate with new gedcom line *)
-    let br = find_br s i in
-    if i <= String.length s - String.length br &&
-       String.lowercase_ascii (String.sub s i (String.length br)) = br
-    then
-      begin
-        Printf.ksprintf (oc opts) "\n%d CONT " (succ tagn);
-        let i = i + String.length br in
-        let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
-        display_note_aux opts tagn s
-          (String.length (string_of_int (succ tagn) ^ " CONT ")) i
-      end
-    else if s.[i] = '\n' then
+    if s.[i] = '\n' then
       begin
         Printf.ksprintf (oc opts) "\n%d CONT " (succ tagn);
         let i = if i < String.length s then i + 1 else i in
         display_note_aux opts tagn s
           (String.length (string_of_int (succ tagn) ^ " CONT ")) i
       end
-    (* cut text at max length for CONCat with next gedcom line *)
     else if len = max_len then
       begin Printf.ksprintf (oc opts) "\n%d CONC " (succ tagn);
         display_note_aux opts tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
       end
-    (* continue same gedcom line *)
     else
       begin
         (* FIXME: Rewrite this so we can get rid of this custom [nbc] *)
