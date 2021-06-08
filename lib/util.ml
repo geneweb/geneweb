@@ -2176,9 +2176,8 @@ let create_topological_sort conf base =
       then Filename.concat bfile "tstab_visitor"
       else Filename.concat bfile "tstab"
     in
-    Mutil.read_or_create_channel ~magic:Mutil.executable_magic tstab_file
-      begin fun ic -> (Marshal.from_channel ic : (iper, int) Gwdb.Marker.t) end
-      begin fun oc ->
+    Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
+      begin fun () ->
         Lock.control (Mutil.lock_file bfile) false
           ~onerror:begin fun () ->
             let () = load_ascends_array base in
@@ -2191,7 +2190,6 @@ let create_topological_sort conf base =
             let tstab = Consang.topological_sort base (pget conf) in
             if conf.use_restrict && not conf.wizard && not conf.friend
             then base_visible_write base ;
-            Marshal.to_channel oc tstab [ Marshal.No_sharing ; Marshal.Closures ] ;
             tstab
           end
       end

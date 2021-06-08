@@ -789,91 +789,42 @@ let list_rev_map_append f l1 l2 =
 
 (* POSIX lockf(3), and fcntl(2), releases its locks when the process
    that holds the locks closes ANY file descriptor that was open on that file.
-
-   i.e. Do not close channels before releasing the lock.
 *)
-let rec read_or_create_channel ?(wait = true) ?magic fname read write =
+let read_or_create_channel ?magic ?(wait = false) fname read write =
+#ifdef WINDOWS
+  let _ = wait in
+#endif
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
   let ic = Unix.in_channel_of_descr fd in
-#ifndef WINDOWS
-  let writelock lock =
-    assert (Unix.lseek fd 1 Unix.SEEK_SET = 1) ;
-    Unix.lockf fd lock 1 ;
-    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
-  in
-  let readlock lock =
-    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0) ;
-    Unix.lockf fd lock 1 ;
-    assert (Unix.lseek fd 0 Unix.SEEK_SET = 0)
-  in
-#else
-  let writelock _ = () in
-  let readlock _ = () in
-#endif
-  let aux () =
-    if match magic with None -> true | Some m -> check_magic m ic
+  let check = function None -> true | Some m -> check_magic m ic in
+  let read () =
+    seek_in ic 0 ;
+    if check magic
     then
       try
         let res = read ic in
-        writelock Unix.F_ULOCK ;
+        assert (check magic) ;
         close_in ic ;
         Some res
       with _ -> None
     else None
   in
-  match try writelock Unix.F_TLOCK ; None with e -> Some e with
-  | None ->
-    begin
-      match aux () with
-      | Some res -> res
-      | None ->
-        readlock Unix.F_LOCK ;
-        let oc = open_out_bin fname in
-        begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
-        let res = write oc in
-        begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
-        flush oc ;
-        readlock Unix.F_ULOCK ;
-        writelock Unix.F_ULOCK ;
-        close_out oc ;
-        close_in ic ;
-        res
-    end
-  | Some e ->
-    if wait then begin
-      writelock Unix.F_LOCK ;
-      writelock Unix.F_ULOCK ;
-      readlock Unix.F_RLOCK ;
-      match aux () with
-      | Some res -> res
-      | None -> read_or_create_channel ~wait ?magic fname read write
-    end else raise e
-
-let read_or_create_value ?magic fname create =
-  assert (Secure.check fname) ;
-  let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
-  let ic = Unix.in_channel_of_descr fd in
-  match
-    if match magic with None -> true | Some m -> check_magic m ic
-    then
-      try
-        let res = Marshal.from_channel ic in
-        close_in ic ;
-        Some res
-      with _ -> None
-    else None
-  with
+  match read () with
   | Some v -> v
   | None ->
-    let v = create () in
-    let oc = Unix.out_channel_of_descr (Unix.dup fd) in
-    try
 #ifndef WINDOWS
-      Unix.lockf fd Unix.F_TLOCK 0 ;
+    Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0 ;
+    match read () with
+    | Some v -> v
+    | None ->
 #endif
+      let fd = Unix.dup fd in
+      Unix.ftruncate fd 0 ;
+      let oc = Unix.out_channel_of_descr fd in
       begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
-      Marshal.to_channel oc v [ Marshal.No_sharing ; Marshal.Closures ] ;
+      let v = write oc in
+      begin match magic with Some m -> output_string oc m | None -> () end ;
       begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
 #ifndef WINDOWS
       Unix.lockf fd Unix.F_ULOCK 0 ;
@@ -881,11 +832,16 @@ let read_or_create_value ?magic fname create =
       close_in ic ;
       close_out oc ;
       v
-    with
-    | _ ->
-      close_in ic ;
-      close_out oc ;
-      v
+
+let read_or_create_value ?magic ?wait fname create =
+  let read ic = Marshal.from_channel ic in
+  let write oc =
+    let v = create () in
+    Marshal.to_channel oc v [ Marshal.No_sharing ; Marshal.Closures ] ;
+    v
+  in
+  try read_or_create_channel ?magic ?wait fname read write
+  with _ -> create ()
 
 let encode s =
   let special = function

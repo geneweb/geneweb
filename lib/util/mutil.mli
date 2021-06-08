@@ -215,8 +215,8 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
     On Windows, file is not locked.
 *)
 val read_or_create_channel
-  : ?wait:bool
-  -> ?magic:string
+  :  ?magic:string
+  -> ?wait:bool
   -> string
   -> (in_channel -> 'a)
   -> (out_channel -> 'a)
@@ -224,7 +224,7 @@ val read_or_create_channel
 
 (** [read_or_create_value ?magic fname create]
 
-    If [fname] exists (and starts with [magic] if this one is provided),
+    If [fname] exists (and starts and ends with [magic] if this one is provided),
     return the unmarshalled value.
     If it does not, or does not start with [magic], or if unmarshalling raise an exception,
     [create] function is used to produce the value to be marshalled.
@@ -232,11 +232,11 @@ val read_or_create_channel
     On Windows, file is not locked.
 *)
 val read_or_create_value
-  : ?magic:string
+  :  ?magic:string
+  -> ?wait:bool
   -> string
   -> (unit -> 'a)
   -> 'a
-
 
 (** [bench name fn]
     Execute [fn], print stats about time and memory allocation, return [fn] result.
