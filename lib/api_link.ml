@@ -497,7 +497,10 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
 (**/**)
 
 let get_link_tree_curl =
-  let host = lia_host ^ ":" ^ string_of_int lia_port in
+  let host =
+    Unix.string_of_inet_addr (Unix.gethostbyname lia_host).Unix.h_addr_list.(0)
+    ^ ":" ^ string_of_int lia_port
+  in
   fun conf request basename bname ip s s2 nb_asc from_gen_desc nb_desc ->
   let index = Some (Int32.of_string @@ Gwdb.string_of_iper ip) in
   let data =

@@ -1830,10 +1830,6 @@ let arg_plugins ~check =
     end
   end
 
-#ifdef API
-let string_of_inet_aux x = Unix.string_of_inet_addr (Unix.gethostbyname x).Unix.h_addr_list.(0)
-#endif
-
 let main () =
 #ifdef WINDOWS
   Wserver.sock_in := "gwd.sin";
