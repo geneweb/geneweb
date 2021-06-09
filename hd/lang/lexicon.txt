@@ -39,7 +39,7 @@ af: af=Afrikaans/bg=Bulgaars/br=Bretons/ca=Catalan/co=Korsikaans/cs=Czeck/da=Dee
 bg: af=бурски/bg=български/br=бретонски/ca=каталонски/co=корсикан/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/oc=окситански/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sk=Словашки език/sl=словенски/sv=шведски/tr=турски/zh=китайски
 br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/co=korseg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/oc=okitaneg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sk=Slovakeg/sl=sloveneg/sv=svedeg/tr=turc/zh=sinaeg
 ca: af=africà/bg=búlgar/br=bretó/ca=català/co=cors/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/oc=occità/pl=polac/pt=portuguès/pt-br=brasiler/ro=romanès/ru=rus/sk=Eslovac/sl=eslovè/sv=suec/tr=turc/zh=Xinès
-co: af=africanu/bg=bulgaru/br=brittonu/ca=catalanu/co=corsu/cs=ceccu/da=danese/de=tedescu/en=inglese/eo=esperanto/es=spagnolu/et=estonianu/fi=finlandese/fr=francese/he=ebreu/is=islandese/it=talianu/lv=lettonu/nl=neerlandese/no=nurvegese/oc=occitanicu/pl=pulunese/pt=purtughese/pt-br=purtughese brasilianu/ro=rumanu/ru=russiu/sk=sluvaccu/sl=slovenu/sv=svedese/tr=turc/zh=chinese
+co: af=africanu/bg=bulgaru/br=brittonu/ca=catalanu/co=corsu/cs=ceccu/da=danese/de=tedescu/en=inglese/eo=esperanto/es=spagnolu/et=estonianu/fi=finlandese/fr=francese/he=ebreu/is=islandese/it=talianu/lv=lettonu/nl=neerlandese/no=nurvegese/oc=occitanicu/pl=pulunese/pt=purtughese/pt-br=purtughese brasilianu/ro=rumanu/ru=russiu/sk=sluvaccu/sl=slovenu/sv=svedese/tr=turcu/zh=chinese
 cs: af=afrikánština/bg=bulharština/br=bretonština/ca=katalánština/co=korsikánština/cs=čeština/da=dánština/de=němčina/en=angličtina/eo=esperanto/es=španělština/et=estonština/fi=finština/fr=francouzština/he=hebrejština/is=islandština/it=italština/lv=lotyšština/nl=holandština/no=norština/oc=okcitánština/pl=polština/pt=portugalština/pt-br=brasilština/ro=rumunština/ru=ruština/sk=slovenština/sl=slovinština/sv=švédština/tr=turečtina/zh=čínština
 da: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/co=korsikansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/oc=occitansk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rumænsk/ru=russisk/sk= Slovakisk/sl=slovensk/sv=svensk/tr=tyrkisk/zh=kinesisk
 de: af=Afrikaans/bg=Bulgarish/br=Bretonisch/ca=Katalanisch/co=Korsisch/cs=Tschechisch/da=Dänisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Französisch/he=Hebräisch/is=Isländisch/it=Italienisch/lv=Litauisch/nl=Holländisch/no=Norwegisch/oc=Okzitanisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ro=Rumänisch/ru=Russisch/sk=Slowakisch/sl=Slovenisch/sv=Schwedisch/tr=türkisch/zh=Chinesisch
@@ -134,7 +134,7 @@ af: om die eerste te sien
 bg: за да видите първата родствена връзка
 br: evit gwelout al liamm kentañ
 ca: per veure el primer vincle de parentesc
-co: per fighjà a prima leia
+co: per fighjà u primu
 cs: zobrazit první
 da: for at se det første
 de: , um die erste zu sehen
@@ -1195,6 +1195,7 @@ sv: en bror/en syster/ett syskon
 tr: bir erkek kardeş/bir kız kardeş/bir kardeş
 
     a child-in-law/children-in-law
+co: un zitellu appiccicaticciu/zitelli appiccicaticcii
 en: one child-in-law/children-in-law
 fr: un bel-enfant/beaux-enfants
 pt: enteado/enteados
@@ -3634,7 +3635,7 @@ af: stop GeneWeb-skakels
 bg: без GeneWeb-линкове
 br: nulañ al liammoù GeneWeb
 ca: anul·lar els lligams GeneWeb
-co: affissera simplice senza e leie
+co: affissera simplice senza i liami
 cs: zrušit spoje GeneWebu
 da: uden GeneWeb-links
 de: GeneWeb-Links entfernen
@@ -3759,7 +3760,7 @@ af: kan die geslag van 'n getroude persoon nie verander nie
 bg: не може да се промени полът на човек в брак
 br: n'heller ket kemm reizh unan euredet
 ca: no es pot canviar el sexe d'una persona casada
-co: ùn si pò micca cambià u sessu di una persona maritata
+co: ùn si pò micca cambià u sessu d’una persona maritata
 cs: nemohu změnit pohlaví ženatého muže/nemohu změnit pohlaví vdané ženy
 da: kan ikke ændre køn for en gift person
 de: kann das Geschlecht einer verheirateten Person nicht ändern
@@ -4445,7 +4446,7 @@ sv: forts
 tr: devam eden
 
     copy link
-co: cupià a leia in u preme’papei
+co: cupià u liame in u preme’papei
 en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
 pt: copiar o link para a área de transferência
@@ -5487,7 +5488,7 @@ sv: visa makar
 tr: eşini göster
 
     display this marriage in this order
-co: piazzà st’unione à a so pusizione
+co: dispiazzà st’unione à a so pusizione
 de: diese Verbindung an seine Position setzen
 en: Change order of marriage
 es: colocar esta unión en posición
@@ -6260,7 +6261,7 @@ sv: familj/familjer
 tr: aile/aileler
 
     familyLinkLDS
-co: leia di parentia LDS
+co: liame di parentia LDS
 de: Familien Link-HLT
 en: Family Link (LDS)
 es: enlace familiar LDS
@@ -6430,7 +6431,7 @@ af: voornaam ontbreek
 bg: собственото име липсва
 br: raganv o tioueriñ
 ca: falta el nom
-co: nome chì manca
+co: nome assente
 cs: křestní jméno chybí
 da: fornavn mangler
 de: fehlender Vorname
@@ -7749,7 +7750,7 @@ af: ontbrekende ouers ingesluit
 bg: включително липсващите съпрузи и съпруги
 br: enklozañ ar priedoù a vank
 ca: incloure els cònjuges que falten
-co: include i cumpagni chì mancanu
+co: include i cumpagni assente
 cs: včetně chybějících manželů/manželek
 da: medtag ukendte ægtefæller
 de: Fehlende Ehegatten einbeziehen
@@ -8288,7 +8289,7 @@ af: is dieselfde persoon!
 bg: това е същият човек!
 br: a zo an hevelep den !
 ca: és la mateixa persona
-co: hè a listessa persona !
+co: ghjè a listessa persona !
 cs: je ta samá osoba!
 da: det er den samme person!
 de: es ist die selbe Person!
@@ -8475,7 +8476,7 @@ sv: länk
 tr: bağlantı
 
     link back to parents
-co: leia di ritornu ver di i genitori
+co: liame di ritornu ver di i genitori
 en: link back to parents
 fr: lien retour vers les parents
 no: lenke til foreldre
@@ -8488,7 +8489,7 @@ af: mense tussen
 bg: родство между
 br: liamm etre
 ca: lligam entre
-co: leia trà
+co: liame trà
 cs: vztah mezi
 da: slægtskab mellem
 de: Beziehung zwischen
@@ -8515,7 +8516,7 @@ sv: släktskap emellan
 tr: arasındaki ilişki
 
     link to children
-co: leia ver di i zitelli
+co: liame ver di i zitelli
 en: link to children
 fr: lien vers les enfants
 no: lenke til barn
@@ -8524,7 +8525,7 @@ sv: länk till barnen
 tr: çocuklara bağlantı
 
     link to use
-co: leia à impiegà
+co: liame à impiegà
 de: Link zu verwenden
 en: link to use
 fr: lien à utiliser
@@ -9631,7 +9632,7 @@ af: ontbrekende voorsate
 bg: липсващи предци
 br: lod eus e hendadoù a vank
 ca: ascendents que falten
-co: antenati chì mancanu
+co: antenati assente
 cs: chybějící předkové
 da: manglende forfædre
 de: fehlende Vorfahren
@@ -9666,7 +9667,7 @@ sv: datum saknas
 tr: tarih yok
 
     missing events
-co: avvenimenti chì mancanu
+co: avvenimenti assente
 de: Fehlende Ereignisse
 en: missing events
 es: faltan eventos
@@ -9682,7 +9683,7 @@ sv: Saknade händelser
 tr: eksik etkinlikler
 
     missing image
-co: fiura chì manca
+co: fiura assente
 en: missing image
 fr: image manquante
 no: bilde mangler
@@ -9691,7 +9692,7 @@ sv: bild saknas
 tr: eksik görüntü
 
     missing parents
-co: genitori chì mancanu
+co: genitori assente
 de: Eltern fehlen
 en: Parents unknown
 es: faltan padres
@@ -9707,7 +9708,7 @@ sv: Saknade föräldrar
 tr: Ebeveynler bilinmiyor
 
     missing sosa
-co: Sosa chì manca
+co: Sosa assente
 de: Fehlende SOSA
 en: missing Sosa numbers
 es: falta Sosa
@@ -9722,7 +9723,7 @@ sv: Saknade Sosa
 tr: eksik Sosa numaraları
 
     missing sources
-co: fonti chì mancanu
+co: fonti assente
 de: fehlende Quellenangaben
 en: missing sources
 es: faltan fuentes
@@ -9738,7 +9739,7 @@ sv: saknade källor
 tr: eksik kaynaklar
 
     missing spouse
-co: cumpagnu(a) chì manca
+co: cumpagnu(a) assente
 de: Lebenspartner fehlt
 en: Spouse unknown
 es: falta cónyuge
@@ -10444,7 +10445,7 @@ af: geen bekende verwantskap tussen %s en %s
 bg: няма данни за родство между %s и %s
 br: ne gaver ket al liamm a gerentiezh etre %s ha %s
 ca: cap lligam de parentesc conegut entre %s i %s
-co: nisuna leia di parentia cunnisciuta tra %s è %s
+co: nisunu liame di parentia cunnisciutu tra %s è %s
 cs: žádný známý vztah mezi :i:%s a :i:%s
 da: intet kendt slægtskab mellem %s og %s
 de: %s und %s sind anscheinend nicht verwandt
@@ -11529,6 +11530,7 @@ sv: Borgerligt äktenskap
 tr: Sivil Evlilik
 
     pacsed%t to
+co: PACS%t cù
 de: Eheähnliches Verhältnis%t mit
 en: Civil solidarity pact%t with
 es: Pacto civil de solidaridad%t con
@@ -12384,7 +12386,7 @@ af: aangetroude verwantskappe
 bg: родство чрез брак
 br: liammoù a gerentiezh dre euredennoù
 ca: parentiu polític
-co: leia d’apparentamentu
+co: liame d’apparentamentu
 cs: příbuzenské vztahy přes svatby
 da: slægtskaber ved giftermål
 de: Heiratsbeziehungen
@@ -12475,7 +12477,7 @@ sv: sätt att visa
 tr: seçenekler:
 
     relationship link between
-co: leia di parentia cù...
+co: liame di parentia cù...
 de: verwandt mit ...
 en: family link with...
 es: parentesco con...
@@ -12495,7 +12497,7 @@ af: verwantskap/verwantskappe
 bg: родствена връзка/родствени връзки
 br: liamm a gerentiezh/liammoù a gerentiezh
 ca: grau de parentesc/graus de parentesc
-co: leia di parentia/leie di parentia
+co: liame di parentia/liami di parentia
 cs: vztah/vztahy
 da: slægtskabsforbindelse/slægtskabsforbindelser
 de: Verwandtschaft/Verwandtschaften
@@ -12692,7 +12694,7 @@ pt: anos por geração
 tr: nesile göre yıllar
 
     scellentChildLDS
-co: leia eterna di zitelli LDS
+co: liame eternu di zitelli LDS
 de: HLT Kindes-Siege
 en: Sealing Child (LDS)
 es: sellamiento de hijo LDS
@@ -12706,7 +12708,7 @@ sv: Besegling med barn (LDS)
 tr: Mühürlü Çocuk (LDS)
 
     scellentParentLDS
-co: leia eterna cù i genitori LDS
+co: liame eternu cù i genitori LDS
 de: HTL Eltern-Versiegelung
 en: Sealing Parent (LDS)
 es: sellamiento con padres LDS
@@ -12720,7 +12722,7 @@ sv: Besegling med föräldrar (LDS)
 tr: Mühürlü Ebeveyn (LDS)
 
     scellentSpouseLDS
-co: leia eterna cù a sposa LDS
+co: liame eternu cù a sposa LDS
 de: HTL Ehepartner-Versiegelung
 en: Sealing Spouse (LDS)
 es:  sellamiento con cónyuge LDS
@@ -12814,7 +12816,7 @@ af: kyk hierbo
 bg: вж. по-горе
 br: gwelout amañ a-us
 ca: veure més amunt
-co: fighjà inzù
+co: fighjà insù
 cs: viz výše
 da: se ovenfor
 de: siehe oben
@@ -13061,7 +13063,7 @@ sv: Du kan välja ett annat språk bland de följande:
 tr: içinde görüntüle:
 
     select p_mod
-co: selezziunà i mudulli persunalizati
+co: selezziunà i muduli persunalizati
 en: select personalized modules
 fr: selectionner les modules personnalisés
 pt: seleccionar os módulos personalizados (por defeito zz)
@@ -13713,7 +13715,7 @@ sv: partner/partners
 tr: eş/eşler
 
     spouses info
-co: infurmazione di i cumpagni
+co: infurmazione nant’à i cumpagni
 en: spouses informations
 fr: informations conjoints
 pt: informação do cônjuge
@@ -13899,7 +13901,7 @@ af: van ontbreek
 bg: фамилното име липсва
 br: an anv-tud a vank
 ca: falta el cognom
-co: casata chì manca
+co: casata assente
 cs: příjmení schází
 da: efternavn mangler
 de: fehlender Nachname
@@ -15778,7 +15780,7 @@ af: gebruik "koppel" eerder as "skep"
 bg: използвайте "да се свърже" вместо "да се създаде"
 br: implijit "liammañ" kentoc'h eget "sevel"
 ca: utilitzeu "reunir" en lloc de "crear"
-co: impiegà « unisce » invvece di « creà »
+co: impiegà « unisce » invece di « creà »
 cs: použij "svázat" namísto "vytvořit"
 da: anvend »forbind« i stedet for »opret«
 de: benutze „verbinden“ an Stelle von „erzeugen”
