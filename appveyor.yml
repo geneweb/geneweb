@@ -17,16 +17,10 @@
         CYG_ROOT: C:/cygwin64
         PKG_OS: win64
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
-        PACKAGE_UPDATE: 'sudo apt-get update'
-        PACKAGE_INSTALLER: 'sudo apt-get install -qq'
         PKG_OS: linux
       - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-        PACKAGE_UPDATE: 'brew update'
-        PACKAGE_INSTALLER: 'brew install'
         PKG_OS: macos-10.14
       - APPVEYOR_BUILD_WORKER_IMAGE: macos
-        PACKAGE_UPDATE: 'brew update'
-        PACKAGE_INSTALLER: 'brew install'
         PKG_OS: macos-10.15
 
   install:
@@ -34,7 +28,7 @@
     - cmd: 'choco install -y innosetup'
     - cmd: 'set OPAMYES=1'
     - cmd: 'set PATH=%PATH%;%CYG_ROOT%\usr\x86_64-w64-mingw32\sys-root\mingw\bin'
-    - cmd: '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp'
+    - cmd: '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp -P perl-IPC-System-Simple'
     - cmd: '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
     - cmd: '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
     - cmd: '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.09.1+mingw64c --disable-sandboxing"'
@@ -43,10 +37,14 @@
     - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
     # unix environnement
     - sh: 'export OPAMYES=1'
-    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "macos" || "$APPVEYOR_BUILD_WORKER_IMAGE" == "macos-mojave" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
-    - sh: 'if [[ "$APPVEYOR_BUILD_WORKER_IMAGE" == "Ubuntu1604" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
-    - sh: '$PACKAGE_UPDATE'
-    - sh: '$PACKAGE_INSTALLER opam'
+    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
+    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then brew update; fi;'
+    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then brew install opam; fi;'
+    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then cpan install String::ShellQuote; fi;'
+    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then cpan install IPC::System::Simple; fi;'
+    - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
+    - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo sudo apt-get update; fi;'
+    - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo apt-get install -qq opam libstring-shellquote-perl; fi;'
     - sh: 'opam init --compiler=4.09.1'
     - sh: 'eval $(opam config env)'
     - sh: 'opam update'
