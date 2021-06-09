@@ -502,7 +502,7 @@ let year_text d =
   match d.prec with
   | OrYear d2 when d.year <> d2.year2 ->
     (string_of_int d.year) ^ "/" ^ string_of_int d2.year2
-  | YearInt d2 when d.year = d2.year2 ->
+  | YearInt d2 when d.year <> d2.year2 ->
     (string_of_int d.year) ^ ".." ^ string_of_int d2.year2
   | _ -> string_of_int d.year
 
