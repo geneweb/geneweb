@@ -1186,8 +1186,7 @@ let etc_file_name conf fname =
         (fname ^ ".txt")
     in
     let etc_tpl_dir =
-      Filename.concat (search_in_lang_path "etc")
-        (Filename.concat dir (fname ^ ".txt"))
+      search_in_lang_path (List.fold_right Filename.concat ["etc"; dir] (fname ^ ".txt"))
     in
     if Sys.file_exists base_name_tpl_dir then base_name_tpl_dir
     else if Sys.file_exists base_tpl_dir then base_tpl_dir
