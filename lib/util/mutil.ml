@@ -819,9 +819,9 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
     | Some v -> v
     | None ->
 #endif
-      let fd = Unix.dup fd in
-      Unix.ftruncate fd 0 ;
-      let oc = Unix.out_channel_of_descr fd in
+      let fd2 = Unix.dup fd in
+      Unix.ftruncate fd2 0 ;
+      let oc = Unix.out_channel_of_descr fd2 in
       begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
       let v = write oc in
       begin match magic with Some m -> output_string oc m | None -> () end ;
