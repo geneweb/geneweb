@@ -9,6 +9,7 @@
 
   <title>
 [
+co: Estrazzione d’un schedariu GEDCOM
 de: GEDCOM-Datei extrahieren
 en: Extract a GEDCOM file
 es: Extracción de un fichero GEDCOM
@@ -24,6 +25,7 @@ sv: Exportera en GEDCOM-fil
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
+co: Estrazzione d’un schedariu GEDCOM
 de: GEDCOM-Datei extrahieren
 en: Extract a GEDCOM file
 es: Extracción de un fichero GEDCOM
@@ -41,6 +43,7 @@ sv: Exportera en GEDCOM-fil
 <input type="hidden" name="lang" value="%l">
 <ul><li>
 [
+co: Selezziunate a vostra basa di dati :
 de: Wähle deine Datenbank:
 en: Select your database:
 es: Seleccione Ud. su base de datos :
@@ -59,6 +62,7 @@ sv: Välj din databas:
 <td><input type="radio" name="anon" id="anon%a" value="%a">   
 <label for="anon%a">%a</label></td></tr>|
 <tr align="left"><td>- [
+co: ùn ci hè alcuna basa di dati à stu mumentu
 de: Keine Datenbank vorhanden
 en: here is no database at present
 es: actualmente ninguna base de datos existente
@@ -74,6 +78,9 @@ sv: det finns ingen databas för tillfället
 <p>
 <li>
 [
+co: Scrivite u nome chì vò vulete dà à u vostru schedariu GEDCOM.
+    S’è ùn scrivite nunda, serà u nome di a basa di dati seguitatu
+	da u suffissu.
 de: Gib den Namen ein, den du deiner GEDCOM-Datei geben möchtest.
     Falls du nichts eingibst, verwenden wir den Namen deiner Datenbank,
     gefolgt von der Endung 
@@ -106,6 +113,7 @@ sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver
 <p>
 <li>
 [
+co: Selezziunate l’ozzioni chì vò vulete :
 de: Wähle die gewünschten Optionen:
 en: Select the options you want:
 es: Seleccione Ud. las opciones deseadas:
@@ -122,6 +130,7 @@ sv: Välj de optioner du vill ha:
 <tr align="left"><td>
 <input type="radio" name="charset" value="ASCII" id="ASCII"/>   
 <label for="ASCII">[
+co: Cudificà i caratteri in ASCII.
 de: Kodiere die Zeichen in ASCII.
 en: Encode the characters in ASCII.
 es: Codificar los carácteres en ASCII.
@@ -136,6 +145,7 @@ sv: Koda tecknen i ASCII.
 <tr align="left"><td>
 <input type="radio" name="charset" value="UTF-8" id="UTF-8" checked>   
 <label for="UTF-8">[
+co: Cudificà i caratteri in UTF-8.
 de: Kodiere die Zeichen in UTF-8.
 en: Encode the characters in UTF-8.
 es: Codificar los carácteres en UTF-8.
@@ -150,6 +160,7 @@ sv: Koda tecknen i UTF-8.
 <tr align="left"><td>
 <input type="radio" name="charset" value="ANSEL" id="ANSEL"/>   
 <label for="ANSEL">[
+co: Cudificà i caratteri in ANSEL.
 de: Kodiere die Zeichen in ANSEL.
 en: Encode the characters in ANSEL.
 es: Codificar los carácteres en ANSEL.
@@ -163,6 +174,7 @@ sv: Koda tecknen i ANSEL.
 <tr align="left"><td>
 <input type="radio" name="charset" value="ANSI" id="ANSI"/>&nbsp;&nbsp;&nbsp;
 <label for="ANSI">[
+co: Cudificà i caratteri in ANSI (ISO 8859-1).
 de: Kodiere die Zeichen in ANSI (ISO 8859-1).
 en: Encode the characters in ANSI (ISO 8859-1).
 es: Codificar los car&aacute;cteres en ANSI (ISO 8859-1).
@@ -178,6 +190,8 @@ sv: Koda tecknen i ANSI (ISO 8859-1).
 <tr align=left>
 <td><input type=checkbox name=mem value="on" id=mem>   
 <label for=mem>-mem</label>[
+co:  : Risparmià u spaziu di memoria durante l’operazione
+    (ma anderà più pianu).
 de: : während der Operation sparsam mit dem Speicher umgehen
     (ist aber langsamer).
 en: : Save the memory space during the operation (but it will be slower).
@@ -197,6 +211,7 @@ sv: : spara minne under operationen (men det kommer att gå saktare).
 <tr align=left>
 <td><input type=checkbox name=nn id=nn value="on">   
 <label for=nn>-nn</label>[
+co:  : Ùn micca estrae e note.
 en: : Do not extract notes.
 fr:  : ne pas extraire les notes.
 ]</td>
@@ -207,6 +222,7 @@ fr:  : ne pas extraire les notes.
 <tr align=left>
 <td><input type=checkbox name=nopicture id=nopicture value="on">   
 <label for=nopicture>-nopicture</label>[
+co:  : Ùn micca estrae e fiure individuale (ritratti).
 en: : Dont extract individual pictures (portraits).
 fr:  : ne pas extraire les images individuelles (portraits).
 ]</td>
@@ -217,6 +233,7 @@ fr:  : ne pas extraire les images individuelles (portraits).
 <tr align=left>
 <td><input type=checkbox name=picture-path id=picture-path value="on">   
 <label for=picture-path>-picture-path</label>[
+co:  : Estrae u chjassu di e fiure individuale (ritratti).
 en: : Extract individual pictures path (portraits).
 fr:  : extraire le chemin des images individuelles (portraits).
 ]</td>
@@ -224,6 +241,7 @@ fr:  : extraire le chemin des images individuelles (portraits).
 </table>
 <p>
 [
+co: In e scatule quaghjò, ci vole à scrive sempre un’occurrenza per u campu « Num » (eventualmente « 0 »).
 en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
 fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
 ]
@@ -232,6 +250,7 @@ fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "N
 <tr align=left><td> </td>
 <td colspan=3>
 -a[
+co:  : Estrae solu l’antenati di…
 de: : nur die Vorfahren auswählen von…
 en: : Extract only the ancestors of…
 es: : extraer solamente los antepasados de…
@@ -242,6 +261,7 @@ sv: : exportera endast anorna till…
 ]</td></tr>
 
 <tr align=left><td>[
+co: Nome
 de: Vorname
 en: First name
 es: Nombre
@@ -253,6 +273,7 @@ sv: Förnamn
 <td><input name="a1" size=30 maxlength=200></td>
 
 <td>N[
+co: um
 de: r
 en: um
 es: úm
@@ -265,6 +286,7 @@ sv: ummer
 </tr>
 
 <tr align=left><td>[
+co: Casata
 de: Nachname
 en: Surname
 es: Apellido
@@ -277,6 +299,7 @@ sv: Efternamn
 </tr>
 
 [
+co: 
 de: 
 en: 
 es: 
@@ -289,6 +312,7 @@ sv:
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
 -d[
+co:  : Estrae solu i discendenti di…
 de: : nur die Nachkommen auswählen von…
 en: : Extract only the descendants of…
 es: : extraer solamente los descendientes de…
@@ -299,6 +323,7 @@ lv: : izmantot tikai…
 </tr>
 
 <tr align=left><td>[
+co: Nome
 de: Vorname
 en: First name
 es: Nombre
@@ -309,6 +334,7 @@ lv: Vârds
 <td><input name="d1" size=30 maxlength=200></td>
 
 <td>[
+co: Num
 de: Nr
 en: Num
 es: Núm
@@ -319,6 +345,7 @@ lv: Nr
 <td><input name="d2" size=5 maxlength=8></td></tr>
 
 <tr align=left><td>[
+co: Casata
 de: Nachname
 en: Surname
 es: Apellido
@@ -333,6 +360,9 @@ lv: Uzvârds
 </table>
 <p>
 [
+co: S’è vò impiegate e duie ozzioni inzù, ghjè
+    l’intersezzione chì supranerà :<br> persone <em>à u listessu tempu</em>
+	antenati di l’una è discendenti di l’altra.
 de: Falls du oben beide Optionen gewählt hast, wird die Schnittmenge
     extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
     einen und Nachkommen des anderen sind.
@@ -360,12 +390,14 @@ sv: Om du väljer de båda valen ovan, kommer
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
 -aws[
+co:  : Estrae l’antenati cù fratelli è surelle di…
 en: : Extract ancestors with siblings of…
 fr:  : extraire les ancêtres avec fratries de…
 ]</td>
 </tr>
 
 <tr align=left><td>[
+co: Nome
 de: Vorname
 en: First name
 es: Nombre
@@ -376,6 +408,7 @@ lv: Vârds
 <td><input name="aws1" size=30 maxlength=200></td>
 
 <td>[
+co: Num
 de: Nr
 en: Num
 es: Núm
@@ -386,6 +419,7 @@ lv: Nr
 <td><input name="aws2" size=5 maxlength=8></td></tr>
 
 <tr align=left><td>[
+co: Casata
 de: Nachname
 en: Surname
 es: Apellido
@@ -401,12 +435,14 @@ lv: Uzvârds
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
 -s[
+co:  : estrae una casata (impieghevule parechje volte).
 en: : extract surname (usable several times).
 fr:  : extraire un nom de famille (utilisable plusieurs fois).
 ]</td>
 </tr>
 
 <tr align=left><td>[
+co: Casata
 de: Nachname
 en: Surname
 es: Apellido
@@ -422,6 +458,8 @@ lv: Uzvârds
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>
 -c[
+co:  : Quand’una persona hè nata menu di <num> anni fà, ùn face micca parte di l’espurtazione
+    for di s’ella hè publica.<br> Tutti i sposi è discendenti sò prutetti dinù.
 en: : When a person is born less than <num> years ago, it is not exported unless it is Public.<br> 
     All the spouses and descendants are also censored.
 fr:  : quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br>
@@ -430,6 +468,7 @@ fr:  : quand une personne est née il y a moins de … années, elle n’est p
 </tr>
 
 <tr align=left><td>[
+co: Anni
 en: Years
 fr: Années
 ]
@@ -443,6 +482,7 @@ fr: Années
 <tr align=left>
 <td><input type=checkbox name=nsp id=nsp value="on">   
 <label for=nsp>-nsp</label>[
+co:  : Ùn micca estrae i genitori di i sposi (per l’ozzioni -s è -d).
 en: : Do not extract spouses' parents (for options -s and -d).
 fr:  : ne pas extraire les parents des époux (pour les options -s et -d).
 ]</td>
@@ -452,6 +492,7 @@ fr:  : ne pas extraire les parents des époux (pour les options -s et -d).
 <p>
 <li>
 [
+co: Tandu appughjate nant’à stu buttone :
 de: Dann drücke diesen Knopf:
 en: Then push this button:
 es: Finalmente apoye en el botón:
@@ -464,6 +505,7 @@ sv: Tryck sedan på denna knapp:
 <p>
 
 <input type=submit value="[
+co: Estrae
 de: Extrahieren
 en: Extract
 es: Extraer

@@ -8,6 +8,7 @@
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[
+co: Connex
 en: Connex
 fr: Connex
 ]</title>
@@ -18,6 +19,7 @@ fr: Connex
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
+co: Lista di i cumpunenti cunnessi
 en: Listing connected components
 fr: Liste des composantes connexes
 ]
@@ -32,6 +34,7 @@ fr: Liste des composantes connexes
 <input type="hidden" name="gwd_p" value="%P">
 
 [
+co: Selezziunate a vostra basa di dati clicchendu nant’à u buttone assuciatu :
 en: Select your database by clicking on the associated button:
 fr: Sélectionnez votre base de données en cliquant sur le bouton associé :
 ]
@@ -43,6 +46,7 @@ fr: Sélectionnez votre base de données en cliquant sur le bouton associé :
 <td><a href="http://%m:%P/%a">%a</a></td>
 </tr>|
 <tr align="left"><td>- [
+co: ùn ci hè alcuna basa di dati à stu mumentu
 en: there is no database at present
 fr: il n'y a aucune base de données actuellement
 ]</tr></td>}
@@ -50,6 +54,7 @@ fr: il n'y a aucune base de données actuellement
 <p>
 <li>
 [
+co: Selezziunate l’ozzioni chì vò vulete :
 de: Wähle die gewünschten Optionen:
 en: Select the options you want:
 es: Seleccione las opciones que Ud. desee:
@@ -63,6 +68,7 @@ sv: Välj de optioner du vill ha:
 <tr align="left">
 <td><input type="checkbox" name="a" id="a" value="on">
 <label for="a" style="font-family: monospace">-a&nbsp;&nbsp;</label>[
+co: Tutti i cumpunenti cunnessi.
 en: All connex components.
 fr: Toutes les composantes connexes.
 ]</td>
@@ -73,6 +79,7 @@ fr: Toutes les composantes connexes.
 <tr align="left">
 <td><input type="checkbox" name="s" id="s" value="on">
 <label for="s" style="font-family: monospace">-s&nbsp;&nbsp;</label>[
+co: Affissà e statistiche nant’à i cumpunenti cunnessi.
 en: Produce connected components statistics.
 fr: Afficher les statistiques sur les composantes connexes.
 ]</td>
@@ -85,6 +92,7 @@ fr: Afficher les statistiques sur les composantes connexes.
 <label for="d_1" style="font-family: monospace">-d&nbsp;&nbsp;
 <input type="input" name="d" size="2" maxlength="2" style="padding-left:4px">
 </label>&nbsp;&nbsp;[
+co: Pruvede detaglii per sta longhezza.
 en: Details for this length.
 fr: Fournir détails pour cette taille.
 ]</td>
@@ -96,6 +104,7 @@ fr: Fournir détails pour cette taille.
 <td>
 <label for="i" style="font-family: monospace">-i&nbsp;&nbsp;
 <input type="input" name="i" size="20" maxlength="50" style="padding-left:4px"></label>&nbsp;&nbsp;[
+co: Ignurà stu schedariu.
 en: Ignore this file.
 fr: Ignorer ce fichier.
 ]</td>
@@ -106,6 +115,7 @@ fr: Ignorer ce fichier.
 <tr align="left">
 <td><input type="checkbox" name="bf" id="bf" value="on">
 <label for="bf" style="font-family: monospace">-bf&nbsp;&nbsp;</label>[
+co: Secondu u schedariu d’origine.
 en: By origin file.
 fr: D'après le fichier origine.
 ]</td>
@@ -113,6 +123,7 @@ fr: D'après le fichier origine.
 </table></dl>
 <p>
 [
+co: <span style="color:#FF0000;">AVERTIMENTU</span> : E trè cumande chì seguitanu ponu squassà parechje famiglie di manera irriversibile. Avè un archiviu di salvaguardia hè ricumandatu.
 en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
 fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
 ]
@@ -122,6 +133,7 @@ fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suiv
 <td>
 <label for="del_1" style="font-family: monospace">-del
 <input type="input" name="del" size="5" maxlength="2" style="padding-left:4px"></label>&nbsp;&nbsp;[
+co: Dumandà di squassà i cumpunenti di dimensione <= à stu valore.
 en: Ask for deleting branches whose size <= that value.
 fr: Demander à détruire les composantes de taille <= à cette valeur.
 ]</td>
@@ -133,6 +145,7 @@ fr: Demander à détruire les composantes de taille <= à cette valeur.
 <td>
 <label for="cnt_1" style="font-family: monospace">-cnt
 <input type="input" name="cnt" size="5" maxlength="2" style="padding-left:4px"></label>&nbsp;&nbsp;[
+co: Definisce u contu di ghjembe à squassà.
 en: Specifiy the number of branches to be deleted.
 fr: Définit le nombre de branches à supprimer.
 ]</td>
@@ -143,6 +156,7 @@ fr: Définit le nombre de branches à supprimer.
 <tr align="left">
 <td><input type="checkbox" name="exact" id="exact" value="on">
 <label for="exact" style="font-family: monospace">-exact&nbsp;&nbsp;</label>[
+co: Limiteghja a squassatura à e ghjembe di dimensione = -del.
 en: Restrict deleting branches whose size = -del.
 fr: Limite la suppression aux branches de taille = -del.
 ]</td>
@@ -155,6 +169,7 @@ fr: Limite la suppression aux branches de taille = -del.
 <input type="radio" name="o" id="o" value="choice">
 <label for="o1" style="font-family: monospace">-o &nbsp;
 <input type="input" name="o1" size="20" maxlength="50" style="padding-left:4px"></label>&nbsp;&nbsp;[
+co: Inversureghja i risultati ver di stu schedariu.
 en: Output results to this file.
 fr: Rediriger les résultats vers ce fichier.
 ]</td>
@@ -163,6 +178,7 @@ fr: Rediriger les résultats vers ce fichier.
 <tr align="left">
 <td><input type="radio" name="o" id="o" value="/notes_d/connex.txt">
 <label for="o" style="font-family: monospace">&nbsp;&nbsp;</label>[
+co: Inversureghja i risultati ver di basename/notes_d/connex.txt (-o deve stà viotu è notes_d deve esiste).
 en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
 fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
 ]</td>
@@ -171,6 +187,7 @@ fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide 
 <tr align="left">
 <td><input type="radio" name="o" id="o" value="" checked/>
 <label for="o" style="font-family: monospace">&nbsp;&nbsp;</label>[
+co: Alcuna ridirezzione di i risultati. 
 en: No redirection of results.
 fr: Pas de redirection des résultats.
 ]</td>
@@ -179,6 +196,7 @@ fr: Pas de redirection des résultats.
 <p>
 <li>
 [
+co: È appughjate nant’à « Vai ».
 de: Dann drücke "Ok".
 en: Then click on "Ok".
 es: Finalmente cliquear en "Ok".

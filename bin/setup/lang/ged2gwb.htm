@@ -9,6 +9,7 @@
 
   <title>
 [
+co: Impurtazione d’un schedariu GEDCOM
 de: GEDCOM-Datei importieren
 en: Import a GEDCOM file
 es: Importación de un fichero GEDCOM
@@ -26,6 +27,7 @@ sv: Importera en GEDCOM-fil
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
+co: Impurtazione d’un schedariu GEDCOM
 de: GEDCOM-Datei importieren
 en: Import a GEDCOM file
 es: Importación de un fichero GEDCOM
@@ -46,6 +48,7 @@ sv: Importera en GEDCOM-fil
 <p>
 <ul><li>
 [
+co: Selezziunate u vostru schedariu GEDCOM clicchendu nant’à u so nome, o navigate in i vostri cartulari.
 de: Bitte eingeben vollständiger Name deiner GEDCOM-Datei.
 en: Select your GEDCOM file by clicking on the file or navigating in your folders.
 es: Agregue Ud el nombre completo de su fichero GEDCOM.
@@ -63,10 +66,15 @@ sv: Skriv det kompletta namnet på din GEDCOM-fil.
 <span style="font-size:80%%">
 <table>
 <tr><td valign="top">[
+co: Nota :
 en: Note:
 fr: Note :
 ]</td>
 <td>[
+co: ../ vi permette di navigà fine à u cartulare di a radica.<br>
+    In u mondu Windows, st’azzione ùn vi permitterà mica
+	di cambià a lettera di u lettore (C: -> D:), ma puderete fà
+	què direttamente in l’indirizzu di u vostru navigatore.
 en: ../ allows you to reach the parent directory.<br>
     In the Windows world, this will be
     insufficient to change the drive letter (C: -> D:), but you can do this directly
@@ -81,6 +89,9 @@ fr: ../ vous permet de naviguer vers le dossier parent.<br>
 <p>
 <li>
 [
+co: Scrivite u nome chì vò vulete dà à a vostra basa di
+    dati <font color=#2f6400><b>GeneWeb</b></font>.  S’ellu hè omessu,
+	serà deduttu secondu u nome di u schedariu GEDCOM.
 de: Name, den du deiner <font color=#2f6400><b>GeneWeb</b></font>-Datenbank
     geben möchtest. Wenn du hier nichts eingibst, wird der
     Datenbankname aus dem Namen der  GEDCOM-Datei abgeleitet.
@@ -110,6 +121,7 @@ sv: Namnet du vill kalla din <font color=#2f6400><b>GeneWeb</b></font>
    -o          </span>
 <input name="o" size="30" style="padding-left:4px"
 placeholder="[
+co: nome
 de: name
 en: name
 fr: nom
@@ -121,6 +133,7 @@ sv: namnet
 <p>
 <li>
 [
+co: Selezziunate l’ozzioni chì vò vulete :
 de: Sofern gewünscht, wähle bitte aus den folgenden Optionen:
 en: Select the options you want:
 es: Seleccione las opciones que Ud. desee :
@@ -135,6 +148,7 @@ sv: Välj de optioner du vill ha:
 <tr align="left">
 <td><input type="checkbox" name="uin" id="uin" value="on" />
 <label for="uin" style="font-family: monospace">-uin          | </label>[
+co: Arregistrate in e note l’etichette GEDCOM scunnisciute.
 en: Put untreated GEDCOM tags in notes.
 fi: Pistä käsittelemättömät GEDCOM merkit lainausmerkkeihin.
 fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
@@ -146,6 +160,8 @@ fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
 <tr align="left">
 <td><input type="checkbox" name="lf" id="lf" value="on" />
 <label for="lf" style="font-family: monospace">-lf           | </label>[
+co: Cunvertisce i nomi in minuscule, cù e so iniziali
+    in maiuscula.
 de: Vornamen in Kleinbuchstaben wandeln, nur Anfangsbuchstaben in
     groß.
 en: Convert first names to lowercase letters, with initials in uppercase.
@@ -164,6 +180,8 @@ sv: Forcera gemena förnamn, bara initialer behålls som versaler.
 <tr align=left>
 <td><input type="checkbox" name="ls" id="ls" value="on">
 <label for="ls" style="font-family: monospace">-ls           | </label>[
+co: Cunvertisce e casate in minuscule, cù e so iniziali in
+    maiuscula. Pruvà di cunservà e particule in minuscule.
 de: Nachnamen in Kleinbuchstaben wandeln, nur Anfangsbuchstaben in
     groß. Kleinschreibung von Partikeln möglichst
     beibehalten.
@@ -185,6 +203,12 @@ sv: Forcera gemena efternamn, bara initialer behålls som versaler.
 <table class="setup">
 <tr align=left><td>    </td>
 <td>[
+co: Durante a creazione d’una persona, s’è a catena
+    <i>nome</i> di u schedariu GEDCOM cuntene pareghji nomi
+	staccati da spazii, si pò vulè chì u <i>primu nome</i>
+	di sta lista sia cunsideratu cum’è u « nome »
+	è chì u <i>nome cumpletu</i> di u GEDCOM vochi
+	in u « cugnome di nome » (valore <span style="font-family: monospace">-no_efn</span> predefinitu).
 de: Wenn der GEDCOM-Vorname mehrere, durch Kommata getrennte Namen
     enthält, soll beim Anlegen einer Person der erste dieser Namen der
     "Vorname" werden, während der vollständige GEDCOM-Vorname als
@@ -220,6 +244,7 @@ sv: När man skapar en person, om förnamnen i GEDCOM-filen innehåller flera
 <tr align=left>
 <td colspan=2 width="15"><input type="checkbox" name="efn" id="efn" value="on">
 <label for="efn" style="font-family: monospace">-efn          | </label>[
+co: Attivà st’ozzione.
 de: Diese Option aktivieren.
 en: Set this option.
 es: Poner esta opción.
@@ -234,6 +259,13 @@ sv: Sätt denna option.
 <table class="setup">
 <tr align=left><td>    </td>
 <td>[
+co: L’ozzione « first names enclosed » deve esse seguitata
+    da una catena di dui caratteri di u furmatu "pf".
+	Durante a creazione d’una persona, s’è una parte di
+	a catena <i>nome</i> di u schedariu GEDCOM <b>p</b>rincipia
+	da u caratteru 'p' è si <b>f</b>inisce da u caratteru 'f',
+	sta parte serà impiegata per u nome usuale.
+	Esempii : <span  style="font-family: monospace">-fne "\\"</span> o <span style="font-family: monospace"> -fne "()"</span>.
 en: "first names enclosed": the -fne option must be followed by a
     two characters string "be". When creating a person, if the GEDCOM first
     name part holds a part between 'b' (any character) and 'e' (any character),
@@ -253,6 +285,7 @@ fr: L’option <i>first names enclosed</i> doit être suivie par une
    -fne         </span>
 <input type="input" name="fne" size="2" maxlength="2" style="padding-left:4px">
 [
+co:  (ùn micca inchjude e virgulette "" in u campu di scrittura).
 en:  (do not enter the quotes "" in the input zone).
 fr:  (ne pas inclure les guilemets "" dans le champ de saisie).
 ]
@@ -262,6 +295,15 @@ fr:  (ne pas inclure les guilemets "" dans le champ de saisie).
 <table class="setup">
 <tr align=left><td>    </td>
 <td>[
+co: Di regula, quandu si crea una persona, s’è a parte di u <i>nome</i>
+    di u schedariu GEDCOM s’assumiglia à una casata publica, i.e. cuntene :
+	<ul> <li>un numeru nurmale o cifri rumani chì seria un numeru
+	d’un titulu di nubiltà (esempiu: Louis XIV) ;
+	<li>una di e parolle : « der », « den », « die », « el », « le », « la », « the »,
+	suppostu esse u principiu d’un qualificativu
+	(esempiu : Guillaume le Conquérant) ; </ul> tandu u nome di u GEDCOM
+	diventeghja una « casata publica » è a prima parolla di a parte
+	di u nome và in a parte « nome» (-epn predefinitu).
 de: Normalerweise wird beim Anlegen einer Person, deren GEDCOM-Vorname wie ein
     öffentlicher Name aussieht, d.h. falls er folgendes beinhaltet:
     <ul> <li>Eine Zahl oder eine eine römische Zahl, von der angenommen
@@ -324,6 +366,7 @@ sv: Denna option är förvald: när man skapar en person, om GEDCOM-filens
 <tr align=left>
 <td colspan=2><input type="checkbox" name="no_epn" id="no_epn" value="on">
 <label for="no_epn" style="font-family: monospace">-no_epn        | </label>[
+co: Annullà st’ozzione.
 de: Diese Option abschalten.
 en: Cancel this option.
 es: Anular esta opción.
@@ -338,6 +381,7 @@ sv: Välj bort denna option.
 <table class="setup">
 <td><input type="checkbox" name="no_pit" id="no_pit" value="on">
 <label for="no_pit" style="font-family: monospace">-no_pit        | </label>[
+co: Ùn micca cunsiderà cum’è publicu s’è un titulu hè statu abbentatu (fighjà l’ozzione -epn).
 en: Not public even if titles (see -epn option).
 fr: Ne pas considérer comme public si un titre a été détecté (voir option -epn).
 ]</td>
@@ -348,6 +392,8 @@ fr: Ne pas considérer comme public si un titre a été détecté (voir option -
 <tr align=left>
 <td><input type="checkbox" name="tnd" id="tnd" value="on">
 <label for="tnd" style="font-family: monospace">-tnd           | </label>[
+co: Pruvà di mette date nigative quandu ùn ci hè
+    micca cuerenza (esempiu : nascita dopu a morta).
 de: Negative Datumsangaben erzeugen, falls Inkonsistenzen erkannt werden
     (z. B. Geburt nach Tod).
 en: Set negative dates when inconsistency (e.g. birth after death).
@@ -368,6 +414,8 @@ sv: Sätt negativt datum när datumen är motsägande varandra (tex födelse
 <table class="setup">
 <td><input type="checkbox" name="no_nd" id="no_nd" value="on">
 <label for="no_nd" style="font-family: monospace">-no_nd         | </label>[
+co: Senza data nigativa : ùn micca interpretà un annu precidutu
+    da un segnu menu « - » cum’è una data nigativa.
 de: Keine negativen Datumsangaben: Ein Jahr mit vorangestelltem Minuszeichen
     soll nicht als negative Jahresangabe interpretiert werden. 
 en: No negative dates: do not interpret a year preceded by a minus sign as a
@@ -390,6 +438,7 @@ sv: Inga negativa datum: tolka inte ett år med minus tecken framför som ett
 <tr align=left>
 <td><input type="checkbox" name="nc" id="nc" value="on">
 <label for="nc" style="font-family: monospace">-nc            | </label>[
+co: Ùn micca verificà a cuerenza di i dati.
 en: No consistency check.
 fr: Ne pas contrôler la cohérence des données.
 ]</td>
@@ -400,6 +449,7 @@ fr: Ne pas contrôler la cohérence des données.
 <tr align=left>
 <td><input type="checkbox" name="nopicture" id="nopicture" value="on">
 <label for="nopicture" style="font-family: monospace">-nopicture     | </label>[
+co: Ùn micca estrae di fiura individuale.
 en: Don't extract individual picture.
 fr: Ne pas extraire d’images individuelles.
 ]</td>
@@ -410,6 +460,8 @@ fr: Ne pas extraire d’images individuelles.
 <tr align=left>
 <td><input type="checkbox" name="rs_no_mention" id="rs_no_mention" value="on">
 <label for="rs_no_mention" style="font-family: monospace">-rs_no_mention | </label>[
+co: Marcà e rilazioni cum’è « Nisuna mensione »
+    (u valore predefinitu hè « Maritati »).
 en: Force relation status to "NoMention" (default is "Married").
 fr: Marquer les relations comme « Sans mention »
     (par défaut « Mariés »).
@@ -420,6 +472,7 @@ fr: Marquer les relations comme « Sans mention »
 <table class="setup">
 <tr align=left><td>   
 [
+co: Fonte predefinita :
 en: Default source:
 fr: Source par défaut  :
 ]</td>
@@ -435,6 +488,13 @@ fr: Source par défaut  :
 <tr align=left>
 <td>    </td>
 <td colspan=2>[
+co: Certi schedarii GEDCOM scrivenu ognitantu e date
+    cù numeri (da 1 à 12) per i mesi. A norma GEDCOM 5.5
+	richiede chì i mesi sianu riprisentati da parolle
+	(esempiu : « MAGHJU 1912 » è micca « 05/1912 »).
+	A scrittura « 02/05/1912 » hè ambigua (vole dì
+	« 2 di maghju di u 1912 » o « 5 di ferraghju di u 1912 »
+	secondu i paesi).
 de: GEDCOM-Dateien enthalten manchmal numerische Monatsangaben (von 1 bis
     12). Der GEDCOM-Standard 5.5  schreibt aber vor, daß Monate durch
     Kürzel dargestellt werden (z. B. "MAY 1912" und nicht
@@ -480,6 +540,7 @@ sv: En del GEDCOM-filer innehåller ibland datum med numrerade månader (från
 <td width="120px"><span style="font-family: monospace"></span></td>
 <td><input type="radio" name="dates" id="dates" value="none" checked>
 <label for="dates">[
+co: Per ste date, estraite solu a parte « annu ».
 de: Aus solchen Daten soll nur die Jahreszahl verwendet werden.
 en: For these dates, extract only the "year" part.
 es: Por este tipo de fechas, extraer solamente la parte "año".
@@ -495,6 +556,7 @@ sv: För dessa datum, extrahera endast "år" delen.
 <td><span style="font-family: monospace">-dates_dm</span></td>
 <td><input type="radio" name="dates" id="dates_dm" value="_dm">
 <label for="dates_dm">[
+co: Interpretà ste date cum’è « ghjornu/mese/annu ».
 de: Interpretiere solche Daten als "Tag/Monat/Jahr".
 en: Interpret these dates as "day/month/year".
 es: Interpretar estas fechas como "día/mes/año".
@@ -510,6 +572,7 @@ sv: Tolka dessa datum som "dag/månad/år".
 <td><span style="font-family: monospace">-dates_md</span></td>
 <td><input type=radio name=dates value="_md" id="dates_md">
 <label for="dates_md">[
+co: Interpretà ste date cum’è « mese/ghjornu/annu ».
 de: Interpretiere solche Daten als "Monat/Tag/Jahr".
 en: Interpret these dates as "month/day/year".
 es: Interpretar estas fechas como "mes/día/año".
@@ -525,6 +588,8 @@ sv: Tolka dessa datum som "månad/dag/år".
 <tr align=left>
 <td>    </td>
 <td colspan=2>[
+co: A cudificazione di i caratteri cù l’aletta si trova
+    da bona regula in l’intestatura du u schedariu GEDCOM.
 de: Die Kodierung für Sonderzeichen ist normalerweise im Kopf der
     GEDCOM-Datei angegeben.
 en: The accentuated characters encoding is normally specified in the GEDCOM
@@ -545,6 +610,7 @@ sv: Hur de accentuerade tecknen är kodade är normalt specifierat i
 <td width="120px"><span style="font-family: monospace">-charset</span></td>
 <td><input type="radio" name="charset" id="GEDCOM" value="none" checked>
 <label for="GEDCOM">[
+co: Seguità l’addittamenti di l’intestatura GEDCOM.
 de: Beachte die Hinweise aus der GEDCOM-Datei.
 en: Follow the indications of the GEDCOM header.
 es: Seguir las indicaciones del encabezamiento del fichero GEDCOM.
@@ -559,6 +625,7 @@ sv: Följ GEDCOM-huvudets information.
 <td>    </td>
 <td ><input type="radio" name="charset" value="ANSEL" id="ANSEL">
 <label for="ANSEL">[
+co: I caratteri cù l’aletta sò in cudificazione ANSEL.
 de: Die Sonderzeichen folgen der ANSEL-Kodierung.
 en: The accentuated characters are in ANSEL encoding.
 es: Los carácteres acentuados están en codage ANSEL.
@@ -573,6 +640,7 @@ sv: De accentuerade tecknen är ANSEL kodade.
 <td>    </td>
 <td><input type="radio" name="charset" value="ANSI" id="ANSI">
 <label for="ANSI">[
+co: I caratteri cù l’aletta sò in cudificazione ANSI (ISO 8859-1).
 de: Die Sonderzeichen folgen der ANSI-Kodierung (ISO 8859-1).
 en: The accentuated characters are in ANSI encoding (ISO 8859-1).
 es: Los carácteres acentuados están en codage ANSI (ISO 8859-1).
@@ -587,6 +655,7 @@ sv: De accentuerade tecknen är ANSI kodade (ISO 8859-1).
 <td>    </td>
 <td><input type=radio name=charset value=ASCII id="ASCII">
 <label for="ASCII">[
+co: I caratteri cù l’aletta sò in cudificazione ASCII.
 de: Die Sonderzeichen folgen der ASCII-Kodierung .
 en: The accentuated characters are in ASCII encoding.
 es: Los carácteres acentuados están en codage ASCII.
@@ -601,6 +670,7 @@ sv: De accentuerade tecknen är ASCII kodade.
 <td>    </td>
 <td><input type="radio" name="charset" value="MSDOS" id="MSDOS">
 <label for="MSDOS">[
+co: I caratteri cù l’aletta sò in cudificazione MSDOS.
 de: Die Sonderzeichen folgen der MSDOS-Kodierung.
 en: The accentuated characters are in MSDOS encoding.
 es: Los carácteres acentuados están en codage MSDOS.
@@ -614,6 +684,7 @@ sv: De accentuerade tecknen är MS-DOS kodade.
 <p>
 <li>
 [
+co: È appughjate nant’à « Vai ».
 de: Dann drücke auf "OK".
 en: Then click on "OK".
 es: Finalmente cliquerar en "OK".
