@@ -6,6 +6,7 @@
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[
+co: Estrazzione d’un schedariu GeneWeb
 de: GeneWeb-Quelldatei extrahieren
 en: <title>Extract a GeneWeb file
 es: Extracción de una fichero GeneWeb
@@ -22,6 +23,7 @@ sv: Exportera en GeneWeb källfil
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
+co: Estrazzione d’un schedariu GeneWeb
 de: GeneWeb-Quelldatei extrahieren
 en: Extract a GeneWeb file
 es: Extracción de un fichero GeneWeb
@@ -39,6 +41,7 @@ sv: Exportera en GeneWeb källfil
 
 <ul><li>
 [
+co: Selezziunate a vostra basa di dati :
 de: Wähle deine Datenbank:
 en: Select your database:
 es: Seleccione una base de datos:
@@ -56,6 +59,7 @@ sv: Välj din databas:
 <td><input type=radio name=anon value="%a">   </td>
 <td>%a</td></tr>|
 <tr align=left><td>- [
+co: ùn ci hè alcuna basa di dati à stu mumentu
 de: keine Datenbank vorhanden
 en: there is no database at present
 es: actualmente ninguna base de datos existe
@@ -72,6 +76,10 @@ sv: det finns ingen databas för tillfället
 <table class="setup" style="cellspacing=0 cellpadding=1">
 <tr><td>
 [
+co: Scrivite u nome chì vò vulete dà à u vostru schedariu di fonte
+    <font color=#2f6400><b>GeneWeb</b></font>.
+	U so nome deve finisce cù u suffissu « <tt>.gw</tt> ». S’è ùn scrivite nunda,
+	u so nome serà deduttu secondu quellu di a basa di dati.
 de: Gib den Namen ein, den du deiner
     <font color=#2f6400><b>GeneWeb</b></font>-Quelldatei geben
     möchtest. Er muß mit "<tt>.gw</tt>" enden. Wenn Du nichts
@@ -112,6 +120,9 @@ sv: Skriv in namnet du vill kalla din
 <tr><td>
 <dl><dt><dd>
 [
+co: o dumandate à ricustruisce i schedarii in u cartulare d’origine.<br>
+    S’è a basa hè stata creata da <span style="font-family: monospace">gwc -f *.gw</span>,
+	tandu <span style="font-family: monospace">gwu -odir .</span> ricustruiscerà i schedarii d’origine.
 en: or ask for recreation of files in original directory.<br>
     If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>, 
     then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
@@ -130,6 +141,7 @@ fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br>
 <p>
 <li>
 [
+co: Selezziunate l’ozzioni chì vò vulete :
 de: Wähle die gewünschten Optionen:
 en: Select the options you want:
 es: Seleccione las opciones que Ud. desee:
@@ -145,6 +157,8 @@ sv: Välj de optioner du vill ha:
 <tr align=left>
 <td><input type=checkbox name=mem value="on">   </td>
 <td>[
+co: Risparmià u spaziu di memoria durante l’operazione
+    (ma anderà più pianu).
 de: Während der Operation sparsam mit dem Speicher umgehen
     (ist aber langsamer).
 en: Save memory space during operation (but it will be slower).
@@ -162,6 +176,7 @@ sv: Spara minne under operationen (men det kommer att gå saktare).
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>[
+co: Estrae solu l’antenati di…
 de: Nur die Vorfahren auswählen von…
 en: Extract only the ancestors of…
 es: No extraer los antepasados de…
@@ -172,6 +187,7 @@ sv: Exportera endast anorna till…
 ]</td></tr>
 
 <tr align=left><td>[
+co: Nome
 de: Vorname
 en: First name
 es: Nombre
@@ -183,6 +199,7 @@ sv: Förnamn
 <td><input name="a1" size=30 maxlength=200></td>
 
 <td>[
+co: Num
 de: Nr
 en: Num
 es: Núm
@@ -194,6 +211,7 @@ sv: Nummer
 <td><input name="a2" size=5 maxlength=8></td></tr>
 
 <tr align=left><td>[
+co: Casata
 de: Nachname
 en: Surname
 es: Apellido
@@ -207,6 +225,7 @@ sv: Efternamn
 <p>
 <table class="setup">
 <tr align=left><td> </td><td colspan=3>[
+co: Estrae solu i discendenti di…
 de: Nur die Nachkommen auswählen von…
 en: Extract only the descendants of…
 es: Extraer solamente los descendientes de…
@@ -217,6 +236,7 @@ sv: Exportera endast ättlingarna till…
 ]</td></tr>
 
 <tr align=left><td>[
+co: Nome
 de: Vorname
 en: First name
 es: Nombre
@@ -228,6 +248,7 @@ sv: Förnamn
 <td><input name="d1" size=30 maxlength=200></td>
 
 <td>[
+co: Num
 de: Nr
 en: Num
 es: Núm
@@ -239,6 +260,7 @@ sv: Nummer
 <td><input name="d2" size=5 maxlength=8></td></tr>
 
 <tr align=left><td>[
+co: Casata
 de: Nachname
 en: Surname
 es: Apellido
@@ -251,6 +273,9 @@ sv: Efternamn
 </table>
 <p>
 [
+co: S’è vò impiegate e duie ozzioni inzù, ghjè
+    l’intersezzione chì supranerà : persone <em>à u listessu tempu</em>
+	antenati di l’una è discendenti di l’altra.
 de: Falls du oben beide Optionen gewählt hast, wird die Schnittmenge
     extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
     einen und Nachkommen des anderen sind.
@@ -277,6 +302,7 @@ sv: Om du väljer de båda valen ovan, kommer överlappning att antas:
 <p>
 <li>
 [
+co: Tandu appughjate nant’à stu buttone :
 de: Dann drücke diesen Knopf:
 en: Then push this button:
 es: Apoye luego en este botón:
@@ -290,6 +316,7 @@ sv: Tryck sedan på denna knapp:
 
 <input type=submit value="[
 [
+co: Estrae
 de: Extrahieren
 en: Extract
 es: Extraer

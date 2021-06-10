@@ -1,5 +1,6 @@
 
 [
+co: Benvenuta in GeneWeb %q
 de: Willkommen zu GeneWeb %q
 en: Welcome to GeneWeb %q
 es: Bienvenido a GeneWeb %q
@@ -10,6 +11,7 @@ sv: Välkommen till GeneWeb %q
 ]
 
 [
+co: Andate in u vostru navigatore web è aprite unu di quell’indirizzi :
 de: Nimm deinen Webbrowser und öffne eine der folgenden Adressen:
 en: Go to your Web browser and open one of the following addresses:
 fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
@@ -19,6 +21,8 @@ it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
        http://localhost:%z/
 
 [
+co: Avertimentu : per chì stu prugramma funziuneghji, ùn duvete micca chjode
+    sta finestra !
 de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses 
     Fenster nicht schließen!
 en: Warning: for this program to work, you must not close this window!
@@ -32,6 +36,10 @@ sv: Varning: för att det här programmet ska fungera, får du inte stänga
 ]
 
 [
+co: S’è nisunu di st’indirizzi funziuneghja, forse ci vulerà à cunfigurà
+    in u vostru navigatore qualchì ozzione di u tipu « travaglià fora di
+	 cunnessione » o « ùn impiegà micca u proxy per l’indirizzi lucale » o
+	 « ùn micca cunnettassi à Internet per l’indirizzu 'localhost' »
 de: Falls das nicht funktioniert, mußt du eventuell in deinem Webbrowser
     einige Optionen ändern, wie zum Beispiel "Offline arbeiten" oder
     "Für lokale Adressen keinen Proxy benutzen" oder "Für die Adresse
