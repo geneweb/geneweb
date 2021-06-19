@@ -136,6 +136,10 @@ let print_alphabetic_to_branch conf x =
   Output.print_string conf "</table>";
   Output.print_string conf "<br>\n"
 
+
+let p_auth conf base p =
+  not (is_hide_names conf p) || Util.authorized_age conf base p
+
 let persons_of_fsname conf base base_strings_of_fsname find proj x =
   (* list of strings index corresponding to the crushed lower first name
      or surname "x" *)
@@ -143,26 +147,22 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   (* selecting the persons who have this first name or surname *)
   let l =
     let x = Name.crush_lower x in
-    List.fold_right
-      (fun istr l ->
-         let str = Mutil.nominative (sou base istr) in
-         if Name.crush_lower str = x ||
-            List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
-         then
-           let iperl = find istr in
-           (* maybe they are not the good ones because of changes in the
-              database; checking... *)
-           let iperl =
-             List.fold_left
-               (fun iperl iper ->
-                  if eq_istr (proj (pget conf base iper)) istr then
-                    iper :: iperl
-                  else iperl)
-               [] iperl
-           in
-           if iperl = [] then l else (str, istr, iperl) :: l
-         else l)
-      istrl []
+    List.fold_right begin fun istr l ->
+      let str = Mutil.nominative (sou base istr) in
+      if Name.crush_lower str = x
+      || List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
+      then
+        List.fold_left begin fun acc iper ->
+          let p = pget conf base iper in
+          if eq_istr (proj p) istr && p_auth conf base p
+          then iper :: acc
+          else acc
+        end [] (find istr)
+        |> function
+        | [] -> l
+        | acc ->  (str, istr, acc) :: l
+      else l
+    end istrl []
   in
   let (l, name_inj) =
     let (l1, name_inj) =
@@ -312,8 +312,7 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
       let iperl =
         List.fold_left begin fun iperl iper ->
           let p = pget conf base iper in
-          if eq_istr (get_field p) istr
-          && (not (is_hide_names conf p) || Util.authorized_age conf base p)
+          if eq_istr (get_field p) istr && p_auth conf base p
           then iper :: iperl
           else iperl
         end [] iperl
@@ -338,8 +337,7 @@ let select conf base absolute persons_of_absolute base_strings_of persons_of get
   in
   let list =
     List.map
-      (fun (str, _, iperl) ->
-         Name.lower str, (StrSet.add str StrSet.empty, iperl))
+      (fun (str, _, iperl) -> Name.lower str, (StrSet.add str StrSet.empty, iperl))
       list
   in
   let list = List.fold_right merge_insert list [] in

@@ -1,0 +1,26 @@
+(alias
+   (name plugin)
+   (deps (source_tree assets) plugin_v8.cmxs)
+)
+
+(library
+  (name plugin_v8_lib)
+  (libraries re geneweb geneweb.gwd_lib geneweb.core geneweb.util)
+  (modules
+    v8_DATE
+    v8_GUI
+    v8_HTML
+  )
+  (wrapped true)
+)
+
+(executable
+  (name plugin_v8)
+  (libraries geneweb.gwd_lib plugin_v8_lib)
+  (embed_in_plugin_libraries plugin_v8_lib)
+  (flags -linkall)
+  (modes (native plugin))
+  (modules plugin_v8)
+)
+
+(alias (name plugin) (deps plugin_v8.cmxs))

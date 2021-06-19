@@ -1074,7 +1074,8 @@ let make_conf from_addr request script_name env =
         passwd, env, access_type
     in
     let passwd = Mutil.decode passwd in
-    let command = script_name in command, base_file, passwd, env, access_type
+    let command = script_name in
+    command, base_file, passwd, env, access_type
   in
   let (lang, env) = extract_assoc "lang" env in
   let lang =
@@ -1532,7 +1533,8 @@ let print_misc_file conf misc_fname =
     true
 
 let misc_request conf fname =
-  let fname = find_misc_file fname in
+  List.exists (fun (_, fn) -> fn conf fname) !GwdPlugin.misc
+  || let fname = find_misc_file fname in
   if fname <> "" then
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
@@ -1649,7 +1651,9 @@ let connection (addr, request) script_name contents' =
           let (contents, env) = build_env request contents' in
           if not (image_request printer_conf script_name env)
           && not (misc_request printer_conf script_name)
-          then conf_and_connection from request script_name contents env
+          then begin
+            conf_and_connection from request script_name contents env
+          end
         with Exit -> ()
     end
 
