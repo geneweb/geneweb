@@ -1,3 +1,5 @@
+#ifdef API
+
 open Def
 open Config
 
@@ -397,3 +399,5 @@ let fevent_name_of_piqi_fevent_name = function
   | `efam_marriage_license -> Efam_MarriageLicense
   | `efam_pacs -> Efam_PACS
   | `efam_residence -> Efam_Residence
+
+#endif
