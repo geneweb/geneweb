@@ -1,0 +1,170 @@
+syntax = "proto2" ;
+
+package geneweb.api;
+
+enum Sosa {
+  SOSA_REF = 0;
+  SOSA = 1;
+  NO_SOSA = 2;
+}
+
+message ReferencePerson {
+  required string n = 1;
+  required string p = 2;
+  required int32 oc = 3;
+}
+
+enum Sex {
+  MALE = 0;
+  FEMALE = 1;
+  UNKNOWN = 2;
+}
+
+enum DeathType {
+  NOT_DEAD = 0;
+  DEAD = 1;
+  DEAD_YOUNG = 2;
+  DEAD_DONT_KNOW_WHEN = 3;
+  DONT_KNOW_IF_DEAD = 4;
+  OF_COURSE_DEAD = 5;
+}
+
+enum MarriageType {
+  MARRIED = 0;
+  NOT_MARRIED = 1;
+  ENGAGED = 2;
+  NO_SEXES_CHECK_NOT_MARRIED = 3;
+  NO_MENTION = 4;
+  NO_SEXES_CHECK_MARRIED = 5;
+  MARRIAGE_BANN = 6;
+  MARRIAGE_CONTRACT = 7;
+  MARRIAGE_LICENSE = 8;
+  PACS = 9;
+  RESIDENCE = 10;
+}
+
+enum DivorceType {
+  NOT_DIVORCED = 0;
+  DIVORCED = 1;
+  SEPARATED = 2;
+}
+
+enum RelationParentType {
+  RPT_ADOPTION = 0;
+  RPT_RECOGNITION = 1;
+  RPT_CANDIDATE_PARENT = 2;
+  RPT_GOD_PARENT = 3;
+  RPT_FOSTER_PARENT = 4;
+}
+
+enum TitleType {
+  TITLE_MAIN = 0;
+  TITLE_NAME = 1;
+  TITLE_NONE = 2;
+}
+
+enum WitnessType {
+  WITNESS = 0;
+  WITNESS_GODPARENT = 1;
+  WITNESS_OFFICER = 2;
+}
+
+enum Calendar {
+  GREGORIAN = 0;
+  JULIAN = 1;
+  FRENCH = 2;
+  HEBREW = 3;
+}
+
+enum Precision {
+  SURE = 0;
+  ABOUT = 1;
+  MAYBE = 2;
+  BEFORE = 3;
+  AFTER = 4;
+  ORYEAR = 5;
+  YEARINT = 6;
+}
+
+message Dmy {
+  required int32 day = 1;
+  required int32 month = 2;
+  required sint32 year = 3;
+  required int32 delta = 4;
+}
+
+message Date {
+  optional Calendar cal = 1;
+  optional Precision prec = 2;
+  optional Dmy dmy = 3;
+  optional Dmy dmy2 = 4;
+  optional string text = 5;
+}
+
+enum PeventName {
+  EPERS_BIRTH = 0;
+  EPERS_BAPTISM = 1;
+  EPERS_DEATH = 2;
+  EPERS_BURIAL = 3;
+  EPERS_CREMATION = 4;
+  EPERS_ACCOMPLISHMENT = 5;
+  EPERS_ACQUISITION = 6;
+  EPERS_ADHESION = 7;
+  EPERS_BAPTISMLDS = 8;
+  EPERS_BARMITZVAH = 9;
+  EPERS_BATMITZVAH = 10;
+  EPERS_BENEDICTION = 11;
+  EPERS_CHANGENAME = 12;
+  EPERS_CIRCUMCISION = 13;
+  EPERS_CONFIRMATION = 14;
+  EPERS_CONFIRMATIONLDS = 15;
+  EPERS_DECORATION = 16;
+  EPERS_DEMOBILISATIONMILITAIRE = 17;
+  EPERS_DIPLOMA = 18;
+  EPERS_DISTINCTION = 19;
+  EPERS_DOTATION = 20;
+  EPERS_DOTATIONLDS = 21;
+  EPERS_EDUCATION = 22;
+  EPERS_ELECTION = 23;
+  EPERS_EMIGRATION = 24;
+  EPERS_EXCOMMUNICATION = 25;
+  EPERS_FAMILYLINKLDS = 26;
+  EPERS_FIRSTCOMMUNION = 27;
+  EPERS_FUNERAL = 28;
+  EPERS_GRADUATE = 29;
+  EPERS_HOSPITALISATION = 30;
+  EPERS_ILLNESS = 31;
+  EPERS_IMMIGRATION = 32;
+  EPERS_LISTEPASSENGER = 33;
+  EPERS_MILITARYDISTINCTION = 34;
+  EPERS_MILITARYPROMOTION = 35;
+  EPERS_MILITARYSERVICE = 36;
+  EPERS_MOBILISATIONMILITAIRE = 37;
+  EPERS_NATURALISATION = 38;
+  EPERS_OCCUPATION = 39;
+  EPERS_ORDINATION = 40;
+  EPERS_PROPERTY = 41;
+  EPERS_RECENSEMENT = 42;
+  EPERS_RESIDENCE = 43;
+  EPERS_RETIRED = 44;
+  EPERS_SCELLENTCHILDLDS = 45;
+  EPERS_SCELLENTPARENTLDS = 46;
+  EPERS_SCELLENTSPOUSELDS = 47;
+  EPERS_VENTEBIEN = 48;
+  EPERS_WILL = 49;
+}
+
+enum FeventName {
+  EFAM_MARRIAGE = 0;
+  EFAM_NO_MARRIAGE = 1;
+  EFAM_NO_MENTION = 2;
+  EFAM_ENGAGE = 3;
+  EFAM_DIVORCE = 4;
+  EFAM_SEPARATED = 5;
+  EFAM_ANNULATION = 6;
+  EFAM_MARRIAGE_BANN = 7;
+  EFAM_MARRIAGE_CONTRACT = 8;
+  EFAM_MARRIAGE_LICENSE = 9;
+  EFAM_PACS = 10;
+  EFAM_RESIDENCE = 11;
+}
