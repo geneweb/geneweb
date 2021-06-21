@@ -1,6 +1,6 @@
 syntax = "proto2" ;
 
-package geneweb.api.object;
+package geneweb.api;
 
 message InfosBase {
   required int64 nb_persons = 1;

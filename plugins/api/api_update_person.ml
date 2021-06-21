@@ -3,6 +3,7 @@
 module Mwrite = Api_saisie_write_piqi
 module Mext_write = Api_saisie_write_piqi_ext
 
+open Geneweb
 open Gwdb
 open Def
 open Util

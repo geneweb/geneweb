@@ -421,3 +421,7 @@ val select_mascdesc : config -> base -> (iper * int) list -> int -> (iper, perso
 (** [sprintf_today confo]
     Uses {!val:Mutil.sprintf_date} in order to print datetime defined in [conf]. *)
 val sprintf_today : Config.config -> string
+
+(** [auth_warning conf base w]
+    Check if current user has enough right in order to see [w] *)
+val auth_warning : config -> base -> ('a, person, ifam, 'b, 'c, 'd, 'e) warning -> bool

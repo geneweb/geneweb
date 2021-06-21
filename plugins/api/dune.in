@@ -1,0 +1,85 @@
+(rule
+  (deps api.proto)
+  (targets api_piqi.ml api_piqi_ext.ml)
+  (action (progn
+            (run piqi of-proto --normalize api.proto)
+            (run piqic-ocaml --ext api.proto.piqi)
+          )
+  )
+)
+
+(rule
+  (deps api_saisie_read.proto)
+  (targets api_saisie_read_piqi.ml api_saisie_read_piqi_ext.ml)
+  (action (progn
+            (run piqi of-proto --normalize api_saisie_read.proto)
+            (run piqic-ocaml --ext api_saisie_read.proto.piqi)
+          )
+  )
+)
+
+(rule
+  (deps api_saisie_write.proto)
+  (targets api_saisie_write_piqi.ml api_saisie_write_piqi_ext.ml)
+  (action (progn
+            (run piqi of-proto --normalize api_saisie_write.proto)
+            (run piqic-ocaml --ext api_saisie_write.proto.piqi)
+          )
+  )
+)
+
+(rule
+  (deps api_stats.proto)
+  (targets api_stats_piqi.ml api_stats_piqi_ext.ml)
+  (action (progn
+            (run piqi of-proto --normalize api_stats.proto)
+            (run piqic-ocaml --ext api_stats.proto.piqi)
+          )
+  )
+)
+
+(library
+  (name plugin_api_lib)
+  (libraries geneweb geneweb.gwd_lib geneweb.util)
+  (modules
+    api
+    api_graph
+    api_piqi
+    api_piqi_ext
+    api_saisie_autocomplete
+    api_saisie_read
+    api_saisie_read_piqi
+    api_saisie_read_piqi_ext
+    api_saisie_write
+    api_saisie_write_piqi
+    api_saisie_write_piqi_ext
+    api_search
+    api_stats
+    api_stats_piqi
+    api_stats_piqi_ext
+    api_update_family
+    api_update_person
+    api_update_util
+    api_util
+    api_warnings
+  )
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
+  (wrapped true)
+)
+
+(executable
+  (name plugin_api)
+  (libraries
+    geneweb
+    geneweb.gwd_lib
+    geneweb.wserver
+    plugin_api_lib
+  )
+  (embed_in_plugin_libraries plugin_api_lib)
+  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
+  (flags (:standard -w -40-27))
+  (modes (native plugin))
+  (modules plugin_api)
+)
+
+(alias (name plugin) (deps (source_tree assets) plugin_api.cmxs))

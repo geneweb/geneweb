@@ -79,6 +79,7 @@ GENERATED_FILES_DEP = \
 	lib/dune \
 	lib/gwdb-legacy-x-arangodb/dune \
 	lib/util/dune \
+	plugins/api/dune \
 	test/dune \
 
 generated: $(GENERATED_FILES_DEP)

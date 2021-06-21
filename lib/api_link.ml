@@ -562,7 +562,7 @@ let get_link_tree_curl =
   end;
   Curl.global_cleanup ();
   let output_encoding =
-    match Api_util.p_getenvbin conf.env "output" with
+    match Piqi_util.p_getenvbin conf.env "output" with
      | Some "pb" -> `pb
      | Some "json" -> `json
      | Some "xml" -> `xml
@@ -570,9 +570,8 @@ let get_link_tree_curl =
   in
   MLinkext.parse_link_tree !res output_encoding
 
-
 let print_link_tree conf base =
-  let params = Api_util.get_params conf MLinkext.parse_link_tree_params in
+  let params = Piqi_util.get_params conf MLinkext.parse_link_tree_params in
   let basename = params.MLink.Link_tree_params.basename in
   let ip = params.MLink.Link_tree_params.ip in
   let ref_person = params.MLink.Link_tree_params.ref_person in
@@ -932,6 +931,6 @@ let print_link_tree conf base =
     })
   in
   let data = MLinkext.gen_link_tree data in
-  Api_util.print_result conf data
+  Piqi_util.print_result conf data
 
 #endif

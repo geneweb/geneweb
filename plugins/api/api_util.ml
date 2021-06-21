@@ -7,6 +7,7 @@ module Mext = Api_piqi_ext
 (* fonctions déjà présentes, mais c'est pour qu'il reste *)
 (* le plus indépendant possible des autres modules.      *)
 
+open Geneweb
 open Config
 open Def
 open Gwdb
@@ -14,9 +15,10 @@ open Util
 open Api_def
 
 
-
 (* ... utils ... *)
 
+let p_getenvbin = Piqi_util.p_getenvbin
+let get_params = Piqi_util.get_params
 
 let is_empty_or_quest_name p =
   is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
@@ -24,23 +26,6 @@ let is_empty_or_quest_name p =
 
 
 (**/**)
-
-(* *********************************************************************** *)
-(*  [Fonc] p_getenvbin : (string * string) list -> string -> string option *)
-(** [Description] : Renvoie la valeur associée à la clé donnée. Attention,
-                    on ne supprime pas les espaces sinon on peut avoir des
-                    mauvaises surprises.
-    [Args] :
-      - env   : l'environnement dans lequel on cherche la clé
-      - label : la clé (dont on cherche la valeur)
-    [Retour] :
-      - string : la valeur de la clé.
-    [Rem] : Non exporté en clair hors de ce module.                        *)
-(* *********************************************************************** *)
-let p_getenvbin env label =
-  let decode_varenv = Mutil.gen_decode false in
-  try Some (decode_varenv (List.assoc (decode_varenv label) env))
-  with Not_found -> None
 
 
 (* ********************************************************************* *)
@@ -566,127 +551,17 @@ let apply_filters_p conf filters compute_sosa p =
 
 (**/**) (* Fonctions IO *)
 
+module Filter = Piqi_util.Filter (M) (Mext)
 
-(* ********************************************************************* *)
-(*  [Fonc] get_params :
-      config -> (string -> [> `json | `pb | `xml ] -> 'a) -> 'a          *)
-(** [Description] : Récupère les paramètres passés dans la requête.
-    [Args] :
-      - conf  : configuration de la base
-      - parse : la fonction de parser qui permet de récupérer les
-                paramètres
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let get_params conf parse =
-  match (p_getenvbin conf.env "data", p_getenvbin conf.env "input") with
-  | (Some d, Some "pb") -> parse d `pb
-  | (Some d, Some "json") -> parse d `json
-  | (Some d, Some "xml") -> parse d `xml
-  | _ -> exit (-2)
+module ReferencePerson = Piqi_util.ReferencePerson (M)
 
+let person_to_reference_person = ReferencePerson.person_to_reference_person
 
-(* ********************************************************************* *)
-(*  [Fonc] get_filters : config -> Api_def.filters                       *)
-(** [Description] : Récupère les filtres passés dans la requête.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Api_def.filters
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let get_filters conf =
-  let filters =
-    match (p_getenvbin conf.env "filters", p_getenvbin conf.env "input") with
-    | (Some d, Some "pb") -> Mext.parse_filters d `pb
-    | (Some d, Some "json") -> Mext.parse_filters d `json
-    | (Some d, Some "xml") -> Mext.parse_filters d `xml
-    | _ -> Mext.parse_filters "" `pb (* aucun filtre passé *)
-  in
-  { only_sosa = filters.M.Filters.only_sosa;
-    only_recent = filters.M.Filters.only_recent;
-    filter_sex =
-      (match filters.M.Filters.sex with
-      | Some `male -> Some Male
-      | Some `female -> Some Female
-      | Some `unknown -> Some Neuter
-      | _ -> None);
-    nb_results = filters.M.Filters.nb_results;
-    date_birth =
-      (match filters.M.Filters.date_birth with
-      | Some range ->
-          let date_begin = range.M.Filter_date_range.date_begin in
-          let dmy1 =
-            { day = Int32.to_int date_begin.M.Filter_date.day;
-              month = Int32.to_int date_begin.M.Filter_date.month;
-              year = Int32.to_int date_begin.M.Filter_date.year;
-              prec = Sure; delta = 0 }
-          in
-          let date_end = range.M.Filter_date_range.date_end in
-          let dmy2 =
-            { day = Int32.to_int date_end.M.Filter_date.day;
-              month = Int32.to_int date_end.M.Filter_date.month;
-              year = Int32.to_int date_end.M.Filter_date.year;
-              prec = Sure; delta = 0 }
-          in
-          let prec = range.M.Filter_date_range.only_exact in
-          Some (dmy1, dmy2, prec)
-      | None -> None);
-    date_death =
-      (match filters.M.Filters.date_death with
-      | Some range ->
-          let date_begin = range.M.Filter_date_range.date_begin in
-          let dmy1 =
-            { day = Int32.to_int date_begin.M.Filter_date.day;
-              month = Int32.to_int date_begin.M.Filter_date.month;
-              year = Int32.to_int date_begin.M.Filter_date.year;
-              prec = Sure; delta = 0 }
-          in
-          let date_end = range.M.Filter_date_range.date_end in
-          let dmy2 =
-            { day = Int32.to_int date_end.M.Filter_date.day;
-              month = Int32.to_int date_end.M.Filter_date.month;
-              year = Int32.to_int date_end.M.Filter_date.year;
-              prec = Sure; delta = 0 }
-          in
-          let prec = range.M.Filter_date_range.only_exact in
-          Some (dmy1, dmy2, prec)
-      | None -> None);
-  }
+let empty_reference_person = ReferencePerson.empty_reference_person
 
+let get_filters = Filter.get_filters
 
-(* ********************************************************************* *)
-(*  [Fonc] print_result : config -> (fun output_format -> string -> unit *)
-(** [Description] : Transforme un type piqi en fonction de son format de
-                    sortie puis appelle la fonction print du serveur pour
-                    afficher le résultat.
-    [Args] :
-      - conf : configuration de la base
-      - Piqirun.OBuf.t : le résultat de la requête
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let print_result conf data =
-  let (content_type, output) =
-    match p_getenvbin conf.env "output" with
-     | Some "pb" -> ("application/octet-stream", `pb)
-     | Some "json" -> ("application/json", `json)
-     | Some "xml" -> ("application/xml", `xml)
-     | _ -> exit (-2)
-  in
-  let data = data output in
-  Util.html ~content_type conf ;
-  Output.print_string conf data
-
-let person_to_reference_person base p =
-  { M.Reference_person.n = Name.lower @@ sou base @@ get_surname p
-  ; p = Name.lower @@ sou base @@ get_first_name p
-  ; oc = Int32.of_int (get_occ p)
-  }
-
-let empty_reference_person =
-  { M.Reference_person.n = "" ; p = "" ; oc = 0l }
+let print_result = Piqi_util.print_result
 
 let date_to_opt_string d =
   match Adef.od_of_cdate d with
@@ -824,27 +699,10 @@ let empty_piqi_person_full conf ref_person base_loop =
   }
 
 
-(* ********************************************************************* *)
-(*  [Fonc] empty_piqi_person :                                           *)
-(** [Description] :
-    [Args] :
-      - conf  :
-      - base  :
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
 let empty_piqi_person conf ref_person base_loop =
-(* TODO => peut être un enum piqi ?
-  match p_getenv conf.env "type_person" with
-  | Some "light" -> Light (empty_piqi_person_light conf ref_person base_loop)
-  | Some "full" -> Full (empty_piqi_person_full conf ref_person base_loop)
-  | _ -> exit (-2)
-*)
-  if p_getenvbin conf.env "full_infos" = Some "1" then
-    PFull (empty_piqi_person_full conf ref_person base_loop)
-  else
-    PLight (empty_piqi_person_light conf ref_person base_loop)
+  if p_getenvbin conf.env "full_infos" = Some "1"
+  then PFull (empty_piqi_person_full conf ref_person base_loop)
+  else PLight (empty_piqi_person_light conf ref_person base_loop)
 
 
 (* ************************************************************************** *)
@@ -1436,27 +1294,10 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   }
 
 
-(* ********************************************************************* *)
-(*  [Fonc] pers_to_piqi_person                                           *)
-(** [Description] :
-    [Args] :
-      - conf  :
-      - base  :
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
 let pers_to_piqi_person conf base p base_loop compute_sosa load_img =
-(* TODO
-  match p_getenv conf.env "type_person" with
-  | Some "light" -> Light (empty_piqi_person_light conf ref_person base_loop)
-  | Some "full" -> Full (empty_piqi_person_full conf ref_person base_loop)
-  | _ -> exit (-2)
-*)
-  if p_getenvbin conf.env "full_infos" = Some "1" then
-    PFull (pers_to_piqi_person_full conf base p base_loop compute_sosa load_img)
-  else
-    PLight (pers_to_piqi_person_light conf base p base_loop compute_sosa load_img)
+  if p_getenvbin conf.env "full_infos" = Some "1"
+  then PFull (pers_to_piqi_person_full conf base p base_loop compute_sosa load_img)
+  else PLight (pers_to_piqi_person_light conf base p base_loop compute_sosa load_img)
 
 
 (* ********************************************************************* *)
@@ -1609,141 +1450,6 @@ let fam_to_piqi_family_link base (ifath, imoth) ifam fam =
     index = index;
   }
 
-(**/**) (* Fonctions de transformation person <=> piqi person pour l'app *)
-
-let piqi_fevent_name_of_fevent_name = function
-  | Efam_Marriage -> `efam_marriage
-  | Efam_NoMarriage -> `efam_no_marriage
-  | Efam_NoMention -> `efam_no_mention
-  | Efam_Engage -> `efam_engage
-  | Efam_Divorce -> `efam_divorce
-  | Efam_Separated -> `efam_separated
-  | Efam_Annulation -> `efam_annulation
-  | Efam_MarriageBann -> `efam_marriage_bann
-  | Efam_MarriageContract -> `efam_marriage_contract
-  | Efam_MarriageLicense -> `efam_marriage_license
-  | Efam_PACS -> `efam_pacs
-  | Efam_Residence -> `efam_residence
-  | _ -> failwith __LOC__
-
-let piqi_pevent_name_of_pevent_name = function
-  | Epers_Birth -> `epers_birth
-  | Epers_Baptism -> `epers_baptism
-  | Epers_Death -> `epers_death
-  | Epers_Burial -> `epers_burial
-  | Epers_Cremation -> `epers_cremation
-  | Epers_Accomplishment -> `epers_accomplishment
-  | Epers_Acquisition -> `epers_acquisition
-  | Epers_Adhesion -> `epers_adhesion
-  | Epers_BaptismLDS -> `epers_baptismlds
-  | Epers_BarMitzvah -> `epers_barmitzvah
-  | Epers_BatMitzvah -> `epers_batmitzvah
-  | Epers_Benediction -> `epers_benediction
-  | Epers_ChangeName -> `epers_changename
-  | Epers_Circumcision-> `epers_circumcision
-  | Epers_Confirmation -> `epers_confirmation
-  | Epers_ConfirmationLDS -> `epers_confirmationlds
-  | Epers_Decoration -> `epers_decoration
-  | Epers_DemobilisationMilitaire -> `epers_demobilisationmilitaire
-  | Epers_Diploma -> `epers_diploma
-  | Epers_Distinction -> `epers_distinction
-  | Epers_Dotation -> `epers_dotation
-  | Epers_DotationLDS -> `epers_dotationlds
-  | Epers_Education -> `epers_education
-  | Epers_Election -> `epers_election
-  | Epers_Emigration -> `epers_emigration
-  | Epers_Excommunication -> `epers_excommunication
-  | Epers_FamilyLinkLDS -> `epers_familylinklds
-  | Epers_FirstCommunion -> `epers_firstcommunion
-  | Epers_Funeral -> `epers_funeral
-  | Epers_Graduate -> `epers_graduate
-  | Epers_Hospitalisation -> `epers_hospitalisation
-  | Epers_Illness -> `epers_illness
-  | Epers_Immigration-> `epers_immigration
-  | Epers_ListePassenger -> `epers_listepassenger
-  | Epers_MilitaryDistinction -> `epers_militarydistinction
-  | Epers_MilitaryPromotion -> `epers_militarypromotion
-  | Epers_MilitaryService -> `epers_militaryservice
-  | Epers_MobilisationMilitaire -> `epers_mobilisationmilitaire
-  | Epers_Naturalisation -> `epers_naturalisation
-  | Epers_Occupation -> `epers_occupation
-  | Epers_Ordination -> `epers_ordination
-  | Epers_Property -> `epers_property
-  | Epers_Recensement -> `epers_recensement
-  | Epers_Residence -> `epers_residence
-  | Epers_Retired -> `epers_retired
-  | Epers_ScellentChildLDS -> `epers_scellentchildlds
-  | Epers_ScellentParentLDS -> `epers_scellentparentlds
-  | Epers_ScellentSpouseLDS -> `epers_scellentspouselds
-  | Epers_VenteBien -> `epers_ventebien
-  | Epers_Will -> `epers_will
-  | _ -> failwith __LOC__
-
-let pevent_name_of_piqi_pevent_name = function
-  | `epers_birth -> Epers_Birth
-  | `epers_baptism -> Epers_Baptism
-  | `epers_death -> Epers_Death
-  | `epers_burial -> Epers_Burial
-  | `epers_cremation -> Epers_Cremation
-  | `epers_accomplishment -> Epers_Accomplishment
-  | `epers_acquisition -> Epers_Acquisition
-  | `epers_adhesion -> Epers_Adhesion
-  | `epers_baptismlds -> Epers_BaptismLDS
-  | `epers_barmitzvah -> Epers_BarMitzvah
-  | `epers_batmitzvah -> Epers_BatMitzvah
-  | `epers_benediction -> Epers_Benediction
-  | `epers_changename -> Epers_ChangeName
-  | `epers_circumcision -> Epers_Circumcision
-  | `epers_confirmation -> Epers_Confirmation
-  | `epers_confirmationlds -> Epers_ConfirmationLDS
-  | `epers_decoration -> Epers_Decoration
-  | `epers_demobilisationmilitaire -> Epers_DemobilisationMilitaire
-  | `epers_diploma -> Epers_Diploma
-  | `epers_distinction -> Epers_Distinction
-  | `epers_dotation -> Epers_Dotation
-  | `epers_dotationlds -> Epers_DotationLDS
-  | `epers_education -> Epers_Education
-  | `epers_election -> Epers_Election
-  | `epers_emigration -> Epers_Emigration
-  | `epers_excommunication -> Epers_Excommunication
-  | `epers_familylinklds -> Epers_FamilyLinkLDS
-  | `epers_firstcommunion -> Epers_FirstCommunion
-  | `epers_funeral -> Epers_Funeral
-  | `epers_graduate -> Epers_Graduate
-  | `epers_hospitalisation -> Epers_Hospitalisation
-  | `epers_illness -> Epers_Illness
-  | `epers_immigration -> Epers_Immigration
-  | `epers_listepassenger -> Epers_ListePassenger
-  | `epers_militarydistinction -> Epers_MilitaryDistinction
-  | `epers_militarypromotion -> Epers_MilitaryPromotion
-  | `epers_militaryservice -> Epers_MilitaryService
-  | `epers_mobilisationmilitaire -> Epers_MobilisationMilitaire
-  | `epers_naturalisation -> Epers_Naturalisation
-  | `epers_occupation -> Epers_Occupation
-  | `epers_ordination -> Epers_Ordination
-  | `epers_property -> Epers_Property
-  | `epers_recensement -> Epers_Recensement
-  | `epers_residence -> Epers_Residence
-  | `epers_retired -> Epers_Retired
-  | `epers_scellentchildlds -> Epers_ScellentChildLDS
-  | `epers_scellentparentlds -> Epers_ScellentParentLDS
-  | `epers_scellentspouselds -> Epers_ScellentSpouseLDS
-  | `epers_ventebien -> Epers_VenteBien
-  | `epers_will -> Epers_Will
-
-let fevent_name_of_piqi_fevent_name = function
-  | `efam_marriage -> Efam_Marriage
-  | `efam_no_marriage -> Efam_NoMarriage
-  | `efam_no_mention -> Efam_NoMention
-  | `efam_engage -> Efam_Engage
-  | `efam_divorce -> Efam_Divorce
-  | `efam_separated -> Efam_Separated
-  | `efam_annulation -> Efam_Annulation
-  | `efam_marriage_bann -> Efam_MarriageBann
-  | `efam_marriage_contract -> Efam_MarriageContract
-  | `efam_marriage_license -> Efam_MarriageLicense
-  | `efam_pacs -> Efam_PACS
-  | `efam_residence -> Efam_Residence
 
 (**/**) (* Fonctions de conversion *)
 

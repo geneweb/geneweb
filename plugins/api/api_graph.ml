@@ -3,9 +3,10 @@
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
-module MLink = Api_link_tree_piqi
-module MLinkext = Api_link_tree_piqi_ext
+module MLink = Geneweb.Api_link_tree_piqi
+module MLinkext = Geneweb.Api_link_tree_piqi_ext
 
+open Geneweb
 open Config
 open Gwdb
 open Def
@@ -69,7 +70,7 @@ let pevents_aux conf base filter acc p =
           begin
             { M.Event_query_result.p = pers_to_piqi_person p
             ; sp = None
-            ; pevent_name = Some (piqi_pevent_name_of_pevent_name e.epers_name)
+            ; pevent_name = Some (Piqi_util.piqi_pevent_name_of_pevent_name e.epers_name)
             ; fevent_name = None
             ; date = piqi_date_of_date @@ Adef.date_of_cdate e.epers_date
             ; place = sou base e.epers_place
@@ -92,7 +93,7 @@ let fevents_aux conf base filter acc f =
           { M.Event_query_result.p = pers_to_piqi_person @@ poi base @@ Gwdb.get_father f
           ; sp = Some (pers_to_piqi_person @@ poi base @@ Gwdb.get_mother f)
           ; pevent_name = None
-          ; fevent_name = Some (piqi_fevent_name_of_fevent_name e.efam_name)
+          ; fevent_name = Some (Piqi_util.piqi_fevent_name_of_fevent_name e.efam_name)
           ; date = piqi_date_of_date @@ Adef.date_of_cdate e.efam_date
           ; place = sou base e.efam_place
           ; note = sou base e.efam_note
@@ -102,8 +103,8 @@ let fevents_aux conf base filter acc f =
       end acc events
 
 let events_filters_aux params =
-  let filter_pevents = List.map pevent_name_of_piqi_pevent_name params.M.Events_query_params.pevents in
-  let filter_fevents = List.map fevent_name_of_piqi_fevent_name params.M.Events_query_params.fevents in
+  let filter_pevents = List.map Piqi_util.pevent_name_of_piqi_pevent_name params.M.Events_query_params.pevents in
+  let filter_fevents = List.map Piqi_util.fevent_name_of_piqi_fevent_name params.M.Events_query_params.fevents in
   let filter_start_date =
     match params.M.Events_query_params.start_date with
     | Some b ->

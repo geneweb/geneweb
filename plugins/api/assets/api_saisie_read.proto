@@ -1,6 +1,8 @@
 syntax = "proto2" ;
 
-package geneweb.api.saisie_read.object;
+package geneweb.api.saisie_read;
+
+import public "api.proto";
 
 enum Sosa {
   NO_SOSA = 2;
