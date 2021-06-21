@@ -1,11 +1,11 @@
 #ifdef API
 
+module Mwrite = Api_saisie_write_piqi
+module Mext_write = Api_saisie_write_piqi_ext
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
-module Mwrite = Api_saisie_write_piqi
-module Mext_write = Api_saisie_write_piqi_ext
-
+open Geneweb
 open Config
 open Def
 open Gwdb
@@ -244,7 +244,8 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          (piqi_fevent_name_of_fevent_name evt, Util.string_of_fevent_name conf base evt)
+          ( Piqi_util.piqi_fevent_name_of_fevent_name evt
+          , Util.string_of_fevent_name conf base evt )
         in
         Mwrite.Transl_fevent_name.({
           pos = pos;
@@ -264,7 +265,8 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          (piqi_pevent_name_of_pevent_name evt, Util.string_of_pevent_name conf base evt)
+          ( Piqi_util.piqi_pevent_name_of_pevent_name evt
+          , Util.string_of_pevent_name conf base evt )
         in
         Mwrite.Transl_pevent_name.({
           pos = pos;
@@ -276,7 +278,8 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          (piqi_pevent_name_of_pevent_name evt, Util.string_of_pevent_name conf base evt)
+          ( Piqi_util.piqi_pevent_name_of_pevent_name evt
+          , Util.string_of_pevent_name conf base evt )
         in
         Mwrite.Transl_pevent_name.({
           pos = pos;
@@ -307,7 +310,8 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          (piqi_pevent_name_of_pevent_name evt, Util.string_of_pevent_name conf base evt)
+          ( Piqi_util.piqi_pevent_name_of_pevent_name evt
+          , Util.string_of_pevent_name conf base evt )
         in
         Mwrite.Transl_pevent_name.({
           pos = pos;

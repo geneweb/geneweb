@@ -3,6 +3,7 @@
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
+open Geneweb
 open Config
 open Def
 open Gwdb
@@ -701,18 +702,6 @@ let print_remove_image_ext_all base =
   end (Gwdb.persons base) ;
   Gwdb.commit_patches base
 
-(**/**) (* API_CHECK_BASE *)
-
-(* ********************************************************************* *)
-(*  [Fonc] print_base_warnings : config -> base -> unit                  *)
-(** [Description] : Renvoie les listes des erreurs et warnings d'une base.
-    [Args] :
-    - conf : configuration de la base
-    - base : base de donnée
-      [Retour] :
-    - base_warning : Les listes de tous les warnings de la base.
-      [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
 let print_base_warnings conf base =
   let filters = get_filters conf in
   let errors = ref [] in
@@ -724,7 +713,7 @@ let print_base_warnings conf base =
        then Hashtbl.add warnings w true)
     ignore ;
   let data =
-    if filters.nb_results then
+    if filters.Api_def.nb_results then
       let len = List.length !errors + Hashtbl.length warnings in
       let len = M.Internal_int32.({value = Int32.of_int len}) in
       Mext.gen_internal_int32 len

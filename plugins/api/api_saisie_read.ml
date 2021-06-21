@@ -2,9 +2,10 @@
 
 module Mread = Api_saisie_read_piqi
 module Mext_read = Api_saisie_read_piqi_ext
-module MLink = Api_link_tree_piqi
-module MLinkext = Api_link_tree_piqi_ext
+module MLink = Geneweb.Api_link_tree_piqi
+module MLinkext = Geneweb.Api_link_tree_piqi_ext
 
+open Geneweb
 open Config
 open Def
 open Gwdb
@@ -308,10 +309,10 @@ let convert_wiki_notes_to_html_notes conf base env wiki_notes separator_string =
 let event_to_piqi_event pevt_name fevt_name =
   match pevt_name with
   | Some (Epers_Name _) -> `epers_custom
-  | Some pevt -> Api_util.piqi_pevent_name_of_pevent_name pevt
+  | Some pevt -> Piqi_util.piqi_pevent_name_of_pevent_name pevt
   | None -> match fevt_name with
     | Some (Efam_Name _) -> `efam_custom
-    | Some fevt -> piqi_fevent_name_of_fevent_name fevt
+    | Some fevt -> Piqi_util.piqi_fevent_name_of_fevent_name fevt
     | None -> failwith "event_to_piqi_event"
 
 (* ************************************************************************** *)

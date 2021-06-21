@@ -3,6 +3,7 @@
 module Mstats = Api_stats_piqi
 module Mext_stats = Api_stats_piqi_ext
 
+open Geneweb
 open Config
 open Def
 open Gwdb

@@ -3169,3 +3169,44 @@ let select_mascdesc conf base ips gen_desc =
   let ips = Hashtbl.fold (fun ip (gen, _) acc -> (ip, gen) :: acc) asc [] in
   let r =  select_desc conf base gen_desc ips  in
   r
+
+let auth_warning conf base w =
+  let pauth p = authorized_age conf base p in
+  let fauth ifam =
+    let fam = foi base ifam in
+    pauth (get_father fam |> poi base)
+    && pauth (get_mother fam |> poi base)
+  in
+  match w with
+  | BigAgeBetweenSpouses (p1, p2, _) -> pauth p1 && pauth p2
+  | BirthAfterDeath p -> pauth p
+  | ChildrenNotInOrder (ifam, _, elder, x) -> pauth elder && pauth x && fauth ifam
+  | CloseChildren (ifam, c1, c2) -> pauth c1 && pauth c2 && fauth ifam
+  | DeadOld (p, _) -> pauth p
+  | DeadTooEarlyToBeFather (father, child) -> pauth father && pauth child
+  | DistantChildren (ifam, p1, p2) -> pauth p1 && pauth p2 && fauth ifam
+  | FEventOrder (p, _, _) -> pauth p
+  | FWitnessEventAfterDeath (p, _) -> pauth p
+  | FWitnessEventBeforeBirth (p, _) -> pauth p
+  | IncoherentSex (p, _, _) -> pauth p
+  | IncoherentAncestorDate (anc, p) -> pauth anc && pauth p
+  | MarriageDateAfterDeath p -> pauth p
+  | MarriageDateBeforeBirth p -> pauth p
+  | MotherDeadBeforeChildBirth (mother, child) -> pauth mother && pauth child
+  | ParentBornAfterChild (parent, child) -> pauth parent && pauth child
+  | ParentTooOld (p, _) -> pauth p
+  | ParentTooYoung (p, _) -> pauth p
+  | PossibleDuplicateFam (f1, f2) -> fauth f1 && fauth f2
+  | PEventOrder (p, _, _) -> pauth p
+  | PWitnessEventAfterDeath (p, _) -> pauth p
+  | PWitnessEventBeforeBirth (p, _) -> pauth p
+  | TitleDatesError (p, _) -> pauth p
+  | UndefinedSex p -> pauth p
+  | WitnessDateAfterDeath p -> pauth p
+  | WitnessDateBeforeBirth p -> pauth p
+  | YoungForMarriage (p, _) -> pauth p
+  | OldForMarriage (p, _) -> pauth p
+  | ChangedOrderOfChildren _
+  | ChangedOrderOfMarriages _
+  | ChangedOrderOfFamilyEvents _
+  | ChangedOrderOfPersonEvents _ -> false

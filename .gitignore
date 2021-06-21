@@ -23,6 +23,7 @@ bin/update_nldb/dune
 lib/dune
 lib/gwdb-legacy-x-arangodb/dune
 lib/util/dune
+plugins/api/dune
 test/dune
 
 dune-workspace

@@ -1,7 +1,6 @@
 syntax = "proto2" ;
 
-package geneweb.api.saisie_write.object;
-
+package geneweb.api.saisie_write;
 
 // ***************************************************************************
 // Définitions globales.
