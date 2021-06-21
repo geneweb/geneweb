@@ -246,41 +246,6 @@ type 'person error = 'person Def.error =
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person
 
-type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
-  ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) Def.warning =
-  | BigAgeBetweenSpouses of 'person * 'person * dmy
-  | BirthAfterDeath of 'person
-  | IncoherentSex of 'person * int * int
-  | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array
-  | ChangedOrderOfMarriages of 'person * 'family array * 'family array
-  | ChangedOrderOfFamilyEvents of 'family * 'fevent list * 'fevent list
-  | ChangedOrderOfPersonEvents of 'person * 'pevent list * 'pevent list
-  | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
-  | CloseChildren of 'family * 'person * 'person
-  | DeadOld of 'person * dmy
-  | DeadTooEarlyToBeFather of 'person * 'person
-  | DistantChildren of 'family * 'person * 'person
-  | FEventOrder of 'person * 'fevent * 'fevent
-  | FWitnessEventAfterDeath of 'person * 'fevent
-  | FWitnessEventBeforeBirth of 'person * 'fevent
-  | IncoherentAncestorDate of 'person * 'person
-  | MarriageDateAfterDeath of 'person
-  | MarriageDateBeforeBirth of 'person
-  | MotherDeadBeforeChildBirth of 'person * 'person
-  | ParentBornAfterChild of 'person * 'person
-  | ParentTooOld of 'person * dmy
-  | ParentTooYoung of 'person * dmy
-  | PEventOrder of 'person * 'pevent * 'pevent
-  | PossibleDuplicateFam of 'family * 'family
-  | PWitnessEventAfterDeath of 'person * 'pevent
-  | PWitnessEventBeforeBirth of 'person * 'pevent
-  | TitleDatesError of 'person * 'title
-  | UndefinedSex of 'person
-  | WitnessDateAfterDeath of 'person
-  | WitnessDateBeforeBirth of 'person
-  | YoungForMarriage of 'person * dmy
-  | OldForMarriage of 'person * dmy
-
 type ('person, 'descend, 'title) misc = ('person, 'descend, 'title) Def.misc = MissingSources
 
 type dsk_person = (int, int, int) gen_person
