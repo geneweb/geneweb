@@ -551,46 +551,6 @@ let print_img conf base =
       (fun list ->
          Mext.gen_list_images @@ M.List_images.({list_images = list}) )
 
-(**/**) (* API_IMAGE_EXT *)
-
-let print_img_ext conf base =
-  let filters = get_filters conf in
-  let aux fp fl =
-    let () = Perso.build_sosa_ht conf base in
-    let () = load_image_ht conf in
-    let list =
-      Gwdb.Collection.fold begin fun acc p ->
-        let http = "http://" in
-        let img = sou base (get_image p) in
-        if not (is_empty_string (get_image p)) &&
-           String.length img > String.length http &&
-           String.sub img 0 (String.length http) = http
-        then
-          fp p img :: acc
-        else acc
-      end [] (Gwdb.persons base)
-    in
-    if filters.nb_results then
-      let len = M.Internal_int32.({value = Int32.of_int (List.length list)}) in
-      let data = Mext.gen_internal_int32 len in
-      print_result conf data
-    else print_result conf (fl list)
-  in
-  let base_loop = has_base_loop conf base in
-  if p_getenvbin conf.env "full_infos" = Some "1" then
-    aux
-      (fun p img ->
-         let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
-         M.Full_image.({person = p; img = img;}))
-      (fun list ->
-         Mext.gen_list_full_images @@ M.List_full_images.({images = list}) )
-  else
-    aux
-      (fun p img ->
-         let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
-         M.Image.({person = p; img = img;}))
-      (fun list -> Mext.gen_list_images @@ M.List_images.({list_images = list}))
-
 (**/**) (* API_IMAGE_ALL *)
 
 let print_img_all conf base =
