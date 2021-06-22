@@ -36,8 +36,6 @@ let () =
       , aux @@ w_base @@ Api_graph.print_cpl_relation)
     ; ( "API_GRAPH_ASC"
       , aux @@ w_base @@ Api_graph.print_graph_asc)
-    ; ( "API_GRAPH_ASC_LIA"
-      , aux @@ w_base @@ Api_graph.print_graph_asc_lia)
     ; ( "API_GRAPH_DESC"
       , aux @@ w_base @@ Api_graph.print_graph_desc)
     ; ( "API_GRAPH_REL"
