@@ -70,10 +70,6 @@ let () =
       , aux @@ w_base @@ Api_saisie_read.print_nb_ancestors)
     ; ( "API_REF_PERSON_FROM_ID"
       , aux @@ w_base @@ Api.print_ref_person_from_ip)
-    ; ( "API_REMOVE_IMAGE_EXT"
-      , aux @@ wiz @@ w_base @@ w_lock (fun _ -> Api.print_remove_image_ext))
-    ; ( "API_REMOVE_IMAGE_EXT_ALL"
-      , aux @@ wiz @@ w_base @@ w_lock (fun _ -> Api.print_remove_image_ext_all))
     ; ( "API_SEARCH"
       , aux @@ w_base @@ Api_search.print_search)
     ; ( "API_GRAPH_TREE_V2"
