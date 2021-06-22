@@ -664,6 +664,31 @@ let print_base_warnings conf base =
   in
   print_result conf data
 
+let person_warnings conf base p =
+  let warnings = Hashtbl.create 0 in
+  let add w =
+    if not (Hashtbl.mem warnings w) && Util.auth_warning conf base w
+    then Hashtbl.add warnings w true
+  in
+  ignore @@ CheckItem.person base add p ;
+  CheckItem.on_person_update base add p ;
+  Hashtbl.fold begin fun x _ acc ->
+    Api_warnings.add_warning_to_piqi_warning_list conf base acc x
+  end warnings Api_warnings.empty
+
+
+let print_person_warnings conf base =
+  let ref_person = Piqi_util.get_params conf Api_piqi_ext.parse_reference_person in
+  let sn = ref_person.Api_piqi.Reference_person.n in
+  let fn = ref_person.Api_piqi.Reference_person.p in
+  let occ = ref_person.Api_piqi.Reference_person.oc in
+  match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
+  | None -> assert false
+  | Some ip ->
+    Util.pget conf base ip
+    |> person_warnings conf base
+    |> Api_piqi_ext.gen_base_warnings
+    |> Api_util.print_result conf
 
 (**/**) (* Récupération de toute une base. *)
 

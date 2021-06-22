@@ -124,10 +124,13 @@ let () =
       , aux @@ wiz @@ w_base @@ w_lock @@ Api_saisie_write.print_del_ind_ok)
     ; ( "API_LINK_TREE"
       , aux @@ w_base @@ Api_link.print_link_tree)
+    ; ( "API_PERSON_WARNINGS"
+      , aux @@ w_base @@ Api.print_person_warnings)
     ; ( "API_STATS"
       , aux @@ w_base @@ Api_stats.print_stats)
     ; ( "API_SELECT_EVENTS"
       , aux @@ w_base @@ Api_graph.print_select_events)
     ]
+
 
 #endif
