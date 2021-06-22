@@ -518,27 +518,6 @@ message ModificationStatus {
   optional int32 index = 3;
 }
 
-enum NotifBirthdayParams {
-  CLOSE_PERSON = 0;
-  DESCEND_GRAND_PARENT = 1;
-  DESCEND_GREAT_GRAND_PARENT = 2;
-}
-
-message NotificationBirthdayParams {
-  required ReferencePerson person = 1;
-  required NotifBirthdayParams params = 2;
-  optional int32 month = 3;
-  optional int32 day = 4;
-}
-
-message NotificationBirthday {
-  required int32 number = 1;
-  required bool has_proprio_birthday = 2;
-  optional string firstname1 = 3;
-  optional string firstname2 = 4;
-  optional string firstname3 = 5;
-}
-
 // ***************************************************************************
 // Premiere saisie
 // ***************************************************************************
