@@ -632,36 +632,6 @@ let print_updt_image conf base =
     pers_img_l;
   Gwdb.commit_patches base
 
-(**/**) (* API_REMOVE_IMAGE_EXT *)
-
-let print_remove_image_ext base =
-  Gwdb.Collection.iter begin fun p ->
-    let http = "http://" in
-    let img = sou base (get_image p) in
-    let is_ext =
-      String.length img > String.length http &&
-      String.sub img 0 (String.length http) = http
-    in
-    if img <> "" && is_ext then
-      let p =
-        {(gen_person_of_person p) with image = Gwdb.insert_string base ""}
-      in
-      patch_person base p.key_index p
-  end (Gwdb.persons base) ;
-  Gwdb.commit_patches base
-
-(**/**) (* API_REMOVE_IMAGE_EXT_ALL *)
-
-let print_remove_image_ext_all base =
-  Gwdb.Collection.iter begin fun p ->
-    if not (is_empty_string (get_image p)) then
-      let p =
-        {(gen_person_of_person p) with image = Gwdb.insert_string base ""}
-      in
-      patch_person base p.key_index p
-  end (Gwdb.persons base) ;
-  Gwdb.commit_patches base
-
 let print_base_warnings conf base =
   let filters = get_filters conf in
   let errors = ref [] in
