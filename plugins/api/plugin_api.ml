@@ -50,8 +50,6 @@ let () =
       , aux @@ w_base @@ Api.print_info_ind)
     ; ( "API_IMAGE"
       , aux @@ w_base @@ Api.print_img)
-    ; ( "API_IMAGE_EXT"
-      , aux @@ w_base @@ Api.print_img_ext)
     ; ( "API_IMAGE_ALL"
       , aux @@ w_base @@ Api.print_img_all)
     ; ( "API_IMAGE_PERSON"
