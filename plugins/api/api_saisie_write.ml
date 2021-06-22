@@ -864,8 +864,8 @@ let compute_warnings conf base resp =
                   (fun _ -> print_someone_dates p)
                 in
                 w :: wl
-            | YoungForMarriage (p, a)
-            | OldForMarriage (p, a) ->
+            | YoungForMarriage (p, a, _)
+            | OldForMarriage (p, a, _) ->
                 let w =
                 print_someone p ^ " " ^
                   (Printf.sprintf

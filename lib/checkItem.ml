@@ -779,9 +779,9 @@ let check_parent_marriage_age warning fam p =
                   then warning (MarriageDateBeforeBirth p)
                   else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun e ->
                     if strictly_younger e min_age_marriage
-                    then warning (YoungForMarriage (p, e))
+                    then warning (YoungForMarriage (p, e, get_ifam fam))
                     else if strictly_older e max_age_marriage
-                    then warning (OldForMarriage (p, e))
+                    then warning (OldForMarriage (p, e, get_ifam fam))
                     else loop list
                 | _ -> loop list
             end

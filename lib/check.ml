@@ -215,8 +215,8 @@ let print_base_warning oc base =
   | WitnessDateBeforeBirth p ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "was witness before his/her birth\n"
-  | YoungForMarriage (p, a)
-  | OldForMarriage (p, a) ->
+  | YoungForMarriage (p, a, _)
+  | OldForMarriage (p, a, _) ->
       Printf.fprintf oc "%s married at age %d\n" (designation base p) a.year
 
 type check_date = CheckBefore of int | CheckAfter of int | CheckOther of int | CheckInfered of check_date

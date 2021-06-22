@@ -845,10 +845,11 @@ and mk_warning conf base =
     Tset [ Tstr "MotherDeadBeforeChildBirth"
          ; unsafe_mk_person conf base p1
          ; unsafe_mk_person conf base p2 ]
-  | OldForMarriage (p, a) ->
+  | OldForMarriage (p, a, i) ->
     Tset [ Tstr "OldForMarriage"
          ; unsafe_mk_person conf base p
-         ; mk_date (Dgreg (a, Dgregorian) ) ]
+         ; mk_date (Dgreg (a, Dgregorian) )
+         ; get_n_mk_family conf base i (Gwdb.foi base i) ]
   | ParentBornAfterChild (p1, p2) ->
     Tset [ Tstr "ParentBornAfterChild"
          ; unsafe_mk_person conf base p1
@@ -887,10 +888,12 @@ and mk_warning conf base =
   | WitnessDateBeforeBirth p ->
     Tset [ Tstr "WitnessDateBeforeBirth"
          ; unsafe_mk_person conf base p ]
-  | YoungForMarriage (p, a) ->
+  | YoungForMarriage (p, a, i) ->
     Tset [ Tstr "YoungForMarriage"
          ; unsafe_mk_person conf base p
-         ; mk_date (Dgreg (a, Dgregorian) ) ]
+         ; mk_date (Dgreg (a, Dgregorian) )
+         ; get_n_mk_family conf base i (Gwdb.foi base i)
+         ]
   | PossibleDuplicateFam (ifam1, ifam2) ->
     Tset [ Tstr "PossibleDuplicateFam"
          ; get_fam ifam1

@@ -201,13 +201,13 @@ let add_warning_to_piqi_warning_list conf base =
       { w with warning_witness_date_before_birth =
                  M.Warning_witness_date_before_birth.{ person = p2wp base p }
                  :: w.warning_witness_date_before_birth }
-    | YoungForMarriage (p, dmy) ->
+    | YoungForMarriage (p, dmy, _) ->
       { w with warning_young_for_marriage =
                  M.Warning_young_for_marriage.{
                    person = p2wp base p
                  ; date = string_of_prec_dmy dmy
                  } :: w.warning_young_for_marriage }
-    | OldForMarriage (p, dmy) ->
+    | OldForMarriage (p, dmy, _) ->
       { w with warning_old_for_marriage =
                  M.Warning_old_for_marriage.{
                    person = p2wp base p

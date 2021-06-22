@@ -3204,8 +3204,8 @@ let auth_warning conf base w =
   | UndefinedSex p -> pauth p
   | WitnessDateAfterDeath p -> pauth p
   | WitnessDateBeforeBirth p -> pauth p
-  | YoungForMarriage (p, _) -> pauth p
-  | OldForMarriage (p, _) -> pauth p
+  | YoungForMarriage (_, _, fam) -> fauth fam
+  | OldForMarriage (_, _, fam) -> fauth fam
   | ChangedOrderOfChildren _
   | ChangedOrderOfMarriages _
   | ChangedOrderOfFamilyEvents _

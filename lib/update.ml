@@ -639,8 +639,8 @@ let print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
-  | YoungForMarriage (p, a)
-  | OldForMarriage (p, a) ->
+  | YoungForMarriage (p, a, _)
+  | OldForMarriage (p, a, _) ->
       Output.printf conf "%s\n" (print_someone_strong conf base p);
       Output.printf conf (ftransl conf "married at age %t")
         (fun _ -> DateDisplay.string_of_age conf a)

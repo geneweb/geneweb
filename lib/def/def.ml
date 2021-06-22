@@ -287,8 +287,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | UndefinedSex of 'person
   | WitnessDateAfterDeath of 'person
   | WitnessDateBeforeBirth of 'person
-  | YoungForMarriage of 'person * dmy
-  | OldForMarriage of 'person * dmy
+  | YoungForMarriage of 'person * dmy * 'family
+  | OldForMarriage of 'person * dmy * 'family
 
 type ('person, 'descend, 'title) misc = MissingSources
 
