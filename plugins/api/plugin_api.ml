@@ -68,8 +68,6 @@ let () =
       , aux @@ wiz @@ w_base @@ Api.print_max_ancestors)
     ; ( "API_NB_ANCESTORS"
       , aux @@ w_base @@ Api_saisie_read.print_nb_ancestors)
-    ; ( "API_NOTIFICATION_BIRTHDAY"
-      , aux @@ w_base @@ Api.print_notification_birthday)
     ; ( "API_REF_PERSON_FROM_ID"
       , aux @@ w_base @@ Api.print_ref_person_from_ip)
     ; ( "API_REMOVE_IMAGE_EXT"
