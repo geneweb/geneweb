@@ -2083,31 +2083,19 @@ let search_index conf base an search_order =
   in
   loop search_order
 
-(* ********************************************************************* *)
-(*  [Fonc] print_result_fiche_person :                                   *)
-(*         conf -> base -> ip -> int -> int -> bool -> bool -> unit      *)
-(** [Description] : Renvoie un objet personne contenant les données de
-      la fiche en fonction d'un index.
-    [Args] :
-      - conf              : configuration de la base
-      - base              : base de données
-      - ip                : l'index de la personne
-      - nb_asc_max        : nombre d'ascendants à récupérer au maximum
-      - nb_desc_max       : nombre de descendants à récupérer au maximum
-      - simple_graph_info : ne récupère que des informations simples pour
-       les personnes autres que la principale.
-      - no_event          : ne récupère pas les évènements.
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
 let print_result_fiche_person conf base ip nb_asc_max nb_desc_max simple_graph_info no_event =
-  let () = Perso.build_sosa_ht conf base in
-  let p = poi base ip in
-  (* cache lien inter arbre *)
-  let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let pers_piqi = pers_to_piqi_fiche_person conf base p conf.command true 0 nb_asc_max 0 nb_desc_max true simple_graph_info no_event in
-  let data = Mext_read.gen_person pers_piqi in
-  print_result conf data
+  if Gwdb.iper_exists base ip then begin
+    let () = Perso.build_sosa_ht conf base in
+    let p = poi base ip in
+    (* cache lien inter arbre *)
+    let () = Perso_link.init_cache conf base ip 1 1 1 in
+    let pers_piqi = pers_to_piqi_fiche_person conf base p conf.command true 0 nb_asc_max 0 nb_desc_max true simple_graph_info no_event in
+    let data = Mext_read.gen_person pers_piqi in
+    print_result conf data
+  end else begin
+    Output.status conf Def.Not_Found ;
+    Output.print_string conf ""
+  end
 
 (* ********************************************************************* *)
 (*  [Fonc] is_private_person : conf -> base -> ip -> bool                 *)
