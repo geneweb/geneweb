@@ -651,6 +651,11 @@ let apply_patches tab patches plen =
     new_tab
   end
 
+let make_record_exists patches pending len = fun i ->
+  Hashtbl.find_opt pending i <> None
+  || Hashtbl.find_opt patches i <> None
+  || (i < len && i >= 0)
+
 let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending) len name input_array input_item =
   let tab = ref None in
   let cleared = ref false in
@@ -841,6 +846,8 @@ let opendb bname =
     | None -> ()
   end ;
   let shift = 0 in
+  let iper_exists = make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len in
+  let ifam_exists = make_record_exists (snd patches.h_family) (snd pending.h_family) families_len in
   let persons =
     make_record_access ic ic_acc shift persons_array_pos patches.h_person pending.h_person
       persons_len "persons" (input_value : _ -> person array)
@@ -1140,6 +1147,8 @@ let opendb bname =
     ; commit_notes = commit_notes
     ; cleanup = cleanup
     ; nb_of_real_persons = nbp_read
+    ; iper_exists
+    ; ifam_exists
     }
   in
   { data = base_data
@@ -1206,6 +1215,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; commit_notes = (fun _ -> assert false)
     ; cleanup = (fun _ -> ())
     ; nb_of_real_persons = (fun _ -> assert false)
+    ; iper_exists = (fun _ -> assert false)
+    ; ifam_exists = (fun _ -> assert false)
     }
   in
   { data ; func ; version = GnWb0024 }

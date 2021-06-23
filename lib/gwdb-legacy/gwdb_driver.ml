@@ -442,6 +442,10 @@ let family_of_gen_family base (f, c, d) =
   ; d = Some d
   } [@ocaml.warning "-42"]
 
+let iper_exists base = base.func.iper_exists
+
+let ifam_exists base = base.func.ifam_exists
+
 let poi base iper =
   if iper = dummy_iper then empty_person base iper
   else { base ; iper ; p = None ; a = None ; u = None } [@ocaml.warning "-42"]

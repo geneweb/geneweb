@@ -38,6 +38,9 @@ val quest_string : istr
 val empty_person : base -> iper -> person
 val empty_family : base -> ifam -> family
 
+val iper_exists : base -> iper -> bool
+val ifam_exists : base -> ifam -> bool
+
 val get_access : person -> Def.access
 val get_aliases : person -> istr list
 val get_baptism : person -> Def.cdate

@@ -2081,12 +2081,14 @@ let limited_image_size max_wid max_hei fname size =
 
 let find_person_in_env conf base suff =
   match p_getenv conf.env ("i" ^ suff) with
-    Some i when i <> "" ->
-      (* if i >= 0 && i < nb_of_persons base then *)
-        let p = pget conf base (Gwdb.iper_of_string i) in
-        if is_hidden p then None else Some p
-      (* else None *)
-  | _(* None *) ->
+  | Some i when i <> "" ->
+    let i = Gwdb.iper_of_string i in
+    if Gwdb.iper_exists base i
+    then
+      let p = pget conf base i in
+      if is_hidden p then None else Some p
+    else None
+  | _ ->
       match
         p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff)
       with

@@ -161,13 +161,14 @@ let relation_print conf base p =
   let p1 =
     match p_getenv conf.senv "ei" with
     | Some i ->
-      conf.senv <- [];
-      (* if i >= 0 && i < nb_of_persons base then *)
-      Some (pget conf base (iper_of_string i))
-    (* else None *)
+      conf.senv <- [] ;
+      let i = iper_of_string i in
+      if Gwdb.iper_exists base i
+      then Some (pget conf base i)
+      else None
     | None ->
       match find_person_in_env conf base "1" with
-        Some p1 -> conf.senv <- []; Some p1
+      | Some p1 -> conf.senv <- []; Some p1
       | None -> None
   in
   RelationDisplay.print conf base p p1

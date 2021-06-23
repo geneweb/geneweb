@@ -310,6 +310,8 @@ type base_func =
   ; commit_notes : string -> string -> unit
   ; cleanup : unit -> unit
   ; nb_of_real_persons : unit -> int
+  ; iper_exists : int -> bool
+  ; ifam_exists : int -> bool
   }
 
 type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
