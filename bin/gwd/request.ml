@@ -302,7 +302,24 @@ let very_unknown conf base =
     Hutil.rheader conf title;
     Hutil.print_link_to_welcome conf false;
     Hutil.trailer conf
-  | _ -> incorrect_request conf
+  | _ ->
+    match p_getenv conf.env "i" with
+    | Some i ->
+      let title _ =
+        Output.print_string conf "<kbd>" ;
+        Output.print_string conf (Util.escape_html i) ;
+        Output.print_string conf "</kbd>" ;
+        Output.print_string conf (transl conf ":") ;
+        Output.print_string conf " " ;
+        transl conf "not found"
+        |> Utf8.capitalize_fst
+        |> Output.print_string conf ;
+      in
+      Output.status conf Def.Not_Found;
+      Hutil.rheader conf title;
+      Hutil.print_link_to_welcome conf false;
+      Hutil.trailer conf
+    | None -> incorrect_request conf
 
 let unknown = begin fun conf n ->
       let title _ =
