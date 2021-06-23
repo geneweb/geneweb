@@ -237,3 +237,6 @@ let string_of_iper _ = assert false
 let string_of_istr _ = assert false
 let sync ?scratch:_ = assert false
 let write_nldb _ = assert false
+
+let iper_exists _ = assert false
+let ifam_exists _ = assert false
