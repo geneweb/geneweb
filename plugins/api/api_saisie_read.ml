@@ -2790,7 +2790,7 @@ let print_result_graph_tree_v2 conf base ip =
     | None -> ([], [])
   in
   let graph =
-    Mread.Graph_tree_new.({
+    Mread.Graph_tree.({
       nodes_asc = nodes_asc;
       edges_asc = edges_asc;
       nodes_desc = nodes_desc;
@@ -2800,7 +2800,7 @@ let print_result_graph_tree_v2 conf base ip =
       nodes_siblings_after = nodes_siblings_after;
     })
   in
-  let data = Mext_read.gen_graph_tree_new graph in
+  let data = Mext_read.gen_graph_tree graph in
   print_result conf data
 
 (* ************************************************************************ *)

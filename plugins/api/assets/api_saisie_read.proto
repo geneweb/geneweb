@@ -446,7 +446,7 @@ message Edge {
   required int64 to_node = 2;
 }
 
-message GraphTreeNew {
+message GraphTree {
   repeated Node nodes_asc = 1;
   repeated Edge edges_asc = 2;
   repeated Node nodes_desc = 3;
