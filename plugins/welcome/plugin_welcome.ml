@@ -60,14 +60,13 @@ let search conf base an search_order specify unknown =
         begin match pl with
           [] -> loop l
         | _ ->
-            Some.search_surname_print conf base unknown an
+            Some.surname_print conf base unknown an
         end
     | FirstName :: l ->
-        let pl = Some.search_first_name conf base an in
+        let pl = Some.select_first_name conf base false an in
         begin match pl with
           [] -> loop l
-        | _ ->
-            Some.search_first_name_print conf base an
+        | res -> Some.first_name_print conf base an res
         end
     | FullName :: l ->
         let max_answers =
@@ -131,7 +130,7 @@ let search conf base an search_order specify unknown =
         | pl -> specify conf base an pl
         end
     | DefaultSurname :: _ ->
-        Some.search_surname_print conf base unknown an
+        Some.surname_print conf base unknown an
   in
   loop search_order
 (* end SearchName *)

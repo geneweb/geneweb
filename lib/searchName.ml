@@ -137,20 +137,19 @@ let search conf base an search_order specify unknown =
             record_visited conf (get_iper p); Perso.print conf base p
         | pl -> specify conf base an pl
         end
-    | Surname :: l ->
-        let pl = Some.search_surname conf base an in
-        begin match pl with
-          [] -> loop l
-        | _ ->
-            Some.search_surname_print conf base unknown an
-        end
+    | Surname :: l -> begin
+        let (list, iperl, inj) = Some.select_surname conf base false an in
+        let bhl = Some.mk_branches conf base inj iperl in
+        match bhl, list with
+        | [], _ -> loop l
+        | _, [s, (strl, _)] -> Some.print_one_surname_by_branch conf base an strl (bhl, s)
+        | _ -> loop l
+      end
     | FirstName :: l ->
-        let pl = Some.search_first_name conf base an in
-        begin match pl with
-          [] -> loop l
-        | _ ->
-            Some.search_first_name_print conf base an
-        end
+      begin match Some.select_first_name conf base false an with
+        | [] -> loop l
+        | res -> Some.first_name_print conf base an res
+      end
     | ApproxKey :: l ->
         let pl = search_approx_key conf base an in
         begin match pl with
@@ -168,7 +167,7 @@ let search conf base an search_order specify unknown =
         | pl -> specify conf base an pl
         end
     | DefaultSurname :: _ ->
-        Some.search_surname_print conf base unknown an
+        Some.surname_print conf base unknown an
   in
   loop search_order
 
