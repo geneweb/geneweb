@@ -655,7 +655,8 @@ let treat_request =
                   match real_input "fn", real_input "sn" with
                     Some fn, Some sn -> search (fn ^ " " ^ sn)
                   | Some fn, None ->
-                    Some.first_name_print conf base fn
+                    Some.select_first_name conf base false fn
+                    |> Some.first_name_print conf base fn
                   | None, Some sn ->
                     Some.surname_print conf base unknown sn
                   | None, None -> incorrect_request conf base
@@ -672,7 +673,10 @@ let treat_request =
           w_base @@ BirthDeathDisplay.print_oldest_engagements
         | "P" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.first_name_print conf base v
+            | Some v ->
+              Some.select_first_name
+                conf base (p_getenv conf.env "t" = Some "A") v
+              |> Some.first_name_print conf base v
             | None -> AllnDisplay.print_first_names conf base
           end
         | "POP_PYR" when conf.wizard || conf.friend ->
