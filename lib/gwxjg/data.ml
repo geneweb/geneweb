@@ -547,6 +547,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let first_name_key = get_str (E.first_name_key base) in
   let first_name_key_val = get_str (E.first_name_key_val base) in
   let iper = Tstr (Gwdb.string_of_iper iper') in
+  let image = Tstr Gwdb.(get_image p |> sou base) in
   let is_birthday = get_bool (E.is_birthday conf) in
   let is_visible_for_visitors =
     box_lazy @@
@@ -604,6 +605,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
       | "first_name_key" -> first_name_key
       | "first_name_key_val" -> first_name_key_val
       | "half_siblings" -> half_siblings
+      | "image" -> image
       | "iper" -> iper
       | "is_birthday" -> is_birthday
       | "is_visible_for_visitors" -> is_visible_for_visitors
