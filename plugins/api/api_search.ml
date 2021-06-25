@@ -618,7 +618,7 @@ let load_dico_lieu conf pl_mode =
   else
     let fname = Filename.concat "lang" fname in
     try
-      let ic = Secure.open_in (Util.search_in_lang_path fname) in
+      let ic = Secure.open_in (Util.search_in_assets fname) in
       let list : (string list) = input_value ic in
       close_in ic;
       list

@@ -188,7 +188,7 @@ let load_lexicon =
             in
             rev_iter begin fun fname ->
               Mutil.input_lexicon lang ht begin fun () ->
-                Secure.open_in (Util.search_in_lang_path fname)
+                Secure.open_in (Util.search_in_assets fname)
               end end !lexicon_list ;
             ht
           end
@@ -225,7 +225,7 @@ let alias_lang lang =
   if String.length lang < 2 then lang
   else
     let fname =
-      Util.search_in_lang_path (Filename.concat "lang" "alias_lg.txt")
+      Util.search_in_assets (Filename.concat "lang" "alias_lg.txt")
     in
     try
       let ic = Secure.open_in fname in
@@ -660,7 +660,7 @@ let allowed_denied_titles key extra_line env base_env () =
       if fname = "" then []
       else
         let ic =
-          Secure.open_in (Filename.concat (Secure.base_dir ()) fname)
+          Secure.open_in (Filename.concat (Secure.bd ()) fname)
         in
         let rec loop set =
           let (line, eof) =
@@ -1503,7 +1503,7 @@ let find_misc_file name =
     let name' = Filename.concat (base_path ["etc"] "") name in
     if Sys.file_exists name' then name'
     else
-      let name' = search_in_lang_path @@ Filename.concat "etc" name in
+      let name' = Util.search_in_assets @@ Filename.concat "etc" name in
       if Sys.file_exists name' then name'
       else ""
 
@@ -1831,8 +1831,8 @@ let main () =
   let force_cgi = ref false in
   let speclist =
     [
-      ("-hd", Arg.String Util.add_lang_path, "<DIR> Directory where the directory lang is installed.")
-    ; ("-bd", Arg.String Util.set_base_dir, "<DIR> Directory where the databases are installed.")
+      ("-hd", Arg.String Secure.add_assets, "<DIR> Directory where the directory lang is installed.")
+    ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Directory where the databases are installed.")
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
@@ -1897,11 +1897,12 @@ let main () =
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   List.iter register_plugin !plugins ;
+  !GWPARAM.init () ;
   cache_lexicon () ;
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
-        Util.search_in_lang_path (Filename.concat !images_dir "gwback.jpg")
+        Util.search_in_assets (Filename.concat !images_dir "gwback.jpg")
       in
       let d = Filename.dirname f in
       if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
@@ -1909,7 +1910,7 @@ let main () =
       images_url := "file://" ^ slashify abs_dir
     end;
   if !(Util.cnt_dir) = Filename.current_dir_name then
-    Util.cnt_dir := Secure.base_dir ();
+    Util.cnt_dir := Secure.bd ();
   Wserver.stop_server :=
     List.fold_left Filename.concat !(Util.cnt_dir) ["cnt"; "STOP_SERVER"];
   let (query, cgi) =
