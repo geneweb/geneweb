@@ -42,6 +42,7 @@
 
 (library
   (name plugin_api_lib)
+  (public_name geneweb.plugin_api_lib)
   (libraries geneweb geneweb.gwd_lib geneweb.util)
   (modules
     api
