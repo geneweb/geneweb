@@ -7,15 +7,6 @@ open Gwdb
 let is_hide_names conf p =
   if conf.hide_names || get_access p = Private then true else false
 
-let sharelib =
-  List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
-
-let add_lang_path = Secure.add_lang_path
-let set_base_dir = Secure.set_base_dir
-
-let _ = add_lang_path sharelib
-let _ = add_lang_path Filename.current_dir_name
-
 let cnt_dir = ref Filename.current_dir_name
 
 let search_in_path p s =
@@ -28,7 +19,7 @@ let search_in_path p s =
   in
   loop (p ())
 
-let search_in_lang_path = search_in_path Secure.lang_path
+let search_in_assets = search_in_path Secure.assets
 
 (* Internationalization *)
 
@@ -541,71 +532,7 @@ let is_old_person conf p =
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
-
-(* ********************************************************************** *)
-(*  [Fonc] authorized_age : config -> base -> person -> bool              *)
-(** [Description] : Calcul les droits de visualisation d'une personne en
-      fonction de son age.
-      Renvoie (dans l'ordre des tests) :
-        - Vrai si : magicien ou ami ou la personne est public
-        - Vrai si : la personne est en si_titre, si elle a au moins un
-                    titre et que public_if_title = yes dans le fichier gwf
-        - Faux si : la personne n'est pas décédée et private_years > 0
-        - Vrai si : la personne est plus agée (en fonction de la date de
-                    naissance ou de la date de baptème) que privates_years
-        - Faux si : la personne est plus jeune (en fonction de la date de
-                    naissance ou de la date de baptème) que privates_years
-        - Vrai si : la personne est décédée depuis plus de privates_years
-        - Faux si : la personne est décédée depuis moins de privates_years
-        - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
-                    privée et public_if_no_date = yes
-        - Vrai si : la personne s'est mariée depuis plus de private_years
-        - Faux dans tous les autres cas
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : Vrai si on a les droits, Faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
-let authorized_age conf base p =
-  conf.wizard
-  || conf.friend
-  || get_access p = Public
-  || (conf.public_if_titles
-      && get_access p = IfTitles
-      && nobtit conf base p <> [])
-  || begin
-    let death = get_death p in
-    if death = NotDead then conf.private_years < 1
-    else
-      let check_date none = function
-        | Some (Dgreg (d, _)) ->
-          strictly_after_private_years conf (Date.time_elapsed d conf.today)
-        | _ -> none ()
-      in
-      check_date
-        (fun () ->
-           check_date
-             (fun () ->
-                check_date
-                  (fun () ->
-                     (get_access p <> Private && conf.public_if_no_date)
-                     || begin
-                       let families = get_family p in
-                       let len = Array.length families in
-                       let rec loop i =
-                         i < len
-                         && check_date
-                           (fun () -> loop (i + 1))
-                           (Adef.od_of_cdate (get_marriage @@ foi base (Array.get families i)))
-                       in
-                       loop 0
-                     end)
-                  (Date.date_of_death (get_death p)) )
-             (Adef.od_of_cdate (get_baptism p)) )
-        (Adef.od_of_cdate (get_birth p))
-  end
+let authorized_age conf base p = !GWPARAM.p_auth conf base p
 
 let is_restricted (conf : config) base (ip : iper) =
   let fct p =
@@ -1130,30 +1057,9 @@ let string_of_witness_kind conf sex witness_kind =
       let n = index_of_sex sex in
       transl_nth conf "godfather/godmother/godparents" n
 
-let base_path pref bname =
-  let pref = Secure.base_dir () :: pref in
-  let bfile = List.fold_right Filename.concat pref bname in
-  if Sys.unix then
-    if Sys.file_exists bfile then bfile
-    else if String.length bname >= 6 then
-      let dirs = pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]] in
-      List.fold_right Filename.concat dirs bname
-    else bfile
-  else bfile
+let base_path pref bname = !GWPARAM.base_path pref bname
 
-let bpath bname =
-  let fname = Filename.concat (Secure.base_dir ()) bname in
-  if Sys.file_exists fname then fname
-  else
-    Filename.concat
-      (Secure.base_dir ())
-      (Filename.concat
-         (String.make 1 bname.[0])
-         (Filename.concat
-            (String.make 1 bname.[1])
-            bname
-         )
-      )
+let bpath bname = !GWPARAM.bpath bname
 
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
@@ -1195,7 +1101,7 @@ let etc_file_name conf fname =
         let fn =
           Filename.concat dir (fname ^ ".txt")
           |> Filename.concat "etc"
-          |> search_in_lang_path
+          |> search_in_assets
         in
         if Sys.file_exists fn then fn
         else ""
@@ -1232,7 +1138,7 @@ let etc_file_name conf fname =
   in
   (* template par défaut *)
   let std_fname =
-    search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
+    search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
   in
   (* On cherche le template dans l'ordre de file_exist.         *)
   (* Si on ne trouve rien, alors on cherche le premier template *)
@@ -1244,7 +1150,7 @@ let etc_file_name conf fname =
 let open_etc_file fname =
   let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
   let fname2 =
-    search_in_lang_path
+    search_in_assets
       (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
   in
   try Some (Secure.open_in fname1, fname1) with
@@ -1260,7 +1166,7 @@ let open_templ_fname conf fname =
     Some (Secure.open_in fname, fname) with
     Sys_error _ ->
       let std_fname =
-        search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
+        search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
       in
       try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
 
@@ -1984,16 +1890,16 @@ let source_image_file_name bname str =
     List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
   in
   let fname2 =
-    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str
+    List.fold_right Filename.concat [Secure.bd (); "src"; "images"] str
   in
   if Sys.file_exists fname1 then fname1 else fname2
 
 let image_file_name str =
   let fname1 =
-    List.fold_right Filename.concat [Secure.base_dir (); "images"] str
+    List.fold_right Filename.concat [Secure.bd (); "images"] str
   in
   if Sys.file_exists fname1 then fname1
-  else search_in_lang_path (Filename.concat "images" str)
+  else search_in_assets (Filename.concat "images" str)
 
 let png_image_size ic =
   let magic = really_input_string ic 4 in

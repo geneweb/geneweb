@@ -297,7 +297,7 @@ let ns = "welcome"
 
 let _ =
   let aux fn assets conf base =
-    Util.add_lang_path assets ;
+    Secure.add_assets assets ;
     fn conf base
   in
   Gwd_lib.GwdPlugin.register ~ns

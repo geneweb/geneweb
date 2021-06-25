@@ -115,14 +115,14 @@ let lang_file_name conf fname =
   in
   if Sys.file_exists fname1 then fname1
   else
-    search_in_lang_path
+    search_in_assets
       (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
 
 let any_lang_file_name fname =
   let fname1 = Util.base_path ["lang"] (Filename.basename fname ^ ".txt") in
   if Sys.file_exists fname1 then fname1
   else
-    search_in_lang_path
+    search_in_assets
       (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
 
 let source_file_name conf fname =
