@@ -5,9 +5,9 @@
    this is an extra security: the program should check for
    correct open instead of hoping Secure do it for it *)
 
-let ok_path = ref []
-let lang_path_r = ref []
-let base_dir_r = ref Filename.current_dir_name
+let ok_r = ref []
+let assets_r = ref []
+let bd_r = ref Filename.current_dir_name
 
 let decompose =
   let rec loop r s =
@@ -22,12 +22,17 @@ let decompose =
   in
   loop []
 
-let add_path path s = path := s :: !path; ok_path := decompose s :: !ok_path
+let add_assets d =
+  assets_r := d :: !assets_r ;
+  ok_r := decompose d :: !ok_r
 
-let add_lang_path = add_path lang_path_r
-let set_base_dir s = base_dir_r := s; ok_path := decompose s :: !ok_path
-let lang_path () = !lang_path_r
-let base_dir () = !base_dir_r
+let set_base_dir d =
+  let ok = decompose d in
+  bd_r := d ;
+  ok_r := ok :: (List.filter ((<>) ok)) !ok_r
+
+let assets () = !assets_r
+let bd () = !bd_r
 
 let suffix d df =
   let rec loop =
@@ -53,7 +58,7 @@ let check fname =
         then not (List.mem Filename.parent_dir_name df)
         else false
     in
-    loop !ok_path
+    loop !ok_r
 
 let check_open fname =
   if not (check fname) then begin

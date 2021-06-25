@@ -392,7 +392,7 @@ let output_error_r =
       let fn =
         (code ^ "-" ^ lang ^ ".html")
         |> Filename.concat "etc"
-        |> Util.search_in_lang_path
+        |> Util.search_in_assets
       in
       if Sys.file_exists fn then Some fn else None
     in

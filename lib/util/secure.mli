@@ -1,8 +1,9 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-val lang_path : unit -> string list
-val base_dir : unit -> string
-val add_lang_path : string -> unit
+val assets : unit -> string list
+val bd : unit -> string
+
+val add_assets : string -> unit
 val set_base_dir : string -> unit
 
 (** Check if a filename is safe to read or not

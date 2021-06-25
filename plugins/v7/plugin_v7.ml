@@ -83,13 +83,13 @@ let doc =
     | None -> false
   end
 
-let d = 
+let d =
   w_base @@ w_person @@ fun conf base p -> V7_descend.print conf base p; true
 
 let ns = "v7"
 
 let _ =
-  Util.add_lang_path !Gwd_lib.GwdPlugin.assets ;
+  Secure.add_assets !Gwd_lib.GwdPlugin.assets ;
   let aux fn assets conf base =
     fn conf base
   in
