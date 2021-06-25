@@ -27,7 +27,7 @@ open Api_util
       - result : la liste de la recherche.
                                                                            *)
 (* ************************************************************************ *)
-let print_auto_complete conf base =
+let print_auto_complete assets conf base =
   let params = get_params conf Mext_write.parse_auto_complete in
   let s = params.Mwrite.Auto_complete.input in
   let max_res = Int32.to_int params.Mwrite.Auto_complete.limit in
@@ -37,9 +37,9 @@ let print_auto_complete conf base =
     if nb_of_persons base > 100000 then
       let cache = Api_saisie_autocomplete.get_list_from_cache conf base mode max_res s in
       let ini = Name.lower @@ Mutil.tr '_' ' ' s in
-      Api_search.complete_with_dico conf (ref @@ List.length cache) max_res place_mode ini cache
+      Api_search.complete_with_dico assets conf (ref @@ List.length cache) max_res place_mode ini cache
     else
-      Api_search.search_auto_complete conf base mode place_mode max_res s
+      Api_search.search_auto_complete assets conf base mode place_mode max_res s
   in
   let result = { Mwrite.Auto_complete_result. result = list } in
   let data = Mext_write.gen_auto_complete_result result in
