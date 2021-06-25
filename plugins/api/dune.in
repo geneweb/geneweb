@@ -47,6 +47,7 @@
   (modules
     api
     api_graph
+    api_marshal_dico_place
     api_piqi
     api_piqi_ext
     api_saisie_autocomplete

@@ -65,7 +65,6 @@ GENERATED_FILES_DEP = \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/consang/dune \
-	bin/dico_place/dune \
 	bin/fixbase/dune \
 	bin/ged2gwb/dune \
 	bin/gwb2ged/dune \

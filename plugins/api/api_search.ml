@@ -603,41 +603,37 @@ let select_all_auto_complete _ base get_field max_res ini =
   end () (Gwdb.persons base) ;
   List.sort Gutil.alphabetic_order (StrSet.elements !string_set)
 
-
-let load_dico_lieu conf pl_mode =
-  let fname =
-    match pl_mode with
-    | `town -> "dico_place_town_" ^ conf.lang ^ ".list"
-    | `area_code -> "dico_place_area_code_" ^ conf.lang ^ ".list"
-    | `county -> "dico_place_county_" ^ conf.lang ^ ".list"
-    | `region -> "dico_place_region_" ^ conf.lang ^ ".list"
-    | `country -> "dico_place_country_" ^ conf.lang ^ ".list"
-    | _ -> ""
-  in
-  if fname = "" then []
-  else
-    let fname = Filename.concat "lang" fname in
-    try
-      let ic = Secure.open_in (Util.search_in_assets fname) in
-      let list : (string list) = input_value ic in
-      close_in ic;
-      list
-    with Sys_error _ -> []
-
 let get_field mode =
   match mode with
   | `lastname -> get_surname
   | `firstname -> get_first_name
   | _ -> failwith "get_field"
 
+
+type dico = string array
+
+let dico_fname assets lang k =
+  let fname = match k with
+    | `town -> "town." ^ lang ^ ".bin~"
+    | `area_code -> "area_code." ^ lang ^ ".bin~"
+    | `county -> "county." ^ lang ^ ".bin~"
+    | `region -> "place_region." ^ lang ^ ".bin~"
+    | `country -> "place_country." ^ lang ^ ".bin~"
+    | _ -> assert false
+  in
+  Filename.concat assets fname
+
 (** [ini] must be in the form of [Name.lower @@ Mutil.tr '_' ' ' ini]
     Assume that [list] is already sorted, but reversed.
 *)
-let complete_with_dico conf nb max mode ini list =
+let complete_with_dico assets conf nb max mode ini list =
   let reduce_dico mode ignored format list =
-    let rec loop acc = function
-      | [] -> acc
-      | hd :: tl ->
+    let len = Array.length list in
+    let rec loop acc i =
+      if i = len
+      then acc
+      else
+        let hd = Array.unsafe_get list i in
         let acc =
           let k =  Mutil.tr '_' ' ' hd in
           let k = if mode <> `subdivision then Place.without_suburb k else k in
@@ -664,8 +660,8 @@ let complete_with_dico conf nb max mode ini list =
           end
           else acc
         in
-        if !nb < max then loop acc tl else acc
-    in loop [] list
+        if !nb < max then loop acc (i + 1) else acc
+    in loop [] 0
   in
   match mode with
   | Some mode when !nb < max ->
@@ -684,11 +680,16 @@ let complete_with_dico conf nb max mode ini list =
         end
           (String.split_on_char ',' s)
     in
-    let dico_place = reduce_dico mode list format (load_dico_lieu conf mode) in
-    List.rev_append list (List.sort Place.compare_places dico_place)
+    let dico =
+      Mutil.read_or_create_value
+        (dico_fname assets conf.lang mode)
+        (fun () : dico -> [||])
+      |> reduce_dico mode list format
+    in
+    List.rev_append list (List.sort Place.compare_places dico)
   | _ -> List.rev list
 
-let search_auto_complete conf base mode place_mode max n =
+let search_auto_complete assets conf base mode place_mode max n =
   let aux data compare =
     let conf = { conf with env = ("data", data) :: conf.env } in
     UpdateData.get_all_data conf base
@@ -719,7 +720,7 @@ let search_auto_complete conf base mode place_mode max n =
       in
       loop [] list
     in
-    complete_with_dico conf nb max place_mode ini (reduce_perso list)
+    complete_with_dico assets conf nb max place_mode ini (reduce_perso list)
 
   | `source ->
     let list = aux "src" Gutil.alphabetic_order in

@@ -35,8 +35,21 @@ let w_base =
   GWD.Request.w_base ~none
 
 let () =
-  assets_r := !GWD.GwdPlugin.assets ;
-  let aux fn _ conf base =
+  let assets = !GWD.GwdPlugin.assets in
+  let aux s lang =
+    let e k =
+      not @@ Sys.file_exists @@ Api_search.dico_fname assets lang k
+    in
+    if e `town || e `area_codes || e `countys || e `region || e `country
+    then Api_marshal_dico_place.write_dico_place_set assets (Filename.concat assets s) lang
+  in
+  Array.iter begin fun s ->
+    try Scanf.sscanf s "dico_place_%[a-z].csv" (aux s) with _ -> ()
+  end (Sys.readdir assets) ;
+  let aux fn _assets conf base =
+    fn { conf with api_mode = true } base ; true
+  in
+  let aux' fn conf base =
     fn { conf with api_mode = true } base ; true
   in
   GWD.GwdPlugin.register ~ns
@@ -97,7 +110,7 @@ let () =
     ; ( "API_FICHE_PERSON"
       , aux @@ w_base @@ Api_saisie_read.print_fiche_person)
     ; ( "API_AUTO_COMPLETE"
-      , aux @@ wiz @@ w_base @@ Api_saisie_write.print_auto_complete)
+      , fun a -> aux' @@ wiz @@ w_base @@ Api_saisie_write.print_auto_complete a)
     ; ( "API_GET_CONFIG"
       , aux @@ wiz @@ w_base @@ Api_saisie_write.print_config)
     ; ( "API_PERSON_SEARCH_LIST"
