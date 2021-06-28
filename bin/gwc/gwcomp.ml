@@ -621,7 +621,7 @@ let get_mar_date str =
           (NotMarried, Male, Female), l
         | "#eng" :: l ->
           (Engaged, Male, Female), l
-        | "#noment" :: c :: l ->
+        | "#noment" :: c :: l when String.length c = 2 ->
           decode_sex NoMention c l
         | "#noment" :: l ->
           (NoMention, Male, Female), l
