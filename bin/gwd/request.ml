@@ -475,6 +475,49 @@ let w_person ~none fn conf base =
   | Some p -> fn conf base p
   | _ -> none conf base
 
+let output_file conf fn =
+  let ic = open_in fn in
+  try
+    in_channel_length ic
+    |> really_input_string ic
+    |> Output.print_string conf ;
+    close_in ic
+  with _ -> try close_in ic with _ -> ()
+
+let output_error_r =
+  ref @@ fun ?(headers = []) ?content conf code ->
+  Output.status conf code ;
+  List.iter (Output.header conf "%s") headers ;
+  match content with
+  | Some content -> Output.print_string conf content
+  | None ->
+    let code = match code with
+      | Def.Bad_Request -> "400"
+      | Unauthorized -> "401"
+      | Forbidden -> "403"
+      | Not_Found -> "404"
+      | _ -> raise Not_found
+    in
+    let fn =
+      (code ^ "-" ^ conf.lang ^ ".html")
+      |> Filename.concat "etc"
+      |> Util.search_in_lang_path
+    in
+    try output_file conf fn
+    with _ -> Output.print_string conf ""
+
+let output_error ?headers ?content conf code =
+  !output_error_r ?headers ?content conf code
+
+let w_wizard fn conf base =
+  if conf.wizard then
+    fn conf base
+  else if conf.just_friend_wizard then
+    output_error conf Def.Forbidden
+  else
+    (* FIXME: send authentification headers *)
+    output_error conf Def.Unauthorized
+
 let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base = w_base ~none:incorrect_request in
@@ -546,18 +589,18 @@ let treat_request =
           else incorrect_request
         | "A" ->
           Perso.print_ascend |> w_person |> w_base
-        | "ADD_FAM" when conf.wizard ->
-          w_base @@ UpdateFam.print_add
-        | "ADD_FAM_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateFamOk.print_add
-        | "ADD_IND" when conf.wizard ->
-          w_base @@ UpdateInd.print_add
-        | "ADD_IND_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateIndOk.print_add
-        | "ADD_PAR" when conf.wizard ->
-          w_base @@ UpdateFam.print_add_parents
-        | "ADD_PAR_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateFamOk.print_add_parents
+        | "ADD_FAM" ->
+          w_wizard @@ w_base @@ UpdateFam.print_add
+        | "ADD_FAM_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_add
+        | "ADD_IND" ->
+          w_wizard @@ w_base @@ UpdateInd.print_add
+        | "ADD_IND_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_add
+        | "ADD_PAR" ->
+          w_wizard @@ w_base @@ UpdateFam.print_add_parents
+        | "ADD_PAR_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_add_parents
         | "ANM" ->
           w_base @@ fun conf _ -> BirthdayDisplay.print_anniversaries conf
         | "AN" ->
@@ -582,39 +625,39 @@ let treat_request =
         | "CAL" ->
           fun conf _ -> Hutil.print_calendar conf
         | "CHG_CHN" when conf.wizard ->
-          w_base @@ ChangeChildrenDisplay.print
-        | "CHG_CHN_OK" when conf.wizard ->
-          w_base @@ w_lock @@ ChangeChildrenDisplay.print_ok
-        | "CHG_EVT_IND_ORD" when conf.wizard ->
-          w_base @@ UpdateInd.print_change_event_order
-        | "CHG_EVT_IND_ORD_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateIndOk.print_change_event_order
-        | "CHG_EVT_FAM_ORD" when conf.wizard ->
-          w_base @@ UpdateFam.print_change_event_order
-        | "CHG_EVT_FAM_ORD_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateFamOk.print_change_event_order
-        | "CHG_FAM_ORD" when conf.wizard ->
-          w_base @@ UpdateFam.print_change_order
-        | "CHG_FAM_ORD_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateFamOk.print_change_order_ok
-        | "CONN_WIZ" when conf.wizard ->
-          w_base @@ WiznotesDisplay.connected_wizards
+          w_wizard @@ w_base @@ ChangeChildrenDisplay.print
+        | "CHG_CHN_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ ChangeChildrenDisplay.print_ok
+        | "CHG_EVT_IND_ORD" ->
+          w_wizard @@ w_base @@ UpdateInd.print_change_event_order
+        | "CHG_EVT_IND_ORD_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_change_event_order
+        | "CHG_EVT_FAM_ORD" ->
+          w_wizard @@ w_base @@ UpdateFam.print_change_event_order
+        | "CHG_EVT_FAM_ORD_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_change_event_order
+        | "CHG_FAM_ORD" ->
+          w_wizard @@ w_base @@ UpdateFam.print_change_order
+        | "CHG_FAM_ORD_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_change_order_ok
+        | "CONN_WIZ" ->
+          w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
         | "D" ->
           w_base @@ w_person @@ DescendDisplay.print
         | "DAG" ->
           w_base @@ DagDisplay.print
-        | "DEL_FAM" when conf.wizard ->
-          w_base @@ UpdateFam.print_del
-        | "DEL_FAM_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateFamOk.print_del
-        | "DEL_IMAGE" when conf.wizard && conf.can_send_image ->
-          w_base @@ SendImage.print_del
-        | "DEL_IMAGE_OK" when conf.wizard && conf.can_send_image ->
-          w_base @@ w_lock @@ SendImage.print_del_ok
-        | "DEL_IND" when conf.wizard ->
-          w_base @@ UpdateInd.print_del
-        | "DEL_IND_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateIndOk.print_del
+        | "DEL_FAM" ->
+          w_wizard @@ w_base @@ UpdateFam.print_del
+        | "DEL_FAM_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_del
+        | "DEL_IMAGE" when conf.can_send_image ->
+          w_wizard @@ w_base @@ SendImage.print_del
+        | "DEL_IMAGE_OK" when conf.can_send_image ->
+          w_wizard @@ w_base @@ w_lock @@ SendImage.print_del_ok
+        | "DEL_IND" ->
+          w_wizard @@ w_base @@ UpdateInd.print_del
+        | "DEL_IND_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_del
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
@@ -624,10 +667,10 @@ let treat_request =
           end
         | "HIST" ->
           w_base @@ History.print
-        | "HIST_CLEAN" when conf.wizard ->
-          w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean conf
-        | "HIST_CLEAN_OK" when conf.wizard ->
-          w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean_ok conf
+        | "HIST_CLEAN" ->
+          w_wizard @@ w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean conf
+        | "HIST_CLEAN_OK" ->
+          w_wizard @@ w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean_ok conf
         | "HIST_DIFF" ->
           w_base @@ HistoryDiffDisplay.print
         | "HIST_SEARCH" ->
@@ -636,12 +679,12 @@ let treat_request =
           w_base @@ ImageDisplay.print
         | "IMH" ->
           w_base @@ fun conf _ -> ImageDisplay.print_html conf
-        | "INV_FAM" when conf.wizard ->
-          w_base @@ UpdateFam.print_inv
-        | "INV_FAM_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateFamOk.print_inv
-        | "KILL_ANC" when conf.wizard ->
-          w_base @@ w_lock @@ MergeIndDisplay.print_kill_ancestors
+        | "INV_FAM" ->
+          w_wizard @@ w_base @@ UpdateFam.print_inv
+        | "INV_FAM_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_inv
+        | "KILL_ANC" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeIndDisplay.print_kill_ancestors
         | "LB" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
@@ -656,46 +699,46 @@ let treat_request =
           w_base @@ NotesDisplay.print_misc_notes
         | "MISC_NOTES_SEARCH" ->
           w_base @@ NotesDisplay.print_misc_notes_search
-        | "MOD_DATA" when conf.wizard ->
-          w_base @@ UpdateDataDisplay.print_mod
-        | "MOD_DATA_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateDataDisplay.print_mod_ok
-        | "MOD_FAM" when conf.wizard ->
-          w_base @@ UpdateFam.print_mod
+        | "MOD_DATA" ->
+          w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
+        | "MOD_DATA_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateDataDisplay.print_mod_ok
+        | "MOD_FAM" ->
+          w_wizard @@ w_base @@ UpdateFam.print_mod
         | "MOD_FAM_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateFamOk.print_mod
-        | "MOD_IND" when conf.wizard ->
-          w_base @@ UpdateInd.print_mod
-        | "MOD_IND_OK" when conf.wizard ->
-          w_base @@ w_lock @@ UpdateIndOk.print_mod
-        | "MOD_NOTES" when conf.wizard ->
-          w_base @@ NotesDisplay.print_mod
-        | "MOD_NOTES_OK" when conf.wizard ->
-          w_base @@ w_lock @@ NotesDisplay.print_mod_ok
+          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_mod
+        | "MOD_IND" ->
+          w_wizard @@ w_base @@ UpdateInd.print_mod
+        | "MOD_IND_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_mod
+        | "MOD_NOTES" ->
+          w_wizard @@ w_base @@ NotesDisplay.print_mod
+        | "MOD_NOTES_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ NotesDisplay.print_mod_ok
         | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_mod
         | "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
           w_base @@ w_lock @@ WiznotesDisplay.print_mod_ok
-        | "MRG" when conf.wizard ->
-          w_base @@ w_person @@ MergeDisplay.print
-        | "MRG_DUP" when conf.wizard ->
-          w_base @@ MergeDupDisplay.main_page
-        | "MRG_DUP_IND_Y_N" when conf.wizard ->
-          w_base @@ w_lock @@ MergeDupDisplay.answ_ind_y_n
-        | "MRG_DUP_FAM_Y_N" when conf.wizard ->
-          w_base @@ w_lock @@ MergeDupDisplay.answ_fam_y_n
-        | "MRG_FAM" when conf.wizard ->
-          w_base @@ MergeFamDisplay.print
-        | "MRG_FAM_OK" when conf.wizard ->
-          w_base @@ w_lock @@ MergeFamOk.print_merge
-        | "MRG_MOD_FAM_OK" when conf.wizard ->
-          w_base @@ w_lock @@ MergeFamOk.print_mod_merge
-        | "MRG_IND" when conf.wizard ->
-          w_base @@ w_lock @@ MergeIndDisplay.print
-        | "MRG_IND_OK" when conf.wizard ->
-          w_base @@ w_lock @@ MergeIndOkDisplay.print_merge
-        | "MRG_MOD_IND_OK" when conf.wizard ->
-          w_base @@ w_lock @@ MergeIndOkDisplay.print_mod_merge
+        | "MRG" ->
+          w_wizard @@ w_base @@ w_person @@ MergeDisplay.print
+        | "MRG_DUP" ->
+          w_wizard @@ w_base @@ MergeDupDisplay.main_page
+        | "MRG_DUP_IND_Y_N" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeDupDisplay.answ_ind_y_n
+        | "MRG_DUP_FAM_Y_N" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeDupDisplay.answ_fam_y_n
+        | "MRG_FAM" ->
+          w_wizard @@ w_base @@ MergeFamDisplay.print
+        | "MRG_FAM_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeFamOk.print_merge
+        | "MRG_MOD_FAM_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeFamOk.print_mod_merge
+        | "MRG_IND" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeIndDisplay.print
+        | "MRG_IND_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeIndOkDisplay.print_merge
+        | "MRG_MOD_IND_OK" ->
+          w_wizard @@ w_base @@ w_lock @@ MergeIndOkDisplay.print_mod_merge
         | "N" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some v -> Some.surname_print conf base Some.surname_not_found v
@@ -769,8 +812,8 @@ let treat_request =
           w_base @@ PlaceDisplay.print_all_places_surnames
         | "R" ->
           w_base @@ w_person @@ relation_print
-        | "REQUEST" when conf.wizard ->
-          fun _ _ ->
+        | "REQUEST" ->
+          w_wizard @@ fun _ _ ->
             Output.status conf Def.OK;
             Output.header conf "Content-type: text";
             List.iter (fun s -> Output.print_string conf @@ s ^ "\n") conf.Config.request ;
@@ -780,10 +823,10 @@ let treat_request =
           w_base @@ RelationDisplay.print_multi
         | "S" ->
           w_base @@ fun conf base -> SearchName.print conf base specify unknown
-        | "SND_IMAGE" when conf.wizard && conf.can_send_image ->
-          w_base @@ SendImage.print
-        | "SND_IMAGE_OK" when conf.wizard && conf.can_send_image ->
-          w_base @@ w_lock @@ SendImage.print_send_ok
+        | "SND_IMAGE" when conf.can_send_image ->
+          w_wizard @@ w_base @@ SendImage.print
+        | "SND_IMAGE_OK" when conf.can_send_image ->
+          w_wizard @@ w_base @@ w_lock @@ SendImage.print_send_ok
         | "SRC" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print_source conf base f
@@ -791,14 +834,14 @@ let treat_request =
           end
         | "STAT" ->
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
-        | "CHANGE_WIZ_VIS" when conf.wizard ->
-          w_base @@ w_lock @@ WiznotesDisplay.change_wizard_visibility
+        | "CHANGE_WIZ_VIS" ->
+          w_wizard @@ w_base @@ w_lock @@ WiznotesDisplay.change_wizard_visibility
         | "TT" ->
           w_base @@ TitleDisplay.print
-        | "U" when conf.wizard ->
-          w_base @@ w_person @@ updmenu_print
-        | "VIEW_WIZNOTES" when conf.wizard && conf.authorized_wizards_notes ->
-          w_base @@ WiznotesDisplay.print_view
+        | "U" ->
+          w_wizard @@ w_base @@ w_person @@ updmenu_print
+        | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
+          w_wizard @@ w_base @@ WiznotesDisplay.print_view
         | "WIZNOTES" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->

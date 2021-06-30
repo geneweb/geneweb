@@ -12,17 +12,6 @@ open Gwdb
 open Util
 open Api_util
 
-(** [print_error conf code]
-    Print error code and [raise Exit]
-*)
-let print_error conf code =
-  let piqi_error = Mread.default_error() in
-  piqi_error.Mread.Error.code <- code;
-  let data = Mext_read.gen_error piqi_error in
-  Output.status conf Def.Bad_Request ;
-  print_result conf data ;
-  raise Exit
-
 (**/**) (* Conversion de dates *)
 
 (* Copie de date.ml sans les balises HTML => on devrait créer *)
@@ -2147,16 +2136,16 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
             | Some ip ->
               if is_private_person conf base ip
               then
-                print_error conf `not_found
+                print_error conf `not_found ""
               else
                 (if identifier_person.Mread.Identifier_person.track_visit
                     = Some true
                  then record_visited conf ip;
                  print_result_from_ip conf base ip)
             | None ->
-              print_error conf `not_found
+              print_error conf `not_found ""
           end
-        | _ -> print_error conf `bad_request
+        | _ -> print_error conf `bad_request ""
         end
     | None ->
       (* Fait une recherche par mots-clé *)
@@ -2166,7 +2155,7 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
         | (Some fn, Some sn) -> (fn, sn)
         | (None, Some sn) -> ("", sn)
         | (Some fn, None) -> (fn, "")
-        | _ -> print_error conf `bad_request
+        | _ -> print_error conf `bad_request ""
       in
       let (an, order) =
         if fn = "" then
@@ -2180,7 +2169,7 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
         if identifier_person.Mread.Identifier_person.track_visit = Some true
         then record_visited conf ip;
         print_result_from_ip conf base ip
-      | None -> print_error conf `not_found
+      | None -> print_error conf `not_found ""
 
 (* ********************************************************************* *)
 (*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
