@@ -1620,4 +1620,22 @@ let person_node_map_lia conf base l =
            }))
          l)
 
+let from_piqi_status = function
+  | `bad_request -> Def.Bad_Request
+  | `unauthorized -> Def.Unauthorized
+  | `forbidden -> Def.Forbidden
+  | `not_found -> Def.Not_Found
+
+(** [print_error conf code]
+    Print error code and [raise Exit]
+*)
+let print_error conf code msg =
+  let piqi_error = M.default_error () in
+  piqi_error.M.Error.code <- code ;
+  piqi_error.M.Error.message <- Opt.of_string msg ;
+  let data = Mext.gen_error piqi_error in
+  Output.status conf (from_piqi_status code) ;
+  print_result conf data ;
+  raise Exit
+
 #endif

@@ -5,23 +5,31 @@ open Config
 open Gwdb
 open Plugin_api_lib
 
+module GWD = Gwd_lib
 
 let ns = "api"
 
+let assets_r = ref ""
+
 let wiz fn conf base =
-  if conf.wizard
-  then fn conf base
-  else Gwd_lib.Request.incorrect_request conf
+  if conf.wizard then
+    fn conf base
+  else if conf.just_friend_wizard then
+    Api_util.print_error conf `forbidden ""
+  else
+    (* FIXME: Needs auth headers *)
+    Api_util.print_error conf `unauthorized ""
 
-let w_lock = Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf)
+let w_lock = GWD.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf)
 
-let w_base = Gwd_lib.Request.w_base ~none:Gwd_lib.Request.incorrect_request
+let w_base = GWD.Request.w_base ~none:GWD.Request.incorrect_request
 
 let () =
-  let aux fn _assets conf base =
+  assets_r := !GWD.GwdPlugin.assets ;
+  let aux fn _ conf base =
     fn { conf with api_mode = true } base ; true
   in
-  Gwd_lib.GwdPlugin.register ~ns
+  GWD.GwdPlugin.register ~ns
     [ ( "API_ADD_FIRST_FAM"
       , aux @@ fun conf _ -> Api_saisie_write.print_add_first_fam conf)
     ; ( "API_ALL_PERSONS"

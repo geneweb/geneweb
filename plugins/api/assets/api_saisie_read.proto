@@ -471,17 +471,6 @@ message IdentifierPerson {
   optional bool track_visit = 5;
 }
 
-message Error {
-  enum Code {
-    BAD_REQUEST = 400;
-    UNAUTHORIZED = 401;
-    FORBIDDEN = 403;
-    NOT_FOUND = 404;
-  }
-  required Code code = 998;
-  optional string message = 999;
-}
-
 message NbAncestors {
   required int32 nb = 1;
 }

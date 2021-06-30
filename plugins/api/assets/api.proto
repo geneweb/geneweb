@@ -674,3 +674,14 @@ message EventQueryResult {
 message EventQueryResultList {
   repeated EventQueryResult events = 1 ;
 }
+
+message Error {
+  enum Code {
+    BAD_REQUEST = 400;
+    UNAUTHORIZED = 401;
+    FORBIDDEN = 403;
+    NOT_FOUND = 404;
+  }
+  required Code code = 998;
+  optional string message = 999;
+}
