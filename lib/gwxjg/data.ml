@@ -968,6 +968,15 @@ let mk_conf conf =
     | _ -> raise Not_found
   end
 
+let mk_env_no_base conf =
+  let prefix = Tstr (Util.commd conf) in
+  let prefix_base = Tstr (Util.prefix_base conf) in
+  Tpat begin function
+    | "prefix" -> prefix
+    | "prefix_base" -> prefix_base
+    | x -> Tstr (Mutil.decode @@ List.assoc x conf.env)
+  end
+
 let mk_env conf base =
   let prefix = Tstr (Util.commd conf) in
   let prefix_base = Tstr (Util.prefix_base conf) in
@@ -1251,21 +1260,26 @@ let module_GWDB conf base = begin
   end
 end
 
-let default_env conf base =
-  let conf_env = mk_conf conf in
-  let module_NAME = module_NAME base in
+let default_env_aux conf =
   ("trans", trans conf)
   :: ("DATE", module_date conf)
   :: ("OPT", module_OPT)
-  :: ("NAME", module_NAME)
-  :: ("GWDB", module_GWDB conf base)
-  :: ("env", mk_env conf base)
   :: ("decode_varenv", decode_varenv)
   :: ("encode_varenv", encode_varenv)
   :: ("alphabetic", alphabetic)
   :: ("json_encode", func_arg1_no_kw (fun x -> Tstr (json_encode x) ))
-  :: ("base", mk_base base)
-  :: ("conf", conf_env)
+  :: ("conf", mk_conf conf)
   :: ("LOG", log)
   :: ("CAST", module_CAST)
   :: []
+
+let default_env_no_base conf =
+  ("env", mk_env_no_base conf)
+  :: default_env_aux conf
+
+let default_env conf base =
+  ("NAME", module_NAME base)
+  :: ("GWDB", module_GWDB conf base)
+  :: ("env", mk_env conf base)
+  :: ("base", mk_base base)
+  :: default_env_aux conf
