@@ -87,8 +87,10 @@ let bench () =
   match Sys.getenv_opt "BENCH_BASE" with
   | Some bname when bname <> "" ->
     let conf = Config.empty in
-    let bench_w_base ?t name fn args =
+    let bench_w_base ?t ?(load = []) name fn args =
+      Secure.set_base_dir (Filename.dirname bname) ;
       let base = Gwdb.open_base bname in
+      List.iter (fun load -> load base) load ;
       let r = bench ?t name (fn base) args in
       Gwdb.close_base base ;
       r
@@ -111,6 +113,18 @@ let bench () =
       end
       [ { conf with Config.env = ["data","src"] ; wizard = true }
       ; { conf with Config.env = ["data","place"] ; wizard = true } ]
+    ::
+    bench_w_base ~load:[ Gwdb.load_persons_array ]
+      "Util.authorized_age"
+      begin fun base conf ->
+        Gwdb.Collection.iter begin
+          Sys.opaque_identity begin fun p ->
+            (Sys.opaque_identity ignore) @@ Util.authorized_age conf base p
+          end
+        end (Gwdb.persons base)
+      end
+      [ { conf with wizard = true }
+      ; { conf with wizard = false ; friend = false } ]
     ::
     bench_w_base "Check.check_base" ~t:10
       begin fun base _conf ->
