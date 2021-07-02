@@ -502,7 +502,13 @@ let w_wizard fn conf base =
 
 let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
-  let w_base = w_base ~none:incorrect_request in
+  let w_base =
+    let none conf =
+      if conf.bname = "" then output_error conf Def.Bad_Request
+      else output_error conf Def.Not_Found
+    in
+    w_base ~none
+  in
   let w_person = w_person ~none:very_unknown in
   fun conf ->
   let bfile =

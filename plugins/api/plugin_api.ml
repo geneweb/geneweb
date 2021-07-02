@@ -22,7 +22,12 @@ let wiz fn conf base =
 
 let w_lock = GWD.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf)
 
-let w_base = GWD.Request.w_base ~none:GWD.Request.incorrect_request
+let w_base =
+  let none conf =
+    if conf.bname = "" then Api_util.print_error conf `bad_request ""
+    else Api_util.print_error conf `not_found ""
+  in
+  GWD.Request.w_base ~none
 
 let () =
   assets_r := !GWD.GwdPlugin.assets ;
