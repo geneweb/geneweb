@@ -32,7 +32,7 @@ let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
 
 let set_gwdb_legacy_x_arangodb () = assert (!gwdb = `None) ; gwdb := `LegacyArangoDB
 
-let release = ref false
+let release = ref true
 
 let speclist =
   [ ( "--api"
@@ -46,7 +46,12 @@ let speclist =
     , "Use hybrid legacy-ArangoDB backend" )
   ; ( "--release"
     , Arg.Set release
-    , "Use release profile (no debug informations)" )
+    , "Use release profile: no debug informations \
+      (defaut: " ^ string_of_bool !release ^ ")" )
+  ; ( "--debug"
+    , Arg.Clear release
+    , "Use dev profile: no optimization, debug informations \
+       (default: " ^ string_of_bool (not !release) ^ ")" )
   ; ( "--sosa-legacy"
     , Arg.Unit set_sosa_legacy
     , "Use legacy Sosa module implementation" )
