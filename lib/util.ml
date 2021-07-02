@@ -1178,21 +1178,27 @@ let etc_file_name conf fname =
      - dans la base (bases/etc/templx/name.txt)
      - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
   let file_exist dir =
-    let base_name_tpl_dir =
-      Filename.concat (base_path ["etc"] conf.bname) (fname ^ ".txt")
+    let fn =
+      Filename.concat conf.bname (fname ^ ".txt")
+      |> Filename.concat "etc"
+      |> bpath
     in
-    let base_tpl_dir =
-      Filename.concat (base_path ["etc"] (Filename.basename dir))
-        (fname ^ ".txt")
-    in
-    let etc_tpl_dir =
-      Filename.concat (search_in_lang_path "etc")
-        (Filename.concat dir (fname ^ ".txt"))
-    in
-    if Sys.file_exists base_name_tpl_dir then base_name_tpl_dir
-    else if Sys.file_exists base_tpl_dir then base_tpl_dir
-    else if Sys.file_exists etc_tpl_dir then etc_tpl_dir
-    else ""
+    if Sys.file_exists fn then fn
+    else
+      let fn =
+        Filename.concat (Filename.basename dir) (fname ^ ".txt")
+        |> Filename.concat "etc"
+        |> bpath
+      in
+      if Sys.file_exists fn then fn
+      else
+        let fn =
+          Filename.concat dir (fname ^ ".txt")
+          |> Filename.concat "etc"
+          |> search_in_lang_path
+        in
+        if Sys.file_exists fn then fn
+        else ""
   in
   (* Recherche le template par défaut en fonction de la variable gwf *)
   (* template = templ1,templ2,*                                      *)
