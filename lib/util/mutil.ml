@@ -1018,3 +1018,14 @@ let rev_input_line ic pos (rbuff, rpos) =
       loop pos
   in
   rev_input_line (pos - 1)
+
+let search_file_opt directories fname =
+  let rec loop = function
+    | hd :: tl ->
+      let f = Filename.concat fname fname in
+      if Sys.file_exists f then Some f else loop tl
+    | [] -> None
+  in loop directories
+
+let search_asset_opt fname =
+  search_file_opt (Secure.assets ()) fname

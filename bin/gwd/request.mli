@@ -6,17 +6,6 @@ val make_senv : Config.config -> Gwdb.base -> Config.config
 
 val make_henv : Config.config -> Gwdb.base -> Config.config
 
-(** [output_error_r ?headers ?content conf code]
-    Send the http status [code], [headers] and
-    [content] if provided, or default content otherwise.
-
-    [output_error_r] is a reference so plugin can modify it.
- *)
-val output_error_r
-  : (?headers:string list -> ?content:string -> Config.config -> Def.httpStatus -> unit) ref
-val output_error
-  : ?headers:string list -> ?content:string -> Config.config -> Def.httpStatus -> unit
-
 (** [w_lock ~none callback conf base]
     Acquire a write lock on the base and call [callback], or fail with [none].
 *)

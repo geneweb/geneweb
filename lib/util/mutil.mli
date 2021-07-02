@@ -289,3 +289,14 @@ val sprintf_date : Unix.tm -> string
     at the beginning of line.
 *)
 val rev_input_line : in_channel -> int -> (bytes ref * int ref) -> string * int
+
+(** [search_file directories file]
+    Search for a [file] in different [directories] and return
+    then first result or [None] if not found
+  *)
+val search_file_opt : string list -> string -> string option
+
+(** [search_asset fname]
+    Searches for a file in assets directories.
+    i.e. directories previously registered with [Secure.add_assets] *)
+val search_asset_opt : string -> string option

@@ -1,7 +1,7 @@
 (** This module allows plugins to modify geneweb configuration.
 
-    This approch is preffered if it does not come with a performance
-    cost.
+    This approch is preffered to Functors or library variants
+    for simple functions if it does not come with a performance cost.
 *)
 
 let init = ref @@ fun () ->
@@ -13,6 +13,45 @@ let base_path = ref @@ fun pref bname ->
   List.fold_right Filename.concat (Secure.bd () :: pref) bname
 
 let bpath = ref @@ fun bname -> Filename.concat (Secure.bd ()) bname
+
+(** [output_error ?headers ?content conf code]
+    Send the http status [code], [headers] and
+    [content] if provided, or default content otherwise.
+ *)
+let output_error =
+  let output_file conf fn =
+    let ic = open_in fn in
+    try
+      in_channel_length ic
+      |> really_input_string ic
+      |> Output.print_string conf ;
+      close_in ic
+    with _ -> try close_in ic with _ -> ()
+  in
+  ref @@ fun ?(headers = []) ?content conf code ->
+  Output.status conf code ;
+  List.iter (Output.header conf "%s") headers ;
+  match content with
+  | Some content -> Output.print_string conf content
+  | None ->
+    let code = match code with
+      | Def.Bad_Request -> "400"
+      | Unauthorized -> "401"
+      | Forbidden -> "403"
+      | Not_Found -> "404"
+      | _ -> raise Not_found
+    in
+    let fname lang =
+      (code ^ "-" ^ lang ^ ".html")
+      |> Filename.concat "etc"
+      |> Mutil.search_asset_opt
+    in
+    match fname conf.lang with
+    | Some fn -> output_file conf fn
+    | None ->
+      match fname "en" with
+      | Some fn -> output_file conf fn
+      | None -> Output.print_string conf ""
 
 (** Calcul les droits de visualisation d'une personne en
     fonction de son age.
