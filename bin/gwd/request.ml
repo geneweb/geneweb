@@ -538,7 +538,11 @@ let treat_request =
   fun conf ->
   let bfile =
     if conf.bname = "" then None
-    else Some (Util.bpath (conf.bname ^ ".gwb"))
+    else
+      let bfile = Util.bpath (conf.bname ^ ".gwb") in
+      if Sys.file_exists bfile
+      then Some bfile
+      else None
   in
   let base =
     match bfile with
@@ -589,17 +593,17 @@ let treat_request =
         let incorrect_request conf _ = incorrect_request conf in
         match m with
         | "" ->
-          if base <> None then
-            w_base @@
-            if only_special_env conf.env then SrcfileDisplay.print_start
-            else w_person @@ fun conf base p ->
-              match p_getenv conf.env "ptempl" with
-              | Some t when p_getenv conf.base_env "ptempl" = Some "yes" ->
-                Perso.interp_templ t conf base p
-              | _ -> person_selected conf base p
-          else if conf.bname = ""
+          if conf.bname = ""
           then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
-          else incorrect_request
+          else
+            w_base begin
+              if only_special_env conf.env then SrcfileDisplay.print_start
+              else w_person @@ fun conf base p ->
+                match p_getenv conf.env "ptempl" with
+                | Some t when p_getenv conf.base_env "ptempl" = Some "yes" ->
+                  Perso.interp_templ t conf base p
+                | _ -> person_selected conf base p
+            end
         | "A" ->
           Perso.print_ascend |> w_person |> w_base
         | "ADD_FAM" ->
