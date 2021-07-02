@@ -498,13 +498,20 @@ let output_error_r =
       | Not_Found -> "404"
       | _ -> raise Not_found
     in
-    let fn =
-      (code ^ "-" ^ conf.lang ^ ".html")
-      |> Filename.concat "etc"
-      |> Util.search_in_lang_path
+    let fname lang =
+      let fn =
+        (code ^ "-" ^ lang ^ ".html")
+        |> Filename.concat "etc"
+        |> Util.search_in_lang_path
+      in
+      if Sys.file_exists fn then Some fn else None
     in
-    try output_file conf fn
-    with _ -> Output.print_string conf ""
+    match fname conf.lang with
+    | Some fn -> output_file conf fn
+    | None ->
+      match fname "en" with
+      | Some fn -> output_file conf fn
+      | None -> Output.print_string conf ""
 
 let output_error ?headers ?content conf code =
   !output_error_r ?headers ?content conf code
