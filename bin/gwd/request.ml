@@ -374,37 +374,8 @@ let output_file conf fn =
     close_in ic
   with _ -> try close_in ic with _ -> ()
 
-let output_error_r =
-  ref @@ fun ?(headers = []) ?content conf code ->
-  Output.status conf code ;
-  List.iter (Output.header conf "%s") headers ;
-  match content with
-  | Some content -> Output.print_string conf content
-  | None ->
-    let code = match code with
-      | Def.Bad_Request -> "400"
-      | Unauthorized -> "401"
-      | Forbidden -> "403"
-      | Not_Found -> "404"
-      | _ -> raise Not_found
-    in
-    let fname lang =
-      let fn =
-        (code ^ "-" ^ lang ^ ".html")
-        |> Filename.concat "etc"
-        |> Util.search_in_assets
-      in
-      if Sys.file_exists fn then Some fn else None
-    in
-    match fname conf.lang with
-    | Some fn -> output_file conf fn
-    | None ->
-      match fname "en" with
-      | Some fn -> output_file conf fn
-      | None -> Output.print_string conf ""
-
 let output_error ?headers ?content conf code =
-  !output_error_r ?headers ?content conf code
+  !GWPARAM.output_error ?headers ?content conf code
 
 let w_wizard fn conf base =
   if conf.wizard then
