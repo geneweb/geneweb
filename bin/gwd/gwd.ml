@@ -1702,8 +1702,9 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-      try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o777 with
+      begin try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o777 with
         Unix.Unix_error (_, _, _) -> ()
+      end;
     end;
   Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection
