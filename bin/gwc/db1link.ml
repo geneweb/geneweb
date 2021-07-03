@@ -1223,6 +1223,8 @@ let write_file_contents fname text =
 let output_wizard_notes bdir wiznotes =
   let wizdir = Filename.concat bdir "wiznotes" in
   if wiznotes <> [] then begin
+    (* FIXME ad hoc solution. wiznotes should be handled same as notes_d *)
+    if not @@ Sys.file_exists wizdir then Unix.mkdir wizdir 0o755 ;
     List.iter begin fun (wizid, text) ->
       let fname = Filename.concat wizdir wizid ^ ".txt" in
       write_file_contents fname text
@@ -1296,10 +1298,6 @@ let link next_family_fun bdir =
     begin
       if !do_consang then ignore @@ ConsangAll.compute base true ;
       Gwdb.sync base ;
-      (* FIXME ad hoc solution. wiznotes should be handled same as notes_d *)
-      let wizdir = Filename.concat bdir "wiznotes" in
-      if not @@ Sys.file_exists wizdir then
-        Unix.mkdir wizdir 0o755;
       output_wizard_notes bdir gen.g_wiznotes;
       Mutil.remove_dir tmp_dir ;
       output_command_line bdir;
