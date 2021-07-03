@@ -802,6 +802,7 @@ let print_comment_for_family opts base gen fam =
 
 let print_empty_family opts base p =
   let string_quest = Gwdb.insert_string base "?" in
+  Printf.ksprintf (oc opts) "\n";
   Printf.ksprintf (oc opts) "fam ? ?.0 + #noment ? ?.0\n";
   Printf.ksprintf (oc opts) "beg\n";
   print_child opts base string_quest "" "" p;
@@ -809,59 +810,66 @@ let print_empty_family opts base p =
 
 let print_family opts base gen m =
   let fam = m.m_fam in
+  Printf.ksprintf (oc opts) "\n";
   Printf.ksprintf (oc opts) "fam ";
   print_parent opts base gen m.m_fath;
   Printf.ksprintf (oc opts) " +";
-  print_date_option opts (Adef.od_of_cdate (get_marriage fam));
-  let print_sexes s =
-    let c x =
-      match get_sex x with
-      | Male -> 'm'
-      | Female -> 'f'
-      | Neuter -> '?'
+  if !old_gw then
+  begin
+    print_date_option opts (Adef.od_of_cdate (get_marriage fam));
+    let print_sexes s =
+      let c x =
+        match get_sex x with
+        | Male -> 'm'
+        | Female -> 'f'
+        | Neuter -> '?'
+      in
+      Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
     in
-    Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
-  in
-  begin match get_relation fam with
-    | Married -> ()
-    | NotMarried -> Printf.ksprintf (oc opts) " #nm"
-    | Engaged -> Printf.ksprintf (oc opts) " #eng"
-    | NoSexesCheckNotMarried -> print_sexes "#nsck" ;
-    | NoSexesCheckMarried -> print_sexes "#nsckm" ;
-    | NoMention -> print_sexes "#noment"
-    | MarriageBann -> print_sexes "#banns"
-    | MarriageContract -> print_sexes "#contract"
-    | MarriageLicense -> print_sexes "#license"
-    | Pacs -> print_sexes "#pacs"
-    | Residence -> print_sexes "#residence"
-  end;
-  print_if_no_empty opts base "#mp" (get_marriage_place fam);
-  if opts.source = None then
-    print_if_no_empty opts base "#ms" (get_marriage_src fam);
-  begin match get_divorce fam with
-      NotDivorced -> ()
-    | Separated -> Printf.ksprintf (oc opts) " #sep"
-    | Divorced d ->
-      let d = Adef.od_of_cdate d in
-      Printf.ksprintf (oc opts) " -"; print_date_option opts d
+    begin match get_relation fam with
+      | Married -> ()
+      | NotMarried -> Printf.ksprintf (oc opts) " #nm"
+      | Engaged -> Printf.ksprintf (oc opts) " #eng"
+      | NoSexesCheckNotMarried -> print_sexes "#nsck" ;
+      | NoSexesCheckMarried -> print_sexes "#nsckm" ;
+      | NoMention -> print_sexes "#noment"
+      | MarriageBann -> print_sexes "#banns"
+      | MarriageContract -> print_sexes "#contract"
+      | MarriageLicense -> print_sexes "#license"
+      | Pacs -> print_sexes "#pacs"
+      | Residence -> print_sexes "#residence"
+    end;
+    print_if_no_empty opts base "#mp" (get_marriage_place fam);
+    if opts.source = None then
+      print_if_no_empty opts base "#ms" (get_marriage_src fam);
+    begin match get_divorce fam with
+        NotDivorced -> ()
+      | Separated -> Printf.ksprintf (oc opts) " #sep"
+      | Divorced d ->
+        let d = Adef.od_of_cdate d in
+        Printf.ksprintf (oc opts) " -"; print_date_option opts d
+    end;
   end;
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;
   Printf.ksprintf (oc opts) "\n";
-  Array.iter
-    (fun ip ->
-       if gen.per_sel ip then
-         let p = poi base ip in
-         Printf.ksprintf (oc opts) "wit";
-         begin match get_sex p with
-             Male -> Printf.ksprintf (oc opts) " m"
-           | Female -> Printf.ksprintf (oc opts) " f"
-           | _ -> ()
-         end;
-         Printf.ksprintf (oc opts) ": ";
-         print_witness opts base gen p;
-         Printf.ksprintf (oc opts) "\n")
-    (get_witnesses fam);
+  if !old_gw then
+  begin
+    Array.iter
+      (fun ip ->
+         if gen.per_sel ip then
+           let p = poi base ip in
+           Printf.ksprintf (oc opts) "wit";
+           begin match get_sex p with
+               Male -> Printf.ksprintf (oc opts) " m"
+             | Female -> Printf.ksprintf (oc opts) " f"
+             | _ -> ()
+           end;
+           Printf.ksprintf (oc opts) ": ";
+           print_witness opts base gen p;
+           Printf.ksprintf (oc opts) "\n")
+      (get_witnesses fam);
+  end;
   (match opts.source with
    | None ->
      if sou base (get_fsources fam) <> ""
