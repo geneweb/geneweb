@@ -555,7 +555,7 @@ $(document).ready(function(){
             %if;(bvar.multi_parents!="yes" and cnt=1)
               <div class="form-check my-2">
                 <label class="form-check-label">
-                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(mrel="nsck" or mrel="nsckm") checked%end;%/>
+                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(same_sex) checked%end;%/>
                   [*no sexes check]
                 </label>
               </div>

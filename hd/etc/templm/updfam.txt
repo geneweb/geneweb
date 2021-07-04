@@ -202,7 +202,7 @@
   <table>
     %foreach;parent;%apply;one_parent(cnt)%end;
  <tr><td colspan=4 style="border:0;text-align:left;padding:5px"><label><input type="checkbox" id="nsck" name="nsck" value="on"
-    %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/> [no sexes check]</label></td></tr>
+    %if;(same_sex) checked="checked"%end;%/> [no sexes check]</label></td></tr>
   </table>
 </fieldset>
 <fieldset>
