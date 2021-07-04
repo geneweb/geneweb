@@ -127,6 +127,32 @@ and eval_simple_var conf base env (fam, cpl, des) =
   | ["marriage_note"] -> str_val (Util.escape_html fam.marriage_note)
   | ["marriage_src"] -> str_val (Util.escape_html fam.marriage_src)
   | ["mrel"] -> str_val (eval_relation_kind fam.relation)
+  | ["same_sex"] ->
+      let same_sex =
+        let father = Gutil.father cpl in
+        let mother = Gutil.mother cpl in
+        let father_sex =
+          match father with
+            _, _, _, Update.Create (sex, _), _ -> sex
+          | f, s, o, Update.Link, _ ->
+              match person_of_key base f s o with
+                Some ip -> get_sex (poi base ip)
+              | _ -> Neuter
+        in
+        let mother_sex =
+          match mother with
+            _, _, _, Update.Create (sex, _), _ -> sex
+          | f, s, o, Update.Link, _ ->
+              match person_of_key base f s o with
+                Some ip -> get_sex (poi base ip)
+              | _ -> Neuter
+        in
+        begin match father_sex, mother_sex with
+          Male, Male | Female, Female -> true
+        | _ -> false
+        end
+      in
+      bool_val same_sex
   | ["nb_fevents"] -> str_val (string_of_int (List.length fam.fevents))
   | ["origin_file"] -> str_val (Util.escape_html fam.origin_file)
   | "parent" :: sl ->

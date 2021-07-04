@@ -47,7 +47,9 @@ let main () =
     end ;
     let ofile, oc, close = opts.oc in
     if not !GwuLib.raw_output then oc "encoding: utf-8\n";
-    if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
+    if !GwuLib.old_gw then oc "\n" else 
+      if !GwuLib.gwplus then oc "gwplus\n\n"
+      else oc "gwplus1\n\n";
     GwuLib.prepare_free_occ base ;
     GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select ;
     Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht ;
