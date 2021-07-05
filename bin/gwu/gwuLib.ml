@@ -505,7 +505,9 @@ let print_parent opts base gen p =
      else if get_new_occ p = 0 then ""
      else "." ^ string_of_int (get_new_occ p));
   if pr then
-    if has_infos then print_infos opts base false "" "" p
+    if has_infos then 
+      if !old_gw then print_infos opts base false "" "" p
+      else Printf.ksprintf (oc opts) " 0"
     else if first_name <> "?" && surname <> "?" then Printf.ksprintf (oc opts) " 0"
 
 let print_child opts base fam_surname csrc cbp p =
@@ -521,7 +523,8 @@ let print_child opts base fam_surname csrc cbp p =
   else Printf.ksprintf (oc opts) ".%d" (get_new_occ p);
   if not (eq_istr (get_surname p) fam_surname) then
     Printf.ksprintf (oc opts) " %s" (s_correct_string_nonum (sou base (get_surname p)));
-  print_infos opts base true csrc cbp p;
+  if !old_gw then print_infos opts base true csrc cbp p
+  else Printf.ksprintf (oc opts) " 0";
   Printf.ksprintf (oc opts) "\n"
 
 let bogus_person base p =
@@ -566,7 +569,7 @@ let print_witness opts base gen p =
   && not (Gwdb.Marker.get gen.mark (get_iper p))
   then begin
     Gwdb.Marker.set gen.mark (get_iper p) true;
-    if has_infos opts base p then print_infos opts base false "" "" p
+    if has_infos opts base p && !old_gw then print_infos opts base false "" "" p
     else Printf.ksprintf (oc opts) " 0";
     begin match sou base (get_notes p) with
       | "" ->
@@ -1179,7 +1182,7 @@ let print_relation_parent opts base mark defined_p p =
   then
     begin
       Gwdb.Marker.set mark (get_iper p) true ;
-      if has_infos opts base p then print_infos opts base false "" "" p
+      if has_infos opts base p && !old_gw then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
       defined_p := p :: !defined_p
     end
@@ -1307,7 +1310,7 @@ let print_relations_for_person opts base gen def_p is_definition p =
         begin
           Gwdb.Marker.set gen.mark (get_iper p) true;
           def_p := p :: !def_p;
-          if has_infos opts base p then print_infos opts base false "" "" p
+          if has_infos opts base p && !old_gw then print_infos opts base false "" "" p
           else Printf.ksprintf (oc opts) " 0";
           match get_sex p with
             Male -> Printf.ksprintf (oc opts) " #h"
