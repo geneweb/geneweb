@@ -618,11 +618,11 @@ let get_mar_date str =
           with _ -> (v, Male, Female), c :: l
         in
         match l with
-        | "#nm" :: c :: l when !gwplus1 && String.length c = 2 ->
+        | "#nm" :: c :: l when String.length c = 2 ->
           decode_sex NotMarried c l
         | "#nm" :: l ->
           (NotMarried, Male, Female), l
-        | "#eng" ::c :: l when !gwplus1 && String.length c = 2 ->
+        | "#eng" ::c :: l when String.length c = 2 ->
           decode_sex Engaged c l
         | "#eng" :: l ->
           (Engaged, Male, Female), l
@@ -644,7 +644,7 @@ let get_mar_date str =
           decode_sex Pacs c l
         | "#residence" :: c :: l when String.length c = 2 ->
           decode_sex Residence c l
-        | "#m" :: c :: l when !gwplus1 && String.length c = 2 ->
+        | "#m" :: c :: l when String.length c = 2 ->
           decode_sex Married c l
         | _ ->
           (Married, Male, Female), l
