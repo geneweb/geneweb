@@ -361,7 +361,7 @@ let print_infos opts base is_child csrc cbp p =
     | _ when zero_birth_is_required opts base is_child p -> Printf.ksprintf (oc opts) " 0"
     | _ -> ()
   end;
-  if !gwplus then
+  if !gwplus || !old_gw then
   begin
     print_if_not_equal_to opts cbp base "#bp" (get_birth_place p);
     if opts.source = None then
@@ -371,7 +371,7 @@ let print_infos opts base is_child csrc cbp p =
       Some d -> Printf.ksprintf (oc opts) " !"; print_date opts d
     | _ -> ()
   end;
-  if !gwplus then
+  if !gwplus || !old_gw then
   begin
     print_if_no_empty opts base "#pp" (get_baptism_place p);
     if opts.source = None then
@@ -387,7 +387,7 @@ let print_infos opts base is_child csrc cbp p =
         | Disappeared -> Printf.ksprintf (oc opts) "s"
         | _ -> ()
       end;
-      if !gwplus then print_date opts (Adef.date_of_cdate d)
+      if !gwplus || !old_gw then print_date opts (Adef.date_of_cdate d)
     | DeadYoung -> Printf.ksprintf (oc opts) " mj"
     | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
     | DontKnowIfDead ->
@@ -400,7 +400,7 @@ let print_infos opts base is_child csrc cbp p =
     | OfCourseDead -> Printf.ksprintf (oc opts) " od"
     | NotDead -> ()
   end;
-  if !gwplus then
+  if !gwplus || !old_gw then
   begin
     print_if_no_empty opts base "#dp" (get_death_place p);
     if opts.source = None then
@@ -812,7 +812,8 @@ let print_comment_for_family opts base gen fam =
 
 let print_empty_family opts base p =
   let string_quest = Gwdb.insert_string base "?" in
-  Printf.ksprintf (oc opts) "fam ? ?.0 + #noment %s ? ?.0\n" (if !gwplus then "" else "??");
+  Printf.ksprintf (oc opts) "fam ? ?.0 + #noment %s ? ?.0\n" 
+    (if not (!gwplus || !old_gw) then "??" else "");
   Printf.ksprintf (oc opts) "beg\n";
   print_child opts base string_quest "" "" p;
   Printf.ksprintf (oc opts) "end\n"
@@ -822,7 +823,7 @@ let print_family opts base gen m =
   Printf.ksprintf (oc opts) "fam ";
   print_parent opts base gen m.m_fath;
   Printf.ksprintf (oc opts) " +";
-  if !gwplus then
+  if !gwplus || !old_gw then
     print_date_option opts (Adef.od_of_cdate (get_marriage fam));
   let c x =
     match get_sex x with
@@ -833,27 +834,32 @@ let print_family opts base gen m =
   let print_sexes s =
     Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
   in
-  let test_sexes _s =
+  let test_sexes s =
     if not ((c m.m_fath) = 'm' && (c m.m_moth) = 'f') then
-      Printf.ksprintf (oc opts) " #m %c%c" (c m.m_fath) (c m.m_moth)
+      Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
+    else if s <> "#m" then Printf.ksprintf (oc opts) " %s" s
     else ()
   in
+  (* With gwplus1, NoSexCheckxxx should not occur anymore *)
   begin match get_relation fam with
-    | Married
-    | NoSexesCheckMarried -> if !gwplus then () else test_sexes "#m"
-    | NotMarried -> if !gwplus then Printf.ksprintf (oc opts) " #nm"
-        else print_sexes "#nm"
-    | NoSexesCheckNotMarried -> print_sexes "#nm"
-    | Engaged -> if !gwplus then Printf.ksprintf (oc opts) " #eng"
+    | Married ->if !old_gw  then () else test_sexes "#m"
+    | NotMarried -> if !old_gw then Printf.ksprintf (oc opts) " #nm"
+        else test_sexes "#nm"
+    | Engaged -> if !gwplus || !old_gw then Printf.ksprintf (oc opts) " #eng"
         else print_sexes  "#eng"
-    | NoMention -> print_sexes "#noment"
+        (* TODO check *)
+    | NoSexesCheckNotMarried -> if !old_gw then print_sexes "#nsck" else print_sexes "#nm"
+    | NoSexesCheckMarried -> if !old_gw then print_sexes "#nsckm" 
+        else if !gwplus then () else test_sexes "#m"
+    | NoMention -> if !old_gw then Printf.ksprintf (oc opts) " #noment"
+        else print_sexes "#noment"
     | MarriageBann -> print_sexes "#banns"
     | MarriageContract -> print_sexes "#contract"
     | MarriageLicense -> print_sexes "#license"
     | Pacs -> print_sexes "#pacs"
     | Residence -> print_sexes "#residence"
   end;
-  if !gwplus then
+  if !gwplus || !old_gw then
   begin
   print_if_no_empty opts base "#mp" (get_marriage_place fam);
   if opts.source = None then
@@ -869,7 +875,7 @@ let print_family opts base gen m =
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;
   Printf.ksprintf (oc opts) "\n";
-  if !gwplus then
+  if !gwplus || !old_gw then
   Array.iter
     (fun ip ->
        if gen.per_sel ip then
