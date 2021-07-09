@@ -665,7 +665,7 @@ let get_mar_date str =
   | [] -> failwith str
 
 let read_line ic =
-  try let str = input_real_line ic in Some (str, fields str) with
+  try let str = input_real_line ic in incr line_cnt; Some (str, fields str) with
     End_of_file -> None
 
 let create_person () =
@@ -1102,8 +1102,9 @@ let read_family ic fname =
                 (* On récupère le nom, date, lieu, source, cause *)
                 let (name, l) = get_pevent_name str l in
                 let (date, l) = get_optional_event_date l in
+                (* TODO reason does not seem to be properly recorded for death *)
+                let (reason, l) = get_field "#r" l in
                 let (place, l) = get_field "#p" l in
-                let (cause, l) = get_field "#c" l in
                 let (src, l) = get_field "#s" l in
                 let date =
                   match date with
@@ -1116,7 +1117,7 @@ let read_family ic fname =
                 (* On récupère les notes *)
                 let (notes, line) = loop_note line ic in
                 let notes = Mutil.strip_all_trailing_spaces notes in
-                let evt = name, date, place, cause, src, notes, witn in
+                let evt = name, date, place, reason, src, notes, witn in
                 loop (evt :: pevents) line
           in
           loop [] (input_a_line ic)

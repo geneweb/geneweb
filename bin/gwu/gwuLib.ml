@@ -380,14 +380,18 @@ let print_infos opts base is_child csrc cbp p =
   begin match get_death p with
     | Death (dr, d) ->
       Printf.ksprintf (oc opts) " ";
-      begin match dr with
-          Killed -> Printf.ksprintf (oc opts) "k"
-        | Murdered -> Printf.ksprintf (oc opts) "m"
-        | Executed -> Printf.ksprintf (oc opts) "e"
-        | Disappeared -> Printf.ksprintf (oc opts) "s"
-        | _ -> ()
-      end;
-      if !gwplus || !old_gw then print_date opts (Adef.date_of_cdate d)
+      (* TODO must keep death ad reason is not properly handled by gwcomp *)
+      (*if !gwplus || !old_gw then *)
+      begin
+        begin match dr with
+            Killed -> Printf.ksprintf (oc opts) "k"
+          | Murdered -> Printf.ksprintf (oc opts) "m"
+          | Executed -> Printf.ksprintf (oc opts) "e"
+          | Disappeared -> Printf.ksprintf (oc opts) "s"
+          | _ -> ()
+        end;
+        print_date opts (Adef.date_of_cdate d)
+      end
     | DeadYoung -> Printf.ksprintf (oc opts) " mj"
     | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
     | DontKnowIfDead ->
@@ -643,9 +647,10 @@ let print_pevent opts base gen e =
   Printf.ksprintf (oc opts) " ";
   let epers_date = Adef.od_of_cdate e.epers_date in
   print_date_option opts epers_date;
-  print_if_no_empty opts base "#p" e.epers_place;
   (* TODO *)
-  (*print_if_no_empty opts base "#c" e.epers_cause;*)
+  (*print_if_no_empty opts base "#c" e.epers_cause; ou reason!!*)
+  print_if_no_empty opts base "#r" e.epers_reason;
+  print_if_no_empty opts base "#p" e.epers_place;
   if opts.source = None then
     print_if_no_empty opts base "#s" e.epers_src;
   Printf.ksprintf (oc opts) "\n";
