@@ -377,17 +377,6 @@ let reconstitute_from_fevents nsck empty_string fevents =
     | Some (kind, date, place, note, src, wit) -> ((kind, date, place, note, src), wit)
   in
   (* Parents de même sexe. *)
-  let marr =
-    if nsck then
-      let (relation, date, place, note, src) = marr in
-      let relation =
-        match relation with
-        | Married -> NoSexesCheckMarried
-        | x -> x
-      in
-      relation, date, place, note, src
-    else marr
-  in
   let div = Opt.default NotDivorced !found_divorce in
   marr, div, wit
 
@@ -470,35 +459,6 @@ let reconstitute_family conf base nsck =
     marr
   in
   (* Si parents de même sex ... Pas de mode multi parent. *)
-  let relation =
-    match parents with
-      [father; mother] ->
-        let father_sex =
-          match father with
-            _, _, _, Update.Create (sex, _), _ -> sex
-          | f, s, o, Update.Link, _ ->
-              match person_of_key base f s o with
-                Some ip -> get_sex (poi base ip)
-              | _ -> Neuter
-        in
-        let mother_sex =
-          match mother with
-            _, _, _, Update.Create (sex, _), _ -> sex
-          | f, s, o, Update.Link, _ ->
-              match person_of_key base f s o with
-                Some ip -> get_sex (poi base ip)
-              | _ -> Neuter
-        in
-        begin match father_sex, mother_sex with
-          Male, Male | Female, Female ->
-            begin match relation with
-              Married -> NoSexesCheckMarried
-            | _ -> NoSexesCheckNotMarried
-            end
-        | _ -> relation
-        end
-    | _ -> relation
-  in
   let divorce = div in
   let fam =
     {marriage = marriage; marriage_place = marriage_place;

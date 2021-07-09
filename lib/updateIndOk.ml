@@ -897,8 +897,6 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
     | _ ->
       rename_image_file conf base op sp
   end ;
-  if List.assoc_opt "nsck" conf.env <> Some "on"
-  then check_sex_married ?prerr conf base sp op ;
   let created_p = ref [] in
   let np =
     Futil.map_person_ps (Update.insert_person conf base "" created_p)

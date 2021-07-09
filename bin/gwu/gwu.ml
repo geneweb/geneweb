@@ -10,6 +10,8 @@ let speclist opts =
      , " export isolated persons (work only if export all database)." )
   :: ("-old_gw", Arg.Set GwuLib.old_gw
      , " do not export additional fields (for backward compatibility: < 7.00)" )
+  :: ("-gwplus", Arg.Set GwuLib.gwplus
+     , " force use of gwplus format: < 7.01)" )
   :: ( "-raw", Arg.Set GwuLib.raw_output
      , " raw output (without possible utf-8 conversion)" )
   :: ( "-sep", Arg.String (fun s -> GwuLib.separate_list := s :: !GwuLib.separate_list)
@@ -47,7 +49,9 @@ let main () =
     end ;
     let ofile, oc, close = opts.oc in
     if not !GwuLib.raw_output then oc "encoding: utf-8\n";
-    if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
+    if !GwuLib.old_gw then oc "\n" else 
+      if !GwuLib.gwplus then oc "gwplus\n\n"
+      else oc "gwplus1\n\n";
     GwuLib.prepare_free_occ base ;
     GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select ;
     Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht ;
