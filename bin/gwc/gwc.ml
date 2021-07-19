@@ -39,11 +39,17 @@ let next_family_fun_templ gwo_list fi =
             end
         | None -> None
       in
+      let bnotes_of_string = function
+        | "merge" -> `merge
+        | "erase" -> `erase
+        | "first" -> `first
+        | _ -> assert false
+      in
       match r with
         Some fam -> Some fam
       | None ->
           match !gwo_list with
-            (x, separate, shift) :: rest ->
+            (x, separate, bnotes, shift) :: rest ->
               run ();
               gwo_list := rest;
               let ic = open_in_bin x in
@@ -51,6 +57,7 @@ let next_family_fun_templ gwo_list fi =
               fi.Db1link.f_curr_src_file <- input_value ic;
               fi.Db1link.f_curr_gwo_file <- x;
               fi.Db1link.f_separate <- separate;
+              fi.Db1link.f_bnotes <- bnotes_of_string bnotes ;
               fi.Db1link.f_shift <- shift;
               Hashtbl.clear fi.Db1link.f_local_names;
               ic_opt := Some ic;
@@ -69,39 +76,47 @@ let out_file = ref (Filename.concat Filename.current_dir_name "a")
 let force = ref false
 
 let separate = ref false
+let bnotes = ref "merge"
 let shift = ref 0
 let files = ref []
 
 let speclist =
-  ["-c", Arg.Set just_comp, "Only compiling";
-   "-o", Arg.String (fun s -> out_file := s),
-   "<file> Output database (default: a.gwb)";
-   "-f", Arg.Set force, " Remove database if already existing";
-   "-stats", Arg.Set Db1link.pr_stats, "Print statistics";
-   "-nc", Arg.Clear Db1link.do_check, "No consistency check";
-   "-cg", Arg.Set Db1link.do_consang, "Compute consanguinity";
-   "-sep", Arg.Set separate, " Separate all persons in next file";
-   "-sh", Arg.Int (fun x -> shift := x),
-   "<int> Shift all persons numbers in next files";
-   "-ds", Arg.String (fun s -> Db1link.default_source := s), "\
-     <str> Set the source field for persons and families without source data";
-   "-part", Arg.String (fun s -> Db1link.particules_file := s), "\
-     <file> Particles file (default = predefined particles)";
-   "-mem", Arg.Set Outbase.save_mem, " Save memory, but slower";
-   "-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.";
-   "-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.";
-   "-nopicture", Arg.Set Gwcomp.no_picture,
-   " do not create associative pictures";
-   "-q", Arg.Clear Mutil.verbose, " no verbose";
-   "-v", Arg.Set Mutil.verbose, " verbose"]
+  [ "-bnotes", Arg.Set_string bnotes
+  , "[merge|erase|first] behavior for base notes in the next file \n\
+     merge: new note for an existing file is concatenated to the current note\n\
+     erase: new note for an existing file erase the previous one\n\
+     first: new note for an existing file is dropped\n\
+     Default: " ^ !bnotes ^ ""
+  ; "-c", Arg.Set just_comp, " Only compiling"
+  ; "-cg", Arg.Set Db1link.do_consang, " Compute consanguinity"
+  ; "-ds", Arg.Set_string Db1link.default_source
+    , "<str> Set the source field for persons and families without source data"
+  ; "-f", Arg.Set force, " Remove database if already existing"
+  ; "-mem", Arg.Set Outbase.save_mem, " Save memory, but slower"
+  ; "-nc", Arg.Clear Db1link.do_check, " No consistency check"
+  ; "-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error"
+  ; "-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database"
+  ; "-nopicture", Arg.Set Gwcomp.no_picture, " Do not create associative pictures"
+  ; "-o", Arg.Set_string out_file
+    , "<file> Output database (default: a.gwb)"
+  ; "-part", Arg.Set_string Db1link.particules_file
+    , "<file> Particles file (default = predefined particles)"
+  ; "-q", Arg.Clear Mutil.verbose, " Quiet"
+  ; "-sep", Arg.Set separate, " Separate all persons in next file"
+  ; "-sh", Arg.Set_int shift,"<int> Shift all persons numbers in next files"
+  ; "-stats", Arg.Set Db1link.pr_stats, " Print statistics"
+  ; "-v", Arg.Set Mutil.verbose, " Verbose"
+  ]
 
 let anonfun x =
+  let bn = !bnotes in
   let sep = !separate in
   if Filename.check_suffix x ".gw" then ()
   else if Filename.check_suffix x ".gwo" then ()
   else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
   separate := false;
-  files := (x, sep, !shift) :: !files
+  bnotes := "merge" ;
+  files := (x, sep, bn, !shift) :: !files
 
 let errmsg =
   "Usage: gwc [options] [files]\n\
@@ -116,16 +131,16 @@ let main () =
   Secure.set_base_dir (Filename.dirname !out_file);
   let gwo = ref [] in
   List.iter
-    (fun (x, separate, shift) ->
+    (fun (x, separate, bnotes, shift) ->
        if Filename.check_suffix x ".gw" then
          begin
            begin try Gwcomp.comp_families x with
              e -> Printf.printf "File \"%s\", line %d:\n" x !line_cnt; raise e
            end;
-           gwo := (x ^ "o", separate, shift) :: !gwo
+           gwo := (x ^ "o", separate, bnotes, shift) :: !gwo
          end
        else if Filename.check_suffix x ".gwo" then
-         gwo := (x, separate, shift) :: !gwo
+         gwo := (x, separate, bnotes, shift) :: !gwo
        else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
   if not !just_comp then
