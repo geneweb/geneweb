@@ -40,11 +40,13 @@ type cbase =
   }
 
 type file_info =
-  { mutable f_curr_src_file : string;
-    mutable f_curr_gwo_file : string;
-    mutable f_separate : bool;
-    mutable f_shift : int;
-    mutable f_local_names : (int * int, int) Hashtbl.t }
+  { mutable f_curr_src_file : string
+  ; mutable f_curr_gwo_file : string
+  ; mutable f_separate : bool
+  ; mutable f_bnotes : [ `merge | `erase | `first ]
+  ; mutable f_shift : int
+  ; mutable f_local_names : (int * int, int) Hashtbl.t
+  }
 
 type gen =
   { mutable g_strings : (string, int) Hashtbl.t;
@@ -841,17 +843,26 @@ let insert_bnotes fname gen nfname str =
     if nfname = "" then ""
     else
       match NotesLinks.check_file_name nfname with
-        Some (dl, f) -> List.fold_right Filename.concat dl f
+      | Some (dl, f) -> List.fold_right Filename.concat dl f
       | None -> "bad"
   in
   let bnotes =
-    {nread = (fun f n -> if f = nfname then str else old_nread f n);
-     norigin_file = fname;
-     efiles =
-       if nfname <> "" then
-         let efiles = gen.g_base.c_bnotes.efiles () in
-         fun () -> nfname :: efiles
-       else gen.g_base.c_bnotes.efiles}
+    let str =
+      match gen.g_file_info.f_bnotes with
+      | `erase -> str
+      | `merge -> old_nread nfname RnAll ^ str
+      | `first -> match old_nread nfname RnAll with
+        | "" -> str
+        | str -> str
+    in
+    { nread = (fun f n -> if f = nfname then str else old_nread f n)
+    ; norigin_file = fname
+    ; efiles =
+        if nfname <> "" then
+          let efiles = gen.g_base.c_bnotes.efiles () in
+          fun () -> nfname :: efiles
+        else gen.g_base.c_bnotes.efiles
+    }
   in
   gen.g_base.c_bnotes <- bnotes
 
@@ -1248,8 +1259,13 @@ let link next_family_fun bdir =
   let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
   let tmp_fam = Filename.concat tmp_dir "gwc_fam" in
   let fi =
-    {f_local_names = Hashtbl.create 20011; f_curr_src_file = "";
-     f_curr_gwo_file = ""; f_separate = false; f_shift = 0}
+    { f_local_names = Hashtbl.create 20011
+    ; f_curr_src_file = ""
+    ; f_curr_gwo_file = ""
+    ; f_separate = false
+    ; f_shift = 0
+    ; f_bnotes = `merge
+    }
   in
   let gen =
     {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
