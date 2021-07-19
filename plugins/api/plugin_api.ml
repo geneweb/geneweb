@@ -9,8 +9,6 @@ module GWD = Gwd_lib
 
 let ns = "api"
 
-let assets_r = ref ""
-
 let friend fn conf base =
   if conf.wizard || conf.friend
   then fn conf base
