@@ -36,6 +36,7 @@ let empty : M.Base_warnings.t =
   ; warning_young_for_marriage = []
   ; warning_old_for_marriage = []
   ; warning_distant_children = []
+  ; warning_event_order = []
   }
 
 (** [add_error_to_piqi_warning_list base error]
@@ -213,10 +214,24 @@ let add_warning_to_piqi_warning_list conf base =
                    person = p2wp base p
                  ; date = string_of_prec_dmy dmy
                  } :: w.warning_old_for_marriage }
+    | FEventOrder (p, e1, e2) ->
+      { w with warning_event_order =
+                 M.Warning_event_order.{
+                   person = p2wp base p
+                 ; pevents = []
+                 ; fevents = [ Piqi_util.piqi_fevent_name_of_fevent_name e1.efam_name
+                             ; Piqi_util.piqi_fevent_name_of_fevent_name e2.efam_name ]
+                 } :: w.warning_event_order }
+    | PEventOrder (p, e1, e2) ->
+      { w with warning_event_order =
+                 M.Warning_event_order.{
+                   person = p2wp base p
+                 ; pevents = [ Piqi_util.piqi_pevent_name_of_pevent_name e1.epers_name
+                             ; Piqi_util.piqi_pevent_name_of_pevent_name e2.epers_name ]
+                 ; fevents = []
+                 } :: w.warning_event_order }
     (* Not included in api *)
     | ChangedOrderOfFamilyEvents (_, _, _) -> w
     | ChangedOrderOfPersonEvents (_, _, _) -> w
-    | FEventOrder (_, _, _) -> w
-    | PEventOrder (_, _, _) -> w
 
 #endif
