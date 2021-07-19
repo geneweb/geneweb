@@ -43,6 +43,7 @@ let next_family_fun_templ gwo_list fi =
         | "merge" -> `merge
         | "erase" -> `erase
         | "first" -> `first
+        | "drop" -> `drop
         | _ -> assert false
       in
       match r with
@@ -82,10 +83,11 @@ let files = ref []
 
 let speclist =
   [ "-bnotes", Arg.Set_string bnotes
-  , "[merge|erase|first] behavior for base notes in the next file \n\
-     merge: new note for an existing file is concatenated to the current note\n\
-     erase: new note for an existing file erase the previous one\n\
-     first: new note for an existing file is dropped\n\
+  , "[drop|erase|first|merge] Behavior for base notes of the next file. \
+     [drop]: dropped. \
+     [erase]: erase the current content. \
+     [first]: dropped if current content is not empty. \
+     [merge]: concatenated to the current content. \
      Default: " ^ !bnotes ^ ""
   ; "-c", Arg.Set just_comp, " Only compiling"
   ; "-cg", Arg.Set Db1link.do_consang, " Compute consanguinity"
@@ -107,6 +109,7 @@ let speclist =
   ; "-stats", Arg.Set Db1link.pr_stats, " Print statistics"
   ; "-v", Arg.Set Mutil.verbose, " Verbose"
   ]
+  |> Arg.align
 
 let anonfun x =
   let bn = !bnotes in
