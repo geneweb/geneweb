@@ -43,7 +43,7 @@ type file_info =
   { mutable f_curr_src_file : string
   ; mutable f_curr_gwo_file : string
   ; mutable f_separate : bool
-  ; mutable f_bnotes : [ `merge | `erase | `first ]
+  ; mutable f_bnotes : [ `merge | `erase | `first | `drop ]
   ; mutable f_shift : int
   ; mutable f_local_names : (int * int, int) Hashtbl.t
   }
@@ -838,33 +838,36 @@ let insert_notes fname gen key str =
     flush stdout
 
 let insert_bnotes fname gen nfname str =
-  let old_nread = gen.g_base.c_bnotes.nread in
-  let nfname =
-    if nfname = "" then ""
-    else
-      match NotesLinks.check_file_name nfname with
-      | Some (dl, f) -> List.fold_right Filename.concat dl f
-      | None -> "bad"
-  in
-  let bnotes =
-    let str =
-      match gen.g_file_info.f_bnotes with
-      | `erase -> str
-      | `merge -> old_nread nfname RnAll ^ str
-      | `first -> match old_nread nfname RnAll with
-        | "" -> str
-        | str -> str
+  if gen.g_file_info.f_bnotes <> `drop then begin
+    let old_nread = gen.g_base.c_bnotes.nread in
+    let nfname =
+      if nfname = "" then ""
+      else
+        match NotesLinks.check_file_name nfname with
+        | Some (dl, f) -> List.fold_right Filename.concat dl f
+        | None -> "bad"
     in
-    { nread = (fun f n -> if f = nfname then str else old_nread f n)
-    ; norigin_file = fname
-    ; efiles =
-        if nfname <> "" then
-          let efiles = gen.g_base.c_bnotes.efiles () in
-          fun () -> nfname :: efiles
-        else gen.g_base.c_bnotes.efiles
-    }
-  in
-  gen.g_base.c_bnotes <- bnotes
+    let bnotes =
+      let str =
+        match gen.g_file_info.f_bnotes with
+        | `drop -> assert false
+        | `erase -> str
+        | `merge -> old_nread nfname RnAll ^ str
+        | `first -> match old_nread nfname RnAll with
+          | "" -> str
+          | str -> str
+      in
+      { nread = (fun f n -> if f = nfname then str else old_nread f n)
+      ; norigin_file = fname
+      ; efiles =
+          if nfname <> "" then
+            let efiles = gen.g_base.c_bnotes.efiles () in
+            fun () -> nfname :: efiles
+          else gen.g_base.c_bnotes.efiles
+      }
+    in
+    gen.g_base.c_bnotes <- bnotes
+  end
 
 let insert_wiznote gen wizid str =
   gen.g_wiznotes <- (wizid, str) :: gen.g_wiznotes
