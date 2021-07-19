@@ -1034,9 +1034,9 @@ let stringify s =
   Printf.sprintf (if String.contains s '\'' then "\"%s\"" else "'%s'") s
 
 let trans (conf : Config.config) =
-  let trad ~kwargs s i =
+  let trad ~kwargs k i =
     try
-      let s = Hashtbl.find conf.lexicon s in
+      let s = Hashtbl.find conf.lexicon k in
       let t =
         if Lexicon_parser.need_split s
         then Array.of_list @@ String.split_on_char '/' s
@@ -1074,7 +1074,7 @@ let trans (conf : Config.config) =
         loop (conv "" @@ Array.unsafe_get t @@ len - 1) (len - 2)
         |> Util.translate_eval
       end
-    with Not_found -> Tstr (Printf.sprintf "{{%s|trans}}" @@ stringify @@ s)
+    with Not_found -> Tstr (Printf.sprintf "{{%s|trans}}" @@ stringify k)
   in
   Tfun begin fun ?(kwargs=[]) -> function
     | Tint i ->
