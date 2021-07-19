@@ -11,6 +11,11 @@ let ns = "api"
 
 let assets_r = ref ""
 
+let friend fn conf base =
+  if conf.wizard || conf.friend
+  then fn conf base
+  else Gwd_lib.Request.incorrect_request conf
+
 let wiz fn conf base =
   if conf.wizard then
     fn conf base
@@ -42,7 +47,7 @@ let () =
     ; ( "API_ALL_FAMILIES"
       , aux @@ w_base @@ Api.print_all_families)
     ; ( "API_BASE_WARNINGS"
-      , aux @@ wiz @@ w_base @@ w_lock @@ Api.print_base_warnings)
+      , aux @@ friend @@ w_base @@ w_lock @@ Api.print_base_warnings)
     ; ( "API_CLOSE_PERSONS"
       , aux @@ w_base @@ Api_graph.print_close_person_relations)
     ; ( "API_CPL_REL"
