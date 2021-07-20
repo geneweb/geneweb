@@ -18,6 +18,17 @@ val merge_events :
   ('a -> 'string event_name) -> ('a -> Adef.cdate) -> 'a list -> 'a list ->
     'a list
 
+(** [check_siblings ?onchange base warning (ifam, fam) callback]
+    Checks birth date consistency between siblings.
+    Also calls [callback] with each child. *)
+val check_siblings :
+ ?onchange:bool
+ -> base
+ -> (base_warning -> unit)
+ -> (ifam * family)
+ -> (person -> unit)
+ -> unit
+
 val person
   : ?onchange:bool
   -> base
