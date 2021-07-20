@@ -241,13 +241,6 @@ type 'person gen_couple = 'person Def.gen_couple (* FIXME: expose its type *)
 
 type 'person gen_descend = 'person Def.gen_descend = { children : 'person array }
 
-type 'person error = 'person Def.error =
-  | AlreadyDefined of 'person
-  | OwnAncestor of 'person
-  | BadSexOfMarriedPerson of 'person
-
-type ('person, 'descend, 'title) misc = ('person, 'descend, 'title) Def.misc = MissingSources
-
 type dsk_person = (int, int, int) gen_person
 type dsk_ascend = int gen_ascend
 type dsk_union = int gen_union
