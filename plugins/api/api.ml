@@ -672,6 +672,9 @@ let person_warnings conf base p =
   in
   ignore @@ CheckItem.person base add p ;
   CheckItem.on_person_update base add p ;
+  Array.iter begin fun ifam ->
+    CheckItem.check_siblings ~onchange:false base add (ifam, foi base ifam) ignore
+  end (get_family p) ;
   Hashtbl.fold begin fun x _ acc ->
     Api_warnings.add_warning_to_piqi_warning_list conf base acc x
   end warnings Api_warnings.empty
