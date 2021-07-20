@@ -7,10 +7,8 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-en: Fix base and recompute index
-fr: Corrige une base et reclacule l'index
-]</title>
+  <title>[Fix base and recompute index]
+</title>
 %fsetup.css;
 </head>
 
@@ -18,10 +16,7 @@ fr: Corrige une base et reclacule l'index
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
-[
-en: Fix base and recompute index
-fr: Corrige une base et reclacule l'index
-]
+[Fix base and recompute index]
 </h1>
 </div>
 
@@ -33,202 +28,137 @@ fr: Corrige une base et reclacule l'index
 <tr>
 <td>
 <ul><li>
-[
-en: Select your base:
-fr: Sélectionnez la base de données :
-]
-
+[Select your database by clicking on the associated button][:]
 <p>
 <table class="setup">
 %b{<tr align=left>
 <td><input type="radio" name="anon" value="%a">   </td>
 <td>%a</td></tr>|
-<tr align=left><td>- [
-de: keine Datenbank vorhanden
-en: there is no database at present
-es: actualmente ninguna base de datos existe
-fr: il n’y a aucune base de données actuellement
-it: attualmente non esiste nessuna base di dati
-lv: nav nevienas datu bâzes
-sv: det finns ingen databas för tillfället
-]</tr></td>}
+<tr align=left><td>- [there is no database at present]
+</tr></td>}
 </table>
 <p>
-
-<p>
 <li>
-[
-de: Wähle die gewünschten Optionen:
-en: Select the options you want:
-es: Seleccione las opciones que Ud. desee:
-fr: Sélectionnez les options que vous désirez :
-it: Selezionate le opzioni desiderate:
-lv: Izvçlieties atbilstoðos parametrus:
-sv: Välj de optioner du vill ha:
-]<br>
-[
-en: (no selection is equivalent to select all).
-fr: (aucune option est équivalent à les sélectionner toutes). 
-]
-
+[Select the options you want][:]
+<br>
+[(no selection is equivalent to select all).]
 <p>
 <table class="setup">
 <tr align=left>
 <td><input type="checkbox" name="dry-run" value="on">   </td>
-<td>[
-en: do not commit changes (only traces).
-fr: ne pas effectuer les changements (traces seules).
-]</td>
+<td>[do not commit changes (only traces).]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="q" value="on">   </td>
-<td>[
-en: quiet mode.
-fr: peu de traces.
-]</td>
+<td>[quiet mode.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="qq" value="on">   </td>
-<td>[
-en: very quiet mode.
-fr: pas de traces du tout.
-]</td>
+<td>[very quiet mode.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="fast" value="on">   </td>
-<td>[
-en: fast mode. Needs more memory
-fr: mode rapide. Nécessite plus de mémoire.
-]</td>
+<td>[fast mode. Needs more memory]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="families-parents" value="on">   </td>
-<td>[
-en: families' parents.
-fr: families' parents.
-]</td>
+<td>[families' parents.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="families-children" value="on">   </td>
-<td>[
-en: families' children.
-fr: families' children.
-]</td>
+<td>[families' children.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="persons-NBDS" value="on">   </td>
-<td>[
-en: persons' NBDS.
-fr: persons' NBDS.
-]</td>
+<td>[persons' NBDS.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="persons-parents" value="on">   </td>
-<td>[
-en: persons' parents.
-fr: persons' parents.
-]</td>
+<td>[persons' parents.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="persons-families" value="on">   </td>
-<td>[
-en: persons' families.
-fr: persons' families.
-]</td>
+<td>[persons' families.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="pevents-witnesses" value="on">   </td>
-<td>[
-en: pevents' witnesses.
-fr: pevents' witnesses.
-]</td>
+<td>[pevents' witnesses.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="fevents-witnesses" value=on>   </td>
-<td>[
-en: fevents' witnesses.
-fr: fevents' witnesses.
-]</td>
+<td>[fevents' witnesses.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="marriage-divorce" value="on">   </td>
-<td>[
-en: marriage divorce.
-fr: marriage divorce.
-]</td>
+<td>[marriage divorce.]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="index" value="on">   </td>
-<td>[
-en: index. Automatically enabled by any other option
-fr: index. Activé automatiquement par les autres options
-]</td>
+<td>[index. Automatically enabled by any other option]
+</td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
 <td><input type="checkbox" name="help" value="on">   </td>
-<td>[
-en: help.
-fr: help.
-]</td>
+<td>[help.]
+</td>
 </tr>
 </table>
 <p>
-
 <li>
-[
-de: Dann drücke diesen Knopf:
-en: Then push this button:
-es: Apoye luego en este botón:
-fr: Puis appuyez sur ce bouton :
-it: Poi cliccate su questo bottone:
-lv: Beigâs nospiediet ðo podziòu:
-sv: Tryck sedan på denna knapp:
-]
-
-<p>
-<input type="submit" value="[
-[
-en: Fix base
-fr: Fix base
-]">
+[Then push this button][:]
+<input type="submit" value="[Fix base]">
 </ul>
 </form>
+</body>
+</html>

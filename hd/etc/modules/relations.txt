@@ -215,7 +215,7 @@
     %end;
   %end;
   %if;(count>0)
-    <h3>[*witness to events of] %first_name;</h3>
+    <h3>[*witnesses to events of] %first_name;</h3>
   %end;
   <ul>
     %foreach;event;%sp;

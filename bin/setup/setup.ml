@@ -82,7 +82,7 @@ let trailer _conf =
   Output.printf printer_conf
     "<a href=\"https://github.com/geneweb/geneweb/\">\
      <img src=\"images/logo_bas.png\" style = \"border: 0\" /></a> \
-     Version %s Copyright &copy 1998-2017\n</em>\n"
+     Version %s Copyright &copy 1998-2021\n</em>\n"
     Version.txt;
   Output.print_string printer_conf "</div>\n";
   Output.print_string printer_conf "</div>\n";
@@ -267,7 +267,6 @@ let parameters_2 =
   in
   loop ""
 
-
 let rec list_replace k v =
   function
     [] -> [k, v]
@@ -338,6 +337,8 @@ let only_file_name () =
   if !only_file = "" then Filename.concat !setup_dir "only.txt"
   else !only_file
 
+(* this set of macros are used within translations, hence the repeat of some *)
+(* like %l, %L, %P, ... and they may be different! %G  *)
 let macro conf =
   function
 #ifdef UNIX
@@ -361,21 +362,16 @@ let macro conf =
   | 'w' -> slashify (Sys.getcwd ())
   | 'y' -> Filename.basename (only_file_name ())
   | 'z' -> string_of_int !port
-  | '%' -> "%"
-  | 'K' -> (* print the name of -o filename, prepend bname or -o1 filename *)
-    let outfile1 = strip_spaces (s_getenv conf.env "o") in
-    let bname = strip_spaces (s_getenv conf.env "anon") in
-    let outfile2 = strip_spaces (s_getenv conf.env "o1") in
-    let outfile =
-      if outfile2 <> "" then outfile2
-      else if bname <> ""
-      then slashify_linux_dos bname ^ ".gwb" ^ outfile1
-      else outfile1
-    in
-    outfile
+  | 'D' -> transl conf "!doc"
+  | 'G' -> transl conf "!geneweb"
+  | 'L' ->
+      let lang = conf.lang in
+      let lang_def = transl conf "!languages" in
+      (Translate.language_name ~sep:'|' lang lang_def)
   | 'P' -> string_of_int !gwd_port
   | 'Q' -> parameters_1 conf.env
   | 'R' -> parameters_2 conf.env
+  | '%' -> "%"
   | c -> "BAD MACRO " ^ String.make 1 c
 
 let get_variable (strm : _ Stream.t) =
@@ -437,7 +433,7 @@ let variables bname =
 
 let nth_field s n =
   let rec loop nth i =
-    let j = try String.index_from s i '/' with Not_found -> String.length s in
+    let j = try String.index_from s i '|' with Not_found -> String.length s in
     if nth = n then String.sub s i (j - i)
     else if j = String.length s then s
     else loop (nth + 1) (j + 1)
@@ -485,16 +481,24 @@ let read_base_env bname =
     loop []
   | None -> []
 
+let rec split_string acc s =
+  if String.length s < 80 then acc ^ s
+  else
+    match String.index_from_opt s 70 ' ' with
+    | Some i when String.length s > i + 3 ->
+        split_string (acc ^ (String.sub s 0 i) ^ "\n") (String.sub s (i + 1) (String.length s - i - 1))
+    | _ -> acc ^ s
+
 let rec copy_from_stream conf print strm =
   try
     while true do
       match Stream.next strm with
         '[' ->
           begin match Stream.peek strm with
-            Some '\n' ->
+          | Some '\n' ->
               let s = parse_upto ']' strm in
-              let (s, alt) = Translate.inline conf.lang '%' (macro conf) s in
-              let s = if alt then "[" ^ s ^ "]" else s in print s
+              print "Translations must be on a single line: [string to translate]";
+              print s
           | _ ->
               let s =
                 let rec loop len =
@@ -508,15 +512,32 @@ let rec copy_from_stream conf print strm =
               let n =
                 match Stream.peek strm with
                 | Some ('0'..'9' as c) ->
-                  Stream.junk strm; Some (Char.code c - Char.code '0')
-                | _ -> None
+                  Stream.junk strm; (Char.code c - Char.code '0')
+                | _ -> 0
               in
-              print (translate_phrase conf.lexicon s n)
+              (* translate before macro processing *)
+              let s = (nth_field (transl conf s) n) in
+              (* FIXME must be more efficient way of doing this (with buffers?) *)
+              let s =
+                let rec loop acc s =
+                  if String.length s = 0 then acc
+                  else
+                    if s.[0] = '%' then loop (acc ^ (macro conf s.[1])) (String.sub s 2 (String.length s - 2))
+                    else loop (acc ^ (String.sub s 0 1)) (String.sub s 1 (String.length s - 1))
+                in loop "" s
+              in
+              print (split_string "" s)
           end
       | '%' ->
           let c = Stream.next strm in
           begin match c with
-            'b' -> for_all conf print (all_db ".") strm
+          | '(' ->
+                let rec loop more =
+                  let _s = parse_upto '%' strm in
+                  let c = Stream.next strm in
+                  if c = ')' then () else loop true
+                in loop true
+          | 'b' -> for_all conf print (all_db ".") strm
           | 'e' ->
               print "lang=";
               print conf.lang;
@@ -556,6 +577,7 @@ let rec copy_from_stream conf print strm =
                 conf.env
           | 'j' -> print_selector conf print
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
+          | 'l' -> print conf.lang
           | 'r' ->
               print_specific_file conf print
                 (Filename.concat !setup_dir "gwd.arg") strm
@@ -576,16 +598,8 @@ let rec copy_from_stream conf print strm =
                         print (if c = 'C' then " checked" else " selected")
                   | None -> ()
                   end
-              | 'L' ->
-                  let lang = get_variable strm in
-                  let lang_def = transl conf "!languages" in
-                  print (Translate.language_name lang lang_def)
-              | 'V' | 'F' ->
-                  let k = get_variable strm in
-                  begin match p_getenv conf.env k with
-                    Some v -> print v
-                  | None -> ()
-                  end
+              | 'D' -> print (transl conf "!doc")
+           (* | 'F' see 'V' *)
               | 'G' -> print_specific_file_tail conf print "gwsetup.log" strm
               | 'H' ->
                   (* print the content of -o filename, prepend bname *)
@@ -602,13 +616,35 @@ let rec copy_from_stream conf print strm =
                   let k1 = get_variable strm in
                   let k2 = get_variable strm in
                   print_if_else conf print (p_getenv conf.env k1 = Some k2) strm
+              | 'K' -> (* print the name of -o filename, prepend bname or -o1 filename *)
+                  let outfile1 = strip_spaces (s_getenv conf.env "o") in
+                  let bname = strip_spaces (s_getenv conf.env "anon") in
+                  let outfile2 = strip_spaces (s_getenv conf.env "o1") in
+                  let outfile =
+                    if outfile2 <> "" then outfile2
+                    else if bname <> "" then slashify_linux_dos bname ^ ".gwb" ^ outfile1
+                    else outfile1
+                  in
+                  print outfile
+              | 'L' ->
+                  let lang = get_variable strm in
+                  let lang_def = transl conf "!languages" in
+                  print (Translate.language_name ~sep:'|' lang lang_def)
               | 'O' ->
-                  let fname = Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o"))) in
+                  let fname = Filename.remove_extension
+                    (Filename.basename (strip_spaces (s_getenv conf.env "o")))
+                  in
                   let fname = slashify_linux_dos fname in
                   print fname
               | 'P' -> print (string_of_int !gwd_port)
               | 'Q' -> print (parameters_1 conf.env) (* same as p *)
               | 'R' -> print (parameters_2 conf.env) (* same as p *)
+              | 'V' | 'F' ->
+                  let k = get_variable strm in
+                  begin match p_getenv conf.env k with
+                    Some v -> print v
+                  | None -> ()
+                  end
               | _ ->
                 match p_getenv conf.env (String.make 1 c) with
                 | Some v ->
@@ -629,7 +665,7 @@ let rec copy_from_stream conf print strm =
                       if v = s then print " checked"
                     | _ -> print (strip_spaces v)
                   end
-                | None -> print "BAD MACRO 2"
+                | None -> print ("BAD MACRO 2" ^ String.make 1 c)
               end
           | c -> print (macro conf c)
           end
@@ -651,6 +687,7 @@ and print_specific_file conf print fname strm =
 and print_specific_file_tail conf print fname strm =
   match Stream.next strm with
     '{' ->
+    (* TODO implement the "tail" part *)
       let s = parse_upto '}' strm in
       if Sys.file_exists fname then begin
         let ic = open_in fname in
@@ -1815,9 +1852,10 @@ let copy_text lang fname =
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
+      let lexicon = input_lexicon lang in
       let conf =
         {lang = lang; comm = ""; env = []; request = [];
-         lexicon = Hashtbl.create 1}
+         lexicon = lexicon}
       in
       copy_from_stream conf print_string (Stream.of_channel ic);
       flush stdout;

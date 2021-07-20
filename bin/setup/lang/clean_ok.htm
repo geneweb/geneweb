@@ -7,110 +7,27 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-de: Operation durchgeführt
-en: Operation completed
-es: Operación terminada
-fi: Toiminto suoritettu
-fr: Opération terminée
-it: Operazione terminata
-lv: Darbîba pabeigta
-sv: Operationen klar
-]</title>
+  <title>[Operation completed]
+</title>
 %fsetup.css;
 </head>
 
 <body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
-<h1 style="margin:0;">
-[
-de: Operation durchgeführt
-en: Operation completed
-es: Operación terminada
-fi: Toiminto suoritettu
-fr: Opération terminée
-it: Operazione terminata
-lv: Darbîba pabeigta
-sv: Operationen klar
-]
-</h1>
+<h1 style="margin:0;">[Operation completed]</h1>
 </div>
-
-<p />
-
-[
-de: Deine Datenbank "%a" wurde erfolgreich aufgeräumt.
-en: So. The cleaning up of you database "%a" is completed.
-es: Hela aquí. La limpieza de su base "%a" ha terminado.
-fi: Tietokannan puhdistaminen "%a" on valmis.
-fr: Le nettoyage de votre base "%a" est terminé.
-it: La pulizia della base "%a" è stata portata a termine.
-lv: Darîts. Jûsu datu bâzes "%a" sakopðana ir pabeigta.
-sv: Upprensningen av din databas "%a" är klar.
-]
-
-<p />
-
-[
-de: Die Datenbank wurde erfolgreich neu erzeugt: Die alte Version
-    steht im Unterverzeichnis "old" im Verzeichnis "%w".
-    Falls es Probleme geben sollte, kannst
-    du die alte Version wiederherstellen.
-en: Your database has been completely rebuilt: the old version is on the
-    subdirectory "old" of the directory "%w".
-    You can recover it in case of problem.
-es: Su base ha sido completamente reconstruida: la versión 
-    anterior se encuentra en la sub-carpeta "old" de la carpeta "%w".
-    Ud podrá recuperarla en caso de problema.
-fi: Tietokantasi on nyt kokonaan uudelleen rakennettu: vanha versio on
-    "%w" alahakemistossa. Voit palauttaa sen ongelman tullessa.
-fr: Votre base a été complètement reconstruite :
-    l’ancienne version se trouve dans le sous-répertoire "old" du
-    répertoire "%w".
-    Vous pouvez l’y récupérer en cas de problème.
-it: La vostra base è stata completamente ricostruita;
-    la precedente versione si trova nella sub-directory "old" della
-    directory "%w".
-lv: Jûsu datu bâze ir pilîbâ pârveidota: vecâ versija glabâjas
-    <font color=#2f6400><b>GeneWeb</b></font> izplatîðanas komplekta
-    kataloga "%w" apakðkatalogâ "old". Problçmu gadîjumâ Jûs to variet
-    to atjaunot.
-sv: Din databas har blivit helt återskapad, den gamla versionen finns i
-    underkatalogen "old" i katalogen "%w".
-    Du kan återskapa den om det blir något problem.
-]
-
-<p />
-
-[
-de: Du kannst nun mit deiner superaufgeräumten neuen Datenbank
-    arbeiten…
-en: You can consult your very clean new database…
-es: Ud. puede consultar su nueva base bien "limpia"…
-fi: Voit lukea uutta puhdasta tietokantaasi…
-fr: Vous pouvez consulter votre nouvelle base toute propre…
-it: Ora potete consultare la vostra nuova base ben "pulita"…
-lv: Jûs variet griezties pie Jûsu atjauninâtâs datu bâzes…
-sv: Du kan nu konsultera din nya rena databas…
-]
-
-<p />
-
+<p>
+[The cleaning up of you database "%a" is completed.]
+<p>
+[Your database has been completely rebuilt: the old version is on the subdirectory "old" of the directory "%w". You can recover it in case of problem.]
+%(
+Your database has been completely rebuilt: the old version is on the subdirector
+y "old" of the directory "%w". You can recover it in case of problem.
+%)
+<p>
+[You can consult your very clean new database][:]
+<p>
 <ul><li><a href="http://%m:%P/%a">http://%m:%P/%a</a></ul>
-
-<p /><br />
-
-… [
-de: oder zurück zum
-    <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmenü</a> springen.
-en: or return to the <a href="gwsetup?lang=%l;v=welcome.htm">main menu</a>.
-es: o regresar al <a href="gwsetup?lang=%l;v=welcome.htm">menú
-    principal</a>.
-fi: tai palata <a href="gwsetup?lang=%l;v=welcome.htm">päävalikkoon</a>.
-fr: ou revenir au <a href="gwsetup?lang=%l;v=welcome.htm">menu principal</a>.
-it: o tornare al <a href="gwsetup?lang=%l;v=welcome.htm">menu principale</a>.
-lv: vai atgriezties <a href="gwsetup?lang=%l;v=welcome.htm">galvenajâ
-    izvçlnç</a>.
-sv: eller återvända till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
-]
+<p>
+[Return to the main menu.] (<a href="gwsetup?lang=%l;v=welcome.htm">gesetup</a>)

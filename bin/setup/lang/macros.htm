@@ -15,7 +15,8 @@ The following table lists the macros available in gwsetup. <br>
 The second colums provides the result of executing the marco in the current context.<br>
 Note that depending on the context, some env.var may contain different values.<br>
 For instance, when starting setup, the following code in setup.ml (line 1890):<br>
-<pre>    let conf = {(conf) with env = [("anon", saddr); ("o", s)]} in </pre>
+<pre>    let conf = {(conf) with env = [("anon", saddr); ("o", s)]
+} in </pre>
 assigns the current IP address to evar.anon and the content of the only.txt file to evar.o
 <p>
 

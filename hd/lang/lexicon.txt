@@ -1,3 +1,124 @@
+    sosa reference: %t
+en: sosa reference: %t
+fr: référence Sosa : %t
+
+    sex required
+en: sex required
+fr: sexe demandé
+
+    previous diff
+en: previous difference
+fr: différence précédente
+
+    nouveau(x)
+en: new
+fr: nouveau(x)
+
+    new
+en: new
+fr: nouveau
+
+    next diff
+en: next difference
+fr: différence suivante
+
+    mode H/mode I
+en: mode H/mode I
+fr: mode H/mode I
+
+    missing
+en: missing
+fr: manquant
+
+    marriage notes
+en: marriage notes
+fr: notes du mariage
+
+    lists
+en: lists
+fr: listes
+
+    list of %s
+en: list of %s
+fr: liste de %s
+
+    index required
+en: index required
+fr: index demandé
+
+    history cleaned
+en: history cleaned
+fr: historique nettoyé
+
+    forbidden char
+en: forbidden char
+fr: charactère interdit
+
+    %s forbidden char
+en: forbidden char: %s
+fr: %s : charactère interdit
+
+    edit person
+en: edit person
+fr: modifier la personne
+
+    edit family
+en: edit family
+fr: modifier la famille
+
+    death date before event
+en: death date before event
+fr: décès avant l'événement
+
+    continue
+en: continue
+fr: continuer
+
+    conjoint/conjointe
+en: spouse/spouse
+fr: conjoint/conjointe
+
+    click on dates
+en: click on dates
+fr: clicker sur les dates
+
+    clean history
+en: clean history
+fr: nettoyer l'historique
+
+    children of cousins
+en: children of cousins
+fr: enfants des cousins
+
+    birth date after event
+en: birth date after event
+fr: naissance après l'événement
+
+    back to default sosa reference
+en: back to default sosa reference
+fr: retour à la référence Sosa par défaut
+
+    autofocus
+en: autofocus
+fr: autofocus
+
+    Arbre 9 gen
+en: Arbre 9 generations
+fr: Arvre 9 générations
+
+    Arbre 7 gen
+en: Arbre 7 generations
+fr: Arvre 7 générations
+
+    add the previous first name as a first name alias
+en: add the previous first name as a first name alias
+fr: ajouetr le premier prénom précédent comme prénom alias
+
+    add mariage
+en: add mariage
+fr: ajouter mariage
+
+
     !dates order
 af: yyyymmdd
 ar: ddmmyyyy
@@ -66,130 +187,6 @@ sl: af=afrikaanščina/bg=bolgarščina/br=bretonščina/ca=katalonščina/co=ko
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/co=korsikanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/oc=occitanska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sk=slovakiska/sl=slovenska/sv=svenska/tr=turkiska/zh=kinesiska
 tr: af=Afrikaans/bg=Bulgarca/br=Bretonca/ca=Katalanca/co=Korsikaca/cs=Çekçe/da=Danca/de=Almanca/en=İngilizce/eo=Esperanto/es=İspanyolca/et=Estonca/fi=Fince/fr=Fransızca/he=İbranice/is=İzlandaca/it=İtalyanca/lv=Letonca/nl=Hollandaca/no=Norveççe/oc=Oksitanca/pl=Lehçe/pt=Portekizce/pt-br=Brezilya Portekizcesi/ro=Romence/ru=Rusça/sk=Slovakça/sl=Slovence/sv=İsveççe/tr=Türkçe/zh=Çince
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/tr=土耳其/zh=中文
-
-    the first branch
-af: om die eerste staak te sien
-bg: за да видите първия клон
-br: evit gwelout ar skourr kentañ
-ca: per veure la primera branca
-co: a prima ghjemba
-cs: abyste viděli první
-da: for at se den første
-de: Erster Zweig
-en: first line
-eo: por vidi la unuan branĉon
-es: la primera rama
-et: esimese haru vaatamiseks
-fi: ensimmäinen sukuhaara
-fr: la première
-he:  לראות את הענף הראשון
-is: til að sjá fyrstu grein
-it: il primo ramo
-lv: skatīt pirmo zaru
-nl: de eerste tak
-no: den første grenen
-oc: la primièra branca
-pl: aby zobaczyć pierwszą linię (gałąź)
-pt: para ver o primeiro ramo
-ro: pentru a vedea primul
-ru: чтобы увидеть первую ветку
-sk: aby ste videli prvú vetvu
-sl: za prikaz prve veje
-sv: den första grenen
-tr: İlk satır
-
-    to see the first branch
-af: om die eerste staak te sien
-bg: за да видите първия клон
-br: evit gwelout ar skourr kentañ
-ca: per veure la primera branca
-co: per fighjà a prima ghjemba
-cs: abyste viděli první
-da: for at se den første
-de: , um den ersten zu sehen
-en: to see the first one
-eo: por vidi la unuan branĉon
-es: para ver la primera rama
-et: esimese haru vaatamiseks
-fi: nähdäksesi ensimmäisen haaran
-fr: pour voir la première
-he:  לראות את הענף הראשון
-is: til að sjá fyrstu grein
-it: per vedere il primo
-lv: skatīt pirmo zaru
-nl: om de eerste tak te zien
-no: for å se den første
-oc: per veire la primièra branca
-pl: aby zobaczyć pierwszą linię (gałąź)
-pt: para ver o primeiro ramo
-ro: pentru a vedea primul
-ru: чтобы увидеть первую ветку
-sk: aby ste videli prvú vetvu
-sl: za prikaz prve veje
-sv: för att se den första
-tr: İlkini görmek için
-
-    to see the first relationship link
-af: om die eerste te sien
-bg: за да видите първата родствена връзка
-br: evit gwelout al liamm kentañ
-ca: per veure el primer vincle de parentesc
-co: per fighjà u primu
-cs: zobrazit první
-da: for at se det første
-de: , um die erste zu sehen
-en: to see the first one
-eo: por vidi la unuan ligon de parenceco
-es: para ver el primer vínculo de parentesco
-et: esimese sugulussuhte vaatamiseks
-fi: nähdäksesi ensimmäisen sukulaisuuden
-fr: pour voir le premier
-he:  לראות את הקשר המשפחתי הראשון
-is: til að sjá fyrstu tengsl
-it: per vedere il primo
-lv: skatīt pirmo attiecību saiti
-nl: om de eerste te zien
-no: for å se den første
-oc: per veire lo primièr ligam de parentatge
-pl: aby zobaczyć pierwszą linię pokrewieństwa
-pt: para ver o primeiro link
-ro: pentru a vedea prima relatie
-ru: чтобы увидеть первую связь отношения
-sk: zobraziť prvý vzťah
-sl: za prikaz prve sorodstvene povezave
-sv: för att se den första
-tr: İlkini görmek için
-
-    to try again with this number
-af: om weer te probeer met die nommer
-bg: за опит с този номер
-br: evit esaiñ en-dro gant an niverenn-se
-ca: per tornar a provar aquest número
-co: per pruvà torna cù stu numeru
-cs: zkusit znovu s tímto číslem
-da: for at forsøge igen med dette nummer
-de: , um es mit dieser Nummer nochmals zu versuchen
-en: to try again with this number
-eo: por reprovi kun ĉi tiu numero
-es: para ensayar de nuevo con este número
-et: , proovimaks uuesti selle numbriga
-fi: yrittääksesi uudelleen tällä numerolla
-fr: pour réessayer avec ce numéro
-he: לנסות שוב עם המספר הזה
-is: til að reyna þetta aftur með þessu númeri
-it: per provare di nuovo con questo numero
-lv: mēģiniet vēlreiz ar šo nummuru
-nl: , om dit nummer weer te proberen
-no: for å prøve igjen med dette nummeret
-oc: per tornar ensajar amb aquel numèro
-pl: aby ponowić z tym numerem
-pt: para tentar novamente com este número
-ro: incearca din nou cu acest numar
-ru: для того, чтобы пытаться снова с этим числом
-sk: skúsiť znovu s týmto číslom
-sl: za ponoven poskus s to številko
-sv: för att försöka igen med detta nummer
-tr: Bu numara ile tekrar denemek için
 
     %1 of %2
 af: %1 van %2
@@ -4765,6 +4762,11 @@ ru: дата окончания
 sv: slutdatum
 tr: için
 
+    date of baptism
+co: data di battesimu
+en: date of baptism
+fr: date du baptême
+
     date of birth
 co: data di nascita
 de: Geburtsdatum
@@ -4781,12 +4783,10 @@ ru: дата рождения
 sv: födelsedatum
 tr: doğum tarihi
 
-    date of baptism
-co: data di battesimu
-en: date of baptism
-fr: date du baptême
-sv: dopdag
-tr: vaftiz tarihi
+    date of burial
+co: data di sepultura
+en: date of burial
+fr: date de la sépulture
 
     date of death
 co: data di trapassu
@@ -4819,13 +4819,6 @@ pt: data de casamento
 ru: дата бракосочетания
 sv: vigseldatum
 tr: evlilik tarihi
-
-    date of burial
-co: data di sepultura
-en: date of burial
-fr: date de la sépulture
-sv: begravningsdatum
-tr: defin tarihi
 
     date/dates
 af: datum
@@ -5976,34 +5969,6 @@ sk: presne
 sl: točno
 sv: exakt
 tr: tam
-
-    search_exact_fn
-co: ricerca esatta
-de: genaue Suche
-en: exact search
-es: búsqueda exacta
-fi: tarkka haku
-fr: recherche exacte
-it: ricerca esatta
-nl: exact zoeken
-no: eksakt søk
-pt: pesquisa exata
-sv: exakt sökning
-tr: tam arama
-
-    search_exact_sn
-co: ricerca esatta
-de: genaue Suche
-en: exact search
-es: búsqueda exacta
-fi: tarkka haku
-fr: recherche exacte
-it: ricerca esatta
-nl: exact zoeken
-no: eksakt søk
-pt: pesquisa exata
-sv: exakt sökning
-tr: tam arama
 
     excommunication
 co: scumunicazione
@@ -8944,6 +8909,18 @@ pt: contrato de casamento
 sv: Äktenskapförord
 tr: evlilik sözleşmesi (nikah)
 
+    marriage contract%t with
+co: cuntrattu di matrimoniu%t cù
+de: ehevertrag vom%t mit
+en: marriage contract%t with
+es: contrato de matrimonio%t con
+fi: avioliittosopimus%t kanssa
+fr: contrat de mariage%t avec
+it: contratto di matrimonio%t con
+no: ekteskapskontrakt%t med
+pt: contrato de casamento%t com
+sv: giftermål%t med
+
     marriage date
 co: data di l’unione
 de: Hochzeitstag
@@ -9298,19 +9275,6 @@ sl: %t se je poročil z/%t se je poročila z
 sv: gift%t med
 tr: %t ile evlendi
 zh: %t配偶是
-
-    marriage contract%t with
-co: cuntrattu di matrimoniu%t cù
-de: ehevertrag vom%t mit
-en: marriage contract%t with
-es: contrato de matrimonio%t con
-fi: avioliittosopimus%t kanssa
-fr: contrat de mariage%t avec
-it: contratto di matrimonio%t con
-no: ekteskapskontrakt%t med
-pt: contrato de casamento%t com
-sv: giftermål%t med
-tr: evlilik sözleşmesi %t ile
 
     maternal grand-parents
 co: caccari materni
@@ -10291,7 +10255,6 @@ oc: podètz ensajar amb un autre metòde de calcul de relacion
 pt: pode recomeçar utilizando um novo método de cálculo 
 ru: попытайтесь найти родственную связь другим образом
 sv: välj ett annat uträkningssätt och räkna ut igen
-tr: başka bir hesaplama seçeneği deneyebilirsiniz
 
     new modification
 co: cliccà quì per fà una nova currezzione
@@ -10767,8 +10730,7 @@ no: Merknader
 oc: Ensenhador de las nòtas divèrsas
 pt: sumário de notas diversas
 ru: изменения вкратце
-sv: Summering av noteringar
-tr: Notlar
+sv: Summerade noteringar
 
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
@@ -10800,7 +10762,6 @@ ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl:  št./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
-tr: sıra/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 
     nth (cousin)
 af: n/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
@@ -10832,7 +10793,6 @@ ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n/två/tre/fyra/fem/sex/sju/åtta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
-tr: sıra/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 
     nth (generation)
 af: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
@@ -12764,6 +12724,32 @@ sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
 
+    search_exact_fn
+co: ricerca esatta
+de: genaue Suche
+en: exact search
+es: búsqueda exacta
+fi: tarkka haku
+fr: recherche exacte
+it: ricerca esatta
+nl: exact zoeken
+no: eksakt søk
+pt: pesquisa exata
+sv: exakt sökning
+
+    search_exact_sn
+co: ricerca esatta
+de: genaue Suche
+en: exact search
+es: búsqueda exacta
+fi: tarkka haku
+fr: recherche exacte
+it: ricerca esatta
+nl: exact zoeken
+no: eksakt søk
+pt: pesquisa exata
+sv: exakt sökning
+
     searching all
 co: ricerca tutti i
 de: suche alle
@@ -12856,8 +12842,7 @@ no: vis også
 oc: tanben veire
 pt: ver também
 ru: смотри также
-sv: se också
-tr: Ayrıca bakınız
+sv: visa också
 
     see ascendants notes/sources
 co: fighjà e note è e fonte
@@ -12872,8 +12857,7 @@ no: Se på merknader/kilder
 oc: veire las nòtas e las fonts
 pt: ver notas & fontes
 ru: смотри заметки/документы
-sv: Se noteringar och källor
-tr: Notları/kaynakları görüntüle
+sv: Se kommande generations noteringar och källor
 
     see ascendants pictures
 co: fighjà e fotò
@@ -12888,8 +12872,7 @@ no: Se på bilder
 oc: veire las fòtos
 pt: ver fotos
 ru: смотри изображения предков
-sv: Se bilder
-tr: Resimleri görüntüle
+sv: Se kommande generations bilder
 
     see descendants notes/sources
 co: fighjà e note è e fonte
@@ -12904,8 +12887,7 @@ no: Se på merknader/kilder
 oc: veire las nòtas e las fonts
 pt: ver notas & fontes
 ru: смотри заметки/документы потомков
-sv: Se noteringar och källor
-tr: Notları/kaynakları görüntüle
+sv: Se efterföljandes noteringar och källor
 
     see descendants pictures
 co: fighjà e fotò
@@ -12921,7 +12903,6 @@ oc: veire las fòtos
 pt: ver fotos
 ru: смотри изображения потомков
 sv: Se efterföljandes bilder
-tr: Resimleri görüntüle
 
     see further
 af: kyk verder
@@ -13830,7 +13811,6 @@ oc: estatisticas e aniversaris
 pt: estatísticas e aniversários
 ru: статистика и годовщины
 sv: statistik och årsdagar
-tr: istatistikler ve yıldönümleri
 
     subdivision
 co: paisolu
@@ -14573,6 +14553,36 @@ sl: ta datoteka je začasno zaklenjena: prosimo poskusite znova. Če še vedno n
 sv: filen är temporärt låst: försök igen. Om det ändå inte fungerar, vänta ett tag innan nästa försök
 tr: dosya geçici olarak kilitlendi: lütfen tekrar deneyin. Hala çalışmıyorsa, tekrar denemeden önce bir süre bekleyin
 
+    the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
+de: Erster Zweig
+en: first line
+eo: por vidi la unuan branĉon
+es: la primera rama
+et: esimese haru vaatamiseks
+fi: ensimmäinen sukuhaara
+fr: la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: il primo ramo
+lv: skatīt pirmo zaru
+nl: de eerste tak
+no: den første grenen
+oc: la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: den första grenen
+
     the following children of %t and %t are born very close
 co: e date di nascita di sti zitelli di %t è %t parenu troppu vicine
 de: das Geburtsdatum der Kinder %t und %t liegt sehr nah beieinander
@@ -14787,7 +14797,6 @@ ru: %d последних рождений
 sk: posledných %d narodení
 sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
-tr: son %d doğum
 
     the latest %d celebrated marriages
 bg: последните %d чествувани сватби
@@ -14804,7 +14813,6 @@ oc: las %d darrièras unions celebradas
 pt: as últimas %d uniões celebradas
 ru: последние %d свадеб
 sv: Det senaste %d firade bröllopet
-tr: Son %d evlilik (Evlilik tarihi)
 
     the latest %d marriages
 af: die laaste %d huwelike
@@ -14835,7 +14843,6 @@ ru: последние %d браков
 sk: posledných %d sobášov
 sl: zadnjih %d porok
 sv: de senaste %d äktenskapen
-tr: son %d evlilik
 
     the latest %d registered marriages
 bg: последните %d регистрирани сватби
@@ -14852,7 +14859,6 @@ oc: las %d darrièras unions enregistradas
 pt: as últimas %d uniões registadas
 ru: последние %d зарегистрированных браков
 sv: Det senast %d registreade äktenskapet
-tr: Son %d evlilik (Giriş tarihi)
 
     the latest %t deaths
 af: die laaste %t afsterwes
@@ -15130,6 +15136,66 @@ ru: ещё будет
 sv: kommande händelser
 tr: gelmek
 
+    to see the first branch
+af: om die eerste staak te sien
+bg: за да видите първия клон
+br: evit gwelout ar skourr kentañ
+ca: per veure la primera branca
+co: per fighjà a prima ghjemba
+cs: abyste viděli první
+da: for at se den første
+de: , um den ersten zu sehen
+en: to see the first one
+eo: por vidi la unuan branĉon
+es: para ver la primera rama
+et: esimese haru vaatamiseks
+fi: nähdäksesi ensimmäisen haaran
+fr: pour voir la première
+he:  לראות את הענף הראשון
+is: til að sjá fyrstu grein
+it: per vedere il primo
+lv: skatīt pirmo zaru
+nl: om de eerste tak te zien
+no: for å se den første
+oc: per veire la primièra branca
+pl: aby zobaczyć pierwszą linię (gałąź)
+pt: para ver o primeiro ramo
+ro: pentru a vedea primul
+ru: чтобы увидеть первую ветку
+sk: aby ste videli prvú vetvu
+sl: za prikaz prve veje
+sv: för att se den första
+
+    to see the first relationship link
+af: om die eerste te sien
+bg: за да видите първата родствена връзка
+br: evit gwelout al liamm kentañ
+ca: per veure el primer vincle de parentesc
+co: per fighjà a prima leia
+cs: zobrazit první
+da: for at se det første
+de: , um die erste zu sehen
+en: to see the first one
+eo: por vidi la unuan ligon de parenceco
+es: para ver el primer vínculo de parentesco
+et: esimese sugulussuhte vaatamiseks
+fi: nähdäksesi ensimmäisen sukulaisuuden
+fr: pour voir le premier
+he:  לראות את הקשר המשפחתי הראשון
+is: til að sjá fyrstu tengsl
+it: per vedere il primo
+lv: skatīt pirmo attiecību saiti
+nl: om de eerste te zien
+no: for å se den første
+oc: per veire lo primièr ligam de parentatge
+pl: aby zobaczyć pierwszą linię pokrewieństwa
+pt: para ver o primeiro link
+ro: pentru a vedea prima relatie
+ru: чтобы увидеть первую связь отношения
+sk: zobraziť prvý vzťah
+sl: za prikaz prve sorodstvene povezave
+sv: för att se den första
+
     to the %s generation
 af: tot die %s geslag
 bg: до %s поколение
@@ -15347,6 +15413,36 @@ sl: do staršev
 sv: till föräldrarna
 tr: ebeveynlere kadar
 
+    to try again with this number
+af: om weer te probeer met die nommer
+bg: за опит с този номер
+br: evit esaiñ en-dro gant an niverenn-se
+ca: per tornar a provar aquest número
+co: per pruvà torna cù stu numeru
+cs: zkusit znovu s tímto číslem
+da: for at forsøge igen med dette nummer
+de: , um es mit dieser Nummer nochmals zu versuchen
+en: to try again with this number
+eo: por reprovi kun ĉi tiu numero
+es: para ensayar de nuevo con este número
+et: , proovimaks uuesti selle numbriga
+fi: yrittääksesi uudelleen tällä numerolla
+fr: pour réessayer avec ce numéro
+he: לנסות שוב עם המספר הזה
+is: til að reyna þetta aftur með þessu númeri
+it: per provare di nuovo con questo numero
+lv: mēģiniet vēlreiz ar šo nummuru
+nl: , om dit nummer weer te proberen
+no: for å prøve igjen med dette nummeret
+oc: per tornar ensajar amb aquel numèro
+pl: aby ponowić z tym numerem
+pt: para tentar novamente com este número
+ro: incearca din nou cu acest numar
+ru: для того, чтобы пытаться снова с этим числом
+sk: skúsiť znovu s týmto číslom
+sl: za ponoven poskus s to številko
+sv: för att försöka igen med detta nummer
+
     today
 af: vandag
 bg: днес
@@ -15525,7 +15621,6 @@ oc: Arbres e Listas
 pt: Tabelas & Listas
 ru: Деревья и Списки
 sv: Diagram & Listor
-tr: Grafikler ve Listeler
 
     try again
 bg: опитайте отново
@@ -16120,27 +16215,6 @@ sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
 tr: %s ve %s evliliğinde tanık
 
-    witnesses at his events
-co: testimoni à i so avvenimenti
-en: witnesses at his events
-fr: témoins à ses évènements
-sv: vittnen vid hans händelser
-tr: etkinliklerinde tanıklar
-
-    witnesses to events of
-co: testimoni à l’avvenimenti di
-en: witnesses to events of
-fr: témoins aux évènements de
-sv: vittnen vid händelser för
-tr: etkinliklerinin tanıkları
-
-    witnesses to my events and godparents
-co: testimoni à i mo avvenimenti è cumpare/cummare
-en: witnesses to my events and godparents
-fr: témoins à mes évènements et parrains/marraines
-sv: vittnen vid mina händelser och gudföräldrar
-tr: etkinliklerime ve vaftiz babalarıma tanıklar
-
     witness tree
 co: arburu di i testimoni
 en: tree of witnesses
@@ -16187,6 +16261,21 @@ fr: témoin/témoins
 pt: testemunha/testemunhas
 sv: vittne/vittnen
 tr: tanık/tanıklar
+
+    witnesses at his events
+co: testimoni à i so avvenimenti
+en: witnesses at his events
+fr: témoins à ses évènements
+
+    witnesses to events of
+co: testimoni à l’avvenimenti di
+en: witnesses to events of
+fr: témoins aux évènements de
+
+    witnesses to my events and godparents
+co: testimoni à i mo avvenimenti è cumpare/cummare
+en: witnesses to my events and godparents
+fr: témoins à mes évènements et parrains/marraines
 
     wizard/wizards/friend/friends/exterior
 af: Medewerkers/Medewerkers/vriend/vriend/exterior
@@ -16446,5 +16535,4 @@ pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
-sv: ditt meddelande väntar på godkännande
-tr: mesajınız doğrulama için bekliyor
+sv: ditt meddelande väntar på giltighet

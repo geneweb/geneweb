@@ -7,98 +7,38 @@
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
-  <title>[
-de: Datenbanken löschen
-en: Delete
-es: Supresión
-fi: Poista
-fr: Suppression
-it: Soppressione
-lv: Dzçst
-sv: Radera
-]</title>
+  <title>[Delete]
+</title>
 %fsetup.css;
 </head>
 
 <body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
-<h1 style="margin:0;">
-[
-de: Datenbanken löschen
-en: Deletion of databases
-es: Supresión de bases de datos
-fi: Tietokantojen poistaminen
-fr: Suppression de bases de données
-it: Soppressione di basi di dati
-lv: Datu bâþu dzçðana
-sv: Radering av databaser
-]
-</h1>
+<h1 style="margin:0;">[Deletion of databases]</h1>
 </div>
-
 <form method="get" action="delete">
-<input type="hidden" name="lang" value="%l" />
-<ul><li>
-[
-de: Wähle die Datenbanken, die du löschen möchtest, mit
-    dem zugehörigen Schalter.
-en: Select the database or databases you want to delete, by clicking on the
-    associated buttons.
-es: Seleccione  la o las  bases que Ud desea destruir cliqueando 
-    en el, o los, botones asociados:
-fi: Valitse tietokanta tai tietokannat jotka haluat poistaa, klikkaamalla
-    sille kuuluvaa nappia.
-fr: Sélectionnez la ou les bases que vous voulez détruire
-    en cliquant sur le ou les boutons associés:
-it: Selezionate la o le basi di dati che volete sopprimere
-    cliccando su il o i bottoni associati:
-lv: Iezîmçjiet datu bâzi vai datu bâzes, kuras Jûs vçlaties dzçst.
-sv: Välj den databas eller de databaser du vill radera, genom att klicka på
-    motsvarande knappar.
-]
-
-<p>
-
-<table class="setup">
-%b{
-<tr align="left">
-<td><a href="http://%m:%P/%a">%a</a></td>
-<td><input type="checkbox" name="%a" value="on" /></td>
-</tr>|
-<tr align="left"><td>- [
-de: keine Datenbank vorhanden
-en: there is no database at present
-es: actualmente no existe ninguna base de datos 
-fi: ei tietokantaa saatavilla
-fr: il n’y a aucune base de données actuellement
-it: attualmente non esiste nessuna base di dati
-lv: patreiz nav nevienas datubâzes
-sv: det finns ingen databas för tillfället
-]</tr></td>}
-</table>
-<p>
-<li>
-[
-de: Dann drücke diesen Knopf:
-en: Then push this button:
-es: Luego apoye en este botón:
-fi: Sitten paina tätä nappia:
-fr: Puis appuyez sur ce bouton :
-it: Poi cliccate su questo bottone:
-lv: Tad nospiediet ðo podziòu:
-sv: Tryck sedan på denna knapp:
-]
-<p>
-<input type="submit" value="[
-de: Prüfen
-en: Check
-es: Verificar
-fi: Tarkista
-fr: Vérifier
-it: Verificare
-lv: Pârbaudît
-sv: Radera
-]">
-</ul>
+  <input type="hidden" name="lang" value="%l" />
+  <ul>
+    <li>[Select the database or databases you want to delete, by clicking on the associated buttons.]
+    %(
+    Select the database or databases you want to delete, by clicking on the associat
+    ed buttons.
+    %)
+    <p>
+    <table class="setup">
+      %b{
+      <tr align="left">
+        <td><a href="http://%m:%P/%a">%a</a></td>
+        <td><input type="checkbox" name="%a" value="on" /></td>
+      </tr>|
+      <tr align="left"><td>- [there is no database at present]
+      </tr></td>}
+    </table>
+    <p>
+    <li>[Then push this button][:]
+  <input type="submit" value="[Check]">
+  </ul>
 </form>
+</body>
+</html>
