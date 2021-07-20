@@ -169,19 +169,14 @@ type sosa_t =
     sosa_ht : (iper, (Sosa.t * Gwdb.person) option) Hashtbl.t }
 
 let init_sosa_t conf base sosa_ref =
-  let tstab =
-    try Util.create_topological_sort conf base with
-      Consang.TopologicalSortError p ->
-        let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
-        Hutil.rheader conf title; print_base_loop conf base p
-  in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-  let last_zil = [get_iper sosa_ref, Sosa.one] in
-  let sosa_ht = Hashtbl.create 5003 in
-  let () =
-    Hashtbl.add sosa_ht (get_iper sosa_ref) (Some (Sosa.one, sosa_ref))
-  in
-  {tstab = tstab; mark = mark; last_zil = last_zil; sosa_ht = sosa_ht}
+  try
+    let tstab = Util.create_topological_sort conf base in
+    let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+    let last_zil = [get_iper sosa_ref, Sosa.one] in
+    let sosa_ht = Hashtbl.create 5003 in
+    Hashtbl.add sosa_ht (get_iper sosa_ref) (Some (Sosa.one, sosa_ref)) ;
+    Some {tstab = tstab; mark = mark; last_zil = last_zil; sosa_ht = sosa_ht}
+  with Consang.TopologicalSortError _ -> None
 
 let find_sosa_aux conf base a p t_sosa =
   let cache = ref [] in
@@ -255,8 +250,8 @@ let find_sosa_aux conf base a p t_sosa =
   in
   find t_sosa.last_zil
 
-let find_sosa conf base a sosa_ref_l t_sosa =
-  match Lazy.force sosa_ref_l with
+let find_sosa conf base a sosa_ref t_sosa =
+  match sosa_ref with
     Some p ->
       if get_iper a = get_iper p then Some (Sosa.one, p)
       else
@@ -428,26 +423,24 @@ let has_history conf base p p_auth =
 (** [Description] : Recherche si la personne passée en argument a un
                     numéro de sosa.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : personne dont on cherche si elle a un numéro sosa
-    [Retour] :
-      - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
+    - conf : configuration de la base
+    - base : base de donnée
+    - p    : personne dont on cherche si elle a un numéro sosa
+      [Retour] :
+    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
                 sosa, ou retourne son numéro de sosa sinon
-    [Rem] : Exporté en clair hors de ce module.                         *)
+      [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
 let get_single_sosa conf base p =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  match sosa_ref with
-    Some p_sosa ->
-      let sosa_ref_l = let sosa_ref () = sosa_ref in Lazy.from_fun sosa_ref in
-      let t_sosa = init_sosa_t conf base p_sosa in
-      begin match find_sosa conf base p sosa_ref_l t_sosa with
-        Some (z, _) -> z
-      | None -> Sosa.zero
-      end
+  match Util.find_sosa_ref conf base with
   | None -> Sosa.zero
-
+  | Some p_sosa as sosa_ref ->
+    match init_sosa_t conf base p_sosa with
+    | None -> Sosa.zero
+    | Some t_sosa ->
+      match find_sosa conf base p sosa_ref t_sosa with
+      | Some (z, _) -> z
+      | None -> Sosa.zero
 
 (* ************************************************************************ *)
 (*  [Fonc] print_sosa : config -> base -> person -> bool -> unit            *)
@@ -1682,7 +1675,7 @@ type 'a env =
   | Vgpl of generation_person list
   | Vnldb of (Gwdb.iper, Gwdb.ifam) Def.NLDB.t
   | Vstring of string
-  | Vsosa_ref of person option Lazy.t
+  | Vsosa_ref of person option
   | Vsosa of (iper * (Sosa.t * person) option) list ref
   | Vt_sosa of sosa_t option
   | Vtitle of person * title_item
@@ -1927,7 +1920,7 @@ and eval_simple_bool_var conf base env =
     fam_check_aux (fun fam -> get_divorce fam = Separated)
   | "browsing_with_sosa_ref" ->
       begin match get_env "sosa_ref" env with
-        Vsosa_ref v -> Lazy.force v <> None
+        Vsosa_ref v -> v <> None
       | _ -> raise Not_found
       end
   | "has_comment" | "has_fnotes" ->
@@ -2640,7 +2633,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       *)
       begin match get_env "sosa_ref" env with
       | Vsosa_ref v ->
-          begin match Lazy.force v with
+          begin match v with
           | Some p ->
               let ip = get_iper p in
               let s0 = Sosa.of_string s in
@@ -2687,7 +2680,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
   | "sosa_ref" :: sl ->
       begin match get_env "sosa_ref" env with
         Vsosa_ref v ->
-          begin match Lazy.force v with
+          begin match v with
             Some p ->
               let ep = make_ep conf base (get_iper p) in
               eval_person_field_var conf base env ep loc sl
@@ -5734,12 +5727,11 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     | None -> 120
   in
   let env =
-    if Util.find_sosa_ref conf base <> None then build_sosa_ht conf base ;
     let sosa_ref = Util.find_sosa_ref conf base in
-    let sosa_ref_l = let sosa_ref () = sosa_ref in Lazy.from_fun sosa_ref in
+    if sosa_ref <> None then build_sosa_ht conf base ;
     let t_sosa =
       match sosa_ref with
-      | Some p -> Some (init_sosa_t conf base p)
+      | Some p -> init_sosa_t conf base p
       | _ -> None
     in
     let desc_level_table_l =
@@ -5799,7 +5791,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
      ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vsosa (ref []));
-     ("sosa_ref", Vsosa_ref sosa_ref_l);
+     ("sosa_ref", Vsosa_ref sosa_ref);
      ("t_sosa", Vt_sosa t_sosa);
      ("max_anc_level", Vlazy (Lazy.from_fun mal));
      ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
