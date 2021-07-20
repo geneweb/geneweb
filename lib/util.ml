@@ -3218,3 +3218,16 @@ let auth_warning conf base w =
   | ChangedOrderOfMarriages _
   | ChangedOrderOfFamilyEvents _
   | ChangedOrderOfPersonEvents _ -> false
+
+let person_warnings conf base p =
+  let w = ref [] in
+  let filter x =
+    if not (List.mem x !w) && auth_warning conf base x
+    then w := x :: !w
+  in
+  ignore @@ CheckItem.person base filter p ;
+  CheckItem.on_person_update base filter p ;
+  Array.iter begin fun ifam ->
+    CheckItem.check_siblings ~onchange:false base filter (ifam, foi base ifam) ignore
+  end (get_family p) ;
+  !w

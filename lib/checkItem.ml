@@ -875,7 +875,6 @@ let on_person_update base warning p =
     end (get_children fam)
   end (get_family p)
 
-
 (* ************************************************************************* *)
 (*  [Fonc] check_other_fields :
       base -> (Def.misc -> unit) -> ifam -> family -> unit                   *)

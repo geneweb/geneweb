@@ -665,20 +665,9 @@ let print_base_warnings conf base =
   print_result conf data
 
 let person_warnings conf base p =
-  let warnings = Hashtbl.create 0 in
-  let add w =
-    if not (Hashtbl.mem warnings w) && Util.auth_warning conf base w
-    then Hashtbl.add warnings w true
-  in
-  ignore @@ CheckItem.person base add p ;
-  CheckItem.on_person_update base add p ;
-  Array.iter begin fun ifam ->
-    CheckItem.check_siblings ~onchange:false base add (ifam, foi base ifam) ignore
-  end (get_family p) ;
-  Hashtbl.fold begin fun x _ acc ->
+  List.fold_left begin fun acc x ->
     Api_warnings.add_warning_to_piqi_warning_list conf base acc x
-  end warnings Api_warnings.empty
-
+  end Api_warnings.empty (Util.person_warnings conf base p)
 
 let print_person_warnings conf base =
   let ref_person = Piqi_util.get_params conf Api_piqi_ext.parse_reference_person in

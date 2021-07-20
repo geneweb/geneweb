@@ -425,3 +425,10 @@ val sprintf_today : Config.config -> string
 (** [auth_warning conf base w]
     Check if current user has enough right in order to see [w] *)
 val auth_warning : config -> base -> ('a, person, ifam, 'b, 'c, 'd, 'e) warning -> bool
+
+(** [person_warnings conf base p]
+    Shorthand for [CheckItem.person] and [CheckItem.on_person_update] on [p]
+    and [CheckItem.check_siblings] on they children
+    using [auth_warning] for filtering.
+*)
+val person_warnings : config -> base -> person -> CheckItem.base_warning list
