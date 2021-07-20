@@ -389,7 +389,6 @@ let f syslog addr_opt port tmout max_clients g =
       Unix.setsockopt s Unix.SO_REUSEADDR true;
       Unix.bind s (Unix.ADDR_INET (addr, port));
       Unix.listen s 4;
-      if Sys.unix then (let _ = Unix.nice 1 in ());
       let tm = Unix.localtime (Unix.time ()) in
       eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
         (1900 + tm.Unix.tm_year)
