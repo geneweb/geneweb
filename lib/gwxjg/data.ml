@@ -854,14 +854,16 @@ and mk_warning conf base =
     Tset [ Tstr "ParentBornAfterChild"
          ; unsafe_mk_person conf base p1
          ; unsafe_mk_person conf base p2 ]
-  | ParentTooOld (p, a) ->
+  | ParentTooOld (p, a, c) ->
     Tset [ Tstr "ParentTooOld"
          ; unsafe_mk_person conf base p
-         ; mk_date (Dgreg (a, Dgregorian) ) ]
-  | ParentTooYoung (p, a) ->
+         ; mk_date (Dgreg (a, Dgregorian) )
+         ; unsafe_mk_person conf base c ]
+  | ParentTooYoung (p, a, c) ->
     Tset [ Tstr "ParentTooYoung"
          ; unsafe_mk_person conf base p
-         ; mk_date (Dgreg (a, Dgregorian) ) ]
+         ; mk_date (Dgreg (a, Dgregorian) )
+         ; unsafe_mk_person conf base c ]
   | PEventOrder (p, e1, e2) ->
     Tset [ Tstr "PEventOrder"
          ; unsafe_mk_person conf base p

@@ -3202,8 +3202,8 @@ let auth_warning conf base w =
   | MarriageDateBeforeBirth p -> pauth p
   | MotherDeadBeforeChildBirth (mother, child) -> pauth mother && pauth child
   | ParentBornAfterChild (parent, child) -> pauth parent && pauth child
-  | ParentTooOld (p, _) -> pauth p
-  | ParentTooYoung (p, _) -> pauth p
+  | ParentTooOld (p, _, c) -> pauth p && pauth c
+  | ParentTooYoung (p, _, c) -> pauth p && pauth c
   | PossibleDuplicateFam (f1, f2) -> fauth f1 && fauth f2
   | PEventOrder (p, _, _) -> pauth p
   | PWitnessEventAfterDeath (p, _) -> pauth p

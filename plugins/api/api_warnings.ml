@@ -158,17 +158,19 @@ let add_warning_to_piqi_warning_list conf base =
                    parent = p2wp base p
                  ; child = p2wp base c
                  } :: w.warning_parent_born_after_child }
-    | ParentTooOld (p, dmy) ->
+    | ParentTooOld (p, dmy, c) ->
       { w with warning_parent_too_old =
                  M.Warning_parent_too_old.{
                    parent = p2wp base p
                  ; date = string_of_prec_dmy dmy
+                 ; child = p2wp base c
                  } :: w.warning_parent_too_old }
-    | ParentTooYoung (p, dmy) ->
+    | ParentTooYoung (p, dmy, c) ->
       { w with warning_parent_too_young =
                  M.Warning_parent_too_young.{
                    parent = p2wp base p
                  ; date = string_of_prec_dmy dmy
+                 ; child = p2wp base c
                  } :: w.warning_parent_too_young }
     | PossibleDuplicateFam (f1, f2) ->
       { w with warning_possible_duplicate_fam =

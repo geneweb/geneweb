@@ -465,6 +465,7 @@ message WarningParentBornAfterChild {
 message WarningParentTooYoung {
   required WarningPerson parent = 1;
   required string date = 2;
+  required WarningPerson child = 3;
 }
 
 message WarningPossibleDuplicateFam {
@@ -493,6 +494,7 @@ message WarningOldForMarriage {
 message WarningParentTooOld {
   required WarningPerson parent = 1;
   required string date = 2;
+  required WarningPerson child = 3;
 }
 
 message WarningCloseChildren {

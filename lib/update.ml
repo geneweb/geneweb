@@ -576,11 +576,11 @@ let print_warning conf base =
       Output.printf conf "%s\n%s\n%s" (print_someone_strong conf base p)
         (transl conf "is born after his/her child")
         (print_someone_strong conf base c)
-  | ParentTooYoung (p, a) ->
+  | ParentTooYoung (p, a, _) ->
       Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
         (transl conf "is a very young parent");
       Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)
-  | ParentTooOld (p, a) ->
+  | ParentTooOld (p, a, _) ->
       Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
         (transl conf "is a very old parent");
       Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)

@@ -184,9 +184,9 @@ let print_base_warning oc base =
   | ParentBornAfterChild (parent, child) ->
       Printf.fprintf oc "%s born after his/her child %s\n" (designation base parent)
         (designation base child)
-  | ParentTooOld (p, a) ->
+  | ParentTooOld (p, a, _) ->
       Printf.fprintf oc "%s was parent at age of %d\n" (designation base p) a.year
-  | ParentTooYoung (p, a) ->
+  | ParentTooYoung (p, a, _) ->
       Printf.fprintf oc "%s was parent at age of %d\n" (designation base p) a.year
   | PossibleDuplicateFam (f1, f2) ->
     Printf.fprintf oc "possible duplicate families: %s and %s\n"

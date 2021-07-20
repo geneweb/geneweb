@@ -779,7 +779,7 @@ let compute_warnings conf base resp =
                   (print_someone c)
                 in
                 w :: wl
-            | ParentTooYoung (p, a) ->
+            | ParentTooYoung (p, a, _) ->
                 let w =
                 Printf.sprintf "%s\n%s\n" (print_someone_dates p)
                   (transl conf "is a very young parent") ^
@@ -795,7 +795,7 @@ let compute_warnings conf base resp =
                   (print_someone @@ poi base @@ get_mother f)
               in
               w :: wl
-            | ParentTooOld (p, a) ->
+            | ParentTooOld (p, a, _) ->
                 let w =
                 Printf.sprintf "%s\n%s\n" (print_someone p)
                   (transl conf "is a very old parent") ^

@@ -475,16 +475,16 @@ let child_born_after_his_parent warning x parent =
         if strictly_after_dmy g1 g2 then warning (ParentBornAfterChild (parent, x))
         else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun a ->
           if strictly_younger a min_parent_age
-          then warning (ParentTooYoung (parent, a))
+          then warning (ParentTooYoung (parent, a, x))
           else if (get_sex parent = Female && strictly_older a max_mother_age)
                || (get_sex parent = Male && strictly_older a max_father_age)
-          then warning (ParentTooOld (parent, a))
+          then warning (ParentTooOld (parent, a, x))
       | _ -> match Date.date_of_death (get_death x) with
         | Some (Dgreg (g2, _)) ->
           if strictly_after_dmy g1 g2 then warning (ParentBornAfterChild (parent, x))
           else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun a ->
             if strictly_younger a min_parent_age
-            then warning (ParentTooYoung (parent, a))
+            then warning (ParentTooYoung (parent, a, x))
         | _ -> ()
     end
   | _ -> ()

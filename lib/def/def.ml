@@ -277,8 +277,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | MarriageDateBeforeBirth of 'person
   | MotherDeadBeforeChildBirth of 'person * 'person
   | ParentBornAfterChild of 'person * 'person
-  | ParentTooOld of 'person * dmy
-  | ParentTooYoung of 'person * dmy
+  | ParentTooOld of 'person * dmy * 'person
+  | ParentTooYoung of 'person * dmy * 'person
   | PEventOrder of 'person * 'pevent * 'pevent
   | PossibleDuplicateFam of 'family * 'family
   | PWitnessEventAfterDeath of 'person * 'pevent
