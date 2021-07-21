@@ -607,8 +607,8 @@ let treat_request =
           w_wizard @@ w_base @@ w_lock @@ MergeFamOk.print_mod_merge
         | "MRG_IND" ->
           w_wizard @@ w_base @@ w_lock @@ MergeIndDisplay.print
-        | "MRG_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeIndOkDisplay.print_merge
+        | "MRG_IND_OK" -> (* despite the _OK suffix, this one does not actually update databse *)
+          w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
         | "MRG_MOD_IND_OK" ->
           w_wizard @@ w_base @@ w_lock @@ MergeIndOkDisplay.print_mod_merge
         | "N" ->
