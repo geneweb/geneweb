@@ -614,11 +614,11 @@ type dico = string array
 
 let dico_fname assets lang k =
   let fname = match k with
-    | `town -> "town." ^ lang ^ ".bin~"
-    | `area_code -> "area_code." ^ lang ^ ".bin~"
-    | `county -> "county." ^ lang ^ ".bin~"
-    | `region -> "place_region." ^ lang ^ ".bin~"
-    | `country -> "place_country." ^ lang ^ ".bin~"
+    | `town -> "dico.town." ^ lang ^ ".bin~"
+    | `area_code -> "dico.area_code." ^ lang ^ ".bin~"
+    | `county -> "dico.county." ^ lang ^ ".bin~"
+    | `region -> "dico.region." ^ lang ^ ".bin~"
+    | `country -> "dico.country." ^ lang ^ ".bin~"
     | _ -> assert false
   in
   Filename.concat assets fname
