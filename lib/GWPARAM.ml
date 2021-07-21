@@ -39,6 +39,8 @@ let output_error =
       | Unauthorized -> "401"
       | Forbidden -> "403"
       | Not_Found -> "404"
+      | Internal_Server_Error -> "500"
+      | Service_Unavailable -> "503"
       | _ -> raise Not_found
     in
     let fname lang =

@@ -63,6 +63,8 @@ let http status =
       | Def.Unauthorized -> "401 Unauthorized"
       | Def.Forbidden -> "403 Forbidden"
       | Def.Not_Found -> "404 Not Found"
+      | Def.Internal_Server_Error -> "500 Internal Server Error"
+      | Def.Service_Unavailable -> "503 Service Unavailable"
     in
     if !cgi
     then (output_string !wserver_oc "Status: " ; output_string !wserver_oc answer)
