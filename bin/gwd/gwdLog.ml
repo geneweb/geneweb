@@ -1,4 +1,5 @@
 let verbosity = ref 7
+let debug = ref false
 
 let oc : out_channel option ref = ref None
 
@@ -20,11 +21,7 @@ type level =
 
 #ifdef SYSLOG
 let syslog (level : level) msg =
-#ifdef DEBUG
-    let flags = [`LOG_PERROR] in
-#else
-    let flags = [] in
-#endif
+  let flags = if !debug then [`LOG_PERROR] else [] in
   if !verbosity
      >=
      match level with
@@ -40,9 +37,7 @@ let syslog (level : level) msg =
     let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
     Syslog.syslog log level msg ;
     Syslog.closelog log ;
-#ifdef DEBUG
-    Printexc.print_backtrace stderr ;
-#endif
+    if !debug then Printexc.print_backtrace stderr ;
   end
 #endif
 
@@ -80,8 +75,6 @@ let syslog (level : level) msg =
         close_out oc
       | None -> print stderr
     end ;
-#ifdef DEBUG
-    Printexc.print_backtrace stderr ;
-#endif
+    if !debug then Printexc.print_backtrace stderr ;
   end
 #endif

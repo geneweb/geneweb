@@ -42,7 +42,7 @@ type config =
     supervisor : bool;
     wizard : bool;
     is_printed_by_template : bool;
-    trace_templ : bool;
+    debug : bool;
     friend : bool;
     just_friend_wizard : bool;
     user : string;
@@ -112,7 +112,7 @@ let empty =
   ; api_mode = false
 #endif
   ; is_printed_by_template = false
-  ; trace_templ = false
+  ; debug = false
   ; friend = false
   ; just_friend_wizard = false
   ; user = ""
