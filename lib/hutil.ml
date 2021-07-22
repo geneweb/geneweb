@@ -117,20 +117,35 @@ let gen_trailer with_logo conf =
 
 let trailer = gen_trailer true
 
+let prerr_aux ?(code = Def.Bad_Request) conf fn =
+  let buffer_body = Buffer.create 1023 in
+  let buffer_headers = ref [] in
+  let body s = Buffer.add_string buffer_body s in
+  let header s = buffer_headers := s :: !buffer_headers in
+  let status = ignore in
+  let flush = ignore in
+  let conf' = { conf with output_conf = { status ; header ; body ; flush } } in
+  let () = fn conf' in
+  !GWPARAM.output_error
+    ~headers:(List.rev !buffer_headers)
+    ~content:(Buffer.contents buffer_body)
+    conf code
+
 let incorrect_request conf =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (Util.transl conf "incorrect request"))
-  in
-  Output.status conf Def.Bad_Request;
-  header conf title;
-  Output.print_string conf "<p>\n";
-  print_link_to_welcome conf false;
-  Output.print_string conf "</p>\n";
-  trailer conf
+  prerr_aux conf @@ fun conf' ->
+  header conf' begin fun _ ->
+    Util.transl conf "incorrect request"
+    |> Utf8.capitalize_fst
+    |> Output.print_string conf
+  end ;
+  Output.print_string conf' "<p>\n" ;
+  print_link_to_welcome conf' false ;
+  Output.print_string conf' "</p>\n" ;
+  trailer conf'
 
 let error_cannot_access conf fname =
-  let title _ = Output.print_string conf "Error" in
-  header conf title;
+  prerr_aux conf @@ fun conf' ->
+  header conf' (fun _ -> Output.print_string conf "Error") ;
   Output.print_string conf "<ul>\n";
   Output.print_string conf "<li>\n";
   Output.printf conf "Cannot access file \"%s.txt\".\n" fname;
