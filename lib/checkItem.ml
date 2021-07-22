@@ -71,22 +71,20 @@ type 'string event_name =
 *)
 let compare_event_name name1 name2 =
   match name1, name2 with
-    Psort Epers_Birth, _ -> -1
+  | Psort Epers_Birth, _ -> -1
   | _, Psort Epers_Birth -> 1
-  | Psort Epers_Baptism
-  , ( Psort Epers_Death
-    | Psort Epers_Funeral
-    | Psort Epers_Burial
-    | Psort Epers_Cremation ) ->
+  | Psort Epers_Baptism, Psort ( Epers_Death
+                               | Epers_Funeral
+                               | Epers_Burial
+                               | Epers_Cremation ) ->
     -1
-  | ( Psort Epers_Death
-    | Psort Epers_Funeral
-    | Psort Epers_Burial
-    | Psort Epers_Cremation )
-  , Psort Epers_Baptism ->
+  | Psort ( Epers_Death
+          | Epers_Funeral
+          | Epers_Burial
+          | Epers_Cremation ), Psort Epers_Baptism ->
     1
-  | Psort Epers_Burial, _ | Psort Epers_Cremation, _ -> 1
-  | _, Psort Epers_Burial | _, Psort Epers_Cremation -> -1
+  | Psort (Epers_Burial | Epers_Cremation), _ -> 1
+  | _, Psort (Epers_Burial | Epers_Cremation) -> -1
   | Psort Epers_Funeral, _ -> 1
   | _, Psort Epers_Funeral -> -1
   | Psort Epers_Death, _ -> 1
