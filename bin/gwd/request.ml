@@ -549,9 +549,7 @@ let treat_request =
     | None -> None
     | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
   in
-#ifdef DEBUG
-  Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) @@ fun () ->
-#endif
+  let process () =
   if conf.wizard
   || conf.friend
   || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
@@ -875,6 +873,9 @@ let treat_request =
         (Utf8.capitalize_fst (transl conf "reserved to friends or wizards"));
       Hutil.trailer conf
     end
+  in
+  if conf.debug then Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
+  else process ()
 
 let treat_request conf =
   try treat_request conf with Update.ModErr _ -> Output.flush conf

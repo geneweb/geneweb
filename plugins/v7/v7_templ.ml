@@ -393,7 +393,7 @@ let strip_newlines_after_variables =
 let included_files = ref []
 
 let begin_end_include conf fname al =
-  if conf.trace_templ then
+  if conf.debug then
     Atext ((0,0), "\n\n<!-- begin include " ^ fname ^ " -->\n")
     :: al
     @ [ Atext ((0,0), "<!-- end include " ^ fname ^ " -->\n") ]

@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 #ifdef DEBUG
-let () = Printexc.record_backtrace true
 let () = Sys.enable_runtime_warnings true
 #endif
 
@@ -45,7 +44,7 @@ let selected_addr = ref None
 let selected_port = ref 2317
 let setup_link = ref false
 let trace_failed_passwd = ref false
-let trace_templates = ref false
+let debug = ref false
 let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
@@ -1143,7 +1142,7 @@ let make_conf from_addr request script_name env =
      manitou = manitou;
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
-     trace_templ = !trace_templates;
+     debug = !debug;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name; auth_scheme = ar.ar_scheme;
@@ -1400,9 +1399,6 @@ let conf_and_connection =
         with
         | Exit -> ()
         | e ->
-#ifdef DEBUG
-          Printexc.print_backtrace stderr ;
-#endif
           GwdLog.syslog `LOG_CRIT (context conf contents ^ " " ^ Printexc.to_string e)
 
 let chop_extension name =
@@ -1867,7 +1863,7 @@ let main () =
     ; ("-login_tmout", Arg.Int (fun x -> login_timeout := x), "<SEC> Login timeout for entries with passwords in CGI mode (default " ^ string_of_int !login_timeout ^ "s).")
     ; ("-redirect", Arg.String (fun x -> redirected_addr := Some x), "<ADDR> Send a message to say that this service has been redirected to <ADDR>.")
     ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
-    ; ("-trace_templ", Arg.Set trace_templates, " Print the full path to template files as html comment ")
+    ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Print the full path to template files as html comment ")
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; ("-plugin", arg_plugin ~check:true, "<PLUGIN>.cmxs load a safe plugin." )
     ; ("-unsafe_plugin", arg_plugin ~check:false, "<PLUGIN>.cmxs DO NOT USE UNLESS YOU TRUST THE ORIGIN OF <PLUGIN>.")

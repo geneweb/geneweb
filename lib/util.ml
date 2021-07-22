@@ -1269,9 +1269,9 @@ let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 let include_template conf env fname failure =
   match open_etc_file fname with
   | Some (ic, fname) ->
-    if conf.trace_templ then Output.printf conf "\n<!-- begin include %s -->\n" fname;
+    if conf.debug then Output.printf conf "\n<!-- begin include %s -->\n" fname;
     copy_from_templ conf env ic;
-    if conf.trace_templ then Output.printf conf "<!-- end include %s -->\n" fname;
+    if conf.debug then Output.printf conf "<!-- end include %s -->\n" fname;
   | None -> failure ()
 
 let image_prefix conf = conf.image_prefix
