@@ -787,6 +787,10 @@ let list_rev_map_append f l1 l2 =
   in
   aux l2 l1
 
+let rec list_rev_iter f = function
+  | [] -> ()
+  | hd :: tl -> list_rev_iter f tl ; f hd
+
 (* POSIX lockf(3), and fcntl(2), releases its locks when the process
    that holds the locks closes ANY file descriptor that was open on that file.
 *)
