@@ -1863,7 +1863,7 @@ let main () =
     ; ("-login_tmout", Arg.Int (fun x -> login_timeout := x), "<SEC> Login timeout for entries with passwords in CGI mode (default " ^ string_of_int !login_timeout ^ "s).")
     ; ("-redirect", Arg.String (fun x -> redirected_addr := Some x), "<ADDR> Send a message to say that this service has been redirected to <ADDR>.")
     ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
-    ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Print various debug info on stdout/stderr")
+    ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; ("-plugin", arg_plugin ~check:true, "<PLUGIN>.cmxs load a safe plugin." )
     ; ("-unsafe_plugin", arg_plugin ~check:false, "<PLUGIN>.cmxs DO NOT USE UNLESS YOU TRUST THE ORIGIN OF <PLUGIN>.")
