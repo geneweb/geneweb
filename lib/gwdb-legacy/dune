@@ -4,6 +4,7 @@
   (implements geneweb.gwdb_driver)
   (libraries
     geneweb.def
+    geneweb.io
     geneweb.util
     re
     unix
