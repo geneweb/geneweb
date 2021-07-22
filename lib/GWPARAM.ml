@@ -41,9 +41,10 @@ module Default = struct
           | Unauthorized -> "401"
           | Forbidden -> "403"
           | Not_Found -> "404"
+          | Conflict -> "409"
           | Internal_Server_Error -> "500"
           | Service_Unavailable -> "503"
-          | _ -> raise Not_found
+          | OK | Moved_Temporarily -> assert false
         in
         let fname lang =
           (code ^ "-" ^ lang ^ ".html")
