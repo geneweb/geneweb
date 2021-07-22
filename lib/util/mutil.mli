@@ -121,6 +121,11 @@ val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
   *)
 val list_find_map : ('a -> 'b option) -> 'a list -> 'b option
 
+(** [list_rev_iter f l] gives the same result as [List.rev l |> List.iter fn],
+    but without creating intermediate list (not tail-recursive).
+  *)
+val list_rev_iter : ('a -> unit) -> 'a list -> unit
+
 (** [list_last list]
     Return the last element of the list.
     Raises [Failure] if the list is empty.
