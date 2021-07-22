@@ -16,8 +16,9 @@
             str
             stdlib-shims
             camlp5
-            geneweb.gwdb_driver
             geneweb.def
+            geneweb.gwdb_driver
+            geneweb.io
             geneweb.sosa.mli
             geneweb.util
             markup)

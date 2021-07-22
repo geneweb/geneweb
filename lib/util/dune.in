@@ -8,8 +8,6 @@
    stdlib-shims
    unidecode
    geneweb.def
-   geneweb.io
-   geneweb.gwdb_driver
    re
    unix
    uucp
