@@ -55,7 +55,6 @@ type config =
     default_lang : string;
     default_sosa_ref : iper * Gwdb.person option;
     multi_parents : bool;
-    can_send_image : bool;
     authorized_wizards_notes : bool;
     public_if_titles : bool;
     public_if_no_date : bool;
@@ -125,7 +124,6 @@ let empty =
   ; default_lang = ""
   ; default_sosa_ref = Gwdb.dummy_iper, None
   ; multi_parents = false
-  ; can_send_image = false
   ; authorized_wizards_notes = false
   ; public_if_titles = false
   ; public_if_no_date = false

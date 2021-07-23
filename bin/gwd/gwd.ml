@@ -1159,10 +1159,6 @@ let make_conf from_addr request script_name env =
        begin try List.assoc "multi_parents" base_env = "yes" with
          Not_found -> false
        end;
-     can_send_image =
-       begin try List.assoc "can_send_image" base_env <> "no" with
-         Not_found -> true
-       end;
      authorized_wizards_notes =
        begin try List.assoc "authorized_wizards_notes" base_env = "yes" with
          Not_found -> false
