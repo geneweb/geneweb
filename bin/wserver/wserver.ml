@@ -121,27 +121,6 @@ let get_request strm =
   in
   loop 0 strm
 
-let timeout tmout spid _ =
-  Unix.kill spid Sys.sigkill;
-  Unix.kill spid Sys.sigterm;
-  let pid = Unix.fork () in
-  if pid = 0 then
-    if Unix.fork () = 0 then
-      begin
-        http Def.OK;
-        output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
-        printnl ();
-        printnl ();
-        printf "<head><title>Time out</title></head>\n";
-        printf "<body><h1>Time out</h1>\n";
-        printf "Computation time > %d second(s)\n" tmout;
-        printf "</body>\n";
-        wflush ();
-        exit 0
-      end
-    else exit 0;
-  let _ = Unix.waitpid [] pid in (); exit 2
-
 let get_request_and_content strm =
   let request = get_request strm in
   let content =
@@ -159,18 +138,21 @@ let sockaddr_of_string s = Unix.ADDR_UNIX s
 
 let treat_connection tmout callback addr fd =
   printing_state := Nothing;
-  if Sys.unix then
-    if tmout > 0 then
-      begin let spid = Unix.fork () in
-        if spid > 0 then
-          begin
-            ignore @@ Sys.signal Sys.sigalrm (Sys.Signal_handle (timeout tmout spid)) ;
-            ignore @@ Unix.alarm tmout ;
-            ignore @@ Unix.waitpid [] spid ;
-            ignore @@ Sys.signal Sys.sigalrm Sys.Signal_default ;
-            exit 0
-          end
-      end;
+  if Sys.unix && tmout > 0 then begin
+    ignore @@ Sys.signal Sys.sigalrm @@ Sys.Signal_handle begin fun _ ->
+      http Def.OK;
+      output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
+      printnl ();
+      printnl ();
+      printf "<head><title>Time out</title></head>\n";
+      printf "<body><h1>Time out</h1>\n";
+      printf "Computation time > %d second(s)\n" tmout;
+      printf "</body>\n";
+      wflush ();
+      exit 0
+    end ;
+    ignore @@ Unix.alarm tmout ;
+  end ;
   let (request, script_name, contents) =
     let (request, contents) =
       let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
