@@ -19,7 +19,7 @@
     %%%SYSLOG_PKG%%%
   )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (modules gwdLog gwdPlugin request sendImage)
+  (modules gwdLog gwdPlugin request)
 )
 
 (executable

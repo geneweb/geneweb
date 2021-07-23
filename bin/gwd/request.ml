@@ -665,10 +665,6 @@ let treat_request =
           w_wizard @@ w_base @@ UpdateFam.print_del
         | "DEL_FAM_OK" ->
           w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_del
-        | "DEL_IMAGE" when conf.can_send_image ->
-          w_wizard @@ w_base @@ SendImage.print_del
-        | "DEL_IMAGE_OK" when conf.can_send_image ->
-          w_wizard @@ w_base @@ w_lock @@ SendImage.print_del_ok
         | "DEL_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_del
         | "DEL_IND_OK" ->
@@ -838,10 +834,6 @@ let treat_request =
           w_base @@ RelationDisplay.print_multi
         | "S" ->
           w_base @@ fun conf base -> SearchName.print conf base specify unknown
-        | "SND_IMAGE" when conf.can_send_image ->
-          w_wizard @@ w_base @@ SendImage.print
-        | "SND_IMAGE_OK" when conf.can_send_image ->
-          w_wizard @@ w_base @@ w_lock @@ SendImage.print_send_ok
         | "SRC" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print_source conf base f
