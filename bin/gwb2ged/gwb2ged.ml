@@ -1,4 +1,3 @@
-open Geneweb
 let with_indexes = ref false
 
 let speclist opts =

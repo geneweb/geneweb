@@ -1,7 +1,5 @@
 open Geneweb.Config
-open Geneweb.Gwdb
 open Geneweb.Util
-open Def
 open Geneweb.DescendDisplay
 
 module DescendDisplay = Geneweb.DescendDisplay

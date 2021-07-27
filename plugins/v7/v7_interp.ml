@@ -33,7 +33,7 @@ let gen_interp header conf fname ifun env ep =
 
 let templ
   : (?no_headers:bool -> string -> config -> base -> person -> unit) ref
-  = ref (fun ?no_headers _ _ _ _ -> assert false)
+  = ref (fun ?no_headers:_ _ _ _ _ -> assert false)
 
 let templ_with_menu
   : ( (bool -> unit) -> string -> config -> base -> person -> unit) ref

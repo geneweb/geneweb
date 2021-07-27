@@ -1114,7 +1114,7 @@ let update_pevents_with_person p =
   in
   {p with pevents = pevents}
 
-let convert_persons gen per_index_ic per_ic persons =
+let convert_persons per_index_ic per_ic persons =
   Array.mapi begin fun i mp ->
     let p =
       let c =
@@ -1182,7 +1182,7 @@ let empty_base : cbase =
                ; norigin_file = ""
                ; efiles = fun _ -> [] } }
 
-let make_base bname gen per_index_ic per_ic fam_index_ic fam_ic bdir =
+let make_base bname gen per_index_ic per_ic =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
@@ -1191,7 +1191,7 @@ let make_base bname gen per_index_ic per_ic fam_index_ic fam_ic bdir =
   let persons =
     let a = Array.sub gen.g_base.c_persons 0 gen.g_pcnt in
     gen.g_base.c_persons <- [| |];
-    convert_persons gen per_index_ic per_ic a
+    convert_persons per_index_ic per_ic a
   in
   let ascends =
     let a = Array.sub gen.g_base.c_ascends 0 gen.g_pcnt in
@@ -1280,8 +1280,6 @@ let link next_family_fun bdir =
   in
   let per_index_ic = open_in_bin tmp_per_index in
   let per_ic = open_in_bin tmp_per in
-  let fam_index_ic = open_in_bin tmp_fam_index in
-  let fam_ic = open_in_bin tmp_fam in
   let istr_empty = unique_string gen "" in
   let istr_quest = unique_string gen "?" in
   assert (istr_empty = 0);
@@ -1306,7 +1304,7 @@ let link next_family_fun bdir =
   Hashtbl.clear gen.g_names;
   Hashtbl.clear fi.f_local_names;
   Gc.compact ();
-  let base = make_base bdir gen per_index_ic per_ic fam_index_ic fam_ic bdir in
+  let base = make_base bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
   if !do_check && gen.g_pcnt > 0 then begin
     Check.check_base

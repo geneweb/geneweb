@@ -695,7 +695,7 @@ let tree_generation_list conf base gv p =
       (fun po list ->
          match po with
            Empty -> Empty :: list
-         | Cell (p, _, _, _, _, base_prefix) ->
+         | Cell (p, _, _, _, _, _) ->
              match get_parents p with
                Some ifam ->
                  let cpl = foi base ifam in
@@ -4320,9 +4320,9 @@ let print_foreach conf base print_ast eval_expr =
          let env = ("cell", Vcell cell) :: ("first", Vbool first) :: env in
          List.iter (print_ast env ep) al)
       celll
-  and print_foreach_child env al ep =
+  and print_foreach_child env al _ep =
     function
-      Vfam (ifam, fam, (ifath, imoth, isp), _) ->
+      Vfam (_ifam, fam, (_ifath, _imoth, _isp), _) ->
         begin match get_env "f_link" env with
           Vbool _ -> ()
         | _ ->

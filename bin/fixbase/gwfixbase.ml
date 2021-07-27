@@ -1,5 +1,4 @@
 open Geneweb
-open Def
 open Gwdb
 
 let aux txt (fn : ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> base -> unit) =

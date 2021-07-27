@@ -532,11 +532,11 @@ let rec copy_from_stream conf print strm =
           let c = Stream.next strm in
           begin match c with
           | '(' ->
-                let rec loop more =
+                let rec loop () =
                   let _s = parse_upto '%' strm in
                   let c = Stream.next strm in
-                  if c = ')' then () else loop true
-                in loop true
+                  if c = ')' then () else loop ()
+                in loop ()
           | 'b' -> for_all conf print (all_db ".") strm
           | 'e' ->
               print "lang=";

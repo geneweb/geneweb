@@ -148,14 +148,6 @@ let nobility_titles_list conf base p =
        | _ -> (t_nth, t_name, t_ident, [t_place], t_dates) :: l)
     titles []
 
-let print_base_loop conf base p =
-  Output.printf conf
-    (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
-    (Util.update_family_loop conf base p (Gutil.designation base p));
-  Output.print_string conf ".\n";
-  Hutil.trailer conf;
-  exit 2
-
 (* Optimisation de find_sosa_aux :                                           *)
 (* - ajout d'un cache pour conserver les descendants du sosa que l'on calcul *)
 (* - on sauvegarde la dernière génération où l'on a arrêté le calcul pour    *)

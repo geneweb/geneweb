@@ -2,7 +2,6 @@
 
 open Geneweb
 open Config
-open Gwdb
 open Plugin_api_lib
 
 module GWD = Gwd_lib

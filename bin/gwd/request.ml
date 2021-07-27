@@ -181,7 +181,7 @@ let person_selected_with_redirect conf base p =
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
-let very_unknown conf base =
+let very_unknown conf _ =
   match p_getenv conf.env "n", p_getenv conf.env "p" with
   | Some sname, Some fname ->
     let title _ =
@@ -364,15 +364,6 @@ let w_person ~none fn conf base =
   match find_person_in_env conf base "" with
   | Some p -> fn conf base p
   | _ -> none conf base
-
-let output_file conf fn =
-  let ic = open_in fn in
-  try
-    in_channel_length ic
-    |> really_input_string ic
-    |> Output.print_string conf ;
-    close_in ic
-  with _ -> try close_in ic with _ -> ()
 
 let output_error ?headers ?content conf code =
   !GWPARAM.output_error ?headers ?content conf code
