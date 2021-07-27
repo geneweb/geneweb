@@ -49,23 +49,6 @@ let env = empty
 
 let get_env x = match x with Some x -> x | None -> raise Not_found
 
-let mk_note conf base env note =
-  let s = sou base note in
-  let s = string_with_macros conf env s in
-  let lines = Wiki.html_of_tlsw conf s in
-  let wi =
-    { Wiki.wi_mode = "NOTES"
-    ; Wiki.wi_file_path = Notes.file_path conf base
-    ; Wiki.wi_person_exists = person_exists conf base
-    ; Wiki.wi_always_show_link = conf.wizard || conf.friend
-    }
-  in
-  Wiki.syntax_links conf wi (String.concat "\n" lines)
-
-let mk_person_note conf base p note =
-  let env = ['i', (fun () -> Util.default_image_name base p)] in
-  mk_note conf base env note
-
 let sex_of_index = function
   | 0 -> Male
   | 1 -> Female
@@ -73,34 +56,6 @@ let sex_of_index = function
   | _ -> raise (Invalid_argument "sex_of_index")
 
 module Person = struct
-
-  let access conf base p =
-    Util.acces conf base p
-
-  let birth_date p = Adef.od_of_cdate (get_birth p)
-
-  let birth_place conf base p =
-    Util.string_of_place conf @@ sou base (get_birth_place p)
-
-  let birth_note conf base p =
-    mk_person_note conf base p (get_birth_note p)
-
-  let baptism_date p = Adef.od_of_cdate (get_baptism p)
-
-  let baptism_place conf base p =
-    Util.string_of_place conf @@ sou base (get_baptism_place p)
-
-  let baptism_note conf base p =
-    mk_person_note conf base p (get_baptism_note p)
-
-  let burial p =
-    get_burial p
-
-  let burial_place conf base p =
-    Util.string_of_place conf @@ sou base (get_burial_place p)
-
-  let burial_note conf base p =
-    mk_person_note conf base p (get_burial_note p)
 
   let children base p = Gwdb.children_of_p base p
 
@@ -110,38 +65,59 @@ module Person = struct
     then Adef.float_of_fix c
     else 0.
 
-  let cremation_place conf base p =
-    Util.string_of_place conf @@ sou base (get_burial_place p)
-
   let dates conf base p =
     DateDisplay.short_dates_text conf base p
 
   let death p =
     get_death p
 
-  let death_place conf base p =
-    Util.string_of_place conf @@ sou base (get_death_place p)
-
-  let death_note conf base p =
-    mk_person_note conf base p (get_death_note p)
-
-  let digest base p =
-    Update.digest_person (UpdateInd.string_person_of base p)
-
   let events conf base p =
-    Perso.events_list conf base p
+    if authorized_age conf base p then begin
+      let pevents =
+        List.fold_right begin fun evt events ->
+          let name = Perso.Pevent evt.epers_name in
+          let date = evt.epers_date in
+          let place = evt.epers_place in
+          let note = evt.epers_note in
+          let src = evt.epers_src in
+          let wl = evt.epers_witnesses in
+          let x = name, date, place, note, src, wl, None in
+          x :: events
+        end (get_pevents p) []
+      in
+      let get_name = function
+        | (Perso.Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
+        | (Perso.Fevent n, _, _, _, _, _, _) -> CheckItem.Fsort n
+      in
+      let get_date (_, date, _, _, _, _, _) = date in
+      let fevents =
+        (* On conserve l'ordre des familles. *)
+        Array.fold_right begin fun ifam fevents ->
+          let fam = foi base ifam in
+          let isp = Gutil.spouse (get_iper p) fam in
+          let m_auth = authorized_age conf base (pget conf base isp) in
+          let fam_fevents =
+            if m_auth then
+              List.fold_right begin fun evt fam_fevents ->
+                let name = Perso.Fevent evt.efam_name in
+                let date = evt.efam_date in
+                let place = evt.efam_place in
+                let note = evt.efam_note in
+                let src = evt.efam_src in
+                let wl = evt.efam_witnesses in
+                let x = name, date, place, note, src, wl, Some isp in
+                x :: fam_fevents
+              end (get_fevents fam) []
+            else []
+          in
+          CheckItem.merge_events get_name get_date fam_fevents fevents
+        end (get_family p) []
+      in
+      CheckItem.merge_events get_name get_date pevents fevents
+    end else []
 
   let first_name base p =
     p_first_name base p
-
-  let first_name_aliases base p =
-    List.map (sou base) (get_first_names_aliases p)
-
-  let first_name_key base p =
-    Mutil.encode (Name.lower (p_first_name base p))
-
-  let first_name_key_val base p =
-    Name.lower (p_first_name base p)
 
   let history_file base p =
     let fn = sou base (get_first_name p) in
@@ -155,17 +131,6 @@ module Person = struct
     Util.accessible_by_key
       conf base p (p_first_name base p) (p_surname base p)
 
-  let is_birthday conf p =
-    match Adef.od_of_cdate (get_birth p) with
-    | Some (Dgreg (d, _)) ->
-      if d.prec = Sure && get_death p = NotDead then
-        d.day = conf.today.day && d.month = conf.today.month &&
-        d.year < conf.today.year ||
-        not (Date.leap_year conf.today.year) && d.day = 29 &&
-        d.month = 2 && conf.today.day = 1 && conf.today.month = 3
-      else false
-    | _ -> false
-
   let linked_page conf base p s =
     let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
@@ -176,19 +141,9 @@ module Person = struct
     in
     List.fold_left (Perso.linked_page_text conf base p s key) "" db
 
-  let notes conf base p =
-    if not conf.no_note then mk_person_note conf base p (get_notes p)
+  let note conf base p =
+    if not conf.no_note then sou base (get_notes p)
     else ""
-
-  let occ p =
-    get_occ p
-
-  let occupation conf base p =
-    mk_note conf base [] (get_occupation p)
-
-  let parents p = get_parents p
-
-  let rparents p = get_rparents p
 
   let related conf base p =
     List.sort
@@ -246,37 +201,11 @@ module Person = struct
       else Array.fold_left filter hs (get_family @@ poi base imoth)
     | None -> []
 
-  let public_name base p =
-    sou base (get_public_name p)
-
-  let qualifier base p =
-    match get_qualifiers p with
-    | nn :: _ -> sou base nn
-    | _ -> ""
-
-  let qualifiers base p =
-    List.map (sou base) (get_qualifiers p)
-
   let sex p =
     index_of_sex (get_sex p)
 
-  let psources base p =
-    sou base (get_psources p)
-
   let surname base p =
     p_surname base p
-
-  let surname_aliases base p =
-    List.map (sou base) (get_surnames_aliases p)
-
-  let surname_key base p =
-    Mutil.encode (Name.lower (p_surname base p))
-
-  let surname_key_val base p =
-    Name.lower (p_surname base p)
-
-  let titles p =
-    get_titles p
 
 end
 
@@ -288,39 +217,6 @@ module Family = struct
     match get_divorce fam with
     | Divorced d when auth -> Adef.od_of_cdate d
     | _ -> None
-
-  let father (_, _, (ifath, _, _), _) =
-    ifath
-
-  let ifam (ifam, _, _, _) =
-    string_of_ifam ifam
-
-  let marriage_date (_, fam, (_, _, _), auth) =
-    if auth then Adef.od_of_cdate (get_marriage fam)
-    else None
-
-  let marriage_place base (_, fam, _, _) =
-    sou base (get_marriage_place fam)
-
-  let marriage_note conf base (_, fam, _, auth) =
-    if auth then mk_note conf base [] (get_marriage_note fam)
-    else ""
-
-  let marriage_source base (_, fam, _, auth) =
-    if auth then sou base (get_marriage_src fam)
-    else ""
-
-  let mother (_, _, (_, imoth, _), _) =
-    imoth
-
-  let origin_file conf base (_, fam, _, _) =
-    if conf.wizard then sou base (get_origin_file fam)
-    else ""
-
-  let spouse_iper (_, _, (_, _, ip), _) = ip
-
-  let witnesses (_, fam, _, auth) =
-    if auth then get_witnesses fam else [||]
 
   let events (_, fam, (_, _, isp), auth) =
     if auth then
@@ -336,6 +232,44 @@ module Family = struct
            x :: fam_fevents)
         (get_fevents fam) []
     else []
+
+  let father (_, _, (ifath, _, _), _) = ifath
+
+  let ifam (ifam, _, _, _) = string_of_ifam ifam
+
+  let marriage_date (_, fam, (_, _, _), auth) =
+    if auth then Adef.od_of_cdate (get_marriage fam)
+    else None
+
+  let marriage_place (_, fam, _, _) =
+    get_marriage_place fam
+
+  let marriage_note (_, fam, _, auth) =
+    if auth then get_marriage_note fam
+    else Gwdb.empty_string
+
+  let marriage_source (_, fam, _, auth) =
+    if auth then get_marriage_src fam
+    else Gwdb.empty_string
+
+  let mother (_, _, (_, imoth, _), _) = imoth
+
+  let note conf base (_, fam, _, auth) =
+    if auth && not conf.no_note then sou base (get_comment fam)
+    else ""
+
+  let origin_file conf base (_, fam, _, _) =
+    if conf.wizard then sou base (get_origin_file fam)
+    else ""
+
+  let spouse_iper (_, _, (_, _, ip), _) = ip
+
+  let witnesses (_, fam, _, auth) =
+    if auth then get_witnesses fam else [||]
+
+  let sources base (_, fam, _, auth) =
+    if auth then sou base (get_fsources fam)
+    else ""
 
 end
 
@@ -417,8 +351,8 @@ module Event = struct
     | Fevent Efam_MarriageLicense -> "EFAM_MARRIAGE_LICENSE"
     | Fevent Efam_PACS -> "EFAM_PACS"
     | Fevent Efam_Residence -> "EFAM_RESIDENCE"
-    | Pevent Epers_Name _ -> ""
-    | Fevent Efam_Name _ -> ""
+    | Pevent Epers_Name _ -> "EPERS"
+    | Fevent Efam_Name _ -> "EFAM"
 
   let name conf base (n, _, _, _, _, _, _) =
     match n with
