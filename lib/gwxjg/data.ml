@@ -906,11 +906,11 @@ and mk_warning conf base =
   | WitnessDateBeforeBirth p ->
     Tset [ Tstr "WitnessDateBeforeBirth"
          ; unsafe_mk_person conf base p ]
-  | YoungForMarriage (p, a, c) ->
+  | YoungForMarriage (p, a, i) ->
     Tset [ Tstr "YoungForMarriage"
          ; unsafe_mk_person conf base p
          ; mk_date (Dgreg (a, Dgregorian) )
-         ; unsafe_mk_person conf base p ]
+         ; get_fam i ]
   | PossibleDuplicateFam (ifam1, ifam2) ->
     Tset [ Tstr "PossibleDuplicateFam"
          ; get_fam ifam1
