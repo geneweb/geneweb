@@ -84,7 +84,7 @@ let search_key_aux aux conf base an =
     else an, acc
   in
   let acc =
-    List.filter_map begin fun i ->
+    Util.filter_map begin fun i ->
       let p = Util.pget conf base i in
       if search_reject_p conf base p then None else Some p
     end acc
