@@ -152,6 +152,8 @@ let () =
       , aux @@ wiz @@ w_base @@ w_lock @@ Api_saisie_write.print_del_ind_ok)
     ; ( "API_LINK_TREE"
       , aux @@ w_base @@ Api_link.print_link_tree)
+    ; ( "API_NAME_FREQUENCY"
+      , aux @@ w_base @@ Api.name_frequency)
     ; ( "API_PERSON_WARNINGS"
       , aux @@ w_base @@ Api.print_person_warnings)
     ; ( "API_STATS"

@@ -629,6 +629,15 @@ let list_index x list =
     | hd :: tl -> if hd = x then i else loop (succ i) tl
   in loop 0 list
 
+let list_slice a b list =
+  let rec list_slice a b =  function
+  | [] -> []
+  | hd :: tl ->
+    if a <> 0 then list_slice (pred a) b tl
+    else if b <> 0 then hd :: list_slice 0 (pred b) tl
+    else []
+  in list_slice a (b - a) list
+
 let input_file_ic ic =
   let len = in_channel_length ic in
   if Sys.unix then

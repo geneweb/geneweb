@@ -762,4 +762,33 @@ module IperSort =
         else cmp*)
      end)
 
+let name_frequency conf base =
+  let params = get_params conf Mext.parse_name_frequency_params in
+  let opt d = function Some x -> Int32.to_int x | None -> d in
+  let from_ = opt 0 params.M.Name_frequency_params.from in
+  let to_ = opt max_int params.M.Name_frequency_params.to_ in
+  let sn = params.M.Name_frequency_params.type_ = `last_name in
+  let () = load_strings_array base in
+  let list, len = Alln.select_names conf base sn "" max_int in
+  let () = clear_strings_array base in
+  let list = match list with Specify _ -> assert false | Result list -> list in
+  let list =
+    List.sort begin fun (_, x1, c1) (_, x2, c2) ->
+      match compare c1 c2 with 0 -> Gutil.alphabetic_order x1 x2 | x -> x
+    end list
+  in
+  let list =
+    if from_ <> 0 || to_ <> max_int
+    then Mutil.list_slice from_ to_ list
+    else list
+  in
+  let list =
+    List.map begin fun (key, name, count) ->
+      M.Name_frequency_result.{ key ; count = Int32.of_int count ; name }
+    end list
+  in
+  M.Name_frequency_result_list.({ result = list ; total = Int32.of_int len })
+  |> Mext.gen_name_frequency_result_list
+  |> print_result conf
+
 #endif

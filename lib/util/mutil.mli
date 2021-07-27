@@ -132,6 +132,13 @@ val list_rev_iter : ('a -> unit) -> 'a list -> unit
   *)
 val list_last : 'a list -> 'a
 
+(** [list_slice from_ to_ list]
+    Extracts elements from [a]-nth (starts with zero, inclusive)
+    to [b]-nth (exclusive). If [list] is not long enough, result
+    will be shorter than requested, but the function will not fail.
+  *)
+val list_slice : int -> int -> 'a list -> 'a list
+
 (** [check_magic magic ic]
     Read (and consume) the [magic] string at the beggining of [ic]
     and return [true].
