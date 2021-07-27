@@ -117,7 +117,7 @@ let get_person_from_data conf base =
 let combine_by_ini ini list =
   let len = Utf8.length ini + 1 in
   Util.groupby
-    ~key:(fun (_, s) -> AllnDisplay.ini len @@ Place.without_suburb s)
+    ~key:(fun (_, s) -> Alln.ini len @@ Place.without_suburb s)
     ~value:(fun x -> x)
     list
 
