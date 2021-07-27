@@ -5,10 +5,6 @@ open Util
 let default_max_cnt = Alln.default_max_cnt
 
 (* tools *)
-let ini len k =
-  let ini_k = Utf8.sub ~pad:'_' k 0 len in
-  (* ini_k is "a fresh string": we can use unsafe. *)
-  Mutil.unsafe_tr ' ' '_' ini_k
 
 let particle_at_the_end base is_surnames s =
   if is_surnames then
@@ -19,22 +15,6 @@ let compare_particle_at_the_end base is_surnames a b =
   Gutil.alphabetic_order
     (particle_at_the_end base is_surnames a)
     (particle_at_the_end base is_surnames b)
-
-let groupby_ini len list =
-  list
-  |> Util.groupby
-    ~key:(fun (k, _, _) -> ini len k)
-    ~value:(fun (_, s, c) -> (s, c))
-  |> List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b)
-
-let groupby_count = function
-  | Alln.Specify _ -> assert false
-  | Alln.Result list ->
-    list
-    |> Util.groupby
-      ~key:(fun (_, _, c) -> c)
-      ~value:(fun (_, s, _) -> s)
-    |> List.sort (fun (a, _) (b, _) -> compare b a)
 
 (* print *)
 
@@ -219,7 +199,7 @@ let print_frequency_any conf base is_surnames list len =
 let print_frequency conf base is_surnames =
   let () = load_strings_array base in
   let (list, len) = Alln.select_names conf base is_surnames "" max_int in
-  let list = groupby_count list in
+  let list = Alln.groupby_count list in
   print_frequency_any conf base is_surnames list len
 
 let print_alphabetic conf base is_surnames =
@@ -251,7 +231,7 @@ let print_alphabetic conf base is_surnames =
       print_alphabetic_big conf base is_surnames ini keys len too_big
     | Alln.Result list ->
       if len >= 50 || ini = "" then
-        let list = groupby_ini (Utf8.length ini + 1) list in
+        let list = Alln.groupby_ini (Utf8.length ini + 1) list in
         print_alphabetic_all conf base is_surnames ini list len
       else print_alphabetic_small conf base is_surnames ini list len
   end
@@ -309,7 +289,7 @@ let print_short conf base is_surnames =
   match Alln.select_names conf base is_surnames ini max_int with
   | Alln.Specify _, _ -> Hutil.incorrect_request conf
   | Alln.Result list, len ->
-    let list = groupby_ini (Utf8.length ini + 1) list in
+    let list = Alln.groupby_ini (Utf8.length ini + 1) list in
     print_alphabetic_short conf base is_surnames ini list len
 
 (* main *)

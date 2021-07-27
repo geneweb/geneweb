@@ -133,3 +133,24 @@ let select_names conf base is_surnames ini limit =
         in Result acc, len
   in
   list, len
+
+let ini len k =
+  let ini_k = Utf8.sub ~pad:'_' k 0 len in
+  (* ini_k is "a fresh string": we can use unsafe. *)
+  Mutil.unsafe_tr ' ' '_' ini_k
+
+let groupby_ini len list =
+  list
+  |> Util.groupby
+    ~key:(fun (k, _, _) -> ini len k)
+    ~value:(fun (_, s, c) -> (s, c))
+  |> List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b)
+
+let groupby_count = function
+  | Specify _ -> assert false
+  | Result list ->
+    list
+    |> Util.groupby
+      ~key:(fun (_, _, c) -> c)
+      ~value:(fun (_, s, _) -> s)
+    |> List.sort (fun (a, _) (b, _) -> compare b a)
