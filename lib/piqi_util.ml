@@ -400,4 +400,9 @@ let fevent_name_of_piqi_fevent_name = function
   | `efam_pacs -> Efam_PACS
   | `efam_residence -> Efam_Residence
 
+let piqi_access_to_access = function
+  | `access_iftitles -> IfTitles
+  | `access_public -> Public
+  | `access_private -> Private
+
 #endif
