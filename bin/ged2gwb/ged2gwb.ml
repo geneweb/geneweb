@@ -53,6 +53,7 @@ let default_source = ref ""
 let relation_status = ref Married
 let no_picture = ref false
 let do_check = ref true
+let particles = ref Mutil.default_particles
 
 (* Reading input *)
 
@@ -889,7 +890,7 @@ let string_ini_eq s1 i s2 =
   loop i 0
 
 let particle s i =
-  List.exists (string_ini_eq s i) Mutil.default_particles
+  List.exists (string_ini_eq s i) !particles
 
 let look_like_a_number s =
   let rec loop i =
@@ -3193,6 +3194,7 @@ let finish_base (persons, families, strings, _) =
 (* Main *)
 
 let out_file = ref "a"
+
 let speclist =
   [ ( "-o", Arg.String (fun s -> out_file := s)
     , "<file> Output database (default: \"a\")." )
@@ -3279,7 +3281,10 @@ let speclist =
       end
     , "[ANSEL|ASCII|MSDOS] Force given charset decoding, \
        overriding the possible setting in GEDCOM" )
-  ]
+  ; ( "-particles"
+    , Arg.String (fun s -> particles := Mutil.input_particles s)
+    , "<FILE> Use the given file as list of particles" )
+  ] |> List.sort compare |> Arg.align
 
 let anonfun s =
   if !in_file = "" then in_file := s
@@ -3294,7 +3299,7 @@ let main () =
   Gc.compact ();
   let arrays = make_subarrays arrays in
   finish_base arrays ;
-  let base = Gwdb.make !out_file Mutil.default_particles arrays in
+  let base = Gwdb.make !out_file !particles arrays in
   warning_month_number_dates ();
   if !do_check then begin
     let base_error x =
