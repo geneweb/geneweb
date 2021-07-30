@@ -305,3 +305,8 @@ val search_file_opt : string list -> string -> string option
     Searches for a file in assets directories.
     i.e. directories previously registered with [Secure.add_assets] *)
 val search_asset_opt : string -> string option
+
+(** [eq_key (fn1, sn1, oc1) (fn2, sn2, oc2)]
+    Tests if two persons would have the same key
+*)
+val eq_key : (string * string * int) -> (string * string * int) -> bool
