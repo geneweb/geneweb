@@ -101,7 +101,7 @@ let speclist =
   ; "-nopicture", Arg.Set Gwcomp.no_picture, " Do not create associative pictures"
   ; "-o", Arg.Set_string out_file
     , "<file> Output database (default: a.gwb)"
-  ; "-part", Arg.Set_string Db1link.particules_file
+  ; "-particles", Arg.Set_string Db1link.particules_file
     , "<file> Particles file (default = predefined particles)"
   ; "-q", Arg.Clear Mutil.verbose, " Quiet"
   ; "-sep", Arg.Set separate, " Separate all persons in next file"
@@ -109,6 +109,7 @@ let speclist =
   ; "-stats", Arg.Set Db1link.pr_stats, " Print statistics"
   ; "-v", Arg.Set Mutil.verbose, " Verbose"
   ]
+  |> List.sort compare
   |> Arg.align
 
 let anonfun x =
