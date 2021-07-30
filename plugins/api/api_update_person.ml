@@ -410,7 +410,6 @@ let find_free_occ_nobase fn sn =
       occ
     end
 
-
 let reconstitute_person_nobase conf mod_p =
   let key_index = Gwdb.iper_of_string @@ Int32.to_string mod_p.Mwrite.Person.index in
   let first_name = no_html_tags (only_printable mod_p.Mwrite.Person.firstname) in
@@ -556,58 +555,9 @@ let reconstitute_person_nobase conf mod_p =
           match evt.Mwrite.Pevent.event_perso with
           | Some n -> Epers_Name (no_html_tags (only_printable n))
           | _ ->
-              match evt.Mwrite.Pevent.pevent_type with
-              | Some `epers_birth -> Epers_Birth
-              | Some `epers_baptism -> Epers_Baptism
-              | Some `epers_death -> Epers_Death
-              | Some `epers_burial -> Epers_Burial
-              | Some `epers_cremation -> Epers_Cremation
-              | Some `epers_accomplishment -> Epers_Accomplishment
-              | Some `epers_acquisition -> Epers_Acquisition
-              | Some `epers_adhesion -> Epers_Adhesion
-              | Some `epers_baptismlds -> Epers_BaptismLDS
-              | Some `epers_barmitzvah -> Epers_BarMitzvah
-              | Some `epers_batmitzvah -> Epers_BatMitzvah
-              | Some `epers_benediction -> Epers_Benediction
-              | Some `epers_changename -> Epers_ChangeName
-              | Some `epers_circumcision -> Epers_Circumcision
-              | Some `epers_confirmation -> Epers_Confirmation
-              | Some `epers_confirmationlds -> Epers_ConfirmationLDS
-              | Some `epers_decoration -> Epers_Decoration
-              | Some `epers_demobilisationmilitaire -> Epers_DemobilisationMilitaire
-              | Some `epers_diploma -> Epers_Diploma
-              | Some `epers_distinction -> Epers_Distinction
-              | Some `epers_dotation -> Epers_Dotation
-              | Some `epers_dotationlds -> Epers_DotationLDS
-              | Some `epers_education -> Epers_Education
-              | Some `epers_election -> Epers_Election
-              | Some `epers_emigration -> Epers_Emigration
-              | Some `epers_excommunication -> Epers_Excommunication
-              | Some `epers_familylinklds -> Epers_FamilyLinkLDS
-              | Some `epers_firstcommunion -> Epers_FirstCommunion
-              | Some `epers_funeral -> Epers_Funeral
-              | Some `epers_graduate -> Epers_Graduate
-              | Some `epers_hospitalisation -> Epers_Hospitalisation
-              | Some `epers_illness -> Epers_Illness
-              | Some `epers_immigration -> Epers_Immigration
-              | Some `epers_listepassenger -> Epers_ListePassenger
-              | Some `epers_militarydistinction -> Epers_MilitaryDistinction
-              | Some `epers_militarypromotion -> Epers_MilitaryPromotion
-              | Some `epers_militaryservice -> Epers_MilitaryService
-              | Some `epers_mobilisationmilitaire -> Epers_MobilisationMilitaire
-              | Some `epers_naturalisation -> Epers_Naturalisation
-              | Some `epers_occupation -> Epers_Occupation
-              | Some `epers_ordination -> Epers_Ordination
-              | Some `epers_property -> Epers_Property
-              | Some `epers_recensement -> Epers_Recensement
-              | Some `epers_residence -> Epers_Residence
-              | Some `epers_retired -> Epers_Retired
-              | Some `epers_scellentchildlds -> Epers_ScellentChildLDS
-              | Some `epers_scellentparentlds -> Epers_ScellentParentLDS
-              | Some `epers_scellentspouselds -> Epers_ScellentSpouseLDS
-              | Some `epers_ventebien -> Epers_VenteBien
-              | Some `epers_will -> Epers_Will
-              | _ -> Epers_Name ""
+            match evt.Mwrite.Pevent.pevent_type with
+            | Some x -> Piqi_util.pevent_name_of_piqi_pevent_name x
+            | _ -> Epers_Name ""
         in
         let date =
           match evt.Mwrite.Pevent.date with
