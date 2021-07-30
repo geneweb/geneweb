@@ -157,10 +157,6 @@ let error_conflict_person_link base (f, s, o, create, _, force_create) =
   | _ -> false
 
 let check_person_conflict base sp =
-  (* Vérification de la personne. *)
-  if nb_of_persons base = 0 then () (* FIXME: remove this ? *)
-  else
-    begin
       let op = poi base (sp.key_index) in
       let ofn = sou base (get_first_name op) in
       let osn = sou base (get_surname op) in
@@ -229,8 +225,7 @@ let check_person_conflict base sp =
                 in
                 raise (ModErrApiConflict conflict)
           end evt.epers_witnesses ;
-      end sp.pevents ;
-    end
+      end sp.pevents
 
 let check_family_conflict base sfam scpl sdes =
   (* Vérification des parents. *)
