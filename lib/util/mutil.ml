@@ -1033,3 +1033,7 @@ let search_file_opt directories fname =
 
 let search_asset_opt fname =
   search_file_opt (Secure.assets ()) fname
+
+let eq_key (fn1, sn1, oc1) (fn2, sn2, oc2) =
+  let s x = x |> nominative |> Name.lower in
+  s fn1 = s fn2 && s sn1 = s sn2 && oc1 = oc2
