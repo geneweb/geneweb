@@ -157,75 +157,75 @@ let error_conflict_person_link base (f, s, o, create, _, force_create) =
   | _ -> false
 
 let check_person_conflict base sp =
-      let op = poi base (sp.key_index) in
-      let ofn = sou base (get_first_name op) in
-      let osn = sou base (get_surname op) in
-      let oocc = get_occ op in
-      if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then begin
-        match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
-        | Some p' when p' <> sp.key_index ->
-          let conflict =
-            let form = Some `person_form1 in
-            let lastname = sp.surname in
-            let firstname = sp.first_name in
-            {
-              Mwrite.Create_conflict.form = form;
-              witness = false;
-              rparents = false;
-              event = false;
-              pos = None;
-              pos_witness = None;
-              lastname = lastname;
-              firstname = firstname;
-            }
-          in
-          raise (ModErrApiConflict conflict)
-        | _ -> ()
-      end ;
-      (* Vérification des rparents. *)
-      List.iteri begin fun i r ->
-        match (r.r_fath, r.r_moth) with
-        | (Some (f, s, o, create, var, force_create), None)
-        | (None, Some (f, s, o, create, var, force_create)) ->
+  let op = poi base (sp.key_index) in
+  let ofn = sou base (get_first_name op) in
+  let osn = sou base (get_surname op) in
+  let oocc = get_occ op in
+  if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then begin
+    match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
+    | Some p' when p' <> sp.key_index ->
+      let conflict =
+        let form = Some `person_form1 in
+        let lastname = sp.surname in
+        let firstname = sp.first_name in
+        {
+          Mwrite.Create_conflict.form = form;
+          witness = false;
+          rparents = false;
+          event = false;
+          pos = None;
+          pos_witness = None;
+          lastname = lastname;
+          firstname = firstname;
+        }
+      in
+      raise (ModErrApiConflict conflict)
+    | _ -> ()
+  end ;
+  (* Vérification des rparents. *)
+  List.iteri begin fun i r ->
+    match (r.r_fath, r.r_moth) with
+    | (Some (f, s, o, create, var, force_create), None)
+    | (None, Some (f, s, o, create, var, force_create)) ->
+      if error_conflict_person_link base (f, s, o, create, var, force_create) then
+        let form = Some `person_form1 in
+        let conflict =
+          {
+            Mwrite.Create_conflict.form = form;
+            witness = false;
+            rparents = true;
+            event = false;
+            pos = Some (Int32.of_int i);
+            pos_witness = None;
+            lastname = s;
+            firstname = f;
+          }
+        in
+        raise (ModErrApiConflict conflict)
+    | _ -> failwith __LOC__ (* Dans l'API, ne peut pas arriver *)
+  end sp.rparents ;
+  (* Vérification des pevents. *)
+  List.iteri begin
+    fun i evt ->
+      Array.iteri begin
+        fun j ((f, s, o, create, var, force_create), _) ->
           if error_conflict_person_link base (f, s, o, create, var, force_create) then
             let form = Some `person_form1 in
             let conflict =
               {
                 Mwrite.Create_conflict.form = form;
-                witness = false;
-                rparents = true;
-                event = false;
+                witness = true;
+                rparents = false;
+                event = true;
                 pos = Some (Int32.of_int i);
-                pos_witness = None;
+                pos_witness = Some (Int32.of_int j);
                 lastname = s;
                 firstname = f;
               }
             in
             raise (ModErrApiConflict conflict)
-        | _ -> failwith __LOC__ (* Dans l'API, ne peut pas arriver *)
-      end sp.rparents ;
-      (* Vérification des pevents. *)
-      List.iteri begin
-        fun i evt ->
-          Array.iteri begin
-            fun j ((f, s, o, create, var, force_create), _) ->
-              if error_conflict_person_link base (f, s, o, create, var, force_create) then
-                let form = Some `person_form1 in
-                let conflict =
-                  {
-                    Mwrite.Create_conflict.form = form;
-                    witness = true;
-                    rparents = false;
-                    event = true;
-                    pos = Some (Int32.of_int i);
-                    pos_witness = Some (Int32.of_int j);
-                    lastname = s;
-                    firstname = f;
-                  }
-                in
-                raise (ModErrApiConflict conflict)
-          end evt.epers_witnesses ;
-      end sp.pevents
+      end evt.epers_witnesses ;
+  end sp.pevents
 
 let check_family_conflict base sfam scpl sdes =
   (* Vérification des parents. *)
