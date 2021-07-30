@@ -83,15 +83,18 @@ let print_possible_continue_merging conf base =
       let ini2 = iper_of_string ini2 in
       let p1 = poi base ini1 in
       let p2 = poi base ini2 in
-      Output.printf conf {|<p><a href="%sm=MRG_IND&i=%s&i2=%s">%s</a>\n|}
+      Output.printf conf {|<p><a href="%sm=MRG_IND&i=%s&i2=%s">%s</a>|}
         (commd conf)
         (string_of_iper ini1)
         (string_of_iper ini2)
         (Utf8.capitalize_fst (transl conf "continue merging"));
+      Output.print_string conf " " ;
       print_someone conf base p1;
-      Output.printf conf "\n%s\n" (transl_nth conf "and" 0);
+      Output.print_string conf " " ;
+      Output.print_string conf (transl_nth conf "and" 0);
+      Output.print_string conf " " ;
       print_someone conf base p2;
-      Output.print_string conf "</p>\n"
+      Output.print_string conf "</p>"
   | _ ->
       match p_getenv conf.env "ip" with
         Some ip ->
