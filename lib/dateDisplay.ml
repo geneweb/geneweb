@@ -354,15 +354,17 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy) ?(sep = " ") conf =
         else s
       in
       begin match d.prec with
-        Sure -> s ^ sep ^ " (" ^ gregorian_precision conf d ^ ")"
-      | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
+        | Sure | About | Before | After | Maybe ->
+          s ^ " (" ^ gregorian_precision conf d ^ ")"
+        | OrYear _ | YearInt _ -> s
       end
   | Dgreg (d, Dhebrew) ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let s = string_of_on_hebrew_dmy conf d1 in
       begin match d.prec with
-        Sure -> s ^ sep ^ " (" ^ gregorian_precision conf d ^ ")"
-      | About | Before | After | Maybe | OrYear _ | YearInt _ -> s
+        | Sure | About | Before | After | Maybe ->
+          s ^ " (" ^ gregorian_precision conf d ^ ")"
+        | OrYear _ | YearInt _ -> s
       end
   | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")"
 
