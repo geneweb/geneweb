@@ -160,8 +160,8 @@ let reconstitute_person conf base mod_p : ('a, string * string * int * Update.cr
       mod_p.Mwrite.Person.notes
   in
   let pevents =
-    List.fold_right
-      (fun evt pevents ->
+    (* GeneWeb used to strip empty death event, but we need to do it after conflicts check. *)
+    List.map begin fun evt ->
         let name =
           match evt.Mwrite.Pevent.event_perso with
           | Some n -> Epers_Name (no_html_tags (only_printable n))
@@ -199,21 +199,11 @@ let reconstitute_person conf base mod_p : ('a, string * string * int * Update.cr
               | None -> accu)
             evt.Mwrite.Pevent.witnesses []
         in
-        (* strip evenement vide *)
-        if name = Epers_Death && date = None && place = "" &&
-           reason = "" && note = "" && src = "" &&
-           witnesses = [] && death = DontKnowIfDead
-        then pevents
-        else
-          let evt =
             { epers_name = name; epers_date = Adef.cdate_of_od date;
               epers_place = place; epers_reason = reason; epers_note = note;
               epers_src = src; epers_witnesses = Array.of_list witnesses }
-          in
-          evt :: pevents)
-      mod_p.Mwrite.Person.pevents []
+    end mod_p.Mwrite.Person.pevents
   in
-  (* Mise à jour des évènements principaux. *)
   let (bi, bp, de, bu, pevents) =
     UpdateIndOk.reconstitute_from_pevents pevents false
       (Adef.cdate_None, "", "", "")
@@ -254,23 +244,29 @@ let reconstitute_person conf base mod_p : ('a, string * string * int * Update.cr
   (* Normalement, il ne doit plus y avoir de lever *)
   (* de conflits par les autres modules : update,  *)
   (* updateIndOk et updateFamOk.                   *)
-  let _err = Api_update_util.check_person_conflict base p in
-  (* Maintenant qu'on a fini les conflit, on remet l'objet person *)
-  (* tel que pour GeneWeb, c'est à dire qu'on supprime l'option   *)
-  (* force_create.                                                *)
-  let pevents_gw =
-    List.map
-      (fun e ->
-        let w =
-          Array.map
-            (fun ((f, s, o, create, var, _), wk) ->
-              ((f, s, o, create, var), wk))
-            e.epers_witnesses
-        in
-        {(e) with epers_witnesses = w})
-      pevents
+  ignore @@ Api_update_util.check_person_conflict base p ;
+  (* Now, trim and format events *)
+  let pevents =
+    Util.filter_map begin function
+      | { epers_name = Epers_Death
+        ; epers_place = ""
+        ; epers_reason = ""
+        ; epers_note = ""
+        ; epers_src = ""
+        ; epers_witnesses = [||]
+        ; epers_date
+        }
+        when epers_date = Adef.cdate_None && death = DontKnowIfDead -> None
+      | e ->
+        Some { e
+               with epers_witnesses =
+                      Array.map begin fun ((f, s, o, create, var, _), wk) ->
+                        ((f, s, o, create, var), wk)
+                      end e.epers_witnesses
+             }
+    end p.pevents
   in
-  let rparents_gw =
+  let rparents =
     List.map
       (fun r ->
         let (fath, moth) =
@@ -284,7 +280,7 @@ let reconstitute_person conf base mod_p : ('a, string * string * int * Update.cr
         {(r) with r_fath = fath; r_moth = moth})
       rparents
   in
-  { p with rparents = rparents_gw; pevents = pevents_gw ; related = [] }
+  { p with rparents ; pevents ; related = [] }
 
 (**/**)
 
