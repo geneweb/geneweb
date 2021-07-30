@@ -319,6 +319,26 @@ and lazy_get_n_mk_person conf base i =
   let iper = Tstr (Gwdb.string_of_iper i) in
   Tpat (function "iper" -> iper | s -> unbox_pat (Lazy.force lp) s)
 
+and ppget conf base p =
+  let open Geneweb in
+  let open Config in
+  let open Def in
+  let open Gwdb in
+  if not (Util.authorized_age conf base p)
+  then
+    if conf.use_restrict
+    then get_iper p |> Gwdb.empty_person base |> unsafe_mk_person conf base
+    else if conf.hide_names || get_access p = Private
+    then
+      let lazy_p = lazy (unbox_pat @@ unsafe_mk_semi_public_person conf base p) in
+      Tpat begin function
+        | "first_name" | "surname" -> Tstr "x"
+        | "first_name_aliases" | "surname_aliases" -> Tlist []
+        | x -> (Lazy.force lazy_p) x
+      end
+    else unsafe_mk_semi_public_person conf base p
+  else unsafe_mk_person conf base p
+
 and pget conf base ip =
   let open Geneweb in
   let open Config in
@@ -326,22 +346,7 @@ and pget conf base ip =
   let open Gwdb in
   if ip = dummy_iper
   then unsafe_mk_person conf base (Gwdb.empty_person base ip)
-  else
-    let p = poi base ip in
-    if not (Util.authorized_age conf base p)
-    then
-      if conf.use_restrict
-      then unsafe_mk_person conf base (Gwdb.empty_person base ip)
-      else if conf.hide_names || get_access p = Private
-      then
-        let lazy_p = lazy (unbox_pat @@ unsafe_mk_semi_public_person conf base p) in
-        Tpat begin function
-          | "first_name" | "surname" -> Tstr "x"
-          | "first_name_aliases" | "surname_aliases" -> Tlist []
-          | x -> (Lazy.force lazy_p) x
-        end
-      else unsafe_mk_semi_public_person conf base p
-    else unsafe_mk_person conf base p
+  else ppget conf base (poi base ip)
 
 and get_n_mk_person conf base (i : Gwdb.iper) =
   try Hashtbl.find person_ht i
