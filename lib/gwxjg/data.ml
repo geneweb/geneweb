@@ -159,6 +159,21 @@ and dtext_eq =
   func_arg2_no_kw @@ fun d1 d2 ->
   Tbool ((Jg_runtime.jg_obj_lookup d1 "__str__") = (Jg_runtime.jg_obj_lookup d2 "__str__"))
 
+and mk_dmy { Def.day ; month ; year ; delta ; prec } =
+  let day = Tint day in
+  let month = Tint month in
+  let year = Tint year in
+  let delta = Tint delta in
+  let prec = to_prec prec in
+  Tpat begin function
+    | "day" -> day
+    | "month" -> month
+    | "year" -> year
+    | "delta" -> delta
+    | "prec" -> prec
+    | _ -> raise Not_found
+  end
+
 and mk_date = function
   | Def.Dtext s ->
     Tpat begin function
@@ -175,11 +190,11 @@ and mk_date = function
     let prec = to_prec d.Def.prec in
     let d2 = match d.Def.prec with
       | OrYear d2 | YearInt d2 ->
-        mk_date (Def.Dgreg ( { Def.day = d2.Def.day2
-                             ; month = d2.Def.month2
-                             ; year = d2.Def.year2
-                             ; prec = Def.Sure ; delta = 0 }
-                           , c) )
+        mk_dmy { Def.day = d2.Def.day2
+               ; month = d2.Def.month2
+               ; year = d2.Def.year2
+               ; prec = Def.Sure
+               ; delta = 0 }
       | _ -> Tnull
     in
     let calendar = match c with
@@ -694,21 +709,6 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     | "titles" -> titles
     | _ -> raise Not_found
   end
-
-and mk_dmy { Def.day ; month ; year ; delta ; prec } =
-  let day = Tint day in
-  let month = Tint month in
-  let year = Tint year in
-  let delta = Tint delta in
-  let prec = to_prec prec in
-  Tpat (function
-      | "day" -> day
-      | "month" -> month
-      | "year" -> year
-      | "delta" -> delta
-      | "prec" -> prec
-      | _ -> raise Not_found
-    )
 
 and mk_fevent ?spouse conf base e =
   mk_event conf base
