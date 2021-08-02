@@ -85,7 +85,7 @@ let reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p =
       (fun s -> only_printable_or_nl (Mutil.strip_all_trailing_spaces s))
       mod_p.Mwrite.Person.notes
   in
-  let pevents =
+  let original_pevents =
     (* GeneWeb used to strip empty death event, but we need to do it after conflicts check. *)
     List.map begin fun evt ->
       let name =
@@ -116,7 +116,9 @@ let reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p =
     end mod_p.Mwrite.Person.pevents
   in
   let (bi, bp, de, bu, pevents) =
-    UpdateIndOk.reconstitute_from_pevents pevents false
+    (* [reconstitute_from_pevents] sorts pevents.
+       We need to keep the original pevents list in case of error.  *)
+    UpdateIndOk.reconstitute_from_pevents original_pevents false
       (Adef.cdate_None, "", "", "")
       (Adef.cdate_None, "", "", "")
       (death, "", "", "")
@@ -135,23 +137,25 @@ let reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p =
       Update.infer_death_bb conf (Adef.od_of_cdate birth) (Adef.od_of_cdate baptism)
     | _ -> death
   in
-  { first_name ; surname ; occ ; sex ; access
-  ; image
-  ; first_names_aliases ; surnames_aliases
-  ; public_name ; qualifiers ; aliases
-  ; titles
-  ; rparents
-  ; occupation
-  ; related = []
-  ; birth ; birth_place ; birth_note ; birth_src
-  ; baptism ; baptism_place ; baptism_note ; baptism_src
-  ; death ; death_place ; death_note ; death_src
-  ; burial ; burial_place ; burial_note ; burial_src
-  ; notes
-  ; pevents
-  ; psources
-  ; key_index
-  }
+  ( original_pevents
+  , { first_name ; surname ; occ ; sex ; access
+    ; image
+    ; first_names_aliases ; surnames_aliases
+    ; public_name ; qualifiers ; aliases
+    ; titles
+    ; rparents
+    ; occupation
+    ; related = []
+    ; birth ; birth_place ; birth_note ; birth_src
+    ; baptism ; baptism_place ; baptism_note ; baptism_src
+    ; death ; death_place ; death_note ; death_src
+    ; burial ; burial_place ; burial_note ; burial_src
+    ; notes
+    ; pevents
+    ; psources
+    ; key_index
+    }
+  )
 
 let reconstitute_person conf base mod_p
   : ('a, string * string * int * Update.create * string, string) gen_person =
@@ -210,12 +214,8 @@ let reconstitute_person conf base mod_p
       | None -> accu
     end evt.Mwrite.Pevent.witnesses []
   in
-  let p = reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p in
-  (* On vérifie s'il y a des conflits de personne. *)
-  (* Normalement, il ne doit plus y avoir de lever *)
-  (* de conflits par les autres modules : update,  *)
-  (* updateIndOk et updateFamOk.                   *)
-  ignore @@ Api_update_util.check_person_conflict base p ;
+  let original_pevents, p = reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p in
+  ignore @@ Api_update_util.check_person_conflict base original_pevents p ;
   (* Now, trim and format events *)
   let pevents =
     Util.filter_map begin function
@@ -393,7 +393,7 @@ let reconstitute_person_nobase conf mod_p =
   in
   let fn_rparents _ = [] in
   let fn_pevt_witnesses _ = [] in
-  let p = reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p in
+  let _, p = reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p in
   { p with pevents = List.filter begin fun e ->
         e.epers_name <> Epers_Death
         || e.epers_place <> ""

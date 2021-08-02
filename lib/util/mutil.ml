@@ -623,6 +623,12 @@ let list_except x =
   in
   loop []
 
+let list_index x list =
+  let rec loop i = function
+    | [] -> raise Not_found
+    | hd :: tl -> if hd = x then i else loop (succ i) tl
+  in loop 0 list
+
 let input_file_ic ic =
   let len = in_channel_length ic in
   if Sys.unix then

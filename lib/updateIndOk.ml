@@ -438,13 +438,14 @@ let reconstitute_burial conf burial_place =
   | Some "Cremated" -> Cremated (Adef.cdate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x)
 
+let sort_pevents pevents =
+  CheckItem.sort_events
+    (fun evt -> CheckItem.Psort evt.epers_name) (fun evt -> evt.epers_date)
+    pevents
+
 let reconstitute_from_pevents pevents ext bi bp de bu =
   (* On tri les évènements pour être sûr. *)
-  let pevents =
-    CheckItem.sort_events
-      (fun evt -> CheckItem.Psort evt.epers_name) (fun evt -> evt.epers_date)
-      pevents
-  in
+  let pevents = sort_pevents pevents in
   let found_birth = ref false in
   let found_baptism = ref false in
   let found_death = ref false in

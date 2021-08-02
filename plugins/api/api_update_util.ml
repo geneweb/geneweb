@@ -115,7 +115,7 @@ let error_conflict_person_link base created (f, s, o, create, _, force_create) =
     else false, k :: created
   | Link -> false, created
 
-let check_person_conflict base sp =
+let check_person_conflict base original_pevents sp =
   let op = poi base (sp.key_index) in
   let ofn = sou base (get_first_name op) in
   let osn = sou base (get_surname op) in
@@ -167,17 +167,18 @@ let check_person_conflict base sp =
   in
   (* Vérification des pevents. *)
   ignore @@
-  List.fold_left begin fun (i, created) evt ->
+  List.fold_left begin fun created evt ->
     let _, created =
       Array.fold_left begin fun (j, created) ((f, s, o, create, var, force_create), _) ->
         match error_conflict_person_link base created (f, s, o, create, var, force_create) with
         | true, _ ->
+          let pos = Mutil.list_index evt original_pevents in
           let conflict =
             { Mwrite.Create_conflict.form = Some `person_form1
             ; witness = true
             ; rparents = false
             ; event = true
-            ; pos = Some (Int32.of_int i)
+            ; pos = Some (Int32.of_int pos)
             ; pos_witness = Some (Int32.of_int j)
             ; lastname = s
             ; firstname = f
@@ -186,8 +187,8 @@ let check_person_conflict base sp =
           raise (ModErrApiConflict conflict)
         | false, created -> (j + 1, created)
       end (0, created) evt.epers_witnesses
-    in (i + 1, created)
-  end (0, created) sp.pevents
+    in created
+  end created sp.pevents
 
 let check_family_conflict base sfam scpl sdes =
   let created = [] in
