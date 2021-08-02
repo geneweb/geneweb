@@ -177,6 +177,12 @@ val list_replace : 'a -> 'a -> 'a list -> 'a list
 (** [list_except old_v new_v list] *)
 val list_except : 'a -> 'a list -> 'a list
 
+(** [list_index element list]
+    Finds the index of [element] in list.
+    Raises [Not_found] if it does not exists.
+*)
+val list_index : 'a -> 'a list -> int
+
 (** [list_ref_append tl hd]
     Add [hd] at the beginning of [tl] ref.
  *)
