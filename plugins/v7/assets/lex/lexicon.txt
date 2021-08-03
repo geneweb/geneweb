@@ -1,75 +1,94 @@
     v7 fanchart
+co: arburu in banderetta
 en: fanchart
 fr: arbre en éventail
 
     v7 plugins
+co: moduli d’estensione
 en: plugins
 fr: plugins
 
     v7 all
+co: tutti
 en: all
 fr: tous
 
     v7 any place
+co: sottu-lochi
 en: sub-places
 fr: sous-lieux
 
     v7 any place title
+co: circà in a lista di i sottu-lochi
 en: search in the list of sub-places
 fr: rechercher dans la liste des sous-lieux
 
     v7 anywhere
+co: cuncurdanza senza custrizzione
 en: match anywhere
 fr: correspondance sans contrainte
 
     v7 approxim match
+co: cuncurdanza senza maiuscule nè alette
 en: match with no capitale nor accents
 fr: correspondance sans capitales ni accents
 
     v7 case sensitive
+co: maiuscule è alette
 en: case sensitive
 fr: capitales et accents
 
     v7 case sensitive title
+co: tene contu di e maiuscule è alette
 en: dont ignore case and accents
 fr: tenir compte des majuscules et accents
 
     v7 exact match
+co: cuncurdanza esatta (maiuscule/minuscule è alette)
 en: exact match (upper/lower and accents)
 fr: correspondance exacte (majuscules/minuscules et accents)
 
     v7 hide others
+co: piattà l’altri nomi
 en: hide other first mames
 fr: cacher les autres prénoms
 
     v7 matching
+co: cuncurdanza
 en: matching
 fr: correspondance
 
     v7 max nbr
+co: num mas rel
 en: max rel nbr
 fr: max rel nbr
 
     v7 max nbr title
+co: numeru massimu per e liste di rilazione
 en: max number for relation list
 fr: nombre maximum pour les listes de relations
 
     v7 refresh fnames cache
+co: ricustruisce l’impiatta di i nomi
 en: refresh fnames cache
 fr: reconstruire le cache des prénoms
 
     v7 show others
+co: affissà l’altri nomi
 en: show other first names
 fr: afficher les autres prénoms
 
     v7 word boundaries
+co: cuncurdanza di parolle sane
 en: match full words
 fr: correspondance de mots entiers
 
     v7 word match
+co: parolla sana
 en: word match
 fr: mot complet
 
     v7 word match title
+co: paragunà cù u nome sanu d’un locu
 en: match full location name
 fr: comparer avec le nom complet d'un lieu
