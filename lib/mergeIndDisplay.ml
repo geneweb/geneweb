@@ -94,14 +94,6 @@ let print_differences conf base branches p1 p2 =
          Male -> "M"
        | Female -> "F"
        | Neuter -> "");
-  (*
-      string_field False (transl conf "access") "access"
-        (fun p ->
-           match p.access with
-           [ IfTitles -> transl conf "if titles"
-           | Private -> "private"
-           | Public -> "public" ]);
-  *)
   string_field (transl conf "birth") "birth"
     (fun p ->
        match Adef.od_of_cdate (get_birth p) with
