@@ -57,8 +57,6 @@ let need_split = function
     -> true
   | "is born after his/her child"
   | "loop in database: %s is his/her own ancestor"
-  | "marriage of %t after his/her death"
-  | "marriage of %t before his/her birth"
   | "%t was witness after his/her death"
   | "%t was witness before his/her birth"
   | "%t's %s before his/her %s"

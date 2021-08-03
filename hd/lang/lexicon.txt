@@ -9063,68 +9063,6 @@ pt: notas de casamento
 sv: anteckningar om vigseln
 tr: evlilik notları/evlilik notları
 
-    marriage of %t after his/her death
-af: huwelik van %t na sy/haar afsterwe
-bg: брак на %t след неговата/нейната смърт
-br: eured %t goude e/he v/marv
-ca: casament de %t després de la seva mort
-co: matrimoniu di %t dopu a so morte
-cs: sňatek s %t po své smrti
-da: giftermål af %t efter hans/hendes død
-de: Heirat von %t nach seinem/ihrem Tod
-en: marriage of %t after his/her death
-eo: edz(in)iĝo de %t post sia morto
-es: casamiento de %t después de su muerte
-et: %t abiellus pärast oma surma
-fi: %t olisi naitu vainajana
-fr: mariage de %t après sa mort
-he:  נישואין של %t אחרי מותו/מותה
-is: giftist %t eftir andlát hans/hennar
-it: matrimonio di %t dopo la sua morte
-lv: %t kāzas pēc viņa(s) nāves
-nl: huwelijk van %t na zijn/haar dood
-no: ekteskap med %t etter ektefellens død
-oc: maridatge de %t après la mòrt
-pl: małżeństwo z %t po śmierci
-pt: casamento de %t depois da sua morte
-ro: casatoria %t este dupa deces
-ru: брак %t после его/ее смерти
-sk: svadba s t% po svojej smrti
-sl: %t se je poročil(a) po svoji smrti
-sv: äktenskap med %t före makens/makans död
-tr: evliliği, %t'in ölümünden sonra
-
-    marriage of %t before his/her birth
-af: huwelik van %t voor sy/haar geboorte
-bg: брак на %t преди неговото/нейното раждане
-br: eured %t a-raok e/he c'h/ganedigezh
-ca: casament de %t abans del seu naixement
-co: matrimoniu di %t nanzu a so nascita
-cs: sňatek s %t před svým narozením
-da: giftermål af %t før hans/hendes fødsel
-de: Heirat von %t vor seiner/ihrer Geburt
-en: marriage of %t before his/her birth
-eo: edz(in)iĝo de %t antaù sia naskiĝo
-es: casamiento de %t antes de su nacimiento
-et: %t abiellus enne oma sündi
-fi: %t olisi naitu ennen syntymää
-fr: mariage de %t avant sa naissance
-he:  נישואין של %t לפני הולדתו/הולדתה
-is: gistist %t fyrir fæðingu hans/hennar
-it: matrimonio di %t prima della sua nascita
-lv: %t kāzas pirms viņa(s) dzimšanas
-nl: huwelijk van %t voor zijn/haar geboorte
-no: ekteskap med %t før ektefellens fødsel
-oc: maridatge de %t abans la naissença
-pl: małżeństwo z %t przed narodzeniem
-pt: casamento de %t antes do seu nascimento
-ro: casatoria %t inaninte de nastere
-ru: брак %t перед его/ее рождением
-sk: sobáš s %t pred svojim narodením
-sl: %t se je poročil(a) pred svojim rojstvom
-sv: äktenskap med %t före makens/makans födelse
-tr: evliliği, % t'in doğumundan önce
-
     marriage place
 co: locu di l’unione
 de: Ort der Eheschließung
