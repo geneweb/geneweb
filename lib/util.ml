@@ -1991,8 +1991,8 @@ let limited_image_size max_wid max_hei fname size =
       Some (wid, hei)
   | None -> None
 
-let find_person_in_env conf base suff =
-  match p_getenv conf.env ("i" ^ suff) with
+let find_person_in_env_aux conf base env_i env_p env_n env_occ =
+  match p_getenv conf.env env_i with
   | Some i when i <> "" ->
     let i = Gwdb.iper_of_string i in
     if Gwdb.iper_exists base i
@@ -2001,27 +2001,25 @@ let find_person_in_env conf base suff =
       if is_hidden p then None else Some p
     else None
   | _ ->
-      match
-        p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff)
-      with
-        Some p, Some n ->
-          let occ =
-            match p_getint conf.env ("oc" ^ suff) with
-              Some oc -> oc
-            | None -> 0
-          in
-          begin match person_of_key base p n occ with
-            Some ip ->
-              let p = pget conf base ip in
-              if is_hidden p then None
-              else if
-                not (is_hide_names conf p) || authorized_age conf base p
-              then
-                Some p
-              else None
-          | None -> None
-          end
-      | _ -> None
+    match p_getenv conf.env env_p, p_getenv conf.env env_n with
+    | Some p, Some n ->
+      let occ = Opt.default 0 (p_getint conf.env env_occ) in
+      begin match person_of_key base p n occ with
+        | Some ip ->
+          let p = pget conf base ip in
+          if is_hidden p then None
+          else if not (is_hide_names conf p) || authorized_age conf base p
+          then Some p
+          else None
+        | None -> None
+      end
+    | _ -> None
+
+let find_person_in_env conf base suff =
+  find_person_in_env_aux conf base ("i" ^ suff) ("p" ^ suff) ("n" ^ suff) ("oc" ^ suff)
+
+let find_person_in_env_pref conf base pref =
+  find_person_in_env_aux conf base (pref ^ "i") (pref ^ "p") (pref ^ "n") (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
   match p_getenv conf.base_env "red_if_not_exist" with
