@@ -844,14 +844,16 @@ and mk_warning conf base =
          ; unsafe_mk_person conf base p
          ; mk_fevent conf base e1
          ; mk_fevent conf base e2 ]
-  | FWitnessEventAfterDeath (p, e) ->
+  | FWitnessEventAfterDeath (p, e, ifam) ->
     Tset [ Tstr "FWitnessEventAfterDeath"
          ; unsafe_mk_person conf base p
-         ; mk_fevent conf base e ]
-  | FWitnessEventBeforeBirth (p, e) ->
+         ; mk_fevent conf base e
+         ; get_fam ifam ]
+  | FWitnessEventBeforeBirth (p, e, ifam) ->
     Tset [ Tstr "FWitnessEventBeforeBirth"
          ; unsafe_mk_person conf base p
-         ; mk_fevent conf base e ]
+         ; mk_fevent conf base e
+         ; get_fam ifam ]
   | IncoherentAncestorDate (p1, p2) ->
     Tset [ Tstr "IncoherentAncestorDate"
          ; unsafe_mk_person conf base p1
@@ -890,26 +892,22 @@ and mk_warning conf base =
          ; unsafe_mk_person conf base p
          ; mk_pevent conf base e1
          ; mk_pevent conf base e2 ]
-  | PWitnessEventAfterDeath (p, e) ->
+  | PWitnessEventAfterDeath (p, e, origin) ->
     Tset [ Tstr "PWitnessEventAfterDeath"
          ; unsafe_mk_person conf base p
-         ; mk_pevent conf base e ]
-  | PWitnessEventBeforeBirth (p, e) ->
+         ; mk_pevent conf base e
+         ; unsafe_mk_person conf base origin ]
+  | PWitnessEventBeforeBirth (p, e, origin) ->
     Tset [ Tstr "PWitnessEventBeforeBirth"
          ; unsafe_mk_person conf base p
-         ; mk_pevent conf base e ]
+         ; mk_pevent conf base e
+         ; unsafe_mk_person conf base origin ]
   | TitleDatesError (p, t) ->
     Tset [ Tstr "PWitnessEventBeforeBirth"
          ; unsafe_mk_person conf base p
          ; mk_gen_title base t ]
   | UndefinedSex p ->
     Tset [ Tstr "UndefinedSex"
-         ; unsafe_mk_person conf base p ]
-  | WitnessDateAfterDeath p ->
-    Tset [ Tstr "WitnessDateAfterDeath"
-         ; unsafe_mk_person conf base p ]
-  | WitnessDateBeforeBirth p ->
-    Tset [ Tstr "WitnessDateBeforeBirth"
          ; unsafe_mk_person conf base p ]
   | YoungForMarriage (p, a, i) ->
     Tset [ Tstr "YoungForMarriage"

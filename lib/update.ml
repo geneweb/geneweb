@@ -526,14 +526,14 @@ let print_warning conf base =
         (fun _ -> print_someone_strong conf base p)
         (Util.string_of_fevent_name conf base e1.efam_name)
         (Util.string_of_fevent_name conf base e2.efam_name)
-  | FWitnessEventAfterDeath (p, e) ->
+  | FWitnessEventAfterDeath (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_fevent_name conf base e.efam_name)
-  | FWitnessEventBeforeBirth (p, e) ->
+  | FWitnessEventBeforeBirth (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ ->
@@ -595,14 +595,14 @@ let print_warning conf base =
         (fun _ -> print_someone_strong conf base p)
         (Util.string_of_pevent_name conf base e1.epers_name)
         (Util.string_of_pevent_name conf base e2.epers_name)
-  | PWitnessEventAfterDeath (p, e) ->
+  | PWitnessEventAfterDeath (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (DateDisplay.short_dates_text conf base p))
         (Util.string_of_pevent_name conf base e.epers_name)
-  | PWitnessEventBeforeBirth (p, e) ->
+  | PWitnessEventBeforeBirth (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ ->
@@ -627,18 +627,6 @@ let print_warning conf base =
   | UndefinedSex p ->
       Output.printf conf (fcapitale (ftransl conf "undefined sex for %t"))
         (fun _ -> print_someone_strong conf base p)
-  | WitnessDateAfterDeath p ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t was witness after his/her death"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
-  | WitnessDateBeforeBirth p ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t was witness before his/her birth"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
   | YoungForMarriage (p, a, _)
   | OldForMarriage (p, a, _) ->
       Output.printf conf "%s\n" (print_someone_strong conf base p);

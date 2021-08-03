@@ -719,7 +719,7 @@ let compute_warnings conf base resp =
                     (Util.string_of_fevent_name conf base e2.efam_name)
                 in
                 w :: wl
-            | FWitnessEventAfterDeath (p, e) ->
+            | FWitnessEventAfterDeath (p, e, _) ->
                 let w =
                   Printf.sprintf
                     (ftransl conf "%t witnessed the %s after his/her death")
@@ -727,7 +727,7 @@ let compute_warnings conf base resp =
                     (Util.string_of_fevent_name conf base e.efam_name)
                 in
                 w :: wl
-            | FWitnessEventBeforeBirth (p, e) ->
+            | FWitnessEventBeforeBirth (p, e, _) ->
                 let w =
                   Printf.sprintf
                     (ftransl conf "%t witnessed the %s before his/her birth")
@@ -811,7 +811,7 @@ let compute_warnings conf base resp =
                     (Util.string_of_pevent_name conf base e2.epers_name)
                 in
                 w :: wl
-            | PWitnessEventAfterDeath (p, e) ->
+            | PWitnessEventAfterDeath (p, e, _) ->
                 let w =
                   Printf.sprintf
                     (ftransl conf "%t witnessed the %s after his/her death")
@@ -819,7 +819,7 @@ let compute_warnings conf base resp =
                     (Util.string_of_pevent_name conf base e.epers_name)
                 in
                 w :: wl
-            | PWitnessEventBeforeBirth (p, e) ->
+            | PWitnessEventBeforeBirth (p, e, _) ->
                 let w =
                   Printf.sprintf
                     (ftransl conf "%t witnessed the %s before his/her birth")
@@ -848,20 +848,6 @@ let compute_warnings conf base resp =
                 Printf.sprintf
                   (fcapitale (ftransl conf "undefined sex for %t"))
                   (fun _ -> print_someone p)
-                in
-                w :: wl
-            | WitnessDateAfterDeath p ->
-                let w =
-                Printf.sprintf
-                  (fcapitale (ftransl conf "%t was witness after his/her death"))
-                  (fun _ -> print_someone_dates p)
-                in
-                w :: wl
-            | WitnessDateBeforeBirth p ->
-                let w =
-                Printf.sprintf
-                  (fcapitale (ftransl conf "%t was witness before his/her birth"))
-                  (fun _ -> print_someone_dates p)
                 in
                 w :: wl
             | YoungForMarriage (p, a, _)

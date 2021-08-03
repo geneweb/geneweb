@@ -152,11 +152,11 @@ let print_base_warning oc base =
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_efam_name base e1.efam_name)
         (string_of_efam_name base e2.efam_name)
-  | FWitnessEventAfterDeath (p, e) ->
+  | FWitnessEventAfterDeath (p, e, _fam) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s after his/her death\n"
         (string_of_efam_name base e.efam_name)
-  | FWitnessEventBeforeBirth (p, e) ->
+  | FWitnessEventBeforeBirth (p, e, _fam) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s before his/her birth\n"
         (string_of_efam_name base e.efam_name)
@@ -195,11 +195,11 @@ let print_base_warning oc base =
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_epers_name base e1.epers_name)
         (string_of_epers_name base e2.epers_name)
-  | PWitnessEventAfterDeath (p, e) ->
+  | PWitnessEventAfterDeath (p, e, _origin) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s after his/her death\n"
         (string_of_epers_name base e.epers_name)
-  | PWitnessEventBeforeBirth (p, e) ->
+  | PWitnessEventBeforeBirth (p, e, _origin) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s before his/her birth\n"
         (string_of_epers_name base e.epers_name)
@@ -209,12 +209,6 @@ let print_base_warning oc base =
       Printf.fprintf oc " %s %s\n" (sou base t.t_ident) (sou base t.t_place)
   | UndefinedSex p ->
       Printf.fprintf oc "Undefined sex for %s\n" (designation base p);
-  | WitnessDateAfterDeath p ->
-      Printf.fprintf oc "%s " (designation base p);
-      Printf.fprintf oc "was witness after his/her death\n"
-  | WitnessDateBeforeBirth p ->
-      Printf.fprintf oc "%s " (designation base p);
-      Printf.fprintf oc "was witness before his/her birth\n"
   | YoungForMarriage (p, a, _)
   | OldForMarriage (p, a, _) ->
       Printf.fprintf oc "%s married at age %d\n" (designation base p) a.year
