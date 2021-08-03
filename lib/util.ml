@@ -3100,8 +3100,8 @@ let auth_warning conf base w =
   | DeadTooEarlyToBeFather (father, child) -> pauth father && pauth child
   | DistantChildren (ifam, p1, p2) -> pauth p1 && pauth p2 && fauth ifam
   | FEventOrder (p, _, _) -> pauth p
-  | FWitnessEventAfterDeath (p, _) -> pauth p
-  | FWitnessEventBeforeBirth (p, _) -> pauth p
+  | FWitnessEventAfterDeath (p, _, fam) -> pauth p && fauth fam
+  | FWitnessEventBeforeBirth (p, _, fam) -> pauth p && fauth fam
   | IncoherentSex (p, _, _) -> pauth p
   | IncoherentAncestorDate (anc, p) -> pauth anc && pauth p
   | MarriageDateAfterDeath p -> pauth p
@@ -3112,12 +3112,10 @@ let auth_warning conf base w =
   | ParentTooYoung (p, _, c) -> pauth p && pauth c
   | PossibleDuplicateFam (f1, f2) -> fauth f1 && fauth f2
   | PEventOrder (p, _, _) -> pauth p
-  | PWitnessEventAfterDeath (p, _) -> pauth p
-  | PWitnessEventBeforeBirth (p, _) -> pauth p
+  | PWitnessEventAfterDeath (p, _, origin) -> pauth p && pauth origin
+  | PWitnessEventBeforeBirth (p, _, origin) -> pauth p && pauth origin
   | TitleDatesError (p, _) -> pauth p
   | UndefinedSex p -> pauth p
-  | WitnessDateAfterDeath p -> pauth p
-  | WitnessDateBeforeBirth p -> pauth p
   | YoungForMarriage (_, _, fam) -> fauth fam
   | OldForMarriage (_, _, fam) -> fauth fam
   | ChangedOrderOfChildren _

@@ -273,8 +273,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | DeadTooEarlyToBeFather of 'person * 'person
   | DistantChildren of 'family * 'person * 'person
   | FEventOrder of 'person * 'fevent * 'fevent
-  | FWitnessEventAfterDeath of 'person * 'fevent
-  | FWitnessEventBeforeBirth of 'person * 'fevent
+  | FWitnessEventAfterDeath of 'person * 'fevent * 'family
+  | FWitnessEventBeforeBirth of 'person * 'fevent * 'family
   | IncoherentAncestorDate of 'person * 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
@@ -284,12 +284,10 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | ParentTooYoung of 'person * dmy * 'person
   | PEventOrder of 'person * 'pevent * 'pevent
   | PossibleDuplicateFam of 'family * 'family
-  | PWitnessEventAfterDeath of 'person * 'pevent
-  | PWitnessEventBeforeBirth of 'person * 'pevent
+  | PWitnessEventAfterDeath of 'person * 'pevent * 'person
+  | PWitnessEventBeforeBirth of 'person * 'pevent * 'person
   | TitleDatesError of 'person * 'title
   | UndefinedSex of 'person
-  | WitnessDateAfterDeath of 'person
-  | WitnessDateBeforeBirth of 'person
   | YoungForMarriage of 'person * dmy * 'family
   | OldForMarriage of 'person * dmy * 'family
 

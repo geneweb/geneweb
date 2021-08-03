@@ -389,6 +389,11 @@ enum FeventName {
   EFAM_RESIDENCE = 11;
 }
 
+message WarningEvent {
+  optional PeventName pevent = 1;
+  optional FeventName fevent = 2;
+}
+
 message WarningPerson {
   required string n = 1;
   required string p = 2;
@@ -524,10 +529,14 @@ message WarningDeadOld {
 
 message WarningWitnessDateAfterDeath {
   required WarningPerson person = 1;
+  required WarningEvent event = 2 ;
+  repeated WarningPerson origin = 3;
 }
 
 message WarningWitnessDateBeforeBirth {
   required WarningPerson person = 1;
+  required WarningEvent event = 2 ;
+  repeated WarningPerson origin = 3;
 }
 
 message WarningEventOrder {

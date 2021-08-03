@@ -56,6 +56,20 @@ let add_error_to_piqi_warning_list base (w : M.Base_warnings.t) = function
                M.Warning_bad_sex_of_married_person.{person = person_to_warning_person base p }
                :: w.warning_bad_sex_of_married_person }
 
+let fevent_to_warning_event e =
+  { M.Warning_event.pevent = None
+  ; fevent =
+      try Some (Piqi_util.piqi_fevent_name_of_fevent_name e.efam_name)
+      with _ -> None
+  }
+
+let pevent_to_warning_event e =
+  { M.Warning_event.fevent = None
+  ; pevent =
+      try Some (Piqi_util.piqi_pevent_name_of_pevent_name e.epers_name)
+      with _ -> None
+  }
+
 let add_warning_to_piqi_warning_list conf base =
   let p2wp = person_to_warning_person in
   fun (w : M.Base_warnings.t) -> function
@@ -122,15 +136,23 @@ let add_warning_to_piqi_warning_list conf base =
                  ; child1 = p2wp base c1
                  ; child2 = p2wp base c2
                  } :: w.warning_distant_children }
-    | FWitnessEventAfterDeath (p, _) ->
+    | FWitnessEventAfterDeath (p, e, ifam) ->
+      let cpl = foi base ifam in
       { w with warning_witness_date_after_death =
                  M.Warning_witness_date_after_death.{
                    person = p2wp base p
+                 ; event = fevent_to_warning_event e
+                 ; origin = [ p2wp base @@ poi base @@ get_father cpl
+                            ; p2wp base @@ poi base @@ get_mother cpl ]
                  } :: w.warning_witness_date_after_death }
-    | FWitnessEventBeforeBirth (p, _) ->
+    | FWitnessEventBeforeBirth (p, e, ifam) ->
+      let cpl = foi base ifam in
       { w with warning_witness_date_before_birth =
                  M.Warning_witness_date_before_birth.{
                    person = p2wp base p
+                 ; event = fevent_to_warning_event e
+                 ; origin = [ p2wp base @@ poi base @@ get_father cpl
+                            ; p2wp base @@ poi base @@ get_mother cpl ]
                  } :: w.warning_witness_date_before_birth }
     | IncoherentAncestorDate (a, p) ->
       { w with warning_incoherent_ancestor_date =
@@ -178,15 +200,19 @@ let add_warning_to_piqi_warning_list conf base =
                    family1 = fam_to_piqi_family conf base f1
                  ; family2 = fam_to_piqi_family conf base f2
                  } :: w.warning_possible_duplicate_fam }
-    | PWitnessEventAfterDeath (p, _e) ->
+    | PWitnessEventAfterDeath (p, e, origin) ->
       { w with warning_witness_date_after_death =
                  M.Warning_witness_date_after_death.{
                    person = p2wp base p
+                 ; event = pevent_to_warning_event e
+                 ; origin = [ p2wp base origin ]
                  } :: w.warning_witness_date_after_death }
-    | PWitnessEventBeforeBirth (p, _e) ->
+    | PWitnessEventBeforeBirth (p, e, origin) ->
       { w with warning_witness_date_before_birth =
                  M.Warning_witness_date_before_birth.{
                    person = p2wp base p
+                 ; event = pevent_to_warning_event e
+                 ; origin = [ p2wp base origin ]
                  } :: w.warning_witness_date_before_birth }
     | TitleDatesError (p, _) ->
       { w with warning_title_dates_error =
@@ -196,14 +222,6 @@ let add_warning_to_piqi_warning_list conf base =
       { w with warning_undefined_sex =
                  M.Warning_undefined_sex.{ person = p2wp base p }
                  :: w.warning_undefined_sex }
-    | WitnessDateAfterDeath p ->
-      { w with warning_witness_date_after_death =
-                 M.Warning_witness_date_after_death.{ person = p2wp base p }
-                 :: w.warning_witness_date_after_death }
-    | WitnessDateBeforeBirth p ->
-      { w with warning_witness_date_before_birth =
-                 M.Warning_witness_date_before_birth.{ person = p2wp base p }
-                 :: w.warning_witness_date_before_birth }
     | YoungForMarriage (p, dmy, _) ->
       { w with warning_young_for_marriage =
                  M.Warning_young_for_marriage.{
