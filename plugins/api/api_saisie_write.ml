@@ -338,9 +338,9 @@ let print_config conf base =
       (fun access ->
         let (pos, sval) =
           match access with
-          | IfTitles -> (`access_iftitles, transl conf "if titles")
-          | Public -> (`access_public, transl conf "public")
-          | Private -> (`access_private, transl conf "private")
+          | IfTitles -> (`access_iftitles, transl_nth conf "iftitles/public/private" 0)
+          | Public -> (`access_public, transl_nth conf "iftitles/public/private" 1)
+          | Private -> (`access_private, transl_nth conf "iftitles/public/private" 2)
         in
         Mwrite.Transl_access.({
           pos = pos;
