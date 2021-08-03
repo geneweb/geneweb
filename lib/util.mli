@@ -185,7 +185,18 @@ val string_of_decimal_num : config -> float -> string
 val person_exists : config -> base -> string * string * int -> bool
 val husband_wife : config -> base -> person -> bool -> string
 
+(** [find_person_in_env conf base suff]
+    Reconstitutes the key of a person from [conf.env],
+    using ["i" ^ suff] or ["n" ^ suffix] + ["p" ^ suff] + ["oc" ^ suff]
+*)
 val find_person_in_env : config -> base -> string -> person option
+
+(** [find_person_in_env_pref conf base prefix]
+    Same as [find_person_in_env] except that it uses a prefix
+    instead of a suffix.
+*)
+val find_person_in_env_pref : config -> base -> string -> person option
+
 (* Recherche le sosa uniquement dans le fichier gwf *)
 val default_sosa_ref : config -> base -> person option
 val find_sosa_ref : config -> base -> person option
