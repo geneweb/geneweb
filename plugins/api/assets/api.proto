@@ -16,6 +16,13 @@ message ReferencePerson {
   required int32 oc = 3;
 }
 
+message ReferencePersonI {
+  oneof value {
+     ReferencePerson key = 1;
+     string i = 2;
+  }
+}
+
 message ListReferencePersons {
   repeated ReferencePerson list_ref_persons = 1;
 }
