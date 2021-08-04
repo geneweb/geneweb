@@ -709,13 +709,9 @@ let treat_request =
       end conf base ;
     Output.flush conf ;
   end else
-    begin
-      let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
-      Hutil.rheader conf title;
-      Output.printf conf "<ul>\n<li>\n%s \"%s\" %s.</li>\n</ul>"
-        (Utf8.capitalize_fst (transl conf "base")) conf.bname
-        (Utf8.capitalize_fst (transl conf "reserved to friends or wizards"));
-      Hutil.trailer conf
+    begin match base with
+      | Some base -> SrcfileDisplay.print_start conf base
+      | None -> include_template conf [] "index" (fun () -> propose_base conf)
     end
   in
   if conf.debug then Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process

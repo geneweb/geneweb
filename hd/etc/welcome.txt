@@ -26,11 +26,7 @@
   %else;
     %if;(bvar.visitor_access_msg_en!="")
       %bvar.visitor_access_msg_en;
-    %else;
-      [
-en: Access restricted to friends and wizards of the database!
-fr: Accès réservé aux amis et magiciens de la base de donnée !
-      ]
+    %else;[*access restricted to friends and wizards]
     %end;
   %end;
 %end;

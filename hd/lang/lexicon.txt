@@ -67,6 +67,11 @@ sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/co=korsikanska/cs=tjec
 tr: af=Afrikaans/bg=Bulgarca/br=Bretonca/ca=Katalanca/co=Korsikaca/cs=Çekçe/da=Danca/de=Almanca/en=İngilizce/eo=Esperanto/es=İspanyolca/et=Estonca/fi=Fince/fr=Fransızca/he=İbranice/is=İzlandaca/it=İtalyanca/lv=Letonca/nl=Hollandaca/no=Norveççe/oc=Oksitanca/pl=Lehçe/pt=Portekizce/pt-br=Brezilya Portekizcesi/ro=Romence/ru=Rusça/sk=Slovakça/sl=Slovence/sv=İsveççe/tr=Türkçe/zh=Çince
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/tr=土耳其/zh=中文
 
+    access restricted to friends and wizards
+co: l’accessu hè riservatu à l’amichi è à i maghi di a basa di dati !
+en: access restricted to friends and wizards of the database!
+fr: accès réservé aux amis et magiciens de la base de donnée !
+
     the first branch
 af: om die eerste staak te sien
 bg: за да видите първия клон
