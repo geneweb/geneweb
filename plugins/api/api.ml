@@ -670,11 +670,19 @@ let person_warnings conf base p =
   end Api_warnings.empty (Util.person_warnings conf base p)
 
 let print_person_warnings conf base =
-  let ref_person = Piqi_util.get_params conf Api_piqi_ext.parse_reference_person in
-  let sn = ref_person.Api_piqi.Reference_person.n in
-  let fn = ref_person.Api_piqi.Reference_person.p in
-  let occ = ref_person.Api_piqi.Reference_person.oc in
-  match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
+  let ref_person = Piqi_util.get_params conf Api_piqi_ext.parse_reference_person_i in
+  match
+    match ref_person.Api_piqi.Reference_person_i.i with
+    | Some i -> Some (Gwdb.iper_of_string i)
+    | None ->
+      match ref_person.Api_piqi.Reference_person_i.key with
+      | Some ref_person ->
+        let sn = ref_person.Api_piqi.Reference_person.n in
+        let fn = ref_person.Api_piqi.Reference_person.p in
+        let occ = ref_person.Api_piqi.Reference_person.oc in
+        Gwdb.person_of_key base fn sn (Int32.to_int occ)
+      | None -> None
+  with
   | None -> assert false
   | Some ip ->
     Util.pget conf base ip
