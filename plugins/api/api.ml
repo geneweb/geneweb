@@ -774,7 +774,7 @@ let name_frequency conf base =
   let list = match list with Specify _ -> assert false | Result list -> list in
   let list =
     List.sort begin fun (_, x1, c1) (_, x2, c2) ->
-      match compare c1 c2 with 0 -> Gutil.alphabetic_order x1 x2 | x -> x
+      match compare c2 c1 with 0 -> Gutil.alphabetic_order x1 x2 | x -> x
     end list
   in
   let list =
