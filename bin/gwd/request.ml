@@ -710,8 +710,25 @@ let treat_request =
     Output.flush conf ;
   end else
     begin match base with
-      | Some base -> SrcfileDisplay.print_start conf base
-      | None -> include_template conf [] "index" (fun () -> propose_base conf)
+      | Some base ->
+          let content =
+            try (List.assoc ("visitor_access_msg_" ^ conf.lang) conf.base_env) with
+            Not_found -> Utf8.capitalize_fst
+              (transl conf "access restricted to friends and wizards")
+          in
+          let content = 
+            "<!DOCTYPE html>
+             <html lang=\"en-GB\">
+               <meta charset=\"utf-8\" />
+               <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+               <title>401 Unauthorized</title>
+               <h1>401 Unauthorized</h1>
+               <pre>" ^ content ^
+            "  </pre>
+             </html>"
+          in
+          !GWPARAM.output_error ~content conf Def.Unauthorized
+      | None -> !GWPARAM.output_error conf Def.Not_Found
     end
   in
   if conf.debug then Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
