@@ -219,34 +219,40 @@ let arg_list_of_string line =
   loop [] 0 0 None
 
 let sort_person_list_aux sort base =
+  let default p1 p2 =
+    match alphabetic (p_surname base p1) (p_surname base p2) with
+    | 0 -> begin match alphabetic (p_first_name base p1) (p_first_name base p2) with
+        | 0 -> begin match compare (get_occ p1) (get_occ p2) with
+            | 0 -> compare (get_iper p1) (get_iper p2)
+            | c -> c
+          end
+        | c -> c
+      end
+    | c -> c
+  in
   sort begin fun p1 p2 ->
     if get_iper p1 = get_iper p2
     then 0
-    else
-      match
-        Adef.od_of_cdate (get_birth p1), get_death p1,
-        Adef.od_of_cdate (get_birth p2), get_death p2
+    else match
+        match ( Adef.od_of_cdate (get_birth p1), get_death p1
+              , Adef.od_of_cdate (get_birth p2), get_death p2 )
+        with
+        | Some d1, _, Some d2, _ ->
+          Date.compare_date d1 d2
+        | Some d1, _, _, Death (_, d2) ->
+          Date.compare_date d1 (Adef.date_of_cdate d2)
+        | _, Death (_, d1), Some d2, _ ->
+          Date.compare_date (Adef.date_of_cdate d1) d2
+        | _, Death (_, d1), _, Death (_, d2) ->
+          Date.compare_date (Adef.date_of_cdate d1) (Adef.date_of_cdate d2)
+        | Some _, _, _, _ -> 1
+        | _, Death (_, _), _, _ -> 1
+        | _, _, Some _, _ -> -1
+        | _, _, _, Death (_, _) -> -1
+        | _ -> 0
       with
-      | Some d1, _, Some d2, _ ->
-        Date.compare_date d1 d2
-      | Some d1, _, _, Death (_, d2) ->
-        Date.compare_date d1 (Adef.date_of_cdate d2)
-      | _, Death (_, d1), Some d2, _ ->
-        Date.compare_date (Adef.date_of_cdate d1) d2
-      | _, Death (_, d1), _, Death (_, d2) ->
-        Date.compare_date (Adef.date_of_cdate d1) (Adef.date_of_cdate d2)
-      | Some _, _, _, _ -> 1
-      | _, Death (_, _), _, _ -> 1
-      | _, _, Some _, _ -> -1
-      | _, _, _, Death (_, _) -> -1
-      | _ ->
-        let c = alphabetic (p_surname base p1) (p_surname base p2) in
-        if c = 0 then
-          let c =
-            alphabetic (p_first_name base p1) (p_first_name base p2)
-          in
-          if c = 0 then compare (get_occ p1) (get_occ p2) else c
-        else c
+      | 0 -> default p1 p2
+      | c -> c
   end
 
 let sort_person_list = sort_person_list_aux List.sort
