@@ -96,15 +96,13 @@
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%xxx.index;"%sp;
       title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;"%sp;
-  %end;
-  %if;xxx.is_male;
-    %if;cancel_links;♂ %else;class="fa fa-mars male%end;%nn;
-  %elseif;xxx.is_female;
-    %if;cancel_links;♀ %else;class="fa fa-venus female%end;%nn;
+    %if;xxx.is_male; class="fa fa-mars male mr-1"></a>
+    %elseif;xxx.is_female; class="fa fa-venus female mr-1"></a>
+    %else; class="fa fa-neuter neuter mr-1"></a>
+    %end;%nn;
   %else;
-    %if;cancel_links;⚲ %else;class="fa fa-neuter neuter%end;%nn;
-  %end;%nn;
-  %if;(wizard and not cancel_links) mr-1"></a>%end;
+    %if;xxx.is_male; ♂ %elseif;xxx.is_female; ♀ %else; ⚲ %end;%nn;
+  %end;
 %end;
 
 %define;letter(xx)
