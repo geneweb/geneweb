@@ -700,6 +700,27 @@ message EventQueryResultList {
   repeated EventQueryResult events = 1 ;
 }
 
+message NameFrequencyResult {
+  required string key = 1 ;
+  required string name = 2 ;
+  required int32 count = 3 ;
+}
+
+message NameFrequencyResultList {
+  repeated NameFrequencyResult result = 1 ;
+  required int32 total = 2 ;
+}
+
+message NameFrequencyParams {
+  enum Type {
+    LAST_NAME = 1;
+    FIRST_NAME = 2;
+  }
+  required Type type = 1;
+  optional int32 from = 2 ;
+  optional int32 to = 3 ;
+}
+
 message Error {
   enum Code {
     BAD_REQUEST = 400;
