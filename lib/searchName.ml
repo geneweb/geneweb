@@ -48,8 +48,7 @@ let search_by_sosa conf base an =
 
 let search_reject_p conf base p =
   empty_sn_or_fn base p
-  || (not (conf.wizard || conf.friend) && Util.is_hide_names conf p)
-  || not (Util.authorized_age conf base p)
+  || (Util.is_hide_names conf p && not (Util.authorized_age conf base p) )
 
 let search_by_name conf base n =
   let n1 = Name.abbrev (Name.lower n) in
