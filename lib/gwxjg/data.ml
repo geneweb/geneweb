@@ -905,7 +905,7 @@ and mk_warning conf base =
          ; mk_pevent conf base e
          ; unsafe_mk_person conf base origin ]
   | TitleDatesError (p, t) ->
-    Tset [ Tstr "PWitnessEventBeforeBirth"
+    Tset [ Tstr "TitleDatesError"
          ; unsafe_mk_person conf base p
          ; mk_gen_title base t ]
   | UndefinedSex p ->
