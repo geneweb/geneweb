@@ -12690,7 +12690,7 @@ tr: Sosa ile aynı #
 
     scale
 co: anni à a generazione
-de: Jahre bei Generation
+de: Jahre nach Generation
 en: years by generation
 fr: années par génération
 pt: anos por geração
