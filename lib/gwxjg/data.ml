@@ -562,6 +562,7 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
   let siblings = siblings_aux E.siblings in
   let half_siblings = siblings_aux E.half_siblings in
+  let sex = Tint (E.sex p) in
   let surname = Tstr (E.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let events = Tlist [] in
@@ -578,6 +579,7 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
     | "mother" -> mother
     | "parents" -> parents
     | "related" -> related
+    | "sex" -> sex
     | "siblings" -> siblings
     | "spouses" -> spouses
     | "surname" -> surname
