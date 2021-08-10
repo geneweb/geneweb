@@ -296,6 +296,7 @@ tr: Bu sayfa için %s erişimi iptal edildi
 
     %s and %s have several unions
 co: ci hè parechje unioni trà %s è %s
+de: %s und %s haben mehrere Partnerschaften
 en: %s and %s have several unions
 fr: il y a plusieurs unions entre %s et %s
 pt: existem várias uniões entre %s e %s
@@ -336,7 +337,7 @@ tr: %s kuzenler
     %s forbidden char
 co: caratteri difesi (%s) impiegati in casata/nome
 da: forkert karakter (%s) brugt i efternavn/fornavn
-de: ungültiges Zeichen (%s) im nachname/vorname
+de: ungültiges Zeichen (%s) im Nachnamen/Vornamen
 en: invalid character (%s) used in surname/first name
 es: carácter inválido (%) en la apellido/nombre
 fi: olet kättänyt sopimatonta merkkiä (%s) sukunimi/etunimi
@@ -1157,6 +1158,7 @@ tr: bir kayınbiraderi/kayınbiraderi
 
     a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
 co: un cugnatu/cugnati/una cugnata/cugnate
+de: ein Schwager/Schwäger/eine Schwägerin/Schwägerinnen
 en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
 fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
 pt: um cunhado/cunhados/uma cunhada/cunhadas
@@ -1196,6 +1198,7 @@ tr: bir erkek kardeş/bir kız kardeş/bir kardeş
 
     a child-in-law/children-in-law
 co: un zitellu appiccicaticciu/zitelli appiccicaticcii
+de: ein Schwiegerkind/Schwiegerkinder
 en: one child-in-law/children-in-law
 fr: un bel-enfant/beaux-enfants
 pt: enteado/enteados
@@ -1452,6 +1455,7 @@ tr: bir büyük amca/bir büyük teyze
 
     a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
 co: un mezu cugnatu/mezu cugnati/una meza cugnata/meza cugnate
+de: ein Halbschwager/Halbschwäger/eine Halbschwägerin/Halbschwägerinnen
 en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
 fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
 pt: um meio cunhado/meios cunhados/uma meia cunhada/meias cunhadas
@@ -1460,6 +1464,7 @@ tr: bir üvey kayınbirader/üvey kayınbiraderler/bir üvey baldız/üvey bald�
 
     a half sibling-in-law/half siblings-in-law
 co: un mezu cugnatu o una meza cugnata/mezu cugnati è meze cugnate
+de: ein Halbschwager oder eine Halbschwägerin/Halbschwäger oder Halbschwägerinnen
 en: one half sibling-in-law/half siblings-in-law
 fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
 pt: um meio cunhado ou cunhada/meios cunhados
@@ -1530,6 +1535,7 @@ tr: bir yeğen/bir yeğen/yeğenler/yeğenler/yeğenler ve yeğenler
 
     a sibling-in-law/siblings-in-law
 co: un cugnatu o una cugnata/cugnati è cugnate
+de: ein Schwager oder eine Schwägerin/Schwäger oder Schwägerinnen
 en: one sibling-in-law/siblings-in-law
 fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
 pt: um cunhado ou cunhada/cunhados
@@ -1600,6 +1606,7 @@ tr: bir oğul/bir kız/bir çocuk
 
     a stepchild/stepchildren
 co: un(a) figliastru(a)/figliastri
+de: ein Stiefkind/Stiefkinder
 en: a stepchild/stepchildren
 fr: un bel-enfant/beaux-enfants
 pt: um enteado/enteados
@@ -1608,6 +1615,7 @@ tr: bir üvey çocuk/üvey çocuklar
 
     a stepson/stepsons/a stepdaughter/stepdaughters
 co: un figliastru/figliastri/una figliastra/figliastre
+de: ein Stiefsohn/Stiefsöhne/eine Stieftochter/Stieftöchter
 en: one stepson/stepsons/one stepdaughter/stepdaughters
 fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
 pt: um enteado/enteados/uma enteada/enteadas
@@ -1741,6 +1749,7 @@ tr: Edinme
 
     activate/suppress
 co: attivà/squassà
+de: aktivieren/deaktivieren
 en: activate/suppress
 fr: activer/supprimer
 pt: activar/suprimir
@@ -1786,7 +1795,7 @@ ca: afegir notes
 co: aghjunghje una cronaca
 cs: přidat :a: poznámky
 da: tilføj noter
-de: hinzufügen Notizen
+de: Notizen hinzufügen
 en: add notes
 eo: aldoni :a: notoj:a:+n
 es: agregar notas
@@ -1817,7 +1826,7 @@ ca: afegir imatge
 co: aghjunghje una fiura
 cs: přidat :a: obrázek
 da: tilføj billede
-de: hinzufügen Bild
+de: Bild hinzufügen
 en: add picture
 eo: aldoni :a: bildo:a:+n
 es: agregar imagen
@@ -1841,6 +1850,7 @@ tr: resim ekle
 
     add the previous name as a first name alias
 co: aghjunghje u nome precedente cum’è cugnome di nome
+de: den vorherigen Namen als Vornamen-Alias hinzufügen
 en: add the previous name as a first name alias
 fr: ajouter le nom précédent comme un alias de prénom
 pt: adicionar o nome anterior como primeiro nome alternativo
@@ -1849,6 +1859,7 @@ tr: önceki adı, ilk takma adı olarak ekleyin
 
     add the previous name as a surname alias
 co: aghjunghje u nome precedente cum’è cugnome di casata
+de: den vorherigen Namen als Nachnamen-Alias hinzufügen
 en: add the previous name as a surname alias
 fr: ajouter le nom précédent comme un alias de nom
 pt: adicionar o nome anterior como apelido alternativo
@@ -2740,6 +2751,7 @@ tr: aynı zamanda
 
     available genealogies
 co: lista di e genealugie dispunibule (impiegheghja gwsetup)
+de: Liste der verfügbaren Genealogien (verwende gwsetup)
 en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 pt: lista das genealogias disponíveis (utilize gwsetup)
@@ -2853,7 +2865,7 @@ tr: Vaftiz yeri
 
     baptism src
 co: fonte di battesimu
-de: Ort der Taufe
+de: Quellenangabe der Taufe
 en: source of baptism
 es: fuente de bautismo
 fi: Kastepaikka
@@ -2930,6 +2942,7 @@ tr: Bar Mitzvah
 
     base
 co: basa
+de: Datenbank
 en: base
 fr: base
 sv: bas
@@ -3349,6 +3362,7 @@ tr: Soy kitabı
 
     books
 co: dizziunarii
+de: Wörterbücher
 en: books
 fr: dictionnaires
 oc: diccionaris
@@ -3422,6 +3436,7 @@ zh:  出生
 
     both
 co: i dui
+de: beide
 en: both
 fr: les deux
 pt: ambos
@@ -3461,6 +3476,7 @@ tr: Satır/çizgiler
 
     brothers/sisters/siblings
 co: fratelli/surelle/fratelli o surelle
+de: Brüder/Schwestern/Geschwister
 en: brothers/sisters/siblings
 fr: frères/sœurs/frères et sœurs
 pt: irmãos/irmãs/irmãos e irmãs
@@ -3592,6 +3608,7 @@ zh: 根据
 
     by couple
 co: da coppiu
+de: nach Paar
 en: by couple
 fr: par couple
 pt: por casal
@@ -3915,7 +3932,7 @@ tr: çocukların sırasını değiştirme
 
     changed order of family's events
 co: cambiu di l’ordine di l’avvenimenti famigliale
-de: ändern der Reihenfolge familiäre Ereignisse
+de: ändern der Reihenfolge familiärer Ereignisse
 en: change order of family events
 es: cambio del orden de los acontecimientos familiares
 fr: changement de l’ordre des événements familiaux
@@ -4021,6 +4038,7 @@ tr: çocukların isimleri değişti
 
     choose a genealogy
 co: sceglie una genealugia
+de: eine Genealogie wählen
 en: choose a genealogy
 fr: choisir une généalogie
 pt: seleccionar uma genealogia
@@ -4121,6 +4139,7 @@ tr: bir ebeveyn
 
     collapse implex
 co: ripiegà l’implessi
+de: Implex zusammenklappen
 en: collapse implex
 fr: réduire les implexes
 pt: reduzir os implexos
@@ -4192,6 +4211,7 @@ tr: yorum
 
     compact tree
 co: arburu cumpattu
+de: Kompakter Baum
 en: compact tree
 fr: arbre compact
 pt: árvore compacta
@@ -4232,6 +4252,7 @@ tr: Revizyon geçmişini görüntüle
 
     compiled on %s from commit %s
 co: cumpilatu u %s à partesi di u commit %s
+de: kompiliert auf %s aus commit %s
 en: compiled on %s from commit %s
 fr: compilé le %s à partir du commit %s
 pt: compilou os %s a partir da versão %s
@@ -4447,6 +4468,7 @@ tr: devam eden
 
     copy link
 co: cupià u liame in u preme’papei
+de: Link in die Zwischenablage kopieren
 en: copy the link to the clipboard
 fr: copier le lien dans le presse-papier
 pt: copiar o link para a área de transferência
@@ -4487,6 +4509,7 @@ tr: İlçe
 
     couples
 co: coppii
+de: Paare
 en: couples
 fr: couples
 pt: casais
@@ -4634,6 +4657,7 @@ tr: Ölü yakma
 
     custom event
 co: avvenimentu persunalizatu
+de: benutzerdefiniertes Ereignis
 en: custom event
 fr: événement personnalisé
 pt: evento personalizado
@@ -4657,6 +4681,7 @@ tr: d'Aboville
 
     dag
 co: fusione d’implessi
+de: Implex zusammenfügen
 en: fusion implexes
 fr: fusionner les implexes
 pt: combinar os implexes
@@ -4665,6 +4690,7 @@ tr: implexleri birleştirmek
 
     dag on/dag off
 co: affissà un graficu orientatu aciclicu (dag)/piattà u graficu orientatu aciclicu (dag)
+de: gerichteten azyklischen Graph anzeigen (DAG)/gerichteten azyklischen Graph verbergen (DAG)
 en: show dag/hide dag
 fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
 pt: exibir gráfico acíclico orientado (DAG)/ocultar gráfico acíclico orientado (DAG)
@@ -4783,6 +4809,7 @@ tr: doğum tarihi
 
     date of baptism
 co: data di battesimu
+de: Taufdatum
 en: date of baptism
 fr: date du baptême
 sv: dopdag
@@ -4822,6 +4849,7 @@ tr: evlilik tarihi
 
     date of burial
 co: data di sepultura
+de: Datum der Bestattung
 en: date of burial
 fr: date de la sépulture
 sv: begravningsdatum
@@ -4891,6 +4919,7 @@ tr: eski günler
 
     dd/mm/yyyy
 co: GG/MM/AAAA
+de: DD/MM/YYYY
 en: DD/MM/YYYY
 fr: JJ/MM/AAAA
 pt: DD/MM/AAAA
@@ -4993,6 +5022,7 @@ tr: Madalya
 
     degree of kinship
 co: gradu di parentia
+de: Grad der Elternschaft
 en: degree of kinship
 fr: degré de parenté
 pt: grau de parentesco
@@ -5047,6 +5077,7 @@ tr: Terhis
 
     descendant tree view
 co: arburiscenza discendente
+de: Ansicht Nachfahren-Baum
 en: descendant tree view
 fr: arborescence descendante
 pt: árvore compacta de descendentes
@@ -5103,6 +5134,7 @@ tr: Adına göre liste
 
     descendants tree
 co: arburu di discendenza
+de: Nachfahren-Baum
 en: descendants tree
 fr: arbre de descendance
 pt: árvore de descendentes
@@ -5296,7 +5328,7 @@ tr: çıkış yap
 
     display Aboville number
 co: affissà a numerotazione d’Aboville
-de: Sosa/Kekule-Nummer anzeigen
+de: d'Aboville-Nummer anzeigen
 en: Display d’Aboville number
 es: editar la numeración de Aboville
 fi: Näytä Sosa-numero
@@ -5312,7 +5344,7 @@ tr: D’Aboville numarasını görüntüle
 
     display border tree
 co: affissà i bordi
-de: rahmen in den Bäumen zeigen
+de: Rahmen in den Bäumen zeigen
 en: display frame
 es: editar los marcos a los árboles
 fi: näytä rajat
@@ -5407,6 +5439,7 @@ tr: nesilleri göster
 
     display implex
 co: affissà l’implessi
+de: Implex anzeigen
 en: display implex
 fr: afficher les implexes
 pt: exibir os implexos
@@ -5473,7 +5506,7 @@ tr: soyağacı daralmasını göster
 
     display spouse
 co: affissà u(a) cumpagnu(a)
-de: ehepartner anzeigen
+de: Ehepartner anzeigen
 en: display spouse
 es: editar cónyuge
 fi: näytä puolisot
@@ -5596,6 +5629,7 @@ tr: boşanmış
 
     do not
 co: ùn micca
+de: nicht
 en: do not
 fr: ne pas
 pt: não
@@ -5666,7 +5700,7 @@ tr: bilinmeyen
 
     dotation
 co: dutazione
-de: dotation
+de: Spende
 en: Endowment
 es: dotación
 fi: Lahjoitus
@@ -5694,6 +5728,7 @@ tr: Bağış (LDS)
 
     edit tree
 co: mudificà u graficu
+de: den Graphen editieren
 en: edit the graph
 fr: éditer le graphe
 pt: editar o gráfico
@@ -5933,12 +5968,14 @@ tr: etkinlik/etkinlikler
 
     events to which %s was witness
 co: avvenimenti induve %s era testimoniu
+de: Ereignisse, von denen %s Zeuge war
 en: events to which %s was witness
 fr: évènements auxquels %s était témoin
 tr: %s'in tanık olduğu etkinlikler
 
     events tree
 co: arburu di l’avvenimenti
+de: Baum der Ereignisse
 en: tree of events
 fr: arbre des événements
 pt: árvore de eventos
@@ -6224,6 +6261,7 @@ tr: Kaynak
 
     family time line
 co: cronulugia di a famiglia
+de: Timeline der Familie
 en: time line of the family
 fr: chronologie de la famille
 pt: cronologia da família
@@ -6540,6 +6578,7 @@ tr: İlk Komünyon
 
     font size
 co: dimensione di grafia
+de: Schriftgröße
 en: font size
 fr: taille de police
 pt: tamanho da fonte
@@ -6763,6 +6802,7 @@ tr: kardeşler
 
     full tree
 co: arburu sanu
+de: Voller Baum
 en: full tree
 fr: arbre complet
 pt: árvore completa
@@ -6771,6 +6811,7 @@ tr: tam ağaç
 
     full width/columns
 co: affissera larghezza sana/affissera nant’à duie culonne
+de: Anzeige volle Breite/Anzeige in zwei Spalten
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 pt: exibir na largura total/exibir em duas colunas
@@ -6831,7 +6872,7 @@ ca: padrí/padrina/padrins
 co: cumpare/cummare/cumpare è cummare
 cs: kmotr/kmotra/kmotr a kmotra
 da: gudfader/gudmoder/gudfader og gudmoder
-de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
+de: Taufzeuge/Taufzeugin/Taufzeugen
 en: godfather/godmother/godparents/godparent
 eo: baptopatro/baptopatrino/gebaptopatroj
 es: padrino/madrina/padrinos
@@ -6856,6 +6897,7 @@ tr: vaftiz babası/vaftiz annesi/vaftiz ebeveynleri/vaftiz ebeveyni
 
     godparent
 co: cumpare o cummare
+de: Taufzeuge
 en: godparent
 fr: parrain ou marraine
 pt: padrinho ou madrinha
@@ -7034,6 +7076,7 @@ tr: damat/gelin
 
     h7-tree
 co: arburu in H di 7 generazioni
+de: 7-Generationen H-Baum
 en: 7 generation H tree
 fr: arbre en H 7 générations
 pt: árvore em H 7 gerações
@@ -7042,7 +7085,7 @@ tr: 7 nesil H ağacı
 
     half siblings
 co: fratellastri è surellastre
-de: halbbrüder und-schwestern
+de: Halbbrüder und -schwestern
 en: half-siblings
 es: hermanastros y hermanastras
 fi: puolisisarukset
@@ -7058,6 +7101,7 @@ tr: üvey kardeşler
 
     half-brothers/half-sisters/half-siblings
 co: fratellastri/surellastre/mezu-fratelli è surelle
+de: Halb-Brüder/Halb-Schwestern/Halb-Geschwister
 en: half-brothers/half-sisters/half-siblings
 fr: demi-frères/demi-sœurs/demi-frères et sœurs
 pt: meios-irmãos/meias-irmãs/meios-irmãos
@@ -7255,6 +7299,7 @@ tr: burada
 
     hide portraits
 co: piattà i ritratti
+de: Portraits verbergen
 en: hide portraits
 fr: ne pas afficher les portraits
 pt: não mostrar os retratos
@@ -7294,6 +7339,7 @@ tr: onu/onu
 
     his/her
 co: u so/a so
+de: sein/ihr
 en: his/her
 fr: son/sa
 no: hans/hennes
@@ -7325,7 +7371,7 @@ ca: històric de les actualitzacions
 co: cronulugia di e mudificazioni
 cs: historie změn
 da: opdateringers historie
-de: verlauf der Updates
+de: Verlauf der Updates
 en: history of updates
 eo: historio de la ĝisdatigoj
 es: histórico de las actualizaciones
@@ -7351,6 +7397,7 @@ tr: güncelleme geçmişi
 
     home
 co: accolta
+de: Home
 en: home
 fr: accueil
 pt: início
@@ -7359,6 +7406,7 @@ tr: ev
 
     horizontal tree
 co: arburiscenza ascendente
+de: horizontaler Baum
 en: horizontal tree
 fr: arborescence ascendante
 pt: árvore compacta de ascendentes
@@ -7514,7 +7562,7 @@ tr: eğer başlıklar
 
     iftitles/public/private
 co: s’è tituli/publicu/privatu
-de: Adelstitel/öffendlich/privat
+de: Adelstitel/öffentlich/privat
 en: If titles/Public/Private
 es: si hay títulos/público/privado
 fr: si titres/public/privé
@@ -7526,6 +7574,7 @@ tr: Başlıklar/Herkese Açık/Özel ise
 
     ignore implex
 co: ignurà l’implessi
+de: Implex ignorieren
 en: ignore implex
 fr: ignorer les implexes
 pt: ignorar os implexos
@@ -7655,6 +7704,7 @@ tr: Göçmenlik
 
     implex links
 co: ligà l’implessi
+de: Implex Links
 en: link implexes
 fr: relier les implexes
 pt: ligar os implexes
@@ -7663,6 +7713,7 @@ tr: implexlere bağlantı
 
     implex/implexes
 co: implessu/implessi
+de: Implex/Ahnenverluste
 en: implex/implexes
 fr: implexe/implexes
 pt: implex/implexes
@@ -8643,6 +8694,7 @@ tr: Grafikler ve Listeler
 
     lists of books
 co: liste di dizziunarii
+de: Liste der Wörterbücher
 en: lists of books
 fr: liste des dictionnaires
 oc: lista dels diccionaris
@@ -8918,7 +8970,7 @@ tr: evlilik yasağı
 
     marriage banns%t to
 co: ammunimi di matrimoniu%t cù
-de: aufgebot zur Heirat%t mit
+de: Aufgebot zur Heirat%t mit
 en: marriage banns%t with
 es: proclamas de matrimonio%t con
 fi: kuuluutus aviolittoon%t (kanssa)
@@ -9050,7 +9102,7 @@ tr: Evlilik Cüzdanı
 
     marriage notes/marriages notes
 co: note apprupositu di l’unione/note apprupositu di l'unioni
-de: notizen zu den Ehen
+de: Notizen zu den Ehen
 en: marriage notes/marriages notes
 es: notas de matrionios
 fi: lisämerkintöjä vihkimisestä
@@ -9239,7 +9291,7 @@ zh: %t配偶是
 
     marriage contract%t with
 co: cuntrattu di matrimoniu%t cù
-de: ehevertrag vom%t mit
+de: Ehevertrag vom%t mit
 en: marriage contract%t with
 es: contrato de matrimonio%t con
 fi: avioliittosopimus%t kanssa
@@ -9429,7 +9481,7 @@ ca: missatge/missate anterior//missate anterior/missate següent
 co: messaghju/messaghju precedente/messaghji precedente/messaghju seguente
 cs: zpráva:a:-u/předchozí zpráva/předchozí zprávy/následující zpráva
 da: meddelelse/foregående meddelelse/foregående meddelelse/næste meddelelse
-de: Nachricht/vorherige Nachricht/vorherige Nachricht/nächste Nachricht
+de: Nachricht/vorherige Nachricht/vorherige Nachrichten/nächste Nachricht
 en: message/previous message/previous messages/next message
 eo: mesaĝo:a:+n/antaùa mesaĝo/antaùa mesaĝo/sekvanta mesaĝo
 es: mensaje/mansaje anterior/mansaje anterior/mensaje siguiente
@@ -9928,7 +9980,7 @@ tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı
 
     msg error disconnected
 co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnettate à l’altre.<br />Sta restrizione hè stata aghjunta da u pruprietariu di a basa di dati.
-de: sorry, Sie können nur Familien hinzufügen die mit dem Rest in Verbindung stehen. <br /> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
+de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br /> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
 en: sorry, you can add only families connected to the rest.<br />This restriction has been added by this database owner.
 fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br />Cette restriction a été ajoutée par le propriétaire de cette base de données.
 it: spiacenti, puoi aggiungere solo delle famiglie collegate al resto.<br />Questa restrizione è stata aggiunta dal proprietario del data base
@@ -10098,7 +10150,7 @@ ca: navegació
 co: navigazione
 cs: prohlížení
 da: navigering
-de: navigation
+de: Navigation
 en: navigation
 eo: navigado
 es: navegación
@@ -10511,7 +10563,7 @@ ca: no verificar els sexes
 co: unione omosessuale (senza cuntrollu di i sessi)
 cs: bez kontroly pohlaví
 da: ingen verificering af kønnene
-de: homosexuelles paar (keine Überprüfung des geschlechts)
+de: homosexuelles Paar (keine Überprüfung des Geschlechts)
 en: same sex couple
 eo: sen kontrolo pri seksoj
 es: pareja homosexual (sin comprobación de sexo)
@@ -11115,6 +11167,7 @@ tr: memur/memur/memurlar
 
     old name
 co: vechju nome
+de: alter Name
 en: old name
 fr: ancien nom
 no: gammelt navn
@@ -11187,6 +11240,7 @@ zh:  于
     on (weekday day month year)
 br: d'ar
 co: u
+de: am
 en: on
 et: :i:
 fi: :e:
@@ -11199,6 +11253,7 @@ tr: -da,-de
 
     one additional generation
 co: una generazione di più
+de: eine weitere Generation
 en: one additional generation
 fr: une génération en plus
 pt: uma geração adicional
@@ -11372,6 +11427,7 @@ tr: isteğe bağlı
 
     options
 co: ozzioni
+de: Optionen
 en: options
 fr: options
 pt: opções
@@ -11516,6 +11572,7 @@ zh:  父母
 
     participant/participant
 co: participante/participante
+de: Teilnehmer/Teilnehmerin
 en: participant/participant
 fr: participant/participante
 sv: deltagare/deltagare
@@ -11632,7 +11689,7 @@ tr: kişi değiştirildi
 
     person source
 co: fonte di l’individuu
-de: Quellenangabe-Individuum
+de: Quellenangabe-Person
 en: Source of individual
 es: fuente individuo
 fi: Henkilön lähdetiedot
@@ -11919,7 +11976,7 @@ tr: Sunum
 
     preview family tree
 co: avvistu di l’arburu
-de: überblick vom Stammbaum
+de: Überblick vom Stammbaum
 en: Preview Family Tree
 es: ver ärbol
 fi: Yleiskatsaus sukutauluun
@@ -11966,6 +12023,7 @@ tr: önceki kardeş
 
     previous/next diff
 co: revisione precedente/revisione seguente
+de: vorheriger Unterschied/nächster Unterschied
 en: previous revision/next revision
 fr: révision précédente/révision suivante
 pt: revisão anterior/revisão seguinte
@@ -12188,6 +12246,7 @@ tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
 
     reduce/increase
 co: reduce/aumentà
+de: vermindern/erhöhen
 en: reduce/increase
 fr: réduire/augmenter
 pt: reduzir/aumentar
@@ -12196,7 +12255,7 @@ tr: azalt/arttır
 
     reference key
 co: referenza
-de: referenz
+de: Referenz
 en: ID
 es: referencia
 fi: referenssi
@@ -12259,6 +12318,7 @@ tr: ilişki/ilişkiler
 
     relations of
 co: rilazioni di
+de: Beziehungen von
 en: relations of
 fr: relations de
 sv: relation med
@@ -12266,6 +12326,7 @@ tr: ilişkileri
 
     relations tree
 co: arburu di e rilazioni
+de: Baum der Beziehungen
 en: tree of relations
 fr: arbre des relations
 pt: árvore de familiares
@@ -12384,7 +12445,7 @@ zh:  相关查询
 
     relationship computing mode
 co: modu di calculu
-de: berechnungsart
+de: Berechnungsart
 en: Mode
 es: modo de cálculo
 fi: laskutapa
@@ -12400,7 +12461,7 @@ tr: Mod
 
     relationship display options
 co: ozzioni per affissà l’arburi di parentia :
-de: anzeigeoptionen der Verwandtschafts-Bäume:
+de: Anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
 es: opciones de edición de los árboles de parentesco:
 fi: näyttötapa:
@@ -12463,7 +12524,7 @@ tr: ilişki/ilişkiler
 
     relationship shortcut
 co: accurtatoghji :
-de: Verknüpfungen :
+de: Verknüpfungen:
 en: shortcuts:
 es: atajos :
 fi: oikotie:
@@ -12511,6 +12572,7 @@ tr: ile ilişki%t
 
     remove last module
 co: caccià l’ultimu modulu aghjuntu
+de: zuletzt hinzugefügtes Modul entfernen
 en: remove the last added module
 fr: retirer le dernier module ajouté
 pt: remover o último módulo adicionado
@@ -12519,6 +12581,7 @@ tr: son eklenen modülü kaldır
 
     reserved to friends or wizards
 co: riservatu à l’amichi è à i maghi
+de: reserviert für Freunde und Meister
 en: reserved to friends or wizards
 fr: réservée aux amis et magiciens
 sv: reserverat för vänner och administratörer
@@ -12526,6 +12589,7 @@ tr: arkadaşlar veya sihirbazlar için ayrılmış
 
     reset to
 co: risturà
+de: zurücksetzen
 en: reset to
 fr: restaurer
 pt: restaurar
@@ -12626,6 +12690,7 @@ tr: Sosa ile aynı #
 
     scale
 co: anni à a generazione
+de: Jahre bei Generation
 en: years by generation
 fr: années par génération
 pt: anos por geração
@@ -12926,7 +12991,7 @@ tr: seç
 
     select a letter
 co: sceglie una lettera
-de: wählen Sie einen Zeichen
+de: wählen Sie ein Zeichen
 en: Select a character
 es: elija un carácter
 fi: valitse kirjain
@@ -12942,7 +13007,7 @@ tr: Bir karakter seçin
 
     select a month to see all the anniversaries
 co: selezziunà un mese per fighjà tutti l’anniversarii.
-de: zum zeigen der Geburtstage den Monat auswählen.
+de: zum Zeigen der Geburtstage den Monat auswählen.
 en: select a month to see all the anniversaries.
 es: elegir un mes para ver todos los cumpleaños.
 fi: valitse kuukausi nähdäksesi kaikki syntymäpäivät.
@@ -13002,6 +13067,7 @@ tr: içinde görüntüle:
 
     select p_mod
 co: selezziunà i muduli persunalizati
+de: personalisierte Module auswählen
 en: select personalized modules
 fr: selectionner les modules personnalisés
 pt: seleccionar os módulos personalizados (por defeito zz)
@@ -13211,6 +13277,7 @@ tr: kısa ekran
 
     shortcuts
 co: accurtatoghji di tastera
+de: Tastaturkürzel
 en: keyboard shortcuts
 fr: raccourcis clavier
 pt: atalhos do teclado
@@ -13312,6 +13379,7 @@ tr: erkek olmalı
 
     show implex
 co: identificà l’implessi
+de: Implex anzeigen
 en: show implex
 fr: identifier les implexes
 pt: identificar os implexos
@@ -13360,6 +13428,7 @@ tr: büyük amcalar ve büyük teyzeler
 
     siblings of the great-grandparents
 co: fratelli è surelle di l’arcicaccari
+de: Geschwister der Urgroßeltern
 en: great-granduncles and great-grandaunts
 fr: arrières-grands-oncles et arrières-grands-tantes
 pt: tios-bisavôs e tias-bisavós
@@ -13371,7 +13440,7 @@ bg: от последното щракване
 co: dapoi l’ultimu cliccu
 cs: este posledne kliknutie
 da: siden det sidste klik
-de: seit dem letzten click
+de: seit dem letzten Klick
 en: since the last click
 eo: depost la lasta kliko
 es: desde el último click
@@ -13395,6 +13464,7 @@ tr: son tıklamadan bu yana
 
     size
 co: scala
+de: Größe
 en: scale
 fr: echelle
 pt: escala
@@ -13434,6 +13504,7 @@ tr: oğul/kız/çocuk
 
     sons/daughters/children
 co: figlioli/figliole/zitelli
+de: Söhne/Töchter/Kinder
 en: sons/daughters/children
 fr: fils/filles/enfants
 pt: filhos/filhas/filhos
@@ -13638,7 +13709,7 @@ zh:  从下列选取
 
     spouse/spouses
 co: cumpagnu(a)/cumpagni
-de: ehepartner/partner
+de: Ehepartner/Partner
 en: spouse/spouses
 es: cónyuge/cónyuges
 fi: puoliso/puoliso
@@ -13654,6 +13725,7 @@ tr: eş/eşler
 
     spouses info
 co: infurmazione nant’à i cumpagni
+de: Partner-Informationen
 en: spouses informations
 fr: informations conjoints
 pt: informação do cônjuge
@@ -13788,7 +13860,7 @@ tr: banliyö
 
     summary book ascendants
 co: lista d’individu
-de: liste der Dateien
+de: Liste der Dateien
 en: list of individuals
 es: lista de fichas
 fi: kaikki perhetietokortit
@@ -13934,7 +14006,7 @@ zh:  姓
 
     surnames branch
 co: ghjembe patronimiche
-de: zweige der Familiennamen
+de: Zweige der Familiennamen
 en: lines by name
 es: ramas de apellidos
 fi: sukuhaarat
@@ -13982,7 +14054,7 @@ tr: soyadı listesi
 
     table
 co: tavula
-de: tabelle
+de: Tabelle
 en: table
 es: tabla
 fi: taulukko
@@ -15037,7 +15109,7 @@ tr: bir aileye çocuk eklemek için "%s" kullanın
 
     to change
 co: per cambià
-de: zum wechseln
+de: zum Wechseln
 en: Edit
 es: para cambiar
 et: muutmiseks
@@ -15349,7 +15421,7 @@ tr: yarın
 
     tools
 co: attrezzi
-de: hilfsmittel
+de: Hilfsmittel
 en: tools
 es: herramientas
 fi: työkalut
@@ -15443,6 +15515,7 @@ tr: ağaç
 
     tree of witnesses
 co: arburu di i testimoni
+de: Baum der Zeugen
 en: tree of witnesses
 fr: arbre des témoins
 pt: árvore de testemunhas
@@ -15469,7 +15542,7 @@ tr: Grafikler ve Listeler
 bg: опитайте отново
 co: pruvà torna
 da: prøv igen
-de: Nocheinmal versuchen
+de: Noch einmal versuchen
 en: retry
 es: volver a intentar
 et: proovi uuesti
@@ -15503,6 +15576,7 @@ tr: başka bir hesaplama seçeneği deneyin
 
     uncheck
 co: diselezziunà
+de: Abwählen
 en: uncheck
 fr: décocher
 pt: desseleccionar
@@ -15960,6 +16034,7 @@ tr: Nerede evlendi
 
     width
 co: larghezza
+de: Breite
 en: width
 fr: largeur
 pt:  largura
@@ -16013,6 +16088,7 @@ tr: ile
 
     with root, spouses and unknowns
 co: cù l’antenatu di a radica, i cumpagni è i scunnisciuti
+de: mit Urahn, Ehegatten und Unbekannten
 en: with root ancestor, spouses and unknowns
 fr: avec l’ancêtre racine, les conjoints et les inconnus
 pt: com o antepassado raiz, cônjuges e desconhecidos 
@@ -16021,6 +16097,7 @@ tr: kök atası, eşler ve bilinmeyenler ile
 
     witness at %s of
 co: testimone à u %s di
+de: Zeuge bei %s von
 en: witness at %s of
 fr: témoin au %s de
 pt: testemunha de %s de
@@ -16060,6 +16137,7 @@ tr: %s ve %s evliliğinde tanık
 
     witnesses at his events
 co: testimoni à i so avvenimenti
+de: Zeugen zu seinen Ereignissen
 en: witnesses at his events
 fr: témoins à ses évènements
 sv: vittnen vid hans händelser
@@ -16067,6 +16145,7 @@ tr: etkinliklerinde tanıklar
 
     witnesses to events of
 co: testimoni à l’avvenimenti di
+de: Zeugen zu Ereignissen von
 en: witnesses to events of
 fr: témoins aux évènements de
 sv: vittnen vid händelser för
@@ -16074,6 +16153,7 @@ tr: etkinliklerinin tanıkları
 
     witnesses to my events and godparents
 co: testimoni à i mo avvenimenti è cumpare/cummare
+de: Zeugen zu meinen Ereignissen und Taufzeugen
 en: witnesses to my events and godparents
 fr: témoins à mes évènements et parrains/marraines
 sv: vittnen vid mina händelser och gudföräldrar
@@ -16081,6 +16161,7 @@ tr: etkinliklerime ve vaftiz babalarıma tanıklar
 
     witness tree
 co: arburu di i testimoni
+de: Baum der Zeugen
 en: tree of witnesses
 fr: arbre des témoins
 pt: árvore de testemunhas
@@ -16134,7 +16215,7 @@ ca: administrador/administrador/amic/amic/exterior
 co: magu/maghi/amicu/amichi/furesteru
 cs: wizard/wizards/friend/friends/exterior
 da: bidragyder/bidragydere/betroet/betroet/exterior
-de: Meister/Meisters/Freund/Freunde/exterior
+de: Meister/Meister/Freund/Freunde/exterior
 en: wizard/wizards/friend/friends/exterior
 eo: sorĉisto/sorĉistoj/amiko/amikoj/exterior
 es: mago/magos/amigo/amigos/exterior
@@ -16285,7 +16366,7 @@ zh:  岁
 
     you are visible/you are not visible
 co: site videvule/ùn site micca videvule
-de: sie sind sichtbar/sie sind unsichtbar
+de: Sie sind sichtbar/Sie sind unsichtbar
 en: you are visible/you are invisible
 es: es visible/no es visible
 et: sa oled nähtav/sa ei ole nähtav
