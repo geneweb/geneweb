@@ -24,7 +24,6 @@ let is_empty_or_quest_name p =
   is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
   is_empty_string (get_first_name p) || is_quest_string (get_first_name p)
 
-
 (**/**)
 
 
@@ -177,6 +176,36 @@ let string_of_date_option date =
   match date with
   | Some d -> string_of_date2 d
   | None -> ""
+
+let title_to_piqi_title t =
+  let (title_type, name) =
+    match t.t_name with
+    | Tmain -> (`title_main, "")
+    | Tname name -> (`title_name, name)
+    | Tnone -> (`title_none, "")
+  in
+  let title = t.t_ident in
+  let fief = t.t_place in
+  let date_begin =
+    match Adef.od_of_cdate t.t_date_start with
+    | Some d -> Some (string_of_date d)
+    | None -> None
+  in
+  let date_end =
+    match Adef.od_of_cdate t.t_date_end with
+    | Some d -> Some (string_of_date d)
+    | None -> None
+  in
+  let nth = Some (Int32.of_int t.t_nth) in
+  M.Title.{ title_type
+          ; name = if name = "" then None else Some name
+          ; title = if title = "" then None else Some title
+          ; fief = if fief = "" then None else Some fief
+          ; date_begin
+          ; date_end
+          ; nth
+          }
+
 
 (**/**) (* Convertion d'une date. *)
 
@@ -1171,39 +1200,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
     if p_auth then Some gen_p.burial_src
     else None
   in
-  let titles =
-    List.map
-      (fun t ->
-        let (title_type, name) =
-          match t.t_name with
-          | Tmain -> (`title_main, "")
-          | Tname name -> (`title_name, name)
-          | Tnone -> (`title_none, "")
-        in
-        let title = t.t_ident in
-        let fief = t.t_place in
-        let date_begin =
-          match Adef.od_of_cdate t.t_date_start with
-          | Some d -> Some (string_of_date d)
-          | None -> None
-        in
-        let date_end =
-          match Adef.od_of_cdate t.t_date_end with
-          | Some d -> Some (string_of_date d)
-          | None -> None
-        in
-        let nth = Some (Int32.of_int t.t_nth) in
-        M.Title.({
-          title_type = title_type;
-          name = if name = "" then None else Some name;
-          title = if title = "" then None else Some title;
-          fief = if fief = "" then None else Some fief;
-          date_begin = date_begin;
-          date_end = date_end;
-          nth = nth;
-        }))
-      gen_p.titles
-  in
+  let titles = List.map title_to_piqi_title gen_p.titles in
   let occupation =
     if p_auth then Some gen_p.occupation
     else None

@@ -487,6 +487,7 @@ message WarningPossibleDuplicateFam {
 
 message WarningTitleDatesError {
   required WarningPerson person = 1;
+  required Title title = 2;
 }
 
 message WarningUndefinedSex {
