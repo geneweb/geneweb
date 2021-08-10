@@ -143,14 +143,15 @@ let treat_connection tmout callback addr fd =
   printing_state := Nothing;
   if Sys.unix && tmout > 0 then begin
     ignore @@ Sys.signal Sys.sigalrm @@ Sys.Signal_handle begin fun _ ->
-      http Def.OK;
-      output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
-      printnl ();
-      printnl ();
-      printf "<head><title>Time out</title></head>\n";
-      printf "<body><h1>Time out</h1>\n";
-      printf "Computation time > %d second(s)\n" tmout;
-      printf "</body>\n";
+      if !printing_state = Nothing then http Def.OK ;
+      if !printing_state <> Contents then begin
+        output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
+        printnl ();
+        printnl ();
+        printf "<head><title>Time out</title></head>\n";
+        printf "<body>"
+      end ;
+      printf "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>" tmout ;
       wflush ();
       exit 0
     end ;
