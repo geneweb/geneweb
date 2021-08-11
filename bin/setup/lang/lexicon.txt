@@ -172,7 +172,7 @@ fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suiv
     <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 aa: bsi_fix.htm
 co: <span style="color:#FF0000;">AVERTIMENTU</span> : sta cumanda mudificheghja a basa di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.
-de: <span style="color:#FF0000;">ACHTUNG</span>: dieser Befehl verändert die base unwiderruflich. Ein Backup Archiv wird empfohlen.
+de: <span style="color:#FF0000;">ACHTUNG</span>: dieser Befehl verändert die Datenbank unwiderruflich. Ein Backup Archiv wird empfohlen.
 en: <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 fr: <span style="color:#FF0000;">ATTENTION</span> : cette commande modifie la base de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
 
@@ -295,7 +295,7 @@ sv: Applicera på en databas
     Are you sure you want to delete these databases?
 aa: delete_1.htm
 co: Site sicuru di vulè squassà ste base di dati ?
-de: Bist du sicher, daß du diese Datenbanken löschen möchtest?
+de: Bist du sicher, dass du diese Datenbanken löschen möchtest?
 en: Are you sure you want to delete these databases?
 es: Esta Ud seguro de querer suprimir estas bases?
 fi: Oletko varma että haluat poistaa nämä tietokannat?
@@ -307,7 +307,7 @@ sv: Är du säker att du vill radera dessa databaser?
     Ask for deleting branches whose size <= that value.
 aa: connex.htm
 co: Dumandà di squassà i cumpunenti di dimensione <= à stu valore.
-de: Frage nach dem löschen von Zweigen dessen Größe <= diesem Wert sind.
+de: Frage nach dem Löschen von Zweigen, dessen Größe <= diesem Wert sind.
 en: Ask for deleting branches whose size <= that value.
 fr: Demander à détruire les composantes de taille <= à cette valeur.
 
@@ -356,7 +356,7 @@ sv: Databasen har blivit omdöpt.
     But it does not hold the command "gwu" required to transfer your database. Are you sure it is a %G distribution directory
 aa: err_ngw.htm
 co: Ma ùn cuntene micca a cumanda « gwu » richiesta per u trasferimentu di a vostra basa di dati. Site sicuru chì ghjè un cartulare d’una distribuzione %G
-de: Dieses Verzeichnis enthält aber nicht das Kommando "gwu", welches nötig ist, um die Datenbank zu übertragen. Bist Du sicher, daß dieses Verzeichnis ein %G-Installationsverzeichnis ist
+de: Dieses Verzeichnis enthält aber nicht das Kommando "gwu", welches nötig ist, um die Datenbank zu übertragen. Bist Du sicher, dass dieses Verzeichnis ein %G-Installationsverzeichnis ist
 en: But it does not hold the command "gwu" required to transfer your database. Are you sure it is a %G distribution directory
 es: Pero ella no contiene el comando "gwu" necesario para transferir su base de datos. ¿está Ud. seguro de que se trata bien de una carpeta de una distribución %G
 fi: Mutta se ei sisällä komentoa "gwu" joka vaaditaan että voit siirtää tietokannan. Oletko varma että se on  %G asennus hakemisto
@@ -390,7 +390,7 @@ sv: Alla sidor för databasen visas i detta språk. Välj det språk du föredra
     By default, when creating a person, if the GEDCOM first name part looks like a public name, i.e. holds: <ul> <li>A number or a roman number, supposed to be a number of a nobility title (e.g. George V) <li>One of the words: "der", "den", "die", "el", "le", "la", "the", supposed to be the beginning of a qualifier (e.g. William the Conqueror) </ul> then the GEDCOM first name part becomes the person "public name" and its first word his "first name" (-epn default).
 aa: ged2gwb.htm
 co: Di regula, quandu si crea una persona, s’è a parte di u <i>nome</i> di u schedariu GEDCOM s’assumiglia à una casata publica, i.e. cuntene : <ul> <li>un numeru nurmale o cifri rumani chì seria un numeru d’un titulu di nubiltà (esempiu: Louis XIV) ; <li>una di e parolle : « der », « den », « die », « el », « le », « la », « the », suppostu esse u principiu d’un qualificativu (esempiu : Guillaume le Conquérant) ; </ul> tandu u nome di u GEDCOM diventeghja una « casata publica » è a prima parolla di a parte di u nome và in a parte « nome» (-epn predefinitu).
-de: Normalerweise wird beim Anlegen einer Person, deren GEDCOM-Vorname wie ein öffentlicher Name aussieht, d.h. falls er folgendes beinhaltet: <ul> <li>Eine Zahl oder eine eine römische Zahl, von der angenommen wird,  daß es sich um die Nummer eines Adelstitels handelt (z. B. George V) <li>Eines der Wörter: "der", "den", "die", "el", "le", "la", "the", von dem angenommen wird, daß es sich um den Beginn eines Beinamens handelt (z. B. William der Eroberer) </ul> dann wird der GEDCOM-Vorname der "Öffentliche Name" der Person und das erste Wort des GEDCOM-Vornamens wird ihr "Vorname".
+de: Normalerweise wird beim Anlegen einer Person, deren GEDCOM-Vorname wie ein öffentlicher Name aussieht, d.h. falls er folgendes beinhaltet: <ul> <li>Eine Zahl oder eine eine römische Zahl, von der angenommen wird,  dass es sich um die Nummer eines Adelstitels handelt (z. B. George V) <li>Eines der Wörter: "der", "den", "die", "el", "le", "la", "the", von dem angenommen wird, dass es sich um den Beginn eines Beinamens handelt (z. B. William der Eroberer) </ul> dann wird der GEDCOM-Vorname der "Öffentliche Name" der Person und das erste Wort des GEDCOM-Vornamens wird ihr "Vorname".
 en: By default, when creating a person, if the GEDCOM first name part looks like a public name, i.e. holds: <ul> <li>A number or a roman number, supposed to be a number of a nobility title (e.g. George V) <li>One of the words: "der", "den", "die", "el", "le", "la", "the", supposed to be the beginning of a qualifier (e.g. William the Conqueror) </ul> then the GEDCOM first name part becomes the person "public name" and its first word his "first name" (-epn default).
 es: Por defecto, al crear una persona, si el campo nombre en el fichero GEDCOM se asemeja a un nombre público, es decir, si él contiene: <ul> <li>Un número ordinario o en cifras romanas, normalmente considerado como un número de un título de nobleza (por ejemplo: Luis XIV), <li>Una de las palabras: "der", "den", "die", "el", "le", "la", "the", normalmente utilizadas como particula inicial de un calificativo (por ejemplo: Guillermo el Conquistador), </ul> entonces el nombre en el fichero GEDCOM se transforma en un "nombre público" y la primera palabra del campo nombre va en el campo "nombre".
 fr: Par défaut, au moment de la création d’une personne, si la partie prénom dans le GEDCOM ressemble à un nom public, c’est-à-dire si elle contien contient :<ul> <li> un nombre normal ou en chiffres romains, censé être un numéro d’un titre de noblesse (exemple : Louis XIV) ; <li> un des mots : « der », « den », « die », « el », « le », « la », « the », censé être le début d’un qualificatif (exemple : Guillaume le Conquérant) ; </ul> alors le prénom dans le GEDCOM devient un « nom public » et le premier mot de la partie prénom va dans la partie « prénom» (-epn par défaut).
@@ -554,7 +554,7 @@ fr: Calcule les composantes connexes
     Compute the difference between two bases
 aa: welcome.htm
 co: Calculeghja a sfarenza trà duie base
-de: Berechne die unterschiede zwischen zwei bases
+de: Berechne die Unterschiede zwischen zwei Datenbanken
 en: Compute the difference between two bases
 fr: Calcule la différence entre deux bases
 
@@ -830,7 +830,7 @@ sv: Målkatalog och databas
     Details for this length.
 aa: connex.htm
 co: Pruvede detaglii per sta longhezza.
-de: Details für diese länge.
+de: Details für diese Länge.
 en: Details for this length.
 fr: Fournir détails pour cette taille.
 
@@ -912,7 +912,7 @@ fr: Ne pas extraire d’images individuelles.
     Done. The operation is terminated.
 aa: gwdiff_ok.htm
 co: Eccu. L’operazione hè compia.
-de: Fertig. Die operation ist abgeschlossen.
+de: Fertig. Die Operation ist abgeschlossen.
 en: Done. The operation is terminated.
 fr: L’opération est terminée.
 
@@ -1202,7 +1202,7 @@ fr: fevents' witnesses.
     Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
 aa: gwu_ok.htm
 co: I schedarii sò stati ricustituiti in u cartulare d’origine.<br> I novi dati senza schedariu d’origine sò stati inversiati ver di u schedariu %o o ver di comm.log. Tocca à voi d’amministrà stu novu schedariu .gw o d’aghjunghje sti dati à i schedarii esistente.
-de: Dateien wurden wiederhergestellt im Original Quellverzeichnis.<br>erstellte Daten ohne Originaldatei wurden in die Datei %o oder comm.log umgelenkt. Es liegt an Ihnen die neue Quelldatei zu verwalten, oder sie mit existierenden Dateien zusammenzuführen.
+de: Dateien wurden wiederhergestellt im Original Quellverzeichnis.<br>Erstellte Daten ohne Originaldatei wurden in die Datei %o oder comm.log umgelenkt. Es liegt an Ihnen, die neue Quelldatei zu verwalten oder sie mit existierenden Dateien zusammenzuführen.
 en: Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
 fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br> Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier %o ou vers comm.log. Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
 
@@ -1219,21 +1219,21 @@ lv: Vârds
     Fix base
 aa: gwfix.htm
 co: Riparà una basa
-de: repariere base
+de: repariere Datenbank
 en: Fix base
 fr: Fix base
 
     Fix base and recompute index
 aa: gwfix.htm
 co: Riparà una basa è ricalculeghja l’indice
-de: repariere base und berechne index neu
+de: repariere Datenbank und berechne index neu
 en: Fix base and recompute index
 fr: Corrige une base et reclacule l'index
 
     Fixes problems in a base
 aa: welcome.htm
 co: Currege una basa è calculeghja torna l’indici
-de: Löse Probleme in einer base
+de: Löse Probleme in einer Datenbank
 en: Fixes problems in a base
 fr: Corrige les problèmes d'une base
 
@@ -1413,7 +1413,7 @@ fr: Messages gwfixbase
     help.
 aa: gwfix.htm
 co: aiutu.
-de: hilfe.
+de: Hilfe.
 en: help.
 fr: help.
 
@@ -1443,7 +1443,7 @@ sv: Här är parametrarna för databasen "%a". Ändra vad du anser nödvändigt
     Here are the parameters of the command "gwd". Change the one you estimate necessary
 aa: gwd.htm
 co: Eccu i parametri di a cumanda « gwd ». Cambiate ciò chì vi pare necessariu
-de: Hier sind die Parameter für das Kommando "gwd".  Du kannst die folgenden Werte änder
+de: Hier sind die Parameter für das Kommando "gwd".  Du kannst die folgenden Werte ändern
 en: Here are the parameters of the command "gwd". Change the one you estimate necessary
 es: A continuación se indican los parámetros del commando "gwd". Cambie aquellos que Ud. juzgue necesario
 fr: Voici les paramètres de la commande "gwd". Vous pouvez modifier les paramètres suivants
@@ -1521,7 +1521,7 @@ it: Nascondere la richiesta avanzata.
     Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.
 aa: gwf_1.htm
 co: Piattà i nomi di e persone private, vale à dì e persone vive, o più precisamente, quelle di menu di 100 anni.
-de: Verberge die Namen zeitgenössischer Personen, d.h. die Namen der Personen, die noch leben, oder genauer, die Personen, die jüger als ein Jahrhundert sind.
+de: Verberge die Namen zeitgenössischer Personen, d.h. die Namen der Personen, die noch leben, oder genauer, die Personen, die jünger als ein Jahrhundert sind.
 en: Hide the names of the private persons, i.e. the still living persons or, more exactly, the persons of less than one century.
 fr: Cache les noms des personnes privées, c’est-à-dire les personnes vivantes, ou plus exactement, celles de moins de 100 ans.
 it: Nasconde i nomi delle persone private, ovvero le persone in vita o più esattamente quelle che hanno meno di 100 anni.
@@ -1661,7 +1661,7 @@ sv: Om "Yes", förlorar "wizards" deras behörighet att göra uppdateringar.
     If you changed the name of your database, but this database has been existed since a long time and you think that many people made links to it, keep this parameter file for this base and write here the new name of the database. People who consult the database with the old name receive then a page indicating them the new name to use with the same clickable request.
 aa: gwf_1.htm
 co: S’è vò avete cambiatu u nome di a vostra basa di dati, ma chì ghjè una basa chì esiste dapoi un pezzu, è chì vò pensate chì tamanta ghjente ci hà messu liami annantu, cunservate stu schedariu di parametri per sta basa è indicate quaghjò u novu nome di a basa. A ghjente chì cunsulterà a basa di dati cù u vechju nome riceverà una pagina chì ci indicherà u novu nome à impiegà cù a so stessa richiesta clicchevule.
-de: Wenn du den Namen deiner Datenbank geändert hast, diese Datenbank aber schon seit langer Zeit bestand und du glaubst, daß viele Leute Links auf sie gemacht haben, dann behalte die Parameterdatei und trage hier den Namen der neuen Datenbank ein. Leute, die die Datenbank unter dem alten Namen abfragen, erhalten dann automatisch eine Seite mit einem Verweis auf die neue Datenbank, mit einem klickbaren Kommando, das auf der neuen Datenbank sofort den gleichen Befehl ausführt.
+de: Wenn du den Namen deiner Datenbank geändert hast, diese Datenbank aber schon seit langer Zeit bestand und du glaubst, dass viele Leute Links auf sie gemacht haben, dann behalte die Parameterdatei und trage hier den Namen der neuen Datenbank ein. Leute, die die Datenbank unter dem alten Namen abfragen, erhalten dann automatisch eine Seite mit einem Verweis auf die neue Datenbank, mit einem klickbaren Kommando, das auf der neuen Datenbank sofort den gleichen Befehl ausführt.
 en: If you changed the name of your database, but this database has been existed since a long time and you think that many people made links to it, keep this parameter file for this base and write here the new name of the database. People who consult the database with the old name receive then a page indicating them the new name to use with the same clickable request.
 es: Si Ud. ha cambiado el nombre de su base, pero que esta es una base que existe después de mucho tiempo, y que Ud. piensa que muchas personas han efectuado enlaces en ella, conserve el fichero de parámetros de esta base he indique a continuación el nuevo nombre de la base. Las personas que consultarán la base con el nombre antigüo recibirán una página que les indicará el nuevo nombre a utilizar con la misma demanda clicable.
 fr: Si vous avez changé le nom de votre base, mais que c’est une base qui existe depuis longtemps et que vous pensez que beaucoup de gens ont mis des liens dessus, conservez ce fichier de paramètres pour cette base et indiquez ci-dessous le nouveau nom de la base. Les gens qui consulteront la base avec l’ancien nom recevront une page qui leur indiquera le nouveau nom à utiliser avec leur même requête cliquable.
@@ -1692,7 +1692,7 @@ sv: Om du just gjorde detta, är den nu nog raderad och därför är det inte vi
     If you made many modifications in your database, or if you simply entered much data, it is advised to make a cleaning up, especially if you observe that the access to your database has slowed down.
 aa: cleanup.htm
 co: S’è vò avete fattu mudificazioni numerose in a vostra basa di dati, o avete aghjuntu dati numerosi, hè ricumandatu di fà una nettata, soprattuttu s’è l’accessu à a vostra basa di dati si face avà pianu pianu.
-de: Wenn du viele Änderungen an deiner Datenbank vorgenommen hast, oder einfach nur viele Daten eingegeben hast, dann ist es empfehlenswert, sie aufzuräumen, insbesondere falls du feststellst, daß sich der Zugriff auf deine Datenbank verlangsamt hat.
+de: Wenn du viele Änderungen an deiner Datenbank vorgenommen hast, oder einfach nur viele Daten eingegeben hast, dann ist es empfehlenswert, sie aufzuräumen, insbesondere falls du feststellst, dass sich der Zugriff auf deine Datenbank verlangsamt hat.
 en: If you made many modifications in your database, or if you simply entered much data, it is advised to make a cleaning up, especially if you observe that the access to your database has slowed down.
 es: Si Ud ha efectuado muchas modificaciones en su base de datos, o simplemente si Ud. a entrado muchos datos, es aconsejable de realizar  una limpieza, en particular si Ud constata que el acceso a su base de  datos comienza a ser mas lento que de costumbre.
 fi: Jos olet tehnyt muutoksia tietokantaan, tai olet syöttänyt paljon tietoa on suositeltavaa että puhdistat sen, varsinkin jos huomaat että tietokannan käyttö on hidastunut.
@@ -1726,7 +1726,7 @@ sv: Om du väljer de båda valen ovan, kommer överlappning att antas: personer 
     If you want that a text appears in the bottom of each page, write it here. You can use HTML tags.
 aa: gwf_1.htm
 co: S’è vo vulete chì un testu sia scrittu à u bassu d’ogni pagina, scrivitelu puru quì. Pudete metteci dentru etichette HTML.
-de: Wenn Du möchtest, daß ein bestimmter Text am Ende jeder Seite angezeigt wird, gib ihn hier an. Du kannst HTML-Tags benutzen.
+de: Wenn Du möchtest, dass ein bestimmter Text am Ende jeder Seite angezeigt wird, gib ihn hier an. Du kannst HTML-Tags benutzen.
 en: If you want that a text appears in the bottom of each page, write it here. You can use HTML tags.
 es: Si Ud desea que un texto aparezca en la parte inferior de cada página, indíquela aquí. Ud. puede agregar allí las balizas HTML.
 fr: Si vous voulez qu’un texte apparaisse au bas de chaque page, indiquez-le ici. Vous pouvez y mettre des balises HTML.
@@ -1737,7 +1737,7 @@ sv: Om du vill att en text ska synas längst ner på varje sida, skriv den här.
     If you want that the traces rather go in a file, write here the name of the file here. This file will be created if it does not exist, in the main directory of %G where you see the commands "gwsetup" and "gwd". It will be extended at each request.
 aa: gwd.htm
 co: S’è vo preferite chì e traccie vochinu in un schedariu, scrivite quì u so nome. Stu schedariu serà creatu, s’ellu ùn esiste, in u cartulare principale di %G induve si trovanu e cumande « gwsetup » è « gwd ». È serà allungatu à ogni richiesta.
-de: Wenn du möchtest, daß diese Daten stattdessen in einer Datei protokolliert werden, gib hier den gewünschten Dateinamen an. Die Datei wird im %G-Hauptverzeichnis angelegt (dort wo die Kommandos "gwsetup" und "gwd" stehen), falls sie nicht existiert.
+de: Wenn du möchtest, dass diese Daten stattdessen in einer Datei protokolliert werden, gib hier den gewünschten Dateinamen an. Die Datei wird im %G-Hauptverzeichnis angelegt (dort wo die Kommandos "gwsetup" und "gwd" stehen), falls sie nicht existiert.
 en: If you want that the traces rather go in a file, write here the name of the file here. This file will be created if it does not exist, in the main directory of %G where you see the commands "gwsetup" and "gwd". It will be extended at each request.
 es: Si Ud. desea que las trazas vayan mas bien hacia un fichero; indique aquí el nombre del fichero que Ud. desea utilizar. Este fichero será creado, en caso que el no exista aún, en la carpeta principal de %G donde Ud ve los comandos "gwsetup" y"gwd". A cada demanda de datos a su base, este fichero sera incrementado de las líneas de trazas correspondientes.
 fr: Si vous désirez que les traces aillent plutôt dans un fichier, indiquez ici le nom du fichier que vous désirez. Ce fichier sera créé, s’il n’existe pas, dans le répertoire principal de %G où vous voyez les commandes "gwsetup" et "gwd". Il sera rallongé à chaque requête.
@@ -1819,7 +1819,7 @@ sv: För att parametrarna ska kunna börja användas, måste gwd servicen stoppa
     In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
 aa: gwb2ged.htm
 co: In e scatule quaghjò, ci vole à scrive sempre un’occurrenza per u campu « Num » (eventualmente « 0 »).
-de: In den unteren Boxen, immer einen Wert in den "Num" einträgen eingeben (vorkommen) ("0" möglich).
+de: In den unteren Boxen, immer einen Wert in den "Num"-Einträgen eingeben (Vorkommen) ("0" möglich).
 en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
 fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (éventuellement "0").
 
@@ -1981,7 +1981,7 @@ sv: ledning och skapande
     marriage divorce.
 aa: gwfix.htm
 co: divorziu di u matrimoniu.
-de: heirat scheidung.
+de: Heirat Scheidung.
 en: marriage divorce.
 fr: marriage divorce.
 
@@ -2185,7 +2185,7 @@ sv: Operationen klar
     or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
 aa: gwu.htm
 co: o dumandate à ricustruisce i schedarii in u cartulare d’origine.<br> S’è a basa hè stata creata da <span style="font-family: monospace">gwc -f *.gw</span>, tandu <span style="font-family: monospace">gwu -odir .</span> ricustruiscerà i schedarii d’origine.
-de: oder fragen Sie nach neuerstellung der Dateien im Originalverzeichnis.<br>Wenn die base von <span style="font-family: monospace">gwc -f *.gw</span> erstell wurde, dann wird <span style="font-family: monospace">gwu -odir</span> die Quelldatei neu erstellen.
+de: oder fragen Sie nach neuerstellung der Dateien im Originalverzeichnis.<br>Wenn die Datenbank von <span style="font-family: monospace">gwc -f *.gw</span> erstell wurde, dann wird <span style="font-family: monospace">gwu -odir</span> die Quelldatei neu erstellen.
 en: or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
 fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>, alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
 
@@ -2568,7 +2568,7 @@ sv: Starta beräkning från början.
     Restrict deleting branches whose size = -del.
 aa: connex.htm
 co: Limiteghja a squassatura à e ghjembe di dimensione = -del.
-de: Begrenze das löschen von zweigen deren  Größe = -del.
+de: Begrenze das löschen von Zweigen deren  Größe = -del.
 en: Restrict deleting branches whose size = -del.
 fr: Limite la suppression aux branches de taille = -del.
 
@@ -2587,7 +2587,7 @@ sv: Återvänd till huvudmenyn.
     Return to the previous page and select the correct file.
 aa: err_unkn.htm
 co: Rivinite à a pagina precedente è selezziunate u schedariu currettu.
-de: Kehre zurück auf die vorherige Seite und wähle  eine richtige Datei aus.
+de: Kehre zurück auf die vorherige Seite und wähle eine richtige Datei aus.
 en: Return to the previous page and select the correct file.
 es: Regrece Ud a la página anterior y seleccione el fichero correcto.
 fi: Palaa edelliselle sivulle ja valitse oikea tiedosto.
@@ -2767,7 +2767,7 @@ fr: Sélectionnez la première base de données 
     Select your GEDCOM file by clicking on the file or navigating in your folders.
 aa: ged2gwb.htm
 co: Selezziunate u vostru schedariu GEDCOM clicchendu nant’à u so nome, o navigate in i vostri cartulari.
-de: Bitte eingeben vollständiger Name deiner GEDCOM-Datei.
+de: Bitte den vollständigen Namen deiner GEDCOM-Datei eingeben.
 en: Select your GEDCOM file by clicking on the file or navigating in your folders.
 es: Agregue Ud el nombre completo de su fichero GEDCOM.
 fr: Sélectionnez votre fichier GEDCOM en cliquant sur son nom ou en navigant dans les dossiers.
@@ -2831,7 +2831,7 @@ sv: Enkel metod
     Some GEDCOM files sometimes write dates with numbered months (from 1 to 12). The GEDCOM standard 5.5 requires that the months be represented by identifiers (e.g. "MAY 1912" and not "05/1912"). The notation "02/05/1912" is ambiguous (means "May 2, 1912" or "February 5, 1912" according to the countries).
 aa: ged2gwb.htm
 co: Certi schedarii GEDCOM scrivenu ognitantu e date cù numeri (da 1 à 12) per i mesi. A norma GEDCOM 5.5 richiede chì i mesi sianu riprisentati da parolle (esempiu : « MAGHJU 1912 » è micca « 05/1912 »). A scrittura « 02/05/1912 » hè ambigua (vole dì « 2 di maghju di u 1912 » o « 5 di ferraghju di u 1912 » secondu i paesi).
-de: GEDCOM-Dateien enthalten manchmal numerische Monatsangaben (von 1 bis 12). Der GEDCOM-Standard 5.5  schreibt aber vor, daß Monate durch Kürzel dargestellt werden (z. B. "MAY 1912" und nicht "05/1912"). Die Angabe "02/05/1912" ist mehrdeutig (bedeutet je nach Land "2. Mai 1912" oder "5. Februar 1912").
+de: GEDCOM-Dateien enthalten manchmal numerische Monatsangaben (von 1 bis 12). Der GEDCOM-Standard 5.5  schreibt aber vor, dass Monate durch Kürzel dargestellt werden (z. B. "MAY 1912" und nicht "05/1912"). Die Angabe "02/05/1912" ist mehrdeutig (bedeutet je nach Land "2. Mai 1912" oder "5. Februar 1912").
 en: Some GEDCOM files sometimes write dates with numbered months (from 1 to 12). The GEDCOM standard 5.5 requires that the months be represented by identifiers (e.g. "MAY 1912" and not "05/1912"). The notation "02/05/1912" is ambiguous (means "May 2, 1912" or "February 5, 1912" according to the countries).
 es: Algunos ficheros  GEDCOM utilizan a veces los números ordinarios para referirse a los meses (de 1 a 12). El estándar GEDCOM 5.5 exije que los meses sean representados por sus identificadores (por ej: "MAY 1912" y no "05/1912"). La notación "02/05/1912" es ambigüa; (puede significar "2 de mayo de 1912" o "5 de fevrero de 1912" según los diferentes paises).
 fr: Certains fichiers GEDCOM écrivent parfois les dates en mettant les mois avec des nombres (de 1 à 12). Le standard GEDCOM 5.5 exige que les mois soient représentés par des identificateurs (ex. : « MAI 1912 » et non pas « 05/1912 »). La notation « 02/05/1912 » est ambiguë : elle peut signifier « 2 mai 1912 » ou « 5 février 1912 » suivant les pays.
@@ -2883,14 +2883,14 @@ sv: Startkatalog och databas
     Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 aa: gwdiff.htm
 co: Persona di principu in a prima basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
-de: Startperson in der ersten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
+de: Startperson in der ersten Datenbank.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 en: Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la première base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
 
     Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 aa: gwdiff.htm
 co: Persona di principu in a seconda basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
-de: Startperson in der zweiten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
+de: Startperson in der zweiten Datenbank.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 en: Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la seconde base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
 
@@ -3295,7 +3295,7 @@ sv: Detta skapar en katalog benämnd "%o.gwb".
     This can be useful, temporarilly, when you make a cleanup of your database, if it is accessible to Internet, to avoid that "wizards" make changes which would be lost during the operation (remember to suppress this option after cleanup).
 aa: gwf_1.htm
 co: St’ozzione pò esse ghjuvevule, timpurariamente, quandu si face una nettata di a vostra basa di dati, s’ella hè acciduta da Internet, per impedisce chì certi « maghi » faccianu mudificazioni chì serianu perse durante l’operazione (ma arricurdatevi di squassà st’ozzione dopu a nettata).
-de: Dies kann sinnvoll sein, um z. B. beim Aufräumen der Datenbank, wenn sie über das Internet zugreifbar ist, temporär zu vermeiden, daß "Wizards" Daten ändern, die durch die Operation verloren gehen würden. (Denke in diesem Fall daran, diese Option nach Beendigung des Aufräumens dann wieder zurückzusetzen.)
+de: Dies kann sinnvoll sein, um z. B. beim Aufräumen der Datenbank, wenn sie über das Internet zugreifbar ist, temporär zu vermeiden, dass "Wizards" Daten ändern, die durch die Operation verloren gehen würden. (Denke in diesem Fall daran, diese Option nach Beendigung des Aufräumens dann wieder zurückzusetzen.)
 en: This can be useful, temporarilly, when you make a cleanup of your database, if it is accessible to Internet, to avoid that "wizards" make changes which would be lost during the operation (remember to suppress this option after cleanup).
 es: Esto puede ser util, temporalmente, cuando uno realiza una limpieza de la base si esta es accesible por Internet, afin de evitar que los "magos" realizen actualizaciones, que serian perdidas durante esta operación (piense luego a suprimir esta opción después de finalizar la limpieza).
 fr: Cela peut-être utile, temporairement, quand on fait un nettoyage de la base, si elle est accessible sur Internet, pour éviter que des "magiciens" ne fassent des mises-à-jour qui seraient perdues pendant l’opération (penser alors à supprimer cette option après nettoyage).
@@ -3522,7 +3522,7 @@ sv: Under Unix, starta ett xterm och skriv följande kommandon
     Under Windows or Unix, type "control C" in the window where it is running.
 aa: gwd_info.htm
 co: Sottu <b>Windows</b> o <b>Linux</b>, scrivite « control C » in a finestra induve ellu funziuneghja.
-de: Unter <b>Windows</b> oder <b>Unix</b> drücke Control-C (bzw. Strg-C)  in dem Fenster, wo gwd läuft.
+de: Unter <b>Windows</b> oder <b>Unix</b> drücke Control-C (bzw. Strg-C) in dem Fenster, wo gwd läuft.
 en: Under Windows or Unix, type "control C" in the window where it is running.
 es: A partir de Windows o Unix, escriba en el teclado "control C", (manteniendo apoyadas las dos teclas), en la "ventana" en la cual el programa ha sido lanzado.
 fr: Sous <b>Windows</b> ou <b>Unix</b>, tapez "control C" dans la fenêtre où il tourne.
@@ -3534,7 +3534,7 @@ sv: Under Windows eller Unix, tryck "control C" i fönstret där den körs.
     Under Windows, launch the program "gwd".
 aa: gwd_info.htm
 co: Sottu <b>Windows</b>, lanciate u prugramma « gwd ».
-de: Unter <b>Windows</b> verwende einen Doppelklick auf das  "gwd"-Icon, dann kehre hierher zurück.
+de: Unter <b>Windows</b> verwende einen Doppelklick auf das "gwd"-Icon, dann kehre hierher zurück.
 en: Under Windows, launch the program "gwd".
 es: A partir de Windows, cliquear dos veces en el icono de "gwd", y luego regrese Ud. aquí.
 fr: Sous <b>Windows</b>, lancez le programme "gwd".
@@ -3558,7 +3558,7 @@ sv: Okänd fil
     Update links page / family chronicle
 aa: welcome.htm
 co: Attualisazione di i ligami scheda/cronaca famigliale
-de: Aktualisieren Sie Links-Seite / Familien-Chronik
+de: Aktualisieren der Links-Seite / Familien-Chronik
 en: Update links page / family chronicle
 es: Actualizar página de enlaces / crónica familiar
 fi: Päivitä linkit sivu / sukukronikka
@@ -3582,14 +3582,14 @@ sv: update_nldb
     Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 aa: connex_ok.htm
 co: Impieghendu <b>gwd</b> per fighjà u schedariu in u cartulare NOTES induve i risultati sò stati ridiretti (%a.gwb/notes_d/connex.txt).<br> Ci viderete l’ultimi dati arregistrati in stu locu (chì ùn sò micca necessariamente quelli chì vò vinite di calculà - fighjate a stampiglia di data è ora in capu di schedariu).<br> Sta suluzione vi permette di seguità i liami ver di e persone indettate.
-de: Verwende <b>gwd</b> um die Datei im NOTES Ordner Ihrer base, in der Sie die Ausgabe umgeleitet haben (%a.gwb/notes_d/connex.txt), zu visualisieren.<br> Diese Datei enthält den zuletzt gespeicherten Datensatz an dieser Position (welcher nicht notwendigerweise der ist, den Sie zuletzt berechnet haben - Siehe Zeitstempel am Anfang der Datei).<br> Diese Lösung erlaubt Ihnen Links zu markierten Personen zu folgen.
+de: Verwende <b>gwd</b> um die Datei im NOTES Ordner Ihrer Datenbank, in die Sie die Ausgabe umgeleitet haben (%a.gwb/notes_d/connex.txt), zu visualisieren.<br> Diese Datei enthält den zuletzt gespeicherten Datensatz an dieser Position (welcher nicht notwendigerweise der ist, den Sie zuletzt berechnet haben - Siehe Zeitstempel am Anfang der Datei).<br> Diese Lösung erlaubt Ihnen Links zu markierten Personen zu folgen.
 en: Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
 fr: En utilisant <b>gwd</b> pour visualiser le fichier dans le dossier NOTES où vous avez redirigé les résultats (%a.gwb/notes_d/connex.txt).<br> Vous y verrez la dernière version du fichier connex.txt que vous avez créé à cet endroit (qui n'est pas nécessairement celle que vous venez de calculer - voir l'horodateur en tête de fichier).<br> Cette solution vous permet de suivre les liens vers les personnes désignées.
 
     Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
 aa: connex_ok.htm
 co: Impieghendu <b>gwsetup</b> per fighjà u schedariu induve i risultati sò stati ridiretti ("%K").
-de: Verwende <b>gwsetup</b>  um die Datei in der Ergebnisse umgeleitet wurden zu visualisieren ("%K").
+de: Verwende <b>gwsetup</b>  um die Datei, in die die Ergebnisse umgeleitet wurden, zu visualisieren ("%K").
 en: Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
 fr: En utilisant <b>gwsetup</b> pour visualiser le fichier vers lequel ont été envoyés les résultats ("%K").
 
@@ -3602,7 +3602,7 @@ fr: pas de traces du tout.
 
     Warning: for this program to work, you must not close this window!
 co: Avertimentu : per chì stu prugramma funziuneghji, ùn duvete micca chjode sta finestra !
-de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses  Fenster nicht schließen!
+de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses Fenster nicht schließen!
 en: Warning: for this program to work, you must not close this window!
 fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette fenetre!
 it: Attenzione! Per poter navigare nella base, non dovete mai chiudere questa finestra!
@@ -3710,14 +3710,14 @@ sv: Välkommen till %G
     When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
 aa: gwb2ged.htm
 co: Quand’una persona hè nata menu di <num> anni fà, ùn face micca parte di l’espurtazione for di s’ella hè publica.<br> Tutti i sposi è discendenti sò prutetti dinù.
-de: Wenn ein Person vor weniger als <num> Jahren geboren wurde, wird es nicht exportiert, sofern es nicht öffentlich ist.<br> Alle Ehepartner und Nachkommen sind auch Zensiert.
+de: Wenn ein Person vor weniger als <num> Jahren geboren wurde, wird es nicht exportiert, sofern es nicht öffentlich ist.<br> Alle Ehepartner und Nachkommen sind auch zensiert.
 en: When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.
 fr: Quand une personne est née il y a moins de … années, elle n’est pas exportée sauf<br> si elle est "publique". La censure s’applique aux époux et descendants.
 
     When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.
 aa: gwf_1.htm
 co: Quandu s’affisseghja l’arburu cù l’antenati, què limiteghja u numeru di generazioni. U numeru predefinitu hè 7, ma si pò indicà quì un altru valore.
-de: Wenn Vorfahren in Baumstruktur angezeigt werden, soll die Anzahl der  angezeigten Generationen limitiert werden. Per Default ist die Anzahl  sieben Generationen, aber du kannst hier eine andere Anzahl einstellen.
+de: Wenn Vorfahren in Baumstruktur angezeigt werden, soll die Anzahl der angezeigten Generationen limitiert werden. Per Default ist die Anzahl sieben Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When ancestors are displayed by tree, limit the number of displayed generations. By default, it is 7 generations, but you can indicate a different value here.
 fr: Quand on affiche les ascendants par arbre, limite le nombre de générations affichables. C’est 7 par défaut, mais vous pouvez indiquer une valeur différente ici.
 it: Quando si visualizzano gli antenati per albero, limita il numero delle parentele visualizzabili. Il numero per difetto è 7, ma potete indicare qui un valore diverso.
@@ -3744,7 +3744,7 @@ sv: När man skapar en person, om förnamnen i GEDCOM-filen innehåller flera na
     When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.
 aa: gwf_1.htm
 co: Quandu s’affisseghja l’arburu cù i discendenti, què limiteghja u numeru di generazioni. U numeru predefinitu hè 4, ma si pò indicà quì un altru valore.
-de: Wenn Nachkommen in Baumstruktur angezeigt werden, soll die Anzahl der  angezeigten Generationen limitiert werden. Per Default ist die Anzahl  vier Generationen, aber du kannst hier eine andere Anzahl einstellen.
+de: Wenn Nachkommen in Baumstruktur angezeigt werden, soll die Anzahl der angezeigten Generationen limitiert werden. Per Default ist die Anzahl vier Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When descendants are displayed by tree, limit the number of displayed generations. By default, it is 4 generations, but you can indicate a different value here.
 fr: Quand on affiche les descendants par arbre, limite le nombre de générations affichables. C’est 4 par défaut, mais vous pouvez indiquer une valeur différente ici.
 it: Quando si visualizzano i discendenti per albero, limita il numero delle parentele visualizzabili. Il numero per difetto è 4, ma potete indicare qui un valore diverso.
@@ -3859,7 +3859,7 @@ sv: Du kan konsultera den
     You can consult your very clean new database
 aa: clean_ok.htm
 co: Pudete cunsultà a vostra basa di dati tutta netta
-de: Du kannst nun mit deiner superaufgeräumten neuen Datenbank arbeiten
+de: Du kannst nun mit deiner super aufgeräumten neuen Datenbank arbeiten
 en: You can consult your very clean new database
 es: Ud. puede consultar su nueva base bien "limpia"
 fi: Voit lukea uutta puhdasta tietokantaasi
@@ -3906,7 +3906,7 @@ sv: Du kanske har gått från en alltför gammal version av %G. I det fallet, f�
     You may observe results through two means
 aa: connex_ok.htm
 co: Pudete cunsultà i risultati da duie manere sfarente
-de: Sie können ergebnisse durch zwei Mittel feststellen
+de: Sie können Ergebnisse durch zwei Mittel feststellen
 en: You may observe results through two means
 fr: Vous pouvez consulter les résultats de deux façons différentes
 
