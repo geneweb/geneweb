@@ -884,7 +884,7 @@ sv: Kontrollera inte att databasens data är OK.
     do not commit changes (only traces).
 aa: gwfix.htm
 co: ùn micca effettuà i cambiamenti (solu in e traccie).
-de: änderungen nicht festschreiben (nur Abläufe).
+de: Änderungen nicht festschreiben (nur Abläufe).
 en: do not commit changes (only traces).
 fr: ne pas effectuer les changements (traces seules).
 
@@ -2185,7 +2185,7 @@ sv: Operationen klar
     or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
 aa: gwu.htm
 co: o dumandate à ricustruisce i schedarii in u cartulare d’origine.<br> S’è a basa hè stata creata da <span style="font-family: monospace">gwc -f *.gw</span>, tandu <span style="font-family: monospace">gwu -odir .</span> ricustruiscerà i schedarii d’origine.
-de: oder fragen Sie nach neuerstellung der Dateien im Originalverzeichnis.<br>Wenn die Datenbank von <span style="font-family: monospace">gwc -f *.gw</span> erstell wurde, dann wird <span style="font-family: monospace">gwu -odir</span> die Quelldatei neu erstellen.
+de: oder fragen Sie nach Neuerstellung der Dateien im Originalverzeichnis.<br>Wenn die Datenbank von <span style="font-family: monospace">gwc -f *.gw</span> erstell wurde, dann wird <span style="font-family: monospace">gwu -odir</span> die Quelldatei neu erstellen.
 en: or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.
 fr: ou demandez à reconstruire les fichiers dans le dossier d'origine.<br> Si la base a été créé par <span style="font-family: monospace">gwc -f *.gw</span>, alors <span style="font-family: monospace">gwu -odir .</span> reconstruira les fichiers d'origine.
 
@@ -2568,7 +2568,7 @@ sv: Starta beräkning från början.
     Restrict deleting branches whose size = -del.
 aa: connex.htm
 co: Limiteghja a squassatura à e ghjembe di dimensione = -del.
-de: Begrenze das löschen von Zweigen deren  Größe = -del.
+de: Begrenze das Löschen von Zweigen deren  Größe = -del.
 en: Restrict deleting branches whose size = -del.
 fr: Limite la suppression aux branches de taille = -del.
 
