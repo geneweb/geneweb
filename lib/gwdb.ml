@@ -41,7 +41,14 @@ let get_gen_descend = getf Gwdb_driver.gen_descend_of_family
 
 let rec delete_person excl base ip =
   let iexcl, fexcl = excl in
-  assert (ip <> dummy_iper && not @@ List.mem ip iexcl) ;
+  if ip = dummy_iper || List.mem ip iexcl
+  then
+    failwith ("gwdb.delete_person("
+              ^ string_of_iper ip
+              ^ ",["
+              ^ (List.map string_of_iper iexcl |> String.concat ",")
+              ^ "])"
+             ) ;
   let a = get_gen_ascend base ip in
   let ipers, ifams =
     match a.parents with
@@ -118,7 +125,14 @@ and is_empty_p ?ifam base sp =
 
 and delete_family excl base ifam =
   let iexcl, fexcl = excl in
-  assert (ifam <> dummy_ifam && not @@ List.mem ifam fexcl) ;
+  if ifam = dummy_ifam || List.mem ifam fexcl
+  then
+    failwith ("gwdb.delete_family("
+              ^ string_of_ifam ifam
+              ^ ",["
+              ^ (List.map string_of_ifam fexcl |> String.concat ",")
+              ^ "])"
+             ) ;
   let fam = foi base ifam in
   let fath = get_father fam in
   let moth = get_mother fam in
