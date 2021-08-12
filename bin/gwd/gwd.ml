@@ -1473,6 +1473,7 @@ type misc_fname =
   | Css of string
   | Eot of string
   | Js of string
+  | Map of string
   | Otf of string
   | Other of string
   | Png of string
@@ -1485,9 +1486,10 @@ let content_misc conf len misc_fname =
   Output.status conf Def.OK;
   let (fname, t) =
     match misc_fname with
-    | Css fname -> fname, "text/css"
+    | Css fname -> fname, "text/css; charset=UTF-8"
     | Eot fname -> fname, "application/font-eot"
-    | Js fname -> fname, "text/javascript"
+    | Js fname -> fname, "text/javascript; charset=UTF-8"
+    | Map fname -> fname, "application/json"
     | Otf fname -> fname, "application/font-otf"
     | Other fname -> fname, "text/plain"
     | Png fname -> fname, "image/png"
@@ -1522,6 +1524,7 @@ let print_misc_file conf misc_fname =
   | Css fname
   | Eot fname
   | Js fname
+  | Map fname
   | Otf fname
   | Png fname
   | Svg fname
@@ -1551,6 +1554,7 @@ let misc_request conf fname =
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
       else if Filename.check_suffix fname ".js" then Js fname
+      else if Filename.check_suffix fname ".map" then Map fname
       else if Filename.check_suffix fname ".otf" then Otf fname
       else if Filename.check_suffix fname ".svg" then Svg fname
       else if Filename.check_suffix fname ".woff" then Woff fname
