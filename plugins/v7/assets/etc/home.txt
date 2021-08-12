@@ -1,0 +1,50 @@
+<!-- $Id: home.txt,v7.00-exp 10/01/2018 20:11:37 $ -->
+%define;display_sosa_ref(xx)
+  [*sosa reference: %t:::xx]
+%end;
+%if;(not cancel_links)
+  <div class="float-left">
+    <div class="d-flex mt-2 fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
+      <a role="button" class="btn btn-link ml-0 p-0" href="%prefix;">%nn;
+        <i class="fa fa-home fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
+        <i class="sr-only">[*home]</i>%nn;
+      </a>
+      <a role="button" class="btn btn-link text-primary ml-0 p-0" data-toggle="modal" data-target="#searchmodal" accesskey="S">%nn;
+        <i class="fa fa-search fa-fw" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
+        <span class="sr-only">[*search/case sensitive]0</span>%nn;
+      </a>
+      %if;(referer!="")
+        <a role="button" class="btn btn-link ml-0 p-0" href="%referer;" title="Revenir en arrière">%nn;
+          <i class="fa fa-arrow-left fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
+          <span class="sr-only">[*back]</span>%nn;
+        </a>
+      %end;
+    </div>
+  </div>
+  <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-body" id="ModalSearch">
+          <form id="collapse_search" method="get" action="%prefix;">
+            %hidden;
+            <input type="hidden" name="m" value="S">
+            <div class="d-flex justify-content-center">
+              <h5 class="rounded modal-title my-2 text-center w-50 align-self-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h5>
+              <div class="col-8">
+                %if;(browsing_with_sosa_ref)
+                  <h5>%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
+                %end;
+                <label class="sr-only" for="n">Search public name</label>
+                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
+                  autofocus>
+                <label class="sr-only" for="p">Search firstname</label>
+                <input type="search" id="p" class="form-control form-control-lg mt-2" name="p" placeholder="[*first name/first names]0">
+              </div>
+              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-search fa-lg mx-2"></i> [*search/case sensitive]0</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;

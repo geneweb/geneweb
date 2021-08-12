@@ -1,1 +1,1 @@
-<meta name="format-detection" content="telephone=no" />
+../plugins/v7/assets/etc/hed.txt
