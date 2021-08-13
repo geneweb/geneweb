@@ -1,5 +1,5 @@
 open Geneweb.Config
-module Gwdb = Geneweb.Gwdb
+module Gwdb = Gwdb
 module Util = Geneweb.Util
 module DescendDisplay = Geneweb.DescendDisplay
 module Request = Gwd_lib.Request

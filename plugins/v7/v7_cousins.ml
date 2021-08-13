@@ -1,5 +1,5 @@
 open Geneweb.Config
-open Geneweb.Gwdb
+open Gwdb
 open Geneweb.Util
 open Geneweb.Cousins
 open Def
@@ -8,7 +8,7 @@ module BirthdayDisplay = Geneweb.BirthdayDisplay
 module Cousins = Geneweb.Cousins
 module DateDisplay = Geneweb.DateDisplay
 module Gutil = Geneweb.Gutil
-module Gwdb = Geneweb.Gwdb
+module Gwdb = Gwdb
 module Hutil = Geneweb.Hutil
 module Output = Geneweb.Output
 module Pqueue = Geneweb.Pqueue

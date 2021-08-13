@@ -1,9 +1,9 @@
-open Geneweb.Gwdb
+open Gwdb
 open Geneweb.Util
 open Def
 
 module Gutil = Geneweb.Gutil
-module Gwdb = Geneweb.Gwdb
+module Gwdb = Gwdb
 module Hutil = Geneweb.Hutil
 module Util = Geneweb.Util
 module Output = Geneweb.Output

@@ -1,11 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Geneweb.Config
-open Geneweb.Gwdb
+open Gwdb
 open Geneweb.Util
 
 module Gutil = Geneweb.Gutil
-module Gwdb = Geneweb.Gwdb
+module Gwdb = Gwdb
 module Hutil = Geneweb.Hutil
 module Output = Geneweb.Output
 module Templ = V7_templ

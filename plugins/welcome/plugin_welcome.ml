@@ -1,7 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Geneweb.Config
-open Geneweb.Gwdb
+open Gwdb
 open Geneweb.Util
 open Geneweb.Gutil
 open Geneweb.Hutil
@@ -12,7 +12,7 @@ open Geneweb.Some
 open Geneweb.Output
 open Def
 
-module Gwdb = Geneweb.Gwdb
+module Gwdb = Gwdb
 module Util = Geneweb.Util
 module Gutil = Geneweb.Gutil
 module Hutil = Geneweb.Hutil

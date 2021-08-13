@@ -1,6 +1,6 @@
 open Def
 
-module Gwdb = Geneweb.Gwdb
+module Gwdb = Gwdb
 module DateDisplay = Geneweb.DateDisplay
 
 let short_family_dates_text conf _base fam =

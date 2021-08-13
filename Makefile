@@ -45,6 +45,12 @@ endif
 	> $@ \
 	&& echo " Done!"
 
+bin/gwrepl/.depend:
+	@echo -n "Generating $@..."
+	@pwd > $@
+	@dune top bin/gwrepl >> $@ 2> /dev/null
+	@echo " Done!"
+
 dune-workspace: dune-workspace.in Makefile.config
 	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
@@ -61,7 +67,11 @@ hd/etc/version.txt:
 GENERATED_FILES_DEP = \
 	dune-workspace \
 	hd/etc/version.txt \
+	lib/dune \
+	lib/gwdb/dune \
+	lib/gwdb-legacy-x-arangodb/dune \
 	lib/gwlib.ml \
+	lib/util/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/consang/dune \
@@ -72,12 +82,11 @@ GENERATED_FILES_DEP = \
 	bin/gwd/dune \
 	bin/gwdiff/dune \
 	bin/gwgc/dune \
+	bin/gwrepl/dune \
+	bin/gwrepl/.depend \
 	bin/gwu/dune \
 	bin/setup/dune \
 	bin/update_nldb/dune \
-	lib/dune \
-	lib/gwdb-legacy-x-arangodb/dune \
-	lib/util/dune \
 	plugins/api/dune \
 	test/dune \
 
@@ -141,13 +150,14 @@ distrib: build
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
+	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT);
 	cp $(BUILD_DISTRIB_DIR)ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc $(DISTRIB_DIR)/gw/gwrepl$(EXT);
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
-	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT);
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
 	mkdir $(DISTRIB_DIR)/gw/setup
