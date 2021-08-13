@@ -1,0 +1,11 @@
+<h1>Minimal template system</h1>
+The template system you are using is minimal, and offers very limited functions.<br>
+To use the full fledged GeneWeb capabilities, you must invoque either the v7 or the v8 plugin.<br>
+This is achieved through a two steps mechanism:<br>
+<ul>
+<li>In your gwd launch command, you must add the parameter <pre>-plugins path_to_plugins</pre></li>
+<li>In your .gwf file, you must add the line <pre>plugins=v7</pre>
+</ul>
+Note that additionnal plugins of interest are available and can be added on the plugins line of the .gwf file.<br>
+A full set of plugins would be:<br>
+<pre>plugins=carrousel,cgl,export,forum,no_index,v7,v7_im,welcome,xhtml</pre>

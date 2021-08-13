@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-<!-- $Id: welcome.txt, v.7.00 12/01/2020 11:35:58 $ -->
+<!-- $Id: welcome.txt, v.7.00 13/08/2021 10:30:58 $ -->
   <title>GeneWeb – %base.name;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -120,6 +120,15 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
       %if;(browsing_with_sosa_ref and bvar.visitor_access!="no")<h4>%apply;display_sosa_ref%with;%sosa_ref;%end;</h4>%end;
       </div>
     </div>
+  %end;
+  %if;(not ("v7," in bvar.plugins))
+  <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
+    <div>
+      <h3 class="font-weight-light">[*warning]</h3>
+     [*minimum template system]<br>
+     [*for details, see:] <a href="%prefix;m=H;v=v7_doc_%lang;">v7_doc_%lang;</a>
+    </div>
+  </div>
   %end;
 
   %if;(bvar.visitor_access!="no" or wizard or friend)

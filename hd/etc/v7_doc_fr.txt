@@ -1,0 +1,11 @@
+<h1>Système template minimal</h1>
+Le système de templates que vous utilisez est réduit au strict minimum.<br>
+Pour utiliser toute les possibilités de GeneWeb, vous devez activer les plugins v7 ou v8.<br>
+Ceci est obtenu par deux actions :
+<ul>
+<li>Dans la commande de lancement de gwd, ajouter le paramètre <pre>-plugins path_to_plugins</pre></li>
+<li>Dans votre fichier de configuration .gwf, ajouter la ligne <pre>plugins=v7</pre>
+</ul>
+Notez qu'un ensemble de plugins est disponible et peuvent être ajoutés à la ligne plugins du fichier .gwf.
+L'appel de l'ensemble des plugins serait :
+<pre>plugins=carrousel,cgl,export,forum,no_index,v7,v7_im,welcome,xhtml</pre>
