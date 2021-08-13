@@ -34,6 +34,7 @@
 
 %let;p_mod;%if;(bvar.p_mod!="" and evar.p_mod="")%bvar.p_mod;%elseif;(evar.p_mod!="")%evar.p_mod;%end;%in;
 %if;(not ("v7," in bvar.plugins))
+%include;home
 <h3 class="font-weight-light">[*warning]</h3>
 %let;fname;%apply;file_exists("v7_doc",lang)%in;
 [*minimum template system]<br>
