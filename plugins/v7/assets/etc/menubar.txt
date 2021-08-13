@@ -27,9 +27,18 @@
 %define;get_plugin_cmd(kind, iii)
   %apply;get_plugin(bvar.kind_iii)
 %end;
+%define;file_exists(xxx,yy)
+  %if;(exist_file_xxx_yy)xxx_yy%else;xxx_en%end;
+%end;
+
 
 %let;p_mod;%if;(bvar.p_mod!="" and evar.p_mod="")%bvar.p_mod;%elseif;(evar.p_mod!="")%evar.p_mod;%end;%in;
-%if;(not cancel_links)
+%if;("v7," in bvar.plugins)
+<h3 class="font-weight-light">[*warning]</h3>
+%let;fname;%apply;file_exists("v7_doc",lang)%in;
+[*minimum template system]<br>
+[*for details, see:] <a href="%prefix;m=H;v=%fname;">%fname;</a>
+%elseif;(not cancel_links)
   <div class="d-flex justify-content-between">
     <nav class="navbar navbar-light navbar-expand-md%nn;
       %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"

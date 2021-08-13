@@ -48,19 +48,19 @@ endif
 dune-workspace: dune-workspace.in Makefile.config
 	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
-hd/etc/version.txt:
+etc/version.txt:
 	@echo -n "Generating $@..."
 	@echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
 	@echo "$$(date '+%Y-%m-%d'):" >> $@
 	@echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')]" >> $@
 	@echo " Done!"
-.PHONY:hd/etc/version.txt
+.PHONY:etc/version.txt
 
 ###### [End] Generated files section
 
 GENERATED_FILES_DEP = \
 	dune-workspace \
-	hd/etc/version.txt \
+	etc/version.txt \
 	lib/gwlib.ml \
 	benchmark/dune \
 	bin/connex/dune \
@@ -158,7 +158,6 @@ distrib: build
 	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp -R hd/* $(DISTRIB_DIR)/gw/
 	mkdir $(DISTRIB_DIR)/gw/plugins
 	for P in $(shell ls plugins); do \
 		if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
@@ -172,6 +171,11 @@ distrib: build
 			fi; \
 		fi; \
 	done
+	mv etc/version.txt $(DISTRIB_DIR)/gw/plugins/v7/etc
+	ln -s ./plugins/v7/assets/etc $(DISTRIB_DIR)/gw/etc
+	ln -s ./plugins/v7/assets/lex $(DISTRIB_DIR)/gw/lang
+	ln -s ./plugins/v7/assets/images $(DISTRIB_DIR)/gw/images
+	
 
 .PHONY: install uninstall distrib
 
