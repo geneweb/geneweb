@@ -172,6 +172,9 @@ distrib: build
 		fi; \
 	done
 	mv etc/version.txt $(DISTRIB_DIR)/gw/plugins/v7/assets/etc/
+	if test $(OS_TYPE) = "Win"; then \
+		export CYGWIN="winsymlinks:nativestrict"; \
+	fi
 	ln -s ./plugins/v7/assets/etc $(DISTRIB_DIR)/gw/etc
 	ln -s ./plugins/v7/assets/lex $(DISTRIB_DIR)/gw/lang
 	ln -s ./plugins/v7/assets/images $(DISTRIB_DIR)/gw/images
