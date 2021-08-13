@@ -1,5 +1,4 @@
 open Geneweb.Config
-module Gwdb = Geneweb.Gwdb
 module Request = Gwd_lib.Request
 module Hutil = Geneweb.Hutil
 

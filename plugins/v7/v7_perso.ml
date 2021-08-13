@@ -3,14 +3,14 @@
 open Geneweb.Config
 open Def
 open Geneweb.TemplAst
-open Geneweb.Gwdb
+open Gwdb
 open Geneweb.Util
 
 module CheckItem = Geneweb.CheckItem
 module Date = Geneweb.Date
 module DateDisplay = Geneweb.DateDisplay
 module Gutil = Geneweb.Gutil
-module Gwdb = Geneweb.Gwdb
+module Gwdb = Gwdb
 module HistoryDiff = Geneweb.HistoryDiff
 module Hutil = Geneweb.Hutil
 module Notes = Geneweb.Notes

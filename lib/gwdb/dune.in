@@ -1,0 +1,11 @@
+(library
+ (name geneweb_gwdb)
+ (public_name geneweb.gwdb)
+ (wrapped false)
+ (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
+ (libraries unix
+            geneweb.def
+            geneweb.gwdb_driver
+            geneweb.util
+ )
+)

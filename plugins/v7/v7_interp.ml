@@ -1,5 +1,5 @@
 open Geneweb.Config
-open Geneweb.Gwdb
+open Gwdb
 
 module Templ = V7_templ
 module Util = Geneweb.Util

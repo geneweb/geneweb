@@ -2,7 +2,7 @@
 
 open Geneweb.Config
 open Def
-open Geneweb.Gwdb
+open Gwdb
 open Geneweb.Util
 
 module Alln = Geneweb.Alln

@@ -16,10 +16,13 @@ bin/gwc/dune
 bin/gwd/dune
 bin/gwdiff/dune
 bin/gwgc/dune
+bin/gwrepl/.depend
+bin/gwrepl/dune
 bin/gwu/dune
 bin/setup/dune
 bin/update_nldb/dune
 lib/dune
+lib/gwdb/dune
 lib/gwdb-legacy-x-arangodb/dune
 lib/util/dune
 plugins/api/dune
