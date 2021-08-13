@@ -957,6 +957,12 @@ let loc_of_expr =
   | Aint (loc, _) -> loc
   | _ -> -1, -1
 
+let extract_var sini s =
+  let len = String.length sini in
+  if String.length s > len && String.sub s 0 (String.length sini) = sini then
+    String.sub s len (String.length s - len)
+  else ""
+
 let templ_eval_var conf =
   function
   | ["browsing_with_sosa_ref"] ->
@@ -977,6 +983,15 @@ let templ_eval_var conf =
   | ["true"] -> VVbool true
   | ["wizard"] -> VVbool conf.wizard
   | ["is_printed_by_template"] -> VVbool conf.is_printed_by_template
+  | [s] ->
+      let v = extract_var "exist_file_" s in
+      if v <> "" then
+        let v = Mutil.encode v in
+        begin match Util.open_etc_file v with
+          | Some (_, _fname) -> VVbool true
+          | None -> VVbool false
+        end
+      else raise Not_found
   | _ -> raise Not_found
 
 let bool_of e =
