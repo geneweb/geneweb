@@ -47,13 +47,15 @@ let write_dico_place_set assets fname_csv lang =
     )
   in
   let generate k data =
-    let fname_set = Api_search.dico_fname assets lang k in
-    let ext_flags =
-      [ Open_wronly ; Open_append ; Open_creat ; Open_binary ; Open_nonblock ]
-    in
-    let oc = open_out_gen ext_flags 0o644 fname_set in
-    output_value oc (data : Api_search.dico) ;
-    close_out oc
+    match Api_search.dico_fname assets lang k with
+    | None -> ()
+    | Some fname_set ->
+      let ext_flags =
+        [ Open_wronly ; Open_append ; Open_creat ; Open_binary ; Open_nonblock ]
+      in
+      let oc = open_out_gen ext_flags 0o644 fname_set in
+      output_value oc (data : Api_search.dico) ;
+      close_out oc
   in
   generate `town towns ;
   generate `area_code area_codes ;

@@ -35,9 +35,11 @@ let () =
   let assets = !GWD.GwdPlugin.assets in
   let aux s lang =
     let e k =
-      not @@ Sys.file_exists @@ Api_search.dico_fname assets lang k
+      match Api_search.dico_fname assets lang k with
+      | None -> false
+      | Some fn -> not (Sys.file_exists fn)
     in
-    if e `town || e `area_codes || e `countys || e `region || e `country
+    if e `town || e `area_code || e `county || e `region || e `country
     then Api_marshal_dico_place.write_dico_place_set assets (Filename.concat assets s) lang
   in
   Array.iter begin fun s ->

@@ -613,15 +613,13 @@ let get_field mode =
 type dico = string array
 
 let dico_fname assets lang k =
-  let fname = match k with
-    | `town -> "dico.town." ^ lang ^ ".bin~"
-    | `area_code -> "dico.area_code." ^ lang ^ ".bin~"
-    | `county -> "dico.county." ^ lang ^ ".bin~"
-    | `region -> "dico.region." ^ lang ^ ".bin~"
-    | `country -> "dico.country." ^ lang ^ ".bin~"
-    | _ -> assert false
-  in
-  Filename.concat assets fname
+  Opt.map (Filename.concat assets) @@ match k with
+  | `town -> Some ("dico.town." ^ lang ^ ".bin~")
+  | `area_code -> Some ("dico.area_code." ^ lang ^ ".bin~")
+  | `county -> Some ("dico.county." ^ lang ^ ".bin~")
+  | `region -> Some ("dico.region." ^ lang ^ ".bin~")
+  | `country -> Some ("dico.country." ^ lang ^ ".bin~")
+  | `subdivision -> None
 
 (** [ini] must be in the form of [Name.lower @@ Mutil.tr '_' ' ' ini]
     Assume that [list] is already sorted, but reversed.
@@ -681,10 +679,10 @@ let complete_with_dico assets conf nb max mode ini list =
           (String.split_on_char ',' s)
     in
     let dico =
-      Mutil.read_or_create_value
-        (dico_fname assets conf.lang mode)
-        (fun () : dico -> [||])
-      |> reduce_dico mode list format
+      begin match dico_fname assets conf.lang mode with
+        | Some fn -> Mutil.read_or_create_value fn (fun () : dico -> [||])
+        | None -> [||]
+      end |> reduce_dico mode list format
     in
     List.rev_append list (List.sort Place.compare_places dico)
   | _ -> List.rev list
