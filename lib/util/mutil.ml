@@ -499,7 +499,17 @@ let input_lexicon lang ht open_fname =
           in
           Hashtbl.replace ht k v ;
           key ()
-        end else trad k
+        end
+        else if String.length line > 4
+             && String.unsafe_get line 0 = '-'
+             && String.unsafe_get line 1 = '>'
+             && String.unsafe_get line 2 = ':'
+             && String.unsafe_get line 3 = ' '
+        then
+          let k2 = String.sub line 4 (String.length line - 4) in
+          Opt.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
+          key ()
+        else trad k
       | None -> key ()
   in
   key ()
