@@ -496,7 +496,13 @@ let input_lexicon lang ht open_fname =
           in
           Hashtbl.replace ht k v ;
           key ()
-        end else trad k
+        end
+        else if String.length line > 4 && String.sub line 0 3 = "->:" then
+          let k2 = String.sub line 4 (String.length line - 4) in
+          let v = try Hashtbl.find ht k2 with Not_found -> "" in
+          if v != "" then Hashtbl.replace ht k v;
+          key ()
+        else trad k
       | None -> key ()
   in
   key ()
