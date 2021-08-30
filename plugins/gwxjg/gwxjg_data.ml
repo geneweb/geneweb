@@ -1,3 +1,5 @@
+module Ezgw = Gwxjg_ezgw
+module Lexicon_parser = Gwxjg_lexicon_parser
 open Geneweb
 open Jingoo
 open Jg_types

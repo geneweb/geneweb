@@ -1,3 +1,4 @@
+module Lexicon_parser = Gwxjg_lexicon_parser
 open Jingoo
 
 let fast_concat = function
