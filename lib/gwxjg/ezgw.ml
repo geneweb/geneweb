@@ -275,17 +275,10 @@ end
 
 module Event = struct
 
-  let date (_, d, _, _, _, _, _) =
-    Adef.od_of_cdate d
-
-  let place conf base (_, _, p, _, _, _, _) =
-    Util.string_of_place conf @@ sou base p
-
-  let spouse_opt (_, _, _, _, _, _, isp) =
-    isp
-
-  let src base (_, _, _, _, s, _, _) =
-    sou base s
+  let name conf base (n, _, _, _, _, _, _) =
+    match n with
+    | Geneweb.Perso.Pevent name -> Util.string_of_pevent_name conf base name
+    | Fevent name -> Util.string_of_fevent_name conf base name
 
   let kind (n, _, _, _, _, _, _) =
     match n with
@@ -354,15 +347,22 @@ module Event = struct
     | Pevent Epers_Name _ -> "EPERS"
     | Fevent Efam_Name _ -> "EFAM"
 
-  let name conf base (n, _, _, _, _, _, _) =
-    match n with
-    | Geneweb.Perso.Pevent name -> Util.string_of_pevent_name conf base name
-    | Fevent name -> Util.string_of_fevent_name conf base name
+  let date (_, d, _, _, _, _, _) =
+    Adef.od_of_cdate d
+
+  let place conf base (_, _, p, _, _, _, _) =
+    Util.string_of_place conf @@ sou base p
 
   let note conf base (_, _, _, n, _, _, _) =
     if conf.no_note then "" else sou base n
 
+  let src base (_, _, _, _, s, _, _) =
+    sou base s
+
   let witnesses (_, _, _, _, _, w, _) =
     w
+
+  let spouse_opt (_, _, _, _, _, _, isp) =
+    isp
 
 end

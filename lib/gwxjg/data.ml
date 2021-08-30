@@ -617,7 +617,25 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let events = lazy_list (mk_event conf base) events' in
   let birth = find_event conf base (Perso.Pevent Epers_Birth) events' in
   let baptism = find_event conf base (Perso.Pevent Epers_Baptism) events' in
-  let death = find_event conf base (Perso.Pevent Epers_Death) events' in
+  let death =
+    let wrap s = Tpat (function "reason" -> Tstr s | _ -> raise Not_found) in
+    match Gwdb.get_death p with
+    | Def.NotDead -> Tnull
+    | Death (r, cd) ->
+      let reason = match r with
+        | Def.Killed -> Tstr "Killed"
+        | Murdered -> Tstr "Murdered"
+        | Executed -> Tstr "Executed"
+        | Disappeared -> Tstr "Disappeared"
+        | Unspecified -> Tstr "Unspecified"
+      in
+      let e = find_event conf base (Perso.Pevent Epers_Death) events' in
+      Tpat (function "reason" -> reason | s -> Jg_runtime.jg_obj_lookup e s)
+    | DeadYoung -> wrap "DeadYoung"
+    | DeadDontKnowWhen -> wrap "DeadDontKnowWhen"
+    | DontKnowIfDead -> wrap "DontKnowIfDead"
+    | OfCourseDead -> wrap "OfCourseDead"
+  in
   let burial =
     find_events conf base [ Perso.Pevent Epers_Burial ; Perso.Pevent Epers_Cremation ] events'
   in
