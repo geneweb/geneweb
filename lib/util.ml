@@ -2957,47 +2957,6 @@ let nb_char_occ c s =
   String.iter (fun x -> if x = c then incr cnt) s ;
   !cnt
 
-let rec filter_map fn = function
-  | [] -> []
-  | hd :: tl ->
-    match fn hd with
-    | Some x -> x :: filter_map fn tl
-    | None -> filter_map fn tl
-
-let rec rev_iter fn = function
-  | [] -> ()
-  | hd :: tl -> let () = rev_iter fn tl in fn hd
-
-let groupby ~key ~value list =
-  let h = Hashtbl.create (List.length list) in
-  List.iter
-    (fun x ->
-       let k = key x in
-       let v = value x in
-       if Hashtbl.mem h k then Hashtbl.replace h k (v :: Hashtbl.find h k)
-       else Hashtbl.add h k [v])
-    list ;
-  Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
-
-let ls_r dirs =
-  let rec loop result = function
-    | f :: fs when Sys.is_directory f ->
-      Sys.readdir f
-      |> Array.to_list
-      |> List.rev_map (Filename.concat f)
-      |> List.rev_append fs
-      |> loop (f :: result)
-    | f :: fs -> loop (f :: result) fs
-    | [] -> result
-  in
-  loop [] dirs
-
-let rm_rf f =
-  if Sys.file_exists f then
-    let (directories, files) = ls_r [f] |> List.partition Sys.is_directory in
-    List.iter Unix.unlink files ;
-    List.iter Unix.rmdir directories
-
 module IperSet = Set.Make (struct type t = iper let compare = Stdlib.compare end)
 module IfamSet = Set.Make (struct type t = ifam let compare = Stdlib.compare end)
 

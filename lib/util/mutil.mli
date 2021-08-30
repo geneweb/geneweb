@@ -323,3 +323,29 @@ val search_asset_opt : string -> string option
     Tests if two persons would have the same key
 *)
 val eq_key : (string * string * int) -> (string * string * int) -> bool
+
+(** [ls_rs dirs]
+    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
+*)
+val ls_r : string list -> string list
+
+(** [rm_rf dir]
+    Remove directory [dir] and everything inside [dir].
+*)
+val rm_rf : string -> unit
+
+(** [filter_map fn list] is a combination of map and filter.
+    Not tail-recursive.
+*)
+val filter_map : ('a -> 'b option) -> 'a list -> 'b list
+
+(** [rev_iter fn list] is like [List.iter fn (List.rev list)].
+    Not tail-recursive.
+*)
+val rev_iter : ('a -> unit) -> 'a list -> unit
+
+(** [groupby ~key ~value list]
+    Group the elements returning the same key together.
+    Ordering of elements is unspecified.
+ *)
+val groupby : key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list

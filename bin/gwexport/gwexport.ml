@@ -274,7 +274,7 @@ let select opts ips =
   match opts.base with
   | None -> raise (Arg.Bad "Missing base name. Use option -help for usage")
   | Some (_, base) ->
-    let ips = List.rev_append ips @@ Util.filter_map (Gutil.person_of_string_key base) opts.keys in
+    let ips = List.rev_append ips @@ Mutil.filter_map (Gutil.person_of_string_key base) opts.keys in
     let not_censor_p, not_censor_f =
       if opts.censor <> 0
       then begin

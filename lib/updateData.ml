@@ -116,7 +116,7 @@ let get_person_from_data conf base =
 
 let combine_by_ini ini list =
   let len = Utf8.length ini + 1 in
-  Util.groupby
+  Mutil.groupby
     ~key:(fun (_, s) -> Alln.ini len @@ Place.without_suburb s)
     ~value:(fun x -> x)
     list
@@ -423,7 +423,7 @@ let build_list conf base =
   let ini = Opt.to_string @@ p_getenv conf.env "s" in
   let list = get_all_data conf base in
   if ini <> "" then
-    Util.filter_map begin fun istr ->
+    Mutil.filter_map begin fun istr ->
       let str = sou base istr in
       if Mutil.start_with_wildcard ini 0 @@ Place.without_suburb str
       then Some (istr, str)
