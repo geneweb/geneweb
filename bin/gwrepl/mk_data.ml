@@ -121,9 +121,10 @@ let () =
   end ;
   begin
       Printf.fprintf out {|let shared=[||} ;
-      List.iter begin fun s ->
-        Printf.fprintf out {|"etc/lib/%s",[%%blob "%s"];|} s (opam_swich_prefix_lib ^ s) ;
-      end [ "ocaml/stublibs/dllcamlstr.so" ; "ocaml/stublibs/dllunix.so"] ;
+      if Sys.unix then (* FIXME: what is the windows version? *)
+        List.iter begin fun s ->
+          Printf.fprintf out {|"etc/lib/%s",[%%blob "%s"];|} s (opam_swich_prefix_lib ^ s) ;
+        end [ "ocaml/stublibs/dllcamlstr.so" ; "ocaml/stublibs/dllunix.so"] ;
       Printf.fprintf out {||];;|}
   end ;
   begin
