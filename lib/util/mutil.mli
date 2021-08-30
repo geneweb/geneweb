@@ -349,3 +349,8 @@ val rev_iter : ('a -> unit) -> 'a list -> unit
     Ordering of elements is unspecified.
  *)
 val groupby : key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list
+
+(** [digest s]
+    Returns the (128 bits long, using MD5 algorithm) digest of [s].
+  *)
+val digest : string -> string

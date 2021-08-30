@@ -679,7 +679,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   if fname <> "" then
     Output.printf conf "<input type=\"hidden\" name=\"f\" value=\"%s\">\n" fname;
   if can_edit then
-    begin let digest = Iovalue.digest s in
+    begin let digest = Mutil.digest s in
       Output.printf conf
         "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n" digest
     end;
@@ -841,7 +841,7 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
         Some s -> s
       | None -> ""
     in
-    if digest <> Iovalue.digest old_string then Update.error_digest conf
+    if digest <> Mutil.digest old_string then Update.error_digest conf
     else
       let s =
         match Util.p_getint conf.env "v" with

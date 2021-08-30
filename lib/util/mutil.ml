@@ -1094,3 +1094,5 @@ let groupby ~key ~value list =
     list ;
   Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
 
+let digest s =
+  Digest.string s |> Digest.to_hex

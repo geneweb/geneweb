@@ -787,8 +787,8 @@ let error_digest conf =
   Hutil.print_link_to_welcome conf true;
   Output.printf conf "<p>%s.\n</p>\n" err
 
-let digest_person p = Iovalue.digest p
-let digest_family (fam, cpl, des) = Iovalue.digest (fam, cpl, des)
+let digest_person p = Marshal.to_string p [] |> Mutil.digest
+let digest_family f = Marshal.to_string f [] |> Mutil.digest
 
 let get var key env =
   match p_getenv env (var ^ "_" ^ key) with

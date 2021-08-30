@@ -203,49 +203,6 @@ let size = ref 0
 
 let size v = size := 0; gen_output size_funs size v; !size
 
-(* Digest *)
-
-let dbuf = ref (Bytes.create 256)
-let dlen = ref 0
-let dput_char c =
-  if !dlen = Bytes.length !dbuf then dbuf := Bytes.extend !dbuf 0 !dlen;
-  Bytes.set !dbuf !dlen c;
-  incr dlen
-let rec dput_int i =
-  if i = 0 then ()
-  else
-    begin
-      dput_char (Char.chr (Char.code '0' + i mod 10));
-      dput_int (i / 10)
-    end
-let dput_string s = for i = 0 to String.length s - 1 do dput_char s.[i] done
-
-let rec digest_loop v =
-  if not (Obj.is_block v) then
-    let n : int = Obj.magic v in dput_char 'I'; dput_int n
-  else if Obj.tag v = Obj.closure_tag then
-    invalid_arg "Iovalue.digest: closure"
-  else if Obj.size v = 0 then begin dput_char 'T'; dput_int (Obj.tag v) end
-  else if Obj.tag v = Obj.string_tag then
-    let s : string = Obj.magic v in
-    dput_char 'S'; dput_int (String.length s); dput_char '/'; dput_string s
-  else
-    begin
-      dput_char 'O';
-      dput_int (Obj.tag v);
-      dput_char '/';
-      dput_int (Obj.size v);
-      digest_fields v 0
-    end
-and digest_fields v i =
-  if i = Obj.size v then ()
-  else begin digest_loop (Obj.field v i); digest_fields v (i + 1) end
-
-let digest v =
-  dlen := 0;
-  digest_loop (Obj.repr v);
-  Digest.to_hex (Digest.subbytes !dbuf 0 !dlen)
-
 let output_value_header_size = 20
 let array_header_size arr_len =
   if arr_len < 8 then 1
