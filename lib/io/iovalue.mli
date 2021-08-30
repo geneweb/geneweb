@@ -4,8 +4,6 @@
 val input : in_channel -> 'a
 val output : out_channel -> 'a -> unit
 
-val digest : 'a -> string
-
 val sizeof_long : int
 val sign_extend : int -> int
 

@@ -6,14 +6,13 @@ open Gwdb
 open Util
 
 let digest_children base ipl =
-  let l =
-    List.map
-      (fun ip ->
-         let p = poi base ip in
-         sou base (get_first_name p), sou base (get_surname p), get_occ p)
-      ipl
-  in
-  Iovalue.digest l
+  List.fold_left begin fun s ip ->
+    let p = poi base ip in
+    sou base (get_first_name p) ^ "\n"
+    ^ sou base (get_surname p) ^ "\n"
+    ^ string_of_int (get_occ p) ^ "\n"
+  end "" ipl
+  |> Mutil.digest
 
 let check_digest conf digest =
   match p_getenv conf.env "digest" with
