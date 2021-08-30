@@ -641,7 +641,7 @@ let complete_with_dico assets conf nb max mode ini list =
               then
                 let expl_hd = String.split_on_char ',' hd in
                 String.concat ", " @@
-                Util.filter_map begin function
+                Mutil.filter_map begin function
                   | `town -> List.nth_opt expl_hd 0
                   | `area_code -> List.nth_opt expl_hd 1
                   | `county -> List.nth_opt expl_hd 2
