@@ -88,17 +88,17 @@ let () =
   let sosa_pkg =
     match !sosa with
     | `Legacy ->
-      exclude_dir "sosa.num" ;
-      exclude_dir "sosa.zarith" ;
-      "geneweb.sosa"
+      exclude_dir "sosa_num" ;
+      exclude_dir "sosa_zarith" ;
+      "geneweb_sosa"
     | `Num ->
-      exclude_dir "sosa.array" ;
-      exclude_dir "sosa.zarith" ;
-      "geneweb.sosa-num"
+      exclude_dir "sosa_array" ;
+      exclude_dir "sosa_zarith" ;
+      "geneweb_sosa_num"
     | `Zarith ->
-      exclude_dir "sosa.array" ;
-      exclude_dir "sosa.num" ;
-      "geneweb.sosa-zarith"
+      exclude_dir "sosa_array" ;
+      exclude_dir "sosa_num" ;
+      "geneweb_sosa_zarith"
     | `None -> assert false
   in
   let gwdb_d, gwdb_pkg =

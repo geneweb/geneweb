@@ -1,7 +1,15 @@
 (library
   (name gwrepl_deps)
   (flags -linkall)
-  (libraries stdlib str unix geneweb_gwdb %%%GWDB_PKG%%%)
+  (libraries
+    stdlib
+    str
+    unix geneweb_def
+    geneweb_util
+    geneweb_gwdb
+    %%%GWDB_PKG%%%
+    %%%SOSA_PKG%%%
+  )
   (modules)
 )
 

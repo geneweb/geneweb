@@ -1,5 +1,5 @@
 (library
- (name util)
+ (name geneweb_util)
  (public_name geneweb.util)
  (wrapped false)
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))

@@ -1,0 +1,6 @@
+(library
+ (name geneweb_sosa_zarith)
+ (public_name geneweb.sosa_zarith)
+ (libraries zarith)
+ (implements geneweb.sosa.mli)
+)
