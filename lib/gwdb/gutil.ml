@@ -1,4 +1,3 @@
-(* $Id: gutil.ml,v 5.52 2018-09-27 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
