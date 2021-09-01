@@ -21,6 +21,7 @@ bin/gwrepl/dune
 bin/gwu/dune
 bin/setup/dune
 bin/update_nldb/dune
+lib/core/dune
 lib/dune
 lib/gwdb/dune
 lib/gwdb-legacy-x-arangodb/dune

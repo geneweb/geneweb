@@ -16,12 +16,11 @@
             str
             stdlib-shims
             camlp5
-            geneweb.def
-            geneweb.gwdb
-            geneweb.gwdb_driver
-            geneweb.io
-            geneweb.sosa.mli
-            geneweb.util
+            geneweb_core
+            geneweb_def
+            geneweb_gwdb
+            geneweb_sosa_mli
+            geneweb_util
             markup)
  (modules_without_implementation templAst)
 )

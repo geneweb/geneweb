@@ -4,7 +4,9 @@
   (libraries
     stdlib
     str
-    unix geneweb_def
+    unix
+    geneweb_core
+    geneweb_def
     geneweb_util
     geneweb_gwdb
     %%%GWDB_PKG%%%
@@ -23,7 +25,7 @@
  (name gwrepl)
  (public_name gwrepl)
  (link_flags -linkall -custom)
- (libraries compiler-libs.toplevel unix geneweb.gwdb %%%GWDB_PKG%%%)
+ (libraries compiler-libs.toplevel unix)
  (preprocess
   (per_module
    ((action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})) gwrepl_exe)

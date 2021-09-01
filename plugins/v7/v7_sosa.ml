@@ -32,7 +32,7 @@ let print_base_loop conf base p =
 let init_sosa_t conf base sosa_ref =
   let tstab =
     try Util.create_topological_sort conf base
-    with Geneweb.Consang.TopologicalSortError p ->
+    with Consang.TopologicalSortError p ->
       let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
       Hutil.rheader conf title;
       print_base_loop conf base p

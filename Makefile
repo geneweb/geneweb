@@ -69,6 +69,7 @@ GENERATED_FILES_DEP = \
 	hd/etc/version.txt \
 	lib/dune \
 	lib/gwdb/dune \
+	lib/core/dune \
 	lib/gwdb-legacy-x-arangodb/dune \
 	lib/gwlib.ml \
 	lib/util/dune \
