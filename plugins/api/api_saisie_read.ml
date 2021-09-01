@@ -55,7 +55,7 @@ let partial_short_dates_text conf birth_date death_date p =
 
 let short_dates_text conf base p =
   if authorized_age conf base p then
-    let (birth_date, death_date, _) = Date.get_birth_death_date p in
+    let (birth_date, death_date, _) = Gutil.get_birth_death_date p in
     match (birth_date, death_date) with
     | (Some (Dgreg (b, _)), Some (Dgreg (d, _))) ->
       short_prec_year_text conf b ^ "-" ^ short_prec_year_text conf d
@@ -514,7 +514,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
     let occ = Int32.of_int (get_occ p) in
     let (birth_short, birth_raw, birth_place, death_short, death_raw, death_place) =
       if p_auth then
-        let (birth_date, death_date, _) = Date.get_birth_death_date p in
+        let (birth_date, death_date, _) = Gutil.get_birth_death_date p in
         let birth =
           match birth_date with
           | Some d -> DateDisplay.string_slash_of_date conf d

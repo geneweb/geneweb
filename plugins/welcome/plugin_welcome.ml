@@ -3,7 +3,7 @@
 open Geneweb.Config
 open Gwdb
 open Geneweb.Util
-open Geneweb.Gutil
+open Gutil
 open Geneweb.Hutil
 open Geneweb.SearchName
 open Geneweb.AdvSearchOk
@@ -14,7 +14,7 @@ open Def
 
 module Gwdb = Gwdb
 module Util = Geneweb.Util
-module Gutil = Geneweb.Gutil
+module Gutil = Gutil
 module Hutil = Geneweb.Hutil
 module SearchName = Geneweb.SearchName
 module AdvSearchOk = Geneweb.AdvSearchOk

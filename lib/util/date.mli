@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
 
 val leap_year : int -> bool
 
@@ -29,13 +28,6 @@ val date_of_death : Def.death -> Adef.date option
 (** [dmy_of_dmy2 dmy2]
     Convert a [dmy2] to [dmy] using [Sure] as precision. *)
 val dmy_of_dmy2 : dmy2 -> dmy
-
-(** [get_birth_death p]
-    Return [(birth, death, approx)]. If birth/death date can not be found,
-    baptism/burial date is used and [approx] is set to [true] (it is [false]
-    if both birth and death dates are found).
-*)
-val get_birth_death_date : person -> date option * date option * bool
 
 (** [Not_comparable] is raised by [compare_dmy] and [compare_date] when
     [strict] mode is used and precision of dates are incompatibles to

@@ -4,7 +4,7 @@ open Geneweb.Config
 open Gwdb
 open Geneweb.Util
 
-module Gutil = Geneweb.Gutil
+module Gutil = Gutil
 module Gwdb = Gwdb
 module Hutil = Geneweb.Hutil
 module Output = Geneweb.Output

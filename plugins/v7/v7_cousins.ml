@@ -7,7 +7,7 @@ open Def
 module BirthdayDisplay = Geneweb.BirthdayDisplay
 module Cousins = Geneweb.Cousins
 module DateDisplay = Geneweb.DateDisplay
-module Gutil = Geneweb.Gutil
+module Gutil = Gutil
 module Gwdb = Gwdb
 module Hutil = Geneweb.Hutil
 module Output = Geneweb.Output

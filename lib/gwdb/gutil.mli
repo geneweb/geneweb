@@ -1,4 +1,3 @@
-(* $Id: gutil.mli,v 5.34 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
@@ -31,3 +30,11 @@ val couple : bool -> 'a -> 'a -> 'a gen_couple
 val parent_array : 'a gen_couple -> 'a array
 
 val find_free_occ : base -> string -> string -> int -> int
+
+
+(** [get_birth_death p]
+    Return [(birth, death, approx)]. If birth/death date can not be found,
+    baptism/burial date is used and [approx] is set to [true] (it is [false]
+    if both birth and death dates are found).
+*)
+val get_birth_death_date : person -> date option * date option * bool

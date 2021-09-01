@@ -557,7 +557,7 @@ let prec_year_text conf d =
 (* ********************************************************************** *)
 let short_dates_text conf base p =
   if authorized_age conf base p then
-    let (birth_date, death_date, _) = Date.get_birth_death_date p in
+    let (birth_date, death_date, _) = Gutil.get_birth_death_date p in
     let s =
       match birth_date, death_date with
         Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
@@ -691,7 +691,7 @@ let print_dates conf base p =
       burial_date_place cod
   | UnknownBurial -> ()
   end;
-  let (birth_date, death_date, approx) = Date.get_birth_death_date p in
+  let (birth_date, death_date, approx) = Gutil.get_birth_death_date p in
   match birth_date, death_date with
     Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
     Some (Dgreg (({prec = Sure | About | Maybe} as d2), _))

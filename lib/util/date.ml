@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
 
 let dmy_of_dmy2 dmy2 =
   {day = dmy2.day2; month = dmy2.month2; year = dmy2.year2; prec = Sure;
@@ -75,23 +74,6 @@ let date_of_death =
   function
     Death (_, cd) -> Some (Adef.date_of_cdate cd)
   | _ -> None
-
-let get_birth_death_date p =
-  let (birth_date, approx) =
-    match Adef.od_of_cdate (get_birth p) with
-      None -> Adef.od_of_cdate (get_baptism p), true
-    | x -> x, false
-  in
-  let (death_date, approx) =
-    match date_of_death (get_death p) with
-      Some d -> Some d, approx
-    | _ ->
-        match get_burial p with
-          Buried cd -> Adef.od_of_cdate cd, true
-        | Cremated cd -> Adef.od_of_cdate cd, true
-        | _ -> None, approx
-  in
-  birth_date, death_date, approx
 
 exception Not_comparable
 

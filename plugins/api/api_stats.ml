@@ -1269,7 +1269,7 @@ let print_all_stats conf base =
       if get_sex p = Neuter then ()
       else
         begin
-          match Date.get_birth_death_date p with
+          match Gutil.get_birth_death_date p with
           | (Some (Dgreg (({prec = Sure} as dmy1), _) as d1),
              Some (Dgreg (({prec = Sure} as dmy2), _) as d2), _) ->
 
@@ -1357,8 +1357,8 @@ let print_all_stats conf base =
                             let father = poi base (get_father fam) in
                             let mother = poi base (get_mother fam) in
                             match
-                              ( Date.get_birth_death_date father
-                              , Date.get_birth_death_date mother)
+                              ( Gutil.get_birth_death_date father
+                              , Gutil.get_birth_death_date mother)
                             with
                             | ( (_, Some (Dgreg (dmyf, _)), _)
                               , (_, Some (Dgreg (dmym, _)), _)) ->
@@ -1430,7 +1430,7 @@ let print_all_stats conf base =
           (* Age at wedding *)
           begin
             match
-              (Date.get_birth_death_date f, Date.get_birth_death_date m)
+              (Gutil.get_birth_death_date f, Gutil.get_birth_death_date m)
             with
             | ( (Some (Dgreg (({prec = Sure} as dmy1), _)), _, _)
               , (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _) ) ->
@@ -1461,8 +1461,8 @@ let print_all_stats conf base =
 
           (* Age difference in a couple *)
           begin
-            match ( Date.get_birth_death_date f
-                  , Date.get_birth_death_date m )
+            match ( Gutil.get_birth_death_date f
+                  , Gutil.get_birth_death_date m )
             with
             | ( (Some (Dgreg (({prec = Sure} as dmy1), _)), _, _)
               , (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _) )
@@ -1496,8 +1496,8 @@ let print_all_stats conf base =
                 if Util.authorized_age conf base c1
                 && Util.authorized_age conf base c2
                 then begin match
-                    ( Date.get_birth_death_date c1
-                    , Date.get_birth_death_date c2 )
+                    ( Gutil.get_birth_death_date c1
+                    , Gutil.get_birth_death_date c2 )
                   with
                   | ( (Some (Dgreg (({prec = Sure} as dmy_c1), _)), _, _)
                     , (Some (Dgreg (({prec = Sure} as dmy_c2), _)), _, _) ) ->
@@ -1515,9 +1515,9 @@ let print_all_stats conf base =
           let aux_age_at_birth ht ic =
               let c = poi base ic in
               if Util.authorized_age conf base c then
-                match Date.get_birth_death_date c with
+                match Gutil.get_birth_death_date c with
                 | (Some (Dgreg (({ prec = Sure } as dmy_c), _)), _, _) ->
-                  let aux p = match Date.get_birth_death_date p with
+                  let aux p = match Gutil.get_birth_death_date p with
                     | (Some (Dgreg (({ prec = Sure } as dmy_p), _)), _, _) ->
                       aux1 ht dmy_c (get_sex p) (Date.time_elapsed dmy_p dmy_c).year
                     | _ -> ()
@@ -1544,7 +1544,7 @@ let print_all_stats conf base =
             let c2 = poi base @@ Array.unsafe_get children @@ len - 1 in
             if Util.authorized_age conf base c1
             && Util.authorized_age conf base c2
-            then match (Date.get_birth_death_date c1, Date.get_birth_death_date c2) with
+            then match (Gutil.get_birth_death_date c1, Gutil.get_birth_death_date c2) with
               | ( (Some (Dgreg (({prec = Sure} as dmy1), _)), _, _)
                 , (Some (Dgreg (({prec = Sure} as dmy2), _)), _, _) ) ->
                 let a = Date.time_elapsed dmy1 dmy2 in

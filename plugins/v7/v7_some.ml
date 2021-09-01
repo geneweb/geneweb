@@ -6,10 +6,10 @@ open Gwdb
 open Geneweb.Util
 
 module Alln = Geneweb.Alln
-module Date = Geneweb.Date
+module Date = Date
 module DateDisplay = Geneweb.DateDisplay
 module Hutil = Geneweb.Hutil
-module Gutil = Geneweb.Gutil
+module Gutil = Gutil
 module Output = Geneweb.Output
 module Perso = V7_perso
 module StrSet = Mutil.StrSet

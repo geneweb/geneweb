@@ -574,7 +574,7 @@ let pers_to_piqi_simple_person conf base p =
     Api_saisie_read.person_firstname_surname_txt base p
   in
   let (birth_short, birth_place, death_short, death_place) =
-    let (birth, death, _) = Date.get_birth_death_date p in
+    let (birth, death, _) = Gutil.get_birth_death_date p in
     let birth =
       match birth with
       | Some d -> DateDisplay.string_slash_of_date conf d

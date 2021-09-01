@@ -852,7 +852,7 @@ let print_person_table conf base p lab =
       begin let d =
         if not p_auth then ""
         else
-          match Date.get_birth_death_date p with
+          match Gutil.get_birth_death_date p with
             Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
             Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)), approx
             when d1 <> d2 ->

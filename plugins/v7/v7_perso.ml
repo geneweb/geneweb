@@ -7,9 +7,9 @@ open Gwdb
 open Geneweb.Util
 
 module CheckItem = Geneweb.CheckItem
-module Date = Geneweb.Date
+module Date = Date
 module DateDisplay = Geneweb.DateDisplay
-module Gutil = Geneweb.Gutil
+module Gutil = Gutil
 module Gwdb = Gwdb
 module HistoryDiff = Geneweb.HistoryDiff
 module Hutil = Geneweb.Hutil
@@ -3050,7 +3050,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else false
   | "computable_death_age" ->
       if p_auth then
-        match Date.get_birth_death_date p with
+        match Gutil.get_birth_death_date p with
           Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
           Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)),
           _
@@ -3445,7 +3445,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "dates" -> if p_auth then DateDisplay.short_dates_text conf base p else ""
   | "death_age" ->
       if p_auth then
-        match Date.get_birth_death_date p with
+        match Gutil.get_birth_death_date p with
           Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
           Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)), approx
           when d1 <> d2 ->
