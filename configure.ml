@@ -90,7 +90,7 @@ let () =
     | `Legacy ->
       exclude_dir "sosa_num" ;
       exclude_dir "sosa_zarith" ;
-      "geneweb_sosa"
+      "geneweb_sosa_array"
     | `Num ->
       exclude_dir "sosa_array" ;
       exclude_dir "sosa_zarith" ;
