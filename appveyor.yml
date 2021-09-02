@@ -13,13 +13,6 @@
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
     OPAM_PACKAGES: 'calendars camlp5.8.00.01 cppo dune.2.7.1 jingoo markup ocaml ppx_blob stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
     matrix:
-      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-        CYG_ROOT: C:/cygwin64
-        PKG_OS: win64
-      - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1604
-        PKG_OS: linux
-      - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-        PKG_OS: macos-10.14
       - APPVEYOR_BUILD_WORKER_IMAGE: macos
         PKG_OS: macos-10.15
 
