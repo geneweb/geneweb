@@ -1870,9 +1870,6 @@ let main () =
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
 #endif
-#ifdef WINDOWS
-    ; ("-noproc", Arg.Set Wserver.noproc ," Do not launch a process at each request.")
-#endif
 #ifdef API
     ; ("-api_h", Arg.String (fun x -> selected_api_host := x), "<HOST> Host for GeneWeb API (default = " ^ !selected_api_host ^ ").")
     ; ("-api_p", Arg.Int (fun x -> selected_api_port := x), "<NUMBER> Port number for GeneWeb API (default = " ^ string_of_int !selected_api_port ^ ").")

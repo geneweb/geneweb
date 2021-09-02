@@ -7,7 +7,6 @@ let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
-let noproc = ref false
 let cgi = ref false
 
 let wserver_sock = ref Unix.stdout
@@ -259,7 +258,7 @@ let check_stopping () =
     end
 
 let accept_connection tmout max_clients callback s =
-  if !noproc then wait_and_compact s else wait_available max_clients s;
+  let () = wait_available max_clients s in
   let (t, addr) = Unix.accept s in
   check_stopping ();
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
@@ -292,15 +291,6 @@ let accept_connection tmout max_clients callback s =
     | exc -> cleanup (); raise exc
     end;
     cleanup ();
-    if !noproc then
-      let fd = Unix.openfile !sock_in [Unix.O_RDONLY] 0 in
-      let oc = open_out_bin !sock_out in
-      wserver_oc := oc;
-      treat_connection tmout callback addr fd;
-      flush oc;
-      close_out oc;
-      Unix.close fd
-    else
       begin let pid =
         let env =
           Array.append (Unix.environment ())
