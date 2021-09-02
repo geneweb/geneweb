@@ -1,3 +1,2 @@
-(lang dune 2.7.1)
+(lang dune 2.9.0)
 (name geneweb)
-(allow_approximate_merlin)
