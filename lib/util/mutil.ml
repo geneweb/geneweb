@@ -176,11 +176,11 @@ let nominative s =
     Some _ -> decline 'n' s
   | _ -> s
 
-let mkdir_p x =
+let mkdir_p ?(perm = 0o755) x =
   let rec loop x =
     let y = Filename.dirname x in
     if y <> x && String.length y < String.length x then loop y;
-    try Unix.mkdir x 0o755 with Unix.Unix_error (_, _, _) -> ()
+    try Unix.mkdir x perm with Unix.Unix_error (_, _, _) -> ()
   in
   loop x
 
