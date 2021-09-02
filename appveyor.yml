@@ -40,7 +40,7 @@
     - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
     - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then brew update; fi;'
     - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then brew install opam; fi;'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then sudo cpan install String::ShellQuote; fi;'
+    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then cpan install String::ShellQuote; fi;'
     - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then sudo cpan install IPC::System::Simple; fi;'
     - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
     - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo sudo apt-get update; fi;'
