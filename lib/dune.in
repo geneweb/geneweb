@@ -1,10 +1,6 @@
 (dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
 
-(rule
-  (target templ.ml)
-  (deps templ.camlp5.ml)
-  (action (run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo -impl %{deps} -o %{target}))
-)
+(ocamllex (modules templ_parser))
 
 (library
  (name geneweb)
