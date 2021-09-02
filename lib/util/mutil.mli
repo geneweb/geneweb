@@ -9,7 +9,13 @@ val strip_all_trailing_spaces : string -> string
 val decline : char -> string -> string
 val nominative : string -> string
 
-val mkdir_p : string -> unit
+
+(** [mkdir_p ?perm dir]
+    Create the directory [dir].
+    No error if existing, make parent directories as needed.
+*)
+val mkdir_p : ?perm:int -> string -> unit
+
 val remove_dir : string -> unit
 val lock_file : string -> string
 
