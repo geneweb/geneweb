@@ -132,8 +132,7 @@ let gen_interp header conf fname ifun env ep =
       Some astl ->
         if header then Util.html conf;
         let full_name = Util.etc_file_name conf fname in
-        Templ.interp_ast conf ifun env ep
-          (Templ.begin_end_include conf full_name astl)
+        Templ.interp_ast conf ifun env ep [ Ainclude (full_name, astl) ]
     | None -> error_cannot_access conf fname
   with e -> Templ.template_file := v; raise e
   end;
