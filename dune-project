@@ -1,2 +1,2 @@
-(lang dune 2.9.0)
+(lang dune 2.8)
 (name geneweb)
