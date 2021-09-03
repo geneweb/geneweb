@@ -48,7 +48,7 @@ endif
 bin/gwrepl/.depend:
 	@echo -n "Generating $@..."
 	@pwd > $@
-	@dune top bin/gwrepl >> $@ 2> /dev/null
+	@dune top bin/gwrepl >> $@
 	@echo " Done!"
 
 dune-workspace: dune-workspace.in Makefile.config
