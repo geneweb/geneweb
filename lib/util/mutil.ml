@@ -56,8 +56,11 @@ let bench name fn =
       (gc.top_heap_words |> pint)
       (gc.stack_size |> pint)
   in
-  let diff gc1 gc2 =
-    Gc.{ minor_words = gc2.minor_words -. gc1.minor_words
+ (* OCaml 4.12 added [forced_major_collections] field. *)
+ (* Using [@warning "-23"] and "gc1 with" as a workaround. *)
+  let [@warning "-23"] diff gc1 gc2 =
+    Gc.{ gc1 with
+         minor_words = gc2.minor_words -. gc1.minor_words
        ; promoted_words = gc2.promoted_words -. gc1.promoted_words
        ; major_words = gc2.major_words -. gc1.major_words
        ; minor_collections = gc2.minor_collections - gc1.minor_collections
