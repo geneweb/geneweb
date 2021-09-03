@@ -687,7 +687,7 @@ let list_map_sort_uniq (fn : 'a -> 'b) l =
     | [], l2 -> rev_append l2 accu
     | l1, [] -> rev_append l1 accu
     | h1::t1, h2::t2 ->
-      let c = compare h1 h2 in
+      let c = Stdlib.compare h1 h2 in
       if c = 0 then rev_merge t1 t2 (h1::accu)
       else if c < 0
       then rev_merge t1 l2 (h1::accu)
@@ -698,7 +698,7 @@ let list_map_sort_uniq (fn : 'a -> 'b) l =
     | [], l2 -> rev_append l2 accu
     | l1, [] -> rev_append l1 accu
     | h1::t1, h2::t2 ->
-      let c = compare h1 h2 in
+      let c = Stdlib.compare h1 h2 in
       if c = 0 then rev_merge_rev t1 t2 (h1::accu)
       else if c > 0
       then rev_merge_rev t1 l2 (h1::accu)
@@ -710,7 +710,7 @@ let list_map_sort_uniq (fn : 'a -> 'b) l =
       let x1 = fn x1 in
       let x2 = fn x2 in
       let s =
-        let c = compare x1 x2 in
+        let c = Stdlib.compare x1 x2 in
         if c = 0 then [x1] else if c < 0 then [x1; x2] else [x2; x1]
       in
       (s, tl)
@@ -719,25 +719,25 @@ let list_map_sort_uniq (fn : 'a -> 'b) l =
       let x2 = fn x2 in
       let x3 = fn x3 in
       let s =
-        let c = compare x1 x2 in
+        let c = Stdlib.compare x1 x2 in
         if c = 0 then
-          let c = compare x2 x3 in
+          let c = Stdlib.compare x2 x3 in
           if c = 0 then [x2] else if c < 0 then [x2; x3] else [x3; x2]
         else if c < 0 then
-          let c = compare x2 x3 in
+          let c = Stdlib.compare x2 x3 in
           if c = 0 then [x1; x2]
           else if c < 0 then [x1; x2; x3]
           else
-            let c = compare x1 x3 in
+            let c = Stdlib.compare x1 x3 in
             if c = 0 then [x1; x2]
             else if c < 0 then [x1; x3; x2]
             else [x3; x1; x2]
         else
-          let c = compare x1 x3 in
+          let c = Stdlib.compare x1 x3 in
           if c = 0 then [x2; x1]
           else if c < 0 then [x2; x1; x3]
           else
-            let c = compare x2 x3 in
+            let c = Stdlib.compare x2 x3 in
             if c = 0 then [x2; x1]
             else if c < 0 then [x2; x3; x1]
             else [x3; x2; x1]
@@ -755,7 +755,7 @@ let list_map_sort_uniq (fn : 'a -> 'b) l =
       let x1 = fn x1 in
       let x2 = fn x2 in
       let s =
-        let c = compare x1 x2 in
+        let c = Stdlib.compare x1 x2 in
         if c = 0 then [x1] else if c > 0 then [x1; x2] else [x2; x1]
       in
       (s, tl)
@@ -764,25 +764,25 @@ let list_map_sort_uniq (fn : 'a -> 'b) l =
       let x2 = fn x2 in
       let x3 = fn x3 in
       let s =
-        let c = compare x1 x2 in
+        let c = Stdlib.compare x1 x2 in
         if c = 0 then
-          let c = compare x2 x3 in
+          let c = Stdlib.compare x2 x3 in
           if c = 0 then [x2] else if c > 0 then [x2; x3] else [x3; x2]
         else if c > 0 then
-          let c = compare x2 x3 in
+          let c = Stdlib.compare x2 x3 in
           if c = 0 then [x1; x2]
           else if c > 0 then [x1; x2; x3]
           else
-            let c = compare x1 x3 in
+            let c = Stdlib.compare x1 x3 in
             if c = 0 then [x1; x2]
             else if c > 0 then [x1; x3; x2]
             else [x3; x1; x2]
         else
-          let c = compare x1 x3 in
+          let c = Stdlib.compare x1 x3 in
           if c = 0 then [x2; x1]
           else if c > 0 then [x2; x1; x3]
           else
-            let c = compare x2 x3 in
+            let c = Stdlib.compare x2 x3 in
             if c = 0 then [x2; x1]
             else if c > 0 then [x2; x3; x1]
             else [x3; x2; x1]
