@@ -504,7 +504,10 @@ let input_lexicon lang ht open_fname =
              && String.unsafe_get line 3 = ' '
         then
           let k2 = String.sub line 4 (String.length line - 4) in
-          Option.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
+          match Hashtbl.find_opt ht k2 with
+          | Some entry -> Option.iter (Hashtbl.replace ht k) (Some entry) 
+          | None ->
+            Printf.eprintf "Warning: Entry %s must be defined before aliased entry %s\n" k2 k;
           key ()
         else trad k
       | None -> key ()
