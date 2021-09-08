@@ -468,6 +468,7 @@ let input_lexicon lang ht open_fname =
         && aux a b (i - 1) )
   in
   (* find header *)
+  let tmp = Hashtbl.create 0 in
   let rec key () =
     match input_line ic with
     | exception End_of_file -> close_in ic
@@ -503,16 +504,22 @@ let input_lexicon lang ht open_fname =
              && String.unsafe_get line 2 = ':'
              && String.unsafe_get line 3 = ' '
         then
+        begin
           let k2 = String.sub line 4 (String.length line - 4) in
-          match Hashtbl.find_opt ht k2 with
-          | Some entry -> Option.iter (Hashtbl.replace ht k) (Some entry) 
-          | None ->
-            Printf.eprintf "Warning: Entry %s must be defined before aliased entry %s\n" k2 k;
+          Hashtbl.replace tmp k k2;
           key ()
+        end
         else trad k
-      | None -> key ()
+      | None -> key () ;
   in
-  key ()
+  key () ;
+  Hashtbl.iter (fun k k2 -> 
+      match Hashtbl.find_opt ht k2 with
+      | Some entry -> Hashtbl.replace ht k entry
+      | None -> 
+        Printf.eprintf "Warning: %s aliased to inexistant %s entry\n" k k2
+    ) tmp
+
 
 let array_to_list_map fn a =
   Array.fold_right (fun x acc -> fn x :: acc) a []
