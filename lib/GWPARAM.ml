@@ -4,6 +4,17 @@
     for simple functions if it does not come with a performance cost.
 *)
 
+type syslog_level =
+  [ `LOG_ALERT
+  | `LOG_CRIT
+  | `LOG_DEBUG
+  | `LOG_EMERG
+  | `LOG_ERR
+  | `LOG_INFO
+  | `LOG_NOTICE
+  | `LOG_WARNING
+  ]
+
 module Default = struct
 
   let init = fun () ->
@@ -114,6 +125,21 @@ module Default = struct
         end
     end
 
+  let syslog (level : syslog_level) msg =
+    let tm = Unix.(time () |> localtime) in
+    let level =
+      match level with
+      | `LOG_EMERG -> "EMERGENCY"
+      | `LOG_ALERT -> "ALERT"
+      | `LOG_CRIT -> "CRITICAL"
+      | `LOG_ERR -> "ERROR"
+      | `LOG_WARNING -> "WARNING"
+      | `LOG_NOTICE -> "NOTICE"
+      | `LOG_INFO -> "INFO"
+      | `LOG_DEBUG -> "DEBUG"
+    in
+    Printf.eprintf "[%s]: %s %s\n" (Mutil.sprintf_date tm) level msg
+
 end
 
 let init = ref Default.init
@@ -121,3 +147,4 @@ let base_path = ref Default.base_path
 let bpath = ref Default.bpath
 let output_error = ref Default.output_error
 let p_auth = ref Default.p_auth
+let syslog = ref Default.syslog
