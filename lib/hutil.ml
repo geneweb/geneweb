@@ -125,18 +125,14 @@ let error_cannot_access conf fname =
     ~content:(Printf.sprintf "Cannot access file \"%s.txt\".\n" fname)
 
 let gen_interp header conf fname ifun env ep =
-  let v = !(Templ.template_file) in
-  Templ.template_file := fname;
-  begin try
+  Templ_parser.wrap fname begin fun () ->
     match Templ.input_templ conf fname with
-      Some astl ->
-        if header then Util.html conf;
-        let full_name = Util.etc_file_name conf fname in
-        Templ.interp_ast conf ifun env ep [ Ainclude (full_name, astl) ]
+    | Some astl ->
+      if header then Util.html conf;
+      let full_name = Util.etc_file_name conf fname in
+      Templ.interp_ast conf ifun env ep [ Ainclude (full_name, astl) ]
     | None -> error_cannot_access conf fname
-  with e -> Templ.template_file := v; raise e
-  end;
-  Templ.template_file := v
+  end
 
 let interp_no_header conf fname ifun env ep =
   gen_interp false conf fname ifun env ep
