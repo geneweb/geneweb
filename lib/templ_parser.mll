@@ -73,7 +73,8 @@ let strip_newlines_after_variables =
         in
         loop 0
       in
-      TemplAst.Atext (loc, s) :: loop astl
+      if s <> "" then TemplAst.Atext (loc, s) :: loop astl
+      else loop astl
     | TemplAst.Aif (s, alt, ale) :: astl -> TemplAst.Aif (s, loop alt, loop ale) :: loop astl
     | TemplAst.Aforeach (v, pl, al) :: astl -> TemplAst.Aforeach (v, pl, loop al) :: loop astl
     | TemplAst.Adefine (f, x, al, alk) :: astl ->
