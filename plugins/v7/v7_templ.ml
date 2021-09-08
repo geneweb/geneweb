@@ -1,601 +1,29 @@
-open Geneweb.Config
-open Geneweb.TemplAst
+open Geneweb
+open Config
+open TemplAst
 
-module Output = Geneweb.Output
-module Translate = Geneweb.Translate
-module Util = Geneweb.Util
-module Version = Geneweb.Version
+let include_begin conf fname =
+  if conf.debug then Output.print_string conf ("\n<!-- begin include " ^ fname ^ " -->\n")
 
-(* Parsing *)
-
-type token =
-    BANGEQUAL
-  | COMMA
-  | DOT
-  | DIV
-  | EQUAL
-  | GREATER
-  | GREATEREQUAL
-  | LESS
-  | LESSEQUAL
-  | LPAREN
-  | MINUS
-  | PERCENT
-  | PLUS
-  | RPAREN
-  | EXP
-  | STAR
-  | IDENT of string
-  | STRING of string
-  | INT of string
-  | LEXICON of bool * string * string
-
-type loc_token =
-    Tok of loc * token
+let include_end conf fname =
+  if conf.debug then Output.print_string conf ("\n<!-- end include " ^ fname ^ " -->\n")
 
 exception Exc_located of loc * exn
 
-let raise_with_loc loc exc =
-  match exc with
-    Exc_located (_, _) -> raise exc
-  | _ -> raise (Exc_located (loc, exc))
-
-let rec get_ident len =
-  parser
-    [< ''a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c;
-       a = get_ident (Buff.store len c) ?! >] ->
-      a
-  | [< >] -> Buff.get len
-
-let rec get_value len =
-  parser
-    [< '' ' | '>' | ';' | '\n' | '\r' | '\t' >] -> Buff.get len
-  | [< 'c; a = get_value (Buff.store len c) ?! >] -> a
-
-let rec get_string len =
-  parser
-    [< ''"' >] -> Buff.get len
-  | [< 'c; a = get_string (Buff.store len c) ?! >] -> a
-
-let rec get_int len =
-  parser
-    [< ''0'..'9' as c; a = get_int (Buff.store len c) ?! >] -> a
-  | [< >] -> Buff.get len
-
-let get_compound_var =
-  let rec var_kont =
-    parser
-      [< ''.'; s = get_ident 0; sl = var_kont >] -> s :: sl
-    | [< >] -> []
-  in
-  parser bp [< v = get_ident 0; vl = var_kont >] ep -> ("", bp, ep), v, vl
-
-let get_variable =
-  let rec var_kont =
-    parser
-      [< ''.'; s = get_ident 0; sl = var_kont >] -> s :: sl
-    | [< '';' >] -> []
-    | [< >] -> []
-  in
-  parser bp
-    [< ''%' >] ep -> ("", bp, ep), "%", []
-  | [< ''/' >] ep -> ("", bp, ep), "/", []
-  | [< ''[' >] ep -> ("", bp, ep), "[", []
-  | [< '']' >] ep -> ("", bp, ep), "]", []
-  | [< ''(' >] ep -> ("", bp, ep), "(", []
-  | [< '')' >] ep -> ("", bp, ep), ")", []
-  | [< v = get_ident 0; vl = var_kont >] ep -> ("", bp, ep), v, vl
-
-let rec transl_num_index =
-  parser
-    [< ''0'..'9' as c >] -> String.make 1 c ^ transl_num_index strm__
-  | [< >] -> ""
-
-let transl_index =
-  parser
-    [< ''0'..'9' as c >] -> String.make 1 c ^ transl_num_index strm__
-  | [< ''a'..'z' as c >] -> String.make 1 c
-  | [< >] -> ""
-
-let lexicon_word =
-  let upper =
-    parser
-      [< ''*' >] -> true
-    | [< >] -> false
-  in
-  let rec text lev len =
-    parser
-      [< ''['; a = text (lev + 1) (Buff.store len '[') ?! >] -> a
-    | [< '']'; s >] ->
-        if lev = 0 then Buff.get len
-        else text (lev - 1) (Buff.store len ']') s
-    | [< 'c; a = text lev (Buff.store len c) ?! >] -> a
-  in
-  parser [< upp = upper; s = text 0 0; n = transl_index >] -> upp, s, n
-
-let rec parse_comment =
-  parser
-    [< ''%'; a = parse_comment_after_percent ?! >] -> a
-  | [< '_; a = parse_comment ?! >] -> a
-and parse_comment_after_percent =
-  parser
-    [< '')'; a = parse_spaces_after_comment ?! >] -> a
-  | [< ''('; s >] -> parse_comment s; parse_comment s
-  | [< '_; a = parse_comment ?! >] -> a
-and parse_spaces_after_comment =
-  parser
-    [< '' ' | '\n' | '\t' | '\r'; a = parse_spaces_after_comment ?! >] -> a
-  | [< >] -> ()
-
-let rec get_token =
-  parser bp
-    [< '' ' | '\t' | '\n' | '\r'; a = get_token ?! >] -> a
-  | [< ''(' >] ep -> Tok (("", bp, ep), LPAREN)
-  | [< '')' >] ep -> Tok (("", bp, ep), RPAREN)
-  | [< '',' >] ep -> Tok (("", bp, ep), COMMA)
-  | [< ''.' >] ep -> Tok (("", bp, ep), DOT)
-  | [< ''=' >] ep -> Tok (("", bp, ep), EQUAL)
-  | [< ''+' >] ep -> Tok (("", bp, ep), PLUS)
-  | [< ''-' >] ep -> Tok (("", bp, ep), MINUS)
-  | [< ''*' >] ep -> Tok (("", bp, ep), STAR)
-  | [< ''^' >] ep -> Tok (("", bp, ep), EXP)
-  | [< ''/' >] ep -> Tok (("", bp, ep), DIV)
-  | [< ''%';
-       a =
-         parser
-           [< ''('; _ = parse_comment; a = get_token ?! >] -> a
-         | [< >] ep -> Tok (("", bp, ep), PERCENT) >] ->
-      a
-  | [< ''!'; ''=' ?? "'=' expected" >] ep -> Tok (("", bp, ep), BANGEQUAL)
-  | [< ''>';
-       tok =
-         parser
-           [< ''=' >] -> GREATEREQUAL
-         | [< >] -> GREATER ?! >] ep ->
-      Tok (("", bp, ep), tok)
-  | [< ''<';
-       tok =
-         parser
-           [< ''=' >] -> LESSEQUAL
-         | [< >] -> LESS ?! >] ep ->
-      Tok (("", bp, ep), tok)
-  | [< ''"'; s = get_string 0 >] ep -> Tok (("", bp, ep), STRING s)
-  | [< ''0'..'9' as c; s = get_int (Buff.store 0 c) >] ep ->
-      Tok (("", bp, ep), INT s)
-  | [< ''['; upp, s, n = lexicon_word >] ep ->
-      Tok (("", bp, ep), LEXICON (upp, s, n))
-  | [< s = get_ident 0 >] ep -> Tok (("", bp, ep), IDENT s)
-
-module Buff2 = Buff.Make (struct  end)
-
-let rec parse_var =
-  parser [< 'Tok (loc, IDENT id); loc, idl = ident_list loc >] -> loc, id, idl
-and ident_list (_, bp, _ as loc) =
-  parser
-    [< 'Tok (_, DOT);
-       loc, id =
-         (parser
-            [< 'Tok ((_, _, ep), IDENT id) >] -> ("", bp, ep), id
-          | [< 'Tok ((_, _, ep), INT id) >] -> ("", bp, ep), id
-          | [< 'Tok (loc, _) >] -> loc, "parse_error1");
-       loc, idl = ident_list loc >] ->
-      loc, id :: idl
-  | [< >] -> loc, []
-
-let rec parse_expr strm = parse_expr_if strm
-and parse_expr_if =
-  parser
-    [< 'Tok (_, IDENT "if"); e1 = parse_expr_or; 'Tok (_, IDENT "then");
-       e2 = parse_expr_or; 'Tok (_, IDENT "else"); e3 = parse_expr_or >] ->
-      Aif (e1, [e2], [e3])
-  | [< a = parse_expr_or >] -> a
-and parse_expr_or =
-  parser
-    [< e = parse_expr_and;
-       a =
-         parser
-           [< 'Tok (loc, IDENT "or") >] ->
-             Aop2 (loc, "or", e, parse_expr_or strm__)
-         | [< >] -> e >] ->
-      a
-and parse_expr_and =
-  parser
-    [< e = parse_expr_is_substr;
-       a =
-         parser
-           [< 'Tok (loc, IDENT "and") >] ->
-             Aop2 (loc, "and", e, parse_expr_and strm__)
-         | [< >] -> e >] ->
-      a
-and parse_expr_is_substr =
-  parser
-    [< e = parse_expr_in;
-       a =
-         parser
-           [< 'Tok (loc, IDENT "is_substr"); s >] ->
-             Aop2 (loc, "is_substr", e, (parse_expr_is_substr s))
-         | [< >] -> e >] ->
-      a
-and parse_expr_in =
-  parser
-    [< e = parse_expr_3;
-       a =
-         parser
-           [< 'Tok (loc, IDENT "in"); s >] ->
-             Aop2 (loc, "in", e, (parse_expr_in s))
-         | [< >] -> e >] ->
-      a
-and parse_expr_3 =
-  parser
-    [< e = parse_expr_4;
-       a =
-         parser
-           [< 'Tok (loc, EQUAL); e2 = parse_expr_4 >] ->
-             Aop2 (loc, "=", e, e2)
-         | [< 'Tok (loc, BANGEQUAL); e2 = parse_expr_4 >] ->
-             Aop2 (loc, "!=", e, e2)
-         | [< 'Tok (loc, GREATER); e2 = parse_expr_4 >] ->
-             Aop2 (loc, ">", e, e2)
-         | [< 'Tok (loc, GREATEREQUAL); e2 = parse_expr_4 >] ->
-             Aop2 (loc, ">=", e, e2)
-         | [< 'Tok (loc, LESS); e2 = parse_expr_4 >] -> Aop2 (loc, "<", e, e2)
-         | [< 'Tok (loc, LESSEQUAL); e2 = parse_expr_4 >] ->
-             Aop2 (loc, "<=", e, e2)
-         | [< >] -> e ?! >] ->
-      a
-and parse_expr_4 = parser [< e = parse_expr_5; a = parse_expr_4_kont e >] -> a
-and parse_expr_4_kont e =
-  parser
-    [< 'Tok (loc, PLUS); e2 = parse_expr_5;
-       a = parse_expr_4_kont (Aop2 (loc, "+", e, e2)) >] ->
-      a
-  | [< 'Tok (loc, MINUS); e2 = parse_expr_5;
-       a = parse_expr_4_kont (Aop2 (loc, "-", e, e2)) >] ->
-      a
-  | [< >] -> e
-and parse_expr_5 =
-  parser [< e = parse_simple_expr; a = parse_expr_5_kont e >] -> a
-and parse_expr_5_kont e =
-  parser
-    [< 'Tok (loc, STAR); e2 = parse_simple_expr;
-       a = parse_expr_5_kont (Aop2 (loc, "*", e, e2)) >] ->
-      a
-  | [< 'Tok (loc, EXP); e2 = parse_simple_expr;
-       a = parse_expr_5_kont (Aop2 (loc, "^", e, e2)) >] ->
-      a
-  | [< 'Tok (loc, DIV); e2 = parse_simple_expr;
-       a = parse_expr_5_kont (Aop2 (loc, "/", e, e2)) >] ->
-      a
-  | [< 'Tok (loc, PERCENT); e2 = parse_simple_expr;
-       a = parse_expr_5_kont (Aop2 (loc, "%", e, e2)) >] ->
-      a
-  | [< >] -> e
-and parse_simple_expr =
-  parser
-    [< 'Tok (_, LPAREN); e = parse_expr;
-       a =
-         parser
-           [< 'Tok (_, RPAREN) >] -> e
-         | [< 'Tok (loc, _) >] -> Avar (loc, "parse_error2", []) >] ->
-      a
-  | [< 'Tok (loc, IDENT "not"); e = parse_simple_expr >] ->
-      Aop1 (loc, "not", e)
-  | [< 'Tok (loc, STRING s) >] -> Atext (loc, s)
-  | [< 'Tok (loc, INT s) >] -> Aint (loc, s)
-  | [< 'Tok (loc, LEXICON (upp, s, n)) >] -> Atransl (loc, upp, s, n)
-  | [< loc, id, idl = parse_var;
-       a =
-         parser
-           [< t = parse_tuple >] -> Aapply (loc, id, t)
-         | [< >] -> Avar (loc, id, idl) >] ->
-      a
-and parse_tuple strm =
-  let rec parse_expr_list =
-    parser
-      [< x = parse_expr;
-         xl =
-           parser
-             [< 'Tok (_, COMMA); a = parse_expr_list >] -> a
-           | [< >] -> [] ?! >] ->
-        [x] :: xl
-  in
-  let parse_tuple =
-    parser
-      [< 'Tok (_, LPAREN);
-         xl =
-           (parser
-              [< a = parse_expr_list >] -> a
-            | [< >] -> []);
-         a =
-           parser
-             [< 'Tok (_, RPAREN) >] -> xl
-           | [< 'Tok (loc, _) >] -> [[Atext (loc, "parse_error4")]] >] ->
-        a
-  in
-  parse_tuple strm
-
-let parse_char_stream p strm =
-  let f _ = try Some (get_token strm) with Stream.Failure -> None in
-  p (Stream.from f)
-
-let parse_char_stream_semi p strm =
-  let opt_semi = Stream.peek strm <> Some '(' in
-  let f _ = try Some (get_token strm) with Stream.Failure -> None in
-  let r = p (Stream.from f) in
-  if opt_semi then
-    begin let (strm__ : _ Stream.t) = strm in
-      match Stream.peek strm__ with
-        Some ';' -> Stream.junk strm__; ()
-      | _ -> ()
-    end;
-  r
-
-let parse_formal_params strm =
-  let rec parse_ident_list =
-    parser
-      [< 'Tok (_, IDENT x);
-         xl =
-           parser
-             [< 'Tok (_, COMMA); a = parse_ident_list >] -> a
-           | [< >] -> [] ?! >] ->
-        x :: xl
-  in
-  let parse_tuple =
-    parser
-      [< 'Tok (_, LPAREN);
-         xl =
-           (parser
-              [< a = parse_ident_list >] -> a
-            | [< >] -> []);
-         a =
-           parser
-             [< 'Tok (_, RPAREN) >] -> xl
-           | [< >] -> ["parse_error5"] ?! >] ->
-        a
-  in
-  let f _ = try Some (get_token strm) with Stream.Failure -> None in
-  parse_tuple (Stream.from f)
-
-let strip_newlines_after_variables =
-  let rec loop =
-    function
-      Atext (loc, s) :: astl ->
-        let s =
-          let rec loop i =
-            if i = String.length s then s
-            else if s.[i] = ' ' || s.[i] = '\t' || s.[i] = '\r' then
-              loop (i + 1)
-            else if s.[i] = '\n' then
-              String.sub s (i + 1) (String.length s - i - 1)
-            else s
-          in
-          loop 0
-        in
-        Atext (loc, s) :: loop astl
-    | Aif (s, alt, ale) :: astl -> Aif (s, loop alt, loop ale) :: loop astl
-    | Aforeach (v, pl, al) :: astl -> Aforeach (v, pl, loop al) :: loop astl
-    | Adefine (f, x, al, alk) :: astl ->
-        Adefine (f, x, loop al, loop alk) :: loop astl
-    | Aapply (loc, f, all) :: astl ->
-        Aapply (loc, f, List.map loop all) :: loop astl
-    | Alet (k, v, al) :: astl -> Alet (k, loop v, loop al) :: loop astl
-    | Afor (i, min, max, al) :: astl ->
-        Afor (i, min, max, loop al) :: loop astl
-    | (Atransl (_, _, _, _) | Awid_hei _ as ast1) :: (Atext (_, _) as ast2) ::
-      astl ->
-        ast1 :: ast2 :: loop astl
-    | Ainclude (file, al) :: astl -> Ainclude (file, loop al) :: loop astl
-    | ast :: astl -> ast :: loop astl
-    | [] -> []
-  in
-  loop
-
-let included_files = ref []
-
-let begin_end_include conf fname al =
-  if conf.debug then
-    Atext (("",0,0), "\n\n<!-- begin include " ^ fname ^ " -->\n")
-    :: al
-    @ [ Atext (("",0,0), "<!-- end include " ^ fname ^ " -->\n") ]
-  else al
-
-let parse_templ conf strm =
-  let rec parse_astl astl bol len end_list strm =
-    match strm with parser bp
-      [< ''%' >] ->
-        let astl =
-          if len = 0 then astl
-          else Atext (("", bp - len, bp), Buff2.get len) :: astl
-        in
-        begin match get_variable strm with
-          _, ("%" | "[" | "]" as c), [] ->
-            parse_astl (Atext (("", bp - 1, bp), c) :: astl) false 0 end_list strm
-        | _, "(", [] ->
-            parse_comment strm; parse_astl astl false 0 end_list strm
-        | _, v, [] when List.mem v end_list -> List.rev astl, v
-        | _, "define", [] -> parse_define astl end_list strm
-        | _, "let", [] -> parse_let astl end_list strm
-        | _, "include", [] -> parse_include astl end_list strm
-        | x ->
-            let ast =
-              match x with
-                _, "if", [] -> parse_if strm
-              | _, "foreach", [] -> parse_foreach strm
-              | _, "apply", [] -> parse_apply bp strm
-              | _, "expr", [] -> parse_expr_stmt strm
-              | _, "for", [] -> parse_for strm
-              | _, "wid_hei", [] -> Awid_hei (get_value 0 strm)
-              | (_, _, ep), v, vl -> Avar (("", bp, ep), v, vl)
-            in
-            parse_astl (ast :: astl) false 0 end_list strm
-        end
-    | [< ''[' >] ->
-        let astl =
-          if len = 0 then astl
-          else Atext (("", bp - len, bp), Buff2.get len) :: astl
-        in
-        let a =
-          let (upp, s, n) = lexicon_word strm in
-          if String.length s > 1 && (s.[0] = '[' || s.[0] = '@') then
-            let (astl, _) = parse_astl [] false 0 [] (Stream.of_string s) in
-            Aconcat (("", bp, Stream.count strm), astl)
-          else Atransl (("", bp, Stream.count strm), upp, s, n)
-        in
-        parse_astl (a :: astl) false 0 end_list strm
-    | [< 'c >] ->
-        let empty_c = c = ' ' || c = '\t' in
-        let len = if empty_c && bol then len else Buff2.store len c in
-        let bol = empty_c && bol || c = '\n' in
-        parse_astl astl bol len end_list strm
-    | [< >] ->
-        let astl =
-          if len = 0 then astl
-          else Atext (("", bp - len, bp), Buff2.get len) :: astl
-        in
-        List.rev astl, ""
-  and parse_define astl end_list strm =
-    let fxlal =
-      try
-        let f = get_ident 0 strm in
-        let xl = parse_formal_params strm in
-        let (al, _) = parse_astl [] false 0 ["end"] strm in
-        begin let rec loop () =
-          match strm with parser
-            [< ''\n' | '\r' >] -> loop ()
-          | [< >] -> ()
-        in
-          loop ()
-        end;
-        Some (f, xl, al)
-      with Stream.Failure | Stream.Error _ -> None
-    in
-    let (alk, v) = parse_astl [] false 0 end_list strm in
-    let astl =
-      match fxlal with
-        Some (f, xl, al) -> Adefine (f, xl, al, alk) :: astl
-      | None ->
-          let bp = Stream.count strm - 1 in
-          Atext (("", bp, bp + 1), "define error") :: (alk @ astl)
-    in
-    List.rev astl, v
-  and parse_let astl end_list strm =
-    let (ast, tok) =
-      try
-        let k = get_ident 0 strm in
-        match strm with parser
-          [< '';' >] ->
-            let (v, _) = parse_astl [] false 0 ["in"] strm in
-            let (al, tok) = parse_astl [] false 0 end_list strm in
-            Alet (k, v, al), tok
-      with Stream.Failure | Stream.Error _ ->
-        let bp = Stream.count strm - 1 in
-        Atext (("", bp, bp + 1), "let syntax error"), ""
-    in
-    List.rev (ast :: astl), tok
-  and parse_include astl end_list strm =
-    let ast =
-      try
-        let file = get_value 0 strm in
-        match List.assoc_opt file !included_files with
-        | Some ast -> Some (Ainclude (file, ast))
-        | None ->
-          match Util.open_templ_fname conf file with
-          | Some (ic, fname) ->
-            let strm2 = Stream.of_channel ic in
-            let (al, _) = parse_astl [] false 0 [] strm2 in
-            close_in ic;
-            let al = begin_end_include conf fname al in
-            let () = included_files := (file, al) :: !included_files in
-            Some (Ainclude (file, al))
-          | None -> None
-      with Stream.Failure | Stream.Error _ -> None
-    in
-    let (alk, tok) = parse_astl [] false 0 end_list strm in
-    match ast with
-      Some ast -> List.rev (ast :: astl) @ alk, tok
-    | None -> astl @ alk, tok
-  and parse_apply bp strm =
-    try
-      let f = get_ident 0 strm in
-      match strm with parser
-        [< ''%' >] ->
-          begin match get_variable strm with
-            _, "with", [] ->
-              let all =
-                let rec loop () =
-                  let (al, tok) = parse_astl [] false 0 ["and"; "end"] strm in
-                  match tok with
-                    "and" -> al :: loop ()
-                  | _ -> [al]
-                in
-                loop ()
-              in
-              Aapply (("", bp, Stream.count strm), f, all)
-          | _ -> raise (Stream.Error "'with' expected")
-          end
-      | [< >] ->
-          let el = parse_char_stream parse_tuple strm in
-          Aapply (("", bp, Stream.count strm), f, el)
-    with Stream.Failure | Stream.Error _ ->
-      let bp = Stream.count strm - 1 in
-      Atext (("", bp, bp + 1), "apply syntax error")
-  and parse_expr_stmt strm = parse_char_stream_semi parse_simple_expr strm
-  and parse_if strm =
-    let e = parse_char_stream_semi parse_simple_expr strm in
-    let (al1, al2) =
-      let rec loop () =
-        let (al1, tok) =
-          parse_astl [] false 0 ["elseif"; "else"; "end"] strm
-        in
-        match tok with
-          "elseif" ->
-            let e2 = parse_char_stream_semi parse_simple_expr strm in
-            let (al2, al3) = loop () in al1, [Aif (e2, al2, al3)]
-        | "else" ->
-            let (al2, _) = parse_astl [] false 0 ["end"] strm in al1, al2
-        | _ -> al1, []
-      in
-      loop ()
-    in
-    Aif (e, al1, al2)
-  and parse_for strm =
-    try
-      let iterator = get_ident 0 strm in
-      match strm with parser
-        [< '';' >] ->
-          let min = parse_char_stream_semi parse_simple_expr strm in
-          let max = parse_char_stream_semi parse_simple_expr strm in
-          let (al, _) = parse_astl [] false 0 ["end"] strm in
-          Afor (iterator, min, max, al)
-    with Stream.Failure | Stream.Error _ ->
-      let bp = Stream.count strm - 1 in
-      Atext (("", bp, bp + 1), "for syntax error")
-  and parse_foreach strm =
-    let (loc, v, vl) = get_compound_var strm in
-    let params =
-      if Stream.peek strm = Some '(' then parse_char_stream parse_tuple strm
-      else
-        begin
-          begin let (strm__ : _ Stream.t) = strm in
-            match Stream.peek strm__ with
-              Some ';' -> Stream.junk strm__; ()
-            | _ -> ()
-          end;
-          []
-        end
-    in
-    let (astl, _) = parse_astl [] false 0 ["end"] strm in
-    Aforeach ((loc, v, vl), params, astl)
-  in
-  let astl = fst (parse_astl [] true 0 [] strm) in
-  strip_newlines_after_variables astl
+let raise_with_loc loc = function
+  | Exc_located (_, _) as e -> raise e
+  | e -> raise (Exc_located (loc, e))
 
 let input_templ conf fname =
-  match Util.open_templ conf fname with
-    Some ic ->
-      let astl = parse_templ conf (Stream.of_channel ic) in
-      close_in ic; Some astl
+  match Util.open_templ_fname conf fname with
   | None -> None
+  | Some (ic, fname) ->
+    Templ_parser.wrap fname begin fun () ->
+      let lex = Lexing.from_channel ic in
+      let r = Templ_parser.parse_templ conf lex in
+      close_in ic ;
+      Some r
+    end
 
 (* Common evaluation functions *)
 
@@ -614,9 +42,8 @@ let subst_text x v s =
     in
     loop 0 0 0
 
-let rec subst sf =
-  function
-    Atext (loc, s) -> Atext (loc, sf s)
+let rec subst sf = function
+  | Atext (loc, s) -> Atext (loc, sf s)
   | Avar (loc, s, sl) ->
       let s1 = sf s in
       let sl1 = List.map sf sl in
@@ -625,10 +52,11 @@ let rec subst sf =
       then
         Aint (loc, s1)
       else
-        let strm = Stream.of_string s1 in
-        let (_, s2, sl2) = get_compound_var strm in
-        if Stream.peek strm <> None then Avar (loc, s1, sl1)
-        else Avar (loc, s2, sl2 @ sl1)
+        let lex = Lexing.from_string s1 in
+        let [@warning "-8"] s2 :: sl2 = Templ_parser.compound_var lex in
+        if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
+        then Avar (loc, s2, sl2 @ sl1)
+        else Avar (loc, s1, sl1)
   | Atransl (loc, b, s, c) -> Atransl (loc, b, sf s, c)
   | Aconcat (loc, al) -> Aconcat (loc, List.map (subst sf) al)
   | Awid_hei s -> Awid_hei (sf s)
@@ -637,10 +65,12 @@ let rec subst sf =
       (* Dans le cas d'une "compound variable", il faut la décomposer. *)
       (* Ex: "ancestor.father".family  =>  ancestor.father.family      *)
       let s1 = sf s in
-      let strm = Stream.of_string s1 in
-      let (_, s2, sl2) = get_compound_var strm in
+      let lex = Lexing.from_string s1 in
+      let [@warning "-8"] s2 :: sl2 = Templ_parser.compound_var lex in
       let (s, sl) =
-        if Stream.peek strm <> None then s, sl else s2, sl2 @ sl
+        if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
+        then s2, sl2 @ sl
+        else s, sl
       in
       Aforeach
         ((loc, sf s, List.map sf sl), List.map (substl sf) pl, substl sf al)
@@ -962,7 +392,7 @@ and eval_transl_lexicon conf upp s c =
             let k = skip_spaces_and_newlines s2 (j + 1) in
             let s3 =
               let s = String.sub s2 i (j - i) in
-              let astl = parse_templ conf (Stream.of_string s) in
+              let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
               List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
             in
             let s4 = String.sub s2 k (String.length s2 - k) in
@@ -1058,12 +488,12 @@ let num_of e =
 let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   function
     Atext (_, s) -> VVstring s
-  | Avar (loc, s, sl) ->
+  | Avar (loc, s, sl) as e ->
       begin try eval_var loc (s :: sl) with
         Not_found ->
           begin try templ_eval_var conf (s :: sl) with
             Not_found ->
-              raise_with_loc loc
+              raise_with_loc (loc_of_expr e)
                 (Failure
                    ("unbound var \"" ^ String.concat "." (s :: sl) ^ "\""))
           end
@@ -1117,33 +547,33 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   | Aint (_, s) -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
-let line_of_loc conf fname (_, bp, ep) =
+let line_of_loc conf fname (bp, ep) =
   match Util.open_templ conf fname with
-    Some ic ->
-      let strm = Stream.of_channel ic in
-      let rec loop lin =
-        let rec scan_line col =
-          parser cnt
-            [< 'c; s >] ->
-              if cnt < bp then
-                if c = '\n' then loop (lin + 1) else scan_line (col + 1) s
-              else let col = col - (cnt - bp) in lin, col, col + ep - bp
-        in
-        scan_line 0 strm
-      in
-      let r = try Some (loop 1) with Stream.Failure -> None in close_in ic; r
+  | Some ic ->
+    begin try
+        let rec line i =
+        let rec column j =
+          if j < bp
+          then match input_char ic with
+          | '\n' -> line (i + 1)
+          | _ -> column (j + 1)
+          else
+            (i, j, j + ep - bp)
+        in column 0
+    in Some (line 0)
+      with _ -> None
+    end
   | None -> None
 
-let template_file = ref ""
-let print_error conf (_, bp, ep) exc =
+let print_error conf (fname, bp, ep) exc =
   incr nb_errors;
   if !nb_errors <= 10 then
     begin
-      if !template_file = "" then Printf.eprintf "*** <W> template file"
-      else Printf.eprintf "File \"%s.txt\"" !template_file;
+      if fname = "" then Printf.eprintf "*** <W> template file"
+      else Printf.eprintf "File %s" fname;
       let line =
-        if !template_file = "" then None
-        else line_of_loc conf !template_file ("", bp, ep)
+        if fname = "" then None
+        else line_of_loc conf fname (bp, ep)
       in
       Printf.eprintf ", ";
       begin match line with
@@ -1333,7 +763,7 @@ let eval_var conf ifun env ep loc sl =
         | _ -> raise Not_found
         end
     | "today" :: sl ->
-        Geneweb.TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+        TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
     | s :: sl ->
         begin match get_val ifun.get_vother s env, sl with
           Some (VVother f), sl -> f sl
@@ -1431,8 +861,8 @@ let rec interp_ast conf ifun env =
         match f, vl with
           "capitalize", [VVstring s] -> Utf8.capitalize_fst s
         | "interp", [VVstring s] ->
-            let astl = parse_templ conf (Stream.of_string s) in
-            String.concat "" (eval_ast_list env ep astl)
+            let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
+          String.concat "" (eval_ast_list env ep astl)
         | "language_name", [VVstring s] ->
             Translate.language_name s (Util.transl conf "!languages")
         | "nth", [VVstring s1; VVstring s2] ->
@@ -1512,8 +942,11 @@ let rec interp_ast conf ifun env =
     | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
-    | Ainclude (_, astl) :: al ->
-        print_ast_list env ep astl; print_ast_list !m_env ep al
+    | Ainclude (fname, astl) :: al ->
+        include_begin conf fname ;
+        print_ast_list env ep astl;
+        include_end conf fname ;
+        print_ast_list !m_env ep al
     | [a] -> print_ast env ep a
     | a :: al -> print_ast env ep a; print_ast_list env ep al
   and print_define env ep f xl al alk =
@@ -1564,13 +997,15 @@ and print_var print_ast_list conf ifun env ep loc sl =
       | VVother f -> print_var1 f []
     with Not_found ->
       match sl with
-        ["include"; templ] ->
-          begin match Util.open_templ_fname conf templ with
-            Some (_, fname) ->
-              begin match input_templ conf templ with
-                Some astl ->
-                    let () = included_files := (templ, astl) :: !included_files in
-                    print_ast_list env ep (begin_end_include conf fname astl)
+      | [ "include" ; templ ] ->
+        begin match Util.open_templ_fname conf templ with
+          | Some (_, fname) ->
+            begin match input_templ conf templ with
+              | Some astl ->
+                let () = Templ_parser.(included_files := (templ, astl) :: !included_files) in
+                include_begin conf fname ;
+                print_ast_list env ep astl ;
+                include_end conf fname ;
               | None -> Output.printf conf " %%%s?" (String.concat "." sl)
               end
             | None -> Output.printf conf " %%%s?" (String.concat "." sl)
@@ -1598,7 +1033,7 @@ and print_variable conf sl =
       with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl)
 
 let copy_from_templ conf env ic =
-  let astl = parse_templ conf (Stream.of_channel ic) in
+  let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
   close_in ic;
   let ifun =
     {eval_var =
@@ -1610,11 +1045,8 @@ let copy_from_templ conf env ic =
      get_vother = (fun _ -> None); set_vother = (fun _ -> "");
      print_foreach = fun _ -> raise Not_found}
   in
-  let v = !template_file in
-  template_file := "";
-  begin try interp_ast conf ifun env () astl with
-    e -> template_file := v; raise e
-  end;
-  template_file := v
+  Templ_parser.wrap "" begin fun () ->
+    interp_ast conf ifun env () astl
+  end
 
 let _ = Util.copy_from_templ_ref := copy_from_templ

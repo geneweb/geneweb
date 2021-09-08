@@ -17,19 +17,13 @@ let error_cannot_access conf fname =
   Hutil.trailer conf
 
 let gen_interp header conf fname ifun env ep =
-  let v = !(Templ.template_file) in
-  Templ.template_file := fname;
-  begin try
-      match Templ.input_templ conf fname with
-      | Some astl ->
-        if header then Util.html conf;
-        let full_name = Util.etc_file_name conf fname in
-        Templ.interp_ast conf ifun env ep
-          (Templ.begin_end_include conf full_name astl)
-      | None -> error_cannot_access conf fname
-    with e -> Templ.template_file := v; raise e
-  end;
-  Templ.template_file := v
+  Geneweb.Templ_parser.wrap fname begin fun () ->
+    match Templ.input_templ conf fname with
+    | Some astl ->
+      if header then Util.html conf;
+      Templ.interp_ast conf ifun env ep astl
+    | None -> error_cannot_access conf fname
+  end
 
 let templ
   : (?no_headers:bool -> string -> config -> base -> person -> unit) ref
