@@ -68,7 +68,7 @@ let get_compound_var =
       [< ''.'; s = get_ident 0; sl = var_kont >] -> s :: sl
     | [< >] -> []
   in
-  parser bp [< v = get_ident 0; vl = var_kont >] ep -> (bp, ep), v, vl
+  parser bp [< v = get_ident 0; vl = var_kont >] ep -> ("", bp, ep), v, vl
 
 let get_variable =
   let rec var_kont =
@@ -78,13 +78,13 @@ let get_variable =
     | [< >] -> []
   in
   parser bp
-    [< ''%' >] ep -> (bp, ep), "%", []
-  | [< ''/' >] ep -> (bp, ep), "/", []
-  | [< ''[' >] ep -> (bp, ep), "[", []
-  | [< '']' >] ep -> (bp, ep), "]", []
-  | [< ''(' >] ep -> (bp, ep), "(", []
-  | [< '')' >] ep -> (bp, ep), ")", []
-  | [< v = get_ident 0; vl = var_kont >] ep -> (bp, ep), v, vl
+    [< ''%' >] ep -> ("", bp, ep), "%", []
+  | [< ''/' >] ep -> ("", bp, ep), "/", []
+  | [< ''[' >] ep -> ("", bp, ep), "[", []
+  | [< '']' >] ep -> ("", bp, ep), "]", []
+  | [< ''(' >] ep -> ("", bp, ep), "(", []
+  | [< '')' >] ep -> ("", bp, ep), ")", []
+  | [< v = get_ident 0; vl = var_kont >] ep -> ("", bp, ep), v, vl
 
 let rec transl_num_index =
   parser
@@ -130,53 +130,53 @@ and parse_spaces_after_comment =
 let rec get_token =
   parser bp
     [< '' ' | '\t' | '\n' | '\r'; a = get_token ?! >] -> a
-  | [< ''(' >] ep -> Tok ((bp, ep), LPAREN)
-  | [< '')' >] ep -> Tok ((bp, ep), RPAREN)
-  | [< '',' >] ep -> Tok ((bp, ep), COMMA)
-  | [< ''.' >] ep -> Tok ((bp, ep), DOT)
-  | [< ''=' >] ep -> Tok ((bp, ep), EQUAL)
-  | [< ''+' >] ep -> Tok ((bp, ep), PLUS)
-  | [< ''-' >] ep -> Tok ((bp, ep), MINUS)
-  | [< ''*' >] ep -> Tok ((bp, ep), STAR)
-  | [< ''^' >] ep -> Tok ((bp, ep), EXP)
-  | [< ''/' >] ep -> Tok ((bp, ep), DIV)
+  | [< ''(' >] ep -> Tok (("", bp, ep), LPAREN)
+  | [< '')' >] ep -> Tok (("", bp, ep), RPAREN)
+  | [< '',' >] ep -> Tok (("", bp, ep), COMMA)
+  | [< ''.' >] ep -> Tok (("", bp, ep), DOT)
+  | [< ''=' >] ep -> Tok (("", bp, ep), EQUAL)
+  | [< ''+' >] ep -> Tok (("", bp, ep), PLUS)
+  | [< ''-' >] ep -> Tok (("", bp, ep), MINUS)
+  | [< ''*' >] ep -> Tok (("", bp, ep), STAR)
+  | [< ''^' >] ep -> Tok (("", bp, ep), EXP)
+  | [< ''/' >] ep -> Tok (("", bp, ep), DIV)
   | [< ''%';
        a =
          parser
            [< ''('; _ = parse_comment; a = get_token ?! >] -> a
-         | [< >] ep -> Tok ((bp, ep), PERCENT) >] ->
+         | [< >] ep -> Tok (("", bp, ep), PERCENT) >] ->
       a
-  | [< ''!'; ''=' ?? "'=' expected" >] ep -> Tok ((bp, ep), BANGEQUAL)
+  | [< ''!'; ''=' ?? "'=' expected" >] ep -> Tok (("", bp, ep), BANGEQUAL)
   | [< ''>';
        tok =
          parser
            [< ''=' >] -> GREATEREQUAL
          | [< >] -> GREATER ?! >] ep ->
-      Tok ((bp, ep), tok)
+      Tok (("", bp, ep), tok)
   | [< ''<';
        tok =
          parser
            [< ''=' >] -> LESSEQUAL
          | [< >] -> LESS ?! >] ep ->
-      Tok ((bp, ep), tok)
-  | [< ''"'; s = get_string 0 >] ep -> Tok ((bp, ep), STRING s)
+      Tok (("", bp, ep), tok)
+  | [< ''"'; s = get_string 0 >] ep -> Tok (("", bp, ep), STRING s)
   | [< ''0'..'9' as c; s = get_int (Buff.store 0 c) >] ep ->
-      Tok ((bp, ep), INT s)
+      Tok (("", bp, ep), INT s)
   | [< ''['; upp, s, n = lexicon_word >] ep ->
-      Tok ((bp, ep), LEXICON (upp, s, n))
-  | [< s = get_ident 0 >] ep -> Tok ((bp, ep), IDENT s)
+      Tok (("", bp, ep), LEXICON (upp, s, n))
+  | [< s = get_ident 0 >] ep -> Tok (("", bp, ep), IDENT s)
 
 module Buff2 = Buff.Make (struct  end)
 
 let rec parse_var =
   parser [< 'Tok (loc, IDENT id); loc, idl = ident_list loc >] -> loc, id, idl
-and ident_list (bp, _ as loc) =
+and ident_list (_, bp, _ as loc) =
   parser
     [< 'Tok (_, DOT);
        loc, id =
          (parser
-            [< 'Tok ((_, ep), IDENT id) >] -> (bp, ep), id
-          | [< 'Tok ((_, ep), INT id) >] -> (bp, ep), id
+            [< 'Tok ((_, _, ep), IDENT id) >] -> ("", bp, ep), id
+          | [< 'Tok ((_, _, ep), INT id) >] -> ("", bp, ep), id
           | [< 'Tok (loc, _) >] -> loc, "parse_error1");
        loc, idl = ident_list loc >] ->
       loc, id :: idl
@@ -394,9 +394,9 @@ let included_files = ref []
 
 let begin_end_include conf fname al =
   if conf.debug then
-    Atext ((0,0), "\n\n<!-- begin include " ^ fname ^ " -->\n")
+    Atext (("",0,0), "\n\n<!-- begin include " ^ fname ^ " -->\n")
     :: al
-    @ [ Atext ((0,0), "<!-- end include " ^ fname ^ " -->\n") ]
+    @ [ Atext (("",0,0), "<!-- end include " ^ fname ^ " -->\n") ]
   else al
 
 let parse_templ conf strm =
@@ -405,11 +405,11 @@ let parse_templ conf strm =
       [< ''%' >] ->
         let astl =
           if len = 0 then astl
-          else Atext ((bp - len, bp), Buff2.get len) :: astl
+          else Atext (("", bp - len, bp), Buff2.get len) :: astl
         in
         begin match get_variable strm with
           _, ("%" | "[" | "]" as c), [] ->
-            parse_astl (Atext ((bp - 1, bp), c) :: astl) false 0 end_list strm
+            parse_astl (Atext (("", bp - 1, bp), c) :: astl) false 0 end_list strm
         | _, "(", [] ->
             parse_comment strm; parse_astl astl false 0 end_list strm
         | _, v, [] when List.mem v end_list -> List.rev astl, v
@@ -425,21 +425,21 @@ let parse_templ conf strm =
               | _, "expr", [] -> parse_expr_stmt strm
               | _, "for", [] -> parse_for strm
               | _, "wid_hei", [] -> Awid_hei (get_value 0 strm)
-              | (_, ep), v, vl -> Avar ((bp, ep), v, vl)
+              | (_, _, ep), v, vl -> Avar (("", bp, ep), v, vl)
             in
             parse_astl (ast :: astl) false 0 end_list strm
         end
     | [< ''[' >] ->
         let astl =
           if len = 0 then astl
-          else Atext ((bp - len, bp), Buff2.get len) :: astl
+          else Atext (("", bp - len, bp), Buff2.get len) :: astl
         in
         let a =
           let (upp, s, n) = lexicon_word strm in
           if String.length s > 1 && (s.[0] = '[' || s.[0] = '@') then
             let (astl, _) = parse_astl [] false 0 [] (Stream.of_string s) in
-            Aconcat ((bp, Stream.count strm), astl)
-          else Atransl ((bp, Stream.count strm), upp, s, n)
+            Aconcat (("", bp, Stream.count strm), astl)
+          else Atransl (("", bp, Stream.count strm), upp, s, n)
         in
         parse_astl (a :: astl) false 0 end_list strm
     | [< 'c >] ->
@@ -450,7 +450,7 @@ let parse_templ conf strm =
     | [< >] ->
         let astl =
           if len = 0 then astl
-          else Atext ((bp - len, bp), Buff2.get len) :: astl
+          else Atext (("", bp - len, bp), Buff2.get len) :: astl
         in
         List.rev astl, ""
   and parse_define astl end_list strm =
@@ -475,7 +475,7 @@ let parse_templ conf strm =
         Some (f, xl, al) -> Adefine (f, xl, al, alk) :: astl
       | None ->
           let bp = Stream.count strm - 1 in
-          Atext ((bp, bp + 1), "define error") :: (alk @ astl)
+          Atext (("", bp, bp + 1), "define error") :: (alk @ astl)
     in
     List.rev astl, v
   and parse_let astl end_list strm =
@@ -489,7 +489,7 @@ let parse_templ conf strm =
             Alet (k, v, al), tok
       with Stream.Failure | Stream.Error _ ->
         let bp = Stream.count strm - 1 in
-        Atext ((bp, bp + 1), "let syntax error"), ""
+        Atext (("", bp, bp + 1), "let syntax error"), ""
     in
     List.rev (ast :: astl), tok
   and parse_include astl end_list strm =
@@ -530,15 +530,15 @@ let parse_templ conf strm =
                 in
                 loop ()
               in
-              Aapply ((bp, Stream.count strm), f, all)
+              Aapply (("", bp, Stream.count strm), f, all)
           | _ -> raise (Stream.Error "'with' expected")
           end
       | [< >] ->
           let el = parse_char_stream parse_tuple strm in
-          Aapply ((bp, Stream.count strm), f, el)
+          Aapply (("", bp, Stream.count strm), f, el)
     with Stream.Failure | Stream.Error _ ->
       let bp = Stream.count strm - 1 in
-      Atext ((bp, bp + 1), "apply syntax error")
+      Atext (("", bp, bp + 1), "apply syntax error")
   and parse_expr_stmt strm = parse_char_stream_semi parse_simple_expr strm
   and parse_if strm =
     let e = parse_char_stream_semi parse_simple_expr strm in
@@ -569,7 +569,7 @@ let parse_templ conf strm =
           Afor (iterator, min, max, al)
     with Stream.Failure | Stream.Error _ ->
       let bp = Stream.count strm - 1 in
-      Atext ((bp, bp + 1), "for syntax error")
+      Atext (("", bp, bp + 1), "for syntax error")
   and parse_foreach strm =
     let (loc, v, vl) = get_compound_var strm in
     let params =
@@ -997,7 +997,7 @@ let loc_of_expr =
   | Aop1 (loc, _, _) -> loc
   | Aop2 (loc, _, _, _) -> loc
   | Aint (loc, _) -> loc
-  | _ -> -1, -1
+  | _ -> "", -1, -1
 
 let templ_eval_var conf =
   function
@@ -1117,7 +1117,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   | Aint (_, s) -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
-let line_of_loc conf fname (bp, ep) =
+let line_of_loc conf fname (_, bp, ep) =
   match Util.open_templ conf fname with
     Some ic ->
       let strm = Stream.of_channel ic in
@@ -1135,7 +1135,7 @@ let line_of_loc conf fname (bp, ep) =
   | None -> None
 
 let template_file = ref ""
-let print_error conf (bp, ep) exc =
+let print_error conf (_, bp, ep) exc =
   incr nb_errors;
   if !nb_errors <= 10 then
     begin
@@ -1143,7 +1143,7 @@ let print_error conf (bp, ep) exc =
       else Printf.eprintf "File \"%s.txt\"" !template_file;
       let line =
         if !template_file = "" then None
-        else line_of_loc conf !template_file (bp, ep)
+        else line_of_loc conf !template_file ("", bp, ep)
       in
       Printf.eprintf ", ";
       begin match line with
@@ -1484,7 +1484,7 @@ let rec interp_ast conf ifun env =
       if int_min < int_max then
         let instr = String.concat "" (List.map eval_ast al) in
         let accu = accu ^ instr in
-        loop new_env (Aop2 ((0, 0), "+", min, Aint ((0, 0), "1"))) max accu
+        loop new_env (Aop2 (("", 0, 0), "+", min, Aint (("", 0, 0), "1"))) max accu
       else accu
     in
     loop env min max ""
@@ -1549,7 +1549,7 @@ let rec interp_ast conf ifun env =
       in
       if int_min < int_max then
         let _ = print_ast_list new_env ep al in
-        loop new_env (Aop2 ((0, 0), "+", min, Aint ((0, 0), "1"))) max
+        loop new_env (Aop2 (("", 0, 0), "+", min, Aint (("", 0, 0), "1"))) max
     in
     loop env min max
   in

@@ -1323,7 +1323,7 @@ let extract_var sini s =
 
 let template_file = ref "perso.txt"
 
-let warning_use_has_parents_before_parent (bp, ep) var r =
+let warning_use_has_parents_before_parent (_, bp, ep) var r =
   if Sys.unix then
     begin
       Printf.eprintf "*** <W> %s" !template_file;
@@ -1338,7 +1338,7 @@ let warning_use_has_parents_before_parent (bp, ep) var r =
 
 let obsolete_list = ref []
 
-let obsolete (bp, ep) version var new_var r =
+let obsolete (_, bp, ep) version var new_var r =
   if List.mem var !obsolete_list then r
   else if Sys.unix then
     begin
