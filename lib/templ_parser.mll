@@ -128,7 +128,7 @@ rule parse_ast conf b closing ast = parse
             | `variable ["for"] -> parse_for conf b lexbuf
             | `variable ["wid_hei"] -> Awid_hei (value lexbuf)
             | `variable (hd :: tl) -> Avar (pos, hd, tl)
-            | _ -> assert false
+          [@@warning "-8"]
           in
           parse_ast conf b closing (a :: ast) lexbuf
     }
@@ -525,20 +525,22 @@ and parse_let conf b closing ast = parse
 
 and parse_include conf b closing ast = parse
   | value as file {
-      let a =
+      let ast =
         match List.assoc_opt file !included_files with
-        | Some ast -> Ainclude (file, ast)
+        | Some a -> Ainclude (file, a) :: ast
         | None ->
           match Util.open_templ_fname conf file with
           | Some (ic, fname) ->
             let lex2 = Lexing.from_channel ic in
-            let (ast, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
+            let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
             let () = close_in ic in
-            let () = included_files := (file, ast) :: !included_files in
-            Ainclude (file, ast)
-          | None -> assert false
+            let () = included_files := (file, a) :: !included_files in
+            Ainclude (file, a) :: ast
+          | None ->
+            !GWPARAM.syslog `LOG_WARNING ("Missing template: " ^ file) ;
+            ast
       in
-      parse_ast conf b closing (a :: ast) lexbuf
+      parse_ast conf b closing ast lexbuf
     }
 
 and parse_apply conf b = parse
