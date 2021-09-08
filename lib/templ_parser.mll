@@ -21,7 +21,9 @@ let rec dump_ast trk depth =
   let dump_ast a = if depth > 0 then dump_ast trk (depth - 1) a else "..." in
   let dump_ast_list a = if depth > 0 then dump_list dump_ast a else "..." in
   let dump_ast_list_list a = if depth > 0 then dump_list dump_ast_list a else "..." in
-  let trk s = if String.length s > trk then String.sub s 0 trk ^ "..." else s in
+  let trk s =
+    let s = Str.global_replace (Str.regexp "\n") " " s in
+    if String.length s > trk then String.sub s 0 trk ^ "..." else s in
   function
   | Atext (_, a) ->
     "(Atext " ^ trk a ^ ")"
