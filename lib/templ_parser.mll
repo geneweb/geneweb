@@ -3,6 +3,19 @@
 open Config
 open TemplAst
 
+let current_file = ref ""
+
+let wrap fname fn =
+  let old = !current_file in
+  current_file := fname ;
+  try
+    let r = fn () in
+    current_file := old ;
+    r
+  with e ->
+    current_file := old ;
+    raise e
+
 let dump_list pp a = String.concat ";" (List.map pp a)
 let rec dump_ast trk depth =
   let dump_ast a = if depth > 0 then dump_ast trk (depth - 1) a else "..." in
@@ -45,7 +58,7 @@ let dump_ast ?(truncate=max_int) ?(depth=max_int) a = dump_ast truncate depth a
 
 let dummy_pos = (-1, -1)
 
-let pos lex = Lexing.lexeme_start lex, Lexing.lexeme_end lex
+let pos lex = !current_file, Lexing.lexeme_start lex, Lexing.lexeme_end lex
 
 let included_files = ref []
 
@@ -53,7 +66,7 @@ let flush ast b lexbuf =
   let s = Buffer.contents b in
   let ast =
     if s = "" then ast
-    else Atext ((lexbuf.Lexing.lex_curr_pos - String.length s, lexbuf.Lexing.lex_curr_pos), s) :: ast
+    else Atext ((!current_file, lexbuf.Lexing.lex_curr_pos - String.length s, lexbuf.Lexing.lex_curr_pos), s) :: ast
   in
   let () = Buffer.reset b in
   ast
@@ -325,8 +338,7 @@ and parse_simple_expr = parse
       let pos = pos lexbuf in
       let [@warning "-8"] hd :: tl = String.split_on_char '.' id in
       try
-        let t = parse_tuple lexbuf in
-        Aapply (pos, hd, t)
+        Aapply (pos, hd, parse_tuple lexbuf)
       with _ -> Avar (pos, hd, tl)
     }
 
@@ -494,11 +506,9 @@ and skip_ws = parse
 and parse_define conf b closing ast = parse
   | ws* (r_ident as f) ws* '(' {
       let args = parse_params lexbuf in
-      let (al, _) = parse_ast conf b ["end"] [] lexbuf in
-      let (alk, tok) = parse_ast conf b closing [] lexbuf in
-      ( List.rev (Adefine (f, args, al, alk) :: ast)
-      , tok
-      )
+      let (a, _) = parse_ast conf b ["end"] [] lexbuf in
+      let (k, t) = parse_ast conf b closing [] lexbuf in
+      (List.rev (Adefine (f, args, a, k) :: ast), t)
     }
 and parse_params = parse
   | ws* (r_ident as a) {
@@ -518,10 +528,8 @@ and parse_params_1 = parse
 and parse_let conf b closing ast = parse
   |  ws* (r_ident as k) ';' ws* {
       let (v, _) = parse_ast conf b ["in"] [] lexbuf in
-      let (al, tok) = parse_ast conf b closing [] lexbuf in
-      ( List.rev (Alet (k, v, al) :: ast)
-      , tok
-      )
+      let (a, t) = parse_ast conf b closing [] lexbuf in
+      (List.rev (Alet (k, v, a) :: ast), t)
     }
 
 and parse_include conf b closing ast = parse
@@ -532,11 +540,13 @@ and parse_include conf b closing ast = parse
         | None ->
           match Util.open_templ_fname conf file with
           | Some (ic, fname) ->
-            let lex2 = Lexing.from_channel ic in
-            let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
-            let () = close_in ic in
-            let () = included_files := (file, a) :: !included_files in
-            Ainclude (file, a) :: ast
+            wrap fname begin fun () ->
+              let lex2 = Lexing.from_channel ic in
+              let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
+              let () = close_in ic in
+              let () = included_files := (file, a) :: !included_files in
+              Ainclude (file, a) :: ast
+            end
           | None ->
             !GWPARAM.syslog `LOG_WARNING ("Missing template: " ^ file) ;
             ast

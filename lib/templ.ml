@@ -17,11 +17,12 @@ let input_templ conf fname =
   match Util.open_templ_fname conf fname with
   | None -> None
   | Some (ic, fname) ->
-    let lex = Lexing.from_channel ic in
-    (* Lexing.set_filename lex fname ; *)(* only for OCaml >= 4.11 *)
-    let r = Templ_parser.parse_templ conf lex in
-    close_in ic ;
-    Some r
+    Templ_parser.wrap fname begin fun () ->
+      let lex = Lexing.from_channel ic in
+      let r = Templ_parser.parse_templ conf lex in
+      close_in ic ;
+      Some r
+    end
 
 (* Common evaluation functions *)
 
@@ -390,7 +391,7 @@ let loc_of_expr =
   | Aop1 (loc, _, _) -> loc
   | Aop2 (loc, _, _, _) -> loc
   | Aint (loc, _) -> loc
-  | _ -> -1, -1
+  | _ -> "", -1, -1
 
 let templ_eval_var conf =
   function
@@ -431,7 +432,7 @@ let int_of e =
     VVstring s ->
       begin try int_of_string s with
         Failure _ ->
-          raise
+          raise_with_loc (loc_of_expr e)
             (Failure ("int value expected\nFound = " ^ s))
       end
   | VVbool _ | VVother _ ->
@@ -442,7 +443,7 @@ let num_of e =
     VVstring s ->
       begin try Sosa.of_string s with
         Failure _ ->
-          raise
+          raise_with_loc (loc_of_expr e)
             (Failure ("num value expected\nFound = " ^ s))
       end
   | VVbool _ | VVother _ ->
@@ -451,12 +452,12 @@ let num_of e =
 let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   function
     Atext (_, s) -> VVstring s
-  | Avar (loc, s, sl) ->
+  | Avar (loc, s, sl) as e ->
       begin try eval_var loc (s :: sl) with
         Not_found ->
           begin try templ_eval_var conf (s :: sl) with
             Not_found ->
-              raise
+              raise_with_loc (loc_of_expr e)
                 (Failure
                    ("unbound var \"" ^ String.concat "." (s :: sl) ^ "\""))
           end
@@ -513,28 +514,30 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
 let line_of_loc conf fname (bp, ep) =
   match Util.open_templ conf fname with
   | Some ic ->
-    let rec line i =
-      let rec column j =
-        if j < bp
-        then match input_char ic with
+    begin try
+        let rec line i =
+        let rec column j =
+          if j < bp
+          then match input_char ic with
           | '\n' -> line (i + 1)
           | _ -> column (j + 1)
-        else
-          (i, j, j + ep - bp)
-      in column 0
+          else
+            (i, j, j + ep - bp)
+        in column 0
     in Some (line 0)
+      with _ -> None
+    end
   | None -> None
 
-let template_file = ref ""
-let print_error conf (bp, ep) exc =
+let print_error conf (fname, bp, ep) exc =
   incr nb_errors;
   if !nb_errors <= 10 then
     begin
-      if !template_file = "" then Printf.eprintf "*** <W> template file"
-      else Printf.eprintf "File \"%s.txt\"" !template_file;
+      if fname = "" then Printf.eprintf "*** <W> template file"
+      else Printf.eprintf "File %s" fname;
       let line =
-        if !template_file = "" then None
-        else line_of_loc conf !template_file (bp, ep)
+        if fname = "" then None
+        else line_of_loc conf fname (bp, ep)
       in
       Printf.eprintf ", ";
       begin match line with
@@ -875,7 +878,7 @@ let rec interp_ast conf ifun env =
       if int_min < int_max then
         let instr = String.concat "" (List.map eval_ast al) in
         let accu = accu ^ instr in
-        loop new_env (Aop2 ((0, 0), "+", min, Aint ((0, 0), "1"))) max accu
+        loop new_env (Aop2 (("", 0, 0), "+", min, Aint (("", 0, 0), "1"))) max accu
       else accu
     in
     loop env min max ""
@@ -943,7 +946,7 @@ let rec interp_ast conf ifun env =
       in
       if int_min < int_max then
         let _ = print_ast_list new_env ep al in
-        loop new_env (Aop2 ((0, 0), "+", min, Aint ((0, 0), "1"))) max
+        loop new_env (Aop2 (("", 0, 0), "+", min, Aint (("", 0, 0), "1"))) max
     in
     loop env min max
   in
@@ -1006,11 +1009,8 @@ let copy_from_templ conf env ic =
      get_vother = (fun _ -> None); set_vother = (fun _ -> "");
      print_foreach = fun _ -> raise Not_found}
   in
-  let v = !template_file in
-  template_file := "";
-  begin try interp_ast conf ifun env () astl with
-    e -> template_file := v; raise e
-  end;
-  template_file := v
+  Templ_parser.wrap "" begin fun () ->
+    interp_ast conf ifun env () astl
+  end
 
 let _ = Util.copy_from_templ_ref := copy_from_templ

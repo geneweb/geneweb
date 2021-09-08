@@ -17,7 +17,7 @@ type ast =
   | Aop2 of loc * string * ast * ast
   | Aint of loc * string
   | Ainclude of string * ast list
-and loc = (int * int)
+and loc = (string * int * int)
 
 type 'a expr_val =
   | VVbool of bool

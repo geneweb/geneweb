@@ -24,7 +24,6 @@ val interp_ast :
 
 (**)
 
-val template_file : string ref
 val input_templ : config -> string -> ast list option
 val print_copyright : config -> unit
 val print_copyright_with_logo : config -> unit
