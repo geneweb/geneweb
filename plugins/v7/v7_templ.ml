@@ -46,17 +46,17 @@ let rec subst sf = function
   | Atext (loc, s) -> Atext (loc, sf s)
   | Avar (loc, s, sl) ->
       let s1 = sf s in
-      let sl1 = List.map sf sl in
       if sl = [] &&
          (try let _ = int_of_string s1 in true with Failure _ -> false)
       then
         Aint (loc, s1)
-      else
-        let lex = Lexing.from_string s1 in
-        let [@warning "-8"] s2 :: sl2 = Templ_parser.compound_var lex in
-        if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
-        then Avar (loc, s2, sl2 @ sl1)
-        else Avar (loc, s1, sl1)
+      else begin
+        let sl1 = List.map sf sl in
+        match String.split_on_char '.' s1 with
+        | [_] -> Avar (loc, s1, sl1)
+        | s2 :: sl2 -> Avar (loc, s2, sl2 @ sl1)
+        | _ -> assert false
+      end
   | Atransl (loc, b, s, c) -> Atransl (loc, b, sf s, c)
   | Aconcat (loc, al) -> Aconcat (loc, List.map (subst sf) al)
   | Awid_hei s -> Awid_hei (sf s)
@@ -65,6 +65,13 @@ let rec subst sf = function
       (* Dans le cas d'une "compound variable", il faut la décomposer. *)
       (* Ex: "ancestor.father".family  =>  ancestor.father.family      *)
       let s1 = sf s in
+      let sl1 = List.map sf sl in
+      let (s, sl) =
+        match String.split_on_char '.' s1 (* Templ_parser.compound_var lex *) with
+        | [_] -> s1, sl1
+        | s2 :: sl2 -> s2, List.rev_append (List.rev_map sf sl2) sl1
+        | _ -> assert false
+      in
       let lex = Lexing.from_string s1 in
       let [@warning "-8"] s2 :: sl2 = Templ_parser.compound_var lex in
       let (s, sl) =
@@ -72,8 +79,7 @@ let rec subst sf = function
         then s2, sl2 @ sl
         else s, sl
       in
-      Aforeach
-        ((loc, sf s, List.map sf sl), List.map (substl sf) pl, substl sf al)
+      Aforeach ((loc, s, sl), List.map (substl sf) pl, substl sf al)
   | Afor (i, min, max, al) ->
       Afor (sf i, subst sf min, subst sf max, substl sf al)
   | Adefine (f, xl, al, alk) ->
@@ -547,25 +553,9 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   | Aint (_, s) -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
-let line_of_loc conf fname (bp, ep) =
-  match Util.open_templ conf fname with
-  | Some ic ->
-    begin try
-        let rec line i =
-        let rec column j =
-          if j < bp
-          then match input_char ic with
-          | '\n' -> line (i + 1)
-          | _ -> column (j + 1)
-          else
-            (i, j, j + ep - bp)
-        in column 0
-    in Some (line 0)
-      with _ -> None
-    end
-  | None -> None
+let line_of_loc = Templ_parser.line_of_loc
 
-let print_error conf (fname, bp, ep) exc =
+let print_error conf ((fname, bp, ep) as pos) exc =
   incr nb_errors;
   if !nb_errors <= 10 then
     begin
@@ -573,7 +563,7 @@ let print_error conf (fname, bp, ep) exc =
       else Printf.eprintf "File %s" fname;
       let line =
         if fname = "" then None
-        else line_of_loc conf fname (bp, ep)
+        else line_of_loc conf pos
       in
       Printf.eprintf ", ";
       begin match line with

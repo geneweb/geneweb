@@ -1323,18 +1323,12 @@ let extract_var sini s =
 
 let template_file = ref "perso.txt"
 
-let warning_use_has_parents_before_parent (_, bp, ep) var r =
-  if Sys.unix then
-    begin
-      Printf.eprintf "*** <W> %s" !template_file;
-      Printf.eprintf ", chars %d-%d" bp ep;
-      Printf.eprintf "\
-: since v5.00, must test \"has_parents\" before using \"%s\"\n"
-        var;
-      flush stderr;
-      r
-    end
-  else r
+let warning_use_has_parents_before_parent (fname, bp, ep) var r =
+  Printf.sprintf
+    "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
+    fname bp ep var
+  |> !Geneweb.GWPARAM.syslog `LOG_WARNING ;
+  r
 
 let obsolete_list = ref []
 
