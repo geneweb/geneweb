@@ -3,19 +3,6 @@
 open Config
 open TemplAst
 
-let current_file = ref ""
-
-let wrap fname fn =
-  let old = !current_file in
-  current_file := fname ;
-  try
-    let r = fn () in
-    current_file := old ;
-    r
-  with e ->
-    current_file := old ;
-    raise e
-
 let dump_list pp a = String.concat ";" (List.map pp a)
 let rec dump_ast trk depth =
   let dump_ast a = if depth > 0 then dump_ast trk (depth - 1) a else "..." in
@@ -56,11 +43,48 @@ let rec dump_ast trk depth =
   | Ainclude (a, b) ->
     "(Ainclude " ^ trk a ^ "," ^ dump_ast_list b ^ ")"
 
-let dump_ast ?(truncate=max_int) ?(depth=max_int) a = dump_ast truncate depth a
+let current_file = ref ""
+
+let wrap fname fn =
+  let old = !current_file in
+  current_file := fname ;
+  try
+    let r = fn () in
+    current_file := old ;
+    r
+  with e ->
+    current_file := old ;
+    raise e
+
+let line_of_loc conf (fname, bp, ep) =
+  match Util.open_templ conf fname with
+  | Some ic ->
+    begin try
+      let rec line i =
+      let rec column j =
+          if j < bp
+          then match input_char ic with
+          | '\n' -> line (i + 1)
+          | _ -> column (j + 1)
+          else
+            (i, bp - j, ep - j)
+        in column 0
+    in Some (line 0)
+      with _ -> None
+    end
+  | None -> None
 
 let dummy_pos = (-1, -1)
 
 let pos lex = !current_file, Lexing.lexeme_start lex, Lexing.lexeme_end lex
+
+exception Templ_parser_exc of string * int * int
+
+let fail lex ?(pos = pos lex) () =
+  let (file, bp, ep) = pos in
+  raise (Templ_parser_exc (file, bp, ep))
+
+let dump_ast ?(truncate=max_int) ?(depth=max_int) a = dump_ast truncate depth a
 
 let included_files = ref []
 
@@ -156,8 +180,10 @@ rule parse_ast conf b closing ast = parse
         let (upp, s, n) = lexicon_word lexbuf in
         if String.length s > 1 && (s.[0] = '[' || s.[0] = '@')
         then
-          let (ast, _) = parse_ast conf b [] [] (Lexing.from_string s) in
-          Aconcat (pos, ast)
+          try
+            let (ast, _) = parse_ast conf b [] [] (Lexing.from_string s) in
+            Aconcat (pos, ast)
+          with _ -> fail lexbuf ~pos ()
         else
           Atransl (pos, upp, s, n)
       in
@@ -544,10 +570,12 @@ and parse_include conf b closing ast = parse
           | Some (ic, fname) ->
             wrap fname begin fun () ->
               let lex2 = Lexing.from_channel ic in
-              let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
-              let () = close_in ic in
-              let () = included_files := (file, a) :: !included_files in
-              Ainclude (file, a) :: ast
+              try
+                let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
+                let () = close_in ic in
+                let () = included_files := (file, a) :: !included_files in
+                Ainclude (file, a) :: ast
+              with _ -> fail lex2 ()
             end
           | None ->
             !GWPARAM.syslog `LOG_WARNING ("Missing template: " ^ file) ;
@@ -628,8 +656,11 @@ and parse_foreach_params = parse
 {
 
   let parse_templ conf lexbuf =
-    parse_ast conf (Buffer.create 1024) [] [] lexbuf
-    |> fst
-    |> strip_newlines_after_variables
+    let ast, _ =
+      try parse_ast conf (Buffer.create 1024) [] [] lexbuf
+      with Templ_parser_exc _ as e -> raise e
+         | _ -> fail lexbuf ()
+    in
+    strip_newlines_after_variables ast
 
 }

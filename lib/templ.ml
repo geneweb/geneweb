@@ -504,25 +504,9 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   | Aint (_, s) -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
-let line_of_loc conf fname (bp, ep) =
-  match Util.open_templ conf fname with
-  | Some ic ->
-    begin try
-        let rec line i =
-        let rec column j =
-          if j < bp
-          then match input_char ic with
-          | '\n' -> line (i + 1)
-          | _ -> column (j + 1)
-          else
-            (i, j, j + ep - bp)
-        in column 0
-    in Some (line 0)
-      with _ -> None
-    end
-  | None -> None
+let line_of_loc = Templ_parser.line_of_loc
 
-let print_error conf (fname, bp, ep) exc =
+let print_error conf ((fname, bp, ep) as pos) exc =
   incr nb_errors;
   if !nb_errors <= 10 then
     begin
@@ -530,7 +514,7 @@ let print_error conf (fname, bp, ep) exc =
       else Printf.eprintf "File %s" fname;
       let line =
         if fname = "" then None
-        else line_of_loc conf fname (bp, ep)
+        else line_of_loc conf pos
       in
       Printf.eprintf ", ";
       begin match line with
