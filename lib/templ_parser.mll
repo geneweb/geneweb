@@ -371,7 +371,7 @@ and parse_tuple_1 = parse
     }
 and parse_expr_list = parse
   | ws* {
-      let x = parse_expr lexbuf in
+      let x = parse_expr_3 lexbuf in
       parse_expr_list_1 x lexbuf
     }
 and parse_expr_list_1 x = parse
