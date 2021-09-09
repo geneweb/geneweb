@@ -45,16 +45,13 @@ let rec subst sf = function
   | Atext (loc, s) -> Atext (loc, sf s)
   | Avar (loc, s, sl) ->
     let s1 = sf s in
-    let sl1 = List.map sf sl in
     if sl = [] && try let _ = int_of_string s1 in true with Failure _ -> false
     then Aint (loc, s1)
     else begin
-      let lex = Lexing.from_string s1 in
-      match Templ_parser.compound_var lex with
-      | s2 :: sl2 ->
-        if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
-        then Avar (loc, s2, sl2 @ sl1)
-        else Avar (loc, s1, sl1)
+      let sl1 = List.map sf sl in
+      match String.split_on_char '.' s1 with
+      | [_] -> Avar (loc, s1, sl1)
+      | s2 :: sl2 -> Avar (loc, s2, sl2 @ sl1)
       | _ -> assert false
     end
   | Atransl (loc, b, s, c) -> Atransl (loc, b, sf s, c)
@@ -65,18 +62,14 @@ let rec subst sf = function
     (* Dans le cas d'une "compound variable", il faut la décomposer. *)
     (* Ex: "ancestor.father".family  =>  ancestor.father.family      *)
     let s1 = sf s in
-    let lex = Lexing.from_string s1 in
-    begin match Templ_parser.compound_var lex with
-      | s2 :: sl2 ->
-        let (s, sl) =
-          if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
-          then s2, sl2 @ sl
-          else s, sl
-        in
-        Aforeach
-          ((loc, sf s, List.map sf sl), List.map (substl sf) pl, substl sf al)
+    let sl1 = List.map sf sl in
+    let (s, sl) =
+      match String.split_on_char '.' s1 (* Templ_parser.compound_var lex *) with
+      | [_] -> s1, sl1
+      | s2 :: sl2 -> s2, List.rev_append (List.rev_map sf sl2) sl1
       | _ -> assert false
-    end
+    in
+    Aforeach ((loc, s, sl), List.map (substl sf) pl, substl sf al)
   | Afor (i, min, max, al) ->
     Afor (sf i, subst sf min, subst sf max, substl sf al)
   | Adefine (f, xl, al, alk) ->
