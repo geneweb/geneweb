@@ -57,21 +57,23 @@ let wrap fname fn =
     raise e
 
 let line_of_loc conf (fname, bp, ep) =
-  match try Some (Secure.open_in fname) with _ -> None with
-  | None -> None
+  match Util.open_templ conf
+    (Filename.chop_suffix (Filename.basename fname) ".txt") with
   | Some ic ->
-    try
+    begin try
       let rec line i j =
         let rec column j j0 =
-          if j < bp
-          then match input_char ic with
+            if j < bp
+            then match input_char ic with
             | '\n' -> line (i + 1) (j + 1)
             | _ -> column (j + 1) j0
-          else
-            (i+1, bp - j0, ep - j0)
+            else
+              (i + 1, bp - j0 + 1, ep - j0 + 1)
         in column j j
       in Some (line 0 0)
-    with _ -> None
+      with _ -> None
+    end
+  | None -> None
 
 let dummy_pos = (-1, -1)
 
