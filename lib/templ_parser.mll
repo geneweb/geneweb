@@ -57,23 +57,21 @@ let wrap fname fn =
     raise e
 
 let line_of_loc conf (fname, bp, ep) =
-  match Util.open_templ conf
-    (Filename.chop_suffix (Filename.basename fname) ".txt") with
+  match try Some (Secure.open_in fname) with _ -> None with
+  | None -> None
   | Some ic ->
-    begin try
+    try
       let rec line i j =
         let rec column j j0 =
-            if j < bp
-            then match input_char ic with
+          if j < bp
+          then match input_char ic with
             | '\n' -> line (i + 1) (j + 1)
             | _ -> column (j + 1) j0
-            else
-              (i + 1, bp - j0 + 1, ep - j0 + 1)
+          else
+            (i+1, bp - j0, ep - j0)
         in column j j
       in Some (line 0 0)
-      with _ -> None
-    end
-  | None -> None
+    with _ -> None
 
 let dummy_pos = (-1, -1)
 
@@ -327,6 +325,11 @@ and parse_expr_5_1 e1 = parse
       let pos = pos lexbuf in
       let e2 = parse_simple_expr lexbuf in
       parse_expr_5_1 (Aop2 (pos, String.make 1 op, e1, e2)) lexbuf
+    }
+  | ws* (("/.") as op) {
+      let pos = pos lexbuf in
+      let e2 = parse_simple_expr lexbuf in
+      parse_expr_5_1 (Aop2 (pos, op, e1, e2)) lexbuf
     }
   | ws* {
       e1

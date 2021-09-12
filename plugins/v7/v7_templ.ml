@@ -480,6 +480,17 @@ let int_of e =
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "int value expected")
 
+let float_of e =
+  function
+    VVstring s ->
+      begin try Float.of_string s with
+        Failure _ ->
+          raise_with_loc (loc_of_expr e)
+            (Failure ("float value expected\nFound = " ^ s))
+      end
+  | VVbool _ | VVother _ ->
+      raise_with_loc (loc_of_expr e) (Failure "float value expected")
+
 let num_of e =
   function
     VVstring s ->
@@ -490,6 +501,13 @@ let num_of e =
       end
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "num value expected")
+
+let strip_dot str =
+  let str = if str.[String.length str - 1] = '.' then
+    String.sub str 0 (String.length str - 1)
+    else str
+  in
+  VVstring str
 
 let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   function
@@ -529,6 +547,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       end
   | Aop2 (loc, op, e1, e2) ->
       let int e = int_of e (eval_expr ceva e) in
+      let float e = float_of e (eval_expr ceva e) in
       let num e = num_of e (eval_expr ceva e) in
       let bool e = bool_of e (eval_expr ceva e) in
       let string e = string_of e (eval_expr ceva e) in
@@ -547,6 +566,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       | "*" -> VVstring (string_of_int ((int e1) * (int e2)))
       | "^" -> VVstring (Sosa.to_string (Sosa.exp (num e1) (int e2)))
       | "/" -> VVstring (string_of_int ((int e1) / (int e2)))
+      | "/." -> strip_dot (Float.to_string (Float.div (float e1) (float e2)))
       | "%" -> VVstring (Sosa.to_string (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\""))
       end
