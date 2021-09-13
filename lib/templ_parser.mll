@@ -57,22 +57,21 @@ let wrap fname fn =
     raise e
 
 let line_of_loc conf (fname, bp, ep) =
-  match Util.open_templ conf fname with
+  match try Some (Secure.open_in fname) with _ -> None with
+  | None -> None
   | Some ic ->
-    begin try
-      let rec line i =
-      let rec column j =
+    try
+      let rec line i j =
+        let rec column j j0 =
           if j < bp
           then match input_char ic with
-          | '\n' -> line (i + 1)
-          | _ -> column (j + 1)
+            | '\n' -> line (i + 1) (j + 1)
+            | _ -> column (j + 1) j0
           else
-            (i, bp - j, ep - j)
-        in column 0
-    in Some (line 0)
-      with _ -> None
-    end
-  | None -> None
+            (i+1, bp - j0, ep - j0)
+        in column j j
+      in Some (line 0 0)
+    with _ -> None
 
 let dummy_pos = (-1, -1)
 
