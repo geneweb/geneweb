@@ -87,49 +87,31 @@ let dump_ast ?(truncate=max_int) ?(depth=max_int) a = dump_ast truncate depth a
 
 let included_files = ref []
 
+(* Leading ([' ' '\t' '\r']* '\n') will be removed, except if
+   the previous node is a Atransl. *)
 let flush ast b lexbuf =
   let s = Buffer.contents b in
+  let trim s =
+    let rec loop i =
+      if i = String.length s then s
+      else if s.[i] = ' ' || s.[i] = '\t' || s.[i] = '\r' then
+        loop (i + 1)
+      else if s.[i] = '\n' then
+        String.sub s (i + 1) (String.length s - i - 1)
+      else s
+    in
+    loop 0
+  in
+  let s = match ast with
+    | TemplAst.Atransl _ :: _ | TemplAst.Awid_hei _ :: _ -> s
+    | _ -> trim s
+  in
   let ast =
     if s = "" then ast
     else Atext ((!current_file, lexbuf.Lexing.lex_curr_pos - String.length s, lexbuf.Lexing.lex_curr_pos), s) :: ast
   in
   let () = Buffer.reset b in
   ast
-
-let strip_newlines_after_variables =
-  let rec loop =
-    function
-      TemplAst.Atext (loc, s) :: astl ->
-      let s =
-        let rec loop i =
-          if i = String.length s then s
-          else if s.[i] = ' ' || s.[i] = '\t' || s.[i] = '\r' then
-            loop (i + 1)
-          else if s.[i] = '\n' then
-            String.sub s (i + 1) (String.length s - i - 1)
-          else s
-        in
-        loop 0
-      in
-      if s <> "" then TemplAst.Atext (loc, s) :: loop astl
-      else loop astl
-    | TemplAst.Aif (s, alt, ale) :: astl -> TemplAst.Aif (s, loop alt, loop ale) :: loop astl
-    | TemplAst.Aforeach (v, pl, al) :: astl -> TemplAst.Aforeach (v, pl, loop al) :: loop astl
-    | TemplAst.Adefine (f, x, al, alk) :: astl ->
-      TemplAst.Adefine (f, x, loop al, loop alk) :: loop astl
-    | TemplAst.Aapply (loc, f, all) :: astl ->
-      TemplAst.Aapply (loc, f, List.map loop all) :: loop astl
-    | TemplAst.Alet (k, v, al) :: astl -> TemplAst.Alet (k, loop v, loop al) :: loop astl
-    | TemplAst.Afor (i, min, max, al) :: astl ->
-      TemplAst.Afor (i, min, max, loop al) :: loop astl
-    | (TemplAst.Atransl (_, _, _, _) | TemplAst.Awid_hei _ as ast1) :: (TemplAst.Atext (_, _) as ast2) ::
-      astl ->
-      ast1 :: ast2 :: loop astl
-    | TemplAst.Ainclude (file, al) :: astl -> TemplAst.Ainclude (file, loop al) :: loop astl
-    | ast :: astl -> ast :: loop astl
-    | [] -> []
-  in
-  loop
 
 }
 
@@ -145,6 +127,16 @@ let value = ([^ ' ' '>' ';' '\n' '\r'  '\t' ]+)
 
 rule parse_ast conf b closing ast = parse
 
+  (* Special variable: strip whitespaces coming after this. *)
+  | "%sq;" ws* {
+      parse_ast conf b closing ast lexbuf
+    }
+
+  (* Special variable: strip on newline and its surrounding whitespaces. *)
+  | "%nn;" [ ' ' '\t' '\r' ]* '\n'? [ ' ' '\t' '\r' ]* {
+      parse_ast conf b closing ast lexbuf
+    }
+
   | '%' {
       match match variable lexbuf with `variable [] -> `escaped '%' | x -> x with
       | `escaped c -> Buffer.add_char b c ; parse_ast conf b closing ast lexbuf
@@ -154,7 +146,6 @@ rule parse_ast conf b closing ast = parse
         let ast = flush ast b lexbuf in
         match x with
         | `variable [v] when List.mem v closing -> List.rev ast, v
-        | `variable ["nn"] -> let () = skip_ws lexbuf in parse_ast conf b closing ast lexbuf
         | `variable ["define"] -> parse_define conf b closing ast lexbuf
         | `variable ["let"] -> parse_let conf b closing ast lexbuf
         | `variable ["include"] -> parse_include conf b closing ast lexbuf
@@ -525,11 +516,6 @@ and comment = parse
       comment lexbuf
     }
 
-and skip_ws = parse
-  | ws* {
-      ()
-    }
-
 and parse_define conf b closing ast = parse
   | ws* (r_ident as f) ws* '(' {
       let args = parse_params lexbuf in
@@ -655,11 +641,8 @@ and parse_foreach_params = parse
 {
 
   let parse_templ conf lexbuf =
-    let ast, _ =
-      try parse_ast conf (Buffer.create 1024) [] [] lexbuf
-      with Templ_parser_exc _ as e -> raise e
-         | _ -> fail lexbuf ()
-    in
-    strip_newlines_after_variables ast
+    try parse_ast conf (Buffer.create 1024) [] [] lexbuf |> fst
+    with Templ_parser_exc _ as e -> raise e
+       | _ -> fail lexbuf ()
 
 }
