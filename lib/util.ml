@@ -2883,7 +2883,7 @@ let read_visited conf =
     let ht : cache_visited_t = input_value ic in
     close_in ic;
     ht
-  with Sys_error _ -> Hashtbl.create 1
+  with Sys_error _ -> Hashtbl.create 0
 
 
 (* ************************************************************************ *)

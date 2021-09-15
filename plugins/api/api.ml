@@ -427,16 +427,14 @@ let print_last_visited_persons conf base =
   (* On ne supprime pas le fichier de cache, même après un envoi Gendcom, *)
   (* donc on vérifie que les personnes existent toujours dans la base.    *)
   let list =
-    List.fold_right
-      begin fun (ip, _) accu ->
-        try
-          let p = poi base ip in
-          if apply_filters_p conf filters (Perso.get_single_sosa conf base) p
-          then p :: accu
-          else accu
-        with _ -> accu
-      end
-      list []
+    List.fold_right begin fun (ip, _) acc ->
+      if Gwdb.iper_exists base ip then
+        let p = poi base ip in
+        if apply_filters_p conf filters (Perso.get_single_sosa conf base) p
+        then p :: acc
+        else acc
+      else acc
+    end list []
   in
   let data = conv_data_list_person conf base filters list in
   print_result conf data

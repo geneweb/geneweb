@@ -1031,8 +1031,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
       (fun c -> Array.length (get_children c) > 0)
       (List.map (foi base) faml)
   in
-  let baseprefix = conf.command
-  in
+  let baseprefix = conf.command in
   let visible = is_visible conf base p in
   let index = Int32.of_string @@ Gwdb.string_of_iper gen_p.key_index in
   {
