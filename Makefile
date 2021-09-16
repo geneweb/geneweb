@@ -175,21 +175,21 @@ distrib: build
 
 ###### [END] Installation / Distribution section
 
-doc: | piqi $(GENERATED_FILES_DEP)
+doc: | $(GENERATED_FILES_DEP)
 	dune build @doc
 .PHONY: doc
 
-test: | piqi $(GENERATED_FILES_DEP)
+test: | $(GENERATED_FILES_DEP)
 	dune build @runtest
 .PHONY: test
 
-bench: | piqi $(GENERATED_FILES_DEP)
+bench: | $(GENERATED_FILES_DEP)
 	dune build @runbench
 .PHONY: bench
 
 BENCH_FILE ?= /tmp/geneweb-bench.bin
 
-bench-marshal: | piqi $(GENERATED_FILES_DEP)
+bench-marshal: | $(GENERATED_FILES_DEP)
 ifdef BENCH_NAME
 	dune exec benchmark/bench.exe -- --marshal --name ${BENCH_NAME} ${BENCH_FILE}
 else
@@ -197,7 +197,7 @@ else
 endif
 .PHONY: bench-marshal
 
-bench-tabulate: | piqi $(GENERATED_FILES_DEP)
+bench-tabulate: | $(GENERATED_FILES_DEP)
 	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
 .PHONY: bench-tabulate
 
